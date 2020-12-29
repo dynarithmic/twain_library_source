@@ -1,4 +1,4 @@
-# twain_library_development
+# twain_library_source
 Dynarithmic TWAIN library source and development repository.
 
 This repositiory contains the source code and development versions of the Dynarithmic TWAIN Library DLL and PDB files.  
