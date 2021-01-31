@@ -65,6 +65,33 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsFeederSupported(DTWAIN_SOURCE Source)
     CATCH_BLOCK(false)
 }
 
+DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsAutomaticSenseMediumSupported(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+
+    // Check if automatic sense medium is supported.
+    DTWAIN_ARRAY arr = 0;
+    BOOL bOk = DTWAIN_GetCapValues(Source, DTWAIN_CV_CAPAUTOMATICSENSEMEDIUM, DTWAIN_CAPGETCURRENT, &arr);
+    DTWAINArrayLL_RAII a(arr);
+    if (!bOk)
+        LOG_FUNC_EXIT_PARAMS(false)
+
+        LONG val;
+    DTWAIN_ArrayGetAtLong(arr, 0, &val);
+    if (val == 1)
+        LOG_FUNC_EXIT_PARAMS(true);
+
+    // Enable the automatic sense medium temporarily. 
+    BOOL bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPAUTOMATICSENSEMEDIUM, DTWAIN_CAPSET, arr);
+    if (!bRet)
+        LOG_FUNC_EXIT_PARAMS(false)
+
+    DTWAIN_ArraySetAtLong(arr, 0, 0);
+    bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPAUTOMATICSENSEMEDIUM, DTWAIN_CAPSET, arr);
+    LOG_FUNC_EXIT_PARAMS(bRet)
+        CATCH_BLOCK(false)
+}
+
 DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsFeederLoaded(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
@@ -105,6 +132,18 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsAutoFeedEnabled(DTWAIN_SOURCE Source)
     if (DTWAIN_IsAutoFeedSupported(Source))
     {
         DTWAIN_BOOL bRet = IsFeederEnabledFunc(Source, &CTL_ITwainSource::GetAutoFeedMode);
+        LOG_FUNC_EXIT_PARAMS(bRet)
+    }
+    LOG_FUNC_EXIT_PARAMS(false)
+    CATCH_BLOCK(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsAutomaticSenseMediumEnabled(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    if (DTWAIN_IsAutomaticSenseMediumSupported(Source))
+    {
+        DTWAIN_BOOL bRet = IsFeederEnabledFunc(Source, &CTL_ITwainSource::IsAutomaticSenseMediumEnabledMode);
         LOG_FUNC_EXIT_PARAMS(bRet)
     }
     LOG_FUNC_EXIT_PARAMS(false)
@@ -168,18 +207,38 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnableAutoFeed(DTWAIN_SOURCE Source, DTWAIN_BOOL
 {
     LOG_FUNC_ENTRY_PARAMS((Source, bSet))
     // Check if feeder supported
-    if ( !DTWAIN_IsAutoFeedSupported(Source))
+    if (!DTWAIN_IsAutoFeedSupported(Source))
         LOG_FUNC_EXIT_PARAMS(false)
 
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
 
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    CTL_ITwainSource *p = VerifySourceHandle( pHandle, Source );
+    CTL_ITwainSource* p = VerifySourceHandle(pHandle, Source);
 
     bool bRet = EnableFeederFunc(Source, DTWAIN_CV_CAPAUTOFEED, p,
-                        &CTL_ITwainSource::SetAutoFeedMode, bSet?true:false);
+        &CTL_ITwainSource::SetAutoFeedMode, bSet ? true : false);
     // Call general function to enable feeder
+    LOG_FUNC_EXIT_PARAMS(bRet)
+        CATCH_BLOCK(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnableAutomaticSenseMedium(DTWAIN_SOURCE Source, DTWAIN_BOOL bSet)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, bSet))
+    if (!DTWAIN_IsAutomaticSenseMediumSupported(Source))
+        LOG_FUNC_EXIT_PARAMS(false)
+
+    CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+
+    // See if DLL Handle exists
+    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    CTL_ITwainSource* p = VerifySourceHandle(pHandle, Source);
+
+    // Call general function to enable automatic sense medium
+    bool bRet = EnableFeederFunc(Source, DTWAIN_CV_CAPAUTOMATICSENSEMEDIUM, p,
+        &CTL_ITwainSource::SetAutomaticSenseMediumEnableMode, bSet ? true : false);
+
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
