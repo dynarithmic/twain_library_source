@@ -171,6 +171,21 @@ void RetrieveDib()
     /* Only do this if a source is selected */
     if ( SelectedSource )
    {
+        DTWAIN_BOOL test = DTWAIN_IsFeederSupported(SelectedSource);
+        DTWAIN_BOOL disab = DTWAIN_EnableFeeder(SelectedSource, FALSE);
+        DTWAIN_BOOL feederEnab = DTWAIN_IsFeederEnabled(SelectedSource);
+
+        DTWAIN_BOOL sup = DTWAIN_IsAutomaticSenseMediumSupported(SelectedSource);
+        DTWAIN_BOOL isEnab = DTWAIN_IsAutomaticSenseMediumEnabled(SelectedSource);
+        DTWAIN_BOOL changed = DTWAIN_EnableAutomaticSenseMedium(SelectedSource, !isEnab);
+        DTWAIN_BOOL isDisab = DTWAIN_IsAutomaticSenseMediumEnabled(SelectedSource);
+
+        DTWAIN_BOOL changed2 = DTWAIN_EnableAutomaticSenseMedium(SelectedSource, FALSE);
+        DTWAIN_BOOL isDisab2 = DTWAIN_IsAutomaticSenseMediumEnabled(SelectedSource);
+
+        DTWAIN_BOOL changed3 = DTWAIN_EnableAutomaticSenseMedium(SelectedSource, TRUE);
+        DTWAIN_BOOL isEnab3 = DTWAIN_IsAutomaticSenseMediumEnabled(SelectedSource);
+
         /* Disable the main window */
         EnableWindow(hWndGlobal, FALSE);
 
