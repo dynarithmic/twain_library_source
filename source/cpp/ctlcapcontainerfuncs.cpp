@@ -237,25 +237,8 @@ LONG DLLENTRY_DEF DTWAIN_GetCapArrayType(DTWAIN_SOURCE Source, LONG nCap)
     LONG lDataType = DTWAIN_GetCapDataType(Source, nCap);
     if (lDataType == DTWAIN_FAILURE1)
         LOG_FUNC_EXIT_PARAMS(DTWAIN_FAILURE1)
-    UINT nDataType = lDataType;
-    switch (nDataType)
-    {
-        case TWTY_STR32:
-        case TWTY_STR64:
-        case TWTY_STR128:
-        case TWTY_STR255:
-        case TWTY_STR1024:
-            LOG_FUNC_EXIT_PARAMS(DTWAIN_ARRAYSTRING)
-
-        case TWTY_FRAME:
-            LOG_FUNC_EXIT_PARAMS(DTWAIN_ARRAYFRAME)
-
-        case TWTY_FIX32:
-            LOG_FUNC_EXIT_PARAMS(DTWAIN_ARRAYFLOAT)
-
-        default:
-            LOG_FUNC_EXIT_PARAMS(DTWAIN_ARRAYLONG)
-    }
-    LOG_FUNC_EXIT_PARAMS(DTWAIN_FAILURE1)// DTWAIN_ArrayTypeINVALID;
+    TW_UINT16 nDataType = lDataType;
+    LONG retValue = dynarithmic::GetArrayTypeFromCapType(nDataType);
+    LOG_FUNC_EXIT_PARAMS(retValue)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }

@@ -59,6 +59,29 @@ bool dynarithmic::IsStringCapType(TW_UINT16 nCap)
 bool dynarithmic::IsFrameCapType(TW_UINT16 nCap)
 { return nCap == TWTY_FRAME; }
 
+LONG dynarithmic::GetArrayTypeFromCapType(TW_UINT16 CapType)
+{
+    switch (CapType)
+    {
+        case TWTY_STR32:
+        case TWTY_STR64:
+        case TWTY_STR128:
+        case TWTY_STR255:
+        case TWTY_STR1024:
+            return DTWAIN_ARRAYSTRING;
+
+        case TWTY_FRAME:
+            return DTWAIN_ARRAYFRAME;
+
+        case TWTY_FIX32:
+            return DTWAIN_ARRAYFLOAT;
+
+        default:
+            return DTWAIN_ARRAYLONG;
+     }
+    return -1;
+}
+
 static DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap,
                                                    LONG lGetType, LONG lContainerType,
                                                    LONG nDataType, LPDTWAIN_ARRAY pArray,
@@ -146,12 +169,19 @@ template <typename DataType,
           typename ConvertTo = DataType,
           typename ConverterFn=NullGetCapConverter<DataType, ConvertTo> >
 static DTWAIN_ARRAY performGetCap(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source,
-                           TW_UINT16 lCap, LONG /*nDataType*/, LONG lContainerType,
+                           TW_UINT16 lCap, LONG nDataType, LONG lContainerType,
                            LONG lGetType, LONG overrideDataType, CTL_EnumeratorType eType,
                            LONG oneCapFlag=0)
 {
     DataType dValue;
-    DTWAIN_ARRAY ThisArray = DTWAIN_ArrayCreateFromCap(Source, lCap, 0);
+    DTWAIN_ARRAY ThisArray = NULL;
+    if (overrideDataType == 0xFFFF)
+    {
+        LONG nArrayType = dynarithmic::GetArrayTypeFromCapType(nDataType);
+        ThisArray = DTWAIN_ArrayCreate(nArrayType, 0);
+    }
+    else
+        ThisArray = DTWAIN_ArrayCreateFromCap(Source, lCap, 0);
 
     if (!ThisArray)
         return NULL;
@@ -242,7 +272,7 @@ static bool performSetCap(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, TW_UINT
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapValues( DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LPDTWAIN_ARRAY pArray )
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, pArray))
-    DTWAIN_BOOL bRet = DTWAIN_GetCapValuesEx(Source, lCap, lGetType, DTWAIN_CONTDEFAULT, pArray);
+    DTWAIN_BOOL bRet = DTWAIN_GetCapValuesEx2(Source, lCap, lGetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, pArray);
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -253,16 +283,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapValues( DTWAIN_SOURCE Source, LONG lCap, L
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapValuesEx( DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LONG lContainerType, LPDTWAIN_ARRAY pArray )
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, lContainerType, pArray))
-    DTWAIN_BOOL bRet = FALSE;
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle((DTWAIN_HANDLE)pHandle, Source);
-
-    if( p )
-    {
-        LONG nDataType = DTWAIN_GetCapDataType(Source, (CTL_EnumCapability)lCap);
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]{ return (nDataType < 0);}, nDataType, false, FUNC_MACRO);
-        bRet = DTWAIN_GetCapValuesEx_Internal(Source, (TW_UINT16)lCap, lGetType, DTWAIN_CONTDEFAULT, nDataType, pArray, false);
-    }
+    DTWAIN_BOOL bRet = DTWAIN_GetCapValuesEx2(Source, lCap, lGetType, lContainerType, DTWAIN_DEFAULT, pArray);
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -273,8 +294,20 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap
                                                  LONG nDataType, LPDTWAIN_ARRAY pArray )
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, lContainerType, nDataType,pArray))
-
-    DTWAIN_BOOL bRet = DTWAIN_GetCapValuesEx_Internal(Source, (TW_UINT16)lCap, lGetType, lContainerType, nDataType, pArray, true);
+    DTWAIN_BOOL bRet = FALSE;
+    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    CTL_ITwainSource *p = VerifySourceHandle((DTWAIN_HANDLE)pHandle, Source);
+    if (p)
+    {
+        bool overrideDataType = true;
+        if (nDataType == DTWAIN_DEFAULT)
+        {
+            nDataType = DTWAIN_GetCapDataType(Source, (CTL_EnumCapability)lCap);
+            DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return (nDataType < 0); }, nDataType, false, FUNC_MACRO);
+            overrideDataType = false;
+        }
+        bRet = DTWAIN_GetCapValuesEx_Internal(Source, (TW_UINT16)lCap, lGetType, lContainerType, nDataType, pArray, overrideDataType);
+    }
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
