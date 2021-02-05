@@ -168,20 +168,20 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnableAutoFeed(DTWAIN_SOURCE Source, DTWAIN_BOOL
 {
     LOG_FUNC_ENTRY_PARAMS((Source, bSet))
     // Check if feeder supported
-    if ( !DTWAIN_IsAutoFeedSupported(Source))
+    if (!DTWAIN_IsAutoFeedSupported(Source))
         LOG_FUNC_EXIT_PARAMS(false)
 
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
 
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    CTL_ITwainSource *p = VerifySourceHandle( pHandle, Source );
+    CTL_ITwainSource* p = VerifySourceHandle(pHandle, Source);
 
     bool bRet = EnableFeederFunc(Source, DTWAIN_CV_CAPAUTOFEED, p,
-                        &CTL_ITwainSource::SetAutoFeedMode, bSet?true:false);
+        &CTL_ITwainSource::SetAutoFeedMode, bSet ? true : false);
     // Call general function to enable feeder
     LOG_FUNC_EXIT_PARAMS(bRet)
-    CATCH_BLOCK(false)
+        CATCH_BLOCK(false)
 }
 
 bool EnableFeederFunc(DTWAIN_SOURCE Source, LONG lCap, CTL_ITwainSource* p,
