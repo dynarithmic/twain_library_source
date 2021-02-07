@@ -755,6 +755,7 @@ namespace dynarithmic
     bool IsFloatCapType(TW_UINT16 nCap);
     bool IsStringCapType(TW_UINT16 nCap);
     bool IsFrameCapType(TW_UINT16 nCap);
+    LONG GetArrayTypeFromCapType(TW_UINT16 CapType);
 
     DTWAIN_BOOL    DTWAIN_ArrayFirst(DTWAIN_ARRAY pArray, LPVOID pVariant);
 
