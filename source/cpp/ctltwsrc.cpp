@@ -162,21 +162,22 @@ bool CTL_ITwainSource::IsActive() const
     return m_bActive;
 }
 
-CTL_ITwainSource::CTL_ITwainSource( CTL_ITwainSession *pSession, LPCTSTR lpszProduct )
-                               :
+CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProduct)
+    :
     m_pUserPtr(nullptr),
     CapCacheInfo(),
-    m_bDSMVersion2 ( false ),
+    m_bDSMVersion2(false),
     m_bIsOpened(false),
-    m_SourceId {},
+    m_SourceId{},
     m_pSession(pSession),
     m_bIsSelected(false),
     m_bUIOpened(false),
-    m_bPromptPending ( false ),
+    m_bPromptPending(false),
     m_bActive(true),
     m_hOutWnd(0),
     m_DibArray(std::make_shared<CTL_TwainDibArray>(CTL_TwainDibArray())),
     m_bUseFeeder(true),
+    m_bUseAutomaticSenseMediumEnabledMode(true),
     m_bDibAutoDelete(false),
     m_AcquireType(TWAINAcquireType_Native),
     m_nImageNum(0),
@@ -442,6 +443,16 @@ void CTL_ITwainSource::SetFeederEnableMode( bool bMode )
 bool CTL_ITwainSource::IsFeederEnabledMode() const
 {
     return m_bUseFeeder;
+}
+
+void CTL_ITwainSource::SetAutomaticSenseMediumEnableMode(bool bMode)
+{
+    m_bUseAutomaticSenseMediumEnabledMode = bMode;
+}
+
+bool CTL_ITwainSource::IsAutomaticSenseMediumEnabledMode() const
+{
+    return m_bUseAutomaticSenseMediumEnabledMode;
 }
 
 bool CTL_ITwainSource::CloseSource(bool bForce)

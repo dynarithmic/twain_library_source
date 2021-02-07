@@ -145,6 +145,8 @@ namespace dynarithmic
             bool         RenderImage(int nWhich=0);
             void         SetFeederEnableMode( bool bMode=true);
             bool         IsFeederEnabledMode() const;
+            void         SetAutomaticSenseMediumEnableMode(bool bMode=true);
+            bool         IsAutomaticSenseMediumEnabledMode() const;
             void         SetAutoFeedMode(bool bMode=true) { m_bAutoFeed = bMode; }
             bool         GetAutoFeedMode() const { return m_bAutoFeed; }
             bool         IsDeleteDibOnScan() const { return m_bDeleteOnScan; }
@@ -449,6 +451,7 @@ namespace dynarithmic
             HWND            m_hOutWnd;
             std::shared_ptr<CTL_TwainDibArray> m_DibArray;
             bool            m_bUseFeeder;
+            bool            m_bUseAutomaticSenseMediumEnabledMode;
             bool            m_bDibAutoDelete;
             CTL_StringType  m_strAcquireFile;
             CTL_StringType  m_strLastAcquiredFile;
