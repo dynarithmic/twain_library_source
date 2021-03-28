@@ -387,6 +387,9 @@ namespace dynarithmic
             // Normalization of irregular DIBs
             static HANDLE NormalizeDib(HANDLE hDib);
 
+            // Convert Dib to HBITMAP
+            static HBITMAP DIBToBitmap(HANDLE hDib, HPALETTE hPal = NULL);
+
             static double GetScaleFactorPerInch(LONG Unit);
 
         protected:
