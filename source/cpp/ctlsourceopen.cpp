@@ -131,9 +131,7 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
     DTWAIN_ARRAY PixelTypes;
 
     // enumerate all of the pixel types
-    DTWAIN_BOOL bOK = DTWAIN_GetCapValues(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPGET, &PixelTypes);
-    if (bOK)
-    {
+    DTWAIN_GetCapValues(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPGET, &PixelTypes);
     DTWAINArrayLL_RAII arrP(PixelTypes);
     auto vPixelTypes = EnumeratorVectorPtr<LONG>(PixelTypes);
 
@@ -191,11 +189,8 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
         }
         DTWAIN_SetCapValues(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPRESET, NULL);
     }
-    }
-    if (oldflags && bOK )
+
+    if (oldflags)
         CTL_TwainAppMgr::WriteLogInfo(sBitDepths);
-    else
-    if (!bOK)
-        CTL_TwainAppMgr::WriteLogInfo(_T("Could not retrieve bit depth information\n"));
     p->SetCurrentlyProcessingPixelInfo(false);
 }
