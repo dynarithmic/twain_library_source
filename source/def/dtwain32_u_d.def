@@ -539,8 +539,8 @@ DTWAIN_ResetPDFTextElement                        @9306
 DTWAIN_GetPDFTextElementFloat                     @9307                    
 DTWAIN_GetPDFTextElementLong                      @9308                    
 DTWAIN_GetPDFTextElementString                    @9309                    
-DTWAIN_SetPDFTextElementStringA                   @9310
-DTWAIN_SetPDFTextElementStringW                   @9311
+DTWAIN_SetPDFTextElementStringA					  @9310
+DTWAIN_SetPDFTextElementStringW					  @9311
 DTWAIN_SetTwainDSM                                @9600                    
 DTWAIN_GetTwainAvailability                       @9602                    
 DTWAIN_ArrayCreateFromLong64s                     @9700                    
@@ -898,11 +898,6 @@ DTWAIN_SetResourcePath                            @30080
 DTWAIN_SetResourcePathA                           @30081
 DTWAIN_SetResourcePathW                           @30082
 
-DTWAIN_SelectSource2Ex                            @30085
-DTWAIN_SelectSource2ExA                           @30086
-DTWAIN_SelectSource2ExW                           @30087
-DTWAIN_GetTwainAppIDEx                            @30090
-DTWAIN_GetSourceIDEx                              @30091        
-DTWAIN_ArrayGetSourceAt                           @30100     
-
-DTWAIN_ConvertDIBToBitmap                         @30101        
+DTWAIN_SelectSource2Ex							  @30085
+DTWAIN_SelectSource2ExA							  @30086
+DTWAIN_SelectSource2ExW							  @30087

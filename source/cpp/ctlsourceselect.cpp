@@ -526,28 +526,21 @@ LRESULT CALLBACK DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPA
 
             vector<SIZE> TextExtents;
             HDC hdcList = NULL;
-            DTWAINDeviceContextRelease_RAII contextRAII;
             if (pS->CS.nOptions & DTWAIN_DLG_HORIZONTALSCROLL)
-            {
                 hdcList = GetDC(lstSources);
-                contextRAII.SetObject({ lstSources, hdcList });
-            }
+
             // Get all the source names
-            std::vector<CTL_StringType> vSourceNames;
-            std::vector<CTL_StringType> vNewSourceNames;
-            if (vValues)
-            {
+            vector<CTL_StringType> vSourceNames;
             TCHAR ProdName[256];
 
             std::transform(vValues->begin(), vValues->end(), std::back_inserter(vSourceNames),
                            [&](CTL_ITwainSourcePtr ptr)
-                {
-                    DTWAIN_GetSourceProductName(ptr, ProdName, 255); return ProdName;
-                }
+                            { DTWAIN_GetSourceProductName(ptr, ProdName, 255); return ProdName; }
                           );
 
+
             // Remove and rename sources depending on the options
-                vNewSourceNames = AdjustSourceNames(vSourceNames, pS->CS);
+            auto vNewSourceNames = AdjustSourceNames(vSourceNames, pS->CS);
 
             for (auto& sName : vNewSourceNames )
             {
@@ -562,6 +555,7 @@ LRESULT CALLBACK DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPA
 
             if (hdcList)
             {
+                ReleaseDC(lstSources, hdcList);
                 sort(TextExtents.begin(), TextExtents.end(), ByCX);
             }
 
@@ -571,7 +565,7 @@ LRESULT CALLBACK DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPA
                 CTL_TwainAppMgr::WriteLogInfo(_T("Initializing TWAIN Dialog -- Sorting TWAIN Source names...\n"));
                 sort(vSourceNames.begin(), vSourceNames.end());
             }
-            }
+
             LRESULT index;
             LRESULT DefIndex = 0;
             CTL_StringStreamType strm;
