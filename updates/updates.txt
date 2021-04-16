@@ -9,6 +9,10 @@ DTWAIN Version changes
   DTWAIN_GetTwainAppIDEx
   DTWAIN_GetSourceIDEx
 
+- The dtwainx.h header file now includes <commdlg.h> and replaces LPCBYTE with const BYTE*.
+  The reason for this is that if WIN32_LEAN_AND_MEAN are defined by the application, and 
+  dtwain.h is #included after this definition, the OPENFILENAME and LPCBYTE were not defined.
+
 - Miscellaneous code refactoring.
 
 
