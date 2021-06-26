@@ -35,6 +35,9 @@ DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_IsTwainAvailable(VOID_PROTOTYPE);
 /* DTWAIN Initialization / Deinitialization */
 DTWAIN_HANDLE  DLLENTRY_DEF      DTWAIN_SysInitialize(VOID_PROTOTYPE);
 
+/* Initialize DTWAIN without having the "Resources not found" error box blocking the client */
+DTWAIN_HANDLE  DLLENTRY_DEF      DTWAIN_SysInitializeNoBlocking(VOID_PROTOTYPE);
+
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_SysDestroy(VOID_PROTOTYPE);
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_IsInitialized(VOID_PROTOTYPE);
 LONG           DLLENTRY_DEF      DTWAIN_GetRegisteredMsg(VOID_PROTOTYPE);

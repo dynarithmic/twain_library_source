@@ -906,3 +906,4 @@ DTWAIN_GetSourceIDEx                              @30091
 DTWAIN_ArrayGetSourceAt                           @30100     
 
 DTWAIN_ConvertDIBToBitmap                         @30101        
+DTWAIN_SysInitializeNoBlocking					  @30200        

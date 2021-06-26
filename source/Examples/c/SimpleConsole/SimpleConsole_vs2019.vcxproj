@@ -180,7 +180,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\h;..\dibview</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)h;..\dibview</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -199,7 +199,7 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;dtwain32d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\binaries\$(PlatformArchitecture)bit</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)binaries\$(PlatformArchitecture)bit</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
@@ -219,7 +219,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\h;..\dibview</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)h;..\dibview</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -237,7 +237,7 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;dtwain64d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\binaries\$(PlatformArchitecture)bit</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)binaries\$(PlatformArchitecture)bit</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
@@ -256,7 +256,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\h;..\dibview</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)h;..\dibview</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -274,7 +274,7 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;dtwain64ud.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\binaries\$(PlatformArchitecture)bit</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)binaries\$(PlatformArchitecture)bit</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
@@ -293,7 +293,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\h;..\dibview</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)h;..\dibview</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -312,7 +312,7 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;dtwain32ud.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\binaries\$(PlatformArchitecture)bit</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)binaries\$(PlatformArchitecture)bit</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
@@ -332,7 +332,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">
     <ClCompile>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\..\..\h;..\dibview</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)h;..\dibview</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -351,7 +351,7 @@
       <AdditionalDependencies>dtwain32.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\binaries\$(PlatformArchitecture)bit</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)binaries\$(PlatformArchitecture)bit</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -370,7 +370,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">
     <ClCompile>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\..\..\h;..\dibview</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)h;..\dibview</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -388,7 +388,7 @@
       <AdditionalDependencies>dtwain64.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\binaries\$(PlatformArchitecture)bit</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)binaries\$(PlatformArchitecture)bit</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>
@@ -411,7 +411,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">
     <ClCompile>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\..\..\h;..\dibview</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)h;..\dibview</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -429,7 +429,7 @@
       <AdditionalDependencies>dtwain64u.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\binaries\$(PlatformArchitecture)bit</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)binaries\$(PlatformArchitecture)bit</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>
@@ -452,7 +452,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">
     <ClCompile>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\..\..\h;..\dibview</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)h;..\dibview</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -471,7 +471,7 @@
       <AdditionalDependencies>dtwain32u.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\binaries\$(PlatformArchitecture)bit</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)binaries\$(PlatformArchitecture)bit</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
     </Link>

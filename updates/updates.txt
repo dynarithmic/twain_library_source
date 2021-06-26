@@ -1,5 +1,20 @@
 DTWAIN Version changes
 
+5.2.0.7		  
+- Added following function:
+  DTWAIN_SysInitializeNoBlocking() --
+
+  This new function works identical to DTWAIN_SysIntialize, except that DTWAIN_SysInitializeNoBlocking 
+  will not display the "DTWAIN Resource Error" message box if the DTWAIN resource text files cannot be found.  
+  This will allow DTWAIN to not block the application if there is a resource error.
+
+- DTWAIN_SysIntialize and DTWAIN_SysInitializeNoBlocking() will now set DTWAIN_GetLastError() to -1051
+  if the DTWAIN resource text files cannot be found.  
+
+  If DTWAIN_SysInitialize or DTWAIN_SysInitializeNoBlocking return 0, your application should immediately 
+  call DTWAIN_GetLastError() to confirm that the error received is -1051, indicating that the resources could not be found.
+
+
 5.2.0.6		  
 - Added following function:
   DTWAIN_ConvertDIBToBitmap -- Converts a Device Independent Bitmap to a Device Dependent Bitmap

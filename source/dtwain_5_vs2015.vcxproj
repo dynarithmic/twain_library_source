@@ -267,7 +267,10 @@
       <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_32);.\FreeImage\Source\FreeImageLib\Win32\DebugU</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt</Command>
+      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).dll
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).pdb
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).lib</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">
@@ -328,7 +331,10 @@
       <AdditionalLibraryDirectories>.\FreeImage\Source\FreeImageLib\Win32\ReleaseU;$(BOOST_LIBRARY_DIR_32)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt</Command>
+      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).dll
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).pdb
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).lib</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">
@@ -389,7 +395,10 @@
       <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_32);.\FreeImage\Source\FreeImageLib\Win32\Release</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt</Command>
+      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).dll
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).pdb
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).lib</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">
@@ -450,7 +459,10 @@
       <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_32);.\FreeImage\Source\FreeImageLib\Win32\Debug</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt</Command>
+      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).dll
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).pdb
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).lib</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">
@@ -480,7 +492,10 @@
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt</Command>
+      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).dll
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).pdb
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).lib</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">
@@ -510,7 +525,10 @@
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt</Command>
+      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).dll
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).pdb
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).lib</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">
@@ -540,7 +558,10 @@
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt</Command>
+      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).dll
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).pdb
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).lib</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">
@@ -570,7 +591,10 @@
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt</Command>
+      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).dll
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).pdb
+$(ZIP7_UTIL_CMD) a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).lib</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

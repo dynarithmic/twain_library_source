@@ -4,6 +4,7 @@
 #include "dtwdemo.h"
 #include "dtwain.h"
 #include <ctype.h>
+#include <stdio.h>
 #include "dibdisplay.h"
 
 
@@ -139,7 +140,12 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 
     /* Initialize DTWAIN.  Quit if error! */
     if ( !DTWAIN_SysInitialize( )) 
+    {
+        TCHAR sMsg[255];
+        _stprintf(sMsg, _T("Error %d"), DTWAIN_GetLastError());
+        MessageBox(NULL, _T("DTWAIN could not be initialized"), sMsg, MB_ICONSTOP);
         return 0;
+    }
     DTWAIN_CheckHandles(FALSE);
     /* Allow DTWAIN messages to be sent directly to our Window proc */
     DTWAIN_StartTwainSession(g_hWnd, NULL);

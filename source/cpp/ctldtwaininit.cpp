@@ -78,6 +78,7 @@
 
 using namespace dynarithmic;
 
+static DTWAIN_HANDLE SysInitializeHelper(bool noblock);
 static LONG DTWAIN_CloseAllSources();
 static void UnhookAllDisplays();
 static bool HookTwainDLL(CTL_TwainDLLHandle *pHandle, bool bHook);
@@ -313,7 +314,10 @@ LONG DLLENTRY_DEF DTWAIN_GetLastError()
     CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     if ( !IsDLLHandleValid( pHandle, FALSE ) )
     {
-        LOG_FUNC_EXIT_PARAMS(DTWAIN_ERR_BAD_HANDLE)
+        LONG err = DTWAIN_ERR_BAD_HANDLE;
+        if (!CTL_TwainDLLHandle::s_ResourcesInitialized)
+            err = DTWAIN_ERR_RESOURCES_NOT_FOUND;
+        LOG_FUNC_EXIT_PARAMS(err)
     }
     else
     {
@@ -680,7 +684,12 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx(LPCTSTR szINIPath)
     CATCH_BLOCK(DTWAIN_HANDLE(0))
 }
 
-DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitialize()
+DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeNoBlocking()
+{
+    return SysInitializeHelper(false);
+}
+
+DTWAIN_HANDLE SysInitializeHelper(bool block)
 {
 #ifdef DTWAIN_LIB
     if ( CTL_TwainDLLHandle::s_DLLInstance == NULL )
@@ -728,6 +737,7 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitialize()
             if (!ret)
         {
         #ifdef _WIN32
+                if ( block )
             MessageBox(NULL, _T("DTWAIN Resources not found"), _T("DTWAIN Resource Error"), MB_ICONERROR);
         #endif
             LOG_FUNC_EXIT_PARAMS(NULL)
@@ -792,6 +802,11 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitialize()
     {
         LOG_FUNC_EXIT_PARAMS(NULL)
     }
+}
+
+DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitialize()
+{
+    return SysInitializeHelper(true);
 }
 
 void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, const char *szLangDLL, const char *szName)
@@ -1898,8 +1913,8 @@ CTL_StringType CheckSearchOrderString(const CTL_StringType& str)
 {
     static std::set<char> setValidChars = {'C','W','O','U','S'};
     CTL_StringType strOut;
-    std::copy_if(str.begin(), str.end(), std::back_inserter(strOut), [&](char ch) { return setValidChars.count(toupper(ch)); });
-    std::transform(strOut.begin(), strOut.end(), strOut.begin(), [&](char ch) { return std::toupper(ch); });
+    std::copy_if(str.begin(), str.end(), std::back_inserter(strOut), [&](char ch) { return setValidChars.count(toupper(static_cast<int>(ch))); });
+    std::transform(strOut.begin(), strOut.end(), strOut.begin(), [&](char ch) { return std::toupper(static_cast<int>(ch)); });
     return strOut;
 }
 
