@@ -907,3 +907,29 @@ DTWAIN_ArrayGetSourceAt                           @30100
 
 DTWAIN_ConvertDIBToBitmap                         @30101        
 DTWAIN_SysInitializeNoBlocking					  @30200        
+
+DTWAIN_RangeGetAllFloatStringA					  @30201
+DTWAIN_RangeGetAllFloatStringW					  @30202
+DTWAIN_RangeSetAllFloatStringA				      @30203		
+DTWAIN_RangeSetAllFloatStringW					  @30204
+DTWAIN_RangeSetValueFloatStringA				  @30205
+DTWAIN_RangeSetValueFloatStringW				  @30206
+DTWAIN_RangeNearestValueFloatStringA			  @30207
+DTWAIN_RangeNearestValueFloatStringW			  @30208
+DTWAIN_RangeGetValueFloatStringA			      @30209		
+DTWAIN_RangeGetValueFloatStringW				  @30210
+DTWAIN_RangeGetPosFloatStringA					  @30211	
+DTWAIN_RangeGetPosFloatStringW					  @30212
+DTWAIN_RangeGetExpValueFloatStringA				  @30213
+DTWAIN_RangeGetExpValueFloatStringW				  @30214
+DTWAIN_FrameSetValueStringA						  @30215
+DTWAIN_FrameSetValueStringW						  @30216
+DTWAIN_FrameSetAllStringA						  @30217
+DTWAIN_FrameSetAllStringW						  @30218
+DTWAIN_FrameGetValueStringA						  @30219
+DTWAIN_FrameGetValueStringW						  @30220
+DTWAIN_FrameGetAllStringA						  @30221
+DTWAIN_FrameGetAllStringW						  @30222
+DTWAIN_FrameCreateStringA						  @30223
+DTWAIN_FrameCreateStringW						  @30224
+

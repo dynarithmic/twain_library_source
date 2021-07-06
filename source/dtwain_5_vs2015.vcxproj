@@ -264,7 +264,7 @@
       <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
-      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_32);.\FreeImage\Source\FreeImageLib\Win32\DebugU</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_INCLUDE_DIR)\lib$(PlatformArchitecture)-msvc-$(VisualStudioVersion)\;.\FreeImage\Source\FreeImageLib\$(Platform)\DebugU</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
@@ -328,7 +328,7 @@ $(ZIP7_UTIL_CMD) a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetNa
       <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
-      <AdditionalLibraryDirectories>.\FreeImage\Source\FreeImageLib\Win32\ReleaseU;$(BOOST_LIBRARY_DIR_32)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_INCLUDE_DIR)\lib$(PlatformArchitecture)-msvc-$(VisualStudioVersion)\;.\FreeImage\Source\FreeImageLib\Win32\ReleaseU</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
@@ -392,7 +392,7 @@ $(ZIP7_UTIL_CMD) a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(Target
       <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
-      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_32);.\FreeImage\Source\FreeImageLib\Win32\Release</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_INCLUDE_DIR)\lib$(PlatformArchitecture)-msvc-$(VisualStudioVersion)\;.\FreeImage\Source\FreeImageLib\Win32\Release</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
@@ -456,7 +456,7 @@ $(ZIP7_UTIL_CMD) a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(Target
       <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
-      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_32);.\FreeImage\Source\FreeImageLib\Win32\Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_INCLUDE_DIR)\lib$(PlatformArchitecture)-msvc-$(VisualStudioVersion)\;.\FreeImage\Source\FreeImageLib\Win32\Debug</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
@@ -482,7 +482,7 @@ $(ZIP7_UTIL_CMD) a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetNa
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
       <ModuleDefinitionFile>.\def\dtwain64_u_d.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_64);.\FreeImage\Source\FreeImageLib\x64\DebugU</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_INCLUDE_DIR)\lib$(PlatformArchitecture)-msvc-$(VisualStudioVersion)\;.\FreeImage\Source\FreeImageLib\x64\DebugU</AdditionalLibraryDirectories>
       <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)ud$(TargetExt)</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);FreeImageLib.lib</AdditionalDependencies>
@@ -515,7 +515,7 @@ $(ZIP7_UTIL_CMD) a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetNa
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
       <ModuleDefinitionFile>.\def\dtwain64_u.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_64);.\FreeImage\Source\FreeImageLib\x64\ReleaseU</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_INCLUDE_DIR)\lib$(PlatformArchitecture)-msvc-$(VisualStudioVersion)\;.\FreeImage\Source\FreeImageLib\x64\ReleaseU</AdditionalLibraryDirectories>
       <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)u$(TargetExt)</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);FreeImageLib.lib</AdditionalDependencies>
@@ -548,7 +548,7 @@ $(ZIP7_UTIL_CMD) a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(Target
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
       <ModuleDefinitionFile>.\def\dtwain64.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_64);.\FreeImage\Source\FreeImageLib\x64\Release</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_INCLUDE_DIR)\lib$(PlatformArchitecture)-msvc-$(VisualStudioVersion)\;.\FreeImage\Source\FreeImageLib\x64\Release</AdditionalLibraryDirectories>
       <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)$(TargetExt)</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);FreeImageLib.lib</AdditionalDependencies>
@@ -581,7 +581,7 @@ $(ZIP7_UTIL_CMD) a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(Target
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
       <ModuleDefinitionFile>.\def\dtwain64_d.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_64);.\FreeImage\Source\FreeImageLib\x64\Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_INCLUDE_DIR)\lib$(PlatformArchitecture)-msvc-$(VisualStudioVersion)\;.\FreeImage\Source\FreeImageLib\x64\Debug</AdditionalLibraryDirectories>
       <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)d$(TargetExt)</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);FreeImageLib.lib</AdditionalDependencies>
@@ -1039,8 +1039,6 @@ $(ZIP7_UTIL_CMD) a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetNa
     <ClInclude Include=".\h\dtwainx.h" />
     <ClInclude Include=".\h\dtwpdft.h" />
     <ClInclude Include=".\h\dtwstrfn.h" />
-    <ClInclude Include=".\h\dtwstrfn_a.h" />
-    <ClInclude Include=".\h\dtwstrfn_u.h" />
     <ClInclude Include=".\h\enumeratorfuncs.h" />
     <ClInclude Include=".\h\funcmac.h" />
     <ClInclude Include=".\h\imagefun\txtfun32.h" />

@@ -8,11 +8,13 @@ DTWAIN Version changes
   will not display the "DTWAIN Resource Error" message box if the DTWAIN resource text files cannot be found.  
   This will allow DTWAIN to not block the application if there is a resource error.
 
-- DTWAIN_SysIntialize and DTWAIN_SysInitializeNoBlocking() will now set DTWAIN_GetLastError() to -1051
-  if the DTWAIN resource text files cannot be found.  
+- Added missing ANSI and Wide functions for DTWAIN_Range... and DTWAIN_Frame... functions that have 
+  pointers to strings as parameters.
 
-  If DTWAIN_SysInitialize or DTWAIN_SysInitializeNoBlocking return 0, your application should immediately 
-  call DTWAIN_GetLastError() to confirm that the error received is -1051, indicating that the resources could not be found.
+- DTWAIN_SysIntialize and DTWAIN_SysInitializeNoBlocking() will now set DTWAIN_GetLastError() to -1051
+  if the DTWAIN resource text files cannot be found.  If DTWAIN_SysInitialize or DTWAIN_SysInitializeNoBlocking 
+  return 0, your application should immediately call DTWAIN_GetLastError() to confirm that the error received 
+  is -1051, indicating that the resources could not be found.
 
 
 5.2.0.6		  

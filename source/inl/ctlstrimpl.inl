@@ -2247,3 +2247,303 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementStringA(DTWAIN_PDFTEXTELEMENT T
     return DTWAIN_SetPDFTextElementString(TextElement, szString, Flags);
 #endif
 }
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetAllFloatStringW(DTWAIN_RANGE pArray, LPWSTR dLow,
+                                                        LPWSTR dUp, LPWSTR dStep,
+                                                        LPWSTR dDefault,
+                                                        LPWSTR dCurrent)
+{
+#ifdef _UNICODE
+    return DTWAIN_RangeGetAllFloatString(pArray, dLow, dUp, dStep, dDefault, dCurrent);
+#else
+    std::array<LPWSTR, 5> outarg = { dLow, dUp, dStep, dDefault, dCurrent };
+    std::array<CTL_String, 5> args = { { CTL_String(128, 0), CTL_String(128, 0), CTL_String(128, 0), CTL_String(128, 0), CTL_String(128, 0) } };
+    DTWAIN_BOOL retVal = DTWAIN_RangeGetAllFloatString(pArray, &args[0][0], &args[1][0], &args[2][0], &args[3][0], &args[4][0]);
+    for (size_t i = 0; i < args.size(); ++i)
+        null_terminator_copier(args[i], outarg[i], retVal);
+    return retVal;
+#endif
+}
+
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetAllFloatStringA(DTWAIN_RANGE pArray, LPSTR dLow,
+                                                        LPSTR dUp, LPSTR dStep,
+                                                        LPSTR dDefault,
+                                                        LPSTR dCurrent)
+{
+#ifdef _UNICODE
+    std::array<LPSTR, 5> outarg = { dLow, dUp, dStep, dDefault, dCurrent };
+    std::array<CTL_WString, 5> args = { { CTL_WString(128, 0), CTL_WString(128, 0), CTL_WString(128, 0), CTL_WString(128, 0), CTL_WString(128, 0) } };
+    DTWAIN_BOOL retVal = DTWAIN_RangeGetAllFloatString(pArray, &args[0][0], &args[1][0], &args[2][0], &args[3][0], &args[4][0]);
+    for (size_t i = 0; i < outarg.size(); ++i)
+        null_terminator_copier(args[i], outarg[i], retVal);
+    return retVal;
+#else
+    return DTWAIN_RangeGetAllFloatString(pArray, dLow, dUp, dStep, dDefault, dCurrent);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeSetAllFloatStringW(DTWAIN_RANGE pArray, LPCWSTR dLow,
+                                                        LPCWSTR dUp, LPCWSTR dStep,
+                                                        LPCWSTR dDefault,
+                                                        LPCWSTR dCurrent)
+{
+#ifdef _UNICODE
+    return DTWAIN_RangeSetAllFloatString(pArray, dLow, dUp, dStep, dDefault, dCurrent);
+#else
+    return DTWAIN_RangeSetAllFloatString(pArray,
+                                         StringConversion::Convert_Wide_To_Native(dLow).c_str(),
+                                         StringConversion::Convert_Wide_To_Native(dUp).c_str(),
+                                         StringConversion::Convert_Wide_To_Native(dStep).c_str(),
+                                         StringConversion::Convert_Wide_To_Native(dDefault).c_str(),
+                                         StringConversion::Convert_Wide_To_Native(dCurrent).c_str());
+#endif
+}
+
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeSetAllFloatStringA(DTWAIN_RANGE pArray, LPCSTR dLow,
+                                                        LPCSTR dUp, LPCSTR dStep,
+                                                        LPCSTR dDefault,
+                                                        LPCSTR dCurrent)
+{
+#ifdef _UNICODE
+    return DTWAIN_RangeSetAllFloatString(pArray,
+                                         StringConversion::Convert_Ansi_To_Native(dLow).c_str(),
+                                         StringConversion::Convert_Ansi_To_Native(dUp).c_str(),
+                                         StringConversion::Convert_Ansi_To_Native(dStep).c_str(),
+                                         StringConversion::Convert_Ansi_To_Native(dDefault).c_str(),
+                                         StringConversion::Convert_Ansi_To_Native(dCurrent).c_str());
+#else
+    return DTWAIN_RangeSetAllFloatString(pArray, dLow, dUp, dStep, dDefault, dCurrent);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeSetValueFloatStringW(DTWAIN_RANGE pArray, LONG nWhich, LPCWSTR dValue)
+{
+#ifdef _UNICODE
+    return DTWAIN_RangeSetValueFloatString(pArray, nWhich, dValue);
+#else
+    return DTWAIN_RangeSetValueFloatString(pArray, nWhich, StringConversion::Convert_Wide_To_Native(dValue).c_str());
+#endif
+}
+
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeSetValueFloatStringA(DTWAIN_RANGE pArray, LONG nWhich, LPCSTR dValue)
+{
+#ifdef _UNICODE
+    return DTWAIN_RangeSetValueFloatString(pArray, nWhich, StringConversion::Convert_Ansi_To_Native(dValue).c_str());
+#else
+    return DTWAIN_RangeSetValueFloatString(pArray, nWhich, dValue);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeNearestValueFloatStringW(DTWAIN_RANGE pArray, LPCWSTR dIn, LPWSTR dOut, LONG RoundType)
+{
+#ifdef _UNICODE
+    return DTWAIN_RangeNearestValueFloatString(pArray, dIn, dOut, RoundType);
+#else
+    CTL_String arg(128, 0);
+    DTWAIN_BOOL retVal = DTWAIN_RangeNearestValueFloatString(pArray,
+                                               StringConversion::Convert_Wide_To_Native(dIn).c_str(),
+                                               &arg[0], RoundType);
+    return null_terminator_copier(arg, dOut, retVal);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeNearestValueFloatStringA(DTWAIN_RANGE pArray, LPCSTR dIn, LPSTR dOut, LONG RoundType)
+{
+#ifdef _UNICODE
+    CTL_WString arg(128, 0);
+    DTWAIN_BOOL retVal = DTWAIN_RangeNearestValueFloatString(pArray,
+                                                             StringConversion::Convert_Ansi_To_Native(dIn).c_str(),
+                                                             &arg[0], RoundType);
+    return null_terminator_copier(arg, dOut, retVal);
+#else
+    return DTWAIN_RangeNearestValueFloatString(pArray, dIn, dOut, RoundType);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetValueFloatStringW(DTWAIN_RANGE pArray, LONG nWhich, LPWSTR dValue)
+{
+#ifdef _UNICODE
+    return DTWAIN_RangeGetValueFloatString(pArray, nWhich, dValue);
+#else
+    CTL_String arg(128, 0);
+    DTWAIN_BOOL retval = DTWAIN_RangeGetValueFloatString(pArray, nWhich, &arg[0]);
+    return null_terminator_copier(arg, dValue, retval);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetValueFloatStringA(DTWAIN_RANGE pArray, LONG nWhich, LPSTR dValue)
+{
+#ifdef _UNICODE
+    CTL_WString arg(128, 0);
+    DTWAIN_BOOL retval = DTWAIN_RangeGetValueFloatString(pArray, nWhich, &arg[0]);
+    return null_terminator_copier(arg, dValue, retval);
+#else
+    return DTWAIN_RangeGetValueFloatString(pArray, nWhich, dValue);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetPosFloatStringW(DTWAIN_RANGE pArray, LPCWSTR Val, LPLONG pPos)
+{
+#ifdef _UNICODE
+    return DTWAIN_RangeGetPosFloatString(pArray, Val, pPos);
+#else
+    return DTWAIN_RangeGetPosFloatString(pArray, 
+                                         StringConversion::Convert_Wide_To_Native(Val).c_str(),
+                                         pPos);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetPosFloatStringA(DTWAIN_RANGE pArray, LPCSTR Val, LPLONG pPos)
+{
+#ifdef _UNICODE
+    return DTWAIN_RangeGetPosFloatString(pArray, 
+                                         StringConversion::Convert_Ansi_To_Native(Val).c_str(),
+                                         pPos);
+#else
+    return DTWAIN_RangeGetPosFloatString(pArray, Val, pPos);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetExpValueFloatStringW(DTWAIN_RANGE pArray, LONG lPos, LPWSTR pVal)
+{
+#ifdef _UNICODE
+    return DTWAIN_RangeGetExpValueFloatString(pArray, lPos, pVal);
+#else
+    CTL_String arg(128, 0);
+    DTWAIN_BOOL retval = DTWAIN_RangeGetExpValueFloatString(pArray, lPos, &arg[0]);
+    return null_terminator_copier(arg, pVal, retval);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetExpValueFloatStringA(DTWAIN_RANGE pArray, LONG lPos, LPSTR pVal)
+{
+#ifdef _UNICODE
+    CTL_WString arg(128, 0);
+    DTWAIN_BOOL retval = DTWAIN_RangeGetExpValueFloatString(pArray, lPos, &arg[0]);
+    return null_terminator_copier(arg, pVal, retval);
+#else
+    return DTWAIN_RangeGetExpValueFloatString(pArray, lPos, pVal);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetValueStringW(DTWAIN_FRAME Frame, LONG nWhich, LPCWSTR Value)
+{
+#ifdef _UNICODE
+    return DTWAIN_FrameSetValueString(Frame, nWhich, Value);
+#else
+    return DTWAIN_FrameSetValueString(Frame, nWhich, StringConversion::Convert_Wide_To_Native(Value).c_str());
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetValueStringA(DTWAIN_FRAME Frame, LONG nWhich, LPCSTR Value)
+{
+#ifdef _UNICODE
+    return DTWAIN_FrameSetValueString(Frame, nWhich, StringConversion::Convert_Ansi_To_Native(Value).c_str());
+#else
+    return DTWAIN_FrameSetValueString(Frame, nWhich, Value);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetAllStringW(DTWAIN_FRAME Frame, LPCWSTR Left, LPCWSTR Top, LPCWSTR Right, LPCWSTR Bottom)
+{
+#ifdef _UNICODE
+    return DTWAIN_FrameSetAllString(Frame, Left, Top, Right, Bottom);
+#else
+    return DTWAIN_FrameSetAllString(Frame,
+                                    StringConversion::Convert_Wide_To_Native(Left).c_str(),
+                                    StringConversion::Convert_Wide_To_Native(Top).c_str(),
+                                    StringConversion::Convert_Wide_To_Native(Right).c_str(),
+                                    StringConversion::Convert_Wide_To_Native(Bottom).c_str());
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetAllStringA(DTWAIN_FRAME Frame, LPCSTR Left, LPCSTR Top, LPCSTR Right, LPCSTR Bottom)
+{
+#ifdef _UNICODE
+    return DTWAIN_FrameSetAllString(Frame,
+                                    StringConversion::Convert_Ansi_To_Native(Left).c_str(),
+                                    StringConversion::Convert_Ansi_To_Native(Top).c_str(),
+                                    StringConversion::Convert_Ansi_To_Native(Right).c_str(),
+                                    StringConversion::Convert_Ansi_To_Native(Bottom).c_str());
+#else
+    return DTWAIN_FrameSetAllString(Frame, Left, Top, Right, Bottom);
+#endif
+}
+
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetValueStringW(DTWAIN_FRAME Frame, LONG nWhich, LPWSTR Value)
+{
+#ifdef _UNICODE
+    return DTWAIN_FrameGetValueString(Frame, nWhich, Value);
+#else
+    CTL_String arg(128, 0);
+    DTWAIN_BOOL retval = DTWAIN_FrameGetValueString(Frame, nWhich, &arg[0]);
+    return null_terminator_copier(arg, Value, retval);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetValueStringA(DTWAIN_FRAME Frame, LONG nWhich, LPSTR Value)
+{
+#ifdef _UNICODE
+    CTL_WString arg(128, 0);
+    DTWAIN_BOOL retval = DTWAIN_FrameGetValueString(Frame, nWhich, &arg[0]);
+    return null_terminator_copier(arg, Value, retval);
+#else
+    return DTWAIN_FrameGetValueString(Frame, nWhich, Value);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetAllStringW(DTWAIN_FRAME Frame, LPWSTR Left, LPWSTR Top, LPWSTR Right, LPWSTR Bottom)
+{
+#ifdef _UNICODE
+    return DTWAIN_FrameGetAllString(Frame, Left, Top, Right, Bottom);
+#else
+    std::array<LPWSTR, 4> outarg = { Left, Top, Right, Bottom };
+    std::array<CTL_String, 4> args = { { CTL_String(128, 0), CTL_String(128, 0), CTL_String(128, 0), CTL_String(128, 0) } };
+    DTWAIN_BOOL retVal = DTWAIN_FrameGetAllString(Frame, &args[0][0], &args[1][0], &args[2][0], &args[3][0]);
+    for (size_t i = 0; i < outarg.size(); ++i)
+        null_terminator_copier(args[i], outarg[i], retVal);
+    return retVal;
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetAllStringA(DTWAIN_FRAME Frame, LPSTR Left, LPSTR Top, LPSTR Right, LPSTR Bottom)
+{
+#ifdef _UNICODE
+    std::array<LPSTR, 4> outarg = { Left, Top, Right, Bottom };
+    std::array<CTL_WString, 4> args = { { CTL_WString(128, 0), CTL_WString(128, 0), CTL_WString(128, 0), CTL_WString(128, 0) } };
+    DTWAIN_BOOL retVal = DTWAIN_FrameGetAllString(Frame, &args[0][0], &args[1][0], &args[2][0], &args[3][0]);
+    for (size_t i = 0; i < outarg.size(); ++i)
+        null_terminator_copier(args[i], outarg[i], retVal);
+    return retVal;
+#else
+    return DTWAIN_FrameGetAllString(Frame, Left, Top, Right, Bottom);
+#endif
+}
+
+DTWAIN_FRAME DLLENTRY_DEF DTWAIN_FrameCreateStringW(LPCWSTR Left, LPCWSTR Top, LPCWSTR Right, LPCWSTR Bottom)
+{
+#ifdef _UNICODE
+    return DTWAIN_FrameCreateString(Left, Top, Right, Bottom);
+#else
+    return DTWAIN_FrameCreateString(StringConversion::Convert_Wide_To_Native(Left).c_str(),
+                                    StringConversion::Convert_Wide_To_Native(Top).c_str(),
+                                    StringConversion::Convert_Wide_To_Native(Right).c_str(),
+                                    StringConversion::Convert_Wide_To_Native(Bottom).c_str());
+#endif
+}
+
+DTWAIN_FRAME DLLENTRY_DEF DTWAIN_FrameCreateStringA(LPCSTR Left, LPCSTR Top, LPCSTR Right, LPCSTR Bottom)
+{
+#ifdef _UNICODE
+    return DTWAIN_FrameCreateString(StringConversion::Convert_Ansi_To_Native(Left).c_str(),
+                                    StringConversion::Convert_Ansi_To_Native(Top).c_str(),
+                                    StringConversion::Convert_Ansi_To_Native(Right).c_str(),
+                                    StringConversion::Convert_Ansi_To_Native(Bottom).c_str());
+#else
+    return DTWAIN_FrameCreateString(Left, Top, Right, Bottom);
+#endif
+}
