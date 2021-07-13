@@ -840,7 +840,7 @@ DTWAIN_EnumSupportedCapsEx2                       @30002
 DTWAIN_EnumExtendedCapsEx2                        @30003
 DTWAIN_EnumCustomCapsEx2                          @30004
 DTWAIN_EnumSourceUnitsEx                          @30005
-DTWAIN_EnumPaperSizesEx                           @30006
+DTWAIN_EnumPaperSizesEx                           @30006    
 DTWAIN_EnumDoubleFeedDetectLengthsEx              @30007 
 DTWAIN_EnumAudioXferMechsEx                       @30008
 DTWAIN_EnumAlarmsEx                               @30009
@@ -932,4 +932,4 @@ DTWAIN_FrameGetAllStringA                         @30221
 DTWAIN_FrameGetAllStringW                         @30222
 DTWAIN_FrameCreateStringA                         @30223
 DTWAIN_FrameCreateStringW                         @30224
-
+DTWAIN_AddPDFTextEx                               @30230

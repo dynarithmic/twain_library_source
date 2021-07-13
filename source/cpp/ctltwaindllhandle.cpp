@@ -64,6 +64,7 @@ CTL_TwainDLLHandle::CTL_TwainDLLHandle() :
             #ifdef _WIN32
             , m_hOrigProc(nullptr)
             , m_hWndDummy(nullptr)
+            , m_mapPDFTextElement{ {nullptr, {}} }
             #endif
              {}
 

@@ -975,6 +975,12 @@ CTL_ITwainSource::~CTL_ITwainSource()
 {
     ResetManualDuplexMode();
     CloseSource(true);
+    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+
+    // Remove all of the PDF text elements for this source
+    if ( pHandle )
+        pHandle->m_mapPDFTextElement.erase(this);
+
     EnumeratorFunctionImpl::EnumeratorDestroy(m_pFileEnumerator);
 }
 
@@ -1179,9 +1185,11 @@ void CTL_ITwainSource::SetPDFValue(const CTL_StringType& nWhich, DTWAIN_FLOAT f1
 void CTL_ITwainSource::SetPDFValue(const CTL_StringType& nWhich, PDFTextElementPtr& element)
 {
     if ( nWhich == PDFTEXTELEMENTKEY )
-        m_ImageInfoEx.PDFTextElementList.push_back(element);
+    {
+        CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+        pHandle->m_mapPDFTextElement[this].push_back(element);
+    }
 }
-
 void CTL_ITwainSource::SetPDFPageSize(LONG nPageSize, DTWAIN_FLOAT cWidth, DTWAIN_FLOAT cHeight)
 {
     m_ImageInfoEx.PDFPageSize = nPageSize;
@@ -1207,7 +1215,10 @@ void CTL_ITwainSource::SetPDFEncryption(bool bIsEncrypted,
 
 void CTL_ITwainSource::ClearPDFText()
 {
-    m_ImageInfoEx.PDFTextElementList.clear();
+    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto it = pHandle->m_mapPDFTextElement.find(this);
+    if ( it != pHandle->m_mapPDFTextElement.end())
+        it->second.clear();
 }
 
 void CTL_ITwainSource::SetPhotometric(LONG Setting)

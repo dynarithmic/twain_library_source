@@ -619,7 +619,7 @@ namespace dynarithmic
             LPOFNHOOKPROC       m_pSaveAsDlgProc;
             CustomPlacement     m_CustomPlacement;
             #endif
-            CTL_TEXTELEMENTPTRLIST m_lPDFTextElement;
+            CTL_TEXTELEMENTMAP m_mapPDFTextElement;
             bool                m_bUseProxy;
             CTL_SourceCapInfoArray   m_aSourceCapInfo;
             CTL_MAPSTRTOSOURCE       m_mapStringToSource;

@@ -275,13 +275,19 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
     // Set any other text to write (searchable text is included in this)
     if ( m_MultiPageStruct.Stage != DIB_MULTI_LAST || m_MultiPageStruct.Stage == 0 )
     {
-        CTL_TEXTELEMENTPTRLIST::iterator it = pPDFInfo->ImageInfoEx.PDFTextElementList.begin();
-        CTL_TEXTELEMENTPTRLIST::iterator it2 = pPDFInfo->ImageInfoEx.PDFTextElementList.end();
+        auto* pSource = pPDFInfo->ImageInfoEx.theSource;
+        CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+        auto iter = pHandle->m_mapPDFTextElement.find(pSource);
+        if (iter != pHandle->m_mapPDFTextElement.end())
+        {
+            CTL_TEXTELEMENTPTRLIST::iterator it = iter->second.begin();
+            CTL_TEXTELEMENTPTRLIST::iterator it2 = iter->second.end();
         while (it != it2 )
         {
             m_pPDFAddPageText(pPDFInfo->pPDFdoc, it->get());
             ++it;
         }
+    }
     }
 
     if (!m_pPDFWritePage(pPDFInfo->pPDFdoc, path))
@@ -456,4 +462,9 @@ int CPDFImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImage
 void CPDFImageHandler::SetSearchableText(const std::string& sText)
 {
     m_sSearchableText = sText;
+}
+
+void CPDFImageHandler::AddPDFTextElement(PDFTextElementPtr element) 
+{ 
+    m_ImageInfoEx.theSource->SetPDFValue(StringConversion::Convert_Ansi_To_Native("PDFTEXTELEMENTKEY").c_str(), element); 
 }

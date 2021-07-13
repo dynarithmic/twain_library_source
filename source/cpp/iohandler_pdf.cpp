@@ -200,12 +200,16 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, LO
     CTL_StringType szTempFile;
     CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
+
     if (!s || s->Stage == DIB_MULTI_FIRST)
     {
+        auto* pSource = m_ImageInfoEx.theSource;
+        auto it = pHandle->m_mapPDFTextElement.find(pSource);
+        if (it != pHandle->m_mapPDFTextElement.end())
+        {
         // any PDF text is initialized to not written
-        for_each(m_ImageInfoEx.PDFTextElementList.begin(),
-                 m_ImageInfoEx.PDFTextElementList.end(),
-                 InitializeDisplayStatus);
+            std::for_each(it->second.begin(), it->second.end(),InitializeDisplayStatus);
+        }
     }
 
     if (!s || s->Stage != DIB_MULTI_LAST)
@@ -335,34 +339,25 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, LO
 
             PDFStringToTextElement::iterator itStart = pElMap.begin();
             PDFStringToTextElement::iterator itEnd = pElMap.end();
-            tempExFirst = m_ImageInfoEx.PDFTextElementList.begin();
-            tempExLast = m_ImageInfoEx.PDFTextElementList.begin();
 
-            itFirstElement = tempEx.PDFTextElementList.begin();
-            itLastElement  = tempEx.PDFTextElementList.begin();
             while ( itStart != itEnd )
             {
                 DTWAIN_PDFTEXTELEMENT TextElement = DTWAIN_CreatePDFTextElement(m_ImageInfoEx.theSource); // add to Source array of elements
                 PDFTextElement *pElement = static_cast<PDFTextElement *>(TextElement);
                 *pElement = *itStart;
-                PDFTextElementPtr addedElement = tempEx.PDFTextElementList.back();
-                m_ImageInfoEx.PDFTextElementList.push_back( addedElement );
-                PDFHandler.AddPDFTextElement( addedElement );  // give this to the PDF code
                 if ( itStart == pElMap.begin())
                 {
-                    std::advance(itFirstElement, m_ImageInfoEx.PDFTextElementList.size()-1);
-                    std::advance(tempExFirst, m_ImageInfoEx.PDFTextElementList.size()-1);
-                    m_ImageInfoEx.PDFSearchableTextRange.first = itFirstElement;
+                    // Iterator to last item added to the Text element list
+                    m_ImageInfoEx.PDFSearchableTextRange.first = 
+                        std::prev(pHandle->m_mapPDFTextElement[m_ImageInfoEx.theSource].end()); 
                 }
                 ++itStart;
                 ++nCount;
             }
             if ( nCount > 0 )
             {
-                std::advance(itLastElement, m_ImageInfoEx.PDFTextElementList.size());
-                std::advance(tempExLast, m_ImageInfoEx.PDFTextElementList.size());
-                m_ImageInfoEx.PDFSearchableTextRange.second = m_ImageInfoEx.PDFSearchableTextRange.first;
-                std::advance(m_ImageInfoEx.PDFSearchableTextRange.second, nCount);
+                m_ImageInfoEx.PDFSearchableTextRange.second = 
+                    std::prev(pHandle->m_mapPDFTextElement[m_ImageInfoEx.theSource].end());
                 m_ImageInfoEx.IsSearchableTextOnPage = true;
             }
         }
@@ -375,14 +370,13 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, LO
     // Destroy the local text elements
     if (nCount > 0 )
     {
-        tempEx.PDFTextElementList.erase(itFirstElement, itLastElement);
+        pHandle->m_mapPDFTextElement[m_ImageInfoEx.theSource].erase(itFirstElement, itLastElement);
     }
 
     // erase temporary (current page) text elements
     PDFTextElementEraser eraser(DTWAIN_PDFTEXT_CURRENTPAGE);
-    tempEx.PDFTextElementList.erase(
-                    std::remove_if(tempEx.PDFTextElementList.begin(), tempEx.PDFTextElementList.end(), eraser),
-                    tempEx.PDFTextElementList.end());
+    auto& mapElement = pHandle->m_mapPDFTextElement[m_ImageInfoEx.theSource];
+    mapElement.erase(std::remove_if(mapElement.begin(), mapElement.end(), eraser), mapElement.end());
 
     if ( bRet != 0 )
     {

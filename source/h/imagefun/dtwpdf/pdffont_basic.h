@@ -24,6 +24,7 @@
 #include <string>
 #include <list>
 #include <unordered_set>
+#include <unordered_map>
 #include <memory>
 #include "dtwpdft.h"
 #include "ctlobstr.h"
@@ -81,6 +82,7 @@ namespace dynarithmic
 
     typedef std::shared_ptr<PDFTextElement> PDFTextElementPtr;
     typedef std::list<PDFTextElementPtr> CTL_TEXTELEMENTPTRLIST;
+    typedef std::unordered_map<CTL_ITwainSource*, CTL_TEXTELEMENTPTRLIST> CTL_TEXTELEMENTMAP;
     typedef std::list<PDFTextElement*> CTL_TEXTELEMENTNAKEDPTRLIST;
     typedef std::unordered_set<PDFTextElement*> CTL_TEXTELEMENTNAKEDPTRSET;
     typedef std::pair<CTL_TEXTELEMENTPTRLIST::iterator, CTL_TEXTELEMENTPTRLIST::iterator> CTL_SEARCHABLETEXTRANGE;

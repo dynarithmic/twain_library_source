@@ -119,13 +119,13 @@ namespace dynarithmic
         DTWAIN_FLOAT PDFThumbnailScale[2];
         DTWAIN_FLOAT PDFCustomSize[2];
         DTWAIN_FLOAT PDFCustomScale[2];
-        CTL_TEXTELEMENTPTRLIST PDFTextElementList;
         CTL_SEARCHABLETEXTRANGE PDFSearchableTextRange;
         DTWAINImageOCRPDFInfo PDFOCRInfo;
 
         // Vista ICONs
         DTWAINImageInfoEx() :
             theSession{},
+            theSource{},
             PhotoMetric{},
             PostscriptType(0),
             IsPostscript(false),
@@ -143,7 +143,6 @@ namespace dynarithmic
             ResolutionY(100),
             nPDFJpegQuality(75),
             IsImageFileCreated(false),
-            theSource(nullptr),
             PDFOrientation(DTWAIN_PDF_PORTRAIT),
             IsOCRTempImage(false),
             IsOCRUsedForPDF(false),

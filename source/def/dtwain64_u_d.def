@@ -932,4 +932,4 @@ DTWAIN_FrameGetAllStringA                         @30221
 DTWAIN_FrameGetAllStringW                         @30222
 DTWAIN_FrameCreateStringA                         @30223
 DTWAIN_FrameCreateStringW                         @30224
-
+DTWAIN_AddPDFTextEx                               @30230

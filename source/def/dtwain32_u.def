@@ -905,7 +905,7 @@ DTWAIN_GetTwainAppIDEx                            @30090
 DTWAIN_GetSourceIDEx                              @30091        
 DTWAIN_ArrayGetSourceAt                           @30100     
 
-DTWAIN_ConvertDIBToBitmap                         @30101        
+DTWAIN_ConvertDIBToBitmap                         @30101
 DTWAIN_SysInitializeNoBlocking                    @30200        
 
 DTWAIN_RangeGetAllFloatStringA                    @30201
@@ -932,4 +932,4 @@ DTWAIN_FrameGetAllStringA                         @30221
 DTWAIN_FrameGetAllStringW                         @30222
 DTWAIN_FrameCreateStringA                         @30223
 DTWAIN_FrameCreateStringW                         @30224
-
+DTWAIN_AddPDFTextEx                               @30230

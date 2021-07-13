@@ -117,7 +117,7 @@ namespace dynarithmic
             void SetDPI(LONG dpi) { m_dpi = dpi; }
             LONG GetDPI() const { return m_dpi; }
             void SetSearchableText(const std:: string& s);
-            void AddPDFTextElement(PDFTextElementPtr element) { m_ImageInfoEx.PDFTextElementList.push_back(element); }
+            void AddPDFTextElement(PDFTextElementPtr element); 
 
             static void UnloadPDFLibrary() { s_bLibraryLoaded = false; }
 
