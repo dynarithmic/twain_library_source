@@ -715,7 +715,7 @@ bool CTL_ImageXferTriplet::AbortTransfer(bool bForceClose)
         }
         break;
     }
-    m_bScanPending = false;
+    m_bScanPending = (ptrPending->Count != 0);
     return false;
 }
 
