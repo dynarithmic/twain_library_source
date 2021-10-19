@@ -95,10 +95,9 @@ int CPCXImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, 
     DestroyObjectHandler destroyHandler(this);
 
     m_bWriteOk = FALSE;
-    LPBITMAPINFOHEADER lpbi=NULL;
-    PCXHEAD pcx;
+    LPBITMAPINFOHEADER lpbi= nullptr;
+    PCXHEAD pcx{};
     BYTE *ps;
-    char palette[768];
     unsigned int linewidth;
     int width,depth,bits;
     int a,i,j,k;
@@ -134,7 +133,7 @@ int CPCXImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, 
     if ( m_MultiPageStruct.Stage == DIB_MULTI_NEXT )
     {
         // Retrieve handle and write the directory
-        m_pDCXInfo = (DCXINFO *)m_MultiPageStruct.pUserData;
+        m_pDCXInfo = static_cast<DCXINFO*>(m_MultiPageStruct.pUserData);
 
         // Increment the page
         m_pDCXInfo->nCurrentPage++;
@@ -169,7 +168,9 @@ int CPCXImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, 
         return (0); // All OK
     }
 
-    lpbi = (LPBITMAPINFOHEADER)pImage2;
+    if ( !fh )
+        fh = m_hFile.get();
+    lpbi = reinterpret_cast<LPBITMAPINFOHEADER>(pImage2);
     fipImage fimage;
     fipImageUtility::copyFromHandle(fimage,lpbi,false);
 
@@ -182,7 +183,7 @@ int CPCXImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, 
     depth = ht;
     bits  = bpp;
 
-    memset((LPSTR)&pcx,0,sizeof(PCXHEAD));
+    pcx = {};
 
     if(bits < 4)
         GetDibPalette(fimage,pcx.palette);
@@ -315,6 +316,7 @@ int CPCXImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, 
 
     if(bits > 4 && bits <=8)
     {
+        char palette[768];
         putbyte(12,*fh);
         GetDibPalette(fimage, palette);
         fh->write(reinterpret_cast<char*>(palette), 768);
