@@ -569,12 +569,14 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
         case TextFormatMulti:
         {
             // Get the current OCR engine's input format
-            DTWAIN_ARRAY a = 0;
+            DTWAIN_ARRAY a = nullptr;
             DTWAINArrayLL_RAII raii(a);
             CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
             DTWAIN_GetOCRCapValues((DTWAIN_OCRENGINE)pHandle->m_pOCRDefaultEngine.get(), DTWAIN_OCRCV_IMAGEFILEFORMAT,
                                     DTWAIN_CAPGETCURRENT, &a);
-            auto& vValues = EnumeratorVector<int>(a);
+            if ( a )
+            {
+                const auto& vValues = EnumeratorVector<int>(a);
             if ( !vValues.empty() )
             {
                 LONG InputFormat = vValues[0];
@@ -582,6 +584,9 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
             }
             else
                 return DTWAIN_ERR_BADPARAM;
+        }
+            else
+                return pHandle->m_lLastError;
         }
         break;
 
@@ -615,7 +620,7 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
     CTL_ImageIOHandlerPtr pHandler;
     ImageInfo.IsPDF = false;
     ResolvePostscriptOptions(ImageInfo, nFormat);
-
+    nStatus = DTWAIN_NO_ERROR; 
     switch (nFormat )
     {
         case TiffFormatNONEMULTI:
@@ -644,24 +649,30 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
         case TextFormatMulti:
         {
             // Get the current OCR engine's input format
-            DTWAIN_ARRAY a = 0;
+            DTWAIN_ARRAY a = nullptr;
             DTWAINArrayLL_RAII raii(a);
             CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
             DTWAIN_GetOCRCapValues((DTWAIN_OCRENGINE)pHandle->m_pOCRDefaultEngine.get(), DTWAIN_OCRCV_IMAGEFILEFORMAT,
                                     DTWAIN_CAPGETCURRENT, &a);
-            auto& vValues = EnumeratorVector<int>(a);
+            if ( a )
+            {
+                const auto& vValues = EnumeratorVector<int>(a);
             if ( !vValues.empty() )
             {
                 LONG InputFormat = vValues[0];
                 pHandler = std::make_shared<CTL_TextIOHandler>(this, InputFormat, ImageInfo, pHandle->m_pOCRDefaultEngine.get());
             }
         }
+            else
+                nStatus = pHandle->m_lLastError;
         break;
+        }
     }
     if ( !pHandler )
     {
+        if ( nStatus == DTWAIN_NO_ERROR)
         nStatus = DTWAIN_ERR_BADPARAM;
-        return NULL;
+        return nullptr;
     }
 
     DibMultiPageStruct s;
@@ -681,8 +692,6 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
     }
     if ( nStatus != 0)
     {
-        // If this error is > 0, this is an ISource error, else this
-        // is a DTWAIN error
         if ( nStatus > 0 )
             nStatus = DTWAIN_ERR_FILEXFERSTART - nStatus;
 
