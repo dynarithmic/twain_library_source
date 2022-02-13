@@ -5,6 +5,13 @@ This repositiory contains the source code and development versions of the Dynari
 
 ----
 
+# Current release builds of the Dynarithmic TWAIN Library
+Currently, all the binaries that are released to the general public (the libraries in the twain_library repository) are compiled using **Visual Studio 2015, Update 3**.  
+
+This may change over time, as Visual Studio 2019 and higher are now becoming the mainstream compiler used for Windows.  
+
+----
+
 ### Rebuilding the Dynarithmic TWAIN Library from source ###
 
 If you want to rebuild the libraries, you will need the following tools and computer resources:
