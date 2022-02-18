@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <cstring>
 #include "ctltr010.h"
 #include "ctldevnt.h"
+#include "dtwain.h"
 using namespace dynarithmic;
 CTL_DeviceEvent::CTL_DeviceEvent() : m_DeviceEvent() {}
 
@@ -32,12 +32,12 @@ TW_INT32   CTL_DeviceEvent::GetPowerSupply() const { return       m_DeviceEvent.
 
 double CTL_DeviceEvent::GetXResolution() const
 {
-    return (double)CTL_CapabilityTriplet::Twain32ToFloat( m_DeviceEvent.XResolution );
+    return static_cast<double>(CTL_CapabilityTriplet::Twain32ToFloat(m_DeviceEvent.XResolution));
 }
 
 double CTL_DeviceEvent::GetYResolution() const
 {
-    return (double)CTL_CapabilityTriplet::Twain32ToFloat( m_DeviceEvent.YResolution );
+    return static_cast<double>(CTL_CapabilityTriplet::Twain32ToFloat(m_DeviceEvent.YResolution));
 }
 
 TW_UINT32  CTL_DeviceEvent::GetFlashUsed2() const { return             m_DeviceEvent.FlashUsed2;            }
@@ -54,7 +54,7 @@ bool CTL_DeviceEvent::GetEventInfoEx(DTWAIN_ARRAY Array)  const
         case TWDE_CHECKBATTERY:
         {
             DTWAIN_ArrayAdd( Array, (LPVOID)&m_DeviceEvent.BatteryMinutes );
-            LONG dummy = (LONG)m_DeviceEvent.BatteryPercentage;
+            LONG dummy = static_cast<LONG>(m_DeviceEvent.BatteryPercentage);
             DTWAIN_ArrayAdd( Array, &dummy );
         }
         break;

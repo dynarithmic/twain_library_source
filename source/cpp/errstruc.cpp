@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#define USE_SSTREAM_H  // always use ostringstream.  Too bad if compiler can't support them!
-#include <vector>
 #include <boost/format.hpp>
 #include <sstream>
 #include "ctliface.h"
@@ -28,25 +26,24 @@
 #include "errstruc.h"
 #include "dtwain_resource_constants.h"
 
-using namespace std;
 using namespace dynarithmic;
 
-static CTL_StringType DecodeSourceInfo(pTW_IDENTITY pIdentity, LPCTSTR sPrefix);
-static CTL_StringType DecodeData(CTL_ErrorStructDecoder *pDecoder, TW_MEMREF pData, ErrorStructTypes sType);
-static CTL_StringType DecodeTW_MEMORY(pTW_MEMORY pMemory, LPCTSTR pMem);
-static CTL_StringType DecodeTW_ELEMENT8(pTW_ELEMENT8 pEl, LPCTSTR pMem);
-static CTL_StringType DecodeTW_INFO(pTW_INFO pInfo, LPCTSTR pMem);
-static CTL_StringType DecodeSupportedGroups(TW_UINT32 SupportedGroups);
-static CTL_StringType IndentDefinition() { return CTL_StringType(4, _T(' ')); }
+static std::string DecodeSourceInfo(pTW_IDENTITY pIdentity, LPCSTR sPrefix);
+static std::string DecodeData(CTL_ErrorStructDecoder *pDecoder, TW_MEMREF pData, ErrorStructTypes sType);
+static std::string DecodeTW_MEMORY(pTW_MEMORY pMemory, LPCSTR pMem);
+static std::string DecodeTW_ELEMENT8(pTW_ELEMENT8 pEl, LPCSTR pMem);
+static std::string DecodeTW_INFO(pTW_INFO pInfo, LPCSTR pMem);
+static std::string DecodeSupportedGroups(TW_UINT32 SupportedGroups);
+static std::string IndentDefinition() { return std::string(4, ' '); }
 
 CTL_ContainerToNameMap CTL_ErrorStructDecoder::s_mapContainerType;
 CTL_ContainerToNameMap CTL_ErrorStructDecoder::s_mapNotificationType;
-std::unordered_map<TW_UINT32, CTL_StringType> CTL_ErrorStructDecoder::s_mapSupportedGroups;
-std::unordered_map<TW_UINT16, CTL_StringType> CTL_ErrorStructDecoder::s_mapTwainDSMReturnCodes;
+std::unordered_map<TW_UINT32, std::string> CTL_ErrorStructDecoder::s_mapSupportedGroups;
+std::unordered_map<TW_UINT16, std::string> CTL_ErrorStructDecoder::s_mapTwainDSMReturnCodes;
 
 bool CTL_ErrorStructDecoder::s_bInit=false;
 
-#define ADD_ERRORCODE_TO_MAP(theMap, start, x) theMap[(start) + x] = _T(#x);
+#define ADD_ERRORCODE_TO_MAP(theMap, start, x) theMap[(start) + x] = #x;
 
 CTL_ErrorStructDecoder::CTL_ErrorStructDecoder()
 {
@@ -102,10 +99,10 @@ CTL_ErrorStructDecoder::CTL_ErrorStructDecoder()
         ADD_ERRORCODE_TO_MAP(s_mapSupportedGroups, 0, DF_APP2)
         ADD_ERRORCODE_TO_MAP(s_mapSupportedGroups, 0, DF_DS2)
 
-        s_mapContainerType[TWON_ARRAY]          = _T("TW_ARRAY");
-        s_mapContainerType[TWON_ENUMERATION]    = _T("TW_ENUMERATION");
-        s_mapContainerType[TWON_ONEVALUE]       = _T("TW_ONEVALUE");
-        s_mapContainerType[TWON_RANGE]          = _T("TW_RANGE");
+        s_mapContainerType[TWON_ARRAY]          = "TW_ARRAY";
+        s_mapContainerType[TWON_ENUMERATION]    = "TW_ENUMERATION";
+        s_mapContainerType[TWON_ONEVALUE]       = "TW_ONEVALUE";
+        s_mapContainerType[TWON_RANGE]          = "TW_RANGE";
 
         // Map of DTWAIN window messages to strings
         ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_ACQUIREDONE       )
@@ -168,27 +165,28 @@ CTL_ErrorStructDecoder::CTL_ErrorStructDecoder()
         ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_BLANKPAGEDISCARDED2   )
         ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_MESSAGELOOPERROR   )
         ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_SETUPMODALACQUISITION )
+        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_TWAINTRIPLETBEGIN)
+        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_TWAINTRIPLETEND)
         s_bInit = true;
     }
 }
 
-#define MAX_DECODE_BUFFER 100000
 void CTL_ErrorStructDecoder::StartMessageDecoder(HWND hWnd, UINT nMsg,
                                                  WPARAM wParam, LPARAM lParam)
 {
-    CTL_StringStreamType sBuffer;
+    StringStreamA sBuffer;
 
-    m_pString = _T("");
+    m_pString = "";
     if ( s_mapNotificationType.find(wParam) != s_mapNotificationType.end())
-        sBuffer << _T("\nDTWAIN Message(HWND = ") << hWnd << _T(", ") <<
-                                    _T("MSG = ") << nMsg << _T(", ") <<
-                                    _T("Notification code = ") << s_mapNotificationType[wParam] << _T(", ") <<
-                                    _T("LPARAM = ") << lParam;
+        sBuffer << "\nDTWAIN Message(HWND = " << hWnd << ", " <<
+                                    "MSG = " << nMsg << ", " <<
+                                    "Notification code = " << s_mapNotificationType[wParam] << ", " <<
+                                    "LPARAM = " << lParam;
     else
-        sBuffer << _T("\nDTWAIN Message(HWND = ") << hWnd << _T(", ") <<
-                                    _T("MSG = ") << nMsg << _T(", ") <<
-                                    _T("Notification code = ") << wParam << _T(", ") <<
-                                    _T("LPARAM = ") << lParam;
+        sBuffer << "\nDTWAIN Message(HWND = " << hWnd << ", " <<
+                                    "MSG = " << nMsg << ", " <<
+                                    "Notification code = " << wParam << ", " <<
+                                    "LPARAM = " << lParam;
     m_pString = sBuffer.str();
 }
 
@@ -196,21 +194,21 @@ void CTL_ErrorStructDecoder::StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDe
                                          LONG nDG, UINT nDAT, UINT nMSG, TW_MEMREF Data,
                                          ErrorStructTypes sType)
 {
-    CTL_StringStreamType sBuffer;
+    StringStreamA sBuffer;
 
-    m_pString = _T("");
-    CTL_StringType s1;
-    sBuffer << _T("\nDSM_Entry(pSource=") << pSource << _T("H, ") <<
-                _T("pDest=") << pDest << _T("H, ") <<
-           (CTL_TwainDLLHandle::GetTwainNameFromResource(CTL_TwainDLLHandle::GetDGResourceID(),(int)nDG)) << _T(", ") <<
-           (CTL_TwainDLLHandle::GetTwainNameFromResource(CTL_TwainDLLHandle::GetDATResourceID(),nDAT)) << _T(", ") <<
-           (CTL_TwainDLLHandle::GetTwainNameFromResource(CTL_TwainDLLHandle::GetMSGResourceID(),nMSG)) << _T(", ") <<
-           _T("TW_MEMREF=") << Data << _T("H) called\n");
+    m_pString = "";
+    std::string s1;
+    sBuffer << "\nDSM_Entry(pSource=" << pSource << "H, " <<
+                "pDest=" << pDest << "H, " <<
+           (CTL_TwainDLLHandle::GetTwainNameFromResource(CTL_TwainDLLHandle::GetDGResourceID(),static_cast<int>(nDG))) << ", " <<
+           (CTL_TwainDLLHandle::GetTwainNameFromResource(CTL_TwainDLLHandle::GetDATResourceID(),static_cast<int>(nDAT))) << ", " <<
+           (CTL_TwainDLLHandle::GetTwainNameFromResource(CTL_TwainDLLHandle::GetMSGResourceID(),static_cast<int>(nMSG))) << ", " <<
+           "TW_MEMREF=" << Data << "H) called\n";
     s1 = sBuffer.str();
 
-    CTL_StringType pSourceStr;
-    CTL_StringType pDestStr;
-    CTL_StringType pMemRefStr;
+    std::string pSourceStr;
+    std::string pDestStr;
+    std::string pMemRefStr;
 
     // Decode the pSource argument
     long lErrorFilter = CTL_TwainDLLHandle::GetErrorFilterFlags();
@@ -221,15 +219,15 @@ void CTL_ErrorStructDecoder::StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDe
     }
     if ( lErrorFilter & DTWAIN_LOG_DECODE_SOURCE )
     {
-        pSourceStr = DecodeSourceInfo(pSource, _T("pSource"));
-        pSourceStr += _T("\n");
+        pSourceStr = DecodeSourceInfo(pSource, "pSource");
+        pSourceStr += "\n";
     }
 
     // Decode the pDest argument
     if ( lErrorFilter & DTWAIN_LOG_DECODE_DEST)
     {
-        pDestStr   = DecodeSourceInfo(pDest, _T("pDest"));
-        pDestStr += _T("\n");
+        pDestStr   = DecodeSourceInfo(pDest, "pDest");
+        pDestStr += "\n";
     }
 
     // Decode the TW_MEMREF structure
@@ -240,112 +238,112 @@ void CTL_ErrorStructDecoder::StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDe
     m_pString += pDestStr + pMemRefStr;
 }
 
-CTL_StringType CTL_ErrorStructDecoder::DecodeBitmap(HANDLE hBitmap) const
+std::string CTL_ErrorStructDecoder::DecodeBitmap(HANDLE hBitmap)
 {
-    CTL_StringStreamType sBuffer;
+    StringStreamA sBuffer;
     if ( !hBitmap )
-        return _T("\n(null bitmap)\n\n");
-    LPBITMAPINFOHEADER pbi = (LPBITMAPINFOHEADER)ImageMemoryHandler::GlobalLock(hBitmap);
+        return "\n(null bitmap)\n\n";
+    const auto pbi = static_cast<LPBITMAPINFOHEADER>(ImageMemoryHandler::GlobalLock(hBitmap));
     DTWAINGlobalHandle_RAII dibHandle(hBitmap);
-    sBuffer << _T("\nHandle=") << hBitmap << _T("\n") <<
-            _T("biSize=") << pbi->biSize << _T("\n") <<
-            _T("biWidth=") << pbi->biWidth << _T("\n") <<
-            _T("biHeight=") << pbi->biHeight << _T("\n") <<
-            _T("biPlanes=") << pbi->biPlanes << _T("\n") <<
-            _T("biBitCount=") << pbi->biBitCount << _T("\n") <<
-            _T("biCompression=") << pbi->biCompression << _T("\n") <<
-            _T("biSizeImage=") << pbi->biSizeImage << _T("\n") <<
-            _T("biXPelsPerMeter=") << pbi->biXPelsPerMeter << _T("\n") <<
-            _T("biYPelsPerMeter=") << pbi->biYPelsPerMeter << _T("\n") <<
-            _T("biClrUsed=") << pbi->biClrUsed << _T("\n") <<
-            _T("biClrImportant=") << pbi->biClrImportant << _T("\n\n");
+    sBuffer << "\nHandle=" << hBitmap << "\n" <<
+            "biSize=" << pbi->biSize << "\n" <<
+            "biWidth=" << pbi->biWidth << "\n" <<
+            "biHeight=" << pbi->biHeight << "\n" <<
+            "biPlanes=" << pbi->biPlanes << "\n" <<
+            "biBitCount=" << pbi->biBitCount << "\n" <<
+            "biCompression=" << pbi->biCompression << "\n" <<
+            "biSizeImage=" << pbi->biSizeImage << "\n" <<
+            "biXPelsPerMeter=" << pbi->biXPelsPerMeter << "\n" <<
+            "biYPelsPerMeter=" << pbi->biYPelsPerMeter << "\n" <<
+            "biClrUsed=" << pbi->biClrUsed << "\n" <<
+            "biClrImportant=" << pbi->biClrImportant << "\n\n";
     return sBuffer.str();
 }
 
-CTL_StringType CTL_ErrorStructDecoder::DecodePDFTextElement(PDFTextElement *pEl) const
+std::string CTL_ErrorStructDecoder::DecodePDFTextElement(PDFTextElement *pEl)
 {
-    CTL_StringStreamType sBuffer;
+    StringStreamA sBuffer;
     if ( !pEl )
-        return _T("\n(null PDF Text Element)\n\n");
+        return "\n(null PDF Text Element)\n\n";
 
     // PDFTextHandle
-    CTL_StringType indent(42, _T(' '));
-    sBuffer << indent << _T("text=\"") << pEl->m_text << _T("\"\n");
-    sBuffer << indent <<  _T("(xpos,ypos)=(") << pEl->xpos << _T(",") << pEl->ypos << _T(")\n");
-    sBuffer <<  indent << _T("(scalex,scaley)=(") << pEl->scalingX << _T(",") << pEl->scalingY << _T(")\n");
-    sBuffer <<  indent << _T("generalScaling=") << pEl->scaling << _T("\n");
-    sBuffer <<  indent << _T("font=") << pEl->m_font.m_fontName << _T("\n");
-    sBuffer <<  indent << _T("fontSize=") << pEl->fontSize << _T("\n");
-    int r = GetRValue(pEl->colorRGB);
-    int g = GetBValue(pEl->colorRGB);
-    int b = GetGValue(pEl->colorRGB);
-    sBuffer <<  indent << _T("RGBValue=(") << r << _T(",") << g <<_T(",") << b << _T(")\n");
-    sBuffer <<  indent << _T("charSpacing=") << pEl->charSpacing << _T("\n");
-    sBuffer <<  indent << _T("wordSpacing=") << pEl->wordSpacing << _T("\n");
-    sBuffer <<  indent << _T("strokeWidth=") << pEl->strokeWidth << _T("\n");
-    sBuffer <<  indent << _T("renderMode=") << pEl->renderMode << _T("\n\n");
+    const std::string indent(42, ' ');
+    sBuffer << indent << "text=\"" << pEl->m_text << "\"\n";
+    sBuffer << indent <<  "(xpos,ypos)=" << pEl->xpos << "," << pEl->ypos << "\n";
+    sBuffer <<  indent << "(scalex,scaley)=" << pEl->scalingX << "," << pEl->scalingY << "\n";
+    sBuffer <<  indent << "generalScaling=" << pEl->scaling << "\n";
+    sBuffer <<  indent << "font=" << pEl->m_font.m_fontName << "\n";
+    sBuffer <<  indent << "fontSize=" << pEl->fontSize << "\n";
+    const int r = GetRValue(pEl->colorRGB);
+    const int g = GetBValue(pEl->colorRGB);
+    const int b = GetGValue(pEl->colorRGB);
+    sBuffer <<  indent << "RGBValue=" << r << "," << g <<"," << b << "\n";
+    sBuffer <<  indent << "charSpacing=" << pEl->charSpacing << "\n";
+    sBuffer <<  indent << "wordSpacing=" << pEl->wordSpacing << "\n";
+    sBuffer <<  indent << "strokeWidth=" << pEl->strokeWidth << "\n";
+    sBuffer <<  indent << "renderMode=" << pEl->renderMode << "\n\n";
     return sBuffer.str();
 }
 
 
-CTL_StringType CTL_ErrorStructDecoder::DecodeTWAINReturnCode(TW_UINT16 retCode) const
+std::string CTL_ErrorStructDecoder::DecodeTWAINReturnCode(TW_UINT16 retCode)
 {
-    return DecodeTWAINCode(retCode, IDS_TWRC_ERRORSTART, _T("Unknown TWAIN Return Code"));
+    return DecodeTWAINCode(retCode, IDS_TWRC_ERRORSTART,  "Unknown TWAIN Return Code");
 }
 
-CTL_StringType CTL_ErrorStructDecoder::DecodeTWAINReturnCodeCC(TW_UINT16 retCode) const
+std::string CTL_ErrorStructDecoder::DecodeTWAINReturnCodeCC(TW_UINT16 retCode)
 {
-    return DecodeTWAINCode(retCode, IDS_TWCC_ERRORSTART, _T("Unknown TWAIN Condition Code"));
+    return DecodeTWAINCode(retCode, IDS_TWCC_ERRORSTART, "Unknown TWAIN Condition Code");
 }
 
-CTL_StringType CTL_ErrorStructDecoder::DecodeTWAINCode(TW_UINT16 retCode, TW_UINT16 errStart, const CTL_StringType& defMessage) const
+std::string CTL_ErrorStructDecoder::DecodeTWAINCode(TW_UINT16 retCode, TW_UINT16 errStart, const std::string& defMessage)
 {
-    TW_UINT16 actualCode = retCode + errStart;
-    auto it = s_mapTwainDSMReturnCodes.find(actualCode);
+    const TW_UINT16 actualCode = retCode + errStart;
+    const auto it = s_mapTwainDSMReturnCodes.find(actualCode);
     if ( it != s_mapTwainDSMReturnCodes.end() )
         return it->second;
     return defMessage;
 }
 
-CTL_StringType DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorStructTypes sType)
+std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorStructTypes sType)
 {
-    CTL_StringStreamType sBuffer;
-    CTL_StringType sTemp;
-    CTL_StringType indenter = IndentDefinition();
+    StringStreamA sBuffer;
+    std::string sTemp;
+    std::string indenter = IndentDefinition();
     if ( !pData )
-        sBuffer << _T("\nNo TW_MEMREF Data");
+        sBuffer << "\nNo TW_MEMREF Data";
     else
     {
         switch (sType)
         {
             case ERRSTRUCT_NONE:
-                sBuffer << _T("\nNo TW_MEMREF Data");
+                sBuffer << "\nNo TW_MEMREF Data";
             break;
 
             case ERRSTRUCT_TW_CUSTOMDSDATA:
             {
-                pTW_CUSTOMDSDATA p = (pTW_CUSTOMDSDATA)pData;
-                sBuffer << _T("\nTW_MEMREF is TW_CUSTOMDATA:\n{\n") <<
-                            _T("InfoLength=") << p->InfoLength << _T("\n") <<
-                            _T("hData=") << p->hData << _T("\n}\n");
+                auto p = static_cast<pTW_CUSTOMDSDATA>(pData);
+                sBuffer << "\nTW_MEMREF is TW_CUSTOMDATA:\n{\n" <<
+                            "InfoLength=" << p->InfoLength << "\n" <<
+                            "hData=" << p->hData << "\n}\n";
             }
             break;
 
             case ERRSTRUCT_TW_DEVICEEVENT:
             {
-                pTW_DEVICEEVENT p = (pTW_DEVICEEVENT)pData;
-                sBuffer << _T("\nTW_MEMREF is TW_DEVICEEVENT:\n{\n") <<
-                            _T("Event=") << p->Event << _T("\n") <<
-                            _T("DeviceName=") << p->DeviceName << _T("\n") <<
-                            _T("BatteryMinutes=") << p->BatteryMinutes << _T("\n") <<
-                            _T("BatteryPercentage=") << p->BatteryPercentage << _T("\n") <<
-                            _T("PowerSupply=") << p->PowerSupply << _T("\n") <<
-                            _T("XResolution=") << CTL_CapabilityTriplet::Twain32ToFloat(p->XResolution) << _T("\n") <<
-                            _T("YResolution=") << CTL_CapabilityTriplet::Twain32ToFloat(p->YResolution) << _T("\n") <<
-                            _T("FlashUsed2=") << p->FlashUsed2 << _T("\n") <<
-                            _T("AutomaticCapture=") << p->AutomaticCapture << _T("\n") <<
-                            _T("TimeBeforeFirstCapture=") << p->TimeBeforeFirstCapture << _T("\n") <<
-                            _T("TimeBetweenCaptures=") << p->TimeBetweenCaptures << _T("\n}\n");
+                auto p = static_cast<pTW_DEVICEEVENT>(pData);
+                sBuffer << "\nTW_MEMREF is TW_DEVICEEVENT:\n{\n" <<
+                            "Event=" << p->Event << "\n" <<
+                            "DeviceName=" << p->DeviceName << "\n" <<
+                            "BatteryMinutes=" << p->BatteryMinutes << "\n" <<
+                            "BatteryPercentage=" << p->BatteryPercentage << "\n" <<
+                            "PowerSupply=" << p->PowerSupply << "\n" <<
+                            "XResolution=" << CTL_CapabilityTriplet::Twain32ToFloat(p->XResolution) << "\n" <<
+                            "YResolution=" << CTL_CapabilityTriplet::Twain32ToFloat(p->YResolution) << "\n" <<
+                            "FlashUsed2=" << p->FlashUsed2 << "\n" <<
+                            "AutomaticCapture=" << p->AutomaticCapture << "\n" <<
+                            "TimeBeforeFirstCapture=" << p->TimeBeforeFirstCapture << "\n" <<
+                            "TimeBetweenCaptures=" << p->TimeBetweenCaptures << "\n}\n";
             }
             break;
 
@@ -354,71 +352,71 @@ CTL_StringType DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, Err
                 LONG lErrorFlags = CTL_TwainDLLHandle::GetErrorFilterFlags();
                 if ( lErrorFlags & DTWAIN_LOG_DECODE_TWEVENT )
                 {
-                    pTW_EVENT p = (pTW_EVENT)pData;
-                    MSG *pmsg = (MSG*)p->pEvent;
-                    sBuffer << _T("\nTW_MEMREF is TW_EVENT:\n{\n") <<
-                                indenter << _T("pEvent has MSG structure:\n") <<
-                                indenter << _T("MSG Values\n") <<
-                                indenter << _T("{")<<
-                                _T(" hwnd=") <<  pmsg->hwnd <<
-                                _T(", message=") << pmsg->message <<
-                                _T(", wParam=") << pmsg->wParam <<
-                                _T(", lParam=") << pmsg->lParam <<
-                                _T(", time=") << pmsg->time <<
-                                _T(", point.x=") << pmsg->pt.x <<
-                                _T(", point.y=") << pmsg->pt.y <<
-                                _T(" }\n") <<
-                                indenter << _T("DS Message=") << p->TWMessage << _T("\n}\n");
+                    auto p = static_cast<pTW_EVENT>(pData);
+                    MSG *pmsg = static_cast<MSG*>(p->pEvent);
+                    sBuffer << "\nTW_MEMREF is TW_EVENT:\n{\n" <<
+                                indenter << "pEvent has MSG structure:\n" <<
+                                indenter << "MSG Values\n" <<
+                                indenter << "{"<<
+                                " hwnd=" <<  pmsg->hwnd <<
+                                ", message=" << pmsg->message <<
+                                ", wParam=" << pmsg->wParam <<
+                                ", lParam=" << pmsg->lParam <<
+                                ", time=" << pmsg->time <<
+                                ", point.x=" << pmsg->pt.x <<
+                                ", point.y=" << pmsg->pt.y <<
+                                " }\n" <<
+                                indenter << "DS Message=" << p->TWMessage << "\n}\n";
                 }
             }
             break;
 
             case ERRSTRUCT_TW_FILESYSTEM:
             {
-                pTW_FILESYSTEM p = (pTW_FILESYSTEM)pData;
-                sBuffer << _T("\nTW_MEMREF is TW_FILESYSTEM:\n{\n") <<
-                        indenter << _T("InputName=") << p->InputName << _T("\n") <<
-                        indenter << _T("OutputName=") << p->OutputName << _T("\n") <<
-                        indenter << _T("Context=") << p->Context << _T("H\n") <<
-                        indenter << _T("Recursive=") << p->Recursive << _T("\n") <<
-                        indenter << _T("FileType=") << p->FileType << _T("\n") <<
-                        indenter << _T("Size=") << p->Size << _T("\n") <<
-                        indenter << _T("CreateTimeDate=") << p->CreateTimeDate << _T("\n") <<
-                        indenter << _T("ModifiedTimeDate=") << p->ModifiedTimeDate << _T("\n") <<
-                        indenter << _T("FreeSpace=") << p->FreeSpace << _T("\n") <<
-                        indenter << _T("NewImageSize=") << p->NewImageSize << _T("\n") <<
-                        indenter << _T("NumberOfFiles=") << p->NumberOfFiles << _T("\n") <<
-                        indenter << _T("NumberOfSnippets=") << p->NumberOfSnippets << _T("\n}\n");
+                auto p = static_cast<pTW_FILESYSTEM>(pData);
+                sBuffer << "\nTW_MEMREF is TW_FILESYSTEM:\n{\n" <<
+                        indenter << "InputName=" << p->InputName << "\n" <<
+                        indenter << "OutputName=" << p->OutputName << "\n" <<
+                        indenter << "Context=" << p->Context << "H\n" <<
+                        indenter << "Recursive=" << p->Recursive << "\n" <<
+                        indenter << "FileType=" << p->FileType << "\n" <<
+                        indenter << "Size=" << p->Size << "\n" <<
+                        indenter << "CreateTimeDate=" << p->CreateTimeDate << "\n" <<
+                        indenter << "ModifiedTimeDate=" << p->ModifiedTimeDate << "\n" <<
+                        indenter << "FreeSpace=" << p->FreeSpace << "\n" <<
+                        indenter << "NewImageSize=" << p->NewImageSize << "\n" <<
+                        indenter << "NumberOfFiles=" << p->NumberOfFiles << "\n" <<
+                        indenter << "NumberOfSnippets=" << p->NumberOfSnippets << "\n}\n";
             }
             break;
 
             case ERRSTRUCT_TW_IDENTITY:
             {
-                sBuffer << _T("\nTW_MEMREF is TW_IDENTITY:\n") << DecodeSourceInfo((pTW_IDENTITY)pData, _T("TW_MEMREF"));
+                sBuffer << "\nTW_MEMREF is TW_IDENTITY:\n" << DecodeSourceInfo(static_cast<pTW_IDENTITY>(pData), "TW_MEMREF");
             }
             break;
 
             case ERRSTRUCT_TW_MEMORY:
             {
-                TW_MEMORY* pMemory = (TW_MEMORY*)pData;
+                auto pMemory = static_cast<TW_MEMORY*>(pData);
                 sBuffer <<
-                    _T("\nTW_MEMREF is TW_MEMORY:\n{\n") <<
-                    indenter << _T("Flags=") << pMemory->Flags<< _T("\n") <<
-                    indenter << _T("Length=") << pMemory->Length << _T("\n") <<
-                    indenter << _T("TheMem=") << pMemory->TheMem << _T("\n}\n");
+                    "\nTW_MEMREF is TW_MEMORY:\n{\n" <<
+                    indenter << "Flags=" << pMemory->Flags<< "\n" <<
+                    indenter << "Length=" << pMemory->Length << "\n" <<
+                    indenter << "TheMem=" << pMemory->TheMem << "\n}\n";
             }
             break;
 
             case ERRSTRUCT_TW_ENTRYPOINT:
             {
-                TW_ENTRYPOINT* pEntryPoint = (TW_ENTRYPOINT*)pData;
+                auto pEntryPoint = static_cast<TW_ENTRYPOINT*>(pData);
                 sBuffer <<
-                    _T("\nTW_MEMREF is TW_ENTRYPOINT:\n{\n") <<
-                    indenter << _T("Size=") << pEntryPoint->Size << _T("\n") <<
-                    indenter << _T("DSMEntry=") << pEntryPoint->DSM_Entry << _T("\n") <<
-                    indenter << _T("DSMMemAllocate=") << pEntryPoint->DSM_MemAllocate << _T("\n") <<
-                    indenter << _T("DSMMemLock=") << pEntryPoint->DSM_MemLock << _T("\n") <<
-                    indenter << _T("DSMMemUnlock=") << pEntryPoint->DSM_MemUnlock << _T("\n}\n");
+                    "\nTW_MEMREF is TW_ENTRYPOINT:\n{\n" <<
+                    indenter << "Size=" << pEntryPoint->Size << "\n" <<
+                    indenter << "DSMEntry=" << &pEntryPoint->DSM_Entry << "\n" <<
+                    indenter << "DSMMemAllocate=" << &pEntryPoint->DSM_MemAllocate << "\n" <<
+                    indenter << "DSMMemLock=" << &pEntryPoint->DSM_MemLock << "\n" <<
+                    indenter << "DSMMemUnlock=" << &pEntryPoint->DSM_MemUnlock << "\n}\n";
             }
             break;
 
@@ -426,225 +424,224 @@ CTL_StringType DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, Err
             {
             #ifdef _WIN32
                 RECT r;
-                HWND *p = (HWND *)pData;
+                HWND *p = static_cast<HWND*>(pData);
                 ::GetWindowRect(*p, &r);
 
                 sBuffer <<
-                _T("\nTW_MEMREF is handle to window (HWND):\n{\n") <<
-                indenter << _T("HWND=") << *p << _T("\n") <<
-                indenter << _T("Screen Pos.= (") << r.left << _T(",") << r.top << _T(")-(") <<
-                                    r.right << _T(",") << r.bottom << _T(")\n}\n");
+                "\nTW_MEMREF is handle to window (HWND):\n{\n" <<
+                indenter << "HWND=" << *p << "\n" <<
+                indenter << "Screen Pos.= " << r.left << "," << r.top << "-" <<
+                                    r.right << "," << r.bottom << "\n}\n";
             #endif
             }
             break;
 
             case ERRSTRUCT_TW_PASSTHRU:
             {
-                pTW_PASSTHRU p = (pTW_PASSTHRU)pData;
+                auto p = static_cast<pTW_PASSTHRU>(pData);
                 sBuffer <<
-                _T("\nTW_MEMREF is TW_PASSTHRU:\n{\n") <<
-                indenter << _T("Command=") << p->pCommand << _T("H\n") <<
-                indenter << _T("CommandBytes=") << p->CommandBytes << _T("\n") <<
-                indenter << _T("Direction=") << p->Direction << _T("\n") <<
-                indenter << _T("pDataBuffer=") << p->pData << _T("H\n") <<
-                indenter << _T("DataBytes=") << p->DataBytes << _T("\n") <<
-                indenter << _T("DataBytesXfered=") << p->DataBytesXfered << _T("\n}\n");
+                "\nTW_MEMREF is TW_PASSTHRU:\n{\n" <<
+                indenter << "Command=" << p->pCommand << "H\n" <<
+                indenter << "CommandBytes=" << p->CommandBytes << "\n" <<
+                indenter << "Direction=" << p->Direction << "\n" <<
+                indenter << "pDataBuffer=" << p->pData << "H\n" <<
+                indenter << "DataBytes=" << p->DataBytes << "\n" <<
+                indenter << "DataBytesXfered=" << p->DataBytesXfered << "\n}\n";
             }
             break;
 
             case ERRSTRUCT_TW_PENDINGXFERS:
             {
-                pTW_PENDINGXFERS p = (pTW_PENDINGXFERS)pData;
-                sBuffer << _T("\nTW_MEMREF is TW_PENDINGXFERS:\n{\n") <<
-                            indenter << _T("Count=") << p->Count << _T("\n") <<
-                            indenter << _T("EOJ=") << p->EOJ << _T("\n}\n");
+                auto p = static_cast<pTW_PENDINGXFERS>(pData);
+                sBuffer << "\nTW_MEMREF is TW_PENDINGXFERS:\n{\n" <<
+                            indenter << "Count=" << p->Count << "\n" <<
+                            indenter << "EOJ=" << p->EOJ << "\n}\n";
             }
             break;
 
             case ERRSTRUCT_TW_SETUPFILEXFER:
             {
-                pTW_SETUPFILEXFER p = (pTW_SETUPFILEXFER)pData;
+                auto p = static_cast<pTW_SETUPFILEXFER>(pData);
                 sBuffer <<
-                _T("\nTW_MEMREF is TW_SETUPFILEXFER:\n{\n") <<
-                indenter << _T("FileName=") << p->FileName << _T("\n") <<
-                indenter << _T("Format=") << p->Format << _T("\n") <<
-                indenter << _T("VRefNum=") << p->VRefNum << _T("\n}\n");
+                "\nTW_MEMREF is TW_SETUPFILEXFER:\n{\n" <<
+                indenter << "FileName=" << p->FileName << "\n" <<
+                indenter << "Format=" << p->Format << "\n" <<
+                indenter << "VRefNum=" << p->VRefNum << "\n}\n";
             }
             break;
 
             case ERRSTRUCT_TW_SETUPMEMXFER:
             {
-                pTW_SETUPMEMXFER p = (pTW_SETUPMEMXFER)pData;
-                sBuffer << _T("\nTW_MEMREF is TW_SETUPMEMXFER:\n{\n") <<
-                        indenter << _T("MinBufSize=") << p->MinBufSize << _T("\n") <<
-                        indenter << _T("MaxBufSize=") << p->MaxBufSize << _T("\n") <<
-                        indenter << _T("Preferred=") << p->Preferred << _T("\n}\n");
+                auto p = static_cast<pTW_SETUPMEMXFER>(pData);
+                sBuffer << "\nTW_MEMREF is TW_SETUPMEMXFER:\n{\n" <<
+                        indenter << "MinBufSize=" << p->MinBufSize << "\n" <<
+                        indenter << "MaxBufSize=" << p->MaxBufSize << "\n" <<
+                        indenter << "Preferred=" << p->Preferred << "\n}\n";
             }
             break;
 
             case ERRSTRUCT_TW_CAPABILITY:
             {
                 CTL_ContainerToNameMap::iterator it;
-                pTW_CAPABILITY p = (pTW_CAPABILITY)pData;
-                it = pDecoder->s_mapContainerType.find((int)p->ConType);
-                CTL_StringType s = _T("Unspecified (TWON_DONTCARE)");
-                if (it != pDecoder->s_mapContainerType.end() )
+                auto p = static_cast<pTW_CAPABILITY>(pData);
+                it = dynarithmic::CTL_ErrorStructDecoder::s_mapContainerType.find(static_cast<int>(p->ConType));
+                std::string s = "Unspecified (TWON_DONTCARE)";
+                if (it != dynarithmic::CTL_ErrorStructDecoder::s_mapContainerType.end() )
                     s = (*it).second;
 
-                sBuffer << _T("\nTW_MEMREF is TW_CAPABILITY:\n{\n") <<
-                        indenter << _T("Cap=") << StringConversion::Convert_Ansi_To_Native(CTL_TwainAppMgr::GetCapNameFromCap(p->Cap)) << _T("\n") <<
-                        indenter << _T("ContainerType=") << s << _T("\n") <<
-                        indenter << _T("hContainer=") << p->hContainer << _T("\n}\n");
+                sBuffer << "\nTW_MEMREF is TW_CAPABILITY:\n{\n" <<
+                        indenter << "Cap=" << CTL_TwainAppMgr::GetCapNameFromCap(p->Cap) << "\n" <<
+                        indenter << "ContainerType=" << s << "\n" <<
+                        indenter << "hContainer=" << p->hContainer << "\n}\n";
             }
             break;
 
             case ERRSTRUCT_TW_STATUSUTF8:
             {
                 CTL_ContainerToNameMap::iterator it;
-                pTW_STATUSUTF8 p = (pTW_STATUSUTF8)pData;
+                auto p = static_cast<pTW_STATUSUTF8>(pData);
                 pTW_STATUS pStatus = &p->Status;
-                sBuffer << _T("\nTW_MEMREF is TW_STATUSUTF8:\n{\n") <<
-                    indenter << _T("Status ConditionCode=") << pStatus->ConditionCode << _T("\n") <<
-                    indenter << _T("Size=") << p->Size << _T("\n") <<
-                    indenter << _T("UTF8string=") << p->UTF8string << _T("\n}\n");
+                sBuffer << "\nTW_MEMREF is TW_STATUSUTF8:\n{\n" <<
+                    indenter << "Status ConditionCode=" << pStatus->ConditionCode << "\n" <<
+                    indenter << "Size=" << p->Size << "\n" <<
+                    indenter << "UTF8string=" << p->UTF8string << "\n}\n";
             }
             break;
 
             case ERRSTRUCT_TW_STATUS:
             {
-                pTW_STATUS p = (pTW_STATUS)pData;
-                CTL_StringType sConditionCode = _T("(Unknown)");
+                auto p = static_cast<pTW_STATUS>(pData);
+                std::string sConditionCode = "(Unknown)";
                 if (CTL_ErrorStructDecoder::s_mapTwainDSMReturnCodes.find(IDS_TWCC_ERRORSTART + p->ConditionCode)
                     != CTL_ErrorStructDecoder::s_mapTwainDSMReturnCodes.end())
-                    sConditionCode = _T("(") + CTL_ErrorStructDecoder::s_mapTwainDSMReturnCodes[IDS_TWCC_ERRORSTART + p->ConditionCode] + _T(")");
-                sBuffer << _T("\nTW_MEMREF is TW_STATUS:\n{\n") <<
-                        indenter << _T("ConditionCode=") << p->ConditionCode << _T("  ") << sConditionCode << _T("\n}\n");
+                    sConditionCode = "" + CTL_ErrorStructDecoder::s_mapTwainDSMReturnCodes[IDS_TWCC_ERRORSTART + p->ConditionCode] + "";
+                sBuffer << "\nTW_MEMREF is TW_STATUS:\n{\n" <<
+                        indenter << "ConditionCode=" << p->ConditionCode << "  " << sConditionCode << "\n}\n";
             }
             break;
 
             case ERRSTRUCT_TW_USERINTERFACE:
             {
             #ifdef _WIN32
-                pTW_USERINTERFACE p = (pTW_USERINTERFACE)pData;
+                auto p = static_cast<pTW_USERINTERFACE>(pData);
                 TCHAR sz[256];
                 RECT r;
                 SetRect(&r,0,0,0,0);
                 sz[0] = _T('\0');
-                sBuffer << _T("\nTW_MEMREF is TW_USERINTERFACE:\n{\n") <<
-                        indenter << _T("ShowUI=") <<  (p->ShowUI?_T("TRUE"):_T("FALSE")) << _T("\n") <<
-                        indenter << _T("ModalUI=") << (p->ModalUI?_T("TRUE"):_T("FALSE")) << _T("\n") <<
-                        indenter << _T("hParent=") << p->hParent << _T("\n") <<
-                        indenter << _T("hParent.Title=") << sz << _T("\n") <<
-                        indenter << _T("hParent.ScreenPos.=(") <<
-                        r.left << _T(",") << r.top << _T(")-(") <<
-                        r.right << _T(",") << r.bottom << _T(")\n}\n");
+                sBuffer << "\nTW_MEMREF is TW_USERINTERFACE:\n{\n" <<
+                        indenter << "ShowUI=" <<  (p->ShowUI?"TRUE":"FALSE") << "\n" <<
+                        indenter << "ModalUI=" << (p->ModalUI?"TRUE":"FALSE") << "\n" <<
+                        indenter << "hParent=" << p->hParent << "\n" <<
+                        indenter << "hParent.Title=" << sz << "\n" <<
+                        indenter << "hParent.ScreenPos.=" <<
+                        r.left << "," << r.top << "-" <<
+                        r.right << "," << r.bottom << "\n}\n";
             #endif
             }
             break;
 
             case ERRSTRUCT_TW_IMAGEINFO:
             {
-                pTW_IMAGEINFO p = (pTW_IMAGEINFO)pData;
-                sBuffer << _T("\nTW_MEMREF is TW_IMAGEINFO:\n{\n") <<
-                        indenter << _T("XResolution=") << CTL_CapabilityTriplet::Twain32ToFloat(p->XResolution) << _T("\n") <<
-                        indenter << _T("YResolution=") << CTL_CapabilityTriplet::Twain32ToFloat(p->YResolution) << _T("\n") <<
-                        indenter << _T("ImageWidth=") << p->ImageWidth << _T("\n") <<
-                        indenter << _T("ImageLength=") << p->ImageLength << _T("\n") <<
-                        indenter << _T("SamplesPerPixel=") << p->SamplesPerPixel << _T("\n") <<
-                        indenter << _T("BitsPerSample(") <<
-                        p->BitsPerSample[0] << _T(",")  <<
-                        p->BitsPerSample[1] << _T(",")  <<
-                        p->BitsPerSample[2] << _T(",")  <<
-                        p->BitsPerSample[3] << _T(",")  <<
-                        p->BitsPerSample[4] << _T(",")  <<
-                        p->BitsPerSample[5] << _T(",")  <<
-                        p->BitsPerSample[6] << _T(",")  <<
-                        p->BitsPerSample[7] << _T(")\n")  <<
-                        indenter << _T("BitsPerPixel=") << p->BitsPerPixel << _T("\n") <<
-                        indenter << _T("Planar=") << (p->Planar?_T("TRUE"):_T("FALSE")) << _T("\n") <<
-                        indenter << _T("PixelType=") << p->PixelType << _T("\n") <<
-                        indenter << _T("Compression=") << p->Compression << _T("\n}\n");
+                auto p = static_cast<pTW_IMAGEINFO>(pData);
+                sBuffer << "\nTW_MEMREF is TW_IMAGEINFO:\n{\n" <<
+                        indenter << "XResolution=" << CTL_CapabilityTriplet::Twain32ToFloat(p->XResolution) << "\n" <<
+                        indenter << "YResolution=" << CTL_CapabilityTriplet::Twain32ToFloat(p->YResolution) << "\n" <<
+                        indenter << "ImageWidth=" << p->ImageWidth << "\n" <<
+                        indenter << "ImageLength=" << p->ImageLength << "\n" <<
+                        indenter << "SamplesPerPixel=" << p->SamplesPerPixel << "\n" <<
+                        indenter << "BitsPerSample" <<
+                        p->BitsPerSample[0] << ","  <<
+                        p->BitsPerSample[1] << ","  <<
+                        p->BitsPerSample[2] << ","  <<
+                        p->BitsPerSample[3] << ","  <<
+                        p->BitsPerSample[4] << ","  <<
+                        p->BitsPerSample[5] << ","  <<
+                        p->BitsPerSample[6] << ","  <<
+                        p->BitsPerSample[7] << "\n"  <<
+                        indenter << "BitsPerPixel=" << p->BitsPerPixel << "\n" <<
+                        indenter << "Planar=" << (p->Planar?"TRUE":"FALSE") << "\n" <<
+                        indenter << "PixelType=" << p->PixelType << "\n" <<
+                        indenter << "Compression=" << p->Compression << "\n}\n";
             }
             break;
 
             case ERRSTRUCT_TW_IMAGELAYOUT:
             {
-                pTW_IMAGELAYOUT p = (pTW_IMAGELAYOUT)pData;
+                auto p = static_cast<pTW_IMAGELAYOUT>(pData);
                 sBuffer <<
-                _T("\nTW_MEMREF is TW_IMAGELAYOUT:\n{\n") <<
-                indenter << _T("Frame=(") <<
-                CTL_CapabilityTriplet::Twain32ToFloat(p->Frame.Left) << _T(",") <<
-                CTL_CapabilityTriplet::Twain32ToFloat(p->Frame.Top) << _T(")-(") <<
-                CTL_CapabilityTriplet::Twain32ToFloat(p->Frame.Right) << _T(",") <<
-                CTL_CapabilityTriplet::Twain32ToFloat(p->Frame.Bottom) << _T(")\n") <<
-                indenter << _T("DocmentNumber=") << p->DocumentNumber << _T("\n") <<
-                indenter << _T("PageNumber=") << p->PageNumber << _T("\n") <<
-                indenter << _T("FrameNumber=") << p->FrameNumber << _T("\n}\n");
+                "\nTW_MEMREF is TW_IMAGELAYOUT:\n{\n" <<
+                indenter << "Frame=" <<
+                CTL_CapabilityTriplet::Twain32ToFloat(p->Frame.Left) << "," <<
+                CTL_CapabilityTriplet::Twain32ToFloat(p->Frame.Top) << "-" <<
+                CTL_CapabilityTriplet::Twain32ToFloat(p->Frame.Right) << "," <<
+                CTL_CapabilityTriplet::Twain32ToFloat(p->Frame.Bottom) << "\n" <<
+                indenter << "DocmentNumber=" << p->DocumentNumber << "\n" <<
+                indenter << "PageNumber=" << p->PageNumber << "\n" <<
+                indenter << "FrameNumber=" << p->FrameNumber << "\n}\n";
             }
             break;
 
             case ERRSTRUCT_TW_IMAGEMEMXFER:
             {
-                pTW_IMAGEMEMXFER p = (pTW_IMAGEMEMXFER)pData;
-                sBuffer << _T("\nTW_MEMREF is TW_IMAGEMEMXFER:\n{\n") <<
-                            indenter << _T("Compression=") << p->Compression << _T("\n") <<
-                            indenter << _T("BytesPerRow=") << p->BytesPerRow << _T("\n") <<
-                            indenter << _T("Columns=") << p->Columns << _T("\n") <<
-                            indenter << _T("Rows=") << p->Rows << _T("\n") <<
-                            indenter << _T("XOffset=") << p->XOffset << _T("\n") <<
-                            indenter << _T("YOffset=") << p->YOffset << _T("\n") <<
-                            indenter << _T("BytesWritten=") << p->BytesWritten << _T("\n") <<
-                            indenter << DecodeTW_MEMORY(&p->Memory,_T("Memory")) << _T("\n}\n");
+                auto p = static_cast<pTW_IMAGEMEMXFER>(pData);
+                sBuffer << "\nTW_MEMREF is TW_IMAGEMEMXFER:\n{\n" <<
+                            indenter << "Compression=" << p->Compression << "\n" <<
+                            indenter << "BytesPerRow=" << p->BytesPerRow << "\n" <<
+                            indenter << "Columns=" << p->Columns << "\n" <<
+                            indenter << "Rows=" << p->Rows << "\n" <<
+                            indenter << "XOffset=" << p->XOffset << "\n" <<
+                            indenter << "YOffset=" << p->YOffset << "\n" <<
+                            indenter << "BytesWritten=" << p->BytesWritten << "\n" <<
+                            indenter << DecodeTW_MEMORY(&p->Memory,"Memory") << "\n}\n";
             }
             break;
 
             case ERRSTRUCT_HDIB:
             {
-                HANDLE h = (HANDLE)pData;
-                sBuffer << _T("\nTW_MEMREF is a DIB:\n{\n") <<
-                            indenter << _T("DIB Handle=") << h << _T("\n}\n");
+                auto h = static_cast<HANDLE>(pData);
+                sBuffer << "\nTW_MEMREF is a DIB:\n{\n" <<
+                            indenter << "DIB Handle=" << h << "\n}\n";
             }
             break;
 
             case ERRSTRUCT_TW_PALETTE8:
             {
-                pTW_PALETTE8 p = (pTW_PALETTE8)pData;
-                sBuffer << _T("\nTW_MEMREF is a TW_PALETTE8:\n{\n") <<
-                            indenter << _T("NumColors=") << p->NumColors << _T("\n") <<
-                            indenter << _T("PaletteType=") << p->PaletteType << _T("\n");
+                auto p = static_cast<pTW_PALETTE8>(pData);
+                sBuffer << "\nTW_MEMREF is a TW_PALETTE8:\n{\n" <<
+                            indenter << "NumColors=" << p->NumColors << "\n" <<
+                            indenter << "PaletteType=" << p->PaletteType << "\n";
                 for ( int i = 0; i < 256; i++ )
                 {
-                    sBuffer << _T("ColorInfo[") << i << _T("]") <<
-                            _T(" - Index=") << (int)p->Colors[i].Index <<
-                            _T(", Channel1=") << (int)p->Colors[i].Channel1 <<
-                            _T(", Channel2=") << (int)p->Colors[i].Channel2 <<
-                            _T(", Channel3=") << (int)p->Colors[i].Channel3 << _T("\n");
+                    sBuffer << "ColorInfo[" << i << "]" <<
+                            " - Index=" << static_cast<int>(p->Colors[i].Index) <<
+                            ", Channel1=" << static_cast<int>(p->Colors[i].Channel1) <<
+                            ", Channel2=" << static_cast<int>(p->Colors[i].Channel2) <<
+                            ", Channel3=" << static_cast<int>(p->Colors[i].Channel3) << "\n";
                 }
-                sBuffer << _T("}\n");
+                sBuffer << "}\n";
             }
             break;
 
             case ERRSTRUCT_pTW_UINT32:
             {
-                sBuffer << _T("\nTW_MEMREF is TW_UINT32 pointer:\n{\n") <<
-                            indenter << _T("Address=") << pData << _T("H\n") <<
-                            indenter << _T("Value at Address=") << *(TW_UINT32 *)pData << _T("\n}\n");
+                sBuffer << "\nTW_MEMREF is TW_UINT32 pointer:\n{\n" <<
+                            indenter << "Address=" << pData << "H\n" <<
+                            indenter << "Value at Address=" << *static_cast<TW_UINT32*>(pData) << "\n}\n";
             }
             break;
 
             case ERRSTRUCT_TW_CIECOLOR:
             {
-                const TCHAR *CIEPointNames[4] = {_T("WhitePoint"), _T("BlackPoint"), _T("WhitePaper"), _T("BlackInk")};
-                CTL_StringType str2;
+                const char *CIEPointNames[4] = {"WhitePoint", "BlackPoint", "WhitePaper", "BlackInk"};
+                std::string str2;
                 int i;
-                pTW_CIECOLOR p = (pTW_CIECOLOR)pData;
-                pTW_CIEPOINT aPoints[4] = {&p->WhitePoint, &p->BlackPoint, &p->WhitePaper,
-                                        &p->BlackInk};
-                sBuffer << _T("\nTW_MEMREF is TW_CIECOLOR:\n{\n{\n") <<
-                            _T("ColorSpace=") << p->ColorSpace << _T(",\n") <<
-                            _T("LowEndian=") << p->LowEndian << _T(",\n") <<
-                            _T("DeviceDependent=") << p->DeviceDependent << _T(",\n") <<
-                            _T("VersionNumber=") << p->VersionNumber << _T("\n\nTransform Stage Info:\n}");
+                auto p = static_cast<pTW_CIECOLOR>(pData);
+                pTW_CIEPOINT aPoints[4] = {&p->WhitePoint, &p->BlackPoint, &p->WhitePaper, &p->BlackInk};
+                sBuffer << "\nTW_MEMREF is TW_CIECOLOR:\n{\n{\n" <<
+                            "ColorSpace=" << p->ColorSpace << ",\n" <<
+                            "LowEndian=" << p->LowEndian << ",\n" <<
+                            "DeviceDependent=" << p->DeviceDependent << ",\n" <<
+                            "VersionNumber=" << p->VersionNumber << "\n\nTransform Stage Info:\n}";
 
                 pTW_TRANSFORMSTAGE pCurTransform;
                 for ( int nTransform = 0; nTransform < 2; nTransform++)
@@ -655,17 +652,17 @@ CTL_StringType DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, Err
                         pCurTransform = &p->StageLMN;
                     for ( i = 0; i < 3; i++ )
                     {
-                        sBuffer << _T("Decode Value[") << i << _T("] =");
-                        sBuffer << _T("{\n") <<
-                          _T("StartIn=") << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].StartIn) << _T(", ") <<
-                          _T("BreakIn=") << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].BreakIn) << _T(", ") <<
-                          _T("EndIn=")   << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].EndIn) << _T(",\n") <<
-                          _T("StartOut=") << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].StartOut) << _T(", ") <<
-                          _T("BreakOut=") << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].BreakOut) << _T(", ") <<
-                          _T("EndOut=") << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].EndOut) << _T(", \n") <<
-                          _T("Gamma=") << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].Gamma) << _T(", ") <<
-                          _T("SampleCount=") << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].SampleCount) <<
-                          _T("\n}\n");
+                        sBuffer << "Decode Value[" << i << "] =";
+                        sBuffer << "{\n" <<
+                          "StartIn=" << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].StartIn) << ", " <<
+                          "BreakIn=" << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].BreakIn) << ", " <<
+                          "EndIn="   << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].EndIn) << ",\n" <<
+                          "StartOut=" << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].StartOut) << ", " <<
+                          "BreakOut=" << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].BreakOut) << ", " <<
+                          "EndOut=" << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].EndOut) << ", \n" <<
+                          "Gamma=" << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].Gamma) << ", " <<
+                          "SampleCount=" << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].SampleCount) <<
+                          "\n}\n";
                     }
                     int j;
                     str2.clear();
@@ -673,8 +670,8 @@ CTL_StringType DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, Err
                     {
                         for ( j = 0; j < 3; j++ )
                         {
-                            sBuffer << _T("MixValue[") << i << _T("][") << j << _T("]=") <<
-                                    CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Mix[i][j]) << _T("\n");
+                            sBuffer << "MixValue[" << i << "][" << j << "]=" <<
+                                    CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Mix[i][j]) << "\n";
                         }
                     }
                 }
@@ -682,276 +679,263 @@ CTL_StringType DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, Err
                 // Get the CIE info
                 for ( i = 0; i < 4; i++ )
                 {
-                    sBuffer << _T("CIEPoint ") << CIEPointNames[i] << _T(" = {") <<
-                                CTL_CapabilityTriplet::Twain32ToFloat(aPoints[i]->X) << _T(",") <<
-                                CTL_CapabilityTriplet::Twain32ToFloat(aPoints[i]->Y) << _T(",") <<
-                                CTL_CapabilityTriplet::Twain32ToFloat(aPoints[i]->Z) << _T("}\n");
+                    sBuffer << "CIEPoint " << CIEPointNames[i] << " = {" <<
+                                CTL_CapabilityTriplet::Twain32ToFloat(aPoints[i]->X) << "," <<
+                                CTL_CapabilityTriplet::Twain32ToFloat(aPoints[i]->Y) << "," <<
+                                CTL_CapabilityTriplet::Twain32ToFloat(aPoints[i]->Z) << "}\n";
                 }
 
-                sBuffer << _T("\nSample is user-defined and can't be determined \n}\n");
+                sBuffer << "\nSample is user-defined and can't be determined \n}\n";
             }
             break;
 
             case ERRSTRUCT_TW_GRAYRESPONSE:
             {
-                pTW_GRAYRESPONSE p = (pTW_GRAYRESPONSE)pData;
-                sBuffer << _T("\nTW_MEMREF is TW_GRAYRESPONSE:\n{\n") <<
-                            DecodeTW_ELEMENT8(&p->Response[0], _T("Response[0]")) <<
-                            _T("\n}\n");
+                auto p = static_cast<pTW_GRAYRESPONSE>(pData);
+                sBuffer << "\nTW_MEMREF is TW_GRAYRESPONSE:\n{\n" <<
+                            DecodeTW_ELEMENT8(&p->Response[0], "Response[0]") <<
+                            "\n}\n";
             }
             break;
             case ERRSTRUCT_TW_RGBRESPONSE:
             {
-                pTW_RGBRESPONSE p = (pTW_RGBRESPONSE)pData;
-                sBuffer << _T("\nTW_MEMREF is TW_RGBRESPONSE:\n{\n") <<
-                            DecodeTW_ELEMENT8(&p->Response[0], _T("Response[0]")) <<
-                            _T("\n}\n");
+                auto p = static_cast<pTW_RGBRESPONSE>(pData);
+                sBuffer << "\nTW_MEMREF is TW_RGBRESPONSE:\n{\n" <<
+                            DecodeTW_ELEMENT8(&p->Response[0], "Response[0]") <<
+                            "\n}\n";
             }
             break;
             case ERRSTRUCT_TW_JPEGCOMPRESSION:
             {
-                pTW_JPEGCOMPRESSION p = (pTW_JPEGCOMPRESSION)pData;
-                sBuffer << _T("\nTW_MEMREF is TW_JPEGCOMPRESSION:\n{\n") <<
-                            indenter << _T("ColorSpace=") << p->ColorSpace << _T("\n") <<
-                            indenter << _T("SubSampling=") << p->SubSampling << _T("\n") <<
-                            indenter << _T("NumComponents=") << p->NumComponents << _T("\n") <<
-                            indenter << _T("RestartFrequency=") << p->RestartFrequency << _T("\n") <<
-                            indenter << _T("QuantMap={") <<
-                            p->QuantMap[0] << _T(",") <<
-                            p->QuantMap[1] << _T(",") <<
-                            p->QuantMap[2] << _T(",") <<
-                            p->QuantMap[3] << _T("}\n") <<
-                            indenter << DecodeTW_MEMORY(&p->QuantTable[0],_T("QuantTable[0]")) <<
-                            _T("\n") <<
-                            indenter << DecodeTW_MEMORY(&p->QuantTable[1],_T("QuantTable[1]"))<<
-                            _T("\n") <<
-                            indenter << DecodeTW_MEMORY(&p->QuantTable[2],_T("QuantTable[2]"))<<
-                            _T("\n") <<
-                            indenter << DecodeTW_MEMORY(&p->QuantTable[3],_T("QuantTable[3]"))<<
-                            _T("\n") <<
-                            indenter << _T("HuffmanMap={") <<
-                            p->HuffmanMap[0] << _T(",") <<
-                            p->HuffmanMap[1] << _T(",") <<
-                            p->HuffmanMap[2] << _T(",") <<
-                            p->HuffmanMap[3] << _T("}\n") <<
-                            indenter << DecodeTW_MEMORY(&p->HuffmanDC[0],_T("HuffmanDC[0]")) <<
-                            _T("\n") <<
-                            indenter << DecodeTW_MEMORY(&p->HuffmanDC[1],_T("HuffmanDC[1]")) <<
-                            _T("\n") <<
-                            indenter << DecodeTW_MEMORY(&p->HuffmanAC[0],_T("HuffmanAC[0]")) <<
-                            _T("\n") <<
-                            indenter << DecodeTW_MEMORY(&p->HuffmanAC[1],_T("HuffmanAC[1]")) <<
-                            _T("\n}\n");
+                auto p = static_cast<pTW_JPEGCOMPRESSION>(pData);
+                sBuffer << "\nTW_MEMREF is TW_JPEGCOMPRESSION:\n{\n" <<
+                            indenter << "ColorSpace=" << p->ColorSpace << "\n" <<
+                            indenter << "SubSampling=" << p->SubSampling << "\n" <<
+                            indenter << "NumComponents=" << p->NumComponents << "\n" <<
+                            indenter << "RestartFrequency=" << p->RestartFrequency << "\n" <<
+                            indenter << "QuantMap={" <<
+                            p->QuantMap[0] << "," <<
+                            p->QuantMap[1] << "," <<
+                            p->QuantMap[2] << "," <<
+                            p->QuantMap[3] << "}\n" <<
+                            indenter << DecodeTW_MEMORY(&p->QuantTable[0],"QuantTable[0]") <<
+                            "\n" <<
+                            indenter << DecodeTW_MEMORY(&p->QuantTable[1],"QuantTable[1]")<<
+                            "\n" <<
+                            indenter << DecodeTW_MEMORY(&p->QuantTable[2],"QuantTable[2]")<<
+                            "\n" <<
+                            indenter << DecodeTW_MEMORY(&p->QuantTable[3],"QuantTable[3]")<<
+                            "\n" <<
+                            indenter << "HuffmanMap={" <<
+                            p->HuffmanMap[0] << "," <<
+                            p->HuffmanMap[1] << "," <<
+                            p->HuffmanMap[2] << "," <<
+                            p->HuffmanMap[3] << "}\n" <<
+                            indenter << DecodeTW_MEMORY(&p->HuffmanDC[0],"HuffmanDC[0]") <<
+                            "\n" <<
+                            indenter << DecodeTW_MEMORY(&p->HuffmanDC[1],"HuffmanDC[1]") <<
+                            "\n" <<
+                            indenter << DecodeTW_MEMORY(&p->HuffmanAC[0],"HuffmanAC[0]") <<
+                            "\n" <<
+                            indenter << DecodeTW_MEMORY(&p->HuffmanAC[1],"HuffmanAC[1]") <<
+                            "\n}\n";
             }
             break;
 
             case ERRSTRUCT_TW_EXTIMAGEINFO:
             {
-                CTL_StringStreamType TempStream;
-                pTW_EXTIMAGEINFO p = (pTW_EXTIMAGEINFO)pData;
-                TempStream << _T("\nTW_MEMREF is TW_EXTIMAGINFO:\n{\n") << _T("NumInfos=") << p->NumInfos << _T("\n");
+                StringStreamA TempStream;
+                auto p = static_cast<pTW_EXTIMAGEINFO>(pData);
+                TempStream << "\nTW_MEMREF is TW_EXTIMAGINFO:\n{\n" << "NumInfos=" << p->NumInfos << "\n";
 
-                CTL_StringType sAllInfo = TempStream.str();
-                CTL_StringStreamType strm;
+                std::string sAllInfo = TempStream.str();
+                StringStreamA strm;
                 for (TW_UINT32 i = 0; i < p->NumInfos; i++ )
                 {
-                    #ifdef UNICODE
-                    strm << boost::wformat(_T("Info[%1%]=%2%\n")) % i % DecodeTW_INFO(&p->Info[i], NULL);
-                    #else
-                    strm << boost::format(_T("Info[%1%]=%2%\n")) % i % DecodeTW_INFO(&p->Info[i], NULL);
-                    #endif
+                    strm << boost::format("Info[%1%]=%2%\n") % i % DecodeTW_INFO(&p->Info[i], nullptr);
                 }
                 sAllInfo += strm.str();
-                sBuffer << sAllInfo << _T("}\n");
+                sBuffer << sAllInfo << "}\n";
             }
             break;
 
             case ERRSTRUCT_TW_TWUNKIDENTITY:
             {
-                pTW_TWUNKIDENTITY p = (pTW_TWUNKIDENTITY)pData;
+                auto p = static_cast<pTW_TWUNKIDENTITY>(pData);
                 pTW_IDENTITY pIdentity = &p->identity;
-                CTL_StringType dsPath = _T(" ");
-                if ( p->dsPath )
-                {
-                    #ifdef UNICODE
-                    dsPath = (LPWSTR)p->dsPath;
-                    #else
+                std::string dsPath = " ";
                     dsPath = p->dsPath;
-                    #endif
-                }
-                sBuffer << _T("\nTW_MEMREF is TW_TWUNKIDENTITY:\n{\n") <<
-                            indenter << DecodeSourceInfo(pIdentity, _T("TW_TWUNKIDENTITY")) << _T("\n") <<
-                            indenter << _T("dsPath = ") << dsPath << _T("\n}");
+                sBuffer << "\nTW_MEMREF is TW_TWUNKIDENTITY:\n{\n" <<
+                            indenter << DecodeSourceInfo(pIdentity, "TW_TWUNKIDENTITY") << "\n" <<
+                            indenter << "dsPath = " << dsPath << "\n}";
             }
             break;
 
             case ERRSTRUCT_TW_AUDIOINFO:
             {
-                pTW_AUDIOINFO p = (pTW_AUDIOINFO)pData;
-                sBuffer << _T("\nTW_MEMREF is TW_AUDIOINFO:\n{\n") <<
-                    indenter << _T("Name=") << p->Name << _T("\n") <<
-                    indenter << _T("Reserved=") << p->Reserved << _T("\n}\n");
+                auto p = static_cast<pTW_AUDIOINFO>(pData);
+                sBuffer << "\nTW_MEMREF is TW_AUDIOINFO:\n{\n" <<
+                    indenter << "Name=" << p->Name << "\n" <<
+                    indenter << "Reserved=" << p->Reserved << "\n}\n";
             }
             break;
 
             case ERRSTRUCT_TW_CALLBACK:
             {
-                pTW_CALLBACK p = (pTW_CALLBACK)pData;
-                sBuffer << _T("\nTW_MEMREF is TW_CALLBACK:\n{\n");
+                auto p = static_cast<pTW_CALLBACK>(pData);
+                sBuffer << "\nTW_MEMREF is TW_CALLBACK:\n{\n";
                 #if defined(__APPLE__)
-                    sBuffer << indenter << _T("Refcon=") << p->RefCon << _T("\n");
+                    sBuffer << indenter << "Refcon=" << p->RefCon << "\n";
                 #endif
-                    sBuffer << indenter << _T("Message=") << p->Message << _T("\n}\n");
+                    sBuffer << indenter << "Message=" << p->Message << "\n}\n";
             }
             break;
 
             case ERRSTRUCT_TW_CALLBACK2:
             {
-                pTW_CALLBACK2 p = (pTW_CALLBACK2)pData;
-                sBuffer << _T("\nTW_MEMREF is TW_CALLBACK2:\n{\n");
-                sBuffer << indenter << _T("CallbackProc=") << p->CallBackProc << _T("\n");
-                sBuffer << indenter << _T("Refcon=") << p->RefCon << _T("\n");
-                sBuffer << indenter << _T("Message=") << p->Message << _T("\n}\n");
+                auto p = static_cast<pTW_CALLBACK2>(pData);
+                sBuffer << "\nTW_MEMREF is TW_CALLBACK2:\n{\n";
+                sBuffer << indenter << "CallbackProc=" << p->CallBackProc << "\n";
+                sBuffer << indenter << "Refcon=" << p->RefCon << "\n";
+                sBuffer << indenter << "Message=" << p->Message << "\n}\n";
             }
             break;
 
             case ERRSTRUCT_TW_METRICS:
             {
-                pTW_METRICS p = (pTW_METRICS)pData;
-                sBuffer << _T("\nTW_MEMREF is TW_METRICS:\n{\n");
-                sBuffer << indenter << _T("SizeOf=") << p->SizeOf << _T("\n");
-                sBuffer << indenter << _T("ImageCount=") << p->ImageCount << _T("\n");
-                sBuffer << indenter << _T("SheetCount=") << p->SheetCount << _T("\n}\n");
+                auto p = static_cast<pTW_METRICS>(pData);
+                sBuffer << "\nTW_MEMREF is TW_METRICS:\n{\n";
+                sBuffer << indenter << "SizeOf=" << p->SizeOf << "\n";
+                sBuffer << indenter << "ImageCount=" << p->ImageCount << "\n";
+                sBuffer << indenter << "SheetCount=" << p->SheetCount << "\n}\n";
             }
             break;
 
             case ERRSTRUCT_TW_TWAINDIRECT:
             {
-                pTW_TWAINDIRECT p = (pTW_TWAINDIRECT)pData;
-                sBuffer << _T("\nTW_MEMREF is TW_TWAINDIRECT:\n{\n");
-                sBuffer << indenter << _T("SizeOf=") << p->SizeOf << _T("\n");
-                sBuffer << indenter << _T("CommunicationManager=") << p->CommunicationManager << _T("\n");
-                sBuffer << indenter << _T("Send=") << p->Send << _T("\n");
-                sBuffer << indenter << _T("SendSize=") << p->SendSize << _T("\n");
-                sBuffer << indenter << _T("Receive=") << p->Receive << _T("\n");
-                sBuffer << indenter << _T("ReceiveSize=") << p->ReceiveSize << _T("\n}\n");
+                auto p = static_cast<pTW_TWAINDIRECT>(pData);
+                sBuffer << "\nTW_MEMREF is TW_TWAINDIRECT:\n{\n";
+                sBuffer << indenter << "SizeOf=" << p->SizeOf << "\n";
+                sBuffer << indenter << "CommunicationManager=" << p->CommunicationManager << "\n";
+                sBuffer << indenter << "Send=" << p->Send << "\n";
+                sBuffer << indenter << "SendSize=" << p->SendSize << "\n";
+                sBuffer << indenter << "Receive=" << p->Receive << "\n";
+                sBuffer << indenter << "ReceiveSize=" << p->ReceiveSize << "\n}\n";
             }
             break;
-
+            case ERRSTRUCT_TW_TWUNKDSENTRYPARAMS: break;
+            case ERRSTRUCT_pWAV: break;
+            case ERRSTRUCT_DTWAIN_MESSAGE: break;
+            default: ;
         }
     }
     sTemp = sBuffer.str();
     return sTemp;
 }
 
-CTL_StringType DecodeSourceInfo(pTW_IDENTITY pIdentity, LPCTSTR sPrefix)
+std::string DecodeSourceInfo(pTW_IDENTITY pIdentity, LPCSTR sPrefix)
 {
-    CTL_StringType indenter = IndentDefinition();
-    CTL_StringStreamType sBuffer;
+    const std::string indenter = IndentDefinition();
+    StringStreamA sBuffer;
     if ( pIdentity)
     {
-        sBuffer << _T("Decoded ") << sPrefix << _T(":\n{\n") <<
+        sBuffer << "Decoded " << sPrefix << ":\n{\n" <<
 
-        indenter << _T("Id=") << pIdentity->Id << _T("\n") <<
-        indenter << _T("Version Number=") << pIdentity->Version.MajorNum << _T(".") << pIdentity->Version.MinorNum << _T("\n") <<
-        indenter << _T("Version Language=") << pIdentity->Version.Language << _T("\n") <<
-        indenter << _T("Version Country=") << pIdentity->Version.Country << _T("\n") <<
-        indenter << _T("Version Info=")   << pIdentity->Version.Info << _T("\n") <<
-        indenter << _T("ProtocolMajor=")  << pIdentity->ProtocolMajor << _T("\n")  <<
-        indenter << _T("ProtocolMinor=")  << pIdentity->ProtocolMinor << _T("\n")    <<
-        indenter << _T("SupportedGroups=") << DecodeSupportedGroups(pIdentity->SupportedGroups) << _T("\n") <<
-        indenter << _T("Manufacturer=") << pIdentity->Manufacturer << _T("\n") <<
-        indenter << _T("Product Family=") << pIdentity->ProductFamily << _T("\n") <<
-        indenter << _T("Product Name=") << pIdentity->ProductName <<
+        indenter << "Id=" << pIdentity->Id << "\n" <<
+        indenter << "Version Number=" << pIdentity->Version.MajorNum << "." << pIdentity->Version.MinorNum << "\n" <<
+        indenter << "Version Language=" << pIdentity->Version.Language << "\n" <<
+        indenter << "Version Country=" << pIdentity->Version.Country << "\n" <<
+        indenter << "Version Info="   << pIdentity->Version.Info << "\n" <<
+        indenter << "ProtocolMajor="  << pIdentity->ProtocolMajor << "\n"  <<
+        indenter << "ProtocolMinor="  << pIdentity->ProtocolMinor << "\n"    <<
+        indenter << "SupportedGroups=" << DecodeSupportedGroups(pIdentity->SupportedGroups) << "\n" <<
+        indenter << "Manufacturer=" << pIdentity->Manufacturer << "\n" <<
+        indenter << "Product Family=" << pIdentity->ProductFamily << "\n" <<
+        indenter << "Product Name=" << pIdentity->ProductName <<
 
-        _T("\n}\n");
+        "\n}\n";
     }
     else
     {
-        sBuffer << _T("\nNo information for ") << sPrefix << _T("\n");
+        sBuffer << "\nNo information for " << sPrefix << "\n";
     }
     return sBuffer.str();
 }
 
-CTL_StringType DecodeSupportedGroups(TW_UINT32 SupportedGroups)
+std::string DecodeSupportedGroups(TW_UINT32 SupportedGroups)
 {
-    CTL_StringStreamType sBuffer;
-    const unsigned int numberOfBits = sizeof(TW_UINT32) << 3;
+    StringStreamA sBuffer;
+    constexpr unsigned int numberOfBits = sizeof(TW_UINT32) << 3;
     bool foundGroup = false;
     for (unsigned int i = 0; i < numberOfBits; ++i)
     {
-        unsigned int curGroup = (TW_UINT32)1 << i;
+        const unsigned int curGroup = static_cast<TW_UINT32>(1) << i;
         if ( SupportedGroups & curGroup )
         {
             auto it = CTL_ErrorStructDecoder::s_mapSupportedGroups.find( curGroup );
             if ( it != CTL_ErrorStructDecoder::s_mapSupportedGroups.end() )
             {
                 if ( foundGroup )
-                    sBuffer << _T(",");
-                sBuffer << _T(" ") << it->second;
+                    sBuffer << ",";
+                sBuffer << " " << it->second;
                 foundGroup = true;
             }
             else
-                sBuffer << _T(" Unknown(") << curGroup << _T(")");
+                sBuffer << " Unknown" << curGroup << "";
         }
     }
     return sBuffer.str();
 }
 
-CTL_StringType DecodeTW_MEMORY(pTW_MEMORY pMemory, LPCTSTR pMem)
+std::string DecodeTW_MEMORY(pTW_MEMORY pMemory, LPCSTR pMem)
 {
-    CTL_StringType sTemp;
-    CTL_StringStreamType sBuffer;
-    sBuffer << _T("{Flags=") <<
-            pMemory->Flags << _T(", ") <<
-            _T("Length=") <<
-            pMemory->Length << _T(", ") <<
-            _T("TheMem=") << pMemory->TheMem << _T("H}");
-    sTemp = sBuffer.str();
+    StringStreamA sBuffer;
+    sBuffer << "{Flags=" <<
+            pMemory->Flags << ", " <<
+            "Length=" <<
+            pMemory->Length << ", " <<
+            "TheMem=" << pMemory->TheMem << "H}";
+    std::string sTemp = sBuffer.str();
     if ( pMem )
     {
         sTemp = pMem;
-        sTemp += _T("=");
+        sTemp += "=";
     }
     sTemp += sBuffer.str();
     return sTemp;
 }
 
 
-CTL_StringType DecodeTW_ELEMENT8(pTW_ELEMENT8 pEl, LPCTSTR pMem)
+std::string DecodeTW_ELEMENT8(pTW_ELEMENT8 pEl, LPCSTR pMem)
 {
-    CTL_StringType sTemp;
-    CTL_StringStreamType sBuffer;
+    StringStreamA sBuffer;
 
-    sBuffer << _T("{Index=") << pEl->Index << _T(", ") <<
-               _T("Channel1=") << pEl->Channel1 << _T(", ") <<
-               _T("Channel2=") << pEl->Channel3 << _T("}");
-    sTemp = sBuffer.str();
+    sBuffer << "{Index=" << pEl->Index << ", " <<
+               "Channel1=" << pEl->Channel1 << ", " <<
+               "Channel2=" << pEl->Channel3 << "}";
+    std::string sTemp = sBuffer.str();
     if ( pMem )
     {
-        CTL_StringType sTemp2;
-        sTemp2 = pMem;
-        sTemp2 += _T("=");
+        std::string sTemp2 = pMem;
+        sTemp2 += "=";
         sTemp = sTemp2 + sTemp;
     }
     return sTemp;
 }
 
-CTL_StringType DecodeTW_INFO(pTW_INFO pInfo, LPCTSTR pMem)
+std::string DecodeTW_INFO(pTW_INFO pInfo, LPCSTR pMem)
 {
-    CTL_StringType sTemp;
-    CTL_StringStreamType sBuffer;
-    sBuffer << _T("{InfoId=") << pInfo->InfoID << _T(", ") <<
-               _T("ItemType=") << pInfo->ItemType << _T(", ") <<
-               _T("NumItems=") << pInfo->NumItems << _T(", ") <<
-               _T("ReturnCode=") << pInfo->ReturnCode << _T(", ") <<
-               _T("Item=") << pInfo->Item << _T("}");
-    sTemp = sBuffer.str();
+    StringStreamA sBuffer;
+    sBuffer << "{InfoId=" << pInfo->InfoID << ", " <<
+               "ItemType=" << pInfo->ItemType << ", " <<
+               "NumItems=" << pInfo->NumItems << ", " <<
+               "ReturnCode=" << pInfo->ReturnCode << ", " <<
+               "Item=" << pInfo->Item << "}";
+    std::string sTemp = sBuffer.str();
     if ( pMem )
     {
-        CTL_StringType sTemp2;
-        sTemp2 = pMem;
-        sTemp2 += _T("=");
+        std::string sTemp2 = pMem;
+        sTemp2 += "=";
         sTemp = sTemp2 + sTemp;
     }
     return sTemp;

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,13 +18,14 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include "cppfunc.h"
 #include "ctltwmgr.h"
 #include "enumeratorfuncs.h"
 #include "errorcheck.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
-using namespace std;
+
 using namespace dynarithmic;
 
 static DTWAIN_BOOL DTWAIN_CloseSourceUnconditional(CTL_TwainDLLHandle *pHandle, CTL_ITwainSource *pSource);
@@ -33,11 +34,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CloseSource(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     bool bRetval = false;
     if (p)
     {
-        CTL_StringType sProductName = p->GetProductName();
+        const auto sProductName = p->GetProductName();
         bRetval = DTWAIN_CloseSourceUnconditional(pHandle, p)?true:false;
         if (bRetval)
             pHandle->m_mapStringToSource.erase(sProductName);
@@ -50,11 +51,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CloseSourceUI(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     if (p)
     {
-        CTL_ITwainSession *pSession = (CTL_ITwainSession *)pHandle->m_Session;
-        CTL_TwainAppMgr::EndTwainUI(pSession, p);
+        CTL_TwainAppMgr::EndTwainUI(pHandle->m_pTwainSession, p);
         LOG_FUNC_EXIT_PARAMS(true)
     }
     LOG_FUNC_EXIT_PARAMS(false)
@@ -78,7 +78,7 @@ DTWAIN_BOOL DTWAIN_CloseSourceUnconditional(CTL_TwainDLLHandle *pHandle, CTL_ITw
             DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return p->IsAcquireAttempt(); },
             DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
 
-        bRetval = CTL_TwainAppMgr::CloseSource(pHandle->m_Session, p)?true:false;
+        bRetval = CTL_TwainAppMgr::CloseSource(pHandle->m_pTwainSession, p)?true:false;
     }
     LOG_FUNC_EXIT_PARAMS(bRetval)
     CATCH_BLOCK(false)

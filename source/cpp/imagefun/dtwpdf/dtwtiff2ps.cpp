@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -46,7 +46,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>         /* for atof */
-#include <math.h>
 #include <time.h>
 #include <string.h>
 #include "tiff.h"
@@ -220,7 +219,8 @@ int PostscriptMain(int argc, const char** argv, const char* szTitle)
             break;
         case 'H':
             maxPageHeight = static_cast<float>(atof(optarg));
-            if (pageHeight==0) pageHeight = maxPageHeight;
+            if (pageHeight==0)
+                pageHeight = maxPageHeight;
             break;
         case 'L':
             splitOverlap = static_cast<float>(atof(optarg));
@@ -229,12 +229,12 @@ int PostscriptMain(int argc, const char** argv, const char* szTitle)
             useImagemask = TRUE;
             break;
         case 'o':
-            diroff = (uint32) strtoul(optarg, NULL, 0);
+            diroff = static_cast<uint32>(strtoul(optarg, nullptr, 0));
             break;
         case 'O':       /* XXX too bad -o is already taken */
             output = fopen(optarg, "w");
             strcpy(outfile, optarg);
-            if (output == NULL) {
+            if (output == nullptr) {
                 return -2;
             }
             break;
@@ -287,14 +287,14 @@ int PostscriptMain(int argc, const char** argv, const char* szTitle)
     int nPage = 0;
     for (; argc - optind > 0; optind++) {
         TIFF* tif = TIFFOpen(filename = argv[optind], "r");
-        if (tif != NULL) {
-            if (dirnum != -1 && !TIFFSetDirectory(tif, (tdir_t)dirnum))
+        if (tif != nullptr) {
+            if (dirnum != -1 && !TIFFSetDirectory(tif, static_cast<tdir_t>(dirnum)))
                 return (-1);
             else if (diroff != 0 &&
                 !TIFFSetSubDirectory(tif, diroff))
                 return (-1);
             np = TIFF2PS(output, tif, pageWidth, pageHeight,
-                leftmargin, bottommargin, centered, nPage, (const char *)outfile,
+                leftmargin, bottommargin, centered, nPage, static_cast<const char*>(outfile),
                 szTitle);
             TIFFClose(tif);
         }
@@ -423,7 +423,7 @@ static void
 PhotoshopBanner(FILE* fd, uint32 w, uint32 h, int bs, int nc, const char* startline)
 {
     fprintf(fd, "%%ImageData: %ld %ld %d %d 0 %d 2 \"",
-        (long) w, (long) h, bitspersample, nc, bs);
+        static_cast<long>(w), static_cast<long>(h), bitspersample, nc, bs);
     fprintf(fd, startline, nc);
     fprintf(fd, "\"\n");
 }
@@ -491,15 +491,13 @@ PlaceImage(FILE *fp, float pagewidth, float pageheight,
        float imagewidth, float imageheight, int splitpage,
        double lm, double bm, int cnt)
 {
-    float xtran = 0;
+    const float xtran = 0;
     float ytran = 0;
     float xscale = 1;
     float yscale = 1;
     float left_offset = static_cast<float>(lm * PS_UNIT_SIZE);
     float bottom_offset = static_cast<float>(bm * PS_UNIT_SIZE);
-    float subimageheight;
     float splitheight;
-    float overlap;
 
     pagewidth *= PS_UNIT_SIZE;
     pageheight *= PS_UNIT_SIZE;
@@ -508,7 +506,7 @@ PlaceImage(FILE *fp, float pagewidth, float pageheight,
         splitheight = 0;
     else
         splitheight = static_cast<float>(maxPageHeight * PS_UNIT_SIZE);
-    overlap = static_cast<float>(splitOverlap * PS_UNIT_SIZE);
+    float overlap = static_cast<float>(splitOverlap * PS_UNIT_SIZE);
 
     /*
      * WIDTH:
@@ -532,7 +530,7 @@ PlaceImage(FILE *fp, float pagewidth, float pageheight,
         (splitheight == 0 || imageheight <= splitheight)) {
         yscale = pageheight;
     } else /* imageheight > splitheight */ {
-        subimageheight = imageheight - (pageheight-overlap)*splitpage;
+        float subimageheight = imageheight - (pageheight - overlap) * splitpage;
         if (subimageheight <= pageheight) {
             yscale = imageheight;
             ytran = pageheight - subimageheight;
@@ -567,13 +565,10 @@ TIFF2PS(FILE* fd, TIFF* tif, float pw, float ph, double lm, double bm, int cnt, 
 {
     uint32 w, h;
     float ox, oy, prw, prh;
-    float scale = 1.0;
     float left_offset = static_cast<float>(lm * PS_UNIT_SIZE);
     float bottom_offset = static_cast<float>(bm * PS_UNIT_SIZE);
     uint32 subfiletype;
     uint16* sampleinfo;
-//  static int npages = 0;
-    int split;
 
     if (!TIFFGetField(tif, TIFFTAG_XPOSITION, &ox))
         ox = 0;
@@ -622,8 +617,10 @@ TIFF2PS(FILE* fd, TIFF* tif, float pw, float ph, double lm, double bm, int cnt, 
             fprintf(fd, "gsave\n");
             fprintf(fd, "100 dict begin\n");
             if (pw != 0 && ph != 0) {
-                if (maxPageHeight) { /* used -H option */
-                    split = PlaceImage(fd,pw,ph,prw,prh,0,lm,bm,cnt);
+                if (maxPageHeight)
+                {
+                    /* used -H option */
+                    int split = PlaceImage(fd, pw, ph, prw, prh, 0, lm, bm, cnt);
                     while( split ) {
                         PSpage(fd, tif, w, h);
                         fprintf(fd, "end\n");
@@ -637,9 +634,9 @@ TIFF2PS(FILE* fd, TIFF* tif, float pw, float ph, double lm, double bm, int cnt, 
                     }
                 } else {
                     /* NB: maintain image aspect ratio */
-                    scale = (pw*PS_UNIT_SIZE/prw) < (ph*PS_UNIT_SIZE/prh) ?
-                        static_cast<float>((pw*PS_UNIT_SIZE/prw)) :
-                        static_cast<float>((ph*PS_UNIT_SIZE/prh));
+                    float scale = (pw * PS_UNIT_SIZE / prw) < (ph * PS_UNIT_SIZE / prh)
+                                      ? static_cast<float>((pw * PS_UNIT_SIZE / prw))
+                                      : static_cast<float>((ph * PS_UNIT_SIZE / prh));
                     if (scale > 1.0)
                         scale = 1.0;
                     bottom_offset +=
@@ -711,18 +708,17 @@ PSHead(FILE *fd, TIFF *tif, uint32 w, uint32 h, float pw, float ph,
     time_t t;
 
     (void) tif; (void) w; (void) h;
-    t = time(0);
+    t = time(nullptr);
     fprintf(fd, "%%!PS-Adobe-3.0%s\n", generateEPSF ? " EPSF-3.0" : "");
-    dynarithmic::CTL_StringType Buffer;
-    Buffer = dynarithmic::GetVersionString();
+    CTL_StringType Buffer = dynarithmic::GetVersionString();
     fprintf(fd, "%%%%Creator: %s\n", StringConversion::Convert_Native_To_Ansi(Buffer).c_str());
     fprintf(fd, "%%%%Title: %s\n", szTitle);
     fprintf(fd, "%%%%CreationDate: %s", ctime(&t));
     fprintf(fd, "%%%%DocumentData: Clean7Bit\n");
-    fprintf(fd, "%%%%Origin: %ld %ld\n", (long) ox, (long) oy);
+    fprintf(fd, "%%%%Origin: %ld %ld\n", static_cast<long>(ox), static_cast<long>(oy));
     /* NB: should use PageBoundingBox */
     fprintf(fd, "%%%%BoundingBox: 0 0 %ld %ld\n",
-        (long) ceil(pw), (long) ceil(ph));
+        static_cast<long>(ceil(pw)), static_cast<long>(ceil(ph)));
     fprintf(fd, "%%%%LanguageLevel: %d\n", (level3 ? 3 : (level2 ? 2 : 1)));
     fprintf(fd, "%%%%Pages: (atend)\n");
     fprintf(fd, "%%%%EndComments\n");
@@ -759,7 +755,7 @@ static void
 PS_Lvl2colorspace(FILE* fd, TIFF* tif)
 {
     uint16 *rmap, *gmap, *bmap;
-    int i, num_colors;
+    int i;
     const char * colorspace_p;
 
     switch ( photometric )
@@ -792,7 +788,7 @@ PS_Lvl2colorspace(FILE* fd, TIFF* tif)
     /*
      * Set up an indexed/palette colorspace
      */
-    num_colors = (1 << bitspersample);
+    int num_colors = (1 << bitspersample);
     if (!TIFFGetField(tif, TIFFTAG_COLORMAP, &rmap, &gmap, &bmap)) {
         TIFFError(filename,
             "Palette image w/o \"Colormap\" tag");
@@ -838,7 +834,6 @@ PS_Lvl2colorspace(FILE* fd, TIFF* tif)
 static int
 PS_Lvl2ImageDict(FILE* fd, TIFF* tif, uint32 w, uint32 h)
 {
-    int use_rawdata;
     uint32 tile_width, tile_height;
     uint16 predictor, minsamplevalue, maxsamplevalue;
     int repeat_count;
@@ -849,8 +844,8 @@ PS_Lvl2ImageDict(FILE* fd, TIFF* tif, uint32 w, uint32 h)
         imageOp = "imagemask";
 
     (void)strcpy(im_x, "0");
-    (void)sprintf(im_y, "%lu", (long) h);
-    (void)sprintf(im_h, "%lu", (long) h);
+    (void)sprintf(im_y, "%lu", static_cast<long>(h));
+    (void)sprintf(im_h, "%lu", static_cast<long>(h));
     tile_width = w;
     tile_height = h;
     if (TIFFIsTiled(tif)) {
@@ -871,7 +866,7 @@ PS_Lvl2ImageDict(FILE* fd, TIFF* tif, uint32 w, uint32 h)
         }
         if (tile_height < h) {
             fputs("/im_y 0 def\n", fd);
-            (void)sprintf(im_y, "%lu im_y sub", (unsigned long) h);
+            (void)sprintf(im_y, "%lu im_y sub", static_cast<unsigned long>(h));
         }
     } else {
         repeat_count = tf_numberstrips;
@@ -881,9 +876,9 @@ PS_Lvl2ImageDict(FILE* fd, TIFF* tif, uint32 w, uint32 h)
         if (repeat_count > 1) {
             fputs("/im_y 0 def\n", fd);
             fprintf(fd, "/im_h %lu def\n",
-                (unsigned long) tile_height);
+                static_cast<unsigned long>(tile_height));
             (void)strcpy(im_h, "im_h");
-            (void)sprintf(im_y, "%lu im_y sub", (unsigned long) h);
+            (void)sprintf(im_y, "%lu im_y sub", static_cast<unsigned long>(h));
         }
     }
 
@@ -903,7 +898,7 @@ PS_Lvl2ImageDict(FILE* fd, TIFF* tif, uint32 w, uint32 h)
             fd);
     fputs(" <<\n", fd);
     fputs("  /ImageType 1\n", fd);
-    fprintf(fd, "  /Width %lu\n", (unsigned long) tile_width);
+    fprintf(fd, "  /Width %lu\n", static_cast<unsigned long>(tile_width));
     /*
      * Workaround for some software that may crash when last strip
      * of image contains fewer number of scanlines than specified
@@ -915,14 +910,14 @@ PS_Lvl2ImageDict(FILE* fd, TIFF* tif, uint32 w, uint32 h)
      * one-stripped image).
      */
     if (TIFFIsTiled(tif) || tf_numberstrips == 1)
-        fprintf(fd, "  /Height %lu\n", (unsigned long) tile_height);
+        fprintf(fd, "  /Height %lu\n", static_cast<unsigned long>(tile_height));
     else
         fprintf(fd, "  /Height im_h\n");
 
     if (planarconfiguration == PLANARCONFIG_SEPARATE && samplesperpixel > 1)
         fputs("  /MultipleDataSources true\n", fd);
     fprintf(fd, "  /ImageMatrix [ %lu 0 0 %ld %s %s ]\n",
-        (unsigned long) w, - (long)h, im_x, im_y);
+        static_cast<unsigned long>(w), - static_cast<long>(h), im_x, im_y);
     fprintf(fd, "  /BitsPerComponent %d\n", bitspersample);
     fprintf(fd, "  /Interpolate %s\n", interpolate ? "true" : "false");
 
@@ -992,7 +987,7 @@ PS_Lvl2ImageDict(FILE* fd, TIFF* tif, uint32 w, uint32 h)
     else
         fputs(" currentfile /ASCIIHexDecode filter", fd);
 
-    use_rawdata = TRUE;
+    int use_rawdata = TRUE;
     switch (compression) {
     case COMPRESSION_NONE:      /* 1: uncompressed */
         break;
@@ -1027,7 +1022,7 @@ PS_Lvl2ImageDict(FILE* fd, TIFF* tif, uint32 w, uint32 h)
         }
         if (!(tile_width == w && w == 1728U))
             fprintf(fd, "\t /Columns %lu\n",
-                (unsigned long) tile_width);
+                static_cast<unsigned long>(tile_width));
         fprintf(fd, "\t /Rows %s\n", im_h);
         if (compression == COMPRESSION_CCITTRLE ||
             compression == COMPRESSION_CCITTRLEW) {
@@ -1044,7 +1039,7 @@ PS_Lvl2ImageDict(FILE* fd, TIFF* tif, uint32 w, uint32 h)
             fputs("\n\t<<\n", fd);
             fprintf(fd, "\t /Predictor %u\n", predictor);
             fprintf(fd, "\t /Columns %lu\n",
-                (unsigned long) tile_width);
+                static_cast<unsigned long>(tile_width));
             fprintf(fd, "\t /Colors %u\n", samplesperpixel);
             fprintf(fd, "\t /BitsPerComponent %u\n",
                 bitspersample);
@@ -1061,7 +1056,7 @@ PS_Lvl2ImageDict(FILE* fd, TIFF* tif, uint32 w, uint32 h)
                 fputs("\n\t<<\n", fd);
                 fprintf(fd, "\t /Predictor %u\n", predictor);
                 fprintf(fd, "\t /Columns %lu\n",
-                    (unsigned long) tile_width);
+                    static_cast<unsigned long>(tile_width));
                 fprintf(fd, "\t /Colors %u\n", samplesperpixel);
                     fprintf(fd, "\t /BitsPerComponent %u\n",
                     bitspersample);
@@ -1105,12 +1100,10 @@ PS_Lvl2ImageDict(FILE* fd, TIFF* tif, uint32 w, uint32 h)
     }
     if (planarconfiguration == PLANARCONFIG_SEPARATE &&
         samplesperpixel > 1) {
-        uint16 i;
-
         /*
          * NOTE: This code does not work yet...
          */
-        for (i = 1; i < samplesperpixel; i++)
+        for (uint16 i = 1; i < samplesperpixel; i++)
             fputs(" dup", fd);
         fputs(" ]", fd);
     }
@@ -1121,27 +1114,27 @@ PS_Lvl2ImageDict(FILE* fd, TIFF* tif, uint32 w, uint32 h)
     if (repeat_count > 1) {
         if (tile_width < w) {
             fprintf(fd, " /im_x im_x %lu add def\n",
-                (unsigned long) tile_width);
+                static_cast<unsigned long>(tile_width));
             if (tile_height < h) {
                 fprintf(fd, " im_x %lu ge {\n",
-                    (unsigned long) w);
+                    static_cast<unsigned long>(w));
                 fputs("  /im_x 0 def\n", fd);
                 fprintf(fd, " /im_y im_y %lu add def\n",
-                    (unsigned long) tile_height);
+                    static_cast<unsigned long>(tile_height));
                 fputs(" } if\n", fd);
             }
         }
         if (tile_height < h) {
             if (tile_width >= w) {
                 fprintf(fd, " /im_y im_y %lu add def\n",
-                    (unsigned long) tile_height);
+                    static_cast<unsigned long>(tile_height));
                 if (!TIFFIsTiled(tif)) {
                     fprintf(fd, " /im_h %lu im_y sub",
-                        (unsigned long) h);
+                        static_cast<unsigned long>(h));
                     fprintf(fd, " dup %lu gt { pop",
-                        (unsigned long) tile_height);
+                        static_cast<unsigned long>(tile_height));
                     fprintf(fd, " %lu } if def\n",
-                        (unsigned long) tile_height);
+                        static_cast<unsigned long>(tile_height));
                 }
             }
         }
@@ -1161,12 +1154,12 @@ PS_Lvl2page(FILE* fd, TIFF* tif, uint32 w, uint32 h)
     uint16 fillorder;
     int use_rawdata, tiled_image, breaklen = 1;
     uint32 chunk_no, num_chunks, *bc;
-    unsigned char *buf_data, *cp;
+    unsigned char *buf_data;
     tsize_t chunk_size, byte_count;
 
 #if defined( EXP_ASCII85ENCODER )
     int         ascii85_l;  /* Length, in bytes, of ascii85_p[] data */
-    uint8       *   ascii85_p = 0;  /* Holds ASCII85 encoded data */
+    uint8       *   ascii85_p = nullptr;  /* Holds ASCII85 encoded data */
 #endif
 
     PS_Lvl2colorspace(fd, tif);
@@ -1198,7 +1191,7 @@ PS_Lvl2page(FILE* fd, TIFF* tif, uint32 w, uint32 h)
         else
             chunk_size = TIFFStripSize(tif);
     }
-    buf_data = (unsigned char *)_TIFFmalloc(chunk_size);
+    buf_data = static_cast<unsigned char*>(_TIFFmalloc(chunk_size));
     if (!buf_data) {
         TIFFError(filename, "Can't alloc %u bytes for %s.",
             chunk_size, tiled_image ? "tiles" : "strips");
@@ -1216,7 +1209,7 @@ PS_Lvl2page(FILE* fd, TIFF* tif, uint32 w, uint32 h)
          * 5*chunk_size/4.
          */
 
-        ascii85_p = (unsigned char *)_TIFFmalloc( (chunk_size+(chunk_size/2)) + 8 );
+        ascii85_p = static_cast<unsigned char*>(_TIFFmalloc((chunk_size + (chunk_size / 2)) + 8));
 
         if ( !ascii85_p ) {
         _TIFFfree( buf_data );
@@ -1272,7 +1265,7 @@ PS_Lvl2page(FILE* fd, TIFF* tif, uint32 w, uint32 h)
         }
         else
         {
-            for (cp = buf_data; byte_count > 0; byte_count--) {
+            for (unsigned char* cp = buf_data; byte_count > 0; byte_count--) {
                 putc(hex[((*cp)>>4)&0xf], fd);
                 putc(hex[(*cp)&0xf], fd);
                 cp++;
@@ -1343,11 +1336,11 @@ PSpage(FILE* fd, TIFF* tif, uint32 w, uint32 h)
         fprintf(fd, "%s", RGBcolorimage);
         PhotoshopBanner(fd, w, h, 1, 3, "false 3 colorimage");
         fprintf(fd, "/scanLine %ld string def\n",
-            (long) ps_bytesperrow * 3L);
+            static_cast<long>(ps_bytesperrow) * 3L);
         fprintf(fd, "%lu %lu 8\n",
-            (unsigned long) w, (unsigned long) h);
+            static_cast<unsigned long>(w), static_cast<unsigned long>(h));
         fprintf(fd, "[%lu 0 0 -%lu 0 %lu]\n",
-            (unsigned long) w, (unsigned long) h, (unsigned long) h);
+            static_cast<unsigned long>(w), static_cast<unsigned long>(h), static_cast<unsigned long>(h));
         fprintf(fd, "{currentfile scanLine readhexstring pop} bind\n");
         fprintf(fd, "false 3 colorimage\n");
         PSDataPalette(fd, tif, w, h);
@@ -1356,11 +1349,11 @@ PSpage(FILE* fd, TIFF* tif, uint32 w, uint32 h)
     case PHOTOMETRIC_MINISWHITE:
         PhotoshopBanner(fd, w, h, 1, 1, imageOp);
         fprintf(fd, "/scanLine %ld string def\n",
-            (long) ps_bytesperrow);
+            static_cast<long>(ps_bytesperrow));
         fprintf(fd, "%lu %lu %d\n",
-            (unsigned long) w, (unsigned long) h, bitspersample);
+            static_cast<unsigned long>(w), static_cast<unsigned long>(h), bitspersample);
         fprintf(fd, "[%lu 0 0 -%lu 0 %lu]\n",
-            (unsigned long) w, (unsigned long) h, (unsigned long) h);
+            static_cast<unsigned long>(w), static_cast<unsigned long>(h), static_cast<unsigned long>(h));
         fprintf(fd,
             "{currentfile scanLine readhexstring pop} bind\n");
         fprintf(fd, "%s\n", imageOp);
@@ -1375,11 +1368,11 @@ PSColorContigPreamble(FILE* fd, uint32 w, uint32 h, int nc)
 {
     ps_bytesperrow = nc * (tf_bytesperrow / samplesperpixel);
     PhotoshopBanner(fd, w, h, 1, nc, "false %d colorimage");
-    fprintf(fd, "/line %ld string def\n", (long) ps_bytesperrow);
+    fprintf(fd, "/line %ld string def\n", static_cast<long>(ps_bytesperrow));
     fprintf(fd, "%lu %lu %d\n",
-        (unsigned long) w, (unsigned long) h, bitspersample);
+        static_cast<unsigned long>(w), static_cast<unsigned long>(h), bitspersample);
     fprintf(fd, "[%lu 0 0 -%lu 0 %lu]\n",
-        (unsigned long) w, (unsigned long) h, (unsigned long) h);
+        static_cast<unsigned long>(w), static_cast<unsigned long>(h), static_cast<unsigned long>(h));
     fprintf(fd, "{currentfile line readhexstring pop} bind\n");
     fprintf(fd, "false %d colorimage\n", nc);
 }
@@ -1392,11 +1385,11 @@ PSColorSeparatePreamble(FILE* fd, uint32 w, uint32 h, int nc)
     PhotoshopBanner(fd, w, h, ps_bytesperrow, nc, "true %d colorimage");
     for (i = 0; i < nc; i++)
         fprintf(fd, "/line%d %ld string def\n",
-            i, (long) ps_bytesperrow);
+            i, static_cast<long>(ps_bytesperrow));
     fprintf(fd, "%lu %lu %d\n",
-        (unsigned long) w, (unsigned long) h, bitspersample);
+        static_cast<unsigned long>(w), static_cast<unsigned long>(h), bitspersample);
     fprintf(fd, "[%lu 0 0 -%lu 0 %lu] \n",
-        (unsigned long) w, (unsigned long) h, (unsigned long) h);
+        static_cast<unsigned long>(w), static_cast<unsigned long>(h), static_cast<unsigned long>(h));
     for (i = 0; i < nc; i++)
         fprintf(fd, "{currentfile line%d readhexstring pop}bind\n", i);
     fprintf(fd, "true %d colorimage\n", nc);
@@ -1413,23 +1406,20 @@ PSColorSeparatePreamble(FILE* fd, uint32 w, uint32 h, int nc)
 void
 PSDataColorContig(FILE* fd, TIFF* tif, uint32 w, uint32 h, int nc)
 {
-    uint32 row;
     int breaklen = MAXLINE, cc, es = samplesperpixel - nc;
-    unsigned char *tf_buf;
-    unsigned char *cp, c;
+    unsigned char c;
 
     (void) w;
-    tf_buf = (unsigned char *) _TIFFmalloc(tf_bytesperrow);
-    if (tf_buf == NULL) {
+    unsigned char* tf_buf = static_cast<unsigned char*>(_TIFFmalloc(tf_bytesperrow));
+    if (tf_buf == nullptr) {
         TIFFError(filename, "No space for scanline buffer");
         return;
     }
-    for (row = 0; row < h; row++) {
+    for (uint32 row = 0; row < h; row++) {
         if (TIFFReadScanline(tif, tf_buf, row, 0) < 0)
             break;
-        cp = tf_buf;
+        unsigned char* cp = tf_buf;
         if (alpha) {
-            int adjust;
             cc = 0;
             for (; cc < tf_bytesperrow; cc += samplesperpixel) {
                 DOBREAK(breaklen, nc, fd);
@@ -1439,7 +1429,7 @@ PSDataColorContig(FILE* fd, TIFF* tif, uint32 w, uint32 h, int nc)
                  *    Cback * (1 - Aimage)
                  * where Cback = 1.
                  */
-                adjust = 255 - cp[nc];
+                int adjust = 255 - cp[nc];
                 switch (nc) {
                 case 4: c = *cp++ + adjust; PUTHEX(c,fd);
                 case 3: c = *cp++ + adjust; PUTHEX(c,fd);
@@ -1468,25 +1458,23 @@ PSDataColorContig(FILE* fd, TIFF* tif, uint32 w, uint32 h, int nc)
 void
 PSDataColorSeparate(FILE* fd, TIFF* tif, uint32 w, uint32 h, int nc)
 {
-    uint32 row;
-    int breaklen = MAXLINE, cc, s, maxs;
-    unsigned char *tf_buf;
-    unsigned char *cp, c;
+    int breaklen = MAXLINE, cc;
+    unsigned char *cp;
 
     (void) w;
-    tf_buf = (unsigned char *) _TIFFmalloc(tf_bytesperrow);
-    if (tf_buf == NULL) {
+    unsigned char* tf_buf = static_cast<unsigned char*>(_TIFFmalloc(tf_bytesperrow));
+    if (tf_buf == nullptr) {
         TIFFError(filename, "No space for scanline buffer");
         return;
     }
-    maxs = (samplesperpixel > nc ? nc : samplesperpixel);
-    for (row = 0; row < h; row++) {
-        for (s = 0; s < maxs; s++) {
+    int maxs = (samplesperpixel > nc ? nc : samplesperpixel);
+    for (uint32 row = 0; row < h; row++) {
+        for (int s = 0; s < maxs; s++) {
             if (TIFFReadScanline(tif, tf_buf, row, s) < 0)
                 break;
             for (cp = tf_buf, cc = 0; cc < tf_bytesperrow; cc++) {
                 DOBREAK(breaklen, 1, fd);
-                c = *cp++;
+                unsigned char c = *cp++;
                 PUTHEX(c,fd);
             }
         }
@@ -1501,9 +1489,7 @@ void
 PSDataPalette(FILE* fd, TIFF* tif, uint32 w, uint32 h)
 {
     uint16 *rmap, *gmap, *bmap;
-    uint32 row;
-    int breaklen = MAXLINE, cc, nc;
-    unsigned char *tf_buf;
+    int breaklen = MAXLINE, cc;
     unsigned char *cp, c;
 
     (void) w;
@@ -1518,23 +1504,22 @@ PSDataPalette(FILE* fd, TIFF* tif, uint32 w, uint32 h)
         TIFFError(filename, "Depth %d not supported", bitspersample);
         return;
     }
-    nc = 3 * (8 / bitspersample);
-    tf_buf = (unsigned char *) _TIFFmalloc(tf_bytesperrow);
-    if (tf_buf == NULL) {
+    int nc = 3 * (8 / bitspersample);
+    unsigned char* tf_buf = static_cast<unsigned char*>(_TIFFmalloc(tf_bytesperrow));
+    if (tf_buf == nullptr) {
         TIFFError(filename, "No space for scanline buffer");
         return;
     }
     if (checkcmap(tif, 1<<bitspersample, rmap, gmap, bmap) == 16) {
-        int i;
 #define CVT(x)      (((x) * 255) / ((1U<<16)-1))
-        for (i = (1<<bitspersample)-1; i >= 0; i--) {
+        for (int i = (1 << bitspersample) - 1; i >= 0; i--) {
             rmap[i] = CVT(rmap[i]);
             gmap[i] = CVT(gmap[i]);
             bmap[i] = CVT(bmap[i]);
         }
 #undef CVT
     }
-    for (row = 0; row < h; row++) {
+    for (uint32 row = 0; row < h; row++) {
         if (TIFFReadScanline(tif, tf_buf, row, 0) < 0)
             break;
         for (cp = tf_buf, cc = 0; cc < tf_bytesperrow; cc++) {
@@ -1575,17 +1560,16 @@ PSDataBW(FILE* fd, TIFF* tif, uint32 w, uint32 h)
     int breaklen = MAXLINE;
     unsigned char* tf_buf;
     unsigned char* cp;
-    tsize_t stripsize = TIFFStripSize(tif);
-    tstrip_t s;
+    const tsize_t stripsize = TIFFStripSize(tif);
 
 #if defined( EXP_ASCII85ENCODER )
     int ascii85_l;      /* Length, in bytes, of ascii85_p[] data */
-    uint8   *ascii85_p = 0;     /* Holds ASCII85 encoded data */
+    uint8   *ascii85_p = nullptr;     /* Holds ASCII85 encoded data */
 #endif
 
     (void) w; (void) h;
-    tf_buf = (unsigned char *) _TIFFmalloc(stripsize);
-    if (tf_buf == NULL) {
+    tf_buf = static_cast<unsigned char*>(_TIFFmalloc(stripsize));
+    if (tf_buf == nullptr) {
         TIFFError(filename, "No space for scanline buffer");
         return;
     }
@@ -1601,7 +1585,7 @@ PSDataBW(FILE* fd, TIFF* tif, uint32 w, uint32 h)
          * 5*stripsize/4.
          */
 
-        ascii85_p = (unsigned char *)_TIFFmalloc( (stripsize+(stripsize/2)) + 8 );
+        ascii85_p = static_cast<unsigned char*>(_TIFFmalloc((stripsize + (stripsize / 2)) + 8));
 
         if ( !ascii85_p ) {
         _TIFFfree( tf_buf );
@@ -1615,7 +1599,7 @@ PSDataBW(FILE* fd, TIFF* tif, uint32 w, uint32 h)
     if (ascii85)
         Ascii85Init();
 
-    for (s = 0; s < TIFFNumberOfStrips(tif); s++) {
+    for (tstrip_t s = 0; s < TIFFNumberOfStrips(tif); s++) {
         int cc = TIFFReadEncodedStrip(tif, s, tf_buf, stripsize);
         if (cc < 0) {
             TIFFError(filename, "Can't read strip");
@@ -1670,12 +1654,12 @@ PSRawDataBW(FILE* fd, TIFF* tif, uint32 w, uint32 h)
     int breaklen = MAXLINE, cc;
     uint16 fillorder;
     unsigned char *tf_buf;
-    unsigned char *cp, c;
+    unsigned char c;
     tstrip_t s;
 
 #if defined( EXP_ASCII85ENCODER )
     int         ascii85_l;      /* Length, in bytes, of ascii85_p[] data */
-    uint8       *   ascii85_p = 0;      /* Holds ASCII85 encoded data */
+    uint8       *   ascii85_p = nullptr;      /* Holds ASCII85 encoded data */
 #endif
 
     (void) w; (void) h;
@@ -1693,8 +1677,8 @@ PSRawDataBW(FILE* fd, TIFF* tif, uint32 w, uint32 h)
             bufsize = bc[s];
     }
 
-    tf_buf = (unsigned char*) _TIFFmalloc(bufsize);
-    if (tf_buf == NULL) {
+    tf_buf = static_cast<unsigned char*>(_TIFFmalloc(bufsize));
+    if (tf_buf == nullptr) {
         TIFFError(filename, "No space for strip buffer");
         return;
     }
@@ -1710,7 +1694,7 @@ PSRawDataBW(FILE* fd, TIFF* tif, uint32 w, uint32 h)
          * 5*bufsize/4.
          */
 
-        ascii85_p = (unsigned char *)_TIFFmalloc( (bufsize+(bufsize/2)) + 8 );
+        ascii85_p = static_cast<unsigned char*>(_TIFFmalloc((bufsize + (bufsize / 2)) + 8));
 
         if ( !ascii85_p ) {
         _TIFFfree( tf_buf );
@@ -1730,7 +1714,7 @@ PSRawDataBW(FILE* fd, TIFF* tif, uint32 w, uint32 h)
         if (fillorder == FILLORDER_LSB2MSB)
             TIFFReverseBits(tf_buf, cc);
         if (!ascii85) {
-            for (cp = tf_buf; cc > 0; cc--) {
+            for (unsigned char* cp = tf_buf; cc > 0; cc--) {
                 DOBREAK(breaklen, 1, fd);
                 c = *cp++;
                 PUTHEX(c, fd);
@@ -1770,14 +1754,10 @@ static char*
 Ascii85Encode(unsigned char* raw)
 {
     static char encoded[6];
-    uint32 word;
 
-    word = (((raw[0]<<8)+raw[1])<<16) + (raw[2]<<8) + raw[3];
+    uint32 word = (((raw[0] << 8) + raw[1]) << 16) + (raw[2] << 8) + raw[3];
     if (word != 0L) {
-        uint32 q;
-        uint16 w1;
-
-        q = word / (85L*85*85*85);  /* actually only a byte */
+        uint32 q = word / (85L * 85 * 85 * 85);  /* actually only a byte */
         encoded[0] = q + '!';
 
         word -= q * (85L*85*85*85); q = word / (85L*85*85);
@@ -1786,7 +1766,7 @@ Ascii85Encode(unsigned char* raw)
         word -= q * (85L*85*85); q = word / (85*85);
         encoded[2] = q + '!';
 
-        w1 = (uint16) (word - q*(85L*85));
+        uint16 w1 = static_cast<uint16>(word - q * (85L * 85));
         encoded[3] = (w1 / 85) + '!';
         encoded[4] = (w1 % 85) + '!';
         encoded[5] = '\0';
@@ -1804,8 +1784,7 @@ Ascii85Put(unsigned char code, FILE* fd)
         int n;
 
         for (n = ascii85count, p = ascii85buf; n >= 4; n -= 4, p += 4) {
-            char* cp;
-            for (cp = Ascii85Encode(p); *cp; cp++) {
+            for (char* cp = Ascii85Encode(p); *cp; cp++) {
                 putc(*cp, fd);
                 if (--ascii85breaklen == 0) {
                     putc('\n', fd);
@@ -1822,9 +1801,8 @@ void
 Ascii85Flush(FILE* fd)
 {
     if (ascii85count > 0) {
-        char* res;
         _TIFFmemset(&ascii85buf[ascii85count], 0, 3);
-        res = Ascii85Encode(ascii85buf);
+        char* res = Ascii85Encode(ascii85buf);
         fwrite(res[0] == 'z' ? "!!!!" : res, ascii85count + 1, 1, fd);
     }
     fputs("~>\n", fd);
@@ -1876,11 +1854,10 @@ int Ascii85EncodeBlock( uint8 * ascii85_p, unsigned f_eod, const uint8 * raw_p, 
 
 {
     char                        ascii85_block[5];     /* Encoded 5 tuple */
-    int                         ascii85_l;      /* Number of bytes written to ascii85_p[] */
     int                         rc;             /* Return code */
     uint32                      val32;          /* Unencoded 4 tuple */
 
-    ascii85_l = 0;                              /* Nothing written yet */
+    int ascii85_l = 0;                              /* Nothing written yet */
 
     if ( raw_p )
     {
@@ -1933,9 +1910,7 @@ int Ascii85EncodeBlock( uint8 * ascii85_p, unsigned f_eod, const uint8 * raw_p, 
 
         if ( raw_l > 0 )
         {
-            int             len;                /* Output this many bytes */
-
-            len = raw_l + 1;
+            int len = raw_l + 1;
             val32 = *++raw_p << 24;             /* Prime the pump */
 
             if ( --raw_l > 0 )  val32 += *(++raw_p) << 16;
@@ -2004,7 +1979,7 @@ char* stuff[] = {
 " -x            override resolution units as centimeters",
 " -y            override resolution units as inches",
 " -z            enable printing in the deadzone (only for PostScript Level 2/3)",*/
-NULL
+nullptr
 };
 
 static void

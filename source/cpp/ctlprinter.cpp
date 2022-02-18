@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,20 +18,19 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <cstring>
+#include "cppfunc.h"
 #include "dtwain.h"
 #include "ctliface.h"
 #include "ctltwmgr.h"
 #include "enumeratorfuncs.h"
 #include "errorcheck.h"
 
-using namespace std;
 using namespace dynarithmic;
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAvailablePrintersArray(DTWAIN_SOURCE Source, DTWAIN_ARRAY AvailPrinters)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, AvailPrinters))
-    DTWAIN_BOOL bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPPRINTER, DTWAIN_CAPSET, AvailPrinters );
+    const DTWAIN_BOOL bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPPRINTER, DTWAIN_CAPSET, AvailPrinters );
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -42,9 +41,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAvailablePrinters(DTWAIN_SOURCE Source, LONG 
     if ( !DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPPRINTER) )
         LOG_FUNC_EXIT_PARAMS(false)
 
-    DTWAIN_ARRAY Array = 0;
-
-    Array = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 32);
+    const DTWAIN_ARRAY Array = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 32);
     if ( !Array )
         LOG_FUNC_EXIT_PARAMS(false)
 
@@ -63,7 +60,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAvailablePrinters(DTWAIN_SOURCE Source, LONG 
         }
      }
 
-    DTWAIN_BOOL bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPPRINTER, DTWAIN_CAPSET, Array );
+    const DTWAIN_BOOL bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPPRINTER, DTWAIN_CAPSET, Array );
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -73,8 +70,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinter(DTWAIN_SOURCE Source, LONG nPrinter, 
     LOG_FUNC_ENTRY_PARAMS((Source, nPrinter, bSetCurrent))
     if ( !DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPPRINTER) )
         LOG_FUNC_EXIT_PARAMS(false)
-    DTWAIN_ARRAY Array = 0;
-    Array = DTWAIN_ArrayCreateFromCap(NULL, DTWAIN_CV_CAPPRINTER, 1);
+    const DTWAIN_ARRAY Array = DTWAIN_ArrayCreateFromCap(nullptr, DTWAIN_CV_CAPPRINTER, 1);
     if ( !Array )
         LOG_FUNC_EXIT_PARAMS(false)
 
@@ -124,7 +120,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterStrings(DTWAIN_SOURCE Source, DTWAIN_A
     if ( !DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPPRINTERSTRING) )
         LOG_FUNC_EXIT_PARAMS(false)
 
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle( pHandle, Source );
     if ( p )
     {
@@ -137,7 +133,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterStrings(DTWAIN_SOURCE Source, DTWAIN_A
     else
         LOG_FUNC_EXIT_PARAMS(false)
 
-        LONG nStrings = EnumeratorFunctionImpl::EnumeratorGetCount(ArrayString);
+    const LONG nStrings = EnumeratorFunctionImpl::EnumeratorGetCount(ArrayString);
     if ( nStrings == 0 )
     {
         if (pNumStrings)
@@ -145,7 +141,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterStrings(DTWAIN_SOURCE Source, DTWAIN_A
         LOG_FUNC_EXIT_PARAMS(true)
     }
 
-    bool bRet = false;
+    bool bRet;
     if ( nStrings == 1 )
     {
         // First try one value
@@ -196,11 +192,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterStrings(DTWAIN_SOURCE Source, DTWAIN_A
 DTWAIN_ARRAY GetPrinterMode(DTWAIN_SOURCE Source, LONG GetType)
 {
     if ( !DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPPRINTERMODE) )
-        return NULL;
-    DTWAIN_ARRAY Array = 0;
-    DTWAIN_BOOL bRet = DTWAIN_GetCapValues(Source, DTWAIN_CV_CAPPRINTERMODE, GetType, &Array);
+        return nullptr;
+    DTWAIN_ARRAY Array = nullptr;
+    const DTWAIN_BOOL bRet = DTWAIN_GetCapValues(Source, DTWAIN_CV_CAPPRINTERMODE, GetType, &Array);
     if ( bRet )
         return Array;
     DTWAIN_ArrayDestroy(Array);
-    return NULL;
+    return nullptr;
 }

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,17 +21,22 @@
 #ifndef CTLTWSES_H_
 #define CTLTWSES_H_
 #include <vector>
+#include <memory>
+#include <unordered_set>
 #include "ctlobstr.h"
 #include "ctlenum.h"
 #include "ctltwsrc.h"
-#include "dtwdecl.h"
 
 namespace dynarithmic
 {
+  class CTL_ITwainSession;
+  using CTL_ITwainSessionPtr = std::unique_ptr<CTL_ITwainSession>;
+  using CTL_TwainSourceSet = std::unordered_set<CTL_ITwainSource*>;
+
   class CTL_ITwainSession
   {
     public:
-        static CTL_ITwainSession *Create(LPCTSTR pAppName,
+        static CTL_ITwainSession*  Create(LPCTSTR pAppName,
                                         HWND* hAppWnd,
                                         TW_UINT16 nMajorNum,
                                         TW_UINT16 nMinorNum,
@@ -42,33 +47,8 @@ namespace dynarithmic
                                         LPCTSTR lpszFamily,
                                         LPCTSTR lpszProduct
                                         );
-        static void Destroy( CTL_ITwainSession *pSession );
-
-        HWND*               GetWindowHandlePtr() const { return (HWND* )&m_AppWnd; }
-        TW_IDENTITY*        GetAppIDPtr()              { return &m_AppId; }
-        CTL_ITwainSource*    CreateTwainSource( LPCTSTR pProduct );
-        bool                AddTwainSource( CTL_ITwainSource *pSource );
-        void                CopyAllSources( CTL_TwainSourceArray & rArray );
-        int                 GetNumSources();
-        void                EnumSources();
-        bool                SelectSource(const CTL_ITwainSource* pSource);
-        bool                SelectSource(LPCTSTR strName);
-        bool                OpenSource(const CTL_ITwainSource* pSource);
-        bool                CloseSource(const CTL_ITwainSource* pSource,
-                                        bool bForce );
-        CTL_ITwainSource*   GetSelectedSource();
-        CTL_ITwainSource*   Find( CTL_ITwainSource* pSource );
-        void                SetSelectedSource(CTL_ITwainSource* pSource);
-        CTL_ITwainSource*   GetDefaultSource();
-        bool                IsValidSource(CTL_ITwainSource *pSource);
-        void                SetTwainMessageFlag(bool bSet = true);
-        bool                IsTwainMsgOn() const
-                                    { return m_bTwainMessageFlag; }
-        bool                IsAllSourcesRetrieved() const { return m_bAllSourcesRetrieved; }
-        void                DestroyOneSource(CTL_ITwainSource *pSource);
-
-    protected:
-        CTL_ITwainSession( LPCTSTR pszAppName,
+        static void Destroy( CTL_ITwainSessionPtr& pSession );
+        CTL_ITwainSession(LPCTSTR pszAppName,
                           HWND* hAppWnd,
                           TW_UINT16 nMajorNum,
                           TW_UINT16 nMinorNum,
@@ -79,41 +59,50 @@ namespace dynarithmic
                           LPCTSTR lpszFamily,
                           LPCTSTR lpszProduct
                         );
+
+        HWND*               GetWindowHandlePtr() const { return const_cast<HWND*>(&m_AppWnd); }
+        TW_IDENTITY*        GetAppIDPtr()              { return &m_AppId; }
+        CTL_ITwainSource*    CreateTwainSource( LPCTSTR pProduct );
+        bool                AddTwainSource( CTL_ITwainSource *pSource );
+        void                CopyAllSources( CTL_TwainSourceSet & rArray );
+        int                 GetNumSources();
+        void                EnumSources();
+        bool                SelectSource(const CTL_ITwainSource* pSource);
+        bool                SelectSource(LPCTSTR strName);
+        bool                OpenSource(const CTL_ITwainSource* pSource);
+        bool                CloseSource(const CTL_ITwainSource* pSource,
+                                        bool bForce );
+        CTL_ITwainSource*   GetSelectedSource() const;
+        CTL_ITwainSource*   Find(const CTL_ITwainSource* pSource);
+        void                SetSelectedSource(CTL_ITwainSource* pSource);
+        CTL_ITwainSource*   GetDefaultSource();
+        bool                IsValidSource(const CTL_ITwainSource* pSource) const;
+        void                SetTwainMessageFlag(bool bSet = true);
+        bool                IsTwainMsgOn() const
+                                    { return m_bTwainMessageFlag; }
+        bool                IsAllSourcesRetrieved() const { return m_bAllSourcesRetrieved; }
+        void                DestroyOneSource(CTL_ITwainSource *pSource);
         virtual ~CTL_ITwainSession();
-        CTL_ITwainSource* IsSourceSelected( CTL_ITwainSource* pSource/*,
-                                           int *pWhere=NULL */);
-        CTL_ITwainSource* IsSourceSelected( LPCTSTR pPsourceName/*,
-                                           int *pWhere=NULL */);
+
+    protected:
+        CTL_ITwainSource* IsSourceSelected( LPCTSTR pPsourceName);
+
         void            DestroyAllSources();
-        HWND            CreateTwainWindow();
+        static HWND     CreateTwainWindow();
         bool            IsTwainWindowActive() const;
         void            DestroyTwainWindow();
 
     private:
         bool       m_bAllSourcesRetrieved;
         HWND       m_AppWnd;
-        CTL_StringType  m_AppName;
+        CTL_StringType m_AppName;
         TW_IDENTITY m_AppId;          // Twain Identity structure
-        CTL_TwainSourceArray m_arrTwainSource;
+        CTL_TwainSourceSet m_arrTwainSource;
         CTL_ITwainSource *m_pSelectedSource;
         bool        m_bTwainWindowCreated;
         bool        m_bTwainMessageFlag;
 };
 
-typedef std::vector< CTL_ITwainSession *> CTL_TwainSessionArray;
-
-class CTL_TwainSession
-{
-    public:
-        CTL_TwainSession( CTL_ITwainSession *pSession=NULL);
-        CTL_TwainSession( CTL_TwainSession & SObject );
-        void operator = (CTL_TwainSession& SessionObject);
-
-        operator CTL_ITwainSession*() { return m_pSession; }
-
-    private:
-        CTL_ITwainSession* m_pSession;
-        void SetEqual(CTL_TwainSession & SObject);
-};
+typedef std::vector< CTL_ITwainSessionPtr > CTL_TwainSessionArray;
 }
 #endif

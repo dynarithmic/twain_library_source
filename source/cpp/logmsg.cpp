@@ -1,6 +1,6 @@
 /*
 This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-Copyright (c) 2002-2021 Dynarithmic Software.
+Copyright (c) 2002-2022 Dynarithmic Software.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,16 +18,14 @@ FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
 DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
 OF THIRD PARTY RIGHTS.
 */
+#undef min
+#undef max
 #include "date/date.h"
-#include <string.h>
-#include <time.h>
-#include <stdarg.h>
-#include <stdio.h>
+#include <ctime>
+#include <cstdio>
 #include <sstream>
-#include <stdio.h>
 #ifdef _WIN32
 #include <windows.h>
-#include <mmSystem.h>
 #include <tchar.h>
 #else
 #include <dlfcn.h>
@@ -36,7 +34,6 @@ OF THIRD PARTY RIGHTS.
 #include "logmsg.h"
 #include "ctlobstr.h"
 #include "ctlfileutils.h"
-#include <boost/log/trivial.hpp>
 
 using namespace dynarithmic;
 using namespace date;
@@ -45,31 +42,33 @@ using namespace date;
 
 namespace dynarithmic
 {
-    CTL_String CBaseLogger::getTime()
+    std::string CBaseLogger::getTime()
     {
-        time_t     now = time(0);
-        struct tm  tstruct;
+        const time_t now = time(nullptr);
+        struct tm  tstruct{};
         char       buf[80];
-        tstruct = *localtime(&now);
+        localtime_s(&tstruct, &now);
         strftime(buf, sizeof(buf), "[%Y-%m-%d %X] ", &tstruct);
         return buf;
     }
 
-    void CBaseLogger::generic_outstream(std::ostream& os, const CTL_String& msg)
+    void CBaseLogger::generic_outstream(std::ostream& os, const std::string& msg)
     {
         os << msg << '\n';
     }
 
-    void StdCout_Logger::trace(const CTL_String& msg)
+    void StdCout_Logger::trace(const std::string& msg)
     {
-        CTL_String total = getTime() + msg;
-        BOOST_LOG_TRIVIAL(trace) << total.c_str();
+        std::string total = getTime() + msg;
+        if (total.back() != '\n')
+            total += '\n';
+        std::cout << total.c_str();
     }
 
     #ifdef _WIN32
-    void DebugMonitor_Logger::trace(const CTL_String& msg) { OutputDebugStringA((getTime() + msg).c_str()); }
+    void DebugMonitor_Logger::trace(const std::string& msg) { OutputDebugStringA((getTime() + msg).c_str()); }
     #else
-    void DebugMonitor_Logger::trace(const CTL_String& msg) { generic_outstream(std::cout, getTime() + msg + "\n"); }
+    void DebugMonitor_Logger::trace(const std::string& msg) { generic_outstream(std::cout, getTime() + msg + "\n"); }
     #endif
 
     File_Logger::File_Logger(const LPCSTR filename, bool bAppend/* = false*/)
@@ -80,22 +79,26 @@ namespace dynarithmic
             m_ostr.open(filename);
     }
 
-    void File_Logger::trace(const CTL_String& msg)
+    void File_Logger::trace(const std::string& msg)
     {
         if (m_ostr)
             generic_outstream(m_ostr, getTime() + msg);
     }
+
 }
 
+void Callback_Logger::trace(const std::string& msg)
+{
+    // We have to convert the string to native format, since the user-defined logger handles both wide and non-wide
+    // character strings
+    if (dynarithmic::UserDefinedLoggerExists())
+        dynarithmic::WriteUserDefinedLogMsgA(msg.c_str());
+}
 
 CLogSystem::CLogSystem() : m_bEnable(false), m_bPrintTime(false), m_bPrintAppName(false), m_bFileOpenedOK(false), m_bErrorDisplayed(false)
 {}
 
 /////////////////////////////////////////////////////////////////////////////
-
-CLogSystem::~CLogSystem()
-{
-}
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -103,8 +106,8 @@ void CLogSystem::GetModuleName(HINSTANCE hInst)
 {
     // get application path and name
     #ifdef WIN32
-    TCHAR buf[_MAX_PATH+1];
-    GetModuleFileName(hInst, buf, _MAX_PATH);
+    char buf[_MAX_PATH+1];
+    GetModuleFileNameA(hInst, buf, _MAX_PATH);
     m_csAppName = GetBaseName(buf);
 #else
     // code for Linux using dladdr
@@ -125,6 +128,10 @@ void CLogSystem::InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE h
         case FILE_LOGGING:
             app_logger_map[FILE_LOGGING] = std::make_shared<File_Logger>(StringConversion::Convert_NativePtr_To_Ansi(pOutputFilename).c_str(), bAppend);
         break;
+        case CALLBACK_LOGGING:
+            app_logger_map[CALLBACK_LOGGING] = std::make_shared<Callback_Logger>();
+        break;
+        default: ;
     }
     m_bEnable = true;
 }
@@ -132,8 +139,9 @@ void CLogSystem::InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE h
 void  CLogSystem::InitConsoleLogging(HINSTANCE hInst)
 {
 #ifdef _WIN32
+    FILE* fDummy;
     AllocConsole();
-    freopen("CON", "w", stdout);
+    freopen_s(&fDummy, "CONOUT$", "w", stdout);
 #endif
     InitLogger(CONSOLE_LOGGING, nullptr, hInst, false);
 }
@@ -141,6 +149,11 @@ void  CLogSystem::InitConsoleLogging(HINSTANCE hInst)
 void  CLogSystem::InitDebugWindowLogging(HINSTANCE hInst)
 {
     InitLogger(DEBUG_WINDOW_LOGGING, nullptr, hInst, false);
+}
+
+void  CLogSystem::InitCallbackLogging(HINSTANCE hInst)
+{
+    InitLogger(CALLBACK_LOGGING, nullptr, hInst, false);
 }
 
 void CLogSystem::InitFileLogging(LPCTSTR pOutputFilename, HINSTANCE hInst, bool bAppend)
@@ -152,9 +165,9 @@ void CLogSystem::InitFileLogging(LPCTSTR pOutputFilename, HINSTANCE hInst, bool 
 void CLogSystem::PrintBanner(bool bStarted)
 {
     if ( bStarted )
-    StatusOutFast(_T("****** Log started ******\n"));
+    StatusOutFast("****** Log started ******\n");
     else
-        StatusOutFast(_T("****** Log ended ******\n"));
+        StatusOutFast("****** Log ended ******\n");
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -165,18 +178,18 @@ void CLogSystem::Enable(bool bEnable)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-bool CLogSystem::StatusOutFast(LPCTSTR fmt)
+bool CLogSystem::StatusOutFast(LPCSTR fmt)
 {
     if (!m_bEnable)
         return true;
 
-    WriteOnDemand(StringConversion::Convert_NativePtr_To_Ansi(fmt));
+    WriteOnDemand(fmt);
     return true;
 }
 
-bool CLogSystem::WriteOnDemand(const CTL_String& fmt)
+bool CLogSystem::WriteOnDemand(const std::string& fmt)
 {
-    for (auto& m : app_logger_map)
+    for (const auto& m : app_logger_map)
         (m.second)->trace(fmt);
     return true;
 }
@@ -187,33 +200,33 @@ bool CLogSystem::Flush()
 }
 /////////////////////////////////////////////////////////////////////////////
 
-CTL_StringType CLogSystem::GetBaseName(const CTL_StringType &path)
+std::string CLogSystem::GetBaseName(const std::string& path) const
 {
-    CTL_StringArrayType rArray;
-    StringWrapper::SplitPath(path, rArray);
+    StringArray rArray;
+    StringWrapperA::SplitPath(path, rArray);
     return rArray[StringWrapper::NAME_POS];
 }
 
 /////////////////////////////////////////////////////////////////////////////
 
-CTL_StringType CLogSystem::GetBaseDir(const CTL_StringType & path)
+std::string CLogSystem::GetBaseDir(const std::string& path) const
 {
-    CTL_StringArrayType rArray;
-    StringWrapper::SplitPath(path, rArray);
+    StringArray rArray;
+    StringWrapperA::SplitPath(path, rArray);
     return rArray[StringWrapper::DIRECTORY_POS];
 }
 
-void CLogSystem::OutputDebugStringFull(const CTL_StringType& s)
+void CLogSystem::OutputDebugStringFull(const std::string& s)
 {
-    for (auto& m : app_logger_map)
-        (m.second)->trace(StringConversion::Convert_Native_To_Ansi(s));
+    for (const auto& m : app_logger_map)
+        (m.second)->trace(s);
 }
 
-CTL_StringType CLogSystem::GetDebugStringFull(const CTL_StringType& s)
+std::string CLogSystem::GetDebugStringFull(const std::string& s)
 {
-    CTL_StringStreamType strm;
+    std::ostringstream strm;
     if ( m_csAppName.empty() )
-        m_csAppName = _T("Unknown App");
-    strm << m_csAppName << _T(" : ") << StringConversion::Convert_Ansi_To_Native(CBaseLogger::getTime()) << _T(" : ") << s;
+        m_csAppName = "Unknown App";
+    strm << m_csAppName << " : " << CBaseLogger::getTime() << " : " << s;
     return strm.str();
 }

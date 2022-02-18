@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 #define CAPSTRUCT_H_
 
 #include <unordered_map>
-#include "dtwdecl.h"
 namespace dynarithmic
 {
     // Define the cap info structure used
@@ -33,8 +32,8 @@ namespace dynarithmic
             UINT       m_nDataType;
             UINT       m_nGetContainer;
             UINT       m_nSetContainer;
-            CTL_String m_strCapName;
-            operator CTL_String();
+            std::string m_strCapName;
+            operator std::string() const;
     };
 
     typedef std::unordered_map<TW_UINT16, CTL_CapStruct> CTL_GeneralCapInfo;

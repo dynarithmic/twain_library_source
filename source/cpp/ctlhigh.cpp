@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -20,11 +20,13 @@
  */
 #include <boost/format.hpp>
 #include <type_traits>
+
+#include "cppfunc.h"
 #include "ctltwmgr.h"
 #include "enumeratorfuncs.h"
 #include "errorcheck.h"
 #include "ctlsupport.h"
-using namespace std;
+
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -44,22 +46,22 @@ static LONG EnumCapInternal(DTWAIN_SOURCE Source,
                             LPDTWAIN_ARRAY arr,
                             DTWAIN_BOOL expandRange,
                             GetCapValuesFn fn,
-                            const CTL_String& func,
-                            const CTL_StringType& paramLog);
+                            const std::string& func,
+                            const std::string& paramLog);
 
 #define GENERATE_PARAM_LOG(argVals) \
-        (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK) ? (ParamOutputter(_T(#argVals)).outputParam argVals.getString()) : _T("")
+        (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK) ? (ParamOutputter((#argVals)).outputParam argVals.getString()) : ("")
 
 template <typename CapArrayType>
 static bool GetCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, CapArrayType value,
-                                 GetCapValuesFn /*capFn*/, const CTL_String& func, const CTL_StringType& paramLog)
+                                 GetCapValuesFn /*capFn*/, const std::string& func, const std::string& paramLog)
 {
-    DTWAIN_ARRAY ArrayValues = 0;
-    LONG retVal = EnumCapInternal(Source, Cap, &ArrayValues, false, GetCurrentCapValues, func, paramLog);
+    DTWAIN_ARRAY ArrayValues = nullptr;
+    const LONG retVal = EnumCapInternal(Source, Cap, &ArrayValues, false, GetCurrentCapValues, func, paramLog);
     DTWAINArrayLL_RAII arr(ArrayValues);
     if (retVal > 0)
     {
-        auto& vOut = EnumeratorVector<typename std::remove_pointer<CapArrayType>::type>(ArrayValues);
+        auto& vOut = EnumeratorVector<std::remove_pointer_t<CapArrayType>>(ArrayValues);
         *value = vOut[0];
         return true;
     }
@@ -102,15 +104,15 @@ struct SetSupportFn2 : public SetSupportFn1<T>
 };
 
 template <typename T, typename FnToCall>
-static T FunctionCaller(FnToCall fn, const CTL_String& func, const CTL_StringType& paramLog)
+static T FunctionCaller(FnToCall fn, const std::string& func, const std::string& paramLog)
 {
-    bool doLog = (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK) ? true : false;
+    const bool doLog = (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK) ? true : false;
     try
     {
         T bRet = T(0);
         if (doLog)
         {
-            try { CTL_TwainAppMgr::WriteLogInfo(CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_IN) + paramLog); }
+            try { CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_IN) + paramLog); }
             catch (...) {}
         }
         bRet = fn();
@@ -118,7 +120,7 @@ static T FunctionCaller(FnToCall fn, const CTL_String& func, const CTL_StringTyp
         {
             try
             {
-                CTL_TwainAppMgr::WriteLogInfo(CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_OUT) + ParamOutputter(_T(""), true).outputParam(bRet).getString());
+                CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_OUT) + ParamOutputter("", true).outputParam(bRet).getString());
             }
             catch (...)
             { return bRet; }
@@ -143,7 +145,7 @@ struct GetDeviceCapsByStringFn
 
     GetDeviceCapsByStringFn(DTWAIN_SOURCE Src, LPTSTR value, GetByStringFn fn) :
         theSource(Src), theString(value), theFn(fn) {}
-    DTWAIN_BOOL operator()() { return dynarithmic::DTWAIN_GetDeviceCapByString(theSource, theString, theFn); }
+    DTWAIN_BOOL operator()() const { return dynarithmic::DTWAIN_GetDeviceCapByString(theSource, theString, theFn); }
 };
 
 struct CapSetterFn
@@ -205,20 +207,20 @@ struct EnumCapInternalFn
 };
 
 template <typename CapDataType, typename SetterFn>
-static DTWAIN_BOOL SetCapability(SetterFn fn, const CTL_String& func, const CTL_StringType& paramLog)
+static DTWAIN_BOOL SetCapability(SetterFn fn, const std::string& func, const std::string& paramLog)
 { return FunctionCaller<DTWAIN_BOOL>(fn, func, paramLog); }
 
 static DTWAIN_BOOL GetCapabilityByString(GetDeviceCapsByStringFn fn,
-                                        const CTL_String& func,
-                                        const CTL_StringType& paramLog)
+                                        const std::string& func,
+                                        const std::string& paramLog)
 { return FunctionCaller<DTWAIN_BOOL>(fn, func, paramLog); }
 
-static bool IsEnabledImpl(DTWAIN_SOURCE Source, TW_UINT16 Cap, const CTL_String& func, const CTL_StringType& paramLog)
+static bool IsEnabledImpl(DTWAIN_SOURCE Source, TW_UINT16 Cap, const std::string& func, const std::string& paramLog)
 { return FunctionCaller<bool>(IsEnabledImplFn(Source, Cap), func, paramLog); }
 
 template <typename T>
 static bool IsSupportedImpl(DTWAIN_SOURCE Source, TW_UINT16 Cap, bool anySupport, T SupportVal,
-                            const CTL_String& func, const CTL_StringType& paramLog)
+                            const std::string& func, const std::string& paramLog)
 { return FunctionCaller<bool>(IsSupportedImplFn<T>(Source, Cap, anySupport, SupportVal), func, paramLog); }
 
 static LONG EnumCapInternal(DTWAIN_SOURCE Source,
@@ -226,29 +228,29 @@ static LONG EnumCapInternal(DTWAIN_SOURCE Source,
                             LPDTWAIN_ARRAY arr,
                             DTWAIN_BOOL expandRange,
                             GetCapValuesFn fn,
-                            const CTL_String& func,
-                            const CTL_StringType& paramLog)
+                            const std::string& func,
+                            const std::string& paramLog)
 { return FunctionCaller<LONG>(EnumCapInternalFn(Source, Cap, arr, expandRange?true:false, fn), func, paramLog); }
 
 template <typename SetFn>
 static DTWAIN_BOOL SetCapabilityByString(SetFn fn,
-                                         const CTL_String& func,
-                                         const CTL_StringType& paramLog)
+                                         const std::string& func,
+                                         const std::string& paramLog)
 { return FunctionCaller<DTWAIN_BOOL>(fn, func, paramLog); }
 
-static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPTSTR value, LONG nLen, GetCapValuesFn fn, const CTL_String& func, const CTL_StringType& paramLog)
+static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value, LONG nLen, GetCapValuesFn fn, const std::string& func, const std::string& paramLog)
 {
 
-    DTWAIN_ARRAY ArrayValues = 0;
-    LONG retVal = EnumCapInternal(Source, Cap, &ArrayValues, false, fn, func, paramLog);
+    DTWAIN_ARRAY ArrayValues = nullptr;
+    const LONG retVal = EnumCapInternal(Source, Cap, &ArrayValues, false, fn, func, paramLog);
     if (nLen > 0)
-        value[0] = _T('\0');
+        value[0] = '\0';
     DTWAINArrayLL_RAII arr(ArrayValues);
     if (retVal > 0)
     {
-        CTL_StringType sVal;
+        std::string sVal;
         EnumeratorFunctionImpl::EnumeratorGetAt(ArrayValues, 0, &sVal);
-        CopyInfoToCString(sVal, value, nLen);
+        StringWrapperA::CopyInfoToCString(sVal, value, nLen);
         return true;
     }
     return false;
@@ -313,8 +315,8 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPTSTR valu
 #define EXPORT_GET_CAP_VALUE_OPT_CURRENT(FuncName, Cap, CapDataType) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, CapDataType value, DTWAIN_BOOL bCurrent)\
     {\
-        CTL_StringType sLog = GENERATE_PARAM_LOG((Source, value, bCurrent));\
-        CTL_String func = __FUNCTION__;\
+        std::string sLog = GENERATE_PARAM_LOG((Source, value, bCurrent));\
+        std::string func = __FUNCTION__;\
         if ( bCurrent ) \
             return GetCapability<CapDataType>(Source, Cap, value, GetCurrentCapValues, func, sLog); \
         return GetCapability<CapDataType>(Source, Cap, value, GetDefaultCapValues, func, sLog); \
@@ -323,8 +325,8 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPTSTR valu
 #define EXPORT_SET_CAP_VALUE_OPT_CURRENT(FuncName, Cap, CapDataType, CapFn) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, CapDataType value, DTWAIN_BOOL bCurrent)\
     {\
-        CTL_StringType sLog = GENERATE_PARAM_LOG((Source, value, bCurrent));\
-        CTL_String func = __FUNCTION__;\
+        std::string sLog = GENERATE_PARAM_LOG((Source, value, bCurrent));\
+        std::string func = __FUNCTION__;\
         return SetCapability<CapDataType>(CapFn(Source, value, Cap, bCurrent?true:false), func, sLog); \
     }
 
@@ -354,13 +356,23 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPTSTR valu
 #define EXPORT_GET_CAP_VALUE_S(FuncName, Cap, NumChars) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, LPTSTR value)\
     {\
-        return GetStringCapability(Source, Cap, value, NumChars, GetCurrentCapValues, __FUNCTION__, GENERATE_PARAM_LOG((Source, value))); \
+        std::string valueTemp(NumChars + 1, '\0');\
+        auto retVal = GetStringCapability(Source, Cap, &valueTemp[0], NumChars, \
+                                          GetCurrentCapValues, __FUNCTION__, GENERATE_PARAM_LOG((Source, value))); \
+        valueTemp.resize(NumChars); \
+        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp), value, NumChars); \
+        return retVal;\
     }
 
 #define EXPORT_GET_VALUE_OPT_MAXLENGTH_S(FuncName, Cap) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, LPTSTR value, LONG MaxLen)\
     {\
-        return GetStringCapability(Source, Cap, value, MaxLen, GetCurrentCapValues, __FUNCTION__, GENERATE_PARAM_LOG((Source, value))); \
+        std::string valueTemp(MaxLen + 1, '\0');\
+        auto retVal = GetStringCapability(Source, Cap, &valueTemp[0], MaxLen, GetCurrentCapValues,\
+                                         __FUNCTION__, GENERATE_PARAM_LOG((Source, value))); \
+        valueTemp.resize(MaxLen); \
+        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp), value, MaxLen); \
+        return retVal;\
     }
 
 #define EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(FuncName, Cap) EXPORT_GET_CAP_VALUE_OPT_CURRENT(FuncName, Cap, LPLONG)
@@ -374,7 +386,12 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPTSTR valu
         else\
         if ( GetType == DTWAIN_CAPGETDEFAULT) \
            fn = GetDefaultCapValues;\
-        return GetStringCapability(Source, Cap, value, NumChars, fn, __FUNCTION__, GENERATE_PARAM_LOG((Source, value, GetType))); \
+        std::string valueTemp(NumChars + 1, '\0');\
+        auto retval = GetStringCapability(Source, Cap, &valueTemp[0], NumChars, fn, __FUNCTION__, \
+                            GENERATE_PARAM_LOG((Source, value, GetType))); \
+        valueTemp.resize(NumChars); \
+        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp), value, NumChars); \
+        return retval; \
     }
 
 #define EXPORT_SET_CAP_VALUE_D(FuncName, Cap) EXPORT_SET_CAP_VALUE(FuncName, Cap, DTWAIN_FLOAT, SetSupportFn1<DTWAIN_FLOAT>)
@@ -656,7 +673,7 @@ EXPORT_ENUM_CAP_VALUES_EX(DTWAIN_EnumThresholdValuesEx, DTWAIN_CV_ICAPTHRESHOLD)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSourceValues(DTWAIN_SOURCE Source, LPCTSTR capName, LPDTWAIN_ARRAY pArray, DTWAIN_BOOL expandIfRange)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, capName, pArray, expandIfRange))
-    DTWAIN_BOOL retVal = DTWAIN_GetCapValues(Source, CTL_TwainAppMgr::GetCapFromCapName(StringConversion::Convert_NativePtr_To_Ansi(capName).c_str()), DTWAIN_CAPGET, pArray);
+    const DTWAIN_BOOL retVal = DTWAIN_GetCapValues(Source, CTL_TwainAppMgr::GetCapFromCapName(StringConversion::Convert_NativePtr_To_Ansi(capName).c_str()), DTWAIN_CAPGET, pArray);
     LOG_FUNC_EXIT_PARAMS(retVal)
     CATCH_BLOCK(false)
 }
@@ -681,12 +698,13 @@ DTWAIN_BOOL dynarithmic::DTWAIN_SetDeviceCapByString2(DTWAIN_SOURCE Source, LPCT
 DTWAIN_BOOL dynarithmic::DTWAIN_GetDeviceCapByString(DTWAIN_SOURCE Source, LPTSTR strVal, GetByStringFn fn)
 {
     DTWAIN_FLOAT tempR;
-    DTWAIN_BOOL retVal = fn(Source, &tempR);
+    const DTWAIN_BOOL retVal = fn(Source, &tempR);
     if ( retVal )
     {
-        CTL_StringStreamType strm;
-        strm << BOOST_FORMAT(_T("%1%")) % tempR;
-        StringWrapper::SafeStrcpy(strVal, strm.str().c_str());
+        StringStreamA strm;
+        strm << boost::format("%1%") % tempR;
+        const auto srcStr = StringConversion::Convert_Ansi_To_Native(strm.str().c_str());
+        StringWrapper::SafeStrcpy(strVal, srcStr.c_str());
     }
     return retVal;
 }
@@ -702,7 +720,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetResolution(DTWAIN_SOURCE Source, LPDTWAIN_FLO
          lCap = DTWAIN_CV_ICAPXNATIVERESOLUTION;
     else
         LOG_FUNC_EXIT_PARAMS(FALSE)
-    DTWAIN_BOOL bRet = GetDoubleCap( Source, lCap, Resolution);
+    const DTWAIN_BOOL bRet = GetDoubleCap( Source, lCap, Resolution);
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(FALSE)
 }
@@ -714,9 +732,8 @@ static bool GetDoubleCap( DTWAIN_SOURCE Source, LONG lCap, double *pValue )
     double *pRealValue = pValue;
     if (DTWAIN_GetCapDataType(Source, lCap) != TWTY_FIX32)
         return false;
-    DTWAIN_ARRAY Array = 0;
-    bool bRet = false;
-    bRet = DTWAIN_GetCapValues(Source, lCap, DTWAIN_CAPGETCURRENT, &Array)?true:false;
+    DTWAIN_ARRAY Array = nullptr;
+    bool bRet = DTWAIN_GetCapValues(Source, lCap, DTWAIN_CAPGETCURRENT, &Array) ? true : false;
     DTWAINArrayLL_RAII arr(Array);
     auto vIn = EnumeratorVectorPtr<double>(Array);
     if ( bRet && Array )
@@ -732,7 +749,7 @@ static bool GetDoubleCap( DTWAIN_SOURCE Source, LONG lCap, double *pValue )
 static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, LONG GetType, DTWAIN_BOOL bExpandRange)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pArray, lCap, bExpandRange))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     LONG nValues = 0;
 
@@ -744,7 +761,7 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
 
     if (p)
     {
-        DTWAIN_ARRAY OrigVals = NULL;
+        DTWAIN_ARRAY OrigVals = nullptr;
 
         // we may use a brand new array
         LPDTWAIN_ARRAY arrayToUse = &OrigVals;
@@ -759,7 +776,7 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
         if (DTWAIN_GetCapValues(Source, lCap, GetType, arrayToUse))
         {
             // Gotten the value.  Check what container type holds the data
-            LONG lContainer = DTWAIN_GetCapContainer(Source, lCap, GetType);
+            const LONG lContainer = DTWAIN_GetCapContainer(Source, lCap, GetType);
             switch (lContainer)
             {
                 case DTWAIN_CONTRANGE:
@@ -769,7 +786,7 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
                         if (pArray)
                         {
                             // we need to expand to a temporary
-                            DTWAIN_ARRAY tempArray = 0;
+                            DTWAIN_ARRAY tempArray = nullptr;
 
                             // throw this away when done
                             DTWAINArrayPtr_RAII aTemp(&tempArray);
@@ -807,7 +824,7 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
                 }
             }
         }
-        LOG_FUNC_EXIT_PARAMS(nValues);
+        LOG_FUNC_EXIT_PARAMS(nValues)
     }
     LOG_FUNC_EXIT_PARAMS(0);
     CATCH_BLOCK(DTWAIN_FAILURE1)

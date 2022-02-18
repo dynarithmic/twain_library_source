@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -24,7 +24,9 @@
 #include <string>
 #include <list>
 #include <unordered_set>
+#include <unordered_map>
 #include <memory>
+#include <utility>
 #include "dtwpdft.h"
 #include "ctlobstr.h"
 namespace dynarithmic
@@ -33,13 +35,13 @@ namespace dynarithmic
 
     struct PDFFont
     {
-        CTL_StringType m_fontName;
+        std::string m_fontName;
         int refNum;
         int fontNum;
         bool bUsedOnPage;
-        PDFFont(const CTL_StringType& fname= _T("Helvetica"), int rNum = -1,
+        PDFFont(std::string fname= "Helvetica", int rNum = -1,
                 int fNum = -1 ) :
-                m_fontName(fname), refNum(rNum), fontNum(fNum), bUsedOnPage(false) { }
+                m_fontName(std::move(fname)), refNum(rNum), fontNum(fNum), bUsedOnPage(false) { }
         bool isCreated() const { return refNum != -1; }
         bool isUsedOnPage() const { return bUsedOnPage; }
         void setUsedOnPage(bool bSet) { bUsedOnPage = bSet; }
@@ -68,12 +70,12 @@ namespace dynarithmic
         bool hasBeenDisplayed;
         unsigned int textTransform;
         bool isEnabled;
-        CTL_StringType m_text;
+        std::string m_text;
         PDFTextElement() : xpos(0), ypos(0), charSpacing(0),
             wordSpacing(0), scaling(100), fontSize(10),
             renderMode(0), riseValue(0), colorRGB(0), displayFlags(0), strokeWidth(2),
             stockPosition(0), scalingX(1), scalingY(1), rotationAngle(0),
-            skewAngleX(0), skewAngleY(0), pTwainSource(0), hasBeenDisplayed(false),
+            skewAngleX(0), skewAngleY(0), pTwainSource(nullptr), hasBeenDisplayed(false),
             textTransform(DTWAIN_PDFTEXTTRANSFORM_TSRK), isEnabled(true) { }
             std::string GetPDFTextString() const;
             void SetInvisible() { renderMode = 3; m_font.refNum = 1; }
@@ -81,6 +83,7 @@ namespace dynarithmic
 
     typedef std::shared_ptr<PDFTextElement> PDFTextElementPtr;
     typedef std::list<PDFTextElementPtr> CTL_TEXTELEMENTPTRLIST;
+    typedef std::unordered_map<CTL_ITwainSource*, CTL_TEXTELEMENTPTRLIST> CTL_TEXTELEMENTMAP;
     typedef std::list<PDFTextElement*> CTL_TEXTELEMENTNAKEDPTRLIST;
     typedef std::unordered_set<PDFTextElement*> CTL_TEXTELEMENTNAKEDPTRSET;
     typedef std::pair<CTL_TEXTELEMENTPTRLIST::iterator, CTL_TEXTELEMENTPTRLIST::iterator> CTL_SEARCHABLETEXTRANGE;

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,8 +18,9 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <cstring>
 #include "ctltr010.h"
+
+#include "ctliface.h"
 #include "ctltwmgr.h"
 
 using namespace dynarithmic;
@@ -48,7 +49,7 @@ CTL_CapabilityTriplet::CTL_CapabilityTriplet(CTL_ITwainSession *pSession,
         {
             Init( pSession->GetAppIDPtr(), pSource->GetSourceIDPtr(),
                     DG_CONTROL, DAT_CAPABILITY, nMsg,
-                    (TW_MEMREF)&m_Capability);
+                    static_cast<TW_MEMREF>(&m_Capability));
             SetAlive (true);
         }
     }
@@ -66,10 +67,10 @@ void CTL_CapabilityTriplet::RemoveAllTypeObjects()
 
 bool CTL_CapabilityTriplet::IsCapabilitySupported()
 {
-    bool oldTesting = m_bTesting;
+    const bool oldTesting = m_bTesting;
     m_bTesting = true;
     // Call base class
-    TW_UINT16 rc = Execute();
+    const TW_UINT16 rc = Execute();
     m_bTesting = oldTesting;
     // Return FALSE if capability is not supported
     if ( rc != TWRC_SUCCESS )
@@ -89,7 +90,7 @@ TW_UINT16 CTL_CapabilityTriplet::Execute()
     {
         m_bSupported = FALSE;
 
-        TW_UINT16 ccode =
+        const TW_UINT16 ccode =
             CTL_TwainAppMgr::GetConditionCode(GetSessionPtr(), GetSourcePtr(), rc);
         if ( ccode != TWCC_SUCCESS )
         {
@@ -109,16 +110,15 @@ TW_UINT16 CTL_CapabilityTriplet::Execute()
             {
                 // Need to specially decode this to determine ItemType
                 // Get pointer to data
-                void *pCapData = (void *)CTL_TwainDLLHandle::s_TwainMemoryFunc->LockMemory(m_Capability.hContainer);
-                pTW_ONEVALUE pValOne;
+                void *pCapData = static_cast<void*>(CTL_TwainDLLHandle::s_TwainMemoryFunc->LockMemory(m_Capability.hContainer));
 
                 // dereference to a TW_ONEVALUE structure.  Don't really
                 // care if item is not really TW_ONEVALUE since first
                 // item in structure is the same for all types (the item type)
-                pValOne = (pTW_ONEVALUE) pCapData;
+                pTW_ONEVALUE pValOne = static_cast<pTW_ONEVALUE>(pCapData);
 
                 // Get item type
-                TW_UINT16 nItemType = pValOne->ItemType;
+                const TW_UINT16 nItemType = pValOne->ItemType;
 
                 SetItemType(nItemType);
             }
@@ -126,7 +126,7 @@ TW_UINT16 CTL_CapabilityTriplet::Execute()
             if ( CTL_TwainDLLHandle::s_TwainMemoryFunc == &CTL_TwainDLLHandle::s_TwainLegacyFunc)
             {
                 #ifdef _WIN32
-                UINT nCount = GlobalFlags(m_Capability.hContainer) & GMEM_LOCKCOUNT;
+                const UINT nCount = GlobalFlags(m_Capability.hContainer) & GMEM_LOCKCOUNT;
                 for ( UINT i = 0; i < nCount; i++ )
                       GlobalUnlock(m_Capability.hContainer);
                 GlobalFree( m_Capability.hContainer );
@@ -152,14 +152,14 @@ TW_UINT16 CTL_CapabilityTriplet::Execute()
 
         try
         {
-            TW_MEMREF p = CTL_TwainDLLHandle::s_TwainMemoryFunc->LockMemory( m_Capability.hContainer );
+            const TW_MEMREF p = CTL_TwainDLLHandle::s_TwainMemoryFunc->LockMemory( m_Capability.hContainer );
             Decode(p);
             CTL_TwainDLLHandle::s_TwainMemoryFunc->UnlockMemory(m_Capability.hContainer);
             CTL_TwainDLLHandle::s_TwainMemoryFunc->FreeMemory( m_Capability.hContainer ); // Test
         }
         catch(...)
         {
-
+            return TWRC_FAILURE;
         }
     }
     return rc;
@@ -237,18 +237,17 @@ CTL_TwainTypeArray* CTL_CapabilityTriplet::GetTwainTypeArray()
 ////////////////////////////////////////////////////////////////////////////
 float CTL_CapabilityTriplet::Twain32ToFloat( TW_FIX32 Fix32 )
 {
-    float  fval;
-    fval = (float)Fix32.Whole + (float)Fix32.Frac / (float)65536.0;
+    float fval = static_cast<float>(Fix32.Whole) + static_cast<float>(Fix32.Frac) / static_cast<float>(65536.0);
     return fval;
 }
 
 
 void CTL_CapabilityTriplet::FloatToTwain32( float fnum, TW_FIX32 & Fix32_value )
 {
-    TW_BOOL sign = (fnum < 0)?TRUE:FALSE;
-    TW_INT32 value = (TW_INT32) (fnum * 65536.0 + (sign?(-0.5):0.5));
+    const TW_BOOL sign = (fnum < 0)?TRUE:FALSE;
+    TW_INT32 value = static_cast<TW_INT32>(fnum * 65536.0 + (sign ? (-0.5) : 0.5));
     Fix32_value.Whole = static_cast<TW_INT16>(value >> 16);
-    Fix32_value.Frac = (TW_UINT16)(value & 0x0000ffffL);
+    Fix32_value.Frac = static_cast<TW_UINT16>(value & 0x0000ffffL);
 }
 
 

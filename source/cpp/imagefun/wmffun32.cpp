@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,14 +21,14 @@
 #include "wmffun32.h"
 #include "ctliface.h"
 using namespace dynarithmic;
-CTL_String CWMFImageHandler::GetFileExtension() const
+std::string CWMFImageHandler::GetFileExtension() const
 {
     return "WMF";
 }
 
 HANDLE CWMFImageHandler::GetFileInformation(LPCSTR /*path*/)
 {
-    return NULL;
+    return nullptr;
 }
 
 int CWMFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR path, HANDLE bitmap, void *pUserInfo/*=NULL*/)
@@ -55,12 +55,11 @@ int CWMFImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, 
 WORD CWMFImageHandler::CalculateAPMCheckSum( APMHEADER apmfh )
 {
     LPWORD  lpWord;
-    WORD    wResult, i;
 
     // Start with the first word
-    wResult = *(lpWord = (LPWORD)(&apmfh));
+    WORD wResult = *(lpWord = (LPWORD)(&apmfh));
     // XOR in each of the other 9 words
-    for(i=1;i<=9;i++)
+    for(WORD i = 1;i<=9;i++)
     {
         wResult ^= lpWord[i];
     }
@@ -75,17 +74,17 @@ int CWMFImageHandler::WriteEMF(BYTE *pDib, UINT32 width, UINT32 height,
     #else
     int error = 0;
     std::vector<BYTE> bitBuf;
-    HDC dc = ::GetDC(NULL);
-    if (dc!=NULL)
+    HDC dc = ::GetDC(nullptr);
+    if (dc!= nullptr)
     {
-        DTWAINDeviceContextRelease_RAII dcRAII(std::make_pair(static_cast<HWND>(NULL), dc));
-        int iDPIX = GetDeviceCaps(dc, LOGPIXELSX);
-        int iDPIY = GetDeviceCaps(dc, LOGPIXELSY);
+        DTWAINDeviceContextRelease_RAII dcRAII(std::make_pair(static_cast<HWND>(nullptr), dc));
+        const int iDPIX = GetDeviceCaps(dc, LOGPIXELSX);
+        const int iDPIY = GetDeviceCaps(dc, LOGPIXELSY);
 
-        int iWidthMM = GetDeviceCaps(dc, HORZSIZE);
-        int iHeightMM = GetDeviceCaps(dc, VERTSIZE);
-        int iWidthPels = GetDeviceCaps(dc, HORZRES);
-        int iHeightPels = GetDeviceCaps(dc, VERTRES);
+        const int iWidthMM = GetDeviceCaps(dc, HORZSIZE);
+        const int iHeightMM = GetDeviceCaps(dc, VERTSIZE);
+        const int iWidthPels = GetDeviceCaps(dc, HORZRES);
+        const int iHeightPels = GetDeviceCaps(dc, VERTRES);
 
         RECT rect;
         rect.left=0;rect.right=width;
@@ -96,35 +95,35 @@ int CWMFImageHandler::WriteEMF(BYTE *pDib, UINT32 width, UINT32 height,
         rect.right = (rect.right * iWidthMM * 100)/ iWidthPels;
         rect.bottom = (rect.bottom * iHeightMM * 100)/ iHeightPels;
 
-        HDC hMetaDC = ::CreateEnhMetaFile(dc, NULL, &rect, _T(""));
-        if (hMetaDC!=NULL)
+        const HDC hMetaDC = ::CreateEnhMetaFile(dc, nullptr, &rect, _T(""));
+        if (hMetaDC!= nullptr)
         {
             SetMapMode(hMetaDC, MM_ISOTROPIC);
-            SetWindowExtEx(hMetaDC, iDPIX, iDPIY, NULL);
-            SetViewportExtEx(hMetaDC, iDPIX, iDPIY, NULL);
+            SetWindowExtEx(hMetaDC, iDPIX, iDPIY, nullptr);
+            SetViewportExtEx(hMetaDC, iDPIX, iDPIY, nullptr);
 
             // Get source bitmap info
-            BITMAPINFO *bmInfo = (LPBITMAPINFO)pDib ;
+            const BITMAPINFO *bmInfo = (LPBITMAPINFO)pDib ;
 
             // assumes a generic 24bit DIB
-            LPVOID lpDIBBits = (LPVOID)(pDib + bmInfo->bmiHeader.biSize);
+            const LPVOID lpDIBBits = static_cast<LPVOID>(pDib + bmInfo->bmiHeader.biSize);
 
             // lines returns the number of lines actually displayed
-            UINT32 lines = ::StretchDIBits(hMetaDC,
-                                           0,0,
-                                           width, height,
-                                           0,0,
-                                           width, height,
-                                           lpDIBBits,
-                                           bmInfo,
-                                           DIB_RGB_COLORS,
-                                           SRCCOPY);
+            const UINT32 lines = ::StretchDIBits(hMetaDC,
+                                                 0,0,
+                                                 width, height,
+                                                 0,0,
+                                                 width, height,
+                                                 lpDIBBits,
+                                                 bmInfo,
+                                                 DIB_RGB_COLORS,
+                                                 SRCCOPY);
 
-             HENHMETAFILE hMeta = ::CloseEnhMetaFile(hMetaDC);
+            const HENHMETAFILE hMeta = ::CloseEnhMetaFile(hMetaDC);
              if (lines==height)
              {
                 // How big will the metafile bits be?
-                UINT32 dwSize = GetEnhMetaFileBits( hMeta, 0, NULL);
+                const UINT32 dwSize = GetEnhMetaFileBits( hMeta, 0, nullptr);
 
                 if (dwSize!=0)
                 {
@@ -163,69 +162,64 @@ int CWMFImageHandler::WriteWMF(BYTE *pDib, UINT32 width, UINT32 height,
     return DTWAIN_ERR_INVALIDBMP;
     #else
     int error = 0;
-    std::vector<BYTE> bitBuf;
-    HDC dc = ::GetDC(NULL);
-    if (dc!=NULL)
+    HDC dc = ::GetDC(nullptr);
+    if (dc!= nullptr)
     {
-        DTWAINDeviceContextRelease_RAII raii(std::make_pair(static_cast<HWND>(NULL), dc));
-        int iDPIX = GetDeviceCaps(dc, LOGPIXELSX);
-        int iDPIY = GetDeviceCaps(dc, LOGPIXELSY);
+        DTWAINDeviceContextRelease_RAII raii(std::make_pair(static_cast<HWND>(nullptr), dc));
+        const int iDPIX = GetDeviceCaps(dc, LOGPIXELSX);
+        const int iDPIY = GetDeviceCaps(dc, LOGPIXELSY);
 
-        int iWidthMM = GetDeviceCaps(dc, HORZSIZE);
-        int iHeightMM = GetDeviceCaps(dc, VERTSIZE);
-        int iWidthPels = GetDeviceCaps(dc, HORZRES);
-        int iHeightPels = GetDeviceCaps(dc, VERTRES);
+        const int iWidthMM = GetDeviceCaps(dc, HORZSIZE);
+        const int iHeightMM = GetDeviceCaps(dc, VERTSIZE);
+        const int iWidthPels = GetDeviceCaps(dc, HORZRES);
+        const int iHeightPels = GetDeviceCaps(dc, VERTRES);
 
         RECT rect;
-        rect.left=0;rect.right=width;
-        rect.top=0;rect.bottom=height;
+        rect.left=0;rect.right = width;
+        rect.top=0;rect.bottom = height;
 
         rect.left = (rect.left * iWidthMM * 100) / iWidthPels;
         rect.top = (rect.top * iHeightMM * 100) / iHeightPels;
         rect.right = (rect.right * iWidthMM * 100) / iWidthPels;
         rect.bottom = (rect.bottom * iHeightMM * 100) / iHeightPels;
 
-        HDC hMetaDC = ::CreateEnhMetaFile(dc, NULL,  &rect, _T(""));
-        if (hMetaDC!=NULL)
+        const HDC hMetaDC = ::CreateEnhMetaFile(dc, nullptr,  &rect, _T(""));
+        if (hMetaDC!= nullptr)
         {
 
             SetMapMode(hMetaDC, MM_ANISOTROPIC);
-            SetWindowExtEx(hMetaDC, iDPIX, iDPIY, NULL);
-            SetViewportExtEx(hMetaDC, iDPIX, iDPIY, NULL);
+            SetWindowExtEx(hMetaDC, iDPIX, iDPIY, nullptr);
+            SetViewportExtEx(hMetaDC, iDPIX, iDPIY, nullptr);
 
             // Get source bitmap info
-            BITMAPINFO *bmInfo = (LPBITMAPINFO)pDib ;
+            const BITMAPINFO *bmInfo = (LPBITMAPINFO)pDib ;
 
             // assumes a generic 24bit DIB
-            LPVOID lpDIBBits = (LPVOID)(pDib + bmInfo->bmiHeader.biSize);
-
-            // lines returns the number of lines actually displayed
-            UINT32 lines = 0;
+            const LPVOID lpDIBBits = static_cast<LPVOID>(pDib + bmInfo->bmiHeader.biSize);
 
 
-            lines = SetDIBitsToDevice(hMetaDC,
-                                0, 0,
-                                width, height,
-                                0, 0,
-                                0, height,
-                                lpDIBBits,
-                                bmInfo,
-                                DIB_PAL_COLORS);
+            UINT32 lines = SetDIBitsToDevice(hMetaDC,
+                                             0, 0,
+                                             width, height,
+                                             0, 0,
+                                             0, height,
+                                             lpDIBBits,
+                                             bmInfo,
+                                             DIB_PAL_COLORS);
 
-            HENHMETAFILE hMeta = ::CloseEnhMetaFile(hMetaDC);
+            const HENHMETAFILE hMeta = ::CloseEnhMetaFile(hMetaDC);
             if (lines==height)
             {
                 // How big will the metafile bits be?
-                UINT32 dwSize = GetWinMetaFileBits( hMeta, 0, NULL, MM_ANISOTROPIC, dc  );
+                const UINT32 dwSize = GetWinMetaFileBits( hMeta, 0, nullptr, MM_ANISOTROPIC, dc  );
 
                 if (dwSize!=0)
                 {
+                    std::vector<BYTE> bitBuf;
                     // Write the Aldus Placeable Header
-                    APMHEADER       APMHeader;
-                    ENHMETAHEADER   emh;
+                    APMHEADER       APMHeader = {};
+                    ENHMETAHEADER   emh = {};
 
-                    // Initialize the header
-                    ZeroMemory( &emh, sizeof(ENHMETAHEADER) );
                     emh.nSize = sizeof(ENHMETAHEADER);
                     // Fill in the enhanced metafile header
                     GetEnhMetaFileHeader( hMeta, sizeof( ENHMETAHEADER ), &emh );
@@ -233,10 +227,10 @@ int CWMFImageHandler::WriteWMF(BYTE *pDib, UINT32 width, UINT32 height,
                     // Fill in the Aldus Placeable Header
                     APMHeader.dwKey = 0x9ac6cdd7l;
                     APMHeader.hmf = 0;
-                    APMHeader.bbox.Top = (SHORT)(1000 * emh.rclFrame.top/2540);
-                    APMHeader.bbox.Left = (SHORT)(1000 * emh.rclFrame.left/2540);
-                    APMHeader.bbox.Right = (SHORT)(1000 * emh.rclFrame.right/2540);
-                    APMHeader.bbox.Bottom = (SHORT)(1000 * emh.rclFrame.bottom/2540);
+                    APMHeader.bbox.Top = static_cast<SHORT>(1000 * emh.rclFrame.top / 2540);
+                    APMHeader.bbox.Left = static_cast<SHORT>(1000 * emh.rclFrame.left / 2540);
+                    APMHeader.bbox.Right = static_cast<SHORT>(1000 * emh.rclFrame.right / 2540);
+                    APMHeader.bbox.Bottom = static_cast<SHORT>(1000 * emh.rclFrame.bottom / 2540);
                     APMHeader.wInch = 1000;
                     APMHeader.dwReserved = 0;
                     APMHeader.wCheckSum = CalculateAPMCheckSum( APMHeader );

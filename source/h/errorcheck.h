@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -20,9 +20,8 @@
  */
 #ifndef ERRORCHECK_H
 #define ERRORCHECK_H
-
+#include "cppfunc.h"
 #include "ctliface.h"
-#include "ctlobstr.h"
 #include "ctltwmgr.h"
 
 namespace dynarithmic
@@ -32,11 +31,11 @@ namespace dynarithmic
                                             Func f,
                                             int32_t Err,
                                             RetType retErr,
-                                            const CTL_String::value_type* fnName,
+                                            const std::string::value_type* fnName,
                                             bool logError=true)
     {
         Handle->m_lLastError = 0;
-        bool bRet = f() ? true : false;
+        const bool bRet = f() ? true : false;
         if (bRet)
         {
             Handle->m_lLastError = Err;
@@ -44,8 +43,8 @@ namespace dynarithmic
             OutputDTWAINErrorA(Handle, fnName);
             if (logError && (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK))
             {
-                CTL_TwainAppMgr::WriteLogInfo(CTL_LogFunctionCallA(fnName, LOG_INDENT_OUT) +
-                    ParamOutputter(_T(""), true).outputParam(retErr).getString());
+                CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(fnName, LOG_INDENT_OUT) +
+                    ParamOutputter("", true).outputParam(retErr).getString());
             }
             if (doThrow)
             throw retErr;
@@ -57,7 +56,7 @@ namespace dynarithmic
                                             Func f,
                                             int32_t Err,
                                             RetType retErr,
-                                            const CTL_String::value_type* fnName,
+                                            const std::string::value_type* fnName,
                                             bool logError=true)
     {
         DTWAIN_Check_Error_Condition_0_Impl<Func,RetType,true>(Handle,f,Err,retErr,fnName,logError);
@@ -68,22 +67,22 @@ namespace dynarithmic
                                             Func f,
                                             int32_t Err,
                                             RetType retErr,
-                                            const CTL_String::value_type* fnName)
+                                            const std::string::value_type* fnName)
     { DTWAIN_Check_Error_Condition_0_Ex(Handle, f, Err, retErr, fnName, false); }
 
     template <typename Func, typename RetType>
     void DTWAIN_Check_Error_Condition_2_Ex(CTL_TwainDLLHandle* Handle,Func f,int32_t Err,RetType retErr,
-                                           const CTL_String::value_type* fnName,bool logError = true)
+                                           const std::string::value_type* fnName,bool logError = true)
     {
         DTWAIN_Check_Error_Condition_0_Impl<Func, RetType, false>(Handle, f, Err, retErr, fnName, logError);
     }
 
     template <typename RetType>
-    void DTWAIN_Check_Bad_Handle_Ex(CTL_TwainDLLHandle* pHandle, RetType retErr, const CTL_String::value_type* fnName)
+    void DTWAIN_Check_Bad_Handle_Ex(CTL_TwainDLLHandle* pHandle, RetType retErr, const std::string::value_type* fnName)
     {
         if (CTL_TwainDLLHandle::s_bCheckHandles && !IsDLLHandleValid(pHandle, false))
         {
-            OutputDTWAINErrorA(NULL, fnName);
+            OutputDTWAINErrorA(nullptr, fnName);
             throw retErr;
         }
     }

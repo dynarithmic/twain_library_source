@@ -73,13 +73,13 @@ int getopt(int nargc, const char** nargv, const char* ostr)
             return(EOF);
         }
     }                   /* option letter okay? */
-    if ((optopt = (int)*place++) == (int)':' ||
+    if ((optopt = static_cast<int>(*place++)) == static_cast<int>(':') ||
         !(oli = strchr(ostr, optopt))) {
         /*
          * if the user didn't specify '-' as an option,
          * assume it means EOF.
          */
-        if (optopt == (int)'-')
+        if (optopt == static_cast<int>('-'))
             return(EOF);
         if (!*place)
             ++optind;
@@ -94,7 +94,7 @@ int getopt(int nargc, const char** nargv, const char* ostr)
         return(BADCH);
     }
     if (*++oli != ':') {            /* don't need argument */
-        optarg = NULL;
+        optarg = nullptr;
         if (!*place)
             ++optind;
     }

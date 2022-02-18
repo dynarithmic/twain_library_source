@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,9 +18,10 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <cstring>
 #include <deque>
 #include <algorithm>
+
+#include "cppfunc.h"
 #include "dtwain.h"
 #include "ctliface.h"
 #include "enumeratorfuncs.h"
@@ -30,12 +31,12 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetErrorBuffer(LPDTWAIN_ARRAY ArrayBuffer)
 {
     LOG_FUNC_ENTRY_PARAMS((ArrayBuffer))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     if ( !IsDLLHandleValid( pHandle, FALSE ) )
         LOG_FUNC_EXIT_PARAMS(false)
 
-    size_t nEntries = (std::min)(static_cast<size_t>(CTL_TwainDLLHandle::s_nErrorBufferThreshold), CTL_TwainDLLHandle::s_vErrorBuffer.size());
-    DTWAIN_ARRAY A = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, (LONG)nEntries);
+    const size_t nEntries = (std::min)(static_cast<size_t>(CTL_TwainDLLHandle::s_nErrorBufferThreshold), CTL_TwainDLLHandle::s_vErrorBuffer.size());
+    const DTWAIN_ARRAY A = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, static_cast<LONG>(nEntries));
     if ( A )
     {
         auto& vIn = EnumeratorVector<LONG>(A);
@@ -52,7 +53,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetErrorBuffer(LPDTWAIN_ARRAY ArrayBuffer)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ClearErrorBuffer(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     if ( !IsDLLHandleValid( pHandle, FALSE ) )
         LOG_FUNC_EXIT_PARAMS(false)
     std::deque<int> tempdeque;
@@ -65,12 +66,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ClearErrorBuffer(VOID_PROTOTYPE)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetErrorBufferThreshold(LONG nErrors)
 {
     LOG_FUNC_ENTRY_PARAMS((nErrors))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     if ( !IsDLLHandleValid( pHandle, FALSE ) )
         LOG_FUNC_EXIT_PARAMS(false)
 
     // Minimum of 50 errors
-    LONG nEntries = (std::max)(nErrors, static_cast<LONG>(50));
+    const LONG nEntries = (std::max)(nErrors, static_cast<LONG>(50));
 
     // clear buffer
     CTL_TwainDLLHandle::s_nErrorBufferThreshold = nEntries;
@@ -86,11 +87,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetErrorBufferThreshold(LONG nErrors)
 LONG DLLENTRY_DEF DTWAIN_GetErrorBufferThreshold(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     if ( !IsDLLHandleValid( pHandle, -1 ) )
         LOG_FUNC_EXIT_PARAMS(-1)
 
-    LONG nValues = CTL_TwainDLLHandle::s_nErrorBufferThreshold;
+    const LONG nValues = CTL_TwainDLLHandle::s_nErrorBufferThreshold;
     LOG_FUNC_EXIT_PARAMS(nValues)
     CATCH_BLOCK(-1)
 }

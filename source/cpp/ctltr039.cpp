@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -30,14 +30,14 @@ CTL_EntryPointTriplet::CTL_EntryPointTriplet(CTL_ITwainSession *pSession, TW_UIN
     if ( pMgr && pMgr->IsValidTwainSession( pSession ))
     {
         m_EntryPoint.Size = sizeof(TW_ENTRYPOINT);
-        Init( pSession->GetAppIDPtr(), NULL, DG_CONTROL, DAT_ENTRYPOINT, msg, &m_EntryPoint);
+        Init( pSession->GetAppIDPtr(), nullptr, DG_CONTROL, DAT_ENTRYPOINT, msg, &m_EntryPoint);
         SetAlive (true);
     }
 }
 
 TW_UINT16 CTL_EntryPointTriplet::Execute()
 {
-    TW_UINT16 retVal = CTL_TwainTriplet::Execute();
+    const TW_UINT16 retVal = CTL_TwainTriplet::Execute();
     if ( retVal == TWRC_SUCCESS)
         m_bTripletFound = true;
     return retVal;

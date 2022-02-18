@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,21 +18,21 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <boost/filesystem.hpp>
 #include "pcxfun32.h"
 #include "ctliface.h"
+#include <dtwain_filesystem.h>
 #ifdef _MSC_VER
 #pragma warning (disable:4244)
 #endif
 using namespace dynarithmic;
-CTL_String CPCXImageHandler::GetFileExtension() const
+std::string CPCXImageHandler::GetFileExtension() const
 {
     return "PCX";
 }
 
 HANDLE CPCXImageHandler::GetFileInformation(LPCSTR /*path*/)
 {
-    return NULL;
+    return nullptr;
 }
 
 bool CPCXImageHandler::OpenOutputFile(LPCTSTR pFileName)
@@ -77,12 +77,15 @@ int CPCXImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, 
     {
         bool doDestroy;
         CPCXImageHandler* m_pThis;
+        std::shared_ptr<DibMultiPageData> m_pMultiPageData;
         DestroyObjectHandler(CPCXImageHandler* pThis) : doDestroy(true), m_pThis(pThis) {}
         void setDoDestroy(bool bSet) { doDestroy = bSet;  }
+        void setDCXInfo(const std::shared_ptr<DibMultiPageData>& ptrData) { m_pMultiPageData = ptrData; }
         ~DestroyObjectHandler()
         {
             if (doDestroy)
             {
+                m_pMultiPageData.reset();
                 try
                 {
                     m_pThis->DestroyAllObjects();
@@ -94,64 +97,73 @@ int CPCXImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, 
 
     DestroyObjectHandler destroyHandler(this);
 
-    m_bWriteOk = FALSE;
+    m_bWriteOk = false;
     LPBITMAPINFOHEADER lpbi= nullptr;
     PCXHEAD pcx{};
     BYTE *ps;
     unsigned int linewidth;
-    int width,depth,bits;
-    int a,i,j,k;
+    int width = 0;
+    int depth = 0;
+    int bits = 0;
+    int a;
+    int i;
+    int j;
+    int k;
 
     std::ofstream* fh = nullptr;
     if ( m_MultiPageStruct.Stage == DIB_MULTI_FIRST)
     {
         // This is a multi-page PCX (DCX file)
         // create a DCXINFO
-        m_pDCXInfo = new DCXINFO;
+        m_pDCXInfo = std::make_shared<DCXINFO>();
+        destroyHandler.setDCXInfo(m_pDCXInfo);
         m_MultiPageStruct.pUserData = m_pDCXInfo;
-        m_pDCXInfo->nCurrentPage = 0;
-        m_pDCXInfo->fh = std::move(m_hFile);
-        fh = m_pDCXInfo->fh.get();
+        auto dcxPtr = std::dynamic_pointer_cast<DCXINFO>(m_pDCXInfo);
+        dcxPtr->nCurrentPage = 0;
+        dcxPtr->fh = std::move(m_hFile);
+        fh = dcxPtr->fh.get();
 
         // Set all elements to 0
-        memset(&m_pDCXInfo->DCXHeader, 0, sizeof(DCXHEADER));
+        memset(&dcxPtr->DCXHeader, 0, sizeof(DCXHEADER));
 
         // Set the DCXHeader Id
-        m_pDCXInfo->DCXHeader.Id = DCXHEADER_ID;
+        dcxPtr->DCXHeader.Id = DCXHEADER_ID;
 
         // Write offset of first PCX page now
-        m_pDCXInfo->DCXHeader.nOffsets[0] = sizeof(DCXHEADER);
+        dcxPtr->DCXHeader.nOffsets[0] = sizeof(DCXHEADER);
 
         // Save current offset
-        m_pDCXInfo->nCurrentOffset = sizeof(DCXHEADER);
+        dcxPtr->nCurrentOffset = sizeof(DCXHEADER);
 
         // Write the DCX Header to the file
-        fh->write(reinterpret_cast<char *>(&m_pDCXInfo->DCXHeader), sizeof(DCXHEADER));
+        fh->write(reinterpret_cast<char *>(&dcxPtr->DCXHeader), sizeof(DCXHEADER));
     }
 
     else
     if ( m_MultiPageStruct.Stage == DIB_MULTI_NEXT )
     {
         // Retrieve handle and write the directory
-        m_pDCXInfo = static_cast<DCXINFO*>(m_MultiPageStruct.pUserData);
+        m_pDCXInfo = m_MultiPageStruct.pUserData;
+        destroyHandler.setDCXInfo(m_pDCXInfo);
+        auto dcxPtr = std::dynamic_pointer_cast<DCXINFO>(m_pDCXInfo);
 
         // Increment the page
-        m_pDCXInfo->nCurrentPage++;
+        dcxPtr->nCurrentPage++;
 
         // Get the file handle
-        fh = m_pDCXInfo->fh.get();
+        fh = dcxPtr->fh.get();
 
         // Get current position in file
         std::streampos current_pos = fh->tellp();
 
         // Write the info to the file
-        long dcxheaderpos = m_pDCXInfo->nCurrentPage * sizeof(DWORD) + sizeof(DWORD);
+        long dcxheaderpos = dcxPtr->nCurrentPage * sizeof(DWORD) + sizeof(DWORD);
 
         // First, go to position in the DCX header
         fh->seekp(dcxheaderpos, std::ios_base::beg);
 
         // Write the offset into the header
-        fh->write(reinterpret_cast<char*>(&m_pDCXInfo->nCurrentOffset), sizeof(DWORD));
+        fh->write(reinterpret_cast<char*>(&dcxPtr->nCurrentOffset), sizeof(DWORD));
 
         // return to current end of file
         fh->seekp(current_pos, std::ios_base::beg);
@@ -159,11 +171,13 @@ int CPCXImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, 
     else
     if (m_MultiPageStruct.Stage == DIB_MULTI_LAST)
     {
-        m_bWriteOk = TRUE;
+        m_bWriteOk = true;
         if (m_MultiPageStruct.pUserData)
         {
-            std::unique_ptr<DCXINFO> ptrDeleter(reinterpret_cast<DCXINFO*>(m_MultiPageStruct.pUserData));
-            m_hFile = std::move(ptrDeleter->fh);
+            m_pDCXInfo = m_MultiPageStruct.pUserData;
+            destroyHandler.setDCXInfo(m_pDCXInfo);
+            auto dcxPtr = std::dynamic_pointer_cast<DCXINFO>(m_pDCXInfo);
+            m_hFile = std::move(dcxPtr->fh);
         }
         return (0); // All OK
     }
@@ -200,13 +214,13 @@ int CPCXImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, 
         pcx.manufacturer=10;
         pcx.encoding=1;
         pcx.xmin=pcx.ymin=0;
-        pcx.xmax=(short)(width-1);
-        pcx.ymax=(short)(depth-1);
+        pcx.xmax=static_cast<short>(width - 1);
+        pcx.ymax=static_cast<short>(depth - 1);
         pcx.palette_type=1;
         pcx.bits=1;
         pcx.version=5;
         pcx.colour_planes=1;
-        pcx.bytes_per_line=(short)PIXELS2BYTES(width);
+        pcx.bytes_per_line=static_cast<short>(PIXELS2BYTES(width));
     }
     else
     if(bits > 1 && bits <=4)
@@ -214,13 +228,13 @@ int CPCXImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, 
         pcx.manufacturer=10;
         pcx.encoding=1;
         pcx.xmin=pcx.ymin=0;
-        pcx.xmax=(short)width-1;
-        pcx.ymax=(short)depth-1;
+        pcx.xmax=static_cast<short>(width)-1;
+        pcx.ymax=static_cast<short>(depth)-1;
         pcx.palette_type=1;
         pcx.bits=1;
         pcx.version=5;
-        pcx.colour_planes=(char)bits;
-        pcx.bytes_per_line=(short)PIXELS2BYTES(width);
+        pcx.colour_planes=static_cast<char>(bits);
+        pcx.bytes_per_line=static_cast<short>(PIXELS2BYTES(width));
     }
     else
     if(bits > 4 && bits <=8)
@@ -228,13 +242,13 @@ int CPCXImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, 
         pcx.manufacturer=10;
         pcx.encoding=1;
         pcx.xmin=pcx.ymin=0;
-        pcx.xmax=(short)width-1;
-        pcx.ymax=(short)depth-1;
+        pcx.xmax=static_cast<short>(width)-1;
+        pcx.ymax=static_cast<short>(depth)-1;
         pcx.palette_type=1;
         pcx.bits=8;
         pcx.version=5;
         pcx.colour_planes=1;
-        pcx.bytes_per_line=(short)width;
+        pcx.bytes_per_line=static_cast<short>(width);
     }
     else
     {
@@ -242,10 +256,10 @@ int CPCXImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, 
         pcx.encoding=1;
         pcx.xmin=0;
         pcx.ymin=0;
-        pcx.xmax=(short)width-1;
-        pcx.ymax=(short)depth-1;
+        pcx.xmax=static_cast<short>(width)-1;
+        pcx.ymax=static_cast<short>(depth)-1;
         pcx.colour_planes=3;
-        pcx.bytes_per_line=(short)width;
+        pcx.bytes_per_line=static_cast<short>(width);
         pcx.bits=8;
         pcx.version=5;
     }
@@ -255,8 +269,8 @@ int CPCXImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, 
 
     fh->write(reinterpret_cast<char*>(&pcx), sizeof(PCXHEAD));
 
-    int nLineWidth = (DWORD)LPBlinewidth(lpbi);
-    ps = GetDibBits(pImage2) + nLineWidth * (DWORD)depth;
+    int nLineWidth = static_cast<DWORD>(LPBlinewidth(lpbi));
+    ps = GetDibBits(pImage2) + nLineWidth * static_cast<DWORD>(depth);
 
     resetbuffer();
 
@@ -312,7 +326,7 @@ int CPCXImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, 
         }
     }
 
-    putbufferedbyte((WORD)EOF,*fh, TRUE);
+    putbufferedbyte(static_cast<WORD>(EOF),*fh, TRUE);
 
     if(bits > 4 && bits <=8)
     {
@@ -322,11 +336,12 @@ int CPCXImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, 
         fh->write(reinterpret_cast<char*>(palette), 768);
     }
 
-    m_bWriteOk = TRUE;
+    m_bWriteOk = true;
     if ( m_MultiPageStruct.Stage == DIB_MULTI_FIRST || m_MultiPageStruct.Stage == DIB_MULTI_NEXT)
     {
         // Save the current position
-        m_pDCXInfo->nCurrentOffset = fh->tellp(); // SetFilePointer(fh, 0, NULL, FILE_CURRENT);
+        auto dcxPtr = std::dynamic_pointer_cast<DCXINFO>(m_pDCXInfo);
+        dcxPtr->nCurrentOffset = fh->tellp(); 
         destroyHandler.setDoDestroy(false);
     }
 
@@ -338,15 +353,15 @@ void CPCXImageHandler::DestroyAllObjects()
     if (m_hFile && *(m_hFile.get()))
     m_hFile->close();
     if ( !m_bWriteOk )
-       boost::filesystem::remove(GetOutputFileName().c_str());
+       filesys::remove(GetOutputFileName().c_str());
 }
 
 WORD CPCXImageHandler::PCXWriteLine(LPSTR p, std::ofstream& fh,int n)
 {
-    unsigned short int i=0,j=0,t=0;
+    unsigned short int j=0,t=0;
     int m_nStatus;
     do {
-        i=0;
+        unsigned short int i = 0;
         while((p[t+i]==p[t+i+1]) && ((t+i) < n) && (i < 63))++i;
         if(i>0)
         {

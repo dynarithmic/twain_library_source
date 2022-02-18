@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -28,13 +28,42 @@
 namespace dynarithmic
 {
     template <typename T, typename DestroyTraits>
+    struct RAII_Thrower
+    {
+        static void RAII_Destroy(T m_a)
+        {
+            try
+            {
+                DestroyTraits::Destroy(m_a);
+            }
+            catch (...)
+            {
+                LogExceptionErrorA("RAII failure");
+            }
+        }
+    };
+
+    template <typename T, typename DestroyTraits>
+    struct RAII_NoThrower
+    {
+        static void RAII_Destroy(T m_a)
+        {
+            DestroyTraits::Destroy(m_a);
+        }
+    };
+
+    template <typename T, typename DestroyTraits, bool canThrow=true>
     struct DTWAIN_RAII
     {
         T m_a;
         DTWAIN_RAII(T a = T()) : m_a(a) {}
         void SetObject(T a) { m_a = a; }
         void Disconnect() { m_a = T(); }
-        ~DTWAIN_RAII() { DestroyTraits::Destroy(m_a); }
+        ~DTWAIN_RAII()
+        {
+            canThrow?RAII_Thrower<T, DestroyTraits>::RAII_Destroy(m_a):
+                     RAII_NoThrower<T, DestroyTraits>::RAII_Destroy(m_a);
+        }
     };
 }
 #endif

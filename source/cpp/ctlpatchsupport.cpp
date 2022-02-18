@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,20 +18,18 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <cstring>
+#include "cppfunc.h"
 #include "dtwain.h"
 #include "ctliface.h"
 #include "ctltwmgr.h"
 #include "enumeratorfuncs.h"
-#include "ctlsupport.h"
-#include "errorcheck.h"
 using namespace dynarithmic;
 
 /////////////// Patch code support //////////////////////////
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPatchCapsSupported(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    const LONG nCapToTest[] = {
+    constexpr LONG nCapToTest[] = {
         DTWAIN_CV_ICAPPATCHCODESEARCHMODE,
         DTWAIN_CV_ICAPPATCHCODEDETECTIONENABLED,
         DTWAIN_CV_ICAPSUPPORTEDPATCHCODETYPES   ,
@@ -41,10 +39,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPatchCapsSupported(DTWAIN_SOURCE Source)
         DTWAIN_CV_ICAPPATCHCODETIMEOUT
     };
 
-    auto iter = std::find_if(std::begin(nCapToTest), std::end(nCapToTest), [&](LONG val)
-    { return DTWAIN_IsCapSupported(Source, val)?true:false;});
+    const auto iter = std::find_if(std::begin(nCapToTest), std::end(nCapToTest), [&](LONG val)
+                                   { return DTWAIN_IsCapSupported(Source, val)?true:false;});
 
-    bool bRet = (iter != std::end(nCapToTest));
+    const bool bRet = (iter != std::end(nCapToTest));
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }

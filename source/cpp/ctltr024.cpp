@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -50,8 +50,8 @@ void CTL_ImageTriplet::InitVars(TW_UINT16 nType,
               GetSourcePtr()->GetSourceIDPtr(),
               DG_IMAGE,
               nType,
-              (TW_UINT16)nGetType,
-              (TW_MEMREF)pData);
+              static_cast<TW_UINT16>(nGetType),
+              static_cast<TW_MEMREF>(pData));
     }
 }
 
@@ -59,19 +59,19 @@ void CTL_ImageTriplet::InitVars(TW_UINT16 nType,
 bool CTL_ImageTriplet::QueryAndRemoveDib(CTL_TwainAcquireEnum acquireType, CTL_TwainDibArray& pArray, size_t nWhich)
 {
     bool bKeepPage = true;
-    CTL_ITwainSession* pSession = GetSessionPtr();
+    const CTL_ITwainSession* pSession = GetSessionPtr();
     CTL_ITwainSource* pSource = GetSourcePtr();
 
     if (pSource->GetAcquireType() == acquireType)
     {
-        bKeepPage = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, NULL, DTWAIN_TN_QUERYPAGEDISCARD, (LPARAM)pSource) ? true : false;
+        bKeepPage = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_QUERYPAGEDISCARD, (LPARAM)pSource) ? true : false;
         // Keep the page
         if (!bKeepPage)
         {
             // throw this dib away (remove from the dib array)
             pArray.DeleteDibMemory(nWhich);
             pArray.RemoveDib(nWhich);
-            CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, NULL, DTWAIN_TN_PAGEDISCARDED, (LPARAM)pSource);
+            CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_PAGEDISCARDED, (LPARAM)pSource);
         }
     }
     return bKeepPage;

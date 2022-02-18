@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -20,25 +20,25 @@
  */
 #ifndef CTLRES_H_
 #define CTLRES_H_
-#include "ctlobstr.h"
+#include <vector>
+#include <string>
 
-#define DTWAINLANGRESOURCEFILE "twainresourcestrings_"
-#define DTWAINRESOURCEINFOFILE "twaininfo.txt"
-#define DTWAINLANGRESOURCENAMESFILE  "twainlanguage.txt"
+#define DTWAINLANGRESOURCEFILE _T("twainresourcestrings_")
+#define DTWAINRESOURCEINFOFILE _T("twaininfo.txt")
+#define DTWAINLANGRESOURCENAMESFILE  _T("twainlanguage.txt")
 
 namespace dynarithmic
 {
-    void LoadImageDLL();
-    bool LoadLanguageResource(LPCSTR lpszName, const CTL_ResourceRegistryMap& registryMap);
-    bool LoadLanguageResource(LPCSTR lpszName);
-    bool LoadLanguageResource(const CTL_String& lpszName, const CTL_ResourceRegistryMap& registryMap);
-    bool LoadLanguageResource(const CTL_String& lpszName);
+    typedef std::unordered_map<std::string, bool> CTL_ResourceRegistryMap;
+
+    bool LoadLanguageResourceA(LPCSTR lpszName, const CTL_ResourceRegistryMap& registryMap);
+    bool LoadLanguageResourceA(LPCSTR lpszName);
+    bool LoadLanguageResourceA(const std::string& lpszName, const CTL_ResourceRegistryMap& registryMap);
+    bool LoadLanguageResourceA(const std::string& lpszName);
     bool LoadTwainResources();
     void UnloadStringResources();
     void UnloadErrorResources();
-    void UnloadImageDLL();
-    std::vector<CTL_String> GetLangResourceNames();
-    CTL_String GetResourceFileName(LPCTSTR lpszName);
-    CTL_String GetResourceFileNameA(LPCSTR lpszName);
+    std::vector<std::string> GetLangResourceNames();
+    std::string GetResourceFileNameA(LPCSTR lpszName);
 }
 #endif

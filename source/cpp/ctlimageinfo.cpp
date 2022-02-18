@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
     OF THIRD PARTY RIGHTS.
  */
 #include <boost/format.hpp>
+
+#include "cppfunc.h"
 #include "ctltwmgr.h"
 #include "enumeratorfuncs.h"
 #include "errorcheck.h"
@@ -26,7 +28,7 @@
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
-using namespace std;
+
 using namespace dynarithmic;
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfoString(DTWAIN_SOURCE Source,
@@ -45,15 +47,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfoString(DTWAIN_SOURCE Source,
 
     DTWAIN_FLOAT tempX;
     DTWAIN_FLOAT tempY;
-    DTWAIN_BOOL retVal = DTWAIN_GetImageInfo(Source, &tempX, &tempY, Width, Length, NumSamples, BitsPerSample, BitsPerPixel, Planar, PixelType, Compression);
+    const DTWAIN_BOOL retVal = DTWAIN_GetImageInfo(Source, &tempX, &tempY, Width, Length, NumSamples, BitsPerSample, BitsPerPixel, Planar, PixelType, Compression);
     if (retVal)
     {
-        CTL_StringStreamType strm;
-        strm << BOOST_FORMAT(_T("%1%")) % tempX;
-        StringWrapper::SafeStrcpy(XResolution, strm.str().c_str());
-        strm.str(_T(""));
-        strm << BOOST_FORMAT(_T("%1%")) % tempY;
-        StringWrapper::SafeStrcpy(YResolution, strm.str().c_str());
+        StringStreamA strm;
+        strm << boost::format("%1%") % tempX;
+        StringWrapper::SafeStrcpy(XResolution, StringConversion::Convert_Ansi_To_Native(strm.str()).c_str());
+        strm.str("");
+        strm << boost::format("%1%") % tempY;
+        StringWrapper::SafeStrcpy(YResolution, StringConversion::Convert_Ansi_To_Native(strm.str()).c_str());
     }
     LOG_FUNC_EXIT_PARAMS(retVal)
     CATCH_BLOCK(false)
@@ -73,7 +75,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfo(DTWAIN_SOURCE Source,
 {
     LOG_FUNC_ENTRY_PARAMS((Source, XResolution, YResolution, Width, Length, NumSamples, BitsPerSample,BitsPerPixel, Planar, PixelType, Compression))
 
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
 
     if (!p)
@@ -82,7 +84,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfo(DTWAIN_SOURCE Source,
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return (!CTL_TwainAppMgr::IsSourceOpen(p)); },
     DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
-    CTL_ImageInfoTriplet II(pHandle->m_Session, p);
+    CTL_ImageInfoTriplet II(pHandle->m_pTwainSession, p);
 
     if (!CTL_TwainAppMgr::GetImageInfo(p, &II))
         LOG_FUNC_EXIT_PARAMS(false)
@@ -90,9 +92,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfo(DTWAIN_SOURCE Source,
         // Get the image information
     TW_IMAGEINFO *pInfo = II.GetImageInfoBuffer();
     if (XResolution)
-        *XResolution = (DTWAIN_FLOAT)CTL_CapabilityTriplet::Twain32ToFloat(pInfo->XResolution);
+        *XResolution = static_cast<DTWAIN_FLOAT>(CTL_CapabilityTriplet::Twain32ToFloat(pInfo->XResolution));
     if (YResolution)
-        *YResolution = (DTWAIN_FLOAT)CTL_CapabilityTriplet::Twain32ToFloat(pInfo->YResolution);
+        *YResolution = static_cast<DTWAIN_FLOAT>(CTL_CapabilityTriplet::Twain32ToFloat(pInfo->YResolution));
     if (Width)
         *Width = pInfo->ImageWidth;
     if (Length)
@@ -105,7 +107,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfo(DTWAIN_SOURCE Source,
 
     if (BitsPerSample)
     {
-        DTWAIN_ARRAY Array = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 8);
+        const DTWAIN_ARRAY Array = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 8);
         auto& vValues = EnumeratorVector<LONG>(Array);
         TW_INT16* pStart = &pInfo->BitsPerSample[0];
         TW_INT16* pEnd = &pInfo->BitsPerSample[8];

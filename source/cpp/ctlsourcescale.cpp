@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,13 +18,14 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include "cppfunc.h"
 #include "ctltwmgr.h"
 #include "enumeratorfuncs.h"
 #include "errorcheck.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
-using namespace std;
+
 using namespace dynarithmic;
 
 static bool SetImageScale(CTL_ITwainSource *p, DTWAIN_FLOAT xscale, DTWAIN_FLOAT yscale)
@@ -38,9 +39,9 @@ static bool SetImageScale(CTL_ITwainSource *p, DTWAIN_FLOAT xscale, DTWAIN_FLOAT
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageScaleString(DTWAIN_SOURCE Source, LPCTSTR xscale, LPCTSTR yscale)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, xscale, yscale))
-    DTWAIN_FLOAT xValue = StringWrapper::ToDouble(xscale);
-    DTWAIN_FLOAT yValue = StringWrapper::ToDouble(yscale);
-    DTWAIN_BOOL retVal = DTWAIN_SetAcquireImageScale(Source, xValue, yValue);
+    const DTWAIN_FLOAT xValue = StringWrapper::ToDouble(xscale);
+    const DTWAIN_FLOAT yValue = StringWrapper::ToDouble(yscale);
+    const DTWAIN_BOOL retVal = DTWAIN_SetAcquireImageScale(Source, xValue, yValue);
     LOG_FUNC_EXIT_PARAMS(retVal)
     CATCH_BLOCK(false)
 }
@@ -48,7 +49,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageScaleString(DTWAIN_SOURCE Source,
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageNegative(DTWAIN_SOURCE Source, DTWAIN_BOOL IsNegative)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, IsNegative))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     if (!p)
         LOG_FUNC_EXIT_PARAMS(false)
@@ -61,7 +62,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageNegative(DTWAIN_SOURCE Source, DT
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageScale(DTWAIN_SOURCE Source, DTWAIN_FLOAT  xscale, DTWAIN_FLOAT  yscale)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, xscale, yscale))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     if (!p)
         LOG_FUNC_EXIT_PARAMS(false)
@@ -69,7 +70,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageScale(DTWAIN_SOURCE Source, DTWAI
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return (!CTL_TwainAppMgr::IsSourceOpen(p)); },
     DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
-    DTWAIN_BOOL bRet = SetImageScale(p, xscale, yscale);
+    const DTWAIN_BOOL bRet = SetImageScale(p, xscale, yscale);
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }

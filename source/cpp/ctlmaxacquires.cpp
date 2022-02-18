@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,20 +18,21 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include "cppfunc.h"
 #include "ctltwmgr.h"
 #include "enumeratorfuncs.h"
 #include "errorcheck.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
-using namespace std;
+
 using namespace dynarithmic;
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetMaxAcquisitions(DTWAIN_SOURCE Source, LONG MaxAcquires)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, MaxAcquires))
     CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     bool bRetval = false;
     if (p)
     {
@@ -52,7 +53,7 @@ LONG DLLENTRY_DEF DTWAIN_GetMaxAcquisitions(DTWAIN_SOURCE Source)
     CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
     if (p)
     {
-        LONG Ret = p->GetMaxAcquisitions();
+        const LONG Ret = p->GetMaxAcquisitions();
         LOG_FUNC_EXIT_PARAMS(Ret)
     }
     LOG_FUNC_EXIT_PARAMS(DTWAIN_FAILURE2)
@@ -62,14 +63,14 @@ LONG DLLENTRY_DEF DTWAIN_GetMaxAcquisitions(DTWAIN_SOURCE Source)
 LONG DLLENTRY_DEF DTWAIN_GetMaxPagesToAcquire(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, DTWAIN_FAILURE2, FUNC_MACRO);
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     if (!p)
         LOG_FUNC_EXIT_PARAMS(DTWAIN_FAILURE2)
-    LONG Ret = p->GetMaxAcquireCount();
+    const LONG Ret = p->GetMaxAcquireCount();
     LOG_FUNC_EXIT_PARAMS(Ret)
     CATCH_BLOCK(DTWAIN_FAILURE2)
 }

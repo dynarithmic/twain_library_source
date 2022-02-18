@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -26,21 +26,17 @@ using namespace dynarithmic;
 
 std::unordered_map<LONG, std::vector<int>> CTL_ImageIOHandler::s_supportedBitDepths;
 
-CTL_ImageIOHandler::CTL_ImageIOHandler() : pMultiDibData(NULL), m_nPage(0),
-m_bAllWritten(true), m_bOnePageWritten(false), bytesleft(0), nextbyte(0), bytebuffer{}, bittable{}, masktable{}
+CTL_ImageIOHandler::CTL_ImageIOHandler() : bytesleft(0), nextbyte(0),
+bytebuffer{}, bittable{}, masktable{}, pMultiDibData(nullptr), m_nPage(0), m_bAllWritten(true), m_bOnePageWritten(false)
 {
-    m_pDib = NULL;
+    m_pDib = nullptr;
 
 }
 
-CTL_ImageIOHandler::CTL_ImageIOHandler( CTL_TwainDib *pDib ): pMultiDibData(NULL), m_nPage(0),
-m_bAllWritten(true), m_bOnePageWritten(false), bytesleft(0), nextbyte(0), bytebuffer{}, bittable{}, masktable{}
+CTL_ImageIOHandler::CTL_ImageIOHandler( CTL_TwainDib *pDib ): bytesleft(0), nextbyte(0),
+bytebuffer{}, bittable{}, masktable{}, pMultiDibData(nullptr), m_nPage(0), m_bAllWritten(true), m_bOnePageWritten(false)
 {
     m_pDib = pDib;
-}
-
-CTL_ImageIOHandler::~CTL_ImageIOHandler()
-{
 }
 
 void CTL_ImageIOHandler::SetMultiDibInfo(const DibMultiPageStruct &s)
@@ -60,10 +56,10 @@ void CTL_ImageIOHandler::resetbuffer()
 
 bool CTL_ImageIOHandler::IsValidBitDepth(LONG FileType, LONG bitDepth)
 {
-    auto it = s_supportedBitDepths.find(FileType);
+    const auto it = s_supportedBitDepths.find(FileType);
     if (it != s_supportedBitDepths.end())
     {
-        auto it2 = std::find(it->second.begin(), it->second.end(), bitDepth);
+        const auto it2 = std::find(it->second.begin(), it->second.end(), bitDepth);
         if (it2 == it->second.end())
             return false;
     }
@@ -72,7 +68,7 @@ bool CTL_ImageIOHandler::IsValidBitDepth(LONG FileType, LONG bitDepth)
 
 int CTL_ImageIOHandler::SaveToFile(HANDLE hDib, LPCTSTR szFile, FREE_IMAGE_FORMAT fmt, int flags,
                                    UINT unitOfMeasure, const std::pair<LONG, LONG>& res,
-                                    const std::tuple<double, double, double, double>& multiplier_pr)
+                                    const std::tuple<double, double, double, double>& multiplier_pr) const
 {
     #ifdef _WIN32
     fipImage fw;
@@ -92,8 +88,11 @@ int CTL_ImageIOHandler::SaveToFile(HANDLE hDib, LPCTSTR szFile, FREE_IMAGE_FORMA
     fw.setHorizontalResolution(res.first * multiplier + std::get<2>(multiplier_pr));
     fw.setVerticalResolution(res.second * multiplier + std::get<3>(multiplier_pr));
 
+    char commentStr[256] = {};
+    dynarithmic::GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
+
     fipTag fp;
-    fp.setKeyValue("Comment", StringConversion::Convert_Native_To_Ansi(dynarithmic::GetVersionString()).c_str());
+    fp.setKeyValue("Comment", commentStr);
     fw.setMetadata(FIMD_COMMENTS, "Comment", fp);
-    return fw.save(fmt, StringConversion::Convert_Native_To_Ansi(szFile).c_str(), flags) ? 0 : 1;
+    return fw.save(fmt, StringConversion::Convert_NativePtr_To_Ansi(szFile).c_str(), flags) ? 0 : 1;
 }

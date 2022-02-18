@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,22 +21,20 @@
  #ifdef _MSC_VER
 #pragma warning( disable : 4786)
 #endif
-#include <cstring>
-#include <cstdio>
 #include <sstream>
 #include <boost/format.hpp>
-#include <climits>
 #include "ctlreg.h"
+
+#include "ctliface.h"
 #include "ctltwmgr.h"
 #include "ctlobstr.h"
-#include "dtwain.h"
 #include "../simpleini/simpleini.h"
 #undef min
 #undef max
 using namespace dynarithmic;
-static CTL_String NormalizeCapName(const CTL_String& sName);
+static std::string NormalizeCapName(const std::string& sName);
 
-bool SaveCapInfoToIni(const CTL_String& strSourceName, UINT nCap, const CTL_IntArray& rContainerTypes)
+bool SaveCapInfoToIni(const std::string& strSourceName, UINT nCap, const CTL_IntArray& rContainerTypes)
 {
     #ifdef WIN32
     const char *szName = "dtwain32.ini";
@@ -45,23 +43,22 @@ bool SaveCapInfoToIni(const CTL_String& strSourceName, UINT nCap, const CTL_IntA
     #endif
 
     // Saves the capability information to the DTWAIN16/32.INI
-    CTL_String strKeyName;
-    CTL_StringStreamA strm;
+    std::string strKeyName;
+    StringStreamOutA strm;
     strm << boost::format("%1%_CAP%2%") % strSourceName % nCap;
     strKeyName = strm.str();
     if ( rContainerTypes.size() != 5 )
         return false;
 
     // Create the entry string
-    CTL_String strValues;
-    CTL_String strTemp;
-    CTL_StringArray aStr;
-    int nValue;
+    std::string strValues;
+    std::string strTemp;
+    StringArray aStr;
     for ( int i = 0; i < 5; i++ )
     {
         if ( i > 0 )
             strValues += ',';
-        nValue = rContainerTypes[i];
+        const int nValue = rContainerTypes[i];
         strTemp.clear();
         if ( nValue != 0 )
         {
@@ -79,8 +76,8 @@ bool SaveCapInfoToIni(const CTL_String& strSourceName, UINT nCap, const CTL_IntA
     return true;
 }
 
-bool dynarithmic::GetCapInfoFromIni(const CTL_String& strCapName,
-                       const CTL_String& strSourceName,
+bool dynarithmic::GetCapInfoFromIni(const std::string& strCapName,
+                       const std::string& strSourceName,
                        UINT /* nCap*/,
                        UINT &rGetValues,
                        UINT &rGetValuesCurrent,
@@ -102,7 +99,7 @@ bool dynarithmic::GetCapInfoFromIni(const CTL_String& strCapName,
         unsigned int dataType;
     };
 
-    static const DataTypeToString DataTypeArray[] = {
+    static constexpr DataTypeToString DataTypeArray[] = {
                     {"TWTY_INT8",    TWTY_INT8},
                     {"TWTY_UINT8",   TWTY_UINT8},
                     {"TWTY_BOOL",    TWTY_BOOL},
@@ -119,32 +116,33 @@ bool dynarithmic::GetCapInfoFromIni(const CTL_String& strCapName,
                     {"TWTY_UNI512",  TWTY_UNI512},
                     {"TWTY_FRAME",   TWTY_FRAME}
                     };
-    static const unsigned DataTypeArraySize = sizeof(DataTypeArray) / sizeof(DataTypeArray[0]);
+    static constexpr unsigned DataTypeArraySize = std::size(DataTypeArray);
 
     #ifdef WIN32
-    CTL_String szName = "dtwain32.ini";
+    CTL_StringType szName = _T("dtwain32.ini");
     #else
-    CTL_String szName = "dtwain64.ini";
+    CTL_StringType szName = _T("dtwain64.ini");
     #endif
 
     bContainerInfoFound = false;
 
-    szName = StringConversion::Convert_Native_To_Ansi(CTL_TwainDLLHandle::s_sINIPath) + szName;
+    szName = CTL_TwainDLLHandle::s_sINIPath + szName;
 
     // Initialize State Info to indicate states 4 - 7 are negotiable for capability
     rStateInfo = 0xFF;
 
     // Get the capability information from DTWAIN16/32.INI
-    CTL_String strKeyName = strSourceName;
-    CTL_String strStates;
+    std::string strKeyName = strSourceName;
+    std::string strStates;
 
     // Check if profile string is present
-    CTL_String szBuffer;
+    std::string szBuffer;
 
     // Check if there are any entries for the Source
     // Get the section name
     CSimpleIniA customProfile;
-    customProfile.LoadFile(szName.c_str());
+    auto sName = StringConversion::Convert_Native_To_Ansi(szName);
+    customProfile.LoadFile(sName.c_str());
 
     // Check if MSG_QUERYSUPPORT is actually supported
     // First get a global setting
@@ -153,18 +151,18 @@ bool dynarithmic::GetCapInfoFromIni(const CTL_String& strCapName,
     // Now check the job control detector value
     rEOJValue     = customProfile.GetLongValue("AllSources", "EOJVALUE", 1);
 
-    rEntryFound = true;
+    rEntryFound = 1;
 
     CSimpleIniA::TNamesDepend keys;
     customProfile.GetAllKeys(strKeyName.c_str(), keys);
 
     if ( keys.empty() )
     {
-        rEntryFound = false;
+        rEntryFound = 0;
         return false;
     }
 
-    CTL_String strNormalizedCapName = NormalizeCapName(strCapName);
+    std::string strNormalizedCapName = NormalizeCapName(strCapName);
 
     szBuffer =  customProfile.GetValue(strKeyName.c_str(), strNormalizedCapName.c_str(), " ");
     bool bFound = true;
@@ -197,8 +195,8 @@ bool dynarithmic::GetCapInfoFromIni(const CTL_String& strCapName,
     rEOJValue = customProfile.GetLongValue(strKeyName.c_str(), "EOJVALUE", rEOJValue);
 
     // Check the data type
-    CTL_String strDataType = strNormalizedCapName + "_DATATYPE";
-    CTL_String szDataType;
+    std::string strDataType = strNormalizedCapName + "_DATATYPE";
+    std::string szDataType;
     szDataType = customProfile.GetValue(strKeyName.c_str(), strDataType.c_str(), "");
 
     // Trim the name found
@@ -214,7 +212,7 @@ bool dynarithmic::GetCapInfoFromIni(const CTL_String& strCapName,
     }
 
     // Check if there are is any state-related info
-    CTL_String szStates;
+    std::string szStates;
     strStates = strCapName + "_STATES";
     szStates = customProfile.GetValue(strKeyName.c_str(), strStates.c_str(), "");
 
@@ -222,48 +220,48 @@ bool dynarithmic::GetCapInfoFromIni(const CTL_String& strCapName,
         return false;
 
     // Check the values in the Capability string (parse)
-    CTL_StringArray aStr;
+    StringArray aStr;
 
     // Make sure that you parse the NULL tokens
     StringWrapperA::Tokenize(szBuffer, ",", aStr, true );
 
     // Get strings and translate them to the correct values
     ContainerMap::const_iterator it;
-    CTL_String str;
+    std::string str;
     if ( aStr.size() > 0 )
     {
         if ( !aStr[0].empty() )
         {
             str = aStr[0];
-            it = (ContainerMap::const_iterator) mapContainer.find( str );
+            it = static_cast<ContainerMap::const_iterator>(mapContainer.find(str));
             if ( it != mapContainer.end())
                 rGetValues = (*it).second;
         }
         if ( !aStr[1].empty() )
         {
             str = aStr[1];
-            it = (ContainerMap::const_iterator) mapContainer.find( str );
+            it = static_cast<ContainerMap::const_iterator>(mapContainer.find(str));
             if ( it != mapContainer.end())
                 rGetValuesCurrent = (*it).second;
         }
         if ( !aStr[2].empty() )
         {
             str = aStr[2];
-            it = (ContainerMap::const_iterator) mapContainer.find( str );
+            it = static_cast<ContainerMap::const_iterator>(mapContainer.find(str));
             if ( it != mapContainer.end())
                 rGetValuesDefault = (*it).second;
         }
         if ( !aStr[3].empty() )
         {
             str = aStr[3];
-            it = (ContainerMap::const_iterator)mapContainer.find( str );
+            it = static_cast<ContainerMap::const_iterator>(mapContainer.find(str));
             if ( it != mapContainer.end())
                 rSetValuesCurrent = (*it).second;
         }
         if ( !aStr[4].empty() )
         {
             str = aStr[4];
-            it = (ContainerMap::const_iterator)mapContainer.find( str );
+            it = static_cast<ContainerMap::const_iterator>(mapContainer.find(str));
             if ( it != mapContainer.end())
                 rSetValuesAvailable = (*it).second;
         }
@@ -273,10 +271,10 @@ bool dynarithmic::GetCapInfoFromIni(const CTL_String& strCapName,
     {
         // Make sure that you parse the NULL tokens
         StringWrapperA::Tokenize(szStates, ",", aStr, true );
-        CTL_String strNum;
+        std::string strNum;
         short int tempInfo = 0;
         bool bFoundNum = false;
-        int nStates = (int)aStr.size();
+        int nStates = static_cast<int>(aStr.size());
         if ( nStates > 0 )
         {
             for ( int Count = 0; Count < nStates; Count++ )
@@ -300,10 +298,10 @@ bool dynarithmic::GetCapInfoFromIni(const CTL_String& strCapName,
 }
 
 
-CTL_String NormalizeCapName(const CTL_String& sName)
+std::string NormalizeCapName(const std::string& sName)
 {
     // remove spaces in all the name
-    CTL_StringArray arr;
+    StringArray arr;
     StringWrapperA::Tokenize(sName, " ", arr);
     return StringWrapperA::Join(arr);
 }

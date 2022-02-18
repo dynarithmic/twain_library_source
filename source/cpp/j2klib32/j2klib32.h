@@ -34,7 +34,7 @@ Please read this file before deploying or distributing any application using DTW
 #define FUNCCONVENTION CALLBACK
 #else
 #pragma message ("DLL entry function")
-#define FUNCCONVENTION DLLENTRY_DEF 
+#define FUNCCONVENTION DLLENTRY_DEF
 #endif
 
 #ifdef __cplusplus

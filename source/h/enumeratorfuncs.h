@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -27,9 +27,7 @@
 #include "ctliface.h"
 #include "ctlobstr.h"
 #include "ctltwmgr.h"
-
-
-#define FLOAT_CLOSE(x,y) (fabs((x) - (y)) <= DTWAIN_FLOATDELTA)
+#include "dtwain_float_utils.h"
 
 inline bool operator == (const TW_FRAME& lhs, const TW_FRAME& rhs)
 {
@@ -60,14 +58,14 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
     struct VectorHelper
     {
         static void push_back(std::vector<T>& vec, void* value)
-        { vec.push_back(*(T*)(value)); }
+        { vec.push_back(*static_cast<T*>(value)); }
 
         static void erase(std::vector<T>& vec, size_t pos)
         { vec.erase(vec.begin() + pos); }
 
         static void erase(std::vector<T>& vec, size_t pos, size_t numValues)
         {
-            size_t maxNumValues = std::distance(vec.begin() + pos, vec.end());
+            const size_t maxNumValues = std::distance(vec.begin() + pos, vec.end());
             size_t realNumValues = (std::min)(numValues, maxNumValues);
             vec.erase(vec.begin() + pos, vec.begin() + pos + realNumValues);
         }
@@ -77,9 +75,9 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
 
         static LONG find(const std::vector<T>&vec, void *value)
         {
-            typename std::vector<T>::const_iterator it = std::find(vec.begin(), vec.end(), *(T*)(value));
+            typename std::vector<T>::const_iterator it = std::find(vec.begin(), vec.end(), *static_cast<T*>(value));
             if ( it != vec.end())
-                return (LONG)std::distance(vec.begin(), it);
+                return static_cast<LONG>(std::distance(vec.begin(), it));
             return -1;
         }
 
@@ -87,7 +85,7 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
         { dest = src; }
 
         static void assign(std::vector<T>& vec, size_t where, void* value)
-        { vec[where] = *(T*)(value); }
+        { vec[where] = *static_cast<T*>(value); }
 
         static size_t size(const std::vector<T>& vec)
         { return vec.size(); }
@@ -99,20 +97,20 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
         {
             if ( where >= vec.size() )
                 return false;
-            T *ptrvalue = (T*)value;
+            T *ptrvalue = static_cast<T*>(value);
             *ptrvalue = vec[where];
             return true;
         }
 
         static void insert(std::vector<T>& vec, size_t where, void* value)
-        { vec.insert(vec.begin() + where, *(T*)(value)); }
+        { vec.insert(vec.begin() + where, *static_cast<T*>(value)); }
 
         static void insert(std::vector<T>& vec, size_t where, size_t numValues, void* value)
-        { vec.insert(vec.begin() + where, numValues, *(T*)(value)); }
+        { vec.insert(vec.begin() + where, numValues, *static_cast<T*>(value)); }
 
         static void insert_range(std::vector<T>& vec, size_t where, size_t numValues, void* valueStart)
         {
-            T* valStart = (T*)valueStart;
+            T* valStart = static_cast<T*>(valueStart);
             T* valEnd = valStart + numValues;
             vec.insert(vec.begin() + where, valStart, valEnd);
         }
@@ -352,12 +350,12 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
                 double m_value;
                 DoubleFinder(double v) : m_value(v) {}
                 bool operator()(double testValue) const
-                { return FLOAT_CLOSE(testValue, m_value)?true:false; }
+                { return float_close(testValue, m_value)?true:false; }
             };
 
-            CTL_Enumerator_double::container_base_type::iterator it = std::find_if(container.m_Array.begin(), container.m_Array.end(), DoubleFinder(value));
+            const CTL_Enumerator_double::container_base_type::iterator it = std::find_if(container.m_Array.begin(), container.m_Array.end(), DoubleFinder(value));
             if ( it != container.m_Array.end() )
-                    return (LONG)std::distance(container.m_Array.begin(), it);
+                    return static_cast<LONG>(std::distance(container.m_Array.begin(), it));
             return -1;
         }
 
@@ -392,9 +390,9 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
         {
             typename T::iterator it = std::find_if(val.begin(), val.end(), EnumeratorFinder<T>(pEnum));
             if ( it != val.end())
-                {
-                    retIt = it;
-                    return true;
+            {
+                retIt = it;
+                return true;
             }
             return false;
         }
@@ -416,7 +414,7 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
             return false;
         }
 
-        static void WriteEnumeratorInfo(LPCTSTR descr, LPVOID pEnum, LPCTSTR extraText = NULL)
+        static void WriteEnumeratorInfo(LPCTSTR descr, LPVOID pEnum, LPCTSTR extraText = nullptr)
         {
             CTL_StringStreamType strm;
             strm << _T("[Enumerator Info] ") << descr << pEnum;
@@ -446,7 +444,7 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
                 case CTL_EnumeratorDTWAINFrameType:
                 case CTL_EnumeratorTWFrameType:
                 case CTL_EnumeratorTWFIX32Type:
-                    return CTL_EnumeratorType(enumType);
+                    return static_cast<CTL_EnumeratorType>(enumType);
             }
             return CTL_EnumeratorInvalid;
         }
@@ -459,8 +457,8 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
             ENUMERATOR_IS_VALID(LONG64, CTL_EnumeratorInt64Type, pEnum)
             ENUMERATOR_IS_VALID(HANDLE, CTL_EnumeratorHandleType, pEnum)
             ENUMERATOR_IS_VALID(CTL_StringType, CTL_EnumeratorStringType, pEnum)
-            ENUMERATOR_IS_VALID(CTL_String, CTL_EnumeratorANSIStringType, pEnum)
-            ENUMERATOR_IS_VALID(CTL_WString, CTL_EnumeratorWideStringType, pEnum)
+            ENUMERATOR_IS_VALID(EnumStringTypeA, CTL_EnumeratorANSIStringType, pEnum)
+            ENUMERATOR_IS_VALID(EnumStringTypeW, CTL_EnumeratorWideStringType, pEnum)
             ENUMERATOR_IS_VALID(DTWAINFrameInternal, CTL_EnumeratorDTWAINFrameType, pEnum)
             ENUMERATOR_IS_VALID(TW_FRAME, CTL_EnumeratorTWFrameType, pEnum)
             ENUMERATOR_IS_VALID(CTL_ITwainSourcePtr, CTL_EnumeratorSourceType, pEnum)
@@ -478,8 +476,8 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
             ENUMERATOR_IS_VALID_NOCHECK(LONG64, pEnum)
             ENUMERATOR_IS_VALID_NOCHECK(HANDLE, pEnum)
             ENUMERATOR_IS_VALID_NOCHECK(CTL_StringType, pEnum)
-            ENUMERATOR_IS_VALID_NOCHECK(CTL_String, pEnum)
-            ENUMERATOR_IS_VALID_NOCHECK(CTL_WString, pEnum)
+            ENUMERATOR_IS_VALID_NOCHECK(EnumStringTypeA, pEnum)
+            ENUMERATOR_IS_VALID_NOCHECK(EnumStringTypeW, pEnum)
             ENUMERATOR_IS_VALID_NOCHECK(DTWAINFrameInternal, pEnum)
             ENUMERATOR_IS_VALID_NOCHECK(TW_FRAME, pEnum)
             ENUMERATOR_IS_VALID_NOCHECK(CTL_ITwainSourcePtr, pEnum)
@@ -495,8 +493,8 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
             ENUMERATOR_IS_VALID_EX(pEnum, enumType, double)
             ENUMERATOR_IS_VALID_EX(pEnum, enumType, HANDLE)
             ENUMERATOR_IS_VALID_EX(pEnum, enumType, CTL_StringType)
-            ENUMERATOR_IS_VALID_EX(pEnum, enumType, CTL_String)
-            ENUMERATOR_IS_VALID_EX(pEnum, enumType, CTL_WString)
+            ENUMERATOR_IS_VALID_EX(pEnum, enumType, EnumStringTypeA)
+            ENUMERATOR_IS_VALID_EX(pEnum, enumType, EnumStringTypeW)
             ENUMERATOR_IS_VALID_EX(pEnum, enumType, DTWAINFrameInternal)
             ENUMERATOR_IS_VALID_EX(pEnum, enumType, TW_FRAME)
             ENUMERATOR_IS_VALID_EX(pEnum, enumType, CTL_ITwainSourcePtr)
@@ -515,12 +513,12 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
             ENUMERATOR_SETUP(CTL_ITwainSourcePtr, EnumType, CTL_EnumeratorSourceType)
             ENUMERATOR_SETUP(DTWAINFrameInternal, EnumType, CTL_EnumeratorDTWAINFrameType)
             ENUMERATOR_SETUP(TW_FRAME, EnumType, CTL_EnumeratorTWFrameType)
-            ENUMERATOR_SETUP(CTL_String, EnumType, CTL_EnumeratorANSIStringType)
-            ENUMERATOR_SETUP(CTL_WString, EnumType, CTL_EnumeratorWideStringType)
+            ENUMERATOR_SETUP(EnumStringTypeA, EnumType, CTL_EnumeratorANSIStringType)
+            ENUMERATOR_SETUP(EnumStringTypeW, EnumType, CTL_EnumeratorWideStringType)
             ENUMERATOR_SETUP(TW_FIX32, EnumType, CTL_EnumeratorTWFIX32Type)
             if ( pStatus )
                 *pStatus = DTWAIN_ERR_WRONG_ARRAY_TYPE;
-            return NULL;
+            return nullptr;
         }
 
         static void CopyArraysFromEnumerator(LPVOID destEnum, LPVOID sourceEnum, CTL_EnumeratorType enumToCheck)
@@ -530,8 +528,8 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
             ENUMERATOR_COPY(sourceEnum, destEnum, enumToCheck, CTL_EnumeratorIntType,         int)
             ENUMERATOR_COPY(sourceEnum, destEnum, enumToCheck,  CTL_EnumeratorInt64Type,      LONG64)
             ENUMERATOR_COPY(sourceEnum, destEnum, enumToCheck, CTL_EnumeratorStringType,      CTL_StringType)
-            ENUMERATOR_COPY(sourceEnum, destEnum, enumToCheck, CTL_EnumeratorANSIStringType,  CTL_String)
-            ENUMERATOR_COPY(sourceEnum, destEnum, enumToCheck, CTL_EnumeratorWideStringType,  CTL_WString)
+            ENUMERATOR_COPY(sourceEnum, destEnum, enumToCheck, CTL_EnumeratorANSIStringType,  EnumStringTypeA)
+            ENUMERATOR_COPY(sourceEnum, destEnum, enumToCheck, CTL_EnumeratorWideStringType,  EnumStringTypeW)
             ENUMERATOR_COPY(sourceEnum, destEnum, enumToCheck, CTL_EnumeratorHandleType,         HANDLE)
             ENUMERATOR_COPY(sourceEnum, destEnum, enumToCheck, CTL_EnumeratorSourceType,      CTL_ITwainSourcePtr)
             ENUMERATOR_COPY(sourceEnum, destEnum, enumToCheck, CTL_EnumeratorDTWAINFrameType, DTWAINFrameInternal)
@@ -546,8 +544,8 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
             ENUMERATOR_PUSH_BACK(pEnum, value, double)
             ENUMERATOR_PUSH_BACK(pEnum, value, int)
             ENUMERATOR_PUSH_BACK(pEnum, value, LONG64)
-            ENUMERATOR_PUSH_BACK(pEnum, value, CTL_String)
-            ENUMERATOR_PUSH_BACK(pEnum, value, CTL_WString)
+            ENUMERATOR_PUSH_BACK(pEnum, value, EnumStringTypeA)
+            ENUMERATOR_PUSH_BACK(pEnum, value, EnumStringTypeW)
             ENUMERATOR_PUSH_BACK(pEnum, value, CTL_StringType)
             ENUMERATOR_PUSH_BACK(pEnum, value, CTL_ITwainSourcePtr)
             ENUMERATOR_PUSH_BACK(pEnum, value, HANDLE)
@@ -564,8 +562,8 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
             ENUMERATOR_PUSH_BACK_MULTIPLE(pEnum, value, numValues, int)
             ENUMERATOR_PUSH_BACK_MULTIPLE(pEnum, value, numValues, LONG64)
             ENUMERATOR_PUSH_BACK_MULTIPLE(pEnum, value, numValues, CTL_StringType)
-            ENUMERATOR_PUSH_BACK_MULTIPLE(pEnum, value, numValues, CTL_String)
-            ENUMERATOR_PUSH_BACK_MULTIPLE(pEnum, value, numValues, CTL_WString)
+            ENUMERATOR_PUSH_BACK_MULTIPLE(pEnum, value, numValues, EnumStringTypeA)
+            ENUMERATOR_PUSH_BACK_MULTIPLE(pEnum, value, numValues, EnumStringTypeW)
             ENUMERATOR_PUSH_BACK_MULTIPLE(pEnum, value, numValues, CTL_ITwainSourcePtr)
             ENUMERATOR_PUSH_BACK_MULTIPLE(pEnum, value, numValues, HANDLE)
             ENUMERATOR_PUSH_BACK_MULTIPLE(pEnum, value, numValues, DTWAINFrameInternal)
@@ -581,8 +579,8 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
             ENUMERATOR_CLEAR(pEnum, int)
             ENUMERATOR_CLEAR(pEnum, LONG64)
             ENUMERATOR_CLEAR(pEnum, CTL_StringType)
-            ENUMERATOR_CLEAR(pEnum, CTL_String)
-            ENUMERATOR_CLEAR(pEnum, CTL_WString)
+            ENUMERATOR_CLEAR(pEnum, EnumStringTypeA)
+            ENUMERATOR_CLEAR(pEnum, EnumStringTypeW)
             ENUMERATOR_CLEAR(pEnum, CTL_ITwainSourcePtr)
             ENUMERATOR_CLEAR(pEnum, HANDLE)
             ENUMERATOR_CLEAR(pEnum, DTWAINFrameInternal)
@@ -597,8 +595,8 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
             ENUMERATOR_GET_AT(pEnum, nWhere, retValue, int)
             ENUMERATOR_GET_AT(pEnum, nWhere, retValue, LONG64)
             ENUMERATOR_GET_AT(pEnum, nWhere, retValue, CTL_StringType)
-            ENUMERATOR_GET_AT(pEnum, nWhere, retValue, CTL_String)
-            ENUMERATOR_GET_AT(pEnum, nWhere, retValue, CTL_WString)
+            ENUMERATOR_GET_AT(pEnum, nWhere, retValue, EnumStringTypeA)
+            ENUMERATOR_GET_AT(pEnum, nWhere, retValue, EnumStringTypeW)
             ENUMERATOR_GET_AT(pEnum, nWhere, retValue, CTL_ITwainSourcePtr)
             ENUMERATOR_GET_AT(pEnum, nWhere, retValue, HANDLE)
             ENUMERATOR_GET_AT(pEnum, nWhere, retValue, DTWAINFrameInternal)
@@ -614,8 +612,8 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
             ENUMERATOR_FIND_VALUE(pEnum, value, int)
             ENUMERATOR_FIND_VALUE(pEnum, value, LONG64)
             ENUMERATOR_FIND_VALUE(pEnum, value, CTL_StringType)
-            ENUMERATOR_FIND_VALUE(pEnum, value, CTL_String)
-            ENUMERATOR_FIND_VALUE(pEnum, value, CTL_WString)
+            ENUMERATOR_FIND_VALUE(pEnum, value, EnumStringTypeA)
+            ENUMERATOR_FIND_VALUE(pEnum, value, EnumStringTypeW)
             ENUMERATOR_FIND_VALUE(pEnum, value, CTL_ITwainSourcePtr)
             ENUMERATOR_FIND_VALUE(pEnum, value, HANDLE)
             ENUMERATOR_FIND_VALUE(pEnum, value, DTWAINFrameInternal)
@@ -637,8 +635,8 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
             ENUMERATOR_RESIZE(pEnum, numValues, int)
             ENUMERATOR_RESIZE(pEnum, numValues, LONG64)
             ENUMERATOR_RESIZE(pEnum, numValues, CTL_StringType)
-            ENUMERATOR_RESIZE(pEnum, numValues, CTL_String)
-            ENUMERATOR_RESIZE(pEnum, numValues, CTL_WString)
+            ENUMERATOR_RESIZE(pEnum, numValues, EnumStringTypeA)
+            ENUMERATOR_RESIZE(pEnum, numValues, EnumStringTypeW)
             ENUMERATOR_RESIZE(pEnum, numValues, CTL_ITwainSourcePtr)
             ENUMERATOR_RESIZE(pEnum, numValues, HANDLE)
             ENUMERATOR_RESIZE(pEnum, numValues, DTWAINFrameInternal)
@@ -653,8 +651,8 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
             ENUMERATOR_DESTROY_ARRAY(pEnum, int)
             ENUMERATOR_DESTROY_ARRAY(pEnum, LONG64)
             ENUMERATOR_DESTROY_ARRAY(pEnum, CTL_StringType)
-            ENUMERATOR_DESTROY_ARRAY(pEnum, CTL_String)
-            ENUMERATOR_DESTROY_ARRAY(pEnum, CTL_WString)
+            ENUMERATOR_DESTROY_ARRAY(pEnum, EnumStringTypeA)
+            ENUMERATOR_DESTROY_ARRAY(pEnum, EnumStringTypeW)
             ENUMERATOR_DESTROY_ARRAY(pEnum, CTL_ITwainSourcePtr)
             ENUMERATOR_DESTROY_ARRAY(pEnum, HANDLE)
             ENUMERATOR_DESTROY_ARRAY(pEnum, DTWAINFrameInternal)
@@ -670,8 +668,8 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
             ENUMERATOR_REMOVE_AT(pEnum, nWhere, int)
             ENUMERATOR_REMOVE_AT(pEnum, nWhere, LONG64)
             ENUMERATOR_REMOVE_AT(pEnum, nWhere, CTL_StringType)
-            ENUMERATOR_REMOVE_AT(pEnum, nWhere, CTL_String)
-            ENUMERATOR_REMOVE_AT(pEnum, nWhere, CTL_WString)
+            ENUMERATOR_REMOVE_AT(pEnum, nWhere, EnumStringTypeA)
+            ENUMERATOR_REMOVE_AT(pEnum, nWhere, EnumStringTypeW)
             ENUMERATOR_REMOVE_AT(pEnum, nWhere, CTL_ITwainSourcePtr)
             ENUMERATOR_REMOVE_AT(pEnum, nWhere, HANDLE)
             ENUMERATOR_REMOVE_AT(pEnum, nWhere, DTWAINFrameInternal)
@@ -686,8 +684,8 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
             ENUMERATOR_REMOVE_AT_MULTIPLE(pEnum, nWhere, numItems, int)
             ENUMERATOR_REMOVE_AT_MULTIPLE(pEnum, nWhere, numItems, LONG64)
             ENUMERATOR_REMOVE_AT_MULTIPLE(pEnum, nWhere, numItems, CTL_StringType)
-            ENUMERATOR_REMOVE_AT_MULTIPLE(pEnum, nWhere, numItems, CTL_String)
-            ENUMERATOR_REMOVE_AT_MULTIPLE(pEnum, nWhere, numItems, CTL_WString)
+            ENUMERATOR_REMOVE_AT_MULTIPLE(pEnum, nWhere, numItems, EnumStringTypeA)
+            ENUMERATOR_REMOVE_AT_MULTIPLE(pEnum, nWhere, numItems, EnumStringTypeW)
             ENUMERATOR_REMOVE_AT_MULTIPLE(pEnum, nWhere, numItems, CTL_ITwainSourcePtr)
             ENUMERATOR_REMOVE_AT_MULTIPLE(pEnum, nWhere, numItems, HANDLE)
             ENUMERATOR_REMOVE_AT_MULTIPLE(pEnum, nWhere, numItems, DTWAINFrameInternal)
@@ -702,8 +700,8 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
             ENUMERATOR_INSERT_AT(pEnum, nWhere, value, int)
             ENUMERATOR_INSERT_AT(pEnum, nWhere, value, LONG64)
             ENUMERATOR_INSERT_AT(pEnum, nWhere, value, CTL_StringType)
-            ENUMERATOR_INSERT_AT(pEnum, nWhere, value, CTL_String)
-            ENUMERATOR_INSERT_AT(pEnum, nWhere, value, CTL_WString)
+            ENUMERATOR_INSERT_AT(pEnum, nWhere, value, EnumStringTypeA)
+            ENUMERATOR_INSERT_AT(pEnum, nWhere, value, EnumStringTypeW)
             ENUMERATOR_INSERT_AT(pEnum, nWhere, value, CTL_ITwainSourcePtr)
             ENUMERATOR_INSERT_AT(pEnum, nWhere, value, HANDLE)
             ENUMERATOR_INSERT_AT(pEnum, nWhere, value, DTWAINFrameInternal)
@@ -718,9 +716,9 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
             ENUMERATOR_INSERT_RANGE(pEnum, nWhere, value, numValues, int)
             ENUMERATOR_INSERT_RANGE(pEnum, nWhere, value, numValues, LONG64)
             ENUMERATOR_INSERT_RANGE(pEnum, nWhere, value, numValues, CTL_StringType)
-            ENUMERATOR_INSERT_RANGE(pEnum, nWhere, value, numValues, CTL_String)
+            ENUMERATOR_INSERT_RANGE(pEnum, nWhere, value, numValues, EnumStringTypeA)
             ENUMERATOR_INSERT_RANGE(pEnum, nWhere, value, numValues, CTL_ITwainSourcePtr)
-            ENUMERATOR_INSERT_RANGE(pEnum, nWhere, value, numValues, CTL_WString)
+            ENUMERATOR_INSERT_RANGE(pEnum, nWhere, value, numValues, EnumStringTypeW)
             ENUMERATOR_INSERT_RANGE(pEnum, nWhere, value, numValues, HANDLE)
             ENUMERATOR_INSERT_RANGE(pEnum, nWhere, value, numValues, DTWAINFrameInternal)
             ENUMERATOR_INSERT_RANGE(pEnum, nWhere, value, numValues, TW_FRAME)
@@ -734,8 +732,8 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
             ENUMERATOR_SET_AT(pEnum, nWhere, value, int)
             ENUMERATOR_SET_AT(pEnum, nWhere, value, LONG64)
             ENUMERATOR_SET_AT(pEnum, nWhere, value, CTL_StringType)
-            ENUMERATOR_SET_AT(pEnum, nWhere, value, CTL_String)
-            ENUMERATOR_SET_AT(pEnum, nWhere, value, CTL_WString)
+            ENUMERATOR_SET_AT(pEnum, nWhere, value, EnumStringTypeA)
+            ENUMERATOR_SET_AT(pEnum, nWhere, value, EnumStringTypeW)
             ENUMERATOR_SET_AT(pEnum, nWhere, value, CTL_ITwainSourcePtr)
             ENUMERATOR_SET_AT(pEnum, nWhere, value, HANDLE)
             ENUMERATOR_SET_AT(pEnum, nWhere, value, DTWAINFrameInternal)
@@ -750,8 +748,8 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
             ENUMERATOR_COUNT(pEnum, int)
             ENUMERATOR_COUNT(pEnum, LONG64)
             ENUMERATOR_COUNT(pEnum, CTL_StringType)
-            ENUMERATOR_COUNT(pEnum, CTL_String)
-            ENUMERATOR_COUNT(pEnum, CTL_WString)
+            ENUMERATOR_COUNT(pEnum, EnumStringTypeA)
+            ENUMERATOR_COUNT(pEnum, EnumStringTypeW)
             ENUMERATOR_COUNT(pEnum, CTL_ITwainSourcePtr)
             ENUMERATOR_COUNT(pEnum, HANDLE)
             ENUMERATOR_COUNT(pEnum, DTWAINFrameInternal)
@@ -767,14 +765,14 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
             ENUMERATOR_GET_BUFFER(pEnum, offset, int)
             ENUMERATOR_GET_BUFFER(pEnum, offset, LONG64)
             ENUMERATOR_GET_BUFFER(pEnum, offset, CTL_StringType)
-            ENUMERATOR_GET_BUFFER(pEnum, offset, CTL_String)
-            ENUMERATOR_GET_BUFFER(pEnum, offset, CTL_WString)
+            ENUMERATOR_GET_BUFFER(pEnum, offset, EnumStringTypeA)
+            ENUMERATOR_GET_BUFFER(pEnum, offset, EnumStringTypeW)
             ENUMERATOR_GET_BUFFER(pEnum, offset, CTL_ITwainSourcePtr)
             ENUMERATOR_GET_BUFFER(pEnum, offset, HANDLE)
             ENUMERATOR_GET_BUFFER(pEnum, offset, DTWAINFrameInternal)
             ENUMERATOR_GET_BUFFER(pEnum, offset, TW_FRAME)
             ENUMERATOR_GET_BUFFER(pEnum, offset, TW_FIX32)
-            return NULL;
+            return nullptr;
         }
 
         static LPVOID EnumeratorGetVector(LPVOID pEnum)
@@ -784,14 +782,14 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
             ENUMERATOR_GET_VECTOR(pEnum, int)
             ENUMERATOR_GET_VECTOR(pEnum, LONG64)
             ENUMERATOR_GET_VECTOR(pEnum, CTL_StringType)
-            ENUMERATOR_GET_VECTOR(pEnum, CTL_String)
-            ENUMERATOR_GET_VECTOR(pEnum, CTL_WString)
+            ENUMERATOR_GET_VECTOR(pEnum, EnumStringTypeA)
+            ENUMERATOR_GET_VECTOR(pEnum, EnumStringTypeW)
             ENUMERATOR_GET_VECTOR(pEnum, CTL_ITwainSourcePtr)
             ENUMERATOR_GET_VECTOR(pEnum, HANDLE)
             ENUMERATOR_GET_VECTOR(pEnum, DTWAINFrameInternal)
             ENUMERATOR_GET_VECTOR(pEnum, TW_FRAME)
             ENUMERATOR_GET_VECTOR(pEnum, TW_FIX32)
-            return NULL;
+            return nullptr;
         }
 
         static bool EnumeratorClearExisting(LPDTWAIN_ARRAY pEnum)

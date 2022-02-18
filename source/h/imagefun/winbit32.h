@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,16 +21,14 @@
 #ifndef WINBIT32_H
 #define WINBIT32_H
 
-#include <stdio.h>
-#include "dtwainc.h"
 #include <string>
+#include <fstream>
 #include "fltrect.h"
 #include "dibmulti.h"
-#include "dibinfox.h"
-#include "dtwdecl.h"
 #include "ctlobstr.h"
 #include "FreeImagePlus.h"
 #include "dtwain_raii.h"
+#include "dtwain_filesystem.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4100)
 #endif
@@ -290,7 +288,7 @@ namespace dynarithmic
                 if (m_outStream)
                 {
                     m_outStream.close();
-                    if (boost::filesystem::exists(m_outFileName))
+                    if (filesys::exists(m_outFileName.c_str()))
                         return true;
                 }
                 return false;
@@ -308,21 +306,21 @@ namespace dynarithmic
     {
         public:
             CDibInterface();
-            virtual ~CDibInterface() {}
+            virtual ~CDibInterface() = default;
 
             // Virtual interface
-            virtual CTL_String GetFileExtension() const = 0;
+            virtual std::string GetFileExtension() const = 0;
             virtual HANDLE  GetFileInformation(LPCSTR path) = 0;
             virtual int     WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImage2*/, UINT32 /*wid*/, UINT32 /*ht*/, UINT32 /*bpp*/, UINT32 /*nColors*/, RGBQUAD * /*pPal*/,
-                                       void * /*pUserInfo*/ = NULL) { return TRUE; }
+                                       void * /*pUserInfo*/ = nullptr) { return TRUE; }
 
             virtual void SetMultiPageStatus(DibMultiPageStruct * /*pStruct*/) { }
             virtual void GetMultiPageStatus(DibMultiPageStruct * /*pStruct*/) { }
-            virtual int WriteGraphicFile(CTL_ImageIOHandler* /*pThis*/, LPCTSTR /*path*/, HANDLE /*bitmap*/, void * /*pUserInfo*/ = NULL);
+            virtual int WriteGraphicFile(CTL_ImageIOHandler* /*pThis*/, LPCTSTR /*path*/, HANDLE /*bitmap*/, void * /*pUserInfo*/ = nullptr);
             virtual int WriteGraphicFile(CTL_ImageIOHandler* /*pThis*/, LPCTSTR /*path*/, HANDLE /*bitmap*/, bool /*bUsefh*/ =false,
                                           int /*fhToUse*/ = 0, LONG /*Info*/ =0) { return 1; }
 
-            static HANDLE CreateDIB(int width, int height, int bpp, LPSTR palette=NULL);
+            static HANDLE CreateDIB(int width, int height, int bpp, LPSTR palette= nullptr);
 
             static int CalculateLine(int width, int bitdepth) {
                 return ((width * bitdepth) + 7) / 8;
@@ -385,28 +383,33 @@ namespace dynarithmic
             static HANDLE NegateDIB(HANDLE hDib);
 
             // Normalization of irregular DIBs
-            static HANDLE NormalizeDib(HANDLE hDib);
+            static HANDLE NormalizeDib(HANDLE hDib, bool bReturnCopy = false);
+
+            // Copy function
+            static HANDLE CopyDib(HANDLE hDib);
 
             // Convert Dib to HBITMAP
-            static HBITMAP DIBToBitmap(HANDLE hDib, HPALETTE hPal = NULL);
+            static HBITMAP DIBToBitmap(HANDLE hDib, HPALETTE hPal = nullptr);
 
             static double GetScaleFactorPerInch(LONG Unit);
+            virtual bool OpenOutputFile(LPCTSTR pFileName);
+            virtual bool CloseOutputFile();
+            auto& GetOutputFileHandle() { return m_fStream.getStream(); }
+            CTL_StringType GetOutputFileName() const { return m_fStream.getOutputFileName(); }
 
         protected:
             void SetError(LONG nError) { m_lasterror = nError; }
-            virtual bool OpenOutputFile(LPCTSTR pFileName);
-            virtual bool CloseOutputFile();
+            static bool IsBlankDIBHelper(HANDLE hDib, double threshold);
+
             virtual void DestroyAllObjects() { }
-            std::ofstream& GetOutputFileHandle() { return m_fStream.getStream(); }
-            CTL_StringType GetOutputFileName() const { return m_fStream.getOutputFileName(); }
             static unsigned GetLine(BYTE *pDib, BYTE *pDest, int nWhichLine);
             // Lower level routines
             void resetbuffer() { bytesleft=0; }
-            int      putbufferedbyte(WORD byte, std::ofstream& fh, bool bRealEOF=false, int *pStatus=NULL);
+            int      putbufferedbyte(WORD byte, std::ofstream& fh, bool bRealEOF=false, int *pStatus= nullptr);
 
             static FloatRect Normalize(fipImage& pImage, const FloatRect& ActualRect, const FloatRect& RequestedRect,
                                 int sourceunit, int destunit, int dpi);
-            int      putbyte(WORD byte, std::ofstream& fh);
+            static int      putbyte(WORD byte, std::ofstream& fh);
 
             static char masktable[8];
             static char bittable[8];

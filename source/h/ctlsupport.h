@@ -55,7 +55,9 @@ namespace dynarithmic
                     arrayToUse = tempArray;
                 }
                 catch(...)
-                {}
+                {
+                    return false;
+                }
             }
             // get underlying vector and search it for the value
             auto& vData = EnumeratorVector<T>(arrayToUse);

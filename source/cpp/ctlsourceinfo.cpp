@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,11 +18,13 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include "cppfunc.h"
+#include "ctliface.h"
 #include "ctltwmgr.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
-using namespace std;
+
 using namespace dynarithmic;
 
 typedef CTL_StringType (CTL_ITwainSource::*SOURCEINFOFUNC)() const;
@@ -34,8 +36,7 @@ LONG   DLLENTRY_DEF DTWAIN_GetSourceManufacturer( DTWAIN_SOURCE Source, LPTSTR s
     CTL_ITwainSource *p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
     if (p)
     {
-        LONG Ret = GetSourceInfo(p, (SOURCEINFOFUNC)&CTL_ITwainSource::GetManufacturer,
-                                szMan, nMaxLen);
+        const LONG Ret = GetSourceInfo(p, static_cast<SOURCEINFOFUNC>(&CTL_ITwainSource::GetManufacturer), szMan, nMaxLen);
         LOG_FUNC_EXIT_PARAMS(Ret)
     }
     LOG_FUNC_EXIT_PARAMS(-1L)
@@ -48,8 +49,8 @@ LONG   DLLENTRY_DEF DTWAIN_GetSourceProductFamily( DTWAIN_SOURCE Source, LPTSTR 
     CTL_ITwainSource *p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
     if (p)
     {
-        LONG Ret = GetSourceInfo(p, (SOURCEINFOFUNC)&CTL_ITwainSource::GetProductFamily,
-                             szProduct, nMaxLen);
+        const LONG Ret = GetSourceInfo(p, static_cast<SOURCEINFOFUNC>(&CTL_ITwainSource::GetProductFamily),
+                                       szProduct, nMaxLen);
         LOG_FUNC_EXIT_PARAMS(Ret)
     }
     LOG_FUNC_EXIT_PARAMS(-1L)
@@ -62,8 +63,8 @@ LONG   DLLENTRY_DEF DTWAIN_GetSourceProductName(DTWAIN_SOURCE Source,LPTSTR szPr
     CTL_ITwainSource *p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
     if (p)
     {
-        LONG Ret = GetSourceInfo(p, (SOURCEINFOFUNC)&CTL_ITwainSource::GetProductName,
-                            szProduct, nMaxLen);
+        const LONG Ret = GetSourceInfo(p, static_cast<SOURCEINFOFUNC>(&CTL_ITwainSource::GetProductName),
+                                       szProduct, nMaxLen);
         LOG_FUNC_EXIT_PARAMS(Ret)
     }
     LOG_FUNC_EXIT_PARAMS(-1L)
@@ -78,8 +79,8 @@ LONG DLLENTRY_DEF DTWAIN_GetSourceVersionInfo(DTWAIN_SOURCE Source, LPTSTR szVIn
     {
         const TW_VERSION *pV = p->GetVersion();
         CTL_StringType pName = StringConversion::Convert_AnsiPtr_To_Native(pV->Info);
-        size_t nLen = pName.length();
-        if ( szVInfo == NULL )
+        const size_t nLen = pName.length();
+        if ( szVInfo == nullptr)
             LOG_FUNC_EXIT_PARAMS((LONG)nLen)
 
         std::copy(pName.begin(), pName.begin() + nLen, szVInfo);
@@ -92,10 +93,10 @@ LONG DLLENTRY_DEF DTWAIN_GetSourceVersionInfo(DTWAIN_SOURCE Source, LPTSTR szVIn
 
 static LONG GetSourceInfo(CTL_ITwainSource *p,SOURCEINFOFUNC pFunc,LPTSTR szInfo, LONG nMaxLen)
 {
-    return CopyInfoToCString((p->*pFunc)(), szInfo, nMaxLen);
+    return StringWrapper::CopyInfoToCString((p->*pFunc)(), szInfo, nMaxLen);
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetSourceVersionNumber( DTWAIN_SOURCE Source, LONG FAR *pMajor, LONG FAR *pMinor)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetSourceVersionNumber( DTWAIN_SOURCE Source, LPLONG pMajor, LPLONG pMinor)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pMajor, pMinor))
     CTL_ITwainSource *p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );

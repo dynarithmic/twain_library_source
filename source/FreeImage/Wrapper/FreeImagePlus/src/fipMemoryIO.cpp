@@ -21,75 +21,71 @@
 
 #include "FreeImagePlus.h"
 #include <stdlib.h>
-#include <string.h>
 #include <assert.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <stdio.h>
 
 fipMemoryIO::fipMemoryIO(BYTE *data, DWORD size_in_bytes) {
-	_hmem = FreeImage_OpenMemory(data, size_in_bytes);
+    _hmem = FreeImage_OpenMemory(data, size_in_bytes);
 }
 
-fipMemoryIO::~fipMemoryIO() { 
-	if(_hmem != NULL) {
-		FreeImage_CloseMemory(_hmem);
-	}
+fipMemoryIO::~fipMemoryIO() {
+    if(_hmem != nullptr) {
+        FreeImage_CloseMemory(_hmem);
+    }
 }
 
-void fipMemoryIO::close() { 
-	if(_hmem != NULL) {
-		FreeImage_CloseMemory(_hmem);
-		_hmem = NULL;
-	}
+void fipMemoryIO::close() {
+    if(_hmem != nullptr) {
+        FreeImage_CloseMemory(_hmem);
+        _hmem = nullptr;
+    }
 }
 
 BOOL fipMemoryIO::isValid() const {
-	return (_hmem != NULL);
+    return (_hmem != nullptr);
 }
 
 FREE_IMAGE_FORMAT fipMemoryIO::getFileType() const {
-	if(_hmem != NULL) {
-		return FreeImage_GetFileTypeFromMemory(_hmem, 0);
-	}
+    if(_hmem != nullptr) {
+        return FreeImage_GetFileTypeFromMemory(_hmem, 0);
+    }
 
-	return FIF_UNKNOWN;
+    return FIF_UNKNOWN;
 }
 
 FIBITMAP* fipMemoryIO::load(FREE_IMAGE_FORMAT fif, int flags) const {
-	return FreeImage_LoadFromMemory(fif, _hmem, flags);
+    return FreeImage_LoadFromMemory(fif, _hmem, flags);
 }
 
 FIMULTIBITMAP* fipMemoryIO::loadMultiPage(FREE_IMAGE_FORMAT fif, int flags) const {
-	return FreeImage_LoadMultiBitmapFromMemory(fif, _hmem, flags);
+    return FreeImage_LoadMultiBitmapFromMemory(fif, _hmem, flags);
 }
 
 BOOL fipMemoryIO::save(FREE_IMAGE_FORMAT fif, FIBITMAP *dib, int flags) {
-	return FreeImage_SaveToMemory(fif, dib, _hmem, flags);
+    return FreeImage_SaveToMemory(fif, dib, _hmem, flags);
 }
 
 BOOL fipMemoryIO::saveMultiPage(FREE_IMAGE_FORMAT fif, FIMULTIBITMAP *bitmap, int flags) {
-	return FreeImage_SaveMultiBitmapToMemory(fif, bitmap, _hmem, flags);
+    return FreeImage_SaveMultiBitmapToMemory(fif, bitmap, _hmem, flags);
 }
 
 unsigned fipMemoryIO::read(void *buffer, unsigned size, unsigned count) const {
-	return FreeImage_ReadMemory(buffer, size, count, _hmem);
+    return FreeImage_ReadMemory(buffer, size, count, _hmem);
 }
 
 unsigned fipMemoryIO::write(const void *buffer, unsigned size, unsigned count) {
-	return FreeImage_WriteMemory(buffer, size, count, _hmem);
+    return FreeImage_WriteMemory(buffer, size, count, _hmem);
 }
 
 long fipMemoryIO::tell() const {
-	return FreeImage_TellMemory(_hmem);
+    return FreeImage_TellMemory(_hmem);
 }
 
 BOOL fipMemoryIO::seek(long offset, int origin) {
-	return FreeImage_SeekMemory(_hmem, offset, origin);
+    return FreeImage_SeekMemory(_hmem, offset, origin);
 }
 
 BOOL fipMemoryIO::acquire(BYTE **data, DWORD *size_in_bytes) {
-	return FreeImage_AcquireMemory(_hmem, data, size_in_bytes);
+    return FreeImage_AcquireMemory(_hmem, data, size_in_bytes);
 }
 
 

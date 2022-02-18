@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,10 +22,12 @@
 #include "enumeratorfuncs.h"
 #include "errorcheck.h"
 #include <boost/format.hpp>
+#include "cppfunc.h"
 #ifdef _MSC_VER
-#pragma warning (disable:4702)
+#pragma warning (disable : 4702)
+#pragma warning (disable : 4714)
 #endif
-using namespace std;
+
 using namespace dynarithmic;
 
 static bool GetImageSize(DTWAIN_SOURCE Source,
@@ -66,7 +68,7 @@ static bool IsValidUnit(LONG Unit)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea(DTWAIN_SOURCE Source, LONG lGetType, LPDTWAIN_ARRAY FloatEnum)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lGetType, FloatEnum))
-    DTWAIN_BOOL bRet = GetImageSize(Source, FloatEnum, (CTL_EnumGetType)lGetType);
+    const DTWAIN_BOOL bRet = GetImageSize(Source, FloatEnum, static_cast<CTL_EnumGetType>(lGetType));
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -74,15 +76,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea(DTWAIN_SOURCE Source, LONG lGetTy
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea(DTWAIN_SOURCE Source, LONG lSetType, DTWAIN_ARRAY FloatEnum, DTWAIN_ARRAY ActualEnum)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lSetType, FloatEnum, ActualEnum))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
+    const CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
 
     // See if Source is opened
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return (!CTL_TwainAppMgr::IsSourceOpen(p)); },
     DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
-    DTWAIN_BOOL bRet = SetImageSize(Source, FloatEnum, ActualEnum,(CTL_EnumSetType)lSetType);
+    const DTWAIN_BOOL bRet = SetImageSize(Source, FloatEnum, ActualEnum,static_cast<CTL_EnumSetType>(lSetType));
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -90,11 +92,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea(DTWAIN_SOURCE Source, LONG lSetTy
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2String(DTWAIN_SOURCE Source, LPCTSTR left, LPCTSTR top, LPCTSTR right, LPCTSTR bottom, LONG Unit, LONG flags)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit, flags))
-    DTWAIN_FLOAT val1 = StringWrapper::ToDouble(left);
-    DTWAIN_FLOAT val2 = StringWrapper::ToDouble(top);
-    DTWAIN_FLOAT val3 = StringWrapper::ToDouble(right);
-    DTWAIN_FLOAT val4 = StringWrapper::ToDouble(bottom);
-    DTWAIN_BOOL bRet = DTWAIN_SetAcquireArea2(Source, val1, val2, val3, val4, Unit, flags);
+    const DTWAIN_FLOAT val1 = StringWrapper::ToDouble(left);
+    const DTWAIN_FLOAT val2 = StringWrapper::ToDouble(top);
+    const DTWAIN_FLOAT val3 = StringWrapper::ToDouble(right);
+    const DTWAIN_FLOAT val4 = StringWrapper::ToDouble(bottom);
+    const DTWAIN_BOOL bRet = DTWAIN_SetAcquireArea2(Source, val1, val2, val3, val4, Unit, flags);
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -102,7 +104,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2String(DTWAIN_SOURCE Source, LPCT
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2(DTWAIN_SOURCE Source, DTWAIN_FLOAT left, DTWAIN_FLOAT top, DTWAIN_FLOAT right, DTWAIN_FLOAT bottom, LONG Unit, LONG flags)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit, flags))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     if (!p)
         LOG_FUNC_EXIT_PARAMS(false)
@@ -111,7 +113,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2(DTWAIN_SOURCE Source, DTWAIN_FLO
                                     DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return (!IsValidUnit(Unit)); },
                                     DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-    DTWAIN_BOOL bRet = SetImageSize2(p, left, top, right, bottom, Unit, flags);
+    const DTWAIN_BOOL bRet = SetImageSize2(p, left, top, right, bottom, Unit, flags);
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -121,25 +123,25 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2String(DTWAIN_SOURCE Source, LPTS
     LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit))
     DTWAIN_FLOAT val[4];
     LPTSTR* pStr[] = { &left, &top, &right, &bottom };
-    DTWAIN_BOOL bRet = DTWAIN_GetAcquireArea2(Source, &val[0], &val[1], &val[2], &val[3], Unit);
+    const DTWAIN_BOOL bRet = DTWAIN_GetAcquireArea2(Source, &val[0], &val[1], &val[2], &val[3], Unit);
     if (bRet)
     {
-        CTL_StringStreamType strm;
+        std::ostringstream strm;
         for (int i = 0; i < 4; ++i)
         {
-            strm << BOOST_FORMAT(_T("%1%")) % val[i];
-            StringWrapper::SafeStrcpy(*pStr[i], strm.str().c_str());
-            strm.str(_T(""));
+            strm << boost::format("%1%") % val[i];
+            StringWrapper::SafeStrcpy(*pStr[i], StringConversion::Convert_Ansi_To_Native(strm.str()).c_str());
+            strm.str("");
         }
     }
     LOG_FUNC_EXIT_PARAMS(bRet)
-        CATCH_BLOCK(false)
+    CATCH_BLOCK(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2(DTWAIN_SOURCE Source, LPDTWAIN_FLOAT  left, LPDTWAIN_FLOAT  top, LPDTWAIN_FLOAT  right, LPDTWAIN_FLOAT  bottom, LPLONG Unit)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     if (!p)
         LOG_FUNC_EXIT_PARAMS(false)
@@ -147,18 +149,18 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2(DTWAIN_SOURCE Source, LPDTWAIN_F
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return (!CTL_TwainAppMgr::IsSourceOpen(p)); },
     DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
-    DTWAIN_BOOL bRet = GetImageSize2(p, left, top, right, bottom, Unit);
+    const DTWAIN_BOOL bRet = GetImageSize2(p, left, top, right, bottom, Unit);
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
 
 static bool GetImageSize(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, CTL_EnumGetType GetType)
 {
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     if (p)
     {
-        DTWAIN_ARRAY FloatEnum = DTWAIN_ArrayCreate(DTWAIN_ARRAYFLOAT, 4);
+        const DTWAIN_ARRAY FloatEnum = DTWAIN_ArrayCreate(DTWAIN_ARRAYFLOAT, 4);
         if (!FloatEnum)
             return false;
         DTWAINArrayLL_RAII a(FloatEnum);
@@ -167,17 +169,17 @@ static bool GetImageSize(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, CTL_En
         if (GetType == CTL_GetTypeGETCURRENT)
             GetType = CTL_GetTypeGET;
 
-        bool bOk = CTL_TwainAppMgr::GetImageLayoutSize(p, Array, GetType);
+        const bool bOk = CTL_TwainAppMgr::GetImageLayoutSize(p, Array, GetType);
         if (!bOk)
             return false;
         auto& vValues = EnumeratorVector<double>(FloatEnum);
         std::copy(Array.begin(), Array.end(), vValues.begin());
-        DTWAIN_ARRAY Temp = DTWAIN_ArrayCreateCopy(FloatEnum);
+        const DTWAIN_ARRAY temp = DTWAIN_ArrayCreateCopy(FloatEnum);
         if  (EnumeratorFunctionImpl::EnumeratorIsValidNoCheck(*FloatArray))
             EnumeratorFunctionImpl::EnumeratorDestroy(*FloatArray);
-        if (Temp)
-            *FloatArray = Temp;
-        if (Temp)
+        if (temp)
+            *FloatArray = temp;
+        if (temp)
             return true;
     }
     return false;
@@ -187,17 +189,17 @@ static bool GetImageSize(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, CTL_En
 static bool SetImageSize(DTWAIN_SOURCE Source, DTWAIN_ARRAY FloatEnum, DTWAIN_ARRAY ActualEnum, CTL_EnumSetType SetType)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, FloatEnum, ActualEnum, SetType))
-        CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     if (p)
     {
-        DTWAIN_ARRAY pArray = FloatEnum;
+        const DTWAIN_ARRAY pArray = FloatEnum;
         DTWAIN_ARRAY pArrayActual = DTWAIN_ArrayInit();
         DTWAIN_Check_Error_Condition_0_Ex(pHandle,
             [&] { return (!EnumeratorFunctionImpl::EnumeratorIsValidEx(pArray, CTL_EnumeratorDoubleType)); },
             DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
 
-        auto vFloatEnum = EnumeratorVectorPtr<double>(FloatEnum);
+        const auto vFloatEnum = EnumeratorVectorPtr<double>(FloatEnum);
         auto vActualEnum = EnumeratorVectorPtr<double>(ActualEnum);
 
         if (!vFloatEnum || vFloatEnum->size() < 4)
@@ -214,10 +216,10 @@ static bool SetImageSize(DTWAIN_SOURCE Source, DTWAIN_ARRAY FloatEnum, DTWAIN_AR
 
         CTL_RealArray Array;
         CTL_RealArray rArray;
-        std::copy(vFloatEnum->begin(), vFloatEnum->begin() + 4, std::back_inserter(Array));
-        bool bOk = CTL_TwainAppMgr::SetImageLayoutSize(p, Array, rArray, SetType);
+        std::copy_n(vFloatEnum->begin(), 4, std::back_inserter(Array));
+        const bool bOk = CTL_TwainAppMgr::SetImageLayoutSize(p, Array, rArray, SetType);
         if (bOk && pArrayActual)
-            std::copy(rArray.begin(), rArray.begin() + 4, std::back_inserter(*vActualEnum));
+            std::copy_n(rArray.begin(), 4, std::back_inserter(*vActualEnum));
         LOG_FUNC_EXIT_PARAMS(bOk)
     }
     LOG_FUNC_EXIT_PARAMS(false)

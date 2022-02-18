@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,17 +18,16 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <cstring>
 #include "ctltr007.h"
 #include "ctltwses.h"
 #include "ctltwsrc.h"
 #include "ctltwmgr.h"
 using namespace dynarithmic;
 CTL_ConditionCodeTriplet::CTL_ConditionCodeTriplet(CTL_ITwainSession *pSession,
-                                      const CTL_ITwainSource* pSource/* = NULL*/) :
+                                      const CTL_ITwainSource* pSource/* = nullptr*/) :
                                     CTL_TwainTriplet(), m_Status{}
 {
-    SetSourcePtr((CTL_ITwainSource*)pSource);
+    SetSourcePtr(const_cast<CTL_ITwainSource*>(pSource));
     SetSessionPtr(pSession);
 
     // Get the app manager's AppID
@@ -38,10 +37,10 @@ CTL_ConditionCodeTriplet::CTL_ConditionCodeTriplet(CTL_ITwainSession *pSession,
     {
         if ( pSource )
             Init( pSession->GetAppIDPtr(), *pSource, DG_CONTROL, DAT_STATUS,
-                  MSG_GET, (TW_MEMREF)&m_Status );
+                  MSG_GET, static_cast<TW_MEMREF>(&m_Status) );
         else
-            Init( pSession->GetAppIDPtr(), NULL, DG_CONTROL, DAT_STATUS,
-                  MSG_GET, (TW_MEMREF)&m_Status );
+            Init( pSession->GetAppIDPtr(), nullptr, DG_CONTROL, DAT_STATUS,
+                  MSG_GET, static_cast<TW_MEMREF>(&m_Status) );
 
         SetAlive (true);
     }

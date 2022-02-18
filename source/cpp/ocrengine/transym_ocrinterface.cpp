@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,44 +18,43 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include "capconst.h"
  #ifdef _WIN32
 #include <unordered_map>
 #include <string>
 #include <algorithm>
 #include <cstdio>
-#include <io.h>
 #include <tchar.h>
 #include "transym_ocrinterface.h"
-#include "dtwain.h"
 #include "ctlobstr.h"
-#include "dtwdecl.h"
 #include "versioninfo.h"
+#include "ctlfileutils.h"
 
 #ifdef VERSINFO_STANDALONE
 using namespace VersionInformation;
 #endif
 
 TOCRSDK::TOCRSDK()
-        : TOCRInitialise(0),
-        TOCRShutdown        (0),
-        TOCRGetErrorMode    (0),
-        TOCRSetErrorMode    (0),
-        TOCRDoJob           (0),
-        TOCRWaitForJob      (0),
-        TOCRWaitForAnyJob   (0),
-        TOCRGetJobDBInfo    (0),
-        TOCRGetJobStatus    (0),
-        TOCRGetJobStatusEx  (0),
-        TOCRGetJobStatusMsg (0),
-        TOCRGetNumPages     (0),
-        TOCRGetJobResults   (0),
-        TOCRGetJobResultsEx (0),
-        TOCRGetLicenceInfo  (0),
-        TOCRConvertTIFFtoDIB(0),
-        TOCRRotateMonoBitmap(0),
-        TOCRConvertFormat   (0),
-        TOCRGetLicenceInfoEx(0),
-        m_hMod (0)
+        : TOCRInitialise(nullptr),
+        TOCRShutdown        (nullptr),
+        TOCRGetErrorMode    (nullptr),
+        TOCRSetErrorMode    (nullptr),
+        TOCRDoJob           (nullptr),
+        TOCRWaitForJob      (nullptr),
+        TOCRWaitForAnyJob   (nullptr),
+        TOCRGetJobDBInfo    (nullptr),
+        TOCRGetJobStatus    (nullptr),
+        TOCRGetJobStatusEx  (nullptr),
+        TOCRGetJobStatusMsg (nullptr),
+        TOCRGetNumPages     (nullptr),
+        TOCRGetJobResults   (nullptr),
+        TOCRGetJobResultsEx (nullptr),
+        TOCRGetLicenceInfo  (nullptr),
+        TOCRConvertTIFFtoDIB(nullptr),
+        TOCRRotateMonoBitmap(nullptr),
+        TOCRConvertFormat   (nullptr),
+        TOCRGetLicenceInfoEx(nullptr),
+        m_hMod (nullptr)
 {
 }
 
@@ -67,7 +66,7 @@ HMODULE TOCRSDK::InitTOCR()
 
     if ( !m_hMod )
     {
-        return NULL;
+        return nullptr;
     }
 
     TOCRInitialise       =  (TOCRINITIALIZEFUNC      )GetProcAddress(m_hMod, "TOCRInitialise");
@@ -111,8 +110,8 @@ HMODULE TOCRSDK::InitTOCR()
         !TOCRGetLicenceInfoEx )
     {
         FreeLibrary(m_hMod);
-        m_hMod = NULL;
-        return NULL;
+        m_hMod = nullptr;
+        return nullptr;
     }
     return m_hMod;
 }
@@ -123,7 +122,7 @@ TOCRSDK::~TOCRSDK()
         FreeLibrary(m_hMod);
 }
 
-#define INIT_TOCR_ERROR_CODE(x) m_ErrorCode[x]=_T(#x);
+#define INIT_TOCR_ERROR_CODE(x) m_ErrorCode[x] = #x;
 ///////////////////////////////////////////////////////////////////
 TransymOCR::TransymOCR()
 {
@@ -368,11 +367,11 @@ TransymOCR::TransymOCR()
     m_hMod = m_SDK.InitTOCR();
     if ( m_hMod )
     {
-        LONG status = m_SDK.TOCRInitialise(&m_JobHandle);
+        const LONG status = m_SDK.TOCRInitialise(&m_JobHandle);
         if ( status != TOCR_OK )
         {
             FreeLibrary(m_hMod);
-            m_hMod = NULL;
+            m_hMod = nullptr;
         }
         SetActivated(true);
         FileTypeArray fArray;
@@ -410,16 +409,17 @@ void TransymOCR::SetAvailableCaps()
         const ArrayCapsLong capsLongInfo[] = {
             { DTWAIN_OCRCV_IMAGEFILEFORMAT,ALLOPS, DTWAIN_TIFFG4, DTWAIN_TIFFG4,
                 {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },
-                0,0, "800:0,801:0,600:0,700:0,500:0,100:0", NULL, false },
+                0,0, "800:0,801:0,600:0,700:0,500:0,100:0", nullptr, false },
 
             { DTWAIN_OCRCV_NATIVEFILEFORMAT,ALLOPS, DTWAIN_TIFFG4, DTWAIN_TIFFG4,
                 {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0,
                 "800:0,801:0,600:0,700:0,500:0,100:0,"
-                "900:0,901:0,902:0,903:0,906:0,7000:0", NULL, false },
+                "900:0,901:0,902:0,903:0,906:0,7000:0",
+                nullptr, false },
 
             { DTWAIN_OCRCV_MPNATIVEFILEFORMAT,ALLOPS_GET, DTWAIN_TIFFG4MULTI, DTWAIN_TIFFG4MULTI,
                 {DTWAIN_CONTARRAY, DTWAIN_CONTARRAY, DTWAIN_CONTARRAY, DTWAIN_CONTARRAY},0,0,
-                "900:0,901:0,902:0,903:0,906:0,7000:0", NULL, false },
+                "900:0,901:0,902:0,903:0,906:0,7000:0", nullptr, false },
 
             { DTWAIN_OCRCV_ORIENTATION,ALLOPS, DTWAIN_OCRORIENT_OFF, DTWAIN_OCRORIENT_OFF,
                 {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0,
@@ -428,7 +428,7 @@ void TransymOCR::SetAvailableCaps()
             { DTWAIN_OCRCV_ERRORREPORTMODE, ALLOPS, DTWAIN_OCRERROR_MODENONE,
                 DTWAIN_OCRERROR_MODENONE,
                 {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0,
-                "0:0,1:0", NULL , false},
+                "0:0,1:0", nullptr, false},
 
             { DTWAIN_OCRCV_SUPPORTEDCAPS, ALLOPS_GET, 0, 0,
                 {DTWAIN_CONTARRAY, DTWAIN_CONTARRAY, DTWAIN_CONTARRAY, DTWAIN_CONTARRAY},0,0,
@@ -450,19 +450,20 @@ void TransymOCR::SetAvailableCaps()
                 "0x1015:0,"
                 "0x1016:0,"
                 "0x1017:0,"
-                , NULL, false },
+                ,
+                nullptr, false },
 
-            { DTWAIN_OCRCV_DESKEW, ALLOPS, false, false, {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0,"1:1,0:0", NULL, false },
-            { DTWAIN_OCRCV_NOISEREMOVE, ALLOPS, false, false, {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0, "1:1,0:0", NULL, false },
-            { DTWAIN_OCRCV_LINEREMOVE, ALLOPS, false, false, {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE }, 0,0,"1:1,0:0", NULL, false },
-            { DTWAIN_OCRCV_DESHADE, ALLOPS, false, false,  {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0,"1:1,0:0", NULL, false },
-            { DTWAIN_OCRCV_LINEREJECT, ALLOPS, false, false,  {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0,"1:1,0:0", NULL, false },
-            { DTWAIN_OCRCV_CHARACTERREJECT, ALLOPS, false, false,  {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0,"1:1,0:0", NULL, false },
-            { DTWAIN_OCRCV_PIXELTYPE, ALLOPS, false, false,  {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0,"0:0", NULL, false },
-            { DTWAIN_OCRCV_BITDEPTH, ALLOPS, false, false,  {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0,"1:1", NULL, false },
-            { DTWAIN_OCRCV_RETURNCHARINFO, ALLOPS, TRUE, TRUE,  {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0,"1:1,0:0", NULL, false },
-            { DTWAIN_OCRCV_DISABLECHARACTERS, ALLOPS, 0,0,  {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,255,"0:0", NULL, true },
-            { DTWAIN_OCRCV_REMOVECONTROLCHARS, ALLOPS, false, false,  {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0,"1:1,0:0", NULL, false }
+            { DTWAIN_OCRCV_DESKEW, ALLOPS, false, false, {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0,"1:1,0:0", nullptr, false },
+            { DTWAIN_OCRCV_NOISEREMOVE, ALLOPS, false, false, {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0, "1:1,0:0", nullptr, false },
+            { DTWAIN_OCRCV_LINEREMOVE, ALLOPS, false, false, {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE }, 0,0,"1:1,0:0", nullptr, false },
+            { DTWAIN_OCRCV_DESHADE, ALLOPS, false, false,  {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0,"1:1,0:0", nullptr, false },
+            { DTWAIN_OCRCV_LINEREJECT, ALLOPS, false, false,  {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0,"1:1,0:0", nullptr, false },
+            { DTWAIN_OCRCV_CHARACTERREJECT, ALLOPS, false, false,  {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0,"1:1,0:0", nullptr, false },
+            { DTWAIN_OCRCV_PIXELTYPE, ALLOPS, false, false,  {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0,"0:0", nullptr, false },
+            { DTWAIN_OCRCV_BITDEPTH, ALLOPS, false, false,  {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0,"1:1", nullptr, false },
+            { DTWAIN_OCRCV_RETURNCHARINFO, ALLOPS, TRUE, TRUE,  {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0,"1:1,0:0", nullptr, false },
+            { DTWAIN_OCRCV_DISABLECHARACTERS, ALLOPS, 0,0,  {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,255,"0:0", nullptr, true },
+            { DTWAIN_OCRCV_REMOVECONTROLCHARS, ALLOPS, false, false,  {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0,"1:1,0:0", nullptr, false }
         };
 
         const int numCaps = sizeof(capsLongInfo) / sizeof(capsLongInfo[0]);
@@ -478,13 +479,13 @@ void TransymOCR::SetAvailableCaps()
                                          capsLongInfo[i].CapContainers[1],
                                          capsLongInfo[i].CapContainers[2],
                                          capsLongInfo[i].CapContainers[3]);
-            CTL_StringArray strVals;
-            CTL_StringArray strSplit;
+            StringArray strVals;
+            StringArray strSplit;
 
             // Tokenize the comma delimited string
             StringWrapperA::Tokenize(capsLongInfo[i].CommaDelValues, "," , strVals);
 
-            size_t numVals = strVals.size();
+            const size_t numVals = strVals.size();
 
             // For each value in the string, split into two numbers
             char *p;
@@ -540,7 +541,7 @@ void TransymOCR::SetAvailableCaps()
         };
 
         const ArrayCapsString capsStringInfo[] = {
-            { DTWAIN_OCRCV_ERRORREPORTFILE, ALLOPS, "OCRERRORS.LOG", "OCRERRORS.LOG", "OCRERRORS.LOG:OCRERRORS.LOG", NULL },
+            { DTWAIN_OCRCV_ERRORREPORTFILE, ALLOPS, "OCRERRORS.LOG", "OCRERRORS.LOG", "OCRERRORS.LOG:OCRERRORS.LOG", nullptr},
         };
 
         const int numCaps = sizeof(capsStringInfo) / sizeof(capsStringInfo[0]);
@@ -554,13 +555,13 @@ void TransymOCR::SetAvailableCaps()
             CapInfo.SetCapContainerTypes(DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE,
                                          DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE);
 
-            CTL_StringArray strVals;
-            CTL_StringArray strSplit;
+            StringArray strVals;
+            StringArray strSplit;
 
             // Tokenize the comma delimited string
             StringWrapperA::Tokenize(capsStringInfo[i].CommaDelValues,"," , strVals);
 
-            size_t numVals = strVals.size();
+            const size_t numVals = strVals.size();
 
             // For each value in the string, split into two numbers
             for ( size_t j = 0; j < numVals; ++j )
@@ -597,7 +598,7 @@ TransymOCR::~TransymOCR()
     if ( m_hMod )
     {
         FreeLibrary(m_hMod);
-        m_hMod = NULL;
+        m_hMod = nullptr;
     }
 }
 
@@ -608,12 +609,12 @@ bool TransymOCR::IsInitialized() const
 
 bool TransymOCR::SetOptions(OCRJobOptions& options)
 {
-    TOCRJOBINFO *pInfo = reinterpret_cast<TOCRJOBINFO*>(options.pOtherOptions);
+    const TOCRJOBINFO *pInfo = reinterpret_cast<TOCRJOBINFO*>(options.pOtherOptions);
     memcpy(&m_JobInfo, pInfo, sizeof(TOCRJOBINFO));
     return true;
 }
 
-LONG TransymOCR::StartOCR(const CTL_StringType& filename)
+LONG TransymOCR::StartOCR(CTL_StringType filename)
 {
     TOCRJOBINFO JobInfo;
     memset(&JobInfo, 0, sizeof(JobInfo));
@@ -633,7 +634,7 @@ LONG TransymOCR::StartOCR(const CTL_StringType& filename)
     // Get the orientation
     bRet = GetCapValues(DTWAIN_OCRCV_ORIENTATION,DTWAIN_CAPGETCURRENT, vals);
     if ( bRet )
-        JobInfo.ProcessOptions.Orientation = (BYTE)m_OrientationMap[vals[0]];
+        JobInfo.ProcessOptions.Orientation = static_cast<BYTE>(m_OrientationMap[vals[0]]);
 
     // Get the characters to disable
     bRet = GetCapValues(DTWAIN_OCRCV_REMOVECONTROLCHARS, DTWAIN_CAPGETCURRENT, vals);
@@ -695,11 +696,12 @@ LONG TransymOCR::StartOCR(const CTL_StringType& filename)
     {
         bRet = GetCapValues(OffCaps[i],DTWAIN_CAPGETCURRENT, vals);
         if ( bRet )
-            *boolFuncs[i] = !(VBBOOL)vals[0];
+            *boolFuncs[i] = !static_cast<VBBOOL>(vals[0]);
     }
 
-    char    InputFile[MAX_PATH];    // Input file name
-    strcpy(InputFile, StringConversion::Convert_Native_To_Ansi(filename).c_str());
+    char InputFile[MAX_PATH] = {};    // Input file name
+    const auto minToCopy = (std::min)(static_cast<int>(filename.size()), MAX_PATH);
+    std::copy(filename.begin(), filename.begin() + minToCopy, InputFile);
     JobInfo.InputFile = InputFile;
 
     // Now set the options
@@ -726,12 +728,12 @@ LONG TransymOCR::StartOCR(const CTL_StringType& filename)
 LONG TransymOCR::ProcessTOCRJob()
 {
     LONG ResultsInf;
-    bool bSaveOCRCharInfo = GetBaseOption(OCROPTION_GETINFO);
+    const bool bSaveOCRCharInfo = GetBaseOption(OCROPTION_GETINFO);
 
     OCRCharacterInfo cInfo(this, GetCurrentPageNumber());
 
     // Find out how much space to allocate for results
-    LONG status = m_SDK.TOCRGetJobResults(m_JobHandle, &ResultsInf, 0);
+    LONG status = m_SDK.TOCRGetJobResults(m_JobHandle, &ResultsInf, nullptr);
     if ( status == TOCR_OK )
     {
         if ( ResultsInf > 0 )
@@ -744,7 +746,7 @@ LONG TransymOCR::ProcessTOCRJob()
             status = m_SDK.TOCRGetJobResults(m_JobHandle, &ResultsInf,
                 reinterpret_cast<TOCRRESULTS*>(&theResults[0]));
 
-            TOCRRESULTS* TOCRResults = reinterpret_cast<TOCRRESULTS*>(&theResults[0]);
+            const TOCRRESULTS* TOCRResults = reinterpret_cast<TOCRRESULTS*>(&theResults[0]);
             if ( status == TOCR_OK )
             {
                 m_sOCRResults.reserve(TOCRResults->Hdr.NumItems + 100);
@@ -763,7 +765,7 @@ LONG TransymOCR::ProcessTOCRJob()
                     }
                 }
 
-                SetPageTextMap(GetCurrentPageNumber(), StringConversion::Convert_Ansi_To_Native(m_sOCRResults));
+                SetPageTextMap(GetCurrentPageNumber(), m_sOCRResults);
                 AddCharacterInfo(GetCurrentPageNumber(), cInfo);
             }
         }
@@ -782,13 +784,13 @@ LONG TransymOCR::ProcessTOCRJob()
 bool TransymOCR::SetOCRVersionIdentity()
 {
     OCRVersionIdentity theIdentity;
-    HMODULE hInst = ::GetModuleHandle(_T("TOCRDLL.DLL"));
+    const HMODULE hInst = ::GetModuleHandle(_T("TOCRDLL.DLL"));
     if ( hInst )
     {
         try
         {
-            VersionInfoA ver( hInst );
-            CTL_StringArray aTokens;
+            const VersionInfoA ver( hInst );
+            StringArray aTokens;
             StringWrapperA::Tokenize(ver.getFileVersionDotted(),".", aTokens);
             if ( aTokens.size() >= 2 )
             {
@@ -809,67 +811,64 @@ bool TransymOCR::SetOCRVersionIdentity()
     }
     theIdentity.Version.Language = DTWAIN_LANGUSAENGLISH;
     theIdentity.Version.Country = DTWAIN_CNTYUSA;
-    theIdentity.Version.Info = StringConversion::Convert_Native_To_Ansi(GetOCRVersionInfo());
+    theIdentity.Version.Info = GetOCRVersionInfo();
 
-    theIdentity.Manufacturer = _T("Transym Computer Services Ltd.");
-    theIdentity.ProductFamily = _T("TOCR");
-    theIdentity.ProductName = _T("Transym TOCR");
+    theIdentity.Manufacturer = "Transym Computer Services Ltd.";
+    theIdentity.ProductFamily = "TOCR";
+    theIdentity.ProductName = "Transym TOCR";
 
     OCREngine::SetOCRVersionIdentity(theIdentity);
     return true;
 }
 
-CTL_StringType TransymOCR::GetOCRVersionInfo()
+std::string TransymOCR::GetOCRVersionInfo()
 {
-    static std::unordered_map<int, CTL_StringType> LicenseMap;
+    static std::unordered_map<int, std::string> LicenseMap;
     if (LicenseMap.empty())
     {
-        LicenseMap[TOCRLICENCE_EUROUPGRADE] = _T("Standard License upgraded to European License");
-        LicenseMap[TOCRLICENCE_EURO] = _T("European License");
-        LicenseMap[TOCRLICENCE_STANDARD] = _T("Standard License");
+        LicenseMap[TOCRLICENCE_EUROUPGRADE] = "Standard License upgraded to European License";
+        LicenseMap[TOCRLICENCE_EURO] = "European License";
+        LicenseMap[TOCRLICENCE_STANDARD] = "Standard License";
     }
 
     if (m_SDK.TOCRGetLicenceInfoEx)
     {
-        LONG retvalue = TOCRERR_FAILLICENCEINF;
         char LicenseString[30];
         LONG VolumeLicense;
         LONG LicenseTime;
         LONG RemainingTime;
         LONG TOCRLicenseValue;
-        retvalue = m_SDK.TOCRGetLicenceInfoEx(m_JobHandle, LicenseString, &VolumeLicense,
-                        &LicenseTime, &RemainingTime, &TOCRLicenseValue);
+        const LONG retvalue = m_SDK.TOCRGetLicenceInfoEx(m_JobHandle, LicenseString, &VolumeLicense,
+                                                         &LicenseTime, &RemainingTime, &TOCRLicenseValue);
 
         if (retvalue == TOCR_OK)
         {
-            HMODULE hInst = ::GetModuleHandle(_T("TOCRDLL.DLL"));
+            const HMODULE hInst = ::GetModuleHandle(_T("TOCRDLL.DLL"));
             try
             {
-                VersionInfoA ver(hInst);
-                std::string sVer = "2";
-                sVer = ver.getProductVersion();
+                const VersionInfoA ver(hInst);
+                const std::string sVer = ver.getProductVersion();
                 std::ostringstream strm;
                 strm << "Transym OCR Engine - Version " << sVer <<
                         "\nLicense String: " << LicenseString <<
                         "\nVolume: " << VolumeLicense <<
                         "\nLicense Time: " << LicenseTime <<
                         "\nRemaining License Time: " << RemainingTime <<
-                        "\nLicense Feature: " << StringConversion::Convert_Native_To_Ansi(LicenseMap[TOCRLicenseValue]);
-                return StringConversion::Convert_Ansi_To_Native(strm.str());
+                        "\nLicense Feature: " << LicenseMap[TOCRLicenseValue];
+                return strm.str();
             }
             catch(...)
             {
-                return _T("");
+                return {};
             }
         }
     }
-    return _T("TranSym OCR Initialization error!");
+    return "TranSym OCR Initialization error!";
 }
 
 bool TransymOCR::ProcessGetCapValues(LONG nOCRCap, LONG CapType, OCRLongArrayValues& vals)
 {
-    OCRCapInfo& CapInfo = m_AllCapValues[nOCRCap];
-    OCRLongArrayValues pt;
+    const OCRCapInfo& CapInfo = m_AllCapValues[nOCRCap];
     vals.resize(0);
     switch(nOCRCap)
     {
@@ -915,23 +914,26 @@ bool TransymOCR::ProcessGetCapValues(LONG nOCRCap, LONG CapType, OCRLongArrayVal
 
         case DTWAIN_OCRCV_BITDEPTH:
         {
+            OCRLongArrayValues pt;
             // Get the current pixel type
-            case DTWAIN_CAPGET:
-                if ( ProcessGetCapValues(DTWAIN_OCRCV_PIXELTYPE, DTWAIN_CAPGETCURRENT, pt) )
-                    vals = m_BitDepths[pt[0]];
-            break;
+            switch (CapType)
+            {
+                case DTWAIN_CAPGET:
+                    if ( ProcessGetCapValues(DTWAIN_OCRCV_PIXELTYPE, DTWAIN_CAPGETCURRENT, pt) )
+                        vals = m_BitDepths[pt[0]];
+                break;
 
-            case DTWAIN_CAPGETCURRENT:
-                if ( ProcessGetCapValues(DTWAIN_OCRCV_PIXELTYPE, DTWAIN_CAPGETCURRENT, pt) )
-                    vals.push_back(m_BitDepthsCurrent[pt[0]]);
-            break;
+                case DTWAIN_CAPGETCURRENT:
+                    if ( ProcessGetCapValues(DTWAIN_OCRCV_PIXELTYPE, DTWAIN_CAPGETCURRENT, pt) )
+                        vals.push_back(m_BitDepthsCurrent[pt[0]]);
+                break;
 
-            case DTWAIN_CAPGETDEFAULT:
-                if ( ProcessGetCapValues(DTWAIN_OCRCV_PIXELTYPE, DTWAIN_CAPGETCURRENT, pt) )
-                    vals.push_back(m_BitDepthsDefault[pt[0]]);
-            break;
+                case DTWAIN_CAPGETDEFAULT:
+                    if ( ProcessGetCapValues(DTWAIN_OCRCV_PIXELTYPE, DTWAIN_CAPGETCURRENT, pt) )
+                        vals.push_back(m_BitDepthsDefault[pt[0]]);
+                break;
+            }
         }
-        break;
     }
     return true;
 }
@@ -939,7 +941,7 @@ bool TransymOCR::ProcessGetCapValues(LONG nOCRCap, LONG CapType, OCRLongArrayVal
 
 bool TransymOCR::ProcessGetCapValues(LONG nOCRCap, LONG CapType, OCRStringArrayValues& vals)
 {
-    OCRCapInfo& CapInfo = m_AllCapValues[nOCRCap];
+    const OCRCapInfo& CapInfo = m_AllCapValues[nOCRCap];
     vals.resize(0);
     switch(nOCRCap)
     {
@@ -968,7 +970,6 @@ bool TransymOCR::ProcessGetCapValues(LONG nOCRCap, LONG CapType, OCRStringArrayV
 bool TransymOCR::ProcessSetCapValues(LONG nOCRCap, LONG CapType, const OCRLongArrayValues& vals)
 {
     OCRCapInfo& CapInfo = m_AllCapValues[nOCRCap];
-    OCRLongArrayValues pt;
     bool bRetval = true;
     switch(nOCRCap)
     {
@@ -989,7 +990,7 @@ bool TransymOCR::ProcessSetCapValues(LONG nOCRCap, LONG CapType, const OCRLongAr
         {
             if ( CapType == DTWAIN_CAPSET )
             {
-                if ( vals.size() > 0)
+                if ( !vals.empty() )
                 {
                     if ( CapInfo.IsSingleValue() )
                         CapInfo.longData.currentdata = vals[0];
@@ -1013,6 +1014,7 @@ bool TransymOCR::ProcessSetCapValues(LONG nOCRCap, LONG CapType, const OCRLongAr
 
         case DTWAIN_OCRCV_BITDEPTH:
         {
+            OCRLongArrayValues pt;
             switch (CapType)
             {
                 // Get the current pixel type
@@ -1072,7 +1074,7 @@ bool TransymOCR::ProcessSetCapValues(LONG nOCRCap, LONG CapType,
         {
             if ( CapType == DTWAIN_CAPSET )
             {
-                if ( vals.size() > 0)
+                if (!vals.empty())
                 {
                     CapInfo.stringData.currentdata = vals[0];
                     return true;
@@ -1093,19 +1095,18 @@ bool TransymOCR::IsReturnCodeOk(LONG returnCode)
     return returnCode == TOCR_OK;
 }
 
-CTL_StringType TransymOCR::GetErrorString(LONG returnCode)
+std::string TransymOCR::GetErrorString(LONG returnCode)
 {
     if ( m_ErrorCode.find(returnCode) != m_ErrorCode.end())
         return m_ErrorCode[returnCode];
-    return _T("Unknown TOCR Error");
+    return "Unknown TOCR Error";
 }
 
-int TransymOCR::GetNumPagesInFile(const CTL_StringType& szFileName, int& errCode)
+int TransymOCR::GetNumPagesInFile(CTL_StringType szFileName, int& errCode)
 {
-    LONG bRet;
     LONG nPages = -1;
     LONG oldErrorMode;
-    bRet = m_SDK.TOCRGetErrorMode( m_JobHandle, &oldErrorMode );
+    LONG bRet = m_SDK.TOCRGetErrorMode(m_JobHandle, &oldErrorMode);
     if ( bRet != TOCR_OK)
     {
         errCode = bRet;
@@ -1114,9 +1115,8 @@ int TransymOCR::GetNumPagesInFile(const CTL_StringType& szFileName, int& errCode
 
     // Set the mode to not show the message box
     m_SDK.TOCRSetErrorMode(m_JobHandle, TOCRERRORMODE_NONE);
-    int fExists = (_taccess(szFileName.c_str(), 0 ) == 0);
-    bRet = m_SDK.TOCRGetNumPages(m_JobHandle, (char *)szFileName.c_str(),
-                                TOCRJOBTYPE_TIFFFILE, &nPages);
+    const int fExists = dynarithmic::file_exists(szFileName.c_str());
+    bRet = m_SDK.TOCRGetNumPages(m_JobHandle, (char *)szFileName.c_str(), TOCRJOBTYPE_TIFFFILE, &nPages);
 
     // Set the old error mode back
     m_SDK.TOCRSetErrorMode(m_JobHandle, oldErrorMode);
@@ -1126,7 +1126,7 @@ int TransymOCR::GetNumPagesInFile(const CTL_StringType& szFileName, int& errCode
     {
         if ( fExists )
         {
-            FILE *infile = fopen(StringConversion::Convert_Native_To_Ansi(szFileName).c_str(), "rb");
+            FILE *infile = _tfopen(szFileName.c_str(), _T("rb"));
             if ( infile )
             {
                 char buffer[2];
@@ -1147,7 +1147,7 @@ int TransymOCR::GetNumPagesInFile(const CTL_StringType& szFileName, int& errCode
 
 LONG TransymOCR::StartupOCREngine()
 {
-    LONG status = m_SDK.TOCRInitialise(&m_JobHandle);
+    const LONG status = m_SDK.TOCRInitialise(&m_JobHandle);
     if ( status == TOCR_OK )
         SetActivated(true);
     return status;

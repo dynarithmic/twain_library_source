@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include "cppfunc.h"
 #include "ctltwmgr.h"
 #include "enumeratorfuncs.h"
 #include "errorcheck.h"
@@ -25,14 +26,14 @@
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
-using namespace std;
+
 using namespace dynarithmic;
 
 // This function allows the user to only show the UI
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
@@ -48,7 +49,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
 
     // Open the source (if source is closed)
     bool bCloseSource = false;
-    bool bIsSourceOpen = DTWAIN_IsSourceOpen(Source)?true:false;
+    const bool bIsSourceOpen = DTWAIN_IsSourceOpen(Source)?true:false;
 
     if (!bIsSourceOpen && (DTWAIN_GetTwainMode() == DTWAIN_MODAL))
     {
@@ -66,7 +67,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
     // Start a thread depending on Twain Mode.
     if (DTWAIN_GetTwainMode() == DTWAIN_MODELESS) // No thread
     {
-        DTWAIN_BOOL bRet2 = CTL_TwainAppMgr::ShowUserInterface(pSource, false, true);
+        const DTWAIN_BOOL bRet2 = CTL_TwainAppMgr::ShowUserInterface(pSource, false, true);
         LOG_FUNC_EXIT_PARAMS(bRet2)
     }
 
@@ -90,8 +91,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
                 // assign the callback procedure
                 CTL_TwainDLLHandle::s_TwainCallbackSet = false;
                 CTL_DSMCallbackTripletRegister callbackSetter(CTL_TwainAppMgr::GetCurrentSession(),
-                    pSource,
-                    &TwainMessageLoopV2::TwainVersion2MsgProc);
+                    pSource, &TwainMessageLoopV2::TwainVersion2MsgProc);
                 if (callbackSetter.Execute() == TWRC_SUCCESS)
                     pImpl = &v2Impl;
             }
@@ -114,7 +114,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ForceScanOnNoUI(DTWAIN_SOURCE Source, BOOL bSet)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, bSet))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, Source);
     if (!pSource)

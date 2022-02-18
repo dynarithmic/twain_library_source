@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ bool CTL_CapabilitySetOneValTriplet<T>::Encode(const std::vector<T>& rArray, voi
     T Data;
 
     // Get a TW_ONEVALUE structure
-    pTW_ONEVALUE pVal = (pTW_ONEVALUE)pMemBlock;
+    const pTW_ONEVALUE pVal = static_cast<pTW_ONEVALUE>(pMemBlock);
 
     // Get the TWTY_xxx type
     pVal->ItemType = CTL_CapabilitySetTripletBase::GetTwainType();

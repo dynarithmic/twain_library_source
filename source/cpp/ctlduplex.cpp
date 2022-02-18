@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <cstring>
+#include "cppfunc.h"
 #include "dtwain.h"
 #include "ctliface.h"
 #include "ctltwmgr.h"
@@ -33,16 +33,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, LPLONG lpDup
     if ( !DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPDUPLEX))
     {
         if ( lpDupType )
-            lpDupType = DTWAIN_DX_NONE;
+            lpDupType = nullptr;
         bRet = false;
     }
     else
     {
         if ( lpDupType )
         {
-            bool bRet2 = true;
-            DTWAIN_ARRAY Array = 0;
-            bRet2 = DTWAIN_GetCapValues(Source, DTWAIN_CV_CAPDUPLEX, DTWAIN_CAPGET, &Array) ? true : false;
+            DTWAIN_ARRAY Array = nullptr;
+            const DTWAIN_BOOL bRet2 = DTWAIN_GetCapValues(Source, DTWAIN_CV_CAPDUPLEX, DTWAIN_CAPGET, &Array) ? true : false;
             DTWAINArrayLL_RAII arr(Array);
             if ( bRet2 && Array)
             {
@@ -52,7 +51,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, LPLONG lpDup
             }
         }
     }
-    LOG_FUNC_EXIT_PARAMS(bRet);
+    LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
 
