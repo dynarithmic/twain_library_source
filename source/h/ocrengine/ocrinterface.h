@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@
 #include <bitset>
 #include <algorithm>
 
-#include "dtwainc.h"
 #include "ctlobstr.h"
 #define OCROPTION_GETINFO         0
 #define OCROPTION_STORECLEANTEXT1 1
@@ -60,9 +59,9 @@ namespace dynarithmic
     //    TW_UINT16  ProtocolMajor;   /* Application and DS must set to TWON_PROTOCOLMAJOR */
     //    TW_UINT16  ProtocolMinor;   /* Application and DS must set to TWON_PROTOCOLMINOR */
     //    TW_UINT32  SupportedGroups; /* Bit field OR combination of DG_ constants */
-        CTL_StringType Manufacturer;    /* Manufacturer name, e.g. "Hewlett-Packard" */
-        CTL_StringType ProductFamily;   /* Product family name, e.g. "ScanJet"       */
-        CTL_StringType ProductName;     /* Product name, e.g. "ScanJet Plus"         */
+        std::string Manufacturer;    /* Manufacturer name, e.g. "Hewlett-Packard" */
+        std::string ProductFamily;   /* Product family name, e.g. "ScanJet"       */
+        std::string ProductName;     /* Product name, e.g. "ScanJet Plus"         */
     };
 
     class OCREngine;
@@ -106,12 +105,12 @@ namespace dynarithmic
                                          CapDataType(capDataType),
                                          CapOperations(capOperations),
                                          CapContainerType(4,0),
-                                         m_bIsSingleValue(isSingleValue),
                                          doubleData{},
-                                         longData{}
+                                         longData{},
+                                         m_bIsSingleValue(isSingleValue)
                     { }
 
-        OCRCapInfo() : CapValue(0), CapDataType(-1), CapOperations(-1), m_bIsSingleValue(false), doubleData{}, longData{} { }
+        OCRCapInfo() : CapValue(0), CapDataType(-1), CapOperations(-1), doubleData{}, longData{}, m_bIsSingleValue(false) { }
 
         LONG GetCapDataType() const { return CapDataType; }
         LONG GetCapOperations() const { return CapOperations; }
@@ -213,7 +212,7 @@ namespace dynarithmic
     struct OCRCacheInfo
     {
         std::string sOCRText;
-        CTL_StringType sOCRFileName;
+        std::string  sOCRFileName;
     };
 
     struct OCRPDFInfo
@@ -238,7 +237,7 @@ namespace dynarithmic
         typedef std::vector<UINT> FileTypeArray;
         typedef std::bitset<16> OptionList;
         typedef std::unordered_map<LONG, std::vector<OCRCharacterInfo> > OCRCharacterInfoMap;
-        typedef std::unordered_map<LONG, CTL_StringType> OCRPageTextMap;
+        typedef std::unordered_map<LONG, std::string> OCRPageTextMap;
 
         std::unordered_map<LONG, OCRCapInfo> m_AllCapValues;
         std::unordered_map<LONG, LONG> m_mapOperations;
@@ -252,34 +251,34 @@ namespace dynarithmic
         virtual bool SetOptions(OCRJobOptions& options);
         virtual LONG StartupOCREngine();
         virtual LONG StartOCR();
-        virtual LONG StartOCR(const CTL_StringType& filename);
+        virtual LONG StartOCR(CTL_StringType filename);
         virtual LONG GetLastError() const;
-        virtual CTL_StringType GetErrorString(LONG errCode);
+        virtual std::string GetErrorString(LONG errCode);
         virtual void SetOkErrorCode();
         virtual void SetLastError(LONG errCode);
         virtual bool IsReturnCodeOk(LONG returnCode);
         virtual std::string GetReturnCodeString(LONG returnCode);
         virtual bool SetFileType();
         virtual bool SetFileName();
-        virtual CTL_StringType GetOCRText(LONG nPage=0);
-        virtual CTL_StringType GetOCRVersionInfo();
+        virtual std::string GetOCRText(LONG nPage=0);
+        virtual std::string GetOCRVersionInfo();
         virtual bool SetOCRVersionIdentity(const OCRVersionIdentity& vIdentity);
         virtual bool SetOCRVersionIdentity();
         virtual bool ShutdownOCR(int& status);
-        virtual int GetNumPagesInFile(const CTL_StringType& /*szFileName*/, int&) {return 1;}
-        CTL_StringType GetManufacturer() const;
-        CTL_StringType GetProductFamily() const;
-        CTL_StringType GetProductName() const;
+        virtual int GetNumPagesInFile(CTL_StringType /*szFileName*/, int&) {return 1;}
+        std::string GetManufacturer() const;
+        std::string GetProductFamily() const;
+        std::string GetProductName() const;
         LONG GetPDFColorFileType() { return m_OCRPDFInfo.FileType[OCRPDFInfo::PDFINFO_COLOR]; }
         LONG GetPDFBWFileType() { return m_OCRPDFInfo.FileType[OCRPDFInfo::PDFINFO_BW]; }
 
-        CTL_StringType GetCachedFile() const;
+        std::string GetCachedFile() const;
         std::string GetCachedText() const;
 
         void AddCharacterInfo(LONG nPage, const OCRCharacterInfo& cInfo);
         void SetBaseOption(int nWhichOption, bool bSet=true);
         bool GetBaseOption(int nWhichOption) const;
-        void SetCachedFile(const CTL_StringType& filename);
+        void SetCachedFile(const std::string& filename);
         void SetCachedText(const std::string& sText);
         void SetCurrentPageNumber(int PageNo);
         int GetCurrentPageNumber() const;
@@ -300,7 +299,7 @@ namespace dynarithmic
         LONG GetCapDataType(LONG nOCRCap) const;
         void ClearCharacterInfoMap();
         std::vector<OCRCharacterInfo>& GetCharacterInfo(LONG nPage, int &status);
-        void SetPageTextMap(LONG nPage, const CTL_StringType& sData);
+        void SetPageTextMap(LONG nPage, const std::string& sData);
         bool IsValidOCRPage(LONG nPage) const;
 
 

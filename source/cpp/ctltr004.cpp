@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 using namespace dynarithmic;
 CTL_SelectSourceDlgTriplet::CTL_SelectSourceDlgTriplet(
                             CTL_ITwainSession *pSession,
-                            LPCTSTR pProduct/*=NULL*/) :
+                            LPCTSTR pProduct/*=nullptr*/) :
               CTL_SourceTriplet( pSession, pProduct, MSG_USERSELECT )
 {
 }
@@ -31,21 +31,17 @@ CTL_SelectSourceDlgTriplet::CTL_SelectSourceDlgTriplet(
 
 TW_UINT16 CTL_SelectSourceDlgTriplet::Execute()
 {
-    TW_UINT16 rc = CTL_SourceTriplet::Execute();
-    CTL_ITwainSession *pSession;
-    CTL_ITwainSource* pCurSource;
+    const TW_UINT16 rc = CTL_SourceTriplet::Execute();
 
-    pSession = GetSessionPtr();
-    pCurSource = GetSourcePtr();
+    CTL_ITwainSession* pSession = GetSessionPtr();
+    CTL_ITwainSource* pCurSource = GetSourcePtr();
 
     switch ( rc )
     {
         case TWRC_SUCCESS:
         {
-            CTL_ITwainSource* pSource;
-
             // Check if source exists
-            pSource = pSession->Find( pCurSource );
+            CTL_ITwainSource* pSource = pSession->Find(pCurSource);
             if ( !pSource )
             {
                 pSession->AddTwainSource( pCurSource );

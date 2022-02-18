@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@
     template  CTL_CapabilitySetOneValTriplet<unsigned long>;
     template  CTL_CapabilitySetOneValTriplet<unsigned short>;
     template  CTL_CapabilitySetOneValTriplet<double>;
-    template  CTL_CapabilitySetOneValTriplet<CTL_String>;
+    template  CTL_CapabilitySetOneValTriplet<std::string>;
     template  CTL_CapabilitySetOneValTriplet<char *>;
     template  CTL_CapabilitySetOneValTriplet<TW_FRAME>;
     template  CTL_CapabilitySetOneValTriplet<unsigned short *>;

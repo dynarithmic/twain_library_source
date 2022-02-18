@@ -1,14 +1,14 @@
 /*****************************************************************************************
 
-***		MD5ChecksumDefines.h : MD5 Checksum constants
+***     MD5ChecksumDefines.h : MD5 Checksum constants
 
-***		Developed by Langfine Ltd. 
-***		Released to the public domain 12/Nov/2001.
-***		Please visit our website www.langfine.com
+***     Developed by Langfine Ltd.
+***     Released to the public domain 12/Nov/2001.
+***     Please visit our website www.langfine.com
 
-***		Any modifications must be clearly commented to distinguish them from Langfine's 
-***		original source code. Please advise Langfine of useful modifications so that we 
-***		can make them generally available. 
+***     Any modifications must be clearly commented to distinguish them from Langfine's
+***     original source code. Please advise Langfine of useful modifications so that we
+***     can make them generally available.
 
 *****************************************************************************************/
 
@@ -38,7 +38,7 @@
 #define MD5_S44 21
 
 //Transformation Constants - Round 1
-#define MD5_T01  0xd76aa478 //Transformation Constant 1 
+#define MD5_T01  0xd76aa478 //Transformation Constant 1
 #define MD5_T02  0xe8c7b756 //Transformation Constant 2
 #define MD5_T03  0x242070db //Transformation Constant 3
 #define MD5_T04  0xc1bdceee //Transformation Constant 4

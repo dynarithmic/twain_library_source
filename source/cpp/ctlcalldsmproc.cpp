@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,13 +18,14 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include "cppfunc.h"
 #include "ctltwmgr.h"
 #include "enumeratorfuncs.h"
 #include "errorcheck.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
-using namespace std;
+
 using namespace dynarithmic;
 
 TWAIN_IDENTITY DLLENTRY_DEF DTWAIN_GetTwainAppID()
@@ -32,10 +33,8 @@ TWAIN_IDENTITY DLLENTRY_DEF DTWAIN_GetTwainAppID()
     LOG_FUNC_ENTRY_PARAMS(())
     if (!DTWAIN_IsSessionEnabled())
          LOG_FUNC_EXIT_PARAMS(NULL);
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    CTL_ITwainSession *pSession = (CTL_ITwainSession *)pHandle->m_Session;
-    TW_IDENTITY *pIdentity = pSession->GetAppIDPtr();
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    TW_IDENTITY *pIdentity = pHandle->m_pTwainSession->GetAppIDPtr();
     LOG_FUNC_EXIT_PARAMS(((TWAIN_IDENTITY)pIdentity))
     CATCH_BLOCK(TWAIN_IDENTITY(0))
 }
@@ -43,7 +42,7 @@ TWAIN_IDENTITY DLLENTRY_DEF DTWAIN_GetTwainAppID()
 TWAIN_IDENTITY DLLENTRY_DEF DTWAIN_GetTwainAppIDEx(TW_IDENTITY* pIdentity)
 {
     LOG_FUNC_ENTRY_PARAMS((pIdentity))
-    TWAIN_IDENTITY thisID = DTWAIN_GetTwainAppID();
+    const TWAIN_IDENTITY thisID = DTWAIN_GetTwainAppID();
     if (thisID)
         memcpy(pIdentity, thisID, sizeof(TW_IDENTITY));
     LOG_FUNC_EXIT_PARAMS(((TWAIN_IDENTITY)pIdentity))
@@ -56,7 +55,7 @@ TWAIN_IDENTITY DLLENTRY_DEF DTWAIN_GetSourceID(DTWAIN_SOURCE Source)
     CTL_ITwainSource *pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
     TWAIN_IDENTITY Id = {};
     if ( pSource )
-        Id = (TWAIN_IDENTITY)pSource->GetSourceIDPtr();
+        Id = static_cast<TWAIN_IDENTITY>(pSource->GetSourceIDPtr());
     LOG_FUNC_EXIT_PARAMS(Id)
     CATCH_BLOCK(TWAIN_IDENTITY())
 }
@@ -64,7 +63,7 @@ TWAIN_IDENTITY DLLENTRY_DEF DTWAIN_GetSourceID(DTWAIN_SOURCE Source)
 TWAIN_IDENTITY  DLLENTRY_DEF DTWAIN_GetSourceIDEx(DTWAIN_SOURCE Source, TW_IDENTITY* pIdentity)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pIdentity))
-    TWAIN_IDENTITY thisID = DTWAIN_GetSourceID(Source);
+    const TWAIN_IDENTITY thisID = DTWAIN_GetSourceID(Source);
     if (thisID)
         memcpy(pIdentity, thisID, sizeof(TW_IDENTITY));
     LOG_FUNC_EXIT_PARAMS(((TWAIN_IDENTITY)pIdentity))
@@ -74,18 +73,62 @@ TWAIN_IDENTITY  DLLENTRY_DEF DTWAIN_GetSourceIDEx(DTWAIN_SOURCE Source, TW_IDENT
 LONG DLLENTRY_DEF DTWAIN_CallDSMProc(TWAIN_IDENTITY AppID, TWAIN_IDENTITY SourceId, LONG lDG, LONG lDAT, LONG lMSG, LPVOID pData)
 {
     LOG_FUNC_ENTRY_PARAMS((AppID, SourceId, lDG, lDAT, lMSG, pData))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, -1L, FUNC_MACRO);
 
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return (!DTWAIN_IsSessionEnabled()); }, DTWAIN_ERR_NO_SESSION, -1L, FUNC_MACRO);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return (!AppID && !SourceId); }, DTWAIN_ERR_INVALID_PARAM, -1L, FUNC_MACRO);
-    LONG Ret = CTL_TwainAppMgr::CallDSMEntryProc((TW_IDENTITY*)AppID,
-                                                (TW_IDENTITY*)SourceId,
-                                                (TW_UINT32)lDG,
-                                                (TW_UINT16)lDAT,
-                                                (TW_UINT16)lMSG,
-                                                (TW_MEMREF)pData);
+    const LONG Ret = CTL_TwainAppMgr::CallDSMEntryProc(static_cast<TW_IDENTITY*>(AppID),
+                                                       static_cast<TW_IDENTITY*>(SourceId),
+                                                       static_cast<TW_UINT32>(lDG),
+                                                       static_cast<TW_UINT16>(lDAT),
+                                                       static_cast<TW_UINT16>(lMSG),
+                                                       static_cast<TW_MEMREF>(pData));
 
     LOG_FUNC_EXIT_PARAMS(Ret)
     CATCH_BLOCK(DTWAIN_FAILURE1)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCurrentTwainTriplet(TW_IDENTITY* pAppID, TW_IDENTITY* pSourceID,
+                                                       LPLONG lpDG, LPLONG lpDAT, LPLONG lpMsg, LPLONG64 lpMemRef)
+{
+    LOG_FUNC_ENTRY_PARAMS((pAppID, pSourceID, lpDAT, lpDG, lpMsg, lpMemRef))
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    DTWAIN_Check_Bad_Handle_Ex(pHandle, FALSE, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return (!DTWAIN_IsSessionEnabled()); }, DTWAIN_ERR_NO_SESSION, -1L, FUNC_MACRO);
+    const CTL_TwainTriplet* currentTriplet = CTL_TwainAppMgr::GetInstance()->GetCurrentTriplet();
+    if (currentTriplet)
+    {
+        if ( pAppID )
+        {
+            const TW_IDENTITY* trip = currentTriplet->GetOriginID();
+            if ( trip )
+                memcpy(pAppID, trip, sizeof(TW_IDENTITY));
+        }
+
+        if ( pSourceID )
+        {
+            const TW_IDENTITY* trip = currentTriplet->GetDestinationID();
+            if (trip)
+                memcpy(pSourceID, trip, sizeof(TW_IDENTITY));
+        }
+
+        if ( lpDG )
+            *lpDG = static_cast<LONG>(currentTriplet->GetDG());
+        if (lpDAT)
+            *lpDAT = currentTriplet->GetDAT();
+        if (lpMsg)
+            *lpMsg = currentTriplet->GetMSG();
+
+        if ( lpMemRef )
+        {
+             const TW_MEMREF memref = currentTriplet->GetMemRef();
+             if (memref)
+                *lpMemRef = reinterpret_cast<LONG64>(memref);
+            else
+                *lpMemRef = {};
+        }
+    }
+    LOG_FUNC_EXIT_PARAMS(TRUE)
+    CATCH_BLOCK(FALSE)
 }

@@ -39,7 +39,7 @@ struct Threefish_Info : public FixedBlockSize<BS>, FixedKeyLength<BS>
 template <unsigned int BS>
 struct CRYPTOPP_NO_VTABLE Threefish_Base
 {
-	virtual ~Threefish_Base() {}
+    virtual ~Threefish_Base() {}
 
     void SetTweak(const NameValuePairs &params)
     {
@@ -91,7 +91,7 @@ public:
         void ProcessAndXorBlock(const byte *inBlock, const byte *xorBlock, byte *outBlock) const;
     };
 
-    /// \brief Encryption transformation
+    /// \brief Decryption transformation
     /// \details Dec provides implementation for decryption transformation. All key and block
     ///   sizes are supported.
     /// \since Crypto++ 6.0
@@ -135,7 +135,7 @@ public:
         void ProcessAndXorBlock(const byte *inBlock, const byte *xorBlock, byte *outBlock) const;
     };
 
-    /// \brief Encryption transformation
+    /// \brief Decryption transformation
     /// \details Dec provides implementation for decryption transformation. All key and block
     ///   sizes are supported.
     /// \since Crypto++ 6.0

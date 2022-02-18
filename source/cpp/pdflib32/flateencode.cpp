@@ -1,6 +1,6 @@
 /*
 This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-Copyright (c) 2002-2021 Dynarithmic Software.
+Copyright (c) 2002-2022 Dynarithmic Software.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,16 +19,15 @@ DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRING
 OF THIRD PARTY RIGHTS.
 */
 
-#include <algorithm>
 #include <string>
 #include "zlib.h"
 #include "flateencode.h"
 
 int FlateEncode(const std::string&inData, std::string& outData)
 {
-    unsigned long compressedLen = (long)((double)inData.size() * 1.2 + 12);
+    unsigned long compressedLen = static_cast<long>(static_cast<double>(inData.size()) * 1.2 + 12);
     outData.resize(compressedLen);
-    int result = compress2((unsigned char *)&outData[0], &compressedLen,(const unsigned char *)inData.data(), (uLong)inData.size(), 9);
+    const int result = compress2(reinterpret_cast<unsigned char*>(&outData[0]), &compressedLen,reinterpret_cast<const unsigned char*>(inData.data()), static_cast<uLong>(inData.size()), 9);
     outData.resize(compressedLen);
     return result;
 }

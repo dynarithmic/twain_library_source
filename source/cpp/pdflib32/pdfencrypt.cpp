@@ -1,6 +1,6 @@
 /*
 This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-Copyright (c) 2002-2021 Dynarithmic Software.
+Copyright (c) 2002-2022 Dynarithmic Software.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,14 +22,12 @@ OF THIRD PARTY RIGHTS.
 #define BOOST_DATE_TIME_NO_LIB
 
 #include <algorithm>
-#include <stdlib.h>
 #include <sstream>
 #include <string>
 #include <vector>
 #undef min
 #undef max
 #include "pdfencrypt.h"
-#include "../cryptolib/modes.h"
 #include "../cryptolib/filters.h"
 #include "../cryptolib/md5.h"
 #include "boost/date_time/posix_time/posix_time.hpp"
@@ -68,14 +66,13 @@ class ARCFOUREncryption
             int index1 = 0;
             int index2 = 0;
             for (int k = 0; k < 256; ++k)
-                state[k] = (unsigned char)k;
+                state[k] = static_cast<unsigned char>(k);
             x = 0;
             y = 0;
-            unsigned char tmp;
             for (int k = 0; k < 256; ++k)
             {
                 index2 = (key[index1 + off] + state[k] + index2) & 255;
-                tmp = state[k];
+                unsigned char tmp = state[k];
                 state[k] = state[index2];
                 state[index2] = tmp;
                 index1 = (index1 + 1) % len;
@@ -84,16 +81,15 @@ class ARCFOUREncryption
 
        void encryptARCFOUR(const PDFEncryption::UCHARArray& dataIn, int off, int len, PDFEncryption::UCHARArray& dataOut, int offOut)
        {
-            int length = len + off;
-            unsigned char tmp;
-            for (int k = off; k < length; ++k)
+           const int length = len + off;
+           for (int k = off; k < length; ++k)
             {
                 x = (x + 1) & 255;
                 y = (state[x] + y) & 255;
-                tmp = state[x];
+                unsigned char tmp = state[x];
                 state[x] = state[y];
                 state[y] = tmp;
-                dataOut[k - off + offOut] = (unsigned char)(dataIn[k] ^ state[(state[x] + state[y]) & 255]);
+                dataOut[k - off + offOut] = static_cast<unsigned char>(dataIn[k] ^ state[(state[x] + state[y]) & 255]);
             }
         }
 
@@ -115,7 +111,7 @@ class ARCFOUREncryption
         public:
             IVGenerator()
             {
-                std::string time = "01234567890123";
+                const std::string time = "01234567890123";
                 std::string time2 = "01234567890123";
                 std::reverse(time2.begin(), time2.end());
                 std::string revTime = time + "+" + time2;
@@ -155,7 +151,7 @@ static unsigned char ConvertToHex(unsigned char hi, unsigned char lo)
 static PDFEncryption::UCHARArray StringToHexArray(const std::string& sSource)
 {
     PDFEncryption::UCHARArray aDest(sSource.size() / 2);
-    int nLen = static_cast<int>(sSource.size());
+    const int nLen = static_cast<int>(sSource.size());
     int j = 0;
     for ( int i = 0; i < nLen; i+=2, j++ )
     {
@@ -167,7 +163,7 @@ static PDFEncryption::UCHARArray StringToHexArray(const std::string& sSource)
 static PDFEncryption::UCHARArray StringToByteArray(const std::string& sSource)
 {
     PDFEncryption::UCHARArray aDest(sSource.size());
-    int nLen = static_cast<int>(sSource.size());
+    const int nLen = static_cast<int>(sSource.size());
     for ( int i = 0; i < nLen; ++i )
         aDest[i] = sSource[i];
     return aDest;
@@ -183,8 +179,8 @@ unsigned char PDFEncryption::pad[] =
     0x69, 0x7A
 };
 
-PDFEncryption::PDFEncryption() : state(256), ownerKey(32), userKey(32),
-                                m_xRC4Component{}, m_yRC4Component{}, keySize{}, permissions{}
+PDFEncryption::PDFEncryption() : state(256), m_xRC4Component{}, m_yRC4Component{},
+                                keySize{}, ownerKey(32), userKey(32), permissions{}
 {
 }
 
@@ -202,11 +198,12 @@ void PDFEncryption::SetupAllKeys(const std::string& DocID,
 
 
 void PDFEncryption::SetupAllKeys(const std::string& DocID,
-                                 UCHARArray& userPassword,
-                                 UCHARArray& ownerPassword, int permissionsParam,
+                                 const PDFEncryption::UCHARArray& userPassword,
+                                 PDFEncryption::UCHARArray& ownerPassword,
+                                 int permissionsParam,
                                  bool strength128Bits)
 {
-    if (ownerPassword.size() == 0 )
+    if (ownerPassword.empty() )
         ownerPassword = userPassword;
     permissionsParam |= strength128Bits ? 0xfffff0c0 : 0xffffffc0;
 
@@ -214,8 +211,8 @@ void PDFEncryption::SetupAllKeys(const std::string& DocID,
         //PDF reference 3.5.2 Standard Security Handler, Algorithm 3.3-1
         //If there is no owner password, use the user password instead.
 
-    UCHARArray userPad = PadPassword(userPassword);
-    UCHARArray ownerPad = PadPassword(ownerPassword);
+    const UCHARArray userPad = PadPassword(userPassword);
+    const UCHARArray ownerPad = PadPassword(ownerPassword);
 
     ownerKey = ComputeOwnerKey(userPad, ownerPad, strength128Bits);
     SetupByUserPad(DocID, userPad, ownerKey, permissionsParam, strength128Bits);
@@ -257,7 +254,7 @@ void PDFEncryption::SetupGlobalEncryptionKey(const std::string& documentID,
     Cryp.Update(ownerKeyParam.data(), ownerKeyParam.size());
     Cryp.Update(ext.data(), 4);
     {
-        UCHARArray test = StringToHexArray(documentID);
+        const UCHARArray test = StringToHexArray(documentID);
         Cryp.Update(test.data(), test.size());
     }
 
@@ -322,7 +319,7 @@ void PDFEncryption::SetupUserKey()
         Cryp.Update(&pad[0], sizeof(pad));
 
         // step 3
-        UCHARArray test = StringToHexArray(m_documentID);
+        const UCHARArray test = StringToHexArray(m_documentID);
         Cryp.Update(test.data(), test.size());
         Cryp.Final(digest.data());
 
@@ -352,16 +349,16 @@ void PDFEncryption::SetupUserKey()
     }
     else
     {
-        UCHARArray vectorPad(pad, pad + sizeof(pad) / sizeof(pad[0]));
+        const UCHARArray vectorPad(pad, pad + std::size(pad));
         PrepareRC4Key(mkey);
         EncryptRC4(vectorPad, userKey);
     }
 }
 
-PDFEncryption::UCHARArray PDFEncryption::PadPassword(const UCHARArray& pass)
+PDFEncryption::UCHARArray PDFEncryption::PadPassword(const UCHARArray& pass) const
 {
     UCHARArray userPad(32);
-    UCHARArray vectorPad(pad, pad + sizeof(pad) / sizeof(pad[0]));
+    const UCHARArray vectorPad(pad, pad + std::size(pad));
     if ( pass.empty() )
     {
         ArrayCopy(vectorPad, 0, userPad, 0, 32);
@@ -392,13 +389,13 @@ void PDFEncryption::SetHashKey(int number, int generation)
 {
 
     /** Work area to prepare the object/generation bytes */
-    UCHARArray extra = GetExtendedKey(number, generation);
+    const UCHARArray extra = GetExtendedKey(number, generation);
     std::ostringstream m;
-    m.write((const char *)mkey.data(), mkey.size());
-    m.write((const char *)extra.data(),extra.size());
-    std::string sTemp = m.str();
+    m.write(reinterpret_cast<const char*>(mkey.data()), mkey.size());
+    m.write(reinterpret_cast<const char*>(extra.data()),extra.size());
+    const std::string sTemp = m.str();
 
-    UCHARArray tempArr = StringToByteArray(sTemp);
+    const UCHARArray tempArr = StringToByteArray(sTemp);
     CryptoPP::Weak1::MD5 Cryp;
     Cryp.Update(tempArr.data(), tempArr.size());
     key.resize(32);
@@ -423,11 +420,10 @@ void PDFEncryption::PrepareRC4Key(const UCHARArray& keyParam, int off, int len)
         state[k] = static_cast<unsigned char>(k);
     m_xRC4Component = 0;
     m_yRC4Component = 0;
-    unsigned char tmp;
     for (k = 0; k < 256; ++k)
     {
         index2 = (keyParam[index1 + off] + state[k] + index2) & 255;
-        tmp = state[k];
+        unsigned char tmp = state[k];
         state[k] = state[index2];
         state[index2] = tmp;
         index1 = (index1 + 1) % len;
@@ -436,13 +432,12 @@ void PDFEncryption::PrepareRC4Key(const UCHARArray& keyParam, int off, int len)
 
 void PDFEncryption::EncryptRC4(const UCHARArray& dataIn, int off, int len, UCHARArray& dataOut)
 {
-    int length = len + off;
-    unsigned char tmp;
+    const int length = len + off;
     for (int k = off; k < length; ++k)
     {
         m_xRC4Component = (m_xRC4Component + 1) & 255;
         m_yRC4Component = (state[m_xRC4Component] + m_yRC4Component) & 255;
-        tmp = state[m_xRC4Component];
+        unsigned char tmp = state[m_xRC4Component];
         state[m_xRC4Component] = state[m_yRC4Component];
         state[m_yRC4Component] = tmp;
         dataOut[k] = (dataIn[k] ^ state[(state[m_xRC4Component] + state[m_yRC4Component]) & 255]);
@@ -487,7 +482,7 @@ void PDFEncryptionRC4::Encrypt(const std::string& dataIn, std::string& dataOut)
 void PDFEncryptionRC4::Encrypt(char *dataIn, int len)
 {
     UCHARArray dIn(len);
-    std::copy (dataIn, dataIn + len, dIn.begin());
+    std::copy_n (dataIn, len, dIn.begin());
     EncryptRC4(dIn);
     std::copy(dIn.begin(), dIn.end(), dataIn);
 }

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -75,14 +75,14 @@ struct TOCRSDK
     TOCRSDK();
     ~TOCRSDK();
     HMODULE InitTOCR();
-    bool IsInitialized() const { return m_hMod!=NULL; }
+    bool IsInitialized() const { return m_hMod!= nullptr; }
     HMODULE GetModuleHandle() const { return m_hMod; }
     HMODULE m_hMod;
 };
 
 typedef std::unordered_map<LONG,LONG> LongCapMap;
 typedef std::unordered_map<std::string,std::string> StringCapMap;
-typedef std::unordered_map<LONG, CTL_StringType> TOCRErrorCodeMap;
+typedef std::unordered_map<LONG, std::string> TOCRErrorCodeMap;
 typedef std::unordered_map<LONG, std::vector<LONG> > TOCRBitDepthMap;
 
 class TransymOCR : public OCREngine
@@ -91,17 +91,17 @@ class TransymOCR : public OCREngine
 public:
     TransymOCR();
     ~TransymOCR();
-    virtual bool IsInitialized() const;
-    virtual bool SetOptions(OCRJobOptions& options);
-    virtual LONG StartOCR(const CTL_StringType& filename);
-    virtual bool SetFileType()  { return true; }
-    virtual CTL_StringType GetOCRVersionInfo();
-    virtual bool SetOCRVersionIdentity();
-    virtual bool IsReturnCodeOk(LONG returnCode);
-    virtual CTL_StringType GetErrorString(LONG returnCode);
-    virtual int GetNumPagesInFile(const CTL_StringType& szFileName, int& errCode);
-    virtual bool ShutdownOCR(int& status);
-    virtual LONG StartupOCREngine();
+    bool IsInitialized() const override;
+    bool SetOptions(OCRJobOptions& options) override;
+    LONG StartOCR(CTL_StringType filename) override;
+    bool SetFileType() override { return true; }
+    std::string GetOCRVersionInfo() override;
+    bool SetOCRVersionIdentity() override;
+    bool IsReturnCodeOk(LONG returnCode) override;
+    std::string GetErrorString(LONG returnCode) override;
+    int GetNumPagesInFile(CTL_StringType szFileName, int& errCode) override;
+    bool ShutdownOCR(int& status) override;
+    LONG StartupOCREngine() override;
 
 protected:
     virtual bool ProcessGetCapValues(LONG nOCRCap, LONG CapType, OCRLongArrayValues& vals);

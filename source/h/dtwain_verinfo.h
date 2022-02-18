@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -26,54 +26,30 @@
 #ifdef _DEBUG
     #define DTWAIN_DEVELOP_SUFFIX "d"
 #else
-#define DTWAIN_DEVELOP_SUFFIX ""
+    #define DTWAIN_DEVELOP_SUFFIX ""
 #endif
 
 #ifdef _WIN32
 #if defined (WIN64) || (_WIN64)
-    #ifdef UNICODE
-        #define DTWAIN_DLLNAME      "dtwain64u" DTWAIN_DEVELOP_SUFFIX ".dll"
-        #define DTWAIN_FILEDESCRIPTION  "dtwain64u" DTWAIN_DEVELOP_SUFFIX
-        #define DTWAIN_OSPLATFORM L"64"
-    #else
         #define DTWAIN_DLLNAME      "dtwain64" DTWAIN_DEVELOP_SUFFIX ".dll"
         #define DTWAIN_FILEDESCRIPTION  "dtwain64" DTWAIN_DEVELOP_SUFFIX
         #define DTWAIN_OSPLATFORM "64"
-    #endif
 #else
-    #ifdef UNICODE
-        #define DTWAIN_DLLNAME      "dtwain32u" DTWAIN_DEVELOP_SUFFIX ".dll"
-        #define DTWAIN_FILEDESCRIPTION  "dtwain32u" DTWAIN_DEVELOP_SUFFIX
-        #define DTWAIN_OSPLATFORM L"32"
-    #else
         #define DTWAIN_DLLNAME      "dtwain32" DTWAIN_DEVELOP_SUFFIX ".dll"
         #define DTWAIN_FILEDESCRIPTION  "dtwain32" DTWAIN_DEVELOP_SUFFIX
         #define DTWAIN_OSPLATFORM "32"
-    #endif
 #endif
 #endif
 
 #ifndef _WIN32
     #if defined (UNIX64)
-    #ifdef UNICODE
-        #define DTWAIN_DLLNAME      "libdtwain64u" DTWAIN_DEVELOP_SUFFIX ".a"
-        #define DTWAIN_FILEDESCRIPTION  "libdtwain64u" DTWAIN_DEVELOP_SUFFIX
-        #define DTWAIN_OSPLATFORM L"64"
-    #else
         #define DTWAIN_DLLNAME      "libdtwain64" DTWAIN_DEVELOP_SUFFIX ".a"
         #define DTWAIN_FILEDESCRIPTION  "libdtwain64" DTWAIN_DEVELOP_SUFFIX
         #define DTWAIN_OSPLATFORM "64"
-    #endif
-    #else
-    #ifdef UNICODE
-        #define DTWAIN_DLLNAME      "libdtwain32u" DTWAIN_DEVELOP_SUFFIX ".a"
-        #define DTWAIN_FILEDESCRIPTION  "libdtwain32u" DTWAIN_DEVELOP_SUFFIX
-        #define DTWAIN_OSPLATFORM L"32"
     #else
         #define DTWAIN_DLLNAME      "libdtwain32" DTWAIN_DEVELOP_SUFFIX ".a"
         #define DTWAIN_FILEDESCRIPTION  "libdtwain32" DTWAIN_DEVELOP_SUFFIX
         #define DTWAIN_OSPLATFORM "32"
-    #endif
     #endif
 #endif
 
@@ -85,7 +61,7 @@
 
 #define DTWAIN_VERINFO_COMMENTS             "Patch Level " DTWAIN_VERINFO_PATCHLEVEL_VERSION "\0"
 #define DTWAIN_VERINFO_COMPANYNAME          "Dynarithmic Software\0"
-#define DTWAIN_VERINFO_LEGALCOPYRIGHT       "Copyright © 2020-2021\0"
+#define DTWAIN_VERINFO_LEGALCOPYRIGHT       "Copyright © 2020-2022\0"
 #define DTWAIN_VERINFO_PRODUCTNAME          "Dynarithmic Software Twain Library " UNICODE_VERSION "\0"
 #define DTWAIN_VERINFO_INTERNALNAME         DTWAIN_DLLNAME
 #define DTWAIN_VERINFO_ORIGINALFILENAME     DTWAIN_DLLNAME

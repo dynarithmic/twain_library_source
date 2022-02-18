@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,6 +18,9 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#ifndef CTLTR019_INL
+#define CTLTR019_INL
+
 template <class T>
 CTL_CapabilitySetEnumTriplet<T>::CTL_CapabilitySetEnumTriplet(CTL_ITwainSession *pSession,
                                                              CTL_ITwainSource* pSource,
@@ -55,10 +58,10 @@ template <class T>
 bool CTL_CapabilitySetEnumTriplet<T>::Encode(const std::vector<T>& rArray, void *pMemBlock)
 {
     // Get a TW_ENUMERATION structure
-    pTW_ENUMERATION pArray = (pTW_ENUMERATION)pMemBlock;
+    pTW_ENUMERATION pArray = static_cast<pTW_ENUMERATION>(pMemBlock);
 
     // Set the # of elements
-    pArray->NumItems = (TW_UINT32)m_nAggSize;
+    pArray->NumItems = static_cast<TW_UINT32>(m_nAggSize);
 
     // Set the data type
     pArray->ItemType = CTL_CapabilitySetTripletBase::GetTwainType();
@@ -74,3 +77,4 @@ bool CTL_CapabilitySetEnumTriplet<T>::Encode(const std::vector<T>& rArray, void 
 }
 
 
+#endif // CTLTR019_INL

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,19 +18,20 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include "cppfunc.h"
 #include "ctltwmgr.h"
 #include "enumeratorfuncs.h"
 #include "errorcheck.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
-using namespace std;
+
 using namespace dynarithmic;
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSourcesEx()
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    DTWAIN_ARRAY pArray = 0;
+    DTWAIN_ARRAY pArray = nullptr;
     DTWAIN_EnumSources(&pArray);
     LOG_FUNC_EXIT_PARAMS(pArray)
     CATCH_BLOCK(DTWAIN_ARRAY(0))
@@ -39,35 +40,34 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSourcesEx()
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
 {
     LOG_FUNC_ENTRY_PARAMS((Array))
-        DTWAIN_ARRAY aSource = NULL;
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     // Terminate if Array is NULL )
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-    aSource = DTWAIN_ArrayCreate(DTWAIN_ARRAYSOURCE, 0);
+    const DTWAIN_ARRAY aSource = DTWAIN_ArrayCreate(DTWAIN_ARRAYSOURCE, 0);
     if (!aSource)
         LOG_FUNC_EXIT_PARAMS(false)
-    DTWAIN_ARRAY pDTWAINArray = aSource;
+    const DTWAIN_ARRAY pDTWAINArray = aSource;
 
     EnumeratorFunctionImpl::ClearEnumerator(pDTWAINArray);
 
-    CTL_TwainSourceArray SourceArray;
+    CTL_TwainSourceSet SourceArray;
 
     // Start a session if not already started
     if (!pHandle->m_bSessionAllocated)
     {
-        if (!DTWAIN_StartTwainSession(NULL, NULL))
+        if (!DTWAIN_StartTwainSession(nullptr, nullptr))
             LOG_FUNC_EXIT_PARAMS(false)
     }
 
     struct EnumAddValue {
         DTWAIN_ARRAY m_Arr; EnumAddValue(DTWAIN_ARRAY Arr) : m_Arr(Arr) {}
-        void operator()(CTL_ITwainSource* ptr) { EnumeratorFunctionImpl::EnumeratorAddValue(m_Arr, &ptr); }
+        void operator()(CTL_ITwainSource* ptr) const { EnumeratorFunctionImpl::EnumeratorAddValue(m_Arr, &ptr); }
     };
 
-    CTL_TwainAppMgr::EnumSources(pHandle->m_Session, SourceArray);
+    CTL_TwainAppMgr::EnumSources(pHandle->m_pTwainSession, SourceArray);
     for_each(SourceArray.begin(), SourceArray.end(), [&](CTL_ITwainSource* ptr) {EnumeratorFunctionImpl::EnumeratorAddValue(pDTWAINArray, &ptr);});
     *Array = aSource;
     LOG_FUNC_EXIT_PARAMS(true)

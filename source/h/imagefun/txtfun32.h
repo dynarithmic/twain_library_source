@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -26,13 +26,14 @@
 #include <memory>
 
 #include "ctlobstr.h"
+#include "dibinfox.h"
 #include "winbit32.h"
 #include "ocrinterface.h"
 namespace dynarithmic
 {
     class CTL_ImageIOHandler;
     class CTL_TwainDib;
-    struct CTextPageInfo
+    struct CTextPageInfo : DibMultiPageData
     {
         int curPageNum;
         std::unique_ptr<std::ofstream> fh;
@@ -40,7 +41,7 @@ namespace dynarithmic
         std::shared_ptr<CTL_ImageIOHandler> m_pOrigHandler;
 
         CTextPageInfo(int curPage) : curPageNum(curPage) { }
-        ~CTextPageInfo();
+        ~CTextPageInfo() = default;
     };
 
     class CTextImageHandler : public CDibInterface
@@ -53,12 +54,12 @@ namespace dynarithmic
                                      m_InputFormat(inputFormat),
                                      m_pDib(pDib) {}
             // Virtual interface
-            virtual CTL_String GetFileExtension() const  override;
+            virtual std::string GetFileExtension() const  override;
             virtual HANDLE  GetFileInformation(LPCSTR path)  override;
-            virtual int     WriteGraphicFile(CTL_ImageIOHandler *pHandler, LPCTSTR path, HANDLE bitmap, void *pUserInfo = NULL)  override;
+            int     WriteGraphicFile(CTL_ImageIOHandler *pHandler, LPCTSTR path, HANDLE bitmap, void *pUserInfo = nullptr)  override;
             virtual int     WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, UINT32 wid, UINT32 ht,
                                        UINT32 bpp, UINT32 cpal, RGBQUAD *pPal,
-                                       void *pUserInfo = NULL)  override;
+                                       void *pUserInfo = nullptr)  override;
 
             virtual void SetMultiPageStatus(DibMultiPageStruct *pStruct);
             virtual void GetMultiPageStatus(DibMultiPageStruct *pStruct);
@@ -71,12 +72,14 @@ namespace dynarithmic
             int SaveOCR();
 
         private:
+            bool m_bWriteOk;
             DTWAINImageInfoEx m_ImageInfoEx;
             OCREngine *m_pOCREngine;
             LONG m_InputFormat;
             CTL_TwainDib* m_pDib;
-            std::unique_ptr<std::ofstream> m_fh;
+            std::unique_ptr<std::ofstream> m_hFile;
             std::shared_ptr<CTextPageInfo> m_pTextPageInfo;
+            CTL_StringType szTempFile;
     };
 }
 #endif

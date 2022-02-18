@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <cstring>
 #include "dtwain.h"
 #include "ctliface.h"
 #include "ctltwmgr.h"
@@ -32,14 +31,14 @@ bool dynarithmic::GetSupportString(DTWAIN_SOURCE Source, LPTSTR sz, LONG nLen, L
 {
     if ( nLen > 0 )
         sz[0] = _T('\0');
-    DTWAIN_ARRAY Array = 0;
-    bool bRet = DTWAIN_GetCapValues(Source, Cap, GetType, &Array)?true:false;
+    DTWAIN_ARRAY Array = nullptr;
+    const bool bRet = DTWAIN_GetCapValues(Source, Cap, GetType, &Array)?true:false;
     DTWAINArrayLL_RAII raii(Array);
     CTL_StringType sVal;
     if ( bRet )
     {
         EnumeratorFunctionImpl::EnumeratorGetAt(Array, 0, &sVal);
-        CopyInfoToCString(sVal,sz,nLen);
+        StringWrapper::CopyInfoToCString(sVal,sz,nLen);
     }
     return bRet;
 }
@@ -47,7 +46,7 @@ bool dynarithmic::GetSupportString(DTWAIN_SOURCE Source, LPTSTR sz, LONG nLen, L
 
 bool dynarithmic::EnumSupported(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG Cap)
 {
-    bool bRet = DTWAIN_GetCapValues(Source, Cap, DTWAIN_CAPGET, pArray)?true:false;
+    const bool bRet = DTWAIN_GetCapValues(Source, Cap, DTWAIN_CAPGET, pArray)?true:false;
     return bRet;
 }
 

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -30,10 +30,10 @@ using namespace dynarithmic;
 
 struct PDFDimensions
 {
-    std::array<double,4> mediabox;
+    std::array<double,4> mediabox{};
     PDFDimensions() : mediabox{ 0,0,0,0 } { }
 
-    PDFDimensions(double d1, double d2, double d3, double d4)
+    PDFDimensions(double d1, double d2, double d3, double d4) : mediabox {}
     {
         SetDimensions(d1, d2, d3, d4);
     }
@@ -115,17 +115,14 @@ struct AllPDFDimensions
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CTL_PDFIOHandler::CTL_PDFIOHandler(CTL_TwainDib* pDib, int /*nFormat*/, DTWAINImageInfoEx &ImageInfoEx)
-: CTL_ImageIOHandler( pDib ), m_ImageInfoEx(ImageInfoEx),
-        m_JpegHandler(pDib, m_ImageInfoEx),
-        m_TiffHandler(pDib, CTL_TwainDib::TiffFormatNONE, m_ImageInfoEx), m_nFormat(0)
+CTL_PDFIOHandler::CTL_PDFIOHandler(CTL_TwainDib* pDib, int /*nFormat*/, const DTWAINImageInfoEx &ImageInfoEx)
+: CTL_ImageIOHandler( pDib ), m_nFormat(0),
+        m_ImageInfoEx(ImageInfoEx),
+        m_JpegHandler(pDib, m_ImageInfoEx), m_TiffHandler(pDib, CTL_TwainDib::TiffFormatNONE, m_ImageInfoEx)
 {
     // Create a JPEG and TIFF handler locally
     m_ImageInfoEx.IsPDF = true;
 }
-
-CTL_PDFIOHandler::~CTL_PDFIOHandler()
-{ }
 
 static char CleanupOCRText1(char ch)
 {
@@ -140,7 +137,7 @@ struct OCRTextInfo
     std::vector<LONG> yPos;
     std::vector<LONG> xDim;
     std::vector<LONG> yDim;
-    CTL_StringType OCRChar;
+    std::string OCRChar;
     PDFDimensions m_RealDimensions;
     PDFDimensions m_ScaledDimensions;
     std::pair<LONG, LONG> m_ImageDimensions;
@@ -184,7 +181,7 @@ static void InitializeDisplayStatus(PDFTextElementPtr& pElement)
 struct PDFTextElementEraser
 {
     PDFTextElementEraser(LONG Flags) : m_Flags(Flags) {}
-    bool operator()(PDFTextElementPtr& pElement) const
+    bool operator()(const PDFTextElementPtr& pElement) const
     {
         return (pElement->displayFlags & m_Flags)?true:false;
     }
@@ -194,18 +191,21 @@ struct PDFTextElementEraser
 
 int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, LONG64 MultiStage)
 {
-    DibMultiPageStruct *s = (DibMultiPageStruct *)MultiStage;
+    auto s = reinterpret_cast<DibMultiPageStruct*>(MultiStage);
     // Now add this to PDF page
     CPDFImageHandler PDFHandler(szFile, m_ImageInfoEx);
     CTL_StringType szTempFile;
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     if (!s || s->Stage == DIB_MULTI_FIRST)
     {
+        auto* pSource = m_ImageInfoEx.theSource;
+        auto it = pHandle->m_mapPDFTextElement.find(pSource);
+        if (it != pHandle->m_mapPDFTextElement.end())
+        {
         // any PDF text is initialized to not written
-        for_each(m_ImageInfoEx.PDFTextElementList.begin(),
-                 m_ImageInfoEx.PDFTextElementList.end(),
-                 InitializeDisplayStatus);
+            std::for_each(it->second.begin(), it->second.end(),InitializeDisplayStatus);
+        }
     }
 
     if (!s || s->Stage != DIB_MULTI_LAST)
@@ -219,53 +219,53 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, LO
             {
                 return DTWAIN_ERR_FILEWRITE;
             }
-            int bRet;
             if ( m_pDib )
             {
+                int bRet;
                 // Make a JPEG from this info
                 if ( m_pDib->GetDepth() > 1 )
                 {
                     szTempFile += StringWrapper::GetGUID() + _T(".JPG");
-                    CTL_TwainAppMgr::WriteLogInfo(CTL_StringType(_T("Temporary Image File is ")) + szTempFile + CTL_StringType(_T("\n")));
+                    auto szTempFileA = StringConversion::Convert_Native_To_Ansi(szTempFile);
+                    CTL_TwainAppMgr::WriteLogInfoA("Temporary Image File is " + szTempFileA + "\n");
 
                     // Create a JPEG
                     m_JpegHandler.SetDib(m_pDib);
                     bRet = m_JpegHandler.WriteBitmap(szTempFile.c_str(), bOpenFile, fhFile);
                     if ( bRet != 0 )
                     {
-                        CTL_TwainAppMgr::WriteLogInfo(CTL_StringType(_T("Error creating temporary Image File ")) + szTempFile + CTL_StringType(_T("\n")));
+                        CTL_TwainAppMgr::WriteLogInfoA("Error creating temporary Image File " + szTempFileA + "\n");
                         delete_file(szTempFile.c_str());
                         return bRet;
                     }
                     else
-                        CTL_TwainAppMgr::WriteLogInfo(CTL_StringType(_T("Image file created successfully ")) + szTempFile + CTL_StringType(_T("\n")));
+                        CTL_TwainAppMgr::WriteLogInfoA("Image file created successfully " + szTempFileA + "\n");
                     PDFHandler.SetImageType(0);
-
                 }
                 else
                     // make a CCITTFaxDecode
                 {
                     DibMultiPageStruct dps = {};
                     szTempFile += StringWrapper::GetGUID() + _T(".TIF");
+                    auto szTempFileA = StringConversion::Convert_Native_To_Ansi(szTempFile);
 
-                    CTL_TwainAppMgr::WriteLogInfo(CTL_StringType(_T("Temporary Image File is ")) + szTempFile + CTL_StringType(_T("\n")));
+                    CTL_TwainAppMgr::WriteLogInfoA("Temporary Image File is " + szTempFileA + "\n");
 
                     // Create a TIFF file
                     m_TiffHandler.SetDib(m_pDib);
                     dps.Stage = DIB_MULTI_FIRST;
-                    bRet = m_TiffHandler.WriteBitmap(szTempFile.c_str(), bOpenFile, 0, (LONG64)&dps);
+                    bRet = m_TiffHandler.WriteBitmap(szTempFile.c_str(), bOpenFile, 0, reinterpret_cast<LONG64>(&dps));
 
                     if ( bRet != 0 )
                     {
-                        CTL_TwainAppMgr::WriteLogInfo(CTL_StringType(_T("Error creating temporary Image File ")) + szTempFile + CTL_StringType(_T("\n")));
-                        //                        ::LeaveCriticalSection(&CTL_TwainDLLHandle::s_critFileCreate);
+                        CTL_TwainAppMgr::WriteLogInfoA("Error creating temporary Image File " + szTempFileA + "\n");
                         return bRet;
                     }
                     else
                     {
                         dps.Stage = DIB_MULTI_LAST;
-                        bRet = m_TiffHandler.WriteBitmap(szTempFile.c_str(), bOpenFile, 0, (LONG64)&dps);
-                        CTL_TwainAppMgr::WriteLogInfo(CTL_StringType(_T("Image file created successfully ")) + szTempFile + CTL_StringType(_T("\n")));
+                        bRet = m_TiffHandler.WriteBitmap(szTempFile.c_str(), bOpenFile, 0, reinterpret_cast<LONG64>(&dps));
+                        CTL_TwainAppMgr::WriteLogInfoA("Image file created successfully " + szTempFileA + "\n");
                     }
                     PDFHandler.SetImageType(1);
                 }
@@ -277,7 +277,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, LO
             CTL_StringArrayType pathValues;
             StringWrapper::SplitPath(m_ImageInfoEx.szImageFileName, pathValues);
             szTempFile = m_ImageInfoEx.szImageFileName;
-            if ( StringWrapper::CompareNoCase(pathValues[StringWrapper::EXTENSION_POS].c_str(), _T("TIF")))
+            if ( StringWrapper::CompareNoCase(pathValues[StringWrapper::EXTENSION_POS], _T("TIF")))
                 PDFHandler.SetImageType(1);
             else
                 PDFHandler.SetImageType(0);
@@ -288,27 +288,24 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, LO
 
     // If OCR text is desired, then get the text for the page now
     int bRet;
-    CTL_TEXTELEMENTPTRLIST::iterator itFirstElement;
-    CTL_TEXTELEMENTPTRLIST::iterator itLastElement;
     CTL_TEXTELEMENTPTRLIST::iterator tempExFirst;
     CTL_TEXTELEMENTPTRLIST::iterator tempExLast;
-    DTWAINImageInfoEx& tempEx = m_ImageInfoEx.theSource->GetImageInfoExRef();
     unsigned int nCount = 0;
     m_ImageInfoEx.IsSearchableTextOnPage = false;
 
     if ( m_ImageInfoEx.IsOCRUsedForPDF && (!s || s->Stage != DIB_MULTI_LAST))
     {
         OCRTextInfo ocrTextInfo;
-        CTL_TwainAppMgr::SendTwainMsgToWindow(m_ImageInfoEx.theSession, NULL,
+        CTL_TwainAppMgr::SendTwainMsgToWindow(m_ImageInfoEx.theSession, nullptr,
                                               DTWAIN_TN_PDFOCRREADY,
-                                             (LPARAM)m_ImageInfoEx.theSource);
+                                             reinterpret_cast<LPARAM>(m_ImageInfoEx.theSource));
 
         bRet = GetOCRText(szTempFile.c_str(), PDFHandler.GetImageType(), ocrTextInfo.OCRChar);
         if ( bRet != 0 )
         {
             // Error occurred
-            CTL_TwainAppMgr::SendTwainMsgToWindow(m_ImageInfoEx.theSession, NULL,
-                DTWAIN_TN_PDFOCRERROR, (LPARAM)m_ImageInfoEx.theSource);
+            CTL_TwainAppMgr::SendTwainMsgToWindow(m_ImageInfoEx.theSession, nullptr,
+                DTWAIN_TN_PDFOCRERROR, reinterpret_cast<LPARAM>(m_ImageInfoEx.theSource));
             bRet = DTWAIN_ERR_OCR_RECOGNITIONERROR;
             delete_file(szTempFile.c_str());
         }
@@ -316,8 +313,8 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, LO
         {
             // Save this text to the PDF file as searchable, invisible text
             // Test
-            CTL_TwainAppMgr::SendTwainMsgToWindow(m_ImageInfoEx.theSession, NULL,
-                DTWAIN_TN_PDFOCRDONE, (LPARAM)m_ImageInfoEx.theSource);
+            CTL_TwainAppMgr::SendTwainMsgToWindow(m_ImageInfoEx.theSession, nullptr,
+                DTWAIN_TN_PDFOCRDONE, reinterpret_cast<LPARAM>(m_ImageInfoEx.theSource));
 
             // Get the handle to the text buffer
             // Clean up the text if necessary... To do
@@ -333,56 +330,47 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, LO
 
             PDFStringToTextElement pElMap = CreatePDFTextElementMap(ocrTextInfo);
 
-            PDFStringToTextElement::iterator itStart = pElMap.begin();
-            PDFStringToTextElement::iterator itEnd = pElMap.end();
-            tempExFirst = m_ImageInfoEx.PDFTextElementList.begin();
-            tempExLast = m_ImageInfoEx.PDFTextElementList.begin();
+            auto itStart = pElMap.begin();
+            auto itEnd = pElMap.end();
 
-            itFirstElement = tempEx.PDFTextElementList.begin();
-            itLastElement  = tempEx.PDFTextElementList.begin();
             while ( itStart != itEnd )
             {
                 DTWAIN_PDFTEXTELEMENT TextElement = DTWAIN_CreatePDFTextElement(m_ImageInfoEx.theSource); // add to Source array of elements
-                PDFTextElement *pElement = static_cast<PDFTextElement *>(TextElement);
+                auto pElement = static_cast<PDFTextElement *>(TextElement);
                 *pElement = *itStart;
-                PDFTextElementPtr addedElement = tempEx.PDFTextElementList.back();
-                m_ImageInfoEx.PDFTextElementList.push_back( addedElement );
-                PDFHandler.AddPDFTextElement( addedElement );  // give this to the PDF code
                 if ( itStart == pElMap.begin())
                 {
-                    std::advance(itFirstElement, m_ImageInfoEx.PDFTextElementList.size()-1);
-                    std::advance(tempExFirst, m_ImageInfoEx.PDFTextElementList.size()-1);
-                    m_ImageInfoEx.PDFSearchableTextRange.first = itFirstElement;
+                    // Iterator to last item added to the Text element list
+                    m_ImageInfoEx.PDFSearchableTextRange.first =
+                        std::prev(pHandle->m_mapPDFTextElement[m_ImageInfoEx.theSource].end());
                 }
                 ++itStart;
                 ++nCount;
             }
             if ( nCount > 0 )
             {
-                std::advance(itLastElement, m_ImageInfoEx.PDFTextElementList.size());
-                std::advance(tempExLast, m_ImageInfoEx.PDFTextElementList.size());
-                m_ImageInfoEx.PDFSearchableTextRange.second = m_ImageInfoEx.PDFSearchableTextRange.first;
-                std::advance(m_ImageInfoEx.PDFSearchableTextRange.second, nCount);
+                m_ImageInfoEx.PDFSearchableTextRange.second =
+                    std::prev(pHandle->m_mapPDFTextElement[m_ImageInfoEx.theSource].end());
                 m_ImageInfoEx.IsSearchableTextOnPage = true;
             }
         }
     }
 
-    CTL_TwainAppMgr::WriteLogInfo(_T("Writing 1 page of PDF file...\n"));
-    bRet = PDFHandler.WriteGraphicFile(this, szTempFile.c_str(), m_pDib?(m_pDib->GetHandle()):NULL, &m_ImageInfoEx);
-    CTL_TwainAppMgr::WriteLogInfo(_T("Finished writing 1 page of PDF file...\n"));
+    CTL_TwainAppMgr::WriteLogInfoA("Writing 1 page of PDF file...\n");
+    bRet = PDFHandler.WriteGraphicFile(this, szTempFile.c_str(), m_pDib?(m_pDib->GetHandle()): nullptr, &m_ImageInfoEx);
+    CTL_TwainAppMgr::WriteLogInfoA("Finished writing 1 page of PDF file...\n");
 
     // Destroy the local text elements
     if (nCount > 0 )
     {
-        tempEx.PDFTextElementList.erase(itFirstElement, itLastElement);
+        pHandle->m_mapPDFTextElement[m_ImageInfoEx.theSource].erase(m_ImageInfoEx.PDFSearchableTextRange.first,
+                                                                    m_ImageInfoEx.PDFSearchableTextRange.second);
     }
 
     // erase temporary (current page) text elements
     PDFTextElementEraser eraser(DTWAIN_PDFTEXT_CURRENTPAGE);
-    tempEx.PDFTextElementList.erase(
-                    std::remove_if(tempEx.PDFTextElementList.begin(), tempEx.PDFTextElementList.end(), eraser),
-                    tempEx.PDFTextElementList.end());
+    auto& mapElement = pHandle->m_mapPDFTextElement[m_ImageInfoEx.theSource];
+    mapElement.erase(std::remove_if(mapElement.begin(), mapElement.end(), eraser), mapElement.end());
 
     if ( bRet != 0 )
     {
@@ -394,26 +382,25 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, LO
     return bRet;
 }
 
-int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, CTL_StringType& sText)
+int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, std::string& sText)
 {
-    CTL_StringType szTempPath;
-    sText = _T("");
+    sText.clear();
 
     CTL_StringType sFileToUse = filename;
 
     // Get the temp file path
-    szTempPath = GetDTWAINTempFilePath();
+    auto szTempPath = GetDTWAINTempFilePath();
 
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     OCREngine *pEngine = pHandle->m_pOCRDefaultEngine.get();
     if (!pEngine)
         return DTWAIN_ERR_OCR_INVALIDENGINE;
 
-    static const OCRPDFInfo::enumPDFColorType allColorTypes[] = {OCRPDFInfo::PDFINFO_COLOR, OCRPDFInfo::PDFINFO_BW};
-    static const LONG defaultPageTypes[] = {DTWAIN_JPEG, DTWAIN_TIFFNONE };
-    static const LONG defaultBitDepths[] = { 8, 1 };
-    static const LONG defaultPixelTypes[] = {DTWAIN_PT_RGB, DTWAIN_PT_BW};
+    static constexpr OCRPDFInfo::enumPDFColorType allColorTypes[] = {OCRPDFInfo::PDFINFO_COLOR, OCRPDFInfo::PDFINFO_BW};
+    static constexpr LONG defaultPageTypes[] = {DTWAIN_JPEG, DTWAIN_TIFFNONE };
+    static constexpr LONG defaultBitDepths[] = { 8, 1 };
+    static constexpr LONG defaultPixelTypes[] = {DTWAIN_PT_RGB, DTWAIN_PT_BW};
 
     // Get the page type
     int index = 0;
@@ -428,8 +415,8 @@ int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, CTL_StringType&
     // Now see if this type matches the native type
     // for b/w PDF files, DTWAIN_TIFFNONE / PixelType == DTWAIN_PT_BW / BitDepth == 1
     bool bMustConvert = true;
-    LONG OCRBitDepth = pEngine->m_OCRPDFInfo.BitDepth[allColorTypes[index]];
-    LONG pixelType = pEngine->m_OCRPDFInfo.PixelType[allColorTypes[index]];
+    const LONG OCRBitDepth = pEngine->m_OCRPDFInfo.BitDepth[allColorTypes[index]];
+    const LONG pixelType = pEngine->m_OCRPDFInfo.PixelType[allColorTypes[index]];
 
     // Check the BPP for the OCR's file type
     if ( fileType == defaultPageTypes[index] )
@@ -468,7 +455,7 @@ int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, CTL_StringType&
         szTempPath += StringWrapper::GetGUID() + _T("TMP");
         // If we need to convert the BPP to the one supported by the
         // OCR engine, do it now.
-        HANDLE hNewDib=NULL;
+        HANDLE hNewDib= nullptr;
 
         if ( OCRBitDepth > defaultBitDepths[index] )
             // Create a new dib with an increased bpp for the OCR engine to work with
@@ -503,37 +490,37 @@ int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, CTL_StringType&
 
         if ( bRetWrite != 0 )
         {
-            CTL_TwainAppMgr::WriteLogInfo(CTL_StringType(_T("Error creating temporary OCR Image File ")) + szTempPath + CTL_StringType(_T("\n")));
+            CTL_TwainAppMgr::WriteLogInfo(_T("Error creating temporary OCR Image File ") + szTempPath + _T("\n"));
             return bRetWrite;
         }
         sFileToUse = szTempPath;
     }
     // Just OCR the text here
-    DTWAIN_ARRAY aValues = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 1);
+    const DTWAIN_ARRAY aValues = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 1);
     if ( aValues )
     {
         DTWAINArrayLL_RAII a(aValues);
         DTWAIN_ArraySetAtLong(aValues, 0, fileType );
-        LONG bRet1 = DTWAIN_SetOCRCapValues((DTWAIN_OCRENGINE)pEngine, DTWAIN_OCRCV_IMAGEFILEFORMAT, DTWAIN_CAPSET, aValues);
+        const LONG bRet1 = DTWAIN_SetOCRCapValues(static_cast<DTWAIN_OCRENGINE>(pEngine), DTWAIN_OCRCV_IMAGEFILEFORMAT, DTWAIN_CAPSET, aValues);
         if ( bRet1 )
         {
-            LONG bRet = DTWAIN_ExecuteOCR((DTWAIN_OCRENGINE)pEngine, sFileToUse.c_str(), 0, 0);
+            const LONG bRet = DTWAIN_ExecuteOCR(static_cast<DTWAIN_OCRENGINE>(pEngine), sFileToUse.c_str(), 0, 0);
             if ( bRet )
             {
                 // OCRed the text.  Now retrieve it and return it
                 LONG dataSize;
-                DTWAIN_GetOCRText((DTWAIN_OCRENGINE)pEngine, 0, NULL, 0, &dataSize, DTWAINOCR_COPYDATA);
+                DTWAIN_GetOCRText(static_cast<DTWAIN_OCRENGINE>(pEngine), 0, nullptr, 0, &dataSize, DTWAINOCR_COPYDATA);
                 if ( dataSize <= 0 )
                 {
-                    sText = _T("");
+                    sText = {};
                     return 0;
                 }
                 std::vector<TCHAR> charBuffer(dataSize);
-                DTWAIN_GetOCRText((DTWAIN_OCRENGINE)pEngine, 0, &charBuffer[0], dataSize, &dataSize, DTWAINOCR_COPYDATA);
+                DTWAIN_GetOCRText(static_cast<DTWAIN_OCRENGINE>(pEngine), 0, &charBuffer[0], dataSize, &dataSize, DTWAINOCR_COPYDATA);
 
                 // Now send a notification to the application
-                CTL_ITwainSession *pSession = m_ImageInfoEx.theSource->GetTwainSession();
-                LONG bSave = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, NULL, DTWAIN_TN_QUERYOCRTEXT, (LPARAM)m_ImageInfoEx.theSource);
+                const auto pSession = m_ImageInfoEx.theSource->GetTwainSession();
+                const LONG bSave = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_QUERYOCRTEXT, reinterpret_cast<LPARAM>(m_ImageInfoEx.theSource));
 
                 // Delete the temp file if we created one
                 if ( bMustConvert )
@@ -541,7 +528,7 @@ int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, CTL_StringType&
 
                 if ( bSave )
                 {
-                    sText.assign(&charBuffer[0], charBuffer.size());
+                    std::copy(charBuffer.begin(), charBuffer.end(), std::back_inserter(sText));
                     return 0;
                 }
                 else
@@ -571,13 +558,13 @@ bool CTL_PDFIOHandler::CheckValidConvertType(int fileType, int pageType)
 
 bool GetOCRCharacterInformation( OCREngine* pEngine, OCRTextInfo& tInfo, HANDLE hBitmap, const DTWAINImageInfoEx& imageInfoEx )
 {
-    DTWAIN_OCRTEXTINFOHANDLE tInfoHandle = DTWAIN_GetOCRTextInfoHandle((DTWAIN_OCRENGINE)pEngine, 0);
+    const DTWAIN_OCRTEXTINFOHANDLE tInfoHandle = DTWAIN_GetOCRTextInfoHandle(static_cast<DTWAIN_OCRENGINE>(pEngine), 0);
     if ( !tInfoHandle )
         return false;
 
     // Get the text info length
     LONG bufSize;
-    DTWAIN_GetOCRText( (DTWAIN_OCRENGINE)pEngine, 0, 0, 0, &bufSize, DTWAINOCR_COPYDATA ); // first get the buffer size
+    DTWAIN_GetOCRText( static_cast<DTWAIN_OCRENGINE>(pEngine), 0, nullptr, 0, &bufSize, DTWAINOCR_COPYDATA ); // first get the buffer size
 
     // size the components in the struct
     tInfo.xDim.resize(bufSize);
@@ -592,21 +579,21 @@ bool GetOCRCharacterInformation( OCREngine* pEngine, OCRTextInfo& tInfo, HANDLE 
     DTWAIN_GetOCRTextInfoLongEx(tInfoHandle, DTWAIN_OCRINFO_CHARYWIDTH, &tInfo.yDim[0], bufSize);
 
     // Get the original bitmap info translated into PDF units
-    LPBITMAPINFOHEADER pbi = (LPBITMAPINFOHEADER)ImageMemoryHandler::GlobalLock(hBitmap);
+    const LPBITMAPINFOHEADER pbi = static_cast<LPBITMAPINFOHEADER>(ImageMemoryHandler::GlobalLock(hBitmap));
     DTWAINGlobalHandle_RAII dibHandle(hBitmap);
 
-    double xInches = (double)pbi->biXPelsPerMeter / 39.37;
-    double yInches = (double)pbi->biYPelsPerMeter / 39.37;
-    double xWidth = (double)pbi->biWidth;
-    double yHeight = (double)pbi->biHeight;
-    double widthInPoints = xWidth / xInches * 72.0;
-    double heightInPoints = yHeight / yInches * 72.0;
+    const double xInches = static_cast<double>(pbi->biXPelsPerMeter) / 39.37;
+    const double yInches = static_cast<double>(pbi->biYPelsPerMeter) / 39.37;
+    const double xWidth = static_cast<double>(pbi->biWidth);
+    const double yHeight = static_cast<double>(pbi->biHeight);
+    const double widthInPoints = xWidth / xInches * 72.0;
+    const double heightInPoints = yHeight / yInches * 72.0;
 
     tInfo.m_RealDimensions.SetDimensions(0,0, widthInPoints, heightInPoints );
 
     // test scaling of normal PDF page
     AllPDFDimensions pdfdims;
-    PDFDimensionsMap::const_iterator it = pdfdims.m_mediaMap.find(imageInfoEx.PDFPageSize);
+    const PDFDimensionsMap::const_iterator it = pdfdims.m_mediaMap.find(imageInfoEx.PDFPageSize);
     if ( it != pdfdims.m_mediaMap.end() )
     {
         double d1, d2, d3, d4;
@@ -634,7 +621,7 @@ bool GetOCRCharacterInformation( OCREngine* pEngine, OCRTextInfo& tInfo, HANDLE 
     tInfo.m_PDFScalingFactorForPage.second = tInfo.m_ScaledDimensions.mediabox[3] / tInfo.m_RealDimensions.mediabox[3];
 
     // end test
-    tInfo.m_ImageDimensions = std::make_pair(LONG(xWidth), (LONG)yHeight);
+    tInfo.m_ImageDimensions = std::make_pair(static_cast<LONG>(xWidth), static_cast<LONG>(yHeight));
     return true;
 }
 
@@ -646,22 +633,20 @@ PDFStringToTextElement CreatePDFTextElementMap(OCRTextInfo& tInfo)
     //  b) The starting position in PDF is always the first character in string
     //  c) All other text info fields are "static"
     std::vector<unsigned> PositionVec;
-    CTL_StringArrayType strArray;
-    StringWrapper::TokenizeEx(tInfo.OCRChar, _T(" "), strArray, false, &PositionVec);
+    StringArray strArray;
+    StringWrapperA::TokenizeEx(tInfo.OCRChar, " ", strArray, false, &PositionVec);
     PDFStringToTextElement pMap;
     pMap.reserve(strArray.size());
-    LONG maxWidth;
-    LONG maxHeight;
     PDFTextElement element;
     for (size_t i = 0; i < strArray.size(); ++i)
     {
         element.m_text = strArray[i];
         // get the max x-dimension for this word
-        maxWidth = *std::max_element(tInfo.xDim.begin() + PositionVec[i],
-                                     tInfo.xDim.begin() + PositionVec[i] + strArray[i].size());
-        maxHeight = *std::max_element(tInfo.yDim.begin() + PositionVec[i],
-                                      tInfo.yDim.begin() + PositionVec[i] + strArray[i].size());
-        double fheight = tInfo.FontHeightFromPixelSize(maxHeight);
+        LONG maxWidth = *std::max_element(tInfo.xDim.begin() + PositionVec[i],
+                                          tInfo.xDim.begin() + PositionVec[i] + strArray[i].size());
+        LONG maxHeight = *std::max_element(tInfo.yDim.begin() + PositionVec[i],
+                                           tInfo.yDim.begin() + PositionVec[i] + strArray[i].size());
+        const double fheight = tInfo.FontHeightFromPixelSize(maxHeight);
         element.scalingX = tInfo.FontWidthFromPixelSize(maxWidth) * tInfo.m_PDFScalingFactorForPage.first;
         element.scalingY = fheight * tInfo.m_PDFScalingFactorForPage.second;
         element.colorRGB = 0;
@@ -675,7 +660,7 @@ PDFStringToTextElement CreatePDFTextElementMap(OCRTextInfo& tInfo)
         element.xpos = pPos.first;
         element.ypos = pPos.second;
         element.displayFlags = DTWAIN_PDFTEXT_CURRENTPAGE | DTWAIN_PDFTEXT_NOWORDSPACING;
-        element.m_font.m_fontName = _T("Courier");
+        element.m_font.m_fontName = "Courier";
         pMap.push_back(element);
     }
     return pMap;

@@ -120,10 +120,10 @@ MD5Update (
      unsigned char *input,	/* input block */
      unsigned int inputLen)	/* length of input block */
 {
-  unsigned int i, index, partLen;
+  unsigned int i;
 
   /* Compute number of bytes mod 64 */
-  index = (unsigned int) ((context->count[0] >> 3) & 0x3F);
+  unsigned int index = (unsigned int)((context->count[0] >> 3) & 0x3F);
 
   /* Update number of bits */
   if ((context->count[0] += ((UINT4) inputLen << 3))
@@ -131,7 +131,7 @@ MD5Update (
     context->count[1]++;
   context->count[1] += ((UINT4) inputLen >> 29);
 
-  partLen = 64 - index;
+  unsigned int partLen = 64 - index;
 
   /* Transform as many times as possible.
    */
@@ -162,15 +162,14 @@ MD5Final (unsigned char digest[],	/* message digest */
      MD5_CTX *context)		/* context */
 {
   unsigned char bits[8];
-  unsigned int index, padLen;
 
   /* Save number of bits */
   Encode (bits, context->count, 8);
 
   /* Pad out to 56 mod 64.
    */
-  index = (unsigned int) ((context->count[0] >> 3) & 0x3f);
-  padLen = (index < 56) ? (56 - index) : (120 - index);
+  unsigned int index = (unsigned int)((context->count[0] >> 3) & 0x3f);
+  unsigned int padLen = (index < 56) ? (56 - index) : (120 - index);
   MD5Update (context, PADDING, padLen);
 
   /* Append length (before padding) */
@@ -321,9 +320,7 @@ MD5_memcpy (
      POINTER input,
      unsigned int len)
 {
-  unsigned int i;
-
-  for (i = 0; i < len; i++)
+    for (unsigned int i = 0; i < len; i++)
     output[i] = input[i];
 }
 
@@ -335,8 +332,6 @@ MD5_memset (
      int value,
      unsigned int len)
 {
-  unsigned int i;
-
-  for (i = 0; i < len; i++)
+    for (unsigned int i = 0; i < len; i++)
     ((char *) output)[i] = (char) value;
 }

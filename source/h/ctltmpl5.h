@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #ifndef CTLTMPL5_H_
 #define CTLTMPL5_H_
 
+#include <utility>
 #include <vector>
 #include <algorithm>
 #include <memory>
@@ -62,9 +63,8 @@ namespace dynarithmic
                              std::vector<T> &rArray
                             )
     {
-        CTL_ITwainSource *pTempSource = (CTL_ITwainSource *)pSource;
-        CTL_ITwainSession* pSession = pTempSource->GetTwainSession();
-        TW_UINT16 rc;
+        auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
+        const auto pSession = pTempSource->GetTwainSession();
         rArray.erase(rArray.begin(), rArray.end());
         std::unique_ptr<CTL_CapabilityGetTriplet> pGetTriplet;
 
@@ -110,14 +110,14 @@ namespace dynarithmic
         else
             return false;
 
-        rc = pGetTriplet->Execute();
+        const TW_UINT16 rc = pGetTriplet->Execute();
         if ( rc == TWRC_SUCCESS )
         {
-            size_t nValues = pGetTriplet->GetNumItems();
+            const size_t nValues = pGetTriplet->GetNumItems();
 
             // Check if string type was actually used.
             // This may be the case of custom caps are used
-            int nItemType = pGetTriplet->GetItemType();
+            const int nItemType = pGetTriplet->GetItemType();
             if ( nItemType == TWTY_STR32 ||
                  nItemType == TWTY_STR64  ||
                  nItemType == TWTY_STR128  ||
@@ -145,7 +145,7 @@ namespace dynarithmic
                     {
                         TW_STR255 ThisString;
                         pGetTriplet->GetValue(ThisString, i );
-                        CTL_StringArray *pArray = (CTL_StringArray *)&rArray;
+                        StringArray *pArray = reinterpret_cast<StringArray*>(&rArray);
                         pArray->push_back(ThisString);
                     }
                     else
@@ -153,7 +153,7 @@ namespace dynarithmic
                     {
                         TW_STR1024 ThisString;
                         pGetTriplet->GetValue(ThisString, i );
-                        CTL_StringArray *pArray = (CTL_StringArray *)&rArray;
+                        StringArray *pArray = reinterpret_cast<StringArray*>(&rArray);
                         pArray->push_back(reinterpret_cast<LPSTR>(ThisString));
                     }
                     else
@@ -190,9 +190,8 @@ namespace dynarithmic
                              std::vector<T> &rArray
                             )
     {
-        CTL_ITwainSource *pTempSource = (CTL_ITwainSource *)pSource;
-        CTL_ITwainSession* pSession = pTempSource->GetTwainSession();
-        TW_UINT16 rc;
+        auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
+        const auto pSession = pTempSource->GetTwainSession();
 
         std::unique_ptr<CTL_CapabilityTriplet> pSetTriplet;
 
@@ -248,10 +247,7 @@ namespace dynarithmic
         else
             return false;
 
-        rc = pSetTriplet->Execute();
-        if ( rc == TWRC_SUCCESS )
-            return true;
-        return false;
+        return pSetTriplet->Execute() == TWRC_SUCCESS;
     }
 
     template <class TwainType, class AssignType>
@@ -280,13 +276,13 @@ namespace dynarithmic
             return false;
 
         std::vector<TwainType> Array;
-        int bOk = GetCapabilityValues( p,
-                                        nCap,
-                                        (CTL_EnumGetType)GetType,
-                                        (UINT)TwainContainer_ONEVALUE,
-                                        bUseStrings,
-                                        TwainDataType,
-                                        Array );
+        const int bOk = GetCapabilityValues( p,
+                                             nCap,
+                                             static_cast<CTL_EnumGetType>(GetType),
+                                             static_cast<UINT>(TwainContainer_ONEVALUE),
+                                             bUseStrings,
+                                             TwainDataType,
+                                             Array );
         if ( !bOk )
             return false;
 
@@ -303,7 +299,7 @@ namespace dynarithmic
     {
         std::vector<T> Array;
         Array.push_back(dValue);
-        return SetCapabilityValues(pSource, (CTL_EnumCapability)nCap, (CTL_EnumSetType)SetType, (UINT)TwainContainer_ONEVALUE, nDataType, Array)?true:false;
+        return SetCapabilityValues(pSource, static_cast<CTL_EnumCapability>(nCap), static_cast<CTL_EnumSetType>(SetType), static_cast<UINT>(TwainContainer_ONEVALUE), nDataType, Array)?true:false;
     }
 
     template <class T>
@@ -329,27 +325,12 @@ namespace dynarithmic
 
     struct VectorAdderFn2
     {
-        static void AdderFn(std::vector<CTL_StringType>* ptr, CTL_String& data)
+        static void AdderFn(std::vector<CTL_StringType>* ptr, const std::string& data)
         {
-            CTL_StringType sVal = StringConversion::Convert_Ansi_To_Native(data);
+            const CTL_StringType sVal = StringConversion::Convert_Ansi_To_Native(data);
             ptr->push_back( sVal );
         }
     };
-
-    template <class TwainType, class AssignType, class EnumeratorType>
-    bool GetMultiCapValues( DTWAIN_HANDLE DLLHandle,
-                           DTWAIN_SOURCE Source,
-                           DTWAIN_ARRAY pArray,
-                           CTL_EnumeratorType EnumType,
-                           TW_UINT16 nCap,
-                           CTL_EnumGetType GetType,
-                           AssignType AValue,
-                           TW_UINT16 TwainDataType,
-                           UINT nContainerVal/* = 0*/,
-                           bool bUseContainer/* = false*/,
-                           TwainType TT = TwainType()
-                         );
-
 
     template <class TwainType, class AssignType, class EnumeratorType, class Adder>
     struct GetMultiCapValuesImpl
@@ -381,8 +362,7 @@ namespace dynarithmic
 
             bool bOk = false;
 
-            CTL_CapInfo Info;
-            Info = GetCapInfo( pHandle, p, nCap );
+            const CTL_CapInfo Info = GetCapInfo(pHandle, p, nCap);
             if ( !Info.IsValid() )
                 return false;
             UINT nAll[3];
@@ -426,7 +406,7 @@ namespace dynarithmic
             {
                 bOk = GetCapabilityValues( p,
                     nCap,
-                    (CTL_EnumGetType)GetType,
+                    static_cast<CTL_EnumGetType>(GetType),
                     nAll[i],
                     StringType,
                     TwainDataType,
@@ -439,7 +419,7 @@ namespace dynarithmic
                 return false;
 
             // Populate the array
-            size_t nSize = Array.size();
+            const size_t nSize = Array.size();
             auto  pVector = EnumeratorVectorPtr<AssignType>(pArray);
             for ( i = 0; i < nSize; i++)
                 Adder::AdderFn(pVector, Array[i]);
@@ -481,7 +461,7 @@ namespace dynarithmic
                           bool bUseContainer
                           )
     {
-        return GetMultiCapValuesImpl<CTL_String, CTL_StringType, EnumeratorType, VectorAdderFn2>::GetMultiCapValues
+        return GetMultiCapValuesImpl<std::string, CTL_StringType, EnumeratorType, VectorAdderFn2>::GetMultiCapValues
                                     (DLLHandle,
                                     Source,
                                     pArray,
@@ -492,7 +472,7 @@ namespace dynarithmic
                                     TwainDataType,
                                     nContainerVal,
                                     bUseContainer,
-                                    CTL_String());
+                                    std::string());
     }
 
     template <typename T>
@@ -503,25 +483,11 @@ namespace dynarithmic
 
     struct StringNativeToTwainConverter
     {
-        static CTL_String convert(CTL_StringType& value)
+        static std::string convert(const CTL_StringType& value)
         { return StringConversion::Convert_Native_To_Ansi(value); }
     };
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    template <class NativeTwainType, class ArrayType>
-    bool SetMultiCapValues( DTWAIN_HANDLE DLLHandle,
-                           DTWAIN_SOURCE Source,
-                           DTWAIN_ARRAY  pArray,
-                           CTL_EnumeratorType EnumType,
-                           UINT nCap,
-                           CTL_EnumSetType SetType,
-                           NativeTwainType TValue,
-                           UINT nContainerVal,
-                           bool bUseContainer,
-                           TW_UINT16 OriginalTwainType,
-                           ArrayType eType
-                         );
-
     template <class OriginalType, class ArrayType, class ConvertedTwainType, class NativeToTwainConverter>
     bool SetMultiCapValuesImpl( DTWAIN_HANDLE DLLHandle,
                            DTWAIN_SOURCE Source,
@@ -548,13 +514,13 @@ namespace dynarithmic
             return false;
 
         // Create array of the twain type
-        DTWAIN_ARRAY pDTWAINArray = pArray;
+        const DTWAIN_ARRAY pDTWAINArray = pArray;
         std::vector<ConvertedTwainType> Array;
-        OriginalType dValue;
-        size_t nValues = EnumeratorFunctionImpl::EnumeratorGetCount(pDTWAINArray);
+        OriginalType dValue = {};
+        const size_t nValues = EnumeratorFunctionImpl::EnumeratorGetCount(pDTWAINArray);
         int i;
 
-        for ( i = 0; i < (int)nValues; i++ )
+        for ( i = 0; i < static_cast<int>(nValues); i++ )
         {
             EnumeratorFunctionImpl::EnumeratorGetAt(pDTWAINArray, i, &dValue);
             ConvertedTwainType conv = NativeToTwainConverter::convert(dValue);
@@ -563,8 +529,7 @@ namespace dynarithmic
 
         bool bOk = false;
 
-        CTL_CapInfo Info;
-        Info = GetCapInfo( pHandle, p, (TW_UINT16)nCap );
+        const CTL_CapInfo Info = GetCapInfo(pHandle, p, static_cast<TW_UINT16>(nCap));
         if ( !Info.IsValid() )
             return false;
         UINT nAll[3];
@@ -587,7 +552,7 @@ namespace dynarithmic
         for ( i = 0; i < nMaxNum; i++ )
         {
             bOk = SetCapabilityValues(  p,
-                                        (CTL_EnumCapability)nCap,
+                                        static_cast<CTL_EnumCapability>(nCap),
                                         SetType,
                                         nAll[i],
                                         OriginalTwainType,
@@ -638,10 +603,10 @@ namespace dynarithmic
         DTWAIN_ARRAY pDTWAINArray = pArray;
         std::vector<TwainType> Array;
         NativeType dValue;
-        size_t nValues = EnumeratorFunctionImpl::EnumeratorGetCount(pDTWAINArray);
+        const size_t nValues = EnumeratorFunctionImpl::EnumeratorGetCount(pDTWAINArray);
         int i;
 
-        for ( i = 0; i < (int)nValues; i++ )
+        for ( i = 0; i < static_cast<int>(nValues); i++ )
         {
             EnumeratorFunctionImpl::EnumeratorGetAt(pDTWAINArray, i, &dValue );
             Array.push_back( TwainConverter::convert(dValue, pDTWAINArray) );
@@ -649,8 +614,7 @@ namespace dynarithmic
 
         bool bOk = false;
 
-        CTL_CapInfo Info;
-        Info = GetCapInfo( pHandle, p, (TW_UINT16)nCap );
+        const CTL_CapInfo Info = GetCapInfo(pHandle, p, static_cast<TW_UINT16>(nCap));
         if ( !Info.IsValid() )
             return false;
         UINT nAll[3];
@@ -673,7 +637,7 @@ namespace dynarithmic
         for ( i = 0; i < nMaxNum; i++ )
         {
             bOk = SetCapabilityValues(  p,
-                (CTL_EnumCapability)nCap,
+                static_cast<CTL_EnumCapability>(nCap),
                 SetType,
                 nAll[i],
                 OriginalTwainType,
@@ -689,7 +653,7 @@ namespace dynarithmic
     struct tupleFinder
     {
         TypeInfo tInfo;
-        tupleFinder(TypeInfo t) : tInfo(t) {}
+        tupleFinder(TypeInfo t) : tInfo(std::move(t)) {}
         bool operator()(const tupleType& tpl) const
         { return std::get<nWhich>(tpl) == tInfo; }
     };
@@ -697,8 +661,7 @@ namespace dynarithmic
     template <class TypeInfo, class TypeArray>
     bool FindFirstValue( TypeInfo SearchVal, std::vector<TypeArray> *pSearchArray, int *pWhere)
     {
-        typename std::vector<TypeArray>::iterator it =
-                std::find_if(pSearchArray->begin(), pSearchArray->end(), tupleFinder<TypeArray, TypeInfo, 0>(SearchVal));
+        auto it = std::find_if(pSearchArray->begin(), pSearchArray->end(), tupleFinder<TypeArray, TypeInfo, 0>(SearchVal));
         if ( it != pSearchArray->end())
         {
             if ( pWhere )

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -41,30 +41,49 @@
 
         #define LOG_FUNC_STRING(x) \
             if ( CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK) \
-            CTL_LogFunctionCall(_T(""), LOG_INDENT_CONSOLE, _T(#x));
+            CTL_LogFunctionCallA((""), LOG_INDENT_CONSOLE, (#x));
 
         #define LOG_FUNC_VALUES(x) \
             if ( CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK) \
-            CTL_LogFunctionCall(_T(""), LOG_INDENT_CONSOLE, (x));
+            CTL_LogFunctionCallA((""), LOG_INDENT_CONSOLE, (x));
+
+        #define LOG_FUNC_ENTRY_PARAMS_ISTWAINMSG(argVals) \
+            TRY_BLOCK \
+            if ((CTL_TwainDLLHandle::s_lErrorFilterFlags & (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG)) == \
+                    (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG)) \
+            CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_IN) + ParamOutputter((#argVals)).outputParam argVals.getString());
+
+        #define LOG_FUNC_EXIT_PARAMS_ISTWAINMSG(x) { \
+            if ((CTL_TwainDLLHandle::s_lErrorFilterFlags & (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG)) == \
+                    (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG)) \
+            CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO, LOG_INDENT_OUT) + ParamOutputter((""), true).outputParam(x).getString()); \
+            return(x); \
+                }
 
         #define LOG_FUNC_ENTRY_PARAMS(argVals) \
             TRY_BLOCK \
             if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK) \
-            CTL_TwainAppMgr::WriteLogInfo(CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_IN) +  ParamOutputter(_T(#argVals)).outputParam argVals.getString());
+            CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_IN) + ParamOutputter((#argVals)).outputParam argVals.getString());
 
         #define LOG_FUNC_EXIT_PARAMS(x) { \
             if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK) \
-            CTL_TwainAppMgr::WriteLogInfo(CTL_LogFunctionCallA(FUNC_MACRO, LOG_INDENT_OUT) + ParamOutputter(_T(""), true).outputParam(x).getString()); \
+            CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO, LOG_INDENT_OUT) + ParamOutputter((""), true).outputParam(x).getString()); \
             return(x); \
                 }
 
         #define LOG_FUNC_VALUES_EX(argvals) { \
             if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK) \
-            CTL_TwainAppMgr::WriteLogInfo(CTL_LogFunctionCall(_T(""),LOG_INDENT_IN) + ParamOutputter(_T(#argvals)).outputParam argvals.getString()); \
+            CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA((""),LOG_INDENT_IN) + ParamOutputter((#argvals)).outputParam argvals.getString()); \
         }
 
         #define CATCH_BLOCK(type) \
                 } \
+                catch(std::exception& ex_) \
+                {\
+                    LogExceptionErrorA(FUNC_MACRO, ex_.what()); \
+                    THROW_EXCEPTION \
+                    return(type); \
+                }\
                 catch(decltype(type) var) { return var; }\
                 catch(...) {\
                 LogExceptionErrorA(FUNC_MACRO); \

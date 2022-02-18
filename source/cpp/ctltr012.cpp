@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -43,20 +43,17 @@ CTL_CapabilityGetEnumTriplet::CTL_CapabilityGetEnumTriplet(
 
 bool CTL_CapabilityGetEnumTriplet::EnumCapValues( void *pCapData )
 {
-    pTW_ENUMERATION pValEnum;
-    size_t          nNumItems;
-
     // dereference to a TW_ENUMERATION structure
-    pValEnum = (pTW_ENUMERATION) pCapData;
+    pTW_ENUMERATION pValEnum = static_cast<pTW_ENUMERATION>(pCapData);
 
     // Get # of items in enumeration
-    nNumItems = static_cast<size_t>(pValEnum->NumItems);
+    size_t nNumItems = static_cast<size_t>(pValEnum->NumItems);
 
     // Get item type
     TW_UINT16 nItemType = GetEffectiveItemType(pValEnum->ItemType);
 
     // Get sizeof each item in enumeration
-    int nItemSize = GetItemSize( nItemType );
+    const int nItemSize = GetItemSize( nItemType );
 
     // Unknown item type.  Do error condition here??
     if ( nItemSize == 0 )
@@ -79,13 +76,13 @@ bool CTL_CapabilityGetEnumTriplet::EnumCapValues( void *pCapData )
         if ( nItemType == TWTY_FIX32 )
         {
             pTW_FIX32 p = (pTW_FIX32)&pValEnum->ItemList[nIndex * nItemSize];
-            double fFix = (double)Twain32ToFloat( *p );
+            double fFix = static_cast<double>(Twain32ToFloat(*p));
             pOb->CopyData( &fFix );
         }
         else
         {
             // Copy Data to pOb
-            pOb->CopyData( (void *)&pValEnum->ItemList[nIndex * nItemSize] );
+            pOb->CopyData( static_cast<void*>(&pValEnum->ItemList[nIndex * nItemSize]) );
         }
         // Store this object in object array
         pArray->push_back( pOb );
@@ -102,11 +99,11 @@ size_t CTL_CapabilityGetEnumTriplet::GetNumItems()
 
 bool CTL_CapabilityGetEnumTriplet::GetValue( void *pData, size_t nWhere )
 {
-    CTL_TwainTypeArray *pArray = GetTwainTypeArray();
+    const CTL_TwainTypeArray *pArray = GetTwainTypeArray();
 
     if ( nWhere >= m_nNumItems )
         return false;
-    CTL_TwainTypeObPtr pOb = pArray->at( nWhere );
+    const CTL_TwainTypeObPtr pOb = pArray->at( nWhere );
     if ( pOb )
     {
         pOb->GetData( pData );

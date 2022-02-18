@@ -83,6 +83,7 @@ bool ValidateARC4();
 
 bool ValidateRC5();
 bool ValidateBlowfish();
+bool ValidateBlowfishCompat();
 bool ValidateThreeWay();
 bool ValidateGOST();
 bool ValidateSHARK();
@@ -116,6 +117,7 @@ bool ValidateSosemanuk();
 bool ValidateVMAC();
 bool ValidateCCM();
 bool ValidateGCM();
+bool ValidateXTS();
 bool ValidateCMAC();
 
 bool ValidateBBS();
@@ -151,7 +153,7 @@ bool ValidateEd25519();
 bool ValidateNaCl();
 
 // If CRYPTOPP_DEBUG or CRYPTOPP_COVERAGE is in effect, then perform additional tests
-#if (defined(CRYPTOPP_DEBUG) || defined(CRYPTOPP_COVERAGE) || defined(CRYPTOPP_VALGRIND)) && !defined(CRYPTOPP_IMPORTS)
+#if (defined(CRYPTOPP_DEBUG) || defined(CRYPTOPP_COVERAGE)) && !defined(CRYPTOPP_IMPORTS)
 # define CRYPTOPP_EXTENDED_VALIDATION 1
 #endif
 
@@ -185,89 +187,98 @@ bool TestAltivecOps();
 class FixedRNG : public RandomNumberGenerator
 {
 public:
-	FixedRNG(BufferedTransformation &source) : m_source(source) {}
+    FixedRNG(BufferedTransformation &source) : m_source(source) {}
 
-	void GenerateBlock(byte *output, size_t size)
-	{
-		m_source.Get(output, size);
-	}
+    void GenerateBlock(byte *output, size_t size)
+    {
+        m_source.Get(output, size);
+    }
 
 private:
-	BufferedTransformation &m_source;
+    BufferedTransformation &m_source;
 };
 
 // Safer functions on Windows for C&A, http://github.com/weidai11/cryptopp/issues/55
 inline std::string TimeToString(const time_t& t)
 {
 #if (CRYPTOPP_MSC_VERSION >= 1400)
-	tm localTime = {};
-	char timeBuf[64];
-	errno_t err;
+    tm localTime;
+    char timeBuf[64];
+    errno_t err;
 
-	err = ::localtime_s(&localTime, &t);
-	CRYPTOPP_ASSERT(err == 0);
-	err = ::asctime_s(timeBuf, sizeof(timeBuf), &localTime);
-	CRYPTOPP_ASSERT(err == 0);
+    err = ::localtime_s(&localTime, &t);
+    CRYPTOPP_ASSERT(err == 0);
+    err = ::asctime_s(timeBuf, sizeof(timeBuf), &localTime);
+    CRYPTOPP_ASSERT(err == 0);
 
-	std::string str(timeBuf);
+    std::string str(err == 0 ? timeBuf : "");
+#elif defined(__MINGW32__) || defined(__MINGW64__)
+    char* timeString = ::asctime(::localtime(&t));
+    std::string str(timeString ? timeString : "");
+#elif (_POSIX_C_SOURCE >= 1 || _XOPEN_SOURCE || _BSD_SOURCE || _SVID_SOURCE || defined(_POSIX_SOURCE))
+    tm localTime;
+    char timeBuf[64];
+    char* timeString = ::asctime_r(::localtime_r(&t, &localTime), timeBuf);
+    std::string str(timeString ? timeString : "");
 #else
-	std::string str(::asctime(::localtime(&t)));
+    char* timeString = ::asctime(::localtime(&t));
+    std::string str(timeString ? timeString : "");
 #endif
 
-	// Cleanup whitespace
-	std::string::size_type pos = 0;
-	while (!str.empty() && std::isspace(str[str.length()-1]))
-		{str.erase(str.end()-1);}
-	while (!str.empty() && std::string::npos != (pos = str.find("  ", pos)))
-		{str.erase(pos, 1);}
+    // Cleanup whitespace
+    std::string::size_type pos = 0;
+    while (!str.empty() && std::isspace(str[str.length()-1]))
+        {str.erase(str.end()-1);}
+    while (!str.empty() && std::string::npos != (pos = str.find("  ", pos)))
+        {str.erase(pos, 1);}
 
-	return str;
+    return str;
 }
 
 // Coverity finding
 template <class T, bool NON_NEGATIVE>
 inline T StringToValue(const std::string& str)
 {
-	std::istringstream iss(str);
+    std::istringstream iss(str);
 
-	// Arbitrary, but we need to clear a Coverity finding TAINTED_SCALAR
-	if (iss.str().length() > 25)
-		throw InvalidArgument(str + "' is too long");
+    // Arbitrary, but we need to clear a Coverity finding TAINTED_SCALAR
+    if (iss.str().length() > 25)
+        throw InvalidArgument(str + "' is too long");
 
-	T value;
-	iss >> std::noskipws >> value;
+    T value;
+    iss >> std::noskipws >> value;
 
-	// Use fail(), not bad()
-	if (iss.fail())
-		throw InvalidArgument(str + "' is not a value");
+    // Use fail(), not bad()
+    if (iss.fail())
+        throw InvalidArgument(str + "' is not a value");
 
-	if (NON_NEGATIVE && value < 0)
-		throw InvalidArgument(str + "' is negative");
+    if (NON_NEGATIVE && value < 0)
+        throw InvalidArgument(str + "' is negative");
 
-	return value;
+    return value;
 }
 
 // Coverity finding
 template<>
 inline int StringToValue<int, true>(const std::string& str)
 {
-	Integer n(str.c_str());
-	long l = n.ConvertToLong();
+    Integer n(str.c_str());
+    long l = n.ConvertToLong();
 
-	int r;
-	if (!SafeConvert(l, r))
-		throw InvalidArgument(str + "' is not an integer value");
+    int r;
+    if (!SafeConvert(l, r))
+        throw InvalidArgument(str + "' is not an integer value");
 
-	return r;
+    return r;
 }
 
 inline std::string AddSeparator(std::string str)
 {
-	if (str.empty()) return "";
-	const char last = str[str.length()-1];
-	if (last != '/' && last != '\\')
-		return str + "/";
-	return str;
+    if (str.empty()) return "";
+    const char last = str[str.length()-1];
+    if (last != '/' && last != '\\')
+        return str + "/";
+    return str;
 }
 
 // Use CRYPTOPP_DATA_DIR last. The problem this sidesteps is, finding an
@@ -279,54 +290,54 @@ inline std::string AddSeparator(std::string str)
 // where the old test data was coming from.
 static std::string GetDataDir()
 {
-	std::ifstream file;
-	std::string name, filename = "TestData/usage.dat";
+    std::ifstream file;
+    std::string name, filename = "TestData/usage.dat";
 
 #ifndef CRYPTOPP_DISABLE_DATA_DIR_SEARCH
-	// Look in $ORIGIN/../share/. This is likely a Linux install directory.
-	name = AddSeparator(g_argvPathHint) + std::string("../share/cryptopp/") + filename;
-	file.open(name.c_str());
-	if (file.is_open())
-		return AddSeparator(g_argvPathHint) + std::string("../share/cryptopp/");
+    // Look in $ORIGIN/../share/. This is likely a Linux install directory.
+    name = AddSeparator(g_argvPathHint) + std::string("../share/cryptopp/") + filename;
+    file.open(name.c_str());
+    if (file.is_open())
+        return AddSeparator(g_argvPathHint) + std::string("../share/cryptopp/");
 #endif
 #ifndef CRYPTOPP_DISABLE_DATA_DIR_SEARCH
-	// Look in current working directory
-	name = AddSeparator(g_argvPathHint) + filename;
-	file.open(name.c_str());
-	if (file.is_open())
-		return AddSeparator(g_argvPathHint);
+    // Look in current working directory
+    name = AddSeparator(g_argvPathHint) + filename;
+    file.open(name.c_str());
+    if (file.is_open())
+        return AddSeparator(g_argvPathHint);
 #endif
 #ifdef CRYPTOPP_DATA_DIR
-	// Honor CRYPTOPP_DATA_DIR. This is likely an install directory if it is not "./".
-	name = AddSeparator(CRYPTOPP_DATA_DIR) + filename;
-	file.open(name.c_str());
-	if (file.is_open())
-		return AddSeparator(CRYPTOPP_DATA_DIR);
+    // Honor CRYPTOPP_DATA_DIR. This is likely an install directory if it is not "./".
+    name = AddSeparator(CRYPTOPP_DATA_DIR) + filename;
+    file.open(name.c_str());
+    if (file.is_open())
+        return AddSeparator(CRYPTOPP_DATA_DIR);
 #endif
-	return "./";
+    return "./";
 }
 
 inline std::string DataDir(const std::string& filename)
 {
-	std::string name;
-	std::ifstream file;
+    std::string name;
+    std::ifstream file;
 
-#if CRYPTOPP_CXX11_DYNAMIC_INIT
-	static std::string path = AddSeparator(GetDataDir());
-	name = path + filename;
-	file.open(name.c_str());
-	if (file.is_open())
-		return name;
+#if CRYPTOPP_CXX11_STATIC_INIT
+    static std::string path = AddSeparator(GetDataDir());
+    name = path + filename;
+    file.open(name.c_str());
+    if (file.is_open())
+        return name;
 #else
-	// Avoid static initialization problems
-	name = AddSeparator(GetDataDir()) + filename;
-	file.open(name.c_str());
-	if (file.is_open())
-		return name;
+    // Avoid static initialization problems
+    name = AddSeparator(GetDataDir()) + filename;
+    file.open(name.c_str());
+    if (file.is_open())
+        return name;
 #endif
 
-	// This will cause the expected exception in the caller
-	return filename;
+    // This will cause the expected exception in the caller
+    return filename;
 }
 
 // Definition in test.cpp
@@ -338,6 +349,7 @@ bool RunTestDataFile(const char *filename, const NameValuePairs &overrideParamet
 // Definitions in validat6.cpp
 bool CryptoSystemValidate(PK_Decryptor &priv, PK_Encryptor &pub, bool thorough = false);
 bool SimpleKeyAgreementValidate(SimpleKeyAgreementDomain &d);
+bool AuthenticatedKeyAgreementWithRolesValidate(AuthenticatedKeyAgreementDomain &initiator, AuthenticatedKeyAgreementDomain &recipient);
 bool AuthenticatedKeyAgreementValidate(AuthenticatedKeyAgreementDomain &d);
 bool SignatureValidate(PK_Signer &priv, PK_Verifier &pub, bool thorough = false);
 
@@ -365,6 +377,10 @@ bool ValidateECP();
 bool ValidateECP_Agreement();
 bool ValidateECP_Encrypt();
 bool ValidateECP_Sign();
+
+bool ValidateECP_Legacy_Encrypt();
+bool ValidateEC2N_Legacy_Encrypt();
+bool ValidateECP_NULLDigest_Encrypt();
 
 bool ValidateEC2N();
 bool ValidateEC2N_Agreement();

@@ -1,37 +1,38 @@
 /*
-    This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+This file is part of the Dynarithmic TWAIN Library (DTWAIN).
+Copyright (c) 2002-2022 Dynarithmic Software.
 
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-        http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
-    FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
-    DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
-    OF THIRD PARTY RIGHTS.
+FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
+DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
+OF THIRD PARTY RIGHTS.
+*/
 
-    For more information, the license file LICENSE.TXT that is located in the root
-    directory of the DTWAIN installation covers the restrictions under the LGPL license.
-    Please read this file before deploying or distributing any application using DTWAIN.
- */
 #ifndef PDFFUN32_H_
 #define PDFFUN32_H_
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #ifndef WINBIT32_H
 #include "winbit32.h"
 #endif
 #include "ctlobstr.h"
+#include "dibinfox.h"
+#include "pdffont_basic.h"
+
 namespace dynarithmic
 {
     typedef void * PdfDocumentPtr;
@@ -63,9 +64,9 @@ namespace dynarithmic
     typedef void  (CALLBACK *PDF_FUNC18)(void *pDoc, LONG Polarity);
     typedef void  (CALLBACK *PDF_FUNC19)(void* pDoc, bool bCompress);
 
-    struct PDFINFO
+    struct PDFINFO : DibMultiPageData
     {
-    //    PdfDocument *pPDFdoc;
+        PDFINFO() : pPDFdoc(nullptr), nCurrentPage(0), IsFileOpened(false), IsPDFStarted(false) {}
         PdfDocumentPtr pPDFdoc;
         int nCurrentPage;
         bool IsFileOpened;
@@ -73,13 +74,12 @@ namespace dynarithmic
 
         // PDF Information
         CTL_StringType sFileName;
-
-        std:: string sAuthor;
-        std:: string sProducer;
-        std:: string sTitle;
-        std:: string sSubject;
-        std:: string sKeywords;
-        std:: string sCreator;
+        CTL_StringType sAuthor;
+        CTL_StringType sProducer;
+        CTL_StringType sTitle;
+        CTL_StringType sSubject;
+        CTL_StringType sKeywords;
+        CTL_StringType sCreator;
 
         CTL_StringArrayType TempFileArray;
         DTWAINImageInfoEx ImageInfoEx;
@@ -91,53 +91,53 @@ namespace dynarithmic
             DTWAINImageInfoEx m_ImageInfoEx;
 
         public:
-            CPDFImageHandler(const CTL_StringType& sFileName, DTWAINImageInfoEx &ImageInfoEx);
+            CPDFImageHandler(CTL_StringType sFileName, DTWAINImageInfoEx ImageInfoEx);
 
-            bool LibraryIsLoaded() const { return s_bLibraryLoaded; }
+            static bool LibraryIsLoaded() { return s_bLibraryLoaded; }
             LONG GetErrorCode() const { return m_nError; }
 
             // Virtual interface
-            virtual CTL_String GetFileExtension() const;
-            virtual HANDLE  GetFileInformation(LPCSTR path) ;
-            virtual int     WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR path, HANDLE bitmap, void *pUserInfo=NULL) override;
-            virtual int     WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, UINT32 wid, UINT32 ht, UINT32 bpp, UINT32 cpal, RGBQUAD *pPal, void *pUserInfo=NULL) override;
+            std::string GetFileExtension() const override;
+            HANDLE  GetFileInformation(LPCSTR path) override;
+            int WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR path, HANDLE bitmap, void *pUserInfo= nullptr) override;
+            int WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, UINT32 wid, UINT32 ht, UINT32 bpp, UINT32 cpal, RGBQUAD *pPal, void *pUserInfo= nullptr) override;
 
-            virtual void SetMultiPageStatus(DibMultiPageStruct *pStruct);
-            virtual void GetMultiPageStatus(DibMultiPageStruct *pStruct);
+            void SetMultiPageStatus(DibMultiPageStruct *pStruct) override;
+            void GetMultiPageStatus(DibMultiPageStruct *pStruct) override;
 
-            void SetAuthor(const std:: string& s) { m_sAuthor = s; }
-            void SetProducer(const std:: string& s) { m_sProducer = s; }
-            void SetTitle(const std:: string& s) { m_sTitle = s; }
-            void SetSubject(const std:: string& s) { m_sSubject = s; }
-            void SetKeywords(const std:: string& s) { m_sKeywords = s; }
-            void SetCreator(const std:: string& s) {m_sCreator = s; }
+            void SetAuthor(const std::string& s) { m_sAuthor = s; }
+            void SetProducer(const std::string& s) { m_sProducer = s; }
+            void SetTitle(const std::string& s) { m_sTitle = s; }
+            void SetSubject(const std::string& s) { m_sSubject = s; }
+            void SetKeywords(const std::string& s) { m_sKeywords = s; }
+            void SetCreator(const std::string& s) {m_sCreator = s; }
             void SetImageType(int nWhich) { m_nImageType = nWhich; }
             int  GetImageType() const { return m_nImageType; }
-            void SetThumbnailFile(const CTL_StringType& s) { m_sThumbnailFile = s; }
+            void SetThumbnailFile(CTL_StringType s) { m_sThumbnailFile = std::move(s); }
             void SetDPI(LONG dpi) { m_dpi = dpi; }
             LONG GetDPI() const { return m_dpi; }
-            void SetSearchableText(const std:: string& s);
-            void AddPDFTextElement(PDFTextElementPtr element) { m_ImageInfoEx.PDFTextElementList.push_back(element); }
+            void SetSearchableText(const std::string& s);
+            void AddPDFTextElement(PDFTextElementPtr element) const;
 
             static void UnloadPDFLibrary() { s_bLibraryLoaded = false; }
 
         protected:
-            bool OpenOutputFile(LPCTSTR pFileName);
-            int  InitializePDFPage(PDFINFO *pPDFInfo, HANDLE bitmap);
-            void RemoveAllImageFiles(PDFINFO *pPDFInfo);
+            bool OpenOutputFile(LPCTSTR pFileName) override;
+            int  InitializePDFPage(PDFINFO *pPDFInfo, HANDLE bitmap) const;
+            static void RemoveAllImageFiles(PDFINFO *pPDFInfo);
             bool LoadPDFLibrary();
 
         private:
 
             CTL_StringType m_sFileName;
-            std:: string m_sAuthor;
-            std:: string m_sProducer;
-            std:: string m_sTitle;
-            std:: string m_sSubject;
-            std:: string m_sKeywords;
-            CTL_StringType  m_sThumbnailFile;
-            std:: string m_sCreator;
-            std:: string m_sSearchableText;
+            std::string m_sAuthor;
+            std::string m_sProducer;
+            std::string m_sTitle;
+            std::string m_sSubject;
+            std::string m_sKeywords;
+            CTL_StringType m_sThumbnailFile;
+            std::string m_sCreator;
+            std::string m_sSearchableText;
 
             int m_nImageType;
             LONG m_nError;
@@ -169,8 +169,8 @@ namespace dynarithmic
     class CPSImageHandler : public CPDFImageHandler
     {
         public:
-              CPSImageHandler(const CTL_StringType& sFileName, DTWAINImageInfoEx &ImageInfoEx) :
-              CPDFImageHandler(sFileName, ImageInfoEx) { }
+              CPSImageHandler(CTL_StringType sFileName, const DTWAINImageInfoEx &ImageInfoEx) :
+              CPDFImageHandler(std::move(sFileName), ImageInfoEx) { }
 
     };
 }

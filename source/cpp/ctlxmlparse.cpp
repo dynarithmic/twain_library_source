@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -20,11 +20,9 @@
  */
 #include <string>
 #include <iterator>
-#include <fstream>
 #include <algorithm>
 #include "ctliface.h"
 
-using namespace std;
 using namespace dynarithmic;
 
 template <typename Obj, typename Container>
@@ -45,7 +43,7 @@ struct OneLineData
 
 typedef std::vector<OneLineData> OneLineDataVector;
 
-istream& operator >> (istream& theStream, OneLineData& theData)
+std::istream& operator >> (std::istream& theStream, OneLineData& theData)
 {
     theStream >> theData.errnum >> theData.errcode;
 
@@ -54,7 +52,7 @@ istream& operator >> (istream& theStream, OneLineData& theData)
 
    // set the error string
    StringWrapperA::TrimAll(theData.errstring);
-   CTL_TwainDLLHandle::s_ErrorCodes[theData.errnum] = StringConversion::Convert_Ansi_To_Native(theData.errstring);
+   CTL_TwainDLLHandle::s_ErrorCodes[theData.errnum] = theData.errstring;
 
    // return the input stream
    return theStream;
@@ -62,8 +60,8 @@ istream& operator >> (istream& theStream, OneLineData& theData)
 
 bool dynarithmic::LoadLanguageResourceXMLImpl(LPCTSTR szFile)
 {
-    CTL_String str = StringConversion::Convert_Native_To_Ansi(szFile);
-    ifstream xmlFile(str.c_str()); //szFile);
+    const std::string str = StringConversion::Convert_Native_To_Ansi(szFile);
+    std::ifstream xmlFile(str.c_str()); //szFile);
     ReadData<OneLineData, OneLineDataVector>(xmlFile);
     return true;
 }

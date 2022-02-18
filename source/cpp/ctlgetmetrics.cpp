@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,15 +18,13 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include "cppfunc.h"
 #include "ctltwmgr.h"
 #include "enumeratorfuncs.h"
-#include "errorcheck.h"
 #include "ctltr041.h"
-#include <boost/format.hpp>
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
-using namespace std;
 using namespace dynarithmic;
 
 static bool GetMetrics(DTWAIN_SOURCE Source, LPLONG ImageCount, LPLONG SheetCount);
@@ -35,31 +33,32 @@ static bool GetMetrics(DTWAIN_SOURCE Source, LPLONG ImageCount, LPLONG SheetCoun
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireMetrics(DTWAIN_SOURCE Source, LPLONG ImageCount, LPLONG SheetCount)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, ImageCount, SheetCount))
-    DTWAIN_BOOL bRet = GetMetrics(Source, ImageCount, SheetCount)?TRUE:FALSE;
+    const DTWAIN_BOOL bRet = GetMetrics(Source, ImageCount, SheetCount)?TRUE:FALSE;
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
 
 static bool GetMetrics(DTWAIN_SOURCE Source, LPLONG ImageCount, LPLONG SheetCount)
 {
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     if (p)
     {
         CTL_DSMMetricsTriplet triplet(p->GetTwainSession(), p);
-        TW_UINT16 rc = triplet.Execute();
+        const TW_UINT16 rc = triplet.Execute();
         switch (rc)
         {
             case TWRC_SUCCESS:
             {
                 const TW_METRICS& metrics = triplet.getMetrics();
                 if (ImageCount)
-                    *ImageCount = metrics.ImageCount;
+                    *ImageCount = static_cast<LONG>(metrics.ImageCount);
                 if (SheetCount)
-                    *SheetCount = metrics.SheetCount;
+                    *SheetCount = static_cast<LONG>(metrics.SheetCount);
                 return true;
             }
-            break;
+            default:
+            {}
         }
         CTL_TwainAppMgr::ProcessReturnCodeOneValue(p, rc);
     }

@@ -1,6 +1,6 @@
 /*
 This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-Copyright (c) 2002-2021 Dynarithmic Software.
+Copyright (c) 2002-2022 Dynarithmic Software.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,16 +25,16 @@ static UINT_PTR APIENTRY FileSaveAsHookProc(HWND hWnd, UINT msg, WPARAM /*w*/, L
     case WM_INITDIALOG:
     {
         // Get the parameters
-        HWND ThisWnd = GetParent(hWnd);
-        OPENFILENAME *pofs = reinterpret_cast<OPENFILENAME *>(lParam);
+        const HWND ThisWnd = GetParent(hWnd);
+        const OPENFILENAME *pofs = reinterpret_cast<OPENFILENAME *>(lParam);
         CustomPlacement *pCS = reinterpret_cast<CustomPlacement *>(pofs->lCustData);
         if (pCS->nOptions & DTWAIN_DLG_CENTER_SCREEN)
-            CenterWindow(ThisWnd, NULL);
+            CenterWindow(ThisWnd, nullptr);
         else
             if (pCS->nOptions & DTWAIN_DLG_CENTER)
                 CenterWindow(ThisWnd, pCS->hWndParent);
             else
-                SetWindowPos(ThisWnd, NULL, pCS->xpos, pCS->ypos, 0, 0, SWP_NOSIZE);
+                SetWindowPos(ThisWnd, nullptr, pCS->xpos, pCS->ypos, 0, 0, SWP_NOSIZE);
     }
     break;
     }
@@ -44,23 +44,20 @@ static UINT_PTR APIENTRY FileSaveAsHookProc(HWND hWnd, UINT msg, WPARAM /*w*/, L
 bool dynarithmic::CenterWindow(HWND hwnd, HWND hwndParent)
 {
     RECT rect, rectP;
-    int width, height;
-    int screenwidth, screenheight;
-    int x, y;
 
     if (!hwndParent)
         hwndParent = GetDesktopWindow();
     GetWindowRect(hwnd, &rect);
     GetWindowRect(hwndParent, &rectP);
 
-    width = rect.right - rect.left;
-    height = rect.bottom - rect.top;
+    int width = rect.right - rect.left;
+    int height = rect.bottom - rect.top;
 
-    x = ((rectP.right - rectP.left) - width) / 2 + rectP.left;
-    y = ((rectP.bottom - rectP.top) - height) / 2 + rectP.top;
+    int x = ((rectP.right - rectP.left) - width) / 2 + rectP.left;
+    int y = ((rectP.bottom - rectP.top) - height) / 2 + rectP.top;
 
-    screenwidth = GetSystemMetrics(SM_CXSCREEN);
-    screenheight = GetSystemMetrics(SM_CYSCREEN);
+    int screenwidth = GetSystemMetrics(SM_CXSCREEN);
+    int screenheight = GetSystemMetrics(SM_CYSCREEN);
 
     //make sure that the dialog box never moves outside of
     //the screen
@@ -78,9 +75,9 @@ bool dynarithmic::CenterWindow(HWND hwnd, HWND hwndParent)
 ////////// Function to subclass the window ////////////////////////
 WNDPROC SubclassTwainMsgWindow(HWND hWnd, WNDPROC wProcIn /*=NULL*/)
 {
-    WNDPROC wProc = NULL;
-    WNDPROC wProcToUse = NULL;
-    if (wProcIn == NULL)
+    WNDPROC wProc = nullptr;
+    WNDPROC wProcToUse = nullptr;
+    if (wProcIn == nullptr)
         wProcToUse = static_cast<WNDPROC>(DTWAIN_WindowProc);
     else
         wProcToUse = wProcIn;
@@ -104,7 +101,7 @@ static HWND CreateTwainWindow(CTL_TwainDLLHandle * /*pHandle*/,
     HINSTANCE hInstance/*=NULL*/,
     HWND hWndParent)
 {
-    if (hInstance == NULL)
+    if (hInstance == nullptr)
         hInstance = CTL_TwainDLLHandle::s_DLLInstance;
     HWND hWndP;
     if (!hWndParent)
@@ -115,7 +112,7 @@ static HWND CreateTwainWindow(CTL_TwainDLLHandle * /*pHandle*/,
     RECT rect;
 
     GetWindowRect(hWndP, &rect);
-    HWND hwnd = CreateWindow(_T("DTWAINWindowClass"),              // class
+    const HWND hwnd = CreateWindow(_T("DTWAINWindowClass"),              // class
         _T("Twain Window"),                 // title
         WS_OVERLAPPED,    // style
         0, 0,   // x, y
@@ -130,7 +127,7 @@ static HWND CreateTwainWindow(CTL_TwainDLLHandle * /*pHandle*/,
 void dynarithmic::DTWAIN_InvokeCallback(int nWhich, DTWAIN_HANDLE p, DTWAIN_SOURCE pSource, WPARAM lData1, LPARAM lData2)
 {
     DTWAIN_CALLBACK cProc;
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(p);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(p);
     switch (nWhich)
     {
     case DTWAIN_CallbackMESSAGE:
@@ -163,17 +160,17 @@ void RegisterTwainWindowClass()
     wndclass.cbClsExtra = 0;
     wndclass.cbWndExtra = 0;
     wndclass.hInstance = CTL_TwainDLLHandle::s_DLLInstance;
-    wndclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-    wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wndclass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
-    wndclass.lpszMenuName = NULL;
+    wndclass.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
+    wndclass.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    wndclass.hbrBackground = static_cast<HBRUSH>(GetStockObject(WHITE_BRUSH));
+    wndclass.lpszMenuName = nullptr;
     wndclass.lpszClassName = _T("DTWAINWindowClass");
     RegisterClass(&wndclass);
 }
 
 void UnregisterTwainWindowClass()
 {
-    UnregisterClass(_T("DTWAINWindowClass"), (HINSTANCE)CTL_TwainDLLHandle::s_DLLInstance);
+    UnregisterClass(_T("DTWAINWindowClass"), static_cast<HINSTANCE>(CTL_TwainDLLHandle::s_DLLInstance));
 }
 
 #ifndef DTWAIN_LIB
@@ -184,7 +181,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID /*plvReserved*/)
     case DLL_PROCESS_ATTACH:
     case DLL_THREAD_ATTACH:
     {
-        LPCTSTR szININame = _T("dtwain32.ini");
+        const LPCTSTR szININame = _T("dtwain32.ini");
         CTL_TwainDLLHandle::s_bCheckReentrancy = GetPrivateProfileInt(_T("Settings"), _T("HookReentrancyCheck"), 0, szININame) ? true : false;
         if (fdwReason == DLL_PROCESS_ATTACH)
         {
@@ -213,52 +210,68 @@ BOOL WINAPI DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID /*plvReserved*/)
 
 void dynarithmic::LogWin32Error(DWORD lastError)
 {
-    LPVOID lpMsgBuf;
+    LPSTR lpMsgBuf = nullptr;
 
-    FormatMessage(
+    ::FormatMessageA(
         FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-        NULL,
+        nullptr,
         lastError,
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-        (LPTSTR)&lpMsgBuf,
+        (LPSTR)&lpMsgBuf,
         0,
-        NULL
-        );
+        nullptr
+    );
 
     // Display the string.
-    CTL_StringType sError = (LPCTSTR)lpMsgBuf;
-    StringWrapper::TrimRight(sError, _T(" \n"));
-    CTL_StringStreamType strm;
-#ifdef UNICODE
-    strm << boost::wformat(_T("Win32 Error: %1% (%2%)")) % lastError % sError;
-#else
-    strm << boost::format(_T("Win32 Error: %1% (%2%)")) % lastError % sError;
-#endif
-    CTL_TwainAppMgr::WriteLogInfo(strm.str());
+    std::string sError = lpMsgBuf;
+    StringWrapperA::TrimRight(sError, " \n");
+    StringStreamA strm;
+    strm << boost::format("Win32 Error: %1% (%2%)") % lastError % sError;
+    CTL_TwainAppMgr::WriteLogInfoA(strm.str());
 
     // Free the buffer.
     LocalFree(lpMsgBuf);
 }
 
-void LogDTWAINErrorToMsgBox(int nError, LPCTSTR func, const CTL_StringType& s)
+void LogDTWAINErrorToMsgBox(int nError, LPCSTR func, const std::string& s)
 {
-    CTL_StringStreamType strm;
-    CTL_StringType funcstr;
+    StringStreamA strm;
     if (func)
-        funcstr = func;
+        std::string funcstr = func;
     else
-        func = _T("(Uninitialized DTWAIN DLL)");
-    strm << _T("DTWAIN Function ") << func << _T(" returned error code ") << nError << endl << endl;
+        func = "(Uninitialized DTWAIN DLL)";
+    strm << "DTWAIN Function " << func << " returned error code " << nError << std::endl << std::endl;
     strm << s.c_str();
-    CTL_StringType st = strm.str();
-    MessageBox(NULL, st.c_str(), _T("DTWAIN Error"), MB_ICONSTOP);
+    const std::string st = strm.str();
+    MessageBoxA(nullptr, st.c_str(), "DTWAIN Error", MB_ICONSTOP);
+}
+
+void dynarithmic::LogToDebugMonitorA(std::string sMsg)
+{
+    if (sMsg.back() != '\n')
+        sMsg.push_back('\n');
+    ::OutputDebugStringA(sMsg.c_str());
+}
+
+void dynarithmic::LogToDebugMonitorW(std::wstring sMsg)
+{
+    if (sMsg.back() != L'\n')
+        sMsg.push_back(L'\n');
+    ::OutputDebugStringW(sMsg.c_str());
+}
+
+void dynarithmic::LogToDebugMonitor(CTL_StringType sMsg)
+{
+    if (sMsg.back() != StringWrapper::traits_type::GetNewLineChar())
+        sMsg.push_back(StringWrapper::traits_type::GetNewLineChar());
+    ::OutputDebugString(sMsg.c_str());
 }
 
 DTWAIN_BOOL dynarithmic::DTWAIN_SetCallbackProc(DTWAIN_CALLBACK fnCall, LONG nWhich)
 {
     LOG_FUNC_ENTRY_PARAMS((fnCall, nWhich))
         // See if DLL Handle exists
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     switch (nWhich)
     {
@@ -277,7 +290,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_SetCallbackProc(DTWAIN_CALLBACK fnCall, LONG nWh
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileSavePos(HWND hWndParent, LPCTSTR szTitle, LONG xPos, LONG yPos, LONG nFlags)
 {
     LOG_FUNC_ENTRY_PARAMS((hWndParent, szTitle, xPos, yPos, nFlags))
-        CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+        const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     if (nFlags & DTWAIN_DLG_CLEAR_PARAMS)
@@ -291,23 +304,22 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileSavePos(HWND hWndParent, LPCTSTR szTitle,
         if (szTitle)
             pHandle->m_CustomPlacement.sTitle = szTitle;
         else
-            pHandle->m_CustomPlacement.sTitle = _T("");
+            pHandle->m_CustomPlacement.sTitle.clear();
     }
     LOG_FUNC_EXIT_PARAMS(true)
-        CATCH_BLOCK(false)
+    CATCH_BLOCK(false)
 }
 
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomFileSave(OPENFILENAME* lpOpenFileName)
 {
     LOG_FUNC_ENTRY_PARAMS((lpOpenFileName))
-        CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+        const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 	pHandle->m_pofn = std::make_unique<OPENFILENAME>();
 	memcpy(pHandle->m_pofn.get(), lpOpenFileName, sizeof(OPENFILENAME));
     LOG_FUNC_EXIT_PARAMS(true)
-        CATCH_BLOCK(false)
+    CATCH_BLOCK(false)
 }
-
 

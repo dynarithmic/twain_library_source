@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,6 +21,6 @@
 #include "ctltr003.h"
 using namespace dynarithmic;
 CTL_GetNextSourceTriplet::CTL_GetNextSourceTriplet(CTL_ITwainSession *pSession)
-                         : CTL_SourceTriplet( pSession, (LPCTSTR)NULL, MSG_GETNEXT )
+                         : CTL_SourceTriplet( pSession, static_cast<LPCTSTR>(nullptr), MSG_GETNEXT )
 {
 }

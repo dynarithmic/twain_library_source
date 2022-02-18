@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -30,22 +30,27 @@ namespace dynarithmic
     {
         public:
             // Only MSG_GET is supported
-            CTL_ExtImageInfoTriplet() : m_pExtImageInfo(NULL), m_memHandle{}, m_nNumInfo{} { }
+            CTL_ExtImageInfoTriplet() : m_pExtImageInfo(nullptr), m_memHandle{}, m_nNumInfo{} { }
             CTL_ExtImageInfoTriplet(CTL_ITwainSession *pSession,
                                    CTL_ITwainSource* pSource,
                                    int nInfo);
+            CTL_ExtImageInfoTriplet(const CTL_ExtImageInfoTriplet&) = delete;
+            CTL_ExtImageInfoTriplet& operator =(const CTL_ExtImageInfoTriplet&) = delete;
+            CTL_ExtImageInfoTriplet(CTL_ExtImageInfoTriplet&& rhs) noexcept;
+            CTL_ExtImageInfoTriplet& operator = (CTL_ExtImageInfoTriplet&& rhs) = delete;
 
-            void InitInfo(CTL_ITwainSession *pSession,
-                          CTL_ITwainSource* pSource,
-                          int nInfo);
+            static void swap(CTL_ExtImageInfoTriplet& left, const CTL_ExtImageInfoTriplet& right) noexcept;
 
-            TW_UINT16   Execute();
+            void InitInfo(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource, int nInfo);
+            void DestroyInfo();
+
+            TW_UINT16 Execute() override;
 
             // Get the number of information structures
             size_t GetNumInfo() const { return m_nNumInfo; }
 
             // Get the TW_INFO information
-            TW_INFO GetInfo(size_t nWhich, int nSearch);
+            TW_INFO GetInfo(size_t nWhich, int nSearch) const;
 
             // Set the information for item nWhich
             bool SetInfo(const TW_INFO& Info, size_t nWhich);
@@ -53,23 +58,17 @@ namespace dynarithmic
             bool AddInfo(const TW_INFO& Info);
 
             // Utility functions
-            bool GetItemData(int nWhichItem, int nSearch, int nWhichValue, LPVOID Data, size_t *pItemSize=NULL);
+            bool GetItemData(int nWhichItem, int nSearch, int nWhichValue, LPVOID Data, size_t *pItemSize= nullptr) const;
 
-
-            TW_UINT16 GetInfoID(int nWhich);
-            TW_UINT16 GetItemType(int nWhich);
-            TW_UINT16 GetNumItems(int nWhich);
-            TW_UINT16 GetCondCode(int nWhich);
-            TW_UINT32 GetItem(int nWhich);
             bool IsItemHandle(size_t nWhich) const;
 
-            ~CTL_ExtImageInfoTriplet();
+            ~CTL_ExtImageInfoTriplet() override;
 
             static bool EnumSupported(CTL_ITwainSource *pSource,
                                       CTL_ITwainSession *pSession,
                                       CTL_IntArray &rArray);
 
-            bool RetrieveInfo(TWINFOVector &v);
+            bool RetrieveInfo(TWINFOVector &v) const;
 
         private:
             void ResolveTypes();

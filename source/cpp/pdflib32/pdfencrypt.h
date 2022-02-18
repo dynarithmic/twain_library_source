@@ -1,6 +1,6 @@
 /*
 This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-Copyright (c) 2002-2021 Dynarithmic Software.
+Copyright (c) 2002-2022 Dynarithmic Software.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@ OF THIRD PARTY RIGHTS.
 #define PDFENCRYPT_H
 #include <vector>
 #include <string>
-#include <md5class.h>
-#include <MD5Checksum.h>
 //#include "..\cryptolib\md5.h"
 //#include "..\cryptolib\aes.h"
 
@@ -62,9 +60,9 @@ class PDFEncryption
 
         int permissions;
 
-        std:: string m_documentID;
+        std::string m_documentID;
 
-        UCHARArray PadPassword(const UCHARArray& passw);
+        UCHARArray PadPassword(const UCHARArray& passw) const;
         void SetupByUserPad(const std::string& documentID,
                             const UCHARArray& userPad,
                             const UCHARArray& ownerKey,
@@ -91,17 +89,17 @@ class PDFEncryption
                                    const UCHARArray& ownerPad,
                                    bool strength128Bits);
 
-        void SetupAllKeys(const std:: string& DocID,
-                          const std:: string& userPassword,
-                          const std:: string& ownerPassword, int permissions,
+        void SetupAllKeys(const std::string& DocID,
+                          const std::string& userPassword,
+                          const std::string& ownerPassword, int permissions,
                           bool strength128Bits);
 
-        void SetupAllKeys(const std:: string& DocID,
-                          UCHARArray& userPassword, UCHARArray& ownerPassword,
+        void SetupAllKeys(const std::string& DocID,
+                          const UCHARArray& userPassword, UCHARArray& ownerPassword,
                           int permissions, bool strength128Bits);
         virtual void PrepareKey() = 0;
         void SetHashKey(int number, int generation);
-        std:: string CreateEncryptionDictionary();
+        std::string CreateEncryptionDictionary();
         virtual void Encrypt(const std::string& /*dataIn*/, std::string& /*dataOut*/) {}
         virtual void Encrypt(char * /*dataIn*/, int/* len*/) {}
 

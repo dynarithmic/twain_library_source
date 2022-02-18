@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -37,9 +37,9 @@ namespace dynarithmic
                                            const std::vector<T>& rArray);
 
         protected:
-            TW_UINT16   GetContainerTypeSize();
-            size_t      GetAggregateSize();
-            TW_UINT16   GetContainerType();
+            TW_UINT16   GetContainerTypeSize() override;
+            size_t      GetAggregateSize() override;
+            TW_UINT16   GetContainerType() override;
             bool        Encode(const std::vector<T>& rArray, void *pMemBlock) override;
     };
 

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,20 +18,20 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include "cppfunc.h"
 #include "ctltwmgr.h"
 #include "enumeratorfuncs.h"
 #include "errorcheck.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
-using namespace std;
 using namespace dynarithmic;
 
 #define CREATE_SETLOGGER_CALLBACK(loggerproc) \
     DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetLoggerCallback##loggerproc(DTWAIN_LOGGER_PROC##loggerproc logProc, DTWAIN_LONG64 UserData) \
     { \
       LOG_FUNC_ENTRY_PARAMS((logProc)) \
-      CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal()); \
+      const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal()); \
       DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO); \
       pHandle->s_pLoggerCallback##loggerproc = logProc; \
       pHandle->s_pLoggerCallback_UserData##loggerproc = UserData; \
@@ -43,7 +43,7 @@ using namespace dynarithmic;
 DTWAIN_LOGGER_PROC##loggerproc DLLENTRY_DEF DTWAIN_GetLoggerCallback##loggerproc(VOID_PROTOTYPE) \
 { \
     LOG_FUNC_ENTRY_PARAMS(()) \
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal()); \
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal()); \
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO); \
     DTWAIN_LOGGER_PROC##loggerproc theProc = pHandle->s_pLoggerCallback##loggerproc; \
     LOG_FUNC_EXIT_PARAMS(theProc) \
@@ -53,23 +53,21 @@ DTWAIN_LOGGER_PROC##loggerproc DLLENTRY_DEF DTWAIN_GetLoggerCallback##loggerproc
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetLoggerCallback(DTWAIN_LOGGER_PROC logProc, DTWAIN_LONG64 UserData)
 {
     LOG_FUNC_ENTRY_PARAMS((logProc))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 
-    pHandle->s_pLoggerCallback = logProc;
-    pHandle->s_pLoggerCallback_UserData = UserData;
+    dynarithmic::CTL_TwainDLLHandle::s_pLoggerCallback = logProc;
+    dynarithmic::CTL_TwainDLLHandle::s_pLoggerCallback_UserData = UserData;
     LOG_FUNC_EXIT_PARAMS(true)
-    CATCH_BLOCK(false);
+    CATCH_BLOCK(false)
 }
 
 DTWAIN_LOGGER_PROC DLLENTRY_DEF DTWAIN_GetLoggerCallback(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-
-    DTWAIN_LOGGER_PROC theProc = pHandle->s_pLoggerCallback;
-    LOG_FUNC_EXIT_PARAMS(theProc)
+    LOG_FUNC_EXIT_PARAMS(dynarithmic::CTL_TwainDLLHandle::s_pLoggerCallback)
     CATCH_BLOCK(DTWAIN_LOGGER_PROC(0))
 }
 

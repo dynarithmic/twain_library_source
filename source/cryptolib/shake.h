@@ -66,8 +66,8 @@ template<unsigned int T_Strength>
 class SHAKE_Final : public SHAKE
 {
 public:
-    CRYPTOPP_CONSTANT(DIGESTSIZE = (T_Strength == 128 ? 32 : 64))
-    CRYPTOPP_CONSTANT(BLOCKSIZE = (T_Strength == 128 ? 1344/8 : 1088/8))
+    CRYPTOPP_CONSTANT(DIGESTSIZE = (T_Strength == 128 ? 32 : 64));
+    CRYPTOPP_CONSTANT(BLOCKSIZE = (T_Strength == 128 ? 1344/8 : 1088/8));
     static std::string StaticAlgorithmName()
         { return "SHAKE-" + IntToString(T_Strength); }
 
@@ -93,8 +93,6 @@ private:
 #if !defined(__BORLANDC__)
     // ensure there was no underflow in the math
     CRYPTOPP_COMPILE_ASSERT(BLOCKSIZE < 200);
-    // this is a general expectation by HMAC
-    CRYPTOPP_COMPILE_ASSERT((int)BLOCKSIZE > (int)DIGESTSIZE);
 #endif
 };
 
@@ -125,7 +123,7 @@ public:
     ///   requires the output size in advance because the algoirthm uses
     ///   output size as a parameter to the hash function.
     /// \since Crypto++ 8.1
-    SHAKE128(unsigned int outputSize) : SHAKE_Final(outputSize) {}
+    SHAKE128(unsigned int outputSize) : SHAKE_Final<128>(outputSize) {}
 };
 
 /// \brief SHAKE256 message digest
@@ -155,7 +153,7 @@ public:
     ///   requires the output size in advance because the algoirthm uses
     ///   output size as a parameter to the hash function.
     /// \since Crypto++ 8.1
-    SHAKE256(unsigned int outputSize) : SHAKE_Final(outputSize) {}
+    SHAKE256(unsigned int outputSize) : SHAKE_Final<256>(outputSize) {}
 };
 
 NAMESPACE_END

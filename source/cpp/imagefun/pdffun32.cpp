@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,55 +22,54 @@
 #pragma warning (disable:4786)
 #endif
 #include "pdffun32.h"
-#include <limits.h>
 #undef min
 #undef max
-#include <sstream>
-#include <sstream>
 #include <string>
 #include <cmath>
+#include <pdfconst.h>
+#include <utility>
+#include <memory>
 #include <pdflib32.h>
 #include "ctliface.h"
 #include "ctltwmgr.h"
 #include "ctlfileutils.h"
+#include "dtwain_float_utils.h"
 
-#define FLOAT_DELTA  (+1.0e-8)
-#define FLOAT_CLOSE(x,y) (fabs((x) - (y)) <= FLOAT_DELTA)
-
-using namespace std;
 using namespace dynarithmic;
 
 bool CPDFImageHandler::s_bLibraryLoaded=false;
-PDF_FUNC1  CPDFImageHandler::m_pPDFGetNewDocument  =NULL;
-PDF_FUNC2  CPDFImageHandler::m_pPDFOpenNewFile     =NULL;
-PDF_FUNC3  CPDFImageHandler::m_pPDFSetCompression  =NULL;
-PDF_FUNC4  CPDFImageHandler::m_pPDFSetNameField    =NULL;
-PDF_FUNC5  CPDFImageHandler::m_pPDFStartCreation   =NULL;
-PDF_FUNC6  CPDFImageHandler::m_pPDFEndCreation     =NULL;
-PDF_FUNC7  CPDFImageHandler::m_pPDFSetImageType    =NULL;
-PDF_FUNC8  CPDFImageHandler::m_pPDFSetLongField    =NULL;
-PDF_FUNC9  CPDFImageHandler::m_pPDFWritePage       =NULL;
-PDF_FUNC10 CPDFImageHandler::m_pPDFSetScaling      =NULL;
-PDF_FUNC11 CPDFImageHandler::m_pPDFReleaseDocument =NULL;
-PDF_FUNC12 CPDFImageHandler::m_pPDFSetThumbnailFile=NULL;
-PDF_FUNC13 CPDFImageHandler::m_pPDFSetDPI          =NULL;
-PDF_FUNC14 CPDFImageHandler::m_pPDFSetEncryption   =NULL;
-PDF_FUNC15 CPDFImageHandler::m_pPDFSetASCIICompression   =NULL;
-PDF_FUNC16 CPDFImageHandler::m_pPDFSetSearchableText = NULL;
-PDF_FUNC17 CPDFImageHandler::m_pPDFAddPageText = NULL;
-PDF_FUNC18 CPDFImageHandler::m_pPDFSetPolarity = NULL;
-PDF_FUNC19 CPDFImageHandler::m_pPDFSetNoCompression = NULL;
+PDF_FUNC1  CPDFImageHandler::m_pPDFGetNewDocument  = nullptr;
+PDF_FUNC2  CPDFImageHandler::m_pPDFOpenNewFile     = nullptr;
+PDF_FUNC3  CPDFImageHandler::m_pPDFSetCompression  = nullptr;
+PDF_FUNC4  CPDFImageHandler::m_pPDFSetNameField    = nullptr;
+PDF_FUNC5  CPDFImageHandler::m_pPDFStartCreation   = nullptr;
+PDF_FUNC6  CPDFImageHandler::m_pPDFEndCreation     = nullptr;
+PDF_FUNC7  CPDFImageHandler::m_pPDFSetImageType    = nullptr;
+PDF_FUNC8  CPDFImageHandler::m_pPDFSetLongField    = nullptr;
+PDF_FUNC9  CPDFImageHandler::m_pPDFWritePage       = nullptr;
+PDF_FUNC10 CPDFImageHandler::m_pPDFSetScaling      = nullptr;
+PDF_FUNC11 CPDFImageHandler::m_pPDFReleaseDocument = nullptr;
+PDF_FUNC12 CPDFImageHandler::m_pPDFSetThumbnailFile= nullptr;
+PDF_FUNC13 CPDFImageHandler::m_pPDFSetDPI          = nullptr;
+PDF_FUNC14 CPDFImageHandler::m_pPDFSetEncryption   = nullptr;
+PDF_FUNC15 CPDFImageHandler::m_pPDFSetASCIICompression   = nullptr;
+PDF_FUNC16 CPDFImageHandler::m_pPDFSetSearchableText = nullptr;
+PDF_FUNC17 CPDFImageHandler::m_pPDFAddPageText = nullptr;
+PDF_FUNC18 CPDFImageHandler::m_pPDFSetPolarity = nullptr;
+PDF_FUNC19 CPDFImageHandler::m_pPDFSetNoCompression = nullptr;
 
-CPDFImageHandler::CPDFImageHandler(const CTL_StringType& sFileName, DTWAINImageInfoEx &ImageInfoEx) :
-        CDibInterface(), m_ImageInfoEx(ImageInfoEx),
-        m_sFileName(sFileName),
+CPDFImageHandler::CPDFImageHandler(CTL_StringType sFileName, DTWAINImageInfoEx ImageInfoEx) :
+        CDibInterface(), m_ImageInfoEx(std::move(ImageInfoEx)),
+        m_sFileName(std::move(sFileName)),
         m_sAuthor("(None)"),
         m_sProducer("(None)"),
         m_sTitle("(None)"),
         m_sSubject("(None)"),
         m_sKeywords("(None)"),
         m_sCreator("(None)"),
-        m_nImageType(0)
+        m_nImageType(0),
+        m_nError{},
+        m_dpi(72)
 {
     LoadPDFLibrary();
 }
@@ -104,14 +103,14 @@ bool CPDFImageHandler::LoadPDFLibrary()
 
 
 
-CTL_String CPDFImageHandler::GetFileExtension() const
+std::string CPDFImageHandler::GetFileExtension() const
 {
     return "PDF";
 }
 
 HANDLE CPDFImageHandler::GetFileInformation(LPCSTR /*path*/)
 {
-    return NULL;
+    return nullptr;
 }
 
 bool CPDFImageHandler::OpenOutputFile(LPCTSTR /*pFileName*/)
@@ -133,19 +132,17 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
         return m_nError;
     }
 
-    PDFINFO *pPDFInfo = NULL;
-    PdfDocumentPtr pDocument;
+    std::shared_ptr<PDFINFO> pPDFInfo;
 
 
-    if ( m_MultiPageStruct.Stage == DIB_MULTI_FIRST ||
-         m_MultiPageStruct.Stage == 0 )
+    if ( m_MultiPageStruct.Stage == DIB_MULTI_FIRST || m_MultiPageStruct.Stage == 0 )
     {
-        pPDFInfo = new PDFINFO;
+        pPDFInfo = std::make_shared<PDFINFO>();
         pPDFInfo->ImageInfoEx = m_ImageInfoEx;
         m_MultiPageStruct.pUserData = pPDFInfo;
 
         // Open the file, return if there is an error
-        pDocument = m_pPDFGetNewDocument();
+        const PdfDocumentPtr pDocument = m_pPDFGetNewDocument();
 
         if ( !pDocument || !m_pPDFOpenNewFile(pDocument, m_sFileName.c_str()) )
         {
@@ -153,7 +150,7 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
             pPDFInfo->IsPDFStarted = false;
             if ( pDocument )
                 m_pPDFReleaseDocument(pDocument);
-            pPDFInfo->pPDFdoc = NULL;
+            pPDFInfo->pPDFdoc = nullptr;
             return DTWAIN_ERR_FILEWRITE;
         }
 
@@ -211,47 +208,41 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
     else
     if ( m_MultiPageStruct.Stage == DIB_MULTI_LAST )
     {
-        pPDFInfo = (PDFINFO *)m_MultiPageStruct.pUserData;
-        if ( 1 ) //pPDFInfo->IsFileOpened && pPDFInfo->IsPDFStarted )
+        pPDFInfo = std::dynamic_pointer_cast<PDFINFO>(m_MultiPageStruct.pUserData);
+        try
         {
-            try
+            if ( pPDFInfo->IsPDFStarted )
+                m_pPDFEndCreation(pPDFInfo->pPDFdoc);
+            if ( pPDFInfo->pPDFdoc )
             {
-                if ( pPDFInfo->IsPDFStarted )
-                    m_pPDFEndCreation(pPDFInfo->pPDFdoc);
-                if ( pPDFInfo->pPDFdoc )
-                {
-                    m_pPDFReleaseDocument(pPDFInfo->pPDFdoc);
-                    pPDFInfo->pPDFdoc = NULL;
-                }
+                m_pPDFReleaseDocument(pPDFInfo->pPDFdoc);
+                pPDFInfo->pPDFdoc = nullptr;
+            }
 
-                retval = 0;
-                if ( !pPDFInfo->IsPDFStarted ||
-                     !pPDFInfo->IsFileOpened )
-                     retval = DTWAIN_ERR_FILEWRITE;
-                delete pPDFInfo;
-                pPDFInfo = NULL;
-                return retval;
-            }
-            catch(...)
+            retval = 0;
+            if ( !pPDFInfo->IsPDFStarted ||
+                 !pPDFInfo->IsFileOpened )
+                 retval = DTWAIN_ERR_FILEWRITE;
+            return retval;
+        }
+        catch(...)
+        {
+            if ( pPDFInfo->IsPDFStarted )
+                m_pPDFEndCreation(pPDFInfo->pPDFdoc);
+            if ( pPDFInfo->pPDFdoc )
             {
-                if ( pPDFInfo->IsPDFStarted )
-                    m_pPDFEndCreation(pPDFInfo->pPDFdoc);
-                if ( pPDFInfo->pPDFdoc )
-                {
-                    m_pPDFReleaseDocument(pPDFInfo->pPDFdoc);
-                    pPDFInfo->pPDFdoc = NULL;
-                }
-                // Delete the PDF file.  Something went wrong.
-                if ( pPDFInfo )
-                    delete pPDFInfo;
-                return DTWAIN_ERR_FILEWRITE;
+                m_pPDFReleaseDocument(pPDFInfo->pPDFdoc);
+                pPDFInfo->pPDFdoc = nullptr;
             }
+            return DTWAIN_ERR_FILEWRITE;
         }
     }
     else
     if ( m_MultiPageStruct.Stage == DIB_MULTI_NEXT)
     {
-        pPDFInfo = (PDFINFO *)m_MultiPageStruct.pUserData;
+        pPDFInfo = std::dynamic_pointer_cast<PDFINFO>(m_MultiPageStruct.pUserData);
+        if ( !pPDFInfo )
+            return DTWAIN_ERR_FILEWRITE;
         pPDFInfo->nCurrentPage++;
         pPDFInfo->ImageInfoEx = *(static_cast<DTWAINImageInfoEx*>(pUserInfo));
         if ( !pPDFInfo->IsFileOpened || !pPDFInfo->IsPDFStarted )
@@ -259,7 +250,7 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
     }
 
     // Initialize the page dimensions depending on the image information
-    retval = InitializePDFPage(pPDFInfo, bitmap);
+    retval = InitializePDFPage(pPDFInfo.get(), bitmap);
     // Set the thumbnail if used
     if ( pPDFInfo->ImageInfoEx.PDFUseThumbnail )
     {
@@ -273,14 +264,20 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
     }
 
     // Set any other text to write (searchable text is included in this)
-    if ( m_MultiPageStruct.Stage != DIB_MULTI_LAST || m_MultiPageStruct.Stage == 0 )
+    if (m_MultiPageStruct.Stage != DIB_MULTI_LAST)
     {
-        CTL_TEXTELEMENTPTRLIST::iterator it = pPDFInfo->ImageInfoEx.PDFTextElementList.begin();
-        CTL_TEXTELEMENTPTRLIST::iterator it2 = pPDFInfo->ImageInfoEx.PDFTextElementList.end();
-        while (it != it2 )
+        const auto pSource = pPDFInfo->ImageInfoEx.theSource;
+        const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+        const auto iter = pHandle->m_mapPDFTextElement.find(pSource);
+        if (iter != pHandle->m_mapPDFTextElement.end())
         {
-            m_pPDFAddPageText(pPDFInfo->pPDFdoc, it->get());
-            ++it;
+            auto it = iter->second.begin();
+            const auto it2 = iter->second.end();
+            while (it != it2 )
+            {
+                m_pPDFAddPageText(pPDFInfo->pPDFdoc, it->get());
+                ++it;
+            }
         }
     }
 
@@ -288,7 +285,6 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
     {
         delete_file(path);
         m_pPDFReleaseDocument(pPDFInfo->pPDFdoc);
-        delete pPDFInfo;
         return DTWAIN_ERR_FILEWRITE;
     }
 
@@ -300,21 +296,20 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
     {
         m_pPDFEndCreation(pPDFInfo->pPDFdoc);
         m_pPDFReleaseDocument(pPDFInfo->pPDFdoc);
-        RemoveAllImageFiles(pPDFInfo);
-        delete pPDFInfo;
+        RemoveAllImageFiles(pPDFInfo.get());
     }
 
     return retval;
 }
 
 
-int CPDFImageHandler::InitializePDFPage(PDFINFO *pPDFInfo, HANDLE bitmap)
+int CPDFImageHandler::InitializePDFPage(PDFINFO *pPDFInfo, HANDLE bitmap) const
 {
     // Initialize the page.
 
     // Get the orientation
     int rotation = pPDFInfo->ImageInfoEx.PDFOrientation;
-    string sDimensions;
+    std::string sDimensions;
 
     if ( rotation != DTWAIN_PDF_PORTRAIT &&
          rotation != DTWAIN_PDF_LANDSCAPE )
@@ -336,8 +331,8 @@ int CPDFImageHandler::InitializePDFPage(PDFINFO *pPDFInfo, HANDLE bitmap)
     if ( pPDFInfo->ImageInfoEx.PDFPageSize == DTWAIN_PDF_CUSTOMSIZE )
     {
         // Dimensions specified by the user
-        ostringstream sBuf;
-        sBuf << "[0 0 " << (int)pPDFInfo->ImageInfoEx.PDFCustomSize[0] << " " << (int)pPDFInfo->ImageInfoEx.PDFCustomSize[1] << "]";
+        std::ostringstream sBuf;
+        sBuf << "[0 0 " << static_cast<int>(pPDFInfo->ImageInfoEx.PDFCustomSize[0]) << " " << static_cast<int>(pPDFInfo->ImageInfoEx.PDFCustomSize[1]) << "]";
         sDimensions = sBuf.str();
         m_pPDFSetNameField(pPDFInfo->pPDFdoc, PDF_MEDIABOX, sDimensions.c_str());
     }
@@ -349,14 +344,14 @@ int CPDFImageHandler::InitializePDFPage(PDFINFO *pPDFInfo, HANDLE bitmap)
     else
     {
         // Determine the size of the page, given the DIB dimensions and bytes per meter
-        LPBITMAPINFOHEADER pbi = (LPBITMAPINFOHEADER)ImageMemoryHandler::GlobalLock(bitmap);
+        auto pbi = static_cast<LPBITMAPINFOHEADER>(ImageMemoryHandler::GlobalLock(bitmap));
 
-        double xInches = (double)pbi->biXPelsPerMeter / 39.37;
-        double yInches = (double)pbi->biYPelsPerMeter / 39.37;
-        double xWidth = (double)pbi->biWidth;
-        double yHeight = (double)pbi->biHeight;
+        auto xInches = static_cast<double>(pbi->biXPelsPerMeter) / 39.37;
+        auto yInches = static_cast<double>(pbi->biYPelsPerMeter) / 39.37;
+        auto xWidth = static_cast<double>(pbi->biWidth);
+        auto yHeight = static_cast<double>(pbi->biHeight);
 
-        if ( FLOAT_CLOSE(xInches,0.0) || FLOAT_CLOSE(yInches, 0.0) )
+        if ( float_close(xInches,0.0) || float_close(yInches, 0.0) )
         {
             ImageMemoryHandler::GlobalUnlock(bitmap);
             return DTWAIN_ERR_BAD_DIB_PAGE; // this page cannot be created due to improper pels per meter
@@ -366,7 +361,7 @@ int CPDFImageHandler::InitializePDFPage(PDFINFO *pPDFInfo, HANDLE bitmap)
         double heightInPoints = yHeight / yInches * 72.0;
 
         // Dimensions specified by the user
-        ostringstream sBuf;
+        std::ostringstream sBuf;
         sBuf << "[0 0 " << widthInPoints << " " << heightInPoints << "]";
         sDimensions = sBuf.str();
 
@@ -374,9 +369,9 @@ int CPDFImageHandler::InitializePDFPage(PDFINFO *pPDFInfo, HANDLE bitmap)
 
         if ( CTL_TwainDLLHandle::s_lErrorFilterFlags )
         {
-            CTL_StringType sOut = _T("PDF Computed media box: ");
-            sOut += StringConversion::Convert_Ansi_To_Native(sDimensions);
-            CTL_TwainAppMgr::WriteLogInfo(sOut);
+            std::string sOut = "PDF Computed media box: ";
+            sOut += sDimensions;
+            CTL_TwainAppMgr::WriteLogInfoA(sOut);
         }
     }
 
@@ -408,31 +403,30 @@ int CPDFImageHandler::InitializePDFPage(PDFINFO *pPDFInfo, HANDLE bitmap)
     }
 
 
-    m_pPDFSetNameField(pPDFInfo->pPDFdoc, PDF_AUTHOR,   string("(" + StringConversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFAuthor) + ")").c_str());
+    m_pPDFSetNameField(pPDFInfo->pPDFdoc, PDF_AUTHOR,   std::string("(" + StringConversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFAuthor) + ")").c_str());
 
-    m_pPDFSetNameField(pPDFInfo->pPDFdoc, PDF_PRODUCER, string("(" + StringConversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFProducer) + ")").c_str());
+    m_pPDFSetNameField(pPDFInfo->pPDFdoc, PDF_PRODUCER, std::string("(" + StringConversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFProducer) + ")").c_str());
 
-    m_pPDFSetNameField(pPDFInfo->pPDFdoc, PDF_KEYWORDS, string("(" + StringConversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFKeywords) + ")").c_str());
+    m_pPDFSetNameField(pPDFInfo->pPDFdoc, PDF_KEYWORDS, std::string("(" + StringConversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFKeywords) + ")").c_str());
 
-    m_pPDFSetNameField(pPDFInfo->pPDFdoc, PDF_TITLE,    string("(" + StringConversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFTitle) + ")").c_str());
+    m_pPDFSetNameField(pPDFInfo->pPDFdoc, PDF_TITLE,    std::string("(" + StringConversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFTitle) + ")").c_str());
 
-    m_pPDFSetNameField(pPDFInfo->pPDFdoc, PDF_SUBJECT,  string("(" + StringConversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFSubject) + ")").c_str());
+    m_pPDFSetNameField(pPDFInfo->pPDFdoc, PDF_SUBJECT,  std::string("(" + StringConversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFSubject) + ")").c_str());
 
-    m_pPDFSetNameField(pPDFInfo->pPDFdoc, PDF_CREATOR,  string("(" + StringConversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFCreator) + ")").c_str());
+    m_pPDFSetNameField(pPDFInfo->pPDFdoc, PDF_CREATOR,  std::string("(" + StringConversion::Convert_Native_To_Ansi(pPDFInfo->ImageInfoEx.PDFCreator) + ")").c_str());
 
     return 0;
 }
 
 void CPDFImageHandler::RemoveAllImageFiles(PDFINFO *pPDFInfo)
 {
-    CTL_StringArrayType::iterator it = pPDFInfo->TempFileArray.begin();
+    auto it = pPDFInfo->TempFileArray.begin();
     while (it != pPDFInfo->TempFileArray.end())
     {
         delete_file((*it).c_str());
         ++it;
     }
 }
-
 
 void CPDFImageHandler::SetMultiPageStatus(DibMultiPageStruct *pStruct)
 {
@@ -456,4 +450,9 @@ int CPDFImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImage
 void CPDFImageHandler::SetSearchableText(const std::string& sText)
 {
     m_sSearchableText = sText;
+}
+
+void CPDFImageHandler::AddPDFTextElement(PDFTextElementPtr element) const
+{
+    m_ImageInfoEx.theSource->SetPDFValue(StringConversion::Convert_Ansi_To_Native("PDFTEXTELEMENTKEY"), element);
 }

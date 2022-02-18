@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 
 #include <memory>
 #include "ctlobstr.h"
-#include "ctltwain.h"
+#include "twain.h"
 ////////////////////////////////////////////////////////////////////////////
 namespace dynarithmic
 {
@@ -33,6 +33,12 @@ namespace dynarithmic
              // Set equal to twain type
              CTL_TwainTypeOb( TW_UINT16 nType, bool bGetTypeSize=true);
              virtual ~CTL_TwainTypeOb();
+             CTL_TwainTypeOb(CTL_TwainTypeOb& rhs) = delete;
+             CTL_TwainTypeOb(CTL_TwainTypeOb&& rhs);
+             CTL_TwainTypeOb& operator=(CTL_TwainTypeOb&& rhs);
+             CTL_TwainTypeOb& operator=(CTL_TwainTypeOb&) = delete;
+
+             static void swap(CTL_TwainTypeOb& left, CTL_TwainTypeOb& right) noexcept;
 
              // Data initialization.  This MUST fit into allocated space for type
              // specified in constructor
@@ -47,15 +53,15 @@ namespace dynarithmic
 
              // Define operators for each type (useful if calling functions
              // with the known type as the receiver
-             operator TW_INT8 ()    const { return *(TW_INT8   *)m_pData; }
-             operator TW_INT16 ()   const { return *(TW_INT16  *)m_pData; }
-             operator TW_INT32 ()   const { return *(TW_INT32  *)m_pData; }
-             operator TW_UINT8 ()   const { return *(TW_UINT8  *)m_pData; }
-             operator TW_UINT16 ()  const { return *(TW_UINT16 *)m_pData; }
-             operator TW_UINT32 ()  const { return *(TW_UINT32 *)m_pData; }
-             operator TW_FIX32 ()   const { return *(TW_FIX32  *)m_pData; }
-             operator TW_FRAME ()   const { return *(TW_FRAME  *)m_pData; }
-             operator CTL_String()  const { return  (CTL_String)(LPSTR)m_pData; }
+             operator TW_INT8 ()    const { return *static_cast<TW_INT8*>(m_pData); }
+             operator TW_INT16 ()   const { return *static_cast<TW_INT16*>(m_pData); }
+             operator TW_INT32 ()   const { return *static_cast<TW_INT32*>(m_pData); }
+             operator TW_UINT8 ()   const { return *static_cast<TW_UINT8*>(m_pData); }
+             operator TW_UINT16 ()  const { return *static_cast<TW_UINT16*>(m_pData); }
+             operator TW_UINT32 ()  const { return *static_cast<TW_UINT32*>(m_pData); }
+             operator TW_FIX32 ()   const { return *static_cast<TW_FIX32*>(m_pData); }
+             operator TW_FRAME ()   const { return *static_cast<TW_FRAME*>(m_pData); }
+             operator std::string()  const { return  static_cast<std::string>(static_cast<LPSTR>(m_pData)); }
 
         private:
              int        m_nSize;

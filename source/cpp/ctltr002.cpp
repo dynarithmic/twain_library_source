@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,6 +22,6 @@
 #include "ctltwses.h"
 using namespace dynarithmic;
 CTL_GetFirstSourceTriplet::CTL_GetFirstSourceTriplet(CTL_ITwainSession *pSession)
-                            : CTL_SourceTriplet( pSession, (LPCTSTR)NULL, MSG_GETFIRST )
+                            : CTL_SourceTriplet( pSession, static_cast<LPCTSTR>(nullptr), MSG_GETFIRST )
 {
 }

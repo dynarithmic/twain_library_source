@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,10 +21,8 @@
 #ifndef ERRSTRUC_H_
 #define ERRSTRUC_H_
 
-#include "ctlreg.h"
 #include <tuple>
 #include <unordered_map>
-#include "dtwdecl.h"
 /* Structure types are as follows
    0 - NONE
    1 - TW_CUSTOMDSDATA
@@ -97,29 +95,29 @@ namespace dynarithmic
                             ERRSTRUCT_TW_METRICS
    };
 
-   typedef std::unordered_map<WPARAM, CTL_StringType> CTL_ContainerToNameMap;
+   typedef std::unordered_map<WPARAM, std::string> CTL_ContainerToNameMap;
 
 class CTL_ErrorStructDecoder {
     public:
         CTL_ErrorStructDecoder();
         void StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDest, LONG nDG, UINT nDAT, UINT nMSG, TW_MEMREF Data,
                           ErrorStructTypes sType);
-        CTL_StringType DecodeBitmap(HANDLE hBitmap) const;
-        CTL_StringType DecodePDFTextElement(PDFTextElement* pEl) const;
-        CTL_StringType DecodeTWAINReturnCode(TW_UINT16 retCode) const;
-        CTL_StringType DecodeTWAINCode(TW_UINT16 retCode, TW_UINT16 errStart, const CTL_StringType& defMessage) const;
-        CTL_StringType DecodeTWAINReturnCodeCC(TW_UINT16 retCode) const;
+        static std::string DecodeBitmap(HANDLE hBitmap);
+        static std::string DecodePDFTextElement(PDFTextElement* pEl);
+        static std::string DecodeTWAINReturnCode(TW_UINT16 retCode);
+        static std::string DecodeTWAINCode(TW_UINT16 retCode, TW_UINT16 errStart, const std::string& defMessage);
+        static std::string DecodeTWAINReturnCodeCC(TW_UINT16 retCode);
         void StartMessageDecoder(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam);
-        const CTL_StringType& GetDecodedString() const { return m_pString; }
+        const std::string& GetDecodedString() const { return m_pString; }
         static CTL_ContainerToNameMap s_mapContainerType;
         static CTL_ContainerToNameMap s_mapNotificationType;
-        static std::unordered_map<TW_UINT32, CTL_StringType> s_mapSupportedGroups;
-        static std::unordered_map<TW_UINT16, CTL_StringType> s_mapTwainDSMReturnCodes;
+        static std::unordered_map<TW_UINT32, std::string> s_mapSupportedGroups;
+        static std::unordered_map<TW_UINT16, std::string> s_mapTwainDSMReturnCodes;
 
         static bool s_bInit;
 
     protected:
-        CTL_StringType m_pString;
+        std::string m_pString;
 };
 
 // Define the cap info structure used
@@ -128,21 +126,21 @@ class CTL_ErrorStruct
     public:
         typedef std::tuple<int, int, int> key_type;
         CTL_ErrorStruct() :
-            m_pOrigin(nullptr),
-            m_pDest(nullptr),
-            m_pData(nullptr),
             m_nStructType(0),
             m_nTWCCErrorCodes(0),
             m_nTWRCCodes(0),
+            m_pOrigin(nullptr),
+            m_pDest(nullptr),
+            m_pData(nullptr),
             m_Key(0,0,0) {}
 
         CTL_ErrorStruct(LONG nDG, UINT nDAT, UINT nMsg) :
-                m_pOrigin(nullptr),
-                m_pDest(nullptr),
-                m_pData(nullptr),
                 m_nStructType(0),
                 m_nTWCCErrorCodes(0),
                 m_nTWRCCodes(0),
+                m_pOrigin(nullptr),
+                m_pDest(nullptr),
+                m_pData(nullptr),
                 m_Key{nDG,nDAT,nMsg}
         {}
 
@@ -157,33 +155,33 @@ class CTL_ErrorStruct
         void    SetFailureCodes(LONG lFailureCodes) { m_nTWCCErrorCodes = lFailureCodes; }
         LONG    GetSuccessCodes() const { return m_nTWRCCodes; }
         void    SetSuccessCodes(LONG lSuccessCodes) { m_nTWRCCodes = lSuccessCodes; }
-        bool    IsFailureMatch(TW_UINT16 cc);
-        bool    IsSuccessMatch(TW_UINT16 rc);
+        bool    IsFailureMatch(TW_UINT16 cc) const;
+        bool    IsSuccessMatch(TW_UINT16 rc) const;
         bool    IsValid() const { return GetDG() || GetDAT() || GetMSG(); }
 
-        CTL_StringType GetIdentityAndDataInfo(pTW_IDENTITY pOrigin, pTW_IDENTITY pDest, TW_MEMREF pData)
+        std::string GetIdentityAndDataInfo(pTW_IDENTITY pOrigin, pTW_IDENTITY pDest, TW_MEMREF pData)
                 {
                     m_pOrigin = pOrigin; m_pDest = pDest; m_pData = pData;
-                    m_Decoder.StartDecoder(m_pOrigin, m_pDest, (UINT)GetDG(),
+                    m_Decoder.StartDecoder(m_pOrigin, m_pDest, GetDG(),
                                            GetDAT(), GetMSG(), m_pData,
-                                           (ErrorStructTypes)m_nStructType);
+                                           static_cast<ErrorStructTypes>(m_nStructType));
                     return m_Decoder.GetDecodedString();
                 }
 
-        CTL_StringType GetDTWAINMessageAndDataInfo(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
+        std::string GetDTWAINMessageAndDataInfo(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
                 {
                     m_Decoder.StartMessageDecoder(hWnd, nMsg, wParam, lParam);
                     return m_Decoder.GetDecodedString();
                 }
 
-        CTL_StringType GetTWAINDSMError(TW_UINT16 retcode)
+        static std::string GetTWAINDSMError(TW_UINT16 retcode)
         {
-            return m_Decoder.DecodeTWAINReturnCode(retcode);
+            return CTL_ErrorStructDecoder::DecodeTWAINReturnCode(retcode);
         }
 
-        CTL_StringType GetTWAINDSMErrorCC(TW_UINT16 retcode)
+        static std::string GetTWAINDSMErrorCC(TW_UINT16 retcode)
         {
-            return m_Decoder.DecodeTWAINReturnCodeCC(retcode);
+            return CTL_ErrorStructDecoder::DecodeTWAINReturnCodeCC(retcode);
         }
 
     private:

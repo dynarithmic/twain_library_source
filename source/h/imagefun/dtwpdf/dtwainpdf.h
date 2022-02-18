@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -17,11 +17,8 @@
     FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
+*/
 
-    For more information, the license file LICENSE.TXT that is located in the root
-    directory of the DTWAIN installation covers the restrictions under the LGPL license.
-    Please read this file before deploying or distributing any application using DTWAIN.
- */
 #ifndef DTWAIN_PDFLIB_H
 #define DTWAIN_PDFLIB_H
 
@@ -33,19 +30,17 @@
 #include <map>
 #include <set>
 #include <vector>
-#include <dtwainc.h>
 #include <pdfencrypt.h>
 #include <memory>
 #include "pdffont_basic.h"
 #include "ctlobstr.h"
-#include "tiff.h"
 #include "tiffio.h"
 #include "ctliface.h"
 namespace dynarithmic
 {
     typedef CTL_TwainDLLHandle::CTL_PDFMediaMap MediaBoxMap;
     typedef std::map< unsigned int, PDFFont> FontRefToFontInfoMap;
-    typedef std::map< CTL_StringType, PDFFont> FontNameToFontInfoMap;
+    typedef std::map< std::string, PDFFont> FontNameToFontInfoMap;
     typedef std::map< unsigned int, PDFFont> FontNumberToFontInfoMap;
     typedef std::set< std::string > StringSet;
     typedef std::vector< std::string > StringVector;
@@ -63,8 +58,8 @@ namespace dynarithmic
             bool m_bASCIIHexCompression;
 
         public:
-            PDFObject(int objNum=-1) : m_nObjNum(objNum), m_pParentDoc(NULL),
-                        m_bIsEncrypted(false), m_bASCIIHexCompression(false), m_byteOffset(0) { }
+            PDFObject(int objNum=-1) : m_nObjNum(objNum), m_byteOffset(0),
+                        m_pParentDoc(nullptr), m_bIsEncrypted(false), m_bASCIIHexCompression(false) { }
             virtual ~PDFObject() { }
             void SetByteOffset(unsigned long byteoffset) { m_byteOffset = byteoffset; }
             void SetASCIIHexCompression(bool bSet) { m_bASCIIHexCompression = bSet; }
@@ -73,8 +68,8 @@ namespace dynarithmic
             PdfDocument* GetParent() const { return m_pParentDoc; }
             void SetEncrypted(bool bEncrypted=true) { m_bIsEncrypted = bEncrypted; }
             bool IsEncrypted() const { return m_bIsEncrypted; }
-            int EncryptBlock(const std::string &sIn, std::string& sOut, int objectnum, int gennum);
-            int EncryptBlock(char *pIn, int nLength, int objectnum, int gennum);
+            int EncryptBlock(const std::string &sIn, std::string& sOut, int objectnum, int gennum) const;
+            int EncryptBlock(char *pIn, int nLength, int objectnum, int gennum) const;
             virtual std::string GetExtraInfo() { return ""; }
             virtual std::string GetExtraInfoEnd() { return ""; }
             virtual std::string GetStreamContents() { return GetContents(); }
@@ -90,7 +85,7 @@ namespace dynarithmic
             {
                 Contents.append(pBuffer, nLength);
             }
-            int GetContentsSize() const { return (int)Contents.length(); }
+            int GetContentsSize() const { return static_cast<int>(Contents.length()); }
 
             virtual void ComposeObject() { }
     };
@@ -152,8 +147,11 @@ namespace dynarithmic
     class ImageObject : public PDFObject
     {
         public:
-            ImageObject(int objnum, const CTL_StringType& sImgName) : PDFObject(objnum), m_sImgName(sImgName) { }
-            void SetPDFImageName(const std::string& sPDFImgName) { m_sPDFImgName = sPDFImgName; }
+            ImageObject(int objnum, CTL_StringType sImgName) : PDFObject(objnum), m_sImgName(std::move(sImgName)),
+            m_bpp(0), m_Width(0), m_Height(0), m_imgLengthInBytes(0), m_nCurCRCVal(0), m_nTiffKValue(0),
+            m_nImgType(0), m_nTiffColumns(0), m_nTiffRows(0) { }
+
+            void SetPDFImageName(std::string sPDFImgName) { m_sPDFImgName = std::move(sPDFImgName); }
             bool OpenAndComposeImage(int& width, int& height, int& bpp, int& rgb, int& dpix, int& dpiy);
             void ComposeObject();
             unsigned long GetCRCVal() const { return m_nCurCRCVal; }
@@ -222,7 +220,7 @@ namespace dynarithmic
     class EncryptionObject : public PDFObject
     {
         public:
-            EncryptionObject(int objnum) : PDFObject(objnum) , m_RValue(2), m_bAESEncrypted(false), m_nLength(0), m_nPermissions(0), m_nVValue(0) { }
+            EncryptionObject(int objnum) : PDFObject(objnum) , m_RValue(2), m_nLength(0), m_nVValue(0), m_nPermissions(0), m_bAESEncrypted(false) { }
             void ComposeObject();
             void SetRValue(int RValue) { m_RValue = RValue; }
             void SetLength(int nLength) { m_nLength = nLength; }
@@ -297,17 +295,17 @@ namespace dynarithmic
 
         private:
             std::string m_smediabox;
-            ContentsObject* theContents;
-            int m_resObjNum;
-            unsigned long m_nImageNum;
-            int m_orientation;
-            bool m_bDuplicateImage;
-            bool m_bDuplicateThumbImage;
-            bool m_bThumbnailImage;
-            unsigned long m_nDuplicateObjNum;
-            unsigned long m_nDuplicateThumbObjNum;
-            unsigned long m_CRCValue;
-            unsigned long m_nMaxObjectNum;
+            ContentsObject* theContents = nullptr;
+            int m_resObjNum = 0;
+            unsigned long m_nImageNum = 0;
+            int m_orientation = 0;
+            bool m_bDuplicateImage = false;
+            bool m_bDuplicateThumbImage = false;
+            bool m_bThumbnailImage = false;
+            unsigned long m_nDuplicateObjNum = 0;
+            unsigned long m_nDuplicateThumbObjNum = 0;
+            unsigned long m_CRCValue = 0;
+            unsigned long m_nMaxObjectNum = 0;
     };
 
     struct ObjectInfo
@@ -327,7 +325,7 @@ namespace dynarithmic
             enum PaperSize { US_LETTER, LEGAL, A4 };
             enum CompressTypes { NO_COMPRESS, FLATE_COMPRESS, A85_COMPRESS, AHEX_COMPRESS };
             PdfDocument();
-            ~PdfDocument();
+            ~PdfDocument() = default;
 
             // Set the PDF version
             void SetPDFVersion(const std::string& pdfVer) { m_sPDFVer = pdfVer; }
@@ -342,11 +340,11 @@ namespace dynarithmic
             void SetPDFHeader(const std::string& sHeader) { m_sPDFHeader = sHeader; }
             std::string GetPDFHeader() const { return m_sPDFHeader; }
 
-            bool OpenNewPDFFile(const CTL_StringType& sFile);
+            bool OpenNewPDFFile(CTL_StringType sFile);
             void SetPolarity(int PolarityType) { m_nPolarity = PolarityType; }
             int GetPolarity() const { return m_nPolarity; }
             bool SetImageFileName(const std::string& sImgName);
-            bool WritePage(const CTL_StringType& sFileName);
+            bool WritePage(CTL_StringType sFileName);
             void SetMediaBox(int mediatype);
             void SetMediaBox(const std::string& sMedia) { m_smediabox = sMedia; }
             void SetOrientation( int oType ) { m_Orientation = oType; }
@@ -382,7 +380,7 @@ namespace dynarithmic
 
             void SetImageType(int nImageType) { m_nImageType = nImageType; }
             int  GetImageType() const { return m_nImageType; }
-            void SetThumbnailFile(const CTL_StringType& s) { m_sThumbnailFileName = s; }
+            void SetThumbnailFile(CTL_StringType s) { m_sThumbnailFileName = s; }
             void SetDPI(unsigned long dpi) { m_dpi = dpi; }
             void SetASCIICompression(bool bSet) { m_bASCIICompression = bSet; }
             bool IsASCIICompressed() { return m_bASCIICompression; }
@@ -415,7 +413,7 @@ namespace dynarithmic
                 else
                     *(*it) = *element;*/
             }
-            int GetNumTextElements() const { return (int)m_vPDFText.size(); }
+            int GetNumTextElements() const { return static_cast<int>(m_vPDFText.size()); }
             void RemoveTextElement();
             void ChangeTextElement(int nWhich);
             void CreateFontNumbersFromTextElements();

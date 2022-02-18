@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include <utility>
+
 #include "ctldib.h"
 #include "ctliface.h"
 #include "ctltwmgr.h"
@@ -25,22 +27,19 @@
 using namespace dynarithmic;
 
 // Text routines
-CTL_TextIOHandler::CTL_TextIOHandler(CTL_TwainDib* pDib, int nInputFormat, DTWAINImageInfoEx &ImageInfoEx,
+CTL_TextIOHandler::CTL_TextIOHandler(CTL_TwainDib* pDib, int nInputFormat, DTWAINImageInfoEx ImageInfoEx,
                                      OCREngine *pEngine)
                                      :
-CTL_ImageIOHandler( pDib ), m_nInputFormat(nInputFormat),
-                            m_ImageInfoEx(ImageInfoEx),
+                                    CTL_ImageIOHandler( pDib ), m_nInputFormat(nInputFormat),
+                                    m_ImageInfoEx(std::move(ImageInfoEx)),
 m_pOCREngine(pEngine)
 { }
-
-CTL_TextIOHandler::~CTL_TextIOHandler()
-{}
 
 
 int CTL_TextIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, LONG64 MultiStage)
 {
-    DibMultiPageStruct *s = (DibMultiPageStruct *)MultiStage;
-    HANDLE hDib = NULL;
+    const auto s = reinterpret_cast<DibMultiPageStruct*>(MultiStage);
+    HANDLE hDib = nullptr;
 
     if ( !s || s->Stage != DIB_MULTI_LAST )
     {
@@ -62,7 +61,7 @@ int CTL_TextIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     if ( !s || s->Stage != DIB_MULTI_LAST )
         retval = TextHandler.WriteGraphicFile(this, szFile, hDib);
     else
-        retval = TextHandler.WriteImage(NULL,0,0,0,0,0,NULL);
+        retval = TextHandler.WriteImage(nullptr,nullptr,0,0,0,0, nullptr);
     if ( s )
         TextHandler.GetMultiPageStatus(s);
     return retval;

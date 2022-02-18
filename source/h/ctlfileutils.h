@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -27,5 +27,7 @@ namespace dynarithmic
 {
     bool delete_file(LPCTSTR filename);
     bool parent_directory_exists(LPCTSTR filename);
+    bool file_exists(LPCTSTR filename);
+    CTL_StringType temp_directory_path(bool bWithSeparator=true);
 }
 #endif
