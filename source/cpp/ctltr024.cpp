@@ -64,14 +64,14 @@ bool CTL_ImageTriplet::QueryAndRemoveDib(CTL_TwainAcquireEnum acquireType, CTL_T
 
     if (pSource->GetAcquireType() == acquireType)
     {
-        bKeepPage = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_QUERYPAGEDISCARD, (LPARAM)pSource) ? true : false;
+        bKeepPage = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_QUERYPAGEDISCARD, reinterpret_cast<LPARAM>(pSource)) ? true : false;
         // Keep the page
         if (!bKeepPage)
         {
             // throw this dib away (remove from the dib array)
             pArray.DeleteDibMemory(nWhich);
             pArray.RemoveDib(nWhich);
-            CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_PAGEDISCARDED, (LPARAM)pSource);
+            CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_PAGEDISCARDED, reinterpret_cast<LPARAM>(pSource));
         }
     }
     return bKeepPage;

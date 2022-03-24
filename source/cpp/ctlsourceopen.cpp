@@ -126,7 +126,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceOpen(DTWAIN_SOURCE Source)
 
 void LogAndCachePixelTypes(CTL_ITwainSource *p)
 {
-    static const int MaxMessage = 1024;
+    static constexpr int MaxMessage = 1024;
     if (p->PixelTypesRetrieved())
         return;
 

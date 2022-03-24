@@ -35,6 +35,6 @@ int CTL_WmfIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     if (!IsValidBitDepth(DTWAIN_WMF, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    const int nWhichType = (m_nFormat == CTL_TwainDib::WmfFormat?0:1);
+    const int nWhichType = m_nFormat == CTL_TwainDib::WmfFormat?0:1;
     return CWMFImageHandler(nWhichType).WriteGraphicFile(this, szFile, hDib);
 }

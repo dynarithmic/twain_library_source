@@ -180,7 +180,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetBitDepth(DTWAIN_SOURCE Source, LPLONG BitDept
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !BitDepth;} ,
                                  DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-    DTWAIN_BOOL bRet = DTWAIN_GetCapValues(Source, DTWAIN_CV_ICAPBITDEPTH, GetType, &Array);
+    const DTWAIN_BOOL bRet = DTWAIN_GetCapValues(Source, DTWAIN_CV_ICAPBITDEPTH, GetType, &Array);
     DTWAINArrayLL_RAII arr(Array);
     if ( bRet && Array )
     {
@@ -284,6 +284,6 @@ LONG DLLENTRY_DEF DTWAIN_MakeRGB(LONG red, LONG green, LONG blue)
 {
     LOG_FUNC_ENTRY_PARAMS((red, green, blue))
     const LONG returnVal = RGB(red, green, blue);
-    LOG_FUNC_EXIT_PARAMS(returnVal);
+    LOG_FUNC_EXIT_PARAMS(returnVal)
     CATCH_BLOCK(0)
 }

@@ -99,7 +99,7 @@ namespace dynarithmic
                                              LPCTSTR lpszProduct  = _T("<?>")
                                   );
 
-            static void DestroyTwainSession( CTL_ITwainSession* pSession );
+            static void DestroyTwainSession(const CTL_ITwainSession* pSession);
             static bool IsValidTwainSession(const CTL_ITwainSession* pSession);
             static bool IsValidTwainSource( const CTL_ITwainSession* pSession,
                                             const CTL_ITwainSource *pSource);
@@ -134,7 +134,7 @@ namespace dynarithmic
             static bool OpenSource( CTL_ITwainSession* pSession, const CTL_ITwainSource* pSource=nullptr);
             static bool CloseSource(CTL_ITwainSession* pSession, const CTL_ITwainSource* pSource=nullptr, bool bForce=true);
             static CTL_TwainAcquireEnum GetCompatibleFileTransferType( const CTL_ITwainSource *pSource );
-            static TW_UINT16 GetConditionCode( CTL_ITwainSession *pSession, const CTL_ITwainSource *pSource=nullptr, TW_UINT16 rc=1);
+            static TW_UINT16 GetConditionCode( CTL_ITwainSession *pSession, CTL_ITwainSource *pSource=nullptr, TW_UINT16 rc=1);
 
             // Get the current session in use
             static CTL_ITwainSession* GetCurrentSession();
@@ -161,7 +161,7 @@ namespace dynarithmic
             static void EnumTransferMechanisms( const CTL_ITwainSource *pSource, CTL_IntArray & rArray );
             static void EnumTwainFileFormats( const CTL_ITwainSource *pSource, CTL_IntArray & rArray );
             static bool IsSupportedFileFormat( const CTL_ITwainSource* pSource, int nFileFormat );
-            static bool GetFileTransferDefaults( CTL_ITwainSource *pSource, CTL_StringType strFile, int &nFileType);
+            static bool GetFileTransferDefaults( CTL_ITwainSource *pSource, int &nFileType);
             static int SetTransferMechanism( const CTL_ITwainSource *pSource, CTL_TwainAcquireEnum AcquireType,
                                             LONG ClipboardTransferType);
 
@@ -186,8 +186,8 @@ namespace dynarithmic
             static bool GetImageInfo(CTL_ITwainSource *pSource, CTL_ImageInfoTriplet *pTrip=nullptr);
             static int  TransferImage(const CTL_ITwainSource *pSource, int nImageNum=0);
             static bool SetFeederEnableMode( CTL_ITwainSource *pSource, bool bMode=true);
-            static bool ShowProgressIndicator(CTL_ITwainSource *pSource, bool bShow=true);
-            static bool IsProgressIndicatorOn(CTL_ITwainSource *pSource);
+            static bool ShowProgressIndicator(const CTL_ITwainSource* pSource, bool bShow = true);
+            static bool IsProgressIndicatorOn(const CTL_ITwainSource* pSource);
             static bool IsJobControlSupported( const CTL_ITwainSource *pSource, TW_UINT16& nValue );
 
             static void     SetError(int nError, const std::string& extraInfo="");
@@ -253,7 +253,7 @@ namespace dynarithmic
                                                      UINT &nDataType);
 
             static void         GetContainerNamesFromType( int nType, StringArray &rArray );
-            static void         EndTwainUI(CTL_ITwainSession *pSession, CTL_ITwainSource *pSource);
+            static void         EndTwainUI(const CTL_ITwainSession* pSession, CTL_ITwainSource* pSource);
 
             static int          CopyFile(CTL_StringType strIn, CTL_StringType strOut);
             static LONG         GetCapFromCapName( const char *szCapName );
@@ -343,8 +343,8 @@ namespace dynarithmic
                                        CTL_ITwainSource * pSource,
                                        CTL_ImageXferTriplet *pTrip);
 
-            static bool SetupMemXferDIB( CTL_ITwainSession *pSession, CTL_ITwainSource *pSource,
-                                         HGLOBAL hGlobal, TW_IMAGEINFO *pImgInfo, TW_INT32 nSize);
+            static bool SetupMemXferDIB(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource,
+                                        HGLOBAL hGlobal, const TW_IMAGEINFO* pImgInfo, TW_INT32 nSize);
 
             static CTL_ITwainSource* GenericSourceSelector(CTL_ITwainSession* pSession, const CTL_ITwainSource* pSource, LPCTSTR lpszSource, int nWhich);
 
@@ -362,7 +362,7 @@ namespace dynarithmic
 
                 if ( rc == TWRC_FAILURE ) // Check if there is a real failure
                 {
-                    auto pSession = pTempSource->GetTwainSession();
+                    const auto pSession = pTempSource->GetTwainSession();
                     const TW_UINT16 ccode = GetConditionCode(pSession, nullptr);
                     ProcessConditionCodeError(ccode);
                     return false;
@@ -412,10 +412,10 @@ namespace dynarithmic
             struct GetMultiValuesImpl
             {
             static void GetMultipleTwainCapValues(const CTL_ITwainSource *pSource,
-                                                      T& pArray,
-                                                    TW_UINT16 Cap,
-                                                    TW_UINT16 nDataType,
-                                                      CTL_EnumContainer Container=TwainContainer_ENUMERATION)
+                                                  T& pArray,
+                                                  TW_UINT16 Cap,
+                                                  TW_UINT16 nDataType,
+                                                  CTL_EnumContainer Container=TwainContainer_ENUMERATION)
                {
                    auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
                    auto pSession = pTempSource->GetTwainSession();
@@ -463,7 +463,7 @@ namespace dynarithmic
 
             static CTL_ErrorStruct GetGeneralErrorInfo(LONG nDG, UINT nDAT, UINT nMSG);
 
-            void DestroySession( CTL_ITwainSession* pSession );
+            void DestroySession(const CTL_ITwainSession* pSession);
             void DestroyAllTwainSessions();
             void WriteToLogFile(int rc);
             void OpenLogFile(LPCSTR lpszFile);
@@ -471,7 +471,6 @@ namespace dynarithmic
             CTL_TwainDLLHandle* GetDLLHandle() const { return m_pDLLHandle; }
             static bool SetDependentCaps( const CTL_ITwainSource *pSource, CTL_EnumCapability Cap );
             static void EnumNoTimeoutTriplets();
-            static CTL_TwainSessionArray::iterator FindSession(CTL_ITwainSessionPtr pSession);
             static CTL_TwainSessionArray::iterator FindSession(const CTL_ITwainSession* pSession);
 
             static TW_IDENTITY s_AppId;          // Twain Identity structure

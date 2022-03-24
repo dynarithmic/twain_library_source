@@ -117,7 +117,7 @@ RGBQUAD* CDibInterface::GetPalettePtr(BYTE *pDibData, int bpp)
 {
   if ( pDibData && bpp < 16)
   {
-      BYTE *pPalette = (pDibData + sizeof(BITMAPINFOHEADER));
+      BYTE *pPalette = pDibData + sizeof(BITMAPINFOHEADER);
       return (RGBQUAD *)pPalette;
   }
   return nullptr;
@@ -140,7 +140,7 @@ unsigned CDibInterface::GetLine(BYTE *pDib)
         UINT32 bpp;
         GetWidth(pDib, &width);
         GetBitsPerPixel(pDib, &bpp);
-        return ((width * bpp) + 7) / 8;
+        return (width * bpp + 7) / 8;
     }
     return 0;
 }
@@ -159,13 +159,13 @@ unsigned CDibInterface::GetLine(BYTE *pDib, BYTE *pDest, int nWhichLine)
 unsigned CDibInterface::GetPitch(BYTE *pDib)
 {
     if ( pDib )
-        return (GetLine(pDib) + 3) & ~3;
+        return GetLine(pDib) + 3 & ~3;
     return 0;
 }
 
 unsigned CDibInterface::GetPitch(fipImage& pDib)
 {
-    return (pDib.getScanWidth() + 3) & ~3;
+    return pDib.getScanWidth() + 3 & ~3;
 }
 
 BYTE * CDibInterface::GetDibBits(BYTE *pDib)
@@ -192,7 +192,7 @@ int CDibInterface::GetDibPalette(fipImage& lpbi,LPSTR palette)
         palette[i*RGB_SIZE + RGB_BLUE] = header->bmiColors[i].rgbBlue;
     }
 
-    return(j);
+    return j;
 }
 
 // Function to ensure that DIB data is on DWORD boundaries
@@ -496,10 +496,10 @@ FloatRect CDibInterface::Normalize(fipImage& pImage, const FloatRect& ActualRect
             }
             else
             {
-                fRect.left   = (RequestedRect.left / iterDestUnit->second) * PixelsPerInch;
-                fRect.right  = (RequestedRect.right  / iterSourceUnit->second) * PixelsPerInch;
-                fRect.top    = (RequestedRect.top   / iterSourceUnit->second)  * PixelsPerInch;
-                fRect.bottom = (RequestedRect.bottom  / iterSourceUnit->second) * PixelsPerInch;
+                fRect.left   = RequestedRect.left / iterDestUnit->second * PixelsPerInch;
+                fRect.right  = RequestedRect.right  / iterSourceUnit->second * PixelsPerInch;
+                fRect.top    = RequestedRect.top   / iterSourceUnit->second  * PixelsPerInch;
+                fRect.bottom = RequestedRect.bottom  / iterSourceUnit->second * PixelsPerInch;
             }
         }
         break;
@@ -773,7 +773,7 @@ int CDibInterface::putbufferedbyte(WORD byte, std::ofstream& fh, bool bRealEOF, 
     {
         fh.write(reinterpret_cast<char*>(bytebuffer), bytesleft);
         bytesleft=0;
-        return(byte);
+        return byte;
     }
     else
     {
@@ -783,14 +783,14 @@ int CDibInterface::putbufferedbyte(WORD byte, std::ofstream& fh, bool bRealEOF, 
             bytesleft=0;
         }
         bytebuffer[bytesleft++]=static_cast<char>(byte);
-        return(byte);
+        return byte;
     }
 }
 
 int CDibInterface::putbyte(WORD byte, std::ofstream& fh)
 {
     fh.write(reinterpret_cast<char*>(&byte), 1);
-    return(byte);
+    return byte;
 }
 
 double CDibInterface::GetScaleFactorPerInch(LONG Unit)
@@ -819,7 +819,7 @@ HBITMAP CDibInterface::DIBToBitmap(HANDLE hDIB, HPALETTE hPal)
     BYTE* lpDIBHdr = static_cast<BYTE*>(GlobalLock(hDIB));
 
     DTWAINGlobalHandle_RAII dibHandle(hDIB);
-    const BYTE* lpDIBBits = CDibInterface::GetDibBits(lpDIBHdr);
+    const BYTE* lpDIBBits = GetDibBits(lpDIBHdr);
     HDC hDC = GetDC(nullptr);
 
     if (!hDC)

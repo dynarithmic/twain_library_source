@@ -174,7 +174,7 @@ void CTL_ExtImageInfoTriplet::DestroyInfo()
             continue;
 
         // Remove the items
-        if ((CTL_CapabilityTriplet::GetItemSize(pInfo->ItemType) * pInfo->NumItems) > sizeof(TW_HANDLE))
+        if (CTL_CapabilityTriplet::GetItemSize(pInfo->ItemType) * pInfo->NumItems > sizeof(TW_HANDLE))
         {
             // Get the data
             auto h = reinterpret_cast<TW_HANDLE>(pInfo->Item);
@@ -328,7 +328,7 @@ void CTL_ExtImageInfoTriplet::ResolveTypes()
         }
 
         // Set the info within the allocated memory here
-        TW_INFO Info = (*it);
+        TW_INFO Info = *it;
 
         memcpy(&m_pExtImageInfo->Info[i], &Info, sizeof(TW_INFO));
 
@@ -530,7 +530,7 @@ bool CTL_ExtImageInfoTriplet::EnumSupported(CTL_ITwainSource *pSource,
                                             CTL_IntArray &rArray)
 {
     rArray.clear();
-    const int NumAttr = std::size(s_AllAttr);
+    constexpr int NumAttr = std::size(s_AllAttr);
     CTL_ExtImageInfoTriplet Trip(pSession, pSource, NumAttr);
     const TW_UINT16 rc = Trip.Execute();
     switch (rc)

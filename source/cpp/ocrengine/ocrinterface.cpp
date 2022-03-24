@@ -77,7 +77,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetOCRText(DTWAIN_OCRENGINE Engine,
             if (!Data)
             {
                 // cache the info
-                LOG_FUNC_EXIT_PARAMS(HANDLE(1));
+                LOG_FUNC_EXIT_PARAMS(HANDLE(1))
             }
             int nMinCopy;
 
@@ -320,7 +320,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ExecuteOCR(DTWAIN_OCRENGINE Engine, LPCTSTR szFi
         nEndPage = nPages - 1;
     }
     else
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return (nStartPage >= nPages); },
+        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return nStartPage >= nPages; },
         DTWAIN_ERR_OCR_INVALIDPAGENUM, false, FUNC_MACRO);
 
     const LONG minEndPage = (std::min)(nEndPage, nPages - 1);
@@ -690,7 +690,7 @@ void dynarithmic::LoadOCRInterfaces(CTL_TwainDLLHandle *pHandle)
 
     // Set first OCR engine to be the default engine
     if (!pHandle->m_OCRInterfaceArray.empty())
-        pHandle->m_pOCRDefaultEngine = *(pHandle->m_OCRInterfaceArray.begin());
+        pHandle->m_pOCRDefaultEngine = *pHandle->m_OCRInterfaceArray.begin();
 }
 
 void dynarithmic::UnloadOCRInterfaces(CTL_TwainDLLHandle *pHandle)
@@ -822,7 +822,7 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectDefaultOCREngine()
     DTWAIN_Check_Bad_Handle_Ex(pHandle, NULL, FUNC_MACRO);
 
     // Get the OCR engine associated with the name
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return (pHandle->m_OCRInterfaceArray.empty()); },
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return pHandle->m_OCRInterfaceArray.empty(); },
         DTWAIN_ERR_OCR_NOTACTIVE, 0, FUNC_MACRO);
     const auto SelectedEngine = static_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine.get());
 
@@ -986,7 +986,7 @@ LRESULT CALLBACK DisplayOCRDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             if ( pS->CS.nOptions & DTWAIN_DLG_CENTER)
                 CenterWindow(hWnd, GetParent(hWnd));
             else
-                ::SetWindowPos(hWnd, nullptr, pS->CS.xpos, pS->CS.ypos, 0, 0, SWP_NOSIZE);
+                SetWindowPos(hWnd, nullptr, pS->CS.xpos, pS->CS.ypos, 0, 0, SWP_NOSIZE);
 
             lstSources = GetDlgItem(hWnd, IDC_LSTSOURCES);
 

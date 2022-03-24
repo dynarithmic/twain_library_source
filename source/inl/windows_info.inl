@@ -33,7 +33,7 @@ using namespace dynarithmic;
 CTL_StringType dynarithmic::GetWinVersion()
 {
     COSVersion::OS_VERSION_INFO osvi;
-    memset(&osvi, 0, sizeof(osvi));
+    memset(&osvi, 0, sizeof osvi);
 #ifdef _UNICODE
     std::wostringstream sText, sBuf;
 #else
@@ -411,10 +411,10 @@ CTL_StringType dynarithmic::GetWinVersion()
             if (osvi.wEmulatedServicePackMinor)
             {
                 //Handle the special case of NT 4 SP 6a which Dtwinver ver treats as SP 6.1
-                if (os.IsNTPreWin2k(&osvi, FALSE) && (osvi.wEmulatedServicePackMajor == 6) && (osvi.wEmulatedServicePackMinor == 1))
+                if (os.IsNTPreWin2k(&osvi, FALSE) && osvi.wEmulatedServicePackMajor == 6 && osvi.wEmulatedServicePackMinor == 1)
                     sBuf << _T(" Service Pack: 6a");
                 //Handle the special case of XP SP 1a which Dtwinver ver treats as SP 1.1
-                else if (os.IsWindowsXP(&osvi, FALSE) && (osvi.wEmulatedServicePackMajor == 1) && (osvi.wEmulatedServicePackMinor == 1))
+                else if (os.IsWindowsXP(&osvi, FALSE) && osvi.wEmulatedServicePackMajor == 1 && osvi.wEmulatedServicePackMinor == 1)
                     sBuf << _T(" Service Pack: 1a");
                 else
                     sBuf << _T(" Service Pack:") << static_cast<int>(osvi.wEmulatedServicePackMajor) << _T(".") << static_cast<int>(osvi.wEmulatedServicePackMinor);
@@ -804,10 +804,10 @@ CTL_StringType dynarithmic::GetWinVersion()
             if (osvi.wUnderlyingServicePackMinor)
             {
                 //Handle the special case of NT 4 SP 6a which Dtwinver treats as SP 6.1
-                if (os.IsNTPreWin2k(&osvi, TRUE) && (osvi.wUnderlyingServicePackMajor == 6) && (osvi.wUnderlyingServicePackMinor == 1))
+                if (os.IsNTPreWin2k(&osvi, TRUE) && osvi.wUnderlyingServicePackMajor == 6 && osvi.wUnderlyingServicePackMinor == 1)
                     sBuf << _T(" Service Pack: 6a");
                 //Handle the special case of XP SP 1a which Dtwinver treats as SP 1.1
-                else if (os.IsWindowsXP(&osvi, TRUE) && (osvi.wUnderlyingServicePackMajor == 1) && (osvi.wUnderlyingServicePackMinor == 1))
+                else if (os.IsWindowsXP(&osvi, TRUE) && osvi.wUnderlyingServicePackMajor == 1 && osvi.wUnderlyingServicePackMinor == 1)
                     sBuf << _T(" Service Pack: 1a");
                 else
                     sBuf << _T(" Service Pack:") << static_cast<int>(osvi.wUnderlyingServicePackMajor) << _T(".") << static_cast<int>(osvi.wUnderlyingServicePackMinor);

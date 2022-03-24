@@ -38,5 +38,5 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetEOJDetectValue(DTWAIN_SOURCE Source, LONG nVa
         // return the file name that would be acquired
     pSource->SetEOJDetectedValue(nValue);
     LOG_FUNC_EXIT_PARAMS(true)
-    CATCH_BLOCK(false);
+    CATCH_BLOCK(false)
 }

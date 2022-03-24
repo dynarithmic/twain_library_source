@@ -173,7 +173,7 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
             m_hFile = std::move(pTextPageInfo->fh);
         }
     }
-    return (0); 
+    return 0; 
 }
 
 int CTextImageHandler::WriteTempFile()
@@ -186,7 +186,7 @@ int CTextImageHandler::WriteTempFile()
 int CTextImageHandler::SaveOCR()
 {
     // Now OCR the file and save to the text file specified by user
-    const LONG bRet = m_pOCREngine->StartOCR(m_pTextPageInfo->szTempFile.c_str());
+    const LONG bRet = m_pOCREngine->StartOCR(m_pTextPageInfo->szTempFile);
     if ( m_pOCREngine->IsReturnCodeOk(bRet) )
     {
         const std::string theText = m_pOCREngine->GetOCRText();
@@ -197,7 +197,7 @@ int CTextImageHandler::SaveOCR()
 
 void CTextImageHandler::DestroyAllObjects()
 {
-    if (m_hFile && *(m_hFile.get()))
+    if (m_hFile && *m_hFile.get())
         m_hFile->close();
     if (!m_bWriteOk)
         filesys::remove(GetOutputFileName().c_str());

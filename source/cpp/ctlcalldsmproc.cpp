@@ -32,7 +32,7 @@ TWAIN_IDENTITY DLLENTRY_DEF DTWAIN_GetTwainAppID()
 {
     LOG_FUNC_ENTRY_PARAMS(())
     if (!DTWAIN_IsSessionEnabled())
-         LOG_FUNC_EXIT_PARAMS(NULL);
+        LOG_FUNC_EXIT_PARAMS(NULL)
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     TW_IDENTITY *pIdentity = pHandle->m_pTwainSession->GetAppIDPtr();
     LOG_FUNC_EXIT_PARAMS(((TWAIN_IDENTITY)pIdentity))
@@ -76,8 +76,8 @@ LONG DLLENTRY_DEF DTWAIN_CallDSMProc(TWAIN_IDENTITY AppID, TWAIN_IDENTITY Source
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, -1L, FUNC_MACRO);
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return (!DTWAIN_IsSessionEnabled()); }, DTWAIN_ERR_NO_SESSION, -1L, FUNC_MACRO);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return (!AppID && !SourceId); }, DTWAIN_ERR_INVALID_PARAM, -1L, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !DTWAIN_IsSessionEnabled(); }, DTWAIN_ERR_NO_SESSION, -1L, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !AppID && !SourceId; }, DTWAIN_ERR_INVALID_PARAM, -1L, FUNC_MACRO);
     const LONG Ret = CTL_TwainAppMgr::CallDSMEntryProc(static_cast<TW_IDENTITY*>(AppID),
                                                        static_cast<TW_IDENTITY*>(SourceId),
                                                        static_cast<TW_UINT32>(lDG),
@@ -95,7 +95,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCurrentTwainTriplet(TW_IDENTITY* pAppID, TW_I
     LOG_FUNC_ENTRY_PARAMS((pAppID, pSourceID, lpDAT, lpDG, lpMsg, lpMemRef))
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, FALSE, FUNC_MACRO);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return (!DTWAIN_IsSessionEnabled()); }, DTWAIN_ERR_NO_SESSION, -1L, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !DTWAIN_IsSessionEnabled(); }, DTWAIN_ERR_NO_SESSION, -1L, FUNC_MACRO);
     const CTL_TwainTriplet* currentTriplet = CTL_TwainAppMgr::GetInstance()->GetCurrentTriplet();
     if (currentTriplet)
     {

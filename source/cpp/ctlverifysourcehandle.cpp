@@ -48,8 +48,8 @@ CTL_ITwainSource* dynarithmic::VerifySourceHandle(DTWAIN_HANDLE DLLHandle,  DTWA
         p = static_cast<CTL_ITwainSource *>(Source);
 
         // Check if Source is valid
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return (!p ||
-            (!CTL_TwainAppMgr::IsValidTwainSource(pHandle->m_pTwainSession, p))); },
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !p ||
+                                              !CTL_TwainAppMgr::IsValidTwainSource(pHandle->m_pTwainSession, p); },
             DTWAIN_ERR_BAD_SOURCE, NULL, FUNC_MACRO);
     }
     LOG_FUNC_EXIT_PARAMS(p)

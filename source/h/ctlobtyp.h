@@ -34,19 +34,19 @@ namespace dynarithmic
              CTL_TwainTypeOb( TW_UINT16 nType, bool bGetTypeSize=true);
              virtual ~CTL_TwainTypeOb();
              CTL_TwainTypeOb(CTL_TwainTypeOb& rhs) = delete;
-             CTL_TwainTypeOb(CTL_TwainTypeOb&& rhs);
-             CTL_TwainTypeOb& operator=(CTL_TwainTypeOb&& rhs);
+             CTL_TwainTypeOb(CTL_TwainTypeOb&& rhs) noexcept;
+             CTL_TwainTypeOb& operator=(CTL_TwainTypeOb&& rhs) noexcept;
              CTL_TwainTypeOb& operator=(CTL_TwainTypeOb&) = delete;
 
              static void swap(CTL_TwainTypeOb& left, CTL_TwainTypeOb& right) noexcept;
 
              // Data initialization.  This MUST fit into allocated space for type
              // specified in constructor
-             void CopyData( void *pData );
+             void CopyData(const void* pData) const;
 
              // Returns the raw data in this object
              void *GetDataRaw() const;
-             void GetData( void *pData );
+             void GetData( void *pData ) const;
 
              int GetDataSize() const;
              int GetDataType() const;

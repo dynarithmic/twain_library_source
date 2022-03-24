@@ -39,7 +39,7 @@ namespace dynarithmic
 
             CTL_StringType GetFileName() const { return StringConversion::Convert_AnsiPtr_To_Native(m_SetupFileXfer.FileName); }
             CTL_TwainFileFormatEnum  GetFileFormat() const { return static_cast<CTL_TwainFileFormatEnum>(m_SetupFileXfer.Format); }
-            TW_UINT16 Execute();
+            TW_UINT16 Execute() override;
             void SetJPEGQuality(TW_INT16 quality) { m_capMap[DTWAIN_CV_ICAPJPEGQUALITY] = static_cast<LONG>(quality); }
             void SetJPEGPixelType(TW_UINT16 pixType) { m_capMap[DTWAIN_CV_ICAPJPEGPIXELTYPE] = static_cast<LONG>(pixType); }
             void SetCompression(TW_UINT16 nCompression) { m_capMap[DTWAIN_CV_ICAPCOMPRESSION] = nCompression; }

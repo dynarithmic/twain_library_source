@@ -37,7 +37,7 @@ CTL_SetupFileXferTriplet::CTL_SetupFileXferTriplet(CTL_ITwainSession *pSession,
     SetSourcePtr( pSource );
     StringWrapperA::SafeStrcpy( m_SetupFileXfer.FileName,
                                StringConversion::Convert_Native_To_Ansi(strFileName).c_str(),
-                                sizeof(m_SetupFileXfer.FileName) - 1 );
+                                sizeof m_SetupFileXfer.FileName - 1 );
 
     m_SetupFileXfer.Format = static_cast<TW_UINT16>(FileFormat);
 
@@ -96,7 +96,7 @@ struct CapGetter
 {
     CTL_ITwainSource *m_pSource;
     CapGetter(CTL_ITwainSource* pSource) : m_pSource(pSource) {}
-    void operator()(CTL_SetupFileXferTriplet::FileXferCapMap::value_type& v)
+    void operator()(CTL_SetupFileXferTriplet::FileXferCapMap::value_type& v) const
     { CTL_TwainAppMgr::GetCurrentOneCapValue(m_pSource, &v.second, v.first, static_cast<TW_UINT16>(CTL_TwainAppMgr::GetGeneralCapInfo(v.first).m_nDataType)); }
 };
 
@@ -104,7 +104,7 @@ struct CapSetter
 {
     CTL_ITwainSource *m_pSource;
     CapSetter(CTL_ITwainSource* pSource) : m_pSource(pSource) {}
-    void operator()(CTL_SetupFileXferTriplet::FileXferCapMap::value_type& v)
+    void operator()(const CTL_SetupFileXferTriplet::FileXferCapMap::value_type& v) const
     { SetOneCapValue(m_pSource, v.first, CTL_SetTypeSET, v.second, static_cast<TW_UINT16>(CTL_TwainAppMgr::GetGeneralCapInfo(v.first).m_nDataType)); }
 };
 

@@ -123,7 +123,7 @@ namespace dynarithmic
 
         protected:
             bool OpenOutputFile(LPCTSTR pFileName) override;
-            int  InitializePDFPage(PDFINFO *pPDFInfo, HANDLE bitmap) const;
+            static int  InitializePDFPage(const PDFINFO* pPDFInfo, HANDLE bitmap);
             static void RemoveAllImageFiles(PDFINFO *pPDFInfo);
             bool LoadPDFLibrary();
 

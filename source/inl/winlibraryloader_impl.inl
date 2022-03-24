@@ -23,7 +23,7 @@ struct library_loader_impl
 {
     static void *get(void *handle, const char *name)
     {
-        return ::GetProcAddress(static_cast<HMODULE>(handle), name);
+        return GetProcAddress(static_cast<HMODULE>(handle), name);
     }
 };
 #endif

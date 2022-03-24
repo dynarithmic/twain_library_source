@@ -53,7 +53,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAvailablePrinters(DTWAIN_SOURCE Source, LONG 
     LONG j = 0;
     for ( LONG i = 0; i < 8; i++ )
     {
-        if ( lpAvailPrinters & (1L << i) )
+        if ( lpAvailPrinters & 1L << i )
         {
             vValues[j] = i;
             ++j;
@@ -82,7 +82,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinter(DTWAIN_SOURCE Source, LONG nPrinter, 
     bool bFound = false;
     for ( LONG i = 0; i < 8; i++ )
     {
-        if ( (nPrinter >> i) == 1L )
+        if ( nPrinter >> i == 1L )
         {
             nPrinter = i;
             bFound = true;
@@ -107,7 +107,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPrinterEnabled(DTWAIN_SOURCE Source, LONG Prin
     LONG Current;
     if ( DTWAIN_GetPrinter(Source, &Current, TRUE ) )
     {
-        if ( (Current == Printer) || Printer == DTWAIN_ANYSUPPORT)
+        if ( Current == Printer || Printer == DTWAIN_ANYSUPPORT)
             LOG_FUNC_EXIT_PARAMS(true)
     }
     LOG_FUNC_EXIT_PARAMS(false)
@@ -127,7 +127,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterStrings(DTWAIN_SOURCE Source, DTWAIN_A
 
         // Check if array is of the correct type
         DTWAIN_Check_Error_Condition_0_Ex(pHandle,
-                        [&]{ return ( !EnumeratorFunctionImpl::EnumeratorIsValidEx(ArrayString, CTL_EnumeratorStringType ) );},
+                        [&]{ return !EnumeratorFunctionImpl::EnumeratorIsValidEx(ArrayString, CTL_EnumeratorStringType );},
                          DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
     }
     else

@@ -3,89 +3,89 @@
 
 // TOCR declares Version 3.0.2.0
 
-#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
+#define WIN32_LEAN_AND_MEAN     // Exclude rarely-used stuff from Windows headers
 
 typedef unsigned char       BYTE;
-typedef signed short		VBBOOL;	// in VB Boolean is a signed short True is -1
+typedef signed short        VBBOOL; // in VB Boolean is a signed short True is -1
 
 typedef struct tagTOCRProcessOptions
 {
-	long		StructId;
-	VBBOOL		InvertWholePage;
-	VBBOOL		DeskewOff;
-	BYTE		Orientation;
-	VBBOOL		NoiseRemoveOff;
-	VBBOOL		LineRemoveOff;
-	VBBOOL		DeshadeOff;
-	VBBOOL		InvertOff;
-	VBBOOL		SectioningOn;
-	VBBOOL		MergeBreakOff;
-	VBBOOL		LineRejectOff;
-	VBBOOL		CharacterRejectOff;
-	VBBOOL		LexOff;
-	VBBOOL		DisableCharacter[256];
+    long        StructId;
+    VBBOOL      InvertWholePage;
+    VBBOOL      DeskewOff;
+    BYTE        Orientation;
+    VBBOOL      NoiseRemoveOff;
+    VBBOOL      LineRemoveOff;
+    VBBOOL      DeshadeOff;
+    VBBOOL      InvertOff;
+    VBBOOL      SectioningOn;
+    VBBOOL      MergeBreakOff;
+    VBBOOL      LineRejectOff;
+    VBBOOL      CharacterRejectOff;
+    VBBOOL      LexOff;
+    VBBOOL      DisableCharacter[256];
 } TOCRPROCESSOPTIONS;
 
 typedef struct tagTOCRJobInfo
 {
-	long		StructId;
-	long		JobType;
-	char		*InputFile;
-	long		PageNo;
-	TOCRPROCESSOPTIONS	ProcessOptions;
+    long        StructId;
+    long        JobType;
+    char        *InputFile;
+    long        PageNo;
+    TOCRPROCESSOPTIONS  ProcessOptions;
 } TOCRJOBINFO;
 
 typedef struct tagTOCRRESULTSHEADER
 {
-    long		StructId;
-	long		XPixelsPerInch;
-	long		YPixelsPerInch;
-	long		NumItems;
-	float		MeanConfidence;
+    long        StructId;
+    long        XPixelsPerInch;
+    long        YPixelsPerInch;
+    long        NumItems;
+    float       MeanConfidence;
 } TOCRRESULTSHEADER;
 
 typedef struct tagTOCRRESULTSITEM
 {
-	unsigned short	StructId;
-	unsigned short	OCRCha;
-	float			Confidence;
-	unsigned short	XPos;
-	unsigned short	YPos;
-	unsigned short	XDim;
-	unsigned short	YDim;
+    unsigned short  StructId;
+    unsigned short  OCRCha;
+    float           Confidence;
+    unsigned short  XPos;
+    unsigned short  YPos;
+    unsigned short  XDim;
+    unsigned short  YDim;
 } TOCRRESULTSITEM;
 
 
 typedef struct tagTOCRRESULTS
 {
-	TOCRRESULTSHEADER	Hdr;
-	TOCRRESULTSITEM		Item[1];
+    TOCRRESULTSHEADER   Hdr;
+    TOCRRESULTSITEM     Item[1];
 } TOCRRESULTS;
 
 
 typedef struct tagTOCRRESULTSITEMEXALT
 {
-	unsigned short	Valid;
-	unsigned short	OCRCha;
-	float			Factor;
+    unsigned short  Valid;
+    unsigned short  OCRCha;
+    float           Factor;
 } TOCRRESULTSITEMEXALT;
 
 typedef struct tagTOCRRESULTSITEMEX
 {
-	unsigned short			StructId;
-	unsigned short			OCRCha;
-	float					Confidence;
-	unsigned short			XPos;
-	unsigned short			YPos;
-	unsigned short			XDim;
-	unsigned short			YDim;
-	TOCRRESULTSITEMEXALT	Alt[5];
+    unsigned short          StructId;
+    unsigned short          OCRCha;
+    float                   Confidence;
+    unsigned short          XPos;
+    unsigned short          YPos;
+    unsigned short          XDim;
+    unsigned short          YDim;
+    TOCRRESULTSITEMEXALT    Alt[5];
 } TOCRRESULTSITEMEX;
 
 typedef struct tagTOCRRESULTSEX
 {
-	TOCRRESULTSHEADER	Hdr;
-	TOCRRESULTSITEMEX	Item[1];
+    TOCRRESULTSHEADER   Hdr;
+    TOCRRESULTSITEMEX   Item[1];
 } TOCRRESULTSEX;
 
 #ifndef _WIN32

@@ -83,7 +83,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSourceVersionInfo(DTWAIN_SOURCE Source, LPTSTR szVIn
         if ( szVInfo == nullptr)
             LOG_FUNC_EXIT_PARAMS((LONG)nLen)
 
-        std::copy(pName.begin(), pName.begin() + nLen, szVInfo);
+        std::copy_n(pName.begin(), nLen, szVInfo);
         szVInfo[nLen] = _T('\0');
         LOG_FUNC_EXIT_PARAMS((LONG)nLen)
     }

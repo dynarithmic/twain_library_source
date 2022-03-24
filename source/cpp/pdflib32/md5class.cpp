@@ -1,5 +1,5 @@
 #include <md5class.h>
-#include <string.h>
+#include <cstring>
 
 std::vector<unsigned char> MD5::ComputeHash(const char *input, int len/* = -1*/)
 {

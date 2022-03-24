@@ -54,7 +54,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source, DTWAIN_AR
         LOG_FUNC_EXIT_PARAMS(false)
 
         // Check if array is of the correct type
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return (!EnumeratorFunctionImpl::EnumeratorIsValidEx(pArray, CTL_EnumeratorHandleType)); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !EnumeratorFunctionImpl::EnumeratorIsValidEx(pArray, CTL_EnumeratorHandleType); },
                                                     DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
     const DTWAIN_ARRAY pDTWAINArray = pArray;
     EnumeratorFunctionImpl::ClearEnumerator(pDTWAINArray);
@@ -129,7 +129,7 @@ struct NestedAcquisitionDestroyer
     bool m_bDestroyDibs;
     NestedAcquisitionDestroyer(bool bDestroyDibs) : m_bDestroyDibs(bDestroyDibs) {}
 
-    void operator()(DTWAIN_ARRAY ImagesArray)
+    void operator()(DTWAIN_ARRAY ImagesArray) const
     {
         // we want this array destroyed when we're finished
         DTWAINArrayLL_RAII raii(ImagesArray);
@@ -167,7 +167,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyAcquisitionArray(DTWAIN_ARRAY aAcq, DTWAI
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, nullptr);
 
     // Check if array exists
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return (!EnumeratorFunctionImpl::EnumeratorIsValid(aAcq)); }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !EnumeratorFunctionImpl::EnumeratorIsValid(aAcq); }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
 
     // Make sure this array is destroyed when we exit this function
     DTWAINArrayLL_RAII raiiMain(aAcq);
@@ -195,7 +195,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ForceAcquireBitDepth(DTWAIN_SOURCE Source, LONG 
     if (!p)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return (!CTL_TwainAppMgr::IsSourceOpen(p)); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(p); },
                 DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
     const DTWAIN_BOOL bRet = SetBitDepth(p, BitDepth);

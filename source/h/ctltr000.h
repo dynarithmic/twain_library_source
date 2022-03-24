@@ -31,7 +31,7 @@ namespace dynarithmic
     {
         public:
             CTL_TwainSMTriplet(CTL_ITwainSession *pSession, TW_UINT16 nMsg, int nErr);
-            TW_UINT16       Execute();
+            TW_UINT16       Execute() override;
             int GetDSMVersion() const;
 
         private:

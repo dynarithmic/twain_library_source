@@ -323,28 +323,28 @@ namespace dynarithmic
             static HANDLE CreateDIB(int width, int height, int bpp, LPSTR palette= nullptr);
 
             static int CalculateLine(int width, int bitdepth) {
-                return ((width * bitdepth) + 7) / 8;
+                return (width * bitdepth + 7) / 8;
             }
 
             static int CalculatePitch(int line) {
-                return (line + 3) & ~3;
+                return line + 3 & ~3;
             }
 
             static int CalculateUsedPaletteEntries(int bit_count) {
-                if ((bit_count >= 1) && (bit_count <= 8))
+                if (bit_count >= 1 && bit_count <= 8)
                     return 1 << bit_count;
                 return 0;
             }
 
             static int CalculateEffWidth(int width, int bpp) {
-                return ((((width * bpp) + 31) / 32) * 4);
+                return (width * bpp + 31) / 32 * 4;
             }
 
             static unsigned GetLine(BYTE *pDib);
 
             static unsigned char * CalculateScanLine(unsigned char *bits, unsigned pitch, int scanline)
             {
-                return (bits + (pitch * scanline));
+                return bits + pitch * scanline;
             }
 
             static unsigned char * GetScanLine(BYTE *pDib, int scanline);

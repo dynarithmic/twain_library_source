@@ -41,7 +41,7 @@ namespace dynarithmic
         std::shared_ptr<CTL_ImageIOHandler> m_pOrigHandler;
 
         CTextPageInfo(int curPage) : curPageNum(curPage) { }
-        ~CTextPageInfo() = default;
+        ~CTextPageInfo() override = default;
     };
 
     class CTextImageHandler : public CDibInterface
@@ -54,20 +54,20 @@ namespace dynarithmic
                                      m_InputFormat(inputFormat),
                                      m_pDib(pDib) {}
             // Virtual interface
-            virtual std::string GetFileExtension() const  override;
-            virtual HANDLE  GetFileInformation(LPCSTR path)  override;
+            std::string GetFileExtension() const  override;
+            HANDLE  GetFileInformation(LPCSTR path)  override;
             int     WriteGraphicFile(CTL_ImageIOHandler *pHandler, LPCTSTR path, HANDLE bitmap, void *pUserInfo = nullptr)  override;
-            virtual int     WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, UINT32 wid, UINT32 ht,
-                                       UINT32 bpp, UINT32 cpal, RGBQUAD *pPal,
-                                       void *pUserInfo = nullptr)  override;
+            int     WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, UINT32 wid, UINT32 ht,
+                               UINT32 bpp, UINT32 cpal, RGBQUAD *pPal,
+                               void *pUserInfo = nullptr)  override;
 
-            virtual void SetMultiPageStatus(DibMultiPageStruct *pStruct);
-            virtual void GetMultiPageStatus(DibMultiPageStruct *pStruct);
+            void SetMultiPageStatus(DibMultiPageStruct *pStruct) override;
+            void GetMultiPageStatus(DibMultiPageStruct *pStruct) override;
 
         protected:
-            bool OpenOutputFile(LPCTSTR pFileName);
-            bool CloseOutputFile();
-            void DestroyAllObjects();
+            bool OpenOutputFile(LPCTSTR pFileName) override;
+            bool CloseOutputFile() override;
+            void DestroyAllObjects() override;
             int WriteTempFile();
             int SaveOCR();
 

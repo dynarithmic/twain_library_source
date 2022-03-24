@@ -42,7 +42,7 @@ namespace dynarithmic
     // Finds the array item that has a value of SearchVal
     template <class TypeInfo, class TypeArray>
     bool FindFirstValue( TypeInfo SearchVal, std::vector<TypeArray>* SearchArray, int *pWhere);
-    CTL_CapInfo GetCapInfo( CTL_TwainDLLHandle* pHandle, CTL_ITwainSource *p,TW_UINT16 nCap);
+    CTL_CapInfo GetCapInfo(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource* p, TW_UINT16 nCap);
 
     template <class T>
     bool    GetCapabilityValues( const CTL_ITwainSource *pSource,
@@ -350,7 +350,7 @@ namespace dynarithmic
         {
             UNUSED_PARAM(TT);
             CTL_ITwainSource *p = VerifySourceHandle( DLLHandle, Source );
-            CTL_TwainDLLHandle *pHandle = (static_cast<CTL_TwainDLLHandle*>(DLLHandle));
+            CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle*>(DLLHandle);
 
             if ( !p )
                 return false;

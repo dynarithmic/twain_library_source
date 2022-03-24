@@ -34,12 +34,6 @@
 #include <boost/dll/shared_library.hpp>
 #include "dtwain_resource_constants.h"
 #include "dtwain_filesystem.h"
-
-#define DTWAIN_SET_ERROR_CONDITION(Err,Retval) {  \
-            static_cast<CTL_TwainDLLHandle *>(::GetDTWAINHandle_Internal())->m_lLastError = (Err); \
-            DTWAIN_ERROR_CONDITION((Err),(Retval)) \
-            }
-
 #include "dtwain.h"
 #include "ctltrall.h"
 #include <ctlccerr.h>
@@ -138,7 +132,7 @@ CTL_ITwainSession* CTL_TwainAppMgr::CreateTwainSession(
     // Try to load the source manager ( set in state 2 if not already
     //    in state 2 or 3)
     if ( !s_pGlobalAppMgr )
-        DTWAIN_ERROR_CONDITION(IDS_ErrTwainMgrInvalid, nullptr);
+        DTWAIN_ERROR_CONDITION(IDS_ErrTwainMgrInvalid, nullptr)
 
     // Load if not already loaded
     if ( !s_pGlobalAppMgr->m_hLibModule )
@@ -147,16 +141,16 @@ CTL_ITwainSession* CTL_TwainAppMgr::CreateTwainSession(
             return nullptr;
     }
 
-    auto pSession = CTL_ITwainSession::Create(pAppName,
-                                              hAppWnd,
-                                              nMajorNum,
-                                              nMinorNum,
-                                              nLanguage,
-                                              nCountry,
-                                              lpszVersion,
-                                              lpszMfg,
-                                              lpszFamily,
-                                              lpszProduct);
+    const auto pSession = CTL_ITwainSession::Create(pAppName,
+                                                    hAppWnd,
+                                                    nMajorNum,
+                                                    nMinorNum,
+                                                    nLanguage,
+                                                    nCountry,
+                                                    lpszVersion,
+                                                    lpszMfg,
+                                                    lpszFamily,
+                                                    lpszProduct);
     if ( pSession )
     {
         // We need to now set the ProtocolMajor, ProtocolMinor, and Supported Groups
@@ -225,7 +219,7 @@ bool CTL_TwainAppMgr::IsVersion2DSMUsedWithCallback()
 
 int CTL_TwainAppMgr::CopyFile(CTL_StringType strIn, CTL_StringType strOut)
 {
-    filesys::copy_file(strIn, strOut, filesys::copy_options::overwrite_existing);
+    copy_file(strIn, strOut, filesys::copy_options::overwrite_existing);
     return 1;
 }
 
@@ -272,7 +266,7 @@ void CTL_TwainAppMgr::EnumSources( CTL_ITwainSession* pSession, CTL_TwainSourceS
 }
 
 /* static static static static static static static static static static */
-void CTL_TwainAppMgr::DestroyTwainSession( CTL_ITwainSession* pSession )
+void CTL_TwainAppMgr::DestroyTwainSession(const CTL_ITwainSession* pSession)
 {
     if ( s_pGlobalAppMgr )
         s_pGlobalAppMgr->DestroySession( pSession );
@@ -298,7 +292,7 @@ void CTL_TwainAppMgr::UnloadSourceManager()
     if ( s_pGlobalAppMgr && s_pGlobalAppMgr->m_hLibModule.is_loaded() )
     {
         while (s_pGlobalAppMgr->m_hLibModule.is_loaded())
-        s_pGlobalAppMgr->m_hLibModule.unload();
+            s_pGlobalAppMgr->m_hLibModule.unload();
     }
     CTL_TwainDLLHandle::s_nDSMState = DSM_STATE_NONE;
 }
@@ -397,7 +391,7 @@ bool CTL_TwainAppMgr::GetBestContainerType(const CTL_ITwainSource* pSource,
         return false;
 
     const auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
-    auto pSession = pTempSource->GetTwainSession();
+    const auto pSession = pTempSource->GetTwainSession();
 
     const UINT setSave = rContainerSet;
 
@@ -409,9 +403,9 @@ bool CTL_TwainAppMgr::GetBestContainerType(const CTL_ITwainSource* pSource,
     }
 
     const bool bGetTheCap =
-         ((lGetType == CTL_GetTypeGET && !flags[0] ) ||
-         (lGetType == CTL_GetTypeGETCURRENT && !flags[1]) ||
-         (lGetType == CTL_GetTypeGETDEFAULT && !flags[2]));
+         lGetType == CTL_GetTypeGET && !flags[0] ||
+         lGetType == CTL_GetTypeGETCURRENT && !flags[1] ||
+         lGetType == CTL_GetTypeGETDEFAULT && !flags[2];
 
     // Get the possible container types for the get cap
     if ( bGetTheCap )
@@ -460,8 +454,8 @@ bool CTL_TwainAppMgr::GetBestContainerType(const CTL_ITwainSource* pSource,
     // Now determine Set container for custom caps
     if ( nCap >= CAP_CUSTOMBASE )
     {
-        if ((lGetType == CTL_GetTypeGET && !flags[3]) ||
-            (lGetType == CTL_GetTypeGETCURRENT && !flags[4]))
+        if (lGetType == CTL_GetTypeGET && !flags[3] ||
+            lGetType == CTL_GetTypeGETCURRENT && !flags[4])
             rContainerSet = rContainerGet; // assume that setting and getting use the same
         else
             rContainerSet = setSave;
@@ -537,7 +531,7 @@ bool CTL_TwainAppMgr::GetImageLayoutSize(const CTL_ITwainSource* pSource,
         const TW_UINT16 ccode = GetConditionCode(pSession, pTempSource);
         if ( ccode != TWCC_SUCCESS )
         {
-            CTL_TwainAppMgr::ProcessConditionCodeError(ccode);
+            ProcessConditionCodeError(ccode);
         }
     }
     return false;
@@ -583,7 +577,7 @@ bool CTL_TwainAppMgr::SetImageLayoutSize(const CTL_ITwainSource* pSource,
         {
             const TW_UINT16 ccode = GetConditionCode(pSession, pTempSource);
             if ( ccode != TWCC_SUCCESS )
-                CTL_TwainAppMgr::ProcessConditionCodeError(ccode);
+                ProcessConditionCodeError(ccode);
         }
         return false;
     }
@@ -615,15 +609,15 @@ bool CTL_TwainAppMgr::ShowUserInterface( CTL_ITwainSource *pSource, bool bTest, 
             oldState = pSource->GetState();
             isModal = pSource->IsModal();
             isUIOnly = pSource->IsUIOnly();
-            SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_UIOPENED, (LPARAM)pSource);
+            SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_UIOPENED, reinterpret_cast<LPARAM>(pSource));
         }
 
-        void restoreState()
+        void restoreState() const
         {
             pSource->SetState(oldState);
             pSource->SetModal(isModal);
             pSource->SetUIOnly(isUIOnly);
-            SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_UIOPENFAILURE, (LPARAM)pSource);
+            SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_UIOPENFAILURE, reinterpret_cast<LPARAM>(pSource));
         }
     };
 
@@ -657,7 +651,7 @@ bool CTL_TwainAppMgr::ShowUserInterface( CTL_ITwainSource *pSource, bool bTest, 
     {
         const TW_UINT16 ccode = GetConditionCode(pSession, pTempSource);
         if ( ccode != TWCC_SUCCESS )
-            CTL_TwainAppMgr::ProcessConditionCodeError(ccode);
+            ProcessConditionCodeError(ccode);
 
         oState.restoreState();
 
@@ -679,14 +673,14 @@ bool CTL_TwainAppMgr::ShowUserInterface( CTL_ITwainSource *pSource, bool bTest, 
                 // Send the MSG_xxx messages to close the user interface.
                 // This is actually a bug in the TWAIN device, not a
                 // bug in DTWAIN.
-                CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,nullptr,DTWAIN_TN_UICLOSING,reinterpret_cast<LPARAM>(pSource));
-                CTL_TwainAppMgr::DisableUserInterface(pSource);
+                SendTwainMsgToWindow(pSession,nullptr,DTWAIN_TN_UICLOSING,reinterpret_cast<LPARAM>(pSource));
+                DisableUserInterface(pSource);
 
                 // Force setting the transfer done now.
                 const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
                 pHandle->m_bTransferDone = true;
 
-                CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,nullptr,DTWAIN_TN_UICLOSED,reinterpret_cast<LPARAM>(pSource));
+                SendTwainMsgToWindow(pSession,nullptr,DTWAIN_TN_UICLOSED,reinterpret_cast<LPARAM>(pSource));
                 return false;
             }
         }
@@ -723,8 +717,8 @@ bool CTL_TwainAppMgr::ShowUserInterface( CTL_ITwainSource *pSource, bool bTest, 
 bool CTL_TwainAppMgr::DisableUserInterface(const CTL_ITwainSource *pSource)
 {
     // Check if source is valid
-    auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
-    auto pSession = pTempSource->GetTwainSession();
+    const auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
+    const auto pSession = pTempSource->GetTwainSession();
     TW_USERINTERFACE *pTWUI = pTempSource->GetTWUserInterface();
     CTL_UserInterfaceDisableTriplet UI(pSession, pTempSource, pTWUI );
     bool bRet = true;
@@ -734,7 +728,7 @@ bool CTL_TwainAppMgr::DisableUserInterface(const CTL_ITwainSource *pSource)
         const TW_UINT16 ccode = GetConditionCode(pSession, pTempSource);
         if ( ccode != TWCC_SUCCESS )
         {
-            CTL_TwainAppMgr::ProcessConditionCodeError(ccode);
+            ProcessConditionCodeError(ccode);
             bRet = false;
         }
     }
@@ -746,22 +740,21 @@ bool CTL_TwainAppMgr::DisableUserInterface(const CTL_ITwainSource *pSource)
 }
 
 
-void CTL_TwainAppMgr::EndTwainUI(CTL_ITwainSession *pSession, CTL_ITwainSource *pSource)
+void CTL_TwainAppMgr::EndTwainUI(const CTL_ITwainSession* pSession, CTL_ITwainSource* pSource)
 {
     // The source UI must be closed for modeless Source
     if ( pSource->IsUIOpen()/* && !pSource->IsModal() */)
     {
-        CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
-                                              nullptr,
-                                              DTWAIN_TN_UICLOSING,
-                                              (LPARAM)pSource);
-        if ( 1 ) //pSource->IsUIOpenOnAcquire() )
-            CTL_TwainAppMgr::DisableUserInterface(pSource);
+        SendTwainMsgToWindow(pSession,
+                             nullptr,
+                             DTWAIN_TN_UICLOSING,
+                             reinterpret_cast<LPARAM>(pSource));
+        DisableUserInterface(pSource);
 
-        CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
-                                              nullptr,
-                                              DTWAIN_TN_UICLOSED,
-                                              (LPARAM)pSource);
+        SendTwainMsgToWindow(pSession,
+                             nullptr,
+                             DTWAIN_TN_UICLOSED,
+                             reinterpret_cast<LPARAM>(pSource));
         if ( pSource->IsMultiPageModeUIMode() )
             pSource->ProcessMultipageFile();
     }
@@ -769,17 +762,17 @@ void CTL_TwainAppMgr::EndTwainUI(CTL_ITwainSession *pSession, CTL_ITwainSource *
 
 bool CTL_TwainAppMgr::GetImageInfo(CTL_ITwainSource *pSource, CTL_ImageInfoTriplet *pTrip/*=NULL*/)
 {
-    auto pTempSource = static_cast<CTL_ITwainSource*>(pSource);
-    auto pSession = pTempSource->GetTwainSession();
-    CTL_ImageInfoTriplet II(pSession, pTempSource);
+    const auto pTempSource = static_cast<CTL_ITwainSource*>(pSource);
+    const auto pSession = pTempSource->GetTwainSession();
+    CTL_ImageInfoTriplet ImageInfo(pSession, pTempSource);
     if ( !pTrip )
-        pTrip = &II;
+        pTrip = &ImageInfo;
     if ( pTrip->Execute() != TWRC_SUCCESS )
     {
         const TW_UINT16 ccode = GetConditionCode(pSession, pTempSource);
         if ( ccode != TWCC_SUCCESS )
         {
-            CTL_TwainAppMgr::ProcessConditionCodeError(ccode);
+            ProcessConditionCodeError(ccode);
             return false;
         }
         return true;
@@ -804,8 +797,8 @@ CTL_ITwainSession* CTL_TwainAppMgr::GetNthSession(int nSession)
 }
 
 
-TW_UINT16 CTL_TwainAppMgr::GetConditionCode( CTL_ITwainSession *pSession,
-                                             const CTL_ITwainSource *pSource,
+TW_UINT16 dynarithmic::CTL_TwainAppMgr::GetConditionCode( CTL_ITwainSession *pSession,
+                                             CTL_ITwainSource *pSource/*=nullptr*/,
                                              TW_UINT16 rc/*=1*/)
 {
     if ( rc == DTWAIN_ERR_EXCEPTION_ERROR_ )
@@ -822,7 +815,8 @@ bool CTL_TwainAppMgr::ProcessConditionCodeError(TW_UINT16 nError)
     CTL_CondCodeInfo p = FindConditionCode(nError);
     if ( p.IsValidCode())
     {
-        DTWAIN_SET_ERROR_CONDITION(p.m_nResourceID, false)
+        static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal())->m_lLastError = p.m_nResourceID; 
+        DTWAIN_ERROR_CONDITION(p.m_nResourceID, false)
     }
     return true;
 }
@@ -836,7 +830,7 @@ bool CTL_TwainAppMgr::IsTwainMsg(MSG *pMsg, bool bFromUserQueue/*=false*/)
     if ( !IsValidTwainSession( s_pSelectedSession ) )
         return false;
 
-    const CTL_ITwainSource* ptrSource = s_pSelectedSession->GetSelectedSource();
+    CTL_ITwainSource* ptrSource = s_pSelectedSession->GetSelectedSource();
     s_pSelectedSession->SetTwainMessageFlag(true);
     if (!IsSourceOpen(ptrSource))
         return false;
@@ -886,7 +880,7 @@ bool CTL_TwainAppMgr::SetFeederEnableMode( CTL_ITwainSource *pSource, bool bMode
 
 int CTL_TwainAppMgr::TransferImage(const CTL_ITwainSource *pSource, int nImageNum)
 {
-    auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
+    const auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
     if ( !s_pGlobalAppMgr )
         return 0;
 
@@ -895,9 +889,9 @@ int CTL_TwainAppMgr::TransferImage(const CTL_ITwainSource *pSource, int nImageNu
     // Test native transfer
     // if (transfer == NATIVE)  {
     pTempSource->SetPendingImageNum( nImageNum );
-    auto pSession = pTempSource->GetTwainSession();
+    const auto pSession = pTempSource->GetTwainSession();
 
-    CTL_TwainAcquireEnum AcquireType = pTempSource->GetAcquireType();
+    const CTL_TwainAcquireEnum AcquireType = pTempSource->GetAcquireType();
     pTempSource->SetNumCompressBytes(0);
 
     // Get the layout information for any transfer
@@ -944,8 +938,8 @@ int CTL_TwainAppMgr::TransferImage(const CTL_ITwainSource *pSource, int nImageNu
 bool CTL_TwainAppMgr::StoreImageLayout(CTL_ITwainSource *pSource)
 {
     FloatRect fRect;
-    auto pTempSource = static_cast<CTL_ITwainSource*>(pSource);
-    auto pSession = pTempSource->GetTwainSession();
+    const auto pTempSource = static_cast<CTL_ITwainSource*>(pSource);
+    const auto pSession = pTempSource->GetTwainSession();
 
 
     // First, see if ICAP_UNDEFINED image size is used
@@ -983,14 +977,14 @@ bool CTL_TwainAppMgr::StoreImageLayout(CTL_ITwainSource *pSource)
         const TW_UINT16 ccode = GetConditionCode(pSession, pTempSource);
         if ( ccode != TWCC_SUCCESS )
         {
-            CTL_TwainAppMgr::ProcessConditionCodeError(ccode);
+            ProcessConditionCodeError(ccode);
         }
     }
     return false;
 }
 
 
-/* All sources provide this transfer capability */
+// All sources provide this transfer capability 
 int CTL_TwainAppMgr::NativeTransfer( CTL_ITwainSession *pSession,
                                       CTL_ITwainSource  *pSource)
 {
@@ -998,7 +992,7 @@ int CTL_TwainAppMgr::NativeTransfer( CTL_ITwainSession *pSession,
     return StartTransfer( pSession, pSource, &IXfer );
 }
 
-/* All sources provide this transfer capability */
+// All sources provide this transfer capability 
 int CTL_TwainAppMgr::AudioNativeTransfer(CTL_ITwainSession *pSession, CTL_ITwainSource  *pSource)
 {
     CTL_ImageXferTriplet AXfer(pSession, pSource, DAT_AUDIONATIVEXFER);
@@ -1032,7 +1026,7 @@ int  CTL_TwainAppMgr::FileTransfer( CTL_ITwainSession *pSession,
         auto sGUID = StringWrapper::GetGUID();
         szTempPath += sGUID + _T(".IDT");
         StringWrapper::TrimAll(szTempPath);
-        pSource->SetAcquireFile(szTempPath.c_str());
+        pSource->SetAcquireFile(szTempPath);
     }
     else
     {
@@ -1040,11 +1034,11 @@ int  CTL_TwainAppMgr::FileTransfer( CTL_ITwainSession *pSession,
 
         // See if name should be changed by sending notification to user
         pSource->SetActualFileName(sFileName);
-        CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(), nullptr, DTWAIN_TN_FILENAMECHANGING, reinterpret_cast<LPARAM>(pSource));
+        SendTwainMsgToWindow(pSource->GetTwainSession(), nullptr, DTWAIN_TN_FILENAMECHANGING, reinterpret_cast<LPARAM>(pSource));
         // check if name has changed
         auto sFileNameNew = pSource->GetActualFileName();
         if ( sFileName != sFileNameNew )
-            CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(), nullptr, DTWAIN_TN_FILENAMECHANGED, reinterpret_cast<LPARAM>(pSource));
+            SendTwainMsgToWindow(pSource->GetTwainSession(), nullptr, DTWAIN_TN_FILENAMECHANGED, reinterpret_cast<LPARAM>(pSource));
         std::swap(sFileNameNew, sFileName);  // swap the names, even if they may not have changed.
     }
 
@@ -1172,9 +1166,9 @@ TW_INT32 CTL_TwainAppMgr::AllocateBufferStrip(const TW_IMAGEINFO *pImgInfo,
         return 0;
 
     DWORD nExtra = sizeof(BITMAPINFOHEADER) + 256*sizeof(RGBQUAD);
-    TW_INT32 nImageSize = ((((static_cast<TW_INT32>(pImgInfo->ImageWidth) *
-                        pImgInfo->BitsPerPixel + 31) / 32) *4)
-                        * pImgInfo->ImageLength);
+    TW_INT32 nImageSize = (static_cast<TW_INT32>(pImgInfo->ImageWidth) *
+            pImgInfo->BitsPerPixel + 31) / 32 *4
+        * pImgInfo->ImageLength;
     // No image if compression is used
     if ( nCompression != TWCP_NONE)
     {
@@ -1219,11 +1213,11 @@ TW_INT32 CTL_TwainAppMgr::AllocateBufferStrip(const TW_IMAGEINFO *pImgInfo,
     return 0;
 }
 
-bool CTL_TwainAppMgr::SetupMemXferDIB( CTL_ITwainSession *pSession, CTL_ITwainSource *pSource,
-                                       HGLOBAL hGlobal, TW_IMAGEINFO *pImgInfo, TW_INT32 nSize)
+bool CTL_TwainAppMgr::SetupMemXferDIB(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource,
+                                      HGLOBAL hGlobal, const TW_IMAGEINFO* pImgInfo, TW_INT32 nSize)
 {
     DTWAINGlobalHandle_RAII dibHandle(hGlobal);
-    LPBITMAPINFO pDibInfo = static_cast<LPBITMAPINFO>(ImageMemoryHandler::GlobalLock(hGlobal));
+    const auto pDibInfo = static_cast<LPBITMAPINFO>(ImageMemoryHandler::GlobalLock(hGlobal));
 
     // fill in the image information
     pDibInfo->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
@@ -1235,7 +1229,7 @@ bool CTL_TwainAppMgr::SetupMemXferDIB( CTL_ITwainSession *pSession, CTL_ITwainSo
     pDibInfo->bmiHeader.biSizeImage   = nSize;
 
     // Get Units and calculate PelsPerMeter
-    const TW_INT16 nValue = static_cast<TW_INT16>(GetCurrentUnitMeasure(pSource));
+    const auto nValue = static_cast<TW_INT16>(GetCurrentUnitMeasure(pSource));
     if ( nValue == -1)
         return false;
 
@@ -1320,10 +1314,10 @@ bool CTL_TwainAppMgr::SetupMemXferDIB( CTL_ITwainSession *pSession, CTL_ITwainSo
                 pDibInfo->bmiHeader.biClrUsed = 16;
                 for (DWORD i=0; i<pDibInfo->bmiHeader.biClrUsed; i++)
                 {
-                    BYTE val = static_cast<BYTE>((i << 4) | i);
-                    pDibInfo->bmiColors[i].rgbRed = val;//(BYTE) i;
-                    pDibInfo->bmiColors[i].rgbGreen = val; //(BYTE) i;
-                    pDibInfo->bmiColors[i].rgbBlue = val; //(BYTE) i;
+                    BYTE val = static_cast<BYTE>(i << 4 | i);
+                    pDibInfo->bmiColors[i].rgbRed = val;
+                    pDibInfo->bmiColors[i].rgbGreen = val;
+                    pDibInfo->bmiColors[i].rgbBlue = val;
                     pDibInfo->bmiColors[i].rgbReserved = 0;
                 }
             }
@@ -1421,7 +1415,7 @@ int CTL_TwainAppMgr::StartTransfer( CTL_ITwainSession * /*pSession*/,
             {
                 // Check if using Prompt
                 long lFlags   = pSource->GetAcquireFileFlags();
-                if ( (lFlags & DTWAIN_USEPROMPT) && pSource->IsPromptPending())
+                if ( lFlags & DTWAIN_USEPROMPT && pSource->IsPromptPending())
                 {
                     pTrip->PromptAndSaveImage( nCurImage );
                     if ( pSource->IsDeleteDibOnScan() )
@@ -1440,16 +1434,15 @@ int CTL_TwainAppMgr::StartTransfer( CTL_ITwainSession * /*pSession*/,
 }
 
 
-bool CTL_TwainAppMgr::GetFileTransferDefaults(CTL_ITwainSource *pSource, CTL_StringType strFile, int &nFileType)
+bool CTL_TwainAppMgr::GetFileTransferDefaults(CTL_ITwainSource *pSource, int &nFileType)
 {
-    auto pTempSource = static_cast<CTL_ITwainSource*>(pSource);
-    auto pSession = pTempSource->GetTwainSession();
+    const auto pTempSource = static_cast<CTL_ITwainSource*>(pSource);
+    const auto pSession = pTempSource->GetTwainSession();
     CTL_SetupFileXferTriplet  FileXferGetDef( pSession, pTempSource,
                                             static_cast<int>(CTL_GetTypeGETDEFAULT),
                                             static_cast<CTL_TwainFileFormatEnum>(0),{});
     if ( FileXferGetDef.Execute() == TWRC_SUCCESS )
     {
-        strFile = FileXferGetDef.GetFileName();
         nFileType = FileXferGetDef.GetFileFormat();
         return true;
     }
@@ -1468,15 +1461,14 @@ CTL_TwainAcquireEnum CTL_TwainAppMgr::GetCompatibleFileTransferType( const CTL_I
     return TWAINAcquireType_FileUsingNative;
 }
 
-bool CTL_TwainAppMgr::IsSupportedFileFormat( const CTL_ITwainSource* pSource,
-                                             int nFileFormat )
+bool CTL_TwainAppMgr::IsSupportedFileFormat( const CTL_ITwainSource* pSource, int nFileFormat )
 {
     CTL_IntArray iArray;
     EnumTwainFileFormats( pSource, iArray );
     if ( iArray.empty() )
-        return ( nFileFormat != TWFF_BMP )?false:true;
+        return nFileFormat != TWFF_BMP?false:true;
 
-    return (std::find(iArray.begin(), iArray.end(), nFileFormat) != iArray.end())?true:false;
+    return std::find(iArray.begin(), iArray.end(), nFileFormat) != iArray.end()?true:false;
 }
 
 HINSTANCE CTL_TwainAppMgr::GetAppInstance()
@@ -1492,7 +1484,7 @@ int CTL_TwainAppMgr::SendTwainMsgToWindow(const CTL_ITwainSession *pSession,
                                            LPARAM lParam)
 {
 #ifdef _WIN32
-    const unsigned int nMsg = CTL_TwainAppMgr::GetRegisteredMsg();
+    const unsigned int nMsg = GetRegisteredMsg();
     if ( hWndWhich == nullptr)
     {
         if ( pSession )
@@ -1531,7 +1523,7 @@ void CTL_TwainAppMgr::SetError(int nError, const std::string& extraInfo)
     if ( nRealError > 0 )
         nRealError = -nRealError;
 
-    static_cast<CTL_TwainDLLHandle *>(::GetDTWAINHandle_Internal())->m_lLastError = nRealError;
+    static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal())->m_lLastError = nRealError;
 
     if ( nError < 0 )
         nError = -nError;  // Can't have negative error codes
@@ -1641,7 +1633,7 @@ bool CTL_TwainAppMgr::IsCapabilitySupported(const CTL_ITwainSource *pSource, TW_
         default:
             return false;
     }
-    bool bRet = pTrip->IsCapabilitySupported();
+    const bool bRet = pTrip->IsCapabilitySupported();
     if (!bRet)
         pTempSource->AddCapToUnsupportedList(nCap);
     return bRet;
@@ -1658,7 +1650,7 @@ bool CTL_TwainAppMgr::IsSourceOpen( const CTL_ITwainSource *pSource )
 
     if ( !pSource )
         return false;
-    auto pSession = pTempSource->GetTwainSession();
+    const auto pSession = pTempSource->GetTwainSession();
     if ( !IsValidTwainSession( pSession) )
         return false;
     if ( !pTempSource->IsOpened() )
@@ -1835,25 +1827,26 @@ void CTL_TwainAppMgr::SetPixelAndBitDepth(const CTL_ITwainSource * /*pSource*/)
 /////////////// Supported formats for File transfers ////////////////
 void CTL_TwainAppMgr::EnumTwainFileFormats( const CTL_ITwainSource * /*pSource*/, CTL_IntArray & rArray )
 {
-    static const CTL_IntArray ca = { TWAINFileFormat_BMP, TWAINFileFormat_PCX, TWAINFileFormat_DCX, TWAINFileFormat_TIFFLZW,
-                                    TWAINFileFormat_PDF, TWAINFileFormat_PDFMULTI, TWAINFileFormat_TIFFNONE, TWAINFileFormat_TIFFGROUP3,TWAINFileFormat_TIFFGROUP4
-                                 ,TWAINFileFormat_TIFFPACKBITS, TWAINFileFormat_TIFFDEFLATE, TWAINFileFormat_TIFFJPEG, TWAINFileFormat_TIFFNONEMULTI,
-                                 TWAINFileFormat_TIFFGROUP3MULTI, TWAINFileFormat_TIFFGROUP4MULTI, TWAINFileFormat_TIFFPACKBITSMULTI,TWAINFileFormat_TIFFDEFLATEMULTI,TWAINFileFormat_TIFFJPEGMULTI
-                                ,TWAINFileFormat_TIFFLZWMULTI ,TWAINFileFormat_WMF,TWAINFileFormat_EMF,TWAINFileFormat_PSD,TWAINFileFormat_JPEG,TWAINFileFormat_TGA
-                                ,TWAINFileFormat_JPEG2000,TWAINFileFormat_POSTSCRIPT1,TWAINFileFormat_POSTSCRIPT1MULTI,TWAINFileFormat_POSTSCRIPT2,TWAINFileFormat_POSTSCRIPT2MULTI
-                                ,TWAINFileFormat_POSTSCRIPT3,TWAINFileFormat_POSTSCRIPT3MULTI,TWAINFileFormat_GIF,TWAINFileFormat_PNG,TWAINFileFormat_TEXT
-                                ,TWAINFileFormat_TEXTMULTI,TWAINFileFormat_ICO,TWAINFileFormat_ICO_VISTA, TWAINFileFormat_WBMP, TWAINFileFormat_WEBP, TWAINFileFormat_PBM };
+    static const CTL_IntArray ca = {
+        TWAINFileFormat_BMP, TWAINFileFormat_PCX, TWAINFileFormat_DCX, TWAINFileFormat_TIFFLZW,
+        TWAINFileFormat_PDF, TWAINFileFormat_PDFMULTI, TWAINFileFormat_TIFFNONE, TWAINFileFormat_TIFFGROUP3,TWAINFileFormat_TIFFGROUP4,
+        TWAINFileFormat_TIFFPACKBITS, TWAINFileFormat_TIFFDEFLATE, TWAINFileFormat_TIFFJPEG, TWAINFileFormat_TIFFNONEMULTI,
+        TWAINFileFormat_TIFFGROUP3MULTI, TWAINFileFormat_TIFFGROUP4MULTI, TWAINFileFormat_TIFFPACKBITSMULTI,TWAINFileFormat_TIFFDEFLATEMULTI,TWAINFileFormat_TIFFJPEGMULTI,
+        TWAINFileFormat_TIFFLZWMULTI ,TWAINFileFormat_WMF,TWAINFileFormat_EMF,TWAINFileFormat_PSD,TWAINFileFormat_JPEG,TWAINFileFormat_TGA,
+        TWAINFileFormat_JPEG2000,TWAINFileFormat_POSTSCRIPT1,TWAINFileFormat_POSTSCRIPT1MULTI,TWAINFileFormat_POSTSCRIPT2,TWAINFileFormat_POSTSCRIPT2MULTI,
+        TWAINFileFormat_POSTSCRIPT3,TWAINFileFormat_POSTSCRIPT3MULTI,TWAINFileFormat_GIF,TWAINFileFormat_PNG,TWAINFileFormat_TEXT,
+        TWAINFileFormat_TEXTMULTI,TWAINFileFormat_ICO,TWAINFileFormat_ICO_VISTA, TWAINFileFormat_WBMP, TWAINFileFormat_WEBP, TWAINFileFormat_PBM };
       rArray = ca;
 }
 
 struct FindTriplet
 {
     FindTriplet(const RawTwainTriplet& theTriplet) : m_Trip(theTriplet) { }
-    bool operator() (const RawTwainTriplet& trip)
+    bool operator() (const RawTwainTriplet& trip) const
     {
-        return (m_Trip.nDG == trip.nDG &&
-                m_Trip.nDAT == trip.nDAT &&
-                m_Trip.nMSG == trip.nMSG);
+        return m_Trip.nDG == trip.nDG &&
+            m_Trip.nDAT == trip.nDAT &&
+            m_Trip.nMSG == trip.nMSG;
     }
     private:
         RawTwainTriplet m_Trip;
@@ -1871,14 +1864,13 @@ void CTL_TwainAppMgr::EnumNoTimeoutTriplets()
         {DG_IMAGE, DAT_IMAGEMEMXFER, MSG_GET}
     };
 
-    const int nItems = sizeof(Trips) / sizeof(Trips[0]);
-    std::copy(Trips, Trips + nItems, std::back_inserter(s_NoTimeoutTriplets));
+    constexpr int nItems = std::size(Trips);
+    std::copy_n(Trips, nItems, std::back_inserter(s_NoTimeoutTriplets));
 }
 
 ////////////////////////////////////////////////////////////////////////
 /////////////////////// Pixel Types ///////////////////////////////////
-void CTL_TwainAppMgr::GetPixelTypes( const CTL_ITwainSource *pSource,
-                                     CTL_IntArray & rArray )
+void CTL_TwainAppMgr::GetPixelTypes( const CTL_ITwainSource *pSource, CTL_IntArray & rArray )
 {
     GetMultiValuesImpl<CTL_IntArray, TW_UINT16>::GetMultipleTwainCapValues(pSource, rArray, TwainCap_PIXELTYPE,TWTY_UINT16);
 }
@@ -1895,15 +1887,12 @@ CTL_TwainUnitEnum CTL_TwainAppMgr::GetCurrentUnitMeasure(const CTL_ITwainSource 
 //////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////
-void CTL_TwainAppMgr::GetCompressionTypes( const CTL_ITwainSource *pSource,
-                                           CTL_IntArray & rArray )
+void CTL_TwainAppMgr::GetCompressionTypes( const CTL_ITwainSource *pSource, CTL_IntArray & rArray )
 {
     GetMultiValuesImpl<CTL_IntArray, TW_UINT16>::GetMultipleTwainCapValues(pSource, rArray, TwainCap_COMPRESSION,TWTY_UINT16);
 }
 
-
-void CTL_TwainAppMgr::GetUnitTypes( const CTL_ITwainSource *pSource,
-                                    CTL_IntArray & rArray )
+void CTL_TwainAppMgr::GetUnitTypes( const CTL_ITwainSource *pSource, CTL_IntArray & rArray )
 {
     GetMultiValuesImpl<CTL_IntArray, TW_UINT16>::GetMultipleTwainCapValues(pSource, rArray, TwainCap_UNITS,TWTY_UINT16);
 }
@@ -1941,8 +1930,8 @@ void CTL_TwainAppMgr::GetCapabilities(const CTL_ITwainSource *pSource, CTL_Twain
     // Double check what the right GET container is to use
     UINT cGet = 0, cSet = 0, nDataType = 0;
     bool cFlags[6] = { false };
-    const bool bSuccess = CTL_TwainAppMgr::GetBestContainerType(pSource,
-                                                                static_cast<CTL_EnumCapability>(DTWAIN_CV_CAPSUPPORTEDCAPS),cGet, cSet, nDataType,CTL_GetTypeGET, cFlags);
+    const bool bSuccess = GetBestContainerType(pSource,
+                                               static_cast<CTL_EnumCapability>(DTWAIN_CV_CAPSUPPORTEDCAPS),cGet, cSet, nDataType,CTL_GetTypeGET, cFlags);
 
     if (bSuccess)
         ContainerToUse = static_cast<CTL_EnumContainer>(cGet);
@@ -1975,11 +1964,11 @@ UINT CTL_TwainAppMgr::GetCapOps(const CTL_ITwainSource *pSource, int nCap, bool 
 
 UINT CTL_TwainAppMgr::GetCapabilityOperations(const CTL_ITwainSource *pSource, int nCap)
 {
-    auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
+    const auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
     if ( !pSource )
         return 0;
 
-    auto pSession = pTempSource->GetTwainSession();
+    const auto pSession = pTempSource->GetTwainSession();
 
     if ( !IsValidTwainSession(pSession) )
         return 0;
@@ -2066,13 +2055,13 @@ bool CTL_TwainAppMgr::SetupFeeder( const CTL_ITwainSource *pSource, int /*maxpag
     return true;
 }
 
-bool CTL_TwainAppMgr::ShowProgressIndicator(CTL_ITwainSource *pSource, bool bShow)
+bool CTL_TwainAppMgr::ShowProgressIndicator(const CTL_ITwainSource* pSource, bool bShow)
 {
     bool bTemp = bShow;
     return SetOneTwainCapValue( pSource, &bTemp, CTL_SetTypeSET, TwainCap_INDICATORS, TWTY_BOOL );
 }
 
-bool CTL_TwainAppMgr::IsProgressIndicatorOn(CTL_ITwainSource *pSource)
+bool CTL_TwainAppMgr::IsProgressIndicatorOn(const CTL_ITwainSource* pSource)
 {
     bool bTemp;
     if ( GetOneCapValue( pSource, &bTemp, TwainCap_INDICATORS, TWTY_BOOL ) )
@@ -2088,9 +2077,9 @@ void CTL_TwainAppMgr::AddConditionCodeError(TW_UINT16 nCode, int nResource)
 
 CTL_CondCodeInfo CTL_TwainAppMgr::FindConditionCode(TW_UINT16 nCode)
 {
-    mapCondCodeInfo::iterator it = s_mapCondCode.find(nCode);
+    const auto it = s_mapCondCode.find(nCode);
     if ( it == s_mapCondCode.end() )
-        return CTL_CondCodeInfo(static_cast<TW_UINT16>(-9999), static_cast<TW_UINT16>(-9999));
+        return {static_cast<TW_UINT16>(-9999), static_cast<TW_UINT16>(-9999)};
     return (*it).second;
 }
 
@@ -2123,7 +2112,7 @@ UINT CTL_TwainAppMgr::GetDataTypeFromCap( CTL_EnumCapability Cap, CTL_ITwainSour
 {
     if ( static_cast<unsigned>(Cap) >= CAP_CUSTOMBASE )
         return DTWAIN_GetCapDataType(pSource, Cap);
-    CTL_CapStruct cStruct = GetGeneralCapInfo(Cap);
+    const CTL_CapStruct cStruct = GetGeneralCapInfo(Cap);
     if ( static_cast<std::string>(cStruct).length() == 0 )
         return 0xFFFF;
     return cStruct.m_nDataType;
@@ -2229,12 +2218,12 @@ void CTL_TwainAppMgr::GetContainerNamesFromType( int nType, StringArray &rArray 
 int CTL_TwainAppMgr::GetCapMaskFromCap( CTL_EnumCapability Cap )
 {
     // Jump table
-    const int CapAll = CTL_CapMaskGET | CTL_CapMaskGETCURRENT | CTL_CapMaskGETDEFAULT |
+    constexpr int CapAll = CTL_CapMaskGET | CTL_CapMaskGETCURRENT | CTL_CapMaskGETDEFAULT |
                         CTL_CapMaskSET | CTL_CapMaskRESET;
 
-    const int CapSupport = CTL_CapMaskGET | CTL_CapMaskGETCURRENT | CTL_CapMaskGETDEFAULT |
+    constexpr int CapSupport = CTL_CapMaskGET | CTL_CapMaskGETCURRENT | CTL_CapMaskGETDEFAULT |
                             CTL_CapMaskRESET;
-    const int CapAllGets = CTL_CapMaskGET | CTL_CapMaskGETCURRENT | CTL_CapMaskGETDEFAULT;
+    constexpr int CapAllGets = CTL_CapMaskGET | CTL_CapMaskGETCURRENT | CTL_CapMaskGETDEFAULT;
 
     switch (Cap)
     {
@@ -2427,7 +2416,7 @@ void CTL_TwainAppMgr::DestroyAllTwainSessions()
 }
 
 
-void CTL_TwainAppMgr::DestroySession( CTL_ITwainSession* pSession )
+void CTL_TwainAppMgr::DestroySession(const CTL_ITwainSession* pSession)
 {
     const auto iter = FindSession(pSession);
     if ( iter != s_pGlobalAppMgr->m_arrTwainSession.end() )
@@ -2470,11 +2459,11 @@ bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
         // Attempt to load TWAIN DLL
         boost::dll::shared_library libloader;
         boost::system::error_code ec;
-        libloader.load(m_strTwainDSMPath, ec); //::LoadLibrary(m_strTwainDLLName.c_str());
+        libloader.load(m_strTwainDSMPath, ec);
         if ( ec != boost::system::errc::success)
         {
             const CTL_StringType dllName = _T(" : ") + m_strTwainDSMPath;
-            DTWAIN_ERROR_CONDITION_EX(IDS_ErrTwainDLLNotFound, StringConversion::Convert_Native_To_Ansi(dllName), false);
+            DTWAIN_ERROR_CONDITION_EX(IDS_ErrTwainDLLNotFound, StringConversion::Convert_Native_To_Ansi(dllName), false)
         }
         m_hLibModule = libloader;
     }
@@ -2491,12 +2480,12 @@ bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
             if ( m_strTwainDSMPath.empty())
             {
                 const CTL_StringType dllName = _T(" : ") + tempStr;
-                DTWAIN_ERROR_CONDITION_EX(IDS_ErrTwainDLLNotFound, StringConversion::Convert_Native_To_Ansi(dllName), false);
+                DTWAIN_ERROR_CONDITION_EX(IDS_ErrTwainDLLNotFound, StringConversion::Convert_Native_To_Ansi(dllName), false)
             }
         }
         CTL_StringStreamType strm;
         strm << _T("TWAIN DSM \"") + m_strTwainDSMPath + _T("\" is found and will be used for this TWAIN session");
-        dynarithmic::LogToDebugMonitor(strm.str().c_str());
+        LogToDebugMonitor(strm.str());
         if (CTL_TwainDLLHandle::s_lErrorFilterFlags != 0)
             DTWAIN_LogMessageA(StringConversion::Convert_Native_To_Ansi(strm.str()).c_str());
     }
@@ -2507,7 +2496,7 @@ bool CTL_TwainAppMgr::LoadDSM()
 {
     m_lpDSMEntry = dtwain_library_loader<DSMENTRYPROC>::get_func_ptr(m_hLibModule.native(), "DSM_Entry");
     if ( !m_lpDSMEntry )
-        DTWAIN_ERROR_CONDITION(IDS_ErrTwainDLLInvalid,false);
+        DTWAIN_ERROR_CONDITION(IDS_ErrTwainDLLInvalid,false)
     CTL_TwainDLLHandle::s_nDSMState = DSM_STATE_LOADED;
     return true;   // return success
 }
@@ -2544,7 +2533,7 @@ void CTL_TwainAppMgr::WriteLogInfo(const CTL_StringType& s, bool bFlush)
 
 struct TripletSaveRestore
 {
-    const CTL_TwainTriplet **pTrip;
+    const CTL_TwainTriplet **pTrip = nullptr;
     TripletSaveRestore(const CTL_TwainTriplet** p) : pTrip(p) {}
     ~TripletSaveRestore()
     {
@@ -2600,8 +2589,9 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
                                         s_NoTimeoutTriplets.end(),
                                         FindTriplet(rtrip)) == s_NoTimeoutTriplets.end())
         {
-            CTL_TwainDLLHandle::s_nTimeoutID = ::SetTimer(nullptr, 0,
-                                                          CTL_TwainDLLHandle::s_nTimeoutMilliseconds, reinterpret_cast<TIMERPROC>(CTL_TwainAppMgr::TwainTimeOutProc));
+            CTL_TwainDLLHandle::s_nTimeoutID = SetTimer(nullptr, 0,
+                                                        CTL_TwainDLLHandle::s_nTimeoutMilliseconds, reinterpret_cast<TIMERPROC>(
+                                                            TwainTimeOutProc));
             bTimeOutInEffect = true;
         }
     }
@@ -2622,7 +2612,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         // To do later...
         #ifdef _WIN32
         if ( bTimeOutInEffect )
-            ::KillTimer(nullptr, CTL_TwainDLLHandle::s_nTimeoutID);
+            KillTimer(nullptr, CTL_TwainDLLHandle::s_nTimeoutID);
         #endif
         retcode = DTWAIN_ERR_EXCEPTION_ERROR_;
         if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_LOWLEVELTWAIN)
@@ -2638,7 +2628,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
     }
     #ifdef _WIN32
     if ( bTimeOutInEffect )
-        ::KillTimer(nullptr, CTL_TwainDLLHandle::s_nTimeoutID);
+        KillTimer(nullptr, CTL_TwainDLLHandle::s_nTimeoutID);
     #endif
     if (m_pDLLHandle->m_bNotificationsUsed)
     {
@@ -2679,7 +2669,7 @@ bool CTL_TwainAppMgr::SetDefaultSource( CTL_ITwainSession *pSession, const CTL_I
     {
         const TW_UINT16 ccode = GetConditionCode(pSession, pTemp);
         if ( ccode != TWCC_SUCCESS )
-            CTL_TwainAppMgr::ProcessConditionCodeError(ccode);
+            ProcessConditionCodeError(ccode);
         return false;
     }
     return true;
@@ -2706,11 +2696,11 @@ bool CTL_TwainAppMgr::SetDependentCaps( const CTL_ITwainSource *pSource, CTL_Enu
 VOID CALLBACK CTL_TwainAppMgr::TwainTimeOutProc(HWND, UINT, ULONG, DWORD)
 {
 #ifdef _WIN32
-    ::KillTimer(nullptr, CTL_TwainDLLHandle::s_nTimeoutID);
+    KillTimer(nullptr, CTL_TwainDLLHandle::s_nTimeoutID);
 
     WriteLogInfoA("The last TWAIN triplet was not completed due to time out");
     SetError(DTWAIN_ERR_TIMEOUT);
-    throw(DTWAIN_ERR_TIMEOUT);
+    throw DTWAIN_ERR_TIMEOUT;
 #endif
 }
 

@@ -41,7 +41,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainerEx(LONG nCap, DTWAIN_BOOL bSetContainer,
     if (pArray)
     {
         *pArray = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 0);
-        if (!(*pArray))
+        if (!*pArray)
             LOG_FUNC_EXIT_PARAMS(0L)
     }
     DTWAIN_ARRAY pDTWAINArray = nullptr;
@@ -115,9 +115,9 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainer(DTWAIN_SOURCE Source, LONG nCap, LONG l
                     nHold = std::get<5>(CapInfo);
                 if (/* lCapType == DTWAIN_CAPSETCURRENT ||*/
                     lCapType == DTWAIN_CAPSET)
-                    bResult1 = ((Value & TwainContainer_ONEVALUE) || (Value & TwainContainer_ARRAY));
+                    bResult1 = Value & TwainContainer_ONEVALUE || Value & TwainContainer_ARRAY;
                 else
-                    bResult2 = ((Value & TwainContainer_ENUMERATION) || (Value & TwainContainer_RANGE) || (Value & TwainContainer_ARRAY));
+                    bResult2 = Value & TwainContainer_ENUMERATION || Value & TwainContainer_RANGE || Value & TwainContainer_ARRAY;
                 if (!bResult1 && !bResult2 && !nHold)
                     LOG_FUNC_EXIT_PARAMS(0)
                 if (!bResult1 && !bResult2 && nHold)
@@ -228,7 +228,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCapArrayType(DTWAIN_SOURCE Source, LONG nCap)
     if (lDataType == DTWAIN_FAILURE1)
         LOG_FUNC_EXIT_PARAMS(DTWAIN_FAILURE1)
     const TW_UINT16 nDataType = lDataType;
-    const LONG retValue = dynarithmic::GetArrayTypeFromCapType(nDataType);
+    const LONG retValue = GetArrayTypeFromCapType(nDataType);
     LOG_FUNC_EXIT_PARAMS(retValue)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }

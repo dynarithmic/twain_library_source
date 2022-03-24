@@ -244,7 +244,7 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
         if ( !pPDFInfo )
             return DTWAIN_ERR_FILEWRITE;
         pPDFInfo->nCurrentPage++;
-        pPDFInfo->ImageInfoEx = *(static_cast<DTWAINImageInfoEx*>(pUserInfo));
+        pPDFInfo->ImageInfoEx = *static_cast<DTWAINImageInfoEx*>(pUserInfo);
         if ( !pPDFInfo->IsFileOpened || !pPDFInfo->IsPDFStarted )
             return DTWAIN_ERR_FILEWRITE;
     }
@@ -303,7 +303,7 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
 }
 
 
-int CPDFImageHandler::InitializePDFPage(PDFINFO *pPDFInfo, HANDLE bitmap) const
+int CPDFImageHandler::InitializePDFPage(const PDFINFO* pPDFInfo, HANDLE bitmap)
 {
     // Initialize the page.
 
@@ -346,10 +346,10 @@ int CPDFImageHandler::InitializePDFPage(PDFINFO *pPDFInfo, HANDLE bitmap) const
         // Determine the size of the page, given the DIB dimensions and bytes per meter
         auto pbi = static_cast<LPBITMAPINFOHEADER>(ImageMemoryHandler::GlobalLock(bitmap));
 
-        auto xInches = static_cast<double>(pbi->biXPelsPerMeter) / 39.37;
-        auto yInches = static_cast<double>(pbi->biYPelsPerMeter) / 39.37;
-        auto xWidth = static_cast<double>(pbi->biWidth);
-        auto yHeight = static_cast<double>(pbi->biHeight);
+        const auto xInches = static_cast<double>(pbi->biXPelsPerMeter) / 39.37;
+        const auto yInches = static_cast<double>(pbi->biYPelsPerMeter) / 39.37;
+        const auto xWidth = static_cast<double>(pbi->biWidth);
+        const auto yHeight = static_cast<double>(pbi->biHeight);
 
         if ( float_close(xInches,0.0) || float_close(yInches, 0.0) )
         {
@@ -357,8 +357,8 @@ int CPDFImageHandler::InitializePDFPage(PDFINFO *pPDFInfo, HANDLE bitmap) const
             return DTWAIN_ERR_BAD_DIB_PAGE; // this page cannot be created due to improper pels per meter
         }
 
-        double widthInPoints = xWidth / xInches * 72.0;
-        double heightInPoints = yHeight / yInches * 72.0;
+        const double widthInPoints = xWidth / xInches * 72.0;
+        const double heightInPoints = yHeight / yInches * 72.0;
 
         // Dimensions specified by the user
         std::ostringstream sBuf;

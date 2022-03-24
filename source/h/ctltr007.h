@@ -29,7 +29,7 @@ namespace dynarithmic
     {
         public:
             CTL_ConditionCodeTriplet(CTL_ITwainSession* pSession,
-                                     const CTL_ITwainSource* pSource = nullptr);
+                                     CTL_ITwainSource* pSource = nullptr);
             TW_UINT16   GetConditionCode() const;
         private:
             TW_STATUS   m_Status;

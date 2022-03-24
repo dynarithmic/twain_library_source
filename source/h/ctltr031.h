@@ -55,8 +55,6 @@ namespace dynarithmic
             TW_UINT32       m_nCurDibSize;
             TW_UINT16       m_nCompression;
             TW_UINT32       m_nCompressPos;
-            unsigned char TW_HUGE * m_ptrTempDib;
-            HANDLE          m_origDibHandle;
             CTL_TwainDynMemoryHandler m_dynMemoryHandler;
     };
 }

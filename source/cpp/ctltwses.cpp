@@ -84,15 +84,15 @@ CTL_ITwainSession::CTL_ITwainSession(LPCTSTR pAppName,
 
     StringWrapperA::SafeStrcpy( m_AppId.Version.Info,
                                 StringConversion::Convert_Native_To_Ansi(lpszVersion).c_str(),
-                                sizeof( m_AppId.Version.Info ) - 1 );
+                                sizeof m_AppId.Version.Info - 1 );
 
     m_AppId.ProtocolMajor =    TWON_PROTOCOLMAJOR;
     m_AppId.ProtocolMinor =    TWON_PROTOCOLMINOR;
     m_AppId.SupportedGroups =  DG_IMAGE | DG_CONTROL | DG_AUDIO | DF_APP2 | DF_DSM2 ;
 
-    StringWrapperA::SafeStrcpy( m_AppId.Manufacturer,  StringConversion::Convert_Native_To_Ansi(lpszMfg).c_str(), sizeof( m_AppId.Manufacturer ) - 1 );
-    StringWrapperA::SafeStrcpy( m_AppId.ProductFamily, StringConversion::Convert_Native_To_Ansi(lpszFamily).c_str(), sizeof( m_AppId.ProductFamily ) - 1 );
-    StringWrapperA::SafeStrcpy( m_AppId.ProductName,   StringConversion::Convert_Native_To_Ansi(lpszProduct).c_str(),sizeof( m_AppId.ProductName ) - 1 );
+    StringWrapperA::SafeStrcpy( m_AppId.Manufacturer,  StringConversion::Convert_Native_To_Ansi(lpszMfg).c_str(), sizeof m_AppId.Manufacturer - 1 );
+    StringWrapperA::SafeStrcpy( m_AppId.ProductFamily, StringConversion::Convert_Native_To_Ansi(lpszFamily).c_str(), sizeof m_AppId.ProductFamily - 1 );
+    StringWrapperA::SafeStrcpy( m_AppId.ProductName,   StringConversion::Convert_Native_To_Ansi(lpszProduct).c_str(),sizeof m_AppId.ProductName - 1 );
     m_pSelectedSource = nullptr;
     m_bTwainMessageFlag = false;
     m_bAllSourcesRetrieved = false;
@@ -154,7 +154,7 @@ bool CTL_ITwainSession::AddTwainSource( CTL_ITwainSource *pSource )
     {
         std::string m_str;
         SourceFinder(std::string str) : m_str(std::move(str)) {}
-        bool operator()(const CTL_ITwainSource* ptr) const
+        bool operator()(CTL_ITwainSource* ptr) const
             { return ptr->GetSourceIDPtr()->ProductName == m_str; }
     };
 
@@ -198,7 +198,7 @@ bool CTL_ITwainSession::SelectSource( const CTL_ITwainSource* pSource )
             return false;
         }
         m_pSelectedSource = const_cast<CTL_ITwainSource*>(pSource);
-        m_pSelectedSource->SetTwainVersion2((m_pSelectedSource->GetSourceIDPtr()->SupportedGroups & DF_DS2) ? true : false);
+        m_pSelectedSource->SetTwainVersion2(m_pSelectedSource->GetSourceIDPtr()->SupportedGroups & DF_DS2 ? true : false);
     }
     return true;
 }
@@ -232,7 +232,7 @@ bool CTL_ITwainSession::OpenSource( const CTL_ITwainSource* pSource )
     if ( !pTemp->IsOpened() )
     {
         // see if this is a DS 2.x source
-        pTemp->SetTwainVersion2((pTemp->GetSupportedGroups() & DF_DS2) ? true : false);
+        pTemp->SetTwainVersion2(pTemp->GetSupportedGroups() & DF_DS2 ? true : false);
 
         // Not opened, so open it.
         CTL_OpenSourceTriplet ST( this, pTemp );
@@ -280,7 +280,7 @@ void CTL_ITwainSession::DestroyTwainWindow()
 #ifdef _WIN32
     if ( m_bTwainWindowCreated )
     {
-        ::DestroyWindow( m_AppWnd );
+        DestroyWindow( m_AppWnd );
         m_bTwainWindowCreated = false;
     }
 #endif
@@ -377,7 +377,7 @@ CTL_ITwainSource* CTL_ITwainSession::IsSourceSelected(LPCTSTR pSourceName)
     {
         CTL_StringType m_strProduct;
         ProductNameFinder(CTL_StringType s) : m_strProduct(std::move(s)) {}
-        bool operator()(const CTL_ITwainSource* pSource) const
+        bool operator()(CTL_ITwainSource* pSource) const
         {
             const TW_IDENTITY* pIdentity = pSource->GetSourceIDPtr();
             CTL_StringType strTemp = StringConversion::Convert_AnsiPtr_To_Native(pIdentity->ProductName);
@@ -393,7 +393,7 @@ CTL_ITwainSource* CTL_ITwainSession::IsSourceSelected(LPCTSTR pSourceName)
     const auto it =
         std::find_if(m_arrTwainSource.begin(), m_arrTwainSource.end(), ProductNameFinder(strProduct));
     if (it != m_arrTwainSource.end())
-        return (*it);
+        return *it;
     return nullptr;
 }
 

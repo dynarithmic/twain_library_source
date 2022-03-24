@@ -52,9 +52,9 @@ void A85Encoder::processA85char(unsigned c)
     c = c & 0x00FF;
     switch (count++)
     {
-        case 0: tuple |= (c << 24); break;
-        case 1: tuple |= (c << 16); break;
-        case 2: tuple |= (c <<  8); break;
+        case 0: tuple |= c << 24; break;
+        case 1: tuple |= c << 16; break;
+        case 2: tuple |= c <<  8; break;
         case 3:
             tuple |= c;
             if (tuple == 0)

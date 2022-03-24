@@ -34,8 +34,8 @@ namespace dynarithmic
                                    TW_UINT16 nMsg,
                                    TW_UINT16 nItemType,
                                    bool     bReading);
-            ~CTL_CapabilityTriplet();
-            TW_UINT16       Execute();
+            ~CTL_CapabilityTriplet() override;
+            TW_UINT16       Execute() override;
             void            SetTestMode( bool bSet = true );
             bool            IsTesting() const;
             bool            IsFindDefaultItemType() const { return m_bGetDefaultType; }

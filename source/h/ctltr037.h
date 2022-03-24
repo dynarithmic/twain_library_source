@@ -30,8 +30,6 @@ namespace dynarithmic
             CTL_FileSystemTriplet(CTL_ITwainSession *pSession,
                                    CTL_ITwainSource* pSource,
                                    TW_UINT16 nMsg=MSG_CHANGEDIRECTORY);
-            //TW_UINT16   Execute();
-
             TW_UINT16 ChangeDirectory(const CTL_StringType& sDir);
             TW_UINT16 CopyFile(const CTL_StringType& sInput, const CTL_StringType& sOutput);
             TW_UINT16 CreateDirectory(const CTL_StringType& sDir);

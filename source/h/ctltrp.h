@@ -55,12 +55,12 @@ namespace dynarithmic
                               TW_UINT16    MSG,
                               TW_MEMREF    pData);
 
-            void Init( pTW_IDENTITY pOrigin,
-                       pTW_IDENTITY pDest,
-                       TW_UINT32    nDG,
-                       TW_UINT16    nDAT,
-                       TW_UINT16    nMSG,
-                       TW_MEMREF    pData);
+            void Init( const pTW_IDENTITY pOrigin,
+                       const pTW_IDENTITY pDest,
+                       TW_UINT32 nDG,
+                       TW_UINT16 nDAT,
+                       TW_UINT16 nMSG,
+                       TW_MEMREF pData);
 
             typedef std::tuple<pTW_IDENTITY, pTW_IDENTITY, TwainTripletComponents, TW_MEMREF> TwainTripletArgs;
 

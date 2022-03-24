@@ -106,7 +106,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainCountryValue(LPCTSTR country)
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, -1L, FUNC_MACRO);
     const auto value = GetGenericTwainValue(country, CTL_TwainDLLHandle::GetTwainCountryMap());
-    LOG_FUNC_EXIT_PARAMS(value);
+    LOG_FUNC_EXIT_PARAMS(value)
     CATCH_BLOCK(-1L)
 }
 
@@ -126,6 +126,6 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainLanguageValue(LPCTSTR szName)
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, -1L, FUNC_MACRO);
     const auto value = GetGenericTwainValue(szName, CTL_TwainDLLHandle::GetTwainLanguageMap());
-    LOG_FUNC_EXIT_PARAMS(value);
+    LOG_FUNC_EXIT_PARAMS(value)
     CATCH_BLOCK(-1L)
 }

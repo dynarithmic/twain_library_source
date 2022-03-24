@@ -162,8 +162,8 @@ void dynarithmic::DTWAIN_CollectCapabilityInfo(CTL_ITwainSource *p, TW_UINT16 nC
         {
             if (nCap >= CAP_CUSTOMBASE)
             {
-                nOps = (cGet > 0) ? (TWQC_GET | TWQC_GETDEFAULT | TWQC_GETCURRENT) : 0;
-                nOps |= (cSet > 0) ? (TWQC_SET | TWQC_RESET | TWQC_SETCONSTRAINT) : 0;
+                nOps = cGet > 0 ? TWQC_GET | TWQC_GETDEFAULT | TWQC_GETCURRENT : 0;
+                nOps |= cSet > 0 ? TWQC_SET | TWQC_RESET | TWQC_SETCONSTRAINT : 0;
             }
             else
             {
@@ -176,8 +176,8 @@ void dynarithmic::DTWAIN_CollectCapabilityInfo(CTL_ITwainSource *p, TW_UINT16 nC
     {
         if (nCap >= CAP_CUSTOMBASE)
         {
-            nOps = (cGet > 0) ? (TWQC_GET | TWQC_GETDEFAULT | TWQC_GETCURRENT) : 0;
-            nOps |= (cSet > 0) ? (TWQC_SET | TWQC_RESET | TWQC_SETCONSTRAINT) : 0;
+            nOps = cGet > 0 ? TWQC_GET | TWQC_GETDEFAULT | TWQC_GETCURRENT : 0;
+            nOps |= cSet > 0 ? TWQC_SET | TWQC_RESET | TWQC_SETCONSTRAINT : 0;
         }
         else
             nOps = CTL_TwainAppMgr::GetCapOps(p, nCap, bCanQuerySupport);
@@ -375,8 +375,8 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
             {
                 if (nCap >= CAP_CUSTOMBASE)
                 {
-                    nOps = (cGet > 0) ? (TWQC_GET | TWQC_GETDEFAULT | TWQC_GETCURRENT) : 0;
-                    nOps |= (cSet > 0) ? (TWQC_SET | TWQC_RESET) : 0;
+                    nOps = cGet > 0 ? TWQC_GET | TWQC_GETDEFAULT | TWQC_GETCURRENT : 0;
+                    nOps |= cSet > 0 ? TWQC_SET | TWQC_RESET : 0;
                 }
                 else
                 {
@@ -389,8 +389,8 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
         {
             if (nCap >= CAP_CUSTOMBASE)
             {
-                nOps = (cGet > 0) ? (TWQC_GET | TWQC_GETDEFAULT | TWQC_GETCURRENT) : 0;
-                nOps |= (cSet > 0) ? (TWQC_SET | TWQC_RESET) : 0;
+                nOps = cGet > 0 ? TWQC_GET | TWQC_GETDEFAULT | TWQC_GETCURRENT : 0;
+                nOps |= cSet > 0 ? TWQC_SET | TWQC_RESET : 0;
             }
             else
                 nOps = CTL_TwainAppMgr::GetCapOps(pSource, nCap, bCanQuerySupport);

@@ -39,11 +39,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
         LOG_FUNC_EXIT_PARAMS(false)
 
     // See if Source is opened
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return (!CTL_TwainAppMgr::IsSourceOpen(pSource)); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(pSource); },
     DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
     // See if Source supports the DEVICEEVENTS capability
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return (!DTWAIN_IsCapSupported(pSource, DTWAIN_CV_CAPDEVICEEVENT)); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !DTWAIN_IsCapSupported(pSource, DTWAIN_CV_CAPDEVICEEVENT); },
     DTWAIN_ERR_DEVICEEVENT_NOT_SUPPORTED, false, FUNC_MACRO);
 
     // Set the notifications
@@ -59,7 +59,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
         LONG i;
         for (i = 0; i < 32; i++)
         {
-            if (DeviceEvents & (1L << i))
+            if (DeviceEvents & 1L << i)
                 nBits++;
         }
         if (nBits == 0)
@@ -75,7 +75,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
 
         for (i = 0; i < 32; i++)
         {
-            if (DeviceEvents & (1L << i))
+            if (DeviceEvents & 1L << i)
             {
                 vValues[nIndex] = i;
                 ++nIndex;
@@ -99,11 +99,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceNotifications(DTWAIN_SOURCE Source, LPL
     DTWAINArrayPtr_RAII raii(&Array);
 
     // See if Source is opened
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return (!CTL_TwainAppMgr::IsSourceOpen(pSource)); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !CTL_TwainAppMgr::IsSourceOpen(pSource); },
         DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
     // See if Source supports the DEVICEEVENTS capability
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return (!DTWAIN_IsCapSupported(pSource, DTWAIN_CV_CAPDEVICEEVENT)); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !DTWAIN_IsCapSupported(pSource, DTWAIN_CV_CAPDEVICEEVENT); },
                                         DTWAIN_ERR_DEVICEEVENT_NOT_SUPPORTED, false, FUNC_MACRO);
 
     const bool bRet = DTWAIN_GetCapValues(Source, DTWAIN_CV_CAPDEVICEEVENT, DTWAIN_CAPGETCURRENT, &Array) ? true : false;

@@ -200,9 +200,9 @@ void CTL_ErrorStructDecoder::StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDe
     std::string s1;
     sBuffer << "\nDSM_Entry(pSource=" << pSource << "H, " <<
                 "pDest=" << pDest << "H, " <<
-           (CTL_TwainDLLHandle::GetTwainNameFromResource(CTL_TwainDLLHandle::GetDGResourceID(),static_cast<int>(nDG))) << ", " <<
-           (CTL_TwainDLLHandle::GetTwainNameFromResource(CTL_TwainDLLHandle::GetDATResourceID(),static_cast<int>(nDAT))) << ", " <<
-           (CTL_TwainDLLHandle::GetTwainNameFromResource(CTL_TwainDLLHandle::GetMSGResourceID(),static_cast<int>(nMSG))) << ", " <<
+           CTL_TwainDLLHandle::GetTwainNameFromResource(CTL_TwainDLLHandle::GetDGResourceID(),static_cast<int>(nDG)) << ", " <<
+           CTL_TwainDLLHandle::GetTwainNameFromResource(CTL_TwainDLLHandle::GetDATResourceID(),static_cast<int>(nDAT)) << ", " <<
+           CTL_TwainDLLHandle::GetTwainNameFromResource(CTL_TwainDLLHandle::GetMSGResourceID(),static_cast<int>(nMSG)) << ", " <<
            "TW_MEMREF=" << Data << "H) called\n";
     s1 = sBuffer.str();
 
@@ -425,7 +425,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
             #ifdef _WIN32
                 RECT r;
                 HWND *p = static_cast<HWND*>(pData);
-                ::GetWindowRect(*p, &r);
+                GetWindowRect(*p, &r);
 
                 sBuffer <<
                 "\nTW_MEMREF is handle to window (HWND):\n{\n" <<
@@ -484,9 +484,9 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
             {
                 CTL_ContainerToNameMap::iterator it;
                 auto p = static_cast<pTW_CAPABILITY>(pData);
-                it = dynarithmic::CTL_ErrorStructDecoder::s_mapContainerType.find(static_cast<int>(p->ConType));
+                it = CTL_ErrorStructDecoder::s_mapContainerType.find(static_cast<int>(p->ConType));
                 std::string s = "Unspecified (TWON_DONTCARE)";
-                if (it != dynarithmic::CTL_ErrorStructDecoder::s_mapContainerType.end() )
+                if (it != CTL_ErrorStructDecoder::s_mapContainerType.end() )
                     s = (*it).second;
 
                 sBuffer << "\nTW_MEMREF is TW_CAPABILITY:\n{\n" <<

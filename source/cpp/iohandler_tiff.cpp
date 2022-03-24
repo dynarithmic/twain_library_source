@@ -184,7 +184,7 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
         strm << "Return from writing last image = " << retval << "\n";
         CTL_TwainAppMgr::WriteLogInfoA(strm.str());
     }
-    if ( (!s || s->Stage == DIB_MULTI_LAST) && (retval == 0) )
+    if ( (!s || s->Stage == DIB_MULTI_LAST) && retval == 0 )
     {
         // Convert the TIFF file to Postscript if necessary
         if ( m_ImageInfoEx.IsPostscript )
@@ -210,8 +210,8 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
             sTitle = m_ImageInfoEx.PSTitle;
             if ( sTitle.empty() )
                 sTitle = _T("DTWAIN Postscript");
-            retval = dynarithmic::CTIFFImageHandler::Tiff2PS(sActualFileName.c_str(), sPostscriptName.c_str(),Level,
-                                                             sTitle.c_str(), m_ImageInfoEx.PSType==DTWAIN_PS_ENCAPSULATED);
+            retval = CTIFFImageHandler::Tiff2PS(sActualFileName.c_str(), sPostscriptName.c_str(),Level,
+                                                sTitle.c_str(), m_ImageInfoEx.PSType==DTWAIN_PS_ENCAPSULATED);
 
             if ( retval == -1 )
                 retval = DTWAIN_ERR_FILEWRITE;

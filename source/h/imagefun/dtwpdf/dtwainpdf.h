@@ -95,7 +95,7 @@ namespace dynarithmic
     {
         public:
             CatalogObject() : PDFObject(1){ }
-            void ComposeObject()
+            void ComposeObject() override
             {
                 SetContents("<< /Type /Catalog\r\n/Pages 2 0 R\r\n>>");
             }
@@ -106,7 +106,7 @@ namespace dynarithmic
         public:
             PagesObject() : PDFObject(2) { KidsArrayObjects.reserve(100);}
             void AddObjectToKids(int nNum) { KidsArrayObjects.push_back(nNum); }
-            void ComposeObject();
+            void ComposeObject() override;
 
         private:
             std::vector<int> KidsArrayObjects;
@@ -118,12 +118,12 @@ namespace dynarithmic
             ContentsObject(int objnum) : PDFObject(objnum), m_xscale(0), m_yscale(0) { }
             void SetImageName(const std::string& sImgName) { m_sImgName = sImgName; }
             void SetScaling(double x, double y) { m_xscale = x; m_yscale = y; }
-            void ComposeObject();
+            void ComposeObject() override;
             void PreComposeObject();
 
-            std::string GetStreamContents();
-            std::string GetExtraInfo();
-            std::string GetExtraInfoEnd();
+            std::string GetStreamContents() override;
+            std::string GetExtraInfo() override;
+            std::string GetExtraInfoEnd() override;
             std::string GetPreComposedString() const { return m_preComposedObject; }
             void CreateFontDictAndText(int startObjNum, int& nextObjNum);
             std::string GetFontDictionaryString() const { return m_sFontDictString; }
@@ -153,12 +153,12 @@ namespace dynarithmic
 
             void SetPDFImageName(std::string sPDFImgName) { m_sPDFImgName = std::move(sPDFImgName); }
             bool OpenAndComposeImage(int& width, int& height, int& bpp, int& rgb, int& dpix, int& dpiy);
-            void ComposeObject();
+            void ComposeObject() override;
             unsigned long GetCRCVal() const { return m_nCurCRCVal; }
             static std::vector<char>& GetDataStream() { return m_vImgStream; }
-            std::string GetStreamContents();
-            std::string GetExtraInfo();
-            std::string GetExtraInfoEnd();
+            std::string GetStreamContents() override;
+            std::string GetExtraInfo() override;
+            std::string GetExtraInfoEnd() override;
 
         protected:
             bool ProcessJPEGImage(int& width, int& height, int& bpp, int& rgb);
@@ -203,7 +203,7 @@ namespace dynarithmic
             m_sCreator("(None)")
             { }
 
-            void ComposeObject();
+            void ComposeObject() override;
             void SetProducer(const std::string& s) { m_sProducer = s; }
             void SetAuthor(const std::string& s) { m_sAuthor = s; }
             void SetTitle(const std::string& s) { m_sTitle = s; }
@@ -221,7 +221,7 @@ namespace dynarithmic
     {
         public:
             EncryptionObject(int objnum) : PDFObject(objnum) , m_RValue(2), m_nLength(0), m_nVValue(0), m_nPermissions(0), m_bAESEncrypted(false) { }
-            void ComposeObject();
+            void ComposeObject() override;
             void SetRValue(int RValue) { m_RValue = RValue; }
             void SetLength(int nLength) { m_nLength = nLength; }
             void SetFilter(const std::string& sFilter) { m_sFilter = sFilter; }
@@ -246,14 +246,14 @@ namespace dynarithmic
     {
         public:
             ProcSetObject(int objnum) : PDFObject(objnum) { }
-            void ComposeObject();
+            void ComposeObject() override;
     };
 
     class FontObject : public PDFObject
     {
         public:
             FontObject(int objnum) : PDFObject(objnum) { }
-            void ComposeObject();
+            void ComposeObject() override;
             void SetFontName(const std::string& name) { fontname = name; }
             std::string GetFontName() const { return fontname; }
 
@@ -287,7 +287,7 @@ namespace dynarithmic
             }
             unsigned long GetDuplicateImageNum() const { return m_nDuplicateObjNum; }
             unsigned long GetDuplicateThumbnailNum() const { return m_nDuplicateThumbObjNum; }
-            void ComposeObject();
+            void ComposeObject() override;
             unsigned long GetCRCValue() const { return m_CRCValue; }
             void EnableThumbnailImage(bool bEnable=true) { m_bThumbnailImage = bEnable; }
             unsigned long GetMaxObjectNum() const { return m_nMaxObjectNum; }

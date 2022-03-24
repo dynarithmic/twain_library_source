@@ -36,7 +36,7 @@ Container ReadData( std::istream& iFile)
 
 struct OneLineData
 {
-    int errnum;
+    int errnum{};
     std::string errcode;
     std::string errstring;
 };

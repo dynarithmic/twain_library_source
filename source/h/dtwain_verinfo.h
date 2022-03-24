@@ -30,13 +30,21 @@
 #endif
 
 #ifdef _WIN32
+#ifdef UNICODE
+#define UNICODE_VERSION "(Unicode)"
+#define UNICODE_SUFFIX  "u"
+#else
+#define UNICODE_VERSION
+#define UNICODE_SUFFIX ""
+#endif
+
 #if defined (WIN64) || (_WIN64)
-        #define DTWAIN_DLLNAME      "dtwain64" DTWAIN_DEVELOP_SUFFIX ".dll"
-        #define DTWAIN_FILEDESCRIPTION  "dtwain64" DTWAIN_DEVELOP_SUFFIX
+        #define DTWAIN_DLLNAME      "dtwain64" UNICODE_SUFFIX DTWAIN_DEVELOP_SUFFIX ".dll"
+        #define DTWAIN_FILEDESCRIPTION  "dtwain64" UNICODE_SUFFIX DTWAIN_DEVELOP_SUFFIX
         #define DTWAIN_OSPLATFORM "64"
 #else
-        #define DTWAIN_DLLNAME      "dtwain32" DTWAIN_DEVELOP_SUFFIX ".dll"
-        #define DTWAIN_FILEDESCRIPTION  "dtwain32" DTWAIN_DEVELOP_SUFFIX
+        #define DTWAIN_DLLNAME      "dtwain32" UNICODE_SUFFIX DTWAIN_DEVELOP_SUFFIX ".dll"
+        #define DTWAIN_FILEDESCRIPTION  "dtwain32" UNICODE_SUFFIX DTWAIN_DEVELOP_SUFFIX
         #define DTWAIN_OSPLATFORM "32"
 #endif
 #endif
@@ -53,11 +61,6 @@
     #endif
 #endif
 
-#ifdef UNICODE
-    #define UNICODE_VERSION         "(Unicode)"
-#else
-    #define UNICODE_VERSION
-#endif
 
 #define DTWAIN_VERINFO_COMMENTS             "Patch Level " DTWAIN_VERINFO_PATCHLEVEL_VERSION "\0"
 #define DTWAIN_VERINFO_COMPANYNAME          "Dynarithmic Software\0"

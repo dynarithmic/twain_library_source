@@ -36,10 +36,10 @@ using namespace dynarithmic;
 
 /* Sent when DTWAIN_Acquire...() functions are about to return */
 
-CTL_ProcessEventTriplet::CTL_ProcessEventTriplet(CTL_ITwainSession *pSession,
-                                                 const CTL_ITwainSource* pSource,
-                                                 MSG *pMsg,
-                                                 bool isDSM2) : m_Event{}, m_bDSM2Used(isDSM2)
+dynarithmic::CTL_ProcessEventTriplet::CTL_ProcessEventTriplet(CTL_ITwainSession* pSession,
+                                                             CTL_ITwainSource* pSource,
+                                                             MSG *pMsg,
+                                                             bool isDSM2) : m_bDSM2Used(isDSM2)
 {
     SetSourcePtr(const_cast<CTL_ITwainSource*>(pSource));
     SetSessionPtr(pSession);
@@ -56,7 +56,7 @@ CTL_ProcessEventTriplet::CTL_ProcessEventTriplet(CTL_ITwainSession *pSession,
     {
         if (pSource)
         {
-            Init(pSession->GetAppIDPtr(), *pSource, DG_CONTROL, DAT_EVENT,
+            Init(pSession->GetAppIDPtr(), pSource->GetSourceIDPtr(), DG_CONTROL, DAT_EVENT,
                 MSG_PROCESSEVENT, static_cast<TW_MEMREF>(&m_Event));
             SetAlive(true);
         }
@@ -66,7 +66,6 @@ CTL_ProcessEventTriplet::CTL_ProcessEventTriplet(CTL_ITwainSession *pSession,
 
 TW_UINT16 CTL_ProcessEventTriplet::ExecuteEventHandler()
 {
-    static int nCount = 0;
     TW_UINT16 rc = TWRC_SUCCESS;
 
     // if we are doing a legacy TWAIN call, then we need to
@@ -74,188 +73,185 @@ TW_UINT16 CTL_ProcessEventTriplet::ExecuteEventHandler()
     if (!m_bDSM2Used)
         rc = CTL_TwainTriplet::Execute();
 
-    bool bNextAttemptIsRetry = false;
-
     CTL_ITwainSession* pSession = GetSessionPtr();
     CTL_ITwainSource* pSource = GetSourcePtr();
 
-    if ( 1 ) //rc == TWRC_SUCCESS )
+    const HWND hWnd =*pSession->GetWindowHandlePtr();
+    const unsigned int nMsg = CTL_TwainAppMgr::GetRegisteredMsg();
+
+   // Check message from source
+    switch (m_Event.TWMessage)
     {
-        const HWND hWnd =*pSession->GetWindowHandlePtr();
-        const unsigned int nMsg = CTL_TwainAppMgr::GetRegisteredMsg();
-
-       // Check message from source
-        switch (m_Event.TWMessage)
+        case MSG_XFERREADY:
         {
-            case MSG_XFERREADY:
+            static int nCount = 0;
+            bool bNextAttemptIsRetry = false;
+            // Set the retry count
+            pSource->SetCurrentRetryCount(0);
+
+            pSource->SetState(SOURCE_STATE_XFERREADY);
+            // Set the transfer mechanism (??)
+            // Set the pixel type and bit depth based on what the current values
+            // found in the Source.
+            CTL_TwainAppMgr::SetPixelAndBitDepth(pSource);
+
+            // Send this message to the Twain window(s)
+            #ifdef _WIN32
+            ::SendMessage(hWnd, nMsg, MSG_XFERREADY, 0 );
+            #endif
+            // Remove Dibs if already scanned
+            pSource->Reset();
+
+            // Loop for all documents installed
+            int  bPending = 1;
+            nCount = 0;
+            pSource->SetPendingJobNum(0);
+            while (bPending != 0)
             {
-                // Set the retry count
-                pSource->SetCurrentRetryCount(0);
-
-                pSource->SetState(SOURCE_STATE_XFERREADY);
-                // Set the transfer mechanism (??)
-                // Set the pixel type and bit depth based on what the current values
-                // found in the Source.
-                CTL_TwainAppMgr::SetPixelAndBitDepth(pSource);
-
-                // Send this message to the Twain window(s)
-                #ifdef _WIN32
-                ::SendMessage(hWnd, nMsg, MSG_XFERREADY, 0 );
-                #endif
-                // Remove Dibs if already scanned
-                pSource->Reset();
-
-                // Loop for all documents installed
-                int  bPending = 1;
-                nCount = 0;
-                pSource->SetPendingJobNum(0);
-                while (bPending != 0)
+                // Get the image information
+                if ( !bNextAttemptIsRetry )
                 {
-                    // Get the image information
-                    if ( !bNextAttemptIsRetry )
+                    if (!CTL_TwainAppMgr::GetImageInfo(pSource))
                     {
-                        if (!CTL_TwainAppMgr::GetImageInfo(pSource))
+                        if ( !pSource->SkipImageInfoErrors() )
                         {
-                            if ( !pSource->SkipImageInfoErrors() )
-                            {
-                                CTL_TwainAppMgr::WriteLogInfoA("Invalid Image Information on acquiring image");
-                                CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
-                                                                      nullptr,
-                                                                      DTWAIN_TN_IMAGEINFOERROR,
-                                                                      reinterpret_cast<LPARAM>(pSource));
-                                break;
-                            }
+                            CTL_TwainAppMgr::WriteLogInfoA("Invalid Image Information on acquiring image");
+                            CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
+                                                                  nullptr,
+                                                                  DTWAIN_TN_IMAGEINFOERROR,
+                                                                  reinterpret_cast<LPARAM>(pSource));
+                            break;
                         }
-                        else
-                        {
-                        }
-                    }
-                    // Let TWAIN initiate the transfer
-                    // Send message that acquire has started if nCount is 0
-                    if ( nCount == 0 && !bNextAttemptIsRetry )
-                        CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
-                                                              nullptr,
-                                                              DTWAIN_TWAINAcquireStarted,
-                                                              reinterpret_cast<LPARAM>(pSource));
-
-                    // Send message if nCount is 0 and manual duplex is on, and side 1 is
-                    // being acquired
-                    if ( nCount == 0 && pSource->IsManualDuplexModeOn() &&
-                         pSource->GetCurrentSideAcquired() == 0 )
-                        CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
-                                                              nullptr,
-                                                              DTWAIN_TN_MANDUPSIDE1START,
-                                                              reinterpret_cast<LPARAM>(pSource));
-
-                    // Also send that the acquisition is ready (this is sent for every page)
-                    const bool bContinue = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
-                                                                                 nullptr,
-                                                                                 DTWAIN_TN_TRANSFERREADY,
-                                                                                 reinterpret_cast<LPARAM>(pSource))?true:false;
-                    if ( !bContinue )
-                    {
-                        // Transfer aborted by callback
-                        ResetTransfer();
-
-                        // Send a message to close things down if
-                        // there was no user interface chosen
-                        if ( !pSource->IsUIOpenOnAcquire() )
-                            CTL_TwainAppMgr::EndTwainUI(pSession, pSource);
-
-                        CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
-                                                              nullptr,
-                                                              DTWAIN_TN_TRANSFERCANCELLED,
-                                                              reinterpret_cast<LPARAM>(pSource));
-                        bPending = 0;
                     }
                     else
                     {
-                        bNextAttemptIsRetry = false;
-                        bPending = CTL_TwainAppMgr::TransferImage(pSource, nCount);
-                        if ( bPending != -1 )  // Only if aborting or images have been retrieved
-                            nCount++;
-                        else
-                            bNextAttemptIsRetry = true;
                     }
                 }
-                pSource->SetState(SOURCE_STATE_UIENABLED);
-                if ( !pSource->GetTransferDone() && nCount <= 1 )
+                // Let TWAIN initiate the transfer
+                // Send message that acquire has started if nCount is 0
+                if ( nCount == 0 && !bNextAttemptIsRetry )
+                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
+                                                          nullptr,
+                                                          DTWAIN_TWAINAcquireStarted,
+                                                          reinterpret_cast<LPARAM>(pSource));
+
+                // Send message if nCount is 0 and manual duplex is on, and side 1 is
+                // being acquired
+                if ( nCount == 0 && pSource->IsManualDuplexModeOn() &&
+                     pSource->GetCurrentSideAcquired() == 0 )
+                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
+                                                          nullptr,
+                                                          DTWAIN_TN_MANDUPSIDE1START,
+                                                          reinterpret_cast<LPARAM>(pSource));
+
+                // Also send that the acquisition is ready (this is sent for every page)
+                const bool bContinue = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
+                                                                             nullptr,
+                                                                             DTWAIN_TN_TRANSFERREADY,
+                                                                             reinterpret_cast<LPARAM>(pSource))?true:false;
+                if ( !bContinue )
                 {
+                    // Transfer aborted by callback
+                    ResetTransfer();
+
+                    // Send a message to close things down if
+                    // there was no user interface chosen
+                    if ( !pSource->IsUIOpenOnAcquire() )
+                        CTL_TwainAppMgr::EndTwainUI(pSession, pSource);
+
                     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                           nullptr,
-                                                          DTWAIN_TN_ACQUIREDONE_EX,
+                                                          DTWAIN_TN_TRANSFERCANCELLED,
                                                           reinterpret_cast<LPARAM>(pSource));
-
-                    break;  // No transfer occurred.  Cancellation or Failure occurred
+                    bPending = 0;
                 }
-                if ( nCount > 0)
-                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
-                                                          nullptr,
-                                                          DTWAIN_TN_ACQUIREDONE,
-                                                          reinterpret_cast<LPARAM>(pSource));
+                else
+                {
+                    bNextAttemptIsRetry = false;
+                    bPending = CTL_TwainAppMgr::TransferImage(pSource, nCount);
+                    if ( bPending != -1 )  // Only if aborting or images have been retrieved
+                        nCount++;
+                    else
+                        bNextAttemptIsRetry = true;
+                }
             }
-            break;
-
-            case MSG_CLOSEDSREQ:
-            case MSG_CLOSEDSOK:
+            pSource->SetState(SOURCE_STATE_UIENABLED);
+            if ( !pSource->GetTransferDone() && nCount <= 1 )
             {
-                // The source UI must be closed
-                if ( pSource->IsUIOpen())
-                {
-                   CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
-                                                         nullptr,
-                                                         DTWAIN_TN_UICLOSING,
-                                                         reinterpret_cast<LPARAM>(pSource));
+                CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
+                                                      nullptr,
+                                                      DTWAIN_TN_ACQUIREDONE_EX,
+                                                      reinterpret_cast<LPARAM>(pSource));
 
-                        CTL_TwainAppMgr::DisableUserInterface(pSource);
-
-                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
-                                                          nullptr,
-                                                          DTWAIN_TN_UICLOSED,
-                                                          reinterpret_cast<LPARAM>(pSource));
-                }
+                break;  // No transfer occurred.  Cancellation or Failure occurred
             }
-            break;
-
-            // Possible device event
-            case MSG_DEVICEEVENT:
-            {
-                // Some dude has changed something on the device!!
-                // Get the change
-                CTL_DeviceEventTriplet DevTrip(pSession, pSource);
-                DevTrip.Execute();
-                if ( DevTrip.IsSuccessful() )
-                {
-                    pSource->SetDeviceEvent( DevTrip.GetDeviceEvent() );
-                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_DEVICEEVENT,reinterpret_cast<LPARAM>(pSource));
-
-                    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-                    // if there is a callback, call it now with the error notifications
-                    if ( pHandle->m_pCallbackFn )
-                    {
-                        const UINT uMsg = CTL_TwainDLLHandle::s_nRegisteredDTWAINMsg;
-                        LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_DEVICEEVENT, 0, true);
-                        #ifdef WIN64
-                            (*pHandle->m_pCallbackFn)(DTWAIN_TN_DEVICEEVENT, 0, (LONG_PTR)pSource);
-                        #else
-                            (*pHandle->m_pCallbackFn)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG_PTR>(pSource));
-                        #endif
-                    }
-
-                    // if there is a 64-bit callback, call it now with the error notifications
-                    if ( pHandle->m_pCallbackFn64 )
-                    {
-                        const UINT uMsg = CTL_TwainDLLHandle::s_nRegisteredDTWAINMsg;
-                        LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_DEVICEEVENT, 0, true);
-                        (*pHandle->m_pCallbackFn64)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONGLONG>(pSource));
-                    }
-                }
-            }
-            break;
-
-            case MSG_NULL:
-            break;
+            if ( nCount > 0)
+                CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
+                                                      nullptr,
+                                                      DTWAIN_TN_ACQUIREDONE,
+                                                      reinterpret_cast<LPARAM>(pSource));
         }
+        break;
+
+        case MSG_CLOSEDSREQ:
+        case MSG_CLOSEDSOK:
+        {
+            // The source UI must be closed
+            if ( pSource->IsUIOpen())
+            {
+               CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
+                                                     nullptr,
+                                                     DTWAIN_TN_UICLOSING,
+                                                     reinterpret_cast<LPARAM>(pSource));
+
+                    CTL_TwainAppMgr::DisableUserInterface(pSource);
+
+                CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
+                                                      nullptr,
+                                                      DTWAIN_TN_UICLOSED,
+                                                      reinterpret_cast<LPARAM>(pSource));
+            }
+        }
+        break;
+
+        // Possible device event
+        case MSG_DEVICEEVENT:
+        {
+            // Some dude has changed something on the device!!
+            // Get the change
+            CTL_DeviceEventTriplet DevTrip(pSession, pSource);
+            DevTrip.Execute();
+            if ( DevTrip.IsSuccessful() )
+            {
+                pSource->SetDeviceEvent( DevTrip.GetDeviceEvent() );
+                CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_DEVICEEVENT,reinterpret_cast<LPARAM>(pSource));
+
+                const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+                // if there is a callback, call it now with the error notifications
+                if ( pHandle->m_pCallbackFn )
+                {
+                    const UINT uMsg = CTL_TwainDLLHandle::s_nRegisteredDTWAINMsg;
+                    LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_DEVICEEVENT, 0, true);
+                    #ifdef WIN64
+                        (*pHandle->m_pCallbackFn)(DTWAIN_TN_DEVICEEVENT, 0, (LONG_PTR)pSource);
+                    #else
+                        (*pHandle->m_pCallbackFn)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG_PTR>(pSource));
+                    #endif
+                }
+
+                // if there is a 64-bit callback, call it now with the error notifications
+                if ( pHandle->m_pCallbackFn64 )
+                {
+                    const UINT uMsg = CTL_TwainDLLHandle::s_nRegisteredDTWAINMsg;
+                    LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_DEVICEEVENT, 0, true);
+                    (*pHandle->m_pCallbackFn64)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONGLONG>(pSource));
+                }
+            }
+        }
+        break;
+
+        case MSG_NULL:
+        break;
     }
     return rc;
 }

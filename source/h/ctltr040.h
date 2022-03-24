@@ -36,7 +36,7 @@ namespace dynarithmic
                 m_TWCallback.CallBackProc = reinterpret_cast<TW_MEMREF>(proc);
                 m_TWCallback.RefCon = 0;
             }
-            DSMENTRYPROC getEntryProc() { return m_DSMEntryProc; }
+            DSMENTRYPROC getEntryProc() const { return m_DSMEntryProc; }
             TW_CALLBACK getCallback() const { return m_TWCallback; }
 
         private:

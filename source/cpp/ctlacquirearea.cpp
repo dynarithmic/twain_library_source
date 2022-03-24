@@ -56,12 +56,12 @@ static bool SetImageSize2(CTL_ITwainSource *p,
 
 static bool IsValidUnit(LONG Unit)
 {
-    return (Unit == DTWAIN_INCHES ||
+    return Unit == DTWAIN_INCHES ||
         Unit == DTWAIN_CENTIMETERS ||
         Unit == DTWAIN_PICAS ||
         Unit == DTWAIN_POINTS ||
         Unit == DTWAIN_TWIPS ||
-        Unit == DTWAIN_PIXELS);
+        Unit == DTWAIN_PIXELS;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -81,7 +81,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea(DTWAIN_SOURCE Source, LONG lSetTy
     const CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
 
     // See if Source is opened
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return (!CTL_TwainAppMgr::IsSourceOpen(p)); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(p); },
     DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
     const DTWAIN_BOOL bRet = SetImageSize(Source, FloatEnum, ActualEnum,static_cast<CTL_EnumSetType>(lSetType));
@@ -109,9 +109,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2(DTWAIN_SOURCE Source, DTWAIN_FLO
     if (!p)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return (!CTL_TwainAppMgr::IsSourceOpen(p)); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(p); },
                                     DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return (!IsValidUnit(Unit)); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !IsValidUnit(Unit); },
                                     DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     const DTWAIN_BOOL bRet = SetImageSize2(p, left, top, right, bottom, Unit, flags);
     LOG_FUNC_EXIT_PARAMS(bRet)
@@ -146,7 +146,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2(DTWAIN_SOURCE Source, LPDTWAIN_F
     if (!p)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return (!CTL_TwainAppMgr::IsSourceOpen(p)); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(p); },
     DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
     const DTWAIN_BOOL bRet = GetImageSize2(p, left, top, right, bottom, Unit);
@@ -196,7 +196,7 @@ static bool SetImageSize(DTWAIN_SOURCE Source, DTWAIN_ARRAY FloatEnum, DTWAIN_AR
         const DTWAIN_ARRAY pArray = FloatEnum;
         DTWAIN_ARRAY pArrayActual = DTWAIN_ArrayInit();
         DTWAIN_Check_Error_Condition_0_Ex(pHandle,
-            [&] { return (!EnumeratorFunctionImpl::EnumeratorIsValidEx(pArray, CTL_EnumeratorDoubleType)); },
+            [&] { return !EnumeratorFunctionImpl::EnumeratorIsValidEx(pArray, CTL_EnumeratorDoubleType); },
             DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
 
         const auto vFloatEnum = EnumeratorVectorPtr<double>(FloatEnum);
@@ -209,7 +209,7 @@ static bool SetImageSize(DTWAIN_SOURCE Source, DTWAIN_ARRAY FloatEnum, DTWAIN_AR
         {
             pArrayActual = ActualEnum;
             DTWAIN_Check_Error_Condition_0_Ex(pHandle,
-                [&] {return (!EnumeratorFunctionImpl::EnumeratorIsValidEx(pArrayActual, CTL_EnumeratorDoubleType)); },
+                [&] {return !EnumeratorFunctionImpl::EnumeratorIsValidEx(pArrayActual, CTL_EnumeratorDoubleType); },
                 DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
             vActualEnum->clear();
         }

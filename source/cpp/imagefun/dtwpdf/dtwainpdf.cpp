@@ -129,13 +129,13 @@ tsize_t ImageObject::libtiffWriteProc (thandle_t /*fd*/, tdata_t buf, tsize_t ns
 {
     // libtiff will try to write an 8 byte header into the tiff file. We need
     // to ignore this because PDF does not use it...
-    if ((nsize == 8) && (static_cast<char*>(buf)[0] == 'I') && (static_cast<char*>(buf)[1] == 'I')
-      && (static_cast<char*>(buf)[2] == 42))
+    if (nsize == 8 && static_cast<char*>(buf)[0] == 'I' && static_cast<char*>(buf)[1] == 'I'
+      && static_cast<char*>(buf)[2] == 42)
     {
       // Skip the header -- little endian
     }
-    else if ((nsize == 8) && (static_cast<char*>(buf)[0] == 'M') &&
-       (static_cast<char*>(buf)[1] == 'M') && (static_cast<char*>(buf)[2] == 42))
+    else if (nsize == 8 && static_cast<char*>(buf)[0] == 'M' &&
+       static_cast<char*>(buf)[1] == 'M' && static_cast<char*>(buf)[2] == 42)
     {
       // Skip the header -- big endian
     }
@@ -156,7 +156,7 @@ tsize_t ImageObject::libtiffWriteProc (thandle_t /*fd*/, tdata_t buf, tsize_t ns
         memcpy (&m_vImgStream[m_sTiffOffset], buf, nsize);
         m_sTiffOffset += static_cast<unsigned>(nsize);
     }
-    return (nsize);
+    return nsize;
 }
 
 
@@ -336,10 +336,10 @@ static int EncodeVectorStream(const std::vector<char>& InputStream,
 {
 
     static std::unordered_map<PdfDocument::CompressTypes, std::function<int(const std::string&, std::string&)>>
-                compress_fn = { { PdfDocument::NO_COMPRESS, ::NoCompress },
-                                { PdfDocument::A85_COMPRESS, ::ASCII85Encode },
-                                { PdfDocument::AHEX_COMPRESS, ::ASCIIHexEncode },
-                                { PdfDocument::FLATE_COMPRESS, ::FlateEncode}, };
+                compress_fn = { { PdfDocument::NO_COMPRESS, NoCompress},
+                                { PdfDocument::A85_COMPRESS, ASCII85Encode},
+                                { PdfDocument::AHEX_COMPRESS, ASCIIHexEncode},
+                                { PdfDocument::FLATE_COMPRESS, FlateEncode}, };
 
     const auto fnCall = compress_fn.find(compresstype);
         if (fnCall != compress_fn.end())
@@ -543,7 +543,7 @@ void PdfDocument::SetSearchableText(const std::string& /*s*/)
 
 bool RemoveCurrentText(const PDFTextElement* element)
 {
-    return ((*element).displayFlags & DTWAIN_PDFTEXT_CURRENTPAGE)?true:false;
+    return (*element).displayFlags & DTWAIN_PDFTEXT_CURRENTPAGE?true:false;
 }
 
 void PdfDocument::RemoveTempTextElements()
@@ -614,11 +614,11 @@ bool PdfDocument::WritePage(CTL_StringType sImgFileName)
 
         if ( dpix > 1 )
         {
-            realwidth = (static_cast<double>(width) / static_cast<double>(dpix)) * 72.0;
+            realwidth = static_cast<double>(width) / static_cast<double>(dpix) * 72.0;
         }
         if ( dpiy > 1)
         {
-            realheight = (static_cast<double>(height) / static_cast<double>(dpiy)) * 72.0;
+            realheight = static_cast<double>(height) / static_cast<double>(dpiy) * 72.0;
         }
 
         switch(m_scaletype)
@@ -827,7 +827,7 @@ void PdfDocument::WriteAllFontObjects()
 bool PdfDocument::IsTextElementOnPage(CTL_TEXTELEMENTNAKEDPTRLIST::const_iterator it) const
 {
     const unsigned int pageFlag = (*it)->displayFlags;
-    const bool isEvenPage = ((m_nCurPage) %2 == 0);
+    const bool isEvenPage = m_nCurPage %2 == 0;
     switch(pageFlag & 0x0000FFFF)
     {
         case DTWAIN_PDFTEXT_ALLPAGES:
@@ -842,7 +842,7 @@ bool PdfDocument::IsTextElementOnPage(CTL_TEXTELEMENTNAKEDPTRLIST::const_iterato
             return !isEvenPage;
 
         case DTWAIN_PDFTEXT_FIRSTPAGE:
-            return (m_nCurPage == 1);
+            return m_nCurPage == 1;
     }
     return false;
 }
@@ -859,7 +859,7 @@ void PdfDocument::CreateFontNumbersFromTextElements()
         if ( !IsTextElementOnPage(itTextElement))
             continue;
 
-        PDFTextElement* tElement = (*itTextElement);
+        PDFTextElement* tElement = *itTextElement;
 
         // Check if font is in set
         auto it = m_mapFontNames.find(tElement->m_font.m_fontName);
@@ -1055,7 +1055,7 @@ void PagesObject::ComposeObject()
     {
         sprintf(szBuf,"%d 0 R ", KidsArrayObjects[i]);
         AppendContents(szBuf);
-        if ( (i % 10 == 0) && i > 0 )
+        if ( i % 10 == 0 && i > 0 )
             AppendContents("\n          ");
     }
     AppendContents("]\n");
@@ -1153,10 +1153,10 @@ void EncryptionObject::ComposeObject()
 
 bool IsRenderModeStroked(int rendermode)
 {
-    return (rendermode == 1 ||
+    return rendermode == 1 ||
         rendermode == 2 ||
         rendermode == 5 ||
-        rendermode == 6);
+        rendermode == 6;
 }
 
 std::string PDFTextElement::GetPDFTextString() const
@@ -1250,7 +1250,7 @@ void ContentsObject::CreateFontDictAndText(int startObjNum, int& nextObjNum)
     int numTextElements = pParent->GetNumTextElements();
     bool printOnPage = false;
     int numPrinted = 0;
-    bool onEvenPage = (pParent->GetCurrentPageNumber() % 2) == 0;
+    bool onEvenPage = pParent->GetCurrentPageNumber() % 2 == 0;
     auto it = pParent->GetFirstTextElement();
     for ( int nElements = 0; nElements < numTextElements; ++nElements, ++it )
     {
@@ -1262,17 +1262,17 @@ void ContentsObject::CreateFontDictAndText(int startObjNum, int& nextObjNum)
         if ( pageFlag & (DTWAIN_PDFTEXT_ALLPAGES | DTWAIN_PDFTEXT_CURRENTPAGE ))
         {
             printOnPage = true;
-            if ((pageFlag & DTWAIN_PDFTEXT_CURRENTPAGE) && (*it)->hasBeenDisplayed)
+            if (pageFlag & DTWAIN_PDFTEXT_CURRENTPAGE && (*it)->hasBeenDisplayed)
                 printOnPage = false;
         }
         else
-        if ( (pageFlag & DTWAIN_PDFTEXT_EVENPAGES) && onEvenPage )
+        if ( pageFlag & DTWAIN_PDFTEXT_EVENPAGES && onEvenPage )
             printOnPage = true;
         else
-        if ( (pageFlag & DTWAIN_PDFTEXT_ODDPAGES) && !onEvenPage )
+        if ( pageFlag & DTWAIN_PDFTEXT_ODDPAGES && !onEvenPage )
             printOnPage = true;
         else
-        if  ((pageFlag & DTWAIN_PDFTEXT_FIRSTPAGE) && pParent->GetCurrentPageNumber() == 1 )
+        if  (pageFlag & DTWAIN_PDFTEXT_FIRSTPAGE && pParent->GetCurrentPageNumber() == 1 )
             printOnPage = true;
         if ( printOnPage )
         {
@@ -1767,7 +1767,7 @@ bool ImageObject::ProcessTIFFImage(int& width, int& height, int& bpp, int& /*rgb
   // multistrip images also need to be converted
     TIFFGetField (image, TIFFTAG_FILLORDER, &fillorder);
 
-    if ( (fillorder == FILLORDER_LSB2MSB) || (TIFFNumberOfStrips (image) > 1))
+    if ( fillorder == FILLORDER_LSB2MSB || TIFFNumberOfStrips (image) > 1)
     {
     /*************************************************************************
       Convert the image
@@ -1949,7 +1949,7 @@ bool ImageObject::ProcessBMPImage(int& width, int& height, int& bpp, int& /*rgb*
   // multistrip images also need to be converted
     TIFFGetField (image, TIFFTAG_FILLORDER, &fillorder);
 
-    if ( (fillorder == FILLORDER_LSB2MSB) || (TIFFNumberOfStrips (image) > 1))
+    if ( fillorder == FILLORDER_LSB2MSB || TIFFNumberOfStrips (image) > 1)
     {
     /*************************************************************************
       Convert the image

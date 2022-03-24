@@ -38,8 +38,8 @@ CTL_TwainTypeOb::CTL_TwainTypeOb( TW_UINT16 nType, bool bGetTypeSize/*=true*/ ) 
         m_pData = CTL_TwainDLLHandle::s_TwainMemoryFunc->LockMemory(m_hGlobal);
 }
 
-CTL_TwainTypeOb::CTL_TwainTypeOb(CTL_TwainTypeOb&& rhs) : m_nSize(rhs.m_nSize), m_nType(rhs.m_nType),
-                                                          m_pData(rhs.m_pData), m_hGlobal(rhs.m_hGlobal)
+CTL_TwainTypeOb::CTL_TwainTypeOb(CTL_TwainTypeOb&& rhs) noexcept : m_nSize(rhs.m_nSize), m_nType(rhs.m_nType),
+                                                                   m_pData(rhs.m_pData), m_hGlobal(rhs.m_hGlobal)
 {
     rhs.m_pData = nullptr;
     rhs.m_hGlobal = {};
@@ -53,7 +53,7 @@ void CTL_TwainTypeOb::swap(CTL_TwainTypeOb& left, CTL_TwainTypeOb& right) noexce
     std::swap(left.m_pData, right.m_pData);
 }
 
-CTL_TwainTypeOb& CTL_TwainTypeOb::operator=(CTL_TwainTypeOb&& rhs)
+CTL_TwainTypeOb& CTL_TwainTypeOb::operator=(CTL_TwainTypeOb&& rhs) noexcept
 {
     if (m_hGlobal)
     {
@@ -76,12 +76,12 @@ CTL_TwainTypeOb::~CTL_TwainTypeOb()
 }
 
 // No check for size!!!
-void CTL_TwainTypeOb::CopyData( void *pData )
+void CTL_TwainTypeOb::CopyData(const void* pData) const
 {
    memcpy( m_pData, pData, m_nSize );
 }
 
-void CTL_TwainTypeOb::GetData( void *pData)
+void CTL_TwainTypeOb::GetData( void *pData) const
 {
     if ( m_pData )
         memcpy( pData, m_pData, m_nSize );

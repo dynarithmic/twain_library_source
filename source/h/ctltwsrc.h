@@ -96,10 +96,9 @@ namespace dynarithmic
                                          LPCTSTR lpszProductName = nullptr);
 
         static void Destroy(const CTL_ITwainSource* pSource);
-        static bool Close( CTL_ITwainSource* pSource, bool bRemainLoaded);
-        operator TW_IDENTITY* () const { return GetSourceIDPtr(); }
+        operator TW_IDENTITY* () { return GetSourceIDPtr(); }
 
-        dynarithmic::CTL_ITwainSession* GetTwainSession() const;
+        CTL_ITwainSession* GetTwainSession() const;
 
         bool isCapValuesCached(TW_UINT16 lCap, LONG getType) const
         {
@@ -112,7 +111,7 @@ namespace dynarithmic
         DTWAIN_ARRAY getCapCachedValues(TW_UINT16 lCap, LONG getType);
         bool setCapCachedValues(DTWAIN_ARRAY array, TW_UINT16 lCap, LONG getType);
 
-        TW_IDENTITY *GetSourceIDPtr() const { return (TW_IDENTITY*)&m_SourceId; }
+        TW_IDENTITY *GetSourceIDPtr() { return &m_SourceId; }
 
         TW_UINT32    GetId() const          { return m_SourceId.Id; }
         const TW_VERSION*  GetVersion() const { return &m_SourceId.Version; }
@@ -132,12 +131,12 @@ namespace dynarithmic
         void         SetAcquireFileType(CTL_TwainFileFormatEnum FileType)
                                         { m_nFileAcquireType = FileType; }
         CTL_TwainFileFormatEnum GetAcquireFileType() const { return m_nFileAcquireType; }
-        void         Clone( CTL_ITwainSource* pSource);
+        void         Clone(const CTL_ITwainSource* pSource);
         void         SetActive(bool bSet);
         bool         IsActive() const;
         HWND         GetOutputWindow() const;
-        void         SetDibHandle(HANDLE hDib, size_t nWhich=0);
-        void         SetDibHandleNoPalette(HANDLE hDib, int nWhich=0);
+        void         SetDibHandle(HANDLE hDib, size_t nWhich=0) const;
+        void         SetDibHandleNoPalette(HANDLE hDib, int nWhich=0) const;
 
         HANDLE       GetDibHandle(int nWhich=0) const;
         CTL_TwainDibPtr GetDibObject(int nWhich=0) const;
@@ -177,28 +176,27 @@ namespace dynarithmic
         void         SetJobFileHandling(bool bSet=true) { m_bJobFileHandling = bSet; }
         bool         IsJobFileHandlingOn() const { return m_bJobFileHandling; }
         bool         CurrentJobIncludesPage() const { return
-                        (m_nJobControl == DTWAIN_JC_JSIS || m_nJobControl == DTWAIN_JC_JSIC ||
-                        m_nJobControl == DTWAIN_JCBP_JSIS || m_nJobControl == DTWAIN_JCBP_JSIC); }
+                        m_nJobControl == DTWAIN_JC_JSIS || m_nJobControl == DTWAIN_JC_JSIC ||
+                        m_nJobControl == DTWAIN_JCBP_JSIS || m_nJobControl == DTWAIN_JCBP_JSIC; }
 
         int          GetNumDibs() const;
         bool         SetCurrentDibPage(int nPage);
         int          GetCurrentDibPage() const;
-        void         Reset();
-        CTL_TwainDibArray* GetDibArray() { return m_DibArray.get(); }
+        void         Reset() const;
+        CTL_TwainDibArray* GetDibArray() const { return m_DibArray.get(); }
         void         SetAcquireAttempt(bool bSet) { m_bAcquireAttempt = bSet; }
         bool         IsAcquireAttempt() const { return m_bAcquireAttempt; }
         bool         IsSourceCompliant( CTL_EnumTwainVersion TVersion, CTL_TwainCapArray& rArray ) const;
-        void         RemoveAllDibs();
+        void         RemoveAllDibs() const;
         CTL_StringType GetCurrentImageFileName(); // const;
         CTL_StringType GetImageFileName(int curFile=0) const;
         void         SetFileEnumerator(DTWAIN_ARRAY pDTWAINArray) { m_pFileEnumerator = pDTWAINArray; }
-        DTWAIN_ARRAY GetFileEnumerator() { return m_pFileEnumerator; }
+        DTWAIN_ARRAY GetFileEnumerator() const { return m_pFileEnumerator; }
         void         SetTransferDone(bool bDone) { m_bTransferDone = bDone; }
         bool         GetTransferDone() const { return m_bTransferDone; }
         void         SetCapCacheValue( LONG lCap, double dValue, bool bTurnOn );
         double       GetCapCacheValue( LONG lCap, LONG *pTurnOn ) const;
         CTL_StringType PromptForFileName() const;
-        bool         PromptAndSaveImage( int nCurImage );
         bool         IsAcquireStarted() const { return m_bAcquireStarted; }
         void         SetAcquireStarted(bool bSet) { m_bAcquireStarted = bSet; }
         void         SetModal(bool bSet) { m_bDialogModal = bSet; }
@@ -208,7 +206,7 @@ namespace dynarithmic
         bool         IsOpenAfterAcquire() const { return m_bOpenAfterAcquire; }
 
         // Controls whether to reopen the source if it has been closed
-        bool         IsReopenAfterAcquire() const { return (!m_bOpenAfterAcquire)?true:false; }
+        bool         IsReopenAfterAcquire() const { return !m_bOpenAfterAcquire?true:false; }
         int          GetMaxAcquisitions() const { return m_nMaxAcquisitions; }
         void         SetMaxAcquisitions(int nMax) { m_nMaxAcquisitions = nMax; }
         int          GetUIMaxAcquisitions() const { return m_nUIMaxAcquisitions; }
@@ -218,8 +216,7 @@ namespace dynarithmic
         void         SetSpecialTransferMode(LONG lMode) { m_nSpecialMode = lMode; }
         LONG         GetSpecialTransferMode() const { return m_nSpecialMode; }
         TW_USERINTERFACE *GetTWUserInterface() { return &m_UserInterface; }
-        void         ResetAcquisitionAttempts();
-        void         AddDibsToAcquisition(DTWAIN_ARRAY aDibs);
+        void         AddDibsToAcquisition(DTWAIN_ARRAY aDibs) const;
         void         ResetAcquisitionAttempts(DTWAIN_ARRAY aNewAttempts);
         DTWAIN_ARRAY   GetAcquisitionArray() const;
         CTL_DeviceEvent GetDeviceEvent() const { return m_DeviceEvent; }
@@ -267,7 +264,7 @@ namespace dynarithmic
         void         SetPDFValue(const CTL_StringType& nWhich, const CTL_StringType& sz);
         void         SetPDFValue(const CTL_StringType& nWhich, LONG nValue);
         void         SetPDFValue(const CTL_StringType& s, DTWAIN_FLOAT f1, DTWAIN_FLOAT f2);
-        void         SetPDFValue(const CTL_StringType& nWhich, PDFTextElementPtr& element);
+        void         SetPDFValue(const CTL_StringType& nWhich, const PDFTextElementPtr& element);
         void         SetPDFPageSize(LONG nPageSize, DTWAIN_FLOAT cWidth, DTWAIN_FLOAT cHeight);
         void         SetPDFEncryption(bool bIsEncrypted,
                                       const CTL_StringType& strOwnerPassword, const CTL_StringType& strUserPassword,
@@ -282,7 +279,7 @@ namespace dynarithmic
         TW_UINT16    GetCurrentJobControl() const { return m_nJobControl; }
         bool         IsTwainJobControl() const { return m_nJobControl > TWJC_NONE && m_nJobControl <= DTWAIN_JC_JSXS; }
         CTL_ImageIOHandlerPtr& GetImageHandlerPtr() { return m_pImageHandler; }
-        int          GetAcquireFailureAction() { return m_nFailAction; }
+        int          GetAcquireFailureAction() const { return m_nFailAction; }
         void         SetAcquireFailureAction(int nAction) { m_nFailAction = nAction; }
         void         SetMaxRetryAttempts(int nMax) {m_nMaxRetryAttempts = nMax; }
         int          GetMaxRetryAttempts() const { return m_nMaxRetryAttempts;  }
@@ -291,7 +288,7 @@ namespace dynarithmic
         bool         SkipImageInfoErrors() const { return m_bSkipImageInfoErrors; }
         void         SetImageInfoErrors(bool bSet=true) { m_bSkipImageInfoErrors = bSet; }
         void         SetImageInfo(TW_IMAGEINFO* pInfo) { memcpy(&m_ImageInfo, pInfo, sizeof(TW_IMAGEINFO)); }
-        void         GetImageInfo(TW_IMAGEINFO* pInfo) { memcpy(pInfo, &m_ImageInfo, sizeof(TW_IMAGEINFO)); }
+        void         GetImageInfo(TW_IMAGEINFO* pInfo) const { memcpy(pInfo, &m_ImageInfo, sizeof(TW_IMAGEINFO)); }
         void         SetImageLayout(const FloatRect* pInfo) { memcpy(&m_ImageLayout, pInfo, sizeof(FloatRect)); }
         void         GetImageLayout(FloatRect* pInfo) const { memcpy(pInfo, &m_ImageLayout, sizeof(FloatRect)); }
         void         SetImageLayoutValid(bool bSet=true) { m_bImageLayoutValid = bSet; }
@@ -304,7 +301,7 @@ namespace dynarithmic
         void         SetUserStripBuffer(HANDLE h) { m_hAcquireStrip = h; }
         SIZE_T       GetUserStripBufSize() const { return m_nUserStripSize; }
         void         SetUserStripBufSize(SIZE_T nSize) { m_nUserStripSize = nSize; }
-        bool         IsUserBufferUsed() { return m_bUserStripUsed; }
+        bool         IsUserBufferUsed() const { return m_bUserStripUsed; }
         void         SetBufferStripData(TW_IMAGEMEMXFER* pMemXferBuffer) { m_pImageMemXfer = pMemXferBuffer; }
         TW_IMAGEMEMXFER* GetBufferStripData() const { return m_pImageMemXfer; }
 
@@ -317,10 +314,10 @@ namespace dynarithmic
         // Extended image info functions
         bool         InitExtImageInfo(int nNum);
         bool         GetExtImageInfo(bool bExecute);
-        bool         AddExtImageInfo(const TW_INFO &Info);
+        bool         AddExtImageInfo(const TW_INFO &Info) const;
         bool         EnumExtImageInfo(CTL_IntArray& r);
-        TW_INFO      GetExtImageInfoItem(int nItem, int nSearch);
-        bool         GetExtImageInfoData(int nWhichItem, int nSearch, int nWhichValue, LPVOID Data, size_t* pNumChars=nullptr);
+        TW_INFO      GetExtImageInfoItem(int nItem, int nSearch) const;
+        bool         GetExtImageInfoData(int nWhichItem, int nSearch, int nWhichValue, LPVOID Data, size_t* pNumChars=nullptr) const;
         void         SetUserAcquisitionArray(DTWAIN_ARRAY UserArray) { m_PersistentArray = UserArray; }
         DTWAIN_ARRAY GetUserAcquisitionArray() const { return m_PersistentArray; }
 
@@ -374,9 +371,9 @@ namespace dynarithmic
         void         SetForcedImageBpp(LONG bpp) { m_nForcedBpp = bpp; }
         void         SetFileIncompleteSaveMode( bool bSaveIncomplete ) { m_bIsFileSaveIncomplete = bSaveIncomplete; }
         bool         IsFileIncompleteSave() const { return m_bIsFileSaveIncomplete; }
-        bool         IsBlankPageDetectionOn() const { return (m_bIsBlankPageDetectionOn &&
-                                                       m_nJobControl < DTWAIN_JCBP_JSIC)
-                                                        || IsBlankPageDetectionSampleOn() ||
+        bool         IsBlankPageDetectionOn() const { return m_bIsBlankPageDetectionOn &&
+            m_nJobControl < DTWAIN_JCBP_JSIC
+            || IsBlankPageDetectionSampleOn() ||
                                                            IsBlankPageDetectionNoSampleOn(); }
         void         SetBlankPageDetectionOn(bool bSet=true) { m_bIsBlankPageDetectionOn = bSet; }
         bool         IsBlankPageDetectionNoSampleOn() const { return m_bIsBlankPageDetectionNoSampleOn &&
@@ -387,7 +384,7 @@ namespace dynarithmic
         double       GetBlankPageThreshold() const { return m_dBlankPageThreshold; }
         void         SetBlankPageThreshold(double threshold) { m_dBlankPageThreshold = threshold; }
         void         SetBlankPageAutoDetect(LONG bSet) { m_lBlankPageAutoDetect = bSet;}
-        bool         IsBlankPageAutoDetectOn() const { return (m_lBlankPageAutoDetect != DTWAIN_BP_AUTODISCARD_NONE); }
+        bool         IsBlankPageAutoDetectOn() const { return m_lBlankPageAutoDetect != DTWAIN_BP_AUTODISCARD_NONE; }
         LONG         GetBlankPageAutoDetect() const { return m_lBlankPageAutoDetect;}
         LONG         GetBlankPageCount() const { return m_nBlankPageCount; }
         void         SetBlankPageCount(LONG nCount) { m_nBlankPageCount = nCount; }
@@ -413,7 +410,7 @@ namespace dynarithmic
 
     protected:
         CTL_ITwainSource( CTL_ITwainSession* pSession, LPCTSTR lpszProductName );
-        void SetDibHandleProc(HANDLE hDib, size_t nWhich, bool bCreatePalette);
+        void SetDibHandleProc(HANDLE hDib, size_t nWhich, bool bCreatePalette) const;
 
     private:
 

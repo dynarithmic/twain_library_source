@@ -135,19 +135,19 @@ int CTIFFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR 
         case DTWAIN_CENTIMETERS:
             factor = 1.0;
     }
-    im.setHorizontalResolution((m_ImageInfoEx.ResolutionX * factor) / 2.54);
-    im.setVerticalResolution((m_ImageInfoEx.ResolutionY * factor) / 2.54);
+    im.setHorizontalResolution(m_ImageInfoEx.ResolutionX * factor / 2.54);
+    im.setVerticalResolution(m_ImageInfoEx.ResolutionY * factor / 2.54);
 
     fipTag ft;
     char commentStr[256] = {};
-    dynarithmic::GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
+    GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
     ft.setKeyValue("Comment", commentStr);
     im.setMetadata(FIMD_COMMENTS, "Comment", ft);
 
     const auto iter = compressionFlags.find(static_cast<int>(compression));
     if (m_MultiPageStruct.Stage == 0)
     {
-        const int flagsValue = static_cast<int>(m_ImageInfoEx.nJpegQuality << 24) | (iter->second);
+        const int flagsValue = static_cast<int>(m_ImageInfoEx.nJpegQuality << 24) | iter->second;
         const auto retVal2 = im.saveEx(FIF_TIFF, StringConversion::Convert_Native_To_Ansi(path).c_str(), m_MultiPageStruct.Page, flagsValue);
         if (retVal2 == 1)
         {

@@ -116,10 +116,10 @@ bool VersionInfoImpl<charTraits>::getit( typename charTraits::TraitsCharType con
         if ( charTraits::VerQueryValueImpl( &versionInfo[0],
                                             charTraits::Compat( "\\VarFileInfo\\Translation" ).c_str(), (LPVOID *) &lpdwLangCp, &uTranLen ))
         {
-            for ( int iIndex = 0; iIndex < static_cast<int>(uTranLen / sizeof(VersionInfoImpl<charTraits>::TranslationInfo));
+            for ( int iIndex = 0; iIndex < static_cast<int>(uTranLen / sizeof(TranslationInfo));
 						iIndex++ )
             {
-                m_sBuf.str( ( charTraits::Compat("") ) );
+                m_sBuf.str( charTraits::Compat("") );
 
                 // Flip the words to display lang first.
                 typename charTraits::TraitsStringStreamType szStrm;

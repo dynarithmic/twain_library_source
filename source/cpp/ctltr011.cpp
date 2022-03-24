@@ -59,8 +59,8 @@ TW_UINT16 CTL_CapabilityGetTriplet::GetEffectiveItemType(TW_UINT16 curDataType) 
         strm << "Getting cap value: " << m_gCap << "  requested item type: " << itemType <<
                 "  Observed item type: " << curDataType;
         CTL_TwainAppMgr::WriteLogInfoA(strm.str());
-        CTL_TwainAppMgr::WriteLogInfoA("Observed and requested data types " + std::string((itemType ==
-            curDataType ? "equal" : "not equal")));
+        CTL_TwainAppMgr::WriteLogInfoA("Observed and requested data types " + std::string(itemType ==
+            curDataType ? "equal" : "not equal"));
     }
 
     // If we're the same, or if we must return the correct type as returned by the Source ...

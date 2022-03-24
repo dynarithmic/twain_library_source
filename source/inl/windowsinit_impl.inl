@@ -53,8 +53,8 @@ bool dynarithmic::CenterWindow(HWND hwnd, HWND hwndParent)
     int width = rect.right - rect.left;
     int height = rect.bottom - rect.top;
 
-    int x = ((rectP.right - rectP.left) - width) / 2 + rectP.left;
-    int y = ((rectP.bottom - rectP.top) - height) / 2 + rectP.top;
+    int x = (rectP.right - rectP.left - width) / 2 + rectP.left;
+    int y = (rectP.bottom - rectP.top - height) / 2 + rectP.top;
 
     int screenwidth = GetSystemMetrics(SM_CXSCREEN);
     int screenheight = GetSystemMetrics(SM_CYSCREEN);
@@ -87,7 +87,7 @@ WNDPROC SubclassTwainMsgWindow(HWND hWnd, WNDPROC wProcIn /*=NULL*/)
         {
             wProc = TWSubclassWindow(hWnd, wProcToUse);
             if (!wProc)
-                LogWin32Error(::GetLastError());
+                LogWin32Error(GetLastError());
         }
     }
     // Already equal, so return the original
@@ -212,7 +212,7 @@ void dynarithmic::LogWin32Error(DWORD lastError)
 {
     LPSTR lpMsgBuf = nullptr;
 
-    ::FormatMessageA(
+    FormatMessageA(
         FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
         nullptr,
         lastError,
@@ -250,14 +250,14 @@ void dynarithmic::LogToDebugMonitorA(std::string sMsg)
 {
     if (sMsg.back() != '\n')
         sMsg.push_back('\n');
-    ::OutputDebugStringA(sMsg.c_str());
+    OutputDebugStringA(sMsg.c_str());
 }
 
 void dynarithmic::LogToDebugMonitorW(std::wstring sMsg)
 {
     if (sMsg.back() != L'\n')
         sMsg.push_back(L'\n');
-    ::OutputDebugStringW(sMsg.c_str());
+    OutputDebugStringW(sMsg.c_str());
 }
 
 void dynarithmic::LogToDebugMonitor(CTL_StringType sMsg)

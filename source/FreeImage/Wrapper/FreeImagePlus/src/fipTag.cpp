@@ -70,7 +70,7 @@ fipTag& fipTag::operator=(FITAG *tag) {
 }
 
 BOOL fipTag::isValid() const {
-    return (_tag != nullptr) ? TRUE : FALSE;
+    return _tag != nullptr ? TRUE : FALSE;
 }
 
 const char* fipTag::getKey() const {

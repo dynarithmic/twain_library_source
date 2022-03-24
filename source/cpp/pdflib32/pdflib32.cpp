@@ -50,7 +50,7 @@ void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetCompression(void* pDoc,  bool bCom
 
 void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetNameField(void* pDoc, LONG nWhich, LPCSTR szName)
 {
-    PdfDocument *p = static_cast<PdfDocument*>(pDoc);
+    const auto p = static_cast<PdfDocument*>(pDoc);
     switch (nWhich)
     {
         case PDF_AUTHOR:
@@ -100,7 +100,7 @@ BOOL FUNCCONVENTION dynarithmic::DTWLIB_PDFWritePage(void *pDoc, LPCTSTR szPath)
 
 void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetLongField(void *pDoc, LONG nWhich, LONG nValue)
 {
-    PdfDocument *p = static_cast<PdfDocument*>(pDoc);
+    auto p = static_cast<PdfDocument*>(pDoc);
     switch (nWhich)
     {
         case PDF_ORIENTATION:

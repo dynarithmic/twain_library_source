@@ -62,7 +62,7 @@ struct HandleRAII : public DTWAINGlobalHandle_RAII
 {
     LPBYTE m_pByte;
     HandleRAII(HANDLE h) : DTWAIN_RAII(h), m_pByte(static_cast<LPBYTE>(GlobalLock(h))) {}
-    LPBYTE getData() { return m_pByte; }
+    LPBYTE getData() const { return m_pByte; }
 };
 
 HANDLE DLLENTRY_DEF DTWAIN_ConvertDIBToFullBitmap(HANDLE hDib, DTWAIN_BOOL isBMP)
@@ -100,7 +100,7 @@ HANDLE DLLENTRY_DEF DTWAIN_ConvertDIBToFullBitmap(HANDLE hDib, DTWAIN_BOOL isBMP
         const unsigned int totalSize = GlobalSize(hDib) + sizeof(BITMAPFILEHEADER);
         // Allocate for returned handle
         returnHandle = static_cast<HANDLE>(GlobalAlloc(GMEM_FIXED, totalSize));
-        HandleRAII raii2(returnHandle);
+        const HandleRAII raii2(returnHandle);
         const LPBYTE bFullImage = raii2.getData();
         if (bFullImage)
         {
@@ -112,7 +112,7 @@ HANDLE DLLENTRY_DEF DTWAIN_ConvertDIBToFullBitmap(HANDLE hDib, DTWAIN_BOOL isBMP
     else
     {
         returnHandle = GlobalAlloc(GMEM_FIXED, GlobalSize(hDib));
-        HandleRAII raii2(returnHandle);
+        const HandleRAII raii2(returnHandle);
         const LPBYTE bFullImage = raii2.getData();
         std::copy_n(pDibData, GlobalSize(hDib), &bFullImage[0]);
     }

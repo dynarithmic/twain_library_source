@@ -48,7 +48,7 @@ namespace dynarithmic
         struct tm  tstruct{};
         char       buf[80];
         localtime_s(&tstruct, &now);
-        strftime(buf, sizeof(buf), "[%Y-%m-%d %X] ", &tstruct);
+        strftime(buf, sizeof buf, "[%Y-%m-%d %X] ", &tstruct);
         return buf;
     }
 
@@ -91,8 +91,8 @@ void Callback_Logger::trace(const std::string& msg)
 {
     // We have to convert the string to native format, since the user-defined logger handles both wide and non-wide
     // character strings
-    if (dynarithmic::UserDefinedLoggerExists())
-        dynarithmic::WriteUserDefinedLogMsgA(msg.c_str());
+    if (UserDefinedLoggerExists())
+        WriteUserDefinedLogMsgA(msg.c_str());
 }
 
 CLogSystem::CLogSystem() : m_bEnable(false), m_bPrintTime(false), m_bPrintAppName(false), m_bFileOpenedOK(false), m_bErrorDisplayed(false)
@@ -120,7 +120,7 @@ void CLogSystem::InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE h
     switch (loggerType )
     {
         case CONSOLE_LOGGING:
-            app_logger_map[CONSOLE_LOGGING] = std::make_shared<dynarithmic::StdCout_Logger>();
+            app_logger_map[CONSOLE_LOGGING] = std::make_shared<StdCout_Logger>();
         break;
         case DEBUG_WINDOW_LOGGING:
             app_logger_map[DEBUG_WINDOW_LOGGING] = std::make_shared<DebugMonitor_Logger>();
@@ -190,7 +190,7 @@ bool CLogSystem::StatusOutFast(LPCSTR fmt)
 bool CLogSystem::WriteOnDemand(const std::string& fmt)
 {
     for (const auto& m : app_logger_map)
-        (m.second)->trace(fmt);
+        m.second->trace(fmt);
     return true;
 }
 
@@ -219,7 +219,7 @@ std::string CLogSystem::GetBaseDir(const std::string& path) const
 void CLogSystem::OutputDebugStringFull(const std::string& s)
 {
     for (const auto& m : app_logger_map)
-        (m.second)->trace(s);
+        m.second->trace(s);
 }
 
 std::string CLogSystem::GetDebugStringFull(const std::string& s)

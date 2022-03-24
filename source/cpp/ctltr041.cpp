@@ -29,7 +29,7 @@ CTL_DSMMetricsTriplet::CTL_DSMMetricsTriplet(CTL_ITwainSession *pSession, CTL_IT
     if (pMgr && pMgr->IsValidTwainSession(pSession))
     {
         Init(pSession->GetAppIDPtr(), pSource->GetSourceIDPtr(), DG_CONTROL, DAT_METRICS, MSG_GET, &m_DSMMetrics);
-        m_DSMMetrics.SizeOf = sizeof(m_DSMMetrics);
+        m_DSMMetrics.SizeOf = sizeof m_DSMMetrics;
         SetAlive(true);
     }
 }

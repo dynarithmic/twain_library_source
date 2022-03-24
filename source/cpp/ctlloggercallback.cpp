@@ -56,8 +56,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetLoggerCallback(DTWAIN_LOGGER_PROC logProc, DT
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 
-    dynarithmic::CTL_TwainDLLHandle::s_pLoggerCallback = logProc;
-    dynarithmic::CTL_TwainDLLHandle::s_pLoggerCallback_UserData = UserData;
+    CTL_TwainDLLHandle::s_pLoggerCallback = logProc;
+    CTL_TwainDLLHandle::s_pLoggerCallback_UserData = UserData;
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }

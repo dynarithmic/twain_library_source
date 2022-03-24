@@ -169,8 +169,8 @@ int ImageXferFileWriter::CopyDibToFileEx(CTL_TwainDibPtr pCurDib,
         ImageInfo.PostscriptType = static_cast<LONG>(FileType);
     }
 
-    if ( MultipageOption == 0 || (m_pSource->IsMultiPageModeSaveAtEnd()
-                          && !CTL_ITwainSource::IsFileTypeMultiPage( FileType ))
+    if ( MultipageOption == 0 || m_pSource->IsMultiPageModeSaveAtEnd()
+        && !CTL_ITwainSource::IsFileTypeMultiPage( FileType )
     )
     {
         const int retval = pCurDib->WriteDibBitmap(ImageInfo, strTempFile.c_str(), m_pSource->GetAcquireFileType());
@@ -330,7 +330,7 @@ LONG ImageXferFileWriter::MergeDuplexFiles() const
         while ( currentside < 2 )
         {
             // front side
-            if ( currentside == 0 || (currentside == 0 && m_pSource->IsMultiPageModeContinuous()))
+            if ( currentside == 0 || currentside == 0 && m_pSource->IsMultiPageModeContinuous())
                 DupData = m_pSource->GetDuplexFileData( nCurPage[0], nWhichSide[0] );
             else
             if ( bNotManualDuplex )
@@ -414,7 +414,7 @@ LONG ImageXferFileWriter::MergeDuplexFiles() const
     if ( !bNotManualDuplex ) //!m_pSource->IsMultiPageModeContinuous())
     {
         bool bMergeExtra = false;
-        if ( (nFiles[0] > nFiles[1]) && IsOddSide1)
+        if ( nFiles[0] > nFiles[1] && IsOddSide1)
         {
             // side 1 has page 1, and more pages than side 2.  Add
             // side 1 page to image
@@ -422,7 +422,7 @@ LONG ImageXferFileWriter::MergeDuplexFiles() const
             bMergeExtra = true;
         }
         else
-        if ( (nFiles[0] > nFiles[1]) && !IsOddSide1)
+        if ( nFiles[0] > nFiles[1] && !IsOddSide1)
         {
             DupData = m_pSource->GetDuplexFileData(nCurPage[1], nWhichSide[1]);
             bMergeExtra = true;
@@ -562,8 +562,8 @@ LONG ImageXferFileWriter::CopyDuplexDibToFile(CTL_TwainDibPtr pCurDib, bool bIsJ
     if ( pCurDib && // If we have a bitmap
 
         (!bIsJobControl ||  // no job control or
-        (bIsJobControl &&  // job control and handling jobs is on
-         m_pSource->IsJobFileHandlingOn())))
+        bIsJobControl &&  // job control and handling jobs is on
+        m_pSource->IsJobFileHandlingOn()))
 
     {
         CTL_StringType sRealName;

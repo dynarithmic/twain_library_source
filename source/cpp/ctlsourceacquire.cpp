@@ -378,7 +378,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
     // Get the array of Dibs
     const auto vValues = EnumeratorVectorPtr<LPVOID>(aAcquisitionArray);
 
-    if (vValues && vValues->empty() && (opts.getAcquireType() != ACQUIREFILE))
+    if (vValues && vValues->empty() && opts.getAcquireType() != ACQUIREFILE)
     {
         pSource->ResetAcquisitionAttempts(nullptr);
         LOG_FUNC_EXIT_PARAMS(NULL)
@@ -396,7 +396,7 @@ bool dynarithmic::AcquireExHelper(SourceAcquireOptions& opts)
 
     bool bRet = false;
     if (aDibs && vValues)
-        bRet = (!vValues->empty()) ? true: false;
+        bRet = !vValues->empty() ? true: false;
     if (opts.getStatus() == DTWAIN_TN_ACQUIRESTARTED && aDibs)
         bRet = true;
     return bRet;
@@ -432,7 +432,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
         LONG lFileFlags = opts.getFileFlags();
         const LONG lFileType = opts.getFileType();
         // Check if the DTWAIN_USESOURCEMODE flag is set
-        const bool bUseSourceMode = (lFileFlags & DTWAIN_USESOURCEMODE) ? true : false;
+        const bool bUseSourceMode = lFileFlags & DTWAIN_USESOURCEMODE ? true : false;
         if (bUseSourceMode)
         {
             // Source must support file transfers
@@ -442,19 +442,19 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
             // Turn off NATIVE and BUFFERED modes if set
             lFileFlags = lFileFlags & ~(DTWAIN_USENATIVE | DTWAIN_USEBUFFERED);
 
-            CTL_TwainAppMgr::GetFileTransferDefaults(pSource, strFile, nFileType);
+            CTL_TwainAppMgr::GetFileTransferDefaults(pSource, nFileType);
         }
 
         // Check if the file type is supported
         // check if defaults were specified
-        if ((lFileFlags & (DTWAIN_USENAME | DTWAIN_USELONGNAME)) &&
+        if (lFileFlags & (DTWAIN_USENAME | DTWAIN_USELONGNAME) &&
             !(lFileFlags & DTWAIN_USELIST))
             strFile = opts.getFileName();
 
         nFileType = lFileType;
 
-        if (bUseSourceMode || (/*lFileFlags & */CTL_TwainAppMgr::IsSupportedFileFormat(pSource,
-            nFileType)))
+        if (bUseSourceMode || /*lFileFlags & */CTL_TwainAppMgr::IsSupportedFileFormat(pSource,
+            nFileType))
         {
             opts.setActualAcquireType(CTL_TwainAppMgr::GetCompatibleFileTransferType(pSource));
             if (!bUseSourceMode)
@@ -471,7 +471,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
                 if (!lMode)
                     lMode = DTWAIN_USENATIVE;
                 else
-                    if ((lFileFlags & DTWAIN_USENATIVE) && (lFileFlags & DTWAIN_USEBUFFERED))
+                    if (lFileFlags & DTWAIN_USENATIVE && lFileFlags & DTWAIN_USEBUFFERED)
                         lMode = DTWAIN_USENATIVE;
             }
             else

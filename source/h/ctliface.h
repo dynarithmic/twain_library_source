@@ -60,7 +60,7 @@ struct dtwain_library_loader : library_loader_impl
 {
     static T get_func_ptr(void *handle, const char *name)
     {
-        return static_cast<T>(library_loader_impl::get(handle, name));
+        return static_cast<T>(get(handle, name));
     }
 };
 
@@ -295,14 +295,14 @@ namespace dynarithmic
     struct DTWAINFrameInternal
     {
         std::array<double, 4> m_FrameComponent;
-        std::array<TCHAR, sizeof(DTWAINFrameInternalGUID) / sizeof(TCHAR)> s_id;
+        std::array<TCHAR, sizeof DTWAINFrameInternalGUID / sizeof(TCHAR)> s_id;
         DTWAINFrameInternal(double left=0, double top=0, double right=0, double bottom=0) : m_FrameComponent{}
         {
             m_FrameComponent[DTWAIN_FRAMELEFT] = left;
             m_FrameComponent[DTWAIN_FRAMETOP] = top;
             m_FrameComponent[DTWAIN_FRAMERIGHT] = right;
             m_FrameComponent[DTWAIN_FRAMEBOTTOM] = bottom;
-            std::copy_n(DTWAINFrameInternalGUID, sizeof(DTWAINFrameInternalGUID) / sizeof(TCHAR), s_id.begin());
+            std::copy_n(DTWAINFrameInternalGUID, sizeof DTWAINFrameInternalGUID / sizeof(TCHAR), s_id.begin());
             s_id.back() = _T('\0');
         }
     };
@@ -466,10 +466,11 @@ namespace dynarithmic
     {
         public:
         #ifdef WIN32
-            TW_HANDLE AllocateMemory(TW_UINT32 size) { return ::GlobalAlloc(GHND, size); }
-            void      FreeMemory(TW_HANDLE h) { if (h) ::GlobalFree( h ); }
-            TW_MEMREF LockMemory(TW_HANDLE h) { if (h) return ::GlobalLock(h); return nullptr; }
-            void      UnlockMemory(TW_HANDLE h) { if (h) ::GlobalUnlock(h); }
+            TW_HANDLE AllocateMemory(TW_UINT32 size) override { return GlobalAlloc(GHND, size); }
+            void      FreeMemory(TW_HANDLE h) override { if (h) GlobalFree( h ); }
+            TW_MEMREF LockMemory(TW_HANDLE h) override
+            { if (h) return GlobalLock(h); return nullptr; }
+            void      UnlockMemory(TW_HANDLE h) override { if (h) GlobalUnlock(h); }
         #else
             TW_HANDLE AllocateMemory(TW_UINT32) { return nullptr; }
             void      FreeMemory(TW_HANDLE) { }
@@ -483,10 +484,11 @@ namespace dynarithmic
     {
         public:
             TW_ENTRYPOINT m_EntryPoint;
-            TW_HANDLE AllocateMemory(TW_UINT32 size) { return m_EntryPoint.DSM_MemAllocate(size); }
-            void      FreeMemory(TW_HANDLE h) { if (h) m_EntryPoint.DSM_MemFree(h); }
-            TW_MEMREF LockMemory(TW_HANDLE h) { if (h) return m_EntryPoint.DSM_MemLock(h); return nullptr; }
-            void      UnlockMemory(TW_HANDLE h) { if (h) m_EntryPoint.DSM_MemUnlock(h); }
+            TW_HANDLE AllocateMemory(TW_UINT32 size) override { return m_EntryPoint.DSM_MemAllocate(size); }
+            void      FreeMemory(TW_HANDLE h) override { if (h) m_EntryPoint.DSM_MemFree(h); }
+            TW_MEMREF LockMemory(TW_HANDLE h) override
+            { if (h) return m_EntryPoint.DSM_MemLock(h); return nullptr; }
+            void      UnlockMemory(TW_HANDLE h) override { if (h) m_EntryPoint.DSM_MemUnlock(h); }
     };
 
     class TwainMessageLoopImpl
@@ -500,6 +502,12 @@ namespace dynarithmic
 
         public:
             TwainMessageLoopImpl(CTL_TwainDLLHandle* pHandle) : m_pDLLHandle(pHandle) {}
+            TwainMessageLoopImpl(const TwainMessageLoopImpl&) = delete;
+            TwainMessageLoopImpl& operator=(const TwainMessageLoopImpl&) = delete;
+            TwainMessageLoopImpl(TwainMessageLoopImpl&& rhs) noexcept :
+                    m_pDLLHandle(rhs.m_pDLLHandle) { rhs.m_pDLLHandle = nullptr; }
+            TwainMessageLoopImpl& operator=(TwainMessageLoopImpl&& rhs) = delete;
+
             virtual ~TwainMessageLoopImpl() = default;
             virtual void PrepareLoop() {}
             virtual void PerformMessageLoop(CTL_ITwainSource * /*pSource*/, bool /*bUIOnly*/) {}
@@ -883,7 +891,7 @@ namespace dynarithmic
     DTWAIN_BOOL DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *p, CTL_TwainDLLHandle *pHandle, TW_UINT16 nCapToCache);
     DTWAIN_BOOL DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, CTL_TwainDLLHandle *pHandle, CTL_EnumeratorNode<LONG>::container_pointer_type vCaps);
     void DTWAIN_CollectCapabilityInfo(CTL_ITwainSource *p, TW_UINT16 nCap, CTL_CapInfoArray& pArray);
-    CTL_CapInfoArrayPtr GetCapInfoArray(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource *p);
+    CTL_CapInfoArrayPtr GetCapInfoArray(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource *p);
     DTWAIN_SOURCE SourceSelect(const SourceSelectionOptions& options);
     DTWAIN_ARRAY  SourceAcquire(SourceAcquireOptions& opts);
     bool AcquireExHelper(SourceAcquireOptions& opts);
@@ -912,17 +920,17 @@ namespace dynarithmic
         {
             // ptr is a valid string supplied by the user, so just write it out
             if ( ptr )
-                strm << outStr << ("=") << ptr;
+                strm << outStr << "=" << ptr;
             else
-                strm << outStr << ("=") << "(null)";
+                strm << outStr << "=" << "(null)";
         }
 
         void LogInputType(std::string outStr, const wchar_t *ptr)
         {
             if (ptr)
-                strm << outStr << ("=") << StringConversion::Convert_WidePtr_To_Ansi(ptr);
+                strm << outStr << "=" << StringConversion::Convert_WidePtr_To_Ansi(ptr);
             else
-                strm << outStr << ("=") << "(null)";
+                strm << outStr << "=" << "(null)";
         }
 
         void LogInputType(std::string outStr, char *ptr)
@@ -931,7 +939,7 @@ namespace dynarithmic
             // (It doesn't have to be null-terminated, as the DTWAIN function will eventually put the NULL
             //  terminated value into the output string).
             // So for now, we just output the pointer value of the string
-            strm << outStr << ("=") << static_cast<void*>(ptr);
+            strm << outStr << "=" << static_cast<void*>(ptr);
         }
 
         void LogInputType(std::string outStr, wchar_t *ptr)
@@ -940,22 +948,22 @@ namespace dynarithmic
             // (It doesn't have to be null-terminated, as the DTWAIN function will eventually put the NULL
             //  terminated value into the output string).
             // So for now, we just output the pointer value of the string
-            strm << outStr << ("=") << static_cast<void*>(ptr);
+            strm << outStr << "=" << static_cast<void*>(ptr);
         }
 
         template <typename T>
         void LogInputType(std::string outStr, T t, std::enable_if_t<std::is_pointer_v<T> >* = nullptr)
         {
             if (t)
-                strm << outStr << ("=") << t;
+                strm << outStr << "=" << t;
             else
-                strm << outStr << ("=") << "(null)";
+                strm << outStr << "=" << "(null)";
         }
 
         template <typename T>
         void LogInputType(std::string outStr, T t, std::enable_if_t<!std::is_pointer_v<T> >* = nullptr)
         {
-            strm << outStr << ("=") << t;
+            strm << outStr << "=" << t;
         }
 
     public:
@@ -973,7 +981,7 @@ namespace dynarithmic
         {
             if (sv.empty() && !m_bIsReturnValue)
                 return *this;
-            const bool bIsNull = (std::is_pointer<T>::value && !t);
+            const bool bIsNull = std::is_pointer_v<T> && !t;
             if (!m_bIsReturnValue)
             {
                 // Make sure we log input types correctly, especially character pointers.
@@ -983,16 +991,16 @@ namespace dynarithmic
             else
             {
                 if ( bIsNull )
-                    strm << ("(null)");
+                    strm << "(null)";
                 else
                     strm << t;
             }
             if (!m_bIsReturnValue)
             {
               if (nWhich < sv.size() - 1)
-                strm << (", ");
+                strm << ", ";
               else
-                strm << (")");
+                strm << ")";
             }
             ++nWhich;
             if (sizeof...(p))
@@ -1002,10 +1010,10 @@ namespace dynarithmic
 
         ParamOutputter& outputParam()
         {
-            strm << (")"); return *this;
+            strm << ")"; return *this;
         }
 
-        std::string getString() { return strm.str(); }
+        std::string getString() const { return strm.str(); }
     };
 
     struct DTWAINArray_DestroyTraits
@@ -1077,7 +1085,7 @@ namespace dynarithmic
         {
             #ifdef _WIN32
             if (val.second)
-                ::ReleaseDC(val.first, val.second);
+                ReleaseDC(val.first, val.second);
             #endif
         }
     };
@@ -1088,7 +1096,7 @@ namespace dynarithmic
         {
             #ifdef _WIN32
             if (h)
-                ::CloseHandle(h);
+                CloseHandle(h);
             #endif
         }
     };
@@ -1110,7 +1118,7 @@ namespace dynarithmic
         {
 #ifdef _WIN32
             if (h && *h)
-                ::DeleteObject(*h);
+                DeleteObject(*h);
 #endif
         }
     };

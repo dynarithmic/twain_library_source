@@ -36,7 +36,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetMultipageScanMode(DTWAIN_SOURCE Source, LONG 
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    const bool bSaveIncomplete = (ScanType & DTWAIN_FILESAVE_SAVEINCOMPLETE) ? true : false;
+    const bool bSaveIncomplete = ScanType & DTWAIN_FILESAVE_SAVEINCOMPLETE ? true : false;
 
     // remove the DTWAIN_FILESAVE_INCOMPLETE mask
     ScanType = ScanType &~DTWAIN_FILESAVE_SAVEINCOMPLETE;
