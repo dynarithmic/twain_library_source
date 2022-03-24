@@ -40,7 +40,7 @@ bool CPCXImageHandler::OpenOutputFile(LPCTSTR pFileName)
     if (m_MultiPageStruct.Stage == DIB_MULTI_FIRST || m_MultiPageStruct.Stage == 0)
     {
         m_hFile = std::make_unique<std::ofstream>(StringConversion::Convert_NativePtr_To_Ansi(pFileName).c_str(), std::ios::binary);
-        if (!(*m_hFile.get()))
+        if (!*m_hFile.get())
         {
             SetError(DTWAIN_ERR_FILEOPEN);
             return false;
@@ -179,7 +179,7 @@ int CPCXImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, 
             auto dcxPtr = std::dynamic_pointer_cast<DCXINFO>(m_pDCXInfo);
             m_hFile = std::move(dcxPtr->fh);
         }
-        return (0); // All OK
+        return 0; // All OK
     }
 
     if ( !fh )
@@ -345,13 +345,13 @@ int CPCXImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, 
         destroyHandler.setDoDestroy(false);
     }
 
-    return(0);
+    return 0;
 }
 
 void CPCXImageHandler::DestroyAllObjects()
 {
-    if (m_hFile && *(m_hFile.get()))
-    m_hFile->close();
+    if (m_hFile && *m_hFile.get())
+        m_hFile->close();
     if ( !m_bWriteOk )
        filesys::remove(GetOutputFileName().c_str());
 }
@@ -362,32 +362,32 @@ WORD CPCXImageHandler::PCXWriteLine(LPSTR p, std::ofstream& fh,int n)
     int m_nStatus;
     do {
         unsigned short int i = 0;
-        while((p[t+i]==p[t+i+1]) && ((t+i) < n) && (i < 63))++i;
+        while(p[t+i]==p[t+i+1] && t+i < n && i < 63)++i;
         if(i>0)
         {
             putbufferedbyte(i | 0xc0, fh, false, &m_nStatus);
             if ( m_nStatus == -1 )
-                return(FALSE);
+                return FALSE;
             putbufferedbyte(p[t], fh, false, &m_nStatus);
             if ( m_nStatus == -1 )
-                return(FALSE);
+                return FALSE;
             t+=i;
             j+=2;
         }
         else
         {
-            if(((p[t]) & 0xc0)==0xc0)
+            if((p[t] & 0xc0)==0xc0)
             {
                 putbufferedbyte(0xc1, fh, false, &m_nStatus);
                 if ( m_nStatus == -1 )
-                    return(FALSE);
+                    return FALSE;
                 ++j;
             }
             putbufferedbyte(p[t++], fh, false, &m_nStatus);
             if ( m_nStatus == -1 )
-                return(FALSE);
+                return FALSE;
             ++j;
         }
     } while(t<n);
-    return(TRUE);
+    return TRUE;
 }

@@ -31,19 +31,19 @@
 
 inline bool operator == (const TW_FRAME& lhs, const TW_FRAME& rhs)
 {
-    return (lhs.Bottom.Frac == rhs.Bottom.Frac &&
+    return lhs.Bottom.Frac == rhs.Bottom.Frac &&
         lhs.Bottom.Whole == rhs.Bottom.Whole &&
         lhs.Left.Frac == rhs.Left.Frac &&
         lhs.Left.Whole == rhs.Left.Whole &&
         lhs.Right.Frac == rhs.Right.Frac &&
         lhs.Right.Whole == rhs.Right.Whole &&
         lhs.Top.Frac == rhs.Top.Frac &&
-        lhs.Top.Whole == rhs.Top.Whole);
+        lhs.Top.Whole == rhs.Top.Whole;
 }
 
 inline bool operator == (const TW_FIX32& lhs, const TW_FIX32& rhs)
 {
-    return (lhs.Whole == rhs.Whole && lhs.Frac == rhs.Frac);
+    return lhs.Whole == rhs.Whole && lhs.Frac == rhs.Frac;
 }
 
 inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
@@ -75,7 +75,7 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
 
         static LONG find(const std::vector<T>&vec, void *value)
         {
-            typename std::vector<T>::const_iterator it = std::find(vec.begin(), vec.end(), *static_cast<T*>(value));
+            auto it = std::find(vec.begin(), vec.end(), *static_cast<T*>(value));
             if ( it != vec.end())
                 return static_cast<LONG>(std::distance(vec.begin(), it));
             return -1;
@@ -121,7 +121,7 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
                 vec.resize(newSize);
             else
             {
-                T defVal = *(reinterpret_cast<T*>(value));
+                T defVal = *reinterpret_cast<T*>(value);
                 vec.resize(newSize, defVal);
             }
         }
@@ -388,7 +388,7 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
         template <typename T>
         static bool IsEnumeratorFound(T& val, LPVOID pEnum, typename T::iterator& retIt)
         {
-            typename T::iterator it = std::find_if(val.begin(), val.end(), EnumeratorFinder<T>(pEnum));
+            auto it = std::find_if(val.begin(), val.end(), EnumeratorFinder<T>(pEnum));
             if ( it != val.end())
             {
                 retIt = it;
@@ -794,9 +794,9 @@ inline bool operator != (const TW_FRAME& lhs, const TW_FRAME& rhs)
 
         static bool EnumeratorClearExisting(LPDTWAIN_ARRAY pEnum)
         {
-            if (pEnum && EnumeratorFunctionImpl::EnumeratorIsValidNoCheck(*pEnum))
+            if (pEnum && EnumeratorIsValidNoCheck(*pEnum))
             {
-                EnumeratorFunctionImpl::ClearEnumerator(*pEnum);
+                ClearEnumerator(*pEnum);
                 return true;
             }
             return false;

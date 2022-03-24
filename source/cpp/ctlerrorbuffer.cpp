@@ -40,8 +40,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetErrorBuffer(LPDTWAIN_ARRAY ArrayBuffer)
     if ( A )
     {
         auto& vIn = EnumeratorVector<LONG>(A);
-        std::copy(CTL_TwainDLLHandle::s_vErrorBuffer.begin(),
-                  CTL_TwainDLLHandle::s_vErrorBuffer.begin() + nEntries, vIn.begin());
+        std::copy_n(CTL_TwainDLLHandle::s_vErrorBuffer.begin(), nEntries, vIn.begin());
         *ArrayBuffer = A;
         LOG_FUNC_EXIT_PARAMS(true)
     }

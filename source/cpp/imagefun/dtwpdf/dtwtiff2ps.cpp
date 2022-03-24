@@ -289,10 +289,10 @@ int PostscriptMain(int argc, const char** argv, const char* szTitle)
         TIFF* tif = TIFFOpen(filename = argv[optind], "r");
         if (tif != nullptr) {
             if (dirnum != -1 && !TIFFSetDirectory(tif, static_cast<tdir_t>(dirnum)))
-                return (-1);
+                return -1;
             else if (diroff != 0 &&
                 !TIFFSetSubDirectory(tif, diroff))
-                return (-1);
+                return -1;
             np = TIFF2PS(output, tif, pageWidth, pageHeight,
                 leftmargin, bottommargin, centered, nPage, static_cast<const char*>(outfile),
                 szTitle);
@@ -305,7 +305,7 @@ int PostscriptMain(int argc, const char** argv, const char* szTitle)
         usage(-1);*/
     if (output != stdout)
         fclose(output);
-    return (0);
+    return 0;
 }
 
 static  uint16 samplesperpixel;
@@ -332,7 +332,7 @@ checkImage(TIFF* tif)
                 break;
             TIFFError(filename, "Can not handle image with %s",
                 "PhotometricInterpretation=YCbCr");
-            return (0);
+            return 0;
         }
         /* fall thru... */
     case PHOTOMETRIC_RGB:
@@ -340,7 +340,7 @@ checkImage(TIFF* tif)
             TIFFError(filename,
                 "Can not handle %d-bit/sample RGB image with alpha",
                 bitspersample);
-            return (0);
+            return 0;
         }
         /* fall thru... */
     case PHOTOMETRIC_SEPARATED:
@@ -354,14 +354,14 @@ checkImage(TIFF* tif)
             compression != COMPRESSION_SGILOG24) {
             TIFFError(filename,
             "Can not handle %s data with compression other than SGILog",
-                (photometric == PHOTOMETRIC_LOGL) ?
+                photometric == PHOTOMETRIC_LOGL ?
                 "LogL" : "LogLuv"
             );
-            return (0);
+            return 0;
         }
         /* rely on library to convert to RGB/greyscale */
         TIFFSetField(tif, TIFFTAG_SGILOGDATAFMT, SGILOGDATAFMT_8BIT);
-        photometric = (photometric == PHOTOMETRIC_LOGL) ?
+        photometric = photometric == PHOTOMETRIC_LOGL ?
             PHOTOMETRIC_MINISBLACK : PHOTOMETRIC_RGB;
         bitspersample = 8;
         break;
@@ -371,7 +371,7 @@ checkImage(TIFF* tif)
         TIFFError(filename,
             "Can not handle image with PhotometricInterpretation=%d",
             photometric);
-        return (0);
+        return 0;
     }
     switch (bitspersample) {
     case 1: case 2:
@@ -380,11 +380,11 @@ checkImage(TIFF* tif)
     default:
         TIFFError(filename, "Can not handle %d-bit/sample image",
             bitspersample);
-        return (0);
+        return 0;
     }
     if (planarconfiguration == PLANARCONFIG_SEPARATE && extrasamples > 0)
         TIFFWarning(filename, "Ignoring extra samples");
-    return (1);
+    return 1;
 }
 
 #define PS_UNIT_SIZE    72.0
@@ -470,10 +470,10 @@ isCCITTCompression(TIFF* tif)
 {
     uint16 compress;
     TIFFGetField(tif, TIFFTAG_COMPRESSION, &compress);
-    return (compress == COMPRESSION_CCITTFAX3 ||
+    return compress == COMPRESSION_CCITTFAX3 ||
         compress == COMPRESSION_CCITTFAX4 ||
         compress == COMPRESSION_CCITTRLE ||
-        compress == COMPRESSION_CCITTRLEW);
+        compress == COMPRESSION_CCITTRLEW;
 }
 
 static  tsize_t tf_bytesperrow;
@@ -592,8 +592,8 @@ TIFF2PS(FILE* fd, TIFF* tif, float pw, float ph, double lm, double bm, int cnt, 
         TIFFGetField(tif, TIFFTAG_COMPRESSION, &compression);
         TIFFGetFieldDefaulted(tif, TIFFTAG_EXTRASAMPLES,
             &extrasamples, &sampleinfo);
-        alpha = (extrasamples == 1 &&
-             sampleinfo[0] == EXTRASAMPLE_ASSOCALPHA);
+        alpha = extrasamples == 1 &&
+            sampleinfo[0] == EXTRASAMPLE_ASSOCALPHA;
         if (!TIFFGetField(tif, TIFFTAG_PHOTOMETRIC, &photometric)) {
             switch (samplesperpixel - extrasamples) {
             case 1:
@@ -634,7 +634,7 @@ TIFF2PS(FILE* fd, TIFF* tif, float pw, float ph, double lm, double bm, int cnt, 
                     }
                 } else {
                     /* NB: maintain image aspect ratio */
-                    float scale = (pw * PS_UNIT_SIZE / prw) < (ph * PS_UNIT_SIZE / prh)
+                    float scale = pw * PS_UNIT_SIZE / prw < ph * PS_UNIT_SIZE / prh
                                       ? static_cast<float>((pw * PS_UNIT_SIZE / prw))
                                       : static_cast<float>((ph * PS_UNIT_SIZE / prh));
                     if (scale > 1.0)
@@ -662,10 +662,10 @@ TIFF2PS(FILE* fd, TIFF* tif, float pw, float ph, double lm, double bm, int cnt, 
         if (generateEPSF)
             break;
         TIFFGetFieldDefaulted(tif, TIFFTAG_SUBFILETYPE, &subfiletype);
-    } while (((subfiletype & FILETYPE_PAGE) || printAll) &&
+    } while ((subfiletype & FILETYPE_PAGE || printAll) &&
         TIFFReadDirectory(tif));
 
-    return(npages);
+    return npages;
 }
 
 
@@ -710,7 +710,7 @@ PSHead(FILE *fd, TIFF *tif, uint32 w, uint32 h, float pw, float ph,
     (void) tif; (void) w; (void) h;
     t = time(nullptr);
     fprintf(fd, "%%!PS-Adobe-3.0%s\n", generateEPSF ? " EPSF-3.0" : "");
-    CTL_StringType Buffer = dynarithmic::GetVersionString();
+    CTL_StringType Buffer = GetVersionString();
     fprintf(fd, "%%%%Creator: %s\n", StringConversion::Convert_Native_To_Ansi(Buffer).c_str());
     fprintf(fd, "%%%%Title: %s\n", szTitle);
     fprintf(fd, "%%%%CreationDate: %s", ctime(&t));
@@ -719,7 +719,7 @@ PSHead(FILE *fd, TIFF *tif, uint32 w, uint32 h, float pw, float ph,
     /* NB: should use PageBoundingBox */
     fprintf(fd, "%%%%BoundingBox: 0 0 %ld %ld\n",
         static_cast<long>(ceil(pw)), static_cast<long>(ceil(ph)));
-    fprintf(fd, "%%%%LanguageLevel: %d\n", (level3 ? 3 : (level2 ? 2 : 1)));
+    fprintf(fd, "%%%%LanguageLevel: %d\n", level3 ? 3 : level2 ? 2 : 1);
     fprintf(fd, "%%%%Pages: (atend)\n");
     fprintf(fd, "%%%%EndComments\n");
     fprintf(fd, "%%%%BeginSetup\n");
@@ -746,9 +746,9 @@ checkcmap(TIFF* tif, int n, uint16* r, uint16* g, uint16* b)
     (void) tif;
     while (n-- > 0)
         if (*r++ >= 256 || *g++ >= 256 || *b++ >= 256)
-            return (16);
+            return 16;
     TIFFWarning(filename, "Assuming 8-bit colormap");
-    return (8);
+    return 8;
 }
 
 static void
@@ -788,7 +788,7 @@ PS_Lvl2colorspace(FILE* fd, TIFF* tif)
     /*
      * Set up an indexed/palette colorspace
      */
-    int num_colors = (1 << bitspersample);
+    int num_colors = 1 << bitspersample;
     if (!TIFFGetField(tif, TIFFTAG_COLORMAP, &rmap, &gmap, &bmap)) {
         TIFFError(filename,
             "Palette image w/o \"Colormap\" tag");
@@ -819,7 +819,7 @@ PS_Lvl2colorspace(FILE* fd, TIFF* tif)
             Ascii85Put(static_cast<unsigned char>(gmap[i]), fd);
             Ascii85Put(static_cast<unsigned char>(bmap[i]), fd);
         } else {
-            fputs((i % 8) ? " " : "\n  ", fd);
+            fputs(i % 8 ? " " : "\n  ", fd);
             fprintf(fd, "%02x%02x%02x",
                 rmap[i], gmap[i], bmap[i]);
         }
@@ -840,7 +840,7 @@ PS_Lvl2ImageDict(FILE* fd, TIFF* tif, uint32 w, uint32 h)
     char im_h[64], im_x[64], im_y[64];
     const char * imageOp = "image";
 
-    if ( useImagemask && (bitspersample == 1) )
+    if ( useImagemask && bitspersample == 1 )
         imageOp = "imagemask";
 
     (void)strcpy(im_x, "0");
@@ -853,7 +853,7 @@ PS_Lvl2ImageDict(FILE* fd, TIFF* tif, uint32 w, uint32 h)
         TIFFGetField(tif, TIFFTAG_TILEWIDTH, &tile_width);
         TIFFGetField(tif, TIFFTAG_TILELENGTH, &tile_height);
         if (tile_width > w || tile_height > h ||
-            (w % tile_width) != 0 || (h % tile_height != 0)) {
+            w % tile_width != 0 || h % tile_height != 0) {
             /*
              * The tiles does not fit image width and height.
              * Set up a clip rectangle for the image unit square.
@@ -1145,7 +1145,7 @@ PS_Lvl2ImageDict(FILE* fd, TIFF* tif, uint32 w, uint32 h)
      */
     fputs("}\n", fd);
 
-    return(use_rawdata);
+    return use_rawdata;
 }
 
 int
@@ -1195,7 +1195,7 @@ PS_Lvl2page(FILE* fd, TIFF* tif, uint32 w, uint32 h)
     if (!buf_data) {
         TIFFError(filename, "Can't alloc %u bytes for %s.",
             chunk_size, tiled_image ? "tiles" : "strips");
-        return(FALSE);
+        return FALSE;
     }
 
 #if defined( EXP_ASCII85ENCODER )
@@ -1209,13 +1209,13 @@ PS_Lvl2page(FILE* fd, TIFF* tif, uint32 w, uint32 h)
          * 5*chunk_size/4.
          */
 
-        ascii85_p = static_cast<unsigned char*>(_TIFFmalloc((chunk_size + (chunk_size / 2)) + 8));
+        ascii85_p = static_cast<unsigned char*>(_TIFFmalloc(chunk_size + chunk_size / 2 + 8));
 
         if ( !ascii85_p ) {
         _TIFFfree( buf_data );
 
         TIFFError( filename, "Cannot allocate ASCII85 encoding buffer." );
-        return ( FALSE );
+        return FALSE;
         }
     }
 #endif
@@ -1266,8 +1266,8 @@ PS_Lvl2page(FILE* fd, TIFF* tif, uint32 w, uint32 h)
         else
         {
             for (unsigned char* cp = buf_data; byte_count > 0; byte_count--) {
-                putc(hex[((*cp)>>4)&0xf], fd);
-                putc(hex[(*cp)&0xf], fd);
+                putc(hex[*cp>>4&0xf], fd);
+                putc(hex[*cp&0xf], fd);
                 cp++;
 
                 if (--breaklen <= 0) {
@@ -1297,7 +1297,7 @@ PS_Lvl2page(FILE* fd, TIFF* tif, uint32 w, uint32 h)
 #ifdef ENABLE_BROKEN_BEGINENDDATA
     fputs("%%EndData\n", fd);
 #endif
-    return(TRUE);
+    return TRUE;
 }
 
 void
@@ -1305,7 +1305,7 @@ PSpage(FILE* fd, TIFF* tif, uint32 w, uint32 h)
 {
     const char  *   imageOp = "image";
 
-    if ( useImagemask && (bitspersample == 1) )
+    if ( useImagemask && bitspersample == 1 )
         imageOp = "imagemask";
 
     if ((level2 || level3) && PS_Lvl2page(fd, tif, w, h))
@@ -1422,7 +1422,7 @@ PSDataColorContig(FILE* fd, TIFF* tif, uint32 w, uint32 h, int nc)
         if (alpha) {
             cc = 0;
             for (; cc < tf_bytesperrow; cc += samplesperpixel) {
-                DOBREAK(breaklen, nc, fd);
+                DOBREAK(breaklen, nc, fd)
                 /*
                  * For images with alpha, matte against
                  * a white background; i.e.
@@ -1441,7 +1441,7 @@ PSDataColorContig(FILE* fd, TIFF* tif, uint32 w, uint32 h, int nc)
         } else {
             cc = 0;
             for (; cc < tf_bytesperrow; cc += samplesperpixel) {
-                DOBREAK(breaklen, nc, fd);
+                DOBREAK(breaklen, nc, fd)
                 switch (nc) {
                 case 4: c = *cp++; PUTHEX(c,fd);
                 case 3: c = *cp++; PUTHEX(c,fd);
@@ -1467,13 +1467,13 @@ PSDataColorSeparate(FILE* fd, TIFF* tif, uint32 w, uint32 h, int nc)
         TIFFError(filename, "No space for scanline buffer");
         return;
     }
-    int maxs = (samplesperpixel > nc ? nc : samplesperpixel);
+    int maxs = samplesperpixel > nc ? nc : samplesperpixel;
     for (uint32 row = 0; row < h; row++) {
         for (int s = 0; s < maxs; s++) {
             if (TIFFReadScanline(tif, tf_buf, row, s) < 0)
                 break;
             for (cp = tf_buf, cc = 0; cc < tf_bytesperrow; cc++) {
-                DOBREAK(breaklen, 1, fd);
+                DOBREAK(breaklen, 1, fd)
                 unsigned char c = *cp++;
                 PUTHEX(c,fd);
             }
@@ -1523,7 +1523,7 @@ PSDataPalette(FILE* fd, TIFF* tif, uint32 w, uint32 h)
         if (TIFFReadScanline(tif, tf_buf, row, 0) < 0)
             break;
         for (cp = tf_buf, cc = 0; cc < tf_bytesperrow; cc++) {
-            DOBREAK(breaklen, nc, fd);
+            DOBREAK(breaklen, nc, fd)
             switch (bitspersample) {
             case 8:
                 c = *cp++; PUTRGBHEX(c, fd);
@@ -1585,7 +1585,7 @@ PSDataBW(FILE* fd, TIFF* tif, uint32 w, uint32 h)
          * 5*stripsize/4.
          */
 
-        ascii85_p = static_cast<unsigned char*>(_TIFFmalloc((stripsize + (stripsize / 2)) + 8));
+        ascii85_p = static_cast<unsigned char*>(_TIFFmalloc(stripsize + stripsize / 2 + 8));
 
         if ( !ascii85_p ) {
         _TIFFfree( tf_buf );
@@ -1624,7 +1624,7 @@ PSDataBW(FILE* fd, TIFF* tif, uint32 w, uint32 h)
         } else {
             while (cc-- > 0) {
                 unsigned char c = *cp++;
-                DOBREAK(breaklen, 1, fd);
+                DOBREAK(breaklen, 1, fd)
                 PUTHEX(c, fd);
             }
         }
@@ -1694,7 +1694,7 @@ PSRawDataBW(FILE* fd, TIFF* tif, uint32 w, uint32 h)
          * 5*bufsize/4.
          */
 
-        ascii85_p = static_cast<unsigned char*>(_TIFFmalloc((bufsize + (bufsize / 2)) + 8));
+        ascii85_p = static_cast<unsigned char*>(_TIFFmalloc(bufsize + bufsize / 2 + 8));
 
         if ( !ascii85_p ) {
         _TIFFfree( tf_buf );
@@ -1715,7 +1715,7 @@ PSRawDataBW(FILE* fd, TIFF* tif, uint32 w, uint32 h)
             TIFFReverseBits(tf_buf, cc);
         if (!ascii85) {
             for (unsigned char* cp = tf_buf; cc > 0; cc--) {
-                DOBREAK(breaklen, 1, fd);
+                DOBREAK(breaklen, 1, fd)
                 c = *cp++;
                 PUTHEX(c, fd);
             }
@@ -1755,7 +1755,7 @@ Ascii85Encode(unsigned char* raw)
 {
     static char encoded[6];
 
-    uint32 word = (((raw[0] << 8) + raw[1]) << 16) + (raw[2] << 8) + raw[3];
+    uint32 word = ((raw[0] << 8) + raw[1] << 16) + (raw[2] << 8) + raw[3];
     if (word != 0L) {
         uint32 q = word / (85L * 85 * 85 * 85);  /* actually only a byte */
         encoded[0] = q + '!';
@@ -1767,12 +1767,12 @@ Ascii85Encode(unsigned char* raw)
         encoded[2] = q + '!';
 
         uint16 w1 = static_cast<uint16>(word - q * (85L * 85));
-        encoded[3] = (w1 / 85) + '!';
-        encoded[4] = (w1 % 85) + '!';
+        encoded[3] = w1 / 85 + '!';
+        encoded[4] = w1 % 85 + '!';
         encoded[5] = '\0';
     } else
         encoded[0] = 'z', encoded[1] = '\0';
-    return (encoded);
+    return encoded;
 }
 
 void
@@ -1865,10 +1865,10 @@ int Ascii85EncodeBlock( uint8 * ascii85_p, unsigned f_eod, const uint8 * raw_p, 
 
         for ( ; raw_l > 3; raw_l -= 4 )
         {
-            val32  = *(++raw_p) << 24;
-            val32 += *(++raw_p) << 16;
-            val32 += *(++raw_p) <<  8;
-            val32 += *(++raw_p);
+            val32  = *++raw_p << 24;
+            val32 += *++raw_p << 16;
+            val32 += *++raw_p <<  8;
+            val32 += *++raw_p;
 
             if ( val32 == 0 )                   /* Special case */
             {
@@ -1878,20 +1878,20 @@ int Ascii85EncodeBlock( uint8 * ascii85_p, unsigned f_eod, const uint8 * raw_p, 
 
             else
             {
-                ascii85_block[4] = (val32 % 85) + 33;
+                ascii85_block[4] = val32 % 85 + 33;
                 val32 /= 85;
 
-                ascii85_block[3] = (val32 % 85) + 33;
+                ascii85_block[3] = val32 % 85 + 33;
                 val32 /= 85;
 
-                ascii85_block[2] = (val32 % 85) + 33;
+                ascii85_block[2] = val32 % 85 + 33;
                 val32 /= 85;
 
-                ascii85_block[1] = (val32 % 85) + 33;
-                ascii85_block[0] = (val32 / 85) + 33;
+                ascii85_block[1] = val32 % 85 + 33;
+                ascii85_block[0] = val32 / 85 + 33;
 
-                _TIFFmemcpy( &ascii85_p[ascii85_l], ascii85_block, sizeof(ascii85_block) );
-                rc = sizeof(ascii85_block);
+                _TIFFmemcpy( &ascii85_p[ascii85_l], ascii85_block, sizeof ascii85_block );
+                rc = sizeof ascii85_block;
             }
 
             ascii85_l += rc;
@@ -1913,19 +1913,19 @@ int Ascii85EncodeBlock( uint8 * ascii85_p, unsigned f_eod, const uint8 * raw_p, 
             int len = raw_l + 1;
             val32 = *++raw_p << 24;             /* Prime the pump */
 
-            if ( --raw_l > 0 )  val32 += *(++raw_p) << 16;
-            if ( --raw_l > 0 )  val32 += *(++raw_p) <<  8;
+            if ( --raw_l > 0 )  val32 += *++raw_p << 16;
+            if ( --raw_l > 0 )  val32 += *++raw_p <<  8;
 
             val32 /= 85;
 
-            ascii85_block[3] = (val32 % 85) + 33;;
+            ascii85_block[3] = val32 % 85 + 33;
             val32 /= 85;
 
-            ascii85_block[2] = (val32 % 85) + 33;;
+            ascii85_block[2] = val32 % 85 + 33;
             val32 /= 85;
 
-            ascii85_block[1] = (val32 % 85) + 33;;
-            ascii85_block[0] = (val32 / 85) + 33;;
+            ascii85_block[1] = val32 % 85 + 33;
+            ascii85_block[0] = val32 / 85 + 33;
 
             _TIFFmemcpy( &ascii85_p[ascii85_l], ascii85_block, len );
             ascii85_l += len;
@@ -1943,7 +1943,7 @@ int Ascii85EncodeBlock( uint8 * ascii85_p, unsigned f_eod, const uint8 * raw_p, 
         ascii85_p[ascii85_l++] = '\n';
     }
 
-    return ( ascii85_l );
+    return ascii85_l;
 
 }   /* Ascii85EncodeBlock() */
 

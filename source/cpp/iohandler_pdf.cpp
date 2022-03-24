@@ -148,17 +148,17 @@ struct OCRTextInfo
         double xP = m_RealDimensions.mediabox[2] * xPos[nChar] / m_ImageDimensions.first;  // get PDF x-position of character
         double yP = m_RealDimensions.mediabox[3] * yPos[nChar] / m_ImageDimensions.second; // get PDF y-position of character
         yP = m_RealDimensions.mediabox[3] - yP;
-        fontHeight = (m_RealDimensions.mediabox[3] * yDim[nChar] / m_ImageDimensions.second) * 1.5; // get font height of character
-        fontWidth = (m_RealDimensions.mediabox[2] * xDim[nChar] / m_ImageDimensions.first) * 1.5;
+        fontHeight = m_RealDimensions.mediabox[3] * yDim[nChar] / m_ImageDimensions.second * 1.5; // get font height of character
+        fontWidth = m_RealDimensions.mediabox[2] * xDim[nChar] / m_ImageDimensions.first * 1.5;
         yP -= fontHeight/2.0;  // adjust y-position per PDF coordinate system
         pdfPosition = std::make_pair(xP, yP);  // make the pair and get out
     }
 
     double FontWidthFromPixelSize(LONG PixelSize) const
-    { return (m_RealDimensions.mediabox[2] * PixelSize / m_ImageDimensions.first) * 1.5; }
+    { return m_RealDimensions.mediabox[2] * PixelSize / m_ImageDimensions.first * 1.5; }
 
     double FontHeightFromPixelSize(LONG PixelSize) const
-    { return (m_RealDimensions.mediabox[3] * PixelSize / m_ImageDimensions.second) * 1.5; }
+    { return m_RealDimensions.mediabox[3] * PixelSize / m_ImageDimensions.second * 1.5; }
 
     PDFPosition PDFPositionFromPixelPosition(LONG x, LONG y, double fontHeight) const
     {
@@ -183,7 +183,7 @@ struct PDFTextElementEraser
     PDFTextElementEraser(LONG Flags) : m_Flags(Flags) {}
     bool operator()(const PDFTextElementPtr& pElement) const
     {
-        return (pElement->displayFlags & m_Flags)?true:false;
+        return pElement->displayFlags & m_Flags?true:false;
     }
 
     LONG m_Flags;
@@ -357,7 +357,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, LO
     }
 
     CTL_TwainAppMgr::WriteLogInfoA("Writing 1 page of PDF file...\n");
-    bRet = PDFHandler.WriteGraphicFile(this, szTempFile.c_str(), m_pDib?(m_pDib->GetHandle()): nullptr, &m_ImageInfoEx);
+    bRet = PDFHandler.WriteGraphicFile(this, szTempFile.c_str(), m_pDib?m_pDib->GetHandle(): nullptr, &m_ImageInfoEx);
     CTL_TwainAppMgr::WriteLogInfoA("Finished writing 1 page of PDF file...\n");
 
     // Destroy the local text elements

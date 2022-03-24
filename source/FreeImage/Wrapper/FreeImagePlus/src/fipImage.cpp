@@ -193,7 +193,7 @@ unsigned fipImage::getScanWidth() const {
 }
 
 BOOL fipImage::isValid() const {
-    return (_dib != nullptr) ? TRUE:FALSE;
+    return _dib != nullptr ? TRUE:FALSE;
 }
 
 const BITMAPINFO* fipImage::getInfo() const {
@@ -221,11 +221,11 @@ unsigned fipImage::getLine() const {
 }
 
 double fipImage::getHorizontalResolution() const {
-    return (FreeImage_GetDotsPerMeterX(_dib.get()) / static_cast<double>(100));
+    return FreeImage_GetDotsPerMeterX(_dib.get()) / static_cast<double>(100);
 }
 
 double fipImage::getVerticalResolution() const {
-    return (FreeImage_GetDotsPerMeterY(_dib.get()) / static_cast<double>(100));
+    return FreeImage_GetDotsPerMeterY(_dib.get()) / static_cast<double>(100);
 }
 
 void fipImage::setHorizontalResolution(double value) {
@@ -257,7 +257,7 @@ FREE_IMAGE_COLOR_TYPE fipImage::getColorType() const {
 }
 
 BOOL fipImage::isGrayscale() const {
-    return ((FreeImage_GetBPP(_dib.get()) == 8) && (FreeImage_GetColorType(_dib.get()) != FIC_PALETTE));
+    return FreeImage_GetBPP(_dib.get()) == 8 && FreeImage_GetColorType(_dib.get()) != FIC_PALETTE;
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -273,7 +273,7 @@ BOOL fipImage::setThumbnail(const fipImage& image) {
 }
 
 BOOL fipImage::hasThumbnail() const {
-    return (FreeImage_GetThumbnail(_dib.get()) != nullptr);
+    return FreeImage_GetThumbnail(_dib.get()) != nullptr;
 }
 
 BOOL fipImage::clearThumbnail() {
@@ -365,7 +365,7 @@ BOOL fipImage::load(FREE_IMAGE_FORMAT fif, const char* lpszPathName, int flag) {
     replace(FreeImage_Load(fif, lpszPathName, flag));
     _fif = fif;
     _bHasChanged = TRUE;
-    return (_dib == nullptr) ? FALSE : TRUE;
+    return _dib == nullptr ? FALSE : TRUE;
 }
 
 BOOL fipImage::load(const char* lpszPathName, int flag) {
@@ -378,7 +378,7 @@ BOOL fipImage::load(const char* lpszPathName, int flag) {
         fif = FreeImage_GetFIFFromFilename(lpszPathName);
     }
     // check that the plugin has reading capabilities ...
-    if((fif != FIF_UNKNOWN) && FreeImage_FIFSupportsReading(fif)) {
+    if(fif != FIF_UNKNOWN && FreeImage_FIFSupportsReading(fif)) {
         return load(fif, lpszPathName, flag);
     }
 
@@ -390,7 +390,7 @@ BOOL fipImage::loadU(FREE_IMAGE_FORMAT fif, const wchar_t* lpszPathName, int fla
     replace(FreeImage_LoadU(fif, lpszPathName, flag));
     _fif = fif;
     _bHasChanged = TRUE;
-    return (_dib == nullptr) ? FALSE : TRUE;
+    return _dib == nullptr ? FALSE : TRUE;
 }
 
 BOOL fipImage::loadU(const wchar_t* lpszPathName, int flag) {
@@ -403,7 +403,7 @@ BOOL fipImage::loadU(const wchar_t* lpszPathName, int flag) {
         fif = FreeImage_GetFIFFromFilenameU(lpszPathName);
     }
     // check that the plugin has reading capabilities ...
-    if((fif != FIF_UNKNOWN) && FreeImage_FIFSupportsReading(fif)) {
+    if(fif != FIF_UNKNOWN && FreeImage_FIFSupportsReading(fif)) {
         return loadU(fif, lpszPathName, flag);
     }
 
@@ -413,13 +413,13 @@ BOOL fipImage::loadU(const wchar_t* lpszPathName, int flag) {
 BOOL fipImage::loadFromHandle(FreeImageIO *io, fi_handle handle, int flag) {
     // check the file signature and get its format
     FREE_IMAGE_FORMAT fif = FreeImage_GetFileTypeFromHandle(io, handle);
-    if((fif != FIF_UNKNOWN) && FreeImage_FIFSupportsReading(fif))
+    if(fif != FIF_UNKNOWN && FreeImage_FIFSupportsReading(fif))
     {
         // Load the file
         replace(FreeImage_LoadFromHandle(fif, io, handle, flag));
         _fif = fif;
         _bHasChanged = TRUE;
-        return (_dib == nullptr) ? FALSE : TRUE;
+        return _dib == nullptr ? FALSE : TRUE;
     }
     return FALSE;
 }
@@ -427,14 +427,14 @@ BOOL fipImage::loadFromHandle(FreeImageIO *io, fi_handle handle, int flag) {
 BOOL fipImage::loadFromMemory(fipMemoryIO& memIO, int flag) {
     // check the file signature and get its format
     FREE_IMAGE_FORMAT fif = memIO.getFileType();
-    if((fif != FIF_UNKNOWN) && FreeImage_FIFSupportsReading(fif))
+    if(fif != FIF_UNKNOWN && FreeImage_FIFSupportsReading(fif))
     {
         // Load the file
         replace(memIO.load(fif, flag));
         _fif = fif;
         _bHasChanged = TRUE;
 
-        return (_dib == nullptr) ? FALSE : TRUE;
+        return _dib == nullptr ? FALSE : TRUE;
     }
     return FALSE;
 }
@@ -447,7 +447,7 @@ BOOL fipImage::loadFromMemory(FREE_IMAGE_FORMAT fif, fipMemoryIO& memIO, int fla
         _fif = fif;
         _bHasChanged = TRUE;
 
-        return (_dib == nullptr) ? FALSE : TRUE;
+        return _dib == nullptr ? FALSE : TRUE;
     }
     return FALSE;
 }
@@ -471,7 +471,7 @@ BOOL fipImage::save(const char* lpszPathName, int flag) {
         if(image_type == FIT_BITMAP) {
             // standard bitmap type
             const WORD bpp = FreeImage_GetBPP(_dib.get());
-            bCanSave = (FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp));
+            bCanSave = FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp);
         } else {
             // special bitmap type
             bCanSave = FreeImage_FIFSupportsExportType(fif, image_type);
@@ -505,7 +505,7 @@ BOOL fipImage::saveU(const wchar_t* lpszPathName, int flag) {
         if(image_type == FIT_BITMAP) {
             // standard bitmap type
             const WORD bpp = FreeImage_GetBPP(_dib.get());
-            bCanSave = (FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp));
+            bCanSave = FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp);
         } else {
             // special bitmap type
             bCanSave = FreeImage_FIFSupportsExportType(fif, image_type);
@@ -531,7 +531,7 @@ BOOL fipImage::saveToHandle(FREE_IMAGE_FORMAT fif, FreeImageIO *io, fi_handle ha
         if(image_type == FIT_BITMAP) {
             // standard bitmap type
             const WORD bpp = FreeImage_GetBPP(_dib.get());
-            bCanSave = (FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp));
+            bCanSave = FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp);
         } else {
             // special bitmap type
             bCanSave = FreeImage_FIFSupportsExportType(fif, image_type);
@@ -557,7 +557,7 @@ BOOL fipImage::saveToMemory(FREE_IMAGE_FORMAT fif, fipMemoryIO& memIO, int flag)
         if(image_type == FIT_BITMAP) {
             // standard bitmap type
             const WORD bpp = FreeImage_GetBPP(_dib.get());
-            bCanSave = (FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp));
+            bCanSave = FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp);
         } else {
             // special bitmap type
             bCanSave = FreeImage_FIFSupportsExportType(fif, image_type);
@@ -596,7 +596,7 @@ BOOL fipImage::saveEx(const char* lpszPathName, int page, int flag)
         {
             // standard bitmap type
             const WORD bpp = FreeImage_GetBPP(_dib.get());
-            bCanSave = (FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp));
+            bCanSave = FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp);
         }
         else
         {
@@ -637,7 +637,7 @@ BOOL fipImage::saveUEx(const wchar_t* lpszPathName, int page, int flag)
         {
             // standard bitmap type
             const WORD bpp = FreeImage_GetBPP(_dib.get());
-            bCanSave = (FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp));
+            bCanSave = FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp);
         }
         else
         {
@@ -669,7 +669,7 @@ BOOL fipImage::saveToHandleEx(FREE_IMAGE_FORMAT fif, FreeImageIO *io, fi_handle 
         {
             // standard bitmap type
             const WORD bpp = FreeImage_GetBPP(_dib.get());
-            bCanSave = (FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp));
+            bCanSave = FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp);
         }
         else
         {
@@ -701,7 +701,7 @@ BOOL fipImage::saveToMemoryEx(FREE_IMAGE_FORMAT fif, fipMemoryIO& memIO, int pag
         {
             // standard bitmap type
             const WORD bpp = FreeImage_GetBPP(_dib.get());
-            bCanSave = (FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp));
+            bCanSave = FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp);
         }
         else
         {
@@ -929,7 +929,7 @@ BOOL fipImage::splitChannels(fipImage& RedChannel, fipImage& GreenChannel, fipIm
         GreenChannel = FreeImage_GetChannel(_dib.get(), FICC_GREEN);
         BlueChannel = FreeImage_GetChannel(_dib.get(), FICC_BLUE);
 
-        return (RedChannel.isValid() && GreenChannel.isValid() && BlueChannel.isValid());
+        return RedChannel.isValid() && GreenChannel.isValid() && BlueChannel.isValid();
     }
     return FALSE;
 }

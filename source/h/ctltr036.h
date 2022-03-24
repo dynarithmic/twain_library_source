@@ -28,10 +28,9 @@ namespace dynarithmic
     {
         public:
             CTL_CustomDSTriplet(CTL_ITwainSession *pSession,
-                                   CTL_ITwainSource* pSource,
-                                   TW_UINT16 nMsg);
-            TW_UINT16   Execute();
-            bool        IsSuccessful() const;
+                                CTL_ITwainSource* pSource,
+                                TW_UINT16 nMsg);
+            TW_UINT16   Execute() override;
             TW_UINT32   GetDataSize() const;
             HANDLE      GetData() const;
             void        SetDataSize(TW_UINT32 nSize);

@@ -48,7 +48,7 @@ std::string A85Decoder::decode85()
         {
         default:
             if (c < '!' || c > 'u')
-                return "";
+                return {};
             tuple += (c - '!') * pow85[count++];
             if (count == 5)
             {
@@ -60,7 +60,7 @@ std::string A85Decoder::decode85()
 
         case 'z':
             if (count != 0)
-                return "";
+                return {};
             output.append(4,'\0');
             break;
 
@@ -89,19 +89,19 @@ std::string A85Decoder::DecodeA85(const std::string& strIn,
                                   )
 {
     if (strIn.size() < 2)
-        return "";
+        return {};
     m_scratch = strIn;
     if ( checkPrefix )
     {
         if (strIn[0] != '<' || strIn[1] != '~' )
-            return "";
+            return {};
         m_scratch = strIn.substr(2);
     }
     if (checkSuffix)
     {
         if (strIn[strIn.size()-2] != '~' ||
             strIn[strIn.size()-1] != '>')
-            return "";
+            return {};
     }
     return decode85();
 }

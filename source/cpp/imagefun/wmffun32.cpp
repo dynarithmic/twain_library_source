@@ -57,7 +57,7 @@ WORD CWMFImageHandler::CalculateAPMCheckSum( APMHEADER apmfh )
     LPWORD  lpWord;
 
     // Start with the first word
-    WORD wResult = *(lpWord = (LPWORD)(&apmfh));
+    WORD wResult = *(lpWord = (LPWORD)&apmfh);
     // XOR in each of the other 9 words
     for(WORD i = 1;i<=9;i++)
     {
@@ -74,7 +74,7 @@ int CWMFImageHandler::WriteEMF(BYTE *pDib, UINT32 width, UINT32 height,
     #else
     int error = 0;
     std::vector<BYTE> bitBuf;
-    HDC dc = ::GetDC(nullptr);
+    HDC dc = GetDC(nullptr);
     if (dc!= nullptr)
     {
         DTWAINDeviceContextRelease_RAII dcRAII(std::make_pair(static_cast<HWND>(nullptr), dc));
@@ -90,10 +90,10 @@ int CWMFImageHandler::WriteEMF(BYTE *pDib, UINT32 width, UINT32 height,
         rect.left=0;rect.right=width;
         rect.top=0;rect.bottom=height;
 
-        rect.left = (rect.left * iWidthMM * 100) / iWidthPels;
-        rect.top = (rect.top * iHeightMM * 100)/ iHeightPels;
-        rect.right = (rect.right * iWidthMM * 100)/ iWidthPels;
-        rect.bottom = (rect.bottom * iHeightMM * 100)/ iHeightPels;
+        rect.left = rect.left * iWidthMM * 100 / iWidthPels;
+        rect.top = rect.top * iHeightMM * 100/ iHeightPels;
+        rect.right = rect.right * iWidthMM * 100/ iWidthPels;
+        rect.bottom = rect.bottom * iHeightMM * 100/ iHeightPels;
 
         const HDC hMetaDC = ::CreateEnhMetaFile(dc, nullptr, &rect, _T(""));
         if (hMetaDC!= nullptr)
@@ -109,17 +109,17 @@ int CWMFImageHandler::WriteEMF(BYTE *pDib, UINT32 width, UINT32 height,
             const LPVOID lpDIBBits = static_cast<LPVOID>(pDib + bmInfo->bmiHeader.biSize);
 
             // lines returns the number of lines actually displayed
-            const UINT32 lines = ::StretchDIBits(hMetaDC,
-                                                 0,0,
-                                                 width, height,
-                                                 0,0,
-                                                 width, height,
-                                                 lpDIBBits,
-                                                 bmInfo,
-                                                 DIB_RGB_COLORS,
-                                                 SRCCOPY);
+            const UINT32 lines = StretchDIBits(hMetaDC,
+                                               0,0,
+                                               width, height,
+                                               0,0,
+                                               width, height,
+                                               lpDIBBits,
+                                               bmInfo,
+                                               DIB_RGB_COLORS,
+                                               SRCCOPY);
 
-            const HENHMETAFILE hMeta = ::CloseEnhMetaFile(hMetaDC);
+            const HENHMETAFILE hMeta = CloseEnhMetaFile(hMetaDC);
              if (lines==height)
              {
                 // How big will the metafile bits be?
@@ -142,7 +142,7 @@ int CWMFImageHandler::WriteEMF(BYTE *pDib, UINT32 width, UINT32 height,
              }
              else
                  error = DTWAIN_ERR_DC;
-             ::DeleteEnhMetaFile(hMeta);
+            DeleteEnhMetaFile(hMeta);
         }
         else
             error = DTWAIN_ERR_DC;
@@ -162,7 +162,7 @@ int CWMFImageHandler::WriteWMF(BYTE *pDib, UINT32 width, UINT32 height,
     return DTWAIN_ERR_INVALIDBMP;
     #else
     int error = 0;
-    HDC dc = ::GetDC(nullptr);
+    HDC dc = GetDC(nullptr);
     if (dc!= nullptr)
     {
         DTWAINDeviceContextRelease_RAII raii(std::make_pair(static_cast<HWND>(nullptr), dc));
@@ -178,10 +178,10 @@ int CWMFImageHandler::WriteWMF(BYTE *pDib, UINT32 width, UINT32 height,
         rect.left=0;rect.right = width;
         rect.top=0;rect.bottom = height;
 
-        rect.left = (rect.left * iWidthMM * 100) / iWidthPels;
-        rect.top = (rect.top * iHeightMM * 100) / iHeightPels;
-        rect.right = (rect.right * iWidthMM * 100) / iWidthPels;
-        rect.bottom = (rect.bottom * iHeightMM * 100) / iHeightPels;
+        rect.left = rect.left * iWidthMM * 100 / iWidthPels;
+        rect.top = rect.top * iHeightMM * 100 / iHeightPels;
+        rect.right = rect.right * iWidthMM * 100 / iWidthPels;
+        rect.bottom = rect.bottom * iHeightMM * 100 / iHeightPels;
 
         const HDC hMetaDC = ::CreateEnhMetaFile(dc, nullptr,  &rect, _T(""));
         if (hMetaDC!= nullptr)
@@ -207,7 +207,7 @@ int CWMFImageHandler::WriteWMF(BYTE *pDib, UINT32 width, UINT32 height,
                                              bmInfo,
                                              DIB_PAL_COLORS);
 
-            const HENHMETAFILE hMeta = ::CloseEnhMetaFile(hMetaDC);
+            const HENHMETAFILE hMeta = CloseEnhMetaFile(hMetaDC);
             if (lines==height)
             {
                 // How big will the metafile bits be?
@@ -256,7 +256,7 @@ int CWMFImageHandler::WriteWMF(BYTE *pDib, UINT32 width, UINT32 height,
                 }
                 else
                     error = DTWAIN_ERR_GETWINMETAFILEBITS;
-                ::DeleteEnhMetaFile(hMeta);
+                DeleteEnhMetaFile(hMeta);
             }
             else
                 error = DTWAIN_ERR_DC;

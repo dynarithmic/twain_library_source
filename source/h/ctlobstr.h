@@ -160,20 +160,20 @@ namespace dynarithmic
 
         static int ToUpper(char_type ch) { return toupper(static_cast<int>(ch)); }
         static int ToLower(char_type ch) { return tolower(static_cast<int>(ch)); }
-        static bool IsDigit(int ch) { return ::isdigit(ch)?true:false; }
+        static bool IsDigit(int ch) { return isdigit(ch)?true:false; }
         static double ToDouble(const char_type* s1)
         { return s1?strtod(s1, nullptr):0.0; }
         #ifdef _WIN32
         static UINT GetWindowsDirectoryImpl(char_type* buffer)
-                    { return ::GetWindowsDirectoryA(buffer, _MAX_PATH); }
+                    { return GetWindowsDirectoryA(buffer, _MAX_PATH); }
         static UINT GetSystemDirectoryImpl(char_type* buffer)
-                    { return ::GetSystemDirectoryA(buffer, _MAX_PATH); }
+                    { return GetSystemDirectoryA(buffer, _MAX_PATH); }
         static char_type* AddBackslashImpl(char_type* buffer)
-                    { return ::PathAddBackslashA(buffer); }
+                    { return PathAddBackslashA(buffer); }
         static char_type* RemoveBackslashImpl(char_type* buffer)
-                    { return ::PathRemoveBackslashA(buffer); }
+                    { return PathRemoveBackslashA(buffer); }
         static DWORD GetModuleFileNameImpl(HMODULE hModule, char_type* lpFileName, DWORD nSize)
-                    { return ::GetModuleFileNameA(hModule, lpFileName, nSize); }
+                    { return GetModuleFileNameA(hModule, lpFileName, nSize); }
         #else
         static UINT GetWindowsDirectoryImpl(char_type* buffer)
         { getcwd(buffer, 8096); return 1; }
@@ -270,20 +270,20 @@ namespace dynarithmic
         static char_type* CopyN(char_type* dest, const char_type* src, size_t count) { return std::char_traits<char_type>::copy(dest, src, count); }
         static wint_t ToUpper(char_type ch) { return towupper(static_cast<wint_t>(ch)); }
         static wint_t ToLower(char_type ch) { return towlower(static_cast<wint_t>(ch)); }
-        static bool IsDigit(wint_t ch) { return ::iswdigit(ch)?true:false; }
+        static bool IsDigit(wint_t ch) { return iswdigit(ch)?true:false; }
         static double ToDouble(const char_type* s1)
         { return s1 ? wcstod(s1, nullptr) : 0.0; }
         #ifdef _WIN32
         static UINT GetWindowsDirectoryImpl(char_type* buffer)
-        { return ::GetWindowsDirectoryW(buffer, _MAX_PATH); }
+        { return GetWindowsDirectoryW(buffer, _MAX_PATH); }
         static UINT GetSystemDirectoryImpl(char_type* buffer)
-        { return ::GetSystemDirectoryW(buffer, _MAX_PATH); }
+        { return GetSystemDirectoryW(buffer, _MAX_PATH); }
         static LPWSTR AddBackslashImpl(char_type* buffer)
-        { return ::PathAddBackslashW(buffer); }
+        { return PathAddBackslashW(buffer); }
         static char_type* RemoveBackslashImpl(char_type* buffer)
-        { return ::PathRemoveBackslashW(buffer); }
+        { return PathRemoveBackslashW(buffer); }
         static DWORD GetModuleFileNameImpl(HMODULE hModule, char_type* lpFileName, DWORD nSize)
-        { return ::GetModuleFileNameW(hModule, lpFileName, nSize); }
+        { return GetModuleFileNameW(hModule, lpFileName, nSize); }
         #else
         static UINT GetWindowsDirectoryImpl(char_type* buffer)
         {
@@ -706,7 +706,7 @@ namespace dynarithmic
         {
             const boost::uuids::uuid u = boost::uuids::random_generator()();
             std::ostringstream strm;
-            strm << "{" + boost::uuids::to_string(u) + "}";
+            strm << "{" + to_string(u) + "}";
             StringType sTemp;
             std::string sTempIn = strm.str();
             std::copy(sTempIn.begin(), sTempIn.end(), std::back_inserter(sTemp));
@@ -799,7 +799,7 @@ namespace dynarithmic
 
         static int32_t CopyInfoToCString(const StringType& strInfo, CharType* szInfo, int32_t nMaxLen)
         {
-            if (strInfo.empty() || (szInfo && nMaxLen <= 0))
+            if (strInfo.empty() || szInfo && nMaxLen <= 0)
                 return 0;
             if (nMaxLen > 0)
                 --nMaxLen;

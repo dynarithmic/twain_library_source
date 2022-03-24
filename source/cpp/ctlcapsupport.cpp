@@ -91,7 +91,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsCapSupported(DTWAIN_SOURCE Source, LONG lCapab
 
             // Get all the information about the capability.
             std::for_each(pArray.begin(), pArray.end(), [&](TW_UINT16 val)
-            {dynarithmic::DTWAIN_CacheCapabilityInfo(p, pHandle, static_cast<TW_UINT16>(val)); });
+            {
+                DTWAIN_CacheCapabilityInfo(p, pHandle, static_cast<TW_UINT16>(val)); });
 
             // We have retrieved all the capability information
             p->SetRetrievedAllCaps(true);

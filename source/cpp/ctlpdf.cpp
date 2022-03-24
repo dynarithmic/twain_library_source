@@ -504,7 +504,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementFloat(DTWAIN_PDFTEXTELEMENT Tex
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, [] { return 1;}, ConditionCode, false, FUNC_MACRO);
 
 
-    PDFTextElement* pPtr = static_cast<PDFTextElement*>(TextElement);
+    auto* pPtr = static_cast<PDFTextElement*>(TextElement);
 
     switch (Flags)
     {
@@ -558,7 +558,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementLong(DTWAIN_PDFTEXTELEMENT Text
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, []{ return 1; }, ConditionCode, false, FUNC_MACRO);
     }
 
-    PDFTextElement* pPtr = static_cast<PDFTextElement*>(TextElement);
+    auto pPtr = static_cast<PDFTextElement*>(TextElement);
 
     switch (Flags)
     {
@@ -606,7 +606,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementString(DTWAIN_PDFTEXTELEMENT Te
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, [] { return 1;}, ConditionCode, false, FUNC_MACRO);
     }
 
-    PDFTextElement* pPtr = static_cast<PDFTextElement*>(TextElement);
+    auto* pPtr = static_cast<PDFTextElement*>(TextElement);
 
     switch (Flags)
     {
@@ -735,7 +735,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPDFTextElementString(DTWAIN_PDFTEXTELEMENT Te
 
     LONG ConditionCode;
     const auto it = CheckPDFTextElement(TextElement, ConditionCode);
-    if ( !(it.first) )
+    if ( !it.first )
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, [] { return 1; }, ConditionCode, false, FUNC_MACRO);
 
     const PDFTextElement* pPtr = static_cast<PDFTextElement*>(TextElement);
@@ -764,10 +764,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ResetPDFTextElement(DTWAIN_PDFTEXTELEMENT TextEl
 
     LONG ConditionCode;
     const auto it = CheckPDFTextElement(TextElement, ConditionCode);
-    if ( !(it.first) )
+    if ( !it.first )
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, [] { return 1; }, ConditionCode, false, FUNC_MACRO);
 
-    PDFTextElement* pPtr = static_cast<PDFTextElement*>(TextElement);
+    const auto pPtr = static_cast<PDFTextElement*>(TextElement);
     *pPtr = {};
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
@@ -778,7 +778,7 @@ std::pair<bool, CTL_TEXTELEMENTPTRLIST::iterator> CheckPDFTextElement(DTWAIN_PDF
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     ConditionCode = 0;
 
-    PDFTextElement* pPtr = static_cast<PDFTextElement*>(TextElement);
+    const auto pPtr = static_cast<PDFTextElement*>(TextElement);
 
     // First check if source handle is still open/valid (note that this only does a read, not write
     // so if an invalid pointer is passed, we won't care at this point)
@@ -802,7 +802,7 @@ std::pair<bool, CTL_TEXTELEMENTPTRLIST::iterator> CheckPDFTextElement(DTWAIN_PDF
     if ( CTL_TwainDLLHandle::s_lErrorFilterFlags )
     {
         std::string sOut = "PDF TextElement Info: \n";
-        sOut += CTL_ErrorStructDecoder().DecodePDFTextElement(pPtr);
+        sOut += CTL_ErrorStructDecoder::DecodePDFTextElement(pPtr);
         CTL_TwainAppMgr::WriteLogInfoA(sOut);
     }
     return { true, it2 };

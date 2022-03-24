@@ -53,7 +53,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTIFFCompressType(DTWAIN_SOURCE Source, LONG S
         LONG curAcquireType = p->GetAcquireFileType();
         const bool bIsCurTiff = p->IsFileTypeTIFF(static_cast<CTL_TwainFileFormatEnum>(curAcquireType));
 
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return (theState < SOURCE_STATE_UIENABLED);}, DTWAIN_ERR_INVALID_STATE, false,
+        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return theState < SOURCE_STATE_UIENABLED;}, DTWAIN_ERR_INVALID_STATE, false,
                                           FUNC_MACRO);
 
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !bIsTiff;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);

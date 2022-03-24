@@ -32,7 +32,7 @@ fipMultiPage::~fipMultiPage() {
 }
 
 BOOL fipMultiPage::isValid() const {
-    return (nullptr != _mpage) ? TRUE : FALSE;
+    return nullptr != _mpage ? TRUE : FALSE;
 }
 
 BOOL fipMultiPage::open(const char* lpszPathName, BOOL create_new, BOOL read_only, int flags) {
@@ -51,7 +51,7 @@ BOOL fipMultiPage::open(const char* lpszPathName, BOOL create_new, BOOL read_onl
         _mpage = FreeImage_OpenMultiBitmap(fif, lpszPathName, create_new, read_only, _bMemoryCache, flags);
     }
 
-    return (nullptr != _mpage ) ? TRUE : FALSE;
+    return nullptr != _mpage ? TRUE : FALSE;
 }
 
 BOOL fipMultiPage::open(fipMemoryIO& memIO, int flags) {
@@ -61,7 +61,7 @@ BOOL fipMultiPage::open(fipMemoryIO& memIO, int flags) {
     // open the stream
     _mpage = memIO.loadMultiPage(fif, flags);
 
-    return (nullptr != _mpage ) ? TRUE : FALSE;
+    return nullptr != _mpage ? TRUE : FALSE;
 }
 
 BOOL fipMultiPage::open(FreeImageIO *io, fi_handle handle, int flags) {
@@ -71,7 +71,7 @@ BOOL fipMultiPage::open(FreeImageIO *io, fi_handle handle, int flags) {
     // open the stream
     _mpage = FreeImage_OpenMultiBitmapFromHandle(fif, io, handle, flags);
 
-    return (nullptr != _mpage ) ? TRUE : FALSE;
+    return nullptr != _mpage ? TRUE : FALSE;
 }
 
 BOOL fipMultiPage::close(int flags) {

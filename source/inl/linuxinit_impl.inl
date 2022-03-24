@@ -60,7 +60,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileSavePos(HWND hWndParent, LPCTSTR szTitle,
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomFileSave(OPENFILENAME* lpOpenFileName)
 {
-    LOG_FUNC_ENTRY_PARAMS((lpOpenFileName))
+    LOG_FUNC_ENTRY_PARAMS(lpOpenFileName)
     #if 0
         const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     // See if DLL Handle exists

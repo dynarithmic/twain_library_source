@@ -301,7 +301,7 @@ TransymOCR::TransymOCR()
     INIT_TOCR_ERROR_CODE(TOCRERR_MEMALLOCINDEX)
     INIT_TOCR_ERROR_CODE(TOCRERR_CERTAINTYDB_INIT)
     INIT_TOCR_ERROR_CODE(TOCRERR_CERTAINTYDB_DELETE)
-    INIT_TOCR_ERROR_CODE(TOCRERR_CERTAINTYDB_INSERT1)                        ;
+    INIT_TOCR_ERROR_CODE(TOCRERR_CERTAINTYDB_INSERT1)
     INIT_TOCR_ERROR_CODE(TOCRERR_CERTAINTYDB_INSERT2)
     INIT_TOCR_ERROR_CODE(TOCRERR_OPENXORNEAREST)
     INIT_TOCR_ERROR_CODE(TOCRERR_XORNEAREST)
@@ -466,7 +466,7 @@ void TransymOCR::SetAvailableCaps()
             { DTWAIN_OCRCV_REMOVECONTROLCHARS, ALLOPS, false, false,  {DTWAIN_CONTARRAY, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE, DTWAIN_CONTONEVALUE },0,0,"1:1,0:0", nullptr, false }
         };
 
-        const int numCaps = sizeof(capsLongInfo) / sizeof(capsLongInfo[0]);
+        const int numCaps = sizeof capsLongInfo / sizeof capsLongInfo[0];
 
         std::vector<LONG> fArray;
         for (int i = 0; i < numCaps; ++i )
@@ -544,7 +544,7 @@ void TransymOCR::SetAvailableCaps()
             { DTWAIN_OCRCV_ERRORREPORTFILE, ALLOPS, "OCRERRORS.LOG", "OCRERRORS.LOG", "OCRERRORS.LOG:OCRERRORS.LOG", nullptr},
         };
 
-        const int numCaps = sizeof(capsStringInfo) / sizeof(capsStringInfo[0]);
+        const int numCaps = sizeof capsStringInfo / sizeof capsStringInfo[0];
 
         std::vector<std::string> fArray;
         for (int i = 0; i < numCaps; ++i )
@@ -617,7 +617,7 @@ bool TransymOCR::SetOptions(OCRJobOptions& options)
 LONG TransymOCR::StartOCR(CTL_StringType filename)
 {
     TOCRJOBINFO JobInfo;
-    memset(&JobInfo, 0, sizeof(JobInfo));
+    memset(&JobInfo, 0, sizeof JobInfo);
     JobInfo.StructId = 0;
     JobInfo.PageNo = GetCurrentPageNumber();  // This will change
     JobInfo.JobType = TOCRJOBTYPE_TIFFFILE;
@@ -641,7 +641,7 @@ LONG TransymOCR::StartOCR(CTL_StringType filename)
     if ( bRet )
     {
         if ( vals[0] == 0 )
-            memset(JobInfo.ProcessOptions.DisableCharacter, 0, sizeof(JobInfo.ProcessOptions.DisableCharacter));
+            memset(JobInfo.ProcessOptions.DisableCharacter, 0, sizeof JobInfo.ProcessOptions.DisableCharacter);
         else
         {
             for (int i = 0; i < 32; ++i )
@@ -681,7 +681,7 @@ LONG TransymOCR::StartOCR(CTL_StringType filename)
                      DTWAIN_OCRCV_CHARACTERREJECT
                     };
 
-    static LONG OffCapSize = sizeof(OffCaps) / sizeof(OffCaps[0]);
+    static LONG OffCapSize = sizeof OffCaps / sizeof OffCaps[0];
 
     VBBOOL* boolFuncs[] = {
                     &JobInfo.ProcessOptions.DeskewOff,
@@ -1115,7 +1115,7 @@ int TransymOCR::GetNumPagesInFile(CTL_StringType szFileName, int& errCode)
 
     // Set the mode to not show the message box
     m_SDK.TOCRSetErrorMode(m_JobHandle, TOCRERRORMODE_NONE);
-    const int fExists = dynarithmic::file_exists(szFileName.c_str());
+    const int fExists = file_exists(szFileName.c_str());
     bRet = m_SDK.TOCRGetNumPages(m_JobHandle, (char *)szFileName.c_str(), TOCRJOBTYPE_TIFFFILE, &nPages);
 
     // Set the old error mode back

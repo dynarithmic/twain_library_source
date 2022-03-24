@@ -52,9 +52,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG 
     {
         const filesys::path p(szFilePath);
 
-        if (filesys::exists(p))
+        if (exists(p))
         {
-           if (filesys::is_directory(p))
+           if (is_directory(p))
            {
                auto retVal = p.generic_string();
                if (!retVal.empty() && *retVal.rbegin() != filesys::path::preferred_separator)

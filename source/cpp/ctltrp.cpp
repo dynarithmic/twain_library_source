@@ -46,12 +46,12 @@ CTL_TwainTriplet::CTL_TwainTriplet(  pTW_IDENTITY pOrigin,
     Init(pOrigin, pDest, nDG, nDAT,  nMSG, pData);
 }
 
-void CTL_TwainTriplet::Init( pTW_IDENTITY pOrigin,
-                             pTW_IDENTITY pDest,
-                             TW_UINT32    nDG,
-                             TW_UINT16    nDAT,
-                             TW_UINT16    nMSG,
-                             TW_MEMREF    pData)
+void dynarithmic::CTL_TwainTriplet::Init( const pTW_IDENTITY pOrigin,
+                             const pTW_IDENTITY pDest,
+                             TW_UINT32 nDG,
+                             TW_UINT16 nDAT,
+                             TW_UINT16 nMSG,
+                             TW_MEMREF pData)
 {
     m_TwainTripletArg = {pOrigin, pDest, {nDG, nDAT, nMSG}, pData};
     m_bInit     = true;
@@ -89,11 +89,11 @@ TW_UINT16 CTL_TwainTriplet::Execute()
     const TW_UINT16 nFail = TWRC_FAILURE;
     if ( !pTemp )
     {
-        DTWAIN_ERROR_CONDITION(IDS_ErrTwainMgrInvalid, nFail);
+        DTWAIN_ERROR_CONDITION(IDS_ErrTwainMgrInvalid, nFail)
     }
     if ( !m_bAlive )
     {
-        DTWAIN_ERROR_CONDITION(IDS_ErrTripletNotExecuted, nFail);
+        DTWAIN_ERROR_CONDITION(IDS_ErrTripletNotExecuted, nFail)
     }
     return pTemp->CallDSMEntryProc( *this );
 }

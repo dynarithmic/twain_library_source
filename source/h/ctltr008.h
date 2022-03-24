@@ -28,7 +28,7 @@ namespace dynarithmic
     {
         public:
             CTL_ProcessEventTriplet(CTL_ITwainSession* pSession,
-                                    const CTL_ITwainSource* pSource,
+                                    CTL_ITwainSource* pSource,
                                     MSG *pMsg,
                                     bool isDSM2);
 

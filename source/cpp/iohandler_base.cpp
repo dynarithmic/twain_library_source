@@ -89,7 +89,7 @@ int CTL_ImageIOHandler::SaveToFile(HANDLE hDib, LPCTSTR szFile, FREE_IMAGE_FORMA
     fw.setVerticalResolution(res.second * multiplier + std::get<3>(multiplier_pr));
 
     char commentStr[256] = {};
-    dynarithmic::GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
+    GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
 
     fipTag fp;
     fp.setKeyValue("Comment", commentStr);

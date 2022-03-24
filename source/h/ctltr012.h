@@ -38,7 +38,7 @@ namespace dynarithmic
             bool GetValue(void *pData, size_t nWhere) override;
 
         protected:
-            virtual bool EnumCapValues( void *pCapData ) override;
+            bool EnumCapValues( void *pCapData ) override;
 
         private:
             size_t     m_nNumItems;

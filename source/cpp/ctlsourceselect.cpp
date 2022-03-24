@@ -43,10 +43,10 @@ static std::string GetTwainDlgTextFromResource(int nID, size_t& status);
 static void DisplayLocalString(HWND hWnd, int nID, int ResID);
 
 typedef DTWAIN_SOURCE(*SourceFn)(const SourceSelectionOptions&);
-static std::unordered_map<int, SourceFn> SourcefnMap = { { SELECTSOURCE, dynarithmic::DTWAIN_LLSelectSource },
-{ SELECTDEFAULTSOURCE, dynarithmic::DTWAIN_LLSelectDefaultSource },
-{ SELECTSOURCEBYNAME, dynarithmic::DTWAIN_LLSelectSourceByName },
-{ SELECTSOURCE2, dynarithmic::DTWAIN_LLSelectSource2 } };
+static std::unordered_map<int, SourceFn> SourcefnMap = { { SELECTSOURCE, DTWAIN_LLSelectSource},
+{ SELECTDEFAULTSOURCE, DTWAIN_LLSelectDefaultSource},
+{ SELECTSOURCEBYNAME, DTWAIN_LLSelectSourceByName},
+{ SELECTSOURCE2, DTWAIN_LLSelectSource2} };
 
 static LONG OpenSourceInternal(DTWAIN_SOURCE Source)
 {
@@ -82,7 +82,7 @@ DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSource()
 {
     LOG_FUNC_ENTRY_PARAMS(())
     const DTWAIN_SOURCE Source = SelectAndOpenSource(SourceSelectionOptions());
-        LOG_FUNC_EXIT_PARAMS(Source);
+    LOG_FUNC_EXIT_PARAMS(Source)
     CATCH_BLOCK(DTWAIN_SOURCE(0))
 }
 
@@ -92,7 +92,7 @@ DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSource2(HWND hWndParent, LPCTSTR szTitle
     const CTL_StringType sTitle = szTitle? szTitle : _T("");
     const DTWAIN_SOURCE Source = SelectAndOpenSource(SourceSelectionOptions(SELECTSOURCE2, nullptr, hWndParent,
                                                                             sTitle.c_str(), xPos, yPos, nullptr, nullptr, nullptr, nOptions));
-    LOG_FUNC_EXIT_PARAMS(Source);
+    LOG_FUNC_EXIT_PARAMS(Source)
     CATCH_BLOCK(DTWAIN_SOURCE(0))
 }
 
@@ -124,7 +124,7 @@ DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectDefaultSource()
 {
     LOG_FUNC_ENTRY_PARAMS(())
     const DTWAIN_SOURCE Source = SelectAndOpenSource(SourceSelectionOptions(SELECTDEFAULTSOURCE));
-    LOG_FUNC_EXIT_PARAMS(Source);
+    LOG_FUNC_EXIT_PARAMS(Source)
     CATCH_BLOCK(DTWAIN_SOURCE(0))
 }
 
@@ -176,7 +176,7 @@ DTWAIN_SOURCE dynarithmic::SourceSelect(const SourceSelectionOptions& options)
         // Open and close the source to initialize capability structure
         // Return a dead source.  This allows closing of the source without
         // destroying the source info
-    CTL_ITwainSource *pRealSource = static_cast<CTL_ITwainSource*>(pSource);
+    auto pRealSource = static_cast<CTL_ITwainSource*>(pSource);
     DTWAIN_SOURCE pDead = nullptr;
 
     DTWAIN_ARRAY pDTWAINArray = nullptr;
@@ -387,9 +387,9 @@ static std::vector<CTL_StringType> AdjustSourceNames(std::vector<CTL_StringType>
     if (vSourceNames.empty())
         return {};
 
-    const bool doExclude = (CS.nOptions & DTWAIN_DLG_USEEXCLUDENAMES)?true:false;
-    const bool doInclude = (CS.nOptions & DTWAIN_DLG_USEINCLUDENAMES)?true : false;
-    const bool doMapping = (CS.nOptions & DTWAIN_DLG_USENAMEMAPPING)?true : false;
+    const bool doExclude = CS.nOptions & DTWAIN_DLG_USEEXCLUDENAMES?true:false;
+    const bool doInclude = CS.nOptions & DTWAIN_DLG_USEINCLUDENAMES?true : false;
+    const bool doMapping = CS.nOptions & DTWAIN_DLG_USENAMEMAPPING?true : false;
 
     if (!doInclude && !doExclude && !doMapping)
         return vSourceNames;
@@ -473,7 +473,7 @@ LRESULT CALLBACK DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPA
             if (pS->CS.nOptions & DTWAIN_DLG_CENTER)
                 CenterWindow(hWnd, GetParent(hWnd));
             else
-                ::SetWindowPos(hWnd, nullptr, pS->CS.xpos, pS->CS.ypos, 0, 0, SWP_NOSIZE);
+                SetWindowPos(hWnd, nullptr, pS->CS.xpos, pS->CS.ypos, 0, 0, SWP_NOSIZE);
             lstSources = GetDlgItem(hWnd, IDC_LSTSOURCES);
 
             // Set the title
@@ -503,7 +503,7 @@ LRESULT CALLBACK DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPA
                 DisplayLocalString(hWnd, IDOK, IDS_SELECT_TEXT);
                 DisplayLocalString(hWnd, IDCANCEL, IDS_CANCEL_TEXT);
                 DisplayLocalString(hWnd, IDC_SOURCETEXT, IDS_SOURCES_TEXT);
-                ::SetFocus(hWnd);
+                SetFocus(hWnd);
                 CTL_TwainAppMgr::WriteLogInfoA("Finished Initializing TWAIN Dialog...\n");
                 return TRUE;
             }
@@ -627,8 +627,8 @@ LRESULT CALLBACK DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPA
             DisplayLocalString(hWnd, IDOK, IDS_SELECT_TEXT);
             DisplayLocalString(hWnd, IDCANCEL, IDS_CANCEL_TEXT);
             DisplayLocalString(hWnd, IDC_SOURCETEXT, IDS_SOURCES_TEXT);
-            ::SetFocus(hWnd);
-            ::BringWindowToTop(hWnd);
+            SetFocus(hWnd);
+            BringWindowToTop(hWnd);
             CTL_TwainAppMgr::WriteLogInfoA("Finished Initializing TWAIN Dialog...\n");
             return TRUE;
         }

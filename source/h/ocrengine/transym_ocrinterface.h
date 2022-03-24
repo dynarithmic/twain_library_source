@@ -90,7 +90,7 @@ class TransymOCR : public OCREngine
 #ifdef _WIN32
 public:
     TransymOCR();
-    ~TransymOCR();
+    ~TransymOCR() override;
     bool IsInitialized() const override;
     bool SetOptions(OCRJobOptions& options) override;
     LONG StartOCR(CTL_StringType filename) override;
@@ -104,10 +104,10 @@ public:
     LONG StartupOCREngine() override;
 
 protected:
-    virtual bool ProcessGetCapValues(LONG nOCRCap, LONG CapType, OCRLongArrayValues& vals);
-    virtual bool ProcessGetCapValues(LONG nOCRCap, LONG CapType, OCRStringArrayValues& vals);
-    virtual bool ProcessSetCapValues(LONG, LONG, const OCRLongArrayValues&);
-    virtual bool ProcessSetCapValues(LONG nOCRCap, LONG CapType, const OCRStringArrayValues& vals);
+    bool ProcessGetCapValues(LONG nOCRCap, LONG CapType, OCRLongArrayValues& vals) override;
+    bool ProcessGetCapValues(LONG nOCRCap, LONG CapType, OCRStringArrayValues& vals) override;
+    bool ProcessSetCapValues(LONG, LONG, const OCRLongArrayValues&) override;
+    bool ProcessSetCapValues(LONG nOCRCap, LONG CapType, const OCRStringArrayValues& vals) override;
 
 private:
     void SetAvailableCaps();

@@ -54,7 +54,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
         DTWAIN_ARRAY CapArray = nullptr;
         DTWAIN_GetCapValuesEx(Source, DTWAIN_CV_CAPUICONTROLLABLE, DTWAIN_CAPGET, DTWAIN_CONTONEVALUE, &CapArray);
         DTWAINArrayLL_RAII arr(CapArray);
-        bOk = (EnumeratorVector<LONG>(CapArray)[0]) ? true : false;
+        bOk = EnumeratorVector<LONG>(CapArray)[0] ? true : false;
     }
     else
     {
@@ -63,7 +63,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
     }
     // Close source if opened in this function
     if (!bSourceOpen)
-        ::DTWAIN_CloseSource(Source);
+        DTWAIN_CloseSource(Source);
     LOG_FUNC_EXIT_PARAMS(bOk ? TRUE : FALSE)
     CATCH_BLOCK(false)
 }

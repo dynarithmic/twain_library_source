@@ -51,7 +51,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
     bool bCloseSource = false;
     const bool bIsSourceOpen = DTWAIN_IsSourceOpen(Source)?true:false;
 
-    if (!bIsSourceOpen && (DTWAIN_GetTwainMode() == DTWAIN_MODAL))
+    if (!bIsSourceOpen && DTWAIN_GetTwainMode() == DTWAIN_MODAL)
     {
         bCloseSource = true;
         if (!DTWAIN_OpenSource(Source))
@@ -123,6 +123,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ForceScanOnNoUI(DTWAIN_SOURCE Source, BOOL bSet)
         // return the file name that would be acquired
     pSource->SetForceScanOnNoUI(bSet ? true : false);
     LOG_FUNC_EXIT_PARAMS(true)
-   CATCH_BLOCK(false);
+    CATCH_BLOCK(false)
 }
 

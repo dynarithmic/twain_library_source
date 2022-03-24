@@ -852,43 +852,43 @@
 52 USSTATEMENT  [0 0 396.00 792.00]
 53 BUSINESSCARD [0 0 144.00 290.00]
 -1 0
-100   Windows-BMP-SinglePage  bmp                             
-200   JPEG-SinglePage         jpg jpeg                     
-250   Adobe-PDF-SinglePage    pdf                             
-251   Adobe-PDF-Multipage     pdf
-300   PCX-SinglePage 	      pcx	
-301   DCX/PCX-Multipage       dcx	
-400   TARGA-SinglePage 	      tga
-500   TIFF-LZW-SinglePage     tif tiff	
-600   TIFF-Uncompressed-SinglePage tif tiff	
-700   TIFF-G3-SinglePage tif tiff	
-800   TIFF-G4-SinglePage tif tiff	
-801   TIFF-Packbits-SinglePage tif tiff	
-802   TIFF-Deflate-SinglePage tif tiff	
-803   TIFF-JPEG-SinglePage tif tiff	
-900   TIFF-Uncompressed-Multipage tif tiff	
-901   TIFF-G3-Multipage tif tiff	
-902   TIFF-G4-Multipage tif tiff	
-903   TIFF-Packbits-Multipage tif tiff	
-904   TIFF-Deflate-Multipage tif tiff	
-905   TIFF-JPEG-Multipage tif tiff	
-906   TIFF-LZW-Multipage tif tiff	
-850   Windows-Metafile-WMF-SinglePage wmf
-851   Enhanced-Windows-Metafile-EMF-SinglePage emf wmf
-950   GIF-SinglePage gif
-1000  PNG-SinglePage png
-2000  Adobe-PSD-SinglePage psd
-3000  JPEG2000-SinglePage jp2
-4000  PostScript-Level1-SinglePage ps
-4001  PostScript-Level2-SinglePage ps
-4002  PostScript-Level3-SinglePage ps
-4003  PostScript-Level1-Multipage ps
-4004  PostScript-Level2-Multipage ps
-4005  PostScript-Level3-Multipage ps
-6000  OCR-Text-SinglePage txt
-6001  OCR-Text-Multipage txt
-8000  Windows-ICON-SinglePage ico
-8001  Windows-Vista-ICON-SinglePage ico
-8500  WBMP-Wireless-Bitmap-SinglePage wbmp
-8501  WEBP-Google-Format-SinglePage webp
-10000 PPM-Portable-Bitmap-SinglePage ppm 
+100   Windows-BMP-Single  bmp                             
+200   JPEG-Single         jpg jpeg                     
+250   Adobe-PDF-Single    pdf                             
+251   Adobe-PDF-Multi     pdf
+300   PCX-Single 	      pcx	
+301   DCX/PCX-Multi       dcx	
+400   TARGA-Single 	      tga
+500   TIFF-LZW-Single     tif tiff	
+600   TIFF-Uncompressed-Single tif tiff	
+700   TIFF-G3-Single tif tiff	
+800   TIFF-G4-Single tif tiff	
+801   TIFF-Packbits-Single tif tiff	
+802   TIFF-Deflate-Single tif tiff	
+803   TIFF-JPEG-Single tif tiff	
+900   TIFF-Uncompressed-Multi tif tiff	
+901   TIFF-G3-Multi tif tiff	
+902   TIFF-G4-Multi tif tiff	
+903   TIFF-Packbits-Multi tif tiff	
+904   TIFF-Deflate-Multi tif tiff	
+905   TIFF-JPEG-Multi tif tiff	
+906   TIFF-LZW-Multi tif tiff	
+850   Windows-Metafile-WMF-Single wmf
+851   Enhanced-Windows-Metafile-EMF-Single emf wmf
+950   GIF-Single gif
+1000  PNG-Single png
+2000  Adobe-PSD-Single psd
+3000  JPEG2000-Single jp2
+4000  PostScript-Level1-Single ps
+4001  PostScript-Level2-Single ps
+4002  PostScript-Level3-Single ps
+4003  PostScript-Level1-Multi ps
+4004  PostScript-Level2-Multi ps
+4005  PostScript-Level3-Multi ps
+6000  OCR-Text-Single txt
+6001  OCR-Text-Multi txt
+8000  Windows-ICON-Single ico
+8001  Windows-Vista-ICON-Single ico
+8500  WBMP-Wireless-Bitmap-Single wbmp
+8501  WEBP-Google-Format-Single webp
+10000 PPM-Portable-Bitmap-Single ppm 

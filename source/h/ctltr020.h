@@ -37,9 +37,9 @@ namespace dynarithmic
                                            const std::vector<T>& rArray);
 
         protected:
-            TW_UINT16   GetContainerTypeSize();
-            size_t      GetAggregateSize();
-            TW_UINT16   GetContainerType();
+            TW_UINT16   GetContainerTypeSize() override;
+            size_t      GetAggregateSize() override;
+            TW_UINT16   GetContainerType() override;
             bool        Encode(const std::vector<T>& rArray, void *pMemBlock) override;
 
         private:

@@ -54,15 +54,15 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
         std::vector<LONG> validTypes = {DTWAIN_ARRAYSTRING, DTWAIN_ARRAYANSISTRING, DTWAIN_ARRAYWIDESTRING};
         const LONG Type = EnumeratorFunctionImpl::GetEnumeratorType(aFileNames);
         const auto itArrType = std::find(validTypes.begin(), validTypes.end(), Type);
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return (itArrType == validTypes.end()); }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return itArrType == validTypes.end(); }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
         const auto idx = std::distance(validTypes.begin(), itArrType);
         if ( idx > 0 )
         {
             tempNames = DTWAIN_ArrayCreate(DTWAIN_ARRAYSTRING, 0);
             if ( idx == 1 )
-                dynarithmic::ArrayCopyAnsiToNative(aFileNames, tempNames);
+                ArrayCopyAnsiToNative(aFileNames, tempNames);
             else
-                dynarithmic::ArrayCopyWideToNative(aFileNames, tempNames);
+                ArrayCopyWideToNative(aFileNames, tempNames);
             arrayToUse = tempNames;
         }
     }

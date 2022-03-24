@@ -29,7 +29,7 @@ namespace dynarithmic
         public:
             CTL_DeviceEventTriplet(CTL_ITwainSession *pSession,
                                    CTL_ITwainSource* pSource);
-            TW_UINT16   Execute();
+            TW_UINT16   Execute() override;
             bool        IsSuccessful() const;
             CTL_DeviceEvent  GetDeviceEvent() const;
 

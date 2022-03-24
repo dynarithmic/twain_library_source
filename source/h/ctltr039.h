@@ -30,7 +30,7 @@ namespace dynarithmic
     {
         public:
             CTL_EntryPointTriplet(CTL_ITwainSession *pSession, TW_UINT16 msg);
-            TW_UINT16 Execute();
+            TW_UINT16 Execute() override;
             TW_ENTRYPOINT& getEntryPoint() { return m_EntryPoint; }
             bool isTripletFound() const { return m_bTripletFound; }
 

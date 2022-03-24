@@ -74,6 +74,6 @@ LONG DLLENTRY_DEF DTWAIN_GetCurrentFileName(DTWAIN_SOURCE Source, LPTSTR szName,
     std::copy(sCopy, sCopy + nLenToUse - 1, szName);
     szName[nLenToUse-1] = _T('\0');
     LOG_FUNC_EXIT_PARAMS((LONG)sLen)
-    CATCH_BLOCK(-1L);
+    CATCH_BLOCK(-1L)
 }
 

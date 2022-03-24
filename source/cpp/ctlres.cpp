@@ -52,9 +52,9 @@ namespace dynarithmic
     {
         CTL_StringType sPath;
         if ( CTL_TwainDLLHandle::s_strResourcePath.empty())
-            sPath = dynarithmic::GetDTWAINExecutionPath();
+            sPath = GetDTWAINExecutionPath();
         else
-            sPath = StringWrapper::RemoveBackslashFromDirectory(CTL_TwainDLLHandle::s_strResourcePath.c_str());
+            sPath = StringWrapper::RemoveBackslashFromDirectory(CTL_TwainDLLHandle::s_strResourcePath);
         sPath = StringWrapper::AddBackslashToDirectory(sPath);
         return sPath + resName;
     }
@@ -187,7 +187,7 @@ namespace dynarithmic
     {
         const auto found = CTL_TwainDLLHandle::s_ResourceStrings.find(nError);
         if (found != CTL_TwainDLLHandle::s_ResourceStrings.end())
-            return StringWrapperA::CopyInfoToCString(found->second.c_str(), buffer, bufSize);
+            return StringWrapperA::CopyInfoToCString(found->second, buffer, bufSize);
         return 0;
     }
 
@@ -225,7 +225,7 @@ namespace dynarithmic
     {
         const auto resPath = createResourceFileName(DTWAINLANGRESOURCEFILE);
         const std::string sPathA = StringConversion::Convert_Native_To_Ansi(resPath);
-        return (sPathA + lpszName) + ".txt";
+        return sPathA + lpszName + ".txt";
     }
 
     bool LoadLanguageResourceA(LPCSTR lpszName, const CTL_ResourceRegistryMap& registryMap)
@@ -290,13 +290,13 @@ namespace dynarithmic
     ////////////////////////////////////////////////////////////////////
     bool CTL_ErrorStruct::IsFailureMatch(TW_UINT16 cc) const
     {
-        return ((1L << cc) & m_nTWCCErrorCodes)?true:false;
+        return 1L << cc & m_nTWCCErrorCodes?true:false;
     }
 
     bool CTL_ErrorStruct::IsSuccessMatch(TW_UINT16 rc) const
     {
         if (rc == TWRC_SUCCESS)
             return true;
-        return ((1L << rc) & m_nTWRCCodes)?true:false;
+        return 1L << rc & m_nTWRCCodes?true:false;
     }
 }

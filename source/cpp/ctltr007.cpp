@@ -24,8 +24,8 @@
 #include "ctltwmgr.h"
 using namespace dynarithmic;
 CTL_ConditionCodeTriplet::CTL_ConditionCodeTriplet(CTL_ITwainSession *pSession,
-                                      const CTL_ITwainSource* pSource/* = nullptr*/) :
-                                    CTL_TwainTriplet(), m_Status{}
+                                                   CTL_ITwainSource* pSource/* = nullptr*/) :
+                                                   CTL_TwainTriplet(), m_Status{}
 {
     SetSourcePtr(const_cast<CTL_ITwainSource*>(pSource));
     SetSessionPtr(pSession);
@@ -36,7 +36,7 @@ CTL_ConditionCodeTriplet::CTL_ConditionCodeTriplet(CTL_ITwainSession *pSession,
     if ( pMgr && pMgr->IsValidTwainSession( pSession ))
     {
         if ( pSource )
-            Init( pSession->GetAppIDPtr(), *pSource, DG_CONTROL, DAT_STATUS,
+            Init( pSession->GetAppIDPtr(), pSource->GetSourceIDPtr(), DG_CONTROL, DAT_STATUS,
                   MSG_GET, static_cast<TW_MEMREF>(&m_Status) );
         else
             Init( pSession->GetAppIDPtr(), nullptr, DG_CONTROL, DAT_STATUS,

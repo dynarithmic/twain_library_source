@@ -41,7 +41,7 @@ void fipMemoryIO::close() {
 }
 
 BOOL fipMemoryIO::isValid() const {
-    return (_hmem != nullptr);
+    return _hmem != nullptr;
 }
 
 FREE_IMAGE_FORMAT fipMemoryIO::getFileType() const {

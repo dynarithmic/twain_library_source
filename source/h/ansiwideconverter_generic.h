@@ -33,7 +33,7 @@ public:
 
     operator LPCSTR() const
     {
-        return(m_sz.c_str());
+        return m_sz.c_str();
     }
 
 private:
@@ -57,7 +57,7 @@ public:
 
     operator LPCWSTR() const
     {
-        return(m_sz.c_str());
+        return m_sz.c_str();
     }
 
 private:

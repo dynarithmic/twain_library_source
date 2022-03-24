@@ -22,7 +22,7 @@
 #include "FreeImagePlus.h"
 
 BOOL fipMetadataFind::isValid() const {
-    return (_mdhandle != nullptr) ? TRUE : FALSE;
+    return _mdhandle != nullptr ? TRUE : FALSE;
 }
 
 fipMetadataFind::fipMetadataFind() : _mdhandle(nullptr) {

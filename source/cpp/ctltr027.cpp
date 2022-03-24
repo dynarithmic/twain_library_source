@@ -55,7 +55,7 @@ CTL_ImagePendingTriplet::CTL_ImagePendingTriplet(CTL_ITwainSession *pSession,
 bool CTL_ImagePendingTriplet::Reset( TW_UINT16 nMsg )
 {
     CTL_ITwainSession *pSession = GetSessionPtr();
-    const CTL_ITwainSource *pSource   = GetSourcePtr();
+    CTL_ITwainSource *pSource = GetSourcePtr();
     if ( IsAlive() )
     {
         m_nMsg = nMsg;

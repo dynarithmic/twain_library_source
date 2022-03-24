@@ -195,7 +195,7 @@ bool EnableFeederFunc(DTWAIN_SOURCE Source, LONG lCap, CTL_ITwainSource* p, SetF
     if ( !vFeeder || vFeeder->empty() )
         return false;
 
-    const bool Val = ((*vFeeder)[0])?true:false;
+    const bool Val = (*vFeeder)[0]?true:false;
     bool bValue=false;
     if ( bSet != 0 )
         bValue = true;
@@ -273,7 +273,7 @@ LONG DLLENTRY_DEF DTWAIN_GetFeederFuncs(DTWAIN_SOURCE Source)
     for ( int i = 0; i < 3; i++ )
     {
         if (DTWAIN_IsCapSupported(Source,Caps[i]))
-            ReturnVal |= (i << 1);
+            ReturnVal |= i << 1;
     }
     LOG_FUNC_EXIT_PARAMS(ReturnVal)
     CATCH_BLOCK(0)
@@ -303,12 +303,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnableAutoFeedNotify(LONG Latency, DTWAIN_BOOL b
     #ifdef _WIN32
     if ( bEnable )
     {
-        CTL_TwainDLLHandle::s_nTimerID = ::SetTimer(nullptr, 0, static_cast<UINT>(Latency), reinterpret_cast<TIMERPROC>(ThisTimerProc));
+        CTL_TwainDLLHandle::s_nTimerID = SetTimer(nullptr, 0, static_cast<UINT>(Latency), reinterpret_cast<TIMERPROC>(ThisTimerProc));
         CTL_TwainDLLHandle::s_bTimerIDSet = true;
     }
     else
     {
-        ::KillTimer(nullptr, CTL_TwainDLLHandle::s_nTimerID);
+        KillTimer(nullptr, CTL_TwainDLLHandle::s_nTimerID);
         CTL_TwainDLLHandle::s_bTimerIDSet = false;
     }
     #endif

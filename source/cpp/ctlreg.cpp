@@ -202,11 +202,11 @@ bool dynarithmic::GetCapInfoFromIni(const std::string& strCapName,
     // Trim the name found
     strDataType = StringWrapperA::TrimAll(strDataType);
     StringWrapperA::MakeUpperCase(strDataType);
-    for (unsigned i = 0; i < DataTypeArraySize; ++i)
+    for (auto i : DataTypeArray)
     {
-        if ( StringWrapperA::CompareNoCase(DataTypeArray[i].name, szDataType.c_str()) )
+        if ( StringWrapperA::CompareNoCase(i.name, szDataType.c_str()) )
         {
-            rDataType = DataTypeArray[i].dataType;
+            rDataType = i.dataType;
             break;
         }
     }
@@ -225,11 +225,10 @@ bool dynarithmic::GetCapInfoFromIni(const std::string& strCapName,
     // Make sure that you parse the NULL tokens
     StringWrapperA::Tokenize(szBuffer, ",", aStr, true );
 
-    // Get strings and translate them to the correct values
-    ContainerMap::const_iterator it;
-    std::string str;
-    if ( aStr.size() > 0 )
+    if (!aStr.empty())
     {
+        std::string str;
+        ContainerMap::const_iterator it;
         if ( !aStr[0].empty() )
         {
             str = aStr[0];
@@ -271,12 +270,12 @@ bool dynarithmic::GetCapInfoFromIni(const std::string& strCapName,
     {
         // Make sure that you parse the NULL tokens
         StringWrapperA::Tokenize(szStates, ",", aStr, true );
-        std::string strNum;
-        short int tempInfo = 0;
-        bool bFoundNum = false;
         int nStates = static_cast<int>(aStr.size());
         if ( nStates > 0 )
         {
+            std::string strNum;
+            short int tempInfo = 0;
+            bool bFoundNum = false;
             for ( int Count = 0; Count < nStates; Count++ )
             {
                 strNum = StringWrapperA::TrimAll(aStr[Count]);
@@ -286,7 +285,7 @@ bool dynarithmic::GetCapInfoFromIni(const std::string& strCapName,
                     if ( nNum >= 4 && nNum <= 7 )
                     {
                         bFoundNum = true;
-                        tempInfo |= (1 << (nNum-1));
+                        tempInfo |= 1 << nNum-1;
                     }
                 }
             }

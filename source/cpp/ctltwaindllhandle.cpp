@@ -210,7 +210,7 @@ CTL_TwainDLLHandle* dynarithmic::FindHandle(HWND hWnd, bool bIsDisplay)
                                  {
                                      if ( bIsDisplay)
                                          return false;
-                                     return (p.get() && (p.get()->m_hWndTwain == hWnd));
+                                     return p.get() && p.get()->m_hWndTwain == hWnd;
                                  });
     if (it != CTL_TwainDLLHandle::s_DLLHandles.end())
         return (*it).get();
@@ -221,7 +221,7 @@ CTL_TwainDLLHandle* dynarithmic::FindHandle(HINSTANCE hInst)
 {
     const auto it = std::find_if(CTL_TwainDLLHandle::s_DLLHandles.begin(), CTL_TwainDLLHandle::s_DLLHandles.end(),
                                  [&](CTL_TwainDLLHandlePtr& p)
-                                 { return (p.get() && p.get()->m_hInstance == hInst); });
+                                 { return p.get() && p.get()->m_hInstance == hInst; });
     if (it != CTL_TwainDLLHandle::s_DLLHandles.end())
         return (*it).get();
     return nullptr;

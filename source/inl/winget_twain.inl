@@ -116,7 +116,7 @@ CTL_StringType GetTwainDirFullNameEx(LPCTSTR strTwainDLLName, bool bLeaveLoaded,
         else
             fNameTotal = fName;
         #ifdef _WIN32
-        const UINT nOldError = ::SetErrorMode(SEM_NOOPENFILEERRORBOX);
+        const UINT nOldError = SetErrorMode(SEM_NOOPENFILEERRORBOX);
         #endif
 
         boost::dll::shared_library libloader;
@@ -124,7 +124,7 @@ CTL_StringType GetTwainDirFullNameEx(LPCTSTR strTwainDLLName, bool bLeaveLoaded,
         libloader.load(fNameTotal, ec); 
 
         #ifdef _WIN32
-        ::SetErrorMode(nOldError);
+        SetErrorMode(nOldError);
         #endif
 
         if (ec != boost::system::errc::success)
@@ -143,7 +143,7 @@ CTL_StringType GetTwainDirFullNameEx(LPCTSTR strTwainDLLName, bool bLeaveLoaded,
         if (lpDSMEntry)
         {
             // We need the full module name
-            fNameTotal = StringWrapper::traits_type::BoostGenericString(libloader.location());
+            fNameTotal = StringWrapper::traits_type::PathGenericString(libloader.location());
             if (!bLeaveLoaded)
                 // Unload the library
                 libloader.unload();

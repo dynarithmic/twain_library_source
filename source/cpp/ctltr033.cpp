@@ -57,7 +57,7 @@ TW_UINT16 CTL_SetDefaultSourceTriplet::Execute()
         return rc;
     }
 #ifdef _WIN32
-    ::WriteProfileStringA("TWAIN", "DEFAULT SOURCE", m_TWUNK.dsPath);
+    WriteProfileStringA("TWAIN", "DEFAULT SOURCE", m_TWUNK.dsPath);
 #endif
     // Dispatch message that WIN.INI has changed
     return rc;

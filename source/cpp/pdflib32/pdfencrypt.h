@@ -99,7 +99,6 @@ class PDFEncryption
                           int permissions, bool strength128Bits);
         virtual void PrepareKey() = 0;
         void SetHashKey(int number, int generation);
-        std::string CreateEncryptionDictionary();
         virtual void Encrypt(const std::string& /*dataIn*/, std::string& /*dataOut*/) {}
         virtual void Encrypt(char * /*dataIn*/, int/* len*/) {}
 
@@ -112,11 +111,11 @@ class PDFEncryption
 class PDFEncryptionRC4 : public PDFEncryption
 {
     protected:
-        UCHARArray GetExtendedKey(int number, int generation);
+        UCHARArray GetExtendedKey(int number, int generation) override;
     public:
-        void Encrypt(const std::string& dataIn, std::string& dataOut);
-        void Encrypt(char *dataIn, int len);
-        void PrepareKey();
+        void Encrypt(const std::string& dataIn, std::string& dataOut) override;
+        void Encrypt(char *dataIn, int len) override;
+        void PrepareKey() override;
 
 };
 /*

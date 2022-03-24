@@ -106,7 +106,7 @@ struct SetSupportFn2 : public SetSupportFn1<T>
 template <typename T, typename FnToCall>
 static T FunctionCaller(FnToCall fn, const std::string& func, const std::string& paramLog)
 {
-    const bool doLog = (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK) ? true : false;
+    const bool doLog = CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK ? true : false;
     try
     {
         T bRet = T(0);
@@ -145,7 +145,7 @@ struct GetDeviceCapsByStringFn
 
     GetDeviceCapsByStringFn(DTWAIN_SOURCE Src, LPTSTR value, GetByStringFn fn) :
         theSource(Src), theString(value), theFn(fn) {}
-    DTWAIN_BOOL operator()() const { return dynarithmic::DTWAIN_GetDeviceCapByString(theSource, theString, theFn); }
+    DTWAIN_BOOL operator()() const { return DTWAIN_GetDeviceCapByString(theSource, theString, theFn); }
 };
 
 struct CapSetterFn
@@ -156,7 +156,7 @@ struct CapSetterFn
     CapSetterFn(DTWAIN_SOURCE src, LPCTSTR val, SetByStringFn theFn) : Source(src), value(val), fn(theFn) {}
     DTWAIN_BOOL operator()()
     {
-        return dynarithmic::DTWAIN_SetDeviceCapByString(Source, value, fn);
+        return DTWAIN_SetDeviceCapByString(Source, value, fn);
     }
 };
 
@@ -169,7 +169,7 @@ struct CapSetterFn2
     CapSetterFn2(DTWAIN_SOURCE src, LPCTSTR val, bool ex, SetByStringFn2 theFn) : Source(src), value(val), fn(theFn), extra(ex) {}
     DTWAIN_BOOL operator()()
     {
-        return dynarithmic::DTWAIN_SetDeviceCapByString2(Source, value, extra, fn);
+        return DTWAIN_SetDeviceCapByString2(Source, value, extra, fn);
     }
 };
 
@@ -703,7 +703,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_GetDeviceCapByString(DTWAIN_SOURCE Source, LPTST
     {
         StringStreamA strm;
         strm << boost::format("%1%") % tempR;
-        const auto srcStr = StringConversion::Convert_Ansi_To_Native(strm.str().c_str());
+        const auto srcStr = StringConversion::Convert_Ansi_To_Native(strm.str());
         StringWrapper::SafeStrcpy(strVal, srcStr.c_str());
     }
     return retVal;
@@ -826,7 +826,7 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
         }
         LOG_FUNC_EXIT_PARAMS(nValues)
     }
-    LOG_FUNC_EXIT_PARAMS(0);
+    LOG_FUNC_EXIT_PARAMS(0)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 

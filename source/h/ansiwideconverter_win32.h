@@ -35,7 +35,7 @@ public:
 
     operator LPCSTR() const
     {
-        return(m_sz.c_str());
+        return m_sz.c_str();
     }
 
 private:
@@ -46,14 +46,14 @@ private:
         const int nLengthW = static_cast<int>(wcslen(psz)) + 1;
         int nLengthA = nLengthW * 4;
         std::vector<char> szBuffer(nLengthA);
-        bool bFailed = (0 == ::WideCharToMultiByte(nConvertCodePage, 0, psz, nLengthW, szBuffer.data(), nLengthA, nullptr, nullptr)) ? true : false;
+        bool bFailed = 0 == WideCharToMultiByte(nConvertCodePage, 0, psz, nLengthW, szBuffer.data(), nLengthA, nullptr, nullptr) ? true : false;
         if (bFailed)
         {
             if (GetLastError() == ERROR_INSUFFICIENT_BUFFER)
             {
-                nLengthA = ::WideCharToMultiByte(nConvertCodePage, 0, psz, nLengthW, nullptr, 0, nullptr, nullptr);
+                nLengthA = WideCharToMultiByte(nConvertCodePage, 0, psz, nLengthW, nullptr, 0, nullptr, nullptr);
                 szBuffer.resize(nLengthA);
-                bFailed = (0 == ::WideCharToMultiByte(nConvertCodePage, 0, psz, nLengthW, szBuffer.data(), nLengthA, nullptr, nullptr)) ? true : false;
+                bFailed = 0 == WideCharToMultiByte(nConvertCodePage, 0, psz, nLengthW, szBuffer.data(), nLengthA, nullptr, nullptr) ? true : false;
             }
         }
         if (bFailed)
@@ -75,7 +75,7 @@ public:
 
     operator LPCWSTR() const
     {
-        return(m_sz.c_str());
+        return m_sz.c_str();
     }
 
 private:
@@ -86,14 +86,14 @@ private:
         const int nLengthA = static_cast<int>(strlen(psz)) + 1;
         int nLengthW = nLengthA;
         std::vector<wchar_t> szBuffer(nLengthW);
-        bool bFailed = (0 == ::MultiByteToWideChar(nConvertCodePage, 0, psz, nLengthA, szBuffer.data(), nLengthW)) ? true : false;
+        bool bFailed = 0 == MultiByteToWideChar(nConvertCodePage, 0, psz, nLengthA, szBuffer.data(), nLengthW) ? true : false;
         if (bFailed)
         {
             if (GetLastError() == ERROR_INSUFFICIENT_BUFFER)
             {
-                nLengthW = ::MultiByteToWideChar(nConvertCodePage, 0, psz, nLengthA, nullptr, 0);
+                nLengthW = MultiByteToWideChar(nConvertCodePage, 0, psz, nLengthA, nullptr, 0);
                 szBuffer.resize(nLengthW);
-                bFailed = (0 == ::MultiByteToWideChar(nConvertCodePage, 0, psz, nLengthA, szBuffer.data(), nLengthW)) ? true : false;
+                bFailed = 0 == MultiByteToWideChar(nConvertCodePage, 0, psz, nLengthA, szBuffer.data(), nLengthW) ? true : false;
             }
         }
         if (bFailed)

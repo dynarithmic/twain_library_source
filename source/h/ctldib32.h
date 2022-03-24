@@ -198,9 +198,9 @@ namespace dynarithmic
         public:
             CTL_PDFIOHandler(CTL_TwainDib* pDib, int nFormat, const DTWAINImageInfoEx &ImageInfoEx);
             int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
-            ~CTL_PDFIOHandler() = default;
+            ~CTL_PDFIOHandler() override = default;
 
-            virtual void SetImageInfo(const DTWAINImageInfoEx& ImageInfo) override
+            void SetImageInfo(const DTWAINImageInfoEx& ImageInfo) override
             {
                 m_ImageInfoEx = ImageInfo;
             }
@@ -221,7 +221,7 @@ namespace dynarithmic
             CTL_PSIOHandler(CTL_TwainDib* pDib, int nFormat, const DTWAINImageInfoEx &ImageInfoEx,
                             LONG PSType, bool IsMultiPage);
             int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
-            ~CTL_PSIOHandler() = default;
+            ~CTL_PSIOHandler() override = default;
 
         private:
             int m_nFormat;
@@ -238,7 +238,7 @@ namespace dynarithmic
         public:
             CTL_Jpeg2KIOHandler(CTL_TwainDib* pDib, const DTWAINImageInfoEx &ImageInfoEx);
             int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
-            ~CTL_Jpeg2KIOHandler() = default;
+            ~CTL_Jpeg2KIOHandler() override = default;
 
         private:
             int m_nFormat;
@@ -294,9 +294,9 @@ namespace dynarithmic
         CTL_TextIOHandler(CTL_TwainDib* pDib, int nInputFormat, DTWAINImageInfoEx ImageInfoEx,
                           OCREngine* pEngine);
         int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
-        ~CTL_TextIOHandler() = default;
+        ~CTL_TextIOHandler() override = default;
 
-        virtual void SetImageInfo(const DTWAINImageInfoEx& ImageInfo) override
+        void SetImageInfo(const DTWAINImageInfoEx& ImageInfo) override
         {
             m_ImageInfoEx = ImageInfo;
         }
@@ -476,10 +476,10 @@ namespace dynarithmic
             CTL_TwainDib(const CTL_TwainDib& rDib);
             void swap(CTL_TwainDib& left, CTL_TwainDib& rt) noexcept;
 
-            static int         PixelToBytes(int n) { return ((n+7)/8); }
+            static int         PixelToBytes(int n) { return (n+7)/8; }
             WORD               PaletteSize (void* pv);
             HPALETTE           GetPalette() const {return m_TwainDibInfo.GetPalette(); }
-            static             int  WidthInBytes(int i)  { return ((i+31)/32*4); }
+            static             int  WidthInBytes(int i)  { return (i+31)/32*4; }
             // Destruction
             ~CTL_TwainDib();
 

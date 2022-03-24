@@ -53,15 +53,15 @@ std::string dynarithmic::CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich,
         if ( nWhich == 0 || nWhich == LOG_INDENT_IN)
         {
             const std::string sTemp(nIndent, ' ');
-            s = sTemp + static_cast<std::string>("===>>>") + CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_ENTERTEXT] + (" ");
+            s = sTemp + static_cast<std::string>("===>>>") + CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_ENTERTEXT] + " ";
             nIndent += 3;
         }
         else
         {
             nIndent -= 3;
             nIndent = (std::max)(0, nIndent);
-            const std::string sTemp(nIndent, (' '));
-            s = sTemp + static_cast<std::string>("<<<===") + CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_EXITTEXT] + (" ");
+            const std::string sTemp(nIndent, ' ');
+            s = sTemp + static_cast<std::string>("<<<===") + CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_EXITTEXT] + " ";
         }
     }
     else
@@ -127,7 +127,7 @@ void LogExceptionToConsole(LPCSTR fname, const char* sAdditionalText)
         if (sAdditionalText)
             strm << "\nAdditional Information: " << sAdditionalText;
         #ifdef _WIN32
-           ::MessageBoxA(nullptr, strm.str().c_str(), CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_EXCEPTERRORTEXT].c_str(), MB_ICONSTOP);
+        MessageBoxA(nullptr, strm.str().c_str(), CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_EXCEPTERRORTEXT].c_str(), MB_ICONSTOP);
         #else
            std::cout << strm.str() << '\n';
         #endif

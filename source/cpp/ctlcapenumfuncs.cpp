@@ -152,7 +152,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAllCapsToDefault(DTWAIN_SOURCE Source)
     if (!p)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return (!CTL_TwainAppMgr::IsSourceOpen(p)); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !CTL_TwainAppMgr::IsSourceOpen(p); },
         DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
     {
         DTWAIN_ARRAY a = nullptr;

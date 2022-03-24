@@ -32,7 +32,7 @@ bool TwainMessageLoopImpl::IsSourceOpen(CTL_ITwainSource* pSource, bool bUIOnly)
 {
     if (bUIOnly)
         return pSource->IsUIOpen() ? true : false;
-    return (!m_pDLLHandle->m_bTransferDone == true && !m_pDLLHandle->m_bSourceClosed == true);
+    return !m_pDLLHandle->m_bTransferDone == true && !m_pDLLHandle->m_bSourceClosed == true;
 }
 
 void TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource *pSource, bool isUIOnly)
@@ -55,7 +55,7 @@ void TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource *pSource, 
             break;
         if (CanEnterDispatch(&msg))
         {
-            ::TranslateMessage(&msg);
+            TranslateMessage(&msg);
             ::DispatchMessage(&msg);
         }
     }

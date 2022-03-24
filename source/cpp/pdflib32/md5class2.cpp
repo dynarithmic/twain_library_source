@@ -170,7 +170,7 @@ DWORD CMD5Checksum::RotateLeft(DWORD x, int n)
 //        ASSERT( sizeof(x) == 4 );
 
         //rotate and return x
-        return (x << n) | (x >> (32-n));
+        return x << n | x >> 32-n;
 }
 
 
@@ -187,7 +187,7 @@ NOTES:                  None
 *****************************************************************************************/
 void CMD5Checksum::FF( DWORD& A, DWORD B, DWORD C, DWORD D, DWORD X, DWORD S, DWORD T)
 {
-    const DWORD F = (B & C) | (~B & D);
+    const DWORD F = B & C | ~B & D;
         A += F + X + T;
         A = RotateLeft(A, S);
         A += B;
@@ -207,7 +207,7 @@ NOTES:                  None
 *****************************************************************************************/
 void CMD5Checksum::GG( DWORD& A, DWORD B, DWORD C, DWORD D, DWORD X, DWORD S, DWORD T)
 {
-    const DWORD G = (B & D) | (C & ~D);
+    const DWORD G = B & D | C & ~D;
         A += G + X + T;
         A = RotateLeft(A, S);
         A += B;
@@ -227,7 +227,7 @@ NOTES:                  None
 *****************************************************************************************/
 void CMD5Checksum::HH( DWORD& A, DWORD B, DWORD C, DWORD D, DWORD X, DWORD S, DWORD T)
 {
-    const DWORD H = (B ^ C ^ D);
+    const DWORD H = B ^ C ^ D;
         A += H + X + T;
         A = RotateLeft(A, S);
         A += B;
@@ -247,7 +247,7 @@ NOTES:                  None
 *****************************************************************************************/
 void CMD5Checksum::II( DWORD& A, DWORD B, DWORD C, DWORD D, DWORD X, DWORD S, DWORD T)
 {
-    const DWORD I = (C ^ (B | ~D));
+    const DWORD I = C ^ (B | ~D);
         A += I + X + T;
         A = RotateLeft(A, S);
         A += B;
@@ -443,9 +443,9 @@ void CMD5Checksum::DWordToByte(BYTE* Output, DWORD* Input, UINT nLength )
         for ( ; j < nLength; i++, j += 4)
         {
                 Output[j] =   static_cast<UCHAR>(Input[i] & 0xff);
-                Output[j+1] = static_cast<UCHAR>((Input[i] >> 8) & 0xff);
-                Output[j+2] = static_cast<UCHAR>((Input[i] >> 16) & 0xff);
-                Output[j+3] = static_cast<UCHAR>((Input[i] >> 24) & 0xff);
+                Output[j+1] = static_cast<UCHAR>(Input[i] >> 8 & 0xff);
+                Output[j+2] = static_cast<UCHAR>(Input[i] >> 16 & 0xff);
+                Output[j+3] = static_cast<UCHAR>(Input[i] >> 24 & 0xff);
         }
 }
 
@@ -466,8 +466,8 @@ std::string CMD5Checksum::Final()
         DWordToByte( Bits, m_nCount, 8 );
 
         //Pad out to 56 mod 64.
-        const UINT nIndex = static_cast<UINT>((m_nCount[0] >> 3) & 0x3f);
-        const UINT nPadLen = (nIndex < 56) ? (56 - nIndex) : (120 - nIndex);
+        const UINT nIndex = static_cast<UINT>(m_nCount[0] >> 3 & 0x3f);
+        const UINT nPadLen = nIndex < 56 ? 56 - nIndex : 120 - nIndex;
         Update( PADDING, nPadLen );
 
         //Append length (before padding)
@@ -518,14 +518,14 @@ NOTES:                  Computes the partial MD5 checksum for 'nInputLen' bytes 
 void CMD5Checksum::Update( const BYTE* Input, ULONG nInputLen )
 {
         //Compute number of bytes mod 64
-        UINT nIndex = static_cast<UINT>((m_nCount[0] >> 3) & 0x3F);
+        UINT nIndex = static_cast<UINT>(m_nCount[0] >> 3 & 0x3F);
 
         //Update number of bits
-        if ( ( m_nCount[0] += nInputLen << 3 )  <  ( nInputLen << 3) )
+        if ( ( m_nCount[0] += nInputLen << 3 )  <  nInputLen << 3 )
         {
                 m_nCount[1]++;
         }
-        m_nCount[1] += (nInputLen >> 29);
+        m_nCount[1] += nInputLen >> 29;
 
         //Transform as many times as possible.
         UINT i=0;

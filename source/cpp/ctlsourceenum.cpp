@@ -34,7 +34,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSourcesEx()
     DTWAIN_ARRAY pArray = nullptr;
     DTWAIN_EnumSources(&pArray);
     LOG_FUNC_EXIT_PARAMS(pArray)
-    CATCH_BLOCK(DTWAIN_ARRAY(0))
+    CATCH_BLOCK(DTWAIN_ARRAY{})
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
@@ -46,10 +46,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     // Terminate if Array is NULL )
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-    const DTWAIN_ARRAY aSource = DTWAIN_ArrayCreate(DTWAIN_ARRAYSOURCE, 0);
+    DTWAIN_ARRAY aSource = DTWAIN_ArrayCreate(DTWAIN_ARRAYSOURCE, 0);
     if (!aSource)
         LOG_FUNC_EXIT_PARAMS(false)
-    const DTWAIN_ARRAY pDTWAINArray = aSource;
+    DTWAIN_ARRAY pDTWAINArray = aSource;
 
     EnumeratorFunctionImpl::ClearEnumerator(pDTWAINArray);
 
@@ -71,5 +71,5 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
     for_each(SourceArray.begin(), SourceArray.end(), [&](CTL_ITwainSource* ptr) {EnumeratorFunctionImpl::EnumeratorAddValue(pDTWAINArray, &ptr);});
     *Array = aSource;
     LOG_FUNC_EXIT_PARAMS(true)
-        CATCH_BLOCK(false)
+    CATCH_BLOCK(false)
 }

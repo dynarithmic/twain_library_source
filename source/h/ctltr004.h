@@ -29,7 +29,7 @@ namespace dynarithmic
         public:
             CTL_SelectSourceDlgTriplet(CTL_ITwainSession *pSession,
                                        LPCTSTR pszProduct=nullptr);
-            TW_UINT16 Execute();
+            TW_UINT16 Execute() override;
     };
 }
 #endif

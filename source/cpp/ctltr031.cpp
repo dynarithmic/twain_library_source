@@ -37,9 +37,7 @@ CTL_ImageMemXferTriplet::CTL_ImageMemXferTriplet(CTL_ITwainSession *pSession,
                                                  TW_UINT16 nCompression/*=TWCP_NONE*/)
     : CTL_ImageXferTriplet(pSession, pSource, DAT_IMAGEMEMXFER),
         m_ImageMemXferBuffer{},
-        m_TempMemory{},
-        m_ptrTempDib(nullptr),
-        m_origDibHandle{}
+        m_TempMemory{}
 {
     LPBITMAPINFO    pDibInfo;
 
@@ -154,7 +152,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
     do
     {
         // Call base function
-        rc = dynarithmic::CTL_ImageXferTriplet::Execute();
+        rc = CTL_ImageXferTriplet::Execute();
 
         switch (rc)
         {
@@ -270,7 +268,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                     {
                         // Indicate that pending xfers has been executed
                         SetPendingXfersDone(true);
-                        bEndOfJobDetected = ( Pending.EOJ == pSource->GetEOJDetectedValue());
+                        bEndOfJobDetected = Pending.EOJ == pSource->GetEOJDetectedValue();
                         if ( bEndOfJobDetected )
                         {
                             CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_EOJDETECTED_XFERDONE,reinterpret_cast<LPARAM>(pSource));
@@ -343,7 +341,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                         // Here we can do a check for blank page.  The code has not been tested
                         // To be done...
                         if ( ProcessBlankPage(pSession, pSource, CurDib, false, DTWAIN_TN_BLANKPAGEDETECTED1,
-                            DTWAIN_TN_BLANKPAGEDISCARDED1, DTWAIN_BP_AUTODISCARD_IMMEDIATE) == 0 )
+                                              DTWAIN_TN_BLANKPAGEDISCARDED1, DTWAIN_BP_AUTODISCARD_IMMEDIATE) == 0 )
                         {
                             bPageDiscarded = true;
                             break;  // The page is discarded
@@ -357,7 +355,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                             const HANDLE hRetDib =
                                 (*CTL_TwainDLLHandle::s_pDibUpdateProc)
                                         (pSource, static_cast<int>(nCurImage), m_hDataHandle);
-                            if ( hRetDib && (hRetDib != m_hDataHandle))
+                            if ( hRetDib && hRetDib != m_hDataHandle)
                             {
                                 // Application changed DIB.  So make this the current dib
                                 ImageMemoryHandler::GlobalFree( m_hDataHandle );
@@ -382,7 +380,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                         }
                     }
 
-                    if ( ProcessBlankPage(pSession, pSource, CurDib, true, DTWAIN_TN_BLANKPAGEDETECTED2,DTWAIN_TN_BLANKPAGEDISCARDED2,  DTWAIN_BP_AUTODISCARD_AFTERPROCESS) == 0 )
+                    if ( ProcessBlankPage(pSession, pSource, CurDib, true, DTWAIN_TN_BLANKPAGEDETECTED2, DTWAIN_TN_BLANKPAGEDISCARDED2, DTWAIN_BP_AUTODISCARD_AFTERPROCESS) == 0 )
                     {
                         bPageDiscarded = true;
                         break;  // The page is discarded
@@ -438,7 +436,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                             if ( bIsMultiPageFile || pSource->IsMultiPageModeSaveAtEnd())
                             {
                                 // This is the fist page of the acquisition
-                                if (nLastDib == 0 || (pSource->IsNewJob() && pSource->IsJobFileHandlingOn()))
+                                if (nLastDib == 0 || pSource->IsNewJob() && pSource->IsJobFileHandlingOn())
                                     nMultiStage = DIB_MULTI_FIRST;
                                 else
                                 // This is a subsequent page of the acquisition
@@ -447,12 +445,12 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                                 // Now check if this we are in manual duplex mode
                                 if ( pSource->IsManualDuplexModeOn() ||
                                      pSource->IsMultiPageModeContinuous() ||
-                               ( pSource->IsMultiPageModeSaveAtEnd() && !bIsMultiPageFile))
+                               pSource->IsMultiPageModeSaveAtEnd() && !bIsMultiPageFile)
                                 {
                                     // We need to copy the data to a file and store info in
                                     // vector of the source
                                 if ( !bEndOfJobDetected || // Not end -of-job
-                                    (bExecuteEOJPageHandling && !m_bJobControlPageRecorded ) // write job control page
+                                    bExecuteEOJPageHandling && !m_bJobControlPageRecorded // write job control page
                                     )
                                     errfile = FileWriter.CopyDuplexDibToFile(CurDib, bExecuteEOJPageHandling);
 

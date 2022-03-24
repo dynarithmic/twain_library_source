@@ -74,11 +74,11 @@ BOOL fipImageUtility::copyFromHandle(fipImage& im, HANDLE hMem, bool isHandle)
 
     // Get a pointer to the palette
     if (pHead->biBitCount < 16) {
-        pPalette = (RGBQUAD *)(((BYTE *)pHead) + sizeof(BITMAPINFOHEADER));
+        pPalette = (RGBQUAD *)((BYTE *)pHead + sizeof(BITMAPINFOHEADER));
     }
 
     // Get a pointer to the pixels
-    BYTE* bits = ((BYTE*)pHead + sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD) * pHead->biClrUsed);
+    BYTE* bits = (BYTE*)pHead + sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD) * pHead->biClrUsed;
 
     if (pHead->biCompression == BI_BITFIELDS) {
         // Take into account the color masks that specify the red, green, and blue components (16- and 32-bit)
@@ -446,7 +446,7 @@ void fipWinImage::drawEx(HDC hDC, RECT& rcDest, BOOL useFileBkg, RGBQUAD *appBkC
                 _display_dib.replace(FreeImage_ConvertToStandardType(dib_double, TRUE));
                 // Free image of type FIT_DOUBLE
                 FreeImage_Unload(dib_double);
-            } else if((image_type == FIT_RGBF) || (image_type == FIT_RGBAF) || (image_type == FIT_RGB16)) {
+            } else if(image_type == FIT_RGBF || image_type == FIT_RGBAF || image_type == FIT_RGB16) {
                 // Apply a tone mapping algorithm and convert to 24-bit
                 switch(_tmo) {
                     case FITMO_REINHARD05:
@@ -487,7 +487,7 @@ void fipWinImage::drawEx(HDC hDC, RECT& rcDest, BOOL useFileBkg, RGBQUAD *appBkC
 
 void fipWinImage::setToneMappingOperator(FREE_IMAGE_TMO tmo, double first_param, double second_param, double third_param, double fourth_param) {
     // avoid costly operations if possible ...
-    if((_tmo != tmo) || (_tmo_param_1 != first_param) || (_tmo_param_2 != second_param) || (_tmo_param_3 != third_param) || (_tmo_param_4 != fourth_param)) {
+    if(_tmo != tmo || _tmo_param_1 != first_param || _tmo_param_2 != second_param || _tmo_param_3 != third_param || _tmo_param_4 != fourth_param) {
         _tmo = tmo;
         _tmo_param_1 = first_param;
         _tmo_param_2 = second_param;

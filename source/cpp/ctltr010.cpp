@@ -115,7 +115,7 @@ TW_UINT16 CTL_CapabilityTriplet::Execute()
                 // dereference to a TW_ONEVALUE structure.  Don't really
                 // care if item is not really TW_ONEVALUE since first
                 // item in structure is the same for all types (the item type)
-                pTW_ONEVALUE pValOne = static_cast<pTW_ONEVALUE>(pCapData);
+                const pTW_ONEVALUE pValOne = static_cast<pTW_ONEVALUE>(pCapData);
 
                 // Get item type
                 const TW_UINT16 nItemType = pValOne->ItemType;
@@ -244,8 +244,8 @@ float CTL_CapabilityTriplet::Twain32ToFloat( TW_FIX32 Fix32 )
 
 void CTL_CapabilityTriplet::FloatToTwain32( float fnum, TW_FIX32 & Fix32_value )
 {
-    const TW_BOOL sign = (fnum < 0)?TRUE:FALSE;
-    TW_INT32 value = static_cast<TW_INT32>(fnum * 65536.0 + (sign ? (-0.5) : 0.5));
+    const TW_BOOL sign = fnum < 0?TRUE:FALSE;
+    TW_INT32 value = static_cast<TW_INT32>(fnum * 65536.0 + (sign ? -0.5 : 0.5));
     Fix32_value.Whole = static_cast<TW_INT16>(value >> 16);
     Fix32_value.Frac = static_cast<TW_UINT16>(value & 0x0000ffffL);
 }

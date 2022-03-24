@@ -29,7 +29,7 @@ namespace dynarithmic
         public:
             CTL_SetDefaultSourceTriplet(CTL_ITwainSession *pSession,
                                         CTL_ITwainSource* pSource);
-            TW_UINT16 Execute();
+            TW_UINT16 Execute() override;
 
         private:
             TW_TWUNKIDENTITY    m_TWUNK;

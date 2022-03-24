@@ -22,10 +22,10 @@ OF THIRD PARTY RIGHTS.
 
 int ASCIIHexEncode( const std::string&inData, std::string& outData)
 {
-    const char *pHexStr = "0123456789ABCDEF";
     outData.reserve(inData.size() * 2);
     for ( size_t i = 0; i < inData.size(); ++i)
     {
+        auto pHexStr = "0123456789ABCDEF";
         unsigned char ch = inData[i];
         ch = ch >> 4;
         unsigned int hival = ch;
