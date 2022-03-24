@@ -14,48 +14,64 @@ One of the following compilers:
       * Visual Studio 2015 with Update 3
       * Visual Studio 2017 (may need to install XP tools and Windows 10 SDK from the VS 2017 Installation Manager).
       * Visual Studio 2019
+      * Visual Studio 2022
       
 In addition, you will need 
 
 1) At least 20 GB of free disk space.
 2) An installation of the [Boost](http://www.boost.org/) library (version 1.68 or above)
-3) The following environment variables must be set before compilation (if using the Visual Studio IDE, these variables must be set before starting the IDE):
+3) An installation of the [7-Zip](https://www.7-zip.org/) archiving utility.
+4) An installation of the [DirHash](https://idrassi.github.io/DirHash/) utility to compute the hash value of the resulting output files.
+5) The following environment variables must be set before compilation (if using the Visual Studio IDE, these variables must be set before starting the IDE):
 
 *    BOOST_INCLUDE_DIR
-*    BOOST_LIBRARY_DIR_32
-*    BOOST_LIBRARY_DIR_64
+*    ZIP7_UTIL_CMD
+*    DIRHASH_UTIL_CMD
 
 The **BOOST_INCLUDE_DIR** should point to your boost installation folder.  This is usually **C:\boost_install_directory**, where this folder contains a subsequent **boost** folder, containing the **boost** header files.  For example:
 
 ```plaintext
 SET BOOST_INCLUDE_DIR=C:\boost_installation\boost
 ```
+    
+Since the DTWAIN build also requires to link to the prebuilt boost libraries, you must also set the appropriate environment variable to link to the boost library:
 
+**If using Visual Studio 2015:**
+*    BOOST_LIBRARY_DIR_2015_32
+*    BOOST_LIBRARY_DIR_2015_64    
 
+**If using Visual Studio 2017:**
+*    BOOST_LIBRARY_DIR_2017_32
+*    BOOST_LIBRARY_DIR_2017_64    
 
-The **BOOST_LIBRARY_DIR_32** is the directory where the 32-bit boost libraries are installed.  These libraries would be named similar to **libboost_xxxxxxxx-vcyyy-zzzz-x32.lib**.  For example:
+**If using Visual Studio 2019:**
+*    BOOST_LIBRARY_DIR_2019_32
+*    BOOST_LIBRARY_DIR_2019_64    
+
+**If using Visual Studio 2022:**
+*    BOOST_LIBRARY_DIR_2022_32
+*    BOOST_LIBRARY_DIR_2022_64    
+
+The **BOOST_LIBRARY_DIR_xxxx_32**, where **xxxx** is the compiler you are using to build with, is the directory where the 32-bit boost libraries are installed.  These libraries would be named similar to **libboost_xxxxxxxx-vcyyy-zzzz-x32.lib**.  For example:
 
 ```plaintext
-SET BOOST_LIBRARY_DIR_32=C:\boost_installation\lib32-msvc-14.0
+SET BOOST_LIBRARY_DIR_2015_32=C:\boost_installation\lib32-msvc-14.0
 ```
 
-
-
-The **BOOST_LIBRARY_DIR_64** is the directory where the 64-bit boost libraries are installed.  These libraries would be named similar to **libboost_xxxxxxxx-vcyyy-zzzz-x64.lib**.  For example:
+The **BOOST_LIBRARY_DIR_xxxx_64**, where **xxxx** is the compiler you are using to build with, is the directory where the 64-bit boost libraries are installed.  These libraries would be named similar to **libboost_xxxxxxxx-vcyyy-zzzz-x64.lib**.  For example:
 
 ```plaintext
-SET BOOST_LIBRARY_DIR_64=C:\boost_installation\lib64-msvc-14.0
+SET BOOST_LIBRARY_DIR_2015_64=C:\boost_installation\lib64-msvc-14.0
 ```
 
-   
 If you are using Visual C++, I recommend getting the pre-built boost libraries found at [SourceForge](https://sourceforge.net/projects/boost/files/boost-binaries/).  When installed, you will get the boost **include** files, plus the library files.  Please download the version of boost that fits your compiler.  
 
 ```plaintext
 For Visual C++ 2015 -- Download files with "14.0" in the file name.
 For Visual C++ 2017 -- Download files with "14.1" in the file name.
 For Visual C++ 2019 -- Download files with "14.2" in the file name.
+For Visual C++ 2022 -- Download files with "14.3" in the file name.
 ```
-
 
 
 If you are not using Visual C++, you will need to build the following boost libraries:  
@@ -65,6 +81,24 @@ If you are not using Visual C++, you will need to build the following boost libr
 * log
 * system
 * thread
+
+----
+The **ZIP7_UTIL_CMD** is the full path name of the executable file **7z.exe** of the **7-Zip** archiving utility.  For example:
+
+```plaintext
+SET ZIP7_UTIL_CMD=C:\7-Zip\7z.exe
+```
+----
+The **DIRHASH_UTIL_CMD** is the full path name of the executable file **DirHash.exe** of the **DirHash** hash value computing utility.  For example:
+
+```plaintext
+SET DIRHASH_UTIL_CMD=C:\DirHash\DirHash.exe
+```
+
+If the environment variable is not set, the library files will be built, but the hash code computation of the output files will fail to execute.  
+
+The final hashes of the files are stored as text in the **binaries\32bit** and **binaries\64bit** folders (the names of the files will look something like **xxxxxxhash.txt**).
+
 ----------
 Note that the C++ source code should be able to be built with any C++11 or C++14 compliant compiler that recognizes the Windows API headers (MingW using g++ 5.0 or above is an example).  However we have not tested builds of the DTWAIN library that have been built with any other compiler other than the Visual Studio family.   
 
