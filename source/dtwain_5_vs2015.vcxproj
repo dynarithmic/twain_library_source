@@ -242,9 +242,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <ForcedIncludeFiles>dtwainlib.h</ForcedIncludeFiles>
       <AdditionalOptions>-Zm400 %(AdditionalOptions)</AdditionalOptions>
-      <PrecompiledHeaderFile>dtwainlib.h</PrecompiledHeaderFile>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;_DEBUG;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -318,8 +316,6 @@ $(DIRHASH_UTIL_CMD) $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>dtwainlib.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>dtwainlib.h</ForcedIncludeFiles>
       <AdditionalOptions>/Zm1024 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ResourceCompile>
@@ -392,8 +388,6 @@ $(DIRHASH_UTIL_CMD) $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)rele
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>dtwainlib.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>dtwainlib.h</ForcedIncludeFiles>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;NDEBUG;PDFLIB_INTERNAL;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -465,8 +459,6 @@ $(DIRHASH_UTIL_CMD) $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)rele
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>dtwainlib.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>dtwainlib.h</ForcedIncludeFiles>
       <AdditionalOptions>/Zm1024 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ResourceCompile>
@@ -518,10 +510,7 @@ $(DIRHASH_UTIL_CMD) $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_
       <ProgramDataBaseFileName>.\obj\$(Configuration)\</ProgramDataBaseFileName>
       <ExceptionHandling>Async</ExceptionHandling>
       <DisableSpecificWarnings>4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <ForcedIncludeFiles>dtwainlib.h</ForcedIncludeFiles>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>dtwainlib.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>dtwain$(PlatformArchitecture)ud.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -563,9 +552,6 @@ $(DIRHASH_UTIL_CMD) $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_
       <ExceptionHandling>Async</ExceptionHandling>
       <DisableSpecificWarnings>4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>dtwainlib.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>dtwain$(PlatformArchitecture)u.pch</PrecompiledHeaderOutputFile>
-      <ForcedIncludeFiles>dtwainlib.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -607,9 +593,6 @@ $(DIRHASH_UTIL_CMD) $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)rele
       <ExceptionHandling>Async</ExceptionHandling>
       <DisableSpecificWarnings>4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>dtwainlib.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>dtwain$(PlatformArchitecture).pch</PrecompiledHeaderOutputFile>
-      <ForcedIncludeFiles>dtwainlib.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -651,9 +634,6 @@ $(DIRHASH_UTIL_CMD) $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)rele
       <ExceptionHandling>Async</ExceptionHandling>
       <DisableSpecificWarnings>4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>dtwainlib.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>dtwain$(PlatformArchitecture)d.pch</PrecompiledHeaderOutputFile>
-      <ForcedIncludeFiles>dtwainlib.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -974,7 +954,6 @@ $(DIRHASH_UTIL_CMD) $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_
     <ClInclude Include="h\ctltr042.h" />
     <ClInclude Include="h\dibinfox.h" />
     <ClInclude Include="h\dibmulti.h" />
-    <ClInclude Include="h\dtwainlib.h" />
     <ClInclude Include="h\dtwain_filesystem.h" />
     <ClInclude Include="h\dtwain_float_utils.h" />
     <ClInclude Include="h\dtwain_raii.h" />
