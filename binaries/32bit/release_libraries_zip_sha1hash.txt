@@ -1,0 +1,1 @@
+﻿SHA1 hash of "release_libraries.zip" (20 bytes) = fb26741011ed08ac435c583394ac12778ed88c14
