@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -46,21 +46,21 @@ namespace dynarithmic
             void * PreEncode();
             TW_UINT16 PostEncode(TW_UINT16);
 
-            void EncodeOneValue(pTW_ONEVALUE pVal, void *pData);
+            static void EncodeOneValue(pTW_ONEVALUE pVal, void *pData);
 
             void EncodeRange(pTW_RANGE pVal,
                             void *pData1,
                             void *pData2,
-                            void *pData3);
+                            void *pData3) const;
 
             void EncodeEnumValue(pTW_ENUMERATION pArray,
                                 int valuePos,
                                 size_t nItemSize,
                                 void *pData);
 
-            void EncodeArrayValue(pTW_ARRAY pArray,
-                                  size_t valuePos,
-                                  void *pData);
+            static void EncodeArrayValue(pTW_ARRAY pArray,
+                                         size_t valuePos,
+                                         void *pData);
 
         private:
             CTL_EnumSetType         m_gType;
@@ -80,7 +80,7 @@ namespace dynarithmic
                                      TW_UINT16 TwainType,
                                      const std::vector<T> & rArray);
 
-            TW_UINT16                Execute();
+            TW_UINT16                Execute() override;
 
         protected:
             virtual bool Encode( const std::vector<T>& /*rArray*/, void * /*pMemBlock*/) { return false; }

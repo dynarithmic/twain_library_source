@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ CTL_UserInterfaceDisableTriplet::CTL_UserInterfaceDisableTriplet(CTL_ITwainSessi
 
 TW_UINT16 CTL_UserInterfaceDisableTriplet::Execute()
 {
-    TW_UINT16 rc = CTL_UserInterfaceTriplet::Execute();
+    const TW_UINT16 rc = CTL_UserInterfaceTriplet::Execute();
     if ( rc == TWRC_SUCCESS )
         GetSourcePtr()->SetUIOpen(FALSE);
     return rc;

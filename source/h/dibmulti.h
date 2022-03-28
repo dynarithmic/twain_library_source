@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -33,13 +33,18 @@
 #include "ctlobstr.h"
 namespace dynarithmic
 {
+    struct DibMultiPageData
+    {
+        virtual ~DibMultiPageData() = default;
+    };
+
     struct DibMultiPageStruct
     {
-        int Stage;
-        int Page;
-        void *pUserData;
+        int Stage = 0;
+        int Page = 0;
+        std::shared_ptr<DibMultiPageData> pUserData;
         CTL_StringType strName;
-        DibMultiPageStruct() : Stage(0), Page(0), pUserData(NULL) { }
+        DibMultiPageStruct() = default;
     };
 }
 #endif

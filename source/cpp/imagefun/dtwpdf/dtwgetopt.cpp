@@ -65,22 +65,22 @@ int getopt(int nargc, const char** nargv, const char* ostr)
     if (!*place) {              /* update scanning pointer */
         if (optind >= nargc || *(place = nargv[optind]) != '-') {
             place = EMSG;
-            return(EOF);
+            return EOF;
         }
         if (place[1] && *++place == '-') {  /* found "--" */
             ++optind;
             place = EMSG;
-            return(EOF);
+            return EOF;
         }
     }                   /* option letter okay? */
-    if ((optopt = (int)*place++) == (int)':' ||
+    if ((optopt = static_cast<int>(*place++)) == static_cast<int>(':') ||
         !(oli = strchr(ostr, optopt))) {
         /*
          * if the user didn't specify '-' as an option,
          * assume it means EOF.
          */
-        if (optopt == (int)'-')
-            return(EOF);
+        if (optopt == static_cast<int>('-'))
+            return EOF;
         if (!*place)
             ++optind;
         if (opterr) {
@@ -91,10 +91,10 @@ int getopt(int nargc, const char** nargv, const char* ostr)
             (void)fprintf(stderr, "%s: illegal option -- %c\n",
                 p, optopt);
         }
-        return(BADCH);
+        return BADCH;
     }
     if (*++oli != ':') {            /* don't need argument */
-        optarg = NULL;
+        optarg = nullptr;
         if (!*place)
             ++optind;
     }
@@ -111,12 +111,12 @@ int getopt(int nargc, const char** nargv, const char* ostr)
                 (void)fprintf(stderr,
                     "%s: option requires an argument -- %c\n",
                     p, optopt);
-            return(BADCH);
+            return BADCH;
         }
         else                /* white space */
             optarg = nargv[optind];
         place = EMSG;
         ++optind;
     }
-    return(optopt);             /* dump back option letter */
+    return optopt;             /* dump back option letter */
 }

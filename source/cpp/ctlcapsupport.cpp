@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -25,14 +25,14 @@
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
-using namespace std;
+
 using namespace dynarithmic;
 
 ////////////////////////////////////////////////////////////////////////////////
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsCapSupported(DTWAIN_SOURCE Source, LONG lCapability)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCapability))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     if (p)
     {
@@ -44,7 +44,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsCapSupported(DTWAIN_SOURCE Source, LONG lCapab
         DTWAINScopedLogControllerExclude sLogger(DTWAIN_LOG_ERRORMSGBOX);
 
         // Use the cap information from the arrays
-        CTL_StringType strProdName = p->GetProductName();
+        const auto strProdName = p->GetProductName();
 
         // Find where capability setting is
         int nWhere;
@@ -56,17 +56,17 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsCapSupported(DTWAIN_SOURCE Source, LONG lCapab
 
         // Check if cached (means that cap is supported and was already queried
         // for all information
-        if (p->IsCapabilityCached((TW_UINT16)lCapability))
+        if (p->IsCapabilityCached(static_cast<TW_UINT16>(lCapability)))
         {
             // Get the cap array values
-            CTL_SourceCapInfo& Info = pHandle->m_aSourceCapInfo[nWhere];
+            const CTL_SourceCapInfo& Info = pHandle->m_aSourceCapInfo[nWhere];
             CTL_CapInfoArrayPtr pArray = std::get<1>(Info);
-            CTL_EnumCapability nCap = (CTL_EnumCapability)lCapability;
+            const CTL_EnumCapability nCap = static_cast<CTL_EnumCapability>(lCapability);
             if (pArray->find(nCap) != pArray->end())
                 LOG_FUNC_EXIT_PARAMS(true)
             else
             {
-                DTWAIN_CollectCapabilityInfo(p, (TW_UINT16)nCap, *pArray);
+                DTWAIN_CollectCapabilityInfo(p, static_cast<TW_UINT16>(nCap), *pArray);
                 LOG_FUNC_EXIT_PARAMS(true)
             }
         }
@@ -91,7 +91,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsCapSupported(DTWAIN_SOURCE Source, LONG lCapab
 
             // Get all the information about the capability.
             std::for_each(pArray.begin(), pArray.end(), [&](TW_UINT16 val)
-            {dynarithmic::DTWAIN_CacheCapabilityInfo(p, pHandle, static_cast<TW_UINT16>(val)); });
+            {
+                DTWAIN_CacheCapabilityInfo(p, pHandle, static_cast<TW_UINT16>(val)); });
 
             // We have retrieved all the capability information
             p->SetRetrievedAllCaps(true);
@@ -99,13 +100,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsCapSupported(DTWAIN_SOURCE Source, LONG lCapab
 
         // Now test if the capability is supported
         CapList& pArray = p->GetCapSupportedList();
-        bool bReturnVal = false;
-        auto it = pArray.find(static_cast<TW_UINT16>(lCapability));
+        const auto it = pArray.find(static_cast<TW_UINT16>(lCapability));
         if (it != pArray.end())
         {
             // supported, so return true
-            bReturnVal = true;
-            LOG_FUNC_EXIT_PARAMS(bReturnVal)
+            LOG_FUNC_EXIT_PARAMS(true)
         }
         // cap not supported, so add to unsupported list
         p->AddCapToUnsupportedList(static_cast<TW_UINT16>(lCapability));

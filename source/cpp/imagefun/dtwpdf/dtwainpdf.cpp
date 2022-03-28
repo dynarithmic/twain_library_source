@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -42,7 +42,6 @@
 #include "dtwainpdf.h"
 #include "crc32_aux.h"
 #include "jpeglib.h"
-#include "winbit32.h"
 #undef Z_PREFIX
 #include "zlib.h"
 #ifdef __MSL__
@@ -54,24 +53,23 @@
 #pragma warning (push)
 #pragma  warning (disable : 4702)
 #endif
-#include <md5-global.h>
 #include <md5c.h>
 #include "a85encode.h"
 #include "ahexencode.h"
 #include "flateencode.h"
 #include "pdfencrypt.h"
-#include "dtwain_verinfo.h"
 #include "tiffio.h"
+#include "dtwain_float_utils.h"
 #ifdef _MSC_VER
 #pragma warning (pop)
 #endif
 #undef min
 #undef max
-#include <math.h>
+#include <cmath>
+#include <MD5Checksum.h>
 #define D_TO_R_SCALEFACTOR (3.14159265358979323846 / 180.0)
 #define DegreesToRadians(x) ((x) * D_TO_R_SCALEFACTOR)
 
-using namespace std;
 using namespace dynarithmic;
 
 // Add DTWAIN stuff if internal to DTWAIN32.DLL
@@ -84,21 +82,19 @@ using namespace dynarithmic;
     #define WRITE_TO_LOG()
 #endif
 
-#define FLOAT_DELTA  (+1.0e-8)
-#define FLOAT_CLOSE(x,y) (fabs((x) - (y)) <= FLOAT_DELTA)
 #define EXTRA_OBJECTS   3
 
-vector<unsigned char> MD5Hash (unsigned char *input);
-static string GetPDFDate();
+std::vector<unsigned char> MD5Hash (unsigned char *input);
+static std::string GetPDFDate();
 static std::string CreateIDString(const std::string& sName, std::string& ID1, std::string& ID2);
 static std::string HexString(unsigned char *input, int length=-1);
 static std::string MakeCompatiblePDFString(const std::string& sString);
 std::string GetSystemTimeInMilliseconds();
 static bool IsRenderModeStroked(int rendermode);
 
-static int EncodeVectorStream(const vector<char>& InputStream,
+static int EncodeVectorStream(const std::vector<char>& InputStream,
                                 size_t InputLength,
-                                vector<char>& OutStream,
+                                std::vector<char>& OutStream,
                                 PdfDocument::CompressTypes compresstype= PdfDocument::FLATE_COMPRESS);
 
 typedef std::array<std::array<double, 3>, 3> Matrix3_3;
@@ -127,19 +123,19 @@ tsize_t ImageObject::libtiffReadProc (thandle_t /*fd*/, tdata_t /*buf*/, tsize_t
 }
 
 
-vector<char> ImageObject::m_vImgStream;
+std::vector<char> ImageObject::m_vImgStream;
 unsigned int ImageObject::m_sTiffOffset;
 tsize_t ImageObject::libtiffWriteProc (thandle_t /*fd*/, tdata_t buf, tsize_t nsize)
 {
     // libtiff will try to write an 8 byte header into the tiff file. We need
     // to ignore this because PDF does not use it...
-    if ((nsize == 8) && (((char *) buf)[0] == 'I') && (((char *) buf)[1] == 'I')
-      && (((char *) buf)[2] == 42))
+    if (nsize == 8 && static_cast<char*>(buf)[0] == 'I' && static_cast<char*>(buf)[1] == 'I'
+      && static_cast<char*>(buf)[2] == 42)
     {
       // Skip the header -- little endian
     }
-    else if ((nsize == 8) && (((char *) buf)[0] == 'M') &&
-       (((char *) buf)[1] == 'M') && (((char *) buf)[2] == 42))
+    else if (nsize == 8 && static_cast<char*>(buf)[0] == 'M' &&
+       static_cast<char*>(buf)[1] == 'M' && static_cast<char*>(buf)[2] == 42)
     {
       // Skip the header -- big endian
     }
@@ -147,7 +143,7 @@ tsize_t ImageObject::libtiffWriteProc (thandle_t /*fd*/, tdata_t buf, tsize_t ns
     {
 
         // Have we done anything yet?
-        if ( m_vImgStream.size() == 0 )
+        if ( m_vImgStream.empty() )
             m_vImgStream.resize( nsize );
 
         // Otherwise, we need to grow the memory buffer
@@ -160,7 +156,7 @@ tsize_t ImageObject::libtiffWriteProc (thandle_t /*fd*/, tdata_t buf, tsize_t ns
         memcpy (&m_vImgStream[m_sTiffOffset], buf, nsize);
         m_sTiffOffset += static_cast<unsigned>(nsize);
     }
-    return (nsize);
+    return nsize;
 }
 
 
@@ -184,13 +180,13 @@ toff_t ImageObject::libtiffSizeProc (thandle_t /*fd*/)
 
 // Helper functions
 // This is the MD5 function
-vector<unsigned char> MD5Hash (unsigned char *input)
+std::vector<unsigned char> MD5Hash (unsigned char *input)
 {
   MD5_CTX context;
-  vector<unsigned char> digest(16);
+  std::vector<unsigned char> digest(16);
 
   MD5Init (&context);
-  MD5Update (&context, input, (unsigned int)strlen((const char *)input));
+  MD5Update (&context, input, static_cast<unsigned>(strlen(reinterpret_cast<const char*>(input))));
   MD5Final (digest.data(), &context);
 
   return digest;
@@ -200,8 +196,8 @@ std::string HexString(unsigned char *input, int length/*=-1*/)
 {
     std::string sOut;
     if ( length == -1 )
-        length = (int)strlen((const char *)input);
-    ASCIIHexEncode(std::string((const char *)input, length), sOut);
+        length = static_cast<int>(strlen(reinterpret_cast<const char*>(input)));
+    ASCIIHexEncode(std::string(reinterpret_cast<const char*>(input), length), sOut);
     if (!sOut.empty())
         sOut.pop_back();
     return sOut;
@@ -211,14 +207,14 @@ std::string CreateIDString(const std::string& sName, std::string& ID1, std::stri
 {
     char szBuf[1024];
 
-    std::string sNow = GetPDFDate();
+    const std::string sNow = GetPDFDate();
     WRITE_TO_LOG()
     sprintf(szBuf, "%s-%s", sNow.c_str(), sName.c_str());
     WRITE_TO_LOG()
-    vector<unsigned char> hash = MD5Hash((unsigned char *)szBuf);
+    std::vector<unsigned char> hash = MD5Hash(reinterpret_cast<unsigned char*>(szBuf));
     hash.resize(32,'\0');
     WRITE_TO_LOG()
-    vector<unsigned char> version = MD5Hash((unsigned char *)"001");
+    std::vector<unsigned char> version = MD5Hash(reinterpret_cast<unsigned char*>("001"));
     version.resize(32,'\0');
     WRITE_TO_LOG()
     std::string hexHash;
@@ -239,11 +235,11 @@ std::string CreateIDString(const std::string& sName, std::string& ID1, std::stri
     return szBuf;
 }
 
-static string MakeLandscapeMediaBox(const string& sBox)
+static std::string MakeLandscapeMediaBox(const std::string& sBox)
 {
     double f1[4];
     char szBuf[50];
-    string sStart = sBox.substr(1, sBox.length() - 2);
+    std::string sStart = sBox.substr(1, sBox.length() - 2);
     sscanf(sStart.c_str(), "%lf%lf%lf%lf", &f1[0], &f1[1], &f1[2], &f1[3]);
     sprintf(szBuf, "%-5.2lf %-5.2lf %-5.2lf %-5.2lf", f1[0], f1[1], f1[3], f1[2]);
     sStart = "[";
@@ -254,7 +250,7 @@ static string MakeLandscapeMediaBox(const string& sBox)
 
 std::string MakeCompatiblePDFString(const PDFEncryption::UCHARArray& u)
 {
-    std::string sTemp((const char *)u.data(), u.size());
+    const std::string sTemp(reinterpret_cast<const char*>(u.data()), u.size());
     return MakeCompatiblePDFString(sTemp);
 }
 
@@ -263,16 +259,16 @@ std::string MakeCompatiblePDFString(const std::string& sString)
     // Search for forward slash and replace with two forward slashes
     std::string sNew;
     sNew.reserve(100);
-    string::difference_type nEscapes[5] = {0};
+    std::string::difference_type nEscapes[5] = {0};
     unsigned char nChars[] = { 0x09, 0x0d, 0x0a, 0x0c, 0x08 };
 
     PDFEncryption::UCHARArray nEscapeChar(5);
-    std::copy(nChars, nChars + 5, nEscapeChar.begin());
+    std::copy_n(nChars, 5, nEscapeChar.begin());
 
     const char *nEscapeString[] = { "\\t", "\\r", "\\n", "\\f", "\\b" };
 
-    string::difference_type nForward = std::count(sString.begin(), sString.end(), '\\');
-    string::difference_type sum = 0;
+    const std::string::difference_type nForward = std::count(sString.begin(), sString.end(), '\\');
+    std::string::difference_type sum = 0;
 
     for ( int i = 0; i < 5; ++i )
     {
@@ -283,22 +279,20 @@ std::string MakeCompatiblePDFString(const std::string& sString)
     if ( nForward + sum > 0 )
     {
         std::string::const_iterator it1 = sString.begin();
-        std::string::const_iterator it2 = sString.end();
-        PDFEncryption::UCHARArray::iterator found;
+        const std::string::const_iterator it2 = sString.end();
 
-        bool addit;
         while (it1 != it2 )
         {
-            addit = true;
+            bool addit = true;
             if ( *it1 == '\\' )
                 sNew += '\\';
             else
             {
-                found = std::find(nEscapeChar.begin(), nEscapeChar.end(), *it1);
+                auto found = std::find(nEscapeChar.begin(), nEscapeChar.end(), *it1);
 
                 if ( found != nEscapeChar.end() )
                 {
-                    int dist = (int)std::distance(nEscapeChar.begin(), found);
+                    const int dist = static_cast<int>(std::distance(nEscapeChar.begin(), found));
                     sNew += nEscapeString[dist];
                     addit = false;
                 }
@@ -312,15 +306,15 @@ std::string MakeCompatiblePDFString(const std::string& sString)
         sNew = sString;
 
     // balances parentheses
-    int nLeft = (int)std::count(sNew.begin(), sNew.end(), '(');
-    int nRight = (int)std::count(sNew.begin(), sNew.end(), ')');
+    const int nLeft = static_cast<int>(std::count(sNew.begin(), sNew.end(), '('));
+    const int nRight = static_cast<int>(std::count(sNew.begin(), sNew.end(), ')'));
     if ( nLeft == nRight )
         return sNew;
 
     // prepend all parens with / characters
     std::string sNew2;
     std::string::const_iterator it3 = sNew.begin();
-    std::string::const_iterator it4 = sNew.end();
+    const std::string::const_iterator it4 = sNew.end();
     while (it3 != it4 )
     {
         if (*it3 == '(' || *it3 == ')')
@@ -337,17 +331,17 @@ static int NoCompress(const std::string& inData, std::string& outData)
     return 1;
 }
 
-static int EncodeVectorStream(const vector<char>& InputStream,
-                              size_t InputLength,vector<char>& OutStream,PdfDocument::CompressTypes compresstype)
+static int EncodeVectorStream(const std::vector<char>& InputStream,
+                              size_t InputLength,std::vector<char>& OutStream,PdfDocument::CompressTypes compresstype)
 {
 
     static std::unordered_map<PdfDocument::CompressTypes, std::function<int(const std::string&, std::string&)>>
-                compress_fn = { { PdfDocument::NO_COMPRESS, ::NoCompress },
-                                { PdfDocument::A85_COMPRESS, ::ASCII85Encode },
-                                { PdfDocument::AHEX_COMPRESS, ::ASCIIHexEncode },
-                                { PdfDocument::FLATE_COMPRESS, ::FlateEncode}, };
+                compress_fn = { { PdfDocument::NO_COMPRESS, NoCompress},
+                                { PdfDocument::A85_COMPRESS, ASCII85Encode},
+                                { PdfDocument::AHEX_COMPRESS, ASCIIHexEncode},
+                                { PdfDocument::FLATE_COMPRESS, FlateEncode}, };
 
-        auto fnCall = compress_fn.find(compresstype);
+    const auto fnCall = compress_fn.find(compresstype);
         if (fnCall != compress_fn.end())
         {
             std::string sTemp;
@@ -361,12 +355,10 @@ static int EncodeVectorStream(const vector<char>& InputStream,
     return 0;
 }
 
-static string MakeDate(int year, int month, int day, int hour, int minutes,
-                            int seconds)
+static std::string MakeDate(int year, int month, int day, int hour, int minutes,int seconds)
 {
-
     // Get current utc time
-    boost::posix_time::ptime timeutc =
+    const boost::posix_time::ptime timeutc =
         boost::posix_time::second_clock::universal_time();
 
     // get time zone difference
@@ -388,23 +380,22 @@ static string MakeDate(int year, int month, int day, int hour, int minutes,
 
 std::string GetSystemTimeInMilliseconds()
 {
-    boost::posix_time::ptime time_t_epoch(boost::gregorian::date(1601, 1, 1));
-    auto systimex = boost::get_system_time();
-    boost::posix_time::time_duration diff = systimex - time_t_epoch;
-    auto mill = diff.total_milliseconds() * 10000LL;
-    CTL_StringStreamA strm;
+    const boost::posix_time::ptime time_t_epoch(boost::gregorian::date(1601, 1, 1));
+    const auto systimex = boost::get_system_time();
+    const boost::posix_time::time_duration diff = systimex - time_t_epoch;
+    const auto mill = diff.total_milliseconds() * 10000LL;
+    StringStreamOutA strm;
     strm << mill;
     return strm.str();
 }
 
-static string GetPDFDate()
+static std::string GetPDFDate()
 {
-    struct tm *timenow;
     time_t curtime;
 
     // Get the current time...
-    curtime = time (NULL);
-    timenow = (struct tm *) localtime (&curtime);
+    curtime = time (nullptr);
+    const struct tm* timenow = static_cast<tm*>(localtime(&curtime));
 
     return MakeDate (1900 + timenow->tm_year,
              timenow->tm_mon + 1,
@@ -414,7 +405,7 @@ static string GetPDFDate()
 };
 
 
-int PDFObject::EncryptBlock(const std::string& sIn, std::string& sOut, int objectnum, int gennum)
+int PDFObject::EncryptBlock(const std::string& sIn, std::string& sOut, int objectnum, int gennum) const
 {
     PdfDocument *pParent = GetParent();
     if ( !pParent )
@@ -436,11 +427,15 @@ int PDFObject::EncryptBlock(const std::string& sIn, std::string& sOut, int objec
 PdfDocument::PdfDocument() :
     m_byteOffset(0),
     m_sPDFVer("1.3"),
-    m_sPDFHeader("DTWAIN PDF, 2019"),
+    m_sPDFHeader("DTWAIN PDF, 2022"),
     m_sCurSysTime(GetSystemTimeInMilliseconds()),
     m_nPolarity(DTWAIN_PDFPOLARITY_POSITIVE),
+    m_nCurContentsObj(0),
+    m_nCurObjNum(0),
+    m_nCurPage(0),
     m_smediabox("[0 0 612 792]"),
     m_Orientation(DTWAIN_PDF_PORTRAIT),
+    m_mediaMap(CTL_TwainDLLHandle::GetPDFMediaMap()),
     m_xscale(0),
     m_yscale(0),
     m_scaletype(DTWAIN_PDF_NOSCALING),
@@ -452,6 +447,7 @@ PdfDocument::PdfDocument() :
     m_sTitle("(None)"),
     m_sSubject("(None)"),
     m_sKeywords("(None)"),
+    m_nProcSetObj(0),
     m_nFontObj(0),
     m_bProcSetObjEstablished(false),
     m_bFontObjEstablished(false),
@@ -465,44 +461,38 @@ PdfDocument::PdfDocument() :
     m_bIsEncrypted(false),
     m_bASCIICompression(false),
     m_bIsNoCompression(false),
-    m_nCurContentsObj(0),
-    m_nCurObjNum(0),
-    m_nCurPage(0),
-    m_nProcSetObj(0),
-    CurFontRefNum(START_FONTREF_NUM),
-    m_mediaMap(CTL_TwainDLLHandle::GetPDFMediaMap())
+    CurFontRefNum(START_FONTREF_NUM)
 {
-    auto iter = m_mediaMap.find(DTWAIN_FS_USLETTER);
+    const auto iter = m_mediaMap.find(DTWAIN_FS_USLETTER);
     if (iter != m_mediaMap.end())
         m_smediabox = iter->second.second;
 }
 
 void PdfDocument::SetPDFVersion(int major, int minor)
 {
-    ostringstream strm;
+    std::ostringstream strm;
     strm << major << "." << minor;
     m_sPDFVer = strm.str();
 }
 
 char converttobin(char ch)
 {
-    return (char)(256 - ch);
+    return static_cast<char>(256 - ch);
 }
 
 
-string PdfDocument::GetBinaryHeader() const
+std::string PdfDocument::GetBinaryHeader() const
 {
-    string sBinHeader;
-    sBinHeader = m_sPDFHeader;
-    transform(sBinHeader.begin(), sBinHeader.end(), sBinHeader.begin(), converttobin);
+    std::string sBinHeader = m_sPDFHeader;
+    std::transform(sBinHeader.begin(), sBinHeader.end(), sBinHeader.begin(), converttobin);
     return sBinHeader;
 }
 
 bool PdfDocument::WriteHeaderInfo()
 {
-    ostringstream strm;
-    string sOut;
-    string binheader = GetBinaryHeader();
+    std::ostringstream strm;
+    std::string sOut;
+    std::string binheader = GetBinaryHeader();
 
     if ( IsASCIICompressed() )
         ASCIIHexEncode(binheader, sOut);
@@ -510,24 +500,24 @@ bool PdfDocument::WriteHeaderInfo()
         sOut = std::move(binheader);
 
     strm << "%PDF-" << GetPDFVersion() << "\n" << sOut << "\r";
-    string s = strm.str();
-    m_byteOffset = (int)s.length();
+    const std::string s = strm.str();
+    m_byteOffset = static_cast<int>(s.length());
     m_outFile.write(s.c_str(), s.length());
     return true;
 }
 
 
-bool PdfDocument::OpenNewPDFFile(const CTL_StringType& sFile)
+bool PdfDocument::OpenNewPDFFile(CTL_StringType sFile)
 {
     WRITE_TO_LOG()
     // Open the file here
     {
         CTL_StringStreamType strm;
         strm << _T("File name to be saved: ") << sFile;
-        CTL_TwainAppMgr::WriteLogInfo( strm.str() );
+        CTL_TwainAppMgr::WriteLogInfo(strm.str());
     }
 
-    m_outFile.open(StringConversion::Convert_Native_To_Ansi(sFile).c_str(), ios::binary|ios::out);
+    m_outFile.open(sFile, std::ios::binary|std::ios::out);
     WRITE_TO_LOG()
     if ( !m_outFile )
         return false;
@@ -553,7 +543,7 @@ void PdfDocument::SetSearchableText(const std::string& /*s*/)
 
 bool RemoveCurrentText(const PDFTextElement* element)
 {
-    return ((*element).displayFlags & DTWAIN_PDFTEXT_CURRENTPAGE)?true:false;
+    return (*element).displayFlags & DTWAIN_PDFTEXT_CURRENTPAGE?true:false;
 }
 
 void PdfDocument::RemoveTempTextElements()
@@ -561,12 +551,12 @@ void PdfDocument::RemoveTempTextElements()
     m_vPDFText.clear();
 }
 
-bool PdfDocument::WritePage(const CTL_StringType& sImgFileName)
+bool PdfDocument::WritePage(CTL_StringType sImgFileName)
 {
     m_nCurPage++;
     char szBuf[100];
-    sprintf(szBuf, "Img%d", m_nCurPage);
-    string actualFileName = szBuf;
+    sprintf(szBuf, "Img%u", m_nCurPage);
+    std::string actualFileName = szBuf;
     PageObject page(m_nCurObjNum);
     page.AssignParent(this);
 
@@ -593,9 +583,9 @@ bool PdfDocument::WritePage(const CTL_StringType& sImgFileName)
     // Create the thumbnail
     char szBufThumb[100];
     ImageObject imgObjThumb(m_nCurObjNum + 4, m_sThumbnailFileName);
-    sprintf(szBufThumb, "ImgThumb%d", m_nCurPage);
+    sprintf(szBufThumb, "ImgThumb%u", m_nCurPage);
     bool bIsDuplicateThumb = false;
-    unsigned long nObjNumThumb = false;
+    unsigned long nObjNumThumb = 0;
     bool bIsThumbnail = !m_sThumbnailFileName.empty();
     if ( bIsThumbnail )
     {
@@ -614,7 +604,7 @@ bool PdfDocument::WritePage(const CTL_StringType& sImgFileName)
 
 
     // Determine media box
-    string mbox = m_smediabox;
+    std::string mbox = m_smediabox;
     double realwidth = width;
     double realheight = height;
     if ( !m_bUseVariableMediaBox )
@@ -624,11 +614,11 @@ bool PdfDocument::WritePage(const CTL_StringType& sImgFileName)
 
         if ( dpix > 1 )
         {
-            realwidth = ((double)width / (double)dpix) * 72.0;
+            realwidth = static_cast<double>(width) / static_cast<double>(dpix) * 72.0;
         }
         if ( dpiy > 1)
         {
-            realheight = ((double)height / (double)dpiy) * 72.0;
+            realheight = static_cast<double>(height) / static_cast<double>(dpiy) * 72.0;
         }
 
         switch(m_scaletype)
@@ -642,7 +632,7 @@ bool PdfDocument::WritePage(const CTL_StringType& sImgFileName)
             case DTWAIN_PDF_FITPAGE:
             {
                 double f1[4];
-                string sStart = mbox.substr(1, mbox.length() - 2);
+                std::string sStart = mbox.substr(1, mbox.length() - 2);
                 sscanf(sStart.c_str(), "%lf%lf%lf%lf", &f1[0], &f1[1], &f1[2], &f1[3]);
                 cObj.SetScaling(f1[2], f1[3]);
             }
@@ -670,7 +660,7 @@ bool PdfDocument::WritePage(const CTL_StringType& sImgFileName)
             realwidth *= m_xscale;
             realheight *= m_yscale;
         }
-        sprintf(szBuf, "[0 0 %d %d]", (int)realwidth, (int)realheight);
+        sprintf(szBuf, "[0 0 %d %d]", static_cast<int>(realwidth), static_cast<int>(realheight));
         mbox = szBuf;
         cObj.SetScaling(width, height);
     }
@@ -741,7 +731,7 @@ bool PdfDocument::WritePage(const CTL_StringType& sImgFileName)
 
     unsigned int maxFontObjectNum = GetMaxFontRefNumber();
     m_nCurObjNum = page.GetMaxObjectNum() + 1;
-    m_nCurObjNum = max(maxFontObjectNum + 1, m_nCurObjNum);
+    m_nCurObjNum = (std::max)(maxFontObjectNum + 1, m_nCurObjNum);
     return true;
 }
 
@@ -762,11 +752,11 @@ unsigned int PdfDocument::GetMaxFontRefNumber() const
 
 bool PdfDocument::WriteObject(PDFObject* pObj)
 {
-    ostringstream strm;
+    std::ostringstream strm;
     // Write the object number
-    int nObjectNum = pObj->GetObjectNum();
+    const int nObjectNum = pObj->GetObjectNum();
     strm << nObjectNum << " 0 obj\n" << pObj->GetExtraInfo();
-    string s;
+    std:: string s;
     std::string strOut;
     if ( pObj->IsEncrypted() )
     {
@@ -777,11 +767,11 @@ bool PdfDocument::WriteObject(PDFObject* pObj)
         s = strm.str() + pObj->GetStreamContents() + "\n" + "endobj\n";
     m_outFile.write(s.c_str(), s.length());
     // Remember the old byte offset for this object
-    ObjectInfo oi;
+    ObjectInfo oi = {};
     oi.ObjNum = nObjectNum;
     oi.ObjOffset = m_byteOffset;
     m_vAllOffsets.push_back(oi);
-    m_byteOffset += (unsigned long)s.length();
+    m_byteOffset += static_cast<unsigned long>(s.length());
     return true;
 }
 
@@ -821,13 +811,13 @@ void PdfDocument::SortObjects()
 
 void PdfDocument::WriteAllFontObjects()
 {
-    FontNumberToFontInfoMap::iterator itCur = m_mapFontNumbers.begin();
-    FontNumberToFontInfoMap::iterator itEnd = m_mapFontNumbers.end();
+    auto itCur = m_mapFontNumbers.begin();
+    const FontNumberToFontInfoMap::iterator itEnd = m_mapFontNumbers.end();
     FontObject fobj(-1);
     while (itCur != itEnd)
     {
         fobj.SetObjectNum(itCur->second.refNum);
-        fobj.SetFontName(StringConversion::Convert_Native_To_Ansi(itCur->second.m_fontName));
+        fobj.SetFontName(itCur->second.m_fontName);
         fobj.ComposeObject();
         WriteObject(&fobj);
         ++itCur;
@@ -836,12 +826,13 @@ void PdfDocument::WriteAllFontObjects()
 
 bool PdfDocument::IsTextElementOnPage(CTL_TEXTELEMENTNAKEDPTRLIST::const_iterator it) const
 {
-    unsigned int pageFlag = (*it)->displayFlags;
-    bool isEvenPage = ((m_nCurPage) %2 == 0);
+    const unsigned int pageFlag = (*it)->displayFlags;
+    const bool isEvenPage = m_nCurPage %2 == 0;
     switch(pageFlag & 0x0000FFFF)
     {
         case DTWAIN_PDFTEXT_ALLPAGES:
         case DTWAIN_PDFTEXT_CURRENTPAGE:
+        case DTWAIN_PDFTEXT_LASTPAGE:
             return true;
 
         case DTWAIN_PDFTEXT_EVENPAGES:
@@ -851,10 +842,7 @@ bool PdfDocument::IsTextElementOnPage(CTL_TEXTELEMENTNAKEDPTRLIST::const_iterato
             return !isEvenPage;
 
         case DTWAIN_PDFTEXT_FIRSTPAGE:
-            return (m_nCurPage == 1);
-
-        case DTWAIN_PDFTEXT_LASTPAGE:
-            return true;
+            return m_nCurPage == 1;
     }
     return false;
 }
@@ -862,34 +850,32 @@ bool PdfDocument::IsTextElementOnPage(CTL_TEXTELEMENTNAKEDPTRLIST::const_iterato
 void PdfDocument::CreateFontNumbersFromTextElements()
 {
     // Create the map of font reference numbers, given all of the text references.
-    int nSize = (int)m_vPDFText.size();
-    CTL_TEXTELEMENTNAKEDPTRLIST::iterator itTextElement = m_vPDFText.begin();
-    int curFontNum = (int)m_mapFontNumbers.size() + 1;
+    const int nSize = static_cast<int>(m_vPDFText.size());
+    auto itTextElement = m_vPDFText.begin();
+    int curFontNum = static_cast<int>(m_mapFontNumbers.size()) + 1;
     for (int i = 0; i < nSize; ++i, ++itTextElement )
     {
         // Check if text should show up on this page
         if ( !IsTextElementOnPage(itTextElement))
             continue;
 
-        PDFTextElement* tElement = (*itTextElement);
+        PDFTextElement* tElement = *itTextElement;
 
         // Check if font is in set
-        FontNameToFontInfoMap::iterator it =
-            m_mapFontNames.find(tElement->m_font.m_fontName);
+        auto it = m_mapFontNames.find(tElement->m_font.m_fontName);
 
         if ( it == m_mapFontNames.end())
         {
             // Not found, so add it to set and to map
             PDFFont newFont(tElement->m_font.m_fontName, -1, curFontNum);
             newFont.setUsedOnPage(true);
-            m_mapFontNames.insert(make_pair(tElement->m_font.m_fontName, newFont));
-            m_mapFontNumbers.insert(make_pair(curFontNum, newFont));
+            m_mapFontNames.insert({tElement->m_font.m_fontName, newFont});
+            m_mapFontNumbers.insert({curFontNum, newFont});
             tElement->m_font.fontNum = curFontNum;
             ++curFontNum;
         }
         else
         {
-            //            m_vPDFText[i].m_font.refNum = m_mapFontRef[it->second].refNum;
             // Get the font number from font name map
             tElement->m_font.fontNum = it->second.fontNum;
             m_mapFontNumbers[it->second.fontNum].setUsedOnPage(true);
@@ -905,8 +891,8 @@ bool SortFontsByNumber(const PDFFont& left, const PDFFont& right)
 
 std::string PdfDocument::GenerateFontDictionary(int firstObjNum, int& nextObjNum)
 {
-    FontNumberToFontInfoMap::iterator itCur = m_mapFontNumbers.begin();
-    FontNumberToFontInfoMap::iterator itEnd = m_mapFontNumbers.end();
+    auto itCur = m_mapFontNumbers.begin();
+    auto itEnd = m_mapFontNumbers.end();
 
     // Resolve the font numbers and object numbers now.
     int curObjNum = firstObjNum;
@@ -935,23 +921,6 @@ std::string PdfDocument::GenerateFontDictionary(int firstObjNum, int& nextObjNum
 
     itCur = m_mapFontNumbers.begin();
     itEnd = m_mapFontNumbers.end();
-/*    std::vector<PDFFont> theFonts(m_mapFontNames.size());
-    int i = 0;
-
-    // Get the list of fonts
-    while (itCur != itEnd)
-    {
-        theFonts[i] = itCur->second;
-        ++itCur;
-        ++i;
-    }
-
-    // sort by number
-    std::sort(theFonts.begin(), theFonts.end(), SortFontsByNumber);
-    std::vector<PDFFont>::iterator itv1 = theFonts.begin();
-    std::vector<PDFFont>::iterator itv2 = theFonts.end();
-*/
-    char szBuf[200];
     curObjNum = firstObjNum;
     sDict += "   /Font << ";
     bool bTextExists = false;
@@ -959,6 +928,7 @@ std::string PdfDocument::GenerateFontDictionary(int firstObjNum, int& nextObjNum
     {
         if ( itCur->second.isUsedOnPage() )
         {
+            char szBuf[200];
             sprintf(szBuf, "/F%d %d 0 R ", itCur->second.fontNum, itCur->second.refNum);
             sDict += szBuf;
             bTextExists = true;
@@ -986,7 +956,7 @@ bool PdfDocument::EndPDFCreation()
     // Write the pages object now
     m_pagesObj.ComposeObject();
     WriteObject(&m_pagesObj);
-    m_nCurObjNum += (int)m_mapFontRef.size();
+    m_nCurObjNum += static_cast<int>(m_mapFontRef.size());
     int nEncryptObjectNum = m_nCurObjNum;
     if ( IsEncrypted() )
     {
@@ -1032,9 +1002,7 @@ bool PdfDocument::EndPDFCreation()
 
     WriteObject(&Info);
 
-       // will do xref stuff here
-    char szBuf[50];
-    ostringstream strmXRef;
+    std::ostringstream strmXRef;
     size_t nObjects = m_vAllOffsets.size();
     size_t nTotalObjects = nObjects + 1;
     strmXRef << "xref\n0 " << nTotalObjects << "\n";
@@ -1043,6 +1011,7 @@ bool PdfDocument::EndPDFCreation()
     SortObjects();
     for ( size_t i = 0; i < nObjects; ++i)
     {
+        char szBuf[50];
         sprintf(szBuf,"%010d", static_cast<int>(m_vAllOffsets[i].ObjOffset));
         strmXRef << szBuf << " 00000 n \n";
     }
@@ -1053,7 +1022,7 @@ bool PdfDocument::EndPDFCreation()
         strmXRef << "/Encrypt " << nEncryptObjectNum << " 0 R\n";
     strmXRef << ">>\n";
     strmXRef << "\nstartxref\n" << m_byteOffset << "\n%%EOF";
-    string sXref = strmXRef.str();
+    std::string sXref = strmXRef.str();
 
     m_outFile << sXref;
 
@@ -1071,7 +1040,7 @@ void PdfDocument::SetMediaBox(int mediatype)
         m_bUseVariableMediaBox = true;
         return;
     }
-    MediaBoxMap::iterator it = m_mediaMap.find(mediatype);
+    const MediaBoxMap::iterator it = m_mediaMap.find(mediatype);
     if ( it != m_mediaMap.end())
         SetMediaBox((*it).second.second);
     m_bUseVariableMediaBox = false;
@@ -1080,13 +1049,13 @@ void PdfDocument::SetMediaBox(int mediatype)
 void PagesObject::ComposeObject()
 {
     SetContents("<< /Type /Pages\n   /Kids [");
-    size_t nSize = KidsArrayObjects.size();
+    const size_t nSize = KidsArrayObjects.size();
     char szBuf[100];
     for ( size_t i = 0; i < nSize; i++ )
     {
         sprintf(szBuf,"%d 0 R ", KidsArrayObjects[i]);
         AppendContents(szBuf);
-        if ( (i % 10 == 0) && i > 0 )
+        if ( i % 10 == 0 && i > 0 )
             AppendContents("\n          ");
     }
     AppendContents("]\n");
@@ -1163,8 +1132,8 @@ void EncryptionObject::ComposeObject()
     // Now for the owner and user passwords
     std::string enc1;
     std::string enc2;
-    PDFEncryption::UCHARArray enc1Array = GetParent()->GetEncryptionEngine().GetOwnerKey();
-    PDFEncryption::UCHARArray enc2Array = GetParent()->GetEncryptionEngine().GetUserKey();
+    const PDFEncryption::UCHARArray enc1Array = GetParent()->GetEncryptionEngine().GetOwnerKey();
+    const PDFEncryption::UCHARArray enc2Array = GetParent()->GetEncryptionEngine().GetUserKey();
     enc1.append(reinterpret_cast<const char *>(enc1Array.data()), 32);
     enc2.append(reinterpret_cast<const char *>(enc2Array.data()), 32);
     AppendContents("/O (");
@@ -1184,10 +1153,10 @@ void EncryptionObject::ComposeObject()
 
 bool IsRenderModeStroked(int rendermode)
 {
-    return (rendermode == 1 ||
+    return rendermode == 1 ||
         rendermode == 2 ||
         rendermode == 5 ||
-        rendermode == 6);
+        rendermode == 6;
 }
 
 std::string PDFTextElement::GetPDFTextString() const
@@ -1200,9 +1169,9 @@ std::string PDFTextElement::GetPDFTextString() const
     sText += szBuf;
 
     // Get the color
-    double red = (double)GetRValue(colorRGB) / 255.0;
-    double green = (double)GetGValue(colorRGB) / 255.0;
-    double blue = (double)GetBValue(colorRGB) / 255.0;
+    const double red = static_cast<double>(GetRValue(colorRGB)) / 255.0;
+    const double green = static_cast<double>(GetGValue(colorRGB)) / 255.0;
+    const double blue = static_cast<double>(GetBValue(colorRGB)) / 255.0;
     sprintf(szBuf, "\n%4.2lf %4.2lf %4.2lf rg", red, green, blue);
     sText += szBuf;
 
@@ -1239,7 +1208,7 @@ std::string PDFTextElement::GetPDFTextString() const
         sText += szBuf;
     }
 
-    sText += "\n(" + MakeCompatiblePDFString(StringConversion::Convert_Native_To_Ansi(m_text)) + ")Tj\n";
+    sText += "\n(" + MakeCompatiblePDFString(m_text) + ")Tj\n";
 
     // Reset the position for next text item
   //  sText += "1 0 0 1 0 0 Tm\n";
@@ -1248,12 +1217,10 @@ std::string PDFTextElement::GetPDFTextString() const
 
 void ContentsObject::PreComposeObject()
 {
-    string sLength;
-    string sStream;
-    string sRealStream;
+    std::string sRealStream;
     char szBuf[120];
-    sLength = "/Length ";
-    sStream = "stream\n";
+    std::string sLength = "/Length ";
+    std::string sStream = "stream\n";
 
     // Start of stream
     sRealStream += "q\n";
@@ -1278,14 +1245,13 @@ void ContentsObject::CreateFontDictAndText(int startObjNum, int& nextObjNum)
     m_sFontDictString = pParent->GenerateFontDictionary(startObjNum, tempNum);
     nextObjNum = tempNum;
 
-    std::string m_sText;
-    m_sFontString = "";
+    m_sFontString.clear();
 
     int numTextElements = pParent->GetNumTextElements();
     bool printOnPage = false;
     int numPrinted = 0;
-    bool onEvenPage = (pParent->GetCurrentPageNumber() % 2) == 0;
-    CTL_TEXTELEMENTNAKEDPTRLIST::const_iterator it = pParent->GetFirstTextElement();
+    bool onEvenPage = pParent->GetCurrentPageNumber() % 2 == 0;
+    auto it = pParent->GetFirstTextElement();
     for ( int nElements = 0; nElements < numTextElements; ++nElements, ++it )
     {
         printOnPage = false;
@@ -1296,17 +1262,17 @@ void ContentsObject::CreateFontDictAndText(int startObjNum, int& nextObjNum)
         if ( pageFlag & (DTWAIN_PDFTEXT_ALLPAGES | DTWAIN_PDFTEXT_CURRENTPAGE ))
         {
             printOnPage = true;
-            if ((pageFlag & DTWAIN_PDFTEXT_CURRENTPAGE) && (*it)->hasBeenDisplayed)
+            if (pageFlag & DTWAIN_PDFTEXT_CURRENTPAGE && (*it)->hasBeenDisplayed)
                 printOnPage = false;
         }
         else
-        if ( (pageFlag & DTWAIN_PDFTEXT_EVENPAGES) && onEvenPage )
+        if ( pageFlag & DTWAIN_PDFTEXT_EVENPAGES && onEvenPage )
             printOnPage = true;
         else
-        if ( (pageFlag & DTWAIN_PDFTEXT_ODDPAGES) && !onEvenPage )
+        if ( pageFlag & DTWAIN_PDFTEXT_ODDPAGES && !onEvenPage )
             printOnPage = true;
         else
-        if  ((pageFlag & DTWAIN_PDFTEXT_FIRSTPAGE) && pParent->GetCurrentPageNumber() == 1 )
+        if  (pageFlag & DTWAIN_PDFTEXT_FIRSTPAGE && pParent->GetCurrentPageNumber() == 1 )
             printOnPage = true;
         if ( printOnPage )
         {
@@ -1314,7 +1280,7 @@ void ContentsObject::CreateFontDictAndText(int startObjNum, int& nextObjNum)
             PDFTextElement* elm = *it;
             elm->hasBeenDisplayed = true;
             FontPairKey fpk(elm->m_font.fontNum, elm->fontSize);
-            FontToElementMap::iterator it2 = fontToElementMap.find(fpk);
+            auto it2 = fontToElementMap.find(fpk);
             if ( it2 == fontToElementMap.end() )
                 it2 = fontToElementMap.insert(make_pair(fpk, std::vector<PDFTextElement*>())).first;
             it2->second.push_back(elm);
@@ -1324,11 +1290,11 @@ void ContentsObject::CreateFontDictAndText(int startObjNum, int& nextObjNum)
 
     if ( numPrinted > 0 )
     {
-        char szBuf[100];
+        std::string m_sText;
 
         // go through map and print
-        FontToElementMap::iterator it1 = fontToElementMap.begin();
-        FontToElementMap::iterator it2 = fontToElementMap.end();
+        auto it1 = fontToElementMap.begin();
+        auto it2 = fontToElementMap.end();
         Matrix3_3 pdfTransformation;
         Matrix3_3 pdfTransformation2;
         Matrix3_3 pdfTransformation3;
@@ -1369,11 +1335,12 @@ void ContentsObject::CreateFontDictAndText(int startObjNum, int& nextObjNum)
         std::vector<const Matrix3_3*> MatrixAll(4);
         while (it1 != it2 )
         {
+            char szBuf[100];
             // Get the font
             sprintf(szBuf, "\n/F%d %4.2lf Tf", it1->first.first, it1->first.second);
             m_sText += szBuf;
-            std::vector<PDFTextElement*>::iterator pIt1 = it1->second.begin();
-            std::vector<PDFTextElement*>::iterator pIt2 = it1->second.end();
+            auto pIt1 = it1->second.begin();
+            auto pIt2 = it1->second.end();
 
             MatrixTranslate[0][2] = 0;
             MatrixTranslate[1][2] = 0;
@@ -1397,9 +1364,9 @@ void ContentsObject::CreateFontDictAndText(int startObjNum, int& nextObjNum)
             while (pIt1 != pIt2)
             {
                 // Get the color
-                double red = (double)GetRValue((*pIt1)->colorRGB) / 255.0;
-                double green = (double)GetGValue((*pIt1)->colorRGB) / 255.0;
-                double blue = (double)GetBValue((*pIt1)->colorRGB) / 255.0;
+                double red = static_cast<double>(GetRValue((*pIt1)->colorRGB)) / 255.0;
+                double green = static_cast<double>(GetGValue((*pIt1)->colorRGB)) / 255.0;
+                double blue = static_cast<double>(GetBValue((*pIt1)->colorRGB)) / 255.0;
                 sprintf(szBuf, "\n%4.2lf %4.2lf %4.2lf rg", red, green, blue);
                 m_sText += szBuf;
 
@@ -1496,7 +1463,7 @@ void ContentsObject::CreateFontDictAndText(int startObjNum, int& nextObjNum)
                     m_sText += szBuf;
                 }
 
-                m_sText += "\n(" + MakeCompatiblePDFString(StringConversion::Convert_Native_To_Ansi((*pIt1)->m_text)) + ") Tj";
+                m_sText += "\n(" + MakeCompatiblePDFString((*pIt1)->m_text) + ") Tj";
                 ++pIt1;
             }
             ++it1;
@@ -1511,35 +1478,31 @@ void ContentsObject::CreateFontDictAndText(int startObjNum, int& nextObjNum)
 
 void ContentsObject::ComposeObject()
 {
-    string sLength;
-    string sStream;
-    string sRealStream;
     char szBuf[120];
-    size_t nLength;
 
-    sLength = "/Length ";
-    sStream = "stream\n";
+    const std::string sLength = "/Length ";
+    const std::string sStream = "stream\n";
 
     // Start of stream
 
     // Get the stream string that has already been composed
-    sRealStream = m_preComposedObject + m_sFontString;
+    std::string sRealStream = m_preComposedObject + m_sFontString;
 
-    nLength = sRealStream.length();
+    size_t nLength = sRealStream.length();
     // end of graphics stream
 
     // Compress stream?
-    vector<char> VecIn(sRealStream.begin(), sRealStream.end());
-    vector<char> VecOut;
+    std::vector<char> VecIn(sRealStream.begin(), sRealStream.end());
+    std::vector<char> VecOut;
 
     // attempt to compress twice (as a test)
     // first compress with flate, then a85
-    PdfDocument::CompressTypes compresstype[] = {PdfDocument::NO_COMPRESS,PdfDocument::FLATE_COMPRESS,PdfDocument::A85_COMPRESS};
+    constexpr PdfDocument::CompressTypes compresstype[] = {PdfDocument::NO_COMPRESS,PdfDocument::FLATE_COMPRESS,PdfDocument::A85_COMPRESS};
     const char *fstrings[] = {"", " /FlateDecode ", " /ASCII85Decode " };
 
     std::string filterstr;
 
-    for ( size_t i = 0; i < sizeof(compresstype) / sizeof(compresstype[0]); ++i )
+    for ( size_t i = 0; i < std::size(compresstype); ++i )
     {
         if ( compresstype[i] == PdfDocument::NO_COMPRESS)
         {
@@ -1561,7 +1524,6 @@ void ContentsObject::ComposeObject()
         if ( !GetParent()->IsNoCompression() )
         {
             VecIn = VecOut;
-            VecIn.swap(VecIn);
             nLength = VecIn.size();
             filterstr = fstrings[i] + filterstr;
         }
@@ -1578,9 +1540,7 @@ void ContentsObject::ComposeObject()
     if ( !GetParent()->IsNoCompression() )
         filterstr = "[" + filterstr + "]";
 
-     // Encrypt this block of data if encryption is set
-    const char *pStreamToWrite;
-    pStreamToWrite = VecIn.data();
+    const char* pStreamToWrite = VecIn.data();
 
     AppendContents("<< ");
 
@@ -1624,7 +1584,7 @@ std::string ContentsObject::GetStreamContents()
 bool ImageObject::OpenAndComposeImage(int& width, int& height, int& bpp, int& rgb, int& dpix,
                                       int& dpiy)
 {
-    vector<char> t;
+    const std::vector<char> t;
     m_vImgStream = t;  // This resizes to 0
 
     bool bRet = false;
@@ -1633,9 +1593,8 @@ bool ImageObject::OpenAndComposeImage(int& width, int& height, int& bpp, int& rg
     {
         bRet = ProcessJPEGImage(width, height, bpp, rgb);
         dpix = GetParent()->GetDPI();
-        dpiy = GetParent()->GetDPI();
-        dpix = max(dpix, 1);
-        dpiy = max(dpiy, 1);
+        dpix = (std::max)(dpix, 1);
+        dpiy = dpix;
     }
     else
         bRet = ProcessBMPImage(width, height, bpp, rgb, dpix, dpiy);
@@ -1651,7 +1610,7 @@ bool ImageObject::ProcessJPEGImage(int& width, int& height, int& bpp, int& rgb)
 
     // First open the image file (this will always be a JPEG file
     // Open the file -- why is this a memory leak?
-    if ((infile = fopen(StringConversion::Convert_Native_To_Ansi(m_sImgName).c_str(), "rb")) == NULL)
+    if ((infile = fopen(StringConversion::Convert_Native_To_Ansi(m_sImgName).c_str(), "rb")) == nullptr)
         return false;
     {
         // Setup the decompression options
@@ -1668,12 +1627,12 @@ bool ImageObject::ProcessJPEGImage(int& width, int& height, int& bpp, int& rgb)
         {
         case JCS_GRAYSCALE:
                 m_sColorSpace = "DeviceGray";
-                rgb = false;
+                rgb = 0;
             break;
 
             default:
                 m_sColorSpace = "DeviceRGB";
-                rgb = true;
+                rgb = 1;
             break;
         }
 
@@ -1691,7 +1650,7 @@ bool ImageObject::ProcessJPEGImage(int& width, int& height, int& bpp, int& rgb)
     size_t nMaxRead = 50000;
     m_vImgStream.resize(nMaxRead);
 
-    if ((infile = fopen (StringConversion::Convert_Native_To_Ansi(m_sImgName).c_str(), "rb")) == NULL)
+    if ((infile = fopen (StringConversion::Convert_Native_To_Ansi(m_sImgName).c_str(), "rb")) == nullptr)
         return false;
     size_t nCount;
 
@@ -1715,7 +1674,7 @@ bool ImageObject::ProcessJPEGImage(int& width, int& height, int& bpp, int& rgb)
     }
     fclose (infile);
 
-    unsigned long crcVal = crc32_aux(0, (unsigned char *)m_vImgStream.data(), (unsigned int)m_imgLengthInBytes);
+    unsigned long crcVal = crc32_aux(0, reinterpret_cast<unsigned char*>(m_vImgStream.data()), static_cast<unsigned>(m_imgLengthInBytes));
 
     m_nCurCRCVal = crcVal;
     return true;
@@ -1732,17 +1691,15 @@ bool ImageObject::ProcessTIFFImage(int& width, int& height, int& bpp, int& /*rgb
      - G3 and G4 are supported
   **************************************************************************/
 
-    TIFF *image, *conv = 0;
-    int stripCount, stripMax;
+    TIFF *image, *conv = nullptr;
+    int stripCount;
     tsize_t stripSize;
     unsigned long imageOffset;
-    vector<char> stripBuffer;
+    std::vector<char> stripBuffer;
     uint16 tiffResponse16, compression, fillorder;
 
-    uint32 theight, twidth;
-
   // Open the file and make sure that it exists and is a TIFF file
-    if ((image = TIFFOpen(StringConversion::Convert_Native_To_Ansi(m_sImgName).c_str(), "r")) == NULL)
+    if ((image = TIFFOpen(StringConversion::Convert_Native_To_Ansi(m_sImgName).c_str(), "r")) == nullptr)
     {
         return false;
     }
@@ -1800,8 +1757,8 @@ bool ImageObject::ProcessTIFFImage(int& width, int& height, int& bpp, int& /*rgb
     TIFFGetField (image, TIFFTAG_XRESOLUTION, &xres);
     TIFFGetField (image, TIFFTAG_YRESOLUTION, &yres);
 
-    dpix = (int)xres;
-    dpiy = (int)yres;
+    dpix = static_cast<int>(xres);
+    dpiy = static_cast<int>(yres);
 
     m_Width = m_nTiffColumns = width;
     m_Height = m_nTiffRows = height;
@@ -1810,7 +1767,7 @@ bool ImageObject::ProcessTIFFImage(int& width, int& height, int& bpp, int& /*rgb
   // multistrip images also need to be converted
     TIFFGetField (image, TIFFTAG_FILLORDER, &fillorder);
 
-    if ( (fillorder == FILLORDER_LSB2MSB) || (TIFFNumberOfStrips (image) > 1))
+    if ( fillorder == FILLORDER_LSB2MSB || TIFFNumberOfStrips (image) > 1)
     {
     /*************************************************************************
       Convert the image
@@ -1827,12 +1784,12 @@ bool ImageObject::ProcessTIFFImage(int& width, int& height, int& bpp, int& /*rgb
             libtiffSeekProc,
             libtiffCloseProc,
             libtiffSizeProc,
-            NULL,
-            NULL);
+            nullptr,
+        nullptr);
 
       // Copy the image information ready for conversion
       stripSize = TIFFStripSize (image);
-      stripMax = TIFFNumberOfStrips (image);
+    const int stripMax = TIFFNumberOfStrips(image);
       imageOffset = 0;
 
       stripBuffer.resize(TIFFNumberOfStrips (image) * stripSize);
@@ -1847,9 +1804,9 @@ bool ImageObject::ProcessTIFFImage(int& width, int& height, int& bpp, int& /*rgb
       // We also need to copy some of the attributes of the tiff image
       // Bits per sample has to be 1 because this is going to be a G4/G3 image
       // (and all other image formats were stripped out above).
-      twidth = width;
+    const uint32 twidth = width;
 
-      theight = height;
+    const uint32 theight = height;
       TIFFSetField (conv, TIFFTAG_IMAGEWIDTH, twidth);
       TIFFSetField (conv, TIFFTAG_IMAGELENGTH, theight);
       TIFFSetField (conv, TIFFTAG_BITSPERSAMPLE, 1);
@@ -1864,7 +1821,12 @@ bool ImageObject::ProcessTIFFImage(int& width, int& height, int& bpp, int& /*rgb
       TIFFSetField (conv, TIFFTAG_RESOLUTIONUNIT, RESUNIT_INCH);
       TIFFSetField (conv, TIFFTAG_XRESOLUTION, 300);
       TIFFSetField (conv, TIFFTAG_YRESOLUTION, 300);
-      TIFFSetField (conv, TIFFTAG_SOFTWARE, "DynaRithmic TWAIN Library (DTWAIN) 5.0");
+
+      std::string version = "Dynarithmic TWAIN Library ";
+      const auto len = version.length();
+      version.resize(50);
+      DTWAIN_GetShortVersionStringA(&version[len], 50);
+      TIFFSetField (conv, TIFFTAG_SOFTWARE, version.c_str());
 
       if (compression == COMPRESSION_CCITTFAX4)
             TIFFSetField (conv, TIFFTAG_GROUP4OPTIONS, 0);
@@ -1886,7 +1848,7 @@ bool ImageObject::ProcessTIFFImage(int& width, int& height, int& bpp, int& /*rgb
       stripSize = TIFFStripSize (image);
       imageOffset = 0;
 
-      int nStrips = TIFFNumberOfStrips(image);
+    const int nStrips = TIFFNumberOfStrips(image);
       m_vImgStream.resize( nStrips * stripSize );
 
       for (stripCount = 0; stripCount < nStrips;  stripCount++)
@@ -1901,7 +1863,7 @@ bool ImageObject::ProcessTIFFImage(int& width, int& height, int& bpp, int& /*rgb
       m_imgLengthInBytes = imageOffset;
     }
 
-    unsigned long crcVal = crc32_aux(0, (unsigned char *)m_vImgStream.data(), (unsigned int)m_imgLengthInBytes);
+  const unsigned long crcVal = crc32_aux(0, reinterpret_cast<unsigned char*>(m_vImgStream.data()), static_cast<unsigned>(m_imgLengthInBytes));
 
     m_nCurCRCVal = crcVal;
     TIFFClose (image);
@@ -1912,23 +1874,20 @@ bool ImageObject::ProcessTIFFImage(int& width, int& height, int& bpp, int& /*rgb
 
 bool ImageObject::ProcessBMPImage(int& width, int& height, int& bpp, int& /*rgb*/, int& dpix, int& dpiy)
 {
-    TIFF *image, *conv = 0;
-    int stripCount, stripMax;
+    TIFF *image, *conv = nullptr;
     tsize_t stripSize;
     unsigned long imageOffset;
-    vector<char> stripBuffer;
+    std::vector<char> stripBuffer;
     uint16 tiffResponse16, compression, fillorder = 0;
 
-    uint32 theight, twidth;
-
     // Open the file and make sure that it exists and is a TIFF file
-    if ((image = TIFFOpen (StringConversion::Convert_Native_To_Ansi(m_sImgName).c_str(), "r")) == NULL)
+    if ((image = TIFFOpen (StringConversion::Convert_Native_To_Ansi(m_sImgName).c_str(), "rb")) == nullptr)
     {
         return false;
     }
 
 
-    // Bits per component is per colour component, not per sample. Does this
+    // Bits per component is per color component, not per sample. Does this
     // matter?
     if (TIFFGetField (image, TIFFTAG_BITSPERSAMPLE, &tiffResponse16) != 0)
       m_bpp = bpp = tiffResponse16;
@@ -1980,8 +1939,8 @@ bool ImageObject::ProcessBMPImage(int& width, int& height, int& bpp, int& /*rgb*
     TIFFGetField (image, TIFFTAG_XRESOLUTION, &xres);
     TIFFGetField (image, TIFFTAG_YRESOLUTION, &yres);
 
-    dpix = (int)xres;
-    dpiy = (int)yres;
+    dpix = static_cast<int>(xres);
+    dpiy = static_cast<int>(yres);
 
     m_Width = m_nTiffColumns = width;
     m_Height = m_nTiffRows = height;
@@ -1990,7 +1949,7 @@ bool ImageObject::ProcessBMPImage(int& width, int& height, int& bpp, int& /*rgb*
   // multistrip images also need to be converted
     TIFFGetField (image, TIFFTAG_FILLORDER, &fillorder);
 
-    if ( (fillorder == FILLORDER_LSB2MSB) || (TIFFNumberOfStrips (image) > 1))
+    if ( fillorder == FILLORDER_LSB2MSB || TIFFNumberOfStrips (image) > 1)
     {
     /*************************************************************************
       Convert the image
@@ -2015,17 +1974,17 @@ bool ImageObject::ProcessBMPImage(int& width, int& height, int& bpp, int& /*rgb*
             libtiffSeekProc,
             libtiffCloseProc,
             libtiffSizeProc,
-            NULL,
-            NULL);
+            nullptr,
+        nullptr);
 
       // Copy the image information ready for conversion
       stripSize = TIFFStripSize (image);
-      stripMax = TIFFNumberOfStrips (image);
+    const int stripMax = TIFFNumberOfStrips(image);
       imageOffset = 0;
 
       stripBuffer.resize(TIFFNumberOfStrips (image) * stripSize);
 
-      for (stripCount = 0; stripCount < stripMax; stripCount++)
+      for (int stripCount = 0; stripCount < stripMax; stripCount++)
       {
          imageOffset += static_cast<unsigned long>(TIFFReadEncodedStrip (image, stripCount,
                                               &stripBuffer[imageOffset],stripSize));
@@ -2034,9 +1993,9 @@ bool ImageObject::ProcessBMPImage(int& width, int& height, int& bpp, int& /*rgb*
       // We also need to copy some of the attributes of the tiff image
       // Bits per sample has to be 1 because this is going to be a G4/G3 image
       // (and all other image formats were stripped out above).
-      twidth = width;
+    const uint32 twidth = width;
 
-      theight = height;
+    const uint32 theight = height;
       TIFFSetField (conv, TIFFTAG_IMAGEWIDTH, twidth);
       TIFFSetField (conv, TIFFTAG_IMAGELENGTH, theight);
       TIFFSetField (conv, TIFFTAG_BITSPERSAMPLE, 1);
@@ -2049,9 +2008,14 @@ bool ImageObject::ProcessBMPImage(int& width, int& height, int& bpp, int& /*rgb*
       TIFFSetField (conv, TIFFTAG_SAMPLESPERPIXEL, 1);
       TIFFSetField (conv, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
       TIFFSetField (conv, TIFFTAG_RESOLUTIONUNIT, RESUNIT_INCH);
-      TIFFSetField (conv, TIFFTAG_XRESOLUTION, (double)dpix);
-      TIFFSetField (conv, TIFFTAG_YRESOLUTION, (double)dpiy);
-      TIFFSetField (conv, TIFFTAG_SOFTWARE, "DynaRithmic TWAIN Library (DTWAIN) 5.0");
+      TIFFSetField (conv, TIFFTAG_XRESOLUTION, static_cast<double>(dpix));
+      TIFFSetField (conv, TIFFTAG_YRESOLUTION, static_cast<double>(dpiy));
+
+        std::string version = "Dynarithmic TWAIN Library ";
+      const auto len = version.length();
+      version.resize(50);
+      DTWAIN_GetShortVersionStringA(&version[len], 50);
+      TIFFSetField(conv, TIFFTAG_SOFTWARE, version.c_str());
 
       if (compression == COMPRESSION_CCITTFAX4)
             TIFFSetField (conv, TIFFTAG_GROUP4OPTIONS, 0);
@@ -2079,19 +2043,19 @@ bool ImageObject::ProcessBMPImage(int& width, int& height, int& bpp, int& /*rgb*
       stripSize = TIFFStripSize (image);
       imageOffset = 0;
 
-      int nStrips = TIFFNumberOfStrips(image);
+        const int nStrips = TIFFNumberOfStrips(image);
       m_vImgStream.resize( nStrips * stripSize );
     }
 
     // Flate encode this stuff
-    std::vector<char> tempRealData = m_vImgStream;
+    const std::vector<char> tempRealData = m_vImgStream;
     EncodeVectorStream(tempRealData,
                        m_imgLengthInBytes,
                        m_vImgStream,
                        PdfDocument::FLATE_COMPRESS);
 
     m_imgLengthInBytes = m_vImgStream.size();
-    unsigned long crcVal = crc32_aux(0, (unsigned char *)m_vImgStream.data(), (unsigned int)m_imgLengthInBytes);
+    const unsigned long crcVal = crc32_aux(0, reinterpret_cast<unsigned char*>(m_vImgStream.data()), static_cast<unsigned>(m_imgLengthInBytes));
 
     m_nCurCRCVal = crcVal;
     TIFFClose (image);
@@ -2147,7 +2111,7 @@ void ImageObject::ComposeObject()
 
     if (m_nImgType == 1 ) // Tiff
     {
-        int polarity =pParent->GetPolarity();
+        const int polarity =pParent->GetPolarity();
         if (polarity == DTWAIN_PDFPOLARITY_POSITIVE )
             sprintf(szBuf,"/ImageMask true /Decode [0 1] ");
         else
@@ -2157,7 +2121,7 @@ void ImageObject::ComposeObject()
     AppendContents(">>\nstream\n");
     m_sExtraInfo = "";
 
-    if ( pParent && pParent->IsEncrypted())
+    if (pParent->IsEncrypted())
     {
         // make the extra info the current contents
         m_sExtraInfo = GetContents();
@@ -2173,7 +2137,7 @@ void ImageObject::ComposeObject()
 
 std::string ImageObject::GetStreamContents()
 {
-    string s;
+    std::string s;
     PdfDocument *pParent = GetParent();
     if ( pParent && pParent->IsEncrypted() )
     {
@@ -2208,8 +2172,7 @@ void FontObject::ComposeObject()
 void PageObject::ComposeObject()
 {
     char szBuf [100];
-    string realmediabox = m_smediabox;
-    string sConstantText;
+    const std::string realmediabox = m_smediabox;
     SetContents("<< /Type /Page\n"
                 "   /Parent 2 0 R\n"
                 "   /MediaBox ");
@@ -2221,7 +2184,7 @@ void PageObject::ComposeObject()
     m_nMaxObjectNum = GetObjectNum() + 1;
 
     AppendContents("   /Resources  <</XObject <<");
-    sConstantText = "   /Resources  <</XObject <<";
+    std::string sConstantText = "   /Resources  <</XObject <<";
 
     sprintf (szBuf,"/Img%d ", static_cast<int>(m_nImageNum));
     AppendContents(szBuf);
@@ -2234,7 +2197,7 @@ void PageObject::ComposeObject()
     }
     else
         sprintf(szBuf, "%d 0 R >>", static_cast<int>(m_nDuplicateObjNum));
-    m_nMaxObjectNum = max(m_nDuplicateObjNum, m_nMaxObjectNum);
+    m_nMaxObjectNum = (std::max)(m_nDuplicateObjNum, m_nMaxObjectNum);
 
     AppendContents(szBuf);
     sConstantText += szBuf;
@@ -2251,7 +2214,7 @@ void PageObject::ComposeObject()
     AppendContents(szBuf);
     sConstantText += szBuf;
 
-    m_nMaxObjectNum = max(m_nMaxObjectNum, pDoc->GetProcSetObjNum());
+    m_nMaxObjectNum = (std::max)(m_nMaxObjectNum, pDoc->GetProcSetObjNum());
 
     if ( !pDoc->IsFontObjDone() )
     {
@@ -2266,7 +2229,7 @@ void PageObject::ComposeObject()
     theContents->ComposeObject();
 
     m_nMaxObjectNum = nextObjNum - 1;
-    std::string fontDict = theContents->GetFontDictionaryString();
+    const std::string fontDict = theContents->GetFontDictionaryString();
     AppendContents(fontDict);
     AppendContents(">>\n");
     sConstantText += fontDict; //szBuf;
@@ -2276,14 +2239,14 @@ void PageObject::ComposeObject()
     sConstantText += szBuf;
 
     // Get the CRC for the page contents
-    vector<char> v(sConstantText.begin(), sConstantText.end());
-    m_CRCValue = crc32_aux(0, (unsigned char*)v.data(), (unsigned int)v.size());
+    std::vector<char> v(sConstantText.begin(), sConstantText.end());
+    m_CRCValue = crc32_aux(0, (unsigned char*)v.data(), static_cast<unsigned>(v.size()));
 }
 
 
 bool PdfDocument::IsDuplicateImage(unsigned long CRCVal, unsigned long& ObjNum)
 {
-    CRCMapToObj::iterator it = m_allCRC.find( CRCVal );
+    const CRCMapToObj::iterator it = m_allCRC.find( CRCVal );
     if ( it != m_allCRC.end())
     {
         ObjNum = (*it).second;
@@ -2300,7 +2263,7 @@ void PdfDocument::AddDuplicateImage(unsigned long CRCVal, unsigned long ObjNum)
 
 bool PdfDocument::IsDuplicatePage(unsigned long CRCVal, unsigned long& ObjNum)
 {
-    CRCMapToObj::iterator it = m_allPageCRC.find( CRCVal );
+    const CRCMapToObj::iterator it = m_allPageCRC.find( CRCVal );
     if ( it != m_allPageCRC.end())
     {
         ObjNum = (*it).second;
@@ -2336,21 +2299,11 @@ void PdfDocument::SetEncryption(const CTL_StringType& ownerPassword,
         SetPDFVersion(1,6);*/
     }
 
-    bool bOk = true;
-
-    // Keep going until we find keys that have valid chars
-    do
-    {
-        std::string s = GetSystemTimeInMilliseconds().substr(0,13) + "+1359064+" + m_sCurSysTime.substr(0,13);
-        std::string dID = CMD5Checksum().GetMD5((const unsigned char *)s.c_str(), (UINT)s.size());
+    const std::string s = GetSystemTimeInMilliseconds().substr(0,13) + "+1359064+" + m_sCurSysTime.substr(0,13);
+    const std::string dID = CMD5Checksum().GetMD5(reinterpret_cast<const unsigned char*>(s.c_str()), static_cast<UINT>(s.size()));
         m_DocumentID[0] = dID;
         m_DocumentID[1] = dID;
 
         m_Encryption->SetupAllKeys(m_DocumentID[0], m_EncryptionPassword[USER_PASSWORD], m_EncryptionPassword[OWNER_PASSWORD], permissions, bIsStrongEncryption);
-        bOk = true;
-    } while (!bOk);
-
     m_bIsEncrypted = true;
 }
-
-PdfDocument::~PdfDocument() { }

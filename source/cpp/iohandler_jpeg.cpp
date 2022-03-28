@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
  */
 #include "ctldib.h"
 #include "ctliface.h"
-#include "ctltwmgr.h"
 #include "FreeImage.h"
 using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -29,9 +28,7 @@ int CTL_JpegIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     if ( !m_pDib )
         return DTWAIN_ERR_DIB;
 
-    HANDLE hDib = NULL;
-
-    hDib = m_pDib->GetHandle();
+    const HANDLE hDib = m_pDib->GetHandle();
     if ( !hDib )
         return DTWAIN_ERR_DIB;
 

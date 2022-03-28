@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,12 +18,13 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include "dtwaindefs.h"
 #include "OCRInterface.h"
 using namespace dynarithmic;
 
 OCRCapInfo& OCREngine::GetOCRCapInfo(LONG nCap) { return m_AllCapValues[nCap]; }
 
-OCREngine::OCREngine() : m_nLastOCRError(0), m_OCRIdentity{}, m_nCurrentPage(0), m_bIsActivated(false)
+OCREngine::OCREngine() : m_OCRIdentity{}, m_nCurrentPage(0), m_bIsActivated(false), m_nLastOCRError(0)
 {
     m_mapOperations[DTWAIN_CAPGET] = DTWAIN_CO_GET;
     m_mapOperations[DTWAIN_CAPGETDEFAULT] = DTWAIN_CO_GETDEFAULT;
@@ -35,28 +36,28 @@ OCREngine::OCREngine() : m_nLastOCRError(0), m_OCRIdentity{}, m_nCurrentPage(0),
 OCREngine::~OCREngine() {}
 bool OCREngine::IsInitialized() const { return false; }
 bool OCREngine::SetOptions(OCRJobOptions& /*options*/) { return false; }
-LONG OCREngine::StartOCR() { return false; }
-LONG OCREngine::StartOCR(const CTL_StringType& /*filename*/) {return false;}
+LONG OCREngine::StartOCR() { return 0; }
+LONG OCREngine::StartOCR(CTL_StringType /*filename*/) {return 0;}
 LONG OCREngine::GetLastError() const { return m_nLastOCRError; }
-CTL_StringType OCREngine::GetErrorString(LONG /*errCode*/) { return _T(""); }
+std::string OCREngine::GetErrorString(LONG /*errCode*/) { return ""; }
 void OCREngine::SetOkErrorCode() { m_nLastOCRError = 0; }
 void OCREngine::SetLastError(LONG errCode) { m_nLastOCRError = errCode; }
 bool OCREngine::IsReturnCodeOk(LONG /*returnCode*/) { return true; }
 std::string OCREngine::GetReturnCodeString(LONG /*returnCode*/) { return ""; }
 bool OCREngine::SetFileType() { return false; }
 bool OCREngine::SetFileName() { return false;}
-CTL_StringType OCREngine::GetOCRVersionInfo() { return _T("Unknown OCR Engine"); }
+std::string OCREngine::GetOCRVersionInfo() { return "Unknown OCR Engine"; }
 bool OCREngine::SetOCRVersionIdentity(const OCRVersionIdentity& vIdentity) { m_OCRIdentity = vIdentity; return true;}
 bool OCREngine::SetOCRVersionIdentity() { return false; }
-CTL_StringType OCREngine::GetManufacturer() const { return m_OCRIdentity.Manufacturer;}
-CTL_StringType OCREngine::GetProductFamily() const { return m_OCRIdentity.ProductFamily;}
-CTL_StringType OCREngine::GetProductName() const { return m_OCRIdentity.ProductName;}
+std::string OCREngine::GetManufacturer() const { return m_OCRIdentity.Manufacturer;}
+std::string OCREngine::GetProductFamily() const { return m_OCRIdentity.ProductFamily;}
+std::string OCREngine::GetProductName() const { return m_OCRIdentity.ProductName;}
 bool OCREngine::ShutdownOCR(int&) { return true; }
 bool OCREngine::IsActivated() const { return m_bIsActivated; }
 void OCREngine::SetActivated(bool bActive) { m_bIsActivated = bActive; }
 LONG OCREngine::StartupOCREngine() { return 0; }
 
-CTL_StringType OCREngine::GetCachedFile() const { return m_OCRCache.sOCRFileName; }
+std::string OCREngine::GetCachedFile() const { return m_OCRCache.sOCRFileName; }
 std::string OCREngine::GetCachedText() const { return m_OCRCache.sOCRText; }
 
 void OCREngine::AddCharacterInfo(LONG nPage, const OCRCharacterInfo& cInfo)
@@ -75,20 +76,20 @@ void OCREngine::SetBaseOption(int nWhichOption, bool bSet/*=true*/)
         m_baseOptions.reset(nWhichOption);
 }
 
-void OCREngine::SetCachedFile(const CTL_StringType& filename) { m_OCRCache.sOCRFileName = filename; }
+void OCREngine::SetCachedFile(const std::string& filename) { m_OCRCache.sOCRFileName = filename; }
 void OCREngine::SetCachedText(const std::string& sText) { m_OCRCache.sOCRText = sText; }
 
     // OCR capability functions similar to TWAIN protocol
 bool OCREngine::GetCapValues(LONG nOCRCap, LONG CapType, OCRLongArrayValues& vals)
 {
-    auto it = m_AllCapValues.find(nOCRCap);
+    const auto it = m_AllCapValues.find(nOCRCap);
     if ( it != m_AllCapValues.end())
     {
-        OCRCapInfo &CapInfo = it->second;
+        const OCRCapInfo &CapInfo = it->second;
         if ( CapInfo.GetCapDataType() == DTWAIN_ARRAYLONG )
         {
             // Check if operation exists
-            auto itOp = m_mapOperations.find(CapType);
+            const auto itOp = m_mapOperations.find(CapType);
             if ( itOp != m_mapOperations.end())
             {
                 // Now check if cap supports these operations
@@ -106,14 +107,14 @@ bool OCREngine::GetCapValues(LONG nOCRCap, LONG CapType, OCRLongArrayValues& val
 
 bool OCREngine::GetCapValues(LONG nOCRCap, LONG CapType, OCRStringArrayValues& vals)
 {
-    auto it = m_AllCapValues.find(nOCRCap);
+    const auto it = m_AllCapValues.find(nOCRCap);
     if ( it != m_AllCapValues.end())
     {
-        OCRCapInfo &CapInfo = it->second;
+        const OCRCapInfo &CapInfo = it->second;
         if ( CapInfo.GetCapDataType() == DTWAIN_ARRAYSTRING )
         {
             // Check if operation exists
-            auto itOp = m_mapOperations.find(CapType);
+            const auto itOp = m_mapOperations.find(CapType);
             if ( itOp != m_mapOperations.end())
             {
                 // Now check if cap supports these operations
@@ -132,14 +133,14 @@ bool OCREngine::GetCapValues(LONG nOCRCap, LONG CapType, OCRStringArrayValues& v
 
 bool OCREngine::SetCapValues(LONG nOCRCap, LONG CapType, const OCRLongArrayValues& vals)
 {
-    auto it = m_AllCapValues.find(nOCRCap);
+    const auto it = m_AllCapValues.find(nOCRCap);
     if ( it != m_AllCapValues.end())
     {
-        OCRCapInfo &CapInfo = it->second;
+        const OCRCapInfo &CapInfo = it->second;
         if ( CapInfo.GetCapDataType() == DTWAIN_ARRAYLONG )
         {
             // Check if operation exists
-            auto itOp = m_mapOperations.find(CapType);
+            const auto itOp = m_mapOperations.find(CapType);
             if ( itOp != m_mapOperations.end())
             {
                 // Now check if cap supports these operations
@@ -157,14 +158,14 @@ bool OCREngine::SetCapValues(LONG nOCRCap, LONG CapType, const OCRLongArrayValue
 
 bool OCREngine::SetCapValues(LONG nOCRCap, LONG CapType, const OCRStringArrayValues& vals)
 {
-    auto it = m_AllCapValues.find(nOCRCap);
+    const auto it = m_AllCapValues.find(nOCRCap);
     if ( it != m_AllCapValues.end())
     {
-        OCRCapInfo &CapInfo = it->second;
+        const OCRCapInfo &CapInfo = it->second;
         if ( CapInfo.GetCapDataType() == DTWAIN_ARRAYSTRING )
         {
             // Check if operation exists
-            auto itOp = m_mapOperations.find(CapType);
+            const auto itOp = m_mapOperations.find(CapType);
             if ( itOp != m_mapOperations.end())
             {
                 // Now check if cap supports these operations
@@ -199,7 +200,7 @@ void OCREngine::AddCapValue(LONG nCap, const OCRCapInfo& capInfo)
 
 LONG OCREngine::GetCapDataType(LONG nOCRCap) const
 {
-    auto it = m_AllCapValues.find(nOCRCap);
+    const auto it = m_AllCapValues.find(nOCRCap);
     if ( it != m_AllCapValues.end())
     {
         const OCRCapInfo &CapInfo = it->second;
@@ -235,7 +236,7 @@ int OCREngine::GetCurrentPageNumber() const { return m_nCurrentPage; }
 
 std::vector<OCRCharacterInfo>& OCREngine::GetCharacterInfo(LONG nPage, int& status)
 {
-    OCRCharacterInfoMap::iterator it = m_OCRCharMap.find(nPage);
+    const OCRCharacterInfoMap::iterator it = m_OCRCharMap.find(nPage);
     status = -1;
     if ( it != m_OCRCharMap.end())
     {
@@ -245,17 +246,17 @@ std::vector<OCRCharacterInfo>& OCREngine::GetCharacterInfo(LONG nPage, int& stat
     return m_InvalidOCRCharInfo;
 }
 
-void OCREngine::SetPageTextMap(LONG nPage, const CTL_StringType& sData)
+void OCREngine::SetPageTextMap(LONG nPage, const std::string& sData)
 {
     m_OCRPageTextMap[nPage] = sData;
 }
 
-CTL_StringType OCREngine::GetOCRText(LONG nPage)
+std::string OCREngine::GetOCRText(LONG nPage)
 {
-    OCRPageTextMap::iterator it = m_OCRPageTextMap.find(nPage);
+    const OCRPageTextMap::iterator it = m_OCRPageTextMap.find(nPage);
     if ( it != m_OCRPageTextMap.end())
         return it->second;
-    return _T("");
+    return {};
 }
 
 bool OCREngine::IsValidOCRPage(LONG nPage) const

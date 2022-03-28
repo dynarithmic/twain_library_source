@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 #include "ctltwmgr.h"
 #include "ctltr016.h"
 
+#include "ctliface.h"
+
 using namespace dynarithmic;
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -29,14 +31,14 @@ CTL_CapabilitySetTripletBase::CTL_CapabilitySetTripletBase(CTL_ITwainSession *pS
                                                            CTL_EnumSetType sType,
                                                            TW_UINT16    sCap,
                                                            TW_UINT16 TwainType) :
-                    CTL_CapabilityTriplet(pSession, pSource, (TW_UINT16)sType, TwainType, false),
+                    CTL_CapabilityTriplet(pSession, pSource, static_cast<TW_UINT16>(sType), TwainType, false),
                         m_gType(sType), m_gCap(sCap), m_nTwainType(TwainType)
 {
     TW_CAPABILITY *pCap = GetCapabilityBuffer();
 
-    pCap->Cap = (TW_UINT16)sCap;
-    pCap->ConType = (TW_UINT16)-1;
-    pCap->hContainer = NULL;
+    pCap->Cap = static_cast<TW_UINT16>(sCap);
+    pCap->ConType = static_cast<TW_UINT16>(-1);
+    pCap->hContainer = nullptr;
 }
 
 CTL_EnumSetType CTL_CapabilitySetTripletBase::CapSetType() const
@@ -59,32 +61,30 @@ void * CTL_CapabilitySetTripletBase::PreEncode()
     TW_CAPABILITY *pCap = GetCapabilityBuffer();
 
     // Get the cap container
-    TW_UINT16 nContainerSize = GetContainerTypeSize();
+    const TW_UINT16 nContainerSize = GetContainerTypeSize();
 
     // Get the container type
-    TW_UINT16 nConType = GetContainerType();
+    const TW_UINT16 nConType = GetContainerType();
     pCap->ConType = nConType;
 
     // Allocate proper amount of memory
     size_t nAggSize = GetAggregateSize();
     if ( nAggSize == 0 )
         nAggSize = 1;
-    DWORD dMem = (DWORD)(nContainerSize + GetItemSize( m_nTwainType ) * nAggSize);
+    const auto dMem = static_cast<DWORD>(nContainerSize + GetItemSize(m_nTwainType) * nAggSize);
 
     pCap->hContainer = CTL_TwainDLLHandle::s_TwainMemoryFunc->AllocateMemory(dMem );
-    void *pCapPtr = CTL_TwainDLLHandle::s_TwainMemoryFunc->LockMemory( pCap->hContainer );
-
-    return pCapPtr;
+    return CTL_TwainDLLHandle::s_TwainMemoryFunc->LockMemory( pCap->hContainer );
 }
 
 TW_UINT16 CTL_CapabilitySetTripletBase::PostEncode(TW_UINT16 rc)
 {
-    TW_CAPABILITY *pCap = GetCapabilityBuffer();
+    const TW_CAPABILITY *pCap = GetCapabilityBuffer();
     CTL_TwainDLLHandle::s_TwainMemoryFunc->UnlockMemory( pCap->hContainer );
     CTL_TwainDLLHandle::s_TwainMemoryFunc->FreeMemory( pCap->hContainer );
     if ( rc != TWRC_SUCCESS )
     {
-        TW_UINT16 cc = CTL_TwainAppMgr::GetConditionCode( GetSessionPtr(), GetSourcePtr() );
+        const TW_UINT16 cc = CTL_TwainAppMgr::GetConditionCode( GetSessionPtr(), GetSourcePtr() );
         CTL_TwainAppMgr::ProcessConditionCodeError(cc);
     }
     return rc;
@@ -97,7 +97,7 @@ void CTL_CapabilitySetTripletBase::EncodeOneValue(pTW_ONEVALUE pVal, void *pData
     {
         case TWTY_FIX32:
         {
-            float fnum = static_cast<float>(*(double *)pData);
+            const float fnum = static_cast<float>(*static_cast<double*>(pData));
             TW_FIX32 ffix32;
             FloatToTwain32( fnum, ffix32 );
             memcpy(&pVal->Item, &ffix32, sizeof(TW_FIX32));
@@ -113,9 +113,8 @@ void CTL_CapabilitySetTripletBase::EncodeOneValue(pTW_ONEVALUE pVal, void *pData
             // The data is in the CTL_StringType type.  Must extract
             // Copy data to TW_CONTAINER
             // Make sure that string is fully null terminated
-            TW_STR1024 TempString;
-            memset(TempString, 0, sizeof(TempString));
-            CTL_String *ptrString = (CTL_String *)pData;
+            TW_STR1024 TempString = {};
+            auto ptrString = static_cast<std::string*>(pData);
             std::copy(ptrString->begin(), ptrString->end(), TempString);
             memcpy(&pVal->Item, TempString,GetItemSize( pVal->ItemType) );
         }
@@ -136,7 +135,7 @@ void CTL_CapabilitySetTripletBase::EncodeEnumValue(pTW_ENUMERATION pArray,
     if ( pArray->ItemType == TWTY_FIX32 )
     {
         // floats are stored as doubles in CTL
-        float fnum = static_cast<float>(*(double *)pData);
+        const float fnum = static_cast<float>(*static_cast<double*>(pData));
         TW_FIX32 ffix32;
         FloatToTwain32( fnum, ffix32 );
         memcpy(&pArray->ItemList[valuePos], &ffix32, sizeof(TW_FIX32));
@@ -145,7 +144,7 @@ void CTL_CapabilitySetTripletBase::EncodeEnumValue(pTW_ENUMERATION pArray,
     if ( TwainUtils::IsTwainStringType(pArray->ItemType) )
     {
         TW_STR1024 TempString = {0};
-        CTL_String *ptrString = reinterpret_cast<CTL_String*>(pData);
+        std::string *ptrString = reinterpret_cast<std::string*>(pData);
         std::copy(ptrString->begin(), ptrString->end(), TempString);
         memcpy(&pArray->ItemList[valuePos], TempString, GetItemSize( pArray->ItemType) );
     }
@@ -157,24 +156,23 @@ void CTL_CapabilitySetTripletBase::EncodeEnumValue(pTW_ENUMERATION pArray,
 void CTL_CapabilitySetTripletBase::EncodeRange(pTW_RANGE pVal,
                                                void *pData1,
                                                void *pData2,
-                                               void *pData3)
-
+                                               void *pData3) const
 {
     pVal->ItemType = GetTwainType();
-    size_t nItemSize = GetItemSize( pVal->ItemType );
+    const size_t nItemSize = GetItemSize( pVal->ItemType );
 
     if ( pVal->ItemType == TWTY_FIX32 )
     {
-        float fnum = static_cast<float>(*(double *)pData1);   // Min Value
+        auto fnum = static_cast<float>(*static_cast<double*>(pData1));   // Min Value
         TW_FIX32 ffix32;
         FloatToTwain32( fnum, ffix32 );
         memcpy(&pVal->MinValue, &ffix32, sizeof(TW_FIX32));
 
-        fnum = static_cast<float>(*(double *)pData2);
+        fnum = static_cast<float>(*static_cast<double*>(pData2));
         FloatToTwain32( fnum, ffix32 );
         memcpy(&pVal->MaxValue, &ffix32, sizeof(TW_FIX32));
 
-        fnum = static_cast<float>(*(double *)pData3);
+        fnum = static_cast<float>(*static_cast<double*>(pData3));
         FloatToTwain32( fnum, ffix32 );
         memcpy(&pVal->StepSize, &ffix32, sizeof(TW_FIX32));
     }
@@ -193,11 +191,11 @@ void CTL_CapabilitySetTripletBase::EncodeArrayValue(pTW_ARRAY pArray,
                                                     void *pData)
 {
     // Get size of datatype
-    TW_UINT16 nItemSize = GetItemSize( pArray->ItemType );
+    const TW_UINT16 nItemSize = GetItemSize( pArray->ItemType );
     if ( pArray->ItemType == TWTY_FIX32 )
     {
         // floats are stored as doubles in CTL
-        float fnum = static_cast<float>(*(double *)pData);
+        const float fnum = static_cast<float>(*static_cast<double*>(pData));
         TW_FIX32 ffix32;
         FloatToTwain32( fnum, ffix32 );
         memcpy(&pArray->ItemList[valuePos], &ffix32, sizeof(TW_FIX32));
@@ -206,7 +204,7 @@ void CTL_CapabilitySetTripletBase::EncodeArrayValue(pTW_ARRAY pArray,
     if ( TwainUtils::IsTwainStringType(pArray->ItemType) )
     {
         TW_STR1024 TempString = {0};
-        CTL_String* pStrData = reinterpret_cast<CTL_String*>(pData);
+        const auto pStrData = static_cast<std::string*>(pData);
         std::copy(pStrData->begin(), pStrData->end(), TempString);
         memcpy(&pArray->ItemList[valuePos], TempString, GetItemSize( pArray->ItemType) );
     }
@@ -224,9 +222,9 @@ CTL_CapabilityResetTriplet::CTL_CapabilityResetTriplet(CTL_ITwainSession *pSessi
 {
     TW_CAPABILITY *pCap = GetCapabilityBuffer();
 
-    pCap->Cap = (TW_UINT16)sCap;
+    pCap->Cap = static_cast<TW_UINT16>(sCap);
     pCap->ConType = TWON_DONTCARE16;
-    pCap->hContainer = NULL;
+    pCap->hContainer = nullptr;
     SetTestMode( true );  // No decoding done for this triplet type
 }
 
@@ -238,7 +236,7 @@ CTL_CapabilityResetTriplet::CTL_CapabilityResetTriplet(CTL_ITwainSession *pSessi
     template  CTL_CapabilitySetTriplet<unsigned long>;
     template  CTL_CapabilitySetTriplet<unsigned short>;
     template  CTL_CapabilitySetTriplet<double>;
-    template  CTL_CapabilitySetTriplet<CTL_String>;
+    template  CTL_CapabilitySetTriplet<std::string>;
     template  CTL_CapabilitySetTriplet<char *>;
     template  CTL_CapabilitySetTriplet<TW_FRAME>;
     template  CTL_CapabilitySetTriplet<unsigned short *>;

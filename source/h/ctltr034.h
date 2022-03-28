@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ namespace dynarithmic
         public:
             CTL_DeviceEventTriplet(CTL_ITwainSession *pSession,
                                    CTL_ITwainSource* pSource);
-            TW_UINT16   Execute();
+            TW_UINT16   Execute() override;
             bool        IsSuccessful() const;
             CTL_DeviceEvent  GetDeviceEvent() const;
 

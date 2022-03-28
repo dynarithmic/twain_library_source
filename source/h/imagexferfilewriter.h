@@ -1,27 +1,23 @@
 /*
-    This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+This file is part of the Dynarithmic TWAIN Library (DTWAIN).
+Copyright (c) 2002-2022 Dynarithmic Software.
 
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-        http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
-    FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
-    DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
-    OF THIRD PARTY RIGHTS.
-
-    For more information, the license file LICENSE.TXT that is located in the root
-    directory of the DTWAIN installation covers the restrictions under the LGPL license.
-    Please read this file before deploying or distributing any application using DTWAIN.
- */
+FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
+DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
+OF THIRD PARTY RIGHTS.
+*/
 #ifndef IMAGEXFERFILEWRITER_H
 #define IMAGEXFERFILEWRITER_H
 
@@ -53,28 +49,27 @@ namespace dynarithmic
                                    int MultipageOption,
                                    CTL_ImageIOHandlerPtr& pHandler,
                                    LONG rawBytes,
-                                   bool bIsJobControl=false);
+                                   bool bIsJobControl=false) const;
 
-            LONG     CopyDuplexDibToFile(CTL_TwainDibPtr pCurDib, bool bIsJobControl=false);
+            LONG     CopyDuplexDibToFile(CTL_TwainDibPtr pCurDib, bool bIsJobControl=false) const;
 
-            LONG     MergeDuplexFiles();
-            void     RecordBadDuplexPage();
-            int      ProcessManualDuplexState(LONG Msg);
+            LONG     MergeDuplexFiles() const;
+            void     RecordBadDuplexPage() const;
+            int      ProcessManualDuplexState(LONG Msg) const;
             int      MergeDuplexFilesEx(const sDuplexFileData& DupData,
                                         CTL_ImageIOHandlerPtr& pHandler,
-                                        const CTL_StringType& strTempFile,
-                                        int MultiPageOption);
+                                        CTL_StringType strTempFile,
+                                        int MultiPageOption) const;
 
             int     CopyDibToFileEx(CTL_TwainDibPtr pCurDib,
                                      int MultipageOption,
                                      CTL_ImageIOHandlerPtr& pHandler,
-                                     const CTL_StringType& strTempFile);
+                                     CTL_StringType strTempFile) const;
 
-            void     ManualDuplexCleanUp(const CTL_StringType& strFile,
-                                         bool bDeleteFile=false);
-            bool     ProcessFailureCondition(int nAction);
-            LONG     CloseMultiPageDibFile(bool bSaveFile=true);
-            void     EndProcessingImageFile(bool bSaveFile=true);
+            void     ManualDuplexCleanUp(CTL_StringType strFile, bool bDeleteFile=false) const;
+            bool     ProcessFailureCondition(int nAction) const;
+            LONG     CloseMultiPageDibFile(bool bSaveFile=true) const;
+            void     EndProcessingImageFile(bool bSaveFile=true) const;
 
         private:
             CTL_ImageXferTriplet *m_pTrip;

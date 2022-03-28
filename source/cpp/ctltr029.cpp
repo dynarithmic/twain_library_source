@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ CTL_SetupMemXferTriplet::CTL_SetupMemXferTriplet(CTL_ITwainSession *pSession,
                 DG_CONTROL,
                 DAT_SETUPMEMXFER,
                 CTL_GetTypeGET,
-                (TW_MEMREF)&m_SetupMemXfer);
+                static_cast<TW_MEMREF>(&m_SetupMemXfer));
 
             SetAlive(true);
         }

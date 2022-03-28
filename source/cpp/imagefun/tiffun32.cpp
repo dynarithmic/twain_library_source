@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,28 +21,27 @@
  #ifdef _MSC_VER
 #pragma warning (disable : 4786)
 #endif
-#include <cstring>
 #include <stdio.h>
 #include <stdlib.h>
+#include <memory>
 #include "tiffun32.h"
 #include "pdflib32.h"
 #include "ctliface.h"
 #include "ctltwmgr.h"
-#include "ctlfileutils.h"
 #include "tiff.h"
 
 using namespace dynarithmic;
 
 CTL_StringType CTIFFImageHandler::s_AppInfo;
 
-CTL_String CTIFFImageHandler::GetFileExtension() const
+std::string CTIFFImageHandler::GetFileExtension() const
 {
     return "TIF";
 }
 
 HANDLE CTIFFImageHandler::GetFileInformation(LPCSTR /*path*/)
 {
-    return NULL;
+    return nullptr;
 }
 
 void CTIFFImageHandler::SetMultiPageStatus(DibMultiPageStruct *pStruct)
@@ -60,7 +59,7 @@ void CTIFFImageHandler::GetMultiPageStatus(DibMultiPageStruct *pStruct)
 
 bool CTIFFImageHandler::OpenOutputFile(LPCTSTR pFileName)
 {
-    StringTraits::StringCopy(m_FileName, pFileName);
+    StringTraits::Copy(m_FileName, pFileName);
     SetError(0);
     return true;
 }
@@ -72,14 +71,18 @@ bool CTIFFImageHandler::CloseOutputFile()
 
 void CTIFFImageHandler::DestroyAllObjects()
 {
-    FIMULTIBITMAP *fp = reinterpret_cast<FIMULTIBITMAP*>(m_MultiPageStruct.pUserData);
-    if ( fp )
-        m_nError = FreeImage_CloseMultiBitmap(fp, 0)?0:1;
+    auto tiffPtr = std::dynamic_pointer_cast<TiffMultiPageData>(m_MultiPageStruct.pUserData);
+    if ( tiffPtr )
+    {
+        auto fp = tiffPtr->fp;
+        if ( fp )
+            m_nError = FreeImage_CloseMultiBitmap(fp, 0)? false : true;
+    }
 }
 
 int CTIFFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR path, HANDLE bitmap, void *pUserInfo/*=NULL*/)
 {
-    std::unordered_map<int, int> compressionFlags = {{COMPRESSION_PACKBITS, TIFF_PACKBITS},
+    const std::unordered_map<int, int> compressionFlags = {{COMPRESSION_PACKBITS, TIFF_PACKBITS},
                                                      {COMPRESSION_DEFLATE, TIFF_DEFLATE},
                                                      {COMPRESSION_NONE, TIFF_NONE},
                                                      {COMPRESSION_CCITTFAX3, TIFF_CCITTFAX3},
@@ -92,21 +95,22 @@ int CTIFFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR 
     // if only a single page TIFF
     if (m_MultiPageStruct.Stage == 0 || m_MultiPageStruct.Stage == DIB_MULTI_FIRST)
     {
-        FIMULTIBITMAP *fp = nullptr;
-        CTL_String fname = StringConversion::Convert_NativePtr_To_Ansi(path);
+        auto ptrTiffData = std::make_shared<TiffMultiPageData>();
+        ptrTiffData->fp = nullptr;
+        const std::string fname = StringConversion::Convert_NativePtr_To_Ansi(path);
         {
-            std::ofstream ofs(fname.c_str());
+            const std::ofstream ofs(fname);
             if (!ofs)
                 return DTWAIN_ERR_FILEOPEN;
         }
         if (m_MultiPageStruct.Stage != 0)
         {
-            fp = FreeImage_OpenMultiBitmap(FIF_TIFF, fname.c_str(), true, false, false, 0);
-            FreeImage_SetPageNumberEx(fp, 0);
-            if ( !fp )
+            ptrTiffData->fp = FreeImage_OpenMultiBitmap(FIF_TIFF, fname.c_str(), true, false, false, 0);
+            FreeImage_SetPageNumberEx(ptrTiffData->fp, 0);
+            if ( !ptrTiffData->fp )
                 return DTWAIN_ERR_FILEOPEN;
         }
-        m_MultiPageStruct.pUserData = fp;
+        m_MultiPageStruct.pUserData = ptrTiffData;
     }
     else
     if (m_MultiPageStruct.Stage == DIB_MULTI_LAST)
@@ -115,12 +119,13 @@ int CTIFFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR 
         return DTWAIN_NO_ERROR;
     }
 
-    FIMULTIBITMAP *fp = reinterpret_cast<FIMULTIBITMAP*>(m_MultiPageStruct.pUserData);
+
+    auto ptrTiffData = std::dynamic_pointer_cast<TiffMultiPageData>(m_MultiPageStruct.pUserData);
     fipImage im;
     fipImageUtility::copyFromHandle(im, bitmap);
     fipWinImage_RAII raii(&im);
     unsigned long compression;
-    int retVal = ProcessCompressionType(im, compression);
+    const int retVal = ProcessCompressionType(im, compression);
     if (retVal != 0)
         return retVal;
 
@@ -130,17 +135,20 @@ int CTIFFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR 
         case DTWAIN_CENTIMETERS:
             factor = 1.0;
     }
-    im.setHorizontalResolution((m_ImageInfoEx.ResolutionX * factor) / 2.54);
-    im.setVerticalResolution((m_ImageInfoEx.ResolutionY * factor) / 2.54);
+    im.setHorizontalResolution(m_ImageInfoEx.ResolutionX * factor / 2.54);
+    im.setVerticalResolution(m_ImageInfoEx.ResolutionY * factor / 2.54);
 
     fipTag ft;
-    ft.setKeyValue("Comment", StringConversion::Convert_Native_To_Ansi(dynarithmic::GetVersionString()).c_str());
+    char commentStr[256] = {};
+    GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
+    ft.setKeyValue("Comment", commentStr);
     im.setMetadata(FIMD_COMMENTS, "Comment", ft);
 
+    const auto iter = compressionFlags.find(static_cast<int>(compression));
     if (m_MultiPageStruct.Stage == 0)
     {
-        int flagsValue = (int)(m_ImageInfoEx.nJpegQuality << 24) | (compressionFlags[compression]);
-        auto retVal2 = im.saveEx(FIF_TIFF, StringConversion::Convert_Native_To_Ansi(path).c_str(), m_MultiPageStruct.Page, flagsValue);
+        const int flagsValue = static_cast<int>(m_ImageInfoEx.nJpegQuality << 24) | iter->second;
+        const auto retVal2 = im.saveEx(FIF_TIFF, StringConversion::Convert_Native_To_Ansi(path).c_str(), m_MultiPageStruct.Page, flagsValue);
         if (retVal2 == 1)
         {
             ++m_MultiPageStruct.Page;
@@ -150,20 +158,20 @@ int CTIFFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR 
     }
 
     // this is a multipage write
-    FreeImage_AppendPageEx(fp, im, compressionFlags[compression]);
-    FreeImage_SetPageNumberEx(fp, FreeImage_GetPageNumber(fp) + 1);
+    FreeImage_AppendPageEx(ptrTiffData->fp, im, iter->second);
+    FreeImage_SetPageNumberEx(ptrTiffData->fp, FreeImage_GetPageNumber(ptrTiffData->fp) + 1);
     ++m_MultiPageStruct.Page;
     return 0;
 }
 
-int CTIFFImageHandler::ProcessCompressionType(fipImage& im, unsigned long& compression)
+int CTIFFImageHandler::ProcessCompressionType(fipImage& im, unsigned long& compression) const
 {
     long samplesperpixel = 0;
     long bitspersample = 0;
     long photometric = 0;
     compression = 0;
     bool bOk = false;
-    auto bits = im.getBitsPerPixel();
+    const auto bits = im.getBitsPerPixel();
 
     switch(bits)
     {
@@ -204,14 +212,12 @@ int CTIFFImageHandler::ProcessCompressionType(fipImage& im, unsigned long& compr
                 bOk = true;
             }
 
-            if (m_nFormat == COMPRESSION_JPEG)
-                photometric = PHOTOMETRIC_RGB;
+            if (m_nFormat == COMPRESSION_JPEG) {}
             break;
         case 24:
         case 32:
             samplesperpixel = 3;
             bitspersample = 8;
-            photometric = PHOTOMETRIC_RGB;
             if ( m_nFormat == COMPRESSION_NONE ||
                  m_nFormat == COMPRESSION_LZW ||
                  m_nFormat == COMPRESSION_PACKBITS ||

@@ -63,6 +63,7 @@
 1048 Type inconnu
 1049 Demo Version of DTWAIN does not support this file type
 1050 Sélection Annulée
+1051 DTWAIN Resources not found
 1100 Condition de Twain ne pouvait pas Coder : ne pouvions pas parachever de l'opération.   Mémoire Insuffisante.
 1101 Faute de Code : de Condition de Twain
 1102 Twain Conditionne Code : Inconnu de la cause du raté
@@ -257,5 +258,5 @@
 9609 TWRC_DATANOTAVAILABLE
 9610 TWRC_BUSY
 9611 TWRC_SCANNERLOCKED
-9700 DTWAIN Twain Library, version {short_version}, {company_name}, {copyright}
+9700 DTWAIN Twain Library, v{short_version}, {company_name}, {copyright}
 9999 Exception error occurred during call to Twain DSM.  Possible corrupted Twain session?

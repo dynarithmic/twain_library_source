@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,13 +18,14 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include "cppfunc.h"
 #include "ctltwmgr.h"
 #include "enumeratorfuncs.h"
 #include "errorcheck.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
-using namespace std;
+
 using namespace dynarithmic;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,21 +33,21 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LONG DeviceEvents)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, DeviceEvents))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, Source);
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
 
     // See if Source is opened
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return (!CTL_TwainAppMgr::IsSourceOpen(pSource)); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(pSource); },
     DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
     // See if Source supports the DEVICEEVENTS capability
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return (!DTWAIN_IsCapSupported(pSource, DTWAIN_CV_CAPDEVICEEVENT)); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !DTWAIN_IsCapSupported(pSource, DTWAIN_CV_CAPDEVICEEVENT); },
     DTWAIN_ERR_DEVICEEVENT_NOT_SUPPORTED, false, FUNC_MACRO);
 
     // Set the notifications
-    DTWAIN_ARRAY Array = 0;
+    DTWAIN_ARRAY Array = nullptr;
     DTWAINArrayPtr_RAII a(&Array);
 
     LONG SetType = DTWAIN_CAPSET;
@@ -58,7 +59,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
         LONG i;
         for (i = 0; i < 32; i++)
         {
-            if (DeviceEvents & (1L << i))
+            if (DeviceEvents & 1L << i)
                 nBits++;
         }
         if (nBits == 0)
@@ -74,14 +75,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
 
         for (i = 0; i < 32; i++)
         {
-            if (DeviceEvents & (1L << i))
+            if (DeviceEvents & 1L << i)
             {
                 vValues[nIndex] = i;
                 ++nIndex;
             }
         }
     }
-    bool bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPDEVICEEVENT, SetType, Array)?true:false;
+    const bool bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPDEVICEEVENT, SetType, Array)?true:false;
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -89,23 +90,23 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceNotifications(DTWAIN_SOURCE Source, LPLONG lpDeviceEvents)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpDeviceEvents))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, Source);
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    DTWAIN_ARRAY Array = 0;
+    DTWAIN_ARRAY Array = nullptr;
     DTWAINArrayPtr_RAII raii(&Array);
 
     // See if Source is opened
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return (!CTL_TwainAppMgr::IsSourceOpen(pSource)); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !CTL_TwainAppMgr::IsSourceOpen(pSource); },
         DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
     // See if Source supports the DEVICEEVENTS capability
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return (!DTWAIN_IsCapSupported(pSource, DTWAIN_CV_CAPDEVICEEVENT)); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !DTWAIN_IsCapSupported(pSource, DTWAIN_CV_CAPDEVICEEVENT); },
                                         DTWAIN_ERR_DEVICEEVENT_NOT_SUPPORTED, false, FUNC_MACRO);
 
-    bool bRet = DTWAIN_GetCapValues(Source, DTWAIN_CV_CAPDEVICEEVENT, DTWAIN_CAPGETCURRENT, &Array) ? true : false;
+    const bool bRet = DTWAIN_GetCapValues(Source, DTWAIN_CV_CAPDEVICEEVENT, DTWAIN_CAPGETCURRENT, &Array) ? true : false;
     if (!bRet)
         LOG_FUNC_EXIT_PARAMS(false)
 
@@ -124,12 +125,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceNotifications(DTWAIN_SOURCE Source, LPL
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEvent(DTWAIN_SOURCE Source, LPLONG lpEvent)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpEvent))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, Source);
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    CTL_DeviceEvent DeviceEvent = pSource->GetDeviceEvent();
+    const CTL_DeviceEvent DeviceEvent = pSource->GetDeviceEvent();
     *lpEvent = DeviceEvent.GetEvent() + 1;
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
@@ -143,9 +144,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventEx(DTWAIN_SOURCE Source, LPLONG lp
     if (!pArray)
         LOG_FUNC_EXIT_PARAMS(true)
 
-    CTL_ITwainSource* pSource = (CTL_ITwainSource *)Source;
-    CTL_DeviceEvent DeviceEvent = pSource->GetDeviceEvent();
-    DTWAIN_BOOL bRet = DeviceEvent.GetEventInfoEx(pArray);
+    const CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
+    const CTL_DeviceEvent DeviceEvent = pSource->GetDeviceEvent();
+    const DTWAIN_BOOL bRet = DeviceEvent.GetEventInfoEx(pArray);
     LOG_FUNC_EXIT_PARAMS(bRet)
         CATCH_BLOCK(false)
 }
@@ -153,87 +154,87 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventEx(DTWAIN_SOURCE Source, LPLONG lp
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventInfo(DTWAIN_SOURCE Source, LONG nWhichInfo, LPVOID pValue)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nWhichInfo, pValue))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, Source);
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    CTL_DeviceEvent DeviceEvent = pSource->GetDeviceEvent();
+    const CTL_DeviceEvent DeviceEvent = pSource->GetDeviceEvent();
     switch (nWhichInfo)
     {
         case DTWAIN_GETDE_EVENT:
         {
-            LPLONG p = (LPLONG)pValue;
+            const auto p = static_cast<LPLONG>(pValue);
             *p = DeviceEvent.GetEvent() + 1;
         }
         break;
 
         case DTWAIN_GETDE_DEVNAME:
         {
-            char FAR *s = (char FAR *)pValue;
+            char *s = static_cast<char*>(pValue);
             strcpy(s, StringConversion::Convert_Native_To_Ansi(DeviceEvent.GetDeviceName()).c_str());
         }
         break;
 
         case DTWAIN_GETDE_BATTERYMINUTES:
         {
-            LPLONG p = (LPLONG)pValue;
+            const LPLONG p = static_cast<LPLONG>(pValue);
             *p = DeviceEvent.GetBatteryMinutes();
         }
             break;
 
         case DTWAIN_GETDE_BATTERYPCT:
         {
-            LPLONG p = (LPLONG)pValue;
+            const LPLONG p = static_cast<LPLONG>(pValue);
             *p = DeviceEvent.GetBatteryPercentage();
         }
             break;
 
         case DTWAIN_GETDE_XRESOLUTION:
         {
-            double *p = (double *)pValue;
+            double *p = static_cast<double*>(pValue);
             *p = DeviceEvent.GetXResolution();
         }
         break;
 
         case DTWAIN_GETDE_YRESOLUTION:
         {
-            double *p = (double *)pValue;
+            double *p = static_cast<double*>(pValue);
             *p = DeviceEvent.GetYResolution();
         }
             break;
 
         case DTWAIN_GETDE_FLASHUSED:
         {
-            LPLONG p = (LPLONG)pValue;
+            const LPLONG p = static_cast<LPLONG>(pValue);
             *p = DeviceEvent.GetFlashUsed2();
         }
             break;
 
         case DTWAIN_GETDE_AUTOCAPTURE:
         {
-            LPLONG p = (LPLONG)pValue;
+            const LPLONG p = static_cast<LPLONG>(pValue);
             *p = DeviceEvent.GetAutomaticCapture();
         }
         break;
 
         case DTWAIN_GETDE_TIMEBEFORECAPTURE:
         {
-            LPLONG p = (LPLONG)pValue;
+            const LPLONG p = static_cast<LPLONG>(pValue);
             *p = DeviceEvent.GetTimeBeforeFirstCapture();
         }
         break;
 
         case DTWAIN_GETDE_TIMEBETWEENCAPTURES:
         {
-            LPLONG p = (LPLONG)pValue;
+            const LPLONG p = static_cast<LPLONG>(pValue);
             *p = DeviceEvent.GetTimeBetweenCaptures();
         }
         break;
 
         case DTWAIN_GETDE_POWERSUPPLY:
         {
-            LPLONG p = (LPLONG)pValue;
+            const LPLONG p = static_cast<LPLONG>(pValue);
             *p = DeviceEvent.GetPowerSupply();
         }
         break;

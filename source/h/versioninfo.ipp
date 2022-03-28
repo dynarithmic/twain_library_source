@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
  */
 // CVersionInfo implementation
 
-#define SWAPWORDS(X) ( (X<<16) | (X>>16) )
+#define SWAPWORDS(X) ( ((X)<<16) | ((X)>>16) )
 
 template <typename charTraits>
 VersionInfoImpl<charTraits>::VersionInfoImpl(HMODULE hMod )
@@ -112,18 +112,18 @@ bool VersionInfoImpl<charTraits>::getit( typename charTraits::TraitsCharType con
         }
 
         UINT     uTranLen = 0;
-        LPDWORD  lpdwLangCp = NULL;
+        LPDWORD  lpdwLangCp = nullptr;
         if ( charTraits::VerQueryValueImpl( &versionInfo[0],
                                             charTraits::Compat( "\\VarFileInfo\\Translation" ).c_str(), (LPVOID *) &lpdwLangCp, &uTranLen ))
         {
-            for ( int iIndex = 0; iIndex < (int)( uTranLen / sizeof( VersionInfoImpl<charTraits>::TranslationInfo ) );
+            for ( int iIndex = 0; iIndex < static_cast<int>(uTranLen / sizeof(TranslationInfo));
 						iIndex++ )
             {
-                m_sBuf.str( ( charTraits::Compat("") ) );
+                m_sBuf.str( charTraits::Compat("") );
 
                 // Flip the words to display lang first.
                 typename charTraits::TraitsStringStreamType szStrm;
-                szStrm.fill((char_type)'0');
+                szStrm.fill(static_cast<char_type>('0'));
                 szStrm << std::hex << std::setw(8) << SWAPWORDS( *( lpdwLangCp + iIndex ) );
                 typename charTraits::TraitsStringType szLangCp = szStrm.str();
 
@@ -141,10 +141,10 @@ bool VersionInfoImpl<charTraits>::getit( typename charTraits::TraitsCharType con
                     strm << charTraits::Compat("\\StringFileInfo\\") << szLangCp <<
                         charTraits::Compat("\\") << (*it).first;
 
-                    char_type* szVer = NULL;
-                    if ( charTraits::VerQueryValueImpl( &versionInfo[0], strm.str().c_str(), (LPVOID *) &szVer, &uVerLen ) )
+                    char_type* szVer = nullptr;
+                    if ( charTraits::VerQueryValueImpl( &versionInfo[0], strm.str().c_str(), reinterpret_cast<LPVOID*>(&szVer), &uVerLen ) )
                     {
-                        (*it).second = (const char_type*) szVer;
+                        (*it).second = static_cast<const char_type*>(szVer);
                     }
                 }
             }

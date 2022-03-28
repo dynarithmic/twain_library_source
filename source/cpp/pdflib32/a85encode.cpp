@@ -1,6 +1,6 @@
 /*
 This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-Copyright (c) 2002-2021 Dynarithmic Software.
+Copyright (c) 2002-2022 Dynarithmic Software.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ std::string A85Encoder::EncodeA85(const std::string& strIn)
 {
     strOut.clear();
     strOut.reserve(strIn.length());
-    for (char ch : strIn) 
+    for (const char ch : strIn)
         processA85char(ch);
     cleanup85();
     return strOut;
@@ -52,9 +52,9 @@ void A85Encoder::processA85char(unsigned c)
     c = c & 0x00FF;
     switch (count++)
     {
-        case 0: tuple |= (c << 24); break;
-        case 1: tuple |= (c << 16); break;
-        case 2: tuple |= (c <<  8); break;
+        case 0: tuple |= c << 24; break;
+        case 1: tuple |= c << 16; break;
+        case 2: tuple |= c <<  8; break;
         case 3:
             tuple |= c;
             if (tuple == 0)
@@ -76,11 +76,10 @@ void A85Encoder::processA85char(unsigned c)
 
 void A85Encoder::encode(unsigned long tupleParam, int countParam)
 {
-    int i;
     char buf[5], *s = buf;
-    i = 5;
+    int i = 5;
     do {
-        *s++ = (char)(tupleParam % 85);
+        *s++ = static_cast<char>(tupleParam % 85);
         tupleParam /= 85;
     } while (--i > 0);
     i = countParam;

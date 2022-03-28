@@ -97,11 +97,11 @@ unsigned long crc32_aux(unsigned long crc, unsigned char *buf, unsigned int len)
     crc = crc ^ 0xffffffffL;
     while (len >= 8)
     {
-      DO8(buf);
+      DO8(buf)
       len -= 8;
     }
     if (len) do {
-      DO1(buf);
+      DO1(buf)
     } while (--len);
     return crc ^ 0xffffffffL;
 }

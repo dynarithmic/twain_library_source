@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,13 +18,14 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#define MC_NO_CPP
 #include <cstring>
-#include <stdlib.h>
+#include <cstdlib>
 #include <algorithm>
-#include <cwchar>
 #include <sstream>
 #include <iterator>
+#include <string>
+#include <boost/lexical_cast.hpp>
+#include <utility>
 #include "ctltwsrc.h"
 #include "ctltr009.h"
 #include "ctltwmgr.h"
@@ -36,31 +37,17 @@
 #include "enumeratorfuncs.h"
 #include "ctlfileutils.h"
 #include "tiff.h"
-#include "boost/lexical_cast.hpp"
-using namespace std;
+
 using namespace dynarithmic;
 
-static CTL_StringType GetPageFileName(const CTL_StringType &strBase,
-                                  int nCurImage,
-                                  bool bUseLongNames );
-
-static CTL_StringType CreateFileNameFromNumber(const CTL_StringType& sFileName, int num, int nDigits);
-static int GetInitialFileNumber(const CTL_StringType& sFileName, size_t &nDigits);
-
 //////////////////////////////////////////////////////////////////////////////
-CTL_TwainSource::CTL_TwainSource(CTL_ITwainSource *pSource) : m_pSource(pSource){}
-
-void CTL_TwainSource::SetEqual(CTL_TwainSource & SObject)
-{ m_pSource = SObject.m_pSource; }
-
 CTL_ITwainSource* CTL_ITwainSource::Create( CTL_ITwainSession* pSession,
-                                            LPCTSTR lpszProduct/*=NULL*/ )
+                                            LPCTSTR lpszProduct/*=nullptr*/ )
 {
-    CTL_ITwainSource *pSource = new CTL_ITwainSource( pSession, lpszProduct );
-    return pSource;
+    return new CTL_ITwainSource( pSession, lpszProduct );
 }
 
-void CTL_ITwainSource::Destroy( CTL_ITwainSource *pSource )
+void CTL_ITwainSource::Destroy(const CTL_ITwainSource* pSource)
 { delete pSource; }
 
 void CTL_ITwainSource::SetUIOpen(bool bSet)
@@ -69,7 +56,7 @@ void CTL_ITwainSource::SetUIOpen(bool bSet)
 void CTL_ITwainSource::SetActive(bool bSet)
 { m_bActive = bSet; }
 
-bool CTL_ITwainSource::IsSourceCompliant( CTL_EnumTwainVersion TVersion, CTL_TwainCapArray &rArray )
+bool CTL_ITwainSource::IsSourceCompliant( CTL_EnumTwainVersion TVersion, CTL_TwainCapArray &rArray ) const
 {
     CTL_TwainCapArray Array;
     rArray.clear();
@@ -106,43 +93,39 @@ bool CTL_ITwainSource::IsSourceCompliant( CTL_EnumTwainVersion TVersion, CTL_Twa
             break;
     }
 
-    int nMask;
-    TW_UINT16 Cap;
     bool bIsCompliant = true;
-    int  nValue;
-    for ( CTL_IntArray::size_type i = 0; i < Array.size(); i++ )
+    for (unsigned short Cap : Array)
     {
-        nValue = 0;
-        Cap = Array[i];
-        nMask = CTL_TwainAppMgr::GetCapMaskFromCap( Cap );
+        int nValue = 0;
+        const int nMask = CTL_TwainAppMgr::GetCapMaskFromCap(Cap);
 
-        if ( CTL_TwainAppMgr::IsCapMaskOn( Cap, (CTL_EnumGetType)CTL_CapMaskGET ) )
+        if ( CTL_TwainAppMgr::IsCapMaskOn( Cap, static_cast<CTL_EnumGetType>(CTL_CapMaskGET) ) )
         {
-            bIsCompliant = CTL_TwainAppMgr::IsCapabilitySupported( this, (int) Cap, CTL_GetTypeGET );
+            bIsCompliant = CTL_TwainAppMgr::IsCapabilitySupported( this, Cap, CTL_GetTypeGET );
             if ( bIsCompliant )
                 nValue |= CTL_CapMaskGET;
         }
 
-        if ( CTL_TwainAppMgr::IsCapMaskOn( Cap, (CTL_EnumGetType)CTL_CapMaskGETCURRENT ) )
+        if ( CTL_TwainAppMgr::IsCapMaskOn( Cap, static_cast<CTL_EnumGetType>(CTL_CapMaskGETCURRENT) ) )
         {
-            bIsCompliant = CTL_TwainAppMgr::IsCapabilitySupported( this, (int) Cap, CTL_GetTypeGETCURRENT );
+            bIsCompliant = CTL_TwainAppMgr::IsCapabilitySupported( this, Cap, CTL_GetTypeGETCURRENT );
             if ( bIsCompliant )
                 nValue |= CTL_CapMaskGETCURRENT;
         }
 
-        if ( CTL_TwainAppMgr::IsCapMaskOn( Cap, (CTL_EnumGetType)CTL_CapMaskGETDEFAULT ) )
+        if ( CTL_TwainAppMgr::IsCapMaskOn( Cap, static_cast<CTL_EnumGetType>(CTL_CapMaskGETDEFAULT) ) )
         {
-            bIsCompliant = CTL_TwainAppMgr::IsCapabilitySupported( this, (int) Cap, CTL_GetTypeGETDEFAULT );
+            bIsCompliant = CTL_TwainAppMgr::IsCapabilitySupported( this, Cap, CTL_GetTypeGETDEFAULT );
             if ( bIsCompliant )
                 nValue |= CTL_CapMaskGETDEFAULT;
         }
 
-        if ( CTL_TwainAppMgr::IsCapMaskOn( Cap, (CTL_EnumSetType)CTL_CapMaskSET ) )
+        if ( CTL_TwainAppMgr::IsCapMaskOn( Cap, static_cast<CTL_EnumSetType>(CTL_CapMaskSET) ) )
         {
             nValue |= CTL_CapMaskSET;
         }
 
-        if ( CTL_TwainAppMgr::IsCapMaskOn( Cap, (CTL_EnumSetType)CTL_CapMaskRESET ) )
+        if ( CTL_TwainAppMgr::IsCapMaskOn( Cap, static_cast<CTL_EnumSetType>(CTL_CapMaskRESET) ) )
         {
             nValue |= CTL_CapMaskRESET;
         }
@@ -168,13 +151,13 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     CapCacheInfo(),
     m_bDSMVersion2(false),
     m_bIsOpened(false),
+    m_bIsSelected(false),
     m_SourceId{},
     m_pSession(pSession),
-    m_bIsSelected(false),
     m_bUIOpened(false),
     m_bPromptPending(false),
     m_bActive(true),
-    m_hOutWnd(0),
+    m_hOutWnd(nullptr),
     m_DibArray(std::make_shared<CTL_TwainDibArray>(CTL_TwainDibArray())),
     m_bUseFeeder(true),
     m_bUseAutomaticSenseMediumEnabledMode(true),
@@ -201,7 +184,6 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_nSpecialMode(0),
     m_UserInterface{},
     m_aAcqAttempts(nullptr),
-    m_DeviceEvent {},
     m_bShowUIOnly(false),
     m_nCompression(DTWAIN_CP_NONE),
     m_nState(SOURCE_STATE_CLOSED),
@@ -217,7 +199,7 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_nMaxRetryAttempts ( DTWAIN_MAXRETRY_ATTEMPTS ),
     m_nCurRetryCount ( 0 ),
     m_pImageHandler(nullptr),
-    m_hAcquireStrip(0),
+    m_hAcquireStrip(nullptr),
     m_bUserStripUsed ( false ),
     m_nUserStripSize ( 0 ),
     m_bImagesStored ( false ),
@@ -232,6 +214,7 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_nManualDuplexModeFlags ( DTWAIN_MANDUP_FACEDOWNBOTTOMPAGE ),
     m_nMultiPageScanMode ( DTWAIN_FILESAVE_DEFAULT ),
     m_nCurrentSideAcquired ( 0 ),
+    m_bDuplexSideDone{ false,false },
     m_EOJDetectedValue ( 1 ),
     m_bIsFileSaveIncomplete ( false ),
     m_nJobNum ( 0 ),
@@ -239,6 +222,8 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_bJobFileHandling ( false ),
     m_bImageLayoutValid ( false ),
     m_bIsBlankPageDetectionOn ( false ),
+    m_bIsBlankPageDetectionNoSampleOn(false),
+    m_bIsBlankPageDetectionSampleOn(false),
     m_lBlankPageAutoDetect ( DTWAIN_BP_AUTODISCARD_NONE ),
     m_dBlankPageThreshold ( 0.99 ),
     m_nBlankPageCount ( 0 ),
@@ -247,19 +232,15 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_bProcessingPixelInfo ( false ),
     m_bSkipImageInfoErrors ( false ),
     m_nForcedBpp ( 0 ),
-    m_AltAcquireArea(),
     m_ImageInfo (),
-    m_ImageLayout(),
     m_FileSystem(),
     m_pImageMemXfer(nullptr),
     m_PersistentArray(nullptr),
-    m_bDuplexSideDone{ false,false },
     m_bImageInfoRetrieved(false)
-{
-    if ( lpszProduct != NULL )
+ {
+    if ( lpszProduct )
         StringWrapperA::SafeStrcpy( m_SourceId.ProductName,
-                                    StringConversion::Convert_Native_To_Ansi(lpszProduct).c_str(),
-                                    sizeof( m_SourceId.ProductName ) - 1 );
+                                    StringConversion::Convert_Native_To_Ansi(lpszProduct).c_str(), sizeof m_SourceId.ProductName - 1 );
 
     // Image information default values
     m_ImageInfoEx.nJpegQuality = 75;
@@ -281,14 +262,13 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_ImageInfoEx.PDFThumbnailScale[0] = m_ImageInfoEx.PDFThumbnailScale[1] = 0.1;
     m_ImageInfoEx.PhotoMetric = PHOTOMETRIC_MINISBLACK;
     m_ImageInfoEx.theSource = this;
-
     m_AltAcquireArea.UnitOfMeasure = DTWAIN_INCHES;
-
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    SetPDFValue(PDFPRODUCERKEY, pHandle->GetVersionString());
+    char commentStr[256] = {};
+    GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
+    SetPDFValue(PDFPRODUCERKEY, StringConversion::Convert_Ansi_To_Native(commentStr));
 }
 
-void CTL_ITwainSource::Reset()
+void CTL_ITwainSource::Reset() const
 {
     RemoveAllDibs();
 }
@@ -298,7 +278,7 @@ void CTL_ITwainSource::SetAlternateAcquireArea(double left, double top, double r
 {
     if ( bSet )
     {
-        m_AltAcquireArea.flags |= CTL_ITwainSource::CROP_FLAG;
+        m_AltAcquireArea.flags |= CROP_FLAG;
         m_AltAcquireArea.m_rect.left = left;
         m_AltAcquireArea.m_rect.top = top;
         m_AltAcquireArea.m_rect.right = right;
@@ -307,7 +287,7 @@ void CTL_ITwainSource::SetAlternateAcquireArea(double left, double top, double r
     }
     else
         m_AltAcquireArea.flags =
-            m_AltAcquireArea.flags &~ CTL_ITwainSource::CROP_FLAG;
+            m_AltAcquireArea.flags &~ CROP_FLAG;
 }
 
 void CTL_ITwainSource::SetImageScale(double xscale, double yscale, bool bSet)
@@ -316,11 +296,11 @@ void CTL_ITwainSource::SetImageScale(double xscale, double yscale, bool bSet)
     {
         m_AltAcquireArea.m_rectScaling.left = xscale;
         m_AltAcquireArea.m_rectScaling.top  = yscale;
-        m_AltAcquireArea.flags |= CTL_ITwainSource::SCALE_FLAG;
+        m_AltAcquireArea.flags |= SCALE_FLAG;
     }
     else
         m_AltAcquireArea.flags =
-            m_AltAcquireArea.flags &~ CTL_ITwainSource::SCALE_FLAG;
+            m_AltAcquireArea.flags &~ SCALE_FLAG;
 }
 
 bool CTL_ITwainSource::SetManualDuplexMode(LONG nFlags, bool bSet)
@@ -330,21 +310,21 @@ bool CTL_ITwainSource::SetManualDuplexMode(LONG nFlags, bool bSet)
     return true;
 }
 
-void CTL_ITwainSource::GetAlternateAcquireArea(FloatRect& r, LONG& UnitOfMeasure, LONG& flags)
+void CTL_ITwainSource::GetAlternateAcquireArea(FloatRect& r, LONG& UnitOfMeasure, LONG& flags) const
 {
     r.left = m_AltAcquireArea.m_rect.left;
     r.top = m_AltAcquireArea.m_rect.top;
     r.right = m_AltAcquireArea.m_rect.right;
     r.bottom = m_AltAcquireArea.m_rect.bottom;
     UnitOfMeasure = m_AltAcquireArea.UnitOfMeasure;
-    flags = (LONG)m_AltAcquireArea.flags;
+    flags = static_cast<LONG>(m_AltAcquireArea.flags);
 }
 
-void CTL_ITwainSource::GetImageScale(double& xscale, double& yscale, LONG& flags)
+void CTL_ITwainSource::GetImageScale(double& xscale, double& yscale, LONG& flags) const
 {
     xscale = m_AltAcquireArea.m_rectScaling.left;
     yscale = m_AltAcquireArea.m_rectScaling.top;
-    flags = (LONG)m_AltAcquireArea.flags;
+    flags = static_cast<LONG>(m_AltAcquireArea.flags);
 }
 
 void CTL_ITwainSource::AddCapToStateInfo(TW_UINT16 nCap, short int cStateInfo)
@@ -354,8 +334,7 @@ void CTL_ITwainSource::AddCapToStateInfo(TW_UINT16 nCap, short int cStateInfo)
 
 bool CTL_ITwainSource::IsCapNegotiableInState(TW_UINT16 nCap, int nState) const
 {
-    CapToStateMap::const_iterator it;
-    it = m_mapCapToState.find(nCap);
+    const auto it = m_mapCapToState.find(nCap);
     //...
     if (it != m_mapCapToState.end())
     {
@@ -373,8 +352,8 @@ bool CTL_ITwainSource::IsCapabilityCached(TW_UINT16 nCap) const
 
 void CTL_ITwainSource::SetCapCached(TW_UINT16 nCapability, bool bSet)
 {
-    CachedCapMap::iterator found = m_aCapCache.find((TW_UINT16)nCapability);
-    TW_UINT16 nVal = nCapability;
+    const CachedCapMap::iterator found = m_aCapCache.find(static_cast<TW_UINT16>(nCapability));
+    const TW_UINT16 nVal = nCapability;
     bool bCached = false;
     if ( found != m_aCapCache.end())
         bCached = true;
@@ -388,7 +367,7 @@ void CTL_ITwainSource::SetCapCached(TW_UINT16 nCapability, bool bSet)
 
 int CTL_ITwainSource::IsCapSupportedFromCache(TW_UINT16 nCap)
 {
-    CachedCapMap::iterator found = m_aCapCache.find((TW_UINT16)nCap);
+    const auto found = m_aCapCache.find(static_cast<TW_UINT16>(nCap));
     if ( found == m_aCapCache.end())
         return -1;
     return (*found).second;
@@ -419,7 +398,7 @@ bool CTL_ITwainSource::IsCapInSupportedList(TW_UINT16 nCap) const
     return IsCapInList(m_aSupportedCapCache, nCap);
 }
 
-bool CTL_ITwainSource::IsCapInList(const CapList& vList, TW_UINT16 nCap) const
+bool CTL_ITwainSource::IsCapInList(const CapList& vList, TW_UINT16 nCap)
 {
     return vList.count(nCap)?true:false;
 }
@@ -431,7 +410,7 @@ CapList& CTL_ITwainSource::GetCapSupportedList()
 
 void CTL_ITwainSource::SetCapSupportedList(CTL_TwainCapArray& rArray)
 {
-    CapList::iterator it = m_aSupportedCapCache.begin();
+    const auto it = m_aSupportedCapCache.begin();
     std::copy(rArray.begin(), rArray.end(), std::inserter(m_aSupportedCapCache, it));
 }
 
@@ -460,15 +439,15 @@ bool CTL_ITwainSource::CloseSource(bool bForce)
     RemoveAllDibs();
     if ( m_bIsOpened )
     {
-        if ( (bForce) && m_bActive)
+        if ( bForce && m_bActive)
         {
             ProcessMultipageFile();
             CTL_CloseSourceTriplet CS( m_pSession, this );
-            TW_UINT16 rc = CS.Execute();
+            const TW_UINT16 rc = CS.Execute();
             if ( rc != TWRC_SUCCESS )
             {
                 CTL_TwainAppMgr::ProcessConditionCodeError(
-                    CTL_TwainAppMgr::GetConditionCode( m_pSession, NULL, rc ));
+                    CTL_TwainAppMgr::GetConditionCode( m_pSession, nullptr, rc ));
                 m_bIsOpened = false;
                 return false;
             }
@@ -479,26 +458,26 @@ bool CTL_ITwainSource::CloseSource(bool bForce)
     return true;
 }
 
-void CTL_ITwainSource::RemoveAllDibs()
+void CTL_ITwainSource::RemoveAllDibs() const
 {
     m_DibArray->RemoveAllDibs();
 }
 
-void CTL_ITwainSource::Clone( CTL_ITwainSource* pSource)
+void CTL_ITwainSource::Clone(const CTL_ITwainSource* pSource)
 {
     m_bIsOpened = pSource->m_bIsOpened;
     m_bUIOpened = pSource->m_bUIOpened;
 }
 
-void CTL_ITwainSource::SetDibHandle(HANDLE hDib, size_t nWhich/*=0*/)
+void CTL_ITwainSource::SetDibHandle(HANDLE hDib, size_t nWhich/*=0*/) const
 {
     SetDibHandleProc(hDib, nWhich, false);
 }
 
 
-void CTL_ITwainSource::SetDibHandleProc(HANDLE hDib, size_t nWhich, bool bCreatePalette)
+void CTL_ITwainSource::SetDibHandleProc(HANDLE hDib, size_t nWhich, bool bCreatePalette) const
 {
-    size_t nSize = m_DibArray->GetSize();
+    const size_t nSize = m_DibArray->GetSize();
 
     if ( nWhich < nSize )
     {
@@ -508,14 +487,13 @@ void CTL_ITwainSource::SetDibHandleProc(HANDLE hDib, size_t nWhich, bool bCreate
     else
     {
         // Create a dib
-        CTL_TwainDibPtr pDib;
-        pDib = m_DibArray->CreateDib();
+        const CTL_TwainDibPtr pDib = m_DibArray->CreateDib();
         pDib->SetHandle( hDib, bCreatePalette );
         pDib->SetAutoDelete( m_bDibAutoDelete );
     }
 }
 
-void CTL_ITwainSource::SetDibHandleNoPalette(HANDLE hDib, int nWhich/*=0*/ )
+void CTL_ITwainSource::SetDibHandleNoPalette(HANDLE hDib, int nWhich/*=0*/ ) const
 {
     SetDibHandleProc(hDib, nWhich, false);
 }
@@ -523,22 +501,20 @@ void CTL_ITwainSource::SetDibHandleNoPalette(HANDLE hDib, int nWhich/*=0*/ )
 
 HANDLE CTL_ITwainSource::GetDibHandle(int nWhich /*=0*/) const
 {
-    CTL_TwainDibPtr pDib;
-    pDib = GetDibObject(nWhich);
+    const CTL_TwainDibPtr pDib = GetDibObject(nWhich);
     if ( pDib )
         return *pDib;
-    return NULL;
+    return nullptr;
 }
 
 
 CTL_TwainDibPtr CTL_ITwainSource::GetDibObject(int nWhich /*=0*/) const
 {
-    CTL_TwainDibPtr pDib;
-    auto nSize = m_DibArray->GetSize();
+    const auto nSize = m_DibArray->GetSize();
     if ( static_cast<size_t>(nWhich) < nSize )
     {
         // replace DIB with this DIB (returns reference to existing object)
-        pDib = m_DibArray->GetAt( nWhich );
+        CTL_TwainDibPtr pDib = m_DibArray->GetAt(nWhich);
         return pDib;
     }
     else
@@ -548,7 +524,7 @@ CTL_TwainDibPtr CTL_ITwainSource::GetDibObject(int nWhich /*=0*/) const
 
 bool CTL_ITwainSource::SetCurrentDibPage(int nPage)
 {
-    auto nDibPages = m_DibArray->GetSize();
+    const auto nDibPages = m_DibArray->GetSize();
     if ( static_cast<size_t>(nPage) >= nDibPages )
         return false;
     m_nCurDibPage = nPage;
@@ -556,26 +532,26 @@ bool CTL_ITwainSource::SetCurrentDibPage(int nPage)
 }
 
 
-int  CTL_ITwainSource::GetCurrentDibPage()
+int  CTL_ITwainSource::GetCurrentDibPage() const
 {
     return m_nCurDibPage;
 }
 
 // Get the current page file name for file transfers
-CTL_StringType CTL_ITwainSource::GetImageFileName(int curFile)
+CTL_StringType CTL_ITwainSource::GetImageFileName(int curFile) const
 {
     CTL_StringType strTemp;
-    DTWAIN_ARRAY pDTWAINArray = m_pFileEnumerator;
+    const DTWAIN_ARRAY pDTWAINArray = m_pFileEnumerator;
     if ( !pDTWAINArray )
-        return _T("");
+        return {};
 
-    int nCount = (int)EnumeratorFunctionImpl::EnumeratorGetCount(pDTWAINArray);
+    const int nCount = static_cast<int>(EnumeratorFunctionImpl::EnumeratorGetCount(pDTWAINArray));
     if ( nCount > 0 && curFile < nCount )
     {
-        EnumeratorFunctionImpl::EnumeratorGetAt(pDTWAINArray, curFile, &strTemp); //  (pDTWAINArray->Value(&strTemp, curFile, nStatus);
+        EnumeratorFunctionImpl::EnumeratorGetAt(pDTWAINArray, curFile, &strTemp);
         return strTemp;
     }
-    return _T("");
+    return {};
 }
 
 bool CTL_ITwainSource::IsNewJob() const
@@ -589,11 +565,11 @@ bool CTL_ITwainSource::IsNewJob() const
 
 void CTL_ITwainSource::AddPixelTypeAndBitDepth(int PixelType, int BitDepth)
 {
-    CachedPixelTypeMap::iterator it = FindPixelType(PixelType);
+    const auto it = FindPixelType(PixelType);
     if ( it == m_aPixelTypeMap.end())
     {
         // pixel type not found, so add it
-        vector<int> BitDepths;
+        std::vector<int> BitDepths;
         BitDepths.push_back( BitDepth );
         m_aPixelTypeMap[PixelType] = BitDepths;
     }
@@ -620,7 +596,7 @@ bool CTL_ITwainSource::IsPixelTypeSupported(int PixelType)
 
 bool CTL_ITwainSource::IsBitDepthSupported(int PixelType, int BitDepth)
 {
-    CachedPixelTypeMap::iterator it = FindPixelType(PixelType);
+    const auto it = FindPixelType(PixelType);
     if ( it != m_aPixelTypeMap.end())
         // search for bit depth
         return std::find((*it).second.begin(), (*it).second.end(), BitDepth) != (*it).second.end();
@@ -653,18 +629,18 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
     if ( m_bAutoIncrementFile )
     {
         CTL_StringType strTemp;
-        DTWAIN_ARRAY pDTWAINArray = m_pFileEnumerator;
+        const DTWAIN_ARRAY pDTWAINArray = m_pFileEnumerator;
         if ( !pDTWAINArray )
             return m_strAcquireFile;
 
-        int nCount = (int)EnumeratorFunctionImpl::EnumeratorGetCount(pDTWAINArray);
+        const int nCount = static_cast<int>(EnumeratorFunctionImpl::EnumeratorGetCount(pDTWAINArray));
         if ( nCount > 0 )
         {
             EnumeratorFunctionImpl::EnumeratorGetAt(pDTWAINArray, 0, &strTemp);
-            m_strAcquireFile = CreateFileNameFromNumber(strTemp, m_nCurFileNum, static_cast<int>(m_nFileDigits));
+            m_strAcquireFile = StringWrapper::CreateFileNameFromNumber(strTemp, m_nCurFileNum, static_cast<int>(m_nFileDigits));
         }
         else
-            m_strAcquireFile = _T("");
+            m_strAcquireFile.clear();
         m_nCurFileNum += m_nFileIncrement;
         return m_strAcquireFile;
     }
@@ -673,17 +649,17 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
     {
         // Get array
         CTL_StringType strTemp;
-        DTWAIN_ARRAY pDTWAINArray = m_pFileEnumerator;
+        const DTWAIN_ARRAY pDTWAINArray = m_pFileEnumerator;
         if ( !pDTWAINArray )
             return m_strAcquireFile;
         bool bRet = EnumeratorFunctionImpl::EnumeratorGetAt(pDTWAINArray, nCurImage, &strTemp); //pDTWAINArray->Value(&strTemp, nCurImage, nStatus);
         if ( !bRet ) // No more names
         {
-            int nCount = EnumeratorFunctionImpl::EnumeratorGetCount(pDTWAINArray);
+            const int nCount = EnumeratorFunctionImpl::EnumeratorGetCount(pDTWAINArray);
             bRet = EnumeratorFunctionImpl::EnumeratorGetAt(pDTWAINArray, nCount-1, &strTemp);
             if ( !bRet )
                 return m_strAcquireFile;
-            return GetPageFileName( strTemp, nCurImage, (lFlags & DTWAIN_USELONGNAME)?true:false );
+            return StringWrapper::GetPageFileName( strTemp, nCurImage, lFlags & DTWAIN_USELONGNAME?true:false );
         }
         else
             return strTemp;
@@ -693,23 +669,21 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
 
 bool CTL_ITwainSource::IsFileTypeMultiPage(CTL_TwainFileFormatEnum FileType) // static function
 {
-    return (
-            (FileType == TWAINFileFormat_TIFFGROUP3MULTI) ||
-            (FileType == TWAINFileFormat_TIFFGROUP4MULTI) ||
-            (FileType == TWAINFileFormat_TIFFNONEMULTI)   ||
-            (FileType == TWAINFileFormat_TIFFJPEGMULTI)   ||
-            (FileType == TWAINFileFormat_TIFFPACKBITSMULTI) ||
-            (FileType == TWAINFileFormat_TIFFDEFLATEMULTI) ||
-            (FileType == TWAINFileFormat_PDFMULTI)        ||
-            (FileType == TWAINFileFormat_POSTSCRIPT1MULTI) ||
-            (FileType == TWAINFileFormat_POSTSCRIPT2MULTI) ||
-            (FileType == TWAINFileFormat_POSTSCRIPT3MULTI) ||
-            (FileType == TWAINFileFormat_TIFFLZWMULTI) ||
-            (FileType == TWAINFileFormat_TIFFPIXARLOGMULTI) ||
-            (FileType == TWAINFileFormat_DCX)           ||
-            (FileType == TWAINFileFormat_TEXTMULTI) ||
-            (FileType == DTWAIN_FF_TIFFMULTI)
-            );
+    return FileType == TWAINFileFormat_TIFFGROUP3MULTI ||
+        FileType == TWAINFileFormat_TIFFGROUP4MULTI ||
+        FileType == TWAINFileFormat_TIFFNONEMULTI   ||
+        FileType == TWAINFileFormat_TIFFJPEGMULTI   ||
+        FileType == TWAINFileFormat_TIFFPACKBITSMULTI ||
+        FileType == TWAINFileFormat_TIFFDEFLATEMULTI ||
+        FileType == TWAINFileFormat_PDFMULTI        ||
+        FileType == TWAINFileFormat_POSTSCRIPT1MULTI ||
+        FileType == TWAINFileFormat_POSTSCRIPT2MULTI ||
+        FileType == TWAINFileFormat_POSTSCRIPT3MULTI ||
+        FileType == TWAINFileFormat_TIFFLZWMULTI ||
+        FileType == TWAINFileFormat_TIFFPIXARLOGMULTI ||
+        FileType == TWAINFileFormat_DCX           ||
+        FileType == TWAINFileFormat_TEXTMULTI ||
+        FileType == DTWAIN_FF_TIFFMULTI;
 }
 
 CTL_TwainFileFormatEnum CTL_ITwainSource::GetMultiPageType(CTL_TwainFileFormatEnum FileType)
@@ -732,7 +706,7 @@ CTL_TwainFileFormatEnum CTL_ITwainSource::GetMultiPageType(CTL_TwainFileFormatEn
         { TWAINFileFormat_TEXT,            TWAINFileFormat_TEXTMULTI }
     };
 
-    auto iter = pageMap.find(FileType);
+    const auto iter = pageMap.find(FileType);
     if (iter != pageMap.end())
         return iter->second;
     return FileType;
@@ -757,7 +731,7 @@ bool CTL_ITwainSource::IsFileTypeTIFF(CTL_TwainFileFormatEnum FileType)
                             TWAINFileFormat_TIFFPIXARLOG,
                             TWAINFileFormat_TIFFLZW
                     };
-    return (setInfo.count(FileType) == 1);
+    return setInfo.count(FileType) == 1;
 }
 
 void CTL_ITwainSource::initFileSaveMap() const
@@ -857,22 +831,23 @@ void CTL_ITwainSource::initFileSaveMap() const
 
 bool CTL_ITwainSource::IsFileTypePostscript(CTL_TwainFileFormatEnum FileType)
 {
-    return (
-            (FileType == TWAINFileFormat_POSTSCRIPT1) ||
-            (FileType == TWAINFileFormat_POSTSCRIPT1MULTI) ||
-            (FileType == TWAINFileFormat_POSTSCRIPT2) ||
-            (FileType == TWAINFileFormat_POSTSCRIPT2MULTI) ||
-            (FileType == TWAINFileFormat_POSTSCRIPT3) ||
-            (FileType == TWAINFileFormat_POSTSCRIPT3MULTI));
+    return FileType == TWAINFileFormat_POSTSCRIPT1 ||
+        FileType == TWAINFileFormat_POSTSCRIPT1MULTI ||
+        FileType == TWAINFileFormat_POSTSCRIPT2 ||
+        FileType == TWAINFileFormat_POSTSCRIPT2MULTI ||
+        FileType == TWAINFileFormat_POSTSCRIPT3 ||
+        FileType == TWAINFileFormat_POSTSCRIPT3MULTI;
 }
 
 CTL_StringType CTL_ITwainSource::PromptForFileName() const
 {
+    OPENFILENAME ofn;
+    OPENFILENAME *pOfn = &ofn;
     CTL_StringType szFilter;
     LPCTSTR szExt;
 
     initFileSaveMap();
-    auto it = m_saveFileMap.find(m_nFileAcquireType);
+    const auto it = m_saveFileMap.find(m_nFileAcquireType);
     if ( it != m_saveFileMap.end() )
     {
         szFilter.append(it->second.filter, it->second.len);
@@ -888,14 +863,9 @@ CTL_StringType CTL_ITwainSource::PromptForFileName() const
     }
 
     #ifdef _WIN32
-    TCHAR szFile[256];
+    TCHAR szFile[1024];
     // prompt for filename
-
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    OPENFILENAME ofn;
-    OPENFILENAME *pOfn = &ofn;
-    int nExt;
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     if (pHandle->m_pofn)
         pOfn = pHandle->m_pofn.get();
@@ -903,13 +873,13 @@ CTL_StringType CTL_ITwainSource::PromptForFileName() const
         memset(pOfn, 0, sizeof(OPENFILENAME));
     szFile[0] = _T('\0');
     pOfn->lStructSize = sizeof(OPENFILENAME);
-
+    const auto sTitle = pHandle->m_CustomPlacement.sTitle;
     if ( pOfn == &ofn )
     {
-        pOfn->hwndOwner = NULL;
+        pOfn->hwndOwner = nullptr;
         pOfn->lpstrFilter = szFilter.data();
         pOfn->lpstrFile= szFile;
-        pOfn->nMaxFile = sizeof(szFile) - 5;
+        pOfn->nMaxFile = sizeof szFile - 5;
         pOfn->Flags = OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY |
                     OFN_NOREADONLYRETURN | OFN_EXPLORER;
         if ( pHandle->m_CustomPlacement.nOptions != 0 )
@@ -917,37 +887,27 @@ CTL_StringType CTL_ITwainSource::PromptForFileName() const
             pOfn->lpfnHook = pHandle->m_pSaveAsDlgProc;
             pOfn->Flags |= OFN_ENABLEHOOK;
             pOfn->lCustData = (LPARAM)&pHandle->m_CustomPlacement;
-            if ( !StringWrapper::IsEmpty(pHandle->m_CustomPlacement.sTitle) )
-                    pOfn->lpstrTitle = pHandle->m_CustomPlacement.sTitle.c_str();
+            if ( !StringWrapper::IsEmpty(sTitle))
+                 pOfn->lpstrTitle = sTitle.c_str();
         }
     }
 
-    if (!GetSaveFileName(pOfn)) {
-        return _T("");                    // user cancelled dialog
+    if (!GetSaveFileName(pOfn))
+    {
+        return {};                    // user canceled dialog
     }
 
     // supply default extension - GetOpenFileName doesn't seem to do it!
-    nExt = pOfn->nFileExtension;
-    if (nExt && !szFile[nExt]) {
+    int nExt = pOfn->nFileExtension;
+    if (nExt && !szFile[nExt])
+    {
         // no extension
         lstrcat(szFile, szExt);
     }
     return szFile;
 #else
-    return CTL_StringType();
+    return {};
 #endif
-}
-
-
-bool CTL_ITwainSource::RenderImage(int nWhich/*=0*/)
-{
-    auto nSize = m_DibArray->GetSize();
-    if ( static_cast<size_t>(nWhich) < nSize )
-    {
-        // replace DIB with this DIB
-        return m_DibArray->GetAt(nWhich)->Render();
-    }
-    return false;
 }
 
 bool CTL_ITwainSource::SetDibAutoDelete(bool bSet)
@@ -956,8 +916,7 @@ bool CTL_ITwainSource::SetDibAutoDelete(bool bSet)
     return true;
 }
 
-void CTL_ITwainSource:: SetAcquireType(CTL_TwainAcquireEnum AcquireType,
-                                      LPCTSTR lpszFile)
+void CTL_ITwainSource:: SetAcquireType(CTL_TwainAcquireEnum AcquireType, LPCTSTR lpszFile)
 {
     m_AcquireType = AcquireType;
     if ( lpszFile )
@@ -973,9 +932,22 @@ int CTL_ITwainSource::GetNumDibs() const
 
 CTL_ITwainSource::~CTL_ITwainSource()
 {
-    ResetManualDuplexMode();
-    CloseSource(true);
-    EnumeratorFunctionImpl::EnumeratorDestroy(m_pFileEnumerator);
+    try
+    {
+        ResetManualDuplexMode();
+        CloseSource(true);
+        const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+
+        // Remove all of the PDF text elements for this source
+        if ( pHandle )
+            pHandle->m_mapPDFTextElement.erase(this);
+
+        EnumeratorFunctionImpl::EnumeratorDestroy(m_pFileEnumerator);
+    }
+    catch(...)
+    {
+        // No exceptions can escape here
+    }
 }
 
 #undef GetWindow
@@ -1011,7 +983,7 @@ void CTL_ITwainSource::SetCapCacheValue( LONG lCap, double dValue, bool bTurnOn 
             return;
 
         case DTWAIN_CV_ICAPPIXELFLAVOR:
-            CapCacheInfo.PixelFlavor   = (int)dValue;
+            CapCacheInfo.PixelFlavor   = static_cast<int>(dValue);
             CapCacheInfo.UsePixelFlavor= bTurnOn;
             return;
 
@@ -1021,20 +993,20 @@ void CTL_ITwainSource::SetCapCacheValue( LONG lCap, double dValue, bool bTurnOn 
             return;
 
         case DTWAIN_CV_ICAPPIXELTYPE:
-            CapCacheInfo.PixelType = (int)dValue;
+            CapCacheInfo.PixelType = static_cast<int>(dValue);
             CapCacheInfo.UsePixelType = bTurnOn;
             return;
 
         case DTWAIN_CV_ICAPBITDEPTH:
-            CapCacheInfo.BitDepth = (int)dValue;
+            CapCacheInfo.BitDepth = static_cast<int>(dValue);
             CapCacheInfo.UseBitDepth = bTurnOn;
             return;
     }
 }
 
-double CTL_ITwainSource::GetCapCacheValue( LONG lCap, LONG FAR *pTurnOn ) const
+double CTL_ITwainSource::GetCapCacheValue( LONG lCap, LONG *pTurnOn ) const
 {
-    double dValue;
+    double dValue = 0;
     switch (lCap)
     {
         case DTWAIN_CV_ICAPBRIGHTNESS:
@@ -1058,7 +1030,7 @@ double CTL_ITwainSource::GetCapCacheValue( LONG lCap, LONG FAR *pTurnOn ) const
             return dValue;
 
        case DTWAIN_CV_ICAPPIXELFLAVOR:
-            dValue = (double)CapCacheInfo.PixelFlavor;
+            dValue = static_cast<double>(CapCacheInfo.PixelFlavor);
             *pTurnOn = CapCacheInfo.UsePixelFlavor;
             return dValue;
 
@@ -1068,12 +1040,12 @@ double CTL_ITwainSource::GetCapCacheValue( LONG lCap, LONG FAR *pTurnOn ) const
             return dValue;
 
         case DTWAIN_CV_ICAPPIXELTYPE:
-            dValue = (double)CapCacheInfo.PixelType;
+            dValue = static_cast<double>(CapCacheInfo.PixelType);
             *pTurnOn = CapCacheInfo.UsePixelType;
             return dValue;
 
         case DTWAIN_CV_ICAPBITDEPTH:
-            dValue = (double)CapCacheInfo.BitDepth;
+            dValue = static_cast<double>(CapCacheInfo.BitDepth);
             *pTurnOn = CapCacheInfo.UseBitDepth;
             return dValue;
     }
@@ -1081,7 +1053,7 @@ double CTL_ITwainSource::GetCapCacheValue( LONG lCap, LONG FAR *pTurnOn ) const
     return 0.0;
 }
 
-void CTL_ITwainSource::AddDibsToAcquisition(DTWAIN_ARRAY aDibs)
+void CTL_ITwainSource::AddDibsToAcquisition(DTWAIN_ARRAY aDibs) const
 {
    EnumeratorFunctionImpl::EnumeratorAddValue( m_aAcqAttempts, &aDibs );
    EnumeratorFunctionImpl::EnumeratorAddValue(m_PersistentArray, &aDibs);
@@ -1097,7 +1069,7 @@ void CTL_ITwainSource::ResetAcquisitionAttempts(DTWAIN_ARRAY aNewAttempts)
     }
 }
 
-DTWAIN_ARRAY CTL_ITwainSource::GetAcquisitionArray()
+DTWAIN_ARRAY CTL_ITwainSource::GetAcquisitionArray() const
 {
     return m_aAcqAttempts;
 }
@@ -1176,12 +1148,14 @@ void CTL_ITwainSource::SetPDFValue(const CTL_StringType& nWhich, DTWAIN_FLOAT f1
     }
 }
 
-void CTL_ITwainSource::SetPDFValue(const CTL_StringType& nWhich, PDFTextElementPtr& element)
+void CTL_ITwainSource::SetPDFValue(const CTL_StringType& nWhich, const PDFTextElementPtr& element)
 {
     if ( nWhich == PDFTEXTELEMENTKEY )
-        m_ImageInfoEx.PDFTextElementList.push_back(element);
+    {
+        const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+        pHandle->m_mapPDFTextElement[this].push_back(element);
+    }
 }
-
 void CTL_ITwainSource::SetPDFPageSize(LONG nPageSize, DTWAIN_FLOAT cWidth, DTWAIN_FLOAT cHeight)
 {
     m_ImageInfoEx.PDFPageSize = nPageSize;
@@ -1207,7 +1181,10 @@ void CTL_ITwainSource::SetPDFEncryption(bool bIsEncrypted,
 
 void CTL_ITwainSource::ClearPDFText()
 {
-    m_ImageInfoEx.PDFTextElementList.clear();
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto it = pHandle->m_mapPDFTextElement.find(this);
+    if ( it != pHandle->m_mapPDFTextElement.end())
+        it->second.clear();
 }
 
 void CTL_ITwainSource::SetPhotometric(LONG Setting)
@@ -1220,37 +1197,6 @@ void CTL_ITwainSource::SetPhotometric(LONG Setting)
 }
 
 
-////////////////////////////////////////////////////////////////////////////
-static CTL_StringType GetPageFileName(const CTL_StringType &strBase,
-                                  int nCurImage,
-                                  bool bUseLongNames )
-{
-    CTL_StringType strFormat;
-    CTL_StringStreamType strm;
-    strm << nCurImage;
-    strFormat = strm.str();
-    int nLenFormat = (int)strFormat.length();
-
-    CTL_StringArrayType rName;
-    StringWrapper::SplitPath(strBase, rName);
-
-    CTL_StringType strName = rName[StringWrapper::NAME_POS];
-
-    if ( bUseLongNames )
-        strName += strFormat;
-    else
-    {
-        if ((strName + strFormat).length() > 8)
-        {
-            int nBase = 8 - nLenFormat;
-            strName = StringWrapper::Left(strName, nBase) + strFormat;
-        }
-        else
-            strName += strFormat;
-    }
-    rName[StringWrapper::NAME_POS] = strName;
-    return StringWrapper::MakePath(rName);
-}
 
 bool CTL_ITwainSource::InitExtImageInfo(int nNum)
 {
@@ -1270,7 +1216,7 @@ bool CTL_ITwainSource::InitExtImageInfo(int nNum)
     }
 
 
-bool CTL_ITwainSource::AddExtImageInfo(const TW_INFO &Info)
+bool CTL_ITwainSource::AddExtImageInfo(const TW_INFO &Info) const
 {
     if ( m_pExtImageTriplet )
     {
@@ -1287,7 +1233,7 @@ bool CTL_ITwainSource::GetExtImageInfo(bool bExecute)
 
     if ( bExecute )
     {
-        TW_UINT16 rc = m_pExtImageTriplet->Execute();
+        const TW_UINT16 rc = m_pExtImageTriplet->Execute();
         switch (rc)
         {
             case TWRC_SUCCESS:
@@ -1298,10 +1244,10 @@ bool CTL_ITwainSource::GetExtImageInfo(bool bExecute)
     return false;
 }
 
-TW_INFO CTL_ITwainSource::GetExtImageInfoItem(int nItem, int nSearchType )
+TW_INFO CTL_ITwainSource::GetExtImageInfoItem(int nItem, int nSearchType ) const
 {
-    TW_INFO Info;
-    Info.NumItems = (TW_UINT16)-1;
+    TW_INFO Info {};
+    Info.NumItems = static_cast<TW_UINT16>(-1);
 
     if ( !m_pExtImageTriplet )
         return Info;
@@ -1315,7 +1261,7 @@ bool CTL_ITwainSource::DestroyExtImageInfo()
     return true;
 }
 
-bool CTL_ITwainSource::GetExtImageInfoData(int nWhichItem, int /*nSearch*/, int nWhichValue, LPVOID Data, size_t* pNumChars)
+bool CTL_ITwainSource::GetExtImageInfoData(int nWhichItem, int /*nSearch*/, int nWhichValue, LPVOID Data, size_t* pNumChars) const
 {
     if ( !m_pExtImageTriplet )
         return false;
@@ -1345,12 +1291,9 @@ bool CTL_ITwainSource::AddCapToExtendedCapList(LONG nCap)
     return  true;
 }
 
-bool CTL_ITwainSource::InitFileAutoIncrementData(const CTL_StringType& sName)
+bool CTL_ITwainSource::InitFileAutoIncrementData(CTL_StringType sName)
 {
-    if ( 1 ) //m_nFileNameBaseNum == DTWAIN_INCREMENT_DEFAULT )
-        m_nCurFileNum = GetInitialFileNumber(sName, m_nFileDigits);
-    else
-        m_nCurFileNum = m_nFileNameBaseNum;
+    m_nCurFileNum = StringWrapper::GetInitialFileNumber(std::move(sName), m_nFileDigits);
     m_nStartFileNum = m_nCurFileNum;
     return true;
 }
@@ -1363,16 +1306,16 @@ bool CTL_ITwainSource::ResetFileAutoIncrementData()
 }
 
 
-void CTL_ITwainSource::AddDuplexFileData(const CTL_StringType& fName,
+void CTL_ITwainSource::AddDuplexFileData(CTL_StringType fName,
                                          unsigned long nBytes,
                                          int nWhich,
-                                         const CTL_StringType& fRealName,
+                                         CTL_StringType fRealName,
                                          bool bIsJobControl/*=false*/)
 {
     sDuplexFileData filedata;
-    filedata.sFileName = fName;
+    filedata.sFileName = std::move(fName);
     filedata.nBytes = nBytes;
-    filedata.sRealFileName = fRealName;
+    filedata.sRealFileName = std::move(fRealName);
     filedata.bIsJobControlPage = bIsJobControl;
 
     if ( nWhich == 0 )  // add to front side
@@ -1390,7 +1333,7 @@ sDuplexFileData CTL_ITwainSource::GetDuplexFileData( int nPage, int nWhich ) con
     else
         pData = &m_DuplexFileData.second;
 
-    if ( nPage < (int)pData->size() )
+    if ( nPage < static_cast<int>(pData->size()) )
         return pData->at(nPage);
     return junk;
 }
@@ -1435,7 +1378,7 @@ void CTL_ITwainSource::DeleteDuplexFiles(int nWhich)
         pData = &m_DuplexFileData.first;
     else
         pData = &m_DuplexFileData.second;
-    for_each(pData->begin(), pData->end(), [](sDuplexFileData& Data) {delete_file(Data.sFileName.c_str()); });
+    for_each(pData->begin(), pData->end(), [](const sDuplexFileData& Data) {delete_file(Data.sFileName.c_str()); });
 }
 
 unsigned long CTL_ITwainSource::GetNumDuplexFiles(int nWhich) const
@@ -1455,7 +1398,7 @@ void CTL_ITwainSource::ProcessMultipageFile()
     if ( !m_DuplexFileData.first.empty() ||
          !m_DuplexFileData.second.empty() )
     {
-        ImageXferFileWriter FileWriter(NULL, m_pSession ,this);
+        const ImageXferFileWriter FileWriter(nullptr, m_pSession ,this);
         FileWriter.CloseMultiPageDibFile(GetMutiPageScanMode() != DTWAIN_FILESAVE_MANUALSAVE);
     }
     ClearPDFText(); // clear the text elements
@@ -1487,7 +1430,7 @@ bool isFloatCap(LONG capType)
 template <typename T>
 static DTWAIN_ARRAY PopulateArray(const std::vector<boost::any>& dataArray, CTL_ITwainSource* pSource, TW_UINT16 nCap)
 {
-    DTWAIN_ARRAY theArray = DTWAIN_ArrayCreateFromCap(pSource, static_cast<LONG>(nCap), static_cast<LONG>(dataArray.size()));
+    const DTWAIN_ARRAY theArray = DTWAIN_ArrayCreateFromCap(pSource, static_cast<LONG>(nCap), static_cast<LONG>(dataArray.size()));
     auto& vVector = EnumeratorVector<T>(theArray);
     std::transform(dataArray.begin(), dataArray.end(), vVector.begin(), [](boost::any theAny) { return boost::any_cast<T>(theAny);});
     return theArray;
@@ -1501,22 +1444,25 @@ static bool PopulateCache(DTWAIN_ARRAY theArray, std::vector<boost::any>& dataAr
     return true;
 }
 
+CTL_ITwainSession* CTL_ITwainSource::GetTwainSession() const
+{ return m_pSession; }
+
 DTWAIN_ARRAY CTL_ITwainSource::getCapCachedValues(TW_UINT16 lCap, LONG getType)
 {
     // get the data type for this cap.
     const CapToValuesMap* mapToUse = &m_capToValuesMap_G;
     if (getType == DTWAIN_CAPGETDEFAULT)
         mapToUse = &m_capToValuesMap_GD;
-    auto iter = mapToUse->find(lCap);
+    const auto iter = mapToUse->find(lCap);
     if (iter == mapToUse->end() )
-        return NULL;
+        return nullptr;
     const container_values& cValues = (*iter).second;
     if (isIntCap(cValues.m_dataType))
         return PopulateArray<LONG>(cValues.m_data, this, lCap);
     else
     if ( isFloatCap(cValues.m_dataType))
         return PopulateArray<double>(cValues.m_data, this, lCap);
-    return NULL;
+    return nullptr;
 }
 
 bool CTL_ITwainSource::setCapCachedValues(DTWAIN_ARRAY array, TW_UINT16 lCap, LONG getType)
@@ -1525,53 +1471,46 @@ bool CTL_ITwainSource::setCapCachedValues(DTWAIN_ARRAY array, TW_UINT16 lCap, LO
     CapToValuesMap* mapToUse = &m_capToValuesMap_G;
     if (getType == DTWAIN_CAPGETDEFAULT)
         mapToUse = &m_capToValuesMap_GD;
-    auto iter = mapToUse->find(lCap);
+    const auto iter = mapToUse->find(lCap);
     if (iter != mapToUse->end())
         return true;
     container_values cValues;
     cValues.m_dataType = DTWAIN_GetCapDataType(this, lCap);
     if (isIntCap(cValues.m_dataType))
     {
-        bool retVal = PopulateCache<LONG>(array, cValues.m_data);
+        const bool retVal = PopulateCache<LONG>(array, cValues.m_data);
         if (retVal)
-            return mapToUse->insert(make_pair(lCap, cValues)).second;
+            return mapToUse->insert({lCap, cValues}).second;
     }
     return false;
 }
 
-CTL_StringType CreateFileNameFromNumber(const CTL_StringType& sFileName, int num, int nDigits)
+/*std::string CreateFileNameFromNumber(const std::string& sFileName, int num, int nDigits)
 {
-    CTL_StringArrayType rArray;
-    StringWrapper::SplitPath(sFileName, rArray);
+    StringArray rArray;
+    StringWrapperA::SplitPath(sFileName, rArray);
 
     // Adjust the file name
-    #ifdef _UNICODE
-    char szBuf__[25];
-    sprintf(szBuf__, "%0*d", nDigits, num);
-    TCHAR szBuf[25];
-    std::copy(szBuf__, szBuf__ + 25, szBuf);
-    #else
     char szBuf[25];
     sprintf(szBuf, "%0*d", nDigits, num);
-    #endif
-    CTL_StringType& sTemp = rArray[StringWrapper::NAME_POS];
+    std::string& sTemp = rArray[StringWrapperA::NAME_POS];
     sTemp = sTemp.substr(0, sTemp.length() - nDigits) + szBuf;
-    return StringWrapper::MakePath(rArray);
+    return StringWrapperA::MakePath(rArray);
 }
 
-int GetInitialFileNumber(const CTL_StringType& sFileName, size_t &nDigits)
+int GetInitialFileNumber(const std::string& sFileName, size_t &nDigits)
 {
-    CTL_StringArrayType rArray;
-    StringWrapper::SplitPath(sFileName, rArray);
+    StringArray rArray;
+    StringWrapperA::SplitPath(sFileName, rArray);
     nDigits = 0;
-    CTL_StringType sTemp;
+    std::string sTemp;
 
-    size_t nLen = rArray[StringWrapper::NAME_POS].length();
+    size_t nLen = rArray[StringWrapperA::NAME_POS].length();
     for ( size_t i = nLen - 1; ; --i)
     {
-        if ( StringTraits::IsDigit(rArray[StringWrapper::NAME_POS][i]) )
+        if ( StringTraitsA::IsDigit(rArray[StringWrapperA::NAME_POS][i]) )
         {
-            sTemp = rArray[StringWrapper::NAME_POS][i] + sTemp;
+            sTemp = rArray[StringWrapperA::NAME_POS][i] + sTemp;
             nDigits++;
         }
         else
@@ -1594,5 +1533,5 @@ int GetInitialFileNumber(const CTL_StringType& sFileName, size_t &nDigits)
     }
     return 0;
 }
-
+*/
 ///////////////////////////////////////////////////////////////////////////////////////////

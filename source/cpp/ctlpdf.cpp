@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,16 +18,17 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <cstring>
 #include <algorithm>
+#include "cppfunc.h"
 #include "dtwain.h"
 #include "ctliface.h"
 #include "ctltwmgr.h"
 #include "dtwain_resource_constants.h"
 #include "errorcheck.h"
+#include "dtwstrfn.h"
 
 using namespace dynarithmic;
-static CTL_TEXTELEMENTPTRLIST::iterator
+static std::pair<bool, CTL_TEXTELEMENTPTRLIST::iterator>
     CheckPDFTextElement(DTWAIN_PDFTEXTELEMENT TextElement, LONG& ConditionCode);
 
 /////////////////////////////  PDF Settings ///////////////////////////////
@@ -72,8 +73,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFEncryption(DTWAIN_SOURCE Source, DTWAIN_BO
     CTL_ITwainSource *p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
     if (p)
     {
-        CTL_StringType owner = lpszOwner?lpszOwner:_T("");
-        CTL_StringType user = lpszUser?lpszUser:_T("");
+        const CTL_StringType owner = lpszOwner?lpszOwner:_T("");
+        const CTL_StringType user = lpszUser?lpszUser:_T("");
 
         p->SetPDFEncryption(bUseEncryption?true:false, user, owner, Permissions, UseStrongEncryption?true:false);
         LOG_FUNC_EXIT_PARAMS(true)
@@ -145,7 +146,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFJpegQuality(DTWAIN_SOURCE Source, LONG Qua
     CTL_ITwainSource *p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
     if (p)
     {
-        Quality = (std::max)((LONG)1, (std::min)((LONG)100, Quality));
+        Quality = (std::max)(static_cast<LONG>(1), (std::min)(static_cast<LONG>(100), Quality));
         p->SetPDFValue(PDFJPEGQUALITYKEY, Quality);
         LOG_FUNC_EXIT_PARAMS(true)
     }
@@ -157,8 +158,8 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF *SetPDFFn)(DTWAIN_SOURCE, LONG, DTWAIN_FLOAT, 
 
 static DTWAIN_BOOL SetPDFStringFunc(DTWAIN_SOURCE Source, LONG value, LPCTSTR val1, LPCTSTR val2, SetPDFFn fn)
 {
-    DTWAIN_FLOAT value1 = StringWrapper::ToDouble(val1);
-    DTWAIN_FLOAT value2 = StringWrapper::ToDouble(val2);
+    const DTWAIN_FLOAT value1 = StringWrapper::ToDouble(val1);
+    const DTWAIN_FLOAT value2 = StringWrapper::ToDouble(val2);
     return fn(Source, value, value1, value2);
 }
 
@@ -166,7 +167,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFPageSizeString(DTWAIN_SOURCE Source, LONG 
                                                      LPCTSTR CustomWidth, LPCTSTR CustomHeight)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PageSize, CustomWidth, CustomHeight))
-    DTWAIN_BOOL bRet = SetPDFStringFunc(Source, PageSize, CustomWidth, CustomHeight, &DTWAIN_SetPDFPageSize);
+    const DTWAIN_BOOL bRet = SetPDFStringFunc(Source, PageSize, CustomWidth, CustomHeight, &DTWAIN_SetPDFPageSize);
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -175,7 +176,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFPageScaleString(DTWAIN_SOURCE Source, LONG
                                                       LPCTSTR xScale, LPCTSTR yScale)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nOptions,xScale, yScale))
-    DTWAIN_BOOL bRet = SetPDFStringFunc(Source, nOptions, xScale, yScale, &DTWAIN_SetPDFPageScale);
+    const DTWAIN_BOOL bRet = SetPDFStringFunc(Source, nOptions, xScale, yScale, &DTWAIN_SetPDFPageScale);
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -218,7 +219,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFCompression(DTWAIN_SOURCE Source, DTWAIN_B
     CTL_ITwainSource *p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
     if (p)
     {
-        p->SetPDFValue(PDFCOMPRESSIONKEY, (LONG)bCompression);
+        p->SetPDFValue(PDFCOMPRESSIONKEY, static_cast<LONG>(bCompression));
         LOG_FUNC_EXIT_PARAMS(true)
     }
     LOG_FUNC_EXIT_PARAMS(false)
@@ -231,7 +232,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFAESEncryption(DTWAIN_SOURCE Source, DTWAIN
     CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
     if (p)
     {
-        p->SetPDFValue(PDFAESKEY, (LONG)bUseAES);
+        p->SetPDFValue(PDFAESKEY, static_cast<LONG>(bUseAES));
         LOG_FUNC_EXIT_PARAMS(true)
     }
     LOG_FUNC_EXIT_PARAMS(false)
@@ -244,7 +245,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFASCIICompression(DTWAIN_SOURCE Source, DTW
     CTL_ITwainSource *p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
     if (p)
     {
-        p->SetPDFValue(PDFASCIICOMPRESSKEY, (LONG)bCompression);
+        p->SetPDFValue(PDFASCIICOMPRESSKEY, static_cast<LONG>(bCompression));
         LOG_FUNC_EXIT_PARAMS(true)
     }
     LOG_FUNC_EXIT_PARAMS(false)
@@ -295,16 +296,38 @@ LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontName(LONG FontVal, LPTSTR szFont, LONG n
 {
     LOG_FUNC_ENTRY_PARAMS((FontVal, szFont, nChars))
 
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     if ( pHandle )
     {
-        CTL_StringType st = CTL_TwainDLLHandle::s_ResourceStrings[FontVal + DTWAIN_FONT_START_];
-        LONG numChars = (std::min)(nChars, (LONG)st.size());
-        std::copy(st.begin(), st.begin() + numChars, szFont);
+        std::string st = CTL_TwainDLLHandle::s_ResourceStrings[FontVal + DTWAIN_FONT_START_];
+        const LONG numChars = (std::min)(nChars, static_cast<LONG>(st.size()));
+        std::copy_n(st.begin(), numChars, szFont);
         LOG_FUNC_EXIT_PARAMS(numChars)
     }
     LOG_FUNC_EXIT_PARAMS(-1)
     CATCH_BLOCK(-1)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextEx(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement, LONG Flags)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, TextElement))
+    const PDFTextElement* pElement = static_cast<PDFTextElement*>(TextElement);
+
+    const DTWAIN_BOOL retVal = DTWAIN_AddPDFText(Source,
+                                                 StringConversion::Convert_Ansi_To_Native(pElement->m_text).c_str(),
+                                                 static_cast<LONG>(pElement->xpos),
+                                                 static_cast<LONG>(pElement->ypos),
+                                                 StringConversion::Convert_Ansi_To_Native(pElement->m_font.m_fontName).c_str(),
+                                                 pElement->fontSize,
+                                                 static_cast<LONG>(pElement->colorRGB),
+                                                 static_cast<LONG>(pElement->renderMode),
+                                                 pElement->scaling,
+                                                 pElement->charSpacing,
+                                                 pElement->wordSpacing,
+                                                 pElement->strokeWidth,
+                                                 Flags);
+    LOG_FUNC_EXIT_PARAMS(retVal)
+    CATCH_BLOCK(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFText(DTWAIN_SOURCE Source,
@@ -349,14 +372,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFText(DTWAIN_SOURCE Source,
                                              };
 */
     PDFTextElement element;
-    LONG riseValue = 0;
-   const DefaultValSetterLONG defVals[] = {
+    constexpr LONG riseValue = 0;
+    const DefaultValSetterLONG defVals[] = {
 
                         {DTWAIN_DEFAULT, 0 , renderMode, &element.renderMode,DTWAIN_PDFTEXT_NORENDERMODE},
                         {riseValue, 0 , riseValue, &element.riseValue,1},
                         {DTWAIN_DEFAULT, 1 , strokeWidth, &element.strokeWidth,DTWAIN_PDFTEXT_NOSTROKEWIDTH},
                         {DTWAIN_DEFAULT, 0 , colorRGB, &element.colorRGB, DTWAIN_PDFTEXT_NORGBCOLOR},
-                        {Flags, (int)Flags, Flags, &element.displayFlags, 1}
+                        {Flags, static_cast<int>(Flags), Flags, &element.displayFlags, 1}
                      };
 
    const DefaultValSetterDOUBLE defValsDOUBLE[] = {
@@ -366,19 +389,22 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFText(DTWAIN_SOURCE Source,
                         {DTWAIN_FLOATDEFAULT, 0.0 , charSpacing, &element.charSpacing, DTWAIN_PDFTEXT_NOCHARSPACING},
                      };
 
-     const int numDefVals = sizeof(defVals) / sizeof(defVals[0]);
-     const int numDefValsDOUBLE = sizeof(defValsDOUBLE) / sizeof(defValsDOUBLE[0]);
+     constexpr int numDefVals = std::size(defVals);
+     constexpr int numDefValsDOUBLE = std::size(defValsDOUBLE);
 
     if (p)
     {
-        CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-        element.m_text = szText;
+        element.m_text = StringConversion::Convert_NativePtr_To_Ansi(szText);
         element.xpos = xPos;
         element.ypos = yPos;
+        std::string sFontName = "Helvetica";
         if ( !fontName )
-            element.m_font.m_fontName = _T("Helvetica");
+            element.m_font.m_fontName = sFontName;
         else
-            element.m_font.m_fontName = fontName;
+        {
+            sFontName = StringConversion::Convert_NativePtr_To_Ansi(fontName);
+            element.m_font.m_fontName = sFontName;
+        }
         for (int i = 0; i < numDefVals; ++i )
         {
             if ( Flags & defVals[i].flagValue )
@@ -401,7 +427,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFText(DTWAIN_SOURCE Source,
 
         PDFTextElementPtr pPtr( new PDFTextElement );
         *pPtr = element;
-        pHandle->m_lPDFTextElement.push_back( pPtr );
         p->SetPDFValue(PDFTEXTELEMENTKEY, pPtr);
         LOG_FUNC_EXIT_PARAMS(true)
     }
@@ -412,7 +437,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFText(DTWAIN_SOURCE Source,
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ClearPDFText(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-        CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
 
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]{ return !p;} , DTWAIN_ERR_BAD_SOURCE, false, FUNC_MACRO);
@@ -425,17 +450,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ClearPDFText(DTWAIN_SOURCE Source)
 DTWAIN_PDFTEXTELEMENT DLLENTRY_DEF DTWAIN_CreatePDFTextElement(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle( pHandle, Source );
     if (p)
     {
         PDFTextElementPtr pPtr( new PDFTextElement );
-        DTWAIN_PDFTEXTELEMENT pdfHandle = pPtr.get();
+        const DTWAIN_PDFTEXTELEMENT pdfHandle = pPtr.get();
         PDFTextElement* rawPtr = static_cast<PDFTextElement*>(pdfHandle);
         rawPtr->pTwainSource = p;
-
         p->SetPDFValue(PDFTEXTELEMENTKEY, pPtr);
-        //pHandle->m_lPDFTextElement.push_back( pPtr );
         LOG_FUNC_EXIT_PARAMS(pdfHandle)
     }
     LOG_FUNC_EXIT_PARAMS(NULL)
@@ -455,18 +478,17 @@ private:
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyPDFTextElement(DTWAIN_PDFTEXTELEMENT TextElement)
 {
     LOG_FUNC_ENTRY_PARAMS((TextElement))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     LONG ConditionCode;
-    if ( CheckPDFTextElement(TextElement, ConditionCode) == pHandle->m_lPDFTextElement.end() )
+    const auto itEx = CheckPDFTextElement(TextElement, ConditionCode);
+    if ( !itEx.first )
     {
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, [] { return TRUE;} , ConditionCode, false, FUNC_MACRO);
     }
+    const PDFTextElement* pPtr = static_cast<PDFTextElement*>(TextElement);
 
-    PDFTextElement* pPtr = static_cast<PDFTextElement*>(TextElement);
-    CTL_TEXTELEMENTPTRLIST::iterator it =
-        find_if( pHandle->m_lPDFTextElement.begin(), pHandle->m_lPDFTextElement.end(), FindPDFTextHandle(pPtr));
-    pHandle->m_lPDFTextElement.erase(it);
+    pHandle->m_mapPDFTextElement[pPtr->pTwainSource].erase(itEx.second);
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -474,15 +496,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyPDFTextElement(DTWAIN_PDFTEXTELEMENT Text
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementFloat(DTWAIN_PDFTEXTELEMENT TextElement, DTWAIN_FLOAT val1, DTWAIN_FLOAT val2, LONG Flags)
 {
     LOG_FUNC_ENTRY_PARAMS((TextElement, val1, val2, Flags))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     LONG ConditionCode;
-    CTL_TEXTELEMENTPTRLIST::iterator it = CheckPDFTextElement(TextElement, ConditionCode);
-    if ( it == pHandle->m_lPDFTextElement.end() )
+    const auto it = CheckPDFTextElement(TextElement, ConditionCode);
+    if ( !it.first )
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, [] { return 1;}, ConditionCode, false, FUNC_MACRO);
 
 
-    PDFTextElement* pPtr = static_cast<PDFTextElement*>(TextElement);
+    auto* pPtr = static_cast<PDFTextElement*>(TextElement);
 
     switch (Flags)
     {
@@ -527,16 +549,16 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementFloat(DTWAIN_PDFTEXTELEMENT Tex
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementLong(DTWAIN_PDFTEXTELEMENT TextElement, LONG val1, LONG val2, LONG Flags)
 {
     LOG_FUNC_ENTRY_PARAMS((TextElement, val1, val2, Flags))
-        CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     LONG ConditionCode;
-    CTL_TEXTELEMENTPTRLIST::iterator it = CheckPDFTextElement(TextElement, ConditionCode);
-    if ( it == pHandle->m_lPDFTextElement.end() )
+    const auto it = CheckPDFTextElement(TextElement, ConditionCode);
+    if ( !it.first )
     {
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, []{ return 1; }, ConditionCode, false, FUNC_MACRO);
     }
 
-    PDFTextElement* pPtr = static_cast<PDFTextElement*>(TextElement);
+    auto pPtr = static_cast<PDFTextElement*>(TextElement);
 
     switch (Flags)
     {
@@ -562,7 +584,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementLong(DTWAIN_PDFTEXTELEMENT Text
         break;
 
         case DTWAIN_PDFTEXTELEMENT_TRANSFORMORDER:
-            pPtr->textTransform = (std::max)((LONG)0, (std::min)(val1, static_cast<LONG>(DTWAIN_PDFTEXTTRANSFORM_KTRS)));
+            pPtr->textTransform = (std::max)(static_cast<LONG>(0), (std::min)(val1, static_cast<LONG>(DTWAIN_PDFTEXTTRANSFORM_KTRS)));
         break;
 
         default:
@@ -575,25 +597,25 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementLong(DTWAIN_PDFTEXTELEMENT Text
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementString(DTWAIN_PDFTEXTELEMENT TextElement, LPCTSTR val1, LONG Flags)
 {
     LOG_FUNC_ENTRY_PARAMS((TextElement, val1, Flags))
-        CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     LONG ConditionCode;
-    CTL_TEXTELEMENTPTRLIST::iterator it = CheckPDFTextElement(TextElement, ConditionCode);
-    if ( it == pHandle->m_lPDFTextElement.end() )
+    const auto it = CheckPDFTextElement(TextElement, ConditionCode);
+    if ( !it.first )
     {
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, [] { return 1;}, ConditionCode, false, FUNC_MACRO);
     }
 
-    PDFTextElement* pPtr = static_cast<PDFTextElement*>(TextElement);
+    auto* pPtr = static_cast<PDFTextElement*>(TextElement);
 
     switch (Flags)
     {
         case DTWAIN_PDFTEXTELEMENT_FONTNAME:
-            pPtr->m_font.m_fontName = val1;
+            pPtr->m_font.m_fontName = StringConversion::Convert_NativePtr_To_Ansi(val1);
         break;
 
         case DTWAIN_PDFTEXTELEMENT_TEXT:
-            pPtr->m_text = val1;
+            pPtr->m_text = StringConversion::Convert_NativePtr_To_Ansi(val1);
         break;
 
         default:
@@ -606,17 +628,17 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementString(DTWAIN_PDFTEXTELEMENT Te
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPDFTextElementFloat(DTWAIN_PDFTEXTELEMENT TextElement, LPDTWAIN_FLOAT val1, LPDTWAIN_FLOAT val2, LONG Flags)
 {
     LOG_FUNC_ENTRY_PARAMS((TextElement, val1, val2, Flags))
-        CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     LONG ConditionCode;
 
-    CTL_TEXTELEMENTPTRLIST::iterator it = CheckPDFTextElement(TextElement, ConditionCode);
-    if ( it == pHandle->m_lPDFTextElement.end() )
+    const auto it = CheckPDFTextElement(TextElement, ConditionCode);
+    if ( !it.first )
     {
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, [] { return 1; }, ConditionCode, false, FUNC_MACRO);
     }
 
-    PDFTextElement* pPtr = static_cast<PDFTextElement*>(TextElement);
+    const PDFTextElement* pPtr = static_cast<PDFTextElement*>(TextElement);
 
     switch (Flags)
     {
@@ -661,16 +683,16 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPDFTextElementFloat(DTWAIN_PDFTEXTELEMENT Tex
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPDFTextElementLong(DTWAIN_PDFTEXTELEMENT TextElement, LPLONG val1, LPLONG val2, LONG Flags)
 {
     LOG_FUNC_ENTRY_PARAMS((TextElement, val1, val2, Flags))
-        CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     LONG ConditionCode;
-    CTL_TEXTELEMENTPTRLIST::iterator it = CheckPDFTextElement(TextElement, ConditionCode);
-    if ( it == pHandle->m_lPDFTextElement.end() )
+    const auto it = CheckPDFTextElement(TextElement, ConditionCode);
+    if ( !it.first )
     {
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, [] { return 1; }, ConditionCode, false, FUNC_MACRO);
     }
 
-    PDFTextElement* pPtr = static_cast<PDFTextElement*>(TextElement);
+    const PDFTextElement* pPtr = static_cast<PDFTextElement*>(TextElement);
 
     switch (Flags)
     {
@@ -696,7 +718,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPDFTextElementLong(DTWAIN_PDFTEXTELEMENT Text
         break;
 
         case DTWAIN_PDFTEXTELEMENT_TEXTLENGTH:
-            *val1 = (long)pPtr->m_text.size();
+            *val1 = static_cast<long>(pPtr->m_text.size());
         break;
 
         default:
@@ -709,31 +731,28 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPDFTextElementLong(DTWAIN_PDFTEXTELEMENT Text
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPDFTextElementString(DTWAIN_PDFTEXTELEMENT TextElement, LPTSTR lpszStr, LONG maxLen, LONG Flags)
 {
     LOG_FUNC_ENTRY_PARAMS((TextElement, lpszStr, maxLen, Flags))
-        CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     LONG ConditionCode;
-    CTL_TEXTELEMENTPTRLIST::iterator it = CheckPDFTextElement(TextElement, ConditionCode);
-    if ( it == pHandle->m_lPDFTextElement.end() )
+    const auto it = CheckPDFTextElement(TextElement, ConditionCode);
+    if ( !it.first )
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, [] { return 1; }, ConditionCode, false, FUNC_MACRO);
 
-    PDFTextElement* pPtr = static_cast<PDFTextElement*>(TextElement);
-
-    LPCTSTR retval = NULL;
+    const PDFTextElement* pPtr = static_cast<PDFTextElement*>(TextElement);
 
     switch (Flags)
     {
         case DTWAIN_PDFTEXTELEMENT_FONTNAME:
-            retval = pPtr->m_font.m_fontName.c_str();
+            StringWrapper::SafeStrcpy(lpszStr, StringConversion::Convert_Ansi_To_Native(pPtr->m_font.m_fontName).c_str(), maxLen);
         break;
 
         case DTWAIN_PDFTEXTELEMENT_TEXT:
-            retval = pPtr->m_text.c_str();
+            StringWrapper::SafeStrcpy(lpszStr, StringConversion::Convert_Ansi_To_Native(pPtr->m_text).c_str(), maxLen);
         break;
 
         default:
             LOG_FUNC_EXIT_PARAMS(false)
     }
-    StringWrapper::SafeStrcpy(lpszStr, retval, maxLen);
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -741,25 +760,25 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPDFTextElementString(DTWAIN_PDFTEXTELEMENT Te
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ResetPDFTextElement(DTWAIN_PDFTEXTELEMENT TextElement)
 {
     LOG_FUNC_ENTRY_PARAMS((TextElement))
-        CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     LONG ConditionCode;
-    CTL_TEXTELEMENTPTRLIST::iterator it = CheckPDFTextElement(TextElement, ConditionCode);
-    if ( it == pHandle->m_lPDFTextElement.end() )
+    const auto it = CheckPDFTextElement(TextElement, ConditionCode);
+    if ( !it.first )
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, [] { return 1; }, ConditionCode, false, FUNC_MACRO);
 
-    PDFTextElement* pPtr = static_cast<PDFTextElement*>(TextElement);
-    *pPtr = PDFTextElement();
+    const auto pPtr = static_cast<PDFTextElement*>(TextElement);
+    *pPtr = {};
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
-CTL_TEXTELEMENTPTRLIST::iterator CheckPDFTextElement(DTWAIN_PDFTEXTELEMENT TextElement, LONG& ConditionCode)
+std::pair<bool, CTL_TEXTELEMENTPTRLIST::iterator> CheckPDFTextElement(DTWAIN_PDFTEXTELEMENT TextElement, LONG& ConditionCode)
 {
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     ConditionCode = 0;
 
-    PDFTextElement* pPtr = static_cast<PDFTextElement*>(TextElement);
+    const auto pPtr = static_cast<PDFTextElement*>(TextElement);
 
     // First check if source handle is still open/valid (note that this only does a read, not write
     // so if an invalid pointer is passed, we won't care at this point)
@@ -767,28 +786,26 @@ CTL_TEXTELEMENTPTRLIST::iterator CheckPDFTextElement(DTWAIN_PDFTEXTELEMENT TextE
     if ( !pSource )
     {
         ConditionCode = DTWAIN_ERR_INVALID_PARAM;
-        return pHandle->m_lPDFTextElement.end();
+        return { false, pHandle->m_mapPDFTextElement[nullptr].end() };
     }
 
     // Now check if the source really has this pointer
-    DTWAINImageInfoEx& infoEx = pSource->GetImageInfoExRef();
-
-    CTL_TEXTELEMENTPTRLIST::iterator it =
-        find_if(infoEx.PDFTextElementList.begin(), infoEx.PDFTextElementList.end(), FindPDFTextHandle(pPtr));
-
-    if ( it == infoEx.PDFTextElementList.end())
+    const auto it = pHandle->m_mapPDFTextElement.find(pSource);
+    if ( it == pHandle->m_mapPDFTextElement.end())
     {
         ConditionCode = DTWAIN_ERR_INVALID_PARAM;
-        return pHandle->m_lPDFTextElement.end();
+        return { false, pHandle->m_mapPDFTextElement[nullptr].end() };
     }
+
+    auto it2 = std::find_if(it->second.begin(), it->second.end(), [&](const auto& ptr) { return ptr->pTwainSource == pPtr->pTwainSource; });
 
     if ( CTL_TwainDLLHandle::s_lErrorFilterFlags )
     {
-        CTL_StringType sOut = _T("PDF TextElement Info: \n");
-        sOut += CTL_ErrorStructDecoder().DecodePDFTextElement(pPtr);
-        CTL_TwainAppMgr::WriteLogInfo(sOut);
+        std::string sOut = "PDF TextElement Info: \n";
+        sOut += CTL_ErrorStructDecoder::DecodePDFTextElement(pPtr);
+        CTL_TwainAppMgr::WriteLogInfoA(sOut);
     }
-    return it;
+    return { true, it2 };
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFPolarity(DTWAIN_SOURCE Source, LONG Polarity)

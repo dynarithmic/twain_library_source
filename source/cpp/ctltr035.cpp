@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -36,15 +36,15 @@ CTL_CapabilityQueryTriplet::CTL_CapabilityQueryTriplet(CTL_ITwainSession *pSessi
     TW_CAPABILITY *pCap = GetCapabilityBuffer();
     pCap->Cap = static_cast<TW_UINT16>(gCap);
     pCap->ConType = TWON_ONEVALUE;
-    pCap->hContainer = NULL;
+    pCap->hContainer = nullptr;
     m_lCapSupport = 0;
 }
 
 TW_UINT16 CTL_CapabilityQueryTriplet::Execute()
 {
-    TW_UINT16 rc = CTL_CapabilityGetOneValTriplet::Execute();
+    const TW_UINT16 rc = CTL_CapabilityGetOneValTriplet::Execute();
     if ( rc == TWRC_SUCCESS )
-        GetValue(NULL);
+        GetValue(nullptr);
     return rc;
 }
 
@@ -56,13 +56,12 @@ bool CTL_CapabilityQueryTriplet::GetValue( void * /*pData*/, size_t /*nWhere =0 
 
 bool CTL_CapabilityQueryTriplet::EnumCapValues( void *pCapData )
 {
-    bool bRetVal = CTL_CapabilityGetOneValTriplet::EnumCapValues(pCapData);
+    const bool bRetVal = CTL_CapabilityGetOneValTriplet::EnumCapValues(pCapData);
 
     if (bRetVal)
     {
-        pTW_ONEVALUE pValOne;
         // dereference to a TW_ENUMERATION structure
-        pValOne = (pTW_ONEVALUE) pCapData;
+        pTW_ONEVALUE pValOne = static_cast<pTW_ONEVALUE>(pCapData);
         m_lCapSupport = pValOne->Item;
     }
     return bRetVal;

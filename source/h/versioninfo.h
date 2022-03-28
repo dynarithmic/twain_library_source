@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -31,13 +31,8 @@
 #ifdef _MSC_VER
 #pragma comment(lib, "version.lib")
 #endif
-#include <vector>
 #include <unordered_map>
-#include <iostream>
-#include <tchar.h>
-#include <iomanip>
 #include <sstream>
-#include <array>
 
 struct charTraitsUNICODE
 {
@@ -111,15 +106,17 @@ class VersionInfoImpl
         lookupName_SpecialBuild    ,
         lookupName_FileVersion2,
         lookupName_ProductVersion2
+
     };
 
     private:
+
         VS_FIXEDFILEINFO * m_vFixedFileInfo;
         STLMapStringToString m_verStrings;
 
         typename charTraits::TraitsStringStreamType m_sBuf;
         bool getit( typename charTraits::TraitsCharType const * const iFilename );
-        VersionInfoImpl( VersionInfoImpl& );
+
         typedef std::unordered_map<int, typename charTraits::TraitsStringType> lookupMapType;
         lookupMapType m_lookUps;
 
@@ -130,6 +127,10 @@ class VersionInfoImpl
         };
 
     public:
+
+        VersionInfoImpl(VersionInfoImpl&) = delete;
+        VersionInfoImpl& operator=(const VersionInfoImpl&) = delete;
+        virtual ~VersionInfoImpl() = default;
 
         const char_type* getCompanyName() const { return findVersionStringData(lookupName_CompanyName); }
         const char_type* getFileDescription() const { return findVersionStringData(lookupName_FileDescription);}
@@ -146,9 +147,8 @@ class VersionInfoImpl
         const char_type* getPrivateBuild() const { return findVersionStringData(lookupName_PrivateBuild);}
         const char_type* getSpecialBuild() const { return findVersionStringData(lookupName_SpecialBuild);}
 
-        VersionInfoImpl( HMODULE hMod=NULL);
-        virtual ~VersionInfoImpl( ) {}
-        void printit( typename charTraits::TraitsBaseOutputStreamType& stream, const char_type *eol=0 ) const;
+        VersionInfoImpl( HMODULE hMod= nullptr);
+        void printit( typename charTraits::TraitsBaseOutputStreamType& stream, const char_type *eol=nullptr ) const;
 
         DWORD m_dwSignature;
         DWORD m_dwStrucVersion;
@@ -167,7 +167,6 @@ class VersionInfoImpl
     private:
         //  make sure that there is no assignment operator available for this
         //  class by making it private...
-        VersionInfoImpl& operator=( const VersionInfoImpl& ) = delete;
         const char_type* findVersionStringData( int nWhich ) const;
     };
 
@@ -184,6 +183,6 @@ class VersionInfoImpl
     typedef VersionInfoA VersionInfo;
 #endif
 
-#include "VersionInfo.ipp"
+#include "versioninfo.ipp"
 
 #endif // !defined( _VERSIONINFO_H_INCLUDED_ )

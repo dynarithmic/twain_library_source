@@ -28,16 +28,16 @@
 
 // marker used for clipboard copy / paste
 
-static inline void 
+static inline void
 SET_FREEIMAGE_MARKER(BITMAPINFOHEADER *bmih, FIBITMAP *dib) {
-	// Windows constants goes from 0L to 5L
-	// Add 0xFF to avoid conflicts
-	bmih->biCompression = 0xFF + FreeImage_GetImageType(dib);
+    // Windows constants goes from 0L to 5L
+    // Add 0xFF to avoid conflicts
+    bmih->biCompression = 0xFF + FreeImage_GetImageType(dib);
 }
 
-static inline FREE_IMAGE_TYPE 
+static inline FREE_IMAGE_TYPE
 GET_FREEIMAGE_MARKER(BITMAPINFOHEADER *bmih) {
-	return (FREE_IMAGE_TYPE)(bmih->biCompression - 0xFF);
+    return static_cast<FREE_IMAGE_TYPE>(bmih->biCompression - 0xFF);
 }
 
 BOOL fipImageUtility::copyFromHandle(fipImage& im, HANDLE hMem, bool isHandle)
@@ -47,44 +47,42 @@ BOOL fipImageUtility::copyFromHandle(fipImage& im, HANDLE hMem, bool isHandle)
         return FALSE;
     }
 
-    BYTE *lpVoid = NULL;
+    BYTE *lpVoid = nullptr;
     // Get a pointer to the bitmap
 #ifdef _WIN32
     struct raii_
     {
         HANDLE h;
-        raii_(HANDLE h_ = 0) : h(h_) {}
+        raii_(HANDLE h_ = nullptr) : h(h_) {}
         ~raii_() { if (h) GlobalUnlock(h); }
     };
 
     if (isHandle)
-        lpVoid = (BYTE *)GlobalLock(hMem);
+        lpVoid = static_cast<BYTE*>(GlobalLock(hMem));
     else
-        lpVoid = (BYTE *)hMem;
-    raii_ r(isHandle ? hMem : 0);
+        lpVoid = static_cast<BYTE*>(hMem);
+    raii_ r(isHandle ? hMem : nullptr);
 #else
     lpVoid = (BYTE*)hMem;
 #endif
 
-    BITMAPINFOHEADER *pHead = NULL;
-    RGBQUAD *pPalette = NULL;
-    BYTE *bits = NULL;
+    const RGBQUAD *pPalette = nullptr;
     DWORD bitfields[3] = { 0, 0, 0 };
 
     // Get a pointer to the bitmap header
-    pHead = (BITMAPINFOHEADER *)lpVoid;
+    BITMAPINFOHEADER* pHead = (BITMAPINFOHEADER*)lpVoid;
 
     // Get a pointer to the palette
     if (pHead->biBitCount < 16) {
-        pPalette = (RGBQUAD *)(((BYTE *)pHead) + sizeof(BITMAPINFOHEADER));
+        pPalette = (RGBQUAD *)((BYTE *)pHead + sizeof(BITMAPINFOHEADER));
     }
 
     // Get a pointer to the pixels
-    bits = ((BYTE*)pHead + sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD) * pHead->biClrUsed);
+    BYTE* bits = (BYTE*)pHead + sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD) * pHead->biClrUsed;
 
     if (pHead->biCompression == BI_BITFIELDS) {
         // Take into account the color masks that specify the red, green, and blue components (16- and 32-bit)
-        unsigned mask_size = 3 * sizeof(DWORD);
+        const unsigned mask_size = 3 * sizeof(DWORD);
         memcpy(&bitfields[0], bits, mask_size);
         bits += mask_size;
     }
@@ -110,7 +108,7 @@ BOOL fipImageUtility::copyFromHandle(fipImage& im, HANDLE hMem, bool isHandle)
             image_type = GET_FREEIMAGE_MARKER(pHead);
             break;
         }
-        if (!im.setSize(image_type, (WORD)pHead->biWidth, (WORD)pHead->biHeight, pHead->biBitCount, bitfields[2], bitfields[1], bitfields[0])) {
+        if (!im.setSize(image_type, static_cast<WORD>(pHead->biWidth), static_cast<WORD>(pHead->biHeight), pHead->biBitCount, bitfields[2], bitfields[1], bitfields[0])) {
             return FALSE;
         }
         // Copy the palette
@@ -124,8 +122,8 @@ BOOL fipImageUtility::copyFromHandle(fipImage& im, HANDLE hMem, bool isHandle)
 
 HANDLE fipImageUtility::copyToHandle(const fipImage& im)
 {
-    HANDLE hMem = NULL;
-    if (im) 
+    HANDLE hMem = nullptr;
+    if (im)
     {
         // Get equivalent DIB size
         long dib_size = sizeof(BITMAPINFOHEADER);
@@ -135,16 +133,16 @@ HANDLE fipImageUtility::copyToHandle(const fipImage& im)
         // Allocate a DIB
 #ifdef _WIN32
         hMem = GlobalAlloc(GHND, dib_size);
-        BYTE *dib = (BYTE*)GlobalLock(hMem);
+        BYTE *dib = static_cast<BYTE*>(GlobalLock(hMem));
 #else
         BYTE *dib = new BYTE[dib_size];
 #endif
 
         memset(dib, 0, dib_size);
-        BYTE *p_dib = (BYTE*)dib;
+        BYTE *p_dib = static_cast<BYTE*>(dib);
 
         // Copy the BITMAPINFOHEADER
-        BITMAPINFOHEADER *bih = FreeImage_GetInfoHeader(im);
+        const BITMAPINFOHEADER *bih = FreeImage_GetInfoHeader(im);
         memcpy(p_dib, bih, sizeof(BITMAPINFOHEADER));
         if (FreeImage_GetImageType(im) != FIT_BITMAP) {
             // this hack is used to store the bitmap type in the biCompression member of the BITMAPINFOHEADER
@@ -153,12 +151,12 @@ HANDLE fipImageUtility::copyToHandle(const fipImage& im)
         p_dib += sizeof(BITMAPINFOHEADER);
 
         // Copy the palette
-        RGBQUAD *pal = FreeImage_GetPalette(im);
+        const RGBQUAD *pal = FreeImage_GetPalette(im);
         memcpy(p_dib, pal, FreeImage_GetColorsUsed(im) * sizeof(RGBQUAD));
         p_dib += FreeImage_GetColorsUsed(im) * sizeof(RGBQUAD);
 
         // Copy the bitmap
-        BYTE *bits = FreeImage_GetBits(im);
+        const BYTE *bits = FreeImage_GetBits(im);
         memcpy(p_dib, bits, FreeImage_GetPitch(im) * FreeImage_GetHeight(im));
 #ifdef _WIN32
         GlobalUnlock(hMem);
@@ -173,236 +171,234 @@ HANDLE fipImageUtility::copyToHandle(const fipImage& im)
 // Construction / Destruction
 
 fipWinImage::fipWinImage(FREE_IMAGE_TYPE image_type, unsigned width, unsigned height, unsigned bpp) : fipImage(image_type, width, height, bpp) {
-	_display_dib = NULL;
-	_bDeleteMe = FALSE;
-	// default tone mapping operator
-	_tmo = FITMO_DRAGO03;
-	_tmo_param_1 = 0;
-	_tmo_param_2 = 0;
-	_tmo_param_3 = 1;
-	_tmo_param_4 = 0;
+    _display_dib = nullptr;
+    _bDeleteMe = FALSE;
+    // default tone mapping operator
+    _tmo = FITMO_DRAGO03;
+    _tmo_param_1 = 0;
+    _tmo_param_2 = 0;
+    _tmo_param_3 = 1;
+    _tmo_param_4 = 0;
 }
 
-fipWinImage::~fipWinImage() { 
-	if(_bDeleteMe) {
-		fipImage::clear();
-	}
+fipWinImage::~fipWinImage() {
+    if(_bDeleteMe) {
+        fipImage::clear();
+    }
 }
 
 void fipWinImage::clear() {
-	// delete _display_dib
-	if(_bDeleteMe) {
-		fipImage::clear();
-	}
-	_display_dib = NULL;
-	_bDeleteMe = FALSE;
-	// delete base class data
-	fipImage::clear();
+    // delete _display_dib
+    if(_bDeleteMe) {
+        fipImage::clear();
+    }
+    _display_dib = nullptr;
+    _bDeleteMe = FALSE;
+    // delete base class data
+    fipImage::clear();
 }
 
 BOOL fipWinImage::isValid() const {
-	return fipImage::isValid();
+    return fipImage::isValid();
 }
 
 ///////////////////////////////////////////////////////////////////
 // Copying
 
 fipWinImage& fipWinImage::operator=(const fipImage& Image) {
-	// delete _display_dib
-	if(_bDeleteMe) {
-		FreeImage_Unload(_display_dib);
-	}
-	_display_dib = NULL;
-	_bDeleteMe = FALSE;
-	// clone the base class
-	fipImage::operator=(Image);
+    // delete _display_dib
+    if(_bDeleteMe) {
+        FreeImage_Unload(_display_dib);
+    }
+    _display_dib = nullptr;
+    _bDeleteMe = FALSE;
+    // clone the base class
+    fipImage::operator=(Image);
 
-	return *this;
+    return *this;
 }
 
 fipWinImage& fipWinImage::operator=(const fipWinImage& Image) {
-	if(this != &Image) {
-		// delete _display_dib
-		if(_bDeleteMe) {
-			FreeImage_Unload(_display_dib);
-		}
-		_display_dib = NULL;
-		_bDeleteMe = FALSE;
-		// copy tmo data
-		_tmo = Image._tmo;
-		_tmo_param_1 = Image._tmo_param_1;
-		_tmo_param_2 = Image._tmo_param_2;
-		_tmo_param_3 = Image._tmo_param_3;
-		_tmo_param_4 = Image._tmo_param_4;
+    if(this != &Image) {
+        // delete _display_dib
+        if(_bDeleteMe) {
+            FreeImage_Unload(_display_dib);
+        }
+        _display_dib = nullptr;
+        _bDeleteMe = FALSE;
+        // copy tmo data
+        _tmo = Image._tmo;
+        _tmo_param_1 = Image._tmo_param_1;
+        _tmo_param_2 = Image._tmo_param_2;
+        _tmo_param_3 = Image._tmo_param_3;
+        _tmo_param_4 = Image._tmo_param_4;
 
-		// clone the base class
-		fipImage::operator=(Image);
-	}
-	return *this;
+        // clone the base class
+        fipImage::operator=(Image);
+    }
+    return *this;
 }
 
-HANDLE fipWinImage::copyToHandle() const 
+HANDLE fipWinImage::copyToHandle() const
 {
     return fipImageUtility::copyToHandle(*this);
 }
 
-BOOL fipWinImage::copyFromHandle(HANDLE hMem, bool isHandle) 
+BOOL fipWinImage::copyFromHandle(HANDLE hMem, bool isHandle)
 {
     return fipImageUtility::copyFromHandle(*this, hMem, isHandle);
 }
 
 BOOL fipWinImage::copyFromBitmap(HBITMAP hbmp) {
-	if(hbmp) { 
-		int Success;
+    if(hbmp) {
         BITMAP bm;
-		// Get informations about the bitmap
+        // Get informations about the bitmap
         GetObject(hbmp, sizeof(BITMAP), (LPSTR) &bm);
-		// Create the image
-        setSize(FIT_BITMAP, (WORD)bm.bmWidth, (WORD)bm.bmHeight, (WORD)bm.bmBitsPixel);
+        // Create the image
+        setSize(FIT_BITMAP, static_cast<WORD>(bm.bmWidth), static_cast<WORD>(bm.bmHeight), static_cast<WORD>(bm.bmBitsPixel));
 
-		// The GetDIBits function clears the biClrUsed and biClrImportant BITMAPINFO members (dont't know why) 
-		// So we save these infos below. This is needed for palettized images only. 
-		int nColors = FreeImage_GetColorsUsed(_dib.get());
+        // The GetDIBits function clears the biClrUsed and biClrImportant BITMAPINFO members (dont't know why)
+        // So we save these infos below. This is needed for palettized images only.
+        const int nColors = FreeImage_GetColorsUsed(_dib.get());
 
-		// Create a device context for the bitmap
-        HDC dc = GetDC(NULL);
-		// Copy the pixels
-		Success = GetDIBits(dc,								// handle to DC
-								hbmp,						// handle to bitmap
-								0,							// first scan line to set
-								FreeImage_GetHeight(_dib.get()),	// number of scan lines to copy
-								FreeImage_GetBits(_dib.get()),	// array for bitmap bits
-								FreeImage_GetInfo(_dib.get()),	// bitmap data buffer
-								DIB_RGB_COLORS				// RGB 
-								);
-		if(Success == 0) {
-			FreeImage_OutputMessageProc(FIF_UNKNOWN, "Error : GetDIBits failed");
-			ReleaseDC(NULL, dc);
-			return FALSE;
+        // Create a device context for the bitmap
+        const HDC dc = GetDC(nullptr);
+        // Copy the pixels
+        int Success = GetDIBits(dc, // handle to DC
+                                hbmp, // handle to bitmap
+                                0, // first scan line to set
+                                FreeImage_GetHeight(_dib.get()), // number of scan lines to copy
+                                FreeImage_GetBits(_dib.get()), // array for bitmap bits
+                                FreeImage_GetInfo(_dib.get()), // bitmap data buffer
+                                DIB_RGB_COLORS // RGB
+        );
+        if(Success == 0) {
+            FreeImage_OutputMessageProc(FIF_UNKNOWN, "Error : GetDIBits failed");
+            ReleaseDC(nullptr, dc);
+            return FALSE;
         }
-        ReleaseDC(NULL, dc);
+        ReleaseDC(nullptr, dc);
 
-		// restore BITMAPINFO members
-		
-		FreeImage_GetInfoHeader(_dib.get())->biClrUsed = nColors;
-		FreeImage_GetInfoHeader(_dib.get())->biClrImportant = nColors;
+        // restore BITMAPINFO members
 
-		return TRUE;
+        FreeImage_GetInfoHeader(_dib.get())->biClrUsed = nColors;
+        FreeImage_GetInfoHeader(_dib.get())->biClrImportant = nColors;
+
+        return TRUE;
     }
 
-	return FALSE;
+    return FALSE;
 }
 
 BOOL fipWinImage::copyToClipboard(HWND hWndNewOwner) const {
-	HANDLE hDIB = copyToHandle();
+    const HANDLE hDIB = copyToHandle();
 
-	if(OpenClipboard(hWndNewOwner)) {
-		if(EmptyClipboard()) {
-			if(SetClipboardData(CF_DIB, hDIB) == NULL) {
-//				MessageBox(hWndNewOwner, "Unable to set Clipboard data", "FreeImage", MB_ICONERROR);
-				CloseClipboard();
-				return FALSE;
-			}
-		}
-	}
-	CloseClipboard();
+    if(OpenClipboard(hWndNewOwner)) {
+        if(EmptyClipboard()) {
+            if(SetClipboardData(CF_DIB, hDIB) == nullptr) {
+//              MessageBox(hWndNewOwner, "Unable to set Clipboard data", "FreeImage", MB_ICONERROR);
+                CloseClipboard();
+                return FALSE;
+            }
+        }
+    }
+    CloseClipboard();
 
-	return TRUE;
+    return TRUE;
 }
 
 BOOL fipWinImage::pasteFromClipboard() {
-	if(!IsClipboardFormatAvailable(CF_DIB)) {
-		return FALSE;
-	}
+    if(!IsClipboardFormatAvailable(CF_DIB)) {
+        return FALSE;
+    }
 
-	if(OpenClipboard(NULL)) {
-		BOOL bResult = FALSE;
-		HANDLE hDIB = GetClipboardData(CF_DIB);
-		if(hDIB) {
-			bResult = copyFromHandle(hDIB);
-		}
-		CloseClipboard();
-		return bResult;
-	}
-	CloseClipboard();
+    if(OpenClipboard(nullptr)) {
+        BOOL bResult = FALSE;
+        const HANDLE hDIB = GetClipboardData(CF_DIB);
+        if(hDIB) {
+            bResult = copyFromHandle(hDIB);
+        }
+        CloseClipboard();
+        return bResult;
+    }
+    CloseClipboard();
 
-	return FALSE;
+    return FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////
 // Screen capture
 
 BOOL fipWinImage::captureWindow(HWND hWndApplicationWindow, HWND hWndSelectedWindow) {
-	int xScreen, yScreen, xshift, yshift;
-	RECT r;
+    RECT r;
 
-	// Get window size
-	GetWindowRect(hWndSelectedWindow, &r);
+    // Get window size
+    GetWindowRect(hWndSelectedWindow, &r);
 
-	// Check if the window is out of the screen or maximixed
-	xshift = 0;
-	yshift = 0;
-	xScreen = GetSystemMetrics(SM_CXSCREEN);
-	yScreen = GetSystemMetrics(SM_CYSCREEN);
-	if(r.right > xScreen) {
-		r.right = xScreen;
-	}
-	if(r.bottom > yScreen) {
-		r.bottom = yScreen;
-	}
-	if(r.left < 0) {
-		xshift = -r.left;
-		r.left = 0;
-	}
-	if(r.top < 0) {
-		yshift = -r.top;
-		r.top = 0;
-	}
-	
-	int width  = r.right  - r.left;
-	int height = r.bottom - r.top;
+    // Check if the window is out of the screen or maximixed
+    int xshift = 0;
+    int yshift = 0;
+    int xScreen = GetSystemMetrics(SM_CXSCREEN);
+    int yScreen = GetSystemMetrics(SM_CYSCREEN);
+    if(r.right > xScreen) {
+        r.right = xScreen;
+    }
+    if(r.bottom > yScreen) {
+        r.bottom = yScreen;
+    }
+    if(r.left < 0) {
+        xshift = -r.left;
+        r.left = 0;
+    }
+    if(r.top < 0) {
+        yshift = -r.top;
+        r.top = 0;
+    }
 
-	if(width <= 0 || height <= 0) {
-		return FALSE;
-	}
+    const int width  = r.right  - r.left;
+    const int height = r.bottom - r.top;
 
-	// Hide the application window. 
-	ShowWindow(hWndApplicationWindow, SW_HIDE); 
-	// Bring the window at the top most level
-	SetWindowPos(hWndSelectedWindow, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
-	// Give enough time to refresh the window
-	Sleep(500);
+    if(width <= 0 || height <= 0) {
+        return FALSE;
+    }
 
-	// Prepare the DCs
-	HDC dstDC = GetDC(NULL);
-    HDC srcDC = GetWindowDC(hWndSelectedWindow); // full window (GetDC(hWndSelectedWindow) = clientarea)
-	HDC memDC = CreateCompatibleDC(dstDC);
-	
-	// Copy the screen to the bitmap
-	HBITMAP bm = CreateCompatibleBitmap(dstDC, width, height);
-	HBITMAP oldbm = (HBITMAP)SelectObject(memDC, bm);
-	BitBlt(memDC, 0, 0, width, height, srcDC, xshift, yshift, SRCCOPY);
+    // Hide the application window.
+    ShowWindow(hWndApplicationWindow, SW_HIDE);
+    // Bring the window at the top most level
+    SetWindowPos(hWndSelectedWindow, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
+    // Give enough time to refresh the window
+    Sleep(500);
 
-	// Redraw the application window. 
-	ShowWindow(hWndApplicationWindow, SW_SHOW); 
+    // Prepare the DCs
+    const HDC dstDC = GetDC(nullptr);
+    const HDC srcDC = GetWindowDC(hWndSelectedWindow); // full window (GetDC(hWndSelectedWindow) = clientarea)
+    const HDC memDC = CreateCompatibleDC(dstDC);
 
-	// Restore the position
-	SetWindowPos(hWndSelectedWindow, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
-	SetWindowPos(hWndApplicationWindow, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
-	
-	// Convert the HBITMAP to a FIBITMAP
-	copyFromBitmap(bm);
+    // Copy the screen to the bitmap
+    const HBITMAP bm = CreateCompatibleBitmap(dstDC, width, height);
+    const HBITMAP oldbm = static_cast<HBITMAP>(SelectObject(memDC, bm));
+    BitBlt(memDC, 0, 0, width, height, srcDC, xshift, yshift, SRCCOPY);
 
-	// Free objects
-	DeleteObject(SelectObject(memDC, oldbm));
-	DeleteDC(memDC);
+    // Redraw the application window.
+    ShowWindow(hWndApplicationWindow, SW_SHOW);
 
-	// Convert 32-bit images to 24-bit
-	if(getBitsPerPixel() == 32) {
-		convertTo24Bits();
-	}
+    // Restore the position
+    SetWindowPos(hWndSelectedWindow, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
+    SetWindowPos(hWndApplicationWindow, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
 
-	return TRUE;
+    // Convert the HBITMAP to a FIBITMAP
+    copyFromBitmap(bm);
+
+    // Free objects
+    DeleteObject(SelectObject(memDC, oldbm));
+    DeleteDC(memDC);
+
+    // Convert 32-bit images to 24-bit
+    if(getBitsPerPixel() == 32) {
+        convertTo24Bits();
+    }
+
+    return TRUE;
 }
 
 
@@ -410,114 +406,114 @@ BOOL fipWinImage::captureWindow(HWND hWndApplicationWindow, HWND hWndSelectedWin
 // Painting operations
 
 void fipWinImage::drawEx(HDC hDC, RECT& rcDest, BOOL useFileBkg, RGBQUAD *appBkColor, FIBITMAP *bg) const {
-	// Convert to a standard bitmap if needed
-	if(_bHasChanged) {
-		if(_bDeleteMe) {
-			FreeImage_Unload(_display_dib);
-			_display_dib = NULL;
-			_bDeleteMe = FALSE;
-		}
+    // Convert to a standard bitmap if needed
+    if(_bHasChanged) {
+        if(_bDeleteMe) {
+            FreeImage_Unload(_display_dib);
+            _display_dib = nullptr;
+            _bDeleteMe = FALSE;
+        }
 
-		FREE_IMAGE_TYPE image_type = getImageType();
-		if(image_type == FIT_BITMAP) {
-			BOOL bHasBackground = FreeImage_HasBackgroundColor(_dib.get());
-			BOOL bIsTransparent = FreeImage_IsTransparent(_dib.get());
+        const FREE_IMAGE_TYPE image_type = getImageType();
+        if(image_type == FIT_BITMAP) {
+            const BOOL bHasBackground = FreeImage_HasBackgroundColor(_dib.get());
+            const BOOL bIsTransparent = FreeImage_IsTransparent(_dib.get());
 
-			if(!bIsTransparent && (!bHasBackground || !useFileBkg)) 
-			{
-				// Copy pointer
-				_display_dib.replace(_dib.get());// .reset(std::move(_dib);
-			}
-			else 
-			{
-				// Create the transparent / alpha blended image
-				_display_dib.replace(FreeImage_Composite(_dib.get(), useFileBkg, appBkColor, bg));
-				if(_display_dib) {
-					// Remember to delete _display_dib
-					_bDeleteMe = TRUE;
-				} else {
-					// Something failed: copy pointers
-					_display_dib.replace(_dib.get());
-				}
-			}
-		} else {
-			// Convert to a standard dib for display
+            if(!bIsTransparent && (!bHasBackground || !useFileBkg))
+            {
+                // Copy pointer
+                _display_dib.replace(_dib.get());// .reset(std::move(_dib);
+            }
+            else
+            {
+                // Create the transparent / alpha blended image
+                _display_dib.replace(FreeImage_Composite(_dib.get(), useFileBkg, appBkColor, bg));
+                if(_display_dib) {
+                    // Remember to delete _display_dib
+                    _bDeleteMe = TRUE;
+                } else {
+                    // Something failed: copy pointers
+                    _display_dib.replace(_dib.get());
+                }
+            }
+        } else {
+            // Convert to a standard dib for display
 
-			if(image_type == FIT_COMPLEX) {
-				// Convert to type FIT_DOUBLE
-				FIBITMAP *dib_double = FreeImage_GetComplexChannel(_dib.get(), FICC_MAG);
-				// Convert to a standard bitmap (linear scaling)
-				_display_dib.replace(FreeImage_ConvertToStandardType(dib_double, TRUE));
-				// Free image of type FIT_DOUBLE
-				FreeImage_Unload(dib_double);
-			} else if((image_type == FIT_RGBF) || (image_type == FIT_RGBAF) || (image_type == FIT_RGB16)) {
-				// Apply a tone mapping algorithm and convert to 24-bit 
-				switch(_tmo) {
-					case FITMO_REINHARD05:
-						_display_dib.replace(FreeImage_TmoReinhard05Ex(_dib.get(), _tmo_param_1, _tmo_param_2, _tmo_param_3, _tmo_param_4));
-						break;
-					default:
-						_display_dib.replace(FreeImage_ToneMapping(_dib.get(), _tmo, _tmo_param_1, _tmo_param_2));
-						break;
-				}
-			} else if(image_type == FIT_RGBA16) {
-				// Convert to 32-bit
-				FIBITMAP *dib32 = FreeImage_ConvertTo32Bits(_dib.get());
-				if(dib32) 
-				{
-					// Create the transparent / alpha blended image
-					_display_dib.replace(FreeImage_Composite(dib32, useFileBkg, appBkColor, bg));
-					FreeImage_Unload(dib32);
-				}
-			} else {
-				// Other cases: convert to a standard bitmap (linear scaling)
-				_display_dib.replace(FreeImage_ConvertToStandardType(_dib.get(), TRUE));
-			}
-			// Remember to delete _display_dib
-			_bDeleteMe = TRUE;
-		}
+            if(image_type == FIT_COMPLEX) {
+                // Convert to type FIT_DOUBLE
+                FIBITMAP *dib_double = FreeImage_GetComplexChannel(_dib.get(), FICC_MAG);
+                // Convert to a standard bitmap (linear scaling)
+                _display_dib.replace(FreeImage_ConvertToStandardType(dib_double, TRUE));
+                // Free image of type FIT_DOUBLE
+                FreeImage_Unload(dib_double);
+            } else if(image_type == FIT_RGBF || image_type == FIT_RGBAF || image_type == FIT_RGB16) {
+                // Apply a tone mapping algorithm and convert to 24-bit
+                switch(_tmo) {
+                    case FITMO_REINHARD05:
+                        _display_dib.replace(FreeImage_TmoReinhard05Ex(_dib.get(), _tmo_param_1, _tmo_param_2, _tmo_param_3, _tmo_param_4));
+                        break;
+                    default:
+                        _display_dib.replace(FreeImage_ToneMapping(_dib.get(), _tmo, _tmo_param_1, _tmo_param_2));
+                        break;
+                }
+            } else if(image_type == FIT_RGBA16) {
+                // Convert to 32-bit
+                FIBITMAP *dib32 = FreeImage_ConvertTo32Bits(_dib.get());
+                if(dib32)
+                {
+                    // Create the transparent / alpha blended image
+                    _display_dib.replace(FreeImage_Composite(dib32, useFileBkg, appBkColor, bg));
+                    FreeImage_Unload(dib32);
+                }
+            } else {
+                // Other cases: convert to a standard bitmap (linear scaling)
+                _display_dib.replace(FreeImage_ConvertToStandardType(_dib.get(), TRUE));
+            }
+            // Remember to delete _display_dib
+            _bDeleteMe = TRUE;
+        }
 
-		_bHasChanged = FALSE;
-	}
+        _bHasChanged = FALSE;
+    }
 
-	// Draw the dib
-	SetStretchBltMode(hDC, COLORONCOLOR);	
-	StretchDIBits(hDC, rcDest.left, rcDest.top, 
-		rcDest.right-rcDest.left, rcDest.bottom-rcDest.top, 
-		0, 0, FreeImage_GetWidth(_display_dib), FreeImage_GetHeight(_display_dib),
-		FreeImage_GetBits(_display_dib), FreeImage_GetInfo(_display_dib), DIB_RGB_COLORS, SRCCOPY);
+    // Draw the dib
+    SetStretchBltMode(hDC, COLORONCOLOR);
+    StretchDIBits(hDC, rcDest.left, rcDest.top,
+        rcDest.right-rcDest.left, rcDest.bottom-rcDest.top,
+        0, 0, FreeImage_GetWidth(_display_dib), FreeImage_GetHeight(_display_dib),
+        FreeImage_GetBits(_display_dib), FreeImage_GetInfo(_display_dib), DIB_RGB_COLORS, SRCCOPY);
 
 }
 
 void fipWinImage::setToneMappingOperator(FREE_IMAGE_TMO tmo, double first_param, double second_param, double third_param, double fourth_param) {
-	// avoid costly operations if possible ...
-	if((_tmo != tmo) || (_tmo_param_1 != first_param) || (_tmo_param_2 != second_param) || (_tmo_param_3 != third_param) || (_tmo_param_4 != fourth_param)) {
-		_tmo = tmo;
-		_tmo_param_1 = first_param;
-		_tmo_param_2 = second_param;
-		_tmo_param_3 = third_param;
-		_tmo_param_4 = fourth_param;
+    // avoid costly operations if possible ...
+    if(_tmo != tmo || _tmo_param_1 != first_param || _tmo_param_2 != second_param || _tmo_param_3 != third_param || _tmo_param_4 != fourth_param) {
+        _tmo = tmo;
+        _tmo_param_1 = first_param;
+        _tmo_param_2 = second_param;
+        _tmo_param_3 = third_param;
+        _tmo_param_4 = fourth_param;
 
-		FREE_IMAGE_TYPE image_type = getImageType();
-		switch(image_type) {
-			case FIT_RGBF:
-			case FIT_RGBAF:
-			case FIT_RGB16:
-			case FIT_RGBA16:
-				_bHasChanged = TRUE;
-				break;
-			default:
-				break;
-		}
-	}
+        const FREE_IMAGE_TYPE image_type = getImageType();
+        switch(image_type) {
+            case FIT_RGBF:
+            case FIT_RGBAF:
+            case FIT_RGB16:
+            case FIT_RGBA16:
+                _bHasChanged = TRUE;
+                break;
+            default:
+                break;
+        }
+    }
 }
 
 void fipWinImage::getToneMappingOperator(FREE_IMAGE_TMO *tmo, double *first_param, double *second_param, double *third_param, double *fourth_param) const {
-	*tmo = _tmo;
-	*first_param = _tmo_param_1;
-	*second_param = _tmo_param_2;
-	*third_param = _tmo_param_3;
-	*fourth_param = _tmo_param_4;
+    *tmo = _tmo;
+    *first_param = _tmo_param_1;
+    *second_param = _tmo_param_2;
+    *third_param = _tmo_param_3;
+    *fourth_param = _tmo_param_4;
 }
 
 

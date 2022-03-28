@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -17,19 +17,20 @@
     FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
+*/
 
-    For more information, the license file LICENSE.TXT that is located in the root
-    directory of the DTWAIN installation covers the restrictions under the LGPL license.
-    Please read this file before deploying or distributing any application using DTWAIN.
- */
 #ifndef DIBINFOX_H
 #define DIBINFOX_H
 //...
 #include <string>
-#include "imagefun/dtwpdf/pdffont_basic.h"
 #include <vector>
-#include <list>
+#include "imagefun/dtwpdf/pdffont_basic.h"
+#include "dtwtype.h"
 #include "ctlobstr.h"
+#include "dtwain_filetypes.h"
+#include "dtwaindefs.h"
+#include "dibinfox.h"
+
 namespace dynarithmic
 {
     class CTL_ITwainSource;
@@ -119,14 +120,11 @@ namespace dynarithmic
         DTWAIN_FLOAT PDFThumbnailScale[2];
         DTWAIN_FLOAT PDFCustomSize[2];
         DTWAIN_FLOAT PDFCustomScale[2];
-        CTL_TEXTELEMENTPTRLIST PDFTextElementList;
         CTL_SEARCHABLETEXTRANGE PDFSearchableTextRange;
         DTWAINImageOCRPDFInfo PDFOCRInfo;
 
         // Vista ICONs
         DTWAINImageInfoEx() :
-            theSession{},
-            PhotoMetric{},
             PostscriptType(0),
             IsPostscript(false),
             IsPDF(false),
@@ -136,6 +134,7 @@ namespace dynarithmic
             bIsAESEncrypted(false),
             bUseStrongEncryption(false),
             PDFUseASCIICompression(false),
+            PDFUseNoCompression(false),
             PDFPermissions(0),
             PSType(0),
             UnitOfMeasure(DTWAIN_INCHES),
@@ -143,27 +142,25 @@ namespace dynarithmic
             ResolutionY(100),
             nPDFJpegQuality(75),
             IsImageFileCreated(false),
-            theSource(nullptr),
+            theSource{},
             PDFOrientation(DTWAIN_PDF_PORTRAIT),
             IsOCRTempImage(false),
             IsOCRUsedForPDF(false),
             IsVistaIcon(false),
             nPDFPolarity(DTWAIN_PDFPOLARITY_POSITIVE),
+            theSession{},
             IsSearchableTextOnPage(false),
             nJpegQuality(100),
             bProgressiveJpeg(false),
             PDFPageSize(DTWAIN_PDF_NOSCALING),
             PDFUseCompression(true),
-            PDFUseNoCompression(false),
-            PDFUseThumbnail(false)
-            {
-                PDFThumbnailScale[0] =
-                PDFThumbnailScale[1] =
-                PDFCustomSize[0] =
-                PDFCustomSize[1] =
-                PDFCustomScale[0] =
-                PDFCustomScale[1] = 0.0;
-            }
+            PDFUseThumbnail(false),
+            PhotoMetric{},
+            PDFThumbnailScale{},
+            PDFCustomSize{},
+            PDFCustomScale{}
+        {
+        }
     };
 }
 #endif

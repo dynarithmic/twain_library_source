@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -20,18 +20,18 @@
  */
 #include "ctltwmgr.h"
 #include "enumeratorfuncs.h"
-#include "errorcheck.h"
 #include "ctltmpl5.h"
 #include "ctliface.h"
-#include <boost/assign/list_of.hpp>
+#include "cppfunc.h"
+#include "ctlreg.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 #undef min
 #undef max
-using namespace std;
+
 using namespace dynarithmic;
-using namespace boost::assign; // bring 'map_list_of()' into scope
 
 #define DTWAIN_STATE4   8
 
@@ -49,7 +49,7 @@ void dynarithmic::DTWAIN_CollectCapabilityInfo(CTL_ITwainSource *p, TW_UINT16 nC
                                                 {"TW_ENUMERATION", DTWAIN_CONTENUMERATION},
                                                 {"TW_RANGE", DTWAIN_CONTRANGE},
                                                 {"TW_ARRAY", DTWAIN_CONTARRAY},
-                                                {"-1", (UINT)-1},
+                                                {"-1", static_cast<UINT>(-1)},
                                                 {"0", 0} };
 
     // Add capabilities where the state info is set
@@ -62,7 +62,6 @@ void dynarithmic::DTWAIN_CollectCapabilityInfo(CTL_ITwainSource *p, TW_UINT16 nC
     UINT cSetCurrent;
     UINT cSetAvailable;
     UINT cQuerySupport;
-    UINT cEOJValue;
     UINT cEntryFound;
 
     bool cFlags[6] = { false };
@@ -70,28 +69,27 @@ void dynarithmic::DTWAIN_CollectCapabilityInfo(CTL_ITwainSource *p, TW_UINT16 nC
     UINT cSetAlt = 0;
     TW_UINT16 cStateInfo = 0xFF;
     UINT nDataType = 0;
-    CTL_String strName = CTL_TwainAppMgr::GetCapNameFromCap(nCap);
-    bool bOk;
-    bool bCanQuerySupport;
+    const std::string strName = CTL_TwainAppMgr::GetCapNameFromCap(nCap);
     bool bContainerInfoFound = false;
-    cEOJValue = 0;
-    bOk = GetCapInfoFromIni(strName,
-        StringConversion::Convert_Native_To_Ansi(p->GetProductName()),
-        (UINT)nCap,
-        cGet,
-        cGetCurrent,
-        cGetDefault,
-        cSetCurrent,
-        cSetAvailable,
-        cQuerySupport,
-        cEOJValue,
-        cStateInfo,
-        cEntryFound,
-        nDataType,
-        bContainerInfoFound,
-        mapContainer);
+    UINT cEOJValue = 0;
+    const std::string sProdNameA = StringConversion::Convert_Native_To_Ansi(p->GetProductName());
+    bool bOk = GetCapInfoFromIni(strName,
+                                 sProdNameA,
+                                 static_cast<UINT>(nCap),
+                                 cGet,
+                                 cGetCurrent,
+                                 cGetDefault,
+                                 cSetCurrent,
+                                 cSetAvailable,
+                                 cQuerySupport,
+                                 cEOJValue,
+                                 cStateInfo,
+                                 cEntryFound,
+                                 nDataType,
+                                 bContainerInfoFound,
+                                 mapContainer);
 
-    bCanQuerySupport = cQuerySupport ? true : false;
+    bool bCanQuerySupport = cQuerySupport ? true : false;
     if (cEntryFound)
     {
         if (cStateInfo != 0xFF)
@@ -101,10 +99,9 @@ void dynarithmic::DTWAIN_CollectCapabilityInfo(CTL_ITwainSource *p, TW_UINT16 nC
     {
         if (CTL_TwainDLLHandle::s_lErrorFilterFlags)
         {
-            CTL_StringStreamA strm;
+            StringStreamOutA strm;
             strm << "Using capability info from DTWAIN32.INI (Source="
-                 << StringConversion::Convert_Native_To_Ansi(p->GetProductName())
-                 << ", Cap=" << CTL_TwainAppMgr::GetCapNameFromCap(nCap) << ")\n";
+                 << sProdNameA << ", Cap=" << CTL_TwainAppMgr::GetCapNameFromCap(nCap) << ")\n";
             CTL_TwainAppMgr::WriteLogInfoA(strm.str());
         }
         if (bContainerInfoFound)
@@ -131,19 +128,19 @@ void dynarithmic::DTWAIN_CollectCapabilityInfo(CTL_ITwainSource *p, TW_UINT16 nC
 
     // Get the container that works the best
     CTL_TwainAppMgr::GetBestContainerType(p,
-        (CTL_EnumCapability)nCap,
+        static_cast<CTL_EnumCapability>(nCap),
         cGet, cSet, nDataType,
         CTL_GetTypeGET, cFlags);
 
     CTL_TwainAppMgr::GetBestContainerType(p,
-        (CTL_EnumCapability)nCap,
+        static_cast<CTL_EnumCapability>(nCap),
         cGetCurrent, cSetAlt, nDataType,
         CTL_GetTypeGETCURRENT, cFlags);
 
     if (cSet != 0)
     {
         CTL_TwainAppMgr::GetBestContainerType(p,
-            (CTL_EnumCapability)nCap,
+            static_cast<CTL_EnumCapability>(nCap),
             cGetDefault, cSetAlt, nDataType,
             CTL_GetTypeGETDEFAULT, cFlags);
     }
@@ -165,8 +162,8 @@ void dynarithmic::DTWAIN_CollectCapabilityInfo(CTL_ITwainSource *p, TW_UINT16 nC
         {
             if (nCap >= CAP_CUSTOMBASE)
             {
-                nOps = (cGet > 0) ? (TWQC_GET | TWQC_GETDEFAULT | TWQC_GETCURRENT) : 0;
-                nOps |= (cSet > 0) ? (TWQC_SET | TWQC_RESET | TWQC_SETCONSTRAINT) : 0;
+                nOps = cGet > 0 ? TWQC_GET | TWQC_GETDEFAULT | TWQC_GETCURRENT : 0;
+                nOps |= cSet > 0 ? TWQC_SET | TWQC_RESET | TWQC_SETCONSTRAINT : 0;
             }
             else
             {
@@ -179,8 +176,8 @@ void dynarithmic::DTWAIN_CollectCapabilityInfo(CTL_ITwainSource *p, TW_UINT16 nC
     {
         if (nCap >= CAP_CUSTOMBASE)
         {
-            nOps = (cGet > 0) ? (TWQC_GET | TWQC_GETDEFAULT | TWQC_GETCURRENT) : 0;
-            nOps |= (cSet > 0) ? (TWQC_SET | TWQC_RESET | TWQC_SETCONSTRAINT) : 0;
+            nOps = cGet > 0 ? TWQC_GET | TWQC_GETDEFAULT | TWQC_GETCURRENT : 0;
+            nOps |= cSet > 0 ? TWQC_SET | TWQC_RESET | TWQC_SETCONSTRAINT : 0;
         }
         else
             nOps = CTL_TwainAppMgr::GetCapOps(p, nCap, bCanQuerySupport);
@@ -207,9 +204,9 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
         CTL_ITwainSource *m_ps;
         LONG m_nCap;
         CapFinder(CTL_ITwainSource *ps, LONG nCap) : m_ps(ps), m_nCap(nCap) {}
-        bool operator()(CTL_CapInfo& CapInfo)
+        bool operator()(const CTL_CapInfo& CapInfo) const
         {
-            if ((int)std::get<0>(CapInfo) == m_nCap)
+            if (static_cast<int>(std::get<0>(CapInfo)) == m_nCap)
             {
                 m_ps->SetCapCached(static_cast<TW_UINT16>(m_nCap), true);
                 return true;
@@ -233,12 +230,12 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
         bNewArray = true;
     }
 
-    static const ContainerMap mapContainer = map_list_of("TW_ONEVALUE", DTWAIN_CONTONEVALUE)
-        ("TW_ENUMERATION", DTWAIN_CONTENUMERATION)
-        ("TW_RANGE", DTWAIN_CONTRANGE)
-        ("TW_ARRAY", DTWAIN_CONTARRAY)
-        ("-1", (UINT)-1)
-        ("0", 0);
+    static const ContainerMap mapContainer = {{"TW_ONEVALUE", DTWAIN_CONTONEVALUE},
+                                                  {"TW_ENUMERATION", DTWAIN_CONTENUMERATION},
+                                                  {"TW_RANGE", DTWAIN_CONTRANGE},
+                                                  {"TW_ARRAY", DTWAIN_CONTARRAY},
+                                                  {"-1", static_cast<UINT>(-1)},
+                                                  {"0", 0}};
 
     FindFirstValue(pSource->GetProductName(), &pHandle->m_aSourceCapInfo, &nWhere);
 
@@ -255,7 +252,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
         // and source cap info does not exist.  Add cap info statically.
 
         // Get an array
-        DTWAIN_ARRAY pDTWAINArray = 0;
+        DTWAIN_ARRAY pDTWAINArray = nullptr;
         DTWAINArrayLL_RAII raii(pDTWAINArray);
         bool bGetINIEntry = true;
 
@@ -269,7 +266,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
         }
 
         // if we get here, then the cap was never tested.
-        TW_UINT16 nCap = static_cast<TW_UINT16>(*vIt);
+        auto nCap = static_cast<TW_UINT16>(*vIt);
 
         // Add capabilities where the state info is set
         pSource->AddCapToStateInfo(CAP_CUSTOMDSDATA, DTWAIN_STATE4);
@@ -291,32 +288,32 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
         UINT cSetAlt = 0;
         TW_UINT16 cStateInfo = 0xFF;
         UINT nDataType = 0;
-        CTL_String strName = CTL_TwainAppMgr::GetCapNameFromCap(nCap);
-            bOk = GetCapInfoFromIni(strName, StringConversion::Convert_Native_To_Ansi(pSource->GetProductName()), (UINT)nCap, cGet, cGetCurrent,
-                cGetDefault, cSetCurrent, cSetAvailable, cQuerySupport,
-                cEOJValue, cStateInfo, nDataType, cEntryFound, bContainerInfoFound, mapContainer);
+        std::string strName = CTL_TwainAppMgr::GetCapNameFromCap(nCap);
+        std::string sProdNameA = StringConversion::Convert_Native_To_Ansi(pSource->GetProductName());
+        bOk = GetCapInfoFromIni(strName, sProdNameA, static_cast<UINT>(nCap), cGet, cGetCurrent,
+            cGetDefault, cSetCurrent, cSetAvailable, cQuerySupport,
+            cEOJValue, cStateInfo, nDataType, cEntryFound, bContainerInfoFound, mapContainer);
 
-            bCanQuerySupport = cQuerySupport ? true : false;
+        bCanQuerySupport = cQuerySupport ? true : false;
 
-            if (cEntryFound)
-                pSource->SetEOJDetectedValue(cEOJValue);
+        if (cEntryFound)
+            pSource->SetEOJDetectedValue(cEOJValue);
 
-            if (!cEntryFound)
-                bGetINIEntry = false;
-            else
-            {
-                if (cStateInfo != 0xFF)
-                    pSource->AddCapToStateInfo(nCap, cStateInfo);
-            }
+        if (!cEntryFound)
+            bGetINIEntry = false;
+        else
+        {
+            if (cStateInfo != 0xFF)
+                pSource->AddCapToStateInfo(nCap, cStateInfo);
+        }
 
         if (bOk)
         {
             if (CTL_TwainDLLHandle::s_lErrorFilterFlags)
             {
-                CTL_StringStreamA strm;
+                StringStreamOutA strm;
                 strm << "Using capability info from DTWAIN32.INI (Source="
-                     << StringConversion::Convert_Native_To_Ansi(pSource->GetProductName())
-                     << ", Cap=" << CTL_TwainAppMgr::GetCapNameFromCap(nCap) << ")\n";
+                     << sProdNameA << ", Cap=" << CTL_TwainAppMgr::GetCapNameFromCap(nCap) << ")\n";
 
                 CTL_TwainAppMgr::WriteLogInfoA(strm.str());
             }
@@ -347,13 +344,13 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
             }
         }
 
-        CTL_TwainAppMgr::GetBestContainerType(pSource, (CTL_EnumCapability)nCap, cGet, cSet,
+        CTL_TwainAppMgr::GetBestContainerType(pSource, static_cast<CTL_EnumCapability>(nCap), cGet, cSet,
             nDataType, CTL_GetTypeGET, cFlags);
-        CTL_TwainAppMgr::GetBestContainerType(pSource, (CTL_EnumCapability)nCap, cGetCurrent,
+        CTL_TwainAppMgr::GetBestContainerType(pSource, static_cast<CTL_EnumCapability>(nCap), cGetCurrent,
             cSetAlt, nDataType, CTL_GetTypeGETCURRENT, cFlags);
         if (cSet != 0)
         {
-            CTL_TwainAppMgr::GetBestContainerType(pSource, (CTL_EnumCapability)nCap, cGetDefault,
+            CTL_TwainAppMgr::GetBestContainerType(pSource, static_cast<CTL_EnumCapability>(nCap), cGetDefault,
                 cSetAlt, nDataType, CTL_GetTypeGETDEFAULT, cFlags);
         }
         else
@@ -378,8 +375,8 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
             {
                 if (nCap >= CAP_CUSTOMBASE)
                 {
-                    nOps = (cGet > 0) ? (TWQC_GET | TWQC_GETDEFAULT | TWQC_GETCURRENT) : 0;
-                    nOps |= (cSet > 0) ? (TWQC_SET | TWQC_RESET) : 0;
+                    nOps = cGet > 0 ? TWQC_GET | TWQC_GETDEFAULT | TWQC_GETCURRENT : 0;
+                    nOps |= cSet > 0 ? TWQC_SET | TWQC_RESET : 0;
                 }
                 else
                 {
@@ -392,8 +389,8 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
         {
             if (nCap >= CAP_CUSTOMBASE)
             {
-                nOps = (cGet > 0) ? (TWQC_GET | TWQC_GETDEFAULT | TWQC_GETCURRENT) : 0;
-                nOps |= (cSet > 0) ? (TWQC_SET | TWQC_RESET) : 0;
+                nOps = cGet > 0 ? TWQC_GET | TWQC_GETDEFAULT | TWQC_GETCURRENT : 0;
+                nOps |= cSet > 0 ? TWQC_SET | TWQC_RESET : 0;
             }
             else
                 nOps = CTL_TwainAppMgr::GetCapOps(pSource, nCap, bCanQuerySupport);

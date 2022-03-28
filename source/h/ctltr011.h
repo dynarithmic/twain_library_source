@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ namespace dynarithmic
 
             virtual bool            GetValue( void * /*pData*/, size_t /*nWhere*/ =0 ){ return false; }
             CTL_EnumContainer       GetSupportedContainer() const { return m_nContainerToUse; }
-            TW_UINT16               Execute();
+            TW_UINT16               Execute() override;
 
 
         protected:
@@ -45,7 +45,7 @@ namespace dynarithmic
 
             virtual bool            EnumCapValues( void * /*pCapData*/) { return false; }
 
-            void    Decode(void *p);
+            void    Decode(void *p) override;
 
             TW_UINT16 GetEffectiveItemType(TW_UINT16 curDataType) const;
 

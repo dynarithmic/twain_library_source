@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 #include "ctltrp.h"
 #include "ctltwses.h"
 #include "ctlobtyp.h"
-#include "ctlenum.h"
 namespace dynarithmic
 {
     class CTL_CapabilityTriplet : public CTL_TwainTriplet
@@ -35,8 +34,8 @@ namespace dynarithmic
                                    TW_UINT16 nMsg,
                                    TW_UINT16 nItemType,
                                    bool     bReading);
-            ~CTL_CapabilityTriplet();
-            TW_UINT16       Execute();
+            ~CTL_CapabilityTriplet() override;
+            TW_UINT16       Execute() override;
             void            SetTestMode( bool bSet = true );
             bool            IsTesting() const;
             bool            IsFindDefaultItemType() const { return m_bGetDefaultType; }

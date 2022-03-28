@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -20,27 +20,24 @@
  */
 #include "ctldib.h"
 #include "ctliface.h"
-#include "ctltwmgr.h"
 #include "ctlfileutils.h"
-using namespace std;
+
 using namespace dynarithmic;
 
 int CTL_WBMPIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, LONG64 /*MultiStage*/)
 {
-    HANDLE hDib = NULL;
-
     if ( !m_pDib )
         return DTWAIN_ERR_DIB;
 
-    hDib = m_pDib->GetHandle();
+    const HANDLE hDib = m_pDib->GetHandle();
     if ( !hDib )
         return DTWAIN_ERR_DIB;
 
     if ( m_pDib->GetDepth() > 1 )
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    int height = m_pDib->GetHeight();
-    int width = m_pDib->GetWidth();
+    const int height = m_pDib->GetHeight();
+    const int width = m_pDib->GetWidth();
 
     if ( height > 255 || width > 255 )
         return DTWAIN_ERR_INVALIDWBMP;

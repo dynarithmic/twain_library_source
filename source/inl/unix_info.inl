@@ -1,6 +1,6 @@
 /*
 This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-Copyright (c) 2002-2021 Dynarithmic Software.
+Copyright (c) 2002-2022 Dynarithmic Software.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License version 3 (AGPL)
@@ -19,14 +19,13 @@ Please read this file before deploying or distributing any application using DTW
 #include "dtwinverex.h"
 
 using namespace dynarithmic;
-using namespace std;
 
 CTL_StringType dynarithmic::GetWinVersion()
 {
     utsname test;
     uname(&test);
     CTL_StringType out;
-    CTL_StringStreamA strm;
+    StringStreamOutA strm;
     strm << "System: " << test.sysname << 
             "  Node: " << test.nodename << 
             "  Release: " << test.release << 

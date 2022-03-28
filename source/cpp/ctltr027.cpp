@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ CTL_ImagePendingTriplet::CTL_ImagePendingTriplet(CTL_ITwainSession *pSession,
                   DG_CONTROL,
                   DAT_PENDINGXFERS,
                   m_nMsg,
-                  (TW_MEMREF)&m_PendingXfers);
+                  static_cast<TW_MEMREF>(&m_PendingXfers));
 
             SetAlive (true);
         }
@@ -55,7 +55,7 @@ CTL_ImagePendingTriplet::CTL_ImagePendingTriplet(CTL_ITwainSession *pSession,
 bool CTL_ImagePendingTriplet::Reset( TW_UINT16 nMsg )
 {
     CTL_ITwainSession *pSession = GetSessionPtr();
-    CTL_ITwainSource *pSource   = GetSourcePtr();
+    CTL_ITwainSource *pSource = GetSourcePtr();
     if ( IsAlive() )
     {
         m_nMsg = nMsg;
@@ -64,7 +64,7 @@ bool CTL_ImagePendingTriplet::Reset( TW_UINT16 nMsg )
               DG_CONTROL,
               DAT_PENDINGXFERS,
               m_nMsg,
-              (TW_MEMREF)&m_PendingXfers);
+              static_cast<TW_MEMREF>(&m_PendingXfers));
         return true;
     }
     return false;

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
     OF THIRD PARTY RIGHTS.
  */
 #include <cstring>
+#include <algorithm>
+
 #include "ctlobtyp.h"
 #include "ctltr010.h"
 #include "ctliface.h"
@@ -31,25 +33,55 @@ CTL_TwainTypeOb::CTL_TwainTypeOb( TW_UINT16 nType, bool bGetTypeSize/*=true*/ ) 
     else
         m_nSize = nType;
     m_hGlobal = CTL_TwainDLLHandle::s_TwainMemoryFunc->AllocateMemory(m_nSize);
-    m_pData = NULL;
+    m_pData = nullptr;
     if ( m_hGlobal )
         m_pData = CTL_TwainDLLHandle::s_TwainMemoryFunc->LockMemory(m_hGlobal);
 }
 
+CTL_TwainTypeOb::CTL_TwainTypeOb(CTL_TwainTypeOb&& rhs) noexcept : m_nSize(rhs.m_nSize), m_nType(rhs.m_nType),
+                                                                   m_pData(rhs.m_pData), m_hGlobal(rhs.m_hGlobal)
+{
+    rhs.m_pData = nullptr;
+    rhs.m_hGlobal = {};
+}
+
+void CTL_TwainTypeOb::swap(CTL_TwainTypeOb& left, CTL_TwainTypeOb& right) noexcept
+{
+    std::swap(left.m_nSize, right.m_nSize);
+    std::swap(left.m_hGlobal, right.m_hGlobal);
+    std::swap(left.m_nType, right.m_nType);
+    std::swap(left.m_pData, right.m_pData);
+}
+
+CTL_TwainTypeOb& CTL_TwainTypeOb::operator=(CTL_TwainTypeOb&& rhs) noexcept
+{
+    if (m_hGlobal)
+    {
+        CTL_TwainDLLHandle::s_TwainMemoryFunc->UnlockMemory(m_hGlobal);
+        CTL_TwainDLLHandle::s_TwainMemoryFunc->FreeMemory(m_hGlobal);
+    }
+    swap(*this, rhs);
+    rhs.m_pData = nullptr;
+    rhs.m_hGlobal = {};
+    return *this;
+}
 
 CTL_TwainTypeOb::~CTL_TwainTypeOb()
 {
-    CTL_TwainDLLHandle::s_TwainMemoryFunc->UnlockMemory(m_hGlobal);
-    CTL_TwainDLLHandle::s_TwainMemoryFunc->FreeMemory(m_hGlobal);
+    if ( m_hGlobal )
+    {
+        CTL_TwainDLLHandle::s_TwainMemoryFunc->UnlockMemory(m_hGlobal);
+        CTL_TwainDLLHandle::s_TwainMemoryFunc->FreeMemory(m_hGlobal);
+    }
 }
 
 // No check for size!!!
-void CTL_TwainTypeOb::CopyData( void *pData )
+void CTL_TwainTypeOb::CopyData(const void* pData) const
 {
-        memcpy( m_pData, pData, m_nSize );
+   memcpy( m_pData, pData, m_nSize );
 }
 
-void CTL_TwainTypeOb::GetData( void *pData)
+void CTL_TwainTypeOb::GetData( void *pData) const
 {
     if ( m_pData )
         memcpy( pData, m_pData, m_nSize );

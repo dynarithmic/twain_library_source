@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -20,11 +20,10 @@
  */
 #include "ctltwmgr.h"
 #include "enumeratorfuncs.h"
-#include "errorcheck.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
-using namespace std;
+
 using namespace dynarithmic;
 
 std::queue<MSG> TwainMessageLoopV2::s_MessageQueue;
@@ -33,7 +32,7 @@ bool TwainMessageLoopImpl::IsSourceOpen(CTL_ITwainSource* pSource, bool bUIOnly)
 {
     if (bUIOnly)
         return pSource->IsUIOpen() ? true : false;
-    return (!m_pDLLHandle->m_bTransferDone == true && !m_pDLLHandle->m_bSourceClosed == true);
+    return !m_pDLLHandle->m_bTransferDone == true && !m_pDLLHandle->m_bSourceClosed == true;
 }
 
 void TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource *pSource, bool isUIOnly)
@@ -50,13 +49,13 @@ void TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource *pSource, 
     UIScopedRAII raii(pSource);
     pSource->SetUIOnly(isUIOnly);
 #ifdef WIN32
-    while (GetMessage(&msg, NULL, 0, 0))
+    while (GetMessage(&msg, nullptr, 0, 0))
     {
         if (!IsSourceOpen(pSource, isUIOnly))
             break;
         if (CanEnterDispatch(&msg))
         {
-            ::TranslateMessage(&msg);
+            TranslateMessage(&msg);
             ::DispatchMessage(&msg);
         }
     }
@@ -83,7 +82,7 @@ bool TwainMessageLoopV2::IsSourceOpen(CTL_ITwainSource* pSource, bool bUIOnly)
 
 void dynarithmic::DTWAIN_AcquireProc(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE, WPARAM Data1, LPARAM)
 {
-    CTL_TwainDLLHandle *p = static_cast<CTL_TwainDLLHandle *>(DLLHandle);
+    const auto p = static_cast<CTL_TwainDLLHandle *>(DLLHandle);
 
     switch (Data1)
     {

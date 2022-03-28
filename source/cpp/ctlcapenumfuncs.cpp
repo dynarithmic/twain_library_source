@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,22 +18,22 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include "cppfunc.h"
 #include "ctltwmgr.h"
-#include "ctltrall.h"
 #include "enumeratorfuncs.h"
 #include "errorcheck.h"
 #include "ctltmpl5.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
-using namespace std;
+
 using namespace dynarithmic;
 
 /////////////////////////////////////////////////////////////////////////
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCustomCapsEx2(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    DTWAIN_ARRAY pArray = 0;
+    DTWAIN_ARRAY pArray = nullptr;
     DTWAIN_EnumCustomCaps(Source, &pArray);
     LOG_FUNC_EXIT_PARAMS(pArray)
     CATCH_BLOCK(DTWAIN_ARRAY(nullptr))
@@ -43,7 +43,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCustomCapsEx2(DTWAIN_SOURCE Source)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Array))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
 
     // See if DLL Handle exists
@@ -58,8 +58,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
             EnumeratorFunctionImpl::ClearEnumerator(*Array);
     }
 
-    DTWAIN_ARRAY ThisArray = 0;
-    ThisArray = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 0);
+    const DTWAIN_ARRAY ThisArray = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 0);
     DTWAINArrayLL_RAII arr(ThisArray);
     auto vCaps = EnumeratorVectorPtr<LONG>(ThisArray);
 
@@ -68,15 +67,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
         if (p->RetrievedAllCaps())
         {
             // Check if this source has had capabilities negotiated and tested
-            CTL_StringType strProdName;
-            strProdName = p->GetProductName();
+            const auto strProdName = p->GetProductName();
             int nWhere;
             FindFirstValue(strProdName, &pHandle->m_aSourceCapInfo, &nWhere);
 
             if (nWhere != -1) // Already negotiated
             {
                 // Get the cap array values
-                CTL_SourceCapInfo Info = pHandle->m_aSourceCapInfo[nWhere];
+                const CTL_SourceCapInfo Info = pHandle->m_aSourceCapInfo[nWhere];
                 CTL_CapInfoArray *pCapInfoArray = std::get<1>(Info).get();
                 std::for_each(pCapInfoArray->begin(), pCapInfoArray->end(), [&vCaps](const CTL_CapInfoArray::value_type& CapInfo)
                                 { vCaps->push_back(static_cast<int>(std::get<0>(CapInfo))); });
@@ -86,7 +84,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
         }
 
         // First time, so let's go
-        DTWAIN_ARRAY pDTWAINArray = ThisArray;
+        const DTWAIN_ARRAY pDTWAINArray = ThisArray;
         EnumeratorFunctionImpl::ClearEnumerator(pDTWAINArray);
         CTL_TwainCapArray rArray;
 
@@ -100,7 +98,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
         // Cache this information and set source's flag that all caps were retrieved
         DTWAIN_CacheCapabilityInfo(p, pHandle, vCaps);
         p->SetRetrievedAllCaps(true);
-        bool bFound = !vCaps->empty();
+        const bool bFound = !vCaps->empty();
         *Array = DTWAIN_ArrayCreateCopy(ThisArray);
         if (bFound)
             LOG_FUNC_EXIT_PARAMS(true)
@@ -112,7 +110,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtendedCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Array))
-    DTWAIN_BOOL retVal = DTWAIN_EnumExtendedCapsEx(Source, Array);
+        const DTWAIN_BOOL retVal = DTWAIN_EnumExtendedCapsEx(Source, Array);
     LOG_FUNC_EXIT_PARAMS(retVal)
     CATCH_BLOCK(false)
 }
@@ -122,9 +120,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCustomCaps(DTWAIN_SOURCE Source, LPDTWAIN_AR
     LOG_FUNC_ENTRY_PARAMS((Source, Array))
     if (!DTWAIN_EnumSupportedCapsEx(Source, Array))
     LOG_FUNC_EXIT_PARAMS(false)
-    DTWAIN_ARRAY ThisArray = (DTWAIN_ARRAY)(*Array);
+    const DTWAIN_ARRAY ThisArray = static_cast<DTWAIN_ARRAY>(*Array);
 
-    auto vCaps = EnumeratorVectorPtr<LONG>(ThisArray);
+    const auto vCaps = EnumeratorVectorPtr<LONG>(ThisArray);
     if (vCaps)
         vCaps->erase(std::remove_if(vCaps->begin(), vCaps->end(), [&](LONG nCap) { return static_cast<unsigned>(nCap) < DTWAIN_CV_CAPCUSTOMBASE;}), vCaps->end());
     LOG_FUNC_EXIT_PARAMS(true)
@@ -137,9 +135,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCap
     if (!DTWAIN_IsCapSupported(Source, lCapability))
         LOG_FUNC_EXIT_PARAMS(false)
 
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
-    CTL_CapInfo CapInfo = GetCapInfo(pHandle, p, (TW_UINT16)lCapability);
+    const CTL_CapInfo CapInfo = GetCapInfo(pHandle, p, static_cast<TW_UINT16>(lCapability));
     *lpOps = std::get<4>(CapInfo);
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
@@ -148,30 +146,30 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCap
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAllCapsToDefault(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
 
     if (!p)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return (!CTL_TwainAppMgr::IsSourceOpen(p)); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !CTL_TwainAppMgr::IsSourceOpen(p); },
         DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
     {
-        DTWAIN_ARRAY a = 0;
+        DTWAIN_ARRAY a = nullptr;
         DTWAINArrayPtr_RAII arr(&a);
         DTWAIN_EnumSupportedCaps(Source, &a);
     }
 
-    CTL_CapInfoArrayPtr pArray = GetCapInfoArray(pHandle, p);
+    const CTL_CapInfoArrayPtr pArray = GetCapInfoArray(pHandle, p);
 
-    vector<int> Array;
+    std::vector<int> Array;
     Array.push_back(0);
-    for_each(pArray->begin(), pArray->end(), [&](CTL_CapInfoArray::value_type& InfoVal)
+    for_each(pArray->begin(), pArray->end(), [&](const CTL_CapInfoArray::value_type& InfoVal)
     {
-        CTL_CapInfo Info = InfoVal.second;
-        if (p->IsCapNegotiableInState((TW_UINT16)std::get<0>(Info), p->GetState()))
+        const CTL_CapInfo Info = InfoVal.second;
+        if (p->IsCapNegotiableInState(static_cast<TW_UINT16>(std::get<0>(Info)), p->GetState()))
         {
-            if (!SetCapabilityValues(p, std::get<0>(Info), CTL_SetTypeRESET, (UINT)TwainContainer_ONEVALUE, 0,Array)) {}
+            if (!SetCapabilityValues(p, std::get<0>(Info), CTL_SetTypeRESET, static_cast<UINT>(TwainContainer_ONEVALUE), 0,Array)) {}
         }
     });
 

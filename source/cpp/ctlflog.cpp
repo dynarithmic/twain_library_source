@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -19,55 +19,54 @@
     OF THIRD PARTY RIGHTS.
  */
 #include <boost/format.hpp>
+
+#include "cppfunc.h"
 #include "ctliface.h"
 #include "ctltwmgr.h"
 #include "dtwain_resource_constants.h"
-#include "dtwdecl.h"
 
-using namespace std;
 using namespace dynarithmic;
 
-static void LogExceptionToConsole(LPCTSTR fname);
+static void LogExceptionToConsole(LPCSTR fname, const char* sAdditionalText=nullptr);
 
-CTL_StringType dynarithmic::CTL_LogFunctionCallA(LPCSTR pFuncName, int nWhich, LPCSTR pOptionalString/* = NULL*/)
+std::string dynarithmic::CTL_LogFunctionCallA(LPCSTR pFuncName, int nWhich, LPCSTR pOptionalString/* = NULL*/)
 {
-    CTL_StringType ret;
+    std::string ret;
     if (pOptionalString)
-        ret = CTL_LogFunctionCall(StringConversion::Convert_AnsiPtr_To_Native(pFuncName).c_str(),
-                                  nWhich, StringConversion::Convert_AnsiPtr_To_Native(pOptionalString).c_str());
+        ret = CTL_LogFunctionCallHelper(pFuncName, nWhich, pOptionalString);
     else
-        ret = CTL_LogFunctionCall(StringConversion::Convert_AnsiPtr_To_Native(pFuncName).c_str(), nWhich );
+        ret = CTL_LogFunctionCallHelper(pFuncName, nWhich );
     return ret;
 }
 
-CTL_StringType dynarithmic::CTL_LogFunctionCall(LPCTSTR pFuncName, int nWhich, LPCTSTR pString/*=NULL*/)
+std::string dynarithmic::CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich, LPCSTR pString/*=NULL*/)
 {
     if (CTL_TwainDLLHandle::s_lErrorFilterFlags == 0 )
-         return CTL_StringType();
+         return {};
     static int nIndent = 0;
-    CTL_StringType s;
-    CTL_StringType s2;
+    std::string s;
+    std::string s2;
     if ( pString )
         s2 = pString;
     if ( nWhich != LOG_NO_INDENT )
     {
         if ( nWhich == 0 || nWhich == LOG_INDENT_IN)
         {
-            CTL_StringType sTemp(nIndent, _T(' '));
-            s = sTemp + (CTL_StringType)_T("===>>>") + CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_ENTERTEXT] + _T(" ");
+            const std::string sTemp(nIndent, ' ');
+            s = sTemp + static_cast<std::string>("===>>>") + CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_ENTERTEXT] + " ";
             nIndent += 3;
         }
         else
         {
             nIndent -= 3;
-            nIndent = max(0, nIndent);
-            CTL_StringType sTemp(nIndent, _T(' '));
-            s = sTemp + (CTL_StringType)_T("<<<===") + CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_EXITTEXT] + _T(" ");
+            nIndent = (std::max)(0, nIndent);
+            const std::string sTemp(nIndent, ' ');
+            s = sTemp + static_cast<std::string>("<<<===") + CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_EXITTEXT] + " ";
         }
     }
     else
     {
-        s = CTL_StringType(nIndent, _T(' '));
+        s = std::string(nIndent, ' ');
     }
     if ( !pString )
         s += pFuncName;
@@ -88,60 +87,49 @@ CTL_StringType dynarithmic::CTL_LogFunctionCall(LPCTSTR pFuncName, int nWhich, L
     return s;
 }
 
-void dynarithmic::LogExceptionErrorA(LPCSTR fname)
-{
-    LogExceptionError(StringConversion::Convert_AnsiPtr_To_Native(fname).c_str());
-}
-
-void dynarithmic::LogExceptionError(LPCTSTR fname)
+void dynarithmic::LogExceptionErrorA(LPCSTR fname, const char* sAdditionalText)
 {
     if ( CTL_TwainDLLHandle::s_lErrorFilterFlags == 0 )
          return;
-    try {
-       CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    try
+    {
+       const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
        if ( pHandle )
             pHandle->m_lLastError = DTWAIN_ERR_EXCEPTION_ERROR;
-       CTL_StringStreamType output;
+       std::ostringstream output;
 
-       output << _T("**** DTWAIN ") << CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_EXCEPTERRORTEXT] <<  _T(" ****.  ") <<
-                 CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_MODULETEXT] << _T(": ") <<  fname;
+       output << "**** DTWAIN " << CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_EXCEPTERRORTEXT] <<  " ****.  " <<
+                 CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_MODULETEXT] << ": " <<  fname;
+       if ( sAdditionalText )
+          output << "\nAdditional Information: " << sAdditionalText;
 
-       CTL_StringType s = output.str();
+       std::string s = output.str();
        if (!(CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_USEFILE))
-            s += _T("\n");
-       CTL_TwainAppMgr::WriteLogInfo(s, true);  // flush all writes to the log file
+            s += "\n";
+       CTL_TwainAppMgr::WriteLogInfoA(s, true);  // flush all writes to the log file
        if ( CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_SHOWEXCEPTIONS)
-           LogExceptionToConsole(fname);
+           LogExceptionToConsole(fname, sAdditionalText);
     }
     catch(...)
     {
-        LogExceptionToConsole(fname);
+        LogExceptionToConsole(fname, sAdditionalText);
     }
 }
 
-void LogExceptionToConsole(LPCTSTR fname)
+void LogExceptionToConsole(LPCSTR fname, const char* sAdditionalText)
 {
     try
     {
-        #ifdef UNICODE
-            std::wostringstream strm;
-            strm << boost::wformat(_T("**** DTWAIN %1% ****.  %2%: %3%\n")) %
-                CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_EXCEPTERRORTEXT].c_str() %
-                CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_MODULETEXT].c_str() % fname;
-        #else
-            std::ostringstream strm;
-            strm << boost::format("**** DTWAIN %1% ****.  %2%: %3%\n") %
-                CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_EXCEPTERRORTEXT].c_str() %
-                CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_MODULETEXT].c_str() % fname;
-        #endif
+        std::ostringstream strm;
+        strm << boost::format("**** DTWAIN %1% ****.  %2%: %3%\n") %
+            CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_EXCEPTERRORTEXT].c_str() %
+            CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_MODULETEXT].c_str() % fname;
+        if (sAdditionalText)
+            strm << "\nAdditional Information: " << sAdditionalText;
         #ifdef _WIN32
-           ::MessageBox(NULL, strm.str().c_str(), CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_EXCEPTERRORTEXT].c_str(), MB_ICONSTOP);
-        #else
-        #ifdef _UNICODE
-           std::wcout << strm.str() << L'\n';
+        MessageBoxA(nullptr, strm.str().c_str(), CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_EXCEPTERRORTEXT].c_str(), MB_ICONSTOP);
         #else
            std::cout << strm.str() << '\n';
-        #endif
         #endif
     }
     catch (...) {}  // can't really do anything

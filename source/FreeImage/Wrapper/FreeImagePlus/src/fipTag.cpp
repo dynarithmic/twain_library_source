@@ -23,112 +23,112 @@
 #include "FreeImagePlus.h"
 
 fipTag::fipTag() {
-	_tag = FreeImage_CreateTag();
+    _tag = FreeImage_CreateTag();
 }
 
 fipTag::~fipTag() {
-	FreeImage_DeleteTag(_tag);
+    FreeImage_DeleteTag(_tag);
 }
 
 BOOL fipTag::setKeyValue(const char *key, const char *value) {
-	if(_tag) {
-		FreeImage_DeleteTag(_tag);
-		_tag = NULL;
-	}
-	// create a tag
-	_tag = FreeImage_CreateTag();
-	if(_tag) {
-		BOOL bSuccess = TRUE;
-		// fill the tag
-		DWORD tag_length = (DWORD)(strlen(value) + 1);
-		bSuccess &= FreeImage_SetTagKey(_tag, key);
-		bSuccess &= FreeImage_SetTagLength(_tag, tag_length);
-		bSuccess &= FreeImage_SetTagCount(_tag, tag_length);
-		bSuccess &= FreeImage_SetTagType(_tag, FIDT_ASCII);
-		bSuccess &= FreeImage_SetTagValue(_tag, value);
-		return bSuccess;
-	}
-	return FALSE;
+    if(_tag) {
+        FreeImage_DeleteTag(_tag);
+        _tag = nullptr;
+    }
+    // create a tag
+    _tag = FreeImage_CreateTag();
+    if(_tag) {
+        BOOL bSuccess = TRUE;
+        // fill the tag
+        const DWORD tag_length = static_cast<DWORD>(strlen(value) + 1);
+        bSuccess &= FreeImage_SetTagKey(_tag, key);
+        bSuccess &= FreeImage_SetTagLength(_tag, tag_length);
+        bSuccess &= FreeImage_SetTagCount(_tag, tag_length);
+        bSuccess &= FreeImage_SetTagType(_tag, FIDT_ASCII);
+        bSuccess &= FreeImage_SetTagValue(_tag, value);
+        return bSuccess;
+    }
+    return FALSE;
 }
 
 fipTag::fipTag(const fipTag& tag) {
-	_tag = FreeImage_CloneTag(tag._tag);
+    _tag = FreeImage_CloneTag(tag._tag);
 }
 
 fipTag& fipTag::operator=(const fipTag& tag) {
-	if(this != &tag) {
-		if(_tag) FreeImage_DeleteTag(_tag);
-		_tag = FreeImage_CloneTag(tag._tag);
-	}
-	return *this;
+    if(this != &tag) {
+        if(_tag) FreeImage_DeleteTag(_tag);
+        _tag = FreeImage_CloneTag(tag._tag);
+    }
+    return *this;
 }
 
 fipTag& fipTag::operator=(FITAG *tag) {
-	if(_tag) FreeImage_DeleteTag(_tag);
-	_tag = tag;
-	return *this;
+    if(_tag) FreeImage_DeleteTag(_tag);
+    _tag = tag;
+    return *this;
 }
 
 BOOL fipTag::isValid() const {
-	return (_tag != NULL) ? TRUE : FALSE;
+    return _tag != nullptr ? TRUE : FALSE;
 }
 
 const char* fipTag::getKey() const {
-	return FreeImage_GetTagKey(_tag);
+    return FreeImage_GetTagKey(_tag);
 }
 
 const char* fipTag::getDescription() const {
-	return FreeImage_GetTagDescription(_tag);
+    return FreeImage_GetTagDescription(_tag);
 }
 
 WORD fipTag::getID() const {
-	return FreeImage_GetTagID(_tag);
+    return FreeImage_GetTagID(_tag);
 }
 
 FREE_IMAGE_MDTYPE fipTag::getType() const {
-	return FreeImage_GetTagType(_tag);
+    return FreeImage_GetTagType(_tag);
 }
 
 DWORD fipTag::getCount() const {
-	return FreeImage_GetTagCount(_tag);
+    return FreeImage_GetTagCount(_tag);
 }
 
 DWORD fipTag::getLength() const {
-	return FreeImage_GetTagLength(_tag);
+    return FreeImage_GetTagLength(_tag);
 }
 
 const void* fipTag::getValue() const {
-	return FreeImage_GetTagValue(_tag);
+    return FreeImage_GetTagValue(_tag);
 }
 
 BOOL fipTag::setKey(const char *key) {
-	return FreeImage_SetTagKey(_tag, key);
+    return FreeImage_SetTagKey(_tag, key);
 }
 
 BOOL fipTag::setDescription(const char *description) {
-	return FreeImage_SetTagDescription(_tag, description);
+    return FreeImage_SetTagDescription(_tag, description);
 }
 
 BOOL fipTag::setID(WORD id) {
-	return FreeImage_SetTagID(_tag, id);
+    return FreeImage_SetTagID(_tag, id);
 }
 
 BOOL fipTag::setType(FREE_IMAGE_MDTYPE type) {
-	return FreeImage_SetTagType(_tag, type);
+    return FreeImage_SetTagType(_tag, type);
 }
 
 BOOL fipTag::setCount(DWORD count) {
-	return FreeImage_SetTagCount(_tag, count);
+    return FreeImage_SetTagCount(_tag, count);
 }
 
 BOOL fipTag::setLength(DWORD length) {
-	return FreeImage_SetTagLength(_tag, length);
+    return FreeImage_SetTagLength(_tag, length);
 }
 
 BOOL fipTag::setValue(const void *value) {
-	return FreeImage_SetTagValue(_tag, value);
+    return FreeImage_SetTagValue(_tag, value);
 }
 
 const char* fipTag::toString(FREE_IMAGE_MDMODEL model, char *Make) const {
-	return FreeImage_TagToString(model, _tag, Make);
+    return FreeImage_TagToString(model, _tag, Make);
 }

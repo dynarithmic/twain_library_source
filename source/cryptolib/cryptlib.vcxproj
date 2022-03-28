@@ -1,9 +1,17 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- Microsoft documentation for VCXPROJ file format is located at -->
   <!-- the following URL. The documentation leaves a lot to be desired. -->
   <!-- https://msdn.microsoft.com/en-us/library/2208a1f2.aspx -->
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugU|Win32">
+      <Configuration>DebugU</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DebugU|x64">
+      <Configuration>DebugU</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
@@ -12,28 +20,22 @@
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseU|Win32">
+      <Configuration>ReleaseU</Configuration>
+      <CharacterSet>Unicode</CharacterSet>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseU|x64">
+      <Configuration>ReleaseU</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
+      <CharacterSet>MultiByte</CharacterSet>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="DLL-Import Debug|Win32">
-      <Configuration>DLL-Import Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="DLL-Import Debug|x64">
-      <Configuration>DLL-Import Debug</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="DLL-Import Release|Win32">
-      <Configuration>DLL-Import Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="DLL-Import Release|x64">
-      <Configuration>DLL-Import Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -44,15 +46,34 @@
     <ProjectGuid>{c39f4b46-6e89-4074-902e-ca57073044d2}</ProjectGuid>
     <RootNamespace>cryptlib</RootNamespace>
     <ConfigurationType>StaticLibrary</ConfigurationType>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <!-- Use DefaultPlatformToolset after Microsoft.Cpp.Default.props -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='ReleaseU|Win32'">
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='DebugU|Win32'">
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='ReleaseU|x64'">
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
   <!-- Set DefaultPlatformToolset to v100 (VS2010) if not defined -->
   <PropertyGroup Label="EmptyDefaultPlatformToolset">
     <DefaultPlatformToolset Condition=" '$(DefaultPlatformToolset)' == '' ">v100</DefaultPlatformToolset>
   </PropertyGroup>
   <PropertyGroup Label="PlatformToolset">
-    <PlatformToolset>$(DefaultPlatformToolset)</PlatformToolset>
+    <PlatformToolset>v140_xp</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -62,6 +83,22 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugU|x64'">
+    <OutDir>$(ProjectDir)$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseU|x64'">
+    <OutDir>$(ProjectDir)$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugU|Win32'">
+    <OutDir>$(ProjectDir)$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseU|Win32'">
+    <OutDir>$(ProjectDir)$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
+  </PropertyGroup>
   <!-- End of Visual Studio boilerplate -->
   <!-- All Configurations -->
   <PropertyGroup Label="All Configurations">
@@ -69,22 +106,21 @@
     <TargetName>cryptlib</TargetName>
     <TargetExt>.lib</TargetExt>
     <UseOfMfc>false</UseOfMfc>
-    <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <!-- Intermediate and Output directories -->
   <!-- Cryptlib and Cryptest need extra care due to Non-DLL/DLL configs -->
   <PropertyGroup Condition="'$(Configuration)'=='Debug' Or '$(Configuration)'=='Release'" Label="Non-DLL Directories">
-    <OutDir>$(Platform)\Output\$(Configuration)\</OutDir>
-    <IntDir>$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='DLL-Import Debug'" Label="DLL Directories">
-    <OutDir>$(Platform)\DLL_Output\Debug\</OutDir>
-    <IntDir>$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='DLL-Import Release'" Label="DLL Directories">
-    <OutDir>$(Platform)\DLL_Output\Release\</OutDir>
-    <IntDir>$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>$(PlatformTarget)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <!-- All Configurations -->
   <ItemDefinitionGroup Label="All Configurations">
@@ -124,8 +160,10 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <StringPooling>true</StringPooling>
+      <FunctionLevelLinking>
+      </FunctionLevelLinking>
+      <StringPooling>
+      </StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <ResourceCompile>
@@ -160,6 +198,83 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Lib>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseU|Win32'">
+    <Lib>
+      <OutputFile>$(ProjectDir)$(PlatformTarget)\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+    <ClCompile>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PreprocessorDefinitions>NDEBUG;USE_PRECOMPILED_HEADERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <OmitFramePointers>true</OmitFramePointers>
+      <ExceptionHandling>Async</ExceptionHandling>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugU|x64'">
+    <Lib>
+      <OutputFile>$(ProjectDir)$(PlatformTarget)\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+    <ClCompile>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseU|x64'">
+    <Lib>
+      <OutputFile>$(ProjectDir)$(PlatformTarget)\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+    <ClCompile>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PreprocessorDefinitions>NDEBUG;USE_PRECOMPILED_HEADERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>Async</ExceptionHandling>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Lib>
+      <OutputFile>$(ProjectDir)$(PlatformTarget)\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+    <ClCompile>
+      <ExceptionHandling>Async</ExceptionHandling>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Lib>
+      <OutputFile>$(ProjectDir)$(PlatformTarget)\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+    <ClCompile>
+      <ExceptionHandling>Async</ExceptionHandling>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugU|Win32'">
+    <Lib>
+      <OutputFile>$(ProjectDir)$(PlatformTarget)\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <ClCompile>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <ExceptionHandling>Async</ExceptionHandling>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Lib>
+      <OutputFile>$(ProjectDir)$(PlatformTarget)\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+    <ClCompile>
+      <ExceptionHandling>Async</ExceptionHandling>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Lib>
+      <OutputFile>$(ProjectDir)$(PlatformTarget)\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+    <ClCompile>
+      <ExceptionHandling>Async</ExceptionHandling>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <!-- Original File with special treatment -->
   <!-- Source Files -->
   <!-- The order of the first three matters -->
@@ -171,6 +286,7 @@
     <ClCompile Include="adler32.cpp" />
     <ClCompile Include="algebra.cpp" />
     <ClCompile Include="algparam.cpp" />
+    <ClCompile Include="allocate.cpp" />
     <ClCompile Include="arc4.cpp" />
     <ClCompile Include="aria.cpp" />
     <ClCompile Include="aria_simd.cpp" />
@@ -314,9 +430,7 @@
     <ClCompile Include="shark.cpp" />
     <ClCompile Include="sharkbox.cpp" />
     <ClCompile Include="simeck.cpp" />
-    <ClCompile Include="simeck_simd.cpp" />
     <ClCompile Include="simon.cpp" />
-    <ClCompile Include="simon64_simd.cpp" />
     <ClCompile Include="simon128_simd.cpp" />
     <ClCompile Include="simple.cpp" />
     <ClCompile Include="skipjack.cpp" />
@@ -325,7 +439,6 @@
     <ClCompile Include="sm4_simd.cpp" />
     <ClCompile Include="sosemanuk.cpp" />
     <ClCompile Include="speck.cpp" />
-    <ClCompile Include="speck64_simd.cpp" />
     <ClCompile Include="speck128_simd.cpp" />
     <ClCompile Include="square.cpp" />
     <ClCompile Include="squaretb.cpp" />
@@ -345,6 +458,7 @@
     <ClCompile Include="xed25519.cpp" />
     <ClCompile Include="xtr.cpp" />
     <ClCompile Include="xtrcrypt.cpp" />
+    <ClCompile Include="xts.cpp" />
     <ClCompile Include="zdeflate.cpp" />
     <ClCompile Include="zinflate.cpp" />
     <ClCompile Include="zlib.cpp" />
@@ -373,6 +487,16 @@
       <Command>ml64.exe /c /nologo /D_M_X64 /W3 /Cx /Zi /Fo"$(IntDir)rdrand-x64.obj" "%(FullPath)"</Command>
       <Outputs>$(IntDir)\rdrand-x64.obj;%(Outputs)</Outputs>
     </CustomBuild>
+    <CustomBuild Condition="'$(Platform)'=='Win32'" Include="rdseed.asm">
+      <Message>Building and assembling rdseed.asm</Message>
+      <Command>ml.exe /c /nologo /D_M_X86 /W3 /Cx /Zi /safeseh /Fo"$(IntDir)rdseed-x86.obj" "%(FullPath)"</Command>
+      <Outputs>$(IntDir)\rdseed-x86.obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Condition="'$(Platform)'=='x64'" Include="rdseed.asm">
+      <Message>Building and assembling rdseed.asm</Message>
+      <Command>ml64.exe /c /nologo /D_M_X64 /W3 /Cx /Zi /Fo"$(IntDir)rdseed-x64.obj" "%(FullPath)"</Command>
+      <Outputs>$(IntDir)\rdseed-x64.obj;%(Outputs)</Outputs>
+    </CustomBuild>
     <CustomBuild Condition="'$(Platform)'=='x64' AND ('$(Configuration)'=='Debug' Or '$(Configuration)'=='Release')" Include="x64dll.asm">
       <Message>Building and assembling x64dll.asm</Message>
       <Command>ml64.exe /c /nologo /D_M_X64 /W3 /Zi /Fo"$(IntDir)x64dll.obj" "%(FullPath)"</Command>
@@ -391,6 +515,7 @@
     <ClInclude Include="aes.h" />
     <ClInclude Include="algebra.h" />
     <ClInclude Include="algparam.h" />
+    <ClInclude Include="allocate.h" />
     <ClInclude Include="arc4.h" />
     <ClInclude Include="aria.h" />
     <ClInclude Include="argnames.h" />
@@ -412,6 +537,16 @@
     <ClInclude Include="channels.h" />
     <ClInclude Include="cmac.h" />
     <ClInclude Include="config.h" />
+    <ClInclude Include="config_align.h" />
+    <ClInclude Include="config_asm.h" />
+    <ClInclude Include="config_cpu.h" />
+    <ClInclude Include="config_cxx.h" />
+    <ClInclude Include="config_dll.h" />
+    <ClInclude Include="config_int.h" />
+    <ClInclude Include="config_misc.h" />
+    <ClInclude Include="config_ns.h" />
+    <ClInclude Include="config_os.h" />
+    <ClInclude Include="config_ver.h" />
     <ClInclude Include="cpu.h" />
     <ClInclude Include="crc.h" />
     <ClInclude Include="cryptlib.h" />
@@ -509,6 +644,7 @@
     <ClInclude Include="scrypt.h" />
     <ClInclude Include="seal.h" />
     <ClInclude Include="secblock.h" />
+    <ClInclude Include="secblockfwd.h" />
     <ClInclude Include="seckey.h" />
     <ClInclude Include="seed.h" />
     <ClInclude Include="serpent.h" />
@@ -545,9 +681,18 @@
     <ClInclude Include="xed25519.h" />
     <ClInclude Include="xtr.h" />
     <ClInclude Include="xtrcrypt.h" />
+    <ClInclude Include="xts.h" />
     <ClInclude Include="zdeflate.h" />
     <ClInclude Include="zinflate.h" />
     <ClInclude Include="zlib.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="x64dll.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugU|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseU|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </MASM>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

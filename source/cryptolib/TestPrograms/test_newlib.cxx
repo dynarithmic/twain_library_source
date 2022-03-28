@@ -2,7 +2,7 @@
 int main(int argc, char* argv[])
 {
 #ifndef __NEWLIB__
-	XXX
+    XXX
 #endif
-	return 0;
+    return 0;
 }

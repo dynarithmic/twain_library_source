@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,13 +18,14 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include "cppfunc.h"
 #include "ctltwmgr.h"
 #include "enumeratorfuncs.h"
 #include "errorcheck.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
-using namespace std;
+
 using namespace dynarithmic;
 
 static LONG GetCustomCapDataType(DTWAIN_SOURCE Source, TW_UINT16 nCap);
@@ -32,26 +33,25 @@ static LONG GetCustomCapDataType(DTWAIN_SOURCE Source, TW_UINT16 nCap);
 LONG DLLENTRY_DEF DTWAIN_GetCapContainerEx(LONG nCap, DTWAIN_BOOL bSetContainer, LPDTWAIN_ARRAY pArray)
 {
     LOG_FUNC_ENTRY_PARAMS((nCap, bSetContainer, pArray))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, 0, FUNC_MACRO);
     // Check if array is of the correct type
     if (pArray)
     {
-        //DTWAIN_ArrayDestroy(*pArray);
         *pArray = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 0);
-        if (*pArray == NULL)
+        if (!*pArray)
             LOG_FUNC_EXIT_PARAMS(0L)
     }
-    DTWAIN_ARRAY pDTWAINArray = 0;
+    DTWAIN_ARRAY pDTWAINArray = nullptr;
     if (pArray)
         pDTWAINArray = *pArray;
 
-    LONG lValue;
     if (nCap < CAP_CUSTOMBASE)
     {
-        lValue = CTL_TwainAppMgr::GetContainerTypesFromCap((CTL_EnumCapability)nCap, bSetContainer?true:false);
+        LONG lValue = CTL_TwainAppMgr::GetContainerTypesFromCap(static_cast<CTL_EnumCapability>(nCap),
+                                                                bSetContainer ? true : false);
         if (pDTWAINArray)
         {
             for (int i = 1; i <= 16; i++)
@@ -68,7 +68,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainerEx(LONG nCap, DTWAIN_BOOL bSetContainer,
 LONG DLLENTRY_DEF DTWAIN_GetCapContainer(DTWAIN_SOURCE Source, LONG nCap, LONG lCapType)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nCap, lCapType))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, 0, FUNC_MACRO);
@@ -76,18 +76,17 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainer(DTWAIN_SOURCE Source, LONG nCap, LONG l
     if (!p)
         LOG_FUNC_EXIT_PARAMS(0L)
 
-    CTL_CapInfoArrayPtr pArray;
-    DTWAIN_BOOL bCapSupported = DTWAIN_IsCapSupported(Source, nCap);
+    const DTWAIN_BOOL bCapSupported = DTWAIN_IsCapSupported(Source, nCap);
     if (!bCapSupported)
         LOG_FUNC_EXIT_PARAMS(0L)
-    pArray = GetCapInfoArray(pHandle, p);
+    const CTL_CapInfoArrayPtr pArray = GetCapInfoArray(pHandle, p);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !pArray; }, DTWAIN_ERR_NO_CAPS_DEFINED, 0L, FUNC_MACRO);
 
     // Get the cap array values
-    auto iter = pArray->find(static_cast<TW_UINT16>(nCap));
+    const auto iter = pArray->find(static_cast<TW_UINT16>(nCap));
     if (iter != pArray->end())
     {
-        CTL_CapInfo CapInfo = iter->second;
+        const CTL_CapInfo CapInfo = iter->second;
         switch (lCapType)
         {
             case DTWAIN_CAPGET:
@@ -104,7 +103,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainer(DTWAIN_SOURCE Source, LONG nCap, LONG l
             case DTWAIN_CAPSETCURRENT:
             case DTWAIN_CAPSETCONSTRAINT:
             {
-                LONG Value = (LONG)std::get<2>(CapInfo);
+                LONG Value = static_cast<LONG>(std::get<2>(CapInfo));
                 LONG bResult1 = 0, bResult2 = 0;
                 if (Value == 0)
                     LOG_FUNC_EXIT_PARAMS(0)
@@ -116,16 +115,16 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainer(DTWAIN_SOURCE Source, LONG nCap, LONG l
                     nHold = std::get<5>(CapInfo);
                 if (/* lCapType == DTWAIN_CAPSETCURRENT ||*/
                     lCapType == DTWAIN_CAPSET)
-                    bResult1 = ((Value & TwainContainer_ONEVALUE) || (Value & TwainContainer_ARRAY));
+                    bResult1 = Value & TwainContainer_ONEVALUE || Value & TwainContainer_ARRAY;
                 else
-                    bResult2 = ((Value & TwainContainer_ENUMERATION) || (Value & TwainContainer_RANGE) || (Value & TwainContainer_ARRAY));
+                    bResult2 = Value & TwainContainer_ENUMERATION || Value & TwainContainer_RANGE || Value & TwainContainer_ARRAY;
                 if (!bResult1 && !bResult2 && !nHold)
                     LOG_FUNC_EXIT_PARAMS(0)
                 if (!bResult1 && !bResult2 && nHold)
                     LOG_FUNC_EXIT_PARAMS(nHold)
 
                     // Check container for CAPGET
-                    LONG GetContainer = (LONG)std::get<1>(CapInfo);
+                const LONG GetContainer = static_cast<LONG>(std::get<1>(CapInfo));
 
                     // Return if containers are the same
                     if (lCapType == DTWAIN_CAPSETCURRENT ||
@@ -155,13 +154,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainer(DTWAIN_SOURCE Source, LONG nCap, LONG l
                         else
                             LOG_FUNC_EXIT_PARAMS(Value & ~GetContainer)
                     }
-                    // Set container does not match get container :-(
-                    // No choice but to return other container type and hope
-                    // that Source handles wrong container gracefully.
-                    LOG_FUNC_EXIT_PARAMS(Value & ~GetContainer)
             }
-            break;
-
             default:
                 LOG_FUNC_EXIT_PARAMS(DTWAIN_CONTONEVALUE)
         }
@@ -173,19 +166,19 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainer(DTWAIN_SOURCE Source, LONG nCap, LONG l
 LONG DLLENTRY_DEF DTWAIN_GetCapDataType(DTWAIN_SOURCE Source, LONG nCap)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nCap))
-    TW_UINT16 nThisCap = (TW_UINT16)nCap;
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto nThisCap = static_cast<TW_UINT16>(nCap);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, -1L, FUNC_MACRO);
     if (nThisCap >= CAP_CUSTOMBASE)
     {
-        if (Source == NULL)
+        if (!Source)
             LOG_FUNC_EXIT_PARAMS(DTWAIN_FAILURE1)
-        LONG nDataType = GetCustomCapDataType(Source, nThisCap);
+        const LONG nDataType = GetCustomCapDataType(Source, nThisCap);
         LOG_FUNC_EXIT_PARAMS(nDataType)
     }
-    UINT nDataType = CTL_TwainAppMgr::GetDataTypeFromCap((CTL_EnumCapability)nCap);
+    const UINT nDataType = CTL_TwainAppMgr::GetDataTypeFromCap(static_cast<CTL_EnumCapability>(nCap));
     if (nDataType == 0xFFFF)
         LOG_FUNC_EXIT_PARAMS(DTWAIN_FAILURE1)
     LOG_FUNC_EXIT_PARAMS((LONG)nDataType)
@@ -195,7 +188,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCapDataType(DTWAIN_SOURCE Source, LONG nCap)
 LONG GetCustomCapDataType(DTWAIN_SOURCE Source, TW_UINT16 nCap)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nCap))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, 0, FUNC_MACRO);
@@ -211,18 +204,15 @@ LONG GetCustomCapDataType(DTWAIN_SOURCE Source, TW_UINT16 nCap)
             p->AddCapToSupportedList(static_cast<TW_UINT16>(nCap));
     }
 
-    CTL_CapInfoArrayPtr pArray;
     DTWAIN_CacheCapabilityInfo(p, pHandle, nCap);
-    pArray = GetCapInfoArray(pHandle, p);
+    CTL_CapInfoArrayPtr pArray = GetCapInfoArray(pHandle, p);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !pArray; }, DTWAIN_ERR_NO_CAPS_DEFINED, 0L, FUNC_MACRO);
 
-    // Get the cap array values
-    CTL_CapInfo CapInfo;
-    auto iter = pArray->find(static_cast<TW_UINT16>(nCap));
+    const auto iter = pArray->find(static_cast<TW_UINT16>(nCap));
     if (iter != pArray->end())
     {
-        CapInfo = iter->second;
-        LONG nValue = (LONG)std::get<3>(CapInfo);
+        CTL_CapInfo CapInfo = iter->second;
+        LONG nValue = static_cast<LONG>(std::get<3>(CapInfo));
         if (nValue == DTWAIN_CAPDATATYPE_UNKNOWN)
             nValue = DTWAIN_ERR_UNKNOWN_CAPDATATYPE;
         LOG_FUNC_EXIT_PARAMS(nValue) // Capability data type value
@@ -234,11 +224,11 @@ LONG GetCustomCapDataType(DTWAIN_SOURCE Source, TW_UINT16 nCap)
 LONG DLLENTRY_DEF DTWAIN_GetCapArrayType(DTWAIN_SOURCE Source, LONG nCap)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nCap))
-    LONG lDataType = DTWAIN_GetCapDataType(Source, nCap);
+        const LONG lDataType = DTWAIN_GetCapDataType(Source, nCap);
     if (lDataType == DTWAIN_FAILURE1)
         LOG_FUNC_EXIT_PARAMS(DTWAIN_FAILURE1)
-    TW_UINT16 nDataType = lDataType;
-    LONG retValue = dynarithmic::GetArrayTypeFromCapType(nDataType);
+    const TW_UINT16 nDataType = lDataType;
+    const LONG retValue = GetArrayTypeFromCapType(nDataType);
     LOG_FUNC_EXIT_PARAMS(retValue)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }

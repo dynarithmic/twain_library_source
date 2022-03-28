@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,24 +18,19 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <cstring>
-#include <stdio.h>
-#include <stdlib.h>
-#include <algorithm>
+#include <cstdio>
 #include <string>
-#include <boost/filesystem.hpp>
-#include <boost/format.hpp>
+
+#include "cppfunc.h"
 #include "ctltwmgr.h"
-#include "ctltrall.h"
-#include "ctlres.h"
 #include "dtwain_resource_constants.h"
-#include "dtwinverex.h"
 #include "ctlobstr.h"
 #include "errorcheck.h"
+#include "ctlfileutils.h"
 
-using namespace boost::filesystem;
 using namespace dynarithmic;
 
+#if 0
 bool CreateDirectoryTree(LPCTSTR lpszPath, DWORD* /*lasterror*/)
 {
     CTL_StringType thePath;
@@ -47,22 +42,23 @@ bool CreateDirectoryTree(LPCTSTR lpszPath, DWORD* /*lasterror*/)
     thePath = pathInfo[StringWrapper::DRIVE_POS] + StringWrapper::Join(dirs,_T("\\"));
     return true;
 }
+#endif
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG CreationFlags)
 {
     LOG_FUNC_ENTRY_PARAMS((szFilePath, CreationFlags))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     if (CreationFlags == 0)
     {
-        path p(szFilePath);
+        const filesys::path p(szFilePath);
 
         if (exists(p))
         {
            if (is_directory(p))
            {
-               auto retVal = p.native();
-               if (!retVal.empty() && *retVal.rbegin() != boost::filesystem::path::preferred_separator)
-                   retVal += boost::filesystem::path::preferred_separator;
+               auto retVal = p.generic_string();
+               if (!retVal.empty() && *retVal.rbegin() != filesys::path::preferred_separator)
+                   retVal += filesys::path::preferred_separator;
                CTL_TwainDLLHandle::s_TempFilePath = CTL_StringType(retVal.begin(), retVal.end());
                LOG_FUNC_EXIT_PARAMS(true)
             }
@@ -77,7 +73,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectory(LPCTSTR szFilePath)
 {
     LOG_FUNC_ENTRY_PARAMS((szFilePath))
-    DTWAIN_BOOL bRetval = DTWAIN_SetTempFileDirectoryEx(szFilePath, 0);
+    const DTWAIN_BOOL bRetval = DTWAIN_SetTempFileDirectoryEx(szFilePath, 0);
     LOG_FUNC_EXIT_PARAMS(bRetval)
     CATCH_BLOCK(false)
 }
@@ -85,7 +81,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectory(LPCTSTR szFilePath)
 LONG DLLENTRY_DEF DTWAIN_GetTempFileDirectory(LPTSTR szFilePath, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((szFilePath, nMaxLen))
-    LONG nRealLen = CopyInfoToCString(GetDTWAINTempFilePath(), szFilePath, nMaxLen);
+    const LONG nRealLen = StringWrapper::CopyInfoToCString(GetDTWAINTempFilePath(), szFilePath, nMaxLen);
     LOG_FUNC_EXIT_PARAMS(nRealLen)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }

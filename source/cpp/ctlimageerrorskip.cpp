@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,18 +18,19 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include "cppfunc.h"
 #include "ctltwmgr.h"
 #include "enumeratorfuncs.h"
 #include "errorcheck.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
-using namespace std;
+
 using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SkipImageInfoError(DTWAIN_SOURCE Source, DTWAIN_BOOL bSkip)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, bSkip))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
@@ -44,14 +45,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SkipImageInfoError(DTWAIN_SOURCE Source, DTWAIN_
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSkipImageInfoError(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     if (!p)
         LOG_FUNC_EXIT_PARAMS(false)
-    LONG retval = p->SkipImageInfoErrors();
+    const LONG retval = p->SkipImageInfoErrors();
     LOG_FUNC_EXIT_PARAMS(retval)
     CATCH_BLOCK(false)
 }

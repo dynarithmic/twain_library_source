@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,13 +18,14 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include <algorithm>
+#include "cppfunc.h"
 #include "ctltwmgr.h"
 #include "enumeratorfuncs.h"
-#include "errorcheck.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
-using namespace std;
+
 using namespace dynarithmic;
 
 //////////////////// Source information functions /////////////////////////
@@ -47,7 +48,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSaveFileName(DTWAIN_SOURCE Source, LPTSTR fileName, 
     CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
     if (p)
     {
-        LONG nTotalBytes = CopyInfoToCString(p->GetActualFileName(), fileName, nMaxLen);
+        const LONG nTotalBytes = StringWrapper::CopyInfoToCString(p->GetActualFileName(), fileName, nMaxLen);
         LOG_FUNC_EXIT_PARAMS(nTotalBytes)
     }
     LOG_FUNC_EXIT_PARAMS(-1)
@@ -57,22 +58,22 @@ LONG DLLENTRY_DEF DTWAIN_GetSaveFileName(DTWAIN_SOURCE Source, LPTSTR fileName, 
 LONG DLLENTRY_DEF DTWAIN_GetCurrentFileName(DTWAIN_SOURCE Source, LPTSTR szName, LONG MaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, szName, MaxLen))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, Source);
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(-1L)
 
     // return the file name that would be acquired
-    CTL_StringType s = pSource->GetLastAcquiredFileName();
-    size_t sLen = s.length()  + 1;
-    if (szName == NULL)
+    const CTL_StringType s = pSource->GetLastAcquiredFileName();
+    const size_t sLen = s.length()  + 1;
+    if (!szName)
         LOG_FUNC_EXIT_PARAMS((LONG)sLen)
 
-    size_t nLenToUse = min(sLen, (size_t)MaxLen);
+    const size_t nLenToUse = (std::min)(sLen, static_cast<size_t>(MaxLen));
     const CTL_StringType::value_type* sCopy = s.c_str();
     std::copy(sCopy, sCopy + nLenToUse - 1, szName);
     szName[nLenToUse-1] = _T('\0');
     LOG_FUNC_EXIT_PARAMS((LONG)sLen)
-    CATCH_BLOCK(-1L);
+    CATCH_BLOCK(-1L)
 }
 

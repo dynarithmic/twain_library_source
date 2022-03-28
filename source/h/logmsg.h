@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -23,65 +23,72 @@
 #ifndef CLogSystem_H
 #define CLogSystem_H
 #include "ctlobstr.h"
-#include <deque>
-#include <vector>
 #include <memory>
 #include <unordered_map>
 #include <fstream>
-#include <iostream>
-#include <iomanip>
-#include <chrono>
-#include <sstream>
+
 /////////////////////////////////////////////////////////////////////////////
 namespace dynarithmic
 {
     class CBaseLogger
     {
         public:
-            virtual void trace(const CTL_String& msg) = 0;
-            void generic_outstream(std::ostream& os, const CTL_String& msg);
-            static CTL_String getTime();
+            virtual ~CBaseLogger() = default;
+            CBaseLogger(const CBaseLogger&) = default;
+            CBaseLogger() = default;
+            CBaseLogger& operator=(const CBaseLogger&) = default;
+            virtual void trace(const std::string& msg) = 0;
+            static void generic_outstream(std::ostream& os, const std::string& msg);
+            static std::string getTime();
     };
 
-    class StdCout_Logger : public CBaseLogger
+    class StdCout_Logger final : public CBaseLogger
     {
         public:
-            void trace(const CTL_String& msg) override;
+            void trace(const std::string& msg) override;
     };
 
-    class DebugMonitor_Logger : public CBaseLogger
+    class DebugMonitor_Logger final : public CBaseLogger
     {
         public:
-            void trace(const CTL_String& msg) override;
+            void trace(const std::string& msg) override;
     };
 
-    class File_Logger : public CBaseLogger
+    class File_Logger final : public CBaseLogger
     {
-        CTL_String m_fileName;
+        std::string m_fileName;
         std::ofstream m_ostr;
         public:
             File_Logger(const LPCSTR filename, bool bAppend = false);
-            void trace(const CTL_String& msg) override;
+            void trace(const std::string& msg) override;
+    };
+
+    class Callback_Logger final : public CBaseLogger
+    {
+        public:
+            void trace(const std::string& msg) override;
     };
 
     class CLogSystem
     {
     public:
-        enum {FILE_LOGGING, DEBUG_WINDOW_LOGGING, CONSOLE_LOGGING};
+        enum {FILE_LOGGING, DEBUG_WINDOW_LOGGING, CONSOLE_LOGGING, CALLBACK_LOGGING};
 
        /////////////////////////////////////////////////////////////////////////////
         std::unordered_map<int, std::shared_ptr<CBaseLogger>> app_logger_map;
         CLogSystem();
-       ~CLogSystem();
+       ~CLogSystem() = default;
 
        /////////////////////////////////////////////////////////////////////////////
        void     InitFileLogging(LPCTSTR pOutputFilename, HINSTANCE hInst, bool bAppend);
        void     InitConsoleLogging(HINSTANCE hInst); // adds console.
        void     InitDebugWindowLogging(HINSTANCE hInst); // adds win debug logging.
+       void     InitCallbackLogging(HINSTANCE hInst);
+
 
        /////////////////////////////////////////////////////////////////////////////
        // output text, just like TRACE or printf
-       bool     StatusOutFast(LPCTSTR fmt);
+       bool     StatusOutFast(LPCSTR fmt);
 
 
        /////////////////////////////////////////////////////////////////////////////
@@ -98,19 +105,19 @@ namespace dynarithmic
 
        /////////////////////////////////////////////////////////////////////////////
        // override the default app name, which is the name the EXE (minus the ".exe")
-       void     SetAppName(LPCTSTR pName) {m_csAppName = pName;}
+       void     SetAppName(LPCSTR pName) {m_csAppName = pName;}
 
        bool     Flush();
 
        void     PrintBanner(bool bStarted = true);
 
-       CTL_StringType GetAppName() const {return m_csAppName;}
-       void OutputDebugStringFull(const CTL_StringType& s);
-       CTL_StringType GetDebugStringFull(const CTL_StringType& s);
+       std::string GetAppName() const {return m_csAppName;}
+       void OutputDebugStringFull(const std::string& s);
+       std::string GetDebugStringFull(const std::string& s);
 
     protected:
-       CTL_StringType  m_csAppName;
-       CTL_StringType  m_csFileName;
+       std::string m_csAppName;
+       std::string m_csFileName;
 
        /////////////////////////////////////////////////////////////////////////////
        // controlling stuff
@@ -122,10 +129,10 @@ namespace dynarithmic
 
        /////////////////////////////////////////////////////////////////////////////
        // string utils
-       CTL_StringType GetBaseDir(const CTL_StringType & path);
-       CTL_StringType GetBaseName(const CTL_StringType & path);
+       std::string GetBaseDir(const std::string& path) const;
+       std::string GetBaseName(const std::string& path) const;
        void GetModuleName(HINSTANCE hInst);
-       bool WriteOnDemand(const CTL_String& fmt);
+       bool WriteOnDemand(const std::string& fmt);
 
        private:
            void InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE hInst, bool bAppend);
