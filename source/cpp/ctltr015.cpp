@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#define MC_NO_CPP
-
 #include "ctltr015.h"
 #include "ctlobtyp.h"
 
@@ -50,26 +48,23 @@ void CTL_CapabilityGetRangeTriplet::Decode( void *pCapData )
 
 bool CTL_CapabilityGetRangeTriplet::EnumCapValues( void *pCapData )
 {
-    CTL_TwainTypeObPtr pOb;
-    pTW_RANGE pRange;
-
     RemoveAllTypeObjects();
 
     CTL_TwainTypeArray *pArray = GetTwainTypeArray();
 
     // dereference to a TW_RANGE structure
-    pRange = (pTW_RANGE) pCapData;
+    const pTW_RANGE pRange = static_cast<pTW_RANGE>(pCapData);
 
     // get item type
-    int nItemType = GetEffectiveItemType(pRange->ItemType);
+    const int nItemType = GetEffectiveItemType(pRange->ItemType);
 
     // get min value
 
     // Create a new object for this item
-    pOb = std::make_shared<CTL_TwainTypeOb>( static_cast<TW_UINT16>(sizeof(TW_RANGE)), false );
+    const CTL_TwainTypeObPtr pOb = std::make_shared<CTL_TwainTypeOb>(static_cast<TW_UINT16>(sizeof(TW_RANGE)), false);
 
     // Copy Data to pOb
-    pOb->CopyData( (void *)pRange );
+    pOb->CopyData( static_cast<void*>(pRange) );
 
     // Store this object in object array
     pArray->push_back( pOb );
@@ -77,17 +72,11 @@ bool CTL_CapabilityGetRangeTriplet::EnumCapValues( void *pCapData )
     // Get range stats
     if ( nItemType == TWTY_FIX32 )
     {
-        pTW_FIX32   pFixFirst;
-        pTW_FIX32   pFixLast;
-        pTW_FIX32   pFixStep;
-        pTW_FIX32   pFixDefVal;
-        pTW_FIX32   pFixCurVal;
-
-        pFixFirst = (pTW_FIX32)&pRange->MinValue;
-        pFixLast  = (pTW_FIX32)&pRange->MaxValue;
-        pFixStep  = (pTW_FIX32)&pRange->StepSize;
-        pFixDefVal = (pTW_FIX32)&pRange->DefaultValue;
-        pFixCurVal = (pTW_FIX32)&pRange->CurrentValue;
+        auto pFixFirst = reinterpret_cast<pTW_FIX32>(&pRange->MinValue);
+        auto pFixLast = reinterpret_cast<pTW_FIX32>(&pRange->MaxValue);
+        auto pFixStep = reinterpret_cast<pTW_FIX32>(&pRange->StepSize);
+        auto pFixDefVal = reinterpret_cast<pTW_FIX32>(&pRange->DefaultValue);
+        auto pFixCurVal = reinterpret_cast<pTW_FIX32>(&pRange->CurrentValue);
 
         m_FirstVal.fval  = Twain32ToFloat( *pFixFirst );
         m_LastVal.fval   = Twain32ToFloat( *pFixLast  );
@@ -111,22 +100,19 @@ bool CTL_CapabilityGetRangeTriplet::EnumCapValues( void *pCapData )
 
 pTW_RANGE CTL_CapabilityGetRangeTriplet::GetRangePtr()
 {
-    pTW_RANGE pRange;
-    CTL_TwainTypeArray *pArray = GetTwainTypeArray();
-    if ( pArray->size() == 0 )
-        return NULL;
-    CTL_TwainTypeOb *pOb = pArray->front().get();
-    pRange = static_cast<pTW_RANGE>(pOb->GetDataRaw());
-    return pRange;
+    const CTL_TwainTypeArray *pArray = GetTwainTypeArray();
+    if (pArray->empty())
+        return nullptr;
+    const CTL_TwainTypeOb *pOb = pArray->front().get();
+    return static_cast<pTW_RANGE>(pOb->GetDataRaw());
 }
 
 
 TW_UINT16 CTL_CapabilityGetRangeTriplet::GetDataType()
 {
-    pTW_RANGE pRange;
-    pRange = GetRangePtr();
+    const pTW_RANGE pRange = GetRangePtr();
     if ( !pRange )
-        return (TW_UINT16)-1;
+        return static_cast<TW_UINT16>(-1);
     return pRange->ItemType;
 }
 
@@ -140,11 +126,11 @@ bool CTL_CapabilityGetRangeTriplet::GetValue(void *pData, size_t nWhichVal)
 {
     if ( nWhichVal >= m_nNumRangeItems )
         return false;
-    int nDataType = GetDataType();
+    const int nDataType = GetDataType();
     if ( nDataType == TWTY_FIX32 )
     {
-        double *pFloat = (double *)pData;
-        switch ((CTL_EnumTwainRange)nWhichVal)
+        auto pFloat = static_cast<double*>(pData);
+        switch (static_cast<CTL_EnumTwainRange>(nWhichVal))
         {
             case TwainRange_MIN:
                 *pFloat = m_FirstVal.fval;
@@ -167,9 +153,8 @@ bool CTL_CapabilityGetRangeTriplet::GetValue(void *pData, size_t nWhichVal)
         return true;
     }
 
-    pTW_UINT32 pInt32;
-    pInt32 = (pTW_UINT32)pData;
-    switch ((CTL_EnumTwainRange)nWhichVal)
+    pTW_UINT32 pInt32 = static_cast<pTW_UINT32>(pData);
+    switch (static_cast<CTL_EnumTwainRange>(nWhichVal))
     {
         case TwainRange_MIN:
             *pInt32 = m_FirstVal.ival;

@@ -40,22 +40,39 @@ namespace dynarithmic
         LPCTSTR szNameMapping;
         LONG nOptions;
 
-        SourceSelectionOptions(int n = SELECTSOURCE, LPCTSTR sProd = NULL, HWND parent = NULL, LPCTSTR title = NULL, LONG xP = 0, LONG yP = 0, 
-                               LPCTSTR sIncludeNames = NULL, LPCTSTR sExcludeNames = NULL, LPCTSTR sNameMapping = NULL, LONG opt = 0) :
-                               nWhich(n), 
-                               szProduct(sProd), 
-                               hWndParent(parent), 
-                               szTitle(title), 
-                               xPos(xP), 
-                               yPos(yP), 
-                               szIncludeNames(sIncludeNames), 
-                               szExcludeNames(sExcludeNames), 
-                               szNameMapping(sNameMapping), 
+        SourceSelectionOptions(int n = SELECTSOURCE, LPCTSTR sProd=nullptr, HWND parent=nullptr, LPCTSTR title=nullptr, LONG xP = 0, LONG yP = 0,
+                               LPCTSTR sIncludeNames=nullptr, LPCTSTR sExcludeNames=nullptr, LPCTSTR sNameMapping=nullptr, LONG opt = 0) :
+                               nWhich(n),
+                               szProduct(sProd),
+                               hWndParent(parent),
+                               szTitle(title),
+                               xPos(xP),
+                               yPos(yP),
+                               szIncludeNames(sIncludeNames),
+                               szExcludeNames(sExcludeNames),
+                               szNameMapping(sNameMapping),
                                nOptions(opt) {}
-        friend CTL_OutputBaseStreamType& operator << (CTL_OutputBaseStreamType& strm, const SourceSelectionOptions& src);
+        friend OutputBaseStreamA& operator << (OutputBaseStreamA& strm, const SourceSelectionOptions& src);
+        friend OutputBaseStreamW& operator << (OutputBaseStreamW& strm, const SourceSelectionOptions& src);
     };
 
-    inline CTL_OutputBaseStreamType& operator << (CTL_OutputBaseStreamType& strm, const SourceSelectionOptions& src)
+    inline OutputBaseStreamA& operator << (OutputBaseStreamA& strm, const SourceSelectionOptions& src)
+    {
+        LPCSTR nuller = "null";
+        strm << ("whichOption=") << src.nWhich
+            << (", productName=") << (src.szProduct ? StringConversion::Convert_NativePtr_To_Ansi(src.szProduct) : nuller)
+            << (", parentWindow=") << src.hWndParent
+            << (", title=") << (src.szTitle ? StringConversion::Convert_NativePtr_To_Ansi(src.szTitle) : nuller)
+            << (", xPos=") << src.xPos
+            << (", yPos=") << src.yPos
+            << (", includeNames=") << (src.szIncludeNames ? StringConversion::Convert_NativePtr_To_Ansi(src.szIncludeNames) : nuller)
+            << (", excludeNames=") << (src.szExcludeNames ? StringConversion::Convert_NativePtr_To_Ansi(src.szExcludeNames) : nuller)
+            << (", nameMapping=") << (src.szNameMapping ? StringConversion::Convert_NativePtr_To_Ansi(src.szNameMapping) : nuller)
+            << (", options=") << src.nOptions;
+        return strm;
+    }
+
+    inline OutputBaseStreamW& operator << (OutputBaseStreamW& strm, const SourceSelectionOptions& src)
     {
         LPCTSTR nuller = _T("null");
         strm << _T("whichOption=") << src.nWhich

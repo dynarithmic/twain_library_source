@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,19 +18,18 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include "cppfunc.h"
 #include "ctltwmgr.h"
 #include "enumeratorfuncs.h"
-#include "errorcheck.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
-using namespace std;
 using namespace dynarithmic;
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetManualDuplexMode(DTWAIN_SOURCE Source, LONG Flags, DTWAIN_BOOL bSet)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Flags, bSet))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, Source);
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
@@ -42,14 +41,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetManualDuplexMode(DTWAIN_SOURCE Source, LONG F
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetManualDuplexCount(DTWAIN_SOURCE Source, LONG *pSide1, LONG *pSide2)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pSide1, pSide2))
-        CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, Source);
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
     if (pSide1)
-        *pSide1 = pSource->GetNumDuplexFiles(0);
+        *pSide1 = static_cast<LONG>(pSource->GetNumDuplexFiles(0));
     if (pSide2)
-        *pSide2 = pSource->GetNumDuplexFiles(1);
+        *pSide2 = static_cast<LONG>(pSource->GetNumDuplexFiles(1));
     LOG_FUNC_EXIT_PARAMS(true)
    CATCH_BLOCK(false)
 }

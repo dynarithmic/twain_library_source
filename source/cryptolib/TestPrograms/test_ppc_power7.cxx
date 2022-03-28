@@ -19,23 +19,23 @@
 
 int main(int argc, char* argv[])
 {
-	__vector unsigned char x;
-	unsigned char res[16];
+    __vector unsigned char x;
+    unsigned char res[16];
 
 #if defined(_ARCH_PWR7) && (defined(__early_xlc__) || defined(__early_xlC__))
     x=vec_xlw4(0, (unsigned char*)argv[0]);
-	x=vec_add(x,x);
-	vec_xstw4(x, 0, res);
+    x=vec_add(x,x);
+    vec_xstw4(x, 0, res);
 #elif defined(_ARCH_PWR7) && (defined(__xlc__) || defined(__xlC__) || defined(__clang__))
-	x=vec_xl(0, (unsigned char*)argv[0]);
-	x=vec_add(x,x);
-	vec_xst(x, 0, res);
+    x=vec_xl(0, (unsigned char*)argv[0]);
+    x=vec_add(x,x);
+    vec_xst(x, 0, res);
 #elif defined(_ARCH_PWR7) && defined(__GNUC__)
-	x=vec_vsx_ld(0, (unsigned char*)argv[0]);
-	x=vec_add(x,x);
-	vec_vsx_st(x, 0, res);
+    x=vec_vsx_ld(0, (unsigned char*)argv[0]);
+    x=vec_add(x,x);
+    vec_vsx_st(x, 0, res);
 #else
-	int XXX[-1];
+    int XXX[-1];
 #endif
-	return 0;
+    return 0;
 }

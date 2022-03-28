@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -24,13 +24,13 @@
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
-using namespace std;
+
 using namespace dynarithmic;
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
@@ -43,7 +43,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
     if (CTL_TwainAppMgr::IsSourceOpen(pSource))
         bSourceOpen = true;
     else
-    if (!CTL_TwainAppMgr::OpenSource(pHandle->m_Session, pSource))
+    if (!CTL_TwainAppMgr::OpenSource(pHandle->m_pTwainSession, pSource))
        LOG_FUNC_EXIT_PARAMS(false)
     bool bOk = false;
 
@@ -51,10 +51,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
     if (DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPUICONTROLLABLE))
     {
         // Get the capability value
-        DTWAIN_ARRAY CapArray = 0;
+        DTWAIN_ARRAY CapArray = nullptr;
         DTWAIN_GetCapValuesEx(Source, DTWAIN_CV_CAPUICONTROLLABLE, DTWAIN_CAPGET, DTWAIN_CONTONEVALUE, &CapArray);
         DTWAINArrayLL_RAII arr(CapArray);
-        bOk = (EnumeratorVector<LONG>(CapArray)[0]) ? true : false;
+        bOk = EnumeratorVector<LONG>(CapArray)[0] ? true : false;
     }
     else
     {
@@ -63,7 +63,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
     }
     // Close source if opened in this function
     if (!bSourceOpen)
-        ::DTWAIN_CloseSource(Source);
+        DTWAIN_CloseSource(Source);
     LOG_FUNC_EXIT_PARAMS(bOk ? TRUE : FALSE)
     CATCH_BLOCK(false)
 }

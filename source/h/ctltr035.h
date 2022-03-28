@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -32,37 +32,37 @@ namespace dynarithmic
                                        CTL_ITwainSource *pSource,
                                        TW_UINT16 gCap,
                                        TW_UINT16 TwainType=0xFFFF);
-            TW_UINT16       Execute();
+            TW_UINT16       Execute() override;
 
             bool            IsGet() const
-                            { return (m_lCapSupport & TWQC_GET)?true:false; }
+                            { return m_lCapSupport & TWQC_GET?true:false; }
 
             bool            IsGetDefault() const
-                            { return (m_lCapSupport & TWQC_GETDEFAULT)?true:false; }
+                            { return m_lCapSupport & TWQC_GETDEFAULT?true:false; }
 
             bool            IsGetCurrent() const
-                            { return (m_lCapSupport & TWQC_GETCURRENT) ? true : false; }
+                            { return m_lCapSupport & TWQC_GETCURRENT ? true : false; }
 
             bool            IsSet() const
-                            { return (m_lCapSupport & TWQC_SET)?true:false; }
+                            { return m_lCapSupport & TWQC_SET?true:false; }
 
             bool            IsReset() const
-                            { return (m_lCapSupport & TWQC_RESET)?true:false; }
+                            { return m_lCapSupport & TWQC_RESET?true:false; }
 
             bool            IsSetConstraint() const
-                            { return (m_lCapSupport & TWQC_SETCONSTRAINT) ? true : false;}
+                            { return m_lCapSupport & TWQC_SETCONSTRAINT ? true : false;}
 
             bool            IsAnySupport() const
                             { return m_lCapSupport?true:false; }
 
-            UINT            GetSupport() const { return (UINT)m_lCapSupport; }
+            UINT            GetSupport() const { return static_cast<UINT>(m_lCapSupport); }
 
         protected:
-            virtual bool    GetValue( void *pData, size_t nWhere=0 );
-            virtual bool    EnumCapValues( void *pCapData );
+            bool    GetValue( void *pData, size_t nWhere=0 ) override;
+            bool    EnumCapValues( void *pCapData ) override;
 
         private:
-            LONG            m_lCapSupport;
+            TW_UINT32   m_lCapSupport;
     };
 }
 #endif

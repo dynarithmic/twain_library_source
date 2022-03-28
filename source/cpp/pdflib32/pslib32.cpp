@@ -1,6 +1,6 @@
 /*
 This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-Copyright (c) 2002-2021 Dynarithmic Software.
+Copyright (c) 2002-2022 Dynarithmic Software.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -36,12 +36,10 @@ LONG FUNCCONVENTION dynarithmic::DTWLIB_PSWriteFile(LPCTSTR szFileIn,
                                      LPCTSTR szTitle,
                                      bool bUseEncapsulated)
 {
-    CTL_String sFileIn = StringConversion::Convert_Native_To_Ansi(szFileIn);
-    CTL_String sFileOut = StringConversion::Convert_Native_To_Ansi(szFileOut);
-    CTL_String sTitle  = StringConversion::Convert_Native_To_Ansi(szTitle);
+    const std::string sFileIn = StringConversion::Convert_Native_To_Ansi(szFileIn);
+    const std::string sFileOut = StringConversion::Convert_Native_To_Ansi(szFileOut);
+    const std::string sTitle  = StringConversion::Convert_Native_To_Ansi(szTitle);
 
-    // Create a fake command line to pass to the main Postscript conversion routine
-    CTL_String sCommandLine;
     const char *argv[6];
     argv[0] = "DTWLIB";
     argv[1] = "-a";
@@ -59,7 +57,7 @@ LONG FUNCCONVENTION dynarithmic::DTWLIB_PSWriteFile(LPCTSTR szFileIn,
             argv[2] = "-3";
         break;
     }
-    sCommandLine = "-O";
+    std::string sCommandLine = "-O";
     sCommandLine += sFileOut;
     std::vector<char> sCommandV(sCommandLine.length() + 1, 0);
     std::copy(sCommandLine.begin(), sCommandLine.end(), sCommandV.begin());
@@ -70,6 +68,6 @@ LONG FUNCCONVENTION dynarithmic::DTWLIB_PSWriteFile(LPCTSTR szFileIn,
     else
         argv[4] = "-p";
 
-    argv[5] = (char*)sFileIn.c_str();
+    argv[5] = const_cast<char*>(sFileIn.c_str());
     return PostscriptMain(6, argv, sTitle.c_str());
 }

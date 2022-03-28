@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -19,10 +19,8 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "dtwain.h"
-#include "ctlobstr.h"
 #include "ctliface.h"
 #include "enumeratorfuncs.h"
-#include "twain.h"
 
 using namespace dynarithmic;
 
@@ -44,14 +42,14 @@ static DTWAIN_ARRAY CreateArrayFromArray(LPVOID ArraySource, fn f)
 {
     if ( ArraySource )
     {
-        CTL_EnumeratorType eType = EnumeratorFunctionImpl::GetEnumeratorType(ArraySource);
+        const CTL_EnumeratorType eType = EnumeratorFunctionImpl::GetEnumeratorType(ArraySource);
         if ( eType != enumTypeIn )
-            return NULL;
+            return nullptr;
         int status;
-        LPVOID TempSource = EnumeratorFunctionImpl::GetNewEnumerator(enumTypeOut,&status, 0, 0);
+        const LPVOID TempSource = EnumeratorFunctionImpl::GetNewEnumerator(enumTypeOut,&status, 0, 0);
         if ( TempSource )
         {
-            LONG nItems = EnumeratorFunctionImpl::EnumeratorGetCount(ArraySource);
+            const LONG nItems = EnumeratorFunctionImpl::EnumeratorGetCount(ArraySource);
             SourceString sVal;
             DestString sVal2;
             for (LONG i = 0; i < nItems; ++i )
@@ -63,7 +61,7 @@ static DTWAIN_ARRAY CreateArrayFromArray(LPVOID ArraySource, fn f)
             return TempSource;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 

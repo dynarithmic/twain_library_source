@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ CTL_FileSystemTriplet::CTL_FileSystemTriplet(CTL_ITwainSession *pSession,
                   DG_CONTROL,
                   DAT_FILESYSTEM,
                   nMsg,
-                  (TW_MEMREF)((pTW_FILESYSTEM)&m_FileSystem));
+                  static_cast<TW_MEMREF>(static_cast<pTW_FILESYSTEM>(&m_FileSystem)));
             SetAlive (true);
         }
     }
@@ -113,9 +113,9 @@ TW_UINT16 CTL_FileSystemTriplet::GetClose()
     return ExecuteIt(MSG_GETCLOSE);
 }
 
-void CTL_FileSystemTriplet::GetTWFileSystem(TW_FILESYSTEM& FS)
+const TW_FILESYSTEM& CTL_FileSystemTriplet::GetTWFileSystem() const
 {
-    FS = m_FileSystem;
+    return m_FileSystem;
 }
 
 TW_UINT16 CTL_FileSystemTriplet::Rename(const CTL_StringType& sInput, const CTL_StringType& sOutput)
@@ -128,7 +128,7 @@ TW_UINT16 CTL_FileSystemTriplet::Rename(const CTL_StringType& sInput, const CTL_
 
 TW_UINT16 CTL_FileSystemTriplet::ExecuteIt(TW_UINT16 Msg)
 {
-    std::get<4>(GetTripletArgs()) = Msg;
+    std::get<MSGPOS_>(GetTripletComponents()) = Msg;
     return Execute();
 }
 

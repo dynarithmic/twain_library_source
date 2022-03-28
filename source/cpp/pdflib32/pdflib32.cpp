@@ -1,6 +1,6 @@
 /*
 This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-Copyright (c) 2002-2021 Dynarithmic Software.
+Copyright (c) 2002-2022 Dynarithmic Software.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ OF THIRD PARTY RIGHTS.
 #ifdef _MSC_VER
 #pragma warning (disable:4786)
 #endif
-#include <vector>
 #include <pdflib32.h>
 #include <dtwainpdf.h>
+#include <pdfconst.h>
 using namespace dynarithmic;
 
 #define FUNCCONVENTION CALLBACK
@@ -35,22 +35,22 @@ void* FUNCCONVENTION dynarithmic::DTWLIB_PDFGetNewDocument()
 
 void FUNCCONVENTION dynarithmic::DTWLIB_PDFReleaseDocument(void *pDoc)
 {
-    delete (PdfDocument *)pDoc;
+    delete static_cast<PdfDocument*>(pDoc);
 }
 
 BOOL FUNCCONVENTION dynarithmic::DTWLIB_PDFOpenNewFile(void* pDoc, LPCTSTR szFile)
 {
-    return ((PdfDocument *)pDoc)->OpenNewPDFFile(szFile);
+    return static_cast<PdfDocument*>(pDoc)->OpenNewPDFFile(szFile);
 }
 
 void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetCompression(void* pDoc,  bool bCompress)
 {
-    ((PdfDocument *)pDoc)->SetCompression(bCompress);
+    static_cast<PdfDocument*>(pDoc)->SetCompression(bCompress);
 }
 
 void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetNameField(void* pDoc, LONG nWhich, LPCSTR szName)
 {
-    PdfDocument *p = (PdfDocument *)pDoc;
+    const auto p = static_cast<PdfDocument*>(pDoc);
     switch (nWhich)
     {
         case PDF_AUTHOR:
@@ -74,32 +74,33 @@ void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetNameField(void* pDoc, LONG nWhich,
         case PDF_CREATOR:
             p->SetCreator(szName);
         break;
+        default: ;
     }
 }
 
 BOOL FUNCCONVENTION dynarithmic::DTWLIB_PDFStartCreation(void *pDoc)
 {
-    return ((PdfDocument *)pDoc)->StartPDFCreation();
+    return static_cast<PdfDocument*>(pDoc)->StartPDFCreation();
 }
 
 BOOL FUNCCONVENTION dynarithmic::DTWLIB_PDFEndCreation(void *pDoc)
 {
-    return ((PdfDocument *)pDoc)->EndPDFCreation();
+    return static_cast<PdfDocument*>(pDoc)->EndPDFCreation();
 }
 
 void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetImageType(void *pDoc, LONG iType)
 {
-    ((PdfDocument *)pDoc)->SetImageType(iType);
+    static_cast<PdfDocument*>(pDoc)->SetImageType(iType);
 }
 
 BOOL FUNCCONVENTION dynarithmic::DTWLIB_PDFWritePage(void *pDoc, LPCTSTR szPath)
 {
-    return ((PdfDocument *)pDoc)->WritePage(szPath);
+    return static_cast<PdfDocument*>(pDoc)->WritePage(szPath);
 }
 
 void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetLongField(void *pDoc, LONG nWhich, LONG nValue)
 {
-    PdfDocument *p = (PdfDocument *)pDoc;
+    auto p = static_cast<PdfDocument*>(pDoc);
     switch (nWhich)
     {
         case PDF_ORIENTATION:
@@ -113,22 +114,23 @@ void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetLongField(void *pDoc, LONG nWhich,
         case PDF_SCALETYPE:
             p->SetScaleType(nValue);
         break;
+        default: ;
     }
 }
 
 void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetScaling(void *pDoc, double xscale, double yscale)
 {
-    ((PdfDocument *)pDoc)->SetScaling(xscale, yscale);
+    static_cast<PdfDocument*>(pDoc)->SetScaling(xscale, yscale);
 }
 
 void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetThumbnailFile(void *pDoc, LPCTSTR szPath)
 {
-    ((PdfDocument *)pDoc)->SetThumbnailFile(szPath);
+    static_cast<PdfDocument*>(pDoc)->SetThumbnailFile(szPath);
 }
 
 void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetDPI(void *pDoc, LONG dpi)
 {
-    ((PdfDocument *)pDoc)->SetDPI( dpi );
+    static_cast<PdfDocument*>(pDoc)->SetDPI( dpi );
 }
 
 void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetEncryption(void *pDoc, LPCTSTR szOwnerPass,
@@ -136,11 +138,11 @@ void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetEncryption(void *pDoc, LPCTSTR szO
                                           bool bUseStrongEncrypt,
                                           bool bUseAESEncryption)
 {
-    ((PdfDocument *)pDoc)->SetEncryption(szOwnerPass?szOwnerPass:_T(""),
-                                         szUserPass?szUserPass:_T(""),
-                                         Permissions,
-                                         bUseStrongEncrypt,
-                                         bUseAESEncryption);
+    static_cast<PdfDocument*>(pDoc)->SetEncryption(szOwnerPass?szOwnerPass:_T(""),
+                                                   szUserPass?szUserPass:_T(""),
+                                                   Permissions,
+                                                   bUseStrongEncrypt,
+                                                   bUseAESEncryption);
 }
 
 void FUNCCONVENTION dynarithmic::DTWLIB_PDFGetDLLVersion(LPLONG lMajor, LPLONG lMinor, LPLONG lPatch)
@@ -152,17 +154,17 @@ void FUNCCONVENTION dynarithmic::DTWLIB_PDFGetDLLVersion(LPLONG lMajor, LPLONG l
 
 void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetASCIICompression(void *pDoc, bool bSetCompression)
 {
-    ((PdfDocument *)pDoc)->SetASCIICompression(bSetCompression);
+    static_cast<PdfDocument*>(pDoc)->SetASCIICompression(bSetCompression);
 }
 
 void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetNoCompression(void *pDoc, bool bSetCompression)
 {
-    ((PdfDocument *)pDoc)->SetNoCompression(bSetCompression);
+    static_cast<PdfDocument*>(pDoc)->SetNoCompression(bSetCompression);
 }
 
 void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetSearchableText(void *pDoc, LPCSTR text)
 {
-    ((PdfDocument *)pDoc)->SetSearchableText(text);
+    static_cast<PdfDocument*>(pDoc)->SetSearchableText(text);
 }
 
 void FUNCCONVENTION dynarithmic::DTWLIB_PDFAddPageText(void* pDoc, PDFTextElement* pElement)
@@ -184,10 +186,10 @@ void FUNCCONVENTION dynarithmic::DTWLIB_PDFAddPageText(void* pDoc, PDFTextElemen
     element.scalingX = scalingX;
     element.scalingY = scalingY;
 */
-    ((PdfDocument *)pDoc)->AddTextElement(pElement);
+    static_cast<PdfDocument*>(pDoc)->AddTextElement(pElement);
 }
 
 void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetPolarity(void *pDoc, LONG Polarity)
 {
-    ((PdfDocument *)pDoc)->SetPolarity( Polarity );
+    static_cast<PdfDocument*>(pDoc)->SetPolarity( Polarity );
 }

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 #ifndef CTLTR031_H_
 #define CTLTR031_H_
 
-#include <vector>
 #include "ctltr026.h"
 #include "ctliface.h"
 
@@ -39,8 +38,10 @@ namespace dynarithmic
                                     TW_UINT32 nNumBytes,
                                     TW_UINT16 nCompression=TWCP_NONE);
 
-            TW_UINT16           Execute();
-            ~CTL_ImageMemXferTriplet();
+            TW_UINT16           Execute() override;
+            ~CTL_ImageMemXferTriplet() override;
+            CTL_ImageMemXferTriplet(const CTL_ImageMemXferTriplet&) = delete;
+            CTL_ImageMemXferTriplet& operator=(const CTL_ImageMemXferTriplet&) = delete;
 
         private:
             void InitXferBuffer();
@@ -53,9 +54,7 @@ namespace dynarithmic
             TW_UINT16       m_nPixelType;
             TW_UINT32       m_nCurDibSize;
             TW_UINT16       m_nCompression;
-            LONG            m_nCompressPos;
-            unsigned char TW_HUGE * m_ptrTempDib;
-            HANDLE          m_origDibHandle;
+            TW_UINT32       m_nCompressPos;
             CTL_TwainDynMemoryHandler m_dynMemoryHandler;
     };
 }

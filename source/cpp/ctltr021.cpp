@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <cstring>
 #include "ctltr021.h"
 #include "ctltwmgr.h"
 
@@ -35,9 +34,9 @@ CTL_UserInterfaceTriplet::CTL_UserInterfaceTriplet(CTL_ITwainSession *pSession,
     SetSourcePtr( pSource );
     m_pUserInterface->ShowUI  = bShowUI;
     m_pUserInterface->ModalUI = 0;
-    HWND *pWnd = pSession->GetWindowHandlePtr();
+    const HWND *pWnd = pSession->GetWindowHandlePtr();
 
-    m_pUserInterface->hParent = (TW_HANDLE)(*pWnd);
+    m_pUserInterface->hParent = static_cast<TW_HANDLE>(*pWnd);
     // Get the app manager's AppID
     const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
     if ( pMgr && pMgr->IsValidTwainSession( pSession ))
@@ -46,7 +45,7 @@ CTL_UserInterfaceTriplet::CTL_UserInterfaceTriplet(CTL_ITwainSession *pSession,
         {
             Init( pSession->GetAppIDPtr(), pSource->GetSourceIDPtr(),
                     DG_CONTROL, DAT_USERINTERFACE, nMsg,
-                    (TW_MEMREF)m_pUserInterface);
+                    static_cast<TW_MEMREF>(m_pUserInterface));
             SetAlive (true);
         }
     }

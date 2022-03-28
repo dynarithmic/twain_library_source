@@ -58,7 +58,7 @@ namespace dynarithmic
                              bool discardPages=false,
                              LONG fileType=-1,
                              LONG fileflags=0,
-                             LPCTSTR fileName=_T(""),
+                             LPCTSTR fileName= StringTraits::GetEmptyString(),
                              DTWAIN_ARRAY fList=NULL) :
 
                              DLLHandle(hnd),
@@ -112,28 +112,51 @@ namespace dynarithmic
         LONG getTransferMode() const { return nTransferMode; }
         LONG getActualAcquireType() const { return nActualAcquireType; }
 
-        friend CTL_OutputBaseStreamType& operator << (CTL_OutputBaseStreamType& strm, const SourceAcquireOptions& src);
+        friend std::wostream& operator << (std::wostream& strm, const SourceAcquireOptions& src);
+        friend std::ostream& operator << (std::ostream& strm, const SourceAcquireOptions& src);
     };
 
-    inline CTL_OutputBaseStreamType& operator << (CTL_OutputBaseStreamType& strm, const SourceAcquireOptions& src)
+    inline std::wostream& operator << (std::wostream& strm, const SourceAcquireOptions& src)
     {
-        LPCTSTR nuller = _T("null");
-        strm << _T("DLLHandle=") << src.DLLHandle
-             << _T(", Source=") << src.Source
-             << _T(", nPixelType=") << src.nPixelType
-             << _T(", nMaxPages=") << src.nMaxPages
-             << _T(", nTransferMode=") << src.nTransferMode
-             << _T(", bShowUI=") << src.bShowUI
-             << _T(", bRemainOpen=") << src.bRemainOpen
-             << _T(", nOrigAcquireType=") << src.nOrigAcquireType
-             << _T(", nActualAcquireType=") << src.nActualAcquireType
-             << _T(", return_status=") << src.return_status
-             << _T(", UserArray=") << src.UserArray
-             << _T(", bDiscardDibs=") << src.bDiscardDibs
-             << _T(", lFileType=") << src.lFileType
-             << _T(", lFileFlags=") << src.lFileFlags
-             << _T(", lpszFile=") << (src.lpszFile?src.lpszFile:nuller)
-             << _T(", FileList=") << src.FileList;
+        std::wstring nuller = L"null";
+        strm << L"DLLHandle=" << src.DLLHandle
+            << L", Source=" << src.Source
+            << L", nPixelType=" << src.nPixelType
+            << L", nMaxPages=" << src.nMaxPages
+            << L", nTransferMode=" << src.nTransferMode
+            << L", bShowUI=" << src.bShowUI
+            << L", bRemainOpen=" << src.bRemainOpen
+            << L", nOrigAcquireType=" << src.nOrigAcquireType
+            << L", nActualAcquireType=" << src.nActualAcquireType
+            << L", return_status=" << src.return_status
+            << L", UserArray=" << src.UserArray
+            << L", bDiscardDibs=" << src.bDiscardDibs
+            << L", lFileType=" << src.lFileType
+            << L", lFileFlags=" << src.lFileFlags
+            << L", lpszFile=" << (src.lpszFile ? StringConversion::Convert_NativePtr_To_Wide(src.lpszFile) : nuller)
+            << L", FileList=" << src.FileList;
+        return strm;
+    }
+
+    inline std::ostream& operator << (std::ostream& strm, const SourceAcquireOptions& src)
+    {
+        std::string nuller = "null";
+        strm << "DLLHandle=" << src.DLLHandle
+            << ", Source=" << src.Source
+            << ", nPixelType=" << src.nPixelType
+            << ", nMaxPages=" << src.nMaxPages
+            << ", nTransferMode=" << src.nTransferMode
+            << ", bShowUI=" << src.bShowUI
+            << ", bRemainOpen=" << src.bRemainOpen
+            << ", nOrigAcquireType=" << src.nOrigAcquireType
+            << ", nActualAcquireType=" << src.nActualAcquireType
+            << ", return_status=" << src.return_status
+            << ", UserArray=" << src.UserArray
+            << ", bDiscardDibs=" << src.bDiscardDibs
+            << ", lFileType=" << src.lFileType
+            << ", lFileFlags=" << src.lFileFlags
+            << ", lpszFile=" << (src.lpszFile ? StringConversion::Convert_NativePtr_To_Ansi(src.lpszFile) : nuller)
+            << ", FileList=" << src.FileList;
         return strm;
     }
 

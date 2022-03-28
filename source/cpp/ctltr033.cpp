@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -38,11 +38,11 @@ CTL_SetDefaultSourceTriplet::CTL_SetDefaultSourceTriplet(CTL_ITwainSession *pSes
         {
             memcpy(&m_TWUNK.identity, pSource->GetSourceIDPtr(), sizeof(TW_IDENTITY));
             Init( pSession->GetAppIDPtr(),
-                  NULL,
+                  nullptr,
                   DG_CONTROL,
                   DAT_TWUNKIDENTITY,
                   MSG_GET,
-                  (TW_MEMREF)&m_TWUNK);
+                  static_cast<TW_MEMREF>(&m_TWUNK));
             SetAlive (true);
         }
     }
@@ -50,14 +50,14 @@ CTL_SetDefaultSourceTriplet::CTL_SetDefaultSourceTriplet(CTL_ITwainSession *pSes
 
 TW_UINT16 CTL_SetDefaultSourceTriplet::Execute()
 {
-    TW_UINT16 rc = CTL_TwainTriplet::Execute();
+    const TW_UINT16 rc = CTL_TwainTriplet::Execute();
     if ( rc != TWRC_SUCCESS )
     {
         // Process Condition code
         return rc;
     }
 #ifdef _WIN32
-    ::WriteProfileStringA("TWAIN", "DEFAULT SOURCE", m_TWUNK.dsPath);
+    WriteProfileStringA("TWAIN", "DEFAULT SOURCE", m_TWUNK.dsPath);
 #endif
     // Dispatch message that WIN.INI has changed
     return rc;

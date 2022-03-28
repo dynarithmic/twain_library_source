@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@
 #include <fstream>
 #include <memory>
 
+#include "dibinfox.h"
+
 #define DCXHEADER_ID 0x3ADE68B1
 namespace dynarithmic
 {
@@ -60,7 +62,7 @@ namespace dynarithmic
         DWORD nOffsets[1024];
     };
 
-    struct DCXINFO
+    struct DCXINFO : DibMultiPageData
     {
         DCXHEADER DCXHeader;
         std::unique_ptr<std::ofstream> fh;
@@ -71,30 +73,29 @@ namespace dynarithmic
     class CPCXImageHandler : public CDibInterface
     {
         public:
-            CPCXImageHandler(DTWAINImageInfoEx &ImageInfoEx) : m_ImageInfoEx(ImageInfoEx), m_bWriteOk(true), m_pDCXInfo(nullptr) {}
+            CPCXImageHandler(const DTWAINImageInfoEx &ImageInfoEx) : m_bWriteOk(true), m_pDCXInfo(nullptr), m_ImageInfoEx(ImageInfoEx) {}
             // Virtual interface
-            virtual CTL_String GetFileExtension() const  override;
-            virtual HANDLE  GetFileInformation(LPCSTR path) override;
-            virtual int     WriteGraphicFile(CTL_ImageIOHandler* pThis, LPCTSTR path, HANDLE bitmap, void *pUserInfo=NULL) override;
-            virtual int     WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, UINT32 wid, UINT32 ht,
-                                       UINT32 bpp, UINT32 cpal, RGBQUAD *pPal, void *pUserInfo=NULL) override;
+            std::string GetFileExtension() const  override;
+            HANDLE  GetFileInformation(LPCSTR path) override;
+            int     WriteGraphicFile(CTL_ImageIOHandler* pThis, LPCTSTR path, HANDLE bitmap, void *pUserInfo= nullptr) override;
+            int     WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, UINT32 wid, UINT32 ht,
+                               UINT32 bpp, UINT32 cpal, RGBQUAD *pPal, void *pUserInfo= nullptr) override;
 
-            virtual void SetMultiPageStatus(DibMultiPageStruct *pStruct) override;
-            virtual void GetMultiPageStatus(DibMultiPageStruct *pStruct) override;
+            void SetMultiPageStatus(DibMultiPageStruct *pStruct) override;
+            void GetMultiPageStatus(DibMultiPageStruct *pStruct) override;
 
         protected:
-            void DestroyAllObjects();
-            bool OpenOutputFile(LPCTSTR pFileName);
-            bool CloseOutputFile();
+            void DestroyAllObjects() override;
+            bool OpenOutputFile(LPCTSTR pFileName) override;
+            bool CloseOutputFile() override;
             WORD PCXWriteLine(LPSTR p, std::ofstream& fh,int n);
 
         private:
             bool m_bWriteOk;
             std::vector<CHAR> m_plinebuffer;
             std::vector<CHAR> m_pextrabuffer;
-            DCXINFO *m_pDCXInfo;
+            std::shared_ptr<DibMultiPageData> m_pDCXInfo;
             std::unique_ptr<std::ofstream> m_hFile;
-//            HANDLE m_hFile;
             DTWAINImageInfoEx m_ImageInfoEx;
     };
 }

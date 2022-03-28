@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <cstring>
 #include "ctltr019.h"
 
 #ifdef USE_EXPLICIT_TEMPLATE_INSTANTIATIONS
@@ -29,7 +28,7 @@
     template  CTL_CapabilitySetEnumTriplet<unsigned long>;
     template  CTL_CapabilitySetEnumTriplet<unsigned short>;
     template  CTL_CapabilitySetEnumTriplet<double>;
-    template  CTL_CapabilitySetEnumTriplet<CTL_String>;
+    template  CTL_CapabilitySetEnumTriplet<std::string>;
     template  CTL_CapabilitySetEnumTriplet<char *>;
     template  CTL_CapabilitySetEnumTriplet<TW_FRAME>;
 #endif

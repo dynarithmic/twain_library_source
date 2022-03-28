@@ -1,37 +1,32 @@
 /*
-    This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+This file is part of the Dynarithmic TWAIN Library (DTWAIN).
+Copyright (c) 2002-2022 Dynarithmic Software.
 
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-        http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
-    FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
-    DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
-    OF THIRD PARTY RIGHTS.
+FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
+DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
+OF THIRD PARTY RIGHTS.
+*/
 
-    For more information, the license file LICENSE.TXT that is located in the root
-    directory of the DTWAIN installation covers the restrictions under the LGPL license.
-    Please read this file before deploying or distributing any application using DTWAIN.
- */
 #ifndef CTLDIB32_H_
 #define CTLDIB32_H_
-
-#include <string.h>
 
 //// Special bitmap routines
 #include "imagefun/imgfunc.h"
 #include <vector>
 #include <utility>
-#include "dtwdecl.h"
+#include <boost/optional.hpp>
 #include "dibmulti.h"
 #include "dibinfox.h"
 #include "fltrect.h"
@@ -50,21 +45,16 @@ namespace dynarithmic
     //////////////////// Io Handler
     #define BYTEBUFFERSIZE      2048
 
-    class CTL_ImageIOHandler;
-
-    #include "fltrect.h"
-    #include "dibmulti.h"
-    #include "dibinfox.h"
     class CTL_ImageIOHandler
     {
         public:
             CTL_ImageIOHandler();
             CTL_ImageIOHandler( CTL_TwainDib *pDib );
-            virtual ~CTL_ImageIOHandler();
+            virtual ~CTL_ImageIOHandler() = default;
             void    SetDib( CTL_TwainDib *pDib ) { m_pDib = pDib; }
             virtual int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) = 0;
-            void *GetMultiDibData() { return pMultiDibData; }
-            void SetMultiDibData(void *pData) { pMultiDibData = pData;  }
+            std::shared_ptr<DibMultiPageData> GetMultiDibData() const { return pMultiDibData; }
+            void SetMultiDibData(std::shared_ptr<DibMultiPageData> pData) { pMultiDibData = pData;  }
             void SetMultiDibInfo(const DibMultiPageStruct &s);
             DibMultiPageStruct GetMultiDibInfo() const;
             bool AllPagesOK() const { return m_bAllWritten; }
@@ -74,21 +64,20 @@ namespace dynarithmic
             void SetOnePageWritten(bool bSet) { m_bOnePageWritten = bSet; }
             bool IsOnePageWritten() const { return m_bOnePageWritten; }
             virtual void SetImageInfo(const DTWAINImageInfoEx& /*ImageInfo*/) { }
-            CTL_TwainDib* GetDib() { return m_pDib; }
+            CTL_TwainDib* GetDib() const { return m_pDib; }
             static bool IsValidBitDepth(LONG FileType, LONG bitDepth);
             int SaveToFile(HANDLE hDib, LPCTSTR szFile, FREE_IMAGE_FORMAT fmt, int flags, UINT unitOfMeasure,
-                           const std::pair<LONG, LONG>& res, const std::tuple<double, double, double, double>& multipler_pr = { 1,1, 0.5, 0.5 });
+                           const std::pair<LONG, LONG>& res, const std::tuple<double, double, double, double>& multipler_pr = { 1,1, 0.5, 0.5 }) const;
             static std::unordered_map<LONG, std::vector<int>>& GetSupportedBPPMap() { return s_supportedBitDepths; }
 
         protected:
             CTL_TwainDib *m_pDib;
             unsigned int bytesleft,nextbyte;
             char bytebuffer[BYTEBUFFERSIZE];
-            int getbyte(int fh);
             void resetbuffer();
             char bittable[8];
             char masktable[8];
-            void *pMultiDibData;
+            std::shared_ptr<DibMultiPageData> pMultiDibData;
             DibMultiPageStruct m_DibMultiPageStruct;
             unsigned m_nPage;
             bool m_bAllWritten;
@@ -105,7 +94,7 @@ namespace dynarithmic
         public:
             CTL_BmpIOHandler() : CTL_ImageIOHandler(), m_bUseRLE(false) {}
             CTL_BmpIOHandler( CTL_TwainDib *pDib ) : CTL_ImageIOHandler(pDib ), m_bUseRLE(false) {}
-            virtual int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0);
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
 
         private:
             bool m_bUseRLE;
@@ -121,11 +110,11 @@ namespace dynarithmic
 
             CTL_JpegIOHandler( CTL_TwainDib *pDib, DTWAINImageInfoEx& ImageInfoEx)
                             : CTL_ImageIOHandler(pDib ),
-                            m_ImageInfoEx(ImageInfoEx),
                             m_nJpegQuality(75),
-                            m_bJpegProgressive(false) {}
+                            m_bJpegProgressive(false),
+                            m_ImageInfoEx(ImageInfoEx) {}
 
-            virtual int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0);
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
 
         private:
             int     m_nJpegQuality;
@@ -140,7 +129,7 @@ namespace dynarithmic
                                 m_ImageInfoEx(ImageInfoEx) {}
             CTL_TiffIOHandler( CTL_TwainDib *pDib, int nFormat, DTWAINImageInfoEx &ImageInfoEx ): CTL_ImageIOHandler(pDib),
                             m_nFormat(nFormat), m_ImageInfoEx(ImageInfoEx) {}
-            virtual int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData);
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData) override;
             void SetTiffFormat(int nFormat) { m_nFormat = nFormat; }
             int  GetTiffFormat() const { return m_nFormat; }
             CTL_StringType GetFileName() const { return sActualFileName; }
@@ -158,7 +147,7 @@ namespace dynarithmic
         public:
             CTL_PngIOHandler() : CTL_ImageIOHandler() {};
             CTL_PngIOHandler( CTL_TwainDib *pDib, DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler( pDib ), m_ImageInfoEx(ImageInfoEx) {}
-            virtual int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0);
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
         private:
             DTWAINImageInfoEx m_ImageInfoEx;
     };
@@ -169,7 +158,7 @@ namespace dynarithmic
             CTL_PcxIOHandler() : CTL_ImageIOHandler(), m_nFormat{} {};
             CTL_PcxIOHandler( CTL_TwainDib *pDib, int nFormat, DTWAINImageInfoEx& ImageInfoEx ) : CTL_ImageIOHandler(pDib),
             m_nFormat(nFormat), m_ImageInfoEx(ImageInfoEx) {}
-            virtual int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0);
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
 
         private:
             int m_nFormat;
@@ -181,16 +170,16 @@ namespace dynarithmic
         public:
             CTL_TgaIOHandler()  : CTL_ImageIOHandler() {};
             CTL_TgaIOHandler( CTL_TwainDib *pDib ) : CTL_ImageIOHandler( pDib ) {}
-            virtual int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0);
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
     };
 
     class CTL_WmfIOHandler : public CTL_ImageIOHandler
     {
         public:
-            CTL_WmfIOHandler() : CTL_ImageIOHandler(), m_nFormat{} {};
+            CTL_WmfIOHandler() : CTL_ImageIOHandler(), m_nFormat{} {}
             CTL_WmfIOHandler( CTL_TwainDib *pDib, int nFormat ) :
                                 CTL_ImageIOHandler( pDib ), m_nFormat(nFormat) {}
-            virtual int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0);
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
 
         private:
             int m_nFormat;
@@ -201,24 +190,24 @@ namespace dynarithmic
         public:
             CTL_PsdIOHandler()  : CTL_ImageIOHandler() {};
             CTL_PsdIOHandler( CTL_TwainDib *pDib ) : CTL_ImageIOHandler( pDib ) {}
-            virtual int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0);
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
     };
 
-    class CTL_PDFIOHandler : public CTL_ImageIOHandler
+    class CTL_PDFIOHandler final : public CTL_ImageIOHandler
     {
         public:
-            CTL_PDFIOHandler(CTL_TwainDib* pDib, int nFormat, DTWAINImageInfoEx &ImageInfoEx);
-            virtual int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0);
-            ~CTL_PDFIOHandler();
+            CTL_PDFIOHandler(CTL_TwainDib* pDib, int nFormat, const DTWAINImageInfoEx &ImageInfoEx);
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
+            ~CTL_PDFIOHandler() override = default;
 
-            virtual void SetImageInfo(const DTWAINImageInfoEx& ImageInfo)
+            void SetImageInfo(const DTWAINImageInfoEx& ImageInfo) override
             {
                 m_ImageInfoEx = ImageInfo;
             }
 
         private:
-            int GetOCRText(LPCTSTR szFileName, int pageType, CTL_StringType& sText);
-            bool CheckValidConvertType(int fileType, int pageType);
+            int GetOCRText(LPCTSTR szFileName, int pageType, std::string& sText);
+            static bool CheckValidConvertType(int fileType, int pageType);
             int m_nFormat;
             DTWAINImageInfoEx m_ImageInfoEx;
             CTL_JpegIOHandler m_JpegHandler;
@@ -226,13 +215,13 @@ namespace dynarithmic
     };
 
 
-    class CTL_PSIOHandler : public CTL_ImageIOHandler
+    class CTL_PSIOHandler final : public CTL_ImageIOHandler
     {
         public:
-            CTL_PSIOHandler(CTL_TwainDib* pDib, int nFormat, DTWAINImageInfoEx &ImageInfoEx,
+            CTL_PSIOHandler(CTL_TwainDib* pDib, int nFormat, const DTWAINImageInfoEx &ImageInfoEx,
                             LONG PSType, bool IsMultiPage);
-            virtual int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0);
-            ~CTL_PSIOHandler();
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
+            ~CTL_PSIOHandler() override = default;
 
         private:
             int m_nFormat;
@@ -244,12 +233,12 @@ namespace dynarithmic
             bool m_bIsMultiPage;
     };
 
-    class CTL_Jpeg2KIOHandler : public CTL_ImageIOHandler
+    class CTL_Jpeg2KIOHandler final : public CTL_ImageIOHandler
     {
         public:
-            CTL_Jpeg2KIOHandler(CTL_TwainDib* pDib, DTWAINImageInfoEx &ImageInfoEx);
-            virtual int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0);
-            ~CTL_Jpeg2KIOHandler();
+            CTL_Jpeg2KIOHandler(CTL_TwainDib* pDib, const DTWAINImageInfoEx &ImageInfoEx);
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
+            ~CTL_Jpeg2KIOHandler() override = default;
 
         private:
             int m_nFormat;
@@ -262,7 +251,7 @@ namespace dynarithmic
         public:
             CTL_GifIOHandler(CTL_TwainDib* pDib)  :
             CTL_ImageIOHandler(pDib) {}
-            virtual int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0);
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
     };
 
     class CTL_IcoIOHandler : public CTL_ImageIOHandler
@@ -270,7 +259,7 @@ namespace dynarithmic
         public:
             CTL_IcoIOHandler(CTL_TwainDib* pDib, DTWAINImageInfoEx& ImageInfoEx)  : CTL_ImageIOHandler(pDib),
                 m_ImageInfoEx(ImageInfoEx) {}
-            virtual int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0);
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
 
         private:
             DTWAINImageInfoEx m_ImageInfoEx;
@@ -281,7 +270,7 @@ namespace dynarithmic
         public:
             CTL_PBMIOHandler() : CTL_ImageIOHandler() {}
             CTL_PBMIOHandler(CTL_TwainDib *pDib) : CTL_ImageIOHandler(pDib){}
-            virtual int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData = 0);
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData = 0) override;
         private:
             DTWAINImageInfoEx m_ImageInfoEx;
     };
@@ -291,7 +280,7 @@ namespace dynarithmic
     public:
         CTL_WBMPIOHandler(CTL_TwainDib* pDib, DTWAINImageInfoEx& ImageInfoEx)  : CTL_ImageIOHandler(pDib),
             m_ImageInfoEx(ImageInfoEx) {}
-        virtual int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0);
+        int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
 
     private:
         DTWAINImageInfoEx m_ImageInfoEx;
@@ -302,12 +291,12 @@ namespace dynarithmic
     class CTL_TextIOHandler : public CTL_ImageIOHandler
     {
     public:
-        CTL_TextIOHandler(CTL_TwainDib* pDib, int nInputFormat, DTWAINImageInfoEx &ImageInfoEx,
+        CTL_TextIOHandler(CTL_TwainDib* pDib, int nInputFormat, DTWAINImageInfoEx ImageInfoEx,
                           OCREngine* pEngine);
-        virtual int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0);
-        ~CTL_TextIOHandler();
+        int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
+        ~CTL_TextIOHandler() override = default;
 
-        virtual void SetImageInfo(const DTWAINImageInfoEx& ImageInfo)
+        void SetImageInfo(const DTWAINImageInfoEx& ImageInfo) override
         {
             m_ImageInfoEx = ImageInfo;
         }
@@ -323,7 +312,7 @@ namespace dynarithmic
         public:
             CTL_WebpIOHandler() : CTL_ImageIOHandler() {}
             CTL_WebpIOHandler(CTL_TwainDib *pDib) : CTL_ImageIOHandler(pDib){}
-            virtual int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData = 0);
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData = 0) override;
     };
 
     #endif  // NOIMAGE_SUPPORT
@@ -332,8 +321,8 @@ namespace dynarithmic
     class CTL_HBitmap
     {
         public:
-            CTL_HBitmap(HBITMAP h=NULL) {m_hBitmap = h;}
-            operator HBITMAP() { return m_hBitmap; }
+            CTL_HBitmap(HBITMAP h= nullptr) {m_hBitmap = h;}
+            operator HBITMAP() const { return m_hBitmap; }
             HBITMAP GetHBitmap() const {return m_hBitmap;}
 
         private:
@@ -430,9 +419,9 @@ namespace dynarithmic
             int         GetNumColors() const;
             int         GetResolution() const;
             int         GetBitsPerPixel() const;
+            boost::optional<DWORD> GetBitsOffset() const;
             bool        IsGrayScale() const;
             bool        IsBlankDIB(double threshold) const;
-            bool        Render();
             void        Delete();
             bool        FlipBitMap(bool bRGB=false);
 
@@ -443,7 +432,7 @@ namespace dynarithmic
             bool        IsAutoDeletePalette() const { return m_bAutoDeletePalette; }
 
             // Read an image file
-            HANDLE      ReadDibBitmap(LPCTSTR lpszFileName);
+            static HANDLE      ReadDibBitmap(LPCSTR lpszFileName);
             // Write an image file
             int         WriteDibBitmap(DTWAINImageInfoEx& ImageInfo, LPCTSTR szFile, int nFormat=BmpFormat,
                                        bool bOpenFile=true, int fh=0);
@@ -453,14 +442,14 @@ namespace dynarithmic
                                                         bool bOpenFile, int fhFile, int &nStatus);
             int WriteNextPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int &nStatus,
                                       const DTWAINImageInfoEx& ImageInfo);
-            int WriteLastPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int &nStatus, bool bSaveFile=true);
+            static int WriteLastPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int &nStatus, bool bSaveFile=true);
 
 
             // Special JPEG stuff
             void SetJpegValues(int nQuality, bool bProgressive);
 
             // Crop a DIB
-            int CropDib(FloatRect& ActualRect, FloatRect& RequestedRect,
+            int CropDib(const FloatRect& ActualRect, const FloatRect& RequestedRect,
                         LONG SourceUnit, LONG DestUnit, int dpi,
                         int flags);
 
@@ -479,34 +468,29 @@ namespace dynarithmic
             // Negate DIB
             int NegateDib();
 
-            void ResolvePostscriptOptions(const DTWAINImageInfoEx& Info, int &nFormat );
+            static void ResolvePostscriptOptions(const DTWAINImageInfoEx& Info, int &nFormat );
 
             CTL_TwainDib();
-            CTL_TwainDib(HANDLE hDib, HWND hWnd=NULL);
-            CTL_TwainDib(LPCTSTR lpszFileName, HWND hWnd=NULL);
+            CTL_TwainDib(HANDLE hDib, HWND hWnd= nullptr);
+            CTL_TwainDib(LPCSTR lpszFileName, HWND hWnd= nullptr);
             CTL_TwainDib(const CTL_TwainDib& rDib);
-            void swap(CTL_TwainDib& left, CTL_TwainDib& rt);
+            void swap(CTL_TwainDib& left, CTL_TwainDib& rt) noexcept;
 
-            static int         PixelToBytes(int n) { return ((n+7)/8); }
+            static int         PixelToBytes(int n) { return (n+7)/8; }
             WORD               PaletteSize (void* pv);
             HPALETTE           GetPalette() const {return m_TwainDibInfo.GetPalette(); }
-            static             int  WidthInBytes(int i)  { return ((i+31)/32*4); }
+            static             int  WidthInBytes(int i)  { return (i+31)/32*4; }
             // Destruction
             ~CTL_TwainDib();
 
         protected:
-            int         DibNumColors(void* pv) const;
-            // HPALETTE    CreateDibPalette();
-            LPBYTE      DibBits(fipImage& lpdib);
-            void        DeleteDib();
-            // void        DeleteDibPalette();
-            void        DeleteAllDibInfo() { /*DeleteDibPalette();*/ DeleteDib(); }
+            static int         DibNumColors(void* pv);
+            static LPBYTE DibBits(fipImage& lpdib);
             void        Init();
             void        SetEqual(const CTL_TwainDib& rDib);
 
         private:
             CTL_TwainDibInfo m_TwainDibInfo;
-            // static      PALETTEENTRY s_peStock256[256];
             bool        m_bAutoDelete;
             bool        m_bAutoDeletePalette;
             bool        m_bIsValid;
@@ -524,8 +508,8 @@ namespace dynarithmic
 
             // Dib page creation
             CTL_TwainDibPtr CreateDib();
-            CTL_TwainDibPtr CreateDib(HANDLE hDib, HWND hWnd=NULL);
-            CTL_TwainDibPtr CreateDib(LPCTSTR lpszFileName, HWND hWnd=NULL);
+            CTL_TwainDibPtr CreateDib(HANDLE hDib, HWND hWnd= nullptr);
+            CTL_TwainDibPtr CreateDib(LPCSTR lpszFileName, HWND hWnd= nullptr);
             CTL_TwainDibPtr CreateDib(const CTL_TwainDib& rDib);
 
             // Dib page deletion
@@ -546,7 +530,6 @@ namespace dynarithmic
             CTL_TwainDibPtr        operator[](size_t nPos);
 
             // Deletion of globally locked dib memory.  If TRUE, dib memory is deallocated when Dib object is deleted
-            void    SetAutoDeleteFlag(bool bSet, bool bUpdateAll=true);
             bool    IsAutoDelete() const;
             size_t  GetSize() const { return m_TwainDibArray.size(); }
 

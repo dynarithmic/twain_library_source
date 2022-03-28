@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -24,14 +24,13 @@
 #include <unordered_map>
 #include "ctlarray.h"
 #include "ctlobstr.h"
-#include "dtwdecl.h"
 
 namespace dynarithmic
 {
-    typedef std::unordered_map<CTL_String, UINT> ContainerMap;
-    BOOL SaveCapInfoToIni(const CTL_String& strSourceName, UINT nCap, const CTL_IntArray& rContainerTypes);
-    bool GetCapInfoFromIni(const CTL_String& strCapName,
-                           const CTL_String& strSourceName,
+    typedef std::unordered_map<std::string, UINT> ContainerMap;
+    BOOL SaveCapInfoToIni(const std::string& strSourceName, UINT nCap, const CTL_IntArray& rContainerTypes);
+    bool GetCapInfoFromIni(const std::string& strCapName,
+                           const std::string& strSourceName,
                            UINT nCap,
                            UINT &rGetValues,
                            UINT &rGetValuesCurrent,

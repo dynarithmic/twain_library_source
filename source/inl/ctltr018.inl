@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,6 +18,9 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#ifndef CTLTR018_INL
+#define CTLTR018_INL
+
 template <class T>
 CTL_CapabilitySetRangeTriplet<T>::CTL_CapabilitySetRangeTriplet(CTL_ITwainSession *pSession,
                                                              CTL_ITwainSource* pSource,
@@ -54,7 +57,7 @@ bool CTL_CapabilitySetRangeTriplet<T>::Encode(const std::vector<T>& rArray, void
 	T Data1, Data2, Data3;
 
     // Get a TW_RANGE structure
-    pTW_RANGE pVal = (pTW_RANGE)pMemBlock;
+    const pTW_RANGE pVal = static_cast<pTW_RANGE>(pMemBlock);
     if (rArray.size() >= 3)
     {
         Data1 = rArray[0]; // Min value
@@ -67,3 +70,4 @@ bool CTL_CapabilitySetRangeTriplet<T>::Encode(const std::vector<T>& rArray, void
     return false;
 }
 
+#endif // CTLTR018_INL

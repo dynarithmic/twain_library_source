@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include "ctltwmgr.h"
 #include "dtwain_resource_constants.h"
 using namespace dynarithmic;
+#pragma warning (disable : 4714)
 ///////////////// Open Data source manager triplet /////////////////////////
 CTL_TwainCloseSMTriplet::CTL_TwainCloseSMTriplet(CTL_ITwainSession *pSession) :
                         CTL_TwainSMTriplet(pSession, MSG_CLOSEDSM, IDS_ErrSourceMgrClose)
@@ -47,8 +48,8 @@ CTL_TwainSMTriplet::CTL_TwainSMTriplet(CTL_ITwainSession *pSession, TW_UINT16 nM
     const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
     if ( pMgr && pMgr->IsValidTwainSession( pSession ))
     {
-         Init( pSession->GetAppIDPtr(), NULL, DG_CONTROL, DAT_PARENT,
-                nMsg, (TW_MEMREF)pSession->GetWindowHandlePtr() );
+         Init( pSession->GetAppIDPtr(), nullptr, DG_CONTROL, DAT_PARENT,
+                nMsg, static_cast<TW_MEMREF>(pSession->GetWindowHandlePtr()) );
          SetAlive (true);
     }
 }
@@ -62,13 +63,13 @@ int CTL_TwainSMTriplet::GetDSMVersion() const
 
 TW_UINT16 CTL_TwainSMTriplet::Execute()
 {
-    TW_UINT16 rc = CTL_TwainTriplet::Execute();
+    const TW_UINT16 rc = CTL_TwainTriplet::Execute();
     if ( rc != TWRC_SUCCESS )
     {
         CTL_ConditionCodeTriplet CC(GetSessionPtr(), GetSourcePtr());
         if ( CC.Execute() == TWRC_SUCCESS )
             CTL_TwainAppMgr::ProcessConditionCodeError(CC.GetConditionCode());
-        DTWAIN_ERROR_CONDITION(m_nErr, TWRC_FAILURE);
+        DTWAIN_ERROR_CONDITION(m_nErr, TWRC_FAILURE)
     }
     return TWRC_SUCCESS;
 }

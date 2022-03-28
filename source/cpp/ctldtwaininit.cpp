@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@
     FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
-
-
  */
 #include <cstring>
 #include <cstdio>
@@ -26,22 +24,23 @@
 #include <algorithm>
 #include <string>
 #include <sstream>
-#include <type_traits>
 #include <boost/format.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/dll/runtime_symbol_info.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/thread.hpp>
+#include <thread>
 #include <set>
+#include <vector>
+
+#include "cppfunc.h"
 #include "ctltwmgr.h"
-#include "ctltrall.h"
 #include "ctlres.h"
 #include "../dtwinver/dtwinverex.h"
 #include "../simpleini/simpleini.h"
 #include "dtwain_verinfo.h"
 #include "dtwain_resource_constants.h"
-#include "dtwinverex.h"
 #include "errorcheck.h"
+#include "dtwstrfn.h"
+#include "ctlfileutils.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #pragma comment (lib, "shlwapi")
@@ -73,44 +72,45 @@
 #endif
 
 #ifdef USE_NAMESPACES
-   using namespace std;
+
 #endif
 
 using namespace dynarithmic;
 
+static DTWAIN_HANDLE SysInitializeHelper(bool noblock);
 static LONG DTWAIN_CloseAllSources();
 static void UnhookAllDisplays();
-static bool HookTwainDLL(CTL_TwainDLLHandle *pHandle, bool bHook);
-static HWND CreateTwainWindow(CTL_TwainDLLHandle *pHandle,
-                              HINSTANCE hInstance=NULL,
-                              HWND hWndParent=NULL);
+static bool HookTwainDLL(CTL_TwainDLLHandle* pHandle, bool bHook);
+static HWND CreateTwainWindow(CTL_TwainDLLHandle* pHandle,
+                              HINSTANCE hInstance= nullptr,
+                              HWND hWndParent= nullptr);
 static void RegisterTwainWindowClass();
 static void OpenLogFile(LPCTSTR pFileName, LONG logFlags, bool append=false);
 static void WriteVersionToLog();
-static bool SysDestroyHelper(CTL_TwainDLLHandle *pHandle, bool bCheck=true);
-static void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, const char *szLangDLL, const char *szName);
+static bool SysDestroyHelper(CTL_TwainDLLHandle* pHandle, bool bCheck=true);
+static void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL, LPCTSTR szName);
 
 #ifdef _WIN32
 static UINT_PTR APIENTRY FileSaveAsHookProc(HWND hWnd, UINT msg, WPARAM w, LPARAM lparam);
-static WNDPROC SubclassTwainMsgWindow(HWND hWnd, WNDPROC wProcIn = NULL);
+static WNDPROC SubclassTwainMsgWindow(HWND hWnd, WNDPROC wProcIn = nullptr);
 //LRESULT ProcessHook(int nCode, WPARAM wParam, LPARAM lParam, int nValue);
 #define     TWSubclassWindow(hwnd, lpfn)  \
             (reinterpret_cast<WNDPROC>(SetWindowLongPtr((hwnd), GWLP_WNDPROC, (LONG_PTR)(WNDPROC)(lpfn))))
 #endif
 
-static void LogDTWAINErrorToMsgBox(int nError, LPCTSTR pFunc, const CTL_StringType& s);
-static CTL_String FixPathStringA( LPCSTR szINIPath );
-static CTL_WString FixPathStringW(LPCWSTR szINIPath);
+static void LogDTWAINErrorToMsgBox(int nError, LPCSTR pFunc, const std::string& s);
+static std::string FixPathStringA( LPCSTR szINIPath );
+static std::wstring FixPathStringW(LPCWSTR szINIPath);
 
 /* Set the paths for image DLL's and language resource */
 static DTWAIN_BOOL SetImageDLLPath(LPCTSTR szPath);
 static DTWAIN_BOOL SetLangResourcePath(LPCTSTR szPath);
-static CTL_StringType GetStaticLibVer();
+static std::string GetStaticLibVer();
 static void LoadStaticData(CTL_TwainDLLHandle*);
 static bool GetDTWAINDLLVersionInfo(HMODULE hMod, LONG* lMajor, LONG* lMinor, LONG *pPatch);
-static CTL_String GetDTWAINDLLVersionInfoStr();
+static CTL_StringType GetDTWAINDLLVersionInfoStr();
 static DTWAIN_BOOL DTWAIN_GetVersionInternal(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatch);
-static CTL_StringType CheckSearchOrderString(const CTL_StringType& );
+static std::string CheckSearchOrderString(std::string);
 
 #ifdef UNICODE
 #define FixPathString FixPathStringW
@@ -122,13 +122,13 @@ static CTL_StringType CheckSearchOrderString(const CTL_StringType& );
     static void GetVersionFromResource(LPLONG lMajor, LPLONG lMinor, LPLONG patch);
 #endif
 
-static bool FindTask( DWORD hTask, int *pWhere=NULL );
+static bool FindTask( DWORD hTask, int *pWhere= nullptr);
 static HMODULE GetDLLInstance();
 
 static unsigned long getThreadId()
 {
     static std::unordered_map<std::string, unsigned long> s_thread_map;
-    std::string threadId = boost::lexical_cast<std::string>(boost::this_thread::get_id());
+    std::string threadId = boost::lexical_cast<std::string>(std::this_thread::get_id());
     auto iter = s_thread_map.find(threadId);
     if (iter == s_thread_map.end())
     {
@@ -142,7 +142,7 @@ static unsigned long getThreadId()
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetVersion(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType)
 {
     LOG_FUNC_ENTRY_PARAMS((lMajor, lMinor, lVersionType))
-        bool bRetVal = DTWAIN_GetVersionInternal(lMajor, lMinor, lVersionType, NULL) ? true : false;
+    const bool bRetVal = DTWAIN_GetVersionInternal(lMajor, lMinor, lVersionType, nullptr) ? true : false;
     LOG_FUNC_EXIT_PARAMS(bRetVal)
     CATCH_BLOCK(false)
 }
@@ -150,7 +150,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetVersion(LPLONG lMajor, LPLONG lMinor, LPLONG 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetVersionEx(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatchLevel)
 {
     LOG_FUNC_ENTRY_PARAMS((lMajor,lMinor,lVersionType, lPatchLevel))
-    bool bRetVal = DTWAIN_GetVersionInternal(lMajor, lMinor, lVersionType, lPatchLevel)?true:false;
+    const bool bRetVal = DTWAIN_GetVersionInternal(lMajor, lMinor, lVersionType, lPatchLevel)?true:false;
     LOG_FUNC_EXIT_PARAMS(bRetVal)
     CATCH_BLOCK(false)
 }
@@ -178,7 +178,7 @@ DTWAIN_BOOL DTWAIN_GetVersionInternal(LPLONG lMajor, LPLONG lMinor, LPLONG lVers
     #ifdef DTWAIN_LIB
     GetVersionFromResource(lMajor, lMinor, lPatch);
     #else
-     bool modRet = GetDTWAINDLLVersionInfo(CTL_TwainDLLHandle::s_DLLInstance, lMajor, lMinor, lPatch);
+    const bool modRet = GetDTWAINDLLVersionInfo(CTL_TwainDLLHandle::s_DLLInstance, lMajor, lMinor, lPatch);
      if ( !modRet )
      {
          LOG_FUNC_EXIT_PARAMS(false)
@@ -190,6 +190,10 @@ DTWAIN_BOOL DTWAIN_GetVersionInternal(LPLONG lMajor, LPLONG lMinor, LPLONG lVers
 
     #ifdef UNICODE
         *lVersionType |= DTWAIN_UNICODE_VERSION;
+    #endif
+
+    #ifdef DTWAIN_DEBUG
+        *lVersionType |= DTWAIN_DEVELOP_VERSION;
     #endif
 
     #if defined (WIN64) || defined(_WIN64)
@@ -291,9 +295,9 @@ void DLLENTRY_DEF DTWAIN_X(LPCTSTR)
 {}
 
 //////////////////////////////// Initialize DLL /////////////////////////////
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTwainMsg(MSG FAR *pMsg)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTwainMsg(MSG *pMsg)
 {
-    LOG_FUNC_ENTRY_PARAMS((pMsg))
+    LOG_FUNC_ENTRY_PARAMS_ISTWAINMSG((pMsg))
     if (!TwainMessageLoopV2::s_MessageQueue.empty())
     {
         MSG msg = TwainMessageLoopV2::s_MessageQueue.front();
@@ -301,8 +305,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTwainMsg(MSG FAR *pMsg)
         CTL_TwainAppMgr::IsTwainMsg(&msg, true);  // make sure we perform what we need to do for TWAIN 2.x.
     }
     // make sure we perform any default message handling here.
-    DTWAIN_BOOL bRet = CTL_TwainAppMgr::IsTwainMsg( pMsg, false );
-    LOG_FUNC_EXIT_PARAMS(bRet)
+    const DTWAIN_BOOL bRet = CTL_TwainAppMgr::IsTwainMsg( pMsg, false );
+    LOG_FUNC_EXIT_PARAMS_ISTWAINMSG(bRet)
     CATCH_BLOCK(false)
 }
 
@@ -310,10 +314,13 @@ LONG DLLENTRY_DEF DTWAIN_GetLastError()
 {
     LOG_FUNC_ENTRY_PARAMS(())
     // See if DLL Handle exists
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     if ( !IsDLLHandleValid( pHandle, FALSE ) )
     {
-        LOG_FUNC_EXIT_PARAMS(DTWAIN_ERR_BAD_HANDLE)
+        LONG err = DTWAIN_ERR_BAD_HANDLE;
+        if (!CTL_TwainDLLHandle::s_ResourcesInitialized)
+            err = DTWAIN_ERR_RESOURCES_NOT_FOUND;
+        LOG_FUNC_EXIT_PARAMS(err)
     }
     else
     {
@@ -325,15 +332,17 @@ LONG DLLENTRY_DEF DTWAIN_GetLastError()
 LONG DLLENTRY_DEF  DTWAIN_GetErrorString(LONG lError, LPTSTR lpszBuffer, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((lError, lpszBuffer, nMaxLen))
-    size_t nBytes = GetResourceString(static_cast<UINT>(-lError), NULL, 1023);
+    const size_t nBytes = GetResourceStringA(static_cast<UINT>(-lError), nullptr, 2048);
     if ( nBytes == 0)
     {
         LOG_FUNC_EXIT_PARAMS(0)
     }
-    std::vector<TCHAR> szTemp(nBytes);
-    GetResourceString(static_cast<UINT>(-lError), &szTemp[0], static_cast<LONG>(nBytes));
 
-    LONG nTotalBytes = CopyInfoToCString(&szTemp[0], lpszBuffer, nMaxLen);
+    std::vector<char> szTemp(nBytes);
+    GetResourceStringA(static_cast<UINT>(-lError), &szTemp[0], static_cast<LONG>(nBytes));
+    const CTL_StringType sCopy = StringConversion::Convert_Ansi_To_Native(szTemp.data());
+
+    const LONG nTotalBytes = StringWrapper::CopyInfoToCString(sCopy, lpszBuffer, nMaxLen);
     LOG_FUNC_EXIT_PARAMS(nTotalBytes)
     CATCH_BLOCK(0)
 }
@@ -341,8 +350,8 @@ LONG DLLENTRY_DEF  DTWAIN_GetErrorString(LONG lError, LPTSTR lpszBuffer, LONG nM
 LONG DLLENTRY_DEF DTWAIN_GetConditionCodeString(LONG CC, LPTSTR lpszBuffer, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((CC, lpszBuffer, nMaxLen))
-    LONG lError = -(IDS_TWCC_ERRORSTART + CC);
-    LONG Retval = DTWAIN_GetErrorString(lError, lpszBuffer, nMaxLen);
+    const LONG lError = -(IDS_TWCC_ERRORSTART + CC);
+    const LONG Retval = DTWAIN_GetErrorString(lError, lpszBuffer, nMaxLen);
     LOG_FUNC_EXIT_PARAMS(Retval)
     CATCH_BLOCK(0)
 }
@@ -351,7 +360,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadLanguageResource(LONG nLanguage)
 {
     LOG_FUNC_ENTRY_PARAMS((nLanguage))
     LPCTSTR pLangDLL;
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     switch(nLanguage)
     {
@@ -378,7 +387,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadLanguageResource(LONG nLanguage)
     }
 
     // Add the resource to the registry.
-    DTWAIN_BOOL bRet = DTWAIN_LoadCustomStringResources(pLangDLL);
+    const DTWAIN_BOOL bRet = DTWAIN_LoadCustomStringResources(pLangDLL);
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -386,14 +395,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadLanguageResource(LONG nLanguage)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResources(LPCTSTR sLangDLL)
 {
     LOG_FUNC_ENTRY_PARAMS((sLangDLL))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 
+    const std::string sLangDLLString = StringConversion::Convert_NativePtr_To_Ansi(sLangDLL);
     // Add the resource to the registry.
-    auto exists = pHandle->AddResourceToRegistry(sLangDLL).second;
+    const auto exists = pHandle->AddResourceToRegistry(sLangDLLString.c_str()).second;
     bool bRet = false;
     if (exists)
-        bRet = LoadLanguageResource(StringConversion::Convert_Native_To_Ansi(sLangDLL), pHandle->GetResourceRegistry());
+        bRet = LoadLanguageResourceA(sLangDLLString.c_str(), pHandle->GetResourceRegistry());
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bRet;}, DTWAIN_ERR_FILEOPEN, false, FUNC_MACRO);
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -403,7 +413,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsInitialized()
 {
     // Get the Current task
     LOG_FUNC_ENTRY_PARAMS(())
-    DWORD hTask = getThreadId();
+    const DWORD hTask = getThreadId();
 
 #ifdef DTWAIN_LIB
     if ( CTL_TwainDLLHandle::s_DLLInstance == NULL )
@@ -414,7 +424,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsInitialized()
 #else
     // Check if this task has already been hooked
     int nWhere;
-    if ( ::FindTask( hTask, &nWhere ) )
+    if (FindTask( hTask, &nWhere ) )
         // Already hooked.  No need to do this again
         LOG_FUNC_EXIT_PARAMS(true)
     LOG_FUNC_EXIT_PARAMS(false)
@@ -434,12 +444,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndThread( DTWAIN_HANDLE DLLHandle )
 {
     LOG_FUNC_ENTRY_PARAMS((DLLHandle))
     int nWhere;
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 
     if ( pHandle )
     {
-        bool bOk = ::FindTask( getThreadId(), &nWhere );
+        const bool bOk = FindTask( getThreadId(), &nWhere );
         if ( bOk )
             pHandle->s_aHookInfo.erase(pHandle->s_aHookInfo.begin() +  nWhere );
     }
@@ -457,10 +467,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_UseMultipleThreads(DTWAIN_BOOL bSet)
 
 DTWAIN_HANDLE dynarithmic::GetDTWAINHandle_Internal()
 {
-    CTL_TwainDLLHandle *pHandle;
     #ifdef DTWAIN_LIB
     if (CTL_TwainDLLHandle::s_DLLInstance == NULL)
-        return NULL;
+        return nullptr;
     #endif
 
     if (!CTL_TwainDLLHandle::s_multipleThreads)
@@ -472,22 +481,20 @@ DTWAIN_HANDLE dynarithmic::GetDTWAINHandle_Internal()
 
     // Check if this task has already been hooked
     // Get the Current task
-    DWORD hTask = getThreadId();
+    const DWORD hTask = getThreadId();
 
     #ifdef DTWAIN_LIB
     if (!CTL_TwainDLLHandle::s_DLLHandles.empty())
     {
-        pHandle = CTL_TwainDLLHandle::s_DLLHandles[0].get();
-        return pHandle;
+        return CTL_TwainDLLHandle::s_DLLHandles[0].get();
     }
     return NULL;
     #else
     int nWhere;
-    if (::FindTask(hTask, &nWhere))
+    if (FindTask(hTask, &nWhere))
     {
-        CTL_HookInfo HookInfo = CTL_TwainDLLHandle::s_aHookInfo[nWhere];
-        pHandle = std::get<3>(HookInfo);
-        return pHandle;
+        const CTL_HookInfo HookInfo = CTL_TwainDLLHandle::s_aHookInfo[nWhere];
+        return std::get<3>(HookInfo);
     }
     return nullptr;
     #endif
@@ -497,8 +504,7 @@ DTWAIN_HANDLE dynarithmic::GetDTWAINHandle_Internal()
 DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_GetDTWAINHandle()
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    DTWAIN_HANDLE pHandle = ::GetDTWAINHandle_Internal();
-    LOG_FUNC_EXIT_PARAMS(pHandle)
+    LOG_FUNC_EXIT_PARAMS(::GetDTWAINHandle_Internal())
     CATCH_BLOCK(DTWAIN_HANDLE(0))
 }
 
@@ -524,7 +530,6 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_GetDTWAINHandle()
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTwainAvailable()
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    DTWAIN_HANDLE DLLHandle;
 
     // Check if TWAIN session started.  If so, they must have had TWAIN installed!
     // Save the filter flags
@@ -532,8 +537,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTwainAvailable()
     try
     {
         // Check if DTWAIN already initialized
-        DLLHandle = GetDTWAINHandle_Internal();
-        CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(DLLHandle);
+        const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
         if (pHandle && DTWAIN_IsSessionEnabled())
         {
             LOG_FUNC_EXIT_PARAMS(true)
@@ -590,7 +594,7 @@ LONG DLLENTRY_DEF DTWAIN_GetDSMFullName(LONG DSMType, LPTSTR szDLLName, LONG nMa
 
     CTL_StringType sPath;
     CTL_StringType* strToSet = &sPath;
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     if (pHandle)
     {
@@ -602,7 +606,7 @@ LONG DLLENTRY_DEF DTWAIN_GetDSMFullName(LONG DSMType, LPTSTR szDLLName, LONG nMa
     if ( strToSet->empty() )
         *strToSet = CTL_TwainAppMgr::GetTwainDirFullName(sName.c_str(), pWhichSearch);
 
-    size_t nBytes = strToSet->length();
+    const size_t nBytes = strToSet->length();
     if ( nBytes == 0)
         LOG_FUNC_EXIT_PARAMS(0)
     LONG nTotalBytes;
@@ -612,9 +616,22 @@ LONG DLLENTRY_DEF DTWAIN_GetDSMFullName(LONG DSMType, LPTSTR szDLLName, LONG nMa
         LOG_FUNC_EXIT_PARAMS(nTotalBytes)
     }
 
-    nTotalBytes = CopyInfoToCString(*strToSet, szDLLName, nMaxLen);
+    CTL_StringType sDLLName;
+    std::copy(strToSet->begin(), strToSet->end(), std::back_inserter(sDLLName));
+    nTotalBytes = StringWrapper::CopyInfoToCString(sDLLName, szDLLName, nMaxLen);
     LOG_FUNC_EXIT_PARAMS(nTotalBytes)
-    CATCH_BLOCK(false)
+    CATCH_BLOCK(0)
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetActiveDSMPath(LPTSTR szDLLName, LONG nMaxLen)
+{
+    LOG_FUNC_ENTRY_PARAMS((szDLLName, nMaxLen))
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+
+    if (pHandle)
+        return StringWrapper::CopyInfoToCString(CTL_TwainAppMgr::GetDSMPath(), szDLLName, nMaxLen);
+    LOG_FUNC_EXIT_PARAMS(-1)
+    CATCH_BLOCK(-1)
 }
 
 DTWAIN_HANDLE DLLENTRY_DEF  DTWAIN_SysInitializeLib(HINSTANCE hInstance)
@@ -624,7 +641,7 @@ DTWAIN_HANDLE DLLENTRY_DEF  DTWAIN_SysInitializeLib(HINSTANCE hInstance)
 #ifdef DTWAIN_LIB
     CTL_TwainDLLHandle::s_DLLInstance = hInstance;
 #endif
-    DTWAIN_HANDLE Handle = DTWAIN_SysInitialize();
+    const DTWAIN_HANDLE Handle = DTWAIN_SysInitialize();
     LOG_FUNC_EXIT_PARAMS(Handle)
     CATCH_BLOCK(DTWAIN_HANDLE(0))
 }
@@ -639,7 +656,7 @@ DTWAIN_HANDLE DLLENTRY_DEF  DTWAIN_SysInitializeLibEx2(HINSTANCE hInstance,
     SetImageDLLPath(szImageDLLPath);
     SetLangResourcePath(szLangResourcePath);
 
-    DTWAIN_HANDLE Handle = DTWAIN_SysInitializeLibEx(hInstance, szINIPath);
+    const DTWAIN_HANDLE Handle = DTWAIN_SysInitializeLibEx(hInstance, szINIPath);
     LOG_FUNC_EXIT_PARAMS(Handle)
     CATCH_BLOCK(DTWAIN_HANDLE(0))
 }
@@ -651,7 +668,7 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeLibEx(HINSTANCE hInstance, LPCTST
 
     CTL_TwainDLLHandle::s_sINIPath = FixPathString(szINIPath);
 
-    DTWAIN_HANDLE Handle = DTWAIN_SysInitializeLib(hInstance);
+    const DTWAIN_HANDLE Handle = DTWAIN_SysInitializeLib(hInstance);
     LOG_FUNC_EXIT_PARAMS(Handle)
     CATCH_BLOCK(DTWAIN_HANDLE(0))
 }
@@ -666,7 +683,7 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx2(LPCTSTR szINIPath,
 
     SetLangResourcePath(szLangResourcePath);
     SetImageDLLPath(szImageDLLPath);
-    DTWAIN_HANDLE Handle = DTWAIN_SysInitializeEx(szINIPath);
+    const DTWAIN_HANDLE Handle = DTWAIN_SysInitializeEx(szINIPath);
     LOG_FUNC_EXIT_PARAMS(Handle)
     CATCH_BLOCK(DTWAIN_HANDLE(0))
 }
@@ -674,13 +691,18 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx2(LPCTSTR szINIPath,
 DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx(LPCTSTR szINIPath)
 {
     LOG_FUNC_ENTRY_PARAMS((szINIPath))
-    CTL_TwainDLLHandle::s_sINIPath = FixPathString( szINIPath );
-    DTWAIN_HANDLE Handle = DTWAIN_SysInitialize();
+    CTL_TwainDLLHandle::s_sINIPath = FixPathString(szINIPath);
+    const DTWAIN_HANDLE Handle = DTWAIN_SysInitialize();
     LOG_FUNC_EXIT_PARAMS(Handle)
     CATCH_BLOCK(DTWAIN_HANDLE(0))
 }
 
-DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitialize()
+DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeNoBlocking()
+{
+    return SysInitializeHelper(false);
+}
+
+DTWAIN_HANDLE SysInitializeHelper(bool block)
 {
 #ifdef DTWAIN_LIB
     if ( CTL_TwainDLLHandle::s_DLLInstance == NULL )
@@ -705,9 +727,8 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitialize()
     LOG_FUNC_ENTRY_PARAMS(())
 
     CTL_TwainDLLHandlePtr pHandlePtr;
-    CTL_TwainDLLHandle*   pHandle;
     // Return handle if already registered
-    DTWAIN_HANDLE DLLHandle = GetDTWAINHandle_Internal();
+    const DTWAIN_HANDLE DLLHandle = GetDTWAINHandle_Internal();
     if (DLLHandle)
         LOG_FUNC_EXIT_PARAMS(DLLHandle)
 
@@ -722,16 +743,17 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitialize()
     {
         typedef std::function<bool()> boolFuncs;
         boolFuncs bf[] = { &LoadTwainResources };
-        for (int i = 0; i < sizeof(bf) / sizeof(bf[0]); ++i)
+        for (auto& i : bf)
         {
-            bool ret = bf[i]();
+            const bool ret = i();
             if (!ret)
-        {
-        #ifdef _WIN32
-            MessageBox(NULL, _T("DTWAIN Resources not found"), _T("DTWAIN Resource Error"), MB_ICONERROR);
-        #endif
-            LOG_FUNC_EXIT_PARAMS(NULL)
-        }
+            {
+            #ifdef _WIN32
+                if ( block )
+                    MessageBox(nullptr, _T("DTWAIN Resources not found"), _T("DTWAIN Resource Error"), MB_ICONERROR);
+            #endif
+                LOG_FUNC_EXIT_PARAMS(NULL)
+            }
         }
         CTL_TwainDLLHandle::s_ResourcesInitialized = true;
     }
@@ -739,11 +761,11 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitialize()
     try
     {
         pHandlePtr = std::make_unique<CTL_TwainDLLHandle>();
-        pHandle = pHandlePtr.get();
+        CTL_TwainDLLHandle* pHandle = pHandlePtr.get();
         CTL_TwainDLLHandle::s_DLLHandles.push_back(pHandlePtr);
-        dynarithmic::CTL_TwainDLLHandle::s_pLoggerCallback  = nullptr;
-        dynarithmic::CTL_TwainDLLHandle::s_pLoggerCallbackA = nullptr;
-        dynarithmic::CTL_TwainDLLHandle::s_pLoggerCallbackW = nullptr;
+        CTL_TwainDLLHandle::s_pLoggerCallback  = nullptr;
+        CTL_TwainDLLHandle::s_pLoggerCallbackA = nullptr;
+        CTL_TwainDLLHandle::s_pLoggerCallbackW = nullptr;
         #ifdef _WIN32
         pHandle->m_pSaveAsDlgProc = FileSaveAsHookProc;
         RegisterTwainWindowClass();
@@ -755,9 +777,9 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitialize()
         HookTwainDLL( pHandle, FALSE );
         if ( CTL_TwainDLLHandle::s_DLLHandles.size() == 1 )
         {
-            CTL_StringType iniName = _T(".ini");
-            CTL_StringType szName = _T("dtwain" DTWAIN_OSPLATFORM) + iniName;
-            CTL_StringType szLangDLL = _T("english");
+            const CTL_StringType iniName = _T(".ini");
+            CTL_StringType szName =  StringConversion::Convert_AnsiPtr_To_Native("dtwain" DTWAIN_OSPLATFORM) + iniName;
+            const CTL_StringType szLangDLL = _T("english");
             if (!CTL_TwainDLLHandle::s_sINIPath.empty())
             {
                 szName = CTL_TwainDLLHandle::s_sINIPath + szName;
@@ -771,9 +793,7 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitialize()
             pHandle->InitializeResourceRegistry();
 
             // Load customized resources from INI
-            LoadCustomResourcesFromIni(pHandle,
-                                       StringConversion::Convert_Native_To_Ansi(szLangDLL).c_str(),
-                                       StringConversion::Convert_Native_To_Ansi(szName).c_str());
+            LoadCustomResourcesFromIni(pHandle, szLangDLL.c_str(), szName.c_str());
 
             // Initialize imaging code
             FreeImage_Initialise(true);
@@ -788,23 +808,41 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitialize()
         CATCH_BLOCK(DTWAIN_HANDLE(0))
         LOG_FUNC_EXIT_PARAMS(NULL)
     }
+    catch (std::exception& ex)
+    {
+        if ( block )
+        {
+            MessageBoxA(nullptr, "DTWAIN Initialization Error", ex.what(), MB_ICONERROR);
+        }
+        else
+        {
+            LogToDebugMonitorA("DTWAIN Initialization Error\n");
+            LogToDebugMonitorA(ex.what());
+        }
+        LOG_FUNC_EXIT_PARAMS(NULL)
+    }
     catch(...)
     {
         LOG_FUNC_EXIT_PARAMS(NULL)
     }
 }
 
-void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, const char *szLangDLL, const char *szName)
+DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitialize()
 {
-    CTL_String szStr;
+    return SysInitializeHelper(true);
+}
+
+void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL, LPCTSTR szName)
+{
     // Load the resources
     CSimpleIniA customProfile;
     customProfile.LoadFile(szName);
-    szStr = customProfile.GetValue("Language", "dll", szLangDLL);
-    if (!LoadLanguageResource(szStr, pHandle->GetResourceRegistry()))
+    std::string szStr = customProfile.GetValue("Language", "dll",
+                                               StringConversion::Convert_NativePtr_To_Ansi(szLangDLL).c_str());
+    if (!LoadLanguageResourceA(szStr, pHandle->GetResourceRegistry()))
     {
         // Use the English resources by default
-        LoadLanguageResource("english", pHandle->GetResourceRegistry());
+        LoadLanguageResourceA("english", pHandle->GetResourceRegistry());
     }
     // Load error flags if defined
     struct ProfileSettingsInt
@@ -825,7 +863,7 @@ void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, const char *szLangD
         { "DSMErrorLogging", "BufferErrors", DTWAIN_LOG_USEBUFFER } };
     std::for_each(allIntProfiles, std::end(allIntProfiles), [&](const ProfileSettingsInt& ps)
     {
-        auto nVal = customProfile.GetLongValue(ps.section, ps.name, 0);
+        const auto nVal = customProfile.GetLongValue(ps.section, ps.name, 0);
         if (nVal != 0)
             CTL_TwainDLLHandle::s_lErrorFilterFlags |= ps.orValue;
     });
@@ -843,7 +881,7 @@ void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, const char *szLangD
     {
         CTL_TwainDLLHandle::s_lErrorFilterFlags |= DTWAIN_LOG_USEFILE;
         OpenLogFile(StringConversion::Convert_Ansi_To_Native(szStr).c_str(), CTL_TwainDLLHandle::s_lErrorFilterFlags);
-        CTL_TwainDLLHandle::s_appLog.StatusOutFast(_T("In DTWAIN_SysInitialize()"));
+        CTL_TwainDLLHandle::s_appLog.StatusOutFast("In DTWAIN_SysInitialize()");
     }
 
     nVal = customProfile.GetLongValue("DSMErrorLogging", "BufferErrorThreshold", 50);
@@ -851,7 +889,7 @@ void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, const char *szLangD
         DTWAIN_SetErrorBufferThreshold(nVal);
 
     nVal = customProfile.GetLongValue("DSMErrorLogging", "AppHandlesExceptions", 0);
-    CTL_TwainDLLHandle::s_bThrowExceptions = (nVal == 0 ? false : true);
+    CTL_TwainDLLHandle::s_bThrowExceptions = nVal == 0 ? false : true;
 }
 
 
@@ -864,14 +902,14 @@ void LoadStaticData(CTL_TwainDLLHandle* pHandle)
         int TwainFloatTypes[] = {TWTY_FIX32};
         int TwainFrameTypes[] = {TWTY_FRAME};
         int DTwainArrayTypes[] = {DTWAIN_ARRAYLONG, DTWAIN_ARRAYSTRING, DTWAIN_ARRAYFLOAT, DTWAIN_ARRAYFRAME};
-        int NumTwainTypes[] = {sizeof(TwainIntTypes) / sizeof(TwainIntTypes[0]),
-                                     sizeof(TwainStringTypes) / sizeof(TwainStringTypes[0]),
-                                     sizeof(TwainFloatTypes) / sizeof(TwainFloatTypes[0]),
-                                     sizeof(TwainFrameTypes) / sizeof(TwainFrameTypes[0])
+        const int NumTwainTypes[] = {sizeof TwainIntTypes / sizeof TwainIntTypes[0],
+                                     sizeof TwainStringTypes / sizeof TwainStringTypes[0],
+                                     sizeof TwainFloatTypes / sizeof TwainFloatTypes[0],
+                                     sizeof TwainFrameTypes / sizeof TwainFrameTypes[0]
                                     };
         int *intArray[] = {TwainIntTypes, TwainStringTypes, TwainFloatTypes, TwainFrameTypes};
 
-        size_t nNumAllTypes = sizeof(NumTwainTypes) / sizeof(NumTwainTypes[0]);
+        const size_t nNumAllTypes = sizeof NumTwainTypes / sizeof NumTwainTypes[0];
         for (size_t i = 0; i < nNumAllTypes; ++i)
         {
             std::vector<LONG> TwainType(intArray[i], intArray[i] + NumTwainTypes[i]);
@@ -885,14 +923,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLog(LONG LogFlags, LPCTSTR lpszLogFile)
 {
     LOG_FUNC_ENTRY_PARAMS((LogFlags, lpszLogFile))
     CTL_TwainDLLHandle::s_lErrorFilterFlags = LogFlags;
-    if ((UserDefinedLoggerExists() || CTL_TwainDLLHandle::s_lErrorFilterFlags ) && (LogFlags == 0))
+    if ((UserDefinedLoggerExists() || CTL_TwainDLLHandle::s_lErrorFilterFlags ) && LogFlags == 0)
         CTL_TwainDLLHandle::s_appLog.PrintBanner(false);
     else
     {
         if ( LogFlags && !UserDefinedLoggerExists())
             CTL_TwainDLLHandle::s_lErrorFilterFlags |= DTWAIN_LOG_WRITE;
 
-        bool append = (LogFlags & DTWAIN_LOG_FILEAPPEND)?true:false;
+        const bool append = LogFlags & DTWAIN_LOG_FILEAPPEND?true:false;
         OpenLogFile(lpszLogFile, LogFlags, append);
 
         // Write the version info
@@ -902,6 +940,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLog(LONG LogFlags, LPCTSTR lpszLogFile)
     CATCH_BLOCK(false)
 }
 
+/*DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLogFilter(LPCTSTR szTripletFilter, BOOL bIncludeSet)
+{
+    LOG_FUNC_ENTRY_PARAMS((szTripletFilter, bIncludeSet))
+    if ((UserDefinedLoggerExists() || CTL_TwainDLLHandle::s_lErrorFilterFlags) && (LogFlags == 0))
+        CTL_TwainDLLHandle::s_appLog.PrintBanner(false);
+*/
 bool dynarithmic::UserDefinedLoggerExists()
 {
     return CTL_TwainDLLHandle::s_pLoggerCallback || CTL_TwainDLLHandle::s_pLoggerCallbackA || CTL_TwainDLLHandle::s_pLoggerCallbackW;
@@ -913,15 +957,59 @@ void dynarithmic::WriteUserDefinedLogMsg(LPCTSTR sz)
         CTL_TwainDLLHandle::s_pLoggerCallback(sz, CTL_TwainDLLHandle::s_pLoggerCallback_UserData);
     if (CTL_TwainDLLHandle::s_pLoggerCallbackA)
 #ifdef _UNICODE
-        CTL_TwainDLLHandle::s_pLoggerCallbackA(StringConversion::Convert_Native_To_Ansi(sz).c_str(), CTL_TwainDLLHandle::s_pLoggerCallback_UserDataA);
+        WriteUserDefinedLogMsgA(StringConversion::Convert_Native_To_Ansi(sz).c_str());
 #else
-        CTL_TwainDLLHandle::s_pLoggerCallbackA(sz, CTL_TwainDLLHandle::s_pLoggerCallback_UserDataA);
+        WriteUserDefinedLogMsgA(sz);
 #endif
     if (CTL_TwainDLLHandle::s_pLoggerCallbackW)
 #ifdef _UNICODE
-        CTL_TwainDLLHandle::s_pLoggerCallbackW(sz, CTL_TwainDLLHandle::s_pLoggerCallback_UserDataW);
+        WriteUserDefinedLogMsgW(sz);
 #else
-        CTL_TwainDLLHandle::s_pLoggerCallbackW(StringConversion::Convert_Native_To_Wide(sz).c_str(), CTL_TwainDLLHandle::s_pLoggerCallback_UserDataW);
+        WriteUserDefinedLogMsgW(StringConversion::Convert_NativePtr_To_Wide(sz).c_str());
+#endif
+}
+
+void dynarithmic::WriteUserDefinedLogMsgA(LPCSTR sz)
+{
+    if (CTL_TwainDLLHandle::s_pLoggerCallbackA)
+        CTL_TwainDLLHandle::s_pLoggerCallbackA(sz, CTL_TwainDLLHandle::s_pLoggerCallback_UserDataA);
+
+    if (CTL_TwainDLLHandle::s_pLoggerCallback)
+#ifdef _UNICODE
+        CTL_TwainDLLHandle::s_pLoggerCallback(StringConversion::Convert_Ansi_To_Native(sz).c_str(),
+                                              CTL_TwainDLLHandle::s_pLoggerCallback_UserData);
+#else
+        CTL_TwainDLLHandle::s_pLoggerCallback(sz, CTL_TwainDLLHandle::s_pLoggerCallback_UserData);
+#endif
+    if (CTL_TwainDLLHandle::s_pLoggerCallbackW)
+#ifdef _UNICODE
+        CTL_TwainDLLHandle::s_pLoggerCallbackW(StringConversion::Convert_Ansi_To_Native(sz).c_str(),
+                                               CTL_TwainDLLHandle::s_pLoggerCallback_UserDataW);
+#else
+        CTL_TwainDLLHandle::s_pLoggerCallbackW(StringConversion::Convert_Native_To_Wide(sz).c_str(),
+                                                CTL_TwainDLLHandle::s_pLoggerCallback_UserDataW);
+#endif
+}
+
+void dynarithmic::WriteUserDefinedLogMsgW(LPCWSTR sz)
+{
+    if (CTL_TwainDLLHandle::s_pLoggerCallbackW)
+        CTL_TwainDLLHandle::s_pLoggerCallbackW(sz, CTL_TwainDLLHandle::s_pLoggerCallback_UserDataW);
+
+    if (CTL_TwainDLLHandle::s_pLoggerCallback)
+#ifdef _UNICODE
+        CTL_TwainDLLHandle::s_pLoggerCallback(sz, CTL_TwainDLLHandle::s_pLoggerCallback_UserData);
+#else
+        CTL_TwainDLLHandle::s_pLoggerCallback(StringConversion::Convert_Wide_To_Native(sz).c_str(),
+                                              CTL_TwainDLLHandle::s_pLoggerCallback_UserData);
+#endif
+    if (CTL_TwainDLLHandle::s_pLoggerCallbackA)
+#ifdef _UNICODE
+        CTL_TwainDLLHandle::s_pLoggerCallbackA(StringConversion::Convert_Native_To_Ansi(sz).c_str(),
+                                               CTL_TwainDLLHandle::s_pLoggerCallback_UserDataA);
+#else
+        CTL_TwainDLLHandle::s_pLoggerCallbackA(StringConversion::Convert_Wide_To_Native(sz).c_str(),
+                                               CTL_TwainDLLHandle::s_pLoggerCallback_UserDataA);
 #endif
 }
 
@@ -933,6 +1021,8 @@ void OpenLogFile(LPCTSTR pFileName, LONG logFlags, bool bAppend)
         CTL_TwainDLLHandle::s_appLog.InitConsoleLogging(CTL_TwainDLLHandle::s_DLLInstance);
     if ( logFlags & DTWAIN_LOG_DEBUGMONITOR)
         CTL_TwainDLLHandle::s_appLog.InitDebugWindowLogging(CTL_TwainDLLHandle::s_DLLInstance);
+    if ( !(logFlags & DTWAIN_LOG_NOCALLBACK) )
+        CTL_TwainDLLHandle::s_appLog.InitCallbackLogging(CTL_TwainDLLHandle::s_DLLInstance);
     CTL_TwainDLLHandle::s_appLog.PrintTime(true);
     CTL_TwainDLLHandle::s_appLog.PrintAppName(true);
     CTL_TwainDLLHandle::s_appLog.PrintBanner();
@@ -942,9 +1032,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCountry(LONG nCountry)
 {
     LOG_FUNC_ENTRY_PARAMS((nCountry))
     // See if DLL Handle exists
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    pHandle->m_SessionStruct.nCountry = (TW_UINT16)nCountry;
+    pHandle->m_SessionStruct.nCountry = static_cast<TW_UINT16>(nCountry);
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -953,9 +1043,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetLanguage(LONG nLanguage)
 {
     LOG_FUNC_ENTRY_PARAMS((nLanguage))
     // See if DLL Handle exists
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    pHandle->m_SessionStruct.nLanguage = (TW_UINT16)nLanguage;
+    pHandle->m_SessionStruct.nLanguage = static_cast<TW_UINT16>(nLanguage);
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -964,7 +1054,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCountry()
 {
     LOG_FUNC_ENTRY_PARAMS(())
     // See if DLL Handle exists
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex( pHandle, DTWAIN_FAILURE1, FUNC_MACRO);
     LOG_FUNC_EXIT_PARAMS(pHandle->m_SessionStruct.nCountry)
     CATCH_BLOCK(DTWAIN_FAILURE1)
@@ -974,7 +1064,7 @@ LONG DLLENTRY_DEF DTWAIN_GetLanguage()
 {
     LOG_FUNC_ENTRY_PARAMS(())
     // See if DLL Handle exists
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex( pHandle, DTWAIN_FAILURE1, FUNC_MACRO);
     LOG_FUNC_EXIT_PARAMS(pHandle->m_SessionStruct.nLanguage)
     CATCH_BLOCK(DTWAIN_FAILURE1)
@@ -984,7 +1074,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAppInfo(LPCTSTR szVerStr, LPCTSTR szManu, LPC
 {
     LOG_FUNC_ENTRY_PARAMS((szVerStr, szManu, szProdFam, szProdName))
     // See if DLL Handle exists
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     if ( szVerStr )
         pHandle->m_SessionStruct.szVersion = szVerStr;
@@ -1014,7 +1104,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAppInfo(LPTSTR szVerStr, LPTSTR szManu, LPTST
 
     LOG_FUNC_ENTRY_PARAMS((szVerStr, szManu, szProdFam, szProdName))
     // See if DLL Handle exists
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     if ( szVerStr )
         std::copy(pHandle->m_SessionStruct.szVersion.begin(), pHandle->m_SessionStruct.szVersion.end(), szVerStr);
@@ -1032,7 +1122,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAppInfo(LPTSTR szVerStr, LPTSTR szManu, LPTST
 DTWAIN_BOOL DTWAIN_SetSourceCloseMode(LONG lCloseMode)
 {
     LOG_FUNC_ENTRY_PARAMS((lCloseMode))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     pHandle->m_nSourceCloseMode = lCloseMode?true:false;
@@ -1043,7 +1133,7 @@ DTWAIN_BOOL DTWAIN_SetSourceCloseMode(LONG lCloseMode)
 LONG DTWAIN_GetSourceCloseMode()
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex( pHandle, false, FUNC_MACRO);
     LOG_FUNC_EXIT_PARAMS(pHandle->m_nSourceCloseMode)
@@ -1053,7 +1143,7 @@ LONG DTWAIN_GetSourceCloseMode()
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSessionEnabled()
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
@@ -1067,13 +1157,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSessionEnabled()
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lpszDLLName)
 {
     LOG_FUNC_ENTRY_PARAMS((hWndMsgNotify, lpszDLLName))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     if ( pHandle->m_bSessionAllocated )
         LOG_FUNC_EXIT_PARAMS(true)
 
+    const CTL_StringType sDLLName = lpszDLLName?lpszDLLName:StringWrapper::traits_type::GetEmptyString();
 #ifdef _WIN32
     HWND hWndMsg;
     HINSTANCE hInstance;
@@ -1082,7 +1173,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lp
     if ( !hWndMsgNotify )
     {
         // Create the window
-        hWndMsg = CreateTwainWindow(pHandle,0,hWndMsgNotify);
+        hWndMsg = CreateTwainWindow(pHandle,nullptr,hWndMsgNotify);
 
         // This is the window's instance handle
         hInstance = CTL_TwainDLLHandle::s_DLLInstance;
@@ -1101,7 +1192,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lp
         #ifdef DTWAIN_LIB
         hInstance = CTL_TwainDLLHandle::s_DLLInstance;
         #else
-        hInstance = (HINSTANCE)GetWindowLongPtr(hWndMsg, GWLP_HINSTANCE);
+        hInstance = reinterpret_cast<HINSTANCE>(GetWindowLongPtr(hWndMsg, GWLP_HINSTANCE));
         #endif
     }
     // Error if the window does not exist
@@ -1114,15 +1205,21 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lp
     hInstance = CTL_TwainDLLHandle::s_DLLInstance;
     HWND hWndMsg;
 #endif
-    CTL_String szName = boost::dll::symbol_location(DTWAIN_DLLNAME).string();
+
+#ifdef _UNICODE
+    const CTL_StringType szName = boost::dll::symbol_location(DTWAIN_DLLNAME).wstring();
+#else
+    CTL_StringType szName = boost::dll::symbol_location(DTWAIN_DLLNAME).string();
+#endif
 
     // See if we need to create a TWAIN application manager
     if ( !CTL_TwainAppMgr::GetInstance() )
     {
         // Create it with the parameters shown
-        if ( !CTL_TwainAppMgr::Create(hInstance,
+        if ( !CTL_TwainAppMgr::Create(pHandle,
+                                      hInstance,
                                       CTL_TwainDLLHandle::s_DLLInstance,
-                                      lpszDLLName) )
+                                      lpszDLLName?sDLLName.c_str():nullptr) )
         {
             if ( pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_LATESTVERSION )
                DTWAIN_Check_Error_Condition_1_Ex(pHandle, [] { return 1;}, DTWAIN_ERR_TWAINOPENSOURCEDSMNOTFOUND, false, FUNC_MACRO);
@@ -1131,8 +1228,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lp
     }
 
     // Create a session
-    CTL_TwainSession Session =
-        CTL_TwainAppMgr::CreateTwainSession( StringConversion::Convert_Ansi_To_Native(szName).c_str(), &hWndMsg,
+    auto Session =
+        CTL_TwainAppMgr::CreateTwainSession( szName.c_str(), &hWndMsg,
                                              pHandle->m_SessionStruct.nMajorNum,
                                              pHandle->m_SessionStruct.nMinorNum,
                                              static_cast<CTL_TwainLanguageEnum>(pHandle->m_SessionStruct.nLanguage),
@@ -1142,18 +1239,18 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lp
                                              pHandle->m_SessionStruct.szFamily.c_str(),
                                              pHandle->m_SessionStruct.szProduct.c_str());
 
-    if ( static_cast<CTL_ITwainSession*>(Session) == NULL )
+    if ( Session == nullptr)
     {
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, []{return 1;}, DTWAIN_ERR_TWAIN, false, FUNC_MACRO);
     }
     #ifdef DTWAIN_LIB
     CTL_TwainAppMgr::SetDLLInstance( CTL_TwainDLLHandle::s_DLLInstance );
     #else
-    CTL_TwainAppMgr::SetDLLInstance( (HINSTANCE)GetDLLInstance() );
+    CTL_TwainAppMgr::SetDLLInstance( static_cast<HINSTANCE>(GetDLLInstance()) );
     #endif
 
     pHandle->m_pAppMgr     = CTL_TwainAppMgr::GetInstance().get();
-    pHandle->m_Session     = Session;
+    pHandle->m_pTwainSession = Session;
     pHandle->m_hInstance   = hInstance;
 
     // We may need to route the messages to the user.  The user window
@@ -1169,10 +1266,105 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lp
     if ( !pHandle->m_bUseProxy )
         pHandle->m_hOrigProc = SubclassTwainMsgWindow(hWndMsgNotify);
     else
-        pHandle->m_hOrigProc = NULL;
+        pHandle->m_hOrigProc = nullptr;
     #endif
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
+}
+
+static DTWAIN_ARRAY GetFileTypes(int nType)
+{
+    constexpr const char *sNames[] = { "","-Single","-Multi" };
+    DTWAIN_ARRAY aFileTypes = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 0);
+    if (aFileTypes)
+    {
+        const auto& availableFileTypes = CTL_TwainDLLHandle::GetAvailableFileFormatsMap();
+        for (auto& pr : availableFileTypes)
+        {
+            if (StringWrapperA::EndsWith(pr.second.m_formatName, sNames[nType]))
+                DTWAIN_ArrayAddLong(aFileTypes, pr.first);
+        }
+    }
+    return aFileTypes;
+}
+
+static std::string GetFileTypeExtensionsInternal(int nType)
+{
+    const auto& availableFileTypes = CTL_TwainDLLHandle::GetAvailableFileFormatsMap();
+    const auto iter = availableFileTypes.find(nType);
+    if ( iter != availableFileTypes.end())
+        return StringWrapperA::Join(iter->second.m_vExtensions, "|");
+    return {};
+}
+
+static std::string GetFileTypeNameInternal(int nType)
+{
+    const auto& availableFileTypes = CTL_TwainDLLHandle::GetAvailableFileFormatsMap();
+    const auto iter = availableFileTypes.find(nType);
+    if (iter != availableFileTypes.end())
+        return iter->second.m_formatName;
+    return{};
+}
+
+template <typename Fn>
+static LONG GetFileTypeInfo(Fn infoFn, int nType, LPTSTR lpszName, LONG nMaxLen)
+{
+    LONG realLen = -1;
+    std::string str = infoFn(nType);
+    if (!str.empty())
+    {
+        const CTL_StringType str2 = StringConversion::Convert_Ansi_To_Native(str);
+        realLen = StringWrapper::CopyInfoToCString(str2, lpszName, nMaxLen);
+    }
+    return realLen;
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetFileTypeName(LONG nType, LPTSTR lpszName, LONG nMaxLen)
+{
+    LOG_FUNC_ENTRY_PARAMS((nType, lpszName, nMaxLen))
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    DTWAIN_Check_Bad_Handle_Ex(pHandle, -1, FUNC_MACRO);
+    LOG_FUNC_EXIT_PARAMS(GetFileTypeInfo(&GetFileTypeNameInternal, nType, lpszName, nMaxLen))
+    CATCH_BLOCK(-1)
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetFileTypeExtensions(LONG nType, LPTSTR lpszName, LONG nMaxLen)
+{
+    LOG_FUNC_ENTRY_PARAMS((nType, lpszName, nMaxLen))
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    DTWAIN_Check_Bad_Handle_Ex(pHandle, -1, FUNC_MACRO);
+    LOG_FUNC_EXIT_PARAMS(GetFileTypeInfo(&GetFileTypeExtensionsInternal, nType, lpszName, nMaxLen))
+    CATCH_BLOCK(-1)
+}
+
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSupportedFileTypes(VOID_PROTOTYPE)
+{
+    LOG_FUNC_ENTRY_PARAMS(())
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    // See if DLL Handle exists
+    DTWAIN_Check_Bad_Handle_Ex(pHandle, nullptr, FUNC_MACRO);
+    LOG_FUNC_EXIT_PARAMS(GetFileTypes(0))
+    CATCH_BLOCK(nullptr)
+}
+
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSupportedMultiPageFileTypes(VOID_PROTOTYPE)
+{
+    LOG_FUNC_ENTRY_PARAMS(())
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    // See if DLL Handle exists
+    DTWAIN_Check_Bad_Handle_Ex(pHandle, nullptr, FUNC_MACRO);
+    LOG_FUNC_EXIT_PARAMS(GetFileTypes(2))
+    CATCH_BLOCK(nullptr)
+}
+
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSupportedSinglePageFileTypes(VOID_PROTOTYPE)
+{
+    LOG_FUNC_ENTRY_PARAMS(())
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    // See if DLL Handle exists
+    DTWAIN_Check_Bad_Handle_Ex(pHandle, nullptr, FUNC_MACRO);
+    LOG_FUNC_EXIT_PARAMS(GetFileTypes(1))
+    CATCH_BLOCK(nullptr)
 }
 
 static HMODULE GetDLLInstance()
@@ -1185,17 +1377,17 @@ static HMODULE GetDLLInstance()
 }
 
 
-static bool HookTwainDLL(CTL_TwainDLLHandle *pHandle, bool /*bHook*/)
+static bool HookTwainDLL(CTL_TwainDLLHandle* pHandle, bool /*bHook*/)
 {
     if ( !pHandle )
          return false;
-    DWORD hTask = getThreadId();
+    const DWORD hTask = getThreadId();
 
     // Get the pointers to the hook functions
-    HHOOK proc1 = NULL;
-    HHOOK proc2 = NULL;
+    const HHOOK proc1 = nullptr;
+    const HHOOK proc2 = nullptr;
 
-    CTL_HookInfo Info( hTask, proc1, proc2, pHandle, false,0,0 );
+    const CTL_HookInfo Info( hTask, proc1, proc2, pHandle, false,0,0 );
     pHandle->s_aHookInfo.push_back( Info );
 
     return true;
@@ -1204,7 +1396,7 @@ static bool HookTwainDLL(CTL_TwainDLLHandle *pHandle, bool /*bHook*/)
 
 template <class TypeInfo, class TypeArray>
 bool FindFirstValue( TypeInfo SearchVal,
-                    vector<TypeArray> *pSearchArray,
+                    std::vector<TypeArray> *pSearchArray,
                     int *pWhere/*=NULL*/ )
 {
     if ( pWhere )
@@ -1224,8 +1416,8 @@ static bool FindTask( DWORD hTask, int *pWhere )
     if (pWhere)
         *pWhere = -1;
 
-    CTL_HookInfoArray::iterator it = std::find_if(CTL_TwainDLLHandle::s_aHookInfo.begin(), CTL_TwainDLLHandle::s_aHookInfo.end(), [&](const CTL_HookInfo& Info)
-                                                 { return std::get<0>(Info) == hTask; });
+    const CTL_HookInfoArray::iterator it = std::find_if(CTL_TwainDLLHandle::s_aHookInfo.begin(), CTL_TwainDLLHandle::s_aHookInfo.end(), [&](const CTL_HookInfo& Info)
+                                                        { return std::get<0>(Info) == hTask; });
     if ( it != CTL_TwainDLLHandle::s_aHookInfo.end() )
     {
         if ( pWhere )
@@ -1239,11 +1431,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
 {
     LOG_FUNC_ENTRY_PARAMS(())
     // Delete it
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]{return (DTWAIN_IsAcquiring()==1);}, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]{return DTWAIN_IsAcquiring()==1;}, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
 
     // Check if any source is still acquiring
     if ( pHandle->m_nSourceCloseMode == DTWAIN_SourceCloseModeFORCE )
@@ -1252,7 +1444,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
         DTWAIN_CloseAllSources();
     }
     else
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return (DTWAIN_IsAcquiring()==1);}, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return DTWAIN_IsAcquiring()==1;}, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
 
     if ( !pHandle->m_bSessionAllocated )
         LOG_FUNC_EXIT_PARAMS(true)
@@ -1261,20 +1453,20 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
     {
         try
         {
-            CTL_TwainAppMgr::CloseSourceManager(pHandle->m_Session);
+            CTL_TwainAppMgr::CloseSourceManager(pHandle->m_pTwainSession);
         }
         catch(...)
         {
-            CTL_TwainAppMgr::WriteLogInfo(_T("Error in closing Twain DSM\n"));
+            CTL_TwainAppMgr::WriteLogInfoA("Error in closing Twain DSM\n");
         }
 
         try
         {
-            CTL_TwainAppMgr::DestroyTwainSession(pHandle->m_Session);
+            CTL_TwainAppMgr::DestroyTwainSession(pHandle->m_pTwainSession);
         }
         catch(...)
         {
-            CTL_TwainAppMgr::WriteLogInfo(_T("Error in closing Twain Session\n"));
+            CTL_TwainAppMgr::WriteLogInfoA("Error in closing Twain Session\n");
         }
         if ( CTL_TwainDLLHandle::s_DLLHandles.size() == 1 )
         {
@@ -1284,10 +1476,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
             }
             catch(...)
             {
-                CTL_TwainAppMgr::WriteLogInfo(_T("Error in closing DTWAIN Manager\n"));
+                CTL_TwainAppMgr::WriteLogInfoA("Error in closing DTWAIN Manager\n");
             }
         }
-        CTL_TwainAppMgr::WriteLogInfo(_T("TWAIN Source Manager, Session, and DTWAIN closed successfully\n"));
+        CTL_TwainAppMgr::WriteLogInfoA("TWAIN Source Manager, Session, and DTWAIN closed successfully\n");
     }
 
     // Remove the hook
@@ -1297,9 +1489,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
     if ( pHandle->m_bUseProxy ) //hWndTwain )
     {
         pHandle->m_CallbackMsg = nullptr;
-        if ( ::IsWindow(pHandle->m_hWndTwain))
+        if (IsWindow(pHandle->m_hWndTwain))
             try {
-            ::DestroyWindow(pHandle->m_hWndTwain);
+                DestroyWindow(pHandle->m_hWndTwain);
         }
         catch(...) {}
     }
@@ -1313,13 +1505,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
         }
         catch(...)
         {
-            CTL_TwainAppMgr::WriteLogInfo(_T("Could not remove subclass from user window\n"));
+            CTL_TwainAppMgr::WriteLogInfoA("Could not remove subclass from user window\n");
         }
     }
-    pHandle->m_hWndTwain = NULL;
-    pHandle->m_hOrigProc = NULL;
+    pHandle->m_hWndTwain = nullptr;
+    pHandle->m_hOrigProc = nullptr;
     #endif
-    pHandle->m_bSessionAllocated = false;
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -1327,13 +1518,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SysDestroy()
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     if (!DTWAIN_EndTwainSession())
         LOG_FUNC_EXIT_PARAMS(false)
-    DTWAIN_BOOL bRet = SysDestroyHelper(pHandle);
+    const DTWAIN_BOOL bRet = SysDestroyHelper(pHandle);
 
 #ifdef DTWAIN_DEBUG_CALL_STACK
     if (CTL_TwainDLLHandle::s_lErrorFilterFlags)
@@ -1349,7 +1540,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SysDestroy()
     CATCH_BLOCK(false)
 }
 
-static bool SysDestroyHelper(CTL_TwainDLLHandle *pHandle, bool bCheck)
+static bool SysDestroyHelper(CTL_TwainDLLHandle* pHandle, bool bCheck)
 {
     #ifdef _WIN32
     // Unload the OCR interfaces
@@ -1358,30 +1549,29 @@ static bool SysDestroyHelper(CTL_TwainDLLHandle *pHandle, bool bCheck)
     // Remove the handle
     int nWhere;
 
-    vector<CTL_TwainDLLHandlePtr>::iterator it;
-    it = find_if(CTL_TwainDLLHandle::s_DLLHandles.begin(),
-                 CTL_TwainDLLHandle::s_DLLHandles.end(),
-                 SmartPointerFinder<CTL_TwainDLLHandlePtr>(pHandle));
+    std::vector<CTL_TwainDLLHandlePtr>::iterator it = find_if(CTL_TwainDLLHandle::s_DLLHandles.begin(),
+                                                         CTL_TwainDLLHandle::s_DLLHandles.end(),
+                                                         SmartPointerFinder<CTL_TwainDLLHandlePtr>(pHandle));
     if ( it == CTL_TwainDLLHandle::s_DLLHandles.end() )
         return false;
 
     UnhookAllDisplays();
     // Remove the function hooks
-    DWORD hTask = getThreadId();
+    const DWORD hTask = getThreadId();
 
     bool bOk;
 #ifdef DTWAIN_LIB
     bOk = true;
     nWhere = 0;
 #else
-    bOk = ::FindTask( hTask, &nWhere );
+    bOk = FindTask( hTask, &nWhere );
 #endif
     if ( bOk || !bCheck )
         pHandle->s_aHookInfo.erase(pHandle->s_aHookInfo.begin() +  nWhere );
 
     // Remove the handle
-    pHandle->m_CallbackMsg   = NULL;
-    pHandle->m_CallbackError = NULL;
+    pHandle->m_CallbackMsg   = nullptr;
+    pHandle->m_CallbackError = nullptr;
     CTL_TwainDLLHandle::s_DLLHandles.erase( it );
 
     #ifdef DTWAIN_LIB
@@ -1408,18 +1598,18 @@ static bool SysDestroyHelper(CTL_TwainDLLHandle *pHandle, bool bCheck)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsAcquiring()
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    CTL_HookInfoArray::iterator it = std::find_if(CTL_TwainDLLHandle::s_aHookInfo.begin(),
-                                                  CTL_TwainDLLHandle::s_aHookInfo.end(), [&](const CTL_HookInfo& hookInfo)
-                                                  {
-                                                       CTL_TwainDLLHandle* pHandle = std::get<3>(hookInfo);
-                                                       if (!pHandle)
-                                                           return false;
+    const CTL_HookInfoArray::iterator it = std::find_if(CTL_TwainDLLHandle::s_aHookInfo.begin(),
+                                                            CTL_TwainDLLHandle::s_aHookInfo.end(), [&](const CTL_HookInfo& hookInfo)
+                                                            {
+                                                                CTL_TwainDLLHandle* pHandle = std::get<3>(hookInfo);
+                                                                if (!pHandle)
+                                                                    return false;
 
-                                                       CTL_MAPSTRTOSOURCE::iterator it = std::find_if(pHandle->m_mapStringToSource.begin(),
-                                                           pHandle->m_mapStringToSource.end(), [&](const CTL_MAPSTRTOSOURCE::value_type& vt) {return (vt.second)->IsAcquireAttempt(); });
+                                                                const CTL_StringToSourcePtrMap::iterator it = std::find_if(pHandle->m_mapStringToSource.begin(),
+                                                                                                                           pHandle->m_mapStringToSource.end(), [&](const CTL_StringToSourcePtrMap::value_type& vt) {return vt.second->IsAcquireAttempt(); });
 
-                                                       return (it != pHandle->m_mapStringToSource.end());
-                                                  });
+                                                                return it != pHandle->m_mapStringToSource.end();
+                                                            });
     if ( it != CTL_TwainDLLHandle::s_aHookInfo.end() )
          LOG_FUNC_EXIT_PARAMS(true)
     LOG_FUNC_EXIT_PARAMS(false)
@@ -1429,7 +1619,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsAcquiring()
 HWND  DLLENTRY_DEF  DTWAIN_GetTwainHwnd()
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, NULL, FUNC_MACRO);
     LOG_FUNC_EXIT_PARAMS(pHandle->m_hWndTwain)
     CATCH_BLOCK(HWND(0))
@@ -1440,12 +1630,12 @@ LONG DTWAIN_CloseAllSources()
     LOG_FUNC_ENTRY_PARAMS(())
 
     // See if DLL Handle exists
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex( pHandle, -1L, FUNC_MACRO);
     if ( pHandle->m_mapStringToSource.empty() )
         LOG_FUNC_EXIT_PARAMS(0)
-    CTL_MAPSTRTOSOURCE m_mapTemp = pHandle->m_mapStringToSource;
-    std::for_each(m_mapTemp.begin(), m_mapTemp.end(), [&](CTL_MAPSTRTOSOURCE::value_type& vt)
+    CTL_StringToSourcePtrMap m_mapTemp = pHandle->m_mapStringToSource;
+    std::for_each(m_mapTemp.begin(), m_mapTemp.end(), [&](CTL_StringToSourcePtrMap::value_type& vt)
     {
         CTL_ITwainSource *pSource = vt.second;
         if (pSource->IsAcquireAttempt())
@@ -1460,7 +1650,7 @@ LONG DTWAIN_CloseAllSources()
 LONG DLLENTRY_DEF DTWAIN_GetTwainMode()
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex( pHandle, -1L, FUNC_MACRO);
     LOG_FUNC_EXIT_PARAMS(pHandle->m_lAcquireMode)
     CATCH_BLOCK(-1L)
@@ -1469,7 +1659,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainMode()
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainMode(LONG lMode)
 {
     LOG_FUNC_ENTRY_PARAMS((lMode))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex( pHandle, false, FUNC_MACRO);
 
     switch (lMode)
@@ -1488,7 +1678,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainMode(LONG lMode)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTIFFSupported(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex( pHandle, false, FUNC_MACRO);
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
@@ -1498,7 +1688,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTIFFSupported(VOID_PROTOTYPE)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPDFSupported(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex( pHandle, false, FUNC_MACRO);
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
@@ -1506,7 +1696,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPDFSupported(VOID_PROTOTYPE)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPNGSupported(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex( pHandle, false, FUNC_MACRO);
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
@@ -1514,7 +1704,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPNGSupported(VOID_PROTOTYPE)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsJPEGSupported(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex( pHandle, false, FUNC_MACRO);
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
@@ -1523,7 +1713,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsJPEGSupported(VOID_PROTOTYPE)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainDSM(LONG DSMType)
 {
     LOG_FUNC_ENTRY_PARAMS((DSMType))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex( pHandle, false, FUNC_MACRO);
     #ifndef WIN64
     if ( DSMType == DTWAIN_TWAINDSM_LEGACY || DSMType == DTWAIN_TWAINDSM_LATESTVERSION)
@@ -1556,7 +1746,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDSMSearchOrder(LONG SearchOrder)
 LONG DLLENTRY_DEF DTWAIN_GetDSMSearchOrder(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    LONG SearchOrder = CTL_TwainDLLHandle::s_TwainDSMSearchOrder;
+    const LONG SearchOrder = CTL_TwainDLLHandle::s_TwainDSMSearchOrder;
     LOG_FUNC_EXIT_PARAMS(SearchOrder)
     CATCH_BLOCK(false)
 }
@@ -1564,12 +1754,11 @@ LONG DLLENTRY_DEF DTWAIN_GetDSMSearchOrder(VOID_PROTOTYPE)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDSMSearchOrderEx(LPCTSTR SearchOrder, LPCTSTR UserDirectory)
 {
     LOG_FUNC_ENTRY_PARAMS((SearchOrder))
-    CTL_StringType strValidString = CheckSearchOrderString(SearchOrder);
+    const std::string strValidString = CheckSearchOrderString(StringConversion::Convert_NativePtr_To_Ansi(SearchOrder));
     if ( !strValidString.empty() )
     {
         CTL_TwainDLLHandle::s_TwainDSMSearchOrderStr = strValidString;
-        if ( UserDirectory )
-            CTL_TwainDLLHandle::s_TwainDSMUserDirectory = strValidString;
+        CTL_TwainDLLHandle::s_TwainDSMUserDirectory = UserDirectory?UserDirectory:StringWrapper::traits_type::GetEmptyString();
         CTL_TwainDLLHandle::s_TwainDSMSearchOrder = -1;
         LOG_FUNC_EXIT_PARAMS(TRUE)
     }
@@ -1588,7 +1777,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetResourcePath(LPCTSTR ResourcePath)
 LONG DLLENTRY_DEF DTWAIN_CallCallback(WPARAM wParam, LPARAM lParam, LONG UserData)
 {
     LOG_FUNC_ENTRY_PARAMS((wParam, lParam, UserData))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, -1L, FUNC_MACRO);
     LONG RetVal = 1;
     if (pHandle->m_pCallbackFn)
@@ -1605,107 +1794,158 @@ void UnhookAllDisplays()
 #endif
 }
 
-void dynarithmic::OutputDTWAINErrorA(CTL_TwainDLLHandle *pHandle, LPCSTR pFunc/*=NULL*/)
+void dynarithmic::OutputDTWAINErrorW(CTL_TwainDLLHandle* pHandle, LPCWSTR pFunc)
 {
     if ( pFunc )
-        OutputDTWAINError(pHandle, StringConversion::Convert_AnsiPtr_To_Native(pFunc).c_str());
+        OutputDTWAINError(pHandle, StringConversion::Convert_Wide_To_Ansi(pFunc).c_str());
     else
         OutputDTWAINError(pHandle);
 }
 
-void dynarithmic::OutputDTWAINError(CTL_TwainDLLHandle *pHandle, LPCTSTR pFunc/*=NULL*/)
+void dynarithmic::OutputDTWAINErrorA(CTL_TwainDLLHandle* pHandle, LPCSTR pFunc)
+{
+    OutputDTWAINError(pHandle, pFunc);
+}
+
+void dynarithmic::OutputDTWAINError(CTL_TwainDLLHandle* pHandle, LPCSTR pFunc)
 {
     if (!CTL_TwainDLLHandle::s_lErrorFilterFlags )
         return;
-    static const int MaxMessage=1024;
-    TCHAR szBuf[MaxMessage+1];
+    static constexpr int MaxMessage=1024;
+    char szBuf[MaxMessage+1];
     if ( !pHandle )
-        DTWAIN_GetErrorString( DTWAIN_ERR_BAD_HANDLE, szBuf,MaxMessage);
+        DTWAIN_GetErrorStringA( DTWAIN_ERR_BAD_HANDLE, szBuf,MaxMessage);
     else
-        DTWAIN_GetErrorString( pHandle->m_lLastError, szBuf, MaxMessage);
-    CTL_StringType s(szBuf);
-    s += _T("\n");
-    if ( !pHandle || (pHandle && pHandle->s_bProcessError) )
-        CTL_TwainAppMgr::WriteLogInfo(s);
+        DTWAIN_GetErrorStringA( pHandle->m_lLastError, szBuf, MaxMessage);
+    std::string s(szBuf);
+    s += "\n";
+    if ( !pHandle || pHandle->s_bProcessError)
+        CTL_TwainAppMgr::WriteLogInfoA(s);
+
     if ( CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_ERRORMSGBOX && pHandle)
         LogDTWAINErrorToMsgBox(pHandle->m_lLastError, pFunc, s);
     else
-    if ( !pHandle && (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_INITFAILURE ))
-        LogDTWAINErrorToMsgBox(DTWAIN_ERR_BAD_HANDLE, NULL, s);
+    if ( !pHandle && CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_INITFAILURE)
+        LogDTWAINErrorToMsgBox(DTWAIN_ERR_BAD_HANDLE, nullptr, s);
 }
 
 
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AppHandlesExceptions(DTWAIN_BOOL bSet)
 {
-    CTL_TwainDLLHandle::s_bThrowExceptions = (bSet?true:false);
+    CTL_TwainDLLHandle::s_bThrowExceptions = bSet?true:false;
     return TRUE;
 }
 
 
-CTL_StringType GetStaticLibVer()
+std::string GetStaticLibVer()
 {
-    LONG nVer = DTWAIN_GetStaticLibVersion();
+    const LONG nVer = DTWAIN_GetStaticLibVersion();
     if ( nVer != 0 )
     {
         switch (nVer)
         {
             case 10:
-                return _T("Microsoft Visual C++ 5.0");
+                return "Microsoft Visual C++ 5.0";
             case 11:
-                return _T("Microsoft Visual C++ 6.0");
+                return "Microsoft Visual C++ 6.0";
             case 12:
-                return _T("Microsoft Visual C++ 7.0");
+                return "Microsoft Visual C++ 7.0";
             case 18:
-                return _T("Microsoft Visual Studio 2003");
+                return "Microsoft Visual Studio 2003";
             case 20:
-                return _T("Microsoft Visual Studio 2005");
+                return "Microsoft Visual Studio 2005";
             case 21:
-                return _T("Microsoft Visual Studio 2008");
+                return "Microsoft Visual Studio 2008";
             case 31:
-                return _T("Microsoft Visual Studio 2010");
+                return "Microsoft Visual Studio 2010";
             case 41:
-                return _T("Microsoft Visual Studio 2012");
+                return "Microsoft Visual Studio 2012";
             case 51:
-                return _T("Microsoft Visual Studio 2013");
+                return "Microsoft Visual Studio 2013";
             case 22:
-                return _T("gcc/MingW");
+                return "gcc/MingW";
             case 24:
-                return _T("Metrowerks CodeWarrior");
+                return "Metrowerks CodeWarrior";
             case 26:
-                return _T("Borland C++ Builder");
+                return "Borland C++ Builder";
             case 28:
-                return _T("Borland C++ 5.0");
+                return "Borland C++ 5.0";
             case 30:
-                return _T("Digital Mars");
+                return "Digital Mars";
         }
     }
-    return _T("");
+    return {};
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetVersionString(LPTSTR lpszVer, LONG nLength)
 {
-    return CopyInfoToCString(GetVersionString(),lpszVer, nLength);
+    LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
+    const LONG RetVal = StringWrapper::CopyInfoToCString(GetVersionString(), lpszVer, nLength);
+    LOG_FUNC_EXIT_PARAMS(RetVal)
+    CATCH_BLOCK(-1)
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetLibraryPath(LPTSTR lpszVer, LONG nLength)
 {
-    return CopyInfoToCString(GetDTWAINDLLPath(), lpszVer, nLength);
+    LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
+    const LONG RetVal = StringWrapper::CopyInfoToCString(GetDTWAINDLLPath(), lpszVer, nLength);
+    LOG_FUNC_EXIT_PARAMS(RetVal)
+    CATCH_BLOCK(-1)
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetShortVersionString(LPTSTR lpszVer, LONG nLength)
 {
-    return CopyInfoToCString(StringConversion::Convert_AnsiPtr_To_Native(GetDTWAINDLLVersionInfoStr().c_str()), lpszVer, nLength);
+    LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
+    const LONG RetVal = StringWrapper::CopyInfoToCString(GetDTWAINDLLVersionInfoStr(), lpszVer, nLength);
+    LOG_FUNC_EXIT_PARAMS(RetVal)
+    CATCH_BLOCK(-1)
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetVersionInfo(LPTSTR lpszVer, LONG nLength)
 {
-    return CopyInfoToCString(dynarithmic::GetVersionInfo(), lpszVer, nLength);
+    LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
+    const LONG RetVal = StringWrapper::CopyInfoToCString(GetVersionInfo(), lpszVer, nLength);
+    LOG_FUNC_EXIT_PARAMS(RetVal)
+    CATCH_BLOCK(-1)
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetTwainStringName(LONG category, LONG TwainID, LPTSTR lpszBuffer, LONG nMaxLen)
+{
+    LOG_FUNC_ENTRY_PARAMS((category, TwainID, lpszBuffer, nMaxLen))
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    DTWAIN_Check_Bad_Handle_Ex(pHandle, -1L, FUNC_MACRO);
+    std::string sValue;
+    switch (category)
+    {
+        case DTWAIN_DGNAME:
+            sValue = CTL_TwainDLLHandle::GetTwainNameFromResource(CTL_TwainDLLHandle::GetDGResourceID(), static_cast<int>(TwainID));
+        break;
+        case DTWAIN_DATNAME:
+            sValue = CTL_TwainDLLHandle::GetTwainNameFromResource(CTL_TwainDLLHandle::GetDATResourceID(), static_cast<int>(TwainID));
+        break;
+        case DTWAIN_MSGNAME:
+            sValue = CTL_TwainDLLHandle::GetTwainNameFromResource(CTL_TwainDLLHandle::GetMSGResourceID(), static_cast<int>(TwainID));
+        break;
+    }
+    const LONG RetVal = StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sValue), lpszBuffer, nMaxLen);
+    LOG_FUNC_EXIT_PARAMS(RetVal)
+    CATCH_BLOCK(-1)
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetTwainIDFromName(LPCTSTR lpszBuffer)
+{
+    LOG_FUNC_ENTRY_PARAMS((lpszBuffer))
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    DTWAIN_Check_Bad_Handle_Ex(pHandle, -1L, FUNC_MACRO);
+    const LONG RetVal = pHandle->GetIDFromTwainName(StringConversion::Convert_NativePtr_To_Ansi(lpszBuffer));
+    LOG_FUNC_EXIT_PARAMS(RetVal)
+    CATCH_BLOCK(-1)
 }
 
 CTL_StringType dynarithmic::GetDTWAINExecutionPath()
 {
-    auto symlocation = boost::dll::symbol_location(DTWAIN_DLLNAME);
+    const auto symlocation = boost::dll::symbol_location(DTWAIN_DLLNAME);
     #ifdef _UNICODE
     CTL_StringType szName = symlocation.parent_path().wstring();
     #else
@@ -1732,73 +1972,62 @@ CTL_StringType dynarithmic::GetVersionString()
     // Write the version info
     if ( DTWAIN_GetVersionEx(&lMajor, &lMinor, &lVersionType, &lPatch) )
     {
-        CTL_StringType s = _T("");
-        CTL_StringType sBits = _T("(32-bit)");
+        std::string s = "";
+        std::string sBits = "(32-bit)";
         if ( lVersionType & DTWAIN_64BIT_VERSION )
-            sBits = _T("(64-bit)");
+            sBits = "(64-bit)";
 
-#ifdef DTWAIN_DEVELOP_DLL
-//        lVersionType -= 100;
-#endif
-#ifdef DTWAIN_LIB
-        if ( lVersionType & DTWAIN_STATICLIB_VERSION )
-            s = _T("Static Library") + sDistType;
-
-        if ( lVersionType & DTWAIN_STATICLIB_STDCALL_VERSION )
-            s = _T("Static Library (stdcall convention)") + sDistType;
-
-        if ( (lVersionType & DTWAIN_STATICLIB_VERSION) &&
-             (lVersionType & DTWAIN_PDF_VERSION))
-            s = _T("Static Library with PDF support") + sDistType;
-
-        if ( (lVersionType & DTWAIN_STATICLIB_STDCALL_VERSION) &&
-            (lVersionType & DTWAIN_PDF_VERSION))
-            s = _T("Static Library with PDF support (stdcall convention)") + sDistType;
-#endif
         if (lVersionType & DTWAIN_UNICODE_VERSION)
-            s += _T(" [Unicode Version]");
+            s += " [Unicode Version]";
 
-        s += _T(" ");
+        if (lVersionType & DTWAIN_DEVELOP_VERSION)
+            s += " [Debug]";
+
+        s += " ";
         s += sBits;
-        CTL_StringStreamType strm;
-        CTL_StringType sStatic;
+        StringStreamA strm;
+        std::string sStatic;
         if (DTWAIN_GetStaticLibVersion() != 0 )
         {
-            sStatic += _T("Compiler used: ") + GetStaticLibVer();
-            sStatic += _T("\n");
+            sStatic += "Compiler used: " + GetStaticLibVer();
+            sStatic += "\n";
         }
 
-        strm << sStatic << _T("Dynarithmic TWAIN Library, Version ") << lMajor << _T(".") << lMinor << _T(" - ") << s << _T(" Version (Patch Level ")
-            << lPatch << _T(")\n") << _T("Shared Library Path: ") << GetDTWAINDLLPath();
-        CTL_TwainDLLHandle::s_VersionString = strm.str();
+        strm << sStatic << "Dynarithmic TWAIN Library, Version " << lMajor << "." << lMinor << " - " << s << " Version (Patch Level "
+            << lPatch << ")\n" << "Shared Library Path: " <<  StringConversion::Convert_Native_To_Ansi(GetDTWAINDLLPath());
+        CTL_TwainDLLHandle::s_VersionString = StringConversion::Convert_Ansi_To_Native(strm.str());
         return CTL_TwainDLLHandle::s_VersionString;
     }
-    return _T("");
+    return {};
 }
 
 void WriteVersionToLog()
 {
+    std::string ansiVer;
     if (CTL_TwainDLLHandle::s_lErrorFilterFlags)
     {
-        CTL_StringType sVer = GetVersionString();
-        CTL_StringType sWinVer = GetWinVersion();
+        auto sVer = GetVersionString();
+        const auto sWinVer = GetWinVersion();
         sVer += _T("\n") + sWinVer;
         #ifdef _WIN32
+        // All log messages must be ANSI
+        ansiVer = StringConversion::Convert_Native_To_Ansi(sVer);
         if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_USEFILE)
         {
-            if (!CTL_TwainDLLHandle::s_appLog.StatusOutFast( sVer.c_str() ))
+            if (!CTL_TwainDLLHandle::s_appLog.StatusOutFast(ansiVer.c_str()))
             {
-                sVer += _T("\n");
-                OutputDebugString(sVer.c_str());
+                ansiVer += "\n";
+                LogToDebugMonitorA(ansiVer);
             }
         }
         else
+        if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_DEBUGMONITOR)
         {
             sVer += _T("\n");
-            OutputDebugString(sVer.c_str());
+            LogToDebugMonitor(sVer);
         }
         if ( UserDefinedLoggerExists() )
-            WriteUserDefinedLogMsg(sVer.c_str());
+            WriteUserDefinedLogMsgA(ansiVer.c_str());
         #endif
     }
 }
@@ -1833,25 +2062,25 @@ STRINGTYPE FixPathString_Impl(POINTERTYPE szINIPath, size_t numChars)
         FN::PathAddBackslashFn(&vec[0]);
         return &vec[0];
     }
-    return ((POINTERTYPE)"");
+    return {};
 }
 
-CTL_String FixPathStringA(LPCSTR szINIPath)
+std::string FixPathStringA(LPCSTR szINIPath)
 {
     if ( szINIPath)
     {
-        size_t numChars = strlen(szINIPath);
-        return FixPathString_Impl<char, CTL_String, LPCSTR, ANSIPathTraits>(szINIPath, numChars);
+        const size_t numChars = strlen(szINIPath);
+        return FixPathString_Impl<char, std::string, LPCSTR, ANSIPathTraits>(szINIPath, numChars);
     }
     return "";
 }
 
-CTL_WString FixPathStringW(LPCWSTR szINIPath)
+std::wstring FixPathStringW(LPCWSTR szINIPath)
 {
     if ( szINIPath)
     {
-        size_t numChars = wcslen(szINIPath);
-        return FixPathString_Impl<wchar_t, CTL_WString, LPCWSTR, UNICODEPathTraits>(szINIPath, numChars);
+        const size_t numChars = wcslen(szINIPath);
+        return FixPathString_Impl<wchar_t, std::wstring, LPCWSTR, UNICODEPathTraits>(szINIPath, numChars);
     }
     return L"";
 }
@@ -1867,39 +2096,34 @@ bool GetDTWAINDLLVersionInfo(HMODULE hMod, LONG* lMajor, LONG* lMinor, LONG *pPa
     return true;
 }
 
-CTL_String GetDTWAINDLLVersionInfoStr()
+CTL_StringType GetDTWAINDLLVersionInfoStr()
 {
     std::ostringstream strm;
     strm << DTWAIN_MAJOR_VERSION << "." << DTWAIN_SUBVERSION_VERSION << "." << DTWAIN_PLACEHOLDER_VERSION << "." << DTWAIN_VERINFO_PATCHLEVEL_VERSION;
-    return strm.str();
+    return StringConversion::Convert_Ansi_To_Native(strm.str());
 }
 
 CTL_StringType& dynarithmic::GetDTWAINTempFilePath()
 {
     if ( CTL_TwainDLLHandle::s_TempFilePath.empty())
     {
-        auto tempPath = boost::filesystem::temp_directory_path();
-        auto retVal = tempPath.native();
+        const auto tempPath = temp_directory_path();
         if (tempPath.empty())
-            CTL_TwainAppMgr::WriteLogInfo(CTL_StringType(_T("Error: Temp directory does not exist\n")));
+            CTL_TwainAppMgr::WriteLogInfoA("Error: Temp directory does not exist\n");
         else
-        {
-            if (!retVal.empty() && *retVal.rbegin() != boost::filesystem::path::preferred_separator)
-                retVal += boost::filesystem::path::preferred_separator;
-            CTL_TwainDLLHandle::s_TempFilePath = CTL_StringType(retVal.begin(), retVal.end());
-        }
+            CTL_TwainDLLHandle::s_TempFilePath = tempPath;
     }
-    CTL_TwainAppMgr::WriteLogInfo(CTL_StringType(_T("Temp path is ")) +  CTL_TwainDLLHandle::s_TempFilePath + CTL_StringType(_T("\n")));
+    CTL_TwainAppMgr::WriteLogInfoA("Temp path is " +  StringConversion::Convert_Native_To_Ansi(CTL_TwainDLLHandle::s_TempFilePath) + "\n");
     return CTL_TwainDLLHandle::s_TempFilePath;
 }
 
 
-CTL_StringType CheckSearchOrderString(const CTL_StringType& str)
+std::string CheckSearchOrderString(std::string str)
 {
     static std::set<char> setValidChars = {'C','W','O','U','S'};
-    CTL_StringType strOut;
-    std::copy_if(str.begin(), str.end(), std::back_inserter(strOut), [&](char ch) { return setValidChars.count(toupper(ch)); });
-    std::transform(strOut.begin(), strOut.end(), strOut.begin(), [&](char ch) { return std::toupper(ch); });
+    std::string strOut;
+    StringWrapperA::MakeUpperCase(str);
+    std::copy_if(str.begin(), str.end(), std::back_inserter(strOut), [&](char ch) { return setValidChars.count(ch); });
     return strOut;
 }
 

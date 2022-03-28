@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,21 +18,19 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <cstring>
-#include <algorithm>
+#include "cppfunc.h"
 #include "dtwain.h"
 #include "ctliface.h"
-#include "enumeratorfuncs.h"
 #include "ctltwmgr.h"
 using namespace dynarithmic;
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainTimeout( LONG milliseconds )
 {
     LOG_FUNC_ENTRY_PARAMS((milliseconds))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     if ( !IsDLLHandleValid( pHandle, FALSE ) )
         LOG_FUNC_EXIT_PARAMS(false)
-    pHandle->s_nTimeoutID = milliseconds;
+    pHandle->s_nTimeoutMilliseconds = milliseconds;
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -40,10 +38,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainTimeout( LONG milliseconds )
 LONG DLLENTRY_DEF DTWAIN_GetTwainTimeout()
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     if ( !IsDLLHandleValid( pHandle, FALSE ) )
         LOG_FUNC_EXIT_PARAMS(-1)
-    LOG_FUNC_EXIT_PARAMS((LONG)pHandle->s_nTimeoutID)
+    LOG_FUNC_EXIT_PARAMS((LONG)pHandle->s_nTimeoutMilliseconds)
     CATCH_BLOCK(-1)
 }
 
