@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -28,11 +28,11 @@ using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, LONG64 MultiStage)
 {
-    DibMultiPageStruct *s = (DibMultiPageStruct *)MultiStage;
-    HANDLE hDib = NULL;
+    auto s = reinterpret_cast<DibMultiPageStruct*>(MultiStage);
+    HANDLE hDib = nullptr;
 
     // Check if this is the first page
-    CTL_TwainAppMgr::WriteLogInfo(CTL_StringType(_T("Writing TIFF or Postscript file\n")));
+    CTL_TwainAppMgr::WriteLogInfoA("Writing TIFF or Postscript file\n");
 
     // Get the current TIFF type from the Source
     if ( m_ImageInfoEx.theSource &&
@@ -55,7 +55,7 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
                 return DTWAIN_ERR_FILEWRITE;
             szTempPath += StringWrapper::GetGUID() +  _T("TIF");
 
-            CTL_TwainAppMgr::WriteLogInfo(CTL_StringType(_T("Temporary Image File is ")) + szTempPath + CTL_StringType(_T("\n")));
+            CTL_TwainAppMgr::WriteLogInfoA("Temporary Image File is " + StringConversion::Convert_Native_To_Ansi(szTempPath) + "\n");
 
             // OK, now remember that the file we are writing is a TIF file, and this is
             // the file that is created first
@@ -69,7 +69,7 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
 
             // Attempt to delete the file
             if ( !delete_file(sActualFileName.c_str()) )
-                CTL_TwainAppMgr::WriteLogInfo(CTL_StringType(_T("Could not delete existing file ")) + sActualFileName.c_str() + CTL_StringType(_T("\n")));
+                CTL_TwainAppMgr::WriteLogInfoA("Could not delete existing file " + StringConversion::Convert_Native_To_Ansi(sActualFileName) + "\n");
         }
     }
 
@@ -77,20 +77,20 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     if ( !s )
         bNotLastFile = true;
     else
-        if ( s->Stage != DIB_MULTI_LAST )
+    if ( s->Stage != DIB_MULTI_LAST )
             bNotLastFile = true;
-    if ( bNotLastFile ) //!s || (s && s->Stage != DIB_MULTI_LAST ))
+    if ( bNotLastFile )
     {
-        CTL_TwainAppMgr::WriteLogInfo(CTL_StringType(_T("Retrieving DIB:\n")));
+        CTL_TwainAppMgr::WriteLogInfoA("Retrieving DIB:\n");
         if ( !m_pDib )
         {
-            CTL_TwainAppMgr::WriteLogInfo(CTL_StringType(_T("Dib not found!\n")));
+            CTL_TwainAppMgr::WriteLogInfoA("Dib not found!\n");
             return DTWAIN_ERR_DIB;
         }
         hDib = m_pDib->GetHandle();
         if ( !hDib )
         {
-            CTL_TwainAppMgr::WriteLogInfo(CTL_StringType(_T("Dib handle not found!\n")));
+            CTL_TwainAppMgr::WriteLogInfoA("Dib handle not found!\n");
             return DTWAIN_ERR_DIB;
         }
     }
@@ -156,22 +156,22 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     if ( bNotLastFile )
     {
         SetNumPagesWritten(GetNumPagesWritten()+1);
-        CTL_TwainAppMgr::WriteLogInfo(CTL_StringType(_T("Writing TIFF / PS page\n")));
+        CTL_TwainAppMgr::WriteLogInfoA("Writing TIFF / PS page\n");
         retval = TIFFHandler.WriteGraphicFile(this, sActualFileName.c_str(), hDib);
         if ( retval != 0 )
             SetPagesOK(false);
         else
             SetOnePageWritten(true);
-        CTL_TwainAppMgr::WriteLogInfo(CTL_StringType(_T("Writing TIFF / PS page\n")));
-        CTL_StringStreamType strm;
-        strm << _T("Return from writing intermediate image = ") << retval << _T("\n");
-        CTL_TwainAppMgr::WriteLogInfo(strm.str());
+        CTL_TwainAppMgr::WriteLogInfoA("Writing TIFF / PS page\n");
+        StringStreamA strm;
+        strm << "Return from writing intermediate image = " << retval << "\n";
+        CTL_TwainAppMgr::WriteLogInfoA(strm.str());
     }
     else
     {
         // Close the multi-page TIFF file
-        CTL_TwainAppMgr::WriteLogInfo(CTL_StringType(_T("Closing TIFF / PS file\n")));
-        retval = TIFFHandler.WriteImage(this,0,0,0,0,0,NULL);
+        CTL_TwainAppMgr::WriteLogInfoA("Closing TIFF / PS file\n");
+        retval = TIFFHandler.WriteImage(this,nullptr,0,0,0,0, nullptr);
         if ( !AllPagesOK() )
         {
             if ( !IsOnePageWritten() )
@@ -180,11 +180,11 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
                 retval = DTWAIN_ERR_FILEXFERSTART - DTWAIN_ERR_FILEWRITE;
             }
         }
-        CTL_StringStreamType strm;
-        strm << _T("Return from writing last image = ") << retval << _T("\n");
-        CTL_TwainAppMgr::WriteLogInfo(strm.str());
+        StringStreamA strm;
+        strm << "Return from writing last image = " << retval << "\n";
+        CTL_TwainAppMgr::WriteLogInfoA(strm.str());
     }
-    if ( (!s || s->Stage == DIB_MULTI_LAST) && (retval == 0) )
+    if ( (!s || s->Stage == DIB_MULTI_LAST) && retval == 0 )
     {
         // Convert the TIFF file to Postscript if necessary
         if ( m_ImageInfoEx.IsPostscript )
@@ -210,8 +210,8 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
             sTitle = m_ImageInfoEx.PSTitle;
             if ( sTitle.empty() )
                 sTitle = _T("DTWAIN Postscript");
-            retval = TIFFHandler.Tiff2PS(sActualFileName.c_str(), sPostscriptName.c_str(),Level,
-                sTitle.c_str(), m_ImageInfoEx.PSType==DTWAIN_PS_ENCAPSULATED);
+            retval = CTIFFImageHandler::Tiff2PS(sActualFileName.c_str(), sPostscriptName.c_str(),Level,
+                                                sTitle.c_str(), m_ImageInfoEx.PSType==DTWAIN_PS_ENCAPSULATED);
 
             if ( retval == -1 )
                 retval = DTWAIN_ERR_FILEWRITE;

@@ -83,6 +83,9 @@
 8890 1 DG_CONTROL
 8890 2 DG_IMAGE
 8890 4 DG_AUDIO
+8890 268435456 DF_DSM2
+8890 536870912 DF_APP2
+8890 1073741824 DF_DS2
 8891 0 DAT_NULL
 8891 -32768 DAT_CUSTOMBASE
 8891 1 DAT_CAPABILITY
@@ -112,10 +115,13 @@
 8891 265 DAT_JPEGCOMPRESSION
 8891 266 DAT_PALETTE8
 8891 267 DAT_EXTIMAGEINFO
+8891 268 DAT_FILTER
 8891 513 DAT_AUDIOFILEXFER
 8891 514 DAT_AUDIOINFO
 8891 515 DAT_AUDIONATIVEXFER
 8891 1025 DAT_ICCPROFILE
+8891 1026 DAT_IMAGEMEMFILEXFER
+8891 1027 DAT_ENTRYPOINT
 8891 17 DAT_STATUSUTF8
 8891 16 DAT_CALLBACK
 8891 18 DAT_CALLBACK2
@@ -845,3 +851,44 @@
 51 C10          [0 0 79.37 113.39]
 52 USSTATEMENT  [0 0 396.00 792.00]
 53 BUSINESSCARD [0 0 144.00 290.00]
+-1 0
+100   Windows-BMP-Single  bmp                             
+200   JPEG-Single         jpg jpeg                     
+250   Adobe-PDF-Single    pdf                             
+251   Adobe-PDF-Multi     pdf
+300   PCX-Single 	      pcx	
+301   DCX/PCX-Multi       dcx	
+400   TARGA-Single 	      tga
+500   TIFF-LZW-Single     tif tiff	
+600   TIFF-Uncompressed-Single tif tiff	
+700   TIFF-G3-Single tif tiff	
+800   TIFF-G4-Single tif tiff	
+801   TIFF-Packbits-Single tif tiff	
+802   TIFF-Deflate-Single tif tiff	
+803   TIFF-JPEG-Single tif tiff	
+900   TIFF-Uncompressed-Multi tif tiff	
+901   TIFF-G3-Multi tif tiff	
+902   TIFF-G4-Multi tif tiff	
+903   TIFF-Packbits-Multi tif tiff	
+904   TIFF-Deflate-Multi tif tiff	
+905   TIFF-JPEG-Multi tif tiff	
+906   TIFF-LZW-Multi tif tiff	
+850   Windows-Metafile-WMF-Single wmf
+851   Enhanced-Windows-Metafile-EMF-Single emf wmf
+950   GIF-Single gif
+1000  PNG-Single png
+2000  Adobe-PSD-Single psd
+3000  JPEG2000-Single jp2
+4000  PostScript-Level1-Single ps
+4001  PostScript-Level2-Single ps
+4002  PostScript-Level3-Single ps
+4003  PostScript-Level1-Multi ps
+4004  PostScript-Level2-Multi ps
+4005  PostScript-Level3-Multi ps
+6000  OCR-Text-Single txt
+6001  OCR-Text-Multi txt
+8000  Windows-ICON-Single ico
+8001  Windows-Vista-ICON-Single ico
+8500  WBMP-Wireless-Bitmap-Single wbmp
+8501  WEBP-Google-Format-Single webp
+10000 PPM-Portable-Bitmap-Single ppm 

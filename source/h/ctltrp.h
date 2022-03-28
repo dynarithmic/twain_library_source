@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@
 #ifndef CTLTRP_H_
 #define CTLTRP_H_
 
-#include "ctltwain.h"
 #include "ctltwses.h"
 #include "ctlobstr.h"
+#include <tuple>
 
 namespace dynarithmic
 {
@@ -41,8 +41,11 @@ namespace dynarithmic
 
     class CTL_TwainTriplet
     {
-    public:
-        enum {DGPOS_ = 2, DATPOS_ = 3, MSGPOS_ = 4, MEMREFPOS_ = 5};
+        public:
+            enum {TRIPCOMPONENTPOS_= 2};
+            enum {DGPOS_ = 0, DATPOS_ = 1, MSGPOS_ = 2, MEMREFPOS_ = 3};
+            enum {ORIGINPOS_ = 0, DESTPOS_ =1};
+            typedef std::tuple <TW_UINT32, TW_UINT16, TW_UINT16> TwainTripletComponents;
 
             CTL_TwainTriplet();
             CTL_TwainTriplet( pTW_IDENTITY pOrigin,
@@ -52,29 +55,38 @@ namespace dynarithmic
                               TW_UINT16    MSG,
                               TW_MEMREF    pData);
 
-            void Init( pTW_IDENTITY pOrigin,
-                       pTW_IDENTITY pDest,
-                       TW_UINT32    nDG,
-                       TW_UINT16    nDAT,
-                       TW_UINT16    nMSG,
-                       TW_MEMREF    pData);
+            void Init( const pTW_IDENTITY pOrigin,
+                       const pTW_IDENTITY pDest,
+                       TW_UINT32 nDG,
+                       TW_UINT16 nDAT,
+                       TW_UINT16 nMSG,
+                       TW_MEMREF pData);
 
-            typedef std::tuple<pTW_IDENTITY, pTW_IDENTITY, TW_UINT32,
-                                 TW_UINT16, TW_UINT16, TW_MEMREF> TwainTripletArgs;
+            typedef std::tuple<pTW_IDENTITY, pTW_IDENTITY, TwainTripletComponents, TW_MEMREF> TwainTripletArgs;
 
             const TwainTripletArgs& GetTripletArgs() const { return m_TwainTripletArg; }
             TwainTripletArgs& GetTripletArgs() { return m_TwainTripletArg; }
+            const TwainTripletComponents& GetTripletComponents() const { return std::get<TRIPCOMPONENTPOS_>(m_TwainTripletArg); }
+            TwainTripletComponents& GetTripletComponents() { return std::get<TRIPCOMPONENTPOS_>(m_TwainTripletArg); }
 
-            virtual ~CTL_TwainTriplet() {}
+            virtual ~CTL_TwainTriplet() = default;
             virtual TW_UINT16 Execute();
             void    SetAlive( bool bSet );
             bool    IsAlive() const;
             bool    IsMSGGetType() const;
             bool    IsMSGSetType() const;
+            bool    IsMSGResetType() const;
 
-            TW_UINT32 GetDG() const { return std::get<DGPOS_>(m_TwainTripletArg); }
-            TW_UINT16 GetDAT() const { return std::get<DATPOS_>(m_TwainTripletArg); }
-            TW_UINT16 GetMSG() const { return std::get<MSGPOS_>(m_TwainTripletArg); }
+            pTW_IDENTITY GetOriginID() const { return std::get<ORIGINPOS_>(m_TwainTripletArg); }
+            pTW_IDENTITY GetDestinationID() const { return std::get<DESTPOS_>(m_TwainTripletArg); }
+            TW_UINT32 GetDG() const { return std::get<DGPOS_>(std::get<TRIPCOMPONENTPOS_>(m_TwainTripletArg)); }
+            TW_UINT16 GetDAT() const { return std::get<DATPOS_>(std::get<TRIPCOMPONENTPOS_>(m_TwainTripletArg)); }
+            TW_UINT16 GetMSG() const { return std::get<MSGPOS_>(std::get<TRIPCOMPONENTPOS_>(m_TwainTripletArg)); }
+            TW_MEMREF GetMemRef() const { return std::get<MEMREFPOS_>(m_TwainTripletArg);}
+            TW_MEMREF GetMemRef() { return std::get<MEMREFPOS_>(m_TwainTripletArg); }
+
+            const CTL_ITwainSession* GetSessionPtr() const
+            { return m_pSession; }
 
         protected:
             CTL_ITwainSession* GetSessionPtr()
@@ -83,7 +95,7 @@ namespace dynarithmic
             void SetSessionPtr(CTL_ITwainSession* pSession)
             { m_pSession = pSession; }
 
-            CTL_ITwainSource*  GetSourcePtr()
+            CTL_ITwainSource*  GetSourcePtr() const
             { return m_pSource; }
 
             void SetSourcePtr(CTL_ITwainSource* pSource)

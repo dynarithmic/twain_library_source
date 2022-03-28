@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -28,16 +28,18 @@
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <boost/format.hpp>
 #include <assert.h>
-#include <stdarg.h>
 #include <algorithm>
 #include <stdlib.h>
-#include <cstring>
+#include <iomanip>
 #include <locale>
+#include <iostream>
+#include <boost/lexical_cast.hpp>
+#include <dtwain_filesystem.h>
 #include "dtwain_standard_defs.h"
 #ifndef _MAX_PATH
 #define _MAX_PATH 260
@@ -45,47 +47,52 @@
 
 namespace dynarithmic
 {
-    typedef std::string CTL_String;
-    typedef std::wstring CTL_WString;
-    typedef std::vector<CTL_String> CTL_StringArray;
-    typedef std::vector<CTL_WString> CTL_WStringArray;
-    typedef std::ostringstream CTL_StringStreamA;
-    typedef std::wostringstream CTL_StringStreamW;
-    typedef std::istringstream CTL_StringStreamInA;
-    typedef std::wistringstream CTL_StringStreamInW;
-    typedef std::wstring CTL_WString;
-    typedef std::wofstream  CTL_OutputFileStreamTypeW;
-    typedef std::wostream   CTL_OutputBaseStreamTypeW;
-    typedef std::ofstream  CTL_OutputFileStreamTypeA;
-    typedef std::ostream   CTL_OutputBaseStreamTypeA;
+    typedef std::vector<std::string> StringArray;
+    typedef std::vector<std::wstring> StringArrayW;
+    typedef std::stringstream StringStreamA;
+    typedef std::wstringstream StringStreamW;
+    typedef std::ostringstream StringStreamOutA;
+    typedef std::wostringstream StringStreamOutW;
+    typedef std::istringstream StringStreamInA;
+    typedef std::wistringstream StringStreamInW;
+    typedef std::wofstream  OutputFileStreamW;
+    typedef std::wostream   OutputBaseStreamW;
+    typedef std::ofstream  OutputFileStreamA;
+    typedef std::ostream   OutputBaseStreamA;
+    typedef std::ifstream InputFileStreamA;
+    typedef std::wifstream InputFileStreamW;
+    typedef std::wistream InputBaseStreamW;
+    typedef std::istream InputBaseStreamA;
 
     #ifdef UNICODE
-        typedef CTL_WString CTL_StringType;
-        typedef CTL_WStringArray CTL_StringArrayType;
+        typedef std::wstring        CTL_StringType;
+        typedef StringArrayW        CTL_StringArrayType;
         typedef std::wostringstream CTL_StringStreamType;
         typedef std::wistringstream CTL_StringStreamInType;
         typedef std::wifstream      CTL_InputFileStreamType;
         typedef std::wistream       CTL_InputBaseStreamType;
         typedef std::wofstream      CTL_OutputFileStreamType;
         typedef std::wostream       CTL_OutputBaseStreamType;
-        #define BOOST_FORMAT boost::wformat
-        #define BOOST_PATHTYPE boost::filesystem::wpath
-        #define BOOST_GENERIC_STRING(x) (x).generic_wstring()
-        #define BOOST_UUID_STRING_CONVERT(x)  boost::uuids::to_wstring((x))
+        struct ErrorStream
+        {
+            template <typename T>
+            static void StreamMe(T t ) { std::wcerr << t; }
+        };
     #else
-        typedef CTL_String CTL_StringType;
-        typedef CTL_StringArray CTL_StringArrayType;
-        typedef std::ostringstream CTL_StringStreamType;
-        typedef std::istringstream CTL_StringStreamInType;
-        typedef std::ifstream      CTL_InputFileStreamType;
-        typedef std::istream       CTL_InputBaseStreamType;
-        typedef std::ofstream      CTL_OutputFileStreamType;
-        typedef std::ostream       CTL_OutputBaseStreamType;
-        #define BOOST_FORMAT boost::format
-        #define BOOST_PATHTYPE boost::filesystem::path
-        #define BOOST_GENERIC_STRING(x) (x).generic_string()
-        #define BOOST_UUID_STRING_CONVERT(x)  boost::uuids::to_string((x))
-    #endif
+        typedef std::string         CTL_StringType;
+        typedef StringArray         CTL_StringArrayType;
+        typedef std::ostringstream  CTL_StringStreamType;
+        typedef std::istringstream  CTL_StringStreamInType;
+        typedef std::ifstream       CTL_InputFileStreamType;
+        typedef std::istream        CTL_InputBaseStreamType;
+        typedef std::ofstream       CTL_OutputFileStreamType;
+        typedef std::ostream        CTL_OutputBaseStreamType;
+        struct ErrorStream
+        {
+            template <typename T>
+            static void StreamMe(T t) { std::cerr << t; }
+        };
+#endif
 
     #define LOCAL_STATIC static
     #define STRINGWRAPPER_QUALIFIER StringWrapper::
@@ -93,30 +100,80 @@ namespace dynarithmic
 
     struct ANSIStringTraits
     {
-        typedef char char_type;
-        static char_type GetSpace() { return ' ';}
-        static const char_type* GetEmptyString() { return ""; }
-        static size_t StringLength(const char_type* s) { return std::char_traits<char_type>::length(s); }
-        static char_type* StringCopy(char_type* dest, const char_type* src) { return std::char_traits<char_type>::copy(dest, src, StringLength(src)); }
-        static char_type* StringCopyN(char_type* dest, const char_type* src, size_t count) { return std::char_traits<char_type>::copy(dest, src, count); }
-        static int StringCompare(const char_type* dest, const char_type* src, size_t count) { return std::char_traits<char_type>::compare(dest, src, count); }
-        static int StringCompare(const char_type* dest, const char_type* src) { return std::char_traits<char_type>::compare(dest, src, (std::min)(StringLength(dest), StringLength(src))); }
-        static int ToUpper(char_type ch) { return toupper((int)ch); }
-        static int ToLower(char_type ch) { return tolower((int)ch); }
-        static bool IsDigit(int ch) { return ::isdigit(ch)?true:false; }
+        using char_type = char;
+        using string_type = std::string;
+        using stringarray_type = std::vector<string_type>;
+        using outputstream_type = std::ostringstream;
+        using inputstream_type = std::istringstream;
+        using outputfile_type = std::ofstream;
+        using inputfile_type = std::ifstream;
+        using baseoutputstream_type = std::ostream;
+        using baseinputstream_type = std::istream;
+
+        using BOOST_FORMAT = boost::format;
+        using FILESYSTEM_PATHTYPE = filesys::path;
+
+        template <typename T>
+        static std::string PathGenericString(const T& x) { return x.generic_string(); }
+
+        template <typename T>
+        static std::string ConvertToBoostUUIDString(const T& x)  { return boost::uuids::to_string(x); }
+
+        static constexpr char_type GetSpace() { return ' ';}
+        static constexpr const char_type* GetEmptyString() { return ""; }
+        static constexpr char_type GetZeroString() { return '\0'; }
+        static constexpr char_type EscapeChar() { return '\\';}
+        static constexpr char_type BackSlashChar() { return '\\';}
+        static constexpr char_type ForwardSlashChar() { return '/'; }
+        static constexpr const char_type* EscapeString() { return "\\"; }
+        static constexpr const char_type* AllQuoteString() { return "\"'"; }
+        static constexpr char_type SingleQuoteChar() { return '\''; }
+        static constexpr const char_type* SingleQuoteString() { return "'"; }
+        static constexpr char_type DoubleQuoteChar() { return '\"'; }
+        static constexpr const char_type* DoubleQuoteString() { return "\""; }
+        static constexpr char_type GetZeroNumericString() { return '0'; }
+        static const char_type* GetCompatStringLiteral(const char_type* x) { return x; }
+        static constexpr char_type GetNewLineChar() { return '\n'; }
+        static constexpr const char_type* GetNewLineString() { return "\n"; }
+        static size_t Length(const char_type* s) { return std::char_traits<char_type>::length(s); }
+        static char_type* Copy(char_type* dest, const char_type* src) { return std::char_traits<char_type>::copy(dest, src, Length(src)); }
+        static char_type* CopyN(char_type* dest, const char_type* src, size_t count) { return std::char_traits<char_type>::copy(dest, src, count); }
+        static int Compare(const char_type* dest, const char_type* src, size_t count) { return std::char_traits<char_type>::compare(dest, src, count); }
+        static int Compare(const char_type* dest, const char_type* src) { return std::char_traits<char_type>::compare(dest, src, (std::min)(Length(dest), Length(src))); }
+
+        static const char_type* ConvertToOther(wchar_t* dest, const char_type* src)
+        {
+            auto& f = std::use_facet<std::ctype<wchar_t>>(std::locale());
+            return f.widen(src, src + Length(src), dest);
+        }
+
+        static const char_type* ConvertToOther(wchar_t* dest, const char_type* src, int len)
+        {
+            auto& f = std::use_facet<std::ctype<wchar_t>>(std::locale());
+            return f.widen(src, src + len, dest);
+        }
+
+        static const char_type CharToThisType(char ch)
+        {
+            return ch;
+        }
+
+        static int ToUpper(char_type ch) { return toupper(static_cast<int>(ch)); }
+        static int ToLower(char_type ch) { return tolower(static_cast<int>(ch)); }
+        static bool IsDigit(int ch) { return isdigit(ch)?true:false; }
         static double ToDouble(const char_type* s1)
-        { return s1?strtod(s1, NULL):0.0; }
+        { return s1?strtod(s1, nullptr):0.0; }
         #ifdef _WIN32
         static UINT GetWindowsDirectoryImpl(char_type* buffer)
-                    { return ::GetWindowsDirectoryA(buffer, _MAX_PATH); }
+                    { return GetWindowsDirectoryA(buffer, _MAX_PATH); }
         static UINT GetSystemDirectoryImpl(char_type* buffer)
-                    { return ::GetSystemDirectoryA(buffer, _MAX_PATH); }
+                    { return GetSystemDirectoryA(buffer, _MAX_PATH); }
         static char_type* AddBackslashImpl(char_type* buffer)
-                    { return ::PathAddBackslashA(buffer); }
+                    { return PathAddBackslashA(buffer); }
         static char_type* RemoveBackslashImpl(char_type* buffer)
-                    { return ::PathRemoveBackslashA(buffer); }
+                    { return PathRemoveBackslashA(buffer); }
         static DWORD GetModuleFileNameImpl(HMODULE hModule, char_type* lpFileName, DWORD nSize)
-                    { return ::GetModuleFileNameA(hModule, lpFileName, nSize); }
+                    { return GetModuleFileNameA(hModule, lpFileName, nSize); }
         #else
         static UINT GetWindowsDirectoryImpl(char_type* buffer)
         { getcwd(buffer, 8096); return 1; }
@@ -124,8 +181,8 @@ namespace dynarithmic
         { getcwd(buffer, 8096); return 1; }
         static char_type* AddBackslashImpl(char_type* buffer)
         {
-            auto ps = boost::filesystem::path::preferred_separator;
-            auto len = StringLength(buffer);
+            auto ps = filesys::path::preferred_separator;
+            auto len = Length(buffer);
             if (buffer[len-1] != ps)
             {
                 buffer[len] = ps;
@@ -136,8 +193,8 @@ namespace dynarithmic
 
         static char_type* RemoveBackslashImpl(char_type* buffer)
         {
-            auto ps = boost::filesystem::path::preferred_separator;
-            auto len = StringLength(buffer);
+            auto ps = filesys::path::preferred_separator;
+            auto len = Length(buffer);
             if (buffer[len - 1] == ps)
                 buffer[len - 1] = 0;
             return buffer;
@@ -152,31 +209,81 @@ namespace dynarithmic
 
     struct UnicodeStringTraits
     {
-        typedef wchar_t char_type;
-        static char_type GetSpace() { return L' ';}
-        static const char_type* GetEmptyString() { return L""; }
+        using char_type = wchar_t;
+        using string_type = std::wstring;
+        using stringarray_type = std::vector<string_type>;
+        using outputstream_type = std::wostringstream;
+        using inputstream_type = std::wistringstream;
+        using outputfile_type = std::wofstream;
+        using inputfile_type = std::wifstream;
+        using baseoutputstream_type = std::wostream;
+        using baseinputstream_type = std::wistream;
+
+        using BOOST_FORMAT = boost::wformat;
+        using FILESYSTEM_PATHTYPE = filesys::path;
+
+        template <typename T>
+        static std::wstring PathGenericString(const T& x) { return x.generic_wstring(); }
+
+        template <typename T>
+        static std::wstring ConvertToBoostUUIDString(const T& x) { return boost::uuids::to_wstring(x); }
+        static constexpr char_type GetSpace() { return L' ';}
+        static constexpr const char_type* GetEmptyString() { return L""; }
+        static constexpr char_type GetZeroString() { return L'\0'; }
+        static constexpr char_type EscapeChar() { return L'\\'; }
+        static constexpr char_type BackSlashChar() { return L'\\'; }
+        static constexpr char_type ForwardSlashChar() { return L'/'; }
+        static constexpr const char_type* EscapeString() { return L"\\"; }
+        static constexpr const char_type* AllQuoteString() { return L"\"'"; }
+        static constexpr char_type SingleQuoteChar() { return L'\''; }
+        static constexpr const char_type* SingleQuoteString() { return L"'"; }
+        static constexpr char_type DoubleQuoteChar() { return L'\"'; }
+        static constexpr const char_type* DoubleQuoteString() { return L"\""; }
+        static constexpr char_type GetZeroNumericString() { return L'0'; }
+        static constexpr char_type GetNewLineChar() { return L'\n'; }
+        static constexpr const char_type* GetNewLineString() { return L"\n"; }
         static const char_type* GetCompatStringLiteral(const char_type* x) { return x; }
-        static size_t StringLength(const char_type* s) { return std::char_traits<char_type>::length(s); }
-        static int StringCompare(const char_type* dest, const char_type* src, size_t count) { return std::char_traits<char_type>::compare(dest, src, count); }
-        static int StringCompare(const char_type* dest, const char_type* src) { return std::char_traits<char_type>::compare(dest, src, (std::min)(StringLength(dest), StringLength(src))); }
-        static char_type* StringCopy(char_type* dest, const char_type* src) { return std::char_traits<char_type>::copy(dest, src, StringLength(src)); }
-        static char_type* StringCopyN(char_type* dest, const char_type* src, size_t count) { return std::char_traits<char_type>::copy(dest, src, count); }
-        static wint_t ToUpper(char_type ch) { return towupper((wint_t)ch); }
-        static wint_t ToLower(char_type ch) { return towlower((wint_t)ch); }
-        static bool IsDigit(wint_t ch) { return ::iswdigit(ch)?true:false; }
+        static size_t Length(const char_type* s) { return std::char_traits<char_type>::length(s); }
+        static int Compare(const char_type* dest, const char_type* src, size_t count) { return std::char_traits<char_type>::compare(dest, src, count); }
+        static int Compare(const char_type* dest, const char_type* src) { return std::char_traits<char_type>::compare(dest, src, (std::min)(Length(dest), Length(src))); }
+
+        static const char_type* ConvertToOther(char* dest, const char_type* src)
+        {
+            auto& f = std::use_facet<std::ctype<wchar_t>>(std::locale());
+            return f.narrow(src, src + Length(src), '\0', dest);
+        }
+
+        static const char_type* ConvertToOther(char* dest, const char_type* src, int len)
+        {
+            auto& f = std::use_facet<std::ctype<wchar_t>>(std::locale());
+            return f.narrow(src, src + len, '\0', dest);
+        }
+
+        static const char_type CharToThisType(char ch)
+        {
+            char_type dest {};
+            ANSIStringTraits::ConvertToOther(&dest, &ch, 1);
+            return dest;
+        }
+
+        static char_type* Copy(char_type* dest, const char_type* src) { return std::char_traits<char_type>::copy(dest, src, Length(src)); }
+        static char_type* CopyN(char_type* dest, const char_type* src, size_t count) { return std::char_traits<char_type>::copy(dest, src, count); }
+        static wint_t ToUpper(char_type ch) { return towupper(static_cast<wint_t>(ch)); }
+        static wint_t ToLower(char_type ch) { return towlower(static_cast<wint_t>(ch)); }
+        static bool IsDigit(wint_t ch) { return iswdigit(ch)?true:false; }
         static double ToDouble(const char_type* s1)
-        { return s1 ? wcstod(s1, NULL) : 0.0; }
+        { return s1 ? wcstod(s1, nullptr) : 0.0; }
         #ifdef _WIN32
         static UINT GetWindowsDirectoryImpl(char_type* buffer)
-        { return ::GetWindowsDirectoryW(buffer, _MAX_PATH); }
+        { return GetWindowsDirectoryW(buffer, _MAX_PATH); }
         static UINT GetSystemDirectoryImpl(char_type* buffer)
-        { return ::GetSystemDirectoryW(buffer, _MAX_PATH); }
+        { return GetSystemDirectoryW(buffer, _MAX_PATH); }
         static LPWSTR AddBackslashImpl(char_type* buffer)
-        { return ::PathAddBackslashW(buffer); }
+        { return PathAddBackslashW(buffer); }
         static char_type* RemoveBackslashImpl(char_type* buffer)
-        { return ::PathRemoveBackslashW(buffer); }
+        { return PathRemoveBackslashW(buffer); }
         static DWORD GetModuleFileNameImpl(HMODULE hModule, char_type* lpFileName, DWORD nSize)
-        { return ::GetModuleFileNameW(hModule, lpFileName, nSize); }
+        { return GetModuleFileNameW(hModule, lpFileName, nSize); }
         #else
         static UINT GetWindowsDirectoryImpl(char_type* buffer)
         {
@@ -191,8 +298,8 @@ namespace dynarithmic
         }
         static char_type* AddBackslashImpl(char_type* buffer)
         {
-            auto ps = boost::filesystem::path::preferred_separator;
-            auto len = StringLength(buffer);
+            auto ps = filesys::path::preferred_separator;
+            auto len = Length(buffer);
             if (buffer[len - 1] != ps)
             {
                 buffer[len] = ps;
@@ -202,8 +309,8 @@ namespace dynarithmic
         }
         static char_type* RemoveBackslashImpl(char_type* buffer)
         {
-            auto ps = boost::filesystem::path::preferred_separator;
-            auto len = StringLength(buffer);
+            auto ps = filesys::path::preferred_separator;
+            auto len = Length(buffer);
             if (buffer[len - 1] == ps)
                 buffer[len - 1] = 0;
             return buffer;
@@ -225,37 +332,43 @@ namespace dynarithmic
     {
 
         #ifdef UNICODE
-        static const CTL_WString    Convert_Ansi_To_Native(const CTL_String& x) { return ANSIToWide(x); }
-        static CTL_WString          Convert_AnsiPtr_To_Native(const char *x) { return ANSIToWide(x); }
+        static std::wstring          Convert_Ansi_To_Native(const std::string& x) { return ANSIToWide(x); }
+        static std::wstring          Convert_AnsiPtr_To_Native(const char *x) { return ANSIToWide(x?x:""); }
 
-        static const CTL_WString&   Convert_Wide_To_Native(const CTL_WString& x) { return x; }
-        static CTL_WString          Convert_WidePtr_To_Native(const wchar_t* x) { return x; }
+        static const std::wstring&   Convert_Wide_To_Native(const std::wstring& x) { return x; }
+        static std::wstring          Convert_WidePtr_To_Native(const wchar_t* x) { return x; }
 
-        static CTL_String           Convert_Native_To_Ansi(const CTL_WString& x) { return WideToANSI(x); }
-        static CTL_String           Convert_NativePtr_To_Ansi(const wchar_t *x) { return WideToANSI(x); }
+        static std::string           Convert_Native_To_Ansi(const std::wstring& x) { return WideToANSI(x); }
+        static std::string           Convert_NativePtr_To_Ansi(const wchar_t *x) { return WideToANSI(x?x:L""); }
 
-        static const CTL_WString&   Convert_Native_To_Wide(const CTL_WString& x) { return x; }
-        static CTL_WString          Convert_NativePtr_To_Wide(const wchar_t *x) { return x; }
+        static const std::wstring&   Convert_Native_To_Wide(const std::wstring& x) { return x; }
+        static std::wstring          Convert_NativePtr_To_Wide(const wchar_t *x) { return x; }
+
+
         #else
-        static const CTL_String&   Convert_Ansi_To_Native(const CTL_String& x) { return x; }
-        static CTL_String    Convert_AnsiPtr_To_Native(const char *x) { return x; }
+        static const std::string&   Convert_Ansi_To_Native(const std::string& x) { return x; }
+        static std::string    Convert_AnsiPtr_To_Native(const char *x) { return x; }
 
-        static CTL_String    Convert_Wide_To_Native(const CTL_WString& x) {return WideToANSI(x);}
-        static CTL_String    Convert_WidePtr_To_Native(const wchar_t* x) { return WideToANSI(x); }
+        static std::string    Convert_Wide_To_Native(const std::wstring& x) {return WideToANSI(x);}
+        static std::string    Convert_WidePtr_To_Native(const wchar_t *x) { return WideToANSI(x?x:L""); }
 
-        static const CTL_String&   Convert_Native_To_Ansi(const CTL_String& x) { return x; }
-        static CTL_String    Convert_NativePtr_To_Ansi(const char *x)  { return x; }
+        static const std::string&   Convert_Native_To_Ansi(const std::string& x) { return x; }
+        static std::string    Convert_NativePtr_To_Ansi(const char *x)  { return x; }
 
-        static CTL_WString   Convert_Native_To_Wide(const CTL_String& x) { return ANSIToWide(x); }
-        static CTL_WString   Convert_NativePtr_To_Wide(const char *x) { return ANSIToWide(x); }
-        #endif
+        static std::wstring   Convert_Native_To_Wide(const std::string& x) { return ANSIToWide(x); }
+        static std::wstring   Convert_NativePtr_To_Wide(const char *x) { return ANSIToWide(x?x:""); }
+#endif
+        static std::string     Convert_Wide_To_Ansi(const std::wstring& x) { return WideToANSI(x); }
+        static std::wstring    Convert_Ansi_To_Wide(const std::string& x) { return ANSIToWide(x); }
+        static std::string     Convert_WidePtr_To_Ansi(const wchar_t *x) { return x ? WideToANSI(x) : ""; }
+        static std::wstring     Convert_AnsiPtr_To_Wide(const char *x) { return x ? ANSIToWide(x) : L""; }
 
-        static CTL_String WideToANSI(const CTL_WString& wstr)
+        static std::string WideToANSI(const std::wstring& wstr)
         {
             return static_cast<LPCSTR>(ConvertW2A(wstr.c_str()));
         }
 
-        static CTL_WString ANSIToWide(const CTL_String& str)
+        static std::wstring ANSIToWide(const std::string& str)
         {
             return static_cast<LPCWSTR>(ConvertA2W(str.c_str()));
         }
@@ -278,17 +391,17 @@ namespace dynarithmic
             }
         };
 
-        CTL_StringVector<CTL_String> WideToANSIWriteable(const CTL_WString& wstr)
+        static CTL_StringVector<std::string> WideToANSIWriteable(const std::wstring& wstr)
         {
-            ConvertW2A conv(wstr.c_str());
-            CTL_StringVector<CTL_String> ret((LPCSTR)conv);
+            const ConvertW2A conv(wstr.c_str());
+            CTL_StringVector<std::string> ret(static_cast<LPCSTR>(conv));
             return ret;
         }
 
-        CTL_StringVector<CTL_WString> ANSIToWideWriteable(const CTL_String& str)
+        static CTL_StringVector<std::wstring> ANSIToWideWriteable(const std::string& str)
         {
-            ConvertA2W conv(str.c_str());
-            CTL_StringVector<CTL_WString> ret((LPCWSTR)conv);
+            const ConvertA2W conv(str.c_str());
+            CTL_StringVector<std::wstring> ret(static_cast<LPCWSTR>(conv));
             return ret;
         }
     };
@@ -299,10 +412,11 @@ namespace dynarithmic
         typedef StringTraits traits_type;
         enum { DRIVE_POS, DRIVE_PATH, DIRECTORY_POS, NAME_POS, EXTENSION_POS };
         typedef std::vector<StringType> StringArrayType;
+
         // define string helper functions here
         static StringType Right(const StringType& str, size_t nNum)
         {
-            size_t nLen = str.length();
+            const size_t nLen = str.length();
             if (nNum == 0)
                 return StringTraits::GetEmptyString();
             if (nNum > nLen)
@@ -329,7 +443,7 @@ namespace dynarithmic
 
         static CharType GetAt(const StringType &str, size_t nPos)
         {
-            assert(nPos >= 0 && nPos < str.length());
+            assert(nPos < str.length());
             return str[nPos];
         }
 
@@ -411,6 +525,32 @@ namespace dynarithmic
             return TokenizeEx(str, lpszTokStr, rArray, bGetNullTokens);
         }
 
+        static bool StartsWith(const StringType& str, const StringType& sub)
+        {
+            return boost::algorithm::starts_with(str, sub);
+        }
+
+        static bool StartsWith(const StringType& str, const CharType* sub)
+        {
+            return boost::algorithm::starts_with(str, sub);
+        }
+
+        static bool EndsWith(const StringType& str, const StringType& sub)
+        {
+            return boost::algorithm::ends_with(str, sub);
+        }
+
+        static bool EndsWith(const StringType& str, const CharType* sub)
+        {
+            return boost::algorithm::ends_with(str, sub);
+        }
+
+        static int TokenizeQuoted(const StringType& str, const CharType *lpszTokStr,
+                                  StringArrayType &rArray, bool bGetNullTokens = false)
+        {
+            return TokenizeQuotedEx(str, lpszTokStr, rArray, bGetNullTokens);
+        }
+
         static int Compare(const StringType& str, const CharType* lpsz)
         {
             return str.compare(lpsz);
@@ -468,10 +608,10 @@ namespace dynarithmic
         {
             if ( !pSrc || !pDest)
                 return pDest;
-            size_t nLen = StringTraits::StringLength( pSrc );
+            size_t nLen = StringTraits::Length( pSrc );
             if ( nMaxChars < nLen )
-                nLen = nMaxChars; //nLen = MINMAX_NAMESPACE min( nLen, nMaxChars );
-            StringTraits::StringCopyN( pDest, pSrc, nLen );
+                nLen = nMaxChars;
+            StringTraits::CopyN( pDest, pSrc, nLen );
             pDest[nLen] = 0;
             return pDest;
         }
@@ -481,18 +621,18 @@ namespace dynarithmic
         {
             if ( !pSrc || !pDest)
                 return pDest;
-            return StringTraits::StringCopy( pDest, pSrc );
+            return StringTraits::Copy( pDest, pSrc );
         }
 
         static void SplitPath(const StringType& str, StringArrayType & rArray)
         {
-            BOOST_PATHTYPE p(str.c_str()); //{ "C:\\Windows\\System" };
+            typename StringTraits::FILESYSTEM_PATHTYPE p(str.c_str());
             rArray.clear();
-            rArray.push_back(BOOST_GENERIC_STRING(p.root_name()));
-            rArray.push_back(BOOST_GENERIC_STRING(p.root_directory()));
-            rArray.push_back(BOOST_GENERIC_STRING(p.parent_path()));
-            rArray.push_back(BOOST_GENERIC_STRING(p.stem()));
-            rArray.push_back(BOOST_GENERIC_STRING(p.extension()));
+            rArray.push_back(StringTraits::PathGenericString(p.root_name()));
+            rArray.push_back(StringTraits::PathGenericString(p.root_directory()));
+            rArray.push_back(StringTraits::PathGenericString(p.parent_path()));
+            rArray.push_back(StringTraits::PathGenericString(p.stem()));
+            rArray.push_back(StringTraits::PathGenericString(p.extension()));
         }
 
         static StringArrayType SplitPath(const StringType& str)
@@ -513,12 +653,11 @@ namespace dynarithmic
         {
             if ( rArray.size() < 5 )
                 return StringTraits::GetEmptyString();
-            namespace fs = boost::filesystem;
             StringType s = rArray[NAME_POS] + rArray[EXTENSION_POS];
-            fs::path dir(rArray[DIRECTORY_POS]);
-            fs::path file = s; //rArray[NAME_POS] + StringType(".") + rArray[EXTENSION_POS];
-            fs::path full_path = dir / file;
-            s = BOOST_GENERIC_STRING(full_path);
+            const filesys::path dir(rArray[DIRECTORY_POS]);
+            const filesys::path file = s; //rArray[NAME_POS] + StringType(".") + rArray[EXTENSION_POS];
+            filesys::path full_path = dir / file;
+            s = StringTraits::PathGenericString(full_path);
             return s;
             // std::vector<CharType> retStr(MAX_PATH, 0);
             /*_tmakepath( &retStr[0], rArray[DRIVE_POS].c_str(),
@@ -532,7 +671,7 @@ namespace dynarithmic
         static StringType GetWindowsDirectory()
         {
             CharType buffer[_MAX_PATH];
-            UINT retValue = StringTraits::GetWindowsDirectoryImpl(buffer);
+            const UINT retValue = StringTraits::GetWindowsDirectoryImpl(buffer);
             if ( retValue != 0 )
                 return buffer;
             return StringTraits::GetEmptyString();
@@ -541,7 +680,7 @@ namespace dynarithmic
         static StringType GetSystemDirectory()
         {
             CharType buffer[_MAX_PATH];
-            UINT retValue = StringTraits::GetSystemDirectoryImpl(buffer);
+            const UINT retValue = StringTraits::GetSystemDirectoryImpl(buffer);
             if ( retValue != 0 )
                 return buffer;
             return StringTraits::GetEmptyString();
@@ -565,8 +704,13 @@ namespace dynarithmic
 
         static StringType GetGUID()
         {
-            boost::uuids::uuid u = boost::uuids::random_generator()();
-            return StringConversion::Convert_AnsiPtr_To_Native("{") + BOOST_UUID_STRING_CONVERT(u) + StringConversion::Convert_AnsiPtr_To_Native("}");
+            const boost::uuids::uuid u = boost::uuids::random_generator()();
+            std::ostringstream strm;
+            strm << "{" + to_string(u) + "}";
+            StringType sTemp;
+            std::string sTempIn = strm.str();
+            std::copy(sTempIn.begin(), sTempIn.end(), std::back_inserter(sTemp));
+            return sTemp;
         }
 
         static StringType GetModuleFileName(HMODULE hModule)
@@ -584,9 +728,11 @@ namespace dynarithmic
             return &szName[0];
         }
 
-        static int TokenizeEx(const StringType& str, const CharType *lpszTokStr,
-                                    StringArrayType &rArray, bool bGetNullTokens,
-                                    std::vector<unsigned>* positionArray=NULL)
+        static int TokenizeEx(const StringType& str,
+                              const CharType *lpszTokStr,
+                              StringArrayType &rArray,
+                              bool bGetNullTokens,
+                              std::vector<unsigned>* positionArray= nullptr)
         {
             rArray.clear();
             typedef boost::tokenizer<boost::char_separator<CharType>,
@@ -602,23 +748,161 @@ namespace dynarithmic
                 rArray.push_back(*tok_iter);
                 if ( positionArray )
                 {
-                    std::ptrdiff_t offset = tok_iter.base() - str.begin() - tok_iter->size();
+                    const std::ptrdiff_t offset = tok_iter.base() - str.begin() - tok_iter->size();
                     positionArray->push_back(static_cast<unsigned>(offset));
                 }
             }
-            return (int)rArray.size();
+            return static_cast<int>(rArray.size());
+        }
+
+        static int TokenizeQuotedEx(const StringType& str,
+                                    const CharType *lpszTokStr,
+                                    StringArrayType &rArray,
+                                    bool bGetNullTokens,
+                                    std::vector<unsigned>* positionArray = nullptr)
+        {
+            rArray.clear();
+            typedef boost::tokenizer<boost::escaped_list_separator<CharType>,
+                                    typename StringType::const_iterator,
+                                    StringType> tokenizer;
+
+            boost::escaped_list_separator<CharType> sepr(StringTraits::GetEmptyString(), lpszTokStr, StringTraits::AllQuoteString());
+            tokenizer tokens(str, sepr);
+            typename StringType::const_iterator beg = str.begin();
+            for (auto tok_iter = tokens.begin(); tok_iter != tokens.end(); ++tok_iter)
+            {
+                rArray.push_back(*tok_iter);
+                if (positionArray)
+                {
+                    const std::ptrdiff_t offset = tok_iter.base() - str.begin() - tok_iter->size();
+                    positionArray->push_back(static_cast<unsigned>(offset));
+                }
+            }
+            if ( !bGetNullTokens )
+            {
+                std::vector<size_t> removed_pos;
+                for (size_t idx = 0; idx < rArray.size(); ++idx)
+                {
+                    if ( rArray[idx].empty() )
+                        removed_pos.push_back(idx);
+                }
+
+                for (auto i : removed_pos)
+                {
+                    rArray.erase(rArray.begin() + i);
+                    if ( positionArray )
+                        positionArray->erase(positionArray->begin() + i);
+                }
+            }
+            return static_cast<int>(rArray.size());
+        }
+
+        static int32_t CopyInfoToCString(const StringType& strInfo, CharType* szInfo, int32_t nMaxLen)
+        {
+            if (strInfo.empty() || szInfo && nMaxLen <= 0)
+                return 0;
+            if (nMaxLen > 0)
+                --nMaxLen;
+            int32_t nRealLen;
+            if (szInfo != nullptr && nMaxLen >= 0)
+            {
+                const size_t nLen = strInfo.size();
+                nRealLen = static_cast<int32_t>((std::min)(static_cast<size_t>(nMaxLen), nLen));
+                CharType* pEnd = std::copy(strInfo.begin(), strInfo.begin() + static_cast<size_t>(nRealLen), szInfo);
+                *pEnd = StringTraits::GetZeroString();
+            }
+            else
+                nRealLen = static_cast<int32_t>(strInfo.size());
+            ++nRealLen;
+            return nRealLen;
+        }
+
+        static typename StringTraits::string_type CreateFileNameFromNumber(typename StringTraits::string_type sFileName, int num, int nDigits)
+        {
+            typename StringTraits::stringarray_type rArray;
+            SplitPath(sFileName, rArray);
+
+            // Adjust the file name
+            typename StringTraits::outputstream_type strm;
+            strm << std::setfill(StringTraits::GetZeroNumericString()) << std::setw(nDigits) << num;
+            typename StringTraits::string_type szBuf = strm.str();
+            typename StringTraits::string_type& sTemp = rArray[NAME_POS];
+            sTemp = sTemp.substr(0, sTemp.length() - nDigits) + szBuf;
+            return MakePath(rArray);
+        }
+
+        static int GetInitialFileNumber(typename StringTraits::string_type sFileName, size_t &nDigits)
+        {
+            typename StringTraits::stringarray_type rArray;
+            SplitPath(sFileName, rArray);
+            nDigits = 0;
+            typename StringTraits::string_type sTemp;
+            const size_t nLen = rArray[NAME_POS].length();
+            for (size_t i = nLen - 1; ; --i)
+            {
+                if (StringTraits::IsDigit(rArray[NAME_POS][i]))
+                {
+                    sTemp = rArray[NAME_POS][i] + sTemp;
+                    nDigits++;
+                }
+                else
+                    break;
+                if (i == 0)
+                    break;
+            }
+
+            // now loop until we get a good cast from the string we have
+            while (!sTemp.empty())
+            {
+                try
+                {
+                    return boost::lexical_cast<int>(sTemp);
+                }
+                catch (boost::bad_lexical_cast&)
+                {
+                    sTemp.erase(sTemp.begin());
+                }
+            }
+            return 0;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////
+        static typename StringTraits::string_type GetPageFileName(typename StringTraits::string_type strBase, int nCurImage, bool bUseLongNames)
+        {
+            typename StringTraits::string_type strFormat;
+            typename StringTraits::outputstream_type strm;
+            strm << nCurImage;
+            strFormat = strm.str();
+            const int nLenFormat = static_cast<int>(strFormat.length());
+
+            typename StringTraits::stringarray_type rName;
+            SplitPath(strBase, rName);
+
+            auto strName = rName[NAME_POS];
+
+            if (bUseLongNames)
+                strName += strFormat;
+            else
+            {
+                if ((strName + strFormat).length() > 8)
+                {
+                    int nBase = 8 - nLenFormat;
+                    strName = Left(strName, nBase) + strFormat;
+                }
+                else
+                    strName += strFormat;
+            }
+            rName[NAME_POS] = strName;
+            return MakePath(rName);
         }
     };
 
-    typedef StringWrapper_Impl<CTL_String, char, ANSIStringTraits> StringWrapperA;
-    typedef StringWrapper_Impl<CTL_WString, wchar_t, UnicodeStringTraits> StringWrapperW;
+    typedef StringWrapper_Impl<std::string, char, ANSIStringTraits> StringWrapperA;
+    typedef StringWrapper_Impl<std::wstring, wchar_t, UnicodeStringTraits> StringWrapperW;
     typedef UnicodeStringTraits StringTraitsW;
     typedef ANSIStringTraits    StringTraitsA;
 
-
-
-
-    #define GET_NUM_CHARS_NATIVE(x) (sizeof(x) / sizeof(x[0])
+    #define GET_NUM_CHARS_NATIVE(x) (sizeof(x) / sizeof((x)[0])
     #define GET_NUM_BYTES_NATIVE(x) sizeof(x)
 
     #ifdef UNICODE

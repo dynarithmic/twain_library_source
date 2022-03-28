@@ -1,6 +1,6 @@
 /*
 This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-Copyright (c) 2002-2021 Dynarithmic Software.
+Copyright (c) 2002-2022 Dynarithmic Software.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,15 +22,14 @@ OF THIRD PARTY RIGHTS.
 
 int ASCIIHexEncode( const std::string&inData, std::string& outData)
 {
-    const char *pHexStr = "0123456789ABCDEF";
-    unsigned int hival, loval;
     outData.reserve(inData.size() * 2);
     for ( size_t i = 0; i < inData.size(); ++i)
     {
+        auto pHexStr = "0123456789ABCDEF";
         unsigned char ch = inData[i];
         ch = ch >> 4;
-        hival = ch;
-        loval = inData[i] & 0x0F;
+        unsigned int hival = ch;
+        unsigned int loval = inData[i] & 0x0F;
         outData += pHexStr[hival];
         outData += pHexStr[loval];
     }

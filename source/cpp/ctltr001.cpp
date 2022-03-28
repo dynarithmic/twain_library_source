@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -28,9 +28,8 @@ CTL_SourceTriplet::CTL_SourceTriplet(CTL_ITwainSession *pSession,
                                      TW_UINT16 nMsg)
                                      :  CTL_TwainTriplet()
 {
-    SetSessionPtr( NULL );
-    SetSourcePtr( NULL );
-    CTL_ITwainSource *pSource;
+    SetSessionPtr( nullptr );
+    SetSourcePtr(  nullptr );
 
     // Get the app manager's AppID
     const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
@@ -38,14 +37,14 @@ CTL_SourceTriplet::CTL_SourceTriplet(CTL_ITwainSession *pSession,
     if ( pMgr && pMgr->IsValidTwainSession( pSession ))
     {
         // Don't add this source to permanent list
-        pSource = CTL_ITwainSource::Create(pSession, pProduct);
+        CTL_ITwainSource* pSource = CTL_ITwainSource::Create(pSession, pProduct);
         SetSourcePtr(pSource);
         m_bSourceCreated = true;
         SetSessionPtr(pSession);
         if ( pSource )
         {
-            Init( pSession->GetAppIDPtr(), NULL, DG_CONTROL, DAT_IDENTITY,
-                  nMsg, (TW_MEMREF)pSource->GetSourceIDPtr() );
+            Init( pSession->GetAppIDPtr(), nullptr, DG_CONTROL, DAT_IDENTITY,
+                  nMsg, static_cast<TW_MEMREF>(pSource->GetSourceIDPtr()) );
             SetAlive (true);
         }
     }
@@ -65,8 +64,8 @@ CTL_SourceTriplet::CTL_SourceTriplet(CTL_ITwainSession *pSession,
     if ( pMgr && pMgr->IsValidTwainSession( pSession ))
     {
         // Don't add this source to permanent list
-        Init( pSession->GetAppIDPtr(), NULL, DG_CONTROL, DAT_IDENTITY,
-              nMsg, (TW_MEMREF) pSource->GetSourceIDPtr() );
+        Init( pSession->GetAppIDPtr(), nullptr, DG_CONTROL, DAT_IDENTITY,
+              nMsg, static_cast<TW_MEMREF>(pSource->GetSourceIDPtr()) );
         SetAlive (true);
     }
 }

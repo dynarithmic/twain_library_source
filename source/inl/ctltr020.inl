@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,6 +18,9 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#ifndef CTLTR020_INL
+#define CTLTR020_INL
+
 template <class T>
 CTL_CapabilitySetArrayTriplet<T>::CTL_CapabilitySetArrayTriplet(CTL_ITwainSession *pSession,
                                                              CTL_ITwainSource* pSource,
@@ -55,10 +58,10 @@ template <class T>
 bool CTL_CapabilitySetArrayTriplet<T>::Encode(const std::vector<T>& rArray, void *pMemBlock)
 {
     // Get a TW_RANGE structure
-    pTW_ARRAY pArray = (pTW_ARRAY)pMemBlock;
+    pTW_ARRAY pArray = static_cast<pTW_ARRAY>(pMemBlock);
 
     // Set the # of elements
-    pArray->NumItems = (TW_UINT32)m_nAggSize;
+    pArray->NumItems = static_cast<TW_UINT32>(m_nAggSize);
 
     // Set the data type
     pArray->ItemType = CTL_CapabilitySetTripletBase::GetTwainType();
@@ -72,3 +75,4 @@ bool CTL_CapabilitySetArrayTriplet<T>::Encode(const std::vector<T>& rArray, void
     });
     return true;
 }
+#endif // CTLTR020_INL

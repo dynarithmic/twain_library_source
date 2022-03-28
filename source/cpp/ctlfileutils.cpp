@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,8 +18,9 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+
 #include "ctlfileutils.h"
-#include <boost/filesystem.hpp>
+#include <dtwain_filesystem.h>
 
 namespace dynarithmic
 {
@@ -27,9 +28,9 @@ namespace dynarithmic
     {
         try
         {
-            boost::filesystem::remove(filename);
+            filesys::remove(filename);
         }
-        catch (boost::filesystem::filesystem_error &)
+        catch (filesys::filesystem_error &)
         {
             return false;
         }
@@ -40,17 +41,35 @@ namespace dynarithmic
     {
         try
         {
-            auto p = boost::filesystem::path(filename);
-            auto p2 = p.remove_filename();
+            auto p = filesys::path(filename);
+            const auto p2 = p.remove_filename();
             auto native_str = p2.native();
             CTL_StringType str(native_str.begin(), native_str.end());
             str = StringWrapper::AddBackslashToDirectory(str);
-            if (boost::filesystem::exists(str))
+            if (filesys::exists(str))
                 return true;
         }
-        catch (boost::filesystem::filesystem_error&)
+        catch (filesys::filesystem_error&)
         {
         }
         return false;
+    }
+
+    bool file_exists(LPCTSTR filename)
+    {
+        return filesys::exists(filename);
+    }
+
+    CTL_StringType temp_directory_path(bool bWithSeparator)
+    {
+        auto retVal = filesys::temp_directory_path().string();
+        if ( bWithSeparator && !retVal.empty() )
+        {
+            CTL_StringType tempStr(retVal.begin(), retVal.end());
+            if (!tempStr.empty() && *tempStr.rbegin() != filesys::path::preferred_separator)
+                tempStr += filesys::path::preferred_separator;
+            return tempStr;
+        }
+        return {retVal.begin(), retVal.end()};
     }
 }

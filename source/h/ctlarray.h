@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -25,11 +25,15 @@
 #include "dtwtype.h"
 #include "twain.h"
 
-typedef std::vector<int>          CTL_IntArray;
-typedef std::vector<TW_UINT16>  CTL_TwainCapArray;
-typedef std::vector<double>       CTL_RealArray;
-typedef std::vector<HANDLE>       CTL_HDIBArray;
+typedef std::vector<int>            CTL_IntArray;
+typedef std::vector<TW_UINT16>      CTL_TwainCapArray;
+typedef std::vector<double>         CTL_RealArray;
+typedef std::vector<HANDLE>         CTL_HDIBArray;
 
-#include "ctlobstr.h"
+namespace dynarithmic
+{
+    void ArrayCopyWideToNative(DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest);
+    void ArrayCopyAnsiToNative(DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest);
+}
 
 #endif

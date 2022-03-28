@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,10 +22,14 @@
 #include "enumeratorfuncs.h"
 #include "errorcheck.h"
 #include "sourceacquireopts.h"
+#include <algorithm>
+
+#include "cppfunc.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
+#pragma warning (disable:4714)
 #endif
-using namespace std;
+
 using namespace dynarithmic;
 
 DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
@@ -38,30 +42,37 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
                                                     DTWAIN_BOOL bCloseSource,
                                                     LPLONG pStatus)
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, aFileNames, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI,
-        bCloseSource, pStatus))
-    LONG Count, Type;
-    bool bRetval = true;
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    LOG_FUNC_ENTRY_PARAMS((Source, aFileNames, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI,bCloseSource, pStatus))
+    auto bRetval = true;
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    DTWAIN_ARRAY tempNames = nullptr;
+    DTWAINArrayPtr_RAII tempRAII(&tempNames);
+    DTWAIN_ARRAY arrayToUse = aFileNames;
     if (aFileNames)
     {
-        auto vValues = EnumeratorVectorPtr<CTL_StringType>(aFileNames);
-        if (vValues)
-            Count = static_cast<LONG>(vValues->size());
-        else
-            Count = 0;
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return (Count <= 0); }, DTWAIN_ERR_INDEX_BOUNDS, false, FUNC_MACRO);
-
-        Type = EnumeratorFunctionImpl::GetEnumeratorType(aFileNames);
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return (Type != DTWAIN_ARRAYSTRING); }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
+        std::vector<LONG> validTypes = {DTWAIN_ARRAYSTRING, DTWAIN_ARRAYANSISTRING, DTWAIN_ARRAYWIDESTRING};
+        const LONG Type = EnumeratorFunctionImpl::GetEnumeratorType(aFileNames);
+        const auto itArrType = std::find(validTypes.begin(), validTypes.end(), Type);
+        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return itArrType == validTypes.end(); }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
+        const auto idx = std::distance(validTypes.begin(), itArrType);
+        if ( idx > 0 )
+        {
+            tempNames = DTWAIN_ArrayCreate(DTWAIN_ARRAYSTRING, 0);
+            if ( idx == 1 )
+                ArrayCopyAnsiToNative(aFileNames, tempNames);
+            else
+                ArrayCopyWideToNative(aFileNames, tempNames);
+            arrayToUse = tempNames;
+        }
     }
     else
         bRetval = false;
+
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !bRetval; }, DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
 
     SourceAcquireOptions opts = SourceAcquireOptions().setHandle(GetDTWAINHandle_Internal()).setSource(Source).setFileType(lFileType).setFileFlags(lFileFlags | DTWAIN_USELIST).
-                setFileList(aFileNames).setPixelType(PixelType).setMaxPages(lMaxPages).setShowUI(bShowUI ? true : false).
+                setFileList(arrayToUse).setPixelType(PixelType).setMaxPages(lMaxPages).setShowUI(bShowUI ? true : false).
                 setRemainOpen(!(bCloseSource ? true : false));
 
     bRetval = AcquireFileHelper(opts, ACQUIREFILE);
@@ -73,20 +84,21 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
 
 
 DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFile(DTWAIN_SOURCE Source,
-                                                LPCTSTR   lpszFile,
-                                                LONG     lFileType,
-                                                LONG     lFileFlags,
-                                                LONG     PixelType,
-                                                LONG     lMaxPages,
-                                                DTWAIN_BOOL bShowUI,
-                                                DTWAIN_BOOL bCloseSource,
-                                                LPLONG pStatus)
+                                                  LPCTSTR   lpszFile,
+                                                  LONG     lFileType,
+                                                  LONG     lFileFlags,
+                                                  LONG     PixelType,
+                                                  LONG     lMaxPages,
+                                                  DTWAIN_BOOL bShowUI,
+                                                  DTWAIN_BOOL bCloseSource,
+                                                  LPLONG pStatus)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpszFile, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus))
     lFileFlags &= ~DTWAIN_USELIST;
-    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(GetDTWAINHandle_Internal()).setSource(Source).setFileName(lpszFile).setFileType(lFileType).setFileFlags(lFileFlags).setPixelType(PixelType).
+    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(GetDTWAINHandle_Internal()).setSource(Source).
+        setFileName(lpszFile).setFileType(lFileType).setFileFlags(lFileFlags).setPixelType(PixelType).
         setMaxPages(lMaxPages).setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setAcquireType(ACQUIREFILE);
-    bool bRetval = AcquireFileHelper(opts, ACQUIREFILE);
+    const bool bRetval = AcquireFileHelper(opts, ACQUIREFILE);
     if (pStatus)
         *pStatus = opts.getStatus();
     LOG_FUNC_EXIT_PARAMS(bRetval)
@@ -96,7 +108,7 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFile(DTWAIN_SOURCE Source,
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileAutoIncrement(DTWAIN_SOURCE Source, LONG nValue, DTWAIN_BOOL bResetOnAcquire, DTWAIN_BOOL bSet)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nValue, bResetOnAcquire, bSet))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, Source);
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
@@ -113,12 +125,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileAutoIncrement(DTWAIN_SOURCE Source, LONG 
 DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireFile(SourceAcquireOptions& opts)
 {
     LOG_FUNC_ENTRY_PARAMS((opts))
-    DTWAIN_ARRAY FileList = opts.getFileList();
+    const DTWAIN_ARRAY FileList = opts.getFileList();
     if (FileList)
         opts.setFileFlags(opts.getFileFlags() | DTWAIN_USELIST);
     if ( opts.getAcquireType() != TWAINAcquireType_AudioFile)
         opts.setActualAcquireType(TWAINAcquireType_File);
-    DTWAIN_ACQUIRE Ret = LLAcquireImage(opts);
+    const DTWAIN_ACQUIRE Ret = LLAcquireImage(opts);
     LOG_FUNC_EXIT_PARAMS(Ret)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
@@ -126,14 +138,13 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireFile(SourceAcquireOptions& opts)
 bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType)
 {
     LOG_FUNC_ENTRY_PARAMS((opts))
-    DTWAIN_ARRAY aDibs = 0;
     CTL_ITwainSource *pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), opts.getSource());
 
     // Check if file type requires a loaded DLL
     DumpArrayContents(opts.getFileList(), 0);
     opts.setAcquireType(AcquireType);
     opts.setDiscardDibs(true); // make sure we remove acquired dibs for file handling
-    aDibs = SourceAcquire(opts);
+    const DTWAIN_ARRAY aDibs = SourceAcquire(opts);
     if (opts.getStatus() < 0 && !aDibs)
     {
         LOG_FUNC_EXIT_PARAMS(false)
@@ -145,7 +156,7 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
         bRetval = TRUE;
         if (DTWAIN_GetTwainMode() == DTWAIN_MODAL)
         {
-            auto vDibs = EnumeratorVectorPtr<LPVOID>(aDibs);
+            const auto vDibs = EnumeratorVectorPtr<LPVOID>(aDibs);
             if (vDibs)
                 for_each(begin(*vDibs), end(*vDibs), EnumeratorFunctionImpl::EnumeratorDestroy);
             pSource->ResetAcquisitionAttempts(nullptr);

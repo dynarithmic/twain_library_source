@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -23,13 +23,13 @@
 #include <cstdio>
 void A85Decoder::wput(std::string & output, unsigned long tuple, int bytes)
 {
-    char buf[100];
-    static const int shifter[] = {24, 16, 8, 0};
+    static constexpr int shifter[] = {24, 16, 8, 0};
     if ( bytes >=1 && bytes <= 4 )
     {
         for (int i = 0; i < bytes; ++i )
         {
-            sprintf(buf, "%c", (unsigned char)(tuple >> shifter[i]));
+            char buf[100];
+            sprintf(buf, "%c", static_cast<unsigned char>(tuple >> shifter[i]));
             output+=buf;
         }
     }
@@ -38,17 +38,17 @@ void A85Decoder::wput(std::string & output, unsigned long tuple, int bytes)
 std::string A85Decoder::decode85()
 {
     unsigned long tuple = 0;
-    int c, count = 0;
+    int count = 0;
     int curinputPos = 0;
     std::string output;
     while (curinputPos < static_cast<int>(m_scratch.size()))
     {
-        c = m_scratch[curinputPos++];
+        int c = m_scratch[curinputPos++];
         switch (c)
         {
         default:
             if (c < '!' || c > 'u')
-                return "";
+                return {};
             tuple += (c - '!') * pow85[count++];
             if (count == 5)
             {
@@ -60,7 +60,7 @@ std::string A85Decoder::decode85()
 
         case 'z':
             if (count != 0)
-                return "";
+                return {};
             output.append(4,'\0');
             break;
 
@@ -89,19 +89,19 @@ std::string A85Decoder::DecodeA85(const std::string& strIn,
                                   )
 {
     if (strIn.size() < 2)
-        return "";
+        return {};
     m_scratch = strIn;
     if ( checkPrefix )
     {
         if (strIn[0] != '<' || strIn[1] != '~' )
-            return "";
+            return {};
         m_scratch = strIn.substr(2);
     }
     if (checkSuffix)
     {
         if (strIn[strIn.size()-2] != '~' ||
             strIn[strIn.size()-1] != '>')
-            return "";
+            return {};
     }
     return decode85();
 }

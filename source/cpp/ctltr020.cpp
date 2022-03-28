@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <cstring>
 #include "ctltr020.h"
 
 
@@ -30,7 +29,7 @@
     template  CTL_CapabilitySetArrayTriplet<unsigned long>;
     template  CTL_CapabilitySetArrayTriplet<unsigned short>;
     template  CTL_CapabilitySetArrayTriplet<double>;
-    template  CTL_CapabilitySetArrayTriplet<CTL_String>;
+    template  CTL_CapabilitySetArrayTriplet<std::string>;
     template  CTL_CapabilitySetArrayTriplet<char *>;
     template  CTL_CapabilitySetArrayTriplet<TW_FRAME>;
 #endif

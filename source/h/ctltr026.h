@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@
 #define CTLTR026_H_
 
 #include "ctltr024.h"
-#include "ctltr038.h"
-
 namespace dynarithmic
 {
 
@@ -37,14 +35,14 @@ namespace dynarithmic
                                  CTL_ITwainSource *pSource,
                                  TW_UINT16 nType);
 
-            HANDLE          GetDibHandle();
+            HANDLE          GetDibHandle() const;
 
-            TW_UINT16       Execute();
+            TW_UINT16       Execute() override;
             bool            IsScanPending() const;
             int             GetTotalScannedPages() const;
             int             GetTransferType() const;
             int             PromptAndSaveImage(size_t nImageNum);
-            CTL_TwainFileFormatEnum GetFileTypeFromCompression(int nCompression);
+            static CTL_TwainFileFormatEnum GetFileTypeFromCompression(int nCompression);
             int             GetAcquireFailAction() const { return m_nFailAction; }
             void            SetAcquireFailAction(int nAction) { m_nFailAction = nAction; }
             static void     ResolveImageResolution(CTL_ITwainSource *pSource,  DTWAINImageInfoEx* ImageInfo);
@@ -53,7 +51,7 @@ namespace dynarithmic
 
         protected:
             bool            AbortTransfer(bool bForceClose = false);
-            CTL_StringType  GetPageFileName(const CTL_StringType& strBase, int nCurImage );
+            std::string     GetPageFileName(const std::string& strBase, int nCurImage ) const;
             bool            IsPendingXfersDone() const { return m_bPendingXfersDone; }
             void            SetPendingXfersDone(bool bSet) { m_bPendingXfersDone = bSet; }
             TW_PENDINGXFERS& GetLocalPendingXferInfo() { return m_PendingXfers; }
@@ -63,61 +61,56 @@ namespace dynarithmic
             bool            FailAcquisition();
 
             bool            StopFeeder();
-            bool            IsJobControlPending(TW_PENDINGXFERS *pPending);
-            bool            CopyDibToClipboard(CTL_ITwainSession *pSession, HANDLE hDib);
+            bool            IsJobControlPending(TW_PENDINGXFERS *pPending) const;
+            static bool     CopyDibToClipboard(CTL_ITwainSession *pSession, HANDLE hDib);
             TW_UINT16       GetImagePendingInfo(TW_PENDINGXFERS *pPI, TW_UINT16 nMsg=MSG_ENDXFER);
-            CTL_ImageIOHandler *GetImageHandler() { return m_pImgHandler; }
+            CTL_ImageIOHandler *GetImageHandler() const { return m_pImgHandler; }
             CTL_ImageIOHandler *m_pImgHandler;
-            static LONG CloseMultiPageDibFile();
-            bool CropDib(CTL_ITwainSession *pSession,
-                         CTL_ITwainSource *pSource,
-                         CTL_TwainDibPtr CurDib);
-            bool ResampleDib(CTL_ITwainSession *pSession,
-                             CTL_ITwainSource *pSource,
-                             CTL_TwainDibPtr CurDib);
+            static bool CropDib(CTL_ITwainSession* pSession,
+                                const CTL_ITwainSource* pSource,
+                                const CTL_TwainDibPtr& CurDib);
+            static bool ResampleDib(CTL_ITwainSession* pSession,
+                                    const CTL_ITwainSource* pSource,
+                                    const CTL_TwainDibPtr& CurDib);
 
-            bool NegateDib(CTL_ITwainSession *pSession, CTL_ITwainSource *pSource, CTL_TwainDibPtr CurDib);
+            static bool NegateDib(CTL_ITwainSession* pSession, const CTL_ITwainSource* pSource, const CTL_TwainDibPtr& CurDib);
 
-            bool ResampleBppForJPEG(CTL_ITwainSession *pSession,
-                                     CTL_ITwainSource *pSource,
-                                     CTL_TwainDibPtr CurDib);
-            bool ChangeBpp(CTL_ITwainSession *pSession,
-                           CTL_ITwainSource *pSource,
-                           CTL_TwainDibPtr CurDib);
+            static bool ResampleBppForJPEG(CTL_ITwainSession* pSession,
+                                           CTL_ITwainSource* pSource,
+                                           CTL_TwainDibPtr& CurDib);
+            static bool ChangeBpp(CTL_ITwainSession* pSession,
+                                  const CTL_ITwainSource* pSource,
+                                  const CTL_TwainDibPtr& CurDib);
 
-            bool ResampleBppForGIF(CTL_ITwainSession *pSession,
-                                    CTL_ITwainSource *pSource,
-                                    CTL_TwainDibPtr CurDib);
+            static bool ResampleBppForGIF(CTL_ITwainSession *pSession,
+                                         CTL_ITwainSource *pSource,
+                                        CTL_TwainDibPtr& CurDib);
 
-            bool ResampleBppForPDF(CTL_ITwainSession *pSession,
-                                    CTL_ITwainSource *pSource,
-                                    CTL_TwainDibPtr CurDib);
+            static bool ResampleBppForPDF(CTL_ITwainSession *pSession,
+                                         CTL_ITwainSource *pSource,
+                                        CTL_TwainDibPtr& CurDib);
 
-            bool ResampleBppForWBMP(CTL_ITwainSession *pSession,
-                                    CTL_ITwainSource *pSource,
-                                    CTL_TwainDibPtr CurDib);
+            static bool ResampleBppForWBMP(CTL_ITwainSession* pSession,
+                                           CTL_ITwainSource* pSource,
+                                           CTL_TwainDibPtr& CurDib);
 
-            bool IsPageBlank(CTL_ITwainSession *pSession,
-                             CTL_ITwainSource *pSource,
-                             CTL_TwainDibPtr CurDib);
+            static bool IsPageBlank(CTL_ITwainSession* pSession,
+                                    const CTL_ITwainSource* pSource,
+                                    bool resampled,
+                                    const CTL_TwainDibPtr& CurDib);
 
-            int ProcessBlankPage(CTL_ITwainSession *pSession,
-                CTL_ITwainSource *pSource,
-                CTL_TwainDibPtr CurDib,
-                LONG message_to_send1,
-                LONG message_to_send2,
-                LONG option_to_test);
+            int ProcessBlankPage(CTL_ITwainSession* pSession,
+                                 CTL_ITwainSource* pSource,
+                                 const CTL_TwainDibPtr& CurDib,
+                                 bool resampled,
+                                 LONG message_to_send1,
+                                 LONG message_to_send2,
+                                 LONG option_to_test) const;
 
-            void SaveJobPages(ImageXferFileWriter& FileWwriter);
+            void SaveJobPages(const ImageXferFileWriter& FileWriter);
             bool ModifyAcquiredDib();
             bool QueryAndRemoveDib(CTL_TwainAcquireEnum acquireType, size_t nWhich);
             bool ResampleAcquiredDib();
-
-
-
-    /*        void EndProcessingImageFile(CTL_ITwainSource *pSource,
-                                        ImageXferFileWriter& FileWriter,
-                                        bool bSaveFile=true);*/
 
         protected:
             HANDLE          m_hDataHandle;

@@ -29,7 +29,7 @@ extern "C" int TIFFSplitMain(int argc, char* argv[]);
 
 TIFF* FUNCCONVENTION DTWLIB_TIFFOpen(LPCTSTR szFile, LPCTSTR szOpen)
 {
-    return TIFFOpen(dynarithmic::StringConversion::Convert_Native_To_Ansi(szFile).c_str(), 
+    return TIFFOpen(dynarithmic::StringConversion::Convert_Native_To_Ansi(szFile).c_str(),
                     dynarithmic::StringConversion::Convert_Native_To_Ansi(szOpen).c_str());
 }
 
@@ -89,7 +89,7 @@ void FUNCCONVENTION  DTWLIB_TIFFSetRowsPerStrip(TIFF* pTiff, LONG nRows)
 
 
 void FUNCCONVENTION  DTWLIB_TIFFSetColorMap(TIFF* pTiff, uint16 *pRed,
-                                  uint16 *pGreen, 
+                                  uint16 *pGreen,
                                   uint16 *pBlue)
 {
     TIFFSetField(pTiff, TIFFTAG_COLORMAP, pRed, pGreen, pBlue);

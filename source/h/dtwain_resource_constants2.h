@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -405,7 +405,7 @@
 #define IDC_DLGSELECTSOURCE      10000
 #define IDC_LSTSOURCES           10001
 #define IDC_SOURCETEXT           10002
-#define IDC_EDIT1				 10003
+#define IDC_EDIT1                10003
 #define IDC_STATIC               -1
 
 // version string

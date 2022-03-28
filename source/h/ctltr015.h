@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -41,14 +41,14 @@ namespace dynarithmic
                                         TW_UINT16   gCap,
                                         TW_UINT16 TwainDataType);
 
-            size_t          GetNumItems();
-            bool            GetValue(void *pData, size_t nWhichVal);
+            size_t          GetNumItems() override;
+            bool            GetValue(void *pData, size_t nWhichVal) override;
             TW_UINT16       GetDataType();
 
         protected:
-            bool            EnumCapValues( void *pCapData );
+            bool            EnumCapValues( void *pCapData ) override;
             pTW_RANGE       GetRangePtr();
-            void            Decode( void *pCapData );
+            void            Decode( void *pCapData ) override;
 
         private:
             CTL_RangeType   m_FirstVal;

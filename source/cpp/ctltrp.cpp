@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////
 /// Classes that do the TWAIN triplet protocol
 
-CTL_TwainTriplet::CTL_TwainTriplet() : m_TwainTripletArg(std::make_tuple((pTW_IDENTITY)0, (pTW_IDENTITY)0, 0, 0, 0, (TW_MEMREF)0)),
+CTL_TwainTriplet::CTL_TwainTriplet() : m_TwainTripletArg({nullptr, nullptr, {0,0,0}, nullptr}),
                                        m_bInit(false),
                                        m_bAlive(false),
                                        m_pSource(nullptr),
@@ -38,48 +38,62 @@ CTL_TwainTriplet::CTL_TwainTriplet(  pTW_IDENTITY pOrigin,
                                      TW_UINT32    nDG,
                                      TW_UINT16    nDAT,
                                      TW_UINT16    nMSG,
-                                     TW_MEMREF    pData)
+                                     TW_MEMREF    pData) : m_bInit(false),
+                                                           m_bAlive(false),
+                                                           m_pSource(nullptr),
+                                                           m_pSession(nullptr)
 {
     Init(pOrigin, pDest, nDG, nDAT,  nMSG, pData);
 }
 
-void CTL_TwainTriplet::Init( pTW_IDENTITY pOrigin,
-                             pTW_IDENTITY pDest,
-                             TW_UINT32    nDG,
-                             TW_UINT16    nDAT,
-                             TW_UINT16    nMSG,
-                             TW_MEMREF    pData)
+void dynarithmic::CTL_TwainTriplet::Init( const pTW_IDENTITY pOrigin,
+                             const pTW_IDENTITY pDest,
+                             TW_UINT32 nDG,
+                             TW_UINT16 nDAT,
+                             TW_UINT16 nMSG,
+                             TW_MEMREF pData)
 {
-    m_TwainTripletArg = std::make_tuple(pOrigin, pDest, nDG, nDAT, nMSG, pData);
+    m_TwainTripletArg = {pOrigin, pDest, {nDG, nDAT, nMSG}, pData};
     m_bInit     = true;
 }
 
 bool CTL_TwainTriplet::IsMSGGetType() const
 {
-    TW_UINT16 msgType = std::get<MSGPOS_>(m_TwainTripletArg);
-    return msgType == MSG_GET || msgType == MSG_GETCURRENT || msgType == MSG_GETDEFAULT;
+    const TW_UINT16 msgType = GetMSG();
+    return  msgType == MSG_GET ||
+            msgType == MSG_GETCURRENT ||
+            msgType == MSG_GETDEFAULT ||
+            msgType == MSG_GETHELP ||
+            msgType == MSG_GETLABEL ||
+            msgType == MSG_GETLABELENUM;
 }
 
 bool CTL_TwainTriplet::IsMSGSetType() const
 {
-    TW_UINT16 msgType = std::get<MSGPOS_>(m_TwainTripletArg);
+    const TW_UINT16 msgType = GetMSG();
     return msgType == MSG_SET || msgType == MSG_SETCONSTRAINT;
+}
+
+bool CTL_TwainTriplet::IsMSGResetType() const
+{
+    const TW_UINT16 msgType = GetMSG();
+    return msgType == MSG_RESET || msgType == MSG_RESETALL;
 }
 
 TW_UINT16 CTL_TwainTriplet::Execute()
 {
     // Get the Main App Ptr
     const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-    CTL_TwainAppMgrPtr pTemp = pMgr;
+    const CTL_TwainAppMgrPtr pTemp = pMgr;
 
-    TW_UINT16 nFail = TWRC_FAILURE;
+    const TW_UINT16 nFail = TWRC_FAILURE;
     if ( !pTemp )
     {
-        DTWAIN_ERROR_CONDITION(IDS_ErrTwainMgrInvalid, nFail);
+        DTWAIN_ERROR_CONDITION(IDS_ErrTwainMgrInvalid, nFail)
     }
     if ( !m_bAlive )
     {
-        DTWAIN_ERROR_CONDITION(IDS_ErrTripletNotExecuted, nFail);
+        DTWAIN_ERROR_CONDITION(IDS_ErrTripletNotExecuted, nFail)
     }
     return pTemp->CallDSMEntryProc( *this );
 }

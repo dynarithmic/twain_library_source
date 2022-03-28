@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#define MC_NO_CPP
 #include "ctltr014.h"
 #include "ctlobtyp.h"
 
@@ -42,19 +41,16 @@ CTL_CapabilityGetArrayTriplet::CTL_CapabilityGetArrayTriplet(
 
 bool CTL_CapabilityGetArrayTriplet::EnumCapValues( void *pCapData )
 {
-    pTW_ARRAY pValArray;
-    size_t    nNumItems;
-
     // dereference to a TW_ARRAY structure
-    pValArray = static_cast<pTW_ARRAY>(pCapData);
+    const pTW_ARRAY pValArray = static_cast<pTW_ARRAY>(pCapData);
 
     // Get # of items in array
-    nNumItems = static_cast<size_t>(pValArray->NumItems);
+    const size_t nNumItems = static_cast<size_t>(pValArray->NumItems);
 
     TW_UINT16 nItemType = GetEffectiveItemType(pValArray->ItemType);
 
     // Get sizeof each item in enumeration
-    TW_UINT16 nItemSize = GetItemSize( nItemType );
+    const TW_UINT16 nItemSize = GetItemSize( nItemType );
 
     // Unknown item type.  Do error condition here??
     if ( nItemSize == 0 )
@@ -76,14 +72,14 @@ bool CTL_CapabilityGetArrayTriplet::EnumCapValues( void *pCapData )
 
         if ( nItemType == TWTY_FIX32 )
         {
-            pTW_FIX32 p = (pTW_FIX32)&pValArray->ItemList[nIndex * nItemSize];
+            pTW_FIX32 p = reinterpret_cast<pTW_FIX32>(&pValArray->ItemList[nIndex * nItemSize]);
             float fFix = Twain32ToFloat( *p );
             pOb->CopyData( &fFix );
         }
         else
         {
             // Copy Data to pOb
-            pOb->CopyData( (void *)&pValArray->ItemList[nIndex * nItemSize] );
+            pOb->CopyData( static_cast<void*>(&pValArray->ItemList[nIndex * nItemSize]) );
         }
             // Store this object in object array
         pArray->push_back( pOb );
@@ -101,11 +97,11 @@ size_t CTL_CapabilityGetArrayTriplet::GetNumItems()
 
 bool CTL_CapabilityGetArrayTriplet::GetValue( void *pData, size_t nWhere )
 {
-    CTL_TwainTypeArray *pArray = GetTwainTypeArray();
+    const CTL_TwainTypeArray *pArray = GetTwainTypeArray();
 
     if ( nWhere >= m_nNumItems )
         return false;
-    CTL_TwainTypeOb *pOb = (*pArray)[nWhere].get();
+    const auto pOb = (*pArray)[nWhere].get();
     if ( pOb )
     {
         pOb->GetData( pData );

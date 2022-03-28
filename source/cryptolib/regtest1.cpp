@@ -1,6 +1,6 @@
 // regtest1.cpp - originally written and placed in the public domain by Wei Dai
 //                regtest.cpp split into 3 files due to OOM kills by JW
-//                in April 2017. A second split occured in July 2018.
+//                in April 2017. A second split occurred in July 2018.
 
 #define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1
 
@@ -60,95 +60,95 @@ void RegisterFactories5();
 
 void RegisterFactories(Test::TestClass suites)
 {
-	static bool s_registered = false;
-	if (s_registered)
-		return;
+    static bool s_registered = false;
+    if (s_registered)
+        return;
 
-	if ((suites & Test::Unkeyed) == Test::Unkeyed)
-		RegisterFactories1();
+    if ((suites & Test::Unkeyed) == Test::Unkeyed)
+        RegisterFactories1();
 
-	if ((suites & Test::SharedKeyMAC) == Test::SharedKeyMAC)
-		RegisterFactories2();
+    if ((suites & Test::SharedKeyMAC) == Test::SharedKeyMAC)
+        RegisterFactories2();
 
-	if ((suites & Test::SharedKeyStream) == Test::SharedKeyStream)
-		RegisterFactories3();
+    if ((suites & Test::SharedKeyStream) == Test::SharedKeyStream)
+        RegisterFactories3();
 
-	if ((suites & Test::SharedKeyBlock) == Test::SharedKeyBlock)
-		RegisterFactories4();
+    if ((suites & Test::SharedKeyBlock) == Test::SharedKeyBlock)
+        RegisterFactories4();
 
-	if ((suites & Test::PublicKey) == Test::PublicKey)
-		RegisterFactories5();
+    if ((suites & Test::PublicKey) == Test::PublicKey)
+        RegisterFactories5();
 
-	s_registered = true;
+    s_registered = true;
 }
 
 // Unkeyed ciphers
 void RegisterFactories1()
 {
-	RegisterDefaultFactoryFor<HashTransformation, CRC32>();
-	RegisterDefaultFactoryFor<HashTransformation, CRC32C>();
-	RegisterDefaultFactoryFor<HashTransformation, Adler32>();
-	RegisterDefaultFactoryFor<HashTransformation, Weak::MD5>();
-	RegisterDefaultFactoryFor<HashTransformation, SHA1>();
-	RegisterDefaultFactoryFor<HashTransformation, SHA224>();
-	RegisterDefaultFactoryFor<HashTransformation, SHA256>();
-	RegisterDefaultFactoryFor<HashTransformation, SHA384>();
-	RegisterDefaultFactoryFor<HashTransformation, SHA512>();
-	RegisterDefaultFactoryFor<HashTransformation, Whirlpool>();
-	RegisterDefaultFactoryFor<HashTransformation, Tiger>();
-	RegisterDefaultFactoryFor<HashTransformation, RIPEMD160>();
-	RegisterDefaultFactoryFor<HashTransformation, RIPEMD320>();
-	RegisterDefaultFactoryFor<HashTransformation, RIPEMD128>();
-	RegisterDefaultFactoryFor<HashTransformation, RIPEMD256>();
-	RegisterDefaultFactoryFor<HashTransformation, Weak::PanamaHash<LittleEndian> >();
-	RegisterDefaultFactoryFor<HashTransformation, Weak::PanamaHash<BigEndian> >();
-	RegisterDefaultFactoryFor<HashTransformation, Keccak_224>();
-	RegisterDefaultFactoryFor<HashTransformation, Keccak_256>();
-	RegisterDefaultFactoryFor<HashTransformation, Keccak_384>();
-	RegisterDefaultFactoryFor<HashTransformation, Keccak_512>();
-	RegisterDefaultFactoryFor<HashTransformation, SHA3_224>();
-	RegisterDefaultFactoryFor<HashTransformation, SHA3_256>();
-	RegisterDefaultFactoryFor<HashTransformation, SHA3_384>();
-	RegisterDefaultFactoryFor<HashTransformation, SHA3_512>();
-	RegisterDefaultFactoryFor<HashTransformation, SHAKE128>();
-	RegisterDefaultFactoryFor<HashTransformation, SHAKE256>();
-	RegisterDefaultFactoryFor<HashTransformation, SM3>();
-	RegisterDefaultFactoryFor<HashTransformation, BLAKE2s>();
-	RegisterDefaultFactoryFor<HashTransformation, BLAKE2b>();
+    RegisterDefaultFactoryFor<HashTransformation, CRC32>();
+    RegisterDefaultFactoryFor<HashTransformation, CRC32C>();
+    RegisterDefaultFactoryFor<HashTransformation, Adler32>();
+    RegisterDefaultFactoryFor<HashTransformation, Weak::MD5>();
+    RegisterDefaultFactoryFor<HashTransformation, SHA1>();
+    RegisterDefaultFactoryFor<HashTransformation, SHA224>();
+    RegisterDefaultFactoryFor<HashTransformation, SHA256>();
+    RegisterDefaultFactoryFor<HashTransformation, SHA384>();
+    RegisterDefaultFactoryFor<HashTransformation, SHA512>();
+    RegisterDefaultFactoryFor<HashTransformation, Whirlpool>();
+    RegisterDefaultFactoryFor<HashTransformation, Tiger>();
+    RegisterDefaultFactoryFor<HashTransformation, RIPEMD160>();
+    RegisterDefaultFactoryFor<HashTransformation, RIPEMD320>();
+    RegisterDefaultFactoryFor<HashTransformation, RIPEMD128>();
+    RegisterDefaultFactoryFor<HashTransformation, RIPEMD256>();
+    RegisterDefaultFactoryFor<HashTransformation, Weak::PanamaHash<LittleEndian> >();
+    RegisterDefaultFactoryFor<HashTransformation, Weak::PanamaHash<BigEndian> >();
+    RegisterDefaultFactoryFor<HashTransformation, Keccak_224>();
+    RegisterDefaultFactoryFor<HashTransformation, Keccak_256>();
+    RegisterDefaultFactoryFor<HashTransformation, Keccak_384>();
+    RegisterDefaultFactoryFor<HashTransformation, Keccak_512>();
+    RegisterDefaultFactoryFor<HashTransformation, SHA3_224>();
+    RegisterDefaultFactoryFor<HashTransformation, SHA3_256>();
+    RegisterDefaultFactoryFor<HashTransformation, SHA3_384>();
+    RegisterDefaultFactoryFor<HashTransformation, SHA3_512>();
+    RegisterDefaultFactoryFor<HashTransformation, SHAKE128>();
+    RegisterDefaultFactoryFor<HashTransformation, SHAKE256>();
+    RegisterDefaultFactoryFor<HashTransformation, SM3>();
+    RegisterDefaultFactoryFor<HashTransformation, BLAKE2s>();
+    RegisterDefaultFactoryFor<HashTransformation, BLAKE2b>();
 
 #ifdef BLOCKING_RNG_AVAILABLE
-	RegisterDefaultFactoryFor<RandomNumberGenerator, BlockingRng>();
+    RegisterDefaultFactoryFor<RandomNumberGenerator, BlockingRng>();
 #endif
 #ifdef NONBLOCKING_RNG_AVAILABLE
-	RegisterDefaultFactoryFor<RandomNumberGenerator, NonblockingRng>();
+    RegisterDefaultFactoryFor<RandomNumberGenerator, NonblockingRng>();
 #endif
 #ifdef OS_RNG_AVAILABLE
-	RegisterDefaultFactoryFor<RandomNumberGenerator, AutoSeededRandomPool>();
-	RegisterDefaultFactoryFor<RandomNumberGenerator, AutoSeededX917RNG<AES> >();
+    RegisterDefaultFactoryFor<RandomNumberGenerator, AutoSeededRandomPool>();
+    RegisterDefaultFactoryFor<RandomNumberGenerator, AutoSeededX917RNG<AES> >();
 #endif
-	RegisterDefaultFactoryFor<RandomNumberGenerator, MT19937>();
+    RegisterDefaultFactoryFor<RandomNumberGenerator, MT19937>();
 #if (CRYPTOPP_BOOL_X86)
-	if (HasPadlockRNG())
-		RegisterDefaultFactoryFor<RandomNumberGenerator, PadlockRNG>();
+    if (HasPadlockRNG())
+        RegisterDefaultFactoryFor<RandomNumberGenerator, PadlockRNG>();
 #endif
 #if (CRYPTOPP_BOOL_X86 || CRYPTOPP_BOOL_X32 || CRYPTOPP_BOOL_X64)
-	if (HasRDRAND())
-		RegisterDefaultFactoryFor<RandomNumberGenerator, RDRAND>();
-	if (HasRDSEED())
-		RegisterDefaultFactoryFor<RandomNumberGenerator, RDSEED>();
+    if (HasRDRAND())
+        RegisterDefaultFactoryFor<RandomNumberGenerator, RDRAND>();
+    if (HasRDSEED())
+        RegisterDefaultFactoryFor<RandomNumberGenerator, RDSEED>();
 #endif
 #if (CRYPTOPP_BOOL_PPC32 || CRYPTOPP_BOOL_PPC64)
-	if (HasDARN())
-		RegisterDefaultFactoryFor<RandomNumberGenerator, DARN>();
+    if (HasDARN())
+        RegisterDefaultFactoryFor<RandomNumberGenerator, DARN>();
 #endif
-	RegisterDefaultFactoryFor<RandomNumberGenerator, OFB_Mode<AES>::Encryption >("AES/OFB RNG");
-	RegisterDefaultFactoryFor<NIST_DRBG, Hash_DRBG<SHA1> >("Hash_DRBG(SHA1)");
-	RegisterDefaultFactoryFor<NIST_DRBG, Hash_DRBG<SHA256> >("Hash_DRBG(SHA256)");
-	RegisterDefaultFactoryFor<NIST_DRBG, HMAC_DRBG<SHA1> >("HMAC_DRBG(SHA1)");
-	RegisterDefaultFactoryFor<NIST_DRBG, HMAC_DRBG<SHA256> >("HMAC_DRBG(SHA256)");
+    RegisterDefaultFactoryFor<RandomNumberGenerator, OFB_Mode<AES>::Encryption >("AES/OFB RNG");
+    RegisterDefaultFactoryFor<NIST_DRBG, Hash_DRBG<SHA1> >("Hash_DRBG(SHA1)");
+    RegisterDefaultFactoryFor<NIST_DRBG, Hash_DRBG<SHA256> >("Hash_DRBG(SHA256)");
+    RegisterDefaultFactoryFor<NIST_DRBG, HMAC_DRBG<SHA1> >("HMAC_DRBG(SHA1)");
+    RegisterDefaultFactoryFor<NIST_DRBG, HMAC_DRBG<SHA256> >("HMAC_DRBG(SHA256)");
 
-	RegisterDefaultFactoryFor<KeyDerivationFunction, HKDF<SHA1> >();
-	RegisterDefaultFactoryFor<KeyDerivationFunction, HKDF<SHA256> >();
-	RegisterDefaultFactoryFor<KeyDerivationFunction, HKDF<SHA512> >();
-	RegisterDefaultFactoryFor<KeyDerivationFunction, HKDF<Whirlpool> >();
+    RegisterDefaultFactoryFor<KeyDerivationFunction, HKDF<SHA1> >();
+    RegisterDefaultFactoryFor<KeyDerivationFunction, HKDF<SHA256> >();
+    RegisterDefaultFactoryFor<KeyDerivationFunction, HKDF<SHA512> >();
+    RegisterDefaultFactoryFor<KeyDerivationFunction, HKDF<Whirlpool> >();
 }

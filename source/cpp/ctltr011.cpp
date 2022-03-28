@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@
  */
 #include <sstream>
 #include "ctltr011.h"
+
+#include "ctliface.h"
 #include "ctltwmgr.h"
 using namespace dynarithmic;
 CTL_CapabilityGetTriplet::CTL_CapabilityGetTriplet(CTL_ITwainSession* pSession,
@@ -27,13 +29,13 @@ CTL_CapabilityGetTriplet::CTL_CapabilityGetTriplet(CTL_ITwainSession* pSession,
                                                     CTL_EnumGetType gType,
                                                     TW_UINT16 gCap,
                                                     TW_UINT16 TwainDataType)
-                       :  CTL_CapabilityTriplet(pSession, pSource, (TW_UINT16)gType, TwainDataType, true)
+                       :  CTL_CapabilityTriplet(pSession, pSource, static_cast<TW_UINT16>(gType), TwainDataType, true)
                        , m_gCap(gCap), m_gType(gType)
 {
     TW_CAPABILITY* pCap = GetCapabilityBuffer();
     pCap->Cap = gCap;
     pCap->ConType = TWON_DONTCARE16;
-    pCap->hContainer = NULL;
+    pCap->hContainer = nullptr;
     m_nContainerToUse = TwainContainer_INVALID;
     SetItemType(TwainDataType);
 }
@@ -50,16 +52,15 @@ CTL_EnumCapability CTL_CapabilityGetTriplet::CapToRetrieve()const
 
 TW_UINT16 CTL_CapabilityGetTriplet::GetEffectiveItemType(TW_UINT16 curDataType) const
 {
-    TW_UINT16 itemType = GetItemType();
+    const TW_UINT16 itemType = GetItemType();
     if (CTL_TwainDLLHandle::s_lErrorFilterFlags)
     {
-        CTL_StringStreamType strm;
-        strm << _T("Getting cap value: ") << m_gCap << _T("  requested item type: ") << itemType <<
-                _T("  Observed item type: ") << curDataType;
-        CTL_TwainAppMgr::WriteLogInfo(strm.str());
-        CTL_TwainAppMgr::WriteLogInfo(CTL_StringType(
-            _T("Observed and requested data types ")) + CTL_StringType((itemType ==
-            curDataType ? _T("equal") : _T("not equal"))));
+        StringStreamA strm;
+        strm << "Getting cap value: " << m_gCap << "  requested item type: " << itemType <<
+                "  Observed item type: " << curDataType;
+        CTL_TwainAppMgr::WriteLogInfoA(strm.str());
+        CTL_TwainAppMgr::WriteLogInfoA("Observed and requested data types " + std::string(itemType ==
+            curDataType ? "equal" : "not equal"));
     }
 
     // If we're the same, or if we must return the correct type as returned by the Source ...
@@ -72,7 +73,7 @@ TW_UINT16 CTL_CapabilityGetTriplet::GetEffectiveItemType(TW_UINT16 curDataType) 
 
 TW_UINT16 CTL_CapabilityGetTriplet::Execute()
 {
-    TW_UINT16 rc = CTL_CapabilityTriplet::Execute();
+    const TW_UINT16 rc = CTL_CapabilityTriplet::Execute();
     if (rc == TWRC_SUCCESS)
     {
         if (IsTesting())

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -42,16 +42,14 @@ CTL_CapabilityGetOneValTriplet::CTL_CapabilityGetOneValTriplet(
 
 bool CTL_CapabilityGetOneValTriplet::EnumCapValues( void *pCapData )
 {
-    pTW_ONEVALUE pValOne;
-
     // dereference to a TW_ENUMERATION structure
-    pValOne = (pTW_ONEVALUE) pCapData;
+    const pTW_ONEVALUE pValOne = static_cast<pTW_ONEVALUE>(pCapData);
 
     // Get item type
-    int nItemType = GetEffectiveItemType(pValOne->ItemType);
+    const int nItemType = GetEffectiveItemType(pValOne->ItemType);
 
     // Get sizeof each item in enumeration
-    int nItemSize = GetItemSize( pValOne->ItemType );
+    const int nItemSize = GetItemSize( pValOne->ItemType );
 
     // Unknown item type.  Do error condition here??
     if ( nItemSize == 0 )
@@ -71,14 +69,14 @@ bool CTL_CapabilityGetOneValTriplet::EnumCapValues( void *pCapData )
 
     if ( nItemType == TWTY_FIX32 )
     {
-        pTW_FIX32 p = (pTW_FIX32)&pValOne->Item;
+        pTW_FIX32 p = reinterpret_cast<pTW_FIX32>(&pValOne->Item);
         double fFix = Twain32ToFloat( *p );
         pOb->CopyData( &fFix );
     }
     else
     {
         // Copy Data to pOb
-        pOb->CopyData( (void *)&pValOne->Item );
+        pOb->CopyData( static_cast<void*>(&pValOne->Item) );
     }
 
     // Store this object in object array
@@ -93,7 +91,7 @@ size_t CTL_CapabilityGetOneValTriplet::GetNumItems()
 
 bool CTL_CapabilityGetOneValTriplet::GetValue(void *pData, size_t /*nWhere*/)
 {
-    CTL_TwainTypeArray *pArray = GetTwainTypeArray();
+    const CTL_TwainTypeArray *pArray = GetTwainTypeArray();
     if ( pArray->empty() )
         return false;
     CTL_TwainTypeOb *pOb = pArray->front().get();

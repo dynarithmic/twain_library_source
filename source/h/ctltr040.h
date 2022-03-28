@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ namespace dynarithmic
                 m_TWCallback.CallBackProc = reinterpret_cast<TW_MEMREF>(proc);
                 m_TWCallback.RefCon = 0;
             }
-            DSMENTRYPROC getEntryProc() { return m_DSMEntryProc; }
+            DSMENTRYPROC getEntryProc() const { return m_DSMEntryProc; }
             TW_CALLBACK getCallback() const { return m_TWCallback; }
 
         private:

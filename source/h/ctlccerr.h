@@ -26,7 +26,6 @@
 #define CTLCCErr_h_
 
 #include "ctlobstr.h"
-#include "ctltwain.h"
 namespace dynarithmic
 {
     class CTL_CondCodeInfo

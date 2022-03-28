@@ -1,6 +1,6 @@
 /*
 This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-Copyright (c) 2002-2021 Dynarithmic Software.
+Copyright (c) 2002-2022 Dynarithmic Software.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License version 3 (AGPL)
@@ -12,12 +12,10 @@ OF THIRD PARTY RIGHTS.
 */
 
 #define _CRT_NON_CONFORMING_SWPRINTFS
-#include <windows.h>
 #if defined(_WIN32) || defined(_WIN64)
 #include <tchar.h>
 #endif
 //#include <memory.h>
-#include <stdio.h>
 #include <cstring>
 #include <sstream>
 #include <iomanip>
@@ -35,7 +33,7 @@ using namespace dynarithmic;
 CTL_StringType dynarithmic::GetWinVersion()
 {
     COSVersion::OS_VERSION_INFO osvi;
-    memset(&osvi, 0, sizeof(osvi));
+    memset(&osvi, 0, sizeof osvi);
 #ifdef _UNICODE
     std::wostringstream sText, sBuf;
 #else
@@ -391,7 +389,7 @@ CTL_StringType dynarithmic::GetWinVersion()
         }
         }
 #endif
-        sBuf << _T(" v") << (int)(osvi.dwEmulatedMajorVersion) << _T(".");
+        sBuf << _T(" v") << static_cast<int>(osvi.dwEmulatedMajorVersion) << _T(".");
         sText << sBuf.str();
         if (osvi.dwEmulatedMinorVersion % 10)
         {
@@ -405,7 +403,7 @@ CTL_StringType dynarithmic::GetWinVersion()
         sText << sBuf.str();
         if (osvi.dwEmulatedBuildNumber)
         {
-            sBuf << _T(" Build:") << (int)(osvi.dwEmulatedBuildNumber);
+            sBuf << _T(" Build:") << static_cast<int>(osvi.dwEmulatedBuildNumber);
             sText << sBuf.str();
         }
         if (osvi.wEmulatedServicePackMajor)
@@ -413,10 +411,10 @@ CTL_StringType dynarithmic::GetWinVersion()
             if (osvi.wEmulatedServicePackMinor)
             {
                 //Handle the special case of NT 4 SP 6a which Dtwinver ver treats as SP 6.1
-                if (os.IsNTPreWin2k(&osvi, FALSE) && (osvi.wEmulatedServicePackMajor == 6) && (osvi.wEmulatedServicePackMinor == 1))
+                if (os.IsNTPreWin2k(&osvi, FALSE) && osvi.wEmulatedServicePackMajor == 6 && osvi.wEmulatedServicePackMinor == 1)
                     sBuf << _T(" Service Pack: 6a");
                 //Handle the special case of XP SP 1a which Dtwinver ver treats as SP 1.1
-                else if (os.IsWindowsXP(&osvi, FALSE) && (osvi.wEmulatedServicePackMajor == 1) && (osvi.wEmulatedServicePackMinor == 1))
+                else if (os.IsWindowsXP(&osvi, FALSE) && osvi.wEmulatedServicePackMajor == 1 && osvi.wEmulatedServicePackMinor == 1)
                     sBuf << _T(" Service Pack: 1a");
                 else
                     sBuf << _T(" Service Pack:") << static_cast<int>(osvi.wEmulatedServicePackMajor) << _T(".") << static_cast<int>(osvi.wEmulatedServicePackMinor);
@@ -784,7 +782,7 @@ CTL_StringType dynarithmic::GetWinVersion()
         }
         }
 #endif
-        sBuf << _T(" v") << (int)(osvi.dwUnderlyingMajorVersion);
+        sBuf << _T(" v") << static_cast<int>(osvi.dwUnderlyingMajorVersion);
         sText << sBuf.str();
         if (osvi.dwUnderlyingMinorVersion % 10)
         {
@@ -806,10 +804,10 @@ CTL_StringType dynarithmic::GetWinVersion()
             if (osvi.wUnderlyingServicePackMinor)
             {
                 //Handle the special case of NT 4 SP 6a which Dtwinver treats as SP 6.1
-                if (os.IsNTPreWin2k(&osvi, TRUE) && (osvi.wUnderlyingServicePackMajor == 6) && (osvi.wUnderlyingServicePackMinor == 1))
+                if (os.IsNTPreWin2k(&osvi, TRUE) && osvi.wUnderlyingServicePackMajor == 6 && osvi.wUnderlyingServicePackMinor == 1)
                     sBuf << _T(" Service Pack: 6a");
                 //Handle the special case of XP SP 1a which Dtwinver treats as SP 1.1
-                else if (os.IsWindowsXP(&osvi, TRUE) && (osvi.wUnderlyingServicePackMajor == 1) && (osvi.wUnderlyingServicePackMinor == 1))
+                else if (os.IsWindowsXP(&osvi, TRUE) && osvi.wUnderlyingServicePackMajor == 1 && osvi.wUnderlyingServicePackMinor == 1)
                     sBuf << _T(" Service Pack: 1a");
                 else
                     sBuf << _T(" Service Pack:") << static_cast<int>(osvi.wUnderlyingServicePackMajor) << _T(".") << static_cast<int>(osvi.wUnderlyingServicePackMinor);

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ CTL_ImageLayoutTriplet::CTL_ImageLayoutTriplet(CTL_ITwainSession *pSession,
                   DG_IMAGE,
                   DAT_IMAGELAYOUT,
                   GetType,
-                  (TW_MEMREF)&m_ImageLayout);
+                  static_cast<TW_MEMREF>(&m_ImageLayout));
             SetAlive (true);
         }
     }
@@ -102,13 +102,13 @@ CTL_ImageSetLayoutTriplet::CTL_ImageSetLayoutTriplet(
 CTL_ImageLayoutTriplet( pSession, pSource, SetType )
 {
     TW_IMAGELAYOUT *pLayout = GetImageLayout();
-    CTL_CapabilityTriplet::FloatToTwain32((float)rArray[0], pLayout->Frame.Left   );
-    CTL_CapabilityTriplet::FloatToTwain32((float)rArray[1], pLayout->Frame.Top    );
-    CTL_CapabilityTriplet::FloatToTwain32((float)rArray[2], pLayout->Frame.Right  );
-    CTL_CapabilityTriplet::FloatToTwain32((float)rArray[3], pLayout->Frame.Bottom );
-    pLayout->DocumentNumber = (TW_UINT32)-1;
-    pLayout->PageNumber = (TW_UINT32)-1;
-    pLayout->FrameNumber = (TW_UINT32)-1;
+    CTL_CapabilityTriplet::FloatToTwain32(static_cast<float>(rArray[0]), pLayout->Frame.Left   );
+    CTL_CapabilityTriplet::FloatToTwain32(static_cast<float>(rArray[1]), pLayout->Frame.Top    );
+    CTL_CapabilityTriplet::FloatToTwain32(static_cast<float>(rArray[2]), pLayout->Frame.Right  );
+    CTL_CapabilityTriplet::FloatToTwain32(static_cast<float>(rArray[3]), pLayout->Frame.Bottom );
+    pLayout->DocumentNumber = static_cast<TW_UINT32>(-1);
+    pLayout->PageNumber = static_cast<TW_UINT32>(-1);
+    pLayout->FrameNumber = static_cast<TW_UINT32>(-1);
 }
 
 

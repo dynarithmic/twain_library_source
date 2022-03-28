@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -20,16 +20,17 @@
  */
 #include "dtwain.h"
 #include "ctliface.h"
-
 #include "ctltwmgr.h"
 using namespace dynarithmic;
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LogMessage(LPCTSTR message)
 {
-    CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     if ( IsDLLHandleValid( pHandle, FALSE ) )
     {
-        CTL_TwainAppMgr::WriteLogInfo(CTL_StringType(_T("[User] ")) + CTL_StringType(message));
+        CTL_StringType sMsg = message;
+        sMsg = _T("[User]") + sMsg;
+        CTL_TwainAppMgr::WriteLogInfo(sMsg);
         return TRUE;
     }
     return FALSE;

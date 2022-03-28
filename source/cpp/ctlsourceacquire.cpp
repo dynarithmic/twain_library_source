@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -19,40 +19,62 @@
     OF THIRD PARTY RIGHTS.
  */
 #include <boost/format.hpp>
+
+#include "cppfunc.h"
 #include "ctltwmgr.h"
 #include "sourceacquireopts.h"
 #include "errorcheck.h"
 #include "sourceselectopts.h"
 #include "enumeratorfuncs.h"
 #include "ctltr040.h"
+#include "dtwstrfn.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
-using namespace std;
+
 using namespace dynarithmic;
 
-static void ParseFileNames(DTWAIN_ARRAY FileList, LPCTSTR lpszFiles, DTWAIN_ARRAY pArray);
+template <typename PtrType>
+static void ParseFileNames(DTWAIN_ARRAY FileList, PtrType lpszFiles, DTWAIN_ARRAY pArray)
+{
+    if (FileList)
+    {
+        DTWAIN_ArrayCopy(FileList, pArray);
+        return;
+    }
+
+    const CTL_StringType szParseDelim(_T(",;| "));
+    const CTL_StringType strTemp(lpszFiles);
+    std::vector<CTL_StringType> strArray;
+
+    const int nTokens = StringWrapper::TokenizeQuoted(strTemp, szParseDelim.c_str(), strArray);
+    DTWAIN_ArrayRemoveAll(pArray);
+    for_each(strArray.begin(), strArray.begin() + nTokens, [&](const CTL_StringType& s)
+    {
+        DTWAIN_ArrayAdd(pArray, LPVOID(s.c_str()));
+    });
+}
 
 DTWAIN_ACQUIRE CTL_TwainDLLHandle::GetNewAcquireNum()
 {
-    auto iter = std::find(s_aAcquireNum.begin(), s_aAcquireNum.end(), -1L);
+    const auto iter = std::find(s_aAcquireNum.begin(), s_aAcquireNum.end(), -1L);
     if (iter != s_aAcquireNum.end())
     {
-        DTWAIN_ACQUIRE num = static_cast<DTWAIN_ACQUIRE>(std::distance(s_aAcquireNum.begin(), iter));
+        const DTWAIN_ACQUIRE num = static_cast<DTWAIN_ACQUIRE>(std::distance(s_aAcquireNum.begin(), iter));
         *iter = num;
         return num;
     }
 
-    size_t nSize = s_aAcquireNum.size();
-    s_aAcquireNum.push_back((const int)nSize);
-    return (DTWAIN_ACQUIRE)nSize;
+    const size_t nSize = s_aAcquireNum.size();
+    s_aAcquireNum.push_back(static_cast<const int>(nSize));
+    return static_cast<DTWAIN_ACQUIRE>(nSize);
 }
 
 
 void CTL_TwainDLLHandle::EraseAcquireNum(DTWAIN_ACQUIRE nNum)
 {
-    size_t nSize = s_aAcquireNum.size();
-    if (nNum >= (LONG)nSize || nNum < 0)
+    const size_t nSize = s_aAcquireNum.size();
+    if (nNum >= static_cast<LONG>(nSize) || nNum < 0)
         return;
     s_aAcquireNum[nNum] = -1;
 }
@@ -60,11 +82,11 @@ void CTL_TwainDLLHandle::EraseAcquireNum(DTWAIN_ACQUIRE nNum)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceAcquiring(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     if (p)
     {
-        bool Ret = p->IsAcquireAttempt();
+        const bool Ret = p->IsAcquireAttempt();
         LOG_FUNC_EXIT_PARAMS(Ret)
     }
     LOG_FUNC_EXIT_PARAMS(false)
@@ -74,7 +96,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceAcquiring(DTWAIN_SOURCE Source)
 DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
 {
     LOG_FUNC_ENTRY_PARAMS((opts))
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(opts.getHandle());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(opts.getHandle());
     opts.setStatus(0);
     bool bSessionPreStarted = false;
 
@@ -91,7 +113,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
 
     if (!pHandle->m_bSessionAllocated)
     {
-        if (!DTWAIN_StartTwainSession(NULL, NULL))
+        if (!DTWAIN_StartTwainSession(nullptr, nullptr))
         {
             opts.setStatus(DTWAIN_ERR_NO_SESSION);
             DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{return true; }, opts.getStatus(), NULL, FUNC_MACRO);
@@ -99,7 +121,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     }
     else
         bSessionPreStarted = true;
-    CTL_ITwainSource *p = static_cast<CTL_ITwainSource *>(opts.getSource());
+    auto p = static_cast<CTL_ITwainSource *>(opts.getSource());
     DTWAIN_SOURCE pRealSource;
     bool bSourcePreOpened = true;
     if (!DTWAIN_IsSourceOpen(p))
@@ -130,30 +152,30 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     if (PixelType != DTWAIN_PT_DEFAULT && opts.getAcquireType() != ACQUIREAUDIONATIVE)
     {
         CTL_StringType sBuf;
-        CTL_TwainAppMgr::WriteLogInfo(_T("Verifying Current Pixel Type ...\n"));
+        CTL_TwainAppMgr::WriteLogInfoA("Verifying Current Pixel Type ...\n");
 
         if (DTWAIN_IsPixelTypeSupported(pRealSource, PixelType))
         {
-            CTL_StringStreamType strm;
-            strm << BOOST_FORMAT(_T("Pixel Type of %1% is supported.  Checking if we need to set it...")) % PixelType;
-            CTL_TwainAppMgr::WriteLogInfo(strm.str());
+            StringStreamA strm;
+            strm << boost::format("Pixel Type of %1% is supported.  Checking if we need to set it...") % PixelType;
+            CTL_TwainAppMgr::WriteLogInfoA(strm.str());
             LONG curPixelType;
             LONG curBitDepth;
 
             // Now check if current pixel type is the same as desired pixel type
             if (DTWAIN_GetPixelType(pRealSource, &curPixelType, &curBitDepth, TRUE))
             {
-                CTL_StringStreamType strm2;
-                strm2 << BOOST_FORMAT(_T("Current pixel type is %1%, bit depth is %2%\n")) % curPixelType % curBitDepth;
-                CTL_TwainAppMgr::WriteLogInfo(strm2.str());
+                StringStreamA strm2;
+                strm2 << boost::format("Current pixel type is %1%, bit depth is %2%\n") % curPixelType % curBitDepth;
+                CTL_TwainAppMgr::WriteLogInfoA(strm2.str());
 
                 // set the pixel type if not the same
                 if (curPixelType != PixelType)
                 {
-                    CTL_TwainAppMgr::WriteLogInfo(_T("Current and desired pixel type not equal.  Setting to desired..."));
+                    CTL_TwainAppMgr::WriteLogInfoA("Current and desired pixel type not equal.  Setting to desired...");
                     if (!DTWAIN_SetPixelType(pRealSource, PixelType, DTWAIN_DEFAULT, TRUE))
                     {
-                        CTL_TwainAppMgr::WriteLogInfo(_T("Could not set pixel type!"));
+                        CTL_TwainAppMgr::WriteLogInfoA("Could not set pixel type!");
                         opts.setStatus(DTWAIN_ERR_BAD_PIXTYPE);
                         DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{return true; }, DTWAIN_ERR_BAD_PIXTYPE, NULL, FUNC_MACRO);
                     }
@@ -161,12 +183,12 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
                 else
                     // pixel type is supported
                 {
-                    CTL_TwainAppMgr::WriteLogInfo(_T("Current and desired pixel type equal.  End processing pixel type and bit depth..."));
+                    CTL_TwainAppMgr::WriteLogInfoA("Current and desired pixel type equal.  End processing pixel type and bit depth...");
                 }
             }
             else
             {
-                CTL_TwainAppMgr::WriteLogInfo(_T("Could not get current pixel type!"));
+                CTL_TwainAppMgr::WriteLogInfoA("Could not get current pixel type!");
                 opts.setStatus(DTWAIN_ERR_BAD_PIXTYPE);
                 DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{return true; }, DTWAIN_ERR_BAD_PIXTYPE, NULL, FUNC_MACRO);
             }
@@ -174,9 +196,9 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
         else
         {
             // pixel type not supported
-            CTL_StringStreamType strm2;
-            strm2 << BOOST_FORMAT(_T("Pixel Type of %1% is not supported.  Setting to default...")) % PixelType;
-            CTL_TwainAppMgr::WriteLogInfo(strm2.str());
+            StringStreamA strm2;
+            strm2 << boost::format("Pixel Type of %1% is not supported.  Setting to default...") % PixelType;
+            CTL_TwainAppMgr::WriteLogInfoA(strm2.str());
             if (!DTWAIN_SetPixelType(pRealSource, DTWAIN_PT_DEFAULT, DTWAIN_DEFAULT, TRUE))
             {
                 opts.setStatus(DTWAIN_ERR_BAD_PIXTYPE);
@@ -186,7 +208,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     }
 
     // Set the max # of pages to retrieve
-    CTL_ITwainSource *pAcquireSource = (CTL_ITwainSource *)pRealSource;
+    auto pAcquireSource = static_cast<CTL_ITwainSource*>(pRealSource);
 
     pAcquireSource->SetDibAutoDelete(FALSE);
     pAcquireSource->SetAcquireCount(0);
@@ -224,17 +246,17 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
 DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
 {
     LOG_FUNC_ENTRY_PARAMS((opts))
-    DTWAIN_ARRAY Array = NULL;
-    DTWAIN_ARRAY aAcquisitionArray = NULL;
+    DTWAIN_ARRAY Array = nullptr;
+    DTWAIN_ARRAY aAcquisitionArray = nullptr;
 
     DTWAINArrayLL_RAII a1(Array);
     DTWAINArrayLL_RAII aAcq(aAcquisitionArray);
 
     CTL_ITwainSource *pSource = VerifySourceHandle(opts.getHandle(), opts.getSource());
-    pSource->ResetAcquisitionAttempts(NULL);
-    aAcquisitionArray = (DTWAIN_ARRAY)DTWAIN_ArrayCreate(DTWAIN_ArrayTypePTR, 0);
+    pSource->ResetAcquisitionAttempts(nullptr);
+    aAcquisitionArray = static_cast<DTWAIN_ARRAY>(DTWAIN_ArrayCreate(DTWAIN_ArrayTypePTR, 0));
 
-    pSource->m_pUserPtr = NULL;
+    pSource->m_pUserPtr = nullptr;
     CTL_TwainDLLHandle *p = static_cast<CTL_TwainDLLHandle *>(opts.getHandle());
     p->m_bTransferDone = false;
     p->m_bSourceClosed = false;
@@ -243,7 +265,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
     if (DTWAIN_GetTwainMode() == DTWAIN_MODELESS)
     {
         Array = DTWAIN_ArrayCreate(DTWAIN_ARRAYHANDLE, 0);
-        CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(opts.getHandle());
+        const auto pHandle = static_cast<CTL_TwainDLLHandle *>(opts.getHandle());
         if (!Array)
         {
             opts.setStatus(DTWAIN_ERR_OUT_OF_MEMORY);
@@ -335,7 +357,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
 
     }
 
-    if (Array != NULL)  // This is an immediate return
+    if (Array != nullptr)  // This is an immediate return
     {
         // turn off RAII here
         a1.Disconnect();
@@ -354,11 +376,11 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
 
     opts.setStatus(p->m_lLastAcqError);
     // Get the array of Dibs
-    auto vValues = EnumeratorVectorPtr<LPVOID>(aAcquisitionArray);
+    const auto vValues = EnumeratorVectorPtr<LPVOID>(aAcquisitionArray);
 
-    if (vValues && vValues->empty() && (opts.getAcquireType() != ACQUIREFILE))
+    if (vValues && vValues->empty() && opts.getAcquireType() != ACQUIREFILE)
     {
-        pSource->ResetAcquisitionAttempts(NULL);
+        pSource->ResetAcquisitionAttempts(nullptr);
         LOG_FUNC_EXIT_PARAMS(NULL)
     }
     aAcq.Disconnect();
@@ -368,14 +390,13 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
 
 bool dynarithmic::AcquireExHelper(SourceAcquireOptions& opts)
 {
-    DTWAIN_ARRAY aDibs = 0;
-    aDibs = SourceAcquire(opts);
+    const DTWAIN_ARRAY aDibs = SourceAcquire(opts);
     DTWAINArrayLL_RAII arr(aDibs);
-    auto vValues = EnumeratorVectorPtr<LPVOID>(aDibs);
+    const auto vValues = EnumeratorVectorPtr<LPVOID>(aDibs);
 
     bool bRet = false;
     if (aDibs && vValues)
-        bRet = (!vValues->empty()) ? true: false;
+        bRet = !vValues->empty() ? true: false;
     if (opts.getStatus() == DTWAIN_TN_ACQUIRESTARTED && aDibs)
         bRet = true;
     return bRet;
@@ -386,8 +407,8 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
     LOG_FUNC_ENTRY_PARAMS((opts))
     DTWAIN_ACQUIRE nNum = -1;
     LONG ClipboardTransferType = -1;
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    DTWAIN_SOURCE Source = opts.getSource();
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const DTWAIN_SOURCE Source = opts.getSource();
     CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, Source);
 
     if (!pSource)
@@ -396,11 +417,11 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
         // Open the source (if source is closed)
     DTWAIN_IsSourceOpen(Source);
 
-    if (!CTL_TwainAppMgr::OpenSource(pHandle->m_Session, pSource))
+    if (!CTL_TwainAppMgr::OpenSource(pHandle->m_pTwainSession, pSource))
         LOG_FUNC_EXIT_PARAMS((DTWAIN_ACQUIRE)nNum)
 
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return DTWAIN_IsSourceAcquiring(Source); },
-        DTWAIN_ERR_SOURCE_ACQUIRING, ((DTWAIN_ACQUIRE)-1), FUNC_MACRO);
+        DTWAIN_ERR_SOURCE_ACQUIRING, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
     // Negotiate transfer
     CTL_TwainAppMgr::SetTransferCount(pSource, opts.getMaxPages());
     pSource->SetSpecialTransferMode(opts.getTransferMode());
@@ -409,38 +430,38 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
         CTL_StringType strFile;
         int nFileType;
         LONG lFileFlags = opts.getFileFlags();
-        LONG lFileType = opts.getFileType();
+        const LONG lFileType = opts.getFileType();
         // Check if the DTWAIN_USESOURCEMODE flag is set
-        bool bUseSourceMode = (lFileFlags & DTWAIN_USESOURCEMODE) ? true : false;
+        const bool bUseSourceMode = lFileFlags & DTWAIN_USESOURCEMODE ? true : false;
         if (bUseSourceMode)
         {
             // Source must support file transfers
             DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !DTWAIN_IsFileXferSupported(Source, lFileType); },
-                DTWAIN_ERR_NO_FILE_XFER, ((DTWAIN_ACQUIRE)-1), FUNC_MACRO);
+                DTWAIN_ERR_NO_FILE_XFER, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
 
             // Turn off NATIVE and BUFFERED modes if set
             lFileFlags = lFileFlags & ~(DTWAIN_USENATIVE | DTWAIN_USEBUFFERED);
 
-            CTL_TwainAppMgr::GetFileTransferDefaults(pSource, strFile, nFileType);
+            CTL_TwainAppMgr::GetFileTransferDefaults(pSource, nFileType);
         }
 
         // Check if the file type is supported
         // check if defaults were specified
-        if ((lFileFlags & (DTWAIN_USENAME | DTWAIN_USELONGNAME)) &&
+        if (lFileFlags & (DTWAIN_USENAME | DTWAIN_USELONGNAME) &&
             !(lFileFlags & DTWAIN_USELIST))
             strFile = opts.getFileName();
 
         nFileType = lFileType;
 
-        if (bUseSourceMode || (/*lFileFlags & */CTL_TwainAppMgr::IsSupportedFileFormat(pSource,
-            nFileType)))
+        if (bUseSourceMode || /*lFileFlags & */CTL_TwainAppMgr::IsSupportedFileFormat(pSource,
+            nFileType))
         {
             opts.setActualAcquireType(CTL_TwainAppMgr::GetCompatibleFileTransferType(pSource));
             if (!bUseSourceMode)
                 opts.setActualAcquireType(TWAINAcquireType_FileUsingNative);
 
             pSource->SetAcquireType(static_cast<CTL_TwainAcquireEnum>(opts.getActualAcquireType()), strFile.c_str());
-            pSource->SetAcquireFileType((CTL_TwainFileFormatEnum)nFileType);
+            pSource->SetAcquireFileType(static_cast<CTL_TwainFileFormatEnum>(nFileType));
 
             LONG lMode = lFileFlags;
 
@@ -450,7 +471,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
                 if (!lMode)
                     lMode = DTWAIN_USENATIVE;
                 else
-                    if ((lFileFlags & DTWAIN_USENATIVE) && (lFileFlags & DTWAIN_USEBUFFERED))
+                    if (lFileFlags & DTWAIN_USENATIVE && lFileFlags & DTWAIN_USEBUFFERED)
                         lMode = DTWAIN_USENATIVE;
             }
             else
@@ -474,7 +495,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
                 if (DTWAIN_IsCapSupported(Source, DTWAIN_CV_ICAPTILES))
                 {
                     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return TileModeOn(Source); },
-                        DTWAIN_ERR_TILES_NOT_SUPPORTED, ((DTWAIN_ACQUIRE)-1), FUNC_MACRO);
+                        DTWAIN_ERR_TILES_NOT_SUPPORTED, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
                 }
             }
             pSource->SetSpecialTransferMode(lMode);
@@ -498,27 +519,31 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
                     lFileFlags = lMode | DTWAIN_USELONGNAME;
 
                 // Allocate for array
-                DTWAIN_ARRAY pArray = (DTWAIN_ARRAY)pSource->GetFileEnumerator();
+                DTWAIN_ARRAY pArray = static_cast<DTWAIN_ARRAY>(pSource->GetFileEnumerator());
                 if (!pArray)
                     pArray = DTWAIN_ArrayCreate(DTWAIN_ARRAYSTRING, 0);
                 if (!pArray)
                 {
                     // Check if array exists
-                    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !pArray; }, DTWAIN_ERR_BAD_ARRAY, ((DTWAIN_ACQUIRE)-1), FUNC_MACRO);
+                    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !pArray; }, DTWAIN_ERR_BAD_ARRAY, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
                 }
 
                 // Parse the filename string into the array
                 ParseFileNames(opts.getFileList(), opts.getFileName(), pArray);
+//                std::string szName;
                 CTL_StringType szName;
-                LONG nFileCount = EnumeratorFunctionImpl::EnumeratorGetCount(pArray);
+                const LONG nFileCount = EnumeratorFunctionImpl::EnumeratorGetCount(pArray);
                 if (nFileCount > 0)
+                {
+  //                  EnumeratorFunctionImpl::EnumeratorGetAt(pArray, 0, &szName2);
                     EnumeratorFunctionImpl::EnumeratorGetAt(pArray, 0, &szName);
+                }
 
                 if (nFileCount == 0 || szName.empty())
                 {
                     DTWAIN_ArrayDestroy(pArray);
                     // Check if at least one file is in array
-                    DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{ return true; }, DTWAIN_ERR_EMPTY_ARRAY, ((DTWAIN_ACQUIRE)-1), FUNC_MACRO);
+                    DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{ return true; }, DTWAIN_ERR_EMPTY_ARRAY, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
                 }
 
                 pSource->SetFileEnumerator(pArray);
@@ -535,7 +560,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
 
         }
         else
-            DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{return true; }, DTWAIN_ERR_FILE_FORMAT, ((DTWAIN_ACQUIRE)-1), FUNC_MACRO);
+            DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{return true; }, DTWAIN_ERR_FILE_FORMAT, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
     }
     else
     if (opts.getActualAcquireType() == TWAINAcquireType_Clipboard)
@@ -580,13 +605,13 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
         pSource->ResetManualDuplexMode();
 
     // Send message that interface is about to be shown
-    CTL_TwainAppMgr::SendTwainMsgToWindow(pHandle->m_Session, NULL, DTWAIN_TN_UIOPENING, (LPARAM)pSource);
-    bool bUIOk = CTL_TwainAppMgr::ShowUserInterface(pSource);
+    CTL_TwainAppMgr::SendTwainMsgToWindow(pHandle->m_pTwainSession, nullptr, DTWAIN_TN_UIOPENING, reinterpret_cast<LPARAM>(pSource));
+    const bool bUIOk = CTL_TwainAppMgr::ShowUserInterface(pSource);
     if (!bUIOk)
         pSource->SetAcquireAttempt(false);
 
     // Terminate if there is an error showing the UI (or acquiring with no UI)
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bUIOk; }, DTWAIN_ERR_UI_ERROR, ((DTWAIN_ACQUIRE)-1), FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bUIOk; }, DTWAIN_ERR_UI_ERROR, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
     pSource->SetOpenAfterAcquire(opts.getRemainOpen());
     if (!opts.getShowUI())
         pSource->SetMaxAcquisitions(1);
@@ -598,7 +623,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
     pSource->SetPendingJobNum(0);
     pSource->SetBlankPageCount(0);
 
-    CTL_TwainAppMgr::SendTwainMsgToWindow(pHandle->m_Session, NULL, DTWAIN_TN_ACQUIRESTARTED, (LPARAM)pSource);
+    CTL_TwainAppMgr::SendTwainMsgToWindow(pHandle->m_pTwainSession, nullptr, DTWAIN_TN_ACQUIRESTARTED, reinterpret_cast<LPARAM>(pSource));
 
     // return the Acquire Number
     LOG_FUNC_EXIT_PARAMS((DTWAIN_ACQUIRE)nNum)
@@ -608,34 +633,14 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
 bool dynarithmic::TileModeOn(DTWAIN_SOURCE Source)
 {
     BOOL bMode;
-    CTL_TwainDLLHandle *pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     if (p)
     {
         if (CTL_TwainAppMgr::GetOneTwainCapValue(p, &bMode, DTWAIN_CV_ICAPTILES, CTL_GetTypeGET, TWTY_BOOL))
-            return (TW_BOOL)bMode?true:false;
+            return static_cast<TW_BOOL>(bMode)?true:false;
     }
     return false;
 }
 
-static void ParseFileNames(DTWAIN_ARRAY FileList, LPCTSTR lpszFiles, DTWAIN_ARRAY pArray)
-{
-    if (FileList)
-    {
-        DTWAIN_ArrayCopy(FileList, pArray);
-        return;
-    }
-    int i;
-    CTL_StringType szParseDelim;
-    for (i = 0; i < 32; i++)
-        szParseDelim += (TCHAR)i;
-    szParseDelim += _T(",;| ");
-    CTL_StringType strTemp(lpszFiles);
-    CTL_StringArrayType strArray;
-
-    int nTokens = StringWrapper::Tokenize(strTemp, szParseDelim.c_str(), strArray);
-    DTWAIN_ArrayRemoveAll(pArray);
-    for_each(strArray.begin(), strArray.begin() + nTokens, [&](const CTL_StringType& s)
-    { DTWAIN_ArrayAdd(pArray, (LPVOID)s.c_str()); });
-}
 
