@@ -55,7 +55,8 @@ CTL_ImageXferTriplet::CTL_ImageXferTriplet(CTL_ITwainSession *pSession,
                      m_nFailAction(0),
                      m_bPendingXfersDone(false),
                      m_PendingXfers{},
-                     m_lastPendingXferCode(0)
+                     m_lastPendingXferCode(0),
+                     m_IsBuffered(false)
 {
     switch( nType )
     {
@@ -277,6 +278,8 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                 // Check if source acquire is file using native mode
                 case TWAINAcquireType_FileUsingNative:
                 {
+                    if ( m_IsBuffered )
+                        break;
                     pSource->SetPromptPending(false);
                     long lFlags   = pSource->GetAcquireFileFlags();
                     if ( lFlags & DTWAIN_USEPROMPT )
@@ -1519,8 +1522,18 @@ bool CTL_ImageXferTriplet::QueryAndRemoveDib(CTL_TwainAcquireEnum acquireType, s
             pArray->RemoveDib(nWhich);
             CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_PAGEDISCARDED, reinterpret_cast<LPARAM>(pSource));
         }
-    }
+        }
     return bKeepPage;
+}
+
+void CTL_ImageXferTriplet::SetBufferedTransfer(bool bSet)
+{
+    m_IsBuffered = bSet;
+}
+
+bool CTL_ImageXferTriplet::IsBufferedTransfer() const
+{
+    return m_IsBuffered;
 }
 
 bool IsState7InfoNeeded(CTL_ITwainSource *pSource)

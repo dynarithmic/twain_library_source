@@ -99,6 +99,9 @@ namespace dynarithmic
                                     bool resampled,
                                     const CTL_TwainDibPtr& CurDib);
 
+            void SetBufferedTransfer(bool bSet);
+            bool IsBufferedTransfer() const ;
+
             int ProcessBlankPage(CTL_ITwainSession* pSession,
                                  CTL_ITwainSource* pSource,
                                  const CTL_TwainDibPtr& CurDib,
@@ -126,6 +129,7 @@ namespace dynarithmic
             bool            m_bPendingXfersDone;
             TW_PENDINGXFERS m_PendingXfers;
             TW_UINT16       m_lastPendingXferCode;
+            bool            m_IsBuffered;
     };
 }
 #endif
