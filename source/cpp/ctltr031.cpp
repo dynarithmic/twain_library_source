@@ -99,6 +99,7 @@ CTL_ImageMemXferTriplet::CTL_ImageMemXferTriplet(CTL_ITwainSession *pSession,
     m_nCompressPos = 0;
     m_nPixelType = nPixelType;
     pSource->SetBufferStripData(&m_ImageMemXferBuffer);
+    SetBufferedTransfer(true);
 }
 
 CTL_ImageMemXferTriplet::~CTL_ImageMemXferTriplet()
