@@ -1,9 +1,17 @@
 DTWAIN Version changes
 
+5.2.0.11		  
+
+- Fixed potential crash when acquiring using buffered mode, and the image has been discarded due to blank page detection, 
+  or on a 0 return value on the DTWAIN_TN_QUERYPAGEDISCARD notification.
+
+- Fixed issue with buffered transfers using compression types other than BMP not being recognized.
+
+
 5.2.0.10		  
 
 - Fixed issue when acquiring a file using memory/buffered transfer, where an invalid bitmap was sent to the
-  application to query to see if the bitmap should be discarded.
+  application to query if the bitmap should be discarded.
 
 
 5.2.0.9		  
