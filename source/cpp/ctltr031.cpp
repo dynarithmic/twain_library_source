@@ -345,6 +345,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                                               DTWAIN_TN_BLANKPAGEDISCARDED1, DTWAIN_BP_AUTODISCARD_IMMEDIATE) == 0 )
                         {
                             bPageDiscarded = true;
+                            m_ptrOrig = nullptr;
                             break;  // The page is discarded
                         }
 
@@ -384,6 +385,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                     if ( ProcessBlankPage(pSession, pSource, CurDib, true, DTWAIN_TN_BLANKPAGEDETECTED2, DTWAIN_TN_BLANKPAGEDISCARDED2, DTWAIN_BP_AUTODISCARD_AFTERPROCESS) == 0 )
                     {
                         bPageDiscarded = true;
+                        m_ptrOrig = nullptr;
                         break;  // The page is discarded
                     }
 
@@ -391,7 +393,10 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                     // Query if the page should be thrown away
                     const bool bKeepPage = QueryAndRemoveDib(TWAINAcquireType_Buffer, nLastDib);
                     if (!bKeepPage)
+                    {
+                        m_ptrOrig = nullptr;
                         break;
+                    }
 
                     if ( pSource->GetAcquireType() == TWAINAcquireType_Clipboard )
                     {
@@ -467,10 +472,12 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                             m_nTotalPagesSaved++;
                         }
                         else
+                        {
+                            m_ptrOrig = nullptr;
                             CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,
                                                                   DTWAIN_TN_PAGEDISCARDED,
                                                                   reinterpret_cast<LPARAM>(pSource));
-
+                        }
                         // Delete temporary bitmap here
                         if ( pSource->IsDeleteDibOnScan() )
                         {

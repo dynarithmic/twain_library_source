@@ -69,6 +69,11 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireBuffered(SourceAcquireOptions& opts)
 
     if (DTWAIN_IsCapSupported(Source, DTWAIN_CV_ICAPTILES))
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return TileModeOn(Source); }, DTWAIN_ERR_TILES_NOT_SUPPORTED, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
+    LONG compressionType;
+    if (!DTWAIN_GetCompressionType(Source, &compressionType, TRUE))
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return false; }, DTWAIN_ERR_COMPRESSION, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
+    auto pSource = static_cast<CTL_ITwainSource*>(Source);
+    pSource->SetCompressionType(compressionType);
     opts.setActualAcquireType(TWAINAcquireType_Buffer);
     const DTWAIN_ACQUIRE Ret = LLAcquireImage(opts);
     LOG_FUNC_EXIT_PARAMS(Ret)
