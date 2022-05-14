@@ -240,7 +240,6 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
             case TWRC_XFERDONE:             // All strips transferred.  Process bitmap
             {
                 m_bJobControlPageRecorded = false;
-                CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_TRANSFERDONE,reinterpret_cast<LPARAM>(pSource));
                 m_bJobMarkerNeedsToBeWritten = false;
                 // Check if more images are pending (job control only)
                 SetPendingXfersDone(false);
