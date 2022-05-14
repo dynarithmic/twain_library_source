@@ -7,6 +7,9 @@ DTWAIN Version changes
 
 - Fixed issue with buffered transfers using compression types other than BMP not being recognized.
 
+- Fixed issue with buffered transfers sending two DTWAIN_TN_TRANSFERDONE notifications instead of one notification
+  after acquiring an image.
+
 
 5.2.0.10		  
 
