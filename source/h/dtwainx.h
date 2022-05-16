@@ -507,6 +507,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2(DTWAIN_SOURCE Source, LPDTWAIN_F
 /* Functions to control the strip size of buffered transfer. */
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireStripSizes(DTWAIN_SOURCE Source, LPLONG lpMin, LPLONG lpMax,LPLONG lpPreferred);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireStripBuffer(DTWAIN_SOURCE Source, HANDLE hMem);
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireStripSize(DTWAIN_SOURCE Source, LONG StripSize);
 HANDLE      DLLENTRY_DEF DTWAIN_GetAcquireStripBuffer(DTWAIN_SOURCE Source);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireStripData(DTWAIN_SOURCE Source, LPLONG lpCompression, LPLONG lpBytesPerRow,LPLONG lpColumns, LPLONG lpRows, LPLONG XOffset,LPLONG YOffset, LPLONG lpBytesWritten);
 

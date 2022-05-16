@@ -10,6 +10,8 @@ DTWAIN Version changes
 - Fixed issue with buffered transfers sending two DTWAIN_TN_TRANSFERDONE notifications instead of one notification
   after acquiring an image.
 
+- Added function DTWAIN_SetAcquireStripSize to list of exported DLL functions.
+
 
 5.2.0.10		  
 

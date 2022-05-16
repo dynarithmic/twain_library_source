@@ -958,3 +958,4 @@ DTWAIN_SetBlankPageDetectionEx                    @30270
 DTWAIN_SetBlankPageDetectionExString              @30271   
 DTWAIN_SetBlankPageDetectionExStringA             @30272   
 DTWAIN_SetBlankPageDetectionExStringW             @30273 
+DTWAIN_SetAcquireStripSize                        @30291
