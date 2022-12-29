@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2021 Dynarithmic Software.
+    Copyright (c) 2002-2022 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -154,12 +154,12 @@
     D_ARRAYSETATWIDESTRINGFUNC                                        DYNDTWAIN_API::DTWAIN_ArraySetAtWideString = nullptr;
     D_CALLCALLBACK64FUNC                                              DYNDTWAIN_API::DTWAIN_CallCallback64 = nullptr;
     D_CALLCALLBACKFUNC                                                DYNDTWAIN_API::DTWAIN_CallCallback = nullptr;
+    D_CALLDSMPROC                                                     DYNDTWAIN_API::DTWAIN_CallDSMProc = nullptr;
     D_CHECKHANDLESFUNC                                                DYNDTWAIN_API::DTWAIN_CheckHandles = nullptr;
     D_CLEARBUFFERSFUNC                                                DYNDTWAIN_API::DTWAIN_ClearBuffers = nullptr;
     D_CLEARERRORBUFFERFUNC                                            DYNDTWAIN_API::DTWAIN_ClearErrorBuffer = nullptr;
     D_CLEARPAGEFUNC                                                   DYNDTWAIN_API::DTWAIN_ClearPage = nullptr;
     D_CLEARPDFTEXTFUNC                                                DYNDTWAIN_API::DTWAIN_ClearPDFText = nullptr;
-    D_CLOSEIMAGEFILEAPPENDFUNC                                        DYNDTWAIN_API::DTWAIN_CloseImageFileAppend = nullptr;
     D_CLOSESOURCEFUNC                                                 DYNDTWAIN_API::DTWAIN_CloseSource = nullptr;
     D_CLOSESOURCEUIFUNC                                               DYNDTWAIN_API::DTWAIN_CloseSourceUI = nullptr;
     D_CONVERTDIBTOBITMAPFUNC                                          DYNDTWAIN_API::DTWAIN_ConvertDIBToBitmap = nullptr;
@@ -198,7 +198,6 @@
     D_ENUMAUTOMATICCAPTURESFUNC                                       DYNDTWAIN_API::DTWAIN_EnumAutomaticCaptures = nullptr;
     D_ENUMAUTOMATICSENSEMEDIUMEXFUNC                                  DYNDTWAIN_API::DTWAIN_EnumAutomaticSenseMediumEx = nullptr;
     D_ENUMAUTOMATICSENSEMEDIUMFUNC                                    DYNDTWAIN_API::DTWAIN_EnumAutomaticSenseMedium = nullptr;
-    D_ENUMAUTOSCANVALUESFUNC                                          DYNDTWAIN_API::DTWAIN_EnumAutoScanValues = nullptr;
     D_ENUMBITDEPTHSEX2FUNC                                            DYNDTWAIN_API::DTWAIN_EnumBitDepthsEx2 = nullptr;
     D_ENUMBITDEPTHSEXFUNC                                             DYNDTWAIN_API::DTWAIN_EnumBitDepthsEx = nullptr;
     D_ENUMBITDEPTHSFUNC                                               DYNDTWAIN_API::DTWAIN_EnumBitDepths = nullptr;
@@ -274,6 +273,8 @@
     D_ENUMSUPPORTEDCAPSEX2FUNC                                        DYNDTWAIN_API::DTWAIN_EnumSupportedCapsEx2 = nullptr;
     D_ENUMSUPPORTEDCAPSEXFUNC                                         DYNDTWAIN_API::DTWAIN_EnumSupportedCapsEx = nullptr;
     D_ENUMSUPPORTEDCAPSFUNC                                           DYNDTWAIN_API::DTWAIN_EnumSupportedCaps = nullptr;
+    D_ENUMSUPPORTEDSINGLEPAGEFILETYPES                                DYNDTWAIN_API::DTWAIN_EnumSupportedSinglePageFileTypes = nullptr;
+    D_ENUMSUPPORTEDMULTIPAGEFILETYPES                                 DYNDTWAIN_API::DTWAIN_EnumSupportedMultiPageFileTypes = nullptr;
     D_ENUMTHRESHOLDVALUESEXFUNC                                       DYNDTWAIN_API::DTWAIN_EnumThresholdValuesEx = nullptr;
     D_ENUMTHRESHOLDVALUESFUNC                                         DYNDTWAIN_API::DTWAIN_EnumThresholdValues = nullptr;
     D_ENUMTOPCAMERASFUNC                                              DYNDTWAIN_API::DTWAIN_EnumTopCameras = nullptr;
@@ -326,6 +327,7 @@
     D_GETACQUIRESTRIPDATAFUNC                                         DYNDTWAIN_API::DTWAIN_GetAcquireStripData = nullptr;
     D_GETACQUIRESTRIPSIZESFUNC                                        DYNDTWAIN_API::DTWAIN_GetAcquireStripSizes = nullptr;
     D_GETALARMVOLUMEFUNC                                              DYNDTWAIN_API::DTWAIN_GetAlarmVolume = nullptr;
+    D_GETAPIHANDLESTATUS                                              DYNDTWAIN_API::DTWAIN_GetAPIHandleStatus = nullptr;
     D_GETAPPINFOAFUNC                                                 DYNDTWAIN_API::DTWAIN_GetAppInfoA = nullptr;
     D_GETAPPINFOFUNC                                                  DYNDTWAIN_API::DTWAIN_GetAppInfo = nullptr;
     D_GETAPPINFOWFUNC                                                 DYNDTWAIN_API::DTWAIN_GetAppInfoW = nullptr;
@@ -358,11 +360,9 @@
     D_GETCAPVALUESFUNC                                                DYNDTWAIN_API::DTWAIN_GetCapValues = nullptr;
     D_GETCOMPRESSIONSIZEFUNC                                          DYNDTWAIN_API::DTWAIN_GetCompressionSize = nullptr;
     D_GETCOMPRESSIONTYPEFUNC                                          DYNDTWAIN_API::DTWAIN_GetCompressionType = nullptr;
-    D_GETCONDITIONCODEAFUNC                                           DYNDTWAIN_API::DTWAIN_GetConditionCodeA = nullptr;
     D_GETCONDITIONCODESTRINGAFUNC                                     DYNDTWAIN_API::DTWAIN_GetConditionCodeStringA = nullptr;
     D_GETCONDITIONCODESTRINGFUNC                                      DYNDTWAIN_API::DTWAIN_GetConditionCodeString = nullptr;
     D_GETCONDITIONCODESTRINGWFUNC                                     DYNDTWAIN_API::DTWAIN_GetConditionCodeStringW = nullptr;
-    D_GETCONDITIONCODEWFUNC                                           DYNDTWAIN_API::DTWAIN_GetConditionCodeW = nullptr;
     D_GETCONTRASTFUNC                                                 DYNDTWAIN_API::DTWAIN_GetContrast = nullptr;
     D_GETCONTRASTSTRINGAFUNC                                          DYNDTWAIN_API::DTWAIN_GetContrastStringA = nullptr;
     D_GETCONTRASTSTRINGFUNC                                           DYNDTWAIN_API::DTWAIN_GetContrastString = nullptr;
@@ -409,6 +409,12 @@
     D_GETFEEDERALIGNMENTFUNC                                          DYNDTWAIN_API::DTWAIN_GetFeederAlignment = nullptr;
     D_GETFEEDERFUNCSFUNC                                              DYNDTWAIN_API::DTWAIN_GetFeederFuncs = nullptr;
     D_GETFEEDERORDERFUNC                                              DYNDTWAIN_API::DTWAIN_GetFeederOrder = nullptr;
+    D_GETFILETYPENAME                                                 DYNDTWAIN_API::DTWAIN_GetFileTypeName = nullptr;
+    D_GETFILETYPENAMEA                                                DYNDTWAIN_API::DTWAIN_GetFileTypeNameA = nullptr;
+    D_GETFILETYPENAMEW                                                DYNDTWAIN_API::DTWAIN_GetFileTypeNameW = nullptr;
+    D_GETFILETYPEEXTENSIONS                                           DYNDTWAIN_API::DTWAIN_GetFileTypeExtensions = nullptr;
+    D_GETFILETYPEEXTENSIONSA                                          DYNDTWAIN_API::DTWAIN_GetFileTypeExtensionsA = nullptr;
+    D_GETFILETYPEEXTENSIONSW                                          DYNDTWAIN_API::DTWAIN_GetFileTypeExtensionsW = nullptr;
     D_GETHALFTONEAFUNC                                                DYNDTWAIN_API::DTWAIN_GetHalftoneA = nullptr;
     D_GETHALFTONEFUNC                                                 DYNDTWAIN_API::DTWAIN_GetHalftone = nullptr;
     D_GETHALFTONEWFUNC                                                DYNDTWAIN_API::DTWAIN_GetHalftoneW = nullptr;
@@ -444,7 +450,6 @@
     D_GETNOISEFILTERFUNC                                              DYNDTWAIN_API::DTWAIN_GetNoiseFilter = nullptr;
     D_GETNUMACQUIREDIMAGESFUNC                                        DYNDTWAIN_API::DTWAIN_GetNumAcquiredImages = nullptr;
     D_GETNUMACQUISITIONSFUNC                                          DYNDTWAIN_API::DTWAIN_GetNumAcquisitions = nullptr;
-    D_GETNUMFILESTOAPPENDFUNC                                         DYNDTWAIN_API::DTWAIN_GetNumFilesToAppend = nullptr;
     D_GETOCRCAPVALUESFUNC                                             DYNDTWAIN_API::DTWAIN_GetOCRCapValues = nullptr;
     D_GETOCRERRORSTRINGAFUNC                                          DYNDTWAIN_API::DTWAIN_GetOCRErrorStringA = nullptr;
     D_GETOCRERRORSTRINGFUNC                                           DYNDTWAIN_API::DTWAIN_GetOCRErrorString = nullptr;
@@ -559,6 +564,8 @@
     D_GETTWAINLANGUAGEVALUEFUNC                                       DYNDTWAIN_API::DTWAIN_GetTwainLanguageValue = nullptr;
     D_GETTWAINLANGUAGEVALUEWFUNC                                      DYNDTWAIN_API::DTWAIN_GetTwainLanguageValueW = nullptr;
     D_GETTWAINMODEFUNC                                                DYNDTWAIN_API::DTWAIN_GetTwainMode = nullptr;
+    D_GETTWAINNAMEFROMCONSTANTA                                       DYNDTWAIN_API::DTWAIN_GetTwainNameFromConstantA = nullptr;
+    D_GETTWAINNAMEFROMCONSTANTW                                       DYNDTWAIN_API::DTWAIN_GetTwainNameFromConstantW = nullptr;
     D_GETTWAINTIMEOUTFUNC                                             DYNDTWAIN_API::DTWAIN_GetTwainTimeout = nullptr;
     D_GETVERSIONEXFUNC                                                DYNDTWAIN_API::DTWAIN_GetVersionEx = nullptr;
     D_GETVERSIONFUNC                                                  DYNDTWAIN_API::DTWAIN_GetVersion = nullptr;
@@ -818,6 +825,7 @@
     D_SETJOBCONTROLFUNC                                               DYNDTWAIN_API::DTWAIN_SetJobControl = nullptr;
     D_SETJPEGVALUESFUNC                                               DYNDTWAIN_API::DTWAIN_SetJpegValues = nullptr;
     D_SETLANGUAGEFUNC                                                 DYNDTWAIN_API::DTWAIN_SetLanguage = nullptr;
+    D_SETLASTERROR                                                    DYNDTWAIN_API::DTWAIN_SetLastError = nullptr;
     D_SETLIGHTPATHEXFUNC                                              DYNDTWAIN_API::DTWAIN_SetLightPathEx = nullptr;
     D_SETLIGHTPATHFUNC                                                DYNDTWAIN_API::DTWAIN_SetLightPath = nullptr;
     D_SETLIGHTSOURCEFUNC                                              DYNDTWAIN_API::DTWAIN_SetLightSource = nullptr;
@@ -943,7 +951,6 @@
     D_SHOWUIONLYFUNC                                                  DYNDTWAIN_API::DTWAIN_ShowUIOnly = nullptr;
     D_SHUTDOWNOCRENGINEFUNC                                           DYNDTWAIN_API::DTWAIN_ShutdownOCREngine = nullptr;
     D_SKIPIMAGEINFOERRORFUNC                                          DYNDTWAIN_API::DTWAIN_SkipImageInfoError = nullptr;
-    D_STARTAPPENDFUNC                                                 DYNDTWAIN_API::DTWAIN_StartAppend = nullptr;
     D_STARTTHREADFUNC                                                 DYNDTWAIN_API::DTWAIN_StartThread = nullptr;
     D_STARTTWAINSESSIONAFUNC                                          DYNDTWAIN_API::DTWAIN_StartTwainSessionA = nullptr;
     D_STARTTWAINSESSIONFUNC                                           DYNDTWAIN_API::DTWAIN_StartTwainSession = nullptr;
@@ -1003,15 +1010,15 @@ int InitDTWAINInterface(DYNDTWAIN_API* pApi, HMODULE hModule)
           {
               LONG Major, Minor, VerType, Patch;
               DTWAIN_INSTANCE DTWAIN_GetVersionEx(&Major, &Minor, &VerType, &Patch);
-              if (Major >= DTWAINAPI_VER_MAJOR)
+              if (Major >= DTWAIN_MAJOR_VERSION)
               {
-                  if (Minor >= DTWAINAPI_VER_MINOR)
-                      DTWAINAPI_ASSERT(Patch >= DTWAINAPI_VER_PATCH);
+                  if (Minor >= DTWAIN_MINOR_VERSION)
+                      DTWAINAPI_ASSERT(Patch >= DTWAIN_SUBMINOR_VERSION)
                   else
-                      DTWAINAPI_ASSERT(Minor >= DTWAINAPI_VER_MINOR);
+                      DTWAINAPI_ASSERT(Minor >= DTWAIN_MINOR_VERSION)
               }
               else
-                  DTWAINAPI_ASSERT(Major >= DTWAINAPI_VER_MAJOR);
+                  DTWAINAPI_ASSERT(Major >= DTWAIN_MAJOR_VERSION);
           }
 
 
@@ -1133,12 +1140,12 @@ int InitDTWAINInterface(DYNDTWAIN_API* pApi, HMODULE hModule)
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArraySetAtWideString                    = (D_ARRAYSETATWIDESTRINGFUNC)                    GetProcAddress(hModule,"DTWAIN_ArraySetAtWideString"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_CallCallback64                          = (D_CALLCALLBACK64FUNC)                          GetProcAddress(hModule,"DTWAIN_CallCallback64"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_CallCallback                            = (D_CALLCALLBACKFUNC)                            GetProcAddress(hModule,"DTWAIN_CallCallback"));
+          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_CallDSMProc                             = (D_CALLDSMPROC)                                 GetProcAddress(hModule,"DTWAIN_CallDSMProc"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_CheckHandles                            = (D_CHECKHANDLESFUNC)                            GetProcAddress(hModule,"DTWAIN_CheckHandles"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ClearBuffers                            = (D_CLEARBUFFERSFUNC)                            GetProcAddress(hModule,"DTWAIN_ClearBuffers"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ClearErrorBuffer                        = (D_CLEARERRORBUFFERFUNC)                        GetProcAddress(hModule,"DTWAIN_ClearErrorBuffer"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ClearPage                               = (D_CLEARPAGEFUNC)                               GetProcAddress(hModule,"DTWAIN_ClearPage"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ClearPDFText                            = (D_CLEARPDFTEXTFUNC)                            GetProcAddress(hModule,"DTWAIN_ClearPDFText"));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_CloseImageFileAppend                    = (D_CLOSEIMAGEFILEAPPENDFUNC)                    GetProcAddress(hModule,"DTWAIN_CloseImageFileAppend"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_CloseSource                             = (D_CLOSESOURCEFUNC)                             GetProcAddress(hModule,"DTWAIN_CloseSource"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_CloseSourceUI                           = (D_CLOSESOURCEUIFUNC)                           GetProcAddress(hModule,"DTWAIN_CloseSourceUI"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ConvertDIBToBitmap                      = (D_CONVERTDIBTOBITMAPFUNC)                      GetProcAddress(hModule,"DTWAIN_ConvertDIBToBitmap"));
@@ -1177,7 +1184,6 @@ int InitDTWAINInterface(DYNDTWAIN_API* pApi, HMODULE hModule)
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumAutomaticCaptures                   = (D_ENUMAUTOMATICCAPTURESFUNC)                   GetProcAddress(hModule,"DTWAIN_EnumAutomaticCaptures"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumAutomaticSenseMediumEx              = (D_ENUMAUTOMATICSENSEMEDIUMEXFUNC)              GetProcAddress(hModule,"DTWAIN_EnumAutomaticSenseMediumEx"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumAutomaticSenseMedium                = (D_ENUMAUTOMATICSENSEMEDIUMFUNC)                GetProcAddress(hModule,"DTWAIN_EnumAutomaticSenseMedium"));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumAutoScanValues                      = (D_ENUMAUTOSCANVALUESFUNC)                      GetProcAddress(hModule,"DTWAIN_EnumAutoScanValues"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumBitDepthsEx2                        = (D_ENUMBITDEPTHSEX2FUNC)                        GetProcAddress(hModule,"DTWAIN_EnumBitDepthsEx2"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumBitDepthsEx                         = (D_ENUMBITDEPTHSEXFUNC)                         GetProcAddress(hModule,"DTWAIN_EnumBitDepthsEx"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumBitDepths                           = (D_ENUMBITDEPTHSFUNC)                           GetProcAddress(hModule,"DTWAIN_EnumBitDepths"));
@@ -1253,6 +1259,8 @@ int InitDTWAINInterface(DYNDTWAIN_API* pApi, HMODULE hModule)
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumSupportedCapsEx2                    = (D_ENUMSUPPORTEDCAPSEX2FUNC)                    GetProcAddress(hModule,"DTWAIN_EnumSupportedCapsEx2"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumSupportedCapsEx                     = (D_ENUMSUPPORTEDCAPSEXFUNC)                     GetProcAddress(hModule,"DTWAIN_EnumSupportedCapsEx"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumSupportedCaps                       = (D_ENUMSUPPORTEDCAPSFUNC)                       GetProcAddress(hModule,"DTWAIN_EnumSupportedCaps"));
+          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumSupportedSinglePageFileTypes        = (D_ENUMSUPPORTEDSINGLEPAGEFILETYPES)            GetProcAddress(hModule,"DTWAIN_EnumSupportedSinglePageFileTypes"));
+          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumSupportedMultiPageFileTypes         = (D_ENUMSUPPORTEDMULTIPAGEFILETYPES)             GetProcAddress(hModule,"DTWAIN_EnumSupportedMultiPageFileTypes"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumThresholdValuesEx                   = (D_ENUMTHRESHOLDVALUESEXFUNC)                   GetProcAddress(hModule,"DTWAIN_EnumThresholdValuesEx"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumThresholdValues                     = (D_ENUMTHRESHOLDVALUESFUNC)                     GetProcAddress(hModule,"DTWAIN_EnumThresholdValues"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumTopCameras                          = (D_ENUMTOPCAMERASFUNC)                          GetProcAddress(hModule,"DTWAIN_EnumTopCameras"));
@@ -1305,6 +1313,7 @@ int InitDTWAINInterface(DYNDTWAIN_API* pApi, HMODULE hModule)
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAcquireStripData                     = (D_GETACQUIRESTRIPDATAFUNC)                     GetProcAddress(hModule,"DTWAIN_GetAcquireStripData"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAcquireStripSizes                    = (D_GETACQUIRESTRIPSIZESFUNC)                    GetProcAddress(hModule,"DTWAIN_GetAcquireStripSizes"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAlarmVolume                          = (D_GETALARMVOLUMEFUNC)                          GetProcAddress(hModule,"DTWAIN_GetAlarmVolume"));
+          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAPIHandleStatus                      = (D_GETAPIHANDLESTATUS)                          GetProcAddress(hModule,"DTWAIN_GetAPIHandleStatus"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAppInfoA                             = (D_GETAPPINFOAFUNC)                             GetProcAddress(hModule,"DTWAIN_GetAppInfoA"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAppInfo                              = (D_GETAPPINFOFUNC)                              GetProcAddress(hModule,"DTWAIN_GetAppInfo"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAppInfoW                             = (D_GETAPPINFOWFUNC)                             GetProcAddress(hModule,"DTWAIN_GetAppInfoW"));
@@ -1337,11 +1346,9 @@ int InitDTWAINInterface(DYNDTWAIN_API* pApi, HMODULE hModule)
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCapValues                            = (D_GETCAPVALUESFUNC)                            GetProcAddress(hModule,"DTWAIN_GetCapValues"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCompressionSize                      = (D_GETCOMPRESSIONSIZEFUNC)                      GetProcAddress(hModule,"DTWAIN_GetCompressionSize"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCompressionType                      = (D_GETCOMPRESSIONTYPEFUNC)                      GetProcAddress(hModule,"DTWAIN_GetCompressionType"));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetConditionCodeA                       = (D_GETCONDITIONCODEAFUNC)                       GetProcAddress(hModule,"DTWAIN_GetConditionCodeA"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetConditionCodeStringA                 = (D_GETCONDITIONCODESTRINGAFUNC)                 GetProcAddress(hModule,"DTWAIN_GetConditionCodeStringA"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetConditionCodeString                  = (D_GETCONDITIONCODESTRINGFUNC)                  GetProcAddress(hModule,"DTWAIN_GetConditionCodeString"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetConditionCodeStringW                 = (D_GETCONDITIONCODESTRINGWFUNC)                 GetProcAddress(hModule,"DTWAIN_GetConditionCodeStringW"));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetConditionCodeW                       = (D_GETCONDITIONCODEWFUNC)                       GetProcAddress(hModule,"DTWAIN_GetConditionCodeW"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetContrast                             = (D_GETCONTRASTFUNC)                             GetProcAddress(hModule,"DTWAIN_GetContrast"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetContrastStringA                      = (D_GETCONTRASTSTRINGAFUNC)                      GetProcAddress(hModule,"DTWAIN_GetContrastStringA"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetContrastString                       = (D_GETCONTRASTSTRINGFUNC)                       GetProcAddress(hModule,"DTWAIN_GetContrastString"));
@@ -1388,6 +1395,12 @@ int InitDTWAINInterface(DYNDTWAIN_API* pApi, HMODULE hModule)
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetFeederAlignment                      = (D_GETFEEDERALIGNMENTFUNC)                      GetProcAddress(hModule,"DTWAIN_GetFeederAlignment"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetFeederFuncs                          = (D_GETFEEDERFUNCSFUNC)                          GetProcAddress(hModule,"DTWAIN_GetFeederFuncs"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetFeederOrder                          = (D_GETFEEDERORDERFUNC)                          GetProcAddress(hModule,"DTWAIN_GetFeederOrder"));
+          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetFileTypeName                         = (D_GETFILETYPENAME)                             GetProcAddress(hModule,"DTWAIN_GetFileTypeName"));
+          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetFileTypeNameA                        = (D_GETFILETYPENAMEA)                            GetProcAddress(hModule,"DTWAIN_GetFileTypeNameA"));
+          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetFileTypeNameW                        = (D_GETFILETYPENAMEW)                            GetProcAddress(hModule,"DTWAIN_GetFileTypeNameW"));
+          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetFileTypeExtensions                   = (D_GETFILETYPEEXTENSIONS)                       GetProcAddress(hModule,"DTWAIN_GetFileTypeExtensions"));
+          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetFileTypeExtensionsA                  = (D_GETFILETYPEEXTENSIONSA)                      GetProcAddress(hModule,"DTWAIN_GetFileTypeExtensionsA"));
+          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetFileTypeExtensionsW                  = (D_GETFILETYPEEXTENSIONSW)                      GetProcAddress(hModule,"DTWAIN_GetFileTypeExtensionsW"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetHalftoneA                            = (D_GETHALFTONEAFUNC)                            GetProcAddress(hModule,"DTWAIN_GetHalftoneA"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetHalftone                             = (D_GETHALFTONEFUNC)                             GetProcAddress(hModule,"DTWAIN_GetHalftone"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetHalftoneW                            = (D_GETHALFTONEWFUNC)                            GetProcAddress(hModule,"DTWAIN_GetHalftoneW"));
@@ -1423,7 +1436,6 @@ int InitDTWAINInterface(DYNDTWAIN_API* pApi, HMODULE hModule)
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetNoiseFilter                          = (D_GETNOISEFILTERFUNC)                          GetProcAddress(hModule,"DTWAIN_GetNoiseFilter"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetNumAcquiredImages                    = (D_GETNUMACQUIREDIMAGESFUNC)                    GetProcAddress(hModule,"DTWAIN_GetNumAcquiredImages"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetNumAcquisitions                      = (D_GETNUMACQUISITIONSFUNC)                      GetProcAddress(hModule,"DTWAIN_GetNumAcquisitions"));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetNumFilesToAppend                     = (D_GETNUMFILESTOAPPENDFUNC)                     GetProcAddress(hModule,"DTWAIN_GetNumFilesToAppend"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRCapValues                         = (D_GETOCRCAPVALUESFUNC)                         GetProcAddress(hModule,"DTWAIN_GetOCRCapValues"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRErrorStringA                      = (D_GETOCRERRORSTRINGAFUNC)                      GetProcAddress(hModule,"DTWAIN_GetOCRErrorStringA"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRErrorString                       = (D_GETOCRERRORSTRINGFUNC)                       GetProcAddress(hModule,"DTWAIN_GetOCRErrorString"));
@@ -1538,6 +1550,8 @@ int InitDTWAINInterface(DYNDTWAIN_API* pApi, HMODULE hModule)
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainLanguageValue                   = (D_GETTWAINLANGUAGEVALUEFUNC)                   GetProcAddress(hModule,"DTWAIN_GetTwainLanguageValue"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainLanguageValueW                  = (D_GETTWAINLANGUAGEVALUEWFUNC)                  GetProcAddress(hModule,"DTWAIN_GetTwainLanguageValueW"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainMode                            = (D_GETTWAINMODEFUNC)                            GetProcAddress(hModule,"DTWAIN_GetTwainMode"));
+          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainNameFromConstantA               = (D_GETTWAINNAMEFROMCONSTANTA)                   GetProcAddress(hModule,"DTWAIN_GetTwainNameFromConstantA"));
+          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainNameFromConstantW               = (D_GETTWAINNAMEFROMCONSTANTW)                   GetProcAddress(hModule,"DTWAIN_GetTwainNameFromConstantW"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainTimeout                         = (D_GETTWAINTIMEOUTFUNC)                         GetProcAddress(hModule,"DTWAIN_GetTwainTimeout"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetVersionEx                            = (D_GETVERSIONEXFUNC)                            GetProcAddress(hModule,"DTWAIN_GetVersionEx"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetVersion                              = (D_GETVERSIONFUNC)                              GetProcAddress(hModule,"DTWAIN_GetVersion"));
@@ -1797,6 +1811,7 @@ int InitDTWAINInterface(DYNDTWAIN_API* pApi, HMODULE hModule)
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetJobControl                           = (D_SETJOBCONTROLFUNC)                           GetProcAddress(hModule,"DTWAIN_SetJobControl"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetJpegValues                           = (D_SETJPEGVALUESFUNC)                           GetProcAddress(hModule,"DTWAIN_SetJpegValues"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetLanguage                             = (D_SETLANGUAGEFUNC)                             GetProcAddress(hModule,"DTWAIN_SetLanguage"));
+          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetLastError                            = (D_SETLASTERROR)                                GetProcAddress(hModule,"DTWAIN_SetLastError"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetLightPathEx                          = (D_SETLIGHTPATHEXFUNC)                          GetProcAddress(hModule,"DTWAIN_SetLightPathEx"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetLightPath                            = (D_SETLIGHTPATHFUNC)                            GetProcAddress(hModule,"DTWAIN_SetLightPath"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetLightSource                          = (D_SETLIGHTSOURCEFUNC)                          GetProcAddress(hModule,"DTWAIN_SetLightSource"));
@@ -1922,7 +1937,6 @@ int InitDTWAINInterface(DYNDTWAIN_API* pApi, HMODULE hModule)
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ShowUIOnly                              = (D_SHOWUIONLYFUNC)                              GetProcAddress(hModule,"DTWAIN_ShowUIOnly"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ShutdownOCREngine                       = (D_SHUTDOWNOCRENGINEFUNC)                       GetProcAddress(hModule,"DTWAIN_ShutdownOCREngine"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SkipImageInfoError                      = (D_SKIPIMAGEINFOERRORFUNC)                      GetProcAddress(hModule,"DTWAIN_SkipImageInfoError"));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_StartAppend                             = (D_STARTAPPENDFUNC)                             GetProcAddress(hModule,"DTWAIN_StartAppend"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_StartThread                             = (D_STARTTHREADFUNC)                             GetProcAddress(hModule,"DTWAIN_StartThread"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_StartTwainSessionA                      = (D_STARTTWAINSESSIONAFUNC)                      GetProcAddress(hModule,"DTWAIN_StartTwainSessionA"));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_StartTwainSession                       = (D_STARTTWAINSESSIONFUNC)                       GetProcAddress(hModule,"DTWAIN_StartTwainSession"));
