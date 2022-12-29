@@ -20,7 +20,7 @@
  */
 #include "cppfunc.h"
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
+#include "arrayfactory.h"
 #include "errorcheck.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -62,6 +62,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     bRetval = CTL_TwainAppMgr::OpenSource(pHandle->m_pTwainSession, p);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bRetval || !p; }, DTWAIN_ERR_BAD_SOURCE, false, FUNC_MACRO);
 
+    // If this source has a feeder, add it to the feeder sources container
+    if (DTWAIN_IsFeederSensitive(Source))
+        CTL_TwainDLLHandle::s_aFeederSources.insert(Source);
+
+    // Get the supported transfer types
+    p->SetSupportedTransferMechanisms(CTL_TwainAppMgr::EnumTransferMechanisms(p));
+
     // Cache the pixel types and bit depths
     LogAndCachePixelTypes(p);
 
@@ -70,7 +77,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     DTWAIN_EnumSupportedCaps(Source, &arr);
 
     // if any logging is turned on, then get the capabilities and log the values
-    if (CTL_TwainDLLHandle::s_lErrorFilterFlags)
+    if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
     {
         CTL_StringType msg = _T("Source: ") + p->GetProductName() + _T(" has been opened successfully");
         CTL_TwainAppMgr::WriteLogInfo(msg);
@@ -78,7 +85,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
         // Log the caps if logging is turned on
         CTL_StringType sName;
 
-        auto& vCaps = EnumeratorVector<LONG>(arr);
+        auto& vCaps = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(arr);
         std::vector<std::string> VecString(vCaps.size());
 
         // copy the names
@@ -110,7 +117,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceOpen(DTWAIN_SOURCE Source)
 {
-    //    TRY_BLOCK
     LOG_FUNC_ENTRY_PARAMS((Source))
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
@@ -146,9 +152,9 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
     if (bOK)
     {
         DTWAINArrayLL_RAII arrP(PixelTypes);
-        auto vPixelTypes = EnumeratorVectorPtr<LONG>(PixelTypes);
+        auto& vPixelTypes = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(PixelTypes);
 
-        LONG nCount = vPixelTypes ? static_cast<LONG>(vPixelTypes->size()) : 0;
+        LONG nCount = static_cast<LONG>(vPixelTypes.size());
         if (nCount > 0)
         {
             // create an array of 1
@@ -156,12 +162,12 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
             DTWAINArrayLL_RAII raii(vCurPixType);
 
             // get pointer to internals of the array
-            auto& vCurPixTypePtr = EnumeratorVector<LONG>(vCurPixType);
+            auto& vCurPixTypePtr = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(vCurPixType);
 
             for (LONG i = 0; i < nCount; ++i)
             {
                 // current pixel type
-                vCurPixTypePtr[0] = (*vPixelTypes)[i];
+                vCurPixTypePtr[0] = vPixelTypes[i];
                 LONG& curPixType = vCurPixTypePtr[0];
                 // Set the pixel type temporarily
                 if (DTWAIN_SetCapValues(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPSET, vCurPixType))
@@ -174,10 +180,10 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
                         DTWAINArrayLL_RAII arr(BitDepths);
 
                         // Get the total number of bit depths.
-                        auto vBitDepths = EnumeratorVectorPtr<LONG>(BitDepths);
+                        auto& vBitDepths = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(BitDepths);
 
-                        LONG nCountBPP = vBitDepths ? static_cast<LONG>(vBitDepths->size()) : 0;
-                        if (oldflags)
+                        LONG nCountBPP = static_cast<LONG>(vBitDepths.size());
+                        if (oldflags & DTWAIN_LOG_MISCELLANEOUS)
                         {
                             StringStreamA strm;
                             strm << "\nFor source \"" << sName << "\", there are (is) " <<
@@ -188,9 +194,9 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
                         LONG nCurBitDepth;
                         for (LONG j = 0; j < nCountBPP; ++j)
                         {
-                            nCurBitDepth = (*vBitDepths)[j];
+                            nCurBitDepth = vBitDepths[j];
                             p->AddPixelTypeAndBitDepth(curPixType, nCurBitDepth);
-                            if (oldflags)
+                            if (oldflags & DTWAIN_LOG_MISCELLANEOUS)
                             {
                                 StringStreamA strm;
                                 strm << "Bit depth[" << j << "] = " << nCurBitDepth << "\n";

@@ -25,8 +25,7 @@ CTL_SelectSourceDlgTriplet::CTL_SelectSourceDlgTriplet(
                             CTL_ITwainSession *pSession,
                             LPCTSTR pProduct/*=nullptr*/) :
               CTL_SourceTriplet( pSession, pProduct, MSG_USERSELECT )
-{
-}
+{}
 
 
 TW_UINT16 CTL_SelectSourceDlgTriplet::Execute()

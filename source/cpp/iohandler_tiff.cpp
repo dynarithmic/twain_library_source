@@ -26,9 +26,8 @@
 #include "tiff.h"
 using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, LONG64 MultiStage)
+int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* pMultiPageStruct)
 {
-    auto s = reinterpret_cast<DibMultiPageStruct*>(MultiStage);
     HANDLE hDib = nullptr;
 
     // Check if this is the first page
@@ -42,7 +41,7 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
         !m_ImageInfoEx.IsOCRTempImage)
         m_nFormat = m_ImageInfoEx.theSource->GetAcquireFileType();
 
-    if ( !s || s->Stage == DIB_MULTI_FIRST )
+    if ( !pMultiPageStruct || pMultiPageStruct->Stage == DIB_MULTI_FIRST )
     {
         // Check for the Postscript option
         if ( m_ImageInfoEx.IsPostscript )
@@ -74,10 +73,10 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     }
 
     bool bNotLastFile = false;
-    if ( !s )
+    if ( !pMultiPageStruct )
         bNotLastFile = true;
     else
-    if ( s->Stage != DIB_MULTI_LAST )
+    if ( pMultiPageStruct->Stage != DIB_MULTI_LAST )
             bNotLastFile = true;
     if ( bNotLastFile )
     {
@@ -126,7 +125,7 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
 
     case CTL_TwainDib::TiffFormatDEFLATE:
     case CTL_TwainDib::TiffFormatDEFLATEMULTI:
-        nLibTiff = COMPRESSION_DEFLATE;
+        nLibTiff = COMPRESSION_ADOBE_DEFLATE;
         break;
 
     case CTL_TwainDib::TiffFormatJPEG:
@@ -148,9 +147,9 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
 
     CTIFFImageHandler TIFFHandler(nLibTiff, m_ImageInfoEx);
 
-    if ( MultiStage )
+    if ( pMultiPageStruct )
     {
-        TIFFHandler.SetMultiPageStatus(s);
+        TIFFHandler.SetMultiPageStatus(pMultiPageStruct);
     }
     int retval;
     if ( bNotLastFile )
@@ -184,7 +183,7 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
         strm << "Return from writing last image = " << retval << "\n";
         CTL_TwainAppMgr::WriteLogInfoA(strm.str());
     }
-    if ( (!s || s->Stage == DIB_MULTI_LAST) && retval == 0 )
+    if ( (!pMultiPageStruct || pMultiPageStruct->Stage == DIB_MULTI_LAST) && retval == 0 )
     {
         // Convert the TIFF file to Postscript if necessary
         if ( m_ImageInfoEx.IsPostscript )
@@ -218,8 +217,8 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
             delete_file( sActualFileName.c_str());
         }
     }
-    if ( s )
-        TIFFHandler.GetMultiPageStatus(s);
+    if ( pMultiPageStruct )
+        TIFFHandler.GetMultiPageStatus(pMultiPageStruct);
 
     return retval;
 }

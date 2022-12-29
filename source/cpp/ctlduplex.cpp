@@ -22,7 +22,7 @@
 #include "dtwain.h"
 #include "ctliface.h"
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
+#include "arrayfactory.h"
 using namespace dynarithmic;
 
 /* Duplex Scanner support */
@@ -45,9 +45,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, LPLONG lpDup
             DTWAINArrayLL_RAII arr(Array);
             if ( bRet2 && Array)
             {
-                auto vValues = EnumeratorVectorPtr<LONG>(Array);
-                if ( vValues && !vValues->empty() )
-                    *lpDupType = (*vValues)[0];
+                auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(Array);
+                if ( !vValues.empty() )
+                    *lpDupType = vValues.front();
             }
         }
     }

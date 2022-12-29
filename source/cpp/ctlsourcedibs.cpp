@@ -20,7 +20,7 @@
  */
 #include "cppfunc.h"
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
+#include "arrayfactory.h"
 #include "errorcheck.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -53,11 +53,13 @@ DTWAIN_BOOL dynarithmic::DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source, DTWAIN_AR
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
 
+    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+
         // Check if array is of the correct type
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !EnumeratorFunctionImpl::EnumeratorIsValidEx(pArray, CTL_EnumeratorHandleType); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !factory->is_valid(pArray, CTL_ArrayFactory::arrayTag::VoidPtrType); },
                                                     DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
     const DTWAIN_ARRAY pDTWAINArray = pArray;
-    EnumeratorFunctionImpl::ClearEnumerator(pDTWAINArray);
+    factory->clear(pDTWAINArray);
 
     // Copy DIBs to the array
     const int nCount = pSource->GetNumDibs();
@@ -66,7 +68,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source, DTWAIN_AR
     {
         hDib = pSource->GetDibHandle(i);
         if (hDib)
-            DTWAIN_ArrayAdd(pArray, &hDib);
+            DTWAIN_ArrayAdd(pArray, hDib);
     }
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
@@ -118,7 +120,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCurrentPageNum(DTWAIN_SOURCE Source)
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_CreateAcquisitionArray()
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    const DTWAIN_ARRAY AcqArray = static_cast<DTWAIN_ARRAY>(DTWAIN_ArrayCreate(DTWAIN_ArrayTypePTR, 0));
+    const DTWAIN_ARRAY AcqArray = static_cast<DTWAIN_ARRAY>(DTWAIN_ArrayCreate(DTWAIN_ARRAYOFHANDLEARRAYS, 0));
     LOG_FUNC_EXIT_PARAMS(AcqArray)
     CATCH_BLOCK(DTWAIN_ARRAY(0))
 }
@@ -138,7 +140,7 @@ struct NestedAcquisitionDestroyer
         if (m_bDestroyDibs)
         {
             // get underlying vector of dibs
-            auto& vHandles = EnumeratorVector<HANDLE>(ImagesArray);
+            auto& vHandles = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<void*>(ImagesArray);
 
             // for each dib, destroy the data
             std::for_each(vHandles.begin(), vHandles.end(), DestroyDibData);
@@ -161,13 +163,15 @@ struct NestedAcquisitionDestroyer
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyAcquisitionArray(DTWAIN_ARRAY aAcq, DTWAIN_BOOL bDestroyDibs)
 {
     LOG_FUNC_ENTRY_PARAMS((aAcq))
-        const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, nullptr);
 
+    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+
     // Check if array exists
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !EnumeratorFunctionImpl::EnumeratorIsValid(aAcq); }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !factory->is_valid(aAcq); }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
 
     // Make sure this array is destroyed when we exit this function
     DTWAINArrayLL_RAII raiiMain(aAcq);
@@ -176,7 +180,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyAcquisitionArray(DTWAIN_ARRAY aAcq, DTWAI
     const NestedAcquisitionDestroyer acqDestroyer(bDestroyDibs ? true : false);
 
     // underlying images array
-    auto& vImagesArray = EnumeratorVector<LPVOID>(aAcq);
+    auto& vImagesArray = factory->underlying_container_t<CTL_ArrayFactory::tagged_array_voidptr*>(aAcq);
 
     // for each image array, destroy it
     std::for_each(vImagesArray.begin(), vImagesArray.end(), acqDestroyer);

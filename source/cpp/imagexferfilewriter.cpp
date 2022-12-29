@@ -30,7 +30,8 @@
 #define DTWAIN_PAGEMISSINGSTR _T("<missing_page>")
 
 using namespace dynarithmic;
-static void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pSession, LONG Error, LONG ErrorMsg);
+static void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pSession, LONG Error, LONG ErrorMsg,
+                                const std::string& extraInfo = "");
 
 ImageXferFileWriter::ImageXferFileWriter() : m_pTrip(nullptr), m_pSession(nullptr),
 m_pSource(nullptr)
@@ -101,7 +102,8 @@ int ImageXferFileWriter::CopyDibToFile(CTL_TwainDibPtr pCurDib,
                 std::ofstream fh(strTempFile, std::ios::binary);
                 if ( !fh )
                 {
-                    SendFileAcquireError(m_pSource, m_pSession, DTWAIN_ERR_FILEWRITE, DTWAIN_TN_FILESAVEERROR);
+                    SendFileAcquireError(m_pSource, m_pSession, DTWAIN_ERR_FILEWRITE, DTWAIN_TN_FILESAVEERROR,
+                                         StringConversion::Convert_Native_To_Ansi(m_pSource->GetActualFileName()));
                     return DTWAIN_ERR_FILEWRITE;
                 }
                 fh.write(pImage, rawBytes);
@@ -109,7 +111,8 @@ int ImageXferFileWriter::CopyDibToFile(CTL_TwainDibPtr pCurDib,
                 if (filesys::file_size(strTempFile) == 0)
                 {
                     SendFileAcquireError(m_pSource, m_pSession,
-                                         DTWAIN_ERR_FILEWRITE, DTWAIN_TN_FILESAVEERROR);
+                                         DTWAIN_ERR_FILEWRITE, DTWAIN_TN_FILESAVEERROR,
+                                         StringConversion::Convert_Native_To_Ansi(m_pSource->GetActualFileName()));
                     CTL_TwainAppMgr::SetError(DTWAIN_ERR_FILEWRITE);
                     return DTWAIN_ERR_FILEWRITE;
                 }
@@ -124,7 +127,8 @@ int ImageXferFileWriter::CopyDibToFile(CTL_TwainDibPtr pCurDib,
             else
             {
                 SendFileAcquireError(m_pSource, m_pSession,
-                                     DTWAIN_ERR_DIB, DTWAIN_TN_FILESAVEERROR);
+                                     DTWAIN_ERR_DIB, DTWAIN_TN_FILESAVEERROR,
+                                     StringConversion::Convert_Native_To_Ansi(m_pSource->GetActualFileName()));
                 return DTWAIN_ERR_DIB;
             }
         }
@@ -169,13 +173,14 @@ int ImageXferFileWriter::CopyDibToFileEx(CTL_TwainDibPtr pCurDib,
         ImageInfo.PostscriptType = static_cast<LONG>(FileType);
     }
 
-    if ( MultipageOption == 0 || m_pSource->IsMultiPageModeSaveAtEnd()
-        && !CTL_ITwainSource::IsFileTypeMultiPage( FileType )
+    if ( MultipageOption == 0 || (m_pSource->IsMultiPageModeSaveAtEnd()
+        && !CTL_ITwainSource::IsFileTypeMultiPage( FileType ))
     )
     {
         const int retval = pCurDib->WriteDibBitmap(ImageInfo, strTempFile.c_str(), m_pSource->GetAcquireFileType());
         if ( retval != 0 )
-           SendFileAcquireError(m_pSource, m_pSession, retval, DTWAIN_TN_FILEPAGESAVEERROR);
+           SendFileAcquireError(m_pSource, m_pSession, retval, DTWAIN_TN_FILEPAGESAVEERROR, 
+                StringConversion::Convert_Native_To_Ansi(m_pSource->GetActualFileName()));
 
         else
         {
@@ -199,7 +204,8 @@ int ImageXferFileWriter::CopyDibToFileEx(CTL_TwainDibPtr pCurDib,
     if ( nStatus != 0 )
     {
         SendFileAcquireError(m_pSource, m_pSession,
-                                nStatus, DTWAIN_TN_FILEPAGESAVEERROR);
+                             nStatus, DTWAIN_TN_FILEPAGESAVEERROR,
+                             StringConversion::Convert_Native_To_Ansi(m_pSource->GetActualFileName()));
     }
     else
     {
@@ -330,7 +336,7 @@ LONG ImageXferFileWriter::MergeDuplexFiles() const
         while ( currentside < 2 )
         {
             // front side
-            if ( currentside == 0 || currentside == 0 && m_pSource->IsMultiPageModeContinuous())
+            if ( currentside == 0 || (currentside == 0 && m_pSource->IsMultiPageModeContinuous()))
                 DupData = m_pSource->GetDuplexFileData( nCurPage[0], nWhichSide[0] );
             else
             if ( bNotManualDuplex )
@@ -495,7 +501,7 @@ int ImageXferFileWriter::MergeDuplexFilesEx(const sDuplexFileData& DupData,
     // Resize the dib buffer
     HANDLE pDibBufferHandle;
     char* pDibBuffer = static_cast<char*>(CTL_TwainDLLHandle::s_TwainMemoryFunc->AllocateMemoryPtr(
-        DupData.nBytes, &pDibBufferHandle));
+											static_cast<TW_UINT32>(DupData.nBytes), &pDibBufferHandle));
     if ( !pDibBuffer )
     {
         retval = ProcessManualDuplexState(DTWAIN_TN_MANDUPMEMORYERROR);
@@ -511,7 +517,7 @@ int ImageXferFileWriter::MergeDuplexFilesEx(const sDuplexFileData& DupData,
         nHandle.read(pDibBuffer, DupData.nBytes);
 
         const std::streamsize numBytesRead = nHandle.gcount();
-        if (numBytesRead != DupData.nBytes)
+        if (numBytesRead < 0 || (static_cast<uint64_t>(numBytesRead) != DupData.nBytes))
         {
             retval = ProcessManualDuplexState(DTWAIN_TN_MANDUPFILEERROR);
             if (retval != DTWAIN_MANDUP_SCANOK)
@@ -543,7 +549,8 @@ void ImageXferFileWriter::ManualDuplexCleanUp(CTL_StringType strFile/* = ""*/, b
     Dib.WriteLastPageDibMulti(m_pSource->GetImageHandlerPtr(), nStatus);
 
     if ( nStatus != 0 )
-        SendFileAcquireError(m_pSource, m_pSession, nStatus, DTWAIN_TN_FILESAVEERROR);
+        SendFileAcquireError(m_pSource, m_pSession, nStatus, DTWAIN_TN_FILESAVEERROR,
+                             StringConversion::Convert_Native_To_Ansi(m_pSource->GetActualFileName()));
 
     else
     {
@@ -587,7 +594,8 @@ LONG ImageXferFileWriter::CopyDuplexDibToFile(CTL_TwainDibPtr pCurDib, bool bIsJ
         fh.open(p.string(), std::ios::binary);
         if ( !fh )
         {
-            SendFileAcquireError(m_pSource, m_pSession, DTWAIN_ERR_FILEWRITE, DTWAIN_TN_FILESAVEERROR );
+            SendFileAcquireError(m_pSource, m_pSession, DTWAIN_ERR_FILEWRITE, DTWAIN_TN_FILESAVEERROR,
+                                 StringConversion::Convert_Native_To_Ansi(m_pSource->GetActualFileName()));
             RecordBadDuplexPage();
             return DTWAIN_ERR_FILEWRITE;
         }
@@ -741,10 +749,11 @@ void ImageXferFileWriter::EndProcessingImageFile(bool bSaveFile/*=true*/) const
     }
 }
 
-void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pSession, LONG Error, LONG ErrorMsg)
+void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pSession, LONG Error, LONG ErrorMsg,
+                          const std::string& extraInfo)
 {
     static constexpr int MaxMessage = 1024;
-    CTL_TwainAppMgr::SetError(Error);
+    CTL_TwainAppMgr::SetError(Error, extraInfo);
     char szBuf[MaxMessage + 1];
     CTL_TwainAppMgr::GetLastErrorString(szBuf, MaxMessage);
     CTL_TwainAppMgr::WriteLogInfoA(szBuf);

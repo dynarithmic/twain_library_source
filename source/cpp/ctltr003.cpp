@@ -22,5 +22,4 @@
 using namespace dynarithmic;
 CTL_GetNextSourceTriplet::CTL_GetNextSourceTriplet(CTL_ITwainSession *pSession)
                          : CTL_SourceTriplet( pSession, static_cast<LPCTSTR>(nullptr), MSG_GETNEXT )
-{
-}
+{}

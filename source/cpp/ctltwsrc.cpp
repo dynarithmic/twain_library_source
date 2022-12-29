@@ -34,7 +34,7 @@
 #include "ctltmpl3.h"
 #include "imagexferfilewriter.h"
 #include "ctltr038.h"
-#include "enumeratorfuncs.h"
+#include "arrayfactory.h"
 #include "ctlfileutils.h"
 #include "tiff.h"
 
@@ -263,6 +263,7 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_ImageInfoEx.PhotoMetric = PHOTOMETRIC_MINISBLACK;
     m_ImageInfoEx.theSource = this;
     m_AltAcquireArea.UnitOfMeasure = DTWAIN_INCHES;
+    m_ImageInfoEx.IsCreateDirectory = false;
     char commentStr[256] = {};
     GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
     SetPDFValue(PDFPRODUCERKEY, StringConversion::Convert_Ansi_To_Native(commentStr));
@@ -545,10 +546,10 @@ CTL_StringType CTL_ITwainSource::GetImageFileName(int curFile) const
     if ( !pDTWAINArray )
         return {};
 
-    const int nCount = static_cast<int>(EnumeratorFunctionImpl::EnumeratorGetCount(pDTWAINArray));
+    const int nCount = static_cast<int>(CTL_TwainDLLHandle::s_ArrayFactory->size(pDTWAINArray));
     if ( nCount > 0 && curFile < nCount )
     {
-        EnumeratorFunctionImpl::EnumeratorGetAt(pDTWAINArray, curFile, &strTemp);
+        CTL_TwainDLLHandle::s_ArrayFactory->get_value(pDTWAINArray, curFile, &strTemp);
         return strTemp;
     }
     return {};
@@ -632,11 +633,11 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
         const DTWAIN_ARRAY pDTWAINArray = m_pFileEnumerator;
         if ( !pDTWAINArray )
             return m_strAcquireFile;
-
-        const int nCount = static_cast<int>(EnumeratorFunctionImpl::EnumeratorGetCount(pDTWAINArray));
+        const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+        const int nCount = static_cast<int>(factory->size(pDTWAINArray));
         if ( nCount > 0 )
         {
-            EnumeratorFunctionImpl::EnumeratorGetAt(pDTWAINArray, 0, &strTemp);
+            strTemp = factory->get_value<CTL_StringType>(pDTWAINArray, 0); 
             m_strAcquireFile = StringWrapper::CreateFileNameFromNumber(strTemp, m_nCurFileNum, static_cast<int>(m_nFileDigits));
         }
         else
@@ -652,12 +653,15 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
         const DTWAIN_ARRAY pDTWAINArray = m_pFileEnumerator;
         if ( !pDTWAINArray )
             return m_strAcquireFile;
-        bool bRet = EnumeratorFunctionImpl::EnumeratorGetAt(pDTWAINArray, nCurImage, &strTemp); //pDTWAINArray->Value(&strTemp, nCurImage, nStatus);
-        if ( !bRet ) // No more names
+        const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+        bool bNameAvailable = nCurImage < factory->size(pDTWAINArray);
+        if ( bNameAvailable )
+            bNameAvailable = factory->get_value(pDTWAINArray, nCurImage, &strTemp)?true:false; 
+        if ( !bNameAvailable ) // No more names
         {
-            const int nCount = EnumeratorFunctionImpl::EnumeratorGetCount(pDTWAINArray);
-            bRet = EnumeratorFunctionImpl::EnumeratorGetAt(pDTWAINArray, nCount-1, &strTemp);
-            if ( !bRet )
+            const int nCount = static_cast<int>(factory->size(pDTWAINArray));
+            bNameAvailable = factory->get_value(pDTWAINArray, nCount-1, &strTemp)?true:false;
+            if ( !bNameAvailable )
                 return m_strAcquireFile;
             return StringWrapper::GetPageFileName( strTemp, nCurImage, lFlags & DTWAIN_USELONGNAME?true:false );
         }
@@ -942,7 +946,7 @@ CTL_ITwainSource::~CTL_ITwainSource()
         if ( pHandle )
             pHandle->m_mapPDFTextElement.erase(this);
 
-        EnumeratorFunctionImpl::EnumeratorDestroy(m_pFileEnumerator);
+        CTL_TwainDLLHandle::s_ArrayFactory->destroy(m_pFileEnumerator);
     }
     catch(...)
     {
@@ -1055,8 +1059,9 @@ double CTL_ITwainSource::GetCapCacheValue( LONG lCap, LONG *pTurnOn ) const
 
 void CTL_ITwainSource::AddDibsToAcquisition(DTWAIN_ARRAY aDibs) const
 {
-   EnumeratorFunctionImpl::EnumeratorAddValue( m_aAcqAttempts, &aDibs );
-   EnumeratorFunctionImpl::EnumeratorAddValue(m_PersistentArray, &aDibs);
+   const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+   factory->add_to_back(m_aAcqAttempts, aDibs, 1 );
+   factory->add_to_back(m_PersistentArray, aDibs, 1);
 }
 
 void CTL_ITwainSource::ResetAcquisitionAttempts(DTWAIN_ARRAY aNewAttempts)
@@ -1064,7 +1069,7 @@ void CTL_ITwainSource::ResetAcquisitionAttempts(DTWAIN_ARRAY aNewAttempts)
     // Remove any old acquisitions
     if ( aNewAttempts != m_aAcqAttempts)
     {
-        EnumeratorFunctionImpl::EnumeratorDestroy(m_aAcqAttempts);
+        CTL_TwainDLLHandle::s_ArrayFactory->destroy(m_aAcqAttempts);
         m_aAcqAttempts = aNewAttempts;
     }
 }
@@ -1307,7 +1312,7 @@ bool CTL_ITwainSource::ResetFileAutoIncrementData()
 
 
 void CTL_ITwainSource::AddDuplexFileData(CTL_StringType fName,
-                                         unsigned long nBytes,
+                                         uint64_t nBytes,
                                          int nWhich,
                                          CTL_StringType fRealName,
                                          bool bIsJobControl/*=false*/)
@@ -1373,7 +1378,7 @@ void CTL_ITwainSource::ResetManualDuplexMode(int nWhich/*=-1*/)
 
 void CTL_ITwainSource::DeleteDuplexFiles(int nWhich)
 {
-    std::vector<sDuplexFileData> *pData;
+    std::vector<sDuplexFileData> *pData = nullptr;
     if ( nWhich == 0 )
         pData = &m_DuplexFileData.first;
     else
@@ -1431,16 +1436,17 @@ template <typename T>
 static DTWAIN_ARRAY PopulateArray(const std::vector<boost::any>& dataArray, CTL_ITwainSource* pSource, TW_UINT16 nCap)
 {
     const DTWAIN_ARRAY theArray = DTWAIN_ArrayCreateFromCap(pSource, static_cast<LONG>(nCap), static_cast<LONG>(dataArray.size()));
-    auto& vVector = EnumeratorVector<T>(theArray);
-    std::transform(dataArray.begin(), dataArray.end(), vVector.begin(), [](boost::any theAny) { return boost::any_cast<T>(theAny);});
+    auto& vVector = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
+    std::transform(dataArray.begin(), dataArray.end(), vVector.begin(), [](boost::any theAny) 
+                    { return boost::any_cast<typename T::value_type>(theAny);});
     return theArray;
 }
 
 template <typename T>
 static bool PopulateCache(DTWAIN_ARRAY theArray, std::vector<boost::any>& dataArray)
 {
-    auto& vVector = EnumeratorVector<T>(theArray);
-    std::transform(vVector.begin(), vVector.end(), std::back_inserter(dataArray), [](T value){ return value;});
+    auto& vVector = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
+    std::transform(vVector.begin(), vVector.end(), std::back_inserter(dataArray), [](typename T::value_type value){ return value;});
     return true;
 }
 
@@ -1458,10 +1464,10 @@ DTWAIN_ARRAY CTL_ITwainSource::getCapCachedValues(TW_UINT16 lCap, LONG getType)
         return nullptr;
     const container_values& cValues = (*iter).second;
     if (isIntCap(cValues.m_dataType))
-        return PopulateArray<LONG>(cValues.m_data, this, lCap);
+        return PopulateArray<CTL_ArrayFactory::tagged_array_long>(cValues.m_data, this, lCap);
     else
     if ( isFloatCap(cValues.m_dataType))
-        return PopulateArray<double>(cValues.m_data, this, lCap);
+        return PopulateArray<CTL_ArrayFactory::tagged_array_double>(cValues.m_data, this, lCap);
     return nullptr;
 }
 
@@ -1478,7 +1484,7 @@ bool CTL_ITwainSource::setCapCachedValues(DTWAIN_ARRAY array, TW_UINT16 lCap, LO
     cValues.m_dataType = DTWAIN_GetCapDataType(this, lCap);
     if (isIntCap(cValues.m_dataType))
     {
-        const bool retVal = PopulateCache<LONG>(array, cValues.m_data);
+        const bool retVal = PopulateCache<CTL_ArrayFactory::tagged_array_long>(array, cValues.m_data);
         if (retVal)
             return mapToUse->insert({lCap, cValues}).second;
     }

@@ -18,8 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLTR021_H_
-#define CTLTR021_H_
+#ifndef CTLTR021_H
+#define CTLTR021_H
 
 #include "ctltrp.h"
 #include "ctltwses.h"

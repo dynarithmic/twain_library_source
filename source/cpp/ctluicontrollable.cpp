@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
+#include "arrayfactory.h"
 #include "errorcheck.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -54,7 +54,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
         DTWAIN_ARRAY CapArray = nullptr;
         DTWAIN_GetCapValuesEx(Source, DTWAIN_CV_CAPUICONTROLLABLE, DTWAIN_CAPGET, DTWAIN_CONTONEVALUE, &CapArray);
         DTWAINArrayLL_RAII arr(CapArray);
-        bOk = EnumeratorVector<LONG>(CapArray)[0] ? true : false;
+        bOk = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(CapArray)[0] ? true : false;
     }
     else
     {

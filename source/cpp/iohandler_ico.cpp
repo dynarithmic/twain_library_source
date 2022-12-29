@@ -24,7 +24,7 @@
 
 using namespace dynarithmic;
 
-int CTL_IcoIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, LONG64 /*MultiStage*/)
+int CTL_IcoIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct*)
 {
     if ( !m_pDib )
         return DTWAIN_ERR_DIB;
@@ -41,7 +41,7 @@ int CTL_IcoIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
         if ( height > 255 || width > 255 )
             return DTWAIN_ERR_INVALIDICONFORMAT;
     }
-    if (!parent_directory_exists(szFile))
+    if (!parent_directory_exists(szFile).first)
         return DTWAIN_ERR_FILEOPEN;
     return SaveToFile(hDib, szFile, FIF_ICO, 0, DTWAIN_INCHES, { 0,0 });
 }

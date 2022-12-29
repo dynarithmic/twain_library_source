@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
+#include "ctliface.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif

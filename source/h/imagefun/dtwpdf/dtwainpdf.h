@@ -46,6 +46,7 @@ namespace dynarithmic
     typedef std::vector< std::string > StringVector;
 
     class PdfDocument;
+    using PdfDocumentPtr = std::shared_ptr<PdfDocument>;
 
     class PDFObject
     {
@@ -483,7 +484,6 @@ namespace dynarithmic
             FontNameToFontInfoMap m_mapFontNames;
             FontNumberToFontInfoMap m_mapFontNumbers;
             int         CurFontRefNum;
-
     };
 }
 #endif

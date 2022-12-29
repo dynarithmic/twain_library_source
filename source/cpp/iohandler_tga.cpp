@@ -23,7 +23,7 @@
 
 using namespace dynarithmic;
 
-int CTL_TgaIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, LONG64)
+int CTL_TgaIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
     if ( !m_pDib )
         return DTWAIN_ERR_DIB;

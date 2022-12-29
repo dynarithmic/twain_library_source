@@ -18,8 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CAPSTRUCT_H_
-#define CAPSTRUCT_H_
+#ifndef CAPSTRUCT_H
+#define CAPSTRUCT_H
 
 #include <unordered_map>
 namespace dynarithmic

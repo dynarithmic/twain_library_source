@@ -20,6 +20,7 @@
  */
 #include "ctltr014.h"
 #include "ctlobtyp.h"
+#include "twainfix32.h"
 
 using namespace dynarithmic;
 
@@ -73,7 +74,7 @@ bool CTL_CapabilityGetArrayTriplet::EnumCapValues( void *pCapData )
         if ( nItemType == TWTY_FIX32 )
         {
             pTW_FIX32 p = reinterpret_cast<pTW_FIX32>(&pValArray->ItemList[nIndex * nItemSize]);
-            float fFix = Twain32ToFloat( *p );
+            float fFix = Fix32ToFloat( *p );
             pOb->CopyData( &fFix );
         }
         else

@@ -22,8 +22,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined( _VERSIONINFO_H_INCLUDED_ )
-#define _VERSIONINFO_H_INCLUDED_
+#ifndef VERSIONINFO_H
+#define VERSIONINFO_H
 
 #if _MSC_VER > 1000
 #pragma once
@@ -185,4 +185,4 @@ class VersionInfoImpl
 
 #include "versioninfo.ipp"
 
-#endif // !defined( _VERSIONINFO_H_INCLUDED_ )
+#endif 

@@ -20,7 +20,6 @@
  */
 #include "cppfunc.h"
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
 #include "errorcheck.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -83,7 +82,7 @@ LONG DLLENTRY_DEF DTWAIN_CallDSMProc(TWAIN_IDENTITY AppID, TWAIN_IDENTITY Source
                                                        static_cast<TW_UINT32>(lDG),
                                                        static_cast<TW_UINT16>(lDAT),
                                                        static_cast<TW_UINT16>(lMSG),
-                                                       static_cast<TW_MEMREF>(pData));
+                                                       pData);
 
     LOG_FUNC_EXIT_PARAMS(Ret)
     CATCH_BLOCK(DTWAIN_FAILURE1)

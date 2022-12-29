@@ -20,7 +20,6 @@
  */
 #include "cppfunc.h"
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
 #include "errorcheck.h"
 #include "ctltr040.h"
 #ifdef _MSC_VER

@@ -19,10 +19,10 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
 #include "errorcheck.h"
 #include <boost/format.hpp>
 #include "cppfunc.h"
+#include "arrayfactory.h"
 #ifdef _MSC_VER
 #pragma warning (disable : 4702)
 #pragma warning (disable : 4714)
@@ -31,7 +31,7 @@
 using namespace dynarithmic;
 
 static bool GetImageSize(DTWAIN_SOURCE Source,
-    LPDTWAIN_ARRAY FloatEnum,
+    LPDTWAIN_ARRAY FloatArray,
     CTL_EnumGetType GetType);
 
 static bool GetImageSize2(CTL_ITwainSource *p,
@@ -42,8 +42,8 @@ static bool GetImageSize2(CTL_ITwainSource *p,
     LPLONG Unit);
 
 static bool SetImageSize(DTWAIN_SOURCE Source,
-    DTWAIN_ARRAY FloatEnum,
-    DTWAIN_ARRAY ActualEnum,
+    DTWAIN_ARRAY FloatArray,
+    DTWAIN_ARRAY ActualArray,
     CTL_EnumSetType SetType);
 
 static bool SetImageSize2(CTL_ITwainSource *p,
@@ -65,17 +65,17 @@ static bool IsValidUnit(LONG Unit)
 }
 
 ///////////////////////////////////////////////////////////////////////
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea(DTWAIN_SOURCE Source, LONG lGetType, LPDTWAIN_ARRAY FloatEnum)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea(DTWAIN_SOURCE Source, LONG lGetType, LPDTWAIN_ARRAY FloatArray)
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, lGetType, FloatEnum))
-    const DTWAIN_BOOL bRet = GetImageSize(Source, FloatEnum, static_cast<CTL_EnumGetType>(lGetType));
+    LOG_FUNC_ENTRY_PARAMS((Source, lGetType, FloatArray))
+    const DTWAIN_BOOL bRet = GetImageSize(Source, FloatArray, static_cast<CTL_EnumGetType>(lGetType));
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea(DTWAIN_SOURCE Source, LONG lSetType, DTWAIN_ARRAY FloatEnum, DTWAIN_ARRAY ActualEnum)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea(DTWAIN_SOURCE Source, LONG lSetType, DTWAIN_ARRAY FloatArray, DTWAIN_ARRAY ActualArray)
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, lSetType, FloatEnum, ActualEnum))
+    LOG_FUNC_ENTRY_PARAMS((Source, lSetType, FloatArray, ActualArray))
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     const CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
@@ -84,7 +84,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea(DTWAIN_SOURCE Source, LONG lSetTy
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(p); },
     DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
-    const DTWAIN_BOOL bRet = SetImageSize(Source, FloatEnum, ActualEnum,static_cast<CTL_EnumSetType>(lSetType));
+    const DTWAIN_BOOL bRet = SetImageSize(Source, FloatArray, ActualArray,static_cast<CTL_EnumSetType>(lSetType));
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -160,10 +160,10 @@ static bool GetImageSize(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, CTL_En
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     if (p)
     {
-        const DTWAIN_ARRAY FloatEnum = DTWAIN_ArrayCreate(DTWAIN_ARRAYFLOAT, 4);
-        if (!FloatEnum)
+        DTWAIN_ARRAY FloatArrayOut = DTWAIN_ArrayCreate(DTWAIN_ARRAYFLOAT, 4);
+        if (!FloatArrayOut)
             return false;
-        DTWAINArrayLL_RAII a(FloatEnum);
+        DTWAINArrayLL_RAII aFloat(FloatArrayOut);
 
         CTL_RealArray Array;
         if (GetType == CTL_GetTypeGETCURRENT)
@@ -172,54 +172,55 @@ static bool GetImageSize(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, CTL_En
         const bool bOk = CTL_TwainAppMgr::GetImageLayoutSize(p, Array, GetType);
         if (!bOk)
             return false;
-        auto& vValues = EnumeratorVector<double>(FloatEnum);
+        auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<double>(FloatArrayOut);
         std::copy(Array.begin(), Array.end(), vValues.begin());
-        const DTWAIN_ARRAY temp = DTWAIN_ArrayCreateCopy(FloatEnum);
-        if  (EnumeratorFunctionImpl::EnumeratorIsValidNoCheck(*FloatArray))
-            EnumeratorFunctionImpl::EnumeratorDestroy(*FloatArray);
+        const DTWAIN_ARRAY temp = DTWAIN_ArrayCreateCopy(FloatArrayOut);
+        if  (CTL_TwainDLLHandle::s_ArrayFactory->is_valid(FloatArray))
+            CTL_TwainDLLHandle::s_ArrayFactory->destroy(FloatArray);
         if (temp)
+        {
             *FloatArray = temp;
-        if (temp)
             return true;
+        }
     }
     return false;
 }
 
 
-static bool SetImageSize(DTWAIN_SOURCE Source, DTWAIN_ARRAY FloatEnum, DTWAIN_ARRAY ActualEnum, CTL_EnumSetType SetType)
+static bool SetImageSize(DTWAIN_SOURCE Source, DTWAIN_ARRAY FloatArray, DTWAIN_ARRAY ActualArray, CTL_EnumSetType SetType)
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, FloatEnum, ActualEnum, SetType))
+    LOG_FUNC_ENTRY_PARAMS((Source, FloatArray, ActualArray, SetType))
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     if (p)
     {
-        const DTWAIN_ARRAY pArray = FloatEnum;
+        const DTWAIN_ARRAY pArray = FloatArray;
         DTWAIN_ARRAY pArrayActual = DTWAIN_ArrayInit();
         DTWAIN_Check_Error_Condition_0_Ex(pHandle,
-            [&] { return !EnumeratorFunctionImpl::EnumeratorIsValidEx(pArray, CTL_EnumeratorDoubleType); },
+            [&] { return !CTL_TwainDLLHandle::s_ArrayFactory->is_valid(pArray, CTL_ArrayFactory::arrayTag::DoubleType); },
             DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
 
-        const auto vFloatEnum = EnumeratorVectorPtr<double>(FloatEnum);
-        auto vActualEnum = EnumeratorVectorPtr<double>(ActualEnum);
+        const auto& vFloat = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<double>(FloatArray);
+        auto& vActual = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<double>(ActualArray);
 
-        if (!vFloatEnum || vFloatEnum->size() < 4)
+        if (vFloat.size() < 4)
             LOG_FUNC_EXIT_PARAMS(false)
 
-        if (ActualEnum != nullptr)
+        if (ActualArray != nullptr)
         {
-            pArrayActual = ActualEnum;
+            pArrayActual = ActualArray;
             DTWAIN_Check_Error_Condition_0_Ex(pHandle,
-                [&] {return !EnumeratorFunctionImpl::EnumeratorIsValidEx(pArrayActual, CTL_EnumeratorDoubleType); },
+                [&] {return !CTL_TwainDLLHandle::s_ArrayFactory->is_valid(pArrayActual, CTL_ArrayFactory::arrayTag::DoubleType); },
                 DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
-            vActualEnum->clear();
+            vActual.clear();
         }
 
         CTL_RealArray Array;
         CTL_RealArray rArray;
-        std::copy_n(vFloatEnum->begin(), 4, std::back_inserter(Array));
+        std::copy_n(vFloat.begin(), 4, std::back_inserter(Array));
         const bool bOk = CTL_TwainAppMgr::SetImageLayoutSize(p, Array, rArray, SetType);
         if (bOk && pArrayActual)
-            std::copy_n(rArray.begin(), 4, std::back_inserter(*vActualEnum));
+            std::copy_n(rArray.begin(), 4, std::back_inserter(vActual));
         LOG_FUNC_EXIT_PARAMS(bOk)
     }
     LOG_FUNC_EXIT_PARAMS(false)

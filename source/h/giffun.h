@@ -22,8 +22,8 @@
     directory of the DTWAIN installation covers the restrictions under the LGPL license.
     Please read this file before deploying or distributing any application using DTWAIN.
  */
-#ifndef GIFFUN_H_
-#define GIFFUN_H_
+#ifndef GIFFUN_H
+#define GIFFUN_H
 
 #include "winbit.h"
 

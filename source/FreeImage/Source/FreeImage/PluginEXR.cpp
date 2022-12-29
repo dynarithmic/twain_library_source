@@ -28,17 +28,17 @@
 #pragma warning (disable : 4800) // ImfVersion.h - 'const int' : forcing value to bool 'true' or 'false' (performance warning)
 #endif 
 
-#include "../OpenEXR/IlmImf/ImfIO.h"
+#include "../OpenEXR/OpenEXR/ImfIO.h"
 #include "../OpenEXR/Iex/Iex.h"
-#include "../OpenEXR/IlmImf/ImfOutputFile.h"
-#include "../OpenEXR/IlmImf/ImfInputFile.h"
-#include "../OpenEXR/IlmImf/ImfRgbaFile.h"
-#include "../OpenEXR/IlmImf/ImfChannelList.h"
-#include "../OpenEXR/IlmImf/ImfRgba.h"
-#include "../OpenEXR/IlmImf/ImfArray.h"
-#include "../OpenEXR/IlmImf/ImfPreviewImage.h"
-#include "../OpenEXR/Half/half.h"
-
+#include "../OpenEXR/OpenEXR/ImfOutputFile.h"
+#include "../OpenEXR/OpenEXR/ImfInputFile.h"
+#include "../OpenEXR/OpenEXR/ImfRgbaFile.h"
+#include "../OpenEXR/OpenEXR/ImfChannelList.h"
+#include "../OpenEXR/OpenEXR/ImfRgba.h"
+#include "../OpenEXR/OpenEXR/ImfArray.h"
+#include "../OpenEXR/OpenEXR/ImfPreviewImage.h"
+#include "../OpenEXR/IMath/half.h"
+#include "../OpenEXR/IMath/ImathInt64.h"
 
 // ==========================================================
 // Plugin Interface

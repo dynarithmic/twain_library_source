@@ -42,7 +42,7 @@
 
 /* Signed / Unsigned 64-bit type */
 #ifdef _MSC_VER
-#define TIFF_INT64_T signed __int64
+#define TIFF_INT64_T __int64
 #define TIFF_UINT64_T unsigned __int64
 #else
 #include <inttypes.h>
@@ -52,9 +52,9 @@
 
 /* Signed 64-bit type */
 #if defined(_WIN64)
-#define TIFF_SSIZE_T signed __int64
+#define TIFF_SSIZE_T __int64
 #else
-#define TIFF_SSIZE_T signed long
+#define TIFF_SSIZE_T signed int
 #endif
 
 /* Pointer difference type */

@@ -53,7 +53,7 @@ CTL_EnumCapability CTL_CapabilityGetTriplet::CapToRetrieve()const
 TW_UINT16 CTL_CapabilityGetTriplet::GetEffectiveItemType(TW_UINT16 curDataType) const
 {
     const TW_UINT16 itemType = GetItemType();
-    if (CTL_TwainDLLHandle::s_lErrorFilterFlags)
+    if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
     {
         StringStreamA strm;
         strm << "Getting cap value: " << m_gCap << "  requested item type: " << itemType <<

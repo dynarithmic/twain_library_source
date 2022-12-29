@@ -58,6 +58,7 @@
 #include "ahexencode.h"
 #include "flateencode.h"
 #include "pdfencrypt.h"
+#include "tif_config.h"
 #include "tiffio.h"
 #include "dtwain_float_utils.h"
 #ifdef _MSC_VER

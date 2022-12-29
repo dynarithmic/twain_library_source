@@ -22,7 +22,8 @@
 #include "ctltwmgr.h"
 
 using namespace dynarithmic;
-CTL_DSMCallbackTriplet::CTL_DSMCallbackTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource, TW_UINT16 msg) : m_DSMEntryProc{}
+CTL_DSMCallbackTriplet::CTL_DSMCallbackTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource, TW_UINT16 msg) : 
+    m_DSMEntryProc{}, m_TWCallback{}
 {
     SetSessionPtr( pSession );
     const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();

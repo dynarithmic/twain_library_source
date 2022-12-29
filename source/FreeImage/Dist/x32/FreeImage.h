@@ -34,6 +34,8 @@
 
 // Compiler options ---------------------------------------------------------
 
+#include <wchar.h>	// needed for UNICODE functions
+
 #if defined(FREEIMAGE_CPP_LIB)
 	#define DLL_API
 	#define DLL_CALLCONV

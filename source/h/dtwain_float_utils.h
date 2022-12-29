@@ -25,9 +25,8 @@ OF THIRD PARTY RIGHTS.
 namespace dynarithmic
 {
     template <typename T>
-    bool float_close(T x, T y)
+    bool float_close(T x, T y, double float_delta = +1.0e-8)
     {
-        constexpr double float_delta = +1.0e-8;
         return fabs(x - y) <= float_delta;
     }
 }

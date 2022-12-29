@@ -19,8 +19,8 @@ DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRING
 OF THIRD PARTY RIGHTS.
 */
 
-#ifndef CTLDIB32_H_
-#define CTLDIB32_H_
+#ifndef CTLDIB32_H
+#define CTLDIB32_H
 
 //// Special bitmap routines
 #include "imagefun/imgfunc.h"
@@ -52,7 +52,7 @@ namespace dynarithmic
             CTL_ImageIOHandler( CTL_TwainDib *pDib );
             virtual ~CTL_ImageIOHandler() = default;
             void    SetDib( CTL_TwainDib *pDib ) { m_pDib = pDib; }
-            virtual int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) = 0;
+            virtual int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pMultiDibStruct = nullptr) = 0;
             std::shared_ptr<DibMultiPageData> GetMultiDibData() const { return pMultiDibData; }
             void SetMultiDibData(std::shared_ptr<DibMultiPageData> pData) { pMultiDibData = pData;  }
             void SetMultiDibInfo(const DibMultiPageStruct &s);
@@ -64,6 +64,8 @@ namespace dynarithmic
             void SetOnePageWritten(bool bSet) { m_bOnePageWritten = bSet; }
             bool IsOnePageWritten() const { return m_bOnePageWritten; }
             virtual void SetImageInfo(const DTWAINImageInfoEx& /*ImageInfo*/) { }
+            void SetBaseImageInfo(const DTWAINImageInfoEx& ImageInfo) { m_ImageInfo = ImageInfo; }
+            const DTWAINImageInfoEx& GetBaseImageInfo() const { return m_ImageInfo; }
             CTL_TwainDib* GetDib() const { return m_pDib; }
             static bool IsValidBitDepth(LONG FileType, LONG bitDepth);
             int SaveToFile(HANDLE hDib, LPCTSTR szFile, FREE_IMAGE_FORMAT fmt, int flags, UINT unitOfMeasure,
@@ -72,6 +74,7 @@ namespace dynarithmic
 
         protected:
             CTL_TwainDib *m_pDib;
+            DTWAINImageInfoEx m_ImageInfo;
             unsigned int bytesleft,nextbyte;
             char bytebuffer[BYTEBUFFERSIZE];
             void resetbuffer();
@@ -94,7 +97,7 @@ namespace dynarithmic
         public:
             CTL_BmpIOHandler() : CTL_ImageIOHandler(), m_bUseRLE(false) {}
             CTL_BmpIOHandler( CTL_TwainDib *pDib ) : CTL_ImageIOHandler(pDib ), m_bUseRLE(false) {}
-            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
 
         private:
             bool m_bUseRLE;
@@ -114,7 +117,7 @@ namespace dynarithmic
                             m_bJpegProgressive(false),
                             m_ImageInfoEx(ImageInfoEx) {}
 
-            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
 
         private:
             int     m_nJpegQuality;
@@ -129,7 +132,7 @@ namespace dynarithmic
                                 m_ImageInfoEx(ImageInfoEx) {}
             CTL_TiffIOHandler( CTL_TwainDib *pDib, int nFormat, DTWAINImageInfoEx &ImageInfoEx ): CTL_ImageIOHandler(pDib),
                             m_nFormat(nFormat), m_ImageInfoEx(ImageInfoEx) {}
-            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData) override;
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct) override;
             void SetTiffFormat(int nFormat) { m_nFormat = nFormat; }
             int  GetTiffFormat() const { return m_nFormat; }
             CTL_StringType GetFileName() const { return sActualFileName; }
@@ -147,7 +150,7 @@ namespace dynarithmic
         public:
             CTL_PngIOHandler() : CTL_ImageIOHandler() {};
             CTL_PngIOHandler( CTL_TwainDib *pDib, DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler( pDib ), m_ImageInfoEx(ImageInfoEx) {}
-            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
         private:
             DTWAINImageInfoEx m_ImageInfoEx;
     };
@@ -158,7 +161,7 @@ namespace dynarithmic
             CTL_PcxIOHandler() : CTL_ImageIOHandler(), m_nFormat{} {};
             CTL_PcxIOHandler( CTL_TwainDib *pDib, int nFormat, DTWAINImageInfoEx& ImageInfoEx ) : CTL_ImageIOHandler(pDib),
             m_nFormat(nFormat), m_ImageInfoEx(ImageInfoEx) {}
-            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
 
         private:
             int m_nFormat;
@@ -170,7 +173,7 @@ namespace dynarithmic
         public:
             CTL_TgaIOHandler()  : CTL_ImageIOHandler() {};
             CTL_TgaIOHandler( CTL_TwainDib *pDib ) : CTL_ImageIOHandler( pDib ) {}
-            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
     };
 
     class CTL_WmfIOHandler : public CTL_ImageIOHandler
@@ -179,7 +182,7 @@ namespace dynarithmic
             CTL_WmfIOHandler() : CTL_ImageIOHandler(), m_nFormat{} {}
             CTL_WmfIOHandler( CTL_TwainDib *pDib, int nFormat ) :
                                 CTL_ImageIOHandler( pDib ), m_nFormat(nFormat) {}
-            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
 
         private:
             int m_nFormat;
@@ -190,14 +193,14 @@ namespace dynarithmic
         public:
             CTL_PsdIOHandler()  : CTL_ImageIOHandler() {};
             CTL_PsdIOHandler( CTL_TwainDib *pDib ) : CTL_ImageIOHandler( pDib ) {}
-            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
     };
 
     class CTL_PDFIOHandler final : public CTL_ImageIOHandler
     {
         public:
             CTL_PDFIOHandler(CTL_TwainDib* pDib, int nFormat, const DTWAINImageInfoEx &ImageInfoEx);
-            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
             ~CTL_PDFIOHandler() override = default;
 
             void SetImageInfo(const DTWAINImageInfoEx& ImageInfo) override
@@ -220,7 +223,7 @@ namespace dynarithmic
         public:
             CTL_PSIOHandler(CTL_TwainDib* pDib, int nFormat, const DTWAINImageInfoEx &ImageInfoEx,
                             LONG PSType, bool IsMultiPage);
-            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
             ~CTL_PSIOHandler() override = default;
 
         private:
@@ -237,7 +240,7 @@ namespace dynarithmic
     {
         public:
             CTL_Jpeg2KIOHandler(CTL_TwainDib* pDib, const DTWAINImageInfoEx &ImageInfoEx);
-            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
             ~CTL_Jpeg2KIOHandler() override = default;
 
         private:
@@ -251,15 +254,15 @@ namespace dynarithmic
         public:
             CTL_GifIOHandler(CTL_TwainDib* pDib)  :
             CTL_ImageIOHandler(pDib) {}
-            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
     };
 
     class CTL_IcoIOHandler : public CTL_ImageIOHandler
     {
         public:
-            CTL_IcoIOHandler(CTL_TwainDib* pDib, DTWAINImageInfoEx& ImageInfoEx)  : CTL_ImageIOHandler(pDib),
-                m_ImageInfoEx(ImageInfoEx) {}
-            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
+            CTL_IcoIOHandler(CTL_TwainDib* pDib, DTWAINImageInfoEx& ImageInfoEx)  : 
+                            CTL_ImageIOHandler(pDib), m_ImageInfoEx(ImageInfoEx) {}
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
 
         private:
             DTWAINImageInfoEx m_ImageInfoEx;
@@ -270,7 +273,7 @@ namespace dynarithmic
         public:
             CTL_PBMIOHandler() : CTL_ImageIOHandler() {}
             CTL_PBMIOHandler(CTL_TwainDib *pDib) : CTL_ImageIOHandler(pDib){}
-            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData = 0) override;
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
         private:
             DTWAINImageInfoEx m_ImageInfoEx;
     };
@@ -280,7 +283,7 @@ namespace dynarithmic
     public:
         CTL_WBMPIOHandler(CTL_TwainDib* pDib, DTWAINImageInfoEx& ImageInfoEx)  : CTL_ImageIOHandler(pDib),
             m_ImageInfoEx(ImageInfoEx) {}
-        int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
+        int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
 
     private:
         DTWAINImageInfoEx m_ImageInfoEx;
@@ -293,7 +296,7 @@ namespace dynarithmic
     public:
         CTL_TextIOHandler(CTL_TwainDib* pDib, int nInputFormat, DTWAINImageInfoEx ImageInfoEx,
                           OCREngine* pEngine);
-        int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData=0) override;
+        int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
         ~CTL_TextIOHandler() override = default;
 
         void SetImageInfo(const DTWAINImageInfoEx& ImageInfo) override
@@ -312,7 +315,7 @@ namespace dynarithmic
         public:
             CTL_WebpIOHandler() : CTL_ImageIOHandler() {}
             CTL_WebpIOHandler(CTL_TwainDib *pDib) : CTL_ImageIOHandler(pDib){}
-            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, LONG64 UserData = 0) override;
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
     };
 
     #endif  // NOIMAGE_SUPPORT

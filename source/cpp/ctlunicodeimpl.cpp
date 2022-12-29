@@ -20,7 +20,7 @@
  */
 #include "dtwain.h"
 #include "ctliface.h"
-#include "enumeratorfuncs.h"
+#include "arrayfactory.h"
 
 using namespace dynarithmic;
 
@@ -35,14 +35,14 @@ struct ArrayRAII
 template <typename SourceString,
           typename DestString,
           typename fn,
-          CTL_EnumeratorType enumTypeIn,
-          CTL_EnumeratorType enumTypeOut
+          CTL_ArrayType enumTypeIn,
+          CTL_ArrayType enumTypeOut
          >
 static DTWAIN_ARRAY CreateArrayFromArray(LPVOID ArraySource, fn f)
 {
     if ( ArraySource )
     {
-        const CTL_EnumeratorType eType = EnumeratorFunctionImpl::GetEnumeratorType(ArraySource);
+        const CTL_ArrayType eType = EnumeratorFunctionImpl::GetEnumeratorType(ArraySource);
         if ( eType != enumTypeIn )
             return nullptr;
         int status;

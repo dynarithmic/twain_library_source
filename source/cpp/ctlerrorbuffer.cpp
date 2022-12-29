@@ -24,7 +24,7 @@
 #include "cppfunc.h"
 #include "dtwain.h"
 #include "ctliface.h"
-#include "enumeratorfuncs.h"
+#include "arrayfactory.h"
 #include "ctltwmgr.h"
 using namespace dynarithmic;
 
@@ -39,7 +39,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetErrorBuffer(LPDTWAIN_ARRAY ArrayBuffer)
     const DTWAIN_ARRAY A = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, static_cast<LONG>(nEntries));
     if ( A )
     {
-        auto& vIn = EnumeratorVector<LONG>(A);
+        auto& vIn = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(A);
         std::copy_n(CTL_TwainDLLHandle::s_vErrorBuffer.begin(), nEntries, vIn.begin());
         *ArrayBuffer = A;
         LOG_FUNC_EXIT_PARAMS(true)
@@ -94,3 +94,4 @@ LONG DLLENTRY_DEF DTWAIN_GetErrorBufferThreshold(VOID_PROTOTYPE)
     LOG_FUNC_EXIT_PARAMS(nValues)
     CATCH_BLOCK(-1)
 }
+

@@ -25,8 +25,6 @@ CTL_OpenSourceTriplet::CTL_OpenSourceTriplet(
                             CTL_ITwainSession *pSession,
                             CTL_ITwainSource* pSource) :
               CTL_SourceTriplet( pSession, pSource, MSG_OPENDS )
-{
-
-}
+{}
 
 

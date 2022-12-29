@@ -22,7 +22,7 @@
 #include "ctliface.h"
 
 using namespace dynarithmic;
-int CTL_BmpIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, LONG64 WriteNoHeader/*=FALSE*/)
+int CTL_BmpIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct*)
 {
     if ( !m_pDib )
         return DTWAIN_ERR_DIB;

@@ -1,0 +1,799 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugU|Win32">
+      <Configuration>DebugU</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DebugU|x64">
+      <Configuration>DebugU</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseU|Win32">
+      <Configuration>ReleaseU</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseU|x64">
+      <Configuration>ReleaseU</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>OpenEXR</ProjectName>
+    <ProjectGuid>{17A4874B-0606-4687-90B6-F91F8CB3B8AF}</ProjectGuid>
+    <RootNamespace>OpenEXR</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugU|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseU|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugU|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseU|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugU|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseU|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugU|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseU|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>.\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>.\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseU|Win32'">
+    <OutDir>.\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>.\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>.\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>.\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseU|x64'">
+    <OutDir>.\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>.\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>.\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>.\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugU|Win32'">
+    <OutDir>.\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>.\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>.\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>.\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugU|x64'">
+    <OutDir>.\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>.\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MinSpace</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>./;./Iex;./IlmThread;./OpenEXR;./OpenEXRUtil;./IMath;./OpenEXRCore;../ZLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+      <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x040c</Culture>
+    </ResourceCompile>
+    <Lib>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseU|Win32'">
+    <ClCompile>
+      <Optimization>MinSpace</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>./;./Iex;./IlmThread;./OpenEXR;./OpenEXRUtil;./IMath;./OpenEXRCore;../ZLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+      <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x040c</Culture>
+    </ResourceCompile>
+    <Lib>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>MinSpace</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>./;./Iex;./IlmThread;./OpenEXR;./OpenEXRUtil;./IMath;./OpenEXRCore;../ZLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions);FREEIMAGE_CPP_LIB</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x040c</Culture>
+    </ResourceCompile>
+    <Lib>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseU|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>MinSpace</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>./;./Iex;./IlmThread;./OpenEXR;./OpenEXRUtil;./IMath;./OpenEXRCore;../ZLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions);FREEIMAGE_CPP_LIB</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x040c</Culture>
+    </ResourceCompile>
+    <Lib>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>./;./Iex;./IlmThread;./OpenEXR;./OpenEXRUtil;./IMath;./OpenEXRCore;../ZLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x040c</Culture>
+    </ResourceCompile>
+    <Lib>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugU|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>./;./Iex;./IlmThread;./OpenEXR;./OpenEXRUtil;./IMath;./OpenEXRCore;../ZLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x040c</Culture>
+    </ResourceCompile>
+    <Lib>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>./;./Iex;./IlmThread;./OpenEXR;./OpenEXRUtil;./IMath;./OpenEXRCore;../ZLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions);FREEIMAGE_CPP_LIB</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x040c</Culture>
+    </ResourceCompile>
+    <Lib>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugU|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>./;./Iex;./IlmThread;./OpenEXR;./OpenEXRUtil;./IMath;./OpenEXRCore;../ZLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions);FREEIMAGE_CPP_LIB</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x040c</Culture>
+    </ResourceCompile>
+    <Lib>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Iex\Iex.h" />
+    <ClInclude Include="Iex\IexBaseExc.h" />
+    <ClInclude Include="Iex\IexErrnoExc.h" />
+    <ClInclude Include="Iex\IexExport.h" />
+    <ClInclude Include="Iex\IexForward.h" />
+    <ClInclude Include="Iex\IexMacros.h" />
+    <ClInclude Include="Iex\IexMathExc.h" />
+    <ClInclude Include="Iex\IexMathFloatExc.h" />
+    <ClInclude Include="Iex\IexMathFpu.h" />
+    <ClInclude Include="Iex\IexMathIeeeExc.h" />
+    <ClInclude Include="Iex\IexNamespace.h" />
+    <ClInclude Include="Iex\IexThrowErrnoExc.h" />
+    <ClInclude Include="IlmBaseConfig.h" />
+    <ClInclude Include="IlmThread\IlmThread.h" />
+    <ClInclude Include="IlmThread\IlmThreadExport.h" />
+    <ClInclude Include="IlmThread\IlmThreadForward.h" />
+    <ClInclude Include="IlmThread\IlmThreadMutex.h" />
+    <ClInclude Include="IlmThread\IlmThreadNamespace.h" />
+    <ClInclude Include="IlmThread\IlmThreadPool.h" />
+    <ClInclude Include="IlmThread\IlmThreadSemaphore.h" />
+    <ClInclude Include="IMath\half.h" />
+    <ClInclude Include="IMath\halfFunction.h" />
+    <ClInclude Include="IMath\halfLimits.h" />
+    <ClInclude Include="IMath\ImathBox.h" />
+    <ClInclude Include="IMath\ImathBoxAlgo.h" />
+    <ClInclude Include="IMath\ImathColor.h" />
+    <ClInclude Include="IMath\ImathColorAlgo.h" />
+    <ClInclude Include="IMath\ImathEuler.h" />
+    <ClInclude Include="IMath\ImathExport.h" />
+    <ClInclude Include="IMath\ImathForward.h" />
+    <ClInclude Include="IMath\ImathFrame.h" />
+    <ClInclude Include="IMath\ImathFrustum.h" />
+    <ClInclude Include="IMath\ImathFrustumTest.h" />
+    <ClInclude Include="IMath\ImathFun.h" />
+    <ClInclude Include="IMath\ImathGL.h" />
+    <ClInclude Include="IMath\ImathGLU.h" />
+    <ClInclude Include="IMath\ImathInt64.h" />
+    <ClInclude Include="IMath\ImathInterval.h" />
+    <ClInclude Include="IMath\ImathLine.h" />
+    <ClInclude Include="IMath\ImathLineAlgo.h" />
+    <ClInclude Include="IMath\ImathMath.h" />
+    <ClInclude Include="IMath\ImathMatrix.h" />
+    <ClInclude Include="IMath\ImathMatrixAlgo.h" />
+    <ClInclude Include="IMath\ImathNamespace.h" />
+    <ClInclude Include="IMath\ImathPlane.h" />
+    <ClInclude Include="IMath\ImathPlatform.h" />
+    <ClInclude Include="IMath\ImathQuat.h" />
+    <ClInclude Include="IMath\ImathRandom.h" />
+    <ClInclude Include="IMath\ImathRoots.h" />
+    <ClInclude Include="IMath\ImathShear.h" />
+    <ClInclude Include="IMath\ImathSphere.h" />
+    <ClInclude Include="IMath\ImathTypeTraits.h" />
+    <ClInclude Include="IMath\ImathVec.h" />
+    <ClInclude Include="IMath\ImathVecAlgo.h" />
+    <ClInclude Include="IMath\toFloat.h" />
+    <ClInclude Include="OpenEXRConfig.h" />
+    <ClInclude Include="OpenEXRCore\backward_compatibility.h" />
+    <ClInclude Include="OpenEXRCore\internal_attr.h" />
+    <ClInclude Include="OpenEXRCore\internal_channel_list.h" />
+    <ClInclude Include="OpenEXRCore\internal_coding.h" />
+    <ClInclude Include="OpenEXRCore\internal_compress.h" />
+    <ClInclude Include="OpenEXRCore\internal_constants.h" />
+    <ClInclude Include="OpenEXRCore\internal_decompress.h" />
+    <ClInclude Include="OpenEXRCore\internal_file.h" />
+    <ClInclude Include="OpenEXRCore\internal_float_vector.h" />
+    <ClInclude Include="OpenEXRCore\internal_huf.h" />
+    <ClInclude Include="OpenEXRCore\internal_memory.h" />
+    <ClInclude Include="OpenEXRCore\internal_opaque.h" />
+    <ClInclude Include="OpenEXRCore\internal_posix_file_impl.h" />
+    <ClInclude Include="OpenEXRCore\internal_preview.h" />
+    <ClInclude Include="OpenEXRCore\internal_string.h" />
+    <ClInclude Include="OpenEXRCore\internal_string_vector.h" />
+    <ClInclude Include="OpenEXRCore\internal_structs.h" />
+    <ClInclude Include="OpenEXRCore\internal_util.h" />
+    <ClInclude Include="OpenEXRCore\internal_win32_file_impl.h" />
+    <ClInclude Include="OpenEXRCore\internal_xdr.h" />
+    <ClInclude Include="OpenEXRCore\openexr.h" />
+    <ClInclude Include="OpenEXRCore\openexr_attr.h" />
+    <ClInclude Include="OpenEXRCore\openexr_base.h" />
+    <ClInclude Include="OpenEXRCore\openexr_chunkio.h" />
+    <ClInclude Include="OpenEXRCore\openexr_coding.h" />
+    <ClInclude Include="OpenEXRCore\openexr_conf.h" />
+    <ClInclude Include="OpenEXRCore\openexr_context.h" />
+    <ClInclude Include="OpenEXRCore\openexr_debug.h" />
+    <ClInclude Include="OpenEXRCore\openexr_decode.h" />
+    <ClInclude Include="OpenEXRCore\openexr_encode.h" />
+    <ClInclude Include="OpenEXRCore\openexr_errors.h" />
+    <ClInclude Include="OpenEXRCore\openexr_part.h" />
+    <ClInclude Include="OpenEXRCore\openexr_std_attr.h" />
+    <ClInclude Include="OpenEXRUtil\ImfCheckFile.h" />
+    <ClInclude Include="OpenEXRUtil\ImfDeepImage.h" />
+    <ClInclude Include="OpenEXRUtil\ImfDeepImageChannel.h" />
+    <ClInclude Include="OpenEXRUtil\ImfDeepImageIO.h" />
+    <ClInclude Include="OpenEXRUtil\ImfDeepImageLevel.h" />
+    <ClInclude Include="OpenEXRUtil\ImfFlatImage.h" />
+    <ClInclude Include="OpenEXRUtil\ImfFlatImageChannel.h" />
+    <ClInclude Include="OpenEXRUtil\ImfFlatImageIO.h" />
+    <ClInclude Include="OpenEXRUtil\ImfFlatImageLevel.h" />
+    <ClInclude Include="OpenEXRUtil\ImfImage.h" />
+    <ClInclude Include="OpenEXRUtil\ImfImageChannel.h" />
+    <ClInclude Include="OpenEXRUtil\ImfImageChannelRenaming.h" />
+    <ClInclude Include="OpenEXRUtil\ImfImageDataWindow.h" />
+    <ClInclude Include="OpenEXRUtil\ImfImageIO.h" />
+    <ClInclude Include="OpenEXRUtil\ImfImageLevel.h" />
+    <ClInclude Include="OpenEXRUtil\ImfSampleCountChannel.h" />
+    <ClInclude Include="OpenEXRUtil\ImfUtilExport.h" />
+    <ClInclude Include="OpenEXR\b44ExpLogTable.h" />
+    <ClInclude Include="OpenEXR\dwaLookups.h" />
+    <ClInclude Include="OpenEXR\IlmThreadConfig.h" />
+    <ClInclude Include="OpenEXR\ImfAcesFile.h" />
+    <ClInclude Include="OpenEXR\ImfArray.h" />
+    <ClInclude Include="OpenEXR\ImfAttribute.h" />
+    <ClInclude Include="OpenEXR\ImfAutoArray.h" />
+    <ClInclude Include="OpenEXR\ImfB44Compressor.h" />
+    <ClInclude Include="OpenEXR\ImfBoxAttribute.h" />
+    <ClInclude Include="OpenEXR\ImfChannelList.h" />
+    <ClInclude Include="OpenEXR\ImfChannelListAttribute.h" />
+    <ClInclude Include="OpenEXR\ImfCheckedArithmetic.h" />
+    <ClInclude Include="OpenEXR\ImfChromaticities.h" />
+    <ClInclude Include="OpenEXR\ImfChromaticitiesAttribute.h" />
+    <ClInclude Include="OpenEXR\ImfCompositeDeepScanLine.h" />
+    <ClInclude Include="OpenEXR\ImfCompression.h" />
+    <ClInclude Include="OpenEXR\ImfCompressionAttribute.h" />
+    <ClInclude Include="OpenEXR\ImfCompressor.h" />
+    <ClInclude Include="OpenEXR\ImfConvert.h" />
+    <ClInclude Include="OpenEXR\ImfCRgbaFile.h" />
+    <ClInclude Include="OpenEXR\ImfDeepCompositing.h" />
+    <ClInclude Include="OpenEXR\ImfDeepFrameBuffer.h" />
+    <ClInclude Include="OpenEXR\ImfDeepImageState.h" />
+    <ClInclude Include="OpenEXR\ImfDeepImageStateAttribute.h" />
+    <ClInclude Include="OpenEXR\ImfDeepScanLineInputFile.h" />
+    <ClInclude Include="OpenEXR\ImfDeepScanLineInputPart.h" />
+    <ClInclude Include="OpenEXR\ImfDeepScanLineOutputFile.h" />
+    <ClInclude Include="OpenEXR\ImfDeepScanLineOutputPart.h" />
+    <ClInclude Include="OpenEXR\ImfDeepTiledInputFile.h" />
+    <ClInclude Include="OpenEXR\ImfDeepTiledInputPart.h" />
+    <ClInclude Include="OpenEXR\ImfDeepTiledOutputFile.h" />
+    <ClInclude Include="OpenEXR\ImfDeepTiledOutputPart.h" />
+    <ClInclude Include="OpenEXR\ImfDoubleAttribute.h" />
+    <ClInclude Include="OpenEXR\ImfDwaCompressor.h" />
+    <ClInclude Include="OpenEXR\ImfDwaCompressorSimd.h" />
+    <ClInclude Include="OpenEXR\ImfEnvmap.h" />
+    <ClInclude Include="OpenEXR\ImfEnvmapAttribute.h" />
+    <ClInclude Include="OpenEXR\ImfExport.h" />
+    <ClInclude Include="OpenEXR\ImfFastHuf.h" />
+    <ClInclude Include="OpenEXR\ImfFloatAttribute.h" />
+    <ClInclude Include="OpenEXR\ImfFloatVectorAttribute.h" />
+    <ClInclude Include="OpenEXR\ImfForward.h" />
+    <ClInclude Include="OpenEXR\ImfFrameBuffer.h" />
+    <ClInclude Include="OpenEXR\ImfFramesPerSecond.h" />
+    <ClInclude Include="OpenEXR\ImfGenericInputFile.h" />
+    <ClInclude Include="OpenEXR\ImfGenericOutputFile.h" />
+    <ClInclude Include="OpenEXR\ImfHeader.h" />
+    <ClInclude Include="OpenEXR\ImfHuf.h" />
+    <ClInclude Include="OpenEXR\ImfIDManifest.h" />
+    <ClInclude Include="OpenEXR\ImfIDManifestAttribute.h" />
+    <ClInclude Include="OpenEXR\ImfInputFile.h" />
+    <ClInclude Include="OpenEXR\ImfInputPart.h" />
+    <ClInclude Include="OpenEXR\ImfInputPartData.h" />
+    <ClInclude Include="OpenEXR\ImfInputStreamMutex.h" />
+    <ClInclude Include="OpenEXR\ImfInt64.h" />
+    <ClInclude Include="OpenEXR\ImfIntAttribute.h" />
+    <ClInclude Include="OpenEXR\ImfIO.h" />
+    <ClInclude Include="OpenEXR\ImfKeyCode.h" />
+    <ClInclude Include="OpenEXR\ImfKeyCodeAttribute.h" />
+    <ClInclude Include="OpenEXR\ImfLineOrder.h" />
+    <ClInclude Include="OpenEXR\ImfLineOrderAttribute.h" />
+    <ClInclude Include="OpenEXR\ImfLut.h" />
+    <ClInclude Include="OpenEXR\ImfMatrixAttribute.h" />
+    <ClInclude Include="OpenEXR\ImfMisc.h" />
+    <ClInclude Include="OpenEXR\ImfMultiPartInputFile.h" />
+    <ClInclude Include="OpenEXR\ImfMultiPartOutputFile.h" />
+    <ClInclude Include="OpenEXR\ImfMultiView.h" />
+    <ClInclude Include="OpenEXR\ImfName.h" />
+    <ClInclude Include="OpenEXR\ImfNamespace.h" />
+    <ClInclude Include="OpenEXR\ImfOpaqueAttribute.h" />
+    <ClInclude Include="OpenEXR\ImfOptimizedPixelReading.h" />
+    <ClInclude Include="OpenEXR\ImfOutputFile.h" />
+    <ClInclude Include="OpenEXR\ImfOutputPart.h" />
+    <ClInclude Include="OpenEXR\ImfOutputPartData.h" />
+    <ClInclude Include="OpenEXR\ImfOutputStreamMutex.h" />
+    <ClInclude Include="OpenEXR\ImfPartHelper.h" />
+    <ClInclude Include="OpenEXR\ImfPartType.h" />
+    <ClInclude Include="OpenEXR\ImfPixelType.h" />
+    <ClInclude Include="OpenEXR\ImfPizCompressor.h" />
+    <ClInclude Include="OpenEXR\ImfPreviewImage.h" />
+    <ClInclude Include="OpenEXR\ImfPreviewImageAttribute.h" />
+    <ClInclude Include="OpenEXR\ImfPxr24Compressor.h" />
+    <ClInclude Include="OpenEXR\ImfRational.h" />
+    <ClInclude Include="OpenEXR\ImfRationalAttribute.h" />
+    <ClInclude Include="OpenEXR\ImfRgba.h" />
+    <ClInclude Include="OpenEXR\ImfRgbaFile.h" />
+    <ClInclude Include="OpenEXR\ImfRgbaYca.h" />
+    <ClInclude Include="OpenEXR\ImfRle.h" />
+    <ClInclude Include="OpenEXR\ImfRleCompressor.h" />
+    <ClInclude Include="OpenEXR\ImfScanLineInputFile.h" />
+    <ClInclude Include="OpenEXR\ImfSimd.h" />
+    <ClInclude Include="OpenEXR\ImfStandardAttributes.h" />
+    <ClInclude Include="OpenEXR\ImfStdIO.h" />
+    <ClInclude Include="OpenEXR\ImfStringAttribute.h" />
+    <ClInclude Include="OpenEXR\ImfStringVectorAttribute.h" />
+    <ClInclude Include="OpenEXR\ImfSystemSpecific.h" />
+    <ClInclude Include="OpenEXR\ImfTestFile.h" />
+    <ClInclude Include="OpenEXR\ImfThreading.h" />
+    <ClInclude Include="OpenEXR\ImfTileDescription.h" />
+    <ClInclude Include="OpenEXR\ImfTileDescriptionAttribute.h" />
+    <ClInclude Include="OpenEXR\ImfTiledInputFile.h" />
+    <ClInclude Include="OpenEXR\ImfTiledInputPart.h" />
+    <ClInclude Include="OpenEXR\ImfTiledMisc.h" />
+    <ClInclude Include="OpenEXR\ImfTiledOutputFile.h" />
+    <ClInclude Include="OpenEXR\ImfTiledOutputPart.h" />
+    <ClInclude Include="OpenEXR\ImfTiledRgbaFile.h" />
+    <ClInclude Include="OpenEXR\ImfTileOffsets.h" />
+    <ClInclude Include="OpenEXR\ImfTimeCode.h" />
+    <ClInclude Include="OpenEXR\ImfTimeCodeAttribute.h" />
+    <ClInclude Include="OpenEXR\ImfVecAttribute.h" />
+    <ClInclude Include="OpenEXR\ImfVersion.h" />
+    <ClInclude Include="OpenEXR\ImfWav.h" />
+    <ClInclude Include="OpenEXR\ImfXdr.h" />
+    <ClInclude Include="OpenEXR\ImfZip.h" />
+    <ClInclude Include="OpenEXR\ImfZipCompressor.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ZLib\ZLib.vcxproj">
+      <Project>{33134f61-c1ad-4b6f-9cea-503a9f140c52}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Iex\IexBaseExc.cpp" />
+    <ClCompile Include="Iex\IexMathFloatExc.cpp" />
+    <ClCompile Include="Iex\IexMathFpu.cpp" />
+    <ClCompile Include="Iex\IexThrowErrnoExc.cpp" />
+    <ClCompile Include="IlmThread\IlmThread.cpp" />
+    <ClCompile Include="IlmThread\IlmThreadPool.cpp" />
+    <ClCompile Include="IlmThread\IlmThreadSemaphore.cpp" />
+    <ClCompile Include="IlmThread\IlmThreadSemaphoreOSX.cpp" />
+    <ClCompile Include="IlmThread\IlmThreadSemaphorePosix.cpp" />
+    <ClCompile Include="IlmThread\IlmThreadSemaphorePosixCompat.cpp" />
+    <ClCompile Include="IlmThread\IlmThreadSemaphoreWin32.cpp" />
+    <ClCompile Include="IMath\half.cpp" />
+    <ClCompile Include="IMath\ImathColorAlgo.cpp" />
+    <ClCompile Include="IMath\ImathFun.cpp" />
+    <ClCompile Include="IMath\ImathMatrixAlgo.cpp" />
+    <ClCompile Include="IMath\ImathRandom.cpp" />
+    <ClCompile Include="OpenEXRCore\attributes.c" />
+    <ClCompile Include="OpenEXRCore\base.c" />
+    <ClCompile Include="OpenEXRCore\channel_list.c" />
+    <ClCompile Include="OpenEXRCore\chunk.c" />
+    <ClCompile Include="OpenEXRCore\coding.c" />
+    <ClCompile Include="OpenEXRCore\context.c" />
+    <ClCompile Include="OpenEXRCore\debug.c" />
+    <ClCompile Include="OpenEXRCore\decoding.c" />
+    <ClCompile Include="OpenEXRCore\encoding.c" />
+    <ClCompile Include="OpenEXRCore\float_vector.c" />
+    <ClCompile Include="OpenEXRCore\internal_b44.c" />
+    <ClCompile Include="OpenEXRCore\internal_b44_table.c" />
+    <ClCompile Include="OpenEXRCore\internal_dwa.c" />
+    <ClCompile Include="OpenEXRCore\internal_huf.c" />
+    <ClCompile Include="OpenEXRCore\internal_piz.c" />
+    <ClCompile Include="OpenEXRCore\internal_pxr24.c" />
+    <ClCompile Include="OpenEXRCore\internal_rle.c" />
+    <ClCompile Include="OpenEXRCore\internal_structs.c" />
+    <ClCompile Include="OpenEXRCore\internal_zip.c" />
+    <ClCompile Include="OpenEXRCore\memory.c" />
+    <ClCompile Include="OpenEXRCore\opaque.c" />
+    <ClCompile Include="OpenEXRCore\pack.c" />
+    <ClCompile Include="OpenEXRCore\parse_header.c" />
+    <ClCompile Include="OpenEXRCore\part.c" />
+    <ClCompile Include="OpenEXRCore\part_attr.c" />
+    <ClCompile Include="OpenEXRCore\preview.c" />
+    <ClCompile Include="OpenEXRCore\std_attr.c" />
+    <ClCompile Include="OpenEXRCore\string.c" />
+    <ClCompile Include="OpenEXRCore\string_vector.c" />
+    <ClCompile Include="OpenEXRCore\unpack.c" />
+    <ClCompile Include="OpenEXRCore\validation.c" />
+    <ClCompile Include="OpenEXRCore\write_header.c" />
+    <ClCompile Include="OpenEXRUtil\ImfCheckFile.cpp" />
+    <ClCompile Include="OpenEXRUtil\ImfDeepImage.cpp" />
+    <ClCompile Include="OpenEXRUtil\ImfDeepImageChannel.cpp" />
+    <ClCompile Include="OpenEXRUtil\ImfDeepImageIO.cpp" />
+    <ClCompile Include="OpenEXRUtil\ImfDeepImageLevel.cpp" />
+    <ClCompile Include="OpenEXRUtil\ImfFlatImage.cpp" />
+    <ClCompile Include="OpenEXRUtil\ImfFlatImageChannel.cpp" />
+    <ClCompile Include="OpenEXRUtil\ImfFlatImageIO.cpp" />
+    <ClCompile Include="OpenEXRUtil\ImfFlatImageLevel.cpp" />
+    <ClCompile Include="OpenEXRUtil\ImfImage.cpp" />
+    <ClCompile Include="OpenEXRUtil\ImfImageChannel.cpp" />
+    <ClCompile Include="OpenEXRUtil\ImfImageDataWindow.cpp" />
+    <ClCompile Include="OpenEXRUtil\ImfImageIO.cpp" />
+    <ClCompile Include="OpenEXRUtil\ImfImageLevel.cpp" />
+    <ClCompile Include="OpenEXRUtil\ImfSampleCountChannel.cpp" />
+    <ClCompile Include="OpenEXR\dwaLookups.cpp" />
+    <ClCompile Include="OpenEXR\ImfAcesFile.cpp" />
+    <ClCompile Include="OpenEXR\ImfAttribute.cpp" />
+    <ClCompile Include="OpenEXR\ImfB44Compressor.cpp" />
+    <ClCompile Include="OpenEXR\ImfBoxAttribute.cpp" />
+    <ClCompile Include="OpenEXR\ImfChannelList.cpp" />
+    <ClCompile Include="OpenEXR\ImfChannelListAttribute.cpp" />
+    <ClCompile Include="OpenEXR\ImfChromaticities.cpp" />
+    <ClCompile Include="OpenEXR\ImfChromaticitiesAttribute.cpp" />
+    <ClCompile Include="OpenEXR\ImfCompositeDeepScanLine.cpp" />
+    <ClCompile Include="OpenEXR\ImfCompressionAttribute.cpp" />
+    <ClCompile Include="OpenEXR\ImfCompressor.cpp" />
+    <ClCompile Include="OpenEXR\ImfConvert.cpp" />
+    <ClCompile Include="OpenEXR\ImfCRgbaFile.cpp" />
+    <ClCompile Include="OpenEXR\ImfDeepCompositing.cpp" />
+    <ClCompile Include="OpenEXR\ImfDeepFrameBuffer.cpp" />
+    <ClCompile Include="OpenEXR\ImfDeepImageStateAttribute.cpp" />
+    <ClCompile Include="OpenEXR\ImfDeepScanLineInputFile.cpp" />
+    <ClCompile Include="OpenEXR\ImfDeepScanLineInputPart.cpp" />
+    <ClCompile Include="OpenEXR\ImfDeepScanLineOutputFile.cpp" />
+    <ClCompile Include="OpenEXR\ImfDeepScanLineOutputPart.cpp" />
+    <ClCompile Include="OpenEXR\ImfDeepTiledInputFile.cpp" />
+    <ClCompile Include="OpenEXR\ImfDeepTiledInputPart.cpp" />
+    <ClCompile Include="OpenEXR\ImfDeepTiledOutputFile.cpp" />
+    <ClCompile Include="OpenEXR\ImfDeepTiledOutputPart.cpp" />
+    <ClCompile Include="OpenEXR\ImfDoubleAttribute.cpp" />
+    <ClCompile Include="OpenEXR\ImfDwaCompressor.cpp" />
+    <ClCompile Include="OpenEXR\ImfEnvmap.cpp" />
+    <ClCompile Include="OpenEXR\ImfEnvmapAttribute.cpp" />
+    <ClCompile Include="OpenEXR\ImfFastHuf.cpp" />
+    <ClCompile Include="OpenEXR\ImfFloatAttribute.cpp" />
+    <ClCompile Include="OpenEXR\ImfFloatVectorAttribute.cpp" />
+    <ClCompile Include="OpenEXR\ImfFrameBuffer.cpp" />
+    <ClCompile Include="OpenEXR\ImfFramesPerSecond.cpp" />
+    <ClCompile Include="OpenEXR\ImfGenericInputFile.cpp" />
+    <ClCompile Include="OpenEXR\ImfGenericOutputFile.cpp" />
+    <ClCompile Include="OpenEXR\ImfHeader.cpp" />
+    <ClCompile Include="OpenEXR\ImfHuf.cpp" />
+    <ClCompile Include="OpenEXR\ImfIDManifest.cpp" />
+    <ClCompile Include="OpenEXR\ImfIDManifestAttribute.cpp" />
+    <ClCompile Include="OpenEXR\ImfInputFile.cpp" />
+    <ClCompile Include="OpenEXR\ImfInputPart.cpp" />
+    <ClCompile Include="OpenEXR\ImfInputPartData.cpp" />
+    <ClCompile Include="OpenEXR\ImfIntAttribute.cpp" />
+    <ClCompile Include="OpenEXR\ImfIO.cpp" />
+    <ClCompile Include="OpenEXR\ImfKeyCode.cpp" />
+    <ClCompile Include="OpenEXR\ImfKeyCodeAttribute.cpp" />
+    <ClCompile Include="OpenEXR\ImfLineOrderAttribute.cpp" />
+    <ClCompile Include="OpenEXR\ImfLut.cpp" />
+    <ClCompile Include="OpenEXR\ImfMatrixAttribute.cpp" />
+    <ClCompile Include="OpenEXR\ImfMisc.cpp" />
+    <ClCompile Include="OpenEXR\ImfMultiPartInputFile.cpp" />
+    <ClCompile Include="OpenEXR\ImfMultiPartOutputFile.cpp" />
+    <ClCompile Include="OpenEXR\ImfMultiView.cpp" />
+    <ClCompile Include="OpenEXR\ImfOpaqueAttribute.cpp" />
+    <ClCompile Include="OpenEXR\ImfOutputFile.cpp" />
+    <ClCompile Include="OpenEXR\ImfOutputPart.cpp" />
+    <ClCompile Include="OpenEXR\ImfOutputPartData.cpp" />
+    <ClCompile Include="OpenEXR\ImfPartType.cpp" />
+    <ClCompile Include="OpenEXR\ImfPizCompressor.cpp" />
+    <ClCompile Include="OpenEXR\ImfPreviewImage.cpp" />
+    <ClCompile Include="OpenEXR\ImfPreviewImageAttribute.cpp" />
+    <ClCompile Include="OpenEXR\ImfPxr24Compressor.cpp" />
+    <ClCompile Include="OpenEXR\ImfRational.cpp" />
+    <ClCompile Include="OpenEXR\ImfRationalAttribute.cpp" />
+    <ClCompile Include="OpenEXR\ImfRgbaFile.cpp" />
+    <ClCompile Include="OpenEXR\ImfRgbaYca.cpp" />
+    <ClCompile Include="OpenEXR\ImfRle.cpp" />
+    <ClCompile Include="OpenEXR\ImfRleCompressor.cpp" />
+    <ClCompile Include="OpenEXR\ImfScanLineInputFile.cpp" />
+    <ClCompile Include="OpenEXR\ImfStandardAttributes.cpp" />
+    <ClCompile Include="OpenEXR\ImfStdIO.cpp" />
+    <ClCompile Include="OpenEXR\ImfStringAttribute.cpp" />
+    <ClCompile Include="OpenEXR\ImfStringVectorAttribute.cpp" />
+    <ClCompile Include="OpenEXR\ImfSystemSpecific.cpp" />
+    <ClCompile Include="OpenEXR\ImfTestFile.cpp" />
+    <ClCompile Include="OpenEXR\ImfThreading.cpp" />
+    <ClCompile Include="OpenEXR\ImfTileDescriptionAttribute.cpp" />
+    <ClCompile Include="OpenEXR\ImfTiledInputFile.cpp" />
+    <ClCompile Include="OpenEXR\ImfTiledInputPart.cpp" />
+    <ClCompile Include="OpenEXR\ImfTiledMisc.cpp" />
+    <ClCompile Include="OpenEXR\ImfTiledOutputFile.cpp" />
+    <ClCompile Include="OpenEXR\ImfTiledOutputPart.cpp" />
+    <ClCompile Include="OpenEXR\ImfTiledRgbaFile.cpp" />
+    <ClCompile Include="OpenEXR\ImfTileOffsets.cpp" />
+    <ClCompile Include="OpenEXR\ImfTimeCode.cpp" />
+    <ClCompile Include="OpenEXR\ImfTimeCodeAttribute.cpp" />
+    <ClCompile Include="OpenEXR\ImfVecAttribute.cpp" />
+    <ClCompile Include="OpenEXR\ImfVersion.cpp" />
+    <ClCompile Include="OpenEXR\ImfWav.cpp" />
+    <ClCompile Include="OpenEXR\ImfZip.cpp" />
+    <ClCompile Include="OpenEXR\ImfZipCompressor.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="OpenEXRCore\CMakeLists.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -362,7 +362,7 @@ Swap red and blue channels in a 24- or 32-bit dib.
 @return Returns TRUE if successful, returns FALSE otherwise
 @see See definition in Conversion.cpp
 */
-BOOL SwapRedBlue32(FIBITMAP* dib);
+bool SwapRedBlue32(FIBITMAP* dib);
 
 /**
 Inplace convert CMYK to RGBA.(8- and 16-bit). 
@@ -370,7 +370,7 @@ Alpha is filled with the first extra channel if any or white otherwise.
 @return Returns TRUE if successful, returns FALSE otherwise
 @see See definition in Conversion.cpp
 */
-BOOL ConvertCMYKtoRGBA(FIBITMAP* dib);
+bool ConvertCMYKtoRGBA(FIBITMAP* dib);
 
 /**
 Inplace convert CIELab to RGBA (8- and 16-bit).

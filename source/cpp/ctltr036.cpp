@@ -26,7 +26,7 @@ using namespace dynarithmic;
 CTL_CustomDSTriplet::CTL_CustomDSTriplet(CTL_ITwainSession *pSession,
                                          CTL_ITwainSource* pSource,
                                          TW_UINT16 nMsg)
-                                               :  CTL_TwainTriplet()
+                                        : CTL_TwainTriplet(), m_CustomDSData{}
 {
     SetSessionPtr(pSession);
     SetSourcePtr( pSource );

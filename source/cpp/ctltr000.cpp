@@ -28,13 +28,11 @@ using namespace dynarithmic;
 ///////////////// Open Data source manager triplet /////////////////////////
 CTL_TwainCloseSMTriplet::CTL_TwainCloseSMTriplet(CTL_ITwainSession *pSession) :
                         CTL_TwainSMTriplet(pSession, MSG_CLOSEDSM, IDS_ErrSourceMgrClose)
-{
-}
+{}
 
 CTL_TwainOpenSMTriplet::CTL_TwainOpenSMTriplet(CTL_ITwainSession *pSession) :
                         CTL_TwainSMTriplet(pSession, MSG_OPENDSM, IDS_ErrSourceMgrOpen)
-{
-}
+{}
 
 TW_UINT16 CTL_TwainOpenSMTriplet::Execute()
 {

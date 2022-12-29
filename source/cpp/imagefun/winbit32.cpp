@@ -824,8 +824,8 @@ HBITMAP CDibInterface::DIBToBitmap(HANDLE hDIB, HPALETTE hPal)
 
     if (!hDC)
         return nullptr;
-
-    DTWAINDeviceContextRelease_RAII dcHandle({nullptr, hDC });
+    auto pr = std::make_pair(static_cast<HWND>(nullptr), hDC);
+    DTWAINDeviceContextRelease_RAII dcHandle(&pr);
 
     if (hPal)
         hOldPal = SelectPalette(hDC, hPal, FALSE);

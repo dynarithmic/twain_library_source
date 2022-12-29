@@ -36,10 +36,10 @@ using namespace dynarithmic;
 
 /* Sent when DTWAIN_Acquire...() functions are about to return */
 
-dynarithmic::CTL_ProcessEventTriplet::CTL_ProcessEventTriplet(CTL_ITwainSession* pSession,
-                                                             CTL_ITwainSource* pSource,
-                                                             MSG *pMsg,
-                                                             bool isDSM2) : m_bDSM2Used(isDSM2)
+CTL_ProcessEventTriplet::CTL_ProcessEventTriplet(CTL_ITwainSession* pSession,
+                                                 CTL_ITwainSource* pSource,
+                                                 MSG *pMsg,
+                                                 bool isDSM2) : m_Event{}, m_bDSM2Used(isDSM2)
 {
     SetSourcePtr(const_cast<CTL_ITwainSource*>(pSource));
     SetSessionPtr(pSession);
@@ -86,10 +86,10 @@ TW_UINT16 CTL_ProcessEventTriplet::ExecuteEventHandler()
         {
             static int nCount = 0;
             bool bNextAttemptIsRetry = false;
+            pSource->SetState(SOURCE_STATE_XFERREADY);
             // Set the retry count
             pSource->SetCurrentRetryCount(0);
 
-            pSource->SetState(SOURCE_STATE_XFERREADY);
             // Set the transfer mechanism (??)
             // Set the pixel type and bit depth based on what the current values
             // found in the Source.
@@ -233,7 +233,7 @@ TW_UINT16 CTL_ProcessEventTriplet::ExecuteEventHandler()
                     const UINT uMsg = CTL_TwainDLLHandle::s_nRegisteredDTWAINMsg;
                     LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_DEVICEEVENT, 0, true);
                     #ifdef WIN64
-                        (*pHandle->m_pCallbackFn)(DTWAIN_TN_DEVICEEVENT, 0, (LONG_PTR)pSource);
+                        (*pHandle->m_pCallbackFn)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG_PTR>(pSource));
                     #else
                         (*pHandle->m_pCallbackFn)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG_PTR>(pSource));
                     #endif
@@ -275,7 +275,6 @@ bool CTL_ProcessEventTriplet::ResetTransfer(TW_UINT16 Msg/*=MSG_RESET*/)
             CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, TWRC_FAILURE, ccode);
             return false;
         }
-        break;
     }
     return false;
 }

@@ -21,7 +21,7 @@
 #include "dtwain.h"
 #include "ctltwmgr.h"
 #include "ctliface.h"
-#include "enumeratorfuncs.h"
+#include "arrayfactory.h"
 #include "errorcheck.h"
 
 using namespace dynarithmic;
@@ -310,7 +310,7 @@ LRESULT CALLBACK_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
             {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 pSource->SetAcquireAttempt(FALSE);
-                EnumeratorFunctionImpl::EnumeratorDestroy(static_cast<DTWAIN_ARRAY>(pSource->m_pUserPtr));
+                CTL_TwainDLLHandle::s_ArrayFactory->destroy(pSource->m_pUserPtr);
 
                 // Couldn't acquire the first page, so acquire failed totally!
                 if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) ||
@@ -385,7 +385,7 @@ LRESULT CALLBACK_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
             case DTWAIN_TN_PAGECANCELLED:
             {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
-                EnumeratorFunctionImpl::EnumeratorDestroy(static_cast<DTWAIN_ARRAY>(pSource->m_pUserPtr));
+                CTL_TwainDLLHandle::s_ArrayFactory->destroy(pSource->m_pUserPtr);
                 if (  pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) ||
                     !CTL_TwainDLLHandle::s_aAllCallbacks.empty())
                     bPassMsg = true;
@@ -417,7 +417,7 @@ LRESULT CALLBACK_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                 if ( lParam != -1)
                 {
                     pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
-                    EnumeratorFunctionImpl::EnumeratorDestroy(pSource->m_pUserPtr);
+                    CTL_TwainDLLHandle::s_ArrayFactory->destroy(pSource->m_pUserPtr);
                 }
                 if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) ||
                     !CTL_TwainDLLHandle::s_aAllCallbacks.empty())
@@ -515,7 +515,7 @@ LRESULT CALLBACK_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                             if ( nDibs > 0 )
                                 pSource->AddDibsToAcquisition(aDibs);
                             else
-                                EnumeratorFunctionImpl::EnumeratorDestroy(aDibs);
+                                CTL_TwainDLLHandle::s_ArrayFactory->destroy(aDibs);
                             pSource->SetImagesStored(true);
                         }
 
@@ -767,7 +767,7 @@ LRESULT ExecuteDTWAINCallbacks(CTL_TwainDLLHandle *pHandle, HWND hWnd, UINT uMsg
 
 void dynarithmic::LogDTWAINMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, bool bToCallback)
 {
-    if (CTL_TwainDLLHandle::s_lErrorFilterFlags)
+    if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_NOTIFICATIONS)
     {
         CTL_ErrorStruct e;
         std::string s;

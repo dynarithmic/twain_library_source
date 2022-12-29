@@ -18,8 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef DTWAIN_H_
-#define DTWAIN_H_
+#ifndef DTWAIN_H
+#define DTWAIN_H
 #ifdef _WIN32
     #include <windows.h>
 #endif

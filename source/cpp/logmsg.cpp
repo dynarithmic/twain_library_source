@@ -79,6 +79,12 @@ namespace dynarithmic
             m_ostr.open(filename);
     }
 
+    File_Logger::~File_Logger()
+    {
+        if (m_ostr.is_open())
+            m_ostr.close();
+    }
+
     void File_Logger::trace(const std::string& msg)
     {
         if (m_ostr)

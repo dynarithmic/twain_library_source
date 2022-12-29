@@ -21,6 +21,7 @@
 #include "ctltr010.h"
 #include "ctldevnt.h"
 #include "dtwain.h"
+#include "twainfix32.h"
 using namespace dynarithmic;
 CTL_DeviceEvent::CTL_DeviceEvent() : m_DeviceEvent() {}
 
@@ -32,12 +33,12 @@ TW_INT32   CTL_DeviceEvent::GetPowerSupply() const { return       m_DeviceEvent.
 
 double CTL_DeviceEvent::GetXResolution() const
 {
-    return static_cast<double>(CTL_CapabilityTriplet::Twain32ToFloat(m_DeviceEvent.XResolution));
+    return static_cast<double>(Fix32ToFloat(m_DeviceEvent.XResolution));
 }
 
 double CTL_DeviceEvent::GetYResolution() const
 {
-    return static_cast<double>(CTL_CapabilityTriplet::Twain32ToFloat(m_DeviceEvent.YResolution));
+    return static_cast<double>(Fix32ToFloat(m_DeviceEvent.YResolution));
 }
 
 TW_UINT32  CTL_DeviceEvent::GetFlashUsed2() const { return             m_DeviceEvent.FlashUsed2;            }

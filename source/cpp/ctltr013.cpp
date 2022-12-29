@@ -21,6 +21,7 @@
 #define MC_NO_CPP
 #include "ctltr013.h"
 #include "ctlobtyp.h"
+#include "twainfix32.h"
 
 using namespace dynarithmic;
 
@@ -70,7 +71,7 @@ bool CTL_CapabilityGetOneValTriplet::EnumCapValues( void *pCapData )
     if ( nItemType == TWTY_FIX32 )
     {
         pTW_FIX32 p = reinterpret_cast<pTW_FIX32>(&pValOne->Item);
-        double fFix = Twain32ToFloat( *p );
+        double fFix = Fix32ToFloat( *p );
         pOb->CopyData( &fFix );
     }
     else

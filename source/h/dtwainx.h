@@ -24,6 +24,7 @@
 /* Include the basic definitions used by TWAIN */
 #include "twain.h"
 #include "winconst.h"
+#include "capconst.h"
 /* ///////////////////////////////// DTWAIN Exported functions //////////////////////////// */
 #ifdef __cplusplus
   extern "C" {
@@ -32,13 +33,15 @@
 /* Check for TWAIN Availability (initialization not necessary) */
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_IsTwainAvailable(VOID_PROTOTYPE);
 
-/* DTWAIN Initialization / Deinitialization */
+/* DTWAIN Initialization */
 DTWAIN_HANDLE  DLLENTRY_DEF      DTWAIN_SysInitialize(VOID_PROTOTYPE);
 
 /* Initialize DTWAIN without having the "Resources not found" error box blocking the client */
 DTWAIN_HANDLE  DLLENTRY_DEF      DTWAIN_SysInitializeNoBlocking(VOID_PROTOTYPE);
 
+/* Uninitialize DTWAIN (closes all open sources, shuts down the link to the TWAIN DSM) */
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_SysDestroy(VOID_PROTOTYPE);
+
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_IsInitialized(VOID_PROTOTYPE);
 LONG           DLLENTRY_DEF      DTWAIN_GetRegisteredMsg(VOID_PROTOTYPE);
 DTWAIN_HANDLE  DLLENTRY_DEF      DTWAIN_GetDTWAINHandle(VOID_PROTOTYPE);
@@ -48,6 +51,7 @@ LONG           DLLENTRY_DEF      DTWAIN_GetStaticLibVersion(VOID_PROTOTYPE);
 
 /* DTWAIN Error message handling */
 LONG           DLLENTRY_DEF      DTWAIN_GetLastError(VOID_PROTOTYPE);
+LONG           DLLENTRY_DEF      DTWAIN_SetLastError(LONG nError);
 
 /* Modal / Modeless TWAIN message operation */
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_SetTwainMode(LONG lAcquireMode);
@@ -61,6 +65,7 @@ DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_SetLanguage(LONG nLanguage);
 LONG           DLLENTRY_DEF      DTWAIN_GetCountry(VOID_PROTOTYPE);
 LONG           DLLENTRY_DEF      DTWAIN_GetLanguage(VOID_PROTOTYPE);
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_IsTwainMsg(MSG* pMsg);
+LONG           DLLENTRY_DEF      DTWAIN_GetAPIHandleStatus(DTWAIN_HANDLE pHandle);
 
 /* DTWAIN Message Notification functions */
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_EnableMsgNotify(DTWAIN_BOOL bSet);
@@ -94,6 +99,7 @@ DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_SetDefaultSource( DTWAIN_SOURCE Source);
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_IsSourceAcquiring( DTWAIN_SOURCE Source);
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_IsSourceOpen( DTWAIN_SOURCE Source);
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_IsAcquiring(VOID_PROTOTYPE);
+DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_IsMemFileXferSupported(DTWAIN_SOURCE Source);
 
 /*  Capability functions.  Source must be opened before using them!!! */
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_SetCapValues(DTWAIN_SOURCE Source,LONG lCap,LONG lSetType,DTWAIN_ARRAY pArray);
@@ -277,7 +283,11 @@ DTWAIN_BOOL          DLLENTRY_DEF    DTWAIN_GetXResolution(DTWAIN_SOURCE Source,
 DTWAIN_BOOL          DLLENTRY_DEF    DTWAIN_GetYResolution(DTWAIN_SOURCE Source, LPDTWAIN_FLOAT Resolution);
 
 LONG                 DLLENTRY_DEF    DTWAIN_EnumResolutionValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, DTWAIN_BOOL bExpandIfRange);
+LONG                 DLLENTRY_DEF    DTWAIN_EnumXResolutionValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, DTWAIN_BOOL bExpandIfRange);
+LONG                 DLLENTRY_DEF    DTWAIN_EnumYResolutionValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, DTWAIN_BOOL bExpandIfRange);
 DTWAIN_ARRAY         DLLENTRY_DEF    DTWAIN_EnumResolutionValuesEx(DTWAIN_SOURCE Source, DTWAIN_BOOL bExpandIfRange);
+DTWAIN_ARRAY         DLLENTRY_DEF    DTWAIN_EnumXResolutionValuesEx(DTWAIN_SOURCE Source, DTWAIN_BOOL bExpandIfRange);
+DTWAIN_ARRAY         DLLENTRY_DEF    DTWAIN_EnumYResolutionValuesEx(DTWAIN_SOURCE Source, DTWAIN_BOOL bExpandIfRange);
 
 /* Source UI functions */
 DTWAIN_BOOL          DLLENTRY_DEF    DTWAIN_IsUIControllable( DTWAIN_SOURCE Source);
@@ -338,6 +348,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAvailablePrintersArray(DTWAIN_SOURCE Source, 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnablePrinter(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPrinter(DTWAIN_SOURCE Source, LPLONG lpPrinter, DTWAIN_BOOL bCurrent);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinter(DTWAIN_SOURCE Source, LONG Printer, DTWAIN_BOOL bCurrent);
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterEx(DTWAIN_SOURCE Source, LONG Printer, DTWAIN_BOOL bCurrent);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPrinterEnabled(DTWAIN_SOURCE Source, LONG Printer);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPrinterSupported(DTWAIN_SOURCE Source);
 
@@ -358,6 +369,7 @@ DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsFeederSensitive(DTWAIN_SOURCE Source)
 DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_EnableAutomaticSenseMedium(DTWAIN_SOURCE Source, DTWAIN_BOOL bSet);
 DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsAutomaticSenseMediumEnabled(DTWAIN_SOURCE Source);
 DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsAutomaticSenseMediumSupported(DTWAIN_SOURCE Source);
+
 DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_FeedPage(DTWAIN_SOURCE Source);
 DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_RewindPage(DTWAIN_SOURCE Source);
 DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_ClearPage(DTWAIN_SOURCE Source);
@@ -368,7 +380,7 @@ DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsAutoFeedEnabled(DTWAIN_SOURCE Source)
 DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsAutoFeedSupported(DTWAIN_SOURCE Source);
 LONG           DLLENTRY_DEF       DTWAIN_GetFeederFuncs(DTWAIN_SOURCE Source);
 DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsPaperDetectable(DTWAIN_SOURCE Source);
-
+DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_EnableAutoFeedNotify(LONG Latency, DTWAIN_BOOL bEnable);
 
 /* Duplex Scanner support */
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, LPLONG lpDupType);
@@ -586,7 +598,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY
 
 /* Blank page detection functions */
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetection(DTWAIN_SOURCE Source, DTWAIN_FLOAT threshold,
-                                                      LONG autodetect_option, DTWAIN_BOOL bSet);
+                                                      LONG discard_option, DTWAIN_BOOL bSet);
 LONG DLLENTRY_DEF DTWAIN_GetBlankPageAutoDetection(DTWAIN_SOURCE Source);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsBlankPageDetectionOn(DTWAIN_SOURCE Source);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionEx(DTWAIN_SOURCE Source, DTWAIN_FLOAT threshold,
@@ -617,7 +629,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumAutomaticSenseMedium(DTWAIN_SOURCE Source, L
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumAutomaticSenseMediumEx(DTWAIN_SOURCE Source);
 
 /* CAP_AUTOSCAN */
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumAutoScanValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnableAutoScan(DTWAIN_SOURCE Source, DTWAIN_BOOL bEnable);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsAutoScanEnabled(DTWAIN_SOURCE Source);
 
@@ -750,6 +761,29 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumPatchPrioritiesEx(DTWAIN_SOURCE Source);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumPatchCodes(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY PCodes);
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumPatchCodesEx(DTWAIN_SOURCE Source);
 
+/* TWAIN 2.5 functions */
+DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsImageAddressingSupported(DTWAIN_SOURCE Source);
+DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsIAFieldALevelSupported(DTWAIN_SOURCE Source);
+DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsIAFieldBLevelSupported(DTWAIN_SOURCE Source);
+DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsIAFieldCLevelSupported(DTWAIN_SOURCE Source);
+DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsIAFieldDLevelSupported(DTWAIN_SOURCE Source);
+DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsIAFieldELevelSupported(DTWAIN_SOURCE Source);
+DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsIAFieldAPrintFormatSupported(DTWAIN_SOURCE Source);
+DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsIAFieldBPrintFormatSupported(DTWAIN_SOURCE Source); 
+DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsIAFieldCPrintFormatSupported(DTWAIN_SOURCE Source); 
+DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsIAFieldDPrintFormatSupported(DTWAIN_SOURCE Source); 
+DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsIAFieldEPrintFormatSupported(DTWAIN_SOURCE Source); 
+DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsIAFieldAValueSupported(DTWAIN_SOURCE Source);
+DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsIAFieldBValueSupported(DTWAIN_SOURCE Source);
+DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsIAFieldCValueSupported(DTWAIN_SOURCE Source);
+DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsIAFieldDValueSupported(DTWAIN_SOURCE Source);
+DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsIAFieldEValueSupported(DTWAIN_SOURCE Source);
+DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsIAFieldALastPageSupported(DTWAIN_SOURCE Source);
+DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsIAFieldBLastPageSupported(DTWAIN_SOURCE Source);
+DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsIAFieldCLastPageSupported(DTWAIN_SOURCE Source);
+DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsIAFieldDLastPageSupported(DTWAIN_SOURCE Source);
+DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsIAFieldELastPageSupported(DTWAIN_SOURCE Source);
+
 /* Miscellaneous code */
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DisableAppWindow(HWND hWnd, DTWAIN_BOOL bDisable);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSourcesOnSelect(DTWAIN_BOOL bSet);
@@ -767,10 +801,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_UseMultipleThreads(DTWAIN_BOOL bSet);
 /* TWAIN time-out values */
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainTimeout( LONG milliseconds );
 LONG DLLENTRY_DEF DTWAIN_GetTwainTimeout(VOID_PROTOTYPE);
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetNumFilesToAppend(VOID_PROTOTYPE);
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartAppend(VOID_PROTOTYPE);
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CloseImageFileAppend(VOID_PROTOTYPE);
 
 /* User-defined callback to change DIB */
 DTWAIN_DIBUPDATE_PROC DLLENTRY_DEF DTWAIN_SetUpdateDibProc(DTWAIN_DIBUPDATE_PROC DibProc);
@@ -848,6 +878,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadLanguageResource(LONG nLanguage);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayFrameGetAt(DTWAIN_ARRAY FrameArray, LONG nWhere, LPDTWAIN_FLOAT pleft, LPDTWAIN_FLOAT ptop, LPDTWAIN_FLOAT pright, LPDTWAIN_FLOAT pbottom );
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayFrameSetAt(DTWAIN_ARRAY FrameArray, LONG nWhere, DTWAIN_FLOAT left, DTWAIN_FLOAT top, DTWAIN_FLOAT right, DTWAIN_FLOAT bottom );
 DTWAIN_FRAME DLLENTRY_DEF DTWAIN_ArrayFrameGetFrameAt(DTWAIN_ARRAY FrameArray, LONG nWhere );
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayFrameSetFrameAt(DTWAIN_ARRAY FrameArray, LONG nWhere, DTWAIN_FRAME theFrame);
 
 /* TWAIN 1.x memory allocation functions */
 HANDLE      DLLENTRY_DEF DTWAIN_AllocateMemory(LONG memSize);

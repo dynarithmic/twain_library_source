@@ -22,7 +22,6 @@
 #include "dtwain.h"
 #include "ctliface.h"
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
 using namespace dynarithmic;
 
 /////////////// Patch code support //////////////////////////

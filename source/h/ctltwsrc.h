@@ -18,8 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLTwSrc_h_
-#define CTLTwSrc_h_
+#ifndef CTLTWSRC_H
+#define CTLTWSRC_H
 
 #include <unordered_map>
 #include <vector>
@@ -66,7 +66,7 @@ namespace dynarithmic
     {
         CTL_StringType sFileName;
         CTL_StringType sRealFileName;
-        unsigned long nBytes;
+        uint64_t nBytes;
         bool bIsJobControlPage;
         sDuplexFileData() : nBytes(0), bIsJobControlPage(false) {}
     };
@@ -337,6 +337,8 @@ namespace dynarithmic
         LONG         GetFileAutoIncrementFlags() const { return m_nAutoIncrementFlags; }
         bool         ResetFileAutoIncrementData();
         void         SetFileAutoIncrementBase( LONG nInitial ) {m_nFileNameBaseNum = nInitial;}
+        bool         IsFileAutoCreateDirectory() const { return m_ImageInfoEx.IsCreateDirectory; }
+        void         SetFileAutoCreateDirectory(bool bAutoCreate) { m_ImageInfoEx.IsCreateDirectory = bAutoCreate; }
 
         // Added for manual duplex mode processing
         bool         SetManualDuplexMode(LONG nFlags, bool bSet);
@@ -358,7 +360,7 @@ namespace dynarithmic
                                                                 !IsMultiPageModeSaveAtEnd(); }
         bool         IsMultiPageModeSaveAtEnd() const { return m_nMultiPageScanMode == DTWAIN_FILESAVE_ENDACQUIRE; }
 
-        void         AddDuplexFileData(CTL_StringType fName, unsigned long nBytes, int nWhich,
+        void         AddDuplexFileData(CTL_StringType fName, uint64_t nBytes, int nWhich,
                                        CTL_StringType RealName = {}, bool bIsJobControl=false);
         sDuplexFileData GetDuplexFileData( int nPage, int nWhich ) const;
         unsigned long GetNumDuplexFiles(int nWhich) const;
@@ -399,6 +401,9 @@ namespace dynarithmic
         CTL_StringType GetActualFileName() const { return m_ActualFileName;  }
         void         SetOpenFlag(bool bOpened) { m_bIsOpened = bOpened; }
         bool         CloseSource(bool bForce);
+        const std::vector<int>& GetSupportedTransferMechanisms() const { return m_aTransferMechanisms; }
+        void         SetSupportedTransferMechanisms(const std::vector<int>& aTransferMechanisms)
+                            { m_aTransferMechanisms = aTransferMechanisms; }
 
         // Only public member
         void *      m_pUserPtr;
@@ -521,6 +526,7 @@ namespace dynarithmic
         bool            m_bProcessingPixelInfo;
         bool            m_bSkipImageInfoErrors;
         LONG            m_nForcedBpp;
+        std::vector<int> m_aTransferMechanisms;
 
         struct tagCapCachInfo {
             TW_UINT16 nCap;
