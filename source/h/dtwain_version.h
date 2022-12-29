@@ -20,12 +20,63 @@
  */
 #ifndef DTWAIN_VERSION_H
 #define DTWAIN_VERSION_H
-#define DTWAIN_MAJOR_VERSION                5
-#define DTWAIN_SUBVERSION_VERSION           2
-#define DTWAIN_PLACEHOLDER_VERSION          0
-#define DTWAIN_VERINFO_PATCHLEVEL_VERSION   11
 
-#define DTWAIN_VERINFO_BASEVERSION          "5.2"
-#define DTWAIN_VERINFO_FILEVERSION          "5.2.0.11"
+#define DTWAIN_MAJOR_VERSION           5
+#define DTWAIN_MINOR_VERSION           3
+#define DTWAIN_SUBMINOR_VERSION        0
+#define DTWAIN_PATCHLEVEL_VERSION      0
 
+#define DTWAIN_VERINFO_BASEVERSION          "5.3"
+#define DTWAIN_VERINFO_FILEVERSION          "5.3.0.0"
+#define DTWAIN_VERINFO_PATCHLEVEL_VERSION   "0"
+
+#ifdef _DEBUG
+    #define DTWAIN_DEVELOP_SUFFIX "d"
+#else
+    #define DTWAIN_DEVELOP_SUFFIX ""
+#endif
+
+#ifdef _WIN32
+	#ifdef UNICODE
+		#define UNICODE_VERSION "(Unicode)"
+		#define UNICODE_SUFFIX  "u"
+	#else
+		#define UNICODE_VERSION
+		#define UNICODE_SUFFIX ""
+	#endif
+
+	#if defined (WIN64) || (_WIN64)
+		#define DTWAIN_OSPLATFORM "64"
+		#define DTWAIN_FILEDESCRIPTION  "dtwain64" UNICODE_SUFFIX DTWAIN_DEVELOP_SUFFIX
+	#else
+		#define DTWAIN_OSPLATFORM "32"
+		#define DTWAIN_FILEDESCRIPTION  "dtwain32" UNICODE_SUFFIX DTWAIN_DEVELOP_SUFFIX
+	#endif
+	#define DTWAIN_DLLNAME      DTWAIN_FILEDESCRIPTION ".dll"
+	#define DTWAIN_IMPORTLIBNAME DTWAIN_FILEDESCRIPTION ".lib"
+#endif
+
+#ifndef _WIN32
+    #if defined (UNIX64)
+        #define DTWAIN_DLLNAME      "libdtwain64" DTWAIN_DEVELOP_SUFFIX ".a"
+        #define DTWAIN_FILEDESCRIPTION  "libdtwain64" DTWAIN_DEVELOP_SUFFIX
+        #define DTWAIN_OSPLATFORM "64"
+    #else
+        #define DTWAIN_DLLNAME      "libdtwain32" DTWAIN_DEVELOP_SUFFIX ".a"
+        #define DTWAIN_FILEDESCRIPTION  "libdtwain32" DTWAIN_DEVELOP_SUFFIX
+        #define DTWAIN_OSPLATFORM "32"
+    #endif
+#endif
+
+#ifdef _MSC_VER
+    #ifndef BUILDING_DTWAINDLL
+        #pragma message ("Using DTWAIN in user application...")
+	    #ifndef DTWAIN_NOIMPORTLIB
+		    #pragma comment (lib, DTWAIN_IMPORTLIBNAME)
+            #pragma message ("Using import library " DTWAIN_IMPORTLIBNAME " in link phase..")
+	    #else
+            #pragma message ("Not using import library " DTWAIN_IMPORTLIBNAME " in link phase...")
+        #endif
+    #endif
+#endif
 #endif

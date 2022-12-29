@@ -23,12 +23,11 @@
 #include "ctltwmgr.h"
 
 using namespace dynarithmic;
-int CTL_PcxIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, LONG64 MultiStage)
+int CTL_PcxIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* pMutiPageStruct)
 {
-    const auto s = reinterpret_cast<DibMultiPageStruct*>(MultiStage);
     HANDLE hDib = nullptr;
 
-    if ( !s || s->Stage != DIB_MULTI_LAST )
+    if ( !pMutiPageStruct || pMutiPageStruct->Stage != DIB_MULTI_LAST )
     {
         if ( !m_pDib )
             return DTWAIN_ERR_DIB;
@@ -38,21 +37,21 @@ int CTL_PcxIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
             return DTWAIN_ERR_DIB;
     }
 
-    if (s && s->Stage != DIB_MULTI_LAST && !IsValidBitDepth(DTWAIN_PCX, m_pDib->GetBitsPerPixel()))
+    if (pMutiPageStruct && pMutiPageStruct->Stage != DIB_MULTI_LAST && !IsValidBitDepth(DTWAIN_PCX, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
     CPCXImageHandler PCXHandler(m_ImageInfoEx);
-    if ( MultiStage )
+    if ( pMutiPageStruct )
     {
-        PCXHandler.SetMultiPageStatus(s);
+        PCXHandler.SetMultiPageStatus(pMutiPageStruct);
     }
 
     int retval;
-    if ( !s || s->Stage != DIB_MULTI_LAST )
+    if ( !pMutiPageStruct || pMutiPageStruct->Stage != DIB_MULTI_LAST )
         retval = PCXHandler.WriteGraphicFile(this, szFile, hDib);
     else
         retval = PCXHandler.WriteImage(nullptr,nullptr,0,0,0,0, nullptr);
-    if ( s )
-        PCXHandler.GetMultiPageStatus(s);
+    if ( pMutiPageStruct )
+        PCXHandler.GetMultiPageStatus(pMutiPageStruct);
     return retval;
 }

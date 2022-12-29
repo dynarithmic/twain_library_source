@@ -23,5 +23,4 @@
 using namespace dynarithmic;
 CTL_GetFirstSourceTriplet::CTL_GetFirstSourceTriplet(CTL_ITwainSession *pSession)
                             : CTL_SourceTriplet( pSession, static_cast<LPCTSTR>(nullptr), MSG_GETFIRST )
-{
-}
+{}

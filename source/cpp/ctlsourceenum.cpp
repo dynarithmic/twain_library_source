@@ -20,7 +20,7 @@
  */
 #include "cppfunc.h"
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
+#include "arrayfactory.h"
 #include "errorcheck.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -51,7 +51,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
         LOG_FUNC_EXIT_PARAMS(false)
     DTWAIN_ARRAY pDTWAINArray = aSource;
 
-    EnumeratorFunctionImpl::ClearEnumerator(pDTWAINArray);
+    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    auto& vEnum = factory->underlying_container_t<CTL_ITwainSource*>(pDTWAINArray);
+    vEnum.clear();
 
     CTL_TwainSourceSet SourceArray;
 
@@ -64,11 +66,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
 
     struct EnumAddValue {
         DTWAIN_ARRAY m_Arr; EnumAddValue(DTWAIN_ARRAY Arr) : m_Arr(Arr) {}
-        void operator()(CTL_ITwainSource* ptr) const { EnumeratorFunctionImpl::EnumeratorAddValue(m_Arr, &ptr); }
+        void operator()(CTL_ITwainSource* ptr) const
+        {
+            CTL_TwainDLLHandle::s_ArrayFactory->add_to_back(m_Arr, &ptr, 1);
+        }
     };
 
     CTL_TwainAppMgr::EnumSources(pHandle->m_pTwainSession, SourceArray);
-    for_each(SourceArray.begin(), SourceArray.end(), [&](CTL_ITwainSource* ptr) {EnumeratorFunctionImpl::EnumeratorAddValue(pDTWAINArray, &ptr);});
+    std::copy(SourceArray.begin(), SourceArray.end(), std::back_inserter(vEnum));
     *Array = aSource;
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)

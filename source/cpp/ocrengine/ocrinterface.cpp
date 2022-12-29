@@ -23,7 +23,7 @@
 #include "dtwain_resource_constants.h"
 #include "ctltwmgr.h"
 #include "transym_ocrinterface.h"
-#include "enumeratorfuncs.h"
+#include "arrayfactory.h"
 #include "errorcheck.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4505)
@@ -650,7 +650,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumOCRSupportedCaps(DTWAIN_OCRENGINE Engine, LP
     const DTWAIN_ARRAY theArray = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, static_cast<LONG>(vals.size()));
     if (!theArray)
         LOG_FUNC_EXIT_PARAMS(false)
-    auto& vValues = EnumeratorVector<LONG>(theArray);
+    auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(theArray);
     std::copy(vals.begin(), vals.end(), vValues.begin());
     *SupportedCaps = theArray;
     LOG_FUNC_EXIT_PARAMS(true)

@@ -17,16 +17,11 @@
     FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
-
-    For more information, the license file LICENSE.TXT that is located in the root
-    directory of the DTWAIN installation covers the restrictions under the LGPL license.
-    Please read this file before deploying or distributing any application using DTWAIN.
  */
-#ifndef CTLSUPPORT_H_
-#define CTLSUPPORT_H_
+#ifndef CTLSUPPORT_H
+#define CTLSUPPORT_H
 #include <algorithm>
 #include "dtwain.h"
-#include "enumeratorfuncs.h"
 #include "ctliface.h"
 
 ///////////////////////////////////////////////////////////////////////////
@@ -40,18 +35,19 @@ namespace dynarithmic
         if (getAnySupport)
             return true;
         DTWAIN_ARRAY Array = 0;
-        DTWAINArrayLL_RAII raii(Array);
         if (DTWAIN_GetCapValues(Source, Cap, DTWAIN_CAPGET, &Array))
         {
+            DTWAINArrayLL_RAII raii(Array);
             DTWAIN_ARRAY tempArray = 0;
             DTWAIN_ARRAY arrayToUse = Array;
-            DTWAINArrayLL_RAII raii2(tempArray);
+            DTWAINArrayLL_RAII raii2; 
             if (DTWAIN_GetCapContainer(Source, Cap, DTWAIN_CAPGET) == DTWAIN_CONTRANGE)
             {
                 // expand range if we find that the underlying values are in a range
                 try
                 {
                     DTWAIN_RangeExpand(Array, &tempArray);
+                    raii2.reset(tempArray);
                     arrayToUse = tempArray;
                 }
                 catch(...)
@@ -60,7 +56,7 @@ namespace dynarithmic
                 }
             }
             // get underlying vector and search it for the value
-            auto& vData = EnumeratorVector<T>(arrayToUse);
+            auto& vData = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<T>(arrayToUse);
             return std::find(vData.begin(), vData.end(), SupportVal) != vData.end();
         }
         return false;
@@ -92,7 +88,7 @@ namespace dynarithmic
                     DTWAINArrayLL_RAII a2(Array2);
                     if (bRet)
                     {
-                        LONG nSize = EnumeratorFunctionImpl::EnumeratorGetCount(Array2);
+                        LONG nSize = static_cast<LONG>(CTL_TwainDLLHandle::s_ArrayFactory->size(Array2));
                         if (nSize > 0)
                             DTWAIN_RangeGetNearestValue(Source, SupportVal, SupportVal, DTWAIN_ROUNDNEAREST);
                     }
@@ -107,7 +103,7 @@ namespace dynarithmic
     }
 
     template <typename T>
-    int GetSupport(DTWAIN_SOURCE Source, T* lpSupport, LONG Cap)
+    int GetSupport(DTWAIN_SOURCE Source, typename T::value_type* lpSupport, LONG Cap)
     {
         CTL_TwainDLLHandle*pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
         if (lpSupport == NULL)
@@ -122,7 +118,7 @@ namespace dynarithmic
         if ( isSupported )
         {
             // get underlying vector and search it for the value
-            auto& vData = EnumeratorVector<T>(Array);
+            auto& vData = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container<T>(Array);
             if (!vData.empty())
             {
                 *lpSupport = vData.front();

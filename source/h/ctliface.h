@@ -18,15 +18,15 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLIFACE_H_
-#define CTLIFACE_H_
+#ifndef CTLIFACE_H
+#define CTLIFACE_H
 
 #ifdef _MSC_VER
 #pragma warning( disable : 4786)
 #pragma warning (disable : 4786)
 #pragma warning (disable : 4127)
 #endif
-#include <algorithm>
+/*#include <algorithm>
 #include <array>
 #include <bitset>
 #include <cstring>
@@ -41,20 +41,26 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
+#include <cstdlib>
 #include <boost/functional/hash.hpp>
-#include "../tsl/ordered_map.h"
+#include <boost/variant2/variant.hpp>
+
+#include "../tsl/ordered_map.h"*/
 #include "ctltrp.h"
 #include "dtwain_raii.h"
 #include "ocrinterface.h"
 #include "pdffont_basic.h"
 #include "ctlres.h"
 #include "dtwain.h"
+#include "twainframe.h"
 
 #ifdef _WIN32
 #include "winlibraryloader_impl.inl"
 #else
 #include "linuxlibraryloader_impl.inl"
 #endif
+#undef min
+#undef max
 template <typename T>
 struct dtwain_library_loader : library_loader_impl
 {
@@ -92,7 +98,7 @@ namespace dynarithmic
     #define DSM_STATE_NONE      1
     #define DSM_STATE_LOADED    2
     #define DSM_STATE_OPENED    3
-        /* Select source wParam's */
+        // Select source wParam's 
     #define  DTWAIN_SelectSourceFailed                1016
     #define  DTWAIN_AcquireSourceClosed               1017
     #define  DTWAIN_TN_ACQUIRECANCELLED_EX            1200
@@ -291,52 +297,19 @@ namespace dynarithmic
         HMODULE hMod;
         bool  bIsLoaded;
     };
-    #define DTWAINFrameInternalGUID _T("80301C36-4E51-48C3-B2C9-B04E28D5C5FD")
-    struct DTWAINFrameInternal
-    {
-        std::array<double, 4> m_FrameComponent;
-        std::array<TCHAR, sizeof DTWAINFrameInternalGUID / sizeof(TCHAR)> s_id;
-        DTWAINFrameInternal(double left=0, double top=0, double right=0, double bottom=0) : m_FrameComponent{}
-        {
-            m_FrameComponent[DTWAIN_FRAMELEFT] = left;
-            m_FrameComponent[DTWAIN_FRAMETOP] = top;
-            m_FrameComponent[DTWAIN_FRAMERIGHT] = right;
-            m_FrameComponent[DTWAIN_FRAMEBOTTOM] = bottom;
-            std::copy_n(DTWAINFrameInternalGUID, sizeof DTWAINFrameInternalGUID / sizeof(TCHAR), s_id.begin());
-            s_id.back() = _T('\0');
-        }
-    };
 
-    inline bool operator==(const DTWAINFrameInternal& lhs, const DTWAINFrameInternal& rhs)
+    inline bool operator==(const TwainFrameInternal& lhs, const TwainFrameInternal& rhs)
     {
         return lhs.m_FrameComponent == rhs.m_FrameComponent;
     }
 
-    inline bool operator!=(const DTWAINFrameInternal& lhs, const DTWAINFrameInternal& rhs)
+    inline bool operator!=(const TwainFrameInternal& lhs, const TwainFrameInternal& rhs)
     {
         return !(lhs.m_FrameComponent == rhs.m_FrameComponent);
     }
 
     typedef std::vector<ImageModuleDef> CTL_IMAGEDLLINFO;
     typedef std::shared_ptr<CTL_TwainDLLHandle> CTL_TwainDLLHandlePtr;
-
-    enum CTL_EnumeratorType { CTL_EnumeratorPtrType     = 1,
-                                CTL_EnumeratorIntType       = 2,
-                                CTL_EnumeratorDoubleType    = 3,
-                                CTL_EnumeratorHandleType     = 4,
-                                CTL_EnumeratorSourceType    = 5,
-                                CTL_EnumeratorStringType  = 6,
-                                CTL_EnumeratorDTWAINFrameType   = 7,
-                                CTL_EnumeratorLongStringType = 8,
-                                CTL_EnumeratorUnicodeStringType = 9,
-                                CTL_EnumeratorInt64Type   = 10,
-                                CTL_EnumeratorANSIStringType = 11,
-                                CTL_EnumeratorWideStringType = 12,
-                                CTL_EnumeratorTWFIX32Type = 200,
-                                CTL_EnumeratorTWFrameType = 500,
-                                CTL_EnumeratorAnyType     = 1000,
-                                CTL_EnumeratorInvalid     = -1
-    };
 
     template <typename T, int enumType=0>
     struct CTL_EnumeratorNode
@@ -352,50 +325,33 @@ namespace dynarithmic
         enum {ENUMTYPE = enumType};
     };
 
+    /* Fixed point structure type. */
+
     typedef std::string EnumStringTypeA;
     typedef std::wstring EnumStringTypeW;
-
     typedef CTL_ITwainSource* CTL_ITwainSourcePtr;
-    typedef CTL_EnumeratorNode<int, CTL_EnumeratorIntType>                  CTL_Enumerator_int;
-    typedef CTL_EnumeratorNode<LONG64, CTL_EnumeratorInt64Type>             CTL_Enumerator_LONG64;
-    typedef CTL_EnumeratorNode<double, CTL_EnumeratorDoubleType>            CTL_Enumerator_double;
-    typedef CTL_EnumeratorNode<HANDLE, CTL_EnumeratorHandleType>               CTL_Enumerator_HANDLE;
-    typedef CTL_EnumeratorNode<CTL_ITwainSourcePtr, CTL_EnumeratorSourceType> CTL_Enumerator_CTL_ITwainSourcePtr;
-    typedef CTL_EnumeratorNode<LPVOID, CTL_EnumeratorPtrType>               CTL_Enumerator_LPVOID;
-    typedef CTL_EnumeratorNode<CTL_StringType, CTL_EnumeratorStringType>        CTL_Enumerator_CTL_StringType;
-    typedef CTL_EnumeratorNode<EnumStringTypeA, CTL_EnumeratorANSIStringType>        CTL_Enumerator_EnumStringTypeA;
-    typedef CTL_EnumeratorNode<EnumStringTypeW, CTL_EnumeratorWideStringType>        CTL_Enumerator_EnumStringTypeW;
-    typedef CTL_EnumeratorNode<DTWAINFrameInternal, CTL_EnumeratorDTWAINFrameType> CTL_Enumerator_DTWAINFrameInternal;
-    typedef CTL_EnumeratorNode<TW_FRAME, CTL_EnumeratorTWFrameType>         CTL_Enumerator_TW_FRAME;
-    typedef CTL_EnumeratorNode<TW_FIX32, CTL_EnumeratorTWFIX32Type>         CTL_Enumerator_TW_FIX32;
+    
+    typedef std::list<TwainFrameInternal> DTWAINFrameList;
 
-    typedef std::shared_ptr<TW_FIX32> TW_FIX32Ptr;
-
-    //typedef std::list<DTWAINFrameInternalPtr> DTWAINFrameList;
-    typedef std::list<DTWAINFrameInternal> DTWAINFrameList;
-
-    struct CTL_EnumeratorFactory
+    inline bool operator == (const TW_FRAME& lhs, const TW_FRAME& rhs)
     {
-        // Make these lists
-        std::list< CTL_Enumerator_int >         m_EnumeratorList_int;
-        std::list< CTL_Enumerator_LONG64 >      m_EnumeratorList_LONG64;
-        std::list< CTL_Enumerator_double>       m_EnumeratorList_double;
-        std::list< CTL_Enumerator_HANDLE>       m_EnumeratorList_HANDLE;
-        std::list< CTL_Enumerator_CTL_ITwainSourcePtr> m_EnumeratorList_CTL_ITwainSourcePtr;
-        std::list< CTL_Enumerator_LPVOID>       m_EnumeratorList_LPVOID;
-        std::list< CTL_Enumerator_CTL_StringType >  m_EnumeratorList_CTL_StringType;
-        std::list< CTL_Enumerator_EnumStringTypeA >  m_EnumeratorList_EnumStringTypeA;
-        std::list< CTL_Enumerator_EnumStringTypeW>  m_EnumeratorList_EnumStringTypeW;
-        std::list< CTL_Enumerator_DTWAINFrameInternal> m_EnumeratorList_DTWAINFrameInternal;
-        std::list< CTL_Enumerator_TW_FRAME >    m_EnumeratorList_TW_FRAME;
-        std::list< CTL_Enumerator_TW_FIX32 >    m_EnumeratorList_TW_FIX32;
+        return lhs.Bottom.Frac == rhs.Bottom.Frac &&
+            lhs.Bottom.Whole == rhs.Bottom.Whole &&
+            lhs.Left.Frac == rhs.Left.Frac &&
+            lhs.Left.Whole == rhs.Left.Whole &&
+            lhs.Right.Frac == rhs.Right.Frac &&
+            lhs.Right.Whole == rhs.Right.Whole &&
+            lhs.Top.Frac == rhs.Top.Frac &&
+            lhs.Top.Whole == rhs.Top.Whole;
+    }
 
-        // special list for TW_FIX32 individual instances
-        std::list<TW_FIX32Ptr>                    m_AvailableFix32Values;
-        DTWAINFrameList                           m_AvailableFrameValues;
-    };
+    inline bool operator!=(const TW_FRAME& f1, const TW_FRAME& f2)
+    {
+        return !(operator==(f1, f2));
+    }
 
-    typedef std::shared_ptr<CTL_EnumeratorFactory> CTL_EnumeratorFactoryPtr;
+    struct CTL_ArrayFactory;
+    typedef std::shared_ptr<CTL_ArrayFactory> CTL_ArrayFactoryPtr;
 
     class CTL_TwainDynMemoryHandler
     {
@@ -565,6 +521,8 @@ namespace dynarithmic
     class CTL_TwainDLLHandle
     {
         public:
+            static constexpr int NumTwainMapValues = DTWAIN_CONSTANT_LAST;
+
             struct FileFormatNode
             {
                 std::string m_formatName;
@@ -573,8 +531,12 @@ namespace dynarithmic
                                 m_formatName(std::move(name)), m_vExtensions(std::move(vExt)) {}
             };
 
+            typedef tsl::ordered_map<LONG, std::string> CTL_TwainConstantToStringMapNode;
+            typedef std::unordered_map<LONG, CTL_TwainConstantToStringMapNode> CTL_TwainConstantsMap;
             typedef std::unordered_map<LONG, std::pair<std::string, std::string>> CTL_PDFMediaMap;
             typedef tsl::ordered_map<LONG, FileFormatNode> CTL_AvailableFileFormatsMap;
+            typedef std::unordered_map<int32_t, std::string> CTL_ErrorToExtraInfoMap;
+            
             CTL_TwainDLLHandle();
             ~CTL_TwainDLLHandle();
             static void    NotifyWindows( UINT nMsg, WPARAM wParam, LPARAM lParam );
@@ -591,7 +553,7 @@ namespace dynarithmic
 
             static DTWAIN_ACQUIRE     GetNewAcquireNum();
             static void             EraseAcquireNum(DTWAIN_ACQUIRE nNum);
-            static std::string       GetTwainNameFromResource(int nWhichResourceID, int nWhichItem);
+            static std::string      GetTwainNameFromResource(int nWhichResourceID, int nWhichItem);
             static int              GetIDFromTwainName(std::string sName);
             static int              GetDGResourceID()  { return 8890; }
             static int              GetDATResourceID() { return 8891; }
@@ -599,6 +561,8 @@ namespace dynarithmic
             static long             GetErrorFilterFlags() { return s_lErrorFilterFlags; }
             static CTL_PDFMediaMap& GetPDFMediaMap() { return s_PDFMediaMap; }
             static CTL_AvailableFileFormatsMap& GetAvailableFileFormatsMap() { return s_AvailableFileFormatsMap; }
+            static CTL_TwainConstantsMap& GetTwainConstantsMap() { return s_TwainConstantsMap; }
+            static CTL_TwainConstantToStringMapNode& GetTwainConstantsStrings(LONG nWhich) { return s_TwainConstantsMap[nWhich]; }
 
             CTL_TwainAppMgr* m_pAppMgr;
 
@@ -639,6 +603,7 @@ namespace dynarithmic
             CTL_StringType   m_strTWAINPath;     // path to the TWAIN Data Source Manager that is being used
             CTL_StringType   m_strTWAINPath2;   // path to the TWAIN Data Source Manager 2.x that is being used
             CTL_StringType   m_strLibraryPath;   // path to the DTWAIN Library being used
+            CTL_StringType   m_sWindowsVersionInfo; // Windows version information, cached.
             static CTL_StringType   s_strResourcePath;  // path to the DTWAIN resource strings
             HINSTANCE           m_hInstance;
             HWND                m_hWndTwain;
@@ -680,6 +645,7 @@ namespace dynarithmic
             OCREnginePtr          m_pOCRDefaultEngine;
             static CTL_PDFMediaMap s_PDFMediaMap;
             static CTL_AvailableFileFormatsMap s_AvailableFileFormatsMap;
+            static CTL_TwainConstantsMap s_TwainConstantsMap;
             std::set<CTL_TwainTriplet::TwainTripletComponents> m_setLogFilterComponents;
 
             // File Save As information
@@ -709,6 +675,7 @@ namespace dynarithmic
             static bool                     s_bCheckReentrancy;
             static CTL_GeneralCapInfo       s_mapGeneralCapInfo;
             static CTL_GeneralErrorInfo     s_mapGeneralErrorInfo;
+            static CTL_ErrorToExtraInfoMap  s_mapExtraErrorInfo;
             static short int                s_nDSMState;
             static int                      s_nDSMVersion;
             static long                     s_lErrorFilterFlags;
@@ -730,7 +697,7 @@ namespace dynarithmic
             static CTL_CallbackProcArray    s_aAllCallbacks;
             static CTL_LongToStringMap      s_ErrorCodes;
             static CTL_LongToStringMap      s_ResourceStrings;
-            static CTL_EnumeratorFactoryPtr s_EnumeratorFactory;
+            static CTL_ArrayFactoryPtr s_ArrayFactory;
             static bool                     s_UsingCustomResource;
             static bool                     s_DemoInitialized;
             static int                      s_TwainDSMSearchOrder;
@@ -1018,11 +985,7 @@ namespace dynarithmic
 
     struct DTWAINArray_DestroyTraits
     {
-        static void Destroy(DTWAIN_ARRAY a)
-        {
-            if (a)
-                DTWAIN_ArrayDestroy(a);
-        }
+        void operator()(DTWAIN_ARRAY a) { DTWAIN_ArrayDestroy(a); }
     };
 
     struct DTWAINArrayPtr_DestroyTraits
@@ -1032,6 +995,7 @@ namespace dynarithmic
             if (a && *a)
                 DTWAIN_ArrayDestroy(*a);
         }
+        void operator()(DTWAIN_ARRAY* a) { Destroy(a); }
     };
 
     struct DTWAINGlobalHandle_CloseTraits
@@ -1043,6 +1007,7 @@ namespace dynarithmic
                 ImageMemoryHandler::GlobalUnlock(h);
             #endif
         }
+        void operator()(HANDLE h) { Destroy(h); }
     };
 
     struct DTWAINGlobalHandle_ClosePtrTraits
@@ -1054,6 +1019,7 @@ namespace dynarithmic
                 ImageMemoryHandler::GlobalUnlock(*h);
             #endif
         }
+        void operator()(HANDLE* h) { Destroy(h); }
     };
 
     struct DTWAINGlobalHandle_CloseFreeTraits
@@ -1068,26 +1034,24 @@ namespace dynarithmic
             }
             #endif
         }
+        void operator()(HANDLE h) { Destroy(h); }
     };
 
     struct DTWAINFrame_DestroyTraits
     {
-        static void Destroy(DTWAIN_FRAME f)
-        {
-            if (f)
-                DTWAIN_FrameDestroy(f);
-        }
+        void operator()(DTWAIN_FRAME a) { DTWAIN_FrameDestroy(a); }
     };
 
     struct DTWAINGlobalHandle_ReleaseDCTraits
     {
-        static void Destroy(std::pair<HWND, HDC> val)
+        static void Destroy(std::pair<HWND, HDC>& val)
         {
             #ifdef _WIN32
             if (val.second)
                 ReleaseDC(val.first, val.second);
             #endif
         }
+        void operator()(std::pair<HWND, HDC>* val) { Destroy(*val); }
     };
 
     struct DTWAINFileHandle_CloseTraits
@@ -1099,6 +1063,7 @@ namespace dynarithmic
                 CloseHandle(h);
             #endif
         }
+        void operator()(HANDLE h) { Destroy(h); }
     };
 
     struct DTWAINResource_UnlockFreeTraits
@@ -1110,6 +1075,7 @@ namespace dynarithmic
                 FreeResource(h);
             #endif
         }
+        void operator()(HGLOBAL h) { Destroy(h); }
     };
 
     struct DTWAINResource_DeleteObjectTraits
@@ -1121,19 +1087,28 @@ namespace dynarithmic
                 DeleteObject(*h);
 #endif
         }
+        void operator()(HBITMAP* h) { Destroy(h); }
     };
 
+    struct DTWAINArrayLowLevel_DestroyTraits
+    {
+        void Destroy(DTWAIN_ARRAY a);
+        void operator()(DTWAIN_ARRAY a) { Destroy(a); }
+    };
+
+
     // RAII Class for DTWAIN_ARRAY
-    typedef DTWAIN_RAII<DTWAIN_ARRAY, DTWAINArray_DestroyTraits> DTWAINArray_RAII;
-    typedef DTWAIN_RAII<DTWAIN_ARRAY*, DTWAINArrayPtr_DestroyTraits> DTWAINArrayPtr_RAII;
-    typedef DTWAIN_RAII<DTWAIN_FRAME, DTWAINFrame_DestroyTraits> DTWAINFrame_RAII;
-    typedef DTWAIN_RAII<HANDLE, DTWAINGlobalHandle_CloseTraits> DTWAINGlobalHandle_RAII;
-    typedef DTWAIN_RAII<HANDLE*, DTWAINGlobalHandle_ClosePtrTraits> DTWAINGlobalHandlePtr_RAII;
-    typedef DTWAIN_RAII<HANDLE, DTWAINGlobalHandle_CloseFreeTraits> DTWAINGlobalHandleUnlockFree_RAII;
-    typedef DTWAIN_RAII<std::pair<HWND, HDC>, DTWAINGlobalHandle_ReleaseDCTraits> DTWAINDeviceContextRelease_RAII;
-    typedef DTWAIN_RAII<HANDLE, DTWAINFileHandle_CloseTraits> DTWAINFileHandle_RAII;
-    typedef DTWAIN_RAII<HGLOBAL, DTWAINResource_UnlockFreeTraits> DTWAINResourceUnlockFree_RAII;
-    typedef DTWAIN_RAII<HBITMAP*, DTWAINResource_DeleteObjectTraits> DTWAINHBITMAPFree_RAII;
+    using DTWAINDeviceContextRelease_RAII = std::unique_ptr<std::pair<HWND, HDC>, DTWAINGlobalHandle_ReleaseDCTraits>;
+    using DTWAINGlobalHandlePtr_RAII = std::unique_ptr<HANDLE, DTWAINGlobalHandle_ClosePtrTraits>;
+    using DTWAINFileHandle_RAII = std::unique_ptr<void, DTWAINFileHandle_CloseTraits>;
+    using DTWAINResourceUnlockFree_RAII = std::unique_ptr<void, DTWAINResource_UnlockFreeTraits>;
+    using DTWAINHBITMAPFree_RAII = std::unique_ptr<HBITMAP, DTWAINResource_DeleteObjectTraits>;
+    using DTWAINGlobalHandle_RAII = std::unique_ptr<void, DTWAINGlobalHandle_CloseTraits>;
+    using DTWAINArrayPtr_RAII = std::unique_ptr<DTWAIN_ARRAY, DTWAINArrayPtr_DestroyTraits>;
+    using DTWAINGlobalHandleUnlockFree_RAII = std::unique_ptr<void, DTWAINGlobalHandle_CloseFreeTraits>;
+    using DTWAINFrame_RAII = std::unique_ptr<void, DTWAINFrame_DestroyTraits>;
+    using DTWAINArray_RAII = std::unique_ptr<void, DTWAINArray_DestroyTraits>;
+    using DTWAINArrayLL_RAII = std::unique_ptr<void, DTWAINArrayLowLevel_DestroyTraits>;
 
     // RAII Class for turning on/off logging locally
     struct DTWAINScopedLogController

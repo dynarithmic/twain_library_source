@@ -20,8 +20,8 @@
  */
 #include "cppfunc.h"
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
 #include "errorcheck.h"
+#include "arrayfactory.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -69,8 +69,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
 
         if (!Array)
             LOG_FUNC_EXIT_PARAMS(false)
-
-        auto& vValues = EnumeratorVector<LONG>(Array);
+        auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+        auto& vValues = factory->underlying_container_t<LONG>(Array);
         LONG nIndex = 0;
 
         for (i = 0; i < 32; i++)
@@ -110,8 +110,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceNotifications(DTWAIN_SOURCE Source, LPL
     if (!bRet)
         LOG_FUNC_EXIT_PARAMS(false)
 
+    auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+
     *lpDeviceEvents = 0L;
-    auto& vValues = EnumeratorVector<LONG>(Array);
+    auto& vValues = factory->underlying_container_t<LONG>(Array);
     for_each(vValues.begin(), vValues.end(), [&](LONG Value)
     {
         if (Value < 32 && Value > 0L)

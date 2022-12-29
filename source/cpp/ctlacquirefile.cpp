@@ -18,11 +18,12 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include <algorithm>
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
+#include "arrayfactory.h"
 #include "errorcheck.h"
 #include "sourceacquireopts.h"
-#include <algorithm>
+#include "ctlfileutils.h"
 
 #include "cppfunc.h"
 #ifdef _MSC_VER
@@ -52,7 +53,8 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
     if (aFileNames)
     {
         std::vector<LONG> validTypes = {DTWAIN_ARRAYSTRING, DTWAIN_ARRAYANSISTRING, DTWAIN_ARRAYWIDESTRING};
-        const LONG Type = EnumeratorFunctionImpl::GetEnumeratorType(aFileNames);
+        auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+        const LONG Type = factory->tagtype_to_arraytype(factory->tag_type(aFileNames));
         const auto itArrType = std::find(validTypes.begin(), validTypes.end(), Type);
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return itArrType == validTypes.end(); }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
         const auto idx = std::distance(validTypes.begin(), itArrType);
@@ -144,6 +146,29 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
     DumpArrayContents(opts.getFileList(), 0);
     opts.setAcquireType(AcquireType);
     opts.setDiscardDibs(true); // make sure we remove acquired dibs for file handling
+    // set the auto create directory if indicated
+    bool bCreateDir = opts.getFileFlags() & DTWAIN_CREATE_DIRECTORY;
+    pSource->SetFileAutoCreateDirectory(bCreateDir);
+
+    // if the auto-create is not on, let's do a quick test to see if the file can be written to the
+    // directory specified.
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    CTL_StringType filename = opts.getFileName();
+    if (!bCreateDir)
+    {
+        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] 
+                { return !dynarithmic::directory_writeable(filename.c_str()); }, DTWAIN_ERR_INVALID_DIRECTORY, false, FUNC_MACRO);
+    }
+    else
+    {
+        if (!parent_directory_exists(opts.getFileName()).first)
+        {
+            const auto dirCreated = dynarithmic::create_directory(dynarithmic::get_parent_directory(filename.c_str()).c_str());
+            DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]
+                                { return dirCreated.first == false;  }, DTWAIN_ERR_CREATE_DIRECTORY, false, FUNC_MACRO);
+        }
+    }
+
     const DTWAIN_ARRAY aDibs = SourceAcquire(opts);
     if (opts.getStatus() < 0 && !aDibs)
     {
@@ -156,12 +181,14 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
         bRetval = TRUE;
         if (DTWAIN_GetTwainMode() == DTWAIN_MODAL)
         {
-            const auto vDibs = EnumeratorVectorPtr<LPVOID>(aDibs);
-            if (vDibs)
-                for_each(begin(*vDibs), end(*vDibs), EnumeratorFunctionImpl::EnumeratorDestroy);
+            auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+            auto pVariant = aDibs;
+            const auto& vDibs = 
+                factory->underlying_container_t<CTL_ArrayFactory::tagged_array_voidptr*>(pVariant);
+            std::for_each(begin(vDibs), end(vDibs), [&](HANDLE dib) {factory->destroy(dib); });
             pSource->ResetAcquisitionAttempts(nullptr);
-            if (EnumeratorFunctionImpl::EnumeratorIsValid(aDibs))
-                EnumeratorFunctionImpl::EnumeratorDestroy(aDibs);
+            if (factory->is_valid(pVariant))
+                factory->destroy(pVariant);
         }
     }
 

@@ -18,7 +18,7 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "enumeratorfuncs.h"
+#include "arrayfactory.h"
 #include "ctltmpl5.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)

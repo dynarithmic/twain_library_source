@@ -20,6 +20,7 @@
  */
 #include "ctltr032.h"
 #include "ctltwmgr.h"
+#include "twainfix32.h"
 
 using namespace dynarithmic;
 CTL_ImageLayoutTriplet::CTL_ImageLayoutTriplet(CTL_ITwainSession *pSession,
@@ -50,25 +51,25 @@ CTL_ImageLayoutTriplet::CTL_ImageLayoutTriplet(CTL_ITwainSession *pSession,
 
 double CTL_ImageLayoutTriplet::GetLeft() const
 {
-    return CTL_CapabilityTriplet::Twain32ToFloat(m_ImageLayout.Frame.Left);
+    return Fix32ToFloat(m_ImageLayout.Frame.Left);
 }
 
 
 double CTL_ImageLayoutTriplet::GetRight() const
 {
-    return CTL_CapabilityTriplet::Twain32ToFloat(m_ImageLayout.Frame.Right);
+    return Fix32ToFloat(m_ImageLayout.Frame.Right);
 }
 
 
 double CTL_ImageLayoutTriplet::GetTop() const
 {
-    return CTL_CapabilityTriplet::Twain32ToFloat(m_ImageLayout.Frame.Top );
+    return Fix32ToFloat(m_ImageLayout.Frame.Top );
 }
 
 
 double CTL_ImageLayoutTriplet::GetBottom() const
 {
-    return CTL_CapabilityTriplet::Twain32ToFloat(m_ImageLayout.Frame.Bottom);
+    return Fix32ToFloat(m_ImageLayout.Frame.Bottom);
 }
 
 
@@ -102,10 +103,10 @@ CTL_ImageSetLayoutTriplet::CTL_ImageSetLayoutTriplet(
 CTL_ImageLayoutTriplet( pSession, pSource, SetType )
 {
     TW_IMAGELAYOUT *pLayout = GetImageLayout();
-    CTL_CapabilityTriplet::FloatToTwain32(static_cast<float>(rArray[0]), pLayout->Frame.Left   );
-    CTL_CapabilityTriplet::FloatToTwain32(static_cast<float>(rArray[1]), pLayout->Frame.Top    );
-    CTL_CapabilityTriplet::FloatToTwain32(static_cast<float>(rArray[2]), pLayout->Frame.Right  );
-    CTL_CapabilityTriplet::FloatToTwain32(static_cast<float>(rArray[3]), pLayout->Frame.Bottom );
+    pLayout->Frame.Left = FloatToFix32(static_cast<float>(rArray[0]));
+    pLayout->Frame.Top =  FloatToFix32(static_cast<float>(rArray[1]));
+    pLayout->Frame.Right = FloatToFix32(static_cast<float>(rArray[2]));
+    pLayout->Frame.Bottom = FloatToFix32(static_cast<float>(rArray[3]));
     pLayout->DocumentNumber = static_cast<TW_UINT32>(-1);
     pLayout->PageNumber = static_cast<TW_UINT32>(-1);
     pLayout->FrameNumber = static_cast<TW_UINT32>(-1);

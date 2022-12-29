@@ -18,8 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLArray_h_
-#define CTLArray_h_
+#ifndef CTLARRAY_H
+#define CTLARRAY_H
 
 #include <vector>
 #include "dtwtype.h"

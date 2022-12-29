@@ -285,7 +285,7 @@ bool dynarithmic::GetCapInfoFromIni(const std::string& strCapName,
                     if ( nNum >= 4 && nNum <= 7 )
                     {
                         bFoundNum = true;
-                        tempInfo |= 1 << nNum-1;
+                        tempInfo |= (1 << (nNum-1));
                     }
                 }
             }

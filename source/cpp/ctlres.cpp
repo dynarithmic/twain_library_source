@@ -155,6 +155,8 @@ namespace dynarithmic
             StringStreamInA strm(line);
             LONG fileType;
             strm >> fileType;
+            if ( fileType == -1 )
+                break;
             std::string name;
             strm >> name;
             name = StringWrapperA::TrimAll(name);
@@ -165,6 +167,26 @@ namespace dynarithmic
             availableFileMap.insert({ fileType, {name,vExt} });
         }
 
+        // Read in the TWAIN constants
+        auto& constantsMap = CTL_TwainDLLHandle::GetTwainConstantsMap();
+        for ( int constantVal = 0; constantVal < CTL_TwainDLLHandle::NumTwainMapValues; ++constantVal)
+        { 
+            // Read in the pixel type constants
+            std::string twainString;
+            auto iter = constantsMap.insert({constantVal, {}}).first;
+            while (std::getline(ifs, line))
+            {
+                StringStreamInA strm(line);
+                LONG twainValue;
+                strm >> twainValue;
+                if (twainValue == -9999)
+                    break;
+                std::string name;
+                strm >> name;
+                name = StringWrapperA::TrimAll(name);
+                iter->second.insert({twainValue, name});
+            }
+        }
         LOG_FUNC_EXIT_PARAMS(true)
         CATCH_BLOCK(false)
     }
@@ -191,7 +213,7 @@ namespace dynarithmic
         return 0;
     }
 
-    static bool LoadLanguageResourceFromFileA(const std::string& sPath)
+    static bool LoadLanguageResourceFromFileA(const std::string& sPath, bool clearEntry)
     {
         std::string::value_type sVersion[100];
         DTWAIN_GetShortVersionStringA(sVersion, 100);
@@ -201,7 +223,8 @@ namespace dynarithmic
         {
             std::string descr;
             int resourceID;
-            CTL_TwainDLLHandle::s_ResourceStrings.clear();
+            if ( clearEntry )
+                CTL_TwainDLLHandle::s_ResourceStrings.clear();
             open = true;
             std::string line;
             while (getline(ifs, line))
@@ -221,11 +244,11 @@ namespace dynarithmic
         return open;
     }
 
-    std::string GetResourceFileNameA(LPCSTR lpszName)
+    std::string GetResourceFileNameA(LPCSTR lpszName, LPCTSTR szPrefix)
     {
-        const auto resPath = createResourceFileName(DTWAINLANGRESOURCEFILE);
+        const auto resPath = createResourceFileName(szPrefix);
         const std::string sPathA = StringConversion::Convert_Native_To_Ansi(resPath);
-        return sPathA + lpszName + ".txt";
+        return sPathA + lpszName + (std::string)".txt";
     }
 
     bool LoadLanguageResourceA(LPCSTR lpszName, const CTL_ResourceRegistryMap& registryMap)
@@ -245,7 +268,8 @@ namespace dynarithmic
     bool LoadLanguageResourceA(LPCSTR lpszName)
     {
         LOG_FUNC_ENTRY_PARAMS((lpszName))
-        const bool bReturn = LoadLanguageResourceFromFileA(GetResourceFileNameA(lpszName));
+        bool bReturn = LoadLanguageResourceFromFileA(GetResourceFileNameA(lpszName, DTWAINLANGRESOURCEFILE), true);
+        LoadLanguageResourceFromFileA(GetResourceFileNameA(lpszName, DTWAINCUSTOMERRORFILE), false);
         LOG_FUNC_EXIT_PARAMS(bReturn)
         CATCH_BLOCK(false)
     }
@@ -300,3 +324,5 @@ namespace dynarithmic
         return 1L << rc & m_nTWRCCodes?true:false;
     }
 }
+
+

@@ -23,7 +23,7 @@
 
 #include "cppfunc.h"
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
+#include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctlsupport.h"
 
@@ -53,7 +53,7 @@ static LONG EnumCapInternal(DTWAIN_SOURCE Source,
         (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK) ? (ParamOutputter((#argVals)).outputParam argVals.getString()) : ("")
 
 template <typename CapArrayType>
-static bool GetCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, CapArrayType value,
+static bool GetCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, typename CapArrayType::value_type* value,
                                  GetCapValuesFn /*capFn*/, const std::string& func, const std::string& paramLog)
 {
     DTWAIN_ARRAY ArrayValues = nullptr;
@@ -61,7 +61,7 @@ static bool GetCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, CapArrayType valu
     DTWAINArrayLL_RAII arr(ArrayValues);
     if (retVal > 0)
     {
-        auto& vOut = EnumeratorVector<std::remove_pointer_t<CapArrayType>>(ArrayValues);
+        auto& vOut = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<typename CapArrayType::value_type>(ArrayValues);
         *value = vOut[0];
         return true;
     }
@@ -249,7 +249,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
     if (retVal > 0)
     {
         std::string sVal;
-        EnumeratorFunctionImpl::EnumeratorGetAt(ArrayValues, 0, &sVal);
+        CTL_TwainDLLHandle::s_ArrayFactory->get_value(ArrayValues, 0, &sVal);
         StringWrapperA::CopyInfoToCString(sVal, value, nLen);
         return true;
     }
@@ -307,13 +307,13 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
     EXPORT_SET_CAP_VALUE_2(FuncName, Cap1, Cap2, DTWAIN_FLOAT, DTWAIN_FLOAT, SetSupportFn1<DTWAIN_FLOAT>)
 
 #define EXPORT_GET_CAP_VALUE(FuncName, Cap, CapDataType, CapFn) \
-    DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, CapDataType value)\
+    DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, CapDataType::value_type* value)\
     {\
         return GetCapability<CapDataType>(Source, Cap, value, CapFn, __FUNCTION__, GENERATE_PARAM_LOG((Source, value))); \
     }
 
 #define EXPORT_GET_CAP_VALUE_OPT_CURRENT(FuncName, Cap, CapDataType) \
-    DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, CapDataType value, DTWAIN_BOOL bCurrent)\
+    DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, CapDataType::value_type* value, DTWAIN_BOOL bCurrent)\
     {\
         std::string sLog = GENERATE_PARAM_LOG((Source, value, bCurrent));\
         std::string func = __FUNCTION__;\
@@ -350,9 +350,9 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
     return  SetCapabilityByString(fn, __FUNCTION__, GENERATE_PARAM_LOG((Source, value, condition)));\
 }
 
-#define EXPORT_GET_CAP_VALUE_D(FuncName, Cap) EXPORT_GET_CAP_VALUE(FuncName, Cap, LPDTWAIN_FLOAT, GetCurrentCapValues)
-#define EXPORT_GET_CAP_VALUE_I(FuncName, Cap) EXPORT_GET_CAP_VALUE(FuncName, Cap, LPLONG, GetCurrentCapValues)
-#define EXPORT_GET_CAP_VALUE_A(FuncName, Cap) EXPORT_GET_CAP_VALUE(FuncName, Cap, LPDTWAIN_ARRAY, GetCurrentCapValues)
+#define EXPORT_GET_CAP_VALUE_D(FuncName, Cap) EXPORT_GET_CAP_VALUE(FuncName, Cap, CTL_ArrayFactory::tagged_array_double, GetCurrentCapValues)
+#define EXPORT_GET_CAP_VALUE_I(FuncName, Cap) EXPORT_GET_CAP_VALUE(FuncName, Cap, CTL_ArrayFactory::tagged_array_long, GetCurrentCapValues)
+#define EXPORT_GET_CAP_VALUE_A(FuncName, Cap) EXPORT_GET_CAP_VALUE(FuncName, Cap, CTL_ArrayFactory::tagged_array_voidptr, GetCurrentCapValues)
 #define EXPORT_GET_CAP_VALUE_S(FuncName, Cap, NumChars) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, LPTSTR value)\
     {\
@@ -375,8 +375,8 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
         return retVal;\
     }
 
-#define EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(FuncName, Cap) EXPORT_GET_CAP_VALUE_OPT_CURRENT(FuncName, Cap, LPLONG)
-#define EXPORT_GET_CAP_VALUE_OPT_CURRENT_D(FuncName, Cap) EXPORT_GET_CAP_VALUE_OPT_CURRENT(FuncName, Cap, LPDTWAIN_FLOAT)
+#define EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(FuncName, Cap) EXPORT_GET_CAP_VALUE_OPT_CURRENT(FuncName, Cap, CTL_ArrayFactory::tagged_array_long)
+#define EXPORT_GET_CAP_VALUE_OPT_CURRENT_D(FuncName, Cap) EXPORT_GET_CAP_VALUE_OPT_CURRENT(FuncName, Cap, CTL_ArrayFactory::tagged_array_double)
 #define EXPORT_GET_CAP_VALUE_OPT_CURRENT_S(FuncName, Cap, NumChars) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, LPTSTR value, DTWAIN_LONG GetType)\
     {\
@@ -413,7 +413,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
 
 #define EXPORT_IS_CAP_SUPPORTED_I_1(FuncName, Cap) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source)\
-    { return IsSupportedImpl(Source, Cap, true, 0, __FUNCTION__, GENERATE_PARAM_LOG((Source)))?TRUE:FALSE; }
+    { return IsSupportedImpl(Source, Cap, true, 0L, __FUNCTION__, GENERATE_PARAM_LOG((Source)))?TRUE:FALSE; }
 
 #define EXPORT_IS_CAP_ENABLED(FuncName, Cap) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source)\
@@ -447,6 +447,27 @@ EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsRotationSupported, DTWAIN_CV_ICAPROTATION)
 EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsThumbnailSupported, DTWAIN_CV_CAPTHUMBNAILSENABLED)
 EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsUIOnlySupported, DTWAIN_CV_CAPENABLEDSUIONLY)
 EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsAutomaticSenseMediumSupported, DTWAIN_CV_CAPAUTOMATICSENSEMEDIUM)
+EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsImageAddressingSupported, DTWAIN_CV_CAPIMAGEADDRESSENABLED)
+EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsIAFieldALevelSupported, DTWAIN_CV_CAPIAFIELDA_LEVEL)
+EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsIAFieldBLevelSupported, DTWAIN_CV_CAPIAFIELDB_LEVEL)
+EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsIAFieldCLevelSupported, DTWAIN_CV_CAPIAFIELDC_LEVEL)
+EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsIAFieldDLevelSupported, DTWAIN_CV_CAPIAFIELDD_LEVEL)
+EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsIAFieldELevelSupported, DTWAIN_CV_CAPIAFIELDE_LEVEL)
+EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsIAFieldAPrintFormatSupported, DTWAIN_CV_CAPIAFIELDA_PRINTFORMAT)
+EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsIAFieldBPrintFormatSupported, DTWAIN_CV_CAPIAFIELDB_PRINTFORMAT)
+EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsIAFieldCPrintFormatSupported, DTWAIN_CV_CAPIAFIELDC_PRINTFORMAT)
+EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsIAFieldDPrintFormatSupported, DTWAIN_CV_CAPIAFIELDD_PRINTFORMAT)
+EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsIAFieldEPrintFormatSupported, DTWAIN_CV_CAPIAFIELDE_PRINTFORMAT)
+EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsIAFieldAValueSupported, DTWAIN_CV_CAPIAFIELDA_VALUE)
+EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsIAFieldBValueSupported, DTWAIN_CV_CAPIAFIELDB_VALUE)
+EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsIAFieldCValueSupported, DTWAIN_CV_CAPIAFIELDC_VALUE)
+EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsIAFieldDValueSupported, DTWAIN_CV_CAPIAFIELDD_VALUE)
+EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsIAFieldEValueSupported, DTWAIN_CV_CAPIAFIELDE_VALUE)
+EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsIAFieldALastPageSupported, DTWAIN_CV_CAPIAFIELDA_LASTPAGE)
+EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsIAFieldBLastPageSupported, DTWAIN_CV_CAPIAFIELDB_LASTPAGE)
+EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsIAFieldCLastPageSupported, DTWAIN_CV_CAPIAFIELDC_LASTPAGE)
+EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsIAFieldDLastPageSupported, DTWAIN_CV_CAPIAFIELDD_LASTPAGE)
+EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsIAFieldELastPageSupported, DTWAIN_CV_CAPIAFIELDE_LASTPAGE)
 
 EXPORT_IS_CAP_ENABLED(DTWAIN_IsAutoBorderDetectEnabled, DTWAIN_CV_ICAPAUTOMATICBORDERDETECTION)
 EXPORT_IS_CAP_ENABLED(DTWAIN_IsAutoBrightEnabled, DTWAIN_CV_ICAPAUTOBRIGHT)
@@ -618,6 +639,8 @@ EXPORT_ENUM_CAP_VALUES_NOEXPAND(DTWAIN_EnumTwainPrintersArray, DTWAIN_CV_CAPPRIN
 EXPORT_ENUM_CAP_VALUES(DTWAIN_EnumHighlightValues, DTWAIN_CV_ICAPHIGHLIGHT)
 EXPORT_ENUM_CAP_VALUES(DTWAIN_EnumMaxBuffers, DTWAIN_CV_CAPMAXBATCHBUFFERS)
 EXPORT_ENUM_CAP_VALUES(DTWAIN_EnumResolutionValues, DTWAIN_CV_ICAPXRESOLUTION)
+EXPORT_ENUM_CAP_VALUES(DTWAIN_EnumXResolutionValues, DTWAIN_CV_ICAPXRESOLUTION)
+EXPORT_ENUM_CAP_VALUES(DTWAIN_EnumYResolutionValues, DTWAIN_CV_ICAPYRESOLUTION)
 EXPORT_ENUM_CAP_VALUES(DTWAIN_EnumShadowValues, DTWAIN_CV_ICAPSHADOW)
 EXPORT_ENUM_CAP_VALUES(DTWAIN_EnumThresholdValues, DTWAIN_CV_ICAPTHRESHOLD)
 
@@ -664,6 +687,8 @@ EXPORT_ENUM_CAP_VALUES_NOEXPAND_EX(DTWAIN_EnumTwainPrintersArrayEx, DTWAIN_CV_CA
 EXPORT_ENUM_CAP_VALUES_EX(DTWAIN_EnumHighlightValuesEx, DTWAIN_CV_ICAPHIGHLIGHT)
 EXPORT_ENUM_CAP_VALUES_EX(DTWAIN_EnumMaxBuffersEx, DTWAIN_CV_CAPMAXBATCHBUFFERS)
 EXPORT_ENUM_CAP_VALUES_EX(DTWAIN_EnumResolutionValuesEx, DTWAIN_CV_ICAPXRESOLUTION)
+EXPORT_ENUM_CAP_VALUES_EX(DTWAIN_EnumXResolutionValuesEx, DTWAIN_CV_ICAPXRESOLUTION)
+EXPORT_ENUM_CAP_VALUES_EX(DTWAIN_EnumYResolutionValuesEx, DTWAIN_CV_ICAPYRESOLUTION)
 EXPORT_ENUM_CAP_VALUES_EX(DTWAIN_EnumShadowValuesEx, DTWAIN_CV_ICAPSHADOW)
 EXPORT_ENUM_CAP_VALUES_EX(DTWAIN_EnumThresholdValuesEx, DTWAIN_CV_ICAPTHRESHOLD)
 
@@ -735,13 +760,13 @@ static bool GetDoubleCap( DTWAIN_SOURCE Source, LONG lCap, double *pValue )
     DTWAIN_ARRAY Array = nullptr;
     bool bRet = DTWAIN_GetCapValues(Source, lCap, DTWAIN_CAPGETCURRENT, &Array) ? true : false;
     DTWAINArrayLL_RAII arr(Array);
-    auto vIn = EnumeratorVectorPtr<double>(Array);
+    const auto& vIn = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<double>(Array);
     if ( bRet && Array )
     {
-        if ( vIn->empty() )
+        if ( vIn.empty() )
             bRet = false;
         else
-            *pRealValue = (*vIn)[0];
+            *pRealValue = vIn[0];
     }
     return bRet;
 }
@@ -783,32 +808,21 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
                 {
                     if (bExpandRange)
                     {
-                        if (pArray)
-                        {
-                            // we need to expand to a temporary
-                            DTWAIN_ARRAY tempArray = nullptr;
+                        // we need to expand to a temporary
+                        DTWAIN_ARRAY tempArray = nullptr;
 
-                            // throw this away when done
-                            DTWAINArrayPtr_RAII aTemp(&tempArray);
+                        // throw this away when done
+                        DTWAINArrayPtr_RAII aTemp(&tempArray);
 
-                            // expand the range into a temp array
-                            DTWAIN_RangeExpand(pArray, &tempArray);
+                        // expand the range into a temp array
+                        DTWAIN_RangeExpand(*arrayToUse, &tempArray);
 
-                            // destroy original and copy new values
-                            EnumeratorFunctionImpl::EnumeratorDestroy(*pArray);
-                            *pArray = DTWAIN_ArrayCreateCopy(tempArray);
+                        // destroy original and copy new values
+                        CTL_TwainDLLHandle::s_ArrayFactory->destroy(*arrayToUse);
+                        *arrayToUse = DTWAIN_ArrayCreateCopy(tempArray);
 
-                            // get the count
-                            nValues = DTWAIN_ArrayGetCount(*pArray);
-                        }
-                        else
-                        {
-                            // there was no original array
-                            DTWAIN_ARRAY TempVals;
-                            DTWAIN_RangeExpand(OrigVals, &TempVals);
-                            DTWAINArrayLL_RAII arr(TempVals);
-                            nValues = DTWAIN_ArrayGetCount(TempVals);
-                        }
+                        // get the count
+                        nValues = DTWAIN_ArrayGetCount(*arrayToUse);
                     }
                     else
                     {

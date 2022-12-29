@@ -26,7 +26,7 @@ using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////
 /// Classes that do the TWAIN triplet protocol
 
-CTL_TwainTriplet::CTL_TwainTriplet() : m_TwainTripletArg({nullptr, nullptr, {0,0,0}, nullptr}),
+CTL_TwainTriplet::CTL_TwainTriplet() : m_TwainTripletArg({ {}, {}, {{},{},{}}, {}}),
                                        m_bInit(false),
                                        m_bAlive(false),
                                        m_pSource(nullptr),

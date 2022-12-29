@@ -200,8 +200,6 @@ LONG DLLENTRY_DEF DTWAIN_GetDSMFullNameA(LONG DSMType, LPSTR szDLLName, LONG nMa
 LONG DLLENTRY_DEF DTWAIN_GetDSMFullNameW(LONG DSMType, LPWSTR szDLLName, LONG nMaxLen, LPLONG pWhichSearch);
 LONG DLLENTRY_DEF DTWAIN_GetErrorStringA(LONG lError, LPSTR lpszBuffer, LONG nLength);
 LONG DLLENTRY_DEF DTWAIN_GetErrorStringW(LONG lError, LPWSTR lpszBuffer, LONG nLength);
-LONG DLLENTRY_DEF DTWAIN_GetConditionCodeA(LONG lError, LPSTR lpszBuffer, LONG nLength);
-LONG DLLENTRY_DEF DTWAIN_GetConditionCodeW(LONG lError, LPWSTR lpszBuffer, LONG nLength);
 LONG DLLENTRY_DEF DTWAIN_GetExtCapFromNameA(LPCSTR szName);
 LONG DLLENTRY_DEF DTWAIN_GetExtCapFromNameW(LPCWSTR szName);
 LONG DLLENTRY_DEF DTWAIN_GetExtNameFromCapA(LONG nValue, LPSTR szValue, LONG nLength);
@@ -250,7 +248,12 @@ LONG DLLENTRY_DEF DTWAIN_GetFileTypeNameA(LONG nType, LPSTR lpszName, LONG nLeng
 LONG DLLENTRY_DEF DTWAIN_GetFileTypeNameW(LONG nType, LPWSTR lpszName, LONG nLength);
 LONG DLLENTRY_DEF DTWAIN_GetFileTypeExtensionsA(LONG nType, LPSTR lpszName, LONG nLength);
 LONG DLLENTRY_DEF DTWAIN_GetFileTypeExtensionsW(LONG nType, LPWSTR lpszName, LONG nLength);
-
+LONG DLLENTRY_DEF DTWAIN_GetPaperSizeNameA(LONG paperNumber, LPSTR outName, LONG nSize);
+LONG DLLENTRY_DEF DTWAIN_GetPaperSizeNameW(LONG paperNumber, LPWSTR outName, LONG nSize);
+LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstantA(LONG lConstantType, LONG lTwainConstant, LPSTR lpszOut, LONG nSize);
+LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstantW(LONG lConstantType, LONG lTwainConstant, LPWSTR lpszOut, LONG nSize);
+LONG DLLENTRY_DEF DTWAIN_GetWindowsVersionInfoA(LPSTR lpszBuffer, LONG nMaxLen);
+LONG DLLENTRY_DEF DTWAIN_GetWindowsVersionInfoW(LPWSTR lpszBuffer, LONG nMaxLen);
 
 LONG DLLENTRY_DEF DTWAIN_IsDIBBlankStringA(HANDLE hDib, LPCSTR threshold);
 LONG DLLENTRY_DEF DTWAIN_IsDIBBlankStringW(HANDLE hDib, LPCWSTR threshold);
@@ -449,5 +452,9 @@ LONG        DLLENTRY_DEF DTWAIN_GetOCRErrorString(DTWAIN_OCRENGINE Engine, LONG 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementString(DTWAIN_PDFTEXTELEMENT TextElement, DTWAIN_CCHARPTRTYPE val1, LONG Flags);
 LONG        DLLENTRY_DEF DTWAIN_GetFileTypeName(LONG nType, DTWAIN_CHARPTRTYPE lpszName, LONG nLength);
 LONG        DLLENTRY_DEF DTWAIN_GetFileTypeExtensions(LONG nType, DTWAIN_CHARPTRTYPE lpszName, LONG nLength);
+LONG        DLLENTRY_DEF DTWAIN_GetPaperSizeName(LONG paperNumber, DTWAIN_CHARPTRTYPE outName, LONG nSize);
+LONG        DLLENTRY_DEF DTWAIN_GetPaperSizeName(LONG paperNumber, DTWAIN_CHARPTRTYPE outName, LONG nSize);
+LONG        DLLENTRY_DEF DTWAIN_GetTwainNameFromConstant(LONG lConstantType, LONG lTwainConstant, DTWAIN_CHARPTRTYPE lpszOut, LONG nSize);
+LONG        DLLENTRY_DEF DTWAIN_GetWindowsVersionInfo(DTWAIN_CHARPTRTYPE lpszBuffer, LONG nMaxLen);
 
 #endif

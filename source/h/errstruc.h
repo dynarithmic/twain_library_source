@@ -18,8 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef ERRSTRUC_H_
-#define ERRSTRUC_H_
+#ifndef ERRSTRUC_H
+#define ERRSTRUC_H
 
 #include <tuple>
 #include <unordered_map>

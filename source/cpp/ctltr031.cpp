@@ -150,6 +150,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
     const ImageXferFileWriter FileWriter(this, pSession, pSource);
 
     // Loop until strips have been transferred
+    int errfile = 0;
     do
     {
         // Call base function
@@ -191,7 +192,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                                CTL_TwainAppMgr::WriteLogInfoA(szBuf);
                                CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                                      nullptr, DTWAIN_TN_TRANSFERSTRIPFAILED,
-                                                                     reinterpret_cast<LPARAM>(GetSourcePtr()));
+                                                                     reinterpret_cast<LPARAM>(pSource));
                             }
                             else
                             {
@@ -295,7 +296,6 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                 const bool bExecuteEOJPageHandling = bEndOfJobDetected && pSource->IsJobFileHandlingOn();
 
                 // Get the image page
-                int errfile = 0;
                 bool bInClip = false;
 
 
@@ -441,7 +441,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                             if ( bIsMultiPageFile || pSource->IsMultiPageModeSaveAtEnd())
                             {
                                 // This is the fist page of the acquisition
-                                if (nLastDib == 0 || pSource->IsNewJob() && pSource->IsJobFileHandlingOn())
+                                if (nLastDib == 0 || (pSource->IsNewJob() && pSource->IsJobFileHandlingOn()))
                                     nMultiStage = DIB_MULTI_FIRST;
                                 else
                                 // This is a subsequent page of the acquisition
@@ -450,12 +450,12 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                                 // Now check if this we are in manual duplex mode
                                 if ( pSource->IsManualDuplexModeOn() ||
                                      pSource->IsMultiPageModeContinuous() ||
-                               pSource->IsMultiPageModeSaveAtEnd() && !bIsMultiPageFile)
+                               (pSource->IsMultiPageModeSaveAtEnd() && !bIsMultiPageFile))
                                 {
                                     // We need to copy the data to a file and store info in
                                     // vector of the source
                                 if ( !bEndOfJobDetected || // Not end -of-job
-                                    bExecuteEOJPageHandling && !m_bJobControlPageRecorded // write job control page
+                                    (bExecuteEOJPageHandling && !m_bJobControlPageRecorded) // write job control page
                                     )
                                     errfile = FileWriter.CopyDuplexDibToFile(CurDib, bExecuteEOJPageHandling);
 
@@ -499,7 +499,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                    CTL_TwainAppMgr::WriteLogInfoA(szBuf);
                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                          nullptr, DTWAIN_TN_INVALIDIMAGEFORMAT,
-                                                      reinterpret_cast<LPARAM>(GetSourcePtr()));
+                                                         reinterpret_cast<LPARAM>(pSource));
                 }
 
             }
@@ -546,7 +546,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
         bForceClose = false;
     else
         bForceClose = true;
-    AbortTransfer(bForceClose);
+    AbortTransfer(bForceClose, errfile);
     return rc;
 }
 

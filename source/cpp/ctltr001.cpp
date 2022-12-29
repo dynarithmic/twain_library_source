@@ -26,7 +26,7 @@ using namespace dynarithmic;
 CTL_SourceTriplet::CTL_SourceTriplet(CTL_ITwainSession *pSession,
                                      LPCTSTR pProduct,
                                      TW_UINT16 nMsg)
-                                     :  CTL_TwainTriplet()
+                                     :  CTL_TwainTriplet(), m_bSourceCreated(false)
 {
     SetSessionPtr( nullptr );
     SetSourcePtr(  nullptr );

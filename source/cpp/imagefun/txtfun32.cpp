@@ -179,7 +179,7 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
 int CTextImageHandler::WriteTempFile()
 {
     m_pTextPageInfo->m_pOrigHandler->SetDib(m_pDib);
-    const int retval = m_pTextPageInfo->m_pOrigHandler->WriteBitmap(m_pTextPageInfo->szTempFile.c_str(), true, 0, 0);
+    const int retval = m_pTextPageInfo->m_pOrigHandler->WriteBitmap(m_pTextPageInfo->szTempFile.c_str(), true, 0);
     return retval;
 }
 

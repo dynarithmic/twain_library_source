@@ -18,14 +18,14 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLTMPL5_H_
-#define CTLTMPL5_H_
+#ifndef CTLTMPL5_H
+#define CTLTMPL5_H
 
 #include <utility>
 #include <vector>
 #include <algorithm>
 #include <memory>
-#include "enumeratorfuncs.h"
+#include "arrayfactory.h"
 #include "ctltr013.h"
 #include "ctltr014.h"
 #include "ctltr016.h"
@@ -33,6 +33,7 @@
 #include "ctltr018.h"
 #include "ctltr019.h"
 #include "ctltr020.h"
+#include "ctliface.h"
 #define USE_NORMALSTRINGS  1
 #define USE_LONGSTRINGS    2
 #define USE_UNICODESTRINGS 4
@@ -332,13 +333,21 @@ namespace dynarithmic
         }
     };
 
+    struct VectorAdderFn3
+    {
+        static void AdderFn(std::vector<std::string>* ptr, const std::string& data)
+        {
+            ptr->push_back(data);
+        }
+    };
+
     template <class TwainType, class AssignType, class EnumeratorType, class Adder>
     struct GetMultiCapValuesImpl
     {
         static bool GetMultiCapValues( DTWAIN_HANDLE DLLHandle,
                                       DTWAIN_SOURCE Source,
                                       DTWAIN_ARRAY pArray,
-                                      CTL_EnumeratorType EnumType,
+                                      CTL_ArrayType EnumType,
                                       TW_UINT16 nCap,
                                       CTL_EnumGetType GetType,
                                       AssignType,
@@ -356,7 +365,8 @@ namespace dynarithmic
                 return false;
 
             // Check if array is of the correct type
-            if ( !EnumeratorFunctionImpl::EnumeratorIsValidEx(pArray, EnumType ) )
+            const auto actualEnumType = CTL_TwainDLLHandle::s_ArrayFactory->arraytype_to_tagtype(EnumType);
+            if ( !CTL_TwainDLLHandle::s_ArrayFactory->is_valid(pArray, actualEnumType ) )
                 return false;
             std::vector<TwainType> Array;
 
@@ -387,15 +397,15 @@ namespace dynarithmic
             LONG StringType=0;
             switch (EnumType)
             {
-                case CTL_EnumeratorStringType:
+                case CTL_ArrayStringType:
                     StringType = USE_NORMALSTRINGS;
                     break;
 
-                case CTL_EnumeratorLongStringType:
+                case CTL_ArrayLongStringType:
                     StringType = USE_LONGSTRINGS;
                     break;
 
-                case CTL_EnumeratorUnicodeStringType:
+                case CTL_ArrayUnicodeStringType:
                     StringType = USE_UNICODESTRINGS;
                     break;
                 default:
@@ -420,9 +430,11 @@ namespace dynarithmic
 
             // Populate the array
             const size_t nSize = Array.size();
-            auto  pVector = EnumeratorVectorPtr<AssignType>(pArray);
-            for ( i = 0; i < nSize; i++)
-                Adder::AdderFn(pVector, Array[i]);
+            auto&  pVector = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<AssignType>(pArray);
+            pVector.clear();
+            std::copy(Array.begin(), Array.end(), std::back_inserter(pVector));
+/*            for ( i = 0; i < nSize; i++)
+                Adder::AdderFn(&pVector, Array[i]);*/
             return true;
         }
 
@@ -432,7 +444,7 @@ namespace dynarithmic
     bool GetMultiCapValues( DTWAIN_HANDLE DLLHandle,
                            DTWAIN_SOURCE Source,
                            EnumeratorType *pArray,
-                           CTL_EnumeratorType EnumType,
+                           CTL_ArrayType EnumType,
                            TW_UINT16 nCap,
                            CTL_EnumGetType GetType,
                            AssignType CValue,
@@ -452,7 +464,7 @@ namespace dynarithmic
     bool GetMultiCapValues_String( DTWAIN_HANDLE DLLHandle,
                           DTWAIN_SOURCE Source,
                           DTWAIN_ARRAY pArray,
-                          CTL_EnumeratorType EnumType,
+                          CTL_ArrayType EnumType,
                           TW_UINT16 nCap,
                           CTL_EnumGetType GetType,
                           CTL_StringType cStr,
@@ -492,7 +504,7 @@ namespace dynarithmic
     bool SetMultiCapValuesImpl( DTWAIN_HANDLE DLLHandle,
                            DTWAIN_SOURCE Source,
                            DTWAIN_ARRAY pArray,
-                           CTL_EnumeratorType EnumType,
+                           CTL_ArrayType EnumType,
                            UINT nCap,
                            CTL_EnumSetType SetType,
                            OriginalType TValue,
@@ -569,7 +581,7 @@ namespace dynarithmic
     bool SetMultiCapValues( DTWAIN_HANDLE DLLHandle,
                           DTWAIN_SOURCE Source,
                           DTWAIN_ARRAY pArray,
-                          CTL_EnumeratorType EnumType,
+                          CTL_ArrayType EnumType,
                           UINT nCap,
                           CTL_EnumSetType SetType,
                           UINT nContainerVal,
@@ -581,7 +593,7 @@ namespace dynarithmic
     bool SetMultiCapValues( DTWAIN_HANDLE DLLHandle,
                           DTWAIN_SOURCE Source,
                           DTWAIN_ARRAY  pArray,
-                          CTL_EnumeratorType EnumType,
+                          CTL_ArrayType EnumType,
                           UINT nCap,
                           CTL_EnumSetType SetType,
                           UINT nContainerVal,
@@ -596,19 +608,19 @@ namespace dynarithmic
             return false;
 
         // Check if array is of the correct type
-        if ( !EnumeratorFunctionImpl::EnumeratorIsValidEx(pArray, EnumType ) )
+        if ( !CTL_TwainDLLHandle::s_ArrayFactory->is_valid(pArray, CTL_ArrayFactory::arraytype_to_tagtype(EnumType)))
             return false;
 
         // Create array of the twain type
         DTWAIN_ARRAY pDTWAINArray = pArray;
         std::vector<TwainType> Array;
         NativeType dValue;
-        const size_t nValues = EnumeratorFunctionImpl::EnumeratorGetCount(pDTWAINArray);
+        const size_t nValues = CTL_TwainDLLHandle::s_ArrayFactory->size(pDTWAINArray);
         int i;
 
         for ( i = 0; i < static_cast<int>(nValues); i++ )
         {
-            EnumeratorFunctionImpl::EnumeratorGetAt(pDTWAINArray, i, &dValue );
+            CTL_TwainDLLHandle::s_ArrayFactory->get_value(pDTWAINArray, i, &dValue );
             Array.push_back( TwainConverter::convert(dValue, pDTWAINArray) );
         }
 

@@ -18,8 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLObTyp_h_
-#define CTLObTyp_h_
+#ifndef CTLOBTYP_H
+#define CTLOBTYP_H
 
 #include <memory>
 #include "ctlobstr.h"

@@ -20,6 +20,7 @@
  */
 #include "ctltr015.h"
 #include "ctlobtyp.h"
+#include "twainfix32.h"
 
 using namespace dynarithmic;
 
@@ -78,11 +79,11 @@ bool CTL_CapabilityGetRangeTriplet::EnumCapValues( void *pCapData )
         auto pFixDefVal = reinterpret_cast<pTW_FIX32>(&pRange->DefaultValue);
         auto pFixCurVal = reinterpret_cast<pTW_FIX32>(&pRange->CurrentValue);
 
-        m_FirstVal.fval  = Twain32ToFloat( *pFixFirst );
-        m_LastVal.fval   = Twain32ToFloat( *pFixLast  );
-        m_StepVal.fval   = Twain32ToFloat( *pFixStep  );
-        m_CurrentVal.fval = Twain32ToFloat( *pFixCurVal );
-        m_DefaultVal.fval = Twain32ToFloat( *pFixDefVal );
+        m_FirstVal.fval  = Fix32ToFloat( *pFixFirst );
+        m_LastVal.fval   = Fix32ToFloat( *pFixLast  );
+        m_StepVal.fval   = Fix32ToFloat( *pFixStep  );
+        m_CurrentVal.fval = Fix32ToFloat( *pFixCurVal );
+        m_DefaultVal.fval = Fix32ToFloat( *pFixDefVal );
     }
     else
     {
@@ -153,7 +154,7 @@ bool CTL_CapabilityGetRangeTriplet::GetValue(void *pData, size_t nWhichVal)
         return true;
     }
 
-    pTW_UINT32 pInt32 = static_cast<pTW_UINT32>(pData);
+    auto pInt32 = static_cast<pTW_UINT32>(pData);
     switch (static_cast<CTL_EnumTwainRange>(nWhichVal))
     {
         case TwainRange_MIN:

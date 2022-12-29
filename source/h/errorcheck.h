@@ -30,6 +30,7 @@ namespace dynarithmic
     void DTWAIN_Check_Error_Condition_0_Impl(CTL_TwainDLLHandle* Handle,
                                             Func f,
                                             int32_t Err,
+                                            const std::string& extraInfo,
                                             RetType retErr,
                                             const std::string::value_type* fnName,
                                             bool logError=true)
@@ -39,7 +40,7 @@ namespace dynarithmic
         if (bRet)
         {
             Handle->m_lLastError = Err;
-            CTL_TwainAppMgr::SetError(Err);
+            CTL_TwainAppMgr::SetError(Err, extraInfo);
             OutputDTWAINErrorA(Handle, fnName);
             if (logError && CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK)
             {
@@ -59,7 +60,7 @@ namespace dynarithmic
                                             const std::string::value_type* fnName,
                                             bool logError=true)
     {
-        DTWAIN_Check_Error_Condition_0_Impl<Func,RetType,true>(Handle,f,Err,retErr,fnName,logError);
+        DTWAIN_Check_Error_Condition_0_Impl<Func,RetType,true>(Handle,f,Err, "", retErr,fnName,logError);
     }
 
     template <typename Func, typename RetType>
@@ -74,7 +75,18 @@ namespace dynarithmic
     void DTWAIN_Check_Error_Condition_2_Ex(CTL_TwainDLLHandle* Handle,Func f,int32_t Err,RetType retErr,
                                            const std::string::value_type* fnName,bool logError = true)
     {
-        DTWAIN_Check_Error_Condition_0_Impl<Func, RetType, false>(Handle, f, Err, retErr, fnName, logError);
+        DTWAIN_Check_Error_Condition_0_Impl<Func, RetType, false>(Handle, f, Err, "", retErr, fnName, logError);
+    }
+
+    template <typename Func, typename RetType>
+    void DTWAIN_Check_Error_Condition_3_Ex(CTL_TwainDLLHandle* Handle,
+                                           Func f,
+                                           int32_t Err,
+                                           const std::string& errInfo, 
+                                           RetType retErr,
+                                           const std::string::value_type* fnName)
+    {
+        DTWAIN_Check_Error_Condition_0_Impl<Func, RetType, true>(Handle, f, Err, errInfo, retErr, fnName, false);
     }
 
     template <typename RetType>

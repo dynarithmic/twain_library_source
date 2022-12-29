@@ -20,7 +20,7 @@
  */
 #include "cppfunc.h"
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
+#include "arrayfactory.h"
 #include "sourceacquireopts.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -41,19 +41,20 @@ DTWAIN_ARRAY  DLLENTRY_DEF DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source,LONG P
         *pStatus = opts.getStatus();
     if (aDibs && bDiscardDibs)
     {
+        auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
         DTWAINArrayLL_RAII arrAcq(aDibs);
-        const auto vValues = EnumeratorVectorPtr<LPVOID>(aDibs);
-        const LONG nCount = static_cast<LONG>(vValues->size()); //DTWAIN_ArrayGetCount( aDibs );
+        auto& vValues = factory->underlying_container_t<HANDLE>(aDibs);
+        const LONG nCount = static_cast<LONG>(vValues.size()); 
         for (LONG i = 0; i < nCount; i++)
         {
-            const DTWAIN_ARRAY aDibHandle = (*vValues)[i];
+            DTWAIN_ARRAY aDibHandle = vValues[i];
             DTWAINArrayLL_RAII arr(aDibHandle);
-            const auto vDibs = EnumeratorVectorPtr<HANDLE>(aDibHandle);
+            const auto& vDibs = factory->underlying_container_t<HANDLE>(aDibHandle);
 
-            if (!vDibs)
+            if (vDibs.empty())
                 continue;
 
-            const LONG nCount2 = static_cast<LONG>(vDibs->size());
+            const LONG nCount2 = static_cast<LONG>(vDibs.size());
             // Leave last DIB.  This is the one in the clipboard!!
             LONG nLastDib = nCount2;
             if (i == nCount - 1)

@@ -60,6 +60,7 @@ namespace dynarithmic
         std::ofstream m_ostr;
         public:
             File_Logger(const LPCSTR filename, bool bAppend = false);
+            ~File_Logger();
             void trace(const std::string& msg) override;
     };
 

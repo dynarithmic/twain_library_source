@@ -89,6 +89,14 @@
     #pragma message ("DTWAIN Using __cdecl calling convention")
 #endif
 
+#ifdef BUILDING_DTWAINDLL
+    #ifdef _DEBUG
+	    #pragma message ("DTWAIN Debug Library building...")
+    #else
+	    #pragma message ("DTWAIN Release Library building...")
+    #endif
+#endif
+
 #if defined(DTWAIN_LIB)
     #define DLLENTRY_DEF CALLCONVENTION_DEF
     #define EXPORTDEF
@@ -126,18 +134,8 @@
             #if defined (WIN64) || defined(_WIN64)
                 #pragma message("Including 64-bit DTWAIN DLL definitions")
             #else
-            #pragma message("Including 32-bit DTWAIN DLL definitions")
-    #endif
-        #endif
-    #else
-        #if defined(DTWAIN_DLL) || defined(DTWAIN_OCX) || defined(DTWAIN_VB)
-            #define DLLENTRY_DEF __export FAR PASCAL
-            #define IMGFUNC_DEF FAR PASCAL
-            #pragma message("Building 16-bit DTWAIN DLL, OCX or VB version")
-        #else
-            #define DLLENTRY_DEF FAR PASCAL
-            #define IMGFUNC_DEF __export FAR PASCAL
-            #pragma message("Including 16-bit DTWAIN DLL definitions")
+                #pragma message("Including 32-bit DTWAIN DLL definitions")
+            #endif
         #endif
     #endif
 #endif

@@ -58,10 +58,11 @@ HANDLE DLLENTRY_DEF DTWAIN_ConvertDIBToBitmap(HANDLE hDib, HANDLE hPalette)
     CATCH_BLOCK(HANDLE())
 }
 
-struct HandleRAII : public DTWAINGlobalHandle_RAII
+struct HandleRAII 
 {
     LPBYTE m_pByte;
-    HandleRAII(HANDLE h) : DTWAIN_RAII(h), m_pByte(static_cast<LPBYTE>(GlobalLock(h))) {}
+    DTWAINGlobalHandle_RAII m_raii;
+    HandleRAII(HANDLE h) : m_raii(h), m_pByte(static_cast<LPBYTE>(GlobalLock(h))) {}
     LPBYTE getData() const { return m_pByte; }
 };
 
@@ -86,11 +87,11 @@ HANDLE DLLENTRY_DEF DTWAIN_ConvertDIBToFullBitmap(HANDLE hDib, DTWAIN_BOOL isBMP
     if (isBMP)
     {
         BITMAPFILEHEADER fileheader;
-        memset(reinterpret_cast<char*>(&fileheader), 0, sizeof(BITMAPFILEHEADER));
+        memset(&fileheader, 0, sizeof(BITMAPFILEHEADER));
         fileheader.bfType = 'MB';
-        const LPBITMAPINFOHEADER lpbi = reinterpret_cast<LPBITMAPINFOHEADER>(pDibData);
+        const auto lpbi = reinterpret_cast<LPBITMAPINFOHEADER>(pDibData);
         const unsigned int bpp = lpbi->biBitCount;
-        fileheader.bfSize = static_cast<DWORD>(GlobalSize(hDib)) + sizeof(BITMAPFILEHEADER);
+        fileheader.bfSize = GlobalSize(hDib) + sizeof(BITMAPFILEHEADER);
         fileheader.bfReserved1 = 0;
         fileheader.bfReserved2 = 0;
         fileheader.bfOffBits = static_cast<DWORD>(sizeof(BITMAPFILEHEADER)) +
@@ -101,8 +102,7 @@ HANDLE DLLENTRY_DEF DTWAIN_ConvertDIBToFullBitmap(HANDLE hDib, DTWAIN_BOOL isBMP
         // Allocate for returned handle
         returnHandle = static_cast<HANDLE>(GlobalAlloc(GMEM_FIXED, totalSize));
         const HandleRAII raii2(returnHandle);
-        const LPBYTE bFullImage = raii2.getData();
-        if (bFullImage)
+        if (const LPBYTE bFullImage = raii2.getData())
         {
             char *pFileHeader = reinterpret_cast<char *>(&fileheader);
             std::copy_n(pFileHeader, sizeof(BITMAPFILEHEADER), &bFullImage[0]);

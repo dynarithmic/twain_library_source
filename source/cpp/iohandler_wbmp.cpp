@@ -24,7 +24,7 @@
 
 using namespace dynarithmic;
 
-int CTL_WBMPIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, LONG64 /*MultiStage*/)
+int CTL_WBMPIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
     if ( !m_pDib )
         return DTWAIN_ERR_DIB;
@@ -45,7 +45,7 @@ int CTL_WBMPIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     if (!IsValidBitDepth(DTWAIN_WBMP, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    if (!parent_directory_exists(szFile))
+    if (!parent_directory_exists(szFile).first)
         return DTWAIN_ERR_FILEOPEN;
 
     return SaveToFile(hDib, szFile, FIF_WBMP, 0, DTWAIN_INCHES, { 0, 0 });

@@ -61,15 +61,15 @@
 
 // ==========================================================
 // Utility functions declared in Utilities.h
-
-BOOL SwapRedBlue32(FIBITMAP* dib) {
+#pragma message ("SwapRedBlue32 compiled")
+bool SwapRedBlue32(FIBITMAP* dib) {
 	if(FreeImage_GetImageType(dib) != FIT_BITMAP) {
-		return FALSE;
+		return false;
 	}
 		
 	const unsigned bytesperpixel = FreeImage_GetBPP(dib) / 8;
 	if(bytesperpixel > 4 || bytesperpixel < 3) {
-		return FALSE;
+		return false;
 	}
 		
 	const unsigned height = FreeImage_GetHeight(dib);
@@ -83,7 +83,7 @@ BOOL SwapRedBlue32(FIBITMAP* dib) {
 		}
 	}
 	
-	return TRUE;
+	return true;
 }
 
 // ----------------------------------------------------------
@@ -153,10 +153,10 @@ _convertCMYKtoRGBA(unsigned width, unsigned height, BYTE* line_start, unsigned p
 	}
 }
 
-BOOL 
+bool 
 ConvertCMYKtoRGBA(FIBITMAP* dib) {
 	if(!FreeImage_HasPixels(dib)) {
-		return FALSE;
+		return false;
 	}
 		
 	const FREE_IMAGE_TYPE image_type = FreeImage_GetImageType(dib);
@@ -166,7 +166,7 @@ ConvertCMYKtoRGBA(FIBITMAP* dib) {
 	if (image_type == FIT_RGBA16 || image_type == FIT_RGB16) {
 		channelSize = sizeof(WORD);
 	} else if (!(image_type == FIT_BITMAP && (bytesperpixel > 2))) {
-		return FALSE;
+		return false;
 	}
 				
 	const unsigned width = FreeImage_GetWidth(dib);
@@ -182,7 +182,7 @@ ConvertCMYKtoRGBA(FIBITMAP* dib) {
 		_convertCMYKtoRGBA<BYTE>(width, height, line_start, pitch, samplesperpixel);
 	}
 
-	return TRUE;	
+	return true;	
 }
 
 // ----------------------------------------------------------

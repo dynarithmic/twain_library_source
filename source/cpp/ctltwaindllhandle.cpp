@@ -19,8 +19,8 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
 #include "ctlres.h"
+#include "ctliface.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -90,14 +90,14 @@ void CTL_TwainDLLHandle::InitializeResourceRegistry()
     auto default_values = GetLangResourceNames();
     m_ResourceRegistry.clear();
     for (size_t i = 0; i < default_values.size(); ++i)
-        m_ResourceRegistry.insert({ default_values[i], filesys::exists(GetResourceFileNameA(default_values[i].c_str())) });
+        m_ResourceRegistry.insert({ default_values[i], filesys::exists(GetResourceFileNameA(default_values[i].c_str(), DTWAINLANGRESOURCEFILE)) });
     }
 
 std::pair<CTL_ResourceRegistryMap::iterator, bool> CTL_TwainDLLHandle::AddResourceToRegistry(LPCSTR pLangDLL)
 {
     std::string rName = pLangDLL;
     m_ResourceRegistry.erase(rName);
-    return m_ResourceRegistry.insert({ rName, filesys::exists(GetResourceFileNameA(pLangDLL)) });
+    return m_ResourceRegistry.insert({ rName, filesys::exists(GetResourceFileNameA(pLangDLL, DTWAINLANGRESOURCEFILE)) });
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -105,8 +105,10 @@ HINSTANCE               CTL_TwainDLLHandle::s_DLLInstance = nullptr;
 CTL_HookInfoArray       CTL_TwainDLLHandle::s_aHookInfo;
 CTL_GeneralCapInfo      CTL_TwainDLLHandle::s_mapGeneralCapInfo;
 CTL_GeneralErrorInfo    CTL_TwainDLLHandle::s_mapGeneralErrorInfo;
-CTL_EnumeratorFactoryPtr CTL_TwainDLLHandle::s_EnumeratorFactory;
-std::vector<int>             CTL_TwainDLLHandle::s_aAcquireNum;
+CTL_TwainDLLHandle::CTL_ErrorToExtraInfoMap CTL_TwainDLLHandle::s_mapExtraErrorInfo;
+
+CTL_ArrayFactoryPtr     CTL_TwainDLLHandle::s_ArrayFactory;
+std::vector<int>        CTL_TwainDLLHandle::s_aAcquireNum;
 bool                    CTL_TwainDLLHandle::s_bCheckReentrancy;
 short int               CTL_TwainDLLHandle::s_nDSMState = DSM_STATE_NONE;
 CTL_TwainNameMap        CTL_TwainDLLHandle::s_TwainNameMap;
@@ -161,6 +163,7 @@ DTWAIN_LONG64           CTL_TwainDLLHandle::s_pLoggerCallback_UserDataW = 0;
 HFONT                   CTL_TwainDLLHandle::s_DialogFont = nullptr;
 CTL_TwainDLLHandle::CTL_PDFMediaMap CTL_TwainDLLHandle::s_PDFMediaMap;
 CTL_TwainDLLHandle::CTL_AvailableFileFormatsMap CTL_TwainDLLHandle::s_AvailableFileFormatsMap;
+CTL_TwainDLLHandle::CTL_TwainConstantsMap CTL_TwainDLLHandle::s_TwainConstantsMap;
 
 bool                    CTL_TwainDLLHandle::s_TwainCallbackSet = false;
 

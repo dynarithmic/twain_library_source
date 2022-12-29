@@ -40,6 +40,7 @@
 #include "ctldib.h"
 #include "ctliface.h"
 #include "ctltwmgr.h"
+#include "twainfix32.h"
 
 using namespace dynarithmic;
 
@@ -350,7 +351,10 @@ CTL_ITwainSource* CTL_TwainAppMgr::SelectSource( CTL_ITwainSession* pSession, co
 
 CTL_ITwainSource* CTL_TwainAppMgr::SelectSource(CTL_ITwainSession* pSession, LPCTSTR strSource)
 {
-    return GenericSourceSelector(pSession, nullptr, strSource, 1);
+    auto retVal = GenericSourceSelector(pSession, nullptr, strSource, 1);
+    if ( retVal == nullptr )
+        static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal())->m_lLastError = DTWAIN_ERR_SOURCENAME_NOTINSTALLED;
+    return retVal;
 }
 
 CTL_ITwainSource*  CTL_TwainAppMgr::GetDefaultSource(CTL_ITwainSession* pSession)
@@ -845,8 +849,9 @@ bool CTL_TwainAppMgr::IsTwainMsg(MSG *pMsg, bool bFromUserQueue/*=false*/)
     switch (rc)
     {
         case TWRC_NOTDSEVENT:
+        {
             return false;
-
+        }
         case TWRC_DSEVENT:
             return true;
 
@@ -864,6 +869,34 @@ bool CTL_TwainAppMgr::IsTwainMsg(MSG *pMsg, bool bFromUserQueue/*=false*/)
     return false;
 }
 
+void CTL_TwainAppMgr::NotifyFeederStatus()
+{
+#ifdef _WIN32
+    // Make sure that user set a callback
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pFn = DTWAIN_GetCallback();
+    if (!pFn)
+        return;
+    // Check if any open source supports feeder
+    auto it = CTL_TwainDLLHandle::s_aFeederSources.begin();
+    const auto it2 = CTL_TwainDLLHandle::s_aFeederSources.end();
+
+    while (it != it2)
+    {
+        const auto pSource = static_cast<CTL_ITwainSource*>(*it);
+        const auto sourceState = pSource->GetState();
+        if (sourceState != SOURCE_STATE_XFERREADY &&
+            sourceState != SOURCE_STATE_TRANSFERRING)
+        {
+            if (DTWAIN_IsFeederLoaded(*it))
+                (*pFn)(DTWAIN_TN_FEEDERLOADED, reinterpret_cast<LPARAM>(*it), pHandle->m_lCallbackData);
+            else
+                (*pFn)(DTWAIN_TN_FEEDERNOTLOADED, reinterpret_cast<LPARAM>(*it), pHandle->m_lCallbackData);
+        }
+        ++it;
+    }
+#endif
+}
 
 bool CTL_TwainAppMgr::SetFeederEnableMode( CTL_ITwainSource *pSource, bool bMode)
 {
@@ -916,6 +949,7 @@ int CTL_TwainAppMgr::TransferImage(const CTL_ITwainSource *pSource, int nImageNu
         break;
 
         case TWAINAcquireType_File:
+        case TWAINAcquireType_MemFile:
         case TWAINAcquireType_AudioFile:
             return FileTransfer(pSession, pTempSource, AcquireType);
 
@@ -965,10 +999,10 @@ bool CTL_TwainAppMgr::StoreImageLayout(CTL_ITwainSource *pSource)
     {
         TW_IMAGELAYOUT IL;
         memcpy(&IL, LayoutTrip.GetImageLayout(), sizeof(TW_IMAGELAYOUT));
-        fRect.left = CTL_CapabilityTriplet::Twain32ToFloat( IL.Frame.Left );
-        fRect.top = CTL_CapabilityTriplet::Twain32ToFloat( IL.Frame.Top );
-        fRect.right = CTL_CapabilityTriplet::Twain32ToFloat( IL.Frame.Right );
-        fRect.bottom = CTL_CapabilityTriplet::Twain32ToFloat( IL.Frame.Bottom );
+        fRect.left = Fix32ToFloat( IL.Frame.Left );
+        fRect.top = Fix32ToFloat( IL.Frame.Top );
+        fRect.right = Fix32ToFloat( IL.Frame.Right );
+        fRect.bottom = Fix32ToFloat( IL.Frame.Bottom );
         pTempSource->SetImageLayout(&fRect);
         return true;
     }
@@ -1060,6 +1094,25 @@ int  CTL_TwainAppMgr::FileTransfer( CTL_ITwainSession *pSession,
         return 1;
     }
 
+    // If this is a memory file transfer, need to set the buffer
+    if ( AcquireType == TWAINAcquireType_MemFile )
+    {
+        // Check if user has defined a strip size
+        auto nSizeStrip = static_cast<TW_UINT32>(pSource->GetUserStripBufSize());
+
+        // User has not defined a buffer.  Let DTWAIN handle the memory here
+        if (!pSource->GetUserStripBuffer())
+        {
+            // Get the buffer strip size
+            TW_SETUPMEMXFER pXfer = {};
+            if (!GetMemXferValues(pSource, &pXfer))
+                return 0;
+            nSizeStrip = pXfer.Preferred;
+        }
+        CTL_ImageMemFileXferTriplet IXfer(pSession, pSource, nSizeStrip, pSource->GetUserStripBufSize()?false:true);
+        return StartTransfer(pSession, pSource, &IXfer);
+    }
+
     // If this is an audio file, then we need to execute this triplet
     // once per acquisition
     if (AcquireType == TWAINAcquireType_AudioFile)
@@ -1087,9 +1140,9 @@ int  CTL_TwainAppMgr::FileTransfer( CTL_ITwainSession *pSession,
     return StartTransfer( pSession, pSource, &IXfer );
 }
 
-
 int  CTL_TwainAppMgr::BufferTransfer( CTL_ITwainSession *pSession,
-                                      CTL_ITwainSource  *pSource )
+                                      CTL_ITwainSource  *pSource,
+                                      bool bIsMemoryFile)
 {
     // Get the source
     auto* pTempSource = static_cast<CTL_ITwainSource*>(pSource);
@@ -1101,7 +1154,7 @@ int  CTL_TwainAppMgr::BufferTransfer( CTL_ITwainSession *pSession,
     TW_IMAGEINFO *pInfo = ImageInfo.GetImageInfoBuffer();
 
     // Get the buffer strip size
-    TW_SETUPMEMXFER pXfer;
+    TW_SETUPMEMXFER pXfer = {};
     if ( !GetMemXferValues(pTempSource, &pXfer))
         return 0;
 
@@ -1130,7 +1183,7 @@ int  CTL_TwainAppMgr::BufferTransfer( CTL_ITwainSession *pSession,
         hGlobAcquire = pSource->GetUserStripBuffer();
         nSizeStrip = static_cast<TW_INT32>(pSource->GetUserStripBufSize());
     }
-        // Setup the DIB's information for an uncompressed image
+    // Setup the DIB's information for an uncompressed image
     if ( pSource->GetCompressionType() == TWCP_NONE )
         SetupMemXferDIB( pSession, pSource, hGlobAcquire, pInfo, static_cast<TW_INT32>(nTotalSize));
 
@@ -1233,8 +1286,8 @@ bool CTL_TwainAppMgr::SetupMemXferDIB(CTL_ITwainSession* pSession, CTL_ITwainSou
     if ( nValue == -1)
         return false;
 
-    const float XRes = CTL_CapabilityTriplet::Twain32ToFloat(pImgInfo->XResolution);
-    const float YRes = CTL_CapabilityTriplet::Twain32ToFloat(pImgInfo->YResolution);
+    const float XRes = Fix32ToFloat(pImgInfo->XResolution);
+    const float YRes = Fix32ToFloat(pImgInfo->YResolution);
 
     switch( nValue )
     {
@@ -1452,13 +1505,18 @@ bool CTL_TwainAppMgr::GetFileTransferDefaults(CTL_ITwainSource *pSource, int &nF
 
 CTL_TwainAcquireEnum CTL_TwainAppMgr::GetCompatibleFileTransferType( const CTL_ITwainSource *pSource )
 {
-    CTL_IntArray iArray;
-    EnumTransferMechanisms( pSource, iArray );
+    const auto& iArray = pSource->GetSupportedTransferMechanisms();
     if ( iArray.empty() )
         return TWAINAcquireType_Invalid;
     if ( std::find(iArray.begin(), iArray.end(), TWSX_FILE) != iArray.end())
         return TWAINAcquireType_File;
     return TWAINAcquireType_FileUsingNative;
+}
+
+bool CTL_TwainAppMgr::IsMemFileTransferSupported(const CTL_ITwainSource *pSource)
+{
+    const auto& iArray = pSource->GetSupportedTransferMechanisms();
+    return (std::find(iArray.begin(), iArray.end(), TWSX_MEMFILE) != iArray.end());
 }
 
 bool CTL_TwainAppMgr::IsSupportedFileFormat( const CTL_ITwainSource* pSource, int nFileFormat )
@@ -1518,7 +1576,7 @@ void CTL_TwainAppMgr::SetError(int nError, const std::string& extraInfo)
 {
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
-    char szBuffer[256] = {0};
+    char szBuffer[1024] = {0};
     int nRealError = nError;
     if ( nRealError > 0 )
         nRealError = -nRealError;
@@ -1527,11 +1585,12 @@ void CTL_TwainAppMgr::SetError(int nError, const std::string& extraInfo)
 
     if ( nError < 0 )
         nError = -nError;  // Can't have negative error codes
-    GetResourceStringA(nError, szBuffer, 255);
+    GetResourceStringA(nError, szBuffer, 1024);
     s_strLastError  = szBuffer;
-    s_strLastError += extraInfo;
+    s_strLastError += " " + extraInfo;
     s_nLastError    = nError;
 
+    CTL_TwainDLLHandle::s_mapExtraErrorInfo[-s_nLastError] = extraInfo;
     if ( CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_USEBUFFER )
     {
         // Push error onto error stack
@@ -1582,7 +1641,9 @@ LPSTR CTL_TwainAppMgr::GetLastErrorString(LPSTR lpszBuffer, int nSize)
 
 LPSTR CTL_TwainAppMgr::GetErrorString(int nError, LPSTR lpszBuffer, int nSize)
 {
-    if ( nError )
+    if ( nError == s_nLastError )
+        StringWrapperA::CopyInfoToCString(s_strLastError, lpszBuffer, nSize);
+    else
         GetResourceStringA(nError, lpszBuffer, nSize);
     return lpszBuffer;
 }
@@ -1753,7 +1814,7 @@ int CTL_TwainAppMgr::GetTransferCount( const CTL_ITwainSource *pSource )
 int CTL_TwainAppMgr::SetTransferCount( const CTL_ITwainSource *pSource,
                                        int nCount )
 {
-    if (CTL_TwainDLLHandle::s_lErrorFilterFlags )
+    if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS )
     {
         StringStreamA strm;
         strm << boost::format("\nSetting Transfer Count.  Transfer Count = %1%\n") % nCount;
@@ -1813,9 +1874,11 @@ int CTL_TwainAppMgr::SetTransferMechanism( const CTL_ITwainSource *pSource,CTL_T
     return 1;
 }
 
-void CTL_TwainAppMgr::EnumTransferMechanisms( const CTL_ITwainSource *pSource, CTL_IntArray & rArray )
+CTL_IntArray CTL_TwainAppMgr::EnumTransferMechanisms( const CTL_ITwainSource *pSource)
 {
+    CTL_IntArray rArray;
     GetMultiValuesImpl<CTL_IntArray, TW_UINT16>::GetMultipleTwainCapValues(pSource, rArray, TwainCap_XFERMECH, TWTY_UINT16);
+    return rArray;
 }
 //////////////////////////////////////////////////////////////////////
 
@@ -1864,7 +1927,7 @@ void CTL_TwainAppMgr::EnumNoTimeoutTriplets()
         {DG_IMAGE, DAT_IMAGEMEMXFER, MSG_GET}
     };
 
-    constexpr int nItems = std::size(Trips);
+    constexpr int nItems = static_cast<int>(std::size(Trips));
     std::copy_n(Trips, nItems, std::back_inserter(s_NoTimeoutTriplets));
 }
 
@@ -2452,7 +2515,7 @@ CTL_StringType CTL_TwainAppMgr::GetLatestDSMVersion()
 
 bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
 {
-    if ( pszDLLName != nullptr)
+    if ( pszDLLName != nullptr && pszDLLName[0] )
     {
         // This is a custom path, so user knows what they're doing.
         m_strTwainDSMPath = pszDLLName;

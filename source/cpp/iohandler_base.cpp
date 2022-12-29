@@ -21,6 +21,7 @@
 #include "ctldib.h"
 #include "ctliface.h"
 #include "ctltwmgr.h"
+#include "ctlfileutils.h"
 
 using namespace dynarithmic;
 

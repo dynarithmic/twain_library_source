@@ -25,12 +25,14 @@ OF THIRD PARTY RIGHTS.
 #include <dtwainpdf.h>
 #include <vector>
 
-using namespace dynarithmic;
 
 //////////////////////////////////
 /// Postscript stuff
 int PostscriptMain(int argc, const char**, const char *szTitle);
-LONG FUNCCONVENTION dynarithmic::DTWLIB_PSWriteFile(LPCTSTR szFileIn,
+
+namespace dynarithmic
+{
+    LONG PDFInterface::DTWLIB_PSWriteFile(LPCTSTR szFileIn,
                                      LPCTSTR szFileOut,
                                      LONG PSType,
                                      LPCTSTR szTitle,
@@ -70,4 +72,5 @@ LONG FUNCCONVENTION dynarithmic::DTWLIB_PSWriteFile(LPCTSTR szFileIn,
 
     argv[5] = const_cast<char*>(sFileIn.c_str());
     return PostscriptMain(6, argv, sTitle.c_str());
+}
 }

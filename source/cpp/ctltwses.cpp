@@ -59,7 +59,7 @@ CTL_ITwainSession::CTL_ITwainSession(LPCTSTR pAppName,
                                    LPCTSTR lpszMfg,
                                    LPCTSTR lpszFamily,
                                    LPCTSTR lpszProduct
-                                   ) : m_AppId{}
+                                    ) : m_AppId{}, m_AppWnd{}
 {
     if ( pAppName )
         m_AppName = pAppName;

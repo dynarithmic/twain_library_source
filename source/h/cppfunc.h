@@ -18,8 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CPPFUNC_H_
-#define CPPFUNC_H_
+#ifndef CPPFUNC_H
+#define CPPFUNC_H
 
 #include "dtwain_retail_def.h"
 #include <funcmac.h>
@@ -40,12 +40,15 @@
         #define TRY_BLOCK try {
 
         #define LOG_FUNC_STRING(x) \
-            if ( CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK) \
-            CTL_LogFunctionCallA((""), LOG_INDENT_CONSOLE, (#x));
+            if ( CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK) { \
+            CTL_LogFunctionCallA((""), LOG_INDENT_CONSOLE, (#x)); \
+            CTL_LogFunctionCallA((""), LOG_INDENT_OUT, (#x)); }
 
         #define LOG_FUNC_VALUES(x) \
-            if ( CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK) \
-            CTL_LogFunctionCallA((""), LOG_INDENT_CONSOLE, (x));
+            if ( CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK) {\
+            CTL_LogFunctionCallA((""), LOG_INDENT_CONSOLE, (x)); \
+            CTL_LogFunctionCallA((""), LOG_INDENT_OUT, (#x)); }
+
 
         #define LOG_FUNC_ENTRY_PARAMS_ISTWAINMSG(argVals) \
             TRY_BLOCK \
@@ -78,7 +81,7 @@
 
         #define CATCH_BLOCK(type) \
                 } \
-                catch(std::exception& ex_) \
+                catch(const std::exception& ex_) \
                 {\
                     LogExceptionErrorA(FUNC_MACRO, ex_.what()); \
                     THROW_EXCEPTION \

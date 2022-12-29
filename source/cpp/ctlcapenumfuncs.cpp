@@ -20,7 +20,6 @@
  */
 #include "cppfunc.h"
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
 #include "errorcheck.h"
 #include "ctltmpl5.h"
 #ifdef _MSC_VER
@@ -46,6 +45,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
 
+    auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     // See if Source is opened
@@ -54,13 +54,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
 
     if (Array)
     {
-        if (EnumeratorFunctionImpl::EnumeratorIsValid(*Array))
-            EnumeratorFunctionImpl::ClearEnumerator(*Array);
+        if (factory->is_valid(*Array))
+            factory->clear(*Array);
     }
 
-    const DTWAIN_ARRAY ThisArray = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 0);
+    DTWAIN_ARRAY ThisArray = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 0);
     DTWAINArrayLL_RAII arr(ThisArray);
-    auto vCaps = EnumeratorVectorPtr<LONG>(ThisArray);
+    auto& vCaps = factory->underlying_container_t<LONG>(ThisArray);
 
     if (p && ThisArray)
     {
@@ -77,7 +77,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
                 const CTL_SourceCapInfo Info = pHandle->m_aSourceCapInfo[nWhere];
                 CTL_CapInfoArray *pCapInfoArray = std::get<1>(Info).get();
                 std::for_each(pCapInfoArray->begin(), pCapInfoArray->end(), [&vCaps](const CTL_CapInfoArray::value_type& CapInfo)
-                                { vCaps->push_back(static_cast<int>(std::get<0>(CapInfo))); });
+                                { vCaps.push_back(static_cast<int>(std::get<0>(CapInfo))); });
                 *Array = DTWAIN_ArrayCreateCopy(ThisArray);
                 LOG_FUNC_EXIT_PARAMS(true)
             }
@@ -85,21 +85,22 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
 
         // First time, so let's go
         const DTWAIN_ARRAY pDTWAINArray = ThisArray;
-        EnumeratorFunctionImpl::ClearEnumerator(pDTWAINArray);
+        factory->clear(pDTWAINArray);
         CTL_TwainCapArray rArray;
 
         // loop through all capabilities
         CTL_TwainAppMgr::GetCapabilities(p, rArray);
 
         // copy caps to our DTWAIN array
-        std::copy(rArray.begin(), rArray.end(), std::back_inserter(*vCaps));
-        vCaps->erase(std::remove(vCaps->begin(), vCaps->end(), 0), vCaps->end());
+        std::copy(rArray.begin(), rArray.end(), std::back_inserter(vCaps));
+        vCaps.erase(std::remove(vCaps.begin(), vCaps.end(), 0), vCaps.end());
 
         // Cache this information and set source's flag that all caps were retrieved
-        DTWAIN_CacheCapabilityInfo(p, pHandle, vCaps);
+        DTWAIN_CacheCapabilityInfo(p, pHandle, &vCaps);
         p->SetRetrievedAllCaps(true);
-        const bool bFound = !vCaps->empty();
-        *Array = DTWAIN_ArrayCreateCopy(ThisArray);
+        const bool bFound = !vCaps.empty();
+        if ( Array )
+            *Array = DTWAIN_ArrayCreateCopy(ThisArray);
         if (bFound)
             LOG_FUNC_EXIT_PARAMS(true)
     }
@@ -121,10 +122,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCustomCaps(DTWAIN_SOURCE Source, LPDTWAIN_AR
     if (!DTWAIN_EnumSupportedCapsEx(Source, Array))
     LOG_FUNC_EXIT_PARAMS(false)
     const DTWAIN_ARRAY ThisArray = static_cast<DTWAIN_ARRAY>(*Array);
+    auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
 
-    const auto vCaps = EnumeratorVectorPtr<LONG>(ThisArray);
-    if (vCaps)
-        vCaps->erase(std::remove_if(vCaps->begin(), vCaps->end(), [&](LONG nCap) { return static_cast<unsigned>(nCap) < DTWAIN_CV_CAPCUSTOMBASE;}), vCaps->end());
+    auto& vCaps = factory->underlying_container_t<LONG>(ThisArray);
+    vCaps.erase(std::remove_if(vCaps.begin(), vCaps.end(), [&](LONG nCap) { return static_cast<unsigned>(nCap) < DTWAIN_CV_CAPCUSTOMBASE;}), vCaps.end());
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }

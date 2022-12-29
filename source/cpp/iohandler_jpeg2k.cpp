@@ -29,7 +29,7 @@ CTL_Jpeg2KIOHandler::CTL_Jpeg2KIOHandler(CTL_TwainDib* pDib, const DTWAINImageIn
 { }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int CTL_Jpeg2KIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, LONG64 /*UserData*/)
+int CTL_Jpeg2KIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
     if ( !m_pDib )
         return DTWAIN_ERR_DIB;

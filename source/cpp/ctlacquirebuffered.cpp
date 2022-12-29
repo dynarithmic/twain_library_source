@@ -20,7 +20,7 @@
  */
 #include "cppfunc.h"
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
+#include "arrayfactory.h"
 #include "errorcheck.h"
 #include "sourceacquireopts.h"
 #ifdef _MSC_VER

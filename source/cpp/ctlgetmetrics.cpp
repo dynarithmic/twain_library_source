@@ -20,8 +20,8 @@
  */
 #include "cppfunc.h"
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
 #include "ctltr041.h"
+#include "ctliface.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif

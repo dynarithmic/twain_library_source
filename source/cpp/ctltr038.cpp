@@ -185,7 +185,7 @@ void CTL_ExtImageInfoTriplet::DestroyInfo()
                 switch (pInfo->ItemType)
                 {
                 case TWTY_UINT32:
-                    TempHandle = reinterpret_cast<TW_HANDLE>(static_cast<TW_UINT32*>(h)[j]);
+                    TempHandle = reinterpret_cast<TW_HANDLE>(static_cast<TW_UINTPTR*>(h)[j]);
                     break;
 
                 case TWTY_UINT16:
@@ -530,7 +530,7 @@ bool CTL_ExtImageInfoTriplet::EnumSupported(CTL_ITwainSource *pSource,
                                             CTL_IntArray &rArray)
 {
     rArray.clear();
-    constexpr int NumAttr = std::size(s_AllAttr);
+    constexpr int NumAttr = static_cast<int>(std::size(s_AllAttr));
     CTL_ExtImageInfoTriplet Trip(pSession, pSource, NumAttr);
     const TW_UINT16 rc = Trip.Execute();
     switch (rc)

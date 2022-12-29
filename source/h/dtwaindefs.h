@@ -21,6 +21,9 @@
 #ifndef DTWAINDEFS_H
 #define DTWAINDEFS_H
 /* Start of DTWAIN constant definitions */
+#define DTWAIN_TRUE           1
+#define DTWAIN_FALSE          0
+
 #define DTWAIN_FF_TIFF        0
 #define DTWAIN_FF_PICT        1
 #define DTWAIN_FF_BMP         2
@@ -140,10 +143,10 @@
 #define DTWAIN_USELONGNAME        16
 #define DTWAIN_USESOURCEMODE      32
 #define DTWAIN_USELIST            64
+#define DTWAIN_CREATE_DIRECTORY   128
 
 /* DTWAIN_ARRAY types */
 #define DTWAIN_ARRAYANY             1
-#define DTWAIN_ArrayTypePTR         1
 #define DTWAIN_ARRAYLONG            2
 #define DTWAIN_ARRAYFLOAT           3
 #define DTWAIN_ARRAYHANDLE          4
@@ -154,7 +157,8 @@
 #define DTWAIN_ARRAYLONGSTRING      8
 #define DTWAIN_ARRAYUNICODESTRING   9
 #define DTWAIN_ARRAYLONG64          10
-
+#define DTWAIN_ArrayTypePTR         DTWAIN_ARRAYHANDLE
+#define DTWAIN_ARRAYOFHANDLEARRAYS  2000
 /* Same string type as DTWAIN_ARRAYSTRING
    if compiling non-UNICODE (MBCS) applications */
 #define DTWAIN_ARRAYANSISTRING      11
@@ -275,7 +279,7 @@
 #define DTWAIN_DX_2PASSDUPLEX  2
 
 /* Twain Pixel Types */
-#define DTWAIN_PT_BW      0 /* Black and White */
+#define DTWAIN_PT_BW      0 
 #define DTWAIN_PT_GRAY    1
 #define DTWAIN_PT_RGB     2
 #define DTWAIN_PT_PALETTE 3
@@ -284,6 +288,10 @@
 #define DTWAIN_PT_YUV     6
 #define DTWAIN_PT_YUVK    7
 #define DTWAIN_PT_CIEXYZ  8
+#define DTWAIN_PT_LAB     9
+#define DTWAIN_PT_SRGB    10
+#define DTWAIN_PT_SCRGB   11
+#define DTWAIN_PT_INFRARED 16
 #define DTWAIN_PT_DEFAULT 1000
 
 #define DTWAIN_CURRENT     (-2)
@@ -302,6 +310,7 @@
 #define DTWAIN_USENATIVE      1
 #define DTWAIN_USEBUFFERED    2
 #define DTWAIN_USECOMPRESSION 4
+#define DTWAIN_USEMEMFILE     8
 
 /* DTWAIN Special Failure codes */
 #define DTWAIN_FAILURE1       (-1)
@@ -374,6 +383,7 @@
 #define DTWAIN_TN_FILEPAGESAVEERROR         1035
 #define DTWAIN_TN_PROCESSEDDIB              1036
 
+
 /* Sent if document feeder has paper loaded */
 #define DTWAIN_TN_FEEDERLOADED              1037
 
@@ -435,6 +445,9 @@
 #define DTWAIN_TN_PROCESSDIBACCEPTED   1055
 #define DTWAIN_TN_PROCESSDIBFINALACCEPTED   1056
 
+/* Miscellaneous file transfer notifications */
+#define DTWAIN_TN_CLOSEDIBFAILED       1057
+
 
 /* Device event for TWAIN 1.8 Sources */
 #define  DTWAIN_TN_DEVICEEVENT                    1100
@@ -495,6 +508,9 @@
 /* Sent when a TWAIN triplet is being processed */
 #define DTWAIN_TN_TWAINTRIPLETBEGIN         1183
 #define DTWAIN_TN_TWAINTRIPLETEND           1184
+
+/* Sent if document feeder has no paper loaded */
+#define DTWAIN_TN_FEEDERNOTLOADED           1200
 
 /* PDF OCR clean text flags */
 #define DTWAIN_PDFOCR_CLEANTEXT1            1
@@ -767,6 +783,10 @@
 #define DTWAIN_LANGSWEDISH                   12
 #define DTWAIN_LANGUSAENGLISH                13
 
+/* DTWAIN API and Twain status flags */
+#define DTWAIN_APIHANDLEOK                    1
+#define DTWAIN_TWAINSESSIONOK                 2
+
 /* Error codes (returned by DTWAIN_GetLastError() */
 #define DTWAIN_NO_ERROR               (0)
 #define DTWAIN_ERR_FIRST              (-1000)
@@ -821,6 +841,10 @@
 #define DTWAIN_ERR_DEMO_NOFILETYPE (-1049)
 #define DTWAIN_ERR_SOURCESELECTION_CANCELED (-1050)
 #define DTWAIN_ERR_RESOURCES_NOT_FOUND (-1051)
+#define DTWAIN_ERR_STRINGTYPE_MISMATCH (-1052)
+#define DTWAIN_ERR_ARRAYTYPE_MISMATCH (-1053)
+#define DTWAIN_ERR_SOURCENAME_NOTINSTALLED (-1054)
+#define DTWAIN_ERR_NO_MEMFILE_XFER       (-1055)
 
 #define DTWAIN_ERR_LAST_1       DTWAIN_ERR_DEMO_NOFILETYPE
 
@@ -932,6 +956,8 @@
 #define DTWAIN_ERR_INVALIDICONFORMAT       (-2074)
 #define DTWAIN_ERR_TWAIN32DSMNOTFOUND      (-2075)
 #define DTWAIN_ERR_TWAINOPENSOURCEDSMNOTFOUND (-2076)
+#define DTWAIN_ERR_INVALID_DIRECTORY (-2077)
+#define DTWAIN_ERR_CREATE_DIRECTORY (-2078)
 
 /* TwainSave errors */
 #define DTWAIN_TWAINSAVE_OK                (0)
@@ -957,9 +983,11 @@
 #define DTWAIN_ERR_OCR_INVALIDBITDEPTH     (-2106)
 #define DTWAIN_ERR_OCR_RECOGNITIONERROR    (-2107)
 #define DTWAIN_ERR_OCR_LAST                (-2108)
+#define DTWAIN_ERR_SOURCE_COULD_NOT_OPEN   (-2500)
+#define DTWAIN_ERR_SOURCE_COULD_NOT_CLOSE  (-2501)
 
-#define DTWAIN_ERR_LAST                    DTWAIN_ERR_OCR_LAST
-
+#define DTWAIN_ERR_LAST                    DTWAIN_ERR_SOURCE_COULD_NOT_CLOSE
+#define DTWAIN_ERR_USER_START              (-80000)  
 
 /* Device event constants (same as TWAIN 1.8 value plus 1)*/
 #define DTWAIN_DE_CHKAUTOCAPTURE    1
@@ -1003,6 +1031,15 @@
 #define DTWAIN_ENDORSERTOPAFTER       32  /*(5)*/
 #define DTWAIN_ENDORSERBOTTOMBEFORE   64  /*(6)*/
 #define DTWAIN_ENDORSERBOTTOMAFTER    128 /*(7)*/
+
+#define DTWAIN_TWPR_IMPRINTERTOPBEFORE     0
+#define DTWAIN_TWPR_IMPRINTERTOPAFTER      1
+#define DTWAIN_TWPR_IMPRINTERBOTTOMBEFORE  2
+#define DTWAIN_TWPR_IMPRINTERBOTTOMAFTER   3
+#define DTWAIN_TWPR_ENDORSERTOPBEFORE      4
+#define DTWAIN_TWPR_ENDORSERTOPAFTER       5
+#define DTWAIN_TWPR_ENDORSERBOTTOMBEFORE   6
+#define DTWAIN_TWPR_ENDORSERBOTTOMAFTER    7
 
 /* DTWAIN Printermode constants (same as TWAIN 1.8) */
 #define DTWAIN_PM_SINGLESTRING     0
@@ -1103,78 +1140,95 @@
 #define DTWAIN_EI_PRINTERTEXT            0x124A
 #define DTWAIN_EI_TWAINDIRECTMETADATA    0x124B
 
-/* DTWAIN Data Source Error logging functions */
-#define DTWAIN_LOG_DECODE_SOURCE      1
-#define DTWAIN_LOG_DECODE_DEST        2
-#define DTWAIN_LOG_DECODE_TWMEMREF    4
-#define DTWAIN_LOG_DECODE_TWEVENT     8
-#define DTWAIN_LOG_USEFILE           16
+/* TWAIN Data Source Error logging functions */
+#define DTWAIN_LOG_DECODE_SOURCE      0x00000001
+#define DTWAIN_LOG_DECODE_DEST        0x00000002
+#define DTWAIN_LOG_DECODE_TWMEMREF    0x00000004
+#define DTWAIN_LOG_DECODE_TWEVENT     0x00000008
 
 /* DTWAIN Call stack logging */
-#define DTWAIN_LOG_CALLSTACK         32
+#define DTWAIN_LOG_CALLSTACK          0x00000010
 
-/* DTWAIN Log to window (not yet implemented) */
-#define DTWAIN_LOG_USEWINDOW        64
-
-/* log exception errors to message boxes */
-#define DTWAIN_LOG_SHOWEXCEPTIONS  128
-
-/* Display standard message box if DTWAIN error */
-#define DTWAIN_LOG_ERRORMSGBOX     256
+/* DTWAIN LOG DTWAIN_IsTwainMsg
+ * Note that enabling this will produce very large log files.
+ */
+#define DTWAIN_LOG_ISTWAINMSG         0x00000020
 
 /* Display message if DTWAIN function called on bad DLL
-   If this flag is not set, calls to an uninitialized
-   DTWAIN DLL are not displayed */
-#define DTWAIN_LOG_INITFAILURE       512
+If this flag is not set, calls to an uninitialized
+DTWAIN DLL are not displayed */
+#define DTWAIN_LOG_INITFAILURE        0x00000040
+
+/* All other lower-level TWAIN activity*/
+#define DTWAIN_LOG_LOWLEVELTWAIN      0x00000080
+
+/* Decode bitmap info returned by TWAIN device when acquiring images*/
+#define DTWAIN_LOG_DECODE_BITMAP      0x00000100
+
+/* Log DTWAIN_TN_ notifications  */
+#define DTWAIN_LOG_NOTIFICATIONS      0x00000200
+
+/* All other DTWAIN information such as CAP listings, etc.*/
+#define DTWAIN_LOG_MISCELLANEOUS      0x00000400
+
+/* Any DTWAIN errors (not TWAIN related) */
+#define DTWAIN_LOG_DTWAINERRORS       0x00000800
+
+#define DTWAIN_LOG_ALL (DTWAIN_LOG_DECODE_SOURCE | \
+                        DTWAIN_LOG_DECODE_DEST | \
+                        DTWAIN_LOG_DECODE_TWEVENT | \
+                        DTWAIN_LOG_DECODE_TWMEMREF | \
+                        DTWAIN_LOG_CALLSTACK | \
+                        DTWAIN_LOG_ISTWAINMSG | \
+                        DTWAIN_LOG_INITFAILURE | \
+                        DTWAIN_LOG_LOWLEVELTWAIN | \
+                        DTWAIN_LOG_NOTIFICATIONS | \
+                        DTWAIN_LOG_MISCELLANEOUS | \
+                        DTWAIN_LOG_DTWAINERRORS | \
+                        DTWAIN_LOG_DECODE_BITMAP)
+
+/* ------------------------- */
+
+/* DTWAIN Log to a file */
+#define DTWAIN_LOG_USEFILE         0x00010000
+
+/* log exception errors to message boxes */
+#define DTWAIN_LOG_SHOWEXCEPTIONS  0x00020000
+
+/* Display standard message box if DTWAIN error */
+#define DTWAIN_LOG_ERRORMSGBOX     0x00040000
 
 /* Log errors to a buffer of all DTWAIN errors */
-#define DTWAIN_LOG_USEBUFFER         1024
+#define DTWAIN_LOG_USEBUFFER       0x00080000
 
 /* Append to log file */
-#define DTWAIN_LOG_FILEAPPEND        2048
+#define DTWAIN_LOG_FILEAPPEND      0x00100000
 
-/* Decode bitmap info returned by TWAIN device */
-#define DTWAIN_LOG_DECODE_BITMAP     4096
-
-/* If this flag is ON, no callback function is invoked */
-#define DTWAIN_LOG_NOCALLBACK        8192
-
-/* If this flag is OFF, then only callback will contain
-   log message */
-#define DTWAIN_LOG_WRITE           16384
+/* If this flag is ON, a callback function is invoked */
+#define DTWAIN_LOG_USECALLBACK     0x00200000
 
 /* If cr/lf is added to end of log message when writing to
    debug monitor, this flag is ON */
-#define DTWAIN_LOG_USECRLF         32768
+#define DTWAIN_LOG_USECRLF         0x00400000
 
 /* Log to the console */
-#define DTWAIN_LOG_CONSOLE         65536
+#define DTWAIN_LOG_CONSOLE         0x00800000
 
-#define DTWAIN_LOG_DEBUGMONITOR    131072
-#define DTWAIN_LOG_ISTWAINMSG      262144
-#define DTWAIN_LOG_LOWLEVELTWAIN   524288
+/* Log to debug monitor */
+#define DTWAIN_LOG_DEBUGMONITOR    0x01000000
+
+/* DTWAIN Log to window (not yet implemented) */
+#define DTWAIN_LOG_USEWINDOW       0x02000000
 
 /* log everything, including displaying exceptions */
-#define DTWAIN_LOG_ALL               (0xFFFFF7FF &~ (DTWAIN_LOG_NOCALLBACK))
+#define DTWAIN_LOG_ALL_NOCALLBACK   (DTWAIN_LOG_ALL &~ (DTWAIN_LOG_USECALLBACK))
 
 /* log everything using new log file */
-#define DTWAIN_LOG_ALL_APPEND        (0xFFFFFFFF &~ (DTWAIN_LOG_NOCALLBACK))
-
-/* log only using console */
-#define DTWAIN_LOGONLY_CONSOLE ((DTWAIN_LOG_ALL &~ (DTWAIN_LOG_DEBUGMONITOR | DTWAIN_LOG_USEFILE)))
-
-/* log only using debug window*/
-#define DTWAIN_LOGONLY_DEBUGWINDOW ((DTWAIN_LOG_ALL &~ (DTWAIN_LOG_CONSOLE | DTWAIN_LOG_USEFILE)))
-
-/* log only using file */
-#define DTWAIN_LOGONLY_FILE ((DTWAIN_LOG_ALL &~ (DTWAIN_LOG_CONSOLE | DTWAIN_LOG_DEBUGMONITOR)))
-
-/* log only using callback (if defined) */
-#define DTWAIN_LOGONLY_USECALLBACK ((DTWAIN_LOG_ALL &~ (DTWAIN_LOG_CONSOLE | DTWAIN_LOG_DEBUGMONITOR | DTWAIN_LOG_USEFILE | DTWAIN_LOG_WRITE)))
+#define DTWAIN_LOG_ALL_FILEAPPEND    (DTWAIN_LOG_FILEAPPEND | DTWAIN_LOG_ALL)
 
 /* turn off the DTWAIN_IsTwainMsg logging */
-#define DTWAIN_LOG_NOISTWAINMSG(x) { if (x | DTWAIN_LOG_ISTWAINMSG) x &= ~DTWAIN_LOG_ISTWAINMSG; }
-#define DTWAIN_LOG_NOLOWLEVELTWAIN(x) { x &= ~(DTWAIN_LOG_LOWLEVELTWAIN); }
+#define DTWAIN_LOG_NOISTWAINMSG(x) { if ((x) | DTWAIN_LOG_ISTWAINMSG) (x) &= ~DTWAIN_LOG_ISTWAINMSG; }
+#define DTWAIN_LOG_NOLOWLEVELTWAIN(x) { (x) &= ~(DTWAIN_LOG_LOWLEVELTWAIN); }
 
 /* CAP_CUSTOMDSDATA constants */
 #define DTWAINGCD_RETURNHANDLE      1
@@ -1254,6 +1308,8 @@
 #define DTWAIN_DLG_USEINCLUDENAMES      64
 #define DTWAIN_DLG_USEEXCLUDENAMES      128
 #define DTWAIN_DLG_USENAMEMAPPING       256
+#define DTWAIN_DLG_USEDEFAULTTITLE      512
+#define DTWAIN_DLG_TOPMOSTWINDOW        1024
 
 /* DTWAIN Language resource constants */
 #define DTWAIN_RES_ENGLISH              0
@@ -1420,4 +1476,57 @@
 #define DTWAIN_TWDF_ULTRASONIC          0
 #define DTWAIN_TWDF_BYLENGTH            1
 #define DTWAIN_TWDF_INFRARED            2
+
+/* DTWAIN Twain name lookup constants */
+#define DTWAIN_CONSTANT_TWPT     0
+#define DTWAIN_CONSTANT_TWUN     1
+#define DTWAIN_CONSTANT_TWCY     2
+#define DTWAIN_CONSTANT_TWAL     3
+#define DTWAIN_CONSTANT_TWAS     4
+#define DTWAIN_CONSTANT_TWBCOR   5
+#define DTWAIN_CONSTANT_TWBD     6
+#define DTWAIN_CONSTANT_TWBO     7
+#define DTWAIN_CONSTANT_TWBP     8
+#define DTWAIN_CONSTANT_TWBR     9
+#define DTWAIN_CONSTANT_TWBT     10
+#define DTWAIN_CONSTANT_TWCP     11
+#define DTWAIN_CONSTANT_TWCS     12
+#define DTWAIN_CONSTANT_TWDE     13
+#define DTWAIN_CONSTANT_TWDR     14
+#define DTWAIN_CONSTANT_TWDSK    15
+#define DTWAIN_CONSTANT_TWDX     16
+#define DTWAIN_CONSTANT_TWFA     17   
+#define DTWAIN_CONSTANT_TWFE     18   
+#define DTWAIN_CONSTANT_TWFF     19
+#define DTWAIN_CONSTANT_TWFL     20   
+#define DTWAIN_CONSTANT_TWFO     21  
+#define DTWAIN_CONSTANT_TWFP     22   
+#define DTWAIN_CONSTANT_TWFR     23   
+#define DTWAIN_CONSTANT_TWFT     24   
+#define DTWAIN_CONSTANT_TWFY     22   
+#define DTWAIN_CONSTANT_TWIA     23   
+#define DTWAIN_CONSTANT_TWIC     27   
+#define DTWAIN_CONSTANT_TWIF     28   
+#define DTWAIN_CONSTANT_TWIM     29   
+#define DTWAIN_CONSTANT_TWJC     30   
+#define DTWAIN_CONSTANT_TWJQ     31   
+#define DTWAIN_CONSTANT_TWLP     32   
+#define DTWAIN_CONSTANT_TWLS     33   
+#define DTWAIN_CONSTANT_TWMD     34  
+#define DTWAIN_CONSTANT_TWNF     35  
+#define DTWAIN_CONSTANT_TWOR     36  
+#define DTWAIN_CONSTANT_TWOV     37  
+#define DTWAIN_CONSTANT_TWPA     38  
+#define DTWAIN_CONSTANT_TWPC     39  
+#define DTWAIN_CONSTANT_TWPCH    40  
+#define DTWAIN_CONSTANT_TWPF     41  
+#define DTWAIN_CONSTANT_TWPM     42  
+#define DTWAIN_CONSTANT_TWPR     43  
+#define DTWAIN_CONSTANT_TWPF2    44  
+#define DTWAIN_CONSTANT_TWCT     45  
+#define DTWAIN_CONSTANT_TWPS     46  
+#define DTWAIN_CONSTANT_TWSS     47  
+#define DTWAIN_CONSTANT_LAST     (DTWAIN_CONSTANT_TWSS + 1) 
+
 #endif
+

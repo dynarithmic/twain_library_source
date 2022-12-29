@@ -20,8 +20,8 @@
 
 
  */
-#ifndef TXTFUN32_H_
-#define TXTFUN32_H_
+#ifndef TXTFUN32_H
+#define TXTFUN32_H
 
 #include <memory>
 
@@ -52,7 +52,8 @@ namespace dynarithmic
                                      m_ImageInfoEx(ImageInfoEx),
                                      m_pOCREngine(pEngine),
                                      m_InputFormat(inputFormat),
-                                     m_pDib(pDib) {}
+                                     m_pDib(pDib),
+									 m_bWriteOk(true) {}
             // Virtual interface
             std::string GetFileExtension() const  override;
             HANDLE  GetFileInformation(LPCSTR path)  override;

@@ -100,6 +100,7 @@ namespace dynarithmic
         LONG nPDFPolarity;
         CTL_ITwainSession* theSession;
         bool IsSearchableTextOnPage;
+        bool IsCreateDirectory;
 
         LONG nJpegQuality;
         bool bProgressiveJpeg;
@@ -158,7 +159,8 @@ namespace dynarithmic
             PhotoMetric{},
             PDFThumbnailScale{},
             PDFCustomSize{},
-            PDFCustomScale{}
+            PDFCustomScale{},
+            IsCreateDirectory(false)
         {
         }
     };

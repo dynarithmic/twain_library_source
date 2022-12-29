@@ -18,8 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLREG_H_
-#define CTLREG_H_
+#ifndef CTLREG_H
+#define CTLREG_H
 
 #include <unordered_map>
 #include "ctlarray.h"
