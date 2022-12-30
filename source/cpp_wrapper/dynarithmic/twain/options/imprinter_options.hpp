@@ -114,7 +114,7 @@ namespace dynarithmic
                 imprinter_options& set_printer(const Container& c)
                 {
                     m_vPrinterToUse.clear();
-                    std::copy(std::begin(c), std::end(c), std::inserter(m_vPrinterToUse));
+                    std::copy(std::begin(c), std::end(c), std::back_inserter(m_vPrinterToUse));
                     return *this;
                 }
 
