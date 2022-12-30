@@ -27,6 +27,7 @@ OF THIRD PARTY RIGHTS.
 #include <algorithm>
 #include <functional>
 #include <type_traits>
+#include <math.h>
 
 namespace dynarithmic
 {
@@ -59,7 +60,7 @@ namespace dynarithmic
                     return false;
             if (step < 0)
                     return false;
-            if (is_close_to(step, Container::value_type(0)) && low < high)
+            if (is_close_to(step, typename Container::value_type(0)) && low < high)
                     return false;
             return true;
         }

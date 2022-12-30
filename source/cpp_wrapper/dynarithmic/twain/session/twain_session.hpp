@@ -50,6 +50,7 @@ OF THIRD PARTY RIGHTS.
 #include <dynarithmic/twain/dtwain_twain.hpp>
 #include <dynarithmic/twain/twain_values.hpp>
 #include <dynarithmic/twain/types/twain_callback.hpp>
+#include <dynarithmic/twain/types/twain_array.hpp>
 #include <dtwain.h>
 
 #pragma warning( push )  // Stores the current warning state for every warning.
@@ -213,7 +214,6 @@ namespace dynarithmic
         private:                
             using logger_type = std::pair<twain_session*, std::unique_ptr<twain_logger>>;
             using callback_map_type = std::unordered_map<twain_source*, std::unique_ptr<twain_callback>>;
-            using error_logger_func = std::function<void(LONG)>;
             using source_basic_info = twain_app_info;
 
             filetype_value::value_type m_filetype;
@@ -236,7 +236,7 @@ namespace dynarithmic
         #ifdef DTWAIN_NOIMPORTLIB
             HMODULE m_DynamicHandle = 0;
             bool    m_bCacheHandle = true;
-        #endif
+        #endif  
         public:
 
         #ifdef DTWAIN_NOIMPORTLIB
