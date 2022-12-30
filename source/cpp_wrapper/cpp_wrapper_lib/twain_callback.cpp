@@ -22,13 +22,12 @@ OF THIRD PARTY RIGHTS.
 // processing on acquisition startup, UI opening and closing, etc.  See the DTWAIN help manual for a list of
 // the various events.
 
-#include <dynarithmic/twain/types/twain_callback.hpp>
-
 #include <unordered_map>
 #include <functional>
 #include <dtwain.h>
+#include <dynarithmic/twain/types/twain_callback.hpp>
 #include <dynarithmic/twain/twain_values.hpp>
-#include <dynarithmic/twain/source/twain_source_base.hpp>
+#include <dynarithmic/twain/source/twain_source.hpp>
 namespace dynarithmic
 {
     namespace twain

@@ -6,7 +6,8 @@
 #include <string>
 #include <dynarithmic/twain/twain_session.hpp> // for dynarithmic::twain::twain_session
 #include <dynarithmic/twain/twain_source.hpp>  // for dynarithmic::twain::twain_source
-#include <dynarithmic/twain/pdf/text_element.hpp>
+#include <dynarithmic/twain/pdf/pdf_text_element.hpp> // for pdf_text_element
+#include <dynarithmic/twain/acquire_characteristics.hpp> // for acquire_characteristics
 
 using namespace dynarithmic::twain;
 

@@ -51,6 +51,7 @@ namespace dynarithmic
         class capability_interface;
         class capability_listener;
         class twain_session;
+        class twain_source_pimpl;
 
         class twain_source 
         {
@@ -94,12 +95,7 @@ namespace dynarithmic
                 DTWAIN_SOURCE m_theSource;
                 bool m_bUIOnlyOn;
                 bool m_bWeakAttach;
-
-                std::unique_ptr<acquire_characteristics>      m_acquire_characteristics;
-                std::unique_ptr<buffered_transfer_info>       m_buffered_info;
-                std::unique_ptr<file_transfer_info>           m_filetransfer_info;
-                std::unique_ptr<capability_listener>          m_capability_listener;
-                mutable std::unique_ptr<capability_interface> m_capability_info;
+                std::shared_ptr<twain_source_pimpl> m_pTwainSourceImpl;
 
                 void create_interfaces();
                 void get_source_info_internal();

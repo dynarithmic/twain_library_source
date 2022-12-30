@@ -2,6 +2,7 @@
 #include <string>
 #include <dynarithmic/twain/twain_session.hpp> // for dynarithmic::twain::twain_session
 #include <dynarithmic/twain/twain_source.hpp>  // for dynarithmic::twain::twain_source
+#include <dynarithmic/twain/capability_interface.hpp>  // for acquire_characteristics
 
 void TwainCapListing()
 {

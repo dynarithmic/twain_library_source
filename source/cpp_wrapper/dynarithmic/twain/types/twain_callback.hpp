@@ -29,7 +29,6 @@ OF THIRD PARTY RIGHTS.
 #include <functional>
 #include <dtwain.h>
 #include <dynarithmic/twain/twain_values.hpp>
-#include <dynarithmic/twain/source/twain_source_base.hpp>
 namespace dynarithmic
 {
     namespace twain

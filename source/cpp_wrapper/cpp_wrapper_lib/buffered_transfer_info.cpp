@@ -22,7 +22,7 @@ OF THIRD PARTY RIGHTS.
 #include <dynarithmic/twain/dtwain_twain.hpp>
 #include <dynarithmic/twain/capability_interface/capability_interface.hpp>
 #include <dynarithmic/twain/acquire_characteristics/acquire_characteristics.hpp>
-#include <dynarithmic/twain/twain_source.hpp>
+#include <dynarithmic/twain/source/twain_source.hpp>
 namespace dynarithmic
 {
     namespace twain

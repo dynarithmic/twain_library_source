@@ -3,8 +3,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <dynarithmic/twain/twain_session.hpp> // for dynarithmic::twain::twain_session
-#include <dynarithmic/twain/twain_source.hpp>  // for dynarithmic::twain::twain_source
+#include <dynarithmic/twain/twain_session.hpp> // for twain_session
+#include <dynarithmic/twain/twain_source.hpp>  // for twain_source
+#include <dynarithmic/twain/capability_interface.hpp>  // for capability_interface
 
 using namespace dynarithmic::twain;
 

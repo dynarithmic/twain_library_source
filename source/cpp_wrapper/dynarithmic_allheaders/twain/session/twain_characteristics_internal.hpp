@@ -1,6 +1,6 @@
 /*
 This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-Copyright (c) 2002-2022 Dynarithmic Software.
+Copyright (c) 2002-2020 Dynarithmic Software.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,21 +18,13 @@ FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
 DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
 OF THIRD PARTY RIGHTS.
 */
-
-#include <dynarithmic/twain/types/twain_types.hpp>
-#include <dynarithmic/twain/identity/twain_identity.hpp>
-#include <dynarithmic/twain/logging/error_logger_details.hpp>
-namespace dynarithmic
-{
-    namespace twain
-    {
-        // TWAIN characteristics when a session has been started
+// TWAIN characteristics when a session has been started
         /**
         *  The twain_characteristics class describes the various aspects of a TWAIN session such as DSM to use, logging, etc.<p>
-        *  The twain_session class has an instance of twain_characteristics.  To set the current twain_characteristics,
+        *  The twain_session class has an instance of twain_characteristics.  To set the current twain_characteristics, 
         *  call twain_session::get_twain_characeristics() to get a reference to the twain_characteristics object, and issue the requisite
         *  functions described here to set the various options.
-        *
+        * 
         *   \code {.cpp}
         *   twain_session session;
         *   //...
@@ -44,7 +36,7 @@ namespace dynarithmic
         class twain_characteristics
         {
             dynarithmic::twain::dsm_type dsmToUse;
-            twain_identity app_info;
+            twain_app_info app_info;
             std::string m_strSearchOrder;
             error_logger_details errorlog_details;
             std::string m_strTemporaryDirectory;
@@ -56,12 +48,12 @@ namespace dynarithmic
             bool m_bCheckHandles;
 
         public:
-            twain_characteristics() : dsmToUse(dsm_type::legacy_dsm),
-                m_strSearchOrder("WSOCU"),
-                m_bUsingCustomLoop(false),
-                m_bCheckHandles(true),
-                m_classicSearchOrder(-1),
-                m_strlibLanguage("english") {}
+            twain_characteristics() : dsmToUse(dsm_type::legacy_dsm), 
+                                      m_strSearchOrder("WSOCU"), 
+                                      m_bUsingCustomLoop(false),
+                                      m_bCheckHandles(true), 
+                                      m_classicSearchOrder(-1),
+                                      m_strlibLanguage("english") {}
 
             /// Indicates the TWAIN Data Source Manager to use (version 1.x or 2.x, or default) when the TWAIN session is started.
             /// @param[in] dsm TWAIN Data Source Manager to use when TWAIN session is started.
@@ -79,7 +71,7 @@ namespace dynarithmic
             /// @param[in] info Reference a twain_app_info, describing the application information to use
             /// @returns Reference to current twain_characteristics object (**this**)
             /// @note Use this function to have the TWAIN DSM recognize the application name, version, product name, etc.
-            twain_characteristics& set_app_info(const twain_identity& info) { app_info = info; return *this; }
+            twain_characteristics& set_app_info(const twain_app_info& info ) { app_info = info; return *this; }
 
             twain_characteristics& set_errorlogging_details(const error_logger_details& elog) { errorlog_details = elog; return *this; }
 
@@ -115,12 +107,12 @@ namespace dynarithmic
             /// @returns Reference to current twain_characteristics object (**this**)
             /// @note the default search order is "WSOCU"
             /// @see set_dsm_search_order() get_dsm_search_order() twain_session::get_dsm_path() twain_session::start()
-            twain_characteristics& set_dsm_search_order(std::string search_order,
-                std::string user_directory) noexcept
+            twain_characteristics& set_dsm_search_order(std::string search_order, 
+                                                        std::string user_directory) noexcept
             {
-                m_strSearchOrder = std::move(search_order);
-                m_strSearchDirectory = std::move(user_directory);
-                return *this;
+                m_strSearchOrder = std::move(search_order); 
+                m_strSearchDirectory = std::move(user_directory); 
+                return *this; 
             }
 
             twain_characteristics& set_dsm_search_order(int search_order) noexcept
@@ -145,7 +137,7 @@ namespace dynarithmic
                     set_dsm_search_order(iter->second, "");
                 return *this;
             }
-
+            
             /// Sets whether acquiring images requires a user-defined TWAIN message loop to run.
             /// 
             ///   An application that desires to have a customized TWAIN acquisition loop must call this function with a **true** value when twain_source::acquire() is called. Once this is done
@@ -190,7 +182,7 @@ namespace dynarithmic
             /// 
             /// @returns Reference to the current twain_app_info that describes the application information
             /// @see set_app_info()
-            twain_identity& get_app_info() { return app_info; }
+            twain_app_info& get_app_info() { return app_info; }
 
             /// Gets the current TWAIN Data Source Manager type that will be used
             /// 
@@ -239,5 +231,3 @@ namespace dynarithmic
             /// @see set_resource_directory()
             std::string get_resource_directory() const noexcept { return m_strResourcePath; }
         };
-    }
-}
