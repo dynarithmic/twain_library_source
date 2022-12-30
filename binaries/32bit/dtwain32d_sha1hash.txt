@@ -1,1 +1,1 @@
-﻿SHA1 hash of "dtwain32d.dll" (20 bytes) = 13c6c18079d76a001d31835a2edd2030635bc5c2
+﻿SHA1 hash of "dtwain32d.dll" (20 bytes) = 5329bbf67d29f8e1978aad0f2e33cafdfcfbeea1
