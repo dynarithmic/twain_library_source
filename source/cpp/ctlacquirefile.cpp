@@ -153,22 +153,25 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
     // if the auto-create is not on, let's do a quick test to see if the file can be written to the
     // directory specified.
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    CTL_StringType filename = opts.getFileName();
-    if (!bCreateDir)
+    bool bUsePrompt = opts.getFileFlags() & DTWAIN_USEPROMPT;
+    if (!bUsePrompt)
     {
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] 
-                { return !dynarithmic::directory_writeable(filename.c_str()); }, DTWAIN_ERR_INVALID_DIRECTORY, false, FUNC_MACRO);
-    }
-    else
-    {
-        if (!parent_directory_exists(opts.getFileName()).first)
+        CTL_StringType filename = opts.getFileName();
+        if (!bCreateDir)
         {
-            const auto dirCreated = dynarithmic::create_directory(dynarithmic::get_parent_directory(filename.c_str()).c_str());
             DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]
-                                { return dirCreated.first == false;  }, DTWAIN_ERR_CREATE_DIRECTORY, false, FUNC_MACRO);
+                { return !dynarithmic::directory_writeable(filename.c_str()); }, DTWAIN_ERR_INVALID_DIRECTORY, false, FUNC_MACRO);
+        }
+        else
+        {
+            if (!parent_directory_exists(opts.getFileName()).first)
+            {
+                const auto dirCreated = dynarithmic::create_directory(dynarithmic::get_parent_directory(filename.c_str()).c_str());
+                DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]
+                    { return dirCreated.first == false;  }, DTWAIN_ERR_CREATE_DIRECTORY, false, FUNC_MACRO);
+            }
         }
     }
-
     const DTWAIN_ARRAY aDibs = SourceAcquire(opts);
     if (opts.getStatus() < 0 && !aDibs)
     {

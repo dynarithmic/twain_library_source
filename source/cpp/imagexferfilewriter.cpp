@@ -140,9 +140,9 @@ int ImageXferFileWriter::CopyDibToFile(CTL_TwainDibPtr pCurDib,
 
 
 int ImageXferFileWriter::CopyDibToFileEx(CTL_TwainDibPtr pCurDib,
-                                          int MultipageOption,
-                                          CTL_ImageIOHandlerPtr& pHandler,
-                                          const CTL_StringType strTempFile) const
+                                         int MultipageOption,
+                                         CTL_ImageIOHandlerPtr& pHandler,
+                                         const CTL_StringType& strTempFile) const
 {
     DTWAINImageInfoEx ImageInfo;
 
@@ -492,7 +492,7 @@ int ImageXferFileWriter::ProcessManualDuplexState(LONG Msg) const
 
 int ImageXferFileWriter::MergeDuplexFilesEx(const sDuplexFileData& DupData,
                                             CTL_ImageIOHandlerPtr& pHandler,
-                                            CTL_StringType strTempFile,
+                                            const CTL_StringType& strTempFile,
                                             int MultiPageOption) const
 {
     std::ifstream nHandle;
@@ -526,7 +526,7 @@ int ImageXferFileWriter::MergeDuplexFilesEx(const sDuplexFileData& DupData,
         else
         {
             // Now create a DIB
-            const CTL_TwainDibPtr ThisDib(new CTL_TwainDib(pDibBufferHandle));
+            const CTL_TwainDibPtr ThisDib = std::make_shared<CTL_TwainDib>(pDibBufferHandle);
 
             // Move this DIB to the image file
             const LONG nStatus = CopyDibToFileEx(ThisDib, MultiPageOption, pHandler, std::move(strTempFile));
@@ -541,7 +541,7 @@ int ImageXferFileWriter::MergeDuplexFilesEx(const sDuplexFileData& DupData,
     return DTWAIN_MANDUP_SCANOK;
 }
 
-void ImageXferFileWriter::ManualDuplexCleanUp(CTL_StringType strFile/* = ""*/, bool bDestroyFile/*=false*/) const
+void ImageXferFileWriter::ManualDuplexCleanUp(const CTL_StringType& strFile/* = ""*/, bool bDestroyFile/*=false*/) const
 {
     CTL_TwainDib Dib;
     int nStatus;

@@ -31,7 +31,6 @@ namespace dynarithmic
 
         static std::string remove_quotes(std::string s)
         {
-            std::string ret;
             s.erase(std::remove(s.begin(), s.end(), '\"'), s.end());
             return s;
         }
@@ -310,8 +309,7 @@ namespace dynarithmic
                         jColorInfo += strm.str();
 
                         strm.str("");
-                        auto colorStr = join_string(pixInfo.begin(), pixInfo.end());
-                        std::string joinStr = colorStr; // join(colorStrV, ",");
+                        std::string joinStr = join_string(pixInfo.begin(), pixInfo.end()); 
                         strm << "\"color-types\":[" << joinStr << "],";
 
                         std::stringstream strm2;
@@ -433,8 +431,7 @@ namespace dynarithmic
                         tempStrm << "\"capability-count\":[{\"all\":" << vCapabilityInfo.size() << ","
                             "\"custom\":" << capInfo.get_custom_caps().size() << ","
                             "\"extended\":" << capInfo.get_extended_caps().size() << "}],\"capability-values\":" << capabilityString;
-                        std::string str1 = tempStrm.str();
-                        imageInfoString[10] = str1;
+                        imageInfoString[10] = tempStrm.str();
 
                         // Get the filetype info
                         tempStrm.str("");

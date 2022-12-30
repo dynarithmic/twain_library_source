@@ -132,17 +132,18 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
             return DTWAIN_ERR_FILEWRITE;
         }
 
-        pPDFInfo->m_Interface->DTWLIB_PDFSetPolarity(pDocument, pPDFInfo->ImageInfoEx.nPDFPolarity);
+        auto& imageinfo = pPDFInfo->ImageInfoEx;
+        pPDFInfo->m_Interface->DTWLIB_PDFSetPolarity(pDocument, imageinfo.nPDFPolarity);
         // Test the encryption here
         if ( pPDFInfo->ImageInfoEx.bIsPDFEncrypted)
         {
             pPDFInfo->m_Interface->DTWLIB_PDFSetEncryption(pDocument,
-                                    pPDFInfo->ImageInfoEx.PDFOwnerPassword.c_str(),
-                                    pPDFInfo->ImageInfoEx.PDFUserPassword.c_str(),
-                                    pPDFInfo->ImageInfoEx.PDFPermissions,
-                                    pPDFInfo->ImageInfoEx.bUseStrongEncryption?TRUE:false,
-                                    pPDFInfo->ImageInfoEx.bIsAESEncrypted?TRUE:FALSE);
-            }
+                                                            imageinfo.PDFOwnerPassword.c_str(),
+                                                            imageinfo.PDFUserPassword.c_str(),
+                                                            imageinfo.PDFPermissions,
+                                                            imageinfo.bUseStrongEncryption?TRUE:false,
+                                                            imageinfo.bIsAESEncrypted?TRUE:FALSE);
+        }
 
         pPDFInfo->IsPDFStarted = true;
         pPDFInfo->pPDFdoc = pDocument;

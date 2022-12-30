@@ -523,7 +523,7 @@ bool PdfDocument::OpenNewPDFFile(CTL_StringType sFile)
     if ( !m_outFile )
         return false;
     WRITE_TO_LOG()
-    m_sOutputFileName = sFile;
+    m_sOutputFileName = std::move(sFile);
     WRITE_TO_LOG()
     // Get the document ID for this file
     CreateIDString(StringConversion::Convert_Native_To_Ansi(m_sOutputFileName), m_DocumentID[0], m_DocumentID[1]);
@@ -1133,8 +1133,9 @@ void EncryptionObject::ComposeObject()
     // Now for the owner and user passwords
     std::string enc1;
     std::string enc2;
-    const PDFEncryption::UCHARArray enc1Array = GetParent()->GetEncryptionEngine().GetOwnerKey();
-    const PDFEncryption::UCHARArray enc2Array = GetParent()->GetEncryptionEngine().GetUserKey();
+    auto& engine = GetParent()->GetEncryptionEngine();
+    const PDFEncryption::UCHARArray enc1Array = engine.GetOwnerKey();
+    const PDFEncryption::UCHARArray enc2Array = engine.GetUserKey();
     enc1.append(reinterpret_cast<const char *>(enc1Array.data()), 32);
     enc2.append(reinterpret_cast<const char *>(enc2Array.data()), 32);
     AppendContents("/O (");
@@ -1143,7 +1144,7 @@ void EncryptionObject::ComposeObject()
     AppendContents(")\n/U (");
     enc2 = MakeCompatiblePDFString(enc2);
     WriteRaw(enc2.data(), enc2.length());
-    sprintf(szBuf,")\n/P %d\n/V %d\n>>", GetParent()->GetEncryptionEngine().GetPermissions(), m_nVValue);
+    sprintf(szBuf,")\n/P %d\n/V %d\n>>", engine.GetPermissions(), m_nVValue);
     AppendContents(szBuf);
     if (m_bAESEncrypted)
     {
@@ -1220,8 +1221,6 @@ void ContentsObject::PreComposeObject()
 {
     std::string sRealStream;
     char szBuf[120];
-    std::string sLength = "/Length ";
-    std::string sStream = "stream\n";
 
     // Start of stream
     sRealStream += "q\n";
@@ -1229,7 +1228,7 @@ void ContentsObject::PreComposeObject()
     sprintf(szBuf, "%-10.5lf 0.0000 0.0000 %10.5lf 0.000 0.0000 cm\n", m_xscale, m_yscale);
     sRealStream += szBuf;
     sRealStream += "/" + m_sImgName + " Do\nQ\n";
-    m_preComposedObject = sRealStream;
+    m_preComposedObject = std::move(sRealStream);
 }
 
 void ContentsObject::CreateFontDictAndText(int startObjNum, int& nextObjNum)

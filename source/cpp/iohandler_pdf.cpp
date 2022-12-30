@@ -286,8 +286,6 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
 
     // If OCR text is desired, then get the text for the page now
     int bRet;
-    CTL_TEXTELEMENTPTRLIST::iterator tempExFirst;
-    CTL_TEXTELEMENTPTRLIST::iterator tempExLast;
     unsigned int nCount = 0;
     m_ImageInfoEx.IsSearchableTextOnPage = false;
 
@@ -491,7 +489,7 @@ int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, std::string& sT
             CTL_TwainAppMgr::WriteLogInfo(_T("Error creating temporary OCR Image File ") + szTempPath + _T("\n"));
             return bRetWrite;
         }
-        sFileToUse = szTempPath;
+        sFileToUse = std::move(szTempPath);
     }
     // Just OCR the text here
     DTWAIN_ARRAY aValues = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 1);

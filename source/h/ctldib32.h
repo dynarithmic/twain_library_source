@@ -54,7 +54,7 @@ namespace dynarithmic
             void    SetDib( CTL_TwainDib *pDib ) { m_pDib = pDib; }
             virtual int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pMultiDibStruct = nullptr) = 0;
             std::shared_ptr<DibMultiPageData> GetMultiDibData() const { return pMultiDibData; }
-            void SetMultiDibData(std::shared_ptr<DibMultiPageData> pData) { pMultiDibData = pData;  }
+            void SetMultiDibData(std::shared_ptr<DibMultiPageData> pData) { pMultiDibData = std::move(pData);  }
             void SetMultiDibInfo(const DibMultiPageStruct &s);
             DibMultiPageStruct GetMultiDibInfo() const;
             bool AllPagesOK() const { return m_bAllWritten; }

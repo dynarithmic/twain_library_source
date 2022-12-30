@@ -549,7 +549,7 @@ namespace dynarithmic
             static CTL_TwainLongToStringMap& GetTwainCountryMap() { return s_TwainCountryMap;  }
             static CTL_TwainLongToStringMap& GetTwainLanguageMap() { return s_TwainLanguageMap; }
             CTL_StringType GetVersionString() const { return  m_VersionString; }
-            void        SetVersionString(CTL_StringType s) { m_VersionString = s; }
+            void        SetVersionString(CTL_StringType s) { m_VersionString = std::move(s); }
 
             static DTWAIN_ACQUIRE     GetNewAcquireNum();
             static void             EraseAcquireNum(DTWAIN_ACQUIRE nNum);

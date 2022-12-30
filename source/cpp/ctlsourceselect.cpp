@@ -103,7 +103,6 @@ DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSource()
 DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSource2(HWND hWndParent, LPCTSTR szTitle, LONG xPos, LONG yPos, LONG nOptions)
 {
     LOG_FUNC_ENTRY_PARAMS((hWndParent, szTitle, xPos, yPos, nOptions))
-    const CTL_StringType sTitle = szTitle? szTitle : _T("");
     const DTWAIN_SOURCE Source = SelectAndOpenSource(SourceSelectionOptions(SELECTSOURCE2, nullptr, hWndParent,
                                                                             szTitle, xPos, yPos, nullptr, nullptr, nullptr, nOptions));
     LOG_FUNC_EXIT_PARAMS(Source)

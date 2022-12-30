@@ -572,7 +572,7 @@ void CTL_ITwainSource::AddPixelTypeAndBitDepth(int PixelType, int BitDepth)
         // pixel type not found, so add it
         std::vector<int> BitDepths;
         BitDepths.push_back( BitDepth );
-        m_aPixelTypeMap[PixelType] = BitDepths;
+        m_aPixelTypeMap[PixelType] = std::move(BitDepths);
     }
     else
     {

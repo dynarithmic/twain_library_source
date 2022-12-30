@@ -156,7 +156,7 @@ namespace dynarithmic
         void         SetMaxAcquireCount(int nAcquire) { m_nAcquireCount = nAcquire; }
         CTL_TwainAcquireEnum  GetAcquireType() const { return m_AcquireType; }
         CTL_StringType GetAcquireFile() const { return m_strAcquireFile; }
-        void         SetAcquireFile(CTL_StringType szFile) { m_strAcquireFile = szFile; }
+        void         SetAcquireFile(CTL_StringType szFile) { m_strAcquireFile = std::move(szFile); }
         long         GetAcquireFileFlags() const { return m_lFileFlags; }
         void         SetAcquireFileFlags(long lFileFlags) { m_lFileFlags = lFileFlags; }
         static bool  IsFileTypeMultiPage(CTL_TwainFileFormatEnum FileType);
@@ -308,7 +308,7 @@ namespace dynarithmic
         void         SetImagesStored(bool bSet=true) { m_bImagesStored = bSet; }
         bool         ImagesStored() const { return m_bImagesStored; }
         CTL_StringType GetLastAcquiredFileName() const { return m_strLastAcquiredFile; }
-        void         SetLastAcquiredFileName(CTL_StringType sName) { m_strLastAcquiredFile = sName; }
+        void         SetLastAcquiredFileName(CTL_StringType sName) { m_strLastAcquiredFile = std::move(sName); }
         TW_FILESYSTEM*  GetFileSystem() { return &m_FileSystem; }
 
         // Extended image info functions
@@ -397,7 +397,7 @@ namespace dynarithmic
         void         ClearPDFText();
         bool         IsTwainVersion2() const { return m_bDSMVersion2; }
         void         SetTwainVersion2(bool bSet = true) { m_bDSMVersion2 = bSet;  }
-        void         SetActualFileName(CTL_StringType sName) { m_ActualFileName = sName;  }
+        void         SetActualFileName(CTL_StringType sName) { m_ActualFileName = std::move(sName);  }
         CTL_StringType GetActualFileName() const { return m_ActualFileName;  }
         void         SetOpenFlag(bool bOpened) { m_bIsOpened = bOpened; }
         bool         CloseSource(bool bForce);

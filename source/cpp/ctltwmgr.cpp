@@ -419,12 +419,6 @@ bool CTL_TwainAppMgr::GetBestContainerType(const CTL_ITwainSource* pSource,
         // Get the possible container types for the set cap
         rContainerSet = GetContainerTypesFromCap( nCap, 1 );
 
-        CTL_CapabilityGetTriplet CapTester(pSession,
-                                           pTempSource,
-                                           static_cast<CTL_EnumGetType>(lGetType),
-                                           static_cast<TW_UINT16>(nCap),
-                                           0
-                                           );
         // Check if there is only one type of "Get"
         if ( !( rContainerGet == TwainContainer_ONEVALUE ||
              rContainerGet == TwainContainer_ENUMERATION ||
@@ -435,6 +429,12 @@ bool CTL_TwainAppMgr::GetBestContainerType(const CTL_ITwainSource* pSource,
             // First, set the dependent capabilities
             if ( SetDependentCaps( pSource, nCap ) )
             {
+                CTL_CapabilityGetTriplet CapTester(pSession,
+                    pTempSource,
+                    static_cast<CTL_EnumGetType>(lGetType),
+                    static_cast<TW_UINT16>(nCap),
+                    0
+                );
                 CapTester.SetTestMode(true);
                 const TW_UINT16 rc = CapTester.Execute();
                 if ( rc == TWRC_SUCCESS )
@@ -478,12 +478,11 @@ bool CTL_TwainAppMgr::GetBestCapDataType(const CTL_ITwainSource* pSource, TW_UIN
     const auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
     const auto pSession = pTempSource->GetTwainSession();
 
-    CTL_CapabilityGetTriplet CapTester(pSession, pTempSource,
-                                       CTL_GetTypeGET,
-                                       static_cast<CTL_EnumCapability>(nCap), 0);
-
     if ( SetDependentCaps( pSource, nCap ) )
     {
+        CTL_CapabilityGetTriplet CapTester(pSession, pTempSource,
+                                            CTL_GetTypeGET,
+                                            static_cast<CTL_EnumCapability>(nCap), 0);
         CapTester.SetTestMode(true);
         const TW_UINT16 rc = CapTester.Execute();
         if ( rc == TWRC_SUCCESS )
@@ -2534,7 +2533,7 @@ bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
     {
         // load the default TWAIN_32.DLL or TWAINDSM.DLL using the
         // normal process of finding these DLL's
-        const auto tempStr = m_strTwainDSMPath;
+        const auto& tempStr = m_strTwainDSMPath;
         m_strTwainDSMPath = GetTwainDirFullName(m_strTwainDSMPath.c_str(), nullptr, true, &m_hLibModule);
         if ( m_strTwainDSMPath.empty() )
         {
@@ -2614,7 +2613,6 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
     CTL_ErrorStruct e;
     std::string s;
 
-    auto tripComponents = pTriplet.GetTripletComponents();
     pTW_IDENTITY pOrigin = pTriplet.GetOriginID();
     pTW_IDENTITY pDest   = pTriplet.GetDestinationID();
     TW_UINT32    nDG     = pTriplet.GetDG();

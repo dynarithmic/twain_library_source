@@ -712,7 +712,7 @@ PSHead(FILE *fd, TIFF *tif, uint32_t w, uint32_t h, float pw, float ph,
     t = time(nullptr);
     fprintf(fd, "%%!PS-Adobe-3.0%s\n", generateEPSF ? " EPSF-3.0" : "");
     CTL_StringType Buffer = GetVersionString();
-    std::string sConverted = StringConversion::Convert_Native_To_Ansi(Buffer).c_str();
+    std::string sConverted = StringConversion::Convert_Native_To_Ansi(Buffer);
     std::replace_if(sConverted.begin(), sConverted.end(), [](unsigned char ch) { return ::iscntrl(ch); }, ' ');
     fprintf(fd, "%%%%Creator: %s\n", sConverted.c_str());
     fprintf(fd, "%%%%Title: %s\n", szTitle);

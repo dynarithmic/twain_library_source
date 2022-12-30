@@ -148,7 +148,6 @@ namespace dynarithmic
         }
 
         // Read in the list of available file types.
-        std::string extList;
         auto& availableFileMap = CTL_TwainDLLHandle::GetAvailableFileFormatsMap();
         while (std::getline(ifs, line))
         {
@@ -172,7 +171,6 @@ namespace dynarithmic
         for ( int constantVal = 0; constantVal < CTL_TwainDLLHandle::NumTwainMapValues; ++constantVal)
         { 
             // Read in the pixel type constants
-            std::string twainString;
             auto iter = constantsMap.insert({constantVal, {}}).first;
             while (std::getline(ifs, line))
             {

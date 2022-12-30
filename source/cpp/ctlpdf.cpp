@@ -401,10 +401,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFText(DTWAIN_SOURCE Source,
         if ( !fontName )
             element.m_font.m_fontName = sFontName;
         else
-        {
-            sFontName = StringConversion::Convert_NativePtr_To_Ansi(fontName);
-            element.m_font.m_fontName = sFontName;
-        }
+            element.m_font.m_fontName = StringConversion::Convert_NativePtr_To_Ansi(fontName); 
         for (int i = 0; i < numDefVals; ++i )
         {
             if ( Flags & defVals[i].flagValue )
@@ -425,7 +422,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFText(DTWAIN_SOURCE Source,
         if ( Flags & DTWAIN_PDFTEXT_NOABSPOSITION )
             element.stockPosition = Flags & 0x000FFF00;
 
-        PDFTextElementPtr pPtr( new PDFTextElement );
+        PDFTextElementPtr pPtr = std::make_shared<PDFTextElement>();
         *pPtr = element;
         p->SetPDFValue(PDFTEXTELEMENTKEY, pPtr);
         LOG_FUNC_EXIT_PARAMS(true)
@@ -454,7 +451,7 @@ DTWAIN_PDFTEXTELEMENT DLLENTRY_DEF DTWAIN_CreatePDFTextElement(DTWAIN_SOURCE Sou
     CTL_ITwainSource *p = VerifySourceHandle( pHandle, Source );
     if (p)
     {
-        PDFTextElementPtr pPtr( new PDFTextElement );
+        PDFTextElementPtr pPtr = std::make_shared<PDFTextElement>();
         const DTWAIN_PDFTEXTELEMENT pdfHandle = pPtr.get();
         PDFTextElement* rawPtr = static_cast<PDFTextElement*>(pdfHandle);
         rawPtr->pTwainSource = p;

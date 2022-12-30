@@ -1007,7 +1007,7 @@ LRESULT CALLBACK DisplayFileTypesProc(HWND hDlg, UINT message, WPARAM wParam, LP
                     /* Get the current selection */
                         SendMessage( hWndEdit, WM_GETTEXT, 256, (LPARAM)g_FileName);
 
-                    if ( lstrlen(g_FileName) == 0 || IsAllSpace(g_FileName))
+                    if ( g_FileName[0] == 0 || IsAllSpace(g_FileName))
                     {
                         MessageBox(hDlg, _T("A file name must be entered"), _T("Error"), MB_ICONSTOP);
                     }

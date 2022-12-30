@@ -138,12 +138,17 @@
 #define DTWAIN_MILLIMETERS 6
 
 /* File Acquire flags */
-#define DTWAIN_USENAME            4
-#define DTWAIN_USEPROMPT          8
-#define DTWAIN_USELONGNAME        16
-#define DTWAIN_USESOURCEMODE      32
-#define DTWAIN_USELIST            64
-#define DTWAIN_CREATE_DIRECTORY   128
+#define DTWAIN_USENATIVE           1
+#define DTWAIN_USEBUFFERED         2
+#define DTWAIN_USECOMPRESSION      4
+#define DTWAIN_USEMEMFILE          8
+#define DTWAIN_USENAME            16
+#define DTWAIN_USEPROMPT          32
+#define DTWAIN_USELONGNAME        64
+#define DTWAIN_USESOURCEMODE      128
+#define DTWAIN_USELIST            256
+#define DTWAIN_CREATE_DIRECTORY   512
+
 
 /* DTWAIN_ARRAY types */
 #define DTWAIN_ARRAYANY             1
@@ -306,12 +311,6 @@
 #define DTWAIN_CallbackERROR      1
 #define DTWAIN_CallbackMESSAGE    2
 
-/* DTWAIN Transfer Modes for File and Clipboard */
-#define DTWAIN_USENATIVE      1
-#define DTWAIN_USEBUFFERED    2
-#define DTWAIN_USECOMPRESSION 4
-#define DTWAIN_USEMEMFILE     8
-
 /* DTWAIN Special Failure codes */
 #define DTWAIN_FAILURE1       (-1)
 #define DTWAIN_FAILURE2       (-2)
@@ -319,7 +318,7 @@
 /* Other miscellaneous constants */
 #define DTWAIN_DELETEALL      (-1)
 
-/* Page total page(s) transferrance wParam's */
+/* Page total page(s) transferred wParam's */
 /* Sent when an acquisition has been successful */
 #define  DTWAIN_TN_ACQUIREDONE                    1000
 
@@ -327,6 +326,7 @@
 #define  DTWAIN_TN_ACQUIREFAILED                  1001
 /* Cancelled the acquisition */
 #define  DTWAIN_TN_ACQUIRECANCELLED               1002
+#define  DTWAIN_TN_ACQUIRECANCELED                1002
 /* Started an acquisition */
 #define  DTWAIN_TN_ACQUIRESTARTED                 1003
 
@@ -337,6 +337,7 @@
 #define  DTWAIN_TN_PAGEFAILED                     1005
 /* Page cancelled */
 #define  DTWAIN_TN_PAGECANCELLED                  1006
+#define  DTWAIN_TN_PAGECANCELED                   1006
 
 /* Sent when TWAIN is in the "Transfer ready" state (State 6) */
 #define  DTWAIN_TN_TRANSFERREADY                  1009
@@ -374,9 +375,11 @@
 /* Sent if program decides to cancel the initial
    transfer */
 #define DTWAIN_TN_TRANSFERCANCELLED          1030
+#define DTWAIN_TN_TRANSFERCANCELED           1030
 
 /* Sent if user cancels the saving of a file using the file prompt */
 #define DTWAIN_TN_FILESAVECANCELLED         1031
+#define DTWAIN_TN_FILESAVECANCELED         1031
 #define DTWAIN_TN_FILESAVEOK                1032
 #define DTWAIN_TN_FILESAVEERROR             1033
 #define DTWAIN_TN_FILEPAGESAVEOK            1034
@@ -454,6 +457,7 @@
 
 /* Sent if TWAIN driver sends cancel code during acquisition */
 #define DTWAIN_TN_TWAINPAGECANCELLED       1105
+#define DTWAIN_TN_TWAINPAGECANCELED        1105
 
 /* Sent if TWAIN driver sends failure code during acquisition */
 #define DTWAIN_TN_TWAINPAGEFAILED          1106
