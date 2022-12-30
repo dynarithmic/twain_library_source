@@ -817,7 +817,6 @@ namespace dynarithmic
             boost::empty_token_policy tokenPolicy = bGetNullTokens?boost::keep_empty_tokens : boost::drop_empty_tokens;
             boost::char_separator<CharType> sepr(lpszTokStr, StringTraits::GetEmptyString(), tokenPolicy);
             tokenizer tokens(str, sepr);
-            typename StringType::const_iterator beg = str.begin();
             for (typename tokenizer::const_iterator tok_iter = tokens.begin();
                 tok_iter != tokens.end(); ++tok_iter)
             {
@@ -844,7 +843,6 @@ namespace dynarithmic
 
             boost::escaped_list_separator<CharType> sepr(StringTraits::GetEmptyString(), lpszTokStr, StringTraits::AllQuoteString());
             tokenizer tokens(str, sepr);
-            typename StringType::const_iterator beg = str.begin();
             for (auto tok_iter = tokens.begin(); tok_iter != tokens.end(); ++tok_iter)
             {
                 rArray.push_back(*tok_iter);

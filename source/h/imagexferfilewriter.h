@@ -58,15 +58,15 @@ namespace dynarithmic
             int      ProcessManualDuplexState(LONG Msg) const;
             int      MergeDuplexFilesEx(const sDuplexFileData& DupData,
                                         CTL_ImageIOHandlerPtr& pHandler,
-                                        CTL_StringType strTempFile,
+                                        const CTL_StringType& strTempFile,
                                         int MultiPageOption) const;
 
             int     CopyDibToFileEx(CTL_TwainDibPtr pCurDib,
                                      int MultipageOption,
                                      CTL_ImageIOHandlerPtr& pHandler,
-                                     CTL_StringType strTempFile) const;
+                                     const CTL_StringType& strTempFile) const;
 
-            void     ManualDuplexCleanUp(CTL_StringType strFile, bool bDeleteFile=false) const;
+            void     ManualDuplexCleanUp(const CTL_StringType& strFile, bool bDeleteFile=false) const;
             bool     ProcessFailureCondition(int nAction) const;
             LONG     CloseMultiPageDibFile(bool bSaveFile=true) const;
             void     EndProcessingImageFile(bool bSaveFile=true) const;

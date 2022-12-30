@@ -195,7 +195,7 @@ bool OCREngine::SetAllFileTypes(const FileTypeArray& allTypes)
 OCREngine::FileTypeArray OCREngine::GetAllFileTypes() const { return m_fileTypes; }
 void OCREngine::AddCapValue(LONG nCap, const OCRCapInfo& capInfo)
 {
-    m_AllCapValues.insert(std::make_pair(nCap, capInfo));
+    m_AllCapValues.insert({ nCap, capInfo });
 }
 
 LONG OCREngine::GetCapDataType(LONG nOCRCap) const

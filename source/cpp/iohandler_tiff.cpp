@@ -58,7 +58,7 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
 
             // OK, now remember that the file we are writing is a TIF file, and this is
             // the file that is created first
-            sActualFileName = szTempPath;
+            sActualFileName = std::move(szTempPath);
             sPostscriptName = szFile;
         }
         else

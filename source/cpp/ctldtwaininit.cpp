@@ -1530,9 +1530,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
 
     StringTraitsA::string_type sClosingDSM = CTL_TwainDLLHandle::s_ResourceStrings[IDS_DTWAIN_ERROR_CLOSING_DSM] + "\n";
     StringTraitsA::string_type sClosingTwainSession = CTL_TwainDLLHandle::s_ResourceStrings[IDS_DTWAIN_ERROR_CLOSING_TWAIN_SESSION] + "\n";
-    StringTraitsA::string_type sClosingManager = CTL_TwainDLLHandle::s_ResourceStrings[IDS_DTWAIN_ERROR_CLOSING_DTWAIN_MANAGER] + "\n";
-    StringTraitsA::string_type sClosingDTWAIN = CTL_TwainDLLHandle::s_ResourceStrings[IDS_CLOSING_DTWAIN] + "\n";
-    StringTraitsA::string_type sRemoveWindow = CTL_TwainDLLHandle::s_ResourceStrings[IDS_DTWAIN_ERROR_REMOVE_WINDOW] + "\n";
 
     try
     {
@@ -1560,10 +1557,16 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
         catch(...)
         {
             if (CTL_TwainDLLHandle::s_lErrorFilterFlags)
+            {
+                StringTraitsA::string_type sClosingManager = CTL_TwainDLLHandle::s_ResourceStrings[IDS_DTWAIN_ERROR_CLOSING_DTWAIN_MANAGER] + "\n";
                 CTL_TwainAppMgr::WriteLogInfoA(sClosingManager);
+            }
         }
-        if ( CTL_TwainDLLHandle::s_lErrorFilterFlags)
+        if (CTL_TwainDLLHandle::s_lErrorFilterFlags)
+        {
+            StringTraitsA::string_type sClosingDTWAIN = CTL_TwainDLLHandle::s_ResourceStrings[IDS_CLOSING_DTWAIN] + "\n";
             CTL_TwainAppMgr::WriteLogInfoA(sClosingDTWAIN);
+        }
     }
 
     // Remove the hook
@@ -1590,7 +1593,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
         catch(...)
         {
             if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+            {
+                StringTraitsA::string_type sRemoveWindow = CTL_TwainDLLHandle::s_ResourceStrings[IDS_DTWAIN_ERROR_REMOVE_WINDOW] + "\n";
                 CTL_TwainAppMgr::WriteLogInfoA(sRemoveWindow);
+            }
         }
     }
     pHandle->m_hWndTwain = nullptr;

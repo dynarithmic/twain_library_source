@@ -381,7 +381,7 @@ namespace dynarithmic
 
             void SetImageType(int nImageType) { m_nImageType = nImageType; }
             int  GetImageType() const { return m_nImageType; }
-            void SetThumbnailFile(CTL_StringType s) { m_sThumbnailFileName = s; }
+            void SetThumbnailFile(CTL_StringType s) { m_sThumbnailFileName = std::move(s); }
             void SetDPI(unsigned long dpi) { m_dpi = dpi; }
             void SetASCIICompression(bool bSet) { m_bASCIICompression = bSet; }
             bool IsASCIICompressed() { return m_bASCIICompression; }

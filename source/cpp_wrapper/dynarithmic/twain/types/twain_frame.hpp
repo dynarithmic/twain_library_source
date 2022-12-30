@@ -45,8 +45,7 @@ namespace dynarithmic
             twain_frame(const FrameType& l, const FrameType& t, const FrameType& r, const FrameType& b) : left(l), top(t), right(r), bottom(b)
             {}
 
-            twain_frame()
-            {}
+            twain_frame() = default;
 
             bool operator==(const twain_frame& tf) const
             {

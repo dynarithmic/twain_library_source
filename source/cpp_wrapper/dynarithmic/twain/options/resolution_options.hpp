@@ -37,7 +37,7 @@ namespace dynarithmic
             double m_yResolution = (std::numeric_limits<double>::min)();
     
             public:
-                resolution_options() {}
+                resolution_options() = default;
                 resolution_options& set_xresolution(double val) noexcept
                 { m_xResolution = val; return *this; }
 

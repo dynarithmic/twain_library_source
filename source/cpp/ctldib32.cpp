@@ -912,28 +912,24 @@ bool CTL_TwainDib::FlipBitMap(bool /*bRGB*/)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 CTL_TwainDibPtr CTL_TwainDibArray::CreateDib()
 {
-    const CTL_TwainDibPtr NewDib(new CTL_TwainDib);
-    return InitializeDibInfo(NewDib);
+    return InitializeDibInfo(std::make_shared<CTL_TwainDib>());
 }
 
 
 CTL_TwainDibPtr CTL_TwainDibArray::CreateDib(HANDLE hDib, HWND hWnd/*=NULL*/)
 {
-    const CTL_TwainDibPtr NewDib(new CTL_TwainDib(hDib, hWnd));
-    return InitializeDibInfo(NewDib);
+    return InitializeDibInfo(std::make_shared<CTL_TwainDib>(hDib, hWnd));
 }
 
 
 CTL_TwainDibPtr CTL_TwainDibArray::CreateDib(LPCSTR lpszFileName, HWND hWnd/*=NULL*/)
 {
-    const CTL_TwainDibPtr NewDib(new CTL_TwainDib( lpszFileName, hWnd ));
-    return InitializeDibInfo(NewDib);
+    return InitializeDibInfo(std::make_shared<CTL_TwainDib>(lpszFileName, hWnd));
 }
 
 CTL_TwainDibPtr CTL_TwainDibArray::CreateDib( const CTL_TwainDib& rDib )
 {
-    const CTL_TwainDibPtr NewDib(new CTL_TwainDib( rDib ));
-    return InitializeDibInfo(NewDib);
+    return InitializeDibInfo(std::make_shared<CTL_TwainDib>(rDib));
 }
 
 CTL_TwainDibPtr CTL_TwainDibArray::InitializeDibInfo(CTL_TwainDibPtr Dib)

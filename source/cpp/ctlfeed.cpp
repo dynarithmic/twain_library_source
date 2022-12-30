@@ -137,12 +137,12 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_EnableFeeder(DTWAIN_SOURCE Source, DTWAIN_BOOL 
     if ( bSet )
     {
         DTWAIN_ARRAY aExtendedCaps = nullptr;
-        LONG Caps[] = { DTWAIN_CV_CAPFEEDPAGE, DTWAIN_CV_CAPREWINDPAGE, DTWAIN_CV_CAPCLEARPAGE };
         if (!DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPEXTENDEDCAPS))
             LOG_FUNC_EXIT_PARAMS(bRet)
         const DTWAIN_BOOL bOk = DTWAIN_GetCapValues( Source, DTWAIN_CV_CAPEXTENDEDCAPS, DTWAIN_CAPGETCURRENT, &aExtendedCaps);
         if ( bOk && aExtendedCaps )
         {
+            LONG Caps[] = { DTWAIN_CV_CAPFEEDPAGE, DTWAIN_CV_CAPREWINDPAGE, DTWAIN_CV_CAPCLEARPAGE };
             DTWAINArrayLL_RAII arr(aExtendedCaps);
             auto& vCaps = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(aExtendedCaps);
             const size_t oldSize = vCaps.size();

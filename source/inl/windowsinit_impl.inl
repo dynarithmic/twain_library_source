@@ -236,9 +236,7 @@ void dynarithmic::LogWin32Error(DWORD lastError)
 void LogDTWAINErrorToMsgBox(int nError, LPCSTR func, const std::string& s)
 {
     StringStreamA strm;
-    if (func)
-        std::string funcstr = func;
-    else
+    if (!func)
         func = "(Uninitialized DTWAIN DLL)";
     strm << "DTWAIN Function " << func << " returned error code " << nError << std::endl << std::endl;
     strm << s.c_str();

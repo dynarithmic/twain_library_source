@@ -177,7 +177,7 @@ void CTL_ErrorStructDecoder::StartMessageDecoder(HWND hWnd, UINT nMsg,
 {
     StringStreamA sBuffer;
 
-    m_pString = "";
+    m_pString.clear();
     if ( s_mapNotificationType.find(wParam) != s_mapNotificationType.end())
         sBuffer << "\nDTWAIN Message(HWND = " << hWnd << ", " <<
                                     "MSG = " << nMsg << ", " <<
@@ -197,7 +197,7 @@ void CTL_ErrorStructDecoder::StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDe
 {
     StringStreamA sBuffer;
 
-    m_pString = "";
+    m_pString.clear();
     std::string s1;
     sBuffer << "\nDSM_Entry(pSource=" << pSource << "H, " <<
                 "pDest=" << pDest << "H, " <<
