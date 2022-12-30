@@ -43,7 +43,7 @@ OF THIRD PARTY RIGHTS.
 #define optional_type_ boost::optional
 #define optional_null_ boost::none
 #endif
-#include <dynarithmic/twain/session/twain_characteristics_internal.hpp>
+#include <dynarithmic/twain/session/twain_characteristics.hpp>
 #include <dynarithmic/twain/characteristics/twain_select_dialog.hpp>
 #include <dynarithmic/twain/logging/error_logger.hpp>
 #include <dynarithmic/twain/logging/twain_logger.hpp>

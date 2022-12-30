@@ -22,12 +22,12 @@ OF THIRD PARTY RIGHTS.
 #ifndef DTWAIN_TWAIN_IDENTITY_HPP
 #define DTWAIN_TWAIN_IDENTITY_HPP
 
-#include "twain.h"
 #include <string>
 #include <cstring>
 #include <algorithm>
 #include <sstream>
 #include <numeric>
+#include "twain.h"
 
 namespace dynarithmic
 {

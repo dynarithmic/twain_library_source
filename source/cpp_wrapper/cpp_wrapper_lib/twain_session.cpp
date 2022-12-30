@@ -202,7 +202,7 @@ namespace dynarithmic
             if (handleStatus == 0)
                 return false;
             m_Handle = handle;
-            return start(handleStatus & DTWAIN_TWAINSESSIONOK);
+            return start((handleStatus & DTWAIN_TWAINSESSIONOK)?true:false);
         }
 
         /// Starts a TWAIN session by opening the TWAIN Data Source Manager (DSM).

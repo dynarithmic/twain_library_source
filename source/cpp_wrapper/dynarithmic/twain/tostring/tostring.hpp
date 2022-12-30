@@ -21,26 +21,10 @@ OF THIRD PARTY RIGHTS.
 #ifndef DTWAIN_TOSTRING_HPP
 #define DTWAIN_TOSTRING_HPP
 
-#if __cplusplus >= 201703L
-#include <variant>
-#define variant_type_ std::variant
-#define variant_get_ std::get
-#define variant_get_type_(v) (v).index() 
-#else
-#include <boost/variant.hpp>
-#define variant_type_ boost::variant
-#define variant_get_ boost::get
-#define variant_get_type_(v) (v).which() 
-#endif
-
 #include <map>
-#include <unordered_map>
-#include <unordered_set>
 #include <type_traits>
-#include <memory>
 #include <vector>
 #include <algorithm>
-#include <set>
 #include <iterator>
 
 namespace dynarithmic

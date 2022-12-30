@@ -153,7 +153,7 @@ namespace dynarithmic
                 pdf_ignoreflag_container get_ignoreflags() const { return m_vIgnoreflags; }
                 pdf_ignoreflag_container& get_ignoreflags_ref() { return m_vIgnoreflags; }
 
-                bool add_text(twain_source& ts)
+                bool add_text(twain_source_base& ts)
                 {
                     DTWAIN_SOURCE src = ts.get_source();
                     LONG flags = 0;

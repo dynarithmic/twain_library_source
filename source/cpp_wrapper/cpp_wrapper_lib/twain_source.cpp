@@ -25,6 +25,8 @@ OF THIRD PARTY RIGHTS.
 #include <dynarithmic/twain/info/paperhandling_info.hpp>
 #include <dynarithmic/twain/types/twain_timer.hpp>
 #include <dynarithmic/twain/tostring/tojson.hpp>
+#include <dynarithmic/twain/source/twain_source_pimpl.hpp>
+
 namespace dynarithmic
 {
 	namespace twain
@@ -36,7 +38,8 @@ namespace dynarithmic
             m_bCloseable{},
             m_theSource{},
             m_bUIOnlyOn{},
-            m_bWeakAttach{}
+            m_bWeakAttach{},
+            m_pTwainSourceImpl{}
         {
             create_interfaces();
             attach(select_info);
@@ -64,19 +67,17 @@ namespace dynarithmic
             std::swap(left.m_source_details, right.m_source_details);
             std::swap(left.m_theSource, right.m_theSource);
             std::swap(left.m_bUIOnlyOn, right.m_bUIOnlyOn);
-            std::swap(left.m_acquire_characteristics, right.m_acquire_characteristics);
-            std::swap(left.m_buffered_info, right.m_buffered_info);
-            std::swap(left.m_filetransfer_info, right.m_filetransfer_info);
-            std::swap(left.m_capability_listener, right.m_capability_listener);
+            std::swap(left.m_pTwainSourceImpl, right.m_pTwainSourceImpl);
         }
 
         void twain_source::create_interfaces()
         {
-            m_acquire_characteristics = std::make_unique<acquire_characteristics>();
-            m_buffered_info = std::make_unique<buffered_transfer_info>();
-            m_filetransfer_info = std::make_unique<file_transfer_info>();
-            m_capability_listener = std::make_unique<capability_listener>();
-            m_capability_info = std::make_unique<capability_interface>();
+            m_pTwainSourceImpl = std::make_shared<twain_source_pimpl>();
+            m_pTwainSourceImpl->m_acquire_characteristics = std::make_unique<acquire_characteristics>();
+            m_pTwainSourceImpl->m_buffered_info = std::make_unique<buffered_transfer_info>();
+            m_pTwainSourceImpl->m_filetransfer_info = std::make_unique<file_transfer_info>();
+            m_pTwainSourceImpl->m_capability_listener = std::make_unique<capability_listener>();
+            m_pTwainSourceImpl->m_capability_info = std::make_unique<capability_interface>();
         }
 
         void twain_source::get_source_info_internal()
@@ -97,8 +98,8 @@ namespace dynarithmic
             if (source)
             {
                 get_source_info_internal();
-                m_capability_info->attach(source);
-                m_buffered_info->attach(*this);
+                m_pTwainSourceImpl->m_capability_info->attach(source);
+                m_pTwainSourceImpl->m_buffered_info->attach(*this);
                 m_bIsSelected = true;
                 m_source_details.clear();
                 m_pSession->update_source_status(*this);
@@ -126,11 +127,7 @@ namespace dynarithmic
         void twain_source::detach()
         {
             m_theSource = nullptr;
-            m_acquire_characteristics.reset();
-            m_buffered_info.reset();
-            m_filetransfer_info.reset();
-            m_capability_listener.reset();
-            m_capability_info.reset();
+            create_interfaces();
         }
 
         bool twain_source::open()
@@ -234,7 +231,7 @@ namespace dynarithmic
             
         void twain_source::prepare_acquisition()
         {
-            acquire_characteristics& ac = *m_acquire_characteristics;
+            acquire_characteristics& ac = *(m_pTwainSourceImpl->m_acquire_characteristics);
             start_apply();
 
             // set the acquisition area
@@ -305,7 +302,7 @@ namespace dynarithmic
             auto source = get_source();
 
             // set the PDF file properties
-            pdf_options& po = m_acquire_characteristics->get_pdf_options();
+            pdf_options& po = m_pTwainSourceImpl->m_acquire_characteristics->get_pdf_options();
             API_INSTANCE DTWAIN_SetPDFCreatorA(source, po.get_creator().c_str());
             API_INSTANCE DTWAIN_SetPDFTitleA(source, po.get_title().c_str());
             API_INSTANCE DTWAIN_SetPDFProducerA(source, po.get_creator().c_str());
@@ -370,11 +367,11 @@ namespace dynarithmic
             }
             bool fstatus = true;
             prepare_acquisition();
-            if (!m_acquire_characteristics->get_paperhandling_options().get_feederenabled())
+            if (!m_pTwainSourceImpl->m_acquire_characteristics->get_paperhandling_options().get_feederenabled())
                 API_INSTANCE DTWAIN_EnableFeeder(m_theSource, FALSE);
             else
             {
-                auto& feedOptions = m_acquire_characteristics->get_paperhandling_options();
+                auto& feedOptions = m_pTwainSourceImpl->m_acquire_characteristics->get_paperhandling_options();
                 auto fmode = feedOptions.get_feedermode();
                 bool use_feeder_or_flatbed = (fmode == feedermode_value::feeder_flatbed);
                 bool use_wait = (feedOptions.get_feederwait() != 0);
@@ -400,7 +397,7 @@ namespace dynarithmic
             {
                 if (twain_session::callback_proc(twain_callback_values::DTWAIN_PREACQUIRE_START, 0, reinterpret_cast<UINT_PTR>(m_pSession)))
                 {
-                    const auto transtype = m_acquire_characteristics->get_general_options().get_transfer_type();
+                    const auto transtype = m_pTwainSourceImpl->m_acquire_characteristics->get_general_options().get_transfer_type();
                     if (transtype == transfer_type::file_using_native ||
                         transtype == transfer_type::file_using_buffered ||
                         transtype == transfer_type::file_using_source)
@@ -416,7 +413,7 @@ namespace dynarithmic
 
         twain_source::acquire_return_type twain_source::acquire_to_file(transfer_type transtype)
         {
-            acquire_characteristics& ac = *m_acquire_characteristics;
+            acquire_characteristics& ac = *(m_pTwainSourceImpl->m_acquire_characteristics);
             file_transfer_options& ftOptions = ac.get_file_transfer_options();
 
             LONG dtwain_transfer_type = DTWAIN_USENATIVE;
@@ -483,9 +480,9 @@ namespace dynarithmic
         }
         twain_source::acquire_return_type twain_source::acquire_to_image_handles(transfer_type transtype)
         {
-            acquire_characteristics& ac = *m_acquire_characteristics;
+            acquire_characteristics& ac = *(m_pTwainSourceImpl->m_acquire_characteristics);
             general_options& gOpts = ac.get_general_options();
-            color_value::value_type ct = m_capability_info->get_cap_values(ICAP_PIXELTYPE, capability_interface::get_current()).front();
+            color_value::value_type ct = m_pTwainSourceImpl->m_capability_info->get_cap_values(ICAP_PIXELTYPE, capability_interface::get_current()).front();
 
             bool isModeless = m_pSession->is_custom_twain_loop();
             API_INSTANCE DTWAIN_SetTwainMode(isModeless ? DTWAIN_MODELESS : DTWAIN_MODAL);
@@ -509,7 +506,7 @@ namespace dynarithmic
                     options_base::apply(*this, ac.get_compression_options());
                     buffered_transfer_info& bt = get_buffered_transfer_info();
                     bt.init_transfer(
-                        static_cast<compression_value::value_type>(m_capability_info->get_cap_values(ICAP_COMPRESSION, capability_interface::get_current()).front()));
+                        static_cast<compression_value::value_type>(m_pTwainSourceImpl->m_capability_info->get_cap_values(ICAP_COMPRESSION, capability_interface::get_current()).front()));
                     retval = API_INSTANCE DTWAIN_AcquireBufferedEx(m_theSource,
                         static_cast<LONG>(ct),
                         static_cast<LONG>(gOpts.get_max_pages()),
@@ -541,8 +538,8 @@ namespace dynarithmic
             }
             twain_std_array<capability_type::feederenabled_type, 1> arr;
             arr[0] = 1;
-            m_capability_info->set_cap_values< CAP_FEEDERENABLED_>(arr);
-            auto vEnabled = m_capability_info->get_cap_values< CAP_FEEDERENABLED_>(capability_interface::get_current());
+            m_pTwainSourceImpl->m_capability_info->set_cap_values< CAP_FEEDERENABLED_>(arr);
+            auto vEnabled = m_pTwainSourceImpl->m_capability_info->get_cap_values< CAP_FEEDERENABLED_>(capability_interface::get_current());
             if (vEnabled.empty() || !vEnabled.front())
             {
                 // feeder not enabled
@@ -550,7 +547,7 @@ namespace dynarithmic
                 return;
             }
 
-            bool ispaperdetectable = m_capability_info->is_cap_supported(CAP_PAPERDETECTABLE);
+            bool ispaperdetectable = m_pTwainSourceImpl->m_capability_info->is_cap_supported(CAP_PAPERDETECTABLE);
             if (!ispaperdetectable)
             {
                 // Cannot detect if paper is in feeder
@@ -558,7 +555,7 @@ namespace dynarithmic
                 return;
             }
 
-            bool isfeederloaded = m_capability_info->is_cap_supported(CAP_FEEDERLOADED);
+            bool isfeederloaded = m_pTwainSourceImpl->m_capability_info->is_cap_supported(CAP_FEEDERLOADED);
             if (!isfeederloaded)
             {
                 // Cannot detect if feeder is loaded
@@ -571,7 +568,7 @@ namespace dynarithmic
             twain_timer theTimer;
 
             // loop until feeder is loaded
-            while (!m_capability_info->get_cap_values<CAP_FEEDERLOADED_>(capability_interface::get_current()).front())
+            while (!m_pTwainSourceImpl->m_capability_info->get_cap_values<CAP_FEEDERLOADED_>(capability_interface::get_current()).front())
             {
                 if (timeoutval != -1)
                 {
@@ -662,13 +659,13 @@ namespace dynarithmic
             return std::move(ih);
         }
 
-        const capability_interface& twain_source::get_capability_interface() const noexcept { return *m_capability_info; }
-        buffered_transfer_info& twain_source::get_buffered_transfer_info() noexcept { return *m_buffered_info; }
-        acquire_characteristics& twain_source::get_acquire_characteristics() { return *m_acquire_characteristics; }
+        const capability_interface& twain_source::get_capability_interface() const noexcept { return *(m_pTwainSourceImpl->m_capability_info); }
+        buffered_transfer_info& twain_source::get_buffered_transfer_info() noexcept { return *(m_pTwainSourceImpl->m_buffered_info); }
+        acquire_characteristics& twain_source::get_acquire_characteristics() { return *(m_pTwainSourceImpl->m_acquire_characteristics); }
         twain_identity twain_source::get_source_info() const noexcept { return m_sourceInfo; }
         bool twain_source::is_selected() const noexcept { return m_bIsSelected; }
         bool twain_source::is_open() const { return API_INSTANCE DTWAIN_IsSourceOpen(m_theSource) ? true : false; }
         twain_source& twain_source::set_acquire_characteristics(const acquire_characteristics& ac) noexcept 
-                    { *m_acquire_characteristics = ac; return *this; }
+                    { *(m_pTwainSourceImpl->m_acquire_characteristics) = ac; return *this; }
 	}
 }

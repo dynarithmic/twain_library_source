@@ -357,6 +357,8 @@
   <ItemGroup>
     <ClCompile Include="buffered_transfer_info.cpp" />
     <ClCompile Include="options_base.cpp" />
+    <ClCompile Include="paperhandling_info.cpp" />
+    <ClCompile Include="pdf_text_element.cpp" />
     <ClCompile Include="tojson.cpp" />
     <ClCompile Include="twain_callback.cpp" />
     <ClCompile Include="twain_session.cpp" />

@@ -23,12 +23,12 @@ OF THIRD PARTY RIGHTS.
 
 #include <vector>
 #include <dynarithmic/twain/twain_values.hpp>
-#include <dynarithmic/twain/source/twain_source_base.hpp>
-
+#include <dynarithmic/twain/types/twain_capbasics.hpp>
 namespace dynarithmic
 {
     namespace twain
     {
+        class twain_source;
         class paperhandling_info
         {
             std::vector<capability_type::autofeed_type> m_vAutoFeed;
@@ -75,59 +75,8 @@ namespace dynarithmic
             bool is_feedersupported() const { return m_bFeederSupported; }
 
             // This is a "live" capability.  Can change depending on external factors.
-            bool is_feederloaded(twain_source_base& ts) const 
-            {
-                const auto& v = ts.get_capability_interface().get_cap_values(CAP_FEEDERLOADED);
-                if (v.empty())
-                    return false;
-                return v.front() ? true : false;
-            }
-
-            bool get_info(twain_source& ts)
-            {
-                *this = {};
-                auto& capInterface = ts.get_capability_interface();
-                m_vAutoFeed = capInterface.get_cap_values<std::vector<CAP_AUTOFEED_::value_type>>(CAP_AUTOFEED);
-                m_vClearPage = capInterface.get_cap_values<std::vector<CAP_CLEARPAGE_::value_type>>(CAP_CLEARPAGE);
-                m_vDuplexEnabled = capInterface.get_cap_values<std::vector<CAP_DUPLEXENABLED_::value_type>>(CAP_DUPLEXENABLED);
-                m_vFeederAlignment = capInterface.get_cap_values<std::vector<CAP_FEEDERALIGNMENT_::value_type>>(CAP_FEEDERALIGNMENT);
-                m_vFeederEnabled = capInterface.get_cap_values<std::vector<CAP_FEEDERENABLED_::value_type>>(CAP_FEEDERENABLED); 
-                m_vFeederOrder = capInterface.get_cap_values<std::vector<CAP_FEEDERORDER_::value_type>>(CAP_FEEDERORDER);
-                m_vFeederLoaded = capInterface.get_cap_values<std::vector<CAP_FEEDERLOADED_::value_type>>(CAP_FEEDERLOADED); 
-                m_vFeederPocket = capInterface.get_cap_values<std::vector<CAP_FEEDERPOCKET_::value_type>>(CAP_FEEDERPOCKET);
-                m_vFeederPrep = capInterface.get_cap_values<std::vector<CAP_FEEDERPREP_::value_type>>(CAP_FEEDERPREP); 
-                m_vFeedPage = capInterface.get_cap_values<std::vector<CAP_FEEDPAGE_::value_type>>(CAP_FEEDPAGE);
-                m_vPaperDetectable = capInterface.get_cap_values<std::vector<CAP_PAPERDETECTABLE_::value_type>>(CAP_PAPERDETECTABLE);
-                m_vPaperHandling = capInterface.get_cap_values<std::vector<CAP_PAPERHANDLING_::value_type>>(CAP_PAPERHANDLING);
-                m_vReacquireAllowed = capInterface.get_cap_values<std::vector<CAP_REACQUIREALLOWED_::value_type>>(CAP_REACQUIREALLOWED); 
-                m_vRewindPage = capInterface.get_cap_values<std::vector<CAP_REWINDPAGE_::value_type>>(CAP_REWINDPAGE);
-                m_vFeederType = capInterface.get_cap_values<std::vector<ICAP_FEEDERTYPE_::value_type>>(ICAP_FEEDERTYPE);
-                if (capInterface.is_cap_supported(CAP_DUPLEX))
-                    m_Duplex = capInterface.get_cap_values<std::vector<CAP_DUPLEX_::value_type>>(CAP_DUPLEX).front();
-                if (!capInterface.is_cap_supported(CAP_FEEDERENABLED))
-                    m_bFeederSupported = false;
-                else
-                {
-                    auto tempVal = capInterface.get_cap_values<std::vector<CAP_FEEDERENABLED_::value_type>>(CAP_FEEDERENABLED, capability_interface::get_current());
-                    if (!tempVal.empty())
-                    {
-                        if (tempVal.front() == true)
-                            m_bFeederSupported = true;
-                        else
-                        {
-                            capInterface.set_cap_values<std::vector<CAP_FEEDERENABLED_::value_type >>({ true }, CAP_FEEDERENABLED);
-                            if (capInterface.get_last_error().error_code == DTWAIN_NO_ERROR)
-                            {
-                                capInterface.set_cap_values<std::vector<CAP_FEEDERENABLED_::value_type >>({ tempVal.front() }, CAP_FEEDERENABLED); 
-                                m_bFeederSupported = true;
-                            }
-                            else
-                                m_bFeederSupported = false;
-                        }
-                    }
-                }
-                return true;
-            }
+            bool is_feederloaded(twain_source& ts) const;
+            bool get_info(twain_source& ts);
         };
     }
 }

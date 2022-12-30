@@ -5,6 +5,7 @@
 #include <boost/range/adaptor/transformed.hpp>
 #include <dynarithmic/twain/nlohmann/json.hpp>
 #include <dynarithmic/twain/info/paperhandling_info.hpp>
+#include <dynarithmic/twain/capability_interface/capability_interface.hpp>
 #include <sstream>
 #include <string>
 #include <vector>

@@ -1,10 +1,11 @@
-#include <dynarithmic/twain/tostring/tojson.hpp>
+#ifndef TOJSON_H
+#define TOJSON_H
 #include <dynarithmic/twain/twain_session.hpp> // for dynarithmic::twain::twain_session
 #include <dynarithmic/twain/twain_source.hpp>
+#include <dynarithmic/twain/info/paperhandling_info.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/range/adaptor/transformed.hpp>
 #include <dynarithmic/twain/nlohmann/json.hpp>
-#include <dynarithmic/twain/info/paperhandling_info.hpp>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -14,7 +15,7 @@ namespace dynarithmic
     namespace twain
     {
         template <typename Iter>
-        static std::string join_string(Iter it1, Iter it2, char val = ',')
+        std::string join_string(Iter it1, Iter it2, char val = ',')
         {
             std::stringstream strm;
             int i = 0;
@@ -29,7 +30,7 @@ namespace dynarithmic
             return strm.str();
         }
 
-        static std::string remove_quotes(std::string s)
+        std::string remove_quotes(std::string s)
         {
             std::string ret;
             s.erase(std::remove(s.begin(), s.end(), '\"'), s.end());
@@ -37,7 +38,7 @@ namespace dynarithmic
         }
 
         template <typename T>
-        static void create_stream(std::stringstream& strm, const capability_interface& capInfo, int capValue)
+        void create_stream(std::stringstream& strm, const capability_interface& capInfo, int capValue)
         {
             std::vector<T> imageVals;
             imageVals = capInfo.get_cap_values<std::vector<T>>(capValue);
@@ -57,7 +58,7 @@ namespace dynarithmic
             }
         }
 
-        static void create_stream_from_strings(std::stringstream& strm, const capability_interface& capInfo, int capValue)
+        void create_stream_from_strings(std::stringstream& strm, const capability_interface& capInfo, int capValue)
         {
             std::vector<std::string> imageVals;
             imageVals = capInfo.get_cap_values<std::vector<std::string>>(capValue);
@@ -78,7 +79,7 @@ namespace dynarithmic
         }
 
         template <typename T, typename S>
-        static void create_stream(std::stringstream& strm, const capability_interface& capInfo, int capValue, bool createStringNames)
+        void create_stream(std::stringstream& strm, const capability_interface& capInfo, int capValue, bool createStringNames)
         {
             std::vector<T> imageVals;
             imageVals = capInfo.get_cap_values<std::vector<T>>(capValue);
@@ -103,7 +104,7 @@ namespace dynarithmic
             }
         }
 
-        static std::string get_source_file_types(const capability_interface& capInfo)
+        std::string get_source_file_types(const capability_interface& capInfo)
         {
             using sourceMapType = std::unordered_map<dynarithmic::twain::compression_value::value_type, std::string>;
             static sourceMapType source_map = {
@@ -213,7 +214,7 @@ namespace dynarithmic
             return join_string(returnFileTypes.begin(), returnFileTypes.end());
         }
 
-        std::string json_generator::generate_details(twain_session& ts, const std::vector<std::string>& allSources)
+        std::string generate_details(twain_session& ts, const std::vector<std::string>& allSources)
         {
             using boost::algorithm::join;
             using boost::adaptors::transformed;
@@ -226,25 +227,15 @@ namespace dynarithmic
                 capabilityInfo(std::string n = "", int val = 0) : name(n), value(val) {}
             };
 
-            struct sUniquePtrRAII
-            {
-                std::unique_ptr<twain_source>* m_ptr;
-                bool m_bReleaseOnDestruction;
-                sUniquePtrRAII(std::unique_ptr<twain_source>* p, bool isReleaseOnDestruction)
-                    : m_ptr(p), m_bReleaseOnDestruction(isReleaseOnDestruction) {}
-                ~sUniquePtrRAII()
-                {
-                    if (m_bReleaseOnDestruction)
-                        (*m_ptr).release();
-                }
-            };
             std::vector<capabilityInfo> vCapabilityInfo;
 
             json glob_json;
+//            auto allSources = ts.get_sources();
             glob_json["device-count"] = allSources.size();
             json array_twain_identity;
             json array_source_names;
             std::vector<std::string> sNames = allSources;
+//            std::transform(allSources.begin(), allSources.end(), std::back_inserter(sNames), [](auto& info) { return info.get_product_name(); });
             glob_json["device-names"] = sNames;
             std::string jsonString;
             std::string imageInfoString[12];
@@ -265,46 +256,20 @@ namespace dynarithmic
                 deviceInfoString[7] = "\"jobcontrol-supported\":false";
                 deviceInfoString[8] = "\"transparencyunit-supported\":false";
                 bool devOpen[] = { false, false };
-
-                // Check if we need to select and open the source to see
-                // the details
-                std::unique_ptr<twain_source> pCurrentSourcePtr;
-
-                bool bWeOpenedSource = false;
-                auto sourceStatus = ts.get_source_status(curSource);
-                if (sourceStatus == twain_session::source_status::closed ||
-                    sourceStatus == twain_session::source_status::unknown)
-                {
-                    auto select_info = ts.select_source(select_byname(curSource), false);
-                    if (select_info.source_handle)
-                    {
-                        bWeOpenedSource = true;
-                        pCurrentSourcePtr = std::make_unique<twain_source>(select_info);
-                    }
-                    else
-                        continue;
-                }
-                else
-                {
-                    // Source already opened
-                    DTWAIN_SOURCE openedSource = ts.get_source_handle_from_name(curSource);
-                    pCurrentSourcePtr = std::make_unique<twain_source>();
-                    pCurrentSourcePtr->attach(ts, openedSource);
-                    pCurrentSourcePtr->make_weak();
-                }
-
-                if (pCurrentSourcePtr->is_selected())
+                twain_source theSource = ts.select_source(select_byname(curSource), false);
+                if (theSource.is_selected())
                 {
                     devOpen[0] = true;
-                    if (pCurrentSourcePtr->is_open())
+                    theSource.open();
+                    if (theSource.is_open())
                     {
                         devOpen[1] = true;
-                        jsonString = pCurrentSourcePtr->get_source_info().to_json();
+                        jsonString = theSource.get_source_info().to_json();
                         jColorInfo = "\"color-info\":{";
                         std::stringstream strm;
 
                         // Get the pixel information
-                        auto& capInfo = pCurrentSourcePtr->get_capability_interface();
+                        auto& capInfo = theSource.get_capability_interface();
                         auto pixInfo = capInfo.get_pixeltype();
                         strm << "\"num-colors\":" << pixInfo.size() << ",";
                         jColorInfo += strm.str();
@@ -481,7 +446,7 @@ namespace dynarithmic
                         std::copy(deviceInfoString, deviceInfoString + sizeof(deviceInfoString) / sizeof(deviceInfoString[0]), deviceInfoCapsStr);
                         for (auto& s : deviceInfoCapsStr)
                             s.resize(s.size() - 5);
-                        paperhandling_info pinfo(*pCurrentSourcePtr);
+                        paperhandling_info pinfo(theSource);
                         for (int i = 0; i < sizeof(deviceInfoCaps) / sizeof(deviceInfoCaps[0]); ++i)
                         {
                             if (i > 0)
@@ -516,7 +481,7 @@ namespace dynarithmic
                     }
                     else
                     {
-                        jsonString = pCurrentSourcePtr->get_source_info().to_json();
+                        jsonString = theSource.get_source_info().to_json();
                         jColorInfo = "\"color-info\":\"<not available>\",";
                         resUnitInfo = "\"resolution-info\":\"<not available>\",";
                         imageInfoString[0] = "\"brightness-values\":\"<not available>\"";
@@ -568,3 +533,4 @@ namespace dynarithmic
         }
     }
 }
+#endif
