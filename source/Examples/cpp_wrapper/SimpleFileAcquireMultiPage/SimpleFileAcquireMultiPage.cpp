@@ -48,7 +48,7 @@ void SimpleFileAcquireMultiPage()
 
             // enable the feeder (may need to do this for "devices" that do not 
             // use hardware to acquire images.
-            ac.get_paperhandling_options().set_feederenabled(true);
+            ac.get_paperhandling_options().enable_feeder(true);
 
             auto retval = twsource.acquire();
 

@@ -62,16 +62,16 @@ namespace dynarithmic
                                         m_DuplexModeValue(manualduplexmode_value::none),
                                         m_FeederType(feedertype_value::default_val) {}
 
-                paperhandling_options& set_autofeed(bool bSet)
+                paperhandling_options& enable_autofeed(bool bSet)
                 { m_bAutoFeed = bSet; return *this; }
 
-                paperhandling_options& set_duplexenabled(bool bSet)
+                paperhandling_options& enable_duplex(bool bSet)
                 { m_bDuplexEnabled = bSet; return *this; }
 
                 paperhandling_options& set_feederalignment(feederalignment_value::value_type fa)
                 { m_FeederAlignment = fa; return *this; }
 
-                paperhandling_options& set_feederenabled(bool bSet)
+                paperhandling_options& enable_feeder(bool bSet)
                 { m_bFeederEnabled = bSet; return *this; }
 
                 paperhandling_options& set_feederwait(int val)
@@ -80,7 +80,7 @@ namespace dynarithmic
                 paperhandling_options& set_feederorder(feederorder_value::value_type fv)
                 { m_FeederOrder = fv; return *this; }
 
-                paperhandling_options& set_feederprep(bool bSet)
+                paperhandling_options& enable_feederprep(bool bSet)
                 { m_bFeederPrep = bSet; return *this; }
 
                 paperhandling_options& set_feedertype(feedertype_value::value_type fv)
@@ -92,14 +92,14 @@ namespace dynarithmic
                 paperhandling_options& set_duplexmode(manualduplexmode_value dm)
                 { m_DuplexModeValue = dm; return *this; }
 
-                bool get_autofeed() const { return m_bAutoFeed; }
-                bool get_duplexenabled() const { return m_bDuplexEnabled; }
+                bool is_autofeed_enabled() const { return m_bAutoFeed; }
+                bool is_duplex_enabled() const { return m_bDuplexEnabled; }
                 feederalignment_value::value_type get_feederalignment() const { return m_FeederAlignment; }
-                bool get_feederenabled() const { return m_bFeederEnabled; }
+                bool is_feeder_enabled() const { return m_bFeederEnabled; }
                 int get_feederwait() const { return m_feeder_waittime; }
                 std::vector<feederpocket_value::value_type> get_feederpocket() const { return m_vFeederPocket; }
                 feederorder_value::value_type get_feederorder() const { return m_FeederOrder; }
-                bool get_feederprep() const { return m_bFeederPrep; }
+                bool is_feederprep_enabled() const { return m_bFeederPrep; }
                 std::vector<paperhandling_value::value_type> get_paperhandling() const { return m_vPaperHandling; }
                 feedertype_value::value_type get_feedertype() const { return m_FeederType; }
                 feedermode_value get_feedermode() const { return m_FeederMode;  }

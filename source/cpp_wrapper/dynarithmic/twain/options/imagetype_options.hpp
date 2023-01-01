@@ -44,6 +44,8 @@ namespace dynarithmic
             pixelflavor_value::value_type m_PixelFlavor;
             double m_Threshold;
             bool m_bNegateImage;
+            bool m_bCustomHalfToneEnabled;
+
             static double constexpr default_threshold = (std::numeric_limits<double>::max)();
 
             public:
@@ -53,8 +55,11 @@ namespace dynarithmic
                                     m_BitOrderValue(bitorder_value::default_val),
                                     m_PixelFlavor(pixelflavor_value::chocolate),
                                     m_PixelType(color_value::default_color),
+                                    m_bCustomHalfToneEnabled(false),
                                     m_Threshold(default_threshold) {}
 
+                imagetype_options& enable_customhalftones(bool bEnable = true) { m_bCustomHalfToneEnabled = bEnable; return *this; }
+                bool is_customhalftones_enabled() const { return m_bCustomHalfToneEnabled; }
 
                 imagetype_options& set_bitdepth(uint16_t bitdepth) 
                 { m_BitDepth = bitdepth; return *this; }
@@ -77,7 +82,7 @@ namespace dynarithmic
                 imagetype_options& set_threshold(double val) 
                 { m_Threshold = val; return *this; }
 
-                imagetype_options& set_negate(bool bSet) { m_bNegateImage = bSet; return *this; }
+                imagetype_options& enable_negate(bool bSet) { m_bNegateImage = bSet; return *this; }
 
                 uint16_t get_bitdepth() const { return m_BitDepth; }
                 color_value::value_type get_pixeltype() const { return m_PixelType;  }
@@ -87,7 +92,7 @@ namespace dynarithmic
                 std::string get_halftone() const { return m_sHalftone; }
                 pixelflavor_value::value_type get_pixelflavor() const { return m_PixelFlavor; }
                 double get_threshold() const { return m_Threshold; }
-                bool get_negate() const { return m_bNegateImage; }
+                bool is_negate_enabled() const { return m_bNegateImage; }
 
                 const std::array<uint16_t, 8>& get_affected_caps()
                 {

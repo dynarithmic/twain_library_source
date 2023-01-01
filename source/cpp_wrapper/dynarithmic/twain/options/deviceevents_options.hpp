@@ -35,8 +35,12 @@ namespace dynarithmic
         {
             friend class options_base;
             std::vector<deviceevent_value::value_type> m_vDeviceEvents;
+            bool m_bEnable = false;
             public:
                 std::vector<deviceevent_value::value_type>& get_deviceevents() { return m_vDeviceEvents;}
+
+                deviceevent_options& enable(bool bEnable = true) { m_bEnable = bEnable; return *this; }
+                bool is_enabled() const { return m_bEnable; }
 
                 template <typename Container=std::vector<deviceevent_value::value_type>>
                 deviceevent_options& set_deviceevents(const Container& c)

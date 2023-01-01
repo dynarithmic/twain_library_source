@@ -37,9 +37,9 @@ namespace dynarithmic
     
             public:
                 micr_options() : m_bMicrEnabled(false) {}
-                micr_options& set_micrenabled(bool bSet = true) { m_bMicrEnabled = bSet; return *this; }
+                micr_options& enable(bool bSet = true) { m_bMicrEnabled = bSet; return *this; }
 
-                bool get_micrenabled() const { return m_bMicrEnabled; }
+                bool is_enabled() const { return m_bMicrEnabled; }
 
                 static const std::array<uint16_t, 1>& get_affected_caps()
                 {

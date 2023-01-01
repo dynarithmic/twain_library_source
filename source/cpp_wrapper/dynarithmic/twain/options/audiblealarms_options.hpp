@@ -72,7 +72,7 @@ namespace dynarithmic
                 /// @param[in] value any 32-bit value that represents the alarm's volume
                 /// @returns a reference to the current audiblealarms_options object (**this**)
                 /// @note To turn off the volume setting, pass disable_volume to this function
-                audiblealarms_options& set_alarmvolume(alarm_volume_type value) noexcept
+                audiblealarms_options& set_volume(alarm_volume_type value) noexcept
                 { m_AlarmVolume = value; return *this; }
 
                 /// Gets the alarm volume that will be used
@@ -85,7 +85,7 @@ namespace dynarithmic
                 ///                     get_alarmvolume();
                 /// \endcode
                 /// @returns an integer representing the alarm volume.  If no alarm volume is set, disable_volume is returned.
-                alarm_volume_type get_alarmvolume() const noexcept { return m_AlarmVolume; }
+                alarm_volume_type get_volume() const noexcept { return m_AlarmVolume; }
 
                 /// Gets the alarm options that will be used
                 /// Example:

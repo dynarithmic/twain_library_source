@@ -52,7 +52,7 @@ namespace dynarithmic
                                                  m_ICCProfileValue(iccprofile_value::default_val),
                                                  m_PlanarChunkyValue(planarchunky_value::default_val) {}
 
-                color_options& set_colormanagementenabled(bool bSet=true) 
+                color_options& enable(bool bSet=true) 
                 { m_bColorManagementEnabled = bSet; return *this; }
 
                 color_options& set_gamma(gamma_type val)
@@ -64,7 +64,7 @@ namespace dynarithmic
                 color_options& set_planarchunky(planarchunky_value::value_type val)
                 { m_PlanarChunkyValue = val; return *this; }
 
-                bool get_colormanagementenabled() const { return m_bColorManagementEnabled; }
+                bool is_enabled() const { return m_bColorManagementEnabled; }
                 std::vector<filter_value::value_type> get_filter() const { return m_vFilterValue; }
                 gamma_type get_gamma() const { return m_Gamma; }
                 iccprofile_value::value_type get_iccprofile() const { return m_ICCProfileValue; }

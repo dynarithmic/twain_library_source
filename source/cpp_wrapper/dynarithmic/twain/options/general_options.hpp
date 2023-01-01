@@ -55,7 +55,7 @@ namespace dynarithmic
                 general_options& set_transfer_type(transfer_type t)
                 { m_transfer_type = t; return *this; }
 
-                general_options& set_max_pages(int numPages)
+                general_options& set_max_page_count(int numPages)
                 { m_nMaxPageCount = numPages; return *this; }
 
                 general_options& set_max_acquisitions(int numAcqs)
@@ -70,7 +70,7 @@ namespace dynarithmic
                 transfer_type get_transfer_type() const
                 { return m_transfer_type; }
 
-                int get_max_pages() const
+                int get_max_page_count() const
                 { return m_nMaxPageCount; }
 
                 int get_max_acquisitions() const 

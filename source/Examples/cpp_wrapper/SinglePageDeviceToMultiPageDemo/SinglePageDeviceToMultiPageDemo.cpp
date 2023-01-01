@@ -47,7 +47,7 @@ void SinglePageDeviceToMultiPageDemo()
             ftOpts.set_multi_page(true). // This must always be explicitly turned on!!
                    set_name("c:\\dtwain_ctest\\tif_from_wrapper.tif").  // File name
                    set_type(filetype_value::tifflzwmulti);  // set the file type to a multipage TIFF-LZW
-            ac.get_general_options().set_max_pages(2);
+            ac.get_general_options().set_max_page_count(2);
 
             auto retval = twsource.acquire();
 

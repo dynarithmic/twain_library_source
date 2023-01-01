@@ -58,41 +58,41 @@ namespace dynarithmic
             public:
 
                 autoadjust_options() : m_bSenseMedium(false),
-                                                            m_bDiscardBlankPages(TWBP_DISABLE),
-                                                            m_bBorderDetection(false),
-                                                            m_bColorEnabled(false),
-                                                            m_ColorNonColorPixelType(color_value::default_color),
-                                                            m_bDeskew(false),
-                                                            m_bLengthDetection(false),
-                                                            m_bRotate(false),
-                                                            m_AutoSize(autosize_value::none),
-                                                            m_FlipRotation(fliprotation_value::default_flip),
-                                                            m_ImageMerge(imagemerge_value::none),
-                                                            m_ImageMergeHeightThreshold(disable_threshold)
+                                        m_bDiscardBlankPages(TWBP_DISABLE),
+                                        m_bBorderDetection(false),
+                                        m_bColorEnabled(false),
+                                        m_ColorNonColorPixelType(color_value::default_color),
+                                        m_bDeskew(false),
+                                        m_bLengthDetection(false),
+                                        m_bRotate(false),
+                                        m_AutoSize(autosize_value::none),
+                                        m_FlipRotation(fliprotation_value::default_flip),
+                                        m_ImageMerge(imagemerge_value::none),
+                                        m_ImageMergeHeightThreshold(disable_threshold)
                 {}
 
-                autoadjust_options& set_sensemedium(bool bSet) noexcept
+                autoadjust_options& enable_sensemedium(bool bSet) noexcept
                 {m_bSenseMedium = bSet; return *this;}
 
                 autoadjust_options& set_discardblankpages(int32_t num) noexcept
                 {m_bDiscardBlankPages = num; return *this; }
 
-                autoadjust_options& set_borderdetection(bool bSet) noexcept
+                autoadjust_options& enable_borderdetection(bool bSet) noexcept
                 {m_bBorderDetection = bSet; return *this; }
 
-                autoadjust_options& set_colorenabled(bool bSet) noexcept
+                autoadjust_options& enable_colorenabled(bool bSet) noexcept
                 {m_bColorEnabled = bSet; return *this; }
 
                 autoadjust_options& set_noncolorpixeltype(color_value::value_type ct) noexcept
                 {m_ColorNonColorPixelType = ct; return *this; }
 
-                autoadjust_options& set_deskew(bool bSet) noexcept
+                autoadjust_options& enable_deskew(bool bSet) noexcept
                 {m_bDeskew = bSet; return *this; }
 
-                autoadjust_options& set_lengthdetection(bool bSet) noexcept
+                autoadjust_options& enable_lengthdetection(bool bSet) noexcept
                 {m_bLengthDetection = bSet; return *this; }
 
-                autoadjust_options& set_rotate(bool bSet) noexcept
+                autoadjust_options& enable_rotate(bool bSet) noexcept
                 {m_bRotate = bSet; return *this; }
 
                 autoadjust_options& set_autosize(autosize_value::value_type ao) noexcept
@@ -107,14 +107,14 @@ namespace dynarithmic
                 autoadjust_options& set_mergeheightthreshold(threshold_type threshold) noexcept
                 {m_ImageMergeHeightThreshold = threshold; return *this; }
 
-                bool get_sensemedium() const  noexcept { return m_bSenseMedium; }
+                bool is_sensemedium_enabled() const  noexcept { return m_bSenseMedium; }
                 capability_type::autodiscardblankpages_type get_discardblankpages() const noexcept { return m_bDiscardBlankPages; }
-                bool get_borderdetection() const noexcept { return m_bBorderDetection; }
-                bool get_colorenabled() const noexcept { return m_bColorEnabled; }
+                bool is_borderdetection_enabled() const noexcept { return m_bBorderDetection; }
+                bool is_colorenabled_enabled() const noexcept { return m_bColorEnabled; }
                 color_value::value_type get_noncolorpixeltype() const noexcept { return m_ColorNonColorPixelType; }
-                bool get_deskew() const noexcept { return m_bDeskew; }
-                bool get_lengthdetection() const noexcept { return m_bLengthDetection; }
-                bool get_rotate() const noexcept { return m_bRotate; }
+                bool is_deskew_enabled() const noexcept { return m_bDeskew; }
+                bool is_lengthdetection_enabled() const noexcept { return m_bLengthDetection; }
+                bool is_rotate_enabled() const noexcept { return m_bRotate; }
                 autosize_value::value_type get_autosize() const noexcept { return m_AutoSize; }
                 fliprotation_value::value_type get_fliprotation() const noexcept { return m_FlipRotation; }
                 imagemerge_value::value_type get_imagemerge() const noexcept { return m_ImageMerge; }

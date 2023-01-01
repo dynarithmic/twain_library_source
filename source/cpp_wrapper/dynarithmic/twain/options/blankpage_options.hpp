@@ -39,6 +39,13 @@ namespace dynarithmic
             discard_all_after_resampling =  DTWAIN_BP_AUTODISCARD_AFTERPROCESS
         };
 
+        enum class blankpage_detection_option
+        {
+            detect_original = DTWAIN_BP_DETECTORIGINAL,
+            detect_adjusted = DTWAIN_BP_DETECTADJUSTED,
+            detect_both = DTWAIN_BP_DETECTORIGINAL | DTWAIN_BP_DETECTADJUSTED
+        };
+
          class blankpage_options
          {
              public:
@@ -49,16 +56,22 @@ namespace dynarithmic
                  bool m_bEnabled;
                  double m_threshold = default_blank_page_threshold;
                  blankpage_discard_option discard_option;
+                 blankpage_detection_option detection_option;
 
              public:
                  using blankpage_detection_info = std::pair<bool, double>;
-                 blankpage_options() : m_bEnabled(false), discard_option(blankpage_discard_option::discard_on_notification) {}
+                 blankpage_options() : m_bEnabled(false), 
+                     discard_option(blankpage_discard_option::discard_on_notification),
+                     detection_option(blankpage_detection_option::detect_both) {}
                  blankpage_options& enable(bool bEnable) { m_bEnabled = bEnable; return *this; }
                  blankpage_options& set_threshold(double threshold) { m_threshold = threshold; return *this; }
                  blankpage_options& set_discard_option(blankpage_discard_option discardOpt) { discard_option = discardOpt; return *this; }
+                 blankpage_options& set_detection_option(blankpage_detection_option detectOpt) { detection_option = detectOpt; return *this; }
+
                  bool is_enabled() const { return m_bEnabled; }
                  double get_threshold() const { return m_threshold; }
                  blankpage_discard_option get_discard_option() const { return discard_option; }
+                 blankpage_detection_option get_detection_option() const { return detection_option; }
          };
     }
 }

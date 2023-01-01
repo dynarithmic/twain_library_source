@@ -115,8 +115,8 @@ void TestMultiOrSingleFile(std::string outDir, bool bTestSingle)
 
     // Set the general options for all file types
     auto& gOpts = ac.get_general_options().
-                     set_max_pages(bTestSingle ? 1 : 2);  // set the max pages to acquire either 1 for single
-                                                          // or 2 if multipage
+                     set_max_page_count(bTestSingle ? 1 : 2);  // set the max pages to acquire either 1 for single
+                                                              // or 2 if multipage
 
     // turn off the user interface
     auto& uiOpts = ac.get_userinterface_options().show(false);
