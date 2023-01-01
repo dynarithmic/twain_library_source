@@ -32,6 +32,9 @@
 #include "dtwainx2.h"
 #include <assert.h>
 #include <commdlg.h>
+#pragma warning (push)
+#pragma warning (disable:4113)
+#pragma warning (disable:4047)
 
 /* declare function pointers */
 #ifdef __cplusplus
@@ -767,9 +770,9 @@
     D_SETBLANKPAGEDETECTIONSTRINGFUNC                                 DYNDTWAIN_API::DTWAIN_SetBlankPageDetectionString = nullptr;
     D_SETBLANKPAGEDETECTIONSTRINGWFUNC                                DYNDTWAIN_API::DTWAIN_SetBlankPageDetectionStringW = nullptr;
     D_SETBLANKPAGEDETECTIONEX                                         DYNDTWAIN_API::DTWAIN_SetBlankPageDetectionEx = nullptr;
-    D_SETBLANKPAGEDETECTIONEXSTRING                                   DYNDTWAIN_API::DTWAIN_SetBlankPageDetectionStringEx = nullptr;
-    D_SETBLANKPAGEDETECTIONEXSTRINGA                                  DYNDTWAIN_API::DTWAIN_SetBlankPageDetectionStringExA = nullptr;
-    D_SETBLANKPAGEDETECTIONEXSTRINGW                                  DYNDTWAIN_API::DTWAIN_SetBlankPageDetectionStringExW = nullptr;
+    D_SETBLANKPAGEDETECTIONEXSTRING                                   DYNDTWAIN_API::DTWAIN_SetBlankPageDetectionExString = nullptr;
+    D_SETBLANKPAGEDETECTIONEXSTRINGA                                  DYNDTWAIN_API::DTWAIN_SetBlankPageDetectionExStringA = nullptr;
+    D_SETBLANKPAGEDETECTIONEXSTRINGW                                  DYNDTWAIN_API::DTWAIN_SetBlankPageDetectionExStringW = nullptr;
     D_SETBRIGHTNESSFUNC                                               DYNDTWAIN_API::DTWAIN_SetBrightness = nullptr;
     D_SETBRIGHTNESSSTRINGAFUNC                                        DYNDTWAIN_API::DTWAIN_SetBrightnessStringA = nullptr;
     D_SETBRIGHTNESSSTRINGFUNC                                         DYNDTWAIN_API::DTWAIN_SetBrightnessString = nullptr;
@@ -984,15 +987,28 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Implementation
 #ifdef __cplusplus
-#define DTWAIN_INSTANCE DYNDTWAIN_API::
-int DYNDTWAIN_API::InitDTWAINInterface(HMODULE hModule)
-#else
-#define DTWAIN_INSTANCE pApi->
-int InitDTWAINInterface(DYNDTWAIN_API* pApi, HMODULE hModule)
-#endif
+template <typename Fn>
+void LoadFunction(DYNDTWAIN_API* pApi, Fn& apifn, HMODULE hModule, const char *fnName)
 {
+    DTWAINAPI_ASSERT(apifn = reinterpret_cast<Fn>(::GetProcAddress(hModule, fnName)));
+}
+#define LoadFunctionImpl(fn, apiptr, module) LoadFunction(nullptr, fn, module, #fn);
+#else
+#define LoadFunctionImpl(fn, apiptr, module) { \
+        DTWAINAPI_ASSERT(DTWAIN_INSTANCE fn = GetProcAddress(module, #fn)); }
+#endif
+#ifdef __cplusplus
+    #define DTWAIN_INSTANCE DYNDTWAIN_API::
+    int DYNDTWAIN_API::InitDTWAINInterface(HMODULE hModule)
+    {
+        DYNDTWAIN_API* pApi = nullptr;
+#else
+    #define DTWAIN_INSTANCE pApi->
+    int InitDTWAINInterface(DYNDTWAIN_API* pApi, HMODULE hModule)
+    {
+#endif
 #ifndef __cplusplus
-    memset(pApi, 0, sizeof(DYNDTWAIN_API));
+        memset(pApi, 0, sizeof(DYNDTWAIN_API));
 #endif
     /* hModule must be the return value of LoadLibraryA(LibraryVersion);
        where LibraryVersion is one of the following, depending on the DTWAIN DLL that is being used:
@@ -1025,950 +1041,950 @@ int InitDTWAINInterface(DYNDTWAIN_API* pApi, HMODULE hModule)
                   DTWAINAPI_ASSERT(Major >= DTWAIN_MAJOR_VERSION);
           }
 
-
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_AcquireAudioFileA                       = reinterpret_cast<D_ACQUIREAUDIOFILEAFUNC>                       (GetProcAddress(hModule,"DTWAIN_AcquireAudioFileA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_AcquireAudioFile                        = reinterpret_cast<D_ACQUIREAUDIOFILEFUNC>                        (GetProcAddress(hModule,"DTWAIN_AcquireAudioFile")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_AcquireAudioFileW                       = reinterpret_cast<D_ACQUIREAUDIOFILEWFUNC>                       (GetProcAddress(hModule,"DTWAIN_AcquireAudioFileW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_AcquireAudioNativeEx                    = reinterpret_cast<D_ACQUIREAUDIONATIVEEXFUNC>                    (GetProcAddress(hModule,"DTWAIN_AcquireAudioNativeEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_AcquireAudioNative                      = reinterpret_cast<D_ACQUIREAUDIONATIVEFUNC>                      (GetProcAddress(hModule,"DTWAIN_AcquireAudioNative")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_AcquireBufferedEx                       = reinterpret_cast<D_ACQUIREBUFFEREDEXFUNC>                       (GetProcAddress(hModule,"DTWAIN_AcquireBufferedEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_AcquireBuffered                         = reinterpret_cast<D_ACQUIREBUFFEREDFUNC>                         (GetProcAddress(hModule,"DTWAIN_AcquireBuffered")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_AcquireFileA                            = reinterpret_cast<D_ACQUIREFILEAFUNC>                            (GetProcAddress(hModule,"DTWAIN_AcquireFileA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_AcquireFileEx                           = reinterpret_cast<D_ACQUIREFILEEXFUNC>                           (GetProcAddress(hModule,"DTWAIN_AcquireFileEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_AcquireFile                             = reinterpret_cast<D_ACQUIREFILEFUNC>                             (GetProcAddress(hModule,"DTWAIN_AcquireFile")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_AcquireFileW                            = reinterpret_cast<D_ACQUIREFILEWFUNC>                            (GetProcAddress(hModule,"DTWAIN_AcquireFileW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_AcquireNativeEx                         = reinterpret_cast<D_ACQUIRENATIVEEXFUNC>                         (GetProcAddress(hModule,"DTWAIN_AcquireNativeEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_AcquireNative                           = reinterpret_cast<D_ACQUIRENATIVEFUNC>                           (GetProcAddress(hModule,"DTWAIN_AcquireNative")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_AcquireToClipboard                      = reinterpret_cast<D_ACQUIRETOCLIPBOARDFUNC>                      (GetProcAddress(hModule,"DTWAIN_AcquireToClipboard")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_AddExtImageInfoQuery                    = reinterpret_cast<D_ADDEXTIMAGEINFOQUERYFUNC>                    (GetProcAddress(hModule,"DTWAIN_AddExtImageInfoQuery")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_AddPDFTextA                             = reinterpret_cast<D_ADDPDFTEXTAFUNC>                             (GetProcAddress(hModule,"DTWAIN_AddPDFTextA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_AddPDFTextEx                            = reinterpret_cast<D_ADDPDFTEXTEXFUNC>                            (GetProcAddress(hModule,"DTWAIN_AddPDFTextEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_AddPDFText                              = reinterpret_cast<D_ADDPDFTEXTFUNC>                              (GetProcAddress(hModule,"DTWAIN_AddPDFText")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_AddPDFTextW                             = reinterpret_cast<D_ADDPDFTEXTWFUNC>                             (GetProcAddress(hModule,"DTWAIN_AddPDFTextW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_AllocateMemoryEx                        = reinterpret_cast<D_ALLOCATEMEMORYEXFUNC>                        (GetProcAddress(hModule,"DTWAIN_AllocateMemoryEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_AllocateMemory                          = reinterpret_cast<D_ALLOCATEMEMORYFUNC>                          (GetProcAddress(hModule,"DTWAIN_AllocateMemory")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_AppHandlesExceptions                    = reinterpret_cast<D_APPHANDLESEXCEPTIONSFUNC>                    (GetProcAddress(hModule,"DTWAIN_AppHandlesExceptions")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayAddANSIString                      = reinterpret_cast<D_ARRAYADDANSISTRINGFUNC>                      (GetProcAddress(hModule,"DTWAIN_ArrayAddANSIString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayAddANSIStringN                     = reinterpret_cast<D_ARRAYADDANSISTRINGNFUNC>                     (GetProcAddress(hModule,"DTWAIN_ArrayAddANSIStringN")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayAddFloat                           = reinterpret_cast<D_ARRAYADDFLOATFUNC>                           (GetProcAddress(hModule,"DTWAIN_ArrayAddFloat")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayAddFloatN                          = reinterpret_cast<D_ARRAYADDFLOATNFUNC>                          (GetProcAddress(hModule,"DTWAIN_ArrayAddFloatN")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayAdd                                = reinterpret_cast<D_ARRAYADDFUNC>                                (GetProcAddress(hModule,"DTWAIN_ArrayAdd")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayAddLong64                          = reinterpret_cast<D_ARRAYADDLONG64FUNC>                          (GetProcAddress(hModule,"DTWAIN_ArrayAddLong64")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayAddLong64N                         = reinterpret_cast<D_ARRAYADDLONG64NFUNC>                         (GetProcAddress(hModule,"DTWAIN_ArrayAddLong64N")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayAddLong                            = reinterpret_cast<D_ARRAYADDLONGFUNC>                            (GetProcAddress(hModule,"DTWAIN_ArrayAddLong")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayAddLongN                           = reinterpret_cast<D_ARRAYADDLONGNFUNC>                           (GetProcAddress(hModule,"DTWAIN_ArrayAddLongN")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayAddN                               = reinterpret_cast<D_ARRAYADDNFUNC>                               (GetProcAddress(hModule,"DTWAIN_ArrayAddN")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayAddStringA                         = reinterpret_cast<D_ARRAYADDSTRINGAFUNC>                         (GetProcAddress(hModule,"DTWAIN_ArrayAddStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayAddString                          = reinterpret_cast<D_ARRAYADDSTRINGFUNC>                          (GetProcAddress(hModule,"DTWAIN_ArrayAddString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayAddStringNA                        = reinterpret_cast<D_ARRAYADDSTRINGNAFUNC>                        (GetProcAddress(hModule,"DTWAIN_ArrayAddStringNA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayAddStringN                         = reinterpret_cast<D_ARRAYADDSTRINGNFUNC>                         (GetProcAddress(hModule,"DTWAIN_ArrayAddStringN")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayAddStringNW                        = reinterpret_cast<D_ARRAYADDSTRINGNWFUNC>                        (GetProcAddress(hModule,"DTWAIN_ArrayAddStringNW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayAddStringW                         = reinterpret_cast<D_ARRAYADDSTRINGWFUNC>                         (GetProcAddress(hModule,"DTWAIN_ArrayAddStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayAddWideString                      = reinterpret_cast<D_ARRAYADDWIDESTRINGFUNC>                      (GetProcAddress(hModule,"DTWAIN_ArrayAddWideString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayAddWideStringN                     = reinterpret_cast<D_ARRAYADDWIDESTRINGNFUNC>                     (GetProcAddress(hModule,"DTWAIN_ArrayAddWideStringN")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayConvertFix32ToFloat                = reinterpret_cast<D_ARRAYCONVERTFIX32TOFLOATFUNC>                (GetProcAddress(hModule,"DTWAIN_ArrayConvertFix32ToFloat")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayConvertFloatToFix32                = reinterpret_cast<D_ARRAYCONVERTFLOATTOFIX32FUNC>                (GetProcAddress(hModule,"DTWAIN_ArrayConvertFloatToFix32")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayCopy                               = reinterpret_cast<D_ARRAYCOPYFUNC>                               (GetProcAddress(hModule,"DTWAIN_ArrayCopy")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayCreateCopy                         = reinterpret_cast<D_ARRAYCREATECOPYFUNC>                         (GetProcAddress(hModule,"DTWAIN_ArrayCreateCopy")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayCreateFromCap                      = reinterpret_cast<D_ARRAYCREATEFROMCAPFUNC>                      (GetProcAddress(hModule,"DTWAIN_ArrayCreateFromCap")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayCreateFromLong64s                  = reinterpret_cast<D_ARRAYCREATEFROMLONG64SFUNC>                  (GetProcAddress(hModule,"DTWAIN_ArrayCreateFromLong64s")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayCreateFromLongs                    = reinterpret_cast<D_ARRAYCREATEFROMLONGSFUNC>                    (GetProcAddress(hModule,"DTWAIN_ArrayCreateFromLongs")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayCreateFromReals                    = reinterpret_cast<D_ARRAYCREATEFROMREALSFUNC>                    (GetProcAddress(hModule,"DTWAIN_ArrayCreateFromReals")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayCreateFromStrings                  = reinterpret_cast<D_ARRAYCREATEFROMSTRINGSFUNC>                  (GetProcAddress(hModule,"DTWAIN_ArrayCreateFromStrings")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayCreate                             = reinterpret_cast<D_ARRAYCREATEFUNC>                             (GetProcAddress(hModule,"DTWAIN_ArrayCreate")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayDestroyFrames                      = reinterpret_cast<D_ARRAYDESTROYFRAMESFUNC>                      (GetProcAddress(hModule,"DTWAIN_ArrayDestroyFrames")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayDestroy                            = reinterpret_cast<D_ARRAYDESTROYFUNC>                            (GetProcAddress(hModule,"DTWAIN_ArrayDestroy")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayFindANSIString                     = reinterpret_cast<D_ARRAYFINDANSISTRINGFUNC>                     (GetProcAddress(hModule,"DTWAIN_ArrayFindANSIString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayFindFloat                          = reinterpret_cast<D_ARRAYFINDFLOATFUNC>                          (GetProcAddress(hModule,"DTWAIN_ArrayFindFloat")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayFind                               = reinterpret_cast<D_ARRAYFINDFUNC>                               (GetProcAddress(hModule,"DTWAIN_ArrayFind")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayFindLong64                         = reinterpret_cast<D_ARRAYFINDLONG64FUNC>                         (GetProcAddress(hModule,"DTWAIN_ArrayFindLong64")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayFindLong                           = reinterpret_cast<D_ARRAYFINDLONGFUNC>                           (GetProcAddress(hModule,"DTWAIN_ArrayFindLong")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayFindStringA                        = reinterpret_cast<D_ARRAYFINDSTRINGAFUNC>                        (GetProcAddress(hModule,"DTWAIN_ArrayFindStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayFindString                         = reinterpret_cast<D_ARRAYFINDSTRINGFUNC>                         (GetProcAddress(hModule,"DTWAIN_ArrayFindString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayFindStringW                        = reinterpret_cast<D_ARRAYFINDSTRINGWFUNC>                        (GetProcAddress(hModule,"DTWAIN_ArrayFindStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayFindWideString                     = reinterpret_cast<D_ARRAYFINDWIDESTRINGFUNC>                     (GetProcAddress(hModule,"DTWAIN_ArrayFindWideString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayFix32GetAt                         = reinterpret_cast<D_ARRAYFIX32GETATFUNC>                         (GetProcAddress(hModule,"DTWAIN_ArrayFix32GetAt")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayFix32SetAt                         = reinterpret_cast<D_ARRAYFIX32SETATFUNC>                         (GetProcAddress(hModule,"DTWAIN_ArrayFix32SetAt")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayFrameGetAt                         = reinterpret_cast<D_ARRAYFRAMEGETATFUNC>                         (GetProcAddress(hModule,"DTWAIN_ArrayFrameGetAt")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayFrameGetFrameAt                    = reinterpret_cast<D_ARRAYFRAMEGETFRAMEATFUNC>                    (GetProcAddress(hModule,"DTWAIN_ArrayFrameGetFrameAt")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayFrameSetAt                         = reinterpret_cast<D_ARRAYFRAMESETATFUNC>                         (GetProcAddress(hModule,"DTWAIN_ArrayFrameSetAt")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayGetAtANSIString                    = reinterpret_cast<D_ARRAYGETATANSISTRINGFUNC>                    (GetProcAddress(hModule,"DTWAIN_ArrayGetAtANSIString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayGetAtANSIStringPtr                 = reinterpret_cast<D_ARRAYGETATANSISTRINGPTRFUNC>                 (GetProcAddress(hModule,"DTWAIN_ArrayGetAtANSIStringPtr")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayGetAtFloat                         = reinterpret_cast<D_ARRAYGETATFLOATFUNC>                         (GetProcAddress(hModule,"DTWAIN_ArrayGetAtFloat")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayGetAt                              = reinterpret_cast<D_ARRAYGETATFUNC>                              (GetProcAddress(hModule,"DTWAIN_ArrayGetAt")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayGetAtLong64                        = reinterpret_cast<D_ARRAYGETATLONG64FUNC>                        (GetProcAddress(hModule,"DTWAIN_ArrayGetAtLong64")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayGetAtLong                          = reinterpret_cast<D_ARRAYGETATLONGFUNC>                          (GetProcAddress(hModule,"DTWAIN_ArrayGetAtLong")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayGetAtStringA                       = reinterpret_cast<D_ARRAYGETATSTRINGAFUNC>                       (GetProcAddress(hModule,"DTWAIN_ArrayGetAtStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayGetAtString                        = reinterpret_cast<D_ARRAYGETATSTRINGFUNC>                        (GetProcAddress(hModule,"DTWAIN_ArrayGetAtString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayGetAtStringPtr                     = reinterpret_cast<D_ARRAYGETATSTRINGPTRFUNC>                     (GetProcAddress(hModule,"DTWAIN_ArrayGetAtStringPtr")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayGetAtStringW                       = reinterpret_cast<D_ARRAYGETATSTRINGWFUNC>                       (GetProcAddress(hModule,"DTWAIN_ArrayGetAtStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayGetAtWideString                    = reinterpret_cast<D_ARRAYGETATWIDESTRINGFUNC>                    (GetProcAddress(hModule,"DTWAIN_ArrayGetAtWideString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayGetAtWideStringPtr                 = reinterpret_cast<D_ARRAYGETATWIDESTRINGPTRFUNC>                 (GetProcAddress(hModule,"DTWAIN_ArrayGetAtWideStringPtr")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayGetBuffer                          = reinterpret_cast<D_ARRAYGETBUFFERFUNC>                          (GetProcAddress(hModule,"DTWAIN_ArrayGetBuffer")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayGetCount                           = reinterpret_cast<D_ARRAYGETCOUNTFUNC>                           (GetProcAddress(hModule,"DTWAIN_ArrayGetCount")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayGetMaxStringLength                 = reinterpret_cast<D_ARRAYGETMAXSTRINGLENGTHFUNC>                 (GetProcAddress(hModule,"DTWAIN_ArrayGetMaxStringLength")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayGetSourceAt                        = reinterpret_cast<D_ARRAYGETSOURCEATFUNC>                        (GetProcAddress(hModule,"DTWAIN_ArrayGetSourceAt")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayGetStringLength                    = reinterpret_cast<D_ARRAYGETSTRINGLENGTHFUNC>                    (GetProcAddress(hModule,"DTWAIN_ArrayGetStringLength")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayGetType                            = reinterpret_cast<D_ARRAYGETTYPEFUNC>                            (GetProcAddress(hModule,"DTWAIN_ArrayGetType")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayInit                               = reinterpret_cast<D_ARRAYINITFUNC>                               (GetProcAddress(hModule,"DTWAIN_ArrayInit")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayInsertAtANSIString                 = reinterpret_cast<D_ARRAYINSERTATANSISTRINGFUNC>                 (GetProcAddress(hModule,"DTWAIN_ArrayInsertAtANSIString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayInsertAtANSIStringN                = reinterpret_cast<D_ARRAYINSERTATANSISTRINGNFUNC>                (GetProcAddress(hModule,"DTWAIN_ArrayInsertAtANSIStringN")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayInsertAtFloat                      = reinterpret_cast<D_ARRAYINSERTATFLOATFUNC>                      (GetProcAddress(hModule,"DTWAIN_ArrayInsertAtFloat")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayInsertAtFloatN                     = reinterpret_cast<D_ARRAYINSERTATFLOATNFUNC>                     (GetProcAddress(hModule,"DTWAIN_ArrayInsertAtFloatN")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayInsertAt                           = reinterpret_cast<D_ARRAYINSERTATFUNC>                           (GetProcAddress(hModule,"DTWAIN_ArrayInsertAt")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayInsertAtLong64                     = reinterpret_cast<D_ARRAYINSERTATLONG64FUNC>                     (GetProcAddress(hModule,"DTWAIN_ArrayInsertAtLong64")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayInsertAtLong64N                    = reinterpret_cast<D_ARRAYINSERTATLONG64NFUNC>                    (GetProcAddress(hModule,"DTWAIN_ArrayInsertAtLong64N")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayInsertAtLong                       = reinterpret_cast<D_ARRAYINSERTATLONGFUNC>                       (GetProcAddress(hModule,"DTWAIN_ArrayInsertAtLong")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayInsertAtLongN                      = reinterpret_cast<D_ARRAYINSERTATLONGNFUNC>                      (GetProcAddress(hModule,"DTWAIN_ArrayInsertAtLongN")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayInsertAtN                          = reinterpret_cast<D_ARRAYINSERTATNFUNC>                          (GetProcAddress(hModule,"DTWAIN_ArrayInsertAtN")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayInsertAtStringA                    = reinterpret_cast<D_ARRAYINSERTATSTRINGAFUNC>                    (GetProcAddress(hModule,"DTWAIN_ArrayInsertAtStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayInsertAtString                     = reinterpret_cast<D_ARRAYINSERTATSTRINGFUNC>                     (GetProcAddress(hModule,"DTWAIN_ArrayInsertAtString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayInsertAtStringNA                   = reinterpret_cast<D_ARRAYINSERTATSTRINGNAFUNC>                   (GetProcAddress(hModule,"DTWAIN_ArrayInsertAtStringNA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayInsertAtStringN                    = reinterpret_cast<D_ARRAYINSERTATSTRINGNFUNC>                    (GetProcAddress(hModule,"DTWAIN_ArrayInsertAtStringN")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayInsertAtStringNW                   = reinterpret_cast<D_ARRAYINSERTATSTRINGNWFUNC>                   (GetProcAddress(hModule,"DTWAIN_ArrayInsertAtStringNW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayInsertAtStringW                    = reinterpret_cast<D_ARRAYINSERTATSTRINGWFUNC>                    (GetProcAddress(hModule,"DTWAIN_ArrayInsertAtStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayInsertAtWideString                 = reinterpret_cast<D_ARRAYINSERTATWIDESTRINGFUNC>                 (GetProcAddress(hModule,"DTWAIN_ArrayInsertAtWideString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayInsertAtWideStringN                = reinterpret_cast<D_ARRAYINSERTATWIDESTRINGNFUNC>                (GetProcAddress(hModule,"DTWAIN_ArrayInsertAtWideStringN")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayRemoveAll                          = reinterpret_cast<D_ARRAYREMOVEALLFUNC>                          (GetProcAddress(hModule,"DTWAIN_ArrayRemoveAll")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayRemoveAt                           = reinterpret_cast<D_ARRAYREMOVEATFUNC>                           (GetProcAddress(hModule,"DTWAIN_ArrayRemoveAt")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayRemoveAtN                          = reinterpret_cast<D_ARRAYREMOVEATNFUNC>                          (GetProcAddress(hModule,"DTWAIN_ArrayRemoveAtN")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArrayResize                             = reinterpret_cast<D_ARRAYRESIZEFUNC>                             (GetProcAddress(hModule,"DTWAIN_ArrayResize")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArraySetAtANSIString                    = reinterpret_cast<D_ARRAYSETATANSISTRINGFUNC>                    (GetProcAddress(hModule,"DTWAIN_ArraySetAtANSIString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArraySetAtFloat                         = reinterpret_cast<D_ARRAYSETATFLOATFUNC>                         (GetProcAddress(hModule,"DTWAIN_ArraySetAtFloat")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArraySetAt                              = reinterpret_cast<D_ARRAYSETATFUNC>                              (GetProcAddress(hModule,"DTWAIN_ArraySetAt")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArraySetAtLong64                        = reinterpret_cast<D_ARRAYSETATLONG64FUNC>                        (GetProcAddress(hModule,"DTWAIN_ArraySetAtLong64")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArraySetAtLong                          = reinterpret_cast<D_ARRAYSETATLONGFUNC>                          (GetProcAddress(hModule,"DTWAIN_ArraySetAtLong")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArraySetAtStringA                       = reinterpret_cast<D_ARRAYSETATSTRINGAFUNC>                       (GetProcAddress(hModule,"DTWAIN_ArraySetAtStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArraySetAtString                        = reinterpret_cast<D_ARRAYSETATSTRINGFUNC>                        (GetProcAddress(hModule,"DTWAIN_ArraySetAtString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArraySetAtStringW                       = reinterpret_cast<D_ARRAYSETATSTRINGWFUNC>                       (GetProcAddress(hModule,"DTWAIN_ArraySetAtStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ArraySetAtWideString                    = reinterpret_cast<D_ARRAYSETATWIDESTRINGFUNC>                    (GetProcAddress(hModule,"DTWAIN_ArraySetAtWideString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_CallCallback64                          = reinterpret_cast<D_CALLCALLBACK64FUNC>                          (GetProcAddress(hModule,"DTWAIN_CallCallback64")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_CallCallback                            = reinterpret_cast<D_CALLCALLBACKFUNC>                            (GetProcAddress(hModule,"DTWAIN_CallCallback")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_CallDSMProc                             = reinterpret_cast<D_CALLDSMPROC>                                 (GetProcAddress(hModule,"DTWAIN_CallDSMProc")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_CheckHandles                            = reinterpret_cast<D_CHECKHANDLESFUNC>                            (GetProcAddress(hModule,"DTWAIN_CheckHandles")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ClearBuffers                            = reinterpret_cast<D_CLEARBUFFERSFUNC>                            (GetProcAddress(hModule,"DTWAIN_ClearBuffers")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ClearErrorBuffer                        = reinterpret_cast<D_CLEARERRORBUFFERFUNC>                        (GetProcAddress(hModule,"DTWAIN_ClearErrorBuffer")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ClearPage                               = reinterpret_cast<D_CLEARPAGEFUNC>                               (GetProcAddress(hModule,"DTWAIN_ClearPage")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ClearPDFText                            = reinterpret_cast<D_CLEARPDFTEXTFUNC>                            (GetProcAddress(hModule,"DTWAIN_ClearPDFText")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_CloseSource                             = reinterpret_cast<D_CLOSESOURCEFUNC>                             (GetProcAddress(hModule,"DTWAIN_CloseSource")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_CloseSourceUI                           = reinterpret_cast<D_CLOSESOURCEUIFUNC>                           (GetProcAddress(hModule,"DTWAIN_CloseSourceUI")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ConvertDIBToBitmap                      = reinterpret_cast<D_CONVERTDIBTOBITMAPFUNC>                      (GetProcAddress(hModule,"DTWAIN_ConvertDIBToBitmap")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_CreateAcquisitionArray                  = reinterpret_cast<D_CREATEACQUISITIONARRAYFUNC>                  (GetProcAddress(hModule,"DTWAIN_CreateAcquisitionArray")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_CreatePDFTextElement                    = reinterpret_cast<D_CREATEPDFTEXTELEMENTFUNC>                    (GetProcAddress(hModule,"DTWAIN_CreatePDFTextElement")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_DestroyAcquisitionArray                 = reinterpret_cast<D_DESTROYACQUISITIONARRAYFUNC>                 (GetProcAddress(hModule,"DTWAIN_DestroyAcquisitionArray")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_DestroyPDFTextElement                   = reinterpret_cast<D_DESTROYPDFTEXTELEMENTFUNC>                   (GetProcAddress(hModule,"DTWAIN_DestroyPDFTextElement")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_DisableAppWindow                        = reinterpret_cast<D_DISABLEAPPWINDOWFUNC>                        (GetProcAddress(hModule,"DTWAIN_DisableAppWindow")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnableAutoBorderDetect                  = reinterpret_cast<D_ENABLEAUTOBORDERDETECTFUNC>                  (GetProcAddress(hModule,"DTWAIN_EnableAutoBorderDetect")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnableAutoBright                        = reinterpret_cast<D_ENABLEAUTOBRIGHTFUNC>                        (GetProcAddress(hModule,"DTWAIN_EnableAutoBright")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnableAutoDeskew                        = reinterpret_cast<D_ENABLEAUTODESKEWFUNC>                        (GetProcAddress(hModule,"DTWAIN_EnableAutoDeskew")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnableAutoFeed                          = reinterpret_cast<D_ENABLEAUTOFEEDFUNC>                          (GetProcAddress(hModule,"DTWAIN_EnableAutoFeed")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnableAutomaticSenseMedium              = reinterpret_cast<D_ENABLEAUTOMATICSENSEMEDIUMFUNC>              (GetProcAddress(hModule,"DTWAIN_EnableAutomaticSenseMedium")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnableAutoRotate                        = reinterpret_cast<D_ENABLEAUTOROTATEFUNC>                        (GetProcAddress(hModule,"DTWAIN_EnableAutoRotate")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnableAutoScan                          = reinterpret_cast<D_ENABLEAUTOSCANFUNC>                          (GetProcAddress(hModule,"DTWAIN_EnableAutoScan")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnableDuplex                            = reinterpret_cast<D_ENABLEDUPLEXFUNC>                            (GetProcAddress(hModule,"DTWAIN_EnableDuplex")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnableFeeder                            = reinterpret_cast<D_ENABLEFEEDERFUNC>                            (GetProcAddress(hModule,"DTWAIN_EnableFeeder")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnableIndicator                         = reinterpret_cast<D_ENABLEINDICATORFUNC>                         (GetProcAddress(hModule,"DTWAIN_EnableIndicator")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnableJobFileHandling                   = reinterpret_cast<D_ENABLEJOBFILEHANDLINGFUNC>                   (GetProcAddress(hModule,"DTWAIN_EnableJobFileHandling")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnableLamp                              = reinterpret_cast<D_ENABLELAMPFUNC>                              (GetProcAddress(hModule,"DTWAIN_EnableLamp")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnableMsgNotify                         = reinterpret_cast<D_ENABLEMSGNOTIFYFUNC>                         (GetProcAddress(hModule,"DTWAIN_EnableMsgNotify")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnablePatchDetect                       = reinterpret_cast<D_ENABLEPATCHDETECTFUNC>                       (GetProcAddress(hModule,"DTWAIN_EnablePatchDetect")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnablePrinter                           = reinterpret_cast<D_ENABLEPRINTERFUNC>                           (GetProcAddress(hModule,"DTWAIN_EnablePrinter")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnableThumbnail                         = reinterpret_cast<D_ENABLETHUMBNAILFUNC>                         (GetProcAddress(hModule,"DTWAIN_EnableThumbnail")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EndThread                               = reinterpret_cast<D_ENDTHREADFUNC>                               (GetProcAddress(hModule,"DTWAIN_EndThread")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EndTwainSession                         = reinterpret_cast<D_ENDTWAINSESSIONFUNC>                         (GetProcAddress(hModule,"DTWAIN_EndTwainSession")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumAlarmsEx                            = reinterpret_cast<D_ENUMALARMSEXFUNC>                            (GetProcAddress(hModule,"DTWAIN_EnumAlarmsEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumAlarms                              = reinterpret_cast<D_ENUMALARMSFUNC>                              (GetProcAddress(hModule,"DTWAIN_EnumAlarms")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumAlarmVolumesEx                      = reinterpret_cast<D_ENUMALARMVOLUMESEXFUNC>                      (GetProcAddress(hModule,"DTWAIN_EnumAlarmVolumesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumAlarmVolumes                        = reinterpret_cast<D_ENUMALARMVOLUMESFUNC>                        (GetProcAddress(hModule,"DTWAIN_EnumAlarmVolumes")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumAudioXferMechsEx                    = reinterpret_cast<D_ENUMAUDIOXFERMECHSEXFUNC>                    (GetProcAddress(hModule,"DTWAIN_EnumAudioXferMechsEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumAudioXferMechs                      = reinterpret_cast<D_ENUMAUDIOXFERMECHSFUNC>                      (GetProcAddress(hModule,"DTWAIN_EnumAudioXferMechs")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumAutoFeedValuesEx                    = reinterpret_cast<D_ENUMAUTOFEEDVALUESEXFUNC>                    (GetProcAddress(hModule,"DTWAIN_EnumAutoFeedValuesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumAutoFeedValues                      = reinterpret_cast<D_ENUMAUTOFEEDVALUESFUNC>                      (GetProcAddress(hModule,"DTWAIN_EnumAutoFeedValues")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumAutomaticCapturesEx                 = reinterpret_cast<D_ENUMAUTOMATICCAPTURESEXFUNC>                 (GetProcAddress(hModule,"DTWAIN_EnumAutomaticCapturesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumAutomaticCaptures                   = reinterpret_cast<D_ENUMAUTOMATICCAPTURESFUNC>                   (GetProcAddress(hModule,"DTWAIN_EnumAutomaticCaptures")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumAutomaticSenseMediumEx              = reinterpret_cast<D_ENUMAUTOMATICSENSEMEDIUMEXFUNC>              (GetProcAddress(hModule,"DTWAIN_EnumAutomaticSenseMediumEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumAutomaticSenseMedium                = reinterpret_cast<D_ENUMAUTOMATICSENSEMEDIUMFUNC>                (GetProcAddress(hModule,"DTWAIN_EnumAutomaticSenseMedium")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumBitDepthsEx2                        = reinterpret_cast<D_ENUMBITDEPTHSEX2FUNC>                        (GetProcAddress(hModule,"DTWAIN_EnumBitDepthsEx2")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumBitDepthsEx                         = reinterpret_cast<D_ENUMBITDEPTHSEXFUNC>                         (GetProcAddress(hModule,"DTWAIN_EnumBitDepthsEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumBitDepths                           = reinterpret_cast<D_ENUMBITDEPTHSFUNC>                           (GetProcAddress(hModule,"DTWAIN_EnumBitDepths")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumBottomCameras                       = reinterpret_cast<D_ENUMBOTTOMCAMERASFUNC>                       (GetProcAddress(hModule,"DTWAIN_EnumBottomCameras")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumBrightnessValuesEx                  = reinterpret_cast<D_ENUMBRIGHTNESSVALUESEXFUNC>                  (GetProcAddress(hModule,"DTWAIN_EnumBrightnessValuesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumBrightnessValues                    = reinterpret_cast<D_ENUMBRIGHTNESSVALUESFUNC>                    (GetProcAddress(hModule,"DTWAIN_EnumBrightnessValues")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumCameras                             = reinterpret_cast<D_ENUMCAMERASFUNC>                             (GetProcAddress(hModule,"DTWAIN_EnumCameras")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumCompressionTypesEx                  = reinterpret_cast<D_ENUMCOMPRESSIONTYPESEXFUNC>                  (GetProcAddress(hModule,"DTWAIN_EnumCompressionTypesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumCompressionTypes                    = reinterpret_cast<D_ENUMCOMPRESSIONTYPESFUNC>                    (GetProcAddress(hModule,"DTWAIN_EnumCompressionTypes")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumContrastValuesEx                    = reinterpret_cast<D_ENUMCONTRASTVALUESEXFUNC>                    (GetProcAddress(hModule,"DTWAIN_EnumContrastValuesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumContrastValues                      = reinterpret_cast<D_ENUMCONTRASTVALUESFUNC>                      (GetProcAddress(hModule,"DTWAIN_EnumContrastValues")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumCustomCapsEx2                       = reinterpret_cast<D_ENUMCUSTOMCAPSEX2FUNC>                       (GetProcAddress(hModule,"DTWAIN_EnumCustomCapsEx2")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumCustomCaps                          = reinterpret_cast<D_ENUMCUSTOMCAPSFUNC>                          (GetProcAddress(hModule,"DTWAIN_EnumCustomCaps")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumDoubleFeedDetectLengthsEx           = reinterpret_cast<D_ENUMDOUBLEFEEDDETECTLENGTHSEXFUNC>           (GetProcAddress(hModule,"DTWAIN_EnumDoubleFeedDetectLengthsEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumDoubleFeedDetectLengths             = reinterpret_cast<D_ENUMDOUBLEFEEDDETECTLENGTHSFUNC>             (GetProcAddress(hModule,"DTWAIN_EnumDoubleFeedDetectLengths")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumDoubleFeedDetectValuesEx            = reinterpret_cast<D_ENUMDOUBLEFEEDDETECTVALUESEXFUNC>            (GetProcAddress(hModule,"DTWAIN_EnumDoubleFeedDetectValuesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumDoubleFeedDetectValues              = reinterpret_cast<D_ENUMDOUBLEFEEDDETECTVALUESFUNC>              (GetProcAddress(hModule,"DTWAIN_EnumDoubleFeedDetectValues")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumExtendedCapsEx2                     = reinterpret_cast<D_ENUMEXTENDEDCAPSEX2FUNC>                     (GetProcAddress(hModule,"DTWAIN_EnumExtendedCapsEx2")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumExtendedCapsEx                      = reinterpret_cast<D_ENUMEXTENDEDCAPSEXFUNC>                      (GetProcAddress(hModule,"DTWAIN_EnumExtendedCapsEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumExtendedCaps                        = reinterpret_cast<D_ENUMEXTENDEDCAPSFUNC>                        (GetProcAddress(hModule,"DTWAIN_EnumExtendedCaps")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumExtImageInfoTypes                   = reinterpret_cast<D_ENUMEXTIMAGEINFOTYPESFUNC>                   (GetProcAddress(hModule,"DTWAIN_EnumExtImageInfoTypes")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumFileTypeBitsPerPixel                = reinterpret_cast<D_ENUMFILETYPEBITSPERPIXELFUNC>                (GetProcAddress(hModule,"DTWAIN_EnumFileTypeBitsPerPixel")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumFileXferFormatsEx                   = reinterpret_cast<D_ENUMFILEXFERFORMATSEXFUNC>                   (GetProcAddress(hModule,"DTWAIN_EnumFileXferFormatsEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumFileXferFormats                     = reinterpret_cast<D_ENUMFILEXFERFORMATSFUNC>                     (GetProcAddress(hModule,"DTWAIN_EnumFileXferFormats")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumHalftonesEx                         = reinterpret_cast<D_ENUMHALFTONESEXFUNC>                         (GetProcAddress(hModule,"DTWAIN_EnumHalftonesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumHalftones                           = reinterpret_cast<D_ENUMHALFTONESFUNC>                           (GetProcAddress(hModule,"DTWAIN_EnumHalftones")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumHighlightValuesEx                   = reinterpret_cast<D_ENUMHIGHLIGHTVALUESEXFUNC>                   (GetProcAddress(hModule,"DTWAIN_EnumHighlightValuesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumHighlightValues                     = reinterpret_cast<D_ENUMHIGHLIGHTVALUESFUNC>                     (GetProcAddress(hModule,"DTWAIN_EnumHighlightValues")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumJobControlsEx                       = reinterpret_cast<D_ENUMJOBCONTROLSEXFUNC>                       (GetProcAddress(hModule,"DTWAIN_EnumJobControlsEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumJobControls                         = reinterpret_cast<D_ENUMJOBCONTROLSFUNC>                         (GetProcAddress(hModule,"DTWAIN_EnumJobControls")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumLightPathsEx                        = reinterpret_cast<D_ENUMLIGHTPATHSEXFUNC>                        (GetProcAddress(hModule,"DTWAIN_EnumLightPathsEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumLightPaths                          = reinterpret_cast<D_ENUMLIGHTPATHSFUNC>                          (GetProcAddress(hModule,"DTWAIN_EnumLightPaths")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumLightSourcesEx                      = reinterpret_cast<D_ENUMLIGHTSOURCESEXFUNC>                      (GetProcAddress(hModule,"DTWAIN_EnumLightSourcesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumLightSources                        = reinterpret_cast<D_ENUMLIGHTSOURCESFUNC>                        (GetProcAddress(hModule,"DTWAIN_EnumLightSources")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumMaxBuffersEx                        = reinterpret_cast<D_ENUMMAXBUFFERSEXFUNC>                        (GetProcAddress(hModule,"DTWAIN_EnumMaxBuffersEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumMaxBuffers                          = reinterpret_cast<D_ENUMMAXBUFFERSFUNC>                          (GetProcAddress(hModule,"DTWAIN_EnumMaxBuffers")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumNoiseFiltersEx                      = reinterpret_cast<D_ENUMNOISEFILTERSEXFUNC>                      (GetProcAddress(hModule,"DTWAIN_EnumNoiseFiltersEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumNoiseFilters                        = reinterpret_cast<D_ENUMNOISEFILTERSFUNC>                        (GetProcAddress(hModule,"DTWAIN_EnumNoiseFilters")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumOCRInterfaces                       = reinterpret_cast<D_ENUMOCRINTERFACESFUNC>                       (GetProcAddress(hModule,"DTWAIN_EnumOCRInterfaces")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumOCRSupportedCaps                    = reinterpret_cast<D_ENUMOCRSUPPORTEDCAPSFUNC>                    (GetProcAddress(hModule,"DTWAIN_EnumOCRSupportedCaps")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumOrientationsEx                      = reinterpret_cast<D_ENUMORIENTATIONSEXFUNC>                      (GetProcAddress(hModule,"DTWAIN_EnumOrientationsEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumOrientations                        = reinterpret_cast<D_ENUMORIENTATIONSFUNC>                        (GetProcAddress(hModule,"DTWAIN_EnumOrientations")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumOverscanValuesEx                    = reinterpret_cast<D_ENUMOVERSCANVALUESEXFUNC>                    (GetProcAddress(hModule,"DTWAIN_EnumOverscanValuesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumOverscanValues                      = reinterpret_cast<D_ENUMOVERSCANVALUESFUNC>                      (GetProcAddress(hModule,"DTWAIN_EnumOverscanValues")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumPaperSizesEx                        = reinterpret_cast<D_ENUMPAPERSIZESEXFUNC>                        (GetProcAddress(hModule,"DTWAIN_EnumPaperSizesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumPaperSizes                          = reinterpret_cast<D_ENUMPAPERSIZESFUNC>                          (GetProcAddress(hModule,"DTWAIN_EnumPaperSizes")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumPatchCodesEx                        = reinterpret_cast<D_ENUMPATCHCODESEXFUNC>                        (GetProcAddress(hModule,"DTWAIN_EnumPatchCodesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumPatchCodes                          = reinterpret_cast<D_ENUMPATCHCODESFUNC>                          (GetProcAddress(hModule,"DTWAIN_EnumPatchCodes")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumPatchMaxPrioritiesEx                = reinterpret_cast<D_ENUMPATCHMAXPRIORITIESEXFUNC>                (GetProcAddress(hModule,"DTWAIN_EnumPatchMaxPrioritiesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumPatchMaxPriorities                  = reinterpret_cast<D_ENUMPATCHMAXPRIORITIESFUNC>                  (GetProcAddress(hModule,"DTWAIN_EnumPatchMaxPriorities")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumPatchMaxRetriesEx                   = reinterpret_cast<D_ENUMPATCHMAXRETRIESEXFUNC>                   (GetProcAddress(hModule,"DTWAIN_EnumPatchMaxRetriesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumPatchMaxRetries                     = reinterpret_cast<D_ENUMPATCHMAXRETRIESFUNC>                     (GetProcAddress(hModule,"DTWAIN_EnumPatchMaxRetries")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumPatchPrioritiesEx                   = reinterpret_cast<D_ENUMPATCHPRIORITIESEXFUNC>                   (GetProcAddress(hModule,"DTWAIN_EnumPatchPrioritiesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumPatchPriorities                     = reinterpret_cast<D_ENUMPATCHPRIORITIESFUNC>                     (GetProcAddress(hModule,"DTWAIN_EnumPatchPriorities")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumPatchSearchModesEx                  = reinterpret_cast<D_ENUMPATCHSEARCHMODESEXFUNC>                  (GetProcAddress(hModule,"DTWAIN_EnumPatchSearchModesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumPatchSearchModes                    = reinterpret_cast<D_ENUMPATCHSEARCHMODESFUNC>                    (GetProcAddress(hModule,"DTWAIN_EnumPatchSearchModes")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumPatchTimeOutValuesEx                = reinterpret_cast<D_ENUMPATCHTIMEOUTVALUESEXFUNC>                (GetProcAddress(hModule,"DTWAIN_EnumPatchTimeOutValuesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumPatchTimeOutValues                  = reinterpret_cast<D_ENUMPATCHTIMEOUTVALUESFUNC>                  (GetProcAddress(hModule,"DTWAIN_EnumPatchTimeOutValues")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumPixelTypes                          = reinterpret_cast<D_ENUMPIXELTYPESFUNC>                          (GetProcAddress(hModule,"DTWAIN_EnumPixelTypes")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumPrinterStringModesEx                = reinterpret_cast<D_ENUMPRINTERSTRINGMODESEXFUNC>                (GetProcAddress(hModule,"DTWAIN_EnumPrinterStringModesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumPrinterStringModes                  = reinterpret_cast<D_ENUMPRINTERSTRINGMODESFUNC>                  (GetProcAddress(hModule,"DTWAIN_EnumPrinterStringModes")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumResolutionValuesEx                  = reinterpret_cast<D_ENUMRESOLUTIONVALUESEXFUNC>                  (GetProcAddress(hModule,"DTWAIN_EnumResolutionValuesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumResolutionValues                    = reinterpret_cast<D_ENUMRESOLUTIONVALUESFUNC>                    (GetProcAddress(hModule,"DTWAIN_EnumResolutionValues")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumShadowValuesEx                      = reinterpret_cast<D_ENUMSHADOWVALUESEXFUNC>                      (GetProcAddress(hModule,"DTWAIN_EnumShadowValuesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumShadowValues                        = reinterpret_cast<D_ENUMSHADOWVALUESFUNC>                        (GetProcAddress(hModule,"DTWAIN_EnumShadowValues")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumSourcesEx                           = reinterpret_cast<D_ENUMSOURCESEXFUNC>                           (GetProcAddress(hModule,"DTWAIN_EnumSourcesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumSources                             = reinterpret_cast<D_ENUMSOURCESFUNC>                             (GetProcAddress(hModule,"DTWAIN_EnumSources")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumSourceUnitsEx                       = reinterpret_cast<D_ENUMSOURCEUNITSEXFUNC>                       (GetProcAddress(hModule,"DTWAIN_EnumSourceUnitsEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumSourceUnits                         = reinterpret_cast<D_ENUMSOURCEUNITSFUNC>                         (GetProcAddress(hModule,"DTWAIN_EnumSourceUnits")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumSourceValuesA                       = reinterpret_cast<D_ENUMSOURCEVALUESAFUNC>                       (GetProcAddress(hModule,"DTWAIN_EnumSourceValuesA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumSourceValues                        = reinterpret_cast<D_ENUMSOURCEVALUESFUNC>                        (GetProcAddress(hModule,"DTWAIN_EnumSourceValues")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumSourceValuesW                       = reinterpret_cast<D_ENUMSOURCEVALUESWFUNC>                       (GetProcAddress(hModule,"DTWAIN_EnumSourceValuesW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumSupportedCapsEx2                    = reinterpret_cast<D_ENUMSUPPORTEDCAPSEX2FUNC>                    (GetProcAddress(hModule,"DTWAIN_EnumSupportedCapsEx2")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumSupportedCapsEx                     = reinterpret_cast<D_ENUMSUPPORTEDCAPSEXFUNC>                     (GetProcAddress(hModule,"DTWAIN_EnumSupportedCapsEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumSupportedCaps                       = reinterpret_cast<D_ENUMSUPPORTEDCAPSFUNC>                       (GetProcAddress(hModule,"DTWAIN_EnumSupportedCaps")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumSupportedSinglePageFileTypes        = reinterpret_cast<D_ENUMSUPPORTEDSINGLEPAGEFILETYPES>            (GetProcAddress(hModule,"DTWAIN_EnumSupportedSinglePageFileTypes")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumSupportedMultiPageFileTypes         = reinterpret_cast<D_ENUMSUPPORTEDMULTIPAGEFILETYPES>             (GetProcAddress(hModule,"DTWAIN_EnumSupportedMultiPageFileTypes")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumThresholdValuesEx                   = reinterpret_cast<D_ENUMTHRESHOLDVALUESEXFUNC>                   (GetProcAddress(hModule,"DTWAIN_EnumThresholdValuesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumThresholdValues                     = reinterpret_cast<D_ENUMTHRESHOLDVALUESFUNC>                     (GetProcAddress(hModule,"DTWAIN_EnumThresholdValues")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumTopCameras                          = reinterpret_cast<D_ENUMTOPCAMERASFUNC>                          (GetProcAddress(hModule,"DTWAIN_EnumTopCameras")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumTwainPrintersArrayEx                = reinterpret_cast<D_ENUMTWAINPRINTERSARRAYEXFUNC>                (GetProcAddress(hModule,"DTWAIN_EnumTwainPrintersArrayEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumTwainPrintersArray                  = reinterpret_cast<D_ENUMTWAINPRINTERSARRAYFUNC>                  (GetProcAddress(hModule,"DTWAIN_EnumTwainPrintersArray")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumTwainPrintersEx                     = reinterpret_cast<D_ENUMTWAINPRINTERSEXFUNC>                     (GetProcAddress(hModule,"DTWAIN_EnumTwainPrintersEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_EnumTwainPrinters                       = reinterpret_cast<D_ENUMTWAINPRINTERSFUNC>                       (GetProcAddress(hModule,"DTWAIN_EnumTwainPrinters")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ExecuteOCRA                             = reinterpret_cast<D_EXECUTEOCRAFUNC>                             (GetProcAddress(hModule,"DTWAIN_ExecuteOCRA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ExecuteOCR                              = reinterpret_cast<D_EXECUTEOCRFUNC>                              (GetProcAddress(hModule,"DTWAIN_ExecuteOCR")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ExecuteOCRW                             = reinterpret_cast<D_EXECUTEOCRWFUNC>                             (GetProcAddress(hModule,"DTWAIN_ExecuteOCRW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FeedPage                                = reinterpret_cast<D_FEEDPAGEFUNC>                                (GetProcAddress(hModule,"DTWAIN_FeedPage")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FlipBitmap                              = reinterpret_cast<D_FLIPBITMAPFUNC>                              (GetProcAddress(hModule,"DTWAIN_FlipBitmap")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FlushAcquiredPages                      = reinterpret_cast<D_FLUSHACQUIREDPAGESFUNC>                      (GetProcAddress(hModule,"DTWAIN_FlushAcquiredPages")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ForceAcquireBitDepth                    = reinterpret_cast<D_FORCEACQUIREBITDEPTHFUNC>                    (GetProcAddress(hModule,"DTWAIN_ForceAcquireBitDepth")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ForceScanOnNoUI                         = reinterpret_cast<D_FORCESCANONNOUIFUNC>                         (GetProcAddress(hModule,"DTWAIN_ForceScanOnNoUI")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FrameCreate                             = reinterpret_cast<D_FRAMECREATEFUNC>                             (GetProcAddress(hModule,"DTWAIN_FrameCreate")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FrameCreateStringA                      = reinterpret_cast<D_FRAMECREATESTRINGAFUNC>                      (GetProcAddress(hModule,"DTWAIN_FrameCreateStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FrameCreateString                       = reinterpret_cast<D_FRAMECREATESTRINGFUNC>                       (GetProcAddress(hModule,"DTWAIN_FrameCreateString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FrameCreateStringW                      = reinterpret_cast<D_FRAMECREATESTRINGWFUNC>                      (GetProcAddress(hModule,"DTWAIN_FrameCreateStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FrameDestroy                            = reinterpret_cast<D_FRAMEDESTROYFUNC>                            (GetProcAddress(hModule,"DTWAIN_FrameDestroy")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FrameGetAll                             = reinterpret_cast<D_FRAMEGETALLFUNC>                             (GetProcAddress(hModule,"DTWAIN_FrameGetAll")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FrameGetAllStringA                      = reinterpret_cast<D_FRAMEGETALLSTRINGAFUNC>                      (GetProcAddress(hModule,"DTWAIN_FrameGetAllStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FrameGetAllString                       = reinterpret_cast<D_FRAMEGETALLSTRINGFUNC>                       (GetProcAddress(hModule,"DTWAIN_FrameGetAllString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FrameGetAllStringW                      = reinterpret_cast<D_FRAMEGETALLSTRINGWFUNC>                      (GetProcAddress(hModule,"DTWAIN_FrameGetAllStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FrameGetValue                           = reinterpret_cast<D_FRAMEGETVALUEFUNC>                           (GetProcAddress(hModule,"DTWAIN_FrameGetValue")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FrameGetValueStringA                    = reinterpret_cast<D_FRAMEGETVALUESTRINGAFUNC>                    (GetProcAddress(hModule,"DTWAIN_FrameGetValueStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FrameGetValueString                     = reinterpret_cast<D_FRAMEGETVALUESTRINGFUNC>                     (GetProcAddress(hModule,"DTWAIN_FrameGetValueString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FrameGetValueStringW                    = reinterpret_cast<D_FRAMEGETVALUESTRINGWFUNC>                    (GetProcAddress(hModule,"DTWAIN_FrameGetValueStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FrameIsValid                            = reinterpret_cast<D_FRAMEISVALIDFUNC>                            (GetProcAddress(hModule,"DTWAIN_FrameIsValid")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FrameSetAll                             = reinterpret_cast<D_FRAMESETALLFUNC>                             (GetProcAddress(hModule,"DTWAIN_FrameSetAll")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FrameSetAllStringA                      = reinterpret_cast<D_FRAMESETALLSTRINGAFUNC>                      (GetProcAddress(hModule,"DTWAIN_FrameSetAllStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FrameSetAllString                       = reinterpret_cast<D_FRAMESETALLSTRINGFUNC>                       (GetProcAddress(hModule,"DTWAIN_FrameSetAllString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FrameSetAllStringW                      = reinterpret_cast<D_FRAMESETALLSTRINGWFUNC>                      (GetProcAddress(hModule,"DTWAIN_FrameSetAllStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FrameSetValue                           = reinterpret_cast<D_FRAMESETVALUEFUNC>                           (GetProcAddress(hModule,"DTWAIN_FrameSetValue")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FrameSetValueStringA                    = reinterpret_cast<D_FRAMESETVALUESTRINGAFUNC>                    (GetProcAddress(hModule,"DTWAIN_FrameSetValueStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FrameSetValueString                     = reinterpret_cast<D_FRAMESETVALUESTRINGFUNC>                     (GetProcAddress(hModule,"DTWAIN_FrameSetValueString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FrameSetValueStringW                    = reinterpret_cast<D_FRAMESETVALUESTRINGWFUNC>                    (GetProcAddress(hModule,"DTWAIN_FrameSetValueStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FreeExtImageInfo                        = reinterpret_cast<D_FREEEXTIMAGEINFOFUNC>                        (GetProcAddress(hModule,"DTWAIN_FreeExtImageInfo")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FreeMemoryEx                            = reinterpret_cast<D_FREEMEMORYEXFUNC>                            (GetProcAddress(hModule,"DTWAIN_FreeMemoryEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_FreeMemory                              = reinterpret_cast<D_FREEMEMORYFUNC>                              (GetProcAddress(hModule,"DTWAIN_FreeMemory")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAcquireArea2                         = reinterpret_cast<D_GETACQUIREAREA2FUNC>                         (GetProcAddress(hModule,"DTWAIN_GetAcquireArea2")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAcquireArea2StringA                  = reinterpret_cast<D_GETACQUIREAREA2STRINGAFUNC>                  (GetProcAddress(hModule,"DTWAIN_GetAcquireArea2StringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAcquireArea2String                   = reinterpret_cast<D_GETACQUIREAREA2STRINGFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetAcquireArea2String")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAcquireArea2StringW                  = reinterpret_cast<D_GETACQUIREAREA2STRINGWFUNC>                  (GetProcAddress(hModule,"DTWAIN_GetAcquireArea2StringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAcquireArea                          = reinterpret_cast<D_GETACQUIREAREAFUNC>                          (GetProcAddress(hModule,"DTWAIN_GetAcquireArea")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAcquiredImageArray                   = reinterpret_cast<D_GETACQUIREDIMAGEARRAYFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetAcquiredImageArray")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAcquiredImage                        = reinterpret_cast<D_GETACQUIREDIMAGEFUNC>                        (GetProcAddress(hModule,"DTWAIN_GetAcquiredImage")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAcquireMetrics                       = reinterpret_cast<D_GETACQUIREMETRICSFUNC>                       (GetProcAddress(hModule,"DTWAIN_GetAcquireMetrics")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAcquireStripBuffer                   = reinterpret_cast<D_GETACQUIRESTRIPBUFFERFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetAcquireStripBuffer")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAcquireStripData                     = reinterpret_cast<D_GETACQUIRESTRIPDATAFUNC>                     (GetProcAddress(hModule,"DTWAIN_GetAcquireStripData")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAcquireStripSizes                    = reinterpret_cast<D_GETACQUIRESTRIPSIZESFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetAcquireStripSizes")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAlarmVolume                          = reinterpret_cast<D_GETALARMVOLUMEFUNC>                          (GetProcAddress(hModule,"DTWAIN_GetAlarmVolume")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAPIHandleStatus                      = reinterpret_cast<D_GETAPIHANDLESTATUS>                          (GetProcAddress(hModule,"DTWAIN_GetAPIHandleStatus")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAppInfoA                             = reinterpret_cast<D_GETAPPINFOAFUNC>                             (GetProcAddress(hModule,"DTWAIN_GetAppInfoA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAppInfo                              = reinterpret_cast<D_GETAPPINFOFUNC>                              (GetProcAddress(hModule,"DTWAIN_GetAppInfo")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAppInfoW                             = reinterpret_cast<D_GETAPPINFOWFUNC>                             (GetProcAddress(hModule,"DTWAIN_GetAppInfoW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAuthorA                              = reinterpret_cast<D_GETAUTHORAFUNC>                              (GetProcAddress(hModule,"DTWAIN_GetAuthorA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAuthor                               = reinterpret_cast<D_GETAUTHORFUNC>                               (GetProcAddress(hModule,"DTWAIN_GetAuthor")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetAuthorW                              = reinterpret_cast<D_GETAUTHORWFUNC>                              (GetProcAddress(hModule,"DTWAIN_GetAuthorW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetBatteryMinutes                       = reinterpret_cast<D_GETBATTERYMINUTESFUNC>                       (GetProcAddress(hModule,"DTWAIN_GetBatteryMinutes")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetBatteryPercent                       = reinterpret_cast<D_GETBATTERYPERCENTFUNC>                       (GetProcAddress(hModule,"DTWAIN_GetBatteryPercent")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetBitDepth                             = reinterpret_cast<D_GETBITDEPTHFUNC>                             (GetProcAddress(hModule,"DTWAIN_GetBitDepth")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetBlankPageAutoDetection               = reinterpret_cast<D_GETBLANKPAGEAUTODETECTIONFUNC>               (GetProcAddress(hModule,"DTWAIN_GetBlankPageAutoDetection")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetBrightness                           = reinterpret_cast<D_GETBRIGHTNESSFUNC>                           (GetProcAddress(hModule,"DTWAIN_GetBrightness")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetBrightnessStringA                    = reinterpret_cast<D_GETBRIGHTNESSSTRINGAFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetBrightnessStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetBrightnessString                     = reinterpret_cast<D_GETBRIGHTNESSSTRINGFUNC>                     (GetProcAddress(hModule,"DTWAIN_GetBrightnessString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetBrightnessStringW                    = reinterpret_cast<D_GETBRIGHTNESSSTRINGWFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetBrightnessStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCallback64                           = reinterpret_cast<D_GETCALLBACK64FUNC>                           (GetProcAddress(hModule,"DTWAIN_GetCallback64")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCallback                             = reinterpret_cast<D_GETCALLBACKFUNC>                             (GetProcAddress(hModule,"DTWAIN_GetCallback")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCapArrayType                         = reinterpret_cast<D_GETCAPARRAYTYPEFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetCapArrayType")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCapContainerEx                       = reinterpret_cast<D_GETCAPCONTAINEREXFUNC>                       (GetProcAddress(hModule,"DTWAIN_GetCapContainerEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCapContainer                         = reinterpret_cast<D_GETCAPCONTAINERFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetCapContainer")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCapDataType                          = reinterpret_cast<D_GETCAPDATATYPEFUNC>                          (GetProcAddress(hModule,"DTWAIN_GetCapDataType")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCapFromNameA                         = reinterpret_cast<D_GETCAPFROMNAMEAFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetCapFromNameA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCapFromName                          = reinterpret_cast<D_GETCAPFROMNAMEFUNC>                          (GetProcAddress(hModule,"DTWAIN_GetCapFromName")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCapFromNameW                         = reinterpret_cast<D_GETCAPFROMNAMEWFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetCapFromNameW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCapOperations                        = reinterpret_cast<D_GETCAPOPERATIONSFUNC>                        (GetProcAddress(hModule,"DTWAIN_GetCapOperations")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCaptionA                             = reinterpret_cast<D_GETCAPTIONAFUNC>                             (GetProcAddress(hModule,"DTWAIN_GetCaptionA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCaption                              = reinterpret_cast<D_GETCAPTIONFUNC>                              (GetProcAddress(hModule,"DTWAIN_GetCaption")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCaptionW                             = reinterpret_cast<D_GETCAPTIONWFUNC>                             (GetProcAddress(hModule,"DTWAIN_GetCaptionW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCapValuesEx2                         = reinterpret_cast<D_GETCAPVALUESEX2FUNC>                         (GetProcAddress(hModule,"DTWAIN_GetCapValuesEx2")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCapValuesEx                          = reinterpret_cast<D_GETCAPVALUESEXFUNC>                          (GetProcAddress(hModule,"DTWAIN_GetCapValuesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCapValues                            = reinterpret_cast<D_GETCAPVALUESFUNC>                            (GetProcAddress(hModule,"DTWAIN_GetCapValues")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCompressionSize                      = reinterpret_cast<D_GETCOMPRESSIONSIZEFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetCompressionSize")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCompressionType                      = reinterpret_cast<D_GETCOMPRESSIONTYPEFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetCompressionType")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetConditionCodeStringA                 = reinterpret_cast<D_GETCONDITIONCODESTRINGAFUNC>                 (GetProcAddress(hModule,"DTWAIN_GetConditionCodeStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetConditionCodeString                  = reinterpret_cast<D_GETCONDITIONCODESTRINGFUNC>                  (GetProcAddress(hModule,"DTWAIN_GetConditionCodeString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetConditionCodeStringW                 = reinterpret_cast<D_GETCONDITIONCODESTRINGWFUNC>                 (GetProcAddress(hModule,"DTWAIN_GetConditionCodeStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetContrast                             = reinterpret_cast<D_GETCONTRASTFUNC>                             (GetProcAddress(hModule,"DTWAIN_GetContrast")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetContrastStringA                      = reinterpret_cast<D_GETCONTRASTSTRINGAFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetContrastStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetContrastString                       = reinterpret_cast<D_GETCONTRASTSTRINGFUNC>                       (GetProcAddress(hModule,"DTWAIN_GetContrastString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetContrastStringW                      = reinterpret_cast<D_GETCONTRASTSTRINGWFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetContrastStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCountry                              = reinterpret_cast<D_GETCOUNTRYFUNC>                              (GetProcAddress(hModule,"DTWAIN_GetCountry")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCurrentAcquiredImage                 = reinterpret_cast<D_GETCURRENTACQUIREDIMAGEFUNC>                 (GetProcAddress(hModule,"DTWAIN_GetCurrentAcquiredImage")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCurrentFileNameA                     = reinterpret_cast<D_GETCURRENTFILENAMEAFUNC>                     (GetProcAddress(hModule,"DTWAIN_GetCurrentFileNameA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCurrentFileName                      = reinterpret_cast<D_GETCURRENTFILENAMEFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetCurrentFileName")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCurrentFileNameW                     = reinterpret_cast<D_GETCURRENTFILENAMEWFUNC>                     (GetProcAddress(hModule,"DTWAIN_GetCurrentFileNameW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCurrentPageNum                       = reinterpret_cast<D_GETCURRENTPAGENUMFUNC>                       (GetProcAddress(hModule,"DTWAIN_GetCurrentPageNum")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCurrentRetryCount                    = reinterpret_cast<D_GETCURRENTRETRYCOUNTFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetCurrentRetryCount")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetCustomDSData                         = reinterpret_cast<D_GETCUSTOMDSDATAFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetCustomDSData")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetDeviceEventEx                        = reinterpret_cast<D_GETDEVICEEVENTEXFUNC>                        (GetProcAddress(hModule,"DTWAIN_GetDeviceEventEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetDeviceEvent                          = reinterpret_cast<D_GETDEVICEEVENTFUNC>                          (GetProcAddress(hModule,"DTWAIN_GetDeviceEvent")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetDeviceEventInfo                      = reinterpret_cast<D_GETDEVICEEVENTINFOFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetDeviceEventInfo")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetDeviceNotifications                  = reinterpret_cast<D_GETDEVICENOTIFICATIONSFUNC>                  (GetProcAddress(hModule,"DTWAIN_GetDeviceNotifications")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetDeviceTimeDateA                      = reinterpret_cast<D_GETDEVICETIMEDATEAFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetDeviceTimeDateA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetDeviceTimeDate                       = reinterpret_cast<D_GETDEVICETIMEDATEFUNC>                       (GetProcAddress(hModule,"DTWAIN_GetDeviceTimeDate")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetDeviceTimeDateW                      = reinterpret_cast<D_GETDEVICETIMEDATEWFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetDeviceTimeDateW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetDoubleFeedDetectLength               = reinterpret_cast<D_GETDOUBLEFEEDDETECTLENGTHFUNC>               (GetProcAddress(hModule,"DTWAIN_GetDoubleFeedDetectLength")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetDoubleFeedDetectValues               = reinterpret_cast<D_GETDOUBLEFEEDDETECTVALUESFUNC>               (GetProcAddress(hModule,"DTWAIN_GetDoubleFeedDetectValues")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetDSMFullNameA                         = reinterpret_cast<D_GETDSMFULLNAMEAFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetDSMFullNameA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetDSMFullName                          = reinterpret_cast<D_GETDSMFULLNAMEFUNC>                          (GetProcAddress(hModule,"DTWAIN_GetDSMFullName")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetDSMFullNameW                         = reinterpret_cast<D_GETDSMFULLNAMEWFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetDSMFullNameW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetDSMSearchOrder                       = reinterpret_cast<D_GETDSMSEARCHORDERFUNC>                       (GetProcAddress(hModule,"DTWAIN_GetDSMSearchOrder")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetDTWAINHandle                         = reinterpret_cast<D_GETDTWAINHANDLEFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetDTWAINHandle")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetDuplexType                           = reinterpret_cast<D_GETDUPLEXTYPEFUNC>                           (GetProcAddress(hModule,"DTWAIN_GetDuplexType")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetErrorBuffer                          = reinterpret_cast<D_GETERRORBUFFERFUNC>                          (GetProcAddress(hModule,"DTWAIN_GetErrorBuffer")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetErrorBufferThreshold                 = reinterpret_cast<D_GETERRORBUFFERTHRESHOLDFUNC>                 (GetProcAddress(hModule,"DTWAIN_GetErrorBufferThreshold")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetErrorCallback64                      = reinterpret_cast<D_GETERRORCALLBACK64FUNC>                      (GetProcAddress(hModule,"DTWAIN_GetErrorCallback64")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetErrorCallback                        = reinterpret_cast<D_GETERRORCALLBACKFUNC>                        (GetProcAddress(hModule,"DTWAIN_GetErrorCallback")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetErrorStringA                         = reinterpret_cast<D_GETERRORSTRINGAFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetErrorStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetErrorString                          = reinterpret_cast<D_GETERRORSTRINGFUNC>                          (GetProcAddress(hModule,"DTWAIN_GetErrorString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetErrorStringW                         = reinterpret_cast<D_GETERRORSTRINGWFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetErrorStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetExtCapFromNameA                      = reinterpret_cast<D_GETEXTCAPFROMNAMEAFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetExtCapFromNameA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetExtCapFromName                       = reinterpret_cast<D_GETEXTCAPFROMNAMEFUNC>                       (GetProcAddress(hModule,"DTWAIN_GetExtCapFromName")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetExtCapFromNameW                      = reinterpret_cast<D_GETEXTCAPFROMNAMEWFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetExtCapFromNameW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetExtImageInfoData                     = reinterpret_cast<D_GETEXTIMAGEINFODATAFUNC>                     (GetProcAddress(hModule,"DTWAIN_GetExtImageInfoData")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetExtImageInfo                         = reinterpret_cast<D_GETEXTIMAGEINFOFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetExtImageInfo")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetExtImageInfoItem                     = reinterpret_cast<D_GETEXTIMAGEINFOITEMFUNC>                     (GetProcAddress(hModule,"DTWAIN_GetExtImageInfoItem")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetExtNameFromCapA                      = reinterpret_cast<D_GETEXTNAMEFROMCAPAFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetExtNameFromCapA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetExtNameFromCap                       = reinterpret_cast<D_GETEXTNAMEFROMCAPFUNC>                       (GetProcAddress(hModule,"DTWAIN_GetExtNameFromCap")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetExtNameFromCapW                      = reinterpret_cast<D_GETEXTNAMEFROMCAPWFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetExtNameFromCapW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetFeederAlignment                      = reinterpret_cast<D_GETFEEDERALIGNMENTFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetFeederAlignment")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetFeederFuncs                          = reinterpret_cast<D_GETFEEDERFUNCSFUNC>                          (GetProcAddress(hModule,"DTWAIN_GetFeederFuncs")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetFeederOrder                          = reinterpret_cast<D_GETFEEDERORDERFUNC>                          (GetProcAddress(hModule,"DTWAIN_GetFeederOrder")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetFileTypeName                         = reinterpret_cast<D_GETFILETYPENAME>                             (GetProcAddress(hModule,"DTWAIN_GetFileTypeName")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetFileTypeNameA                        = reinterpret_cast<D_GETFILETYPENAMEA>                            (GetProcAddress(hModule,"DTWAIN_GetFileTypeNameA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetFileTypeNameW                        = reinterpret_cast<D_GETFILETYPENAMEW>                            (GetProcAddress(hModule,"DTWAIN_GetFileTypeNameW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetFileTypeExtensions                   = reinterpret_cast<D_GETFILETYPEEXTENSIONS>                       (GetProcAddress(hModule,"DTWAIN_GetFileTypeExtensions")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetFileTypeExtensionsA                  = reinterpret_cast<D_GETFILETYPEEXTENSIONSA>                      (GetProcAddress(hModule,"DTWAIN_GetFileTypeExtensionsA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetFileTypeExtensionsW                  = reinterpret_cast<D_GETFILETYPEEXTENSIONSW>                      (GetProcAddress(hModule,"DTWAIN_GetFileTypeExtensionsW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetHalftoneA                            = reinterpret_cast<D_GETHALFTONEAFUNC>                            (GetProcAddress(hModule,"DTWAIN_GetHalftoneA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetHalftone                             = reinterpret_cast<D_GETHALFTONEFUNC>                             (GetProcAddress(hModule,"DTWAIN_GetHalftone")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetHalftoneW                            = reinterpret_cast<D_GETHALFTONEWFUNC>                            (GetProcAddress(hModule,"DTWAIN_GetHalftoneW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetHighlight                            = reinterpret_cast<D_GETHIGHLIGHTFUNC>                            (GetProcAddress(hModule,"DTWAIN_GetHighlight")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetHighlightStringA                     = reinterpret_cast<D_GETHIGHLIGHTSTRINGAFUNC>                     (GetProcAddress(hModule,"DTWAIN_GetHighlightStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetHighlightString                      = reinterpret_cast<D_GETHIGHLIGHTSTRINGFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetHighlightString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetHighlightStringW                     = reinterpret_cast<D_GETHIGHLIGHTSTRINGWFUNC>                     (GetProcAddress(hModule,"DTWAIN_GetHighlightStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetImageInfo                            = reinterpret_cast<D_GETIMAGEINFOFUNC>                            (GetProcAddress(hModule,"DTWAIN_GetImageInfo")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetImageInfoStringA                     = reinterpret_cast<D_GETIMAGEINFOSTRINGAFUNC>                     (GetProcAddress(hModule,"DTWAIN_GetImageInfoStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetImageInfoString                      = reinterpret_cast<D_GETIMAGEINFOSTRINGFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetImageInfoString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetImageInfoStringW                     = reinterpret_cast<D_GETIMAGEINFOSTRINGWFUNC>                     (GetProcAddress(hModule,"DTWAIN_GetImageInfoStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetJobControl                           = reinterpret_cast<D_GETJOBCONTROLFUNC>                           (GetProcAddress(hModule,"DTWAIN_GetJobControl")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetJpegValues                           = reinterpret_cast<D_GETJPEGVALUESFUNC>                           (GetProcAddress(hModule,"DTWAIN_GetJpegValues")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetLanguage                             = reinterpret_cast<D_GETLANGUAGEFUNC>                             (GetProcAddress(hModule,"DTWAIN_GetLanguage")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetLastError                            = reinterpret_cast<D_GETLASTERRORFUNC>                            (GetProcAddress(hModule,"DTWAIN_GetLastError")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetLibraryPathA                         = reinterpret_cast<D_GETLIBRARYPATHAFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetLibraryPathA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetLibraryPath                          = reinterpret_cast<D_GETLIBRARYPATHFUNC>                          (GetProcAddress(hModule,"DTWAIN_GetLibraryPath")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetLibraryPathW                         = reinterpret_cast<D_GETLIBRARYPATHWFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetLibraryPathW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetLightPath                            = reinterpret_cast<D_GETLIGHTPATHFUNC>                            (GetProcAddress(hModule,"DTWAIN_GetLightPath")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetLightSource                          = reinterpret_cast<D_GETLIGHTSOURCEFUNC>                          (GetProcAddress(hModule,"DTWAIN_GetLightSource")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetLightSources                         = reinterpret_cast<D_GETLIGHTSOURCESFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetLightSources")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetLoggerCallbackA                      = reinterpret_cast<D_GETLOGGERCALLBACKAFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetLoggerCallbackA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetLoggerCallback                       = reinterpret_cast<D_GETLOGGERCALLBACKFUNC>                       (GetProcAddress(hModule,"DTWAIN_GetLoggerCallback")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetLoggerCallbackW                      = reinterpret_cast<D_GETLOGGERCALLBACKWFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetLoggerCallbackW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetManualDuplexCount                    = reinterpret_cast<D_GETMANUALDUPLEXCOUNTFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetManualDuplexCount")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetMaxAcquisitions                      = reinterpret_cast<D_GETMAXACQUISITIONSFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetMaxAcquisitions")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetMaxBuffers                           = reinterpret_cast<D_GETMAXBUFFERSFUNC>                           (GetProcAddress(hModule,"DTWAIN_GetMaxBuffers")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetMaxPagesToAcquire                    = reinterpret_cast<D_GETMAXPAGESTOACQUIREFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetMaxPagesToAcquire")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetMaxRetryAttempts                     = reinterpret_cast<D_GETMAXRETRYATTEMPTSFUNC>                     (GetProcAddress(hModule,"DTWAIN_GetMaxRetryAttempts")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetNameFromCapA                         = reinterpret_cast<D_GETNAMEFROMCAPAFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetNameFromCapA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetNameFromCap                          = reinterpret_cast<D_GETNAMEFROMCAPFUNC>                          (GetProcAddress(hModule,"DTWAIN_GetNameFromCap")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetNameFromCapW                         = reinterpret_cast<D_GETNAMEFROMCAPWFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetNameFromCapW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetNoiseFilter                          = reinterpret_cast<D_GETNOISEFILTERFUNC>                          (GetProcAddress(hModule,"DTWAIN_GetNoiseFilter")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetNumAcquiredImages                    = reinterpret_cast<D_GETNUMACQUIREDIMAGESFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetNumAcquiredImages")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetNumAcquisitions                      = reinterpret_cast<D_GETNUMACQUISITIONSFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetNumAcquisitions")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRCapValues                         = reinterpret_cast<D_GETOCRCAPVALUESFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetOCRCapValues")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRErrorStringA                      = reinterpret_cast<D_GETOCRERRORSTRINGAFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetOCRErrorStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRErrorString                       = reinterpret_cast<D_GETOCRERRORSTRINGFUNC>                       (GetProcAddress(hModule,"DTWAIN_GetOCRErrorString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRErrorStringW                      = reinterpret_cast<D_GETOCRERRORSTRINGWFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetOCRErrorStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRLastError                         = reinterpret_cast<D_GETOCRLASTERRORFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetOCRLastError")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRManufacturerA                     = reinterpret_cast<D_GETOCRMANUFACTURERAFUNC>                     (GetProcAddress(hModule,"DTWAIN_GetOCRManufacturerA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRManufacturer                      = reinterpret_cast<D_GETOCRMANUFACTURERFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetOCRManufacturer")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRManufacturerW                     = reinterpret_cast<D_GETOCRMANUFACTURERWFUNC>                     (GetProcAddress(hModule,"DTWAIN_GetOCRManufacturerW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRProductFamilyA                    = reinterpret_cast<D_GETOCRPRODUCTFAMILYAFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetOCRProductFamilyA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRProductFamily                     = reinterpret_cast<D_GETOCRPRODUCTFAMILYFUNC>                     (GetProcAddress(hModule,"DTWAIN_GetOCRProductFamily")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRProductFamilyW                    = reinterpret_cast<D_GETOCRPRODUCTFAMILYWFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetOCRProductFamilyW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRProductNameA                      = reinterpret_cast<D_GETOCRPRODUCTNAMEAFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetOCRProductNameA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRProductName                       = reinterpret_cast<D_GETOCRPRODUCTNAMEFUNC>                       (GetProcAddress(hModule,"DTWAIN_GetOCRProductName")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRProductNameW                      = reinterpret_cast<D_GETOCRPRODUCTNAMEWFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetOCRProductNameW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRTextA                             = reinterpret_cast<D_GETOCRTEXTAFUNC>                             (GetProcAddress(hModule,"DTWAIN_GetOCRTextA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRText                              = reinterpret_cast<D_GETOCRTEXTFUNC>                              (GetProcAddress(hModule,"DTWAIN_GetOCRText")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRTextInfoFloatEx                   = reinterpret_cast<D_GETOCRTEXTINFOFLOATEXFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetOCRTextInfoFloatEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRTextInfoFloat                     = reinterpret_cast<D_GETOCRTEXTINFOFLOATFUNC>                     (GetProcAddress(hModule,"DTWAIN_GetOCRTextInfoFloat")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRTextInfoHandle                    = reinterpret_cast<D_GETOCRTEXTINFOHANDLEFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetOCRTextInfoHandle")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRTextInfoLongEx                    = reinterpret_cast<D_GETOCRTEXTINFOLONGEXFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetOCRTextInfoLongEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRTextInfoLong                      = reinterpret_cast<D_GETOCRTEXTINFOLONGFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetOCRTextInfoLong")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRTextW                             = reinterpret_cast<D_GETOCRTEXTWFUNC>                             (GetProcAddress(hModule,"DTWAIN_GetOCRTextW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRVersionInfoA                      = reinterpret_cast<D_GETOCRVERSIONINFOAFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetOCRVersionInfoA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRVersionInfo                       = reinterpret_cast<D_GETOCRVERSIONINFOFUNC>                       (GetProcAddress(hModule,"DTWAIN_GetOCRVersionInfo")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOCRVersionInfoW                      = reinterpret_cast<D_GETOCRVERSIONINFOWFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetOCRVersionInfoW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOrientation                          = reinterpret_cast<D_GETORIENTATIONFUNC>                          (GetProcAddress(hModule,"DTWAIN_GetOrientation")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetOverscan                             = reinterpret_cast<D_GETOVERSCANFUNC>                             (GetProcAddress(hModule,"DTWAIN_GetOverscan")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetPaperSize                            = reinterpret_cast<D_GETPAPERSIZEFUNC>                            (GetProcAddress(hModule,"DTWAIN_GetPaperSize")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetPatchMaxPriorities                   = reinterpret_cast<D_GETPATCHMAXPRIORITIESFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetPatchMaxPriorities")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetPatchMaxRetries                      = reinterpret_cast<D_GETPATCHMAXRETRIESFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetPatchMaxRetries")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetPatchPriorities                      = reinterpret_cast<D_GETPATCHPRIORITIESFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetPatchPriorities")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetPatchSearchMode                      = reinterpret_cast<D_GETPATCHSEARCHMODEFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetPatchSearchMode")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetPatchTimeOut                         = reinterpret_cast<D_GETPATCHTIMEOUTFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetPatchTimeOut")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetPDFTextElementFloat                  = reinterpret_cast<D_GETPDFTEXTELEMENTFLOATFUNC>                  (GetProcAddress(hModule,"DTWAIN_GetPDFTextElementFloat")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetPDFTextElementLong                   = reinterpret_cast<D_GETPDFTEXTELEMENTLONGFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetPDFTextElementLong")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetPDFTextElementStringA                = reinterpret_cast<D_GETPDFTEXTELEMENTSTRINGAFUNC>                (GetProcAddress(hModule,"DTWAIN_GetPDFTextElementStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetPDFTextElementString                 = reinterpret_cast<D_GETPDFTEXTELEMENTSTRINGFUNC>                 (GetProcAddress(hModule,"DTWAIN_GetPDFTextElementString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetPDFTextElementStringW                = reinterpret_cast<D_GETPDFTEXTELEMENTSTRINGWFUNC>                (GetProcAddress(hModule,"DTWAIN_GetPDFTextElementStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetPDFType1FontNameA                    = reinterpret_cast<D_GETPDFTYPE1FONTNAMEAFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetPDFType1FontNameA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetPDFType1FontName                     = reinterpret_cast<D_GETPDFTYPE1FONTNAMEFUNC>                     (GetProcAddress(hModule,"DTWAIN_GetPDFType1FontName")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetPDFType1FontNameW                    = reinterpret_cast<D_GETPDFTYPE1FONTNAMEWFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetPDFType1FontNameW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetPixelFlavor                          = reinterpret_cast<D_GETPIXELFLAVORFUNC>                          (GetProcAddress(hModule,"DTWAIN_GetPixelFlavor")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetPixelType                            = reinterpret_cast<D_GETPIXELTYPEFUNC>                            (GetProcAddress(hModule,"DTWAIN_GetPixelType")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetPrinter                              = reinterpret_cast<D_GETPRINTERFUNC>                              (GetProcAddress(hModule,"DTWAIN_GetPrinter")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetPrinterStartNumber                   = reinterpret_cast<D_GETPRINTERSTARTNUMBERFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetPrinterStartNumber")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetPrinterStringMode                    = reinterpret_cast<D_GETPRINTERSTRINGMODEFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetPrinterStringMode")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetPrinterStrings                       = reinterpret_cast<D_GETPRINTERSTRINGSFUNC>                       (GetProcAddress(hModule,"DTWAIN_GetPrinterStrings")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetPrinterSuffixStringA                 = reinterpret_cast<D_GETPRINTERSUFFIXSTRINGAFUNC>                 (GetProcAddress(hModule,"DTWAIN_GetPrinterSuffixStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetPrinterSuffixString                  = reinterpret_cast<D_GETPRINTERSUFFIXSTRINGFUNC>                  (GetProcAddress(hModule,"DTWAIN_GetPrinterSuffixString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetPrinterSuffixStringW                 = reinterpret_cast<D_GETPRINTERSUFFIXSTRINGWFUNC>                 (GetProcAddress(hModule,"DTWAIN_GetPrinterSuffixStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetRegisteredMsg                        = reinterpret_cast<D_GETREGISTEREDMSGFUNC>                        (GetProcAddress(hModule,"DTWAIN_GetRegisteredMsg")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetResolution                           = reinterpret_cast<D_GETRESOLUTIONFUNC>                           (GetProcAddress(hModule,"DTWAIN_GetResolution")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetResolutionStringA                    = reinterpret_cast<D_GETRESOLUTIONSTRINGAFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetResolutionStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetResolutionString                     = reinterpret_cast<D_GETRESOLUTIONSTRINGFUNC>                     (GetProcAddress(hModule,"DTWAIN_GetResolutionString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetResolutionStringW                    = reinterpret_cast<D_GETRESOLUTIONSTRINGWFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetResolutionStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetRotation                             = reinterpret_cast<D_GETROTATIONFUNC>                             (GetProcAddress(hModule,"DTWAIN_GetRotation")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetRotationStringA                      = reinterpret_cast<D_GETROTATIONSTRINGAFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetRotationStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetRotationString                       = reinterpret_cast<D_GETROTATIONSTRINGFUNC>                       (GetProcAddress(hModule,"DTWAIN_GetRotationString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetRotationStringW                      = reinterpret_cast<D_GETROTATIONSTRINGWFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetRotationStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetSaveFileNameA                        = reinterpret_cast<D_GETSAVEFILENAMEAFUNC>                        (GetProcAddress(hModule,"DTWAIN_GetSaveFileNameA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetSaveFileName                         = reinterpret_cast<D_GETSAVEFILENAMEFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetSaveFileName")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetSaveFileNameW                        = reinterpret_cast<D_GETSAVEFILENAMEWFUNC>                        (GetProcAddress(hModule,"DTWAIN_GetSaveFileNameW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetShadow                               = reinterpret_cast<D_GETSHADOWFUNC>                               (GetProcAddress(hModule,"DTWAIN_GetShadow")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetShadowStringA                        = reinterpret_cast<D_GETSHADOWSTRINGAFUNC>                        (GetProcAddress(hModule,"DTWAIN_GetShadowStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetShadowString                         = reinterpret_cast<D_GETSHADOWSTRINGFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetShadowString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetShadowStringW                        = reinterpret_cast<D_GETSHADOWSTRINGWFUNC>                        (GetProcAddress(hModule,"DTWAIN_GetShadowStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetShortVersionStringA                  = reinterpret_cast<D_GETSHORTVERSIONSTRINGAFUNC>                  (GetProcAddress(hModule,"DTWAIN_GetShortVersionStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetShortVersionString                   = reinterpret_cast<D_GETSHORTVERSIONSTRINGFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetShortVersionString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetShortVersionStringW                  = reinterpret_cast<D_GETSHORTVERSIONSTRINGWFUNC>                  (GetProcAddress(hModule,"DTWAIN_GetShortVersionStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetSourceAcquisitions                   = reinterpret_cast<D_GETSOURCEACQUISITIONSFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetSourceAcquisitions")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetSourceIDEx                           = reinterpret_cast<D_GETSOURCEIDEXFUNC>                           (GetProcAddress(hModule,"DTWAIN_GetSourceIDEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetSourceID                             = reinterpret_cast<D_GETSOURCEIDFUNC>                             (GetProcAddress(hModule,"DTWAIN_GetSourceID")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetSourceManufacturerA                  = reinterpret_cast<D_GETSOURCEMANUFACTURERAFUNC>                  (GetProcAddress(hModule,"DTWAIN_GetSourceManufacturerA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetSourceManufacturer                   = reinterpret_cast<D_GETSOURCEMANUFACTURERFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetSourceManufacturer")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetSourceManufacturerW                  = reinterpret_cast<D_GETSOURCEMANUFACTURERWFUNC>                  (GetProcAddress(hModule,"DTWAIN_GetSourceManufacturerW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetSourceProductFamilyA                 = reinterpret_cast<D_GETSOURCEPRODUCTFAMILYAFUNC>                 (GetProcAddress(hModule,"DTWAIN_GetSourceProductFamilyA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetSourceProductFamily                  = reinterpret_cast<D_GETSOURCEPRODUCTFAMILYFUNC>                  (GetProcAddress(hModule,"DTWAIN_GetSourceProductFamily")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetSourceProductFamilyW                 = reinterpret_cast<D_GETSOURCEPRODUCTFAMILYWFUNC>                 (GetProcAddress(hModule,"DTWAIN_GetSourceProductFamilyW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetSourceProductNameA                   = reinterpret_cast<D_GETSOURCEPRODUCTNAMEAFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetSourceProductNameA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetSourceProductName                    = reinterpret_cast<D_GETSOURCEPRODUCTNAMEFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetSourceProductName")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetSourceProductNameW                   = reinterpret_cast<D_GETSOURCEPRODUCTNAMEWFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetSourceProductNameW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetSourceUnit                           = reinterpret_cast<D_GETSOURCEUNITFUNC>                           (GetProcAddress(hModule,"DTWAIN_GetSourceUnit")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetSourceVersionInfoA                   = reinterpret_cast<D_GETSOURCEVERSIONINFOAFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetSourceVersionInfoA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetSourceVersionInfo                    = reinterpret_cast<D_GETSOURCEVERSIONINFOFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetSourceVersionInfo")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetSourceVersionInfoW                   = reinterpret_cast<D_GETSOURCEVERSIONINFOWFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetSourceVersionInfoW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetSourceVersionNumber                  = reinterpret_cast<D_GETSOURCEVERSIONNUMBERFUNC>                  (GetProcAddress(hModule,"DTWAIN_GetSourceVersionNumber")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetStaticLibVersion                     = reinterpret_cast<D_GETSTATICLIBVERSIONFUNC>                     (GetProcAddress(hModule,"DTWAIN_GetStaticLibVersion")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTempFileDirectoryA                   = reinterpret_cast<D_GETTEMPFILEDIRECTORYAFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetTempFileDirectoryA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTempFileDirectory                    = reinterpret_cast<D_GETTEMPFILEDIRECTORYFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetTempFileDirectory")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTempFileDirectoryW                   = reinterpret_cast<D_GETTEMPFILEDIRECTORYWFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetTempFileDirectoryW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetThreshold                            = reinterpret_cast<D_GETTHRESHOLDFUNC>                            (GetProcAddress(hModule,"DTWAIN_GetThreshold")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetThresholdStringA                     = reinterpret_cast<D_GETTHRESHOLDSTRINGAFUNC>                     (GetProcAddress(hModule,"DTWAIN_GetThresholdStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetThresholdString                      = reinterpret_cast<D_GETTHRESHOLDSTRINGFUNC>                      (GetProcAddress(hModule,"DTWAIN_GetThresholdString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetThresholdStringW                     = reinterpret_cast<D_GETTHRESHOLDSTRINGWFUNC>                     (GetProcAddress(hModule,"DTWAIN_GetThresholdStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTimeDateA                            = reinterpret_cast<D_GETTIMEDATEAFUNC>                            (GetProcAddress(hModule,"DTWAIN_GetTimeDateA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTimeDate                             = reinterpret_cast<D_GETTIMEDATEFUNC>                             (GetProcAddress(hModule,"DTWAIN_GetTimeDate")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTimeDateW                            = reinterpret_cast<D_GETTIMEDATEWFUNC>                            (GetProcAddress(hModule,"DTWAIN_GetTimeDateW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainAppIDEx                         = reinterpret_cast<D_GETTWAINAPPIDEXFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetTwainAppIDEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainAppID                           = reinterpret_cast<D_GETTWAINAPPIDFUNC>                           (GetProcAddress(hModule,"DTWAIN_GetTwainAppID")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainAvailability                    = reinterpret_cast<D_GETTWAINAVAILABILITYFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetTwainAvailability")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainCountryNameA                    = reinterpret_cast<D_GETTWAINCOUNTRYNAMEAFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetTwainCountryNameA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainCountryName                     = reinterpret_cast<D_GETTWAINCOUNTRYNAMEFUNC>                     (GetProcAddress(hModule,"DTWAIN_GetTwainCountryName")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainCountryNameW                    = reinterpret_cast<D_GETTWAINCOUNTRYNAMEWFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetTwainCountryNameW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainCountryValueA                   = reinterpret_cast<D_GETTWAINCOUNTRYVALUEAFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetTwainCountryValueA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainCountryValue                    = reinterpret_cast<D_GETTWAINCOUNTRYVALUEFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetTwainCountryValue")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainCountryValueW                   = reinterpret_cast<D_GETTWAINCOUNTRYVALUEWFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetTwainCountryValueW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainHwnd                            = reinterpret_cast<D_GETTWAINHWNDFUNC>                            (GetProcAddress(hModule,"DTWAIN_GetTwainHwnd")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainLanguageNameA                   = reinterpret_cast<D_GETTWAINLANGUAGENAMEAFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetTwainLanguageNameA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainLanguageName                    = reinterpret_cast<D_GETTWAINLANGUAGENAMEFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetTwainLanguageName")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainLanguageNameW                   = reinterpret_cast<D_GETTWAINLANGUAGENAMEWFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetTwainLanguageNameW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainLanguageValueA                  = reinterpret_cast<D_GETTWAINLANGUAGEVALUEAFUNC>                  (GetProcAddress(hModule,"DTWAIN_GetTwainLanguageValueA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainLanguageValue                   = reinterpret_cast<D_GETTWAINLANGUAGEVALUEFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetTwainLanguageValue")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainLanguageValueW                  = reinterpret_cast<D_GETTWAINLANGUAGEVALUEWFUNC>                  (GetProcAddress(hModule,"DTWAIN_GetTwainLanguageValueW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainMode                            = reinterpret_cast<D_GETTWAINMODEFUNC>                            (GetProcAddress(hModule,"DTWAIN_GetTwainMode")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainNameFromConstantA               = reinterpret_cast<D_GETTWAINNAMEFROMCONSTANTA>                   (GetProcAddress(hModule,"DTWAIN_GetTwainNameFromConstantA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainNameFromConstantW               = reinterpret_cast<D_GETTWAINNAMEFROMCONSTANTW>                   (GetProcAddress(hModule,"DTWAIN_GetTwainNameFromConstantW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetTwainTimeout                         = reinterpret_cast<D_GETTWAINTIMEOUTFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetTwainTimeout")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetVersionEx                            = reinterpret_cast<D_GETVERSIONEXFUNC>                            (GetProcAddress(hModule,"DTWAIN_GetVersionEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetVersion                              = reinterpret_cast<D_GETVERSIONFUNC>                              (GetProcAddress(hModule,"DTWAIN_GetVersion")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetVersionInfoA                         = reinterpret_cast<D_GETVERSIONINFOAFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetVersionInfoA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetVersionInfo                          = reinterpret_cast<D_GETVERSIONINFOFUNC>                          (GetProcAddress(hModule,"DTWAIN_GetVersionInfo")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetVersionInfoW                         = reinterpret_cast<D_GETVERSIONINFOWFUNC>                         (GetProcAddress(hModule,"DTWAIN_GetVersionInfoW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetVersionStringA                       = reinterpret_cast<D_GETVERSIONSTRINGAFUNC>                       (GetProcAddress(hModule,"DTWAIN_GetVersionStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetVersionString                        = reinterpret_cast<D_GETVERSIONSTRINGFUNC>                        (GetProcAddress(hModule,"DTWAIN_GetVersionString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetVersionStringW                       = reinterpret_cast<D_GETVERSIONSTRINGWFUNC>                       (GetProcAddress(hModule,"DTWAIN_GetVersionStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetXResolution                          = reinterpret_cast<D_GETXRESOLUTIONFUNC>                          (GetProcAddress(hModule,"DTWAIN_GetXResolution")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetXResolutionStringA                   = reinterpret_cast<D_GETXRESOLUTIONSTRINGAFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetXResolutionStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetXResolutionString                    = reinterpret_cast<D_GETXRESOLUTIONSTRINGFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetXResolutionString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetXResolutionStringW                   = reinterpret_cast<D_GETXRESOLUTIONSTRINGWFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetXResolutionStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetYResolution                          = reinterpret_cast<D_GETYRESOLUTIONFUNC>                          (GetProcAddress(hModule,"DTWAIN_GetYResolution")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetYResolutionStringA                   = reinterpret_cast<D_GETYRESOLUTIONSTRINGAFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetYResolutionStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetYResolutionString                    = reinterpret_cast<D_GETYRESOLUTIONSTRINGFUNC>                    (GetProcAddress(hModule,"DTWAIN_GetYResolutionString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_GetYResolutionStringW                   = reinterpret_cast<D_GETYRESOLUTIONSTRINGWFUNC>                   (GetProcAddress(hModule,"DTWAIN_GetYResolutionStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_InitExtImageInfo                        = reinterpret_cast<D_INITEXTIMAGEINFOFUNC>                        (GetProcAddress(hModule,"DTWAIN_InitExtImageInfo")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_InitImageFileAppendA                    = reinterpret_cast<D_INITIMAGEFILEAPPENDAFUNC>                    (GetProcAddress(hModule,"DTWAIN_InitImageFileAppendA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_InitImageFileAppend                     = reinterpret_cast<D_INITIMAGEFILEAPPENDFUNC>                     (GetProcAddress(hModule,"DTWAIN_InitImageFileAppend")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_InitImageFileAppendW                    = reinterpret_cast<D_INITIMAGEFILEAPPENDWFUNC>                    (GetProcAddress(hModule,"DTWAIN_InitImageFileAppendW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_InitOCRInterface                        = reinterpret_cast<D_INITOCRINTERFACEFUNC>                        (GetProcAddress(hModule,"DTWAIN_InitOCRInterface")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsAcquiring                             = reinterpret_cast<D_ISACQUIRINGFUNC>                             (GetProcAddress(hModule,"DTWAIN_IsAcquiring")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsAutoBorderDetectEnabled               = reinterpret_cast<D_ISAUTOBORDERDETECTENABLEDFUNC>               (GetProcAddress(hModule,"DTWAIN_IsAutoBorderDetectEnabled")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsAutoBorderDetectSupported             = reinterpret_cast<D_ISAUTOBORDERDETECTSUPPORTEDFUNC>             (GetProcAddress(hModule,"DTWAIN_IsAutoBorderDetectSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsAutoBrightEnabled                     = reinterpret_cast<D_ISAUTOBRIGHTENABLEDFUNC>                     (GetProcAddress(hModule,"DTWAIN_IsAutoBrightEnabled")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsAutoBrightSupported                   = reinterpret_cast<D_ISAUTOBRIGHTSUPPORTEDFUNC>                   (GetProcAddress(hModule,"DTWAIN_IsAutoBrightSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsAutoDeskewEnabled                     = reinterpret_cast<D_ISAUTODESKEWENABLEDFUNC>                     (GetProcAddress(hModule,"DTWAIN_IsAutoDeskewEnabled")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsAutoDeskewSupported                   = reinterpret_cast<D_ISAUTODESKEWSUPPORTEDFUNC>                   (GetProcAddress(hModule,"DTWAIN_IsAutoDeskewSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsAutoFeedEnabled                       = reinterpret_cast<D_ISAUTOFEEDENABLEDFUNC>                       (GetProcAddress(hModule,"DTWAIN_IsAutoFeedEnabled")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsAutoFeedSupported                     = reinterpret_cast<D_ISAUTOFEEDSUPPORTEDFUNC>                     (GetProcAddress(hModule,"DTWAIN_IsAutoFeedSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsAutomaticSenseMediumEnabled           = reinterpret_cast<D_ISAUTOMATICSENSEMEDIUMENABLEDFUNC>           (GetProcAddress(hModule,"DTWAIN_IsAutomaticSenseMediumEnabled")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsAutomaticSenseMediumSupported         = reinterpret_cast<D_ISAUTOMATICSENSEMEDIUMSUPPORTEDFUNC>         (GetProcAddress(hModule,"DTWAIN_IsAutomaticSenseMediumSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsAutoRotateEnabled                     = reinterpret_cast<D_ISAUTOROTATEENABLEDFUNC>                     (GetProcAddress(hModule,"DTWAIN_IsAutoRotateEnabled")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsAutoRotateSupported                   = reinterpret_cast<D_ISAUTOROTATESUPPORTEDFUNC>                   (GetProcAddress(hModule,"DTWAIN_IsAutoRotateSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsAutoScanEnabled                       = reinterpret_cast<D_ISAUTOSCANENABLEDFUNC>                       (GetProcAddress(hModule,"DTWAIN_IsAutoScanEnabled")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsBlankPageDetectionOn                  = reinterpret_cast<D_ISBLANKPAGEDETECTIONONFUNC>                  (GetProcAddress(hModule,"DTWAIN_IsBlankPageDetectionOn")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsCapSupported                          = reinterpret_cast<D_ISCAPSUPPORTEDFUNC>                          (GetProcAddress(hModule,"DTWAIN_IsCapSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsCompressionSupported                  = reinterpret_cast<D_ISCOMPRESSIONSUPPORTEDFUNC>                  (GetProcAddress(hModule,"DTWAIN_IsCompressionSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsCustomDSDataSupported                 = reinterpret_cast<D_ISCUSTOMDSDATASUPPORTEDFUNC>                 (GetProcAddress(hModule,"DTWAIN_IsCustomDSDataSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsDeviceEventSupported                  = reinterpret_cast<D_ISDEVICEEVENTSUPPORTEDFUNC>                  (GetProcAddress(hModule,"DTWAIN_IsDeviceEventSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsDeviceOnLine                          = reinterpret_cast<D_ISDEVICEONLINEFUNC>                          (GetProcAddress(hModule,"DTWAIN_IsDeviceOnLine")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsDIBBlank                              = reinterpret_cast<D_ISDIBBLANKFUNC>                              (GetProcAddress(hModule,"DTWAIN_IsDIBBlank")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsDIBBlankStringA                       = reinterpret_cast<D_ISDIBBLANKSTRINGAFUNC>                       (GetProcAddress(hModule,"DTWAIN_IsDIBBlankStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsDIBBlankString                        = reinterpret_cast<D_ISDIBBLANKSTRINGFUNC>                        (GetProcAddress(hModule,"DTWAIN_IsDIBBlankString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsDIBBlankStringW                       = reinterpret_cast<D_ISDIBBLANKSTRINGWFUNC>                       (GetProcAddress(hModule,"DTWAIN_IsDIBBlankStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsDoubleFeedDetectLengthSupported       = reinterpret_cast<D_ISDOUBLEFEEDDETECTLENGTHSUPPORTEDFUNC>       (GetProcAddress(hModule,"DTWAIN_IsDoubleFeedDetectLengthSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsDoubleFeedDetectSupported             = reinterpret_cast<D_ISDOUBLEFEEDDETECTSUPPORTEDFUNC>             (GetProcAddress(hModule,"DTWAIN_IsDoubleFeedDetectSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsDuplexEnabled                         = reinterpret_cast<D_ISDUPLEXENABLEDFUNC>                         (GetProcAddress(hModule,"DTWAIN_IsDuplexEnabled")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsDuplexSupported                       = reinterpret_cast<D_ISDUPLEXSUPPORTEDFUNC>                       (GetProcAddress(hModule,"DTWAIN_IsDuplexSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsExtImageInfoSupported                 = reinterpret_cast<D_ISEXTIMAGEINFOSUPPORTEDFUNC>                 (GetProcAddress(hModule,"DTWAIN_IsExtImageInfoSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsFeederEnabled                         = reinterpret_cast<D_ISFEEDERENABLEDFUNC>                         (GetProcAddress(hModule,"DTWAIN_IsFeederEnabled")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsFeederLoaded                          = reinterpret_cast<D_ISFEEDERLOADEDFUNC>                          (GetProcAddress(hModule,"DTWAIN_IsFeederLoaded")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsFeederSensitive                       = reinterpret_cast<D_ISFEEDERSENSITIVEFUNC>                       (GetProcAddress(hModule,"DTWAIN_IsFeederSensitive")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsFeederSupported                       = reinterpret_cast<D_ISFEEDERSUPPORTEDFUNC>                       (GetProcAddress(hModule,"DTWAIN_IsFeederSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsFileSystemSupported                   = reinterpret_cast<D_ISFILESYSTEMSUPPORTEDFUNC>                   (GetProcAddress(hModule,"DTWAIN_IsFileSystemSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsFileXferSupported                     = reinterpret_cast<D_ISFILEXFERSUPPORTEDFUNC>                     (GetProcAddress(hModule,"DTWAIN_IsFileXferSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsIndicatorEnabled                      = reinterpret_cast<D_ISINDICATORENABLEDFUNC>                      (GetProcAddress(hModule,"DTWAIN_IsIndicatorEnabled")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsIndicatorSupported                    = reinterpret_cast<D_ISINDICATORSUPPORTEDFUNC>                    (GetProcAddress(hModule,"DTWAIN_IsIndicatorSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsInitialized                           = reinterpret_cast<D_ISINITIALIZEDFUNC>                           (GetProcAddress(hModule,"DTWAIN_IsInitialized")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsJobControlSupported                   = reinterpret_cast<D_ISJOBCONTROLSUPPORTEDFUNC>                   (GetProcAddress(hModule,"DTWAIN_IsJobControlSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsJPEGSupported                         = reinterpret_cast<D_ISJPEGSUPPORTEDFUNC>                         (GetProcAddress(hModule,"DTWAIN_IsJPEGSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsLampEnabled                           = reinterpret_cast<D_ISLAMPENABLEDFUNC>                           (GetProcAddress(hModule,"DTWAIN_IsLampEnabled")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsLampSupported                         = reinterpret_cast<D_ISLAMPSUPPORTEDFUNC>                         (GetProcAddress(hModule,"DTWAIN_IsLampSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsLightPathSupported                    = reinterpret_cast<D_ISLIGHTPATHSUPPORTEDFUNC>                    (GetProcAddress(hModule,"DTWAIN_IsLightPathSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsLightSourceSupported                  = reinterpret_cast<D_ISLIGHTSOURCESUPPORTEDFUNC>                  (GetProcAddress(hModule,"DTWAIN_IsLightSourceSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsMaxBuffersSupported                   = reinterpret_cast<D_ISMAXBUFFERSSUPPORTEDFUNC>                   (GetProcAddress(hModule,"DTWAIN_IsMaxBuffersSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsMsgNotifyEnabled                      = reinterpret_cast<D_ISMSGNOTIFYENABLEDFUNC>                      (GetProcAddress(hModule,"DTWAIN_IsMsgNotifyEnabled")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsOCREngineActivated                    = reinterpret_cast<D_ISOCRENGINEACTIVATEDFUNC>                    (GetProcAddress(hModule,"DTWAIN_IsOCREngineActivated")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsOrientationSupported                  = reinterpret_cast<D_ISORIENTATIONSUPPORTEDFUNC>                  (GetProcAddress(hModule,"DTWAIN_IsOrientationSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsOverscanSupported                     = reinterpret_cast<D_ISOVERSCANSUPPORTEDFUNC>                     (GetProcAddress(hModule,"DTWAIN_IsOverscanSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsPaperDetectable                       = reinterpret_cast<D_ISPAPERDETECTABLEFUNC>                       (GetProcAddress(hModule,"DTWAIN_IsPaperDetectable")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsPaperSizeSupported                    = reinterpret_cast<D_ISPAPERSIZESUPPORTEDFUNC>                    (GetProcAddress(hModule,"DTWAIN_IsPaperSizeSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsPatchCapsSupported                    = reinterpret_cast<D_ISPATCHCAPSSUPPORTEDFUNC>                    (GetProcAddress(hModule,"DTWAIN_IsPatchCapsSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsPatchDetectEnabled                    = reinterpret_cast<D_ISPATCHDETECTENABLEDFUNC>                    (GetProcAddress(hModule,"DTWAIN_IsPatchDetectEnabled")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsPatchSupported                        = reinterpret_cast<D_ISPATCHSUPPORTEDFUNC>                        (GetProcAddress(hModule,"DTWAIN_IsPatchSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsPDFSupported                          = reinterpret_cast<D_ISPDFSUPPORTEDFUNC>                          (GetProcAddress(hModule,"DTWAIN_IsPDFSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsPixelTypeSupported                    = reinterpret_cast<D_ISPIXELTYPESUPPORTEDFUNC>                    (GetProcAddress(hModule,"DTWAIN_IsPixelTypeSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsPNGSupported                          = reinterpret_cast<D_ISPNGSUPPORTEDFUNC>                          (GetProcAddress(hModule,"DTWAIN_IsPNGSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsPrinterEnabled                        = reinterpret_cast<D_ISPRINTERENABLEDFUNC>                        (GetProcAddress(hModule,"DTWAIN_IsPrinterEnabled")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsPrinterSupported                      = reinterpret_cast<D_ISPRINTERSUPPORTEDFUNC>                      (GetProcAddress(hModule,"DTWAIN_IsPrinterSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsRotationSupported                     = reinterpret_cast<D_ISROTATIONSUPPORTEDFUNC>                     (GetProcAddress(hModule,"DTWAIN_IsRotationSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsSessionEnabled                        = reinterpret_cast<D_ISSESSIONENABLEDFUNC>                        (GetProcAddress(hModule,"DTWAIN_IsSessionEnabled")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsSkipImageInfoError                    = reinterpret_cast<D_ISSKIPIMAGEINFOERRORFUNC>                    (GetProcAddress(hModule,"DTWAIN_IsSkipImageInfoError")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsSourceAcquiring                       = reinterpret_cast<D_ISSOURCEACQUIRINGFUNC>                       (GetProcAddress(hModule,"DTWAIN_IsSourceAcquiring")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsSourceOpen                            = reinterpret_cast<D_ISSOURCEOPENFUNC>                            (GetProcAddress(hModule,"DTWAIN_IsSourceOpen")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsSourceSelected                        = reinterpret_cast<D_ISSOURCESELECTEDFUNC>                        (GetProcAddress(hModule,"DTWAIN_IsSourceSelected")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsThumbnailEnabled                      = reinterpret_cast<D_ISTHUMBNAILENABLEDFUNC>                      (GetProcAddress(hModule,"DTWAIN_IsThumbnailEnabled")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsThumbnailSupported                    = reinterpret_cast<D_ISTHUMBNAILSUPPORTEDFUNC>                    (GetProcAddress(hModule,"DTWAIN_IsThumbnailSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsTIFFSupported                         = reinterpret_cast<D_ISTIFFSUPPORTEDFUNC>                         (GetProcAddress(hModule,"DTWAIN_IsTIFFSupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsTwainAvailable                        = reinterpret_cast<D_ISTWAINAVAILABLEFUNC>                        (GetProcAddress(hModule,"DTWAIN_IsTwainAvailable")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsTwainMsg                              = reinterpret_cast<D_ISTWAINMSGFUNC>                              (GetProcAddress(hModule,"DTWAIN_IsTwainMsg")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsUIControllable                        = reinterpret_cast<D_ISUICONTROLLABLEFUNC>                        (GetProcAddress(hModule,"DTWAIN_IsUIControllable")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsUIEnabled                             = reinterpret_cast<D_ISUIENABLEDFUNC>                             (GetProcAddress(hModule,"DTWAIN_IsUIEnabled")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_IsUIOnlySupported                       = reinterpret_cast<D_ISUIONLYSUPPORTEDFUNC>                       (GetProcAddress(hModule,"DTWAIN_IsUIOnlySupported")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_LoadCustomStringResourcesA              = reinterpret_cast<D_LOADCUSTOMSTRINGRESOURCESAFUNC>              (GetProcAddress(hModule,"DTWAIN_LoadCustomStringResourcesA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_LoadCustomStringResources               = reinterpret_cast<D_LOADCUSTOMSTRINGRESOURCESFUNC>               (GetProcAddress(hModule,"DTWAIN_LoadCustomStringResources")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_LoadCustomStringResourcesW              = reinterpret_cast<D_LOADCUSTOMSTRINGRESOURCESWFUNC>              (GetProcAddress(hModule,"DTWAIN_LoadCustomStringResourcesW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_LoadLanguageResource                    = reinterpret_cast<D_LOADLANGUAGERESOURCEFUNC>                    (GetProcAddress(hModule,"DTWAIN_LoadLanguageResource")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_LockMemoryEx                            = reinterpret_cast<D_LOCKMEMORYEXFUNC>                            (GetProcAddress(hModule,"DTWAIN_LockMemoryEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_LockMemory                              = reinterpret_cast<D_LOCKMEMORYFUNC>                              (GetProcAddress(hModule,"DTWAIN_LockMemory")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_LogMessageA                             = reinterpret_cast<D_LOGMESSAGEAFUNC>                             (GetProcAddress(hModule,"DTWAIN_LogMessageA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_LogMessage                              = reinterpret_cast<D_LOGMESSAGEFUNC>                              (GetProcAddress(hModule,"DTWAIN_LogMessage")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_LogMessageW                             = reinterpret_cast<D_LOGMESSAGEWFUNC>                             (GetProcAddress(hModule,"DTWAIN_LogMessageW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_MakeRGB                                 = reinterpret_cast<D_MAKERGBFUNC>                                 (GetProcAddress(hModule,"DTWAIN_MakeRGB")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_OpenSource                              = reinterpret_cast<D_OPENSOURCEFUNC>                              (GetProcAddress(hModule,"DTWAIN_OpenSource")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_OpenSourcesOnSelect                     = reinterpret_cast<D_OPENSOURCESONSELECTFUNC>                     (GetProcAddress(hModule,"DTWAIN_OpenSourcesOnSelect")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeCreateFromCap                      = reinterpret_cast<D_RANGECREATEFROMCAPFUNC>                      (GetProcAddress(hModule,"DTWAIN_RangeCreateFromCap")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeCreate                             = reinterpret_cast<D_RANGECREATEFUNC>                             (GetProcAddress(hModule,"DTWAIN_RangeCreate")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeDestroy                            = reinterpret_cast<D_RANGEDESTROYFUNC>                            (GetProcAddress(hModule,"DTWAIN_RangeDestroy")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeExpand                             = reinterpret_cast<D_RANGEEXPANDFUNC>                             (GetProcAddress(hModule,"DTWAIN_RangeExpand")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetAllFloat                        = reinterpret_cast<D_RANGEGETALLFLOATFUNC>                        (GetProcAddress(hModule,"DTWAIN_RangeGetAllFloat")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetAllFloatStringA                 = reinterpret_cast<D_RANGEGETALLFLOATSTRINGAFUNC>                 (GetProcAddress(hModule,"DTWAIN_RangeGetAllFloatStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetAllFloatString                  = reinterpret_cast<D_RANGEGETALLFLOATSTRINGFUNC>                  (GetProcAddress(hModule,"DTWAIN_RangeGetAllFloatString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetAllFloatStringW                 = reinterpret_cast<D_RANGEGETALLFLOATSTRINGWFUNC>                 (GetProcAddress(hModule,"DTWAIN_RangeGetAllFloatStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetAll                             = reinterpret_cast<D_RANGEGETALLFUNC>                             (GetProcAddress(hModule,"DTWAIN_RangeGetAll")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetAllLong                         = reinterpret_cast<D_RANGEGETALLLONGFUNC>                         (GetProcAddress(hModule,"DTWAIN_RangeGetAllLong")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetCount                           = reinterpret_cast<D_RANGEGETCOUNTFUNC>                           (GetProcAddress(hModule,"DTWAIN_RangeGetCount")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetExpValueFloat                   = reinterpret_cast<D_RANGEGETEXPVALUEFLOATFUNC>                   (GetProcAddress(hModule,"DTWAIN_RangeGetExpValueFloat")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetExpValueFloatStringA            = reinterpret_cast<D_RANGEGETEXPVALUEFLOATSTRINGAFUNC>            (GetProcAddress(hModule,"DTWAIN_RangeGetExpValueFloatStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetExpValueFloatString             = reinterpret_cast<D_RANGEGETEXPVALUEFLOATSTRINGFUNC>             (GetProcAddress(hModule,"DTWAIN_RangeGetExpValueFloatString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetExpValueFloatStringW            = reinterpret_cast<D_RANGEGETEXPVALUEFLOATSTRINGWFUNC>            (GetProcAddress(hModule,"DTWAIN_RangeGetExpValueFloatStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetExpValue                        = reinterpret_cast<D_RANGEGETEXPVALUEFUNC>                        (GetProcAddress(hModule,"DTWAIN_RangeGetExpValue")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetExpValueLong                    = reinterpret_cast<D_RANGEGETEXPVALUELONGFUNC>                    (GetProcAddress(hModule,"DTWAIN_RangeGetExpValueLong")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetNearestValue                    = reinterpret_cast<D_RANGEGETNEARESTVALUEFUNC>                    (GetProcAddress(hModule,"DTWAIN_RangeGetNearestValue")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetPosFloat                        = reinterpret_cast<D_RANGEGETPOSFLOATFUNC>                        (GetProcAddress(hModule,"DTWAIN_RangeGetPosFloat")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetPosFloatStringA                 = reinterpret_cast<D_RANGEGETPOSFLOATSTRINGAFUNC>                 (GetProcAddress(hModule,"DTWAIN_RangeGetPosFloatStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetPosFloatString                  = reinterpret_cast<D_RANGEGETPOSFLOATSTRINGFUNC>                  (GetProcAddress(hModule,"DTWAIN_RangeGetPosFloatString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetPosFloatStringW                 = reinterpret_cast<D_RANGEGETPOSFLOATSTRINGWFUNC>                 (GetProcAddress(hModule,"DTWAIN_RangeGetPosFloatStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetPos                             = reinterpret_cast<D_RANGEGETPOSFUNC>                             (GetProcAddress(hModule,"DTWAIN_RangeGetPos")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetPosLong                         = reinterpret_cast<D_RANGEGETPOSLONGFUNC>                         (GetProcAddress(hModule,"DTWAIN_RangeGetPosLong")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetValueFloat                      = reinterpret_cast<D_RANGEGETVALUEFLOATFUNC>                      (GetProcAddress(hModule,"DTWAIN_RangeGetValueFloat")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetValueFloatStringA               = reinterpret_cast<D_RANGEGETVALUEFLOATSTRINGAFUNC>               (GetProcAddress(hModule,"DTWAIN_RangeGetValueFloatStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetValueFloatString                = reinterpret_cast<D_RANGEGETVALUEFLOATSTRINGFUNC>                (GetProcAddress(hModule,"DTWAIN_RangeGetValueFloatString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetValueFloatStringW               = reinterpret_cast<D_RANGEGETVALUEFLOATSTRINGWFUNC>               (GetProcAddress(hModule,"DTWAIN_RangeGetValueFloatStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetValue                           = reinterpret_cast<D_RANGEGETVALUEFUNC>                           (GetProcAddress(hModule,"DTWAIN_RangeGetValue")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeGetValueLong                       = reinterpret_cast<D_RANGEGETVALUELONGFUNC>                       (GetProcAddress(hModule,"DTWAIN_RangeGetValueLong")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeIsValid                            = reinterpret_cast<D_RANGEISVALIDFUNC>                            (GetProcAddress(hModule,"DTWAIN_RangeIsValid")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeNearestValueFloat                  = reinterpret_cast<D_RANGENEARESTVALUEFLOATFUNC>                  (GetProcAddress(hModule,"DTWAIN_RangeNearestValueFloat")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeNearestValueFloatStringA           = reinterpret_cast<D_RANGENEARESTVALUEFLOATSTRINGAFUNC>           (GetProcAddress(hModule,"DTWAIN_RangeNearestValueFloatStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeNearestValueFloatString            = reinterpret_cast<D_RANGENEARESTVALUEFLOATSTRINGFUNC>            (GetProcAddress(hModule,"DTWAIN_RangeNearestValueFloatString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeNearestValueFloatStringW           = reinterpret_cast<D_RANGENEARESTVALUEFLOATSTRINGWFUNC>           (GetProcAddress(hModule,"DTWAIN_RangeNearestValueFloatStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeNearestValueLong                   = reinterpret_cast<D_RANGENEARESTVALUELONGFUNC>                   (GetProcAddress(hModule,"DTWAIN_RangeNearestValueLong")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeSetAllFloat                        = reinterpret_cast<D_RANGESETALLFLOATFUNC>                        (GetProcAddress(hModule,"DTWAIN_RangeSetAllFloat")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeSetAllFloatStringA                 = reinterpret_cast<D_RANGESETALLFLOATSTRINGAFUNC>                 (GetProcAddress(hModule,"DTWAIN_RangeSetAllFloatStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeSetAllFloatString                  = reinterpret_cast<D_RANGESETALLFLOATSTRINGFUNC>                  (GetProcAddress(hModule,"DTWAIN_RangeSetAllFloatString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeSetAllFloatStringW                 = reinterpret_cast<D_RANGESETALLFLOATSTRINGWFUNC>                 (GetProcAddress(hModule,"DTWAIN_RangeSetAllFloatStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeSetAll                             = reinterpret_cast<D_RANGESETALLFUNC>                             (GetProcAddress(hModule,"DTWAIN_RangeSetAll")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeSetAllLong                         = reinterpret_cast<D_RANGESETALLLONGFUNC>                         (GetProcAddress(hModule,"DTWAIN_RangeSetAllLong")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeSetValueFloat                      = reinterpret_cast<D_RANGESETVALUEFLOATFUNC>                      (GetProcAddress(hModule,"DTWAIN_RangeSetValueFloat")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeSetValueFloatStringA               = reinterpret_cast<D_RANGESETVALUEFLOATSTRINGAFUNC>               (GetProcAddress(hModule,"DTWAIN_RangeSetValueFloatStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeSetValueFloatString                = reinterpret_cast<D_RANGESETVALUEFLOATSTRINGFUNC>                (GetProcAddress(hModule,"DTWAIN_RangeSetValueFloatString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeSetValueFloatStringW               = reinterpret_cast<D_RANGESETVALUEFLOATSTRINGWFUNC>               (GetProcAddress(hModule,"DTWAIN_RangeSetValueFloatStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeSetValue                           = reinterpret_cast<D_RANGESETVALUEFUNC>                           (GetProcAddress(hModule,"DTWAIN_RangeSetValue")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RangeSetValueLong                       = reinterpret_cast<D_RANGESETVALUELONGFUNC>                       (GetProcAddress(hModule,"DTWAIN_RangeSetValueLong")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ResetPDFTextElement                     = reinterpret_cast<D_RESETPDFTEXTELEMENTFUNC>                     (GetProcAddress(hModule,"DTWAIN_ResetPDFTextElement")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_RewindPage                              = reinterpret_cast<D_REWINDPAGEFUNC>                              (GetProcAddress(hModule,"DTWAIN_RewindPage")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SelectDefaultOCREngine                  = reinterpret_cast<D_SELECTDEFAULTOCRENGINEFUNC>                  (GetProcAddress(hModule,"DTWAIN_SelectDefaultOCREngine")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SelectDefaultSource                     = reinterpret_cast<D_SELECTDEFAULTSOURCEFUNC>                     (GetProcAddress(hModule,"DTWAIN_SelectDefaultSource")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SelectOCREngineByNameA                  = reinterpret_cast<D_SELECTOCRENGINEBYNAMEAFUNC>                  (GetProcAddress(hModule,"DTWAIN_SelectOCREngineByNameA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SelectOCREngineByName                   = reinterpret_cast<D_SELECTOCRENGINEBYNAMEFUNC>                   (GetProcAddress(hModule,"DTWAIN_SelectOCREngineByName")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SelectOCREngineByNameW                  = reinterpret_cast<D_SELECTOCRENGINEBYNAMEWFUNC>                  (GetProcAddress(hModule,"DTWAIN_SelectOCREngineByNameW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SelectOCREngine                         = reinterpret_cast<D_SELECTOCRENGINEFUNC>                         (GetProcAddress(hModule,"DTWAIN_SelectOCREngine")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SelectSource2A                          = reinterpret_cast<D_SELECTSOURCE2AFUNC>                          (GetProcAddress(hModule,"DTWAIN_SelectSource2A")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SelectSource2ExA                        = reinterpret_cast<D_SELECTSOURCE2EXAFUNC>                        (GetProcAddress(hModule,"DTWAIN_SelectSource2ExA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SelectSource2Ex                         = reinterpret_cast<D_SELECTSOURCE2EXFUNC>                         (GetProcAddress(hModule,"DTWAIN_SelectSource2Ex")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SelectSource2ExW                        = reinterpret_cast<D_SELECTSOURCE2EXWFUNC>                        (GetProcAddress(hModule,"DTWAIN_SelectSource2ExW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SelectSource2                           = reinterpret_cast<D_SELECTSOURCE2FUNC>                           (GetProcAddress(hModule,"DTWAIN_SelectSource2")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SelectSource2W                          = reinterpret_cast<D_SELECTSOURCE2WFUNC>                          (GetProcAddress(hModule,"DTWAIN_SelectSource2W")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SelectSourceByNameA                     = reinterpret_cast<D_SELECTSOURCEBYNAMEAFUNC>                     (GetProcAddress(hModule,"DTWAIN_SelectSourceByNameA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SelectSourceByName                      = reinterpret_cast<D_SELECTSOURCEBYNAMEFUNC>                      (GetProcAddress(hModule,"DTWAIN_SelectSourceByName")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SelectSourceByNameW                     = reinterpret_cast<D_SELECTSOURCEBYNAMEWFUNC>                     (GetProcAddress(hModule,"DTWAIN_SelectSourceByNameW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SelectSource                            = reinterpret_cast<D_SELECTSOURCEFUNC>                            (GetProcAddress(hModule,"DTWAIN_SelectSource")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetAcquireArea2                         = reinterpret_cast<D_SETACQUIREAREA2FUNC>                         (GetProcAddress(hModule,"DTWAIN_SetAcquireArea2")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetAcquireArea2StringA                  = reinterpret_cast<D_SETACQUIREAREA2STRINGAFUNC>                  (GetProcAddress(hModule,"DTWAIN_SetAcquireArea2StringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetAcquireArea2String                   = reinterpret_cast<D_SETACQUIREAREA2STRINGFUNC>                   (GetProcAddress(hModule,"DTWAIN_SetAcquireArea2String")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetAcquireArea2StringW                  = reinterpret_cast<D_SETACQUIREAREA2STRINGWFUNC>                  (GetProcAddress(hModule,"DTWAIN_SetAcquireArea2StringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetAcquireArea                          = reinterpret_cast<D_SETACQUIREAREAFUNC>                          (GetProcAddress(hModule,"DTWAIN_SetAcquireArea")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetAcquireImageNegative                 = reinterpret_cast<D_SETACQUIREIMAGENEGATIVEFUNC>                 (GetProcAddress(hModule,"DTWAIN_SetAcquireImageNegative")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetAcquireImageScale                    = reinterpret_cast<D_SETACQUIREIMAGESCALEFUNC>                    (GetProcAddress(hModule,"DTWAIN_SetAcquireImageScale")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetAcquireImageScaleStringA             = reinterpret_cast<D_SETACQUIREIMAGESCALESTRINGAFUNC>             (GetProcAddress(hModule,"DTWAIN_SetAcquireImageScaleStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetAcquireImageScaleString              = reinterpret_cast<D_SETACQUIREIMAGESCALESTRINGFUNC>              (GetProcAddress(hModule,"DTWAIN_SetAcquireImageScaleString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetAcquireImageScaleStringW             = reinterpret_cast<D_SETACQUIREIMAGESCALESTRINGWFUNC>             (GetProcAddress(hModule,"DTWAIN_SetAcquireImageScaleStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetAcquireStripBuffer                   = reinterpret_cast<D_SETACQUIRESTRIPBUFFERFUNC>                   (GetProcAddress(hModule,"DTWAIN_SetAcquireStripBuffer")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetAlarms                               = reinterpret_cast<D_SETALARMSFUNC>                               (GetProcAddress(hModule,"DTWAIN_SetAlarms")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetAlarmVolume                          = reinterpret_cast<D_SETALARMVOLUMEFUNC>                          (GetProcAddress(hModule,"DTWAIN_SetAlarmVolume")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetAllCapsToDefault                     = reinterpret_cast<D_SETALLCAPSTODEFAULTFUNC>                     (GetProcAddress(hModule,"DTWAIN_SetAllCapsToDefault")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetAppInfoA                             = reinterpret_cast<D_SETAPPINFOAFUNC>                             (GetProcAddress(hModule,"DTWAIN_SetAppInfoA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetAppInfo                              = reinterpret_cast<D_SETAPPINFOFUNC>                              (GetProcAddress(hModule,"DTWAIN_SetAppInfo")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetAppInfoW                             = reinterpret_cast<D_SETAPPINFOWFUNC>                             (GetProcAddress(hModule,"DTWAIN_SetAppInfoW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetAuthorA                              = reinterpret_cast<D_SETAUTHORAFUNC>                              (GetProcAddress(hModule,"DTWAIN_SetAuthorA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetAuthor                               = reinterpret_cast<D_SETAUTHORFUNC>                               (GetProcAddress(hModule,"DTWAIN_SetAuthor")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetAuthorW                              = reinterpret_cast<D_SETAUTHORWFUNC>                              (GetProcAddress(hModule,"DTWAIN_SetAuthorW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetAvailablePrintersArray               = reinterpret_cast<D_SETAVAILABLEPRINTERSARRAYFUNC>               (GetProcAddress(hModule,"DTWAIN_SetAvailablePrintersArray")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetAvailablePrinters                    = reinterpret_cast<D_SETAVAILABLEPRINTERSFUNC>                    (GetProcAddress(hModule,"DTWAIN_SetAvailablePrinters")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetBitDepth                             = reinterpret_cast<D_SETBITDEPTHFUNC>                             (GetProcAddress(hModule,"DTWAIN_SetBitDepth")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetBlankPageDetection                   = reinterpret_cast<D_SETBLANKPAGEDETECTIONFUNC>                   (GetProcAddress(hModule,"DTWAIN_SetBlankPageDetection")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetBlankPageDetectionStringA            = reinterpret_cast<D_SETBLANKPAGEDETECTIONSTRINGAFUNC>            (GetProcAddress(hModule,"DTWAIN_SetBlankPageDetectionStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetBlankPageDetectionString             = reinterpret_cast<D_SETBLANKPAGEDETECTIONSTRINGFUNC>             (GetProcAddress(hModule,"DTWAIN_SetBlankPageDetectionString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetBlankPageDetectionStringW            = reinterpret_cast<D_SETBLANKPAGEDETECTIONSTRINGWFUNC>            (GetProcAddress(hModule,"DTWAIN_SetBlankPageDetectionStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetBlankPageDetectionEx                 = reinterpret_cast<D_SETBLANKPAGEDETECTIONEX>                     (GetProcAddress(hModule,"DTWAIN_SetBlankPageDetectionEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetBlankPageDetectionStringEx           = reinterpret_cast<D_SETBLANKPAGEDETECTIONEXSTRING>               (GetProcAddress(hModule,"DTWAIN_SetBlankPageDetectionExString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetBlankPageDetectionStringExA          = reinterpret_cast<D_SETBLANKPAGEDETECTIONEXSTRINGA>              (GetProcAddress(hModule,"DTWAIN_SetBlankPageDetectionExStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetBlankPageDetectionStringExW          = reinterpret_cast<D_SETBLANKPAGEDETECTIONEXSTRINGW>              (GetProcAddress(hModule,"DTWAIN_SetBlankPageDetectionExStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetBrightness                           = reinterpret_cast<D_SETBRIGHTNESSFUNC>                           (GetProcAddress(hModule,"DTWAIN_SetBrightness")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetBrightnessStringA                    = reinterpret_cast<D_SETBRIGHTNESSSTRINGAFUNC>                    (GetProcAddress(hModule,"DTWAIN_SetBrightnessStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetBrightnessString                     = reinterpret_cast<D_SETBRIGHTNESSSTRINGFUNC>                     (GetProcAddress(hModule,"DTWAIN_SetBrightnessString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetBrightnessStringW                    = reinterpret_cast<D_SETBRIGHTNESSSTRINGWFUNC>                    (GetProcAddress(hModule,"DTWAIN_SetBrightnessStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetCallback64                           = reinterpret_cast<D_SETCALLBACK64FUNC>                           (GetProcAddress(hModule,"DTWAIN_SetCallback64")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetCallback                             = reinterpret_cast<D_SETCALLBACKFUNC>                             (GetProcAddress(hModule,"DTWAIN_SetCallback")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetCameraA                              = reinterpret_cast<D_SETCAMERAAFUNC>                              (GetProcAddress(hModule,"DTWAIN_SetCameraA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetCamera                               = reinterpret_cast<D_SETCAMERAFUNC>                               (GetProcAddress(hModule,"DTWAIN_SetCamera")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetCameraW                              = reinterpret_cast<D_SETCAMERAWFUNC>                              (GetProcAddress(hModule,"DTWAIN_SetCameraW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetCaptionA                             = reinterpret_cast<D_SETCAPTIONAFUNC>                             (GetProcAddress(hModule,"DTWAIN_SetCaptionA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetCaption                              = reinterpret_cast<D_SETCAPTIONFUNC>                              (GetProcAddress(hModule,"DTWAIN_SetCaption")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetCaptionW                             = reinterpret_cast<D_SETCAPTIONWFUNC>                             (GetProcAddress(hModule,"DTWAIN_SetCaptionW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetCapValuesEx2                         = reinterpret_cast<D_SETCAPVALUESEX2FUNC>                         (GetProcAddress(hModule,"DTWAIN_SetCapValuesEx2")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetCapValuesEx                          = reinterpret_cast<D_SETCAPVALUESEXFUNC>                          (GetProcAddress(hModule,"DTWAIN_SetCapValuesEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetCapValues                            = reinterpret_cast<D_SETCAPVALUESFUNC>                            (GetProcAddress(hModule,"DTWAIN_SetCapValues")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetCompressionType                      = reinterpret_cast<D_SETCOMPRESSIONTYPEFUNC>                      (GetProcAddress(hModule,"DTWAIN_SetCompressionType")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetContrast                             = reinterpret_cast<D_SETCONTRASTFUNC>                             (GetProcAddress(hModule,"DTWAIN_SetContrast")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetContrastStringA                      = reinterpret_cast<D_SETCONTRASTSTRINGAFUNC>                      (GetProcAddress(hModule,"DTWAIN_SetContrastStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetContrastString                       = reinterpret_cast<D_SETCONTRASTSTRINGFUNC>                       (GetProcAddress(hModule,"DTWAIN_SetContrastString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetContrastStringW                      = reinterpret_cast<D_SETCONTRASTSTRINGWFUNC>                      (GetProcAddress(hModule,"DTWAIN_SetContrastStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetCountry                              = reinterpret_cast<D_SETCOUNTRYFUNC>                              (GetProcAddress(hModule,"DTWAIN_SetCountry")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetCurrentRetryCount                    = reinterpret_cast<D_SETCURRENTRETRYCOUNTFUNC>                    (GetProcAddress(hModule,"DTWAIN_SetCurrentRetryCount")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetCustomDSData                         = reinterpret_cast<D_SETCUSTOMDSDATAFUNC>                         (GetProcAddress(hModule,"DTWAIN_SetCustomDSData")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetCustomFileSave                       = reinterpret_cast<D_SETCUSTOMFILESAVEFUNC>                       (GetProcAddress(hModule,"DTWAIN_SetCustomFileSave")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetDefaultSource                        = reinterpret_cast<D_SETDEFAULTSOURCEFUNC>                        (GetProcAddress(hModule,"DTWAIN_SetDefaultSource")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetDeviceNotifications                  = reinterpret_cast<D_SETDEVICENOTIFICATIONSFUNC>                  (GetProcAddress(hModule,"DTWAIN_SetDeviceNotifications")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetDeviceTimeDateA                      = reinterpret_cast<D_SETDEVICETIMEDATEAFUNC>                      (GetProcAddress(hModule,"DTWAIN_SetDeviceTimeDateA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetDeviceTimeDate                       = reinterpret_cast<D_SETDEVICETIMEDATEFUNC>                       (GetProcAddress(hModule,"DTWAIN_SetDeviceTimeDate")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetDeviceTimeDateW                      = reinterpret_cast<D_SETDEVICETIMEDATEWFUNC>                      (GetProcAddress(hModule,"DTWAIN_SetDeviceTimeDateW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetDoubleFeedDetectLength               = reinterpret_cast<D_SETDOUBLEFEEDDETECTLENGTHFUNC>               (GetProcAddress(hModule,"DTWAIN_SetDoubleFeedDetectLength")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetDoubleFeedDetectLengthStringA        = reinterpret_cast<D_SETDOUBLEFEEDDETECTLENGTHSTRINGAFUNC>        (GetProcAddress(hModule,"DTWAIN_SetDoubleFeedDetectLengthStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetDoubleFeedDetectLengthString         = reinterpret_cast<D_SETDOUBLEFEEDDETECTLENGTHSTRINGFUNC>         (GetProcAddress(hModule,"DTWAIN_SetDoubleFeedDetectLengthString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetDoubleFeedDetectLengthStringW        = reinterpret_cast<D_SETDOUBLEFEEDDETECTLENGTHSTRINGWFUNC>        (GetProcAddress(hModule,"DTWAIN_SetDoubleFeedDetectLengthStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetDoubleFeedDetectValues               = reinterpret_cast<D_SETDOUBLEFEEDDETECTVALUESFUNC>               (GetProcAddress(hModule,"DTWAIN_SetDoubleFeedDetectValues")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetDSMSearchOrderExA                    = reinterpret_cast<D_SETDSMSEARCHORDEREXAFUNC>                    (GetProcAddress(hModule,"DTWAIN_SetDSMSearchOrderExA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetDSMSearchOrderEx                     = reinterpret_cast<D_SETDSMSEARCHORDEREXFUNC>                     (GetProcAddress(hModule,"DTWAIN_SetDSMSearchOrderEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetDSMSearchOrderExW                    = reinterpret_cast<D_SETDSMSEARCHORDEREXWFUNC>                    (GetProcAddress(hModule,"DTWAIN_SetDSMSearchOrderExW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetDSMSearchOrder                       = reinterpret_cast<D_SETDSMSEARCHORDERFUNC>                       (GetProcAddress(hModule,"DTWAIN_SetDSMSearchOrder")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetEOJDetectValue                       = reinterpret_cast<D_SETEOJDETECTVALUEFUNC>                       (GetProcAddress(hModule,"DTWAIN_SetEOJDetectValue")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetErrorBufferThreshold                 = reinterpret_cast<D_SETERRORBUFFERTHRESHOLDFUNC>                 (GetProcAddress(hModule,"DTWAIN_SetErrorBufferThreshold")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetErrorCallback64                      = reinterpret_cast<D_SETERRORCALLBACK64FUNC>                      (GetProcAddress(hModule,"DTWAIN_SetErrorCallback64")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetErrorCallback                        = reinterpret_cast<D_SETERRORCALLBACKFUNC>                        (GetProcAddress(hModule,"DTWAIN_SetErrorCallback")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetFeederAlignment                      = reinterpret_cast<D_SETFEEDERALIGNMENTFUNC>                      (GetProcAddress(hModule,"DTWAIN_SetFeederAlignment")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetFeederOrder                          = reinterpret_cast<D_SETFEEDERORDERFUNC>                          (GetProcAddress(hModule,"DTWAIN_SetFeederOrder")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetFileAutoIncrement                    = reinterpret_cast<D_SETFILEAUTOINCREMENTFUNC>                    (GetProcAddress(hModule,"DTWAIN_SetFileAutoIncrement")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetFileSavePosA                         = reinterpret_cast<D_SETFILESAVEPOSAFUNC>                         (GetProcAddress(hModule,"DTWAIN_SetFileSavePosA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetFileSavePos                          = reinterpret_cast<D_SETFILESAVEPOSFUNC>                          (GetProcAddress(hModule,"DTWAIN_SetFileSavePos")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetFileSavePosW                         = reinterpret_cast<D_SETFILESAVEPOSWFUNC>                         (GetProcAddress(hModule,"DTWAIN_SetFileSavePosW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetFileXferFormat                       = reinterpret_cast<D_SETFILEXFERFORMATFUNC>                       (GetProcAddress(hModule,"DTWAIN_SetFileXferFormat")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetHalftoneA                            = reinterpret_cast<D_SETHALFTONEAFUNC>                            (GetProcAddress(hModule,"DTWAIN_SetHalftoneA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetHalftone                             = reinterpret_cast<D_SETHALFTONEFUNC>                             (GetProcAddress(hModule,"DTWAIN_SetHalftone")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetHalftoneW                            = reinterpret_cast<D_SETHALFTONEWFUNC>                            (GetProcAddress(hModule,"DTWAIN_SetHalftoneW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetHighlight                            = reinterpret_cast<D_SETHIGHLIGHTFUNC>                            (GetProcAddress(hModule,"DTWAIN_SetHighlight")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetHighlightStringA                     = reinterpret_cast<D_SETHIGHLIGHTSTRINGAFUNC>                     (GetProcAddress(hModule,"DTWAIN_SetHighlightStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetHighlightString                      = reinterpret_cast<D_SETHIGHLIGHTSTRINGFUNC>                      (GetProcAddress(hModule,"DTWAIN_SetHighlightString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetHighlightStringW                     = reinterpret_cast<D_SETHIGHLIGHTSTRINGWFUNC>                     (GetProcAddress(hModule,"DTWAIN_SetHighlightStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetJobControl                           = reinterpret_cast<D_SETJOBCONTROLFUNC>                           (GetProcAddress(hModule,"DTWAIN_SetJobControl")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetJpegValues                           = reinterpret_cast<D_SETJPEGVALUESFUNC>                           (GetProcAddress(hModule,"DTWAIN_SetJpegValues")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetLanguage                             = reinterpret_cast<D_SETLANGUAGEFUNC>                             (GetProcAddress(hModule,"DTWAIN_SetLanguage")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetLastError                            = reinterpret_cast<D_SETLASTERROR>                                (GetProcAddress(hModule,"DTWAIN_SetLastError")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetLightPathEx                          = reinterpret_cast<D_SETLIGHTPATHEXFUNC>                          (GetProcAddress(hModule,"DTWAIN_SetLightPathEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetLightPath                            = reinterpret_cast<D_SETLIGHTPATHFUNC>                            (GetProcAddress(hModule,"DTWAIN_SetLightPath")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetLightSource                          = reinterpret_cast<D_SETLIGHTSOURCEFUNC>                          (GetProcAddress(hModule,"DTWAIN_SetLightSource")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetLightSources                         = reinterpret_cast<D_SETLIGHTSOURCESFUNC>                         (GetProcAddress(hModule,"DTWAIN_SetLightSources")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetLoggerCallbackA                      = reinterpret_cast<D_SETLOGGERCALLBACKAFUNC>                      (GetProcAddress(hModule,"DTWAIN_SetLoggerCallbackA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetLoggerCallback                       = reinterpret_cast<D_SETLOGGERCALLBACKFUNC>                       (GetProcAddress(hModule,"DTWAIN_SetLoggerCallback")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetLoggerCallbackW                      = reinterpret_cast<D_SETLOGGERCALLBACKWFUNC>                      (GetProcAddress(hModule,"DTWAIN_SetLoggerCallbackW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetManualDuplexMode                     = reinterpret_cast<D_SETMANUALDUPLEXMODEFUNC>                     (GetProcAddress(hModule,"DTWAIN_SetManualDuplexMode")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetMaxAcquisitions                      = reinterpret_cast<D_SETMAXACQUISITIONSFUNC>                      (GetProcAddress(hModule,"DTWAIN_SetMaxAcquisitions")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetMaxBuffers                           = reinterpret_cast<D_SETMAXBUFFERSFUNC>                           (GetProcAddress(hModule,"DTWAIN_SetMaxBuffers")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetMaxRetryAttempts                     = reinterpret_cast<D_SETMAXRETRYATTEMPTSFUNC>                     (GetProcAddress(hModule,"DTWAIN_SetMaxRetryAttempts")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetMultipageScanMode                    = reinterpret_cast<D_SETMULTIPAGESCANMODEFUNC>                    (GetProcAddress(hModule,"DTWAIN_SetMultipageScanMode")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetNoiseFilter                          = reinterpret_cast<D_SETNOISEFILTERFUNC>                          (GetProcAddress(hModule,"DTWAIN_SetNoiseFilter")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetOCRCapValues                         = reinterpret_cast<D_SETOCRCAPVALUESFUNC>                         (GetProcAddress(hModule,"DTWAIN_SetOCRCapValues")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetOrientation                          = reinterpret_cast<D_SETORIENTATIONFUNC>                          (GetProcAddress(hModule,"DTWAIN_SetOrientation")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetOverscan                             = reinterpret_cast<D_SETOVERSCANFUNC>                             (GetProcAddress(hModule,"DTWAIN_SetOverscan")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPaperSize                            = reinterpret_cast<D_SETPAPERSIZEFUNC>                            (GetProcAddress(hModule,"DTWAIN_SetPaperSize")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPatchMaxPriorities                   = reinterpret_cast<D_SETPATCHMAXPRIORITIESFUNC>                   (GetProcAddress(hModule,"DTWAIN_SetPatchMaxPriorities")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPatchMaxRetries                      = reinterpret_cast<D_SETPATCHMAXRETRIESFUNC>                      (GetProcAddress(hModule,"DTWAIN_SetPatchMaxRetries")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPatchPriorities                      = reinterpret_cast<D_SETPATCHPRIORITIESFUNC>                      (GetProcAddress(hModule,"DTWAIN_SetPatchPriorities")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPatchSearchMode                      = reinterpret_cast<D_SETPATCHSEARCHMODEFUNC>                      (GetProcAddress(hModule,"DTWAIN_SetPatchSearchMode")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPatchTimeOut                         = reinterpret_cast<D_SETPATCHTIMEOUTFUNC>                         (GetProcAddress(hModule,"DTWAIN_SetPatchTimeOut")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFAESEncryption                     = reinterpret_cast<D_SETPDFAESENCRYPTIONFUNC>                     (GetProcAddress(hModule,"DTWAIN_SetPDFAESEncryption")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFASCIICompression                  = reinterpret_cast<D_SETPDFASCIICOMPRESSIONFUNC>                  (GetProcAddress(hModule,"DTWAIN_SetPDFASCIICompression")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFAuthorA                           = reinterpret_cast<D_SETPDFAUTHORAFUNC>                           (GetProcAddress(hModule,"DTWAIN_SetPDFAuthorA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFAuthor                            = reinterpret_cast<D_SETPDFAUTHORFUNC>                            (GetProcAddress(hModule,"DTWAIN_SetPDFAuthor")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFAuthorW                           = reinterpret_cast<D_SETPDFAUTHORWFUNC>                           (GetProcAddress(hModule,"DTWAIN_SetPDFAuthorW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFCompression                       = reinterpret_cast<D_SETPDFCOMPRESSIONFUNC>                       (GetProcAddress(hModule,"DTWAIN_SetPDFCompression")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFCreatorA                          = reinterpret_cast<D_SETPDFCREATORAFUNC>                          (GetProcAddress(hModule,"DTWAIN_SetPDFCreatorA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFCreator                           = reinterpret_cast<D_SETPDFCREATORFUNC>                           (GetProcAddress(hModule,"DTWAIN_SetPDFCreator")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFCreatorW                          = reinterpret_cast<D_SETPDFCREATORWFUNC>                          (GetProcAddress(hModule,"DTWAIN_SetPDFCreatorW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFEncryptionA                       = reinterpret_cast<D_SETPDFENCRYPTIONAFUNC>                       (GetProcAddress(hModule,"DTWAIN_SetPDFEncryptionA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFEncryption                        = reinterpret_cast<D_SETPDFENCRYPTIONFUNC>                        (GetProcAddress(hModule,"DTWAIN_SetPDFEncryption")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFEncryptionW                       = reinterpret_cast<D_SETPDFENCRYPTIONWFUNC>                       (GetProcAddress(hModule,"DTWAIN_SetPDFEncryptionW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFJpegQuality                       = reinterpret_cast<D_SETPDFJPEGQUALITYFUNC>                       (GetProcAddress(hModule,"DTWAIN_SetPDFJpegQuality")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFKeywordsA                         = reinterpret_cast<D_SETPDFKEYWORDSAFUNC>                         (GetProcAddress(hModule,"DTWAIN_SetPDFKeywordsA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFKeywords                          = reinterpret_cast<D_SETPDFKEYWORDSFUNC>                          (GetProcAddress(hModule,"DTWAIN_SetPDFKeywords")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFKeywordsW                         = reinterpret_cast<D_SETPDFKEYWORDSWFUNC>                         (GetProcAddress(hModule,"DTWAIN_SetPDFKeywordsW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFOCRConversion                     = reinterpret_cast<D_SETPDFOCRCONVERSIONFUNC>                     (GetProcAddress(hModule,"DTWAIN_SetPDFOCRConversion")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFOCRMode                           = reinterpret_cast<D_SETPDFOCRMODEFUNC>                           (GetProcAddress(hModule,"DTWAIN_SetPDFOCRMode")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFOrientation                       = reinterpret_cast<D_SETPDFORIENTATIONFUNC>                       (GetProcAddress(hModule,"DTWAIN_SetPDFOrientation")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFPageScale                         = reinterpret_cast<D_SETPDFPAGESCALEFUNC>                         (GetProcAddress(hModule,"DTWAIN_SetPDFPageScale")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFPageScaleStringA                  = reinterpret_cast<D_SETPDFPAGESCALESTRINGAFUNC>                  (GetProcAddress(hModule,"DTWAIN_SetPDFPageScaleStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFPageScaleString                   = reinterpret_cast<D_SETPDFPAGESCALESTRINGFUNC>                   (GetProcAddress(hModule,"DTWAIN_SetPDFPageScaleString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFPageScaleStringW                  = reinterpret_cast<D_SETPDFPAGESCALESTRINGWFUNC>                  (GetProcAddress(hModule,"DTWAIN_SetPDFPageScaleStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFPageSize                          = reinterpret_cast<D_SETPDFPAGESIZEFUNC>                          (GetProcAddress(hModule,"DTWAIN_SetPDFPageSize")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFPageSizeStringA                   = reinterpret_cast<D_SETPDFPAGESIZESTRINGAFUNC>                   (GetProcAddress(hModule,"DTWAIN_SetPDFPageSizeStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFPageSizeString                    = reinterpret_cast<D_SETPDFPAGESIZESTRINGFUNC>                    (GetProcAddress(hModule,"DTWAIN_SetPDFPageSizeString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFPageSizeStringW                   = reinterpret_cast<D_SETPDFPAGESIZESTRINGWFUNC>                   (GetProcAddress(hModule,"DTWAIN_SetPDFPageSizeStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFPolarity                          = reinterpret_cast<D_SETPDFPOLARITYFUNC>                          (GetProcAddress(hModule,"DTWAIN_SetPDFPolarity")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFProducerA                         = reinterpret_cast<D_SETPDFPRODUCERAFUNC>                         (GetProcAddress(hModule,"DTWAIN_SetPDFProducerA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFProducer                          = reinterpret_cast<D_SETPDFPRODUCERFUNC>                          (GetProcAddress(hModule,"DTWAIN_SetPDFProducer")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFProducerW                         = reinterpret_cast<D_SETPDFPRODUCERWFUNC>                         (GetProcAddress(hModule,"DTWAIN_SetPDFProducerW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFSubjectA                          = reinterpret_cast<D_SETPDFSUBJECTAFUNC>                          (GetProcAddress(hModule,"DTWAIN_SetPDFSubjectA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFSubject                           = reinterpret_cast<D_SETPDFSUBJECTFUNC>                           (GetProcAddress(hModule,"DTWAIN_SetPDFSubject")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFSubjectW                          = reinterpret_cast<D_SETPDFSUBJECTWFUNC>                          (GetProcAddress(hModule,"DTWAIN_SetPDFSubjectW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFTextElementFloat                  = reinterpret_cast<D_SETPDFTEXTELEMENTFLOATFUNC>                  (GetProcAddress(hModule,"DTWAIN_SetPDFTextElementFloat")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFTextElementLong                   = reinterpret_cast<D_SETPDFTEXTELEMENTLONGFUNC>                   (GetProcAddress(hModule,"DTWAIN_SetPDFTextElementLong")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFTextElementStringA                = reinterpret_cast<D_SETPDFTEXTELEMENTSTRINGAFUNC>                (GetProcAddress(hModule,"DTWAIN_SetPDFTextElementStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFTextElementString                 = reinterpret_cast<D_SETPDFTEXTELEMENTSTRINGFUNC>                 (GetProcAddress(hModule,"DTWAIN_SetPDFTextElementString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFTextElementStringW                = reinterpret_cast<D_SETPDFTEXTELEMENTSTRINGWFUNC>                (GetProcAddress(hModule,"DTWAIN_SetPDFTextElementStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFTitleA                            = reinterpret_cast<D_SETPDFTITLEAFUNC>                            (GetProcAddress(hModule,"DTWAIN_SetPDFTitleA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFTitle                             = reinterpret_cast<D_SETPDFTITLEFUNC>                             (GetProcAddress(hModule,"DTWAIN_SetPDFTitle")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPDFTitleW                            = reinterpret_cast<D_SETPDFTITLEWFUNC>                            (GetProcAddress(hModule,"DTWAIN_SetPDFTitleW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPixelFlavor                          = reinterpret_cast<D_SETPIXELFLAVORFUNC>                          (GetProcAddress(hModule,"DTWAIN_SetPixelFlavor")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPixelType                            = reinterpret_cast<D_SETPIXELTYPEFUNC>                            (GetProcAddress(hModule,"DTWAIN_SetPixelType")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPostScriptTitleA                     = reinterpret_cast<D_SETPOSTSCRIPTTITLEAFUNC>                     (GetProcAddress(hModule,"DTWAIN_SetPostScriptTitleA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPostScriptTitle                      = reinterpret_cast<D_SETPOSTSCRIPTTITLEFUNC>                      (GetProcAddress(hModule,"DTWAIN_SetPostScriptTitle")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPostScriptTitleW                     = reinterpret_cast<D_SETPOSTSCRIPTTITLEWFUNC>                     (GetProcAddress(hModule,"DTWAIN_SetPostScriptTitleW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPostScriptType                       = reinterpret_cast<D_SETPOSTSCRIPTTYPEFUNC>                       (GetProcAddress(hModule,"DTWAIN_SetPostScriptType")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPrinter                              = reinterpret_cast<D_SETPRINTERFUNC>                              (GetProcAddress(hModule,"DTWAIN_SetPrinter")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPrinterStartNumber                   = reinterpret_cast<D_SETPRINTERSTARTNUMBERFUNC>                   (GetProcAddress(hModule,"DTWAIN_SetPrinterStartNumber")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPrinterStringMode                    = reinterpret_cast<D_SETPRINTERSTRINGMODEFUNC>                    (GetProcAddress(hModule,"DTWAIN_SetPrinterStringMode")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPrinterStrings                       = reinterpret_cast<D_SETPRINTERSTRINGSFUNC>                       (GetProcAddress(hModule,"DTWAIN_SetPrinterStrings")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPrinterSuffixStringA                 = reinterpret_cast<D_SETPRINTERSUFFIXSTRINGAFUNC>                 (GetProcAddress(hModule,"DTWAIN_SetPrinterSuffixStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPrinterSuffixString                  = reinterpret_cast<D_SETPRINTERSUFFIXSTRINGFUNC>                  (GetProcAddress(hModule,"DTWAIN_SetPrinterSuffixString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetPrinterSuffixStringW                 = reinterpret_cast<D_SETPRINTERSUFFIXSTRINGWFUNC>                 (GetProcAddress(hModule,"DTWAIN_SetPrinterSuffixStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetQueryCapSupport                      = reinterpret_cast<D_SETQUERYCAPSUPPORTFUNC>                      (GetProcAddress(hModule,"DTWAIN_SetQueryCapSupport")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetResolution                           = reinterpret_cast<D_SETRESOLUTIONFUNC>                           (GetProcAddress(hModule,"DTWAIN_SetResolution")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetResolutionStringA                    = reinterpret_cast<D_SETRESOLUTIONSTRINGAFUNC>                    (GetProcAddress(hModule,"DTWAIN_SetResolutionStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetResolutionString                     = reinterpret_cast<D_SETRESOLUTIONSTRINGFUNC>                     (GetProcAddress(hModule,"DTWAIN_SetResolutionString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetResolutionStringW                    = reinterpret_cast<D_SETRESOLUTIONSTRINGWFUNC>                    (GetProcAddress(hModule,"DTWAIN_SetResolutionStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetResourcePathA                        = reinterpret_cast<D_SETRESOURCEPATHAFUNC>                        (GetProcAddress(hModule,"DTWAIN_SetResourcePathA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetResourcePath                         = reinterpret_cast<D_SETRESOURCEPATHFUNC>                         (GetProcAddress(hModule,"DTWAIN_SetResourcePath")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetResourcePathW                        = reinterpret_cast<D_SETRESOURCEPATHWFUNC>                        (GetProcAddress(hModule,"DTWAIN_SetResourcePathW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetRotation                             = reinterpret_cast<D_SETROTATIONFUNC>                             (GetProcAddress(hModule,"DTWAIN_SetRotation")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetRotationStringA                      = reinterpret_cast<D_SETROTATIONSTRINGAFUNC>                      (GetProcAddress(hModule,"DTWAIN_SetRotationStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetRotationString                       = reinterpret_cast<D_SETROTATIONSTRINGFUNC>                       (GetProcAddress(hModule,"DTWAIN_SetRotationString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetRotationStringW                      = reinterpret_cast<D_SETROTATIONSTRINGWFUNC>                      (GetProcAddress(hModule,"DTWAIN_SetRotationStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetSaveFileNameA                        = reinterpret_cast<D_SETSAVEFILENAMEAFUNC>                        (GetProcAddress(hModule,"DTWAIN_SetSaveFileNameA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetSaveFileName                         = reinterpret_cast<D_SETSAVEFILENAMEFUNC>                         (GetProcAddress(hModule,"DTWAIN_SetSaveFileName")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetSaveFileNameW                        = reinterpret_cast<D_SETSAVEFILENAMEWFUNC>                        (GetProcAddress(hModule,"DTWAIN_SetSaveFileNameW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetShadow                               = reinterpret_cast<D_SETSHADOWFUNC>                               (GetProcAddress(hModule,"DTWAIN_SetShadow")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetShadowStringA                        = reinterpret_cast<D_SETSHADOWSTRINGAFUNC>                        (GetProcAddress(hModule,"DTWAIN_SetShadowStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetShadowString                         = reinterpret_cast<D_SETSHADOWSTRINGFUNC>                         (GetProcAddress(hModule,"DTWAIN_SetShadowString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetShadowStringW                        = reinterpret_cast<D_SETSHADOWSTRINGWFUNC>                        (GetProcAddress(hModule,"DTWAIN_SetShadowStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetSourceUnit                           = reinterpret_cast<D_SETSOURCEUNITFUNC>                           (GetProcAddress(hModule,"DTWAIN_SetSourceUnit")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetTempFileDirectoryA                   = reinterpret_cast<D_SETTEMPFILEDIRECTORYAFUNC>                   (GetProcAddress(hModule,"DTWAIN_SetTempFileDirectoryA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetTempFileDirectory                    = reinterpret_cast<D_SETTEMPFILEDIRECTORYFUNC>                    (GetProcAddress(hModule,"DTWAIN_SetTempFileDirectory")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetTempFileDirectoryW                   = reinterpret_cast<D_SETTEMPFILEDIRECTORYWFUNC>                   (GetProcAddress(hModule,"DTWAIN_SetTempFileDirectoryW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetThreshold                            = reinterpret_cast<D_SETTHRESHOLDFUNC>                            (GetProcAddress(hModule,"DTWAIN_SetThreshold")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetThresholdStringA                     = reinterpret_cast<D_SETTHRESHOLDSTRINGAFUNC>                     (GetProcAddress(hModule,"DTWAIN_SetThresholdStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetThresholdString                      = reinterpret_cast<D_SETTHRESHOLDSTRINGFUNC>                      (GetProcAddress(hModule,"DTWAIN_SetThresholdString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetThresholdStringW                     = reinterpret_cast<D_SETTHRESHOLDSTRINGWFUNC>                     (GetProcAddress(hModule,"DTWAIN_SetThresholdStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetTIFFCompressType                     = reinterpret_cast<D_SETTIFFCOMPRESSTYPEFUNC>                     (GetProcAddress(hModule,"DTWAIN_SetTIFFCompressType")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetTIFFInvert                           = reinterpret_cast<D_SETTIFFINVERTFUNC>                           (GetProcAddress(hModule,"DTWAIN_SetTIFFInvert")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetTwainDialogFont                      = reinterpret_cast<D_SETTWAINDIALOGFONTFUNC>                      (GetProcAddress(hModule,"DTWAIN_SetTwainDialogFont")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetTwainDSM                             = reinterpret_cast<D_SETTWAINDSMFUNC>                             (GetProcAddress(hModule,"DTWAIN_SetTwainDSM")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetTwainLogA                            = reinterpret_cast<D_SETTWAINLOGAFUNC>                            (GetProcAddress(hModule,"DTWAIN_SetTwainLogA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetTwainLog                             = reinterpret_cast<D_SETTWAINLOGFUNC>                             (GetProcAddress(hModule,"DTWAIN_SetTwainLog")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetTwainLogW                            = reinterpret_cast<D_SETTWAINLOGWFUNC>                            (GetProcAddress(hModule,"DTWAIN_SetTwainLogW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetTwainMode                            = reinterpret_cast<D_SETTWAINMODEFUNC>                            (GetProcAddress(hModule,"DTWAIN_SetTwainMode")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetTwainTimeout                         = reinterpret_cast<D_SETTWAINTIMEOUTFUNC>                         (GetProcAddress(hModule,"DTWAIN_SetTwainTimeout")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetUpdateDibProc                        = reinterpret_cast<D_SETUPDATEDIBPROCFUNC>                        (GetProcAddress(hModule,"DTWAIN_SetUpdateDibProc")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetXResolution                          = reinterpret_cast<D_SETXRESOLUTIONFUNC>                          (GetProcAddress(hModule,"DTWAIN_SetXResolution")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetXResolutionStringA                   = reinterpret_cast<D_SETXRESOLUTIONSTRINGAFUNC>                   (GetProcAddress(hModule,"DTWAIN_SetXResolutionStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetXResolutionString                    = reinterpret_cast<D_SETXRESOLUTIONSTRINGFUNC>                    (GetProcAddress(hModule,"DTWAIN_SetXResolutionString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetXResolutionStringW                   = reinterpret_cast<D_SETXRESOLUTIONSTRINGWFUNC>                   (GetProcAddress(hModule,"DTWAIN_SetXResolutionStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetYResolution                          = reinterpret_cast<D_SETYRESOLUTIONFUNC>                          (GetProcAddress(hModule,"DTWAIN_SetYResolution")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetYResolutionStringA                   = reinterpret_cast<D_SETYRESOLUTIONSTRINGAFUNC>                   (GetProcAddress(hModule,"DTWAIN_SetYResolutionStringA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetYResolutionString                    = reinterpret_cast<D_SETYRESOLUTIONSTRINGFUNC>                    (GetProcAddress(hModule,"DTWAIN_SetYResolutionString")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetYResolutionStringW                   = reinterpret_cast<D_SETYRESOLUTIONSTRINGWFUNC>                   (GetProcAddress(hModule,"DTWAIN_SetYResolutionStringW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ShowUIOnly                              = reinterpret_cast<D_SHOWUIONLYFUNC>                              (GetProcAddress(hModule,"DTWAIN_ShowUIOnly")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_ShutdownOCREngine                       = reinterpret_cast<D_SHUTDOWNOCRENGINEFUNC>                       (GetProcAddress(hModule,"DTWAIN_ShutdownOCREngine")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SkipImageInfoError                      = reinterpret_cast<D_SKIPIMAGEINFOERRORFUNC>                      (GetProcAddress(hModule,"DTWAIN_SkipImageInfoError")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_StartThread                             = reinterpret_cast<D_STARTTHREADFUNC>                             (GetProcAddress(hModule,"DTWAIN_StartThread")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_StartTwainSessionA                      = reinterpret_cast<D_STARTTWAINSESSIONAFUNC>                      (GetProcAddress(hModule,"DTWAIN_StartTwainSessionA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_StartTwainSession                       = reinterpret_cast<D_STARTTWAINSESSIONFUNC>                       (GetProcAddress(hModule,"DTWAIN_StartTwainSession")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_StartTwainSessionW                      = reinterpret_cast<D_STARTTWAINSESSIONWFUNC>                      (GetProcAddress(hModule,"DTWAIN_StartTwainSessionW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SysDestroy                              = reinterpret_cast<D_SYSDESTROYFUNC>                              (GetProcAddress(hModule,"DTWAIN_SysDestroy")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SysInitializeEx2A                       = reinterpret_cast<D_SYSINITIALIZEEX2AFUNC>                       (GetProcAddress(hModule,"DTWAIN_SysInitializeEx2A")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SysInitializeEx2                        = reinterpret_cast<D_SYSINITIALIZEEX2FUNC>                        (GetProcAddress(hModule,"DTWAIN_SysInitializeEx2")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SysInitializeEx2W                       = reinterpret_cast<D_SYSINITIALIZEEX2WFUNC>                       (GetProcAddress(hModule,"DTWAIN_SysInitializeEx2W")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SysInitializeExA                        = reinterpret_cast<D_SYSINITIALIZEEXAFUNC>                        (GetProcAddress(hModule,"DTWAIN_SysInitializeExA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SysInitializeEx                         = reinterpret_cast<D_SYSINITIALIZEEXFUNC>                         (GetProcAddress(hModule,"DTWAIN_SysInitializeEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SysInitializeExW                        = reinterpret_cast<D_SYSINITIALIZEEXWFUNC>                        (GetProcAddress(hModule,"DTWAIN_SysInitializeExW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SysInitialize                           = reinterpret_cast<D_SYSINITIALIZEFUNC>                           (GetProcAddress(hModule,"DTWAIN_SysInitialize")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SysInitializeLibEx2A                    = reinterpret_cast<D_SYSINITIALIZELIBEX2AFUNC>                    (GetProcAddress(hModule,"DTWAIN_SysInitializeLibEx2A")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SysInitializeLibEx2                     = reinterpret_cast<D_SYSINITIALIZELIBEX2FUNC>                     (GetProcAddress(hModule,"DTWAIN_SysInitializeLibEx2")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SysInitializeLibEx2W                    = reinterpret_cast<D_SYSINITIALIZELIBEX2WFUNC>                    (GetProcAddress(hModule,"DTWAIN_SysInitializeLibEx2W")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SysInitializeLibExA                     = reinterpret_cast<D_SYSINITIALIZELIBEXAFUNC>                     (GetProcAddress(hModule,"DTWAIN_SysInitializeLibExA")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SysInitializeLibEx                      = reinterpret_cast<D_SYSINITIALIZELIBEXFUNC>                      (GetProcAddress(hModule,"DTWAIN_SysInitializeLibEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SysInitializeLibExW                     = reinterpret_cast<D_SYSINITIALIZELIBEXWFUNC>                     (GetProcAddress(hModule,"DTWAIN_SysInitializeLibExW")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SysInitializeLib                        = reinterpret_cast<D_SYSINITIALIZELIBFUNC>                        (GetProcAddress(hModule,"DTWAIN_SysInitializeLib")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SysInitializeNoBlocking                 = reinterpret_cast<D_SYSINITIALIZENOBLOCKINGFUNC>                 (GetProcAddress(hModule,"DTWAIN_SysInitializeNoBlocking")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_UnlockMemoryEx                          = reinterpret_cast<D_UNLOCKMEMORYEXFUNC>                          (GetProcAddress(hModule,"DTWAIN_UnlockMemoryEx")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_UnlockMemory                            = reinterpret_cast<D_UNLOCKMEMORYFUNC>                            (GetProcAddress(hModule,"DTWAIN_UnlockMemory")));
-          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_UseMultipleThreads                      = reinterpret_cast<D_USEMULTIPLETHREADSFUNC>                      (GetProcAddress(hModule,"DTWAIN_UseMultipleThreads")));
+          LoadFunctionImpl(DTWAIN_AcquireAudioFileA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_AcquireAudioFile, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_AcquireAudioFileW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_AcquireAudioNativeEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_AcquireAudioNative, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_AcquireBufferedEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_AcquireBuffered, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_AcquireFileA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_AcquireFileEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_AcquireFile, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_AcquireFileW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_AcquireNativeEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_AcquireNative, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_AcquireToClipboard, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_AddExtImageInfoQuery, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_AddPDFTextA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_AddPDFTextEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_AddPDFText, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_AddPDFTextW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_AllocateMemoryEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_AllocateMemory, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_AppHandlesExceptions, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayAddANSIString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayAddANSIStringN, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayAddFloat, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayAddFloatN, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayAdd, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayAddLong64, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayAddLong64N, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayAddLong, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayAddLongN, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayAddN, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayAddStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayAddString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayAddStringNA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayAddStringN, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayAddStringNW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayAddStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayAddWideString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayAddWideStringN, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayConvertFix32ToFloat, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayConvertFloatToFix32, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayCopy, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayCreateCopy, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayCreateFromCap, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayCreateFromLong64s, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayCreateFromLongs, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayCreateFromReals, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayCreateFromStrings, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayCreate, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayDestroyFrames, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayDestroy, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayFindANSIString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayFindFloat, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayFind, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayFindLong64, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayFindLong, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayFindStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayFindString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayFindStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayFindWideString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayFix32GetAt, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayFix32SetAt, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayFrameGetAt, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayFrameGetFrameAt, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayFrameSetAt, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayGetAtANSIString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayGetAtANSIStringPtr, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayGetAtFloat, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayGetAt, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayGetAtLong64, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayGetAtLong, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayGetAtStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayGetAtString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayGetAtStringPtr, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayGetAtStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayGetAtWideString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayGetAtWideStringPtr, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayGetBuffer, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayGetCount, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayGetMaxStringLength, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayGetSourceAt, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayGetStringLength, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayGetType, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayInit, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayInsertAtANSIString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayInsertAtANSIStringN, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayInsertAtFloat, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayInsertAtFloatN, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayInsertAt, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayInsertAtLong64, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayInsertAtLong64N, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayInsertAtLong, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayInsertAtLongN, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayInsertAtN, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayInsertAtStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayInsertAtString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayInsertAtStringNA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayInsertAtStringN, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayInsertAtStringNW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayInsertAtStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayInsertAtWideString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayInsertAtWideStringN, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayRemoveAll, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayRemoveAt, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayRemoveAtN, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArrayResize, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArraySetAtANSIString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArraySetAtFloat, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArraySetAt, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArraySetAtLong64, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArraySetAtLong, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArraySetAtStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArraySetAtString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArraySetAtStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ArraySetAtWideString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_CallCallback64, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_CallCallback, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_CallDSMProc, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_CheckHandles, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ClearBuffers, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ClearErrorBuffer, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ClearPage, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ClearPDFText, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_CloseSource, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_CloseSourceUI, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ConvertDIBToBitmap, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_CreateAcquisitionArray, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_CreatePDFTextElement, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_DestroyAcquisitionArray, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_DestroyPDFTextElement, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_DisableAppWindow, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnableAutoBorderDetect, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnableAutoBright, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnableAutoDeskew, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnableAutoFeed, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnableAutomaticSenseMedium, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnableAutoRotate, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnableAutoScan, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnableDuplex, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnableFeeder, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnableIndicator, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnableJobFileHandling, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnableLamp, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnableMsgNotify, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnablePatchDetect, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnablePrinter, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnableThumbnail, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EndThread, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EndTwainSession, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumAlarmsEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumAlarms, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumAlarmVolumesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumAlarmVolumes, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumAudioXferMechsEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumAudioXferMechs, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumAutoFeedValuesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumAutoFeedValues, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumAutomaticCapturesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumAutomaticCaptures, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumAutomaticSenseMediumEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumAutomaticSenseMedium, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumBitDepthsEx2, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumBitDepthsEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumBitDepths, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumBottomCameras, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumBrightnessValuesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumBrightnessValues, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumCameras, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumCompressionTypesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumCompressionTypes, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumContrastValuesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumContrastValues, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumCustomCapsEx2, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumCustomCaps, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumDoubleFeedDetectLengthsEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumDoubleFeedDetectLengths, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumDoubleFeedDetectValuesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumDoubleFeedDetectValues, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumExtendedCapsEx2, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumExtendedCapsEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumExtendedCaps, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumExtImageInfoTypes, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumFileTypeBitsPerPixel, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumFileXferFormatsEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumFileXferFormats, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumHalftonesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumHalftones, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumHighlightValuesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumHighlightValues, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumJobControlsEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumJobControls, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumLightPathsEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumLightPaths, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumLightSourcesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumLightSources, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumMaxBuffersEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumMaxBuffers, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumNoiseFiltersEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumNoiseFilters, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumOCRInterfaces, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumOCRSupportedCaps, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumOrientationsEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumOrientations, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumOverscanValuesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumOverscanValues, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumPaperSizesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumPaperSizes, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumPatchCodesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumPatchCodes, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumPatchMaxPrioritiesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumPatchMaxPriorities, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumPatchMaxRetriesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumPatchMaxRetries, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumPatchPrioritiesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumPatchPriorities, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumPatchSearchModesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumPatchSearchModes, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumPatchTimeOutValuesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumPatchTimeOutValues, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumPixelTypes, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumPrinterStringModesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumPrinterStringModes, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumResolutionValuesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumResolutionValues, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumShadowValuesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumShadowValues, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumSourcesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumSources, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumSourceUnitsEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumSourceUnits, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumSourceValuesA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumSourceValues, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumSourceValuesW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumSupportedCapsEx2, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumSupportedCapsEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumSupportedCaps, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumSupportedSinglePageFileTypes, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumSupportedMultiPageFileTypes, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumThresholdValuesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumThresholdValues, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumTopCameras, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumTwainPrintersArrayEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumTwainPrintersArray, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumTwainPrintersEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_EnumTwainPrinters, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ExecuteOCRA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ExecuteOCR, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ExecuteOCRW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FeedPage, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FlipBitmap, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FlushAcquiredPages, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ForceAcquireBitDepth, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ForceScanOnNoUI, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FrameCreate, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FrameCreateStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FrameCreateString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FrameCreateStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FrameDestroy, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FrameGetAll, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FrameGetAllStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FrameGetAllString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FrameGetAllStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FrameGetValue, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FrameGetValueStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FrameGetValueString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FrameGetValueStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FrameIsValid, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FrameSetAll, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FrameSetAllStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FrameSetAllString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FrameSetAllStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FrameSetValue, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FrameSetValueStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FrameSetValueString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FrameSetValueStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FreeExtImageInfo, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FreeMemoryEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_FreeMemory, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetAcquireArea2, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetAcquireArea2StringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetAcquireArea2String, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetAcquireArea2StringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetAcquireArea, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetAcquiredImageArray, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetAcquiredImage, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetAcquireMetrics, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetAcquireStripBuffer, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetAcquireStripData, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetAcquireStripSizes, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetAlarmVolume, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetAPIHandleStatus, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetAppInfoA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetAppInfo, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetAppInfoW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetAuthorA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetAuthor, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetAuthorW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetBatteryMinutes, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetBatteryPercent, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetBitDepth, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetBlankPageAutoDetection, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetBrightness, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetBrightnessStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetBrightnessString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetBrightnessStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCallback64, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCallback, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCapArrayType, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCapContainerEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCapContainer, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCapDataType, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCapFromNameA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCapFromName, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCapFromNameW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCapOperations, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCaptionA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCaption, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCaptionW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCapValuesEx2, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCapValuesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCapValues, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCompressionSize, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCompressionType, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetConditionCodeStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetConditionCodeString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetConditionCodeStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetContrast, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetContrastStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetContrastString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetContrastStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCountry, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCurrentAcquiredImage, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCurrentFileNameA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCurrentFileName, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCurrentFileNameW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCurrentPageNum, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCurrentRetryCount, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetCustomDSData, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetDeviceEventEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetDeviceEvent, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetDeviceEventInfo, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetDeviceNotifications, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetDeviceTimeDateA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetDeviceTimeDate, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetDeviceTimeDateW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetDoubleFeedDetectLength, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetDoubleFeedDetectValues, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetDSMFullNameA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetDSMFullName, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetDSMFullNameW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetDSMSearchOrder, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetDTWAINHandle, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetDuplexType, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetErrorBuffer, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetErrorBufferThreshold, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetErrorCallback64, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetErrorCallback, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetErrorStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetErrorString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetErrorStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetExtCapFromNameA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetExtCapFromName, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetExtCapFromNameW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetExtImageInfoData, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetExtImageInfo, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetExtImageInfoItem, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetExtNameFromCapA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetExtNameFromCap, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetExtNameFromCapW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetFeederAlignment, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetFeederFuncs, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetFeederOrder, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetFileTypeName, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetFileTypeNameA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetFileTypeNameW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetFileTypeExtensions, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetFileTypeExtensionsA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetFileTypeExtensionsW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetHalftoneA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetHalftone, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetHalftoneW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetHighlight, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetHighlightStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetHighlightString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetHighlightStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetImageInfo, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetImageInfoStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetImageInfoString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetImageInfoStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetJobControl, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetJpegValues, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetLanguage, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetLastError, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetLibraryPathA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetLibraryPath, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetLibraryPathW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetLightPath, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetLightSource, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetLightSources, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetLoggerCallbackA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetLoggerCallback, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetLoggerCallbackW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetManualDuplexCount, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetMaxAcquisitions, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetMaxBuffers, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetMaxPagesToAcquire, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetMaxRetryAttempts, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetNameFromCapA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetNameFromCap, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetNameFromCapW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetNoiseFilter, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetNumAcquiredImages, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetNumAcquisitions, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRCapValues, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRErrorStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRErrorString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRErrorStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRLastError, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRManufacturerA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRManufacturer, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRManufacturerW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRProductFamilyA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRProductFamily, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRProductFamilyW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRProductNameA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRProductName, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRProductNameW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRTextA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRText, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRTextInfoFloatEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRTextInfoFloat, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRTextInfoHandle, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRTextInfoLongEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRTextInfoLong, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRTextW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRVersionInfoA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRVersionInfo, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOCRVersionInfoW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOrientation, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetOverscan, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetPaperSize, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetPatchMaxPriorities, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetPatchMaxRetries, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetPatchPriorities, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetPatchSearchMode, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetPatchTimeOut, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetPDFTextElementFloat, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetPDFTextElementLong, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetPDFTextElementStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetPDFTextElementString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetPDFTextElementStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetPDFType1FontNameA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetPDFType1FontName, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetPDFType1FontNameW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetPixelFlavor, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetPixelType, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetPrinter, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetPrinterStartNumber, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetPrinterStringMode, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetPrinterStrings, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetPrinterSuffixStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetPrinterSuffixString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetPrinterSuffixStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetRegisteredMsg, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetResolution, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetResolutionStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetResolutionString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetResolutionStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetRotation, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetRotationStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetRotationString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetRotationStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetSaveFileNameA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetSaveFileName, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetSaveFileNameW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetShadow, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetShadowStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetShadowString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetShadowStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetShortVersionStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetShortVersionString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetShortVersionStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetSourceAcquisitions, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetSourceIDEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetSourceID, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetSourceManufacturerA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetSourceManufacturer, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetSourceManufacturerW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetSourceProductFamilyA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetSourceProductFamily, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetSourceProductFamilyW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetSourceProductNameA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetSourceProductName, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetSourceProductNameW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetSourceUnit, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetSourceVersionInfoA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetSourceVersionInfo, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetSourceVersionInfoW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetSourceVersionNumber, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetStaticLibVersion, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTempFileDirectoryA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTempFileDirectory, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTempFileDirectoryW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetThreshold, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetThresholdStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetThresholdString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetThresholdStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTimeDateA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTimeDate, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTimeDateW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTwainAppIDEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTwainAppID, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTwainAvailability, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTwainCountryNameA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTwainCountryName, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTwainCountryNameW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTwainCountryValueA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTwainCountryValue, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTwainCountryValueW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTwainHwnd, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTwainLanguageNameA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTwainLanguageName, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTwainLanguageNameW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTwainLanguageValueA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTwainLanguageValue, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTwainLanguageValueW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTwainMode, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTwainNameFromConstantA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTwainNameFromConstantW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetTwainTimeout, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetVersionEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetVersion, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetVersionInfoA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetVersionInfo, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetVersionInfoW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetVersionStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetVersionString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetVersionStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetXResolution, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetXResolutionStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetXResolutionString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetXResolutionStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetYResolution, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetYResolutionStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetYResolutionString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_GetYResolutionStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_InitExtImageInfo, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_InitImageFileAppendA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_InitImageFileAppend, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_InitImageFileAppendW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_InitOCRInterface, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsAcquiring, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsAutoBorderDetectEnabled, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsAutoBorderDetectSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsAutoBrightEnabled, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsAutoBrightSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsAutoDeskewEnabled, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsAutoDeskewSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsAutoFeedEnabled, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsAutoFeedSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsAutomaticSenseMediumEnabled, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsAutomaticSenseMediumSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsAutoRotateEnabled, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsAutoRotateSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsAutoScanEnabled, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsBlankPageDetectionOn, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsCapSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsCompressionSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsCustomDSDataSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsDeviceEventSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsDeviceOnLine, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsDIBBlank, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsDIBBlankStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsDIBBlankString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsDIBBlankStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsDoubleFeedDetectLengthSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsDoubleFeedDetectSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsDuplexEnabled, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsDuplexSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsExtImageInfoSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsFeederEnabled, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsFeederLoaded, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsFeederSensitive, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsFeederSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsFileSystemSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsFileXferSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsIndicatorEnabled, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsIndicatorSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsInitialized, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsJobControlSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsJPEGSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsLampEnabled, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsLampSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsLightPathSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsLightSourceSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsMaxBuffersSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsMsgNotifyEnabled, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsOCREngineActivated, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsOrientationSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsOverscanSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsPaperDetectable, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsPaperSizeSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsPatchCapsSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsPatchDetectEnabled, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsPatchSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsPDFSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsPixelTypeSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsPNGSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsPrinterEnabled, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsPrinterSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsRotationSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsSessionEnabled, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsSkipImageInfoError, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsSourceAcquiring, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsSourceOpen, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsSourceSelected, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsThumbnailEnabled, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsThumbnailSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsTIFFSupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsTwainAvailable, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsTwainMsg, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsUIControllable, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsUIEnabled, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_IsUIOnlySupported, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_LoadCustomStringResourcesA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_LoadCustomStringResources, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_LoadCustomStringResourcesW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_LoadLanguageResource, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_LockMemoryEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_LockMemory, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_LogMessageA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_LogMessage, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_LogMessageW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_MakeRGB, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_OpenSource, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_OpenSourcesOnSelect, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeCreateFromCap, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeCreate, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeDestroy, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeExpand, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetAllFloat, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetAllFloatStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetAllFloatString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetAllFloatStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetAll, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetAllLong, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetCount, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetExpValueFloat, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetExpValueFloatStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetExpValueFloatString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetExpValueFloatStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetExpValue, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetExpValueLong, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetNearestValue, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetPosFloat, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetPosFloatStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetPosFloatString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetPosFloatStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetPos, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetPosLong, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetValueFloat, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetValueFloatStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetValueFloatString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetValueFloatStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetValue, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeGetValueLong, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeIsValid, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeNearestValueFloat, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeNearestValueFloatStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeNearestValueFloatString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeNearestValueFloatStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeNearestValueLong, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeSetAllFloat, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeSetAllFloatStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeSetAllFloatString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeSetAllFloatStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeSetAll, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeSetAllLong, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeSetValueFloat, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeSetValueFloatStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeSetValueFloatString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeSetValueFloatStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeSetValue, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RangeSetValueLong, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ResetPDFTextElement, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_RewindPage, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SelectDefaultOCREngine, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SelectDefaultSource, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SelectOCREngineByNameA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SelectOCREngineByName, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SelectOCREngineByNameW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SelectOCREngine, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SelectSource2A, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SelectSource2ExA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SelectSource2Ex, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SelectSource2ExW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SelectSource2, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SelectSource2W, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SelectSourceByNameA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SelectSourceByName, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SelectSourceByNameW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SelectSource, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetAcquireArea2, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetAcquireArea2StringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetAcquireArea2String, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetAcquireArea2StringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetAcquireArea, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetAcquireImageNegative, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetAcquireImageScale, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetAcquireImageScaleStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetAcquireImageScaleString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetAcquireImageScaleStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetAcquireStripBuffer, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetAlarms, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetAlarmVolume, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetAllCapsToDefault, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetAppInfoA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetAppInfo, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetAppInfoW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetAuthorA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetAuthor, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetAuthorW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetAvailablePrintersArray, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetAvailablePrinters, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetBitDepth, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetBlankPageDetection, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetBlankPageDetectionStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetBlankPageDetectionString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetBlankPageDetectionStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetBlankPageDetectionEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetBlankPageDetectionExString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetBlankPageDetectionExStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetBlankPageDetectionExStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetBrightness, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetBrightnessStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetBrightnessString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetBrightnessStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetCallback64, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetCallback, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetCameraA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetCamera, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetCameraW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetCaptionA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetCaption, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetCaptionW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetCapValuesEx2, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetCapValuesEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetCapValues, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetCompressionType, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetContrast, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetContrastStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetContrastString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetContrastStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetCountry, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetCurrentRetryCount, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetCustomDSData, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetCustomFileSave, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetDefaultSource, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetDeviceNotifications, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetDeviceTimeDateA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetDeviceTimeDate, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetDeviceTimeDateW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetDoubleFeedDetectLength, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetDoubleFeedDetectLengthStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetDoubleFeedDetectLengthString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetDoubleFeedDetectLengthStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetDoubleFeedDetectValues, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetDSMSearchOrderExA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetDSMSearchOrderEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetDSMSearchOrderExW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetDSMSearchOrder, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetEOJDetectValue, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetErrorBufferThreshold, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetErrorCallback64, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetErrorCallback, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetFeederAlignment, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetFeederOrder, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetFileAutoIncrement, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetFileSavePosA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetFileSavePos, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetFileSavePosW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetFileXferFormat, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetHalftoneA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetHalftone, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetHalftoneW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetHighlight, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetHighlightStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetHighlightString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetHighlightStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetJobControl, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetJpegValues, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetLanguage, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetLastError, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetLightPathEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetLightPath, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetLightSource, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetLightSources, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetLoggerCallbackA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetLoggerCallback, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetLoggerCallbackW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetManualDuplexMode, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetMaxAcquisitions, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetMaxBuffers, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetMaxRetryAttempts, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetMultipageScanMode, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetNoiseFilter, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetOCRCapValues, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetOrientation, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetOverscan, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPaperSize, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPatchMaxPriorities, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPatchMaxRetries, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPatchPriorities, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPatchSearchMode, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPatchTimeOut, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFAESEncryption, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFASCIICompression, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFAuthorA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFAuthor, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFAuthorW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFCompression, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFCreatorA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFCreator, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFCreatorW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFEncryptionA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFEncryption, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFEncryptionW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFJpegQuality, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFKeywordsA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFKeywords, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFKeywordsW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFOCRConversion, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFOCRMode, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFOrientation, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFPageScale, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFPageScaleStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFPageScaleString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFPageScaleStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFPageSize, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFPageSizeStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFPageSizeString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFPageSizeStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFPolarity, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFProducerA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFProducer, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFProducerW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFSubjectA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFSubject, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFSubjectW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFTextElementFloat, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFTextElementLong, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFTextElementStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFTextElementString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFTextElementStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFTitleA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFTitle, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPDFTitleW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPixelFlavor, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPixelType, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPostScriptTitleA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPostScriptTitle, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPostScriptTitleW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPostScriptType, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPrinter, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPrinterStartNumber, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPrinterStringMode, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPrinterStrings, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPrinterSuffixStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPrinterSuffixString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetPrinterSuffixStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetQueryCapSupport, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetResolution, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetResolutionStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetResolutionString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetResolutionStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetResourcePathA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetResourcePath, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetResourcePathW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetRotation, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetRotationStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetRotationString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetRotationStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetSaveFileNameA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetSaveFileName, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetSaveFileNameW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetShadow, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetShadowStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetShadowString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetShadowStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetSourceUnit, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetTempFileDirectoryA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetTempFileDirectory, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetTempFileDirectoryW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetThreshold, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetThresholdStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetThresholdString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetThresholdStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetTIFFCompressType, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetTIFFInvert, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetTwainDialogFont, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetTwainDSM, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetTwainLogA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetTwainLog, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetTwainLogW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetTwainMode, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetTwainTimeout, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetUpdateDibProc, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetXResolution, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetXResolutionStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetXResolutionString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetXResolutionStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetYResolution, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetYResolutionStringA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetYResolutionString, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SetYResolutionStringW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ShowUIOnly, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_ShutdownOCREngine, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SkipImageInfoError, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_StartThread, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_StartTwainSessionA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_StartTwainSession, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_StartTwainSessionW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SysDestroy, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SysInitializeEx2A, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SysInitializeEx2, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SysInitializeEx2W, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SysInitializeExA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SysInitializeEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SysInitializeExW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SysInitialize, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SysInitializeLibEx2A, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SysInitializeLibEx2, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SysInitializeLibEx2W, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SysInitializeLibExA, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SysInitializeLibEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SysInitializeLibExW, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SysInitializeLib, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_SysInitializeNoBlocking, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_UnlockMemoryEx, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_UnlockMemory, pApi, hModule)
+          LoadFunctionImpl(DTWAIN_UseMultipleThreads, pApi, hModule)
     }
     return 1;
 }
+#pragma warning (pop)
 

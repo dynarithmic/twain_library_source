@@ -1728,9 +1728,9 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF* D_SETBLANKPAGEDETECTIONEXSTRING)             
     STATIC D_SETBLANKPAGEDETECTIONSTRINGFUNC                DTWAIN_SetBlankPageDetectionString;
     STATIC D_SETBLANKPAGEDETECTIONSTRINGWFUNC               DTWAIN_SetBlankPageDetectionStringW;
     STATIC D_SETBLANKPAGEDETECTIONEX                        DTWAIN_SetBlankPageDetectionEx;
-    STATIC D_SETBLANKPAGEDETECTIONEXSTRING                  DTWAIN_SetBlankPageDetectionStringEx;
-    STATIC D_SETBLANKPAGEDETECTIONEXSTRINGA                 DTWAIN_SetBlankPageDetectionStringExA;
-    STATIC D_SETBLANKPAGEDETECTIONEXSTRINGW                 DTWAIN_SetBlankPageDetectionStringExW;
+    STATIC D_SETBLANKPAGEDETECTIONEXSTRING                  DTWAIN_SetBlankPageDetectionExString;
+    STATIC D_SETBLANKPAGEDETECTIONEXSTRINGA                 DTWAIN_SetBlankPageDetectionExStringA;
+    STATIC D_SETBLANKPAGEDETECTIONEXSTRINGW                 DTWAIN_SetBlankPageDetectionExStringW;
 
     STATIC D_SETBRIGHTNESSFUNC                              DTWAIN_SetBrightness;
     STATIC D_SETBRIGHTNESSSTRINGAFUNC                       DTWAIN_SetBrightnessStringA;
