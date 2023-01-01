@@ -40,11 +40,11 @@ namespace dynarithmic
     
             public:
                 capnegotiation_options() : m_bSetExtendedCaps(false ){}
-                capnegotiation_options& enable_set(bool bSet= true)
+                capnegotiation_options& enable(bool bSet= true)
                 { m_bSetExtendedCaps = bSet; return *this; }
 
                 std::vector<uint16_t> get_extendedcaps() const { return m_vExtendedCaps; }
-                bool is_enable_set() const { return m_bSetExtendedCaps; }
+                bool is_enabled() const { return m_bSetExtendedCaps; }
 
                 template <typename Container=std::vector<uint16_t>>
                 capnegotiation_options& set_extendedcaps(const Container& c)

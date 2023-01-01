@@ -766,6 +766,10 @@
     D_SETBLANKPAGEDETECTIONSTRINGAFUNC                                DYNDTWAIN_API::DTWAIN_SetBlankPageDetectionStringA = nullptr;
     D_SETBLANKPAGEDETECTIONSTRINGFUNC                                 DYNDTWAIN_API::DTWAIN_SetBlankPageDetectionString = nullptr;
     D_SETBLANKPAGEDETECTIONSTRINGWFUNC                                DYNDTWAIN_API::DTWAIN_SetBlankPageDetectionStringW = nullptr;
+    D_SETBLANKPAGEDETECTIONEX                                         DYNDTWAIN_API::DTWAIN_SetBlankPageDetectionEx = nullptr;
+    D_SETBLANKPAGEDETECTIONEXSTRING                                   DYNDTWAIN_API::DTWAIN_SetBlankPageDetectionStringEx = nullptr;
+    D_SETBLANKPAGEDETECTIONEXSTRINGA                                  DYNDTWAIN_API::DTWAIN_SetBlankPageDetectionStringExA = nullptr;
+    D_SETBLANKPAGEDETECTIONEXSTRINGW                                  DYNDTWAIN_API::DTWAIN_SetBlankPageDetectionStringExW = nullptr;
     D_SETBRIGHTNESSFUNC                                               DYNDTWAIN_API::DTWAIN_SetBrightness = nullptr;
     D_SETBRIGHTNESSSTRINGAFUNC                                        DYNDTWAIN_API::DTWAIN_SetBrightnessStringA = nullptr;
     D_SETBRIGHTNESSSTRINGFUNC                                         DYNDTWAIN_API::DTWAIN_SetBrightnessString = nullptr;
@@ -1752,6 +1756,10 @@ int InitDTWAINInterface(DYNDTWAIN_API* pApi, HMODULE hModule)
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetBlankPageDetectionStringA            = reinterpret_cast<D_SETBLANKPAGEDETECTIONSTRINGAFUNC>            (GetProcAddress(hModule,"DTWAIN_SetBlankPageDetectionStringA")));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetBlankPageDetectionString             = reinterpret_cast<D_SETBLANKPAGEDETECTIONSTRINGFUNC>             (GetProcAddress(hModule,"DTWAIN_SetBlankPageDetectionString")));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetBlankPageDetectionStringW            = reinterpret_cast<D_SETBLANKPAGEDETECTIONSTRINGWFUNC>            (GetProcAddress(hModule,"DTWAIN_SetBlankPageDetectionStringW")));
+          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetBlankPageDetectionEx                 = reinterpret_cast<D_SETBLANKPAGEDETECTIONEX>                     (GetProcAddress(hModule,"DTWAIN_SetBlankPageDetectionEx")));
+          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetBlankPageDetectionStringEx           = reinterpret_cast<D_SETBLANKPAGEDETECTIONEXSTRING>               (GetProcAddress(hModule,"DTWAIN_SetBlankPageDetectionExString")));
+          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetBlankPageDetectionStringExA          = reinterpret_cast<D_SETBLANKPAGEDETECTIONEXSTRINGA>              (GetProcAddress(hModule,"DTWAIN_SetBlankPageDetectionExStringA")));
+          DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetBlankPageDetectionStringExW          = reinterpret_cast<D_SETBLANKPAGEDETECTIONEXSTRINGW>              (GetProcAddress(hModule,"DTWAIN_SetBlankPageDetectionExStringW")));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetBrightness                           = reinterpret_cast<D_SETBRIGHTNESSFUNC>                           (GetProcAddress(hModule,"DTWAIN_SetBrightness")));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetBrightnessStringA                    = reinterpret_cast<D_SETBRIGHTNESSSTRINGAFUNC>                    (GetProcAddress(hModule,"DTWAIN_SetBrightnessStringA")));
           DTWAINAPI_ASSERT(DTWAIN_INSTANCE DTWAIN_SetBrightnessString                     = reinterpret_cast<D_SETBRIGHTNESSSTRINGFUNC>                     (GetProcAddress(hModule,"DTWAIN_SetBrightnessString")));

@@ -48,16 +48,16 @@ namespace dynarithmic
     
             public:
                 imageparameter_options() : m_bThumbnailsEnabled(false), m_bAutoBright(false),
-                                                                    m_Brightness(0), m_Contrast(0), m_Highlight(255),
-                                                                    m_MirrorValue(mirror_value::none),
-                                                                    m_OrientationValue(orientation_value::portrait),
-                                                                    m_RotationValue(0), m_ShadowValue(0),
-                                                                    m_xScaling(1.0), m_yScaling(1.0) {}
+                                            m_Brightness(0), m_Contrast(0), m_Highlight(255),
+                                            m_MirrorValue(mirror_value::none),
+                                            m_OrientationValue(orientation_value::portrait),
+                                            m_RotationValue(0), m_ShadowValue(0),
+                                            m_xScaling(1.0), m_yScaling(1.0) {}
 
-                imageparameter_options& set_thumbnailsenabled(bool bEnable)
+                imageparameter_options& enable_thumbnails(bool bEnable)
                 { m_bThumbnailsEnabled = bEnable; return *this; }
 
-                imageparameter_options& set_autobright(bool bEnable)
+                imageparameter_options& enable_autobright(bool bEnable)
                 { m_bAutoBright = bEnable; return *this; }
 
                 imageparameter_options& set_brightness(double val)
@@ -87,8 +87,8 @@ namespace dynarithmic
                 imageparameter_options& set_yscaling(double val)
                 { m_yScaling = val; return *this; }
 
-                bool get_thumbnailsenabled() const { return m_bThumbnailsEnabled; }
-                bool get_autobright() const { return m_bAutoBright; }
+                bool is_thumbnails_enabled() const { return m_bThumbnailsEnabled; }
+                bool is_autobright_enabled() const { return m_bAutoBright; }
                 double get_brightness() const { return m_Brightness; }
                 double get_contrast() const { return m_Contrast; }
                 double get_highlight() const { return m_Highlight; }

@@ -39,7 +39,7 @@ namespace dynarithmic
             public:
                 autocapture_options() : m_NumImages(0), m_TimeBefore(0), m_TimeBetween(0) {}
 
-                autocapture_options& set_imagecount(capability_type::automaticcapture_type numImages)
+                autocapture_options& set_num_images(capability_type::automaticcapture_type numImages)
                 { m_NumImages = numImages; return *this; }
 
                 autocapture_options& set_timebeforefirstcapture(capability_type::timebeforefirstcapture_type num)
@@ -48,7 +48,7 @@ namespace dynarithmic
                 autocapture_options& set_timebetweencaptures(capability_type::timebetweencaptures_type num)
                 { m_TimeBetween = num; return *this; }
 
-                int32_t get_imagecount() const { return m_NumImages; }
+                int32_t get_num_images() const { return m_NumImages; }
                 capability_type::timebeforefirstcapture_type get_timebeforefirstcapture() const { return m_TimeBefore; }
                 capability_type::timebetweencaptures_type get_timebetweencaptures() const { return m_TimeBetween; }
 

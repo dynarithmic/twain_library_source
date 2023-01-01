@@ -40,7 +40,7 @@ void DuplexScanningDemo()
 
         // set the duplex
         auto& ac = twsource.get_acquire_characteristics();
-        ac.get_paperhandling_options().set_duplexenabled(true);
+        ac.get_paperhandling_options().enable_duplex(true);
 
         // set the characteristics to acquire to a file.
         // Set to a TIFF-LZW file

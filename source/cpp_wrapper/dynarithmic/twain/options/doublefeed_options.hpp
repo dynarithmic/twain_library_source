@@ -40,18 +40,22 @@ namespace dynarithmic
                 static constexpr length_type default_length = (std::numeric_limits<length_type>::min)();
             private:
                 friend class options_base;
+                bool m_bEnable;
                 doublefeeddetection_value::value_type m_detection;
                 double m_length;
                 doublefeedsensitivity_value::value_type m_sensitivity;
                 std::vector<doublefeedresponse_value::value_type> m_vResponses;
 
             public:
-                doublefeed_options& set_response(doublefeedresponse_value::value_type v)
-                { return set_response({v}); }
+                doublefeed_options& set_responses(doublefeedresponse_value::value_type v)
+                { return set_responses({v}); }
 
                 doublefeed_options() : m_detection(doublefeeddetection_value::default_val),
                                                            m_sensitivity(doublefeedsensitivity_value::default_val),
-                                                           m_length(DBL_MIN) {}
+                                                           m_length(DBL_MIN), m_bEnable(false) {}
+
+                doublefeed_options& enable(bool bEnable = true) { m_bEnable = bEnable; return *this; }
+                bool is_enabled() const { return m_bEnable; }
 
                 doublefeed_options& set_detection(doublefeeddetection_value::value_type dv) 
                 { m_detection = dv; return *this; }
@@ -63,12 +67,12 @@ namespace dynarithmic
                 { m_sensitivity = sensitivity; return *this; }
 
                 doublefeeddetection_value::value_type get_detection() const { return m_detection; }
-                std::vector<doublefeedresponse_value::value_type> get_response() const { return m_vResponses; }
+                std::vector<doublefeedresponse_value::value_type> get_responses() const { return m_vResponses; }
                 length_type get_length(double length) const { return m_length; }
                 doublefeedsensitivity_value::value_type get_sensitivity() const { return m_sensitivity; }
 
                 template <typename Container=std::vector<doublefeedresponse_value::value_type>>
-                doublefeed_options& set_response(const Container &c)
+                doublefeed_options& set_responses(const Container &c)
                 {
                     m_vResponses.clear();
                     std::copy(c.begin(), c.end(), std::back_inserter(m_vResponses));

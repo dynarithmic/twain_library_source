@@ -42,14 +42,14 @@ namespace dynarithmic
 
             public:
                 autoscanning_options() :  m_bAutoScan(true),
-                                                                m_bCameraEnabled(false),
-                                                                m_CameraSide(cameraside_value::both),
-                                                                m_MaxBatchBuffers(0) {}
+                                          m_bCameraEnabled(false),
+                                          m_CameraSide(cameraside_value::both),
+                                          m_MaxBatchBuffers(0) {}
 
-                autoscanning_options& set_autoscan(bool bSet=true)
+                autoscanning_options& enable_autoscan(bool bSet=true)
                 { m_bAutoScan = bSet; return *this; }
 
-                autoscanning_options& set_cameraenabled(bool bSet=true)
+                autoscanning_options& enable_camerahandling(bool bSet=true)
                 { m_bCameraEnabled = bSet; return *this; }
 
                 autoscanning_options& set_cameraside(cameraside_value::value_type cv)
@@ -58,8 +58,8 @@ namespace dynarithmic
                 autoscanning_options& set_maxbatchbuffers(capability_type::maxbatchbuffers_type val)
                 { m_MaxBatchBuffers = val; return *this; }
 
-                bool get_autoscan() const { return m_bAutoScan; }
-                bool get_cameraenabled() const { return m_bCameraEnabled; }
+                bool is_autoscan_enabled() const { return m_bAutoScan; }
+                bool is_camerahandling_enabled() const { return m_bCameraEnabled; }
                 std::vector<color_value::value_type> get_cameraorder() const { return m_vCameraOrder; }
                 cameraside_value::value_type get_cameraside() const { return m_CameraSide; }
                 capability_type::maxbatchbuffers_type get_maxbatchbuffers() const { return m_MaxBatchBuffers; }

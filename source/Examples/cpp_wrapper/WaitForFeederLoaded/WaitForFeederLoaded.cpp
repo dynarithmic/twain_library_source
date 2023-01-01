@@ -56,7 +56,7 @@ void WaitForFeederLoaded()
             //
             // To have an infinite wait time, use paperhandling::wait_infinite in the call to
             // set_feederwait().
-            paperhandling.set_feederenabled(true).set_feederwait(30).  // wait time
+            paperhandling.enable_feeder(true).set_feederwait(30).  // wait time
                           set_feedermode(feedermode_value::feeder_flatbed); // feeder, then flatbed
 
             auto& ftOpts = ac.get_file_transfer_options();
@@ -66,7 +66,7 @@ void WaitForFeederLoaded()
                    set_type(filetype_value::tifflzwmulti);  // set the file type to a multipage TIFF-LZW
 
             // We will only acquire 2 pages
-            ac.get_general_options().set_max_pages(2);
+            ac.get_general_options().set_max_page_count(2);
 
             auto retval = twsource.acquire();
 

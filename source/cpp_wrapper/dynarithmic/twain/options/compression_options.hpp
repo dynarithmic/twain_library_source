@@ -45,13 +45,13 @@ namespace dynarithmic
 
             public:
                 compression_options() :  m_BitOrderValue(bitorder_value::msbfirst),
-                                                                m_CCITKFactor(4),
-                                                                m_CompressionValue(compression_value::none),
-                                                                m_JpegPixelType(jpegpixel_value::default_val),
-                                                                m_JpegQuality(75),
-                                                                m_JpegSubSampleValue(jpegsubsampling_value::default_val),
-                                                                m_PixelFlavor(pixelflavor_value::chocolate),
-                                                                m_TimeFill(1) {}
+                                        m_CCITKFactor(4),
+                                        m_CompressionValue(compression_value::none),
+                                        m_JpegPixelType(jpegpixel_value::default_val),
+                                        m_JpegQuality(75),
+                                        m_JpegSubSampleValue(jpegsubsampling_value::default_val),
+                                        m_PixelFlavor(pixelflavor_value::chocolate),
+                                        m_TimeFill(1) {}
 
                 compression_options& set_bitordercodes(bitorder_value::value_type val) 
                 { m_BitOrderValue = val; return *this; }

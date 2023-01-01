@@ -279,11 +279,12 @@ namespace dynarithmic
                 break;
             }
 
-            API_INSTANCE DTWAIN_SetAcquireImageNegative(m_theSource, ac.get_imagetype_options().get_negate() ? TRUE : FALSE);
+            API_INSTANCE DTWAIN_SetAcquireImageNegative(m_theSource, ac.get_imagetype_options().is_negate_enabled() ? TRUE : FALSE);
             auto& blank_handler = ac.get_blank_page_options();
-            API_INSTANCE DTWAIN_SetBlankPageDetection(m_theSource, blank_handler.get_threshold(),
-                static_cast<LONG>(blank_handler.get_discard_option()),
-                static_cast<LONG>(blank_handler.is_enabled()));
+            API_INSTANCE DTWAIN_SetBlankPageDetectionEx(m_theSource, blank_handler.get_threshold(),
+                                                        static_cast<LONG>(blank_handler.get_discard_option()),
+                                                        static_cast<LONG>(blank_handler.get_detection_option()),
+                                                        static_cast<LONG>(blank_handler.is_enabled()));
             auto& multisave_info = ac.get_file_transfer_options().get_multipage_save_options();
             API_INSTANCE DTWAIN_SetMultipageScanMode(m_theSource,
                 static_cast<LONG>(multisave_info.get_save_mode())
@@ -367,7 +368,7 @@ namespace dynarithmic
             }
             bool fstatus = true;
             prepare_acquisition();
-            if (!m_pTwainSourceImpl->m_acquire_characteristics->get_paperhandling_options().get_feederenabled())
+            if (!m_pTwainSourceImpl->m_acquire_characteristics->get_paperhandling_options().is_feeder_enabled())
                 API_INSTANCE DTWAIN_EnableFeeder(m_theSource, FALSE);
             else
             {
@@ -444,7 +445,7 @@ namespace dynarithmic
                 auto& paper_options = ac.get_paperhandling_options();
 
                 // Check if feeder wasn't enabled
-                if (!paper_options.get_feederenabled())
+                if (!paper_options.is_feeder_enabled())
                 {
                     // Now get if the user is using the flatbed to save multi-page images
                     auto& multisave_info = ac.get_file_transfer_options().get_multipage_save_options();
@@ -463,7 +464,7 @@ namespace dynarithmic
                 file_type,
                 dtwain_transfer_type,
                 gOpts.get_pixel_type(),
-                static_cast<LONG>(gOpts.get_max_pages()),
+                static_cast<LONG>(gOpts.get_max_page_count()),
                 ac.get_userinterface_options().is_shown(),
                 gOpts.get_source_action() == sourceaction_type::closeafteracquire,
                 &status) != 0;
@@ -495,7 +496,7 @@ namespace dynarithmic
                 {
                     retval = API_INSTANCE DTWAIN_AcquireNativeEx(m_theSource,
                         static_cast<LONG>(ct),
-                        static_cast<LONG>(gOpts.get_max_pages()),
+                        static_cast<LONG>(gOpts.get_max_page_count()),
                         ac.get_userinterface_options().is_shown(),
                         ac.get_general_options().get_source_action() == sourceaction_type::closeafteracquire,
                         images.get_array(), nullptr) != 0;
@@ -509,7 +510,7 @@ namespace dynarithmic
                         static_cast<compression_value::value_type>(m_pTwainSourceImpl->m_capability_info->get_cap_values(ICAP_COMPRESSION, capability_interface::get_current()).front()));
                     retval = API_INSTANCE DTWAIN_AcquireBufferedEx(m_theSource,
                         static_cast<LONG>(ct),
-                        static_cast<LONG>(gOpts.get_max_pages()),
+                        static_cast<LONG>(gOpts.get_max_page_count()),
                         ac.get_userinterface_options().is_shown(),
                         gOpts.get_source_action() == sourceaction_type::closeafteracquire,
                         images.get_array(),
