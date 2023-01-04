@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -988,11 +988,12 @@
 // Implementation
 #ifdef __cplusplus
 template <typename Fn>
-void LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
+int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
 {
     DTWAINAPI_ASSERT(apifn = reinterpret_cast<Fn>(::GetProcAddress(hModule, fnName)));
+    return 1;
 }
-#define LOADFUNCTIONIMPL(fn, module) do {LoadFunction(fn, module, #fn);} while(false);
+#define LOADFUNCTIONIMPL(fn, module) do { if (!LoadFunction(fn, module, #fn)) return 0;} while(false);
 #else
 #define LOADFUNCTIONIMPL(fn, module) do { \
         DTWAINAPI_ASSERT(DTWAIN_INSTANCE fn = GetProcAddress(module, #fn)); } while(false);

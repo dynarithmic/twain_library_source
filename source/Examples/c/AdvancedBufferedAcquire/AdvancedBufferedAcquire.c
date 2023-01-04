@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "dtwain.h"
-
 /* This callback is invoked by the DTWAIN library whenever an event
 * during the acquisition process is triggered
 */
