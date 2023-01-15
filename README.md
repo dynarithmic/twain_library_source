@@ -115,7 +115,7 @@ The final hashes of the files are stored as text in the **binaries\32bit** and *
 ----------
 Note that the C++ source code should be able to be built with any C++17 compliant compiler that recognizes the Windows API headers.  However we have not tested builds of the DTWAIN library that have been built with any other compiler other than the Visual Studio family.   
 
-* Start Visual Studio, and open one of the DTWAIN solution.  The DTWAIN solution files are found in the [source](https://github.com/dynarithmic/twain_library_source/tree/master/source) directory.  Open **dtwain_5_vs2019.sln** or **dtwain_5_vs2022.sln**, depending on whether you are using Visual Studio 2019 or 2022, respectively. 
+* Start Visual Studio, and open one of the DTWAIN solution.  The DTWAIN solution files are found in the [source](https://github.com/dynarithmic/twain_library_source/tree/master/source) directory.  Open **dtwain_5_vs2019.sln**.
 
 * A full rebuild of all the configurations available is recommended.  Use the "Build -> Batch Build..." option in the Visual Studio IDE and check all of the configurations to build everything (take a coffee break -- this could take a while).  This will create a "binaries" directory that will contain the following DLLs:
 
@@ -130,8 +130,15 @@ Note that the C++ source code should be able to be built with any C++17 complian
 
 * Note -- the resulting "*.lib* files that reside in these directories are import libraries compatible with the Visual Studio toolset.  Other compilers will require converting these .lib files to your compiler's import library format, or you can use the LoadLibrary / GetProcAddress approach (we have a wrapper for this -- see below in the "Getting DTWAIN to work with other programming languages" section).
 
+* If the IMPLIB.EXE program from Embarcadero is available on the path, it will be called to create Embarcadero C++ compatible import libraries for the 32-bit DLL's.  The names of the Embarcadero import libraries will have a **_embarcadero** appended to the library name.
+
 * When all the configurations are built, there should be multiple DTWDEMO*.exe programs residing in the **binaries** subdirectory, where the suffix used in the program name matches the DTWAIN DLL that will be loaded.  For example, DTWDEMO32U.exe will load the dtwain32u.dll library when run. The easiest way to get started is to debug DTWDEMO.EXE and single step through the program using the debugger to get a feel of the flow of the program.  You should get a good idea of how DTWAIN works if you step into one or more of the DTWAIN functions (such as DTWAIN_SysInitialize or DTWAIN_SelectSource).
 
+----
+### Building the demo applications
+If you wish to build the demo applications, the **demos\AllDemos.sln** file can be loaded into Visual Studio 2019 or 2022.  Please note that you must build the base libraries first (by building using the **dtwain_5_vs2019.sln** project, mentioned above) before building the demos.  
+
+The demos consist of C and C++ language demos, plus C++ demos based on an experimental C++ wrapper library that is currently being developed.  In addition, there are C# and Visual Basic *.sln files you can load, build, and test the functionality of DTWAIN.
 
 ----
 
