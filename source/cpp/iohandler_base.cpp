@@ -68,7 +68,7 @@ bool CTL_ImageIOHandler::IsValidBitDepth(LONG FileType, LONG bitDepth)
 }
 
 int CTL_ImageIOHandler::SaveToFile(HANDLE hDib, LPCTSTR szFile, FREE_IMAGE_FORMAT fmt, int flags,
-                                   UINT unitOfMeasure, const std::pair<LONG, LONG>& res,
+                                   UINT unitOfMeasure, std::pair<LONG, LONG> res,
                                     const std::tuple<double, double, double, double>& multiplier_pr) const
 {
     #ifdef _WIN32

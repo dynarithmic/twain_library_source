@@ -55,8 +55,6 @@ bool SetOneTwainCapValue( const CTL_ITwainSource *pSource,
 
     // Set the #transfer count
     auto pSession = pTempSource->GetTwainSession();
-    std::vector<T> arrObj;
-    arrObj.push_back( Value );
 
     if ( TwainType == 0xFFFF )
         TwainType = static_cast<TW_UINT16>(DTWAIN_GetCapDataType((DTWAIN_SOURCE)pSource, Cap));
@@ -67,7 +65,7 @@ bool SetOneTwainCapValue( const CTL_ITwainSource *pSource,
                                            nSetType,
                                            Cap,
                                            TwainType,
-                                           arrObj);
+                                           { Value });
 
     if ( !CTL_TwainAppMgr::IsSourceOpen( pTempSource ) )
         return false;
@@ -1903,12 +1901,10 @@ void CTL_TwainAppMgr::EnumTwainFileFormats( const CTL_ITwainSource * /*pSource*/
 
 struct FindTriplet
 {
-    FindTriplet(const RawTwainTriplet& theTriplet) : m_Trip(theTriplet) { }
-    bool operator() (const RawTwainTriplet& trip) const
+    FindTriplet(RawTwainTriplet theTriplet) : m_Trip(theTriplet) { }
+    bool operator() (RawTwainTriplet trip) const
     {
-        return m_Trip.nDG == trip.nDG &&
-            m_Trip.nDAT == trip.nDAT &&
-            m_Trip.nMSG == trip.nMSG;
+        return std::tie(m_Trip.nDG, m_Trip.nDAT, m_Trip.nMSG) == std::tie(trip.nDG, trip.nDAT, trip.nMSG);
     }
     private:
         RawTwainTriplet m_Trip;

@@ -148,7 +148,7 @@ struct StringSetCapConverterA
 
 struct FrameGetCapConverter
 {
-    static TwainFrameInternal Convert(const TW_FRAME& fValue)
+    static TwainFrameInternal Convert(TW_FRAME fValue)
     {
         return fValue;
     }

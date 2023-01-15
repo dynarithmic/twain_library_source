@@ -152,6 +152,8 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
     if ( m_MultiPageStruct.Stage == DIB_MULTI_LAST )
     {
         pPDFInfo = std::dynamic_pointer_cast<PDFINFO>(m_MultiPageStruct.pUserData);
+        if ( !pPDFInfo )
+            return DTWAIN_ERR_FILEWRITE;
         try
         {
             if ( pPDFInfo->IsPDFStarted )

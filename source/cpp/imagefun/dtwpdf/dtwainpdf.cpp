@@ -800,7 +800,7 @@ bool PdfDocument::StartPDFCreation()
     return true;
 }
 
-bool SortByRefNum(const ObjectInfo& first, const ObjectInfo& second)
+bool SortByRefNum(ObjectInfo first, ObjectInfo second)
 {
     return first.ObjNum < second.ObjNum;
 }

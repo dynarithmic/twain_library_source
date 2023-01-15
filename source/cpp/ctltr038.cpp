@@ -495,7 +495,7 @@ TW_INFO CTL_ExtImageInfoTriplet::GetInfo(size_t nWhich, int nSearch) const
     return Info;
 }
 
-bool CTL_ExtImageInfoTriplet::SetInfo(const TW_INFO &Info, size_t nWhich)
+bool CTL_ExtImageInfoTriplet::SetInfo(TW_INFO Info, size_t nWhich)
 {
     if ( nWhich >= m_nNumInfo || !m_pExtImageInfo )
         return false;
@@ -510,7 +510,7 @@ bool CTL_ExtImageInfoTriplet::IsItemHandle(size_t nWhich) const
 }
 
 // Alternate
-bool CTL_ExtImageInfoTriplet::AddInfo(const TW_INFO& Info)
+bool CTL_ExtImageInfoTriplet::AddInfo(TW_INFO Info)
 {
     m_vInfo.push_back(Info);
     return true;

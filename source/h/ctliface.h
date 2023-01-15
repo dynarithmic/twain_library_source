@@ -333,19 +333,20 @@ namespace dynarithmic
     
     typedef std::list<TwainFrameInternal> DTWAINFrameList;
 
-    inline bool operator == (const TW_FRAME& lhs, const TW_FRAME& rhs)
+    inline bool operator == (TW_FRAME lhs, TW_FRAME rhs)
     {
-        return lhs.Bottom.Frac == rhs.Bottom.Frac &&
-            lhs.Bottom.Whole == rhs.Bottom.Whole &&
-            lhs.Left.Frac == rhs.Left.Frac &&
-            lhs.Left.Whole == rhs.Left.Whole &&
-            lhs.Right.Frac == rhs.Right.Frac &&
-            lhs.Right.Whole == rhs.Right.Whole &&
-            lhs.Top.Frac == rhs.Top.Frac &&
-            lhs.Top.Whole == rhs.Top.Whole;
+        return std::tie(lhs.Bottom.Frac, lhs.Bottom.Whole,
+            lhs.Left.Frac, lhs.Left.Whole,
+            lhs.Right.Frac, lhs.Right.Whole,
+            lhs.Top.Frac, lhs.Top.Whole)
+            ==
+            std::tie(rhs.Bottom.Frac, rhs.Bottom.Whole,
+                rhs.Left.Frac, rhs.Left.Whole,
+                rhs.Right.Frac, rhs.Right.Whole,
+                rhs.Top.Frac, rhs.Top.Whole);
     }
 
-    inline bool operator!=(const TW_FRAME& f1, const TW_FRAME& f2)
+    inline bool operator!=(TW_FRAME f1, TW_FRAME f2)
     {
         return !(operator==(f1, f2));
     }
@@ -800,7 +801,7 @@ namespace dynarithmic
     DTWAIN_BOOL    DTWAIN_ArrayNext(DTWAIN_ARRAY pArray, LPVOID pVariant);
     LONG           DTWAIN_ArrayType(DTWAIN_ARRAY pArray, bool bGetReal=true);
     bool           DTWAINFRAMEToTWFRAME(DTWAIN_FRAME pDdtwil, pTW_FRAME pTwain);
-    bool           TWFRAMEToDTWAINFRAME(const TW_FRAME& pTwain, DTWAIN_FRAME pDdtwil);
+    bool           TWFRAMEToDTWAINFRAME(TW_FRAME pTwain, DTWAIN_FRAME pDdtwil);
 
     #ifdef __cplusplus
     extern "C" {

@@ -1221,7 +1221,7 @@ bool CTL_ITwainSource::InitExtImageInfo(int nNum)
     }
 
 
-bool CTL_ITwainSource::AddExtImageInfo(const TW_INFO &Info) const
+bool CTL_ITwainSource::AddExtImageInfo(TW_INFO Info) const
 {
     if ( m_pExtImageTriplet )
     {

@@ -228,7 +228,7 @@
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;_UNICODE;_SCL_SECURE_NO_WARNINGS;DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;NDEBUG;DTWAIN_USE_PDFLIB;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions);FREEIMAGE_CPP_LIB;DTWAIN_DEBUG;BUILDING_DTWAINDLL;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_UNICODE;_SCL_SECURE_NO_WARNINGS;DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;NDEBUG;DTWAIN_USE_PDFLIB;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions);FREEIMAGE_CPP_LIB;DTWAIN_DEBUG;BUILDING_DTWAINDLL;;USE_DTWAIN_DEBUG_LIB</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -270,6 +270,7 @@
       <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_32);$(BOOST_LIBRARY_DIR_V142_32);$(BOOST_LIBRARY_DIR_V141_32);$(BOOST_LIBRARY_DIR_V140_32);.\FreeImage\Source\FreeImageLib\$(Platform)\DebugU;$(SolutionDir)cryptolib\$(PlatformTarget)\DebugU</AdditionalLibraryDirectories>
       <FullProgramDatabaseFile>true</FullProgramDatabaseFile>
       <AssemblyDebug>true</AssemblyDebug>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
       <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
@@ -282,6 +283,38 @@
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip MD5 -t $(TargetDir)debug_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA1 -t $(TargetDir)debug_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_libraries_zip_sha256hash.txt -lowercase -overwrite
+cd $(SolutionDir)
+cd ..
+md demos\c_cpp_includes
+cd demos\c_cpp_includes
+copy $(SolutionDir)h\capconst.h .
+copy $(SolutionDir)h\dtwain.h .
+copy $(SolutionDir)h\dtwainc.h .
+copy $(SolutionDir)h\dtwaindefs.h .
+copy $(SolutionDir)h\dtwainx.h .
+copy $(SolutionDir)h\dtwain_filetypes.h .
+copy $(SolutionDir)h\dtwain_standard_defs.h .
+copy $(SolutionDir)h\dtwain_version.h .
+copy $(SolutionDir)h\dtwpdft.h .
+copy $(SolutionDir)h\dtwstrfn.h .
+copy $(SolutionDir)h\dtwtype.h .
+copy $(SolutionDir)h\twain.h .
+copy $(SolutionDir)h\winconst.h .
+copy $(SolutionDir)h\dtwain_library_selector.h .
+cd $(SolutionDir)
+cd ..
+md demos\binaries\$(PlatformArchitecture)bit
+cd demos\binaries\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).dll .
+copy $(TargetDir)twain*.txt .
+cd $(SolutionDir)
+cd ..
+md demos\libs\$(PlatformArchitecture)bit
+cd demos\libs\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).lib .
+
+
+
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -344,6 +377,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
       <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_32);$(BOOST_LIBRARY_DIR_V142_32);$(BOOST_LIBRARY_DIR_V141_32);$(BOOST_LIBRARY_DIR_V140_32);.\FreeImage\Source\FreeImageLib\Win32\ReleaseU;$(SolutionDir)cryptolib\$(PlatformTarget)\ReleaseU</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
       <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
@@ -356,6 +390,38 @@
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip MD5 -t $(TargetDir)release_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA1 -t $(TargetDir)release_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)release_libraries_zip_sha256hash.txt -lowercase -overwrite
+cd $(SolutionDir)
+cd ..
+md demos\c_cpp_includes
+cd demos\c_cpp_includes
+copy $(SolutionDir)h\capconst.h .
+copy $(SolutionDir)h\dtwain.h .
+copy $(SolutionDir)h\dtwainc.h .
+copy $(SolutionDir)h\dtwaindefs.h .
+copy $(SolutionDir)h\dtwainx.h .
+copy $(SolutionDir)h\dtwain_filetypes.h .
+copy $(SolutionDir)h\dtwain_standard_defs.h .
+copy $(SolutionDir)h\dtwain_version.h .
+copy $(SolutionDir)h\dtwpdft.h .
+copy $(SolutionDir)h\dtwstrfn.h .
+copy $(SolutionDir)h\dtwtype.h .
+copy $(SolutionDir)h\twain.h .
+copy $(SolutionDir)h\winconst.h .
+copy $(SolutionDir)h\dtwain_library_selector.h .
+cd $(SolutionDir)
+cd ..
+md demos\binaries\$(PlatformArchitecture)bit
+cd demos\binaries\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).dll .
+copy $(TargetDir)twain*.txt .
+cd $(SolutionDir)
+cd ..
+md demos\libs\$(PlatformArchitecture)bit
+cd demos\libs\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).lib .
+
+
+
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -378,7 +444,7 @@
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NOMINMAX;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;NDEBUG;DTWAIN_USE_PDFLIB;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;NDEBUG;DTWAIN_USE_PDFLIB;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);USE_DTWAIN_DEBUG_LIB</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -422,6 +488,11 @@
       <TargetMachine>MachineX86</TargetMachine>
       <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
       <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_32);$(BOOST_LIBRARY_DIR_V142_32);$(BOOST_LIBRARY_DIR_V141_32);$(BOOST_LIBRARY_DIR_V140_32);.\FreeImage\Source\FreeImageLib\Win32\Release;$(SolutionDir)cryptolib\$(PlatformTarget)\Release</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
       <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
@@ -434,6 +505,38 @@
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip MD5 -t $(TargetDir)release_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA1 -t $(TargetDir)release_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)release_libraries_zip_sha256hash.txt -lowercase -overwrite
+cd $(SolutionDir)
+cd ..
+md demos\c_cpp_includes
+cd demos\c_cpp_includes
+copy $(SolutionDir)h\capconst.h .
+copy $(SolutionDir)h\dtwain.h .
+copy $(SolutionDir)h\dtwainc.h .
+copy $(SolutionDir)h\dtwaindefs.h .
+copy $(SolutionDir)h\dtwainx.h .
+copy $(SolutionDir)h\dtwain_filetypes.h .
+copy $(SolutionDir)h\dtwain_standard_defs.h .
+copy $(SolutionDir)h\dtwain_version.h .
+copy $(SolutionDir)h\dtwpdft.h .
+copy $(SolutionDir)h\dtwstrfn.h .
+copy $(SolutionDir)h\dtwtype.h .
+copy $(SolutionDir)h\twain.h .
+copy $(SolutionDir)h\winconst.h .
+copy $(SolutionDir)h\dtwain_library_selector.h .
+cd $(SolutionDir)
+cd ..
+md demos\binaries\$(PlatformArchitecture)bit
+cd demos\binaries\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).dll .
+copy $(TargetDir)twain*.txt .
+cd $(SolutionDir)
+cd ..
+md demos\libs\$(PlatformArchitecture)bit
+cd demos\libs\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).lib .
+
+
+
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -456,7 +559,7 @@
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;FREEIMAGE_CPP_LIB;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;DTWAIN_USE_PDFLIB;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;_SCL_SECURE_NO_WARNINGS;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;FREEIMAGE_CPP_LIB;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;DTWAIN_USE_PDFLIB;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;_SCL_SECURE_NO_WARNINGS;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);USE_DTWAIN_DEBUG_LIB</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -497,6 +600,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
       <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_32);$(BOOST_LIBRARY_DIR_V142_32);$(BOOST_LIBRARY_DIR_V141_32);$(BOOST_LIBRARY_DIR_V140_32);.\FreeImage\Source\FreeImageLib\Win32\Debug;$(SolutionDir)cryptolib\$(PlatformTarget)\Debug</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
       <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
@@ -509,6 +613,38 @@
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip MD5 -t $(TargetDir)debug_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA1 -t $(TargetDir)debug_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_libraries_zip_sha256hash.txt -lowercase -overwrite
+cd $(SolutionDir)
+cd ..
+md demos\c_cpp_includes
+cd demos\c_cpp_includes
+copy $(SolutionDir)h\capconst.h .
+copy $(SolutionDir)h\dtwain.h .
+copy $(SolutionDir)h\dtwainc.h .
+copy $(SolutionDir)h\dtwaindefs.h .
+copy $(SolutionDir)h\dtwainx.h .
+copy $(SolutionDir)h\dtwain_filetypes.h .
+copy $(SolutionDir)h\dtwain_standard_defs.h .
+copy $(SolutionDir)h\dtwain_version.h .
+copy $(SolutionDir)h\dtwpdft.h .
+copy $(SolutionDir)h\dtwstrfn.h .
+copy $(SolutionDir)h\dtwtype.h .
+copy $(SolutionDir)h\twain.h .
+copy $(SolutionDir)h\winconst.h .
+copy $(SolutionDir)h\dtwain_library_selector.h .
+cd $(SolutionDir)
+cd ..
+md demos\binaries\$(PlatformArchitecture)bit
+cd demos\binaries\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).dll .
+copy $(TargetDir)twain*.txt .
+cd $(SolutionDir)
+cd ..
+md demos\libs\$(PlatformArchitecture)bit
+cd demos\libs\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).lib .
+
+
+
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -517,7 +653,7 @@
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;NOMINMAX;FREEIMAGE_CPP_LIB;_UNICODE;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;DTWAIN_USE_PDFLIB;WIN64;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;NOMINMAX;FREEIMAGE_CPP_LIB;_UNICODE;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;DTWAIN_USE_PDFLIB;WIN64;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);;USE_DTWAIN_DEBUG_LIB</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
@@ -539,6 +675,7 @@
       <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)ud$(TargetExt)</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);FreeImageLib.lib;cryptlib.lib</AdditionalDependencies>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <ResourceCompile>
       <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;_DEBUG;WIN64;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -555,6 +692,35 @@
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip MD5 -t $(TargetDir)debug_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA1 -t $(TargetDir)debug_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_libraries_zip_sha256hash.txt -lowercase -overwrite
+cd $(SolutionDir)
+cd ..
+md demos\c_cpp_includes
+cd demos\c_cpp_includes
+copy $(SolutionDir)h\capconst.h .
+copy $(SolutionDir)h\dtwain.h .
+copy $(SolutionDir)h\dtwainc.h .
+copy $(SolutionDir)h\dtwaindefs.h .
+copy $(SolutionDir)h\dtwainx.h .
+copy $(SolutionDir)h\dtwain_filetypes.h .
+copy $(SolutionDir)h\dtwain_standard_defs.h .
+copy $(SolutionDir)h\dtwain_version.h .
+copy $(SolutionDir)h\dtwpdft.h .
+copy $(SolutionDir)h\dtwstrfn.h .
+copy $(SolutionDir)h\dtwtype.h .
+copy $(SolutionDir)h\twain.h .
+copy $(SolutionDir)h\winconst.h .
+copy $(SolutionDir)h\dtwain_library_selector.h .
+cd $(SolutionDir)
+cd ..
+md demos\binaries\$(PlatformArchitecture)bit
+cd demos\binaries\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).dll .
+copy $(TargetDir)twain*.txt .
+cd $(SolutionDir)
+cd ..
+md demos\libs\$(PlatformArchitecture)bit
+cd demos\libs\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).lib .
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -584,6 +750,7 @@
       <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)u$(TargetExt)</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);FreeImageLib.lib;cryptlib.lib</AdditionalDependencies>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <ResourceCompile>
       <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;NDEBUG;WIN64;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -600,6 +767,38 @@
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip MD5 -t $(TargetDir)release_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA1 -t $(TargetDir)release_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)release_libraries_zip_sha256hash.txt -lowercase -overwrite
+cd $(SolutionDir)
+cd ..
+md demos\c_cpp_includes
+cd demos\c_cpp_includes
+copy $(SolutionDir)h\capconst.h .
+copy $(SolutionDir)h\dtwain.h .
+copy $(SolutionDir)h\dtwainc.h .
+copy $(SolutionDir)h\dtwaindefs.h .
+copy $(SolutionDir)h\dtwainx.h .
+copy $(SolutionDir)h\dtwain_filetypes.h .
+copy $(SolutionDir)h\dtwain_standard_defs.h .
+copy $(SolutionDir)h\dtwain_version.h .
+copy $(SolutionDir)h\dtwpdft.h .
+copy $(SolutionDir)h\dtwstrfn.h .
+copy $(SolutionDir)h\dtwtype.h .
+copy $(SolutionDir)h\twain.h .
+copy $(SolutionDir)h\winconst.h .
+copy $(SolutionDir)h\dtwain_library_selector.h .
+cd $(SolutionDir)
+cd ..
+md demos\binaries\$(PlatformArchitecture)bit
+cd demos\binaries\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).dll .
+copy $(TargetDir)twain*.txt .
+cd $(SolutionDir)
+cd ..
+md demos\libs\$(PlatformArchitecture)bit
+cd demos\libs\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).lib .
+
+
+
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -608,7 +807,7 @@
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Full</Optimization>
-      <PreprocessorDefinitions>NOMINMAX;FREEIMAGE_CPP_LIB;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;_DEBUGNDEBUG;DTWAIN_USE_PDFLIB;WIN64;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;FREEIMAGE_CPP_LIB;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;_DEBUGNDEBUG;DTWAIN_USE_PDFLIB;WIN64;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);;USE_DTWAIN_DEBUG_LIB</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
@@ -632,6 +831,11 @@
       <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)$(TargetExt)</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);FreeImageLib.lib;cryptlib.lib</AdditionalDependencies>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <ResourceCompile>
       <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;NDEBUG;WIN64;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -648,6 +852,38 @@
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip MD5 -t $(TargetDir)release_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA1 -t $(TargetDir)release_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)release_libraries_zip_sha256hash.txt -lowercase -overwrite
+cd $(SolutionDir)
+cd ..
+md demos\c_cpp_includes
+cd demos\c_cpp_includes
+copy $(SolutionDir)h\capconst.h .
+copy $(SolutionDir)h\dtwain.h .
+copy $(SolutionDir)h\dtwainc.h .
+copy $(SolutionDir)h\dtwaindefs.h .
+copy $(SolutionDir)h\dtwainx.h .
+copy $(SolutionDir)h\dtwain_filetypes.h .
+copy $(SolutionDir)h\dtwain_standard_defs.h .
+copy $(SolutionDir)h\dtwain_version.h .
+copy $(SolutionDir)h\dtwpdft.h .
+copy $(SolutionDir)h\dtwstrfn.h .
+copy $(SolutionDir)h\dtwtype.h .
+copy $(SolutionDir)h\twain.h .
+copy $(SolutionDir)h\winconst.h .
+copy $(SolutionDir)h\dtwain_library_selector.h .
+cd $(SolutionDir)
+cd ..
+md demos\binaries\$(PlatformArchitecture)bit
+cd demos\binaries\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).dll .
+copy $(TargetDir)twain*.txt .
+cd $(SolutionDir)
+cd ..
+md demos\libs\$(PlatformArchitecture)bit
+cd demos\libs\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).lib .
+
+
+
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -656,7 +892,7 @@
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;NOMINMAX;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;DTWAIN_USE_PDFLIB;WIN64;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;NOMINMAX;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;DTWAIN_USE_PDFLIB;WIN64;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);;USE_DTWAIN_DEBUG_LIB</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
@@ -677,6 +913,7 @@
       <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)d$(TargetExt)</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);FreeImageLib.lib;cryptlib.lib</AdditionalDependencies>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <ResourceCompile>
       <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;_DEBUG;WIN64;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -693,6 +930,35 @@
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip MD5 -t $(TargetDir)debug_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA1 -t $(TargetDir)debug_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_libraries_zip_sha256hash.txt -lowercase -overwrite
+cd $(SolutionDir)
+cd ..
+md demos\c_cpp_includes
+cd demos\c_cpp_includes
+copy $(SolutionDir)h\capconst.h .
+copy $(SolutionDir)h\dtwain.h .
+copy $(SolutionDir)h\dtwainc.h .
+copy $(SolutionDir)h\dtwaindefs.h .
+copy $(SolutionDir)h\dtwainx.h .
+copy $(SolutionDir)h\dtwain_filetypes.h .
+copy $(SolutionDir)h\dtwain_standard_defs.h .
+copy $(SolutionDir)h\dtwain_version.h .
+copy $(SolutionDir)h\dtwpdft.h .
+copy $(SolutionDir)h\dtwstrfn.h .
+copy $(SolutionDir)h\dtwtype.h .
+copy $(SolutionDir)h\twain.h .
+copy $(SolutionDir)h\winconst.h .
+copy $(SolutionDir)h\dtwain_library_selector.h .
+cd $(SolutionDir)
+cd ..
+md demos\binaries\$(PlatformArchitecture)bit
+cd demos\binaries\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).dll .
+copy $(TargetDir)twain*.txt .
+cd $(SolutionDir)
+cd ..
+md demos\libs\$(PlatformArchitecture)bit
+cd demos\libs\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).lib .
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -1089,6 +1355,7 @@
     <ClInclude Include="h\dibmulti.h" />
     <ClInclude Include="h\dtwain_filesystem.h" />
     <ClInclude Include="h\dtwain_float_utils.h" />
+    <ClInclude Include="h\dtwain_library_selector.h" />
     <ClInclude Include="h\dtwain_raii.h" />
     <ClInclude Include="h\dtwain_standard_defs.h" />
     <ClInclude Include="h\dtwain_version.h" />

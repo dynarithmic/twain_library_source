@@ -37,7 +37,7 @@ namespace dynarithmic
         SetFrame(left, top, right, bottom);
     }
 
-    TwainFrameInternal::TwainFrameInternal(const TW_FRAME& frame) : m_FrameComponent{}
+    TwainFrameInternal::TwainFrameInternal(TW_FRAME frame) : m_FrameComponent{}
     {
         SetFrame(static_cast<double>(Fix32ToFloat(frame.Left)),
                  static_cast<double>(Fix32ToFloat(frame.Top)),
@@ -45,7 +45,7 @@ namespace dynarithmic
                  static_cast<double>(Fix32ToFloat(frame.Bottom)));
     }
 
-    TwainFrameInternal& TwainFrameInternal::operator=(const TW_FRAME& frame)
+    TwainFrameInternal& TwainFrameInternal::operator=(TW_FRAME frame)
     {
         From_TWFRAME(frame);
         return *this;
@@ -69,7 +69,7 @@ namespace dynarithmic
         return ret;
     }
 
-    void TwainFrameInternal::From_TWFRAME(const TW_FRAME& frame)
+    void TwainFrameInternal::From_TWFRAME(TW_FRAME frame)
     {
         SetFrame(static_cast<double>(Fix32ToFloat(frame.Left)),
                  static_cast<double>(Fix32ToFloat(frame.Top)),

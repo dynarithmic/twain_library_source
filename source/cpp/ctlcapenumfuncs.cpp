@@ -44,13 +44,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
     LOG_FUNC_ENTRY_PARAMS((Source, Array))
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return Array == nullptr; },
+                                        DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     // See if Source is opened
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(p); },
-        DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+                                        DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
     if (Array)
     {
@@ -99,8 +101,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
         DTWAIN_CacheCapabilityInfo(p, pHandle, &vCaps);
         p->SetRetrievedAllCaps(true);
         const bool bFound = !vCaps.empty();
-        if ( Array )
-            *Array = DTWAIN_ArrayCreateCopy(ThisArray);
+        *Array = DTWAIN_ArrayCreateCopy(ThisArray);
         if (bFound)
             LOG_FUNC_EXIT_PARAMS(true)
     }
