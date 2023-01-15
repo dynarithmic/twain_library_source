@@ -1,1 +1,1 @@
-﻿SHA256 hash of "dtwain64.dll" (32 bytes) = 5a64004094634d413394a5ec99ac5a68603114e8dce02d59d5978794f6c06669
+﻿SHA256 hash of "dtwain64.dll" (32 bytes) = 2655ebdb36e57a54e7844238ce3008b4b1f173da9a6bbf375a8052920cbbf2a3

@@ -42,6 +42,8 @@
 #include "dtwstrfn.h"
 #include "ctlfileutils.h"
 #include "arrayfactory.h"
+#include "dtwain_library_selector.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #pragma comment (lib, "shlwapi")
@@ -818,8 +820,12 @@ DTWAIN_HANDLE SysInitializeHelper(bool block)
             if (!ret)
             {
             #ifdef _WIN32
-                if ( block )
-                    MessageBox(nullptr, _T("DTWAIN Resources not found"), _T("DTWAIN Resource Error"), MB_ICONERROR);
+                if (block)
+                {
+                    CTL_StringType errorMsg = _T("Error.  DTWAIN Resource file not found: ");
+                    errorMsg += DTWAINRESOURCEINFOFILE;
+                    MessageBox(nullptr, errorMsg.c_str(), _T("DTWAIN Resource Error"), MB_ICONERROR);
+                }
             #endif
                 LOG_FUNC_EXIT_PARAMS(NULL)
             }
@@ -840,7 +846,6 @@ DTWAIN_HANDLE SysInitializeHelper(bool block)
         RegisterTwainWindowClass();
         #endif
 
-        // Load the static elements using a critical section
         LoadStaticData(pHandle);
 
         HookTwainDLL( pHandle, FALSE );

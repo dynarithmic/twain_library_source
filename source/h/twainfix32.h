@@ -30,7 +30,7 @@ namespace dynarithmic
     /* Fixed point structure type. */
     struct TW_FIX32Ex : TW_FIX32
     {
-        TW_FIX32Ex(const TW_FIX32& fix32)
+        TW_FIX32Ex(TW_FIX32 fix32)
         {
             Whole = fix32.Whole;
             Frac = fix32.Frac;

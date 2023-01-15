@@ -1278,7 +1278,6 @@ static LONG IsValidRangeArray( DTWAIN_ARRAY pArray )
             LOG_FUNC_EXIT_PARAMS(DTWAIN_ERR_INVALID_RANGE)
     }
     else
-    if (enumType == CTL_ArrayFactory::arrayTag::DoubleType)
     {
         const double *pVals = static_cast<double*>(factory->get_buffer(pArray, 0));
         const double dLow = pVals[0];
@@ -2307,7 +2306,7 @@ bool dynarithmic::DTWAINFRAMEToTWFRAME(DTWAIN_FRAME pDdtwil, pTW_FRAME pTwain)
     return true;
 }
 
-bool dynarithmic::TWFRAMEToDTWAINFRAME(const TW_FRAME& pTwain, DTWAIN_FRAME pDdtwil)
+bool dynarithmic::TWFRAMEToDTWAINFRAME(TW_FRAME pTwain, DTWAIN_FRAME pDdtwil)
 {
     double ValOut[4];
     TW_FIX32 ValIn[4];

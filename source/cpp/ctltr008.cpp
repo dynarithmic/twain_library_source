@@ -244,7 +244,7 @@ TW_UINT16 CTL_ProcessEventTriplet::ExecuteEventHandler()
                 {
                     const UINT uMsg = CTL_TwainDLLHandle::s_nRegisteredDTWAINMsg;
                     LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_DEVICEEVENT, 0, true);
-                    (*pHandle->m_pCallbackFn64)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONGLONG>(pSource));
+                    (*pHandle->m_pCallbackFn64)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG_PTR>(pSource));
                 }
             }
         }

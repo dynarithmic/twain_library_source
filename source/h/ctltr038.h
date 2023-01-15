@@ -53,9 +53,9 @@ namespace dynarithmic
             TW_INFO GetInfo(size_t nWhich, int nSearch) const;
 
             // Set the information for item nWhich
-            bool SetInfo(const TW_INFO& Info, size_t nWhich);
+            bool SetInfo(TW_INFO Info, size_t nWhich);
 
-            bool AddInfo(const TW_INFO& Info);
+            bool AddInfo(TW_INFO Info);
 
             // Utility functions
             bool GetItemData(int nWhichItem, int nSearch, int nWhichValue, LPVOID Data, size_t *pItemSize= nullptr) const;

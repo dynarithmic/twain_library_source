@@ -385,7 +385,7 @@ std::string GetTwainDlgTextFromResource(int nID, size_t& status)
     return {};
 }
 
-static bool ByCX(const SIZE& sz1, const SIZE& sz2)
+static bool ByCX(SIZE sz1, SIZE sz2)
 { return sz1.cx > sz2.cx; }
 
 static BOOL CALLBACK ChildEnumFontProc(HWND hWnd, LPARAM lParam)

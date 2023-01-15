@@ -175,7 +175,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\h</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)h</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -184,10 +184,17 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)\binaries\$(PlatformArchitecture)bit\</AdditionalLibraryDirectories>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">
@@ -199,7 +206,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\h</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)h</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -208,14 +215,17 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\..\binaries\$(PlatformArchitecture)bit</AdditionalLibraryDirectories>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PreBuildEvent>
       <Command>
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">
@@ -236,13 +246,20 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <ResourceCompile>
       <PreprocessorDefinitions>;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">
@@ -253,7 +270,7 @@
       <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions);USE_DTWAIN_DEBUG_LIB;</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)h</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
@@ -263,14 +280,18 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dtwain64d.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <IgnoreSpecificDefaultLibraries>dtwain64.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <ResourceCompile>
       <PreprocessorDefinitions>;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">
@@ -281,7 +302,7 @@
       <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions);USE_DTWAIN_DEBUG_LIB;</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)h</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
@@ -291,14 +312,18 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dtwain64ud.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <IgnoreSpecificDefaultLibraries>dtwain64u.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <ResourceCompile>
       <PreprocessorDefinitions>;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">
@@ -319,37 +344,58 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\h</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)h</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dtwain32d.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\binaries\$(PlatformArchitecture)bit</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <IgnoreSpecificDefaultLibraries>dtwain32.lib</IgnoreSpecificDefaultLibraries>
     </Link>
+    <PostBuildEvent>
+      <Command>"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\h</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)h</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">
     <ClCompile>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>..\..\..\binaries\$(PlatformArchitecture)bit</AdditionalLibraryDirectories>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dtwain32ud.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <IgnoreSpecificDefaultLibraries>dtwain32u.lib</IgnoreSpecificDefaultLibraries>
     </Link>
+    <PostBuildEvent>
+      <Command>"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\DibView\DIB.c" />

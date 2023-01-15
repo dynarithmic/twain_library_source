@@ -670,7 +670,8 @@ bool CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int errFile)
                                 pSource->ProcessMultipageFile();
                             }
                             else
-                            if ( !pSource->IsMultiPageModeContinuous() )
+                            if ( (!pSource->IsMultiPageModeContinuous()) ||
+                                 (pSource->IsMultiPageModeContinuous() && !CTL_ITwainSource::IsFileTypeMultiPage(pSource->GetAcquireFileType())))
                             {
                                 if ( !pSource->GetTransferDone())
                                 {

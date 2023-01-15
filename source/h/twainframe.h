@@ -41,10 +41,10 @@ namespace dynarithmic
         static bool IsValidComponent(int nWhich);
 
         TwainFrameInternal(double left = 0, double top = 0, double right = 0, double bottom = 0);
-        TwainFrameInternal(const TW_FRAME& frame);
-        TwainFrameInternal& operator=(const TW_FRAME& frame);
+        TwainFrameInternal(TW_FRAME frame);
+        TwainFrameInternal& operator=(TW_FRAME frame);
         TW_FRAME To_TWFRAME() const;
-        void From_TWFRAME(const TW_FRAME& frame);
+        void From_TWFRAME(TW_FRAME frame);
         double Left() const;
         double Top() const;
         double Right() const;

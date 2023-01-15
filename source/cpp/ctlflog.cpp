@@ -53,7 +53,10 @@ std::string dynarithmic::CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich,
         if ( nWhich == 0 || nWhich == LOG_INDENT_IN)
         {
             const std::string sTemp(nIndent, ' ');
-            s = sTemp + static_cast<std::string>("===>>>") + CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_ENTERTEXT] + " ";
+            auto resText = CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_ENTERTEXT];
+            if (resText.empty())
+                resText = "Entering";
+            s = sTemp + static_cast<std::string>("===>>>") + resText + " ";
             nIndent += 3;
         }
         else
@@ -61,7 +64,10 @@ std::string dynarithmic::CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich,
             nIndent -= 3;
             nIndent = (std::max)(0, nIndent);
             const std::string sTemp(nIndent, ' ');
-            s = sTemp + static_cast<std::string>("<<<===") + CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_EXITTEXT] + " ";
+            auto resText = CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_EXITTEXT];
+            if (resText.empty())
+                resText = "Exiting";
+            s = sTemp + static_cast<std::string>("<<<===") + resText + " ";
         }
     }
     else
