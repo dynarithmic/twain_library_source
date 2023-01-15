@@ -27,6 +27,7 @@ OF THIRD PARTY RIGHTS.
 #include <algorithm>
 #include <string>
 #include <exception>
+#include <stdexcept>
 #include <dtwain.h>
 #include <dynarithmic/twain/types/twain_frame.hpp>
 #include <dynarithmic/twain/dtwain_twain.hpp>
