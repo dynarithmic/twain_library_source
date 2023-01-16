@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,16 +18,19 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLFILEUTILS_H_
-#define CTLFILEUTILS_H_
+#ifndef CTLFILEUTILS_H
+#define CTLFILEUTILS_H
 
 #include "ctliface.h"
 
 namespace dynarithmic
 {
     bool delete_file(LPCTSTR filename);
-    bool parent_directory_exists(LPCTSTR filename);
+    std::pair<bool, std::string> parent_directory_exists(LPCTSTR filename);
     bool file_exists(LPCTSTR filename);
+    std::pair<bool, std::string> create_directory(LPCTSTR dirName);
     CTL_StringType temp_directory_path(bool bWithSeparator=true);
+    CTL_StringType get_parent_directory(LPCTSTR filename);
+    bool directory_writeable(LPCTSTR filename);
 }
 #endif

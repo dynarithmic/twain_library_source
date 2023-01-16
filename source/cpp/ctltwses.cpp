@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ CTL_ITwainSession::CTL_ITwainSession(LPCTSTR pAppName,
                                    LPCTSTR lpszMfg,
                                    LPCTSTR lpszFamily,
                                    LPCTSTR lpszProduct
-                                   ) : m_AppId{}
+                                    ) : m_AppId{}, m_AppWnd{}
 {
     if ( pAppName )
         m_AppName = pAppName;

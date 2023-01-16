@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -60,6 +60,7 @@ namespace dynarithmic
         std::ofstream m_ostr;
         public:
             File_Logger(const LPCSTR filename, bool bAppend = false);
+            ~File_Logger();
             void trace(const std::string& msg) override;
     };
 

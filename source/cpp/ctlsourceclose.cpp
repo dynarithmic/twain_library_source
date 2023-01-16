@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
  */
 #include "cppfunc.h"
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
 #include "errorcheck.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -41,7 +40,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CloseSource(DTWAIN_SOURCE Source)
         const auto sProductName = p->GetProductName();
         bRetval = DTWAIN_CloseSourceUnconditional(pHandle, p)?true:false;
         if (bRetval)
+        {
             pHandle->m_mapStringToSource.erase(sProductName);
+            pHandle->s_aFeederSources.erase(Source);
+        }
     }
     LOG_FUNC_EXIT_PARAMS(bRetval)
     CATCH_BLOCK(false)

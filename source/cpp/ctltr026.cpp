@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -31,13 +31,13 @@
 #include "imagexferfilewriter.h"
 #include "ctldib.h"
 #include "dtwain.h"
-#include "enumeratorfuncs.h"
+#include "arrayfactory.h"
 #include "ctlfileutils.h"
 
 using namespace dynarithmic;
 
 static void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pSession,
-                                 LONG Error, LONG ErrorMsg);
+                                 LONG Error, LONG ErrorMsg, const std::string& extraInfo = "");
 static bool IsState7InfoNeeded(CTL_ITwainSource *pSource);
 
 CTL_ImageXferTriplet::CTL_ImageXferTriplet(CTL_ITwainSession *pSession,
@@ -62,9 +62,10 @@ CTL_ImageXferTriplet::CTL_ImageXferTriplet(CTL_ITwainSession *pSession,
     {
         case DAT_IMAGENATIVEXFER:
         case DAT_AUDIONATIVEXFER:
-            InitVars(nType, CTL_GetTypeGET, static_cast<void*>(&m_hDataHandle));
+            InitVars(nType, CTL_GetTypeGET, &m_hDataHandle);
         break;
         case DAT_IMAGEFILEXFER:
+        case DAT_IMAGEMEMFILEXFER:
             InitVars(nType, CTL_GetTypeGET, nullptr );
         break;
     }
@@ -84,6 +85,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
     ImageXferFileWriter FileWriter(this, pSession, pSource);
 
     m_bJobControlPageRecorded = false;
+    int errfile = 0;
 
     switch (rc)
     {
@@ -92,7 +94,6 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
             size_t nLastDib = 0;
             bool bKeepPage = true;
             bool bInClip = false;
-            int errfile = 0;
             CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,
                                                   DTWAIN_TN_TRANSFERDONE,
                                                   reinterpret_cast<LPARAM>(pSource));
@@ -195,7 +196,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     break;
                 }
 
-                if (CTL_TwainDLLHandle::s_lErrorFilterFlags)
+                if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_DECODE_BITMAP)
                 {
                     std::string sOut = "Original bitmap from device: \n";
                     sOut += CTL_ErrorStructDecoder::DecodeBitmap(m_hDataHandle);
@@ -308,7 +309,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                         if ( bIsMultiPageFile || pSource->IsMultiPageModeSaveAtEnd())
                         {
                             // This is the first page of the acquisition
-                            if ( nLastDib == 0 || pSource->IsNewJob() && pSource->IsJobFileHandlingOn())
+                            if ( nLastDib == 0 || (pSource->IsNewJob() && pSource->IsJobFileHandlingOn()))
                                 nMultiStage = DIB_MULTI_FIRST;
                             else
                             // This is a subsequent page of the acquisition
@@ -318,12 +319,12 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                             // or in continuous mode
                             if ( pSource->IsManualDuplexModeOn() ||
                                  pSource->IsMultiPageModeContinuous() ||
-                               pSource->IsMultiPageModeSaveAtEnd() && !bIsMultiPageFile)
+                               (pSource->IsMultiPageModeSaveAtEnd() && !bIsMultiPageFile))
                             {
                                 // We need to copy the data to a file and store info in
                                 // vector of the source
                                 if ( !bEndOfJobDetected || // Not end -of-job
-                                    bExecuteEOJPageHandling && !m_bJobControlPageRecorded // write job control page
+                                    (bExecuteEOJPageHandling && !m_bJobControlPageRecorded) // write job control page
                                     )
                                     errfile = FileWriter.CopyDuplexDibToFile(CurDib, bExecuteEOJPageHandling);
 
@@ -365,7 +366,8 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                         StringWrapper::TrimAll(strTempFile);
                         if ( strTempFile.empty())
                         {
-                            SendFileAcquireError(pSource, pSession, DTWAIN_ERR_BAD_FILENAME, DTWAIN_TN_FILESAVECANCELLED );
+                            SendFileAcquireError(pSource, pSession, DTWAIN_ERR_BAD_FILENAME, DTWAIN_TN_FILESAVECANCELLED,
+                                                 StringConversion::Convert_Native_To_Ansi(pSource->GetActualFileName()));
                             pSource->SetLastAcquiredFileName( StringWrapper::traits_type::GetEmptyString() );
                         }
                         else
@@ -374,7 +376,8 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                             if ( CTL_TwainAppMgr::CopyFile(pSource->GetAcquireFile(), strTempFile) != 1 )
                             {
                                 // Error in copying the file
-                                SendFileAcquireError(pSource, pSession, DTWAIN_ERR_FILEWRITE, DTWAIN_TN_FILESAVEERROR );
+                                SendFileAcquireError(pSource, pSession, DTWAIN_ERR_FILEWRITE, DTWAIN_TN_FILESAVEERROR,
+                                                     StringConversion::Convert_Native_To_Ansi(pSource->GetActualFileName()));
                                 pSource->SetLastAcquiredFileName( StringWrapper::traits_type::GetEmptyString() );
                             }
                             else
@@ -408,7 +411,8 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                 CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_CLIPTRANSFERDONE,static_cast<LPARAM>(pSource->GetAcquireNum()));
 
             if ( errfile != 0 )
-               SendFileAcquireError(pSource, pSession, errfile, DTWAIN_TN_INVALIDIMAGEFORMAT);
+               SendFileAcquireError(pSource, pSession, errfile, DTWAIN_TN_FILESAVEERROR, 
+                                    StringConversion::Convert_Native_To_Ansi(pSource->GetActualFileName()));
             break;
         }
 
@@ -455,7 +459,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
         bForceClose = false;
     else
         bForceClose = true;
-    AbortTransfer(bForceClose);
+    AbortTransfer(bForceClose, errfile);
     return rc;
 
 }
@@ -465,7 +469,7 @@ bool CTL_ImageXferTriplet::CancelAcquisition()
     CTL_ITwainSource* pSource = GetSourcePtr();
     CTL_ITwainSession* pSession = GetSessionPtr();
 
-    pSource->SetState(SOURCE_STATE_UIENABLED); // Transition to state 6
+    pSource->SetState(SOURCE_STATE_UIENABLED); // Transition to state 5
     pSource->SetTransferDone(false);
     m_hDataHandle = nullptr;
     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,
@@ -495,7 +499,7 @@ bool CTL_ImageXferTriplet::FailAcquisition()
     const int nRetryMax = pSource->GetMaxRetryAttempts();
     int nCurRetry = pSource->GetCurrentRetryCount();
 
-    pSource->SetState(SOURCE_STATE_UIENABLED); // Transition to state 6
+    pSource->SetState(SOURCE_STATE_UIENABLED); // Transition to state 5
     pSource->SetTransferDone(false);
     const TW_UINT16 ccode = CTL_TwainAppMgr::GetConditionCode(pSession, nullptr);
     CTL_TwainAppMgr::ProcessConditionCodeError(ccode);
@@ -526,8 +530,7 @@ bool CTL_ImageXferTriplet::FailAcquisition()
             bContinue = DTWAIN_PAGEFAIL_RETRY;
         }
     }
-    ImageXferFileWriter(this, pSession, pSource).ProcessFailureCondition(bContinue);
-    return true;
+    return ImageXferFileWriter(this, pSession, pSource).ProcessFailureCondition(bContinue);
 }
 
 HANDLE  CTL_ImageXferTriplet::GetDibHandle() const
@@ -549,9 +552,10 @@ TW_UINT16 CTL_ImageXferTriplet::GetImagePendingInfo(TW_PENDINGXFERS *pPI, TW_UIN
 
 
 
-bool CTL_ImageXferTriplet::AbortTransfer(bool bForceClose)
+bool CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int errFile)
 {
-    CTL_TwainAppMgr::WriteLogInfoA("Potentially aborting transfer..\n");
+    if ( CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+        CTL_TwainAppMgr::WriteLogInfoA("Potentially aborting transfer..\n");
     CTL_ITwainSession *pSession = GetSessionPtr();
     CTL_ITwainSource *pSource = GetSourcePtr();
     ImageXferFileWriter FileWriter(this, pSession, pSource);
@@ -574,6 +578,8 @@ bool CTL_ImageXferTriplet::AbortTransfer(bool bForceClose)
     bool bUserCancelled = false;
     bool bJobControlContinue = false;
     bool bEndOfJobDetected = false;
+    bool bProcessSinglePage = (!CTL_ITwainSource::IsFileTypeMultiPage(pSource->GetAcquireFileType()) &&
+                               errFile == 0);
     switch( rc )
     {
         case TWRC_SUCCESS:
@@ -583,7 +589,7 @@ bool CTL_ImageXferTriplet::AbortTransfer(bool bForceClose)
             if ( bEndOfJobDetected )
                 CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                       nullptr, DTWAIN_TN_ENDOFJOBDETECTED,
-                                                  reinterpret_cast<LPARAM>(GetSourcePtr()));
+                                                  reinterpret_cast<LPARAM>(pSource));
 
             bJobControlContinue = IsJobControlPending(ptrPending);
             m_nTotalPages++;
@@ -604,7 +610,7 @@ bool CTL_ImageXferTriplet::AbortTransfer(bool bForceClose)
                     // Send message to User App
                     nContinue = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                                       nullptr, DTWAIN_TN_PAGECONTINUE,
-                                                 reinterpret_cast<LPARAM>(GetSourcePtr()));
+                                                                      reinterpret_cast<LPARAM>(pSource));
                     if ( !nContinue)
                         bUserCancelled = true;
                 }
@@ -615,7 +621,7 @@ bool CTL_ImageXferTriplet::AbortTransfer(bool bForceClose)
                     if ( bUserCancelled )
                         CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                               nullptr, DTWAIN_TN_PAGECANCELLED,
-                                           reinterpret_cast<LPARAM>(GetSourcePtr()));
+                                                              reinterpret_cast<LPARAM>(pSource));
                 }
                 else
                 // Check if the user wants to just stop the feeder
@@ -641,7 +647,7 @@ bool CTL_ImageXferTriplet::AbortTransfer(bool bForceClose)
                 }
             }
 
-            if ( ptrPending->Count == 0 || !nContinue || bForceClose || bEndOfJobDetected )
+            if ( ptrPending->Count == 0 || !nContinue || bForceClose || bEndOfJobDetected || bProcessSinglePage)
             {
                 // Prompt to save image here
 
@@ -664,26 +670,28 @@ bool CTL_ImageXferTriplet::AbortTransfer(bool bForceClose)
                                 pSource->ProcessMultipageFile();
                             }
                             else
-                            if ( !pSource->IsMultiPageModeContinuous() )
+                            if ( (!pSource->IsMultiPageModeContinuous()) ||
+                                 (pSource->IsMultiPageModeContinuous() && !CTL_ITwainSource::IsFileTypeMultiPage(pSource->GetAcquireFileType())))
                             {
                                 if ( !pSource->GetTransferDone())
                                 {
                                     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                                           nullptr, DTWAIN_TN_FILESAVECANCELLED,
-                                        reinterpret_cast<LPARAM>(GetSourcePtr()));
+                                                                          reinterpret_cast<LPARAM>(pSource));
                                 }
                                 else
                                 {
-                              if ( FileWriter.CloseMultiPageDibFile() == 0 )
-                                CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
-                                                                      nullptr, DTWAIN_TN_FILESAVEOK,
-                                                                  reinterpret_cast<LPARAM>(GetSourcePtr()));
-                              else
-                              {
-                                CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
-                                                                      nullptr, DTWAIN_TN_FILESAVEERROR,
-                                                                  reinterpret_cast<LPARAM>(GetSourcePtr()));
-                                GetSourcePtr()->ClearPDFText(); // clear the text elements
+                                    const int notification = (errFile == 0?DTWAIN_TN_FILESAVEOK:DTWAIN_TN_CLOSEDIBFAILED);
+                                    if ( FileWriter.CloseMultiPageDibFile() == 0 )
+                                        CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
+                                                                              nullptr, notification,
+                                                                              reinterpret_cast<LPARAM>(pSource));
+                                  else
+                                  {
+                                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
+                                                                          nullptr, DTWAIN_TN_FILESAVEERROR,
+                                                                          reinterpret_cast<LPARAM>(pSource));
+                                    pSource->ClearPDFText(); // clear the text elements
                                   }
                               }
                             }
@@ -694,7 +702,7 @@ bool CTL_ImageXferTriplet::AbortTransfer(bool bForceClose)
                 {
                     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                           nullptr, DTWAIN_TN_ENDOFJOBDETECTED,
-                                                      reinterpret_cast<LPARAM>(GetSourcePtr()));
+                                                          reinterpret_cast<LPARAM>(pSource));
                 }
             }
         break;
@@ -721,7 +729,7 @@ void CTL_ImageXferTriplet::SaveJobPages(const ImageXferFileWriter& FileWriter)
 
     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                           nullptr, DTWAIN_TN_EOJBEGINFILESAVE,
-                                          reinterpret_cast<LPARAM>(GetSourcePtr()));
+                                          reinterpret_cast<LPARAM>(pSource));
 
     if ( m_nTotalPagesSaved > 0)
     {
@@ -736,16 +744,16 @@ void CTL_ImageXferTriplet::SaveJobPages(const ImageXferFileWriter& FileWriter)
           if ( FileWriter.CloseMultiPageDibFile() == 0 )
             CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                   nullptr, DTWAIN_TN_FILESAVEOK,
-                                              reinterpret_cast<LPARAM>(GetSourcePtr()));
+                                              reinterpret_cast<LPARAM>(pSource));
           else
             CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                   nullptr, DTWAIN_TN_FILESAVEERROR,
-                                              reinterpret_cast<LPARAM>(GetSourcePtr()));
+                                              reinterpret_cast<LPARAM>(pSource));
         }
     }
     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                           nullptr, DTWAIN_TN_EOJENDFILESAVE,
-                                          reinterpret_cast<LPARAM>(GetSourcePtr()));
+                                          reinterpret_cast<LPARAM>(pSource));
 }
 
 int CTL_ImageXferTriplet::GetTotalScannedPages() const
@@ -909,14 +917,16 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
         if ( strTempFile.empty() )
         {
             SendFileAcquireError(pSource, pSession,
-                          DTWAIN_ERR_BAD_FILENAME, DTWAIN_TN_FILESAVECANCELLED );
+                                 DTWAIN_ERR_BAD_FILENAME, DTWAIN_TN_FILESAVECANCELLED,
+                                 StringConversion::Convert_Native_To_Ansi(pSource->GetActualFileName()));
             return 0;
         }
         const filesys::path p{ strTempFile };
         std::ofstream ofs(p.c_str());
         if ( !ofs )
         {
-            SendFileAcquireError(pSource, pSession,DTWAIN_ERR_FILEWRITE, DTWAIN_TN_FILESAVEERROR );
+            SendFileAcquireError(pSource, pSession, DTWAIN_ERR_FILEWRITE, DTWAIN_TN_FILESAVEERROR,
+                                 StringConversion::Convert_Native_To_Ansi(pSource->GetActualFileName()));
             return 0;
         }
         ofs.close();
@@ -961,7 +971,8 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
             // Write single page if just a dib
             if (!CurDib)
             {
-                SendFileAcquireError(pSource, pSession, DTWAIN_ERR_INVALIDBMP, DTWAIN_TN_FILEPAGESAVEERROR);
+                SendFileAcquireError(pSource, pSession, DTWAIN_ERR_INVALIDBMP, DTWAIN_TN_FILEPAGESAVEERROR,
+                                     StringConversion::Convert_Native_To_Ansi(pSource->GetActualFileName()));
                 return DTWAIN_ERR_INVALIDBMP;
             }
 
@@ -981,11 +992,14 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
 
             if ( retval != 0)
             {
-                SendFileAcquireError(pSource, pSession, retval, DTWAIN_TN_INVALIDIMAGEFORMAT );
+                SendFileAcquireError(pSource, pSession, retval, DTWAIN_TN_INVALIDIMAGEFORMAT,
+                                     StringConversion::Convert_Native_To_Ansi(pSource->GetActualFileName()));
                 if ( nMultiStage )
-                    SendFileAcquireError(pSource, pSession, retval, DTWAIN_TN_FILEPAGESAVEERROR);
+                    SendFileAcquireError(pSource, pSession, retval, DTWAIN_TN_FILEPAGESAVEERROR,
+                                         StringConversion::Convert_Native_To_Ansi(pSource->GetActualFileName()));
                 else
-                    SendFileAcquireError(pSource, pSession, retval, DTWAIN_TN_FILESAVEERROR);
+                    SendFileAcquireError(pSource, pSession, retval, DTWAIN_TN_FILESAVEERROR,
+                                         StringConversion::Convert_Native_To_Ansi(pSource->GetActualFileName()));
             }
             else
             {
@@ -994,11 +1008,11 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
                 if ( nMultiStage )
                     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                           nullptr, DTWAIN_TN_FILEPAGESAVEOK,
-                                                          reinterpret_cast<LPARAM>(GetSourcePtr()));
+                                                          reinterpret_cast<LPARAM>(pSource));
                 else
                     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                           nullptr, DTWAIN_TN_FILESAVEOK,
-                                                          reinterpret_cast<LPARAM>(GetSourcePtr()));
+                                                          reinterpret_cast<LPARAM>(pSource));
             }
             // Check if there were any other images
             if (nMultiStage != 0 && !IsScanPending())
@@ -1007,11 +1021,11 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
                 if ( FileWriter.CloseMultiPageDibFile() == 0 )
                     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                           nullptr, DTWAIN_TN_FILESAVEOK,
-                                                          reinterpret_cast<LPARAM>(GetSourcePtr()));
+                                                          reinterpret_cast<LPARAM>(pSource));
                 else
                     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                           nullptr, DTWAIN_TN_FILESAVEERROR,
-                                                          reinterpret_cast<LPARAM>(GetSourcePtr()));
+                                                          reinterpret_cast<LPARAM>(pSource));
                 return retval;
             }
         }
@@ -1271,6 +1285,7 @@ bool CTL_ImageXferTriplet::ResampleBppForPDF( CTL_ITwainSession * /*pSession*/,
                                               CTL_ITwainSource * /*pSource*/,
                                               CTL_TwainDibPtr& CurDib)
 {
+    bool bWriteMisc = (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)?true:false;
     const int depth = CurDib->GetDepth();
 
     if ( depth == 8 || depth == 1 || depth == 24)
@@ -1279,18 +1294,23 @@ bool CTL_ImageXferTriplet::ResampleBppForPDF( CTL_ITwainSession * /*pSession*/,
     bool bOk;
     if ( depth > 8 )
     {
-        CTL_TwainAppMgr::WriteLogInfoA("Resampling bitmap data up to to 24 bpp (PDF processing)...");
+        if ( bWriteMisc )
+            CTL_TwainAppMgr::WriteLogInfoA("Resampling bitmap data up to to 24 bpp (PDF processing)...");
         bOk = CurDib->IncreaseBpp(24);
     }
     else
     {
-        CTL_TwainAppMgr::WriteLogInfoA("Resampling bitmap data up to 8 bpp (PDF processing)...");
+        if (bWriteMisc)
+            CTL_TwainAppMgr::WriteLogInfoA("Resampling bitmap data up to 8 bpp (PDF processing)...");
         bOk = CurDib->IncreaseBpp(8);
     }
-    if ( bOk)
-        CTL_TwainAppMgr::WriteLogInfoA("Resampling ok...");
-    else
-        CTL_TwainAppMgr::WriteLogInfoA("Resampling failed...");
+    if ( bWriteMisc)
+    {
+        if ( bOk)
+            CTL_TwainAppMgr::WriteLogInfoA("Resampling ok...");
+        else
+            CTL_TwainAppMgr::WriteLogInfoA("Resampling failed...");
+    }
     return bOk;
 }
 
@@ -1332,12 +1352,15 @@ CTL_TwainFileFormatEnum CTL_ImageXferTriplet::GetFileTypeFromCompression(int nCo
 }
 
 void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pSession,
-                          LONG Error, LONG ErrorMsg)
+                          LONG Error, LONG ErrorMsg, const std::string& extraInfo)
 {
-    CTL_TwainAppMgr::SetError(Error);
-    char szBuf[255];
-    CTL_TwainAppMgr::GetLastErrorString(szBuf, 254);
-    CTL_TwainAppMgr::WriteLogInfoA(szBuf);
+    CTL_TwainAppMgr::SetError(Error, extraInfo);
+    if ( CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_DTWAINERRORS)
+    {
+        char szBuf[1024];
+        CTL_TwainAppMgr::GetLastErrorString(szBuf, 1024);
+        CTL_TwainAppMgr::WriteLogInfoA(szBuf);
+    }
     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, static_cast<WPARAM>(ErrorMsg), reinterpret_cast<LPARAM>(pSource));
 }
 
@@ -1360,14 +1383,22 @@ void CTL_ImageXferTriplet::ResolveImageResolution(CTL_ITwainSource *pSource,  DT
                               &ResolutionY,
                               nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr))
         {
-            std::string sError = "Image resolution available in state 7.\n";
-            CTL_TwainAppMgr::WriteLogInfoA(sError);
+            bool bWriteMisc = CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
+            std::string sError;
+            if (bWriteMisc)
+            {
+                sError = "Image resolution available in state 7.\n";
+                CTL_TwainAppMgr::WriteLogInfoA(sError);
+            }
             ImageInfo->ResolutionX = static_cast<LONG>(ResolutionX);
             ImageInfo->ResolutionY = static_cast<LONG>(ResolutionY);
-            StringStreamA strm;
-            strm << boost::format("x-Resolution=%1%, y-Resolution=%2%\n") % ImageInfo->ResolutionX % ImageInfo->ResolutionY;
-            sError = strm.str();
-            CTL_TwainAppMgr::WriteLogInfoA(sError);
+            if ( bWriteMisc )
+            {
+                StringStreamA strm;
+                strm << boost::format("x-Resolution=%1%, y-Resolution=%2%\n") % ImageInfo->ResolutionX % ImageInfo->ResolutionY;
+                sError = strm.str();
+                CTL_TwainAppMgr::WriteLogInfoA(sError);
+            }
             bGotResolution = true;
         }
         else
@@ -1378,38 +1409,53 @@ void CTL_ImageXferTriplet::ResolveImageResolution(CTL_ITwainSource *pSource,  DT
     if ( !bGotResolution && !bGetResFromDriver )
     {
         // Get the image info from when we started
-        std::string sError = "Getting image resolution from state 6.\n";
-        CTL_TwainAppMgr::WriteLogInfoA(sError);
+        bool bWriteMisc = CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
+        if ( bWriteMisc )
+        {
+            CTL_TwainAppMgr::WriteLogInfoA("Getting image resolution from state 6.\n");
+        }
         TW_IMAGEINFO II;
         pSource->GetImageInfo( &II );
 
-        ImageInfo->ResolutionX = static_cast<LONG>(CTL_CapabilityTriplet::Twain32ToFloat(II.XResolution));
-        ImageInfo->ResolutionY = static_cast<LONG>(CTL_CapabilityTriplet::Twain32ToFloat(II.YResolution));
-        StringStreamA strm;
-        strm << boost::format("x-Resolution=%1%, y-Resolution=%2%\n") % ImageInfo->ResolutionX % ImageInfo->ResolutionY;
-        CTL_TwainAppMgr::WriteLogInfoA(strm.str());
+        ImageInfo->ResolutionX = static_cast<LONG>(Fix32ToFloat(II.XResolution));
+        ImageInfo->ResolutionY = static_cast<LONG>(Fix32ToFloat(II.YResolution));
+        if ( bWriteMisc )
+        {
+            StringStreamA strm;
+            strm << boost::format("x-Resolution=%1%, y-Resolution=%2%\n") % ImageInfo->ResolutionX % ImageInfo->ResolutionY;
+            CTL_TwainAppMgr::WriteLogInfoA(strm.str());
+        }
         bGotResolution = true;
     }
 
     if ( !bGotResolution )
     {
+        bool bWriteMisc = CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
         // Try TWAIN driver setting
         if ( DTWAIN_GetResolution(pSource, &Resolution) )
         {
-            std::string sError = "Image resolution obtained from TWAIN driver\n";
-            CTL_TwainAppMgr::WriteLogInfoA(sError);
-
+            if ( bWriteMisc )
+            {
+                std::string sError = "Image resolution obtained from TWAIN driver\n";
+                CTL_TwainAppMgr::WriteLogInfoA(sError);
+            }
             ImageInfo->ResolutionX = static_cast<LONG>(Resolution);
             ImageInfo->ResolutionY = static_cast<LONG>(Resolution);
-            StringStreamA strm;
-            strm << boost::format("x-Resolution=%1%, y-Resolution=%2%\n") % ImageInfo->ResolutionX % ImageInfo->ResolutionY;
-            CTL_TwainAppMgr::WriteLogInfoA(strm.str());
+            if ( bWriteMisc )
+            {
+                StringStreamA strm;
+                strm << boost::format("x-Resolution=%1%, y-Resolution=%2%\n") % ImageInfo->ResolutionX % ImageInfo->ResolutionY;
+                CTL_TwainAppMgr::WriteLogInfoA(strm.str());
+            }
         }
         else
         {
-            // Tried everything, just set the resolution to the default resolution
-            std::string sError = "Could not obtain resolution in state 6/7 or through TWAIN.  Image resolution defaulted to 100 DPI\n";
-            CTL_TwainAppMgr::WriteLogInfoA(sError);
+            if ( bWriteMisc )
+            {
+                // Tried everything, just set the resolution to the default resolution
+                std::string sError = "Could not obtain resolution in state 6/7 or through TWAIN.  Image resolution defaulted to 100 DPI\n";
+                CTL_TwainAppMgr::WriteLogInfoA(sError);
+            }
             ImageInfo->ResolutionX = 100;
             ImageInfo->ResolutionY = 100;
         }
@@ -1442,7 +1488,7 @@ bool CTL_ImageXferTriplet::ModifyAcquiredDib()
         {
             // reset the dib handle if adjusted
             pSource->SetDibHandle(m_hDataHandle = CurDib->GetHandle(), nLastDib);
-            if (CTL_TwainDLLHandle::s_lErrorFilterFlags)
+            if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
             {
                 std::string sOut = msg[i];
                 sOut += CTL_ErrorStructDecoder::DecodeBitmap(m_hDataHandle);
@@ -1490,7 +1536,7 @@ bool CTL_ImageXferTriplet::ResampleAcquiredDib()
         {
             // reset the dib handle if resampled
             pSource->SetDibHandle(m_hDataHandle = CurDib->GetHandle(), nLastDib);
-            if (CTL_TwainDLLHandle::s_lErrorFilterFlags)
+            if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
             {
                 std::string sOut = msg[i];
                 sOut += CTL_ErrorStructDecoder::DecodeBitmap(m_hDataHandle);
@@ -1514,7 +1560,7 @@ bool CTL_ImageXferTriplet::QueryAndRemoveDib(CTL_TwainAcquireEnum acquireType, s
     if (pSource->GetAcquireType() == acquireType)
     {
         bKeepPage = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_QUERYPAGEDISCARD, reinterpret_cast<LPARAM>(pSource)) ? true : false;
-        // Keep the page
+        // Do not keep the page
         if (!bKeepPage)
         {
             // throw this dib away (remove from the dib array)
@@ -1522,7 +1568,7 @@ bool CTL_ImageXferTriplet::QueryAndRemoveDib(CTL_TwainAcquireEnum acquireType, s
             pArray->RemoveDib(nWhich);
             CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_PAGEDISCARDED, reinterpret_cast<LPARAM>(pSource));
         }
-        }
+    }
     return bKeepPage;
 }
 
@@ -1540,11 +1586,11 @@ bool IsState7InfoNeeded(CTL_ITwainSource *pSource)
 {
     bool bRetval = false;
     DTWAIN_ARRAY A = nullptr;
-    DTWAINArrayLL_RAII raii(A);
     DTWAINScopedLogControllerExclude scopedLog(DTWAIN_LOG_ERRORMSGBOX);
     if ( DTWAIN_GetCapValues(pSource, DTWAIN_CV_ICAPUNDEFINEDIMAGESIZE, DTWAIN_CAPGETCURRENT, &A))
     {
-        const auto& vValues = EnumeratorVector<int>(A);
+        DTWAINArrayLL_RAII raii(A);
+        const auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(A);
         if ( !vValues.empty())
             bRetval = vValues[0] > 0;
     }

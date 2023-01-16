@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include "ctltr016.h"
 
 #include "ctliface.h"
+#include "twainfix32.h"
 
 using namespace dynarithmic;
 
@@ -98,8 +99,7 @@ void CTL_CapabilitySetTripletBase::EncodeOneValue(pTW_ONEVALUE pVal, void *pData
         case TWTY_FIX32:
         {
             const float fnum = static_cast<float>(*static_cast<double*>(pData));
-            TW_FIX32 ffix32;
-            FloatToTwain32( fnum, ffix32 );
+            TW_FIX32 ffix32 = FloatToFix32( fnum );
             memcpy(&pVal->Item, &ffix32, sizeof(TW_FIX32));
         }
         break;
@@ -136,8 +136,7 @@ void CTL_CapabilitySetTripletBase::EncodeEnumValue(pTW_ENUMERATION pArray,
     {
         // floats are stored as doubles in CTL
         const float fnum = static_cast<float>(*static_cast<double*>(pData));
-        TW_FIX32 ffix32;
-        FloatToTwain32( fnum, ffix32 );
+        TW_FIX32 ffix32 = FloatToFix32( fnum );
         memcpy(&pArray->ItemList[valuePos], &ffix32, sizeof(TW_FIX32));
     }
     else
@@ -164,16 +163,15 @@ void CTL_CapabilitySetTripletBase::EncodeRange(pTW_RANGE pVal,
     if ( pVal->ItemType == TWTY_FIX32 )
     {
         auto fnum = static_cast<float>(*static_cast<double*>(pData1));   // Min Value
-        TW_FIX32 ffix32;
-        FloatToTwain32( fnum, ffix32 );
+        TW_FIX32 ffix32 = FloatToFix32( fnum );
         memcpy(&pVal->MinValue, &ffix32, sizeof(TW_FIX32));
 
         fnum = static_cast<float>(*static_cast<double*>(pData2));
-        FloatToTwain32( fnum, ffix32 );
+        ffix32 = FloatToFix32( fnum );
         memcpy(&pVal->MaxValue, &ffix32, sizeof(TW_FIX32));
 
         fnum = static_cast<float>(*static_cast<double*>(pData3));
-        FloatToTwain32( fnum, ffix32 );
+        ffix32 = FloatToFix32( fnum );
         memcpy(&pVal->StepSize, &ffix32, sizeof(TW_FIX32));
     }
     else
@@ -196,8 +194,7 @@ void CTL_CapabilitySetTripletBase::EncodeArrayValue(pTW_ARRAY pArray,
     {
         // floats are stored as doubles in CTL
         const float fnum = static_cast<float>(*static_cast<double*>(pData));
-        TW_FIX32 ffix32;
-        FloatToTwain32( fnum, ffix32 );
+        TW_FIX32 ffix32 =FloatToFix32( fnum );
         memcpy(&pArray->ItemList[valuePos], &ffix32, sizeof(TW_FIX32));
     }
     else

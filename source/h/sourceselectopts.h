@@ -89,8 +89,8 @@ namespace dynarithmic
     }
 
     DTWAIN_SOURCE     DTWAIN_LLSelectSource(const SourceSelectionOptions& opts);
-    DTWAIN_SOURCE     DTWAIN_LLSelectSourceByName(const SourceSelectionOptions& opts); //LPCTSTR lpszName);
+    DTWAIN_SOURCE     DTWAIN_LLSelectSourceByName(const SourceSelectionOptions& opts); 
     DTWAIN_SOURCE     DTWAIN_LLSelectDefaultSource(const SourceSelectionOptions& opts);
-    DTWAIN_SOURCE     DTWAIN_LLSelectSource2(const SourceSelectionOptions& opts); //HWND hWndParent, LPCTSTR szTitle, LONG xPos, LONG yPos, LONG nOptions);
+    DTWAIN_SOURCE     DTWAIN_LLSelectSource2(const SourceSelectionOptions& opts); 
 }
 #endif

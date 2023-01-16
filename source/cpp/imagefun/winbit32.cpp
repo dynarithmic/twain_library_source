@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -824,8 +824,8 @@ HBITMAP CDibInterface::DIBToBitmap(HANDLE hDIB, HPALETTE hPal)
 
     if (!hDC)
         return nullptr;
-
-    DTWAINDeviceContextRelease_RAII dcHandle({nullptr, hDC });
+    auto pr = std::make_pair(static_cast<HWND>(nullptr), hDC);
+    DTWAINDeviceContextRelease_RAII dcHandle(&pr);
 
     if (hPal)
         hOldPal = SelectPalette(hDC, hPal, FALSE);

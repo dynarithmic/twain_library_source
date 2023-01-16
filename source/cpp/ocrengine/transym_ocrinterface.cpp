@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -124,7 +124,7 @@ TOCRSDK::~TOCRSDK()
 
 #define INIT_TOCR_ERROR_CODE(x) m_ErrorCode[x] = #x;
 ///////////////////////////////////////////////////////////////////
-TransymOCR::TransymOCR()
+TransymOCR::TransymOCR() : m_JobHandle{}, m_JobInfo{}, m_nJobRetrieveType{}, m_JobResults{}
 {
     INIT_TOCR_ERROR_CODE(TOCRERR_ILLEGALJOBNO)
     INIT_TOCR_ERROR_CODE(TOCRERR_FAILLOCKDB)
@@ -616,8 +616,7 @@ bool TransymOCR::SetOptions(OCRJobOptions& options)
 
 LONG TransymOCR::StartOCR(CTL_StringType filename)
 {
-    TOCRJOBINFO JobInfo;
-    memset(&JobInfo, 0, sizeof JobInfo);
+    TOCRJOBINFO JobInfo {};
     JobInfo.StructId = 0;
     JobInfo.PageNo = GetCurrentPageNumber();  // This will change
     JobInfo.JobType = TOCRJOBTYPE_TIFFFILE;
@@ -699,10 +698,9 @@ LONG TransymOCR::StartOCR(CTL_StringType filename)
             *boolFuncs[i] = !static_cast<VBBOOL>(vals[0]);
     }
 
-    char InputFile[MAX_PATH] = {};    // Input file name
     const auto minToCopy = (std::min)(static_cast<int>(filename.size()), MAX_PATH);
-    std::copy(filename.begin(), filename.begin() + minToCopy, InputFile);
-    JobInfo.InputFile = InputFile;
+    auto sInputFile = StringConversion::Convert_Native_To_Ansi(filename);
+    JobInfo.InputFile = &sInputFile[0];
 
     // Now set the options
     OCRJobOptions ocrOptions;
@@ -727,7 +725,7 @@ LONG TransymOCR::StartOCR(CTL_StringType filename)
 
 LONG TransymOCR::ProcessTOCRJob()
 {
-    LONG ResultsInf;
+    LONG ResultsInf = 0;
     const bool bSaveOCRCharInfo = GetBaseOption(OCROPTION_GETINFO);
 
     OCRCharacterInfo cInfo(this, GetCurrentPageNumber());
@@ -970,7 +968,6 @@ bool TransymOCR::ProcessGetCapValues(LONG nOCRCap, LONG CapType, OCRStringArrayV
 bool TransymOCR::ProcessSetCapValues(LONG nOCRCap, LONG CapType, const OCRLongArrayValues& vals)
 {
     OCRCapInfo& CapInfo = m_AllCapValues[nOCRCap];
-    bool bRetval = true;
     switch(nOCRCap)
     {
         case DTWAIN_OCRCV_IMAGEFILEFORMAT:

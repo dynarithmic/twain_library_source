@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLEnum_h_
-#define CTLEnum_h_
+#ifndef CTLENUM_H
+#define CTLENUM_H
 #include "dtwain_filetypes.h"
 #include "dtwaindefs.h"
 #include "twain.h"
@@ -264,19 +264,14 @@ namespace dynarithmic
     enum CTL_TwainAcquireEnum {     TWAINAcquireType_Native = TWSX_NATIVE,
                                     TWAINAcquireType_File   = TWSX_FILE,
                                     TWAINAcquireType_Buffer   = TWSX_MEMORY,
+                                    TWAINAcquireType_MemFile = TWSX_MEMFILE,
                                     TWAINAcquireType_AudioNative = 0xFA,
                                     TWAINAcquireType_AudioFile = 0xFB,
+                                    TWAINAcquireType_FileUsingBuffered = 0xFC,
                                     TWAINAcquireType_FileUsingNative = 0xFD,
-                                    TWAINAcquireType_Clipboard  = 0xFE,
+                                    TWAINAcquireType_Clipboard = 0xFE,
                                     TWAINAcquireType_Invalid
                             };
-    /*        enum { DibFormat=1,
-                   BmpFormat=2,
-                   JpegFormat=3,
-                   PcxFormat=4,
-                   TgaFormat=5,
-                   TiffFormatLZW=6 };
-      */
 
     enum CTL_TwainFileFormatEnum { TWAINFileFormat_Invalid = -1,
                                    TWAINFileFormat_TWAINBMP                  = DTWAIN_FF_BMP,

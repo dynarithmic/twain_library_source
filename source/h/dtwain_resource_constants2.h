@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -199,6 +199,8 @@
 #define DTWAIN_ERR_INVALIDICONFORMAT_       2074
 #define DTWAIN_ERR_TWAIN32DSMNOTFOUND_      2075
 #define DTWAIN_ERR_TWAINOPENSOURCEDSMNOTFOUND_ 2076
+#define DTWAIN_ERR_INVALID_DIRECTORY_ 2077
+#define DTWAIN_ERR_CREATE_DIRECTORY_ 2078
 
 #define DTWAIN_ERR_TS_FIRST_                2080
 #define DTWAIN_ERR_TS_NOFILENAME_           2081
@@ -220,6 +222,9 @@
 #define DTWAIN_ERR_OCR_INVALIDPIXELTYPE_    2104
 #define DTWAIN_ERR_OCR_INVALIDBITDEPTH_     2105
 #define DTWAIN_ERR_OCR_RECOGNITIONERROR_    2106
+
+#define DTWAIN_ERR_SOURCE_COULD_NOT_OPEN_   2500
+#define DTWAIN_ERR_SOURCE_COULD_NOT_CLOSE_  2501
 
 // PDF Font text
 #define DTWAIN_FONT_START_                 5000
@@ -338,6 +343,12 @@
 #define IDS_DTWAIN_APPTITLE       9700
 
 #define IDS_TWCC_EXCEPTION      9999
+#define IDS_DTWAIN_USERMSG_INDICATOR            10000
+#define IDS_DTWAIN_ERROR_CLOSING_DSM            10001 
+#define IDS_DTWAIN_ERROR_CLOSING_TWAIN_SESSION  10002
+#define IDS_DTWAIN_ERROR_CLOSING_DTWAIN_MANAGER 10003
+#define IDS_CLOSING_DTWAIN                      10004
+#define IDS_DTWAIN_ERROR_REMOVE_WINDOW          10005
 //#define VS_VERSION_INFO     9000
 #define IDS_DTWAINFUNCSTART     9001
 

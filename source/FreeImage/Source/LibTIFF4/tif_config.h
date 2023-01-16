@@ -11,6 +11,9 @@
    machine */
 #define HAVE_IEEEFP 1
 
+/* Define to 1 if you have the `jbg_newlen' function. */
+#define HAVE_JBG_NEWLEN 1
+
 /* Define to 1 if you have the <string.h> header file. */
 #define HAVE_STRING_H 1
 
@@ -23,73 +26,107 @@
 /* Define to 1 if you have the <search.h> header file. */
 #define HAVE_SEARCH_H 1
 
-/* Define to 1 if you have the `snprintf' function. */
-#define HAVE_SNPRINTF 1
-
 /* Define to 1 if you have the `setmode' function. */
 #define HAVE_SETMODE 1
 
-/* Define to 1 if you have the `memmove' function. */
-#define HAVE_MEMMOVE 1
+/* Define to 1 if you have the declaration of `optarg', and to 0 if you don't. */
+#define HAVE_DECL_OPTARG 0
 
-/* Define to 1 if you have the `memset' function. */
-#define HAVE_MEMSET 1
+/* The size of a `int', as computed by sizeof. */
+#define SIZEOF_INT 4
 
-/* Signed 32-bit type formatter */
-#define TIFF_INT32_FORMAT "%d"
-
-/* Unsigned 32-bit type formatter */
-#define TIFF_UINT32_FORMAT "%u"
+/* The size of a `long', as computed by sizeof. */
+#define SIZEOF_LONG 4
 
 /* Signed 64-bit type formatter */
-#define TIFF_INT64_FORMAT "%ld"
+#define TIFF_INT64_FORMAT "%I64d"
+
+/* Signed 64-bit type */
+#define TIFF_INT64_T __int64
 
 /* Unsigned 64-bit type formatter */
-#define TIFF_UINT64_FORMAT "%lu"
+#define TIFF_UINT64_FORMAT "%I64u"
 
-/* Pointer difference type formatter */
-#define TIFF_PTRDIFF_FORMAT "%ld"
+/* Unsigned 64-bit type */
+#define TIFF_UINT64_T unsigned __int64
+
+#if _WIN64
+/*
+  Windows 64-bit build
+*/
+
+/* Pointer difference type */
+#  define TIFF_PTRDIFF_T ptrdiff_t
+
+/* The size of `size_t', as computed by sizeof. */
+#  define SIZEOF_SIZE_T 8
+
+/* Size type formatter */
+#  define TIFF_SIZE_FORMAT TIFF_INT64_FORMAT
+
+/* Unsigned size type */
+#  define TIFF_SIZE_T TIFF_UINT64_T
 
 /* Signed size type formatter */
-#define TIFF_SSIZE_FORMAT "%ld"
+#  define TIFF_SSIZE_FORMAT TIFF_INT64_FORMAT
 
-/* 
------------------------------------------------------------------------
-Byte order
------------------------------------------------------------------------
+/* Signed size type */
+#  define TIFF_SSIZE_T __int64
+
+#else
+/*
+  Windows 32-bit build
 */
+
+/* Pointer difference type */
+#  define TIFF_PTRDIFF_T ptrdiff_t
+
+/* The size of `size_t', as computed by sizeof. */
+#  define SIZEOF_SIZE_T 4
+
+/* Size type formatter */
+#  define TIFF_SIZE_FORMAT "%u"
+
+/* Size type formatter */
+#  define TIFF_SIZE_FORMAT "%u"
+
+/* Unsigned size type */
+#  define TIFF_SIZE_T unsigned int
+
+/* Signed size type formatter */
+#  define TIFF_SSIZE_FORMAT "%d"
+
+/* Signed size type */
+#  define TIFF_SSIZE_T signed int
+
+#endif
+
+/* Set the native cpu bit order */
+#define HOST_FILLORDER FILLORDER_LSB2MSB
 
 /*
-Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
-significant byte first (like Motorola and SPARC, unlike Intel).
-Some versions of gcc may have BYTE_ORDER or __BYTE_ORDER defined
-If your big endian system isn't being detected, add an OS specific check
+  Please see associated settings in "nmake.opt" which configure porting
+  settings. It should not be necessary to edit the following pre-processor
+  logic.
 */
-#if (defined(BYTE_ORDER) && BYTE_ORDER==BIG_ENDIAN) || \
-	(defined(__BYTE_ORDER) && __BYTE_ORDER==__BIG_ENDIAN) || \
-	defined(__BIG_ENDIAN__)
-/* Set the native cpu bit order (FILLORDER_LSB2MSB or FILLORDER_MSB2LSB) */
-#define HOST_FILLORDER FILLORDER_MSB2LSB
-/* Native cpu byte order: 1 if big-endian (Motorola) or 0 if little-endian (Intel) */
-#define WORDS_BIGENDIAN 1
-/* Native cpu byte order: 1 if big-endian (Motorola) or 0 if little-endian (Intel) */
-#define HOST_BIGENDIAN 1
-#else
-/* Set the native cpu bit order (FILLORDER_LSB2MSB or FILLORDER_MSB2LSB) */
-#define HOST_FILLORDER FILLORDER_LSB2MSB
-/* Native cpu byte order: 1 if big-endian (Motorola) or 0 if little-endian (Intel) */
-#undef WORDS_BIGENDIAN
-/* Native cpu byte order: 1 if big-endian (Motorola) or 0 if little-endian (Intel) */
-#undef HOST_BIGENDIAN
-#endif // BYTE_ORDER
-
-#ifdef _WIN32
+#if defined(_MSC_VER)
 /* Visual Studio 2015 / VC 14 / MSVC 19.00 finally has snprintf() */
-#if defined(_MSC_VER) && (_MSC_VER < 1900)
+#  if _MSC_VER < 1900 /* Visual C++ 2015 */
 #define snprintf _snprintf
-#endif // _MSC_VER
-#define lfind _lfind
-#endif // _WIN32
+#else
+#define HAVE_SNPRINTF 1
+#  endif
+#  define HAVE_STRTOL 1
+#  define HAVE_STRTOUL 1
+#  if _MSC_VER >= 1900 /* Visual Studio 2015 added strtoll/strtoull */
+#    define HAVE_STRTOLL 1
+#    define HAVE_STRTOULL 1
+#  endif
+#endif
+
+/* Define to 1 if your processor stores words with the most significant byte
+   first (like Motorola and SPARC, unlike Intel and VAX). */
+/* #undef WORDS_BIGENDIAN */
 
 /* Define to `__inline__' or `__inline' if that's what the C compiler
    calls it, or to nothing if 'inline' is not supported under any name.  */
@@ -99,5 +136,15 @@ If your big endian system isn't being detected, add an OS specific check
 # endif
 #endif
 
+#define lfind _lfind
 
-#endif // TIF_CONFIG_H
+#pragma warning(disable : 4996) /* function deprecation warnings */
+
+#endif /* _TIF_CONFIG_H_ */
+/*
+ * Local Variables:
+ * mode: c
+ * c-basic-offset: 8
+ * fill-column: 78
+ * End:
+ */

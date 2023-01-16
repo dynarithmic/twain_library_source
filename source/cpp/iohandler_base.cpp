@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include "ctldib.h"
 #include "ctliface.h"
 #include "ctltwmgr.h"
+#include "ctlfileutils.h"
 
 using namespace dynarithmic;
 
@@ -67,7 +68,7 @@ bool CTL_ImageIOHandler::IsValidBitDepth(LONG FileType, LONG bitDepth)
 }
 
 int CTL_ImageIOHandler::SaveToFile(HANDLE hDib, LPCTSTR szFile, FREE_IMAGE_FORMAT fmt, int flags,
-                                   UINT unitOfMeasure, const std::pair<LONG, LONG>& res,
+                                   UINT unitOfMeasure, std::pair<LONG, LONG> res,
                                     const std::tuple<double, double, double, double>& multiplier_pr) const
 {
     #ifdef _WIN32

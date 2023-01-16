@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 
 #include "cppfunc.h"
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
+#include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctltr025.h"
 #ifdef _MSC_VER
@@ -92,9 +92,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfo(DTWAIN_SOURCE Source,
         // Get the image information
     TW_IMAGEINFO *pInfo = II.GetImageInfoBuffer();
     if (XResolution)
-        *XResolution = static_cast<DTWAIN_FLOAT>(CTL_CapabilityTriplet::Twain32ToFloat(pInfo->XResolution));
+        *XResolution = static_cast<DTWAIN_FLOAT>(Fix32ToFloat(pInfo->XResolution));
     if (YResolution)
-        *YResolution = static_cast<DTWAIN_FLOAT>(CTL_CapabilityTriplet::Twain32ToFloat(pInfo->YResolution));
+        *YResolution = static_cast<DTWAIN_FLOAT>(Fix32ToFloat(pInfo->YResolution));
     if (Width)
         *Width = pInfo->ImageWidth;
     if (Length)
@@ -108,7 +108,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfo(DTWAIN_SOURCE Source,
     if (BitsPerSample)
     {
         const DTWAIN_ARRAY Array = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 8);
-        auto& vValues = EnumeratorVector<LONG>(Array);
+        auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(Array);
         TW_INT16* pStart = &pInfo->BitsPerSample[0];
         TW_INT16* pEnd = &pInfo->BitsPerSample[8];
         std::copy(pStart, pEnd, vValues.begin());

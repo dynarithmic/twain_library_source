@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLTR010_H_
-#define CTLTR010_H_
+#ifndef CTLTR010_H
+#define CTLTR010_H
 
 #include "ctltrp.h"
 #include "ctltwses.h"
@@ -41,8 +41,6 @@ namespace dynarithmic
             bool            IsFindDefaultItemType() const { return m_bGetDefaultType; }
             void            SetFindDefaultItemType(bool bSet) { m_bGetDefaultType = bSet; }
             static TW_UINT16 GetItemSize( TW_UINT16 nTwainItem );
-            static float    Twain32ToFloat( TW_FIX32 Fix32 );
-            static void     FloatToTwain32( float fnum, TW_FIX32 & Fix32 );
             bool            IsCapabilitySupported();
             virtual bool    IsSupported();
             TW_UINT16       GetItemType() const { return m_nItemType; }

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ namespace dynarithmic
     typedef std::vector< std::string > StringVector;
 
     class PdfDocument;
+    using PdfDocumentPtr = std::shared_ptr<PdfDocument>;
 
     class PDFObject
     {
@@ -380,7 +381,7 @@ namespace dynarithmic
 
             void SetImageType(int nImageType) { m_nImageType = nImageType; }
             int  GetImageType() const { return m_nImageType; }
-            void SetThumbnailFile(CTL_StringType s) { m_sThumbnailFileName = s; }
+            void SetThumbnailFile(CTL_StringType s) { m_sThumbnailFileName = std::move(s); }
             void SetDPI(unsigned long dpi) { m_dpi = dpi; }
             void SetASCIICompression(bool bSet) { m_bASCIICompression = bSet; }
             bool IsASCIICompressed() { return m_bASCIICompression; }
@@ -483,7 +484,6 @@ namespace dynarithmic
             FontNameToFontInfoMap m_mapFontNames;
             FontNumberToFontInfoMap m_mapFontNumbers;
             int         CurFontRefNum;
-
     };
 }
 #endif

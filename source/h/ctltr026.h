@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLTR026_H_
-#define CTLTR026_H_
+#ifndef CTLTR026_H
+#define CTLTR026_H
 
 #include "ctltr024.h"
 namespace dynarithmic
@@ -50,7 +50,7 @@ namespace dynarithmic
 
 
         protected:
-            bool            AbortTransfer(bool bForceClose = false);
+            bool            AbortTransfer(bool bForceClose = false, int error = 0);
             std::string     GetPageFileName(const std::string& strBase, int nCurImage ) const;
             bool            IsPendingXfersDone() const { return m_bPendingXfersDone; }
             void            SetPendingXfersDone(bool bSet) { m_bPendingXfersDone = bSet; }

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLTwSrc_h_
-#define CTLTwSrc_h_
+#ifndef CTLTWSRC_H
+#define CTLTWSRC_H
 
 #include <unordered_map>
 #include <vector>
@@ -66,7 +66,7 @@ namespace dynarithmic
     {
         CTL_StringType sFileName;
         CTL_StringType sRealFileName;
-        unsigned long nBytes;
+        uint64_t nBytes;
         bool bIsJobControlPage;
         sDuplexFileData() : nBytes(0), bIsJobControlPage(false) {}
     };
@@ -156,7 +156,7 @@ namespace dynarithmic
         void         SetMaxAcquireCount(int nAcquire) { m_nAcquireCount = nAcquire; }
         CTL_TwainAcquireEnum  GetAcquireType() const { return m_AcquireType; }
         CTL_StringType GetAcquireFile() const { return m_strAcquireFile; }
-        void         SetAcquireFile(CTL_StringType szFile) { m_strAcquireFile = szFile; }
+        void         SetAcquireFile(CTL_StringType szFile) { m_strAcquireFile = std::move(szFile); }
         long         GetAcquireFileFlags() const { return m_lFileFlags; }
         void         SetAcquireFileFlags(long lFileFlags) { m_lFileFlags = lFileFlags; }
         static bool  IsFileTypeMultiPage(CTL_TwainFileFormatEnum FileType);
@@ -308,13 +308,13 @@ namespace dynarithmic
         void         SetImagesStored(bool bSet=true) { m_bImagesStored = bSet; }
         bool         ImagesStored() const { return m_bImagesStored; }
         CTL_StringType GetLastAcquiredFileName() const { return m_strLastAcquiredFile; }
-        void         SetLastAcquiredFileName(CTL_StringType sName) { m_strLastAcquiredFile = sName; }
+        void         SetLastAcquiredFileName(CTL_StringType sName) { m_strLastAcquiredFile = std::move(sName); }
         TW_FILESYSTEM*  GetFileSystem() { return &m_FileSystem; }
 
         // Extended image info functions
         bool         InitExtImageInfo(int nNum);
         bool         GetExtImageInfo(bool bExecute);
-        bool         AddExtImageInfo(const TW_INFO &Info) const;
+        bool         AddExtImageInfo(TW_INFO Info) const;
         bool         EnumExtImageInfo(CTL_IntArray& r);
         TW_INFO      GetExtImageInfoItem(int nItem, int nSearch) const;
         bool         GetExtImageInfoData(int nWhichItem, int nSearch, int nWhichValue, LPVOID Data, size_t* pNumChars=nullptr) const;
@@ -337,6 +337,8 @@ namespace dynarithmic
         LONG         GetFileAutoIncrementFlags() const { return m_nAutoIncrementFlags; }
         bool         ResetFileAutoIncrementData();
         void         SetFileAutoIncrementBase( LONG nInitial ) {m_nFileNameBaseNum = nInitial;}
+        bool         IsFileAutoCreateDirectory() const { return m_ImageInfoEx.IsCreateDirectory; }
+        void         SetFileAutoCreateDirectory(bool bAutoCreate) { m_ImageInfoEx.IsCreateDirectory = bAutoCreate; }
 
         // Added for manual duplex mode processing
         bool         SetManualDuplexMode(LONG nFlags, bool bSet);
@@ -358,7 +360,7 @@ namespace dynarithmic
                                                                 !IsMultiPageModeSaveAtEnd(); }
         bool         IsMultiPageModeSaveAtEnd() const { return m_nMultiPageScanMode == DTWAIN_FILESAVE_ENDACQUIRE; }
 
-        void         AddDuplexFileData(CTL_StringType fName, unsigned long nBytes, int nWhich,
+        void         AddDuplexFileData(CTL_StringType fName, uint64_t nBytes, int nWhich,
                                        CTL_StringType RealName = {}, bool bIsJobControl=false);
         sDuplexFileData GetDuplexFileData( int nPage, int nWhich ) const;
         unsigned long GetNumDuplexFiles(int nWhich) const;
@@ -395,10 +397,13 @@ namespace dynarithmic
         void         ClearPDFText();
         bool         IsTwainVersion2() const { return m_bDSMVersion2; }
         void         SetTwainVersion2(bool bSet = true) { m_bDSMVersion2 = bSet;  }
-        void         SetActualFileName(CTL_StringType sName) { m_ActualFileName = sName;  }
+        void         SetActualFileName(CTL_StringType sName) { m_ActualFileName = std::move(sName);  }
         CTL_StringType GetActualFileName() const { return m_ActualFileName;  }
         void         SetOpenFlag(bool bOpened) { m_bIsOpened = bOpened; }
         bool         CloseSource(bool bForce);
+        const std::vector<int>& GetSupportedTransferMechanisms() const { return m_aTransferMechanisms; }
+        void         SetSupportedTransferMechanisms(const std::vector<int>& aTransferMechanisms)
+                            { m_aTransferMechanisms = aTransferMechanisms; }
 
         // Only public member
         void *      m_pUserPtr;
@@ -521,6 +526,7 @@ namespace dynarithmic
         bool            m_bProcessingPixelInfo;
         bool            m_bSkipImageInfoErrors;
         LONG            m_nForcedBpp;
+        std::vector<int> m_aTransferMechanisms;
 
         struct tagCapCachInfo {
             TW_UINT16 nCap;

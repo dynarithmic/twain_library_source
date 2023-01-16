@@ -1,9 +1,24 @@
 DTWAIN Version changes
 
-5.2.0.10		  
+5.3.0.0		  
 
-- Fixed issue when acquiring a file using memory/buffered transfer, where an invalid bitmap was sent to the
-  application to query to see if the bitmap should be discarded.
+- Initial support for latest TWAIN 2.5 capabilities (mostly Image Addressing).
+
+- Support for Memory File Transfers (see the new DTWAIN_USEMEMFILE file flag for DTWAIN_AcquireFile).
+
+- Internal changes to DTWAIN Array handling.
+
+- Building the DTWAIN source code now requires Visual Studio 2019 and above.
+
+- Updated LibPng to version 1.6.38
+
+- Updated LibTiff to version 4.4
+
+- Added demo projects.
+
+- Initial release of the C++ object-oriented wrapper of DTWAIN.
+
+- Numerous bug fixes
 
 
 5.2.0.9		  

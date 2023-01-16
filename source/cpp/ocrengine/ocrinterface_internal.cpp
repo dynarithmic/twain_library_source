@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -195,7 +195,7 @@ bool OCREngine::SetAllFileTypes(const FileTypeArray& allTypes)
 OCREngine::FileTypeArray OCREngine::GetAllFileTypes() const { return m_fileTypes; }
 void OCREngine::AddCapValue(LONG nCap, const OCRCapInfo& capInfo)
 {
-    m_AllCapValues.insert(std::make_pair(nCap, capInfo));
+    m_AllCapValues.insert({ nCap, capInfo });
 }
 
 LONG OCREngine::GetCapDataType(LONG nOCRCap) const

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLTWMGR_H_
-#define CTLTWMGR_H_
+#ifndef CTLTWMGR_H
+#define CTLTWMGR_H
 #ifdef _MSC_VER
 #pragma warning( disable : 4786)
 #pragma warning( disable : 4996)
@@ -134,6 +134,7 @@ namespace dynarithmic
             static bool OpenSource( CTL_ITwainSession* pSession, const CTL_ITwainSource* pSource=nullptr);
             static bool CloseSource(CTL_ITwainSession* pSession, const CTL_ITwainSource* pSource=nullptr, bool bForce=true);
             static CTL_TwainAcquireEnum GetCompatibleFileTransferType( const CTL_ITwainSource *pSource );
+            static bool IsMemFileTransferSupported(const CTL_ITwainSource *pSource);
             static TW_UINT16 GetConditionCode( CTL_ITwainSession *pSession, CTL_ITwainSource *pSource=nullptr, TW_UINT16 rc=1);
 
             // Get the current session in use
@@ -158,7 +159,7 @@ namespace dynarithmic
             static UINT GetCapabilityOperations(const CTL_ITwainSource *pSource, // Uses the MSG_QUERYSUPPORT triplet
                                                 int nCap);
 
-            static void EnumTransferMechanisms( const CTL_ITwainSource *pSource, CTL_IntArray & rArray );
+            static CTL_IntArray EnumTransferMechanisms( const CTL_ITwainSource *pSource );
             static void EnumTwainFileFormats( const CTL_ITwainSource *pSource, CTL_IntArray & rArray );
             static bool IsSupportedFileFormat( const CTL_ITwainSource* pSource, int nFileFormat );
             static bool GetFileTransferDefaults( CTL_ITwainSource *pSource, int &nFileType);
@@ -186,6 +187,7 @@ namespace dynarithmic
             static bool GetImageInfo(CTL_ITwainSource *pSource, CTL_ImageInfoTriplet *pTrip=nullptr);
             static int  TransferImage(const CTL_ITwainSource *pSource, int nImageNum=0);
             static bool SetFeederEnableMode( CTL_ITwainSource *pSource, bool bMode=true);
+            static void NotifyFeederStatus();
             static bool ShowProgressIndicator(const CTL_ITwainSource* pSource, bool bShow = true);
             static bool IsProgressIndicatorOn(const CTL_ITwainSource* pSource);
             static bool IsJobControlSupported( const CTL_ITwainSource *pSource, TW_UINT16& nValue );
@@ -334,7 +336,8 @@ namespace dynarithmic
                                       CTL_TwainAcquireEnum AcquireType);
 
             static int  BufferTransfer( CTL_ITwainSession *pSession,
-                                        CTL_ITwainSource  *pSource );
+                                        CTL_ITwainSource  *pSource,
+                                        bool bIsMememoryFile = false );
 
             static int  ClipboardTransfer( CTL_ITwainSession *pSession,
                                            CTL_ITwainSource *pSource );
