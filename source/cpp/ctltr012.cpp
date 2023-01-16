@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #define MC_NO_CPP
 #include "ctltr012.h"
 #include "ctlobtyp.h"
+#include "twainfix32.h"
 
 using namespace dynarithmic;
 
@@ -75,8 +76,8 @@ bool CTL_CapabilityGetEnumTriplet::EnumCapValues( void *pCapData )
 
         if ( nItemType == TWTY_FIX32 )
         {
-            pTW_FIX32 p = (pTW_FIX32)&pValEnum->ItemList[nIndex * nItemSize];
-            double fFix = static_cast<double>(Twain32ToFloat(*p));
+            auto p = reinterpret_cast<pTW_FIX32>(&pValEnum->ItemList[nIndex * nItemSize]);
+            double fFix = Fix32ToFloat(*p);
             pOb->CopyData( &fFix );
         }
         else

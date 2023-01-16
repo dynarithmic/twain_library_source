@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 #include "dtwain.h"
 #include "ctliface.h"
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
+#include "arrayfactory.h"
 #include "ctlsupport.h"
 
 using namespace dynarithmic;
@@ -37,7 +37,7 @@ bool dynarithmic::GetSupportString(DTWAIN_SOURCE Source, LPTSTR sz, LONG nLen, L
     CTL_StringType sVal;
     if ( bRet )
     {
-        EnumeratorFunctionImpl::EnumeratorGetAt(Array, 0, &sVal);
+        CTL_TwainDLLHandle::s_ArrayFactory->get_value(Array, 0, &sVal);
         StringWrapper::CopyInfoToCString(sVal,sz,nLen);
     }
     return bRet;
@@ -64,7 +64,7 @@ bool dynarithmic::GetSupportArray(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array, LO
 LONG dynarithmic::CheckEnabled(DTWAIN_SOURCE Source, LONG CapVal)
 {
     LONG IsEnabled = 0;
-    GetSupport(Source, &IsEnabled, CapVal);
+    GetSupport<CTL_ArrayFactory::tagged_array_long>(Source, &IsEnabled, CapVal);
     return IsEnabled;
 }
 

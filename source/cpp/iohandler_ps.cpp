@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -41,14 +41,13 @@ CTL_PSIOHandler::CTL_PSIOHandler(CTL_TwainDib* pDib, int /*nFormat*/, const DTWA
     //     m_pTiffHandler = new CTL_TiffIOHandler(pDib, CTL_TwainDib::TiffFormatGROUP4, ImageInfoEx);
 }
 
-int CTL_PSIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int /*fhFile*/, LONG64 MultiStage)
+int CTL_PSIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int /*fhFile*/, DibMultiPageStruct* pMultiPageStruct)
 {
-    const auto s = reinterpret_cast<DibMultiPageStruct*>(MultiStage);
     // Now add this to PDF page
     CPSImageHandler PSHandler(szFile, m_ImageInfoEx);
     CTL_StringType szTempPath;
 
-    if ( !s || s->Stage == DIB_MULTI_FIRST )
+    if ( !pMultiPageStruct || pMultiPageStruct->Stage == DIB_MULTI_FIRST )
     {
         // This is the first page, so allocate a TIFF handler here
         // Get the bit depth
@@ -91,7 +90,7 @@ int CTL_PSIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int /*fhFile*/,
         }
     }
 
-    if (!s || s->Stage != DIB_MULTI_LAST)
+    if (!pMultiPageStruct || pMultiPageStruct->Stage != DIB_MULTI_LAST)
     {
         // Create a temporary TIFF file
         //...
@@ -109,7 +108,7 @@ int CTL_PSIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int /*fhFile*/,
 
                 // Create a TIFF file
                 m_pTiffHandler->SetDib(m_pDib);
-                const int bRet = m_pTiffHandler->WriteBitmap(szTempPath.c_str(), bOpenFile, 0, MultiStage);
+                const int bRet = m_pTiffHandler->WriteBitmap(szTempPath.c_str(), bOpenFile, 0, pMultiPageStruct);
                 if ( bRet != 0 )
                 {
                     CTL_TwainAppMgr::WriteLogInfoA("Error creating temporary Image File " + szTempPathA + "\n");
@@ -121,8 +120,8 @@ int CTL_PSIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int /*fhFile*/,
             }
         }
     }
-    if ( MultiStage )
-        PSHandler.SetMultiPageStatus(s);
+    if ( pMultiPageStruct )
+        PSHandler.SetMultiPageStatus(pMultiPageStruct);
 
     const int bRet = PSHandler.WriteGraphicFile(this, szTempPath.c_str(), nullptr, nullptr);
     if ( bRet != 0 )
@@ -130,7 +129,7 @@ int CTL_PSIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int /*fhFile*/,
         delete_file( szTempPath.c_str() );
     }
 
-    if ( s )
-        PSHandler.GetMultiPageStatus(s);
+    if ( pMultiPageStruct )
+        PSHandler.GetMultiPageStatus(pMultiPageStruct);
     return bRet;
 }

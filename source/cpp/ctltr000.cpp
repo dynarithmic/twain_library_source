@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -28,13 +28,11 @@ using namespace dynarithmic;
 ///////////////// Open Data source manager triplet /////////////////////////
 CTL_TwainCloseSMTriplet::CTL_TwainCloseSMTriplet(CTL_ITwainSession *pSession) :
                         CTL_TwainSMTriplet(pSession, MSG_CLOSEDSM, IDS_ErrSourceMgrClose)
-{
-}
+{}
 
 CTL_TwainOpenSMTriplet::CTL_TwainOpenSMTriplet(CTL_ITwainSession *pSession) :
                         CTL_TwainSMTriplet(pSession, MSG_OPENDSM, IDS_ErrSourceMgrOpen)
-{
-}
+{}
 
 TW_UINT16 CTL_TwainOpenSMTriplet::Execute()
 {

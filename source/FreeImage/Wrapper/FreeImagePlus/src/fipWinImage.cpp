@@ -112,7 +112,8 @@ BOOL fipImageUtility::copyFromHandle(fipImage& im, HANDLE hMem, bool isHandle)
             return FALSE;
         }
         // Copy the palette
-        memcpy(FreeImage_GetPalette(im), pPalette, pHead->biClrUsed * sizeof(RGBQUAD));
+        if ( pPalette)
+            memcpy(FreeImage_GetPalette(im), pPalette, pHead->biClrUsed * sizeof(RGBQUAD));
         // Copy the bitmap
         memcpy(FreeImage_GetBits(im), bits, FreeImage_GetPitch(im) * FreeImage_GetHeight(im));
         return TRUE;

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -185,7 +185,7 @@ void CTL_ExtImageInfoTriplet::DestroyInfo()
                 switch (pInfo->ItemType)
                 {
                 case TWTY_UINT32:
-                    TempHandle = reinterpret_cast<TW_HANDLE>(static_cast<TW_UINT32*>(h)[j]);
+                    TempHandle = reinterpret_cast<TW_HANDLE>(static_cast<TW_UINTPTR*>(h)[j]);
                     break;
 
                 case TWTY_UINT16:
@@ -495,7 +495,7 @@ TW_INFO CTL_ExtImageInfoTriplet::GetInfo(size_t nWhich, int nSearch) const
     return Info;
 }
 
-bool CTL_ExtImageInfoTriplet::SetInfo(const TW_INFO &Info, size_t nWhich)
+bool CTL_ExtImageInfoTriplet::SetInfo(TW_INFO Info, size_t nWhich)
 {
     if ( nWhich >= m_nNumInfo || !m_pExtImageInfo )
         return false;
@@ -510,7 +510,7 @@ bool CTL_ExtImageInfoTriplet::IsItemHandle(size_t nWhich) const
 }
 
 // Alternate
-bool CTL_ExtImageInfoTriplet::AddInfo(const TW_INFO& Info)
+bool CTL_ExtImageInfoTriplet::AddInfo(TW_INFO Info)
 {
     m_vInfo.push_back(Info);
     return true;
@@ -530,7 +530,7 @@ bool CTL_ExtImageInfoTriplet::EnumSupported(CTL_ITwainSource *pSource,
                                             CTL_IntArray &rArray)
 {
     rArray.clear();
-    constexpr int NumAttr = std::size(s_AllAttr);
+    constexpr int NumAttr = static_cast<int>(std::size(s_AllAttr));
     CTL_ExtImageInfoTriplet Trip(pSession, pSource, NumAttr);
     const TW_UINT16 rc = Trip.Execute();
     switch (rc)

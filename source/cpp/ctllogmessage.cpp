@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LogMessage(LPCTSTR message)
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     if ( IsDLLHandleValid( pHandle, FALSE ) )
     {
-        CTL_StringType sMsg = message;
-        sMsg = _T("[User]") + sMsg;
+        auto prefix = StringConversion::Convert_Ansi_To_Native(CTL_TwainDLLHandle::s_ResourceStrings[IDS_DTWAIN_USERMSG_INDICATOR]);
+        const CTL_StringType sMsg = prefix + StringTraits::GetSpace() + message;
         CTL_TwainAppMgr::WriteLogInfo(sMsg);
         return TRUE;
     }

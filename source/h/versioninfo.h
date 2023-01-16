@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined( _VERSIONINFO_H_INCLUDED_ )
-#define _VERSIONINFO_H_INCLUDED_
+#ifndef VERSIONINFO_H
+#define VERSIONINFO_H
 
 #if _MSC_VER > 1000
 #pragma once
@@ -185,4 +185,4 @@ class VersionInfoImpl
 
 #include "versioninfo.ipp"
 
-#endif // !defined( _VERSIONINFO_H_INCLUDED_ )
+#endif 

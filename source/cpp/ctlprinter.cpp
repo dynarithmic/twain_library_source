@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 #include "dtwain.h"
 #include "ctliface.h"
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
 #include "errorcheck.h"
+#include "arrayfactory.h"
 
 using namespace dynarithmic;
 
@@ -35,20 +35,20 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAvailablePrintersArray(DTWAIN_SOURCE Source, 
     CATCH_BLOCK(false)
 }
 
+// Deprecated -- Use DTWAIN_SetAvailablePrintersArray
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAvailablePrinters(DTWAIN_SOURCE Source, LONG lpAvailPrinters)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpAvailPrinters))
     if ( !DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPPRINTER) )
         LOG_FUNC_EXIT_PARAMS(false)
 
-    const DTWAIN_ARRAY Array = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 32);
+    DTWAIN_ARRAY Array = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 32);
     if ( !Array )
         LOG_FUNC_EXIT_PARAMS(false)
 
     // Destroys array when out of scope
     DTWAINArrayLL_RAII a(Array);
-
-    auto& vValues = EnumeratorVector<LONG>(Array);
+    auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(Array);
 
     LONG j = 0;
     for ( LONG i = 0; i < 8; i++ )
@@ -65,12 +65,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAvailablePrinters(DTWAIN_SOURCE Source, LONG 
     CATCH_BLOCK(false)
 }
 
+// Deprecated -- Use DTWAIN_SetPrinterEx
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinter(DTWAIN_SOURCE Source, LONG nPrinter, DTWAIN_BOOL bSetCurrent)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nPrinter, bSetCurrent))
     if ( !DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPPRINTER) )
         LOG_FUNC_EXIT_PARAMS(false)
-    const DTWAIN_ARRAY Array = DTWAIN_ArrayCreateFromCap(nullptr, DTWAIN_CV_CAPPRINTER, 1);
+    DTWAIN_ARRAY Array = DTWAIN_ArrayCreateFromCap(nullptr, DTWAIN_CV_CAPPRINTER, 1);
     if ( !Array )
         LOG_FUNC_EXIT_PARAMS(false)
 
@@ -92,10 +93,35 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinter(DTWAIN_SOURCE Source, LONG nPrinter, 
     bool bRet = false;
     if ( bFound )
     {
-        auto& vValues = EnumeratorVector<LONG>(Array);
+        auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(Array);
         if ( !vValues.empty() )
             vValues[0] = nPrinter;
         bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPPRINTER, SetType, Array)?true:false;
+    }
+    LOG_FUNC_EXIT_PARAMS(bRet)
+    CATCH_BLOCK(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterEx(DTWAIN_SOURCE Source, LONG nPrinter, DTWAIN_BOOL bSetCurrent)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, nPrinter, bSetCurrent))
+    if (!DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPPRINTER))
+        LOG_FUNC_EXIT_PARAMS(false)
+    DTWAIN_ARRAY Array = DTWAIN_ArrayCreateFromCap(nullptr, DTWAIN_CV_CAPPRINTER, 1);
+    if (!Array)
+        LOG_FUNC_EXIT_PARAMS(false)
+
+    DTWAINArrayLL_RAII a(Array);
+
+    LONG SetType = DTWAIN_CAPSET;
+    if (!bSetCurrent)
+        SetType = DTWAIN_CAPRESET;
+    auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(Array);
+    DTWAIN_BOOL bRet = 0;
+    if (!vValues.empty())
+    {
+         vValues[0] = nPrinter;
+         bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPPRINTER, SetType, Array);
     }
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -122,18 +148,18 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterStrings(DTWAIN_SOURCE Source, DTWAIN_A
 
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle( pHandle, Source );
+    auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
     if ( p )
     {
-
         // Check if array is of the correct type
         DTWAIN_Check_Error_Condition_0_Ex(pHandle,
-                        [&]{ return !EnumeratorFunctionImpl::EnumeratorIsValidEx(ArrayString, CTL_EnumeratorStringType );},
+                        [&]{ return !factory->is_valid(ArrayString, CTL_ArrayFactory::arrayTag::StringType);},
                          DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
     }
     else
         LOG_FUNC_EXIT_PARAMS(false)
 
-    const LONG nStrings = EnumeratorFunctionImpl::EnumeratorGetCount(ArrayString);
+    const size_t nStrings = factory->size(ArrayString);
     if ( nStrings == 0 )
     {
         if (pNumStrings)
@@ -145,8 +171,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterStrings(DTWAIN_SOURCE Source, DTWAIN_A
     if ( nStrings == 1 )
     {
         // First try one value
-        bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPPRINTERSTRING, DTWAIN_CAPSET,
-                                ArrayString)?true:false;
+        bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPPRINTERSTRING, DTWAIN_CAPSET, ArrayString)?true:false;
         if ( !bRet )
         // Try enumerations
             bRet = DTWAIN_SetCapValuesEx(Source, DTWAIN_CV_CAPPRINTERSTRING, DTWAIN_CAPSETAVAILABLE,
@@ -165,7 +190,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterStrings(DTWAIN_SOURCE Source, DTWAIN_A
         if ( bRet )
         {
             if ( pNumStrings )
-                *pNumStrings = nStrings;
+                *pNumStrings = static_cast<LONG>(nStrings);
         }
         else
         {

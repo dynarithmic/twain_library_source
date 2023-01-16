@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,14 +18,15 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLRES_H_
-#define CTLRES_H_
+#ifndef CTLRES_H
+#define CTLRES_H
 #include <vector>
 #include <string>
 
 #define DTWAINLANGRESOURCEFILE _T("twainresourcestrings_")
 #define DTWAINRESOURCEINFOFILE _T("twaininfo.txt")
 #define DTWAINLANGRESOURCENAMESFILE  _T("twainlanguage.txt")
+#define DTWAINCUSTOMERRORFILE _T("twaincustomerrors_")
 
 namespace dynarithmic
 {
@@ -39,6 +40,7 @@ namespace dynarithmic
     void UnloadStringResources();
     void UnloadErrorResources();
     std::vector<std::string> GetLangResourceNames();
-    std::string GetResourceFileNameA(LPCSTR lpszName);
+    std::string GetResourceFileNameA(LPCSTR lpszName, LPCTSTR szPrefix);
+    std::string GetCustomResourceFileNameA(LPCSTR lpszName);
 }
 #endif

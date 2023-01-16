@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLTR031_H_
-#define CTLTR031_H_
+#ifndef CTLTR031_H
+#define CTLTR031_H
 
 #include "ctltr026.h"
 #include "ctliface.h"
@@ -32,10 +32,10 @@ namespace dynarithmic
         public:
             CTL_ImageMemXferTriplet(CTL_ITwainSession *pSession,
                                     CTL_ITwainSource* pSource,
-                                    HANDLE hDib,
-                                    TW_UINT32 nFlags,
-                                    TW_UINT16 nPixelType,
-                                    TW_UINT32 nNumBytes,
+                                    HANDLE hDib = {},
+                                    TW_UINT32 nFlags = 0,
+                                    TW_UINT16 nPixelType = 0,
+                                    TW_UINT32 nNumBytes = 0,
                                     TW_UINT16 nCompression=TWCP_NONE);
 
             TW_UINT16           Execute() override;
@@ -43,9 +43,10 @@ namespace dynarithmic
             CTL_ImageMemXferTriplet(const CTL_ImageMemXferTriplet&) = delete;
             CTL_ImageMemXferTriplet& operator=(const CTL_ImageMemXferTriplet&) = delete;
 
-        private:
+        protected:
             void InitXferBuffer();
-
+            TW_IMAGEMEMXFER& GetMemXferBuffer() { return m_ImageMemXferBuffer; }
+        private:
             TW_IMAGEMEMXFER m_ImageMemXferBuffer;
             TW_MEMORY       m_TempMemory;
             HANDLE          m_DibStrip;

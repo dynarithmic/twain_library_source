@@ -1,6 +1,6 @@
 /*
 This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-Copyright (c) 2002-2022 Dynarithmic Software.
+Copyright (c) 2002-2023 Dynarithmic Software.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,150 +24,139 @@ OF THIRD PARTY RIGHTS.
 #include <pdflib32.h>
 #include <dtwainpdf.h>
 #include <pdfconst.h>
-using namespace dynarithmic;
 
-#define FUNCCONVENTION CALLBACK
-
-void* FUNCCONVENTION dynarithmic::DTWLIB_PDFGetNewDocument()
+namespace dynarithmic
 {
-    return new PdfDocument;
-}
+    PdfDocumentPtr PDFInterface::DTWLIB_PDFGetNewDocument()
+    {
+        return std::make_shared<PdfDocument>();
+    }
 
-void FUNCCONVENTION dynarithmic::DTWLIB_PDFReleaseDocument(void *pDoc)
-{
-    delete static_cast<PdfDocument*>(pDoc);
-}
+    void PDFInterface::DTWLIB_PDFReleaseDocument(PdfDocumentPtr pDoc)
+    {
+    }
 
-BOOL FUNCCONVENTION dynarithmic::DTWLIB_PDFOpenNewFile(void* pDoc, LPCTSTR szFile)
-{
-    return static_cast<PdfDocument*>(pDoc)->OpenNewPDFFile(szFile);
-}
+    bool PDFInterface::DTWLIB_PDFOpenNewFile(PdfDocumentPtr pDoc, LPCTSTR szFile)
+    {
+        return pDoc->OpenNewPDFFile(szFile);
+    }
 
-void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetCompression(void* pDoc,  bool bCompress)
-{
-    static_cast<PdfDocument*>(pDoc)->SetCompression(bCompress);
-}
+    void PDFInterface::DTWLIB_PDFSetCompression(PdfDocumentPtr pDoc, bool bCompress)
+    {
+        pDoc->SetCompression(bCompress);
+    }
 
-void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetNameField(void* pDoc, LONG nWhich, LPCSTR szName)
-{
-    const auto p = static_cast<PdfDocument*>(pDoc);
+    void PDFInterface::DTWLIB_PDFSetNameField(PdfDocumentPtr pDoc, int32_t nWhich, const char *szName)
+    {
     switch (nWhich)
     {
         case PDF_AUTHOR:
-            p->SetAuthor( szName );
+            pDoc->SetAuthor(szName);
         break;
         case PDF_PRODUCER:
-            p->SetProducer( szName );
+            pDoc->SetProducer(szName);
         break;
         case PDF_TITLE:
-            p->SetTitle( szName );
+            pDoc->SetTitle(szName);
         break;
         case PDF_KEYWORDS:
-            p->SetKeywords( szName );
+            pDoc->SetKeywords(szName);
         break;
         case PDF_SUBJECT:
-            p->SetSubject( szName );
+            pDoc->SetSubject(szName);
         break;
         case PDF_MEDIABOX:
-            p->SetMediaBox( szName );
+            pDoc->SetMediaBox(szName);
         break;
         case PDF_CREATOR:
-            p->SetCreator(szName);
+            pDoc->SetCreator(szName);
         break;
         default: ;
     }
 }
 
-BOOL FUNCCONVENTION dynarithmic::DTWLIB_PDFStartCreation(void *pDoc)
-{
-    return static_cast<PdfDocument*>(pDoc)->StartPDFCreation();
-}
+    bool PDFInterface::DTWLIB_PDFStartCreation(PdfDocumentPtr pDoc)
+    {
+        return pDoc->StartPDFCreation();
+    }
 
-BOOL FUNCCONVENTION dynarithmic::DTWLIB_PDFEndCreation(void *pDoc)
-{
-    return static_cast<PdfDocument*>(pDoc)->EndPDFCreation();
-}
+    bool PDFInterface::DTWLIB_PDFEndCreation(PdfDocumentPtr pDoc)
+    {
+        return pDoc->EndPDFCreation();
+    }
 
-void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetImageType(void *pDoc, LONG iType)
-{
-    static_cast<PdfDocument*>(pDoc)->SetImageType(iType);
-}
+    void PDFInterface::DTWLIB_PDFSetImageType(PdfDocumentPtr pDoc, int32_t iType)
+    {
+        pDoc->SetImageType(iType);
+    }
 
-BOOL FUNCCONVENTION dynarithmic::DTWLIB_PDFWritePage(void *pDoc, LPCTSTR szPath)
-{
-    return static_cast<PdfDocument*>(pDoc)->WritePage(szPath);
-}
+    bool PDFInterface::DTWLIB_PDFWritePage(PdfDocumentPtr pDoc, LPCTSTR szPath)
+    {
+        return pDoc->WritePage(szPath);
+    }
 
-void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetLongField(void *pDoc, LONG nWhich, LONG nValue)
-{
-    auto p = static_cast<PdfDocument*>(pDoc);
+    void PDFInterface::DTWLIB_PDFSetLongField(PdfDocumentPtr pDoc, int32_t nWhich, int32_t nValue)
+    {
     switch (nWhich)
     {
         case PDF_ORIENTATION:
-            p->SetOrientation(nValue);
+            pDoc->SetOrientation(nValue);
         break;
 
         case PDF_MEDIABOX:
-            p->SetMediaBox(nValue);
+            pDoc->SetMediaBox(nValue);
         break;
 
         case PDF_SCALETYPE:
-            p->SetScaleType(nValue);
+            pDoc->SetScaleType(nValue);
         break;
         default: ;
     }
 }
 
-void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetScaling(void *pDoc, double xscale, double yscale)
-{
-    static_cast<PdfDocument*>(pDoc)->SetScaling(xscale, yscale);
-}
+    void PDFInterface::DTWLIB_PDFSetScaling(PdfDocumentPtr pDoc, double xscale, double yscale)
+    {
+        pDoc->SetScaling(xscale, yscale);
+    }
 
-void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetThumbnailFile(void *pDoc, LPCTSTR szPath)
-{
-    static_cast<PdfDocument*>(pDoc)->SetThumbnailFile(szPath);
-}
+    void PDFInterface::DTWLIB_PDFSetThumbnailFile(PdfDocumentPtr pDoc, LPCTSTR szPath)
+    {
+        pDoc->SetThumbnailFile(szPath);
+    }
 
-void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetDPI(void *pDoc, LONG dpi)
-{
-    static_cast<PdfDocument*>(pDoc)->SetDPI( dpi );
-}
+    void PDFInterface::DTWLIB_PDFSetDPI(PdfDocumentPtr pDoc, int32_t dpi)
+    {
+        pDoc->SetDPI(dpi);
+    }
 
-void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetEncryption(void *pDoc, LPCTSTR szOwnerPass,
-                                          LPCTSTR szUserPass, LONG Permissions,
+    void PDFInterface::DTWLIB_PDFSetEncryption(PdfDocumentPtr pDoc, LPCTSTR szOwnerPass,
+                                LPCTSTR szUserPass, int32_t Permissions,
                                           bool bUseStrongEncrypt,
                                           bool bUseAESEncryption)
 {
-    static_cast<PdfDocument*>(pDoc)->SetEncryption(szOwnerPass?szOwnerPass:_T(""),
+        pDoc->SetEncryption(szOwnerPass ? szOwnerPass : _T(""),
                                                    szUserPass?szUserPass:_T(""),
                                                    Permissions,
                                                    bUseStrongEncrypt,
                                                    bUseAESEncryption);
 }
 
-void FUNCCONVENTION dynarithmic::DTWLIB_PDFGetDLLVersion(LPLONG lMajor, LPLONG lMinor, LPLONG lPatch)
-{
-    *lMajor = 1;
-    *lMinor = 9;
-    *lPatch = 0;
-}
+    void PDFInterface::DTWLIB_PDFSetASCIICompression(PdfDocumentPtr pDoc, bool bSetCompression)
+    {
+        pDoc->SetASCIICompression(bSetCompression);
+    }
 
-void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetASCIICompression(void *pDoc, bool bSetCompression)
-{
-    static_cast<PdfDocument*>(pDoc)->SetASCIICompression(bSetCompression);
-}
+    void PDFInterface::DTWLIB_PDFSetNoCompression(PdfDocumentPtr pDoc, bool bSetCompression)
+    {
+        pDoc->SetNoCompression(bSetCompression);
+    }
 
-void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetNoCompression(void *pDoc, bool bSetCompression)
-{
-    static_cast<PdfDocument*>(pDoc)->SetNoCompression(bSetCompression);
-}
+    void PDFInterface::DTWLIB_PDFSetSearchableText(PdfDocumentPtr pDoc, const char *text)
+    {
+        pDoc->SetSearchableText(text);
+    }
 
-void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetSearchableText(void *pDoc, LPCSTR text)
-{
-    static_cast<PdfDocument*>(pDoc)->SetSearchableText(text);
-}
-
-void FUNCCONVENTION dynarithmic::DTWLIB_PDFAddPageText(void* pDoc, PDFTextElement* pElement)
+    void PDFInterface::DTWLIB_PDFAddPageText(PdfDocumentPtr pDoc, PDFTextElement* pElement)
 {
 /*    PDFTextElement element;
 
@@ -186,10 +175,11 @@ void FUNCCONVENTION dynarithmic::DTWLIB_PDFAddPageText(void* pDoc, PDFTextElemen
     element.scalingX = scalingX;
     element.scalingY = scalingY;
 */
-    static_cast<PdfDocument*>(pDoc)->AddTextElement(pElement);
+        pDoc->AddTextElement(pElement);
 }
 
-void FUNCCONVENTION dynarithmic::DTWLIB_PDFSetPolarity(void *pDoc, LONG Polarity)
+    void PDFInterface::DTWLIB_PDFSetPolarity(PdfDocumentPtr pDoc, int32_t Polarity)
 {
-    static_cast<PdfDocument*>(pDoc)->SetPolarity( Polarity );
+        pDoc->SetPolarity(Polarity);
+    }
 }

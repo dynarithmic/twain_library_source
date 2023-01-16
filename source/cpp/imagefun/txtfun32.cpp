@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -179,7 +179,7 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
 int CTextImageHandler::WriteTempFile()
 {
     m_pTextPageInfo->m_pOrigHandler->SetDib(m_pDib);
-    const int retval = m_pTextPageInfo->m_pOrigHandler->WriteBitmap(m_pTextPageInfo->szTempFile.c_str(), true, 0, 0);
+    const int retval = m_pTextPageInfo->m_pOrigHandler->WriteBitmap(m_pTextPageInfo->szTempFile.c_str(), true, 0);
     return retval;
 }
 

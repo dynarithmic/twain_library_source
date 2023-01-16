@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -150,6 +150,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
     const ImageXferFileWriter FileWriter(this, pSession, pSource);
 
     // Loop until strips have been transferred
+    int errfile = 0;
     do
     {
         // Call base function
@@ -191,7 +192,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                                CTL_TwainAppMgr::WriteLogInfoA(szBuf);
                                CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                                      nullptr, DTWAIN_TN_TRANSFERSTRIPFAILED,
-                                                                     reinterpret_cast<LPARAM>(GetSourcePtr()));
+                                                                     reinterpret_cast<LPARAM>(pSource));
                             }
                             else
                             {
@@ -240,7 +241,6 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
             case TWRC_XFERDONE:             // All strips transferred.  Process bitmap
             {
                 m_bJobControlPageRecorded = false;
-                CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_TRANSFERDONE,reinterpret_cast<LPARAM>(pSource));
                 m_bJobMarkerNeedsToBeWritten = false;
                 // Check if more images are pending (job control only)
                 SetPendingXfersDone(false);
@@ -296,7 +296,6 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                 const bool bExecuteEOJPageHandling = bEndOfJobDetected && pSource->IsJobFileHandlingOn();
 
                 // Get the image page
-                int errfile = 0;
                 bool bInClip = false;
 
 
@@ -345,6 +344,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                                               DTWAIN_TN_BLANKPAGEDISCARDED1, DTWAIN_BP_AUTODISCARD_IMMEDIATE) == 0 )
                         {
                             bPageDiscarded = true;
+                            m_ptrOrig = nullptr;
                             break;  // The page is discarded
                         }
 
@@ -384,6 +384,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                     if ( ProcessBlankPage(pSession, pSource, CurDib, true, DTWAIN_TN_BLANKPAGEDETECTED2, DTWAIN_TN_BLANKPAGEDISCARDED2, DTWAIN_BP_AUTODISCARD_AFTERPROCESS) == 0 )
                     {
                         bPageDiscarded = true;
+                        m_ptrOrig = nullptr;
                         break;  // The page is discarded
                     }
 
@@ -391,7 +392,10 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                     // Query if the page should be thrown away
                     const bool bKeepPage = QueryAndRemoveDib(TWAINAcquireType_Buffer, nLastDib);
                     if (!bKeepPage)
+                    {
+                        m_ptrOrig = nullptr;
                         break;
+                    }
 
                     if ( pSource->GetAcquireType() == TWAINAcquireType_Clipboard )
                     {
@@ -437,7 +441,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                             if ( bIsMultiPageFile || pSource->IsMultiPageModeSaveAtEnd())
                             {
                                 // This is the fist page of the acquisition
-                                if (nLastDib == 0 || pSource->IsNewJob() && pSource->IsJobFileHandlingOn())
+                                if (nLastDib == 0 || (pSource->IsNewJob() && pSource->IsJobFileHandlingOn()))
                                     nMultiStage = DIB_MULTI_FIRST;
                                 else
                                 // This is a subsequent page of the acquisition
@@ -446,12 +450,12 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                                 // Now check if this we are in manual duplex mode
                                 if ( pSource->IsManualDuplexModeOn() ||
                                      pSource->IsMultiPageModeContinuous() ||
-                               pSource->IsMultiPageModeSaveAtEnd() && !bIsMultiPageFile)
+                               (pSource->IsMultiPageModeSaveAtEnd() && !bIsMultiPageFile))
                                 {
                                     // We need to copy the data to a file and store info in
                                     // vector of the source
                                 if ( !bEndOfJobDetected || // Not end -of-job
-                                    bExecuteEOJPageHandling && !m_bJobControlPageRecorded // write job control page
+                                    (bExecuteEOJPageHandling && !m_bJobControlPageRecorded) // write job control page
                                     )
                                     errfile = FileWriter.CopyDuplexDibToFile(CurDib, bExecuteEOJPageHandling);
 
@@ -467,10 +471,12 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                             m_nTotalPagesSaved++;
                         }
                         else
+                        {
+                            m_ptrOrig = nullptr;
                             CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,
                                                                   DTWAIN_TN_PAGEDISCARDED,
                                                                   reinterpret_cast<LPARAM>(pSource));
-
+                        }
                         // Delete temporary bitmap here
                         if ( pSource->IsDeleteDibOnScan() )
                         {
@@ -493,7 +499,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                    CTL_TwainAppMgr::WriteLogInfoA(szBuf);
                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                          nullptr, DTWAIN_TN_INVALIDIMAGEFORMAT,
-                                                      reinterpret_cast<LPARAM>(GetSourcePtr()));
+                                                         reinterpret_cast<LPARAM>(pSource));
                 }
 
             }
@@ -540,7 +546,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
         bForceClose = false;
     else
         bForceClose = true;
-    AbortTransfer(bForceClose);
+    AbortTransfer(bForceClose, errfile);
     return rc;
 }
 

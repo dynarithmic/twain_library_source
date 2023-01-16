@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ void CTIFFImageHandler::DestroyAllObjects()
 int CTIFFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR path, HANDLE bitmap, void *pUserInfo/*=NULL*/)
 {
     const std::unordered_map<int, int> compressionFlags = {{COMPRESSION_PACKBITS, TIFF_PACKBITS},
-                                                     {COMPRESSION_DEFLATE, TIFF_DEFLATE},
+                                                     {COMPRESSION_ADOBE_DEFLATE, TIFF_ADOBE_DEFLATE},
                                                      {COMPRESSION_NONE, TIFF_NONE},
                                                      {COMPRESSION_CCITTFAX3, TIFF_CCITTFAX3},
                                                      {COMPRESSION_CCITTFAX4, TIFF_CCITTFAX4},
@@ -158,6 +158,8 @@ int CTIFFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR 
     }
 
     // this is a multipage write
+    if (!ptrTiffData)
+        return DTWAIN_ERR_FILEWRITE; // Issue with writing the file.  File to write may not be valid.
     FreeImage_AppendPageEx(ptrTiffData->fp, im, iter->second);
     FreeImage_SetPageNumberEx(ptrTiffData->fp, FreeImage_GetPageNumber(ptrTiffData->fp) + 1);
     ++m_MultiPageStruct.Page;
@@ -187,7 +189,7 @@ int CTIFFImageHandler::ProcessCompressionType(fipImage& im, unsigned long& compr
                  m_nFormat == COMPRESSION_CCITTFAX4 ||
                  m_nFormat == COMPRESSION_JBIG ||
                  m_nFormat == COMPRESSION_PIXARLOG ||
-                 m_nFormat == COMPRESSION_DEFLATE  )
+                 m_nFormat == COMPRESSION_ADOBE_DEFLATE  )
             {
                 compression = m_nFormat;
                 bOk = true;
@@ -204,7 +206,7 @@ int CTIFFImageHandler::ProcessCompressionType(fipImage& im, unsigned long& compr
                  m_nFormat == COMPRESSION_LZW ||
                  m_nFormat == COMPRESSION_PACKBITS ||
                  m_nFormat == COMPRESSION_JPEG ||
-                 m_nFormat == COMPRESSION_DEFLATE ||
+                 m_nFormat == COMPRESSION_ADOBE_DEFLATE ||
                  m_nFormat == COMPRESSION_JBIG ||
                  m_nFormat == COMPRESSION_PIXARLOG)
             {
@@ -224,7 +226,7 @@ int CTIFFImageHandler::ProcessCompressionType(fipImage& im, unsigned long& compr
                  m_nFormat == COMPRESSION_JPEG ||
                  m_nFormat == COMPRESSION_JBIG ||
                  m_nFormat == COMPRESSION_PIXARLOG ||
-                 m_nFormat == COMPRESSION_DEFLATE )
+                 m_nFormat == COMPRESSION_ADOBE_DEFLATE )
             {
                 compression = m_nFormat;
                 bOk = true;
@@ -246,5 +248,5 @@ int CTIFFImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2,
 int CTIFFImageHandler::Tiff2PS(LPCTSTR szFileIn, LPCTSTR szFileOut, LONG PSType,
                                LPCTSTR szTitle, bool PSEncapsulated)
 {
-    return DTWLIB_PSWriteFile(szFileIn, szFileOut, PSType, szTitle, PSEncapsulated);
+    return PDFInterface().DTWLIB_PSWriteFile(szFileIn, szFileOut, PSType, szTitle, PSEncapsulated);
 }

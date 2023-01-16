@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -82,8 +82,7 @@ namespace dynarithmic
     #define GMEM_DDESHARE 0x2000
     struct MemoryNode
     {
-        char *ptr;
-        size_t numBytes;
+        std::vector<char> ptr;
     };
 
     struct ImageMemoryHandler
@@ -95,17 +94,13 @@ namespace dynarithmic
         static HGLOBAL GlobalAlloc(UINT n, SIZE_T numBytes)
         {
             MemoryNode *pNode = new MemoryNode;
-            pNode->ptr = new char[numBytes];
-            if (n)
-                std::fill_n(pNode->ptr, numBytes, 0);
-            pNode->numBytes = numBytes;
+            pNode->ptr.resize(numBytes);
             return pNode;
         }
 
         static HGLOBAL GlobalFree(HGLOBAL h)
         {
             MemoryNode *pNode = reinterpret_cast<MemoryNode*>(h);
-            delete[] pNode->ptr;
             delete pNode;
             return 0;
         }
@@ -113,15 +108,7 @@ namespace dynarithmic
         static HGLOBAL GlobalReAlloc(HGLOBAL hMem, SIZE_T dwBytes, UINT uFlags)
         {
             MemoryNode *pNode = reinterpret_cast<MemoryNode*>(hMem);
-            if (dwBytes <= pNode->numBytes)
-                return pNode;
-            char *temp = new char[dwBytes];
-            if (uFlags)
-                std::fill_n(temp, dwBytes, 0);
-            std::copy(pNode->ptr, pNode->ptr + pNode->numBytes, temp);
-            delete[] pNode->ptr;
-            pNode->ptr = temp;
-            pNode->numBytes = dwBytes;
+            pNode->ptr.resize(dwBytes);
             return hMem;
         }
 
@@ -136,7 +123,7 @@ namespace dynarithmic
             if ( !h )
                 return 0;
             MemoryNode *pNode = reinterpret_cast<MemoryNode*>(h);
-            return pNode->numBytes;
+            return pNode->ptr.size();
         }
     };
 

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLObStr_h_
-#define CTLObStr_h_
+#ifndef CTLOBSTR_H
+#define CTLOBSTR_H
 
 #include <string>
 #include <vector>
@@ -118,6 +118,20 @@ namespace dynarithmic
 
         template <typename T>
         static std::string ConvertToBoostUUIDString(const T& x)  { return boost::uuids::to_string(x); }
+
+        template <typename T, typename std::enable_if<std::is_arithmetic_v<T>,bool>::type = true>
+        static std::string ToString(const T& value)
+        {
+            return std::to_string(value);
+        }
+
+        template <typename T>
+        static std::string ToStringEx(const T& value)
+        {
+            std::ostringstream strm;
+            strm << value;
+            return strm.str();
+        }
 
         static constexpr char_type GetSpace() { return ' ';}
         static constexpr const char_type* GetEmptyString() { return ""; }
@@ -227,6 +241,21 @@ namespace dynarithmic
 
         template <typename T>
         static std::wstring ConvertToBoostUUIDString(const T& x) { return boost::uuids::to_wstring(x); }
+
+        template <typename T, typename std::enable_if<std::is_arithmetic_v<T>, bool>::type = true>
+        static std::wstring ToString(const T& value)
+        {
+            return std::to_wstring(value);
+        }
+
+        template <typename T>
+        static std::wstring ToStringEx(const T& value)
+        {
+            std::wostringstream strm;
+            strm << value;
+            return strm.str();
+        }
+
         static constexpr char_type GetSpace() { return L' ';}
         static constexpr const char_type* GetEmptyString() { return L""; }
         static constexpr char_type GetZeroString() { return L'\0'; }
@@ -344,6 +373,17 @@ namespace dynarithmic
         static const std::wstring&   Convert_Native_To_Wide(const std::wstring& x) { return x; }
         static std::wstring          Convert_NativePtr_To_Wide(const wchar_t *x) { return x; }
 
+        static std::wstring          Convert_Ansi_To_Native(const std::string& x, size_t len) { return ANSIToWide(x, len); }
+        static std::wstring          Convert_AnsiPtr_To_Native(const char* x, size_t len) { return ANSIToWide(x ? x : "", len); }
+
+        static const std::wstring&   Convert_Wide_To_Native(const std::wstring& x, size_t len) { return x; }
+        static std::wstring          Convert_WidePtr_To_Native(const wchar_t* x, size_t len) { return x; }
+
+        static std::string           Convert_Native_To_Ansi(const std::wstring& x, size_t len) { return WideToANSI(x, len); }
+        static std::string           Convert_NativePtr_To_Ansi(const wchar_t* x, size_t len) { return WideToANSI(x ? x : L"", len); }
+
+        static const std::wstring&   Convert_Native_To_Wide(const std::wstring& x, size_t) { return x; }
+        static std::wstring          Convert_NativePtr_To_Wide(const wchar_t* x, size_t) { return x; }
 
         #else
         static const std::string&   Convert_Ansi_To_Native(const std::string& x) { return x; }
@@ -357,11 +397,29 @@ namespace dynarithmic
 
         static std::wstring   Convert_Native_To_Wide(const std::string& x) { return ANSIToWide(x); }
         static std::wstring   Convert_NativePtr_To_Wide(const char *x) { return ANSIToWide(x?x:""); }
+
+        static const std::string& Convert_Ansi_To_Native(const std::string& x, size_t len) { return x; }
+        static std::string    Convert_AnsiPtr_To_Native(const char* x, size_t len) { return x; }
+
+        static std::string    Convert_Wide_To_Native(const std::wstring& x, size_t len) { return WideToANSI(x, len); }
+        static std::string    Convert_WidePtr_To_Native(const wchar_t* x, size_t len) { return WideToANSI(x ? x : L"", len); }
+
+        static const std::string& Convert_Native_To_Ansi(const std::string& x, size_t) { return x; }
+        static std::string    Convert_NativePtr_To_Ansi(const char* x, size_t) { return x; }
+
+        static std::wstring   Convert_Native_To_Wide(const std::string& x, size_t len) { return ANSIToWide(x, len); }
+        static std::wstring   Convert_NativePtr_To_Wide(const char* x, size_t len) { return ANSIToWide(x ? x : "", len); }
+
 #endif
         static std::string     Convert_Wide_To_Ansi(const std::wstring& x) { return WideToANSI(x); }
         static std::wstring    Convert_Ansi_To_Wide(const std::string& x) { return ANSIToWide(x); }
         static std::string     Convert_WidePtr_To_Ansi(const wchar_t *x) { return x ? WideToANSI(x) : ""; }
         static std::wstring     Convert_AnsiPtr_To_Wide(const char *x) { return x ? ANSIToWide(x) : L""; }
+
+        static std::string     Convert_Wide_To_Ansi(const std::wstring& x, size_t len) { return WideToANSI(x, len); }
+        static std::wstring    Convert_Ansi_To_Wide(const std::string& x, size_t len) { return ANSIToWide(x, len); }
+        static std::string     Convert_WidePtr_To_Ansi(const wchar_t* x, size_t len) { return x ? WideToANSI(x, len) : ""; }
+        static std::wstring    Convert_AnsiPtr_To_Wide(const char* x, size_t len) { return x ? ANSIToWide(x, len) : L""; }
 
         static std::string WideToANSI(const std::wstring& wstr)
         {
@@ -371,6 +429,16 @@ namespace dynarithmic
         static std::wstring ANSIToWide(const std::string& str)
         {
             return static_cast<LPCWSTR>(ConvertA2W(str.c_str()));
+        }
+
+        static std::string WideToANSI(const std::wstring& wstr, size_t len)
+        {
+            return static_cast<LPCSTR>(ConvertW2A(wstr.c_str(), len));
+        }
+
+        static std::wstring ANSIToWide(const std::string& str, size_t len)
+        {
+            return static_cast<LPCWSTR>(ConvertA2W(str.c_str(), len));
         }
 
         template <typename T>
@@ -545,6 +613,12 @@ namespace dynarithmic
             return boost::algorithm::ends_with(str, sub);
         }
 
+        static StringType QuoteString(const StringType& str, 
+                                      const StringType& quoteString = typename traits_type::DoubleQuoteString())
+        {
+            return quoteString + str + quoteString;
+        }
+
         static int TokenizeQuoted(const StringType& str, const CharType *lpszTokStr,
                                   StringArrayType &rArray, bool bGetNullTokens = false)
         {
@@ -563,28 +637,30 @@ namespace dynarithmic
 
         static StringType&  MakeUpperCase(StringType& str)
         {
-            std::transform(str.begin(), str.end(), str.begin(), StringTraits::ToUpper);
+            boost::algorithm::to_upper(str);
             return str;
         }
 
         static StringType&  MakeLowerCase(StringType& str)
         {
-            std::transform(str.begin(), str.end(), str.begin(), StringTraits::ToLower);
+            boost::algorithm::to_lower(str);
             return str;
         }
 
         static StringType UpperCase(const StringType& str)
         {
-            StringType sTemp = str;
-            MakeUpperCase(sTemp);
-            return sTemp;
+            return boost::algorithm::to_upper_copy(str);
         }
 
         static StringType LowerCase(const StringType& str)
         {
-            StringType sTemp = str;
-            MakeLowerCase(sTemp);
-            return sTemp;
+            return boost::algorithm::to_lower_copy(str);
+        }
+
+        template <typename T>
+        static StringType ToString(const T& value)
+        {
+            return StringTraits::ToString(value);
         }
 
         static double ToDouble(const StringType& s1)
@@ -741,7 +817,6 @@ namespace dynarithmic
             boost::empty_token_policy tokenPolicy = bGetNullTokens?boost::keep_empty_tokens : boost::drop_empty_tokens;
             boost::char_separator<CharType> sepr(lpszTokStr, StringTraits::GetEmptyString(), tokenPolicy);
             tokenizer tokens(str, sepr);
-            typename StringType::const_iterator beg = str.begin();
             for (typename tokenizer::const_iterator tok_iter = tokens.begin();
                 tok_iter != tokens.end(); ++tok_iter)
             {
@@ -768,7 +843,6 @@ namespace dynarithmic
 
             boost::escaped_list_separator<CharType> sepr(StringTraits::GetEmptyString(), lpszTokStr, StringTraits::AllQuoteString());
             tokenizer tokens(str, sepr);
-            typename StringType::const_iterator beg = str.begin();
             for (auto tok_iter = tokens.begin(); tok_iter != tokens.end(); ++tok_iter)
             {
                 rArray.push_back(*tok_iter);
@@ -797,10 +871,22 @@ namespace dynarithmic
             return static_cast<int>(rArray.size());
         }
 
+        // If szInfo is nullptr, only the computed length is returned.
+        // The length includes trailing null character.
         static int32_t CopyInfoToCString(const StringType& strInfo, CharType* szInfo, int32_t nMaxLen)
         {
-            if (strInfo.empty() || szInfo && nMaxLen <= 0)
+            if (strInfo.empty())
+            {
+                if ( szInfo && nMaxLen > 0 )
+                {
+                    szInfo[0] = {};
+                    return 0;
+                }
                 return 0;
+            }
+            if (szInfo && nMaxLen <= 0)
+                return 0;
+
             if (nMaxLen > 0)
                 --nMaxLen;
             int32_t nRealLen;

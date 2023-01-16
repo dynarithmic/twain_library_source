@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include "ctltwmgr.h"
 #include "errstruc.h"
 #include "dtwain_resource_constants.h"
+#include "twainfix32.h"
 
 using namespace dynarithmic;
 
@@ -176,7 +177,7 @@ void CTL_ErrorStructDecoder::StartMessageDecoder(HWND hWnd, UINT nMsg,
 {
     StringStreamA sBuffer;
 
-    m_pString = "";
+    m_pString.clear();
     if ( s_mapNotificationType.find(wParam) != s_mapNotificationType.end())
         sBuffer << "\nDTWAIN Message(HWND = " << hWnd << ", " <<
                                     "MSG = " << nMsg << ", " <<
@@ -196,7 +197,7 @@ void CTL_ErrorStructDecoder::StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDe
 {
     StringStreamA sBuffer;
 
-    m_pString = "";
+    m_pString.clear();
     std::string s1;
     sBuffer << "\nDSM_Entry(pSource=" << pSource << "H, " <<
                 "pDest=" << pDest << "H, " <<
@@ -338,8 +339,8 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                             "BatteryMinutes=" << p->BatteryMinutes << "\n" <<
                             "BatteryPercentage=" << p->BatteryPercentage << "\n" <<
                             "PowerSupply=" << p->PowerSupply << "\n" <<
-                            "XResolution=" << CTL_CapabilityTriplet::Twain32ToFloat(p->XResolution) << "\n" <<
-                            "YResolution=" << CTL_CapabilityTriplet::Twain32ToFloat(p->YResolution) << "\n" <<
+                            "XResolution=" << dynarithmic::Fix32ToFloat(p->XResolution) << "\n" <<
+                            "YResolution=" << dynarithmic::Fix32ToFloat(p->YResolution) << "\n" <<
                             "FlashUsed2=" << p->FlashUsed2 << "\n" <<
                             "AutomaticCapture=" << p->AutomaticCapture << "\n" <<
                             "TimeBeforeFirstCapture=" << p->TimeBeforeFirstCapture << "\n" <<
@@ -544,8 +545,8 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
             {
                 auto p = static_cast<pTW_IMAGEINFO>(pData);
                 sBuffer << "\nTW_MEMREF is TW_IMAGEINFO:\n{\n" <<
-                        indenter << "XResolution=" << CTL_CapabilityTriplet::Twain32ToFloat(p->XResolution) << "\n" <<
-                        indenter << "YResolution=" << CTL_CapabilityTriplet::Twain32ToFloat(p->YResolution) << "\n" <<
+                        indenter << "XResolution=" << Fix32ToFloat(p->XResolution) << "\n" <<
+                        indenter << "YResolution=" << Fix32ToFloat(p->YResolution) << "\n" <<
                         indenter << "ImageWidth=" << p->ImageWidth << "\n" <<
                         indenter << "ImageLength=" << p->ImageLength << "\n" <<
                         indenter << "SamplesPerPixel=" << p->SamplesPerPixel << "\n" <<
@@ -571,10 +572,10 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                 sBuffer <<
                 "\nTW_MEMREF is TW_IMAGELAYOUT:\n{\n" <<
                 indenter << "Frame=" <<
-                CTL_CapabilityTriplet::Twain32ToFloat(p->Frame.Left) << "," <<
-                CTL_CapabilityTriplet::Twain32ToFloat(p->Frame.Top) << "-" <<
-                CTL_CapabilityTriplet::Twain32ToFloat(p->Frame.Right) << "," <<
-                CTL_CapabilityTriplet::Twain32ToFloat(p->Frame.Bottom) << "\n" <<
+                Fix32ToFloat(p->Frame.Left) << "," <<
+                Fix32ToFloat(p->Frame.Top) << "-" <<
+                Fix32ToFloat(p->Frame.Right) << "," <<
+                Fix32ToFloat(p->Frame.Bottom) << "\n" <<
                 indenter << "DocmentNumber=" << p->DocumentNumber << "\n" <<
                 indenter << "PageNumber=" << p->PageNumber << "\n" <<
                 indenter << "FrameNumber=" << p->FrameNumber << "\n}\n";
@@ -654,14 +655,14 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                     {
                         sBuffer << "Decode Value[" << i << "] =";
                         sBuffer << "{\n" <<
-                          "StartIn=" << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].StartIn) << ", " <<
-                          "BreakIn=" << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].BreakIn) << ", " <<
-                          "EndIn="   << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].EndIn) << ",\n" <<
-                          "StartOut=" << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].StartOut) << ", " <<
-                          "BreakOut=" << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].BreakOut) << ", " <<
-                          "EndOut=" << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].EndOut) << ", \n" <<
-                          "Gamma=" << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].Gamma) << ", " <<
-                          "SampleCount=" << CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Decode[i].SampleCount) <<
+                          "StartIn=" << Fix32ToFloat(pCurTransform->Decode[i].StartIn) << ", " <<
+                          "BreakIn=" << Fix32ToFloat(pCurTransform->Decode[i].BreakIn) << ", " <<
+                          "EndIn="   << Fix32ToFloat(pCurTransform->Decode[i].EndIn) << ",\n" <<
+                          "StartOut=" <<Fix32ToFloat(pCurTransform->Decode[i].StartOut) << ", " <<
+                          "BreakOut=" << Fix32ToFloat(pCurTransform->Decode[i].BreakOut) << ", " <<
+                          "EndOut=" << Fix32ToFloat(pCurTransform->Decode[i].EndOut) << ", \n" <<
+                          "Gamma=" << Fix32ToFloat(pCurTransform->Decode[i].Gamma) << ", " <<
+                          "SampleCount=" << Fix32ToFloat(pCurTransform->Decode[i].SampleCount) <<
                           "\n}\n";
                     }
                     int j;
@@ -671,7 +672,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                         for ( j = 0; j < 3; j++ )
                         {
                             sBuffer << "MixValue[" << i << "][" << j << "]=" <<
-                                    CTL_CapabilityTriplet::Twain32ToFloat(pCurTransform->Mix[i][j]) << "\n";
+                                    Fix32ToFloat(pCurTransform->Mix[i][j]) << "\n";
                         }
                     }
                 }
@@ -680,9 +681,9 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                 for ( i = 0; i < 4; i++ )
                 {
                     sBuffer << "CIEPoint " << CIEPointNames[i] << " = {" <<
-                                CTL_CapabilityTriplet::Twain32ToFloat(aPoints[i]->X) << "," <<
-                                CTL_CapabilityTriplet::Twain32ToFloat(aPoints[i]->Y) << "," <<
-                                CTL_CapabilityTriplet::Twain32ToFloat(aPoints[i]->Z) << "}\n";
+                                Fix32ToFloat(aPoints[i]->X) << "," <<
+                                Fix32ToFloat(aPoints[i]->Y) << "," <<
+                                Fix32ToFloat(aPoints[i]->Z) << "}\n";
                 }
 
                 sBuffer << "\nSample is user-defined and can't be determined \n}\n";

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -36,12 +36,11 @@ m_pOCREngine(pEngine)
 { }
 
 
-int CTL_TextIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, LONG64 MultiStage)
+int CTL_TextIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* pMultiPageStruct)
 {
-    const auto s = reinterpret_cast<DibMultiPageStruct*>(MultiStage);
     HANDLE hDib = nullptr;
 
-    if ( !s || s->Stage != DIB_MULTI_LAST )
+    if ( !pMultiPageStruct || pMultiPageStruct->Stage != DIB_MULTI_LAST )
     {
         if ( !m_pDib )
             return DTWAIN_ERR_DIB;
@@ -52,18 +51,18 @@ int CTL_TextIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     }
 
     CTextImageHandler TextHandler(m_ImageInfoEx, m_pOCREngine, m_nInputFormat, m_pDib);
-    if ( MultiStage )
+    if ( pMultiPageStruct )
     {
-        TextHandler.SetMultiPageStatus(s);
+        TextHandler.SetMultiPageStatus(pMultiPageStruct);
     }
 
     int retval;
-    if ( !s || s->Stage != DIB_MULTI_LAST )
+    if ( !pMultiPageStruct || pMultiPageStruct->Stage != DIB_MULTI_LAST )
         retval = TextHandler.WriteGraphicFile(this, szFile, hDib);
     else
         retval = TextHandler.WriteImage(nullptr,nullptr,0,0,0,0, nullptr);
-    if ( s )
-        TextHandler.GetMultiPageStatus(s);
+    if ( pMultiPageStruct )
+        TextHandler.GetMultiPageStatus(pMultiPageStruct);
     return retval;
 }
 

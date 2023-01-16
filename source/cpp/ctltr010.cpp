@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 
 #include "ctliface.h"
 #include "ctltwmgr.h"
-
+#include "twainfix32.h"
 using namespace dynarithmic;
 
 CTL_CapabilityTriplet::CTL_CapabilityTriplet(CTL_ITwainSession *pSession,
@@ -235,22 +235,6 @@ CTL_TwainTypeArray* CTL_CapabilityTriplet::GetTwainTypeArray()
     return &m_ObArray;
 }
 ////////////////////////////////////////////////////////////////////////////
-float CTL_CapabilityTriplet::Twain32ToFloat( TW_FIX32 Fix32 )
-{
-    float fval = static_cast<float>(Fix32.Whole) + static_cast<float>(Fix32.Frac) / static_cast<float>(65536.0);
-    return fval;
-}
-
-
-void CTL_CapabilityTriplet::FloatToTwain32( float fnum, TW_FIX32 & Fix32_value )
-{
-    const TW_BOOL sign = fnum < 0?TRUE:FALSE;
-    TW_INT32 value = static_cast<TW_INT32>(fnum * 65536.0 + (sign ? -0.5 : 0.5));
-    Fix32_value.Whole = static_cast<TW_INT16>(value >> 16);
-    Fix32_value.Frac = static_cast<TW_UINT16>(value & 0x0000ffffL);
-}
-
-
 bool CTL_CapabilityTriplet::IsSupported()
 {
     return m_bSupported;

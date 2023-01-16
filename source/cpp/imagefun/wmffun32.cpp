@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -77,7 +77,8 @@ int CWMFImageHandler::WriteEMF(BYTE *pDib, UINT32 width, UINT32 height,
     HDC dc = GetDC(nullptr);
     if (dc!= nullptr)
     {
-        DTWAINDeviceContextRelease_RAII dcRAII(std::make_pair(static_cast<HWND>(nullptr), dc));
+        auto pr = std::make_pair(static_cast<HWND>(nullptr), dc);
+        DTWAINDeviceContextRelease_RAII dcRAII(&pr);
         const int iDPIX = GetDeviceCaps(dc, LOGPIXELSX);
         const int iDPIY = GetDeviceCaps(dc, LOGPIXELSY);
 
@@ -165,7 +166,8 @@ int CWMFImageHandler::WriteWMF(BYTE *pDib, UINT32 width, UINT32 height,
     HDC dc = GetDC(nullptr);
     if (dc!= nullptr)
     {
-        DTWAINDeviceContextRelease_RAII raii(std::make_pair(static_cast<HWND>(nullptr), dc));
+        auto pr = std::make_pair(static_cast<HWND>(nullptr), dc);
+        DTWAINDeviceContextRelease_RAII raii(&pr);
         const int iDPIX = GetDeviceCaps(dc, LOGPIXELSX);
         const int iDPIY = GetDeviceCaps(dc, LOGPIXELSY);
 

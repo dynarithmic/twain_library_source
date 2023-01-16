@@ -1,6 +1,6 @@
 /*
 This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-Copyright (c) 2002-2022 Dynarithmic Software.
+Copyright (c) 2002-2023 Dynarithmic Software.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -58,15 +58,15 @@ namespace dynarithmic
             int      ProcessManualDuplexState(LONG Msg) const;
             int      MergeDuplexFilesEx(const sDuplexFileData& DupData,
                                         CTL_ImageIOHandlerPtr& pHandler,
-                                        CTL_StringType strTempFile,
+                                        const CTL_StringType& strTempFile,
                                         int MultiPageOption) const;
 
             int     CopyDibToFileEx(CTL_TwainDibPtr pCurDib,
                                      int MultipageOption,
                                      CTL_ImageIOHandlerPtr& pHandler,
-                                     CTL_StringType strTempFile) const;
+                                     const CTL_StringType& strTempFile) const;
 
-            void     ManualDuplexCleanUp(CTL_StringType strFile, bool bDeleteFile=false) const;
+            void     ManualDuplexCleanUp(const CTL_StringType& strFile, bool bDeleteFile=false) const;
             bool     ProcessFailureCondition(int nAction) const;
             LONG     CloseMultiPageDibFile(bool bSaveFile=true) const;
             void     EndProcessingImageFile(bool bSaveFile=true) const;

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////
 /// Classes that do the TWAIN triplet protocol
 
-CTL_TwainTriplet::CTL_TwainTriplet() : m_TwainTripletArg({nullptr, nullptr, {0,0,0}, nullptr}),
+CTL_TwainTriplet::CTL_TwainTriplet() : m_TwainTripletArg({ {}, {}, {{},{},{}}, {}}),
                                        m_bInit(false),
                                        m_bAlive(false),
                                        m_pSource(nullptr),

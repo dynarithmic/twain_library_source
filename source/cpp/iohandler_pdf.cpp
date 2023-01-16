@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 #include "ctldib.h"
 #include "ctliface.h"
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
 #include "ctlfileutils.h"
 
 using namespace dynarithmic;
@@ -189,15 +188,14 @@ struct PDFTextElementEraser
     LONG m_Flags;
 };
 
-int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, LONG64 MultiStage)
+int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, DibMultiPageStruct* pMultiPageStruct)
 {
-    auto s = reinterpret_cast<DibMultiPageStruct*>(MultiStage);
     // Now add this to PDF page
     CPDFImageHandler PDFHandler(szFile, m_ImageInfoEx);
     CTL_StringType szTempFile;
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
-    if (!s || s->Stage == DIB_MULTI_FIRST)
+    if (!pMultiPageStruct || pMultiPageStruct->Stage == DIB_MULTI_FIRST)
     {
         auto* pSource = m_ImageInfoEx.theSource;
         auto it = pHandle->m_mapPDFTextElement.find(pSource);
@@ -208,7 +206,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, LO
         }
     }
 
-    if (!s || s->Stage != DIB_MULTI_LAST)
+    if (!pMultiPageStruct || pMultiPageStruct->Stage != DIB_MULTI_LAST)
     {
         if ( !m_ImageInfoEx.IsImageFileCreated )
         {
@@ -254,7 +252,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, LO
                     // Create a TIFF file
                     m_TiffHandler.SetDib(m_pDib);
                     dps.Stage = DIB_MULTI_FIRST;
-                    bRet = m_TiffHandler.WriteBitmap(szTempFile.c_str(), bOpenFile, 0, reinterpret_cast<LONG64>(&dps));
+                    bRet = m_TiffHandler.WriteBitmap(szTempFile.c_str(), bOpenFile, 0, &dps);
 
                     if ( bRet != 0 )
                     {
@@ -264,7 +262,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, LO
                     else
                     {
                         dps.Stage = DIB_MULTI_LAST;
-                        bRet = m_TiffHandler.WriteBitmap(szTempFile.c_str(), bOpenFile, 0, reinterpret_cast<LONG64>(&dps));
+                        bRet = m_TiffHandler.WriteBitmap(szTempFile.c_str(), bOpenFile, 0, &dps);
                         CTL_TwainAppMgr::WriteLogInfoA("Image file created successfully " + szTempFileA + "\n");
                     }
                     PDFHandler.SetImageType(1);
@@ -283,17 +281,15 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, LO
                 PDFHandler.SetImageType(0);
         }
     }
-    if ( MultiStage )
-        PDFHandler.SetMultiPageStatus(s);
+    if ( pMultiPageStruct )
+        PDFHandler.SetMultiPageStatus(pMultiPageStruct);
 
     // If OCR text is desired, then get the text for the page now
     int bRet;
-    CTL_TEXTELEMENTPTRLIST::iterator tempExFirst;
-    CTL_TEXTELEMENTPTRLIST::iterator tempExLast;
     unsigned int nCount = 0;
     m_ImageInfoEx.IsSearchableTextOnPage = false;
 
-    if ( m_ImageInfoEx.IsOCRUsedForPDF && (!s || s->Stage != DIB_MULTI_LAST))
+    if ( m_ImageInfoEx.IsOCRUsedForPDF && (!pMultiPageStruct || pMultiPageStruct->Stage != DIB_MULTI_LAST))
     {
         OCRTextInfo ocrTextInfo;
         CTL_TwainAppMgr::SendTwainMsgToWindow(m_ImageInfoEx.theSession, nullptr,
@@ -377,8 +373,8 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, LO
         delete_file( szTempFile.c_str() );
     }
 
-    if ( s )
-        PDFHandler.GetMultiPageStatus(s);
+    if ( pMultiPageStruct )
+        PDFHandler.GetMultiPageStatus(pMultiPageStruct);
     return bRet;
 }
 
@@ -477,7 +473,7 @@ int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, std::string& sT
             pHandler->SetDib(&theDib);
 
             // Write the bitmap
-            bRetWrite = pHandler->WriteBitmap(szTempPath.c_str(), 0, 0, 0);
+            bRetWrite = pHandler->WriteBitmap(szTempPath.c_str(), 0, 0);
 
             // remove the temp dib
             theDib.Delete();
@@ -486,17 +482,17 @@ int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, std::string& sT
             pHandler->SetDib(oldDib);
         }
         else
-            bRetWrite = pHandler->WriteBitmap(szTempPath.c_str(), 0, 0, 0);
+            bRetWrite = pHandler->WriteBitmap(szTempPath.c_str(), 0, 0);
 
         if ( bRetWrite != 0 )
         {
             CTL_TwainAppMgr::WriteLogInfo(_T("Error creating temporary OCR Image File ") + szTempPath + _T("\n"));
             return bRetWrite;
         }
-        sFileToUse = szTempPath;
+        sFileToUse = std::move(szTempPath);
     }
     // Just OCR the text here
-    const DTWAIN_ARRAY aValues = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 1);
+    DTWAIN_ARRAY aValues = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 1);
     if ( aValues )
     {
         DTWAINArrayLL_RAII a(aValues);
@@ -528,7 +524,7 @@ int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, std::string& sT
 
                 if ( bSave )
                 {
-                    std::copy(charBuffer.begin(), charBuffer.end(), std::back_inserter(sText));
+                    sText = StringConversion::Convert_Native_To_Ansi(charBuffer.data(), charBuffer.size());
                     return 0;
                 }
                 else

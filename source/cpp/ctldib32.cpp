@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@
 #include "winbit32.h"
 #include "ctltwmgr.h"
 #include "ctldib.h"
-#include "enumeratorfuncs.h"
+#include "arrayfactory.h"
 #include "ctlfileutils.h"
 /* Header signatures for various resources */
 #define BFT_ICON   0x4349   /* 'IC' */
@@ -279,15 +279,17 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
         case TextFormat:
         case TextFormatMulti:
         {
+            auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+
             // Get the current OCR engine's input format
             DTWAIN_ARRAY a = nullptr;
-            DTWAINArrayLL_RAII raii(a);
             const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
             DTWAIN_GetOCRCapValues(static_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine.get()), DTWAIN_OCRCV_IMAGEFILEFORMAT,
                                     DTWAIN_CAPGETCURRENT, &a);
+            DTWAINArrayLL_RAII raii(a);
             if ( a )
             {
-                const auto& vValues = EnumeratorVector<int>(a);
+                const auto& vValues = factory->underlying_container_t<LONG>(a);
                 if ( !vValues.empty() )
                 {
                     LONG InputFormat = vValues[0];
@@ -307,7 +309,8 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
     int bRet;
     try
     {
-        bRet = pHandler->WriteBitmap( szFile, bOpenFile, fhFile )?1:0;
+        pHandler->SetBaseImageInfo(ImageInfo);
+        bRet = pHandler->WriteBitmap( szFile, bOpenFile, fhFile );
     }
     catch(...)
     {
@@ -361,13 +364,13 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
         {
             // Get the current OCR engine's input format
             DTWAIN_ARRAY a = nullptr;
-            DTWAINArrayLL_RAII raii(a);
             const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
             DTWAIN_GetOCRCapValues(static_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine.get()), DTWAIN_OCRCV_IMAGEFILEFORMAT,
                                     DTWAIN_CAPGETCURRENT, &a);
+            DTWAINArrayLL_RAII raii(a);
             if ( a )
             {
-                const auto& vValues = EnumeratorVector<int>(a);
+                const auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(a);
                 if ( !vValues.empty() )
                 {
                     LONG InputFormat = vValues[0];
@@ -394,7 +397,7 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
 
     try
     {
-        nStatus = pHandler->WriteBitmap( szFile, bOpenFile, fhFile, reinterpret_cast<LONG64>(&s) );
+        nStatus = pHandler->WriteBitmap( szFile, bOpenFile, fhFile, &s );
     }
     catch(...)
     {
@@ -426,7 +429,7 @@ int CTL_TwainDib::WriteNextPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int 
         pImgHandler->SetImageInfo(ImageInfo);
         try
         {
-            nStatus = pImgHandler->WriteBitmap(s2.strName.c_str(), false, 0, reinterpret_cast<LONG64>(&s2));
+            nStatus = pImgHandler->WriteBitmap(s2.strName.c_str(), false, 0, &s2);
         }
         catch(...)
         {
@@ -458,7 +461,7 @@ int CTL_TwainDib::WriteLastPageDibMulti(CTL_ImageIOHandlerPtr& pImgHandler, int 
 
         try
         {
-            nStatus = pImgHandler->WriteBitmap(s.strName.c_str(), false, 0, reinterpret_cast<LONG64>(&s));
+            nStatus = pImgHandler->WriteBitmap(s.strName.c_str(), false, 0, &s);
         }
         catch(...)
         {
@@ -909,28 +912,24 @@ bool CTL_TwainDib::FlipBitMap(bool /*bRGB*/)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 CTL_TwainDibPtr CTL_TwainDibArray::CreateDib()
 {
-    const CTL_TwainDibPtr NewDib(new CTL_TwainDib);
-    return InitializeDibInfo(NewDib);
+    return InitializeDibInfo(std::make_shared<CTL_TwainDib>());
 }
 
 
 CTL_TwainDibPtr CTL_TwainDibArray::CreateDib(HANDLE hDib, HWND hWnd/*=NULL*/)
 {
-    const CTL_TwainDibPtr NewDib(new CTL_TwainDib(hDib, hWnd));
-    return InitializeDibInfo(NewDib);
+    return InitializeDibInfo(std::make_shared<CTL_TwainDib>(hDib, hWnd));
 }
 
 
 CTL_TwainDibPtr CTL_TwainDibArray::CreateDib(LPCSTR lpszFileName, HWND hWnd/*=NULL*/)
 {
-    const CTL_TwainDibPtr NewDib(new CTL_TwainDib( lpszFileName, hWnd ));
-    return InitializeDibInfo(NewDib);
+    return InitializeDibInfo(std::make_shared<CTL_TwainDib>(lpszFileName, hWnd));
 }
 
 CTL_TwainDibPtr CTL_TwainDibArray::CreateDib( const CTL_TwainDib& rDib )
 {
-    const CTL_TwainDibPtr NewDib(new CTL_TwainDib( rDib ));
-    return InitializeDibInfo(NewDib);
+    return InitializeDibInfo(std::make_shared<CTL_TwainDib>(rDib));
 }
 
 CTL_TwainDibPtr CTL_TwainDibArray::InitializeDibInfo(CTL_TwainDibPtr Dib)

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2022 Dynarithmic Software.
+    Copyright (c) 2002-2023 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include "dtwain.h"
 #include "ctliface.h"
 #include "ctltwmgr.h"
-#include "enumeratorfuncs.h"
+#include "arrayfactory.h"
 using namespace dynarithmic;
 
 /* Duplex Scanner support */
@@ -45,9 +45,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, LPLONG lpDup
             DTWAINArrayLL_RAII arr(Array);
             if ( bRet2 && Array)
             {
-                auto vValues = EnumeratorVectorPtr<LONG>(Array);
-                if ( vValues && !vValues->empty() )
-                    *lpDupType = (*vValues)[0];
+                auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(Array);
+                if ( !vValues.empty() )
+                    *lpDupType = vValues.front();
             }
         }
     }
