@@ -43,6 +43,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "C Demo", "C Demo", "{A8735953-53A3-4A2D-BABC-9DD793265C68}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DTWDEMO", "Examples\c\dtwdemo\DTWDEMO.vcxproj", "{C9174FAA-B3D0-4732-9A9B-283441477092}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CCA03A98-B8AB-41CA-985F-4100371FE5ED} = {CCA03A98-B8AB-41CA-985F-4100371FE5ED}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
