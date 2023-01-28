@@ -100,7 +100,6 @@ CTL_ImageMemXferTriplet::CTL_ImageMemXferTriplet(CTL_ITwainSession *pSession,
     m_nPixelType = nPixelType;
     pSource->SetBufferStripData(&m_ImageMemXferBuffer);
     SetBufferedTransfer(true);
-    SetEndTwainUI(false); // Buffered transfers need to end the TWAIN UI manually
 }
 
 CTL_ImageMemXferTriplet::~CTL_ImageMemXferTriplet()
@@ -518,7 +517,9 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
     // Delete the buffer if compression used and we have saved to a file
     if ( !pSource->GetUserStripBuffer())
     {
-        if ( m_nCompression != TWCP_NONE)
+        if ( m_nCompression != TWCP_NONE/* &&
+            pSource->GetAcquireType() == TWAINAcquireType_FileUsingNative */)
+
             ImageMemoryHandler::GlobalFreePr(m_ImageMemXferBuffer.Memory.TheMem);
     }
     else
@@ -545,13 +546,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
         bForceClose = false;
     else
         bForceClose = true;
-    if ( !IsScanPending() )
-    {
-        if (!pSource->IsUIOpenOnAcquire())
-            // Shut down the "UI" here, even if no UI is shown
-            CTL_TwainAppMgr::EndTwainUI(pSession, pSource);
-        SetPendingXfersDone(true);
-    }
+    AbortTransfer(bForceClose, errfile);
     return rc;
 }
 

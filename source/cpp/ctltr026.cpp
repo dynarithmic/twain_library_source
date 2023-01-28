@@ -56,8 +56,7 @@ CTL_ImageXferTriplet::CTL_ImageXferTriplet(CTL_ITwainSession *pSession,
                      m_bPendingXfersDone(false),
                      m_PendingXfers{},
                      m_lastPendingXferCode(0),
-                     m_IsBuffered(false),
-                     m_bEndTwainUI(true)
+                     m_IsBuffered(false)
 {
     switch( nType )
     {
@@ -553,7 +552,7 @@ TW_UINT16 CTL_ImageXferTriplet::GetImagePendingInfo(TW_PENDINGXFERS *pPI, TW_UIN
 
 
 
-std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int errFile)
+bool CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int errFile)
 {
     if ( CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
         CTL_TwainAppMgr::WriteLogInfoA("Potentially aborting transfer..\n");
@@ -642,9 +641,9 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
 
                         // Set everything for next job
                         pSource->ResetJob();
-                        return { true, false };
+                        return true;
                     }
-                    return { true, false };
+                    return true;
                 }
             }
 
@@ -654,7 +653,7 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
 
                 // Send a message to close things down if
                 // there was no user interface chosen
-                if ( !pSource->IsUIOpenOnAcquire() && m_bEndTwainUI )
+                if ( !pSource->IsUIOpenOnAcquire() )
                     CTL_TwainAppMgr::EndTwainUI(pSession, pSource);
 
                 // Close any open multi page DIB files
@@ -705,8 +704,6 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
                                                           nullptr, DTWAIN_TN_ENDOFJOBDETECTED,
                                                           reinterpret_cast<LPARAM>(pSource));
                 }
-                m_bScanPending = ptrPending->Count != 0;
-                return { true, true };
             }
         break;
 
@@ -721,7 +718,7 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
         break;
     }
     m_bScanPending = ptrPending->Count != 0;
-    return { false, ptrPending->Count == 0};
+    return false;
 }
 
 void CTL_ImageXferTriplet::SaveJobPages(const ImageXferFileWriter& FileWriter)

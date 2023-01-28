@@ -1,11 +1,5 @@
 DTWAIN Version changes
 
-5.3.0.1		  
-
-- Fixed issues with buffered transfers querying for pending transfers twice per page instead of
-  once per page.
-
-
 5.3.0.0		  
 
 - Initial support for latest TWAIN 2.5 capabilities (mostly Image Addressing).
