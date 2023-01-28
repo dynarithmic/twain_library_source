@@ -50,7 +50,7 @@ namespace dynarithmic
 
 
         protected:
-            std::pair<bool, bool> AbortTransfer(bool bForceClose = false, int error = 0);
+            bool            AbortTransfer(bool bForceClose = false, int error = 0);
             std::string     GetPageFileName(const std::string& strBase, int nCurImage ) const;
             bool            IsPendingXfersDone() const { return m_bPendingXfersDone; }
             void            SetPendingXfersDone(bool bSet) { m_bPendingXfersDone = bSet; }
@@ -114,8 +114,6 @@ namespace dynarithmic
             bool ModifyAcquiredDib();
             bool QueryAndRemoveDib(CTL_TwainAcquireEnum acquireType, size_t nWhich);
             bool ResampleAcquiredDib();
-            bool EndTwainUI() const { return m_bEndTwainUI; }
-            void SetEndTwainUI(bool bSet = true) { m_bEndTwainUI = bSet; }
 
         protected:
             HANDLE          m_hDataHandle;
@@ -132,7 +130,6 @@ namespace dynarithmic
             TW_PENDINGXFERS m_PendingXfers;
             TW_UINT16       m_lastPendingXferCode;
             bool            m_IsBuffered;
-            bool            m_bEndTwainUI;
     };
 }
 #endif

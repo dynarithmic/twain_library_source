@@ -238,7 +238,7 @@ LRESULT CALLBACK_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
             {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 if ( wParam == DTWAIN_TN_ACQUIRESTARTED )
-                    pSource->SetImagesStored(false);
+                    pSource->SetImagesStored(FALSE);
 
                 if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) ||
                      !CTL_TwainDLLHandle::s_aAllCallbacks.empty())
@@ -269,11 +269,15 @@ LRESULT CALLBACK_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                 // Add the array of DIBs in the source
                 if ( wParam == DTWAIN_TN_ACQUIREDONE && !pSource->ImagesStored() )
                 {
+                    char buf[25];
                     LOG_FUNC_STRING(DTWAIN_ACQUIREDONE -- Copying DIBS to Source...)
                     DTWAIN_ARRAY aDibs = nullptr;
                     aDibs = DTWAIN_ArrayCreate( DTWAIN_ARRAYHANDLE, 0 );
                     DTWAIN_GetAllSourceDibs( static_cast<DTWAIN_SOURCE>(pSource), aDibs );
                     pSource->AddDibsToAcquisition(aDibs);
+                    StringStreamA strm;
+                    strm << buf;
+                    LOG_FUNC_VALUES(strm.str().c_str())
                     LOG_FUNC_STRING(DTWAIN_ACQUIREDONE -- Finished Copying DIBS to Source...)
                 }
                 else
