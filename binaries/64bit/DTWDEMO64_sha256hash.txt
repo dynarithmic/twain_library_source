@@ -1,0 +1,1 @@
+﻿SHA256 hash of "DTWDEMO64.exe" (32 bytes) = 8cebe40bd6e4f7142dcb781e6285d7f8a76ae3ed1e284ec16208a90713733a5e
