@@ -109,7 +109,7 @@ static T FunctionCaller(FnToCall fn, const std::string& func, const std::string&
     const bool doLog = CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK ? true : false;
     try
     {
-        T bRet = T(0);
+        T bRet {};
         if (doLog)
         {
             try { CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_IN) + paramLog); }
@@ -133,7 +133,7 @@ static T FunctionCaller(FnToCall fn, const std::string& func, const std::string&
         LogExceptionErrorA(func.c_str());
         if (CTL_TwainDLLHandle::s_bThrowExceptions)
             DTWAIN_InternalThrowException();
-        return T(0);
+        return {};
     }
 }
 
@@ -421,6 +421,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+EXPORT_IS_CAP_SUPPORTED_I(DTWAIN_IsAudioXferSupported, ACAP_XFERMECH)
 EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsAutoBorderDetectSupported, DTWAIN_CV_ICAPAUTOMATICBORDERDETECTION)
 EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsAutoBrightSupported, DTWAIN_CV_ICAPAUTOBRIGHT)
 EXPORT_IS_CAP_SUPPORTED_I_1(DTWAIN_IsAutoDeskewSupported, DTWAIN_CV_ICAPAUTOMATICDESKEW)
