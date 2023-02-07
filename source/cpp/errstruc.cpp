@@ -534,7 +534,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                         indenter << "ModalUI=" << (p->ModalUI?"TRUE":"FALSE") << "\n" <<
                         indenter << "hParent=" << p->hParent << "\n" <<
                         indenter << "hParent.Title=" << sz << "\n" <<
-                        indenter << "hParent.ScreenPos.=" <<
+                        indenter << "hParent.ScreenPo.= {" <<
                         r.left << "," << r.top << "-" <<
                         r.right << "," << r.bottom << "\n}\n";
             #endif

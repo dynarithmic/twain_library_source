@@ -23,6 +23,7 @@ it under the terms of the one of two licenses as you choose:
 #include <sys/types.h>
 #include <errno.h>
 #include <string.h>
+#include <memory>
 
 #ifndef __cplusplus
 
@@ -112,7 +113,7 @@ protected:
 };
 
 #ifdef WIN32
-template class DllDef std::auto_ptr<std::streambuf>;
+template class DllDef std::unique_ptr<std::streambuf>;
 #endif
 
 class DllDef LibRaw_file_datastream : public LibRaw_abstract_datastream
