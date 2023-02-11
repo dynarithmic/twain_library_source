@@ -185,9 +185,9 @@ DTWAIN_SOURCE dynarithmic::SourceSelect(const SourceSelectionOptions& options)
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS((DTWAIN_SOURCE)NULL)
 
-        // Open and close the source to initialize capability structure
-        // Return a dead source.  This allows closing of the source without
-        // destroying the source info
+    // Open and close the source to initialize capability structure
+    // Return a dead source.  This allows closing of the source without
+    // destroying the source info
     auto pRealSource = static_cast<CTL_ITwainSource*>(pSource);
     DTWAIN_SOURCE pDead = nullptr;
 
