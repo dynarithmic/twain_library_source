@@ -534,24 +534,21 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
     // Prompt to save image here
     bool bRetval = true;
     bool bForceClose;
+
+    pSource->SetBlankPageCount(pSource->GetBlankPageCount() + (bPageDiscarded ? 1 : 0));
+
     if ( !bPageDiscarded && pSource->IsPromptPending())
     {
         bRetval = PromptAndSaveImage(pSource->GetPendingImageNum())?true:false;
         pSource->SetPromptPending(false);
     }
 
-    // Force a close if Prompting returned FALSE.
+    // Force a close if Prompting returned false.
     if ( bRetval == true )
         bForceClose = false;
     else
         bForceClose = true;
-    if ( !IsScanPending() )
-    {
-        if (!pSource->IsUIOpenOnAcquire())
-            // Shut down the "UI" here, even if no UI is shown
-            CTL_TwainAppMgr::EndTwainUI(pSession, pSource);
-        SetPendingXfersDone(true);
-    }
+    AbortTransfer(bForceClose, errfile);
     return rc;
 }
 

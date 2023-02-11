@@ -443,6 +443,9 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
         }
     }
 
+    if (m_IsBuffered)
+        return rc;
+
     // Prompt to save image here
     bool bRetval = true;
     bool bForceClose;
