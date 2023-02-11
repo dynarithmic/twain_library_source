@@ -100,6 +100,7 @@ CTL_ImageMemXferTriplet::CTL_ImageMemXferTriplet(CTL_ITwainSession *pSession,
     m_nPixelType = nPixelType;
     pSource->SetBufferStripData(&m_ImageMemXferBuffer);
     SetBufferedTransfer(true);
+    SetEndTwainUI(false); // Buffered transfers need to end the TWAIN UI manually
 }
 
 CTL_ImageMemXferTriplet::~CTL_ImageMemXferTriplet()
@@ -517,9 +518,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
     // Delete the buffer if compression used and we have saved to a file
     if ( !pSource->GetUserStripBuffer())
     {
-        if ( m_nCompression != TWCP_NONE/* &&
-            pSource->GetAcquireType() == TWAINAcquireType_FileUsingNative */)
-
+        if ( m_nCompression != TWCP_NONE)
             ImageMemoryHandler::GlobalFreePr(m_ImageMemXferBuffer.Memory.TheMem);
     }
     else
@@ -535,13 +534,16 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
     // Prompt to save image here
     bool bRetval = true;
     bool bForceClose;
+
+    pSource->SetBlankPageCount(pSource->GetBlankPageCount() + (bPageDiscarded ? 1 : 0));
+
     if ( !bPageDiscarded && pSource->IsPromptPending())
     {
         bRetval = PromptAndSaveImage(pSource->GetPendingImageNum())?true:false;
         pSource->SetPromptPending(false);
     }
 
-    // Force a close if Prompting returned FALSE.
+    // Force a close if Prompting returned false.
     if ( bRetval == true )
         bForceClose = false;
     else
