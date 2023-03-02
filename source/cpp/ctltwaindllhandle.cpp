@@ -108,7 +108,7 @@ CTL_GeneralErrorInfo    CTL_TwainDLLHandle::s_mapGeneralErrorInfo;
 CTL_TwainDLLHandle::CTL_ErrorToExtraInfoMap CTL_TwainDLLHandle::s_mapExtraErrorInfo;
 
 CTL_ArrayFactoryPtr     CTL_TwainDLLHandle::s_ArrayFactory;
-std::vector<int>        CTL_TwainDLLHandle::s_aAcquireNum;
+std::vector<LONG_PTR>   CTL_TwainDLLHandle::s_aAcquireNum;
 bool                    CTL_TwainDLLHandle::s_bCheckReentrancy;
 short int               CTL_TwainDLLHandle::s_nDSMState = DSM_STATE_NONE;
 CTL_TwainNameMap        CTL_TwainDLLHandle::s_TwainNameMap;

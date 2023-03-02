@@ -24,6 +24,7 @@
 #include "errorcheck.h"
 #include "sourceacquireopts.h"
 #include "ctlfileutils.h"
+#include "ctltwainmsgloop.h"
 
 #include "cppfunc.h"
 #ifdef _MSC_VER
@@ -132,8 +133,12 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireFile(SourceAcquireOptions& opts)
         opts.setFileFlags(opts.getFileFlags() | DTWAIN_USELIST);
     if ( opts.getAcquireType() != TWAINAcquireType_AudioFile)
         opts.setActualAcquireType(TWAINAcquireType_File);
-    const DTWAIN_ACQUIRE Ret = LLAcquireImage(opts);
-    LOG_FUNC_EXIT_PARAMS(Ret)
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
+        return LLAcquireImage(opts);
+    auto pr = dynarithmic::StartModalMessageLoop(opts.getSource(), opts);
+    return pr.second;
+    LOG_FUNC_EXIT_PARAMS(pr.second)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 

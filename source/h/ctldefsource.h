@@ -18,27 +18,13 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctltwmgr.h"
-#include "errorcheck.h"
-#ifdef _MSC_VER
-#pragma warning (disable:4702)
-#endif
+#ifndef CTLDEFSOURCE_H
+#define CTLDEFSOURCE_H
 
-using namespace dynarithmic;
+#include "ctliface.h"
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIEnabled(DTWAIN_SOURCE Source)
+namespace dynarithmic
 {
-    LOG_FUNC_ENTRY_PARAMS((Source))
-    if (!Source)
-        LOG_FUNC_EXIT_PARAMS(false)
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
-    if (!p)
-        LOG_FUNC_EXIT_PARAMS(false)
-    const DTWAIN_BOOL bRet = p->IsUIOpen();
-    LOG_FUNC_EXIT_PARAMS(bRet)
-    CATCH_BLOCK(false)
+    CTL_StringType GetDTWAININIPath();
 }
+#endif

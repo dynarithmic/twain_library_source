@@ -19,7 +19,9 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltwmgr.h"
-#include "ctliface.h"
+#include "sourceacquireopts.h"
+#include "ctltr040.h"
+#include "ctltwainmsgloop.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -28,11 +30,56 @@ using namespace dynarithmic;
 
 std::queue<MSG> TwainMessageLoopV2::s_MessageQueue;
 
+std::pair<bool, DTWAIN_ACQUIRE> dynarithmic::StartModalMessageLoop(DTWAIN_SOURCE Source, SourceAcquireOptions& opts)
+{
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
+        return { true, 0 };
+
+    CTL_ITwainSource* pSource = VerifySourceHandle(pHandle, Source);
+
+    if (!pSource)
+        return { false, -1 };
+
+    // Start a message loop here
+    // TWAIN 1.x loop implementation
+    TwainMessageLoopV1 v1Impl(pHandle);
+
+    // TWAIN 2.x loop implementation
+    TwainMessageLoopV2 v2Impl(pHandle);
+
+    // default to version 1
+    TwainMessageLoopImpl* pImpl = &v1Impl;
+
+    // check for version 2 implementation
+    if (CTL_TwainAppMgr::IsVersion2DSMUsed())
+    {
+        // assign the callback procedure
+        CTL_TwainDLLHandle::s_TwainCallbackSet = false;
+        CTL_DSMCallbackTripletRegister callbackSetter(CTL_TwainAppMgr::GetCurrentSession(), pSource, &TwainMessageLoopV2::TwainVersion2MsgProc);
+        if (callbackSetter.Execute() == TWRC_SUCCESS)
+            pImpl = &v2Impl;
+    }
+
+    // do any prep work before we loop
+    pImpl->PrepareLoop();
+    pImpl->SetAcquireOptions(opts);
+    pImpl->PerformMessageLoop(pSource, opts.getIsUIOnly());
+    return { true, pImpl->GetAcquireNum() };
+}
+
 bool TwainMessageLoopImpl::IsSourceOpen(CTL_ITwainSource* pSource, bool bUIOnly)
 {
     if (bUIOnly)
         return pSource->IsUIOpen() ? true : false;
     return !m_pDLLHandle->m_bTransferDone == true && !m_pDLLHandle->m_bSourceClosed == true;
+}
+
+bool TwainMessageLoopImpl::IsAcquireTerminated(CTL_ITwainSource* pSource, bool bUIOnly)
+{
+    if (bUIOnly)
+        return !pSource->IsUIOpen();
+    return !IsSourceOpen(pSource, bUIOnly);
 }
 
 void TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource *pSource, bool isUIOnly)
@@ -48,11 +95,44 @@ void TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource *pSource, 
 
     UIScopedRAII raii(pSource);
     pSource->SetUIOnly(isUIOnly);
-#ifdef WIN32
+#ifdef _WIN32
+    bool bInitializeAcquisitionProcess = false;
+
+    // Make sure message loop is not empty.  Post a WM_NULL message to the
+    // message queue to ensure we're not stuck forever on waiting for a 
+    // message in the GetMessage() call.
+    HWND theWnd = *pSource->GetTwainSession()->GetWindowHandlePtr();
+    ::PostMessage(theWnd, WM_NULL, static_cast<WPARAM>(0), static_cast<LPARAM>(0));
+
+    // Start the message loop
     while (GetMessage(&msg, nullptr, 0, 0))
     {
-        if (!IsSourceOpen(pSource, isUIOnly))
+        // If in UIOnly mode, set it up here
+        if (isUIOnly && !bInitializeAcquisitionProcess)
+        {
+            LLSetupUIOnly(pSource);
+            bInitializeAcquisitionProcess = true;
+        }
+
+        // If acquire has been terminated, break out of this loop
+        if (IsAcquireTerminated(pSource, isUIOnly))
             break;
+
+        // If we haven't set up the TWAIN device for the acquisition,
+        // do it now.  The LLAcquireImage() will also eventually show
+        // the user-interface of the device, or acquire immediately if
+        // no user-interface is being used.
+        if (!bInitializeAcquisitionProcess)
+        {
+            m_AcquireNum = LLAcquireImage(sOpts);
+            bInitializeAcquisitionProcess = true;
+
+            // Didn't get an acquisition number, so something failed
+            if (m_AcquireNum == -1L)
+                break;
+        }
+
+        // This will test for TWAIN messages, Data Source messages or application messages.
         if (CanEnterDispatch(&msg))
         {
             TranslateMessage(&msg);

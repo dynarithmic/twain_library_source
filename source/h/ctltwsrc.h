@@ -150,8 +150,8 @@ namespace dynarithmic
         void         SetDeleteDibOnScan(bool bSet=true) { m_bDeleteOnScan = bSet; }
         bool         SetDibAutoDelete(bool bSet=true);
         void         SetAcquireType(CTL_TwainAcquireEnum AcquireType, LPCTSTR lpszFile=nullptr);
-        void         SetAcquireNum(LONG lNum) { m_lAcquireNum = lNum; }
-        LONG         GetAcquireNum() const { return m_lAcquireNum; }
+        void         SetAcquireNum(LONG_PTR lNum) { m_lAcquireNum = lNum; }
+        LONG_PTR     GetAcquireNum() const { return m_lAcquireNum; }
         long         GetMaxAcquireCount() const { return m_nAcquireCount; }
         void         SetMaxAcquireCount(int nAcquire) { m_nAcquireCount = nAcquire; }
         CTL_TwainAcquireEnum  GetAcquireType() const { return m_AcquireType; }
@@ -463,7 +463,7 @@ namespace dynarithmic
         long            m_lFileFlags;
         bool            m_bAcquireAttempt;
         int             m_nAcquireCount;
-        long            m_lAcquireNum;
+        LONG_PTR        m_lAcquireNum;
         DTWAIN_ARRAY    m_pFileEnumerator;
         bool            m_bTransferDone;
         bool            m_bAcquireStarted;

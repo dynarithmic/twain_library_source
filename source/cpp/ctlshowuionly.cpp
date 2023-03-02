@@ -22,6 +22,7 @@
 #include "ctltwmgr.h"
 #include "errorcheck.h"
 #include "ctltr040.h"
+#include "ctltwainmsgloop.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -40,15 +41,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle,[&]{return DTWAIN_IsSourceAcquiring(Source); },
-        DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return DTWAIN_IsSourceAcquiring(Source); },
+    DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle,[&]{return pSource->IsUIOpen(); },
-        DTWAIN_ERR_UI_ALREADY_OPENED, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return pSource->IsUIOpen(); },
+    DTWAIN_ERR_UI_ALREADY_OPENED, false, FUNC_MACRO);
 
     // Open the source (if source is closed)
     bool bCloseSource = false;
-    const bool bIsSourceOpen = DTWAIN_IsSourceOpen(Source)?true:false;
+    const bool bIsSourceOpen = DTWAIN_IsSourceOpen(Source) ? true : false;
 
     if (!bIsSourceOpen && DTWAIN_GetTwainMode() == DTWAIN_MODAL)
     {
@@ -57,10 +58,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
             LOG_FUNC_EXIT_PARAMS(false)
     }
     else
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bIsSourceOpen; }, DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !bIsSourceOpen; }, DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
     // Check if capability is supported
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPENABLEDSUIONLY); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPENABLEDSUIONLY); },
         DTWAIN_ERR_UIONLY_NOT_SUPPORTED, false, FUNC_MACRO);
 
     // Start a thread depending on Twain Mode.
@@ -72,35 +73,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
 
     else
     {
-        // Set up a "worker thread" until we get confirmation on success or failure
-        if (true)
-        {
-            // TWAIN 1.x loop implementation
-            TwainMessageLoopV1 v1Impl(pHandle);
-
-            // TWAIN 2.x loop implementation
-            TwainMessageLoopV2 v2Impl(pHandle);
-
-            // default to version 1
-            TwainMessageLoopImpl* pImpl = &v1Impl;
-
-            // check for version 2 implementation
-            if (CTL_TwainAppMgr::IsVersion2DSMUsed())
-            {
-                // assign the callback procedure
-                CTL_TwainDLLHandle::s_TwainCallbackSet = false;
-                CTL_DSMCallbackTripletRegister callbackSetter(CTL_TwainAppMgr::GetCurrentSession(),
-                    pSource, &TwainMessageLoopV2::TwainVersion2MsgProc);
-                if (callbackSetter.Execute() == TWRC_SUCCESS)
-                    pImpl = &v2Impl;
-            }
-
-            // show the interface -- this is where we may get a message right away in the loop
-            CTL_TwainAppMgr::ShowUserInterface(pSource, false, true);
-
-            // perform the TWAIN loop now.
-            pImpl->PerformMessageLoop(pSource, true);
-        }
+        SourceAcquireOptions opts;
+        opts.setIsUIIOnly(true);
+        dynarithmic::StartModalMessageLoop(pSource, opts);
     }
 
     // Close the source if opened artificially
@@ -108,6 +83,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
         DTWAIN_CloseSource(Source);
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
+}
+
+void dynarithmic::LLSetupUIOnly(CTL_ITwainSource* pSource)
+{
+    // show the interface -- this is where we may get a message right away in the loop
+    CTL_TwainAppMgr::ShowUserInterface(pSource, false, true);
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ForceScanOnNoUI(DTWAIN_SOURCE Source, BOOL bSet)
