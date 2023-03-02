@@ -47,6 +47,7 @@ CTL_ImageXferTriplet::CTL_ImageXferTriplet(CTL_ITwainSession *pSession,
                      m_pImgHandler(nullptr),
                      m_hDataHandle(nullptr),
                      m_nTotalPagesSaved(0),
+                     m_hDataHandleFromDevice(nullptr),
                      m_bJobControlPageRecorded(false),
                      m_bJobMarkerNeedsToBeWritten(false),
                      m_bScanPending(true),
@@ -63,7 +64,7 @@ CTL_ImageXferTriplet::CTL_ImageXferTriplet(CTL_ITwainSession *pSession,
     {
         case DAT_IMAGENATIVEXFER:
         case DAT_AUDIONATIVEXFER:
-            InitVars(nType, CTL_GetTypeGET, &m_hDataHandle);
+            InitVars(nType, CTL_GetTypeGET, &m_hDataHandleFromDevice);
         break;
         case DAT_IMAGEFILEXFER:
         case DAT_IMAGEMEMFILEXFER:
@@ -87,6 +88,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
 
     m_bJobControlPageRecorded = false;
     int errfile = 0;
+    const CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
 
     switch (rc)
     {
@@ -98,8 +100,55 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
             CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,
                                                   DTWAIN_TN_TRANSFERDONE,
                                                   reinterpret_cast<LPARAM>(pSource));
+
+            if (m_nTransferType == DAT_IMAGENATIVEXFER)
+            {
+                // We need to clone the DIB if we're doing a native XFER on a DSM2 Data Source
+                if (CTL_TwainAppMgr::IsVersion2DSMUsed())
+                {
+                    // Lock the DIB returned by the device
+                    BITMAPINFOHEADER* thisBitmap =
+                        (BITMAPINFOHEADER*)CTL_TwainDLLHandle::s_TwainMemoryFunc->LockMemory((HBITMAP)m_hDataHandleFromDevice);
+
+                    // Make sure we unlock and free this memory once out of this scope
+                    DTWAINDSM2LockAndFree_RAII raii(m_hDataHandleFromDevice);
+
+                    // Create a local bitmap
+                    DWORD dwSize = sizeof(BITMAPINFOHEADER) + ((((thisBitmap->biWidth * thisBitmap->biBitCount + 31) / 32) * 4) * 
+                        thisBitmap->biHeight) + thisBitmap->biClrUsed * sizeof(RGBQUAD);
+                    HANDLE hDIB = GlobalAlloc(GHND, dwSize);
+
+                    if (hDIB)
+                    {
+                        BYTE* img = (BYTE*)GlobalLock(hDIB);
+
+                        // Make sure we unlock this handle once out of this scope
+                        DTWAINGlobalHandle_RAII raii2(hDIB);
+
+                        // Copy the image over
+                        memcpy(img, thisBitmap, dwSize);
+                        m_hDataHandle = hDIB;
+                    }
+                    else
+                    {
+                        // Not enough memory to copy the DIB
+                        CTL_TwainAppMgr::SetError(-DTWAIN_ERR_OUT_OF_MEMORY);
+                        char szBuf[255];
+                        CTL_TwainAppMgr::GetLastErrorString(szBuf, 254);
+                        CTL_TwainAppMgr::WriteLogInfoA(szBuf);
+                        FailAcquisition();
+                        return rc;
+                    }
+                }
+                else
+                {
+                    // Just assign the handle returned from the device if the DSM is version 1.x
+                    m_hDataHandle = m_hDataHandleFromDevice;
+                }
+            }
+            
             m_bJobMarkerNeedsToBeWritten = false;
-            // Check if ``more images are pending (job control only)
+            // Check if more images are pending (job control only)
             SetPendingXfersDone(false);
 
             bool bEndOfJobDetected=false;
@@ -233,9 +282,9 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                         (pSource, static_cast<LONG>(nLastDib), m_hDataHandle);
                     if (hRetDib && hRetDib != m_hDataHandle)
                     {
-                         // Application changed DIB.  So make this the current dib
-                         #ifdef _WIN32
-                         GlobalFree(m_hDataHandle);
+                        // Application changed DIB.  So make this the current dib
+                        #ifdef _WIN32
+                        GlobalFree(m_hDataHandle);
                         #endif
                         m_hDataHandle = hRetDib;
                         pSource->SetDibHandle(m_hDataHandle, nLastDib);

@@ -99,6 +99,7 @@ namespace dynarithmic
         TW_IDENTITY m_AppId;          // Twain Identity structure
         CTL_TwainSourceSet m_arrTwainSource;
         CTL_ITwainSource *m_pSelectedSource;
+        
         bool        m_bTwainWindowCreated;
         bool        m_bTwainMessageFlag;
 };

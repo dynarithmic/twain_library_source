@@ -87,7 +87,7 @@
                     THROW_EXCEPTION \
                     return(type); \
                 }\
-                catch(decltype(type) var) { return var; }\
+                catch(const decltype(type) var) { return var; }\
                 catch(...) {\
                 LogExceptionErrorA(FUNC_MACRO); \
                 THROW_EXCEPTION \

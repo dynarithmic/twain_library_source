@@ -54,6 +54,8 @@
 #include "dtwain.h"
 #include "twainframe.h"
 
+#include "notimpl.h"
+#include "sourceacquireopts.h"
 #ifdef _WIN32
 #include "winlibraryloader_impl.inl"
 #else
@@ -448,13 +450,16 @@ namespace dynarithmic
             void      UnlockMemory(TW_HANDLE h) override { if (h) m_EntryPoint.DSM_MemUnlock(h); }
     };
 
+#if 0
     class TwainMessageLoopImpl
     {
         private:
             CTL_TwainDLLHandle* m_pDLLHandle;
+            SourceAcquireOptions sOpts;
 
         protected:
             virtual bool IsSourceOpen(CTL_ITwainSource* pSource, bool bUIOnly);
+            bool IsAcquireTerminated(CTL_ITwainSource* pSource, bool bUIOnly);
             virtual bool CanEnterDispatch(MSG * /*pMsg*/) { return true; }
 
         public:
@@ -518,7 +523,7 @@ namespace dynarithmic
             bool IsSourceOpen(CTL_ITwainSource* pSource, bool bUIOnly) override;
             bool CanEnterDispatch(MSG *pMsg) override { return !DTWAIN_IsTwainMsg(pMsg); }
     };
-
+#endif
     class CTL_TwainDLLHandle
     {
         public:
@@ -605,6 +610,7 @@ namespace dynarithmic
             CTL_StringType   m_strTWAINPath2;   // path to the TWAIN Data Source Manager 2.x that is being used
             CTL_StringType   m_strLibraryPath;   // path to the DTWAIN Library being used
             CTL_StringType   m_sWindowsVersionInfo; // Windows version information, cached.
+            CTL_StringType   m_strDefaultSource; // Current default TWAIN source
             static CTL_StringType   s_strResourcePath;  // path to the DTWAIN resource strings
             HINSTANCE           m_hInstance;
             HWND                m_hWndTwain;
@@ -672,7 +678,7 @@ namespace dynarithmic
             static std::vector<CTL_TwainDLLHandlePtr> s_DLLHandles;
             static std::unordered_set<DTWAIN_SOURCE> s_aFeederSources;
             static CTL_HookInfoArray        s_aHookInfo;
-            static std::vector<int>              s_aAcquireNum;
+            static std::vector<LONG_PTR>    s_aAcquireNum;
             static bool                     s_bCheckReentrancy;
             static CTL_GeneralCapInfo       s_mapGeneralCapInfo;
             static CTL_GeneralErrorInfo     s_mapGeneralErrorInfo;
@@ -866,6 +872,7 @@ namespace dynarithmic
     bool AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType);
     DTWAIN_ARRAY SourceAcquireWorkerThread(SourceAcquireOptions& opts);
     DTWAIN_ACQUIRE  LLAcquireImage(SourceAcquireOptions& opts);
+    void LLSetupUIOnly(CTL_ITwainSource* pSource);
     DTWAIN_HANDLE GetDTWAINHandle_Internal();
     bool TileModeOn(DTWAIN_SOURCE Source);
 
@@ -1038,6 +1045,43 @@ namespace dynarithmic
         void operator()(HANDLE h) { Destroy(h); }
     };
 
+    struct DSM2UnlockTraits
+    {
+        static void Unlock(HANDLE h)
+        {
+            CTL_TwainDLLHandle::s_TwainMemoryFunc->UnlockMemory(h);
+        }
+    };
+
+    struct DSM2NoFreeTraits
+    {
+        static void Free(HANDLE /*h*/)
+        {
+        }
+    };
+
+    struct DSM2FreeTraits
+    {
+        static void Free(HANDLE h)
+        {
+            CTL_TwainDLLHandle::s_TwainMemoryFunc->FreeMemory(h);
+        }
+    };
+
+    template <typename T, typename UnLockFn, typename FreeFn>
+    struct DTWAINGlobalHandle_GenericUnlockFreeTraits
+    {
+        static void Destroy(T h)
+        {
+            if (h)
+            {
+                UnLockFn::Unlock(h);
+                FreeFn::Free(h);
+            }
+        }
+        void operator()(T h) { Destroy(h); }
+    };
+
     struct DTWAINFrame_DestroyTraits
     {
         void operator()(DTWAIN_FRAME a) { DTWAIN_FrameDestroy(a); }
@@ -1098,7 +1142,7 @@ namespace dynarithmic
     };
 
 
-    // RAII Class for DTWAIN_ARRAY
+    // RAII Classes
     using DTWAINDeviceContextRelease_RAII = std::unique_ptr<std::pair<HWND, HDC>, DTWAINGlobalHandle_ReleaseDCTraits>;
     using DTWAINGlobalHandlePtr_RAII = std::unique_ptr<HANDLE, DTWAINGlobalHandle_ClosePtrTraits>;
     using DTWAINFileHandle_RAII = std::unique_ptr<void, DTWAINFileHandle_CloseTraits>;
@@ -1110,6 +1154,10 @@ namespace dynarithmic
     using DTWAINFrame_RAII = std::unique_ptr<void, DTWAINFrame_DestroyTraits>;
     using DTWAINArray_RAII = std::unique_ptr<void, DTWAINArray_DestroyTraits>;
     using DTWAINArrayLL_RAII = std::unique_ptr<void, DTWAINArrayLowLevel_DestroyTraits>;
+    using DTWAINDSM2Lock_RAII = std::unique_ptr<void, 
+            DTWAINGlobalHandle_GenericUnlockFreeTraits<HANDLE, DSM2UnlockTraits, DSM2NoFreeTraits>>;
+    using DTWAINDSM2LockAndFree_RAII = std::unique_ptr<void,
+        DTWAINGlobalHandle_GenericUnlockFreeTraits<HANDLE, DSM2UnlockTraits, DSM2FreeTraits>>;
 
     // RAII Class for turning on/off logging locally
     struct DTWAINScopedLogController
@@ -1132,10 +1180,6 @@ namespace dynarithmic
         DTWAINScopedLogController m_controller;
         DTWAINScopedLogControllerEx(long newValue) : m_controller(LogTraits::Apply(newValue)) {}
     };
-
-    template <typename T, bool Value=false>
-    struct NotImpl
-    { bool operator !() const { return Value; } };
 
     typedef DTWAINScopedLogControllerEx<LogTraitsOff> DTWAINScopedLogControllerExclude;
     typedef DTWAINScopedLogControllerEx<LogTraitsOn>  DTWAINScopedLogControllerInclude;

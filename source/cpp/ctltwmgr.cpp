@@ -174,6 +174,26 @@ CTL_ITwainSession* CTL_TwainAppMgr::CreateTwainSession(
             return nullptr;
         }
 
+        // Now set up the pointers to the memory functions if necessary
+        if (pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_LATESTVERSION ||
+            pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_VERSION2)
+        {
+            CTL_EntryPointTriplet entryPoints(pSession, MSG_GET);
+            TW_UINT16 rc = entryPoints.Execute();
+            switch (rc)
+            {
+                case TWRC_SUCCESS:
+                    pHandle->s_Twain2Func.m_EntryPoint = entryPoints.getEntryPoint();
+                    pHandle->s_TwainMemoryFunc = &pHandle->s_Twain2Func;
+                    break;
+                default:
+                    WriteLogInfoA("The entry points for the TWAINDSM.DLL were not found");
+                    DestroyTwainSession(pSession);
+                    return nullptr;
+            }
+        }
+        else
+            pHandle->s_TwainMemoryFunc = &pHandle->s_TwainLegacyFunc;
         s_pSelectedSession = s_pGlobalAppMgr->m_arrTwainSession.back().get();
         return s_pSelectedSession;
     }
@@ -647,7 +667,10 @@ bool CTL_TwainAppMgr::ShowUserInterface( CTL_ITwainSource *pSource, bool bTest, 
 
     origSourceState oState(pTempSource, pSession);
 
+    // Show the user interface (UI) now.
     const TW_UINT16 rc = pUITrip->Execute();
+
+    // Failed to show the UI
     if (rc != TWRC_SUCCESS )
     {
         const TW_UINT16 ccode = GetConditionCode(pSession, pTempSource);
@@ -694,21 +717,10 @@ bool CTL_TwainAppMgr::ShowUserInterface( CTL_ITwainSource *pSource, bool bTest, 
         return false;
     }
 
-    if ( !bTest && !bShowUIOnly )
-    {
-        if ( !pTempSource->IsUIOpenOnAcquire() )
-        {
-            // We wake up app loop here
-            if ( pTempSource->IsForceScanOnNoUI())
-            {
-                #ifdef _WIN32
-                ::PostMessage(*pSession->GetWindowHandlePtr(), WM_NULL, static_cast<WPARAM>(0), static_cast<LPARAM>(0));
-                #endif
-            }
-        }
-    }
     if ( bTest && !bShowUIOnly )
     {
+        // We were testing if the UI is available.  This is done for diagnostic purposes on old 
+        // TWAIN sources.
         DisableUserInterface( pSource );
         pTempSource->SetUIOpenOnAcquire( bOld );
     }
@@ -724,6 +736,7 @@ bool CTL_TwainAppMgr::DisableUserInterface(const CTL_ITwainSource *pSource)
     CTL_UserInterfaceDisableTriplet UI(pSession, pTempSource, pTWUI );
     bool bRet = true;
 
+    // Turn off user interface
     if ( UI.Execute() != TWRC_SUCCESS )
     {
         const TW_UINT16 ccode = GetConditionCode(pSession, pTempSource);
@@ -733,6 +746,9 @@ bool CTL_TwainAppMgr::DisableUserInterface(const CTL_ITwainSource *pSource)
             bRet = false;
         }
     }
+
+    // Check if we are acquiring to a multi-page file, and will
+    // save the file when the Source UI is closed.
     if ( pTempSource->IsMultiPageModeUIMode() )
         pTempSource->ProcessMultipageFile();
     pTempSource->SetState(SOURCE_STATE_OPENED);
@@ -744,7 +760,7 @@ bool CTL_TwainAppMgr::DisableUserInterface(const CTL_ITwainSource *pSource)
 void CTL_TwainAppMgr::EndTwainUI(const CTL_ITwainSession* pSession, CTL_ITwainSource* pSource)
 {
     // The source UI must be closed for modeless Source
-    if ( pSource->IsUIOpen()/* && !pSource->IsModal() */)
+    if ( pSource->IsUIOpen())
     {
         SendTwainMsgToWindow(pSession,
                              nullptr,

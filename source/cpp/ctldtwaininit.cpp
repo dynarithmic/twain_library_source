@@ -43,6 +43,8 @@
 #include "ctlfileutils.h"
 #include "arrayfactory.h"
 #include "dtwain_library_selector.h"
+#include "ctltwainmsgloop.h"
+#include "ctldefsource.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -91,7 +93,7 @@ static void RegisterTwainWindowClass();
 static void OpenLogFile(LPCTSTR pFileName, LONG logFlags, bool append=false);
 static void WriteVersionToLog();
 static bool SysDestroyHelper(CTL_TwainDLLHandle* pHandle, bool bCheck=true);
-static void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL, LPCTSTR szName);
+static void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL);
 
 #ifdef _WIN32
 static UINT_PTR APIENTRY FileSaveAsHookProc(HWND hWnd, UINT msg, WPARAM w, LPARAM lparam);
@@ -852,12 +854,7 @@ DTWAIN_HANDLE SysInitializeHelper(bool block)
         if ( CTL_TwainDLLHandle::s_DLLHandles.size() == 1 )
         {
             const CTL_StringType iniName = _T(".ini");
-            CTL_StringType szName =  StringConversion::Convert_AnsiPtr_To_Native("dtwain" DTWAIN_OSPLATFORM) + iniName;
             const CTL_StringType szLangDLL = _T("english");
-            if (!CTL_TwainDLLHandle::s_sINIPath.empty())
-            {
-                szName = CTL_TwainDLLHandle::s_sINIPath + szName;
-            }
 
             // Initialize the enumerator factory
             if ( !CTL_TwainDLLHandle::s_ArrayFactory )
@@ -867,7 +864,7 @@ DTWAIN_HANDLE SysInitializeHelper(bool block)
             pHandle->InitializeResourceRegistry();
 
             // Load customized resources from INI
-            LoadCustomResourcesFromIni(pHandle, szLangDLL.c_str(), szName.c_str());
+            LoadCustomResourcesFromIni(pHandle, szLangDLL.c_str());
 
             // Initialize imaging code
             FreeImage_Initialise(true);
@@ -906,11 +903,12 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitialize()
     return SysInitializeHelper(true);
 }
 
-void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL, LPCTSTR szName)
+void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL)
 {
     // Load the resources
     CSimpleIniA customProfile;
-    customProfile.LoadFile(szName);
+    CTL_StringType fullDirectory = dynarithmic::GetDTWAININIPath();
+    customProfile.LoadFile(fullDirectory.c_str());
     std::string szStr = customProfile.GetValue("Language", "dll",
                                                StringConversion::Convert_NativePtr_To_Ansi(szLangDLL).c_str());
     if (!LoadLanguageResourceA(szStr, pHandle->GetResourceRegistry()))
@@ -2231,6 +2229,13 @@ CTL_StringType GetDTWAINDLLVersionInfoStr()
     std::ostringstream strm;
     strm << DTWAIN_MAJOR_VERSION << "." << DTWAIN_MINOR_VERSION << "." << DTWAIN_SUBMINOR_VERSION << "." << DTWAIN_PATCHLEVEL_VERSION;
     return StringConversion::Convert_Ansi_To_Native(strm.str());
+}
+
+CTL_StringType dynarithmic::GetDTWAININIPath()
+{
+    const CTL_StringType iniName = _T(".ini");
+    CTL_StringType szName = StringConversion::Convert_AnsiPtr_To_Native("dtwain" DTWAIN_OSPLATFORM) + iniName;
+    return get_parent_directory(GetDTWAINDLLPath().c_str()) + szName;
 }
 
 CTL_StringType& dynarithmic::GetDTWAINTempFilePath()
