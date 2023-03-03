@@ -684,7 +684,7 @@ bool dynarithmic::TileModeOn(DTWAIN_SOURCE Source)
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     if (p)
     {
-        if (CTL_TwainAppMgr::GetOneTwainCapValue(p, &bMode, DTWAIN_CV_ICAPTILES, CTL_GetTypeGET, TWTY_BOOL))
+        if (CTL_TwainAppMgr::GetCurrentOneCapValue(p, &bMode, DTWAIN_CV_ICAPTILES, CTL_GetTypeGETCURRENT))
             return static_cast<TW_BOOL>(bMode)?true:false;
     }
     return false;
