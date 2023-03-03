@@ -349,10 +349,6 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     bKeepPage = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_QUERYPAGEDISCARD, reinterpret_cast<LPARAM>(pSource))?true:false;
                     // Keep the page
 
-                    // For demo, limit to 2 pages acquired for multipage
-                    #ifdef DTWAIN_DEMO_VERSION
-                    if (nCurImage > DEMO_MAX_PAGES && bIsMultiPageFile ) { nCurImage = DEMO_MAX_PAGES; } else
-                    #endif
                     if ( bKeepPage )
                     {
                         int nMultiStage = 0;
@@ -389,10 +385,11 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                         m_nTotalPagesSaved++;
                     }
                     else
+                    {
                         CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_PAGEDISCARDED,reinterpret_cast<LPARAM>(pSource));
-
+                    }
                     // Delete temporary bitmap here
-                    if ( pSource->IsDeleteDibOnScan() )
+                    if ( !bKeepPage || pSource->IsDeleteDibOnScan() )
                     {
                         // Let array class handle deleting of the DIB (Global memory will be freed only)
                         if ( pArray )

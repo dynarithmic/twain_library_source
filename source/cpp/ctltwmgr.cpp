@@ -1845,7 +1845,15 @@ int CTL_TwainAppMgr::SetTransferCount( const CTL_ITwainSource *pSource,
             SetOneTwainCapValue(pSource, nCount, CTL_SetTypeSET, CAP_SHEETCOUNT, TWTY_UINT32);
     }
     else
+    {
+        // If we are in duplex mode, we need to set the transfer count to 2 * the number
+        // of pages, since each page will use two transfers
+        LONG isDuplex = 0;
+        GetCurrentOneCapValue(pSource, &isDuplex, DTWAIN_CV_CAPDUPLEXENABLED, CTL_GetTypeGETCURRENT);
+        if (isDuplex == 1 && nCount != -1)
+            nCount *= 2; // double the number of images that may be received
         SetOneTwainCapValue( pSource, nCount, CTL_SetTypeSET, TwainCap_XFERCOUNT, TWTY_INT16);
+    }
     return 1;
 }
 
