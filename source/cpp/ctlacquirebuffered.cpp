@@ -23,6 +23,8 @@
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "sourceacquireopts.h"
+#include "ctltwainmsgloop.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #pragma warning (disable:4714)
@@ -75,7 +77,9 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireBuffered(SourceAcquireOptions& opts)
     auto pSource = static_cast<CTL_ITwainSource*>(Source);
     pSource->SetCompressionType(compressionType);
     opts.setActualAcquireType(TWAINAcquireType_Buffer);
-    const DTWAIN_ACQUIRE Ret = LLAcquireImage(opts);
-    LOG_FUNC_EXIT_PARAMS(Ret)
+    if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
+        return LLAcquireImage(opts);
+    auto pr = dynarithmic::StartModalMessageLoop(opts.getSource(), opts);
+    LOG_FUNC_EXIT_PARAMS(pr.second)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }

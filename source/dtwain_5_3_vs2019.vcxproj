@@ -240,7 +240,7 @@
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalOptions>-Zm400 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp14</LanguageStandard>
@@ -273,18 +273,28 @@
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
-implib $(TargetDir)$(TargetName)_embarcadero.lib $(TargetDir)$(TargetName).dll
+      <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
+copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).dll
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).pdb
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).lib
-"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName)_embarcadero.lib
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip MD5 -t $(TargetDir)debug_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA1 -t $(TargetDir)debug_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_libraries_zip_sha256hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
+del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt $(TargetDir)debug_ziphashes$(PlatformArchitecture).txt
+del $(TargetDir)debug_libraries_zip_md5hash.txt
+del $(TargetDir)debug_libraries_zip_sha1hash.txt
+del $(TargetDir)debug_libraries_zip_sha256hash.txt
+del $(TargetDir)$(TargetName)_md5hash.txt  
+del $(TargetDir)$(TargetName)_sha1hash.txt  
+del $(TargetDir)$(TargetName)_sha256hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
@@ -309,6 +319,7 @@ md demos\binaries\$(PlatformArchitecture)bit
 cd demos\binaries\$(PlatformArchitecture)bit
 copy $(TargetDir)$(TargetName).dll .
 copy $(TargetDir)twain*.txt .
+copy $(TargetDir)dtwain$(PlatformArchitecture).ini .
 cd $(SolutionDir)
 cd ..
 md demos\libs\$(PlatformArchitecture)bit
@@ -347,7 +358,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalOptions>/Zm1024 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp14</LanguageStandard>
@@ -378,18 +389,28 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
-implib $(TargetDir)$(TargetName)_embarcadero.lib $(TargetDir)$(TargetName).dll
+      <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
+copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).dll
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).pdb
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).lib
-"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName)_embarcadero.lib
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip MD5 -t $(TargetDir)release_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA1 -t $(TargetDir)release_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)release_libraries_zip_sha256hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
+del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt $(TargetDir)release_ziphashes$(PlatformArchitecture).txt
+del $(TargetDir)release_libraries_zip_md5hash.txt
+del $(TargetDir)release_libraries_zip_sha1hash.txt
+del $(TargetDir)release_libraries_zip_sha256hash.txt
+del $(TargetDir)$(TargetName)_md5hash.txt  
+del $(TargetDir)$(TargetName)_sha1hash.txt  
+del $(TargetDir)$(TargetName)_sha256hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
@@ -414,15 +435,12 @@ md demos\binaries\$(PlatformArchitecture)bit
 cd demos\binaries\$(PlatformArchitecture)bit
 copy $(TargetDir)$(TargetName).dll .
 copy $(TargetDir)twain*.txt .
+copy $(TargetDir)dtwain$(PlatformArchitecture).ini .
 cd $(SolutionDir)
 cd ..
 md demos\libs\$(PlatformArchitecture)bit
 cd demos\libs\$(PlatformArchitecture)bit
-copy $(TargetDir)$(TargetName).lib .
-
-
-
-</Command>
+copy $(TargetDir)$(TargetName).lib .</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">
@@ -456,7 +474,7 @@ copy $(TargetDir)$(TargetName).lib .
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp14</LanguageStandard>
@@ -495,18 +513,28 @@ copy $(TargetDir)$(TargetName).lib .
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
-implib $(TargetDir)$(TargetName)_embarcadero.lib $(TargetDir)$(TargetName).dll
+      <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
+copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).dll
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).pdb
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).lib
-"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName)_embarcadero.lib
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip MD5 -t $(TargetDir)release_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA1 -t $(TargetDir)release_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)release_libraries_zip_sha256hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
+del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt $(TargetDir)release_ziphashes$(PlatformArchitecture).txt
+del $(TargetDir)release_libraries_zip_md5hash.txt
+del $(TargetDir)release_libraries_zip_sha1hash.txt
+del $(TargetDir)release_libraries_zip_sha256hash.txt
+del $(TargetDir)$(TargetName)_md5hash.txt  
+del $(TargetDir)$(TargetName)_sha1hash.txt  
+del $(TargetDir)$(TargetName)_sha256hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
@@ -531,15 +559,12 @@ md demos\binaries\$(PlatformArchitecture)bit
 cd demos\binaries\$(PlatformArchitecture)bit
 copy $(TargetDir)$(TargetName).dll .
 copy $(TargetDir)twain*.txt .
+copy $(TargetDir)dtwain$(PlatformArchitecture).ini .
 cd $(SolutionDir)
 cd ..
 md demos\libs\$(PlatformArchitecture)bit
 cd demos\libs\$(PlatformArchitecture)bit
-copy $(TargetDir)$(TargetName).lib .
-
-
-
-</Command>
+copy $(TargetDir)$(TargetName).lib .</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">
@@ -573,7 +598,7 @@ copy $(TargetDir)$(TargetName).lib .
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalOptions>/Zm1024 %(AdditionalOptions)</AdditionalOptions>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
@@ -605,18 +630,28 @@ copy $(TargetDir)$(TargetName).lib .
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
-implib $(TargetDir)$(TargetName)_embarcadero.lib $(TargetDir)$(TargetName).dll
+      <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
+copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).dll
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).pdb
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).lib
-"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName)_embarcadero.lib
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip MD5 -t $(TargetDir)debug_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA1 -t $(TargetDir)debug_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_libraries_zip_sha256hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
+del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt $(TargetDir)debug_ziphashes$(PlatformArchitecture).txt
+del $(TargetDir)debug_libraries_zip_md5hash.txt
+del $(TargetDir)debug_libraries_zip_sha1hash.txt
+del $(TargetDir)debug_libraries_zip_sha256hash.txt
+del $(TargetDir)$(TargetName)_md5hash.txt  
+del $(TargetDir)$(TargetName)_sha1hash.txt  
+del $(TargetDir)$(TargetName)_sha256hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
@@ -641,6 +676,7 @@ md demos\binaries\$(PlatformArchitecture)bit
 cd demos\binaries\$(PlatformArchitecture)bit
 copy $(TargetDir)$(TargetName).dll .
 copy $(TargetDir)twain*.txt .
+copy $(TargetDir)dtwain$(PlatformArchitecture).ini .
 cd $(SolutionDir)
 cd ..
 md demos\libs\$(PlatformArchitecture)bit
@@ -659,7 +695,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
       <ProgramDataBaseFileName>.\obj\$(Configuration)\</ProgramDataBaseFileName>
       <ExceptionHandling>Async</ExceptionHandling>
-      <DisableSpecificWarnings>4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
@@ -682,7 +718,9 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+      <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
+copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).dll
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).pdb
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).lib
@@ -692,6 +730,16 @@ copy $(TargetDir)$(TargetName).lib .</Command>
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip MD5 -t $(TargetDir)debug_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA1 -t $(TargetDir)debug_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_libraries_zip_sha256hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
+del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt $(TargetDir)debug_ziphashes$(PlatformArchitecture).txt
+del $(TargetDir)debug_libraries_zip_md5hash.txt
+del $(TargetDir)debug_libraries_zip_sha1hash.txt
+del $(TargetDir)debug_libraries_zip_sha256hash.txt
+del $(TargetDir)$(TargetName)_md5hash.txt  
+del $(TargetDir)$(TargetName)_sha1hash.txt  
+del $(TargetDir)$(TargetName)_sha256hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
@@ -716,6 +764,7 @@ md demos\binaries\$(PlatformArchitecture)bit
 cd demos\binaries\$(PlatformArchitecture)bit
 copy $(TargetDir)$(TargetName).dll .
 copy $(TargetDir)twain*.txt .
+copy $(TargetDir)dtwain$(PlatformArchitecture).ini .
 cd $(SolutionDir)
 cd ..
 md demos\libs\$(PlatformArchitecture)bit
@@ -734,7 +783,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
       <ProgramDataBaseFileName>.\obj\$(Configuration)\</ProgramDataBaseFileName>
       <ExceptionHandling>Async</ExceptionHandling>
-      <DisableSpecificWarnings>4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp14</LanguageStandard>
@@ -756,7 +805,9 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+      <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
+copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).dll
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).pdb
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).lib
@@ -766,6 +817,16 @@ copy $(TargetDir)$(TargetName).lib .</Command>
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip MD5 -t $(TargetDir)release_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA1 -t $(TargetDir)release_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)release_libraries_zip_sha256hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
+del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt $(TargetDir)release_ziphashes$(PlatformArchitecture).txt
+del $(TargetDir)release_libraries_zip_md5hash.txt
+del $(TargetDir)release_libraries_zip_sha1hash.txt
+del $(TargetDir)release_libraries_zip_sha256hash.txt
+del $(TargetDir)$(TargetName)_md5hash.txt  
+del $(TargetDir)$(TargetName)_sha1hash.txt  
+del $(TargetDir)$(TargetName)_sha256hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
@@ -790,14 +851,12 @@ md demos\binaries\$(PlatformArchitecture)bit
 cd demos\binaries\$(PlatformArchitecture)bit
 copy $(TargetDir)$(TargetName).dll .
 copy $(TargetDir)twain*.txt .
+copy $(TargetDir)dtwain$(PlatformArchitecture).ini .
 cd $(SolutionDir)
 cd ..
 md demos\libs\$(PlatformArchitecture)bit
 cd demos\libs\$(PlatformArchitecture)bit
 copy $(TargetDir)$(TargetName).lib .
-
-
-
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -812,7 +871,7 @@ copy $(TargetDir)$(TargetName).lib .
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
       <ProgramDataBaseFileName>.\obj\$(Configuration)\</ProgramDataBaseFileName>
       <ExceptionHandling>Async</ExceptionHandling>
-      <DisableSpecificWarnings>4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <LanguageStandard>stdcpp14</LanguageStandard>
@@ -841,7 +900,9 @@ copy $(TargetDir)$(TargetName).lib .
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+      <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
+copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).dll
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).pdb
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).lib
@@ -851,6 +912,16 @@ copy $(TargetDir)$(TargetName).lib .
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip MD5 -t $(TargetDir)release_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA1 -t $(TargetDir)release_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)release_libraries_zip_sha256hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
+del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt $(TargetDir)release_ziphashes$(PlatformArchitecture).txt
+del $(TargetDir)release_libraries_zip_md5hash.txt
+del $(TargetDir)release_libraries_zip_sha1hash.txt
+del $(TargetDir)release_libraries_zip_sha256hash.txt
+del $(TargetDir)$(TargetName)_md5hash.txt  
+del $(TargetDir)$(TargetName)_sha1hash.txt  
+del $(TargetDir)$(TargetName)_sha256hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
@@ -875,14 +946,12 @@ md demos\binaries\$(PlatformArchitecture)bit
 cd demos\binaries\$(PlatformArchitecture)bit
 copy $(TargetDir)$(TargetName).dll .
 copy $(TargetDir)twain*.txt .
+copy $(TargetDir)dtwain$(PlatformArchitecture).ini .
 cd $(SolutionDir)
 cd ..
 md demos\libs\$(PlatformArchitecture)bit
 cd demos\libs\$(PlatformArchitecture)bit
 copy $(TargetDir)$(TargetName).lib .
-
-
-
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -897,7 +966,7 @@ copy $(TargetDir)$(TargetName).lib .
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
       <ProgramDataBaseFileName>.\obj\$(Configuration)\</ProgramDataBaseFileName>
       <ExceptionHandling>Async</ExceptionHandling>
-      <DisableSpecificWarnings>4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp14</LanguageStandard>
@@ -919,7 +988,9 @@ copy $(TargetDir)$(TargetName).lib .
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+      <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
+copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).dll
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).pdb
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).lib
@@ -929,6 +1000,16 @@ copy $(TargetDir)$(TargetName).lib .
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip MD5 -t $(TargetDir)debug_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA1 -t $(TargetDir)debug_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_libraries_zip_sha256hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
+del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt $(TargetDir)debug_ziphashes$(PlatformArchitecture).txt
+del $(TargetDir)debug_libraries_zip_md5hash.txt
+del $(TargetDir)debug_libraries_zip_sha1hash.txt
+del $(TargetDir)debug_libraries_zip_sha256hash.txt
+del $(TargetDir)$(TargetName)_md5hash.txt  
+del $(TargetDir)$(TargetName)_sha1hash.txt  
+del $(TargetDir)$(TargetName)_sha256hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
@@ -953,6 +1034,7 @@ md demos\binaries\$(PlatformArchitecture)bit
 cd demos\binaries\$(PlatformArchitecture)bit
 copy $(TargetDir)$(TargetName).dll .
 copy $(TargetDir)twain*.txt .
+copy $(TargetDir)dtwain$(PlatformArchitecture).ini .
 cd $(SolutionDir)
 cd ..
 md demos\libs\$(PlatformArchitecture)bit
@@ -1341,6 +1423,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\ansiwideconverter_generic.h" />
     <ClInclude Include="h\ansiwideconverter_win32.h" />
     <ClInclude Include="h\arrayfactory.h" />
+    <ClInclude Include="h\ctldefsource.h" />
     <ClInclude Include="h\ctldib32.h" />
     <ClInclude Include="h\ctlfileutils.h" />
     <ClInclude Include="h\ctlres.h" />
@@ -1349,6 +1432,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\ctltr041.h" />
     <ClInclude Include="h\ctltr042.h" />
     <ClInclude Include="h\ctltr043.h" />
+    <ClInclude Include="h\ctltwainmsgloop.h" />
     <ClInclude Include="h\dibinfox.h" />
     <ClInclude Include="h\dibmulti.h" />
     <ClInclude Include="h\dtwain_filesystem.h" />
@@ -1368,6 +1452,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\imagefun\wmffun32.h" />
     <ClInclude Include="h\imagexferfilewriter.h" />
     <ClInclude Include="h\logmsg.h" />
+    <ClInclude Include="h\notimpl.h" />
     <ClInclude Include="h\twainfix32.h" />
     <ClInclude Include="h\twainframe.h" />
     <ClInclude Include="simpleini\SimpleIni.h" />

@@ -22,6 +22,7 @@
 #define SOURCEACQUIREOPTS_H
 
 #include "ctliface.h"
+#include "notimpl.h"
 namespace dynarithmic
 {
     enum { ACQUIRENATIVE=1, ACQUIREBUFFER, ACQUIREFILE, ACQUIRECLIPBOARD, ACQUIRENATIVEEX, ACQUIREBUFFEREX,
@@ -34,6 +35,7 @@ namespace dynarithmic
         LONG nMaxPages;
         LONG nTransferMode;
         bool bShowUI;
+        bool bIsUIOnly;
         bool bRemainOpen;
         int nOrigAcquireType;
         int nActualAcquireType;
@@ -52,6 +54,7 @@ namespace dynarithmic
                              LONG transferMode=0,
                              bool showui=true,
                              bool remainopen=true,
+                             bool isUIOnly = false,
                              int whichTrans=0,
                              LONG status=0,
                              DTWAIN_ARRAY uArray=NULL,
@@ -67,6 +70,7 @@ namespace dynarithmic
                              nMaxPages(maxPages),
                              nTransferMode(transferMode),
                              bShowUI(showui),
+                             bIsUIOnly(isUIOnly),
                              bRemainOpen(remainopen),
                              nOrigAcquireType(whichTrans),
                              nActualAcquireType(0),
@@ -95,6 +99,7 @@ namespace dynarithmic
         SourceAcquireOptions& setFileList(DTWAIN_ARRAY fList) { FileList = fList; return *this; }
         SourceAcquireOptions& setStatus(LONG nStatus) { return_status = nStatus; return *this;}
         SourceAcquireOptions& setActualAcquireType(LONG acqType) { nActualAcquireType = acqType; return *this;}
+        SourceAcquireOptions& setIsUIIOnly(bool bSet) { bIsUIOnly = bSet; return *this; }
         LONG getStatus() const { return return_status; }
         DTWAIN_SOURCE getSource() { return Source; }
         DTWAIN_HANDLE getHandle() { return DLLHandle; }
@@ -102,6 +107,7 @@ namespace dynarithmic
         bool getDiscardDibs() const { return bDiscardDibs; }
         bool getRemainOpen() const { return bRemainOpen; }
         LONG getAcquireType() const { return nOrigAcquireType; }
+        bool getIsUIOnly() const { return bIsUIOnly; }
         DTWAIN_ARRAY getUserArray() { return UserArray; }
         bool getShowUI() const { return bShowUI; }
         LONG getMaxPages() const { return nMaxPages; }

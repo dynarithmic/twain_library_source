@@ -103,7 +103,7 @@ namespace dynarithmic
     }
 
     template <typename T>
-    int GetSupport(DTWAIN_SOURCE Source, typename T::value_type* lpSupport, LONG Cap)
+    int GetSupport(DTWAIN_SOURCE Source, typename T::value_type* lpSupport, LONG Cap, LONG CapOp=DTWAIN_CAPGET)
     {
         CTL_TwainDLLHandle*pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
         if (lpSupport == NULL)
@@ -113,7 +113,7 @@ namespace dynarithmic
             return -1;
         }
         DTWAIN_ARRAY Array = 0;
-        BOOL isSupported = DTWAIN_GetCapValues(Source, Cap, DTWAIN_CAPGET, &Array);
+        BOOL isSupported = DTWAIN_GetCapValues(Source, Cap, CapOp, &Array);
         DTWAINArrayLL_RAII raii(Array);
         if ( isSupported )
         {

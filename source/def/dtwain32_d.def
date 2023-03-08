@@ -1011,3 +1011,4 @@ DTWAIN_GetWindowsVersionInfo                      @30353
 DTWAIN_GetWindowsVersionInfoA                     @30354
 DTWAIN_GetWindowsVersionInfoW                     @30355
 DTWAIN_IsAudioXferSupported                       @30356           
+DTWAIN_IsSourceAcquiringEx                        @30357

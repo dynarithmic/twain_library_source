@@ -28,6 +28,7 @@
 #include "arrayfactory.h"
 #include "ctltr040.h"
 #include "dtwstrfn.h"
+#include "ctltwainmsgloop.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -60,13 +61,13 @@ DTWAIN_ACQUIRE CTL_TwainDLLHandle::GetNewAcquireNum()
     const auto iter = std::find(s_aAcquireNum.begin(), s_aAcquireNum.end(), -1L);
     if (iter != s_aAcquireNum.end())
     {
-        const DTWAIN_ACQUIRE num = static_cast<DTWAIN_ACQUIRE>(std::distance(s_aAcquireNum.begin(), iter));
+        const DTWAIN_ACQUIRE num { std::distance(s_aAcquireNum.begin(), iter) };
         *iter = num;
         return num;
     }
 
     const size_t nSize = s_aAcquireNum.size();
-    s_aAcquireNum.push_back(static_cast<const int>(nSize));
+    s_aAcquireNum.push_back(static_cast<LONG_PTR>(nSize));
     return static_cast<DTWAIN_ACQUIRE>(nSize);
 }
 
@@ -74,7 +75,7 @@ DTWAIN_ACQUIRE CTL_TwainDLLHandle::GetNewAcquireNum()
 void CTL_TwainDLLHandle::EraseAcquireNum(DTWAIN_ACQUIRE nNum)
 {
     const size_t nSize = s_aAcquireNum.size();
-    if (nNum >= static_cast<LONG>(nSize) || nNum < 0)
+    if (nNum >= static_cast<LONG_PTR>(nSize) || nNum < 0)
         return;
     s_aAcquireNum[nNum] = -1;
 }
@@ -83,9 +84,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceAcquiring(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
+    const CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     if (p)
     {
+        // out of a TWAIN loop testing
         const bool Ret = p->IsAcquireAttempt();
         LOG_FUNC_EXIT_PARAMS(Ret)
     }
@@ -93,11 +95,30 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceAcquiring(DTWAIN_SOURCE Source)
     CATCH_BLOCK(false)
 }
 
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceAcquiringEx(DTWAIN_SOURCE Source, BOOL bUIOnly)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, bUIOnly))
+    if ( !Source )
+        LOG_FUNC_EXIT_PARAMS(true)
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const CTL_ITwainSource* p = VerifySourceHandle(pHandle, Source);
+    if (p)
+    {
+        if (bUIOnly)
+            LOG_FUNC_EXIT_PARAMS(p->IsUIOpen() ? true : false);
+        const bool stillAcquiring = (!pHandle->m_bTransferDone == true && !pHandle->m_bSourceClosed == true);
+        LOG_FUNC_EXIT_PARAMS(stillAcquiring)
+    }
+    LOG_FUNC_EXIT_PARAMS(false)
+    CATCH_BLOCK(false)
+}
+
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsMemFileXferSupported(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
+    const CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     if (p)
     {
         const bool Ret = CTL_TwainAppMgr::IsMemFileTransferSupported(p);
@@ -118,7 +139,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     DTWAIN_Check_Bad_Handle_Ex(pHandle, NULL, FUNC_MACRO);
 
     // Check if Source is valid
-    CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, opts.getSource());
+    const CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, opts.getSource());
     if (!pSource)
     {
         opts.setStatus(DTWAIN_ERR_BAD_SOURCE);
@@ -163,7 +184,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     // the default bit depth.  The user should use DTWAIN_SetPixelType and DTWAIN_SetBitDepth before
     // calling the DTWAIN_Acquirexxx() function to override this behavior.
     LONG PixelType = opts.getPixelType();
-    bool bWriteMisc = CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
+    bool bWriteMisc = (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)?true:false;
     if (PixelType != DTWAIN_PT_DEFAULT && opts.getAcquireType() != ACQUIREAUDIONATIVE)
     {
         CTL_StringType sBuf;
@@ -286,10 +307,10 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
     DTWAINArrayLL_RAII aAcq(aAcquisitionArray);
 
     pSource->m_pUserPtr = nullptr;
-    CTL_TwainDLLHandle *p = static_cast<CTL_TwainDLLHandle *>(opts.getHandle());
-    p->m_bTransferDone = false;
-    p->m_bSourceClosed = false;
-    p->m_lLastError = 0;
+    CTL_TwainDLLHandle *pDLLHandle = static_cast<CTL_TwainDLLHandle *>(opts.getHandle());
+    pDLLHandle->m_bTransferDone = false;
+    pDLLHandle->m_bSourceClosed = false;
+    pDLLHandle->m_lLastError = 0;
 
     if (DTWAIN_GetTwainMode() == DTWAIN_MODELESS)
     {
@@ -302,30 +323,9 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
             DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{return true; }, DTWAIN_ERR_OUT_OF_MEMORY, NULL, FUNC_MACRO);
         }
     }
+    else
+        pSource->ResetAcquisitionAttempts(aAcquisitionArray);
 
-    // Set up a "worker thread" until we get confirmation on success or failure
-
-    // TWAIN 1.x loop implementation
-    TwainMessageLoopV1 v1Impl(p);
-
-    // TWAIN 2.x loop implementation
-    TwainMessageLoopV2 v2Impl(p);
-
-    // default to version 1
-    TwainMessageLoopImpl* pImpl = &v1Impl;
-
-    // check for version 2 implementation
-    if (CTL_TwainAppMgr::IsVersion2DSMUsed())
-    {
-        // assign the callback procedure
-        CTL_TwainDLLHandle::s_TwainCallbackSet = false;
-        CTL_DSMCallbackTripletRegister callbackSetter(CTL_TwainAppMgr::GetCurrentSession(), pSource, &TwainMessageLoopV2::TwainVersion2MsgProc);
-        if (callbackSetter.Execute() == TWRC_SUCCESS)
-            pImpl = &v2Impl;
-    }
-
-    // do any prep work before we loop
-    pImpl->PrepareLoop();
     switch (opts.getAcquireType())
     {
         case ACQUIRENATIVE:
@@ -393,7 +393,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
         a1.release();
         aAcq.release();
         pSource->ResetAcquisitionAttempts(aAcquisitionArray);
-        p->m_lLastAcqError = DTWAIN_TN_ACQUIRESTARTED;
+        pDLLHandle->m_lLastAcqError = DTWAIN_TN_ACQUIRESTARTED;
         opts.setStatus(DTWAIN_TN_ACQUIRESTARTED);
         pSource->m_pUserPtr = Array;
         LOG_FUNC_EXIT_PARAMS(Array)
@@ -401,10 +401,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
 
     pSource->ResetAcquisitionAttempts(aAcquisitionArray);
 
-    // perform the TWAIN loop now.
-    pImpl->PerformMessageLoop(pSource, false);
-
-    opts.setStatus(p->m_lLastAcqError);
+    opts.setStatus(pDLLHandle->m_lLastAcqError);
     // Get the array of Dibs
     const auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->
                             underlying_container_t<CTL_ArrayFactory::tagged_array_voidptr*>(aAcquisitionArray);
@@ -637,8 +634,8 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
 
 
     // Enable the document feeder here
-    // Remember the current error flags
     {
+    // Remember the current error flags
         DTWAINScopedLogControllerExclude sLogger(DTWAIN_LOG_ERRORMSGBOX);
         CTL_TwainAppMgr::SetupFeeder(pSource, opts.getMaxPages());
     }
@@ -649,6 +646,8 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
 
     // Send message that interface is about to be shown
     CTL_TwainAppMgr::SendTwainMsgToWindow(pHandle->m_pTwainSession, nullptr, DTWAIN_TN_UIOPENING, reinterpret_cast<LPARAM>(pSource));
+
+    // Show the user interface, or start the acquisition process immediately if no user interface is shown
     const bool bUIOk = CTL_TwainAppMgr::ShowUserInterface(pSource);
     if (!bUIOk)
         pSource->SetAcquireAttempt(false);
@@ -666,6 +665,11 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
     pSource->SetPendingJobNum(0);
     pSource->SetBlankPageCount(0);
 
+    // Set the array to save the image data to the user-provided array
+    if (opts.getUserArray())
+        pSource->SetUserAcquisitionArray(opts.getUserArray());
+
+    // Notify that we started the acquisition
     CTL_TwainAppMgr::SendTwainMsgToWindow(pHandle->m_pTwainSession, nullptr, DTWAIN_TN_ACQUIRESTARTED, reinterpret_cast<LPARAM>(pSource));
 
     // return the Acquire Number
@@ -680,7 +684,7 @@ bool dynarithmic::TileModeOn(DTWAIN_SOURCE Source)
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     if (p)
     {
-        if (CTL_TwainAppMgr::GetOneTwainCapValue(p, &bMode, DTWAIN_CV_ICAPTILES, CTL_GetTypeGET, TWTY_BOOL))
+        if (CTL_TwainAppMgr::GetCurrentOneCapValue(p, &bMode, DTWAIN_CV_ICAPTILES, CTL_GetTypeGETCURRENT))
             return static_cast<TW_BOOL>(bMode)?true:false;
     }
     return false;
