@@ -479,7 +479,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                                                                   reinterpret_cast<LPARAM>(pSource));
                         }
                         // Delete temporary bitmap here
-                        if ( pSource->IsDeleteDibOnScan() )
+                        if ( !bKeepPage2 || pSource->IsDeleteDibOnScan() )
                         {
                             // Let array class handle deleting of the DIB (Global memory will be freed only)
                             pArray->DeleteDibMemory( nLastDib );

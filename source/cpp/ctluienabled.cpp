@@ -29,6 +29,8 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIEnabled(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
+    if (!Source)
+        LOG_FUNC_EXIT_PARAMS(false)
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     // See if DLL Handle exists

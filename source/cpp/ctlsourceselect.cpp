@@ -24,6 +24,9 @@
 #include "dtwstrfn.h"
 #include "sourceselectopts.h"
 #include "errorcheck.h"
+#include "../simpleini/simpleini.h"
+#include "ctlfileutils.h"
+#include "ctldefsource.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -220,6 +223,7 @@ DTWAIN_SOURCE dynarithmic::SourceSelect(const SourceSelectionOptions& options)
             {
                 const auto pSession = CTL_TwainAppMgr::GetCurrentSession();
                 pSession->DestroyOneSource(pRealSource);
+                DTWAIN_SetDefaultSource(pDead);
             }
             LOG_FUNC_EXIT_PARAMS(pDead)
         }
@@ -359,16 +363,29 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDefaultSource(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     if (p)
     {
-        const bool bRetval = CTL_TwainAppMgr::SetDefaultSource(pHandle->m_pTwainSession, p);
-        LOG_FUNC_EXIT_PARAMS(bRetval)
+        // Load the resources
+        CSimpleIniA customProfile;
+        CTL_StringType fullDirectory = dynarithmic::GetDTWAININIPath();
+        customProfile.LoadFile(fullDirectory.c_str());
+        customProfile.SetValue("Sources", "Default",
+                               StringConversion::Convert_Native_To_Ansi(p->GetProductName()).c_str());
+        customProfile.SaveFile(fullDirectory.c_str());
     }
-    LOG_FUNC_EXIT_PARAMS(false)
+    LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
+static CTL_StringType GetDefaultSource()
+{
+    // Load the resources
+    CSimpleIniA customProfile;
+    CTL_StringType fullDirectory = dynarithmic::GetDTWAININIPath();
+    customProfile.LoadFile(fullDirectory.c_str());
+    const char *defSource = customProfile.GetValue("Sources", "Default");
+    return StringConversion::Convert_AnsiPtr_To_Native(defSource);
+}
 #ifdef _WIN32
 /////////////////////////////////////////////////////////////////////////////////
 /// TWAIN Dialog procedure
@@ -462,6 +479,13 @@ struct openSourceSaver
     ~openSourceSaver() { DTWAIN_OpenSourcesOnSelect(m_bSaved); }
 };
 
+struct closeSourceRAII
+{
+    DTWAIN_SOURCE m_Source;
+    closeSourceRAII(DTWAIN_SOURCE source) : m_Source(source) {}
+    ~closeSourceRAII() { DTWAIN_CloseSource(m_Source); }
+};
+
 LRESULT CALLBACK DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static SelectStruct *pS;
@@ -527,27 +551,39 @@ LRESULT CALLBACK DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPA
 
             // Get the default Source
             DTWAIN_SOURCE DefSource = nullptr;
+            std::vector<TCHAR> DefName;
             if (bLogMessages)
                 CTL_TwainAppMgr::WriteLogInfoA("Initializing TWAIN Dialog -- Retrieving default TWAIN Source...\n");
             {
-                // Turn off default open temporarily
-                openSourceSaver sourceSaver(DTWAIN_IsOpenSourcesOnSelect()?true:false);
-                DTWAIN_OpenSourcesOnSelect(false);
-                DefSource = DTWAIN_SelectDefaultSource();
-            }
-            std::vector<TCHAR> DefName;
-            if (DefSource)
-            {
-                LONG nCharacters = DTWAIN_GetSourceProductName(DefSource, nullptr, 0);
-                if (nCharacters > 0)
+                // Try the INI setting first
+                CTL_StringType sourceName = GetDefaultSource();
+                if (!sourceName.empty())
                 {
-                    DefName.resize(nCharacters);
-                    DTWAIN_GetSourceProductName(DefSource, DefName.data(), nCharacters);
-                    if (bLogMessages)
-                        CTL_TwainAppMgr::WriteLogInfoA("Initializing TWAIN Dialog -- Retrieved default TWAIN Source name...\n");
+                    DefName = std::vector<TCHAR>(sourceName.begin(), sourceName.end());
+                    DefName.push_back(0);
+                }
+                else
+                {
+                    {
+                        // Turn off default open temporarily
+                        openSourceSaver sourceSaver(DTWAIN_IsOpenSourcesOnSelect() ? true : false);
+                        DTWAIN_OpenSourcesOnSelect(false);
+                        DefSource = DTWAIN_SelectDefaultSource();
+                    }
+                    if (DefSource)
+                    {
+                        closeSourceRAII cs(DefSource);
+                        LONG nCharacters = DTWAIN_GetSourceProductName(DefSource, nullptr, 0);
+                        if (nCharacters > 0)
+                        {
+                            DefName.resize(nCharacters);
+                            DTWAIN_GetSourceProductName(DefSource, DefName.data(), nCharacters);
+                            if (bLogMessages)
+                                CTL_TwainAppMgr::WriteLogInfoA("Initializing TWAIN Dialog -- Retrieved default TWAIN Source name...\n");
+                        }
+                    }
                 }
             }
-
             if (bLogMessages)
             {
                 if (DefName.empty())

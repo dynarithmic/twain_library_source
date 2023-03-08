@@ -64,7 +64,7 @@ bool dynarithmic::GetSupportArray(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array, LO
 LONG dynarithmic::CheckEnabled(DTWAIN_SOURCE Source, LONG CapVal)
 {
     LONG IsEnabled = 0;
-    GetSupport<CTL_ArrayFactory::tagged_array_long>(Source, &IsEnabled, CapVal);
+    GetSupport<CTL_ArrayFactory::tagged_array_long>(Source, &IsEnabled, CapVal, DTWAIN_CAPGETCURRENT);
     return IsEnabled;
 }
 

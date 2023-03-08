@@ -131,6 +131,7 @@ namespace dynarithmic
             bool            m_bPendingXfersDone;
             TW_PENDINGXFERS m_PendingXfers;
             TW_UINT16       m_lastPendingXferCode;
+            HANDLE          m_hDataHandleFromDevice;
             bool            m_IsBuffered;
             bool            m_bEndTwainUI;
     };
