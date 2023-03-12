@@ -267,7 +267,14 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     DTWAIN_CALLBACK oldCall = pHandle->m_CallbackMsg;
     DTWAIN_SetCallbackProc(DTWAIN_AcquireProc, DTWAIN_CallbackMESSAGE);
 #endif
-
+    auto& user_map = CTL_TwainAppMgr::GetSourceToXferReadyMap();
+    auto iter = user_map.find(pSource->GetProductNameA());
+    if (iter != user_map.end())
+    {
+        iter->second.m_bSeenXferReady = false;
+        iter->second.m_bSeenUIClose = false;
+        iter->second.m_CurrentCount = 0;
+    }
     DTWAIN_ARRAY aAcquisitionArray = SourceAcquireWorkerThread(opts);
     if (DTWAIN_GetTwainMode() == DTWAIN_MODELESS)
     {
@@ -456,6 +463,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
     // Negotiate transfer
     CTL_TwainAppMgr::SetTransferCount(pSource, opts.getMaxPages());
     pSource->SetSpecialTransferMode(opts.getTransferMode());
+    pSource->SetXferReadySent(false);
     if (opts.getActualAcquireType() == TWAINAcquireType_File)
     {
         CTL_StringType strFile;
@@ -635,7 +643,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
 
     // Enable the document feeder here
     {
-    // Remember the current error flags
+        // Remember the current error flags
         DTWAINScopedLogControllerExclude sLogger(DTWAIN_LOG_ERRORMSGBOX);
         CTL_TwainAppMgr::SetupFeeder(pSource, opts.getMaxPages());
     }

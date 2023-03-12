@@ -236,7 +236,8 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_FileSystem(),
     m_pImageMemXfer(nullptr),
     m_PersistentArray(nullptr),
-    m_bImageInfoRetrieved(false)
+    m_bImageInfoRetrieved(false),
+    m_bXferReadySent(false)
  {
     if ( lpszProduct )
         StringWrapperA::SafeStrcpy( m_SourceId.ProductName,

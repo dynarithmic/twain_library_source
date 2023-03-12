@@ -94,6 +94,7 @@ static void OpenLogFile(LPCTSTR pFileName, LONG logFlags, bool append=false);
 static void WriteVersionToLog();
 static bool SysDestroyHelper(CTL_TwainDLLHandle* pHandle, bool bCheck=true);
 static void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL);
+static void LoadTransferReadyOverrides();
 
 #ifdef _WIN32
 static UINT_PTR APIENTRY FileSaveAsHookProc(HWND hWnd, UINT msg, WPARAM w, LPARAM lparam);
@@ -814,19 +815,25 @@ DTWAIN_HANDLE SysInitializeHelper(bool block)
     // Load resources only if first time
     if ( !CTL_TwainDLLHandle::s_ResourcesInitialized )
     {
-        typedef std::function<bool()> boolFuncs;
+        typedef std::function<bool(std::pair<bool, bool>&)> boolFuncs;
         boolFuncs bf[] = { &LoadTwainResources };
-        for (auto& i : bf)
+        for (auto& fnBool : bf)
         {
-            const bool ret = i();
-            if (!ret)
+            std::pair<bool, bool> ret;
+            fnBool(ret);
+            if (!ret.first || !ret.second)
             {
             #ifdef _WIN32
                 if (block)
                 {
-                    CTL_StringType errorMsg = _T("Error.  DTWAIN Resource file not found: ");
-                    errorMsg += DTWAINRESOURCEINFOFILE;
-                    MessageBox(nullptr, errorMsg.c_str(), _T("DTWAIN Resource Error"), MB_ICONERROR);
+                    CTL_StringType errorMsg = _T("Error.  DTWAIN Resource file(s) not found or corrupted: ");
+                    std::vector<CTL_StringType> vErrors;
+                    if (!ret.first)
+                        vErrors.push_back(DTWAINRESOURCEINFOFILE);
+                    if (!ret.second)
+                        vErrors.push_back(DTWAIN_ININAME_NATIVE);
+                    CTL_StringType sAllErrors = errorMsg + StringWrapper::Join(vErrors, _T(","));
+                    MessageBox(nullptr, sAllErrors.c_str(), _T("DTWAIN Resource Error"), MB_ICONERROR);
                 }
             #endif
                 LOG_FUNC_EXIT_PARAMS(NULL)
@@ -837,7 +844,7 @@ DTWAIN_HANDLE SysInitializeHelper(bool block)
     // Return a new DTWAIN_HANDLE
     try
     {
-        pHandlePtr = std::make_unique<CTL_TwainDLLHandle>();
+        pHandlePtr = std::make_shared<CTL_TwainDLLHandle>();
         CTL_TwainDLLHandle* pHandle = pHandlePtr.get();
         CTL_TwainDLLHandle::s_DLLHandles.push_back(pHandlePtr);
         CTL_TwainDLLHandle::s_pLoggerCallback  = nullptr;
@@ -853,7 +860,6 @@ DTWAIN_HANDLE SysInitializeHelper(bool block)
         HookTwainDLL( pHandle, FALSE );
         if ( CTL_TwainDLLHandle::s_DLLHandles.size() == 1 )
         {
-            const CTL_StringType iniName = _T(".ini");
             const CTL_StringType szLangDLL = _T("english");
 
             // Initialize the enumerator factory
@@ -865,6 +871,9 @@ DTWAIN_HANDLE SysInitializeHelper(bool block)
 
             // Load customized resources from INI
             LoadCustomResourcesFromIni(pHandle, szLangDLL.c_str());
+
+            // Load DS overrides for transfer ready / close UI requests
+            LoadTransferReadyOverrides();
 
             // Initialize imaging code
             FreeImage_Initialise(true);
@@ -907,8 +916,10 @@ void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL)
 {
     // Load the resources
     CSimpleIniA customProfile;
-    CTL_StringType fullDirectory = dynarithmic::GetDTWAININIPath();
-    customProfile.LoadFile(fullDirectory.c_str());
+    auto err = customProfile.LoadFile(dynarithmic::GetDTWAININIPathA().c_str());
+    if (err != SI_OK)
+        return;
+
     std::string szStr = customProfile.GetValue("Language", "dll",
                                                StringConversion::Convert_NativePtr_To_Ansi(szLangDLL).c_str());
     if (!LoadLanguageResourceA(szStr, pHandle->GetResourceRegistry()))
@@ -2233,9 +2244,13 @@ CTL_StringType GetDTWAINDLLVersionInfoStr()
 
 CTL_StringType dynarithmic::GetDTWAININIPath()
 {
-    const CTL_StringType iniName = _T(".ini");
-    CTL_StringType szName = StringConversion::Convert_AnsiPtr_To_Native("dtwain" DTWAIN_OSPLATFORM) + iniName;
+    CTL_StringType szName = DTWAIN_ININAME_NATIVE; 
     return get_parent_directory(GetDTWAINDLLPath().c_str()) + szName;
+}
+
+std::string dynarithmic::GetDTWAININIPathA()
+{
+    return StringConversion::Convert_Native_To_Ansi(GetDTWAININIPath());
 }
 
 CTL_StringType& dynarithmic::GetDTWAINTempFilePath()
@@ -2260,6 +2275,56 @@ std::string CheckSearchOrderString(std::string str)
     StringWrapperA::MakeUpperCase(str);
     std::copy_if(str.begin(), str.end(), std::back_inserter(strOut), [&](char ch) { return setValidChars.count(ch); });
     return strOut;
+}
+
+// This loads DTWAIN32.INI or DTWAIN64.INI, and checks the [SourceXferWaitInfo]
+// section for TWAIN sources that may potentially send "close source" requests
+// before sending the "start transfer" request when acquiring images.
+void LoadTransferReadyOverrides()
+{
+    auto& xfer_map = CTL_TwainAppMgr::GetSourceToXferReadyMap();
+    xfer_map.clear();
+    auto& xfer_list = CTL_TwainAppMgr::GetSourceToXferReadyList();
+    xfer_list.clear();
+
+    // Get the section name
+    CSimpleIniA customProfile;
+    auto err = customProfile.LoadFile(dynarithmic::GetDTWAININIPathA().c_str());
+    if (err != SI_OK)
+        return;
+    CSimpleIniA::TNamesDepend keys;
+    customProfile.GetAllKeys("SourceXferWaitInfo", keys);
+    auto iter = keys.begin();
+    while (iter != keys.end())
+    {
+        CSimpleIniA::TNamesDepend vals;
+        customProfile.GetAllValues("SourceXferWaitInfo", iter->pItem, vals);
+        if (!vals.empty())
+        {
+                auto iter2 = vals.begin();
+                if ( !vals.empty())
+            {
+                try
+                {
+                    uint32_t valueToUse = std::stoi(iter2->pItem);
+                    xfer_list.push_back({ iter->pItem, valueToUse });
+                }
+                catch (const std::invalid_argument& /*ex*/)
+                {
+                    // We can get here if std::stoi detects that the value is not 
+                    // a valid integer. 
+                    xfer_list.push_back({ iter->pItem, 0 });
+                }
+                catch (const std::out_of_range& /*ex*/)
+                {
+                    // We can get here if std::stoi detects that the value is not 
+                    // a valid integer. 
+                    xfer_list.push_back({ iter->pItem, 0 });
+                }
+            }
+        }
+        ++iter;
+    }
 }
 
 #undef min

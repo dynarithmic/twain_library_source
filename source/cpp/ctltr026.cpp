@@ -703,7 +703,11 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
 
                 // Send a message to close things down if
                 // there was no user interface chosen
-                if ( !pSource->IsUIOpenOnAcquire() && m_bEndTwainUI )
+                bool keepProcessingSinglePage = bProcessSinglePage && (ptrPending->Count > 0);
+                // If there are no more images pending for single page image types, and
+                // the device is not showing the user-interface, and there are no pages in 
+                // the feeder, shut the UI down.
+                if (!keepProcessingSinglePage && !pSource->IsUIOpenOnAcquire())
                     CTL_TwainAppMgr::EndTwainUI(pSession, pSource);
 
                 // Close any open multi page DIB files

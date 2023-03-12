@@ -35,11 +35,13 @@ namespace dynarithmic
             TW_UINT16       ExecuteEventHandler();
             bool            ResetTransfer(TW_UINT16 Msg=MSG_RESET);
             void            SetMessage(TW_UINT16 nMsg) { m_Event.TWMessage = nMsg;  }
+            void            CloseUI(CTL_ITwainSource* pSource);
 
         private:
             TW_EVENT   m_Event;
             bool       m_bDSM2Used;
             MSG        *m_pMsg;
+            void DeviceEvent(CTL_ITwainSource* pSource);
 
     };
 }
