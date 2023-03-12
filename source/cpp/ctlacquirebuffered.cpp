@@ -36,6 +36,12 @@ DTWAIN_BOOL   DLLENTRY_DEF DTWAIN_AcquireBufferedEx(DTWAIN_SOURCE Source, LONG P
                                                     LPLONG pStatus)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, Acquisitions, pStatus))
+
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    CTL_ITwainSource* pSource = VerifySourceHandle(pHandle, Source);
+    if (!pSource)
+        LOG_FUNC_EXIT_PARAMS(false)
+
     SourceAcquireOptions opts = SourceAcquireOptions().setHandle(GetDTWAINHandle_Internal()).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
         setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setUserArray(Acquisitions).
         setAcquireType(ACQUIREBUFFEREX);

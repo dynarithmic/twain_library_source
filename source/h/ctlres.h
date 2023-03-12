@@ -36,7 +36,7 @@ namespace dynarithmic
     bool LoadLanguageResourceA(LPCSTR lpszName);
     bool LoadLanguageResourceA(const std::string& lpszName, const CTL_ResourceRegistryMap& registryMap);
     bool LoadLanguageResourceA(const std::string& lpszName);
-    bool LoadTwainResources();
+    bool LoadTwainResources(std::pair<bool, bool>& ret);
     void UnloadStringResources();
     void UnloadErrorResources();
     std::vector<std::string> GetLangResourceNames();

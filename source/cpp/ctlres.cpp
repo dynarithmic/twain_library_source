@@ -27,11 +27,13 @@
 #include "ctltwmgr.h"
 #include "dtwain_verinfo.h"
 #include "dtwstrfn.h"
+#include "ctldefsource.h"
 using namespace dynarithmic;
 
 #ifdef TWAINSAVE_STATIC
 LONG  TS_Command(LPCTSTR lpCommand);
 #endif
+
 
 namespace dynarithmic
 {
@@ -59,15 +61,24 @@ namespace dynarithmic
         return sPath + resName;
     }
 
-    bool LoadTwainResources()
+    bool LoadTwainResources(std::pair<bool, bool>& retValue)
     {
         LOG_FUNC_ENTRY_PARAMS(())
+        retValue = { false, false };
         CTL_ErrorStruct ErrorStruct;
         int dg, dat, msg, structtype, retcode, successcode;
         auto sPath = createResourceFileName(DTWAINRESOURCEINFOFILE);
         auto sPathA = StringConversion::Convert_Native_To_Ansi(sPath);
         StringWrapperA::traits_type::inputfile_type ifs(sPathA);
-        if (!ifs)
+        if (ifs)
+            retValue.first = true;
+        // Test for the INI file existing
+        {
+            std::wifstream iniFile(GetDTWAININIPath());
+            if (iniFile)
+                retValue.second = true;
+        }
+        if (!retValue.first || !retValue.second)
             return false;
 
         while (ifs >> dg >> dat >> msg >> structtype >> retcode >> successcode)

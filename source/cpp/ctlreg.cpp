@@ -211,7 +211,7 @@ bool dynarithmic::GetCapInfoFromIni(const std::string& strCapName,
         }
     }
 
-    // Check if there are is any state-related info
+    // Check if there is any state-related info
     std::string szStates;
     strStates = strCapName + "_STATES";
     szStates = customProfile.GetValue(strKeyName.c_str(), strStates.c_str(), "");

@@ -223,8 +223,8 @@ DTWAIN_SOURCE dynarithmic::SourceSelect(const SourceSelectionOptions& options)
             {
                 const auto pSession = CTL_TwainAppMgr::GetCurrentSession();
                 pSession->DestroyOneSource(pRealSource);
-                DTWAIN_SetDefaultSource(pDead);
             }
+                DTWAIN_SetDefaultSource(pDead);
             LOG_FUNC_EXIT_PARAMS(pDead)
         }
     }
@@ -367,10 +367,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDefaultSource(DTWAIN_SOURCE Source)
     {
         // Load the resources
         CSimpleIniA customProfile;
-        CTL_StringType fullDirectory = dynarithmic::GetDTWAININIPath();
+        CTL_StringType fullDirectory = dynarithmic::GetDTWAININIPath().c_str();
         customProfile.LoadFile(fullDirectory.c_str());
-        customProfile.SetValue("Sources", "Default",
-                               StringConversion::Convert_Native_To_Ansi(p->GetProductName()).c_str());
+        customProfile.SetValue("Sources", "Default", p->GetProductNameA().c_str());
         customProfile.SaveFile(fullDirectory.c_str());
     }
     LOG_FUNC_EXIT_PARAMS(true)

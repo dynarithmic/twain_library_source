@@ -856,30 +856,33 @@ bool CTL_TwainAppMgr::IsTwainMsg(MSG *pMsg, bool bFromUserQueue/*=false*/)
     CTL_ProcessEventTriplet processEvent( s_pSelectedSession, ptrSource, pMsg, bFromUserQueue && IsVersion2DSMUsed());
 
     // execute triplet
+    bool retVal = false;
     const TW_UINT16 rc = processEvent.ExecuteEventHandler();
     if ( rc != TWRC_NOTDSEVENT )
         s_pGlobalAppMgr->WriteToLogFile( rc );
     switch (rc)
     {
         case TWRC_NOTDSEVENT:
-        {
-            return false;
-        }
+            retVal = false;
+        break;
+
         case TWRC_DSEVENT:
-            return true;
+            retVal = true;
+        break;
 
         case TWRC_FAILURE:
         {
             const TW_UINT16 CC = GetConditionCode( s_pSelectedSession, ptrSource );
             ProcessConditionCodeError(CC);
-            return false;
+            retVal = false;
         }
+        break;
+
         case TWRC_XFERDONE:
-        {
-            return true;
-        }
+            retVal = true;
+        break;
     }
-    return false;
+    return retVal;
 }
 
 void CTL_TwainAppMgr::NotifyFeederStatus()
@@ -2806,5 +2809,8 @@ std::string  CTL_TwainAppMgr::s_strLastError;
 HINSTANCE    CTL_TwainAppMgr::s_ThisInstance = static_cast<HINSTANCE>(nullptr);
 mapCondCodeInfo  CTL_TwainAppMgr::s_mapCondCode;
 std::vector<RawTwainTriplet> CTL_TwainAppMgr::s_NoTimeoutTriplets;
+SourceToXferReadyMap CTL_TwainAppMgr::s_SourceToXferReadyMap;
+SourceToXferReadyList CTL_TwainAppMgr::s_SourceToXferReadyList;
+
 
 

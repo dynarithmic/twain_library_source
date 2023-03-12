@@ -1503,6 +1503,8 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <None Include="inl\winget_twain.inl" />
     <None Include="inl\winlibraryloader_impl.inl" />
     <None Include="rc\resource_verinfo.rc2" />
+    <None Include="txt\dtwain32.ini" />
+    <None Include="txt\dtwain64.ini" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include=".\rc\twil32.rc">

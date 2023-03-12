@@ -22,6 +22,7 @@
 #include "ctltwmgr.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
+#include "../wildcards/wildcards.hpp"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -29,6 +30,7 @@
 using namespace dynarithmic;
 
 static void LogAndCachePixelTypes(CTL_ITwainSource *p);
+static void DetermineIfSpecialXfer(CTL_ITwainSource* p);
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSourcesOnSelect(DTWAIN_BOOL bSet)
 {
@@ -71,6 +73,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
 
     // Cache the pixel types and bit depths
     LogAndCachePixelTypes(p);
+
+    // See if the source is one that has a bug in the MSG_XFERREADY sending on the 
+    // TWAIN message queue
+    DetermineIfSpecialXfer(p);
 
     DTWAIN_ARRAY arr = nullptr;
     DTWAINArrayPtr_RAII raii(&arr);
@@ -218,3 +224,32 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
         CTL_TwainAppMgr::WriteLogInfoA("Could not retrieve bit depth information\n");
     p->SetCurrentlyProcessingPixelInfo(false);
 }
+
+void DetermineIfSpecialXfer(CTL_ITwainSource* p)
+{
+    using wildcards::match;
+    auto& xfer_map = CTL_TwainAppMgr::GetSourceToXferReadyMap();
+    auto& xfer_list= CTL_TwainAppMgr::GetSourceToXferReadyList();
+    std::string sourceName = p->GetProductNameA();
+    auto iter = xfer_map.find(sourceName);
+
+    // Already in map
+    if (iter != xfer_map.end())
+        return;
+
+    // Search vector for a matching name
+    auto iterSearch = xfer_list.begin();
+    while (iterSearch != xfer_list.end())
+    {
+        bool matches = match(sourceName, iterSearch->first);
+        if (matches)
+        {
+            // Add this source as one that will require special MSG_XFERREADY processing
+            auto insertPr = xfer_map.insert({ sourceName, {} });
+            insertPr.first->second.m_MaxThreshold = iterSearch->second;
+            return;
+        }
+        ++iterSearch;
+    }
+}
+

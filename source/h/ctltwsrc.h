@@ -121,6 +121,28 @@ namespace dynarithmic
         CTL_StringType GetManufacturer() const { return StringConversion::Convert_AnsiPtr_To_Native(m_SourceId.Manufacturer); }
         CTL_StringType GetProductFamily() const { return StringConversion::Convert_AnsiPtr_To_Native(m_SourceId.ProductFamily); }
         CTL_StringType GetProductName() const { return StringConversion::Convert_AnsiPtr_To_Native(m_SourceId.ProductName); }
+        std::string GetManufacturerA() const { return m_SourceId.Manufacturer; }
+        std::string GetProductFamilyA() const { return m_SourceId.ProductFamily; }
+        std::string GetProductNameA() const { return m_SourceId.ProductName; }
+
+        std::wstring GetManufacturerW() const 
+        {
+            auto str = GetManufacturerA();
+            return std::wstring(str.begin(), str.end());
+        }
+
+        std::wstring GetProductFamilyW() const 
+        { 
+            auto str = GetProductFamilyA();
+            return std::wstring(str.begin(), str.end());
+        }
+
+        std::wstring GetProductNameW() const 
+        {
+            auto str = GetProductNameA();
+            return std::wstring(str.begin(), str.end());
+        }
+
         bool         IsOpened() const { return m_bIsOpened; }
         bool         IsSelected() const { return m_bIsSelected; }
         void         SetSelected(bool bSet) { m_bIsSelected = bSet; }
@@ -392,6 +414,8 @@ namespace dynarithmic
         void         SetBlankPageCount(LONG nCount) { m_nBlankPageCount = nCount; }
         void         SetImageNegative(bool bSet=true) { m_bImageNegative = bSet; }
         bool         IsImageNegativeOn() const { return m_bImageNegative; }
+        bool         IsXferReadySent() const { return m_bXferReadySent; }
+        void         SetXferReadySent(bool bSet) { m_bXferReadySent = bSet;  }
         bool         IsCurrentlyProcessingPixelInfo() const { return m_bProcessingPixelInfo; }
         void         SetCurrentlyProcessingPixelInfo(bool bSet=true) { m_bProcessingPixelInfo = bSet; }
         void         ClearPDFText();
@@ -439,6 +463,7 @@ namespace dynarithmic
             } CapCacheInfo;
 
         bool            m_bDSMVersion2;
+        bool            m_bXferReadySent;
         bool            m_bIsOpened;
         bool            m_bIsSelected;
         TW_IDENTITY     m_SourceId;

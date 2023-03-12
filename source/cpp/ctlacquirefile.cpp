@@ -48,6 +48,9 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
     auto bRetval = true;
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    CTL_ITwainSource* pSource = VerifySourceHandle(pHandle, Source);
+    if (!pSource)
+        LOG_FUNC_EXIT_PARAMS(false)
     DTWAIN_ARRAY tempNames = nullptr;
     DTWAINArrayPtr_RAII tempRAII(&tempNames);
     DTWAIN_ARRAY arrayToUse = aFileNames;
@@ -97,6 +100,13 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFile(DTWAIN_SOURCE Source,
                                                   LPLONG pStatus)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpszFile, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus))
+
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    CTL_ITwainSource* pSource = VerifySourceHandle(pHandle, Source);
+    if (!pSource)
+        LOG_FUNC_EXIT_PARAMS(false)
+
     lFileFlags &= ~DTWAIN_USELIST;
     SourceAcquireOptions opts = SourceAcquireOptions().setHandle(GetDTWAINHandle_Internal()).setSource(Source).
         setFileName(lpszFile).setFileType(lFileType).setFileFlags(lFileFlags).setPixelType(PixelType).
