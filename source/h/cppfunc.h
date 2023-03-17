@@ -103,7 +103,11 @@
 
             #define LOG_FUNC_ENTRY_PARAMS_NO_CHECK(argvals) TRY_BLOCK
 
+            #define LOG_FUNC_ENTRY_PARAMS_ISTWAINMSG(x) TRY_BLOCK
+
             #define LOG_FUNC_EXIT_PARAMS(x) { return(x); }
+
+            #define LOG_FUNC_EXIT_PARAMS_ISTWAINMSG(x) { return(x); }
 
             #define LOG_FUNC_VALUES_EX(argvals)
 
@@ -118,13 +122,19 @@
 #else
     #define TRY_BLOCK
 
+    #define LOG_FUNC_ENTRY_PARAMS(x)
+
     #define LOG_FUNC_STRING(x)
 
     #define LOG_FUNC_VALUES(x)
 
-    #define LOG_FUNC_VALUES_EX(x, argtype)
+    #define LOG_FUNC_ENTRY_PARAMS_ISTWAINMSG(x) 
 
-    #define LOG_FUNC_EXIT_PARAMS(x, argtype) { return (x); }
+    #define LOG_FUNC_VALUES_EX(x)
+
+    #define LOG_FUNC_EXIT_PARAMS(x) { return (x); }
+
+    #define LOG_FUNC_EXIT_PARAMS_ISTWAINMSG(x) { return(x); }
 
     #define CATCH_BLOCK(type)
 
