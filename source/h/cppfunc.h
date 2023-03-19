@@ -120,6 +120,7 @@
                 }
         #endif
 #else
+    #pragma message("Building DTWAIN without callstack logging and exception handling...")
     #define TRY_BLOCK
 
     #define LOG_FUNC_ENTRY_PARAMS(x)
