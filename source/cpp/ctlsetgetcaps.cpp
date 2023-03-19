@@ -613,7 +613,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomDSData( DTWAIN_SOURCE Source, HANDLE hD
     if( !bSupported )
         LOG_FUNC_EXIT_PARAMS(false)
 
-
     // Set up triplet for CUSTOMDSDATA call
     const auto pSession = p->GetTwainSession();
     CTL_CustomDSTriplet DST(pSession, p, MSG_SET);
@@ -632,10 +631,17 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomDSData( DTWAIN_SOURCE Source, HANDLE hD
     }
 
     // Set data to the data passed in
+
+    DTWAINGlobalHandleUnlockFree_RAII memHandler;
+
     if( nFlags & DTWAINSCD_USEDATA )
     {
         // Allocate local copy of handle
         pData = static_cast<char*>(ImageMemoryHandler::GlobalAllocPr(GMEM_DDESHARE, dSize));
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pData == NULL; }, DTWAIN_ERR_OUT_OF_MEMORY, false, FUNC_MACRO);
+
+        // Make sure memory is cleaned up at the end
+        memHandler.reset(ImageMemoryHandler::GlobalHandle(pData));
         memcpy(pData, Data, dSize);
         DST.SetData(ImageMemoryHandler::GlobalHandle(pData), dSize);
     }
@@ -643,13 +649,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomDSData( DTWAIN_SOURCE Source, HANDLE hD
     // Call TWAIN
     const int ret = DST.Execute();
 
-    // Release local handle if data used
-    if( nFlags & DTWAINSCD_USEDATA )
-        ImageMemoryHandler::GlobalFreePr(pData);
-
     // return TRUE or FALSE depending on return code of TWAIN
     if( ret != TWRC_SUCCESS )
+    {
+        pHandle->m_lLastError = -(IDS_TWRC_ERRORSTART + ret);
         LOG_FUNC_EXIT_PARAMS(false)
+    }
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
