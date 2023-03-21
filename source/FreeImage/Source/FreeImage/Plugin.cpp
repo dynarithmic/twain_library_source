@@ -135,7 +135,10 @@ PluginList::AddNode(FI_InitProc init_proc, void *instance, const char *format, c
 		delete plugin;
 		delete node;
 	}
-
+	else
+	{
+        m_plugin_map[(const int)m_plugin_map.size()] = nullptr;
+	}
 	return FIF_UNKNOWN;
 }
 
@@ -193,13 +196,16 @@ PluginList::IsEmpty() const {
 PluginList::~PluginList() {
 	for (map<int, PluginNode *>::iterator i = m_plugin_map.begin(); i != m_plugin_map.end(); ++i) {
 #ifdef _WIN32
-		if ((*i).second->m_instance != NULL) {
+		if ((*i).second && (*i).second->m_instance != NULL) {
 			FreeLibrary((HINSTANCE)(*i).second->m_instance);
 		}
 #endif
+		if ((*i).second)
+		{
 		delete (*i).second->m_plugin;
 		delete ((*i).second);
 	}
+}
 }
 
 // =====================================================================
@@ -265,15 +271,17 @@ FreeImage_Initialise(BOOL load_local_plugins_only) {
 	        s_plugins->AddNode(InitHDR);
 			s_plugins->AddNode(InitG3);
 			s_plugins->AddNode(InitSGI);
-			s_plugins->AddNode(InitEXR);
+			s_plugins->AddNode(nullptr);
+            //			s_plugins->AddNode(InitEXR);
 			s_plugins->AddNode(InitJ2K);
 			s_plugins->AddNode(InitJP2);
 			s_plugins->AddNode(InitPFM);
 			s_plugins->AddNode(InitPICT);
-			s_plugins->AddNode(InitRAW);
+            s_plugins->AddNode(nullptr);
+            //			s_plugins->AddNode(InitRAW);
 			s_plugins->AddNode(InitWEBP);
 #if !(defined(_MSC_VER) && (_MSC_VER <= 1310))
-			s_plugins->AddNode(InitJXR);
+//			s_plugins->AddNode(InitJXR);
 #endif // unsupported by MS Visual Studio 2003 !!!
 			
 			// external plugin initialization

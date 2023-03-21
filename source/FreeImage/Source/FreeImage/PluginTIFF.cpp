@@ -1353,7 +1353,6 @@ Load(FreeImageIO *io, fi_handle handle, int page, int flags, void *data) {
 	if (!handle || !data ) {
 		return NULL;
 	}
-	
 	TIFF   *tif = NULL;
 	uint32_t height = 0; 
 	uint32_t width = 0; 
@@ -2285,7 +2284,6 @@ Load(FreeImageIO *io, fi_handle handle, int page, int flags, void *data) {
 		}
 		return NULL;
 	}
-  
 }
 
 // --------------------------------------------------------------------------
