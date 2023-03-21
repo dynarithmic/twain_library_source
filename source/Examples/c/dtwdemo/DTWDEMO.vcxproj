@@ -196,6 +196,9 @@
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
 </Command>
     </PostBuildEvent>
+    <ResourceCompile>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">
     <ClCompile>
@@ -227,6 +230,9 @@
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
 </Command>
     </PostBuildEvent>
+    <ResourceCompile>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">
     <ClCompile>
@@ -286,6 +292,7 @@
     </Link>
     <ResourceCompile>
       <PreprocessorDefinitions>;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
     <PostBuildEvent>
       <Command>"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
@@ -318,6 +325,7 @@
     </Link>
     <ResourceCompile>
       <PreprocessorDefinitions>;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
     <PostBuildEvent>
       <Command>"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
@@ -352,6 +360,9 @@
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
 </Command>
     </PostBuildEvent>
+    <ResourceCompile>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">
     <ClCompile>
@@ -372,6 +383,9 @@
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
 </Command>
     </PostBuildEvent>
+    <ResourceCompile>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">
     <ClCompile>

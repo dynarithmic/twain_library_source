@@ -245,11 +245,13 @@
       <AdditionalOptions>-Zm400 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;_DEBUG;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/fixed:no %(AdditionalOptions)</AdditionalOptions>
@@ -343,7 +345,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       </HeaderFileName>
     </Midl>
     <ClCompile>
-      <Optimization>Full</Optimization>
+      <Optimization>MinSpace</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>FREEIMAGE_CPP_LIB;_UNICODE;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;NDEBUG;DTWAIN_USE_PDFLIB;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -368,6 +370,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;NDEBUG;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/fixed:no %(AdditionalOptions)</AdditionalOptions>
@@ -459,7 +462,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       </HeaderFileName>
     </Midl>
     <ClCompile>
-      <Optimization>Full</Optimization>
+      <Optimization>MinSpace</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;NDEBUG;DTWAIN_USE_PDFLIB;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);USE_DTWAIN_DEBUG_LIB</PreprocessorDefinitions>
@@ -488,6 +491,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;NDEBUG;PDFLIB_INTERNAL;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/fixed:no %(AdditionalOptions)</AdditionalOptions>
@@ -609,6 +613,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;_DEBUG;PDFLIB_INTERNAL;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/fixed:no %(AdditionalOptions)</AdditionalOptions>
@@ -716,6 +721,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ResourceCompile>
       <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;_DEBUG;WIN64;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
     <PostBuildEvent>
       <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
@@ -776,7 +782,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
-      <Optimization>Full</Optimization>
+      <Optimization>MinSpace</Optimization>
       <PreprocessorDefinitions>NOMINMAX;FREEIMAGE_CPP_LIB;_UNICODE;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;NDEBUG;DTWAIN_USE_PDFLIB;WIN64;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
@@ -803,6 +809,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ResourceCompile>
       <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;NDEBUG;WIN64;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
     <PostBuildEvent>
       <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
@@ -864,7 +871,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
-      <Optimization>Full</Optimization>
+      <Optimization>MinSpace</Optimization>
       <PreprocessorDefinitions>NOMINMAX;FREEIMAGE_CPP_LIB;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;_DEBUGNDEBUG;DTWAIN_USE_PDFLIB;WIN64;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);;USE_DTWAIN_DEBUG_LIB</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
@@ -898,6 +905,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ResourceCompile>
       <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;NDEBUG;WIN64;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
     <PostBuildEvent>
       <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
@@ -986,6 +994,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ResourceCompile>
       <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;_DEBUG;WIN64;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
     <PostBuildEvent>
       <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
