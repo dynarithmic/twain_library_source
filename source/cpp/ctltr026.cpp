@@ -699,6 +699,20 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
 
             if ( ptrPending->Count == 0 || !nContinue || bForceClose || bEndOfJobDetected || bProcessSinglePage)
             {
+                struct UIShutDown
+                {
+                    CTL_ITwainSession* pSession;
+                    CTL_ITwainSource* pSource;
+                    bool bShutdown;
+                    UIShutDown(CTL_ITwainSession* pSes, CTL_ITwainSource* pSrc, bool bClose)
+                        : pSession(pSes), pSource(pSrc), bShutdown(bClose) {}
+                    ~UIShutDown()
+                    {
+                        if (bShutdown)
+                            CTL_TwainAppMgr::EndTwainUI(pSession, pSource);
+                    }
+                };
+
                 // Prompt to save image here
 
                 // Send a message to close things down if
@@ -707,10 +721,8 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
                 // If there are no more images pending for single page image types, and
                 // the device is not showing the user-interface, and there are no pages in 
                 // the feeder, shut the UI down.
-                if (!keepProcessingSinglePage && !pSource->IsUIOpenOnAcquire())
-                    CTL_TwainAppMgr::EndTwainUI(pSession, pSource);
+                UIShutDown uiCloser(pSession, pSource, !keepProcessingSinglePage && !pSource->IsUIOpenOnAcquire());
 
-                // Close any open multi page DIB files
                 if ( pSource->GetAcquireType() == TWAINAcquireType_FileUsingNative)
                 {
                     if ( !bForceClose )

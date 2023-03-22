@@ -95,6 +95,7 @@ static void WriteVersionToLog();
 static bool SysDestroyHelper(CTL_TwainDLLHandle* pHandle, bool bCheck=true);
 static void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL);
 static void LoadTransferReadyOverrides();
+static void LoadFlatbedOnlyOverrides();
 
 #ifdef _WIN32
 static UINT_PTR APIENTRY FileSaveAsHookProc(HWND hWnd, UINT msg, WPARAM w, LPARAM lparam);
@@ -874,6 +875,9 @@ DTWAIN_HANDLE SysInitializeHelper(bool block)
 
             // Load DS overrides for transfer ready / close UI requests
             LoadTransferReadyOverrides();
+
+            // Load flatbed only list of devices
+            LoadFlatbedOnlyOverrides();
 
             // Initialize imaging code
             FreeImage_Initialise(true);
@@ -2323,6 +2327,31 @@ void LoadTransferReadyOverrides()
                 }
             }
         }
+        ++iter;
+    }
+}
+
+// This loads DTWAIN32.INI or DTWAIN64.INI, and checks the [FlatbedOnly]
+// section for TWAIN sources that only work if the source is preset to use
+// only the flatbed portion of the device.  
+void LoadFlatbedOnlyOverrides()
+{
+    auto& flatbed_list = CTL_TwainAppMgr::GetSourceFlatbedOnlyList();
+    flatbed_list.clear();
+
+    // Get the section name
+    CSimpleIniA customProfile;
+    auto err = customProfile.LoadFile(dynarithmic::GetDTWAININIPathA().c_str());
+    if (err != SI_OK)
+        return;
+    CSimpleIniA::TNamesDepend keys;
+    customProfile.GetAllKeys("FlatbedOnly", keys);
+    auto iter = keys.begin();
+    while (iter != keys.end())
+    {
+        CSimpleIniA::TNamesDepend vals;
+        customProfile.GetAllValues("FlatbedOnly", iter->pItem, vals);
+        flatbed_list.insert(iter->pItem);
         ++iter;
     }
 }
