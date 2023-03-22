@@ -39,22 +39,16 @@ correspond with the version of the compiler's "Platform Toolset" you will use wh
 
 The DTWAIN Visual Studio solution and project files are built to support the following Visual Studio Platform Toolsets:
 
-* v140 (Visual Studio 2015)
-* v141 (Visual Studio 2017)
 * v142 (Visual Studio 2019)
 * v143 (Visual Studio 2022)
 
-When you load the solution and project files in the Visual Studio IDE, you may be prompted to upgrade the platform toolset from v140 to the latest version that is supported by the particular Visual Studio compiler you are using.  You can choose to leave the platform toolset as-is, or decide to upgrade to the latest one.  However the platform toolset must be v140, v141, v142, or v143, and your current installation must have this toolset installed for your compiler.
+When you load the solution and project files in the Visual Studio IDE, you may be prompted to upgrade the platform toolset from v140 to the latest version that is supported by the particular Visual Studio compiler you are using.  You can choose to leave the platform toolset as-is, or decide to upgrade to the latest one.  However the platform toolset must be v142 or v143, and your current installation must have this toolset installed for your compiler.
 
 The version of the Boost library that will be used at link time must match the platform toolset that DTWAIN was built with.   This must be set before openeing Visual Studio.
 
 To easily facilitate this, the following environment
 variables should be created before starting Visual Studio and building DTWAIN:
 
-*    BOOST_LIBRARY_DIR_V140_32
-*    BOOST_LIBRARY_DIR_V140_64    
-*    BOOST_LIBRARY_DIR_V141_32
-*    BOOST_LIBRARY_DIR_V141_64    
 *    BOOST_LIBRARY_DIR_V142_32
 *    BOOST_LIBRARY_DIR_V142_64    
 *    BOOST_LIBRARY_DIR_V143_32
@@ -80,8 +74,6 @@ SET BOOST_LIBRARY_DIR_V142_64=C:\boost_installation\lib64-msvc-14.2
 If you are using Visual C++, I recommend getting the pre-built boost libraries found at [SourceForge](https://sourceforge.net/projects/boost/files/boost-binaries/).  When installed, you will get the boost **include** files, plus the library files.  Please download the version of boost that fits your compiler.  
 
 ```plaintext
-For platform toolset v140 -- Download files with "14.0" in the file name.
-For platform toolset v141 -- Download files with "14.1" in the file name.
 For platform toolset v142 -- Download files with "14.2" in the file name.
 For platform toolset v143 -- Download files with "14.3" in the file name.
 ```
