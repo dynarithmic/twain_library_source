@@ -68,6 +68,7 @@ namespace dynarithmic
 
     using SourceToXferReadyMap = std::map<std::string, SourceXferReadyOverride>;
     using SourceToXferReadyList = std::vector<std::pair<std::string, uint32_t>>;
+    using SourceFlatbedOnlyList = std::unordered_set<std::string>;
 
     class CTL_TwainAppMgr;
     typedef std::shared_ptr<CTL_TwainAppMgr> CTL_TwainAppMgrPtr;
@@ -296,6 +297,7 @@ namespace dynarithmic
             static CTL_StringType GetDSMPath();
             static SourceToXferReadyMap& GetSourceToXferReadyMap() { return s_SourceToXferReadyMap; }
             static SourceToXferReadyList& GetSourceToXferReadyList() { return s_SourceToXferReadyList; }
+            static SourceFlatbedOnlyList& GetSourceFlatbedOnlyList() { return s_SourceFlatbedOnlyList; }
             const CTL_TwainTriplet* GetCurrentTriplet() const { return m_pCurrentTriplet;}
 
         private:
@@ -511,6 +513,7 @@ namespace dynarithmic
             static VOID CALLBACK TwainTimeOutProc(HWND, UINT, ULONG, DWORD);
             static SourceToXferReadyMap s_SourceToXferReadyMap;
             static SourceToXferReadyList s_SourceToXferReadyList;
+            static SourceFlatbedOnlyList s_SourceFlatbedOnlyList;
     };
 
     #define DTWAIN_ERROR_CONDITION(Err, RetVal) {               \
