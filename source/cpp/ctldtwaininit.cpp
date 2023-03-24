@@ -1044,6 +1044,11 @@ bool dynarithmic::UserDefinedLoggerExists()
     return CTL_TwainDLLHandle::s_pLoggerCallback || CTL_TwainDLLHandle::s_pLoggerCallbackA || CTL_TwainDLLHandle::s_pLoggerCallbackW;
 }
 
+bool dynarithmic::AnyLoggerExists()
+{
+    return UserDefinedLoggerExists() || CTL_TwainDLLHandle::s_lErrorFilterFlags != 0;
+}
+
 void dynarithmic::WriteUserDefinedLogMsg(LPCTSTR sz)
 {
     if (CTL_TwainDLLHandle::s_pLoggerCallback)

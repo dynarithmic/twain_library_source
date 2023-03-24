@@ -58,14 +58,6 @@ HANDLE DLLENTRY_DEF DTWAIN_ConvertDIBToBitmap(HANDLE hDib, HANDLE hPalette)
     CATCH_BLOCK(HANDLE())
 }
 
-struct HandleRAII 
-{
-    LPBYTE m_pByte;
-    DTWAINGlobalHandle_RAII m_raii;
-    HandleRAII(HANDLE h) : m_raii(h), m_pByte(static_cast<LPBYTE>(GlobalLock(h))) {}
-    LPBYTE getData() const { return m_pByte; }
-};
-
 HANDLE DLLENTRY_DEF DTWAIN_ConvertDIBToFullBitmap(HANDLE hDib, DTWAIN_BOOL isBMP)
 {
     LOG_FUNC_ENTRY_PARAMS((hDib, isBMP))
@@ -73,44 +65,16 @@ HANDLE DLLENTRY_DEF DTWAIN_ConvertDIBToFullBitmap(HANDLE hDib, DTWAIN_BOOL isBMP
 
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, NULL, FUNC_MACRO);
-
-    // if hDIB is NULL, do nothing
-    if (!hDib)
-        LOG_FUNC_EXIT_PARAMS(HANDLE(0))
-
-    HandleRAII raii(hDib);
-    const LPBYTE pDibData = raii.getData();
-
-    HANDLE returnHandle = nullptr;
-
-    // attach file header if this is a DIB
+    HANDLE returnHandle = {};
     if (isBMP)
     {
-        BITMAPFILEHEADER fileheader;
-        memset(&fileheader, 0, sizeof(BITMAPFILEHEADER));
-        fileheader.bfType = 'MB';
-        const auto lpbi = reinterpret_cast<LPBITMAPINFOHEADER>(pDibData);
-        const unsigned int bpp = lpbi->biBitCount;
-        fileheader.bfSize = GlobalSize(hDib) + sizeof(BITMAPFILEHEADER);
-        fileheader.bfReserved1 = 0;
-        fileheader.bfReserved2 = 0;
-        fileheader.bfOffBits = static_cast<DWORD>(sizeof(BITMAPFILEHEADER)) +
-            lpbi->biSize + CDibInterface::CalculateUsedPaletteEntries(bpp) * sizeof(RGBQUAD);
-
-        // we need to attach the bitmap header info onto the data
-        const unsigned int totalSize = GlobalSize(hDib) + sizeof(BITMAPFILEHEADER);
-        // Allocate for returned handle
-        returnHandle = static_cast<HANDLE>(GlobalAlloc(GMEM_FIXED, totalSize));
-        const HandleRAII raii2(returnHandle);
-        if (const LPBYTE bFullImage = raii2.getData())
-        {
-            char *pFileHeader = reinterpret_cast<char *>(&fileheader);
-            std::copy_n(pFileHeader, sizeof(BITMAPFILEHEADER), &bFullImage[0]);
-            std::copy_n(pDibData, GlobalSize(hDib), &bFullImage[sizeof(BITMAPFILEHEADER)]);
-        }
+        returnHandle = CTL_TwainDib::CreateBMPBitmapFromDIB(hDib);
+        LOG_FUNC_EXIT_PARAMS(returnHandle);
     }
     else
     {
+        HandleRAII raii(hDib);
+        const LPBYTE pDibData = raii.getData();
         returnHandle = GlobalAlloc(GMEM_FIXED, GlobalSize(hDib));
         const HandleRAII raii2(returnHandle);
         const LPBYTE bFullImage = raii2.getData();

@@ -831,6 +831,7 @@ namespace dynarithmic
     void LogExceptionErrorA(LPCSTR fname, const char *sAdditionalText=nullptr);
     void LogDTWAINMessage(HWND, UINT, WPARAM, LPARAM, bool bCallback=false);
     bool UserDefinedLoggerExists();
+    bool AnyLoggerExists();
     void WriteUserDefinedLogMsg(LPCTSTR sz);
     void WriteUserDefinedLogMsgA(LPCSTR sz);
     void WriteUserDefinedLogMsgW(LPCWSTR sz);
@@ -1166,6 +1167,14 @@ namespace dynarithmic
         DTWAINScopedLogController(long newFilter) : m_ErrorFilterFlags(CTL_TwainDLLHandle::s_lErrorFilterFlags)
         { CTL_TwainDLLHandle::s_lErrorFilterFlags = newFilter; }
         ~DTWAINScopedLogController() { CTL_TwainDLLHandle::s_lErrorFilterFlags = m_ErrorFilterFlags; }
+    };
+
+    struct HandleRAII
+    {
+        LPBYTE m_pByte;
+        DTWAINGlobalHandle_RAII m_raii;
+        HandleRAII(HANDLE h) : m_raii(h), m_pByte(static_cast<LPBYTE>(GlobalLock(h))) {}
+        LPBYTE getData() const { return m_pByte; }
     };
 
     struct LogTraitsOff

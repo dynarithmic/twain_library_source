@@ -802,6 +802,44 @@ bool CTL_TwainDib::IsBlankDIB(double threshold) const
     return false;
 }
 
+HANDLE CTL_TwainDib::CreateBMPBitmapFromDIB(HANDLE hDib)
+{
+    // if hDIB is NULL, do nothing
+    if (!hDib)
+        return {};
+
+    HandleRAII raii(hDib);
+    const LPBYTE pDibData = raii.getData();
+
+    HANDLE returnHandle = nullptr;
+
+    // attach file header if this is a DIB
+    BITMAPFILEHEADER fileheader;
+    memset(&fileheader, 0, sizeof(BITMAPFILEHEADER));
+    fileheader.bfType = 'MB';
+    const auto lpbi = reinterpret_cast<LPBITMAPINFOHEADER>(pDibData);
+    const unsigned int bpp = lpbi->biBitCount;
+    fileheader.bfSize = GlobalSize(hDib) + sizeof(BITMAPFILEHEADER);
+    fileheader.bfReserved1 = 0;
+    fileheader.bfReserved2 = 0;
+    fileheader.bfOffBits = static_cast<DWORD>(sizeof(BITMAPFILEHEADER)) +
+        lpbi->biSize + CDibInterface::CalculateUsedPaletteEntries(bpp) * sizeof(RGBQUAD);
+
+    // we need to attach the bitmap header info onto the data
+    const unsigned int totalSize = ImageMemoryHandler::GlobalSize(hDib) + sizeof(BITMAPFILEHEADER);
+
+    // Allocate for returned handle
+    returnHandle = static_cast<HANDLE>(ImageMemoryHandler::GlobalAlloc(GMEM_FIXED, totalSize));
+    const HandleRAII raii2(returnHandle);
+    if (const LPBYTE bFullImage = raii2.getData())
+    {
+        char* pFileHeader = reinterpret_cast<char*>(&fileheader);
+        std::copy_n(pFileHeader, sizeof(BITMAPFILEHEADER), &bFullImage[0]);
+        std::copy_n(pDibData, ImageMemoryHandler::GlobalSize(hDib), &bFullImage[sizeof(BITMAPFILEHEADER)]);
+    }
+    return returnHandle;
+}
+
 bool CTL_TwainDib::FlipBitMap(bool /*bRGB*/)
 {
     int                     pixels;
