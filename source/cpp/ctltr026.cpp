@@ -33,7 +33,7 @@
 #include "dtwain.h"
 #include "arrayfactory.h"
 #include "ctlfileutils.h"
-
+#include "resamplefactory.h"
 using namespace dynarithmic;
 
 static void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pSession,
@@ -88,7 +88,6 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
 
     m_bJobControlPageRecorded = false;
     int errfile = 0;
-    const CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
 
     switch (rc)
     {
@@ -1293,95 +1292,6 @@ bool CTL_ImageXferTriplet::IsPageBlank(CTL_ITwainSession*,
     return false;
 }
 
-bool CTL_ImageXferTriplet::ResampleBppForJPEG( CTL_ITwainSession * /*pSession*/,
-                                               CTL_ITwainSource * /*pSource*/,
-                                               CTL_TwainDibPtr& CurDib)
-{
-    const int depth = CurDib->GetDepth();
-
-    if ( depth == 24 ) //|| depth < 8 )
-        return false;
-
-    const bool IsGray = CurDib->IsGrayScale();
-    if ( !IsGray || depth < 8 )
-    {
-        CTL_TwainAppMgr::WriteLogInfoA("Resampling bitmap data to 24 bpp (JPEG processing)...");
-        const bool bOk = CurDib->IncreaseBpp(24);
-        if ( bOk)
-            CTL_TwainAppMgr::WriteLogInfoA("Resampling ok...");
-        return bOk;
-    }
-
-    return false;
-}
-
-bool CTL_ImageXferTriplet::ResampleBppForWBMP( CTL_ITwainSession * /*pSession*/,
-                                              CTL_ITwainSource * /*pSource*/,
-                                              CTL_TwainDibPtr& CurDib)
-{
-    const int depth = CurDib->GetDepth();
-    bool ResamplingDone = false; // no resampling needs to be done
-    if ( depth > 1 )
-    {
-        // Make depth == 1
-        CTL_TwainAppMgr::WriteLogInfoA("Resampling bitmap data to 1 bpp (WBMP processing)...");
-        const bool bOk = CurDib->DecreaseBpp(1);
-        if ( bOk)
-        {
-           CTL_TwainAppMgr::WriteLogInfoA("Resampling to 1 bpp ok...");
-           ResamplingDone = true;
-        }
-        else
-        {
-            CTL_TwainAppMgr::WriteLogInfoA("Resampling to 1 bpp failed...");
-            ResamplingDone = false;
-        }
-    }
-    return ResamplingDone;
-}
-
-
-bool CTL_ImageXferTriplet::ResampleBppForGIF( CTL_ITwainSession * /*pSession*/,
-                                              CTL_ITwainSource * /*pSource*/,
-                                              CTL_TwainDibPtr& /*CurDib*/)
-{
-    return false;
-}
-
-
-bool CTL_ImageXferTriplet::ResampleBppForPDF( CTL_ITwainSession * /*pSession*/,
-                                              CTL_ITwainSource * /*pSource*/,
-                                              CTL_TwainDibPtr& CurDib)
-{
-    bool bWriteMisc = (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)?true:false;
-    const int depth = CurDib->GetDepth();
-
-    if ( depth == 8 || depth == 1 || depth == 24)
-        return false;
-
-    bool bOk;
-    if ( depth > 8 )
-    {
-        if ( bWriteMisc )
-            CTL_TwainAppMgr::WriteLogInfoA("Resampling bitmap data up to to 24 bpp (PDF processing)...");
-        bOk = CurDib->IncreaseBpp(24);
-    }
-    else
-    {
-        if (bWriteMisc)
-            CTL_TwainAppMgr::WriteLogInfoA("Resampling bitmap data up to 8 bpp (PDF processing)...");
-        bOk = CurDib->IncreaseBpp(8);
-    }
-    if ( bWriteMisc)
-    {
-        if ( bOk)
-            CTL_TwainAppMgr::WriteLogInfoA("Resampling ok...");
-        else
-            CTL_TwainAppMgr::WriteLogInfoA("Resampling failed...");
-    }
-    return bOk;
-}
-
 CTL_TwainFileFormatEnum CTL_ImageXferTriplet::GetFileTypeFromCompression(int nCompression)
 {
     switch (nCompression)
@@ -1568,48 +1478,32 @@ bool CTL_ImageXferTriplet::ModifyAcquiredDib()
     return false;
 }
 
+// This function is used only for file transfers.  We will need to
+// modify the DIB if the Bit-per-pixel of the original DIB is different 
+// than what the image type expects.
 bool CTL_ImageXferTriplet::ResampleAcquiredDib()
 {
     CTL_ITwainSource* pSource = GetSourcePtr();
     const int nFileType = pSource->GetAcquireFileType();
 
-    std::bitset<3> bResampleType = 0;
-    bResampleType[0] = nFileType == TWAINFileFormat_GIF;
-    bResampleType[1] = nFileType == TWAINFileFormat_JPEG ||
-        nFileType == TWAINFileFormat_JPEG2000;
-    bResampleType[2] = nFileType == TWAINFileFormat_WBMP;
-
-    if (bResampleType.to_ulong() == 0)
-        return false;
-
-    CTL_ITwainSession* pSession = GetSessionPtr();
     CTL_TwainDibArray* pArray = pSource->GetDibArray();
+
+    if (pArray->GetSize() == 0)
+        return false;
 
     const size_t nLastDib = pArray->GetSize() - 1;
     CTL_TwainDibPtr CurDib = pArray->GetAt(nLastDib);
 
-    typedef bool (*ResampleFn)(CTL_ITwainSession*, CTL_ITwainSource*, CTL_TwainDibPtr&);
-    const std::array<ResampleFn, 3> resample = { &CTL_ImageXferTriplet::ResampleBppForGIF,
-                                                 &CTL_ImageXferTriplet::ResampleBppForJPEG,
-                                                 &CTL_ImageXferTriplet::ResampleBppForWBMP };
-
-    const std::array<std::string,3> msg = { "Bitmap after resampling for GIF: \n",
-                                               "Bitmap after resampling for JPEG: \n",
-                                               "Bitmap after resampling for WBMP: \n" };
-
-    for (unsigned i = 0; i < std::size(resample); ++i)
+    // Get the appropriate image resampler for the image
+    auto ptr = ResampleFactory::GetResampler(nFileType);
+    if (ptr)
     {
-        // call the function to resample bitmap
-        if (bResampleType[i] && resample[i](pSession, pSource, CurDib))
+        // resample image
+        bool bResampled = ptr->Resample(*CurDib);
+        if (bResampled)
         {
-            // reset the dib handle if resampled
+            // set the handle to the resampled image
             pSource->SetDibHandle(m_hDataHandle = CurDib->GetHandle(), nLastDib);
-            if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
-            {
-                std::string sOut = msg[i];
-                sOut += CTL_ErrorStructDecoder::DecodeBitmap(m_hDataHandle);
-                CTL_TwainAppMgr::WriteLogInfoA(sOut);
-            }
             return true;
         }
     }

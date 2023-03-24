@@ -1240,6 +1240,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include="cpp\ctltr043.cpp" />
     <ClCompile Include="cpp\ctltsstub.cpp" />
     <ClCompile Include="cpp\ctlupdatedibproc.cpp" />
+    <ClCompile Include="cpp\imagefun\resamplefactory.cpp" />
     <ClCompile Include="cpp\imagefun\tiffun32.cpp" />
     <ClCompile Include="cpp\imagefun\txtfun32.cpp" />
     <ClCompile Include="cpp\iohandler_pbm.cpp" />
@@ -1266,6 +1267,37 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include="cpp\twainfix32.cpp" />
     <ClCompile Include="cpp\twainframe.cpp" />
     <ClCompile Include="cpp\windows_versioninfo.cpp" />
+    <ClCompile Include="cximage\ximabmp.cpp" />
+    <ClCompile Include="cximage\ximadsp.cpp" />
+    <ClCompile Include="cximage\ximaenc.cpp" />
+    <ClCompile Include="cximage\ximaexif.cpp" />
+    <ClCompile Include="cximage\ximage.cpp" />
+    <ClCompile Include="cximage\ximagif.cpp" />
+    <ClCompile Include="cximage\ximahist.cpp" />
+    <ClCompile Include="cximage\ximaico.cpp" />
+    <ClCompile Include="cximage\ximainfo.cpp" />
+    <ClCompile Include="cximage\ximaint.cpp" />
+    <ClCompile Include="cximage\ximajas.cpp" />
+    <ClCompile Include="cximage\ximajbg.cpp" />
+    <ClCompile Include="cximage\ximajpg.cpp" />
+    <ClCompile Include="cximage\ximalpha.cpp" />
+    <ClCompile Include="cximage\ximalyr.cpp" />
+    <ClCompile Include="cximage\ximamng.cpp" />
+    <ClCompile Include="cximage\ximapal.cpp" />
+    <ClCompile Include="cximage\ximapcx.cpp" />
+    <ClCompile Include="cximage\ximapng.cpp" />
+    <ClCompile Include="cximage\ximapsd.cpp" />
+    <ClCompile Include="cximage\ximaraw.cpp" />
+    <ClCompile Include="cximage\ximasel.cpp" />
+    <ClCompile Include="cximage\ximaska.cpp" />
+    <ClCompile Include="cximage\ximatga.cpp" />
+    <ClCompile Include="cximage\ximath.cpp" />
+    <ClCompile Include="cximage\ximatif.cpp" />
+    <ClCompile Include="cximage\ximatran.cpp" />
+    <ClCompile Include="cximage\ximawbmp.cpp" />
+    <ClCompile Include="cximage\ximawmf.cpp" />
+    <ClCompile Include="cximage\ximawnd.cpp" />
+    <ClCompile Include="cximage\xmemfile.cpp" />
     <ClCompile Include="c\imagefun\dtwpdf\crc32_aux.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -1427,6 +1459,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="cpp\pdflib32\md5class.h" />
     <ClInclude Include="cpp\pdflib32\pdfencrypt.h" />
     <ClInclude Include="cpp\pdflib32\pdflib32.h" />
+    <ClInclude Include="cximage\ximage.h" />
     <ClInclude Include="FreeImage\Source\FreeImage.h" />
     <ClInclude Include="FreeImage\Wrapper\FreeImagePlus\FreeImagePlus.h" />
     <ClInclude Include="h\ansiwideconverter_generic.h" />
@@ -1455,6 +1488,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\imagefun\dtwpdf\dtwainpdf.h" />
     <ClInclude Include="h\imagefun\pcxfun32.h" />
     <ClInclude Include="h\imagefun\pdffun32.h" />
+    <ClInclude Include="h\imagefun\resamplefactory.h" />
     <ClInclude Include="h\imagefun\tiffun32.h" />
     <ClInclude Include="h\imagefun\txtfun32.h" />
     <ClInclude Include="h\imagefun\winbit32.h" />

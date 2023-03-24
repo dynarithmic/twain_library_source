@@ -219,9 +219,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
                     if (!DTWAIN_SetPixelType(pRealSource, PixelType, DTWAIN_DEFAULT, TRUE))
                     {
                         if ( bWriteMisc)
-                            CTL_TwainAppMgr::WriteLogInfoA("Could not set pixel type!");
-                        opts.setStatus(DTWAIN_ERR_BAD_PIXTYPE);
-                        DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{return true; }, DTWAIN_ERR_BAD_PIXTYPE, NULL, FUNC_MACRO);
+                            CTL_TwainAppMgr::WriteLogInfoA("Warning: Could not set pixel type!");
                     }
                 }
                 else

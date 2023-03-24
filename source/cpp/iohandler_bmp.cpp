@@ -33,6 +33,21 @@ int CTL_BmpIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     if ( !IsValidBitDepth(DTWAIN_BMP, m_pDib->GetBitsPerPixel()))
             return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    return SaveToFile(hDib, szFile, FIF_BMP, 0, DTWAIN_INCHES, {0,0});
+    HANDLE hHandleToWrite = CTL_TwainDib::CreateBMPBitmapFromDIB(hDib);
+    if (hHandleToWrite)
+    {
+        auto pBytes = (char*)ImageMemoryHandler::GlobalLock(hHandleToWrite);
+        DTWAINGlobalHandleUnlockFree_RAII raii(hHandleToWrite);
+        std::ofstream ofs(StringConversion::Convert_NativePtr_To_Ansi(szFile), std::ios::binary);
+        if (!ofs)
+            return DTWAIN_ERR_FILEWRITE;
+        auto nBytes = ImageMemoryHandler::GlobalSize(hHandleToWrite);
+        ofs.write(pBytes, nBytes);
+        ofs.close();
+        if (!ofs)
+            return DTWAIN_ERR_FILEWRITE;
+        return DTWAIN_NO_ERROR;
+    }
+    return DTWAIN_ERR_DIB;
 }
 

@@ -1077,9 +1077,4 @@
       <Filter>Miscellaneous</Filter>
     </CustomBuild>
   </ItemGroup>
-  <ItemGroup>
-    <MASM Include="x64dll.asm">
-      <Filter>Source Files</Filter>
-    </MASM>
-  </ItemGroup>
 </Project>
