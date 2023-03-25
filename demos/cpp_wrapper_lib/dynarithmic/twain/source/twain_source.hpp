@@ -146,7 +146,7 @@ namespace dynarithmic
                 custom_data_container_type get_custom_data() const;
                 bool set_custom_data(const custom_data_container_type& s) const
                 {
-                    return API_INSTANCE DTWAIN_SetCustomDSData(m_theSource, NULL, s.data(), s.size(), DTWAINSCD_USEDATA) ? true : false;
+                    return API_INSTANCE DTWAIN_SetCustomDSData(m_theSource, NULL, s.data(), static_cast<LONG>(s.size()), DTWAINSCD_USEDATA) ? true : false;
                 }
 
                 static bool acquire_no_error(int32_t errCode);
