@@ -35,24 +35,24 @@ USING_NAMESPACE(CryptoPP)
 
 void RegisterFactories5()
 {
-    RegisterDefaultFactoryFor<SimpleKeyAgreementDomain, DH>();
-    RegisterAsymmetricCipherDefaultFactories<RSAES<OAEP<SHA1> > >("RSA/OAEP-MGF1(SHA-1)");
-    RegisterAsymmetricCipherDefaultFactories<DLIES<> >("DLIES(NoCofactorMultiplication, KDF2(SHA-1), XOR, HMAC(SHA-1), DHAES)");
-    RegisterSignatureSchemeDefaultFactories<DSA>();
-    RegisterSignatureSchemeDefaultFactories<DSA2<SHA224> >();
-    RegisterSignatureSchemeDefaultFactories<DSA2<SHA256> >();
-    RegisterSignatureSchemeDefaultFactories<DSA2<SHA384> >();
-    RegisterSignatureSchemeDefaultFactories<DSA2<SHA512> >();
-    RegisterSignatureSchemeDefaultFactories<DSA_RFC6979<SHA1> >();
-    RegisterSignatureSchemeDefaultFactories<DSA_RFC6979<SHA224> >();
-    RegisterSignatureSchemeDefaultFactories<DSA_RFC6979<SHA256> >();
-    RegisterSignatureSchemeDefaultFactories<DSA_RFC6979<SHA384> >();
-    RegisterSignatureSchemeDefaultFactories<DSA_RFC6979<SHA512> >();
-    RegisterSignatureSchemeDefaultFactories<NR<SHA1> >("NR(1363)/EMSA1(SHA-1)");
-    RegisterSignatureSchemeDefaultFactories<GDSA<SHA1> >("DSA-1363/EMSA1(SHA-1)");
-    RegisterSignatureSchemeDefaultFactories<RSASS<PKCS1v15, Weak::MD2> >("RSA/PKCS1-1.5(MD2)");
-    RegisterSignatureSchemeDefaultFactories<RSASS<PKCS1v15, SHA1> >("RSA/PKCS1-1.5(SHA-1)");
-    RegisterSignatureSchemeDefaultFactories<ESIGN<SHA1> >("ESIGN/EMSA5-MGF1(SHA-1)");
-    RegisterSignatureSchemeDefaultFactories<RWSS<P1363_EMSA2, SHA1> >("RW/EMSA2(SHA-1)");
-    RegisterSignatureSchemeDefaultFactories<RSASS<PSS, SHA1> >("RSA/PSS-MGF1(SHA-1)");
+	RegisterDefaultFactoryFor<SimpleKeyAgreementDomain, DH>();
+	RegisterAsymmetricCipherDefaultFactories<RSAES<OAEP<SHA1> > >("RSA/OAEP-MGF1(SHA-1)");
+	RegisterAsymmetricCipherDefaultFactories<DLIES<> >("DLIES(NoCofactorMultiplication, KDF2(SHA-1), XOR, HMAC(SHA-1), DHAES)");
+	RegisterSignatureSchemeDefaultFactories<DSA>();
+	RegisterSignatureSchemeDefaultFactories<DSA2<SHA224> >();
+	RegisterSignatureSchemeDefaultFactories<DSA2<SHA256> >();
+	RegisterSignatureSchemeDefaultFactories<DSA2<SHA384> >();
+	RegisterSignatureSchemeDefaultFactories<DSA2<SHA512> >();
+	RegisterSignatureSchemeDefaultFactories<DSA_RFC6979<SHA1> >();
+	RegisterSignatureSchemeDefaultFactories<DSA_RFC6979<SHA224> >();
+	RegisterSignatureSchemeDefaultFactories<DSA_RFC6979<SHA256> >();
+	RegisterSignatureSchemeDefaultFactories<DSA_RFC6979<SHA384> >();
+	RegisterSignatureSchemeDefaultFactories<DSA_RFC6979<SHA512> >();
+	RegisterSignatureSchemeDefaultFactories<NR<SHA1> >("NR(1363)/EMSA1(SHA-1)");
+	RegisterSignatureSchemeDefaultFactories<GDSA<SHA1> >("DSA-1363/EMSA1(SHA-1)");
+	RegisterSignatureSchemeDefaultFactories<RSASS<PKCS1v15, Weak::MD2> >("RSA/PKCS1-1.5(MD2)");
+	RegisterSignatureSchemeDefaultFactories<RSASS<PKCS1v15, SHA1> >("RSA/PKCS1-1.5(SHA-1)");
+	RegisterSignatureSchemeDefaultFactories<ESIGN<SHA1> >("ESIGN/EMSA5-MGF1(SHA-1)");
+	RegisterSignatureSchemeDefaultFactories<RWSS<P1363_EMSA2, SHA1> >("RW/EMSA2(SHA-1)");
+	RegisterSignatureSchemeDefaultFactories<RSASS<PSS, SHA1> >("RSA/PSS-MGF1(SHA-1)");
 }

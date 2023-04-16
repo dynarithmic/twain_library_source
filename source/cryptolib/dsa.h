@@ -18,12 +18,12 @@ NAMESPACE_BEGIN(CryptoPP)
 ///  on the Crypto++ wiki.
 /// \since Crypto++ 1.0
 enum DSASignatureFormat {
-    /// \brief Crypto++ native signature encoding format
-    DSA_P1363,
-    /// \brief signature encoding format used by OpenSSL, Java and .Net
-    DSA_DER,
-    /// \brief OpenPGP signature encoding format
-    DSA_OPENPGP
+	/// \brief Crypto++ native signature encoding format
+	DSA_P1363,
+	/// \brief signature encoding format used by OpenSSL, Java and .Net
+	DSA_DER,
+	/// \brief OpenPGP signature encoding format
+	DSA_OPENPGP
 };
 
 /// \brief Converts between signature encoding formats
@@ -46,7 +46,7 @@ enum DSASignatureFormat {
 ///  on the Crypto++ wiki.
 /// \since Crypto++ 1.0
 size_t DSAConvertSignatureFormat(byte *buffer, size_t bufferSize, DSASignatureFormat toFormat,
-    const byte *signature, size_t signatureLen, DSASignatureFormat fromFormat);
+	const byte *signature, size_t signatureLen, DSASignatureFormat fromFormat);
 
 NAMESPACE_END
 

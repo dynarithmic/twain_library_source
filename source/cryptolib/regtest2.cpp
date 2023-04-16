@@ -58,48 +58,48 @@ USING_NAMESPACE(CryptoPP)
 // MAC ciphers
 void RegisterFactories2()
 {
-    RegisterDefaultFactoryFor<MessageAuthenticationCode, HMAC<Weak::MD5> >();
-    RegisterDefaultFactoryFor<MessageAuthenticationCode, HMAC<RIPEMD160> >();
-    RegisterDefaultFactoryFor<MessageAuthenticationCode, HMAC<SHA1> >();
-    RegisterDefaultFactoryFor<MessageAuthenticationCode, HMAC<SHA224> >();
-    RegisterDefaultFactoryFor<MessageAuthenticationCode, HMAC<SHA256> >();
-    RegisterDefaultFactoryFor<MessageAuthenticationCode, HMAC<SHA384> >();
-    RegisterDefaultFactoryFor<MessageAuthenticationCode, HMAC<SHA512> >();
-    RegisterDefaultFactoryFor<MessageAuthenticationCode, TTMAC>();
-    RegisterDefaultFactoryFor<MessageAuthenticationCode, VMAC<AES> >();
-    RegisterDefaultFactoryFor<MessageAuthenticationCode, VMAC<AES, 64> >();
-    RegisterDefaultFactoryFor<MessageAuthenticationCode, Weak::PanamaMAC<LittleEndian> >();
-    RegisterDefaultFactoryFor<MessageAuthenticationCode, Weak::PanamaMAC<BigEndian> >();
-    RegisterDefaultFactoryFor<MessageAuthenticationCode, CMAC<AES> >();
-    RegisterDefaultFactoryFor<MessageAuthenticationCode, DMAC<AES> >();
-    RegisterDefaultFactoryFor<MessageAuthenticationCode, Poly1305<AES> >();
-    RegisterDefaultFactoryFor<MessageAuthenticationCode, Poly1305TLS>();
-    RegisterDefaultFactoryFor<MessageAuthenticationCode, CMAC<DES_EDE3> >();
-    RegisterDefaultFactoryFor<MessageAuthenticationCode, BLAKE2s>();
-    RegisterDefaultFactoryFor<MessageAuthenticationCode, BLAKE2b>();
-    RegisterDefaultFactoryFor<MessageAuthenticationCode, SipHash<2,4> >();
-    RegisterDefaultFactoryFor<MessageAuthenticationCode, SipHash<4,8> >();
+	RegisterDefaultFactoryFor<MessageAuthenticationCode, HMAC<Weak::MD5> >();
+	RegisterDefaultFactoryFor<MessageAuthenticationCode, HMAC<RIPEMD160> >();
+	RegisterDefaultFactoryFor<MessageAuthenticationCode, HMAC<SHA1> >();
+	RegisterDefaultFactoryFor<MessageAuthenticationCode, HMAC<SHA224> >();
+	RegisterDefaultFactoryFor<MessageAuthenticationCode, HMAC<SHA256> >();
+	RegisterDefaultFactoryFor<MessageAuthenticationCode, HMAC<SHA384> >();
+	RegisterDefaultFactoryFor<MessageAuthenticationCode, HMAC<SHA512> >();
+	RegisterDefaultFactoryFor<MessageAuthenticationCode, TTMAC>();
+	RegisterDefaultFactoryFor<MessageAuthenticationCode, VMAC<AES> >();
+	RegisterDefaultFactoryFor<MessageAuthenticationCode, VMAC<AES, 64> >();
+	RegisterDefaultFactoryFor<MessageAuthenticationCode, Weak::PanamaMAC<LittleEndian> >();
+	RegisterDefaultFactoryFor<MessageAuthenticationCode, Weak::PanamaMAC<BigEndian> >();
+	RegisterDefaultFactoryFor<MessageAuthenticationCode, CMAC<AES> >();
+	RegisterDefaultFactoryFor<MessageAuthenticationCode, DMAC<AES> >();
+	RegisterDefaultFactoryFor<MessageAuthenticationCode, Poly1305<AES> >();
+	RegisterDefaultFactoryFor<MessageAuthenticationCode, Poly1305TLS>();
+	RegisterDefaultFactoryFor<MessageAuthenticationCode, CMAC<DES_EDE3> >();
+	RegisterDefaultFactoryFor<MessageAuthenticationCode, BLAKE2s>();
+	RegisterDefaultFactoryFor<MessageAuthenticationCode, BLAKE2b>();
+	RegisterDefaultFactoryFor<MessageAuthenticationCode, SipHash<2,4> >();
+	RegisterDefaultFactoryFor<MessageAuthenticationCode, SipHash<4,8> >();
 }
 
 // Stream ciphers
 void RegisterFactories3()
 {
-    RegisterSymmetricCipherDefaultFactories<Weak::MARC4>();
-    RegisterSymmetricCipherDefaultFactories<SEAL<> >();
-    RegisterSymmetricCipherDefaultFactories<SEAL<LittleEndian> >();
-    RegisterSymmetricCipherDefaultFactories<WAKE_OFB<LittleEndian> >();
-    RegisterSymmetricCipherDefaultFactories<WAKE_OFB<BigEndian> >();
-    RegisterSymmetricCipherDefaultFactories<PanamaCipher<LittleEndian> >();
-    RegisterSymmetricCipherDefaultFactories<PanamaCipher<BigEndian> >();
+	RegisterSymmetricCipherDefaultFactories<Weak::MARC4>();
+	RegisterSymmetricCipherDefaultFactories<SEAL<> >();
+	RegisterSymmetricCipherDefaultFactories<SEAL<LittleEndian> >();
+	RegisterSymmetricCipherDefaultFactories<WAKE_OFB<LittleEndian> >();
+	RegisterSymmetricCipherDefaultFactories<WAKE_OFB<BigEndian> >();
+	RegisterSymmetricCipherDefaultFactories<PanamaCipher<LittleEndian> >();
+	RegisterSymmetricCipherDefaultFactories<PanamaCipher<BigEndian> >();
 
-    RegisterSymmetricCipherDefaultFactories<Salsa20>();
-    RegisterSymmetricCipherDefaultFactories<XSalsa20>();
-    RegisterSymmetricCipherDefaultFactories<ChaCha>();
-    RegisterSymmetricCipherDefaultFactories<ChaChaTLS>();
-    RegisterSymmetricCipherDefaultFactories<XChaCha20>();
-    RegisterSymmetricCipherDefaultFactories<Sosemanuk>();
-    RegisterSymmetricCipherDefaultFactories<Rabbit>();
-    RegisterSymmetricCipherDefaultFactories<RabbitWithIV>();
-    RegisterSymmetricCipherDefaultFactories<HC128>();
-    RegisterSymmetricCipherDefaultFactories<HC256>();
+	RegisterSymmetricCipherDefaultFactories<Salsa20>();
+	RegisterSymmetricCipherDefaultFactories<XSalsa20>();
+	RegisterSymmetricCipherDefaultFactories<ChaCha>();
+	RegisterSymmetricCipherDefaultFactories<ChaChaTLS>();
+	RegisterSymmetricCipherDefaultFactories<XChaCha20>();
+	RegisterSymmetricCipherDefaultFactories<Sosemanuk>();
+	RegisterSymmetricCipherDefaultFactories<Rabbit>();
+	RegisterSymmetricCipherDefaultFactories<RabbitWithIV>();
+	RegisterSymmetricCipherDefaultFactories<HC128>();
+	RegisterSymmetricCipherDefaultFactories<HC256>();
 }
