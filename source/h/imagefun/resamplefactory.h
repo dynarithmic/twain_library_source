@@ -25,6 +25,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <map>
 
 namespace dynarithmic
 {
@@ -38,95 +39,16 @@ namespace dynarithmic
                 FAILED_RESAMPLING,
                 SUCCESS_RESAMPLING
             };
-            std::map<int, int> m_mapSampleFromTo;
-            std::vector<int> m_vectNoSamplingDone;
+            std::map<uint16_t, uint16_t> m_mapSampleFromTo;
+            std::vector<uint16_t> m_vectNoSamplingDone;
             std::string m_ImageType;
             void LogMsg(int nWhich, int high, int low, HANDLE dataHandle = {}) const;
 
         public:
-            virtual ~ImageResampler() = default;
             bool Resample(CTL_TwainDib&);
-            ImageResampler(const std::vector<int>& vNoSamples = {}, const std::map<int, int>& mFromTo = {}, 
+            ImageResampler(const std::vector<uint16_t>& vNoSamples = {}, const std::map<uint16_t, uint16_t>& mFromTo = {},
                 std::string sImgType ="") :
                 m_mapSampleFromTo(mFromTo), m_vectNoSamplingDone(vNoSamples), m_ImageType(sImgType) {}
-    };
-
-    class GIFResampler : public ImageResampler
-    {
-        public:
-            GIFResampler() : ImageResampler({ 8 }, { {1,8}, {4,8}, {16,8}, {24,8}, {32,8} }, "GIF") {}
-    };
-
-    class JPEGResampler : public ImageResampler
-    {
-        public:
-            JPEGResampler() : ImageResampler({ 8, 16, 24 }, { {1,24}, {4,24}, {32,24} }, "JPEG") {}
-    };
-
-    class JPEG2000Resampler : public ImageResampler
-    {
-    public:
-        JPEG2000Resampler() : ImageResampler({ 8, 16, 24, 32 }, { {1,24}, {4,24} }, "JPEG-2000") {}
-    };
-
-    class PCXResampler : public ImageResampler
-    {
-        public:
-            PCXResampler() : ImageResampler({ 1, 8, 24 }, { {4,8}, {16,24}, {32,24} }, "PCX") {}
-    };
-
-    class PNGResampler : public ImageResampler
-    {
-        public:
-            PNGResampler() : ImageResampler({ 8, 16, 24 }, { {1,8}, {4,8}, {32, 24} }, "PNG") {}
-    };
-
-    class TIFFG3G4Resampler : public ImageResampler
-    {
-        public:
-            TIFFG3G4Resampler() : ImageResampler({ 1 }, { {4,1}, {8,1}, {16,1}, {24,1}, {32, 1} }, "TIFF G3/G4") {}
-    };
-
-    class TIFFJPEGResampler : public ImageResampler
-    {
-        public:
-            TIFFJPEGResampler() : ImageResampler({ 8, 24 }, { {1,8}, {4,8}, {16,24}, {32,24} }, "TIFF-JPEG") {}
-    };
-
-    class WEBPResampler : public ImageResampler
-    {
-        public:
-            WEBPResampler() : ImageResampler({24, 32}, { {1,24}, {4,24}, {8,24}, {16,24} }, "WEBP") {}
-    };
-
-    class TGAResampler : public ImageResampler
-    {
-        public:
-            TGAResampler() : ImageResampler({ 8, 24, 32 }, { {1,8}, {4,8}, {16,24} }, "Targa") {}
-    };
-
-    class WBMPResampler : public ImageResampler
-    {
-        public:
-            WBMPResampler() : ImageResampler({ 1 }, { {4,1}, {8,1}, {16,1}, {24,1},{32,1} }, "WBMP") {}
-    };
-
-    class WMFResampler : public ImageResampler
-    {
-        public:
-            WMFResampler() : ImageResampler({ 24 }, { {1,24}, {4,24}, {8,24}, {16,24},{32,24} }, "EMF/WMF") {}
-    };
-
-    class PSDResampler : public ImageResampler
-    {
-        public:
-            PSDResampler() : ImageResampler({ 24 }, { {1,24}, {4,24}, {8,24}, {16,24},{32,24} }, "Adobe PSD") {}
-    };
-
-    class PDFResampler : public ImageResampler
-    {
-        public:
-            PDFResampler() : ImageResampler({ 1, 8, 16, 24 }, { {32,24} }, "Adobe PDF") {}
     };
 
     class ResampleFactory

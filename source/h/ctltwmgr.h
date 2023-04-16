@@ -124,7 +124,6 @@ namespace dynarithmic
             static bool IsTwainMsg(MSG *pMsg, bool bFromUserQueue=false);
             static unsigned int GetRegisteredMsg();
             static bool IsVersion2DSMUsed();
-            static bool IsVersion2DSMUsedWithCallback();
 
             // Source management functions
             // Get all the sources in an array

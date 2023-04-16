@@ -30,6 +30,7 @@
 namespace dynarithmic
 {
   class CTL_ITwainSession;
+  class CTL_TwainDLLHandle;
   using CTL_ITwainSessionPtr = std::unique_ptr<CTL_ITwainSession>;
   using CTL_TwainSourceSet = std::unordered_set<CTL_ITwainSource*>;
 
@@ -82,6 +83,8 @@ namespace dynarithmic
                                     { return m_bTwainMessageFlag; }
         bool                IsAllSourcesRetrieved() const { return m_bAllSourcesRetrieved; }
         void                DestroyOneSource(CTL_ITwainSource *pSource);
+        CTL_TwainDLLHandle* GetTwainDLLHandle() { return m_pTwainDLLHandle; }
+        void                SetTwainDLLHandle(CTL_TwainDLLHandle* pHandle) { m_pTwainDLLHandle = pHandle; }
         virtual ~CTL_ITwainSession();
 
     protected:
@@ -99,6 +102,7 @@ namespace dynarithmic
         TW_IDENTITY m_AppId;          // Twain Identity structure
         CTL_TwainSourceSet m_arrTwainSource;
         CTL_ITwainSource *m_pSelectedSource;
+        CTL_TwainDLLHandle *m_pTwainDLLHandle;
         
         bool        m_bTwainWindowCreated;
         bool        m_bTwainMessageFlag;
