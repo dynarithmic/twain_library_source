@@ -35,25 +35,25 @@ NAMESPACE_BEGIN(CryptoPP)
 class Tiger : public IteratedHashWithStaticTransform<word64, LittleEndian, 64, 24, Tiger>
 {
 public:
-    CRYPTOPP_STATIC_CONSTEXPR const char* StaticAlgorithmName() {return "Tiger";}
-    std::string AlgorithmProvider() const;
+	CRYPTOPP_STATIC_CONSTEXPR const char* StaticAlgorithmName() {return "Tiger";}
+	std::string AlgorithmProvider() const;
 
-    /// \brief Initialize state array
-    /// \param state the state of the hash
-    static void InitState(HashWordType *state);
-    /// \brief Operate the hash
-    /// \param digest the state of the hash
-    /// \param data the data to be digested
-    static void Transform(word64 *digest, const word64 *data);
-    /// \brief Computes the hash of the current message
-    /// \param digest a pointer to the buffer to receive the hash
-    /// \param digestSize the size of the truncated digest, in bytes
-    /// \details TruncatedFinal() call Final() and then copies digestSize bytes to digest.
-    ///   The hash is restarted the hash for the next message.
-    void TruncatedFinal(byte *digest, size_t digestSize);
+	/// \brief Initialize state array
+	/// \param state the state of the hash
+	static void InitState(HashWordType *state);
+	/// \brief Operate the hash
+	/// \param digest the state of the hash
+	/// \param data the data to be digested
+	static void Transform(word64 *digest, const word64 *data);
+	/// \brief Computes the hash of the current message
+	/// \param digest a pointer to the buffer to receive the hash
+	/// \param digestSize the size of the truncated digest, in bytes
+	/// \details TruncatedFinal() calls Final() and then copies digestSize bytes to digest.
+	///   The hash is restarted the hash for the next message.
+	void TruncatedFinal(byte *digest, size_t digestSize);
 
 protected:
-    static const word64 table[4*256+3];
+	static const word64 table[4*256+3];
 };
 
 NAMESPACE_END

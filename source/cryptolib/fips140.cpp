@@ -23,17 +23,17 @@ PowerUpSelfTestStatus g_powerUpSelfTestStatus = POWER_UP_SELF_TEST_NOT_DONE;
 
 bool FIPS_140_2_ComplianceEnabled()
 {
-    return CRYPTOPP_ENABLE_COMPLIANCE_WITH_FIPS_140_2;
+	return CRYPTOPP_ENABLE_COMPLIANCE_WITH_FIPS_140_2;
 }
 
 void SimulatePowerUpSelfTestFailure()
 {
-    g_powerUpSelfTestStatus = POWER_UP_SELF_TEST_FAILED;
+	g_powerUpSelfTestStatus = POWER_UP_SELF_TEST_FAILED;
 }
 
 PowerUpSelfTestStatus CRYPTOPP_API GetPowerUpSelfTestStatus()
 {
-    return g_powerUpSelfTestStatus;
+	return g_powerUpSelfTestStatus;
 }
 
 #if CRYPTOPP_ENABLE_COMPLIANCE_WITH_FIPS_140_2
@@ -46,36 +46,36 @@ static bool s_inProgress = false;
 bool PowerUpSelfTestInProgressOnThisThread()
 {
 #if CRYPTOPP_ENABLE_COMPLIANCE_WITH_FIPS_140_2
-    return s_inProgress;
+	return s_inProgress;
 #else
-    return false;
+	return false;
 #endif
 }
 
 void SetPowerUpSelfTestInProgressOnThisThread(bool inProgress)
 {
 #if CRYPTOPP_ENABLE_COMPLIANCE_WITH_FIPS_140_2
-    s_inProgress = inProgress;
+	s_inProgress = inProgress;
 #else
-    CRYPTOPP_UNUSED(inProgress);
+	CRYPTOPP_UNUSED(inProgress);
 #endif
 }
 
 void EncryptionPairwiseConsistencyTest_FIPS_140_Only(const PK_Encryptor &encryptor, const PK_Decryptor &decryptor)
 {
 #if CRYPTOPP_ENABLE_COMPLIANCE_WITH_FIPS_140_2
-    EncryptionPairwiseConsistencyTest(encryptor, decryptor);
+	EncryptionPairwiseConsistencyTest(encryptor, decryptor);
 #else
-    CRYPTOPP_UNUSED(encryptor), CRYPTOPP_UNUSED(decryptor);
+	CRYPTOPP_UNUSED(encryptor), CRYPTOPP_UNUSED(decryptor);
 #endif
 }
 
 void SignaturePairwiseConsistencyTest_FIPS_140_Only(const PK_Signer &signer, const PK_Verifier &verifier)
 {
 #if CRYPTOPP_ENABLE_COMPLIANCE_WITH_FIPS_140_2
-    SignaturePairwiseConsistencyTest(signer, verifier);
+	SignaturePairwiseConsistencyTest(signer, verifier);
 #else
-    CRYPTOPP_UNUSED(signer), CRYPTOPP_UNUSED(verifier);
+	CRYPTOPP_UNUSED(signer), CRYPTOPP_UNUSED(verifier);
 #endif
 }
 

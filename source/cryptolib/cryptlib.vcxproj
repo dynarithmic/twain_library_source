@@ -395,6 +395,12 @@
     <ClCompile Include="keccak_simd.cpp" />
     <ClCompile Include="lea.cpp" />
     <ClCompile Include="lea_simd.cpp" />
+    <ClCompile Include="lsh256.cpp" />
+    <ClCompile Include="lsh256_sse.cpp" />
+    <ClCompile Include="lsh256_avx.cpp" />
+    <ClCompile Include="lsh512.cpp" />
+    <ClCompile Include="lsh512_sse.cpp" />
+    <ClCompile Include="lsh512_avx.cpp" />
     <ClCompile Include="luc.cpp" />
     <ClCompile Include="mars.cpp" />
     <ClCompile Include="marss.cpp" />
@@ -617,6 +623,7 @@
     <ClInclude Include="keccak.h" />
     <ClInclude Include="lubyrack.h" />
     <ClInclude Include="lea.h" />
+    <ClInclude Include="lsh.h" />
     <ClInclude Include="luc.h" />
     <ClInclude Include="mars.h" />
     <ClInclude Include="md2.h" />
@@ -703,8 +710,6 @@
     <ClInclude Include="zdeflate.h" />
     <ClInclude Include="zinflate.h" />
     <ClInclude Include="zlib.h" />
-  </ItemGroup>
-  <ItemGroup>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

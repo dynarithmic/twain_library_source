@@ -29,13 +29,13 @@
 // Define this if running on a big-endian CPU
 // big endian will be assumed if CRYPTOPP_LITTLE_ENDIAN is not non-0
 #if !defined(CRYPTOPP_LITTLE_ENDIAN) && !defined(CRYPTOPP_BIG_ENDIAN) && (defined(__BIG_ENDIAN__) || (defined(__s390__) || defined(__s390x__) || defined(__zarch__)) || (defined(__m68k__) || defined(__MC68K__)) || defined(__sparc) || defined(__sparc__) || defined(__hppa__) || defined(__MIPSEB__) || defined(__ARMEB__) || (defined(__MWERKS__) && !defined(__INTEL__)))
-#   define CRYPTOPP_BIG_ENDIAN 1
+#	define CRYPTOPP_BIG_ENDIAN 1
 #endif
 
 // Define this if running on a little-endian CPU
 // big endian will be assumed if CRYPTOPP_LITTLE_ENDIAN is not non-0
 #if !defined(CRYPTOPP_BIG_ENDIAN) && !defined(CRYPTOPP_LITTLE_ENDIAN)
-#   define CRYPTOPP_LITTLE_ENDIAN 1
+#	define CRYPTOPP_LITTLE_ENDIAN 1
 #endif
 
 // Define this if you want to set a prefix for TestData/ and TestVectors/
@@ -120,28 +120,28 @@
 // Need GCC 4.6/Clang 1.7/Apple Clang 2.0 or above due to "GCC diagnostic {push|pop}"
 #if (CRYPTOPP_GCC_VERSION >= 40600) || (CRYPTOPP_LLVM_CLANG_VERSION >= 10700) || \
     (CRYPTOPP_APPLE_CLANG_VERSION >= 20000)
-    #define CRYPTOPP_GCC_DIAGNOSTIC_AVAILABLE 1
+	#define CRYPTOPP_GCC_DIAGNOSTIC_AVAILABLE 1
 #endif
 
 // Portable way to suppress warnings.
 // Moved from misc.h due to circular depenedencies.
 #ifndef CRYPTOPP_UNUSED
-    #define CRYPTOPP_UNUSED(x) ((void)(x))
+	#define CRYPTOPP_UNUSED(x) ((void)(x))
 #endif
 
 // how to disable inlining
 #if defined(_MSC_VER)
-#   define CRYPTOPP_NOINLINE_DOTDOTDOT
-#   define CRYPTOPP_NOINLINE __declspec(noinline)
+#	define CRYPTOPP_NOINLINE_DOTDOTDOT
+#	define CRYPTOPP_NOINLINE __declspec(noinline)
 #elif defined(__xlc__) || defined(__xlC__) || defined(__ibmxl__)
-#   define CRYPTOPP_NOINLINE_DOTDOTDOT ...
-#   define CRYPTOPP_NOINLINE __attribute__((noinline))
+#	define CRYPTOPP_NOINLINE_DOTDOTDOT ...
+#	define CRYPTOPP_NOINLINE __attribute__((noinline))
 #elif defined(__GNUC__)
-#   define CRYPTOPP_NOINLINE_DOTDOTDOT
-#   define CRYPTOPP_NOINLINE __attribute__((noinline))
+#	define CRYPTOPP_NOINLINE_DOTDOTDOT
+#	define CRYPTOPP_NOINLINE __attribute__((noinline))
 #else
-#   define CRYPTOPP_NOINLINE_DOTDOTDOT ...
-#   define CRYPTOPP_NOINLINE
+#	define CRYPTOPP_NOINLINE_DOTDOTDOT ...
+#	define CRYPTOPP_NOINLINE
 #endif
 
 // http://stackoverflow.com/a/13867690/608639
@@ -165,24 +165,24 @@
 
 // Warnings
 #ifdef _MSC_VER
-    // 4127: conditional expression is constant
-    // 4512: assignment operator not generated
-    // 4661: no suitable definition provided for explicit template instantiation request
-    // 4910: '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
-#   pragma warning(disable: 4127 4512 4661 4910)
-    // _MSC_VER 1920 is VS2019
-#   if _MSC_VER >= 1920
-        // 5054: operator '|': deprecated between enumerations of different types
-#       pragma warning(disable: 5054)
-#   endif
-    // Security related, possible defects
-    // http://blogs.msdn.com/b/vcblog/archive/2010/12/14/off-by-default-compiler-warnings-in-visual-c.aspx
-#   pragma warning(once: 4191 4242 4263 4264 4266 4302 4826 4905 4906 4928)
+	// 4127: conditional expression is constant
+	// 4512: assignment operator not generated
+	// 4661: no suitable definition provided for explicit template instantiation request
+	// 4910: '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+#	pragma warning(disable: 4127 4512 4661 4910)
+	// _MSC_VER 1920 is VS2019
+#	if _MSC_VER >= 1920
+		// 5054: operator '|': deprecated between enumerations of different types
+#		pragma warning(disable: 5054)
+#	endif
+	// Security related, possible defects
+	// http://blogs.msdn.com/b/vcblog/archive/2010/12/14/off-by-default-compiler-warnings-in-visual-c.aspx
+#	pragma warning(once: 4191 4242 4263 4264 4266 4302 4826 4905 4906 4928)
 #endif
 
 #ifdef __BORLANDC__
 // 8037: non-const function called for const object. needed to work around BCB2006 bug
-#   pragma warn -8037
+#	pragma warn -8037
 #endif
 
 // [GCC Bug 53431] "C++ preprocessor ignores #pragma GCC diagnostic". Clang honors it.
