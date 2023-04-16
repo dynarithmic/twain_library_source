@@ -57,7 +57,7 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
     if (aFileNames)
     {
         std::vector<LONG> validTypes = {DTWAIN_ARRAYSTRING, DTWAIN_ARRAYANSISTRING, DTWAIN_ARRAYWIDESTRING};
-        auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+        auto& factory = pHandle->m_ArrayFactory;
         const LONG Type = factory->tagtype_to_arraytype(factory->tag_type(aFileNames));
         const auto itArrType = std::find(validTypes.begin(), validTypes.end(), Type);
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return itArrType == validTypes.end(); }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
@@ -199,7 +199,7 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
         bRetval = TRUE;
         if (DTWAIN_GetTwainMode() == DTWAIN_MODAL)
         {
-            auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+            auto& factory = pHandle->m_ArrayFactory;
             auto pVariant = aDibs;
             const auto& vDibs = 
                 factory->underlying_container_t<CTL_ArrayFactory::tagged_array_voidptr*>(pVariant);

@@ -37,7 +37,8 @@ bool dynarithmic::GetSupportString(DTWAIN_SOURCE Source, LPTSTR sz, LONG nLen, L
     CTL_StringType sVal;
     if ( bRet )
     {
-        CTL_TwainDLLHandle::s_ArrayFactory->get_value(Array, 0, &sVal);
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        pHandle->m_ArrayFactory->get_value(Array, 0, &sVal);
         StringWrapper::CopyInfoToCString(sVal,sz,nLen);
     }
     return bRet;

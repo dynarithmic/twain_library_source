@@ -32,7 +32,7 @@ namespace dynarithmic
     {
         if (!AnyLoggerExists())
             return;
-        if (!(CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS))
+        if (!(CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS))
             return;
         switch (nWhich)
         {
@@ -67,7 +67,7 @@ namespace dynarithmic
         }
 
         // Get the sampling to be done
-        auto iter = m_mapSampleFromTo.find(depth);
+        auto iter = m_mapSampleFromTo.find(static_cast<uint16_t>(depth));
         bool bOk = false;
         if (iter != m_mapSampleFromTo.end())
         {
@@ -88,53 +88,13 @@ namespace dynarithmic
 
     std::unique_ptr<ImageResampler> ResampleFactory::GetResampler(int imageType)
     {
-        switch (imageType)
+        auto& imageSamplerMap = CTL_StaticData::GetImageResamplerMap();
+        auto iter = imageSamplerMap.find(imageType);
+        if (iter != imageSamplerMap.end())
         {
-            case DTWAIN_GIF:
-                return std::make_unique<GIFResampler>();
-
-            case DTWAIN_JPEG:
-                return std::make_unique<JPEGResampler>();
-
-            case DTWAIN_JPEG2000:
-                return std::make_unique<JPEG2000Resampler>();
-
-            case DTWAIN_PNG:
-                return std::make_unique<PNGResampler>();
-
-            case DTWAIN_PCX:
-            case DTWAIN_DCX:
-                return std::make_unique<PCXResampler>();
-
-            case DTWAIN_TGA:
-                return std::make_unique<TGAResampler>();
-
-            case DTWAIN_EMF:
-            case DTWAIN_WMF:
-                return std::make_unique<WMFResampler>();
-
-            case DTWAIN_TIFFG3:
-            case DTWAIN_TIFFG3MULTI:
-            case DTWAIN_TIFFG4:
-            case DTWAIN_TIFFG4MULTI:
-                return std::make_unique<TIFFG3G4Resampler>();
-
-            case DTWAIN_TIFFJPEG:
-            case DTWAIN_TIFFJPEGMULTI:
-                return std::make_unique<TIFFJPEGResampler>();
-
-            case DTWAIN_WEBP:
-                return std::make_unique<WEBPResampler>();
-
-            case DTWAIN_WBMP:
-                return std::make_unique<WBMPResampler>();
-
-            case DTWAIN_PSD:
-                return std::make_unique<PSDResampler>();
-
-            case DTWAIN_PDF:
-            case DTWAIN_PDFMULTI:
-                return std::make_unique<PDFResampler>();
+            auto& imgNode = iter->second;
+            if (!imgNode.m_mapFromTo.empty())
+                return std::make_unique<ImageResampler>(imgNode.m_vNoSamples, imgNode.m_mapFromTo, imgNode.m_sImageType);
         }
         return nullptr;
     }

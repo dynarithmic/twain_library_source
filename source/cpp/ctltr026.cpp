@@ -105,12 +105,14 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                 // We need to clone the DIB if we're doing a native XFER on a DSM2 Data Source
                 if (CTL_TwainAppMgr::IsVersion2DSMUsed())
                 {
+                    auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
                     // Lock the DIB returned by the device
                     BITMAPINFOHEADER* thisBitmap =
-                        (BITMAPINFOHEADER*)CTL_TwainDLLHandle::s_TwainMemoryFunc->LockMemory((HBITMAP)m_hDataHandleFromDevice);
+                        (BITMAPINFOHEADER*)sessionHandle->m_TwainMemoryFunc->LockMemory((HBITMAP)m_hDataHandleFromDevice);
 
                     // Make sure we unlock and free this memory once out of this scope
-                    DTWAINDSM2LockAndFree_RAII raii(m_hDataHandleFromDevice);
+                    auto dsmPair = DSMPair(sessionHandle, m_hDataHandleFromDevice);
+                    DTWAINDSM2LockAndFree_RAII raii(&dsmPair);
 
                     // Create a local bitmap
                     DWORD dwSize = sizeof(BITMAPINFOHEADER) + ((((thisBitmap->biWidth * thisBitmap->biBitCount + 31) / 32) * 4) * 
@@ -245,7 +247,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     break;
                 }
 
-                if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_DECODE_BITMAP)
+                if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_DECODE_BITMAP)
                 {
                     std::string sOut = "Original bitmap from device: \n";
                     sOut += CTL_ErrorStructDecoder::DecodeBitmap(m_hDataHandle);
@@ -273,11 +275,13 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     break;  // The page is discarded
                 }
 
+                auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
+
                 // Callback function for access to change DIB
-                if (CTL_TwainDLLHandle::s_pDibUpdateProc != nullptr && GetDAT() != DAT_AUDIONATIVEXFER)
+                if (sessionHandle->m_pDibUpdateProc != nullptr && GetDAT() != DAT_AUDIONATIVEXFER)
                 {
                     HANDLE hRetDib =
-                        (*CTL_TwainDLLHandle::s_pDibUpdateProc)
+                        (sessionHandle->m_pDibUpdateProc)
                         (pSource, static_cast<LONG>(nLastDib), m_hDataHandle);
                     if (hRetDib && hRetDib != m_hDataHandle)
                     {
@@ -603,7 +607,7 @@ TW_UINT16 CTL_ImageXferTriplet::GetImagePendingInfo(TW_PENDINGXFERS *pPI, TW_UIN
 
 std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int errFile)
 {
-    if ( CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+    if ( CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
         CTL_TwainAppMgr::WriteLogInfoA("Potentially aborting transfer..\n");
     CTL_ITwainSession *pSession = GetSessionPtr();
     CTL_ITwainSource *pSource = GetSourcePtr();
@@ -1333,7 +1337,7 @@ void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pS
                           LONG Error, LONG ErrorMsg, const std::string& extraInfo)
 {
     CTL_TwainAppMgr::SetError(Error, extraInfo);
-    if ( CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_DTWAINERRORS)
+    if ( CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_DTWAINERRORS)
     {
         char szBuf[1024];
         CTL_TwainAppMgr::GetLastErrorString(szBuf, 1024);
@@ -1361,7 +1365,7 @@ void CTL_ImageXferTriplet::ResolveImageResolution(CTL_ITwainSource *pSource,  DT
                               &ResolutionY,
                               nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr))
         {
-            bool bWriteMisc = CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
+            bool bWriteMisc = CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
             std::string sError;
             if (bWriteMisc)
             {
@@ -1387,7 +1391,7 @@ void CTL_ImageXferTriplet::ResolveImageResolution(CTL_ITwainSource *pSource,  DT
     if ( !bGotResolution && !bGetResFromDriver )
     {
         // Get the image info from when we started
-        bool bWriteMisc = CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
+        bool bWriteMisc = CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
         if ( bWriteMisc )
         {
             CTL_TwainAppMgr::WriteLogInfoA("Getting image resolution from state 6.\n");
@@ -1408,7 +1412,7 @@ void CTL_ImageXferTriplet::ResolveImageResolution(CTL_ITwainSource *pSource,  DT
 
     if ( !bGotResolution )
     {
-        bool bWriteMisc = CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
+        bool bWriteMisc = CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
         // Try TWAIN driver setting
         if ( DTWAIN_GetResolution(pSource, &Resolution) )
         {
@@ -1466,7 +1470,7 @@ bool CTL_ImageXferTriplet::ModifyAcquiredDib()
         {
             // reset the dib handle if adjusted
             pSource->SetDibHandle(m_hDataHandle = CurDib->GetHandle(), nLastDib);
-            if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+            if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
             {
                 std::string sOut = msg[i];
                 sOut += CTL_ErrorStructDecoder::DecodeBitmap(m_hDataHandle);
@@ -1552,7 +1556,8 @@ bool IsState7InfoNeeded(CTL_ITwainSource *pSource)
     if ( DTWAIN_GetCapValues(pSource, DTWAIN_CV_ICAPUNDEFINEDIMAGESIZE, DTWAIN_CAPGETCURRENT, &A))
     {
         DTWAINArrayLL_RAII raii(A);
-        const auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(A);
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        const auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(A);
         if ( !vValues.empty())
             bRetval = vValues[0] > 0;
     }

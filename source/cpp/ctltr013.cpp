@@ -57,16 +57,16 @@ bool CTL_CapabilityGetOneValTriplet::EnumCapValues( void *pCapData )
         return false;
 
     CTL_TwainTypeObPtr pOb;
-
+    auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
     RemoveAllTypeObjects();
 
     CTL_TwainTypeArray *pArray = GetTwainTypeArray();
 
     // Create a new object for this item
     if ( nItemType == TWTY_FIX32 )
-        pOb = std::make_shared<CTL_TwainTypeOb>( static_cast<TW_UINT16>(sizeof( double )), false );
+        pOb = std::make_shared<CTL_TwainTypeOb>(sessionHandle, static_cast<TW_UINT16>(sizeof( double )), false );
     else
-        pOb = std::make_shared<CTL_TwainTypeOb>( pValOne->ItemType );
+        pOb = std::make_shared<CTL_TwainTypeOb>(sessionHandle, pValOne->ItemType );
 
     if ( nItemType == TWTY_FIX32 )
     {

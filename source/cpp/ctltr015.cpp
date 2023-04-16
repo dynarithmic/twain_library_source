@@ -52,7 +52,7 @@ bool CTL_CapabilityGetRangeTriplet::EnumCapValues( void *pCapData )
     RemoveAllTypeObjects();
 
     CTL_TwainTypeArray *pArray = GetTwainTypeArray();
-
+    auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
     // dereference to a TW_RANGE structure
     const pTW_RANGE pRange = static_cast<pTW_RANGE>(pCapData);
 
@@ -62,7 +62,7 @@ bool CTL_CapabilityGetRangeTriplet::EnumCapValues( void *pCapData )
     // get min value
 
     // Create a new object for this item
-    const CTL_TwainTypeObPtr pOb = std::make_shared<CTL_TwainTypeOb>(static_cast<TW_UINT16>(sizeof(TW_RANGE)), false);
+    const CTL_TwainTypeObPtr pOb = std::make_shared<CTL_TwainTypeOb>(sessionHandle, static_cast<TW_UINT16>(sizeof(TW_RANGE)), false);
 
     // Copy Data to pOb
     pOb->CopyData( static_cast<void*>(pRange) );

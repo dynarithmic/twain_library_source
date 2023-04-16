@@ -41,7 +41,7 @@ std::string dynarithmic::CTL_LogFunctionCallA(LPCSTR pFuncName, int nWhich, LPCS
 
 std::string dynarithmic::CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich, LPCSTR pString/*=NULL*/)
 {
-    if (CTL_TwainDLLHandle::s_lErrorFilterFlags == 0 )
+    if (CTL_StaticData::s_lErrorFilterFlags == 0 )
          return {};
     static int nIndent = 0;
     std::string s;
@@ -53,7 +53,7 @@ std::string dynarithmic::CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich,
         if ( nWhich == 0 || nWhich == LOG_INDENT_IN)
         {
             const std::string sTemp(nIndent, ' ');
-            auto resText = CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_ENTERTEXT];
+            auto resText = GetResourceStringFromMap(IDS_LOGMSG_ENTERTEXT);
             if (resText.empty())
                 resText = "Entering";
             s = sTemp + static_cast<std::string>("===>>>") + resText + " ";
@@ -64,7 +64,7 @@ std::string dynarithmic::CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich,
             nIndent -= 3;
             nIndent = (std::max)(0, nIndent);
             const std::string sTemp(nIndent, ' ');
-            auto resText = CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_EXITTEXT];
+            auto resText = GetResourceStringFromMap(IDS_LOGMSG_EXITTEXT);
             if (resText.empty())
                 resText = "Exiting";
             s = sTemp + static_cast<std::string>("<<<===") + resText + " ";
@@ -80,14 +80,14 @@ std::string dynarithmic::CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich,
         s += s2;
     if ( nWhich != LOG_INDENT_IN && nWhich != LOG_INDENT_OUT)
     {
-        if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_USEFILE)
+        if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_USEFILE)
         {
-            if (!CTL_TwainDLLHandle::s_appLog.StatusOutFast( s.c_str() ) )
-                CTL_TwainDLLHandle::s_appLog.OutputDebugStringFull(s);
+            if (!CTL_StaticData::s_appLog.StatusOutFast( s.c_str() ) )
+                CTL_StaticData::s_appLog.OutputDebugStringFull(s);
         }
         else
         {
-           CTL_TwainDLLHandle::s_appLog.OutputDebugStringFull(s);
+           CTL_StaticData::s_appLog.OutputDebugStringFull(s);
         }
     }
     return s;
@@ -95,25 +95,27 @@ std::string dynarithmic::CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich,
 
 void dynarithmic::LogExceptionErrorA(LPCSTR fname, const char* sAdditionalText)
 {
-    if ( CTL_TwainDLLHandle::s_lErrorFilterFlags == 0 )
+    if ( CTL_StaticData::s_lErrorFilterFlags == 0 )
          return;
     try
     {
        const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-       if ( pHandle )
-            pHandle->m_lLastError = DTWAIN_ERR_EXCEPTION_ERROR;
+       if (pHandle)
+           pHandle->m_lLastError = DTWAIN_ERR_EXCEPTION_ERROR;
+       else
+           return;
        std::ostringstream output;
 
-       output << "**** DTWAIN " << CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_EXCEPTERRORTEXT] <<  " ****.  " <<
-                 CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_MODULETEXT] << ": " <<  fname;
+       output << "**** DTWAIN " << GetResourceStringFromMap(IDS_LOGMSG_EXCEPTERRORTEXT) <<  " ****.  " <<
+                                   GetResourceStringFromMap(IDS_LOGMSG_MODULETEXT) << ": " <<  fname;
        if ( sAdditionalText )
           output << "\nAdditional Information: " << sAdditionalText;
 
        std::string s = output.str();
-       if (!(CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_USEFILE))
+       if (!(CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_USEFILE))
             s += "\n";
        CTL_TwainAppMgr::WriteLogInfoA(s, true);  // flush all writes to the log file
-       if ( CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_SHOWEXCEPTIONS)
+       if ( CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_SHOWEXCEPTIONS)
            LogExceptionToConsole(fname, sAdditionalText);
     }
     catch(...)
@@ -126,14 +128,19 @@ void LogExceptionToConsole(LPCSTR fname, const char* sAdditionalText)
 {
     try
     {
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        if (pHandle)
+            pHandle->m_lLastError = DTWAIN_ERR_EXCEPTION_ERROR;
+        else
+            return;
         std::ostringstream strm;
         strm << boost::format("**** DTWAIN %1% ****.  %2%: %3%\n") %
-            CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_EXCEPTERRORTEXT].c_str() %
-            CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_MODULETEXT].c_str() % fname;
+            pHandle->m_mapResourceStrings[IDS_LOGMSG_EXCEPTERRORTEXT].c_str() %
+            pHandle->m_mapResourceStrings[IDS_LOGMSG_MODULETEXT].c_str() % fname;
         if (sAdditionalText)
             strm << "\nAdditional Information: " << sAdditionalText;
         #ifdef _WIN32
-        MessageBoxA(nullptr, strm.str().c_str(), CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_EXCEPTERRORTEXT].c_str(), MB_ICONSTOP);
+        MessageBoxA(nullptr, strm.str().c_str(), pHandle->m_mapResourceStrings[IDS_LOGMSG_EXCEPTERRORTEXT].c_str(), MB_ICONSTOP);
         #else
            std::cout << strm.str() << '\n';
         #endif

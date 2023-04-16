@@ -74,7 +74,7 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsFeederLoaded(DTWAIN_SOURCE Source)
         const DTWAIN_BOOL bReturn = DTWAIN_GetCapValues(Source, DTWAIN_CV_CAPFEEDERLOADED, DTWAIN_CAPGETCURRENT, &a);
         DTWAINArrayLL_RAII arr(a);
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bReturn;}, DTWAIN_ERR_NO_FEEDER_QUERY, false, FUNC_MACRO);
-        auto& vFeeder = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(a);
+        auto& vFeeder = pHandle->m_ArrayFactory->underlying_container_t<LONG>(a);
         LONG Val = 0;
         if ( !vFeeder.empty() )
             Val = vFeeder.front();
@@ -144,7 +144,7 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_EnableFeeder(DTWAIN_SOURCE Source, DTWAIN_BOOL 
         {
             LONG Caps[] = { DTWAIN_CV_CAPFEEDPAGE, DTWAIN_CV_CAPREWINDPAGE, DTWAIN_CV_CAPCLEARPAGE };
             DTWAINArrayLL_RAII arr(aExtendedCaps);
-            auto& vCaps = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(aExtendedCaps);
+            auto& vCaps = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aExtendedCaps);
             const size_t oldSize = vCaps.size();
             std::for_each(std::begin(Caps), std::end(Caps), [&](LONG n)
             {
@@ -190,7 +190,8 @@ bool EnableFeederFunc(DTWAIN_SOURCE Source, LONG lCap, CTL_ITwainSource* p, SetF
     DTWAINArrayLL_RAII arr(aValues);
     if ( !bReturn )
         return false;
-    auto& vFeeder = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(aValues);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    auto& vFeeder = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
 
     if ( vFeeder.empty() )
         return false;
@@ -290,7 +291,7 @@ bool ExecuteFeederState5Func(DTWAIN_SOURCE Source, LONG lCap)
     if ( !aValues )
         return false;
     DTWAINArrayLL_RAII aRAII(aValues);
-    auto& vCaps = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(aValues);
+    auto& vCaps = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
     vCaps.push_back(true);
     DTWAIN_SetCapValues(Source, lCap, DTWAIN_CAPSET, aValues);
     return false;
@@ -300,26 +301,16 @@ bool ExecuteFeederState5Func(DTWAIN_SOURCE Source, LONG lCap)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnableAutoFeedNotify(LONG Latency, DTWAIN_BOOL bEnable)
 {
     LOG_FUNC_ENTRY_PARAMS((Latency, bEnable))
-#if 0
-    #ifdef _WIN32
-    if ( bEnable )
-    {
-        CTL_TwainDLLHandle::s_nTimerID = SetTimer(nullptr, 0, static_cast<UINT>(Latency), reinterpret_cast<TIMERPROC>(ThisTimerProc));
-        CTL_TwainDLLHandle::s_bTimerIDSet = true;
-    }
-    else
-    {
-        KillTimer(nullptr, CTL_TwainDLLHandle::s_nTimerID);
-        CTL_TwainDLLHandle::s_bTimerIDSet = false;
-    }
-    #endif
-#endif
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
 VOID CALLBACK ThisTimerProc(HWND, UINT, ULONG idEvent, DWORD)
 {
+    return;
+    // This is experimental code that unfortunately does not work
+    // consistently, thus it is commented out.
+    #if 0
     #ifdef _WIN32
     // Make sure that user set a callback
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
@@ -330,8 +321,8 @@ VOID CALLBACK ThisTimerProc(HWND, UINT, ULONG idEvent, DWORD)
     if ( idEvent == CTL_TwainDLLHandle::s_nTimerID )
     {
         // Check if any open source supports feeder
-        auto it = CTL_TwainDLLHandle::s_aFeederSources.begin();
-        const auto it2 = CTL_TwainDLLHandle::s_aFeederSources.end();
+        auto it = pHandle->m_aFeederSources.begin();
+        const auto it2 = pHandle->m_aFeederSources.end();
 
         while ( it != it2 )
         {
@@ -348,5 +339,6 @@ VOID CALLBACK ThisTimerProc(HWND, UINT, ULONG idEvent, DWORD)
             ++it;
         }
     }
+    #endif
     #endif
 }

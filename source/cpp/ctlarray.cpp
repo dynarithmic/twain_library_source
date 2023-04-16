@@ -68,7 +68,7 @@ struct ArrayChecker
     LONG Check() const
     {
         const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-        const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+        const auto& factory = pHandle->m_ArrayFactory;
 
         m_bAnsiArray = false;
 
@@ -173,7 +173,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayCreate( LONG nEnumType, LONG nInitialSize 
         default: ;
     }
 
-    const DTWAIN_ARRAY Array = CTL_TwainDLLHandle::s_ArrayFactory->create_array(static_cast<CTL_ArrayType>(nEnumType), &nStatus, nInitialSize);
+    const DTWAIN_ARRAY Array = pHandle->m_ArrayFactory->create_array(static_cast<CTL_ArrayType>(nEnumType), &nStatus, nInitialSize);
     auto checkStatus = ArrayChecker().SetArray1(Array).SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS);
     if ( checkStatus.Check() != DTWAIN_NO_ERROR)
         LOG_FUNC_EXIT_PARAMS(DTWAIN_ARRAY())
@@ -213,7 +213,7 @@ LONG dynarithmic::DTWAIN_ArrayType(DTWAIN_ARRAY pArray, bool bGetReal)
     const auto checkStatus = ArrayChecker().SetArray1(pArray).SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS);
     if (checkStatus.Check() != DTWAIN_NO_ERROR)
         LOG_FUNC_EXIT_PARAMS(-1)
-    const LONG Ret = CTL_ArrayFactory::tagtype_to_arraytype(CTL_TwainDLLHandle::s_ArrayFactory->tag_type(pArray));
+    const LONG Ret = CTL_ArrayFactory::tagtype_to_arraytype(pHandle->m_ArrayFactory->tag_type(pArray));
 
     LOG_FUNC_EXIT_PARAMS(Ret)
     CATCH_BLOCK(DTWAIN_FAILURE1)
@@ -229,7 +229,8 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayCreateCopy(DTWAIN_ARRAY Source)
     if ( !Dest )
         LOG_FUNC_EXIT_PARAMS(NULL)
     // Copy the arrays
-    CTL_TwainDLLHandle::s_ArrayFactory->copy(Dest,Source);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    pHandle->m_ArrayFactory->copy(Dest,Source);
     LOG_FUNC_EXIT_PARAMS(Dest)
     CATCH_BLOCK(DTWAIN_ARRAY(0))
 }
@@ -240,7 +241,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayCopy(DTWAIN_ARRAY Source, DTWAIN_ARRAY Dest
         // Instance of class that takes an array that takes a handle (pointer)
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
-    auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    auto& factory = pHandle->m_ArrayFactory;
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 
@@ -266,20 +267,18 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayCopy(DTWAIN_ARRAY Source, DTWAIN_ARRAY Dest
 template <typename T, bool checkType=true>
 static bool ArrayAddN(DTWAIN_ARRAY pArray, T pVariant, LONG num = 1)
 {
+    // Instance of class that takes an array that takes a handle (pointer)
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    // See if DLL Handle exists
+    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+
     if (checkType)
     {
-        // Instance of class that takes an array that takes a handle (pointer)
-        const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-        // See if DLL Handle exists
-        DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-
         auto checkStatus = ArrayChecker().SetArray1(pArray).SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS);
         if (checkStatus.Check() != DTWAIN_NO_ERROR)
             LOG_FUNC_EXIT_PARAMS(false)
     }
-    auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
-
+    auto& factory = pHandle->m_ArrayFactory;
     factory->add_to_back(pArray, &pVariant, num);
     return true;
 }
@@ -299,7 +298,7 @@ DTWAIN_BOOL  DLLENTRY_DEF DTWAIN_ArrayAddN( DTWAIN_ARRAY pArray, LPVOID pVariant
     if (checkStatus.Check() != DTWAIN_NO_ERROR)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    auto& factory = pHandle->m_ArrayFactory;
     const auto tag_type = factory->tag_type(pArray);
     bool bRet = true;
     switch (tag_type)
@@ -445,7 +444,8 @@ DTWAIN_ARRAY  DLLENTRY_DEF  DTWAIN_ArrayCreateFromLongs(LPLONG pCArray, LONG nSi
     DTWAIN_ARRAY Dest = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 0);
     if ( !Dest )
         LOG_FUNC_EXIT_PARAMS(NULL)
-    auto& vect = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(Dest);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    auto& vect = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Dest);
     vect.insert(vect.end(), pCArray, pCArray + nSize);
     LOG_FUNC_EXIT_PARAMS(Dest)
     CATCH_BLOCK(DTWAIN_ARRAY(0))
@@ -456,7 +456,8 @@ DTWAIN_ARRAY  DLLENTRY_DEF  DTWAIN_ArrayCreateFromLong64s(LPLONG64 pCArray, LONG
     const DTWAIN_ARRAY Dest = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG64, nSize);
     if ( !Dest )
         LOG_FUNC_EXIT_PARAMS(NULL)
-    auto& vect = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG64>(Dest);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    auto& vect = pHandle->m_ArrayFactory->underlying_container_t<LONG64>(Dest);
     vect.insert(vect.end(), pCArray, pCArray + nSize);
     LOG_FUNC_EXIT_PARAMS(Dest)
     CATCH_BLOCK(DTWAIN_ARRAY(0))
@@ -468,7 +469,8 @@ DTWAIN_ARRAY  DLLENTRY_DEF  DTWAIN_ArrayCreateFromReals(double* pCArray, LONG nS
     const DTWAIN_ARRAY Dest = DTWAIN_ArrayCreate(DTWAIN_ARRAYFLOAT, nSize);
     if ( !Dest )
         LOG_FUNC_EXIT_PARAMS(NULL)
-    auto& vect = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<double>(Dest);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    auto& vect = pHandle->m_ArrayFactory->underlying_container_t<double>(Dest);
     vect.insert(vect.end(), pCArray, pCArray + nSize);
     LOG_FUNC_EXIT_PARAMS(Dest)
     CATCH_BLOCK(DTWAIN_ARRAY(0))
@@ -486,11 +488,11 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayCreateFromStrings(LPCTSTR* pCArray, LONG n
         tempArray.push_back(*pCArray);
         ++pCArray;
     }
-
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
 #ifdef _UNICODE
-    auto& vect = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<std::wstring>(Dest);
+    auto& vect = pHandle->m_ArrayFactory->underlying_container_t<std::wstring>(Dest);
 #else
-    auto& vect = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<std::string>(Dest);
+    auto& vect = pHandle->m_ArrayFactory->underlying_container_t<std::string>(Dest);
 #endif
     vect.insert(vect.end(), tempArray.begin(), tempArray.end());
     LOG_FUNC_EXIT_PARAMS(Dest)
@@ -506,7 +508,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayRemoveAll( DTWAIN_ARRAY pArray )
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 
-    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto& factory = pHandle->m_ArrayFactory;
 
     // Check if array exists
     const auto checkStatus = ArrayChecker().SetArray1(pArray).
@@ -536,7 +538,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayRemoveAtN(  DTWAIN_ARRAY pArray, LONG nWher
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 
-    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto& factory = pHandle->m_ArrayFactory;
 
     // Check if array exists
     DTWAIN_Check_Error_Condition_0_Ex(pHandle,
@@ -636,7 +638,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayDestroy( DTWAIN_ARRAY pArray)
     if (checkStatus.Check() != DTWAIN_NO_ERROR)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto& factory = pHandle->m_ArrayFactory; 
 
     factory->destroy(pArray);
     LOG_FUNC_EXIT_PARAMS(true)
@@ -656,7 +658,7 @@ LONG DLLENTRY_DEF DTWAIN_ArrayGetCount( DTWAIN_ARRAY pArray )
     if (checkStatus.Check() != DTWAIN_NO_ERROR)
         LOG_FUNC_EXIT_PARAMS(-1)
 
-    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto& factory = pHandle->m_ArrayFactory; 
 
     const LONG Ret = static_cast<LONG>(factory->size(pArray));
     LOG_FUNC_EXIT_PARAMS(Ret)
@@ -673,7 +675,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayResize(DTWAIN_ARRAY Array, LONG NewSize)
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 
-    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto& factory = pHandle->m_ArrayFactory; 
 
     // Check if array exists
     auto checkStatus = ArrayChecker().SetArray1(Array).SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS);
@@ -708,7 +710,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAt( DTWAIN_ARRAY pArray, LONG nWhere, LP
     if ( checkStatus.Check() != DTWAIN_NO_ERROR )
         LOG_FUNC_EXIT_PARAMS(FALSE)
 
-    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto& factory = pHandle->m_ArrayFactory; 
 
     // Do something special for strings
     DTWAIN_BOOL bRet = FALSE;
@@ -762,7 +764,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFloat(DTWAIN_ARRAY pArray, LONG nWhere
 template <typename T, typename U>
 static DTWAIN_BOOL StringGetter(DTWAIN_ARRAY pArray, LONG nWhere, T& sVal, U pStr, bool bNullTerminate=true)
 {
-    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto& factory = pHandle->m_ArrayFactory;
     factory->get_value(pArray, nWhere, &sVal); 
     std::copy(sVal.begin(), sVal.end(), pStr);
     if (bNullTerminate)
@@ -774,7 +777,8 @@ static DTWAIN_BOOL StringGetter(DTWAIN_ARRAY pArray, LONG nWhere, T& sVal, U pSt
 template <typename T, typename U>
 static T StringPtrGetter(DTWAIN_ARRAY pArray, LONG nWhere)
 {
-    const auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<typename U::value_type>(pArray);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<typename U::value_type>(pArray);
     if (!vValues.empty())
     {
         if ( nWhere >= 0 && nWhere < static_cast<LONG>(vValues.size()) )
@@ -909,7 +913,7 @@ LONG  DLLENTRY_DEF DTWAIN_ArrayFind( DTWAIN_ARRAY pArray, LPVOID pVariant )
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex( pHandle, -1L, FUNC_MACRO);
 
-    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto& factory = pHandle->m_ArrayFactory; 
     const auto checkStatus = ArrayChecker().SetArray1(pArray).SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS);
     if (checkStatus.Check() != DTWAIN_NO_ERROR)
         LOG_FUNC_EXIT_PARAMS(-1)
@@ -950,7 +954,7 @@ LONG DLLENTRY_DEF DTWAIN_ArrayFindFloat( DTWAIN_ARRAY pArray, DTWAIN_FLOAT Val, 
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, -1L, FUNC_MACRO);
 
-    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto& factory = pHandle->m_ArrayFactory; 
     const auto checkStatus = ArrayChecker().SetArray1(pArray).SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS);
     if (checkStatus.Check() != DTWAIN_NO_ERROR)
         LOG_FUNC_EXIT_PARAMS(-1)
@@ -974,7 +978,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtN( DTWAIN_ARRAY pArray, LONG nWhere
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 
-    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto& factory = pHandle->m_ArrayFactory; 
     const auto checkStatus = ArrayChecker().SetArray1(pArray).
                                         SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS | ArrayChecker::CHECK_ARRAY_BOUNDS);
     if (checkStatus.Check() != DTWAIN_NO_ERROR)
@@ -1085,7 +1089,7 @@ DTWAIN_BOOL  DLLENTRY_DEF DTWAIN_ArraySetAt( DTWAIN_ARRAY pArray, LONG lPos, LPV
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 
-    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto& factory = pHandle->m_ArrayFactory; 
 
     // Check if array exists
     const auto checkStatus = ArrayChecker().
@@ -1181,7 +1185,7 @@ LPVOID DLLENTRY_DEF DTWAIN_ArrayGetBuffer( DTWAIN_ARRAY pArray, LONG nOffset )
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex( pHandle, NULL, FUNC_MACRO);
 
-    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto& factory = pHandle->m_ArrayFactory; 
 
     // Check if array exists
     const auto checkStatus = ArrayChecker().SetArray1(pArray).SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS);
@@ -1249,7 +1253,7 @@ static LONG IsValidRangeArray( DTWAIN_ARRAY pArray )
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, DTWAIN_ERR_BAD_HANDLE, FUNC_MACRO);
 
-    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto& factory = pHandle->m_ArrayFactory; 
 
     // Check if array is a valid type for ranges
     auto enumType = factory->tag_type(pArray);
@@ -1381,7 +1385,8 @@ void DTWAIN_RangeSetter(DTWAIN_ARRAY a,
                         LPVOID valueCurrent,
                         LPVOID pDefault)
 {
-    Traits* pBuffer = static_cast<Traits*>(CTL_TwainDLLHandle::s_ArrayFactory->get_buffer(a, 0));
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    Traits* pBuffer = static_cast<Traits*>(pHandle->m_ArrayFactory->get_buffer(a, 0));
     pBuffer[DTWAIN_RANGEMIN] = *static_cast<typename Traits*>(valueLow);
     pBuffer[DTWAIN_RANGEMAX] = *static_cast<typename Traits*>(valueUp);
     pBuffer[DTWAIN_RANGESTEP] = *static_cast<typename Traits*>(valueStep);
@@ -1525,9 +1530,12 @@ LONG DLLENTRY_DEF DTWAIN_RangeGetCount( DTWAIN_RANGE pArray )
     if (IsValidRangeArray( static_cast<DTWAIN_ARRAY>(pArray) ) < 0 )
         LOG_FUNC_EXIT_PARAMS(DTWAIN_FAILURE1)
 
+    // Instance of class that takes an array that takes a handle (pointer)
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+
     // Check if (low < high) and 0 < step < (high - low)
     LONG nNumItems;
-    auto eType = CTL_TwainDLLHandle::s_ArrayFactory->tag_type(pArray);
+    auto eType = pHandle->m_ArrayFactory->tag_type(pArray);
     if ( eType == CTL_ArrayFactory::arrayTag::LongType)
     {
         LONG lLow;
@@ -1560,7 +1568,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetExpValue( DTWAIN_RANGE pArray, LONG lPos
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return lPos < 0;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     // Check if (low < high) and 0 < step < (high - low)
-    auto eType = CTL_TwainDLLHandle::s_ArrayFactory->tag_type(pArray);
+    auto eType = pHandle->m_ArrayFactory->tag_type(pArray);
     if ( eType == CTL_ArrayFactory::arrayTag::LongType)
     {
         LONG* pLong = static_cast<LONG*>(pVariant);
@@ -1616,9 +1624,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetPos( DTWAIN_RANGE pArray, LPVOID pVarian
     if (IsValidRangeArray( static_cast<DTWAIN_ARRAY>(pArray) ) < 0 )
         LOG_FUNC_EXIT_PARAMS(false)
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pVariant || !pPos;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     // Check if (low < high) and 0 < step < (high - low)
-    auto eType = CTL_TwainDLLHandle::s_ArrayFactory->tag_type(pArray);
+    auto eType = pHandle->m_ArrayFactory->tag_type(pArray);
     if ( eType == CTL_ArrayFactory::arrayTag::LongType )
     {
         auto pLong = static_cast<LONG*>(pVariant);
@@ -1681,13 +1688,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeExpand(DTWAIN_RANGE Range, LPDTWAIN_ARRAY A
     if ( !pDest )
         LOG_FUNC_EXIT_PARAMS(false)
 
-    auto eType = CTL_TwainDLLHandle::s_ArrayFactory->tag_type(Range);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    auto eType = pHandle->m_ArrayFactory->tag_type(Range);
 
     if ( eType == CTL_ArrayFactory::arrayTag::LongType )
     {
         LONG lLow, lUp, lStep, lDef, lCur;
         DTWAIN_RangeGetAll( Range, &lLow, &lUp, &lStep, &lDef, &lCur );
-        LONG* pArrayBuf = static_cast<LONG*>(CTL_TwainDLLHandle::s_ArrayFactory->get_buffer(pDest, 0));
+        LONG* pArrayBuf = static_cast<LONG*>(pHandle->m_ArrayFactory->get_buffer(pDest, 0));
         LONG i = 0;
         std::transform(pArrayBuf, pArrayBuf + lCount, pArrayBuf, [&](int /*n*/)
         {
@@ -1702,7 +1710,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeExpand(DTWAIN_RANGE Range, LPDTWAIN_ARRAY A
         double dLow, dUp, dStep, dDef, dCur;
         DTWAIN_RangeGetAll( Range, &dLow, &dUp, &dStep, &dDef, &dCur );
 
-        double *pArrayBuf =  static_cast<double*>(CTL_TwainDLLHandle::s_ArrayFactory->get_buffer(pDest, 0));
+        double *pArrayBuf =  static_cast<double*>(pHandle->m_ArrayFactory->get_buffer(pDest, 0));
         std::transform(pArrayBuf, pArrayBuf + lCount, pArrayBuf, [&](double /*d*/)
         {
             const double dValue = dLow + dStep * i;
@@ -1711,8 +1719,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeExpand(DTWAIN_RANGE Range, LPDTWAIN_ARRAY A
         });
     }
     // Destroy the user array if one is supplied
-    if (CTL_TwainDLLHandle::s_ArrayFactory->is_valid(*Array))
-        CTL_TwainDLLHandle::s_ArrayFactory->destroy(*Array);
+    if (pHandle->m_ArrayFactory->is_valid(*Array))
+        pHandle->m_ArrayFactory->destroy(*Array);
 
     *Array = pDest;
     LOG_FUNC_EXIT_PARAMS(true)
@@ -1725,8 +1733,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetNearestValue( DTWAIN_RANGE pArray, LPVOI
     LOG_FUNC_ENTRY_PARAMS((pArray, pVariantIn, pVariantOut, RoundType))
     if (IsValidRangeArray( static_cast<DTWAIN_ARRAY>(pArray) ) < 0 )
         LOG_FUNC_EXIT_PARAMS(false)
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
 
-    auto eType = CTL_TwainDLLHandle::s_ArrayFactory->tag_type(pArray);
+    auto eType = pHandle->m_ArrayFactory->tag_type(pArray);
 
     if ( eType == CTL_ArrayFactory::arrayTag::LongType )
     {
@@ -1893,8 +1902,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeNearestValueFloatString( DTWAIN_RANGE pArra
 DTWAIN_FRAME DLLENTRY_DEF DTWAIN_FrameCreate(DTWAIN_FLOAT Left, DTWAIN_FLOAT Top, DTWAIN_FLOAT Right, DTWAIN_FLOAT Bottom)
 {
     LOG_FUNC_ENTRY_PARAMS((Left, Top, Right, Bottom))
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    // See if DLL Handle exists
+    DTWAIN_Check_Bad_Handle_Ex(pHandle, NULL, FUNC_MACRO);
     const auto newEnum = 
-                CTL_TwainDLLHandle::s_ArrayFactory->create_frame(Left, Top, Right, Bottom);
+                pHandle->m_ArrayFactory->create_frame(Left, Top, Right, Bottom);
     LOG_FUNC_EXIT_PARAMS((DTWAIN_FRAME)newEnum)
     CATCH_BLOCK(nullptr)
 }
@@ -1937,7 +1949,7 @@ DTWAIN_FRAME DLLENTRY_DEF DTWAIN_ArrayFrameGetFrameAt(DTWAIN_ARRAY FrameArray, L
     if ( checkStatus.Check() != DTWAIN_NO_ERROR )
         LOG_FUNC_EXIT_PARAMS(DTWAIN_ARRAY(NULL))
 
-    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto& factory = pHandle->m_ArrayFactory;
     auto buffer = static_cast<TwainFrameInternal*>(factory->get_buffer(FrameArray, nWhere));
     LOG_FUNC_EXIT_PARAMS(buffer)
     CATCH_BLOCK(DTWAIN_ARRAY(NULL))
@@ -1997,7 +2009,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameDestroy(DTWAIN_FRAME Frame)
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !isValid;},
                                       DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
 
-    CTL_TwainDLLHandle::s_ArrayFactory->destroy_frame(Frame);
+    pHandle->m_ArrayFactory->destroy_frame(Frame);
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -2029,7 +2041,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetAll(DTWAIN_FRAME Frame, LPDTWAIN_FLOAT L
     bool frameValid = DTWAIN_FrameIsValid(Frame);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !frameValid; },
                                       DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
-    auto& vOne = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<TwainFrameInternal>(Frame);
+    auto& vOne = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(Frame);
     auto& pPtr = vOne.front();
 
     *Left =   pPtr.Left();
@@ -2148,7 +2160,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayDestroyFrames(DTWAIN_ARRAY FrameArray)
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 
     auto pVariant = FrameArray;
-    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto& factory = pHandle->m_ArrayFactory;
 
     auto checkStatus = ArrayChecker().SetArray1(FrameArray).SetExplicitTypeCheck(CTL_ArrayFactory::arrayTag::FrameType).
     SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS | ArrayChecker::CHECK_ARRAY_EXPLICIT_TYPE);
@@ -2175,7 +2187,7 @@ static bool CheckFix32(DTWAIN_ARRAY aFix32, DTWAIN_LONG lPos)
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 
-    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto& factory = pHandle->m_ArrayFactory; 
     // Check if array exists
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !factory->is_valid(aFix32); },
                                       DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
@@ -2196,7 +2208,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayFix32SetAt(DTWAIN_ARRAY aFix32, DTWAIN_LONG
     const bool bOk = CheckFix32(aFix32, lPos);
     if ( bOk )
     {
-        const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        const auto& factory = pHandle->m_ArrayFactory;
         TW_FIX32 temp = {static_cast<TW_INT16>(Whole), static_cast<TW_UINT16>(Frac)};
         factory->set_value(aFix32, lPos, &temp);
     }
@@ -2210,7 +2223,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayFix32GetAt(DTWAIN_ARRAY aFix32, DTWAIN_LONG
     const bool bOk = CheckFix32(aFix32, lPos);
     if (bOk)
     {
-        auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        auto& factory = pHandle->m_ArrayFactory;
         TW_FIX32 tempF;
         factory->get_value(aFix32, lPos, &tempF);
         if ( Whole )
@@ -2230,7 +2244,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayConvertFloatToFix32(DTWAIN_ARRAY FloatArra
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 
-    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto& factory = pHandle->m_ArrayFactory;
     const auto FloatArrayV = FloatArray;
 
     // Check if array exists
@@ -2270,7 +2284,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayConvertFix32ToFloat(DTWAIN_ARRAY Fix32Arra
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 
-    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto& factory = pHandle->m_ArrayFactory;
 
     // Check if array exists
     DTWAIN_Check_Error_Condition_0_Ex(pHandle,
@@ -2331,7 +2345,7 @@ static LONG IsValidAcqArray( DTWAIN_ARRAY pArray )
     DTWAIN_Check_Bad_Handle_Ex(pHandle, DTWAIN_ERR_BAD_HANDLE, nullptr);
 
     // Check if array is a valid type for ranges
-    if ( !CTL_TwainDLLHandle::s_ArrayFactory->is_valid(pArray, CTL_ArrayFactory::arrayTag::ArrayOfArrayOfVoidPtrType) )
+    if ( !pHandle->m_ArrayFactory->is_valid(pArray, CTL_ArrayFactory::arrayTag::ArrayOfArrayOfVoidPtrType) )
        LOG_FUNC_EXIT_PARAMS(DTWAIN_ERR_WRONG_ARRAY_TYPE)
     LOG_FUNC_EXIT_PARAMS(1)
     CATCH_BLOCK(0)
@@ -2343,7 +2357,8 @@ LONG DLLENTRY_DEF DTWAIN_GetNumAcquisitions(DTWAIN_ARRAY aAcq)
     LONG lError;
     if (( lError = IsValidAcqArray( aAcq )) < 0 )
         LOG_FUNC_EXIT_PARAMS(lError)
-    const LONG Ret = static_cast<LONG>(CTL_TwainDLLHandle::s_ArrayFactory->size(aAcq));
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const LONG Ret = static_cast<LONG>(pHandle->m_ArrayFactory->size(aAcq));
     LOG_FUNC_EXIT_PARAMS(Ret)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
@@ -2354,8 +2369,8 @@ LONG DLLENTRY_DEF DTWAIN_GetNumAcquiredImages( DTWAIN_ARRAY aAcq, LONG nWhich )
     LONG lError;
     if (( lError = IsValidAcqArray( aAcq )) < 0 )
         LOG_FUNC_EXIT_PARAMS(lError)
-
-    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto& factory = pHandle->m_ArrayFactory;
     LONG lCount = static_cast<LONG>(factory->size(aAcq));
     if ( nWhich >= lCount )
         LOG_FUNC_EXIT_PARAMS(DTWAIN_FAILURE1)
@@ -2371,12 +2386,13 @@ HANDLE DLLENTRY_DEF DTWAIN_GetAcquiredImage( DTWAIN_ARRAY aAcq, LONG nWhichAcq, 
 {
     LOG_FUNC_ENTRY_PARAMS((aAcq, nWhichAcq, nWhichDib))
     if ( nWhichDib < 0 )
-            LOG_FUNC_EXIT_PARAMS(NULL)
+        LOG_FUNC_EXIT_PARAMS(NULL)
     const int nDibs = DTWAIN_GetNumAcquiredImages( aAcq, nWhichAcq );
     if ( nDibs == DTWAIN_FAILURE1 || nWhichDib >= nDibs )
         LOG_FUNC_EXIT_PARAMS(NULL)
     DTWAIN_ARRAY aDib = nullptr;
-    auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    auto& factory = pHandle->m_ArrayFactory;
     aDib = factory->get_value(aAcq, nWhichAcq, nullptr);
     HANDLE hDib = nullptr;
     hDib = factory->get_value(aDib, nWhichDib, nullptr);
@@ -2393,7 +2409,8 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetAcquiredImageArray(DTWAIN_ARRAY aAcq, LONG n
 
     //use a copy
     DTWAIN_ARRAY aDib = nullptr;
-    auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    auto& factory = pHandle->m_ArrayFactory;
     aDib = factory->get_value(aAcq, nWhichAcq, nullptr);
     const DTWAIN_ARRAY aCopy = DTWAIN_ArrayCreateCopy(aDib);
     LOG_FUNC_EXIT_PARAMS(aCopy)
@@ -2403,7 +2420,8 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetAcquiredImageArray(DTWAIN_ARRAY aAcq, LONG n
 template <typename T>
 static LONG ArrayStringLength_Internal(DTWAIN_ARRAY theArray, LONG nWhichString)
 {
-    auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
     const size_t nCount = vValues.size();
     if ( nWhichString < 0 || static_cast<size_t>(nWhichString) > nCount )
         return DTWAIN_ERR_INDEX_BOUNDS;
@@ -2420,7 +2438,8 @@ struct stringLengthComparer
 template <typename T>
 static LONG ArrayMaxStringLength_Internal(DTWAIN_ARRAY theArray)
 {
-    auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
     auto it = std::max_element(vValues.begin(), vValues.end(), stringLengthComparer<typename T::value_type>());
     return static_cast<LONG>((*it).size());
 }
@@ -2485,5 +2504,7 @@ LONG DLLENTRY_DEF DTWAIN_ArrayGetMaxStringLength(DTWAIN_ARRAY theArray)
 
 void CTL_TwainDLLHandle::RemoveAllEnumerators()
 {
-    s_ArrayFactory.reset();
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    if ( pHandle )
+        pHandle->m_ArrayFactory.reset();
 }

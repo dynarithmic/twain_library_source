@@ -52,7 +52,7 @@ std::istream& operator >> (std::istream& theStream, OneLineData& theData)
 
    // set the error string
    StringWrapperA::TrimAll(theData.errstring);
-   CTL_TwainDLLHandle::s_ErrorCodes[theData.errnum] = theData.errstring;
+   CTL_StaticData::s_ErrorCodes[theData.errnum] = theData.errstring;
 
    // return the input stream
    return theStream;

@@ -58,7 +58,6 @@ CTL_TwainDLLHandle::CTL_TwainDLLHandle() : m_hWndTwain(nullptr),
                                            m_pErrorProcFn64(nullptr),
                                            m_lErrorProcUserData(0),
                                            m_lErrorProcUserData64(0),
-                                           m_pDummySource(nullptr),
                                            m_pOCRDefaultEngine(nullptr)
 #ifdef _WIN32
                                            , m_hOrigProc(nullptr)
@@ -66,13 +65,6 @@ CTL_TwainDLLHandle::CTL_TwainDLLHandle() : m_hWndTwain(nullptr),
                                            , m_mapPDFTextElement{{nullptr, {}}}
 #endif
 {
-}
-
-CTL_TwainDLLHandle::~CTL_TwainDLLHandle()
-{
-    RemoveAllEnumerators();
-    RemoveAllSourceCapInfo();
-    RemoveAllSourceMaps();
 }
 
 void CTL_TwainDLLHandle::RemoveAllSourceCapInfo()
@@ -101,131 +93,89 @@ std::pair<CTL_ResourceRegistryMap::iterator, bool> CTL_TwainDLLHandle::AddResour
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-HINSTANCE               CTL_TwainDLLHandle::s_DLLInstance = nullptr;
-CTL_HookInfoArray       CTL_TwainDLLHandle::s_aHookInfo;
-CTL_GeneralCapInfo      CTL_TwainDLLHandle::s_mapGeneralCapInfo;
-CTL_GeneralErrorInfo    CTL_TwainDLLHandle::s_mapGeneralErrorInfo;
-CTL_TwainDLLHandle::CTL_ErrorToExtraInfoMap CTL_TwainDLLHandle::s_mapExtraErrorInfo;
+CTL_PDFMediaMap             CTL_StaticData::s_PDFMediaMap;
+CTL_TwainLongToStringMap    CTL_StaticData::s_TwainCountryMap;
+CTL_TwainNameMap            CTL_StaticData::s_TwainNameMap;
+CTL_AvailableFileFormatsMap CTL_StaticData::s_AvailableFileFormatsMap;
+CTL_TwainConstantsMap       CTL_StaticData::s_TwainConstantsMap;
+bool                        CTL_StaticData::s_bCheckHandles = true;
+CTL_TwainLongToStringMap    CTL_StaticData::s_TwainLanguageMap;
+CTL_StringType              CTL_StaticData::s_strResourcePath;
+CTL_StringType              CTL_StaticData::s_DLLPath;
+CTL_StringType              CTL_StaticData::s_sINIPath;
+bool                        CTL_StaticData::s_multipleThreads = false;
+CTL_LongToStringMap         CTL_StaticData::s_ErrorCodes;
+CTL_StringType              CTL_StaticData::s_VersionString;
+HFONT                       CTL_StaticData::s_DialogFont = nullptr;
+CTL_ErrorToExtraInfoMap     CTL_StaticData::s_mapExtraErrorInfo;
+CTL_GeneralCapInfo          CTL_StaticData::s_mapGeneralCapInfo;
+LONG                        CTL_StaticData::s_nRegisteredDTWAINMsg = 0;
+std::mutex                  CTL_StaticData::s_mutexInitDestroy;
+CTL_MapThreadToDLLHandle    CTL_StaticData::s_mapThreadToDLLHandle;
+CTL_ThreadMap               CTL_StaticData::s_ThreadMap;
+bool                        CTL_StaticData::s_bThrowExceptions = false;
+HINSTANCE                   CTL_StaticData::s_DLLInstance = nullptr;
+std::unordered_set<HWND>    CTL_StaticData::s_appWindowsToDisable;
+CTL_CallbackProcArray       CTL_StaticData::s_aAllCallbacks;
+CTL_StringType              CTL_StaticData::s_strLangResourcePath;
+CTL_GeneralErrorInfo        CTL_StaticData::s_mapGeneralErrorInfo;
+long                        CTL_StaticData::s_lErrorFilterFlags = 0;
+UINT_PTR                    CTL_StaticData::s_nTimeoutID = 0;
+bool                        CTL_StaticData::s_bTimerIDSet = false;
+UINT                        CTL_StaticData::s_nTimeoutMilliseconds = 0;
+CLogSystem                  CTL_StaticData::s_appLog;
+bool                        CTL_StaticData::s_ResourcesInitialized = false;
+ImageResamplerMap           CTL_StaticData::s_ImageResamplerMap;
 
-CTL_ArrayFactoryPtr     CTL_TwainDLLHandle::s_ArrayFactory;
-std::vector<LONG_PTR>   CTL_TwainDLLHandle::s_aAcquireNum;
-bool                    CTL_TwainDLLHandle::s_bCheckReentrancy;
-short int               CTL_TwainDLLHandle::s_nDSMState = DSM_STATE_NONE;
-CTL_TwainNameMap        CTL_TwainDLLHandle::s_TwainNameMap;
-CTL_TwainLongToStringMap        CTL_TwainDLLHandle::s_TwainCountryMap;
-CTL_TwainLongToStringMap        CTL_TwainDLLHandle::s_TwainLanguageMap;
-long                    CTL_TwainDLLHandle::s_lErrorFilterFlags = 0;
-bool                    CTL_TwainDLLHandle::s_bProcessError = true;
-CLogSystem              CTL_TwainDLLHandle::s_appLog;
-LONG                    CTL_TwainDLLHandle::s_nRegisteredDTWAINMsg = 0;
-CTL_StringType          CTL_TwainDLLHandle::s_sINIPath;
-std::string              CTL_TwainDLLHandle::s_CurLangResource;
-CTL_StringType          CTL_TwainDLLHandle::s_TempFilePath;
-std::unordered_set<DTWAIN_SOURCE>   CTL_TwainDLLHandle::s_aFeederSources;
-UINT_PTR                CTL_TwainDLLHandle::s_nTimerID = 0;
-UINT_PTR                CTL_TwainDLLHandle::s_nTimeoutID = 0;
-bool                    CTL_TwainDLLHandle::s_bTimerIDSet = false;
-std::unordered_set<HWND>      CTL_TwainDLLHandle::s_appWindowsToDisable;
-bool                    CTL_TwainDLLHandle::s_bQuerySupport = false;
-bool                    CTL_TwainDLLHandle::s_bCheckHandles = true;
-UINT                    CTL_TwainDLLHandle::s_nTimeoutMilliseconds = 0;
-DTWAIN_DIBUPDATE_PROC   CTL_TwainDLLHandle::s_pDibUpdateProc = nullptr;
-CTL_StringType          CTL_TwainDLLHandle::s_ImageDLLFilePath;
-CTL_StringType          CTL_TwainDLLHandle::s_LangResourcePath;
-CTL_StringType          CTL_TwainDLLHandle::s_VersionString;
-CTL_StringType          CTL_TwainDLLHandle::s_DLLPath;
-std::deque<int> CTL_TwainDLLHandle::s_vErrorBuffer;
-unsigned int            CTL_TwainDLLHandle::s_nErrorBufferThreshold = 50;
-unsigned int            CTL_TwainDLLHandle::s_nErrorBufferReserve = 1000;
-bool                    CTL_TwainDLLHandle::s_bThrowExceptions = false;
-std::stack<unsigned long, std::deque<unsigned long> > CTL_TwainDLLHandle::s_vErrorFlagStack;
-CTL_CallbackProcArray   CTL_TwainDLLHandle::s_aAllCallbacks;
-CTL_LongToStringMap        CTL_TwainDLLHandle::s_ErrorCodes;
-CTL_LongToStringMap       CTL_TwainDLLHandle::s_ResourceStrings;
-bool                    CTL_TwainDLLHandle::s_UsingCustomResource = false;
-bool                    CTL_TwainDLLHandle::s_DemoInitialized;
-int                     CTL_TwainDLLHandle::s_nDSMVersion = DTWAIN_TWAINDSM_LEGACY;
-bool                    CTL_TwainDLLHandle::s_ResourcesInitialized = false;
-CTL_TwainMemoryFunctions*     CTL_TwainDLLHandle::s_TwainMemoryFunc = nullptr;
-CTL_LegacyTwainMemoryFunctions CTL_TwainDLLHandle::s_TwainLegacyFunc;
-CTL_Twain2MemoryFunctions      CTL_TwainDLLHandle::s_Twain2Func;
-int                     CTL_TwainDLLHandle::s_TwainDSMSearchOrder = DTWAIN_TWAINDSMSEARCH_WSO;
-std::string              CTL_TwainDLLHandle::s_TwainDSMSearchOrderStr = "CWSOU";
-CTL_StringType          CTL_TwainDLLHandle::s_TwainDSMUserDirectory;
-CTL_StringType          CTL_TwainDLLHandle::s_strResourcePath;
-bool                    CTL_TwainDLLHandle::s_multipleThreads = false;
-DTWAIN_LOGGER_PROC      CTL_TwainDLLHandle::s_pLoggerCallback = nullptr;
-DTWAIN_LOGGER_PROCA     CTL_TwainDLLHandle::s_pLoggerCallbackA = nullptr;
-DTWAIN_LOGGER_PROCW     CTL_TwainDLLHandle::s_pLoggerCallbackW = nullptr;
-DTWAIN_LONG64           CTL_TwainDLLHandle::s_pLoggerCallback_UserData = 0;
-DTWAIN_LONG64           CTL_TwainDLLHandle::s_pLoggerCallback_UserDataA = 0;
-DTWAIN_LONG64           CTL_TwainDLLHandle::s_pLoggerCallback_UserDataW = 0;
-HFONT                   CTL_TwainDLLHandle::s_DialogFont = nullptr;
-CTL_TwainDLLHandle::CTL_PDFMediaMap CTL_TwainDLLHandle::s_PDFMediaMap;
-CTL_TwainDLLHandle::CTL_AvailableFileFormatsMap CTL_TwainDLLHandle::s_AvailableFileFormatsMap;
-CTL_TwainDLLHandle::CTL_TwainConstantsMap CTL_TwainDLLHandle::s_TwainConstantsMap;
-
-bool                    CTL_TwainDLLHandle::s_TwainCallbackSet = false;
-
-#ifdef WIN32
-CRITICAL_SECTION        CTL_TwainDLLHandle::s_critLogCall;
-bool                    CTL_TwainDLLHandle::s_bCritSectionCreated = false;
-CRITICAL_SECTION        CTL_TwainDLLHandle::s_critFileCreate;
-bool                    CTL_TwainDLLHandle::s_bFileCritSectionCreated = false;
-CRITICAL_SECTION        CTL_TwainDLLHandle::s_critStaticInit;
-bool                    CTL_TwainDLLHandle::s_bCritStaticCreated;
-#endif
-
-CTL_IMAGEDLLINFO        CTL_TwainDLLHandle::s_ImageDLLInfo;
-
-std::bitset<10> CTL_TwainDLLHandle::g_AvailabilityFlags = 0;
 
 ///////////////////////////////////////////////////////////////////////////
 void CTL_TwainDLLHandle::NotifyWindows(UINT /*nMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/)
 {
 }
 
-std::string CTL_TwainDLLHandle::GetTwainNameFromResource(int nWhichResourceID, int nWhichItem)
+std::string CTL_StaticData::GetTwainNameFromResource(int nWhichResourceID, int nWhichItem)
 {
-    const auto iter = s_TwainNameMap.Left().find({ nWhichResourceID,nWhichItem });
-    if (iter != s_TwainNameMap.Left().end())
+    auto& name_map = CTL_StaticData::GetTwainNameMap();
+    const auto iter = name_map.Left().find({ nWhichResourceID,nWhichItem });
+    if (iter != name_map.Left().end())
         return iter->second;
     return {};
 }
 
-int CTL_TwainDLLHandle::GetIDFromTwainName(std::string sName)
+int CTL_StaticData::GetIDFromTwainName(std::string sName)
 {
+    auto& name_map = CTL_StaticData::GetTwainNameMap();
     StringWrapperA::MakeUpperCase(StringWrapperA::TrimAll(sName));
-    const auto iter = s_TwainNameMap.Right().find(sName);
-    if (iter != s_TwainNameMap.Right().end())
+    const auto iter = name_map.Right().find(sName);
+    if (iter != name_map.Right().end())
         return iter->second.second;
     return{};
 }
 
 /////////////////////////////////////////////////////////////////////////
 // static definitions
-std::vector<CTL_TwainDLLHandlePtr> CTL_TwainDLLHandle::s_DLLHandles;
-
 CTL_TwainDLLHandle* dynarithmic::FindHandle(HWND hWnd, bool bIsDisplay)
 {
-    const auto it = std::find_if(CTL_TwainDLLHandle::s_DLLHandles.begin(), CTL_TwainDLLHandle::s_DLLHandles.end(),
-                                 [&](CTL_TwainDLLHandlePtr& p)
+    const auto it = std::find_if(CTL_StaticData::s_mapThreadToDLLHandle.begin(), 
+                                 CTL_StaticData::s_mapThreadToDLLHandle.end(),
+                                 [&](auto& ptr)
                                  {
                                      if ( bIsDisplay)
                                          return false;
-                                     return p.get() && p.get()->m_hWndTwain == hWnd;
+                                     return ptr.second.get() && ptr.second.get()->m_hWndTwain == hWnd;
                                  });
-    if (it != CTL_TwainDLLHandle::s_DLLHandles.end())
-        return (*it).get();
+    if (it != CTL_StaticData::s_mapThreadToDLLHandle.end())
+        return it->second.get();
     return nullptr;
 }
 
 CTL_TwainDLLHandle* dynarithmic::FindHandle(HINSTANCE hInst)
 {
-    const auto it = std::find_if(CTL_TwainDLLHandle::s_DLLHandles.begin(), CTL_TwainDLLHandle::s_DLLHandles.end(),
-                                 [&](CTL_TwainDLLHandlePtr& p)
-                                 { return p.get() && p.get()->m_hInstance == hInst; });
-    if (it != CTL_TwainDLLHandle::s_DLLHandles.end())
-        return (*it).get();
+    const auto it = std::find_if(CTL_StaticData::s_mapThreadToDLLHandle.begin(), 
+                                 CTL_StaticData::s_mapThreadToDLLHandle.end(),
+                                 [&](auto& ptr)
+                                 { return ptr.second.get() && ptr.second.get()->m_hInstance == hInst; });
+    if (it != CTL_StaticData::s_mapThreadToDLLHandle.end())
+        return it->second.get();
     return nullptr;
 }

@@ -30,7 +30,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainTimeout( LONG milliseconds )
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     if ( !IsDLLHandleValid( pHandle, FALSE ) )
         LOG_FUNC_EXIT_PARAMS(false)
-    pHandle->s_nTimeoutMilliseconds = milliseconds;
+    CTL_StaticData::s_nTimeoutMilliseconds = milliseconds;
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -41,7 +41,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainTimeout()
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     if ( !IsDLLHandleValid( pHandle, FALSE ) )
         LOG_FUNC_EXIT_PARAMS(-1)
-    LOG_FUNC_EXIT_PARAMS((LONG)pHandle->s_nTimeoutMilliseconds)
+    LOG_FUNC_EXIT_PARAMS((LONG)CTL_StaticData::s_nTimeoutMilliseconds)
     CATCH_BLOCK(-1)
 }
 

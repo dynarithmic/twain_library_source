@@ -73,16 +73,17 @@ void * CTL_CapabilitySetTripletBase::PreEncode()
     if ( nAggSize == 0 )
         nAggSize = 1;
     const auto dMem = static_cast<DWORD>(nContainerSize + GetItemSize(m_nTwainType) * nAggSize);
-
-    pCap->hContainer = CTL_TwainDLLHandle::s_TwainMemoryFunc->AllocateMemory(dMem );
-    return CTL_TwainDLLHandle::s_TwainMemoryFunc->LockMemory( pCap->hContainer );
+    auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
+    pCap->hContainer = sessionHandle->m_TwainMemoryFunc->AllocateMemory(dMem );
+    return sessionHandle->m_TwainMemoryFunc->LockMemory( pCap->hContainer );
 }
 
 TW_UINT16 CTL_CapabilitySetTripletBase::PostEncode(TW_UINT16 rc)
 {
+    auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
     const TW_CAPABILITY *pCap = GetCapabilityBuffer();
-    CTL_TwainDLLHandle::s_TwainMemoryFunc->UnlockMemory( pCap->hContainer );
-    CTL_TwainDLLHandle::s_TwainMemoryFunc->FreeMemory( pCap->hContainer );
+    sessionHandle->m_TwainMemoryFunc->UnlockMemory( pCap->hContainer );
+    sessionHandle->m_TwainMemoryFunc->FreeMemory( pCap->hContainer );
     if ( rc != TWRC_SUCCESS )
     {
         const TW_UINT16 cc = CTL_TwainAppMgr::GetConditionCode( GetSessionPtr(), GetSourcePtr() );

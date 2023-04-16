@@ -339,13 +339,25 @@ HANDLE CDibInterface::IncreaseDecreaseBpp(HANDLE hDib, long newbpp, bool bIncrea
 {
     BYTE* pImage = (BYTE*)ImageMemoryHandler::GlobalLock(hDib);
     DTWAINGlobalHandle_RAII raii(hDib);
+    uint32_t bpp;
+    GetBitsPerPixel(pImage, &bpp);
+    // FreeImage has better resampling down to gray than CXImage from 24 -> 8
+    if (bpp == 24 && newbpp == 8)
+    {
+        fipImage im;
+        fipImageUtility::copyFromHandle(im, hDib);
+        fipWinImage_RAII raiiImg(&im);
+        im.convertTo8Bits();
+        return fipImageUtility::copyToHandle(im);
+    }
+
+    // Use CxImage resampler
     CxImage ImageHandler(pImage, GlobalSize(hDib), CXIMAGE_FORMAT_BMP);
     if (bIncrease)
         ImageHandler.IncreaseBpp((DWORD)newbpp);
     else
-        ImageHandler.DecreaseBpp((DWORD)newbpp, 0); // Floyd-Steinberg
-    HANDLE temphandle = ImageHandler.CopyToHandle();
-    return temphandle;
+        ImageHandler.DecreaseBpp((DWORD)newbpp, 0); 
+    return ImageHandler.CopyToHandle();
 }
 
 HANDLE CDibInterface::IncreaseBpp(HANDLE hDib, long newbpp)

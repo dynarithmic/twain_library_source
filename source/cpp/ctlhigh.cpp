@@ -50,18 +50,19 @@ static LONG EnumCapInternal(DTWAIN_SOURCE Source,
                             const std::string& paramLog);
 
 #define GENERATE_PARAM_LOG(argVals) \
-        (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK) ? (ParamOutputter((#argVals)).outputParam argVals.getString()) : ("")
+        (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK) ? (ParamOutputter((#argVals)).outputParam argVals.getString()) : ("")
 
 template <typename CapArrayType>
 static bool GetCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, typename CapArrayType::value_type* value,
                                  GetCapValuesFn /*capFn*/, const std::string& func, const std::string& paramLog)
 {
     DTWAIN_ARRAY ArrayValues = nullptr;
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     const LONG retVal = EnumCapInternal(Source, Cap, &ArrayValues, false, GetCurrentCapValues, func, paramLog);
     DTWAINArrayLL_RAII arr(ArrayValues);
     if (retVal > 0)
     {
-        auto& vOut = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<typename CapArrayType::value_type>(ArrayValues);
+        auto& vOut = pHandle->m_ArrayFactory->underlying_container_t<typename CapArrayType::value_type>(ArrayValues);
         *value = vOut[0];
         return true;
     }
@@ -106,7 +107,7 @@ struct SetSupportFn2 : public SetSupportFn1<T>
 template <typename T, typename FnToCall>
 static T FunctionCaller(FnToCall fn, const std::string& func, const std::string& paramLog)
 {
-    const bool doLog = CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK ? true : false;
+    const bool doLog = CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK ? true : false;
     try
     {
         T bRet {};
@@ -131,7 +132,7 @@ static T FunctionCaller(FnToCall fn, const std::string& func, const std::string&
     catch (...)
     {
         LogExceptionErrorA(func.c_str());
-        if (CTL_TwainDLLHandle::s_bThrowExceptions)
+        if (CTL_StaticData::s_bThrowExceptions)
             DTWAIN_InternalThrowException();
         return {};
     }
@@ -248,8 +249,9 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
     DTWAINArrayLL_RAII arr(ArrayValues);
     if (retVal > 0)
     {
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
         std::string sVal;
-        CTL_TwainDLLHandle::s_ArrayFactory->get_value(ArrayValues, 0, &sVal);
+        pHandle->m_ArrayFactory->get_value(ArrayValues, 0, &sVal);
         StringWrapperA::CopyInfoToCString(sVal, value, nLen);
         return true;
     }
@@ -761,7 +763,8 @@ static bool GetDoubleCap( DTWAIN_SOURCE Source, LONG lCap, double *pValue )
     DTWAIN_ARRAY Array = nullptr;
     bool bRet = DTWAIN_GetCapValues(Source, lCap, DTWAIN_CAPGETCURRENT, &Array) ? true : false;
     DTWAINArrayLL_RAII arr(Array);
-    const auto& vIn = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<double>(Array);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<double>(Array);
     if ( bRet && Array )
     {
         if ( vIn.empty() )
@@ -819,7 +822,7 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
                         DTWAIN_RangeExpand(*arrayToUse, &tempArray);
 
                         // destroy original and copy new values
-                        CTL_TwainDLLHandle::s_ArrayFactory->destroy(*arrayToUse);
+                        pHandle->m_ArrayFactory->destroy(*arrayToUse);
                         *arrayToUse = DTWAIN_ArrayCreateCopy(tempArray);
 
                         // get the count

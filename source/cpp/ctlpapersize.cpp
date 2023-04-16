@@ -35,7 +35,7 @@ LONG DLLENTRY_DEF DTWAIN_GetPaperSizeName(LONG paperNumber, LPTSTR outName, LONG
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 
-    auto& pdfmediamap = CTL_TwainDLLHandle::GetPDFMediaMap();
+    auto& pdfmediamap = CTL_StaticData::GetPDFMediaMap();
     auto iter = pdfmediamap.find(paperNumber);
     LONG nActualCharactersCopied = 0;
     if (iter != pdfmediamap.end())

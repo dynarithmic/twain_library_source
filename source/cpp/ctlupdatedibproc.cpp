@@ -30,8 +30,8 @@ DTWAIN_DIBUPDATE_PROC DLLENTRY_DEF DTWAIN_SetUpdateDibProc(DTWAIN_DIBUPDATE_PROC
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     if ( !IsDLLHandleValid( pHandle, FALSE ) )
         LOG_FUNC_EXIT_PARAMS(0)
-    const DTWAIN_DIBUPDATE_PROC oldproc = pHandle->s_pDibUpdateProc;
-    pHandle->s_pDibUpdateProc = DibProc;
+    const DTWAIN_DIBUPDATE_PROC oldproc = pHandle->m_pDibUpdateProc;
+    pHandle->m_pDibUpdateProc = DibProc;
     LOG_FUNC_EXIT_PARAMS(oldproc)
     CATCH_BLOCK(DTWAIN_DIBUPDATE_PROC())
 }

@@ -547,10 +547,11 @@ CTL_StringType CTL_ITwainSource::GetImageFileName(int curFile) const
     if ( !pDTWAINArray )
         return {};
 
-    const int nCount = static_cast<int>(CTL_TwainDLLHandle::s_ArrayFactory->size(pDTWAINArray));
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const int nCount = static_cast<int>(pHandle->m_ArrayFactory->size(pDTWAINArray));
     if ( nCount > 0 && curFile < nCount )
     {
-        CTL_TwainDLLHandle::s_ArrayFactory->get_value(pDTWAINArray, curFile, &strTemp);
+        pHandle->m_ArrayFactory->get_value(pDTWAINArray, curFile, &strTemp);
         return strTemp;
     }
     return {};
@@ -634,7 +635,8 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
         const DTWAIN_ARRAY pDTWAINArray = m_pFileEnumerator;
         if ( !pDTWAINArray )
             return m_strAcquireFile;
-        const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        const auto& factory = pHandle->m_ArrayFactory;
         const int nCount = static_cast<int>(factory->size(pDTWAINArray));
         if ( nCount > 0 )
         {
@@ -654,7 +656,8 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
         const DTWAIN_ARRAY pDTWAINArray = m_pFileEnumerator;
         if ( !pDTWAINArray )
             return m_strAcquireFile;
-        const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        const auto& factory = pHandle->m_ArrayFactory;
         bool bNameAvailable = nCurImage < factory->size(pDTWAINArray);
         if ( bNameAvailable )
             bNameAvailable = factory->get_value(pDTWAINArray, nCurImage, &strTemp)?true:false; 
@@ -947,7 +950,7 @@ CTL_ITwainSource::~CTL_ITwainSource()
         if ( pHandle )
             pHandle->m_mapPDFTextElement.erase(this);
 
-        CTL_TwainDLLHandle::s_ArrayFactory->destroy(m_pFileEnumerator);
+        pHandle->m_ArrayFactory->destroy(m_pFileEnumerator);
     }
     catch(...)
     {
@@ -1060,7 +1063,8 @@ double CTL_ITwainSource::GetCapCacheValue( LONG lCap, LONG *pTurnOn ) const
 
 void CTL_ITwainSource::AddDibsToAcquisition(DTWAIN_ARRAY aDibs) const
 {
-   const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+   const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+   const auto& factory = pHandle->m_ArrayFactory;
    factory->add_to_back(m_aAcqAttempts, aDibs, 1 );
    factory->add_to_back(m_PersistentArray, aDibs, 1);
 }
@@ -1070,7 +1074,8 @@ void CTL_ITwainSource::ResetAcquisitionAttempts(DTWAIN_ARRAY aNewAttempts)
     // Remove any old acquisitions
     if ( aNewAttempts != m_aAcqAttempts)
     {
-        CTL_TwainDLLHandle::s_ArrayFactory->destroy(m_aAcqAttempts);
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        pHandle->m_ArrayFactory->destroy(m_aAcqAttempts);
         m_aAcqAttempts = aNewAttempts;
     }
 }
@@ -1437,7 +1442,8 @@ template <typename T>
 static DTWAIN_ARRAY PopulateArray(const std::vector<boost::any>& dataArray, CTL_ITwainSource* pSource, TW_UINT16 nCap)
 {
     const DTWAIN_ARRAY theArray = DTWAIN_ArrayCreateFromCap(pSource, static_cast<LONG>(nCap), static_cast<LONG>(dataArray.size()));
-    auto& vVector = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    auto& vVector = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
     std::transform(dataArray.begin(), dataArray.end(), vVector.begin(), [](boost::any theAny) 
                     { return boost::any_cast<typename T::value_type>(theAny);});
     return theArray;
@@ -1446,7 +1452,8 @@ static DTWAIN_ARRAY PopulateArray(const std::vector<boost::any>& dataArray, CTL_
 template <typename T>
 static bool PopulateCache(DTWAIN_ARRAY theArray, std::vector<boost::any>& dataArray)
 {
-    auto& vVector = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    auto& vVector = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
     std::transform(vVector.begin(), vVector.end(), std::back_inserter(dataArray), [](typename T::value_type value){ return value;});
     return true;
 }

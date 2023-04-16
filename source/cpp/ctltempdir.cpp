@@ -59,7 +59,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG 
                auto retVal = p.generic_string();
                if (!retVal.empty() && *retVal.rbegin() != filesys::path::preferred_separator)
                    retVal += filesys::path::preferred_separator;
-               CTL_TwainDLLHandle::s_TempFilePath = CTL_StringType(retVal.begin(), retVal.end());
+               pHandle->m_sTempFilePath = CTL_StringType(retVal.begin(), retVal.end());
                LOG_FUNC_EXIT_PARAMS(true)
             }
             else

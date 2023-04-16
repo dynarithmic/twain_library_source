@@ -42,7 +42,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CloseSource(DTWAIN_SOURCE Source)
         if (bRetval)
         {
             pHandle->m_mapStringToSource.erase(sProductName);
-            pHandle->s_aFeederSources.erase(Source);
+            pHandle->m_aFeederSources.erase(Source);
         }
     }
     LOG_FUNC_EXIT_PARAMS(bRetval)

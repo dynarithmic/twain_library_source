@@ -27,6 +27,7 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitImageFileAppend(LPCTSTR szFile, LONG fType)
 {
     LOG_FUNC_ENTRY_PARAMS((szFile, fType ))
+#if 0
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     if ( !IsDLLHandleValid( pHandle, FALSE ) )
         LOG_FUNC_EXIT_PARAMS(false)
@@ -35,6 +36,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitImageFileAppend(LPCTSTR szFile, LONG fType)
 
     // Test destruction here
     CTL_ITwainSource::Destroy(pHandle->m_pDummySource);
+#endif
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(DTWAIN_ERR_BAD_HANDLE)
 }

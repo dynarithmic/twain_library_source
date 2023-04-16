@@ -436,7 +436,7 @@ PdfDocument::PdfDocument() :
     m_nCurPage(0),
     m_smediabox("[0 0 612 792]"),
     m_Orientation(DTWAIN_PDF_PORTRAIT),
-    m_mediaMap(CTL_TwainDLLHandle::GetPDFMediaMap()),
+    m_mediaMap(CTL_StaticData::GetPDFMediaMap()),
     m_xscale(0),
     m_yscale(0),
     m_scaletype(DTWAIN_PDF_NOSCALING),

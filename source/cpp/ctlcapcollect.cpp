@@ -37,7 +37,6 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetQueryCapSupport(DTWAIN_BOOL bSet)
 {
     LOG_FUNC_ENTRY_PARAMS((bSet))
-    CTL_TwainDLLHandle::s_bQuerySupport = bSet ? true : false;
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -96,7 +95,7 @@ void dynarithmic::DTWAIN_CollectCapabilityInfo(CTL_ITwainSource *p, TW_UINT16 nC
     }
     if (bOk)
     {
-        if (CTL_TwainDLLHandle::s_lErrorFilterFlags)
+        if (CTL_StaticData::s_lErrorFilterFlags)
         {
             StringStreamOutA strm;
             strm << "Using capability info from DTWAIN32.INI (Source="
@@ -305,7 +304,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
 
         if (bOk)
         {
-            if (CTL_TwainDLLHandle::s_lErrorFilterFlags)
+            if (CTL_StaticData::s_lErrorFilterFlags)
             {
                 StringStreamOutA strm;
                 strm << "Using capability info from DTWAIN32.INI (Source="

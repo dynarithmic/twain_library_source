@@ -29,7 +29,7 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CheckHandles(DTWAIN_BOOL bCheck)
 {
     LOG_FUNC_ENTRY_PARAMS((bCheck))
-    CTL_TwainDLLHandle::s_bCheckHandles = bCheck ? true : false;
+    CTL_StaticData::s_bCheckHandles = bCheck ? true : false;
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -38,7 +38,7 @@ CTL_ITwainSource* dynarithmic::VerifySourceHandle(DTWAIN_HANDLE DLLHandle,  DTWA
 {
     LOG_FUNC_ENTRY_PARAMS((DLLHandle, Source))
     CTL_ITwainSource *p;
-    if ( !CTL_TwainDLLHandle::s_bCheckHandles )
+    if ( !CTL_StaticData::IsCheckHandles())
         p = static_cast<CTL_ITwainSource *>(Source);
     else
     {
