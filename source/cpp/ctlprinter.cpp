@@ -46,9 +46,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAvailablePrinters(DTWAIN_SOURCE Source, LONG 
     if ( !Array )
         LOG_FUNC_EXIT_PARAMS(false)
 
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+
     // Destroys array when out of scope
     DTWAINArrayLL_RAII a(Array);
-    auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(Array);
+    auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
 
     LONG j = 0;
     for ( LONG i = 0; i < 8; i++ )
@@ -93,7 +95,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinter(DTWAIN_SOURCE Source, LONG nPrinter, 
     bool bRet = false;
     if ( bFound )
     {
-        auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(Array);
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
         if ( !vValues.empty() )
             vValues[0] = nPrinter;
         bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPPRINTER, SetType, Array)?true:false;
@@ -116,7 +119,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterEx(DTWAIN_SOURCE Source, LONG nPrinter
     LONG SetType = DTWAIN_CAPSET;
     if (!bSetCurrent)
         SetType = DTWAIN_CAPRESET;
-    auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(Array);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
     DTWAIN_BOOL bRet = 0;
     if (!vValues.empty())
     {
@@ -148,7 +152,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterStrings(DTWAIN_SOURCE Source, DTWAIN_A
 
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle( pHandle, Source );
-    auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    auto& factory = pHandle->m_ArrayFactory;
     if ( p )
     {
         // Check if array is of the correct type

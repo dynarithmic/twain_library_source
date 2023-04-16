@@ -156,7 +156,7 @@ CTL_ITwainSession* CTL_TwainAppMgr::CreateTwainSession(
         // to the proper levels here.  We support 1.9 for TWAIN_32.DLL (LEGACY) and 2.x for
         // TWAINDSM.DLL.
         // DTWAIN assumes 2.x, but must change for legacy TWAIN_32.DLL source manager
-        const CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
 
         if ( pHandle->m_SessionStruct.DSMName == TWAINDLLVERSION_1 )
         {
@@ -183,8 +183,8 @@ CTL_ITwainSession* CTL_TwainAppMgr::CreateTwainSession(
             switch (rc)
             {
                 case TWRC_SUCCESS:
-                    pHandle->s_Twain2Func.m_EntryPoint = entryPoints.getEntryPoint();
-                    pHandle->s_TwainMemoryFunc = &pHandle->s_Twain2Func;
+                    pHandle->m_Twain2Func.m_EntryPoint = entryPoints.getEntryPoint();
+                    pHandle->m_TwainMemoryFunc = &pHandle->m_Twain2Func;
                     break;
                 default:
                     WriteLogInfoA("The entry points for the TWAINDSM.DLL were not found");
@@ -193,7 +193,7 @@ CTL_ITwainSession* CTL_TwainAppMgr::CreateTwainSession(
             }
         }
         else
-            pHandle->s_TwainMemoryFunc = &pHandle->s_TwainLegacyFunc;
+            pHandle->m_TwainMemoryFunc = &pHandle->m_TwainLegacyFunc;
         s_pSelectedSession = s_pGlobalAppMgr->m_arrTwainSession.back().get();
         return s_pSelectedSession;
     }
@@ -202,14 +202,15 @@ CTL_ITwainSession* CTL_TwainAppMgr::CreateTwainSession(
 
 bool CTL_TwainAppMgr::OpenSourceManager( CTL_ITwainSession* pSession )
 {
+    CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     CTL_TwainOpenSMTriplet SM( pSession );
     if ( SM.Execute() != TWRC_SUCCESS )
         return false;
-    CTL_TwainDLLHandle::s_nDSMState = DSM_STATE_OPENED;
-    CTL_TwainDLLHandle::s_nDSMVersion = SM.GetDSMVersion();
-    CTL_TwainDLLHandle::s_TwainMemoryFunc = &CTL_TwainDLLHandle::s_TwainLegacyFunc;
+    pHandle->m_nDSMState = DSM_STATE_OPENED;
+    pHandle->m_nDSMVersion = SM.GetDSMVersion();
+    pHandle->m_TwainMemoryFunc = &pHandle->m_TwainLegacyFunc;
 
-    if ( CTL_TwainDLLHandle::s_nDSMVersion == DTWAIN_TWAINDSM_VERSION2)
+    if ( pHandle->m_nDSMVersion == DTWAIN_TWAINDSM_VERSION2)
     {
         // For 2.0 data sources.  Set the handle to the memory functions
         CTL_EntryPointTripletGet EntryPoint( pSession );
@@ -217,8 +218,8 @@ bool CTL_TwainAppMgr::OpenSourceManager( CTL_ITwainSession* pSession )
         {
             // assign the memory functions to whatever the DSM has returned for
             // the memory management functions
-            CTL_TwainDLLHandle::s_Twain2Func.m_EntryPoint = EntryPoint.getEntryPoint();
-            CTL_TwainDLLHandle::s_TwainMemoryFunc = &CTL_TwainDLLHandle::s_Twain2Func;
+            pHandle->m_Twain2Func.m_EntryPoint = EntryPoint.getEntryPoint();
+            pHandle->m_TwainMemoryFunc = &pHandle->m_Twain2Func;
         }
         else
             return false;
@@ -228,12 +229,8 @@ bool CTL_TwainAppMgr::OpenSourceManager( CTL_ITwainSession* pSession )
 
 bool CTL_TwainAppMgr::IsVersion2DSMUsed()
 {
-    return CTL_TwainDLLHandle::s_nDSMVersion == DTWAIN_TWAINDSM_VERSION2;
-}
-
-bool CTL_TwainAppMgr::IsVersion2DSMUsedWithCallback()
-{
-    return IsVersion2DSMUsed() && CTL_TwainDLLHandle::s_TwainCallbackSet;
+    CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    return pHandle->m_nDSMVersion == DTWAIN_TWAINDSM_VERSION2;
 }
 
 int CTL_TwainAppMgr::CopyFile(CTL_StringType strIn, CTL_StringType strOut)
@@ -308,12 +305,13 @@ bool CTL_TwainAppMgr::IsValidTwainSource( const CTL_ITwainSession* pSession, con
 // TWAIN, that app will not function or will GPF when a scanning request is given.
 void CTL_TwainAppMgr::UnloadSourceManager()
 {
+    CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     if ( s_pGlobalAppMgr && s_pGlobalAppMgr->m_hLibModule.is_loaded() )
     {
         while (s_pGlobalAppMgr->m_hLibModule.is_loaded())
             s_pGlobalAppMgr->m_hLibModule.unload();
     }
-    CTL_TwainDLLHandle::s_nDSMState = DSM_STATE_NONE;
+    pHandle->m_nDSMState = DSM_STATE_NONE;
 }
 
 CTL_TwainSessionArray::iterator CTL_TwainAppMgr::FindSession(const CTL_ITwainSession* pSession)
@@ -894,8 +892,8 @@ void CTL_TwainAppMgr::NotifyFeederStatus()
     if (!pFn)
         return;
     // Check if any open source supports feeder
-    auto it = CTL_TwainDLLHandle::s_aFeederSources.begin();
-    const auto it2 = CTL_TwainDLLHandle::s_aFeederSources.end();
+    auto it = pHandle->m_aFeederSources.begin();
+    const auto it2 = pHandle->m_aFeederSources.end();
 
     while (it != it2)
     {
@@ -1578,11 +1576,12 @@ bool CTL_TwainAppMgr::CloseSourceManager(CTL_ITwainSession* pSession)
 {
     // Close the source manager
     // Use the session
+    CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     CTL_TwainCloseSMTriplet SM( pSession );
     const TW_UINT16 rc = SM.Execute();
     if ( rc != TWRC_SUCCESS )
         return false;
-    CTL_TwainDLLHandle::s_nDSMState = DSM_STATE_LOADED;
+    pHandle->m_nDSMState = DSM_STATE_LOADED;
     return true;
 }
 
@@ -1606,24 +1605,24 @@ void CTL_TwainAppMgr::SetError(int nError, const std::string& extraInfo)
     s_strLastError += " " + extraInfo;
     s_nLastError    = nError;
 
-    CTL_TwainDLLHandle::s_mapExtraErrorInfo[-s_nLastError] = extraInfo;
-    if ( CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_USEBUFFER )
+    CTL_StaticData::s_mapExtraErrorInfo[-s_nLastError] = extraInfo;
+    if ( CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_USEBUFFER )
     {
         // Push error onto error stack
-        const std::deque<int>::size_type nEntries = CTL_TwainDLLHandle::s_vErrorBuffer.size();
-        CTL_TwainDLLHandle::s_vErrorBuffer.push_front(-nError);
+        const std::deque<int>::size_type nEntries = pHandle->m_vErrorBuffer.size();
+        pHandle->m_vErrorBuffer.push_front(-nError);
 
         // Check if beyond reserve size
-        const unsigned int nReserve = CTL_TwainDLLHandle::s_nErrorBufferReserve;
+        const unsigned int nReserve = pHandle->m_nErrorBufferReserve;
 
         if ( nEntries > nReserve)
-            CTL_TwainDLLHandle::s_vErrorBuffer.resize(CTL_TwainDLLHandle::s_nErrorBufferThreshold);
+            pHandle->m_vErrorBuffer.resize(pHandle->m_nErrorBufferThreshold);
     }
 
     // if there is a callback, call it now with the error notifications
     if ( pHandle->m_pCallbackFn )
     {
-        const UINT uMsg = CTL_TwainDLLHandle::s_nRegisteredDTWAINMsg;
+        const UINT uMsg = CTL_StaticData::s_nRegisteredDTWAINMsg;
         LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_GENERALERROR, -nError, true);
         (*pHandle->m_pCallbackFn)(DTWAIN_TN_GENERALERROR, -nError, static_cast<LPARAM>(0));
     }
@@ -1631,7 +1630,7 @@ void CTL_TwainAppMgr::SetError(int nError, const std::string& extraInfo)
     // If there is a 64 bit callback, call it now with the error notifications
     if ( pHandle->m_pCallbackFn64 )
     {
-        const UINT uMsg = CTL_TwainDLLHandle::s_nRegisteredDTWAINMsg;
+        const UINT uMsg = CTL_StaticData::s_nRegisteredDTWAINMsg;
         LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_GENERALERROR, -nError, true);
         (*pHandle->m_pCallbackFn64)(DTWAIN_TN_GENERALERROR, -nError, static_cast<LPARAM>(0));
     }
@@ -1830,7 +1829,7 @@ int CTL_TwainAppMgr::GetTransferCount( const CTL_ITwainSource *pSource )
 int CTL_TwainAppMgr::SetTransferCount( const CTL_ITwainSource *pSource,
                                        int nCount )
 {
-    if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS )
+    if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS )
     {
         StringStreamA strm;
         strm << boost::format("\nSetting Transfer Count.  Transfer Count = %1%\n") % nCount;
@@ -2211,8 +2210,8 @@ CTL_CapStruct CTL_TwainAppMgr::GetGeneralCapInfo(LONG Cap)
     CTL_CapStruct cStruct;
     bool bFoundCap = false;
 
-    const auto it = CTL_TwainDLLHandle::s_mapGeneralCapInfo.find( static_cast<short>(Cap) );
-    if ( it != CTL_TwainDLLHandle::s_mapGeneralCapInfo.end() )
+    const auto it = CTL_StaticData::s_mapGeneralCapInfo.find( static_cast<short>(Cap) );
+    if ( it != CTL_StaticData::s_mapGeneralCapInfo.end() )
     {
         bFoundCap = true;
         cStruct = (*it).second;
@@ -2220,7 +2219,7 @@ CTL_CapStruct CTL_TwainAppMgr::GetGeneralCapInfo(LONG Cap)
 
     if ( !bFoundCap )
     {
-        cStruct = CTL_TwainDLLHandle::s_mapGeneralCapInfo[static_cast<short>(Cap)];
+        cStruct = CTL_StaticData::s_mapGeneralCapInfo[static_cast<short>(Cap)];
     }
     return cStruct;
 }
@@ -2249,8 +2248,8 @@ LONG CTL_TwainAppMgr::GetCapFromCapName(const char *szCapName )
         }
     }
 
-    const auto it = CTL_TwainDLLHandle::s_mapGeneralCapInfo.begin();
-    const auto itend = CTL_TwainDLLHandle::s_mapGeneralCapInfo.end();
+    const auto it = CTL_StaticData::s_mapGeneralCapInfo.begin();
+    const auto itend = CTL_StaticData::s_mapGeneralCapInfo.end();
     int subtractor = 0;
     if (StringWrapperA::Left(strCap, 5) == "TWEI_")
         subtractor = 1000;
@@ -2280,8 +2279,8 @@ UINT CTL_TwainAppMgr::GetContainerTypesFromCap( CTL_EnumCapability Cap, bool nTy
 CTL_ErrorStruct CTL_TwainAppMgr::GetGeneralErrorInfo(LONG nDG, UINT nDAT, UINT nMSG)
 {
     CTL_ErrorStruct eStruct;
-    const auto it = CTL_TwainDLLHandle::s_mapGeneralErrorInfo.find(std::make_tuple(nDG, nDAT, nMSG));
-    if ( it != CTL_TwainDLLHandle::s_mapGeneralErrorInfo.end() )
+    const auto it = CTL_StaticData::s_mapGeneralErrorInfo.find(std::make_tuple(nDG, nDAT, nMSG));
+    if ( it != CTL_StaticData::s_mapGeneralErrorInfo.end() )
         eStruct = (*it).second;
     return eStruct;
 }
@@ -2391,7 +2390,8 @@ CTL_StringType CTL_TwainAppMgr::GetTwainDirFullNameEx(LPCTSTR szTwainDLLName,
                                                     bool bLeaveLoaded/*=false*/,
                                                     boost::dll::shared_library *pModule)
 {
-    return ::GetTwainDirFullNameEx(szTwainDLLName, bLeaveLoaded, pModule);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    return ::GetTwainDirFullNameEx(pHandle, szTwainDLLName, bLeaveLoaded, pModule);
 }
 
 bool CTL_TwainAppMgr::CheckTwainExistence(CTL_StringType strTwainDLLName, LPLONG pWhichSearch)
@@ -2571,7 +2571,7 @@ bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
         CTL_StringStreamType strm;
         strm << _T("TWAIN DSM \"") + m_strTwainDSMPath + _T("\" is found and will be used for this TWAIN session");
         LogToDebugMonitor(strm.str());
-        if (CTL_TwainDLLHandle::s_lErrorFilterFlags != 0)
+        if (CTL_StaticData::s_lErrorFilterFlags != 0)
             DTWAIN_LogMessageA(StringConversion::Convert_Native_To_Ansi(strm.str()).c_str());
     }
     return LoadDSM();
@@ -2579,10 +2579,11 @@ bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
 
 bool CTL_TwainAppMgr::LoadDSM()
 {
+    CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     m_lpDSMEntry = dtwain_library_loader<DSMENTRYPROC>::get_func_ptr(m_hLibModule.native(), "DSM_Entry");
     if ( !m_lpDSMEntry )
         DTWAIN_ERROR_CONDITION(IDS_ErrTwainDLLInvalid,false)
-    CTL_TwainDLLHandle::s_nDSMState = DSM_STATE_LOADED;
+    pHandle->m_nDSMState = DSM_STATE_LOADED;
     return true;   // return success
 }
 
@@ -2595,15 +2596,15 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( TW_IDENTITY *pOrigin, TW_IDENTITY* 
 
 void CTL_TwainAppMgr::WriteLogInfoA(const std::string& s, bool bFlush)
 {
-    if (!CTL_TwainDLLHandle::s_lErrorFilterFlags)
+    if (!CTL_StaticData::s_lErrorFilterFlags)
         return;
 
-    if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_USECRLF)
+    if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_USECRLF)
         std::string crlf = "\n";
 
-    CTL_TwainDLLHandle::s_appLog.StatusOutFast(s.c_str());
+    CTL_StaticData::s_appLog.StatusOutFast(s.c_str());
     if (bFlush)
-        CTL_TwainDLLHandle::s_appLog.Flush();
+        CTL_StaticData::s_appLog.Flush();
 }
 
 void CTL_TwainAppMgr::WriteLogInfoW(const std::wstring& s, bool bFlush)
@@ -2643,11 +2644,11 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
     TW_UINT16    nMSG    = pTriplet.GetMSG();
     TW_MEMREF    pData   = pTriplet.GetMemRef();
 
-    if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_LOWLEVELTWAIN)
+    if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_LOWLEVELTWAIN)
     {
         e = GetGeneralErrorInfo(nDG, nDAT, nMSG);
         s = e.GetIdentityAndDataInfo(pOrigin, pDest, pData);
-        s = CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_INPUTTEXT] + ": " + s;
+        s = GetResourceStringFromMap(IDS_LOGMSG_INPUTTEXT) + ": " + s;
         WriteLogInfoA(s);
     }
 
@@ -2662,7 +2663,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
 
     bool bTimeOutInEffect = false;
     #ifdef _WIN32
-    if ( CTL_TwainDLLHandle::s_nTimeoutMilliseconds > 0 )
+    if ( CTL_StaticData::s_nTimeoutMilliseconds > 0 )
     {
         // Check if time out is to be applied to this triplet
         RawTwainTriplet rtrip{};
@@ -2673,8 +2674,8 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
                                         s_NoTimeoutTriplets.end(),
                                         FindTriplet(rtrip)) == s_NoTimeoutTriplets.end())
         {
-            CTL_TwainDLLHandle::s_nTimeoutID = SetTimer(nullptr, 0,
-                                                        CTL_TwainDLLHandle::s_nTimeoutMilliseconds, reinterpret_cast<TIMERPROC>(
+            CTL_StaticData::s_nTimeoutID = SetTimer(nullptr, 0,
+                                                        CTL_StaticData::s_nTimeoutMilliseconds, reinterpret_cast<TIMERPROC>(
                                                             TwainTimeOutProc));
             bTimeOutInEffect = true;
         }
@@ -2696,36 +2697,36 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         // To do later...
         #ifdef _WIN32
         if ( bTimeOutInEffect )
-            KillTimer(nullptr, CTL_TwainDLLHandle::s_nTimeoutID);
+            KillTimer(nullptr, CTL_StaticData::s_nTimeoutID);
         #endif
         retcode = DTWAIN_ERR_EXCEPTION_ERROR_;
-        if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_LOWLEVELTWAIN)
+        if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_LOWLEVELTWAIN)
         {
             std::string sz;
             std::ostringstream strm;
             sz = e.GetTWAINDSMErrorCC(IDS_TWCC_EXCEPTION);
             s = e.GetIdentityAndDataInfo(pOrigin, pDest, pData);
-            strm << boost::format("%1%=%2% (%3%)\n%4%") % CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_OUTPUTDSMTEXT] % retcode % sz % s;
+            strm << boost::format("%1%=%2% (%3%)\n%4%") % GetResourceStringFromMap(IDS_LOGMSG_OUTPUTDSMTEXT) % retcode % sz % s;
             WriteLogInfoA(strm.str());
         }
         return retcode;
     }
     #ifdef _WIN32
     if ( bTimeOutInEffect )
-        KillTimer(nullptr, CTL_TwainDLLHandle::s_nTimeoutID);
+        KillTimer(nullptr, CTL_StaticData::s_nTimeoutID);
     #endif
     if (m_pDLLHandle->m_bNotificationsUsed)
     {
         // Send out that we have ended processing the TWAIN triplet
         SendTwainMsgToWindow(pTriplet.GetSessionPtr(), nullptr, DTWAIN_TN_TWAINTRIPLETEND, 0);
     }
-    if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_LOWLEVELTWAIN)
+    if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_LOWLEVELTWAIN)
     {
         std::string sz;
         std::ostringstream strm;
         s =  e.GetIdentityAndDataInfo(pOrigin, pDest, pData);
         sz = e.GetTWAINDSMError(retcode);
-        std::string s1 = CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_OUTPUTDSMTEXT];
+        std::string s1 = GetResourceStringFromMap(IDS_LOGMSG_OUTPUTDSMTEXT);
         boost::format fmt("%1%=%2% (%3%)\n%4%\n");
         strm << fmt % s1.c_str() % retcode % sz % s;
         WriteLogInfoA(strm.str());
@@ -2780,7 +2781,7 @@ bool CTL_TwainAppMgr::SetDependentCaps( const CTL_ITwainSource *pSource, CTL_Enu
 VOID CALLBACK CTL_TwainAppMgr::TwainTimeOutProc(HWND, UINT, ULONG, DWORD)
 {
 #ifdef _WIN32
-    KillTimer(nullptr, CTL_TwainDLLHandle::s_nTimeoutID);
+    KillTimer(nullptr, CTL_StaticData::s_nTimeoutID);
 
     WriteLogInfoA("The last TWAIN triplet was not completed due to time out");
     SetError(DTWAIN_ERR_TIMEOUT);

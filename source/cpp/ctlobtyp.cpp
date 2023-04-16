@@ -26,22 +26,29 @@
 #include "ctliface.h"
 
 using namespace dynarithmic;
-CTL_TwainTypeOb::CTL_TwainTypeOb( TW_UINT16 nType, bool bGetTypeSize/*=true*/ ) : m_nSize(0), m_nType(nType), m_pData(nullptr), m_hGlobal(nullptr)
+CTL_TwainTypeOb::CTL_TwainTypeOb( CTL_TwainDLLHandle* pHandle, TW_UINT16 nType, bool bGetTypeSize/*=true*/ ) : 
+    m_nSize(0), 
+    m_nType(nType), 
+    m_pData(nullptr), 
+    m_pDLLHandle(pHandle),
+    m_hGlobal(nullptr)
 {
     if ( bGetTypeSize )
         m_nSize = CTL_CapabilityTriplet::GetItemSize( nType );
     else
         m_nSize = nType;
-    m_hGlobal = CTL_TwainDLLHandle::s_TwainMemoryFunc->AllocateMemory(m_nSize);
+    m_hGlobal = pHandle->m_TwainMemoryFunc->AllocateMemory(m_nSize);
     m_pData = nullptr;
     if ( m_hGlobal )
-        m_pData = CTL_TwainDLLHandle::s_TwainMemoryFunc->LockMemory(m_hGlobal);
+        m_pData = pHandle->m_TwainMemoryFunc->LockMemory(m_hGlobal);
 }
 
 CTL_TwainTypeOb::CTL_TwainTypeOb(CTL_TwainTypeOb&& rhs) noexcept : m_nSize(rhs.m_nSize), m_nType(rhs.m_nType),
-                                                                   m_pData(rhs.m_pData), m_hGlobal(rhs.m_hGlobal)
+                                                                   m_pData(rhs.m_pData), m_hGlobal(rhs.m_hGlobal),
+                                                                   m_pDLLHandle(rhs.m_pDLLHandle)
 {
     rhs.m_pData = nullptr;
+    rhs.m_pDLLHandle = nullptr;
     rhs.m_hGlobal = {};
 }
 
@@ -51,27 +58,29 @@ void CTL_TwainTypeOb::swap(CTL_TwainTypeOb& left, CTL_TwainTypeOb& right) noexce
     std::swap(left.m_hGlobal, right.m_hGlobal);
     std::swap(left.m_nType, right.m_nType);
     std::swap(left.m_pData, right.m_pData);
+    std::swap(left.m_pDLLHandle, right.m_pDLLHandle);
 }
 
 CTL_TwainTypeOb& CTL_TwainTypeOb::operator=(CTL_TwainTypeOb&& rhs) noexcept
 {
     if (m_hGlobal)
     {
-        CTL_TwainDLLHandle::s_TwainMemoryFunc->UnlockMemory(m_hGlobal);
-        CTL_TwainDLLHandle::s_TwainMemoryFunc->FreeMemory(m_hGlobal);
+        rhs.m_pDLLHandle->m_TwainMemoryFunc->UnlockMemory(m_hGlobal);
+        rhs.m_pDLLHandle->m_TwainMemoryFunc->FreeMemory(m_hGlobal);
     }
     swap(*this, rhs);
     rhs.m_pData = nullptr;
+    rhs.m_pDLLHandle = nullptr;
     rhs.m_hGlobal = {};
     return *this;
 }
 
 CTL_TwainTypeOb::~CTL_TwainTypeOb()
 {
-    if ( m_hGlobal )
+    if ( m_hGlobal && m_pDLLHandle)
     {
-        CTL_TwainDLLHandle::s_TwainMemoryFunc->UnlockMemory(m_hGlobal);
-        CTL_TwainDLLHandle::s_TwainMemoryFunc->FreeMemory(m_hGlobal);
+        m_pDLLHandle->m_TwainMemoryFunc->UnlockMemory(m_hGlobal);
+        m_pDLLHandle->m_TwainMemoryFunc->FreeMemory(m_hGlobal);
     }
 }
 

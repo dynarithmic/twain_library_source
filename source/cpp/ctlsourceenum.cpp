@@ -51,7 +51,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
         LOG_FUNC_EXIT_PARAMS(false)
     DTWAIN_ARRAY pDTWAINArray = aSource;
 
-    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto& factory = pHandle->m_ArrayFactory;
     auto& vEnum = factory->underlying_container_t<CTL_ITwainSource*>(pDTWAINArray);
     vEnum.clear();
 
@@ -63,14 +63,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
         if (!DTWAIN_StartTwainSession(nullptr, nullptr))
             LOG_FUNC_EXIT_PARAMS(false)
     }
-
-    struct EnumAddValue {
-        DTWAIN_ARRAY m_Arr; EnumAddValue(DTWAIN_ARRAY Arr) : m_Arr(Arr) {}
-        void operator()(CTL_ITwainSource* ptr) const
-        {
-            CTL_TwainDLLHandle::s_ArrayFactory->add_to_back(m_Arr, &ptr, 1);
-        }
-    };
 
     CTL_TwainAppMgr::EnumSources(pHandle->m_pTwainSession, SourceArray);
     std::copy(SourceArray.begin(), SourceArray.end(), std::back_inserter(vEnum));

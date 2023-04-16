@@ -94,7 +94,7 @@ BOOL DLLENTRY_DEF DTWAIN_GetTwainCountryName(LONG countryId, LPTSTR szName)
     LOG_FUNC_ENTRY_PARAMS((countryId, szName))
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, -1L, FUNC_MACRO);
-    GetGenericTwainName(countryId, szName, CTL_TwainDLLHandle::GetTwainCountryMap());
+    GetGenericTwainName(countryId, szName, CTL_StaticData::GetTwainCountryMap());
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -104,7 +104,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainCountryValue(LPCTSTR country)
     LOG_FUNC_ENTRY_PARAMS((country))
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, -1L, FUNC_MACRO);
-    const auto value = GetGenericTwainValue(country, CTL_TwainDLLHandle::GetTwainCountryMap());
+    const auto value = GetGenericTwainValue(country, CTL_StaticData::GetTwainCountryMap());
     LOG_FUNC_EXIT_PARAMS(value)
     CATCH_BLOCK(-1L)
 }
@@ -114,7 +114,7 @@ BOOL DLLENTRY_DEF DTWAIN_GetTwainLanguageName(LONG nameId, LPTSTR szName)
     LOG_FUNC_ENTRY_PARAMS((nameId, szName))
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, -1L, FUNC_MACRO);
-    GetGenericTwainName(nameId, szName, CTL_TwainDLLHandle::GetTwainLanguageMap());
+    GetGenericTwainName(nameId, szName, CTL_StaticData::GetTwainLanguageMap());
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -124,7 +124,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainLanguageValue(LPCTSTR szName)
     LOG_FUNC_ENTRY_PARAMS((szName))
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, -1L, FUNC_MACRO);
-    const auto value = GetGenericTwainValue(szName, CTL_TwainDLLHandle::GetTwainLanguageMap());
+    const auto value = GetGenericTwainValue(szName, CTL_StaticData::GetTwainLanguageMap());
     LOG_FUNC_EXIT_PARAMS(value)
     CATCH_BLOCK(-1L)
 }

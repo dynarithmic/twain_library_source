@@ -66,9 +66,9 @@ HANDLE DLLENTRY_DEF DTWAIN_GetOCRText(DTWAIN_OCRENGINE Engine,
     if (nFlags & DTWAINOCR_RETURNHANDLE)
     {
         HANDLE theHandle;
-        const TW_MEMREF hMem = CTL_TwainDLLHandle::s_TwainMemoryFunc->AllocateMemoryPtr(localActualSize*sizeof(TCHAR), &theHandle);
+        const TW_MEMREF hMem = pHandle->m_TwainMemoryFunc->AllocateMemoryPtr(localActualSize*sizeof(TCHAR), &theHandle);
         memcpy(hMem, sText.c_str(), localActualSize*sizeof(TCHAR));
-        CTL_TwainDLLHandle::s_TwainMemoryFunc->UnlockMemory(theHandle);
+        pHandle->m_TwainMemoryFunc->UnlockMemory(theHandle);
         LOG_FUNC_EXIT_PARAMS(theHandle)
     }
     else
@@ -650,7 +650,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumOCRSupportedCaps(DTWAIN_OCRENGINE Engine, LP
     const DTWAIN_ARRAY theArray = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, static_cast<LONG>(vals.size()));
     if (!theArray)
         LOG_FUNC_EXIT_PARAMS(false)
-    auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(theArray);
+    auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(theArray);
     std::copy(vals.begin(), vals.end(), vValues.begin());
     *SupportedCaps = theArray;
     LOG_FUNC_EXIT_PARAMS(true)
@@ -934,8 +934,8 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine()
     DTWAIN_Check_Bad_Handle_Ex( pHandle, NULL, FUNC_MACRO);
 
     // Get the resource for the Twain dialog
-    const HGLOBAL hglb = LoadResource(CTL_TwainDLLHandle::s_DLLInstance,
-                                      static_cast<HRSRC>(FindResource(CTL_TwainDLLHandle::s_DLLInstance,
+    const HGLOBAL hglb = LoadResource(CTL_StaticData::s_DLLInstance,
+                                      static_cast<HRSRC>(FindResource(CTL_StaticData::s_DLLInstance,
                                                                       MAKEINTRESOURCE(10000), RT_DIALOG)));
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return  !hglb;}, DTWAIN_ERR_NULL_WINDOW, NULL, FUNC_MACRO);
 
@@ -948,7 +948,7 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine()
     S.CS.hWndParent = nullptr;
     S.nItems = 0;
     S.CS.sTitle = _T("Select OCR Engine");
-    const INT_PTR bRet = DialogBoxIndirectParam(CTL_TwainDLLHandle::s_DLLInstance,
+    const INT_PTR bRet = DialogBoxIndirectParam(CTL_StaticData::s_DLLInstance,
                                                 lpTemplate, nullptr,
                                                 reinterpret_cast<DLGPROC>(DisplayOCRDlgProc),
                                                 reinterpret_cast<LPARAM>(&S));

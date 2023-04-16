@@ -45,7 +45,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, LPLONG lpDup
             DTWAINArrayLL_RAII arr(Array);
             if ( bRet2 && Array)
             {
-                auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(Array);
+                const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+                auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
                 if ( !vValues.empty() )
                     *lpDupType = vValues.front();
             }

@@ -58,14 +58,15 @@ CTL_ITwainSession::CTL_ITwainSession(LPCTSTR pAppName,
                                    LPCTSTR lpszVersion,
                                    LPCTSTR lpszMfg,
                                    LPCTSTR lpszFamily,
-                                   LPCTSTR lpszProduct
-                                    ) : m_AppId{}, m_AppWnd{}
+                                   LPCTSTR lpszProduct) : 
+                                    m_AppId{}, m_AppWnd{}, m_pTwainDLLHandle{}, m_pSelectedSource{}
 {
     if ( pAppName )
         m_AppName = pAppName;
     if ( hAppWnd )
         m_AppWnd = *hAppWnd;
     m_bTwainWindowCreated = false;
+    SetTwainDLLHandle(static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal()));
 
     if ( !hAppWnd )
     {

@@ -54,7 +54,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
         DTWAIN_ARRAY CapArray = nullptr;
         DTWAIN_GetCapValuesEx(Source, DTWAIN_CV_CAPUICONTROLLABLE, DTWAIN_CAPGET, DTWAIN_CONTONEVALUE, &CapArray);
         DTWAINArrayLL_RAII arr(CapArray);
-        bOk = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(CapArray)[0] ? true : false;
+        bOk = pHandle->m_ArrayFactory->underlying_container_t<LONG>(CapArray)[0] ? true : false;
     }
     else
     {

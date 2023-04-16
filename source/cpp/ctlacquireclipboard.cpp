@@ -28,23 +28,28 @@
 
 using namespace dynarithmic;
 
-DTWAIN_ARRAY  DLLENTRY_DEF DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source,LONG PixelType,LONG nMaxPages,LONG nTransferMode,DTWAIN_BOOL bDiscardDibs,DTWAIN_BOOL bShowUI,DTWAIN_BOOL bCloseSource,
-                                                    LPLONG pStatus)
+DTWAIN_ARRAY  DLLENTRY_DEF DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, LONG nTransferMode, DTWAIN_BOOL bDiscardDibs, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource,
+    LPLONG pStatus)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, nTransferMode, bDiscardDibs, bShowUI, bCloseSource, pStatus))
-        SourceAcquireOptions opts = SourceAcquireOptions().setHandle(GetDTWAINHandle_Internal()).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
-                                                           setTransferMode(nTransferMode).setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).
-                                                           setAcquireType(ACQUIRECLIPBOARD).setDiscardDibs(bDiscardDibs ? true : false);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    CTL_ITwainSource* pSource = VerifySourceHandle(pHandle, Source);
+    if ( !pSource )
+        LOG_FUNC_EXIT_PARAMS(NULL)
+
+    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(GetDTWAINHandle_Internal()).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
+        setTransferMode(nTransferMode).setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).
+        setAcquireType(ACQUIRECLIPBOARD).setDiscardDibs(bDiscardDibs ? true : false);
 
     DTWAIN_ARRAY aDibs = SourceAcquire(opts);
     if (pStatus)
         *pStatus = opts.getStatus();
     if (aDibs && bDiscardDibs)
     {
-        auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+        auto& factory = pHandle->m_ArrayFactory;
         DTWAINArrayLL_RAII arrAcq(aDibs);
         auto& vValues = factory->underlying_container_t<HANDLE>(aDibs);
-        const LONG nCount = static_cast<LONG>(vValues.size()); 
+        const LONG nCount = static_cast<LONG>(vValues.size());
         for (LONG i = 0; i < nCount; i++)
         {
             DTWAIN_ARRAY aDibHandle = vValues[i];
@@ -63,10 +68,10 @@ DTWAIN_ARRAY  DLLENTRY_DEF DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source,LONG P
             for (int j = 0; j < nLastDib; j++)
             {
                 const HANDLE hDib = DTWAIN_GetAcquiredImage(aDibs, i, j);
-                if (CTL_TwainDLLHandle::s_TwainMemoryFunc->LockMemory(hDib))
+                if (pHandle->m_TwainMemoryFunc->LockMemory(hDib))
                 {
-                    CTL_TwainDLLHandle::s_TwainMemoryFunc->UnlockMemory(hDib);
-                    CTL_TwainDLLHandle::s_TwainMemoryFunc->FreeMemory(hDib);
+                    pHandle->m_TwainMemoryFunc->UnlockMemory(hDib);
+                    pHandle->m_TwainMemoryFunc->FreeMemory(hDib);
                 }
             }
         }

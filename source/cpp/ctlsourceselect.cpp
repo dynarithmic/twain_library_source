@@ -36,7 +36,7 @@ using namespace dynarithmic;
 LONG DLLENTRY_DEF DTWAIN_SetTwainDialogFont(HFONT font)
 {
     LOG_FUNC_ENTRY_PARAMS((font))
-    CTL_TwainDLLHandle::s_DialogFont = font;
+    CTL_StaticData::s_DialogFont = font;
     LOG_FUNC_EXIT_PARAMS(1)
     CATCH_BLOCK(0)
 }
@@ -204,7 +204,7 @@ DTWAIN_SOURCE dynarithmic::SourceSelect(const SourceSelectionOptions& options)
     }
 
     DTWAINArrayLL_RAII arr(pDTWAINArray);
-    const auto& vSources = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<CTL_ITwainSource*>(pDTWAINArray);
+    const auto& vSources = pHandle->m_ArrayFactory->underlying_container_t<CTL_ITwainSource*>(pDTWAINArray);
 
     if (!vSources.empty())
     {
@@ -256,8 +256,8 @@ DTWAIN_SOURCE dynarithmic::DTWAIN_LLSelectSource2(const SourceSelectionOptions& 
     LOG_FUNC_ENTRY_PARAMS((opts))
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     // Get the resource for the Twain dialog
-    const HGLOBAL hglb = LoadResource(CTL_TwainDLLHandle::s_DLLInstance,
-                                      static_cast<HRSRC>(FindResource(CTL_TwainDLLHandle::s_DLLInstance,
+    const HGLOBAL hglb = LoadResource(CTL_StaticData::s_DLLInstance,
+                                      static_cast<HRSRC>(FindResource(CTL_StaticData::s_DLLInstance,
                                                                       MAKEINTRESOURCE(10000), RT_DIALOG)));
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]{ return !hglb;}, DTWAIN_ERR_NULL_WINDOW, NULL, FUNC_MACRO);
 
@@ -297,9 +297,9 @@ DTWAIN_SOURCE dynarithmic::DTWAIN_LLSelectSource2(const SourceSelectionOptions& 
                 selectStruct.CS.mapNames.insert({ onePair.front(), onePair.back() });
         }
     }
-    if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+    if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
         CTL_TwainAppMgr::WriteLogInfoA("Displaying TWAIN Dialog...\n");
-    const INT_PTR bRet = DialogBoxIndirectParam(CTL_TwainDLLHandle::s_DLLInstance, lpTemplate, opts.hWndParent,
+    const INT_PTR bRet = DialogBoxIndirectParam(CTL_StaticData::s_DLLInstance, lpTemplate, opts.hWndParent,
                                                 reinterpret_cast<DLGPROC>(DisplayTwainDlgProc), reinterpret_cast<LPARAM>(&selectStruct));
     if ( bRet == -1 )
         LOG_FUNC_EXIT_PARAMS(NULL)
@@ -488,16 +488,16 @@ struct closeSourceRAII
 LRESULT CALLBACK DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static SelectStruct *pS;
-    bool bLogMessages = (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)?true:false;
+    bool bLogMessages = (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)?true:false;
     switch (message)
     {
         case WM_INITDIALOG:
         {
             DTWAINDeviceContextRelease_RAII contextRAII;
-            if (CTL_TwainDLLHandle::s_DialogFont)
+            if (CTL_StaticData::s_DialogFont)
             {
-                SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(CTL_TwainDLLHandle::s_DialogFont), 0);
-                EnumChildWindows(hWnd, ChildEnumFontProc, reinterpret_cast<LPARAM>(CTL_TwainDLLHandle::s_DialogFont));
+                SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(CTL_StaticData::s_DialogFont), 0);
+                EnumChildWindows(hWnd, ChildEnumFontProc, reinterpret_cast<LPARAM>(CTL_StaticData::s_DialogFont));
             }
 
             HWND lstSources;
@@ -521,8 +521,8 @@ LRESULT CALLBACK DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPA
             DTWAIN_ARRAY Array = nullptr;
             DTWAIN_EnumSources(&Array);
             DTWAINArrayLL_RAII arr(Array);
-
-            auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<CTL_ITwainSource*>(Array);
+            const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+            auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<CTL_ITwainSource*>(Array);
 
             int nCount;
             if (vValues.empty())

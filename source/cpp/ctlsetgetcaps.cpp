@@ -186,7 +186,8 @@ static DTWAIN_ARRAY performGetCap(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source,
     DTWAINArray_RAII raii(ThisArray);
 
     DTWAIN_ARRAY pDTWAINArray = ThisArray;
-    CTL_TwainDLLHandle::s_ArrayFactory->clear(pDTWAINArray);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    pHandle->m_ArrayFactory->clear(pDTWAINArray);
     int bOk = 0;
     if (lContainerType == DTWAIN_CONTONEVALUE)
     {
@@ -201,7 +202,7 @@ static DTWAIN_ARRAY performGetCap(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source,
             return nullptr;
 
         ConvertTo convValue = typename ConverterFn::Convert(dValue);
-        CTL_TwainDLLHandle::s_ArrayFactory->add_to_back(pDTWAINArray, &convValue, 1);
+        pHandle->m_ArrayFactory->add_to_back(pDTWAINArray, &convValue, 1);
     }
     else
     {
@@ -234,10 +235,10 @@ static bool performSetCap(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, TW_UINT
 {
     bool bOk = false;
     DTWAIN_ARRAY pDTWAINArray = pArray;
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     if (lSetType != DTWAIN_CAPRESET)
     {
-        auto tagType = CTL_TwainDLLHandle::s_ArrayFactory->tag_type(pArray);
-
+        auto tagType = pHandle->m_ArrayFactory->tag_type(pArray);
         const bool isArrayOk = (tagType == nDTWAIN_ArrayType);
         if (!isArrayOk && CTL_CapabilityTriplet::IsCapOperationSet(lSetType))
             return false;
@@ -253,7 +254,7 @@ static bool performSetCap(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, TW_UINT
         else
         {
             ConvertFrom lVal;
-            CTL_TwainDLLHandle::s_ArrayFactory->get_value(pDTWAINArray, 0, &lVal);
+            pHandle->m_ArrayFactory->get_value(pDTWAINArray, 0, &lVal);
             lValue = ConverterFn::convert(lVal, nullptr);
         }
 
@@ -340,9 +341,9 @@ DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap
 
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !p;}, DTWAIN_ERR_BAD_SOURCE, false, FUNC_MACRO);
 
-    bool bEnumeratorExists = CTL_TwainDLLHandle::s_ArrayFactory->is_valid(*pArray);
+    bool bEnumeratorExists = pHandle->m_ArrayFactory->is_valid(*pArray);
     if ( bEnumeratorExists )
-        CTL_TwainDLLHandle::s_ArrayFactory->clear(*pArray);
+        pHandle->m_ArrayFactory->clear(*pArray);
 
     LONG overrideDataType = nDataType;
     if ( bOverrideDataType )
@@ -437,7 +438,7 @@ DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap
     }
     arr.release();
     if ( bEnumeratorExists )
-        CTL_TwainDLLHandle::s_ArrayFactory->destroy(*pArray);
+        pHandle->m_ArrayFactory->destroy(*pArray);
     *pArray = ThisArray;
     DumpArrayContents(*pArray, lCap);
     LOG_FUNC_EXIT_PARAMS(true)
@@ -466,7 +467,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap
     {
         if ( !CTL_CapabilityTriplet::IsCapOperationReset(lSetType) )
         {
-            auto nCount = CTL_TwainDLLHandle::s_ArrayFactory->size(pArray);
+            auto nCount = pHandle->m_ArrayFactory->size(pArray);
             DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return nCount == 0; }, DTWAIN_ERR_EMPTY_ARRAY, false, FUNC_MACRO);
 
             if (nDataType == DTWAIN_DEFAULT)
@@ -809,7 +810,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDT
     {
         const size_t nCount = r.size();
         DTWAIN_ARRAY ThisArray = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, static_cast<LONG>(nCount));
-        auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(ThisArray);
+        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(ThisArray);
         std::copy(r.begin(), r.end(), vValues.begin());
         *Array = ThisArray;
         return TRUE;
@@ -1025,7 +1026,8 @@ template <typename T>
 static void genericDumper(DTWAIN_ARRAY Array)
 {
     // Get the array contents as a vector
-    auto& vCaps = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<typename T::value_type>(Array);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    auto& vCaps = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(Array);
 
     StringStreamA strm;
     size_t n;
@@ -1042,7 +1044,8 @@ static void DumpArrayLONG(DTWAIN_ARRAY Array, LONG lCap)
     else
     {
         // Get the array contents as a vector
-        const auto& vCaps = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(Array);
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        const auto& vCaps = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
 
         StringStreamA strm;
         size_t n;
@@ -1080,21 +1083,24 @@ static void DumpArrayNativeString(DTWAIN_ARRAY Array)
 
 static void DumpArrayWideString(DTWAIN_ARRAY Array)
 {
-    const auto& vCaps = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<std::wstring>(Array);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto& vCaps = pHandle->m_ArrayFactory->underlying_container_t<std::wstring>(Array);
     for (auto& str : vCaps)
         CTL_TwainAppMgr::WriteLogInfoW(str + UnicodeStringTraits::CharToThisType('\n'));
 }
 
 static void DumpArrayAnsiString(DTWAIN_ARRAY Array)
 {
-    const auto& vCaps = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<std::string>(Array);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto& vCaps = pHandle->m_ArrayFactory->underlying_container_t<std::string>(Array);
     for (auto& str : vCaps)
         CTL_TwainAppMgr::WriteLogInfoA(str + ANSIStringTraits::CharToThisType('\n'));
 }
 
 static void DumpArrayFrame(DTWAIN_ARRAY Array)
 {
-    const auto& vCaps = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<TwainFrameInternal>(Array);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto& vCaps = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(Array);
     size_t n;
     CTL_StringStreamType strm;
     std::for_each(vCaps.begin(), vCaps.end(), StreamerImplFrame(&strm, &n));
@@ -1103,7 +1109,7 @@ static void DumpArrayFrame(DTWAIN_ARRAY Array)
 
 void dynarithmic::DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap)
 {
-    if ( !(CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS ))
+    if ( !(CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS ))
         return;
 
     std::string szBuf;
@@ -1121,7 +1127,8 @@ void dynarithmic::DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap)
             }
         }
 
-        const LONG nCount = static_cast<LONG>(CTL_TwainDLLHandle::s_ArrayFactory->size(Array));
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        const LONG nCount = static_cast<LONG>(pHandle->m_ArrayFactory->size(Array));
         StringStreamA strm;
         if ( nCount < 0 )
         {
@@ -1212,9 +1219,10 @@ int GetMultiCapValues(DTWAIN_HANDLE DLLHandle,
     {
         DTWAIN_FRAME DTWAINFrame = DTWAIN_FrameCreate(0, 0, 0, 0);
         DTWAINFrame_RAII raii(DTWAINFrame);
-        auto& FrameV = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<TW_FRAME>(FrameArray);
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        auto& FrameV = pHandle->m_ArrayFactory->underlying_container_t<TW_FRAME>(FrameArray);
         TWFRAMEToDTWAINFRAME(FrameV[i], DTWAINFrame);
-        CTL_TwainDLLHandle::s_ArrayFactory->add_to_back(pArray, &DTWAINFrame, 1);
+        pHandle->m_ArrayFactory->add_to_back(pArray, &DTWAINFrame, 1);
     }
     return 1;
 }

@@ -44,7 +44,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJobControl(DTWAIN_SOURCE Source, LONG JobCont
         LOG_FUNC_EXIT_PARAMS(false)
     DTWAINArrayLL_RAII a(Array);
 
-    auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(Array);
+    auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
     vValues[0] = JobControl;
 
     const DTWAIN_BOOL bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPJOBCONTROL, SetType, Array );
@@ -67,7 +67,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsJobControlSupported(DTWAIN_SOURCE Source, LONG
     if ( DTWAIN_EnumJobControls(Source, &Array) )
     {
         DTWAINArrayLL_RAII raii(Array);
-        auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(Array);
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
         const LONG lCount = static_cast<LONG>(vValues.size());
         if ( lCount < 1 )
             LOG_FUNC_EXIT_PARAMS(false)

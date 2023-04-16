@@ -28,6 +28,8 @@
 #include "dtwain_verinfo.h"
 #include "dtwstrfn.h"
 #include "ctldefsource.h"
+#include "resamplefactory.h"
+
 using namespace dynarithmic;
 
 #ifdef TWAINSAVE_STATIC
@@ -50,13 +52,60 @@ namespace dynarithmic
         return true;
     }
 
+    static std::vector<std::pair<uint16_t, uint16_t>> parseBracketedPairs(std::string bracketedPairs)
+    {
+        std::vector<std::pair<uint16_t, uint16_t>> retVal;
+        auto pos = 0;
+        while (true)
+        {
+            pos = bracketedPairs.find_first_of('[');
+            if (pos != std::string::npos)
+            {
+                auto pos2 = bracketedPairs.find_first_of(']', pos + 1);
+                if (pos2 != std::string::npos)
+                {
+                    std::string subPair = bracketedPairs.substr(pos + 1, pos2 - pos - 1);
+                    StringWrapperA::TrimAll(subPair);
+                    if (StringWrapperA::IsEmpty(subPair))
+                        break;
+                    std::istringstream strm(subPair);
+                    uint16_t firstNum, secondNum;
+                    strm >> firstNum >> secondNum;
+                    retVal.push_back({ firstNum, secondNum });
+                    bracketedPairs.erase(bracketedPairs.begin(), bracketedPairs.begin() + pos2 + 1);
+                }
+            }
+            else
+                break;
+        }
+        return retVal;
+    }
+
+    static std::vector<uint16_t> parseBracketedNumberList(std::string bracketedList)
+    {
+        std::vector<uint16_t> retVal;
+        auto pos = bracketedList.find_first_of('[');
+        if (pos == std::string::npos)
+            return retVal;
+        auto pos2 = bracketedList.find_first_of(']', pos + 1);
+        if (pos2 == std::string::npos)
+            return retVal;
+        bracketedList.erase(bracketedList.begin() + pos2);
+        bracketedList.erase(bracketedList.begin() + pos);
+        std::istringstream strm(bracketedList);
+        uint16_t num;
+        while (strm >> num)
+            retVal.push_back(num);
+        return retVal;
+    }
+
     static CTL_StringType createResourceFileName(LPCTSTR resName)
     {
         CTL_StringType sPath;
-        if ( CTL_TwainDLLHandle::s_strResourcePath.empty())
+        if ( CTL_StaticData::GetResourcePath().empty())
             sPath = GetDTWAINExecutionPath();
         else
-            sPath = StringWrapper::RemoveBackslashFromDirectory(CTL_TwainDLLHandle::s_strResourcePath);
+            sPath = StringWrapper::RemoveBackslashFromDirectory(CTL_StaticData::GetResourcePath());
         sPath = StringWrapper::AddBackslashToDirectory(sPath);
         return sPath + resName;
     }
@@ -81,6 +130,10 @@ namespace dynarithmic
         if (!retValue.first || !retValue.second)
             return false;
 
+        // Read in warning
+        std::string sWarning;
+        std::getline(ifs, sWarning);
+
         while (ifs >> dg >> dat >> msg >> structtype >> retcode >> successcode)
         {
             if (dg == -1000 && dat == -1000)
@@ -90,7 +143,7 @@ namespace dynarithmic
             ErrorStruct.SetDataType(structtype);
             ErrorStruct.SetFailureCodes(retcode);
             ErrorStruct.SetSuccessCodes(successcode);
-            CTL_TwainDLLHandle::s_mapGeneralErrorInfo.insert({ structKey, ErrorStruct });
+            CTL_StaticData::s_mapGeneralErrorInfo.insert({ structKey, ErrorStruct });
         }
 
         // Load the TWAIN data resources
@@ -101,12 +154,12 @@ namespace dynarithmic
         {
             if (resourceID == -1000 && twainID == -1000)
                 break;
-            CTL_TwainDLLHandle::s_TwainNameMap.insert({ { resourceID,twainID }, twainName });
+            CTL_StaticData::s_TwainNameMap.insert({ { resourceID,twainID }, twainName });
         }
 
-        if (!load2valueMap(ifs, CTL_TwainDLLHandle::GetTwainLanguageMap()))
+        if (!load2valueMap(ifs, CTL_StaticData::GetTwainLanguageMap()))
             return false;
-        if (!load2valueMap(ifs, CTL_TwainDLLHandle::GetTwainCountryMap()))
+        if (!load2valueMap(ifs, CTL_StaticData::GetTwainCountryMap()))
             return false;
 
         decltype(CTL_CapStruct::m_strCapName) capName;
@@ -124,7 +177,7 @@ namespace dynarithmic
             cStruct.m_nGetContainer = capGet;
             cStruct.m_nSetContainer = capSet;
             cStruct.m_strCapName = capName;
-            CTL_TwainDLLHandle::s_mapGeneralCapInfo.insert({ static_cast<TW_UINT16>(lCap), cStruct });
+            CTL_StaticData::GetGeneralCapInfo().insert({ static_cast<TW_UINT16>(lCap), cStruct });
         }
 
         auto& bppMap = CTL_ImageIOHandler::GetSupportedBPPMap();
@@ -141,7 +194,7 @@ namespace dynarithmic
                 bppMap.insert({ imgType, std::vector<int>() }).first->second.push_back(bppValue);
         }
 
-        auto& mediamap = CTL_TwainDLLHandle::GetPDFMediaMap();
+        auto& mediamap = CTL_StaticData::GetPDFMediaMap();
         while (std::getline(ifs, line))
         {
             StringStreamInA strm(line);
@@ -159,7 +212,7 @@ namespace dynarithmic
         }
 
         // Read in the list of available file types.
-        auto& availableFileMap = CTL_TwainDLLHandle::GetAvailableFileFormatsMap();
+        auto& availableFileMap = CTL_StaticData::GetAvailableFileFormatsMap();
         while (std::getline(ifs, line))
         {
             StringStreamInA strm(line);
@@ -178,10 +231,9 @@ namespace dynarithmic
         }
 
         // Read in the TWAIN constants
-        auto& constantsMap = CTL_TwainDLLHandle::GetTwainConstantsMap();
+        auto& constantsMap = CTL_StaticData::GetTwainConstantsMap();
         for ( int constantVal = 0; constantVal < CTL_TwainDLLHandle::NumTwainMapValues; ++constantVal)
         { 
-            // Read in the pixel type constants
             auto iter = constantsMap.insert({constantVal, {}}).first;
             while (std::getline(ifs, line))
             {
@@ -194,6 +246,73 @@ namespace dynarithmic
                 strm >> name;
                 name = StringWrapperA::TrimAll(name);
                 iter->second.insert({twainValue, name});
+            }
+        }
+
+        // Read in the image resampling data
+        auto& imageMap = CTL_StaticData::GetImageResamplerMap();
+        imageMap.clear();
+        std::string sImageConstants, sImageName, sNoResampleVals, sResampleVals;
+        std::string totalLine;
+        while (std::getline(ifs, totalLine))
+        {
+            // break up the line into the 4 components
+            // image constants
+            if (totalLine.compare(0, 3, "END") == 0)
+                break;
+            auto pos = totalLine.find_first_of('[');
+            if (pos == std::string::npos)
+                break;
+            auto pos2 = totalLine.find_first_of(']', pos + 1);
+            if (pos2 == std::string::npos)
+                break;
+            std::string imageConstants = totalLine.substr(pos, pos2 - pos + 1);
+            auto vImageConstants = parseBracketedNumberList(imageConstants);
+
+            // Get the image name
+            totalLine.erase(totalLine.begin(), totalLine.begin() + pos2 + 1);
+            pos = totalLine.find_first_of('[');
+            if (pos == std::string::npos)
+                break;
+            std::string sImageTypeName = totalLine.substr(0, pos);
+            StringWrapperA::TrimAll(sImageTypeName);
+
+            // Get the bits-per-pixel that are "good"
+            totalLine.erase(totalLine.begin(), totalLine.begin() + pos);
+            pos = totalLine.find_first_of('[');
+            if (pos == std::string::npos)
+                break;
+            pos2 = totalLine.find_first_of(']', pos + 1);
+            if (pos2 == std::string::npos)
+                break;
+            std::string sgoodBits = totalLine.substr(pos, pos2 - pos + 1);
+            auto vGoodBits = parseBracketedNumberList(sgoodBits);
+
+            // Get the resample to-from information
+            totalLine.erase(totalLine.begin(), totalLine.begin() + pos2 + 1);
+            pos = totalLine.find_first_of('[');
+            if (pos == std::string::npos)
+                break;
+            pos2 = totalLine.find_last_of(']');
+            if (pos2 == std::string::npos)
+                break;
+            std::string sBracketList = totalLine.substr(pos, pos2 - pos + 1);
+            pos = sBracketList.find_first_of('[', 1);
+            if (pos == std::string::npos)
+                break;
+            sBracketList.pop_back();
+            sBracketList = sBracketList.substr(pos);
+            auto vResampleData = parseBracketedPairs(sBracketList);
+
+            // Add data to resample image map
+            for (auto c : vImageConstants)
+            {
+                auto iter = imageMap.insert({ c, {} }).first;
+                auto& imgNode = iter->second;
+                imgNode.m_sImageType = sImageTypeName;
+                imgNode.m_vNoSamples = vGoodBits;
+                for (auto& pr : vResampleData)
+                    imgNode.m_mapFromTo.insert(pr);
             }
         }
         LOG_FUNC_EXIT_PARAMS(true)
@@ -216,14 +335,24 @@ namespace dynarithmic
 
     size_t GetResourceStringA(UINT nError, LPSTR buffer, LONG bufSize)
     {
-        const auto found = CTL_TwainDLLHandle::s_ResourceStrings.find(nError);
-        if (found != CTL_TwainDLLHandle::s_ResourceStrings.end())
-            return StringWrapperA::CopyInfoToCString(found->second, buffer, bufSize);
-        return 0;
+        return StringWrapperA::CopyInfoToCString(GetResourceStringFromMap(nError), buffer, bufSize);
+    }
+
+    std::string GetResourceStringFromMap(LONG nError)
+    {
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        if (pHandle)
+        {
+            const auto found = pHandle->m_mapResourceStrings.find(nError);
+            if (found != pHandle->m_mapResourceStrings.end())
+                return found->second;
+        }
+        return {};
     }
 
     static bool LoadLanguageResourceFromFileA(const std::string& sPath, bool clearEntry)
     {
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
         std::string::value_type sVersion[100];
         DTWAIN_GetShortVersionStringA(sVersion, 100);
         std::ifstream ifs(sPath);
@@ -233,7 +362,7 @@ namespace dynarithmic
             std::string descr;
             int resourceID;
             if ( clearEntry )
-                CTL_TwainDLLHandle::s_ResourceStrings.clear();
+                pHandle->m_mapResourceStrings.clear();
             open = true;
             std::string line;
             while (getline(ifs, line))
@@ -246,7 +375,7 @@ namespace dynarithmic
                     descr = StringWrapperA::ReplaceAll(descr, "{short_version}", sVersion);
                     descr = StringWrapperA::ReplaceAll(descr, "{company_name}", DTWAIN_VERINFO_COMPANYNAME);
                     descr = StringWrapperA::ReplaceAll(descr, "{copyright}", DTWAIN_VERINFO_LEGALCOPYRIGHT);
-                    CTL_TwainDLLHandle::s_ResourceStrings.insert({ resourceID, descr });
+                    pHandle->m_mapResourceStrings.insert({ resourceID, descr });
                 }
             }
         }
@@ -300,19 +429,17 @@ namespace dynarithmic
         {
             return false;
         }
-        if ( LoadLanguageResourceXMLImpl(sLangDLL) )
-            CTL_TwainDLLHandle::s_UsingCustomResource = true;
         return true;
     }
 
     void UnloadStringResources()
     {
-        CTL_TwainDLLHandle::s_mapGeneralCapInfo.clear();
+        CTL_StaticData::s_mapGeneralCapInfo.clear();
     }
 
     void UnloadErrorResources()
     {
-        CTL_TwainDLLHandle::s_mapGeneralErrorInfo.clear();
+        CTL_StaticData::s_mapGeneralErrorInfo.clear();
     }
 
     /////////////////////////////////////////////////////////////////////

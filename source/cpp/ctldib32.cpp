@@ -279,11 +279,10 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
         case TextFormat:
         case TextFormatMulti:
         {
-            auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
-
             // Get the current OCR engine's input format
             DTWAIN_ARRAY a = nullptr;
             const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+            auto& factory = pHandle->m_ArrayFactory;
             DTWAIN_GetOCRCapValues(static_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine.get()), DTWAIN_OCRCV_IMAGEFILEFORMAT,
                                     DTWAIN_CAPGETCURRENT, &a);
             DTWAINArrayLL_RAII raii(a);
@@ -370,7 +369,7 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
             DTWAINArrayLL_RAII raii(a);
             if ( a )
             {
-                const auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(a);
+                const auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(a);
                 if ( !vValues.empty() )
                 {
                     LONG InputFormat = vValues[0];
