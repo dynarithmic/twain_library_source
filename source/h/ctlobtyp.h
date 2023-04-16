@@ -24,14 +24,16 @@
 #include <memory>
 #include "ctlobstr.h"
 #include "twain.h"
+
 ////////////////////////////////////////////////////////////////////////////
 namespace dynarithmic
 {
+    class CTL_TwainDLLHandle;
     class CTL_TwainTypeOb
     {
         public:
              // Set equal to twain type
-             CTL_TwainTypeOb( TW_UINT16 nType, bool bGetTypeSize=true);
+             CTL_TwainTypeOb( CTL_TwainDLLHandle* pHandle, TW_UINT16 nType, bool bGetTypeSize=true);
              virtual ~CTL_TwainTypeOb();
              CTL_TwainTypeOb(CTL_TwainTypeOb& rhs) = delete;
              CTL_TwainTypeOb(CTL_TwainTypeOb&& rhs) noexcept;
@@ -67,6 +69,7 @@ namespace dynarithmic
              int        m_nSize;
              TW_UINT16  m_nType;
              void *m_pData;
+             CTL_TwainDLLHandle* m_pDLLHandle;
              HGLOBAL    m_hGlobal;
     };
 

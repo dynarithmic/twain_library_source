@@ -42,7 +42,7 @@ namespace dynarithmic
             Handle->m_lLastError = Err;
             CTL_TwainAppMgr::SetError(Err, extraInfo);
             OutputDTWAINErrorA(Handle, fnName);
-            if (logError && CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK)
+            if (logError && CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK)
             {
                 CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(fnName, LOG_INDENT_OUT) +
                     ParamOutputter("", true).outputParam(retErr).getString());
@@ -92,7 +92,7 @@ namespace dynarithmic
     template <typename RetType>
     void DTWAIN_Check_Bad_Handle_Ex(CTL_TwainDLLHandle* pHandle, RetType retErr, const std::string::value_type* fnName)
     {
-        if (CTL_TwainDLLHandle::s_bCheckHandles && !IsDLLHandleValid(pHandle, false))
+        if (CTL_StaticData::IsCheckHandles() && !IsDLLHandleValid(pHandle, false))
         {
             OutputDTWAINErrorA(nullptr, fnName);
             throw retErr;

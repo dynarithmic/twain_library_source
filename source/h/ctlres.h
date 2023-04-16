@@ -42,5 +42,6 @@ namespace dynarithmic
     std::vector<std::string> GetLangResourceNames();
     std::string GetResourceFileNameA(LPCSTR lpszName, LPCTSTR szPrefix);
     std::string GetCustomResourceFileNameA(LPCSTR lpszName);
+    std::string GetResourceStringFromMap(LONG resourceNum);
 }
 #endif

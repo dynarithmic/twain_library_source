@@ -46,6 +46,7 @@
 #include <boost/variant2/variant.hpp>
 
 #include "../tsl/ordered_map.h"*/
+#include <mutex>
 #include "ctltrp.h"
 #include "dtwain_raii.h"
 #include "ocrinterface.h"
@@ -219,10 +220,8 @@ namespace dynarithmic
                              UINT                /* Container for Get Default  */
                              > CTL_CapInfo;
 
-    typedef CTL_ClassValues7<DWORD, HHOOK, HHOOK, CTL_TwainDLLHandle*, bool,char,char>  CTL_HookInfo;
-
+    typedef std::unordered_map<unsigned long, std::shared_ptr<CTL_TwainDLLHandle>> CTL_MapThreadToDLLHandle;
     typedef std::unordered_map<LONG, int> CTL_LongToIntMap;
-//    typedef std::unordered_map<std::pair<int, int>, std::string, boost::hash<std::pair<int, int>>> CTL_TwainNameMap;
     typedef BiDirectionalMap<std::pair<int, int>, std::string> CTL_TwainNameMap;
     typedef std::unordered_map<CTL_StringType, CTL_ITwainSource*> CTL_StringToSourcePtrMap;
     typedef std::unordered_map<CTL_StringType, int> CTL_StringToIntMap;
@@ -233,8 +232,7 @@ namespace dynarithmic
     typedef std::unordered_map<LONG, CTL_StringType> CTL_StringToLongMap;
     typedef std::unordered_map<LONG, std::string> CTL_LongToStringMap;
     typedef std::unordered_map<LONG, std::vector<LONG> > CTL_LongToVectorLongMap;
-    typedef std::vector<CTL_HookInfo>     CTL_HookInfoArray;
-    typedef std::unordered_map<LONG, std::string> CTL_TwainLongToStringMap;
+    typedef std::vector<CTL_MapThreadToDLLHandle>     CTL_HookInfoArray;
 
     // Create these dynamically whenever a new source is opened
     // and source cap info does not exist.  Add cap info statically.
@@ -450,125 +448,120 @@ namespace dynarithmic
             void      UnlockMemory(TW_HANDLE h) override { if (h) m_EntryPoint.DSM_MemUnlock(h); }
     };
 
-#if 0
-    class TwainMessageLoopImpl
+    struct FileFormatNode
     {
-        private:
-            CTL_TwainDLLHandle* m_pDLLHandle;
-            SourceAcquireOptions sOpts;
-
-        protected:
-            virtual bool IsSourceOpen(CTL_ITwainSource* pSource, bool bUIOnly);
-            bool IsAcquireTerminated(CTL_ITwainSource* pSource, bool bUIOnly);
-            virtual bool CanEnterDispatch(MSG * /*pMsg*/) { return true; }
-
-        public:
-            TwainMessageLoopImpl(CTL_TwainDLLHandle* pHandle) : m_pDLLHandle(pHandle) {}
-            TwainMessageLoopImpl(const TwainMessageLoopImpl&) = delete;
-            TwainMessageLoopImpl& operator=(const TwainMessageLoopImpl&) = delete;
-            TwainMessageLoopImpl(TwainMessageLoopImpl&& rhs) noexcept :
-                    m_pDLLHandle(rhs.m_pDLLHandle) { rhs.m_pDLLHandle = nullptr; }
-            TwainMessageLoopImpl& operator=(TwainMessageLoopImpl&& rhs) = delete;
-
-            virtual ~TwainMessageLoopImpl() = default;
-            virtual void PrepareLoop() {}
-            virtual void PerformMessageLoop(CTL_ITwainSource * /*pSource*/, bool /*bUIOnly*/) {}
+        std::string m_formatName;
+        std::vector<std::string> m_vExtensions;
+        FileFormatNode(std::string name, std::vector<std::string> vExt) :
+            m_formatName(std::move(name)), m_vExtensions(std::move(vExt)) {}
     };
 
-    class TwainMessageLoopWindowsImpl : public TwainMessageLoopImpl
+    struct ImageResamplerData
     {
-        public:
-            TwainMessageLoopWindowsImpl(CTL_TwainDLLHandle* pHandle) : TwainMessageLoopImpl(pHandle) {}
-            void PrepareLoop() override
-            {
-            #ifdef WIN32
-                MSG msg;
-                // Call this so that we have a queue to deal with
-                PeekMessage(&msg, nullptr, WM_USER, WM_USER, PM_NOREMOVE);
-            #endif
-            }
-
-            void PerformMessageLoop(CTL_ITwainSource *pSource, bool bUIOnly) override;
+        std::string m_sImageType;
+        std::vector<uint16_t> m_vNoSamples;
+        std::map<uint16_t, uint16_t> m_mapFromTo;
     };
 
-    class TwainMessageLoopV1 : public TwainMessageLoopWindowsImpl
+    typedef std::map<int, ImageResamplerData> ImageResamplerMap;
+    typedef std::unordered_map<LONG, std::pair<std::string, std::string>> CTL_PDFMediaMap;
+    typedef tsl::ordered_map<LONG, FileFormatNode> CTL_AvailableFileFormatsMap;
+    typedef tsl::ordered_map<LONG, std::string> CTL_TwainConstantToStringMapNode;
+    typedef std::unordered_map<LONG, CTL_TwainConstantToStringMapNode> CTL_TwainConstantsMap;
+    typedef std::unordered_map<LONG, std::string> CTL_TwainLongToStringMap;
+    typedef std::unordered_map<int32_t, std::string> CTL_ErrorToExtraInfoMap;
+    typedef std::unordered_map<std::string, unsigned long> CTL_ThreadMap;
+
+    struct CTL_StaticData
     {
-        public:
-            TwainMessageLoopV1(CTL_TwainDLLHandle* pHandle) : TwainMessageLoopWindowsImpl(pHandle) {}
-            bool CanEnterDispatch(MSG *pMsg) override { return !DTWAIN_IsTwainMsg(pMsg); }
+        static CTL_PDFMediaMap          s_PDFMediaMap;
+        static CTL_TwainLongToStringMap s_TwainCountryMap;
+        static CTL_TwainNameMap         s_TwainNameMap;
+        static CTL_AvailableFileFormatsMap s_AvailableFileFormatsMap;
+        static CTL_TwainConstantsMap s_TwainConstantsMap;
+        static CTL_TwainLongToStringMap s_TwainLanguageMap;
+        static bool s_bCheckHandles;
+        static CTL_StringType  s_strResourcePath;  // path to the DTWAIN resource strings
+        static CTL_StringType           s_DLLPath;
+        static CTL_StringType           s_sINIPath;
+        static bool                     s_multipleThreads;
+        static CTL_LongToStringMap      s_ErrorCodes;
+        static CTL_StringType           s_VersionString;
+        static HFONT                    s_DialogFont;
+        static CTL_ErrorToExtraInfoMap  s_mapExtraErrorInfo;
+        static CTL_GeneralCapInfo       s_mapGeneralCapInfo;
+        static LONG                     s_nRegisteredDTWAINMsg;
+        static std::mutex               s_mutexInitDestroy;
+        static CTL_MapThreadToDLLHandle s_mapThreadToDLLHandle;
+        static CTL_ThreadMap            s_ThreadMap;
+        static bool                     s_bThrowExceptions;
+        static HINSTANCE                s_DLLInstance;
+        static std::unordered_set<HWND> s_appWindowsToDisable;
+        static CTL_CallbackProcArray    s_aAllCallbacks;
+        static CTL_StringType           s_strLangResourcePath;
+        static CTL_GeneralErrorInfo     s_mapGeneralErrorInfo;
+        static long                     s_lErrorFilterFlags;
+        static CLogSystem               s_appLog;
+        static UINT_PTR                 s_nTimeoutID;
+        static UINT                     s_nTimeoutMilliseconds;
+        static bool                     s_bTimerIDSet;
+        static bool                     s_ResourcesInitialized;
+        static ImageResamplerMap        s_ImageResamplerMap;
+
+        static CTL_PDFMediaMap& GetPDFMediaMap() { return s_PDFMediaMap; }
+        static CTL_TwainLongToStringMap& GetTwainCountryMap() { return s_TwainCountryMap; }
+        static CTL_TwainNameMap& GetTwainNameMap() { return s_TwainNameMap; }
+        static std::string GetTwainNameFromResource(int nWhichResourceID, int nWhichItem);
+        static CTL_AvailableFileFormatsMap& GetAvailableFileFormatsMap() { return s_AvailableFileFormatsMap; }
+        static CTL_TwainConstantsMap& GetTwainConstantsMap() { return s_TwainConstantsMap; }
+        static CTL_TwainConstantToStringMapNode& GetTwainConstantsStrings(LONG nWhich) { return s_TwainConstantsMap[nWhich]; }
+        static CTL_TwainLongToStringMap& GetTwainLanguageMap() { return s_TwainLanguageMap; }
+        static bool IsCheckHandles() { return s_bCheckHandles; }
+        static int GetIDFromTwainName(std::string sName);
+        static int GetDGResourceID() { return 8890; }
+        static int GetDATResourceID() { return 8891; }
+        static int GetMSGResourceID() { return 8892; }
+        static CTL_StringType& GetResourcePath() { return s_strResourcePath; }
+        static CTL_StringType& GetDLLPath() { return s_DLLPath; }
+        static CTL_StringType& GetINIPath() { return s_sINIPath; }
+        static bool IsUsingMultipleThreads() { return s_multipleThreads; }
+        static CTL_LongToStringMap& GetErrorCodes() { return s_ErrorCodes; }
+        static CTL_GeneralCapInfo& GetGeneralCapInfo() { return s_mapGeneralCapInfo; }
+        static HINSTANCE GetDLLInstanceHandle() { return s_DLLInstance; }
+        static CTL_GeneralErrorInfo& GetGeneralErrorInfo() { return s_mapGeneralErrorInfo; }
+        static long GetErrorFilterFlags() { return s_lErrorFilterFlags; }
+        static ImageResamplerMap& GetImageResamplerMap() { return s_ImageResamplerMap; }
     };
 
-    class TwainMessageLoopV2 : public TwainMessageLoopWindowsImpl
+    struct CTL_LoggerCallbackInfo
     {
-        public:
-            static std::queue<MSG> s_MessageQueue;
-
-            static TW_UINT16 TW_CALLINGSTYLE TwainVersion2MsgProc(
-                pTW_IDENTITY pOrigin,
-                pTW_IDENTITY pDest,
-                TW_UINT32 DG_,
-                TW_UINT16 DAT_,
-                TW_UINT16 MSG_,
-                TW_MEMREF pData
-                );
-
-            TwainMessageLoopV2(CTL_TwainDLLHandle* pHandle) : TwainMessageLoopWindowsImpl(pHandle) {}
-            void PrepareLoop() override
-            {
-                // remove elements from the queue
-                std::queue<MSG> empty;
-                std::swap(s_MessageQueue, empty);
-            }
-
-            bool IsSourceOpen(CTL_ITwainSource* pSource, bool bUIOnly) override;
-            bool CanEnterDispatch(MSG *pMsg) override { return !DTWAIN_IsTwainMsg(pMsg); }
+        DTWAIN_LOGGER_PROC  m_pLoggerCallback = nullptr;
+        DTWAIN_LOGGER_PROCA  m_pLoggerCallbackA = nullptr;
+        DTWAIN_LOGGER_PROCW  m_pLoggerCallbackW = nullptr;
+        DTWAIN_LONG64  m_pLoggerCallback_UserData = 0;
+        DTWAIN_LONG64  m_pLoggerCallback_UserDataA = 0;
+        DTWAIN_LONG64  m_pLoggerCallback_UserDataW = 0;
     };
-#endif
+
     class CTL_TwainDLLHandle
     {
         public:
             static constexpr int NumTwainMapValues = DTWAIN_CONSTANT_LAST;
 
-            struct FileFormatNode
-            {
-                std::string m_formatName;
-                std::vector<std::string> m_vExtensions;
-                FileFormatNode(std::string name, std::vector<std::string> vExt) :
-                                m_formatName(std::move(name)), m_vExtensions(std::move(vExt)) {}
-            };
-
-            typedef tsl::ordered_map<LONG, std::string> CTL_TwainConstantToStringMapNode;
-            typedef std::unordered_map<LONG, CTL_TwainConstantToStringMapNode> CTL_TwainConstantsMap;
-            typedef std::unordered_map<LONG, std::pair<std::string, std::string>> CTL_PDFMediaMap;
-            typedef tsl::ordered_map<LONG, FileFormatNode> CTL_AvailableFileFormatsMap;
-            typedef std::unordered_map<int32_t, std::string> CTL_ErrorToExtraInfoMap;
-            
             CTL_TwainDLLHandle();
-            ~CTL_TwainDLLHandle();
+            ~CTL_TwainDLLHandle() = default;
             static void    NotifyWindows( UINT nMsg, WPARAM wParam, LPARAM lParam );
-            static void    RemoveAllEnumerators();
+            void    RemoveAllEnumerators();
             void    RemoveAllSourceCapInfo();
             void    RemoveAllSourceMaps();
             void    InitializeResourceRegistry();
             std::pair<CTL_ResourceRegistryMap::iterator, bool> AddResourceToRegistry(LPCSTR pLangDLL);
             CTL_ResourceRegistryMap& GetResourceRegistry() { return m_ResourceRegistry; }
-            static CTL_TwainLongToStringMap& GetTwainCountryMap() { return s_TwainCountryMap;  }
-            static CTL_TwainLongToStringMap& GetTwainLanguageMap() { return s_TwainLanguageMap; }
             CTL_StringType GetVersionString() const { return  m_VersionString; }
             void        SetVersionString(CTL_StringType s) { m_VersionString = std::move(s); }
 
-            static DTWAIN_ACQUIRE     GetNewAcquireNum();
-            static void             EraseAcquireNum(DTWAIN_ACQUIRE nNum);
-            static std::string      GetTwainNameFromResource(int nWhichResourceID, int nWhichItem);
-            static int              GetIDFromTwainName(std::string sName);
-            static int              GetDGResourceID()  { return 8890; }
-            static int              GetDATResourceID() { return 8891; }
-            static int              GetMSGResourceID() { return 8892; }
-            static long             GetErrorFilterFlags() { return s_lErrorFilterFlags; }
-            static CTL_PDFMediaMap& GetPDFMediaMap() { return s_PDFMediaMap; }
-            static CTL_AvailableFileFormatsMap& GetAvailableFileFormatsMap() { return s_AvailableFileFormatsMap; }
-            static CTL_TwainConstantsMap& GetTwainConstantsMap() { return s_TwainConstantsMap; }
-            static CTL_TwainConstantToStringMapNode& GetTwainConstantsStrings(LONG nWhich) { return s_TwainConstantsMap[nWhich]; }
+            DTWAIN_ACQUIRE          GetNewAcquireNum();
+            void                    EraseAcquireNum(DTWAIN_ACQUIRE nNum);
 
             CTL_TwainAppMgr* m_pAppMgr;
 
@@ -611,7 +604,9 @@ namespace dynarithmic
             CTL_StringType   m_strLibraryPath;   // path to the DTWAIN Library being used
             CTL_StringType   m_sWindowsVersionInfo; // Windows version information, cached.
             CTL_StringType   m_strDefaultSource; // Current default TWAIN source
-            static CTL_StringType   s_strResourcePath;  // path to the DTWAIN resource strings
+            CTL_LongToStringMap  m_mapResourceStrings;
+            CTL_LoggerCallbackInfo m_LoggerCallbackInfo;
+
             HINSTANCE           m_hInstance;
             HWND                m_hWndTwain;
             HWND                m_hNotifyWnd;
@@ -632,27 +627,20 @@ namespace dynarithmic
             bool                m_nSourceCloseMode;
             int                 m_nUIMode;
             bool                m_bNotificationsUsed;
+            std::deque<int>     m_vErrorBuffer;
+            unsigned int        m_nErrorBufferThreshold = 50;
+            unsigned int        m_nErrorBufferReserve = 1000;
             DTWAIN_CALLBACK_PROC m_pCallbackFn;
             DTWAIN_CALLBACK_PROC64 m_pCallbackFn64;
             DTWAIN_ERROR_PROC   m_pErrorProcFn;
             DTWAIN_ERROR_PROC64 m_pErrorProcFn64;
             LONG                m_lErrorProcUserData;
             LONG64              m_lErrorProcUserData64;
-            static DTWAIN_LOGGER_PROC  s_pLoggerCallback;
-            static DTWAIN_LOGGER_PROCA  s_pLoggerCallbackA;
-            static DTWAIN_LOGGER_PROCW  s_pLoggerCallbackW;
-            static DTWAIN_LONG64  s_pLoggerCallback_UserData;
-            static DTWAIN_LONG64  s_pLoggerCallback_UserDataA;
-            static DTWAIN_LONG64  s_pLoggerCallback_UserDataW;
             LONG                m_lCallbackData;
             LONGLONG            m_lCallbackData64;
-            CTL_ITwainSource*   m_pDummySource;
             OCRInterfaceContainer m_OCRInterfaceArray;
             OCRProductNameToEngineMap m_OCRProdNameToEngine;
             OCREnginePtr          m_pOCRDefaultEngine;
-            static CTL_PDFMediaMap s_PDFMediaMap;
-            static CTL_AvailableFileFormatsMap s_AvailableFileFormatsMap;
-            static CTL_TwainConstantsMap s_TwainConstantsMap;
             std::set<CTL_TwainTriplet::TwainTripletComponents> m_setLogFilterComponents;
 
             // File Save As information
@@ -667,83 +655,21 @@ namespace dynarithmic
             bool                m_bUseProxy;
             CTL_SourceCapInfoArray   m_aSourceCapInfo;
             CTL_StringToSourcePtrMap       m_mapStringToSource;
-            static CTL_TwainNameMap    s_TwainNameMap;
-            static CTL_TwainLongToStringMap s_TwainCountryMap;
-            static CTL_TwainLongToStringMap s_TwainLanguageMap;
-
-            static HINSTANCE         s_DLLInstance;
-
-            // static arrays
-            static bool                     s_ResourcesInitialized;
-            static std::vector<CTL_TwainDLLHandlePtr> s_DLLHandles;
-            static std::unordered_set<DTWAIN_SOURCE> s_aFeederSources;
-            static CTL_HookInfoArray        s_aHookInfo;
-            static std::vector<LONG_PTR>    s_aAcquireNum;
-            static bool                     s_bCheckReentrancy;
-            static CTL_GeneralCapInfo       s_mapGeneralCapInfo;
-            static CTL_GeneralErrorInfo     s_mapGeneralErrorInfo;
-            static CTL_ErrorToExtraInfoMap  s_mapExtraErrorInfo;
-            static short int                s_nDSMState;
-            static int                      s_nDSMVersion;
-            static long                     s_lErrorFilterFlags;
-            static bool                     s_bProcessError;
-            static CLogSystem               s_appLog;
-            static LONG                     s_nRegisteredDTWAINMsg;
-            static CTL_StringType        s_sINIPath;
-            static std::string           s_CurLangResource;
-            static CTL_StringType        s_TempFilePath;
-            static CTL_StringType        s_ImageDLLFilePath;
-            static CTL_StringType        s_LangResourcePath;
-            static CTL_StringType        s_VersionString;
-            static CTL_StringType        s_DLLPath;
-            static UINT_PTR                 s_nTimerID;
-            static UINT_PTR                 s_nTimeoutID;
-            static UINT                     s_nTimeoutMilliseconds;
-            static bool                     s_bTimerIDSet;
-            static bool                     s_bThrowExceptions;
-            static CTL_CallbackProcArray    s_aAllCallbacks;
-            static CTL_LongToStringMap      s_ErrorCodes;
-            static CTL_LongToStringMap      s_ResourceStrings;
-            static CTL_ArrayFactoryPtr s_ArrayFactory;
-            static bool                     s_UsingCustomResource;
-            static bool                     s_DemoInitialized;
-            static int                      s_TwainDSMSearchOrder;
-            static std::string               s_TwainDSMSearchOrderStr;
-            static CTL_StringType           s_TwainDSMUserDirectory;
-            static bool                     s_multipleThreads;
-            static HFONT                    s_DialogFont;
-
-            static std::unordered_set<HWND>   s_appWindowsToDisable;
+            std::vector<LONG_PTR>           m_aAcquireNum;
+            short int                       m_nDSMState = DSM_STATE_NONE;
+            int                             m_nDSMVersion = DTWAIN_TWAINDSM_LEGACY;
             bool                            m_bOpenSourceOnSelect;
-            static bool                     s_bCheckHandles;
-            static bool                     s_bQuerySupport;
-            static DTWAIN_DIBUPDATE_PROC    s_pDibUpdateProc;
-            static std::deque<int> s_vErrorBuffer;
-            static unsigned int             s_nErrorBufferThreshold;
-            static unsigned int             s_nErrorBufferReserve;
-            static std::stack<unsigned long, std::deque<unsigned long> > s_vErrorFlagStack;
-            static CTL_TwainMemoryFunctions*      s_TwainMemoryFunc;
-            static CTL_LegacyTwainMemoryFunctions s_TwainLegacyFunc;
-            static CTL_Twain2MemoryFunctions s_Twain2Func;
-            static bool                     s_TwainCallbackSet;
-            /*static */CTL_LongToVectorLongMap  m_mapDTWAINArrayToTwainType;
-            static CTL_IMAGEDLLINFO         s_ImageDLLInfo;
-            static std::bitset<10>  g_AvailabilityFlags;
-    #ifndef DTWAIN_RETAIL
-    //        static PROCESS_INFORMATION      s_ProcessInfo;
-    #endif
-
-            /////////////////////////////////////////////////////////////////////////////
-            // protection
-           #ifdef WIN32
-                static  CRITICAL_SECTION        s_critLogCall;
-                static  CRITICAL_SECTION        s_critFileCreate;
-                static  CRITICAL_SECTION        s_critStaticInit;
-                static  bool                    s_bCritSectionCreated;
-                static  bool                    s_bFileCritSectionCreated;
-                static  bool                    s_bCritStaticCreated;
-
-           #endif
+            CTL_StringType                  m_sTempFilePath;
+            CTL_ArrayFactoryPtr             m_ArrayFactory;
+            CTL_LongToVectorLongMap         m_mapDTWAINArrayToTwainType;
+            CTL_TwainMemoryFunctions* m_TwainMemoryFunc = nullptr;
+            CTL_LegacyTwainMemoryFunctions  m_TwainLegacyFunc;
+            CTL_Twain2MemoryFunctions       m_Twain2Func;
+            DTWAIN_DIBUPDATE_PROC           m_pDibUpdateProc = nullptr;
+            std::unordered_set<DTWAIN_SOURCE> m_aFeederSources;
+            int                             m_TwainDSMSearchOrder = DTWAIN_TWAINDSMSEARCH_WSO;
+            std::string                     m_TwainDSMSearchOrderStr = "CWSOU";
+            CTL_StringType                  m_TwainDSMUserDirectory;
     };
 
     template <typename T>
@@ -752,9 +678,10 @@ namespace dynarithmic
         // See if DLL Handle exists
         if (!pHandle)
             return {};
-        if (std::find_if(CTL_TwainDLLHandle::s_DLLHandles.begin(),
-            CTL_TwainDLLHandle::s_DLLHandles.end(), SmartPointerFinder<CTL_TwainDLLHandlePtr>(pHandle)) ==
-            CTL_TwainDLLHandle::s_DLLHandles.end())
+        // Check handles registered to the thread id's
+        if (std::find_if(CTL_StaticData::s_mapThreadToDLLHandle.begin(),
+            CTL_StaticData::s_mapThreadToDLLHandle.end(), [&](auto& pr) { return pr.second.get() == pHandle; }) ==
+            CTL_StaticData::s_mapThreadToDLLHandle.end())
             return {};
         if (!pHandle->m_bSessionAllocated && bCheckSession)
             return {};
@@ -831,6 +758,8 @@ namespace dynarithmic
     void LogExceptionErrorA(LPCSTR fname, const char *sAdditionalText=nullptr);
     void LogDTWAINMessage(HWND, UINT, WPARAM, LPARAM, bool bCallback=false);
     bool UserDefinedLoggerExists();
+    bool UserDefinedLoggerExists(CTL_TwainDLLHandle* pHandle);
+    bool AnyLoggerExists(CTL_TwainDLLHandle* pHandle);
     bool AnyLoggerExists();
     void WriteUserDefinedLogMsg(LPCTSTR sz);
     void WriteUserDefinedLogMsgA(LPCSTR sz);
@@ -949,7 +878,7 @@ namespace dynarithmic
             if (!m_bIsReturnValue)
                 strm << "(";
             else
-                strm << s << " " << CTL_TwainDLLHandle::s_ResourceStrings[IDS_LOGMSG_RETURNTEXT] << " ";
+                strm << s << " " << dynarithmic::GetResourceStringFromMap(IDS_LOGMSG_RETURNTEXT) << " ";
         }
 
         template <typename T, typename ...P>
@@ -1046,41 +975,40 @@ namespace dynarithmic
         void operator()(HANDLE h) { Destroy(h); }
     };
 
+    using DSMPair = std::pair<CTL_TwainDLLHandle*, HANDLE>;
+
     struct DSM2UnlockTraits
     {
-        static void Unlock(HANDLE h)
+        static void Unlock(DSMPair* pr)
         {
-            CTL_TwainDLLHandle::s_TwainMemoryFunc->UnlockMemory(h);
+            pr->first->m_TwainMemoryFunc->UnlockMemory(pr->second);
         }
     };
 
     struct DSM2NoFreeTraits
     {
-        static void Free(HANDLE /*h*/)
+        static void Free(DSMPair /*h*/)
         {
         }
     };
 
     struct DSM2FreeTraits
     {
-        static void Free(HANDLE h)
+        static void Free(DSMPair* pr)
         {
-            CTL_TwainDLLHandle::s_TwainMemoryFunc->FreeMemory(h);
+            pr->first->m_TwainMemoryFunc->FreeMemory(pr->second);
         }
     };
 
     template <typename T, typename UnLockFn, typename FreeFn>
     struct DTWAINGlobalHandle_GenericUnlockFreeTraits
     {
-        static void Destroy(T h)
+        static void Destroy(T* h)
         {
-            if (h)
-            {
-                UnLockFn::Unlock(h);
-                FreeFn::Free(h);
-            }
+            UnLockFn::Unlock(h);
+            FreeFn::Free(h);
         }
-        void operator()(T h) { Destroy(h); }
+        void operator()(T* h) { Destroy(h); }
     };
 
     struct DTWAINFrame_DestroyTraits
@@ -1157,16 +1085,16 @@ namespace dynarithmic
     using DTWAINArrayLL_RAII = std::unique_ptr<void, DTWAINArrayLowLevel_DestroyTraits>;
     using DTWAINDSM2Lock_RAII = std::unique_ptr<void, 
             DTWAINGlobalHandle_GenericUnlockFreeTraits<HANDLE, DSM2UnlockTraits, DSM2NoFreeTraits>>;
-    using DTWAINDSM2LockAndFree_RAII = std::unique_ptr<void,
-        DTWAINGlobalHandle_GenericUnlockFreeTraits<HANDLE, DSM2UnlockTraits, DSM2FreeTraits>>;
+    using DTWAINDSM2LockAndFree_RAII = std::unique_ptr<DSMPair,
+        DTWAINGlobalHandle_GenericUnlockFreeTraits<DSMPair, DSM2UnlockTraits, DSM2FreeTraits>>;
 
     // RAII Class for turning on/off logging locally
     struct DTWAINScopedLogController
     {
         long m_ErrorFilterFlags;
-        DTWAINScopedLogController(long newFilter) : m_ErrorFilterFlags(CTL_TwainDLLHandle::s_lErrorFilterFlags)
-        { CTL_TwainDLLHandle::s_lErrorFilterFlags = newFilter; }
-        ~DTWAINScopedLogController() { CTL_TwainDLLHandle::s_lErrorFilterFlags = m_ErrorFilterFlags; }
+        DTWAINScopedLogController(long newFilter) : m_ErrorFilterFlags(CTL_StaticData::s_lErrorFilterFlags)
+        { CTL_StaticData::s_lErrorFilterFlags = newFilter; }
+        ~DTWAINScopedLogController() { CTL_StaticData::s_lErrorFilterFlags = m_ErrorFilterFlags; }
     };
 
     struct HandleRAII
@@ -1178,10 +1106,10 @@ namespace dynarithmic
     };
 
     struct LogTraitsOff
-    { static long Apply(long turnOff) { return CTL_TwainDLLHandle::s_lErrorFilterFlags &~turnOff; } };
+    { static long Apply(long turnOff) { return CTL_StaticData::s_lErrorFilterFlags &~turnOff; } };
 
     struct LogTraitsOn
-    { static long Apply(long turnOn) { return CTL_TwainDLLHandle::s_lErrorFilterFlags  | turnOn; } };
+    { static long Apply(long turnOn) { return CTL_StaticData::s_lErrorFilterFlags  | turnOn; } };
 
     template <typename LogTraits>
     struct DTWAINScopedLogControllerEx
@@ -1193,13 +1121,8 @@ namespace dynarithmic
     typedef DTWAINScopedLogControllerEx<LogTraitsOff> DTWAINScopedLogControllerExclude;
     typedef DTWAINScopedLogControllerEx<LogTraitsOn>  DTWAINScopedLogControllerInclude;
 
-    #ifdef USE_EXCEPTION_SPEC
-        #define THIS_FUNCTION_PROTO_THROWS throw(...);
-        #define THIS_FUNCTION_THROWS throw(...)
-    #else
-        #define THIS_FUNCTION_PROTO_THROWS  ;
-        #define THIS_FUNCTION_THROWS
-    #endif
+    #define THIS_FUNCTION_PROTO_THROWS  ;
+    #define THIS_FUNCTION_THROWS
 
     void  DTWAIN_InternalThrowException() THIS_FUNCTION_PROTO_THROWS
 

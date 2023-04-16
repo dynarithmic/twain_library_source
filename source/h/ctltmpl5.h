@@ -365,8 +365,8 @@ namespace dynarithmic
                 return false;
 
             // Check if array is of the correct type
-            const auto actualEnumType = CTL_TwainDLLHandle::s_ArrayFactory->arraytype_to_tagtype(EnumType);
-            if ( !CTL_TwainDLLHandle::s_ArrayFactory->is_valid(pArray, actualEnumType ) )
+            const auto actualEnumType = pHandle->m_ArrayFactory->arraytype_to_tagtype(EnumType);
+            if ( !pHandle->m_ArrayFactory->is_valid(pArray, actualEnumType ) )
                 return false;
             std::vector<TwainType> Array;
 
@@ -430,7 +430,7 @@ namespace dynarithmic
 
             // Populate the array
             const size_t nSize = Array.size();
-            auto&  pVector = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<AssignType>(pArray);
+            auto&  pVector = pHandle->m_ArrayFactory->underlying_container_t<AssignType>(pArray);
             pVector.clear();
             std::copy(Array.begin(), Array.end(), std::back_inserter(pVector));
 /*            for ( i = 0; i < nSize; i++)
@@ -608,19 +608,19 @@ namespace dynarithmic
             return false;
 
         // Check if array is of the correct type
-        if ( !CTL_TwainDLLHandle::s_ArrayFactory->is_valid(pArray, CTL_ArrayFactory::arraytype_to_tagtype(EnumType)))
+        if ( !pHandle->m_ArrayFactory->is_valid(pArray, CTL_ArrayFactory::arraytype_to_tagtype(EnumType)))
             return false;
 
         // Create array of the twain type
         DTWAIN_ARRAY pDTWAINArray = pArray;
         std::vector<TwainType> Array;
         NativeType dValue;
-        const size_t nValues = CTL_TwainDLLHandle::s_ArrayFactory->size(pDTWAINArray);
+        const size_t nValues = pHandle->m_ArrayFactory->size(pDTWAINArray);
         int i;
 
         for ( i = 0; i < static_cast<int>(nValues); i++ )
         {
-            CTL_TwainDLLHandle::s_ArrayFactory->get_value(pDTWAINArray, i, &dValue );
+            pHandle->m_ArrayFactory->get_value(pDTWAINArray, i, &dValue );
             Array.push_back( TwainConverter::convert(dValue, pDTWAINArray) );
         }
 
