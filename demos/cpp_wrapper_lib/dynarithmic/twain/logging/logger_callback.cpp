@@ -18,13 +18,29 @@ FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
 DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
 OF THIRD PARTY RIGHTS.
 */
-// TWAIN application info (used by both the TWAIN Data Source Manager and Data Source
-#ifndef DTWAIN_TWAIN_COMPILER_DETAILS_HPP
-#define DTWAIN_TWAIN_COMPILER_DETAILS_HPP
 
-#if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || __cplusplus >= 201703L)
-    #define USING_CPP17 1
-#else
-    #define USING_CPP17 0
-#endif
-#endif
+#include <dynarithmic/twain/twain_values.hpp>
+#include <dynarithmic/twain/session/twain_session.hpp>
+#include <dynarithmic/twain/logging/logger_callback.hpp>
+
+namespace dynarithmic
+{
+    namespace twain
+    {
+        LRESULT CALLBACK logger_callback_proc(const char* msg, DTWAIN_LONG64 UserData)
+        {
+            const auto thisObject = reinterpret_cast<twain_session*>(UserData);
+            if (thisObject)
+            {
+                twain_session::logger_type& sesObject = thisObject->get_logger();
+                if (sesObject.second && sesObject.second->is_enabled())
+                {
+                    const auto& fn = sesObject.second->get_custom_function();
+                    if (fn)
+                        fn(msg);
+                }
+            }
+            return 1;
+        }
+    }
+}

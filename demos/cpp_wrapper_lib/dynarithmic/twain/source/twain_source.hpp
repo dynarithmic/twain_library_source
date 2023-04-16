@@ -154,6 +154,7 @@ namespace dynarithmic
                 static bool acquire_internal_error(int32_t errCode);
                 const twain_session* get_session() const;
                 std::string& get_details(bool refresh = false);
+                bool set_tiff_compress_type(tiffcompress_value::value_type compress_type);
         };
 
         inline std::ostream& operator <<(std::ostream& os, const image_information& ii)

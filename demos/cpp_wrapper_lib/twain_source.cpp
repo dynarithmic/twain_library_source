@@ -696,5 +696,7 @@ namespace dynarithmic
         bool twain_source::is_open() const { return API_INSTANCE DTWAIN_IsSourceOpen(m_theSource) ? true : false; }
         twain_source& twain_source::set_acquire_characteristics(const acquire_characteristics& ac) noexcept 
                     { *(m_pTwainSourceImpl->m_acquire_characteristics) = ac; return *this; }
+        bool twain_source::set_tiff_compress_type(tiffcompress_value::value_type compress_type) 
+             { return API_INSTANCE DTWAIN_SetCompressionType(m_theSource, static_cast<LONG>(compress_type), true); }
 	}
 }
