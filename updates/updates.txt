@@ -1,5 +1,10 @@
 DTWAIN Version changes
 
+5.3.0.4 
+
+- Internal source code changes.
+
+
 5.3.0.3		  
 
 - Handle issue WIA-based drivers that close the user-interface of the TWAIN source before issuing a request to
