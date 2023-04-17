@@ -21,7 +21,7 @@
 #ifndef WINGET_TWAIN_INL
 #define WINGET_TWAIN_INL
 #ifdef _WIN32
-CTL_StringType GetTwainDirFullNameEx(LPCTSTR strTwainDLLName,
+static CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwainDLLName,
 									bool bLeaveLoaded = false,
 									boost::dll::shared_library *pModule = nullptr);
 
@@ -30,6 +30,7 @@ CTL_StringType GetTwainDirFullName(LPCTSTR strTwainDLLName,
                                     bool bLeaveLoaded = false, 
                                     boost::dll::shared_library *pModule = nullptr)
 {
+    auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
 	static std::unordered_map<LONG, std::string> searchOrderMap = {
 		{DTWAIN_TWAINDSMSEARCH_WSO,"WSO"},
 		{ DTWAIN_TWAINDSMSEARCH_WOS,"WOS" },
@@ -47,18 +48,18 @@ CTL_StringType GetTwainDirFullName(LPCTSTR strTwainDLLName,
 		{ DTWAIN_TWAINDSMSEARCH_OW,"OW" },
 		{ DTWAIN_TWAINDSMSEARCH_OS,"OS" } };
 
-	auto iter = searchOrderMap.find(CTL_TwainDLLHandle::s_TwainDSMSearchOrder);
+    auto iter = searchOrderMap.find(pHandle->m_TwainDSMSearchOrder);
 	if (iter != searchOrderMap.end())
 	{
         
-		CTL_TwainDLLHandle::s_TwainDSMSearchOrderStr = iter->second + "CU";
-		return GetTwainDirFullNameEx(strTwainDLLName, bLeaveLoaded, pModule);
+        pHandle->m_TwainDSMSearchOrderStr = iter->second + "CU";
+        return GetTwainDirFullNameEx(pHandle, strTwainDLLName, bLeaveLoaded, pModule);
 	}
     // This will completely use the Ex version of finding the directory
-    return GetTwainDirFullNameEx(strTwainDLLName, bLeaveLoaded, pModule);
+    return GetTwainDirFullNameEx(pHandle, strTwainDLLName, bLeaveLoaded, pModule);
 }
 
-CTL_StringType GetTwainDirFullNameEx(LPCTSTR strTwainDLLName, bool bLeaveLoaded, boost::dll::shared_library *pModule)
+CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwainDLLName, bool bLeaveLoaded, boost::dll::shared_library *pModule)
 {
     static constexpr int WinDirPos = 0;
     static constexpr int SysDirPos = 1;
@@ -91,9 +92,9 @@ CTL_StringType GetTwainDirFullNameEx(LPCTSTR strTwainDLLName, bool bLeaveLoaded,
     dirNames[SysDirPos] = StringWrapper::GetSystemDirectory();
     dirNames[SysPathPos] = {};
 	dirNames[CurDirPos] = StringWrapper::SplitPath(dllPath)[StringWrapper::DIRECTORY_POS];
-    dirNames[UserDefPos] = StringWrapper::SplitPath(CTL_TwainDLLHandle::s_TwainDSMUserDirectory)[StringWrapper::DIRECTORY_POS];
+    dirNames[UserDefPos] = StringWrapper::SplitPath(pHandle->m_TwainDSMUserDirectory)[StringWrapper::DIRECTORY_POS];
 
-    const std::string curSearchOrder = CTL_TwainDLLHandle::s_TwainDSMSearchOrderStr;
+    const std::string curSearchOrder = pHandle->m_TwainDSMSearchOrderStr;
     CTL_StringType fNameTotal;
     const int minSize = (std::min)(dirNames.size(), curSearchOrder.size());
 	for (int i = 0; i < minSize; ++i)
