@@ -623,7 +623,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTwainAvailable()
         DTWAIN_BOOL bRet = CTL_TwainAppMgr::CheckTwainExistence(TWAINDLLVERSION_2);
         #else
         #ifdef WIN32
-        DTWAIN_BOOL bRet = CTL_TwainAppMgr::CheckTwainExistence(TWAINDLLVERSION_1);
+        DTWAIN_BOOL bRet = FALSE;
+        if (pHandle->m_SessionStruct.DSMName == TWAINDLLVERSION_2) 
+            bRet = CTL_TwainAppMgr::CheckTwainExistence(TWAINDLLVERSION_2);
+        else
+            bRet = CTL_TwainAppMgr::CheckTwainExistence(TWAINDLLVERSION_1);
         #endif
         #endif
         LOG_FUNC_EXIT_PARAMS(bRet)
