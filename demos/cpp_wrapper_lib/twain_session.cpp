@@ -33,13 +33,20 @@ namespace dynarithmic
 #ifdef DTWAIN_NOIMPORTLIB
             if (bCleanStart && !get_dllhandle())
             {
+#ifndef DTWAIN_USELOADEDLIB
                 HMODULE hDTwainModule = ::LoadLibraryA(DTWAIN_DLLNAME);
+#else
+                HMODULE hDTwainModule = ::GetModuleHandleA(DTWAIN_DLLNAME);
+#endif
                 if (hDTwainModule)
                     set_dllhandle(hDTwainModule);
                 else
                     return false;
             }
 #endif 
+#ifdef DTWAIN_USELOADEDLIB
+            return true;
+#else
             m_source_detail_map.clear();
             m_error_logger.clear();
             m_error_logger.set_maxsize(m_twain_characteristics.get_errorlogger_details().get_maxsize());
@@ -132,6 +139,7 @@ namespace dynarithmic
                 return true;
             }
             return false;
+    #endif
         }
 
 
@@ -517,11 +525,16 @@ namespace dynarithmic
         /// @see set_app_info()
         twain_identity& twain_session::get_app_info() { return m_twain_characteristics.get_app_info(); }
 
-        template <typename Container>
-        std::string twain_session::get_details(Container container, bool refresh)
+        std::string twain_session::get_details(const std::vector<std::string>& container_in, bool refresh)
         {
-            std::transform(std::begin(container), std::end(container), std::begin(container),
+            auto container = container_in;
+            std::transform(std::begin(container_in), std::end(container_in), std::begin(container),
                 [](const std::string& s) { return boost::algorithm::trim_copy(s); });
+            std::string sAllDetails;
+#ifdef DTWAIN_USELOADEDLIB
+            sAllDetails = json_generator().generate_details(*this, container,true);
+            return sAllDetails;
+#else
             std::sort(std::begin(container), std::end(container));
             std::string sMapKey = std::accumulate(container.begin(), container.end(), std::string(),
                 [&](const std::string& total, const std::string& current)
@@ -546,9 +559,10 @@ namespace dynarithmic
             }
             if (aValidSources.empty())
                 return {};
-            auto sAllDetails = json_generator().generate_details(*this, aValidSources);
+            sAllDetails = json_generator().generate_details(*this, aValidSources);
             m_source_detail_map.insert({ sMapKey, sAllDetails });
             return sAllDetails;
+#endif
         }
 
         LRESULT CALLBACK twain_session::error_callback_proc(LONG error, LONG64 UserData)

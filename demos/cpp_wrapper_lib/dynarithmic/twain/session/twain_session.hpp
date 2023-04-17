@@ -741,8 +741,7 @@ namespace dynarithmic
                 /// @see set_app_info()
                 twain_app_info& get_app_info();
 
-                template <typename Container = std::vector<std::string>>
-                std::string get_details(Container container, bool refresh = false);
+                std::string get_details(const std::vector<std::string>& container, bool refresh = false);
 
                 source_status get_source_status(const twain_source& ts);
                 source_status get_source_status(std::string prodName);
