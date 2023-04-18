@@ -408,6 +408,9 @@ namespace dynarithmic
         std::size_t size(arrayTag *pTag) const;
         std::size_t size(void *pTag) const { return size(from_void(pTag)); }
 
+        bool empty(arrayTag* pTag) const { return size(pTag) == 0; }
+        bool empty(void * pTag) const { return size(pTag) == 0; }
+
         int tag_type(void* pTag) const { return tag_type(from_void(pTag)); }
         int tag_type(arrayTag* pTag) const;
         void clear(arrayTag *pTag);
