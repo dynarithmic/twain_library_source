@@ -42,7 +42,7 @@ namespace dynarithmic
         TwainMessageLoopImpl(const TwainMessageLoopImpl&) = delete;
         TwainMessageLoopImpl& operator=(const TwainMessageLoopImpl&) = delete;
         TwainMessageLoopImpl(TwainMessageLoopImpl&& rhs) noexcept :
-            m_pDLLHandle(rhs.m_pDLLHandle) {
+            m_pDLLHandle(rhs.m_pDLLHandle), m_AcquireNum(rhs.m_AcquireNum) {
             rhs.m_pDLLHandle = nullptr;
         }
         TwainMessageLoopImpl& operator=(TwainMessageLoopImpl&& rhs) = delete;
