@@ -476,6 +476,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
         {
             m_hDataHandle = nullptr;
             FailAcquisition();
+            AbortTransfer(false, errfile);
             return rc;
         }
         case TWRC_SUCCESS:
@@ -563,6 +564,13 @@ bool CTL_ImageXferTriplet::FailAcquisition()
 
     int bContinue = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_PAGEFAILED,
                                                           reinterpret_cast<LPARAM>(pSource));
+
+    if (bContinue == 0)
+    {
+        bContinue = DTWAIN_PAGEFAIL_TERMINATE;
+        SetAcquireFailAction(DTWAIN_PAGEFAIL_TERMINATE);
+    }
+    else
     if (bContinue == DTWAIN_RETRY_EX || // Means not a user notification
         bContinue == 2)               // Means notifications are on and user wants
         // default behavior
@@ -582,6 +590,15 @@ bool CTL_ImageXferTriplet::FailAcquisition()
             pSource->SetCurrentRetryCount(++nCurRetry);
             bContinue = DTWAIN_PAGEFAIL_RETRY;
         }
+    }
+    else
+    {
+        // Increment retry count and try again
+        pSource->SetCurrentRetryCount(++nCurRetry);
+        if (pSource->GetCurrentRetryCount() >= pSource->GetMaxRetryAttempts())
+            bContinue = DTWAIN_PAGEFAIL_TERMINATE;
+        else
+            bContinue = DTWAIN_PAGEFAIL_RETRY;
     }
     return ImageXferFileWriter(this, pSession, pSource).ProcessFailureCondition(bContinue);
 }
