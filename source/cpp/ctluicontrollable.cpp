@@ -55,8 +55,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
         BOOL bGetUI = DTWAIN_GetCapValuesEx(Source, DTWAIN_CV_CAPUICONTROLLABLE, DTWAIN_CAPGET, DTWAIN_CONTONEVALUE, &CapArray);
         if (bGetUI && CapArray && !pHandle->m_ArrayFactory->empty(CapArray))
         {
-        DTWAINArrayLL_RAII arr(CapArray);
-        bOk = pHandle->m_ArrayFactory->underlying_container_t<LONG>(CapArray)[0] ? true : false;
+            DTWAINArrayLL_RAII arr(CapArray);
+            bOk = pHandle->m_ArrayFactory->underlying_container_t<LONG>(CapArray)[0] ? true : false;
         }
     }
     else

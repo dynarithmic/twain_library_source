@@ -4,6 +4,8 @@ DTWAIN Version changes
 
 - Allow DTWAIN_IsTwainAvailable() to properly detect TWAINDSM.DLL for 32-bit applications.
 
+- Address issues with DTWAIN_TN_PAGEFAILED on page acquisition failure.
+
 - Internal source code changes.
 
 
