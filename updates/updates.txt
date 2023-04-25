@@ -6,7 +6,10 @@ DTWAIN Version changes
 
 - Address issues with DTWAIN_TN_PAGEFAILED on page acquisition failure.
 
+- Address issue with string-based TWAIN capabilities not being retrieved correctly.
+
 - Internal source code changes.
+
 
 
 5.3.0.3		  
