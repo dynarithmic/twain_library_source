@@ -26,6 +26,7 @@
 #include "ctlobstr.h"
 #include "ctlenum.h"
 #include "ctltwsrc.h"
+#include "ctltwainidentity.h"
 
 namespace dynarithmic
 {
@@ -62,7 +63,7 @@ namespace dynarithmic
                         );
 
         HWND*               GetWindowHandlePtr() const { return const_cast<HWND*>(&m_AppWnd); }
-        TW_IDENTITY*        GetAppIDPtr()              { return &m_AppId; }
+        TW_IDENTITY*        GetAppIDPtr()              { return &m_AppId.get_identity(); }
         CTL_ITwainSource*    CreateTwainSource( LPCTSTR pProduct );
         bool                AddTwainSource( CTL_ITwainSource *pSource );
         void                CopyAllSources( CTL_TwainSourceSet & rArray );
@@ -99,7 +100,7 @@ namespace dynarithmic
         bool       m_bAllSourcesRetrieved;
         HWND       m_AppWnd;
         CTL_StringType m_AppName;
-        TW_IDENTITY m_AppId;          // Twain Identity structure
+        CTL_TwainIdentity m_AppId;          // Twain Identity structure
         CTL_TwainSourceSet m_arrTwainSource;
         CTL_ITwainSource *m_pSelectedSource;
         CTL_TwainDLLHandle *m_pTwainDLLHandle;

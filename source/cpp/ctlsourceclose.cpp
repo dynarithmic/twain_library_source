@@ -44,6 +44,17 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CloseSource(DTWAIN_SOURCE Source)
             pHandle->m_mapStringToSource.erase(sProductName);
             pHandle->m_aFeederSources.erase(Source);
         }
+        std::string sProductNameA = StringConversion::Convert_Native_To_Ansi(sProductName);
+        auto& sourceMap = CTL_StaticData::GetSourceStatusMap();
+        auto iter = sourceMap.find(sProductNameA);
+        if (iter != sourceMap.end())
+        {
+            iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, false);
+            iter->second.SetStatus(SourceStatus::SOURCE_STATUS_SELECECTED, false);
+            iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, false);
+            iter->second.SetSourceHandle({});
+            iter->second.SetThreadID({});
+        }
     }
     LOG_FUNC_EXIT_PARAMS(bRetval)
     CATCH_BLOCK(false)
