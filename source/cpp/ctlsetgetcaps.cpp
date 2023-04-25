@@ -420,7 +420,7 @@ DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap
             if ( IsStringCapType(static_cast<TW_UINT16>(nDataType)))
             {
                 ThisArray = performGetCap<std::string/*, NullGetCapConverter*/>
-                            (pHandle, Source, lCap, nDataType, lContainerType, lGetType, overrideDataType, CTL_ArrayStringType);
+                            (pHandle, Source, lCap, nDataType, lContainerType, lGetType, overrideDataType, CTL_ArrayANSIStringType);
                 if (!ThisArray)
                     LOG_FUNC_EXIT_PARAMS(false)
             }
