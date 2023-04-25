@@ -27,6 +27,7 @@
 #include "../simpleini/simpleini.h"
 #include "ctlfileutils.h"
 #include "ctldefsource.h"
+#include "ctlthreadutils.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -76,8 +77,13 @@ static LONG OpenSourceInternal(DTWAIN_SOURCE Source)
 static DTWAIN_SOURCE SelectAndOpenSource(const SourceSelectionOptions& opts)
 {
     const DTWAIN_SOURCE Source = SourceSelect(opts);
+    auto& sourcemap = CTL_StaticData::GetSourceStatusMap();
     if (Source)
     {
+        CTL_ITwainSource* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
+        auto iter = sourcemap.insert({ pSource->GetProductNameA(), {} }).first;
+        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_SELECECTED, true);
+        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, false);
         const LONG retVal = OpenSourceInternal(Source);
         if (retVal != DTWAIN_NO_ERROR)
         {
@@ -85,7 +91,11 @@ static DTWAIN_SOURCE SelectAndOpenSource(const SourceSelectionOptions& opts)
                 CTL_TwainAppMgr::SetError(retVal, StringConversion::Convert_NativePtr_To_Ansi(opts.szProduct));
             return nullptr;
         }
+        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, CTL_TwainAppMgr::IsSourceOpen(pSource));
+        iter->second.SetThreadID(dynarithmic::getThreadIdAsString());
+        iter->second.SetSourceHandle(pSource);
     }
+
     if ( !Source && opts.nWhich == SELECTSOURCEBYNAME )
     {
         const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());

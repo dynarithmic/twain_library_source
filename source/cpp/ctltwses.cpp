@@ -74,26 +74,26 @@ CTL_ITwainSession::CTL_ITwainSession(LPCTSTR pAppName,
         m_bTwainWindowCreated = true;
     }
 
-    memset( &m_AppId, 0, sizeof(TW_IDENTITY) );
+    TW_IDENTITY m_AppIdTemp = {};
+    m_AppIdTemp.Id = 0;
+    m_AppIdTemp.Version.MajorNum = nMajorNum;
+    m_AppIdTemp.Version.MinorNum = nMinorNum;
+    m_AppIdTemp.Version.Language = static_cast<TW_UINT16>(nLanguage);
+    m_AppIdTemp.Version.Country  = static_cast<TW_UINT16>(nCountry);
 
-    m_AppId.Id = 0;
-    m_AppId.Version.MajorNum = nMajorNum;
-    m_AppId.Version.MinorNum = nMinorNum;
-    m_AppId.Version.Language = static_cast<TW_UINT16>(nLanguage);
-    m_AppId.Version.Country  = static_cast<TW_UINT16>(nCountry);
 
-
-    StringWrapperA::SafeStrcpy( m_AppId.Version.Info,
+    StringWrapperA::SafeStrcpy( m_AppIdTemp.Version.Info,
                                 StringConversion::Convert_Native_To_Ansi(lpszVersion).c_str(),
-                                sizeof m_AppId.Version.Info - 1 );
+                                sizeof m_AppIdTemp.Version.Info - 1 );
 
-    m_AppId.ProtocolMajor =    TWON_PROTOCOLMAJOR;
-    m_AppId.ProtocolMinor =    TWON_PROTOCOLMINOR;
-    m_AppId.SupportedGroups =  DG_IMAGE | DG_CONTROL | DG_AUDIO | DF_APP2 | DF_DSM2 ;
+    m_AppIdTemp.ProtocolMajor =    TWON_PROTOCOLMAJOR;
+    m_AppIdTemp.ProtocolMinor =    TWON_PROTOCOLMINOR;
+    m_AppIdTemp.SupportedGroups =  DG_IMAGE | DG_CONTROL | DG_AUDIO | DF_APP2 | DF_DSM2 ;
 
-    StringWrapperA::SafeStrcpy( m_AppId.Manufacturer,  StringConversion::Convert_Native_To_Ansi(lpszMfg).c_str(), sizeof m_AppId.Manufacturer - 1 );
-    StringWrapperA::SafeStrcpy( m_AppId.ProductFamily, StringConversion::Convert_Native_To_Ansi(lpszFamily).c_str(), sizeof m_AppId.ProductFamily - 1 );
-    StringWrapperA::SafeStrcpy( m_AppId.ProductName,   StringConversion::Convert_Native_To_Ansi(lpszProduct).c_str(),sizeof m_AppId.ProductName - 1 );
+    StringWrapperA::SafeStrcpy( m_AppIdTemp.Manufacturer,  StringConversion::Convert_Native_To_Ansi(lpszMfg).c_str(), sizeof m_AppIdTemp.Manufacturer - 1 );
+    StringWrapperA::SafeStrcpy( m_AppIdTemp.ProductFamily, StringConversion::Convert_Native_To_Ansi(lpszFamily).c_str(), sizeof m_AppIdTemp.ProductFamily - 1 );
+    StringWrapperA::SafeStrcpy( m_AppIdTemp.ProductName,   StringConversion::Convert_Native_To_Ansi(lpszProduct).c_str(),sizeof m_AppIdTemp.ProductName - 1 );
+    m_AppId = m_AppIdTemp;
     m_pSelectedSource = nullptr;
     m_bTwainMessageFlag = false;
     m_bAllSourcesRetrieved = false;
@@ -159,11 +159,14 @@ bool CTL_ITwainSession::AddTwainSource( CTL_ITwainSource *pSource )
             { return ptr->GetSourceIDPtr()->ProductName == m_str; }
     };
 
+    auto& sourceStatusMap = CTL_StaticData::GetSourceStatusMap();
     if ( std::find_if(m_arrTwainSource.begin(), m_arrTwainSource.end(), SourceFinder(strProduct)) == m_arrTwainSource.end())
-        {
-            m_arrTwainSource.insert( pSource );
-            return true;
-        }
+    {
+        m_arrTwainSource.insert( pSource );
+        auto iter = sourceStatusMap.insert({ pSource->GetProductNameA(), {} }).first;
+        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, true);
+        return true;
+    }
     return false;
 }
 

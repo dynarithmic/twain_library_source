@@ -126,7 +126,7 @@ UINT                        CTL_StaticData::s_nTimeoutMilliseconds = 0;
 CLogSystem                  CTL_StaticData::s_appLog;
 bool                        CTL_StaticData::s_ResourcesInitialized = false;
 ImageResamplerMap           CTL_StaticData::s_ImageResamplerMap;
-
+SourceStatusMap             CTL_StaticData::s_SourceStatusMap;
 
 ///////////////////////////////////////////////////////////////////////////
 void CTL_TwainDLLHandle::NotifyWindows(UINT /*nMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/)

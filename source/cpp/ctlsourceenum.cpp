@@ -66,6 +66,17 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
 
     CTL_TwainAppMgr::EnumSources(pHandle->m_pTwainSession, SourceArray);
     std::copy(SourceArray.begin(), SourceArray.end(), std::back_inserter(vEnum));
+    auto& status_map = CTL_StaticData::GetSourceStatusMap();
+    std::for_each(SourceArray.begin(), SourceArray.end(), [&](CTL_ITwainSource* pSource)
+        {
+            std::string sname = pSource->GetProductNameA();
+            auto iter = status_map.find(sname);
+            if (iter == status_map.end())
+            {
+                auto mapIter = status_map.insert({ sname, {} }).first;
+                mapIter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, true);
+            }
+        });
     *Array = aSource;
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)

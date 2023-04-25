@@ -240,8 +240,7 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_bXferReadySent(false)
  {
     if ( lpszProduct )
-        StringWrapperA::SafeStrcpy( m_SourceId.ProductName,
-                                    StringConversion::Convert_Native_To_Ansi(lpszProduct).c_str(), sizeof m_SourceId.ProductName - 1 );
+        m_SourceId.set_product_name(StringConversion::Convert_NativePtr_To_Ansi(lpszProduct));
 
     // Image information default values
     m_ImageInfoEx.nJpegQuality = 75;

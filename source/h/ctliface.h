@@ -463,6 +463,27 @@ namespace dynarithmic
         std::map<uint16_t, uint16_t> m_mapFromTo;
     };
 
+    struct SourceStatus
+    {
+        enum { SOURCE_STATUS_OPEN, SOURCE_STATUS_SELECECTED, SOURCE_STATUS_UNKNOWN };
+
+        std::bitset<3> m_Status;
+        std::string m_ThreadId;
+        CTL_ITwainSource* m_pSource;
+        SourceStatus() : m_Status(), m_ThreadId{}, m_pSource{} {}
+        SourceStatus& SetStatus(int Status, bool bSet) { m_Status[Status] = bSet; return *this; }
+        bool GetStatus(int Status) const { return m_Status[Status]; }
+        bool IsSelected() const { return m_Status[SOURCE_STATUS_SELECECTED]; }
+        bool IsOpen() const { return m_Status[SOURCE_STATUS_OPEN]; }
+        bool IsClosed() const { return !IsOpen(); }
+        bool IsUnknown() const { return m_Status[SOURCE_STATUS_UNKNOWN]; }
+        SourceStatus& SetThreadID(std::string threadId) { m_ThreadId = threadId; return *this; }
+        SourceStatus& SetSourceHandle(CTL_ITwainSource* Source) { m_pSource = Source; return *this; }
+        std::string GetThreadID() const { return m_ThreadId; }
+        CTL_ITwainSource* GetSourceHandle() const { return m_pSource; }
+    };
+
+    typedef std::map<std::string, SourceStatus> SourceStatusMap;
     typedef std::map<int, ImageResamplerData> ImageResamplerMap;
     typedef std::unordered_map<LONG, std::pair<std::string, std::string>> CTL_PDFMediaMap;
     typedef tsl::ordered_map<LONG, FileFormatNode> CTL_AvailableFileFormatsMap;
@@ -507,6 +528,7 @@ namespace dynarithmic
         static bool                     s_bTimerIDSet;
         static bool                     s_ResourcesInitialized;
         static ImageResamplerMap        s_ImageResamplerMap;
+        static SourceStatusMap          s_SourceStatusMap;
 
         static CTL_PDFMediaMap& GetPDFMediaMap() { return s_PDFMediaMap; }
         static CTL_TwainLongToStringMap& GetTwainCountryMap() { return s_TwainCountryMap; }
@@ -531,6 +553,7 @@ namespace dynarithmic
         static CTL_GeneralErrorInfo& GetGeneralErrorInfo() { return s_mapGeneralErrorInfo; }
         static long GetErrorFilterFlags() { return s_lErrorFilterFlags; }
         static ImageResamplerMap& GetImageResamplerMap() { return s_ImageResamplerMap; }
+        static SourceStatusMap& GetSourceStatusMap() { return s_SourceStatusMap;  }
     };
 
     struct CTL_LoggerCallbackInfo
@@ -641,7 +664,6 @@ namespace dynarithmic
             OCRInterfaceContainer m_OCRInterfaceArray;
             OCRProductNameToEngineMap m_OCRProdNameToEngine;
             OCREnginePtr          m_pOCRDefaultEngine;
-            std::set<CTL_TwainTriplet::TwainTripletComponents> m_setLogFilterComponents;
 
             // File Save As information
             #ifdef _WIN32
