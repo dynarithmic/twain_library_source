@@ -465,7 +465,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCurrentFileNameA(DTWAIN_SOURCE Source, LPSTR szName,
 {
 #ifdef _UNICODE
     std::wstring arg((std::max)(MaxLen, 0L),0);
-    const LONG retVal = DTWAIN_GetCurrentFileName(Source, (MaxLen>0) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    const LONG retVal = DTWAIN_GetCurrentFileName(Source, (MaxLen > 0 && szName) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
     return null_terminator_copier(get_view(arg), szName, retVal);
 #else
     return DTWAIN_GetCurrentFileName(Source, szName, MaxLen);
@@ -478,7 +478,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCurrentFileNameW(DTWAIN_SOURCE Source, LPWSTR szName
     return DTWAIN_GetCurrentFileName(Source, szName, MaxLen);
 #else
     std::string arg((std::max)(MaxLen,0L), 0);
-    LONG retVal = DTWAIN_GetCurrentFileName(Source, MaxLen>0 ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    LONG retVal = DTWAIN_GetCurrentFileName(Source, (MaxLen>0 && szName)? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
     return null_terminator_copier(get_view(arg), szName, retVal);
 #endif
 }
@@ -489,7 +489,7 @@ LONG DLLENTRY_DEF DTWAIN_GetDSMFullNameW(LONG DSMType, LPWSTR szDLLName, LONG nM
     return DTWAIN_GetDSMFullName(DSMType, szDLLName, nMaxLen, pWhichSearch);
 #else
     std::string arg((std::max)(nMaxLen,0L), 0);
-    LONG retVal = DTWAIN_GetDSMFullName(DSMType, nMaxLen>0 ? &arg[0] : nullptr, static_cast<LONG>(arg.size()), pWhichSearch);
+    LONG retVal = DTWAIN_GetDSMFullName(DSMType, (nMaxLen > 0 && szDLLName) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()), pWhichSearch);
     return null_terminator_copier(get_view(arg), szDLLName, retVal);
 #endif
 }
@@ -498,7 +498,7 @@ LONG DLLENTRY_DEF DTWAIN_GetDSMFullNameA(LONG DSMType, LPSTR szDLLName, LONG nMa
 {
 #ifdef _UNICODE
     std::wstring arg(nMaxLen, 0);
-    const LONG retVal = DTWAIN_GetDSMFullName(DSMType, (nMaxLen>0) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()), pWhichSearch);
+    const LONG retVal = DTWAIN_GetDSMFullName(DSMType, (nMaxLen>0 && szDLLName) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()), pWhichSearch);
     return null_terminator_copier(get_view(arg), szDLLName, retVal);
 #else
     return DTWAIN_GetDSMFullName(DSMType, szDLLName, nMaxLen, pWhichSearch);
@@ -531,7 +531,7 @@ LONG DLLENTRY_DEF DTWAIN_GetErrorStringA(LONG lError, LPSTR lpszBuffer, LONG nLe
 {
 #ifdef _UNICODE
     std::wstring arg((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetErrorString(lError, (nLength>0) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    const LONG retVal = DTWAIN_GetErrorString(lError, (nLength > 0 && lpszBuffer) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
     return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
 #else
     return DTWAIN_GetErrorString(lError, lpszBuffer, nLength);
@@ -544,7 +544,7 @@ LONG DLLENTRY_DEF DTWAIN_GetErrorStringW(LONG lError, LPWSTR lpszBuffer, LONG nL
     return DTWAIN_GetErrorString(lError, lpszBuffer, nLength);
 #else
     std::string arg((std::max)(nLength,0L), 0);
-    LONG retVal = DTWAIN_GetErrorString(lError, nLength>0 ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    LONG retVal = DTWAIN_GetErrorString(lError, (nLength > 0 && lpszBuffer) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
     return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
 #endif
 }
@@ -553,7 +553,7 @@ LONG DLLENTRY_DEF DTWAIN_GetConditionCodeStringA(LONG lError, LPSTR lpszBuffer, 
 {
 #ifdef _UNICODE
 	std::wstring arg((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetConditionCodeString(lError, (nLength>0) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    const LONG retVal = DTWAIN_GetConditionCodeString(lError, (nLength > 0 && lpszBuffer) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
 	return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
 #else
 	return DTWAIN_GetConditionCodeString(lError, lpszBuffer, nLength);
@@ -566,7 +566,7 @@ LONG DLLENTRY_DEF DTWAIN_GetConditionCodeStringW(LONG lError, LPWSTR lpszBuffer,
 	return DTWAIN_GetConditionCodeString(lError, lpszBuffer, nLength);
 #else
 	std::string arg((std::max)(nLength,0L), 0);
-	LONG retVal = DTWAIN_GetConditionCodeString(lError, nLength>0 ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+	LONG retVal = DTWAIN_GetConditionCodeString(lError, (nLength>0 && lpszBuffer)? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
 	return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
 #endif
 }
@@ -577,7 +577,7 @@ LONG DLLENTRY_DEF DTWAIN_GetPaperSizeNameW(LONG paperNumber, LPWSTR outName, LON
     return DTWAIN_GetPaperSizeName(paperNumber, outName, nSize);
 #else
     std::string arg((std::max)(nSize,0L), 0);
-    LONG retVal = DTWAIN_GetPaperSizeName(paperNumber, nSize>0 ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    LONG retVal = DTWAIN_GetPaperSizeName(paperNumber, (nSize > 0 && outName) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
     return null_terminator_copier(get_view(arg), outName, retVal);
 #endif
 }
@@ -587,7 +587,7 @@ LONG DLLENTRY_DEF DTWAIN_GetPaperSizeNameA(LONG paperNumber, LPSTR outName, LONG
 {
 #ifdef _UNICODE
     std::wstring arg((std::max)(nSize,0L), 0);
-    LONG retVal = DTWAIN_GetPaperSizeName(paperNumber, nSize>0 ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    LONG retVal = DTWAIN_GetPaperSizeName(paperNumber, (nSize>0 && outName)? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
     return null_terminator_copier(get_view(arg), outName, retVal);
 #else
     return DTWAIN_GetPaperSizeName(paperNumber, outName, nSize);
@@ -600,8 +600,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstantW(LONG lConstantType, LONG lTwa
     return DTWAIN_GetTwainNameFromConstant(lConstantType, lTwainConstant, lpszOut, nSize);
 #else
     std::string arg((std::max)(nSize, 0L), 0);
-    LONG retVal = DTWAIN_GetTwainNameFromConstant(lConstantType, lTwainConstant, 
-                                                  nSize > 0 ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    LONG retVal = DTWAIN_GetTwainNameFromConstant(lConstantType, lTwainConstant, (nSize > 0 && lpszOut) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
     return null_terminator_copier(get_view(arg), lpszOut, retVal);
 #endif
 }
@@ -611,7 +610,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstantA(LONG lConstantType, LONG lTwa
 {
 #ifdef _UNICODE
     std::wstring arg((std::max)(nSize, 0L), 0);
-    LONG retVal = DTWAIN_GetTwainNameFromConstant(lConstantType, lTwainConstant, nSize > 0 ? &arg[0] : nullptr, 
+    LONG retVal = DTWAIN_GetTwainNameFromConstant(lConstantType, lTwainConstant, (nSize > 0 && lpszOut)? &arg[0] : nullptr, 
                                                   static_cast<LONG>(arg.size()));
     return null_terminator_copier(get_view(arg), lpszOut, retVal);
 #else
@@ -644,7 +643,7 @@ LONG DLLENTRY_DEF DTWAIN_GetExtNameFromCapW(LONG nValue, LPWSTR szValue, LONG nL
     return DTWAIN_GetExtNameFromCap(nValue, szValue, nLength);
 #else
     std::string arg((std::max)(nLength,0L), 0);
-    LONG retVal = DTWAIN_GetExtNameFromCap(nValue, nLength>0 ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    LONG retVal = DTWAIN_GetExtNameFromCap(nValue, (nLength > 0 && szValue) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
     return null_terminator_copier(get_view(arg), szValue, retVal);
 #endif
 }
@@ -653,7 +652,7 @@ LONG DLLENTRY_DEF DTWAIN_GetExtNameFromCapA(LONG nValue, LPSTR szValue, LONG nLe
 {
 #ifdef _UNICODE
     std::wstring arg((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetExtNameFromCap(nValue, (nLength>0) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    const LONG retVal = DTWAIN_GetExtNameFromCap(nValue, (nLength > 0 && szValue) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
     return null_terminator_copier(get_view(arg), szValue, retVal);
 #else
     return DTWAIN_GetExtNameFromCap(nValue, szValue, nLength);
@@ -737,7 +736,7 @@ LONG DLLENTRY_DEF DTWAIN_GetNameFromCapA(LONG nCapValue, LPSTR szValue, LONG nLe
 {
 #ifdef _UNICODE
     std::wstring arg((std::max)(nLength, 0L), 0);
-    const DTWAIN_BOOL retVal = DTWAIN_GetNameFromCap(nCapValue, (nLength>0)?&arg[0]:nullptr, static_cast<LONG>(arg.size()));
+    const DTWAIN_BOOL retVal = DTWAIN_GetNameFromCap(nCapValue, (nLength > 0 && szValue)?&arg[0]:nullptr, static_cast<LONG>(arg.size()));
     return null_terminator_copier(get_view(arg), szValue, retVal);
 #else
     return DTWAIN_GetNameFromCap(nCapValue, szValue, nLength);
@@ -750,7 +749,7 @@ LONG DLLENTRY_DEF DTWAIN_GetNameFromCapW(LONG nCapValue, LPWSTR szValue, LONG nL
     return DTWAIN_GetNameFromCap(nCapValue, szValue, nLength);
 #else
     std::string arg((std::max)(nLength,0L), 0);
-    DTWAIN_BOOL retVal = DTWAIN_GetNameFromCap(nCapValue, nLength>0 ? &arg[0] : nullptr, nLength);
+    DTWAIN_BOOL retVal = DTWAIN_GetNameFromCap(nCapValue, (nLength>0 && szValue)? &arg[0] : nullptr, nLength);
     return null_terminator_copier(get_view(arg), szValue, retVal);
 #endif
 }
@@ -761,7 +760,7 @@ LONG DLLENTRY_DEF DTWAIN_GetOCRErrorStringW(DTWAIN_OCRENGINE Engine, LONG lError
     return DTWAIN_GetOCRErrorString(Engine, lError, lpszBuffer, nLength);
 #else
     std::string arg((std::max)(nLength,0L), 0);
-    LONG retVal = DTWAIN_GetOCRErrorString(Engine, lError, nLength>0 ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    LONG retVal = DTWAIN_GetOCRErrorString(Engine, lError, (nLength > 0 && lpszBuffer) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
     return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
 #endif
 }
@@ -770,7 +769,7 @@ LONG DLLENTRY_DEF DTWAIN_GetOCRErrorStringA(DTWAIN_OCRENGINE Engine, LONG lError
 {
 #ifdef _UNICODE
     std::wstring arg((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetOCRErrorString(Engine, lError, (nLength>0) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    const LONG retVal = DTWAIN_GetOCRErrorString(Engine, lError, (nLength>0 && lpszBuffer) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
     return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
 #else
     return DTWAIN_GetOCRErrorString(Engine, lError, lpszBuffer, nLength);
@@ -783,7 +782,7 @@ LONG DLLENTRY_DEF DTWAIN_GetOCRManufacturerW(DTWAIN_OCRENGINE Engine, LPWSTR szM
     return DTWAIN_GetOCRManufacturer(Engine, szManufacturer, nLength);
 #else
     std::string arg((std::max)(nLength,0L), 0);
-    LONG retVal = DTWAIN_GetOCRManufacturer(Engine, nLength>0 ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    LONG retVal = DTWAIN_GetOCRManufacturer(Engine, (nLength > 0 && szManufacturer) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
     return null_terminator_copier(get_view(arg), szManufacturer, retVal);
 #endif
 }
@@ -792,7 +791,7 @@ LONG DLLENTRY_DEF DTWAIN_GetOCRManufacturerA(DTWAIN_OCRENGINE Engine, LPSTR szMa
 {
 #ifdef _UNICODE
     std::wstring arg((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetOCRManufacturer(Engine, (nLength>0) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    const LONG retVal = DTWAIN_GetOCRManufacturer(Engine, (nLength > 0 && szManufacturer) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
     return null_terminator_copier(get_view(arg), szManufacturer, retVal);
 #else
     return DTWAIN_GetOCRManufacturer(Engine, szManufacturer, nLength);
@@ -803,7 +802,7 @@ LONG DLLENTRY_DEF DTWAIN_GetOCRProductFamilyA(DTWAIN_OCRENGINE Engine, LPSTR szP
 {
 #ifdef _UNICODE
     std::wstring arg((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetOCRProductFamily(Engine, (nLength > 0) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    const LONG retVal = DTWAIN_GetOCRProductFamily(Engine, (nLength > 0 && szProductFamily) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
     return null_terminator_copier(get_view(arg), szProductFamily, retVal);
 #else
     return DTWAIN_GetOCRProductFamily(Engine, szProductFamily, nLength);
@@ -816,7 +815,7 @@ LONG DLLENTRY_DEF DTWAIN_GetOCRProductFamilyW(DTWAIN_OCRENGINE Engine, LPWSTR sz
     return DTWAIN_GetOCRProductFamily(Engine, szProductFamily, nLength);
 #else
     std::string arg((std::max)(nLength,0L), 0);
-    LONG retVal = DTWAIN_GetOCRProductFamily(Engine, nLength>0 ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    LONG retVal = DTWAIN_GetOCRProductFamily(Engine, (nLength > 0 && szProductFamily) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
     return null_terminator_copier(get_view(arg), szProductFamily, retVal);
 #endif
 }
@@ -827,7 +826,7 @@ LONG DLLENTRY_DEF DTWAIN_GetOCRProductNameW(DTWAIN_OCRENGINE Engine, LPWSTR szPr
     return DTWAIN_GetOCRProductName(Engine, szProductName, nLength);
 #else
     std::string arg((std::max)(nLength,0L), 0);
-    LONG retVal = DTWAIN_GetOCRProductName(Engine, nLength>0 ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    LONG retVal = DTWAIN_GetOCRProductName(Engine, (nLength > 0 && szProductName) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
     return null_terminator_copier(get_view(arg), szProductName, retVal);
 #endif
 }
@@ -836,7 +835,7 @@ LONG DLLENTRY_DEF DTWAIN_GetOCRProductNameA(DTWAIN_OCRENGINE Engine, LPSTR szPro
 {
 #ifdef _UNICODE
     std::wstring arg((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetOCRProductName(Engine, (nLength>0) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    const LONG retVal = DTWAIN_GetOCRProductName(Engine, (nLength>0 && szProductName) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
     return null_terminator_copier(get_view(arg), szProductName, retVal);
 #else
     return DTWAIN_GetOCRProductName(Engine, szProductName, nLength);
@@ -847,7 +846,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetOCRTextA(DTWAIN_OCRENGINE Engine, LONG nPageNo, LP
 {
 #ifdef _UNICODE
     std::wstring arg(dSize, 0);
-    const HANDLE retVal = DTWAIN_GetOCRText(Engine, nPageNo, (dSize>0) ? &arg[0] : nullptr, dSize, pActualSize, nFlags);
+    const HANDLE retVal = DTWAIN_GetOCRText(Engine, nPageNo, (dSize > 0 && Data) ? &arg[0] : nullptr, dSize, pActualSize, nFlags);
     return null_terminator_copier(get_view(arg), Data, retVal);
 #else
     return DTWAIN_GetOCRText(Engine, nPageNo, Data, dSize, pActualSize, nFlags);
@@ -860,7 +859,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetOCRTextW(DTWAIN_OCRENGINE Engine, LONG nPageNo, LP
     return DTWAIN_GetOCRText(Engine, nPageNo, Data, dSize, pActualSize, nFlags);
 #else
     std::string arg(dSize, 0);
-    HANDLE retVal = DTWAIN_GetOCRText(Engine, nPageNo, dSize>0?&arg[0] : nullptr, dSize, pActualSize, nFlags);
+    HANDLE retVal = DTWAIN_GetOCRText(Engine, nPageNo, (dSize>0 && Data)?&arg[0] : nullptr, dSize, pActualSize, nFlags);
     return null_terminator_copier(get_view(arg), Data, retVal);
 #endif
 }
@@ -869,7 +868,7 @@ LONG DLLENTRY_DEF DTWAIN_GetOCRVersionInfoA(DTWAIN_OCRENGINE Engine, LPSTR buffe
 {
 #ifdef _UNICODE
     std::wstring arg((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetOCRVersionInfo(Engine, (nLength>0) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    const LONG retVal = DTWAIN_GetOCRVersionInfo(Engine, (nLength > 0 && buffer) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
     return null_terminator_copier(get_view(arg), buffer, retVal);
 #else
     return DTWAIN_GetOCRVersionInfo(Engine, buffer, nLength);
@@ -882,7 +881,7 @@ LONG DLLENTRY_DEF DTWAIN_GetOCRVersionInfoW(DTWAIN_OCRENGINE Engine, LPWSTR buff
     return DTWAIN_GetOCRVersionInfo(Engine, buffer, nLength);
 #else
     std::string arg((std::max)(nLength,0L), 0);
-    LONG retVal = DTWAIN_GetOCRVersionInfo(Engine, nLength>0 ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    LONG retVal = DTWAIN_GetOCRVersionInfo(Engine, (nLength>0 && buffer)? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
     return null_terminator_copier(get_view(arg), buffer, retVal);
 #endif
 }
@@ -891,7 +890,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPDFTextElementStringA(DTWAIN_PDFTEXTELEMENT T
 {
 #ifdef _UNICODE
     std::wstring arg((std::max)(nMaxLen, 0L),0);
-    const DTWAIN_BOOL retVal = DTWAIN_GetPDFTextElementString(TextElement, (nMaxLen>0) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()), Flags);
+    const DTWAIN_BOOL retVal = DTWAIN_GetPDFTextElementString(TextElement, (nMaxLen > 0 && szData) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()), Flags);
     return null_terminator_copier(get_view(arg), szData, retVal);
 #else
     return DTWAIN_GetPDFTextElementString(TextElement, szData, nMaxLen, Flags);
@@ -904,7 +903,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPDFTextElementStringW(DTWAIN_PDFTEXTELEMENT T
     return DTWAIN_GetPDFTextElementString(TextElement, szData, maxLen, Flags);
 #else
     std::string arg((std::max)(maxLen,0L), 0);
-    DTWAIN_BOOL retVal = DTWAIN_GetPDFTextElementString(TextElement, maxLen>0 ? &arg[0] : nullptr, static_cast<LONG>(arg.size()), Flags);
+    DTWAIN_BOOL retVal = DTWAIN_GetPDFTextElementString(TextElement, (maxLen>0 && szData)? &arg[0] : nullptr, static_cast<LONG>(arg.size()), Flags);
     return null_terminator_copier(get_view(arg), szData, retVal);
 #endif
 }
@@ -913,7 +912,7 @@ LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontNameA(LONG FontVal, LPSTR szFont, LONG n
 {
 #ifdef _UNICODE
     std::wstring arg((std::max)(nChars, 0L), 0);
-    const LONG retVal = DTWAIN_GetPDFType1FontName(FontVal, (nChars>0) ? &arg[0] : nullptr, nChars);
+    const LONG retVal = DTWAIN_GetPDFType1FontName(FontVal, (nChars > 0 && szFont) ? &arg[0] : nullptr, nChars);
     return null_terminator_copier(get_view(arg), szFont, retVal);
 #else
     return DTWAIN_GetPDFType1FontName(FontVal, szFont, nChars);
@@ -926,7 +925,7 @@ LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontNameW(LONG FontVal, LPWSTR szFont, LONG 
     return DTWAIN_GetPDFType1FontName(FontVal, szFont, nChars);
 #else
     std::string arg((std::max)(nChars, 0L), 0);
-    LONG retVal = DTWAIN_GetPDFType1FontName(FontVal, nChars>0 ? &arg[0] : nullptr, nChars);
+    LONG retVal = DTWAIN_GetPDFType1FontName(FontVal, (nChars>0 && szFont)? &arg[0] : nullptr, nChars);
     return null_terminator_copier(get_view(arg), szFont, retVal);
 #endif
 }
@@ -935,7 +934,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPrinterSuffixStringA(DTWAIN_SOURCE Source, LP
 {
 #ifdef _UNICODE
     std::wstring arg((std::max)(nLength, 0L), 0);
-    const DTWAIN_BOOL retVal = DTWAIN_GetPrinterSuffixString(Source, (nLength>0) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    const DTWAIN_BOOL retVal = DTWAIN_GetPrinterSuffixString(Source, (nLength > 0 && Suffix) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
     return null_terminator_copier(get_view(arg), Suffix, retVal);
 #else
     return DTWAIN_GetPrinterSuffixString(Source, Suffix, nLength);
@@ -948,7 +947,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPrinterSuffixStringW(DTWAIN_SOURCE Source, LP
     return DTWAIN_GetPrinterSuffixString(Source, Suffix, nLength);
 #else
     std::string arg((std::max)(nLength,0L), 0);
-    DTWAIN_BOOL retVal = DTWAIN_GetPrinterSuffixString(Source, nLength>0 ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    DTWAIN_BOOL retVal = DTWAIN_GetPrinterSuffixString(Source, (nLength>0 && Suffix)? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
     return null_terminator_copier(get_view(arg), Suffix, retVal);
 #endif
 }
@@ -1003,7 +1002,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSaveFileNameW(DTWAIN_SOURCE Source, LPWSTR fName, LO
     return DTWAIN_GetSaveFileName(Source, fName, nMaxLen);
 #else
     std::string args((std::max)(nMaxLen, 0L), 0);
-    LONG retVal = DTWAIN_GetSaveFileName(Source, nMaxLen>0 ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    LONG retVal = DTWAIN_GetSaveFileName(Source, (nMaxLen > 0 && fName) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), fName, retVal);
 #endif
 }
@@ -1012,7 +1011,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSaveFileNameA(DTWAIN_SOURCE Source, LPSTR fName, LON
 {
 #ifdef _UNICODE
     std::wstring args((std::max)(nMaxLen, 0L), 0);
-    const LONG retVal = DTWAIN_GetSaveFileName(Source, (nMaxLen>0) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    const LONG retVal = DTWAIN_GetSaveFileName(Source, (nMaxLen>0 && fName) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), fName, retVal);
 #else
     return DTWAIN_GetSaveFileName(Source, fName, nMaxLen);
@@ -1045,7 +1044,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSourceManufacturerA(DTWAIN_SOURCE Source, LPSTR szPr
 {
 #ifdef _UNICODE
     std::wstring args((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetSourceManufacturer(Source, (nLength>0) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    const LONG retVal = DTWAIN_GetSourceManufacturer(Source, (nLength > 0 && szProduct) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), szProduct, retVal);
 #else
     return DTWAIN_GetSourceManufacturer(Source, szProduct, nLength);
@@ -1058,7 +1057,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSourceManufacturerW(DTWAIN_SOURCE Source, LPWSTR szP
     return DTWAIN_GetSourceManufacturer(Source, szProduct, nLength);
 #else
     std::string args((std::max)(nLength, 0L), 0);
-    LONG retVal = DTWAIN_GetSourceManufacturer(Source, nLength>0 ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    LONG retVal = DTWAIN_GetSourceManufacturer(Source, (nLength > 0 && szProduct) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), szProduct, retVal);
 #endif
 }
@@ -1069,7 +1068,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSourceProductFamilyW(DTWAIN_SOURCE Source, LPWSTR sz
     return DTWAIN_GetSourceProductFamily(Source, szProduct, nLength);
 #else
     std::string args((std::max)(nLength, 0L), 0);
-    LONG retVal = DTWAIN_GetSourceProductFamily(Source, nLength>0 ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    LONG retVal = DTWAIN_GetSourceProductFamily(Source, (nLength > 0 && szProduct) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), szProduct, retVal);
 #endif
 }
@@ -1078,7 +1077,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSourceProductFamilyA(DTWAIN_SOURCE Source, LPSTR szP
 {
 #ifdef _UNICODE
     std::wstring args((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetSourceProductFamily(Source, (nLength>0) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    const LONG retVal = DTWAIN_GetSourceProductFamily(Source, (nLength > 0 && szProduct) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), szProduct, retVal);
 #else
     return DTWAIN_GetSourceProductFamily(Source, szProduct, nLength);
@@ -1089,7 +1088,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSourceProductNameA(DTWAIN_SOURCE Source, LPSTR szPro
 {
 #ifdef _UNICODE
     std::wstring args((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetSourceProductName(Source, (nLength>0) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    const LONG retVal = DTWAIN_GetSourceProductName(Source, (nLength>0 && szProduct) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), szProduct, retVal);
 #else
     return DTWAIN_GetSourceProductName(Source, szProduct, nLength);
@@ -1102,7 +1101,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSourceProductNameW(DTWAIN_SOURCE Source, LPWSTR szPr
     return DTWAIN_GetSourceProductName(Source, szProduct, nLength);
 #else
     std::string args((std::max)(nLength, 0L), 0);
-    LONG retVal = DTWAIN_GetSourceProductName(Source, nLength>0 ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    LONG retVal = DTWAIN_GetSourceProductName(Source, (nLength>0 && szProduct)? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), szProduct, retVal);
 #endif
 }
@@ -1111,7 +1110,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSourceVersionInfoA(DTWAIN_SOURCE Source, LPSTR szPro
 {
 #ifdef _UNICODE
     std::wstring args((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetSourceVersionInfo(Source, (nLength>0) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    const LONG retVal = DTWAIN_GetSourceVersionInfo(Source, (nLength>0 && szProduct) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), szProduct, retVal);
 #else
     return DTWAIN_GetSourceVersionInfo(Source, szProduct, nLength);
@@ -1124,7 +1123,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSourceVersionInfoW(DTWAIN_SOURCE Source, LPWSTR szPr
     return DTWAIN_GetSourceVersionInfo(Source, szProduct, nLength);
 #else
     std::string args((std::max)(nLength, 0L), 0);
-    LONG retVal = DTWAIN_GetSourceVersionInfo(Source, nLength>0 ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    LONG retVal = DTWAIN_GetSourceVersionInfo(Source, (nLength>0 && szProduct)? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), szProduct, retVal);
 #endif
 }
@@ -1135,7 +1134,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTempFileDirectoryW(LPWSTR szFilePath, LONG nLength)
     return DTWAIN_GetTempFileDirectory(szFilePath, nLength);
 #else
     std::string args((std::max)(nLength, 0L), 0);
-    LONG retVal = DTWAIN_GetTempFileDirectory(nLength>0 ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    LONG retVal = DTWAIN_GetTempFileDirectory((nLength>0 && szFilePath)? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), szFilePath, retVal);
 #endif
 }
@@ -1144,7 +1143,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTempFileDirectoryA(LPSTR szFilePath, LONG nLength)
 {
 #ifdef _UNICODE
     std::wstring args((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetTempFileDirectory((nLength>0) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    const LONG retVal = DTWAIN_GetTempFileDirectory((nLength>0 && szFilePath) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), szFilePath, retVal);
 #else
     return DTWAIN_GetTempFileDirectory(szFilePath, nLength);
@@ -1282,7 +1281,7 @@ LONG DLLENTRY_DEF DTWAIN_GetVersionInfoW(LPWSTR lpszVer, LONG nLength)
     return DTWAIN_GetVersionInfo(lpszVer, nLength);
 #else
     std::string args((std::max)(nLength, 0L), 0);
-    LONG retVal = DTWAIN_GetVersionInfo(nLength>0 ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    LONG retVal = DTWAIN_GetVersionInfo((nLength>0 && lpszVer)? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), lpszVer, retVal);
 #endif
 }
@@ -1291,7 +1290,7 @@ LONG DLLENTRY_DEF DTWAIN_GetVersionInfoA(LPSTR lpszVer, LONG nLength)
 {
 #ifdef _UNICODE
     std::wstring args((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetVersionInfo((nLength>0) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    const LONG retVal = DTWAIN_GetVersionInfo((nLength>0 && lpszVer) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), lpszVer, retVal);
 #else
     return DTWAIN_GetVersionInfo(lpszVer, nLength);
@@ -1304,7 +1303,7 @@ LONG DLLENTRY_DEF DTWAIN_GetVersionStringW(LPWSTR lpszVer, LONG nLength)
     return DTWAIN_GetVersionString(lpszVer, nLength);
 #else
     std::string args((std::max)(nLength, 0L), 0);
-    LONG retVal = DTWAIN_GetVersionString(nLength>0 ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    LONG retVal = DTWAIN_GetVersionString((nLength>0 && lpszVer) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), lpszVer, retVal);
 #endif
 }
@@ -1313,7 +1312,7 @@ LONG DLLENTRY_DEF DTWAIN_GetLibraryPathA(LPSTR lpszVer, LONG nLength)
 {
 #ifdef _UNICODE
 	std::wstring args((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetLibraryPath((nLength>0) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    const LONG retVal = DTWAIN_GetLibraryPath((nLength>0 && lpszVer) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
 	return null_terminator_copier(get_view(args), lpszVer, retVal);
 #else
 	return DTWAIN_GetLibraryPath(lpszVer, nLength);
@@ -1326,7 +1325,7 @@ LONG DLLENTRY_DEF DTWAIN_GetLibraryPathW(LPWSTR lpszVer, LONG nLength)
 	return DTWAIN_GetLibraryPath(lpszVer, nLength);
 #else
 	std::string args((std::max)(nLength, 0L), 0);
-	LONG retVal = DTWAIN_GetLibraryPath(nLength>0 ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+	LONG retVal = DTWAIN_GetLibraryPath((nLength>0 && lpszVer) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
 	return null_terminator_copier(get_view(args), lpszVer, retVal);
 #endif
 }
@@ -1335,7 +1334,7 @@ LONG DLLENTRY_DEF DTWAIN_GetVersionStringA(LPSTR lpszVer, LONG nLength)
 {
 #ifdef _UNICODE
     std::wstring args((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetVersionString((nLength>0) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    const LONG retVal = DTWAIN_GetVersionString((nLength>0 && lpszVer) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), lpszVer, retVal);
 #else
     return DTWAIN_GetVersionString(lpszVer, nLength);
@@ -1348,7 +1347,7 @@ LONG DLLENTRY_DEF DTWAIN_GetShortVersionStringW(LPWSTR lpszVer, LONG nLength)
 	return DTWAIN_GetShortVersionString(lpszVer, nLength);
 #else
 	std::string args((std::max)(nLength, 0L), 0);
-	LONG retVal = DTWAIN_GetShortVersionString(nLength>0 ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+	LONG retVal = DTWAIN_GetShortVersionString((nLength>0 && lpszVer)? &args[0] : nullptr, static_cast<LONG>(args.size()));
 	return null_terminator_copier(get_view(args), lpszVer, retVal);
 #endif
 }
@@ -1357,7 +1356,7 @@ LONG DLLENTRY_DEF DTWAIN_GetShortVersionStringA(LPSTR lpszVer, LONG nLength)
 {
 #ifdef _UNICODE
 	std::wstring args((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetShortVersionString((nLength>0) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    const LONG retVal = DTWAIN_GetShortVersionString((nLength>0 && lpszVer) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
 	return null_terminator_copier(get_view(args), lpszVer, retVal);
 #else
 	return DTWAIN_GetShortVersionString(lpszVer, nLength);
@@ -1371,7 +1370,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainStringNameW(LONG category, LONG TwainID, LPWSTR
     return DTWAIN_GetTwainStringName(category, TwainID, lpszBuffer, nLength);
 #else
     std::string args((std::max)(nLength, 0L), 0);
-    LONG retVal = DTWAIN_GetTwainStringName(category, TwainID, nLength > 0 ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    LONG retVal = DTWAIN_GetTwainStringName(category, TwainID, (nLength > 0 && lpszBuffer)? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), lpszBuffer, retVal);
 #endif
 }
@@ -1380,7 +1379,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainStringNameA(LONG category, LONG TwainID, LPSTR 
 {
 #ifdef _UNICODE
     std::wstring args((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetTwainStringName(category, TwainID, (nLength > 0) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    const LONG retVal = DTWAIN_GetTwainStringName(category, TwainID, (nLength > 0 && lpszBuffer) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), lpszBuffer, retVal);
 #else
     return DTWAIN_GetTwainStringName(category, TwainID, lpszBuffer, nLength);
@@ -1411,7 +1410,7 @@ LONG DLLENTRY_DEF DTWAIN_GetWindowsVersionInfoW(LPWSTR lpszBuffer, LONG nLength)
     return DTWAIN_GetWindowsVersionInfo(lpszBuffer, nLength);
 #else
     std::string args((std::max)(nLength, 0L), 0);
-    LONG retVal = DTWAIN_GetWindowsVersionInfo(nLength > 0 ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    LONG retVal = DTWAIN_GetWindowsVersionInfo((nLength > 0 && lpszBuffer)? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), lpszBuffer, retVal);
 #endif
 }
@@ -1421,7 +1420,7 @@ LONG DLLENTRY_DEF DTWAIN_GetWindowsVersionInfoA(LPSTR lpszBuffer, LONG nLength)
 {
 #ifdef _UNICODE
     std::wstring args((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetWindowsVersionInfo((nLength > 0) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    const LONG retVal = DTWAIN_GetWindowsVersionInfo((nLength > 0 && lpszBuffer) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), lpszBuffer, retVal);
 #else
     return DTWAIN_GetWindowsVersionInfo(lpszBuffer, nLength);
@@ -1435,7 +1434,7 @@ LONG DLLENTRY_DEF DTWAIN_GetActiveDSMPathW(LPWSTR lpszBuffer, LONG nLength)
     return DTWAIN_GetActiveDSMPath(lpszBuffer, nLength);
 #else
     std::string args((std::max)(nLength, 0L), 0);
-    LONG retVal = DTWAIN_GetActiveDSMPath(nLength > 0 ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    LONG retVal = DTWAIN_GetActiveDSMPath((nLength > 0 && lpszBuffer)? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), lpszBuffer, retVal);
 #endif
 }
@@ -1444,7 +1443,7 @@ LONG DLLENTRY_DEF DTWAIN_GetActiveDSMPathA(LPSTR lpszBuffer, LONG nLength)
 {
 #ifdef _UNICODE
     std::wstring args((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetActiveDSMPath((nLength > 0) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    const LONG retVal = DTWAIN_GetActiveDSMPath((nLength > 0 && lpszBuffer) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), lpszBuffer, retVal);
 #else
     return DTWAIN_GetActiveDSMPath(lpszBuffer, nLength);
@@ -2732,7 +2731,7 @@ LONG DLLENTRY_DEF DTWAIN_GetFileTypeExtensionsA(LONG nType, LPSTR lpszName, LONG
 {
 #ifdef _UNICODE
     std::wstring arg((std::max)(nMaxLen, 0L), 0);
-    const LONG retVal = DTWAIN_GetFileTypeExtensions(nType, (nMaxLen > 0) ? &arg[0] : nullptr, nMaxLen);
+    const LONG retVal = DTWAIN_GetFileTypeExtensions(nType, (nMaxLen > 0 && lpszName) ? &arg[0] : nullptr, nMaxLen);
     return null_terminator_copier(get_view(arg), lpszName, retVal);
 #else
     return DTWAIN_GetFileTypeExtensions(nType, lpszName, nMaxLen);
@@ -2745,7 +2744,7 @@ LONG DLLENTRY_DEF DTWAIN_GetFileTypeExtensionsW(LONG nType, LPWSTR lpszName, LON
     return DTWAIN_GetFileTypeExtensions(nType, lpszName, nMaxLen);
 #else
     std::string arg((std::max)(nMaxLen, 0L), 0);
-    const LONG retVal = DTWAIN_GetFileTypeExtensions(nType, nMaxLen > 0 ? &arg[0] : nullptr, nMaxLen);
+    const LONG retVal = DTWAIN_GetFileTypeExtensions(nType, (nMaxLen > 0 && lpszName)? &arg[0] : nullptr, nMaxLen);
     return null_terminator_copier(get_view(arg), lpszName, retVal);
 #endif
 }
@@ -2754,7 +2753,7 @@ LONG DLLENTRY_DEF DTWAIN_GetFileTypeNameA(LONG nType, LPSTR lpszName, LONG nMaxL
 {
 #ifdef _UNICODE
     std::wstring arg((std::max)(nMaxLen, 0L), 0);
-    const LONG retVal = DTWAIN_GetFileTypeName(nType, (nMaxLen > 0) ? &arg[0] : nullptr, nMaxLen);
+    const LONG retVal = DTWAIN_GetFileTypeName(nType, (nMaxLen > 0 && lpszName) ? &arg[0] : nullptr, nMaxLen);
     return null_terminator_copier(get_view(arg), lpszName, retVal);
 #else
     return DTWAIN_GetFileTypeName(nType, lpszName, nMaxLen);
@@ -2768,8 +2767,31 @@ LONG DLLENTRY_DEF DTWAIN_GetFileTypeNameW(LONG nType, LPWSTR lpszName, LONG nMax
     return DTWAIN_GetFileTypeName(nType, lpszName, nMaxLen);
 #else
     std::string arg((std::max)(nMaxLen, 0L), 0);
-    const LONG retVal = DTWAIN_GetFileTypeName(nType, nMaxLen > 0 ? &arg[0] : nullptr, nMaxLen);
+    const LONG retVal = DTWAIN_GetFileTypeName(nType, (nMaxLen > 0 && lpszName)> 0 ? &arg[0] : nullptr, nMaxLen);
     return null_terminator_copier(get_view(arg), lpszName, retVal);
 #endif
 }
+
+LONG DLLENTRY_DEF DTWAIN_GetSessionDetailsA(LPSTR lpszVer, LONG nLength)
+{
+#ifdef _UNICODE
+    std::wstring args((std::max)(nLength, 0L), 0);
+    const LONG retVal = DTWAIN_GetSessionDetails((nLength > 0 && lpszVer) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    return null_terminator_copier(get_view(args), lpszVer, retVal);
+#else
+    return DTWAIN_GetSessionDetails(lpszVer, nLength);
+#endif
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetSessionDetailsW(LPWSTR lpszVer, LONG nLength)
+{
+#ifdef _UNICODE
+    return DTWAIN_GetSessionDetails(lpszVer, nLength);
+#else
+    std::string args((std::max)(nLength, 0L), 0);
+    LONG retVal = DTWAIN_GetSessionDetails((nLength > 0 && lpszVer) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    return null_terminator_copier(get_view(args), lpszVer, retVal);
+#endif
+}
+
 #endif // CTLSTRIMPL_INL
