@@ -1234,6 +1234,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include="cpp\ctlfileutils.cpp" />
     <ClCompile Include="cpp\ctlgetmetrics.cpp" />
     <ClCompile Include="cpp\ctlpapersize.cpp" />
+    <ClCompile Include="cpp\ctlsourcedetails.cpp" />
     <ClCompile Include="cpp\ctlthreadutils.cpp" />
     <ClCompile Include="cpp\ctltimeout.cpp" />
     <ClCompile Include="cpp\ctltr041.cpp" />
@@ -1476,6 +1477,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\ctltr041.h" />
     <ClInclude Include="h\ctltr042.h" />
     <ClInclude Include="h\ctltr043.h" />
+    <ClInclude Include="h\ctltwainidentity.h" />
     <ClInclude Include="h\ctltwainmsgloop.h" />
     <ClInclude Include="h\dibinfox.h" />
     <ClInclude Include="h\dibmulti.h" />
