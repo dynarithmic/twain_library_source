@@ -119,51 +119,56 @@ namespace dynarithmic
 
         std::string to_json() const
         {
-            std::vector<std::string> jComponents;
-            std::vector<std::string> jVerComponents;
             std::stringstream jstrm;
-            jstrm << "\"id\":" << m_identity.Id;
-            jComponents.push_back(jstrm.str());
-            jstrm.str("");
-            jstrm << "\"protocol-major\":" << m_identity.ProtocolMajor;
-            jComponents.push_back(jstrm.str());
-            jstrm.str("");
-            jstrm << "\"protocol-minor\":" << m_identity.ProtocolMinor;
-            jComponents.push_back(jstrm.str());
-            jstrm.str("");
-            jstrm << "\"supported-groups\":\"" << get_supported_groups_string(m_identity.SupportedGroups) << "\"";
-            jComponents.push_back(jstrm.str());
-            jstrm.str("");
-            jstrm << "\"manufacturer\":\"" << m_identity.Manufacturer << "\"";
-            jComponents.push_back(jstrm.str());
-            jstrm.str("");
-            jstrm << "\"product-family\":\"" << m_identity.ProductFamily << "\"";
-            jComponents.push_back(jstrm.str());
-            jstrm.str("");
-            jstrm << "\"product-name\":\"" << m_identity.ProductName << "\"";
-            jComponents.push_back(jstrm.str());
-            jstrm.str("");
-            jstrm << "\"version-majornum\":" << m_identity.Version.MajorNum;
-            jComponents.push_back(jstrm.str());
-            jstrm.str("");
-            jstrm << "\"version-minornum\":" << m_identity.Version.MinorNum;
-            jComponents.push_back(jstrm.str());
-            jstrm.str("");
-            jstrm << "\"version-language\":" << m_identity.Version.Language;
-            jComponents.push_back(jstrm.str());
-            jstrm.str("");
-            jstrm << "\"version-country\":" << m_identity.Version.Country;
-            jComponents.push_back(jstrm.str());
-            jstrm.str("");
-            jstrm << "\"version-info\":\"" << m_identity.Version.Info << "\"";
-            jComponents.push_back(jstrm.str());
+            if (m_identity.SupportedGroups == 0)
+                jstrm << "{\"device-name\":\"" << m_identity.ProductName << "\", \"twain-identity\":\"<not available>\"}";
+            else
+            {
+                std::vector<std::string> jComponents;
+                std::vector<std::string> jVerComponents;
+                jstrm << "\"id\":" << m_identity.Id;
+                jComponents.push_back(jstrm.str());
+                jstrm.str("");
+                jstrm << "\"protocol-major\":" << m_identity.ProtocolMajor;
+                jComponents.push_back(jstrm.str());
+                jstrm.str("");
+                jstrm << "\"protocol-minor\":" << m_identity.ProtocolMinor;
+                jComponents.push_back(jstrm.str());
+                jstrm.str("");
+                jstrm << "\"supported-groups\":\"" << get_supported_groups_string(m_identity.SupportedGroups) << "\"";
+                jComponents.push_back(jstrm.str());
+                jstrm.str("");
+                jstrm << "\"manufacturer\":\"" << m_identity.Manufacturer << "\"";
+                jComponents.push_back(jstrm.str());
+                jstrm.str("");
+                jstrm << "\"product-family\":\"" << m_identity.ProductFamily << "\"";
+                jComponents.push_back(jstrm.str());
+                jstrm.str("");
+                jstrm << "\"product-name\":\"" << m_identity.ProductName << "\"";
+                jComponents.push_back(jstrm.str());
+                jstrm.str("");
+                jstrm << "\"version-majornum\":" << m_identity.Version.MajorNum;
+                jComponents.push_back(jstrm.str());
+                jstrm.str("");
+                jstrm << "\"version-minornum\":" << m_identity.Version.MinorNum;
+                jComponents.push_back(jstrm.str());
+                jstrm.str("");
+                jstrm << "\"version-language\":" << m_identity.Version.Language;
+                jComponents.push_back(jstrm.str());
+                jstrm.str("");
+                jstrm << "\"version-country\":" << m_identity.Version.Country;
+                jComponents.push_back(jstrm.str());
+                jstrm.str("");
+                jstrm << "\"version-info\":\"" << m_identity.Version.Info << "\"";
+                jComponents.push_back(jstrm.str());
 
-            std::string s1 = std::accumulate(jComponents.begin(), jComponents.end(), std::string(),
-                [](const std::string& total, const std::string& cur) { return total + "," + cur; }) + "}";
-            if (s1[0] == ',')
-                s1 = s1.substr(1);
-            jstrm.str("");
-            jstrm << "{\"device-name\":\"" << m_identity.ProductName << "\", \"twain-identity\":{" << s1 << "}";
+                std::string s1 = std::accumulate(jComponents.begin(), jComponents.end(), std::string(),
+                    [](const std::string& total, const std::string& cur) { return total + "," + cur; }) + "}";
+                if (s1[0] == ',')
+                    s1 = s1.substr(1);
+                jstrm.str("");
+                jstrm << "{\"device-name\":\"" << m_identity.ProductName << "\", \"twain-identity\":{" << s1 << "}";
+            }
             return jstrm.str();
         }
     };

@@ -62,6 +62,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 
     bRetval = CTL_TwainAppMgr::OpenSource(pHandle->m_pTwainSession, p);
+    if (bRetval)
+    {
+        auto& sourcemap = CTL_StaticData::GetSourceStatusMap();
+        auto iter = sourcemap.insert({ p->GetProductNameA(), {} }).first;
+        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, true);
+        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, false);
+    }
+
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bRetval || !p; }, DTWAIN_ERR_BAD_SOURCE, false, FUNC_MACRO);
 
     // If this source has a feeder, add it to the feeder sources container
