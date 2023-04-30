@@ -22,8 +22,8 @@ OF THIRD PARTY RIGHTS.
 #include <dynarithmic/twain/session/twain_session.hpp>
 #include <dynarithmic/twain/logging/logger_callback.hpp>
 #include <dynarithmic/twain/twain_source.hpp>
-#include <dynarithmic/twain/tostring/tojson.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/join.hpp>
 namespace dynarithmic
 {
     namespace twain
@@ -525,7 +525,15 @@ namespace dynarithmic
         /// @see set_app_info()
         twain_identity& twain_session::get_app_info() { return m_twain_characteristics.get_app_info(); }
 
-        std::string twain_session::get_details(const std::vector<std::string>& container_in, bool refresh)
+        std::string twain_session::get_details(details_info info)
+        {
+            auto v = get_all_source_info();
+            std::vector<std::string> vSourceNames;
+            std::transform(v.begin(), v.end(), std::back_inserter(vSourceNames), [](twain_identity& id) { return id.get_product_name();});
+            return get_details(vSourceNames, info);
+        }
+
+        std::string twain_session::get_details(const std::vector<std::string>& container_in, details_info info)
         {
             auto container = container_in;
             std::transform(std::begin(container_in), std::end(container_in), std::begin(container),
@@ -542,7 +550,7 @@ namespace dynarithmic
                     return total + "\x01" + current;
                 });
             auto iter = m_source_detail_map.find(sMapKey);
-            if (!refresh && iter != m_source_detail_map.end())
+            if (!info.bRefresh && iter != m_source_detail_map.end())
                 return iter->second;
             if (iter != m_source_detail_map.end())
                 m_source_detail_map.erase(iter);
@@ -559,7 +567,13 @@ namespace dynarithmic
             }
             if (aValidSources.empty())
                 return {};
-            sAllDetails = json_generator().generate_details(*this, aValidSources);
+            std::string sources = boost::algorithm::join(aValidSources, "|");
+            LONG nChars = API_INSTANCE DTWAIN_GetSessionDetailsA(nullptr, 0, info.indentFactor, TRUE);
+            if (nChars > 0)
+            {
+                sAllDetails.resize(nChars);
+                API_INSTANCE DTWAIN_GetSessionDetailsA(&sAllDetails[0], nChars, info.indentFactor, FALSE);
+            }
             m_source_detail_map.insert({ sMapKey, sAllDetails });
             return sAllDetails;
 #endif

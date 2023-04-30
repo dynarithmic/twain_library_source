@@ -360,7 +360,6 @@
     <ClCompile Include="options_base.cpp" />
     <ClCompile Include="paperhandling_info.cpp" />
     <ClCompile Include="pdf_text_element.cpp" />
-    <ClCompile Include="tojson.cpp" />
     <ClCompile Include="twain_callback.cpp" />
     <ClCompile Include="twain_session.cpp" />
     <ClCompile Include="twain_source.cpp" />
@@ -372,6 +371,7 @@
     <ClInclude Include="dynarithmic\twain\compiler_details.hpp" />
     <ClInclude Include="dynarithmic\twain\dtwain_twain.hpp" />
     <ClInclude Include="dynarithmic\twain\twain_callback.hpp" />
+    <ClInclude Include="dynarithmic\twain\twain_details.hpp" />
     <ClInclude Include="dynarithmic\twain\twain_session.hpp" />
     <ClInclude Include="dynarithmic\twain\twain_source.hpp" />
     <ClInclude Include="dynarithmic\twain\twain_values.hpp" />

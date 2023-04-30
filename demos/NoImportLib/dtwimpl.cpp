@@ -523,6 +523,9 @@
     D_GETSHORTVERSIONSTRINGFUNC                                       DYNDTWAIN_API::DTWAIN_GetShortVersionString = nullptr;
     D_GETSHORTVERSIONSTRINGWFUNC                                      DYNDTWAIN_API::DTWAIN_GetShortVersionStringW = nullptr;
     D_GETSOURCEACQUISITIONSFUNC                                       DYNDTWAIN_API::DTWAIN_GetSourceAcquisitions = nullptr;
+    D_GETSOURCEDETAILSFUNC                                            DYNDTWAIN_API::DTWAIN_GetSourceDetails = nullptr;
+    D_GETSOURCEDETAILSAFUNC                                           DYNDTWAIN_API::DTWAIN_GetSourceDetailsA = nullptr;
+    D_GETSOURCEDETAILSWFUNC                                           DYNDTWAIN_API::DTWAIN_GetSourceDetailsW = nullptr;
     D_GETSOURCEIDEXFUNC                                               DYNDTWAIN_API::DTWAIN_GetSourceIDEx = nullptr;
     D_GETSOURCEIDFUNC                                                 DYNDTWAIN_API::DTWAIN_GetSourceID = nullptr;
     D_GETSOURCEMANUFACTURERAFUNC                                      DYNDTWAIN_API::DTWAIN_GetSourceManufacturerA = nullptr;
@@ -982,7 +985,6 @@
     D_UNLOCKMEMORYFUNC                                                DYNDTWAIN_API::DTWAIN_UnlockMemory = nullptr;
     D_USEMULTIPLETHREADSFUNC                                          DYNDTWAIN_API::DTWAIN_UseMultipleThreads = nullptr;
 #endif
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Implementation
@@ -1525,6 +1527,9 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetShortVersionString, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetShortVersionStringW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetSourceAcquisitions, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetSourceDetails, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetSourceDetailsA, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetSourceDetailsW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetSourceIDEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetSourceID, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetSourceManufacturerA, hModule);

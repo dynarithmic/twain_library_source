@@ -51,6 +51,7 @@ OF THIRD PARTY RIGHTS.
 #include <dynarithmic/twain/twain_values.hpp>
 #include <dynarithmic/twain/types/twain_callback.hpp>
 #include <dynarithmic/twain/types/twain_array.hpp>
+#include <dynarithmic/twain/twain_details.hpp>
 #include <dtwain.h>
 
 #pragma warning( push )  // Stores the current warning state for every warning.
@@ -741,8 +742,8 @@ namespace dynarithmic
                 /// @see set_app_info()
                 twain_app_info& get_app_info();
 
-                std::string get_details(const std::vector<std::string>& container, bool refresh = false);
-
+                std::string get_details(const std::vector<std::string>& container, details_info info = {true, 2});
+                std::string get_details(details_info info = { true, 2 });
                 source_status get_source_status(const twain_source& ts);
                 source_status get_source_status(std::string prodName);
                 DTWAIN_SOURCE get_source_handle_from_name(std::string prodName);
