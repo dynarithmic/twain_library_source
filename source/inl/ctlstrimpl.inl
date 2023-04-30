@@ -2772,25 +2772,49 @@ LONG DLLENTRY_DEF DTWAIN_GetFileTypeNameW(LONG nType, LPWSTR lpszName, LONG nMax
 #endif
 }
 
-LONG DLLENTRY_DEF DTWAIN_GetSessionDetailsA(LPSTR lpszVer, LONG nLength)
+LONG DLLENTRY_DEF DTWAIN_GetSessionDetailsA(LPSTR lpszBuf, LONG nLength, LONG indentFactor, BOOL bRefresh)
 {
 #ifdef _UNICODE
     std::wstring args((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetSessionDetails((nLength > 0 && lpszVer) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
-    return null_terminator_copier(get_view(args), lpszVer, retVal);
+    const LONG retVal = DTWAIN_GetSessionDetails((nLength > 0 && lpszBuf) ? &args[0] : nullptr, static_cast<LONG>(args.size()), indentFactor, bRefresh);
+    return null_terminator_copier(get_view(args), lpszBuf, retVal);
 #else
-    return DTWAIN_GetSessionDetails(lpszVer, nLength);
+    return DTWAIN_GetSessionDetails(lpszBuf, nLength, indentFactor, bRefresh);
 #endif
 }
 
-LONG DLLENTRY_DEF DTWAIN_GetSessionDetailsW(LPWSTR lpszVer, LONG nLength)
+LONG DLLENTRY_DEF DTWAIN_GetSessionDetailsW(LPWSTR lpszBuf, LONG nLength, LONG indentFactor, BOOL bRefresh)
 {
 #ifdef _UNICODE
-    return DTWAIN_GetSessionDetails(lpszVer, nLength);
+    return DTWAIN_GetSessionDetails(lpszBuf, nLength, indentFactor, bRefresh);
 #else
     std::string args((std::max)(nLength, 0L), 0);
-    LONG retVal = DTWAIN_GetSessionDetails((nLength > 0 && lpszVer) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
-    return null_terminator_copier(get_view(args), lpszVer, retVal);
+    LONG retVal = DTWAIN_GetSessionDetails((nLength > 0 && lpszBuf) ? &args[0] : nullptr, static_cast<LONG>(args.size()), indentFactor, bRefresh);
+    return null_terminator_copier(get_view(args), lpszBuf, retVal);
+#endif
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetSourceDetailsA(LPCSTR lpszSources, LPSTR lpszBuf, LONG nLength, LONG indentFactor)
+{
+#ifdef _UNICODE
+    std::wstring args((std::max)(nLength, 0L), 0);
+    const LONG retVal = DTWAIN_GetSourceDetails(StringConversion::Convert_AnsiPtr_To_Native(lpszSources).c_str(),
+                                                (nLength > 0 && lpszBuf) ? &args[0] : nullptr, static_cast<LONG>(args.size()), indentFactor);
+    return null_terminator_copier(get_view(args), lpszBuf, retVal);
+#else
+    return DTWAIN_GetSourceDetails(lpszSources, lpszBuf, nLength, indentFactor);
+#endif
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetSourceDetailsW(LPCWSTR lpszSources, LPWSTR lpszBuf, LONG nLength, LONG indentFactor)
+{
+#ifdef _UNICODE
+    return DTWAIN_GetSourceDetails(lpszSources, lpszBuf, nLength, indentFactor);
+#else
+    std::string args((std::max)(nLength, 0L), 0);
+    const LONG retVal = DTWAIN_GetSourceDetails(StringConversion::Convert_WidePtr_To_Ansi(lpszSources).c_str(),
+                                                (nLength > 0 && lpszBuf) ? &args[0] : nullptr, static_cast<LONG>(args.size()), indentFactor);
+    return null_terminator_copier(get_view(args), lpszBuf, retVal);
 #endif
 }
 

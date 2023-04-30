@@ -1260,14 +1260,15 @@ static LONG IsValidRangeArray( DTWAIN_ARRAY pArray )
     if ( enumType != CTL_ArrayFactory::arrayTag::LongType && enumType != CTL_ArrayFactory::arrayTag::DoubleType)
         LOG_FUNC_EXIT_PARAMS(DTWAIN_ERR_WRONG_ARRAY_TYPE)
 
-    // Check if the array has at least 5 elements
-    if ( DTWAIN_ArrayGetCount( pArray ) < 5 )
-        LOG_FUNC_EXIT_PARAMS(DTWAIN_ERR_BAD_ARRAY)
-
     // Check if (low < high) and 0 < step < (high - low)
     if ( enumType == CTL_ArrayFactory::arrayTag::LongType)
     {
-        const LONG *pVals = static_cast<LONG *>(factory->get_buffer(pArray, 0));
+        auto& pVals = factory->underlying_container_t<LONG>(pArray);
+
+        // Check if the array has 5 elements
+        if ( pVals.size() != 5 )
+            LOG_FUNC_EXIT_PARAMS(DTWAIN_ERR_BAD_ARRAY)
+
         const LONG lLow = pVals[0];
         const LONG lUp = pVals[1];
         const LONG lStep = pVals[2];
@@ -1283,7 +1284,11 @@ static LONG IsValidRangeArray( DTWAIN_ARRAY pArray )
     }
     else
     {
-        const double *pVals = static_cast<double*>(factory->get_buffer(pArray, 0));
+        auto& pVals = factory->underlying_container_t<double>(pArray);
+
+        // Check if the array has 5 elements
+        if (pVals.size() != 5)
+            LOG_FUNC_EXIT_PARAMS(DTWAIN_ERR_BAD_ARRAY)
         const double dLow = pVals[0];
         const double dUp = pVals[1];
         const double dStep = pVals[2];

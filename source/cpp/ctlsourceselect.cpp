@@ -234,7 +234,7 @@ DTWAIN_SOURCE dynarithmic::SourceSelect(const SourceSelectionOptions& options)
                 const auto pSession = CTL_TwainAppMgr::GetCurrentSession();
                 pSession->DestroyOneSource(pRealSource);
             }
-                DTWAIN_SetDefaultSource(pDead);
+            DTWAIN_SetDefaultSource(pDead);
             LOG_FUNC_EXIT_PARAMS(pDead)
         }
     }

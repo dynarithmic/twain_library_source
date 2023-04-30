@@ -143,7 +143,7 @@ namespace dynarithmic
         auto& underlying_container_t(arrayTag* pTag) const
         {
 	        if (auto* p = static_cast<tagged_array<T>*>(pTag))
-            return p->get_container();
+                return p->get_container();
             throw (std::invalid_argument::invalid_argument("underlying_container_t argument cannot be nullptr"));
         }
 
