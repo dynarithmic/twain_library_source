@@ -596,20 +596,29 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     {
                         auto pixInfo = getPixelAndBitDepthInfo(pCurrentSourcePtr);
                         std::vector<LONG> allPixInfo;
+                        std::vector<std::string> vPixNames;
+                        std::vector<std::string> vPixNamesEx;
                         for (auto& pr : pixInfo)
+                        {
                             allPixInfo.push_back(pr.first);
+                            char szName[20];
+                            DTWAIN_GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWPT, pr.first, szName, 20);
+                            std::string sName = szName;
+                            vPixNames.push_back(StringWrapperA::LowerCase(sName.substr(5)));
+                            vPixNamesEx.push_back("\"" + vPixNames.back() + "\"");
+                        }
                         strm << "\"num-colors\":" << pixInfo.size() << ",";
                         jColorInfo += strm.str();
 
                         strm.str("");
-                        std::string joinStr = join_string(allPixInfo.begin(), allPixInfo.end());
+                        std::string joinStr = join_string(vPixNamesEx.begin(), vPixNamesEx.end());
                         strm << "\"color-types\":[" << joinStr << "],";
 
                         strm2 << "\"bitdepthinfo\":{";
                         int depthCount = 0;
                         for (auto & pr : pixInfo)
                         {
-                            strm2 << "\"depth_" << depthCount << "\":[";
+                            strm2 << "\"depth_" << vPixNames[depthCount] << "\":[";
                             std::string bdepthStr = join_string(pr.second.begin(), pr.second.end());
                             strm2 << bdepthStr << "],";
                             ++depthCount;
@@ -625,7 +634,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         auto vSizeNames = getPageSizeInfo(pCurrentSourcePtr);
                         std::vector<std::string> vAdjustedNames;
                         std::transform(vSizeNames.begin(), vSizeNames.end(), std::back_inserter(vAdjustedNames),
-                            [](auto& origName) { return "\"" + origName + "\""; });
+                            [](auto& origName) { return "\"" + origName.substr(5) + "\""; });
 
                         std::string paperSizesStr = join_string(vAdjustedNames.begin(), vAdjustedNames.end());
                         strm2 << "\"paper-sizes\":[" << paperSizesStr << "],";
