@@ -667,7 +667,7 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
             // Make sure that job control is "on"
             pSource->StartJob();
 
-            if ( ptrPending->Count != 0 && bJobControlContinue) // More to transfer
+            if ( ptrPending->Count != 0) // More to transfer
             {
                 CTL_TwainAppMgr::WriteLogInfoA("More To Transfer...\n");
                 // Check if max pages has been reached.  Some Sources do not detect when
