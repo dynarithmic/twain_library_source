@@ -196,6 +196,9 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
             return DTWAIN_ERR_FILEWRITE;
         }
     }
+    else
+    if ( !pPDFInfo )
+        return DTWAIN_ERR_FILEWRITE;
 
     // Initialize the page dimensions depending on the image information
     retval = InitializePDFPage(pPDFInfo.get(), bitmap);
