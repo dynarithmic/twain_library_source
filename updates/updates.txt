@@ -8,6 +8,8 @@ DTWAIN Version changes
 
 - Address issue with string-based TWAIN capabilities not being retrieved correctly.
 
+- Ensure DTWAIN_TN_PAGExxxx notifications are sent on every successful page acquisition.
+
 - Add DTWAIN_GetSessionDetails and DTWAIN_GetSourceDetails to return a JSON string describing the TWAIN session
   and TWAIN sources, respectively.
 
