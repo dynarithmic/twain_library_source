@@ -515,6 +515,9 @@
     D_GETSAVEFILENAMEAFUNC                                            DYNDTWAIN_API::DTWAIN_GetSaveFileNameA = nullptr;
     D_GETSAVEFILENAMEFUNC                                             DYNDTWAIN_API::DTWAIN_GetSaveFileName = nullptr;
     D_GETSAVEFILENAMEWFUNC                                            DYNDTWAIN_API::DTWAIN_GetSaveFileNameW = nullptr;
+    D_GETSESSIONDETAILSFUNC                                           DYNDTWAIN_API::DTWAIN_GetSessionDetails = nullptr;
+    D_GETSESSIONDETAILSAFUNC                                          DYNDTWAIN_API::DTWAIN_GetSessionDetailsA = nullptr;
+    D_GETSESSIONDETAILSWFUNC                                          DYNDTWAIN_API::DTWAIN_GetSessionDetailsW = nullptr;
     D_GETSHADOWFUNC                                                   DYNDTWAIN_API::DTWAIN_GetShadow = nullptr;
     D_GETSHADOWSTRINGAFUNC                                            DYNDTWAIN_API::DTWAIN_GetShadowStringA = nullptr;
     D_GETSHADOWSTRINGFUNC                                             DYNDTWAIN_API::DTWAIN_GetShadowString = nullptr;
@@ -1035,7 +1038,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
               if (Major >= DTWAIN_MAJOR_VERSION)
               {
                   if (Minor >= DTWAIN_MINOR_VERSION)
-                      DTWAINAPI_ASSERT(Patch >= DTWAIN_SUBMINOR_VERSION)
+                      DTWAINAPI_ASSERT(Patch >= DTWAIN_PATCHLEVEL_VERSION)
                   else
                       DTWAINAPI_ASSERT(Minor >= DTWAIN_MINOR_VERSION)
               }
@@ -1519,6 +1522,9 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetSaveFileNameA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetSaveFileName, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetSaveFileNameW, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetSessionDetails, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetSessionDetailsA, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetSessionDetailsW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetShadow, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetShadowStringA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetShadowString, hModule);

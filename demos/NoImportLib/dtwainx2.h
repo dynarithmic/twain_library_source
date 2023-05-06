@@ -983,6 +983,9 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF* D_SETBLANKPAGEDETECTIONEXSTRING)             
 typedef LONG        (DLLENTRY_DEF* D_GETSOURCEDETAILSFUNC)                      (LPCTSTR, LPTSTR, LONG, DTWAIN_BOOL);
 typedef LONG        (DLLENTRY_DEF* D_GETSOURCEDETAILSAFUNC)                     (LPCSTR, LPSTR, LONG, DTWAIN_BOOL);
 typedef LONG        (DLLENTRY_DEF* D_GETSOURCEDETAILSWFUNC)                     (LPCWSTR, LPWSTR, LONG, DTWAIN_BOOL);
+typedef LONG        (DLLENTRY_DEF* D_GETSESSIONDETAILSFUNC)                     (LPTSTR, LONG, LONG, DTWAIN_BOOL);
+typedef LONG        (DLLENTRY_DEF* D_GETSESSIONDETAILSAFUNC)                    (LPSTR, LONG, LONG, DTWAIN_BOOL);
+typedef LONG        (DLLENTRY_DEF* D_GETSESSIONDETAILSWFUNC)                    (LPWSTR, LONG, LONG, DTWAIN_BOOL);
 #ifdef __cplusplus
 }
 #endif
@@ -1476,6 +1479,9 @@ typedef LONG        (DLLENTRY_DEF* D_GETSOURCEDETAILSWFUNC)                     
     STATIC D_GETSAVEFILENAMEAFUNC                           DTWAIN_GetSaveFileNameA;
     STATIC D_GETSAVEFILENAMEFUNC                            DTWAIN_GetSaveFileName;
     STATIC D_GETSAVEFILENAMEWFUNC                           DTWAIN_GetSaveFileNameW;
+    STATIC D_GETSESSIONDETAILSFUNC                          DTWAIN_GetSessionDetails;
+    STATIC D_GETSESSIONDETAILSAFUNC                         DTWAIN_GetSessionDetailsA;
+    STATIC D_GETSESSIONDETAILSWFUNC                         DTWAIN_GetSessionDetailsW;
     STATIC D_GETSHADOWFUNC                                  DTWAIN_GetShadow;
     STATIC D_GETSHADOWSTRINGAFUNC                           DTWAIN_GetShadowStringA;
     STATIC D_GETSHADOWSTRINGFUNC                            DTWAIN_GetShadowString;
