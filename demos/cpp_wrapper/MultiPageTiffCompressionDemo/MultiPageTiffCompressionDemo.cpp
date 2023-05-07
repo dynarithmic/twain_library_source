@@ -64,7 +64,7 @@ int Runner::Run()
             // By default, this will acquire to a Windows multipage TIFF file
             auto& ac = twsource.get_acquire_characteristics();
             ac.get_file_transfer_options().
-               set_name("c:\\dtwain_test\\tiffdifferentcompressions.tif").set_type(filetype_value::tiffnocompressmulti);
+               set_name("tiffdifferentcompressions.tif").set_type(filetype_value::tiffnocompressmulti);
 
             // enable the feeder (may need to do this for "devices" that do not 
             // use hardware to acquire images.
