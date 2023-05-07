@@ -132,6 +132,33 @@ If you wish to build the demo applications, the **demos\AllDemos.sln** file can 
 
 The demos consist of C and C++ language demos, plus C++ demos based on an experimental C++ wrapper library that is currently being developed.  In addition, there are C# and Visual Basic *.sln files you can load, build, and test the functionality of DTWAIN.
 
+##### Using the debug DTWAIN DLL's in the demo programs
+The demo programs, by default, will use the release versions of the DTWAIN DLL's.  To use the debug versions of the DTWAIN library, one of the two options is available:
+
+1) Use the following `#define` at the beginning of the main source file that include's **dtwain.h**:
+```cpp
+#define USE_DTWAIN_DEBUG_LIB
+```
+or
+
+2) Define `USE_DTWAIN_DEBUG_LIB` as a preprocessor constant:
+
+![](demos/preprocess.jpg)
+
+If the debug libraries are being used, during the compilation phase in Visual Studio, you should receive the following message in the compiler Output Window:
+
+```plaintext
+Using import library xxxxxx.lib in link phase..
+```
+where "xxxxxx.lib" will be one of the following:
+
+```plaintext
+dtwain32d.lib
+dtwain32ud.lib
+dtwain64d.lib
+dtwain64ud.lib
+```
+
 ----
 
 ### Contributing your updates to this repository
