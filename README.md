@@ -5,18 +5,6 @@ This repository contains the source code and development versions of the Dynarit
 
 ----
 
-**Please note -- Due to licensing issues, the debug versions of the DLL's requires you to rebuild them locally. 
-
-* dtwain32d.dll
-* dtwain32ud.dll
-* dtwain64d.dll
-* dtwain64ud.dll
-
-The only DLL's that are available in this repository without having to build them are the Release versions.
-See the steps below to getting setup in building the release and debug versions of the Dynamic Link Libraries.
-
-----
-
 ### Rebuilding the Dynarithmic TWAIN Library from source ###
 
 **Please note -- these build steps only supports Visual Studio 2019 and above.**
