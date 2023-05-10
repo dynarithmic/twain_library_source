@@ -333,9 +333,23 @@ namespace dynarithmic
         return ret;
     }
 
-    size_t GetResourceStringA(UINT nError, LPSTR buffer, LONG bufSize)
+    size_t GetResourceStringA(UINT nResNumber, LPSTR buffer, LONG bufSize)
     {
-        return StringWrapperA::CopyInfoToCString(GetResourceStringFromMap(nError), buffer, bufSize);
+        return StringWrapperA::CopyInfoToCString(GetResourceStringFromMap(nResNumber), buffer, bufSize);
+    }
+
+    size_t GetResourceStringW(UINT nResNumber, LPWSTR buffer, LONG bufSize)
+    {
+        auto str = GetResourceStringFromMap(nResNumber);
+        auto native_str = StringConversion::Convert_Ansi_To_Wide(str);
+        return StringWrapperW::CopyInfoToCString(native_str, buffer, bufSize);
+    }
+
+    size_t GetResourceString(UINT nResNumber, LPTSTR buffer, LONG bufSize)
+    {
+        auto str = GetResourceStringFromMap(nResNumber);
+        auto native_str = StringConversion::Convert_Ansi_To_Native(str);
+        return StringWrapper::CopyInfoToCString(native_str, buffer, bufSize);
     }
 
     std::string GetResourceStringFromMap(LONG nError)

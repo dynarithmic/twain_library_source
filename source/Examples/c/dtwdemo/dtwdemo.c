@@ -1068,9 +1068,15 @@ LRESULT CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     switch (message)
     {
         case WM_INITDIALOG:
-                
-                SendMessageA(hDlg, WM_SETTEXT, 0, (LPARAM)DTWAIN_VERINFO_FILEVERSION);
+        {
+            char szBuf[1000];
+            HWND hWndEdit = GetDlgItem(hDlg, IDC_edCopyright);
+            DTWAIN_GetShortVersionStringA(szBuf, 100);
+            SendMessageA(hDlg, WM_SETTEXT, 0, (LPARAM)szBuf);
+            DTWAIN_GetAppTitleA(szBuf, 1000);
+            SendMessageA(hWndEdit, WM_SETTEXT, 0, (LPARAM)szBuf);
                 return TRUE;
+        }
 
         case WM_COMMAND:
             if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
