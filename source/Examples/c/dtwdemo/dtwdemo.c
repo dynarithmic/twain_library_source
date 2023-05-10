@@ -1075,7 +1075,7 @@ LRESULT CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
             SendMessageA(hDlg, WM_SETTEXT, 0, (LPARAM)szBuf);
             DTWAIN_GetVersionCopyrightA(szBuf, 1000);
             SendMessageA(hWndEdit, WM_SETTEXT, 0, (LPARAM)szBuf);
-                return TRUE;
+            return TRUE;
         }
 
         case WM_COMMAND:
