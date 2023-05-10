@@ -1973,7 +1973,7 @@ LONG DLLENTRY_DEF DTWAIN_GetVersionInfo(LPTSTR lpszVer, LONG nLength)
     CATCH_BLOCK(-1)
 }
 
-LONG DLLENTRY_DEF DTWAIN_GetAppTitle(LPTSTR lpszVer, LONG nLength)
+LONG DLLENTRY_DEF DTWAIN_GetVersionCopyright(LPTSTR lpszVer, LONG nLength)
 {
     LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
     const LONG RetVal = GetResourceString(IDS_DTWAIN_APPTITLE, lpszVer, nLength);

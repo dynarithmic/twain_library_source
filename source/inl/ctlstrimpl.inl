@@ -2818,24 +2818,24 @@ LONG DLLENTRY_DEF DTWAIN_GetSourceDetailsW(LPCWSTR lpszSources, LPWSTR lpszBuf, 
 #endif
 }
 
-LONG  DLLENTRY_DEF DTWAIN_GetAppTitleA(LPSTR lpszApp, LONG nLength)
+LONG  DLLENTRY_DEF DTWAIN_GetVersionCopyrightA(LPSTR lpszApp, LONG nLength)
 {
 #ifdef _UNICODE
     std::wstring args((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetAppTitle((nLength > 0 && lpszApp) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    const LONG retVal = DTWAIN_GetVersionCopyright((nLength > 0 && lpszApp) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), lpszApp , retVal);
 #else
-    return DTWAIN_GetAppTitle(lpszApp, nLength);
+    return DTWAIN_GetVersionCopyright(lpszApp, nLength);
 #endif
 }
 
-LONG DLLENTRY_DEF DTWAIN_GetAppTitleW(LPWSTR lpszApp, LONG nLength)
+LONG DLLENTRY_DEF DTWAIN_GetVersionCopyrightW(LPWSTR lpszApp, LONG nLength)
 {
 #ifdef _UNICODE
-    return DTWAIN_GetAppTitle(lpszApp, nLength);
+    return DTWAIN_GetVersionCopyright(lpszApp, nLength);
 #else
     std::string args((std::max)(nLength, 0L), 0);
-    const LONG retVal = DTWAIN_GetAppTitle((nLength > 0 && lpszApp) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    const LONG retVal = DTWAIN_GetVersionCopyright((nLength > 0 && lpszApp) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), lpszApp, retVal);
 #endif
 }
