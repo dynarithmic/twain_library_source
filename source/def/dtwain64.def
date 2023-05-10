@@ -1018,6 +1018,6 @@ DTWAIN_GetSessionDetailsW                         @31002
 DTWAIN_GetSourceDetails                           @31003
 DTWAIN_GetSourceDetailsA                          @31004
 DTWAIN_GetSourceDetailsW                          @31005
-DTWAIN_GetAppTitle                                @31006
-DTWAIN_GetAppTitleA                               @31007
-DTWAIN_GetAppTitleW                               @31008
+DTWAIN_GetVersionCopyright                        @31006
+DTWAIN_GetVersionCopyrightA                       @31007
+DTWAIN_GetVersionCopyrightW                       @31008

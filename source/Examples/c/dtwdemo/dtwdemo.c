@@ -1073,7 +1073,7 @@ LRESULT CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
             HWND hWndEdit = GetDlgItem(hDlg, IDC_edCopyright);
             DTWAIN_GetShortVersionStringA(szBuf, 100);
             SendMessageA(hDlg, WM_SETTEXT, 0, (LPARAM)szBuf);
-            DTWAIN_GetAppTitleA(szBuf, 1000);
+            DTWAIN_GetVersionCopyrightA(szBuf, 1000);
             SendMessageA(hWndEdit, WM_SETTEXT, 0, (LPARAM)szBuf);
                 return TRUE;
         }
