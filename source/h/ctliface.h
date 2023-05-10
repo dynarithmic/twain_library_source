@@ -794,6 +794,8 @@ namespace dynarithmic
     bool GetSupportArray(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array, LONG Cap, LONG GetType=DTWAIN_CAPGET);
     CTL_StringType& GetDTWAINTempFilePath();
     size_t GetResourceStringA(UINT nResNumber, LPSTR buffer, LONG bufSize);
+    size_t GetResourceStringW(UINT nResNumber, LPWSTR buffer, LONG bufSize);
+    size_t GetResourceString(UINT nResNumber, LPTSTR buffer, LONG bufSize);
     bool LoadLanguageResourceXML(LPCTSTR sLangDLL);
     bool LoadLanguageResourceXMLImpl(LPCTSTR szFile);
     void DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap);
