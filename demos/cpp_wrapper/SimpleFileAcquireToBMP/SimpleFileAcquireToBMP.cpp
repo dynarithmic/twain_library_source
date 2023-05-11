@@ -5,16 +5,11 @@
 #include <dynarithmic/twain/twain_session.hpp> // for dynarithmic::twain::twain_session
 #include <dynarithmic/twain/twain_source.hpp>  // for dynarithmic::twain::twain_source
 #include <dynarithmic/twain/acquire_characteristics.hpp>  // for acquire_characteristics
+#include "..\Runner\runnerbase.h"
 
-struct Runner
+struct Runner : RunnerBase
 {
     int Run();
-    ~Runner()
-    {
-        printf("\nPress Enter key to exit application...\n");
-        char temp;
-        std::cin.get(temp);
-    }
 };
 
 int Runner::Run()
@@ -40,9 +35,6 @@ int Runner::Run()
     // check if we were able to open the source
     if (twsource.is_open())
     {
-        // output the source product name
-        std::cout << twsource.get_source_info().get_product_name() << "\n";
-
         // set the characteristics to acquire to a file.
         // By default, this will acquire to a Windows BMP file
         twsource.get_acquire_characteristics().

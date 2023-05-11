@@ -51,7 +51,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
         LOG_FUNC_EXIT_PARAMS(false)
     DTWAIN_ARRAY pDTWAINArray = aSource;
 
-    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto& factory = pHandle->m_ArrayFactory;
     auto& vEnum = factory->underlying_container_t<CTL_ITwainSource*>(pDTWAINArray);
     vEnum.clear();
 
@@ -64,16 +64,19 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
             LOG_FUNC_EXIT_PARAMS(false)
     }
 
-    struct EnumAddValue {
-        DTWAIN_ARRAY m_Arr; EnumAddValue(DTWAIN_ARRAY Arr) : m_Arr(Arr) {}
-        void operator()(CTL_ITwainSource* ptr) const
-        {
-            CTL_TwainDLLHandle::s_ArrayFactory->add_to_back(m_Arr, &ptr, 1);
-        }
-    };
-
     CTL_TwainAppMgr::EnumSources(pHandle->m_pTwainSession, SourceArray);
     std::copy(SourceArray.begin(), SourceArray.end(), std::back_inserter(vEnum));
+    auto& status_map = CTL_StaticData::GetSourceStatusMap();
+    std::for_each(SourceArray.begin(), SourceArray.end(), [&](CTL_ITwainSource* pSource)
+        {
+            std::string sname = pSource->GetProductNameA();
+            auto iter = status_map.find(sname);
+            if (iter == status_map.end())
+            {
+                auto mapIter = status_map.insert({ sname, {} }).first;
+                mapIter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, true);
+            }
+        });
     *Array = aSource;
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)

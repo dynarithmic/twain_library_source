@@ -6,18 +6,14 @@
 #include <dynarithmic/twain/twain_session.hpp> // for twain_session
 #include <dynarithmic/twain/twain_source.hpp>  // for twain_source
 #include <dynarithmic/twain/capability_interface.hpp>  // for capability_interface
+#include "..\Runner\runnerbase.h"
 
-using namespace dynarithmic::twain;
-struct Runner
+struct Runner : RunnerBase
 {
     int Run();
-    ~Runner()
-    {
-        printf("\nPress Enter key to exit application...\n");
-        char temp;
-        std::cin.get(temp);
-    }
 };
+
+using namespace dynarithmic::twain;
 
 int Runner::Run()
 {
@@ -43,10 +39,6 @@ int Runner::Run()
         // check if we were able to open the source
         if (twsource.is_open())
         {
-            // output the source product name
-            std::string prodName = twsource.get_source_info().get_product_name();
-            std::cout << prodName << "\n";
-
             // Get the interface to the capabilities of the device
             auto& ci = twsource.get_capability_interface();
 
@@ -54,7 +46,8 @@ int Runner::Run()
             auto vPixelTypes = ci.get_pixeltype();
             if (vPixelTypes.empty())
             {
-                std::cout << "Could not obtain the color type information for device \"" << prodName << "\"\n";
+                std::cout << "Could not obtain the color type information for device \"" << 
+                   twsource.get_source_info().get_product_name() << "\"\n";
                 return 0;
             }
 

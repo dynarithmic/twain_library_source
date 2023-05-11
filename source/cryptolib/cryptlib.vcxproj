@@ -73,7 +73,7 @@
     <DefaultPlatformToolset Condition=" '$(DefaultPlatformToolset)' == '' ">v100</DefaultPlatformToolset>
   </PropertyGroup>
   <PropertyGroup Label="PlatformToolset">
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -142,7 +142,7 @@
     <ClCompile>
       <PreprocessorDefinitions>CRYPTOPP_DISABLE_ASM;USE_PRECOMPILED_HEADERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Optimization>Disabled</Optimization>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>None</DebugInformationFormat>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -157,7 +157,7 @@
     <ClCompile>
       <PreprocessorDefinitions>CRYPTOPP_DISABLE_ASM;NDEBUG;USE_PRECOMPILED_HEADERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <OmitFramePointers>true</OmitFramePointers>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>MinSpace</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FunctionLevelLinking>
@@ -210,6 +210,8 @@
       <OmitFramePointers>true</OmitFramePointers>
       <ExceptionHandling>Async</ExceptionHandling>
       <LanguageStandard>stdcpp14</LanguageStandard>
+      <Optimization>MinSpace</Optimization>
+      <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugU|x64'">
@@ -221,6 +223,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <PreprocessorDefinitions>CRYPTOPP_DISABLE_ASM;NDEBUG;USE_PRECOMPILED_HEADERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseU|x64'">
@@ -232,6 +235,8 @@
       <PreprocessorDefinitions>NDEBUG;CRYPTOPP_DISABLE_ASM;USE_PRECOMPILED_HEADERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <LanguageStandard>stdcpp14</LanguageStandard>
+      <Optimization>MinSpace</Optimization>
+      <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -250,6 +255,7 @@
     <ClCompile>
       <ExceptionHandling>Async</ExceptionHandling>
       <LanguageStandard>stdcpp14</LanguageStandard>
+      <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugU|Win32'">
@@ -265,6 +271,7 @@
       <ExceptionHandling>Async</ExceptionHandling>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <PreprocessorDefinitions>CRYPTOPP_DISABLE_ASM;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -283,6 +290,7 @@
     <ClCompile>
       <ExceptionHandling>Async</ExceptionHandling>
       <LanguageStandard>stdcpp14</LanguageStandard>
+      <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
   </ItemDefinitionGroup>
   <!-- Original File with special treatment -->
@@ -387,6 +395,12 @@
     <ClCompile Include="keccak_simd.cpp" />
     <ClCompile Include="lea.cpp" />
     <ClCompile Include="lea_simd.cpp" />
+    <ClCompile Include="lsh256.cpp" />
+    <ClCompile Include="lsh256_sse.cpp" />
+    <ClCompile Include="lsh256_avx.cpp" />
+    <ClCompile Include="lsh512.cpp" />
+    <ClCompile Include="lsh512_sse.cpp" />
+    <ClCompile Include="lsh512_avx.cpp" />
     <ClCompile Include="luc.cpp" />
     <ClCompile Include="mars.cpp" />
     <ClCompile Include="marss.cpp" />
@@ -609,6 +623,7 @@
     <ClInclude Include="keccak.h" />
     <ClInclude Include="lubyrack.h" />
     <ClInclude Include="lea.h" />
+    <ClInclude Include="lsh.h" />
     <ClInclude Include="luc.h" />
     <ClInclude Include="mars.h" />
     <ClInclude Include="md2.h" />
@@ -695,8 +710,6 @@
     <ClInclude Include="zdeflate.h" />
     <ClInclude Include="zinflate.h" />
     <ClInclude Include="zlib.h" />
-  </ItemGroup>
-  <ItemGroup>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

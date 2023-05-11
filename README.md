@@ -5,19 +5,13 @@ This repository contains the source code and development versions of the Dynarit
 
 ----
 
-**Please note -- Due to licensing issues, the debug versions of the DLL's requires you to rebuild them locally. 
-
-* dtwain32d.dll
-* dtwain32ud.dll
-* dtwain64d.dll
-* dtwain64ud.dll
-
-The only DLL's that are available in this repository without having to build them are the Release versions.
-See the steps below to getting setup in building the release and debug versions of the Dynamic Link Libraries.
+##### [Rebuilding DTWAIN from source](#rebuild-source)
+##### [Building the Demo Programs](#build-demo)  
+##### [Contributing updates](#contribute-updates)
 
 ----
 
-### Rebuilding the Dynarithmic TWAIN Library from source ###
+### <a name="rebuild-source"></a> Rebuilding the Dynarithmic TWAIN Library from source ###
 
 **Please note -- these build steps only supports Visual Studio 2019 and above.**
 
@@ -139,14 +133,41 @@ Note that the C++ source code should be able to be built with any C++17 complian
 * When all the configurations are built, there should be multiple DTWDEMO*.exe programs residing in the **binaries** subdirectory, where the suffix used in the program name matches the DTWAIN DLL that will be loaded.  For example, DTWDEMO32U.exe will load the dtwain32u.dll library when run. The easiest way to get started is to debug DTWDEMO.EXE and single step through the program using the debugger to get a feel of the flow of the program.  You should get a good idea of how DTWAIN works if you step into one or more of the DTWAIN functions (such as DTWAIN_SysInitialize or DTWAIN_SelectSource).
 
 ----
-### Building the demo applications
+### <a name="build-demo"></a> Building the demo applications
 If you wish to build the demo applications, the **demos\AllDemos.sln** file can be loaded into Visual Studio 2019 or 2022.  Please note that you must build the base libraries first (by building using the **dtwain_5_vs2019.sln** project, mentioned above) before building the demos.  
 
 The demos consist of C and C++ language demos, plus C++ demos based on an experimental C++ wrapper library that is currently being developed.  In addition, there are C# and Visual Basic *.sln files you can load, build, and test the functionality of DTWAIN.
 
+##### Using the debug DTWAIN DLL's in the demo programs
+The demo programs, by default, will use the release versions of the DTWAIN DLL's.  To use the debug versions of the DTWAIN library, one of the two options is available:
+
+1) Use the following `#define` at the beginning of the main source file that include's **dtwain.h**:
+```cpp
+#define USE_DTWAIN_DEBUG_LIB
+```
+or
+
+2) Define `USE_DTWAIN_DEBUG_LIB` as a preprocessor constant:
+
+![](demos/preprocess.jpg)
+
+If the debug libraries are being used, during the compilation phase in Visual Studio, you should receive the following message in the compiler Output Window:
+
+```plaintext
+Using import library xxxxxx.lib in link phase..
+```
+where "xxxxxx.lib" will be one of the following:
+
+```plaintext
+dtwain32d.lib
+dtwain32ud.lib
+dtwain64d.lib
+dtwain64ud.lib
+```
+
 ----
 
-### Contributing your updates to this repository
+### <a name="contribute-updates"></a> Contributing your updates to this repository
 If you wish to add your own changes to this repository, it is highly suggested that you "git clone" the **development** branch, and then make a pull request to have your changes merged into the development branch (not the **main** branch).  Once the pull request passes review, the updated changes will be merged into the development branch.  
 
 When deemed appropriate by the maintainer of this repository, the development branch will be merged into the main branch.  Then the main branch will be used to build the libraries found in the dynarithmic/twain_library repository.  The main branch will always reflect the current build being distributed to the public in the dynarithmic/twain_library repository. 

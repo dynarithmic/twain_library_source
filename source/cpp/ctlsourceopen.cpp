@@ -22,6 +22,7 @@
 #include "ctltwmgr.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
+#include "../wildcards/wildcards.hpp"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -29,6 +30,7 @@
 using namespace dynarithmic;
 
 static void LogAndCachePixelTypes(CTL_ITwainSource *p);
+static void DetermineIfSpecialXfer(CTL_ITwainSource* p);
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSourcesOnSelect(DTWAIN_BOOL bSet)
 {
@@ -60,11 +62,19 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 
     bRetval = CTL_TwainAppMgr::OpenSource(pHandle->m_pTwainSession, p);
+    if (bRetval)
+    {
+        auto& sourcemap = CTL_StaticData::GetSourceStatusMap();
+        auto iter = sourcemap.insert({ p->GetProductNameA(), {} }).first;
+        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, true);
+        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, false);
+    }
+
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bRetval || !p; }, DTWAIN_ERR_BAD_SOURCE, false, FUNC_MACRO);
 
     // If this source has a feeder, add it to the feeder sources container
     if (DTWAIN_IsFeederSensitive(Source))
-        CTL_TwainDLLHandle::s_aFeederSources.insert(Source);
+        pHandle->m_aFeederSources.insert(Source);
 
     // Get the supported transfer types
     p->SetSupportedTransferMechanisms(CTL_TwainAppMgr::EnumTransferMechanisms(p));
@@ -72,12 +82,16 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     // Cache the pixel types and bit depths
     LogAndCachePixelTypes(p);
 
+    // See if the source is one that has a bug in the MSG_XFERREADY sending on the 
+    // TWAIN message queue
+    DetermineIfSpecialXfer(p);
+
     DTWAIN_ARRAY arr = nullptr;
     DTWAINArrayPtr_RAII raii(&arr);
     DTWAIN_EnumSupportedCaps(Source, &arr);
 
     // if any logging is turned on, then get the capabilities and log the values
-    if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+    if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
     {
         CTL_StringType msg = _T("Source: ") + p->GetProductName() + _T(" has been opened successfully");
         CTL_TwainAppMgr::WriteLogInfo(msg);
@@ -85,7 +99,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
         // Log the caps if logging is turned on
         CTL_StringType sName;
 
-        auto& vCaps = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(arr);
+        auto& vCaps = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
         std::vector<std::string> VecString(vCaps.size());
 
         // copy the names
@@ -140,7 +154,7 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
 
     p->SetCurrentlyProcessingPixelInfo(true);
     char szName[MaxMessage + 1];
-    LONG oldflags = CTL_TwainDLLHandle::s_lErrorFilterFlags;
+    LONG oldflags = CTL_StaticData::s_lErrorFilterFlags;
 
     if (oldflags)
         DTWAIN_GetSourceProductNameA(p, szName, MaxMessage);
@@ -154,7 +168,8 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
     if (bOK)
     {
         DTWAINArrayLL_RAII arrP(PixelTypes);
-        auto& vPixelTypes = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(PixelTypes);
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        auto& vPixelTypes = pHandle->m_ArrayFactory->underlying_container_t<LONG>(PixelTypes);
 
         LONG nCount = static_cast<LONG>(vPixelTypes.size());
         if (nCount > 0)
@@ -164,7 +179,7 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
             DTWAINArrayLL_RAII raii(vCurPixType);
 
             // get pointer to internals of the array
-            auto& vCurPixTypePtr = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(vCurPixType);
+            auto& vCurPixTypePtr = pHandle->m_ArrayFactory->underlying_container_t<LONG>(vCurPixType);
 
             for (LONG i = 0; i < nCount; ++i)
             {
@@ -182,7 +197,7 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
                         DTWAINArrayLL_RAII arr(BitDepths);
 
                         // Get the total number of bit depths.
-                        auto& vBitDepths = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(BitDepths);
+                        auto& vBitDepths = pHandle->m_ArrayFactory->underlying_container_t<LONG>(BitDepths);
 
                         LONG nCountBPP = static_cast<LONG>(vBitDepths.size());
                         if (oldflags & DTWAIN_LOG_MISCELLANEOUS)
@@ -218,3 +233,32 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
         CTL_TwainAppMgr::WriteLogInfoA("Could not retrieve bit depth information\n");
     p->SetCurrentlyProcessingPixelInfo(false);
 }
+
+void DetermineIfSpecialXfer(CTL_ITwainSource* p)
+{
+    using wildcards::match;
+    auto& xfer_map = CTL_TwainAppMgr::GetSourceToXferReadyMap();
+    auto& xfer_list= CTL_TwainAppMgr::GetSourceToXferReadyList();
+    std::string sourceName = p->GetProductNameA();
+    auto iter = xfer_map.find(sourceName);
+
+    // Already in map
+    if (iter != xfer_map.end())
+        return;
+
+    // Search vector for a matching name
+    auto iterSearch = xfer_list.begin();
+    while (iterSearch != xfer_list.end())
+    {
+        bool matches = match(sourceName, iterSearch->first);
+        if (matches)
+        {
+            // Add this source as one that will require special MSG_XFERREADY processing
+            auto insertPr = xfer_map.insert({ sourceName, {} });
+            insertPr.first->second.m_MaxThreshold = iterSearch->second;
+            return;
+        }
+        ++iterSearch;
+    }
+}
+

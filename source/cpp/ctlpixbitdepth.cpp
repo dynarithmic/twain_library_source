@@ -63,7 +63,7 @@ DTWAIN_BOOL DTWAIN_SetPixelTypeHelper(DTWAIN_SOURCE Source, LONG PixelType, LONG
 
     DTWAINArrayLL_RAII a(Array);
 
-    auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(Array);
+    auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
     LONG defaultBitDepth = -1;
     if (PixelType == DTWAIN_PT_DEFAULT)
         GetPixelType(Source, &PixelType, &defaultBitDepth, DTWAIN_CAPGETDEFAULT);
@@ -121,7 +121,8 @@ DTWAIN_BOOL GetPixelType(DTWAIN_SOURCE Source, LPLONG PixelType, LPLONG BitDepth
     if ( bRet )
     {
         DTWAINArrayLL_RAII arr(Array);
-        const auto& vIn = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(Array);
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        const auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
 
         if ( !vIn.empty())
         {
@@ -147,7 +148,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBitDepth(DTWAIN_SOURCE Source, LONG BitDepth,
     if ( !Array )
         LOG_FUNC_EXIT_PARAMS(false)
     DTWAINArrayLL_RAII a(Array);
-    auto& vIn = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(Array);
+    auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
     if ( !vIn.empty())
     {
         vIn[0] = BitDepth;
@@ -184,7 +185,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetBitDepth(DTWAIN_SOURCE Source, LPLONG BitDept
 
     if ( bRet && Array )
     {
-        const auto& vIn = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(Array);
+        const auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
         if ( !vIn.empty() )
             *BitDepth = vIn[0];
         else
@@ -206,7 +207,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumPixelTypes(DTWAIN_SOURCE Source, LPDTWAIN_AR
     if (  p )
     {
         const DTWAIN_ARRAY arr = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 0);
-        auto& vIn = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(arr);
+        auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
         const CTL_ITwainSource::CachedPixelTypeMap& theMap = p->GetPixelTypeMap();
         std::transform(theMap.begin(), theMap.end(), std::back_inserter(vIn), []
                 (const CTL_ITwainSource::CachedPixelTypeMap::value_type& v) { return v.first; });
@@ -227,7 +228,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumBitDepthsEx(DTWAIN_SOURCE Source, LONG Pixel
     if (  p && p->IsPixelTypeSupported(PixelType) )
     {
         const DTWAIN_ARRAY arr = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 0);
-        auto& vIn = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(arr);
+        auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
         const CTL_ITwainSource::CachedPixelTypeMap& theMap = p->GetPixelTypeMap();
         const std::vector<int>& pBitDepths = theMap.find(PixelType)->second;
         std::copy(pBitDepths.begin(), pBitDepths.end(), std::back_inserter(vIn));
@@ -263,7 +264,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumFileTypeBitsPerPixel(LONG FileType, LPDTWAIN
 
     if (Array)
     {
-        auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+        auto& factory = pHandle->m_ArrayFactory;
         if (factory->is_valid(*Array))
             factory->clear(*Array);
     }
@@ -277,7 +278,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumFileTypeBitsPerPixel(LONG FileType, LPDTWAIN
             [&](int val)
                  {
                      LONG lVal = val;
-                     CTL_TwainDLLHandle::s_ArrayFactory->add_to_back(ThisArray, &lVal, 1);
+                     pHandle->m_ArrayFactory->add_to_back(ThisArray, &lVal, 1);
                  });
     *Array = ThisArray;
     arr.release();

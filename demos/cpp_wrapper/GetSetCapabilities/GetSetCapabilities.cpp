@@ -6,18 +6,14 @@
 #include <dynarithmic/twain/twain_session.hpp> // for dynarithmic::twain::twain_session
 #include <dynarithmic/twain/twain_source.hpp>  // for dynarithmic::twain::twain_source
 #include <dynarithmic/twain/capability_interface.hpp>  // for capability_interface
+#include "..\Runner\runnerbase.h"
 
-using namespace dynarithmic::twain;
-struct Runner
+struct Runner : RunnerBase
 {
     int Run();
-    ~Runner()
-    {
-        printf("\nPress Enter key to exit application...\n");
-        char temp;
-        std::cin.get(temp);
-    }
 };
+
+using namespace dynarithmic::twain;
 
 int Runner::Run()
 {
@@ -43,10 +39,6 @@ int Runner::Run()
         // check if we were able to open the source
         if (twsource.is_open())
         {
-            // output the source product name
-            std::string prodName = twsource.get_source_info().get_product_name();
-            std::cout << prodName << "\n";
-
             // Get the interface to the capabilities of the device.
             // Note that the capability interface actually will "talk" 
             // to the device, getting and setting the capabilities.  This differs
@@ -81,9 +73,27 @@ int Runner::Run()
 
             // Set the current size to the first value found 
             // Note that to set capabilities, the first argument is always a container
-            // of values, and not a single value. That is why for convenience, we use the 
-            // brace initialization list in the first argument to set_supportedsizes.
-            ci.set_supportedsizes( { allPaperSizes.front() } ); // Note the brace initialization list!
+            // of values, and not a single value. 
+            // 
+            ci.set_supportedsizes(allPaperSizes); // default set type is "capability_interface::set()"
+            // 
+            // Note that we also could have explicitly stated the values in a temporary container as 
+            // the first argument:
+            // 
+            // ci.set_supportedsizes({ allPaperSizes.front() }); 
+            // 
+            // Note the brace initialization to create a temporary container:
+            //
+            // For the generic capability setting function, note that we could have stated:
+            // 
+            // ci.set_cap_values(allPaperSizes, ICAP_SUPPORTEDSIZES, capability_interface::set());
+            // 
+            // or
+            // 
+            // ci.set_cap_values(allPaperSizes, ICAP_SUPPORTEDSIZES);
+            // 
+            // where the default set type (capability_interface::set()) will always use the first value
+            // in the container of values to use.  
 
             // See if the current value actually has been set 
             auto currentSize = ci.get_supportedsizes(ci.get_current());

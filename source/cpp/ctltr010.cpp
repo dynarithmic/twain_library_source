@@ -102,6 +102,7 @@ TW_UINT16 CTL_CapabilityTriplet::Execute()
     // Determine return type
     // Get the pointer to the data returned and let it decode
     // if the capability is to be read
+    auto memfnptr = GetSessionPtr()->GetTwainDLLHandle()->m_TwainMemoryFunc;
     if ( m_bTesting ) // Don't decode if in test mode
     {
         if ( m_Capability.hContainer)
@@ -110,7 +111,7 @@ TW_UINT16 CTL_CapabilityTriplet::Execute()
             {
                 // Need to specially decode this to determine ItemType
                 // Get pointer to data
-                void *pCapData = static_cast<void*>(CTL_TwainDLLHandle::s_TwainMemoryFunc->LockMemory(m_Capability.hContainer));
+                void *pCapData = static_cast<void*>(memfnptr->LockMemory(m_Capability.hContainer));
 
                 // dereference to a TW_ONEVALUE structure.  Don't really
                 // care if item is not really TW_ONEVALUE since first
@@ -123,7 +124,7 @@ TW_UINT16 CTL_CapabilityTriplet::Execute()
                 SetItemType(nItemType);
             }
 
-            if ( CTL_TwainDLLHandle::s_TwainMemoryFunc == &CTL_TwainDLLHandle::s_TwainLegacyFunc)
+            if (memfnptr == &GetSessionPtr()->GetTwainDLLHandle()->m_TwainLegacyFunc)
             {
                 #ifdef _WIN32
                 const UINT nCount = GlobalFlags(m_Capability.hContainer) & GMEM_LOCKCOUNT;
@@ -134,8 +135,8 @@ TW_UINT16 CTL_CapabilityTriplet::Execute()
             }
             else
             {
-                CTL_TwainDLLHandle::s_TwainMemoryFunc->UnlockMemory(m_Capability.hContainer);
-                CTL_TwainDLLHandle::s_TwainMemoryFunc->FreeMemory(m_Capability.hContainer);
+                memfnptr->UnlockMemory(m_Capability.hContainer);
+                memfnptr->FreeMemory(m_Capability.hContainer);
             }
         }
     }
@@ -152,10 +153,10 @@ TW_UINT16 CTL_CapabilityTriplet::Execute()
 
         try
         {
-            const TW_MEMREF p = CTL_TwainDLLHandle::s_TwainMemoryFunc->LockMemory( m_Capability.hContainer );
+            const TW_MEMREF p = memfnptr->LockMemory( m_Capability.hContainer );
             Decode(p);
-            CTL_TwainDLLHandle::s_TwainMemoryFunc->UnlockMemory(m_Capability.hContainer);
-            CTL_TwainDLLHandle::s_TwainMemoryFunc->FreeMemory( m_Capability.hContainer ); // Test
+            memfnptr->UnlockMemory(m_Capability.hContainer);
+            memfnptr->FreeMemory( m_Capability.hContainer ); // Test
         }
         catch(...)
         {

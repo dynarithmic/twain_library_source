@@ -26,6 +26,7 @@
 #include <memory>
 #include <unordered_map>
 #include <fstream>
+#include <mutex>
 
 /////////////////////////////////////////////////////////////////////////////
 namespace dynarithmic
@@ -40,6 +41,7 @@ namespace dynarithmic
             virtual void trace(const std::string& msg) = 0;
             static void generic_outstream(std::ostream& os, const std::string& msg);
             static std::string getTime();
+            static std::string getThreadID();
     };
 
     class StdCout_Logger final : public CBaseLogger
@@ -137,6 +139,7 @@ namespace dynarithmic
 
        private:
            void InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE hInst, bool bAppend);
+           static std::mutex s_logMutex;
     };
 }
 #endif

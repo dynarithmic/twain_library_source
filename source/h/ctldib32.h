@@ -483,6 +483,8 @@ namespace dynarithmic
             WORD               PaletteSize (void* pv);
             HPALETTE           GetPalette() const {return m_TwainDibInfo.GetPalette(); }
             static             int  WidthInBytes(int i)  { return (i+31)/32*4; }
+            static             HANDLE CreateBMPBitmapFromDIB(HANDLE hDib);
+
             // Destruction
             ~CTL_TwainDib();
 

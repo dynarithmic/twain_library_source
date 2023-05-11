@@ -26,5 +26,6 @@
 namespace dynarithmic
 {
     CTL_StringType GetDTWAININIPath();
+    std::string GetDTWAININIPathA();
 }
 #endif

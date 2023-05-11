@@ -143,7 +143,7 @@ namespace dynarithmic
         auto& underlying_container_t(arrayTag* pTag) const
         {
 	        if (auto* p = static_cast<tagged_array<T>*>(pTag))
-            return p->get_container();
+                return p->get_container();
             throw (std::invalid_argument::invalid_argument("underlying_container_t argument cannot be nullptr"));
         }
 
@@ -407,6 +407,9 @@ namespace dynarithmic
 
         std::size_t size(arrayTag *pTag) const;
         std::size_t size(void *pTag) const { return size(from_void(pTag)); }
+
+        bool empty(arrayTag* pTag) const { return size(pTag) == 0; }
+        bool empty(void * pTag) const { return size(pTag) == 0; }
 
         int tag_type(void* pTag) const { return tag_type(from_void(pTag)); }
         int tag_type(arrayTag* pTag) const;

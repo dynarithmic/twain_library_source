@@ -102,7 +102,7 @@ static HWND CreateTwainWindow(CTL_TwainDLLHandle * /*pHandle*/,
     HWND hWndParent)
 {
     if (hInstance == nullptr)
-        hInstance = CTL_TwainDLLHandle::s_DLLInstance;
+        hInstance = CTL_StaticData::s_DLLInstance;
     HWND hWndP;
     if (!hWndParent)
         hWndP = GetDesktopWindow();
@@ -148,7 +148,7 @@ void dynarithmic::DTWAIN_InvokeCallback(int nWhich, DTWAIN_HANDLE p, DTWAIN_SOUR
 
 void RegisterTwainWindowClass()
 {
-	CTL_TwainDLLHandle::s_nRegisteredDTWAINMsg = ::RegisterWindowMessage(REGISTERED_DTWAIN_MSG);
+    CTL_StaticData::s_nRegisteredDTWAINMsg = ::RegisterWindowMessage(REGISTERED_DTWAIN_MSG);
     WNDCLASS wndclass;
     memset(&wndclass, 0, sizeof(WNDCLASS));
 #ifdef DTWAIN_LIB
@@ -159,7 +159,7 @@ void RegisterTwainWindowClass()
     wndclass.lpfnWndProc = DTWAIN_WindowProc;
     wndclass.cbClsExtra = 0;
     wndclass.cbWndExtra = 0;
-    wndclass.hInstance = CTL_TwainDLLHandle::s_DLLInstance;
+    wndclass.hInstance = CTL_StaticData::s_DLLInstance;
     wndclass.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
     wndclass.hCursor = LoadCursor(nullptr, IDC_ARROW);
     wndclass.hbrBackground = static_cast<HBRUSH>(GetStockObject(WHITE_BRUSH));
@@ -170,7 +170,7 @@ void RegisterTwainWindowClass()
 
 void UnregisterTwainWindowClass()
 {
-    UnregisterClass(_T("DTWAINWindowClass"), static_cast<HINSTANCE>(CTL_TwainDLLHandle::s_DLLInstance));
+    UnregisterClass(_T("DTWAINWindowClass"), static_cast<HINSTANCE>(CTL_StaticData::s_DLLInstance));
 }
 
 #ifndef DTWAIN_LIB
@@ -181,13 +181,11 @@ BOOL WINAPI DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID /*plvReserved*/)
     case DLL_PROCESS_ATTACH:
     case DLL_THREAD_ATTACH:
     {
-        const LPCTSTR szININame = _T("dtwain32.ini");
-        CTL_TwainDLLHandle::s_bCheckReentrancy = GetPrivateProfileInt(_T("Settings"), _T("HookReentrancyCheck"), 0, szININame) ? true : false;
         if (fdwReason == DLL_PROCESS_ATTACH)
         {
-            CTL_TwainDLLHandle::s_lErrorFilterFlags = 0;
+            CTL_StaticData::s_lErrorFilterFlags = 0;
         }
-        CTL_TwainDLLHandle::s_DLLInstance = hinstDll;
+        CTL_StaticData::s_DLLInstance = hinstDll;
     }
     return TRUE;
 

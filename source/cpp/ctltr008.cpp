@@ -80,11 +80,40 @@ TW_UINT16 CTL_ProcessEventTriplet::ExecuteEventHandler()
     const unsigned int nMsg = CTL_TwainAppMgr::GetRegisteredMsg();
 
    // Check message from source
+    // There are some issues with Sources *not* sending MSG_XFERREADY in
+    // a consistent manner to start the scan, and instead issue a MSG_CLOSEDSREQ.
+    auto& user_map = CTL_TwainAppMgr::GetSourceToXferReadyMap();
+    std::string prodName = pSource->GetProductNameA();
+    auto iter = user_map.find(prodName);
+
+    if (iter != user_map.end())
+    {
+        // Check if we received a close DS request before we have gotten
+        // a "start transfer" request
+        if (iter->second.m_bSeenUIClose && !iter->second.m_bSeenXferReady)
+        {
+            // Increment the message counter and test if we have run out
+            // of messages to check
+            iter->second.m_CurrentCount++;
+            if (iter->second.m_CurrentCount >= iter->second.m_MaxThreshold)
+            {
+                // ran out of messages, so close the UI 
+                CloseUI(pSource);
+            }
+        }
+    }
+
     switch (m_Event.TWMessage)
     {
         case MSG_XFERREADY:
         {
             static int nCount = 0;
+            // For those sources we are tracking for the close / transfer behavior
+            // mark that we have received a transfer message
+            if ( iter != user_map.end())
+                iter->second.m_bSeenXferReady = true;
+
+            pSource->SetXferReadySent(true);
             bool bNextAttemptIsRetry = false;
             pSource->SetState(SOURCE_STATE_XFERREADY);
             // Set the retry count
@@ -196,62 +225,30 @@ TW_UINT16 CTL_ProcessEventTriplet::ExecuteEventHandler()
         case MSG_CLOSEDSREQ:
         case MSG_CLOSEDSOK:
         {
-            // The source UI must be closed
-            if ( pSource->IsUIOpen())
-            {
-               CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
-                                                     nullptr,
-                                                     DTWAIN_TN_UICLOSING,
-                                                     reinterpret_cast<LPARAM>(pSource));
-
-                    CTL_TwainAppMgr::DisableUserInterface(pSource);
-
-                CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
-                                                      nullptr,
-                                                      DTWAIN_TN_UICLOSED,
-                                                      reinterpret_cast<LPARAM>(pSource));
-            }
+            // For those sources where we need to hold off on closing the UI,
+            // record that we have received a close request
+            if (iter != user_map.end())
+                iter->second.m_bSeenUIClose = true;
+            else
+                CloseUI(pSource);
         }
         break;
 
         // Possible device event
         case MSG_DEVICEEVENT:
-        {
-            // Some dude has changed something on the device!!
-            // Get the change
-            CTL_DeviceEventTriplet DevTrip(pSession, pSource);
-            DevTrip.Execute();
-            if ( DevTrip.IsSuccessful() )
-            {
-                pSource->SetDeviceEvent( DevTrip.GetDeviceEvent() );
-                CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_DEVICEEVENT,reinterpret_cast<LPARAM>(pSource));
-
-                const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-                // if there is a callback, call it now with the error notifications
-                if ( pHandle->m_pCallbackFn )
-                {
-                    const UINT uMsg = CTL_TwainDLLHandle::s_nRegisteredDTWAINMsg;
-                    LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_DEVICEEVENT, 0, true);
-                    #ifdef WIN64
-                        (*pHandle->m_pCallbackFn)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG_PTR>(pSource));
-                    #else
-                        (*pHandle->m_pCallbackFn)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG_PTR>(pSource));
-                    #endif
-                }
-
-                // if there is a 64-bit callback, call it now with the error notifications
-                if ( pHandle->m_pCallbackFn64 )
-                {
-                    const UINT uMsg = CTL_TwainDLLHandle::s_nRegisteredDTWAINMsg;
-                    LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_DEVICEEVENT, 0, true);
-                    (*pHandle->m_pCallbackFn64)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG_PTR>(pSource));
-                }
-            }
-        }
+            DeviceEvent(pSource);
         break;
 
         case MSG_NULL:
         break;
+    }
+
+    // For the sources that require close / transfer message processing...
+    if (iter != user_map.end())
+    {
+        // If we have seen both the transfer ready and close, then close the UI
+        if (iter->second.m_bSeenXferReady && iter->second.m_bSeenUIClose)
+            CloseUI(pSource);
     }
     return rc;
 }
@@ -279,4 +276,43 @@ bool CTL_ProcessEventTriplet::ResetTransfer(TW_UINT16 Msg/*=MSG_RESET*/)
     return false;
 }
 
+void CTL_ProcessEventTriplet::CloseUI(CTL_ITwainSource* pSource)
+{
+    // The source UI must be closed
+    CTL_TwainAppMgr::EndTwainUI(pSource->GetTwainSession(), pSource);
+}
 
+void CTL_ProcessEventTriplet::DeviceEvent(CTL_ITwainSource* pSource)
+{
+    // Some dude has changed something on the device!!
+    // Get the change
+    auto pSession = pSource->GetTwainSession();
+    CTL_DeviceEventTriplet DevTrip(pSession, pSource);
+    DevTrip.Execute();
+    if ( DevTrip.IsSuccessful() )
+    {
+        pSource->SetDeviceEvent( DevTrip.GetDeviceEvent() );
+        CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_DEVICEEVENT,reinterpret_cast<LPARAM>(pSource));
+
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        // if there is a callback, call it now with the error notifications
+        if ( pHandle->m_pCallbackFn )
+        {
+            const UINT uMsg = CTL_StaticData::s_nRegisteredDTWAINMsg;
+            LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_DEVICEEVENT, 0, true);
+            #ifdef WIN64
+                (*pHandle->m_pCallbackFn)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG_PTR>(pSource));
+            #else
+                (*pHandle->m_pCallbackFn)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG_PTR>(pSource));
+            #endif
+        }
+
+        // if there is a 64-bit callback, call it now with the error notifications
+        if ( pHandle->m_pCallbackFn64 )
+        {
+            const UINT uMsg = CTL_StaticData::s_nRegisteredDTWAINMsg;
+            LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_DEVICEEVENT, 0, true);
+            (*pHandle->m_pCallbackFn64)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG_PTR>(pSource));
+        }
+    }
+}

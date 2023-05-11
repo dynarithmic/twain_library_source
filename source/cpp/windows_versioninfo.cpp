@@ -7,7 +7,7 @@ namespace dynarithmic
 {
     CTL_StringType GetVersionInfo()
     {
-        const VersionInfo vInfo(CTL_TwainDLLHandle::s_DLLInstance);
+        const VersionInfo vInfo(CTL_StaticData::s_DLLInstance);
         CTL_StringStreamType strm;
         vInfo.printit(strm, _T("\r\n"));
         return strm.str();

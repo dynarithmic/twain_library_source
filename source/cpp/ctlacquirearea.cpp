@@ -172,11 +172,11 @@ static bool GetImageSize(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, CTL_En
         const bool bOk = CTL_TwainAppMgr::GetImageLayoutSize(p, Array, GetType);
         if (!bOk)
             return false;
-        auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<double>(FloatArrayOut);
+        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<double>(FloatArrayOut);
         std::copy(Array.begin(), Array.end(), vValues.begin());
         const DTWAIN_ARRAY temp = DTWAIN_ArrayCreateCopy(FloatArrayOut);
-        if  (CTL_TwainDLLHandle::s_ArrayFactory->is_valid(FloatArray))
-            CTL_TwainDLLHandle::s_ArrayFactory->destroy(FloatArray);
+        if  (pHandle->m_ArrayFactory->is_valid(FloatArray))
+            pHandle->m_ArrayFactory->destroy(FloatArray);
         if (temp)
         {
             *FloatArray = temp;
@@ -197,11 +197,11 @@ static bool SetImageSize(DTWAIN_SOURCE Source, DTWAIN_ARRAY FloatArray, DTWAIN_A
         const DTWAIN_ARRAY pArray = FloatArray;
         DTWAIN_ARRAY pArrayActual = DTWAIN_ArrayInit();
         DTWAIN_Check_Error_Condition_0_Ex(pHandle,
-            [&] { return !CTL_TwainDLLHandle::s_ArrayFactory->is_valid(pArray, CTL_ArrayFactory::arrayTag::DoubleType); },
+            [&] { return !pHandle->m_ArrayFactory->is_valid(pArray, CTL_ArrayFactory::arrayTag::DoubleType); },
             DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
 
-        const auto& vFloat = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<double>(FloatArray);
-        auto& vActual = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<double>(ActualArray);
+        const auto& vFloat = pHandle->m_ArrayFactory->underlying_container_t<double>(FloatArray);
+        auto& vActual = pHandle->m_ArrayFactory->underlying_container_t<double>(ActualArray);
 
         if (vFloat.size() < 4)
             LOG_FUNC_EXIT_PARAMS(false)
@@ -210,7 +210,7 @@ static bool SetImageSize(DTWAIN_SOURCE Source, DTWAIN_ARRAY FloatArray, DTWAIN_A
         {
             pArrayActual = ActualArray;
             DTWAIN_Check_Error_Condition_0_Ex(pHandle,
-                [&] {return !CTL_TwainDLLHandle::s_ArrayFactory->is_valid(pArrayActual, CTL_ArrayFactory::arrayTag::DoubleType); },
+                [&] {return !pHandle->m_ArrayFactory->is_valid(pArrayActual, CTL_ArrayFactory::arrayTag::DoubleType); },
                 DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
             vActual.clear();
         }

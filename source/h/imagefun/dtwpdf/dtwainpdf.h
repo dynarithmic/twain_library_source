@@ -38,7 +38,7 @@
 #include "ctliface.h"
 namespace dynarithmic
 {
-    typedef CTL_TwainDLLHandle::CTL_PDFMediaMap MediaBoxMap;
+    typedef CTL_PDFMediaMap MediaBoxMap;
     typedef std::map< unsigned int, PDFFont> FontRefToFontInfoMap;
     typedef std::map< std::string, PDFFont> FontNameToFontInfoMap;
     typedef std::map< unsigned int, PDFFont> FontNumberToFontInfoMap;

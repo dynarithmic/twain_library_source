@@ -69,7 +69,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
 
         if (!Array)
             LOG_FUNC_EXIT_PARAMS(false)
-        auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+        auto& factory = pHandle->m_ArrayFactory;
         auto& vValues = factory->underlying_container_t<LONG>(Array);
         LONG nIndex = 0;
 
@@ -110,11 +110,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceNotifications(DTWAIN_SOURCE Source, LPL
     if (!bRet)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    auto& factory = pHandle->m_ArrayFactory;
 
     *lpDeviceEvents = 0L;
     auto& vValues = factory->underlying_container_t<LONG>(Array);
-    for_each(vValues.begin(), vValues.end(), [&](LONG Value)
+    std::for_each(vValues.begin(), vValues.end(), [&](LONG Value)
     {
         if (Value < 32 && Value > 0L)
             *lpDeviceEvents |= 1L << (Value - 1L);

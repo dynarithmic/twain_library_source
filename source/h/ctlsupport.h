@@ -56,7 +56,8 @@ namespace dynarithmic
                 }
             }
             // get underlying vector and search it for the value
-            auto& vData = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<T>(arrayToUse);
+            const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+            auto& vData = pHandle->m_ArrayFactory->underlying_container_t<T>(arrayToUse);
             return std::find(vData.begin(), vData.end(), SupportVal) != vData.end();
         }
         return false;
@@ -88,7 +89,8 @@ namespace dynarithmic
                     DTWAINArrayLL_RAII a2(Array2);
                     if (bRet)
                     {
-                        LONG nSize = static_cast<LONG>(CTL_TwainDLLHandle::s_ArrayFactory->size(Array2));
+                        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+                        LONG nSize = static_cast<LONG>(pHandle->m_ArrayFactory->size(Array2));
                         if (nSize > 0)
                             DTWAIN_RangeGetNearestValue(Source, SupportVal, SupportVal, DTWAIN_ROUNDNEAREST);
                     }
@@ -118,7 +120,7 @@ namespace dynarithmic
         if ( isSupported )
         {
             // get underlying vector and search it for the value
-            auto& vData = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container<T>(Array);
+            auto& vData = pHandle->m_ArrayFactory->underlying_container<T>(Array);
             if (!vData.empty())
             {
                 *lpSupport = vData.front();

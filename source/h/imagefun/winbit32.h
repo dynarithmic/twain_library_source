@@ -365,6 +365,7 @@ namespace dynarithmic
             static HANDLE ResampleDIB(HANDLE hDib, double scalex, double scaley);
             static HANDLE IncreaseBpp(HANDLE hDib, long newbpp);
             static HANDLE DecreaseBpp(HANDLE hDib, long newbpp);
+            static HANDLE IncreaseDecreaseBpp(HANDLE hDib, long newbpp, bool bIncrease);
             static HANDLE CropDIB(HANDLE handle, const FloatRect& ActualRect,const FloatRect& RequestedRect,int sourceunit,
                                   int destunit, int dpi, bool bConvertActual, int& retval);
             static HANDLE NegateDIB(HANDLE hDib);

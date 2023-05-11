@@ -25,6 +25,8 @@
 #pragma warning( disable : 4996)
 #endif
 #include <memory>
+#include <map>
+#include <string>
 #include "ctlobstr.h"
 #include "ctlarray.h"
 #include "ctltwses.h"
@@ -55,6 +57,18 @@ namespace dynarithmic
         TW_UINT16    nDAT;
         TW_UINT16    nMSG;
     };
+
+    struct SourceXferReadyOverride
+    {
+        uint32_t m_MaxThreshold = 0;
+        uint32_t m_CurrentCount = 0;
+        bool m_bSeenUIClose = false;
+        bool m_bSeenXferReady = false;
+    };
+
+    using SourceToXferReadyMap = std::map<std::string, SourceXferReadyOverride>;
+    using SourceToXferReadyList = std::vector<std::pair<std::string, uint32_t>>;
+    using SourceFlatbedOnlyList = std::unordered_set<std::string>;
 
     class CTL_TwainAppMgr;
     typedef std::shared_ptr<CTL_TwainAppMgr> CTL_TwainAppMgrPtr;
@@ -110,7 +124,6 @@ namespace dynarithmic
             static bool IsTwainMsg(MSG *pMsg, bool bFromUserQueue=false);
             static unsigned int GetRegisteredMsg();
             static bool IsVersion2DSMUsed();
-            static bool IsVersion2DSMUsedWithCallback();
 
             // Source management functions
             // Get all the sources in an array
@@ -281,6 +294,9 @@ namespace dynarithmic
             static CTL_CapStruct GetGeneralCapInfo(LONG Cap);
             static bool GetCurrentOneCapValue(const CTL_ITwainSource *pSource, void *pValue, TW_UINT16 Cap, TW_UINT16 nDataType );
             static CTL_StringType GetDSMPath();
+            static SourceToXferReadyMap& GetSourceToXferReadyMap() { return s_SourceToXferReadyMap; }
+            static SourceToXferReadyList& GetSourceToXferReadyList() { return s_SourceToXferReadyList; }
+            static SourceFlatbedOnlyList& GetSourceFlatbedOnlyList() { return s_SourceFlatbedOnlyList; }
             const CTL_TwainTriplet* GetCurrentTriplet() const { return m_pCurrentTriplet;}
 
         private:
@@ -494,7 +510,9 @@ namespace dynarithmic
             static mapCondCodeInfo   s_mapCondCode;
             static std::vector<RawTwainTriplet> s_NoTimeoutTriplets;
             static VOID CALLBACK TwainTimeOutProc(HWND, UINT, ULONG, DWORD);
-
+            static SourceToXferReadyMap s_SourceToXferReadyMap;
+            static SourceToXferReadyList s_SourceToXferReadyList;
+            static SourceFlatbedOnlyList s_SourceFlatbedOnlyList;
     };
 
     #define DTWAIN_ERROR_CONDITION(Err, RetVal) {               \

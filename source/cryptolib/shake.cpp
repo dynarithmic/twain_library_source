@@ -54,9 +54,9 @@ void SHAKE::Restart()
 
 void SHAKE::ThrowIfInvalidTruncatedSize(size_t size) const
 {
-    if (size > UINT_MAX)
-        throw InvalidArgument(std::string("HashTransformation: can't truncate a ") +
-            IntToString(UINT_MAX) + " byte digest to " + IntToString(size) + " bytes");
+	if (size > UINT_MAX)
+		throw InvalidArgument(std::string("HashTransformation: can't truncate a ") +
+		    IntToString(UINT_MAX) + " byte digest to " + IntToString(size) + " bytes");
 }
 
 void SHAKE::TruncatedFinal(byte *hash, size_t size)

@@ -74,26 +74,9 @@ namespace dynarithmic
                                     const CTL_TwainDibPtr& CurDib);
 
             static bool NegateDib(CTL_ITwainSession* pSession, const CTL_ITwainSource* pSource, const CTL_TwainDibPtr& CurDib);
-
-            static bool ResampleBppForJPEG(CTL_ITwainSession* pSession,
-                                           CTL_ITwainSource* pSource,
-                                           CTL_TwainDibPtr& CurDib);
             static bool ChangeBpp(CTL_ITwainSession* pSession,
                                   const CTL_ITwainSource* pSource,
                                   const CTL_TwainDibPtr& CurDib);
-
-            static bool ResampleBppForGIF(CTL_ITwainSession *pSession,
-                                         CTL_ITwainSource *pSource,
-                                        CTL_TwainDibPtr& CurDib);
-
-            static bool ResampleBppForPDF(CTL_ITwainSession *pSession,
-                                         CTL_ITwainSource *pSource,
-                                        CTL_TwainDibPtr& CurDib);
-
-            static bool ResampleBppForWBMP(CTL_ITwainSession* pSession,
-                                           CTL_ITwainSource* pSource,
-                                           CTL_TwainDibPtr& CurDib);
-
             static bool IsPageBlank(CTL_ITwainSession* pSession,
                                     const CTL_ITwainSource* pSource,
                                     bool resampled,

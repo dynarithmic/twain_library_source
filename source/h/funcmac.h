@@ -42,5 +42,6 @@
         #endif
     #else
         #define FUNC_HEADER(x)
+        #define FUNC_MACRO ""
     #endif
 #endif

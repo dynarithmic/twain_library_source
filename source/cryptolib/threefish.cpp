@@ -181,9 +181,9 @@ inline void G1024(word64& G0, word64& G1, word64& G2, word64& G3, word64& G4, wo
     word64& G6, word64& G7, word64& G8, word64& G9, word64& G10, word64& G11, word64& G12,
     word64& G13, word64& G14, word64& G15)
 {
-    // The extra gyrations promote inlining. Without it Threefish1024 looses 10 cpb.
-    G1024A<C0, C1, C2, C3>(G0, G1,  G2,  G3,  G4,  G5,  G6,  G7);
-    G1024B<C4, C5, C6, C7>(G8, G9, G10, G11, G12, G13, G14, G15);
+	// The extra gyrations promote inlining. Without it Threefish1024 looses 10 cpb.
+	G1024A<C0, C1, C2, C3>(G0, G1,  G2,  G3,  G4,  G5,  G6,  G7);
+	G1024B<C4, C5, C6, C7>(G8, G9, G10, G11, G12, G13, G14, G15);
 }
 
 template <unsigned int C4, unsigned int C5, unsigned int C6, unsigned int C7>
@@ -220,9 +220,9 @@ inline void IG1024(word64& G0, word64& G1, word64& G2, word64& G3, word64& G4, w
     word64& G6, word64& G7, word64& G8, word64& G9, word64& G10, word64& G11, word64& G12,
     word64& G13, word64& G14, word64& G15)
 {
-    // The extra gyrations promote inlining. Without it Threefish1024 looses 10 cpb.
-    IG1024A<C4, C5, C6, C7>(G8, G9, G10, G11, G12, G13, G14, G15);
-    IG1024B<C0, C1, C2, C3>(G0, G1,  G2,  G3,  G4,  G5,  G6,  G7);
+	// The extra gyrations promote inlining. Without it Threefish1024 looses 10 cpb.
+	IG1024A<C4, C5, C6, C7>(G8, G9, G10, G11, G12, G13, G14, G15);
+	IG1024B<C0, C1, C2, C3>(G0, G1,  G2,  G3,  G4,  G5,  G6,  G7);
 }
 
 #define KS1024(r) \

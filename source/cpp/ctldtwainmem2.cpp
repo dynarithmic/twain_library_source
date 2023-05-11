@@ -65,8 +65,8 @@ HANDLE  DLLENTRY_DEF DTWAIN_AllocateMemoryEx(LONG memSize)
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, NULL, FUNC_MACRO);
     HANDLE h = nullptr;
-    if (CTL_TwainDLLHandle::s_TwainMemoryFunc)
-        h = CTL_TwainDLLHandle::s_TwainMemoryFunc->AllocateMemory(memSize);
+    if (pHandle->m_TwainMemoryFunc)
+        h = pHandle->m_TwainMemoryFunc->AllocateMemory(memSize);
     LOG_FUNC_EXIT_PARAMS(h)
     CATCH_BLOCK(HANDLE())
 }
@@ -77,9 +77,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FreeMemoryEx(HANDLE h)
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     DTWAIN_BOOL bRet = FALSE;
-    if (CTL_TwainDLLHandle::s_TwainMemoryFunc)
+    if (pHandle->m_TwainMemoryFunc)
     {
-        CTL_TwainDLLHandle::s_TwainMemoryFunc->FreeMemory(h);
+        pHandle->m_TwainMemoryFunc->FreeMemory(h);
         bRet = TRUE;
     }
     LOG_FUNC_EXIT_PARAMS(bRet)
@@ -92,8 +92,8 @@ DTWAIN_MEMORY_PTR DLLENTRY_DEF DTWAIN_LockMemoryEx(HANDLE h)
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, NULL, FUNC_MACRO);
     DTWAIN_MEMORY_PTR ptr = nullptr;
-    if (CTL_TwainDLLHandle::s_TwainMemoryFunc)
-        ptr = CTL_TwainDLLHandle::s_TwainMemoryFunc->LockMemory(h);
+    if (pHandle->m_TwainMemoryFunc)
+        ptr = pHandle->m_TwainMemoryFunc->LockMemory(h);
     LOG_FUNC_EXIT_PARAMS(ptr)
     CATCH_BLOCK(DTWAIN_MEMORY_PTR())
 }
@@ -104,9 +104,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_UnlockMemoryEx(HANDLE h)
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     DTWAIN_BOOL bRet = FALSE;
-    if (CTL_TwainDLLHandle::s_TwainMemoryFunc)
+    if (pHandle->m_TwainMemoryFunc)
     {
-        CTL_TwainDLLHandle::s_TwainMemoryFunc->UnlockMemory(h);
+        pHandle->m_TwainMemoryFunc->UnlockMemory(h);
         bRet = TRUE;
     }
     LOG_FUNC_EXIT_PARAMS(bRet)

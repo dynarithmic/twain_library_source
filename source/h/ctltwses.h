@@ -26,10 +26,12 @@
 #include "ctlobstr.h"
 #include "ctlenum.h"
 #include "ctltwsrc.h"
+#include "ctltwainidentity.h"
 
 namespace dynarithmic
 {
   class CTL_ITwainSession;
+  class CTL_TwainDLLHandle;
   using CTL_ITwainSessionPtr = std::unique_ptr<CTL_ITwainSession>;
   using CTL_TwainSourceSet = std::unordered_set<CTL_ITwainSource*>;
 
@@ -61,7 +63,7 @@ namespace dynarithmic
                         );
 
         HWND*               GetWindowHandlePtr() const { return const_cast<HWND*>(&m_AppWnd); }
-        TW_IDENTITY*        GetAppIDPtr()              { return &m_AppId; }
+        TW_IDENTITY*        GetAppIDPtr()              { return &m_AppId.get_identity(); }
         CTL_ITwainSource*    CreateTwainSource( LPCTSTR pProduct );
         bool                AddTwainSource( CTL_ITwainSource *pSource );
         void                CopyAllSources( CTL_TwainSourceSet & rArray );
@@ -82,6 +84,8 @@ namespace dynarithmic
                                     { return m_bTwainMessageFlag; }
         bool                IsAllSourcesRetrieved() const { return m_bAllSourcesRetrieved; }
         void                DestroyOneSource(CTL_ITwainSource *pSource);
+        CTL_TwainDLLHandle* GetTwainDLLHandle() { return m_pTwainDLLHandle; }
+        void                SetTwainDLLHandle(CTL_TwainDLLHandle* pHandle) { m_pTwainDLLHandle = pHandle; }
         virtual ~CTL_ITwainSession();
 
     protected:
@@ -96,9 +100,10 @@ namespace dynarithmic
         bool       m_bAllSourcesRetrieved;
         HWND       m_AppWnd;
         CTL_StringType m_AppName;
-        TW_IDENTITY m_AppId;          // Twain Identity structure
+        CTL_TwainIdentity m_AppId;          // Twain Identity structure
         CTL_TwainSourceSet m_arrTwainSource;
         CTL_ITwainSource *m_pSelectedSource;
+        CTL_TwainDLLHandle *m_pTwainDLLHandle;
         
         bool        m_bTwainWindowCreated;
         bool        m_bTwainMessageFlag;

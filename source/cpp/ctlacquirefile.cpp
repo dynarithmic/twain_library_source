@@ -48,13 +48,16 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
     auto bRetval = true;
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    CTL_ITwainSource* pSource = VerifySourceHandle(pHandle, Source);
+    if (!pSource)
+        LOG_FUNC_EXIT_PARAMS(false)
     DTWAIN_ARRAY tempNames = nullptr;
     DTWAINArrayPtr_RAII tempRAII(&tempNames);
     DTWAIN_ARRAY arrayToUse = aFileNames;
     if (aFileNames)
     {
         std::vector<LONG> validTypes = {DTWAIN_ARRAYSTRING, DTWAIN_ARRAYANSISTRING, DTWAIN_ARRAYWIDESTRING};
-        auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+        auto& factory = pHandle->m_ArrayFactory;
         const LONG Type = factory->tagtype_to_arraytype(factory->tag_type(aFileNames));
         const auto itArrType = std::find(validTypes.begin(), validTypes.end(), Type);
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return itArrType == validTypes.end(); }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
@@ -97,6 +100,13 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFile(DTWAIN_SOURCE Source,
                                                   LPLONG pStatus)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpszFile, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus))
+
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    CTL_ITwainSource* pSource = VerifySourceHandle(pHandle, Source);
+    if (!pSource)
+        LOG_FUNC_EXIT_PARAMS(false)
+
     lFileFlags &= ~DTWAIN_USELIST;
     SourceAcquireOptions opts = SourceAcquireOptions().setHandle(GetDTWAINHandle_Internal()).setSource(Source).
         setFileName(lpszFile).setFileType(lFileType).setFileFlags(lFileFlags).setPixelType(PixelType).
@@ -189,7 +199,7 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
         bRetval = TRUE;
         if (DTWAIN_GetTwainMode() == DTWAIN_MODAL)
         {
-            auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+            auto& factory = pHandle->m_ArrayFactory;
             auto pVariant = aDibs;
             const auto& vDibs = 
                 factory->underlying_container_t<CTL_ArrayFactory::tagged_array_voidptr*>(pVariant);

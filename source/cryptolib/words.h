@@ -20,9 +20,9 @@ NAMESPACE_BEGIN(CryptoPP)
 /// \since Crypto++ 1.0
 inline size_t CountWords(const word *x, size_t n)
 {
-    while (n && x[n-1]==0)
-        n--;
-    return n;
+	while (n && x[n-1]==0)
+		n--;
+	return n;
 }
 
 /// \brief Set the value of words
@@ -34,8 +34,8 @@ inline size_t CountWords(const word *x, size_t n)
 /// \since Crypto++ 1.0
 inline void SetWords(word *r, word a, size_t n)
 {
-    for (size_t i=0; i<n; i++)
-        r[i] = a;
+	for (size_t i=0; i<n; i++)
+		r[i] = a;
 }
 
 /// \brief Copy word array
@@ -47,11 +47,11 @@ inline void SetWords(word *r, word a, size_t n)
 /// \since Crypto++ 1.0
 inline void CopyWords(word *r, const word *a, size_t n)
 {
-    if (r != a)
+	if (r != a)
 #if CRYPTOPP_MSC_VERSION
-        memcpy_s(r, n*WORD_SIZE, a, n*WORD_SIZE);
+		memcpy_s(r, n*WORD_SIZE, a, n*WORD_SIZE);
 #else
-        memcpy(r, a, n*WORD_SIZE);
+		memcpy(r, a, n*WORD_SIZE);
 #endif
 }
 
@@ -65,8 +65,8 @@ inline void CopyWords(word *r, const word *a, size_t n)
 /// \since Crypto++ 1.0
 inline void XorWords(word *r, const word *a, const word *b, size_t n)
 {
-    for (size_t i=0; i<n; i++)
-        r[i] = a[i] ^ b[i];
+	for (size_t i=0; i<n; i++)
+		r[i] = a[i] ^ b[i];
 }
 
 /// \brief XOR word arrays
@@ -78,8 +78,8 @@ inline void XorWords(word *r, const word *a, const word *b, size_t n)
 /// \since Crypto++ 1.0
 inline void XorWords(word *r, const word *a, size_t n)
 {
-    for (size_t i=0; i<n; i++)
-        r[i] ^= a[i];
+	for (size_t i=0; i<n; i++)
+		r[i] ^= a[i];
 }
 
 /// \brief AND word arrays
@@ -92,8 +92,8 @@ inline void XorWords(word *r, const word *a, size_t n)
 /// \since Crypto++ 1.0
 inline void AndWords(word *r, const word *a, const word *b, size_t n)
 {
-    for (size_t i=0; i<n; i++)
-        r[i] = a[i] & b[i];
+	for (size_t i=0; i<n; i++)
+		r[i] = a[i] & b[i];
 }
 
 /// \brief AND word arrays
@@ -105,8 +105,8 @@ inline void AndWords(word *r, const word *a, const word *b, size_t n)
 /// \since Crypto++ 1.0
 inline void AndWords(word *r, const word *a, size_t n)
 {
-    for (size_t i=0; i<n; i++)
-        r[i] &= a[i];
+	for (size_t i=0; i<n; i++)
+		r[i] &= a[i];
 }
 
 /// \brief OR word arrays
@@ -119,8 +119,8 @@ inline void AndWords(word *r, const word *a, size_t n)
 /// \since Crypto++ 1.0
 inline void OrWords(word *r, const word *a, const word *b, size_t n)
 {
-    for (size_t i=0; i<n; i++)
-        r[i] = a[i] | b[i];
+	for (size_t i=0; i<n; i++)
+		r[i] = a[i] | b[i];
 }
 
 /// \brief OR word arrays
@@ -132,8 +132,8 @@ inline void OrWords(word *r, const word *a, const word *b, size_t n)
 /// \since Crypto++ 1.0
 inline void OrWords(word *r, const word *a, size_t n)
 {
-    for (size_t i=0; i<n; i++)
-        r[i] |= a[i];
+	for (size_t i=0; i<n; i++)
+		r[i] |= a[i];
 }
 
 /// \brief Left shift word array
@@ -148,16 +148,16 @@ inline void OrWords(word *r, const word *a, size_t n)
 /// \since Crypto++ 1.0
 inline word ShiftWordsLeftByBits(word *r, size_t n, unsigned int shiftBits)
 {
-    CRYPTOPP_ASSERT (shiftBits<WORD_BITS);
-    word u, carry=0;
-    if (shiftBits)
-        for (size_t i=0; i<n; i++)
-        {
-            u = r[i];
-            r[i] = (u << shiftBits) | carry;
-            carry = u >> (WORD_BITS-shiftBits);
-        }
-    return carry;
+	CRYPTOPP_ASSERT (shiftBits<WORD_BITS);
+	word u, carry=0;
+	if (shiftBits)
+		for (size_t i=0; i<n; i++)
+		{
+			u = r[i];
+			r[i] = (u << shiftBits) | carry;
+			carry = u >> (WORD_BITS-shiftBits);
+		}
+	return carry;
 }
 
 /// \brief Right shift word array
@@ -171,16 +171,16 @@ inline word ShiftWordsLeftByBits(word *r, size_t n, unsigned int shiftBits)
 /// \since Crypto++ 1.0
 inline word ShiftWordsRightByBits(word *r, size_t n, unsigned int shiftBits)
 {
-    CRYPTOPP_ASSERT (shiftBits<WORD_BITS);
-    word u, carry=0;
-    if (shiftBits)
-        for (size_t i=n; i>0; i--)
-        {
-            u = r[i-1];
-            r[i-1] = (u >> shiftBits) | carry;
-            carry = u << (WORD_BITS-shiftBits);
-        }
-    return carry;
+	CRYPTOPP_ASSERT (shiftBits<WORD_BITS);
+	word u, carry=0;
+	if (shiftBits)
+		for (size_t i=n; i>0; i--)
+		{
+			u = r[i-1];
+			r[i-1] = (u >> shiftBits) | carry;
+			carry = u << (WORD_BITS-shiftBits);
+		}
+	return carry;
 }
 
 /// \brief Left shift word array
@@ -193,13 +193,13 @@ inline word ShiftWordsRightByBits(word *r, size_t n, unsigned int shiftBits)
 /// \since Crypto++ 1.0
 inline void ShiftWordsLeftByWords(word *r, size_t n, size_t shiftWords)
 {
-    shiftWords = STDMIN(shiftWords, n);
-    if (shiftWords)
-    {
-        for (size_t i=n-1; i>=shiftWords; i--)
-            r[i] = r[i-shiftWords];
-        SetWords(r, 0, shiftWords);
-    }
+	shiftWords = STDMIN(shiftWords, n);
+	if (shiftWords)
+	{
+		for (size_t i=n-1; i>=shiftWords; i--)
+			r[i] = r[i-shiftWords];
+		SetWords(r, 0, shiftWords);
+	}
 }
 
 /// \brief Right shift word array
@@ -211,13 +211,13 @@ inline void ShiftWordsLeftByWords(word *r, size_t n, size_t shiftWords)
 /// \since Crypto++ 1.0
 inline void ShiftWordsRightByWords(word *r, size_t n, size_t shiftWords)
 {
-    shiftWords = STDMIN(shiftWords, n);
-    if (shiftWords)
-    {
-        for (size_t i=0; i+shiftWords<n; i++)
-            r[i] = r[i+shiftWords];
-        SetWords(r+n-shiftWords, 0, shiftWords);
-    }
+	shiftWords = STDMIN(shiftWords, n);
+	if (shiftWords)
+	{
+		for (size_t i=0; i+shiftWords<n; i++)
+			r[i] = r[i+shiftWords];
+		SetWords(r+n-shiftWords, 0, shiftWords);
+	}
 }
 
 NAMESPACE_END

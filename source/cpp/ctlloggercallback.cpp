@@ -27,16 +27,16 @@
 using namespace dynarithmic;
 
 #define CREATE_SETLOGGER_CALLBACK(loggerproc) \
-    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetLoggerCallback##loggerproc(DTWAIN_LOGGER_PROC##loggerproc logProc, DTWAIN_LONG64 UserData) \
-    { \
-      LOG_FUNC_ENTRY_PARAMS((logProc)) \
-      const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal()); \
-      DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO); \
-      pHandle->s_pLoggerCallback##loggerproc = logProc; \
-      pHandle->s_pLoggerCallback_UserData##loggerproc = UserData; \
-      LOG_FUNC_EXIT_PARAMS(true) \
-      CATCH_BLOCK(false); \
-   }
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetLoggerCallback##loggerproc(DTWAIN_LOGGER_PROC##loggerproc logProc, DTWAIN_LONG64 UserData) \
+{ \
+    LOG_FUNC_ENTRY_PARAMS((logProc)) \
+    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal()); \
+    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO); \
+    pHandle->s_pLoggerCallback##loggerproc = logProc; \
+    pHandle->s_pLoggerCallback_UserData##loggerproc = UserData; \
+    LOG_FUNC_EXIT_PARAMS(true) \
+    CATCH_BLOCK(false); \
+}
 
 #define CREATE_GETLOGGER_CALLBACK(loggerproc) \
 DTWAIN_LOGGER_PROC##loggerproc DLLENTRY_DEF DTWAIN_GetLoggerCallback##loggerproc(VOID_PROTOTYPE) \
@@ -44,7 +44,7 @@ DTWAIN_LOGGER_PROC##loggerproc DLLENTRY_DEF DTWAIN_GetLoggerCallback##loggerproc
     LOG_FUNC_ENTRY_PARAMS(()) \
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal()); \
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO); \
-    DTWAIN_LOGGER_PROC##loggerproc theProc = pHandle->s_pLoggerCallback##loggerproc; \
+    DTWAIN_LOGGER_PROC##loggerproc theProc = pHandle->m_LoggerCallbackInfo.m_pLoggerCallback##loggerproc; \
     LOG_FUNC_EXIT_PARAMS(theProc) \
     CATCH_BLOCK(DTWAIN_LOGGER_PROC##loggerproc(0)) \
 }
@@ -55,8 +55,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetLoggerCallback(DTWAIN_LOGGER_PROC logProc, DT
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 
-    CTL_TwainDLLHandle::s_pLoggerCallback = logProc;
-    CTL_TwainDLLHandle::s_pLoggerCallback_UserData = UserData;
+    pHandle->m_LoggerCallbackInfo.m_pLoggerCallback = logProc;
+    pHandle->m_LoggerCallbackInfo.m_pLoggerCallback_UserData = UserData;
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -66,7 +66,7 @@ DTWAIN_LOGGER_PROC DLLENTRY_DEF DTWAIN_GetLoggerCallback(VOID_PROTOTYPE)
     LOG_FUNC_ENTRY_PARAMS(())
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    LOG_FUNC_EXIT_PARAMS(dynarithmic::CTL_TwainDLLHandle::s_pLoggerCallback)
+    LOG_FUNC_EXIT_PARAMS(pHandle->m_LoggerCallbackInfo.m_pLoggerCallback)
     CATCH_BLOCK(DTWAIN_LOGGER_PROC(0))
 }
 
@@ -82,8 +82,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetLoggerCallbackA(DTWAIN_LOGGER_PROCA logProc, 
     LOG_FUNC_ENTRY_PARAMS((logProc)) 
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal()); 
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO); 
-    pHandle->s_pLoggerCallbackA = logProc;
-    pHandle->s_pLoggerCallback_UserDataA = UserData;
+    pHandle->m_LoggerCallbackInfo.m_pLoggerCallbackA = logProc;
+    pHandle->m_LoggerCallbackInfo.m_pLoggerCallback_UserDataA = UserData;
     LOG_FUNC_EXIT_PARAMS(true) 
     CATCH_BLOCK(false) 
 }
@@ -93,23 +93,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetLoggerCallbackW(DTWAIN_LOGGER_PROCW logProc, 
     LOG_FUNC_ENTRY_PARAMS((logProc))
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    pHandle->s_pLoggerCallbackW = logProc;
-    pHandle->s_pLoggerCallback_UserDataW = UserData;
+    pHandle->m_LoggerCallbackInfo.m_pLoggerCallbackW = logProc;
+    pHandle->m_LoggerCallbackInfo.m_pLoggerCallback_UserDataW = UserData;
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
-#define CREATE_SETLOGGER_CALLBACK(loggerproc) \
-    DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetLoggerCallback##loggerproc(DTWAIN_LOGGER_PROC##loggerproc logProc, DTWAIN_LONG64 UserData) \
-    { \
-      LOG_FUNC_ENTRY_PARAMS((logProc)) \
-      const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal()); \
-      DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO); \
-      pHandle->s_pLoggerCallback##loggerproc = logProc; \
-      pHandle->s_pLoggerCallback_UserData##loggerproc = UserData; \
-      LOG_FUNC_EXIT_PARAMS(true) \
-      CATCH_BLOCK(false); \
-   }
 
 CREATE_GETLOGGER_CALLBACK(A)
 CREATE_GETLOGGER_CALLBACK(W)
