@@ -201,9 +201,9 @@ void CTL_ErrorStructDecoder::StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDe
     std::string s1;
     sBuffer << "\nDSM_Entry(pSource=" << pSource << "H, " <<
                 "pDest=" << pDest << "H, " <<
-           CTL_TwainDLLHandle::GetTwainNameFromResource(CTL_TwainDLLHandle::GetDGResourceID(),static_cast<int>(nDG)) << ", " <<
-           CTL_TwainDLLHandle::GetTwainNameFromResource(CTL_TwainDLLHandle::GetDATResourceID(),static_cast<int>(nDAT)) << ", " <<
-           CTL_TwainDLLHandle::GetTwainNameFromResource(CTL_TwainDLLHandle::GetMSGResourceID(),static_cast<int>(nMSG)) << ", " <<
+           CTL_StaticData::GetTwainNameFromResource(CTL_StaticData::GetDGResourceID(),static_cast<int>(nDG)) << ", " <<
+           CTL_StaticData::GetTwainNameFromResource(CTL_StaticData::GetDATResourceID(),static_cast<int>(nDAT)) << ", " <<
+           CTL_StaticData::GetTwainNameFromResource(CTL_StaticData::GetMSGResourceID(),static_cast<int>(nMSG)) << ", " <<
            "TW_MEMREF=" << Data << "H) called\n";
     s1 = sBuffer.str();
 
@@ -212,7 +212,7 @@ void CTL_ErrorStructDecoder::StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDe
     std::string pMemRefStr;
 
     // Decode the pSource argument
-    long lErrorFilter = CTL_TwainDLLHandle::GetErrorFilterFlags();
+    long lErrorFilter = CTL_StaticData::GetErrorFilterFlags();
     if ( nDG == DG_CONTROL && nDAT == DAT_EVENT && nMSG == MSG_PROCESSEVENT )
     {
         if (!(lErrorFilter & DTWAIN_LOG_DECODE_TWEVENT) )
@@ -350,7 +350,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
 
             case ERRSTRUCT_TW_EVENT:
             {
-                LONG lErrorFlags = CTL_TwainDLLHandle::GetErrorFilterFlags();
+                LONG lErrorFlags = CTL_StaticData::GetErrorFilterFlags();
                 if ( lErrorFlags & DTWAIN_LOG_DECODE_TWEVENT )
                 {
                     auto p = static_cast<pTW_EVENT>(pData);

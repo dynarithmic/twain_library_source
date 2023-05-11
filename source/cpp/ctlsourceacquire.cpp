@@ -58,26 +58,28 @@ static void ParseFileNames(DTWAIN_ARRAY FileList, PtrType lpszFiles, DTWAIN_ARRA
 
 DTWAIN_ACQUIRE CTL_TwainDLLHandle::GetNewAcquireNum()
 {
-    const auto iter = std::find(s_aAcquireNum.begin(), s_aAcquireNum.end(), -1L);
-    if (iter != s_aAcquireNum.end())
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto iter = std::find(pHandle->m_aAcquireNum.begin(), pHandle->m_aAcquireNum.end(), -1L);
+    if (iter != pHandle->m_aAcquireNum.end())
     {
-        const DTWAIN_ACQUIRE num { std::distance(s_aAcquireNum.begin(), iter) };
+        const DTWAIN_ACQUIRE num { std::distance(pHandle->m_aAcquireNum.begin(), iter) };
         *iter = num;
         return num;
     }
 
-    const size_t nSize = s_aAcquireNum.size();
-    s_aAcquireNum.push_back(static_cast<LONG_PTR>(nSize));
+    const size_t nSize = pHandle->m_aAcquireNum.size();
+    pHandle->m_aAcquireNum.push_back(static_cast<LONG_PTR>(nSize));
     return static_cast<DTWAIN_ACQUIRE>(nSize);
 }
 
 
 void CTL_TwainDLLHandle::EraseAcquireNum(DTWAIN_ACQUIRE nNum)
 {
-    const size_t nSize = s_aAcquireNum.size();
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const size_t nSize = pHandle->m_aAcquireNum.size();
     if (nNum >= static_cast<LONG_PTR>(nSize) || nNum < 0)
         return;
-    s_aAcquireNum[nNum] = -1;
+    pHandle->m_aAcquireNum[nNum] = -1;
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceAcquiring(DTWAIN_SOURCE Source)
@@ -184,7 +186,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     // the default bit depth.  The user should use DTWAIN_SetPixelType and DTWAIN_SetBitDepth before
     // calling the DTWAIN_Acquirexxx() function to override this behavior.
     LONG PixelType = opts.getPixelType();
-    bool bWriteMisc = (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)?true:false;
+    bool bWriteMisc = (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)?true:false;
     if (PixelType != DTWAIN_PT_DEFAULT && opts.getAcquireType() != ACQUIREAUDIONATIVE)
     {
         CTL_StringType sBuf;
@@ -219,9 +221,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
                     if (!DTWAIN_SetPixelType(pRealSource, PixelType, DTWAIN_DEFAULT, TRUE))
                     {
                         if ( bWriteMisc)
-                            CTL_TwainAppMgr::WriteLogInfoA("Could not set pixel type!");
-                        opts.setStatus(DTWAIN_ERR_BAD_PIXTYPE);
-                        DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{return true; }, DTWAIN_ERR_BAD_PIXTYPE, NULL, FUNC_MACRO);
+                            CTL_TwainAppMgr::WriteLogInfoA("Warning: Could not set pixel type!");
                     }
                 }
                 else
@@ -267,7 +267,14 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     DTWAIN_CALLBACK oldCall = pHandle->m_CallbackMsg;
     DTWAIN_SetCallbackProc(DTWAIN_AcquireProc, DTWAIN_CallbackMESSAGE);
 #endif
-
+    auto& user_map = CTL_TwainAppMgr::GetSourceToXferReadyMap();
+    auto iter = user_map.find(pSource->GetProductNameA());
+    if (iter != user_map.end())
+    {
+        iter->second.m_bSeenXferReady = false;
+        iter->second.m_bSeenUIClose = false;
+        iter->second.m_CurrentCount = 0;
+    }
     DTWAIN_ARRAY aAcquisitionArray = SourceAcquireWorkerThread(opts);
     if (DTWAIN_GetTwainMode() == DTWAIN_MODELESS)
     {
@@ -276,7 +283,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
 
     if (aAcquisitionArray)
     {
-        auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->
+        auto& vValues = pHandle->m_ArrayFactory->
                             underlying_container_t<CTL_ArrayFactory::tagged_array_voidptr*>(aAcquisitionArray);
         if (!vValues.empty())
             opts.setStatus(DTWAIN_TN_ACQUIREDONE);
@@ -403,7 +410,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
 
     opts.setStatus(pDLLHandle->m_lLastAcqError);
     // Get the array of Dibs
-    const auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->
+    const auto& vValues = pDLLHandle->m_ArrayFactory->
                             underlying_container_t<CTL_ArrayFactory::tagged_array_voidptr*>(aAcquisitionArray);
 
     if (vValues.empty() && opts.getAcquireType() != ACQUIREFILE)
@@ -420,7 +427,8 @@ bool dynarithmic::AcquireExHelper(SourceAcquireOptions& opts)
 {
     DTWAIN_ARRAY aDibs = SourceAcquire(opts);
     DTWAINArrayLL_RAII arr(aDibs);
-    const auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<void*>(aDibs);
+    CTL_TwainDLLHandle* pDLLHandle = static_cast<CTL_TwainDLLHandle*>(opts.getHandle());
+    const auto& vValues = pDLLHandle->m_ArrayFactory->underlying_container_t<void*>(aDibs);
 
     bool bRet = false;
     if (aDibs)
@@ -456,6 +464,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
     // Negotiate transfer
     CTL_TwainAppMgr::SetTransferCount(pSource, opts.getMaxPages());
     pSource->SetSpecialTransferMode(opts.getTransferMode());
+    pSource->SetXferReadySent(false);
     if (opts.getActualAcquireType() == TWAINAcquireType_File)
     {
         CTL_StringType strFile;
@@ -573,10 +582,10 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
                 // Parse the filename string into the array
                 ParseFileNames(opts.getFileList(), opts.getFileName(), pArray);
                 CTL_StringType szName;
-                const size_t nFileCount = CTL_TwainDLLHandle::s_ArrayFactory->size(pArray);
+                const size_t nFileCount = pHandle->m_ArrayFactory->size(pArray);
                 if (nFileCount > 0)
                 {
-                    CTL_TwainDLLHandle::s_ArrayFactory->get_value(pArray, 0, &szName);
+                    pHandle->m_ArrayFactory->get_value(pArray, 0, &szName);
                 }
 
                 if (nFileCount == 0 || szName.empty())
@@ -635,7 +644,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
 
     // Enable the document feeder here
     {
-    // Remember the current error flags
+        // Remember the current error flags
         DTWAINScopedLogControllerExclude sLogger(DTWAIN_LOG_ERRORMSGBOX);
         CTL_TwainAppMgr::SetupFeeder(pSource, opts.getMaxPages());
     }

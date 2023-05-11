@@ -34,11 +34,13 @@ OF THIRD PARTY RIGHTS.
 #include "logmsg.h"
 #include "ctlobstr.h"
 #include "ctlfileutils.h"
+#include "ctlthreadutils.h"
 
 using namespace dynarithmic;
 using namespace date;
 
 /////////////////////////////////////////////////////////////////////////////
+std::mutex CLogSystem::s_logMutex;
 
 namespace dynarithmic
 {
@@ -52,6 +54,14 @@ namespace dynarithmic
         return buf;
     }
 
+    std::string CBaseLogger::getThreadID()
+    {
+        std::string result;
+        auto str = dynarithmic::getThreadIdAsString();
+        result = "Thread [" + str + "] ";
+        return result;
+    }
+
     void CBaseLogger::generic_outstream(std::ostream& os, const std::string& msg)
     {
         os << msg << '\n';
@@ -59,16 +69,16 @@ namespace dynarithmic
 
     void StdCout_Logger::trace(const std::string& msg)
     {
-        std::string total = getTime() + msg;
+        std::string total = getTime() + getThreadID() + msg;
         if (total.back() != '\n')
             total += '\n';
         std::cout << total.c_str();
     }
 
     #ifdef _WIN32
-    void DebugMonitor_Logger::trace(const std::string& msg) { OutputDebugStringA((getTime() + msg).c_str()); }
+    void DebugMonitor_Logger::trace(const std::string& msg) { OutputDebugStringA((getTime() + getThreadID() + msg).c_str()); }
     #else
-    void DebugMonitor_Logger::trace(const std::string& msg) { generic_outstream(std::cout, getTime() + msg + "\n"); }
+    void DebugMonitor_Logger::trace(const std::string& msg) { generic_outstream(std::cout, getTime() + getThreadID() + msg + "\n"); }
     #endif
 
     File_Logger::File_Logger(const LPCSTR filename, bool bAppend/* = false*/)
@@ -88,7 +98,7 @@ namespace dynarithmic
     void File_Logger::trace(const std::string& msg)
     {
         if (m_ostr)
-            generic_outstream(m_ostr, getTime() + msg);
+            generic_outstream(m_ostr, getTime() + getThreadID() + msg);
     }
 
 }
@@ -98,7 +108,10 @@ void Callback_Logger::trace(const std::string& msg)
     // We have to convert the string to native format, since the user-defined logger handles both wide and non-wide
     // character strings
     if (UserDefinedLoggerExists())
-        WriteUserDefinedLogMsgA(msg.c_str());
+    {
+        auto fullMessage = getTime() + getThreadID() + msg;
+        WriteUserDefinedLogMsgA(fullMessage.c_str());
+    }
 }
 
 CLogSystem::CLogSystem() : m_bEnable(false), m_bPrintTime(false), m_bPrintAppName(false), m_bFileOpenedOK(false), m_bErrorDisplayed(false)
@@ -195,6 +208,7 @@ bool CLogSystem::StatusOutFast(LPCSTR fmt)
 
 bool CLogSystem::WriteOnDemand(const std::string& fmt)
 {
+    std::lock_guard<std::mutex> g(s_logMutex);
     for (const auto& m : app_logger_map)
         m.second->trace(fmt);
     return true;

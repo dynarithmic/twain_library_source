@@ -27,6 +27,7 @@
 #include "../simpleini/simpleini.h"
 #include "ctlfileutils.h"
 #include "ctldefsource.h"
+#include "ctlthreadutils.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -36,7 +37,7 @@ using namespace dynarithmic;
 LONG DLLENTRY_DEF DTWAIN_SetTwainDialogFont(HFONT font)
 {
     LOG_FUNC_ENTRY_PARAMS((font))
-    CTL_TwainDLLHandle::s_DialogFont = font;
+    CTL_StaticData::s_DialogFont = font;
     LOG_FUNC_EXIT_PARAMS(1)
     CATCH_BLOCK(0)
 }
@@ -76,8 +77,13 @@ static LONG OpenSourceInternal(DTWAIN_SOURCE Source)
 static DTWAIN_SOURCE SelectAndOpenSource(const SourceSelectionOptions& opts)
 {
     const DTWAIN_SOURCE Source = SourceSelect(opts);
+    auto& sourcemap = CTL_StaticData::GetSourceStatusMap();
     if (Source)
     {
+        CTL_ITwainSource* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
+        auto iter = sourcemap.insert({ pSource->GetProductNameA(), {} }).first;
+        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_SELECECTED, true);
+        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, false);
         const LONG retVal = OpenSourceInternal(Source);
         if (retVal != DTWAIN_NO_ERROR)
         {
@@ -85,7 +91,11 @@ static DTWAIN_SOURCE SelectAndOpenSource(const SourceSelectionOptions& opts)
                 CTL_TwainAppMgr::SetError(retVal, StringConversion::Convert_NativePtr_To_Ansi(opts.szProduct));
             return nullptr;
         }
+        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, CTL_TwainAppMgr::IsSourceOpen(pSource));
+        iter->second.SetThreadID(dynarithmic::getThreadIdAsString());
+        iter->second.SetSourceHandle(pSource);
     }
+
     if ( !Source && opts.nWhich == SELECTSOURCEBYNAME )
     {
         const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
@@ -204,7 +214,7 @@ DTWAIN_SOURCE dynarithmic::SourceSelect(const SourceSelectionOptions& options)
     }
 
     DTWAINArrayLL_RAII arr(pDTWAINArray);
-    const auto& vSources = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<CTL_ITwainSource*>(pDTWAINArray);
+    const auto& vSources = pHandle->m_ArrayFactory->underlying_container_t<CTL_ITwainSource*>(pDTWAINArray);
 
     if (!vSources.empty())
     {
@@ -223,8 +233,8 @@ DTWAIN_SOURCE dynarithmic::SourceSelect(const SourceSelectionOptions& options)
             {
                 const auto pSession = CTL_TwainAppMgr::GetCurrentSession();
                 pSession->DestroyOneSource(pRealSource);
-                DTWAIN_SetDefaultSource(pDead);
             }
+            DTWAIN_SetDefaultSource(pDead);
             LOG_FUNC_EXIT_PARAMS(pDead)
         }
     }
@@ -256,8 +266,8 @@ DTWAIN_SOURCE dynarithmic::DTWAIN_LLSelectSource2(const SourceSelectionOptions& 
     LOG_FUNC_ENTRY_PARAMS((opts))
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     // Get the resource for the Twain dialog
-    const HGLOBAL hglb = LoadResource(CTL_TwainDLLHandle::s_DLLInstance,
-                                      static_cast<HRSRC>(FindResource(CTL_TwainDLLHandle::s_DLLInstance,
+    const HGLOBAL hglb = LoadResource(CTL_StaticData::s_DLLInstance,
+                                      static_cast<HRSRC>(FindResource(CTL_StaticData::s_DLLInstance,
                                                                       MAKEINTRESOURCE(10000), RT_DIALOG)));
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]{ return !hglb;}, DTWAIN_ERR_NULL_WINDOW, NULL, FUNC_MACRO);
 
@@ -297,9 +307,9 @@ DTWAIN_SOURCE dynarithmic::DTWAIN_LLSelectSource2(const SourceSelectionOptions& 
                 selectStruct.CS.mapNames.insert({ onePair.front(), onePair.back() });
         }
     }
-    if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+    if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
         CTL_TwainAppMgr::WriteLogInfoA("Displaying TWAIN Dialog...\n");
-    const INT_PTR bRet = DialogBoxIndirectParam(CTL_TwainDLLHandle::s_DLLInstance, lpTemplate, opts.hWndParent,
+    const INT_PTR bRet = DialogBoxIndirectParam(CTL_StaticData::s_DLLInstance, lpTemplate, opts.hWndParent,
                                                 reinterpret_cast<DLGPROC>(DisplayTwainDlgProc), reinterpret_cast<LPARAM>(&selectStruct));
     if ( bRet == -1 )
         LOG_FUNC_EXIT_PARAMS(NULL)
@@ -367,10 +377,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDefaultSource(DTWAIN_SOURCE Source)
     {
         // Load the resources
         CSimpleIniA customProfile;
-        CTL_StringType fullDirectory = dynarithmic::GetDTWAININIPath();
+        CTL_StringType fullDirectory = dynarithmic::GetDTWAININIPath().c_str();
         customProfile.LoadFile(fullDirectory.c_str());
-        customProfile.SetValue("Sources", "Default",
-                               StringConversion::Convert_Native_To_Ansi(p->GetProductName()).c_str());
+        customProfile.SetValue("Sources", "Default", p->GetProductNameA().c_str());
         customProfile.SaveFile(fullDirectory.c_str());
     }
     LOG_FUNC_EXIT_PARAMS(true)
@@ -489,16 +498,16 @@ struct closeSourceRAII
 LRESULT CALLBACK DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static SelectStruct *pS;
-    bool bLogMessages = (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)?true:false;
+    bool bLogMessages = (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)?true:false;
     switch (message)
     {
         case WM_INITDIALOG:
         {
             DTWAINDeviceContextRelease_RAII contextRAII;
-            if (CTL_TwainDLLHandle::s_DialogFont)
+            if (CTL_StaticData::s_DialogFont)
             {
-                SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(CTL_TwainDLLHandle::s_DialogFont), 0);
-                EnumChildWindows(hWnd, ChildEnumFontProc, reinterpret_cast<LPARAM>(CTL_TwainDLLHandle::s_DialogFont));
+                SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(CTL_StaticData::s_DialogFont), 0);
+                EnumChildWindows(hWnd, ChildEnumFontProc, reinterpret_cast<LPARAM>(CTL_StaticData::s_DialogFont));
             }
 
             HWND lstSources;
@@ -522,8 +531,8 @@ LRESULT CALLBACK DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPA
             DTWAIN_ARRAY Array = nullptr;
             DTWAIN_EnumSources(&Array);
             DTWAINArrayLL_RAII arr(Array);
-
-            auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<CTL_ITwainSource*>(Array);
+            const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+            auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<CTL_ITwainSource*>(Array);
 
             int nCount;
             if (vValues.empty())

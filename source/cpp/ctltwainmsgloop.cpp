@@ -55,7 +55,6 @@ std::pair<bool, DTWAIN_ACQUIRE> dynarithmic::StartModalMessageLoop(DTWAIN_SOURCE
     if (CTL_TwainAppMgr::IsVersion2DSMUsed())
     {
         // assign the callback procedure
-        CTL_TwainDLLHandle::s_TwainCallbackSet = false;
         CTL_DSMCallbackTripletRegister callbackSetter(CTL_TwainAppMgr::GetCurrentSession(), pSource, &TwainMessageLoopV2::TwainVersion2MsgProc);
         if (callbackSetter.Execute() == TWRC_SUCCESS)
             pImpl = &v2Impl;

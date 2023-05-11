@@ -50,7 +50,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainerEx(LONG nCap, DTWAIN_BOOL bSetContainer,
 
     if (nCap < CAP_CUSTOMBASE)
     {
-        auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+        auto& factory = pHandle->m_ArrayFactory;
         LONG lValue = CTL_TwainAppMgr::GetContainerTypesFromCap(static_cast<CTL_EnumCapability>(nCap),
                                                                 bSetContainer ? true : false);
         if (pDTWAINArray)

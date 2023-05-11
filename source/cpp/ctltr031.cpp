@@ -350,12 +350,13 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                         }
 
                         CurDib->FlipBitMap(m_nPixelType == TWPT_RGB?1:0);
+                        auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
 
                         // Callback function for access to change DIB
-                        if ( CTL_TwainDLLHandle::s_pDibUpdateProc != nullptr)
+                        if ( sessionHandle->m_pDibUpdateProc != nullptr)
                         {
                             const HANDLE hRetDib =
-                                (*CTL_TwainDLLHandle::s_pDibUpdateProc)
+                                (sessionHandle->m_pDibUpdateProc)
                                         (pSource, static_cast<int>(nCurImage), m_hDataHandle);
                             if ( hRetDib && hRetDib != m_hDataHandle)
                             {

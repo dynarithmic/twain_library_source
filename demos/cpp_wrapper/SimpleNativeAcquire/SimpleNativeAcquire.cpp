@@ -5,18 +5,14 @@
 #include <dynarithmic/twain/twain_session.hpp> // for dynarithmic::twain::twain_session
 #include <dynarithmic/twain/twain_source.hpp>  // for dynarithmic::twain::twain_source
 #include <dynarithmic/twain/acquire_characteristics.hpp>  // for acquire_characteristics
+#include "..\Runner\runnerbase.h"
 
-using namespace dynarithmic::twain;
-struct Runner
+struct Runner : RunnerBase
 {
     int Run();
-    ~Runner()
-    {
-        printf("\nPress Enter key to exit application...\n");
-        char temp;
-        std::cin.get(temp);
-    }
 };
+
+using namespace dynarithmic::twain;
 
 void DisplayAcquisitionAndImageInfo(twain_array& images)
 {
@@ -84,9 +80,6 @@ int Runner::Run()
         // check if we were able to open the source
         if (twsource.is_open())
         {
-            // output the source product name
-            std::cout << twsource.get_source_info().get_product_name() << "\n";
-
             // set the characteristics to acquire in native mode.
             // Arrays of Device Independent Bitmap's will be returned for each page scanned
             twsource.get_acquire_characteristics().

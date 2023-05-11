@@ -5,28 +5,32 @@
 #include <dynarithmic/twain/twain_session.hpp> // for dynarithmic::twain::twain_session
 #include <dynarithmic/twain/twain_source.hpp>  // for dynarithmic::twain::twain_source
 #include <dynarithmic/twain/acquire_characteristics.hpp>  // for acquire_characteristics
+#include "..\Runner\runnerbase.h"
+
+struct Runner : RunnerBase
+{
+    int m_argc;
+    std::vector<std::string> m_argv;
+
+    Runner(int argc, char* argv[]) : m_argc(argc)
+    {
+        for (int i = 0; i < argc; ++i)
+            m_argv.push_back(argv[i]);
+    }
+    int Run();
+};
 
 void TestMultiOrSingleFile(std::string outDir, bool bTestSingle);
 
 using namespace dynarithmic::twain;
-struct Runner
-{
-    int Run(int argc, char* argv[]);
-    ~Runner()
-    {
-        printf("\nPress Enter key to exit application...\n");
-        char temp;
-        std::cin.get(temp);
-    }
-};
 
 // Global TWAIN session (not started here)
 twain_session session;
 
-int Runner::Run(int argc, char* argv[])
+int Runner::Run()
 {
     int value = 0;
-    if (argc < 3)
+    if (m_argc < 3)
     {
         std::cout << "Usage: TestImageFileCreation test-to-run[1,2,3] output-directory\n\n";
         std::cout << "1 --> Single page files\n2 --> Multipage files\n3 --> Single and multipage files\n\n";
@@ -36,7 +40,7 @@ int Runner::Run(int argc, char* argv[])
 
     try
     {
-        value = std::stoi(argv[1]);
+        value = std::stoi(m_argv[1]);
     }
     catch (std::exception& e)
     {
@@ -44,7 +48,7 @@ int Runner::Run(int argc, char* argv[])
         return -1;
     }
 
-    std::string outDir = argv[2];
+    std::string outDir = m_argv[2];
     if (outDir.back() != '\\')
         outDir.push_back('\\');
 
@@ -80,7 +84,7 @@ int Runner::Run(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-    Runner().Run(argc, argv);
+    Runner(argc, argv).Run();
 }
 
 void TestMultiOrSingleFile(std::string outDir, bool bTestSingle)
@@ -115,14 +119,6 @@ void TestMultiOrSingleFile(std::string outDir, bool bTestSingle)
 
     std::string filePrefix = outDir;
 
-    // These are the black and white, 1 bit-per-pixel types
-    std::set<filetype_value::value_type> sBlackWhite = { filetype_value::tiffgroup3multi,
-                                                        filetype_value::tiffgroup4multi,
-                                                        filetype_value::tiffgroup3,
-                                                        filetype_value::tiffgroup4,
-                                                        filetype_value::text,
-                                                        filetype_value::textmulti };
-
     auto& ac = Source.get_acquire_characteristics();
 
     // Set the base file options for all file types
@@ -153,15 +149,6 @@ void TestMultiOrSingleFile(std::string outDir, bool bTestSingle)
 
         // Set the name and type
         fc.set_name(fileName).set_type(fileType);
-
-        // Make sure pixel type is black/white for the corresponding
-        // file type (TIFF G3, TIFF g4, etc.)
-        color_value::value_type pt = color_value::default_color;
-        if (sBlackWhite.count(fileType) )
-            pt = color_value::bw;
-
-        // Set the pixel type
-        gOpts.set_pixeltype(pt);
 
         // Start the acquisition
         Source.acquire();

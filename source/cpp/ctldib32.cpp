@@ -279,11 +279,10 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
         case TextFormat:
         case TextFormatMulti:
         {
-            auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
-
             // Get the current OCR engine's input format
             DTWAIN_ARRAY a = nullptr;
             const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+            auto& factory = pHandle->m_ArrayFactory;
             DTWAIN_GetOCRCapValues(static_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine.get()), DTWAIN_OCRCV_IMAGEFILEFORMAT,
                                     DTWAIN_CAPGETCURRENT, &a);
             DTWAINArrayLL_RAII raii(a);
@@ -370,7 +369,7 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
             DTWAINArrayLL_RAII raii(a);
             if ( a )
             {
-                const auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(a);
+                const auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(a);
                 if ( !vValues.empty() )
                 {
                     LONG InputFormat = vValues[0];
@@ -800,6 +799,44 @@ bool CTL_TwainDib::IsBlankDIB(double threshold) const
     if (hDib)
         return CDibInterface::IsBlankDIB(hDib, threshold) ? true : false;
     return false;
+}
+
+HANDLE CTL_TwainDib::CreateBMPBitmapFromDIB(HANDLE hDib)
+{
+    // if hDIB is NULL, do nothing
+    if (!hDib)
+        return {};
+
+    HandleRAII raii(hDib);
+    const LPBYTE pDibData = raii.getData();
+
+    HANDLE returnHandle = nullptr;
+
+    // attach file header if this is a DIB
+    BITMAPFILEHEADER fileheader;
+    memset(&fileheader, 0, sizeof(BITMAPFILEHEADER));
+    fileheader.bfType = 'MB';
+    const auto lpbi = reinterpret_cast<LPBITMAPINFOHEADER>(pDibData);
+    const unsigned int bpp = lpbi->biBitCount;
+    fileheader.bfSize = GlobalSize(hDib) + sizeof(BITMAPFILEHEADER);
+    fileheader.bfReserved1 = 0;
+    fileheader.bfReserved2 = 0;
+    fileheader.bfOffBits = static_cast<DWORD>(sizeof(BITMAPFILEHEADER)) +
+        lpbi->biSize + CDibInterface::CalculateUsedPaletteEntries(bpp) * sizeof(RGBQUAD);
+
+    // we need to attach the bitmap header info onto the data
+    const unsigned int totalSize = ImageMemoryHandler::GlobalSize(hDib) + sizeof(BITMAPFILEHEADER);
+
+    // Allocate for returned handle
+    returnHandle = static_cast<HANDLE>(ImageMemoryHandler::GlobalAlloc(GMEM_FIXED, totalSize));
+    const HandleRAII raii2(returnHandle);
+    if (const LPBYTE bFullImage = raii2.getData())
+    {
+        char* pFileHeader = reinterpret_cast<char*>(&fileheader);
+        std::copy_n(pFileHeader, sizeof(BITMAPFILEHEADER), &bFullImage[0]);
+        std::copy_n(pDibData, ImageMemoryHandler::GlobalSize(hDib), &bFullImage[sizeof(BITMAPFILEHEADER)]);
+    }
+    return returnHandle;
 }
 
 bool CTL_TwainDib::FlipBitMap(bool /*bRGB*/)

@@ -41,6 +41,8 @@ OF THIRD PARTY RIGHTS.
 #include <dynarithmic/twain/imagehandler/image_handler.hpp>
 #include <dynarithmic/twain/info/file_transfer_info.hpp>
 #include <dynarithmic/twain/info/buffered_transfer_info.hpp>
+#include <dynarithmic/twain/twain_details.hpp>
+
 namespace dynarithmic
 {
     namespace twain 
@@ -60,6 +62,8 @@ namespace dynarithmic
                 using twain_source_info = twain_identity;
                 using acquire_return_type = std::pair<int32_t, twain_array>;
                 using byte_array = std::vector<BYTE>;
+                using custom_data_type = unsigned char;
+                using custom_data_container_type = std::vector<custom_data_type>;
 
                 static constexpr int ACQUIRE_RETURN = 1;
                 static constexpr int IMAGE_HANDLER = 2;
@@ -141,17 +145,18 @@ namespace dynarithmic
                 bool set_current_camera(const cameraside_value::value_type& camera);
                 DTWAIN_SOURCE get_source() const noexcept { return m_theSource; }
 
-                template <typename Container = std::vector<unsigned char>>
-                Container get_custom_data() const;
-
-                template <typename Container = std::vector<unsigned char>>
-                bool set_custom_data(const Container& s) const;
+                custom_data_container_type get_custom_data() const;
+                bool set_custom_data(const custom_data_container_type& s) const
+                {
+                    return API_INSTANCE DTWAIN_SetCustomDSData(m_theSource, NULL, s.data(), static_cast<LONG>(s.size()), DTWAINSCD_USEDATA) ? true : false;
+                }
 
                 static bool acquire_no_error(int32_t errCode);
                 static bool acquire_timed_out(int32_t errCode);
                 static bool acquire_internal_error(int32_t errCode);
                 const twain_session* get_session() const;
-                std::string& get_details(bool refresh = false);
+                std::string& get_details(details_info info = {true, 2});
+                bool set_tiff_compress_type(tiffcompress_value::value_type compress_type);
         };
 
         inline std::ostream& operator <<(std::ostream& os, const image_information& ii)

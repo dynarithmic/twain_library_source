@@ -126,7 +126,7 @@ bool dynarithmic::GetCapInfoFromIni(const std::string& strCapName,
 
     bContainerInfoFound = false;
 
-    szName = CTL_TwainDLLHandle::s_sINIPath + szName;
+    szName = CTL_StaticData::s_sINIPath + szName;
 
     // Initialize State Info to indicate states 4 - 7 are negotiable for capability
     rStateInfo = 0xFF;
@@ -211,7 +211,7 @@ bool dynarithmic::GetCapInfoFromIni(const std::string& strCapName,
         }
     }
 
-    // Check if there are is any state-related info
+    // Check if there is any state-related info
     std::string szStates;
     strStates = strCapName + "_STATES";
     szStates = customProfile.GetValue(strKeyName.c_str(), strStates.c_str(), "");

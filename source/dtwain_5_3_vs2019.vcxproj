@@ -45,44 +45,44 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
@@ -228,7 +228,7 @@
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;_UNICODE;_SCL_SECURE_NO_WARNINGS;DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;NDEBUG;DTWAIN_USE_PDFLIB;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions);FREEIMAGE_CPP_LIB;DTWAIN_DEBUG;BUILDING_DTWAINDLL;;USE_DTWAIN_DEBUG_LIB</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;_DEBUG;_UNICODE;_SCL_SECURE_NO_WARNINGS;DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;NDEBUG;DTWAIN_USE_PDFLIB;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions);FREEIMAGE_CPP_LIB;DTWAIN_DEBUG;BUILDING_DTWAINDLL;;USE_DTWAIN_DEBUG_LIB</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -245,11 +245,13 @@
       <AdditionalOptions>-Zm400 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;_DEBUG;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;DTWAIN_OPENSOURCE_DISTRIBUTION;_DEBUG;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/fixed:no %(AdditionalOptions)</AdditionalOptions>
@@ -276,7 +278,9 @@
       <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
 copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).dll
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName)_embarcadero.lib
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).pdb
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).lib
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
@@ -324,7 +328,8 @@ cd $(SolutionDir)
 cd ..
 md demos\libs\$(PlatformArchitecture)bit
 cd demos\libs\$(PlatformArchitecture)bit
-copy $(TargetDir)$(TargetName).lib .</Command>
+copy $(TargetDir)$(TargetName).lib .
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">
@@ -343,7 +348,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       </HeaderFileName>
     </Midl>
     <ClCompile>
-      <Optimization>Full</Optimization>
+      <Optimization>MinSpace</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>FREEIMAGE_CPP_LIB;_UNICODE;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;NDEBUG;DTWAIN_USE_PDFLIB;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -368,6 +373,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;NDEBUG;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/fixed:no %(AdditionalOptions)</AdditionalOptions>
@@ -392,7 +398,9 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
 copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).dll
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName)_embarcadero.lib
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).pdb
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).lib
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
@@ -459,7 +467,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       </HeaderFileName>
     </Midl>
     <ClCompile>
-      <Optimization>Full</Optimization>
+      <Optimization>MinSpace</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;NDEBUG;DTWAIN_USE_PDFLIB;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);USE_DTWAIN_DEBUG_LIB</PreprocessorDefinitions>
@@ -488,6 +496,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;NDEBUG;PDFLIB_INTERNAL;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/fixed:no %(AdditionalOptions)</AdditionalOptions>
@@ -516,7 +525,9 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
 copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).dll
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName)_embarcadero.lib
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).pdb
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).lib
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
@@ -586,7 +597,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;FREEIMAGE_CPP_LIB;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;DTWAIN_USE_PDFLIB;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;_SCL_SECURE_NO_WARNINGS;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);USE_DTWAIN_DEBUG_LIB</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;_DEBUG;FREEIMAGE_CPP_LIB;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;DTWAIN_USE_PDFLIB;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;_SCL_SECURE_NO_WARNINGS;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);USE_DTWAIN_DEBUG_LIB</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -606,9 +617,10 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;_DEBUG;PDFLIB_INTERNAL;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;DTWAIN_OPENSOURCE_DISTRIBUTION;_DEBUG;PDFLIB_INTERNAL;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/fixed:no %(AdditionalOptions)</AdditionalOptions>
@@ -633,7 +645,9 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
 copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).dll
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName)_embarcadero.lib
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).pdb
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).lib
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
@@ -681,7 +695,8 @@ cd $(SolutionDir)
 cd ..
 md demos\libs\$(PlatformArchitecture)bit
 cd demos\libs\$(PlatformArchitecture)bit
-copy $(TargetDir)$(TargetName).lib .</Command>
+copy $(TargetDir)$(TargetName).lib .
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">
@@ -689,7 +704,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;NOMINMAX;FREEIMAGE_CPP_LIB;_UNICODE;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;DTWAIN_USE_PDFLIB;WIN64;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);;USE_DTWAIN_DEBUG_LIB</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;_DEBUG;NOMINMAX;FREEIMAGE_CPP_LIB;_UNICODE;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;DTWAIN_USE_PDFLIB;WIN64;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);;USE_DTWAIN_DEBUG_LIB</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
@@ -714,8 +729,9 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <ResourceCompile>
-      <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;_DEBUG;WIN64;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;DTWAIN_OPENSOURCE_DISTRIBUTION;_DEBUG;WIN64;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
     <PostBuildEvent>
       <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
@@ -776,7 +792,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
-      <Optimization>Full</Optimization>
+      <Optimization>MinSpace</Optimization>
       <PreprocessorDefinitions>NOMINMAX;FREEIMAGE_CPP_LIB;_UNICODE;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;NDEBUG;DTWAIN_USE_PDFLIB;WIN64;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
@@ -803,6 +819,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ResourceCompile>
       <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;NDEBUG;WIN64;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
     <PostBuildEvent>
       <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
@@ -864,7 +881,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
-      <Optimization>Full</Optimization>
+      <Optimization>MinSpace</Optimization>
       <PreprocessorDefinitions>NOMINMAX;FREEIMAGE_CPP_LIB;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;_DEBUGNDEBUG;DTWAIN_USE_PDFLIB;WIN64;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);;USE_DTWAIN_DEBUG_LIB</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
@@ -896,8 +913,9 @@ copy $(TargetDir)$(TargetName).lib .
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <ResourceCompile>
-      <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;NDEBUG;WIN64;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;NDEBUG;WIN64;PDFLIB_INTERNAL;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
     <PostBuildEvent>
       <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
@@ -960,7 +978,7 @@ copy $(TargetDir)$(TargetName).lib .
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;NOMINMAX;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;DTWAIN_USE_PDFLIB;WIN64;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);;USE_DTWAIN_DEBUG_LIB</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;_DEBUG;NOMINMAX;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;DTWAIN_USE_PDFLIB;WIN64;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
@@ -984,8 +1002,9 @@ copy $(TargetDir)$(TargetName).lib .
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <ResourceCompile>
-      <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;_DEBUG;WIN64;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;DTWAIN_OPENSOURCE_DISTRIBUTION;_DEBUG;WIN64;PDFLIB_INTERNAL;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
     <PostBuildEvent>
       <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
@@ -1225,12 +1244,15 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include="cpp\ctlfileutils.cpp" />
     <ClCompile Include="cpp\ctlgetmetrics.cpp" />
     <ClCompile Include="cpp\ctlpapersize.cpp" />
+    <ClCompile Include="cpp\ctlsourcedetails.cpp" />
+    <ClCompile Include="cpp\ctlthreadutils.cpp" />
     <ClCompile Include="cpp\ctltimeout.cpp" />
     <ClCompile Include="cpp\ctltr041.cpp" />
     <ClCompile Include="cpp\ctltr042.cpp" />
     <ClCompile Include="cpp\ctltr043.cpp" />
     <ClCompile Include="cpp\ctltsstub.cpp" />
     <ClCompile Include="cpp\ctlupdatedibproc.cpp" />
+    <ClCompile Include="cpp\imagefun\resamplefactory.cpp" />
     <ClCompile Include="cpp\imagefun\tiffun32.cpp" />
     <ClCompile Include="cpp\imagefun\txtfun32.cpp" />
     <ClCompile Include="cpp\iohandler_pbm.cpp" />
@@ -1257,6 +1279,37 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include="cpp\twainfix32.cpp" />
     <ClCompile Include="cpp\twainframe.cpp" />
     <ClCompile Include="cpp\windows_versioninfo.cpp" />
+    <ClCompile Include="cximage\ximabmp.cpp" />
+    <ClCompile Include="cximage\ximadsp.cpp" />
+    <ClCompile Include="cximage\ximaenc.cpp" />
+    <ClCompile Include="cximage\ximaexif.cpp" />
+    <ClCompile Include="cximage\ximage.cpp" />
+    <ClCompile Include="cximage\ximagif.cpp" />
+    <ClCompile Include="cximage\ximahist.cpp" />
+    <ClCompile Include="cximage\ximaico.cpp" />
+    <ClCompile Include="cximage\ximainfo.cpp" />
+    <ClCompile Include="cximage\ximaint.cpp" />
+    <ClCompile Include="cximage\ximajas.cpp" />
+    <ClCompile Include="cximage\ximajbg.cpp" />
+    <ClCompile Include="cximage\ximajpg.cpp" />
+    <ClCompile Include="cximage\ximalpha.cpp" />
+    <ClCompile Include="cximage\ximalyr.cpp" />
+    <ClCompile Include="cximage\ximamng.cpp" />
+    <ClCompile Include="cximage\ximapal.cpp" />
+    <ClCompile Include="cximage\ximapcx.cpp" />
+    <ClCompile Include="cximage\ximapng.cpp" />
+    <ClCompile Include="cximage\ximapsd.cpp" />
+    <ClCompile Include="cximage\ximaraw.cpp" />
+    <ClCompile Include="cximage\ximasel.cpp" />
+    <ClCompile Include="cximage\ximaska.cpp" />
+    <ClCompile Include="cximage\ximatga.cpp" />
+    <ClCompile Include="cximage\ximath.cpp" />
+    <ClCompile Include="cximage\ximatif.cpp" />
+    <ClCompile Include="cximage\ximatran.cpp" />
+    <ClCompile Include="cximage\ximawbmp.cpp" />
+    <ClCompile Include="cximage\ximawmf.cpp" />
+    <ClCompile Include="cximage\ximawnd.cpp" />
+    <ClCompile Include="cximage\xmemfile.cpp" />
     <ClCompile Include="c\imagefun\dtwpdf\crc32_aux.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -1418,6 +1471,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="cpp\pdflib32\md5class.h" />
     <ClInclude Include="cpp\pdflib32\pdfencrypt.h" />
     <ClInclude Include="cpp\pdflib32\pdflib32.h" />
+    <ClInclude Include="cximage\ximage.h" />
     <ClInclude Include="FreeImage\Source\FreeImage.h" />
     <ClInclude Include="FreeImage\Wrapper\FreeImagePlus\FreeImagePlus.h" />
     <ClInclude Include="h\ansiwideconverter_generic.h" />
@@ -1428,10 +1482,12 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\ctlfileutils.h" />
     <ClInclude Include="h\ctlres.h" />
     <ClInclude Include="h\ctlsupport.h" />
+    <ClInclude Include="h\ctlthreadutils.h" />
     <ClInclude Include="h\ctltr037.h" />
     <ClInclude Include="h\ctltr041.h" />
     <ClInclude Include="h\ctltr042.h" />
     <ClInclude Include="h\ctltr043.h" />
+    <ClInclude Include="h\ctltwainidentity.h" />
     <ClInclude Include="h\ctltwainmsgloop.h" />
     <ClInclude Include="h\dibinfox.h" />
     <ClInclude Include="h\dibmulti.h" />
@@ -1446,6 +1502,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\imagefun\dtwpdf\dtwainpdf.h" />
     <ClInclude Include="h\imagefun\pcxfun32.h" />
     <ClInclude Include="h\imagefun\pdffun32.h" />
+    <ClInclude Include="h\imagefun\resamplefactory.h" />
     <ClInclude Include="h\imagefun\tiffun32.h" />
     <ClInclude Include="h\imagefun\txtfun32.h" />
     <ClInclude Include="h\imagefun\winbit32.h" />
@@ -1503,6 +1560,8 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <None Include="inl\winget_twain.inl" />
     <None Include="inl\winlibraryloader_impl.inl" />
     <None Include="rc\resource_verinfo.rc2" />
+    <None Include="txt\dtwain32.ini" />
+    <None Include="txt\dtwain64.ini" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include=".\rc\twil32.rc">

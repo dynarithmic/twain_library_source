@@ -196,6 +196,9 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
             return DTWAIN_ERR_FILEWRITE;
         }
     }
+    else
+    if ( !pPDFInfo )
+        return DTWAIN_ERR_FILEWRITE;
 
     // Initialize the page dimensions depending on the image information
     retval = InitializePDFPage(pPDFInfo.get(), bitmap);
@@ -315,7 +318,7 @@ int CPDFImageHandler::InitializePDFPage(const PDFINFO* pPDFInfo, HANDLE bitmap)
         sDimensions = sBuf.str();
         pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_MEDIABOX, sDimensions.c_str());
 
-        if ( CTL_TwainDLLHandle::s_lErrorFilterFlags )
+        if ( CTL_StaticData::s_lErrorFilterFlags )
         {
             std::string sOut = "PDF Computed media box: ";
             sOut += sDimensions;

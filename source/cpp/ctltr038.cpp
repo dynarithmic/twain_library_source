@@ -165,6 +165,7 @@ void CTL_ExtImageInfoTriplet::DestroyInfo()
 {
     if ( !m_pExtImageInfo )
         return;
+    auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
     for (TW_UINT32 i = 0; i < m_pExtImageInfo->NumInfos; i++)
     {
         TW_INFO* pInfo = &m_pExtImageInfo->Info[i];
@@ -235,13 +236,13 @@ void CTL_ExtImageInfoTriplet::DestroyInfo()
                 }
                 break;
                 }
-                CTL_TwainDLLHandle::s_TwainMemoryFunc->UnlockMemory(TempHandle);
-                CTL_TwainDLLHandle::s_TwainMemoryFunc->FreeMemory(TempHandle);
+                sessionHandle->m_TwainMemoryFunc->UnlockMemory(TempHandle);
+                sessionHandle->m_TwainMemoryFunc->FreeMemory(TempHandle);
             }
         }
     }
-    CTL_TwainDLLHandle::s_TwainMemoryFunc->UnlockMemory(m_memHandle);
-    CTL_TwainDLLHandle::s_TwainMemoryFunc->FreeMemory(m_memHandle);
+    sessionHandle->m_TwainMemoryFunc->UnlockMemory(m_memHandle);
+    sessionHandle->m_TwainMemoryFunc->FreeMemory(m_memHandle);
 }
 
 
@@ -262,12 +263,12 @@ bool CTL_ExtImageInfoTriplet::CreateExtImageInfo()
 {
     CTL_ITwainSession *pSession = GetSessionPtr();
     CTL_ITwainSource *pSource = GetSourcePtr();
-
+    auto sessionHandle = pSession->GetTwainDLLHandle();
     const size_t nInfos = m_vInfo.size();
 
     // Allocate memory for TW_INFO structure
-    m_memHandle = CTL_TwainDLLHandle::s_TwainMemoryFunc->AllocateMemory(static_cast<TW_UINT32>(sizeof(TW_INFO) * nInfos + sizeof(TW_EXTIMAGEINFO)));
-    m_pExtImageInfo = static_cast<TW_EXTIMAGEINFO*>(CTL_TwainDLLHandle::s_TwainMemoryFunc->LockMemory(m_memHandle));
+    m_memHandle = sessionHandle->m_TwainMemoryFunc->AllocateMemory(static_cast<TW_UINT32>(sizeof(TW_INFO) * nInfos + sizeof(TW_EXTIMAGEINFO)));
+    m_pExtImageInfo = static_cast<TW_EXTIMAGEINFO*>(sessionHandle->m_TwainMemoryFunc->LockMemory(m_memHandle));
 
     // Set up the base triplet information here
     if ( m_pExtImageInfo )

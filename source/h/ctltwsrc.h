@@ -34,6 +34,7 @@
 #include "dtwtype.h"
 #include "ctldevnt.h"
 #include "ctltwses.h"
+#include "ctltwainidentity.h"
 
 namespace dynarithmic
 {
@@ -97,6 +98,7 @@ namespace dynarithmic
 
         static void Destroy(const CTL_ITwainSource* pSource);
         operator TW_IDENTITY* () { return GetSourceIDPtr(); }
+        CTL_TwainIdentity& GetTwainIdentity() { return m_SourceId;  }
 
         CTL_ITwainSession* GetTwainSession() const;
 
@@ -111,16 +113,39 @@ namespace dynarithmic
         DTWAIN_ARRAY getCapCachedValues(TW_UINT16 lCap, LONG getType);
         bool setCapCachedValues(DTWAIN_ARRAY array, TW_UINT16 lCap, LONG getType);
 
-        TW_IDENTITY *GetSourceIDPtr() { return &m_SourceId; }
+        TW_IDENTITY *GetSourceIDPtr() { return &m_SourceId.get_identity(); }
 
-        TW_UINT32    GetId() const          { return m_SourceId.Id; }
-        const TW_VERSION*  GetVersion() const { return &m_SourceId.Version; }
-        TW_UINT16    GetProtocolMajor() const { return m_SourceId.ProtocolMajor; }
-        TW_UINT16    GetProtocolMinor() const { return m_SourceId.ProtocolMinor; }
-        TW_UINT32    GetSupportedGroups() const { return m_SourceId.SupportedGroups; }
-        CTL_StringType GetManufacturer() const { return StringConversion::Convert_AnsiPtr_To_Native(m_SourceId.Manufacturer); }
-        CTL_StringType GetProductFamily() const { return StringConversion::Convert_AnsiPtr_To_Native(m_SourceId.ProductFamily); }
-        CTL_StringType GetProductName() const { return StringConversion::Convert_AnsiPtr_To_Native(m_SourceId.ProductName); }
+        TW_UINT32    GetId() const          { return m_SourceId.get_id(); }
+        const TW_VERSION*  GetVersion() const { return &m_SourceId.get_version(); }
+        TW_UINT16    GetProtocolMajor() const { return m_SourceId.get_protocol_major(); }
+        TW_UINT16    GetProtocolMinor() const { return m_SourceId.get_protocol_minor(); }
+        TW_UINT32    GetSupportedGroups() const { return m_SourceId.get_supported_groups(); }
+        CTL_StringType GetManufacturer() const { return StringConversion::Convert_Ansi_To_Native(m_SourceId.get_manufacturer()); }
+        CTL_StringType GetProductFamily() const { return StringConversion::Convert_Ansi_To_Native(m_SourceId.get_product_family()); }
+        CTL_StringType GetProductName() const { return StringConversion::Convert_Ansi_To_Native(m_SourceId.get_product_name()); }
+        std::string GetManufacturerA() const { return m_SourceId.get_manufacturer(); }
+        std::string GetProductFamilyA() const { return m_SourceId.get_product_family(); }
+        std::string GetProductNameA() const { return m_SourceId.get_product_name(); }
+        std::string GetSourceInfo() const { return m_SourceId.to_json(); }
+
+        std::wstring GetManufacturerW() const 
+        {
+            auto str = GetManufacturerA();
+            return std::wstring(str.begin(), str.end());
+        }
+
+        std::wstring GetProductFamilyW() const 
+        { 
+            auto str = GetProductFamilyA();
+            return std::wstring(str.begin(), str.end());
+        }
+
+        std::wstring GetProductNameW() const 
+        {
+            auto str = GetProductNameA();
+            return std::wstring(str.begin(), str.end());
+        }
+
         bool         IsOpened() const { return m_bIsOpened; }
         bool         IsSelected() const { return m_bIsSelected; }
         void         SetSelected(bool bSet) { m_bIsSelected = bSet; }
@@ -392,6 +417,8 @@ namespace dynarithmic
         void         SetBlankPageCount(LONG nCount) { m_nBlankPageCount = nCount; }
         void         SetImageNegative(bool bSet=true) { m_bImageNegative = bSet; }
         bool         IsImageNegativeOn() const { return m_bImageNegative; }
+        bool         IsXferReadySent() const { return m_bXferReadySent; }
+        void         SetXferReadySent(bool bSet) { m_bXferReadySent = bSet;  }
         bool         IsCurrentlyProcessingPixelInfo() const { return m_bProcessingPixelInfo; }
         void         SetCurrentlyProcessingPixelInfo(bool bSet=true) { m_bProcessingPixelInfo = bSet; }
         void         ClearPDFText();
@@ -439,9 +466,10 @@ namespace dynarithmic
             } CapCacheInfo;
 
         bool            m_bDSMVersion2;
+        bool            m_bXferReadySent;
         bool            m_bIsOpened;
         bool            m_bIsSelected;
-        TW_IDENTITY     m_SourceId;
+        CTL_TwainIdentity  m_SourceId;
         CTL_ITwainSession* m_pSession;
         bool            m_bUIOpened;
         bool            m_bPromptPending;

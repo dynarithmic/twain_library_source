@@ -53,7 +53,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source, DTWAIN_AR
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto& factory = pHandle->m_ArrayFactory;
 
         // Check if array is of the correct type
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !factory->is_valid(pArray, CTL_ArrayFactory::arrayTag::VoidPtrType); },
@@ -139,8 +139,9 @@ struct NestedAcquisitionDestroyer
         // Test if the DIB data should also be destroyed
         if (m_bDestroyDibs)
         {
+            const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
             // get underlying vector of dibs
-            auto& vHandles = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<void*>(ImagesArray);
+            auto& vHandles = pHandle->m_ArrayFactory->underlying_container_t<void*>(ImagesArray);
 
             // for each dib, destroy the data
             std::for_each(vHandles.begin(), vHandles.end(), DestroyDibData);
@@ -168,7 +169,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyAcquisitionArray(DTWAIN_ARRAY aAcq, DTWAI
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, nullptr);
 
-    const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    const auto& factory = pHandle->m_ArrayFactory;
 
     // Check if array exists
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !factory->is_valid(aAcq); }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);

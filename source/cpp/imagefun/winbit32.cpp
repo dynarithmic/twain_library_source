@@ -25,6 +25,7 @@
 #include "ctltwmgr.h"
 #include "ctlfileutils.h"
 #include "FreeImagePlus.h"
+#include "../cximage/ximage.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4244)
@@ -300,13 +301,11 @@ HANDLE CDibInterface::CreateDIB(int width, int height, int bpp, LPSTR palette/*=
 
 HANDLE CDibInterface::NegateDIB(HANDLE hDib)
 {
-    fipImage fw;
-    if ( !fipImageUtility::copyFromHandle(fw, hDib) )
-        return nullptr;
-    fipWinImage_RAII raii(&fw);
-    if ( fw.invert() )
-        return nullptr;
-    return fipImageUtility::copyToHandle(fw);
+    BYTE* pImage = (BYTE*)ImageMemoryHandler::GlobalLock(hDib);
+    DTWAINGlobalHandle_RAII raii(hDib);
+    CxImage ImageHandler(pImage, GlobalSize(hDib), CXIMAGE_FORMAT_BMP);
+    ImageHandler.Negative();
+    return hDib;
 }
 
 HANDLE CDibInterface::ResampleDIB(HANDLE hDib, long newx, long newy)
@@ -336,38 +335,39 @@ HANDLE CDibInterface::ResampleDIB(HANDLE hDib, double xscale, double yscale)
     return ResampleDIB(hDib, newx, newy);
 }
 
+HANDLE CDibInterface::IncreaseDecreaseBpp(HANDLE hDib, long newbpp, bool bIncrease)
+{
+    BYTE* pImage = (BYTE*)ImageMemoryHandler::GlobalLock(hDib);
+    DTWAINGlobalHandle_RAII raii(hDib);
+    uint32_t bpp;
+    GetBitsPerPixel(pImage, &bpp);
+    // FreeImage has better resampling down to gray than CXImage from 24 -> 8
+    if (bpp == 24 && newbpp == 8)
+    {
+        fipImage im;
+        fipImageUtility::copyFromHandle(im, hDib);
+        fipWinImage_RAII raiiImg(&im);
+        im.convertTo8Bits();
+        return fipImageUtility::copyToHandle(im);
+    }
+
+    // Use CxImage resampler
+    CxImage ImageHandler(pImage, GlobalSize(hDib), CXIMAGE_FORMAT_BMP);
+    if (bIncrease)
+        ImageHandler.IncreaseBpp((DWORD)newbpp);
+    else
+        ImageHandler.DecreaseBpp((DWORD)newbpp, 0); 
+    return ImageHandler.CopyToHandle();
+}
+
 HANDLE CDibInterface::IncreaseBpp(HANDLE hDib, long newbpp)
 {
-    fipImage fw;
-    if (!fipImageUtility::copyFromHandle(fw, hDib))
-        return nullptr;
-    fipWinImage_RAII raii(&fw);
-    switch (newbpp)
-    {
-        case 4:
-            fw.convertTo4Bits();
-        break;
-        case 8:
-            fw.convertTo8Bits();
-        break;
-        case 16:
-            fw.convertTo16Bits565();
-        break;
-        case 24:
-            fw.convertTo24Bits();
-        break;
-        case 32:
-            fw.convertTo32Bits();
-        break;
-        default:
-            return nullptr;
-    }
-    return fipImageUtility::copyToHandle(fw);
+    return IncreaseDecreaseBpp(hDib, newbpp, true);
 }
 
 HANDLE CDibInterface::DecreaseBpp(HANDLE hDib, long newbpp)
 {
-    return IncreaseBpp(hDib, newbpp);
+    return IncreaseDecreaseBpp(hDib, newbpp, false);
 }
 
 HANDLE CDibInterface::CropDIB(HANDLE handle, const FloatRect& ActualRect, const FloatRect& RequestedRect,int sourceunit,

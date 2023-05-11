@@ -35,12 +35,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetErrorBuffer(LPDTWAIN_ARRAY ArrayBuffer)
     if ( !IsDLLHandleValid( pHandle, FALSE ) )
         LOG_FUNC_EXIT_PARAMS(false)
 
-    const size_t nEntries = (std::min)(static_cast<size_t>(CTL_TwainDLLHandle::s_nErrorBufferThreshold), CTL_TwainDLLHandle::s_vErrorBuffer.size());
+    const size_t nEntries = (std::min)(static_cast<size_t>(pHandle->m_nErrorBufferThreshold), pHandle->m_vErrorBuffer.size());
     const DTWAIN_ARRAY A = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, static_cast<LONG>(nEntries));
     if ( A )
     {
-        auto& vIn = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(A);
-        std::copy_n(CTL_TwainDLLHandle::s_vErrorBuffer.begin(), nEntries, vIn.begin());
+        auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(A);
+        std::copy_n(pHandle->m_vErrorBuffer.begin(), nEntries, vIn.begin());
         *ArrayBuffer = A;
         LOG_FUNC_EXIT_PARAMS(true)
     }
@@ -56,7 +56,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ClearErrorBuffer(VOID_PROTOTYPE)
     if ( !IsDLLHandleValid( pHandle, FALSE ) )
         LOG_FUNC_EXIT_PARAMS(false)
     std::deque<int> tempdeque;
-    tempdeque.swap(CTL_TwainDLLHandle::s_vErrorBuffer);
+    tempdeque.swap(pHandle->m_vErrorBuffer);
 
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
@@ -73,11 +73,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetErrorBufferThreshold(LONG nErrors)
     const LONG nEntries = (std::max)(nErrors, static_cast<LONG>(50));
 
     // clear buffer
-    CTL_TwainDLLHandle::s_nErrorBufferThreshold = nEntries;
+    pHandle->m_nErrorBufferThreshold = nEntries;
 
 
     std::deque<int> tempdeque;
-    tempdeque.swap(CTL_TwainDLLHandle::s_vErrorBuffer);
+    tempdeque.swap(pHandle->m_vErrorBuffer);
 
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
@@ -90,7 +90,7 @@ LONG DLLENTRY_DEF DTWAIN_GetErrorBufferThreshold(VOID_PROTOTYPE)
     if ( !IsDLLHandleValid( pHandle, -1 ) )
         LOG_FUNC_EXIT_PARAMS(-1)
 
-    const LONG nValues = CTL_TwainDLLHandle::s_nErrorBufferThreshold;
+    const LONG nValues = pHandle->m_nErrorBufferThreshold;
     LOG_FUNC_EXIT_PARAMS(nValues)
     CATCH_BLOCK(-1)
 }

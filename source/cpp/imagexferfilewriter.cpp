@@ -500,7 +500,8 @@ int ImageXferFileWriter::MergeDuplexFilesEx(const sDuplexFileData& DupData,
 
     // Resize the dib buffer
     HANDLE pDibBufferHandle;
-    char* pDibBuffer = static_cast<char*>(CTL_TwainDLLHandle::s_TwainMemoryFunc->AllocateMemoryPtr(
+    auto sessionHandle = pHandler->GetBaseImageInfo().theSession->GetTwainDLLHandle();
+    char* pDibBuffer = static_cast<char*>(sessionHandle->m_TwainMemoryFunc->AllocateMemoryPtr(
 											static_cast<TW_UINT32>(DupData.nBytes), &pDibBufferHandle));
     if ( !pDibBuffer )
     {

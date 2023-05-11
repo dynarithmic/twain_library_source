@@ -16,106 +16,106 @@ namespace Weak1 {
 #if defined(CRYPTOPP_DEBUG) && !defined(CRYPTOPP_DOXYGEN_PROCESSING)
 void ARC4_TestInstantiations()
 {
-    ARC4 x;
+	ARC4 x;
 }
 #endif
 
 ARC4_Base::~ARC4_Base()
 {
-    m_x = m_y = 0;
+	m_x = m_y = 0;
 }
 
 void ARC4_Base::UncheckedSetKey(const byte *key, unsigned int length, const NameValuePairs &params)
 {
-    AssertValidKeyLength(length);
+	AssertValidKeyLength(length);
 
-    m_x = 1;
-    m_y = 0;
+	m_x = 1;
+	m_y = 0;
 
-    unsigned int i;
-    for (i=0; i<256; i++)
-        m_state[i] = byte(i);
+	unsigned int i;
+	for (i=0; i<256; i++)
+		m_state[i] = byte(i);
 
-    unsigned int keyIndex = 0, stateIndex = 0;
-    for (i=0; i<256; i++)
-    {
-        unsigned int a = m_state[i];
-        stateIndex += key[keyIndex] + a;
-        stateIndex &= 0xff;
-        m_state[i] = m_state[stateIndex];
-        m_state[stateIndex] = byte(a);
-        if (++keyIndex >= length)
-            keyIndex = 0;
-    }
+	unsigned int keyIndex = 0, stateIndex = 0;
+	for (i=0; i<256; i++)
+	{
+		unsigned int a = m_state[i];
+		stateIndex += key[keyIndex] + a;
+		stateIndex &= 0xff;
+		m_state[i] = m_state[stateIndex];
+		m_state[stateIndex] = byte(a);
+		if (++keyIndex >= length)
+			keyIndex = 0;
+	}
 
-    int discardBytes = params.GetIntValueWithDefault("DiscardBytes", GetDefaultDiscardBytes());
-    DiscardBytes(discardBytes);
+	int discardBytes = params.GetIntValueWithDefault("DiscardBytes", GetDefaultDiscardBytes());
+	DiscardBytes(discardBytes);
 }
 
 template <class T>
 static inline unsigned int MakeByte(T &x, T &y, byte *s)
 {
-    unsigned int a = s[x];
-    y = byte((y+a) & 0xff);
-    unsigned int b = s[y];
-    s[x] = byte(b);
-    s[y] = byte(a);
-    x = byte((x+1) & 0xff);
-    return s[(a+b) & 0xff];
+	unsigned int a = s[x];
+	y = byte((y+a) & 0xff);
+	unsigned int b = s[y];
+	s[x] = byte(b);
+	s[y] = byte(a);
+	x = byte((x+1) & 0xff);
+	return s[(a+b) & 0xff];
 }
 
 void ARC4_Base::GenerateBlock(byte *output, size_t size)
 {
-    while (size--)
-        *output++ = static_cast<byte>(MakeByte(m_x, m_y, m_state));
+	while (size--)
+		*output++ = static_cast<byte>(MakeByte(m_x, m_y, m_state));
 }
 
 void ARC4_Base::ProcessData(byte *outString, const byte *inString, size_t length)
 {
-    if (length == 0)
-        return;
+	if (length == 0)
+		return;
 
-    byte *const s = m_state;
-    unsigned int x = m_x;
-    unsigned int y = m_y;
+	byte *const s = m_state;
+	unsigned int x = m_x;
+	unsigned int y = m_y;
 
-    if (inString == outString)
-    {
-        do
-        {
-            *outString++ ^= MakeByte(x, y, s);
-        } while (--length);
-    }
-    else
-    {
-        do
-        {
-            *outString++ = *inString++ ^ byte(MakeByte(x, y, s));
-        }
-        while(--length);
-    }
+	if (inString == outString)
+	{
+		do
+		{
+			*outString++ ^= MakeByte(x, y, s);
+		} while (--length);
+	}
+	else
+	{
+		do
+		{
+			*outString++ = *inString++ ^ byte(MakeByte(x, y, s));
+		}
+		while(--length);
+	}
 
-    m_x = byte(x);
-    m_y = byte(y);
+	m_x = byte(x);
+	m_y = byte(y);
 }
 
 void ARC4_Base::DiscardBytes(size_t n)
 {
-    if (n == 0)
-        return;
+	if (n == 0)
+		return;
 
-    byte *const s = m_state;
-    unsigned int x = m_x;
-    unsigned int y = m_y;
+	byte *const s = m_state;
+	unsigned int x = m_x;
+	unsigned int y = m_y;
 
-    do
-    {
-        MakeByte(x, y, s);
-    }
-    while(--n);
+	do
+	{
+		MakeByte(x, y, s);
+	}
+	while(--n);
 
-    m_x = byte(x);
-    m_y = byte(y);
+	m_x = byte(x);
+	m_y = byte(y);
 }
 
 }

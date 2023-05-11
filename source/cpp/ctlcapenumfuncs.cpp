@@ -47,7 +47,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return Array == nullptr; },
                                         DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
-    auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    auto& factory = pHandle->m_ArrayFactory;
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     // See if Source is opened
@@ -112,7 +112,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtendedCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Array))
-        const DTWAIN_BOOL retVal = DTWAIN_EnumExtendedCapsEx(Source, Array);
+    const DTWAIN_BOOL retVal = DTWAIN_EnumExtendedCapsEx(Source, Array);
     LOG_FUNC_EXIT_PARAMS(retVal)
     CATCH_BLOCK(false)
 }
@@ -121,9 +121,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCustomCaps(DTWAIN_SOURCE Source, LPDTWAIN_AR
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Array))
     if (!DTWAIN_EnumSupportedCapsEx(Source, Array))
-    LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_PARAMS(false)
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     const DTWAIN_ARRAY ThisArray = static_cast<DTWAIN_ARRAY>(*Array);
-    auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+    auto& factory = pHandle->m_ArrayFactory;
 
     auto& vCaps = factory->underlying_container_t<LONG>(ThisArray);
     vCaps.erase(std::remove_if(vCaps.begin(), vCaps.end(), [&](LONG nCap) { return static_cast<unsigned>(nCap) < DTWAIN_CV_CAPCUSTOMBASE;}), vCaps.end());

@@ -299,7 +299,7 @@ LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontName(LONG FontVal, LPTSTR szFont, LONG n
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     if ( pHandle )
     {
-        std::string st = CTL_TwainDLLHandle::s_ResourceStrings[FontVal + DTWAIN_FONT_START_];
+        std::string st = pHandle->m_mapResourceStrings[FontVal + DTWAIN_FONT_START_];
         const LONG numChars = (std::min)(nChars, static_cast<LONG>(st.size()));
         std::copy_n(st.begin(), numChars, szFont);
         LOG_FUNC_EXIT_PARAMS(numChars)
@@ -796,7 +796,7 @@ std::pair<bool, CTL_TEXTELEMENTPTRLIST::iterator> CheckPDFTextElement(DTWAIN_PDF
 
     auto it2 = std::find_if(it->second.begin(), it->second.end(), [&](const auto& ptr) { return ptr->pTwainSource == pPtr->pTwainSource; });
 
-    if ( CTL_TwainDLLHandle::s_lErrorFilterFlags )
+    if ( CTL_StaticData::s_lErrorFilterFlags )
     {
         std::string sOut = "PDF TextElement Info: \n";
         sOut += CTL_ErrorStructDecoder::DecodePDFTextElement(pPtr);

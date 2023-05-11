@@ -3,16 +3,11 @@
 #include <vector>
 #include <dynarithmic/twain/twain_session.hpp> // for dynarithmic::twain::twain_session
 #include <dynarithmic/twain/twain_source.hpp>  // for dynarithmic::twain::twain_source
+#include "..\Runner\runnerbase.h"
 
-struct Runner
+struct Runner : RunnerBase
 {
     int Run();
-    ~Runner()
-    {
-        printf("\nPress Enter key to exit application...\n");
-        char temp;
-        std::cin.get(temp);
-    }
 };
 
 /* Change this to the output directory that fits your environment */
@@ -31,6 +26,7 @@ int Runner::Run()
         std::cout << "DTWAIN Long Version Info: " << session.get_long_version_name() << "\n";
         std::cout << "DTWAIN Library Path: " << session.get_dtwain_path() << "\n";
         std::cout << "TWAIN DSM Path in use: " << session.get_dsm_path() << "\n";
+        std::cout << "DTWAIN Version & Copyright: " << session.get_version_copyright() << "\n";
 
         // Get information on the installed TWAIN sources
         std::cout << "\nAvailable TWAIN Sources:\n";

@@ -33,7 +33,7 @@
 #include "dtwain.h"
 #include "arrayfactory.h"
 #include "ctlfileutils.h"
-
+#include "resamplefactory.h"
 using namespace dynarithmic;
 
 static void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pSession,
@@ -88,7 +88,6 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
 
     m_bJobControlPageRecorded = false;
     int errfile = 0;
-    const CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
 
     switch (rc)
     {
@@ -106,12 +105,14 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                 // We need to clone the DIB if we're doing a native XFER on a DSM2 Data Source
                 if (CTL_TwainAppMgr::IsVersion2DSMUsed())
                 {
+                    auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
                     // Lock the DIB returned by the device
                     BITMAPINFOHEADER* thisBitmap =
-                        (BITMAPINFOHEADER*)CTL_TwainDLLHandle::s_TwainMemoryFunc->LockMemory((HBITMAP)m_hDataHandleFromDevice);
+                        (BITMAPINFOHEADER*)sessionHandle->m_TwainMemoryFunc->LockMemory((HBITMAP)m_hDataHandleFromDevice);
 
                     // Make sure we unlock and free this memory once out of this scope
-                    DTWAINDSM2LockAndFree_RAII raii(m_hDataHandleFromDevice);
+                    auto dsmPair = DSMPair(sessionHandle, m_hDataHandleFromDevice);
+                    DTWAINDSM2LockAndFree_RAII raii(&dsmPair);
 
                     // Create a local bitmap
                     DWORD dwSize = sizeof(BITMAPINFOHEADER) + ((((thisBitmap->biWidth * thisBitmap->biBitCount + 31) / 32) * 4) * 
@@ -246,7 +247,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     break;
                 }
 
-                if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_DECODE_BITMAP)
+                if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_DECODE_BITMAP)
                 {
                     std::string sOut = "Original bitmap from device: \n";
                     sOut += CTL_ErrorStructDecoder::DecodeBitmap(m_hDataHandle);
@@ -274,11 +275,13 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     break;  // The page is discarded
                 }
 
+                auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
+
                 // Callback function for access to change DIB
-                if (CTL_TwainDLLHandle::s_pDibUpdateProc != nullptr && GetDAT() != DAT_AUDIONATIVEXFER)
+                if (sessionHandle->m_pDibUpdateProc != nullptr && GetDAT() != DAT_AUDIONATIVEXFER)
                 {
                     HANDLE hRetDib =
-                        (*CTL_TwainDLLHandle::s_pDibUpdateProc)
+                        (sessionHandle->m_pDibUpdateProc)
                         (pSource, static_cast<LONG>(nLastDib), m_hDataHandle);
                     if (hRetDib && hRetDib != m_hDataHandle)
                     {
@@ -473,6 +476,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
         {
             m_hDataHandle = nullptr;
             FailAcquisition();
+            AbortTransfer(false, errfile);
             return rc;
         }
         case TWRC_SUCCESS:
@@ -560,6 +564,13 @@ bool CTL_ImageXferTriplet::FailAcquisition()
 
     int bContinue = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_PAGEFAILED,
                                                           reinterpret_cast<LPARAM>(pSource));
+
+    if (bContinue == 0)
+    {
+        bContinue = DTWAIN_PAGEFAIL_TERMINATE;
+        SetAcquireFailAction(DTWAIN_PAGEFAIL_TERMINATE);
+    }
+    else
     if (bContinue == DTWAIN_RETRY_EX || // Means not a user notification
         bContinue == 2)               // Means notifications are on and user wants
         // default behavior
@@ -579,6 +590,15 @@ bool CTL_ImageXferTriplet::FailAcquisition()
             pSource->SetCurrentRetryCount(++nCurRetry);
             bContinue = DTWAIN_PAGEFAIL_RETRY;
         }
+    }
+    else
+    {
+        // Increment retry count and try again
+        pSource->SetCurrentRetryCount(++nCurRetry);
+        if (pSource->GetCurrentRetryCount() >= pSource->GetMaxRetryAttempts())
+            bContinue = DTWAIN_PAGEFAIL_TERMINATE;
+        else
+            bContinue = DTWAIN_PAGEFAIL_RETRY;
     }
     return ImageXferFileWriter(this, pSession, pSource).ProcessFailureCondition(bContinue);
 }
@@ -604,7 +624,7 @@ TW_UINT16 CTL_ImageXferTriplet::GetImagePendingInfo(TW_PENDINGXFERS *pPI, TW_UIN
 
 std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int errFile)
 {
-    if ( CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+    if ( CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
         CTL_TwainAppMgr::WriteLogInfoA("Potentially aborting transfer..\n");
     CTL_ITwainSession *pSession = GetSessionPtr();
     CTL_ITwainSource *pSource = GetSourcePtr();
@@ -647,7 +667,7 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
             // Make sure that job control is "on"
             pSource->StartJob();
 
-            if ( ptrPending->Count != 0 && bJobControlContinue) // More to transfer
+            if ( ptrPending->Count != 0) // More to transfer
             {
                 CTL_TwainAppMgr::WriteLogInfoA("More To Transfer...\n");
                 // Check if max pages has been reached.  Some Sources do not detect when
@@ -699,14 +719,30 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
 
             if ( ptrPending->Count == 0 || !nContinue || bForceClose || bEndOfJobDetected || bProcessSinglePage)
             {
+                struct UIShutDown
+                {
+                    CTL_ITwainSession* pSession;
+                    CTL_ITwainSource* pSource;
+                    bool bShutdown;
+                    UIShutDown(CTL_ITwainSession* pSes, CTL_ITwainSource* pSrc, bool bClose)
+                        : pSession(pSes), pSource(pSrc), bShutdown(bClose) {}
+                    ~UIShutDown()
+                    {
+                        if (bShutdown)
+                            CTL_TwainAppMgr::EndTwainUI(pSession, pSource);
+                    }
+                };
+
                 // Prompt to save image here
 
                 // Send a message to close things down if
                 // there was no user interface chosen
-                if ( !pSource->IsUIOpenOnAcquire() && m_bEndTwainUI )
-                    CTL_TwainAppMgr::EndTwainUI(pSession, pSource);
+                bool keepProcessingSinglePage = bProcessSinglePage && (ptrPending->Count > 0);
+                // If there are no more images pending for single page image types, and
+                // the device is not showing the user-interface, and there are no pages in 
+                // the feeder, shut the UI down.
+                UIShutDown uiCloser(pSession, pSource, !keepProcessingSinglePage && !pSource->IsUIOpenOnAcquire());
 
-                // Close any open multi page DIB files
                 if ( pSource->GetAcquireType() == TWAINAcquireType_FileUsingNative)
                 {
                     if ( !bForceClose )
@@ -1277,95 +1313,6 @@ bool CTL_ImageXferTriplet::IsPageBlank(CTL_ITwainSession*,
     return false;
 }
 
-bool CTL_ImageXferTriplet::ResampleBppForJPEG( CTL_ITwainSession * /*pSession*/,
-                                               CTL_ITwainSource * /*pSource*/,
-                                               CTL_TwainDibPtr& CurDib)
-{
-    const int depth = CurDib->GetDepth();
-
-    if ( depth == 24 ) //|| depth < 8 )
-        return false;
-
-    const bool IsGray = CurDib->IsGrayScale();
-    if ( !IsGray || depth < 8 )
-    {
-        CTL_TwainAppMgr::WriteLogInfoA("Resampling bitmap data to 24 bpp (JPEG processing)...");
-        const bool bOk = CurDib->IncreaseBpp(24);
-        if ( bOk)
-            CTL_TwainAppMgr::WriteLogInfoA("Resampling ok...");
-        return bOk;
-    }
-
-    return false;
-}
-
-bool CTL_ImageXferTriplet::ResampleBppForWBMP( CTL_ITwainSession * /*pSession*/,
-                                              CTL_ITwainSource * /*pSource*/,
-                                              CTL_TwainDibPtr& CurDib)
-{
-    const int depth = CurDib->GetDepth();
-    bool ResamplingDone = false; // no resampling needs to be done
-    if ( depth > 1 )
-    {
-        // Make depth == 1
-        CTL_TwainAppMgr::WriteLogInfoA("Resampling bitmap data to 1 bpp (WBMP processing)...");
-        const bool bOk = CurDib->DecreaseBpp(1);
-        if ( bOk)
-        {
-           CTL_TwainAppMgr::WriteLogInfoA("Resampling to 1 bpp ok...");
-           ResamplingDone = true;
-        }
-        else
-        {
-            CTL_TwainAppMgr::WriteLogInfoA("Resampling to 1 bpp failed...");
-            ResamplingDone = false;
-        }
-    }
-    return ResamplingDone;
-}
-
-
-bool CTL_ImageXferTriplet::ResampleBppForGIF( CTL_ITwainSession * /*pSession*/,
-                                              CTL_ITwainSource * /*pSource*/,
-                                              CTL_TwainDibPtr& /*CurDib*/)
-{
-    return false;
-}
-
-
-bool CTL_ImageXferTriplet::ResampleBppForPDF( CTL_ITwainSession * /*pSession*/,
-                                              CTL_ITwainSource * /*pSource*/,
-                                              CTL_TwainDibPtr& CurDib)
-{
-    bool bWriteMisc = (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)?true:false;
-    const int depth = CurDib->GetDepth();
-
-    if ( depth == 8 || depth == 1 || depth == 24)
-        return false;
-
-    bool bOk;
-    if ( depth > 8 )
-    {
-        if ( bWriteMisc )
-            CTL_TwainAppMgr::WriteLogInfoA("Resampling bitmap data up to to 24 bpp (PDF processing)...");
-        bOk = CurDib->IncreaseBpp(24);
-    }
-    else
-    {
-        if (bWriteMisc)
-            CTL_TwainAppMgr::WriteLogInfoA("Resampling bitmap data up to 8 bpp (PDF processing)...");
-        bOk = CurDib->IncreaseBpp(8);
-    }
-    if ( bWriteMisc)
-    {
-        if ( bOk)
-            CTL_TwainAppMgr::WriteLogInfoA("Resampling ok...");
-        else
-            CTL_TwainAppMgr::WriteLogInfoA("Resampling failed...");
-    }
-    return bOk;
-}
-
 CTL_TwainFileFormatEnum CTL_ImageXferTriplet::GetFileTypeFromCompression(int nCompression)
 {
     switch (nCompression)
@@ -1407,7 +1354,7 @@ void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pS
                           LONG Error, LONG ErrorMsg, const std::string& extraInfo)
 {
     CTL_TwainAppMgr::SetError(Error, extraInfo);
-    if ( CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_DTWAINERRORS)
+    if ( CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_DTWAINERRORS)
     {
         char szBuf[1024];
         CTL_TwainAppMgr::GetLastErrorString(szBuf, 1024);
@@ -1435,7 +1382,7 @@ void CTL_ImageXferTriplet::ResolveImageResolution(CTL_ITwainSource *pSource,  DT
                               &ResolutionY,
                               nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr))
         {
-            bool bWriteMisc = CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
+            bool bWriteMisc = CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
             std::string sError;
             if (bWriteMisc)
             {
@@ -1461,7 +1408,7 @@ void CTL_ImageXferTriplet::ResolveImageResolution(CTL_ITwainSource *pSource,  DT
     if ( !bGotResolution && !bGetResFromDriver )
     {
         // Get the image info from when we started
-        bool bWriteMisc = CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
+        bool bWriteMisc = CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
         if ( bWriteMisc )
         {
             CTL_TwainAppMgr::WriteLogInfoA("Getting image resolution from state 6.\n");
@@ -1482,7 +1429,7 @@ void CTL_ImageXferTriplet::ResolveImageResolution(CTL_ITwainSource *pSource,  DT
 
     if ( !bGotResolution )
     {
-        bool bWriteMisc = CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
+        bool bWriteMisc = CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
         // Try TWAIN driver setting
         if ( DTWAIN_GetResolution(pSource, &Resolution) )
         {
@@ -1540,7 +1487,7 @@ bool CTL_ImageXferTriplet::ModifyAcquiredDib()
         {
             // reset the dib handle if adjusted
             pSource->SetDibHandle(m_hDataHandle = CurDib->GetHandle(), nLastDib);
-            if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+            if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
             {
                 std::string sOut = msg[i];
                 sOut += CTL_ErrorStructDecoder::DecodeBitmap(m_hDataHandle);
@@ -1552,48 +1499,32 @@ bool CTL_ImageXferTriplet::ModifyAcquiredDib()
     return false;
 }
 
+// This function is used only for file transfers.  We will need to
+// modify the DIB if the Bit-per-pixel of the original DIB is different 
+// than what the image type expects.
 bool CTL_ImageXferTriplet::ResampleAcquiredDib()
 {
     CTL_ITwainSource* pSource = GetSourcePtr();
     const int nFileType = pSource->GetAcquireFileType();
 
-    std::bitset<3> bResampleType = 0;
-    bResampleType[0] = nFileType == TWAINFileFormat_GIF;
-    bResampleType[1] = nFileType == TWAINFileFormat_JPEG ||
-        nFileType == TWAINFileFormat_JPEG2000;
-    bResampleType[2] = nFileType == TWAINFileFormat_WBMP;
-
-    if (bResampleType.to_ulong() == 0)
-        return false;
-
-    CTL_ITwainSession* pSession = GetSessionPtr();
     CTL_TwainDibArray* pArray = pSource->GetDibArray();
+
+    if (pArray->GetSize() == 0)
+        return false;
 
     const size_t nLastDib = pArray->GetSize() - 1;
     CTL_TwainDibPtr CurDib = pArray->GetAt(nLastDib);
 
-    typedef bool (*ResampleFn)(CTL_ITwainSession*, CTL_ITwainSource*, CTL_TwainDibPtr&);
-    const std::array<ResampleFn, 3> resample = { &CTL_ImageXferTriplet::ResampleBppForGIF,
-                                                 &CTL_ImageXferTriplet::ResampleBppForJPEG,
-                                                 &CTL_ImageXferTriplet::ResampleBppForWBMP };
-
-    const std::array<std::string,3> msg = { "Bitmap after resampling for GIF: \n",
-                                               "Bitmap after resampling for JPEG: \n",
-                                               "Bitmap after resampling for WBMP: \n" };
-
-    for (unsigned i = 0; i < std::size(resample); ++i)
+    // Get the appropriate image resampler for the image
+    auto ptr = ResampleFactory::GetResampler(nFileType);
+    if (ptr)
     {
-        // call the function to resample bitmap
-        if (bResampleType[i] && resample[i](pSession, pSource, CurDib))
+        // resample image
+        bool bResampled = ptr->Resample(*CurDib);
+        if (bResampled)
         {
-            // reset the dib handle if resampled
+            // set the handle to the resampled image
             pSource->SetDibHandle(m_hDataHandle = CurDib->GetHandle(), nLastDib);
-            if (CTL_TwainDLLHandle::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
-            {
-                std::string sOut = msg[i];
-                sOut += CTL_ErrorStructDecoder::DecodeBitmap(m_hDataHandle);
-                CTL_TwainAppMgr::WriteLogInfoA(sOut);
-            }
             return true;
         }
     }
@@ -1642,7 +1573,8 @@ bool IsState7InfoNeeded(CTL_ITwainSource *pSource)
     if ( DTWAIN_GetCapValues(pSource, DTWAIN_CV_ICAPUNDEFINEDIMAGESIZE, DTWAIN_CAPGETCURRENT, &A))
     {
         DTWAINArrayLL_RAII raii(A);
-        const auto& vValues = CTL_TwainDLLHandle::s_ArrayFactory->underlying_container_t<LONG>(A);
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        const auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(A);
         if ( !vValues.empty())
             bRetval = vValues[0] > 0;
     }

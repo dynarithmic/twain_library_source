@@ -66,13 +66,13 @@ bool CTL_CapabilityGetEnumTriplet::EnumCapValues( void *pCapData )
     RemoveAllTypeObjects();
 
     CTL_TwainTypeArray *pArray = GetTwainTypeArray();
-
+    auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
     for ( TW_UINT16 nIndex = 0; nIndex < nNumItems; nIndex++ )
     {
         if ( nItemType == TWTY_FIX32 )
-            pOb = std::make_shared<CTL_TwainTypeOb>(static_cast<TW_UINT16>(sizeof( double )), false );
+            pOb = std::make_shared<CTL_TwainTypeOb>(sessionHandle, static_cast<TW_UINT16>(sizeof( double )), false );
         else
-            pOb = std::make_shared<CTL_TwainTypeOb>( nItemType );
+            pOb = std::make_shared<CTL_TwainTypeOb>(sessionHandle, nItemType );
 
         if ( nItemType == TWTY_FIX32 )
         {

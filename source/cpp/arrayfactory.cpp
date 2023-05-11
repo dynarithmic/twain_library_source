@@ -33,7 +33,8 @@ namespace dynarithmic
                                    int ArraySourceType,
                                    ConversionFunc fn)
     {
-        const auto& factory = CTL_TwainDLLHandle::s_ArrayFactory;
+        CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        const auto& factory = pHandle->m_ArrayFactory;
         const auto TypeSource = factory->tag_type(CTL_ArrayFactory::from_void(ArraySource));
         const auto TypeDest = factory->tag_type(CTL_ArrayFactory::from_void(ArrayDest));
         if (TypeSource != ArraySourceType)
@@ -445,6 +446,7 @@ namespace dynarithmic
 
     void DTWAINArrayLowLevel_DestroyTraits::Destroy(DTWAIN_ARRAY a)
     {
-        CTL_TwainDLLHandle::s_ArrayFactory->destroy(CTL_ArrayFactory::from_void(a));
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(a));
     }
 }

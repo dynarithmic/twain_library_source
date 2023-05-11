@@ -9,20 +9,16 @@
 #include <dynarithmic/twain/twain_source.hpp>  // for dynarithmic::twain::twain_source
 #include <dynarithmic/twain/capability_interface.hpp>  // for capability_interface
 #include <dynarithmic/twain/acquire_characteristics.hpp>  // for acquire_characteristics
+#include "..\Runner\runnerbase.h"
+
+struct Runner : RunnerBase
+{
+    int Run();
+};
 
 using namespace dynarithmic::twain;
 
 const char * unit[] = { "Dots per Inch", "Dots per centimeter", "Picas", "Points", "TWIPS", "Pixels" };
-struct Runner
-{
-    int Run();
-    ~Runner()
-    {
-        printf("\nPress Enter key to exit application...\n");
-        char temp;
-        std::cin.get(temp);
-    }
-};
 
 template <typename dataType>
 void PrintResolutionValues(const std::vector<dataType>& aResValues, LONG unitOfMeasure, char whichRes)
@@ -60,10 +56,6 @@ int Runner::Run()
         // check if we were able to open the source
         if (twsource.is_open())
         {
-            // output the source product name
-            std::string prodName = twsource.get_source_info().get_product_name();
-            std::cout << prodName << "\n";
-
             // Get the interface to the capabilities of the device
             auto& ci = twsource.get_capability_interface();
 
@@ -71,7 +63,8 @@ int Runner::Run()
             auto vUnits = ci.get_units(capability_interface::get_current());
             if ( vUnits.empty() )
             { 
-                std::cout << "Could not obtain the unit of measure for device \"" << prodName << "\"\n";
+                std::cout << "Could not obtain the unit of measure for device \"" << 
+                    twsource.get_source_info().get_product_name() << "\"\n";
                 return 0;
             }
 
