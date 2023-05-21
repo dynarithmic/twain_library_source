@@ -650,6 +650,7 @@ namespace dynarithmic
             bool                m_nSourceCloseMode;
             int                 m_nUIMode;
             bool                m_bNotificationsUsed;
+            bool                m_bNotifyTripletsUsed;
             std::deque<int>     m_vErrorBuffer;
             unsigned int        m_nErrorBufferThreshold = 50;
             unsigned int        m_nErrorBufferReserve = 1000;
