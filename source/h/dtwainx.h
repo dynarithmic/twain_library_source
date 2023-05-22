@@ -70,7 +70,7 @@ LONG           DLLENTRY_DEF      DTWAIN_GetAPIHandleStatus(DTWAIN_HANDLE pHandle
 /* DTWAIN Message Notification functions */
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_EnableMsgNotify(DTWAIN_BOOL bSet);
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_IsMsgNotifyEnabled(VOID_PROTOTYPE);
-DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_EnableTripletNotify(DTWAIN_BOOL bSet);
+DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_EnableTripletsNotify(DTWAIN_BOOL bSet);
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_IsNotifyTripletsEnabled();
 
 /* Callback procedure for alternate DTWAIN message notification */

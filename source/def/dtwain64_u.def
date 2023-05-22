@@ -1022,5 +1022,5 @@ DTWAIN_GetVersionCopyright                        @31006
 DTWAIN_GetVersionCopyrightA                       @31007
 DTWAIN_GetVersionCopyrightW                       @31008
 DTWAIN_IsSourceValid                              @31009
-DTWAIN_EnableTripletNotify                        @31010
+DTWAIN_EnableTripletsNotify                        @31010
 DTWAIN_IsNotifyTripletsEnabled                    @31011
