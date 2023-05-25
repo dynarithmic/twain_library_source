@@ -1017,26 +1017,36 @@ namespace Dynarithmic
         public const  int DTWAIN_EI_FRAMENUMBER = 0x123D;
         public const  int DTWAIN_EI_FRAME = 0x123E;
         public const  int DTWAIN_EI_PIXELFLAVOR = 0x123F;
-        public const  int DTWAIN_LOG_DECODE_SOURCE = 1;
-        public const  int DTWAIN_LOG_DECODE_DEST = 2;
-        public const  int DTWAIN_LOG_DECODE_TWMEMREF = 4;
-        public const  int DTWAIN_LOG_DECODE_TWEVENT = 8;
-        public const  int DTWAIN_LOG_USEFILE = 16;
-        public const  int DTWAIN_LOG_CALLSTACK = 32;
-        public const  int DTWAIN_LOG_USEWINDOW = 64;
-        public const  int DTWAIN_LOG_SHOWEXCEPTIONS = 128;
-        public const  int DTWAIN_LOG_ERRORMSGBOX = 256;
-        public const  int DTWAIN_LOG_INITFAILURE = 512;
-        public const  int DTWAIN_LOG_USEBUFFER = 1024;
-        public const  int DTWAIN_LOG_FILEAPPEND = 2048;
-        public const  int DTWAIN_LOG_DECODE_BITMAP = 4096;
-        public const  int DTWAIN_LOG_NOCALLBACK = 8192;
-        public const  int DTWAIN_LOG_WRITE = 16384;
-        public const  int DTWAIN_LOG_USECRLF = 32768;
-        public const int DTWAIN_LOG_CONSOLE = 65536;
-        public const int DTWAIN_LOG_DEBUGMONITOR = 131072;
-        public const  uint DTWAIN_LOG_ALL = 0xFFFFF7FF;
+
+        public const int DTWAIN_LOG_DECODE_SOURCE = 0x1      ;
+        public const int DTWAIN_LOG_DECODE_DEST = 0x2        ;
+        public const int DTWAIN_LOG_DECODE_TWMEMREF = 0x4    ;
+        public const int DTWAIN_LOG_DECODE_TWEVENT = 0x8     ;
+        public const int DTWAIN_LOG_CALLSTACK = 0x10         ;
+        public const int DTWAIN_LOG_ISTWAINMSG = 0x20        ;
+        public const int DTWAIN_LOG_INITFAILURE = 0x40       ;
+        public const int DTWAIN_LOG_LOWLEVELTWAIN = 0x80     ;
+        public const int DTWAIN_LOG_DECODE_BITMAP = 0x100    ;
+        public const int DTWAIN_LOG_NOTIFICATIONS = 0x200    ;
+        public const int DTWAIN_LOG_MISCELLANEOUS = 0x400    ;
+        public const int DTWAIN_LOG_DTWAINERRORS = 0x800     ;
+        public const int DTWAIN_LOG_USEFILE = 0x10000        ;
+        public const int DTWAIN_LOG_SHOWEXCEPTIONS = 0x20000 ;
+        public const int DTWAIN_LOG_ERRORMSGBOX = 0x40000    ;
+        public const int DTWAIN_LOG_USEBUFFER = 0x80000      ;
+        public const int DTWAIN_LOG_FILEAPPEND = 0x100000    ;
+        public const int DTWAIN_LOG_USECALLBACK = 0x200000   ;
+        public const int DTWAIN_LOG_USECRLF = 0x400000       ;
+        public const int DTWAIN_LOG_CONSOLE = 0x800000       ;
+        public const int DTWAIN_LOG_DEBUGMONITOR = 0x1000000 ;
+        public const int DTWAIN_LOG_USEWINDOW = 0x2000000    ;
+        public const int DTWAIN_LOG_ALL = (DTWAIN_LOG_DECODE_SOURCE | DTWAIN_LOG_DECODE_DEST | DTWAIN_LOG_DECODE_TWEVENT
+                        | DTWAIN_LOG_DECODE_TWMEMREF | DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG | DTWAIN_LOG_INITFAILURE
+                        | DTWAIN_LOG_LOWLEVELTWAIN | DTWAIN_LOG_NOTIFICATIONS | DTWAIN_LOG_MISCELLANEOUS | DTWAIN_LOG_DTWAINERRORS
+                        | DTWAIN_LOG_DECODE_BITMAP);
+
         public const  uint DTWAIN_LOG_ALL_APPEND = 0xFFFFFFFF;
+
         public const  int DTWAINGCD_RETURNHANDLE = 1;
         public const  int DTWAINGCD_COPYDATA = 2;
         public const  int DTWAIN_BYPOSITION = 0;
