@@ -70,7 +70,7 @@ LONG           DLLENTRY_DEF      DTWAIN_GetAPIHandleStatus(DTWAIN_HANDLE pHandle
 /* DTWAIN Message Notification functions */
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_EnableMsgNotify(DTWAIN_BOOL bSet);
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_IsMsgNotifyEnabled(VOID_PROTOTYPE);
-DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_EnableTripletNotify(DTWAIN_BOOL bSet);
+DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_EnableTripletsNotify(DTWAIN_BOOL bSet);
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_IsNotifyTripletsEnabled();
 
 /* Callback procedure for alternate DTWAIN message notification */
@@ -608,6 +608,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsBlankPageDetectionOn(DTWAIN_SOURCE Source);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionEx(DTWAIN_SOURCE Source, DTWAIN_FLOAT threshold,
                                                         LONG autodetect, LONG detectOpts, DTWAIN_BOOL bSet);
 LONG DLLENTRY_DEF DTWAIN_IsDIBBlank(HANDLE hDib, DTWAIN_FLOAT threshold);
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DeleteDIB(HANDLE hDib);
 
 /* Audio */
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumAudioXferMechs(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);

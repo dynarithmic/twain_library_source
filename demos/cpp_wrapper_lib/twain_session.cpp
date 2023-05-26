@@ -148,6 +148,7 @@ namespace dynarithmic
                 }
 
                 API_INSTANCE DTWAIN_EnableMsgNotify(TRUE);
+                API_INSTANCE DTWAIN_EnableTripletsNotify(m_bTripletsNotify);
                 API_INSTANCE DTWAIN_SetCallback64(callback_proc, PtrToInt64(this));
                 m_source_cache.clear();
                 m_bStarted = true;
@@ -621,6 +622,14 @@ namespace dynarithmic
         bool twain_session::is_custom_twain_loop()
         {
             return m_twain_characteristics.is_custom_twain_loop();
+        }
+
+        twain_session& twain_session::enable_triplets_notification(bool bEnable)
+        {
+            m_bTripletsNotify = bEnable;
+            if ( started() )
+                API_INSTANCE DTWAIN_EnableTripletsNotify(bEnable?1:0);
+            return *this;
         }
 
         void twain_session::update_source_status(const twain_source& ts)
