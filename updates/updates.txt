@@ -4,8 +4,14 @@ DTWAIN Version changes
 
 - Add DTWAIN_IsSourceValid() function to explicitly test to see if the DTWAIN_SOURCE is valid.
 
+- Add DTWAIN_DeleteDIB() to allow deletion of Device Independent Bitmap image data.
+
+- Add a refresh parameter to DTWAIN_GetSourceDetails()
+
 - Introduce DTWAIN_EnableTripletNotify() to allow DTWAIN_TN_TWAINTRIPLETBEGIN and DTWAIN_TN_TWAINTRIPLETEND 
   notifications to be sent to the application.   
+
+- Make corrections to the Visual Basic demo program for 64-bit DTWAIN.
 
 
 
