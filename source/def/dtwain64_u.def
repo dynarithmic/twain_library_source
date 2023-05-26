@@ -914,6 +914,8 @@ DTWAIN_ArrayGetSourceAt                           @30100
 
 DTWAIN_ConvertDIBToBitmap                         @30101
 DTWAIN_ConvertDIBToFullBitmap                     @30102
+DTWAIN_DeleteDIB                                  @30103
+
 DTWAIN_SysInitializeNoBlocking                    @30200
 
 DTWAIN_RangeGetAllFloatStringA                    @30201

@@ -608,6 +608,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsBlankPageDetectionOn(DTWAIN_SOURCE Source);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionEx(DTWAIN_SOURCE Source, DTWAIN_FLOAT threshold,
                                                         LONG autodetect, LONG detectOpts, DTWAIN_BOOL bSet);
 LONG DLLENTRY_DEF DTWAIN_IsDIBBlank(HANDLE hDib, DTWAIN_FLOAT threshold);
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DeleteDIB(HANDLE hDib);
 
 /* Audio */
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumAudioXferMechs(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);

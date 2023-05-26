@@ -694,6 +694,7 @@ namespace dynarithmic
             std::string                     m_TwainDSMSearchOrderStr = "CWSOU";
             CTL_StringType                  m_TwainDSMUserDirectory;
             CTL_StringType                  m_strSessionDetails;
+            CTL_StringType                  m_strSourceDetails;
     };
 
     template <typename T>

@@ -2794,26 +2794,26 @@ LONG DLLENTRY_DEF DTWAIN_GetSessionDetailsW(LPWSTR lpszBuf, LONG nLength, LONG i
 #endif
 }
 
-LONG DLLENTRY_DEF DTWAIN_GetSourceDetailsA(LPCSTR lpszSources, LPSTR lpszBuf, LONG nLength, LONG indentFactor)
+LONG DLLENTRY_DEF DTWAIN_GetSourceDetailsA(LPCSTR lpszSources, LPSTR lpszBuf, LONG nLength, LONG indentFactor, BOOL bRefresh)
 {
 #ifdef _UNICODE
     std::wstring args((std::max)(nLength, 0L), 0);
     const LONG retVal = DTWAIN_GetSourceDetails(StringConversion::Convert_AnsiPtr_To_Native(lpszSources).c_str(),
-                                                (nLength > 0 && lpszBuf) ? &args[0] : nullptr, static_cast<LONG>(args.size()), indentFactor);
+                                                (nLength > 0 && lpszBuf) ? &args[0] : nullptr, static_cast<LONG>(args.size()), indentFactor, bRefresh);
     return null_terminator_copier(get_view(args), lpszBuf, retVal);
 #else
-    return DTWAIN_GetSourceDetails(lpszSources, lpszBuf, nLength, indentFactor);
+    return DTWAIN_GetSourceDetails(lpszSources, lpszBuf, nLength, indentFactor, bRefresh);
 #endif
 }
 
-LONG DLLENTRY_DEF DTWAIN_GetSourceDetailsW(LPCWSTR lpszSources, LPWSTR lpszBuf, LONG nLength, LONG indentFactor)
+LONG DLLENTRY_DEF DTWAIN_GetSourceDetailsW(LPCWSTR lpszSources, LPWSTR lpszBuf, LONG nLength, LONG indentFactor, BOOL bRefresh)
 {
 #ifdef _UNICODE
-    return DTWAIN_GetSourceDetails(lpszSources, lpszBuf, nLength, indentFactor);
+    return DTWAIN_GetSourceDetails(lpszSources, lpszBuf, nLength, indentFactor, bRefresh);
 #else
     std::string args((std::max)(nLength, 0L), 0);
     const LONG retVal = DTWAIN_GetSourceDetails(StringConversion::Convert_WidePtr_To_Ansi(lpszSources).c_str(),
-                                                (nLength > 0 && lpszBuf) ? &args[0] : nullptr, static_cast<LONG>(args.size()), indentFactor);
+                                                (nLength > 0 && lpszBuf) ? &args[0] : nullptr, static_cast<LONG>(args.size()), indentFactor, bRefresh);
     return null_terminator_copier(get_view(args), lpszBuf, retVal);
 #endif
 }
