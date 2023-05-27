@@ -650,6 +650,7 @@ namespace dynarithmic
             bool                m_nSourceCloseMode;
             int                 m_nUIMode;
             bool                m_bNotificationsUsed;
+            bool                m_bNotifyTripletsUsed;
             std::deque<int>     m_vErrorBuffer;
             unsigned int        m_nErrorBufferThreshold = 50;
             unsigned int        m_nErrorBufferReserve = 1000;
@@ -693,6 +694,7 @@ namespace dynarithmic
             std::string                     m_TwainDSMSearchOrderStr = "CWSOU";
             CTL_StringType                  m_TwainDSMUserDirectory;
             CTL_StringType                  m_strSessionDetails;
+            CTL_StringType                  m_strSourceDetails;
     };
 
     template <typename T>

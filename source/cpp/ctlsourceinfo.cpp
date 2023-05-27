@@ -30,6 +30,22 @@ using namespace dynarithmic;
 typedef CTL_StringType (CTL_ITwainSource::*SOURCEINFOFUNC)() const;
 static LONG GetSourceInfo(CTL_ITwainSource *p, SOURCEINFOFUNC pFunc, LPTSTR szInfo, LONG nMaxLen);
 
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceValid(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    if (!Source)
+        LOG_FUNC_EXIT_PARAMS(false)
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    bool bRet = false;
+    if (pHandle)
+    {
+        CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
+        bRet = CTL_TwainAppMgr::IsValidTwainSource(pHandle->m_pTwainSession, p);
+    }
+    LOG_FUNC_EXIT_PARAMS(bRet)
+    CATCH_BLOCK(false)
+}
+
 LONG   DLLENTRY_DEF DTWAIN_GetSourceManufacturer( DTWAIN_SOURCE Source, LPTSTR szMan, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, szMan, nMaxLen))

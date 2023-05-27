@@ -2655,7 +2655,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
     TripletSaveRestore tSaveRestore(&m_pCurrentTriplet);
     m_pCurrentTriplet = &pTriplet;
 
-    if ( m_pDLLHandle->m_bNotificationsUsed)
+    if ( m_pDLLHandle->m_bNotifyTripletsUsed)
     {
         // Send out that we have begun to process the TWAIN triplet
         SendTwainMsgToWindow(pTriplet.GetSessionPtr(), nullptr, DTWAIN_TN_TWAINTRIPLETBEGIN, 0);
@@ -2715,7 +2715,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
     if ( bTimeOutInEffect )
         KillTimer(nullptr, CTL_StaticData::s_nTimeoutID);
     #endif
-    if (m_pDLLHandle->m_bNotificationsUsed)
+    if (m_pDLLHandle->m_bNotifyTripletsUsed)
     {
         // Send out that we have ended processing the TWAIN triplet
         SendTwainMsgToWindow(pTriplet.GetSessionPtr(), nullptr, DTWAIN_TN_TWAINTRIPLETEND, 0);

@@ -38,6 +38,13 @@ static LRESULT ExecuteDTWAINCallbacks(CTL_TwainDLLHandle *pHandle, HWND hWnd, UI
 
 /////////////////////////////////////////////////////////////////////////
 
+static void SetNotification(CTL_TwainDLLHandle* pHandle, bool& notification, DTWAIN_BOOL bSet)
+{
+    // See if DLL Handle exists
+    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    notification = (bSet?true:false);
+}
+
 LONG DLLENTRY_DEF DTWAIN_GetRegisteredMsg()
 {
     LOG_FUNC_ENTRY_PARAMS(())
@@ -50,10 +57,16 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_EnableMsgNotify(DTWAIN_BOOL bSet)
 {
     LOG_FUNC_ENTRY_PARAMS((bSet))
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-        // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    SetNotification(pHandle, pHandle->m_bNotificationsUsed, bSet);
+    LOG_FUNC_EXIT_PARAMS(true)
+    CATCH_BLOCK(false)
+}
 
-    pHandle->m_bNotificationsUsed = bSet != 0?TRUE:FALSE;
+DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_EnableTripletsNotify(DTWAIN_BOOL bSet)
+{
+    LOG_FUNC_ENTRY_PARAMS((bSet))
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    SetNotification(pHandle, pHandle->m_bNotifyTripletsUsed, bSet);
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -62,10 +75,17 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsMsgNotifyEnabled()
 {
     LOG_FUNC_ENTRY_PARAMS(())
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-        // See if DLL Handle exists
      DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-
     LOG_FUNC_EXIT_PARAMS(pHandle->m_bNotificationsUsed)
+    CATCH_BLOCK(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsNotifyTripletsEnabled()
+{
+    LOG_FUNC_ENTRY_PARAMS(())
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    LOG_FUNC_EXIT_PARAMS(pHandle->m_bNotifyTripletsUsed)
     CATCH_BLOCK(false)
 }
 

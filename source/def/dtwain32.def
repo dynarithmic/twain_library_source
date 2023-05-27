@@ -914,6 +914,8 @@ DTWAIN_ArrayGetSourceAt                           @30100
 
 DTWAIN_ConvertDIBToBitmap                         @30101
 DTWAIN_ConvertDIBToFullBitmap                     @30102
+DTWAIN_DeleteDIB                                  @30103
+
 DTWAIN_SysInitializeNoBlocking                    @30200
 
 DTWAIN_RangeGetAllFloatStringA                    @30201
@@ -1021,3 +1023,6 @@ DTWAIN_GetSourceDetailsW                          @31005
 DTWAIN_GetVersionCopyright                        @31006
 DTWAIN_GetVersionCopyrightA                       @31007
 DTWAIN_GetVersionCopyrightW                       @31008
+DTWAIN_IsSourceValid                              @31009
+DTWAIN_EnableTripletsNotify                       @31010
+DTWAIN_IsNotifyTripletsEnabled                    @31011
