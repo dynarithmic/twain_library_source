@@ -904,21 +904,26 @@ LONG DLLENTRY_DEF DTWAIN_GetSessionDetails(LPTSTR szBuf, LONG nSize, LONG indent
     CATCH_BLOCK(0)
 }
 
-LONG DLLENTRY_DEF DTWAIN_GetSourceDetails(LPCTSTR szSources, LPTSTR szBuf, LONG nSize, LONG indentFactor)
+LONG DLLENTRY_DEF DTWAIN_GetSourceDetails(LPCTSTR szSources, LPTSTR szBuf, LONG nSize, LONG indentFactor, BOOL bRefresh)
 {
     LOG_FUNC_ENTRY_PARAMS((szSources, szBuf, nSize, indentFactor))
     auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 
     CTL_StringType details;
-    CTL_StringArrayType vAllSourcesT;
-    std::vector<std::string> vAllSources;
-    StringWrapper::TokenizeEx(szSources, _T("|"), vAllSourcesT, false);
-    for (auto& name : vAllSourcesT)
-        vAllSources.push_back(StringConversion::Convert_Native_To_Ansi(name));
-
-    details = StringConversion::Convert_Ansi_To_Native(generate_details(*pHandle->m_pTwainSession, vAllSources, indentFactor));
-    pHandle->m_strSessionDetails = details;
+    if (bRefresh)
+    {
+        CTL_StringArrayType vAllSourcesT;
+        std::vector<std::string> vAllSources;
+        StringWrapper::TokenizeEx(szSources, _T("|"), vAllSourcesT, false);
+        for (auto& name : vAllSourcesT)
+            vAllSources.push_back(StringConversion::Convert_Native_To_Ansi(name));
+    
+        details = StringConversion::Convert_Ansi_To_Native(generate_details(*pHandle->m_pTwainSession, vAllSources, indentFactor));
+        pHandle->m_strSourceDetails = details;
+    }
+    else
+        details = pHandle->m_strSourceDetails;
     LONG retVal = StringWrapper::CopyInfoToCString(details, szBuf, nSize);
     LOG_FUNC_EXIT_PARAMS(retVal)
     CATCH_BLOCK(0)

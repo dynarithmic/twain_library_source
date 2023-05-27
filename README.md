@@ -134,11 +134,22 @@ Note that the C++ source code should be able to be built with any C++17 complian
 
 ----
 ### <a name="build-demo"></a> Building the demo applications
-If you wish to build the demo applications, the **demos\AllDemos.sln** file can be loaded into Visual Studio 2019 or 2022.  Please note that you must build the base libraries first (by building using the **dtwain_5_vs2019.sln** project, mentioned above) before building the demos.  
+##### C++
 
-The demos consist of C and C++ language demos, plus C++ demos based on an experimental C++ wrapper library that is currently being developed.  In addition, there are C# and Visual Basic *.sln files you can load, build, and test the functionality of DTWAIN.
+If you wish to build the C and C++ demo applications, the **demos\AllDemos.sln** file can be loaded into Visual Studio 2019 or 2022.  Please note that you must build the base libraries first (by building using the **dtwain_5_vs2019.sln** project, mentioned above) before building the demos.  The demos consist of C and C++ language demos, plus C++ demos based on an experimental C++ wrapper library that is currently being developed.
 
-##### Using the debug DTWAIN DLL's in the demo programs
+###### C#
+
+The C# demo is **demos\csharp\Examples\FullDemo\CSharp_FullDemo.csproj**
+This project is by default, setup for 32-bit Unicode (the dtwain32u.cs is part of the projects).  If you want to try 64-bit builds, please replace the dtwain32u.cs with one of the 64-bit .cs files (for example dtwain64u.cs).
+
+###### Visual Basic
+
+The Visual Basic demo is **demos\VisualBasic\Examples\FullDemo\VB_FullDemo.vbproj**
+This project is by default, setup for 32-bit Unicode (the dtwain32u.vb is part of the projects).  If you want to try a 64-bit builds, please replace the dtwain32u.vb with one of the 64-bit .cs files (for example dtwain64u.vb).
+
+-----
+##### Using the debug DTWAIN DLL's in the C/C++ demo programs
 The demo programs, by default, will use the release versions of the DTWAIN DLL's.  To use the debug versions of the DTWAIN library, one of the two options is available:
 
 1) Use the following `#define` at the beginning of the main source file that include's **dtwain.h**:
@@ -159,11 +170,34 @@ Using import library xxxxxx.lib in link phase..
 where "xxxxxx.lib" will be one of the following:
 
 ```plaintext
-dtwain32d.lib
-dtwain32ud.lib
-dtwain64d.lib
-dtwain64ud.lib
+dtwain32d.lib    (this will use dtwain32d.dll at runtime)
+dtwain32ud.lib   (this will use dtwain32ud.dll at runtime)
+dtwain64d.lib    (this will use dtwain64d.dll at runtime)
+dtwain64ud.lib   (this will use dtwain64ud.dll at runtime)
 ```
+
+-----
+##### Using the debug DTWAIN DLL's in a C# or Visual Basic program
+The demo programs, by default, will use the release versions of the DTWAIN DLL's.  To use the debug versions of the DTWAIN library, build your application with one of the following interface files:
+
+C#:
+```plaintext
+dtwain32d.cs     (this will use dtwain32d.dll at runtime)
+dtwain32ud.cs    (this will use dtwain32ud.dll at runtime)
+dtwain64d.cs     (this will use dtwain64d.dll at runtime)
+dtwain64ud.cs    (this will use dtwain64ud.dll at runtime)
+```
+
+
+Visual Basic:
+```plaintext
+dtwain32d.vb     (this will use dtwain32d.dll at runtime)
+dtwain32ud.vb    (this will use dtwain32ud.dll at runtime)
+dtwain64d.vb     (this will use dtwain64d.dll at runtime)
+dtwain64ud.vb    (this will use dtwain64ud.dll at runtime)
+```
+
+
 
 ----
 
