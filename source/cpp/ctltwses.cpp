@@ -183,14 +183,10 @@ bool CTL_ITwainSession::SelectSource( const CTL_ITwainSource* pSource )
 {
     if ( !pSource )  // Choose the default source
     {
-        // Get first source
+        // Get default source
         CTL_GetDefaultSourceTriplet ST( this );
         if ( ST.Execute() == TWRC_SUCCESS )
-        {
-            const CTL_ITwainSource* pSourceTemp = ST.GetSourceIDPtr();
-            m_pSelectedSource = IsSourceSelected( pSourceTemp->GetProductName().c_str() );
-            CTL_ITwainSource::Destroy( pSourceTemp );
-        }
+            m_pSelectedSource = ST.GetSourceIDPtr();
         else
             return false;
     }
