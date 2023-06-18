@@ -222,10 +222,13 @@ static bool SetImageSize(DTWAIN_SOURCE Source, DTWAIN_ARRAY FloatArray, DTWAIN_A
         DTWAIN_Check_Error_Condition_0_Ex(pHandle,
             [&] { return !pHandle->m_ArrayFactory->is_valid(pArray, CTL_ArrayFactory::arrayTag::DoubleType); },
             DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
+
         const auto& vFloat = pHandle->m_ArrayFactory->underlying_container_t<double>(FloatArray);
 
-        if (vFloat.size() < 4)
-            LOG_FUNC_EXIT_PARAMS(false)
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle,
+            [&] { return vFloat.size() < 4; },
+            DTWAIN_ERR_AREA_ARRAY_TOO_SMALL, false, FUNC_MACRO);
+
 
         CTL_RealArray Array;
         CTL_RealArray rArray;
