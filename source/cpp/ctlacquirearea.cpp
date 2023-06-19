@@ -187,6 +187,21 @@ static bool GetImageSize(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, CTL_En
 }
 
 
+static bool FillActualArray(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ActualArray, const std::vector<double>& vValues)
+{
+    if (ActualArray != nullptr)
+    {
+        auto& vActual = pHandle->m_ArrayFactory->underlying_container_t<double>(ActualArray);
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle,
+            [&] {return !pHandle->m_ArrayFactory->is_valid(ActualArray, CTL_ArrayFactory::arrayTag::DoubleType); },
+            DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
+        vActual.clear();
+        std::copy_n(vValues.begin(), 4, std::back_inserter(vActual));
+        return true;
+    }
+    return false;
+}
+
 static bool SetImageSize(DTWAIN_SOURCE Source, DTWAIN_ARRAY FloatArray, DTWAIN_ARRAY ActualArray, CTL_EnumSetType SetType)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, FloatArray, ActualArray, SetType))
@@ -194,33 +209,33 @@ static bool SetImageSize(DTWAIN_SOURCE Source, DTWAIN_ARRAY FloatArray, DTWAIN_A
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     if (p)
     {
+        if (SetType == CTL_SetTypeRESET)
+        {
+            CTL_RealArray dummy;
+            const bool bOk = CTL_TwainAppMgr::SetImageLayoutSize(p, {}, dummy, CTL_SetTypeRESET);
+            if ( bOk )
+                FillActualArray(pHandle, ActualArray, dummy);
+            LOG_FUNC_EXIT_PARAMS(bOk)
+        }
+
         const DTWAIN_ARRAY pArray = FloatArray;
-        DTWAIN_ARRAY pArrayActual = DTWAIN_ArrayInit();
         DTWAIN_Check_Error_Condition_0_Ex(pHandle,
             [&] { return !pHandle->m_ArrayFactory->is_valid(pArray, CTL_ArrayFactory::arrayTag::DoubleType); },
             DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
 
         const auto& vFloat = pHandle->m_ArrayFactory->underlying_container_t<double>(FloatArray);
-        auto& vActual = pHandle->m_ArrayFactory->underlying_container_t<double>(ActualArray);
 
-        if (vFloat.size() < 4)
-            LOG_FUNC_EXIT_PARAMS(false)
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle,
+            [&] { return vFloat.size() < 4; },
+            DTWAIN_ERR_AREA_ARRAY_TOO_SMALL, false, FUNC_MACRO);
 
-        if (ActualArray != nullptr)
-        {
-            pArrayActual = ActualArray;
-            DTWAIN_Check_Error_Condition_0_Ex(pHandle,
-                [&] {return !pHandle->m_ArrayFactory->is_valid(pArrayActual, CTL_ArrayFactory::arrayTag::DoubleType); },
-                DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
-            vActual.clear();
-        }
 
         CTL_RealArray Array;
         CTL_RealArray rArray;
         std::copy_n(vFloat.begin(), 4, std::back_inserter(Array));
         const bool bOk = CTL_TwainAppMgr::SetImageLayoutSize(p, Array, rArray, SetType);
-        if (bOk && pArrayActual)
-            std::copy_n(rArray.begin(), 4, std::back_inserter(vActual));
+        if (bOk)
+            FillActualArray(pHandle, ActualArray, rArray);
         LOG_FUNC_EXIT_PARAMS(bOk)
     }
     LOG_FUNC_EXIT_PARAMS(false)

@@ -26,7 +26,7 @@ using namespace dynarithmic;
 CTL_ImageLayoutTriplet::CTL_ImageLayoutTriplet(CTL_ITwainSession *pSession,
                                                CTL_ITwainSource* pSource,
                                                TW_UINT16 GetType)
-                                               : CTL_TwainTriplet(), m_ImageLayout()
+                                               : CTL_TwainTriplet(), m_ImageLayout{}
 {
     SetSessionPtr(pSession);
     SetSourcePtr( pSource );
@@ -103,10 +103,13 @@ CTL_ImageSetLayoutTriplet::CTL_ImageSetLayoutTriplet(
 CTL_ImageLayoutTriplet( pSession, pSource, SetType )
 {
     TW_IMAGELAYOUT *pLayout = GetImageLayout();
-    pLayout->Frame.Left = FloatToFix32(static_cast<float>(rArray[0]));
-    pLayout->Frame.Top =  FloatToFix32(static_cast<float>(rArray[1]));
-    pLayout->Frame.Right = FloatToFix32(static_cast<float>(rArray[2]));
-    pLayout->Frame.Bottom = FloatToFix32(static_cast<float>(rArray[3]));
+    if ( SetType != MSG_RESET)
+    {
+        pLayout->Frame.Left = FloatToFix32(static_cast<float>(rArray[0]));
+        pLayout->Frame.Top =  FloatToFix32(static_cast<float>(rArray[1]));
+        pLayout->Frame.Right = FloatToFix32(static_cast<float>(rArray[2]));
+        pLayout->Frame.Bottom = FloatToFix32(static_cast<float>(rArray[3]));
+    }
     pLayout->DocumentNumber = static_cast<TW_UINT32>(-1);
     pLayout->PageNumber = static_cast<TW_UINT32>(-1);
     pLayout->FrameNumber = static_cast<TW_UINT32>(-1);
