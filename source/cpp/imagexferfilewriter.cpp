@@ -329,6 +329,7 @@ LONG ImageXferFileWriter::MergeDuplexFiles() const
     }
     bool bDoneFirstPage = false;
     int filecount = 0;
+
     // perform loop for matching pages
     while (filecount < nTotalFiles )
     {
@@ -399,6 +400,7 @@ LONG ImageXferFileWriter::MergeDuplexFiles() const
                 else
                     MultiPageOption = DIB_MULTI_NEXT;   // Next page of mutlipage file
 
+                DupData.m_pSource = m_pSource;                        
                 retval = MergeDuplexFilesEx(DupData, pHandler, strTempFile, MultiPageOption);
                 bDoneFirstPage = true;
 
@@ -435,6 +437,7 @@ LONG ImageXferFileWriter::MergeDuplexFiles() const
         }
         if ( bMergeExtra )
         {
+            DupData.m_pSource = m_pSource;
             retval = MergeDuplexFilesEx(DupData, pHandler, strTempFile, DIB_MULTI_NEXT);
             if (retval != DTWAIN_MANDUP_SCANOK )
             {
@@ -500,7 +503,7 @@ int ImageXferFileWriter::MergeDuplexFilesEx(const sDuplexFileData& DupData,
 
     // Resize the dib buffer
     HANDLE pDibBufferHandle;
-    auto sessionHandle = pHandler->GetBaseImageInfo().theSession->GetTwainDLLHandle();
+    auto sessionHandle = DupData.m_pSource->GetTwainSession()->GetTwainDLLHandle();
     char* pDibBuffer = static_cast<char*>(sessionHandle->m_TwainMemoryFunc->AllocateMemoryPtr(
 											static_cast<TW_UINT32>(DupData.nBytes), &pDibBufferHandle));
     if ( !pDibBuffer )
