@@ -69,7 +69,8 @@ namespace dynarithmic
         CTL_StringType sRealFileName;
         uint64_t nBytes;
         bool bIsJobControlPage;
-        sDuplexFileData() : nBytes(0), bIsJobControlPage(false) {}
+        CTL_ITwainSource* m_pSource;
+        sDuplexFileData() : nBytes(0), bIsJobControlPage(false), m_pSource{} {}
     };
 
     typedef  std::pair<
