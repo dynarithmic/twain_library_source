@@ -486,6 +486,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
     std::vector<capabilityInfo> vCapabilityInfo;
 
     json glob_json;
+    glob_json["session-twain-identity"] = json::parse(CTL_TwainIdentity(ts.GetAppIDPtr()).to_json());
     glob_json["device-count"] = allSources.size();
     json array_twain_identity;
     json array_source_names;
