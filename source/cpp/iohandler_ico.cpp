@@ -21,6 +21,7 @@
 #include "ctldib.h"
 #include "ctliface.h"
 #include "ctlfileutils.h"
+#include "../cximage/ximage.h"
 
 using namespace dynarithmic;
 
@@ -29,19 +30,46 @@ int CTL_IcoIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     if ( !m_pDib )
         return DTWAIN_ERR_DIB;
 
-    const HANDLE hDib = m_pDib->GetHandle();
+    HANDLE hDib = m_pDib->GetHandle();
     if ( !hDib )
         return DTWAIN_ERR_DIB;
 
-    const int height = m_pDib->GetHeight();
-    const int width = m_pDib->GetWidth();
+    int height = m_pDib->GetHeight();
+    int width = m_pDib->GetWidth();
 
     if ( !m_ImageInfoEx.IsVistaIcon )
     {
-        if ( height > 255 || width > 255 )
+        
+        if (m_ImageInfoEx.IsIcoResized && (height > 255 || width > 255))
+        {
+            height = 255;
+            width = 255;
+            if ( width == 0 )
+                return DTWAIN_ERR_INVALIDICONFORMAT;
+            
+            HANDLE hNewDib = nullptr;
+            {
+                BYTE* pImage = (BYTE*)ImageMemoryHandler::GlobalLock(hDib);
+                DTWAINGlobalHandle_RAII raii(hDib);
+                CxImage ImageHandler(pImage, GlobalSize(hDib), CXIMAGE_FORMAT_BMP);
+                ImageHandler.Resample(width, height, 2);
+                hNewDib = ImageHandler.CopyToHandle();
+            }
+            m_pDib->Delete();
+            m_pDib->SetHandle(hNewDib);
+            hDib = hNewDib;
+        }
+        else
             return DTWAIN_ERR_INVALIDICONFORMAT;
     }
+
     if (!parent_directory_exists(szFile).first)
         return DTWAIN_ERR_FILEOPEN;
-    return SaveToFile(hDib, szFile, FIF_ICO, 0, DTWAIN_INCHES, { 0,0 });
+    auto retVal = SaveToFile(hDib, szFile, FIF_ICO, 0, DTWAIN_INCHES, { 0,0 });
+    if (retVal != 0)
+    {
+        // Remove the file if it existed
+        delete_file(szFile);
+    }
+    return retVal;
 }
