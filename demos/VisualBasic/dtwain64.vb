@@ -225,6 +225,7 @@ Class DTWAINAPI
     Public Const DTWAIN_TIFFMULTI As Integer  = 7000
     Public Const DTWAIN_ICO As Integer  = 8000
     Public Const DTWAIN_ICO_VISTA As Integer  = 8001
+    Public Const DTWAIN_ICO_RESIZED As Integer  = 8002
     Public Const DTWAIN_WBMP As Integer  = 8500
     Public Const DTWAIN_INCHES As Integer  = 0
     Public Const DTWAIN_CENTIMETERS As Integer  = 1
