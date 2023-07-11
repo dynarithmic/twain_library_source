@@ -101,6 +101,7 @@ namespace dynarithmic
         CTL_ITwainSession* theSession;
         bool IsSearchableTextOnPage;
         bool IsCreateDirectory;
+        bool IsIcoResized;
 
         LONG nJpegQuality;
         bool bProgressiveJpeg;
@@ -160,7 +161,8 @@ namespace dynarithmic
             PDFThumbnailScale{},
             PDFCustomSize{},
             PDFCustomScale{},
-            IsCreateDirectory(false)
+            IsCreateDirectory(false),
+            IsIcoResized(false)
         {
         }
     };

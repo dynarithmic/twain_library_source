@@ -260,7 +260,9 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
 
         case IcoFormat:
         case IcoVistaFormat:
+        case IcoFormatResized:
             ImageInfo.IsVistaIcon = nFormat == IcoVistaFormat;
+            ImageInfo.IsIcoResized = (nFormat == IcoFormatResized);
             pHandler = std::make_unique<CTL_IcoIOHandler>( this, ImageInfo );
         break;
 

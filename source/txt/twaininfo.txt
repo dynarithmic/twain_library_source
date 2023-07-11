@@ -921,6 +921,7 @@
 6001  OCR-Text-Multi txt
 8000  Windows-ICON-Single ico
 8001  Windows-Vista-ICON-Single ico
+8002  Windows-ICON-Resized-Single ico
 8500  WBMP-Wireless-Bitmap-Single wbmp
 8501  WEBP-Google-Format-Single webp
 10000 PPM-Portable-Bitmap-Single ppm 

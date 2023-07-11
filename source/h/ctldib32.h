@@ -402,6 +402,7 @@ namespace dynarithmic
                    TextFormatMulti = DTWAIN_TEXTMULTI,
                    IcoFormat = DTWAIN_ICO,
                    IcoVistaFormat = DTWAIN_ICO_VISTA,
+                   IcoFormatResized = DTWAIN_ICO_RESIZED,
                    WBMPFormat = DTWAIN_WBMP,
                    WEBPFormat = DTWAIN_WEBP,
                    PBMFormat = DTWAIN_PBM,

@@ -67,6 +67,7 @@ if you want to acquire using DTWAIN's file mode */
 #define DTWAIN_TIFFMULTI         7000  /* Only to be used for standalone OCR engines */
 #define DTWAIN_ICO               8000  /* Windows ICO (icon) format */
 #define DTWAIN_ICO_VISTA         8001  /* Windows ICO (icon) format for Vista and above OS */
+#define DTWAIN_ICO_RESIZED       8002  /* Windows ICO (icon) format for bitmaps with height > 255 or width > 255 pixels */
 #define DTWAIN_WBMP              8500  /* Wireless Bitmap (WAP) format */
 #define DTWAIN_WEBP              8501  /* Google webp format */
 #define DTWAIN_PCD               9000  /* Kodak PCD */

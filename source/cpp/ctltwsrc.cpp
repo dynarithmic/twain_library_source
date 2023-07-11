@@ -796,7 +796,7 @@ void CTL_ITwainSource::initFileSaveMap() const
         m_saveFileMap[TWAINFileFormat_TEXT] =
             m_saveFileMap[TWAINFileFormat_TEXTMULTI] = MAKE_FILE_FORMAT_INFO("Text file (*.txt)\0*.txt\0\0",".txt");
 
-        m_saveFileMap[TWAINFileFormat_ICO] =
+        m_saveFileMap[TWAINFileFormat_ICO] = m_saveFileMap[TwainFileFormat_ICO_RESIZED] =
             m_saveFileMap[TWAINFileFormat_ICO_VISTA] = MAKE_FILE_FORMAT_INFO("Icon file (*.ico)\0*.ico\0\0",".ico");
 
         m_saveFileMap[DTWAIN_FF_SPIFF] = MAKE_FILE_FORMAT_INFO("SPIFF Format (*.spf)\0*.spf\0\0",".spf");

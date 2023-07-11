@@ -490,6 +490,7 @@ namespace dynarithmic
             static constexpr value_type  tiffpackbits = DTWAIN_TIFFPACKBITS;
             static constexpr value_type  windowsicon = DTWAIN_ICO;
             static constexpr value_type  windowsvistaicon = DTWAIN_ICO_VISTA;
+            static constexpr value_type  windowsiconresized = DTWAIN_ICO_RESIZED;
             static constexpr value_type  windowsmetafile = DTWAIN_WMF;
             static constexpr value_type  wirelessbmp = DTWAIN_WBMP;
             static constexpr value_type  portablebitmap = DTWAIN_PBM;
@@ -1778,6 +1779,7 @@ namespace dynarithmic
                     filetype_value::tiffpackbits,
                     filetype_value::windowsicon,
                     filetype_value::windowsvistaicon,
+                    filetype_value::windowsiconresized,
                     filetype_value::portablebitmap,
                     filetype_value::windowsmetafile,
                     filetype_value::wirelessbmp,
