@@ -2889,6 +2889,10 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
         ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern DTWAIN_IDENTITY DTWAIN_GetTwainAppIDEx(TW_IDENTITY pIdentity);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern  int DTWAIN_GetTwainAvailability( );
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
