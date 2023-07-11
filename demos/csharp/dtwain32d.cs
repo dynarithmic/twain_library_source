@@ -270,6 +270,7 @@ namespace Dynarithmic
         public const  int DTWAIN_TIFFMULTI = 7000;
         public const  int DTWAIN_ICO = 8000;
         public const  int DTWAIN_ICO_VISTA = 8001;
+        public const  int DTWAIN_ICO_RESIZED = 8002;
         public const  int DTWAIN_WBMP = 8500;
         public const int DTWAIN_WEBP = 8501;
         public const  int DTWAIN_PPM = 10000;
