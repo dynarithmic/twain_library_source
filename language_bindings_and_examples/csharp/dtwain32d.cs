@@ -499,7 +499,7 @@ namespace Dynarithmic
         public const  int DTWAIN_CNTYAFGHANISTAN = 1001;
         public const  int DTWAIN_CNTYALGERIA = 213;
         public const  int DTWAIN_CNTYAMERICANSAMOA = 684;
-        public const  int DTWAIN_CNTYANDORRA = 033;
+        public const  int DTWAIN_CNTYANDORRA = 33;
         public const  int DTWAIN_CNTYANGOLA = 1002;
         public const  int DTWAIN_CNTYANGUILLA = 8090;
         public const  int DTWAIN_CNTYANTIGUA = 8091;
@@ -542,7 +542,7 @@ namespace Dynarithmic
         public const  int DTWAIN_CNTYCONGO = 1011;
         public const  int DTWAIN_CNTYCOOKIS = 1012;
         public const  int DTWAIN_CNTYCOSTARICA = 506;
-        public const  int DTWAIN_CNTYCUBA = 005;
+        public const  int DTWAIN_CNTYCUBA = 5;
         public const  int DTWAIN_CNTYCYPRUS = 357;
         public const  int DTWAIN_CNTYCZECHOSLOVAKIA = 42;
         public const  int DTWAIN_CNTYDENMARK = 45;
