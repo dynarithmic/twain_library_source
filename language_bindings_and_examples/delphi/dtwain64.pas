@@ -1,5 +1,5 @@
 {* This file is part of the Dynarithmic TWAIN Library (DTWAIN).                          *}
-{* Copyright (c) 2002-2021 Dynarithmic Software.                                         *}
+{* Copyright (c) 2002-2023 Dynarithmic Software.                                         *}
 {*                                                                                       *}
 {* Licensed under the Apache License, Version 2.0 (the "License");                       *}
 {* you may not use this file except in compliance with the License.                      *}
@@ -543,7 +543,7 @@ const
   DTWAIN_CNTYAFGHANISTAN = 1001;
   DTWAIN_CNTYALGERIA = 213;
   DTWAIN_CNTYAMERICANSAMOA = 684;
-  DTWAIN_CNTYANDORRA = 033;
+  DTWAIN_CNTYANDORRA = 33;
   DTWAIN_CNTYANGOLA = 1002;
   DTWAIN_CNTYANGUILLA = 8090;
   DTWAIN_CNTYANTIGUA = 8091;
@@ -586,7 +586,7 @@ const
   DTWAIN_CNTYCONGO = 1011;
   DTWAIN_CNTYCOOKIS = 1012;
   DTWAIN_CNTYCOSTARICA = 506;
-  DTWAIN_CNTYCUBA = 005;
+  DTWAIN_CNTYCUBA = 5;
   DTWAIN_CNTYCYPRUS = 357;
   DTWAIN_CNTYCZECHOSLOVAKIA = 42;
   DTWAIN_CNTYDENMARK = 45;
