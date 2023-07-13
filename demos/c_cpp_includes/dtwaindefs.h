@@ -562,7 +562,7 @@
 #define DTWAIN_CNTYAFGHANISTAN             1001
 #define DTWAIN_CNTYALGERIA                  213
 #define DTWAIN_CNTYAMERICANSAMOA            684
-#define DTWAIN_CNTYANDORRA                  033
+#define DTWAIN_CNTYANDORRA                   33
 #define DTWAIN_CNTYANGOLA                  1002
 #define DTWAIN_CNTYANGUILLA                8090
 #define DTWAIN_CNTYANTIGUA                 8091
@@ -605,7 +605,7 @@
 #define DTWAIN_CNTYCONGO                   1011
 #define DTWAIN_CNTYCOOKIS                  1012
 #define DTWAIN_CNTYCOSTARICA               506
-#define DTWAIN_CNTYCUBA                     005
+#define DTWAIN_CNTYCUBA                     5
 #define DTWAIN_CNTYCYPRUS                   357
 #define DTWAIN_CNTYCZECHOSLOVAKIA            42
 #define DTWAIN_CNTYDENMARK                   45
