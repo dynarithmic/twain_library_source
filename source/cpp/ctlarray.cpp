@@ -1470,6 +1470,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetAll( DTWAIN_RANGE pArray, LPVOID pVarian
     const LONG lResult = IsValidRangeArray( pArray );
     if ( lResult != 1 && lResult != DTWAIN_ERR_INVALID_RANGE)
         LOG_FUNC_EXIT_PARAMS(false)
+    
     if ( pVariantLow )
         DTWAIN_ArrayGetAt(pArray, DTWAIN_RANGEMIN, pVariantLow);
     if ( pVariantUp )
@@ -1543,23 +1544,13 @@ LONG DLLENTRY_DEF DTWAIN_RangeGetCount( DTWAIN_RANGE pArray )
     auto eType = pHandle->m_ArrayFactory->tag_type(pArray);
     if ( eType == CTL_ArrayFactory::arrayTag::LongType)
     {
-        LONG lLow;
-        LONG lUp;
-        LONG lStep;
-        LONG lDef;
-        LONG lCur;
-        DTWAIN_RangeGetAll( pArray, &lLow, &lUp, &lStep, &lDef, &lCur );
-        nNumItems = abs(lUp - lLow) / lStep + 1;
+        LONG* pBuffer = static_cast<LONG*>(pHandle->m_ArrayFactory->get_buffer(pArray, 0));
+        nNumItems = abs(pBuffer[DTWAIN_RANGEMAX] - pBuffer[DTWAIN_RANGEMIN]) / pBuffer[DTWAIN_RANGESTEP] + 1;
     }
     else
     {
-        double dLow;
-        double dUp;
-        double dStep;
-        double dDef;
-        double dCur;
-        DTWAIN_RangeGetAll( pArray, &dLow, &dUp, &dStep, &dDef, &dCur );
-        nNumItems = static_cast<LONG>(static_cast<float>(fabs(dUp - dLow) / dStep) + 1);
+        double * pBuffer = static_cast<double*>(pHandle->m_ArrayFactory->get_buffer(pArray, 0));
+        nNumItems = static_cast<LONG>(fabs(pBuffer[DTWAIN_RANGEMAX] - pBuffer[DTWAIN_RANGEMIN]) / pBuffer[DTWAIN_RANGESTEP] + 1);
     }
     LOG_FUNC_EXIT_PARAMS(nNumItems)
     CATCH_BLOCK(DTWAIN_FAILURE1)
@@ -1576,17 +1567,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetExpValue( DTWAIN_RANGE pArray, LONG lPos
     auto eType = pHandle->m_ArrayFactory->tag_type(pArray);
     if ( eType == CTL_ArrayFactory::arrayTag::LongType)
     {
+        LONG* pBuffer = static_cast<LONG*>(pHandle->m_ArrayFactory->get_buffer(pArray, 0));
         LONG* pLong = static_cast<LONG*>(pVariant);
-        LONG lLow, lUp, lStep, lDef, lCur;
-        DTWAIN_RangeGetAll( pArray, &lLow, &lUp, &lStep, &lDef, &lCur );
-        *pLong = lLow + lStep * lPos;
+        *pLong = pBuffer[DTWAIN_RANGEMIN] + pBuffer[DTWAIN_RANGESTEP] * lPos;
     }
     else
     {
         const auto pFloat = static_cast<double*>(pVariant);
-        double dLow, dUp, dStep, dDef, dCur;
-        DTWAIN_RangeGetAll( pArray, &dLow, &dUp, &dStep, &dDef, &dCur );
-        *pFloat = dLow + dStep * lPos;
+        double* pBuffer = static_cast<double*>(pHandle->m_ArrayFactory->get_buffer(pArray, 0));
+        *pFloat = pBuffer[DTWAIN_RANGEMIN] + pBuffer[DTWAIN_RANGESTEP] * lPos; 
     }
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
@@ -1629,25 +1618,22 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetPos( DTWAIN_RANGE pArray, LPVOID pVarian
     if (IsValidRangeArray( static_cast<DTWAIN_ARRAY>(pArray) ) < 0 )
         LOG_FUNC_EXIT_PARAMS(false)
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    // Check if (low < high) and 0 < step < (high - low)
     auto eType = pHandle->m_ArrayFactory->tag_type(pArray);
     if ( eType == CTL_ArrayFactory::arrayTag::LongType )
     {
         auto pLong = static_cast<LONG*>(pVariant);
-        LONG lLow, lUp, lStep, lDef, lCur;
-        DTWAIN_RangeGetAll( pArray, &lLow, &lUp, &lStep, &lDef, &lCur );
-        if ( lStep == 0 )
+        LONG* pBuffer = static_cast<LONG*>(pHandle->m_ArrayFactory->get_buffer(pArray, 0));
+        if (pBuffer[DTWAIN_RANGESTEP] == 0 )
             LOG_FUNC_EXIT_PARAMS(false)
-        *pPos = (*pLong - lLow) / lStep;
+        *pPos = (*pLong - pBuffer[DTWAIN_RANGEMIN]) / pBuffer[DTWAIN_RANGESTEP];
     }
     else
     {
         const double *pFloat = static_cast<double*>(pVariant);
-        double dLow, dUp, dStep, dDef, dCur;
-        DTWAIN_RangeGetAll( pArray, &dLow, &dUp, &dStep, &dDef, &dCur );
-        if ( float_close(0.0, dStep))
+        double* pBuffer = static_cast<double*>(pHandle->m_ArrayFactory->get_buffer(pArray, 0));
+        if (float_close(0.0, pBuffer[DTWAIN_RANGESTEP]))
             LOG_FUNC_EXIT_PARAMS(false)
-        *pPos = static_cast<LONG>((*pFloat - dLow) / dStep);
+        *pPos = static_cast<LONG>((*pFloat - pBuffer[DTWAIN_RANGEMIN]) / pBuffer[DTWAIN_RANGESTEP]);
     }
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
@@ -1698,13 +1684,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeExpand(DTWAIN_RANGE Range, LPDTWAIN_ARRAY A
 
     if ( eType == CTL_ArrayFactory::arrayTag::LongType )
     {
-        LONG lLow, lUp, lStep, lDef, lCur;
-        DTWAIN_RangeGetAll( Range, &lLow, &lUp, &lStep, &lDef, &lCur );
+        LONG* pBuffer = static_cast<LONG*>(pHandle->m_ArrayFactory->get_buffer(Range, 0));
         LONG* pArrayBuf = static_cast<LONG*>(pHandle->m_ArrayFactory->get_buffer(pDest, 0));
         LONG i = 0;
         std::transform(pArrayBuf, pArrayBuf + lCount, pArrayBuf, [&](int /*n*/)
         {
-            const int retVal = static_cast<int>(lLow + lStep * i);
+            const int retVal = static_cast<int>(pBuffer[DTWAIN_RANGEMIN] + pBuffer[DTWAIN_RANGESTEP] * i);
             ++i;
             return retVal;
         });
@@ -1712,13 +1697,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeExpand(DTWAIN_RANGE Range, LPDTWAIN_ARRAY A
     else
     {
         LONG i = 0;
-        double dLow, dUp, dStep, dDef, dCur;
-        DTWAIN_RangeGetAll( Range, &dLow, &dUp, &dStep, &dDef, &dCur );
-
+        double* pBuffer = static_cast<double*>(pHandle->m_ArrayFactory->get_buffer(Range, 0));
         double *pArrayBuf =  static_cast<double*>(pHandle->m_ArrayFactory->get_buffer(pDest, 0));
         std::transform(pArrayBuf, pArrayBuf + lCount, pArrayBuf, [&](double /*d*/)
         {
-            const double dValue = dLow + dStep * i;
+            const double dValue = pBuffer[DTWAIN_RANGEMIN] + pBuffer[DTWAIN_RANGESTEP] * i;
             ++i;
             return dValue;
         });
@@ -1744,45 +1727,43 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetNearestValue( DTWAIN_RANGE pArray, LPVOI
 
     if ( eType == CTL_ArrayFactory::arrayTag::LongType )
     {
-        LONG lLow, lUp, lStep, lDef, lCur;
-
         // Get the values
-        DTWAIN_RangeGetAll( pArray, &lLow, &lUp, &lStep, &lDef, &lCur );
+        LONG* pBuffer = static_cast<LONG*>(pHandle->m_ArrayFactory->get_buffer(pArray, 0));
 
         // Get the value passed in
         LONG lInVal = *static_cast<LONG*>(pVariantIn);
         LONG *pOutVal = static_cast<LONG*>(pVariantOut);
 
         // return immediately if step is 0
-        if ( lStep == 0 )
+        if ( pBuffer[DTWAIN_RANGESTEP] == 0 )
         {
-            *pOutVal = lLow;
+            *pOutVal = pBuffer[DTWAIN_RANGEMIN];
             LOG_FUNC_EXIT_PARAMS(true)
         }
 
         // Check if value passed in is out of bounds
-        if ( lInVal < lLow )
+        if ( lInVal < pBuffer[DTWAIN_RANGEMIN])
         {
-            *pOutVal = lLow;
+            *pOutVal = pBuffer[DTWAIN_RANGEMIN];
             LOG_FUNC_EXIT_PARAMS(true)
         }
         else
-        if ( lInVal > lUp )
+        if ( lInVal > pBuffer[DTWAIN_RANGEMAX])
         {
-            *pOutVal = lUp;
+            *pOutVal = pBuffer[DTWAIN_RANGEMAX];
             LOG_FUNC_EXIT_PARAMS(true)
         }
 
         // Get the nearest value to *pVariantIn;
         // First get the bias value from 0
         LONG lBias = 0;
-        if ( lLow != 0 )
-            lBias = -lLow;
+        if (pBuffer[DTWAIN_RANGEMIN] != 0 )
+            lBias = -pBuffer[DTWAIN_RANGEMIN];
 
         lInVal += lBias;
 
-        const LONG Remainder = abs(lInVal % lStep);
-        const LONG Dividend = lInVal / lStep;
+        const LONG Remainder = abs(lInVal % pBuffer[DTWAIN_RANGESTEP]);
+        const LONG Dividend = lInVal / pBuffer[DTWAIN_RANGESTEP];
 
         if ( Remainder == 0 )
         {
@@ -1793,55 +1774,53 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetNearestValue( DTWAIN_RANGE pArray, LPVOI
         // Check if round to lowest or highest valid value
         if ( RoundType == DTWAIN_ROUNDNEAREST )
         {
-            if ( Remainder >= abs(lStep) / 2 )
+            if ( Remainder >= abs(pBuffer[DTWAIN_RANGESTEP]) / 2 )
                 RoundType = DTWAIN_ROUNDUP;
             else
                 RoundType = DTWAIN_ROUNDDOWN;
         }
 
         if ( RoundType == DTWAIN_ROUNDDOWN )
-            *pOutVal = Dividend * lStep - lBias;
+            *pOutVal = Dividend * pBuffer[DTWAIN_RANGESTEP]- lBias;
         else
             if ( RoundType == DTWAIN_ROUNDUP )
-                *pOutVal = (Dividend + 1) * lStep - lBias;
+                *pOutVal = (Dividend + 1) * pBuffer[DTWAIN_RANGESTEP] - lBias;
         LOG_FUNC_EXIT_PARAMS(true)
     }
     else
     if ( eType == CTL_ArrayDoubleType )
     {
-        double dLow, dUp, dStep, dDef, dCur;
-
         // Get the values
-        DTWAIN_RangeGetAll( pArray, &dLow, &dUp, &dStep, &dDef, &dCur );
+        double* pBuffer = static_cast<double*>(pHandle->m_ArrayFactory->get_buffer(pArray, 0));
 
         // Get the value passed in
         double dInVal = *static_cast<double*>(pVariantIn);
         const auto pOutVal = static_cast<double*>(pVariantOut);
 
         // Check if value passed in is out of bounds
-        if (float_close(dLow, dInVal) ||
-            float_close(0.0, dStep) ||
-            dInVal < dLow)
+        if (float_close(pBuffer[DTWAIN_RANGEMIN], dInVal) ||
+            float_close(0.0, pBuffer[DTWAIN_RANGESTEP]) ||
+            dInVal < pBuffer[DTWAIN_RANGEMIN])
         {
-            *pOutVal = dLow;
+            *pOutVal = pBuffer[DTWAIN_RANGEMIN];
             LOG_FUNC_EXIT_PARAMS(true)
         }
         else
-        if (float_close(dUp, dInVal) || dInVal > dUp)
+        if (float_close(pBuffer[DTWAIN_RANGEMAX], dInVal) || dInVal > pBuffer[DTWAIN_RANGEMAX])
         {
-            *pOutVal = dUp;
+            *pOutVal = pBuffer[DTWAIN_RANGEMAX];
             LOG_FUNC_EXIT_PARAMS(true)
         }
 
         // Get the nearest value to *pVariantIn;
         // First get the bias value from 0
         double dBias = 0;
-        if ( dLow != 0 )
-            dBias = -dLow;
+        if (pBuffer[DTWAIN_RANGEMIN] != 0 )
+            dBias = -pBuffer[DTWAIN_RANGEMIN];
 
         dInVal += dBias;
-        const double Remainder = fabs(fmod(dInVal, dStep));
-        const double Dividend = static_cast<double>(static_cast<LONG>(dInVal / dStep));
+        const double Remainder = fabs(fmod(dInVal, pBuffer[DTWAIN_RANGESTEP]));
+        const double Dividend = static_cast<double>(static_cast<LONG>(dInVal / pBuffer[DTWAIN_RANGESTEP]));
 
         if ( float_close(Remainder,0.0 ))
         {
@@ -1852,16 +1831,16 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetNearestValue( DTWAIN_RANGE pArray, LPVOI
         // Check if round to lowest or highest valid value
         if ( RoundType == DTWAIN_ROUNDNEAREST )
         {
-            if ( Remainder >= fabs(dStep) / 2.0 )
+            if ( Remainder >= fabs(pBuffer[DTWAIN_RANGESTEP]) / 2.0 )
                 RoundType = DTWAIN_ROUNDUP;
             else
                 RoundType = DTWAIN_ROUNDDOWN;
         }
         if ( RoundType == DTWAIN_ROUNDDOWN )
-            *pOutVal = Dividend * dStep - dBias;
+            *pOutVal = Dividend * pBuffer[DTWAIN_RANGESTEP]- dBias;
         else
             if ( RoundType == DTWAIN_ROUNDUP )
-                *pOutVal = (Dividend + 1.0) * dStep - dBias;
+                *pOutVal = (Dividend + 1.0) * pBuffer[DTWAIN_RANGESTEP]- dBias;
         LOG_FUNC_EXIT_PARAMS(true)
     }
     LOG_FUNC_EXIT_PARAMS(false)
@@ -2173,11 +2152,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayDestroyFrames(DTWAIN_ARRAY FrameArray)
     if ( checkStatus.Check() != DTWAIN_NO_ERROR)
         LOG_FUNC_EXIT_PARAMS(true)
 
-    // Remove DTWAIN_FRAMES from the container of known frames
-/*    const auto& vValues = factory->vector_getter<CTL_ArrayFactory::tagged_array_frame>(pVariant);
-
-    std::for_each(vValues.begin(), vValues.end(), DTWAIN_FrameDestroy);
-*/
     // Now destroy the enumerator
     factory->destroy(pVariant);
     LOG_FUNC_EXIT_PARAMS(true)
