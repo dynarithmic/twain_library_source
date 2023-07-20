@@ -21,7 +21,7 @@
 
 #ifndef FREEIMAGE_TAG_H
 #define FREEIMAGE_TAG_H
-
+#include <memory>
 // ==========================================================
 // Exif JPEG tags
 // ==========================================================
@@ -376,7 +376,7 @@ public:
 private:
 
 	typedef std::map<WORD, TagInfo*> TAGINFO;
-	typedef std::map<int, TAGINFO*>  TABLEMAP;
+	typedef std::map<int, std::unique_ptr<TAGINFO>>  TABLEMAP;
 
 	/// store hash tables for all known tag info tables
 	TABLEMAP _table_map;
@@ -405,7 +405,7 @@ private:
 
 public:
 	/// Destructor
-	~TagLib();
+	~TagLib() = default;
 
 	/**
 	@return Returns a reference to the TagLib instance

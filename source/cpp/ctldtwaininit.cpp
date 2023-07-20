@@ -1640,6 +1640,7 @@ static bool SysDestroyHelper(CTL_TwainDLLHandle* pHandle, bool bCheck)
     pHandle->m_CallbackMsg = nullptr;
     pHandle->m_CallbackError = nullptr;
     RemoveThreadIdFromAssociation(threadId);
+    FreeImage_ClearPlugins();
     FreeImage_DeInitialise();
     return TRUE;
 }
