@@ -811,6 +811,7 @@ extern "C" {
 
 DLL_API void DLL_CALLCONV FreeImage_Initialise(BOOL load_local_plugins_only FI_DEFAULT(FALSE));
 DLL_API void DLL_CALLCONV FreeImage_DeInitialise(void);
+DLL_API void DLL_CALLCONV FreeImage_ClearPlugins(void);
 
 // Version routines ---------------------------------------------------------
 
