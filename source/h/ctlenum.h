@@ -326,6 +326,7 @@ namespace dynarithmic
                                    TWAINFileFormat_ICO      = DTWAIN_ICO,
                                    TWAINFileFormat_ICO_VISTA = DTWAIN_ICO_VISTA,
                                    TwainFileFormat_ICO_RESIZED = DTWAIN_ICO_RESIZED,
+                                   TwainFileFormat_WBMP_RESIZED = DTWAIN_WBMP_RESIZED,
                                    TWAINFileFormat_WBMP     = DTWAIN_WBMP,
                                    TWAINFileFormat_RAW      =9999
                                 };

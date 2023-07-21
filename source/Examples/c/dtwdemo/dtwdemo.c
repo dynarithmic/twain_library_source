@@ -101,7 +101,7 @@ AllTypes g_allTypes[] = {   {_T("BMP File"), DTWAIN_BMP, _T("test.bmp")},
                             {_T("Windows Meta File (WMF)"), DTWAIN_WMF, _T("test.wmf")},
                             {_T("Windows ICON File (ICO)"), DTWAIN_ICO_RESIZED, _T("test.ico")},
                             {_T("Windows ICON File- Vista compatible (ICO)"), DTWAIN_ICO_VISTA, _T("test.ico")},
-                            {_T("Wireless Bitmap File (WBMP)"), DTWAIN_WBMP, _T("test.wbmp")},
+                            {_T("Wireless Bitmap File (WBMP)"), DTWAIN_WBMP_RESIZED, _T("test.wbmp")},
                             {_T("Google WebP (WEBP)"), DTWAIN_WEBP, _T("test.webp")},
 
                         };

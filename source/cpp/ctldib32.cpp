@@ -267,6 +267,8 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
         break;
 
         case WBMPFormat:
+        case WBMPFormatResized:
+            ImageInfo.IsWBMPResized = (nFormat == WBMPFormatResized);
             pHandler = std::make_unique<CTL_WBMPIOHandler>(this, ImageInfo);
         break;
 
@@ -728,7 +730,7 @@ bool CTL_TwainDib::DecreaseBpp(unsigned long bpp)
     return false;
 }
 
-int CTL_TwainDib::ResampleDib(FloatRect& ResampleRect, int flags)
+int CTL_TwainDib::ResampleDib(const FloatRect& ResampleRect, int flags)
 {
     const HANDLE hDib = m_TwainDibInfo.GetDib();
     if (hDib)
