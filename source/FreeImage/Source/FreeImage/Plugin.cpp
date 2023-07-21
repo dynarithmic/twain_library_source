@@ -191,7 +191,7 @@ PluginList::~PluginList() {
             FreeLibrary((HINSTANCE)(*i).second->m_instance);
         }
 #endif
-}
+    }
 }
 
 // =====================================================================
@@ -223,22 +223,19 @@ FreeImage_Initialise(BOOL load_local_plugins_only) {
 
         s_plugins = std::make_shared<PluginList>();
 
-            /* NOTE : 
-            The order used to initialize internal plugins below MUST BE the same order 
-            as the one used to define the FREE_IMAGE_FORMAT enum. 
-            */
-        s_plugins->AddNode(InitBMP, FIF_BMP);
+        /* NOTE : 
+        The order used to initialize internal plugins below MUST BE the same order 
+        as the one used to define the FREE_IMAGE_FORMAT enum. 
+        */
         s_plugins->AddNode(InitICO, FIF_ICO);
         s_plugins->AddNode(InitJPEG, FIF_JPEG);
         s_plugins->AddNode(InitPNM, FIF_PBM, NULL, "PBM", "Portable Bitmap (ASCII)", "pbm", "^P1");
         s_plugins->AddNode(InitPNM, FIF_PBMRAW, NULL, "PBMRAW", "Portable Bitmap (RAW)", "pbm", "^P4");
-        s_plugins->AddNode(InitPCX, FIF_PCX);
         s_plugins->AddNode(InitPNM, FIF_PGM, NULL, "PGM", "Portable Greymap (ASCII)", "pgm", "^P2");
         s_plugins->AddNode(InitPNM, FIF_PGMRAW, NULL, "PGMRAW", "Portable Greymap (RAW)", "pgm", "^P5");
         s_plugins->AddNode(InitPNG, FIF_PNG);
         s_plugins->AddNode(InitPNM, FIF_PPM, NULL, "PPM", "Portable Pixelmap (ASCII)", "ppm", "^P3");
         s_plugins->AddNode(InitPNM, FIF_PPMRAW, NULL, "PPMRAW", "Portable Pixelmap (RAW)", "ppm", "^P6");
-        s_plugins->AddNode(InitTARGA, FIF_TARGA);
         s_plugins->AddNode(InitTIFF, FIF_TIFF);
         s_plugins->AddNode(InitWBMP, FIF_WBMP);
         s_plugins->AddNode(InitPSD, FIF_PSD);
@@ -247,13 +244,16 @@ FreeImage_Initialise(BOOL load_local_plugins_only) {
         s_plugins->AddNode(InitJ2K, FIF_J2K);
         s_plugins->AddNode(InitJP2, FIF_JP2);
         s_plugins->AddNode(InitWEBP, FIF_WEBP);
+        s_plugins->AddNode(InitTARGA, FIF_TARGA);
+//        s_plugins->AddNode(InitPCX, FIF_PCX);
+//          s_plugins->AddNode(InitBMP, FIF_BMP);
 //          s_plugins->AddNode(InitJNG);
 //          s_plugins->AddNode(InitKOALA);
 //          s_plugins->AddNode(InitIFF);
 //          s_plugins->AddNode(InitMNG);
 //          s_plugins->AddNode(InitPCD);
 //          s_plugins->AddNode(InitRAS);
-//            s_plugins->AddNode(InitCUT);
+//          s_plugins->AddNode(InitCUT);
 //          s_plugins->AddNode(InitXBM, -1);
 //          s_plugins->AddNode(InitXPM, -1);
 //          s_plugins->AddNode(InitDDS, -1);
@@ -267,74 +267,74 @@ FreeImage_Initialise(BOOL load_local_plugins_only) {
 //          s_plugins->AddNode(InitJXR);
 #endif // unsupported by MS Visual Studio 2003 !!!
             
-            // external plugin initialization
+        // external plugin initialization
 
 #ifdef _WIN32
         if (!load_local_plugins_only) 
         {
 #if 0
-                int count = 0;
-                char buffer[MAX_PATH + 200];
-                wchar_t current_dir[2 * _MAX_PATH], module[2 * _MAX_PATH];
-                BOOL bOk = FALSE;
+            int count = 0;
+            char buffer[MAX_PATH + 200];
+            wchar_t current_dir[2 * _MAX_PATH], module[2 * _MAX_PATH];
+            BOOL bOk = FALSE;
 
-                // store the current directory. then set the directory to the application location
+            // store the current directory. then set the directory to the application location
 
-                if (GetCurrentDirectoryW(2 * _MAX_PATH, current_dir) != 0) {
-                    if (GetModuleFileNameW(NULL, module, 2 * _MAX_PATH) != 0) {
-                        wchar_t *last_point = wcsrchr(module, L'\\');
+            if (GetCurrentDirectoryW(2 * _MAX_PATH, current_dir) != 0) {
+                if (GetModuleFileNameW(NULL, module, 2 * _MAX_PATH) != 0) {
+                    wchar_t *last_point = wcsrchr(module, L'\\');
 
-                        if (last_point) {
-                            *last_point = L'\0';
+                    if (last_point) {
+                        *last_point = L'\0';
 
-                            bOk = SetCurrentDirectoryW(module);
-                        }
+                        bOk = SetCurrentDirectoryW(module);
                     }
                 }
-
-                // search for plugins
-
-                while (count < s_search_list_size) {
-                    _finddata_t find_data;
-                    long find_handle;
-
-                    strcpy(buffer, s_search_list[count]);
-                    strcat(buffer, "*.fip");
-
-                    if ((find_handle = (long)_findfirst(buffer, &find_data)) != -1L) {
-                        do {
-                            strcpy(buffer, s_search_list[count]);
-                            strncat(buffer, find_data.name, MAX_PATH + 200);
-
-                            HINSTANCE instance = LoadLibraryA(buffer);
-
-                            if (instance != NULL) {
-                                FARPROC proc_address = GetProcAddress(instance, "_Init@8");
-
-                                if (proc_address != NULL) {
-                                    s_plugins->AddNode((FI_InitProc)proc_address, (void *)instance);
-                                } else {
-                                    FreeLibrary(instance);
-                                }
-                            }
-                        } while (_findnext(find_handle, &find_data) != -1L);
-
-                        _findclose(find_handle);
-                    }
-
-                    count++;
-                }
-
-                // restore the current directory
-
-                if (bOk) {
-                    SetCurrentDirectoryW(current_dir);
-                }
-#endif
             }
-#endif // _WIN32
+
+            // search for plugins
+
+            while (count < s_search_list_size) {
+                _finddata_t find_data;
+                long find_handle;
+
+                strcpy(buffer, s_search_list[count]);
+                strcat(buffer, "*.fip");
+
+                if ((find_handle = (long)_findfirst(buffer, &find_data)) != -1L) {
+                    do {
+                        strcpy(buffer, s_search_list[count]);
+                        strncat(buffer, find_data.name, MAX_PATH + 200);
+
+                        HINSTANCE instance = LoadLibraryA(buffer);
+
+                        if (instance != NULL) {
+                            FARPROC proc_address = GetProcAddress(instance, "_Init@8");
+
+                            if (proc_address != NULL) {
+                                s_plugins->AddNode((FI_InitProc)proc_address, (void *)instance);
+                            } else {
+                                FreeLibrary(instance);
+                            }
+                        }
+                    } while (_findnext(find_handle, &find_data) != -1L);
+
+                    _findclose(find_handle);
+                }
+
+                count++;
+            }
+
+            // restore the current directory
+
+            if (bOk) {
+                SetCurrentDirectoryW(current_dir);
+            }
+#endif
         }
+#endif // _WIN32
     }
+}
 
 void DLL_CALLCONV
 FreeImage_DeInitialise() {}
@@ -371,21 +371,21 @@ FreeImage_Close(PluginNode *node, FreeImageIO *io, fi_handle handle, void *data)
 FIBITMAP * DLL_CALLCONV
 FreeImage_LoadFromHandle(FREE_IMAGE_FORMAT fif, FreeImageIO *io, fi_handle handle, int flags) 
 {
-        PluginNode *node = s_plugins->FindNodeFromFIF(fif);
+    PluginNode *node = s_plugins->FindNodeFromFIF(fif);
         
     if (node != NULL) 
     {
         if(node->m_plugin->load_proc != NULL) 
         {
-                void *data = FreeImage_Open(node, io, handle, TRUE);
+            void *data = FreeImage_Open(node, io, handle, TRUE);
                     
-                FIBITMAP *bitmap = node->m_plugin->load_proc(io, handle, -1, flags, data);
+            FIBITMAP *bitmap = node->m_plugin->load_proc(io, handle, -1, flags, data);
                     
-                FreeImage_Close(node, io, handle, data);
+            FreeImage_Close(node, io, handle, data);
                     
-                return bitmap;
-            }
+            return bitmap;
         }
+    }
     return NULL;
 }
 
@@ -437,19 +437,19 @@ FreeImage_SaveToHandle(FREE_IMAGE_FORMAT fif, FIBITMAP *dib, FreeImageIO *io, fi
         return FALSE;
     }
 
-        PluginNode *node = s_plugins->FindNodeFromFIF(fif);
+    PluginNode *node = s_plugins->FindNodeFromFIF(fif);
         
-        if (node) {
-            if(node->m_plugin->save_proc != NULL) {
-                void *data = FreeImage_Open(node, io, handle, FALSE);
+    if (node) {
+        if(node->m_plugin->save_proc != NULL) {
+            void *data = FreeImage_Open(node, io, handle, FALSE);
                     
-                BOOL result = node->m_plugin->save_proc(io, dib, handle, -1, flags, data);
+            BOOL result = node->m_plugin->save_proc(io, dib, handle, -1, flags, data);
                     
-                FreeImage_Close(node, io, handle, data);
+            FreeImage_Close(node, io, handle, data);
                     
-                return result;
-            }
+            return result;
         }
+    }
 
     return FALSE;
 }
@@ -464,21 +464,21 @@ FreeImage_SaveToHandleEx(FREE_IMAGE_FORMAT fif, FIBITMAP *dib, FreeImageIO *io, 
         return FALSE;
     }
 
-        PluginNode *node = s_plugins->FindNodeFromFIF(fif);
+    PluginNode *node = s_plugins->FindNodeFromFIF(fif);
 
-        if (node)
+    if (node)
+    {
+        if (node->m_plugin->save_proc != NULL)
         {
-            if (node->m_plugin->save_proc != NULL)
-            {
-                void *data = FreeImage_Open(node, io, handle, FALSE);
+            void *data = FreeImage_Open(node, io, handle, FALSE);
 
-                BOOL result = node->m_plugin->save_proc(io, dib, handle, page, flags, data);
+            BOOL result = node->m_plugin->save_proc(io, dib, handle, page, flags, data);
 
-                FreeImage_Close(node, io, handle, data);
+            FreeImage_Close(node, io, handle, data);
 
-                return result;
-            }
+            return result;
         }
+    }
 
     return FALSE;
 }

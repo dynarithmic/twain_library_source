@@ -28,7 +28,7 @@ namespace dynarithmic
        double top;
        double right;
        double bottom;
-       FloatRect() : left(0), top(0), right(0), bottom(0) {}
+       FloatRect(double l = 0, double t = 0, double r = 0, double b = 0) : left(l), top(t), right(r), bottom(b) {}
     };
 }
 #endif

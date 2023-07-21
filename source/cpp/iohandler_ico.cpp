@@ -46,18 +46,8 @@ int CTL_IcoIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
             width = 255;
             if ( width == 0 )
                 return DTWAIN_ERR_INVALIDICONFORMAT;
-            
-            HANDLE hNewDib = nullptr;
-            {
-                BYTE* pImage = (BYTE*)ImageMemoryHandler::GlobalLock(hDib);
-                DTWAINGlobalHandle_RAII raii(hDib);
-                CxImage ImageHandler(pImage, GlobalSize(hDib), CXIMAGE_FORMAT_BMP);
-                ImageHandler.Resample(width, height, 2);
-                hNewDib = ImageHandler.CopyToHandle();
-            }
-            m_pDib->Delete();
-            m_pDib->SetHandle(hNewDib);
-            hDib = hNewDib;
+            m_pDib->ResampleDib({ static_cast<double>(width), static_cast<double>(height) }, CTL_ITwainSource::RESIZE_FLAG);
+            hDib = m_pDib->GetHandle();
         }
         else
             return DTWAIN_ERR_INVALIDICONFORMAT;

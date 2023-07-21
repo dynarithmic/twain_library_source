@@ -807,7 +807,8 @@ void CTL_ITwainSource::initFileSaveMap() const
 
         m_saveFileMap[TWAINFileFormat_DCX] = MAKE_FILE_FORMAT_INFO("DCX Format (*.dcx)\0*.dcx\0\0", ".dcx");
 
-        m_saveFileMap[TWAINFileFormat_WBMP] = MAKE_FILE_FORMAT_INFO("WBMP (Wireless Bitmap Format) (*.wbmp)\0*.wbmp\0\0", ".wbmp");
+        m_saveFileMap[TWAINFileFormat_WBMP] = m_saveFileMap[TwainFileFormat_WBMP_RESIZED] = 
+                        MAKE_FILE_FORMAT_INFO("WBMP (Wireless Bitmap Format) (*.wbmp)\0*.wbmp\0\0", ".wbmp");
 
         m_saveFileMap[TWAINFileFormat_PNG] =
             m_saveFileMap[DTWAIN_FF_PNG] = MAKE_FILE_FORMAT_INFO("PNG Format (*.png)\0*.png\0\0",".png");
