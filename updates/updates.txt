@@ -5,13 +5,14 @@ DTWAIN Version changes
 - DTWAIN Version numbering will now use 3 components: 
 	  MajorVersion.MinorVersion.PatchVersion
 
-- For DTWAIN_AcquireFile(), DTWAIN_AcquireFileEx(), added image file type DTWAIN_ICO_RESIZED.  
-  This is a Windows ICON file type that is a resized version of the image acquired if the 
-  image's original width and/or height exceeds a length of 255.  The image will be resampled 
-  to a 255 x 255 bitmap if either the width or height exceeds 255.
+- For DTWAIN_AcquireFile(), DTWAIN_AcquireFileEx(), added image file type DTWAIN_ICO_RESIZED
+  and DTWAIN_WBMP_RESIZED.  These are Windows ICON file and Wireless Bitmap files, respectively,
+  that are a resized version of the image acquired if the image's original width and/or height 
+  exceeds a length of 255.  The image will be resampled to a 255 x 255 bitmap if either 
+  the width or height exceeds 255.
 
-  This differs from DTWAIN_ICO in that if the image's width or height acquired exceeds 255,
-  the image will be invalid and thus no image will be created.
+  This differs from DTWAIN_ICO and DTWAIN_WBMP in that if the image's width or height acquired 
+  exceeds 255, the image will be invalid and thus no image file will be created.
 
 - Added DTWAIN_SelectSource alternative functions:
 
