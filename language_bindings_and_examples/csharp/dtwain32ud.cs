@@ -274,6 +274,7 @@ namespace Dynarithmic
         public const  int DTWAIN_WBMP = 8500;
         public const int DTWAIN_WEBP = 8501;
         public const  int DTWAIN_PPM = 10000;
+        public const int DTWAIN_WBMP_RESIZED = 11000;
         public const  int DTWAIN_INCHES = 0;
         public const  int DTWAIN_CENTIMETERS = 1;
         public const  int DTWAIN_PICAS = 2;
