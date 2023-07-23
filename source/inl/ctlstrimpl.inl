@@ -2785,7 +2785,7 @@ LONG DLLENTRY_DEF DTWAIN_GetFileTypeNameW(LONG nType, LPWSTR lpszName, LONG nMax
     return DTWAIN_GetFileTypeName(nType, lpszName, nMaxLen);
 #else
     std::string arg((std::max)(nMaxLen, 0L), 0);
-    const LONG retVal = DTWAIN_GetFileTypeName(nType, (nMaxLen > 0 && lpszName)> 0 ? &arg[0] : nullptr, nMaxLen);
+    const LONG retVal = DTWAIN_GetFileTypeName(nType, (nMaxLen > 0 && lpszName) ? &arg[0] : nullptr, nMaxLen);
     return null_terminator_copier(get_view(arg), lpszName, retVal);
 #endif
 }
