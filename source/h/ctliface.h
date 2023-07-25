@@ -1122,6 +1122,8 @@ namespace dynarithmic
         DTWAINScopedLogController(long newFilter) : m_ErrorFilterFlags(CTL_StaticData::s_lErrorFilterFlags)
         { CTL_StaticData::s_lErrorFilterFlags = newFilter; }
         ~DTWAINScopedLogController() { CTL_StaticData::s_lErrorFilterFlags = m_ErrorFilterFlags; }
+        DTWAINScopedLogController(DTWAINScopedLogController&) = delete;
+        DTWAINScopedLogController& operator=(DTWAINScopedLogController&) = delete;
     };
 
     struct HandleRAII
@@ -1130,6 +1132,8 @@ namespace dynarithmic
         DTWAINGlobalHandle_RAII m_raii;
         HandleRAII(HANDLE h) : m_raii(h), m_pByte(static_cast<LPBYTE>(GlobalLock(h))) {}
         LPBYTE getData() const { return m_pByte; }
+        HandleRAII(HandleRAII&) = delete;
+        HandleRAII& operator=(HandleRAII&) = delete;
     };
 
     struct LogTraitsOff
@@ -1143,6 +1147,8 @@ namespace dynarithmic
     {
         DTWAINScopedLogController m_controller;
         DTWAINScopedLogControllerEx(long newValue) : m_controller(LogTraits::Apply(newValue)) {}
+        DTWAINScopedLogControllerEx(DTWAINScopedLogControllerEx&) = delete;
+        DTWAINScopedLogControllerEx& operator=(DTWAINScopedLogControllerEx&) = delete;
     };
 
     typedef DTWAINScopedLogControllerEx<LogTraitsOff> DTWAINScopedLogControllerExclude;
