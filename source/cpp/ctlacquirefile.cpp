@@ -147,7 +147,6 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireFile(SourceAcquireOptions& opts)
     if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
         return LLAcquireImage(opts);
     auto pr = dynarithmic::StartModalMessageLoop(opts.getSource(), opts);
-    return pr.second;
     LOG_FUNC_EXIT_PARAMS(pr.second)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }

@@ -40,20 +40,15 @@ int CTL_WBMPIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     int height = m_pDib->GetHeight();
     int width = m_pDib->GetWidth();
 
-    if ( height > 255 || width > 255)
-    {
-        if (m_ImageInfoEx.IsWBMPResized)
+    if (m_ImageInfoEx.IsWBMPResized && (height > 255 || width > 255))
         {
             height = 255;
             width = 255;
-            if (width == 0)
-                return DTWAIN_ERR_INVALIDWBMP;
             m_pDib->ResampleDib({static_cast<double>(width), static_cast<double>(height)}, CTL_ITwainSource::RESIZE_FLAG);
             hDib = m_pDib->GetHandle();
         }
         else
             return DTWAIN_ERR_INVALIDWBMP; 
-    }
 
     if (!parent_directory_exists(szFile).first)
         return DTWAIN_ERR_FILEOPEN;
