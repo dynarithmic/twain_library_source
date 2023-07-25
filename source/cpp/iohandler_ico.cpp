@@ -44,8 +44,6 @@ int CTL_IcoIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
         {
             height = 255;
             width = 255;
-            if ( width == 0 )
-                return DTWAIN_ERR_INVALIDICONFORMAT;
             m_pDib->ResampleDib({ static_cast<double>(width), static_cast<double>(height) }, CTL_ITwainSource::RESIZE_FLAG);
             hDib = m_pDib->GetHandle();
         }
