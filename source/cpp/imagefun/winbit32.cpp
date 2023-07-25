@@ -88,7 +88,7 @@ int  CDibInterface::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR pat
     if ( err == IS_ERR_OK)
     {
         const int nUsedColors = CalculateUsedPaletteEntries(bpp);
-        const LPBITMAPINFOHEADER bi = (LPBITMAPINFOHEADER)pImage2;
+        const LPBITMAPINFOHEADER bi = reinterpret_cast<LPBITMAPINFOHEADER>(pImage2);
         bi->biClrUsed = nUsedColors;
         StringStreamA strm;
         strm << nUsedColors;
@@ -119,7 +119,7 @@ RGBQUAD* CDibInterface::GetPalettePtr(BYTE *pDibData, int bpp)
   if ( pDibData && bpp < 16)
   {
       BYTE *pPalette = pDibData + sizeof(BITMAPINFOHEADER);
-      return (RGBQUAD *)pPalette;
+      return reinterpret_cast<RGBQUAD *>(pPalette);
   }
   return nullptr;
 }
