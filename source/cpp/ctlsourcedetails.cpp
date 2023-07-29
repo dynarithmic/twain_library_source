@@ -59,12 +59,11 @@ static void create_stream(std::stringstream& strm, DTWAIN_SOURCE Source, LONG ca
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     DTWAIN_ARRAY arr = nullptr;
     DTWAIN_GetCapValues(Source, capValue, DTWAIN_CAPGET, &arr);
-    LONG nCount = 0;
     DTWAINArrayPtr_RAII raii(&arr);
     if (arr)
     {
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<T>(arr);
-        nCount = vValues.size();
+        auto nCount = vValues.size();
         if (nCount == 0)
             strm << "\"<not available>\"";
         else
@@ -90,12 +89,11 @@ static void create_stream_from_strings(std::stringstream& strm, DTWAIN_SOURCE So
     std::vector<std::string> imageVals;
     DTWAIN_ARRAY arr = nullptr;
     DTWAIN_GetCapValues(Source, capValue, DTWAIN_CAPGET, &arr); //capInfo.get_cap_values<std::vector<std::string>>(capValue);
-    LONG nCount = 0;
     DTWAINArrayPtr_RAII raii(&arr);
     if (arr)
     {
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<std::string>(arr);
-        nCount = vValues.size();
+        auto nCount = vValues.size();
         if (nCount == 0)
             strm << "\"<not available>\"";
         else
