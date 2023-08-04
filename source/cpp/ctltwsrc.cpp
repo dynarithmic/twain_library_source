@@ -796,7 +796,7 @@ void CTL_ITwainSource::initFileSaveMap() const
         m_saveFileMap[TWAINFileFormat_TEXT] =
             m_saveFileMap[TWAINFileFormat_TEXTMULTI] = MAKE_FILE_FORMAT_INFO("Text file (*.txt)\0*.txt\0\0",".txt");
 
-        m_saveFileMap[TWAINFileFormat_ICO] =
+        m_saveFileMap[TWAINFileFormat_ICO] = m_saveFileMap[TwainFileFormat_ICO_RESIZED] =
             m_saveFileMap[TWAINFileFormat_ICO_VISTA] = MAKE_FILE_FORMAT_INFO("Icon file (*.ico)\0*.ico\0\0",".ico");
 
         m_saveFileMap[DTWAIN_FF_SPIFF] = MAKE_FILE_FORMAT_INFO("SPIFF Format (*.spf)\0*.spf\0\0",".spf");
@@ -807,7 +807,8 @@ void CTL_ITwainSource::initFileSaveMap() const
 
         m_saveFileMap[TWAINFileFormat_DCX] = MAKE_FILE_FORMAT_INFO("DCX Format (*.dcx)\0*.dcx\0\0", ".dcx");
 
-        m_saveFileMap[TWAINFileFormat_WBMP] = MAKE_FILE_FORMAT_INFO("WBMP (Wireless Bitmap Format) (*.wbmp)\0*.wbmp\0\0", ".wbmp");
+        m_saveFileMap[TWAINFileFormat_WBMP] = m_saveFileMap[TwainFileFormat_WBMP_RESIZED] = 
+                        MAKE_FILE_FORMAT_INFO("WBMP (Wireless Bitmap Format) (*.wbmp)\0*.wbmp\0\0", ".wbmp");
 
         m_saveFileMap[TWAINFileFormat_PNG] =
             m_saveFileMap[DTWAIN_FF_PNG] = MAKE_FILE_FORMAT_INFO("PNG Format (*.png)\0*.png\0\0",".png");

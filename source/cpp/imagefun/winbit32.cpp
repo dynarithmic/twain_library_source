@@ -88,7 +88,7 @@ int  CDibInterface::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR pat
     if ( err == IS_ERR_OK)
     {
         const int nUsedColors = CalculateUsedPaletteEntries(bpp);
-        const LPBITMAPINFOHEADER bi = (LPBITMAPINFOHEADER)pImage2;
+        const LPBITMAPINFOHEADER bi = reinterpret_cast<LPBITMAPINFOHEADER>(pImage2);
         bi->biClrUsed = nUsedColors;
         StringStreamA strm;
         strm << nUsedColors;
@@ -119,7 +119,7 @@ RGBQUAD* CDibInterface::GetPalettePtr(BYTE *pDibData, int bpp)
   if ( pDibData && bpp < 16)
   {
       BYTE *pPalette = pDibData + sizeof(BITMAPINFOHEADER);
-      return (RGBQUAD *)pPalette;
+      return reinterpret_cast<RGBQUAD *>(pPalette);
   }
   return nullptr;
 }
@@ -310,12 +310,15 @@ HANDLE CDibInterface::NegateDIB(HANDLE hDib)
 
 HANDLE CDibInterface::ResampleDIB(HANDLE hDib, long newx, long newy)
 {
-    fipImage fw;
-    if (!fipImageUtility::copyFromHandle(fw, hDib))
-        return nullptr;
-    fipWinImage_RAII raii(&fw);
-    fw.rescale(newx, newy, FILTER_BSPLINE);
-    return fipImageUtility::copyToHandle(fw);
+    HANDLE hNewDib = nullptr;
+    {
+        BYTE* pImage = (BYTE*)ImageMemoryHandler::GlobalLock(hDib);
+        DTWAINGlobalHandle_RAII raii(hDib);
+        CxImage ImageHandler(pImage, GlobalSize(hDib), CXIMAGE_FORMAT_BMP);
+        ImageHandler.Resample(newx, newy, 2);
+        hNewDib = ImageHandler.CopyToHandle();
+    }
+    return hNewDib;
 }
 
 HANDLE CDibInterface::ResampleDIB(HANDLE hDib, double xscale, double yscale)

@@ -1651,6 +1651,24 @@ DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSourceByNameA(LPCSTR lpszName)
 #endif
 }
 
+DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSourceByNameWithOpenW(LPCWSTR lpszName, DTWAIN_BOOL bOpen)
+{
+#ifdef _UNICODE
+    return DTWAIN_SelectSourceByNameWithOpen(lpszName, bOpen);
+#else
+    return DTWAIN_SelectSourceByNameWithOpen(StringConversion::Convert_WidePtr_To_Native(lpszName).c_str(), bOpen);
+#endif
+}
+
+DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSourceByNameWithOpenA(LPCSTR lpszName, DTWAIN_BOOL bOpen)
+{
+#ifdef _UNICODE
+    return DTWAIN_SelectSourceByNameWithOpen(StringConversion::Convert_AnsiPtr_To_Native(lpszName).c_str(), bOpen);
+#else
+    return DTWAIN_SelectSourceByNameWithOpen(lpszName, bOpen);
+#endif
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2StringW(DTWAIN_SOURCE Source, LPCWSTR left, LPCWSTR top, LPCWSTR right, LPCWSTR bottom, LONG lUnit, LONG Flags)
 {
 #ifdef _UNICODE
@@ -2767,7 +2785,7 @@ LONG DLLENTRY_DEF DTWAIN_GetFileTypeNameW(LONG nType, LPWSTR lpszName, LONG nMax
     return DTWAIN_GetFileTypeName(nType, lpszName, nMaxLen);
 #else
     std::string arg((std::max)(nMaxLen, 0L), 0);
-    const LONG retVal = DTWAIN_GetFileTypeName(nType, (nMaxLen > 0 && lpszName)> 0 ? &arg[0] : nullptr, nMaxLen);
+    const LONG retVal = DTWAIN_GetFileTypeName(nType, (nMaxLen > 0 && lpszName) ? &arg[0] : nullptr, nMaxLen);
     return null_terminator_copier(get_view(arg), lpszName, retVal);
 #endif
 }

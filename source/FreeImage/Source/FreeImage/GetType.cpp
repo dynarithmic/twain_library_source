@@ -36,10 +36,11 @@
 FREE_IMAGE_FORMAT DLL_CALLCONV
 FreeImage_GetFileTypeFromHandle(FreeImageIO *io, fi_handle handle, int size) {
 	if (handle != NULL) {
-		int fif_count = FreeImage_GetFIFCount();
-
-		for (int i = 0; i < fif_count; ++i) {
-			FREE_IMAGE_FORMAT fif = (FREE_IMAGE_FORMAT)i;
+        auto plugins = FreeImage_GetPluginList();
+		auto iterFirst = plugins->Begin();
+		for (;iterFirst != plugins->End(); ++iterFirst)
+		{
+			FREE_IMAGE_FORMAT fif = (FREE_IMAGE_FORMAT)iterFirst->first;
 			if (FreeImage_ValidateFIF(fif, io, handle)) {
 				if(fif == FIF_TIFF) {
 					// many camera raw files use a TIFF signature ...
