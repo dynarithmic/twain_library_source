@@ -1640,6 +1640,7 @@ static bool SysDestroyHelper(CTL_TwainDLLHandle* pHandle, bool bCheck)
     pHandle->m_CallbackMsg = nullptr;
     pHandle->m_CallbackError = nullptr;
     RemoveThreadIdFromAssociation(threadId);
+    FreeImage_ClearPlugins();
     FreeImage_DeInitialise();
     return TRUE;
 }
@@ -2192,9 +2193,7 @@ bool GetDTWAINDLLVersionInfo(HMODULE hMod, LONG* lMajor, LONG* lMinor, LONG *pPa
 
 CTL_StringType GetDTWAINDLLVersionInfoStr()
 {
-    std::ostringstream strm;
-    strm << DTWAIN_MAJOR_VERSION << "." << DTWAIN_MINOR_VERSION << "." << DTWAIN_SUBMINOR_VERSION << "." << DTWAIN_PATCHLEVEL_VERSION;
-    return StringConversion::Convert_Ansi_To_Native(strm.str());
+    return StringConversion::Convert_AnsiPtr_To_Native(DTWAIN_VERINFO_FILEVERSION);
 }
 
 CTL_StringType dynarithmic::GetDTWAININIPath()

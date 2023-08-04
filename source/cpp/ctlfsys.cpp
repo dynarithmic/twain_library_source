@@ -342,25 +342,30 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCamera(DTWAIN_SOURCE Source, LPCTSTR szCamera
 
 bool FSGetCameras(CTL_ITwainSource *pSource, LPDTWAIN_ARRAY Cameras, TW_UINT16 CameraType )
 {
+    LOG_FUNC_ENTRY_PARAMS((pSource, Cameras, CameraType))
     const DTWAIN_ARRAY aCameras = DTWAIN_ArrayCreate(DTWAIN_ARRAYSTRING, 0);
     CameraStruct CS{};
     CS.aCameras = aCameras;
     CS.CameraType = CameraType;
     WalkFileSystem(EnumCameraProc, pSource, _T("/"), reinterpret_cast<LPARAM>(&CS));
     *Cameras = CS.aCameras;
-    return true;
+    LOG_FUNC_EXIT_PARAMS(true)
+    CATCH_BLOCK(false)
 }
 
 bool EnumCameraProc(TW_FILESYSTEM* p, LPARAM UserParam)
 {
+    LOG_FUNC_ENTRY_PARAMS((p, UserParam))
     const CameraStruct *pCS = reinterpret_cast<CameraStruct*>(UserParam);
     if ( p->FileType == pCS->CameraType )
         DTWAIN_ArrayAdd(pCS->aCameras, p->OutputName);
-    return true;
+    LOG_FUNC_EXIT_PARAMS(true)
+    CATCH_BLOCK(false)
 }
 
 bool WalkFileSystem(WALKFSPROC pProc, CTL_ITwainSource* pSource, LPCTSTR szStart, LPARAM UserParam)
 {
+    LOG_FUNC_ENTRY_PARAMS((pProc, pSource, szStart, UserParam))
     std::vector<TCHAR> szCurDir(256, 0);
     DTWAIN_BOOL bRes = DTWAIN_FSChangeDirectory(pSource, szStart);
     LONG Context;
@@ -373,7 +378,7 @@ bool WalkFileSystem(WALKFSPROC pProc, CTL_ITwainSource* pSource, LPCTSTR szStart
     {
         auto FileType = static_cast<TW_UINT16>(pFS->FileType);
         if ( !(*pProc)(pFS, UserParam))
-            return true;
+            LOG_FUNC_EXIT_PARAMS(true)
         switch ( FileType )
         {
             case TWFY_DIRECTORY:
@@ -381,7 +386,7 @@ bool WalkFileSystem(WALKFSPROC pProc, CTL_ITwainSource* pSource, LPCTSTR szStart
                 if ( bRes )
                 {
                     DTWAIN_FSGetClose( pSource, static_cast<LPLONG>(pFS->Context) );
-                    return bRes?true:false;
+                    LOG_FUNC_EXIT_PARAMS(bRes ? true : false)
                 }
             break;
         }
@@ -389,11 +394,13 @@ bool WalkFileSystem(WALKFSPROC pProc, CTL_ITwainSource* pSource, LPCTSTR szStart
     }
 
     DTWAIN_FSGetClose(pSource, &Context);
-    return TRUE;
+    LOG_FUNC_EXIT_PARAMS(true)
+    CATCH_BLOCK(false)
 }
 
 DTWAIN_BOOL FSGetFileInfo(CTL_ITwainSource* pSource, LPCTSTR szFileName, TW_FILESYSTEM* pFS)
 {
+    LOG_FUNC_ENTRY_PARAMS((pSource, szFileName, pFS))
     const auto pSession = pSource->GetTwainSession();
     CTL_FileSystemTriplet FS(pSession, pSource);
     const TW_UINT16 rc = FS.GetInfo(szFileName);
@@ -401,22 +408,25 @@ DTWAIN_BOOL FSGetFileInfo(CTL_ITwainSource* pSource, LPCTSTR szFileName, TW_FILE
     {
         case TWRC_SUCCESS:
             *pFS = FS.GetTWFileSystem();
-            return TRUE;
+            LOG_FUNC_EXIT_PARAMS(TRUE)
+        break;
 
         case TWRC_FAILURE:
         {
             const TW_UINT16 cc = CTL_TwainAppMgr::GetConditionCode(pSession, pSource);
             CTL_TwainAppMgr::ProcessConditionCodeError(cc);
-            return FALSE;
+            LOG_FUNC_EXIT_PARAMS(FALSE);
         }
-
+        break;
         default: {}
     }
-    return FALSE;
+    LOG_FUNC_EXIT_PARAMS(FALSE);
+    CATCH_BLOCK(FALSE)
 }
 
 DTWAIN_BOOL FSDirectory(CTL_ITwainSource* pSource, LPCTSTR sDir, LONG nWhich)
 {
+    LOG_FUNC_ENTRY_PARAMS((pSource, sDir, nWhich))
     const auto pSession = pSource->GetTwainSession();
     CTL_FileSystemTriplet FS(pSession, pSource);
     TW_UINT16 rc = 0;
@@ -436,12 +446,15 @@ DTWAIN_BOOL FSDirectory(CTL_ITwainSource* pSource, LPCTSTR sDir, LONG nWhich)
         default: ;
     }
 
-    return GetResults(pSource, &FS, rc);
+    DTWAIN_BOOL results = GetResults(pSource, &FS, rc);
+    LOG_FUNC_EXIT_PARAMS(results)
+    CATCH_BLOCK(FALSE)
 }
 
 
 DTWAIN_BOOL FSFileOp(CTL_ITwainSource* pSource, LPCTSTR sInput, LPCTSTR sOutput, LONG nWhich)
 {
+    LOG_FUNC_ENTRY_PARAMS((pSource, sInput, sOutput, nWhich))
     const auto pSession = pSource->GetTwainSession();
     CTL_FileSystemTriplet FS(pSession, pSource);
     TW_UINT16 rc = 0;
@@ -457,12 +470,15 @@ DTWAIN_BOOL FSFileOp(CTL_ITwainSource* pSource, LPCTSTR sInput, LPCTSTR sOutput,
         default: ;
     }
 
-    return GetResults(pSource, &FS, rc);
+    DTWAIN_BOOL results = GetResults(pSource, &FS, rc);
+    LOG_FUNC_EXIT_PARAMS(results)
+    CATCH_BLOCK(FALSE)
 }
 
 
 DTWAIN_BOOL FSFileOp2(CTL_ITwainSource* pSource, LPCTSTR sInput, DTWAIN_BOOL bRecursive, LONG nWhich)
 {
+    LOG_FUNC_ENTRY_PARAMS((pSource, sInput, bRecursive, nWhich))
     const auto pSession = pSource->GetTwainSession();
     CTL_FileSystemTriplet FS(pSession, pSource);
     TW_UINT16 rc = 0;
@@ -473,12 +489,15 @@ DTWAIN_BOOL FSFileOp2(CTL_ITwainSource* pSource, LPCTSTR sInput, DTWAIN_BOOL bRe
         break;
         default: ;
     }
-    return GetResults(pSource, &FS, rc);
+    DTWAIN_BOOL results = GetResults(pSource, &FS, rc);
+    LOG_FUNC_EXIT_PARAMS(results)
+    CATCH_BLOCK(FALSE)
 }
 
 
 LONG FSGetFile(CTL_ITwainSource* pSource, LPTSTR sDir, LPLONG FSHandle, LONG nWhich)
 {
+    LOG_FUNC_ENTRY_PARAMS((pSource, sDir, FSHandle, nWhich))
     const auto pSession = pSource->GetTwainSession();
     CTL_FileSystemTriplet FS(pSession, pSource);
     TW_UINT16 rc = 0;
@@ -505,11 +524,13 @@ LONG FSGetFile(CTL_ITwainSource* pSource, LPTSTR sDir, LPLONG FSHandle, LONG nWh
         if ( nWhich != GET_CLOSE)
             StringWrapper::SafeStrcpy(sDir, StringConversion::Convert_AnsiPtr_To_Native(pFS->OutputName).c_str());
     }
-    return bRet;
+    LOG_FUNC_EXIT_PARAMS(bRet)
+    CATCH_BLOCK(FALSE)
 }
 
 bool GetResults(CTL_ITwainSource* pSource, CTL_FileSystemTriplet* pFST, TW_UINT16 rc)
 {
+    LOG_FUNC_ENTRY_PARAMS((pSource, pFST, rc))
     const auto pSession = pSource->GetTwainSession();
     switch (rc)
     {
@@ -517,17 +538,18 @@ bool GetResults(CTL_ITwainSource* pSource, CTL_FileSystemTriplet* pFST, TW_UINT1
         {
             TW_FILESYSTEM *pFS = pSource->GetFileSystem();
             *pFS = pFST->GetTWFileSystem();
-            return true;
+            LOG_FUNC_EXIT_PARAMS(true)
         }
 
         case TWRC_FAILURE:
         {
             const TW_UINT16 cc = CTL_TwainAppMgr::GetConditionCode(pSession, pSource);
             CTL_TwainAppMgr::ProcessConditionCodeError(cc);
-            return false;
+            LOG_FUNC_EXIT_PARAMS(false)
         }
 
         default:{}
     }
-    return false;
+    LOG_FUNC_EXIT_PARAMS(false)
+    CATCH_BLOCK(false)
 }

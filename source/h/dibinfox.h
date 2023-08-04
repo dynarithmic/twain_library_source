@@ -101,6 +101,8 @@ namespace dynarithmic
         CTL_ITwainSession* theSession;
         bool IsSearchableTextOnPage;
         bool IsCreateDirectory;
+        bool IsIcoResized;
+        bool IsWBMPResized;
 
         LONG nJpegQuality;
         bool bProgressiveJpeg;
@@ -124,7 +126,6 @@ namespace dynarithmic
         CTL_SEARCHABLETEXTRANGE PDFSearchableTextRange;
         DTWAINImageOCRPDFInfo PDFOCRInfo;
 
-        // Vista ICONs
         DTWAINImageInfoEx() :
             PostscriptType(0),
             IsPostscript(false),
@@ -160,7 +161,9 @@ namespace dynarithmic
             PDFThumbnailScale{},
             PDFCustomSize{},
             PDFCustomScale{},
-            IsCreateDirectory(false)
+            IsCreateDirectory(false),
+            IsIcoResized(false),
+            IsWBMPResized(false)
         {
         }
     };

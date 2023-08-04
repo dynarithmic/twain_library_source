@@ -402,7 +402,9 @@ namespace dynarithmic
                    TextFormatMulti = DTWAIN_TEXTMULTI,
                    IcoFormat = DTWAIN_ICO,
                    IcoVistaFormat = DTWAIN_ICO_VISTA,
+                   IcoFormatResized = DTWAIN_ICO_RESIZED,
                    WBMPFormat = DTWAIN_WBMP,
+                   WBMPFormatResized = DTWAIN_WBMP_RESIZED,
                    WEBPFormat = DTWAIN_WEBP,
                    PBMFormat = DTWAIN_PBM,
                    RawFormat=9999};
@@ -456,7 +458,7 @@ namespace dynarithmic
                         LONG SourceUnit, LONG DestUnit, int dpi,
                         int flags);
 
-            int ResampleDib(FloatRect& ResampleRect, int flags);
+            int ResampleDib(const FloatRect& ResampleRect, int flags);
             int ResampleDib(double xscale, double yscale);
 
             // Increase bpp

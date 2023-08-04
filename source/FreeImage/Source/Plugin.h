@@ -29,6 +29,7 @@
 
 #include "FreeImage.h"
 #include "Utilities.h"
+#include <memory>
 
 // ==========================================================
 
@@ -44,7 +45,7 @@ FI_STRUCT (PluginNode) {
 	/** Handle to a user plugin DLL (NULL for standard plugins) */
 	void *m_instance;
 	/** The actual plugin, holding the function pointers */
-	Plugin *m_plugin;
+	std::unique_ptr<Plugin> m_plugin;
 	/** Enable/Disable switch */
 	BOOL m_enabled;
 
@@ -67,16 +68,18 @@ public :
 	PluginList();
 	~PluginList();
 
-	FREE_IMAGE_FORMAT AddNode(FI_InitProc proc, void *instance = NULL, const char *format = 0, const char *description = 0, const char *extension = 0, const char *regexpr = 0);
+	FREE_IMAGE_FORMAT AddNode(FI_InitProc proc, int nFIF, void *instance = NULL, const char *format = 0, const char *description = 0, const char *extension = 0, const char *regexpr = 0);
 	PluginNode *FindNodeFromFormat(const char *format);
 	PluginNode *FindNodeFromMime(const char *mime);
 	PluginNode *FindNodeFromFIF(int node_id);
 
 	int Size() const;
 	BOOL IsEmpty() const;
+	auto Begin() { return m_plugin_map.begin(); }
+    auto End() { return m_plugin_map.end(); }
 
 private :
-	std::map<int, PluginNode *> m_plugin_map;
+	std::map<int, std::unique_ptr<PluginNode>> m_plugin_map;
 	int m_node_count;
 };
 
