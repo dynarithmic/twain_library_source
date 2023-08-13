@@ -733,7 +733,7 @@ void CxImage::SetRetreiveAllFrames(bool flag)
 ////////////////////////////////////////////////////////////////////////////////
 CxImage * CxImage::GetFrame(int32_t nFrame) const
 {
-	if ( ppFrames == NULL) return NULL;
+	if ( ppFrames.empty() ) return NULL;
 	if ( info.nNumFrames == 0) return NULL;
 	if ( nFrame >= info.nNumFrames ) return NULL;
 	if ( nFrame < 0) nFrame = info.nNumFrames - 1;
@@ -782,7 +782,7 @@ uint32_t CxImage::DumpSize()
 	n = sizeof(BITMAPINFOHEADER) + sizeof(CXIMAGEINFO) + GetSize();
 
 #if CXIMAGE_SUPPORT_ALPHA
-	if (pAlpha){
+	if (!pAlpha.empty()){
 		n += 1 + head.biWidth * head.biHeight;
 	} else n++;
 #endif
@@ -803,7 +803,7 @@ uint32_t CxImage::DumpSize()
 	} else n++;
 #endif
 
-	if (ppFrames){
+	if (!ppFrames.empty()){
 		for (int32_t m=0; m<GetNumFrames(); m++){
 			if (GetFrame(m)){
 				n += 1 + GetFrame(m)->DumpSize();
@@ -828,9 +828,9 @@ uint32_t CxImage::Dump(uint8_t * dst)
 	dst += GetSize();
 
 #if CXIMAGE_SUPPORT_ALPHA
-	if (pAlpha){
+	if (!pAlpha.empty()){
 		memset(dst++, 1, 1);
-		memcpy(dst,pAlpha,head.biWidth * head.biHeight);
+		memcpy(dst,pAlpha.data(),head.biWidth * head.biHeight);
 		dst += head.biWidth * head.biHeight;
 	} else {
 		memset(dst++, 0, 1);
@@ -860,7 +860,7 @@ uint32_t CxImage::Dump(uint8_t * dst)
 	}
 #endif
 
-	if (ppFrames){
+	if (!ppFrames.empty()){
 		memset(dst++, 1, 1);
 		for (int32_t m=0; m<GetNumFrames(); m++){
 			if (GetFrame(m)){
@@ -900,7 +900,7 @@ uint32_t CxImage::UnDump(const uint8_t * src)
 #if CXIMAGE_SUPPORT_ALPHA
 	if (src[n++]){
 		if (AlphaCreate()){
-			memcpy(pAlpha, &src[n], head.biWidth * head.biHeight);
+			memcpy(pAlpha.data(), &src[n], head.biWidth * head.biHeight);
 		}
 		n += head.biWidth * head.biHeight;
 	}
@@ -928,7 +928,7 @@ uint32_t CxImage::UnDump(const uint8_t * src)
 #endif
 
 	if (src[n++]){
-		ppFrames = new CxImage*[info.nNumFrames];
+		ppFrames.resize(info.nNumFrames);
 		for (int32_t m=0; m<GetNumFrames(); m++){
 			ppFrames[m] = new CxImage();
 			n += ppFrames[m]->UnDump(&src[n]);
