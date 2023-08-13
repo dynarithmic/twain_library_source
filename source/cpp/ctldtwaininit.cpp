@@ -271,11 +271,14 @@ LONG DLLENTRY_DEF DTWAIN_GetStaticLibVersion()
             #pragma message ("Microsoft Visual Studio 2015 compiler used to build library")
             LOG_FUNC_EXIT_PARAMS(61)
         #elif _MSC_VER >= 1910 && _MSC_VER < 1920
-            #pragma message ("Microsoft Visual Studio 2017 compiler to build library")
+            #pragma message ("Microsoft Visual Studio 2017 compiler used to build library")
             LOG_FUNC_EXIT_PARAMS(71)
         #elif _MSC_VER >= 1920
-            #pragma message ("Microsoft Visual Studio 2019 compiler or greater compiler used to build library")
+            #pragma message ("Microsoft Visual Studio 2019 compiler used to build library")
             LOG_FUNC_EXIT_PARAMS(81)
+        #elif _MSC_VER >= 1930
+            #pragma message ("Microsoft Visual Studio 2022 compiler used to build library")
+            LOG_FUNC_EXIT_PARAMS(91)
         #endif
     #endif
     #ifndef _MSC_VER
@@ -951,7 +954,7 @@ void LoadStaticData(CTL_TwainDLLHandle* pHandle)
         static constexpr int TwainFloatTypes[] = {TWTY_FIX32};
         static constexpr int TwainFrameTypes[] = {TWTY_FRAME};
         static constexpr int DTwainArrayTypes[] = {DTWAIN_ARRAYLONG, DTWAIN_ARRAYANSISTRING, DTWAIN_ARRAYFLOAT, DTWAIN_ARRAYFRAME};
-        static constexpr int NumTwainTypes[] = {std::size(TwainIntTypes),
+        static constexpr size_t NumTwainTypes[] = {std::size(TwainIntTypes),
                                          std::size(TwainStringTypes),
                                          std::size(TwainFloatTypes),
                                          std::size(TwainFrameTypes)};
@@ -976,7 +979,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLog(LONG LogFlags, LPCTSTR lpszLogFile)
     // If the log flags have not specified what to log
     // then log callstack and general TWAIN send/receive info.
     LONG allFlags = DTWAIN_LOG_ALL;
-    if ( (LogFlags & allFlags) == 0)  
+    if ( (LogFlags != 0) && (LogFlags & allFlags) == 0)  
         LogFlags |= (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_DECODE_SOURCE | DTWAIN_LOG_DECODE_DEST | DTWAIN_LOG_MISCELLANEOUS);
 
     CTL_StaticData::s_lErrorFilterFlags = LogFlags;
@@ -1356,14 +1359,17 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lp
 static DTWAIN_ARRAY GetFileTypes(int nType)
 {
     constexpr const char *sNames[] = { "","-Single","-Multi" };
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     DTWAIN_ARRAY aFileTypes = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 0);
     if (aFileTypes)
     {
-        const auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
+        auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
+        auto& factory = pHandle->m_ArrayFactory;
         for (auto& pr : availableFileTypes)
         {
+            auto val = pr.first;
             if (StringWrapperA::EndsWith(pr.second.m_formatName, sNames[nType]))
-                DTWAIN_ArrayAddLong(aFileTypes, pr.first);
+                factory->add_to_back(aFileTypes, &val, 1);
         }
     }
     return aFileTypes;
