@@ -26,8 +26,8 @@
  * ==========================================================
  */
 
-#if !defined(__ImaIter_h)
-#define __ImaIter_h
+#if !defined(ImaIter_h)
+#define ImaIter_h
 
 #include "ximage.h"
 #include "ximadef.h"

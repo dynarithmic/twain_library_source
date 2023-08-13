@@ -150,7 +150,7 @@ bool CxImageTGA::Encode(CxFile * hFile)
     tgaHead.PixelDepth=(uint8_t)head.biBitCount;	// Pixel Depth
     tgaHead.ImagDesc=0;					// Image Descriptor
 
-	if (pAlpha && head.biBitCount==24) tgaHead.PixelDepth=32; 
+	if (!pAlpha.empty() && head.biBitCount==24) tgaHead.PixelDepth=32; 
 
 	tga_toh(&tgaHead);
 	hFile->Write(&tgaHead,sizeof(TGAHEADER),1);
@@ -169,7 +169,7 @@ bool CxImageTGA::Encode(CxFile * hFile)
 	
 	CImageIterator iter(this);
 	uint8_t* pDest;
-	if (pAlpha==0 || head.biBitCount==8){
+	if (pAlpha.empty() || head.biBitCount==8){
 		for (int32_t y=0; y < tgaHead.ImageHeight; y++){
 			pDest = iter.GetRow(y);
 			hFile->Write(pDest,tgaHead.ImageWidth * (head.biBitCount >> 3),1);

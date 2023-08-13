@@ -202,22 +202,20 @@ bool CxImage::Flip(bool bFlipSelection, bool bFlipAlpha)
 {
 	if (!pDib) return false;
 
-	uint8_t *buff = (uint8_t*)malloc(info.dwEffWidth);
-	if (!buff) return false;
+	std::vector<uint8_t> buff(info.dwEffWidth);
 
-	uint8_t *iSrc,*iDst;
+	uint8_t* iSrc = nullptr;
+	uint8_t* iDst = nullptr;
 	iSrc = GetBits(head.biHeight-1);
 	iDst = GetBits(0);
 	for (int32_t i=0; i<(head.biHeight/2); ++i)
 	{
-		memcpy(buff, iSrc, info.dwEffWidth);
+		memcpy(buff.data(), iSrc, info.dwEffWidth);
 		memcpy(iSrc, iDst, info.dwEffWidth);
-		memcpy(iDst, buff, info.dwEffWidth);
+		memcpy(iDst, buff.data(), info.dwEffWidth);
 		iSrc-=info.dwEffWidth;
 		iDst+=info.dwEffWidth;
 	}
-
-	free(buff);
 
 	if (bFlipSelection){
 #if CXIMAGE_SUPPORT_SELECTION
@@ -241,10 +239,9 @@ bool CxImage::Mirror(bool bMirrorSelection, bool bMirrorAlpha)
 {
 	if (!pDib) return false;
 
-	CxImage* imatmp = new CxImage(*this,false,true,true);
-	if (!imatmp) return false;
-	if (!imatmp->IsValid()){
-		delete imatmp;
+	std::unique_ptr<CxImage> imatmp = std::make_unique<CxImage>(*this,false,true,true);
+	if (!imatmp->IsValid())
+	{
 		return false;
 	}
 
@@ -293,7 +290,6 @@ bool CxImage::Mirror(bool bMirrorSelection, bool bMirrorAlpha)
 	}
 
 	Transfer(*imatmp);
-	delete imatmp;
 	return true;
 }
 
@@ -2214,8 +2210,8 @@ bool CxImage::Crop(int32_t left, int32_t top, int32_t right, int32_t bottom, CxI
 	if (AlphaIsValid()){ //<oboolo>
 		tmp.AlphaCreate();
 		if (!tmp.AlphaIsValid()) return false;
-		uint8_t* pDest = tmp.pAlpha;
-		uint8_t* pSrc = pAlpha + startx + starty*head.biWidth;
+		uint8_t* pDest = tmp.pAlpha.data();
+		uint8_t* pSrc = pAlpha.data() + startx + starty*head.biWidth;
 		for (int32_t y=starty; y<endy; y++){
 			memcpy(pDest,pSrc,endx-startx);
 			pDest+=tmp.head.biWidth;
@@ -2686,7 +2682,8 @@ bool CxImage::QIShrink(int32_t newx, int32_t newy, CxImage* const iDst, bool bCh
 				*(accuPtr+2) += rgb.rgbGreen;
 				(*(accuPtr+3)) ++;
 #if CXIMAGE_SUPPORT_ALPHA
-				if (pAlpha) *(accuPtr+4) += rgb.rgbReserved;
+				if (!pAlpha.empty()) 
+					*(accuPtr+4) += rgb.rgbReserved;
 #endif
 				if (ex>oldx) {                                                //when we reach oldx, it's time to move to new slot
 					accuPtr += accuCellSize;
@@ -2702,9 +2699,10 @@ bool CxImage::QIShrink(int32_t newx, int32_t newy, CxImage* const iDst, bool bCh
 					rgb.rgbRed  = (uint8_t)(*(accuPtr+1) / *(accuPtr+3));
 					rgb.rgbGreen= (uint8_t)(*(accuPtr+2) / *(accuPtr+3));
 #if CXIMAGE_SUPPORT_ALPHA
-					if (pAlpha) rgb.rgbReserved = (uint8_t)(*(accuPtr+4) / *(accuPtr+3));
+					if (!pAlpha.empty()) 
+						rgb.rgbReserved = (uint8_t)(*(accuPtr+4) / *(accuPtr+3));
 #endif
-					newImage.SetPixelColor(dx, dy, rgb, pAlpha!=0);
+					newImage.SetPixelColor(dx, dy, rgb, !pAlpha.empty());
 					accuPtr += accuCellSize;
 				}//for dx
 				memset(accu, 0, newx * accuCellSize * sizeof(uint32_t));                   //clear accu
