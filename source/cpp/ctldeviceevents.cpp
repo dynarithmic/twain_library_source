@@ -148,7 +148,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventEx(DTWAIN_SOURCE Source, LPLONG lp
 
     const CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
     const CTL_DeviceEvent DeviceEvent = pSource->GetDeviceEvent();
-    const DTWAIN_BOOL bRet = DeviceEvent.GetEventInfoEx(pArray);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const DTWAIN_BOOL bRet = DeviceEvent.GetEventInfoEx(pHandle, pArray);
     LOG_FUNC_EXIT_PARAMS(bRet)
         CATCH_BLOCK(false)
 }

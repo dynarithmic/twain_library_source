@@ -1,27 +1,24 @@
-#include "crc32_aux.h"
-#ifdef DYNAMIC_CRC_TABLE
-/* =========================================================================
- * Make the crc table. This function is needed only if you want to compute
- * the table dynamically.
+/*
+    This file is part of the Dynarithmic TWAIN Library (DTWAIN).
+    Copyright (c) 2002-2023 Dynarithmic Software.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+    FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
+    DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
+    OF THIRD PARTY RIGHTS.
  */
-static int crc_table_empty = 1;
-static unsigned long crc_table[256];
-
-static void make_crc_table()
-{
-  unsigned long c;
-  int n, k;
-
-  for (n = 0; n < 256; n++)
-  {
-    c = (unsigned long)n;
-    for (k = 0; k < 8; k++)
-      c = c & 1 ? 0xedb88320L ^ (c >> 1) : c >> 1;
-    crc_table[n] = c;
-  }
-  crc_table_empty = 0;
-}
-#else
+#include "crc32_aux.h"
 /* ========================================================================
  * Table of CRC-32's of all single-byte values (made by make_crc_table)
  */
@@ -79,7 +76,6 @@ static unsigned long crc_table[] = {
   0x5d681b02L, 0x2a6f2b94L, 0xb40bbe37L, 0xc30c8ea1L, 0x5a05df1bL,
   0x2d02ef8dL
 };
-#endif
 
 #define DO1(buf) crc = crc_table[((int)crc ^ (*buf++)) & 0xff] ^ (crc >> 8);
 #define DO2(buf)  DO1(buf); DO1(buf);

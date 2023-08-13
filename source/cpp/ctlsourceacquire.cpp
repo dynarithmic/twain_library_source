@@ -36,11 +36,12 @@
 using namespace dynarithmic;
 
 template <typename PtrType>
-static void ParseFileNames(DTWAIN_ARRAY FileList, PtrType lpszFiles, DTWAIN_ARRAY pArray)
+static void ParseFileNames(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY FileList, PtrType lpszFiles, DTWAIN_ARRAY pArray)
 {
+    auto& factory = pHandle->m_ArrayFactory;
     if (FileList)
     {
-        DTWAIN_ArrayCopy(FileList, pArray);
+        factory->copy(pArray, FileList);
         return;
     }
 
@@ -49,10 +50,15 @@ static void ParseFileNames(DTWAIN_ARRAY FileList, PtrType lpszFiles, DTWAIN_ARRA
     std::vector<CTL_StringType> strArray;
 
     const int nTokens = StringWrapper::TokenizeQuoted(strTemp, szParseDelim.c_str(), strArray);
-    DTWAIN_ArrayRemoveAll(pArray);
-    for_each(strArray.begin(), strArray.begin() + nTokens, [&](const CTL_StringType& s)
+    factory->clear(pArray);
+    std::for_each(strArray.begin(), strArray.begin() + nTokens, [&](const CTL_StringType& s)
     {
-        DTWAIN_ArrayAddString(pArray, s.c_str());
+    #ifdef _UNICODE
+        std::wstring val = s;
+    #else
+        std::string val = s;
+    #endif
+        factory->add_to_back(pArray, &val, 1);
     });
 }
 
@@ -580,7 +586,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
                 }
 
                 // Parse the filename string into the array
-                ParseFileNames(opts.getFileList(), opts.getFileName(), pArray);
+                ParseFileNames(pHandle, opts.getFileList(), opts.getFileName(), pArray);
                 CTL_StringType szName;
                 const size_t nFileCount = pHandle->m_ArrayFactory->size(pArray);
                 if (nFileCount > 0)
@@ -590,8 +596,8 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
 
                 if (nFileCount == 0 || szName.empty())
                 {
-                    DTWAIN_ArrayDestroy(pArray);
-                    // Check if at least one file is in array
+                    const auto& factory = pHandle->m_ArrayFactory;
+                    factory->destroy(pArray);
                     DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{ return true; }, DTWAIN_ERR_EMPTY_ARRAY, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
                 }
 

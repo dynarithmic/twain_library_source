@@ -522,8 +522,8 @@ LRESULT CALLBACK_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                             LOG_FUNC_STRING(No UI Mode Done -- Copying DIBS to Source...)
                             DTWAIN_ARRAY aDibs = nullptr;
                             aDibs = DTWAIN_ArrayCreate( DTWAIN_ARRAYHANDLE, 0 );
-                           DTWAIN_GetAllSourceDibs( static_cast<DTWAIN_SOURCE>(pSource), aDibs );
-                            int nDibs = DTWAIN_ArrayGetCount(aDibs);
+                            DTWAIN_GetAllSourceDibs( static_cast<DTWAIN_SOURCE>(pSource), aDibs );
+                            int nDibs = pHandle->m_ArrayFactory->size(aDibs);
                             StringStreamA strm;
                             strm << buf;
                             LOG_FUNC_VALUES(strm.str().c_str())
