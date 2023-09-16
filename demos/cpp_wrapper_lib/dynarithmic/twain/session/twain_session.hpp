@@ -85,7 +85,7 @@ namespace dynarithmic
 
             static DTWAIN_SOURCE select(twain_select_dialog& dlg)
             {
-                #ifdef _WIN32
+#ifdef _WIN32
                 auto position = dlg.get_position();
                 int32_t allFlags = 0;
                 auto flags = dlg.get_flags();
@@ -101,17 +101,17 @@ namespace dynarithmic
                 std::string strTitle = dlg.get_title();
                 API_INSTANCE DTWAIN_SetTwainDialogFont(dlg.get_font());
                 return API_INSTANCE DTWAIN_SelectSource2ExA(dlg.get_parent_window(),
-                                            (allFlags & twain_select_dialog::usedefaulttitle)?nullptr:strTitle.c_str(),
-                                            position.first, 
-                                            position.second,
-                                            dlg.get_includename_list().c_str(),
-                                            dlg.get_excludename_list().c_str(),
-                                            dlg.get_name_mapping_s().c_str(),
-                                            allFlags); 
-                                                                                                  
-                #else
-                    return API_INSTANCE DTWAIN_SelectSource();
-                #endif
+                    (allFlags & twain_select_dialog::usedefaulttitle) ? nullptr : strTitle.c_str(),
+                    position.first,
+                    position.second,
+                    dlg.get_includename_list().c_str(),
+                    dlg.get_excludename_list().c_str(),
+                    dlg.get_name_mapping_s().c_str(),
+                    allFlags);
+
+#else
+                return API_INSTANCE DTWAIN_SelectSource();
+#endif
             }
         };
 
@@ -503,9 +503,9 @@ namespace dynarithmic
                 /// Registers a custom logging object derived from twain_logger with this TWAIN session.
                 /// 
                 /// @param[in] logger custom logger object
-            /// @see unregister_logger
-            template <typename Logger, typename ...Args>
-            Logger& register_logger(Args... theArgs)
+                /// @see unregister_logger
+                template <typename Logger, typename ...Args>
+                Logger& register_logger(Args... theArgs)
                 {
                     static_assert(std::is_base_of<twain_logger, Logger>::value == 1, "Logger is not derived from twain_logger");
                 auto ptr = std::make_unique<Logger>(std::forward<Args>(theArgs)...);
@@ -516,75 +516,74 @@ namespace dynarithmic
                 /// Removes logger from this TWAIN session
                 /// 
                 /// @see register_logger
-            void unregister_logger()
-            {
-                if (m_logger.second)
-                    m_logger.second.reset();
-                m_logger = { nullptr, nullptr };
-            }
-
-                /// Allows logging to be turned on or off during a TWAIN Session.
-                /// 
-                /// To set the details of the logging setting, use the get_twain_characteristics().get_logger_details() to set the various details.
-                /// @note enable_logger() is the only mechanism that can be used to enable or disable logging after a TWAIN
-                /// session has started.
-                /// @param[in] enable if **true** the logging is enabled, **false**, logging is disabled.
-                void enable_logger(bool enable = true);
-
-                /// Sets the enabling of triplet notifications being sent to the application
-                /// 
-                /// @returns reference to the object that identifies this session by TWAIN.
-                twain_session& enable_triplets_notification(bool bEnable);
-
-                /// Returns the complete object that represents this TWAIN session's identity.
-                /// 
-                /// @returns reference to the object that identifies this session by TWAIN.
-                /// @note Unlike get_twain_id(), get_id() returns an object that describes the TWAIN session's name, language, etc.
-                /// @see get_twain_id()
-                twain_identity& get_id() { return m_twain_characteristics.get_app_info(); }
-
-                /// Returns the TW_IDENTITY* that represents this TWAIN session.
-                /// 
-                /// @returns a pointer to the **TW_IDENTITY** that represents this TWAIN session.  
-                /// @note The return value can be used in a call to call_dsm().
-                /// @see call_dsm() get_id()
-                TW_IDENTITY* get_twain_id() { return static_cast<TW_IDENTITY*>(&get_id().get_identity()); }
-
-                template <typename Container>
-                void get_sources_impl(Container& c) const
+                void unregister_logger()
                 {
-                    c.clear();
-                    if (!m_source_cache.empty())
-                    {
-                        std::copy(m_source_cache.begin(),
-                            m_source_cache.end(),
-                            std::inserter(c, c.end()));
-                        return;
-                    }
+                    if (m_logger.second)
+                        m_logger.second.reset();
+                    m_logger = { nullptr, nullptr };
+                }
 
-                    twain_array ta;
-                    if (API_INSTANCE DTWAIN_EnumSources(ta.get_array_ptr()))
+            /// Allows logging to be turned on or off during a TWAIN Session.
+            /// 
+            /// To set the details of the logging setting, use the get_twain_characteristics().get_logger_details() to set the various details.
+            /// @note enable_logger() is the only mechanism that can be used to enable or disable logging after a TWAIN
+            /// session has started.
+            /// @param[in] enable if **true** the logging is enabled, **false**, logging is disabled.
+            void enable_logger(bool enable = true);
+
+            /// Sets the enabling of triplet notifications being sent to the application
+            /// 
+            /// @returns reference to the object that identifies this session by TWAIN.
+            twain_session& enable_triplets_notification(bool bEnable);
+
+            /// Returns the complete object that represents this TWAIN session's identity.
+            /// 
+            /// @returns reference to the object that identifies this session by TWAIN.
+            /// @note Unlike get_twain_id(), get_id() returns an object that describes the TWAIN session's name, language, etc.
+            /// @see get_twain_id()
+            twain_identity& get_id() { return m_twain_characteristics.get_app_info(); }
+
+            /// Returns the TW_IDENTITY* that represents this TWAIN session.
+            /// 
+            /// @returns a pointer to the **TW_IDENTITY** that represents this TWAIN session.  
+            /// @note The return value can be used in a call to call_dsm().
+            /// @see call_dsm() get_id()
+            TW_IDENTITY* get_twain_id() { return static_cast<TW_IDENTITY*>(&get_id().get_identity()); }
+
+            template <typename Container>
+            void get_sources_impl(Container& c) const
+            {
+                c.clear();
+                if (!m_source_cache.empty())
+                {
+                    std::copy(m_source_cache.begin(),
+                        m_source_cache.end(),
+                        std::inserter(c, c.end()));
+                    return;
+                }
+
+                twain_array ta;
+                if (API_INSTANCE DTWAIN_EnumSources(ta.get_array_ptr()))
+                {
+                    DTWAIN_SOURCE src;
+                    const size_t nSources = ta.get_count();
+                    auto insert_iter = std::inserter(c, c.end());
+                    for (size_t i = 0; i < nSources; ++i)
                     {
-                        DTWAIN_SOURCE src;
-                        const size_t nSources = ta.get_count();
-                        auto insert_iter = std::inserter(c, c.end());
-                        for (size_t i = 0; i < nSources; ++i)
-                        {
-                            twain_identity tInfo;
-                            API_INSTANCE DTWAIN_ArrayGetAt(ta.get_array(), static_cast<int32_t>(i), &src);
-                            char szBuf[256];
-                            API_INSTANCE DTWAIN_GetSourceProductNameA(src, szBuf, 255);
-                            tInfo.set_product_name(szBuf);
-                            API_INSTANCE DTWAIN_GetSourceProductFamilyA(src, szBuf, 255);
-                            tInfo.set_product_family(szBuf);
-                            API_INSTANCE DTWAIN_GetSourceManufacturerA(src, szBuf, 255);
-                            tInfo.set_manufacturer(szBuf);
-                            API_INSTANCE DTWAIN_GetSourceVersionInfoA(src, szBuf, 255);
-                            tInfo.set_version_info(szBuf);
-                            (*insert_iter) = tInfo;
-                            ++insert_iter;
-                            m_source_cache.push_back(tInfo);
-                        }
+                        twain_identity tInfo;
+                        API_INSTANCE DTWAIN_ArrayGetAt(ta.get_array(), static_cast<int32_t>(i), &src);
+                        char szBuf[256];
+                        API_INSTANCE DTWAIN_GetSourceProductNameA(src, szBuf, 255);
+                        tInfo.set_product_name(szBuf);
+                        API_INSTANCE DTWAIN_GetSourceProductFamilyA(src, szBuf, 255);
+                        tInfo.set_product_family(szBuf);
+                        API_INSTANCE DTWAIN_GetSourceManufacturerA(src, szBuf, 255);
+                        tInfo.set_manufacturer(szBuf);
+                        API_INSTANCE DTWAIN_GetSourceVersionInfoA(src, szBuf, 255);
+                        tInfo.set_version_info(szBuf);
+                        (*insert_iter) = tInfo;
+                        ++insert_iter;
+                        m_source_cache.push_back(tInfo);
                     }
                 }
             }
