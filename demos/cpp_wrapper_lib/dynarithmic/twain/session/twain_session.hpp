@@ -85,7 +85,7 @@ namespace dynarithmic
 
             static DTWAIN_SOURCE select(twain_select_dialog& dlg)
             {
-#ifdef _WIN32
+                #ifdef _WIN32
                 auto position = dlg.get_position();
                 int32_t allFlags = 0;
                 auto flags = dlg.get_flags();
@@ -101,17 +101,17 @@ namespace dynarithmic
                 std::string strTitle = dlg.get_title();
                 API_INSTANCE DTWAIN_SetTwainDialogFont(dlg.get_font());
                 return API_INSTANCE DTWAIN_SelectSource2ExA(dlg.get_parent_window(),
-                    (allFlags & twain_select_dialog::usedefaulttitle) ? nullptr : strTitle.c_str(),
-                    position.first,
-                    position.second,
-                    dlg.get_includename_list().c_str(),
-                    dlg.get_excludename_list().c_str(),
-                    dlg.get_name_mapping_s().c_str(),
-                    allFlags);
-
-#else
-                return API_INSTANCE DTWAIN_SelectSource();
-#endif
+                                            (allFlags & twain_select_dialog::usedefaulttitle)?nullptr:strTitle.c_str(),
+                                            position.first, 
+                                            position.second,
+                                            dlg.get_includename_list().c_str(),
+                                            dlg.get_excludename_list().c_str(),
+                                            dlg.get_name_mapping_s().c_str(),
+                                            allFlags); 
+                                                                                                  
+                #else
+                    return API_INSTANCE DTWAIN_SelectSource();
+                #endif
             }
         };
 
@@ -508,9 +508,9 @@ namespace dynarithmic
                 Logger& register_logger(Args... theArgs)
                 {
                     static_assert(std::is_base_of<twain_logger, Logger>::value == 1, "Logger is not derived from twain_logger");
-                auto ptr = std::make_unique<Logger>(std::forward<Args>(theArgs)...);
+                    auto ptr = std::make_unique<Logger>(std::forward<Args>(theArgs)...);
                     m_logger = { this, std::move(ptr) };
-                return static_cast<Logger&>(*(m_logger.second));
+                    return static_cast<Logger&>(*(m_logger.second));
                 }
 
                 /// Removes logger from this TWAIN session
