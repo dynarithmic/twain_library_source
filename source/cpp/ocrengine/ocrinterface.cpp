@@ -169,11 +169,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetOCRCapValues(DTWAIN_OCRENGINE Engine, LONG OC
             case DTWAIN_ARRAYLONG:
             {
                 OCREngine::OCRLongArrayValues vals;
-                const LONG nCount = DTWAIN_ArrayGetCount(CapValues);
+                auto& factory = pHandle->m_ArrayFactory;
+                const LONG nCount = factory->size(CapValues);
                 if (nCount < 1)
                     LOG_FUNC_EXIT_PARAMS(false)
                     vals.resize(nCount);
-                auto ArrayStart = static_cast<LONG*>(DTWAIN_ArrayGetBuffer(CapValues, 0));
+                auto ArrayStart = reinterpret_cast<LONG *>(factory->get_buffer(CapValues, 0));
                 std::copy_n(ArrayStart, nCount, vals.begin());
                 const BOOL bRet = pEngine->SetCapValues(OCRCapValue, SetType, vals);
                 LOG_FUNC_EXIT_PARAMS(bRet)
@@ -183,7 +184,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetOCRCapValues(DTWAIN_OCRENGINE Engine, LONG OC
             case DTWAIN_ARRAYSTRING:
             {
                 OCREngine::OCRStringArrayValues vals;
-                const LONG nCount = DTWAIN_ArrayGetCount(CapValues);
+                auto& factory = pHandle->m_ArrayFactory;
+                const LONG nCount = factory->size(CapValues);
                 if (nCount < 1)
                     LOG_FUNC_EXIT_PARAMS(false)
                 vals.resize(nCount);

@@ -31,7 +31,7 @@ void CxImage::AlphaSetMax(uint8_t nAlphaMax)
  */
 bool CxImage::AlphaIsValid()
 {
-	return pAlpha!=0;
+	return !pAlpha.empty();
 }
 ////////////////////////////////////////////////////////////////////////////////
 /**
@@ -55,7 +55,7 @@ bool CxImage::AlphaPaletteIsEnabled()
  */
 void CxImage::AlphaClear()
 {
-	if (pAlpha)	memset(pAlpha,0,head.biWidth * head.biHeight);
+	std::fill(pAlpha.begin(), pAlpha.end(), '\0');
 }
 ////////////////////////////////////////////////////////////////////////////////
 /**
@@ -64,7 +64,8 @@ void CxImage::AlphaClear()
  */
 void CxImage::AlphaSet(uint8_t level)
 {
-	if (pAlpha)	memset(pAlpha,level,head.biWidth * head.biHeight);
+	if ( !pAlpha.empty())
+		std::fill_n(pAlpha.begin(), head.biWidth * head.biHeight, level);
 }
 ////////////////////////////////////////////////////////////////////////////////
 /**
@@ -72,22 +73,20 @@ void CxImage::AlphaSet(uint8_t level)
  */
 bool CxImage::AlphaCreate()
 {
-	if (pAlpha==NULL) {
-		pAlpha = (uint8_t*)malloc(head.biWidth * head.biHeight);
-		if (pAlpha) memset(pAlpha,255,head.biWidth * head.biHeight);
-	}
-	return (pAlpha!=0);
+	pAlpha.resize(head.biWidth * head.biHeight, 255);
+	return true;
 }
 ////////////////////////////////////////////////////////////////////////////////
 void CxImage::AlphaDelete()
 {
-	if (pAlpha) { free(pAlpha); pAlpha=0; }
+	pAlpha.clear();
 }
 ////////////////////////////////////////////////////////////////////////////////
 void CxImage::AlphaInvert()
 {
-	if (pAlpha) {
-		uint8_t *iSrc=pAlpha;
+	if (!pAlpha.empty()) 
+	{
+		uint8_t *iSrc=pAlpha.data();
 		int32_t n=head.biHeight*head.biWidth;
 		for(int32_t i=0; i < n; i++){
 			*iSrc=(uint8_t)~(*(iSrc));
@@ -101,10 +100,9 @@ void CxImage::AlphaInvert()
  */
 bool CxImage::AlphaCopy(CxImage &from)
 {
-	if (from.pAlpha == NULL || head.biWidth != from.head.biWidth || head.biHeight != from.head.biHeight) return false;
-	if (pAlpha==NULL) pAlpha = (uint8_t*)malloc(head.biWidth * head.biHeight);
-	if (pAlpha==NULL) return false;
-	memcpy(pAlpha,from.pAlpha,head.biWidth * head.biHeight);
+	if (from.pAlpha.empty() || head.biWidth != from.head.biWidth || head.biHeight != from.head.biHeight) return false;
+	pAlpha.resize(head.biWidth * head.biHeight);
+	memcpy(pAlpha.data(),from.pAlpha.data(),head.biWidth * head.biHeight);
 	info.nAlphaMax=from.info.nAlphaMax;
 	return true;
 }
@@ -115,9 +113,9 @@ bool CxImage::AlphaCopy(CxImage &from)
 bool CxImage::AlphaSet(CxImage &from)
 {
 	if (!from.IsGrayScale() || head.biWidth != from.head.biWidth || head.biHeight != from.head.biHeight) return false;
-	if (pAlpha==NULL) pAlpha = (uint8_t*)malloc(head.biWidth * head.biHeight);
+	pAlpha.resize(head.biWidth * head.biHeight);
 	uint8_t* src = from.info.pImage;
-	uint8_t* dst = pAlpha;
+	uint8_t* dst = pAlpha.data();
 	if (src==NULL || dst==NULL) return false;
 	for (int32_t y=0; y<head.biHeight; y++){
 		memcpy(dst,src,head.biWidth);
@@ -132,7 +130,7 @@ bool CxImage::AlphaSet(CxImage &from)
  */
 void CxImage::AlphaSet(const int32_t x,const int32_t y,const uint8_t level)
 {
-	if (pAlpha && IsInside(x,y)) pAlpha[x+y*head.biWidth]=level;
+	if (!pAlpha.empty() && IsInside(x,y)) pAlpha[x+y*head.biWidth]=level;
 }
 ////////////////////////////////////////////////////////////////////////////////
 /**
@@ -140,7 +138,7 @@ void CxImage::AlphaSet(const int32_t x,const int32_t y,const uint8_t level)
  */
 uint8_t CxImage::AlphaGet(const int32_t x,const int32_t y)
 {
-	if (pAlpha && IsInside(x,y)) return pAlpha[x+y*head.biWidth];
+	if (!pAlpha.empty() && IsInside(x,y)) return pAlpha[x+y*head.biWidth];
 	return 0;
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -151,7 +149,7 @@ uint8_t CxImage::AlphaGet(const int32_t x,const int32_t y)
  */
 uint8_t* CxImage::AlphaGetPointer(const int32_t x,const int32_t y)
 {
-	if (pAlpha && IsInside(x,y)) return pAlpha+x+y*head.biWidth;
+	if (!pAlpha.empty() && IsInside(x,y)) return pAlpha.data() + x + y*head.biWidth;
 	return 0;
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -163,7 +161,7 @@ uint8_t* CxImage::AlphaGetPointer(const int32_t x,const int32_t y)
 uint8_t CxImage::BlindAlphaGet(const int32_t x,const int32_t y)
 {
 #ifdef _DEBUG
-	if (!IsInside(x,y) || (pAlpha==0))
+	if (!IsInside(x,y) || (pAlpha.empty()))
   #if CXIMAGE_SUPPORT_EXCEPTION_HANDLING
 		throw 0;
   #else
@@ -249,45 +247,40 @@ void CxImage::AlphaStrip()
 ////////////////////////////////////////////////////////////////////////////////
 bool CxImage::AlphaFlip()
 {
-	if (!pAlpha) return false;
+	if (pAlpha.empty()) return false;
 
-	uint8_t *buff = (uint8_t*)malloc(head.biWidth);
-	if (!buff) return false;
+	std::vector<uint8_t> buff(head.biWidth);
 
 	uint8_t *iSrc,*iDst;
-	iSrc = pAlpha + (head.biHeight-1)*head.biWidth;
-	iDst = pAlpha;
+	iSrc = pAlpha.data() + (head.biHeight-1)*head.biWidth;
+	iDst = pAlpha.data();
 	for (int32_t i=0; i<(head.biHeight/2); ++i)
 	{
-		memcpy(buff, iSrc, head.biWidth);
+		memcpy(buff.data(), iSrc, head.biWidth);
 		memcpy(iSrc, iDst, head.biWidth);
-		memcpy(iDst, buff, head.biWidth);
+		memcpy(iDst, buff.data(), head.biWidth);
 		iSrc-=head.biWidth;
 		iDst+=head.biWidth;
 	}
-
-	free(buff);
 
 	return true;
 }
 ////////////////////////////////////////////////////////////////////////////////
 bool CxImage::AlphaMirror()
 {
-	if (!pAlpha) return false;
-	uint8_t* pAlpha2 = (uint8_t*)malloc(head.biWidth * head.biHeight);
-	if (!pAlpha2) return false;
+	if (pAlpha.empty()) return false;
+	std::vector<uint8_t> pAlpha2(head.biWidth * head.biHeight);
 	uint8_t *iSrc,*iDst;
 	int32_t wdt=head.biWidth-1;
-	iSrc=pAlpha + wdt;
-	iDst=pAlpha2;
+	iSrc=pAlpha.data() + wdt;
+	iDst=pAlpha2.data();
 	for(int32_t y=0; y < head.biHeight; y++){
 		for(int32_t x=0; x <= wdt; x++)
 			*(iDst+x)=*(iSrc-x);
 		iSrc+=head.biWidth;
 		iDst+=head.biWidth;
 	}
-	free(pAlpha);
-	pAlpha=pAlpha2;
+	pAlpha = pAlpha2;
 	return true;
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -296,7 +289,7 @@ bool CxImage::AlphaMirror()
  */
 bool CxImage::AlphaSplit(CxImage *dest)
 {
-	if (!pAlpha || !dest) return false;
+	if (pAlpha.empty() || !dest) return false;
 
 	CxImage tmp(head.biWidth,head.biHeight,8);
 	if (!tmp.IsValid()){
@@ -304,7 +297,7 @@ bool CxImage::AlphaSplit(CxImage *dest)
 		return false;
 	}
 
-	uint8_t* src = pAlpha;
+	uint8_t* src = pAlpha.data();
 	uint8_t* dst = tmp.info.pImage;
 	for (int32_t y=0; y<head.biHeight; y++){
 		memcpy(dst,src,head.biWidth);

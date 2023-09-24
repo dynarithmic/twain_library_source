@@ -539,7 +539,7 @@ HBITMAP CxImage::MakeBitmap(HDC hdc, bool bTransparency)
 		return NULL;
 
 	// Create HBITMAP with Trancparency
-	if( (pAlpha!=0) && bTransparency )
+	if( (!pAlpha.empty()) && bTransparency )
 	{
 		HDC hMemDC;
 		if (hdc)
@@ -825,7 +825,7 @@ int32_t CxImage::Draw(HDC hdc, int32_t x, int32_t y, int32_t cx, int32_t cy, REC
 	if (cx < 0) cx = head.biWidth;
 	if (cy < 0) cy = head.biHeight;
 	bool bTransparent = info.nBkgndIndex >= 0;
-	bool bAlpha = pAlpha != 0;
+	bool bAlpha = !pAlpha.empty();
 
 	//required for MM_ANISOTROPIC, MM_HIENGLISH, and similar modes [Greg Peatfield]
 	int32_t hdc_Restore = ::SaveDC(hdc);
@@ -1149,7 +1149,7 @@ HBITMAP CxImage::Draw2HBITMAP(HDC hdc, int32_t x, int32_t y, int32_t cx, int32_t
 	if (cx < 0) cx = head.biWidth;
 	if (cy < 0) cy = head.biHeight;
 	bool bTransparent = info.nBkgndIndex >= 0;
-	bool bAlpha = pAlpha != 0;
+	bool bAlpha = !pAlpha.empty();
 
 	//required for MM_ANISOTROPIC, MM_HIENGLISH, and similar modes [Greg Peatfield]
 	int32_t hdc_Restore = ::SaveDC(hdc);

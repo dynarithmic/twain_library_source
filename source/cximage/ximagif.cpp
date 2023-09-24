@@ -285,8 +285,7 @@ bool CxImageGIF::Decode(CxFile *fp)
 
 				if (info.bGetAllFrames && imaRGB == NULL) {
 					if (iImage == 0) {
-						DestroyFrames();
-						ppFrames = new CxImage*[info.nNumFrames];
+						ppFrames.resize(info.nNumFrames);
 						for(int32_t frameIdx = 0; frameIdx < info.nNumFrames; frameIdx++){
 							ppFrames[frameIdx] = NULL;
 						}
@@ -476,8 +475,8 @@ bool CxImageGIF::Encode(CxFile * fp)
 		return EncodeRGB(fp);
 	}
 
-	if ( GetNumFrames()>1 && ppFrames ) {
-		return Encode(fp, ppFrames, GetNumFrames() );
+	if ( GetNumFrames()>1 && !ppFrames.empty() ) {
+		return Encode(fp, ppFrames.data(), GetNumFrames() );
 	}
 
 	EncodeHeader(fp);

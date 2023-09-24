@@ -228,7 +228,7 @@ RGBQUAD CxImage::GetPixelColorInterpolated(
         wbb+=wd*(*pxptr++); wgg+=wd*(*pxptr++); wrr+=wd*(*pxptr); 
         color.rgbRed=(uint8_t) (wrr>>8); color.rgbGreen=(uint8_t) (wgg>>8); color.rgbBlue=(uint8_t) (wbb>>8);
 #if CXIMAGE_SUPPORT_ALPHA
-        if (pAlpha) {
+        if (!pAlpha.empty()) {
           uint16_t waa;
           //image has alpha layer... we have to do the same for alpha data
           pxptr=AlphaGetPointer(xi,yi);                           //pointer to first byte
