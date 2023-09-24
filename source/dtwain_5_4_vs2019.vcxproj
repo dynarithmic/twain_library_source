@@ -1502,6 +1502,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\dtwain_version.h" />
     <ClInclude Include="h\dtwtype.h" />
     <ClInclude Include="h\errstruc.h" />
+    <ClInclude Include="h\imagefun\dtwpdf\crc32_aux.h" />
     <ClInclude Include="h\imagefun\dtwpdf\dtwainpdf.h" />
     <ClInclude Include="h\imagefun\pcxfun32.h" />
     <ClInclude Include="h\imagefun\pdffun32.h" />

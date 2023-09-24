@@ -68,7 +68,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source, DTWAIN_AR
     {
         hDib = pSource->GetDibHandle(i);
         if (hDib)
-            DTWAIN_ArrayAdd(pArray, hDib);
+            factory->add_to_back(pArray, hDib, 1); 
     }
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)

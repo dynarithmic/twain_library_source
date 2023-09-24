@@ -14,8 +14,11 @@
 void CxImage::Startup(uint32_t imagetype)
 {
 	//init pointers
-	pDib = pSelection = pAlpha = NULL;
-	ppLayers = ppFrames = NULL;
+	pAlpha.clear();
+//	pDib = pSelection = pAlpha = NULL;
+    pDib = pSelection = NULL;
+	ppLayers = NULL;
+	ppFrames.clear();
 	//init structures
 	memset(&head,0,sizeof(BITMAPINFOHEADER));
 	memset(&info,0,sizeof(CXIMAGEINFO));
@@ -57,8 +60,8 @@ bool CxImage::Destroy()
 			delete [] ppLayers; ppLayers=0; info.nNumLayers = 0;
 		}
 		if (pSelection) {free(pSelection); pSelection=0;}
-		if (pAlpha) {free(pAlpha); pAlpha=0;}
-		if (pDib) {free(pDib); pDib=0;}
+		pAlpha.clear(); //  if (pAlpha) { free(pAlpha); pAlpha = 0; }
+		if (pDib) {m_vDib.clear(); pDib=0;}
 		return true;
 	}
 	return false;
@@ -66,10 +69,15 @@ bool CxImage::Destroy()
 ////////////////////////////////////////////////////////////////////////////////
 bool CxImage::DestroyFrames()
 {
-	if (info.pGhost==NULL) {
-		if (ppFrames) {
-			for (int32_t n=0; n<info.nNumFrames; n++) { delete ppFrames[n]; }
-			delete [] ppFrames; ppFrames = NULL; info.nNumFrames = 0;
+	if (info.pGhost==NULL) 
+	{
+		{
+			for (int32_t n=0; n<info.nNumFrames; n++) 
+			{ 
+				delete ppFrames[n]; 
+			}
+			ppFrames.clear(); 
+			info.nNumFrames = 0;
 		}
 		return true;
 	}
@@ -133,10 +141,10 @@ void CxImage::Copy(const CxImage &src, bool copypixels, bool copyselection, bool
 		memcpy(pSelection,src.pSelection,nSize);
 	}
 	//copy the alpha channel
-	if (copyalpha && src.pAlpha){
-		if (pAlpha) free(pAlpha);
-		pAlpha = (uint8_t*)malloc(nSize);
-		memcpy(pAlpha,src.pAlpha,nSize);
+	if (copyalpha && !src.pAlpha.empty())
+	{
+		pAlpha.resize(nSize);
+		std::copy(src.pAlpha.begin(), src.pAlpha.begin() + nSize, pAlpha.begin());
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -220,11 +228,8 @@ void* CxImage::Create(uint32_t dwWidth, uint32_t dwHeight, uint32_t wBpp, uint32
 //    head.biYPelsPerMeter = 0; See SetYDPI
 //    head.biClrImportant = 0;  See SetClrImportant
 
-	pDib = malloc(GetSize()); // alloc memory block to store our bitmap
-    if (!pDib){
-		strcpy(info.szLastError,"CxImage::Create can't allocate memory");
-		return NULL;
-	}
+	m_vDib.resize(GetSize());
+	pDib = m_vDib.data();
 
 	//clear the palette
 	RGBQUAD* pal=GetPalette();
@@ -235,7 +240,8 @@ void* CxImage::Create(uint32_t dwWidth, uint32_t dwHeight, uint32_t wBpp, uint32
 #endif //CXIMAGE_SUPPORT_SELECTION
 	//Destroy the existing alpha channel
 #if CXIMAGE_SUPPORT_ALPHA
-	if (pAlpha) AlphaDelete();
+	if (!pAlpha.empty()) 
+		AlphaDelete();
 #endif //CXIMAGE_SUPPORT_ALPHA
 
     // use our bitmap info structure to fill in first part of
@@ -316,20 +322,22 @@ bool CxImage::Transfer(CxImage &from, bool bTransferFrames /*=true*/)
 	memcpy(&head,&from.head,sizeof(BITMAPINFOHEADER));
 	memcpy(&info,&from.info,sizeof(CXIMAGEINFO));
 
-	pDib = from.pDib;
+	m_vDib = std::move(from.m_vDib);
+	pDib = m_vDib.data();
 	pSelection = from.pSelection;
 	pAlpha = from.pAlpha;
 	ppLayers = from.ppLayers;
 
 	memset(&from.head,0,sizeof(BITMAPINFOHEADER));
 	memset(&from.info,0,sizeof(CXIMAGEINFO));
-	from.pDib = from.pSelection = from.pAlpha = NULL;
-	from.ppLayers = NULL;
+	from.pDib = from.pSelection = {};
+	from.pAlpha.clear();
+	from.ppLayers = {};
 
 	if (bTransferFrames){
 		DestroyFrames();
-		ppFrames = from.ppFrames;
-		from.ppFrames = NULL;
+		ppFrames = std::move(from.ppFrames);
+		from.ppFrames.clear();
 	}
 
 	return true;

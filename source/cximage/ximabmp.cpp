@@ -156,33 +156,30 @@ bool CxImageBMP::Decode(CxFile * hFile)
 			if (bf.bfOffBits != 0L) hFile->Seek(off + bf.bfOffBits,SEEK_SET);
 			if (dwCompression == BI_BITFIELDS || dwCompression == BI_RGB){
 				int32_t imagesize=4*head.biHeight*head.biWidth;
-				uint8_t* buff32=(uint8_t*)malloc(imagesize);
-				if (buff32){
-					hFile->Read(buff32, imagesize,1); // read in the pixels
+				std::vector<uint8_t> buff32(imagesize); // = (uint8_t*)malloc(imagesize);
+				hFile->Read(buff32.data(), imagesize,1); // read in the pixels
 
 #if CXIMAGE_SUPPORT_ALPHA
-					if (dwCompression == BI_RGB){
-						AlphaCreate();
-						if (AlphaIsValid()){
-							bool bAlphaOk = false;
-							uint8_t* p;
-							for (int32_t y=0; y<head.biHeight; y++){
-								p = buff32 + 3 + head.biWidth * 4 * y;
-								for (int32_t x=0; x<head.biWidth; x++){
-									if (*p) bAlphaOk = true;
-									AlphaSet(x,y,*p);
-									p+=4;
-								}
+				if (dwCompression == BI_RGB){
+					AlphaCreate();
+					if (AlphaIsValid()){
+						bool bAlphaOk = false;
+						uint8_t* p;
+						for (int32_t y=0; y<head.biHeight; y++){
+							p = buff32.data() + 3 + head.biWidth * 4 * y;
+							for (int32_t x=0; x<head.biWidth; x++){
+								if (*p) bAlphaOk = true;
+								AlphaSet(x,y,*p);
+								p+=4;
 							}
-							// fix if alpha pixels are all zero
-							if (!bAlphaOk) AlphaInvert();
 						}
+						// fix if alpha pixels are all zero
+						if (!bAlphaOk) AlphaInvert();
 					}
+				}
 #endif //CXIMAGE_SUPPORT_ALPHA
 
-					Bitfield2RGB(buff32,bfmask[0],bfmask[1],bfmask[2],32);
-					free(buff32);
-				} else cx_throw("can't allocate memory");
+				Bitfield2RGB(buff32.data(),bfmask[0],bfmask[1],bfmask[2],32);
 			} else cx_throw("unknown compression");
 			break;
 		case 24 :
@@ -193,19 +190,19 @@ bool CxImageBMP::Decode(CxFile * hFile)
 			break;
 		case 16 :
 		{
-			uint32_t bfmask[3];
+			uint32_t bfmask_[3];
 			if (dwCompression == BI_BITFIELDS)
 			{
-				hFile->Read(bfmask, 12, 1);
+				hFile->Read(bfmask_, 12, 1);
 			} else {
-				bfmask[0]=0x7C00; bfmask[1]=0x3E0; bfmask[2]=0x1F; //RGB555
+				bfmask_[0]=0x7C00; bfmask_[1]=0x3E0; bfmask_[2]=0x1F; //RGB555
 			}
 			// bf.bfOffBits required after the bitfield mask <Cui Ying Jie>
 			if (bf.bfOffBits != 0L) hFile->Seek(off + bf.bfOffBits,SEEK_SET);
 			// read in the pixels
 			hFile->Read(info.pImage, head.biHeight*((head.biWidth+1)/2)*4,1);
 			// transform into RGB
-			Bitfield2RGB(info.pImage,bfmask[0],bfmask[1],bfmask[2],16);
+			Bitfield2RGB(info.pImage,bfmask_[0],bfmask_[1],bfmask_[2],16);
 			break;
 		}
 		case 8 :

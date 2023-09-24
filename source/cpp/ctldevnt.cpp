@@ -23,6 +23,8 @@
 #include "ctldevnt.h"
 #include "dtwain.h"
 #include "twainfix32.h"
+#include "arrayfactory.h"
+
 using namespace dynarithmic;
 CTL_DeviceEvent::CTL_DeviceEvent() : m_DeviceEvent() {}
 
@@ -48,41 +50,53 @@ TW_UINT32  CTL_DeviceEvent::GetTimeBeforeFirstCapture() const { return m_DeviceE
 TW_UINT32  CTL_DeviceEvent::GetTimeBetweenCaptures() const { return    m_DeviceEvent.TimeBetweenCaptures;   }
 
 
-bool CTL_DeviceEvent::GetEventInfoEx(DTWAIN_ARRAY Array)  const
+bool CTL_DeviceEvent::GetEventInfoEx(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Array)  const
 {
-    DTWAIN_ArrayRemoveAll(Array);
+    auto& factory = pHandle->m_ArrayFactory;
+    factory->clear(Array);
     switch (m_DeviceEvent.Event )
     {
         case TWDE_CHECKBATTERY:
         {
-            DTWAIN_ArrayAdd( Array, (LPVOID)&m_DeviceEvent.BatteryMinutes );
-            LONG dummy = static_cast<LONG>(m_DeviceEvent.BatteryPercentage);
-            DTWAIN_ArrayAdd( Array, &dummy );
+            auto val = m_DeviceEvent.BatteryMinutes;
+            factory->add_to_back(Array, &val, 1);
+            val = m_DeviceEvent.BatteryPercentage;
+            factory->add_to_back(Array, &val, 1);
         }
         break;
 
         case TWDE_CHECKPOWERSUPPLY:
-            DTWAIN_ArrayAdd( Array, (LPVOID)&m_DeviceEvent.PowerSupply);
+        {
+            auto val = m_DeviceEvent.PowerSupply;
+            factory->add_to_back(Array, &val, 1);
+        }
         break;
 
         case TWDE_CHECKRESOLUTION:
         {
-            double dummy;
-            dummy = GetXResolution();
-            DTWAIN_ArrayAdd(Array, &dummy);
-            dummy = GetYResolution();
-            DTWAIN_ArrayAdd(Array, &dummy);
+            auto val = GetXResolution();
+            factory->add_to_back(Array, &val, 1);
+            val = GetYResolution();
+            factory->add_to_back(Array, &val, 1);
         }
         break;
 
         case TWDE_CHECKFLASH:
-            DTWAIN_ArrayAdd(Array, (LPVOID)&m_DeviceEvent.FlashUsed2);
+        {
+            auto val = m_DeviceEvent.FlashUsed2;
+            factory->add_to_back(Array, &val, 1);
+        }
         break;
 
         case TWDE_CHECKAUTOMATICCAPTURE:
-            DTWAIN_ArrayAdd(Array, (LPVOID)&m_DeviceEvent.AutomaticCapture);
-            DTWAIN_ArrayAdd(Array, (LPVOID)&m_DeviceEvent.TimeBeforeFirstCapture);
-            DTWAIN_ArrayAdd(Array, (LPVOID)&m_DeviceEvent.TimeBetweenCaptures);
+        {
+            auto val = m_DeviceEvent.AutomaticCapture;
+            factory->add_to_back(Array, &val, 1);
+            val = m_DeviceEvent.TimeBeforeFirstCapture;
+            factory->add_to_back(Array, &val, 1);
+            val = m_DeviceEvent.TimeBetweenCaptures;
+            factory->add_to_back(Array, &val, 1);
+        }
         break;
 
         default:

@@ -1213,16 +1213,17 @@ int GetMultiCapValues(DTWAIN_HANDLE DLLHandle,
     if (!bOk)
         return 0;
 
-    const int nSize = DTWAIN_ArrayGetCount(FrameArray);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    auto& factory = pHandle->m_ArrayFactory;
+    const int nSize = factory->size(FrameArray); 
 
     for (int i = 0; i < nSize; i++)
     {
         DTWAIN_FRAME DTWAINFrame = DTWAIN_FrameCreate(0, 0, 0, 0);
         DTWAINFrame_RAII raii(DTWAINFrame);
-        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-        auto& FrameV = pHandle->m_ArrayFactory->underlying_container_t<TW_FRAME>(FrameArray);
+        auto& FrameV = factory->underlying_container_t<TW_FRAME>(FrameArray);
         TWFRAMEToDTWAINFRAME(FrameV[i], DTWAINFrame);
-        pHandle->m_ArrayFactory->add_to_back(pArray, &DTWAINFrame, 1);
+        factory->add_to_back(pArray, &DTWAINFrame, 1);
     }
     return 1;
 }

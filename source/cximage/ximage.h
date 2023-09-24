@@ -44,9 +44,10 @@
 	CxImage home page: http://www.xdp.it/cximage/
 
   --------------------------------------------------------------------------------
+  Note: MODIFIED BY DYNARITHMIC SOFTWARE 2023
  */
-#if !defined(__CXIMAGE_H)
-#define __CXIMAGE_H
+#if !defined(CXIMAGE_H)
+#define CXIMAGE_H
 
 #if _MSC_VER > 1000
 #pragma once
@@ -57,6 +58,9 @@
   #include <unistd.h>
   #include <arpa/inet.h>
 #endif
+#include <iostream>
+#include <exception>
+#include <vector>
 
 /////////////////////////////////////////////////////////////////////////////
 #include "xfile.h"
@@ -668,9 +672,9 @@ protected:
 	bool DFT(int32_t dir,int32_t m,double *x1,double *y1,double *x2,double *y2);
 	bool RepairChannel(CxImage *ch, float radius);
 	// <nipper>
-	int32_t gen_convolve_matrix (float radius, float **cmatrix_p);
-	float* gen_lookup_table (float *cmatrix, int32_t cmatrix_length);
-	void blur_line (float *ctable, float *cmatrix, int32_t cmatrix_length, uint8_t* cur_col, uint8_t* dest_col, int32_t y, int32_t bytes);
+	int32_t gen_convolve_matrix (float radius, std::vector<float>& cmatrix_p);
+	std::vector<float> gen_lookup_table(const std::vector<float>& cmatrix);
+	void blur_line(const std::vector<float>& ctable, const std::vector<float>& cmatrix, uint8_t* cur_col, uint8_t* dest_col, int32_t y, int32_t bytes);
 	void blur_text (uint8_t threshold, uint8_t decay, uint8_t max_depth, CxImage* iSrc, CxImage* iDst, uint8_t bytes);
 //@}
 
@@ -794,14 +798,62 @@ protected:
 	void bihtoh(BITMAPINFOHEADER* bih);
 
 	void*				pDib; //contains the header, the palette, the pixels
+	std::vector<char> m_vDib;
     BITMAPINFOHEADER    head; //standard header
 	CXIMAGEINFO			info; //extended information
 	uint8_t*			pSelection;	//selected region
-	uint8_t*			pAlpha; //alpha channel
+	std::vector<uint8_t>			pAlpha; //alpha channel
 	CxImage**			ppLayers; //generic layers
-	CxImage**			ppFrames;
+	std::vector<CxImage*> ppFrames;
 //@}
 };
 
+// Dynarithmic Software
+// Faster dynamic 2d-array:
+template <typename T>
+T** create2DArray(unsigned nrows, unsigned ncols, const T& val = T())
+{
+    if (nrows == 0)
+        throw std::invalid_argument("number of rows is 0");
+    if (ncols == 0)
+        throw std::invalid_argument("number of columns is 0");
+    T** ptr = nullptr;
+    T* pool = nullptr;
+    try
+    {
+        ptr = new T * [nrows];  // allocate pointers (can throw here)
+        pool = new T[nrows * ncols]{ val };  // allocate pool (can throw here)
+
+        // now point the row pointers to the appropriate positions in
+        // the memory pool
+        for (unsigned i = 0; i < nrows; ++i, pool += ncols)
+            ptr[i] = pool;
+
+        // Done.
+        return ptr;
+    }
+    catch (std::bad_alloc& ex)
+    {
+        delete[] ptr; // either this is nullptr or it was allocated
+        throw ex;  // memory allocation error
+    }
+}
+
+template <typename T>
+void delete2DArray(T** arr)
+{
+    delete[] arr[0];  // remove the pool
+    delete[] arr;     // remove the pointers
+}
+
+template <typename T>
+struct Array2D_RAII
+{
+	T** arr_;
+	Array2D_RAII(T** arr) : arr_(arr) {}
+	~Array2D_RAII() { delete2DArray(arr_);  }
+	Array2D_RAII(Array2D_RAII&) = delete;
+    Array2D_RAII& operator = (Array2D_RAII&) = delete;
+};
 ////////////////////////////////////////////////////////////////////////////
-#endif // !defined(__CXIMAGE_H)
+#endif // !defined(CXIMAGE_H)

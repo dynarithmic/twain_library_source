@@ -6,6 +6,7 @@
 #include "ximage.h"
 
 #include "ximaiter.h"
+#include <memory>
 
 #if CXIMAGE_SUPPORT_DSP
 
@@ -1402,7 +1403,7 @@ bool CxImage::Median(int32_t Ksize)
 	int32_t kmax= Ksize-k2;
 	int32_t i,j,k;
 
-	RGBQUAD* kernel = (RGBQUAD*)malloc(Ksize*Ksize*sizeof(RGBQUAD));
+	std::vector<RGBQUAD> kernel(Ksize*Ksize);
 
 	CxImage tmp(*this);
 	if (!tmp.IsValid()){
@@ -1432,12 +1433,16 @@ bool CxImage::Median(int32_t Ksize)
 						if (IsInside(x+j,y+k))
 							kernel[i++]=BlindGetPixelColor(x+j,y+k);
 
-				qsort(kernel, i, sizeof(RGBQUAD), CompareColors);
+				std::sort(kernel.begin(), kernel.end(), [&](auto& c1, auto& c2)
+					{
+						int32_t g1 = (int32_t)RGB2GRAY(c1.rgbRed, c1.rgbGreen, c1.rgbBlue);
+						int32_t g2 = (int32_t)RGB2GRAY(c2.rgbRed, c2.rgbGreen, c2.rgbBlue);
+						return g1 < g2;
+					});
 				tmp.SetPixelColor(x,y,kernel[i/2]);
 			}
 		}
 	}
-	free(kernel);
 	Transfer(tmp);
 	return true;
 }
@@ -1543,15 +1548,19 @@ bool CxImage::FFT2(CxImage* srcReal, CxImage* srcImag, CxImage* dstReal, CxImage
 	if (srcImag && dstImag) tmpImag->Copy(*srcImag,true,false,false);
 
 	// dst&&src are empty -> create new one, else turn to GrayScale
+	std::unique_ptr<CxImage> ptrTmpReal, ptrTmpImag;
+
 	if (srcReal==0 && dstReal==0){
-		tmpReal = new CxImage(w,h,8);
+		ptrTmpReal = std::make_unique<CxImage>(w,h,8);
+		tmpReal = ptrTmpReal.get();
 		tmpReal->Clear(0);
 		tmpReal->SetGrayPalette();
 	} else {
 		if (!tmpReal->IsGrayScale()) tmpReal->GrayScale();
 	}
 	if (srcImag==0 && dstImag==0){
-		tmpImag = new CxImage(w,h,8);
+		ptrTmpImag = std::make_unique<CxImage>(w,h,8);
+		tmpImag = ptrTmpImag.get();
 		tmpImag->Clear(0);
 		tmpImag->SetGrayPalette();
 	} else {
@@ -1559,8 +1568,6 @@ bool CxImage::FFT2(CxImage* srcReal, CxImage* srcImag, CxImage* dstReal, CxImage
 	}
 
 	if (!(tmpReal->IsValid() && tmpImag->IsValid())){
-		if (srcReal==0 && dstReal==0) delete tmpReal;
-		if (srcImag==0 && dstImag==0) delete tmpImag;
 		return false;
 	}
 
@@ -1569,18 +1576,11 @@ bool CxImage::FFT2(CxImage* srcReal, CxImage* srcImag, CxImage* dstReal, CxImage
 	tmpImag->Resample(w,h,0);
 
 	//ok, here we have 2 (w x h), grayscale images ready for a FFT
-
-	double* real;
-	double* imag;
 	int32_t j,k,m;
 
-	_complex **grid;
-	//double mean = tmpReal->Mean();
-	/* Allocate memory for the grid */
-	grid = (_complex **)malloc(w * sizeof(_complex));
-	for (k=0;k<w;k++) {
-		grid[k] = (_complex *)malloc(h * sizeof(_complex));
-	}
+	_complex** grid = create2DArray<_complex>(w, h);
+	Array2D_RAII<_complex> aDeleter(grid);
+
 	for (j=0;j<h;j++) {
 		for (k=0;k<w;k++) {
 			grid[k][j].x = tmpReal->GetPixelIndex(k,j)-128;
@@ -1589,60 +1589,52 @@ bool CxImage::FFT2(CxImage* srcReal, CxImage* srcImag, CxImage* dstReal, CxImage
 	}
 
 	//DFT buffers
-	double *real2,*imag2;
-	real2 = (double*)malloc(max(w,h) * sizeof(double));
-	imag2 = (double*)malloc(max(w,h) * sizeof(double));
+	std::vector<double> real2((std::max)(w, h));
+    std::vector<double> imag2((std::max)(w, h));
 
 	/* Transform the rows */
-	real = (double *)malloc(w * sizeof(double));
-	imag = (double *)malloc(w * sizeof(double));
+	std::vector<double> real_(w);
+	std::vector<double> imag_(w);
 
-	m=0;
-	while((1<<m)<w) m++;
+	m = 0;
+	while ((1 << m) < w) m++;
 
-	for (j=0;j<h;j++) {
-		for (k=0;k<w;k++) {
-			real[k] = grid[k][j].x;
-			imag[k] = grid[k][j].y;
+	for (j = 0; j < h; j++) {
+		for (k = 0; k < w; k++) {
+			real_[k] = grid[k][j].x;
+			imag_[k] = grid[k][j].y;
 		}
 
-		if (bXpow2) FFT(direction,m,real,imag);
-		else		DFT(direction,w,real,imag,real2,imag2);
+		if (bXpow2) FFT(direction, m, real_.data(), imag_.data());
+		else		DFT(direction, w, real_.data(), imag_.data(), real2.data(), imag2.data());
 
-		for (k=0;k<w;k++) {
-			grid[k][j].x = real[k];
-			grid[k][j].y = imag[k];
+		for (k = 0; k < w; k++) {
+			grid[k][j].x = real_[k];
+			grid[k][j].y = imag_[k];
 		}
 	}
-	free(real);
-	free(imag);
 
 	/* Transform the columns */
-	real = (double *)malloc(h * sizeof(double));
-	imag = (double *)malloc(h * sizeof(double));
+	real_.resize(h);
+	imag_.resize(h);
 
 	m=0;
 	while((1<<m)<h) m++;
 
 	for (k=0;k<w;k++) {
 		for (j=0;j<h;j++) {
-			real[j] = grid[k][j].x;
-			imag[j] = grid[k][j].y;
+			real_[j] = grid[k][j].x;
+			imag_[j] = grid[k][j].y;
 		}
 
-		if (bYpow2) FFT(direction,m,real,imag);
-		else		DFT(direction,h,real,imag,real2,imag2);
+		if (bYpow2) FFT(direction,m,real_.data(),imag_.data());
+		else		DFT(direction,h,real_.data(),imag_.data(),real2.data(),imag2.data());
 
 		for (j=0;j<h;j++) {
-			grid[k][j].x = real[j];
-			grid[k][j].y = imag[j];
+			grid[k][j].x = real_[j];
+			grid[k][j].y = imag_[j];
 		}
 	}
-	free(real);
-	free(imag);
-
-	free(real2);
-	free(imag2);
 
 	/* converting from double to byte, there is a HUGE loss in the dynamics
 	  "nn" tries to keep an acceptable SNR, but 8bit=48dB: don't ask more */
@@ -1667,13 +1659,6 @@ bool CxImage::FFT2(CxImage* srcReal, CxImage* srcImag, CxImage* dstReal, CxImage
 			}
 		}
 	}
-
-	for (k=0;k<w;k++) free (grid[k]);
-	free (grid);
-
-	if (srcReal==0 && dstReal==0) delete tmpReal;
-	if (srcImag==0 && dstImag==0) delete tmpImag;
-
 	return true;
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -2121,7 +2106,7 @@ bool CxImage::Jitter(int32_t radius)
  * a two-pass gaussian blur.  Returns the length of the matrix.
  * \author [nipper]
  */
-int32_t CxImage::gen_convolve_matrix (float radius, float **cmatrix_p)
+int32_t CxImage::gen_convolve_matrix (float radius, std::vector<float> &cmatrix_p)
 {
 	int32_t matrix_length;
 	int32_t matrix_midpoint;
@@ -2150,8 +2135,8 @@ int32_t CxImage::gen_convolve_matrix (float radius, float **cmatrix_p)
 	matrix_length = int32_t (2 * ceil(radius-0.5) + 1);
 	if (matrix_length <= 0) matrix_length = 1;
 	matrix_midpoint = matrix_length/2 + 1;
-	*cmatrix_p = new float[matrix_length];
-	cmatrix = *cmatrix_p;
+	cmatrix_p.resize(matrix_length);
+	cmatrix = cmatrix_p.data();
 	
 	/*  Now we fill the matrix by doing a numeric integration approximation
 	* from -2*std_dev to 2*std_dev, sampling 50 points per pixel.
@@ -2204,15 +2189,15 @@ int32_t CxImage::gen_convolve_matrix (float radius, float **cmatrix_p)
  * value.
  * \author [nipper]
  */
-float* CxImage::gen_lookup_table (float *cmatrix, int32_t cmatrix_length)
+std::vector<float> CxImage::gen_lookup_table (const std::vector<float>& cmatrix)
 {
-	float* lookup_table = new float[cmatrix_length * 256];
-	float* lookup_table_p = lookup_table;
-	float* cmatrix_p      = cmatrix;
+	std::vector<float> lookup_table(cmatrix.size());
+	float* lookup_table_p = lookup_table.data();
+	const float* cmatrix_p      = cmatrix.data();
 	
-	for (int32_t i=0; i<cmatrix_length; i++)
+	for (size_t i=0; i< cmatrix.size(); i++)
     {
-		for (int32_t j=0; j<256; j++)
+		for (size_t j=0; j<256; j++)
 		{
 			*(lookup_table_p++) = *cmatrix_p * (float)j;
 		}
@@ -2228,41 +2213,41 @@ float* CxImage::gen_lookup_table (float *cmatrix, int32_t cmatrix_length)
  * in the processing of the lines, at least to the blur_line function.
  * \author [nipper]
  */
-void CxImage::blur_line (float *ctable, float *cmatrix, int32_t cmatrix_length, uint8_t* cur_col, uint8_t* dest_col, int32_t y, int32_t bytes)
+void CxImage::blur_line (const std::vector<float>& ctable, const std::vector<float>& cmatrix, uint8_t* cur_col, uint8_t* dest_col, int32_t y, int32_t bytes)
 {
 	float scale;
 	float sum;
-	int32_t i=0, j=0;
-	int32_t row;
-	int32_t cmatrix_middle = cmatrix_length/2;
+	size_t i=0, j=0;
+	size_t row;
+	size_t cmatrix_middle = cmatrix.size() / 2;
 	
-	float *cmatrix_p;
+	const float *cmatrix_p;
 	uint8_t  *cur_col_p;
 	uint8_t  *cur_col_p1;
 	uint8_t  *dest_col_p;
-	float *ctable_p;
+	const float *ctable_p;
 	
 	/* this first block is the same as the non-optimized version --
 	* it is only used for very small pictures, so speed isn't a
 	* big concern.
 	*/
-	if (cmatrix_length > y)
+	if (cmatrix.size() > static_cast<size_t>(y))
     {
-		for (row = 0; row < y ; row++)
+		for (row = 0; row < static_cast<size_t>(y) ; row++)
 		{
 			scale=0;
 			/* find the scale factor */
-			for (j = 0; j < y ; j++)
+			for (j = 0; j < static_cast<size_t>(y); j++)
 			{
 				/* if the index is in bounds, add it to the scale counter */
 				if ((j + cmatrix_middle - row >= 0) &&
-					(j + cmatrix_middle - row < cmatrix_length))
+					(j + cmatrix_middle - row < cmatrix.size()))
 					scale += cmatrix[j + cmatrix_middle - row];
 			}
-			for (i = 0; i<bytes; i++)
+			for (i = 0; i< static_cast<size_t>(bytes); i++)
 			{
 				sum = 0;
-				for (j = 0; j < y; j++)
+				for (j = 0; j < static_cast<size_t>(y); j++)
 				{
 					if ((j >= row - cmatrix_middle) &&
 						(j <= row + cmatrix_middle))
@@ -2279,12 +2264,12 @@ void CxImage::blur_line (float *ctable, float *cmatrix, int32_t cmatrix_length, 
 		{
 			/* find scale factor */
 			scale=0;
-			for (j = cmatrix_middle - row; j<cmatrix_length; j++)
+			for (j = cmatrix_middle - row; j< cmatrix.size(); j++)
 				scale += cmatrix[j];
-			for (i = 0; i<bytes; i++)
+			for (i = 0; i< static_cast<size_t>(bytes); i++)
 			{
 				sum = 0;
-				for (j = cmatrix_middle - row; j<cmatrix_length; j++)
+				for (j = cmatrix_middle - row; j< cmatrix.size(); j++)
 				{
 					sum += cur_col[(row + j-cmatrix_middle)*bytes + i] * cmatrix[j];
 				}
@@ -2296,13 +2281,13 @@ void CxImage::blur_line (float *ctable, float *cmatrix, int32_t cmatrix_length, 
 		for (; row < y-cmatrix_middle; row++)
 		{
 			cur_col_p = (row - cmatrix_middle) * bytes + cur_col;
-			for (i = 0; i<bytes; i++)
+			for (i = 0; i< static_cast<size_t>(bytes); i++)
 			{
 				sum = 0;
-				cmatrix_p = cmatrix;
+				cmatrix_p = cmatrix.data();
 				cur_col_p1 = cur_col_p;
-				ctable_p = ctable;
-				for (j = cmatrix_length; j>0; j--)
+				ctable_p = ctable.data();
+				for (j = cmatrix.size(); j>0; j--)
 				{
 					sum += *(ctable_p + *cur_col_p1);
 					cur_col_p1 += bytes;
@@ -2314,13 +2299,13 @@ void CxImage::blur_line (float *ctable, float *cmatrix, int32_t cmatrix_length, 
 		}
 		
 		/* for the edge condition , we only use available info, and scale to one */
-		for (; row < y; row++)
+		for (; row < static_cast<size_t>(y); row++)
 		{
 			/* find scale factor */
 			scale=0;
 			for (j = 0; j< y-row + cmatrix_middle; j++)
 				scale += cmatrix[j];
-			for (i = 0; i<bytes; i++)
+			for (i = 0; i< static_cast<size_t>(bytes); i++)
 			{
 				sum = 0;
 				for (j = 0; j<y-row + cmatrix_middle; j++)
@@ -2526,10 +2511,10 @@ bool CxImage::GaussianBlur(float radius /*= 1.0f*/, CxImage* iDst /*= 0*/)
 	}
 
 	// generate convolution matrix and make sure it's smaller than each dimension
-	float *cmatrix = NULL;
-	int32_t cmatrix_length = gen_convolve_matrix(radius, &cmatrix);
+	std::vector<float> cmatrix;
+	gen_convolve_matrix(radius, cmatrix);
 	// generate lookup table
-	float *ctable = gen_lookup_table(cmatrix, cmatrix_length);
+	auto ctable = gen_lookup_table(cmatrix);
 
 	int32_t x,y;
 	int32_t bypp = head.biBitCount>>3;
@@ -2545,7 +2530,7 @@ bool CxImage::GaussianBlur(float radius /*= 1.0f*/, CxImage* iDst /*= 0*/)
 		if (info.nEscape) break;
 		info.nProgress = (int32_t)(y*dbScaler);
 
-		blur_line(ctable, cmatrix, cmatrix_length, itSrc.GetRow(y), itTmp.GetRow(y), head.biWidth, bypp);
+		blur_line(ctable, cmatrix, itSrc.GetRow(y), itTmp.GetRow(y), head.biWidth, bypp);
 	}
 
 	CxImage tmp_y(tmp_x, false, true, true);
@@ -2557,27 +2542,23 @@ bool CxImage::GaussianBlur(float radius /*= 1.0f*/, CxImage* iDst /*= 0*/)
 	CImageIterator itDst(&tmp_y);
 
 	// blur the cols
-    uint8_t* cur_col = (uint8_t*)malloc(bypp*head.biHeight);
-    uint8_t* dest_col = (uint8_t*)malloc(bypp*head.biHeight);
-
-	dbScaler = 50.0f/head.biWidth;
-
-	for (x=0;x<head.biWidth;x++)
 	{
-		if (info.nEscape) break;
-		info.nProgress = (int32_t)(50.0f+x*dbScaler);
+		std::vector<uint8_t> cur_col(bypp * head.biHeight);
+		std::vector<uint8_t> dest_col(bypp * head.biHeight);
 
-		itTmp.GetCol(cur_col, x);
-		itDst.GetCol(dest_col, x);
-		blur_line(ctable, cmatrix, cmatrix_length, cur_col, dest_col, head.biHeight, bypp);
-		itDst.SetCol(dest_col, x);
+		dbScaler = 50.0f / head.biWidth;
+
+		for (x = 0; x < head.biWidth; x++)
+		{
+			if (info.nEscape) break;
+			info.nProgress = (int32_t)(50.0f + x * dbScaler);
+
+			itTmp.GetCol(cur_col.data(), x);
+			itDst.GetCol(dest_col.data(), x);
+			blur_line(ctable, cmatrix, cur_col.data(), dest_col.data(), head.biHeight, bypp);
+			itDst.SetCol(dest_col.data(), x);
+		}
 	}
-
-	free(cur_col);
-	free(dest_col);
-
-	delete [] cmatrix;
-	delete [] ctable;
 
 #if CXIMAGE_SUPPORT_SELECTION
 	//restore the non selected region

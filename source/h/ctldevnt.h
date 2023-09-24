@@ -22,6 +22,8 @@
 #define CTLDEVNT_H
 namespace dynarithmic
 {
+    class CTL_TwainDLLHandle;
+
     class CTL_DeviceEvent
     {
         public:
@@ -40,7 +42,7 @@ namespace dynarithmic
             TW_UINT32  GetTimeBeforeFirstCapture() const; /* Automatic Capture            */
             TW_UINT32  GetTimeBetweenCaptures() const;    /* Automatic Capture            */
 
-            bool       GetEventInfoEx(DTWAIN_ARRAY Array) const;
+            bool       GetEventInfoEx(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Array) const;
 
         private:
             TW_DEVICEEVENT  m_DeviceEvent;
