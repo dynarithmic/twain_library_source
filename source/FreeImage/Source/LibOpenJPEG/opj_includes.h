@@ -246,7 +246,6 @@ typedef unsigned int OPJ_BITFIELD;
 #include "mct.h"
 #include "opj_intmath.h"
 #include "sparse_array.h"
-#include "raw.h"
 
 #ifdef USE_JPIP
 #include "cidx_manager.h"

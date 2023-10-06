@@ -28,7 +28,7 @@
  */
 
 #include "opj_includes.h"
-
+#include "raw.h"
 /* 
 ==========================================================
    local functions

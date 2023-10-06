@@ -439,6 +439,7 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='ReleaseU|x64'">MaxSpeed</Optimization>
     </ClCompile>
     <ClCompile Include="function_list.c" />
+    <ClCompile Include="ht_dec.c" />
     <ClCompile Include="image.c">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='DebugU|Win32'">Disabled</Optimization>
