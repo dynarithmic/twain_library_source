@@ -22,26 +22,5 @@
 #define FUNCMAC_H
     #define UNUSED_PARAM(expr) do { (void)(expr); } while (0)
     #include "dtwain_standard_defs.h"
-    #ifndef DTWAIN_LEAN_AND_MEAN
-        #ifdef FUNCTION_MACRO_DEFINED
-            #pragma message("   Compiler defines __FUNCTION__")
-            #define FUNC_MACRO   __FUNCTION__
-            #define FUNC_HEADER(x)
-        #else
-        #ifdef FUNC_MACRO_DEFINED
-            #pragma message("Compiler defines __FUNC__")
-            #define FUNC_MACRO   __FUNC__
-            #define FUNC_HEADER(x)
-        #else
-            #pragma message("Compiler does not define __FUNCTION__ or __FUNC__")
-            #define FUNC_HEADER(x) static const TCHAR funcname_[] = _T(#x);
-            #define __FUNC__    (funcname_)
-            #define FUNC_MACRO  __FUNC__
-            #define FUNC_MACRO_DEFINED
-        #endif
-        #endif
-    #else
-        #define FUNC_HEADER(x)
-        #define FUNC_MACRO ""
-    #endif
+#define FUNC_MACRO   __func__
 #endif
