@@ -303,7 +303,7 @@ int CPDFImageHandler::InitializePDFPage(const PDFINFO* pPDFInfo, HANDLE bitmap)
         const auto xWidth = static_cast<double>(pbi->biWidth);
         const auto yHeight = static_cast<double>(pbi->biHeight);
 
-        if ( float_close(xInches,0.0) || float_close(yInches, 0.0) )
+        if ( float_equal(xInches,0.0) || float_equal(yInches, 0.0) )
         {
             ImageMemoryHandler::GlobalUnlock(bitmap);
             return DTWAIN_ERR_BAD_DIB_PAGE; // this page cannot be created due to improper pels per meter
