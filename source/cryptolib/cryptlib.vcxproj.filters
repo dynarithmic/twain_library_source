@@ -35,6 +35,9 @@
     <ClCompile Include="aria.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="aria_simd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="ariatab.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -269,24 +272,6 @@
     <ClCompile Include="lea_simd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="lsh256.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lsh256_sse.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lsh256_avx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lsh512.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lsh512_sse.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lsh512_avx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="luc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -342,9 +327,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="polynomi.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="primetab.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pssr.cpp">
@@ -537,6 +519,27 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zlib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="primetab.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lsh256.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lsh256_avx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lsh256_sse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lsh512.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lsh512_avx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lsh512_sse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -819,9 +822,6 @@
     <ClInclude Include="lea.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="lsh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="luc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1086,6 +1086,9 @@
     <ClInclude Include="chachapoly.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="lsh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="rdrand.asm">
@@ -1094,14 +1097,13 @@
     <CustomBuild Include="rdseed.asm">
       <Filter>Source Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="x64dll.asm">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="x64masm.asm">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="adhoc.cpp.proto">
       <Filter>Miscellaneous</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="x64dll.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
   </ItemGroup>
 </Project>
