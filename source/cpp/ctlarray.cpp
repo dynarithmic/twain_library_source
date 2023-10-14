@@ -1297,7 +1297,7 @@ static LONG IsValidRangeArray( DTWAIN_ARRAY pArray )
             LOG_FUNC_EXIT_PARAMS(DTWAIN_ERR_INVALID_RANGE)
         if ( dStep < 0 )
             LOG_FUNC_EXIT_PARAMS(DTWAIN_ERR_INVALID_RANGE)
-        if ( float_close(dStep,0.0) && dLow < dUp )
+        if ( float_equal(dStep,0.0) && dLow < dUp )
             LOG_FUNC_EXIT_PARAMS(DTWAIN_ERR_INVALID_RANGE)
     }
     LOG_FUNC_EXIT_PARAMS(1)
@@ -1631,7 +1631,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetPos( DTWAIN_RANGE pArray, LPVOID pVarian
     {
         const double *pFloat = static_cast<double*>(pVariant);
         double* pBuffer = static_cast<double*>(pHandle->m_ArrayFactory->get_buffer(pArray, 0));
-        if (float_close(0.0, pBuffer[DTWAIN_RANGESTEP]))
+        if (float_equal(0.0, pBuffer[DTWAIN_RANGESTEP]))
             LOG_FUNC_EXIT_PARAMS(false)
         *pPos = static_cast<LONG>((*pFloat - pBuffer[DTWAIN_RANGEMIN]) / pBuffer[DTWAIN_RANGESTEP]);
     }
@@ -1798,15 +1798,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetNearestValue( DTWAIN_RANGE pArray, LPVOI
         const auto pOutVal = static_cast<double*>(pVariantOut);
 
         // Check if value passed in is out of bounds
-        if (float_close(pBuffer[DTWAIN_RANGEMIN], dInVal) ||
-            float_close(0.0, pBuffer[DTWAIN_RANGESTEP]) ||
+        if (float_equal(pBuffer[DTWAIN_RANGEMIN], dInVal) ||
+            float_equal(0.0, pBuffer[DTWAIN_RANGESTEP]) ||
             dInVal < pBuffer[DTWAIN_RANGEMIN])
         {
             *pOutVal = pBuffer[DTWAIN_RANGEMIN];
             LOG_FUNC_EXIT_PARAMS(true)
         }
         else
-        if (float_close(pBuffer[DTWAIN_RANGEMAX], dInVal) || dInVal > pBuffer[DTWAIN_RANGEMAX])
+        if (float_equal(pBuffer[DTWAIN_RANGEMAX], dInVal) || dInVal > pBuffer[DTWAIN_RANGEMAX])
         {
             *pOutVal = pBuffer[DTWAIN_RANGEMAX];
             LOG_FUNC_EXIT_PARAMS(true)
@@ -1822,7 +1822,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetNearestValue( DTWAIN_RANGE pArray, LPVOI
         const double Remainder = fabs(fmod(dInVal, pBuffer[DTWAIN_RANGESTEP]));
         const double Dividend = static_cast<double>(static_cast<LONG>(dInVal / pBuffer[DTWAIN_RANGESTEP]));
 
-        if ( float_close(Remainder,0.0 ))
+        if ( float_equal(Remainder,0.0 ))
         {
             *pOutVal = dInVal - dBias;
             LOG_FUNC_EXIT_PARAMS(true)

@@ -27,42 +27,45 @@
  *
  * Auxiliary Support Routines.
  */
-#include "tiffiop.h"
 #include "tif_predict.h"
-#include <math.h>
+#include "tiffiop.h"
 #include <float.h>
+#include <math.h>
 
-uint32_t
-_TIFFMultiply32(TIFF* tif, uint32_t first, uint32_t second, const char* where)
+uint32_t _TIFFMultiply32(TIFF *tif, uint32_t first, uint32_t second,
+                         const char *where)
 {
-	if (second && first > UINT32_MAX / second) {
-		TIFFErrorExt(tif->tif_clientdata, where, "Integer overflow in %s", where);
+    if (second && first > UINT32_MAX / second)
+    {
+        TIFFErrorExtR(tif, where, "Integer overflow in %s", where);
 		return 0;
 	}
 
 	return first * second;
 }
 
-uint64_t
-_TIFFMultiply64(TIFF* tif, uint64_t first, uint64_t second, const char* where)
+uint64_t _TIFFMultiply64(TIFF *tif, uint64_t first, uint64_t second,
+                         const char *where)
 {
-	if (second && first > UINT64_MAX / second) {
-		TIFFErrorExt(tif->tif_clientdata, where, "Integer overflow in %s", where);
+    if (second && first > UINT64_MAX / second)
+    {
+        TIFFErrorExtR(tif, where, "Integer overflow in %s", where);
 		return 0;
 	}
 
 	return first * second;
 }
 
-tmsize_t
-_TIFFMultiplySSize(TIFF* tif, tmsize_t first, tmsize_t second, const char* where)
+tmsize_t _TIFFMultiplySSize(TIFF *tif, tmsize_t first, tmsize_t second,
+                            const char *where)
 {
     if( first <= 0 || second <= 0 )
     {
         if( tif != NULL && where != NULL )
         {
-            TIFFErrorExt(tif->tif_clientdata, where,
-                        "Invalid argument to _TIFFMultiplySSize() in %s", where);
+            TIFFErrorExtR(tif, where,
+                          "Invalid argument to _TIFFMultiplySSize() in %s",
+                          where);
         }
         return 0;
     }
@@ -71,8 +74,7 @@ _TIFFMultiplySSize(TIFF* tif, tmsize_t first, tmsize_t second, const char* where
     {
         if( tif != NULL && where != NULL )
         {
-            TIFFErrorExt(tif->tif_clientdata, where,
-                        "Integer overflow in %s", where);
+            TIFFErrorExtR(tif, where, "Integer overflow in %s", where);
         }
         return 0;
     }
@@ -85,16 +87,15 @@ tmsize_t _TIFFCastUInt64ToSSize(TIFF* tif, uint64_t val, const char* module)
     {
         if( tif != NULL && module != NULL )
         {
-            TIFFErrorExt(tif->tif_clientdata,module,"Integer overflow");
+            TIFFErrorExtR(tif, module, "Integer overflow");
         }
         return 0;
     }
     return (tmsize_t)val;
 }
 
-void*
-_TIFFCheckRealloc(TIFF* tif, void* buffer,
-		  tmsize_t nmemb, tmsize_t elem_size, const char* what)
+void *_TIFFCheckRealloc(TIFF *tif, void *buffer, tmsize_t nmemb,
+                        tmsize_t elem_size, const char *what)
 {
 	void* cp = NULL;
         tmsize_t count = _TIFFMultiplySSize(tif, nmemb, elem_size, NULL);
@@ -103,27 +104,28 @@ _TIFFCheckRealloc(TIFF* tif, void* buffer,
 	 */
 	if (count != 0)
 	{
-		cp = _TIFFrealloc(buffer, count);
+        cp = _TIFFreallocExt(tif, buffer, count);
 	}
 
-	if (cp == NULL) {
-		TIFFErrorExt(tif->tif_clientdata, tif->tif_name,
+    if (cp == NULL)
+    {
+        TIFFErrorExtR(tif, tif->tif_name,
 			     "Failed to allocate memory for %s "
-			     "(%"TIFF_SSIZE_FORMAT" elements of %"TIFF_SSIZE_FORMAT" bytes each)",
+                      "(%" TIFF_SSIZE_FORMAT " elements of %" TIFF_SSIZE_FORMAT
+                      " bytes each)",
 			     what, nmemb, elem_size);
 	}
 
 	return cp;
 }
 
-void*
-_TIFFCheckMalloc(TIFF* tif, tmsize_t nmemb, tmsize_t elem_size, const char* what)
+void *_TIFFCheckMalloc(TIFF *tif, tmsize_t nmemb, tmsize_t elem_size,
+                       const char *what)
 {
 	return _TIFFCheckRealloc(tif, NULL, nmemb, elem_size, what);  
 }
 
-static int
-TIFFDefaultTransferFunction(TIFFDirectory* td)
+static int TIFFDefaultTransferFunction(TIFF *tif, TIFFDirectory *td)
 {
 	uint16_t **tf = td->td_transferfunction;
 	tmsize_t i, n, nbytes;
@@ -134,21 +136,23 @@ TIFFDefaultTransferFunction(TIFFDirectory* td)
 
 	n = ((tmsize_t)1)<<td->td_bitspersample;
 	nbytes = n * sizeof (uint16_t);
-        tf[0] = (uint16_t *)_TIFFmalloc(nbytes);
+    tf[0] = (uint16_t *)_TIFFmallocExt(tif, nbytes);
 	if (tf[0] == NULL)
 		return 0;
 	tf[0][0] = 0;
-	for (i = 1; i < n; i++) {
+    for (i = 1; i < n; i++)
+    {
 		double t = (double)i/((double) n-1.);
 		tf[0][i] = (uint16_t)floor(65535. * pow(t, 2.2) + .5);
 	}
 
-	if (td->td_samplesperpixel - td->td_extrasamples > 1) {
-                tf[1] = (uint16_t *)_TIFFmalloc(nbytes);
+    if (td->td_samplesperpixel - td->td_extrasamples > 1)
+    {
+        tf[1] = (uint16_t *)_TIFFmallocExt(tif, nbytes);
 		if(tf[1] == NULL)
 			goto bad;
 		_TIFFmemcpy(tf[1], tf[0], nbytes);
-                tf[2] = (uint16_t *)_TIFFmalloc(nbytes);
+        tf[2] = (uint16_t *)_TIFFmallocExt(tif, nbytes);
 		if (tf[2] == NULL)
 			goto bad;
 		_TIFFmemcpy(tf[2], tf[0], nbytes);
@@ -157,24 +161,24 @@ TIFFDefaultTransferFunction(TIFFDirectory* td)
 
 bad:
 	if (tf[0])
-		_TIFFfree(tf[0]);
+        _TIFFfreeExt(tif, tf[0]);
 	if (tf[1])
-		_TIFFfree(tf[1]);
+        _TIFFfreeExt(tif, tf[1]);
 	if (tf[2])
-		_TIFFfree(tf[2]);
+        _TIFFfreeExt(tif, tf[2]);
 	tf[0] = tf[1] = tf[2] = 0;
 	return 0;
 }
 
-static int
-TIFFDefaultRefBlackWhite(TIFFDirectory* td)
+static int TIFFDefaultRefBlackWhite(TIFF *tif, TIFFDirectory *td)
 {
 	int i;
 
-        td->td_refblackwhite = (float *)_TIFFmalloc(6*sizeof (float));
+    td->td_refblackwhite = (float *)_TIFFmallocExt(tif, 6 * sizeof(float));
 	if (td->td_refblackwhite == NULL)
 		return 0;
-        if (td->td_photometric == PHOTOMETRIC_YCBCR) {
+    if (td->td_photometric == PHOTOMETRIC_YCBCR)
+    {
 		/*
 		 * YCbCr (Class Y) images must have the ReferenceBlackWhite
 		 * tag set. Fix the broken images, which lacks that tag.
@@ -183,11 +187,14 @@ TIFFDefaultRefBlackWhite(TIFFDirectory* td)
 		td->td_refblackwhite[1] = td->td_refblackwhite[3] =
 			td->td_refblackwhite[5] = 255.0F;
 		td->td_refblackwhite[2] = td->td_refblackwhite[4] = 128.0F;
-	} else {
+    }
+    else
+    {
 		/*
 		 * Assume RGB (Class R)
 		 */
-		for (i = 0; i < 3; i++) {
+        for (i = 0; i < 3; i++)
+        {
 		    td->td_refblackwhite[2*i+0] = 0;
 		    td->td_refblackwhite[2*i+1] =
 			    (float)((1L<<td->td_bitspersample)-1L);
@@ -204,14 +211,14 @@ TIFFDefaultRefBlackWhite(TIFFDirectory* td)
  *	explicit values so that defaults exist only one
  *	place in the library -- in TIFFDefaultDirectory.
  */
-int
-TIFFVGetFieldDefaulted(TIFF* tif, uint32_t tag, va_list ap)
+int TIFFVGetFieldDefaulted(TIFF *tif, uint32_t tag, va_list ap)
 {
 	TIFFDirectory *td = &tif->tif_dir;
 
 	if (TIFFVGetField(tif, tag, ap))
 		return (1);
-	switch (tag) {
+    switch (tag)
+    {
 	case TIFFTAG_SUBFILETYPE:
 		*va_arg(ap, uint32_t *) = td->td_subfiletype;
 		return (1);
@@ -237,8 +244,32 @@ TIFFVGetFieldDefaulted(TIFF* tif, uint32_t tag, va_list ap)
 		*va_arg(ap, uint16_t *) = td->td_minsamplevalue;
 		return (1);
 	case TIFFTAG_MAXSAMPLEVALUE:
-		*va_arg(ap, uint16_t *) = td->td_maxsamplevalue;
+        {
+            uint16_t maxsamplevalue;
+            /* td_bitspersample=1 is always set in TIFFDefaultDirectory().
+             * Therefore, td_maxsamplevalue has to be re-calculated in
+             * TIFFGetFieldDefaulted(). */
+            if (td->td_bitspersample > 0)
+            {
+                /* This shift operation into a uint16_t limits the value to
+                 * 65535 even if td_bitspersamle is > 16 */
+                if (td->td_bitspersample <= 16)
+                {
+                    maxsamplevalue = (1 << td->td_bitspersample) -
+                                     1; /* 2**(BitsPerSample) - 1 */
+                }
+                else
+                {
+                    maxsamplevalue = 65535;
+                }
+            }
+            else
+            {
+                maxsamplevalue = 0;
+            }
+            *va_arg(ap, uint16_t *) = maxsamplevalue;
 		return (1);
+        }
 	case TIFFTAG_PLANARCONFIG:
 		*va_arg(ap, uint16_t *) = td->td_planarconfig;
 		return (1);
@@ -250,7 +281,8 @@ TIFFVGetFieldDefaulted(TIFF* tif, uint32_t tag, va_list ap)
         TIFFPredictorState* sp = (TIFFPredictorState*) tif->tif_data;
         if( sp == NULL )
         {
-            TIFFErrorExt(tif->tif_clientdata, tif->tif_name,
+                TIFFErrorExtR(
+                    tif, tif->tif_name,
                          "Cannot get \"Predictor\" tag as plugin is not configured");
             *va_arg(ap, uint16_t*) = 0;
             return 0;
@@ -310,25 +342,27 @@ TIFFVGetFieldDefaulted(TIFF* tif, uint32_t tag, va_list ap)
 			   Technical Note tells that it should be CIE D50. */
 			static const float whitepoint[] = {
 						D50_X0 / (D50_X0 + D50_Y0 + D50_Z0),
-						D50_Y0 / (D50_X0 + D50_Y0 + D50_Z0)
-			};
+                D50_Y0 / (D50_X0 + D50_Y0 + D50_Z0)};
 			*va_arg(ap, const float **) = whitepoint;
 			return 1;
 		}
 	case TIFFTAG_TRANSFERFUNCTION:
 		if (!td->td_transferfunction[0] &&
-		    !TIFFDefaultTransferFunction(td)) {
-			TIFFErrorExt(tif->tif_clientdata, tif->tif_name, "No space for \"TransferFunction\" tag");
+                !TIFFDefaultTransferFunction(tif, td))
+            {
+                TIFFErrorExtR(tif, tif->tif_name,
+                              "No space for \"TransferFunction\" tag");
 			return (0);
 		}
 		*va_arg(ap, const uint16_t **) = td->td_transferfunction[0];
-		if (td->td_samplesperpixel - td->td_extrasamples > 1) {
+            if (td->td_samplesperpixel - td->td_extrasamples > 1)
+            {
 			*va_arg(ap, const uint16_t **) = td->td_transferfunction[1];
 			*va_arg(ap, const uint16_t **) = td->td_transferfunction[2];
 		}
 		return (1);
 	case TIFFTAG_REFERENCEBLACKWHITE:
-		if (!td->td_refblackwhite && !TIFFDefaultRefBlackWhite(td))
+            if (!td->td_refblackwhite && !TIFFDefaultRefBlackWhite(tif, td))
 			return (0);
 		*va_arg(ap, const float **) = td->td_refblackwhite;
 		return (1);
@@ -340,8 +374,7 @@ TIFFVGetFieldDefaulted(TIFF* tif, uint32_t tag, va_list ap)
  * Like TIFFGetField, but return any default
  * value if the tag is not present in the directory.
  */
-int
-TIFFGetFieldDefaulted(TIFF* tif, uint32_t tag, ...)
+int TIFFGetFieldDefaulted(TIFF *tif, uint32_t tag, ...)
 {
 	int ok;
 	va_list ap;
@@ -352,24 +385,28 @@ TIFFGetFieldDefaulted(TIFF* tif, uint32_t tag, ...)
 	return (ok);
 }
 
-struct _Int64Parts {
+struct _Int64Parts
+{
 	int32_t low, high;
 };
 
-typedef union {
+typedef union
+{
 	struct _Int64Parts part;
 	int64_t value;
 } _Int64;
 
-float
-_TIFFUInt64ToFloat(uint64_t ui64)
+float _TIFFUInt64ToFloat(uint64_t ui64)
 {
 	_Int64 i;
 
 	i.value = ui64;
-	if (i.part.high >= 0) {
+    if (i.part.high >= 0)
+    {
 		return (float)i.value;
-	} else {
+    }
+    else
+    {
 		long double df;
 		df = (long double)i.value;
 		df += 18446744073709551616.0; /* adding 2**64 */
@@ -377,15 +414,17 @@ _TIFFUInt64ToFloat(uint64_t ui64)
 	}
 }
 
-double
-_TIFFUInt64ToDouble(uint64_t ui64)
+double _TIFFUInt64ToDouble(uint64_t ui64)
 {
 	_Int64 i;
 
 	i.value = ui64;
-	if (i.part.high >= 0) {
+    if (i.part.high >= 0)
+    {
 		return (double)i.value;
-	} else {
+    }
+    else
+    {
 		long double df;
 		df = (long double)i.value;
 		df += 18446744073709551616.0; /* adding 2**64 */
@@ -402,18 +441,18 @@ float _TIFFClampDoubleToFloat( double val )
     return (float)val;
 }
 
+uint32_t _TIFFClampDoubleToUInt32(double val)
+{
+    if (val < 0)
+        return 0;
+    if (val > 0xFFFFFFFFU || val != val)
+        return 0xFFFFFFFFU;
+    return (uint32_t)val;
+}
+
 int _TIFFSeekOK(TIFF* tif, toff_t off)
 {
     /* Huge offsets, especially -1 / UINT64_MAX, can cause issues */
     /* See http://bugzilla.maptools.org/show_bug.cgi?id=2726 */
     return off <= (~(uint64_t)0) / 2 && TIFFSeekFile(tif, off, SEEK_SET) == off;
 }
-
-/* vim: set ts=8 sts=8 sw=8 noet: */
-/*
- * Local Variables:
- * mode: c
- * c-basic-offset: 8
- * fill-column: 78
- * End:
- */
