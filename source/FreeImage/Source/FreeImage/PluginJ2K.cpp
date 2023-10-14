@@ -23,6 +23,9 @@
 #include "Utilities.h"
 #include "../LibOpenJPEG/openjpeg.h"
 #include "J2KHelper.h"
+#include <string>
+
+#define MAX_BYTES_IN_MARKER 65533L
 
 // ==========================================================
 // Plugin Interface
@@ -46,6 +49,9 @@ OpenJPEG Warning callback
 static void j2k_warning_callback(const char *msg, void *client_data) {
 	FreeImage_OutputMessageProc(s_format_id, "Warning: %s", msg);
 }
+
+static BOOL
+j2k_write_comment(opj_cparameters_t* cinfo, FIBITMAP* dib, std::string& comment);
 
 // ==========================================================
 // Plugin Implementation
@@ -269,6 +275,8 @@ Save(FreeImageIO *io, FIBITMAP *dib, fi_handle handle, int page, int flags, void
 			opj_set_error_handler(c_codec, j2k_error_callback, NULL);
 
 			// setup the encoder parameters using the current image and using user parameters
+			std::string comment;
+			j2k_write_comment(&parameters, dib, comment);
 			opj_setup_encoder(c_codec, &parameters, image);
 
 			// encode the image
@@ -325,4 +333,23 @@ InitJ2K(Plugin *plugin, int format_id) {
 	plugin->supports_export_bpp_proc = SupportsExportDepth;
 	plugin->supports_export_type_proc = SupportsExportType;
 	plugin->supports_icc_profiles_proc = NULL;
+}
+
+static BOOL j2k_write_comment(opj_cparameters_t* cinfo, FIBITMAP* dib, std::string& comment)
+{
+    FITAG* tag = NULL;
+
+    // write user comment as a JPEG_COM marker
+    FreeImage_GetMetadata(FIMD_COMMENTS, dib, "Comment", &tag);
+    if (tag) 
+	{
+        const char* tag_value = (char*)FreeImage_GetTagValue(tag);
+        if (NULL != tag_value) 
+		{
+			comment = (const char *)tag_value;
+			cinfo->cp_comment = &comment[0];
+			return TRUE;
+        }
+    }
+    return FALSE;
 }

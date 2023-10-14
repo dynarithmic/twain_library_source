@@ -232,14 +232,12 @@ static std::string get_source_file_types(DTWAIN_SOURCE Source)
                     return "";
                 resetAll ra(Source, vCurrentFormat.front(), vCurrentCompress.empty() ? -1 : vCurrentCompress.front());
                 std::vector<std::string> returnFileTypes;
-                size_t numFormats = vFileFormats.size();
                 DTWAIN_ARRAY tempArray = DTWAIN_ArrayCreateFromCap(Source, ICAP_IMAGEFILEFORMAT, 1);
                 DTWAINArrayPtr_RAII raii4(&tempArray);
                 auto& tempBuffer = pHandle->m_ArrayFactory->underlying_container_t<LONG>(tempArray);
 
-                for (size_t i = 0; i < numFormats; ++i)
+                for (auto fformat : vFileFormats) 
                 {
-                    LONG fformat = vFileFormats[i];
                     tempBuffer[0] = fformat;
                     auto compIter = compToMap.find(fformat);
                     if (compIter != compToMap.end())
@@ -249,10 +247,9 @@ static std::string get_source_file_types(DTWAIN_SOURCE Source)
                         auto tempCompression = DTWAIN_EnumCompressionTypesEx(Source);
                         DTWAINArrayPtr_RAII raii5(&tempCompression);
                         auto& compressBuf = pHandle->m_ArrayFactory->underlying_container_t<LONG>(tempCompression);
-                        size_t nCompressions = compressBuf.size();
-                        for (size_t comp = 0; comp < nCompressions; ++comp)
+                        for (auto comp : compressBuf )
                         {
-                            auto iter = ptr->find(compressBuf[comp]);
+                            auto iter = ptr->find(comp);
                             if (iter != ptr->end())
                                 returnFileTypes.push_back(iter->second);
                         }
@@ -281,19 +278,17 @@ static pixelMap getPixelAndBitDepthInfo(CTL_ITwainSource* pSource)
     DTWAIN_EnumPixelTypes(pSource, &aPixelTypes);
     DTWAINArrayPtr_RAII raii(&aPixelTypes);
     auto& pixInfo = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aPixelTypes);
-    size_t pixLen = pixInfo.size();
     pixelMap pMap;
-    for (size_t curPixInfo = 0; curPixInfo < pixLen; ++curPixInfo)
+    for (auto curPixInfo : pixInfo)
     {
-        auto iter = pMap.insert({pixInfo[curPixInfo], {}}).first;
+        auto iter = pMap.insert({curPixInfo, {}}).first;
         DTWAIN_ARRAY aBitDepthInfo = nullptr;
         DTWAINArrayPtr_RAII raii2(&aBitDepthInfo);
-        DTWAIN_SetPixelType(pSource, pixInfo[curPixInfo], DTWAIN_DEFAULT, TRUE);
+        DTWAIN_SetPixelType(pSource, curPixInfo, DTWAIN_DEFAULT, TRUE);
         DTWAIN_EnumBitDepths(pSource, &aBitDepthInfo);
         auto& aBitDepthInfoPtr = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aBitDepthInfo);
-        size_t aBitDepthInfoLen = aBitDepthInfoPtr.size();
-        for (size_t curBitDepth = 0; curBitDepth < aBitDepthInfoLen; ++curBitDepth)
-            iter->second.push_back(aBitDepthInfoPtr[curBitDepth]);
+        for (auto curBitDepth : aBitDepthInfoPtr)
+            iter->second.push_back(curBitDepth);
     }
     return pMap;
 }
@@ -491,8 +486,8 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
     std::vector<std::string> sNames = allSources;
     glob_json["device-names"] = sNames;
     std::string jsonString;
-    std::string imageInfoString[12];
-    std::string deviceInfoString[9];
+    std::array<std::string,12> imageInfoString;
+    std::array<std::string, 9> deviceInfoString;
 
     struct CloserRAII
     {
@@ -683,12 +678,12 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
 
                         resUnitInfo = strm.str() + resolutionTotalStr + "},";
                     }
-                    int imageInfoCaps[] = { ICAP_BRIGHTNESS, ICAP_CONTRAST, ICAP_GAMMA, ICAP_HIGHLIGHT, ICAP_SHADOW,
-                        ICAP_THRESHOLD, ICAP_ROTATION, ICAP_ORIENTATION, ICAP_OVERSCAN, ICAP_HALFTONES };
-                    std::string imageInfoCapsStr[] = { "\"brightness-values\":", "\"contrast-values\":", "\"gamma-values\":",
+                    std::array<int, 10> imageInfoCaps = { ICAP_BRIGHTNESS, ICAP_CONTRAST, ICAP_GAMMA, ICAP_HIGHLIGHT, ICAP_SHADOW,
+                                                          ICAP_THRESHOLD, ICAP_ROTATION, ICAP_ORIENTATION, ICAP_OVERSCAN, ICAP_HALFTONES };
+                    std::array<std::string, 10> imageInfoCapsStr = { "\"brightness-values\":", "\"contrast-values\":", "\"gamma-values\":",
                         "\"highlight-values\":", "\"shadow-values\":", "\"threshold-values\":",
                         "\"rotation-values\":", "\"orientation-values\":", "\"overscan-values\":", "\"halftone-values\":" };
-                    for (int curImageCap = 0; curImageCap < sizeof(imageInfoCaps) / sizeof(imageInfoCaps[0]); ++curImageCap)
+                    for (size_t curImageCap = 0; curImageCap < imageInfoCaps.size(); ++curImageCap)
                     {
                         strm.str("");
                         strm << imageInfoCapsStr[curImageCap];
@@ -756,16 +751,15 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     imageInfoString[11] = tempStrm.str();
 
                     strm.str("");
-                    int deviceInfoCaps[] = { CAP_FEEDERENABLED, CAP_FEEDERLOADED, CAP_UICONTROLLABLE,
-                        ICAP_AUTOBRIGHT, ICAP_AUTOMATICDESKEW,
-                        CAP_PRINTER, CAP_DUPLEX, CAP_JOBCONTROL, ICAP_LIGHTPATH
-                    };
+                    std::array<int, 9> deviceInfoCaps = { CAP_FEEDERENABLED, CAP_FEEDERLOADED, CAP_UICONTROLLABLE,
+                                                          ICAP_AUTOBRIGHT, ICAP_AUTOMATICDESKEW,
+                                                          CAP_PRINTER, CAP_DUPLEX, CAP_JOBCONTROL, ICAP_LIGHTPATH};
 
-                    std::string deviceInfoCapsStr[sizeof(deviceInfoCaps) / sizeof(deviceInfoCaps[0])];
-                    std::copy(deviceInfoString, deviceInfoString + sizeof(deviceInfoString) / sizeof(deviceInfoString[0]), deviceInfoCapsStr);
+                    std::array<std::string, 9> deviceInfoCapsStr; 
+                    std::copy(deviceInfoString.begin(), deviceInfoString.end(), deviceInfoCapsStr.begin());
                     for (auto& s : deviceInfoCapsStr)
                         s.resize(s.size() - 5);
-                    for (int curDevice = 0; curDevice < sizeof(deviceInfoCaps) / sizeof(deviceInfoCaps[0]); ++curDevice)
+                    for (size_t curDevice = 0; curDevice < deviceInfoCaps.size(); ++curDevice)
                     {
                         if (curDevice > 0)
                             strm << ",";
@@ -862,10 +856,8 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     strStatus = "\"<selected, open_error>\"";
 
                 partString += "\"device-status\":" + strStatus + ",";
-                std::string imageInfoStringVal = join_string(imageInfoString, imageInfoString +
-                    sizeof(imageInfoString) / sizeof(imageInfoString[0])) + ",";
-                std::string deviceInfoStringVal = join_string(deviceInfoString, deviceInfoString +
-                    sizeof(deviceInfoString) / sizeof(deviceInfoString[0])) + ",";
+                std::string imageInfoStringVal = join_string(imageInfoString.begin(), imageInfoString.end()) + ",";
+                std::string deviceInfoStringVal = join_string(deviceInfoString.begin(), deviceInfoString.end()) + ",";
                 if (jsonString.empty())
                     jsonString = " }";
                 jsonString = "{" + partString + jColorInfo + resUnitInfo + imageInfoStringVal + deviceInfoStringVal + jsonString.substr(1);
