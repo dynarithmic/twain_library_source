@@ -222,7 +222,7 @@
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <PreprocessorDefinitions>CRYPTOPP_DISABLE_ASM;NDEBUG;USE_PRECOMPILED_HEADERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CRYPTOPP_DISABLE_SHA_ASM;CRYPTOPP_DISABLE_ASM;CRYPTOPP_X64_MASM_AVAILABLE;USE_PRECOMPILED_HEADERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -232,7 +232,7 @@
     </Lib>
     <ClCompile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <PreprocessorDefinitions>NDEBUG;CRYPTOPP_DISABLE_ASM;USE_PRECOMPILED_HEADERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;CRYPTOPP_DISABLE_SHA_ASM;CRYPTOPP_DISABLE_ASM;CRYPTOPP_X64_MASM_AVAILABLE;USE_PRECOMPILED_HEADERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <Optimization>MinSpace</Optimization>
@@ -245,7 +245,10 @@
     </Lib>
     <ClCompile>
       <ExceptionHandling>Async</ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp14</LanguageStandard>
+      <PreprocessorDefinitions>CRYPTOPP_DISABLE_SHA_ASM;CRYPTOPP_DISABLE_ASM;USE_PRECOMPILED_HEADERS;CRYPTOPP_X64_MASM_AVAILABLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -253,8 +256,11 @@
       <OutputFile>$(ProjectDir)$(PlatformTarget)\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
     <ClCompile>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PreprocessorDefinitions>NDEBUG;CRYPTOPP_DISABLE_SHA_ASM;USE_PRECOMPILED_HEADERS;CRYPTOPP_X64_MASM_AVAILABLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <LanguageStandard>stdcpp14</LanguageStandard>
+      <Optimization>MinSpace</Optimization>
       <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -270,7 +276,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <ExceptionHandling>Async</ExceptionHandling>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <PreprocessorDefinitions>CRYPTOPP_DISABLE_ASM;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CRYPTOPP_DISABLE_ASM;UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -279,8 +285,12 @@
       <OutputFile>$(ProjectDir)$(PlatformTarget)\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
     <ClCompile>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <ExceptionHandling>Async</ExceptionHandling>
       <LanguageStandard>stdcpp14</LanguageStandard>
+      <PreprocessorDefinitions>CRYPTOPP_DISABLE_ASM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -288,8 +298,14 @@
       <OutputFile>$(ProjectDir)$(PlatformTarget)\$(Configuration)\$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
     <ClCompile>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PreprocessorDefinitions>CRYPTOPP_DISABLE_ASM;NDEBUG;USE_PRECOMPILED_HEADERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <OmitFramePointers>true</OmitFramePointers>
       <ExceptionHandling>Async</ExceptionHandling>
       <LanguageStandard>stdcpp14</LanguageStandard>
+      <Optimization>MinSpace</Optimization>
       <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -422,6 +438,7 @@
     <ClCompile Include="pkcspad.cpp" />
     <ClCompile Include="poly1305.cpp" />
     <ClCompile Include="polynomi.cpp" />
+    <ClCompile Include="primetab.cpp" />
     <ClCompile Include="pssr.cpp" />
     <ClCompile Include="pubkey.cpp" />
     <ClCompile Include="queue.cpp" />
@@ -520,11 +537,6 @@
       <Message>Building and assembling rdseed.asm</Message>
       <Command>ml64.exe /c /nologo /D_M_X64 /W3 /Cx /Zi /Fo"$(IntDir)rdseed-x64.obj" "%(FullPath)"</Command>
       <Outputs>$(IntDir)\rdseed-x64.obj;%(Outputs)</Outputs>
-    </CustomBuild>
-    <CustomBuild Condition="'$(Platform)'=='x64' AND ('$(Configuration)'=='Debug' Or '$(Configuration)'=='Release')" Include="x64dll.asm">
-      <Message>Building and assembling x64dll.asm</Message>
-      <Command>ml64.exe /c /nologo /D_M_X64 /W3 /Zi /Fo"$(IntDir)x64dll.obj" "%(FullPath)"</Command>
-      <Outputs>$(IntDir)x64dll.obj;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Condition="'$(Platform)'=='x64'" Include="x64masm.asm">
       <Message>Building and Assembling x64masm.asm</Message>
@@ -710,6 +722,14 @@
     <ClInclude Include="zdeflate.h" />
     <ClInclude Include="zinflate.h" />
     <ClInclude Include="zlib.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="x64dll.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugU|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseU|Win32'">true</ExcludedFromBuild>
+    </MASM>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

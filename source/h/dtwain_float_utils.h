@@ -21,13 +21,17 @@ OF THIRD PARTY RIGHTS.
 #ifndef DTWAIN_FLOAT_UTILS_H
 #define DTWAIN_FLOAT_UTILS_H
 #include <cmath>
+#include <limits>
+#include <type_traits>
 
 namespace dynarithmic
 {
-    template <typename T>
-    bool float_close(T x, T y, double float_delta = +1.0e-8)
+    template<class T>
+    typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type
+        float_equal(T x, T y, int ulp=2)
     {
-        return fabs(x - y) <= float_delta;
+        return std::fabs(x - y) <= std::numeric_limits<T>::epsilon() * std::fabs(x + y) * ulp
+            || std::fabs(x - y) < std::numeric_limits<T>::min();
     }
 }
 #endif
