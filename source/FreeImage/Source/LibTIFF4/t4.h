@@ -30,7 +30,8 @@
  * of these tables it does not seem
  * worthwhile to make code & length 8 bits.
  */
-typedef struct tableentry {
+typedef struct tableentry
+{
     unsigned short length;  /* bit length of g3 code */
     unsigned short code;    /* g3 code */
     short runlen;           /* run length in bits */
@@ -281,10 +282,3 @@ extern const tableentry TIFFFaxWhiteCodes[];
 extern const tableentry TIFFFaxBlackCodes[];
 #endif
 #endif /* _T4_ */
-/*
- * Local Variables:
- * mode: c
- * c-basic-offset: 8
- * fill-column: 78
- * End:
- */
