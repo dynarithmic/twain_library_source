@@ -468,7 +468,11 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return DTWAIN_IsSourceAcquiring(Source); },
     DTWAIN_ERR_SOURCE_ACQUIRING, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
     // Negotiate transfer
-    CTL_TwainAppMgr::SetTransferCount(pSource, opts.getMaxPages());
+
+    // We may have to reset the max number of pages double the amount if 
+    // SetTransferCount() detects that the scanner is running a duplex scan
+    opts.setMaxPages(CTL_TwainAppMgr::SetTransferCount(pSource, opts.getMaxPages()));
+
     pSource->SetSpecialTransferMode(opts.getTransferMode());
     pSource->SetXferReadySent(false);
     if (opts.getActualAcquireType() == TWAINAcquireType_File)

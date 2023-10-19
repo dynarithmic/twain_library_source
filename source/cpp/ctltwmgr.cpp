@@ -1856,7 +1856,7 @@ int CTL_TwainAppMgr::SetTransferCount( const CTL_ITwainSource *pSource,
             nCount *= 2; // double the number of images that may be received
         SetOneTwainCapValue( pSource, nCount, CTL_SetTypeSET, TwainCap_XFERCOUNT, TWTY_INT16);
     }
-    return 1;
+    return nCount;
 }
 
 
