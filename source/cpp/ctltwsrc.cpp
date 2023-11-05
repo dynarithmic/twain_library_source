@@ -237,7 +237,8 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_pImageMemXfer(nullptr),
     m_PersistentArray(nullptr),
     m_bImageInfoRetrieved(false),
-    m_bXferReadySent(false)
+    m_bXferReadySent(false),
+    m_bDoublePageCountOnDuplex(true)
  {
     if ( lpszProduct )
         m_SourceId.set_product_name(StringConversion::Convert_NativePtr_To_Ansi(lpszProduct));
