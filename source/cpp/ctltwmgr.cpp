@@ -1853,8 +1853,11 @@ int CTL_TwainAppMgr::SetTransferCount( const CTL_ITwainSource *pSource,
         LONG isDuplex = 0;
         GetCurrentOneCapValue(pSource, &isDuplex, DTWAIN_CV_CAPDUPLEXENABLED, CTL_GetTypeGETCURRENT);
         if (isDuplex == 1 && nCount != -1)
-            nCount *= 2; // double the number of images that may be received
-        SetOneTwainCapValue( pSource, nCount, CTL_SetTypeSET, TwainCap_XFERCOUNT, TWTY_INT16);
+        {
+            if (pSource->IsDoublePageCountOnDuplex())
+                nCount *= 2; // double the number of images that may be received
+            SetOneTwainCapValue( pSource, nCount, CTL_SetTypeSET, TwainCap_XFERCOUNT, TWTY_INT16);
+        }
     }
     return nCount;
 }

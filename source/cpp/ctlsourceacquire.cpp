@@ -88,6 +88,33 @@ void CTL_TwainDLLHandle::EraseAcquireNum(DTWAIN_ACQUIRE nNum)
     pHandle->m_aAcquireNum[nNum] = -1;
 }
 
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDoublePageCountOnDuplex(DTWAIN_SOURCE Source, DTWAIN_BOOL bDoubleCount)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, bDoubleCount))
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    CTL_ITwainSource* p = VerifySourceHandle(pHandle, Source);
+    if (p)
+    {
+        p->SetDoublePageCountOnDuplex(bDoubleCount);
+        LOG_FUNC_EXIT_PARAMS(TRUE)
+    }
+    LOG_FUNC_EXIT_PARAMS(FALSE)
+    CATCH_BLOCK(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsDoublePageCountOnDuplex(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const CTL_ITwainSource* p = VerifySourceHandle(pHandle, Source);
+    if (p)
+    {
+        LOG_FUNC_EXIT_PARAMS(p->IsDoublePageCountOnDuplex())
+    }
+    LOG_FUNC_EXIT_PARAMS(FALSE)
+    CATCH_BLOCK(FALSE)
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceAcquiring(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
