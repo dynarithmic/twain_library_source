@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2023 Dynarithmic Software.
+    Copyright (c) 2002-2024 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -86,6 +86,33 @@ void CTL_TwainDLLHandle::EraseAcquireNum(DTWAIN_ACQUIRE nNum)
     if (nNum >= static_cast<LONG_PTR>(nSize) || nNum < 0)
         return;
     pHandle->m_aAcquireNum[nNum] = -1;
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDoublePageCountOnDuplex(DTWAIN_SOURCE Source, DTWAIN_BOOL bDoubleCount)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, bDoubleCount))
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    CTL_ITwainSource* p = VerifySourceHandle(pHandle, Source);
+    if (p)
+    {
+        p->SetDoublePageCountOnDuplex(bDoubleCount);
+        LOG_FUNC_EXIT_PARAMS(TRUE)
+    }
+    LOG_FUNC_EXIT_PARAMS(FALSE)
+    CATCH_BLOCK(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsDoublePageCountOnDuplex(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const CTL_ITwainSource* p = VerifySourceHandle(pHandle, Source);
+    if (p)
+    {
+        LOG_FUNC_EXIT_PARAMS(p->IsDoublePageCountOnDuplex())
+    }
+    LOG_FUNC_EXIT_PARAMS(FALSE)
+    CATCH_BLOCK(FALSE)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceAcquiring(DTWAIN_SOURCE Source)
@@ -468,7 +495,11 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return DTWAIN_IsSourceAcquiring(Source); },
     DTWAIN_ERR_SOURCE_ACQUIRING, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
     // Negotiate transfer
-    CTL_TwainAppMgr::SetTransferCount(pSource, opts.getMaxPages());
+
+    // We may have to reset the max number of pages double the amount if 
+    // SetTransferCount() detects that the scanner is running a duplex scan
+    opts.setMaxPages(CTL_TwainAppMgr::SetTransferCount(pSource, opts.getMaxPages()));
+
     pSource->SetSpecialTransferMode(opts.getTransferMode());
     pSource->SetXferReadySent(false);
     if (opts.getActualAcquireType() == TWAINAcquireType_File)

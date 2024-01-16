@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2023 Dynarithmic Software.
+    Copyright (c) 2002-2024 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -237,7 +237,8 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_pImageMemXfer(nullptr),
     m_PersistentArray(nullptr),
     m_bImageInfoRetrieved(false),
-    m_bXferReadySent(false)
+    m_bXferReadySent(false),
+    m_bDoublePageCountOnDuplex(true)
  {
     if ( lpszProduct )
         m_SourceId.set_product_name(StringConversion::Convert_NativePtr_To_Ansi(lpszProduct));

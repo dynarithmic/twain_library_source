@@ -1031,3 +1031,4 @@ DTWAIN_SelectSourceByNameWithOpenA                @31013
 DTWAIN_SelectSourceByNameWithOpenW                @31014
 DTWAIN_SelectSourceWithOpen                       @31015
 DTWAIN_SelectDefaultSourceWithOpen                @31016
+DTWAIN_SetDoublePageCountOnDuplex                 @31020
