@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2023 Dynarithmic Software.
+    Copyright (c) 2002-2024 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -432,7 +432,8 @@ namespace dynarithmic
         const std::vector<int>& GetSupportedTransferMechanisms() const { return m_aTransferMechanisms; }
         void         SetSupportedTransferMechanisms(const std::vector<int>& aTransferMechanisms)
                             { m_aTransferMechanisms = aTransferMechanisms; }
-
+        void         SetDoublePageCountOnDuplex(bool bSet) { m_bDoublePageCountOnDuplex = bSet; }
+        bool         IsDoublePageCountOnDuplex() const { return m_bDoublePageCountOnDuplex; }
         // Only public member
         void *      m_pUserPtr;
 
@@ -554,6 +555,7 @@ namespace dynarithmic
         bool            m_bImageNegative;
         bool            m_bProcessingPixelInfo;
         bool            m_bSkipImageInfoErrors;
+        bool            m_bDoublePageCountOnDuplex;
         LONG            m_nForcedBpp;
         std::vector<int> m_aTransferMechanisms;
 
