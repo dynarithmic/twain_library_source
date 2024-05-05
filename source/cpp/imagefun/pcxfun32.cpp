@@ -197,8 +197,6 @@ int CPCXImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, 
     depth = ht;
     bits  = bpp;
 
-    pcx = {};
-
     if(bits < 4)
         GetDibPalette(fimage,pcx.palette);
 
@@ -362,7 +360,8 @@ WORD CPCXImageHandler::PCXWriteLine(LPSTR p, std::ofstream& fh,int n)
     int m_nStatus;
     do {
         unsigned short int i = 0;
-        while(p[t+i]==p[t+i+1] && t+i < n && i < 63)++i;
+        while(i < 63 && t+i < n && p[t+i]==p[t+i+1])
+            ++i;
         if(i>0)
         {
             putbufferedbyte(i | 0xc0, fh, false, &m_nStatus);
