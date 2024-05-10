@@ -707,21 +707,9 @@ bool CTL_TwainAppMgr::ShowUserInterface( CTL_ITwainSource *pSource, bool bTest, 
             }
         }
 
-        if ( bTest && !bShowUIOnly )
-        {
-            pTempSource->SetUIOpenOnAcquire( bOld );
-        }
-
         return false;
     }
 
-    if ( bTest && !bShowUIOnly )
-    {
-        // We were testing if the UI is available.  This is done for diagnostic purposes on old 
-        // TWAIN sources.
-        DisableUserInterface( pSource );
-        pTempSource->SetUIOpenOnAcquire( bOld );
-    }
     return true;
 }
 
