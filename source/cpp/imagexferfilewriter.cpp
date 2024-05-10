@@ -292,9 +292,7 @@ LONG ImageXferFileWriter::MergeDuplexFiles() const
         case DTWAIN_MANDUP_FACEDOWNBOTTOMPAGE:
             nIncrement[0] = 1;
             nIncrement[1] = -1;
-            nCurPage[0] = 0;
             nCurPage[1] = nTotalFiles - 1;
-            nWhichSide[0] = 0;
             nWhichSide[1] = 1;
         break;
 
@@ -302,9 +300,7 @@ LONG ImageXferFileWriter::MergeDuplexFiles() const
             nIncrement[0] = -1;
             nIncrement[1] = 1;
             nCurPage[0] = nTotalFiles - 1;
-            nCurPage[1] = 0;
             nWhichSide[0] = 1;
-            nWhichSide[1] = 0;
             IsOddSide1 = false;
         break;
 
@@ -312,7 +308,6 @@ LONG ImageXferFileWriter::MergeDuplexFiles() const
             nIncrement[0] = -1;
             nIncrement[1] = 1;
             nCurPage[0] = nTotalFiles - 1;
-            nCurPage[1] = 0;
             nWhichSide[0] = 0;
             nWhichSide[1] = 1;
         break;
@@ -320,9 +315,7 @@ LONG ImageXferFileWriter::MergeDuplexFiles() const
         case DTWAIN_MANDUP_FACEUPTOPPAGE:
             nIncrement[0] = 1;
             nIncrement[1] = -1;
-            nCurPage[0] = 0;
             nCurPage[1] = nTotalFiles - 1;
-            nWhichSide[0] = 0;
             nWhichSide[1] = 1;
             IsOddSide1 = false;
         break;

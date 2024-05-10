@@ -8,6 +8,7 @@ This repository contains the source code and development versions of the Dynarit
 ##### [Rebuilding DTWAIN from source](#rebuild-source)
 ##### [Building the Demo Programs](#build-demo)  
 ##### [Contributing updates](#contribute-updates)
+##### [Source Code Analysis Tools used](#tools-we-use)
 
 ----
 
@@ -205,4 +206,11 @@ dtwain64ud.vb    (this will use dtwain64ud.dll at runtime)
 If you wish to add your own changes to this repository, it is highly suggested that you "git clone" the **development** branch, and then make a pull request to have your changes merged into the development branch (not the **main** branch).  Once the pull request passes review, the updated changes will be merged into the development branch.  
 
 When deemed appropriate by the maintainer of this repository, the development branch will be merged into the main branch.  Then the main branch will be used to build the libraries found in the dynarithmic/twain_library repository.  The main branch will always reflect the current build being distributed to the public in the dynarithmic/twain_library repository. 
+
+----
+### <a name="tools-we-use"></a> Source Code Analysis Tools used
+We use the following tools for source code analysis of the underlying C++ code base for DTWAIN:
+
+[PVS-Studio](https://pvs-studio.com/pvs-studio/?utm_source=website&utm_medium=github&utm_campaign=open_source) - static analyzer for C, C++, C#, and Java code.
+
 
