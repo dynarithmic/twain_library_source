@@ -308,7 +308,6 @@ LONG ImageXferFileWriter::MergeDuplexFiles() const
             nIncrement[0] = -1;
             nIncrement[1] = 1;
             nCurPage[0] = nTotalFiles - 1;
-            nWhichSide[0] = 0;
             nWhichSide[1] = 1;
         break;
 
@@ -526,7 +525,7 @@ int ImageXferFileWriter::MergeDuplexFilesEx(const sDuplexFileData& DupData,
             const CTL_TwainDibPtr ThisDib = std::make_shared<CTL_TwainDib>(pDibBufferHandle);
 
             // Move this DIB to the image file
-            const LONG nStatus = CopyDibToFileEx(ThisDib, MultiPageOption, pHandler, std::move(strTempFile));
+            const LONG nStatus = CopyDibToFileEx(ThisDib, MultiPageOption, pHandler, strTempFile);
             if (nStatus != 0)
             {
                 retval = ProcessManualDuplexState(DTWAIN_TN_MANDUPFILESAVEERROR);

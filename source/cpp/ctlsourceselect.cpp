@@ -439,7 +439,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDefaultSource(DTWAIN_SOURCE Source)
     {
         // Load the resources
         CSimpleIniA customProfile;
-        CTL_StringType fullDirectory = dynarithmic::GetDTWAININIPath().c_str();
+        CTL_StringType fullDirectory = dynarithmic::GetDTWAININIPath();
         customProfile.LoadFile(fullDirectory.c_str());
         customProfile.SetValue("Sources", "Default", p->GetProductNameA().c_str());
         customProfile.SaveFile(fullDirectory.c_str());

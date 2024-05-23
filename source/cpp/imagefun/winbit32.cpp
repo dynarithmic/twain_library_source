@@ -85,7 +85,7 @@ int  CDibInterface::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR pat
 
     // Check if any error occurred
     LONG err = GetLastError();
-    if ( err == IS_ERR_OK)
+    if (err == IS_ERR_OK)
     {
         const int nUsedColors = CalculateUsedPaletteEntries(bpp);
         const LPBITMAPINFOHEADER bi = reinterpret_cast<LPBITMAPINFOHEADER>(pImage2);
@@ -95,15 +95,15 @@ int  CDibInterface::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR pat
         CTL_TwainAppMgr::WriteLogInfoA("Image has " + strm.str() + " colors\n");
 
         err = WriteImage(ptrHandler,
-                         pImage2,
-                         wid,
-                         ht,
-                         bpp,
-                         nUsedColors,
-                         GetPalettePtr(pImage2, nUsedColors),
-                         pUserInfo);
+            pImage2,
+            wid,
+            ht,
+            bpp,
+            nUsedColors,
+            GetPalettePtr(pImage2, nUsedColors),
+            pUserInfo);
         const bool goodClose = CloseOutputFile();
-        if ( err != 0 || !goodClose)
+        if (err != 0 || !goodClose)
         {
             if (!goodClose)
                 err = DTWAIN_ERR_FILEWRITE;
@@ -111,6 +111,8 @@ int  CDibInterface::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR pat
             delete_file(path);
         }
     }
+    else
+        CloseOutputFile(true);
     return err;
 }
 
