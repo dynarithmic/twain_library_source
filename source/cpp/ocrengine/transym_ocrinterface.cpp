@@ -742,9 +742,9 @@ LONG TransymOCR::ProcessTOCRJob()
 
             // Retrieve the results
             status = m_SDK.TOCRGetJobResults(m_JobHandle, &ResultsInf,
-                reinterpret_cast<TOCRRESULTS*>(&theResults[0]));
+                reinterpret_cast<TOCRRESULTS*>(theResults.data()));
 
-            const TOCRRESULTS* TOCRResults = reinterpret_cast<TOCRRESULTS*>(&theResults[0]);
+            const TOCRRESULTS* TOCRResults = reinterpret_cast<TOCRRESULTS*>(theResults.data());
             if ( status == TOCR_OK )
             {
                 m_sOCRResults.reserve(TOCRResults->Hdr.NumItems + 100);
