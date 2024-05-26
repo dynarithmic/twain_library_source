@@ -1,5 +1,16 @@
 DTWAIN Version changes
 
+5.4.5
+
+- Upgraded following internal image, compression, and cryptography libraries:
+
+      libpng   --> 1.6.43
+      libwebp  --> 1.4.0
+ 
+- Fixed issue with DTWAIN_SelectOCREngine not showing product name of available OCR engines.
+
+
+
 5.4.4
 
 - Fixed possible null pointer access when retrieving the default TWAIN Source.
