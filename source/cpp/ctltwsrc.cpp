@@ -850,8 +850,6 @@ bool CTL_ITwainSource::IsFileTypePostscript(CTL_TwainFileFormatEnum FileType)
 
 CTL_StringType CTL_ITwainSource::PromptForFileName() const
 {
-    OPENFILENAME ofn;
-    OPENFILENAME *pOfn = &ofn;
     CTL_StringType szFilter;
     LPCTSTR szExt;
 
@@ -876,10 +874,11 @@ CTL_StringType CTL_ITwainSource::PromptForFileName() const
     // prompt for filename
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
+    OPENFILENAME ofn = {};
+    OPENFILENAME* pOfn = &ofn;
+
     if (pHandle->m_pofn)
         pOfn = pHandle->m_pofn.get();
-    else
-        memset(pOfn, 0, sizeof(OPENFILENAME));
     szFile[0] = _T('\0');
     pOfn->lStructSize = sizeof(OPENFILENAME);
     const auto sTitle = pHandle->m_CustomPlacement.sTitle;
@@ -948,10 +947,11 @@ CTL_ITwainSource::~CTL_ITwainSource()
         const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
         // Remove all of the PDF text elements for this source
-        if ( pHandle )
+        if (pHandle)
+        {
             pHandle->m_mapPDFTextElement.erase(this);
-
-        pHandle->m_ArrayFactory->destroy(m_pFileEnumerator);
+            pHandle->m_ArrayFactory->destroy(m_pFileEnumerator);
+        }
     }
     catch(...)
     {
