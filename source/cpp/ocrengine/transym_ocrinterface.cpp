@@ -29,6 +29,10 @@
 #include "ctlobstr.h"
 #include "versioninfo.h"
 #include "ctlfileutils.h"
+#include "errorcheck.h"
+#include "ctliface.h"
+#include "ctldefsource.h"
+#include "../simpleini/simpleini.h"
 
 #ifdef VERSINFO_STANDALONE
 using namespace VersionInformation;
@@ -58,11 +62,24 @@ TOCRSDK::TOCRSDK()
 {
 }
 
+static CTL_StringType GetTOCRDLLName()
+{
+    // Load the resources
+    CSimpleIniA customProfile;
+    CTL_StringType fullDirectory = dynarithmic::GetDTWAININIPath();
+    customProfile.LoadFile(fullDirectory.c_str());
+    const char* defName = customProfile.GetValue("OCRLibrary", "Transym");
+    auto val = StringConversion::Convert_AnsiPtr_To_Native(defName);
+    if (val.empty())
+        val = _T("TOCRDLL.DLL");
+    return val;
+}
+
 HMODULE TOCRSDK::InitTOCR()
 {
     if ( m_hMod )
         return m_hMod;
-    m_hMod = LoadLibrary(_T("TOCRDLL.dll"));
+    m_hMod = LoadLibrary(GetTOCRDLLName().c_str());
 
     if ( !m_hMod )
     {
@@ -124,7 +141,7 @@ TOCRSDK::~TOCRSDK()
 
 #define INIT_TOCR_ERROR_CODE(x) m_ErrorCode[x] = #x;
 ///////////////////////////////////////////////////////////////////
-TransymOCR::TransymOCR() : m_JobHandle{}, m_JobInfo{}, m_nJobRetrieveType{}, m_JobResults{}
+TransymOCR::TransymOCR(CTL_TwainDLLHandle* DLLHandle) : m_JobHandle{}, m_JobInfo{}, m_nJobRetrieveType{}, m_JobResults{}
 {
     INIT_TOCR_ERROR_CODE(TOCRERR_ILLEGALJOBNO)
     INIT_TOCR_ERROR_CODE(TOCRERR_FAILLOCKDB)
@@ -381,6 +398,11 @@ TransymOCR::TransymOCR() : m_JobHandle{}, m_JobInfo{}, m_nJobRetrieveType{}, m_J
         fArray.push_back(DTWAIN_TIFFG3);
         fArray.push_back(DTWAIN_TIFFLZW);
         SetAllFileTypes(fArray);
+    }
+    else
+    {
+        DTWAIN_Check_Error_Condition_0_Ex(DLLHandle, [&] { return !m_hMod; },
+                    DTWAIN_ERR_OCRLIBRARY_NOTFOUND, false, FUNC_MACRO);
     }
 }
 
