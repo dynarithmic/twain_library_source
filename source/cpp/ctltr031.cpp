@@ -422,7 +422,6 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                         if ( lFlags & DTWAIN_USEPROMPT )
                         {
                             pSource->SetPromptPending(true);
-                            break;
                         }
 
                         // resample the DIB
@@ -540,7 +539,6 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
 
     if ( !bPageDiscarded && pSource->IsPromptPending())
     {
-        bRetval = PromptAndSaveImage(pSource->GetPendingImageNum())?true:false;
         pSource->SetPromptPending(false);
     }
 

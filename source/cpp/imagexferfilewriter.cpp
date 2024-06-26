@@ -60,14 +60,12 @@ int ImageXferFileWriter::CopyDibToFile(CTL_TwainDibPtr pCurDib,
 
         // Check if saving via common control.  TWAIN does not like File dialog!
         long lFlags   = m_pSource->GetAcquireFileFlags();
-        if ( lFlags & DTWAIN_USEPROMPT )
-            return TRUE;
 
         // Only get a new file name if this is not a multi-page file,
         // or if this is the first page of a multi-page scan
         if ( MultipageOption == 0 || MultipageOption == DIB_MULTI_FIRST)
         {
-            if ( lFlags & TWAINFileFlag_PROMPT )
+            if ( lFlags & DTWAIN_USEPROMPT )
                 strTempFile = m_pSource->PromptForFileName();
             else
                 strTempFile = m_pSource->GetCurrentImageFileName();

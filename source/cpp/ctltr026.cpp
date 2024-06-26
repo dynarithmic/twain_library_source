@@ -339,7 +339,6 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     if ( lFlags & DTWAIN_USEPROMPT )
                     {
                         pSource->SetPromptPending(true);
-                        break;
                     }
 
                     // resample the acquired dibs
@@ -496,7 +495,6 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
     if (m_IsBuffered)
         return rc;
 
-    // Prompt to save image here
     bool bRetval = true;
     bool bForceClose;
 
@@ -504,7 +502,6 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
 
     if ( !bPageDiscarded && pSource->IsPromptPending())
     {
-        bRetval = PromptAndSaveImage(pSource->GetPendingImageNum())?true:false;
         pSource->SetPromptPending(false);
     }
 
