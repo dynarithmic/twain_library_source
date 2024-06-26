@@ -675,7 +675,7 @@ void dynarithmic::LoadOCRInterfaces(CTL_TwainDLLHandle *pHandle)
 {
     pHandle->m_OCRProdNameToEngine.clear();
 
-    const OCREnginePtr pInterface = std::make_shared<TransymOCR>();
+    const OCREnginePtr pInterface = std::make_shared<TransymOCR>(pHandle);
     if (pInterface->IsInitialized())
         pHandle->m_OCRInterfaceArray.push_back(pInterface);
 
