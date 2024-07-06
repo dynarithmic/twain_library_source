@@ -180,7 +180,7 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
         {
             if (!parent_directory_exists(opts.getFileName()).first)
             {
-                const auto dirCreated = dynarithmic::create_directory(dynarithmic::get_parent_directory(filename.c_str()).c_str());
+                const auto dirCreated = dynarithmic::create_directory(dynarithmic::get_parent_directory(filename.c_str(), false).c_str());
                 DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]
                     { return dirCreated.first == false;  }, DTWAIN_ERR_CREATE_DIRECTORY, false, FUNC_MACRO);
             }

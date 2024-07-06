@@ -35,10 +35,6 @@ CTL_PSIOHandler::CTL_PSIOHandler(CTL_TwainDib* pDib, int /*nFormat*/, const DTWA
                                     m_PSType(PSType),
                                     m_bIsMultiPage(IsMultiPage)
 {
-
-    // Create a JPEG and TIFF handler locally
-
-    //     m_pTiffHandler = new CTL_TiffIOHandler(pDib, CTL_TwainDib::TiffFormatGROUP4, ImageInfoEx);
 }
 
 int CTL_PSIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int /*fhFile*/, DibMultiPageStruct* pMultiPageStruct)

@@ -95,12 +95,12 @@ namespace dynarithmic
     class CTL_BmpIOHandler : public CTL_ImageIOHandler
     {
         public:
-            CTL_BmpIOHandler() : CTL_ImageIOHandler(), m_bUseRLE(false) {}
-            CTL_BmpIOHandler( CTL_TwainDib *pDib ) : CTL_ImageIOHandler(pDib ), m_bUseRLE(false) {}
+            CTL_BmpIOHandler() : CTL_ImageIOHandler() {}
+            CTL_BmpIOHandler( CTL_TwainDib *pDib, DTWAINImageInfoEx& imageInfo ) : CTL_ImageIOHandler(pDib ), m_ImageInfoEx(imageInfo) {}
             int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
 
         private:
-            bool m_bUseRLE;
+            DTWAINImageInfoEx m_ImageInfoEx;
     };
 
     class CTL_JpegIOHandler : public CTL_ImageIOHandler
@@ -171,9 +171,12 @@ namespace dynarithmic
     class CTL_TgaIOHandler : public CTL_ImageIOHandler
     {
         public:
-            CTL_TgaIOHandler()  : CTL_ImageIOHandler() {};
-            CTL_TgaIOHandler( CTL_TwainDib *pDib ) : CTL_ImageIOHandler( pDib ) {}
+            CTL_TgaIOHandler()  : CTL_ImageIOHandler() {}
+            CTL_TgaIOHandler( CTL_TwainDib *pDib, DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler( pDib ), m_ImageInfoEx(ImageInfoEx) {}
             int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
+
+        private:
+            DTWAINImageInfoEx m_ImageInfoEx;
     };
 
     class CTL_WmfIOHandler : public CTL_ImageIOHandler
@@ -368,6 +371,8 @@ namespace dynarithmic
                    PcxFormat = DTWAIN_PCX,
                    DcxFormat = DTWAIN_DCX,
                    TgaFormat = DTWAIN_TGA,
+                   TgaFormatRLE = DTWAIN_TGA_RLE,
+                   BmpFormatRLE = DTWAIN_BMP_RLE, 
                    TiffFormatLZW = DTWAIN_TIFFLZW,
                    TiffFormatNONE = DTWAIN_TIFFNONE,
                    TiffFormatGROUP3 = DTWAIN_TIFFG3,
