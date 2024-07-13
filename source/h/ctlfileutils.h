@@ -26,6 +26,7 @@
 namespace dynarithmic
 {
     bool delete_file(LPCTSTR filename);
+    std::uintmax_t delete_directory(LPCTSTR directory);
     std::pair<bool, std::string> parent_directory_exists(LPCTSTR filename);
     bool file_exists(LPCTSTR filename);
     std::pair<bool, std::string> create_directory(LPCTSTR dirName);

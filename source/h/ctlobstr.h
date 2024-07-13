@@ -94,6 +94,9 @@ namespace dynarithmic
         };
 #endif
 
+    using CTL_StringTypeA = std::string;
+    using CTL_StringTypeW = std::wstring;
+
     #define LOCAL_STATIC static
     #define STRINGWRAPPER_QUALIFIER StringWrapper::
     #define STRINGWRAPPER_PREFIX StringWrapper::

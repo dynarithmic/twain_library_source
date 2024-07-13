@@ -151,13 +151,31 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireFile(SourceAcquireOptions& opts)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 
+template <typename T>
+static std::vector<T> FileListToVector(SourceAcquireOptions& opts)
+{
+    std::vector<T> allNames;
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    auto fileList = opts.getFileList();
+    if (fileList)
+        allNames = pHandle->m_ArrayFactory->underlying_container_t<T>(fileList);
+    else
+        allNames.push_back(opts.getFileName());
+    return allNames;
+}
+
 bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType)
 {
     LOG_FUNC_ENTRY_PARAMS((opts))
     CTL_ITwainSource *pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), opts.getSource());
 
-    // Check if file type requires a loaded DLL
     DumpArrayContents(opts.getFileList(), 0);
+    #ifdef _UNICODE
+        auto vTest = FileListToVector<std::wstring>(opts);
+    #else
+        auto vTest = FileListToVector<std::string>(opts);
+    #endif
+
     opts.setAcquireType(AcquireType);
     opts.setDiscardDibs(true); // make sure we remove acquired dibs for file handling
     // set the auto create directory if indicated
@@ -170,19 +188,34 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
     bool bUsePrompt = opts.getFileFlags() & DTWAIN_USEPROMPT;
     if (!bUsePrompt)
     {
-        CTL_StringType filename = opts.getFileName();
-        if (!bCreateDir)
+        // The following loop makes sure that all of the files specified have directories that are writable
+        for (auto& fileName : vTest)
         {
-            DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]
-                { return !dynarithmic::directory_writeable(filename.c_str()); }, DTWAIN_ERR_INVALID_DIRECTORY, false, FUNC_MACRO);
-        }
-        else
-        {
-            if (!parent_directory_exists(opts.getFileName()).first)
+            if (!bCreateDir)
             {
-                const auto dirCreated = dynarithmic::create_directory(dynarithmic::get_parent_directory(filename.c_str(), false).c_str());
+                // Check for existing writable directory
                 DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]
-                    { return dirCreated.first == false;  }, DTWAIN_ERR_CREATE_DIRECTORY, false, FUNC_MACRO);
+                    { return !dynarithmic::directory_writeable(fileName.c_str()); }, DTWAIN_ERR_INVALID_DIRECTORY, false, FUNC_MACRO);
+            }
+            else
+            {
+                if (!parent_directory_exists(fileName.c_str()).first)
+                {
+                    auto testDir = dynarithmic::get_parent_directory(fileName.c_str(), false);
+
+                    // auto-create the directory
+                    const auto dirCreated = dynarithmic::create_directory(dynarithmic::get_parent_directory(fileName.c_str(), false).c_str());
+
+                    if (!dirCreated.first)
+                    {
+                        // directory creation failed for one of the files.  
+                        CTL_TwainAppMgr::WriteLogInfoA(CTL_StringTypeA("Error: DTWAIN_AcquireFile could not create directory: ")
+                            + StringConversion::Convert_Native_To_Ansi(testDir.c_str()));
+
+                        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]
+                            { return dirCreated.first == false;  }, DTWAIN_ERR_CREATE_DIRECTORY, false, FUNC_MACRO);
+                    }
+                }
             }
         }
     }
