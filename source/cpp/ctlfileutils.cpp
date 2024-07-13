@@ -37,6 +37,12 @@ namespace dynarithmic
         return true;
     }
 
+    std::uintmax_t delete_directory(LPCTSTR directory)
+    {
+        auto p = filesys::path(directory);
+        return filesys::remove_all(p);
+    }
+
     CTL_StringType get_parent_directory(LPCTSTR filename, bool bAddBackSlash)
     {
         auto p = filesys::path(filename);

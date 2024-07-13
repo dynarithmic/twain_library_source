@@ -570,7 +570,7 @@ void AcquireFile(BOOL bUseSource)
     bError = DTWAIN_AcquireFileEx(g_CurrentSource,
                                   AFileNames,
                                   FileType,
-                                  FileFlags,
+                                  FileFlags | DTWAIN_CREATE_DIRECTORY,
                                   DTWAIN_PT_DEFAULT, /* Use default */
                                   DTWAIN_ACQUIREALL, /* Get all pages */
                                   UseUI,
