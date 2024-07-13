@@ -10,11 +10,13 @@ DTWAIN Version changes
       	
 - Fixed issue with saving to files using the DTWAIN_USEPROMPT flag when calling DTWAIN_AcquireFile.
 
+- Fixed issue with DTWAIN_AcquireFileEx when using the DTWAIN_CREATE_DIRECTORY file flag.
+
 - Added generation of Targa Run Length Encoded files to DTWAIN_AcquireFile.  The new constant to use to
   generate thee files is DTWAIN_TGA_RLE.
 
 - Added generation of BMP Run Length Encoded files to DTWAIN_AcquireFile.  The new constant to use to
-  generate thee files is DTWAIN_BMP_RLE.  Usage of RLE reduces the size of the resulting BMP file.
+  generate these files is DTWAIN_BMP_RLE.  Usage of RLE reduces the size of the resulting BMP file.
   Note that this is only available for 8 bit-per-pixel BMP files.
  
 - Fixed issue with DTWAIN_SelectOCREngine not showing product name of available OCR engines.
