@@ -288,7 +288,8 @@ namespace Dynarithmic
         public const  int DTWAIN_USELONGNAME = 64;
         public const  int DTWAIN_USESOURCEMODE = 128;
         public const  int DTWAIN_USELIST = 256;
-        public const  int DTWAIN_CREATEDIRECTORY = 512;
+        public const  int DTWAIN_CREATE_DIRECTORY = 512;
+        public const  int DTWAIN_CREATEDIRECTORY = DTWAIN_CREATE_DIRECTORY;
         public const  int DTWAIN_ARRAYANY = 1;
         public const  int DTWAIN_ArrayTypePTR = 1;
         public const  int DTWAIN_ARRAYLONG = 2;
