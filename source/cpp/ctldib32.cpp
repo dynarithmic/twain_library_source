@@ -197,7 +197,9 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
     switch (nFormat )
     {
         case BmpFormat:
-            pHandler = std::make_unique<CTL_BmpIOHandler>( this );
+        case BmpFormatRLE:
+            ImageInfo.IsRLE = (nFormat == BmpFormatRLE);
+            pHandler = std::make_unique<CTL_BmpIOHandler>( this, ImageInfo );
         break;
 
         case JpegFormat:
@@ -242,7 +244,9 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
             pHandler = std::make_unique<CTL_TiffIOHandler>( this, nFormat, ImageInfo );
         break;
         case TgaFormat:
-            pHandler = std::make_unique<CTL_TgaIOHandler>( this );
+        case TgaFormatRLE:
+            ImageInfo.IsRLE = (nFormat == TWAINFileFormat_TGARLE);
+            pHandler = std::make_unique<CTL_TgaIOHandler>( this, ImageInfo );
         break;
 
         case WmfFormat:

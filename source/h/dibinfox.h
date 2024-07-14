@@ -103,6 +103,7 @@ namespace dynarithmic
         bool IsCreateDirectory;
         bool IsIcoResized;
         bool IsWBMPResized;
+        bool IsRLE;
 
         LONG nJpegQuality;
         bool bProgressiveJpeg;
@@ -163,7 +164,8 @@ namespace dynarithmic
             PDFCustomScale{},
             IsCreateDirectory(false),
             IsIcoResized(false),
-            IsWBMPResized(false)
+            IsWBMPResized(false),
+            IsRLE(false)
         {
         }
     };

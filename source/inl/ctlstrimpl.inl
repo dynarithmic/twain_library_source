@@ -307,7 +307,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2StringW(DTWAIN_SOURCE Source, LPW
     std::array<LPWSTR, 4> outarg = {left, top, right, bottom};
     std::array<std::string, 4> args = {{std::string(1024, 0), std::string(1024, 0), std::string(1024, 0), std::string(1024, 0)}};
     DTWAIN_BOOL retVal = DTWAIN_GetAcquireArea2String(Source, &args[0][0], &args[1][0], &args[2][0], &args[3][0], Unit);
-    for ( size_t i = 0; i < 4; ++i )
+    for ( size_t i = 0; i < args.size(); ++i )
         null_terminator_copier(get_view(args[i]), outarg[i], retVal);
     return retVal;
 #endif
@@ -349,7 +349,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAppInfoW(LPWSTR szVerStr, LPWSTR szManu, LPWS
     std::array<LPWSTR, 4> outarg = { szVerStr, szManu, szProdFam, szProdName };
     std::array<std::string, 4> args = { { std::string(1024, 0), std::string(1024, 0), std::string(1024, 0), std::string(1024, 0) } };
     DTWAIN_BOOL retVal = DTWAIN_GetAppInfo(&args[0][0], &args[1][0], &args[2][0], &args[3][0]);
-    for (size_t i = 0; i < 4; ++i)
+    for (size_t i = 0; i < args.size(); ++i)
         null_terminator_copier(get_view(args[i]), outarg[i], retVal);
     return retVal;
 #endif

@@ -435,7 +435,7 @@ int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, std::string& sT
         switch( fileType )
         {
             case DTWAIN_BMP:
-                pHandler = std::make_shared<CTL_BmpIOHandler>(m_pDib);
+                pHandler = std::make_shared<CTL_BmpIOHandler>(m_pDib, m_ImageInfoEx);
             break;
 
             case DTWAIN_TIFFG4:

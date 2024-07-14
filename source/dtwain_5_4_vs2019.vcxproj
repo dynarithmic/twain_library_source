@@ -243,7 +243,7 @@
       <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalOptions>-Zm400 %(AdditionalOptions)</AdditionalOptions>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
       <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
@@ -366,7 +366,7 @@ copy $(TargetDir)$(TargetName).lib .
       <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalOptions>/Zm1024 %(AdditionalOptions)</AdditionalOptions>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <ResourceCompile>
@@ -489,7 +489,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <ResourceCompile>
@@ -613,7 +613,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalOptions>/Zm1024 %(AdditionalOptions)</AdditionalOptions>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <ResourceCompile>
@@ -714,7 +714,7 @@ copy $(TargetDir)$(TargetName).lib .
       <PrecompiledHeader>Use</PrecompiledHeader>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeaderOutputFile>dtwain$(PlatformArchitecture)ud.pch</PrecompiledHeaderOutputFile>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
@@ -802,7 +802,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeaderOutputFile>dtwain$(PlatformArchitecture)u.pch</PrecompiledHeaderOutputFile>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
@@ -894,7 +894,7 @@ copy $(TargetDir)$(TargetName).lib .
       <LanguageStandard>stdcpp14</LanguageStandard>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeaderOutputFile>dtwain$(PlatformArchitecture).pch</PrecompiledHeaderOutputFile>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
@@ -987,7 +987,7 @@ copy $(TargetDir)$(TargetName).lib .
       <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeaderOutputFile>dtwain$(PlatformArchitecture)d.pch</PrecompiledHeaderOutputFile>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
