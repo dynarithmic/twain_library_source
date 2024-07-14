@@ -37,7 +37,13 @@ namespace dynarithmic
         return true;
     }
 
-    CTL_StringType get_parent_directory(LPCTSTR filename)
+    std::uintmax_t delete_directory(LPCTSTR directory)
+    {
+        auto p = filesys::path(directory);
+        return filesys::remove_all(p);
+    }
+
+    CTL_StringType get_parent_directory(LPCTSTR filename, bool bAddBackSlash)
     {
         auto p = filesys::path(filename);
         const auto p2 = p.remove_filename();
@@ -46,7 +52,10 @@ namespace dynarithmic
 #else
         auto str = p2.string();
 #endif
-        str = StringWrapper::AddBackslashToDirectory(str);
+        if (!bAddBackSlash)
+            str = StringWrapper::RemoveBackslashFromDirectory(str);
+        else
+            str = StringWrapper::AddBackslashToDirectory(str);
         return str;
     }
 

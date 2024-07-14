@@ -89,7 +89,6 @@ For platform toolset v143 -- Download files with "14.3" in the file name.
 If you are not using Visual C++, you will need to build the following boost libraries:  
 * chrono
 * date_time
-* filesystem
 * log
 * system
 * thread

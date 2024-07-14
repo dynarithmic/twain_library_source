@@ -42,7 +42,7 @@ namespace dynarithmic
         }
 
         TW_IDENTITY m_identity;
-
+        static constexpr unsigned maxCharSize = 32;
     public:
         explicit CTL_TwainIdentity(TW_IDENTITY& t) : m_identity(t) {}
         explicit CTL_TwainIdentity(TW_IDENTITY* t) : m_identity(t ? *t : TW_IDENTITY()) {}
@@ -63,10 +63,10 @@ namespace dynarithmic
         CTL_TwainIdentity& set_protocol_major(uint16_t val) { m_identity.ProtocolMajor = val; return *this; }
         CTL_TwainIdentity& set_protocol_minor(uint16_t val) { m_identity.ProtocolMinor = val; return *this; }
         CTL_TwainIdentity& set_supported_groups(uint32_t val) { m_identity.SupportedGroups = val; return *this; }
-        CTL_TwainIdentity& set_manufacturer(const std::string& s) { copy_util(s, m_identity.Manufacturer, 32U); return *this; }
-        CTL_TwainIdentity& set_product_family(const std::string& s) { copy_util(s, m_identity.ProductFamily, 32U); return *this; }
-        CTL_TwainIdentity& set_product_name(const std::string& s) { copy_util(s, m_identity.ProductName, 32U); return *this; }
-        CTL_TwainIdentity& set_version_info(const std::string& s) { copy_util(s, m_identity.Version.Info, 32U); return *this; }
+        CTL_TwainIdentity& set_manufacturer(const std::string& s) { copy_util(s, m_identity.Manufacturer, maxCharSize); return *this; }
+        CTL_TwainIdentity& set_product_family(const std::string& s) { copy_util(s, m_identity.ProductFamily, maxCharSize); return *this; }
+        CTL_TwainIdentity& set_product_name(const std::string& s) { copy_util(s, m_identity.ProductName, maxCharSize); return *this; }
+        CTL_TwainIdentity& set_version_info(const std::string& s) { copy_util(s, m_identity.Version.Info, maxCharSize); return *this; }
 
         CTL_TwainIdentity& set_major_num(uint16_t val) { m_identity.Version.MajorNum = val; return *this; }
         CTL_TwainIdentity& set_minor_num(uint16_t val) { m_identity.Version.MinorNum = val; return *this; }

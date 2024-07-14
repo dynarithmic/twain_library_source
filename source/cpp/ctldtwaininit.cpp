@@ -1031,6 +1031,8 @@ bool dynarithmic::AnyLoggerExists(CTL_TwainDLLHandle* pHandle)
 void dynarithmic::WriteUserDefinedLogMsg(LPCTSTR sz)
 {
     auto pHandle = static_cast<CTL_TwainDLLHandle*>(dynarithmic::GetDTWAINHandle_Internal());
+    if (!pHandle)
+        return;
     if (pHandle->m_LoggerCallbackInfo.m_pLoggerCallback)
         pHandle->m_LoggerCallbackInfo.m_pLoggerCallback(sz, pHandle->m_LoggerCallbackInfo.m_pLoggerCallback_UserData);
     if (pHandle->m_LoggerCallbackInfo.m_pLoggerCallbackA)
@@ -1050,6 +1052,8 @@ void dynarithmic::WriteUserDefinedLogMsg(LPCTSTR sz)
 void dynarithmic::WriteUserDefinedLogMsgA(LPCSTR sz)
 {
     auto pHandle = static_cast<CTL_TwainDLLHandle*>(dynarithmic::GetDTWAINHandle_Internal());
+    if (!pHandle)
+        return;
     auto& loggerRef = pHandle->m_LoggerCallbackInfo;
     if (loggerRef.m_pLoggerCallbackA)
         loggerRef.m_pLoggerCallbackA(sz, loggerRef.m_pLoggerCallback_UserDataA);
@@ -1074,6 +1078,8 @@ void dynarithmic::WriteUserDefinedLogMsgA(LPCSTR sz)
 void dynarithmic::WriteUserDefinedLogMsgW(LPCWSTR sz)
 {
     auto pHandle = static_cast<CTL_TwainDLLHandle*>(dynarithmic::GetDTWAINHandle_Internal());
+    if (!pHandle)
+        return;
     auto& loggerRef = pHandle->m_LoggerCallbackInfo;
     if (loggerRef.m_pLoggerCallbackW)
         loggerRef.m_pLoggerCallbackW(sz, loggerRef.m_pLoggerCallback_UserDataW);
@@ -1360,6 +1366,8 @@ static DTWAIN_ARRAY GetFileTypes(int nType)
 {
     constexpr const char *sNames[] = { "","-Single","-Multi" };
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    if (!pHandle)
+        return {};
     DTWAIN_ARRAY aFileTypes = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 0);
     if (aFileTypes)
     {
@@ -1569,7 +1577,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
         }
     }
 
-    // Remove the hook
     // Close the window (Dummy window may have been created)
     pHandle->m_bSessionAllocated = false;
     #ifdef _WIN32
@@ -1577,10 +1584,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
     {
         pHandle->m_CallbackMsg = nullptr;
         if (IsWindow(pHandle->m_hWndTwain))
-            try {
+        {
+            try
+            {
                 DestroyWindow(pHandle->m_hWndTwain);
+            }
+            catch (...) {}
         }
-        catch(...) {}
     }
     else
     {
@@ -2213,9 +2223,12 @@ std::string dynarithmic::GetDTWAININIPathA()
     return StringConversion::Convert_Native_To_Ansi(GetDTWAININIPath());
 }
 
-CTL_StringType& dynarithmic::GetDTWAINTempFilePath()
+CTL_StringType dynarithmic::GetDTWAINTempFilePath()
 {
+    static CTL_StringType sDummy;
     auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    if (!pHandle)
+        return sDummy;
     if ( pHandle->m_sTempFilePath.empty())
     {
         const auto tempPath = temp_directory_path();

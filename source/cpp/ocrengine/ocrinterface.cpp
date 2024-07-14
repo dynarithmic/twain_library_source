@@ -675,7 +675,7 @@ void dynarithmic::LoadOCRInterfaces(CTL_TwainDLLHandle *pHandle)
 {
     pHandle->m_OCRProdNameToEngine.clear();
 
-    const OCREnginePtr pInterface = std::make_shared<TransymOCR>();
+    const OCREnginePtr pInterface = std::make_shared<TransymOCR>(pHandle);
     if (pInterface->IsInitialized())
         pHandle->m_OCRInterfaceArray.push_back(pInterface);
 
@@ -757,14 +757,16 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumOCRInterfaces(LPDTWAIN_ARRAY OCRArray)
         *OCRArray = nullptr;
     else
     {
-        const DTWAIN_ARRAY theArray = DTWAIN_ArrayCreate(DTWAIN_ARRAYOCRENGINE, static_cast<LONG>(pHandle->m_OCRInterfaceArray.size()));
+        const DTWAIN_ARRAY theArray = DTWAIN_ArrayCreate(DTWAIN_ARRAYOCRENGINE, 0);
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !theArray; }, DTWAIN_ERR_OUT_OF_MEMORY, false, FUNC_MACRO);
-        DTWAIN_OCRENGINE TempE;
-        for (OCRInterfaceContainer::size_type i = 0; i < pHandle->m_OCRInterfaceArray.size(); ++i)
-        {
-            TempE = static_cast<DTWAIN_OCRENGINE>(pHandle->m_OCRInterfaceArray[i].get());
-            DTWAIN_ArraySetAt(theArray, static_cast<LONG>(i), &TempE);
-        }
+
+        const auto& factory = pHandle->m_ArrayFactory;
+        auto& vEnum = factory->underlying_container_t<OCREngine*>(theArray);
+        vEnum.clear();
+
+        for (auto &ocr : pHandle->m_OCRInterfaceArray)
+            vEnum.push_back(ocr.get());
+
         *OCRArray = theArray;
     }
     LOG_FUNC_EXIT_PARAMS(true)

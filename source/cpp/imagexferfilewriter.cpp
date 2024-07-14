@@ -60,14 +60,12 @@ int ImageXferFileWriter::CopyDibToFile(CTL_TwainDibPtr pCurDib,
 
         // Check if saving via common control.  TWAIN does not like File dialog!
         long lFlags   = m_pSource->GetAcquireFileFlags();
-        if ( lFlags & DTWAIN_USEPROMPT )
-            return TRUE;
 
         // Only get a new file name if this is not a multi-page file,
         // or if this is the first page of a multi-page scan
         if ( MultipageOption == 0 || MultipageOption == DIB_MULTI_FIRST)
         {
-            if ( lFlags & TWAINFileFlag_PROMPT )
+            if ( lFlags & DTWAIN_USEPROMPT )
                 strTempFile = m_pSource->PromptForFileName();
             else
                 strTempFile = m_pSource->GetCurrentImageFileName();
@@ -308,7 +306,6 @@ LONG ImageXferFileWriter::MergeDuplexFiles() const
             nIncrement[0] = -1;
             nIncrement[1] = 1;
             nCurPage[0] = nTotalFiles - 1;
-            nWhichSide[0] = 0;
             nWhichSide[1] = 1;
         break;
 
@@ -526,7 +523,7 @@ int ImageXferFileWriter::MergeDuplexFilesEx(const sDuplexFileData& DupData,
             const CTL_TwainDibPtr ThisDib = std::make_shared<CTL_TwainDib>(pDibBufferHandle);
 
             // Move this DIB to the image file
-            const LONG nStatus = CopyDibToFileEx(ThisDib, MultiPageOption, pHandler, std::move(strTempFile));
+            const LONG nStatus = CopyDibToFileEx(ThisDib, MultiPageOption, pHandler, strTempFile);
             if (nStatus != 0)
             {
                 retval = ProcessManualDuplexState(DTWAIN_TN_MANDUPFILESAVEERROR);

@@ -788,6 +788,8 @@ void CTL_ITwainSource::initFileSaveMap() const
         m_saveFileMap[TWAINFileFormat_BMP] =
             m_saveFileMap[DTWAIN_FF_BMP] = MAKE_FILE_FORMAT_INFO("Windows Bitmap Format (*.bmp)\0*.bmp\0\0", ".bmp");
 
+        m_saveFileMap[TWAINFileFormat_BMPRLE] = MAKE_FILE_FORMAT_INFO("Windows Bitmap Format (RLE) (*.bmp)\0*.bmp\0\0", ".bmp");
+
         m_saveFileMap[TWAINFileFormat_JPEG] =
             m_saveFileMap[DTWAIN_FF_JFIF] = MAKE_FILE_FORMAT_INFO("JFIF (JPEG) Format (*.jpg)\0*.jpg\0\0",".jpg");
 
@@ -815,6 +817,8 @@ void CTL_ITwainSource::initFileSaveMap() const
             m_saveFileMap[DTWAIN_FF_PNG] = MAKE_FILE_FORMAT_INFO("PNG Format (*.png)\0*.png\0\0",".png");
 
         m_saveFileMap[TWAINFileFormat_TGA] = MAKE_FILE_FORMAT_INFO("Targa (TGA) Format (*.tga)\0*.tga\0\0",".tga");
+
+        m_saveFileMap[TWAINFileFormat_TGARLE] = MAKE_FILE_FORMAT_INFO("Targa (TGA) Format (Run Length Encoded) (*.tga)\0*.tga\0\0", ".tga");
 
         m_saveFileMap[DTWAIN_POSTSCRIPT1] =
             m_saveFileMap[DTWAIN_POSTSCRIPT1MULTI] = MAKE_FILE_FORMAT_INFO("Postscript Level 1 Format (*.ps)\0*.ps\0\0",".ps");
@@ -850,8 +854,6 @@ bool CTL_ITwainSource::IsFileTypePostscript(CTL_TwainFileFormatEnum FileType)
 
 CTL_StringType CTL_ITwainSource::PromptForFileName() const
 {
-    OPENFILENAME ofn;
-    OPENFILENAME *pOfn = &ofn;
     CTL_StringType szFilter;
     LPCTSTR szExt;
 
@@ -876,10 +878,11 @@ CTL_StringType CTL_ITwainSource::PromptForFileName() const
     // prompt for filename
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
+    OPENFILENAME ofn = {};
+    OPENFILENAME* pOfn = &ofn;
+
     if (pHandle->m_pofn)
         pOfn = pHandle->m_pofn.get();
-    else
-        memset(pOfn, 0, sizeof(OPENFILENAME));
     szFile[0] = _T('\0');
     pOfn->lStructSize = sizeof(OPENFILENAME);
     const auto sTitle = pHandle->m_CustomPlacement.sTitle;
@@ -948,10 +951,11 @@ CTL_ITwainSource::~CTL_ITwainSource()
         const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
         // Remove all of the PDF text elements for this source
-        if ( pHandle )
+        if (pHandle)
+        {
             pHandle->m_mapPDFTextElement.erase(this);
-
-        pHandle->m_ArrayFactory->destroy(m_pFileEnumerator);
+            pHandle->m_ArrayFactory->destroy(m_pFileEnumerator);
+        }
     }
     catch(...)
     {

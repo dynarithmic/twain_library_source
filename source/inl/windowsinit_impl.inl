@@ -128,22 +128,25 @@ void dynarithmic::DTWAIN_InvokeCallback(int nWhich, DTWAIN_HANDLE p, DTWAIN_SOUR
 {
     DTWAIN_CALLBACK cProc;
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(p);
-    switch (nWhich)
+    if (pHandle)
     {
-    case DTWAIN_CallbackMESSAGE:
-        cProc = pHandle->m_CallbackMsg;
-        break;
-    case DTWAIN_CallbackERROR:
-        cProc = pHandle->m_CallbackError;
-        break;
-    default:
-        return;
+        switch (nWhich)
+        {
+        case DTWAIN_CallbackMESSAGE:
+            cProc = pHandle->m_CallbackMsg;
+            break;
+        case DTWAIN_CallbackERROR:
+            cProc = pHandle->m_CallbackError;
+            break;
+        default:
+            return;
+        }
+
+        if (!cProc)
+            return;
+
+        (*cProc)(pHandle, pSource, lData1, lData2);
     }
-
-    if (!cProc)
-        return;
-
-    (*cProc)(pHandle, pSource, lData1, lData2);
 }
 
 void RegisterTwainWindowClass()
