@@ -23,6 +23,8 @@ DTWAIN Version changes
 
 - Added entry to twaininfo.txt to properly handle text obtained from 1 bit-per-pixel OCR-ed images.
 
+- Added versioning check for twaininfo.txt.
+
 
 5.4.4
 
