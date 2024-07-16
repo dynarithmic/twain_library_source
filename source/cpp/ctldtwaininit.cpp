@@ -2329,24 +2329,33 @@ void LoadFlatbedOnlyOverrides()
 bool LoadGeneralResources(bool blockExecution)
 {
     bool bResourcesLoaded = false;
-    typedef std::function<bool(std::pair<bool, bool>&)> boolFuncs;
+    typedef std::function<bool(ResourceLoadingInfo&)> boolFuncs;
     boolFuncs bf[] = { &LoadTwainResources };
     for (auto& fnBool : bf)
     {
-        std::pair<bool, bool> ret;
+        ResourceLoadingInfo ret;
         fnBool(ret);
-        if (!ret.first || !ret.second)
+        if (!ret.errorValue[0] || !ret.errorValue[1] || !ret.errorValue[2] )
         {
 #ifdef _WIN32
             if (blockExecution)
             {
                 CTL_StringType errorMsg = _T("Error.  DTWAIN Resource file(s) not found or corrupted: ");
                 std::vector<CTL_StringType> vErrors;
-                if (!ret.first)
+                if (!ret.errorValue[0])
                     vErrors.push_back(DTWAINRESOURCEINFOFILE);
-                if (!ret.second)
+                if (!ret.errorValue[1])
                     vErrors.push_back(DTWAIN_ININAME_NATIVE);
-                CTL_StringType sAllErrors = errorMsg + StringWrapper::Join(vErrors, _T(","));
+                if (!ret.errorValue[2])
+                {
+                    CTL_StringType versionErrorMessage = _T("Error.  Bad or outdated TWAIN version of resources used: (");
+                    versionErrorMessage += ret.errorMessage;
+                    versionErrorMessage += _T(").  Expected minimum version: ");
+                    versionErrorMessage += _T(DTWAIN_TEXTRESOURCE_FILEVERSION);
+                    versionErrorMessage += _T("\nPlease use the latest text resources found at \"https://github.com/dynarithmic/twain_library/tree/master/text_resources\"");
+                    vErrors.push_back(versionErrorMessage);
+                }
+                CTL_StringType sAllErrors = errorMsg + StringWrapper::Join(vErrors, _T(",\n"));
                 MessageBox(nullptr, sAllErrors.c_str(), _T("DTWAIN Resource Error"), MB_ICONERROR);
             }
 #endif
