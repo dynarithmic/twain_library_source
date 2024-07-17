@@ -54,11 +54,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(p); },
                                         DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
-    if (Array)
-    {
-        if (factory->is_valid(*Array))
-            factory->clear(*Array);
-    }
+    if (factory->is_valid(*Array))
+        factory->clear(*Array);
 
     DTWAIN_ARRAY ThisArray = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 0);
     DTWAINArrayLL_RAII arr(ThisArray);

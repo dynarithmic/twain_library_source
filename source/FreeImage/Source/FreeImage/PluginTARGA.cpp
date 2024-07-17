@@ -107,16 +107,12 @@ static const char *FI_MSG_ERROR_CORRUPTED = "Image data corrupted";
 class TargaThumbnail
 {
 public:
-	TargaThumbnail() : _w(0), _h(0), _depth(0), _data(NULL) { 
+	TargaThumbnail() : _w(0), _h(0), _depth(0) { 
 	}
-	~TargaThumbnail() { 
-		if(_data) {
-			free(_data); 
-		}
-	}
+	~TargaThumbnail() = default;
 
 	BOOL isNull() const { 
-		return (_data == NULL); 
+		return (_data.empty() ); 
 	}
 	
 	BOOL read(FreeImageIO *io, fi_handle handle, size_t size) {
@@ -124,11 +120,8 @@ public:
 		io->read_proc(&_h, 1, 1, handle);
 		
 		const size_t sizeofData = size - 2;
-		_data = (BYTE*)malloc(sizeofData);
-		if(_data) {
-			return (io->read_proc(_data, 1, (unsigned)sizeofData, handle) == sizeofData);
-		}
-		return FALSE;
+		_data.resize(sizeofData);
+		return (io->read_proc(_data.data(), 1, (unsigned)sizeofData, handle) == sizeofData);
 	}
 	
 	void setDepth(BYTE dp) { 
@@ -141,7 +134,7 @@ private:
 	BYTE _w;
 	BYTE _h;
 	BYTE _depth;
-	BYTE* _data;
+	std::vector<BYTE> _data;
 };
 
 #ifdef FREEIMAGE_BIGENDIAN
@@ -180,7 +173,7 @@ FIBITMAP* TargaThumbnail::toFIBITMAP() {
 		return NULL;
 	}
 
-	const BYTE* line = _data;
+	const BYTE* line = _data.data();
 	const BYTE height = _h;
 	for (BYTE h = 0; h < height; ++h, line += line_size) {
 		BYTE* dst_line = FreeImage_GetScanLine(dib, height - 1 - h);
@@ -1397,36 +1390,37 @@ Save(FreeImageIO *io, FIBITMAP *dib, fi_handle handle, int page, int flags, void
 
 	// write the palette
 
-	if (palette) {
-		if (FreeImage_IsTransparent(dib)) {
-			FILE_BGRA *bgra_pal = (FILE_BGRA*)malloc(header.cm_length * sizeof(FILE_BGRA));
+	if (palette) 
+	{
+		if (FreeImage_IsTransparent(dib)) 
+		{
+			std::vector<FILE_BGRA> bgra_pal(header.cm_length);
 
 			// get the transparency table
 			BYTE *trns = FreeImage_GetTransparencyTable(dib);
 
-			for (unsigned i = 0; i < header.cm_length; i++) {
+			for (unsigned i = 0; i < header.cm_length; i++) 
+			{
 				bgra_pal[i].b = palette[i].rgbBlue;
 				bgra_pal[i].g = palette[i].rgbGreen;
 				bgra_pal[i].r = palette[i].rgbRed;
 				bgra_pal[i].a = trns[i];
 			}
 
-			io->write_proc(bgra_pal, sizeof(FILE_BGRA), header.cm_length, handle);
+			io->write_proc(bgra_pal.data(), sizeof(FILE_BGRA), header.cm_length, handle);
+		} 
+		else 
+		{
+			std::vector<FILE_BGR> bgr_pal(header.cm_length);
 
-			free(bgra_pal);
-
-		} else {
-			FILE_BGR *bgr_pal = (FILE_BGR*)malloc(header.cm_length * sizeof(FILE_BGR));
-
-			for (unsigned i = 0; i < header.cm_length; i++) {
+			for (unsigned i = 0; i < header.cm_length; i++) 
+			{
 				bgr_pal[i].b = palette[i].rgbBlue;
 				bgr_pal[i].g = palette[i].rgbGreen;
 				bgr_pal[i].r = palette[i].rgbRed;
 			}
 
-			io->write_proc(bgr_pal, sizeof(FILE_BGR), header.cm_length, handle);
-
-			free(bgr_pal);
+			io->write_proc(bgr_pal.data(), sizeof(FILE_BGR), header.cm_length, handle);
 		}
 	}
 

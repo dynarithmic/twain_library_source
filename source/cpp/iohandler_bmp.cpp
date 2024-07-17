@@ -33,6 +33,9 @@ int CTL_BmpIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     if ( !IsValidBitDepth(DTWAIN_BMP, m_pDib->GetBitsPerPixel()))
             return DTWAIN_ERR_INVALID_BITDEPTH;
 
+    if (m_ImageInfoEx.IsRLE)
+        return SaveToFile(hDib, szFile, FIF_BMP, BMP_SAVE_RLE, DTWAIN_INCHES, { 0, 0 });
+
     HANDLE hHandleToWrite = CTL_TwainDib::CreateBMPBitmapFromDIB(hDib);
     if (hHandleToWrite)
     {

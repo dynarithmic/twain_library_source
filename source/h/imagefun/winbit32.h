@@ -382,6 +382,7 @@ namespace dynarithmic
             static double GetScaleFactorPerInch(LONG Unit);
             virtual bool OpenOutputFile(LPCTSTR pFileName);
             virtual bool CloseOutputFile();
+            void CloseOutputFile(bool) {}
             auto& GetOutputFileHandle() { return m_fStream.getStream(); }
             CTL_StringType GetOutputFileName() const { return m_fStream.getOutputFileName(); }
 
