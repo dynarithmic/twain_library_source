@@ -121,13 +121,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2(DTWAIN_SOURCE Source, DTWAIN_FLO
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2String(DTWAIN_SOURCE Source, LPTSTR left, LPTSTR top, LPTSTR right, LPTSTR bottom, LPLONG Unit)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit))
-    DTWAIN_FLOAT val[4];
-    LPTSTR* pStr[] = { &left, &top, &right, &bottom };
+    std::array<DTWAIN_FLOAT, 4> val;
+    std::array<LPTSTR*, 4> pStr = { &left, &top, &right, &bottom };
     const DTWAIN_BOOL bRet = DTWAIN_GetAcquireArea2(Source, &val[0], &val[1], &val[2], &val[3], Unit);
     if (bRet)
     {
         std::ostringstream strm;
-        for (int i = 0; i < 4; ++i)
+        for (size_t i = 0; i < val.size(); ++i)
         {
             strm << boost::format("%1%") % val[i];
             StringWrapper::SafeStrcpy(*pStr[i], StringConversion::Convert_Ansi_To_Native(strm.str()).c_str());
@@ -196,7 +196,7 @@ static bool FillActualArray(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ActualArra
             [&] {return !pHandle->m_ArrayFactory->is_valid(ActualArray, CTL_ArrayFactory::arrayTag::DoubleType); },
             DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
         vActual.clear();
-        std::copy_n(vValues.begin(), 4, std::back_inserter(vActual));
+        std::copy_n(vValues.begin(), std::min(std::size_t(4), vValues.size()), std::back_inserter(vActual));
         return true;
     }
     return false;
@@ -222,17 +222,15 @@ static bool SetImageSize(DTWAIN_SOURCE Source, DTWAIN_ARRAY FloatArray, DTWAIN_A
         DTWAIN_Check_Error_Condition_0_Ex(pHandle,
             [&] { return !pHandle->m_ArrayFactory->is_valid(pArray, CTL_ArrayFactory::arrayTag::DoubleType); },
             DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
-
+        static const size_t minValue = 4;
         const auto& vFloat = pHandle->m_ArrayFactory->underlying_container_t<double>(FloatArray);
-
         DTWAIN_Check_Error_Condition_0_Ex(pHandle,
-            [&] { return vFloat.size() < 4; },
+            [&] { return vFloat.size() < minValue; },
             DTWAIN_ERR_AREA_ARRAY_TOO_SMALL, false, FUNC_MACRO);
-
 
         CTL_RealArray Array;
         CTL_RealArray rArray;
-        std::copy_n(vFloat.begin(), 4, std::back_inserter(Array));
+        std::copy_n(vFloat.begin(), minValue, std::back_inserter(Array));
         const bool bOk = CTL_TwainAppMgr::SetImageLayoutSize(p, Array, rArray, SetType);
         if (bOk)
             FillActualArray(pHandle, ActualArray, rArray);

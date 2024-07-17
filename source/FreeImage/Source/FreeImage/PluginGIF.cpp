@@ -78,7 +78,7 @@ class StringTable
 {
 public:
 	StringTable();
-	~StringTable();
+	~StringTable() = default;
 	void Initialize(int minCodeSize);
 	BYTE *FillInputBuffer(int len);
 	void CompressStart(int bpp, int width);
@@ -103,10 +103,10 @@ protected:
 	                      // of the whole image had already been read
 
 	std::string m_strings[MAX_LZW_CODE]; //This is what is really the "string table" data for the Decompressor
-	int* m_strmap;
+	std::vector<int> m_strmap;
 
 	//input buffer
-	BYTE *m_buffer;
+	std::vector<BYTE> m_buffer;
 	int m_bufferSize, m_bufferRealSize, m_bufferPos, m_bufferShift;
 
 	void ClearCompressorTable(void);
@@ -180,26 +180,15 @@ FreeImage_GetMetadataEx(FREE_IMAGE_MDMODEL model, FIBITMAP *dib, const char *key
 	return FALSE;
 }
 
-StringTable::StringTable()
-{
-	m_buffer = NULL;
-	firstPixelPassed = 0; // Still no pixel read
-	// Maximum number of entries in the map is MAX_LZW_CODE * 256 
-	// (aka 2**12 * 2**8 => a 20 bits key)
-	// This Map could be optmized to only handle MAX_LZW_CODE * 2**(m_bpp)
-	m_strmap = new(std::nothrow) int[1<<20];
-}
-
-StringTable::~StringTable()
-{
-	if( m_buffer != NULL ) {
-		delete [] m_buffer;
-	}
-	if( m_strmap != NULL ) {
-		delete [] m_strmap;
-		m_strmap = NULL;
-	}
-}
+StringTable::StringTable() : m_strmap(1 << 20), 
+							 firstPixelPassed(0),
+							 m_done{},
+							 m_minCodeSize{}, m_clearCode{}, m_endCode{}, m_nextCode{},
+							 m_bpp{}, m_slack{},
+							 m_prefix{}, m_codeSize{}, m_codeMask{},
+							 m_oldCode{}, m_partial{}, m_partialSize{},
+							 m_bufferSize{}, m_bufferRealSize{}, m_bufferPos{}, m_bufferShift{}
+{}
 
 void StringTable::Initialize(int minCodeSize)
 {
@@ -223,18 +212,12 @@ void StringTable::Initialize(int minCodeSize)
 
 BYTE *StringTable::FillInputBuffer(int len)
 {
-	if( m_buffer == NULL ) {
-		m_buffer = new(std::nothrow) BYTE[len];
-		m_bufferRealSize = len;
-	} else if( len > m_bufferRealSize ) {
-		delete [] m_buffer;
-		m_buffer = new(std::nothrow) BYTE[len];
-		m_bufferRealSize = len;
-	}
+	m_buffer.resize(len);
+	m_bufferRealSize = len;
 	m_bufferSize = len;
 	m_bufferPos = 0;
 	m_bufferShift = 8 - m_bpp;
-	return m_buffer;
+	return m_buffer.data();
 }
 
 void StringTable::CompressStart(int bpp, int width)
@@ -437,9 +420,7 @@ void StringTable::Done(void)
 
 void StringTable::ClearCompressorTable(void)
 {
-	if(m_strmap) {
-		memset(m_strmap, 0xFF, sizeof(unsigned int)*(1<<20));
-	}
+	memset(m_strmap.data(), 0xFF, sizeof(unsigned int)*(1<<20));
 	m_nextCode = m_endCode + 1;
 
 	m_prefix = 0;
@@ -911,8 +892,8 @@ Load(FreeImageIO *io, fi_handle handle, int page, int flags, void *data) {
 
 		//LZW Minimum Code Size
 		io->read_proc(&b, 1, 1, handle);
-		StringTable *stringtable = new(std::nothrow) StringTable;
-		stringtable->Initialize(b);
+		StringTable stringtable;
+		stringtable.Initialize(b);
 
 		//Image Data Sub-blocks
 		int x = 0, xpos = 0, y = 0, shift = 8 - bpp, mask = (1 << bpp) - 1, interlacepass = 0;
@@ -920,9 +901,9 @@ Load(FreeImageIO *io, fi_handle handle, int page, int flags, void *data) {
 		BYTE buf[4096];
 		io->read_proc(&b, 1, 1, handle);
 		while( b ) {
-			io->read_proc(stringtable->FillInputBuffer(b), b, 1, handle);
+			io->read_proc(stringtable.FillInputBuffer(b), b, 1, handle);
 			int size = sizeof(buf);
-			while( stringtable->Decompress(buf, &size) ) {
+			while( stringtable.Decompress(buf, &size) ) {
 				for( int i = 0; i < size; i++ ) {
 					scanline[xpos] |= (buf[i] & mask) << shift;
 					if( shift > 0 ) {
@@ -941,7 +922,7 @@ Load(FreeImageIO *io, fi_handle handle, int page, int flags, void *data) {
 							y++;
 						}
 						if( y >= height ) {
-							stringtable->Done();
+							stringtable.Done();
 							break;
 						}
 						x = xpos = 0;
@@ -1057,9 +1038,6 @@ Load(FreeImageIO *io, fi_handle handle, int page, int flags, void *data) {
 		FreeImage_SetMetadataEx(FIMD_ANIMATION, dib, "FrameTime", ANIMTAG_FRAMETIME, FIDT_LONG, 1, 4, &delay_time);
 		b = (BYTE)disposal_method;
 		FreeImage_SetMetadataEx(FIMD_ANIMATION, dib, "DisposalMethod", ANIMTAG_DISPOSALMETHOD, FIDT_BYTE, 1, 1, &b);
-
-		delete stringtable;
-
 	} catch (const char *msg) {
 		if( dib != NULL ) {
 			FreeImage_Unload(dib);
@@ -1312,9 +1290,9 @@ Save(FreeImageIO *io, FIBITMAP *dib, fi_handle handle, int page, int flags, void
 		//LZW Minimum Code Size
 		b = (BYTE)(bpp == 1 ? 2 : bpp);
 		io->write_proc(&b, 1, 1, handle);
-		StringTable *stringtable = new(std::nothrow) StringTable;
-		stringtable->Initialize(b);
-		stringtable->CompressStart(bpp, width);
+		StringTable stringtable;
+		stringtable.Initialize(b);
+		stringtable.CompressStart(bpp, width);
 
 		//Image Data Sub-blocks
 		int y = 0, interlacepass = 0, line = FreeImage_GetLine(dib);
@@ -1322,8 +1300,8 @@ Save(FreeImageIO *io, FIBITMAP *dib, fi_handle handle, int page, int flags, void
 		int size = sizeof(buf);
 		b = sizeof(buf);
 		while( y < output_height ) {
-			memcpy(stringtable->FillInputBuffer(line), FreeImage_GetScanLine(dib, output_height - y - 1), line);
-			while( stringtable->Compress(bufptr, &size) ) {
+			memcpy(stringtable.FillInputBuffer(line), FreeImage_GetScanLine(dib, output_height - y - 1), line);
+			while( stringtable.Compress(bufptr, &size) ) {
 				bufptr += size;
 				if( bufptr - buf == sizeof(buf) ) {
 					io->write_proc(&b, 1, 1, handle);
@@ -1345,7 +1323,7 @@ Save(FreeImageIO *io, FIBITMAP *dib, fi_handle handle, int page, int flags, void
 		}
 		size = (int)(bufptr - buf);
 		BYTE last[4];
-		w = (WORD)stringtable->CompressEnd(last);
+		w = (WORD)stringtable.CompressEnd(last);
 		if( size + w >= sizeof(buf) ) {
 			//one last full size sub-block
 			io->write_proc(&b, 1, 1, handle);
@@ -1368,9 +1346,6 @@ Save(FreeImageIO *io, FIBITMAP *dib, fi_handle handle, int page, int flags, void
 		//Block Terminator
 		b = 0;
 		io->write_proc(&b, 1, 1, handle);
-
-		delete stringtable;
-
 	} catch (const char *msg) {
 		FreeImage_OutputMessageProc(s_format_id, msg);
 		return FALSE;

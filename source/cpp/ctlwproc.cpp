@@ -202,7 +202,7 @@ LRESULT CALLBACK_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 pSource->SetAcquireStarted(true);
                 pSource->ResetFileAutoIncrementData();
-                if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) ||
+                if ((pHandle && (pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle))) ||
                      !CTL_StaticData::s_aAllCallbacks.empty())
                 {
                     // Send this message on

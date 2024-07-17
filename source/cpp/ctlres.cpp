@@ -110,30 +110,33 @@ namespace dynarithmic
         return sPath + resName;
     }
 
-    bool LoadTwainResources(std::pair<bool, bool>& retValue)
+    bool LoadTwainResources(ResourceLoadingInfo& retValue)
     {
         LOG_FUNC_ENTRY_PARAMS(())
-        retValue = { false, false };
+        retValue.errorValue[0] = false;
+        retValue.errorValue[1] = false;
+        retValue.errorValue[2] = true;
         CTL_ErrorStruct ErrorStruct;
         int dg, dat, msg, structtype, retcode, successcode;
         auto sPath = createResourceFileName(DTWAINRESOURCEINFOFILE);
         auto sPathA = StringConversion::Convert_Native_To_Ansi(sPath);
         StringWrapperA::traits_type::inputfile_type ifs(sPathA);
         if (ifs)
-            retValue.first = true;
+            retValue.errorValue[0] = true;
         // Test for the INI file existing
         {
             std::wifstream iniFile(GetDTWAININIPath());
             if (iniFile)
-                retValue.second = true;
+                retValue.errorValue[1] = true;
         }
-        if (!retValue.first || !retValue.second)
+        if (!retValue.errorValue[0] || !retValue.errorValue[1])
             return false;
 
         // Read in warning
         std::string sWarning;
         std::getline(ifs, sWarning);
 
+        // Read in the Twain triplet information
         while (ifs >> dg >> dat >> msg >> structtype >> retcode >> successcode)
         {
             if (dg == -1000 && dat == -1000)
@@ -315,6 +318,52 @@ namespace dynarithmic
                     imgNode.m_mapFromTo.insert(pr);
             }
         }
+        // Read in the minimum version number for this resource
+        // Check if resource version if >= running version
+        std::getline(ifs, totalLine);
+
+        // Check that all components are integers
+        auto origVersion = totalLine;
+        std::replace(totalLine.begin(), totalLine.end(), '.', ' ');
+        std::istringstream strmVersion(totalLine);
+        std::string oneNumber;
+        constexpr std::array<int, 3> componentNames = 
+            { 
+              DTWAIN_TEXTRESOURCE_MIN_MAJOR_VERSION, 
+              DTWAIN_TEXTRESOURCE_MIN_MINOR_VERSION, 
+              DTWAIN_TEXTRESOURCE_MIN_PATCHLEVEL_VERSION 
+            };
+        int currentComponent = 0;
+        bool badVersion = false;
+
+        // Test that the version number for the twain resource found is at least 
+        // equal to or higher than the version number built into the DTWAIN library
+        while (strmVersion >> oneNumber)
+        {
+            try
+            {
+                auto num = std::stoi(oneNumber);
+                if (num < componentNames[currentComponent])
+                {
+                    badVersion = true;
+                    break;
+                }
+                ++currentComponent;
+                if (currentComponent >= componentNames.size())
+                    break;
+            }
+            catch (...)
+            {
+                badVersion = true;
+            }
+        }
+        if (badVersion)
+        {
+            retValue.errorValue[0] = retValue.errorValue[1] = retValue.errorValue[2] = false;
+            retValue.errorMessage = StringConversion::Convert_Ansi_To_Native(origVersion.c_str());
+            return false;
+        }
+
         LOG_FUNC_EXIT_PARAMS(true)
         CATCH_BLOCK(false)
     }

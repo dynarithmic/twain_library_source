@@ -22,6 +22,7 @@
 #define CTLRES_H
 #include <vector>
 #include <string>
+#include <array>
 
 #define DTWAINLANGRESOURCEFILE _T("twainresourcestrings_")
 #define DTWAINRESOURCEINFOFILE _T("twaininfo.txt")
@@ -36,7 +37,15 @@ namespace dynarithmic
     bool LoadLanguageResourceA(LPCSTR lpszName);
     bool LoadLanguageResourceA(const std::string& lpszName, const CTL_ResourceRegistryMap& registryMap);
     bool LoadLanguageResourceA(const std::string& lpszName);
-    bool LoadTwainResources(std::pair<bool, bool>& ret);
+
+    struct ResourceLoadingInfo
+    {
+        std::array<bool, 3> errorValue;
+        CTL_StringType errorMessage;
+        ResourceLoadingInfo() : errorValue{} { errorValue[2] = true; }
+    };
+
+    bool LoadTwainResources(ResourceLoadingInfo& ret);
     void UnloadStringResources();
     void UnloadErrorResources();
     std::vector<std::string> GetLangResourceNames();

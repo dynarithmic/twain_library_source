@@ -2096,15 +2096,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetAllString(DTWAIN_FRAME Frame, LPCTSTR Le
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetAllString(DTWAIN_FRAME Frame, LPTSTR Left, LPTSTR Top, LPTSTR Right, LPTSTR Bottom)
 {
     LOG_FUNC_ENTRY_PARAMS((Frame, Left, Top, Right, Bottom))
-    double d[4];
-    const DTWAIN_BOOL bRet = DTWAIN_FrameGetAll(Frame, &d[0], &d[1], &d[2], &d[3]);
+    std::array<double, 4> aFrameComponent;
+    const DTWAIN_BOOL bRet = DTWAIN_FrameGetAll(Frame, &aFrameComponent[0], &aFrameComponent[1], &aFrameComponent[2], &aFrameComponent[3]);
     if ( !bRet )
         LOG_FUNC_EXIT_PARAMS(bRet)
-    LPTSTR* vals[] = {&Left, &Top, &Right, &Bottom};
+    std::array<LPTSTR*, 4> vals= {&Left, &Top, &Right, &Bottom};
     StringStreamA strm;
-    for (int i = 0; i < 4; ++i )
+    for (size_t i = 0; i < aFrameComponent.size(); ++i )
     {
-        strm << boost::format("%1%") % d[i];
+        strm << boost::format("%1%") % aFrameComponent[i];
         StringWrapper::SafeStrcpy(*vals[i], StringConversion::Convert_Ansi_To_Native(strm.str()).c_str());
         strm.str("");
     }
@@ -2129,8 +2129,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetValueString(DTWAIN_FRAME Frame, LONG nWh
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetValueString(DTWAIN_FRAME Frame, LONG nWhich, LPCTSTR Value)
 {
     LOG_FUNC_ENTRY_PARAMS((Frame, nWhich, Value))
-    const double d = StringWrapper::ToDouble(Value);
-    const DTWAIN_BOOL bRet = DTWAIN_FrameSetValue(Frame, nWhich, d);
+    const double dFrameComponent = StringWrapper::ToDouble(Value);
+    const DTWAIN_BOOL bRet = DTWAIN_FrameSetValue(Frame, nWhich, dFrameComponent);
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }

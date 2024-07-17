@@ -983,7 +983,6 @@ struct StreamerImplFrame
     size_t* m_pCurItem;
     StreamerImplFrame(CTL_OutputBaseStreamType* strm, size_t* curItem) : m_pStrm(strm), m_pCurItem(curItem) { *curItem = 0; }
 
-    
     void operator()(const TwainFrameInternal& pPtr) const
     {
         *m_pStrm << _T("Array[") << *m_pCurItem << _T("]");

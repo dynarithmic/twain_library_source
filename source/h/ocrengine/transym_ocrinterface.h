@@ -25,6 +25,7 @@
 #include "../ocr/transym/vc++/tocrdll.h"
 #include "../ocr/transym/vc++/TOCRuser.h"
 #include "../ocr/transym/vc++/TOCRerrs.h"
+#include "ctliface.h"
 #ifndef _WIN32
 #define __stdcall
 #endif
@@ -89,7 +90,7 @@ class TransymOCR : public OCREngine
 {
 #ifdef _WIN32
 public:
-    TransymOCR();
+    TransymOCR(CTL_TwainDLLHandle* pHandle);
     ~TransymOCR() override;
     bool IsInitialized() const override;
     bool SetOptions(OCRJobOptions& options) override;

@@ -26,11 +26,12 @@
 namespace dynarithmic
 {
     bool delete_file(LPCTSTR filename);
+    std::uintmax_t delete_directory(LPCTSTR directory);
     std::pair<bool, std::string> parent_directory_exists(LPCTSTR filename);
     bool file_exists(LPCTSTR filename);
     std::pair<bool, std::string> create_directory(LPCTSTR dirName);
     CTL_StringType temp_directory_path(bool bWithSeparator=true);
-    CTL_StringType get_parent_directory(LPCTSTR filename);
+    CTL_StringType get_parent_directory(LPCTSTR filename, bool bAddBackSlash = true);
     bool directory_writeable(LPCTSTR filename);
 }
 #endif
