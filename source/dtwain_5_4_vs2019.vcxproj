@@ -1479,6 +1479,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\ansiwideconverter_generic.h" />
     <ClInclude Include="h\ansiwideconverter_win32.h" />
     <ClInclude Include="h\arrayfactory.h" />
+    <ClInclude Include="h\ctlccerr.h" />
     <ClInclude Include="h\ctldefsource.h" />
     <ClInclude Include="h\ctldib32.h" />
     <ClInclude Include="h\ctlfileutils.h" />
@@ -1514,6 +1515,8 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\imagexferfilewriter.h" />
     <ClInclude Include="h\logmsg.h" />
     <ClInclude Include="h\notimpl.h" />
+    <ClInclude Include="h\sourceacquireopts.h" />
+    <ClInclude Include="h\sourceselectopts.h" />
     <ClInclude Include="h\twainfix32.h" />
     <ClInclude Include="h\twainframe.h" />
     <ClInclude Include="simpleini\SimpleIni.h" />
