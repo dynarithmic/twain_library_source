@@ -160,7 +160,7 @@ static bool GetImageSize(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, CTL_En
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     if (p)
     {
-        DTWAIN_ARRAY FloatArrayOut = DTWAIN_ArrayCreate(DTWAIN_ARRAYFLOAT, 4);
+        DTWAIN_ARRAY FloatArrayOut = CreateArrayFromFactory(DTWAIN_ARRAYFLOAT, 4);
         if (!FloatArrayOut)
             return false;
         DTWAINArrayLL_RAII aFloat(FloatArrayOut);
@@ -174,7 +174,7 @@ static bool GetImageSize(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, CTL_En
             return false;
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<double>(FloatArrayOut);
         std::copy(Array.begin(), Array.end(), vValues.begin());
-        const DTWAIN_ARRAY temp = DTWAIN_ArrayCreateCopy(FloatArrayOut);
+        const DTWAIN_ARRAY temp = CreateArrayCopyFromFactory(FloatArrayOut);
         if  (pHandle->m_ArrayFactory->is_valid(FloatArray))
             pHandle->m_ArrayFactory->destroy(FloatArray);
         if (temp)

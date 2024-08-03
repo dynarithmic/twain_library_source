@@ -64,7 +64,7 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
         const auto idx = std::distance(validTypes.begin(), itArrType);
         if ( idx > 0 )
         {
-            tempNames = DTWAIN_ArrayCreate(DTWAIN_ARRAYSTRING, 0);
+            tempNames = CreateArrayFromFactory(DTWAIN_ARRAYSTRING, 0);
             if ( idx == 1 )
                 ArrayCopyAnsiToNative(aFileNames, tempNames);
             else

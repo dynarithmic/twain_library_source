@@ -42,7 +42,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAvailablePrinters(DTWAIN_SOURCE Source, LONG 
     if ( !DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPPRINTER) )
         LOG_FUNC_EXIT_PARAMS(false)
 
-    DTWAIN_ARRAY Array = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 32);
+    DTWAIN_ARRAY Array = CreateArrayFromFactory(DTWAIN_ARRAYLONG, 32);
     if ( !Array )
         LOG_FUNC_EXIT_PARAMS(false)
 
