@@ -2,7 +2,11 @@ DTWAIN Version changes
 
 5.4.7
 
-- Fix issue with loading 32-bit TWAINDSM.DLL if only found on the system path.
+- Fixed issue with loading 32-bit TWAINDSM.DLL if only found on the system path.
+
+- Fixed issue with some DTWAIN API calls not retaining error codes when DTWAIN_GetLastError() is invoked.
+
+- Added additional resource strings to the twainresourcestrings_*  resource files.
 
 
 5.4.6
