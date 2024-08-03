@@ -2233,7 +2233,7 @@ CTL_StringType dynarithmic::GetDTWAINTempFilePath()
     {
         const auto tempPath = temp_directory_path();
         if (tempPath.empty())
-            CTL_TwainAppMgr::WriteLogInfoA("Error: Temp directory does not exist\n");
+            CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_ERRORTEXT) + ": " + GetResourceStringFromMap(IDS_LOGMSG_TEMPFILENOTEXISTTEXT) + "\n");
         else
             pHandle->m_sTempFilePath = tempPath;
     }

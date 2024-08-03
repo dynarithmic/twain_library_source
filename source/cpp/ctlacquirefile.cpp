@@ -164,6 +164,13 @@ static std::vector<T> FileListToVector(SourceAcquireOptions& opts)
     return allNames;
 }
 
+static std::string GetDirectoryCreationError(CTL_StringType fileName)
+{
+    return  GetResourceStringFromMap(IDS_LOGMSG_ERRORTEXT) + ": DTWAIN_AcquireFile: " +
+            GetResourceStringFromMap(DTWAIN_ERR_CREATE_DIRECTORY_) + ": " +
+            StringConversion::Convert_Native_To_Ansi(fileName.c_str());
+}
+
 bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType)
 {
     LOG_FUNC_ENTRY_PARAMS((opts))
@@ -194,8 +201,11 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
             if (!bCreateDir)
             {
                 // Check for existing writable directory
-                DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]
-                    { return !dynarithmic::directory_writeable(fileName.c_str()); }, DTWAIN_ERR_INVALID_DIRECTORY, false, FUNC_MACRO);
+                if (!dynarithmic::directory_writeable(fileName.c_str()))
+                {
+                    CTL_TwainAppMgr::WriteLogInfoA(GetDirectoryCreationError(dynarithmic::get_parent_directory(fileName.c_str(), false)));
+                    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]{ return true; }, DTWAIN_ERR_INVALID_DIRECTORY, false, FUNC_MACRO);
+                }
             }
             else
             {
@@ -209,9 +219,7 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
                     if (!dirCreated.first)
                     {
                         // directory creation failed for one of the files.  
-                        CTL_TwainAppMgr::WriteLogInfoA(CTL_StringTypeA("Error: DTWAIN_AcquireFile could not create directory: ")
-                            + StringConversion::Convert_Native_To_Ansi(testDir.c_str()));
-
+                        CTL_TwainAppMgr::WriteLogInfoA(GetDirectoryCreationError(testDir));
                         DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]
                             { return dirCreated.first == false;  }, DTWAIN_ERR_CREATE_DIRECTORY, false, FUNC_MACRO);
                     }

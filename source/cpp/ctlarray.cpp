@@ -145,6 +145,18 @@ struct ArrayChecker
 static LONG IsValidRangeArray( DTWAIN_ARRAY pArray );
 static LONG IsValidAcqArray( DTWAIN_ARRAY pArray );
 
+void dynarithmic::DestroyArrayFromFactory(DTWAIN_ARRAY pArray)
+{
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    pHandle->m_ArrayFactory->destroy(pArray);
+}
+
+void dynarithmic::DestroyFrameFromFactory(DTWAIN_FRAME Frame)
+{
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    pHandle->m_ArrayFactory->destroy_frame(Frame);
+}
+
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayInit()
 {
     LOG_FUNC_ENTRY_PARAMS(())
@@ -637,10 +649,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayDestroy( DTWAIN_ARRAY pArray)
     auto checkStatus = ArrayChecker().SetArray1(pArray).SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS);
     if (checkStatus.Check() != DTWAIN_NO_ERROR)
         LOG_FUNC_EXIT_PARAMS(false)
-
-    const auto& factory = pHandle->m_ArrayFactory; 
-
-    factory->destroy(pArray);
+    DestroyArrayFromFactory(pArray);
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -1992,8 +2001,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameDestroy(DTWAIN_FRAME Frame)
     bool isValid = DTWAIN_FrameIsValid(Frame);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !isValid;},
                                       DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
-
-    pHandle->m_ArrayFactory->destroy_frame(Frame);
+    DestroyFrameFromFactory(Frame);
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -2487,3 +2495,4 @@ void CTL_TwainDLLHandle::RemoveAllEnumerators()
     if ( pHandle )
         pHandle->m_ArrayFactory.reset();
 }
+
