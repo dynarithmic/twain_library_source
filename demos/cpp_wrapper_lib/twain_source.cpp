@@ -198,7 +198,7 @@ namespace dynarithmic
                 options_base::apply(*this, ac.get_userinterface_options());
 
             if (allAppliers[acquire_characteristics::apply_imageparameter])
-                options_base::apply(*this, ac.get_imageparamter_options());
+                options_base::apply(*this, ac.get_imageparameter_options());
 
             if (allAppliers[acquire_characteristics::apply_audiblealarms])
                 options_base::apply(*this, ac.get_audiblealarms_options());
