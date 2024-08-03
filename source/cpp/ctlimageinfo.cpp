@@ -107,7 +107,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfo(DTWAIN_SOURCE Source,
 
     if (BitsPerSample)
     {
-        const DTWAIN_ARRAY Array = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 8);
+        const DTWAIN_ARRAY Array = CreateArrayFromFactory(DTWAIN_ARRAYLONG, 8);
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
         TW_INT16* pStart = &pInfo->BitsPerSample[0];
         TW_INT16* pEnd = &pInfo->BitsPerSample[8];
