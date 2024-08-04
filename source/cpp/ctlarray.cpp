@@ -928,6 +928,21 @@ DTWAIN_BOOL DLLENTRY_DEF   DTWAIN_ArrayGetAtANSIString(DTWAIN_ARRAY pArray, LONG
     CATCH_BLOCK(false)
 }
 
+static LONG ArrayFindInternal(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray, LPVOID pVariant, DTWAIN_FLOAT Tolerance, bool UseTolerance = false)
+{
+    const auto& factory = pHandle->m_ArrayFactory;
+
+    // Get correct array type
+    size_t pos = 0;
+    if (!UseTolerance)
+        pos = factory->find(pArray, pVariant);
+    else
+        pos = factory->find(pArray, pVariant, Tolerance);
+    if (pos != (std::numeric_limits<size_t>::max)())
+        return static_cast<LONG>(pos);
+    return -1;
+}
+
 LONG  DLLENTRY_DEF DTWAIN_ArrayFind( DTWAIN_ARRAY pArray, LPVOID pVariant )
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, pVariant))
@@ -937,16 +952,11 @@ LONG  DLLENTRY_DEF DTWAIN_ArrayFind( DTWAIN_ARRAY pArray, LPVOID pVariant )
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex( pHandle, -1L, FUNC_MACRO);
 
-    const auto& factory = pHandle->m_ArrayFactory; 
     const auto checkStatus = ArrayChecker().SetArray1(pArray).SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS);
     if (checkStatus.Check() != DTWAIN_NO_ERROR)
         LOG_FUNC_EXIT_PARAMS(-1)
 
-    // Get correct array type
-    LONG FoundPos = -1;
-    const size_t pos = factory->find(pArray, pVariant);
-    if ( pos != (std::numeric_limits<size_t>::max)() )
-        FoundPos = static_cast<LONG>(pos);
+    auto FoundPos = ArrayFindInternal(pHandle, pArray, pVariant, 0.0, false);
     LOG_FUNC_EXIT_PARAMS(FoundPos)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
@@ -978,17 +988,11 @@ LONG DLLENTRY_DEF DTWAIN_ArrayFindFloat( DTWAIN_ARRAY pArray, DTWAIN_FLOAT Val, 
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, -1L, FUNC_MACRO);
 
-    const auto& factory = pHandle->m_ArrayFactory; 
     const auto checkStatus = ArrayChecker().SetArray1(pArray).SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS);
     if (checkStatus.Check() != DTWAIN_NO_ERROR)
         LOG_FUNC_EXIT_PARAMS(-1)
 
-    // Get correct array type
-    LONG FoundPos = -1;
-
-    const size_t pos = factory->find(pArray, &Val, Tolerance);
-    if (pos != (std::numeric_limits<size_t>::max)())
-        FoundPos = static_cast<LONG>(pos);
+    LONG FoundPos = ArrayFindInternal(pHandle, pArray, &Val, Tolerance, true);
     LOG_FUNC_EXIT_PARAMS(FoundPos)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
