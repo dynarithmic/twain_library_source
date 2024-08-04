@@ -834,7 +834,6 @@ namespace dynarithmic
     bool TileModeOn(DTWAIN_SOURCE Source);
     void DestroyArrayFromFactory(DTWAIN_ARRAY pArray);
     void DestroyFrameFromFactory(DTWAIN_FRAME Frame);
-    DTWAIN_ARRAY CreateArrayFromFactory(LONG nEnumType, LONG* nStatus, LONG nInitialSize);
     DTWAIN_ARRAY CreateArrayFromFactory(LONG nEnumType, LONG nInitialSize);
     DTWAIN_ARRAY CreateArrayCopyFromFactory(DTWAIN_ARRAY Source);
 
