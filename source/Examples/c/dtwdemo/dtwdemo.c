@@ -349,7 +349,7 @@ void SelectTheSource(int nWhich)
     switch (nWhich)
     {
         case IDM_SELECT_SOURCE:
-            tempSource = DTWAIN_SelectSource();
+            tempSource = DTWAIN_SelectSource2(NULL, _T("Select Source"),0,0,DTWAIN_DLG_CENTER_SCREEN);
         break;
 
         case IDM_SELECT_DEFAULT_SOURCE:
@@ -594,7 +594,7 @@ void AcquireFile(BOOL bUseSource)
         if ( !bAcquireOK)
             MessageBox(g_hWnd, szError, _T(""), MB_ICONSTOP);
         else
-        MessageBox(g_hWnd, _T("No Images Acquired"), _T(""), MB_ICONSTOP);
+            MessageBox(g_hWnd, _T("No Images Acquired"), _T(""), MB_ICONSTOP);
         return;
     }
 	else
