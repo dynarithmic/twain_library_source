@@ -836,6 +836,8 @@ namespace dynarithmic
     void DestroyFrameFromFactory(DTWAIN_FRAME Frame);
     DTWAIN_ARRAY CreateArrayFromFactory(LONG nEnumType, LONG nInitialSize);
     DTWAIN_ARRAY CreateArrayCopyFromFactory(DTWAIN_ARRAY Source);
+    DTWAIN_FRAME CreateFrameArray(CTL_TwainDLLHandle* pHandle, double Left, double Top, double Right, double Bottom);
+
 
     //#ifdef DTWAIN_DEBUG_CALL_STACK
     std::string CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich, LPCSTR pOptionalString=nullptr);

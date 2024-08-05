@@ -1218,7 +1218,7 @@ int GetMultiCapValues(DTWAIN_HANDLE DLLHandle,
 
     for (int i = 0; i < nSize; i++)
     {
-        DTWAIN_FRAME DTWAINFrame = DTWAIN_FrameCreate(0, 0, 0, 0);
+        DTWAIN_FRAME DTWAINFrame = dynarithmic::CreateFrameArray(pHandle, 0, 0, 0, 0);
         DTWAINFrame_RAII raii(DTWAINFrame);
         auto& FrameV = factory->underlying_container_t<TW_FRAME>(FrameArray);
         TWFRAMEToDTWAINFRAME(FrameV[i], DTWAINFrame);

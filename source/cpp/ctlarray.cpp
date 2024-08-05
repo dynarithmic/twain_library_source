@@ -188,6 +188,12 @@ DTWAIN_ARRAY dynarithmic::CreateArrayCopyFromFactory(DTWAIN_ARRAY Source)
     return Dest;
 }
 
+
+DTWAIN_FRAME dynarithmic::CreateFrameArray(CTL_TwainDLLHandle* pHandle, double Left, double Top, double Right, double Bottom)
+{
+    return pHandle->m_ArrayFactory->create_frame(Left, Top, Right, Bottom);
+}
+
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayInit()
 {
     LOG_FUNC_ENTRY_PARAMS(())
@@ -389,7 +395,7 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_ArrayAddWideStringN(DTWAIN_ARRAY pArray, LPCWST
                                                 SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS | ArrayChecker::CHECK_ARRAY_WIDE_TYPE);
     if (checkStatus.Check() != DTWAIN_NO_ERROR)
         LOG_FUNC_EXIT_PARAMS(false)
-    const DTWAIN_BOOL bRet = ArrayAddN(pArray, std::wstring(Val), num);
+    const DTWAIN_BOOL bRet = ArrayAddN<std::wstring, false>(pArray, std::wstring(Val), num);
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -403,7 +409,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddANSIStringN(DTWAIN_ARRAY pArray, LPCSTR 
     if (checkStatus.Check() != DTWAIN_NO_ERROR)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    const DTWAIN_BOOL bRet = ArrayAddN(pArray, std::string(Val) ,num );
+    const DTWAIN_BOOL bRet = ArrayAddN<std::string, false>(pArray, std::string(Val) ,num );
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -1917,9 +1923,8 @@ DTWAIN_FRAME DLLENTRY_DEF DTWAIN_FrameCreate(DTWAIN_FLOAT Left, DTWAIN_FLOAT Top
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, NULL, FUNC_MACRO);
-    const auto newEnum = 
-                pHandle->m_ArrayFactory->create_frame(Left, Top, Right, Bottom);
-    LOG_FUNC_EXIT_PARAMS((DTWAIN_FRAME)newEnum)
+    const auto newFrame = dynarithmic::CreateFrameArray(pHandle, Left, Top, Right, Bottom);
+    LOG_FUNC_EXIT_PARAMS(newFrame)
     CATCH_BLOCK(nullptr)
 }
 
@@ -2099,11 +2104,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetValue(DTWAIN_FRAME Frame, LONG nWhich, D
 DTWAIN_FRAME DLLENTRY_DEF DTWAIN_FrameCreateString(LPCTSTR Left, LPCTSTR Top, LPCTSTR Right, LPCTSTR Bottom)
 {
     LOG_FUNC_ENTRY_PARAMS((Left, Top, Right, Bottom))
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    // See if DLL Handle exists
+    DTWAIN_Check_Bad_Handle_Ex(pHandle, NULL, FUNC_MACRO);
     const double leftD    = StringWrapper::ToDouble(Left);
     const double topD     = StringWrapper::ToDouble(Top);
     const double rightD   = StringWrapper::ToDouble(Right);
     const double bottomD  = StringWrapper::ToDouble(Bottom);
-    const DTWAIN_FRAME newFrame = DTWAIN_FrameCreate(leftD, topD, rightD, bottomD);
+    const DTWAIN_FRAME newFrame = CreateFrameArray(pHandle, leftD, topD, rightD, bottomD);
     LOG_FUNC_EXIT_PARAMS(newFrame)
     CATCH_BLOCK(DTWAIN_ARRAY(NULL))
 }
