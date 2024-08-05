@@ -40,7 +40,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainerEx(LONG nCap, DTWAIN_BOOL bSetContainer,
     // Check if array is of the correct type
     if (pArray)
     {
-        *pArray = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 0);
+        *pArray = CreateArrayFromFactory(DTWAIN_ARRAYLONG, 0);
         if (!*pArray)
             LOG_FUNC_EXIT_PARAMS(0L)
     }

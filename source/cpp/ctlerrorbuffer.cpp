@@ -36,7 +36,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetErrorBuffer(LPDTWAIN_ARRAY ArrayBuffer)
         LOG_FUNC_EXIT_PARAMS(false)
 
     const size_t nEntries = (std::min)(static_cast<size_t>(pHandle->m_nErrorBufferThreshold), pHandle->m_vErrorBuffer.size());
-    const DTWAIN_ARRAY A = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, static_cast<LONG>(nEntries));
+    const DTWAIN_ARRAY A = CreateArrayFromFactory(DTWAIN_ARRAYLONG, static_cast<LONG>(nEntries));
     if ( A )
     {
         auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(A);

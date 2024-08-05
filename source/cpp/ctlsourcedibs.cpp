@@ -77,7 +77,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source, DTWAIN_AR
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAllSourceDibsEx(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY  pArray)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pArray))
-    const DTWAIN_ARRAY DibArray = DTWAIN_ArrayCreate(DTWAIN_ARRAYHANDLE, 0);
+    const DTWAIN_ARRAY DibArray = CreateArrayFromFactory(DTWAIN_ARRAYHANDLE, 0);
     if (DibArray)
     {
         DTWAIN_GetAllSourceDibs(Source, DibArray);
@@ -120,7 +120,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCurrentPageNum(DTWAIN_SOURCE Source)
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_CreateAcquisitionArray()
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    const DTWAIN_ARRAY AcqArray = static_cast<DTWAIN_ARRAY>(DTWAIN_ArrayCreate(DTWAIN_ARRAYOFHANDLEARRAYS, 0));
+    const DTWAIN_ARRAY AcqArray = static_cast<DTWAIN_ARRAY>(CreateArrayFromFactory(DTWAIN_ARRAYOFHANDLEARRAYS, 0));
     LOG_FUNC_EXIT_PARAMS(AcqArray)
     CATCH_BLOCK(DTWAIN_ARRAY(0))
 }

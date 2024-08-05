@@ -1368,7 +1368,7 @@ static DTWAIN_ARRAY GetFileTypes(int nType)
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     if (!pHandle)
         return {};
-    DTWAIN_ARRAY aFileTypes = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 0);
+    DTWAIN_ARRAY aFileTypes = CreateArrayFromFactory(DTWAIN_ARRAYLONG, 0);
     if (aFileTypes)
     {
         auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
@@ -2233,7 +2233,7 @@ CTL_StringType dynarithmic::GetDTWAINTempFilePath()
     {
         const auto tempPath = temp_directory_path();
         if (tempPath.empty())
-            CTL_TwainAppMgr::WriteLogInfoA("Error: Temp directory does not exist\n");
+            CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_ERRORTEXT) + ": " + GetResourceStringFromMap(IDS_LOGMSG_TEMPFILENOTEXISTTEXT) + "\n");
         else
             pHandle->m_sTempFilePath = tempPath;
     }

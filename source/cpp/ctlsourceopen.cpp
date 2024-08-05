@@ -175,7 +175,7 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
         if (nCount > 0)
         {
             // create an array of 1
-            DTWAIN_ARRAY vCurPixType = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 1);
+            DTWAIN_ARRAY vCurPixType = CreateArrayFromFactory(DTWAIN_ARRAYLONG, 1);
             DTWAINArrayLL_RAII raii(vCurPixType);
 
             // get pointer to internals of the array
