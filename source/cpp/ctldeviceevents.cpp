@@ -65,7 +65,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
         if (nBits == 0)
             LOG_FUNC_EXIT_PARAMS(false)
 
-        Array = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, nBits);
+        Array = CreateArrayFromFactory(DTWAIN_ARRAYLONG, nBits);
 
         if (!Array)
             LOG_FUNC_EXIT_PARAMS(false)

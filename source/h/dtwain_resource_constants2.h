@@ -268,7 +268,12 @@
 #define IDS_LOGMSG_NOINFOERRORTEXT          (IDS_LOGMSG_START + 6)
 #define IDS_LOGMSG_INPUTTEXT                (IDS_LOGMSG_START + 7)
 #define IDS_LOGMSG_OUTPUTDSMTEXT            (IDS_LOGMSG_START + 8)
-#define IDS_LOGMSG_END                      (IDS_LOGMSG_START + 8)
+#define IDS_LOGMSG_NOINFOTEXT               (IDS_LOGMSG_START + 9)
+#define IDS_LOGMSG_RETURNEDERRORTEXT        (IDS_LOGMSG_START + 10)
+#define IDS_LOGMSG_ERRORTEXT                (IDS_LOGMSG_START + 11)
+#define IDS_LOGMSG_TEMPFILENOTEXISTTEXT     (IDS_LOGMSG_START + 12)
+
+#define IDS_LOGMSG_END                      (IDS_LOGMSG_START + 12)
 
 #define IDS_ErrCCLowMemory          TWAIN_ERR_LOW_MEMORY_
 #define IDS_ErrCCFalseAlarm         TWAIN_ERR_FALSE_ALARM_

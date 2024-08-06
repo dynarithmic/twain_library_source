@@ -118,7 +118,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRCapValues(DTWAIN_OCRENGINE Engine,LONG OCR
             {
                 OCREngine::OCRLongArrayValues vals;
                 pEngine->GetCapValues(OCRCapValue, GetType, vals);
-                const DTWAIN_ARRAY theArray = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, static_cast<LONG>(vals.size()));
+                const DTWAIN_ARRAY theArray = CreateArrayFromFactory(DTWAIN_ARRAYLONG, static_cast<LONG>(vals.size()));
 
                 for (LONG i = 0; i < static_cast<LONG>(vals.size()); ++i)
                     DTWAIN_ArraySetAtLong(theArray, i, vals[i]);
@@ -130,7 +130,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRCapValues(DTWAIN_OCRENGINE Engine,LONG OCR
             {
                 OCREngine::OCRStringArrayValues vals;
                 pEngine->GetCapValues(OCRCapValue, GetType, vals);
-                const DTWAIN_ARRAY theArray = DTWAIN_ArrayCreate(DTWAIN_ARRAYSTRING, static_cast<LONG>(vals.size()));
+                const DTWAIN_ARRAY theArray = CreateArrayFromFactory(DTWAIN_ARRAYSTRING, static_cast<LONG>(vals.size()));
                 for (LONG i = 0; i < static_cast<LONG>(vals.size()); ++i)
                     DTWAIN_ArraySetAtStringA(theArray, i, vals[i].c_str());
                 *CapValues = theArray;
@@ -649,7 +649,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumOCRSupportedCaps(DTWAIN_OCRENGINE Engine, LP
 
     OCREngine::OCRLongArrayValues vals;
     pEngine->GetSupportedCaps(vals);
-    const DTWAIN_ARRAY theArray = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, static_cast<LONG>(vals.size()));
+    const DTWAIN_ARRAY theArray = CreateArrayFromFactory(DTWAIN_ARRAYLONG, static_cast<LONG>(vals.size()));
     if (!theArray)
         LOG_FUNC_EXIT_PARAMS(false)
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(theArray);
@@ -757,7 +757,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumOCRInterfaces(LPDTWAIN_ARRAY OCRArray)
         *OCRArray = nullptr;
     else
     {
-        const DTWAIN_ARRAY theArray = DTWAIN_ArrayCreate(DTWAIN_ARRAYOCRENGINE, 0);
+        const DTWAIN_ARRAY theArray = CreateArrayFromFactory(DTWAIN_ARRAYOCRENGINE, 0);
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !theArray; }, DTWAIN_ERR_OUT_OF_MEMORY, false, FUNC_MACRO);
 
         const auto& factory = pHandle->m_ArrayFactory;

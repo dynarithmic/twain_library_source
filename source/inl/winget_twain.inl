@@ -127,7 +127,7 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
         }
         boost::dll::shared_library libloader;
         boost::system::error_code ec;
-        libloader.load(fNameTotal, ec); 
+        libloader.load(fNameTotal, ec, boost::dll::load_mode::search_system_folders);
 
         #ifdef _WIN32
         SetErrorMode(nOldError);
