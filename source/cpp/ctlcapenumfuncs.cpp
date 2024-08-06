@@ -57,7 +57,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
     if (factory->is_valid(*Array))
         factory->clear(*Array);
 
-    DTWAIN_ARRAY ThisArray = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, 0);
+    DTWAIN_ARRAY ThisArray = CreateArrayFromFactory(DTWAIN_ARRAYLONG, 0);
     DTWAINArrayLL_RAII arr(ThisArray);
     auto& vCaps = factory->underlying_container_t<LONG>(ThisArray);
 
@@ -77,7 +77,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
                 CTL_CapInfoArray *pCapInfoArray = std::get<1>(Info).get();
                 std::for_each(pCapInfoArray->begin(), pCapInfoArray->end(), [&vCaps](const CTL_CapInfoArray::value_type& CapInfo)
                                 { vCaps.push_back(static_cast<int>(std::get<0>(CapInfo))); });
-                *Array = DTWAIN_ArrayCreateCopy(ThisArray);
+                *Array = CreateArrayCopyFromFactory(ThisArray);
                 LOG_FUNC_EXIT_PARAMS(true)
             }
         }
@@ -98,7 +98,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
         DTWAIN_CacheCapabilityInfo(p, pHandle, &vCaps);
         p->SetRetrievedAllCaps(true);
         const bool bFound = !vCaps.empty();
-        *Array = DTWAIN_ArrayCreateCopy(ThisArray);
+        *Array = CreateArrayCopyFromFactory(ThisArray);
         if (bFound)
             LOG_FUNC_EXIT_PARAMS(true)
     }

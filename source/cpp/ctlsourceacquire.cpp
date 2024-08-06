@@ -343,7 +343,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
 
     CTL_ITwainSource *pSource = VerifySourceHandle(opts.getHandle(), opts.getSource());
     pSource->ResetAcquisitionAttempts(nullptr);
-    aAcquisitionArray = static_cast<DTWAIN_ARRAY>(DTWAIN_ArrayCreate(DTWAIN_ARRAYOFHANDLEARRAYS, 0));
+    aAcquisitionArray = static_cast<DTWAIN_ARRAY>(CreateArrayFromFactory(DTWAIN_ARRAYOFHANDLEARRAYS, 0));
     DTWAINArrayLL_RAII aAcq(aAcquisitionArray);
 
     pSource->m_pUserPtr = nullptr;
@@ -354,7 +354,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
 
     if (DTWAIN_GetTwainMode() == DTWAIN_MODELESS)
     {
-        Array = DTWAIN_ArrayCreate(DTWAIN_ARRAYHANDLE, 0);
+        Array = CreateArrayFromFactory(DTWAIN_ARRAYHANDLE, 0);
         a1.reset(Array);
         const auto pHandle = static_cast<CTL_TwainDLLHandle *>(opts.getHandle());
         if (!Array)
@@ -609,7 +609,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
                 // Allocate for array
                 DTWAIN_ARRAY pArray = static_cast<DTWAIN_ARRAY>(pSource->GetFileEnumerator());
                 if (!pArray)
-                    pArray = DTWAIN_ArrayCreate(DTWAIN_ARRAYSTRING, 0);
+                    pArray = CreateArrayFromFactory(DTWAIN_ARRAYSTRING, 0);
                 if (!pArray)
                 {
                     // Check if array exists

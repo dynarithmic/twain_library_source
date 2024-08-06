@@ -832,6 +832,12 @@ namespace dynarithmic
     void LLSetupUIOnly(CTL_ITwainSource* pSource);
     DTWAIN_HANDLE GetDTWAINHandle_Internal();
     bool TileModeOn(DTWAIN_SOURCE Source);
+    void DestroyArrayFromFactory(DTWAIN_ARRAY pArray);
+    void DestroyFrameFromFactory(DTWAIN_FRAME Frame);
+    DTWAIN_ARRAY CreateArrayFromFactory(LONG nEnumType, LONG nInitialSize);
+    DTWAIN_ARRAY CreateArrayCopyFromFactory(DTWAIN_ARRAY Source);
+    DTWAIN_FRAME CreateFrameArray(CTL_TwainDLLHandle* pHandle, double Left, double Top, double Right, double Bottom);
+
 
     //#ifdef DTWAIN_DEBUG_CALL_STACK
     std::string CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich, LPCSTR pOptionalString=nullptr);
@@ -950,7 +956,7 @@ namespace dynarithmic
 
     struct DTWAINArray_DestroyTraits
     {
-        void operator()(DTWAIN_ARRAY a) { DTWAIN_ArrayDestroy(a); }
+        void operator()(DTWAIN_ARRAY a) { DestroyArrayFromFactory(a); }
     };
 
     struct DTWAINArrayPtr_DestroyTraits
@@ -958,7 +964,7 @@ namespace dynarithmic
         static void Destroy(DTWAIN_ARRAY* a)
         {
             if (a && *a)
-                DTWAIN_ArrayDestroy(*a);
+               DestroyArrayFromFactory(*a);
         }
         void operator()(DTWAIN_ARRAY* a) { Destroy(a); }
     };
@@ -1040,7 +1046,7 @@ namespace dynarithmic
 
     struct DTWAINFrame_DestroyTraits
     {
-        void operator()(DTWAIN_FRAME a) { DTWAIN_FrameDestroy(a); }
+        void operator()(DTWAIN_FRAME a) { DestroyFrameFromFactory(a); }
     };
 
     struct DTWAINGlobalHandle_ReleaseDCTraits

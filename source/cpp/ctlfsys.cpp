@@ -343,7 +343,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCamera(DTWAIN_SOURCE Source, LPCTSTR szCamera
 bool FSGetCameras(CTL_ITwainSource *pSource, LPDTWAIN_ARRAY Cameras, TW_UINT16 CameraType )
 {
     LOG_FUNC_ENTRY_PARAMS((pSource, Cameras, CameraType))
-    const DTWAIN_ARRAY aCameras = DTWAIN_ArrayCreate(DTWAIN_ARRAYSTRING, 0);
+    const DTWAIN_ARRAY aCameras = CreateArrayFromFactory(DTWAIN_ARRAYSTRING, 0);
     CameraStruct CS{};
     CS.aCameras = aCameras;
     CS.CameraType = CameraType;

@@ -823,7 +823,7 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
 
                         // destroy original and copy new values
                         pHandle->m_ArrayFactory->destroy(*arrayToUse);
-                        *arrayToUse = DTWAIN_ArrayCreateCopy(tempArray);
+                        *arrayToUse = CreateArrayCopyFromFactory(tempArray);
 
                         // get the count
                         nValues = pHandle->m_ArrayFactory->size(*arrayToUse); 

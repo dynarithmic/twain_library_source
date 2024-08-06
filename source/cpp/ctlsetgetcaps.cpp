@@ -175,7 +175,7 @@ static DTWAIN_ARRAY performGetCap(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source,
     if (overrideDataType == 0xFFFF)
     {
         const LONG nArrayType = GetArrayTypeFromCapType(static_cast<TW_UINT16>(nDataType));
-        ThisArray = DTWAIN_ArrayCreate(nArrayType, 0);
+        ThisArray = CreateArrayFromFactory(nArrayType, 0);
     }
     else
         ThisArray = DTWAIN_ArrayCreateFromCap(Source, lCap, 0);
@@ -809,7 +809,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDT
     if ( p->EnumExtImageInfo(r) )
     {
         const size_t nCount = r.size();
-        DTWAIN_ARRAY ThisArray = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, static_cast<LONG>(nCount));
+        DTWAIN_ARRAY ThisArray = CreateArrayFromFactory(DTWAIN_ARRAYLONG, static_cast<LONG>(nCount));
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(ThisArray);
         std::copy(r.begin(), r.end(), vValues.begin());
         *Array = ThisArray;
@@ -923,7 +923,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
     // Check if array exists
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !Data;}, DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
     // Create the array that corresponds with the correct type
-    const DTWAIN_ARRAY ExtInfoArray = DTWAIN_ArrayCreate(CTL_TwainAppMgr::ExtImageInfoArrayType(nWhich), 0);
+    const DTWAIN_ARRAY ExtInfoArray = CreateArrayFromFactory(CTL_TwainAppMgr::ExtImageInfoArrayType(nWhich), 0);
     if ( !ExtInfoArray )
     {
         // Check if array exists
@@ -1200,7 +1200,7 @@ int GetMultiCapValues(DTWAIN_HANDLE DLLHandle,
                       TW_FRAME )
 {
     // Create a TW_FRAME array
-    DTWAIN_ARRAY FrameArray = DTWAIN_ArrayCreate(CTL_ArrayTWFrameType, 0);
+    DTWAIN_ARRAY FrameArray = CreateArrayFromFactory(CTL_ArrayTWFrameType, 0);
     if ( !FrameArray )
         return 0;
     DTWAINArrayLL_RAII fArr(FrameArray);
@@ -1218,7 +1218,7 @@ int GetMultiCapValues(DTWAIN_HANDLE DLLHandle,
 
     for (int i = 0; i < nSize; i++)
     {
-        DTWAIN_FRAME DTWAINFrame = DTWAIN_FrameCreate(0, 0, 0, 0);
+        DTWAIN_FRAME DTWAINFrame = dynarithmic::CreateFrameArray(pHandle, 0, 0, 0, 0);
         DTWAINFrame_RAII raii(DTWAINFrame);
         auto& FrameV = factory->underlying_container_t<TW_FRAME>(FrameArray);
         TWFRAMEToDTWAINFRAME(FrameV[i], DTWAINFrame);
