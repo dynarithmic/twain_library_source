@@ -1590,6 +1590,8 @@ Class DTWAINAPI
     Public Const DTWAIN_CONSTANT_TWCT As Integer = 45
     Public Const DTWAIN_CONSTANT_TWPS As Integer = 46
     Public Const DTWAIN_CONSTANT_TWSS As Integer = 47
+    Public Const DTWAIN_CONSTANT_TWPH As Integer = 48;
+    Public Const DTWAIN_CONSTANT_TWCI As Integer = 49;
 
     Public Delegate Function DTwainCallback( ByVal WParam As Integer, ByVal LParam As Integer, ByVal UserData As Integer) As Integer
     Public Delegate Function DTwainCallback64( ByVal WParam As Integer, ByVal LParam As Integer, ByVal UserData As Long) As Integer
