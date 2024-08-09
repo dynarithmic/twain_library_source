@@ -1626,6 +1626,8 @@ namespace Dynarithmic
         public const int DTWAIN_CONSTANT_TWCT    = 45;
         public const int DTWAIN_CONSTANT_TWPS    = 46;
         public const int DTWAIN_CONSTANT_TWSS    = 47;
+        public const int DTWAIN_CONSTANT_TWPH    = 48;
+        public const int DTWAIN_CONSTANT_TWCI    = 49;
 
         public const int DTWAIN_APIHANDLEOK    = 1;
         public const int DTWAIN_TWAINSESSIONOK = 2;
