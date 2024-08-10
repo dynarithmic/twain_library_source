@@ -529,6 +529,7 @@ namespace dynarithmic
         static bool                     s_ResourcesInitialized;
         static ImageResamplerMap        s_ImageResamplerMap;
         static SourceStatusMap          s_SourceStatusMap;
+        static CTL_StringType           s_ResourceVersion;
 
         static CTL_PDFMediaMap& GetPDFMediaMap() { return s_PDFMediaMap; }
         static CTL_TwainLongToStringMap& GetTwainCountryMap() { return s_TwainCountryMap; }
@@ -554,6 +555,7 @@ namespace dynarithmic
         static long GetErrorFilterFlags() { return s_lErrorFilterFlags; }
         static ImageResamplerMap& GetImageResamplerMap() { return s_ImageResamplerMap; }
         static SourceStatusMap& GetSourceStatusMap() { return s_SourceStatusMap;  }
+        static CTL_StringType& GetResourceVersion() { return s_ResourceVersion; }
     };
 
     struct CTL_LoggerCallbackInfo
