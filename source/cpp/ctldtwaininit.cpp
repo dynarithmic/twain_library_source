@@ -2105,7 +2105,9 @@ CTL_StringType dynarithmic::GetVersionString()
         }
 
         strm << sStatic << "Dynarithmic TWAIN Library, Version " << lMajor << "." << lMinor << " - " << s << " Version (Patch Level "
-            << lPatch << ")\n" << "Shared Library Path: " <<  StringConversion::Convert_Native_To_Ansi(GetDTWAINDLLPath());
+            << lPatch << ")\n" << "Shared Library path: " <<  StringConversion::Convert_Native_To_Ansi(GetDTWAINDLLPath());
+        strm << "\nUsing Resource file (twaininfo.txt) version: " << StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetResourceVersion());
+        strm << "\nResource file path: " << StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetResourcePath());
         CTL_StaticData::s_VersionString = StringConversion::Convert_Ansi_To_Native(strm.str());
         return CTL_StaticData::s_VersionString;
     }
