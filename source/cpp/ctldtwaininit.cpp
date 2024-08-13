@@ -337,27 +337,26 @@ LONG DLLENTRY_DEF DTWAIN_GetLastError()
     CATCH_BLOCK(DTWAIN_ERR_BAD_HANDLE)
 }
 
-LONG DLLENTRY_DEF  DTWAIN_GetErrorString(LONG lError, LPTSTR lpszBuffer, LONG nMaxLen)
+static LONG GetResourceStringInternal(LONG resourceID, LPTSTR lpszBuffer, LONG nMaxLen)
 {
-    LOG_FUNC_ENTRY_PARAMS((lError, lpszBuffer, nMaxLen))
-    const size_t nBytes = GetResourceStringA(static_cast<UINT>(-lError), nullptr, 2048);
-    if ( nBytes == 0)
+    resourceID = std::abs(resourceID);
+    const size_t nBytes = GetResourceStringA(static_cast<UINT>(resourceID), nullptr, 2048);
+    if (nBytes == 0)
     {
         // Copy the error number to the buffer if we haven't been able to find the 
         // resource string
-        const CTL_StringType sCopy = StringWrapper::ToString(lError);
-        const LONG nTotalBytes = StringWrapper::CopyInfoToCString(sCopy, lpszBuffer, nMaxLen);
-        LOG_FUNC_EXIT_PARAMS(nTotalBytes)
+        const CTL_StringType sCopy = StringWrapper::ToString(resourceID);
+        return StringWrapper::CopyInfoToCString(sCopy, lpszBuffer, nMaxLen);
     }
 
     size_t nAdditionalBytes = 0;
-    auto iter = CTL_StaticData::s_mapExtraErrorInfo.find(lError);
-    if ( iter != CTL_StaticData::s_mapExtraErrorInfo.end())
+    auto iter = CTL_StaticData::s_mapExtraErrorInfo.find(resourceID);
+    if (iter != CTL_StaticData::s_mapExtraErrorInfo.end())
         nAdditionalBytes += iter->second.size();
-        
+
     std::vector<char> szTemp(nBytes);
-    GetResourceStringA(static_cast<UINT>(-lError), &szTemp[0], static_cast<LONG>(nBytes));
-    if ( nAdditionalBytes > 0)
+    GetResourceStringA(static_cast<UINT>(resourceID), &szTemp[0], static_cast<LONG>(nBytes));
+    if (nAdditionalBytes > 0)
     {
         while (!szTemp.empty() && szTemp.back() == 0)
             szTemp.pop_back();
@@ -369,7 +368,21 @@ LONG DLLENTRY_DEF  DTWAIN_GetErrorString(LONG lError, LPTSTR lpszBuffer, LONG nM
     }
     const CTL_StringType sCopy = StringConversion::Convert_Ansi_To_Native(szTemp.data());
 
-    const LONG nTotalBytes = StringWrapper::CopyInfoToCString(sCopy, lpszBuffer, nMaxLen);
+    return StringWrapper::CopyInfoToCString(sCopy, lpszBuffer, nMaxLen);
+}
+
+LONG DLLENTRY_DEF  DTWAIN_GetResourceString(LONG ResourceID, LPTSTR lpszBuffer, LONG nMaxLen)
+{
+    LOG_FUNC_ENTRY_PARAMS((ResourceID, lpszBuffer, nMaxLen))
+    auto nTotalBytes = GetResourceStringInternal(ResourceID, lpszBuffer, nMaxLen);
+    LOG_FUNC_EXIT_PARAMS(nTotalBytes)
+    CATCH_BLOCK(0)
+}
+
+LONG DLLENTRY_DEF  DTWAIN_GetErrorString(LONG lError, LPTSTR lpszBuffer, LONG nMaxLen)
+{
+    LOG_FUNC_ENTRY_PARAMS((lError, lpszBuffer, nMaxLen))
+    auto nTotalBytes = GetResourceStringInternal(lError, lpszBuffer, nMaxLen);
     LOG_FUNC_EXIT_PARAMS(nTotalBytes)
     CATCH_BLOCK(0)
 }
