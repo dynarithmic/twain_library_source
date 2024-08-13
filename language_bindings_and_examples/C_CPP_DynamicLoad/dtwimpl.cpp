@@ -402,6 +402,9 @@
     D_GETERRORSTRINGAFUNC                                             DYNDTWAIN_API::DTWAIN_GetErrorStringA = nullptr;
     D_GETERRORSTRINGFUNC                                              DYNDTWAIN_API::DTWAIN_GetErrorString = nullptr;
     D_GETERRORSTRINGWFUNC                                             DYNDTWAIN_API::DTWAIN_GetErrorStringW = nullptr;
+    D_GETRESOURCESTRINGAFUNC                                          DYNDTWAIN_API::DTWAIN_GetResourceStringA = nullptr;
+    D_GETRESOURCESTRINGFUNC                                           DYNDTWAIN_API::DTWAIN_GetResourceString = nullptr;
+    D_GETRESOURCESTRINGWFUNC                                          DYNDTWAIN_API::DTWAIN_GetResourceStringW = nullptr;
     D_GETEXTCAPFROMNAMEAFUNC                                          DYNDTWAIN_API::DTWAIN_GetExtCapFromNameA = nullptr;
     D_GETEXTCAPFROMNAMEFUNC                                           DYNDTWAIN_API::DTWAIN_GetExtCapFromName = nullptr;
     D_GETEXTCAPFROMNAMEWFUNC                                          DYNDTWAIN_API::DTWAIN_GetExtCapFromNameW = nullptr;
@@ -1420,6 +1423,9 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetErrorStringA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetErrorString, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetErrorStringW, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetResourceStringA, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetResourceString, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetResourceStringW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetExtCapFromNameA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetExtCapFromName, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetExtCapFromNameW, hModule);
