@@ -1543,5 +1543,8 @@ DTWAIN DLL are not displayed */
 /* This ID is the start of user-defined custom resources */
 #define DTWAIN_USERRES_START     20000
 
+/* Maximum length for a resource string*/
+#define DTWAIN_USERRES_MAXSIZE   8192
+
 #endif
 

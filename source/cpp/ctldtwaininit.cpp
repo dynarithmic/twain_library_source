@@ -340,7 +340,7 @@ LONG DLLENTRY_DEF DTWAIN_GetLastError()
 static LONG GetResourceStringInternal(LONG resourceID, LPTSTR lpszBuffer, LONG nMaxLen)
 {
     resourceID = std::abs(resourceID);
-    const size_t nBytes = GetResourceStringA(static_cast<UINT>(resourceID), nullptr, 2048);
+    const size_t nBytes = GetResourceStringA(static_cast<UINT>(resourceID), nullptr, DTWAIN_USERRES_MAXSIZE);
     if (nBytes == 0)
     {
         // Copy the error number to the buffer if we haven't been able to find the 
