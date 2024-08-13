@@ -1540,5 +1540,8 @@ DTWAIN DLL are not displayed */
 #define DTWAIN_CONSTANT_TWCI     49
 #define DTWAIN_CONSTANT_LAST     (DTWAIN_CONSTANT_TWCI + 1) 
 
+/* This ID is the start of user-defined custom resources */
+#define DTWAIN_USERRES_START     20000
+
 #endif
 
