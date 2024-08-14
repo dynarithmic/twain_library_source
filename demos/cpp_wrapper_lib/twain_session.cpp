@@ -359,10 +359,10 @@ namespace dynarithmic
             return sz;
         }
 
-        std::string twain_session::get_resource_string(int32_t res_number)
+        std::string twain_session::get_resource_string(int32_t resource_id)
         {
             char sz[DTWAIN_USERRES_MAXSIZE + 1] = {};
-            API_INSTANCE DTWAIN_GetResourceStringA(error_number, sz, DTWAIN_USERRES_MAXSIZE);
+            API_INSTANCE DTWAIN_GetResourceStringA(resource_id, sz, DTWAIN_USERRES_MAXSIZE);
             return sz;
         }
 
