@@ -103,6 +103,7 @@ CTL_TwainConstantsMap       CTL_StaticData::s_TwainConstantsMap;
 bool                        CTL_StaticData::s_bCheckHandles = true;
 CTL_TwainLongToStringMap    CTL_StaticData::s_TwainLanguageMap;
 CTL_StringType              CTL_StaticData::s_strResourcePath;
+CTL_StringType              CTL_StaticData::s_ResourceVersion;
 CTL_StringType              CTL_StaticData::s_DLLPath;
 CTL_StringType              CTL_StaticData::s_sINIPath;
 bool                        CTL_StaticData::s_multipleThreads = false;
