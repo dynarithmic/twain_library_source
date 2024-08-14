@@ -51,7 +51,7 @@ The DTWAIN Visual Studio solution and project files are built to support the fol
 
 When you load the solution and project files in the Visual Studio IDE, you may be prompted to upgrade the platform toolset from v142 to the latest version that is supported by the particular Visual Studio compiler you are using.  You can choose to leave the platform toolset as-is, or decide to upgrade to the latest one.  However the platform toolset must be v142 or v143, and your current installation must have this toolset installed for your compiler.
 
-The version of the Boost library that will be used at link time must match the platform toolset that DTWAIN was built with.   This must be set before openeing Visual Studio.
+The version of the Boost library that will be used at link time must match the platform toolset that DTWAIN was built with.   This must be set before opening Visual Studio.
 
 To easily facilitate this, the following environment
 variables should be created before starting Visual Studio and building DTWAIN:
