@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2023 Dynarithmic Software.
+    Copyright (c) 2002-2024 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -23,7 +23,9 @@
 
 #include <dtwainc.h>
 #include <capconst.h>
-#include <commdlg.h>
+#ifdef _WIN32
+    #include <commdlg.h>
+#endif
 #include <twain.h>
 #include <winconst.h>
 #include <dtwaindefs.h>
@@ -275,7 +277,7 @@ typedef LONG (DLLENTRY_DEF * D_GETCOUNTRYFUNC)                                  
 typedef HANDLE (DLLENTRY_DEF * D_GETCURRENTACQUIREDIMAGEFUNC)                   (DTWAIN_SOURCE);
 typedef LONG (DLLENTRY_DEF * D_GETCURRENTPAGENUMFUNC)                           (DTWAIN_SOURCE);
 typedef LONG (DLLENTRY_DEF * D_GETCURRENTRETRYCOUNTFUNC)                        (DTWAIN_SOURCE);
-typedef HANDLE (DLLENTRY_DEF * D_GETCUSTOMDSDATAFUNC)                           (DTWAIN_SOURCE, LONG, LPLONG, LONG);
+typedef HANDLE (DLLENTRY_DEF * D_GETCUSTOMDSDATAFUNC)                           (DTWAIN_SOURCE, LPBYTE, LONG, LPLONG, LONG);
 typedef LONG (DLLENTRY_DEF * D_GETDSMSEARCHORDERFUNC)                           (VOID_PROTOTYPE);
 typedef DTWAIN_HANDLE (DLLENTRY_DEF * D_GETDTWAINHANDLEFUNC)                    (VOID_PROTOTYPE);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETDEVICEEVENTFUNC)                       (DTWAIN_SOURCE, LPLONG);
@@ -493,7 +495,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETCOMPRESSIONTYPEFUNC)                   
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETCONTRASTFUNC)                          (DTWAIN_SOURCE, DTWAIN_FLOAT);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETCOUNTRYFUNC)                           (LONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETCURRENTRETRYCOUNTFUNC)                 (DTWAIN_SOURCE, LONG);
-typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETCUSTOMDSDATAFUNC)                      (DTWAIN_SOURCE, HANDLE, LONG, LONG);
+typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETCUSTOMDSDATAFUNC)                      (DTWAIN_SOURCE, HANDLE, LPCBYTE, LONG, LONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETCUSTOMFILESAVEFUNC)                    (OPENFILENAME*);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETDSMSEARCHORDERFUNC)                    (LONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETDEFAULTSOURCEFUNC)                     (DTWAIN_SOURCE);
@@ -1975,7 +1977,7 @@ typedef DTWAIN_SOURCE (DLLENTRY_DEF* D_SELECTDEFAULTSOURCEWITHOPENFUNC)         
     STATIC D_UNLOCKMEMORYFUNC                               DTWAIN_UnlockMemory;
     STATIC D_USEMULTIPLETHREADSFUNC                         DTWAIN_UseMultipleThreads;
 #ifdef __cplusplus
-        static int InitDTWAINInterface(HMODULE h);
+        static int InitDTWAINInterface(DYNDTWAIN_API*, HMODULE h);
 };
 #else
 } DYNDTWAIN_API;

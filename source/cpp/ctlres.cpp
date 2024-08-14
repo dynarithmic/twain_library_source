@@ -107,6 +107,8 @@ namespace dynarithmic
         else
             sPath = StringWrapper::RemoveBackslashFromDirectory(CTL_StaticData::GetResourcePath());
         sPath = StringWrapper::AddBackslashToDirectory(sPath);
+        if (CTL_StaticData::GetResourcePath().empty())
+            CTL_StaticData::s_strResourcePath = sPath;
         return sPath + resName;
     }
 
@@ -363,7 +365,7 @@ namespace dynarithmic
             retValue.errorMessage = StringConversion::Convert_Ansi_To_Native(origVersion.c_str());
             return false;
         }
-
+        CTL_StaticData::s_ResourceVersion = StringConversion::Convert_Ansi_To_Native(origVersion.c_str());
         LOG_FUNC_EXIT_PARAMS(true)
         CATCH_BLOCK(false)
     }
@@ -470,7 +472,7 @@ namespace dynarithmic
     {
         LOG_FUNC_ENTRY_PARAMS((lpszName))
         bool bReturn = LoadLanguageResourceFromFileA(GetResourceFileNameA(lpszName, DTWAINLANGRESOURCEFILE), true);
-        LoadLanguageResourceFromFileA(GetResourceFileNameA(lpszName, DTWAINCUSTOMERRORFILE), false);
+        LoadLanguageResourceFromFileA(GetResourceFileNameA(lpszName, DTWAINCUSTOMRESOURCESFILE), false);
         LOG_FUNC_EXIT_PARAMS(bReturn)
         CATCH_BLOCK(false)
     }
