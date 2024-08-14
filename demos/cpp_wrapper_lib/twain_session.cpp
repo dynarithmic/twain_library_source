@@ -352,10 +352,17 @@ namespace dynarithmic
         /// @returns An error string that describes the error
         /// @see get_last_error() twain_characteristics.get_language()
         /// @note The error string will be in the language specified by twain_characteristics::get_language()
-         std::string twain_session::get_error_string(int32_t error_number)
+        std::string twain_session::get_error_string(int32_t error_number)
         {
-            char sz[1024] = {};
-            API_INSTANCE DTWAIN_GetErrorStringA(error_number, sz, 1024);
+            char sz[DTWAIN_USERRES_MAXSIZE + 1] = {};
+            API_INSTANCE DTWAIN_GetErrorStringA(error_number, sz, DTWAIN_USERRES_MAXSIZE);
+            return sz;
+        }
+
+        std::string twain_session::get_resource_string(int32_t res_number)
+        {
+            char sz[DTWAIN_USERRES_MAXSIZE + 1] = {};
+            API_INSTANCE DTWAIN_GetResourceStringA(error_number, sz, DTWAIN_USERRES_MAXSIZE);
             return sz;
         }
 
