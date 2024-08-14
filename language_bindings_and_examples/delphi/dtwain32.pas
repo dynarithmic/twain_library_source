@@ -1671,7 +1671,10 @@ const
   DTWAIN_CONSTANT_TWPS    = 46;
   DTWAIN_CONSTANT_TWSS    = 47;
   DTWAIN_CONSTANT_TWPH    = 48;
-  DTWAIN_CONSTANT_TWCI    = 49;
+  DTWAIN_CONSTANT_TWCI    = 49;			
+  DTWAIN_USERRES_START    = 20000;
+  DTWAIN_USERRES_MAXSIZE  = 8192;
+
 
 { DTWAIN DLL functional interface }
 function DTWAIN_AcquireAudioNative(Source:DTWAIN_SOURCE; nMaxAudioClips:LONG; bShowUI:BOOL; bCloseSource:BOOL; pStatus:LPLONG):DTWAIN_ARRAY;stdcall; external 'dtwain32.dll'   name 'DTWAIN_AcquireAudioNative';
@@ -2253,6 +2256,7 @@ function DTWAIN_GetCurrentFileNameA(Source:DTWAIN_SOURCE; szName:LPSTR; MaxLen:L
 function DTWAIN_GetDSMFullNameA(DSMType:LONG; szDLLName:LPSTR; nMaxLen:LONG; pWhichSearch:LPLONG):LONG;overload;stdcall; external 'dtwain32.dll'   name 'DTWAIN_GetDSMFullNameA';
 function DTWAIN_GetDeviceTimeDateA(Source:DTWAIN_SOURCE; szTimeDate:LPSTR):BOOL;stdcall; external 'dtwain32.dll'   name 'DTWAIN_GetDeviceTimeDateA';
 function DTWAIN_GetErrorStringA(lError:LONG; lpszBuffer:LPSTR; nLength:LONG):LONG;stdcall; external 'dtwain32.dll'   name 'DTWAIN_GetErrorStringA';
+function DTWAIN_GetResourceStringA(lResource:LONG; lpszBuffer:LPSTR; nLength:LONG):LONG;stdcall; external 'dtwain32.dll'   name 'DTWAIN_GetResourceStringA';
 function DTWAIN_GetExtCapFromNameA(szName:LPCSTR):LONG;stdcall; external 'dtwain32.dll'   name 'DTWAIN_GetExtCapFromNameA';
 function DTWAIN_GetExtNameFromCapA(nValue:LONG; szValue:LPSTR; nLength:LONG):LONG;stdcall; external 'dtwain32.dll'   name 'DTWAIN_GetExtNameFromCapA';
 function DTWAIN_GetHalftoneA(Source:DTWAIN_SOURCE; lpHalftone:LPSTR; lGetType:LONG):BOOL;stdcall; external 'dtwain32.dll'   name 'DTWAIN_GetHalftoneA';
@@ -2380,6 +2384,7 @@ function DTWAIN_GetCurrentFileNameW(Source:DTWAIN_SOURCE; szName:LPWSTR; MaxLen:
 function DTWAIN_GetDSMFullNameW(DSMType:LONG; szDLLName:LPWSTR; nMaxLen:LONG; pWhichSearch:LPLONG):LONG;overload;stdcall; external 'dtwain32.dll'   name 'DTWAIN_GetDSMFullNameW';
 function DTWAIN_GetDeviceTimeDateW(Source:DTWAIN_SOURCE; szTimeDate:LPWSTR):BOOL;stdcall; external 'dtwain32.dll'   name 'DTWAIN_GetDeviceTimeDateW';
 function DTWAIN_GetErrorStringW(lError:LONG; lpszBuffer:LPWSTR; nLength:LONG):LONG;stdcall; external 'dtwain32.dll'   name 'DTWAIN_GetErrorStringW';
+function DTWAIN_GetResourceStringW(lResource:LONG; lpszBuffer:LPWSTR; nLength:LONG):LONG;stdcall; external 'dtwain32.dll'   name 'DTWAIN_GetResourceStringW';
 function DTWAIN_GetExtCapFromNameW(szName:LPCWSTR):LONG;stdcall; external 'dtwain32.dll'   name 'DTWAIN_GetExtCapFromNameW';
 function DTWAIN_GetExtNameFromCapW(nValue:LONG; szValue:LPWSTR; nLength:LONG):LONG;stdcall; external 'dtwain32.dll'   name 'DTWAIN_GetExtNameFromCapW';
 function DTWAIN_GetHalftoneW(Source:DTWAIN_SOURCE; lpHalftone:LPWSTR; lGetType:LONG):BOOL;stdcall; external 'dtwain32.dll'   name 'DTWAIN_GetHalftoneW';
@@ -2517,6 +2522,7 @@ function DTWAIN_GetCurrentFileName(Source:DTWAIN_SOURCE; szName:LPTSTR; MaxLen:L
 function DTWAIN_GetDSMFullName(DSMType:LONG; szDLLName:LPTSTR; nMaxLen:LONG; pWhichSearch:LPLONG):LONG;overload;stdcall; external 'dtwain32.dll'   name 'DTWAIN_GetDSMFullName';
 function DTWAIN_GetDeviceTimeDate(Source:DTWAIN_SOURCE; szTimeDate:LPTSTR):BOOL;stdcall; external 'dtwain32.dll'   name 'DTWAIN_GetDeviceTimeDate';
 function DTWAIN_GetErrorString(lError:LONG; lpszBuffer:LPTSTR; nMaxLen:LONG):LONG;stdcall; external 'dtwain32.dll'   name 'DTWAIN_GetErrorString';
+function DTWAIN_GetResourceString(lResource:LONG; lpszBuffer:LPTSTR; nMaxLen:LONG):LONG;stdcall; external 'dtwain32.dll'   name 'DTWAIN_GetResourceString';
 function DTWAIN_GetExtCapFromName(szName:LPCTSTR):LONG;stdcall; external 'dtwain32.dll'   name 'DTWAIN_GetExtCapFromName';
 function DTWAIN_GetExtNameFromCap(nValue:LONG; szValue:LPTSTR; nMaxLen:LONG):LONG;stdcall; external 'dtwain32.dll'   name 'DTWAIN_GetExtNameFromCap';
 function DTWAIN_GetHalftone(Source:DTWAIN_SOURCE; lpHalftone:LPTSTR; lGetType:LONG):BOOL;stdcall; external 'dtwain32.dll'   name 'DTWAIN_GetHalftone';
