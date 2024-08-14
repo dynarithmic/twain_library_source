@@ -299,7 +299,7 @@ Public Class VB_FullDemo
         Me.Enabled = False
         Select Case nWhich
             Case 0
-                SelectedSource = DTWAINAPI.DTWAIN_SelectSource
+                SelectedSource = DTWAINAPI.DTWAIN_SelectSource2(IntPtr.Zero, "Select Source", 0, 0, DTWAINAPI.DTWAIN_DLG_CENTER_SCREEN)
             Case 1
                 Dim objSelectSourceByName As SelectSourceByName = New SelectSourceByName()
                 Dim nResult As DialogResult = objSelectSourceByName.ShowDialog()
