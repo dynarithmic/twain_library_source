@@ -632,10 +632,11 @@ void DisplayLoggingOptions()
     LONG LogFlags = DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_LOWLEVELTWAIN | DTWAIN_LOG_DECODE_TWEVENT | DTWAIN_LOG_DECODE_TWMEMREF | DTWAIN_LOG_ISTWAINMSG;
     if ( DialogBox(g_hInstance, (LPCTSTR)IDD_dlgDebug, g_hWnd, (DLGPROC)DisplayLoggingProc) == IDOK )
     {
+        // Make sure we make this exclusive by turning off all logging
+        DTWAIN_SetTwainLog(0, _T(""));
         switch (g_LogType)
         {
             case 0:
-                DTWAIN_SetTwainLog(0,_T(""));
             break;
 
             case 1:
