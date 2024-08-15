@@ -152,26 +152,26 @@ void CLogSystem::InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE h
     auto iter = app_logger_map.find(loggerType);
     if (iter == app_logger_map.end())
     {
-    switch (loggerType )
-    {
-        case CONSOLE_LOGGING:
-            app_logger_map[CONSOLE_LOGGING] = std::make_shared<StdCout_Logger>();
+        switch (loggerType)
+        {
+            case CONSOLE_LOGGING:
+                app_logger_map[CONSOLE_LOGGING] = std::make_shared<StdCout_Logger>();
                 loggerSet = true;
-        break;
-        case DEBUG_WINDOW_LOGGING:
-            app_logger_map[DEBUG_WINDOW_LOGGING] = std::make_shared<DebugMonitor_Logger>();
+            break;
+            case DEBUG_WINDOW_LOGGING:
+                app_logger_map[DEBUG_WINDOW_LOGGING] = std::make_shared<DebugMonitor_Logger>();
                 loggerSet = true;
-        break;
-        case FILE_LOGGING:
-            app_logger_map[FILE_LOGGING] = std::make_shared<File_Logger>(StringConversion::Convert_NativePtr_To_Ansi(pOutputFilename).c_str(), bAppend);
+            break;
+            case FILE_LOGGING:
+                app_logger_map[FILE_LOGGING] = std::make_shared<File_Logger>(StringConversion::Convert_NativePtr_To_Ansi(pOutputFilename).c_str(), bAppend);
                 loggerSet = true;
-        break;
-        case CALLBACK_LOGGING:
-            app_logger_map[CALLBACK_LOGGING] = std::make_shared<Callback_Logger>();
+            break;
+            case CALLBACK_LOGGING:
+                app_logger_map[CALLBACK_LOGGING] = std::make_shared<Callback_Logger>();
                 loggerSet = true;
-        break;
-        default: ;
-    }
+            break;
+            default:;
+        }
     }
     else
         loggerSet = true;
