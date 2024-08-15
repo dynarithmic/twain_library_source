@@ -944,22 +944,20 @@ int CTL_ITwainSource::GetNumDibs() const
 
 CTL_ITwainSource::~CTL_ITwainSource()
 {
-    try
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    if (pHandle)
     {
-        ResetManualDuplexMode();
-        CloseSource(true);
-        const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-        // Remove all of the PDF text elements for this source
-        if (pHandle)
+        try
         {
+            ResetManualDuplexMode();
+            CloseSource(true);
             pHandle->m_mapPDFTextElement.erase(this);
             pHandle->m_ArrayFactory->destroy(m_pFileEnumerator);
         }
-    }
-    catch(...)
-    {
-        // No exceptions can escape here
+        catch (...)
+        {
+            // No exceptions can escape here
+        }
     }
 }
 
@@ -1197,10 +1195,13 @@ void CTL_ITwainSource::SetPDFEncryption(bool bIsEncrypted,
 
 void CTL_ITwainSource::ClearPDFText()
 {
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    const auto it = pHandle->m_mapPDFTextElement.find(this);
-    if ( it != pHandle->m_mapPDFTextElement.end())
-        it->second.clear();
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    if (pHandle)
+    {
+        const auto it = pHandle->m_mapPDFTextElement.find(this);
+        if (it != pHandle->m_mapPDFTextElement.end())
+            it->second.clear();
+    }
 }
 
 void CTL_ITwainSource::SetPhotometric(LONG Setting)
