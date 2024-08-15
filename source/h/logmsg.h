@@ -39,6 +39,7 @@ namespace dynarithmic
             CBaseLogger() = default;
             CBaseLogger& operator=(const CBaseLogger&) = default;
             virtual void trace(const std::string& msg) = 0;
+            std::string applyDecoration(const std::string& msg);
             static void generic_outstream(std::ostream& os, const std::string& msg);
             static std::string getTime();
             static std::string getThreadID();
@@ -48,6 +49,7 @@ namespace dynarithmic
     {
         public:
             void trace(const std::string& msg) override;
+            ~StdCout_Logger();
     };
 
     class DebugMonitor_Logger final : public CBaseLogger
@@ -113,6 +115,9 @@ namespace dynarithmic
        bool     Flush();
 
        void     PrintBanner(bool bStarted = true);
+
+       void DisableLogger(int loggerType);
+       void DisableAllLoggers();
 
        std::string GetAppName() const {return m_csAppName;}
        void OutputDebugStringFull(const std::string& s);

@@ -995,11 +995,16 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLog(LONG LogFlags, LPCTSTR lpszLogFile)
     if ( (LogFlags != 0) && (LogFlags & allFlags) == 0)  
         LogFlags |= (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_DECODE_SOURCE | DTWAIN_LOG_DECODE_DEST | DTWAIN_LOG_MISCELLANEOUS);
 
-    CTL_StaticData::s_lErrorFilterFlags = LogFlags;
-    if (AnyLoggerExists(pHandle) && LogFlags == 0)
+    bool bLoggerExists = AnyLoggerExists(pHandle);
+    if (LogFlags == 0 && bLoggerExists)
+    {
         CTL_StaticData::s_appLog.PrintBanner(false);
+        CTL_StaticData::s_appLog.DisableAllLoggers();
+        CTL_StaticData::s_lErrorFilterFlags = LogFlags;
+    }
     else
     {
+        CTL_StaticData::s_lErrorFilterFlags = LogFlags;
         if ( LogFlags && !UserDefinedLoggerExists())
             CTL_StaticData::s_lErrorFilterFlags &= ~DTWAIN_LOG_USECALLBACK;
 
