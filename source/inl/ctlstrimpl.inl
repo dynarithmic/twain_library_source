@@ -549,6 +549,28 @@ LONG DLLENTRY_DEF DTWAIN_GetErrorStringW(LONG lError, LPWSTR lpszBuffer, LONG nL
 #endif
 }
 
+LONG DLLENTRY_DEF DTWAIN_GetResourceStringA(LONG ResourceID, LPSTR lpszBuffer, LONG nLength)
+{
+#ifdef _UNICODE
+    std::wstring arg((std::max)(nLength, 0L), 0);
+    const LONG retVal = DTWAIN_GetResourceString(ResourceID, (nLength > 0 && lpszBuffer) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
+#else
+    return DTWAIN_GetResourceString(ResourceID, lpszBuffer, nLength);
+#endif
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetResourceStringW(LONG ResourceID, LPWSTR lpszBuffer, LONG nLength)
+{
+#ifdef _UNICODE
+    return DTWAIN_GetResourceString(ResourceID, lpszBuffer, nLength);
+#else
+    std::string arg((std::max)(nLength, 0L), 0);
+    LONG retVal = DTWAIN_GetResourceString(ResourceID, (nLength > 0 && lpszBuffer) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    return null_terminator_copier(get_view(arg), lpszBuffer, retVal);
+#endif
+}
+
 LONG DLLENTRY_DEF DTWAIN_GetConditionCodeStringA(LONG lError, LPSTR lpszBuffer, LONG nLength)
 {
 #ifdef _UNICODE

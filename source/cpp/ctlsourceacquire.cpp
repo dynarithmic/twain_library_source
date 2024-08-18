@@ -460,15 +460,22 @@ bool dynarithmic::AcquireExHelper(SourceAcquireOptions& opts)
 {
     DTWAIN_ARRAY aDibs = SourceAcquire(opts);
     DTWAINArrayLL_RAII arr(aDibs);
+    auto pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
+    if (!aDibs)
+    {
+        // Destroy internally generated acquisition array and
+        // utilize only user-defined acquisition array
+        pSource->ResetAcquisitionAttempts(nullptr);
+        return false;
+    }
+
     CTL_TwainDLLHandle* pDLLHandle = static_cast<CTL_TwainDLLHandle*>(opts.getHandle());
     const auto& vValues = pDLLHandle->m_ArrayFactory->underlying_container_t<void*>(aDibs);
 
     bool bRet = false;
-    if (aDibs)
         bRet = !vValues.empty() ? true: false;
-    if (opts.getStatus() == DTWAIN_TN_ACQUIRESTARTED && aDibs)
+    if (opts.getStatus() == DTWAIN_TN_ACQUIRESTARTED && !vValues.empty())
         bRet = true;
-    auto pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
 
     // Destroy internally generated acquisition array and
     // utilize only user-defined acquisition array

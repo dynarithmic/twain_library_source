@@ -27,7 +27,7 @@
 #define DTWAINLANGRESOURCEFILE _T("twainresourcestrings_")
 #define DTWAINRESOURCEINFOFILE _T("twaininfo.txt")
 #define DTWAINLANGRESOURCENAMESFILE  _T("twainlanguage.txt")
-#define DTWAINCUSTOMERRORFILE _T("twaincustomerrors_")
+#define DTWAINCUSTOMRESOURCESFILE _T("twaincustomresources_")
 
 namespace dynarithmic
 {
