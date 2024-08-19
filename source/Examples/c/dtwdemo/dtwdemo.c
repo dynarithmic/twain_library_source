@@ -98,6 +98,13 @@ AllTypes g_allTypes[] = {   {_T("BMP File"), DTWAIN_BMP, _T("test.bmp")},
                             {_T("TIFF (Packbits)"), DTWAIN_TIFFPACKBITSMULTI, _T("test.tif")},
                             {_T("TIFF (Flate compression)"), DTWAIN_TIFFDEFLATEMULTI, _T("test.tif")},
                             {_T("TIFF (LZW compression)"), DTWAIN_TIFFLZWMULTI, _T("test.tif")},
+                            {_T("BigTIFF (No compression)"), DTWAIN_BIGTIFFNONEMULTI, _T("test.tif")},
+                            {_T("BigTIFF (CCITT Group 3)"), DTWAIN_BIGTIFFG3MULTI, _T("test.tif")},
+                            {_T("BigTIFF (CCITT Group 4)"), DTWAIN_BIGTIFFG4MULTI, _T("test.tif")},
+                            {_T("BigTIFF (JPEG compression)"), DTWAIN_BIGTIFFJPEGMULTI, _T("test.tif")},
+                            {_T("BigTIFF (Packbits)"), DTWAIN_BIGTIFFPACKBITSMULTI, _T("test.tif")},
+                            {_T("BigTIFF (Flate compression)"), DTWAIN_BIGTIFFDEFLATEMULTI, _T("test.tif")},
+                            {_T("BigTIFF (LZW compression)"), DTWAIN_BIGTIFFLZWMULTI, _T("test.tif")},
                             {_T("Targa (TGA) File"), DTWAIN_TGA, _T("test.tga")},
                             {_T("Targa Run Length Encoded(TGA) File"), DTWAIN_TGA_RLE, _T("test.tga")},
                             {_T("Windows Meta File (WMF)"), DTWAIN_WMF, _T("test.wmf")},
@@ -525,7 +532,9 @@ void AcquireFile(BOOL bUseSource)
     {
         /* User wants to use DTWAIN File Mode instead of Source mode */
         /* All Sources can use this mode */
-        DialogBox(g_hInstance, (LPCTSTR)IDD_dlgFileType, g_hWnd, (DLGPROC)DisplayFileTypesProc);
+        int nDlgFileType = DialogBox(g_hInstance, (LPCTSTR)IDD_dlgFileType, g_hWnd, (DLGPROC)DisplayFileTypesProc);
+        if (nDlgFileType == 0)
+            return;
         FileFlags |= DTWAIN_USENATIVE;
         FileType = g_FileType;
 
@@ -556,8 +565,9 @@ void AcquireFile(BOOL bUseSource)
 
     /* Disable main window */
     /* Check if feeder or duplex is supported */
+    int nDlgRet = 0;
     if ( DTWAIN_IsFeederSupported(g_CurrentSource) || DTWAIN_IsDuplexSupported(g_CurrentSource))
-        DialogBox(g_hInstance, (LPCTSTR)IDD_dlgSettings, g_hWnd, (DLGPROC)DisplayAcquireSettingsProc);
+        nDlgRet = DialogBox(g_hInstance, (LPCTSTR)IDD_dlgSettings, g_hWnd, (DLGPROC)DisplayAcquireSettingsProc);
     EnableWindow(g_hWnd, FALSE);
     
     /* Create the array of names.  This function is to be used
@@ -1040,7 +1050,7 @@ LRESULT CALLBACK DisplayFileTypesProc(HWND hDlg, UINT message, WPARAM wParam, LP
                 break;
                 case IDCANCEL:
                      g_FileType = g_allTypes[(int)SendMessage(hWndCombo, CB_GETCURSEL, 0, 0)].DTWAINType;
-                     EndDialog(hDlg, 1);
+                     EndDialog(hDlg, 0);
                 break;
                 case IDC_cmbFileType:
                 {

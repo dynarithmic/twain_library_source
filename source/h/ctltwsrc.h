@@ -188,6 +188,8 @@ namespace dynarithmic
         static bool  IsFileTypeMultiPage(CTL_TwainFileFormatEnum FileType);
         static CTL_TwainFileFormatEnum GetMultiPageType(CTL_TwainFileFormatEnum FileType);
         static bool  IsFileTypeTIFF(CTL_TwainFileFormatEnum FileType);
+        static bool  IsFileTypeBigTiff(CTL_TwainFileFormatEnum FileType);
+
         static bool  IsFileTypePostscript(CTL_TwainFileFormatEnum FileType);
 
         void         SetPendingImageNum( long nImageNum )

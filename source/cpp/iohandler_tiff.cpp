@@ -97,49 +97,62 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     int nLibTiff;
     switch( m_nFormat )
     {
-    case CTL_TwainDib::TiffFormatLZW:
-    case CTL_TwainDib::TiffFormatLZWMULTI:
-        nLibTiff = COMPRESSION_LZW;  // LZW compression is suspended
-        //            nLibTiff = COMPRESSION_NONE;
-        break;
+        case CTL_TwainDib::TiffFormatLZW:
+        case CTL_TwainDib::TiffFormatLZWMULTI:
+        case CTL_TwainDib::BigTiffFormatLZW:
+        case CTL_TwainDib::BigTiffFormatLZWMULTI:
+                nLibTiff = COMPRESSION_LZW;  
+            break;
 
-    case CTL_TwainDib::TiffFormatNONE:
-    case CTL_TwainDib::TiffFormatNONEMULTI:
-        nLibTiff = COMPRESSION_NONE;
-        break;
+        case CTL_TwainDib::TiffFormatNONE:
+        case CTL_TwainDib::TiffFormatNONEMULTI:
+        case CTL_TwainDib::BigTiffFormatNONE:
+        case CTL_TwainDib::BigTiffFormatNONEMULTI:
+                nLibTiff = COMPRESSION_NONE;
+            break;
 
-    case CTL_TwainDib::TiffFormatGROUP3:
-    case CTL_TwainDib::TiffFormatGROUP3MULTI:
-        nLibTiff = COMPRESSION_CCITTFAX3;
-        break;
+        case CTL_TwainDib::TiffFormatGROUP3:
+        case CTL_TwainDib::TiffFormatGROUP3MULTI:
+        case CTL_TwainDib::BigTiffFormatGROUP3:
+        case CTL_TwainDib::BigTiffFormatGROUP3MULTI:
+            nLibTiff = COMPRESSION_CCITTFAX3;
+            break;
 
-    case CTL_TwainDib::TiffFormatGROUP4:
-    case CTL_TwainDib::TiffFormatGROUP4MULTI:
-        nLibTiff = COMPRESSION_CCITTFAX4;
-        break;
+        case CTL_TwainDib::TiffFormatGROUP4:
+        case CTL_TwainDib::TiffFormatGROUP4MULTI:
+        case CTL_TwainDib::BigTiffFormatGROUP4:
+        case CTL_TwainDib::BigTiffFormatGROUP4MULTI:
+            nLibTiff = COMPRESSION_CCITTFAX4;
+            break;
 
-    case CTL_TwainDib::TiffFormatPACKBITS:
-    case CTL_TwainDib::TiffFormatPACKBITSMULTI:
-        nLibTiff = COMPRESSION_PACKBITS;
-        break;
+        case CTL_TwainDib::TiffFormatPACKBITS:
+        case CTL_TwainDib::TiffFormatPACKBITSMULTI:
+        case CTL_TwainDib::BigTiffFormatPACKBITS:
+        case CTL_TwainDib::BigTiffFormatPACKBITSMULTI:
+            nLibTiff = COMPRESSION_PACKBITS;
+            break;
 
-    case CTL_TwainDib::TiffFormatDEFLATE:
-    case CTL_TwainDib::TiffFormatDEFLATEMULTI:
-        nLibTiff = COMPRESSION_ADOBE_DEFLATE;
-        break;
+        case CTL_TwainDib::TiffFormatDEFLATE:
+        case CTL_TwainDib::TiffFormatDEFLATEMULTI:
+        case CTL_TwainDib::BigTiffFormatDEFLATE:
+        case CTL_TwainDib::BigTiffFormatDEFLATEMULTI:
+            nLibTiff = COMPRESSION_ADOBE_DEFLATE;
+            break;
 
-    case CTL_TwainDib::TiffFormatJPEG:
-    case CTL_TwainDib::TiffFormatJPEGMULTI:
-        nLibTiff = COMPRESSION_JPEG;
-        break;
+        case CTL_TwainDib::TiffFormatJPEG:
+        case CTL_TwainDib::TiffFormatJPEGMULTI:
+        case CTL_TwainDib::BigTiffFormatJPEG:
+        case CTL_TwainDib::BigTiffFormatJPEGMULTI:
+            nLibTiff = COMPRESSION_JPEG;
+            break;
 
-    case CTL_TwainDib::TiffFormatPIXARLOG:
-    case CTL_TwainDib::TiffFormatPIXARLOGMULTI:
-        nLibTiff = COMPRESSION_PIXARLOG;
-        break;
+        case CTL_TwainDib::TiffFormatPIXARLOG:
+        case CTL_TwainDib::TiffFormatPIXARLOGMULTI:
+            nLibTiff = COMPRESSION_PIXARLOG;
+            break;
 
-    default:
-            return DTWAIN_ERR_INVALID_BITDEPTH;
+        default:
+             return DTWAIN_ERR_INVALID_BITDEPTH;
     }
 
     if (bNotLastFile && !IsValidBitDepth(m_nFormat, m_pDib->GetBitsPerPixel()) )
