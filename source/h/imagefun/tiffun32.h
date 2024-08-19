@@ -68,7 +68,7 @@ namespace dynarithmic
                    BigTiffformatGROUP4MULTI = DTWAIN_BIGTIFFG4MULTI,
                    BigTiffformatJPEG = DTWAIN_BIGTIFFJPEG,
                    BigTiffformatJPEGMULTI = DTWAIN_BIGTIFFJPEGMULTI,
-     };
+            };
 
         private:
             UINT32 m_nFormat;
