@@ -26,6 +26,7 @@ OF THIRD PARTY RIGHTS.
 
 #include "dibinfox.h"
 #include "winbit32.h"
+#include "dtwain_filetypes.h"
 
 // Includes stuff from the LIBTIFF library
 namespace dynarithmic
@@ -37,22 +38,36 @@ namespace dynarithmic
 
     class CTIFFImageHandler : public CDibInterface
     {
-            enum { TiffFormatLZW=500,
-                   TiffFormatNONE=600,
-                   TiffFormatGROUP3=700,
-                   TiffFormatGROUP4=800,
-                   TiffFormatPACKBITS=801,
-                   TiffFormatDEFLATE=802,
-                   TiffFormatJPEG=803,
-                   TiffFormatPIXARLOG=805,
-                   TiffFormatNONEMULTI = 900,
-                   TiffFormatGROUP3MULTI = 901,
-                   TiffFormatGROUP4MULTI  = 902,
-                   TiffFormatPACKBITSMULTI = 903,
-                   TiffFormatDEFLATEMULTI = 904,
-                   TiffFormatJPEGMULTI = 905,
-                   TiffFormatLZWMULTI = 906,
-                   TiffFormatPIXARLOGMULTI=908
+            enum { TiffFormatLZW = DTWAIN_TIFFLZW,
+                   TiffFormatNONE = DTWAIN_TIFFNONE,
+                   TiffFormatGROUP3 = DTWAIN_TIFFG3,
+                   TiffFormatGROUP4 = DTWAIN_TIFFG4,
+                   TiffFormatPACKBITS = DTWAIN_TIFFPACKBITS,
+                   TiffFormatDEFLATE = DTWAIN_TIFFDEFLATE,
+                   TiffFormatJPEG = DTWAIN_TIFFJPEG,
+                   TiffFormatPIXARLOG = DTWAIN_TIFFPIXARLOG,
+                   TiffFormatNONEMULTI = DTWAIN_TIFFNONEMULTI,
+                   TiffFormatGROUP3MULTI = DTWAIN_TIFFG3MULTI,
+                   TiffFormatGROUP4MULTI  = DTWAIN_TIFFG4MULTI,
+                   TiffFormatPACKBITSMULTI = DTWAIN_TIFFPACKBITSMULTI,
+                   TiffFormatDEFLATEMULTI = DTWAIN_TIFFDEFLATEMULTI,
+                   TiffFormatJPEGMULTI = DTWAIN_TIFFJPEGMULTI,
+                   TiffFormatLZWMULTI = DTWAIN_TIFFLZWMULTI,
+                   TiffFormatPIXARLOGMULTI = DTWAIN_TIFFPIXARLOGMULTI,
+                   BigTiffFormatLZW = DTWAIN_BIGTIFFLZW,
+                   BigTiffformatLZWMULTI = DTWAIN_BIGTIFFLZWMULTI,
+                   BigTiffFormatNONE = DTWAIN_BIGTIFFNONE,
+                   BigTiffformatNONEMULTI = DTWAIN_BIGTIFFNONEMULTI,
+                   BigTiffFormatPACKBITS = DTWAIN_BIGTIFFPACKBITS,
+                   BigTiffformatPACKBITSMULTI = DTWAIN_BIGTIFFPACKBITSMULTI,
+                   BigTiffFormatDEFLATE = DTWAIN_BIGTIFFDEFLATE,
+                   BigTiffformatDEFLATEMULTI = DTWAIN_BIGTIFFDEFLATEMULTI,
+                   BigTiffFormatGROUP3 = DTWAIN_BIGTIFFG3,
+                   BigTiffFormatGROUP3MULTI = DTWAIN_BIGTIFFG3MULTI,
+                   BigTiffformatGROUP4 = DTWAIN_BIGTIFFG4,
+                   BigTiffformatGROUP4MULTI = DTWAIN_BIGTIFFG4MULTI,
+                   BigTiffformatJPEG = DTWAIN_BIGTIFFJPEG,
+                   BigTiffformatJPEGMULTI = DTWAIN_BIGTIFFJPEGMULTI,
      };
 
         private:

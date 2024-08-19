@@ -1071,19 +1071,28 @@ SupportsNoPixels() {
 // ----------------------------------------------------------
 
 static void * DLL_CALLCONV
-Open(FreeImageIO *io, fi_handle handle, BOOL read) {
+Open(FreeImageIO *io, fi_handle handle, BOOL read, FIBITMAP* dib, int flags) {
 	// wrapper for TIFF I/O
+	static_assert(sizeof(int) == sizeof(int32_t), "The sizeof(int) must be equal to the sizeof(int32_t)");
+
 	fi_TIFFIO *fio = (fi_TIFFIO*)malloc(sizeof(fi_TIFFIO));
 	if(!fio) return NULL;
 	fio->io = io;
 	fio->handle = handle;
 
+    bool isBigTiff = flags >> 31;
 	if (read) {
-		fio->tif = TIFFFdOpen((thandle_t)fio, "", "r");
+        if (isBigTiff)
+            fio->tif = TIFFFdOpen((thandle_t)fio, "", "r8");
+		else
+            fio->tif = TIFFFdOpen((thandle_t)fio, "", "r");
 	} else {
 		// mode = "w"	: write Classic TIFF
 		// mode = "w8"	: write Big TIFF
-		fio->tif = TIFFFdOpen((thandle_t)fio, "", "w");
+		if (isBigTiff)
+			fio->tif = TIFFFdOpen((thandle_t)fio, "", "w8");
+		else
+		    fio->tif = TIFFFdOpen((thandle_t)fio, "", "w");
 	}
 	if(fio->tif == NULL) {
 		free(fio);

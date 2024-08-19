@@ -691,6 +691,13 @@ bool CTL_ITwainSource::IsFileTypeMultiPage(CTL_TwainFileFormatEnum FileType) // 
         FileType == TWAINFileFormat_TIFFPIXARLOGMULTI ||
         FileType == TWAINFileFormat_DCX           ||
         FileType == TWAINFileFormat_TEXTMULTI ||
+        FileType == TWAINFileFormat_BIGTIFFLZWMULTI ||
+        FileType == TWAINFileFormat_BIGTIFFNONEMULTI ||
+        FileType == TWAINFileFormat_BIGTIFFPACKBITSMULTI ||
+        FileType == TWAINFileFormat_BIGTIFFDEFLATEMULTI ||
+        FileType == TWAINFileFormat_BIGTIFFGROUP3MULTI ||
+        FileType == TWAINFileFormat_BIGTIFFGROUP4MULTI ||
+        FileType == TWAINFileFormat_BIGTIFFJPEGMULTI ||
         FileType == DTWAIN_FF_TIFFMULTI;
 }
 
@@ -709,6 +716,13 @@ CTL_TwainFileFormatEnum CTL_ITwainSource::GetMultiPageType(CTL_TwainFileFormatEn
         { TWAINFileFormat_POSTSCRIPT2,     TWAINFileFormat_POSTSCRIPT2MULTI },
         { TWAINFileFormat_POSTSCRIPT3,     TWAINFileFormat_POSTSCRIPT3MULTI },
         { TWAINFileFormat_TIFFLZW,         TWAINFileFormat_TIFFLZWMULTI },
+        { TWAINFileFormat_BIGTIFFLZW,      TWAINFileFormat_BIGTIFFLZWMULTI },
+        { TWAINFileFormat_BIGTIFFNONE,     TWAINFileFormat_BIGTIFFNONEMULTI },
+        { TWAINFileFormat_BIGTIFFPACKBITS, TWAINFileFormat_BIGTIFFPACKBITSMULTI },
+        { TWAINFileFormat_BIGTIFFDEFLATE,  TWAINFileFormat_BIGTIFFDEFLATEMULTI },
+        { TWAINFileFormat_BIGTIFFGROUP3,   TWAINFileFormat_BIGTIFFGROUP3MULTI },
+        { TWAINFileFormat_BIGTIFFGROUP4,   TWAINFileFormat_BIGTIFFGROUP4MULTI },
+        { TWAINFileFormat_BIGTIFFJPEG,     TWAINFileFormat_BIGTIFFJPEGMULTI },
         { TWAINFileFormat_TIFFPIXARLOG,    TWAINFileFormat_TIFFPIXARLOGMULTI },
         { TWAINFileFormat_PCX,             TWAINFileFormat_DCX },
         { TWAINFileFormat_TEXT,            TWAINFileFormat_TEXTMULTI }
@@ -737,7 +751,42 @@ bool CTL_ITwainSource::IsFileTypeTIFF(CTL_TwainFileFormatEnum FileType)
                             TWAINFileFormat_TIFFPACKBITS,
                             TWAINFileFormat_TIFFDEFLATE,
                             TWAINFileFormat_TIFFPIXARLOG,
-                            TWAINFileFormat_TIFFLZW
+                            TWAINFileFormat_TIFFLZW,
+                            TWAINFileFormat_BIGTIFFLZW,
+                            TWAINFileFormat_BIGTIFFLZWMULTI,
+                            TWAINFileFormat_BIGTIFFNONE,
+                            TWAINFileFormat_BIGTIFFNONEMULTI,
+                            TWAINFileFormat_BIGTIFFPACKBITS,
+                            TWAINFileFormat_BIGTIFFPACKBITSMULTI,
+                            TWAINFileFormat_BIGTIFFDEFLATE,
+                            TWAINFileFormat_BIGTIFFDEFLATEMULTI,
+                            TWAINFileFormat_BIGTIFFGROUP3,
+                            TWAINFileFormat_BIGTIFFGROUP3MULTI,
+                            TWAINFileFormat_BIGTIFFGROUP4,
+                            TWAINFileFormat_BIGTIFFGROUP4MULTI,
+                            TWAINFileFormat_BIGTIFFJPEG,
+                            TWAINFileFormat_BIGTIFFJPEGMULTI,
+    };
+    return setInfo.count(FileType) == 1;
+}
+
+bool CTL_ITwainSource::IsFileTypeBigTiff(CTL_TwainFileFormatEnum FileType) // static function
+{
+    static const std::unordered_set<CTL_TwainFileFormatEnum> setInfo = {
+                            TWAINFileFormat_BIGTIFFLZWMULTI,
+                            TWAINFileFormat_BIGTIFFLZW,
+                            TWAINFileFormat_BIGTIFFNONEMULTI,
+                            TWAINFileFormat_BIGTIFFNONE,
+                            TWAINFileFormat_BIGTIFFPACKBITS,
+                            TWAINFileFormat_BIGTIFFPACKBITSMULTI,
+                            TWAINFileFormat_BIGTIFFDEFLATE,
+                            TWAINFileFormat_BIGTIFFDEFLATEMULTI,
+                            TWAINFileFormat_BIGTIFFGROUP3,
+                            TWAINFileFormat_BIGTIFFGROUP3MULTI,
+                            TWAINFileFormat_BIGTIFFGROUP4,
+                            TWAINFileFormat_BIGTIFFGROUP4MULTI,
+                            TWAINFileFormat_BIGTIFFJPEG,
+                            TWAINFileFormat_BIGTIFFJPEGMULTI
                     };
     return setInfo.count(FileType) == 1;
 }
@@ -751,6 +800,12 @@ void CTL_ITwainSource::initFileSaveMap() const
         m_saveFileMap[TWAINFileFormat_TIFFLZW] =
             m_saveFileMap[TWAINFileFormat_TIFFLZWMULTI] = MAKE_FILE_FORMAT_INFO("TIFF Format (LZW) (*.tif)\0*.tif\0\0", ".tif");
 
+        m_saveFileMap[TWAINFileFormat_BIGTIFFLZW] =
+            m_saveFileMap[TWAINFileFormat_BIGTIFFLZWMULTI] = MAKE_FILE_FORMAT_INFO("Big TIFF Format (LZW) (*.tif)\0*.tif\0\0", ".tif");
+
+        m_saveFileMap[TWAINFileFormat_BIGTIFFNONE] =
+            m_saveFileMap[TWAINFileFormat_BIGTIFFNONEMULTI] = MAKE_FILE_FORMAT_INFO("Big TIFF Format (Uncompressed) (*.tif)\0*.tif\0\0", ".tif");
+
         m_saveFileMap[TWAINFileFormat_TIFFNONE] =
             m_saveFileMap[TWAINFileFormat_TIFFNONEMULTI] =
             m_saveFileMap[DTWAIN_FF_TIFF] = MAKE_FILE_FORMAT_INFO("TIFF Uncompressed Format (*.tif)\0*.tif\0\0", ".tif");
@@ -761,17 +816,32 @@ void CTL_ITwainSource::initFileSaveMap() const
         m_saveFileMap[TWAINFileFormat_TIFFGROUP4] =
             m_saveFileMap[TWAINFileFormat_TIFFGROUP4MULTI] = MAKE_FILE_FORMAT_INFO("TIFF Fax Group 4 Format (*.tif)\0*.tif\0\0", ".tif");
 
+        m_saveFileMap[TWAINFileFormat_BIGTIFFGROUP3] =
+            m_saveFileMap[TWAINFileFormat_BIGTIFFGROUP3MULTI] = MAKE_FILE_FORMAT_INFO("Big TIFF Fax Group 3 Format (*.tif)\0*.tif\0\0", ".tif");
+
+        m_saveFileMap[TWAINFileFormat_BIGTIFFGROUP4] =
+            m_saveFileMap[TWAINFileFormat_BIGTIFFGROUP4MULTI] = MAKE_FILE_FORMAT_INFO("Big TIFF Fax Group 4 Format (*.tif)\0*.tif\0\0", ".tif");
+
         m_saveFileMap[TWAINFileFormat_TIFFPIXARLOG] =
             m_saveFileMap[TWAINFileFormat_TIFFPIXARLOGMULTI] = MAKE_FILE_FORMAT_INFO("TIFF (Pixar-Log Compression) (*.tif)\0*.tif\0\0", ".tif");
 
         m_saveFileMap[TWAINFileFormat_TIFFJPEG] =
             m_saveFileMap[TWAINFileFormat_TIFFJPEGMULTI] = MAKE_FILE_FORMAT_INFO("TIFF (JPEG Compression) (*.tif)\0*.tif\0\0", ".tif");
 
+        m_saveFileMap[TWAINFileFormat_BIGTIFFJPEG] =
+            m_saveFileMap[TWAINFileFormat_BIGTIFFJPEGMULTI] = MAKE_FILE_FORMAT_INFO("Big TIFF (JPEG Compression) (*.tif)\0*.tif\0\0", ".tif");
+
         m_saveFileMap[DTWAIN_TIFFPACKBITS] =
             m_saveFileMap[DTWAIN_TIFFPACKBITSMULTI] = MAKE_FILE_FORMAT_INFO("TIFF (Macintosh RLE Compression) (*.tif)\0*.tif\0\0", ".tif");
 
         m_saveFileMap[DTWAIN_TIFFDEFLATE] =
             m_saveFileMap[DTWAIN_TIFFDEFLATEMULTI] = MAKE_FILE_FORMAT_INFO("TIFF (ZLib Deflate Compression) (*.tif)\0*.tif\0\0", ".tif");
+
+        m_saveFileMap[DTWAIN_BIGTIFFDEFLATE] =
+            m_saveFileMap[DTWAIN_BIGTIFFDEFLATEMULTI] = MAKE_FILE_FORMAT_INFO("Big TIFF (ZLib Deflate Compression) (*.tif)\0*.tif\0\0", ".tif");
+
+        m_saveFileMap[DTWAIN_BIGTIFFPACKBITS] =
+            m_saveFileMap[DTWAIN_BIGTIFFPACKBITSMULTI] = MAKE_FILE_FORMAT_INFO("Big TIFF (Macintosh RLE Compression) (*.tif)\0*.tif\0\0", ".tif");
 
         m_saveFileMap[TWAINFileFormat_JBIG] = MAKE_FILE_FORMAT_INFO("JBIG Format (*.jbg)\0*.jbg\0\0", ".jbg");
 
