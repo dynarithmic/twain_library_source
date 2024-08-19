@@ -511,6 +511,20 @@ namespace dynarithmic
             static constexpr value_type  tiffnocompressmulti = DTWAIN_TIFFNONEMULTI;
             static constexpr value_type  tiffpackbitsmulti = DTWAIN_TIFFPACKBITSMULTI;
             static constexpr value_type  textmulti = DTWAIN_TEXTMULTI;
+            static constexpr value_type  bigtifflzw = DTWAIN_BIGTIFFLZW;
+            static constexpr value_type  bigtifflzwmulti = DTWAIN_BIGTIFFLZWMULTI;
+            static constexpr value_type  bigtiffnone = DTWAIN_BIGTIFFNONE;
+            static constexpr value_type  bigtiffnonemulti = DTWAIN_BIGTIFFNONEMULTI;
+            static constexpr value_type  bigtiffpackbits = DTWAIN_BIGTIFFPACKBITS;
+            static constexpr value_type  bigtiffpackbitsmulti = DTWAIN_BIGTIFFPACKBITSMULTI;
+            static constexpr value_type  bigtiffdeflate = DTWAIN_BIGTIFFDEFLATE;
+            static constexpr value_type  bigtiffdeflatemulti = DTWAIN_BIGTIFFDEFLATEMULTI;
+            static constexpr value_type  bigtiffg3 = DTWAIN_BIGTIFFG3;
+            static constexpr value_type  bigtiffg3multi = DTWAIN_BIGTIFFG3MULTI;
+            static constexpr value_type  bigtiffg4 = DTWAIN_BIGTIFFG4;
+            static constexpr value_type  bigtiffg4multi = DTWAIN_BIGTIFFG4MULTI;
+            static constexpr value_type  bigtiffjpeg = DTWAIN_BIGTIFFJPEG;
+            static constexpr value_type  bigtiffjpegmulti = DTWAIN_BIGTIFFJPEGMULTI;
             static constexpr value_type  bmp_source_mode = DTWAIN_FF_BMP;
             static constexpr value_type  tiff_source_mode = DTWAIN_FF_TIFF;
             static constexpr value_type  pict_source_mode = DTWAIN_FF_PICT;
@@ -1692,7 +1706,14 @@ namespace dynarithmic
                 filetype_value::windowsiconresized,
                 filetype_value::windowsmetafile,
                 filetype_value::wirelessbmp,
-                filetype_value::wirelessbmpresized
+                filetype_value::wirelessbmpresized,
+                filetype_value::bigtifflzw,
+                filetype_value::bigtiffnone,
+                filetype_value::bigtiffpackbits,
+                filetype_value::bigtiffdeflate,
+                filetype_value::bigtiffg3,
+                filetype_value::bigtiffg4,
+                filetype_value::bigtiffjpeg
             };
 
             static constexpr filetype_value::value_type aMulti [] = 
@@ -1708,7 +1729,14 @@ namespace dynarithmic
                 filetype_value::tiffnocompressmulti,
                 filetype_value::tiffpackbitsmulti,
                 filetype_value::pdfmulti,
-                filetype_value::dcxmulti
+                filetype_value::dcxmulti,
+                filetype_value::bigtifflzwmulti,
+                filetype_value::bigtiffnonemulti,
+                filetype_value::bigtiffpackbitsmulti,
+                filetype_value::bigtiffdeflatemulti,
+                filetype_value::bigtiffg3multi,
+                filetype_value::bigtiffg4multi,
+                filetype_value::bigtiffjpegmulti
             };
 
             static bool is_multipage_type(filetype_value::value_type ft)
@@ -1749,6 +1777,13 @@ namespace dynarithmic
                     {filetype_value::tifflzwmulti, DTWAIN_TIFFLZWMULTI},
                     {filetype_value::tiffnocompressmulti, DTWAIN_TIFFNONEMULTI},
                     {filetype_value::tiffpackbitsmulti, DTWAIN_TIFFPACKBITSMULTI},
+                    {filetype_value::bigtifflzwmulti, DTWAIN_BIGTIFFLZWMULTI},
+                    {filetype_value::bigtiffnonemulti,  DTWAIN_BIGTIFFNONEMULTI},
+                    {filetype_value::bigtiffpackbitsmulti,  DTWAIN_BIGTIFFPACKBITSMULTI},
+                    {filetype_value::bigtiffdeflatemulti,  DTWAIN_BIGTIFFDEFLATEMULTI},
+                    {filetype_value::bigtiffg3multi, DTWAIN_BIGTIFFG3MULTI},
+                    {filetype_value::bigtiffg4multi, DTWAIN_BIGTIFFG4MULTI},
+                    {filetype_value::bigtiffjpegmulti, DTWAIN_BIGTIFFJPEGMULTI}
                 };
 
                 auto iter = multipage_map.find(ft);
@@ -1805,7 +1840,21 @@ namespace dynarithmic
                     filetype_value::tiffjpegmulti,
                     filetype_value::tifflzwmulti,
                     filetype_value::tiffnocompressmulti,
-                    filetype_value::tiffpackbitsmulti
+                    filetype_value::tiffpackbitsmulti,
+                    filetype_value::bigtifflzw,
+                    filetype_value::bigtifflzwmulti,
+                    filetype_value::bigtiffnone,
+                    filetype_value::bigtiffnonemulti,
+                    filetype_value::bigtiffpackbits,
+                    filetype_value::bigtiffpackbitsmulti,
+                    filetype_value::bigtiffdeflate,
+                    filetype_value::bigtiffdeflatemulti,
+                    filetype_value::bigtiffg3,
+                    filetype_value::bigtiffg3multi,
+                    filetype_value::bigtiffg4,
+                    filetype_value::bigtiffg4multi,
+                    filetype_value::bigtiffjpeg,
+                    filetype_value::bigtiffjpegmulti
                 };
                 return supported_set.find(ft) != supported_set.end();
             }
