@@ -27,10 +27,18 @@
 #include <unordered_map>
 #include <fstream>
 #include <mutex>
+#include <string>
 
 /////////////////////////////////////////////////////////////////////////////
 namespace dynarithmic
 {
+    struct FileLoggingTraits
+    {
+        CTL_StringType m_filename;
+        bool m_bAppend;
+        bool m_bCreateDirectory;
+    };
+
     class CBaseLogger
     {
         public:
@@ -62,9 +70,11 @@ namespace dynarithmic
     {
         std::string m_fileName;
         std::ofstream m_ostr;
+        bool m_bFileCreated = false;
         public:
-            File_Logger(const LPCSTR filename, bool bAppend = false);
+            File_Logger(const LPCSTR filename, const FileLoggingTraits& fTraits);
             ~File_Logger();
+            bool IsFileCreated() const { return m_bFileCreated; }
             void trace(const std::string& msg) override;
     };
 
@@ -85,10 +95,10 @@ namespace dynarithmic
        ~CLogSystem() = default;
 
        /////////////////////////////////////////////////////////////////////////////
-       void     InitFileLogging(LPCTSTR pOutputFilename, HINSTANCE hInst, bool bAppend);
-       void     InitConsoleLogging(HINSTANCE hInst); // adds console.
-       void     InitDebugWindowLogging(HINSTANCE hInst); // adds win debug logging.
-       void     InitCallbackLogging(HINSTANCE hInst);
+       bool     InitFileLogging(LPCTSTR pOutputFilename, HINSTANCE hInst, const FileLoggingTraits& fTraits);
+       bool     InitConsoleLogging(HINSTANCE hInst); // adds console.
+       bool     InitDebugWindowLogging(HINSTANCE hInst); // adds win debug logging.
+       bool     InitCallbackLogging(HINSTANCE hInst);
 
 
        /////////////////////////////////////////////////////////////////////////////
@@ -143,7 +153,7 @@ namespace dynarithmic
        bool WriteOnDemand(const std::string& fmt);
 
        private:
-           void InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE hInst, bool bAppend);
+           bool InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE hInst, const FileLoggingTraits& fTraits = {});
            static std::mutex s_logMutex;
     };
 }
