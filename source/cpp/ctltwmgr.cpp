@@ -2389,11 +2389,12 @@ CTL_StringType CTL_TwainAppMgr::GetTwainDirFullNameEx(LPCTSTR szTwainDLLName,
     return ::GetTwainDirFullNameEx(pHandle, szTwainDLLName, bLeaveLoaded, pModule);
 }
 
-bool CTL_TwainAppMgr::CheckTwainExistence(CTL_StringType strTwainDLLName, LPLONG pWhichSearch)
+std::pair<bool, CTL_StringType> CTL_TwainAppMgr::CheckTwainExistence(CTL_StringType strTwainDLLName, LPLONG pWhichSearch)
 {
-    if ( GetTwainDirFullName(strTwainDLLName.c_str(), pWhichSearch).empty())
-        return false;
-    return true;
+    auto str = GetTwainDirFullName(strTwainDLLName.c_str(), pWhichSearch);
+    if ( str.empty())
+        return { false, str };
+    return { true, str };
 }
 
 LONG CTL_TwainAppMgr::ExtImageInfoArrayType(LONG ExtType)
@@ -2520,8 +2521,8 @@ CTL_StringType CTL_TwainAppMgr::GetDefaultDLLName()
 
 CTL_StringType CTL_TwainAppMgr::GetLatestDSMVersion()
 {
-    const bool bRet1 = CheckTwainExistence(TWAINDLLVERSION_1);
-    const bool bRet2 = CheckTwainExistence(TWAINDLLVERSION_2);
+    const bool bRet1 = CheckTwainExistence(TWAINDLLVERSION_1).first;
+    const bool bRet2 = CheckTwainExistence(TWAINDLLVERSION_2).first;
 
     if ( bRet2 )
         return TWAINDLLVERSION_2;
