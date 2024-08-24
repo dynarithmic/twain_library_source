@@ -181,7 +181,7 @@ bool CLogSystem::InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE h
                 if (filelogging->IsFileCreated())
                 {
                     app_logger_map[FILE_LOGGING] = filelogging;
-                loggerSet = true;
+                    loggerSet = true;
                 }
                 else
                     loggerSet = false;
@@ -219,7 +219,7 @@ bool CLogSystem::InitConsoleLogging(HINSTANCE hInst)
     BOOL bRet = AllocConsole();
     if (bRet)
     {
-    freopen_s(&fDummy, "CONOUT$", "w", stdout);
+        freopen_s(&fDummy, "CONOUT$", "w", stdout);
 #endif
         InitLogger(CONSOLE_LOGGING, nullptr, hInst);
     }
