@@ -585,7 +585,8 @@ namespace dynarithmic
             return str;
         }
 
-        static StringType Join(const StringArrayType &rArray, const StringType& sep = StringTraits::GetEmptyString())
+        template <typename TArr = StringArrayType>
+        static StringType Join(const TArr& rArray, const StringType& sep = StringTraits::GetEmptyString())
         {
             return boost::algorithm::join(rArray, sep);
         }

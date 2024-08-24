@@ -667,6 +667,7 @@ namespace dynarithmic
             OCRInterfaceContainer m_OCRInterfaceArray;
             OCRProductNameToEngineMap m_OCRProdNameToEngine;
             OCREnginePtr          m_pOCRDefaultEngine;
+            bool                m_bCheckFeederStatusOnOpen;
 
             // File Save As information
             #ifdef _WIN32
