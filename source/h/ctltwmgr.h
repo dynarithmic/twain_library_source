@@ -94,7 +94,7 @@ namespace dynarithmic
 
             static void Destroy();
             static HINSTANCE GetAppInstance();
-            static bool CheckTwainExistence(CTL_StringType DLLName, LPLONG pWhichSearch=nullptr);
+            static std::pair<bool, CTL_StringType> CheckTwainExistence(CTL_StringType DLLName, LPLONG pWhichSearch=nullptr);
 
 
             // Twain session management functions.  Each App utilizing
