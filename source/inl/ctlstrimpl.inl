@@ -1230,7 +1230,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainAvailabilityExA(LPSTR szDirectories, LONG nLeng
 LONG DLLENTRY_DEF DTWAIN_GetTwainAvailabilityExW(LPWSTR szDirectories, LONG nLength)
 {
 #ifdef _UNICODE
-    return DTWAIN_GetTwainAvailabilityEx(szProduct, nLength);
+    return DTWAIN_GetTwainAvailabilityEx(szDirectories, nLength);
 #else
     std::string args((std::max)(nLength, 0L), 0);
     LONG retVal = DTWAIN_GetTwainAvailabilityEx((nLength > 0 && szDirectories) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
@@ -1253,7 +1253,7 @@ LONG DLLENTRY_DEF DTWAIN_IsTwainAvailableExA(LPSTR szDirectories, LONG nLength)
 LONG DLLENTRY_DEF DTWAIN_IsTwainAvailableExW(LPWSTR szDirectories, LONG nLength)
 {
 #ifdef _UNICODE
-    return DTWAIN_IsTwainAvailableEx(szProduct, nLength);
+    return DTWAIN_IsTwainAvailableEx(szDirectories, nLength);
 #else
     std::string args((std::max)(nLength, 0L), 0);
     LONG retVal = DTWAIN_IsTwainAvailableEx((nLength > 0 && szDirectories) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
