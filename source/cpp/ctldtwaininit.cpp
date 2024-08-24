@@ -700,7 +700,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainAvailabilityEx(LPTSTR directories, LONG nMaxLen
     for (auto& s : availability.second)
     {
         if (s.empty())
-            s = "<null>";
+            s = _T("<null>");
     }
     CTL_StringType sDirs;
     auto joinedString = StringWrapper::Join(availability.second, _T("|"));
