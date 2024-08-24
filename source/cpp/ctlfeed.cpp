@@ -48,17 +48,22 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsFeederSupported(DTWAIN_SOURCE Source)
     if (!bOk)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    LONG val;
-    DTWAIN_ArrayGetAtLong(arr, 0, &val);
-    if (val == 1)
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    auto& vFeeder = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
+    if (vFeeder.empty())
+        LOG_FUNC_EXIT_PARAMS(false)
+
+    if (vFeeder[0] == 1)
         LOG_FUNC_EXIT_PARAMS(true)
 
-    // Enable the feeder temporarily.
+    // Enable the feeder temporarily to test if setting it will work.
+    vFeeder[0] = 1;
     BOOL bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPFEEDERENABLED, DTWAIN_CAPSET, arr);
     if (!bRet)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    DTWAIN_ArraySetAtLong(arr, 0, 0);
+    // Disable the feeder
+    vFeeder[0] = 0; 
     bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPFEEDERENABLED, DTWAIN_CAPSET, arr);
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
