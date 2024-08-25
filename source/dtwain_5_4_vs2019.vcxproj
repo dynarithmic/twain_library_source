@@ -485,10 +485,6 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
-      <LanguageStandard>stdcpp14</LanguageStandard>
-      <LanguageStandard>stdcpp14</LanguageStandard>
-      <LanguageStandard>stdcpp14</LanguageStandard>
-      <LanguageStandard>stdcpp14</LanguageStandard>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
@@ -890,10 +886,6 @@ copy $(TargetDir)$(TargetName).lib .
       <ExceptionHandling>Async</ExceptionHandling>
       <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <LanguageStandard>stdcpp14</LanguageStandard>
-      <LanguageStandard>stdcpp14</LanguageStandard>
-      <LanguageStandard>stdcpp14</LanguageStandard>
-      <LanguageStandard>stdcpp14</LanguageStandard>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeaderOutputFile>dtwain$(PlatformArchitecture).pch</PrecompiledHeaderOutputFile>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
