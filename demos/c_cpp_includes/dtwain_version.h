@@ -41,7 +41,11 @@
 #define DTWAIN_TEXTRESOURCE_PATCHLEVEL_VERSION   DTWAIN_STRINGER_2_(DTWAIN_TEXTRESOURCE_MIN_PATCHLEVEL_VERSION)
 
 #ifdef _MSC_VER
-#pragma message ( "Compiling with DTWAIN Version " DTWAIN_VERINFO_FILEVERSION)
+    #ifdef BUILDING_DTWAINDLL
+        #pragma message ( "Building DTWAIN Version " DTWAIN_VERINFO_FILEVERSION)
+    #else
+        #pragma message ( "Compiling using DTWAIN Version " DTWAIN_VERINFO_FILEVERSION)
+    #endif
 #endif
 
 #ifdef USE_DTWAIN_DEBUG_LIB
