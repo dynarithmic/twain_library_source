@@ -383,7 +383,7 @@ LONG DLLENTRY_DEF  DTWAIN_GetErrorString(LONG lError, LPTSTR lpszBuffer, LONG nM
 
 LONG DLLENTRY_DEF DTWAIN_SetLastError(LONG nError)
 {
-    LOG_FUNC_ENTRY_PARAMS(())
+    LOG_FUNC_ENTRY_PARAMS((nError))
         // See if DLL Handle exists
     auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     if (!IsDLLHandleValid(pHandle, FALSE))
@@ -705,7 +705,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainAvailabilityEx(LPTSTR directories, LONG nMaxLen
     CTL_StringType sDirs;
     auto joinedString = StringWrapper::Join(availability.second, _T("|"));
     StringWrapper::CopyInfoToCString(joinedString, directories, nMaxLen);
-    LOG_FUNC_EXIT_PARAMS(joinedString.length());
+    LOG_FUNC_EXIT_PARAMS(static_cast<LONG>(joinedString.length()));
     CATCH_BLOCK(0)
 }
 
