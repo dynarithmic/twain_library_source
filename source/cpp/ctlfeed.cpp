@@ -142,8 +142,7 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_EnableFeeder(DTWAIN_SOURCE Source, DTWAIN_BOOL 
     if ( bSet )
     {
         DTWAIN_ARRAY aExtendedCaps = nullptr;
-        if (!DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPEXTENDEDCAPS))
-            LOG_FUNC_EXIT_PARAMS(bRet)
+        CHECK_IF_CAP_SUPPORTED(p, pHandle, DTWAIN_CV_CAPEXTENDEDCAPS, bRet)
         const DTWAIN_BOOL bOk = DTWAIN_GetCapValues( Source, DTWAIN_CV_CAPEXTENDEDCAPS, DTWAIN_CAPGETCURRENT, &aExtendedCaps);
         if ( bOk && aExtendedCaps )
         {

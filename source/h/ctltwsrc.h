@@ -280,6 +280,18 @@ namespace dynarithmic
         bool         IsCapInSupportedList(TW_UINT16 nCap) const;
         CapList&     GetCapSupportedList();
         void         SetCapSupportedList(CTL_TwainCapArray& rArray);
+
+        template <typename Iter>
+        void         SetCapSupportedList(Iter iter1, Iter iter2)
+        {
+            m_aSupportedCapCache.clear();
+            while (iter1 != iter2)
+            {
+                m_aSupportedCapCache.push_back(*iter1);
+                ++iter1;
+            }
+        }
+
         void         SetFastCapRetrieval(bool bSet=true) { m_bFastCapRetrieval = bSet; }
         bool         IsFastCapRetrieval() const { return m_bFastCapRetrieval; }
 

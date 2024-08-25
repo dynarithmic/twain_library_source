@@ -100,9 +100,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     // TWAIN message queue
     DetermineIfSpecialXfer(pTheSource);
 
+    // Get all the caps supported
     DTWAIN_ARRAY arr = nullptr;
     DTWAINArrayPtr_RAII raii(&arr);
-    DTWAIN_EnumSupportedCaps(Source, &arr);
+    CTL_TwainAppMgr::GatherCapabilityInfo(pTheSource);
+
+    // get the list of caps created
+    CapList& theCapList = pTheSource->GetCapSupportedList();
 
     // if any logging is turned on, then get the capabilities and log the values
     if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
@@ -113,21 +117,20 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
         // Log the caps if logging is turned on
         CTL_StringType sName;
 
-        auto& vCaps = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
-        std::vector<std::string> VecString(vCaps.size());
+        std::vector<std::string> VecString(theCapList.size());
 
         // copy the names
-        std::transform(vCaps.begin(), vCaps.end(), VecString.begin(), [](LONG n) { return CTL_TwainAppMgr::GetCapNameFromCap(n); });
+        std::transform(theCapList.begin(), theCapList.end(), VecString.begin(), [](LONG n) { return CTL_TwainAppMgr::GetCapNameFromCap(n); });
 
         // Sort the names
         std::sort(VecString.begin(), VecString.end());
         CTL_StringStreamType strm;
-        strm << vCaps.size();
+        strm << theCapList.size();
         sName = _T("\n\nSource \"");
         sName += pTheSource->GetProductName();
         sName += _T("\" contains the following ");
         sName += strm.str() + _T(" capabilities: \n{\n");
-        if (vCaps.empty())
+        if (theCapList.empty())
             sName += _T(" No capabilities:\n");
         else
         {
