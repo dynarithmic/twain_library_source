@@ -2613,6 +2613,30 @@ void CTL_TwainAppMgr::WriteLogInfo(const CTL_StringType& s, bool bFlush)
     WriteLogInfoA(StringConversion::Convert_Native_To_Ansi(s));
 }
 
+void CTL_TwainAppMgr::GatherCapabilityInfo(CTL_ITwainSource* pSource)
+{
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    if (!pSource->RetrievedAllCaps())
+    {
+        // Get the capabilities using TWAIN
+        CTL_TwainCapArray rArray;
+        CTL_TwainAppMgr::GetCapabilities(pSource, rArray);
+        pSource->SetCapSupportedList(rArray);
+
+        // Get the capabilities from the list in the Source
+        CapList& pArray = pSource->GetCapSupportedList();
+
+        // Get all the information about the capability.
+        std::for_each(pArray.begin(), pArray.end(), [&](TW_UINT16 val)
+        {
+            DTWAIN_CacheCapabilityInfo(pSource, pHandle, static_cast<TW_UINT16>(val));
+        });
+
+        // We have retrieved all the capability information
+        pSource->SetRetrievedAllCaps(true);
+    }
+}
+
 struct TripletSaveRestore
 {
     const CTL_TwainTriplet **pTrip = nullptr;

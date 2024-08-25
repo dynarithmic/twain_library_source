@@ -203,7 +203,7 @@ LONG GetCustomCapDataType(DTWAIN_SOURCE Source, TW_UINT16 nCap)
         // Try getting it the slow way
         if (!CTL_TwainAppMgr::IsCapabilitySupported(p, nCap))
             LOG_FUNC_EXIT_PARAMS(DTWAIN_ERR_CAP_NO_SUPPORT)
-            p->AddCapToSupportedList(static_cast<TW_UINT16>(nCap));
+        p->AddCapToSupportedList(static_cast<TW_UINT16>(nCap));
     }
 
     DTWAIN_CacheCapabilityInfo(p, pHandle, nCap);

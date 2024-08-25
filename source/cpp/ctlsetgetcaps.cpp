@@ -341,6 +341,8 @@ DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap
 
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !p;}, DTWAIN_ERR_BAD_SOURCE, false, FUNC_MACRO);
 
+	CHECK_IF_CAP_SUPPORTED(p, pHandle, lCap, false)
+
     bool bEnumeratorExists = pHandle->m_ArrayFactory->is_valid(*pArray);
     if ( bEnumeratorExists )
         pHandle->m_ArrayFactory->clear(*pArray);
@@ -349,8 +351,6 @@ DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap
     if ( bOverrideDataType )
         overrideDataType = 0xFFFF;
 
-    if( !DTWAIN_IsCapSupported(Source, lCap) )
-        LOG_FUNC_EXIT_PARAMS(false)
 
     if( !p->IsCapNegotiableInState(static_cast<TW_UINT16>(lCap), p->GetState()) )
         LOG_FUNC_EXIT_PARAMS(false)
@@ -451,7 +451,7 @@ DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValues( DTWAIN_SOURCE Source, LONG lCap, LONG lSetType, DTWAIN_ARRAY pArray )
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCap, lSetType, pArray))
-        const DTWAIN_BOOL bRet = DTWAIN_SetCapValuesEx(Source, lCap, lSetType, DTWAIN_CONTDEFAULT, pArray);
+    const DTWAIN_BOOL bRet = DTWAIN_SetCapValuesEx(Source, lCap, lSetType, DTWAIN_CONTDEFAULT, pArray);
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -465,6 +465,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap
     bool bOk = false;
     if( p )
     {
+        CHECK_IF_CAP_SUPPORTED(p, pHandle, static_cast<TW_UINT16>(lCap), false)
+
         if ( !CTL_CapabilityTriplet::IsCapOperationReset(lSetType) )
         {
             auto nCount = pHandle->m_ArrayFactory->size(pArray);
@@ -1214,9 +1216,9 @@ int GetMultiCapValues(DTWAIN_HANDLE DLLHandle,
 
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     auto& factory = pHandle->m_ArrayFactory;
-    const int nSize = factory->size(FrameArray); 
+    const size_t nSize = factory->size(FrameArray); 
 
-    for (int i = 0; i < nSize; i++)
+    for (size_t i = 0; i < nSize; i++)
     {
         DTWAIN_FRAME DTWAINFrame = dynarithmic::CreateFrameArray(pHandle, 0, 0, 0, 0);
         DTWAINFrame_RAII raii(DTWAINFrame);
