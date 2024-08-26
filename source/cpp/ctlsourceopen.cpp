@@ -94,9 +94,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     // Get the supported transfer types
     pTheSource->SetSupportedTransferMechanisms(CTL_TwainAppMgr::EnumTransferMechanisms(pTheSource));
 
-    // Cache the pixel types and bit depths
-    LogAndCachePixelTypes(pTheSource);
-
     // See if the source is one that has a bug in the MSG_XFERREADY sending on the 
     // TWAIN message queue
     DetermineIfSpecialXfer(pTheSource);
@@ -105,6 +102,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     DTWAIN_ARRAY arr = nullptr;
     DTWAINArrayPtr_RAII raii(&arr);
     CTL_TwainAppMgr::GatherCapabilityInfo(pTheSource);
+
+    // Cache the pixel types and bit depths
+    LogAndCachePixelTypes(pTheSource);
 
     // get the list of caps created
     CapList& theCapList = pTheSource->GetCapSupportedList();
@@ -171,13 +171,12 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
         return;
 
     p->SetCurrentlyProcessingPixelInfo(true);
-    char szName[MaxMessage + 1];
+    TCHAR szName[MaxMessage + 1];
     LONG oldflags = CTL_StaticData::s_lErrorFilterFlags;
 
-    if (oldflags)
-        GetSourceInfo(p, &CTL_ITwainSource::GetProductName, szName, MaxMessage);
+    GetSourceInfo(p, &CTL_ITwainSource::GetProductName, szName, MaxMessage);
 
-    std::string sName = szName;
+    std::string sName = StringConversion::Convert_NativePtr_To_Ansi(szName);
     std::string sBitDepths;
     DTWAIN_ARRAY PixelTypes;
 
