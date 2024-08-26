@@ -906,6 +906,10 @@ namespace Dynarithmic
         public const  int DTWAIN_ERR_INVALIDICONFORMAT = (-2074);
         public const  int DTWAIN_ERR_TWAIN32DSMNOTFOUND = (-2075);
         public const  int DTWAIN_ERR_TWAINOPENSOURCEDSMNOTFOUND = (-2076);
+        public const int DTWAIN_ERR_INVALID_DIRECTORY = (-2077);
+        public const int DTWAIN_ERR_CREATE_DIRECTORY = (-2078);
+        public const int DTWAIN_ERR_OCRLIBRARY_NOTFOUND = (-2079);
+
         public const  int DTWAIN_TWAINSAVE_OK = (0);
         public const  int DTWAIN_ERR_TS_FIRST = (-2080);
         public const  int DTWAIN_ERR_TS_NOFILENAME = (-2081);
