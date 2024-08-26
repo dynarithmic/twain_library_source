@@ -644,11 +644,11 @@ LRESULT CALLBACK DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPA
                     if (DefSource)
                     {
                         closeSourceRAII cs(DefSource);
-                        LONG nCharacters = DTWAIN_GetSourceProductName(DefSource, nullptr, 0);
+                        LONG nCharacters = GetSourceInfo(reinterpret_cast<CTL_ITwainSource*>(DefSource), &CTL_ITwainSource::GetProductName, nullptr, 0);
                         if (nCharacters > 0)
                         {
                             DefName.resize(nCharacters);
-                            DTWAIN_GetSourceProductName(DefSource, DefName.data(), nCharacters);
+                            GetSourceInfo(reinterpret_cast<CTL_ITwainSource*>(DefSource), &CTL_ITwainSource::GetProductName, DefName.data(), nCharacters);
                             if (bLogMessages)
                                 CTL_TwainAppMgr::WriteLogInfoA("Initializing TWAIN Dialog -- Retrieved default TWAIN Source name...\n");
                         }
@@ -685,7 +685,7 @@ LRESULT CALLBACK DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPA
                 std::transform(vValues.begin(), vValues.end(), std::back_inserter(vSourceNames),
                                [&](CTL_ITwainSourcePtr ptr)
                     {
-                        DTWAIN_GetSourceProductName(ptr, ProdName, 255);
+                        GetSourceInfo(ptr, &CTL_ITwainSource::GetProductName, ProdName, 255);
                         return ProdName;
                     });
 
