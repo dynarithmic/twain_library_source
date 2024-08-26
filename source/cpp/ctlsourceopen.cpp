@@ -55,18 +55,19 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsOpenSourcesOnSelect(VOID_PROTOTYPE)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    auto pTheSource = static_cast<CTL_ITwainSource*>(Source);
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+
+    CTL_ITwainSource* pTheSource = VerifySourceHandle(pHandle, Source);
+    if (!pTheSource)
+        LOG_FUNC_EXIT_PARAMS(false)
 
     // If source already opened, just return TRUE.
     if (pTheSource->IsOpened())
-        return TRUE;
+        LOG_FUNC_EXIT_PARAMS(true)
 
     // Set up the opening of the source
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     bool bRetval = false;
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 
     // Go through TWAIN to open the source
     bRetval = CTL_TwainAppMgr::OpenSource(pHandle->m_pTwainSession, pTheSource);
@@ -79,8 +80,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
         iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, false);
     }
 
-    // Check for bad DLL handle and failure to open the source
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bRetval || !pTheSource; }, DTWAIN_ERR_BAD_SOURCE, false, FUNC_MACRO);
+    // Check for failure to open the source
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return bRetval == false; }, DTWAIN_ERR_SOURCE_COULD_NOT_OPEN, false, FUNC_MACRO);
 
     // If this source has a feeder, check the status of whether we should check.
     // If the check is on, add it to the feeder sources container.
@@ -174,7 +175,7 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
     LONG oldflags = CTL_StaticData::s_lErrorFilterFlags;
 
     if (oldflags)
-        DTWAIN_GetSourceProductNameA(p, szName, MaxMessage);
+        GetSourceInfo(p, &CTL_ITwainSource::GetProductName, szName, MaxMessage);
 
     std::string sName = szName;
     std::string sBitDepths;

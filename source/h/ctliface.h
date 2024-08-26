@@ -841,6 +841,8 @@ namespace dynarithmic
     DTWAIN_ARRAY CreateArrayCopyFromFactory(DTWAIN_ARRAY Source);
     DTWAIN_FRAME CreateFrameArray(CTL_TwainDLLHandle* pHandle, double Left, double Top, double Right, double Bottom);
 
+    typedef CTL_StringType(CTL_ITwainSource::* SOURCEINFOFUNC)() const;
+    LONG GetSourceInfo(CTL_ITwainSource* p, SOURCEINFOFUNC pFunc, LPTSTR szInfo, LONG nMaxLen);
 
     //#ifdef DTWAIN_DEBUG_CALL_STACK
     std::string CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich, LPCSTR pOptionalString=nullptr);

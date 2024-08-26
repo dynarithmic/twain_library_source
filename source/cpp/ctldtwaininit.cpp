@@ -672,7 +672,7 @@ LONG DLLENTRY_DEF DTWAIN_IsTwainAvailableEx(LPTSTR directories, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS(())
     auto retVal = IsTwainAvailableHelper(directories, nMaxLen);
-    LOG_FUNC_EXIT_PARAMS(retVal);
+    LOG_FUNC_EXIT_PARAMS((std::max)(retVal, 0L));
     CATCH_BLOCK(0)
 }
 
@@ -695,6 +695,10 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainAvailabilityEx(LPTSTR directories, LONG nMaxLen
     DTWAIN_Check_Bad_Handle_Ex(pHandle, 0, FUNC_MACRO);
     auto availability = GetTwainAvailablityInternal();
 
+    // If not available set the error and exit
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return availability.first == 0; },
+                                        DTWAIN_ERR_TWAIN_NOT_INSTALLED, 0, FUNC_MACRO);
+
     // Provide "<null>" for either TWAIN 1 or TWAIN 2 directories in the
     // returned array of directories if TWAIN could not be found
     for (auto& s : availability.second)
@@ -702,9 +706,12 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainAvailabilityEx(LPTSTR directories, LONG nMaxLen
         if (s.empty())
             s = _T("<null>");
     }
+
+
     CTL_StringType sDirs;
     auto joinedString = StringWrapper::Join(availability.second, _T("|"));
     StringWrapper::CopyInfoToCString(joinedString, directories, nMaxLen);
+
     LOG_FUNC_EXIT_PARAMS(static_cast<LONG>(joinedString.length()));
     CATCH_BLOCK(0)
 }
