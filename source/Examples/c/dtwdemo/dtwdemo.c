@@ -154,7 +154,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 
     
     DTWAIN_SetAppInfoA("1.0","Demo Program Menu", "Demo Program Family", "Demo Program Name");
-    DTWAIN_CheckHandles(FALSE);
+
     /* Allow DTWAIN messages to be sent directly to our Window proc */
     DTWAIN_StartTwainSession(g_hWnd, NULL);
     // DTWAIN_SetTwainMode(DTWAIN_MODELESS);
