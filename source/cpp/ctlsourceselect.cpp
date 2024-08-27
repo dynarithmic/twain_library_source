@@ -48,6 +48,7 @@ LONG DLLENTRY_DEF DTWAIN_SetTwainDialogFont(HFONT font)
 static LRESULT CALLBACK DisplayTwainDlgProc(HWND, UINT, WPARAM, LPARAM);
 static std::string GetTwainDlgTextFromResource(int nID, size_t& status);
 static void DisplayLocalString(HWND hWnd, int nID, int ResID);
+static CTL_StringType GetPossibleMappedName(CustomPlacement CS, TCHAR* szSelectedSourceName);
 
 typedef DTWAIN_SOURCE(*SourceFn)(const SourceSelectionOptions&);
 static std::unordered_map<int, SourceFn> SourcefnMap = {{SELECTSOURCE, DTWAIN_LLSelectSource},
@@ -487,9 +488,9 @@ static std::vector<CTL_StringType> AdjustSourceNames(std::vector<CTL_StringType>
     if (vSourceNames.empty())
         return {};
 
-    const bool doExclude = CS.nOptions & DTWAIN_DLG_USEEXCLUDENAMES?true:false;
-    const bool doInclude = CS.nOptions & DTWAIN_DLG_USEINCLUDENAMES?true : false;
-    const bool doMapping = CS.nOptions & DTWAIN_DLG_USENAMEMAPPING?true : false;
+    const bool doExclude = !CS.aExcludeNames.empty(); // Use an include list
+    const bool doInclude = !CS.aIncludeNames.empty(); // Use an exclude list
+    const bool doMapping = !CS.mapNames.empty();  // Use a name mapping list
 
     if (!doInclude && !doExclude && !doMapping)
         return vSourceNames;
@@ -502,6 +503,7 @@ static std::vector<CTL_StringType> AdjustSourceNames(std::vector<CTL_StringType>
         for (auto& sName : CS.aIncludeNames)
             sName = StringWrapper::TrimAll(sName);
 
+        // Create a list of the names to include (extract only those names)            
         std::vector<CTL_StringType> vReturn2;
         std::sort(vSourceNames.begin(), vSourceNames.end());
         std::sort(CS.aIncludeNames.begin(), CS.aIncludeNames.end());
@@ -518,9 +520,12 @@ static std::vector<CTL_StringType> AdjustSourceNames(std::vector<CTL_StringType>
         for (auto& sName : CS.aExcludeNames)
             sName = StringWrapper::TrimAll(sName);
 
+        // Create a list of the names to include if we remove the excluded names
         std::vector<CTL_StringType> vReturn2;
         std::sort(vSourceNames.begin(), vSourceNames.end());
         std::sort(CS.aExcludeNames.begin(), CS.aExcludeNames.end());
+
+        // This does the magic of removing the excluded names
         std::set_difference(vSourceNames.begin(), vSourceNames.end(),
                             CS.aExcludeNames.begin(), CS.aExcludeNames.end(), std::back_inserter(vReturn2));
         if (!vReturn2.empty())
@@ -529,18 +534,48 @@ static std::vector<CTL_StringType> AdjustSourceNames(std::vector<CTL_StringType>
 
     if (doMapping)
     {
+        // Check if a mapped name should be used
         std::vector<CTL_StringType> vMapped;
         for (auto& sName : vReturn)
         {
             auto iter = CS.mapNames.find(sName);
             if (iter != CS.mapNames.end())
+                // replace real source name with mapped name
                 vMapped.push_back(iter->second);
             else
+                // just use the real source name
                 vMapped.push_back(sName);
         }
         vReturn = vMapped;
     }
+
+    // Return the new vector of Source names to display in the
+    // Select Source dialog.
     return vReturn;
+}
+
+// Determine if the selected source name is actually a mapped name
+CTL_StringType GetPossibleMappedName(CustomPlacement CS, TCHAR* szSelectedSourceName)
+{
+    if (CS.mapNames.empty())
+        return szSelectedSourceName;
+
+    auto& mapping = CS.mapNames;
+
+    // check if selected source name is a map key
+    auto iter = mapping.find(szSelectedSourceName);
+    if (iter != mapping.end())
+        return iter->first;  // return that a Source "by coincidence" is the name of an actual source
+
+    // Go through map to see what the real source name is of the mapped, selected source name
+    for (auto& it : mapping)
+    {
+        if (it.second == szSelectedSourceName)
+            return it.first; // return the real Source name
+    }
+
+    // No name matches
+    return {};
 }
 
 struct openSourceSaver
@@ -795,7 +830,17 @@ LRESULT CALLBACK DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPA
                 TCHAR sz[255];
                 LRESULT nSel = SendMessage(lstSources, LB_GETCURSEL, 0, 0);
                 SendMessage(lstSources, LB_GETTEXT, nSel, reinterpret_cast<LPARAM>(sz));
-                pS->SourceName = sz;
+
+                // Check if this is a mapped name
+                pS->SourceName = GetPossibleMappedName(pS->CS, sz);
+
+                if (bLogMessages)
+                {
+                    StringWrapper::traits_type::outputstream_type strm;
+                    strm << _T("Selected Source name in dialog = \"") << sz << _T("\", Actual Source name = \"") << pS->SourceName << _T("\"\n");
+                    CTL_TwainAppMgr::WriteLogInfo(strm.str());
+                    CTL_TwainAppMgr::WriteLogInfoA("Finished Initializing TWAIN Dialog...\n");
+                }
                 EndDialog(hWnd, LOWORD(wParam));
                 return TRUE;
             }
