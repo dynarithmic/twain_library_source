@@ -364,6 +364,10 @@ namespace dynarithmic
         bool         DestroyExtImageInfo();
         bool         IsExtendedCapNegotiable(LONG nCap);
         bool         AddCapToExtendedCapList(LONG nCap);
+        bool         ExtendedCapsRetrieved() const { return m_bExtendedCapsRetrieved; }
+        void         SetExtendedCapsRetrieved(bool bSet) { m_bExtendedCapsRetrieved = bSet; }
+        CapList&     GetExtendedCapCache() { return m_aExtendedCaps;  }
+        void         RetrieveExtendedCaps();
 
         void         SetFileAutoIncrement(bool bSet, LONG nIncrement)
         {
@@ -448,6 +452,8 @@ namespace dynarithmic
                             { m_aTransferMechanisms = aTransferMechanisms; }
         void         SetDoublePageCountOnDuplex(bool bSet) { m_bDoublePageCountOnDuplex = bSet; }
         bool         IsDoublePageCountOnDuplex() const { return m_bDoublePageCountOnDuplex; }
+        CapList&     GetCustomCapCache() { return m_aSupportedCustomCapCache; }
+
         // Only public member
         void *      m_pUserPtr;
 
@@ -572,7 +578,7 @@ namespace dynarithmic
         bool            m_bDoublePageCountOnDuplex;
         LONG            m_nForcedBpp;
         std::vector<int> m_aTransferMechanisms;
-
+        bool            m_bExtendedCapsRetrieved;
         struct tagCapCachInfo {
             TW_UINT16 nCap;
             bool      m_bSupported;
@@ -604,6 +610,7 @@ namespace dynarithmic
         CachedPixelTypeMap m_aPixelTypeMap;
         CapList m_aUnsupportedCapCache;
         CapList m_aSupportedCapCache;
+        CapList m_aSupportedCustomCapCache;
         TW_IMAGEINFO  m_ImageInfo;
         FloatRect     m_ImageLayout;
         TW_FILESYSTEM   m_FileSystem;
@@ -612,9 +619,10 @@ namespace dynarithmic
         std::shared_ptr<CTL_ExtImageInfoTriplet> m_pExtImageTriplet;
         TWINFOVector m_ExtImageVector;
         DTWAIN_ARRAY    m_PersistentArray;
-        std::unordered_set<LONG> m_aExtendedCaps;
+        CapList    m_aExtendedCaps;
         DuplexData m_DuplexFileData;
         bool    m_bImageInfoRetrieved;
+        bool    m_bSupportedCustomCapsRetrieved;
 
         struct FileFormatInfo
         {

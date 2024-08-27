@@ -2004,24 +2004,15 @@ using MandatorySet = std::set<TW_UINT16>;
 
 void CTL_TwainAppMgr::GetCapabilities(const CTL_ITwainSource *pSource, CTL_TwainCapArray & rArray)
 {
-    CTL_EnumContainer ContainerToUse = TwainContainer_ARRAY;
-
-    // Double check what the right GET container is to use
-    UINT cGet = 0, cSet = 0, nDataType = 0;
-    bool cFlags[6] = { false };
-    const bool bSuccess = GetBestContainerType(pSource,
-                                               static_cast<CTL_EnumCapability>(DTWAIN_CV_CAPSUPPORTEDCAPS),cGet, cSet, nDataType,CTL_GetTypeGET, cFlags);
-
-    if (bSuccess)
-        ContainerToUse = static_cast<CTL_EnumContainer>(cGet);
-
+    // Get all the capabilities of the source
     rArray.clear();
-    GetMultiValuesImpl<CTL_TwainCapArray, TW_UINT16>::GetMultipleTwainCapValues(pSource, rArray, TwainCap_SUPPORTEDCAPS, TWTY_UINT16, ContainerToUse);
+    GetMultiValuesImpl<CTL_TwainCapArray, TW_UINT16>::GetMultipleTwainCapValues(pSource, rArray, TwainCap_SUPPORTEDCAPS, TWTY_UINT16, TwainContainer_ARRAY);
 }
 
 void CTL_TwainAppMgr::GetExtendedCapabilities(const CTL_ITwainSource *pSource, CTL_IntArray & rArray)
 {
-    // Get the capabilities
+    // Get the extended capabilities of the source
+    rArray.clear();
     GetMultiValuesImpl<CTL_IntArray, TW_UINT16>::GetMultipleTwainCapValues(pSource, rArray, TwainCap_EXTENDEDCAPS, TWTY_UINT16, TwainContainer_ARRAY);
 }
 
@@ -2631,6 +2622,15 @@ void CTL_TwainAppMgr::GatherCapabilityInfo(CTL_ITwainSource* pSource)
         {
             DTWAIN_CacheCapabilityInfo(pSource, pHandle, static_cast<TW_UINT16>(val));
         });
+
+        // Retrieve any custom caps
+        auto& customCapSet = pSource->GetCustomCapCache();
+        customCapSet.clear();
+        for (auto& capInfo : pArray)
+        {
+            if (capInfo >= DTWAIN_CV_CAPCUSTOMBASE)
+                customCapSet.insert(capInfo);
+        }
 
         // We have retrieved all the capability information
         pSource->SetRetrievedAllCaps(true);
