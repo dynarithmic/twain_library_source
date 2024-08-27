@@ -238,7 +238,8 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_PersistentArray(nullptr),
     m_bImageInfoRetrieved(false),
     m_bXferReadySent(false),
-    m_bDoublePageCountOnDuplex(true)
+    m_bDoublePageCountOnDuplex(true),
+    m_bExtendedCapsRetrieved(false)
  {
     if ( lpszProduct )
         m_SourceId.set_product_name(StringConversion::Convert_NativePtr_To_Ansi(lpszProduct));
@@ -1376,6 +1377,18 @@ bool CTL_ITwainSource::AddCapToExtendedCapList(LONG nCap)
 {
     m_aExtendedCaps.insert(nCap);
     return  true;
+}
+
+void CTL_ITwainSource::RetrieveExtendedCaps()
+{
+    if (!m_bExtendedCapsRetrieved)
+    {
+        CTL_IntArray aCaps;
+        CTL_TwainAppMgr::GetExtendedCapabilities(this, aCaps);
+        m_aExtendedCaps.clear();
+        m_aExtendedCaps.insert(aCaps.begin(), aCaps.end());
+        m_bExtendedCapsRetrieved = true;
+    }
 }
 
 bool CTL_ITwainSource::InitFileAutoIncrementData(CTL_StringType sName)

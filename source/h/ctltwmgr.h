@@ -375,7 +375,7 @@ namespace dynarithmic
                 if ( !IsSourceOpen( pSource ) )
                     return false;
 
-                // Get the #transfer count
+                // Execute the TWAIN triplet
                 const TW_UINT16 rc = pTrip->Execute();
 
                 const CTL_ITwainSource *pTempSource = const_cast<CTL_ITwainSource*>(pSource);
