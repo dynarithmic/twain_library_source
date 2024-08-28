@@ -1,5 +1,8 @@
 // Example1.c : Acquires an image from a TWAIN Source
 //
+#ifdef _MSC_VER
+    #define _CRT_SECURE_NO_WARNINGS
+#endif
 #include <windows.h>
 #include "dtwdemo.h"
 #include "dtwain.h"
