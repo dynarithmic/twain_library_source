@@ -55,11 +55,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
 
     // Check if Array is nullptr
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return Array == nullptr; },
-                                        DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+                                      DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     // See if Source is opened
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(pTheSource); },
-                                        DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+                                      DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
     auto& factory = pHandle->m_ArrayFactory;
 
