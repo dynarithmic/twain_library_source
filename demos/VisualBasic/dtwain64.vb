@@ -1859,7 +1859,8 @@ Class DTWAINAPI
     Declare Auto Function DTWAIN_GetCurrentAcquiredImage Lib "dtwain64.dll" (ByVal Source As System.IntPtr) As System.IntPtr
     Declare Auto Function DTWAIN_GetCurrentPageNum Lib "dtwain64.dll" (ByVal Source As System.IntPtr) As Integer
     Declare Auto Function DTWAIN_GetCurrentRetryCount Lib "dtwain64.dll" (ByVal Source As System.IntPtr) As Integer
-    Declare Auto Function DTWAIN_GetCustomDSData Lib "dtwain64.dll" (ByVal Source As System.IntPtr, ByVal LPBYTE As Integer, ByRef Data As Integer, ByVal dSize As Integer) As System.IntPtr
+    Declare Auto Function DTWAIN_GetCustomDSData Lib "dtwain64.dll" (ByVal Source As System.IntPtr, ByVal LPBYTE As Integer, ByVal dSize As Integer, ByRef Data As Integer, ByVal flags As Integer) As System.IntPtr
+    Declare Auto Function DTWAIN_GetCustomDSData Lib "dtwain64.dll" (ByVal Source As System.IntPtr, ByVal DSData As Byte(), ByVal dSize As Integer, ByRef Data As Integer, ByVal flags As Integer) As System.IntPtr
     Declare Auto Function DTWAIN_GetDSMSearchOrder Lib "dtwain64.dll" () As Integer
     Declare Auto Function DTWAIN_GetDTWAINHandle Lib "dtwain64.dll" () As System.IntPtr
     Declare Auto Function DTWAIN_GetDeviceEvent Lib "dtwain64.dll" (ByVal Source As System.IntPtr, ByRef lpEvent As Integer) As Integer
