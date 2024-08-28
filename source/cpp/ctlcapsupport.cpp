@@ -78,29 +78,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsCapSupported(DTWAIN_SOURCE Source, LONG lCapab
 
         // Test if the capabilities have already been retrieved.  This should only be done
         // once per TWAIN source.
-        if (!p->RetrievedAllCaps())
-        {
-            // Get the capabilities using TWAIN
-            CTL_TwainCapArray rArray;
-            CTL_TwainAppMgr::GetCapabilities(p, rArray);
-            p->SetCapSupportedList(rArray);
-
-            // Get the capabilities from the list in the Source
-            CapList& pArray = p->GetCapSupportedList();
-
-            // Get all the information about the capability.
-            std::for_each(pArray.begin(), pArray.end(), [&](TW_UINT16 val)
-            {
-                DTWAIN_CacheCapabilityInfo(p, pHandle, static_cast<TW_UINT16>(val)); });
-
-            // We have retrieved all the capability information
-            p->SetRetrievedAllCaps(true);
-        }
+        CTL_TwainAppMgr::GatherCapabilityInfo(p);
 
         // Now test if the capability is supported
-        CapList& pArray = p->GetCapSupportedList();
-        const auto it = pArray.find(static_cast<TW_UINT16>(lCapability));
-        if (it != pArray.end())
+        if ( p->IsCapInSupportedList(lCapability))
         {
             // supported, so return true
             LOG_FUNC_EXIT_PARAMS(true)

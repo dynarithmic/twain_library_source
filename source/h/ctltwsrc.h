@@ -188,6 +188,8 @@ namespace dynarithmic
         static bool  IsFileTypeMultiPage(CTL_TwainFileFormatEnum FileType);
         static CTL_TwainFileFormatEnum GetMultiPageType(CTL_TwainFileFormatEnum FileType);
         static bool  IsFileTypeTIFF(CTL_TwainFileFormatEnum FileType);
+        static bool  IsFileTypeBigTiff(CTL_TwainFileFormatEnum FileType);
+
         static bool  IsFileTypePostscript(CTL_TwainFileFormatEnum FileType);
 
         void         SetPendingImageNum( long nImageNum )
@@ -278,6 +280,18 @@ namespace dynarithmic
         bool         IsCapInSupportedList(TW_UINT16 nCap) const;
         CapList&     GetCapSupportedList();
         void         SetCapSupportedList(CTL_TwainCapArray& rArray);
+
+        template <typename Iter>
+        void         SetCapSupportedList(Iter iter1, Iter iter2)
+        {
+            m_aSupportedCapCache.clear();
+            while (iter1 != iter2)
+            {
+                m_aSupportedCapCache.push_back(*iter1);
+                ++iter1;
+            }
+        }
+
         void         SetFastCapRetrieval(bool bSet=true) { m_bFastCapRetrieval = bSet; }
         bool         IsFastCapRetrieval() const { return m_bFastCapRetrieval; }
 
@@ -350,6 +364,10 @@ namespace dynarithmic
         bool         DestroyExtImageInfo();
         bool         IsExtendedCapNegotiable(LONG nCap);
         bool         AddCapToExtendedCapList(LONG nCap);
+        bool         ExtendedCapsRetrieved() const { return m_bExtendedCapsRetrieved; }
+        void         SetExtendedCapsRetrieved(bool bSet) { m_bExtendedCapsRetrieved = bSet; }
+        CapList&     GetExtendedCapCache() { return m_aExtendedCaps;  }
+        void         RetrieveExtendedCaps();
 
         void         SetFileAutoIncrement(bool bSet, LONG nIncrement)
         {
@@ -434,6 +452,8 @@ namespace dynarithmic
                             { m_aTransferMechanisms = aTransferMechanisms; }
         void         SetDoublePageCountOnDuplex(bool bSet) { m_bDoublePageCountOnDuplex = bSet; }
         bool         IsDoublePageCountOnDuplex() const { return m_bDoublePageCountOnDuplex; }
+        CapList&     GetCustomCapCache() { return m_aSupportedCustomCapCache; }
+
         // Only public member
         void *      m_pUserPtr;
 
@@ -558,7 +578,7 @@ namespace dynarithmic
         bool            m_bDoublePageCountOnDuplex;
         LONG            m_nForcedBpp;
         std::vector<int> m_aTransferMechanisms;
-
+        bool            m_bExtendedCapsRetrieved;
         struct tagCapCachInfo {
             TW_UINT16 nCap;
             bool      m_bSupported;
@@ -590,6 +610,7 @@ namespace dynarithmic
         CachedPixelTypeMap m_aPixelTypeMap;
         CapList m_aUnsupportedCapCache;
         CapList m_aSupportedCapCache;
+        CapList m_aSupportedCustomCapCache;
         TW_IMAGEINFO  m_ImageInfo;
         FloatRect     m_ImageLayout;
         TW_FILESYSTEM   m_FileSystem;
@@ -598,9 +619,10 @@ namespace dynarithmic
         std::shared_ptr<CTL_ExtImageInfoTriplet> m_pExtImageTriplet;
         TWINFOVector m_ExtImageVector;
         DTWAIN_ARRAY    m_PersistentArray;
-        std::unordered_set<LONG> m_aExtendedCaps;
+        CapList    m_aExtendedCaps;
         DuplexData m_DuplexFileData;
         bool    m_bImageInfoRetrieved;
+        bool    m_bSupportedCustomCapsRetrieved;
 
         struct FileFormatInfo
         {

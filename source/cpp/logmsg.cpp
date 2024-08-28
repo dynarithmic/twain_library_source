@@ -46,12 +46,14 @@ namespace dynarithmic
 {
     std::string CBaseLogger::getTime()
     {
-        const time_t now = time(nullptr);
-        struct tm  tstruct{};
-        char       buf[80];
-        localtime_s(&tstruct, &now);
-        strftime(buf, sizeof buf, "[%Y-%m-%d %X] ", &tstruct);
-        return buf;
+        const auto currentDateTime = std::chrono::system_clock::now();
+        const auto currentDateTimeTimeT = std::chrono::system_clock::to_time_t(currentDateTime);
+        const auto currentDateTimeLocalTime = *std::localtime(&currentDateTimeTimeT);
+        const auto ms = std::chrono::time_point_cast<std::chrono::milliseconds>(currentDateTime).time_since_epoch().count() % 1000;
+        std::ostringstream strm;
+        strm << std::put_time(&currentDateTimeLocalTime, "[%Y-%m-%d %X")
+            << "." << std::setfill('0') << std::setw(3) << ms << "] ";
+        return strm.str();
     }
 
     std::string CBaseLogger::getThreadID()
@@ -89,12 +91,23 @@ namespace dynarithmic
     void DebugMonitor_Logger::trace(const std::string& msg) { generic_outstream(std::cout, applyDecoration()); }
     #endif
 
-    File_Logger::File_Logger(const LPCSTR filename, bool bAppend/* = false*/)
+    File_Logger::File_Logger(const LPCSTR filename, const FileLoggingTraits& fTraits)
     {
-        if (bAppend)
+        if (fTraits.m_bCreateDirectory)
+        {
+            // auto-create the directory
+            const auto dirCreated = dynarithmic::create_directory(dynarithmic::get_parent_directory(fTraits.m_filename.c_str(), false).c_str());
+            if (!dirCreated.first)
+            {
+                m_bFileCreated = false;
+                return;
+            }
+        }
+        if (fTraits.m_bAppend)
             m_ostr.open(filename, std::ios::app);
         else
             m_ostr.open(filename);
+        m_bFileCreated = m_ostr?true:false;
     }
 
     File_Logger::~File_Logger()
@@ -145,7 +158,7 @@ void CLogSystem::GetModuleName(HINSTANCE hInst)
     #endif
 }
 
-void CLogSystem::InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE hInst, bool bAppend)
+bool CLogSystem::InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE hInst, const FileLoggingTraits& fTraits)
 {
     bool loggerSet = false;
     GetModuleName(hInst);
@@ -163,8 +176,16 @@ void CLogSystem::InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE h
                 loggerSet = true;
             break;
             case FILE_LOGGING:
-                app_logger_map[FILE_LOGGING] = std::make_shared<File_Logger>(StringConversion::Convert_NativePtr_To_Ansi(pOutputFilename).c_str(), bAppend);
-                loggerSet = true;
+            {
+                auto filelogging = std::make_shared<File_Logger>(StringConversion::Convert_NativePtr_To_Ansi(pOutputFilename).c_str(), fTraits);
+                if (filelogging->IsFileCreated())
+                {
+                    app_logger_map[FILE_LOGGING] = filelogging;
+                    loggerSet = true;
+                }
+                else
+                    loggerSet = false;
+            }
             break;
             case CALLBACK_LOGGING:
                 app_logger_map[CALLBACK_LOGGING] = std::make_shared<Callback_Logger>();
@@ -176,6 +197,7 @@ void CLogSystem::InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE h
     else
         loggerSet = true;
     m_bEnable = loggerSet;
+    return m_bEnable;
 }
 
 void CLogSystem::DisableLogger(int loggerType)
@@ -190,30 +212,38 @@ void CLogSystem::DisableAllLoggers()
     m_bEnable = false;
 }
 
-void  CLogSystem::InitConsoleLogging(HINSTANCE hInst)
+bool CLogSystem::InitConsoleLogging(HINSTANCE hInst)
 {
 #ifdef _WIN32
     FILE* fDummy;
-    AllocConsole();
-    freopen_s(&fDummy, "CONOUT$", "w", stdout);
+    BOOL bRet = AllocConsole();
+    if (bRet)
+    {
+        freopen_s(&fDummy, "CONOUT$", "w", stdout);
 #endif
-    InitLogger(CONSOLE_LOGGING, nullptr, hInst, false);
+        InitLogger(CONSOLE_LOGGING, nullptr, hInst);
+    }
+    return bRet ? true : false;
 }
 
-void  CLogSystem::InitDebugWindowLogging(HINSTANCE hInst)
+bool CLogSystem::InitDebugWindowLogging(HINSTANCE hInst)
 {
-    InitLogger(DEBUG_WINDOW_LOGGING, nullptr, hInst, false);
+    InitLogger(DEBUG_WINDOW_LOGGING, nullptr, hInst);
+    return true;
 }
 
-void  CLogSystem::InitCallbackLogging(HINSTANCE hInst)
+bool  CLogSystem::InitCallbackLogging(HINSTANCE hInst)
 {
-    InitLogger(CALLBACK_LOGGING, nullptr, hInst, false);
+    InitLogger(CALLBACK_LOGGING, nullptr, hInst);
+    return true;
 }
 
-void CLogSystem::InitFileLogging(LPCTSTR pOutputFilename, HINSTANCE hInst, bool bAppend)
+bool CLogSystem::InitFileLogging(LPCTSTR pOutputFilename, HINSTANCE hInst, const FileLoggingTraits& fTraits)
 {
+    bool bLogOpen = false;
     if (pOutputFilename)
-        InitLogger(FILE_LOGGING, pOutputFilename, hInst, bAppend);
+        bLogOpen = InitLogger(FILE_LOGGING, pOutputFilename, hInst, fTraits);
+    return bLogOpen;
 }
 
 void CLogSystem::PrintBanner(bool bStarted)

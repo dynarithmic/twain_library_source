@@ -55,65 +55,83 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsOpenSourcesOnSelect(VOID_PROTOTYPE)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    auto p = static_cast<CTL_ITwainSource*>(Source);
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    bool bRetval = false;
-    // See if DLL Handle exists
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 
-    bRetval = CTL_TwainAppMgr::OpenSource(pHandle->m_pTwainSession, p);
+    CTL_ITwainSource* pTheSource = VerifySourceHandle(pHandle, Source);
+    if (!pTheSource)
+        LOG_FUNC_EXIT_PARAMS(false)
+
+    // If source already opened, just return TRUE.
+    if (pTheSource->IsOpened())
+        LOG_FUNC_EXIT_PARAMS(true)
+
+    // Set up the opening of the source
+    bool bRetval = false;
+
+    // Go through TWAIN to open the source
+    bRetval = CTL_TwainAppMgr::OpenSource(pHandle->m_pTwainSession, pTheSource);
     if (bRetval)
     {
+        // Set up status of the source 
         auto& sourcemap = CTL_StaticData::GetSourceStatusMap();
-        auto iter = sourcemap.insert({ p->GetProductNameA(), {} }).first;
+        auto iter = sourcemap.insert({ pTheSource->GetProductNameA(), {} }).first;
         iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, true);
         iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, false);
     }
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bRetval || !p; }, DTWAIN_ERR_BAD_SOURCE, false, FUNC_MACRO);
+    // Check for failure to open the source
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return bRetval == false; }, DTWAIN_ERR_SOURCE_COULD_NOT_OPEN, false, FUNC_MACRO);
 
-    // If this source has a feeder, add it to the feeder sources container
-    if (DTWAIN_IsFeederSensitive(Source))
+    // If this source has a feeder, check the status of whether we should check.
+    // If the check is on, add it to the feeder sources container.
+    //
+    // Since this operation may rely on the device hardware to respond to CAP_FEEDERLOADED
+    // there is an optional check done that can be set in the DTWAIN INI file(s).
+    if (pHandle->m_bCheckFeederStatusOnOpen && DTWAIN_IsFeederSensitive(Source))
         pHandle->m_aFeederSources.insert(Source);
 
     // Get the supported transfer types
-    p->SetSupportedTransferMechanisms(CTL_TwainAppMgr::EnumTransferMechanisms(p));
-
-    // Cache the pixel types and bit depths
-    LogAndCachePixelTypes(p);
+    pTheSource->SetSupportedTransferMechanisms(CTL_TwainAppMgr::EnumTransferMechanisms(pTheSource));
 
     // See if the source is one that has a bug in the MSG_XFERREADY sending on the 
     // TWAIN message queue
-    DetermineIfSpecialXfer(p);
+    DetermineIfSpecialXfer(pTheSource);
 
+    // Get all the caps supported
     DTWAIN_ARRAY arr = nullptr;
     DTWAINArrayPtr_RAII raii(&arr);
-    DTWAIN_EnumSupportedCaps(Source, &arr);
+    CTL_TwainAppMgr::GatherCapabilityInfo(pTheSource);
+
+    // Cache the pixel types and bit depths
+    LogAndCachePixelTypes(pTheSource);
+
+    // get the list of caps created
+    CapList& theCapList = pTheSource->GetCapSupportedList();
 
     // if any logging is turned on, then get the capabilities and log the values
     if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
     {
-        CTL_StringType msg = _T("Source: ") + p->GetProductName() + _T(" has been opened successfully");
+        CTL_StringType msg = _T("Source: ") + pTheSource->GetProductName() + _T(" has been opened successfully");
         CTL_TwainAppMgr::WriteLogInfo(msg);
 
         // Log the caps if logging is turned on
         CTL_StringType sName;
 
-        auto& vCaps = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
-        std::vector<std::string> VecString(vCaps.size());
+        std::vector<std::string> VecString(theCapList.size());
 
         // copy the names
-        std::transform(vCaps.begin(), vCaps.end(), VecString.begin(), [](LONG n) { return CTL_TwainAppMgr::GetCapNameFromCap(n); });
+        std::transform(theCapList.begin(), theCapList.end(), VecString.begin(), [](LONG n) { return CTL_TwainAppMgr::GetCapNameFromCap(n); });
 
         // Sort the names
         std::sort(VecString.begin(), VecString.end());
         CTL_StringStreamType strm;
-        strm << vCaps.size();
+        strm << theCapList.size();
         sName = _T("\n\nSource \"");
-        sName += p->GetProductName();
+        sName += pTheSource->GetProductName();
         sName += _T("\" contains the following ");
         sName += strm.str() + _T(" capabilities: \n{\n");
-        if (vCaps.empty())
+        if (theCapList.empty())
             sName += _T(" No capabilities:\n");
         else
         {
@@ -153,13 +171,12 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
         return;
 
     p->SetCurrentlyProcessingPixelInfo(true);
-    char szName[MaxMessage + 1];
+    TCHAR szName[MaxMessage + 1];
     LONG oldflags = CTL_StaticData::s_lErrorFilterFlags;
 
-    if (oldflags)
-        DTWAIN_GetSourceProductNameA(p, szName, MaxMessage);
+    GetSourceInfo(p, &CTL_ITwainSource::GetProductName, szName, MaxMessage);
 
-    std::string sName = szName;
+    std::string sName = StringConversion::Convert_NativePtr_To_Ansi(szName);
     std::string sBitDepths;
     DTWAIN_ARRAY PixelTypes;
 

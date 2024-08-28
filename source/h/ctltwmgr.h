@@ -94,7 +94,7 @@ namespace dynarithmic
 
             static void Destroy();
             static HINSTANCE GetAppInstance();
-            static bool CheckTwainExistence(CTL_StringType DLLName, LPLONG pWhichSearch=nullptr);
+            static std::pair<bool, CTL_StringType> CheckTwainExistence(CTL_StringType DLLName, LPLONG pWhichSearch=nullptr);
 
 
             // Twain session management functions.  Each App utilizing
@@ -124,6 +124,7 @@ namespace dynarithmic
             static bool IsTwainMsg(MSG *pMsg, bool bFromUserQueue=false);
             static unsigned int GetRegisteredMsg();
             static bool IsVersion2DSMUsed();
+            static void GatherCapabilityInfo(CTL_ITwainSource* pSource);
 
             // Source management functions
             // Get all the sources in an array
@@ -374,7 +375,7 @@ namespace dynarithmic
                 if ( !IsSourceOpen( pSource ) )
                     return false;
 
-                // Get the #transfer count
+                // Execute the TWAIN triplet
                 const TW_UINT16 rc = pTrip->Execute();
 
                 const CTL_ITwainSource *pTempSource = const_cast<CTL_ITwainSource*>(pSource);

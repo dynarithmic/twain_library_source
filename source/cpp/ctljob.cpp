@@ -23,6 +23,7 @@
 #include "ctliface.h"
 #include "ctltwmgr.h"
 #include "arrayfactory.h"
+#include "errorcheck.h"
 
 using namespace dynarithmic;
 
@@ -30,9 +31,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJobControl(DTWAIN_SOURCE Source, LONG JobCont
 {
     LOG_FUNC_ENTRY_PARAMS((Source, JobControl, bSetCurrent))
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle( pHandle, Source );
-    if (!p)
+    CTL_ITwainSource *pSource = VerifySourceHandle( pHandle, Source );
+    if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
+
+    CHECK_IF_CAP_SUPPORTED(pSource, pHandle, DTWAIN_CV_CAPJOBCONTROL, false);
+
     LONG SetType = DTWAIN_CAPSET;
     if ( !bSetCurrent )
     {
@@ -51,7 +55,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJobControl(DTWAIN_SOURCE Source, LONG JobCont
     if ( bRet )
     {
         // Set the source value in the cache
-        CTL_ITwainSource *pSource = VerifySourceHandle( pHandle, Source );
         pSource->SetCurrentJobControl(static_cast<TW_UINT16>(JobControl));
     }
     LOG_FUNC_EXIT_PARAMS(bRet)

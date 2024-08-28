@@ -1216,6 +1216,50 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetTimeDateA(DTWAIN_SOURCE Source, LPSTR szTimeD
 #endif
 }
 
+LONG DLLENTRY_DEF DTWAIN_GetTwainAvailabilityExA(LPSTR szDirectories, LONG nLength)
+{
+#ifdef _UNICODE
+    std::wstring args((std::max)(nLength, 0L), 0);
+    const LONG retVal = DTWAIN_GetTwainAvailabilityEx((nLength > 0 && szDirectories) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    return null_terminator_copier(get_view(args), szDirectories, retVal);
+#else
+    return DTWAIN_GetTwainAvailabilityEx(szDirectories, nLength);
+#endif
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetTwainAvailabilityExW(LPWSTR szDirectories, LONG nLength)
+{
+#ifdef _UNICODE
+    return DTWAIN_GetTwainAvailabilityEx(szDirectories, nLength);
+#else
+    std::string args((std::max)(nLength, 0L), 0);
+    LONG retVal = DTWAIN_GetTwainAvailabilityEx((nLength > 0 && szDirectories) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    return null_terminator_copier(get_view(args), szDirectories, retVal);
+#endif
+}
+
+
+LONG DLLENTRY_DEF DTWAIN_IsTwainAvailableExA(LPSTR szDirectories, LONG nLength)
+{
+#ifdef _UNICODE
+    std::wstring args((std::max)(nLength, 0L), 0);
+    const LONG retVal = DTWAIN_IsTwainAvailableEx((nLength > 0 && szDirectories) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    return null_terminator_copier(get_view(args), szDirectories, retVal);
+#else
+    return DTWAIN_IsTwainAvailableEx(szDirectories, nLength);
+#endif
+}
+
+LONG DLLENTRY_DEF DTWAIN_IsTwainAvailableExW(LPWSTR szDirectories, LONG nLength)
+{
+#ifdef _UNICODE
+    return DTWAIN_IsTwainAvailableEx(szDirectories, nLength);
+#else
+    std::string args((std::max)(nLength, 0L), 0);
+    LONG retVal = DTWAIN_IsTwainAvailableEx((nLength > 0 && szDirectories) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    return null_terminator_copier(get_view(args), szDirectories, retVal);
+#endif
+}
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetTwainCountryNameA(LONG nameID, LPSTR ret)
 {

@@ -350,9 +350,9 @@ void DLL_CALLCONV FreeImage_ClearPlugins()
 // =====================================================================
 
 void * DLL_CALLCONV
-FreeImage_Open(PluginNode *node, FreeImageIO *io, fi_handle handle, BOOL open_for_reading) {
+FreeImage_Open(PluginNode *node, FreeImageIO *io, fi_handle handle, BOOL open_for_reading, FIBITMAP* dib, int flags) {
     if (node->m_plugin->open_proc != NULL) {
-       return node->m_plugin->open_proc(io, handle, open_for_reading);
+       return node->m_plugin->open_proc(io, handle, open_for_reading, dib, flags);
     }
 
     return NULL;
@@ -378,7 +378,7 @@ FreeImage_LoadFromHandle(FREE_IMAGE_FORMAT fif, FreeImageIO *io, fi_handle handl
     {
         if(node->m_plugin->load_proc != NULL) 
         {
-            void *data = FreeImage_Open(node, io, handle, TRUE);
+            void *data = FreeImage_Open(node, io, handle, TRUE, NULL, flags);
                     
             FIBITMAP *bitmap = node->m_plugin->load_proc(io, handle, -1, flags, data);
                     
@@ -442,7 +442,7 @@ FreeImage_SaveToHandle(FREE_IMAGE_FORMAT fif, FIBITMAP *dib, FreeImageIO *io, fi
         
     if (node) {
         if(node->m_plugin->save_proc != NULL) {
-            void *data = FreeImage_Open(node, io, handle, FALSE);
+            void *data = FreeImage_Open(node, io, handle, FALSE, dib, flags);
                     
             BOOL result = node->m_plugin->save_proc(io, dib, handle, -1, flags, data);
                     
@@ -471,7 +471,7 @@ FreeImage_SaveToHandleEx(FREE_IMAGE_FORMAT fif, FIBITMAP *dib, FreeImageIO *io, 
     {
         if (node->m_plugin->save_proc != NULL)
         {
-            void *data = FreeImage_Open(node, io, handle, FALSE);
+            void *data = FreeImage_Open(node, io, handle, FALSE, dib, flags);
 
             BOOL result = node->m_plugin->save_proc(io, dib, handle, page, flags, data);
 
