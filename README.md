@@ -16,6 +16,8 @@ This repository contains the source code and development versions of the Dynarit
 
 **Please note -- these build steps only supports Visual Studio 2019 and above.**
 
+The DTWAIN libraries are written in C++, and the minimum C++ standard is **C++17**.
+
 If you want to rebuild the libraries, you will need the following tools and computer resources:
 
 One of the following compilers:
@@ -87,12 +89,11 @@ For platform toolset v143 -- Download files with "14.3" in the file name.
 
 
 If you are not using Visual C++, you will need to build the following boost libraries:  
-* chrono
 * date_time
 * log
 * system
 * thread
-
+ 
 ----
 The **ZIP7_UTIL_CMD** is the full path name of the executable file **7z.exe** of the **7-Zip** archiving utility.  For example:
 

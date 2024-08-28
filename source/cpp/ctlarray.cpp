@@ -188,6 +188,31 @@ DTWAIN_ARRAY dynarithmic::CreateArrayCopyFromFactory(DTWAIN_ARRAY Source)
     return Dest;
 }
 
+void dynarithmic::SetArrayValueFromFactory(DTWAIN_ARRAY pArray, size_t lPos, LPVOID pVariant)
+{
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+
+    const auto& factory = pHandle->m_ArrayFactory;
+    const int enumType = factory->tag_type(pArray);
+    switch (enumType)
+    {
+        // Do something special for strings
+        case CTL_ArrayFactory::arrayTag::WStringType:
+        {
+            std::wstring sVal = static_cast<LPCWSTR>(pVariant);
+            factory->set_value(pArray, lPos, &sVal);
+        }
+        break;
+        case CTL_ArrayFactory::arrayTag::StringType:
+        {
+            std::string sVal = static_cast<LPCSTR>(pVariant);
+            factory->set_value(pArray, lPos, &sVal);
+        }
+        break;
+        default:
+            factory->set_value(pArray, lPos, pVariant);
+    }
+}
 
 DTWAIN_FRAME dynarithmic::CreateFrameArray(CTL_TwainDLLHandle* pHandle, double Left, double Top, double Right, double Bottom)
 {
@@ -1123,8 +1148,6 @@ DTWAIN_BOOL  DLLENTRY_DEF DTWAIN_ArraySetAt( DTWAIN_ARRAY pArray, LONG lPos, LPV
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 
-    const auto& factory = pHandle->m_ArrayFactory; 
-
     // Check if array exists
     const auto checkStatus = ArrayChecker().
         SetArray1(pArray).
@@ -1132,25 +1155,8 @@ DTWAIN_BOOL  DLLENTRY_DEF DTWAIN_ArraySetAt( DTWAIN_ARRAY pArray, LONG lPos, LPV
         SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS | ArrayChecker::CHECK_ARRAY_BOUNDS);
     if (checkStatus.Check() != DTWAIN_NO_ERROR)
         LOG_FUNC_EXIT_PARAMS(false )
-    const int enumType = factory->tag_type(pArray);
-    switch (enumType)
-    {
-        // Do something special for strings
-            case CTL_ArrayFactory::arrayTag::WStringType:
-            {
-                std::wstring sVal = static_cast<LPCWSTR>(pVariant);
-                factory->set_value(pArray, lPos, &sVal);
-            }
-            break;
-            case CTL_ArrayFactory::arrayTag::StringType:
-            {
-                std::string sVal = static_cast<LPCSTR>(pVariant);
-                factory->set_value(pArray, lPos, &sVal);
-            }
-            break;
-            default:
-                factory->set_value(pArray, lPos, pVariant);
-    }
+
+    SetArrayValueFromFactory(pArray, lPos, pVariant);
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }

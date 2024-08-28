@@ -98,5 +98,12 @@ namespace dynarithmic
             throw retErr;
         }
     }
+
+#define CHECK_IF_CAP_SUPPORTED(pSource, pHandle, nCap, retValue) \
+    if (!pSource->IsCapInSupportedList(nCap)) \
+    { \
+        pHandle->m_lLastError = DTWAIN_ERR_CAP_NO_SUPPORT; \
+        LOG_FUNC_EXIT_PARAMS(retValue) \
+    }
 }
 #endif

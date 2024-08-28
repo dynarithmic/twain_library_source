@@ -1035,3 +1035,9 @@ DTWAIN_SetDoublePageCountOnDuplex                 @31020
 DTWAIN_GetResourceString                          @31030
 DTWAIN_GetResourceStringA                         @31031
 DTWAIN_GetResourceStringW                         @31032
+DTWAIN_GetTwainAvailabilityEx                     @31033
+DTWAIN_GetTwainAvailabilityExA                    @31034
+DTWAIN_GetTwainAvailabilityExW                    @31035
+DTWAIN_IsTwainAvailableEx                         @31036
+DTWAIN_IsTwainAvailableExA                        @31037
+DTWAIN_IsTwainAvailableExW                        @31038

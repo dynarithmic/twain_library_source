@@ -228,7 +228,7 @@
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;_DEBUG;_UNICODE;_SCL_SECURE_NO_WARNINGS;DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;NDEBUG;DTWAIN_USE_PDFLIB;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions);FREEIMAGE_CPP_LIB;DTWAIN_DEBUG;BUILDING_DTWAINDLL;;USE_DTWAIN_DEBUG_LIB</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;_DEBUG;_UNICODE;_SCL_SECURE_NO_WARNINGS;DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;NDEBUG;DTWAIN_USE_PDFLIB;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions);FREEIMAGE_CPP_LIB;DTWAIN_DEBUG;BUILDING_DTWAINDLL;;USE_DTWAIN_DEBUG_LIB;DTWAIN_DLL</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -242,7 +242,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalOptions>-Zm400 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -351,7 +351,7 @@ copy $(TargetDir)$(TargetName).lib .
       <Optimization>MinSpace</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>FREEIMAGE_CPP_LIB;_UNICODE;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;NDEBUG;DTWAIN_USE_PDFLIB;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FREEIMAGE_CPP_LIB;_UNICODE;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;NDEBUG;DTWAIN_USE_PDFLIB;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -365,7 +365,7 @@ copy $(TargetDir)$(TargetName).lib .
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalOptions>/Zm1024 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
@@ -470,7 +470,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <Optimization>MinSpace</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NOMINMAX;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;NDEBUG;DTWAIN_USE_PDFLIB;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);USE_DTWAIN_DEBUG_LIB</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;NDEBUG;DTWAIN_USE_PDFLIB;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);USE_DTWAIN_DEBUG_LIB;DTWAIN_DLL</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -484,11 +484,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <LanguageStandard>stdcpp14</LanguageStandard>
-      <LanguageStandard>stdcpp14</LanguageStandard>
-      <LanguageStandard>stdcpp14</LanguageStandard>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
@@ -597,7 +593,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;_DEBUG;FREEIMAGE_CPP_LIB;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;DTWAIN_USE_PDFLIB;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;_SCL_SECURE_NO_WARNINGS;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);USE_DTWAIN_DEBUG_LIB</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;_DEBUG;FREEIMAGE_CPP_LIB;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;DTWAIN_USE_PDFLIB;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;_SCL_SECURE_NO_WARNINGS;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);USE_DTWAIN_DEBUG_LIB;DTWAIN_DLL</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -611,7 +607,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalOptions>/Zm1024 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
@@ -704,7 +700,7 @@ copy $(TargetDir)$(TargetName).lib .
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;_DEBUG;NOMINMAX;FREEIMAGE_CPP_LIB;_UNICODE;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;DTWAIN_USE_PDFLIB;WIN64;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);;USE_DTWAIN_DEBUG_LIB</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;_DEBUG;NOMINMAX;FREEIMAGE_CPP_LIB;_UNICODE;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;DTWAIN_USE_PDFLIB;WIN64;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);;USE_DTWAIN_DEBUG_LIB;DTWAIN_DLL</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
@@ -713,7 +709,7 @@ copy $(TargetDir)$(TargetName).lib .
       <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeaderOutputFile>dtwain$(PlatformArchitecture)ud.pch</PrecompiledHeaderOutputFile>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
@@ -793,7 +789,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>MinSpace</Optimization>
-      <PreprocessorDefinitions>NOMINMAX;FREEIMAGE_CPP_LIB;_UNICODE;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;NDEBUG;DTWAIN_USE_PDFLIB;WIN64;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;FREEIMAGE_CPP_LIB;_UNICODE;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;NDEBUG;DTWAIN_USE_PDFLIB;WIN64;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);;DTWAIN_DLL</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
@@ -801,7 +797,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <ExceptionHandling>Async</ExceptionHandling>
       <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeaderOutputFile>dtwain$(PlatformArchitecture)u.pch</PrecompiledHeaderOutputFile>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
@@ -882,7 +878,7 @@ copy $(TargetDir)$(TargetName).lib .
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>MinSpace</Optimization>
-      <PreprocessorDefinitions>NOMINMAX;FREEIMAGE_CPP_LIB;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;_DEBUGNDEBUG;DTWAIN_USE_PDFLIB;WIN64;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);;USE_DTWAIN_DEBUG_LIB</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;FREEIMAGE_CPP_LIB;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;_DEBUGNDEBUG;DTWAIN_USE_PDFLIB;WIN64;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);;USE_DTWAIN_DEBUG_LIB;DTWAIN_DLL</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
@@ -890,13 +886,10 @@ copy $(TargetDir)$(TargetName).lib .
       <ExceptionHandling>Async</ExceptionHandling>
       <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <LanguageStandard>stdcpp14</LanguageStandard>
-      <LanguageStandard>stdcpp14</LanguageStandard>
-      <LanguageStandard>stdcpp14</LanguageStandard>
-      <LanguageStandard>stdcpp14</LanguageStandard>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeaderOutputFile>dtwain$(PlatformArchitecture).pch</PrecompiledHeaderOutputFile>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -978,7 +971,7 @@ copy $(TargetDir)$(TargetName).lib .
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;_DEBUG;NOMINMAX;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;DTWAIN_USE_PDFLIB;WIN64;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;_DEBUG;NOMINMAX;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;DTWAIN_INTERNAL_MODULE;BUILDING_JPEG_DLL;BUILDING_DTWIMG32;DTWAIN_USE_PDFLIB;WIN64;WIN32;_WINDOWS;USE_NAMESPACES;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;NO_CONST_KEYS;JAS_WIN_MSVC_BUILD;_USE_CXIMAGE_JPEG;USE_CXIMAGE_JPEG2K;CXIMAGE_NAMESPACE;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
@@ -986,7 +979,7 @@ copy $(TargetDir)$(TargetName).lib .
       <ExceptionHandling>Async</ExceptionHandling>
       <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeaderOutputFile>dtwain$(PlatformArchitecture)d.pch</PrecompiledHeaderOutputFile>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>

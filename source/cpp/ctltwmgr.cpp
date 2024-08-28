@@ -1913,7 +1913,10 @@ void CTL_TwainAppMgr::EnumTwainFileFormats( const CTL_ITwainSource * /*pSource*/
         TWAINFileFormat_JPEG2000,TWAINFileFormat_POSTSCRIPT1,TWAINFileFormat_POSTSCRIPT1MULTI,TWAINFileFormat_POSTSCRIPT2,TWAINFileFormat_POSTSCRIPT2MULTI,
         TWAINFileFormat_POSTSCRIPT3,TWAINFileFormat_POSTSCRIPT3MULTI,TWAINFileFormat_GIF,TWAINFileFormat_PNG,TWAINFileFormat_TEXT,
         TWAINFileFormat_TEXTMULTI,TWAINFileFormat_ICO,TWAINFileFormat_ICO_VISTA, TwainFileFormat_ICO_RESIZED, TwainFileFormat_WBMP_RESIZED,
-        TWAINFileFormat_WBMP, TWAINFileFormat_WEBP, TWAINFileFormat_PBM, TWAINFileFormat_TGARLE };
+        TWAINFileFormat_WBMP, TWAINFileFormat_WEBP, TWAINFileFormat_PBM, TWAINFileFormat_TGARLE, TWAINFileFormat_BIGTIFFLZW, TWAINFileFormat_BIGTIFFLZWMULTI,
+        TWAINFileFormat_BIGTIFFNONE, TWAINFileFormat_BIGTIFFNONEMULTI, TWAINFileFormat_BIGTIFFPACKBITS, TWAINFileFormat_BIGTIFFPACKBITSMULTI, 
+        TWAINFileFormat_BIGTIFFDEFLATE, TWAINFileFormat_BIGTIFFDEFLATEMULTI, TWAINFileFormat_BIGTIFFGROUP3, TWAINFileFormat_BIGTIFFGROUP3MULTI,
+        TWAINFileFormat_BIGTIFFGROUP4, TWAINFileFormat_BIGTIFFGROUP4MULTI, TWAINFileFormat_BIGTIFFJPEG, TWAINFileFormat_BIGTIFFJPEGMULTI };
       rArray = ca;
 }
 
@@ -2001,24 +2004,15 @@ using MandatorySet = std::set<TW_UINT16>;
 
 void CTL_TwainAppMgr::GetCapabilities(const CTL_ITwainSource *pSource, CTL_TwainCapArray & rArray)
 {
-    CTL_EnumContainer ContainerToUse = TwainContainer_ARRAY;
-
-    // Double check what the right GET container is to use
-    UINT cGet = 0, cSet = 0, nDataType = 0;
-    bool cFlags[6] = { false };
-    const bool bSuccess = GetBestContainerType(pSource,
-                                               static_cast<CTL_EnumCapability>(DTWAIN_CV_CAPSUPPORTEDCAPS),cGet, cSet, nDataType,CTL_GetTypeGET, cFlags);
-
-    if (bSuccess)
-        ContainerToUse = static_cast<CTL_EnumContainer>(cGet);
-
+    // Get all the capabilities of the source
     rArray.clear();
-    GetMultiValuesImpl<CTL_TwainCapArray, TW_UINT16>::GetMultipleTwainCapValues(pSource, rArray, TwainCap_SUPPORTEDCAPS, TWTY_UINT16, ContainerToUse);
+    GetMultiValuesImpl<CTL_TwainCapArray, TW_UINT16>::GetMultipleTwainCapValues(pSource, rArray, TwainCap_SUPPORTEDCAPS, TWTY_UINT16, TwainContainer_ARRAY);
 }
 
 void CTL_TwainAppMgr::GetExtendedCapabilities(const CTL_ITwainSource *pSource, CTL_IntArray & rArray)
 {
-    // Get the capabilities
+    // Get the extended capabilities of the source
+    rArray.clear();
     GetMultiValuesImpl<CTL_IntArray, TW_UINT16>::GetMultipleTwainCapValues(pSource, rArray, TwainCap_EXTENDEDCAPS, TWTY_UINT16, TwainContainer_ARRAY);
 }
 
@@ -2386,11 +2380,12 @@ CTL_StringType CTL_TwainAppMgr::GetTwainDirFullNameEx(LPCTSTR szTwainDLLName,
     return ::GetTwainDirFullNameEx(pHandle, szTwainDLLName, bLeaveLoaded, pModule);
 }
 
-bool CTL_TwainAppMgr::CheckTwainExistence(CTL_StringType strTwainDLLName, LPLONG pWhichSearch)
+std::pair<bool, CTL_StringType> CTL_TwainAppMgr::CheckTwainExistence(CTL_StringType strTwainDLLName, LPLONG pWhichSearch)
 {
-    if ( GetTwainDirFullName(strTwainDLLName.c_str(), pWhichSearch).empty())
-        return false;
-    return true;
+    auto str = GetTwainDirFullName(strTwainDLLName.c_str(), pWhichSearch);
+    if ( str.empty())
+        return { false, str };
+    return { true, str };
 }
 
 LONG CTL_TwainAppMgr::ExtImageInfoArrayType(LONG ExtType)
@@ -2517,8 +2512,8 @@ CTL_StringType CTL_TwainAppMgr::GetDefaultDLLName()
 
 CTL_StringType CTL_TwainAppMgr::GetLatestDSMVersion()
 {
-    const bool bRet1 = CheckTwainExistence(TWAINDLLVERSION_1);
-    const bool bRet2 = CheckTwainExistence(TWAINDLLVERSION_2);
+    const bool bRet1 = CheckTwainExistence(TWAINDLLVERSION_1).first;
+    const bool bRet2 = CheckTwainExistence(TWAINDLLVERSION_2).first;
 
     if ( bRet2 )
         return TWAINDLLVERSION_2;
@@ -2607,6 +2602,39 @@ void CTL_TwainAppMgr::WriteLogInfoW(const std::wstring& s, bool bFlush)
 void CTL_TwainAppMgr::WriteLogInfo(const CTL_StringType& s, bool bFlush)
 {
     WriteLogInfoA(StringConversion::Convert_Native_To_Ansi(s));
+}
+
+void CTL_TwainAppMgr::GatherCapabilityInfo(CTL_ITwainSource* pSource)
+{
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    if (!pSource->RetrievedAllCaps())
+    {
+        // Get the capabilities using TWAIN
+        CTL_TwainCapArray rArray;
+        CTL_TwainAppMgr::GetCapabilities(pSource, rArray);
+        pSource->SetCapSupportedList(rArray);
+
+        // Get the capabilities from the list in the Source
+        CapList& pArray = pSource->GetCapSupportedList();
+
+        // Get all the information about the capability.
+        std::for_each(pArray.begin(), pArray.end(), [&](TW_UINT16 val)
+        {
+            DTWAIN_CacheCapabilityInfo(pSource, pHandle, static_cast<TW_UINT16>(val));
+        });
+
+        // Retrieve any custom caps
+        auto& customCapSet = pSource->GetCustomCapCache();
+        customCapSet.clear();
+        for (auto& capInfo : pArray)
+        {
+            if (capInfo >= DTWAIN_CV_CAPCUSTOMBASE)
+                customCapSet.insert(capInfo);
+        }
+
+        // We have retrieved all the capability information
+        pSource->SetRetrievedAllCaps(true);
+    }
 }
 
 struct TripletSaveRestore
