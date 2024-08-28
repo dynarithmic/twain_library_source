@@ -341,11 +341,13 @@ DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap
 
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !p;}, DTWAIN_ERR_BAD_SOURCE, false, FUNC_MACRO);
 
-	CHECK_IF_CAP_SUPPORTED(p, pHandle, lCap, false)
-
+    // We clear the user array here, since we do not want to 
+    // report information back to user if capability is not supported
     bool bEnumeratorExists = pHandle->m_ArrayFactory->is_valid(*pArray);
     if ( bEnumeratorExists )
         pHandle->m_ArrayFactory->clear(*pArray);
+
+	CHECK_IF_CAP_SUPPORTED(p, pHandle, lCap, false)
 
     LONG overrideDataType = nDataType;
     if ( bOverrideDataType )

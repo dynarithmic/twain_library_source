@@ -181,7 +181,6 @@ static int32_t EnumCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array, CacheFn fn)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtendedCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Array))
-
     // Enumerate the extended caps
     auto retVal = EnumCaps<EnumExtendedTraits>(Source, Array, &CTL_ITwainSource::GetExtendedCapCache);
 
