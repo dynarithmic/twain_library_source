@@ -882,7 +882,6 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
             LONG nCapCount;
             LONG nIndex;
             LONG nCapValue;
-            LONG nCustomDataSize;
             HWND hWndName =     GetDlgItem(hDlg,  IDC_edProductName);
             HWND hWndFamily =   GetDlgItem(hDlg,  IDC_edFamilyName);
             HWND hWndManu =     GetDlgItem(hDlg,  IDC_edManufacturer);
