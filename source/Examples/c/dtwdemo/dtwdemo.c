@@ -356,7 +356,7 @@ void SelectTheSource(int nWhich)
     switch (nWhich)
     {
         case IDM_SELECT_SOURCE:
-            tempSource = DTWAIN_SelectSource2(NULL, _T("Select Source"),0,0,DTWAIN_DLG_CENTER_SCREEN);
+            tempSource = DTWAIN_SelectSource2(NULL, _T("Select Source"),0,0, DTWAIN_DLG_CENTER_SCREEN | DTWAIN_DLG_SORTNAMES);
         break;
 
         case IDM_SELECT_DEFAULT_SOURCE:
@@ -879,7 +879,7 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
             LONG nCapCount;
             LONG nIndex;
             LONG nCapValue;
-
+            LONG nCustomDataSize;
             HWND hWndName =     GetDlgItem(hDlg,  IDC_edProductName);
             HWND hWndFamily =   GetDlgItem(hDlg,  IDC_edFamilyName);
             HWND hWndManu =     GetDlgItem(hDlg,  IDC_edManufacturer);
@@ -889,6 +889,7 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
             HWND hWndNumCaps =  GetDlgItem(hDlg,  IDC_edTotalCaps);
             HWND hWndNumCustomCaps =  GetDlgItem(hDlg,  IDC_edCustomCaps);
             HWND hWndNumExtendedCaps =  GetDlgItem(hDlg,  IDC_edExtendedCaps);
+            HWND hWndDSData = GetDlgItem(hDlg, IDC_edDSData);
 
             DTWAIN_GetSourceProductName(g_CurrentSource, szBuf, 255);
             SetWindowText(hWndName, szBuf);
@@ -926,6 +927,22 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
             DTWAIN_EnumExtendedCaps(g_CurrentSource, &CapArray);
             wsprintf(szBuf, _T("%d"), (int)DTWAIN_ArrayGetCount(CapArray));
             SetWindowText(hWndNumExtendedCaps, szBuf);
+
+            BYTE* szData = NULL;
+            LONG actualSize;
+            /* First, get the size of the Source's custom DS data */
+            HANDLE h = DTWAIN_GetCustomDSData(g_CurrentSource, NULL, 0, &actualSize, DTWAINGCD_COPYDATA);
+            if ( h )
+            {
+                /* Allocate memory for the data */
+                szData = malloc(actualSize * sizeof(BYTE));
+                memset(szData, actualSize, 0);
+
+                /* Second call actually gets the data */
+                DTWAIN_GetCustomDSData(g_CurrentSource, szData, actualSize, &actualSize, DTWAINGCD_COPYDATA);
+                SetWindowText(hWndDSData, szData);
+                free(szData);
+            }
 
             DTWAIN_ArrayDestroy( CapArray );
             return TRUE;
