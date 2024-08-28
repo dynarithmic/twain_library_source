@@ -535,7 +535,7 @@ void AcquireFile(BOOL bUseSource)
     {
         /* User wants to use DTWAIN File Mode instead of Source mode */
         /* All Sources can use this mode */
-        int nDlgFileType = DialogBox(g_hInstance, (LPCTSTR)IDD_dlgFileType, g_hWnd, (DLGPROC)DisplayFileTypesProc);
+        INT_PTR nDlgFileType = DialogBox(g_hInstance, (LPCTSTR)IDD_dlgFileType, g_hWnd, (DLGPROC)DisplayFileTypesProc);
         if (nDlgFileType == 0)
             return;
         FileFlags |= DTWAIN_USENATIVE;
@@ -568,9 +568,8 @@ void AcquireFile(BOOL bUseSource)
 
     /* Disable main window */
     /* Check if feeder or duplex is supported */
-    int nDlgRet = 0;
     if ( DTWAIN_IsFeederSupported(g_CurrentSource) || DTWAIN_IsDuplexSupported(g_CurrentSource))
-        nDlgRet = DialogBox(g_hInstance, (LPCTSTR)IDD_dlgSettings, g_hWnd, (DLGPROC)DisplayAcquireSettingsProc);
+        DialogBox(g_hInstance, (LPCTSTR)IDD_dlgSettings, g_hWnd, (DLGPROC)DisplayAcquireSettingsProc);
     EnableWindow(g_hWnd, FALSE);
     
     /* Create the array of names.  This function is to be used
@@ -882,7 +881,6 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
             LONG nCapCount;
             LONG nIndex;
             LONG nCapValue;
-            LONG nCustomDataSize;
             HWND hWndName =     GetDlgItem(hDlg,  IDC_edProductName);
             HWND hWndFamily =   GetDlgItem(hDlg,  IDC_edFamilyName);
             HWND hWndManu =     GetDlgItem(hDlg,  IDC_edManufacturer);
@@ -943,7 +941,7 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
 
                 /* Second call actually gets the data */
                 DTWAIN_GetCustomDSData(g_CurrentSource, szData, actualSize, &actualSize, DTWAINGCD_COPYDATA);
-                SetWindowText(hWndDSData, szData);
+                SetWindowTextA(hWndDSData, szData);
                 free(szData);
             }
 
