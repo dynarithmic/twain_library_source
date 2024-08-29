@@ -775,6 +775,7 @@
     D_SETACQUIREIMAGESCALESTRINGFUNC                                  DYNDTWAIN_API::DTWAIN_SetAcquireImageScaleString = nullptr;
     D_SETACQUIREIMAGESCALESTRINGWFUNC                                 DYNDTWAIN_API::DTWAIN_SetAcquireImageScaleStringW = nullptr;
     D_SETACQUIRESTRIPBUFFERFUNC                                       DYNDTWAIN_API::DTWAIN_SetAcquireStripBuffer = nullptr;
+    D_SETACQUIRESTRIPSIZEFUNC                                         DYNDTWAIN_API::DTWAIN_SetAcquireStripSize = nullptr;
     D_SETALARMSFUNC                                                   DYNDTWAIN_API::DTWAIN_SetAlarms = nullptr;
     D_SETALARMVOLUMEFUNC                                              DYNDTWAIN_API::DTWAIN_SetAlarmVolume = nullptr;
     D_SETALLCAPSTODEFAULTFUNC                                         DYNDTWAIN_API::DTWAIN_SetAllCapsToDefault = nullptr;
@@ -1819,6 +1820,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_SetAcquireImageScaleStringA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetAcquireImageScaleStringW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetAcquireStripBuffer, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_SetAcquireStripSize, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetAlarms, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetAlarmVolume, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetAllCapsToDefault, hModule);
