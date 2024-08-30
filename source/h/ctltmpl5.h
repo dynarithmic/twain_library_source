@@ -43,7 +43,7 @@ namespace dynarithmic
     // Finds the array item that has a value of SearchVal
     template <class TypeInfo, class TypeArray>
     bool FindFirstValue( TypeInfo SearchVal, std::vector<TypeArray>* SearchArray, int *pWhere);
-    CTL_CapInfo GetCapInfo(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource* p, TW_UINT16 nCap);
+    CTL_CapInfo* GetCapInfo(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource* p, TW_UINT16 nCap);
 
     template <class T>
     bool    GetCapabilityValues( const CTL_ITwainSource *pSource,
@@ -372,11 +372,11 @@ namespace dynarithmic
 
             bool bOk = false;
 
-            const CTL_CapInfo Info = GetCapInfo(pHandle, p, nCap);
-            if ( !Info.IsValid() )
+            const CTL_CapInfo* Info = GetCapInfo(pHandle, p, nCap);
+            if ( !Info )
                 return false;
             UINT nAll[3];
-            UINT nContainer = std::get<1>(Info);
+            UINT nContainer = std::get<1>(*Info);
 
             size_t nMaxNum;
             if ( !bUseContainer )
@@ -433,8 +433,6 @@ namespace dynarithmic
             auto&  pVector = pHandle->m_ArrayFactory->underlying_container_t<AssignType>(pArray);
             pVector.clear();
             std::copy(Array.begin(), Array.end(), std::back_inserter(pVector));
-/*            for ( i = 0; i < nSize; i++)
-                Adder::AdderFn(&pVector, Array[i]);*/
             return true;
         }
 
@@ -541,11 +539,11 @@ namespace dynarithmic
 
         bool bOk = false;
 
-        const CTL_CapInfo Info = GetCapInfo(pHandle, p, static_cast<TW_UINT16>(nCap));
-        if ( !Info.IsValid() )
+        const CTL_CapInfo* Info = GetCapInfo(pHandle, p, static_cast<TW_UINT16>(nCap));
+        if ( !Info )
             return false;
         UINT nAll[3];
-        UINT nContainer = std::get<1>(Info);
+        UINT nContainer = std::get<1>(*Info);
 
         int nMaxNum;
         if ( !bUseContainer )
@@ -626,11 +624,11 @@ namespace dynarithmic
 
         bool bOk = false;
 
-        const CTL_CapInfo Info = GetCapInfo(pHandle, p, static_cast<TW_UINT16>(nCap));
-        if ( !Info.IsValid() )
+        const CTL_CapInfo* Info = GetCapInfo(pHandle, p, static_cast<TW_UINT16>(nCap));
+        if ( !Info )
             return false;
         UINT nAll[3];
-        UINT nContainer = std::get<1>(Info);
+        UINT nContainer = std::get<1>(*Info);
 
         int nMaxNum;
         if ( !bUseContainer )

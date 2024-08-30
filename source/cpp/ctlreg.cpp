@@ -84,6 +84,8 @@ bool dynarithmic::GetCapInfoFromIni(const std::string& strCapName,
                        UINT &rGetValuesDefault,
                        UINT &rSetValuesCurrent,
                        UINT &rSetValuesAvailable,
+                       UINT &rResetValues,
+                       UINT &rQueryValues,
                        UINT &rQuerySupport,
                        UINT &rEOJValue,
                        TW_UINT16 &rStateInfo,
@@ -224,45 +226,21 @@ bool dynarithmic::GetCapInfoFromIni(const std::string& strCapName,
 
     // Make sure that you parse the NULL tokens
     StringWrapperA::Tokenize(szBuffer, ",", aStr, true );
-
+    UINT* pContainerValues[] = { &rGetValues, &rGetValuesCurrent, &rGetValuesDefault,
+                                 &rSetValuesCurrent, &rSetValuesAvailable, &rResetValues, &rQueryValues };
     if (!aStr.empty())
     {
         std::string str;
         ContainerMap::const_iterator it;
-        if ( !aStr[0].empty() )
+        for (int i = 0; i < std::size(pContainerValues); ++i)
         {
-            str = aStr[0];
-            it = static_cast<ContainerMap::const_iterator>(mapContainer.find(str));
-            if ( it != mapContainer.end())
-                rGetValues = (*it).second;
-        }
-        if ( !aStr[1].empty() )
-        {
-            str = aStr[1];
-            it = static_cast<ContainerMap::const_iterator>(mapContainer.find(str));
-            if ( it != mapContainer.end())
-                rGetValuesCurrent = (*it).second;
-        }
-        if ( !aStr[2].empty() )
-        {
-            str = aStr[2];
-            it = static_cast<ContainerMap::const_iterator>(mapContainer.find(str));
-            if ( it != mapContainer.end())
-                rGetValuesDefault = (*it).second;
-        }
-        if ( !aStr[3].empty() )
-        {
-            str = aStr[3];
-            it = static_cast<ContainerMap::const_iterator>(mapContainer.find(str));
-            if ( it != mapContainer.end())
-                rSetValuesCurrent = (*it).second;
-        }
-        if ( !aStr[4].empty() )
-        {
-            str = aStr[4];
-            it = static_cast<ContainerMap::const_iterator>(mapContainer.find(str));
-            if ( it != mapContainer.end())
-                rSetValuesAvailable = (*it).second;
+            if (!aStr[i].empty())
+            {
+                str = aStr[i];
+                it = static_cast<ContainerMap::const_iterator>(mapContainer.find(str));
+                if (it != mapContainer.end())
+                    *(pContainerValues[i]) = (*it).second;
+            }
         }
     }
 

@@ -98,7 +98,7 @@ static bool SysDestroyHelper(CTL_TwainDLLHandle* pHandle, bool bCheck=true);
 static void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL);
 static void LoadTransferReadyOverrides();
 static void LoadFlatbedOnlyOverrides();
-static void LoadCheckFeederStatusOnOpen(CTL_TwainDLLHandle* pHandle);
+static void LoadOnSourceOpenProperties(CTL_TwainDLLHandle* pHandle);
 static bool LoadGeneralResources(bool blockExecution);
 
 #ifdef _WIN32
@@ -910,7 +910,7 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
                 LoadFlatbedOnlyOverrides();
 
                 // Load check feeder on open status
-                LoadCheckFeederStatusOnOpen(pHandle);
+                LoadOnSourceOpenProperties(pHandle);
 
                 // Initialize imaging code
                 FreeImage_Initialise(true);
@@ -2413,17 +2413,19 @@ void LoadTransferReadyOverrides()
     }
 }
 
-// This loads DTWAIN32.INI or DTWAIN64.INI, and checks the [CheckFeederStatus]
-// section and "CheckStatus" key to determine if testing for feeder capabilities will
-// be done when opening the source.
-void LoadCheckFeederStatusOnOpen(CTL_TwainDLLHandle* pHandle)
+// This loads DTWAIN32.INI or DTWAIN64.INI, and checks the [SourceOpenProps]
+// section.  This section determines the activities to perform after sucessfully
+// opening a TWAIN Source
+void LoadOnSourceOpenProperties(CTL_TwainDLLHandle* pHandle)
 {
     // Get the section name
     CSimpleIniA feederProfile;
     auto err = feederProfile.LoadFile(dynarithmic::GetDTWAININIPathA().c_str());
     if (err != SI_OK)
         return;
-    pHandle->m_bCheckFeederStatusOnOpen = feederProfile.GetBoolValue("CheckFeederStatus", "CheckStatus", true);
+    pHandle->m_OnSourceOpenProperties.m_bCheckFeederStatusOnOpen = feederProfile.GetBoolValue("SourceOpenProps", "CheckFeederStatus", true);
+    pHandle->m_OnSourceOpenProperties.m_bQueryBestCapContainer = feederProfile.GetBoolValue("SourceOpenProps", "QueryBestCapContainer", true);
+    pHandle->m_OnSourceOpenProperties.m_bQueryCapOperations = feederProfile.GetBoolValue("SourceOpenProps", "QueryCapOperations", true);
 }
 
 // This loads DTWAIN32.INI or DTWAIN64.INI, and checks the [FlatbedOnly]

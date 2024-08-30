@@ -41,152 +41,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetQueryCapSupport(DTWAIN_BOOL bSet)
     CATCH_BLOCK(false)
 }
 
-void dynarithmic::DTWAIN_CollectCapabilityInfo(CTL_ITwainSource *p, TW_UINT16 nCap, CTL_CapInfoArray& pArray)
-{
-    static const ContainerMap mapContainer = { {"TW_ONEVALUE", DTWAIN_CONTONEVALUE},
-                                                {"TW_ENUMERATION", DTWAIN_CONTENUMERATION},
-                                                {"TW_RANGE", DTWAIN_CONTRANGE},
-                                                {"TW_ARRAY", DTWAIN_CONTARRAY},
-                                                {"-1", static_cast<UINT>(-1)},
-                                                {"0", 0} };
-
-    // Add capabilities where the state info is set
-    // Test the capability and see which container works.
-    UINT cSet;
-
-    UINT cGet;
-    UINT cGetCurrent;
-    UINT cGetDefault;
-    UINT cSetCurrent;
-    UINT cSetAvailable;
-    UINT cQuerySupport;
-    UINT cEntryFound;
-
-    bool cFlags[6] = { false };
-
-    UINT cSetAlt = 0;
-    TW_UINT16 cStateInfo = 0xFF;
-    UINT nDataType = 0;
-    const std::string strName = CTL_TwainAppMgr::GetCapNameFromCap(nCap);
-    bool bContainerInfoFound = false;
-    UINT cEOJValue = 0;
-    const std::string sProdNameA = StringConversion::Convert_Native_To_Ansi(p->GetProductName());
-    bool bOk = GetCapInfoFromIni(strName,
-                                 sProdNameA,
-                                 static_cast<UINT>(nCap),
-                                 cGet,
-                                 cGetCurrent,
-                                 cGetDefault,
-                                 cSetCurrent,
-                                 cSetAvailable,
-                                 cQuerySupport,
-                                 cEOJValue,
-                                 cStateInfo,
-                                 cEntryFound,
-                                 nDataType,
-                                 bContainerInfoFound,
-                                 mapContainer);
-
-    bool bCanQuerySupport = cQuerySupport ? true : false;
-    if (cEntryFound)
-    {
-        if (cStateInfo != 0xFF)
-            p->AddCapToStateInfo(nCap, cStateInfo);
-    }
-    if (bOk)
-    {
-        if (CTL_StaticData::s_lErrorFilterFlags)
-        {
-            StringStreamOutA strm;
-            strm << "Using capability info from DTWAIN32.INI (Source="
-                 << sProdNameA << ", Cap=" << CTL_TwainAppMgr::GetCapNameFromCap(nCap) << ")\n";
-            CTL_TwainAppMgr::WriteLogInfoA(strm.str());
-        }
-        if (bContainerInfoFound)
-        {
-            // set the flags here
-            if (cGet != std::numeric_limits<UINT>::max())
-                cFlags[0] = true;
-            if (cGetCurrent != std::numeric_limits<UINT>::max())
-                cFlags[1] = true;
-            if (cGetDefault != std::numeric_limits<UINT>::max())
-                cFlags[2] = true;
-            if (cSetCurrent != std::numeric_limits<UINT>::max())
-                cFlags[3] = true;
-            if (cSetAvailable != std::numeric_limits<UINT>::max())
-                cFlags[4] = true;
-            if (nDataType != std::numeric_limits<UINT>::max())
-                cFlags[5] = true;
-        }
-
-        // Get the best data type here;
-        if (nDataType == std::numeric_limits<UINT>::max())
-            CTL_TwainAppMgr::GetBestCapDataType(p, nCap, nDataType);
-    }
-
-    // Get the container that works the best
-    CTL_TwainAppMgr::GetBestContainerType(p,
-        static_cast<CTL_EnumCapability>(nCap),
-        cGet, cSet, nDataType,
-        CTL_GetTypeGET, cFlags);
-
-    CTL_TwainAppMgr::GetBestContainerType(p,
-        static_cast<CTL_EnumCapability>(nCap),
-        cGetCurrent, cSetAlt, nDataType,
-        CTL_GetTypeGETCURRENT, cFlags);
-
-    if (cSet != 0)
-    {
-        CTL_TwainAppMgr::GetBestContainerType(p,
-            static_cast<CTL_EnumCapability>(nCap),
-            cGetDefault, cSetAlt, nDataType,
-            CTL_GetTypeGETDEFAULT, cFlags);
-    }
-    else
-        cGetDefault = cGetCurrent;
-    if (bContainerInfoFound)
-    {
-        if (cSetCurrent != std::numeric_limits<UINT>::max())
-            cSet = cSetCurrent;
-        if (cSetAvailable != std::numeric_limits<UINT>::max())
-            cSet |= cSetAvailable;
-    }
-    // Get the supported operations for the capability
-    UINT nOps = 0;
-    if (bCanQuerySupport)
-    {
-        nOps = CTL_TwainAppMgr::GetCapabilityOperations(p, nCap);
-        if (nOps == 0)
-        {
-            if (nCap >= CAP_CUSTOMBASE)
-            {
-                nOps = cGet > 0 ? TWQC_GET | TWQC_GETDEFAULT | TWQC_GETCURRENT : 0;
-                nOps |= cSet > 0 ? TWQC_SET | TWQC_RESET | TWQC_SETCONSTRAINT : 0;
-            }
-            else
-            {
-                bCanQuerySupport = false;
-                nOps = CTL_TwainAppMgr::GetCapOps(p, nCap, false);
-            }
-        }
-    }
-    else
-    {
-        if (nCap >= CAP_CUSTOMBASE)
-        {
-            nOps = cGet > 0 ? TWQC_GET | TWQC_GETDEFAULT | TWQC_GETCURRENT : 0;
-            nOps |= cSet > 0 ? TWQC_SET | TWQC_RESET | TWQC_SETCONSTRAINT : 0;
-        }
-        else
-            nOps = CTL_TwainAppMgr::GetCapOps(p, nCap, bCanQuerySupport);
-    }
-    if (cEntryFound)
-        p->SetEOJDetectedValue(cEOJValue);
-
-    CTL_CapInfo Info(static_cast<CTL_EnumCapability>(nCap), cGet, cSet, nDataType, nOps, cGetCurrent, cGetDefault);
-    pArray.insert(make_pair(nCap, Info));
-}
-
 DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *p, CTL_TwainDLLHandle *pHandle, TW_UINT16 nCapToCache)
 {
     CTL_EnumeratorNode<LONG>::container_base_type vCaps(1, nCapToCache);
@@ -204,7 +58,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
         CapFinder(CTL_ITwainSource *ps, LONG nCap) : m_ps(ps), m_nCap(nCap) {}
         bool operator()(const CTL_CapInfo& CapInfo) const
         {
-            if (static_cast<int>(std::get<0>(CapInfo)) == m_nCap)
+            if (static_cast<int>(std::get<CAPINFO_IDX_CAPABILITY>(CapInfo)) == m_nCap)
             {
                 m_ps->SetCapCached(static_cast<TW_UINT16>(m_nCap), true);
                 return true;
@@ -267,27 +121,26 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
         pSource->AddCapToStateInfo(CAP_CUSTOMDSDATA, DTWAIN_STATE4);
 
         // Test the capability and see which container works.
-        UINT cSet;
-
         UINT cGet = 0;
         UINT cGetCurrent = 0;
         UINT cGetDefault = 0;
         UINT cSetCurrent = 0;
         UINT cSetAvailable = 0;
-        UINT cQuerySupport;
-        UINT cEOJValue;
-        UINT cEntryFound;
-        bool cFlags[6] = { false };
+        UINT cQuerySupport = 0;
+        UINT cEOJValue = 0;
+        UINT cEntryFound = 0;
+        UINT cResetSupport = 0;
+        UINT cQueryContainer = 0;
         bool bContainerInfoFound = false;
 
-        UINT cSetAlt = 0;
         TW_UINT16 cStateInfo = 0xFF;
         UINT nDataType = 0;
         std::string strName = CTL_TwainAppMgr::GetCapNameFromCap(nCap);
         std::string sProdNameA = StringConversion::Convert_Native_To_Ansi(pSource->GetProductName());
+
         bOk = GetCapInfoFromIni(strName, sProdNameA, static_cast<UINT>(nCap), cGet, cGetCurrent,
-            cGetDefault, cSetCurrent, cSetAvailable, cQuerySupport,
-            cEOJValue, cStateInfo, nDataType, cEntryFound, bContainerInfoFound, mapContainer);
+                                cGetDefault, cSetCurrent, cSetAvailable, cResetSupport, cQueryContainer, cQuerySupport,
+                                cEOJValue, cStateInfo, nDataType, cEntryFound, bContainerInfoFound, mapContainer);
 
         bCanQuerySupport = cQuerySupport ? true : false;
 
@@ -315,86 +168,35 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
 
             if (bContainerInfoFound)
             {
-                // set the flags here
-                if (cGet != std::numeric_limits<UINT>::max())
-                    cFlags[0] = true;
+                CTL_CapStruct capData;
+                capData.m_nGetContainer = cGet;
 
-                if (cGetCurrent != std::numeric_limits<UINT>::max())
-                    cFlags[1] = true;
-
-                if (cGetDefault != std::numeric_limits<UINT>::max())
-                    cFlags[2] = true;
-
-                if (cSetCurrent != std::numeric_limits<UINT>::max())
-                    cFlags[3] = true;
-
-                if (cSetAvailable != std::numeric_limits<UINT>::max())
-                    cFlags[4] = true;
-
-                if (nDataType != std::numeric_limits<UINT>::max())
-                    cFlags[5] = true; // always the data type is known here
-
-                if (nDataType == std::numeric_limits<UINT>::max())
-                    CTL_TwainAppMgr::GetBestCapDataType(pSource, nCap, nDataType);
+                CTL_CapInfo Info(static_cast<CTL_EnumCapability>(nCap), cGet, cSetCurrent, nDataType, 0, cGetCurrent, 
+                                                            cGetDefault, cSetAvailable, cResetSupport, cQueryContainer);
+                pArray->insert(make_pair(nCap, Info));
+                return true;
             }
         }
 
-        CTL_TwainAppMgr::GetBestContainerType(pSource, static_cast<CTL_EnumCapability>(nCap), cGet, cSet,
-            nDataType, CTL_GetTypeGET, cFlags);
-        CTL_TwainAppMgr::GetBestContainerType(pSource, static_cast<CTL_EnumCapability>(nCap), cGetCurrent,
-            cSetAlt, nDataType, CTL_GetTypeGETCURRENT, cFlags);
-        if (cSet != 0)
+        auto& allCapInfo = CTL_StaticData::GetGeneralCapInfo();
+        auto thisCapInfo = allCapInfo.find(nCap);
+        if (thisCapInfo != allCapInfo.end())
         {
-            CTL_TwainAppMgr::GetBestContainerType(pSource, static_cast<CTL_EnumCapability>(nCap), cGetDefault,
-                cSetAlt, nDataType, CTL_GetTypeGETDEFAULT, cFlags);
-        }
-        else
-            cGetDefault = cGetCurrent;
-
-        if (bContainerInfoFound)
-        {
-            if (cSetCurrent != std::numeric_limits<UINT>::max())
-                cSet = cSetCurrent;
-
-            if (cSetAvailable != std::numeric_limits<UINT>::max())
-                cSet |= cSetAvailable;
-        }
-        // Get the supported operations for the capability
-        UINT nOps = 0;
-
-        if (bCanQuerySupport)
-        {
-            nOps = CTL_TwainAppMgr::GetCapabilityOperations(pSource, nCap);
-
-            if (nOps == 0)
-            {
-                if (nCap >= CAP_CUSTOMBASE)
-                {
-                    nOps = cGet > 0 ? TWQC_GET | TWQC_GETDEFAULT | TWQC_GETCURRENT : 0;
-                    nOps |= cSet > 0 ? TWQC_SET | TWQC_RESET : 0;
-                }
-                else
-                {
-                    bCanQuerySupport = false;
-                    nOps = CTL_TwainAppMgr::GetCapOps(pSource, nCap, false);
-                }
-            }
+            auto& capData = thisCapInfo->second;
+            CTL_CapInfo Info(static_cast<CTL_EnumCapability>(nCap),
+                capData.m_nGetContainer, capData.m_nSetContainer, capData.m_nDataType, 0, capData.m_nGetCurrentContainer,
+                capData.m_nGetDefaultContainer, capData.m_nSetConstraintContainer, capData.m_nResetContainer, capData.m_nQuerySupportContainer);
+            pArray->insert(make_pair(nCap, Info));
         }
         else
         {
-            if (nCap >= CAP_CUSTOMBASE)
-            {
-                nOps = cGet > 0 ? TWQC_GET | TWQC_GETDEFAULT | TWQC_GETCURRENT : 0;
-                nOps |= cSet > 0 ? TWQC_SET | TWQC_RESET : 0;
-            }
-            else
-                nOps = CTL_TwainAppMgr::GetCapOps(pSource, nCap, bCanQuerySupport);
+            // This is probably a custom capability
+            CTL_CapInfo Info(static_cast<CTL_EnumCapability>(nCap), 0, 0, 0, 0, 0, 0, 0, 0, 0);
+            pArray->insert(make_pair(nCap, Info));
         }
-        CTL_CapInfo Info(static_cast<CTL_EnumCapability>(nCap), cGet, cSet, nDataType, nOps, cGetCurrent, cGetDefault);
-        pArray->insert(make_pair(nCap, Info));
 
         if (bNewArray)
-            InfoSource = CTL_SourceCapInfo(pSource->GetProductName(), pArray, 0, 0, 0, 0, 0);
+            InfoSource = CTL_SourceCapInfo(pSource->GetProductName(), pArray, 0, 0, 0, 0, 0, 0,0,0);
 
         pSource->SetCapCached(static_cast<TW_UINT16>(*vIt), true);
     }
