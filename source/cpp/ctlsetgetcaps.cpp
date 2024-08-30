@@ -177,6 +177,7 @@ static DTWAIN_ARRAY performGetCap(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source,
     {
         const LONG nArrayType = GetArrayTypeFromCapType(static_cast<TW_UINT16>(nDataType));
         ThisArray = CreateArrayFromFactory(nArrayType, 0);
+        overrideDataType = nDataType;
     }
     else
         ThisArray = DTWAIN_ArrayCreateFromCap(Source, lCap, 0);
