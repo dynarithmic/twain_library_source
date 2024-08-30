@@ -302,13 +302,6 @@ bool ExecuteFeederState5Func(DTWAIN_SOURCE Source, LONG lCap)
 }
 
 ///////////////////////////////////////////////////////////
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnableAutoFeedNotify(LONG Latency, DTWAIN_BOOL bEnable)
-{
-    LOG_FUNC_ENTRY_PARAMS((Latency, bEnable))
-    LOG_FUNC_EXIT_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-
 VOID CALLBACK ThisTimerProc(HWND, UINT, ULONG idEvent, DWORD)
 {
     return;

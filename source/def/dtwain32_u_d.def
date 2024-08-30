@@ -968,7 +968,6 @@ DTWAIN_SetBlankPageDetectionExString              @30271
 DTWAIN_SetBlankPageDetectionExStringA             @30272   
 DTWAIN_SetBlankPageDetectionExStringW             @30273 
 DTWAIN_ArrayFrameSetFrameAt                       @30280
-DTWAIN_EnableAutoFeedNotify                       @30290
 DTWAIN_SetAcquireStripSize                        @30291
 DTWAIN_IsMemFileXferSupported                     @30292
 DTWAIN_IsImageAddressingSupported                 @30300

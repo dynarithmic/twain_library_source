@@ -386,7 +386,6 @@ DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsAutoFeedEnabled(DTWAIN_SOURCE Source)
 DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsAutoFeedSupported(DTWAIN_SOURCE Source);
 LONG           DLLENTRY_DEF       DTWAIN_GetFeederFuncs(DTWAIN_SOURCE Source);
 DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_IsPaperDetectable(DTWAIN_SOURCE Source);
-DTWAIN_BOOL    DLLENTRY_DEF       DTWAIN_EnableAutoFeedNotify(LONG Latency, DTWAIN_BOOL bEnable);
 
 /* Duplex Scanner support */
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, LPLONG lpDupType);
