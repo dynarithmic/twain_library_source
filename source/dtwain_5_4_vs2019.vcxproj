@@ -1485,6 +1485,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\ctltr043.h" />
     <ClInclude Include="h\ctltwainidentity.h" />
     <ClInclude Include="h\ctltwainmsgloop.h" />
+    <ClInclude Include="h\ctlutils.h" />
     <ClInclude Include="h\dibinfox.h" />
     <ClInclude Include="h\dibmulti.h" />
     <ClInclude Include="h\dtwain_filesystem.h" />
