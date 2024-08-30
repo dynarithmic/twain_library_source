@@ -65,7 +65,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsCapSupported(DTWAIN_SOURCE Source, LONG lCapab
                 LOG_FUNC_EXIT_PARAMS(true)
             else
             {
-                DTWAIN_CollectCapabilityInfo(p, static_cast<TW_UINT16>(nCap), *pArray);
                 LOG_FUNC_EXIT_PARAMS(true)
             }
         }

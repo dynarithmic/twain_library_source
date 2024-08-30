@@ -30,7 +30,7 @@
 #include "ctltrall.h"
 #include "ctltmpl5.h"
 #include "errorcheck.h"
-
+#include "ctlutils.h"
 using namespace dynarithmic;
 bool dynarithmic::IsIntCapType(TW_UINT16 nCap)
 {
@@ -79,6 +79,7 @@ LONG dynarithmic::GetArrayTypeFromCapType(TW_UINT16 CapType)
             return DTWAIN_ARRAYLONG;
      }
 }
+
 
 static DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap,
                                                    LONG lGetType, LONG lContainerType,
@@ -438,6 +439,25 @@ DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap
                 LOG_FUNC_EXIT_PARAMS(false)
          }
     }
+    if (lCap >= CAP_CUSTOMBASE)
+    {
+        // Save the data type information in the general cap information structure,
+        // since the getting of the cap values was successful.
+        switch (lGetType)
+        {
+            case DTWAIN_CAPGET:
+                SetCapabilityInfo<CAPINFO_IDX_GETCONTAINER>(pHandle, Source, lContainerType, lCap);
+            break;
+            case DTWAIN_CAPGETCURRENT:
+                SetCapabilityInfo<CAPINFO_IDX_GETCURRENTCONTAINER>(pHandle, Source, lContainerType, lCap);
+            break;
+            case DTWAIN_CAPGETDEFAULT:
+                SetCapabilityInfo<CAPINFO_IDX_GETDEFAULTCONTAINER>(pHandle, Source, lContainerType, lCap);
+            break;
+        }
+        SetCapabilityInfo<CAPINFO_IDX_DATATYPE>(pHandle, Source, nDataType, lCap);
+    }
+
     arr.release();
     if ( bEnumeratorExists )
         pHandle->m_ArrayFactory->destroy(*pArray);
@@ -446,6 +466,7 @@ DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
+
 
 // Sets capability values.  This function does not test if the
 // capability exists, or if the container type is valid.  Use
@@ -504,7 +525,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap
         LONG TestContainer;
 
         if( lContainerType == DTWAIN_CONTDEFAULT )
-            TestContainer = DTWAIN_GetCapContainer(Source, lCap, lSetType);
+            TestContainer = DTWAIN_GetCapContainer(Source, lCap, lSetType); // Use the defaults to get the containers we know about
         else
             TestContainer = lContainerType;
 
@@ -513,29 +534,57 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap
         if( lContainerType == DTWAIN_CONTDEFAULT )
             lContainerType = TestContainer;
 
-        if( lSetType == DTWAIN_CAPSETAVAILABLE || lSetType == DTWAIN_CAPSETCURRENT )
+        if (lSetType == DTWAIN_CAPSETCURRENT)
             lSetType = DTWAIN_CAPSET;
+        else
+        if (lSetType == DTWAIN_CAPSETAVAILABLE || lSetType == DTWAIN_CAPSETCONSTRAINT)
+            lSetType = MSG_SETCONSTRAINT;
+
+        // Change to the real TWAIN set-constraint type
 
         DumpArrayContents(pArray, lCap);
 
-        // Change to the real TWAIN set-constraint type
-        if ( lSetType == DTWAIN_CAPSETCONSTRAINT )
-            lSetType = MSG_SETCONSTRAINT;
-
-        if (IsIntCapType(static_cast<TW_UINT16>(nDataType)))
-            bOk = performSetCap<LONG, TW_UINT32>(pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, lContainerType, lSetType, CTL_ArrayFactory::arrayTag::LongType, CTL_ArrayIntType, nDataType);
-        else
-        if (IsFloatCapType(static_cast<TW_UINT16>(nDataType)))
-            bOk = performSetCap<double, double>(pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, lContainerType, lSetType, CTL_ArrayFactory::arrayTag::DoubleType, CTL_ArrayDoubleType, nDataType);
-        else
-        if ( IsStringCapType(static_cast<TW_UINT16>(nDataType)))
-            bOk = performSetCap<std::string, std::string, std::string, StringSetCapConverterA>
-                          (pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, lContainerType, lSetType, CTL_ArrayFactory::arrayTag::StringType, CTL_ArrayStringType, nDataType);
-        else
-        if ( IsFrameCapType(static_cast<TW_UINT16>(nDataType)))
+        // If the container type has multiple options, we will try each container until we get an ok or we get a failure of all attempts of setting the
+        // capability.
+        auto allContainers = dynarithmic::getSetBitsAsVector(lContainerType);
+        for (auto& containerType : allContainers)
         {
-            bOk = performSetCap<TW_FRAME, TW_FRAME, TwainFrameInternal, FrameSetCapConverter>
-            (pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, lContainerType, lSetType, CTL_ArrayFactory::arrayTag::FrameType, CTL_ArrayTWFrameType, nDataType);
+            if (IsIntCapType(static_cast<TW_UINT16>(nDataType)))
+                bOk = performSetCap<LONG, TW_UINT32>(pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::LongType, CTL_ArrayIntType, nDataType);
+            else
+            if (IsFloatCapType(static_cast<TW_UINT16>(nDataType)))
+                bOk = performSetCap<double, double>(pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::DoubleType, CTL_ArrayDoubleType, nDataType);
+            else
+            if ( IsStringCapType(static_cast<TW_UINT16>(nDataType)))
+                bOk = performSetCap<std::string, std::string, std::string, StringSetCapConverterA>
+                              (pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::StringType, CTL_ArrayStringType, nDataType);
+            else
+            if ( IsFrameCapType(static_cast<TW_UINT16>(nDataType)))
+            {
+                bOk = performSetCap<TW_FRAME, TW_FRAME, TwainFrameInternal, FrameSetCapConverter>
+                (pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::FrameType, CTL_ArrayTWFrameType, nDataType);
+            }
+            if (bOk)
+            {
+                if (lCap >= CAP_CUSTOMBASE)
+                {
+                    // Since this is a custom capability, we will save the information that worked (capability type and
+                    // container type)
+                    switch (lSetType)
+                    {
+                        case DTWAIN_CAPSET:
+                        case DTWAIN_CAPSETCURRENT:
+                            SetCapabilityInfo<CAPINFO_IDX_SETCONTAINER>(pHandle, Source, containerType, lCap);
+                        break;
+                        case DTWAIN_CAPSETAVAILABLE:
+                        case DTWAIN_CAPSETCONSTRAINT:
+                            SetCapabilityInfo<CAPINFO_IDX_SETCONSTRAINTCONTAINER>(pHandle, Source, containerType, lCap);
+                        break;
+                    }
+                    SetCapabilityInfo<CAPINFO_IDX_DATATYPE>(pHandle, Source, nDataType, lCap);
+                }
+                break; // get out now
+            }
         }
     }
     LOG_FUNC_EXIT_PARAMS(bOk)

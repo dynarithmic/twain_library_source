@@ -60,7 +60,6 @@ CTL_TwainDLLHandle::CTL_TwainDLLHandle() : m_hWndTwain(nullptr),
                                            m_lErrorProcUserData(0),
                                            m_lErrorProcUserData64(0),
                                            m_pOCRDefaultEngine(nullptr),
-                                           m_bCheckFeederStatusOnOpen(true),
                                            m_Twain2Func{}
 #ifdef _WIN32
                                            , m_hOrigProc(nullptr)

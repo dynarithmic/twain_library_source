@@ -229,8 +229,25 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCap
 
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
-    const CTL_CapInfo CapInfo = GetCapInfo(pHandle, p, static_cast<TW_UINT16>(lCapability));
-    *lpOps = std::get<4>(CapInfo);
+
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return lpOps == NULL; },
+                                        DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+
+    CTL_CapInfo* CapInfo = GetCapInfo(pHandle, p, static_cast<TW_UINT16>(lCapability));
+    if (!CapInfo)
+    {
+        *lpOps = 0;
+        LOG_FUNC_EXIT_PARAMS(false)
+    }
+    *lpOps = std::get<CAPINFO_IDX_SUPPORTEDOPS>(*CapInfo);
+    if (*lpOps == 0)
+    {
+        // Try and get the operations now from TWAIN
+        *lpOps = CTL_TwainAppMgr::GetCapOps(p, lCapability, true);
+        if (*lpOps != 0)
+            // Replace 0 with what TWAIN found out about the supported operations
+            std::get<CAPINFO_IDX_SUPPORTEDOPS>(*CapInfo) = *lpOps;
+    }
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }

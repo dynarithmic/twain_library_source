@@ -396,7 +396,19 @@ bool CTL_TwainAppMgr::OpenSource( CTL_ITwainSession* pSession, const CTL_ITwainS
     return false;
 }
 
-bool CTL_TwainAppMgr::GetBestContainerType(const CTL_ITwainSource* pSource,
+LONG CTL_TwainAppMgr::DoCapContainerTest(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, TW_UINT16 nCap, LONG lGetType)
+{
+    const auto pSession = pSource->GetTwainSession();
+    CTL_CapabilityGetTriplet CapTester(pSession, pSource, static_cast<CTL_EnumGetType>(lGetType), static_cast<TW_UINT16>(nCap), 0);
+    CapTester.SetTestMode(true);
+    const TW_UINT16 rc = CapTester.Execute();
+    if (rc == TWRC_SUCCESS)
+        return CapTester.GetSupportedContainer();
+    return 0;
+}
+
+bool CTL_TwainAppMgr::GetBestContainerType(CTL_TwainDLLHandle* pHandle,
+                                           const CTL_ITwainSource* pSource,
                                            CTL_EnumCapability nCap,
                                            UINT & rContainerGet,
                                            UINT & rContainerSet,
@@ -427,13 +439,26 @@ bool CTL_TwainAppMgr::GetBestContainerType(const CTL_ITwainSource* pSource,
          lGetType == CTL_GetTypeGETCURRENT && !flags[1] ||
          lGetType == CTL_GetTypeGETDEFAULT && !flags[2];
 
-    // Get the possible container types for the get cap
-    if ( bGetTheCap )
+    // Get the possible container types for the get cap.  We can skip
+    // this test if the startup option to perform this test is set to false
+
+    // Get the possible container types for the set cap.  We always need to 
+    // do this "manually", and not try to use TWAIN to test what works for 
+    // SETxxx operations
+    rContainerSet = GetContainerTypesFromCap(nCap, 1);
+
+    // Go through the GETxxx testing to determine the best container
+    // to use for those operations.  We can use TWAIN for this, as 
+    // all we are doing is getting values and seeing what container
+    // we can use.
+    //
+    // Only perform this operation if the startup options in DTWAINxx.INI
+    // state we should do this.  Otherwise we get the GET containers on an
+    // individual basis if the user calls DTWAIN_GetCapValues or similar
+    // function.
+    if (pHandle->m_OnSourceOpenProperties.m_bQueryBestCapContainer && bGetTheCap)
     {
         rContainerGet = GetContainerTypesFromCap( nCap, 0 );
-
-        // Get the possible container types for the set cap
-        rContainerSet = GetContainerTypesFromCap( nCap, 1 );
 
         // Check if there is only one type of "Get"
         if ( !( rContainerGet == TwainContainer_ONEVALUE ||
