@@ -2633,4 +2633,6 @@ Class DTWAINAPI
     Declare Unicode Function DTWAIN_GetTwainAvailabilityExW Lib "dtwain64d.dll" (ByVal sz As System.IntPtr, ByVal nLength As Integer) As Integer
     Declare Auto Function DTWAIN_GetTwainAvailabilityEx Lib "dtwain64d.dll" (ByVal sz As System.IntPtr, ByVal nLength As Integer) As Integer
 
+    Declare Auto Function DTWAIN_TestGetCap Lib "dtwain64d.dll" (ByVal Source As System.IntPtr, ByVal lCapability As Integer) As System.IntPtr
+
 End Class
