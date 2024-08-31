@@ -1040,3 +1040,4 @@ DTWAIN_GetTwainAvailabilityExW                    @31035
 DTWAIN_IsTwainAvailableEx                         @31036
 DTWAIN_IsTwainAvailableExA                        @31037
 DTWAIN_IsTwainAvailableExW                        @31038
+DTWAIN_TestGetCap                                 @31039
