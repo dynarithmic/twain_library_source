@@ -396,10 +396,6 @@ namespace dynarithmic
                     {
                         DataType pData;
                         const size_t nNumItems = pTrip->GetNumItems();
-
-                        if ( nNumItems == 0 )
-                            pArray.push_back(0);
-                        else
                         for ( size_t i = 0; i < nNumItems; i++ )
                         {
                             pTrip->GetValue( &pData, i );
