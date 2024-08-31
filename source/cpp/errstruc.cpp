@@ -864,9 +864,8 @@ std::string DecodeSourceInfo(pTW_IDENTITY pIdentity, LPCSTR sPrefix)
 
 std::string DecodeSupportedGroups(TW_UINT32 SupportedGroups)
 {
-    StringStreamA sBuffer;
+    std::vector<std::string> allGroups;
     constexpr unsigned int numberOfBits = sizeof(TW_UINT32) << 3;
-    bool foundGroup = false;
     for (unsigned int i = 0; i < numberOfBits; ++i)
     {
         const unsigned int curGroup = static_cast<TW_UINT32>(1) << i;
@@ -874,17 +873,12 @@ std::string DecodeSupportedGroups(TW_UINT32 SupportedGroups)
         {
             auto it = CTL_ErrorStructDecoder::s_mapSupportedGroups.find( curGroup );
             if ( it != CTL_ErrorStructDecoder::s_mapSupportedGroups.end() )
-            {
-                if ( foundGroup )
-                    sBuffer << ",";
-                sBuffer << " " << it->second;
-                foundGroup = true;
-            }
+                allGroups.push_back(it->second);
             else
-                sBuffer << " Unknown" << curGroup << "";
+                allGroups.push_back("Unknown (" + std::to_string(curGroup) + ")");
         }
     }
-    return sBuffer.str();
+    return StringWrapperA::Join(allGroups, ", ");
 }
 
 std::string DecodeTW_MEMORY(pTW_MEMORY pMemory, LPCSTR pMem)
