@@ -2668,5 +2668,7 @@ function DTWAIN_IsTwainAvailableEx(lpszPath:LPTSTR; nLength:LONG):LONG;overload;
 function DTWAIN_GetTwainAvailabilityExA(lpszPath:LPSTR; nLength:LONG):LONG;overload;stdcall; external 'dtwain32d.dll'   name 'DTWAIN_GetTwainAvailabilityExA';
 function DTWAIN_GetTwainAvailabilityExW(lpszPath:LPWSTR; nLength:LONG):LONG;overload;stdcall; external 'dtwain32d.dll'   name 'DTWAIN_GetTwainAvailabilityExW';
 function DTWAIN_GetTwainAvailabilityEx(lpszPath:LPTSTR; nLength:LONG):LONG;overload;stdcall; external 'dtwain32d.dll'   name 'DTWAIN_GetTwainAvailabilityEx';
+function DTWAIN_TestGetCap(source:DTWAIN_SOURCE; nCapability:LONG):DTWAIN_ARRAY;stdcall; external 'dtwain32d.dll'   name 'DTWAIN_TestGetCap';
+
     implementation
 end.
