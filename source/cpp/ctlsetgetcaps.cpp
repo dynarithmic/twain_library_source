@@ -348,6 +348,9 @@ DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap
     bool bEnumeratorExists = pHandle->m_ArrayFactory->is_valid(*pArray);
     if ( bEnumeratorExists )
         pHandle->m_ArrayFactory->clear(*pArray);
+    else
+    if (pArray)
+        *pArray = nullptr;
 
 	CHECK_IF_CAP_SUPPORTED(p, pHandle, lCap, false)
 
