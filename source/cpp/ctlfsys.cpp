@@ -53,6 +53,33 @@ typedef bool (*WALKFSPROC)(TW_FILESYSTEM* p, LPARAM UserParam);
 static bool WalkFileSystem(WALKFSPROC pProc, CTL_ITwainSource* pSource, LPCTSTR szDir, LPARAM UserParam);
 static bool EnumCameraProc(TW_FILESYSTEM* p, LPARAM UserParam);
 
+static int CheckFileSystemSupport(CTL_ITwainSource* pSource)
+{
+    // If source is not open, return an error
+    if (!CTL_TwainAppMgr::IsSourceOpen(pSource))
+        return DTWAIN_ERR_SOURCE_NOT_OPEN;
+
+    auto getSupport = pSource->IsFileSystemSupported();
+
+    // If already determined that source does not support
+    // file system, return error.
+    if (!getSupport)
+        return DTWAIN_ERR_FILESYSTEM_NOT_SUPPORTED;
+
+    if (getSupport.value == boost::tribool::indeterminate_value)
+    {
+        // Test if source supports file system
+        const DTWAIN_BOOL bRet = FSDirectory(pSource, _T("/"), CHANGE_DIRECTORY);
+        pSource->SetFileSystemSupported(bRet);
+
+        // return results
+        return bRet?DTWAIN_NO_ERROR:DTWAIN_ERR_FILESYSTEM_NOT_SUPPORTED;
+    }
+
+    // Already tested and determined that source supports file system
+    return DTWAIN_NO_ERROR;
+}
+
 /**********************************************************************************/
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFileSystemSupported(DTWAIN_SOURCE Source )
 {
@@ -63,11 +90,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFileSystemSupported(DTWAIN_SOURCE Source )
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
 
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen( pSource );},
-                                      DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+    int fsSupported = CheckFileSystemSupport(pSource);
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return fsSupported != DTWAIN_NO_ERROR; },
+                                      fsSupported, false, FUNC_MACRO);
 
-    const DTWAIN_BOOL bRet = FSDirectory(pSource, _T("/"), CHANGE_DIRECTORY);
-    LOG_FUNC_EXIT_PARAMS(bRet)
+    LOG_FUNC_EXIT_PARAMS(fsSupported == DTWAIN_NO_ERROR)
     CATCH_BLOCK(false)
 }
 
@@ -80,8 +107,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSChangeDirectory(DTWAIN_SOURCE Source, LPCTSTR 
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return !CTL_TwainAppMgr::IsSourceOpen( pSource );},
-                                    DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+    int fsSupported = CheckFileSystemSupport(pSource);
+
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return fsSupported != DTWAIN_NO_ERROR; },
+                                      fsSupported, false, FUNC_MACRO);
 
     // Get session pointer
     const DTWAIN_BOOL bRet = FSDirectory(pSource, szNewDir, CHANGE_DIRECTORY);
@@ -97,10 +126,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSGetFirstFile(DTWAIN_SOURCE Source, LPTSTR szDi
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !FSHandle;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    int fsSupported = CheckFileSystemSupport(pSource);
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !CTL_TwainAppMgr::IsSourceOpen( pSource );},
-                                      DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return fsSupported != DTWAIN_NO_ERROR; },
+        fsSupported, false, FUNC_MACRO);
 
     // Get session pointer
     const DTWAIN_BOOL bRet = FSGetFile(pSource, szDir, FSHandle, GET_FIRST);
@@ -117,10 +146,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSGetNextFile(DTWAIN_SOURCE Source, LPTSTR szDir
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !FSHandle;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    int fsSupported = CheckFileSystemSupport(pSource);
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !CTL_TwainAppMgr::IsSourceOpen( pSource );},
-                                      DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return fsSupported != DTWAIN_NO_ERROR; },
+        fsSupported, false, FUNC_MACRO);
 
     // Get session pointer
     const DTWAIN_BOOL bRet = FSGetFile(pSource, szDir, FSHandle, GET_NEXT);
@@ -137,10 +166,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSGetClose(DTWAIN_SOURCE Source, LPLONG FSHandle
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !FSHandle;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    int fsSupported = CheckFileSystemSupport(pSource);
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !CTL_TwainAppMgr::IsSourceOpen( pSource );},
-                                      DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return fsSupported != DTWAIN_NO_ERROR; },
+        fsSupported, false, FUNC_MACRO);
 
     // Get session pointer
     const DTWAIN_BOOL bRet = FSGetFile(pSource, nullptr, FSHandle, GET_CLOSE);
@@ -157,10 +186,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSGetFileType(DTWAIN_SOURCE Source, LPCTSTR szFi
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !pFileType;}, DTWAIN_ERR_INVALID_PARAM,false, FUNC_MACRO);
+    int fsSupported = CheckFileSystemSupport(pSource);
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !CTL_TwainAppMgr::IsSourceOpen( pSource );},
-                                      DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return fsSupported != DTWAIN_NO_ERROR; },
+        fsSupported, false, FUNC_MACRO);
 
     TW_FILESYSTEM *pFS = pSource->GetFileSystem();
     const DTWAIN_BOOL bRet = FSGetFileInfo(pSource, szFileName, pFS);
@@ -178,10 +207,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSCreateDirectory(DTWAIN_SOURCE Source, LPCTSTR 
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !szNewDir;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    int fsSupported = CheckFileSystemSupport(pSource);
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !CTL_TwainAppMgr::IsSourceOpen( pSource );},
-                                      DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return fsSupported != DTWAIN_NO_ERROR; },
+        fsSupported, false, FUNC_MACRO);
 
     const DTWAIN_BOOL bRet = FSDirectory(pSource, szNewDir, CREATE_DIRECTORY);
     LOG_FUNC_EXIT_PARAMS(bRet)
@@ -197,10 +226,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSCopy(DTWAIN_SOURCE Source, LPCTSTR szInput, LP
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]{return !szInput || !szOutput;}, DTWAIN_ERR_INVALID_PARAM,
-                                      false, FUNC_MACRO);
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !CTL_TwainAppMgr::IsSourceOpen( pSource );},
-                                      DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+    int fsSupported = CheckFileSystemSupport(pSource);
+
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return fsSupported != DTWAIN_NO_ERROR; },
+        fsSupported, false, FUNC_MACRO);
 
     const DTWAIN_BOOL bRet = FSFileOp(pSource, szInput, szOutput, COPY_DIRECTORY);
     LOG_FUNC_EXIT_PARAMS(bRet)
@@ -217,11 +246,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSRename(DTWAIN_SOURCE Source, LPCTSTR szInput, 
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !szInput || !szOutput;}, DTWAIN_ERR_INVALID_PARAM,
-                                      false, FUNC_MACRO);
+    int fsSupported = CheckFileSystemSupport(pSource);
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !CTL_TwainAppMgr::IsSourceOpen( pSource );},
-                                        DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return fsSupported != DTWAIN_NO_ERROR; },
+        fsSupported, false, FUNC_MACRO);
 
     const DTWAIN_BOOL bRet = FSFileOp(pSource, szInput, szOutput, RENAME_DIRECTORY);
     LOG_FUNC_EXIT_PARAMS(bRet)
@@ -239,11 +267,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSDelete(DTWAIN_SOURCE Source, LPCTSTR szInput,
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !szInput; },
-                                        DTWAIN_ERR_INVALID_PARAM,false, FUNC_MACRO);
+    int fsSupported = CheckFileSystemSupport(pSource);
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !CTL_TwainAppMgr::IsSourceOpen(pSource); },
-                                    DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return fsSupported != DTWAIN_NO_ERROR; },
+        DTWAIN_ERR_FILESYSTEM_NOT_SUPPORTED, fsSupported, FUNC_MACRO);
 
     const DTWAIN_BOOL bRet = FSFileOp2(pSource, szInput, bRecursive, DELETE_DIRECTORY);
 
@@ -260,11 +287,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSFormat(DTWAIN_SOURCE Source, LPCTSTR szDir)
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !szDir; }, DTWAIN_ERR_INVALID_PARAM,
-                                     false, FUNC_MACRO);
+    int fsSupported = CheckFileSystemSupport(pSource);
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !CTL_TwainAppMgr::IsSourceOpen(pSource); },
-                                      DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return fsSupported != DTWAIN_NO_ERROR; },
+        fsSupported, false, FUNC_MACRO);
 
     const DTWAIN_BOOL bRet = FSDirectory(pSource, szDir, FORMAT_MEDIA);
     LOG_FUNC_EXIT_PARAMS(bRet)
@@ -285,15 +311,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumTopCameras(DTWAIN_SOURCE Source, LPDTWAIN_AR
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !Cameras; }, DTWAIN_ERR_INVALID_PARAM,
-        false, FUNC_MACRO);
+    int fsSupported = CheckFileSystemSupport(pSource);
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !CTL_TwainAppMgr::IsSourceOpen(pSource); },
-        DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return fsSupported != DTWAIN_NO_ERROR; },
+        fsSupported, false, FUNC_MACRO);
 
     FSGetCameras( pSource, Cameras, DTWAIN_FT_CAMERATOP );
 
-   LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -305,12 +330,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumBottomCameras(DTWAIN_SOURCE Source, LPDTWAIN
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !Cameras; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !CTL_TwainAppMgr::IsSourceOpen(pSource); }, DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+    int fsSupported = CheckFileSystemSupport(pSource);
 
-    FSGetCameras( pSource, Cameras, DTWAIN_FT_CAMERABOTTOM );
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return fsSupported != DTWAIN_NO_ERROR; },
+        fsSupported, false, FUNC_MACRO);
 
-   LOG_FUNC_EXIT_PARAMS(true)
+    FSGetCameras(pSource, Cameras, DTWAIN_FT_CAMERABOTTOM);
+
+    LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -322,10 +349,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !Cameras; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !CTL_TwainAppMgr::IsSourceOpen(pSource); }, DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+    int fsSupported = CheckFileSystemSupport(pSource);
 
-    FSGetCameras( pSource, Cameras, DTWAIN_FT_CAMERA );
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return fsSupported != DTWAIN_NO_ERROR; },
+        fsSupported, false, FUNC_MACRO);
+
+    FSGetCameras(pSource, Cameras, DTWAIN_FT_CAMERA);
 
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
