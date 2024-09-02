@@ -25,6 +25,7 @@
 #include <vector>
 #include <sstream>
 #include <cctype>
+#include <numeric>
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string.hpp>
@@ -585,10 +586,26 @@ namespace dynarithmic
             return str;
         }
 
-        template <typename TArr = StringArrayType>
-        static StringType Join(const TArr& rArray, const StringType& sep = StringTraits::GetEmptyString())
+        template <typename Container>
+        static StringType Join(const Container& ct, const StringType& seperator = StringTraits::GetEmptyString())
         {
-            return boost::algorithm::join(rArray, sep);
+            return Join(ct.begin(), ct.end(), seperator);
+        }
+
+        template <typename Iter>
+        static StringType Join(Iter iter1, Iter iter2, const StringType& seperator = StringTraits::GetEmptyString())
+        {
+            StringTraits::outputstream_type strm;
+            return std::accumulate(iter1, iter2, StringType(),
+                [&](const auto& str, typename std::iterator_traits<Iter>::value_type val)
+                {
+                    strm.str(StringTraits::GetEmptyString());
+                    if (!str.empty())
+                        strm << str << seperator << val;
+                    else
+                        strm << val;
+                    return strm.str();
+                });
         }
 
         static int Tokenize(const StringType& str, const CharType *lpszTokStr,

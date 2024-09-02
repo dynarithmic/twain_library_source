@@ -28,10 +28,15 @@ namespace dynarithmic
     class CTL_CapStruct
     {
         public:
-            CTL_CapStruct() : m_nDataType(0), m_nGetContainer(0), m_nSetContainer(0) {}
-            UINT       m_nDataType;
-            UINT       m_nGetContainer;
-            UINT       m_nSetContainer;
+            CTL_CapStruct() = default;
+            UINT       m_nDataType = 0;
+            UINT       m_nGetContainer = 0;
+            UINT       m_nGetCurrentContainer = 0;
+            UINT       m_nGetDefaultContainer = 0;
+            UINT       m_nSetContainer = 0;
+            UINT       m_nSetConstraintContainer = 0;
+            UINT       m_nResetContainer = 0;
+            UINT       m_nQuerySupportContainer = 0;
             std::string m_strCapName;
             operator std::string() const;
     };

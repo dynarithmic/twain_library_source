@@ -88,7 +88,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     //
     // Since this operation may rely on the device hardware to respond to CAP_FEEDERLOADED
     // there is an optional check done that can be set in the DTWAIN INI file(s).
-    if (pHandle->m_bCheckFeederStatusOnOpen && DTWAIN_IsFeederSensitive(Source))
+    if (pHandle->m_OnSourceOpenProperties.m_bCheckFeederStatusOnOpen && DTWAIN_IsFeederSensitive(Source))
         pHandle->m_aFeederSources.insert(Source);
 
     // Get the supported transfer types

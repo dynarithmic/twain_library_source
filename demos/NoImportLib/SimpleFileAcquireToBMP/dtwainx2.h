@@ -31,6 +31,8 @@
 #include <dtwaindefs.h>
 #include <dtwain_version.h>
 #include <dtwpdft.h>
+#define DTWAIN_NOIMPORTLIB
+#include <dtwain_library_selector.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -973,6 +975,7 @@ typedef DTWAIN_HANDLE (DLLENTRY_DEF * D_SYSINITIALIZELIBEX2FUNC)                
 typedef LONG        (DLLENTRY_DEF * D_CALLDSMPROC)                              (DTWAIN_IDENTITY AppID, DTWAIN_IDENTITY SourceId, LONG lDG, LONG lDAT, LONG lMSG, LPVOID pData);
 typedef DTWAIN_ARRAY(DLLENTRY_DEF* D_ENUMSUPPORTEDSINGLEPAGEFILETYPES)          (VOID_PROTOTYPE);
 typedef DTWAIN_ARRAY(DLLENTRY_DEF* D_ENUMSUPPORTEDMULTIPAGEFILETYPES)           (VOID_PROTOTYPE);
+typedef LONG        (DLLENTRY_DEF* D_GETTWAINNAMEFROMCONSTANT)                  (LONG, LONG, LPTSTR, LONG nSize);
 typedef LONG        (DLLENTRY_DEF* D_GETTWAINNAMEFROMCONSTANTA)                 (LONG, LONG, LPSTR, LONG nSize);
 typedef LONG        (DLLENTRY_DEF* D_GETTWAINNAMEFROMCONSTANTW)                 (LONG, LONG, LPWSTR, LONG nSize);
 typedef LONG        (DLLENTRY_DEF* D_SETLASTERROR)                              (LONG);
@@ -1007,10 +1010,16 @@ typedef DTWAIN_SOURCE (DLLENTRY_DEF* D_SELECTDEFAULTSOURCEWITHOPENFUNC)         
 typedef LONG          (DLLENTRY_DEF* D_GETTWAINAVAILABILITYEXFUNC)               (LPTSTR, LONG);
 typedef LONG          (DLLENTRY_DEF* D_GETTWAINAVAILABILITYEXAFUNC)              (LPSTR, LONG);
 typedef LONG          (DLLENTRY_DEF* D_GETTWAINAVAILABILITYEXWFUNC)              (LPWSTR, LONG);
-typedef LONG          (DLLENTRY_DEF*  D_ISTWAINAVAILABLEEXFUNC)                   (LPTSTR, LONG);
-typedef LONG          (DLLENTRY_DEF*  D_ISTWAINAVAILABLEEXAFUNC)                  (LPSTR, LONG);
-typedef LONG          (DLLENTRY_DEF*  D_ISTWAINAVAILABLEEXWFUNC)                  (LPWSTR, LONG);
-
+typedef LONG          (DLLENTRY_DEF*  D_ISTWAINAVAILABLEEXFUNC)                  (LPTSTR, LONG);
+typedef LONG          (DLLENTRY_DEF*  D_ISTWAINAVAILABLEEXAFUNC)                 (LPSTR, LONG);
+typedef LONG          (DLLENTRY_DEF*  D_ISTWAINAVAILABLEEXWFUNC)                 (LPWSTR, LONG);
+typedef LONG          (DLLENTRY_DEF*  D_GETTWAINSTRINGNAMEFUNC)                  (LONG, LONG, LPTSTR, LONG);
+typedef LONG          (DLLENTRY_DEF*  D_GETTWAINSTRINGNAMEAFUNC)                 (LONG, LONG, LPSTR, LONG);
+typedef LONG          (DLLENTRY_DEF*  D_GETTWAINSTRINGNAMEWFUNC)                 (LONG, LONG, LPWSTR, LONG);
+typedef LONG          (DLLENTRY_DEF*  D_GETACTIVEDSMPATHFUNC)                    (LPTSTR, LONG);
+typedef LONG          (DLLENTRY_DEF*  D_GETACTIVEDSMPATHAFUNC)                   (LPSTR, LONG);
+typedef LONG          (DLLENTRY_DEF*  D_GETACTIVEDSMPATHWFUNC)                   (LPWSTR, LONG);
+typedef DTWAIN_BOOL   (DLLENTRY_DEF * D_ENUMCAMERASEXFUNC)                       (DTWAIN_SOURCE, LONG, LPDTWAIN_ARRAY);
 #ifdef __cplusplus
 }
 #endif
@@ -1195,6 +1204,7 @@ typedef LONG          (DLLENTRY_DEF*  D_ISTWAINAVAILABLEEXWFUNC)                
     STATIC D_ENUMBRIGHTNESSVALUESEXFUNC                     DTWAIN_EnumBrightnessValuesEx;
     STATIC D_ENUMBRIGHTNESSVALUESFUNC                       DTWAIN_EnumBrightnessValues;
     STATIC D_ENUMCAMERASFUNC                                DTWAIN_EnumCameras;
+    STATIC D_ENUMCAMERASEXFUNC                              DTWAIN_EnumCamerasEx;
     STATIC D_ENUMCOMPRESSIONTYPESEXFUNC                     DTWAIN_EnumCompressionTypesEx;
     STATIC D_ENUMCOMPRESSIONTYPESFUNC                       DTWAIN_EnumCompressionTypes;
     STATIC D_ENUMCONTRASTVALUESEXFUNC                       DTWAIN_EnumContrastValuesEx;
@@ -1316,6 +1326,9 @@ typedef LONG          (DLLENTRY_DEF*  D_ISTWAINAVAILABLEEXWFUNC)                
     STATIC D_GETACQUIRESTRIPBUFFERFUNC                      DTWAIN_GetAcquireStripBuffer;
     STATIC D_GETACQUIRESTRIPDATAFUNC                        DTWAIN_GetAcquireStripData;
     STATIC D_GETACQUIRESTRIPSIZESFUNC                       DTWAIN_GetAcquireStripSizes;
+    STATIC D_GETACTIVEDSMPATHFUNC                     DTWAIN_GetActiveDSMPath;
+    STATIC D_GETACTIVEDSMPATHAFUNC                    DTWAIN_GetActiveDSMPathA;
+    STATIC D_GETACTIVEDSMPATHWFUNC                    DTWAIN_GetActiveDSMPathW;
     STATIC D_GETALARMVOLUMEFUNC                             DTWAIN_GetAlarmVolume;
     STATIC D_GETAPIHANDLESTATUS                             DTWAIN_GetAPIHandleStatus;
     STATIC D_GETAPPINFOAFUNC                                DTWAIN_GetAppInfoA;
@@ -1572,8 +1585,12 @@ typedef LONG          (DLLENTRY_DEF*  D_ISTWAINAVAILABLEEXWFUNC)                
     STATIC D_GETTWAINLANGUAGEVALUEFUNC                      DTWAIN_GetTwainLanguageValue;
     STATIC D_GETTWAINLANGUAGEVALUEWFUNC                     DTWAIN_GetTwainLanguageValueW;
     STATIC D_GETTWAINMODEFUNC                               DTWAIN_GetTwainMode;
+    STATIC D_GETTWAINNAMEFROMCONSTANT                       DTWAIN_GetTwainNameFromConstant;
     STATIC D_GETTWAINNAMEFROMCONSTANTA                      DTWAIN_GetTwainNameFromConstantA;
     STATIC D_GETTWAINNAMEFROMCONSTANTW                      DTWAIN_GetTwainNameFromConstantW;
+    STATIC D_GETTWAINSTRINGNAMEFUNC                         DTWAIN_GetTwainStringName;
+    STATIC D_GETTWAINSTRINGNAMEAFUNC                        DTWAIN_GetTwainStringNameA;
+    STATIC D_GETTWAINSTRINGNAMEWFUNC                        DTWAIN_GetTwainStringNameW;
     STATIC D_GETTWAINTIMEOUTFUNC                            DTWAIN_GetTwainTimeout;
     STATIC D_GETVERSIONEXFUNC                               DTWAIN_GetVersionEx;
     STATIC D_GETVERSIONFUNC                                 DTWAIN_GetVersion;
@@ -1768,7 +1785,7 @@ typedef LONG          (DLLENTRY_DEF*  D_ISTWAINAVAILABLEEXWFUNC)                
     STATIC D_SETACQUIREIMAGESCALESTRINGFUNC                 DTWAIN_SetAcquireImageScaleString;
     STATIC D_SETACQUIREIMAGESCALESTRINGWFUNC                DTWAIN_SetAcquireImageScaleStringW;
     STATIC D_SETACQUIRESTRIPBUFFERFUNC                      DTWAIN_SetAcquireStripBuffer;
-    STATIC D_SETACQUIRESTRIPSIZEFUNC                        DTWAIN_SetAcquireStripSize;
+    STATIC D_SETACQUIRESTRIPSIZEFUNC                            DTWAIN_SetAcquireStripSize;
     STATIC D_SETALARMSFUNC                                  DTWAIN_SetAlarms;
     STATIC D_SETALARMVOLUMEFUNC                             DTWAIN_SetAlarmVolume;
     STATIC D_SETALLCAPSTODEFAULTFUNC                        DTWAIN_SetAllCapsToDefault;

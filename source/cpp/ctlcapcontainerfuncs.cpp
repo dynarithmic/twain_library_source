@@ -22,6 +22,8 @@
 #include "ctltwmgr.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
+#include "ctlutils.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -67,6 +69,26 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainerEx(LONG nCap, DTWAIN_BOOL bSetContainer,
     CATCH_BLOCK(0)
 }
 
+template <int CapInfoIdx>
+static LONG PerformCapContainerTest(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG nCap, LONG lCapType, CTL_CapInfo* CapInfo)
+{
+    // Get the container information for this cap
+    LONG lResults = (LONG)std::get<CapInfoIdx>(*CapInfo);
+
+    // Test if the container info specifies a single container type
+    size_t numBitsOn = dynarithmic::countOnes(lResults);
+    if (numBitsOn == 1)
+        return lResults;  // This is a single container type
+
+    // Multiple container options exist for this cap or we have no idea (a custom cap).  Use TWAIN to get the best container type now
+    lResults = CTL_TwainAppMgr::DoCapContainerTest(pHandle, pSource, static_cast<CTL_EnumCapability>(nCap), lCapType);
+
+    // Replace container information with the updated information
+    std::get<CapInfoIdx>(*CapInfo) = lResults;
+    return lResults;
+}
+
+
 LONG DLLENTRY_DEF DTWAIN_GetCapContainer(DTWAIN_SOURCE Source, LONG nCap, LONG lCapType)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nCap, lCapType))
@@ -88,77 +110,44 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainer(DTWAIN_SOURCE Source, LONG nCap, LONG l
     const auto iter = pArray->find(static_cast<TW_UINT16>(nCap));
     if (iter != pArray->end())
     {
-        const CTL_CapInfo CapInfo = iter->second;
+        LONG lResults = 0;
+        CTL_CapInfo* CapInfo = &iter->second;
+
         switch (lCapType)
         {
             case DTWAIN_CAPGET:
-                LOG_FUNC_EXIT_PARAMS((LONG)std::get<1>(CapInfo))
+            {
+                lResults = PerformCapContainerTest<CAPINFO_IDX_GETCONTAINER>(pHandle, p, nCap, lCapType, CapInfo);
+                LOG_FUNC_EXIT_PARAMS(lResults);
+            }
 
             case DTWAIN_CAPGETCURRENT:
-                LOG_FUNC_EXIT_PARAMS((LONG)std::get<5>(CapInfo))
-
+            {
+                lResults = PerformCapContainerTest<CAPINFO_IDX_GETCURRENTCONTAINER>(pHandle, p, nCap, lCapType, CapInfo);
+                LOG_FUNC_EXIT_PARAMS(lResults);
+            }
             case DTWAIN_CAPGETDEFAULT:
-                LOG_FUNC_EXIT_PARAMS((LONG)std::get<6>(CapInfo))
+            {
+                lResults = PerformCapContainerTest<CAPINFO_IDX_GETDEFAULTCONTAINER>(pHandle, p, nCap, lCapType, CapInfo);
+                LOG_FUNC_EXIT_PARAMS(lResults);
+            }
 
             case DTWAIN_CAPSET:
-            case DTWAIN_CAPSETAVAILABLE:
             case DTWAIN_CAPSETCURRENT:
+            {
+                LOG_FUNC_EXIT_PARAMS(static_cast<LONG>(std::get<CAPINFO_IDX_SETCONTAINER>(*CapInfo)));
+            }
+            break;
+            case DTWAIN_CAPSETAVAILABLE:
             case DTWAIN_CAPSETCONSTRAINT:
             {
-                LONG Value = static_cast<LONG>(std::get<2>(CapInfo));
-                LONG bResult1 = 0, bResult2 = 0;
-                if (Value == 0)
-                    LOG_FUNC_EXIT_PARAMS(0)
-                LONG nHold = 0;
-                if (lCapType == DTWAIN_CAPSETAVAILABLE)
-                    lCapType = DTWAIN_CAPSETCURRENT;
-
-                if (lCapType == DTWAIN_CAPSETCURRENT)
-                    nHold = std::get<5>(CapInfo);
-                if (/* lCapType == DTWAIN_CAPSETCURRENT ||*/
-                    lCapType == DTWAIN_CAPSET)
-                    bResult1 = (Value & TwainContainer_ONEVALUE) || (Value & TwainContainer_ARRAY);
-                else
-                    bResult2 = (Value & TwainContainer_ENUMERATION) || (Value & TwainContainer_RANGE) || (Value & TwainContainer_ARRAY);
-                if (!bResult1 && !bResult2 && !nHold)
-                    LOG_FUNC_EXIT_PARAMS(0)
-                if (!bResult1 && !bResult2 && nHold)
-                    LOG_FUNC_EXIT_PARAMS(nHold)
-
-                    // Check container for CAPGET
-                const LONG GetContainer = static_cast<LONG>(std::get<1>(CapInfo));
-
-                    // Return if containers are the same
-                    if (lCapType == DTWAIN_CAPSETCURRENT ||
-                        lCapType == DTWAIN_CAPSET)
-                    {
-                        // Check if container for get is RANGE
-                        // Return TW_ONEVALUE, since you can't set multiple
-                        // values in the range with SET or SETCURRENT
-                        if (GetContainer == TwainContainer_RANGE)
-                            LOG_FUNC_EXIT_PARAMS(TwainContainer_ONEVALUE)
-
-                        if (bResult1 == 0)
-                            LOG_FUNC_EXIT_PARAMS(GetContainer)
-                        if (Value & GetContainer &&
-                            (GetContainer == TwainContainer_ONEVALUE || GetContainer == TwainContainer_ARRAY))
-                            LOG_FUNC_EXIT_PARAMS(GetContainer)
-                        else
-                            LOG_FUNC_EXIT_PARAMS(TwainContainer_ONEVALUE)
-                    }
-                    else
-                    {
-                        if (bResult2 == 0)
-                            LOG_FUNC_EXIT_PARAMS(GetContainer)
-                        if (Value & GetContainer &&
-                            (GetContainer == TwainContainer_ENUMERATION || GetContainer == TwainContainer_RANGE))
-                                LOG_FUNC_EXIT_PARAMS(GetContainer)
-                        else
-                            LOG_FUNC_EXIT_PARAMS(Value & ~GetContainer)
-                    }
+                LOG_FUNC_EXIT_PARAMS(static_cast<LONG>(std::get<CAPINFO_IDX_SETCONSTRAINTCONTAINER>(*CapInfo)));
             }
-            default:
-                LOG_FUNC_EXIT_PARAMS(DTWAIN_CONTONEVALUE)
+            break;
+            case DTWAIN_CAPRESET:
+            {
+                LOG_FUNC_EXIT_PARAMS(static_cast<LONG>(std::get<CAPINFO_IDX_RESETCONTAINER>(*CapInfo)));
+            }
         }
     }
     LOG_FUNC_EXIT_PARAMS(0L)
@@ -214,7 +203,7 @@ LONG GetCustomCapDataType(DTWAIN_SOURCE Source, TW_UINT16 nCap)
     if (iter != pArray->end())
     {
         CTL_CapInfo CapInfo = iter->second;
-        LONG nValue = static_cast<LONG>(std::get<3>(CapInfo));
+        LONG nValue = static_cast<LONG>(std::get<CAPINFO_IDX_DATATYPE>(CapInfo));
         if (nValue == DTWAIN_CAPDATATYPE_UNKNOWN)
             nValue = DTWAIN_ERR_UNKNOWN_CAPDATATYPE;
         LOG_FUNC_EXIT_PARAMS(nValue) // Capability data type value

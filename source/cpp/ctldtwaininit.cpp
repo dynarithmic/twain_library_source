@@ -98,7 +98,7 @@ static bool SysDestroyHelper(CTL_TwainDLLHandle* pHandle, bool bCheck=true);
 static void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL);
 static void LoadTransferReadyOverrides();
 static void LoadFlatbedOnlyOverrides();
-static void LoadCheckFeederStatusOnOpen(CTL_TwainDLLHandle* pHandle);
+static void LoadOnSourceOpenProperties(CTL_TwainDLLHandle* pHandle);
 static bool LoadGeneralResources(bool blockExecution);
 
 #ifdef _WIN32
@@ -110,8 +110,6 @@ static WNDPROC SubclassTwainMsgWindow(HWND hWnd, WNDPROC wProcIn = nullptr);
 #endif
 
 static void LogDTWAINErrorToMsgBox(int nError, LPCSTR pFunc, const std::string& s);
-static std::string FixPathStringA( LPCSTR szINIPath );
-static std::wstring FixPathStringW(LPCWSTR szINIPath);
 
 /* Set the paths for image DLL's and language resource */
 static DTWAIN_BOOL SetLangResourcePath(LPCTSTR szPath);
@@ -119,14 +117,9 @@ static std::string GetStaticLibVer();
 static void LoadStaticData(CTL_TwainDLLHandle*);
 static bool GetDTWAINDLLVersionInfo(HMODULE hMod, LONG* lMajor, LONG* lMinor, LONG *pPatch);
 static CTL_StringType GetDTWAINDLLVersionInfoStr();
+static CTL_StringType GetDTWAINInternalBuildNumber();
 static DTWAIN_BOOL DTWAIN_GetVersionInternal(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatch);
 static std::string CheckSearchOrderString(std::string);
-
-#ifdef UNICODE
-#define FixPathString FixPathStringW
-#else
-#define FixPathString FixPathStringA
-#endif
 
 #ifdef DTWAIN_LIB
     static void GetVersionFromResource(LPLONG lMajor, LPLONG lMinor, LPLONG patch);
@@ -575,7 +568,7 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_GetDTWAINHandle()
 DTWAIN_BOOL SetLangResourcePath(LPCTSTR szPath)
 {
     LOG_FUNC_ENTRY_PARAMS((szPath))
-    CTL_StaticData::s_strLangResourcePath = FixPathString(szPath);
+    CTL_StaticData::s_strLangResourcePath = StringWrapper::AddBackslashToDirectory(szPath);
     LOG_FUNC_EXIT_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -798,7 +791,7 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeLibEx(HINSTANCE hInstance, LPCTST
 {
     LOG_FUNC_ENTRY_PARAMS((hInstance, szINIPath))
 
-    CTL_StaticData::s_sINIPath = FixPathString(szINIPath);
+    CTL_StaticData::s_sINIPath = StringWrapper::AddBackslashToDirectory(szINIPath);
 
     const DTWAIN_HANDLE Handle = DTWAIN_SysInitializeLib(hInstance);
     LOG_FUNC_EXIT_PARAMS(Handle)
@@ -822,7 +815,7 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx2(LPCTSTR szINIPath,
 DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx(LPCTSTR szINIPath)
 {
     LOG_FUNC_ENTRY_PARAMS((szINIPath))
-    CTL_StaticData::s_sINIPath = FixPathString(szINIPath);
+    CTL_StaticData::s_sINIPath = StringWrapper::AddBackslashToDirectory(szINIPath);
     const DTWAIN_HANDLE Handle = DTWAIN_SysInitialize();
     LOG_FUNC_EXIT_PARAMS(Handle)
     CATCH_BLOCK(DTWAIN_HANDLE(0))
@@ -910,7 +903,7 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
                 LoadFlatbedOnlyOverrides();
 
                 // Load check feeder on open status
-                LoadCheckFeederStatusOnOpen(pHandle);
+                LoadOnSourceOpenProperties(pHandle);
 
                 // Initialize imaging code
                 FreeImage_Initialise(true);
@@ -2036,34 +2029,10 @@ std::string GetStaticLibVer()
     {
         switch (nVer)
         {
-            case 10:
-                return "Microsoft Visual C++ 5.0";
-            case 11:
-                return "Microsoft Visual C++ 6.0";
-            case 12:
-                return "Microsoft Visual C++ 7.0";
-            case 18:
-                return "Microsoft Visual Studio 2003";
-            case 20:
-                return "Microsoft Visual Studio 2005";
-            case 21:
-                return "Microsoft Visual Studio 2008";
-            case 31:
-                return "Microsoft Visual Studio 2010";
-            case 41:
-                return "Microsoft Visual Studio 2012";
-            case 51:
-                return "Microsoft Visual Studio 2013";
-            case 22:
-                return "gcc/MingW";
-            case 24:
-                return "Metrowerks CodeWarrior";
-            case 26:
-                return "Borland C++ Builder";
-            case 28:
-                return "Borland C++ 5.0";
-            case 30:
-                return "Digital Mars";
+            case 81:
+                return "Microsoft Visual Studio 2019";
+            case 91:
+                return "Microsoft Visual Studio 2022";
         }
     }
     return {};
@@ -2104,7 +2073,7 @@ LONG DLLENTRY_DEF DTWAIN_GetVersionInfo(LPTSTR lpszVer, LONG nLength)
 LONG DLLENTRY_DEF DTWAIN_GetVersionCopyright(LPTSTR lpszVer, LONG nLength)
 {
     LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
-    const LONG RetVal = GetResourceString(IDS_DTWAIN_APPTITLE, lpszVer, nLength);
+    const LONG RetVal = static_cast<LONG>(GetResourceString(IDS_DTWAIN_APPTITLE, lpszVer, nLength));
     LOG_FUNC_EXIT_PARAMS(RetVal)
     CATCH_BLOCK(-1)
 }
@@ -2216,7 +2185,9 @@ CTL_StringType dynarithmic::GetVersionString()
         }
 
         strm << sStatic << "Dynarithmic TWAIN Library, Version " << lMajor << "." << lMinor << " - " << s << " Version (Patch Level "
-            << lPatch << ")\n" << "Shared Library path: " <<  StringConversion::Convert_Native_To_Ansi(GetDTWAINDLLPath());
+            << lPatch << ") Internal Build Number: " << StringConversion::Convert_Native_To_Ansi(GetDTWAINInternalBuildNumber()) << "\n" << 
+            "Shared Library path : " <<  StringConversion::Convert_Native_To_Ansi(GetDTWAINDLLPath());
+
         strm << "\nUsing Resource file (twaininfo.txt) version: " << StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetResourceVersion());
         strm << "\nResource file path: " << StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetResourcePath());
         CTL_StaticData::s_VersionString = StringConversion::Convert_Ansi_To_Native(strm.str());
@@ -2260,53 +2231,6 @@ void dynarithmic::DTWAIN_InternalThrowException() THIS_FUNCTION_THROWS
     throw;
 }
 
-/////////////////////////////// Describe Path functions
-struct ANSIPathTraits
-{
-    static LPSTR PathAddBackslashFn(LPSTR path) { return ANSIStringTraits::AddBackslashImpl(path); }
-};
-
-struct UNICODEPathTraits
-{
-    static LPWSTR PathAddBackslashFn(LPWSTR path) { return UnicodeStringTraits::AddBackslashImpl(path); }
-};
-
-template <typename CHARTYPE,
-          typename STRINGTYPE,
-          typename POINTERTYPE,
-          typename FN>
-STRINGTYPE FixPathString_Impl(POINTERTYPE szINIPath, size_t numChars)
-{
-    if ( szINIPath )
-    {
-        std::vector<CHARTYPE> vec(FILENAME_MAX,0);
-        size_t minCopy = (std::min)(static_cast<int>(numChars), FILENAME_MAX);
-        std::copy(szINIPath, szINIPath + minCopy, vec.begin());
-        FN::PathAddBackslashFn(&vec[0]);
-        return &vec[0];
-    }
-    return {};
-}
-
-std::string FixPathStringA(LPCSTR szINIPath)
-{
-    if ( szINIPath)
-    {
-        const size_t numChars = strlen(szINIPath);
-        return FixPathString_Impl<char, std::string, LPCSTR, ANSIPathTraits>(szINIPath, numChars);
-    }
-    return "";
-}
-
-std::wstring FixPathStringW(LPCWSTR szINIPath)
-{
-    if ( szINIPath)
-    {
-        const size_t numChars = wcslen(szINIPath);
-        return FixPathString_Impl<wchar_t, std::wstring, LPCWSTR, UNICODEPathTraits>(szINIPath, numChars);
-    }
-    return L"";
-}
 
 bool GetDTWAINDLLVersionInfo(HMODULE hMod, LONG* lMajor, LONG* lMinor, LONG *pPatch)
 {
@@ -2322,6 +2246,11 @@ bool GetDTWAINDLLVersionInfo(HMODULE hMod, LONG* lMajor, LONG* lMinor, LONG *pPa
 CTL_StringType GetDTWAINDLLVersionInfoStr()
 {
     return StringConversion::Convert_AnsiPtr_To_Native(DTWAIN_VERINFO_FILEVERSION);
+}
+
+CTL_StringType GetDTWAINInternalBuildNumber()
+{
+    return StringConversion::Convert_AnsiPtr_To_Native(DTWAIN_BUILDVERSION);
 }
 
 CTL_StringType dynarithmic::GetDTWAININIPath()
@@ -2413,17 +2342,19 @@ void LoadTransferReadyOverrides()
     }
 }
 
-// This loads DTWAIN32.INI or DTWAIN64.INI, and checks the [CheckFeederStatus]
-// section and "CheckStatus" key to determine if testing for feeder capabilities will
-// be done when opening the source.
-void LoadCheckFeederStatusOnOpen(CTL_TwainDLLHandle* pHandle)
+// This loads DTWAIN32.INI or DTWAIN64.INI, and checks the [SourceOpenProps]
+// section.  This section determines the activities to perform after sucessfully
+// opening a TWAIN Source
+void LoadOnSourceOpenProperties(CTL_TwainDLLHandle* pHandle)
 {
     // Get the section name
     CSimpleIniA feederProfile;
     auto err = feederProfile.LoadFile(dynarithmic::GetDTWAININIPathA().c_str());
     if (err != SI_OK)
         return;
-    pHandle->m_bCheckFeederStatusOnOpen = feederProfile.GetBoolValue("CheckFeederStatus", "CheckStatus", true);
+    pHandle->m_OnSourceOpenProperties.m_bCheckFeederStatusOnOpen = feederProfile.GetBoolValue("SourceOpenProps", "CheckFeederStatus", true);
+    pHandle->m_OnSourceOpenProperties.m_bQueryBestCapContainer = feederProfile.GetBoolValue("SourceOpenProps", "QueryBestCapContainer", true);
+    pHandle->m_OnSourceOpenProperties.m_bQueryCapOperations = feederProfile.GetBoolValue("SourceOpenProps", "QueryCapOperations", true);
 }
 
 // This loads DTWAIN32.INI or DTWAIN64.INI, and checks the [FlatbedOnly]

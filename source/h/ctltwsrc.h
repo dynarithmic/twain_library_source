@@ -24,7 +24,7 @@
 #include <unordered_map>
 #include <vector>
 #include <unordered_set>
-#include <boost/any.hpp>
+#include <boost/logic/tribool.hpp>
 #include <array>
 
 #include "ctlobstr.h"
@@ -35,6 +35,7 @@
 #include "ctldevnt.h"
 #include "ctltwses.h"
 #include "ctltwainidentity.h"
+#include "dtwain_anyutils.h"
 
 namespace dynarithmic
 {
@@ -82,7 +83,7 @@ namespace dynarithmic
         struct container_values
         {
             int m_dataType = 0;
-            std::vector<boost::any> m_data;
+            std::vector<anytype_> m_data;
         };
 
         typedef std::unordered_map<TW_UINT16, container_values> CapToValuesMap;
@@ -453,6 +454,8 @@ namespace dynarithmic
         void         SetDoublePageCountOnDuplex(bool bSet) { m_bDoublePageCountOnDuplex = bSet; }
         bool         IsDoublePageCountOnDuplex() const { return m_bDoublePageCountOnDuplex; }
         CapList&     GetCustomCapCache() { return m_aSupportedCustomCapCache; }
+        boost::logic::tribool IsFileSystemSupported() const { return m_tbIsFileSystemSupported; }
+        void         SetFileSystemSupported(bool bSet) { m_tbIsFileSystemSupported = bSet; }
 
         // Only public member
         void *      m_pUserPtr;
@@ -579,6 +582,8 @@ namespace dynarithmic
         LONG            m_nForcedBpp;
         std::vector<int> m_aTransferMechanisms;
         bool            m_bExtendedCapsRetrieved;
+        boost::logic::tribool m_tbIsFileSystemSupported;
+
         struct tagCapCachInfo {
             TW_UINT16 nCap;
             bool      m_bSupported;
