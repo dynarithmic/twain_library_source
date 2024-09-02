@@ -65,81 +65,99 @@ struct ArrayChecker
 
         bool IsAnsiArray() const { return m_bAnsiArray; }
 
-    LONG Check() const
-    {
-        const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-        const auto& factory = pHandle->m_ArrayFactory;
-
-        m_bAnsiArray = false;
-
-        // Check if array exists
-        if (m_checkFlag & CHECK_ARRAY_EXISTS)
-            DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !factory->is_valid(m_Array[0]); },
-                                              DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
-            
-        if (m_checkFlag & CHECK_ARRAY_SAME_TYPE)
+        int Check() const
         {
-            if ( !(m_checkFlag & CHECK_ARRAY_EXISTS))
-                DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !factory->is_valid(m_Array[0]); },
-                                                  DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
-            DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !factory->is_valid(m_Array[1]); },
-                                              DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
-
-            const auto tagType1 = factory->tag_type(m_Array[0]);
-            const auto tagType2 = factory->tag_type(m_Array[1]);
-            DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return tagType1 != tagType2; },
-                                              DTWAIN_ERR_ARRAYTYPE_MISMATCH, false, FUNC_MACRO);
+            const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+            auto retVal = CheckImpl(pHandle);
+            if (retVal != DTWAIN_NO_ERROR)
+                pHandle->m_lLastError = retVal;
+            return retVal;
         }
 
-        if (m_checkFlag & CHECK_ARRAY_EXPLICIT_TYPE)
+        int CheckImpl(CTL_TwainDLLHandle* pHandle) const
         {
-            if (!(m_checkFlag & CHECK_ARRAY_EXISTS))
-                DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !factory->is_valid(m_Array[0]); },
-                                                  DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
-            const auto tagType1 = factory->tag_type(m_Array[0]);
-            DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return tagType1 != m_explicitTypeCheck; },
-                                              DTWAIN_ERR_ARRAYTYPE_MISMATCH, false, FUNC_MACRO);
-        }
+            const auto& factory = pHandle->m_ArrayFactory;
 
-        if ( m_checkFlag & CHECK_ARRAY_STRING_TYPE)
-        {
-            if (!(m_checkFlag & CHECK_ARRAY_EXISTS))
-                DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !factory->is_valid(m_Array[0]); },
-                                                  DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
-            bool bIsValid = true;
+            m_bAnsiArray = false;
 
-            if ((m_checkFlag & CHECK_ARRAY_STRING_TYPE) == CHECK_ARRAY_STRING_TYPE)
+            // Check if array exists
+            if (m_checkFlag & CHECK_ARRAY_EXISTS)
             {
-                bIsValid = factory->is_valid(m_Array[0], CTL_ArrayFactory::arrayTag::StringType);
-                if ( !bIsValid)
-                    bIsValid = factory->is_valid(m_Array[0], CTL_ArrayFactory::arrayTag::WStringType);
+                if (!m_Array[0] || !factory->is_valid(m_Array[0]))
+                    return DTWAIN_ERR_BAD_ARRAY;
+            }
+
+            if (m_checkFlag & CHECK_ARRAY_SAME_TYPE)
+            {
+                if (!(m_checkFlag & CHECK_ARRAY_EXISTS))
+                {
+                    if (!m_Array[0] || !factory->is_valid(m_Array[0]))
+                        return DTWAIN_ERR_BAD_ARRAY;
+                    if (!m_Array[1] || !factory->is_valid(m_Array[1]))
+                        return DTWAIN_ERR_BAD_ARRAY;
+                }
+
+                const auto tagType1 = factory->tag_type(m_Array[0]);
+                const auto tagType2 = factory->tag_type(m_Array[1]);
+                if (tagType1 != tagType2)
+                    return DTWAIN_ERR_ARRAYTYPE_MISMATCH;
+            }
+
+            if (m_checkFlag & CHECK_ARRAY_EXPLICIT_TYPE)
+            {
+                if (!(m_checkFlag & CHECK_ARRAY_EXISTS))
+                {
+                    if (!m_Array[0] || !factory->is_valid(m_Array[0]))
+                        return DTWAIN_ERR_BAD_ARRAY;
+                }
+                const auto tagType1 = factory->tag_type(m_Array[0]);
+                if (tagType1 != m_explicitTypeCheck)
+                    return DTWAIN_ERR_ARRAYTYPE_MISMATCH;
+            }
+
+            if ( m_checkFlag & CHECK_ARRAY_STRING_TYPE)
+            {
+                if (!(m_checkFlag & CHECK_ARRAY_EXISTS))
+                {
+                    if (!m_Array[0] || !factory->is_valid(m_Array[0]))
+                        return DTWAIN_ERR_BAD_ARRAY;
+                }
+                bool bIsValid = true;
+
+                if ((m_checkFlag & CHECK_ARRAY_STRING_TYPE) == CHECK_ARRAY_STRING_TYPE)
+                {
+                    bIsValid = factory->is_valid(m_Array[0], CTL_ArrayFactory::arrayTag::StringType);
+                    if ( !bIsValid)
+                        bIsValid = factory->is_valid(m_Array[0], CTL_ArrayFactory::arrayTag::WStringType);
+                    else
+                        m_bAnsiArray = true;
+                }
                 else
+                if (m_checkFlag & CHECK_ARRAY_ANSI_TYPE)
+                {
+                    bIsValid = factory->is_valid(m_Array[0], CTL_ArrayFactory::arrayTag::StringType);
                     m_bAnsiArray = true;
+                }
+                else
+                if (m_checkFlag & CHECK_ARRAY_WIDE_TYPE)
+                    bIsValid = factory->is_valid(m_Array[0], CTL_ArrayFactory::arrayTag::WStringType);
+                if (!bIsValid)
+                    return DTWAIN_ERR_STRINGTYPE_MISMATCH;
             }
-            else
-            if (m_checkFlag & CHECK_ARRAY_ANSI_TYPE)
-            {
-                bIsValid = factory->is_valid(m_Array[0], CTL_ArrayFactory::arrayTag::StringType);
-                m_bAnsiArray = true;
-            }
-            else
-            if (m_checkFlag & CHECK_ARRAY_WIDE_TYPE)
-                bIsValid = factory->is_valid(m_Array[0], CTL_ArrayFactory::arrayTag::WStringType);
-            DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !bIsValid; },
-                                              DTWAIN_ERR_STRINGTYPE_MISMATCH, false, FUNC_MACRO);
-        }
 
-        if (m_checkFlag & CHECK_ARRAY_BOUNDS)
-        {
-            if (!(m_checkFlag & CHECK_ARRAY_EXISTS))
-                DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !factory->is_valid(m_Array[0]); },
-                                                  DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
-            const LONG Count = static_cast<LONG>(factory->size(m_Array[0]));
-            DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return Count <= 0 || static_cast<LONG>(m_ArrayPos[0]) >= Count; },
-                                              DTWAIN_ERR_INDEX_BOUNDS, false, FUNC_MACRO);
+            if (m_checkFlag & CHECK_ARRAY_BOUNDS)
+            {
+                if (!(m_checkFlag & CHECK_ARRAY_EXISTS))
+                {
+                    if (!m_Array[0] || !factory->is_valid(m_Array[0]))
+                        return DTWAIN_ERR_BAD_ARRAY;
+                }
+                const LONG Count = static_cast<LONG>(factory->size(m_Array[0]));
+                if (Count <= 0 || static_cast<LONG>(m_ArrayPos[0]) >= Count)
+                    return DTWAIN_ERR_INDEX_BOUNDS;
+            }
+            return DTWAIN_NO_ERROR;
         }
-        return DTWAIN_NO_ERROR;
-    }
 };
 
 static LONG IsValidRangeArray( DTWAIN_ARRAY pArray );
@@ -706,12 +724,12 @@ LONG DLLENTRY_DEF DTWAIN_ArrayGetCount( DTWAIN_ARRAY pArray )
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex( pHandle, -1L, FUNC_MACRO);
+    DTWAIN_Check_Bad_Handle_Ex( pHandle, DTWAIN_FAILURE1, FUNC_MACRO);
 
     // Check if array exists
     auto checkStatus = ArrayChecker().SetArray1(pArray).SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS);
     if (checkStatus.Check() != DTWAIN_NO_ERROR)
-        LOG_FUNC_EXIT_PARAMS(-1)
+        LOG_FUNC_EXIT_PARAMS(DTWAIN_FAILURE1)
 
     const auto& factory = pHandle->m_ArrayFactory; 
 

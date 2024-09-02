@@ -239,7 +239,8 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_bImageInfoRetrieved(false),
     m_bXferReadySent(false),
     m_bDoublePageCountOnDuplex(true),
-    m_bExtendedCapsRetrieved(false)
+    m_bExtendedCapsRetrieved(false),
+    m_tbIsFileSystemSupported(boost::logic::indeterminate)
  {
     if ( lpszProduct )
         m_SourceId.set_product_name(StringConversion::Convert_NativePtr_To_Ansi(lpszProduct));
@@ -659,7 +660,7 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
             return m_strAcquireFile;
         const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
         const auto& factory = pHandle->m_ArrayFactory;
-        bool bNameAvailable = nCurImage < factory->size(pDTWAINArray);
+        bool bNameAvailable = nCurImage < static_cast<int>(factory->size(pDTWAINArray));
         if ( bNameAvailable )
             bNameAvailable = factory->get_value(pDTWAINArray, nCurImage, &strTemp)?true:false; 
         if ( !bNameAvailable ) // No more names
@@ -1375,7 +1376,7 @@ bool CTL_ITwainSource::IsExtendedCapNegotiable(LONG nCap)
 
 bool CTL_ITwainSource::AddCapToExtendedCapList(LONG nCap)
 {
-    m_aExtendedCaps.insert(nCap);
+    m_aExtendedCaps.insert(static_cast<unsigned short>(nCap));
     return  true;
 }
 
@@ -1386,7 +1387,8 @@ void CTL_ITwainSource::RetrieveExtendedCaps()
         CTL_IntArray aCaps;
         CTL_TwainAppMgr::GetExtendedCapabilities(this, aCaps);
         m_aExtendedCaps.clear();
-        m_aExtendedCaps.insert(aCaps.begin(), aCaps.end());
+        for (auto val : aCaps)
+            m_aExtendedCaps.insert(static_cast<unsigned short>(val));
         m_bExtendedCapsRetrieved = true;
     }
 }
@@ -1528,18 +1530,18 @@ bool isFloatCap(LONG capType)
 }
 
 template <typename T>
-static DTWAIN_ARRAY PopulateArray(const std::vector<boost::any>& dataArray, CTL_ITwainSource* pSource, TW_UINT16 nCap)
+static DTWAIN_ARRAY PopulateArray(const std::vector<anytype_>& dataArray, CTL_ITwainSource* pSource, TW_UINT16 nCap)
 {
     const DTWAIN_ARRAY theArray = DTWAIN_ArrayCreateFromCap(pSource, static_cast<LONG>(nCap), static_cast<LONG>(dataArray.size()));
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     auto& vVector = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
-    std::transform(dataArray.begin(), dataArray.end(), vVector.begin(), [](boost::any theAny) 
-                    { return boost::any_cast<typename T::value_type>(theAny);});
+    std::transform(dataArray.begin(), dataArray.end(), vVector.begin(), [](anytype_ theAny) 
+                    { return ANYTYPE_NAMESPACE any_cast<typename T::value_type>(theAny);});
     return theArray;
 }
 
 template <typename T>
-static bool PopulateCache(DTWAIN_ARRAY theArray, std::vector<boost::any>& dataArray)
+static bool PopulateCache(DTWAIN_ARRAY theArray, std::vector<anytype_>& dataArray)
 {
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     auto& vVector = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);

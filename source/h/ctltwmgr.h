@@ -257,7 +257,8 @@ namespace dynarithmic
             static std::string  GetCapNameFromCap( LONG Cap );
             static UINT         GetDataTypeFromCap( CTL_EnumCapability Cap, CTL_ITwainSource *pSource=nullptr);
             static UINT         GetContainerTypesFromCap( CTL_EnumCapability Cap, bool nType );
-            static bool         GetBestContainerType(const CTL_ITwainSource* pSource,
+            static bool         GetBestContainerType(CTL_TwainDLLHandle *pHandle,
+                                                     const CTL_ITwainSource* pSource,
                                                      CTL_EnumCapability nCap,
                                                      UINT &rGet,
                                                      UINT &rSet,
@@ -267,6 +268,7 @@ namespace dynarithmic
             static bool         GetBestCapDataType(const CTL_ITwainSource* pSource,
                                                      CTL_EnumCapability nCap,
                                                      UINT &nDataType);
+            static LONG DoCapContainerTest(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, TW_UINT16 nCap, LONG lGetType);
 
             static void         GetContainerNamesFromType( int nType, StringArray &rArray );
             static void         EndTwainUI(const CTL_ITwainSession* pSession, CTL_ITwainSource* pSource);
@@ -394,10 +396,6 @@ namespace dynarithmic
                     {
                         DataType pData;
                         const size_t nNumItems = pTrip->GetNumItems();
-
-                        if ( nNumItems == 0 )
-                            pArray.push_back(0);
-                        else
                         for ( size_t i = 0; i < nNumItems; i++ )
                         {
                             pTrip->GetValue( &pData, i );
