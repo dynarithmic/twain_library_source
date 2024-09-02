@@ -428,12 +428,11 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                 RECT r;
                 HWND *pHWND = static_cast<HWND*>(pData);
                 GetWindowRect(*pHWND, &r);
-
+                std::array<LONG, 4> aRect = { r.left, r.top, r.right, r.bottom };
                 sBuffer <<
                 "\nTW_MEMREF is handle to window (HWND):\n{\n" <<
                 indenter << "HWND=" << *pHWND << "\n" <<
-                indenter << "Screen Pos.= " << r.left << "," << r.top << "-" <<
-                                    r.right << "," << r.bottom << "\n}\n";
+                indenter << "Screen Pos.= " << StringWrapperA::Join(aRect, ",") << "\n}\n";
             #endif
             }
             break;
@@ -529,15 +528,14 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                 TCHAR sz[256];
                 RECT r;
                 SetRect(&r,0,0,0,0);
+                std::array<LONG, 4> aRect = { r.left, r.top, r.right, r.bottom };
                 sz[0] = _T('\0');
                 sBuffer << "\nTW_MEMREF is TW_USERINTERFACE:\n{\n" <<
                         indenter << "ShowUI=" <<  (pUSERINTERFACE->ShowUI?"TRUE":"FALSE") << "\n" <<
                         indenter << "ModalUI=" << (pUSERINTERFACE->ModalUI?"TRUE":"FALSE") << "\n" <<
                         indenter << "hParent=" << pUSERINTERFACE->hParent << "\n" <<
                         indenter << "hParent.Title=" << sz << "\n" <<
-                        indenter << "hParent.ScreenPo.= {" <<
-                        r.left << "," << r.top << "-" <<
-                        r.right << "," << r.bottom << "\n}\n";
+                        indenter << "hParent.ScreenPos= {" << StringWrapperA::Join(aRect, ",") << "}\n";
             #endif
             }
             break;
