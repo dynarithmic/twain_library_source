@@ -1019,6 +1019,7 @@ typedef LONG          (DLLENTRY_DEF*  D_GETTWAINSTRINGNAMEWFUNC)                
 typedef LONG          (DLLENTRY_DEF*  D_GETACTIVEDSMPATHFUNC)                    (LPTSTR, LONG);
 typedef LONG          (DLLENTRY_DEF*  D_GETACTIVEDSMPATHAFUNC)                   (LPSTR, LONG);
 typedef LONG          (DLLENTRY_DEF*  D_GETACTIVEDSMPATHWFUNC)                   (LPWSTR, LONG);
+typedef DTWAIN_BOOL   (DLLENTRY_DEF * D_ENUMCAMERASEXFUNC)                       (DTWAIN_SOURCE, LONG, LPDTWAIN_ARRAY);
 #ifdef __cplusplus
 }
 #endif
@@ -1203,6 +1204,7 @@ typedef LONG          (DLLENTRY_DEF*  D_GETACTIVEDSMPATHWFUNC)                  
     STATIC D_ENUMBRIGHTNESSVALUESEXFUNC                     DTWAIN_EnumBrightnessValuesEx;
     STATIC D_ENUMBRIGHTNESSVALUESFUNC                       DTWAIN_EnumBrightnessValues;
     STATIC D_ENUMCAMERASFUNC                                DTWAIN_EnumCameras;
+    STATIC D_ENUMCAMERASEXFUNC                              DTWAIN_EnumCamerasEx;
     STATIC D_ENUMCOMPRESSIONTYPESEXFUNC                     DTWAIN_EnumCompressionTypesEx;
     STATIC D_ENUMCOMPRESSIONTYPESFUNC                       DTWAIN_EnumCompressionTypes;
     STATIC D_ENUMCONTRASTVALUESEXFUNC                       DTWAIN_EnumContrastValuesEx;
