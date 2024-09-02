@@ -32,6 +32,29 @@ DTWAIN Version changes
 - Fixed an issue with DTWAIN_GetCapValuesEx2(), where the passed-in TWAIN data type was not
   being processed correctly for all scenarios.
 
+- Fixed issue with DTWAIN_EnumCameras() not returning all of the camera information (only top
+  and bottom cameras were returned).  Please note that "camera" in this context does not mean
+  "digital camera", but instead the mechanism that scans the image.  Only TWAIN devices that
+  support an internal file system (DTWAIN_IsFileSystemSupported()) will have the ability to 
+  enumerate camera types.
+
+- Fixed minor issue with DTWAIN_EnumCameras() and logging, where unsupported TWAIN drivers that
+  do not have an internal file system would log an exception instead of returning an error.
+
+- Added DTWAIN_EnumCamerasEx() that allows the application to enumerate any of the (currently)
+  9 specific camera types defined by TWAIN.  The camera types are described by the TWAIN
+  constants:
+
+      DTWAIN_FT_CAMERA         
+      DTWAIN_FT_CAMERATOP      
+      DTWAIN_FT_CAMERABOTTOM   
+      DTWAIN_FT_CAMERAPREVIEW  
+      DTWAIN_FT_DOMAIN         
+      DTWAIN_FT_HOST           
+      DTWAIN_FT_DIRECTORY      
+      DTWAIN_FT_IMAGE          
+      DTWAIN_FT_UNKNOWN        
+
 - Ensure that DTWAIN_GetCapValues() and other internal functions that call DTWAIN_GetCapValues() 
   clears the returned user array of values if the TWAIN capability being tested is not supported 
   by the device.
