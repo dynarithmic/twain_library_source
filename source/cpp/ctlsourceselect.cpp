@@ -93,7 +93,7 @@ static DTWAIN_SOURCE SelectAndOpenSource(const SourceSelectionOptions& opts)
         if (retVal != DTWAIN_NO_ERROR)
         {
             if ( opts.nWhich == SELECTSOURCEBYNAME )
-                CTL_TwainAppMgr::SetError(retVal, StringConversion::Convert_NativePtr_To_Ansi(opts.szProduct));
+                CTL_TwainAppMgr::SetError(retVal, StringConversion::Convert_NativePtr_To_Ansi(opts.szProduct), false);
             return nullptr;
         }
         iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, CTL_TwainAppMgr::IsSourceOpen(pSource));
@@ -105,7 +105,7 @@ static DTWAIN_SOURCE SelectAndOpenSource(const SourceSelectionOptions& opts)
     {
         const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
         if (pHandle)
-            CTL_TwainAppMgr::SetError(pHandle->m_lLastError, StringConversion::Convert_NativePtr_To_Ansi(opts.szProduct));
+            CTL_TwainAppMgr::SetError(pHandle->m_lLastError, StringConversion::Convert_NativePtr_To_Ansi(opts.szProduct), false);
     }
     return Source;
 }
@@ -376,7 +376,7 @@ DTWAIN_SOURCE dynarithmic::DTWAIN_LLSelectSource2(const SourceSelectionOptions& 
     // See if cancel was selected
     if (selectStruct.SourceName.empty() || selectStruct.nItems == 0 )
     {
-        CTL_TwainAppMgr::SetError(DTWAIN_ERR_SOURCESELECTION_CANCELED);
+        CTL_TwainAppMgr::SetError(DTWAIN_ERR_SOURCESELECTION_CANCELED, "", false);
         LOG_FUNC_EXIT_PARAMS(NULL)
     }
 

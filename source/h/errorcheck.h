@@ -40,7 +40,7 @@ namespace dynarithmic
         if (bRet)
         {
             Handle->m_lLastError = Err;
-            CTL_TwainAppMgr::SetError(Err, extraInfo);
+            CTL_TwainAppMgr::SetError(Err, extraInfo, false);
             OutputDTWAINErrorA(Handle, fnName);
             if (logError && CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK)
             {

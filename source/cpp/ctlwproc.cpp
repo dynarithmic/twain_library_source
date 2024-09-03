@@ -253,6 +253,7 @@ LRESULT CALLBACK_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
             case DTWAIN_TN_PROCESSDIBFINALACCEPTED:
             case DTWAIN_TN_PROCESSDIBACCEPTED:
             case DTWAIN_TN_UIOPENFAILURE:
+            case DTWAIN_TN_UIOPENING:
             case DTWAIN_TN_FILENAMECHANGING:
             case DTWAIN_TN_FILENAMECHANGED:
             {

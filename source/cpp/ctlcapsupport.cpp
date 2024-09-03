@@ -59,8 +59,8 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapabili
                                             DTWAIN_CONTONEVALUE
                                         };
 
-    static constexpr unsigned DataTypeArraySize = std::size(DataTypeArray);
-    static constexpr unsigned ContainerArraySize = std::size(ContainerTypeArray);
+    static constexpr size_t DataTypeArraySize = std::size(DataTypeArray);
+    static constexpr size_t ContainerArraySize = std::size(ContainerTypeArray);
 
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     CTL_ITwainSource* p = VerifySourceHandle(pHandle, Source);

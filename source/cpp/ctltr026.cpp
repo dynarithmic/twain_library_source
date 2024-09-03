@@ -133,7 +133,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     else
                     {
                         // Not enough memory to copy the DIB
-                        CTL_TwainAppMgr::SetError(-DTWAIN_ERR_OUT_OF_MEMORY);
+                        CTL_TwainAppMgr::SetError(-DTWAIN_ERR_OUT_OF_MEMORY, "", true);
                         char szBuf[255];
                         CTL_TwainAppMgr::GetLastErrorString(szBuf, 254);
                         CTL_TwainAppMgr::WriteLogInfoA(szBuf);
@@ -240,7 +240,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                 {
                     bPageDiscarded = true;
                     // Set the error code
-                    CTL_TwainAppMgr::SetError(-DTWAIN_ERR_BAD_DIB_PAGE);
+                    CTL_TwainAppMgr::SetError(-DTWAIN_ERR_BAD_DIB_PAGE, "", false);
                     char szBuf[255];
                     CTL_TwainAppMgr::GetLastErrorString(szBuf, 254);
                     CTL_TwainAppMgr::WriteLogInfoA(szBuf);
@@ -1350,7 +1350,7 @@ CTL_TwainFileFormatEnum CTL_ImageXferTriplet::GetFileTypeFromCompression(int nCo
 void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pSession,
                           LONG Error, LONG ErrorMsg, const std::string& extraInfo)
 {
-    CTL_TwainAppMgr::SetError(Error, extraInfo);
+    CTL_TwainAppMgr::SetError(Error, extraInfo, true);
     if ( CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_DTWAINERRORS)
     {
         char szBuf[1024];
