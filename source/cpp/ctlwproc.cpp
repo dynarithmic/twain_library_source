@@ -647,10 +647,13 @@ LRESULT ExecuteCallback(CallbackType Fn, HWND hWnd, UINT uMsg,
         LogDTWAINMessage(hWnd, uMsg, wParam, lParam, true);
         lResult = CallOneCallback(Fn, wParam, lParam, uType);
     }
-    catch(...)
+    catch (...)
     {
-        const std::string sError = "Callback did not work...\n";
-        CTL_TwainAppMgr::WriteLogInfoA(sError);
+        if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+        {
+            const std::string sError = "In ExecuteCallback: Exception encountered when logging using callback...\n";
+            CTL_TwainAppMgr::WriteLogInfoA(sError);
+        }
     }
     return lResult;
 }
