@@ -2203,11 +2203,15 @@ void WriteVersionToLog()
     {
         auto sVer = GetVersionString();
         const auto sWinVer = GetWinVersion();
-        sVer += _T("\n") + sWinVer;
+        auto sDSMPath = CTL_TwainAppMgr::GetDSMPath();
+        if (sDSMPath.empty())
+            sDSMPath = _T("(unknown or not queried)");
+        sDSMPath = _T("Active DSM Path: ") + sDSMPath;
+        sVer += _T("\n") + sWinVer + sDSMPath + _T("\n");
         #ifdef _WIN32
         // All log messages must be ANSI
         ansiVer = StringConversion::Convert_Native_To_Ansi(sVer);
-        if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_USEFILE)
+        if (CTL_StaticData::s_lErrorFilterFlags & (DTWAIN_LOG_USEFILE | DTWAIN_LOG_CONSOLE))
         {
             if (!CTL_StaticData::s_appLog.StatusOutFast(ansiVer.c_str()))
             {
