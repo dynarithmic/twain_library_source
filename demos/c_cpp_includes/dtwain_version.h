@@ -49,7 +49,7 @@
     #ifdef BUILDING_DTWAINDLL
         #pragma message ( "Building DTWAIN Version " DTWAIN_VERINFO_FILEVERSION " Build " DTWAIN_BUILDVERSION)
     #else
-        #pragma message ( "Compiling using DTWAIN Version " DTWAIN_VERINFO_FILEVERSION)
+        #pragma message ( "Compiling using DTWAIN Version " DTWAIN_VERINFO_FILEVERSION " Build " DTWAIN_BUILDVERSION)
     #endif
 #endif
 
