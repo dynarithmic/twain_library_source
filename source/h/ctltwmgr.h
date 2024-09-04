@@ -206,7 +206,7 @@ namespace dynarithmic
             static bool IsProgressIndicatorOn(const CTL_ITwainSource* pSource);
             static bool IsJobControlSupported( const CTL_ITwainSource *pSource, TW_UINT16& nValue );
 
-            static void     SetError(int nError, const std::string& extraInfo="");
+            static void     SetError(int nError, const std::string& extraInfo, bool bMustReportGeneralError);
             static int      GetLastError();
             static LPSTR    GetLastErrorString(LPSTR lpszBuffer, int nSize);
             static LPSTR    GetErrorString(int nError, LPSTR lpszBuffer, int nSize);
@@ -514,12 +514,12 @@ namespace dynarithmic
             static SourceFlatbedOnlyList s_SourceFlatbedOnlyList;
     };
 
-    #define DTWAIN_ERROR_CONDITION(Err, RetVal) {               \
-            CTL_TwainAppMgr::SetError(Err);               \
+    #define DTWAIN_ERROR_CONDITION(Err, RetVal, mustReport) {               \
+            CTL_TwainAppMgr::SetError(Err, "", mustReport);               \
             return(RetVal); }
 
-    #define DTWAIN_ERROR_CONDITION_EX(Err, ExtraInfo, RetVal) {               \
-        CTL_TwainAppMgr::SetError(Err, ExtraInfo);               \
+    #define DTWAIN_ERROR_CONDITION_EX(Err, ExtraInfo, RetVal, mustReport) {               \
+        CTL_TwainAppMgr::SetError(Err, ExtraInfo, mustReport);               \
         return(RetVal); }
 
     /////////////////// DLL stuff /////////////////////

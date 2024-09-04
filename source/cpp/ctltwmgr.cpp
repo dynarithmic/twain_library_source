@@ -131,7 +131,7 @@ CTL_ITwainSession* CTL_TwainAppMgr::CreateTwainSession(
     // Try to load the source manager ( set in state 2 if not already
     //    in state 2 or 3)
     if ( !s_pGlobalAppMgr )
-        DTWAIN_ERROR_CONDITION(IDS_ErrTwainMgrInvalid, nullptr)
+        DTWAIN_ERROR_CONDITION(IDS_ErrTwainMgrInvalid, nullptr, true)
 
     // Load if not already loaded
     if ( !s_pGlobalAppMgr->m_hLibModule )
@@ -250,7 +250,7 @@ const CTL_ITwainSource* CTL_TwainAppMgr::SelectSourceDlg(  CTL_ITwainSession *pS
     {
         case TWRC_CANCEL:
             SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_ACQUIRECANCELLED_EX, -1L);
-            DTWAIN_ERROR_CONDITION(DTWAIN_ERR_SOURCESELECTION_CANCELED, NULL)
+            DTWAIN_ERROR_CONDITION(DTWAIN_ERR_SOURCESELECTION_CANCELED, NULL, false)
         break;
 
         case TWRC_FAILURE:
@@ -844,7 +844,7 @@ bool CTL_TwainAppMgr::ProcessConditionCodeError(TW_UINT16 nError)
     if ( p.IsValidCode())
     {
         static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal())->m_lLastError = p.m_nResourceID; 
-        DTWAIN_ERROR_CONDITION(p.m_nResourceID, false)
+        DTWAIN_ERROR_CONDITION(p.m_nResourceID, false, false)
     }
     return true;
 }
@@ -1600,7 +1600,7 @@ bool CTL_TwainAppMgr::CloseSourceManager(CTL_ITwainSession* pSession)
 
 
 ////////// These are static error functions that get errors from the RC file
-void CTL_TwainAppMgr::SetError(int nError, const std::string& extraInfo)
+void CTL_TwainAppMgr::SetError(int nError, const std::string& extraInfo, bool bMustReportGeneralError)
 {
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
@@ -1632,20 +1632,20 @@ void CTL_TwainAppMgr::SetError(int nError, const std::string& extraInfo)
             pHandle->m_vErrorBuffer.resize(pHandle->m_nErrorBufferThreshold);
     }
 
-    // if there is a callback, call it now with the error notifications
-    if ( pHandle->m_pCallbackFn )
-    {
-        const UINT uMsg = CTL_StaticData::s_nRegisteredDTWAINMsg;
-        LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_GENERALERROR, -nError, true);
-        (*pHandle->m_pCallbackFn)(DTWAIN_TN_GENERALERROR, -nError, static_cast<LPARAM>(0));
-    }
+    const UINT uMsg = CTL_StaticData::s_nRegisteredDTWAINMsg;
+    LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_GENERALERROR, -nError, true);
 
-    // If there is a 64 bit callback, call it now with the error notifications
-    if ( pHandle->m_pCallbackFn64 )
+    // if there is a callback and we want to report the general error, 
+    // call it now with the error notifications.  We don't want to overwhelm the non-error
+    // related callbacks with all of the general errors we are getting.
+    if (bMustReportGeneralError)
     {
-        const UINT uMsg = CTL_StaticData::s_nRegisteredDTWAINMsg;
-        LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_GENERALERROR, -nError, true);
-        (*pHandle->m_pCallbackFn64)(DTWAIN_TN_GENERALERROR, -nError, static_cast<LPARAM>(0));
+        if (pHandle->m_pCallbackFn)
+            (*pHandle->m_pCallbackFn)(DTWAIN_TN_GENERALERROR, -nError, static_cast<LPARAM>(0));
+
+        // If there is a 64 bit callback, call it now with the error notifications
+        if (pHandle->m_pCallbackFn64)
+            (*pHandle->m_pCallbackFn64)(DTWAIN_TN_GENERALERROR, -nError, static_cast<LPARAM>(0));
     }
 
     // If there is an error-only callback, call it now with the error notification
@@ -2560,7 +2560,7 @@ bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
         if ( ec != boost::system::errc::success)
         {
             const CTL_StringType dllName = _T(" : ") + m_strTwainDSMPath;
-            DTWAIN_ERROR_CONDITION_EX(IDS_ErrTwainDLLNotFound, StringConversion::Convert_Native_To_Ansi(dllName), false)
+            DTWAIN_ERROR_CONDITION_EX(IDS_ErrTwainDLLNotFound, StringConversion::Convert_Native_To_Ansi(dllName), false, true)
         }
         m_hLibModule = libloader;
     }
@@ -2577,7 +2577,7 @@ bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
             if ( m_strTwainDSMPath.empty())
             {
                 const CTL_StringType dllName = _T(" : ") + tempStr;
-                DTWAIN_ERROR_CONDITION_EX(IDS_ErrTwainDLLNotFound, StringConversion::Convert_Native_To_Ansi(dllName), false)
+                DTWAIN_ERROR_CONDITION_EX(IDS_ErrTwainDLLNotFound, StringConversion::Convert_Native_To_Ansi(dllName), false, true)
             }
         }
         CTL_StringStreamType strm;
@@ -2594,7 +2594,7 @@ bool CTL_TwainAppMgr::LoadDSM()
     CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     m_lpDSMEntry = dtwain_library_loader<DSMENTRYPROC>::get_func_ptr(m_hLibModule.native(), "DSM_Entry");
     if ( !m_lpDSMEntry )
-        DTWAIN_ERROR_CONDITION(IDS_ErrTwainDLLInvalid,false)
+        DTWAIN_ERROR_CONDITION(IDS_ErrTwainDLLInvalid,false, true)
     pHandle->m_nDSMState = DSM_STATE_LOADED;
     return true;   // return success
 }
@@ -2829,7 +2829,7 @@ VOID CALLBACK CTL_TwainAppMgr::TwainTimeOutProc(HWND, UINT, ULONG, DWORD)
     KillTimer(nullptr, CTL_StaticData::s_nTimeoutID);
 
     WriteLogInfoA("The last TWAIN triplet was not completed due to time out");
-    SetError(DTWAIN_ERR_TIMEOUT);
+    SetError(DTWAIN_ERR_TIMEOUT, "", false);
     throw DTWAIN_ERR_TIMEOUT;
 #endif
 }

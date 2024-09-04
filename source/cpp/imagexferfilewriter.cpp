@@ -111,7 +111,7 @@ int ImageXferFileWriter::CopyDibToFile(CTL_TwainDibPtr pCurDib,
                     SendFileAcquireError(m_pSource, m_pSession,
                                          DTWAIN_ERR_FILEWRITE, DTWAIN_TN_FILESAVEERROR,
                                          StringConversion::Convert_Native_To_Ansi(m_pSource->GetActualFileName()));
-                    CTL_TwainAppMgr::SetError(DTWAIN_ERR_FILEWRITE);
+                    CTL_TwainAppMgr::SetError(DTWAIN_ERR_FILEWRITE, "", true);
                     return DTWAIN_ERR_FILEWRITE;
                 }
                 else
@@ -747,7 +747,7 @@ void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pS
                           const std::string& extraInfo)
 {
     static constexpr int MaxMessage = 1024;
-    CTL_TwainAppMgr::SetError(Error, extraInfo);
+    CTL_TwainAppMgr::SetError(Error, extraInfo, true);
     char szBuf[MaxMessage + 1];
     CTL_TwainAppMgr::GetLastErrorString(szBuf, MaxMessage);
     CTL_TwainAppMgr::WriteLogInfoA(szBuf);

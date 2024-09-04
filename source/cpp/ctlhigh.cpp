@@ -826,11 +826,11 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
                         *arrayToUse = CreateArrayCopyFromFactory(tempArray);
 
                         // get the count
-                        nValues = pHandle->m_ArrayFactory->size(*arrayToUse); 
+                        nValues = static_cast<LONG>(pHandle->m_ArrayFactory->size(*arrayToUse)); 
                     }
                     else
                     {
-                        nValues = pHandle->m_ArrayFactory->size(*arrayToUse); 
+                        nValues = static_cast<LONG>(pHandle->m_ArrayFactory->size(*arrayToUse)); 
                     }
                 }
                 break;
@@ -838,7 +838,7 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
                 case DTWAIN_CONTONEVALUE:
                 case DTWAIN_CONTARRAY:
                 {
-                    nValues = pHandle->m_ArrayFactory->size(*arrayToUse); 
+                    nValues = static_cast<LONG>(pHandle->m_ArrayFactory->size(*arrayToUse)); 
                 }
             }
         }

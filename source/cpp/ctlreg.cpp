@@ -232,7 +232,7 @@ bool dynarithmic::GetCapInfoFromIni(const std::string& strCapName,
     {
         std::string str;
         ContainerMap::const_iterator it;
-        for (int i = 0; i < std::size(pContainerValues); ++i)
+        for (size_t i = 0; i < std::size(pContainerValues); ++i)
         {
             if (!aStr[i].empty())
             {

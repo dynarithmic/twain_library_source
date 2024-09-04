@@ -89,11 +89,11 @@ TW_UINT16 CTL_TwainTriplet::Execute()
     const TW_UINT16 nFail = TWRC_FAILURE;
     if ( !pTemp )
     {
-        DTWAIN_ERROR_CONDITION(IDS_ErrTwainMgrInvalid, nFail)
+        DTWAIN_ERROR_CONDITION(IDS_ErrTwainMgrInvalid, nFail, true)
     }
     if ( !m_bAlive )
     {
-        DTWAIN_ERROR_CONDITION(IDS_ErrTripletNotExecuted, nFail)
+        DTWAIN_ERROR_CONDITION(IDS_ErrTripletNotExecuted, nFail, false)
     }
     return pTemp->CallDSMEntryProc( *this );
 }
