@@ -34,7 +34,7 @@ namespace dynarithmic
 #if __cplusplus >= 202002L
         return std::popcount(val);
 #else
-        return std::bitset<64>(val).count();
+        return static_cast<int>(std::bitset<64>(val).count());
 #endif
     }
 
