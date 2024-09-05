@@ -2254,7 +2254,19 @@ LONG CTL_TwainAppMgr::GetCapFromCapName(const char *szCapName )
         if ( nSize > 0 )
         {
             std::string sNum = sArray[nSize - 1];
-            const int nNum = stoi(sNum);
+            int nNum = 0;
+            try
+            {
+                nNum = stoi(sNum);
+            }
+            catch (const std::invalid_argument& /*ex*/)
+            {
+                return TwainCap_INVALID;
+            }
+            catch (const std::out_of_range& /*ex*/)
+            {
+                return TwainCap_INVALID;
+            }
             return CAP_CUSTOMBASE + nNum;
         }
     }

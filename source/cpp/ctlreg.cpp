@@ -259,11 +259,24 @@ bool dynarithmic::GetCapInfoFromIni(const std::string& strCapName,
                 strNum = StringWrapperA::TrimAll(aStr[Count]);
                 if (strNum.length() == 1 )
                 {
-                    int nNum = stoi(strNum);
-                    if ( nNum >= 4 && nNum <= 7 )
+                    try
                     {
-                        bFoundNum = true;
-                        tempInfo |= (1 << (nNum-1));
+                        int nNum = std::stoi(strNum);
+                        if (nNum >= 4 && nNum <= 7)
+                        {
+                            bFoundNum = true;
+                            tempInfo |= (1 << (nNum - 1));
+                        }
+                    }
+                    catch (const std::invalid_argument& /*ex*/)
+                    {
+                        // We can get here if std::stoi detects that the value is not 
+                        // a valid integer. 
+                    }
+                    catch (const std::out_of_range& /*ex*/)
+                    {
+                        // We can get here if std::stoi detects that the value is not 
+                        // a valid integer. 
                     }
                 }
             }

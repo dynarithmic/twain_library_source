@@ -363,7 +363,7 @@ namespace dynarithmic
                     break;
                 }
                 ++currentComponent;
-                if (currentComponent >= componentNames.size())
+                if (currentComponent >= static_cast<int>(componentNames.size()))
                     break;
             }
             catch (...)
@@ -374,10 +374,10 @@ namespace dynarithmic
         if (badVersion)
         {
             retValue.errorValue[0] = retValue.errorValue[1] = retValue.errorValue[2] = false;
-            retValue.errorMessage = StringConversion::Convert_Ansi_To_Native(origVersion.c_str());
+            retValue.errorMessage = StringConversion::Convert_Ansi_To_Native(origVersion);
             return false;
         }
-        CTL_StaticData::s_ResourceVersion = StringConversion::Convert_Ansi_To_Native(origVersion.c_str());
+        CTL_StaticData::s_ResourceVersion = StringConversion::Convert_Ansi_To_Native(origVersion);
         LOG_FUNC_EXIT_PARAMS(true)
         CATCH_BLOCK(false)
     }

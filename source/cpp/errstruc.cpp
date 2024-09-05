@@ -833,10 +833,10 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
 
 std::string DecodeSourceInfo(pTW_IDENTITY pIdentity, LPCSTR sPrefix)
 {
-    const std::string indenter = IndentDefinition();
     StringStreamA sBuffer;
     if ( pIdentity)
     {
+        const std::string indenter = IndentDefinition();
         sBuffer << "Decoded " << sPrefix << ":\n{\n" <<
 
         indenter << "Id=" << pIdentity->Id << "\n" <<
