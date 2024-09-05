@@ -518,7 +518,7 @@ LONG FSGetFile(CTL_ITwainSource* pSource, LPTSTR sDir, LPLONG FSHandle, LONG nWh
         break;
 
         case GET_NEXT:
-            rc = FS.GetNextFile(reinterpret_cast<TW_MEMREF>(*FSHandle));
+            rc = FS.GetNextFile(reinterpret_cast<TW_MEMREF>(FSHandle));
         break;
 
         case GET_CLOSE:
