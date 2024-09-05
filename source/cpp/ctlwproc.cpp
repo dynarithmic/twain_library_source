@@ -524,7 +524,7 @@ LRESULT CALLBACK_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                             DTWAIN_ARRAY aDibs = nullptr;
                             aDibs = CreateArrayFromFactory( DTWAIN_ARRAYHANDLE, 0 );
                             DTWAIN_GetAllSourceDibs( static_cast<DTWAIN_SOURCE>(pSource), aDibs );
-                            int nDibs = pHandle->m_ArrayFactory->size(aDibs);
+                            int nDibs = static_cast<int>(pHandle->m_ArrayFactory->size(aDibs));
                             StringStreamA strm;
                             strm << buf;
                             LOG_FUNC_VALUES(strm.str().c_str())
