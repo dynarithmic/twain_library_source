@@ -96,7 +96,7 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
 
     const std::string curSearchOrder = pHandle->m_TwainDSMSearchOrderStr;
     CTL_StringType fNameTotal;
-    const int minSize = (std::min)(dirNames.size(), curSearchOrder.size());
+    const int minSize = static_cast<int>((std::min)(dirNames.size(), curSearchOrder.size()));
 	for (int i = 0; i < minSize; ++i)
     {
         // skip this search if -1 is given

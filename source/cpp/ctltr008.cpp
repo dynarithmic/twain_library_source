@@ -303,7 +303,7 @@ void CTL_ProcessEventTriplet::DeviceEvent(CTL_ITwainSource* pSource)
             #ifdef WIN64
                 (*pHandle->m_pCallbackFn)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG_PTR>(pSource));
             #else
-                (*pHandle->m_pCallbackFn)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG_PTR>(pSource));
+                (*pHandle->m_pCallbackFn)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG>(pSource));
             #endif
         }
 
