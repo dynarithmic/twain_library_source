@@ -121,7 +121,7 @@ DTWAIN_BOOL GetPixelType(DTWAIN_SOURCE Source, LPLONG PixelType, LPLONG BitDepth
     if ( bRet )
     {
         DTWAINArrayLL_RAII arr(Array);
-        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
         const auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
 
         if ( !vIn.empty())

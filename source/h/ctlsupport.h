@@ -56,7 +56,7 @@ namespace dynarithmic
                 }
             }
             // get underlying vector and search it for the value
-            const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+            const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
             auto& vData = pHandle->m_ArrayFactory->underlying_container_t<T>(arrayToUse);
             return std::find(vData.begin(), vData.end(), SupportVal) != vData.end();
         }
@@ -89,7 +89,7 @@ namespace dynarithmic
                     DTWAINArrayLL_RAII a2(Array2);
                     if (bRet)
                     {
-                        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+                        const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
                         LONG nSize = static_cast<LONG>(pHandle->m_ArrayFactory->size(Array2));
                         if (nSize > 0)
                             DTWAIN_RangeGetNearestValue(Source, SupportVal, SupportVal, DTWAIN_ROUNDNEAREST);
@@ -107,11 +107,10 @@ namespace dynarithmic
     template <typename T>
     int GetSupport(DTWAIN_SOURCE Source, typename T::value_type* lpSupport, LONG Cap, LONG CapOp=DTWAIN_CAPGET)
     {
-        CTL_TwainDLLHandle*pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
         if (lpSupport == NULL)
         {
-            if (pHandle)
-                pHandle->m_lLastError = DTWAIN_ERR_INVALID_PARAM;
+            pHandle->m_lLastError = DTWAIN_ERR_INVALID_PARAM;
             return -1;
         }
         DTWAIN_ARRAY Array = 0;

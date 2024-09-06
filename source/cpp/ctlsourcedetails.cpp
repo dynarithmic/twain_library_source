@@ -46,12 +46,12 @@ static std::string remove_quotes(std::string s)
 template <typename T>
 static void create_stream(std::stringstream& strm, DTWAIN_SOURCE Source, LONG capValue)
 {
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     DTWAIN_ARRAY arr = nullptr;
     DTWAIN_GetCapValues(Source, capValue, DTWAIN_CAPGET, &arr);
     DTWAINArrayPtr_RAII raii(&arr);
     if (arr)
     {
+        const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<T>(arr);
         auto nCount = vValues.size();
         if (nCount == 0)
@@ -173,7 +173,7 @@ static std::string get_source_file_types(DTWAIN_SOURCE Source)
         {
             try
             {
-                const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+                const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
                 DTWAIN_ARRAY arr = DTWAIN_ArrayCreateFromCap(Source, ICAP_IMAGEFILEFORMAT, 1);
                 if (arr)
                 {
@@ -193,8 +193,7 @@ static std::string get_source_file_types(DTWAIN_SOURCE Source)
     };
 
     // get all the image file formats
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-
+    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     DTWAIN_ARRAY aFileFormats = nullptr;
     DTWAIN_ARRAY aCurrentFileFormat = nullptr;
     DTWAIN_GetCapValues(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPGET, &aFileFormats);
@@ -262,7 +261,7 @@ using pixelMap = std::map<LONG, std::vector<LONG>>;
 
 static pixelMap getPixelAndBitDepthInfo(CTL_ITwainSource* pSource)
 {
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto pHandle = pSource->GetDTWAINHandle();
     // Get the pixel information
     DTWAIN_ARRAY aPixelTypes = nullptr;
     DTWAIN_EnumPixelTypes(pSource, &aPixelTypes);
@@ -285,7 +284,7 @@ static pixelMap getPixelAndBitDepthInfo(CTL_ITwainSource* pSource)
 
 static std::vector<std::string> getPageSizeInfo(CTL_ITwainSource* pSource)
 {
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto pHandle = pSource->GetDTWAINHandle();
     std::vector<std::string> vSizeNames;
     // get the paper sizes
     DTWAIN_ARRAY aSupportedSizes = DTWAIN_EnumPaperSizesEx(pSource);
@@ -315,7 +314,7 @@ using ResInfoMap = std::map<LONG, OneResInfo>;
 
 ResInfoMap getResolutionInfo(CTL_ITwainSource* pSource)
 {
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto pHandle = pSource->GetDTWAINHandle();
     ResInfoMap resMap;
 
     // get units of measure
@@ -387,7 +386,7 @@ struct AllCapInfo
 
 AllCapInfo getAllCapInfo(CTL_ITwainSource* pSource)
 {
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto pHandle = pSource->GetDTWAINHandle();
     AllCapInfo allCapInfo;
     AllCapInfoMap& capInfo = allCapInfo.m_infoMap;
 

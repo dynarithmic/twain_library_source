@@ -188,7 +188,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtendedCaps(DTWAIN_SOURCE Source, LPDTWAIN_
     if (retVal == DTWAIN_ERR_BAD_HANDLE)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
 
     // Check for any other error return code
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return retVal != DTWAIN_NO_ERROR; },
@@ -210,7 +210,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCustomCaps(DTWAIN_SOURCE Source, LPDTWAIN_AR
     if (retVal == DTWAIN_ERR_BAD_HANDLE)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
 
     // Check for any other error return code
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return retVal != DTWAIN_NO_ERROR; },
@@ -227,13 +227,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCap
     if (!DTWAIN_IsCapSupported(Source, lCapability))
         LOG_FUNC_EXIT_PARAMS(false)
 
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
+    CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*> (Source);
+    const auto pHandle = pSource->GetDTWAINHandle();
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return lpOps == NULL; },
-                                        DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-
-    CTL_CapInfo* CapInfo = GetCapInfo(pHandle, p, static_cast<TW_UINT16>(lCapability));
+    CTL_CapInfo* CapInfo = GetCapInfo(pHandle, pSource, static_cast<TW_UINT16>(lCapability));
     if (!CapInfo)
     {
         *lpOps = 0;
@@ -243,7 +240,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCap
     if (*lpOps == 0)
     {
         // Try and get the operations now from TWAIN
-        *lpOps = CTL_TwainAppMgr::GetCapOps(p, lCapability, true);
+        *lpOps = CTL_TwainAppMgr::GetCapOps(pSource, lCapability, true);
         if (*lpOps != 0)
             // Replace 0 with what TWAIN found out about the supported operations
             std::get<CAPINFO_IDX_SUPPORTEDOPS>(*CapInfo) = *lpOps;

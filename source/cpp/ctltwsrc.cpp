@@ -44,7 +44,7 @@ using namespace dynarithmic;
 CTL_ITwainSource* CTL_ITwainSource::Create( CTL_ITwainSession* pSession,
                                             LPCTSTR lpszProduct/*=nullptr*/ )
 {
-    return new CTL_ITwainSource( pSession, lpszProduct );
+    return new CTL_ITwainSource( pSession, lpszProduct, static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal()));
 }
 
 void CTL_ITwainSource::Destroy(const CTL_ITwainSource* pSource)
@@ -145,7 +145,7 @@ bool CTL_ITwainSource::IsActive() const
     return m_bActive;
 }
 
-CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProduct)
+CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProduct, CTL_TwainDLLHandle *pHandle)
     :
     m_pUserPtr(nullptr),
     CapCacheInfo(),
@@ -240,7 +240,8 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_bXferReadySent(false),
     m_bDoublePageCountOnDuplex(true),
     m_bExtendedCapsRetrieved(false),
-    m_tbIsFileSystemSupported(boost::logic::indeterminate)
+    m_tbIsFileSystemSupported(boost::logic::indeterminate),
+    m_pDLLHandle(pHandle)
  {
     if ( lpszProduct )
         m_SourceId.set_product_name(StringConversion::Convert_NativePtr_To_Ansi(lpszProduct));
@@ -549,11 +550,10 @@ CTL_StringType CTL_ITwainSource::GetImageFileName(int curFile) const
     if ( !pDTWAINArray )
         return {};
 
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    const int nCount = static_cast<int>(pHandle->m_ArrayFactory->size(pDTWAINArray));
+    const int nCount = static_cast<int>(m_pDLLHandle->m_ArrayFactory->size(pDTWAINArray));
     if ( nCount > 0 && curFile < nCount )
     {
-        pHandle->m_ArrayFactory->get_value(pDTWAINArray, curFile, &strTemp);
+        m_pDLLHandle->m_ArrayFactory->get_value(pDTWAINArray, curFile, &strTemp);
         return strTemp;
     }
     return {};
@@ -637,8 +637,7 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
         const DTWAIN_ARRAY pDTWAINArray = m_pFileEnumerator;
         if ( !pDTWAINArray )
             return m_strAcquireFile;
-        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-        const auto& factory = pHandle->m_ArrayFactory;
+        const auto& factory = m_pDLLHandle->m_ArrayFactory;
         const int nCount = static_cast<int>(factory->size(pDTWAINArray));
         if ( nCount > 0 )
         {
@@ -658,8 +657,7 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
         const DTWAIN_ARRAY pDTWAINArray = m_pFileEnumerator;
         if ( !pDTWAINArray )
             return m_strAcquireFile;
-        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-        const auto& factory = pHandle->m_ArrayFactory;
+        const auto& factory = m_pDLLHandle->m_ArrayFactory;
         bool bNameAvailable = nCurImage < static_cast<int>(factory->size(pDTWAINArray));
         if ( bNameAvailable )
             bNameAvailable = factory->get_value(pDTWAINArray, nCurImage, &strTemp)?true:false; 
@@ -948,7 +946,7 @@ CTL_StringType CTL_ITwainSource::PromptForFileName() const
     #ifdef _WIN32
     TCHAR szFile[1024];
     // prompt for filename
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = m_pDLLHandle;
 
     OPENFILENAME ofn = {};
     OPENFILENAME* pOfn = &ofn;
@@ -1016,20 +1014,16 @@ int CTL_ITwainSource::GetNumDibs() const
 
 CTL_ITwainSource::~CTL_ITwainSource()
 {
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    if (pHandle)
+    try
     {
-        try
-        {
-            ResetManualDuplexMode();
-            CloseSource(true);
-            pHandle->m_mapPDFTextElement.erase(this);
-            pHandle->m_ArrayFactory->destroy(m_pFileEnumerator);
-        }
-        catch (...)
-        {
-            // No exceptions can escape here
-        }
+        ResetManualDuplexMode();
+        CloseSource(true);
+        m_pDLLHandle->m_mapPDFTextElement.erase(this);
+        m_pDLLHandle->m_ArrayFactory->destroy(m_pFileEnumerator);
+    }
+    catch (...)
+    {
+        // No exceptions can escape here
     }
 }
 
@@ -1149,8 +1143,7 @@ void CTL_ITwainSource::ResetAcquisitionAttempts(DTWAIN_ARRAY aNewAttempts)
     // Remove any old acquisitions
     if ( aNewAttempts != m_aAcqAttempts)
     {
-        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-        pHandle->m_ArrayFactory->destroy(m_aAcqAttempts);
+        m_pDLLHandle->m_ArrayFactory->destroy(m_aAcqAttempts);
         m_aAcqAttempts = aNewAttempts;
     }
 }
@@ -1238,8 +1231,7 @@ void CTL_ITwainSource::SetPDFValue(const CTL_StringType& nWhich, const PDFTextEl
 {
     if ( nWhich == PDFTEXTELEMENTKEY )
     {
-        const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-        pHandle->m_mapPDFTextElement[this].push_back(element);
+        m_pDLLHandle->m_mapPDFTextElement[this].push_back(element);
     }
 }
 void CTL_ITwainSource::SetPDFPageSize(LONG nPageSize, DTWAIN_FLOAT cWidth, DTWAIN_FLOAT cHeight)
@@ -1267,13 +1259,9 @@ void CTL_ITwainSource::SetPDFEncryption(bool bIsEncrypted,
 
 void CTL_ITwainSource::ClearPDFText()
 {
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    if (pHandle)
-    {
-        const auto it = pHandle->m_mapPDFTextElement.find(this);
-        if (it != pHandle->m_mapPDFTextElement.end())
-            it->second.clear();
-    }
+    const auto it = m_pDLLHandle->m_mapPDFTextElement.find(this);
+    if (it != m_pDLLHandle->m_mapPDFTextElement.end())
+        it->second.clear();
 }
 
 void CTL_ITwainSource::SetPhotometric(LONG Setting)
@@ -1533,7 +1521,7 @@ template <typename T>
 static DTWAIN_ARRAY PopulateArray(const std::vector<anytype_>& dataArray, CTL_ITwainSource* pSource, TW_UINT16 nCap)
 {
     const DTWAIN_ARRAY theArray = DTWAIN_ArrayCreateFromCap(pSource, static_cast<LONG>(nCap), static_cast<LONG>(dataArray.size()));
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto pHandle = pSource->GetDTWAINHandle();
     auto& vVector = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
     std::transform(dataArray.begin(), dataArray.end(), vVector.begin(), [](anytype_ theAny) 
                     { return ANYTYPE_NAMESPACE any_cast<typename T::value_type>(theAny);});

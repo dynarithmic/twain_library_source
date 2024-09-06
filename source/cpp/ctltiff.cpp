@@ -45,7 +45,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTIFFCompressType(DTWAIN_SOURCE Source, LONG S
     LOG_FUNC_ENTRY_PARAMS((Source, Setting))
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     // Must be in state 4 or higher
-    const auto p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
+    const auto p = VerifySourceHandle( pHandle, Source );
     if (p)
     {
         const SourceState theState = p->GetState();
