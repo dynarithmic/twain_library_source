@@ -27,6 +27,72 @@
 
 using namespace dynarithmic;
 
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Test a capability to see what data type and what container types produce a successful MSG_GET operation
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapability)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, lCapability))
+
+    static constexpr LONG DataTypeArray[] = {
+                                            TWTY_INT16,
+                                            TWTY_UINT16,
+                                            TWTY_INT32,
+                                            TWTY_UINT32,
+                                            TWTY_BOOL,
+                                            TWTY_FIX32,
+                                            TWTY_INT8,
+                                            TWTY_UINT8,
+                                            TWTY_STR32,
+                                            TWTY_STR64,
+                                            TWTY_STR255,
+                                            TWTY_STR128,
+                                            TWTY_STR1024,
+                                            TWTY_UNI512,
+                                            TWTY_FRAME
+                                        };
+
+    static constexpr LONG ContainerTypeArray[] = {
+                                            DTWAIN_CONTENUMERATION,
+                                            DTWAIN_CONTARRAY,
+                                            DTWAIN_CONTRANGE,
+                                            DTWAIN_CONTONEVALUE
+                                        };
+
+    static constexpr size_t DataTypeArraySize = std::size(DataTypeArray);
+    static constexpr size_t ContainerArraySize = std::size(ContainerTypeArray);
+
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    CTL_ITwainSource* p = VerifySourceHandle(pHandle, Source);
+
+    if (!CTL_TwainAppMgr::IsSourceOpen(p))
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [] {return true; }, DTWAIN_ERR_SOURCE_NOT_OPEN, nullptr, FUNC_MACRO);
+
+    DTWAIN_ARRAY outputArray = CreateArrayFromFactory(DTWAIN_ARRAYLONG, 0);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return outputArray == nullptr; }, DTWAIN_ERR_OUT_OF_MEMORY, nullptr, FUNC_MACRO);
+
+    auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(outputArray);
+
+    // Loop and test MSG_GET for the capability.
+    for (size_t i = 0; i < DataTypeArraySize; ++i)
+    {
+        for (size_t j = 0; j < ContainerArraySize; ++j)
+        {
+            DTWAIN_ARRAY testArray;
+            DTWAINArrayPtr_RAII raii(&testArray);
+            bool ok = DTWAIN_GetCapValuesEx2(Source, lCapability, DTWAIN_CAPGET, ContainerTypeArray[j], DataTypeArray[i], &testArray);
+            if (ok)
+            {
+                LONG statusValue = (LONG)DataTypeArray[i] << 16 | ContainerTypeArray[j];
+                vValues.push_back(statusValue);
+                DumpArrayContents(testArray, lCapability);
+            }
+        }
+    }
+    LOG_FUNC_EXIT_PARAMS(outputArray)
+    CATCH_BLOCK(nullptr)
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsCapSupported(DTWAIN_SOURCE Source, LONG lCapability)
 {
@@ -65,7 +131,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsCapSupported(DTWAIN_SOURCE Source, LONG lCapab
                 LOG_FUNC_EXIT_PARAMS(true)
             else
             {
-                DTWAIN_CollectCapabilityInfo(p, static_cast<TW_UINT16>(nCap), *pArray);
                 LOG_FUNC_EXIT_PARAMS(true)
             }
         }
@@ -78,29 +143,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsCapSupported(DTWAIN_SOURCE Source, LONG lCapab
 
         // Test if the capabilities have already been retrieved.  This should only be done
         // once per TWAIN source.
-        if (!p->RetrievedAllCaps())
-        {
-            // Get the capabilities using TWAIN
-            CTL_TwainCapArray rArray;
-            CTL_TwainAppMgr::GetCapabilities(p, rArray);
-            p->SetCapSupportedList(rArray);
-
-            // Get the capabilities from the list in the Source
-            CapList& pArray = p->GetCapSupportedList();
-
-            // Get all the information about the capability.
-            std::for_each(pArray.begin(), pArray.end(), [&](TW_UINT16 val)
-            {
-                DTWAIN_CacheCapabilityInfo(p, pHandle, static_cast<TW_UINT16>(val)); });
-
-            // We have retrieved all the capability information
-            p->SetRetrievedAllCaps(true);
-        }
+        CTL_TwainAppMgr::GatherCapabilityInfo(p);
 
         // Now test if the capability is supported
-        CapList& pArray = p->GetCapSupportedList();
-        const auto it = pArray.find(static_cast<TW_UINT16>(lCapability));
-        if (it != pArray.end())
+        if ( p->IsCapInSupportedList(static_cast<TW_UINT16>(lCapability)))
         {
             // supported, so return true
             LOG_FUNC_EXIT_PARAMS(true)

@@ -194,6 +194,7 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
     std::unique_ptr<CTL_ImageIOHandler> pHandler;
     ImageInfo.IsPDF = false;
     ResolvePostscriptOptions(ImageInfo, nFormat);
+    ImageInfo.IsBigTiff = CTL_ITwainSource::IsFileTypeBigTiff(static_cast<dynarithmic::CTL_TwainFileFormatEnum>(nFormat));
     switch (nFormat )
     {
         case BmpFormat:
@@ -236,11 +237,18 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
         case TiffFormatDEFLATE:
         case TiffFormatJPEG:
         case TiffFormatPIXARLOG:
+        case BigTiffFormatLZW:
+        case BigTiffFormatNONE:
+        case BigTiffFormatPACKBITS:
+        case BigTiffFormatDEFLATE:
+        case BigTiffFormatGROUP3:
+        case BigTiffFormatGROUP4:
+        case BigTiffFormatJPEG:
         case PSFormatLevel1:
         case PSFormatLevel2:
         case PSFormatLevel3:
             if ( nFormat == PSFormatLevel1 || nFormat == PSFormatLevel2 || nFormat == PSFormatLevel3 )
-                ImageInfo.IsPostscript = TRUE;
+                ImageInfo.IsPostscript = true;
             pHandler = std::make_unique<CTL_TiffIOHandler>( this, nFormat, ImageInfo );
         break;
         case TgaFormat:
@@ -341,8 +349,9 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
     CTL_ImageIOHandlerPtr pHandler;
     ImageInfo.IsPDF = false;
     ResolvePostscriptOptions(ImageInfo, nFormat);
+    ImageInfo.IsBigTiff = CTL_ITwainSource::IsFileTypeBigTiff(static_cast<dynarithmic::CTL_TwainFileFormatEnum>(nFormat));
     nStatus = DTWAIN_NO_ERROR;
-    switch (nFormat )
+    switch (nFormat)
     {
         case TiffFormatNONEMULTI:
         case TiffFormatGROUP3MULTI:
@@ -351,6 +360,13 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
         case TiffFormatDEFLATEMULTI:
         case TiffFormatJPEGMULTI:
         case TiffFormatLZWMULTI:
+        case BigTiffFormatLZWMULTI:
+        case BigTiffFormatNONEMULTI:
+        case BigTiffFormatPACKBITSMULTI:
+        case BigTiffFormatDEFLATEMULTI:
+        case BigTiffFormatGROUP3MULTI:
+        case BigTiffFormatGROUP4MULTI:
+        case BigTiffFormatJPEGMULTI:
         case PSFormatLevel1Multi:
         case PSFormatLevel2Multi:
         case PSFormatLevel3Multi:
@@ -833,7 +849,7 @@ HANDLE CTL_TwainDib::CreateBMPBitmapFromDIB(HANDLE hDib)
         lpbi->biSize + CDibInterface::CalculateUsedPaletteEntries(bpp) * sizeof(RGBQUAD);
 
     // we need to attach the bitmap header info onto the data
-    const unsigned int totalSize = ImageMemoryHandler::GlobalSize(hDib) + sizeof(BITMAPFILEHEADER);
+    const size_t totalSize = ImageMemoryHandler::GlobalSize(hDib) + sizeof(BITMAPFILEHEADER);
 
     // Allocate for returned handle
     returnHandle = static_cast<HANDLE>(ImageMemoryHandler::GlobalAlloc(GMEM_FIXED, totalSize));

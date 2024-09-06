@@ -40,7 +40,7 @@ namespace dynarithmic
         if (bRet)
         {
             Handle->m_lLastError = Err;
-            CTL_TwainAppMgr::SetError(Err, extraInfo);
+            CTL_TwainAppMgr::SetError(Err, extraInfo, false);
             OutputDTWAINErrorA(Handle, fnName);
             if (logError && CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK)
             {
@@ -97,6 +97,13 @@ namespace dynarithmic
             OutputDTWAINErrorA(nullptr, fnName);
             throw retErr;
         }
+    }
+
+#define CHECK_IF_CAP_SUPPORTED(pSource, pHandle, nCap, retValue) \
+    if (!pSource->IsCapInSupportedList(nCap)) \
+    { \
+        pHandle->m_lLastError = DTWAIN_ERR_CAP_NO_SUPPORT; \
+        LOG_FUNC_EXIT_PARAMS(retValue) \
     }
 }
 #endif

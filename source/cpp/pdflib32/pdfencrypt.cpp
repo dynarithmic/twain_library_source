@@ -30,7 +30,6 @@ OF THIRD PARTY RIGHTS.
 #include "pdfencrypt.h"
 #include "../cryptolib/filters.h"
 #include "../cryptolib/md5.h"
-#include "boost/date_time/posix_time/posix_time.hpp"
 
 std::string GetSystemTimeInMilliseconds();
 #ifdef _MSC_VER

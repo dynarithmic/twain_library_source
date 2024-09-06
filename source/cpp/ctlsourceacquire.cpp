@@ -636,7 +636,12 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
                 {
                     const auto& factory = pHandle->m_ArrayFactory;
                     factory->destroy(pArray);
-                    DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{ return true; }, DTWAIN_ERR_EMPTY_ARRAY, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
+                    if ( nFileCount == 0 )
+                        // Array of names is empty
+                        DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{ return true; }, DTWAIN_ERR_EMPTY_ARRAY, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
+                    else
+                        // File name is empty
+                        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [] { return true; }, DTWAIN_ERR_BAD_FILENAME, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
                 }
 
                 pSource->SetFileEnumerator(pArray);

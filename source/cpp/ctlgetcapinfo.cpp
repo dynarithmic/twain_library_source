@@ -42,22 +42,20 @@ CTL_CapInfoArrayPtr dynarithmic::GetCapInfoArray(CTL_TwainDLLHandle* pHandle, co
     return pArray;
 }
 
-CTL_CapInfo dynarithmic::GetCapInfo(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource* p, TW_UINT16 nCap)
+CTL_CapInfo* dynarithmic::GetCapInfo(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource* p, TW_UINT16 nCap)
 {
     const CTL_CapInfoArrayPtr pArray = GetCapInfoArray(pHandle, p);
-    CTL_CapInfo CapInfo;
+    CTL_CapInfo* CapInfo = nullptr;
     if (!pArray)
     {
-        CapInfo.SetValid(false);
-        return CapInfo;
+        return nullptr;
     }
     const auto iter = pArray->find(static_cast<TW_UINT16>(nCap));
     if (iter != pArray->end())
     {
-        CapInfo = iter->second;
-        CapInfo.SetValid(true);
+        CapInfo = &iter->second;
+        CapInfo->SetValid(true);
         return CapInfo;
     }
-    CapInfo.SetValid(false);
-    return CapInfo;
+    return nullptr;
 }

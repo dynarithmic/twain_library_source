@@ -164,7 +164,7 @@ SupportsNoPixels() {
 // ----------------------------------------------------------
 
 static void * DLL_CALLCONV
-Open(FreeImageIO *io, fi_handle handle, BOOL read) {
+Open(FreeImageIO *io, fi_handle handle, BOOL read, FIBITMAP* dib, int flags) {
 	WebPMux *mux = NULL;
 	int copy_data = 1;	// 1 : copy data into the mux, 0 : keep a link to local data
 

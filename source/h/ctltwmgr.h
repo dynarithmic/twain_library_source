@@ -94,7 +94,7 @@ namespace dynarithmic
 
             static void Destroy();
             static HINSTANCE GetAppInstance();
-            static bool CheckTwainExistence(CTL_StringType DLLName, LPLONG pWhichSearch=nullptr);
+            static std::pair<bool, CTL_StringType> CheckTwainExistence(CTL_StringType DLLName, LPLONG pWhichSearch=nullptr);
 
 
             // Twain session management functions.  Each App utilizing
@@ -124,6 +124,7 @@ namespace dynarithmic
             static bool IsTwainMsg(MSG *pMsg, bool bFromUserQueue=false);
             static unsigned int GetRegisteredMsg();
             static bool IsVersion2DSMUsed();
+            static void GatherCapabilityInfo(CTL_ITwainSource* pSource);
 
             // Source management functions
             // Get all the sources in an array
@@ -205,7 +206,7 @@ namespace dynarithmic
             static bool IsProgressIndicatorOn(const CTL_ITwainSource* pSource);
             static bool IsJobControlSupported( const CTL_ITwainSource *pSource, TW_UINT16& nValue );
 
-            static void     SetError(int nError, const std::string& extraInfo="");
+            static void     SetError(int nError, const std::string& extraInfo, bool bMustReportGeneralError);
             static int      GetLastError();
             static LPSTR    GetLastErrorString(LPSTR lpszBuffer, int nSize);
             static LPSTR    GetErrorString(int nError, LPSTR lpszBuffer, int nSize);
@@ -256,7 +257,8 @@ namespace dynarithmic
             static std::string  GetCapNameFromCap( LONG Cap );
             static UINT         GetDataTypeFromCap( CTL_EnumCapability Cap, CTL_ITwainSource *pSource=nullptr);
             static UINT         GetContainerTypesFromCap( CTL_EnumCapability Cap, bool nType );
-            static bool         GetBestContainerType(const CTL_ITwainSource* pSource,
+            static bool         GetBestContainerType(CTL_TwainDLLHandle *pHandle,
+                                                     const CTL_ITwainSource* pSource,
                                                      CTL_EnumCapability nCap,
                                                      UINT &rGet,
                                                      UINT &rSet,
@@ -266,6 +268,7 @@ namespace dynarithmic
             static bool         GetBestCapDataType(const CTL_ITwainSource* pSource,
                                                      CTL_EnumCapability nCap,
                                                      UINT &nDataType);
+            static LONG DoCapContainerTest(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, TW_UINT16 nCap, LONG lGetType);
 
             static void         GetContainerNamesFromType( int nType, StringArray &rArray );
             static void         EndTwainUI(const CTL_ITwainSession* pSession, CTL_ITwainSource* pSource);
@@ -374,7 +377,7 @@ namespace dynarithmic
                 if ( !IsSourceOpen( pSource ) )
                     return false;
 
-                // Get the #transfer count
+                // Execute the TWAIN triplet
                 const TW_UINT16 rc = pTrip->Execute();
 
                 const CTL_ITwainSource *pTempSource = const_cast<CTL_ITwainSource*>(pSource);
@@ -393,10 +396,6 @@ namespace dynarithmic
                     {
                         DataType pData;
                         const size_t nNumItems = pTrip->GetNumItems();
-
-                        if ( nNumItems == 0 )
-                            pArray.push_back(0);
-                        else
                         for ( size_t i = 0; i < nNumItems; i++ )
                         {
                             pTrip->GetValue( &pData, i );
@@ -515,12 +514,12 @@ namespace dynarithmic
             static SourceFlatbedOnlyList s_SourceFlatbedOnlyList;
     };
 
-    #define DTWAIN_ERROR_CONDITION(Err, RetVal) {               \
-            CTL_TwainAppMgr::SetError(Err);               \
+    #define DTWAIN_ERROR_CONDITION(Err, RetVal, mustReport) {               \
+            CTL_TwainAppMgr::SetError(Err, "", mustReport);               \
             return(RetVal); }
 
-    #define DTWAIN_ERROR_CONDITION_EX(Err, ExtraInfo, RetVal) {               \
-        CTL_TwainAppMgr::SetError(Err, ExtraInfo);               \
+    #define DTWAIN_ERROR_CONDITION_EX(Err, ExtraInfo, RetVal, mustReport) {               \
+        CTL_TwainAppMgr::SetError(Err, ExtraInfo, mustReport);               \
         return(RetVal); }
 
     /////////////////// DLL stuff /////////////////////

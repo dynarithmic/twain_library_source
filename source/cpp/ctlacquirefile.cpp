@@ -51,6 +51,15 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
     CTL_ITwainSource* pSource = VerifySourceHandle(pHandle, Source);
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
+
+    // Check if the file format is valid
+    auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
+    if (availableFileTypes.find(lFileType) == availableFileTypes.end())
+    {
+        DTWAIN_SetLastError(DTWAIN_ERR_FILE_FORMAT);
+        LOG_FUNC_EXIT_PARAMS(false)
+    }
+
     DTWAIN_ARRAY tempNames = nullptr;
     DTWAINArrayPtr_RAII tempRAII(&tempNames);
     DTWAIN_ARRAY arrayToUse = aFileNames;
@@ -88,7 +97,6 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
     CATCH_BLOCK(false)
 }
 
-
 DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFile(DTWAIN_SOURCE Source,
                                                   LPCTSTR   lpszFile,
                                                   LONG     lFileType,
@@ -106,6 +114,14 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFile(DTWAIN_SOURCE Source,
     CTL_ITwainSource* pSource = VerifySourceHandle(pHandle, Source);
     if (!pSource)
         LOG_FUNC_EXIT_PARAMS(false)
+
+    // Check if the file format is valid
+    auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
+    if (availableFileTypes.find(lFileType) == availableFileTypes.end())
+    {
+        DTWAIN_SetLastError(DTWAIN_ERR_FILE_FORMAT);
+        LOG_FUNC_EXIT_PARAMS(false)
+    }
 
     lFileFlags &= ~DTWAIN_USELIST;
     SourceAcquireOptions opts = SourceAcquireOptions().setHandle(GetDTWAINHandle_Internal()).setSource(Source).
@@ -168,7 +184,7 @@ static std::string GetDirectoryCreationError(CTL_StringType fileName)
 {
     return  GetResourceStringFromMap(IDS_LOGMSG_ERRORTEXT) + ": DTWAIN_AcquireFile: " +
             GetResourceStringFromMap(DTWAIN_ERR_CREATE_DIRECTORY_) + ": " +
-            StringConversion::Convert_Native_To_Ansi(fileName.c_str());
+            StringConversion::Convert_Native_To_Ansi(fileName);
 }
 
 bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType)
