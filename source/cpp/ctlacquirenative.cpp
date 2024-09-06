@@ -64,7 +64,7 @@ DTWAIN_BOOL   DLLENTRY_DEF  DTWAIN_AcquireNativeEx(DTWAIN_SOURCE Source, LONG Pi
 DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireNative(SourceAcquireOptions& opts)
 {
     opts.setActualAcquireType(TWAINAcquireType_Native);
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_ITwainSource*>(opts.getSource())->GetDTWAINHandle();
     if ( pHandle->m_lAcquireMode == DTWAIN_MODELESS )
          return LLAcquireImage(opts);
     auto pr = dynarithmic::StartModalMessageLoop(opts.getSource(), opts);

@@ -378,6 +378,12 @@ CTL_ITwainSource*  CTL_TwainAppMgr::GetDefaultSource(CTL_ITwainSession* pSession
     return GenericSourceSelector(pSession, nullptr, nullptr, 2);
 }
 
+bool CTL_TwainAppMgr::SetDefaultSource(CTL_ITwainSource* pSource)
+{
+    const auto pSession = pSource->GetTwainSession();
+    return SetDefaultSource(pSession, pSource);
+}
+
 bool CTL_TwainAppMgr::OpenSource( CTL_ITwainSession* pSession, const CTL_ITwainSource* pSource/*=nullptr*/)
 {
     if ( !s_pGlobalAppMgr )
@@ -724,7 +730,7 @@ bool CTL_TwainAppMgr::ShowUserInterface( CTL_ITwainSource *pSource, bool bTest, 
                 DisableUserInterface(pSource);
 
                 // Force setting the transfer done now.
-                const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+                const auto pHandle = pSource->GetDTWAINHandle();
                 pHandle->m_bTransferDone = true;
 
                 SendTwainMsgToWindow(pSession,nullptr,DTWAIN_TN_UICLOSED,reinterpret_cast<LPARAM>(pSource));
@@ -2643,7 +2649,7 @@ void CTL_TwainAppMgr::WriteLogInfo(const CTL_StringType& s, bool bFlush)
 
 void CTL_TwainAppMgr::GatherCapabilityInfo(CTL_ITwainSource* pSource)
 {
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto pHandle = pSource->GetDTWAINHandle();
     if (!pSource->RetrievedAllCaps())
     {
         // Get the capabilities using TWAIN

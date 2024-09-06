@@ -71,16 +71,18 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireBuffered(SourceAcquireOptions& opts)
 {
     LOG_FUNC_ENTRY_PARAMS((opts))
     // Check if TILES are on.  If so, TILES are not currently supported.
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
     const DTWAIN_SOURCE Source = opts.getSource();
+    auto pSource = static_cast<CTL_ITwainSource*>(Source);
+    const auto pHandle = pSource->GetDTWAINHandle();
 
     if (DTWAIN_IsCapSupported(Source, DTWAIN_CV_ICAPTILES))
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return TileModeOn(Source); }, DTWAIN_ERR_TILES_NOT_SUPPORTED, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
+
     LONG compressionType;
+
     if (!DTWAIN_GetCompressionType(Source, &compressionType, TRUE))
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return false; }, DTWAIN_ERR_COMPRESSION, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
-    auto pSource = static_cast<CTL_ITwainSource*>(Source);
+
     pSource->SetCompressionType(compressionType);
     opts.setActualAcquireType(TWAINAcquireType_Buffer);
     if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)

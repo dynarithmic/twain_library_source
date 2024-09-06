@@ -188,7 +188,7 @@ static DTWAIN_ARRAY performGetCap(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source,
     DTWAINArray_RAII raii(ThisArray);
 
     DTWAIN_ARRAY pDTWAINArray = ThisArray;
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     pHandle->m_ArrayFactory->clear(pDTWAINArray);
     int bOk = 0;
     if (lContainerType == DTWAIN_CONTONEVALUE)
@@ -237,7 +237,7 @@ static bool performSetCap(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, TW_UINT
 {
     bool bOk = false;
     DTWAIN_ARRAY pDTWAINArray = pArray;
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     if (lSetType != DTWAIN_CAPRESET)
     {
         auto tagType = pHandle->m_ArrayFactory->tag_type(pArray);

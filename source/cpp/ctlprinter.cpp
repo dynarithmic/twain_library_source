@@ -95,7 +95,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinter(DTWAIN_SOURCE Source, LONG nPrinter, 
     bool bRet = false;
     if ( bFound )
     {
-        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
         if ( !vValues.empty() )
             vValues[0] = nPrinter;
@@ -119,7 +119,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterEx(DTWAIN_SOURCE Source, LONG nPrinter
     LONG SetType = DTWAIN_CAPSET;
     if (!bSetCurrent)
         SetType = DTWAIN_CAPRESET;
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
     DTWAIN_BOOL bRet = 0;
     if (!vValues.empty())
@@ -149,20 +149,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterStrings(DTWAIN_SOURCE Source, DTWAIN_A
     LOG_FUNC_ENTRY_PARAMS((Source, ArrayString, pNumStrings))
     if ( !DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPPRINTERSTRING) )
         LOG_FUNC_EXIT_PARAMS(false)
-
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle( pHandle, Source );
+    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     auto& factory = pHandle->m_ArrayFactory;
-    if ( p )
-    {
-        // Check if array is of the correct type
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle,
-                        [&]{ return !factory->is_valid(ArrayString, CTL_ArrayFactory::arrayTag::StringType);},
-                         DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
-    }
-    else
-        LOG_FUNC_EXIT_PARAMS(false)
-
+    // Check if array is of the correct type
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle,
+                    [&]{ return !factory->is_valid(ArrayString, CTL_ArrayFactory::arrayTag::StringType);},
+                        DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
     const size_t nStrings = factory->size(ArrayString);
     if ( nStrings == 0 )
     {

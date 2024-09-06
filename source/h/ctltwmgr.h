@@ -142,6 +142,8 @@ namespace dynarithmic
             static CTL_ITwainSource*  SelectSource( CTL_ITwainSession* pSession, LPCTSTR strSource);
 
             static CTL_ITwainSource*  GetDefaultSource(CTL_ITwainSession* pSession);
+            static bool SetDefaultSource(CTL_ITwainSource* pSource);
+
 
             // Select a source from a source object (NULL opens default
             // source)

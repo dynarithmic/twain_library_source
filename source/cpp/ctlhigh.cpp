@@ -57,11 +57,12 @@ static bool GetCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, typename CapArray
                                  GetCapValuesFn /*capFn*/, const std::string& func, const std::string& paramLog)
 {
     DTWAIN_ARRAY ArrayValues = nullptr;
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+
     const LONG retVal = EnumCapInternal(Source, Cap, &ArrayValues, false, GetCurrentCapValues, func, paramLog);
     DTWAINArrayLL_RAII arr(ArrayValues);
     if (retVal > 0)
     {
+        const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
         auto& vOut = pHandle->m_ArrayFactory->underlying_container_t<typename CapArrayType::value_type>(ArrayValues);
         *value = vOut[0];
         return true;
@@ -249,7 +250,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
     DTWAINArrayLL_RAII arr(ArrayValues);
     if (retVal > 0)
     {
-        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
         std::string sVal;
         pHandle->m_ArrayFactory->get_value(ArrayValues, 0, &sVal);
         StringWrapperA::CopyInfoToCString(sVal, value, nLen);
@@ -763,7 +764,7 @@ static bool GetDoubleCap( DTWAIN_SOURCE Source, LONG lCap, double *pValue )
     DTWAIN_ARRAY Array = nullptr;
     bool bRet = DTWAIN_GetCapValues(Source, lCap, DTWAIN_CAPGETCURRENT, &Array) ? true : false;
     DTWAINArrayLL_RAII arr(Array);
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     const auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<double>(Array);
     if ( bRet && Array )
     {

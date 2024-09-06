@@ -159,7 +159,7 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireFile(SourceAcquireOptions& opts)
         opts.setFileFlags(opts.getFileFlags() | DTWAIN_USELIST);
     if ( opts.getAcquireType() != TWAINAcquireType_AudioFile)
         opts.setActualAcquireType(TWAINAcquireType_File);
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_ITwainSource*>(opts.getSource())->GetDTWAINHandle();
     if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
         return LLAcquireImage(opts);
     auto pr = dynarithmic::StartModalMessageLoop(opts.getSource(), opts);
@@ -207,7 +207,7 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
 
     // if the auto-create is not on, let's do a quick test to see if the file can be written to the
     // directory specified.
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto pHandle = pSource->GetDTWAINHandle();
     bool bUsePrompt = opts.getFileFlags() & DTWAIN_USEPROMPT;
     if (!bUsePrompt)
     {

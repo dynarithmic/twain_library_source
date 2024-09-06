@@ -185,7 +185,7 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
     if (bOK)
     {
         DTWAINArrayLL_RAII arrP(PixelTypes);
-        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        const auto pHandle = p->GetDTWAINHandle();
         auto& vPixelTypes = pHandle->m_ArrayFactory->underlying_container_t<LONG>(PixelTypes);
 
         LONG nCount = static_cast<LONG>(vPixelTypes.size());

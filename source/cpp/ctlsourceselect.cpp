@@ -59,8 +59,8 @@ static std::unordered_map<int, SourceFn> SourcefnMap = {{SELECTSOURCE, DTWAIN_LL
 
 static LONG OpenSourceInternal(DTWAIN_SOURCE Source, const SourceSelectionOptions& opts)
 {
-    auto* pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     const auto p = static_cast<CTL_ITwainSource *>(Source);
+    auto* pHandle = p->GetDTWAINHandle();
     if (p)
         p->SetSelected(true);
     else
@@ -228,7 +228,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceSelected(DTWAIN_SOURCE Source)
 
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, FALSE, FUNC_MACRO);
-    CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     DTWAIN_BOOL bRet = FALSE;
     if ( p )
         bRet = p->IsSelected();
@@ -436,8 +436,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDefaultSource(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    bool bRet = false;
     if (p)
     {
+        bRet = CTL_TwainAppMgr::SetDefaultSource(p);
         // Load the resources
         CSimpleIniA customProfile;
         CTL_StringType fullDirectory = dynarithmic::GetDTWAININIPath();
@@ -445,7 +447,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDefaultSource(DTWAIN_SOURCE Source)
         customProfile.SetValue("Sources", "Default", p->GetProductNameA().c_str());
         customProfile.SaveFile(fullDirectory.c_str());
     }
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
 

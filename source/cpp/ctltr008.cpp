@@ -294,7 +294,7 @@ void CTL_ProcessEventTriplet::DeviceEvent(CTL_ITwainSource* pSource)
         pSource->SetDeviceEvent( DevTrip.GetDeviceEvent() );
         CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_DEVICEEVENT,reinterpret_cast<LPARAM>(pSource));
 
-        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        const auto pHandle = pSource->GetDTWAINHandle();
         // if there is a callback, call it now with the error notifications
         if ( pHandle->m_pCallbackFn )
         {

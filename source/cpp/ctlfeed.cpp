@@ -48,7 +48,8 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsFeederSupported(DTWAIN_SOURCE Source)
     if (!bOk)
         LOG_FUNC_EXIT_PARAMS(false)
 
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
+    const auto pHandle = pSource->GetDTWAINHandle(); 
     auto& vFeeder = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
     if (vFeeder.empty())
         LOG_FUNC_EXIT_PARAMS(false)
@@ -74,7 +75,8 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsFeederLoaded(DTWAIN_SOURCE Source)
     LOG_FUNC_ENTRY_PARAMS((Source))
     if ( DTWAIN_IsFeederSupported(Source) )
     {
-        const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+        CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
+        const auto pHandle = pSource->GetDTWAINHandle();
         DTWAIN_ARRAY a = nullptr;
         const DTWAIN_BOOL bReturn = DTWAIN_GetCapValues(Source, DTWAIN_CV_CAPFEEDERLOADED, DTWAIN_CAPGETCURRENT, &a);
         DTWAINArrayLL_RAII arr(a);
@@ -289,8 +291,8 @@ bool ExecuteFeederState5Func(DTWAIN_SOURCE Source, LONG lCap)
     if ( !DTWAIN_IsCapSupported(Source, lCap) )
         return false;
 
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    VerifySourceHandle( pHandle, Source );
+    CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
+    const auto pHandle = pSource->GetDTWAINHandle();
     DTWAIN_ARRAY aValues = DTWAIN_ArrayCreateFromCap(nullptr, lCap, 0);
     if ( !aValues )
         return false;
