@@ -37,6 +37,8 @@ namespace dynarithmic
                            UINT &rGetValuesDefault,
                            UINT &rSetValuesCurrent,
                            UINT &rSetValuesAvailable,
+                           UINT& rResetValues,
+                           UINT& rQueryValues,
                            UINT &rQuerySupport,
                            UINT &rEOJValue,
                            TW_UINT16 &rStateInfo,

@@ -27,9 +27,6 @@
 
 using namespace dynarithmic;
 
-typedef CTL_StringType (CTL_ITwainSource::*SOURCEINFOFUNC)() const;
-static LONG GetSourceInfo(CTL_ITwainSource *p, SOURCEINFOFUNC pFunc, LPTSTR szInfo, LONG nMaxLen);
-
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceValid(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
@@ -52,7 +49,7 @@ LONG   DLLENTRY_DEF DTWAIN_GetSourceManufacturer( DTWAIN_SOURCE Source, LPTSTR s
     CTL_ITwainSource *p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
     if (p)
     {
-        const LONG Ret = GetSourceInfo(p, static_cast<SOURCEINFOFUNC>(&CTL_ITwainSource::GetManufacturer), szMan, nMaxLen);
+        const LONG Ret = GetSourceInfo(p, &CTL_ITwainSource::GetManufacturer, szMan, nMaxLen);
         LOG_FUNC_EXIT_PARAMS(Ret)
     }
     LOG_FUNC_EXIT_PARAMS(-1L)
@@ -65,8 +62,7 @@ LONG   DLLENTRY_DEF DTWAIN_GetSourceProductFamily( DTWAIN_SOURCE Source, LPTSTR 
     CTL_ITwainSource *p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
     if (p)
     {
-        const LONG Ret = GetSourceInfo(p, static_cast<SOURCEINFOFUNC>(&CTL_ITwainSource::GetProductFamily),
-                                       szProduct, nMaxLen);
+        const LONG Ret = GetSourceInfo(p, &CTL_ITwainSource::GetProductFamily, szProduct, nMaxLen);
         LOG_FUNC_EXIT_PARAMS(Ret)
     }
     LOG_FUNC_EXIT_PARAMS(-1L)
@@ -79,8 +75,7 @@ LONG   DLLENTRY_DEF DTWAIN_GetSourceProductName(DTWAIN_SOURCE Source,LPTSTR szPr
     CTL_ITwainSource *p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
     if (p)
     {
-        const LONG Ret = GetSourceInfo(p, static_cast<SOURCEINFOFUNC>(&CTL_ITwainSource::GetProductName),
-                                       szProduct, nMaxLen);
+        const LONG Ret = GetSourceInfo(p, &CTL_ITwainSource::GetProductName, szProduct, nMaxLen);
         LOG_FUNC_EXIT_PARAMS(Ret)
     }
     LOG_FUNC_EXIT_PARAMS(-1L)
@@ -107,7 +102,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSourceVersionInfo(DTWAIN_SOURCE Source, LPTSTR szVIn
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 
-static LONG GetSourceInfo(CTL_ITwainSource *p,SOURCEINFOFUNC pFunc,LPTSTR szInfo, LONG nMaxLen)
+LONG dynarithmic::GetSourceInfo(CTL_ITwainSource *p,SOURCEINFOFUNC pFunc,LPTSTR szInfo, LONG nMaxLen)
 {
     return StringWrapper::CopyInfoToCString((p->*pFunc)(), szInfo, nMaxLen);
 }

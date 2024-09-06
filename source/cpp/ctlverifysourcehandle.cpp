@@ -44,15 +44,15 @@ CTL_ITwainSource* dynarithmic::VerifySourceHandle(DTWAIN_HANDLE DLLHandle,  DTWA
     {
         const auto pHandle = static_cast<CTL_TwainDLLHandle *>(DLLHandle);
         // See if DLL Handle exists
-        DTWAIN_Check_Bad_Handle_Ex(pHandle, NULL, FUNC_MACRO);
+        DTWAIN_Check_Bad_Handle_Ex(pHandle, nullptr, FUNC_MACRO);
         p = static_cast<CTL_ITwainSource *>(Source);
 
         // Check if Source is valid
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !p ||
-                                              !CTL_TwainAppMgr::IsValidTwainSource(pHandle->m_pTwainSession, p); },
-            DTWAIN_ERR_BAD_SOURCE, NULL, FUNC_MACRO);
+                                          !CTL_TwainAppMgr::IsValidTwainSource(pHandle->m_pTwainSession, p); },
+                                          DTWAIN_ERR_BAD_SOURCE, NULL, FUNC_MACRO);
     }
     LOG_FUNC_EXIT_PARAMS(p)
-    CATCH_BLOCK(static_cast<CTL_ITwainSource *>(NULL))
+    CATCH_BLOCK(static_cast<CTL_ITwainSource *>(nullptr))
 }
 

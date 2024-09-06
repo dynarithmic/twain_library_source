@@ -171,9 +171,16 @@ namespace dynarithmic
         decltype(CTL_CapStruct::m_nDataType)  capType;
         decltype(CTL_CapStruct::m_nGetContainer)  capGet;
         decltype(CTL_CapStruct::m_nSetContainer) capSet;
+        decltype(CTL_CapStruct::m_nGetCurrentContainer)  capGetCurrent;
+        decltype(CTL_CapStruct::m_nGetDefaultContainer) capGetDefault;
+        decltype(CTL_CapStruct::m_nSetConstraintContainer) capSetConstraint;
+        decltype(CTL_CapStruct::m_nResetContainer) capReset;
+        decltype(CTL_CapStruct::m_nQuerySupportContainer) capQuery;
         LONG lCap;
 
-        while (ifs >> lCap >> capName >> capType >> capGet >> capSet)
+        while (ifs >> lCap >> capName >> capType >> capGet >>
+                capGetCurrent >> capGetDefault >> capSet >> capSetConstraint >>
+                capReset >> capQuery)
         {
             if (lCap == -1000 && capName == "END")
                 break;
@@ -182,6 +189,11 @@ namespace dynarithmic
             cStruct.m_nGetContainer = capGet;
             cStruct.m_nSetContainer = capSet;
             cStruct.m_strCapName = capName;
+            cStruct.m_nGetCurrentContainer = capGetCurrent;
+            cStruct.m_nGetDefaultContainer = capGetDefault;
+            cStruct.m_nSetConstraintContainer = capSetConstraint;
+            cStruct.m_nResetContainer = capReset;
+            cStruct.m_nQuerySupportContainer = capQuery;
             CTL_StaticData::GetGeneralCapInfo().insert({ static_cast<TW_UINT16>(lCap), cStruct });
         }
 
@@ -351,7 +363,7 @@ namespace dynarithmic
                     break;
                 }
                 ++currentComponent;
-                if (currentComponent >= componentNames.size())
+                if (currentComponent >= static_cast<int>(componentNames.size()))
                     break;
             }
             catch (...)
@@ -362,10 +374,10 @@ namespace dynarithmic
         if (badVersion)
         {
             retValue.errorValue[0] = retValue.errorValue[1] = retValue.errorValue[2] = false;
-            retValue.errorMessage = StringConversion::Convert_Ansi_To_Native(origVersion.c_str());
+            retValue.errorMessage = StringConversion::Convert_Ansi_To_Native(origVersion);
             return false;
         }
-        CTL_StaticData::s_ResourceVersion = StringConversion::Convert_Ansi_To_Native(origVersion.c_str());
+        CTL_StaticData::s_ResourceVersion = StringConversion::Convert_Ansi_To_Native(origVersion);
         LOG_FUNC_EXIT_PARAMS(true)
         CATCH_BLOCK(false)
     }

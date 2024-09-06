@@ -111,6 +111,7 @@ namespace dynarithmic
         bool PDFUseCompression;
         bool PDFUseThumbnail;
         LONG  PhotoMetric;
+        bool IsBigTiff;
         CTL_StringType PDFAuthor;
         CTL_StringType PDFSubject;
         CTL_StringType PDFProducer;
@@ -165,7 +166,8 @@ namespace dynarithmic
             IsCreateDirectory(false),
             IsIcoResized(false),
             IsWBMPResized(false),
-            IsRLE(false)
+            IsRLE(false),
+            IsBigTiff(false)
         {
         }
     };

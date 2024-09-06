@@ -253,6 +253,7 @@ LRESULT CALLBACK_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
             case DTWAIN_TN_PROCESSDIBFINALACCEPTED:
             case DTWAIN_TN_PROCESSDIBACCEPTED:
             case DTWAIN_TN_UIOPENFAILURE:
+            case DTWAIN_TN_UIOPENING:
             case DTWAIN_TN_FILENAMECHANGING:
             case DTWAIN_TN_FILENAMECHANGED:
             {
@@ -523,7 +524,7 @@ LRESULT CALLBACK_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                             DTWAIN_ARRAY aDibs = nullptr;
                             aDibs = CreateArrayFromFactory( DTWAIN_ARRAYHANDLE, 0 );
                             DTWAIN_GetAllSourceDibs( static_cast<DTWAIN_SOURCE>(pSource), aDibs );
-                            int nDibs = pHandle->m_ArrayFactory->size(aDibs);
+                            int nDibs = static_cast<int>(pHandle->m_ArrayFactory->size(aDibs));
                             StringStreamA strm;
                             strm << buf;
                             LOG_FUNC_VALUES(strm.str().c_str())
@@ -646,10 +647,13 @@ LRESULT ExecuteCallback(CallbackType Fn, HWND hWnd, UINT uMsg,
         LogDTWAINMessage(hWnd, uMsg, wParam, lParam, true);
         lResult = CallOneCallback(Fn, wParam, lParam, uType);
     }
-    catch(...)
+    catch (...)
     {
-        const std::string sError = "Callback did not work...\n";
-        CTL_TwainAppMgr::WriteLogInfoA(sError);
+        if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+        {
+            const std::string sError = "In ExecuteCallback: Exception encountered when logging using callback...\n";
+            CTL_TwainAppMgr::WriteLogInfoA(sError);
+        }
     }
     return lResult;
 }

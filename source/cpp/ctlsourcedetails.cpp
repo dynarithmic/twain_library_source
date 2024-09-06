@@ -32,19 +32,9 @@
 using namespace dynarithmic;
 
 template <typename Iter>
-static std::string join_string(Iter it1, Iter it2, char val = ',')
+static std::string join_string(Iter it1, Iter it2, const char* val = ",")
 {
-    std::stringstream strm;
-    int i = 0;
-    while (it1 != it2)
-    {
-        if (i != 0)
-            strm << val;
-        strm << *it1;
-        ++it1;
-        ++i;
-    }
-    return strm.str();
+    return StringWrapperA::Join(it1, it2, val);
 }
 
 static std::string remove_quotes(std::string s)
@@ -487,7 +477,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
     glob_json["device-names"] = sNames;
     std::string jsonString;
     std::array<std::string,12> imageInfoString;
-    std::array<std::string, 9> deviceInfoString;
+    std::array<std::string,10> deviceInfoString;
 
     struct CloserRAII
     {
@@ -534,6 +524,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
         deviceInfoString[6] = "\"duplex-supported\":false";
         deviceInfoString[7] = "\"jobcontrol-supported\":false";
         deviceInfoString[8] = "\"transparencyunit-supported\":false";
+        deviceInfoString[9] = "\"filesystem-supported\":false";
         bool devOpen[] = { false, false };
 
         // Check if we need to select and open the source to see
@@ -655,7 +646,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         std::vector<std::string> unitNameV;
                         std::transform(vSizeNames.begin(), vSizeNames.end(), std::back_inserter(unitNameV),
                             [](auto& p) { return "\"" + p + "\""; });
-                        std::string unitNameStr = "[" + join_string(unitNameV.begin(), unitNameV.end(), ',') + "]";
+                        std::string unitNameStr = "[" + join_string(unitNameV.begin(), unitNameV.end(), ",") + "]";
                         strm << unitNameStr << ",";
 
                         int i = 0;
@@ -751,11 +742,11 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     imageInfoString[11] = tempStrm.str();
 
                     strm.str("");
-                    std::array<int, 9> deviceInfoCaps = { CAP_FEEDERENABLED, CAP_FEEDERLOADED, CAP_UICONTROLLABLE,
+                    std::array<int, 10> deviceInfoCaps = { CAP_FEEDERENABLED, CAP_FEEDERLOADED, CAP_UICONTROLLABLE,
                                                           ICAP_AUTOBRIGHT, ICAP_AUTOMATICDESKEW,
-                                                          CAP_PRINTER, CAP_DUPLEX, CAP_JOBCONTROL, ICAP_LIGHTPATH};
+                                                          CAP_PRINTER, CAP_DUPLEX, CAP_JOBCONTROL, ICAP_LIGHTPATH, 0};
 
-                    std::array<std::string, 9> deviceInfoCapsStr; 
+                    std::array<std::string, 10> deviceInfoCapsStr; 
                     std::copy(deviceInfoString.begin(), deviceInfoString.end(), deviceInfoCapsStr.begin());
                     for (auto& s : deviceInfoCapsStr)
                         s.resize(s.size() - 5);
@@ -794,6 +785,12 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                                 auto& vBuf = pHandle->m_ArrayFactory->underlying_container_t<LONG>(vValue);
                                 value = (!vBuf.empty() && vBuf.front() != TWJC_NONE);
                             }
+                        }
+                        else
+                        if ( deviceInfoCaps[curDevice] == 0)
+                        {
+                            // This is a place holder for file system support
+                            value = DTWAIN_IsFileSystemSupported(pCurrentSourcePtr);
                         }
                         else
                             value = DTWAIN_IsCapSupported(pCurrentSourcePtr, deviceInfoCaps[curDevice]) ? true : false;
@@ -838,6 +835,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     deviceInfoString[6] = "\"duplex-supported\":\"" + sStatus + "\""; 
                     deviceInfoString[7] = "\"jobcontrol-supported\":\"" + sStatus + "\""; 
                     deviceInfoString[8] = "\"transparencyunit-supported\":\"" + sStatus + "\""; 
+                    deviceInfoString[9] = "\"filesystem-supported\":\"" + sStatus + "\"";
                 }
                 std::string partString = "\"device-name\":\"" + curSource + "\",";
                 std::string strStatus;

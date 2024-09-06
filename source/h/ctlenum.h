@@ -330,7 +330,22 @@ namespace dynarithmic
                                    TwainFileFormat_ICO_RESIZED = DTWAIN_ICO_RESIZED,
                                    TwainFileFormat_WBMP_RESIZED = DTWAIN_WBMP_RESIZED,
                                    TWAINFileFormat_WBMP     = DTWAIN_WBMP,
-                                   TWAINFileFormat_RAW      =9999
+
+                                   TWAINFileFormat_BIGTIFFLZW = DTWAIN_BIGTIFFLZW,
+                                   TWAINFileFormat_BIGTIFFLZWMULTI = DTWAIN_BIGTIFFLZWMULTI,
+                                   TWAINFileFormat_BIGTIFFNONE = DTWAIN_BIGTIFFNONE,
+                                   TWAINFileFormat_BIGTIFFNONEMULTI = DTWAIN_BIGTIFFNONEMULTI,
+                                   TWAINFileFormat_BIGTIFFPACKBITS = DTWAIN_BIGTIFFPACKBITS,
+                                   TWAINFileFormat_BIGTIFFPACKBITSMULTI = DTWAIN_BIGTIFFPACKBITSMULTI,
+                                   TWAINFileFormat_BIGTIFFDEFLATE = DTWAIN_BIGTIFFDEFLATE,
+                                   TWAINFileFormat_BIGTIFFDEFLATEMULTI = DTWAIN_BIGTIFFDEFLATEMULTI,
+                                   TWAINFileFormat_BIGTIFFGROUP3 = DTWAIN_BIGTIFFG3,
+                                   TWAINFileFormat_BIGTIFFGROUP3MULTI = DTWAIN_BIGTIFFG3MULTI,
+                                   TWAINFileFormat_BIGTIFFGROUP4 = DTWAIN_BIGTIFFG4,
+                                   TWAINFileFormat_BIGTIFFGROUP4MULTI = DTWAIN_BIGTIFFG4MULTI,
+                                   TWAINFileFormat_BIGTIFFJPEG = DTWAIN_BIGTIFFJPEG,
+                                   TWAINFileFormat_BIGTIFFJPEGMULTI = DTWAIN_BIGTIFFJPEGMULTI,
+                                   TWAINFileFormat_RAW = 9999
                                 };
 
 

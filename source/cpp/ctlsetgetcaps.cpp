@@ -30,7 +30,7 @@
 #include "ctltrall.h"
 #include "ctltmpl5.h"
 #include "errorcheck.h"
-
+#include "ctlutils.h"
 using namespace dynarithmic;
 bool dynarithmic::IsIntCapType(TW_UINT16 nCap)
 {
@@ -79,6 +79,7 @@ LONG dynarithmic::GetArrayTypeFromCapType(TW_UINT16 CapType)
             return DTWAIN_ARRAYLONG;
      }
 }
+
 
 static DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap,
                                                    LONG lGetType, LONG lContainerType,
@@ -176,6 +177,7 @@ static DTWAIN_ARRAY performGetCap(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source,
     {
         const LONG nArrayType = GetArrayTypeFromCapType(static_cast<TW_UINT16>(nDataType));
         ThisArray = CreateArrayFromFactory(nArrayType, 0);
+        overrideDataType = nDataType;
     }
     else
         ThisArray = DTWAIN_ArrayCreateFromCap(Source, lCap, 0);
@@ -341,16 +343,21 @@ DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap
 
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !p;}, DTWAIN_ERR_BAD_SOURCE, false, FUNC_MACRO);
 
+    // We clear the user array here, since we do not want to 
+    // report information back to user if capability is not supported
     bool bEnumeratorExists = pHandle->m_ArrayFactory->is_valid(*pArray);
     if ( bEnumeratorExists )
         pHandle->m_ArrayFactory->clear(*pArray);
+    else
+    if (pArray)
+        *pArray = nullptr;
+
+	CHECK_IF_CAP_SUPPORTED(p, pHandle, lCap, false)
 
     LONG overrideDataType = nDataType;
     if ( bOverrideDataType )
         overrideDataType = 0xFFFF;
 
-    if( !DTWAIN_IsCapSupported(Source, lCap) )
-        LOG_FUNC_EXIT_PARAMS(false)
 
     if( !p->IsCapNegotiableInState(static_cast<TW_UINT16>(lCap), p->GetState()) )
         LOG_FUNC_EXIT_PARAMS(false)
@@ -436,6 +443,25 @@ DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap
                 LOG_FUNC_EXIT_PARAMS(false)
          }
     }
+    if (lCap >= CAP_CUSTOMBASE)
+    {
+        // Save the data type information in the general cap information structure,
+        // since the getting of the cap values was successful.
+        switch (lGetType)
+        {
+            case DTWAIN_CAPGET:
+                SetCapabilityInfo<CAPINFO_IDX_GETCONTAINER>(pHandle, Source, lContainerType, lCap);
+            break;
+            case DTWAIN_CAPGETCURRENT:
+                SetCapabilityInfo<CAPINFO_IDX_GETCURRENTCONTAINER>(pHandle, Source, lContainerType, lCap);
+            break;
+            case DTWAIN_CAPGETDEFAULT:
+                SetCapabilityInfo<CAPINFO_IDX_GETDEFAULTCONTAINER>(pHandle, Source, lContainerType, lCap);
+            break;
+        }
+        SetCapabilityInfo<CAPINFO_IDX_DATATYPE>(pHandle, Source, nDataType, lCap);
+    }
+
     arr.release();
     if ( bEnumeratorExists )
         pHandle->m_ArrayFactory->destroy(*pArray);
@@ -445,13 +471,14 @@ DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap
     CATCH_BLOCK(false)
 }
 
+
 // Sets capability values.  This function does not test if the
 // capability exists, or if the container type is valid.  Use
 // with caution!!
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValues( DTWAIN_SOURCE Source, LONG lCap, LONG lSetType, DTWAIN_ARRAY pArray )
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCap, lSetType, pArray))
-        const DTWAIN_BOOL bRet = DTWAIN_SetCapValuesEx(Source, lCap, lSetType, DTWAIN_CONTDEFAULT, pArray);
+    const DTWAIN_BOOL bRet = DTWAIN_SetCapValuesEx(Source, lCap, lSetType, DTWAIN_CONTDEFAULT, pArray);
     LOG_FUNC_EXIT_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -465,6 +492,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap
     bool bOk = false;
     if( p )
     {
+        CHECK_IF_CAP_SUPPORTED(p, pHandle, static_cast<TW_UINT16>(lCap), false)
+
         if ( !CTL_CapabilityTriplet::IsCapOperationReset(lSetType) )
         {
             auto nCount = pHandle->m_ArrayFactory->size(pArray);
@@ -477,7 +506,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap
             }
 
             bool bFoundType = false;
-            const LONG DTwainArrayType = DTWAIN_ArrayGetType( pArray );
+
+            // Get the array type, given the tag type of the DTWAIN Array
+            const LONG DTwainArrayType = CTL_ArrayFactory::tagtype_to_arraytype(pHandle->m_ArrayFactory->tag_type(pArray));
+
             const auto it1 = pHandle->m_mapDTWAINArrayToTwainType.find(DTwainArrayType);
             if ( it1 != pHandle->m_mapDTWAINArrayToTwainType.end() )
             {
@@ -497,7 +529,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap
         LONG TestContainer;
 
         if( lContainerType == DTWAIN_CONTDEFAULT )
-            TestContainer = DTWAIN_GetCapContainer(Source, lCap, lSetType);
+            TestContainer = DTWAIN_GetCapContainer(Source, lCap, lSetType); // Use the defaults to get the containers we know about
         else
             TestContainer = lContainerType;
 
@@ -506,29 +538,57 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap
         if( lContainerType == DTWAIN_CONTDEFAULT )
             lContainerType = TestContainer;
 
-        if( lSetType == DTWAIN_CAPSETAVAILABLE || lSetType == DTWAIN_CAPSETCURRENT )
+        if (lSetType == DTWAIN_CAPSETCURRENT)
             lSetType = DTWAIN_CAPSET;
+        else
+        if (lSetType == DTWAIN_CAPSETAVAILABLE || lSetType == DTWAIN_CAPSETCONSTRAINT)
+            lSetType = MSG_SETCONSTRAINT;
+
+        // Change to the real TWAIN set-constraint type
 
         DumpArrayContents(pArray, lCap);
 
-        // Change to the real TWAIN set-constraint type
-        if ( lSetType == DTWAIN_CAPSETCONSTRAINT )
-            lSetType = MSG_SETCONSTRAINT;
-
-        if (IsIntCapType(static_cast<TW_UINT16>(nDataType)))
-            bOk = performSetCap<LONG, TW_UINT32>(pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, lContainerType, lSetType, CTL_ArrayFactory::arrayTag::LongType, CTL_ArrayIntType, nDataType);
-        else
-        if (IsFloatCapType(static_cast<TW_UINT16>(nDataType)))
-            bOk = performSetCap<double, double>(pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, lContainerType, lSetType, CTL_ArrayFactory::arrayTag::DoubleType, CTL_ArrayDoubleType, nDataType);
-        else
-        if ( IsStringCapType(static_cast<TW_UINT16>(nDataType)))
-            bOk = performSetCap<std::string, std::string, std::string, StringSetCapConverterA>
-                          (pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, lContainerType, lSetType, CTL_ArrayFactory::arrayTag::StringType, CTL_ArrayStringType, nDataType);
-        else
-        if ( IsFrameCapType(static_cast<TW_UINT16>(nDataType)))
+        // If the container type has multiple options, we will try each container until we get an ok or we get a failure of all attempts of setting the
+        // capability.
+        auto allContainers = dynarithmic::getSetBitsAsVector(lContainerType);
+        for (auto& containerType : allContainers)
         {
-            bOk = performSetCap<TW_FRAME, TW_FRAME, TwainFrameInternal, FrameSetCapConverter>
-            (pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, lContainerType, lSetType, CTL_ArrayFactory::arrayTag::FrameType, CTL_ArrayTWFrameType, nDataType);
+            if (IsIntCapType(static_cast<TW_UINT16>(nDataType)))
+                bOk = performSetCap<LONG, TW_UINT32>(pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::LongType, CTL_ArrayIntType, nDataType);
+            else
+            if (IsFloatCapType(static_cast<TW_UINT16>(nDataType)))
+                bOk = performSetCap<double, double>(pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::DoubleType, CTL_ArrayDoubleType, nDataType);
+            else
+            if ( IsStringCapType(static_cast<TW_UINT16>(nDataType)))
+                bOk = performSetCap<std::string, std::string, std::string, StringSetCapConverterA>
+                              (pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::StringType, CTL_ArrayStringType, nDataType);
+            else
+            if ( IsFrameCapType(static_cast<TW_UINT16>(nDataType)))
+            {
+                bOk = performSetCap<TW_FRAME, TW_FRAME, TwainFrameInternal, FrameSetCapConverter>
+                (pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::FrameType, CTL_ArrayTWFrameType, nDataType);
+            }
+            if (bOk)
+            {
+                if (lCap >= CAP_CUSTOMBASE)
+                {
+                    // Since this is a custom capability, we will save the information that worked (capability type and
+                    // container type)
+                    switch (lSetType)
+                    {
+                        case DTWAIN_CAPSET:
+                        case DTWAIN_CAPSETCURRENT:
+                            SetCapabilityInfo<CAPINFO_IDX_SETCONTAINER>(pHandle, Source, containerType, lCap);
+                        break;
+                        case DTWAIN_CAPSETAVAILABLE:
+                        case DTWAIN_CAPSETCONSTRAINT:
+                            SetCapabilityInfo<CAPINFO_IDX_SETCONSTRAINTCONTAINER>(pHandle, Source, containerType, lCap);
+                        break;
+                    }
+                    SetCapabilityInfo<CAPINFO_IDX_DATATYPE>(pHandle, Source, nDataType, lCap);
+                }
+                break; // get out now
+            }
         }
     }
     LOG_FUNC_EXIT_PARAMS(bOk)
@@ -933,21 +993,25 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
     const TW_INFO Info = p->GetExtImageInfoItem(nWhich, DTWAIN_BYID);
 
     const LONG Count = Info.NumItems;
-    DTWAIN_ArrayResize(ExtInfoArray, Count);
+
+    // resize the array
+    const auto& factory = pHandle->m_ArrayFactory;
+    factory->resize(ExtInfoArray, Count);
+
     for ( int i = 0; i < Count; ++i )
     {
-        if ( DTWAIN_ArrayGetType(ExtInfoArray) == DTWAIN_ARRAYSTRING)
+        if (CTL_ArrayFactory::tagtype_to_arraytype(pHandle->m_ArrayFactory->tag_type(ExtInfoArray) == DTWAIN_ARRAYSTRING))
         {
             std::vector<char> Temp;
             size_t ItemSize;
             if ( p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, nullptr, &ItemSize) )
             {
                 p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, Temp.data(), nullptr);
-                DTWAIN_ArraySetAt(ExtInfoArray, i, &Temp[0]);
+                SetArrayValueFromFactory(ExtInfoArray, i, &Temp[0]);
             }
         }
         else
-            p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, DTWAIN_ArrayGetBuffer(ExtInfoArray, i));
+            p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, factory->get_buffer(ExtInfoArray, i));
     }
     *Data = ExtInfoArray;
     LOG_FUNC_EXIT_PARAMS(true)
@@ -1112,6 +1176,7 @@ void dynarithmic::DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap)
         return;
 
     std::string szBuf;
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     // This dumps contents of array to log file
     {
         // Turn off the error logging flags temporarily
@@ -1126,7 +1191,6 @@ void dynarithmic::DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap)
             }
         }
 
-        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
         const LONG nCount = static_cast<LONG>(pHandle->m_ArrayFactory->size(Array));
         StringStreamA strm;
         if ( nCount < 0 )
@@ -1141,7 +1205,7 @@ void dynarithmic::DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap)
     CTL_TwainAppMgr::WriteLogInfoA(szBuf);
 
     // determine the type
-    const LONG nType = DTWAIN_ArrayGetType(Array);
+    const LONG nType = CTL_ArrayFactory::tagtype_to_arraytype(pHandle->m_ArrayFactory->tag_type(Array));
     switch (nType)
     {
         case DTWAIN_ARRAYLONG:
@@ -1214,9 +1278,9 @@ int GetMultiCapValues(DTWAIN_HANDLE DLLHandle,
 
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     auto& factory = pHandle->m_ArrayFactory;
-    const int nSize = factory->size(FrameArray); 
+    const size_t nSize = factory->size(FrameArray); 
 
-    for (int i = 0; i < nSize; i++)
+    for (size_t i = 0; i < nSize; i++)
     {
         DTWAIN_FRAME DTWAINFrame = dynarithmic::CreateFrameArray(pHandle, 0, 0, 0, 0);
         DTWAINFrame_RAII raii(DTWAINFrame);

@@ -211,14 +211,28 @@ namespace dynarithmic
 
     #include "capstruc.h"
 
-    typedef CTL_ClassValues7<CTL_EnumCapability,/* Capability*/
-                             UINT             , /* Container for Get*/
+    typedef CTL_ClassValues10<CTL_EnumCapability,/* Capability*/
+                             UINT             , /* Container for Get */
                              UINT             , /* Container for Set*/
                              UINT             ,  /* Data Type */
                              UINT             ,  /* Available cap support */
                              UINT             ,  /* Container for Get Current */
-                             UINT                /* Container for Get Default  */
-                             > CTL_CapInfo;
+                             UINT             ,   /* Container for Get Default  */
+                             UINT             ,  /* Container for Set Constraint */
+                             UINT             ,  /* Container for Reset */
+                             UINT                 /* Container for Query Support*/
+                            > CTL_CapInfo;
+
+    #define CAPINFO_IDX_CAPABILITY 0    
+    #define CAPINFO_IDX_GETCONTAINER 1    
+    #define CAPINFO_IDX_SETCONTAINER 2    
+    #define CAPINFO_IDX_DATATYPE     3    
+    #define CAPINFO_IDX_SUPPORTEDOPS 4    
+    #define CAPINFO_IDX_GETCURRENTCONTAINER 5    
+    #define CAPINFO_IDX_GETDEFAULTCONTAINER 6    
+    #define CAPINFO_IDX_SETCONSTRAINTCONTAINER 7    
+    #define CAPINFO_IDX_RESETCONTAINER 8    
+    #define CAPINFO_IDX_QUERYSUPPORT 9    
 
     typedef std::unordered_map<unsigned long, std::shared_ptr<CTL_TwainDLLHandle>> CTL_MapThreadToDLLHandle;
     typedef std::unordered_map<LONG, int> CTL_LongToIntMap;
@@ -241,10 +255,13 @@ namespace dynarithmic
 
     // Create this statically when initializing.  Initialize the second
     // value with the dynamically created CTL_CapInfoArray above
-    typedef CTL_ClassValues7<CTL_StringType, /* Product Name */
+    typedef CTL_ClassValues10<CTL_StringType, /* Product Name */
                              CTL_CapInfoArrayPtr, /* Array of cap info*/
                              int,       /* dummy */
                              int,        /* dummy */
+                             char,
+                             char,
+                             char,
                              char,
                              char,
                              char> CTL_SourceCapInfo;
@@ -568,6 +585,13 @@ namespace dynarithmic
         DTWAIN_LONG64  m_pLoggerCallback_UserDataW = 0;
     };
 
+    struct CTL_OnSourceOpenProperties
+    {
+        bool m_bCheckFeederStatusOnOpen;
+        bool m_bQueryBestCapContainer;
+        bool m_bQueryCapOperations;
+    };
+
     class CTL_TwainDLLHandle
     {
         public:
@@ -667,6 +691,7 @@ namespace dynarithmic
             OCRInterfaceContainer m_OCRInterfaceArray;
             OCRProductNameToEngineMap m_OCRProdNameToEngine;
             OCREnginePtr          m_pOCRDefaultEngine;
+            CTL_OnSourceOpenProperties  m_OnSourceOpenProperties = {};
 
             // File Save As information
             #ifdef _WIN32
@@ -713,6 +738,23 @@ namespace dynarithmic
         if (!pHandle->m_bSessionAllocated && bCheckSession)
             return {};
         return {1};
+    }
+
+    template <int CapInfoIdx>
+    void SetCapabilityInfo(CTL_TwainDLLHandle* pHandle, DTWAIN_SOURCE Source, LONG value, LONG lCap)
+    {
+        CTL_ITwainSource* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
+        const CTL_CapInfoArrayPtr pArray = GetCapInfoArray(pHandle, pSource);
+
+        // Get the cap array values
+        const auto iter = pArray->find(static_cast<TW_UINT16>(lCap));
+        if (iter != pArray->end())
+        {
+            CTL_CapInfo* CapInfo = &iter->second;
+
+            // Replace the cap information with the updated information
+            std::get<CapInfoIdx>(*CapInfo) = value;
+        }
     }
 
     CTL_TwainDLLHandle* FindHandle(HWND hWnd, bool bIsDisplay);
@@ -823,7 +865,6 @@ namespace dynarithmic
 
     DTWAIN_BOOL DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *p, CTL_TwainDLLHandle *pHandle, TW_UINT16 nCapToCache);
     DTWAIN_BOOL DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, CTL_TwainDLLHandle *pHandle, CTL_EnumeratorNode<LONG>::container_pointer_type vCaps);
-    void DTWAIN_CollectCapabilityInfo(CTL_ITwainSource *p, TW_UINT16 nCap, CTL_CapInfoArray& pArray);
     CTL_CapInfoArrayPtr GetCapInfoArray(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource *p);
     DTWAIN_SOURCE SourceSelect(const SourceSelectionOptions& options);
     DTWAIN_ARRAY  SourceAcquire(SourceAcquireOptions& opts);
@@ -839,7 +880,11 @@ namespace dynarithmic
     DTWAIN_ARRAY CreateArrayFromFactory(LONG nEnumType, LONG nInitialSize);
     DTWAIN_ARRAY CreateArrayCopyFromFactory(DTWAIN_ARRAY Source);
     DTWAIN_FRAME CreateFrameArray(CTL_TwainDLLHandle* pHandle, double Left, double Top, double Right, double Bottom);
+    void SetArrayValueFromFactory(DTWAIN_ARRAY pArray, size_t lPos, LPVOID pVariant);
 
+
+    typedef CTL_StringType(CTL_ITwainSource::* SOURCEINFOFUNC)() const;
+    LONG GetSourceInfo(CTL_ITwainSource* p, SOURCEINFOFUNC pFunc, LPTSTR szInfo, LONG nMaxLen);
 
     //#ifdef DTWAIN_DEBUG_CALL_STACK
     std::string CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich, LPCSTR pOptionalString=nullptr);

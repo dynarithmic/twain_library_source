@@ -110,7 +110,7 @@ SupportsExportType(FREE_IMAGE_TYPE type) {
 // ----------------------------------------------------------
 
 static void * DLL_CALLCONV
-Open(FreeImageIO *io, fi_handle handle, BOOL read) {
+Open(FreeImageIO *io, fi_handle handle, BOOL read, FIBITMAP* dib, int flags) {
 	// create the stream wrapper
 	J2KFIO_t *fio = opj_freeimage_stream_create(io, handle, read);
 	return fio;

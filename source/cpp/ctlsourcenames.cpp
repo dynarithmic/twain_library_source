@@ -37,7 +37,7 @@ LONG DLLENTRY_DEF  DTWAIN_GetCapFromName(LPCTSTR szName)
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !szName; }, DTWAIN_ERR_INVALID_PARAM, 0L, FUNC_MACRO);
 
     const LONG Cap = CTL_TwainAppMgr::GetCapFromCapName(StringConversion::Convert_NativePtr_To_Ansi(szName).c_str());
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return Cap == -1L; }, DTWAIN_ERR_BAD_CAP, 0L, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return Cap == TwainCap_INVALID; }, DTWAIN_ERR_BAD_CAP, 0L, FUNC_MACRO);
     LOG_FUNC_EXIT_PARAMS((long)Cap)
     CATCH_BLOCK(0)
 }

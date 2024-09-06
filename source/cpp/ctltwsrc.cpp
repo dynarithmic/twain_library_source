@@ -238,7 +238,9 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_PersistentArray(nullptr),
     m_bImageInfoRetrieved(false),
     m_bXferReadySent(false),
-    m_bDoublePageCountOnDuplex(true)
+    m_bDoublePageCountOnDuplex(true),
+    m_bExtendedCapsRetrieved(false),
+    m_tbIsFileSystemSupported(boost::logic::indeterminate)
  {
     if ( lpszProduct )
         m_SourceId.set_product_name(StringConversion::Convert_NativePtr_To_Ansi(lpszProduct));
@@ -658,7 +660,7 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
             return m_strAcquireFile;
         const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
         const auto& factory = pHandle->m_ArrayFactory;
-        bool bNameAvailable = nCurImage < factory->size(pDTWAINArray);
+        bool bNameAvailable = nCurImage < static_cast<int>(factory->size(pDTWAINArray));
         if ( bNameAvailable )
             bNameAvailable = factory->get_value(pDTWAINArray, nCurImage, &strTemp)?true:false; 
         if ( !bNameAvailable ) // No more names
@@ -691,6 +693,13 @@ bool CTL_ITwainSource::IsFileTypeMultiPage(CTL_TwainFileFormatEnum FileType) // 
         FileType == TWAINFileFormat_TIFFPIXARLOGMULTI ||
         FileType == TWAINFileFormat_DCX           ||
         FileType == TWAINFileFormat_TEXTMULTI ||
+        FileType == TWAINFileFormat_BIGTIFFLZWMULTI ||
+        FileType == TWAINFileFormat_BIGTIFFNONEMULTI ||
+        FileType == TWAINFileFormat_BIGTIFFPACKBITSMULTI ||
+        FileType == TWAINFileFormat_BIGTIFFDEFLATEMULTI ||
+        FileType == TWAINFileFormat_BIGTIFFGROUP3MULTI ||
+        FileType == TWAINFileFormat_BIGTIFFGROUP4MULTI ||
+        FileType == TWAINFileFormat_BIGTIFFJPEGMULTI ||
         FileType == DTWAIN_FF_TIFFMULTI;
 }
 
@@ -709,6 +718,13 @@ CTL_TwainFileFormatEnum CTL_ITwainSource::GetMultiPageType(CTL_TwainFileFormatEn
         { TWAINFileFormat_POSTSCRIPT2,     TWAINFileFormat_POSTSCRIPT2MULTI },
         { TWAINFileFormat_POSTSCRIPT3,     TWAINFileFormat_POSTSCRIPT3MULTI },
         { TWAINFileFormat_TIFFLZW,         TWAINFileFormat_TIFFLZWMULTI },
+        { TWAINFileFormat_BIGTIFFLZW,      TWAINFileFormat_BIGTIFFLZWMULTI },
+        { TWAINFileFormat_BIGTIFFNONE,     TWAINFileFormat_BIGTIFFNONEMULTI },
+        { TWAINFileFormat_BIGTIFFPACKBITS, TWAINFileFormat_BIGTIFFPACKBITSMULTI },
+        { TWAINFileFormat_BIGTIFFDEFLATE,  TWAINFileFormat_BIGTIFFDEFLATEMULTI },
+        { TWAINFileFormat_BIGTIFFGROUP3,   TWAINFileFormat_BIGTIFFGROUP3MULTI },
+        { TWAINFileFormat_BIGTIFFGROUP4,   TWAINFileFormat_BIGTIFFGROUP4MULTI },
+        { TWAINFileFormat_BIGTIFFJPEG,     TWAINFileFormat_BIGTIFFJPEGMULTI },
         { TWAINFileFormat_TIFFPIXARLOG,    TWAINFileFormat_TIFFPIXARLOGMULTI },
         { TWAINFileFormat_PCX,             TWAINFileFormat_DCX },
         { TWAINFileFormat_TEXT,            TWAINFileFormat_TEXTMULTI }
@@ -737,7 +753,42 @@ bool CTL_ITwainSource::IsFileTypeTIFF(CTL_TwainFileFormatEnum FileType)
                             TWAINFileFormat_TIFFPACKBITS,
                             TWAINFileFormat_TIFFDEFLATE,
                             TWAINFileFormat_TIFFPIXARLOG,
-                            TWAINFileFormat_TIFFLZW
+                            TWAINFileFormat_TIFFLZW,
+                            TWAINFileFormat_BIGTIFFLZW,
+                            TWAINFileFormat_BIGTIFFLZWMULTI,
+                            TWAINFileFormat_BIGTIFFNONE,
+                            TWAINFileFormat_BIGTIFFNONEMULTI,
+                            TWAINFileFormat_BIGTIFFPACKBITS,
+                            TWAINFileFormat_BIGTIFFPACKBITSMULTI,
+                            TWAINFileFormat_BIGTIFFDEFLATE,
+                            TWAINFileFormat_BIGTIFFDEFLATEMULTI,
+                            TWAINFileFormat_BIGTIFFGROUP3,
+                            TWAINFileFormat_BIGTIFFGROUP3MULTI,
+                            TWAINFileFormat_BIGTIFFGROUP4,
+                            TWAINFileFormat_BIGTIFFGROUP4MULTI,
+                            TWAINFileFormat_BIGTIFFJPEG,
+                            TWAINFileFormat_BIGTIFFJPEGMULTI,
+    };
+    return setInfo.count(FileType) == 1;
+}
+
+bool CTL_ITwainSource::IsFileTypeBigTiff(CTL_TwainFileFormatEnum FileType) // static function
+{
+    static const std::unordered_set<CTL_TwainFileFormatEnum> setInfo = {
+                            TWAINFileFormat_BIGTIFFLZWMULTI,
+                            TWAINFileFormat_BIGTIFFLZW,
+                            TWAINFileFormat_BIGTIFFNONEMULTI,
+                            TWAINFileFormat_BIGTIFFNONE,
+                            TWAINFileFormat_BIGTIFFPACKBITS,
+                            TWAINFileFormat_BIGTIFFPACKBITSMULTI,
+                            TWAINFileFormat_BIGTIFFDEFLATE,
+                            TWAINFileFormat_BIGTIFFDEFLATEMULTI,
+                            TWAINFileFormat_BIGTIFFGROUP3,
+                            TWAINFileFormat_BIGTIFFGROUP3MULTI,
+                            TWAINFileFormat_BIGTIFFGROUP4,
+                            TWAINFileFormat_BIGTIFFGROUP4MULTI,
+                            TWAINFileFormat_BIGTIFFJPEG,
+                            TWAINFileFormat_BIGTIFFJPEGMULTI
                     };
     return setInfo.count(FileType) == 1;
 }
@@ -751,6 +802,12 @@ void CTL_ITwainSource::initFileSaveMap() const
         m_saveFileMap[TWAINFileFormat_TIFFLZW] =
             m_saveFileMap[TWAINFileFormat_TIFFLZWMULTI] = MAKE_FILE_FORMAT_INFO("TIFF Format (LZW) (*.tif)\0*.tif\0\0", ".tif");
 
+        m_saveFileMap[TWAINFileFormat_BIGTIFFLZW] =
+            m_saveFileMap[TWAINFileFormat_BIGTIFFLZWMULTI] = MAKE_FILE_FORMAT_INFO("Big TIFF Format (LZW) (*.tif)\0*.tif\0\0", ".tif");
+
+        m_saveFileMap[TWAINFileFormat_BIGTIFFNONE] =
+            m_saveFileMap[TWAINFileFormat_BIGTIFFNONEMULTI] = MAKE_FILE_FORMAT_INFO("Big TIFF Format (Uncompressed) (*.tif)\0*.tif\0\0", ".tif");
+
         m_saveFileMap[TWAINFileFormat_TIFFNONE] =
             m_saveFileMap[TWAINFileFormat_TIFFNONEMULTI] =
             m_saveFileMap[DTWAIN_FF_TIFF] = MAKE_FILE_FORMAT_INFO("TIFF Uncompressed Format (*.tif)\0*.tif\0\0", ".tif");
@@ -761,17 +818,32 @@ void CTL_ITwainSource::initFileSaveMap() const
         m_saveFileMap[TWAINFileFormat_TIFFGROUP4] =
             m_saveFileMap[TWAINFileFormat_TIFFGROUP4MULTI] = MAKE_FILE_FORMAT_INFO("TIFF Fax Group 4 Format (*.tif)\0*.tif\0\0", ".tif");
 
+        m_saveFileMap[TWAINFileFormat_BIGTIFFGROUP3] =
+            m_saveFileMap[TWAINFileFormat_BIGTIFFGROUP3MULTI] = MAKE_FILE_FORMAT_INFO("Big TIFF Fax Group 3 Format (*.tif)\0*.tif\0\0", ".tif");
+
+        m_saveFileMap[TWAINFileFormat_BIGTIFFGROUP4] =
+            m_saveFileMap[TWAINFileFormat_BIGTIFFGROUP4MULTI] = MAKE_FILE_FORMAT_INFO("Big TIFF Fax Group 4 Format (*.tif)\0*.tif\0\0", ".tif");
+
         m_saveFileMap[TWAINFileFormat_TIFFPIXARLOG] =
             m_saveFileMap[TWAINFileFormat_TIFFPIXARLOGMULTI] = MAKE_FILE_FORMAT_INFO("TIFF (Pixar-Log Compression) (*.tif)\0*.tif\0\0", ".tif");
 
         m_saveFileMap[TWAINFileFormat_TIFFJPEG] =
             m_saveFileMap[TWAINFileFormat_TIFFJPEGMULTI] = MAKE_FILE_FORMAT_INFO("TIFF (JPEG Compression) (*.tif)\0*.tif\0\0", ".tif");
 
+        m_saveFileMap[TWAINFileFormat_BIGTIFFJPEG] =
+            m_saveFileMap[TWAINFileFormat_BIGTIFFJPEGMULTI] = MAKE_FILE_FORMAT_INFO("Big TIFF (JPEG Compression) (*.tif)\0*.tif\0\0", ".tif");
+
         m_saveFileMap[DTWAIN_TIFFPACKBITS] =
             m_saveFileMap[DTWAIN_TIFFPACKBITSMULTI] = MAKE_FILE_FORMAT_INFO("TIFF (Macintosh RLE Compression) (*.tif)\0*.tif\0\0", ".tif");
 
         m_saveFileMap[DTWAIN_TIFFDEFLATE] =
             m_saveFileMap[DTWAIN_TIFFDEFLATEMULTI] = MAKE_FILE_FORMAT_INFO("TIFF (ZLib Deflate Compression) (*.tif)\0*.tif\0\0", ".tif");
+
+        m_saveFileMap[DTWAIN_BIGTIFFDEFLATE] =
+            m_saveFileMap[DTWAIN_BIGTIFFDEFLATEMULTI] = MAKE_FILE_FORMAT_INFO("Big TIFF (ZLib Deflate Compression) (*.tif)\0*.tif\0\0", ".tif");
+
+        m_saveFileMap[DTWAIN_BIGTIFFPACKBITS] =
+            m_saveFileMap[DTWAIN_BIGTIFFPACKBITSMULTI] = MAKE_FILE_FORMAT_INFO("Big TIFF (Macintosh RLE Compression) (*.tif)\0*.tif\0\0", ".tif");
 
         m_saveFileMap[TWAINFileFormat_JBIG] = MAKE_FILE_FORMAT_INFO("JBIG Format (*.jbg)\0*.jbg\0\0", ".jbg");
 
@@ -1304,8 +1376,21 @@ bool CTL_ITwainSource::IsExtendedCapNegotiable(LONG nCap)
 
 bool CTL_ITwainSource::AddCapToExtendedCapList(LONG nCap)
 {
-    m_aExtendedCaps.insert(nCap);
+    m_aExtendedCaps.insert(static_cast<unsigned short>(nCap));
     return  true;
+}
+
+void CTL_ITwainSource::RetrieveExtendedCaps()
+{
+    if (!m_bExtendedCapsRetrieved)
+    {
+        CTL_IntArray aCaps;
+        CTL_TwainAppMgr::GetExtendedCapabilities(this, aCaps);
+        m_aExtendedCaps.clear();
+        for (auto val : aCaps)
+            m_aExtendedCaps.insert(static_cast<unsigned short>(val));
+        m_bExtendedCapsRetrieved = true;
+    }
 }
 
 bool CTL_ITwainSource::InitFileAutoIncrementData(CTL_StringType sName)
@@ -1445,18 +1530,18 @@ bool isFloatCap(LONG capType)
 }
 
 template <typename T>
-static DTWAIN_ARRAY PopulateArray(const std::vector<boost::any>& dataArray, CTL_ITwainSource* pSource, TW_UINT16 nCap)
+static DTWAIN_ARRAY PopulateArray(const std::vector<anytype_>& dataArray, CTL_ITwainSource* pSource, TW_UINT16 nCap)
 {
     const DTWAIN_ARRAY theArray = DTWAIN_ArrayCreateFromCap(pSource, static_cast<LONG>(nCap), static_cast<LONG>(dataArray.size()));
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     auto& vVector = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
-    std::transform(dataArray.begin(), dataArray.end(), vVector.begin(), [](boost::any theAny) 
-                    { return boost::any_cast<typename T::value_type>(theAny);});
+    std::transform(dataArray.begin(), dataArray.end(), vVector.begin(), [](anytype_ theAny) 
+                    { return ANYTYPE_NAMESPACE any_cast<typename T::value_type>(theAny);});
     return theArray;
 }
 
 template <typename T>
-static bool PopulateCache(DTWAIN_ARRAY theArray, std::vector<boost::any>& dataArray)
+static bool PopulateCache(DTWAIN_ARRAY theArray, std::vector<anytype_>& dataArray)
 {
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     auto& vVector = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);

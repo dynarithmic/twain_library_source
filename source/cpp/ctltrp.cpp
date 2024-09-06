@@ -84,18 +84,17 @@ TW_UINT16 CTL_TwainTriplet::Execute()
 {
     // Get the Main App Ptr
     const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-    const CTL_TwainAppMgrPtr pTemp = pMgr;
 
     const TW_UINT16 nFail = TWRC_FAILURE;
-    if ( !pTemp )
+    if ( !pMgr )
     {
-        DTWAIN_ERROR_CONDITION(IDS_ErrTwainMgrInvalid, nFail)
+        DTWAIN_ERROR_CONDITION(IDS_ErrTwainMgrInvalid, nFail, true)
     }
     if ( !m_bAlive )
     {
-        DTWAIN_ERROR_CONDITION(IDS_ErrTripletNotExecuted, nFail)
+        DTWAIN_ERROR_CONDITION(IDS_ErrTripletNotExecuted, nFail, false)
     }
-    return pTemp->CallDSMEntryProc( *this );
+    return pMgr->CallDSMEntryProc( *this );
 }
 
 void CTL_TwainTriplet::SetAlive( bool bSet )

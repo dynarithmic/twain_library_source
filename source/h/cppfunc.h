@@ -119,8 +119,8 @@
                 }
         #endif
 #else
-    #pragma message("Building DTWAIN without callstack logging and exception handling...")
-    #define TRY_BLOCK
+    #pragma message("Building DTWAIN without callstack logging...")
+    #define TRY_BLOCK try {
 
     #define LOG_FUNC_ENTRY_PARAMS(x)
 
@@ -136,7 +136,13 @@
 
     #define LOG_FUNC_EXIT_PARAMS_ISTWAINMSG(x) { return(x); }
 
-    #define CATCH_BLOCK(type)
+    #define CATCH_BLOCK(type) \
+                } \
+                catch(decltype(type) var) { return var; }\
+                catch(...) {\
+                THROW_EXCEPTION \
+                return(type); \
+                }
 
     #define LOG_FUNC_ENTRY_PARAMS_NO_CHECK(argvals)
 

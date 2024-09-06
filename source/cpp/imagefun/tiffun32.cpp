@@ -75,8 +75,14 @@ void CTIFFImageHandler::DestroyAllObjects()
     if ( tiffPtr )
     {
         auto fp = tiffPtr->fp;
-        if ( fp )
-            m_nError = FreeImage_CloseMultiBitmap(fp, 0)? false : true;
+        if (fp)
+        {
+            // Set the TIFF type to close the TIFF file out with (regular or BigTiff)
+            int32_t flags = 0;
+            if (m_ImageInfoEx.IsBigTiff)
+                flags = 1L << 31;
+            m_nError = FreeImage_CloseMultiBitmap(fp, flags) ? false : true;
+        }
     }
 }
 
@@ -145,10 +151,18 @@ int CTIFFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR 
     im.setMetadata(FIMD_COMMENTS, "Comment", ft);
 
     const auto iter = compressionFlags.find(static_cast<int>(compression));
+    // Set the TIFF type to write (regular or BigTiff)
+    int32_t flagsWord = 0;
+    if (m_ImageInfoEx.IsBigTiff)
+        flagsWord = 1L << 31;
+
     if (m_MultiPageStruct.Stage == 0)
     {
-        const int flagsValue = static_cast<int>(m_ImageInfoEx.nJpegQuality << 24) | iter->second;
+
+        // Set the flags for the TIFF plugin to tuse
+        const int32_t flagsValue = flagsWord | iter->second;
         const auto retVal2 = im.saveEx(FIF_TIFF, StringConversion::Convert_Native_To_Ansi(path).c_str(), m_MultiPageStruct.Page, flagsValue);
+
         if (retVal2 == 1)
         {
             ++m_MultiPageStruct.Page;
@@ -160,7 +174,7 @@ int CTIFFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR 
     // this is a multipage write
     if (!ptrTiffData)
         return DTWAIN_ERR_FILEWRITE; // Issue with writing the file.  File to write may not be valid.
-    FreeImage_AppendPageEx(ptrTiffData->fp, im, iter->second);
+    FreeImage_AppendPageEx(ptrTiffData->fp, im, flagsWord | iter->second);
     FreeImage_SetPageNumberEx(ptrTiffData->fp, FreeImage_GetPageNumber(ptrTiffData->fp) + 1);
     ++m_MultiPageStruct.Page;
     return 0;
