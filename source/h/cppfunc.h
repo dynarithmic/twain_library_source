@@ -67,6 +67,11 @@
             if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK) \
             CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_IN) + ParamOutputter((#argVals)).outputParam argVals.getString());
 
+        #define LOG_FUNC_ENTRY_NONAME_PARAMS(...) \
+            TRY_BLOCK LogValue(FUNC_MACRO, true, int(0), __VA_ARGS__);
+
+        #define LOG_FUNC_EXIT_NONAME_PARAMS(x) { LogValue(FUNC_MACRO, false, x); return(x); }
+
         #define LOG_FUNC_EXIT_PARAMS(x) { \
             if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK) \
             CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO, LOG_INDENT_OUT) + ParamOutputter((""), true).outputParam(x).getString()); \
@@ -78,8 +83,10 @@
             CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA((""),LOG_INDENT_IN) + ParamOutputter((#argvals)).outputParam argvals.getString()); \
         }
 
+        #define CATCH_BLOCK_END }
+
         #define CATCH_BLOCK(type) \
-                } \
+                CATCH_BLOCK_END \
                 catch(const std::exception& ex_) \
                 {\
                     LogExceptionErrorA(FUNC_MACRO, ex_.what()); \
@@ -92,7 +99,28 @@
                 THROW_EXCEPTION \
                 return(type); \
                 }
+
+        #define CATCH_BLOCK_LOG_PARAMS(type) \
+                CATCH_BLOCK_END \
+                catch(const std::exception& ex_) \
+                {\
+                    LogExceptionErrorA(FUNC_MACRO, ex_.what()); \
+                    LOG_FUNC_EXIT_NONAME_PARAMS(type) \
+                    THROW_EXCEPTION \
+                    return(type); \
+                }\
+                catch(const decltype(type) var) { \
+                    LOG_FUNC_EXIT_NONAME_PARAMS(type) \
+                    return var; }\
+                catch(...) {\
+                    LogExceptionErrorA(FUNC_MACRO); \
+                    LOG_FUNC_EXIT_NONAME_PARAMS(type) \
+                    THROW_EXCEPTION \
+                    return(type); \
+                }
         #else
+            #define CATCH_BLOCK_END }
+
             #define TRY_BLOCK try {
             #define LOG_FUNC_STRING(x)
 
@@ -104,14 +132,14 @@
 
             #define LOG_FUNC_ENTRY_PARAMS_ISTWAINMSG(x) TRY_BLOCK
 
-            #define LOG_FUNC_EXIT_PARAMS(x) { return(x); }
+            #define LOG_FUNC_EXIT_NONAME_PARAMS(x) { return(x); }
 
             #define LOG_FUNC_EXIT_PARAMS_ISTWAINMSG(x) { return(x); }
 
             #define LOG_FUNC_VALUES_EX(argvals)
 
             #define CATCH_BLOCK(type) \
-                } \
+                CATCH_BLOCK_END \
                 catch(decltype(type) var) { return var; }\
                 catch(...) {\
                 THROW_EXCEPTION \
@@ -132,7 +160,7 @@
 
     #define LOG_FUNC_VALUES_EX(x)
 
-    #define LOG_FUNC_EXIT_PARAMS(x) { return (x); }
+    #define LOG_FUNC_EXIT_NONAME_PARAMS(x) { return (x); }
 
     #define LOG_FUNC_EXIT_PARAMS_ISTWAINMSG(x) { return(x); }
 
@@ -145,7 +173,7 @@
                 }
 
     #define LOG_FUNC_ENTRY_PARAMS_NO_CHECK(argvals)
-
 #endif
+#include "dtwain_paramlogger.h"
 #endif
 

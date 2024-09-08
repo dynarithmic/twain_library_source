@@ -95,7 +95,7 @@ std::string dynarithmic::CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich,
 
 void dynarithmic::LogExceptionErrorA(LPCSTR fname, const char* sAdditionalText)
 {
-    if ( CTL_StaticData::s_lErrorFilterFlags == 0 )
+    if ( !(CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_SHOWEXCEPTIONS) )
          return;
     try
     {
@@ -115,8 +115,7 @@ void dynarithmic::LogExceptionErrorA(LPCSTR fname, const char* sAdditionalText)
        if (!(CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_USEFILE))
             s += "\n";
        CTL_TwainAppMgr::WriteLogInfoA(s, true);  // flush all writes to the log file
-       if ( CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_SHOWEXCEPTIONS)
-           LogExceptionToConsole(fname, sAdditionalText);
+       LogExceptionToConsole(fname, sAdditionalText);
     }
     catch(...)
     {

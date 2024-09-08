@@ -114,7 +114,7 @@ namespace dynarithmic
 
     bool LoadTwainResources(ResourceLoadingInfo& retValue)
     {
-        LOG_FUNC_ENTRY_PARAMS(())
+        LOG_FUNC_ENTRY_NONAME_PARAMS()
         retValue.errorValue[0] = false;
         retValue.errorValue[1] = false;
         retValue.errorValue[2] = true;
@@ -378,7 +378,7 @@ namespace dynarithmic
             return false;
         }
         CTL_StaticData::s_ResourceVersion = StringConversion::Convert_Ansi_To_Native(origVersion);
-        LOG_FUNC_EXIT_PARAMS(true)
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK(false)
     }
 
@@ -473,10 +473,10 @@ namespace dynarithmic
         if (iter != registryMap.end())
         {
             if ( !iter->second )
-                LOG_FUNC_EXIT_PARAMS(false)
+                LOG_FUNC_EXIT_NONAME_PARAMS(false)
         }
         const bool retVal = LoadLanguageResourceA(lpszName);
-        LOG_FUNC_EXIT_PARAMS(retVal)
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
         CATCH_BLOCK(false)
     }
 
@@ -485,7 +485,7 @@ namespace dynarithmic
         LOG_FUNC_ENTRY_PARAMS((lpszName))
         bool bReturn = LoadLanguageResourceFromFileA(GetResourceFileNameA(lpszName, DTWAINLANGRESOURCEFILE), true);
         LoadLanguageResourceFromFileA(GetResourceFileNameA(lpszName, DTWAINCUSTOMRESOURCESFILE), false);
-        LOG_FUNC_EXIT_PARAMS(bReturn)
+        LOG_FUNC_EXIT_NONAME_PARAMS(bReturn)
         CATCH_BLOCK(false)
     }
 

@@ -44,7 +44,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainerEx(LONG nCap, DTWAIN_BOOL bSetContainer,
     {
         *pArray = CreateArrayFromFactory(DTWAIN_ARRAYLONG, 0);
         if (!*pArray)
-            LOG_FUNC_EXIT_PARAMS(0L)
+            LOG_FUNC_EXIT_NONAME_PARAMS(0L)
     }
     DTWAIN_ARRAY pDTWAINArray = nullptr;
     if (pArray)
@@ -65,8 +65,8 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainerEx(LONG nCap, DTWAIN_BOOL bSetContainer,
             }
         }
     }
-    LOG_FUNC_EXIT_PARAMS(0xFFFFFFFF)
-    CATCH_BLOCK(0)
+    LOG_FUNC_EXIT_NONAME_PARAMS(0xFFFFFFFF)
+    CATCH_BLOCK_LOG_PARAMS(0)
 }
 
 template <int CapInfoIdx>
@@ -92,18 +92,13 @@ static LONG PerformCapContainerTest(CTL_TwainDLLHandle* pHandle, CTL_ITwainSourc
 LONG DLLENTRY_DEF DTWAIN_GetCapContainer(DTWAIN_SOURCE Source, LONG nCap, LONG lCapType)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nCap, lCapType))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, 0, FUNC_MACRO);
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
-    if (!p)
-        LOG_FUNC_EXIT_PARAMS(0L)
+    auto* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    const auto pHandle = pSource->GetDTWAINHandle();
 
     const DTWAIN_BOOL bCapSupported = DTWAIN_IsCapSupported(Source, nCap);
     if (!bCapSupported)
-        LOG_FUNC_EXIT_PARAMS(0L)
-    const CTL_CapInfoArrayPtr pArray = GetCapInfoArray(pHandle, p);
+        LOG_FUNC_EXIT_NONAME_PARAMS(0L)
+    const CTL_CapInfoArrayPtr pArray = GetCapInfoArray(pHandle, pSource);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !pArray; }, DTWAIN_ERR_NO_CAPS_DEFINED, 0L, FUNC_MACRO);
 
     // Get the cap array values
@@ -117,41 +112,41 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainer(DTWAIN_SOURCE Source, LONG nCap, LONG l
         {
             case DTWAIN_CAPGET:
             {
-                lResults = PerformCapContainerTest<CAPINFO_IDX_GETCONTAINER>(pHandle, p, nCap, lCapType, CapInfo);
-                LOG_FUNC_EXIT_PARAMS(lResults);
+                lResults = PerformCapContainerTest<CAPINFO_IDX_GETCONTAINER>(pHandle, pSource, nCap, lCapType, CapInfo);
+                LOG_FUNC_EXIT_NONAME_PARAMS(lResults);
             }
 
             case DTWAIN_CAPGETCURRENT:
             {
-                lResults = PerformCapContainerTest<CAPINFO_IDX_GETCURRENTCONTAINER>(pHandle, p, nCap, lCapType, CapInfo);
-                LOG_FUNC_EXIT_PARAMS(lResults);
+                lResults = PerformCapContainerTest<CAPINFO_IDX_GETCURRENTCONTAINER>(pHandle, pSource, nCap, lCapType, CapInfo);
+                LOG_FUNC_EXIT_NONAME_PARAMS(lResults);
             }
             case DTWAIN_CAPGETDEFAULT:
             {
-                lResults = PerformCapContainerTest<CAPINFO_IDX_GETDEFAULTCONTAINER>(pHandle, p, nCap, lCapType, CapInfo);
-                LOG_FUNC_EXIT_PARAMS(lResults);
+                lResults = PerformCapContainerTest<CAPINFO_IDX_GETDEFAULTCONTAINER>(pHandle, pSource, nCap, lCapType, CapInfo);
+                LOG_FUNC_EXIT_NONAME_PARAMS(lResults);
             }
 
             case DTWAIN_CAPSET:
             case DTWAIN_CAPSETCURRENT:
             {
-                LOG_FUNC_EXIT_PARAMS(static_cast<LONG>(std::get<CAPINFO_IDX_SETCONTAINER>(*CapInfo)));
+                LOG_FUNC_EXIT_NONAME_PARAMS(static_cast<LONG>(std::get<CAPINFO_IDX_SETCONTAINER>(*CapInfo)));
             }
             break;
             case DTWAIN_CAPSETAVAILABLE:
             case DTWAIN_CAPSETCONSTRAINT:
             {
-                LOG_FUNC_EXIT_PARAMS(static_cast<LONG>(std::get<CAPINFO_IDX_SETCONSTRAINTCONTAINER>(*CapInfo)));
+                LOG_FUNC_EXIT_NONAME_PARAMS(static_cast<LONG>(std::get<CAPINFO_IDX_SETCONSTRAINTCONTAINER>(*CapInfo)));
             }
             break;
             case DTWAIN_CAPRESET:
             {
-                LOG_FUNC_EXIT_PARAMS(static_cast<LONG>(std::get<CAPINFO_IDX_RESETCONTAINER>(*CapInfo)));
+                LOG_FUNC_EXIT_NONAME_PARAMS(static_cast<LONG>(std::get<CAPINFO_IDX_RESETCONTAINER>(*CapInfo)));
             }
         }
     }
-    LOG_FUNC_EXIT_PARAMS(0L)
-    CATCH_BLOCK(0)
+    LOG_FUNC_EXIT_NONAME_PARAMS(0L)
+    CATCH_BLOCK_LOG_PARAMS(0)
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetCapDataType(DTWAIN_SOURCE Source, LONG nCap)
@@ -165,33 +160,27 @@ LONG DLLENTRY_DEF DTWAIN_GetCapDataType(DTWAIN_SOURCE Source, LONG nCap)
     if (nThisCap >= CAP_CUSTOMBASE)
     {
         if (!Source)
-            LOG_FUNC_EXIT_PARAMS(DTWAIN_FAILURE1)
+            LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
         const LONG nDataType = GetCustomCapDataType(Source, nThisCap);
-        LOG_FUNC_EXIT_PARAMS(nDataType)
+        LOG_FUNC_EXIT_NONAME_PARAMS(nDataType)
     }
     const UINT nDataType = CTL_TwainAppMgr::GetDataTypeFromCap(static_cast<CTL_EnumCapability>(nCap));
     if (nDataType == 0xFFFF)
-        LOG_FUNC_EXIT_PARAMS(DTWAIN_FAILURE1)
-    LOG_FUNC_EXIT_PARAMS((LONG)nDataType)
+        LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
+    LOG_FUNC_EXIT_NONAME_PARAMS((LONG)nDataType)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 
 LONG GetCustomCapDataType(DTWAIN_SOURCE Source, TW_UINT16 nCap)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nCap))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, 0, FUNC_MACRO);
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
-    if (!p)
-        LOG_FUNC_EXIT_PARAMS(DTWAIN_ERR_BAD_SOURCE)
-
+    auto* p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    auto pHandle = p->GetDTWAINHandle();
     if (!p->IsCapInSupportedList(static_cast<TW_UINT16>(nCap)))
     {
         // Try getting it the slow way
         if (!CTL_TwainAppMgr::IsCapabilitySupported(p, nCap))
-            LOG_FUNC_EXIT_PARAMS(DTWAIN_ERR_CAP_NO_SUPPORT)
+            LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_ERR_CAP_NO_SUPPORT)
         p->AddCapToSupportedList(static_cast<TW_UINT16>(nCap));
     }
 
@@ -206,10 +195,10 @@ LONG GetCustomCapDataType(DTWAIN_SOURCE Source, TW_UINT16 nCap)
         LONG nValue = static_cast<LONG>(std::get<CAPINFO_IDX_DATATYPE>(CapInfo));
         if (nValue == DTWAIN_CAPDATATYPE_UNKNOWN)
             nValue = DTWAIN_ERR_UNKNOWN_CAPDATATYPE;
-        LOG_FUNC_EXIT_PARAMS(nValue) // Capability data type value
+        LOG_FUNC_EXIT_NONAME_PARAMS(nValue) // Capability data type value
     }
-    LOG_FUNC_EXIT_PARAMS(DTWAIN_ERR_UNKNOWN_CAPDATATYPE)
-    CATCH_BLOCK(DTWAIN_FAILURE1)
+    LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_ERR_UNKNOWN_CAPDATATYPE)
+    CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetCapArrayType(DTWAIN_SOURCE Source, LONG nCap)
@@ -217,9 +206,9 @@ LONG DLLENTRY_DEF DTWAIN_GetCapArrayType(DTWAIN_SOURCE Source, LONG nCap)
     LOG_FUNC_ENTRY_PARAMS((Source, nCap))
         const LONG lDataType = DTWAIN_GetCapDataType(Source, nCap);
     if (lDataType == DTWAIN_FAILURE1)
-        LOG_FUNC_EXIT_PARAMS(DTWAIN_FAILURE1)
+        LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
     const TW_UINT16 nDataType = static_cast<TW_UINT16>(lDataType);
     const LONG retValue = GetArrayTypeFromCapType(nDataType);
-    LOG_FUNC_EXIT_PARAMS(retValue)
+    LOG_FUNC_EXIT_NONAME_PARAMS(retValue)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }

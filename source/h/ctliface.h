@@ -894,7 +894,7 @@ namespace dynarithmic
     // outputs parameter and return values
     class ParamOutputter
     {
-        StringArray sv;
+        StringArray aParamNames;
         size_t nWhich;
         std::string argNames;
         std::ostringstream strm;
@@ -954,7 +954,7 @@ namespace dynarithmic
     public:
         ParamOutputter(const std::string& s, bool isReturnValue = false) : nWhich(0), m_bIsReturnValue(isReturnValue)
         {
-            StringWrapperA::Tokenize(s, "(, )", sv);
+            StringWrapperA::Tokenize(s, "(, )", aParamNames);
             if (!m_bIsReturnValue)
                 strm << "(";
             else
@@ -964,14 +964,14 @@ namespace dynarithmic
         template <typename T, typename ...P>
         ParamOutputter& outputParam(T t, P ...p)
         {
-            if (sv.empty() && !m_bIsReturnValue)
+            if (aParamNames.empty() && !m_bIsReturnValue)
                 return *this;
             const bool bIsNull = std::is_pointer_v<T> && !t;
             if (!m_bIsReturnValue)
             {
                 // Make sure we log input types correctly, especially character pointers.
                 // User may supply to us a writable char buffer that is not null-terminated!
-                LogInputType(sv[nWhich], t);
+                LogInputType(aParamNames[nWhich], t);
             }
             else
             {
@@ -982,7 +982,7 @@ namespace dynarithmic
             }
             if (!m_bIsReturnValue)
             {
-              if (nWhich < sv.size() - 1)
+              if (nWhich < aParamNames.size() - 1)
                 strm << ", ";
               else
                 strm << ")";
@@ -1148,6 +1148,24 @@ namespace dynarithmic
     {
         void Destroy(DTWAIN_ARRAY a);
         void operator()(DTWAIN_ARRAY a) { Destroy(a); }
+    };
+
+    struct DTWAINArrayLowLevel_RAII;
+    struct DTWAINArrayLowLevel_DestroyTraitsEx
+    {
+        void Destroy(DTWAINArrayLowLevel_RAII& raii);
+        void operator()(DTWAINArrayLowLevel_RAII& raii) { Destroy(raii); }
+    };
+
+    struct DTWAINArrayLowLevel_RAII
+    {
+        CTL_TwainDLLHandle* m_pHandle;
+        DTWAIN_ARRAY m_Array;
+        bool m_bDestroy;
+        DTWAINArrayLowLevel_DestroyTraitsEx traits;
+        DTWAINArrayLowLevel_RAII(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY a) : m_pHandle(pHandle), m_Array(a), m_bDestroy(true) {}
+        void SetDestroy(bool bSet) { m_bDestroy = bSet;  }
+        ~DTWAINArrayLowLevel_RAII() { traits(*this); }
     };
 
 

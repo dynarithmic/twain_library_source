@@ -33,47 +33,34 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetSaveFileName(DTWAIN_SOURCE Source, LPCTSTR fi
 {
     LOG_FUNC_ENTRY_PARAMS((Source, fileName))
     CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    if (p)
-    {
-        p->SetActualFileName(fileName);
-        LOG_FUNC_EXIT_PARAMS(true)
-    }
-    LOG_FUNC_EXIT_PARAMS(false)
-    CATCH_BLOCK(-1)
+    p->SetActualFileName(fileName);
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(-1)
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetSaveFileName(DTWAIN_SOURCE Source, LPTSTR fileName, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, fileName, nMaxLen))
     CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    if (p)
-    {
-        const LONG nTotalBytes = StringWrapper::CopyInfoToCString(p->GetActualFileName(), fileName, nMaxLen);
-        LOG_FUNC_EXIT_PARAMS(nTotalBytes)
-    }
-    LOG_FUNC_EXIT_PARAMS(-1)
-    CATCH_BLOCK(-1)
+    const LONG nTotalBytes = StringWrapper::CopyInfoToCString(p->GetActualFileName(), fileName, nMaxLen);
+    LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)
+    CATCH_BLOCK_LOG_PARAMS(-1)
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetCurrentFileName(DTWAIN_SOURCE Source, LPTSTR szName, LONG MaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, szName, MaxLen))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, Source);
-    if (!pSource)
-        LOG_FUNC_EXIT_PARAMS(-1L)
-
-    // return the file name that would be acquired
+    CTL_ITwainSource* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
     const CTL_StringType s = pSource->GetLastAcquiredFileName();
     const size_t sLen = s.length()  + 1;
     if (!szName)
-        LOG_FUNC_EXIT_PARAMS((LONG)sLen)
+        LOG_FUNC_EXIT_NONAME_PARAMS((LONG)sLen)
 
     const size_t nLenToUse = (std::min)(sLen, static_cast<size_t>(MaxLen));
     const CTL_StringType::value_type* sCopy = s.c_str();
     std::copy(sCopy, sCopy + nLenToUse - 1, szName);
     szName[nLenToUse-1] = _T('\0');
-    LOG_FUNC_EXIT_PARAMS((LONG)sLen)
-    CATCH_BLOCK(-1L)
+    LOG_FUNC_EXIT_NONAME_PARAMS((LONG)sLen)
+    CATCH_BLOCK_LOG_PARAMS(-1L)
 }
 

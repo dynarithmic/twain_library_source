@@ -31,7 +31,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAvailablePrintersArray(DTWAIN_SOURCE Source, 
 {
     LOG_FUNC_ENTRY_PARAMS((Source, AvailPrinters))
     const DTWAIN_BOOL bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPPRINTER, DTWAIN_CAPSET, AvailPrinters );
-    LOG_FUNC_EXIT_PARAMS(bRet)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
 
@@ -40,16 +40,16 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAvailablePrinters(DTWAIN_SOURCE Source, LONG 
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpAvailPrinters))
     if ( !DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPPRINTER) )
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
     DTWAIN_ARRAY Array = CreateArrayFromFactory(DTWAIN_ARRAYLONG, 32);
     if ( !Array )
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
 
     // Destroys array when out of scope
-    DTWAINArrayLL_RAII a(Array);
+    DTWAINArrayLowLevel_RAII a(pHandle, Array);
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
 
     LONG j = 0;
@@ -63,7 +63,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAvailablePrinters(DTWAIN_SOURCE Source, LONG 
      }
 
     const DTWAIN_BOOL bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPPRINTER, DTWAIN_CAPSET, Array );
-    LOG_FUNC_EXIT_PARAMS(bRet)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
 
@@ -72,12 +72,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinter(DTWAIN_SOURCE Source, LONG nPrinter, 
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nPrinter, bSetCurrent))
     if ( !DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPPRINTER) )
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
     DTWAIN_ARRAY Array = DTWAIN_ArrayCreateFromCap(nullptr, DTWAIN_CV_CAPPRINTER, 1);
     if ( !Array )
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
-    DTWAINArrayLL_RAII a(Array);
+    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+    DTWAINArrayLowLevel_RAII a(pHandle, Array);
 
     LONG SetType = DTWAIN_CAPSET;
     if ( !bSetCurrent )
@@ -95,13 +96,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinter(DTWAIN_SOURCE Source, LONG nPrinter, 
     bool bRet = false;
     if ( bFound )
     {
-        const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
         if ( !vValues.empty() )
             vValues[0] = nPrinter;
         bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPPRINTER, SetType, Array)?true:false;
     }
-    LOG_FUNC_EXIT_PARAMS(bRet)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
 
@@ -109,17 +109,17 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterEx(DTWAIN_SOURCE Source, LONG nPrinter
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nPrinter, bSetCurrent))
     if (!DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPPRINTER))
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
     DTWAIN_ARRAY Array = DTWAIN_ArrayCreateFromCap(nullptr, DTWAIN_CV_CAPPRINTER, 1);
     if (!Array)
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
-    DTWAINArrayLL_RAII a(Array);
+    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+    DTWAINArrayLowLevel_RAII a(pHandle, Array);
 
     LONG SetType = DTWAIN_CAPSET;
     if (!bSetCurrent)
         SetType = DTWAIN_CAPRESET;
-    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
     DTWAIN_BOOL bRet = 0;
     if (!vValues.empty())
@@ -127,7 +127,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterEx(DTWAIN_SOURCE Source, LONG nPrinter
          vValues[0] = nPrinter;
          bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPPRINTER, SetType, Array);
     }
-    LOG_FUNC_EXIT_PARAMS(bRet)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
 
@@ -138,9 +138,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPrinterEnabled(DTWAIN_SOURCE Source, LONG Prin
     if ( DTWAIN_GetPrinter(Source, &Current, TRUE ) )
     {
         if ( Current == Printer || Printer == DTWAIN_ANYSUPPORT)
-            LOG_FUNC_EXIT_PARAMS(true)
+            LOG_FUNC_EXIT_NONAME_PARAMS(true)
     }
-    LOG_FUNC_EXIT_PARAMS(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(false)
     CATCH_BLOCK(false)
 }
 
@@ -148,7 +148,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterStrings(DTWAIN_SOURCE Source, DTWAIN_A
 {
     LOG_FUNC_ENTRY_PARAMS((Source, ArrayString, pNumStrings))
     if ( !DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPPRINTERSTRING) )
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
     const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     auto& factory = pHandle->m_ArrayFactory;
     // Check if array is of the correct type
@@ -160,7 +160,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterStrings(DTWAIN_SOURCE Source, DTWAIN_A
     {
         if (pNumStrings)
             *pNumStrings = 0;
-        LOG_FUNC_EXIT_PARAMS(true)
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
     }
 
     bool bRet;
@@ -205,7 +205,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterStrings(DTWAIN_SOURCE Source, DTWAIN_A
         if ( pNumStrings )
             *pNumStrings = 0;
     }
-    LOG_FUNC_EXIT_PARAMS(bRet)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
 

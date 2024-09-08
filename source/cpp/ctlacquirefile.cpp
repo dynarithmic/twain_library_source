@@ -46,19 +46,16 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
 {
     LOG_FUNC_ENTRY_PARAMS((Source, aFileNames, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI,bCloseSource, pStatus))
     auto bRetval = true;
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    CTL_ITwainSource* pSource = VerifySourceHandle(pHandle, Source);
-    if (!pSource)
-        LOG_FUNC_EXIT_PARAMS(false)
 
     // Check if the file format is valid
     auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
     if (availableFileTypes.find(lFileType) == availableFileTypes.end())
     {
         DTWAIN_SetLastError(DTWAIN_ERR_FILE_FORMAT);
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
     }
+    auto* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    auto pHandle = pSource->GetDTWAINHandle();
 
     DTWAIN_ARRAY tempNames = nullptr;
     DTWAINArrayPtr_RAII tempRAII(&tempNames);
@@ -75,9 +72,9 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
         {
             tempNames = CreateArrayFromFactory(DTWAIN_ARRAYSTRING, 0);
             if ( idx == 1 )
-                ArrayCopyAnsiToNative(aFileNames, tempNames);
+                ArrayCopyAnsiToNative(pHandle, aFileNames, tempNames);
             else
-                ArrayCopyWideToNative(aFileNames, tempNames);
+                ArrayCopyWideToNative(pHandle, aFileNames, tempNames);
             arrayToUse = tempNames;
         }
     }
@@ -86,15 +83,15 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
 
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !bRetval; }, DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
 
-    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(GetDTWAINHandle_Internal()).setSource(Source).setFileType(lFileType).setFileFlags(lFileFlags | DTWAIN_USELIST).
+    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pSource->GetDTWAINHandle()).setSource(Source).setFileType(lFileType).setFileFlags(lFileFlags | DTWAIN_USELIST).
                 setFileList(arrayToUse).setPixelType(PixelType).setMaxPages(lMaxPages).setShowUI(bShowUI ? true : false).
                 setRemainOpen(!(bCloseSource ? true : false));
 
     bRetval = AcquireFileHelper(opts, ACQUIREFILE);
     if (pStatus)
         *pStatus = opts.getStatus();
-    LOG_FUNC_EXIT_PARAMS(bRetval)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFile(DTWAIN_SOURCE Source,
@@ -109,46 +106,40 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFile(DTWAIN_SOURCE Source,
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpszFile, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus))
 
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    CTL_ITwainSource* pSource = VerifySourceHandle(pHandle, Source);
-    if (!pSource)
-        LOG_FUNC_EXIT_PARAMS(false)
+    auto* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    auto pHandle = pSource->GetDTWAINHandle();
 
     // Check if the file format is valid
     auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
     if (availableFileTypes.find(lFileType) == availableFileTypes.end())
     {
         DTWAIN_SetLastError(DTWAIN_ERR_FILE_FORMAT);
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
     }
 
     lFileFlags &= ~DTWAIN_USELIST;
-    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(GetDTWAINHandle_Internal()).setSource(Source).
+    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).
         setFileName(lpszFile).setFileType(lFileType).setFileFlags(lFileFlags).setPixelType(PixelType).
         setMaxPages(lMaxPages).setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setAcquireType(ACQUIREFILE);
     const bool bRetval = AcquireFileHelper(opts, ACQUIREFILE);
     if (pStatus)
         *pStatus = opts.getStatus();
-    LOG_FUNC_EXIT_PARAMS(bRetval)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileAutoIncrement(DTWAIN_SOURCE Source, LONG nValue, DTWAIN_BOOL bResetOnAcquire, DTWAIN_BOOL bSet)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nValue, bResetOnAcquire, bSet))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, Source);
-    if (!pSource)
-        LOG_FUNC_EXIT_PARAMS(false)
+    auto* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
 
     pSource->SetFileAutoIncrement(bSet ? true : false, nValue);
     pSource->SetFileAutoIncrementFlags(bResetOnAcquire ? DTWAIN_INCREMENT_DYNAMIC : DTWAIN_INCREMENT_DEFAULT);
     /*    if ( nInitial < -1 )
     nInitial = 0;                                    */
     pSource->SetFileAutoIncrementBase(0); //nInitial );
-    LOG_FUNC_EXIT_PARAMS(true)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireFile(SourceAcquireOptions& opts)
@@ -163,7 +154,7 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireFile(SourceAcquireOptions& opts)
     if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
         return LLAcquireImage(opts);
     auto pr = dynarithmic::StartModalMessageLoop(opts.getSource(), opts);
-    LOG_FUNC_EXIT_PARAMS(pr.second)
+    LOG_FUNC_EXIT_NONAME_PARAMS(pr.second)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 
@@ -190,7 +181,7 @@ static std::string GetDirectoryCreationError(CTL_StringType fileName)
 bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType)
 {
     LOG_FUNC_ENTRY_PARAMS((opts))
-    CTL_ITwainSource *pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), opts.getSource());
+    CTL_ITwainSource *pSource = static_cast<CTL_ITwainSource*>(opts.getSource());
 
     DumpArrayContents(opts.getFileList(), 0);
     #ifdef _UNICODE
@@ -246,7 +237,7 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
     const DTWAIN_ARRAY aDibs = SourceAcquire(opts);
     if (opts.getStatus() < 0 && !aDibs)
     {
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
     }
 
     bool bRetval = false;
@@ -278,7 +269,7 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
     if (DTWAIN_GetTwainMode() == DTWAIN_MODELESS)
         pSource->m_pUserPtr = nullptr;
 
-    LOG_FUNC_EXIT_PARAMS(bRetval)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
     CATCH_BLOCK(false)
 }
 

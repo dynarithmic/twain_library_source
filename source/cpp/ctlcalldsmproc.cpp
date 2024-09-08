@@ -29,12 +29,12 @@ using namespace dynarithmic;
 
 TWAIN_IDENTITY DLLENTRY_DEF DTWAIN_GetTwainAppID()
 {
-    LOG_FUNC_ENTRY_PARAMS(())
+    LOG_FUNC_ENTRY_NONAME_PARAMS()
     if (!DTWAIN_IsSessionEnabled())
-        LOG_FUNC_EXIT_PARAMS(NULL)
+        LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     TW_IDENTITY *pIdentity = pHandle->m_pTwainSession->GetAppIDPtr();
-    LOG_FUNC_EXIT_PARAMS(((TWAIN_IDENTITY)pIdentity))
+    LOG_FUNC_EXIT_NONAME_PARAMS(((TWAIN_IDENTITY)pIdentity))
     CATCH_BLOCK(TWAIN_IDENTITY(0))
 }
 
@@ -44,19 +44,17 @@ TWAIN_IDENTITY DLLENTRY_DEF DTWAIN_GetTwainAppIDEx(TW_IDENTITY* pIdentity)
     const TWAIN_IDENTITY thisID = DTWAIN_GetTwainAppID();
     if (thisID)
         memcpy(pIdentity, thisID, sizeof(TW_IDENTITY));
-    LOG_FUNC_EXIT_PARAMS(((TWAIN_IDENTITY)pIdentity))
+    LOG_FUNC_EXIT_NONAME_PARAMS(((TWAIN_IDENTITY)pIdentity))
     CATCH_BLOCK(TWAIN_IDENTITY(0))
 }
 
 TWAIN_IDENTITY DLLENTRY_DEF DTWAIN_GetSourceID(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    CTL_ITwainSource *pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    TWAIN_IDENTITY Id = {};
-    if ( pSource )
-        Id = static_cast<TWAIN_IDENTITY>(pSource->GetSourceIDPtr());
-    LOG_FUNC_EXIT_PARAMS(Id)
-    CATCH_BLOCK(TWAIN_IDENTITY())
+    auto* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    TWAIN_IDENTITY Id = static_cast<TWAIN_IDENTITY>(pSource->GetSourceIDPtr());
+    LOG_FUNC_EXIT_NONAME_PARAMS(Id)
+    CATCH_BLOCK_LOG_PARAMS(TWAIN_IDENTITY())
 }
 
 TWAIN_IDENTITY  DLLENTRY_DEF DTWAIN_GetSourceIDEx(DTWAIN_SOURCE Source, TW_IDENTITY* pIdentity)
@@ -65,7 +63,7 @@ TWAIN_IDENTITY  DLLENTRY_DEF DTWAIN_GetSourceIDEx(DTWAIN_SOURCE Source, TW_IDENT
     const TWAIN_IDENTITY thisID = DTWAIN_GetSourceID(Source);
     if (thisID)
         memcpy(pIdentity, thisID, sizeof(TW_IDENTITY));
-    LOG_FUNC_EXIT_PARAMS(((TWAIN_IDENTITY)pIdentity))
+    LOG_FUNC_EXIT_NONAME_PARAMS(((TWAIN_IDENTITY)pIdentity))
     CATCH_BLOCK(TWAIN_IDENTITY(0))
 }
 
@@ -84,7 +82,7 @@ LONG DLLENTRY_DEF DTWAIN_CallDSMProc(TWAIN_IDENTITY AppID, TWAIN_IDENTITY Source
                                                        static_cast<TW_UINT16>(lMSG),
                                                        pData);
 
-    LOG_FUNC_EXIT_PARAMS(Ret)
+    LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 
@@ -128,6 +126,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCurrentTwainTriplet(TW_IDENTITY* pAppID, TW_I
                 *lpMemRef = {};
         }
     }
-    LOG_FUNC_EXIT_PARAMS(TRUE)
+    LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
     CATCH_BLOCK(FALSE)
 }

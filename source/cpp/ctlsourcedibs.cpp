@@ -31,27 +31,19 @@ using namespace dynarithmic;
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetSourceAcquisitions(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, NULL, FUNC_MACRO);
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
-    if (!p)
-        LOG_FUNC_EXIT_PARAMS(NULL)
+    CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
     const DTWAIN_ARRAY AcqArray = p->GetAcquisitionArray();
     if (!AcqArray)
-        LOG_FUNC_EXIT_PARAMS(NULL)
-    LOG_FUNC_EXIT_PARAMS(AcqArray)
-    CATCH_BLOCK(DTWAIN_ARRAY(0))
+        LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
+    LOG_FUNC_EXIT_NONAME_PARAMS(AcqArray)
+    CATCH_BLOCK_LOG_PARAMS(DTWAIN_ARRAY(0))
 }
 
 DTWAIN_BOOL dynarithmic::DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source, DTWAIN_ARRAY pArray)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pArray))
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, Source);
-    if (!pSource)
-        LOG_FUNC_EXIT_PARAMS(false)
+    CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
 
     const auto& factory = pHandle->m_ArrayFactory;
 
@@ -70,7 +62,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source, DTWAIN_AR
         if (hDib)
             factory->add_to_back(pArray, hDib, 1); 
     }
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -82,46 +74,37 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAllSourceDibsEx(DTWAIN_SOURCE Source, LPDTWAI
     {
         DTWAIN_GetAllSourceDibs(Source, DibArray);
         *pArray = DibArray;
-        LOG_FUNC_EXIT_PARAMS(true)
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
     }
-    LOG_FUNC_EXIT_PARAMS(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(false)
     CATCH_BLOCK(false)
 }
 
 HANDLE DLLENTRY_DEF DTWAIN_GetCurrentAcquiredImage(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, Source);
-    if (!pSource)
-        LOG_FUNC_EXIT_PARAMS(NULL)
-
+    CTL_ITwainSource *pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
     const int nCount = pSource->GetNumDibs();
     if (nCount == 0)
-        LOG_FUNC_EXIT_PARAMS(NULL)
-    LOG_FUNC_EXIT_PARAMS((HANDLE)pSource->GetDibHandle(nCount - 1))
-    CATCH_BLOCK(HANDLE(0))
+        LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
+    LOG_FUNC_EXIT_NONAME_PARAMS((HANDLE)pSource->GetDibHandle(nCount - 1))
+    CATCH_BLOCK_LOG_PARAMS(HANDLE(0))
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetCurrentPageNum(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, Source);
-    if (!pSource)
-        LOG_FUNC_EXIT_PARAMS(-1L)
-
-        // return the file name that would be acquired
+    CTL_ITwainSource* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
     const LONG retval = static_cast<LONG>(pSource->GetPendingImageNum());
-    LOG_FUNC_EXIT_PARAMS(retval)
-    CATCH_BLOCK(-1L)
+    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+    CATCH_BLOCK_LOG_PARAMS(-1L)
 }
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_CreateAcquisitionArray()
 {
-    LOG_FUNC_ENTRY_PARAMS(())
+    LOG_FUNC_ENTRY_NONAME_PARAMS()
     const DTWAIN_ARRAY AcqArray = static_cast<DTWAIN_ARRAY>(CreateArrayFromFactory(DTWAIN_ARRAYOFHANDLEARRAYS, 0));
-    LOG_FUNC_EXIT_PARAMS(AcqArray)
+    LOG_FUNC_EXIT_NONAME_PARAMS(AcqArray)
     CATCH_BLOCK(DTWAIN_ARRAY(0))
 }
 
@@ -134,12 +117,12 @@ struct NestedAcquisitionDestroyer
     void operator()(DTWAIN_ARRAY ImagesArray) const
     {
         // we want this array destroyed when we're finished
-        DTWAINArrayLL_RAII raii(ImagesArray);
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        DTWAINArrayLowLevel_RAII raii(pHandle, ImagesArray);
 
         // Test if the DIB data should also be destroyed
         if (m_bDestroyDibs)
         {
-            const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
             // get underlying vector of dibs
             auto& vHandles = pHandle->m_ArrayFactory->underlying_container_t<void*>(ImagesArray);
 
@@ -175,7 +158,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyAcquisitionArray(DTWAIN_ARRAY aAcq, DTWAI
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !factory->is_valid(aAcq); }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
 
     // Make sure this array is destroyed when we exit this function
-    DTWAINArrayLL_RAII raiiMain(aAcq);
+    DTWAINArrayLowLevel_RAII raiiMain(pHandle, aAcq);
 
     // get instance of acquisition destroy class
     const NestedAcquisitionDestroyer acqDestroyer(bDestroyDibs ? true : false);
@@ -186,7 +169,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyAcquisitionArray(DTWAIN_ARRAY aAcq, DTWAI
     // for each image array, destroy it
     std::for_each(vImagesArray.begin(), vImagesArray.end(), acqDestroyer);
 
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -195,17 +178,14 @@ static bool SetBitDepth(CTL_ITwainSource *p, LONG BitDepth);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ForceAcquireBitDepth(DTWAIN_SOURCE Source, LONG BitDepth)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, BitDepth))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
-    if (!p)
-        LOG_FUNC_EXIT_PARAMS(false)
-
+    CTL_ITwainSource* p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    const auto pHandle = p->GetDTWAINHandle();
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(p); },
                 DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
     const DTWAIN_BOOL bRet = SetBitDepth(p, BitDepth);
-    LOG_FUNC_EXIT_PARAMS(bRet)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 static bool SetBitDepth(CTL_ITwainSource *p, LONG BitDepth)

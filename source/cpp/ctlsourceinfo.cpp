@@ -31,7 +31,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceValid(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     if (!Source)
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     bool bRet = false;
     if (pHandle)
@@ -39,7 +39,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceValid(DTWAIN_SOURCE Source)
         CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
         bRet = CTL_TwainAppMgr::IsValidTwainSource(pHandle->m_pTwainSession, p);
     }
-    LOG_FUNC_EXIT_PARAMS(bRet)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
 
@@ -47,59 +47,43 @@ LONG   DLLENTRY_DEF DTWAIN_GetSourceManufacturer( DTWAIN_SOURCE Source, LPTSTR s
 {
     LOG_FUNC_ENTRY_PARAMS((Source, szMan, nMaxLen))
     CTL_ITwainSource *p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
-    if (p)
-    {
-        const LONG Ret = GetSourceInfo(p, &CTL_ITwainSource::GetManufacturer, szMan, nMaxLen);
-        LOG_FUNC_EXIT_PARAMS(Ret)
-    }
-    LOG_FUNC_EXIT_PARAMS(-1L)
-    CATCH_BLOCK(DTWAIN_FAILURE1)
+    const LONG Ret = GetSourceInfo(p, &CTL_ITwainSource::GetManufacturer, szMan, nMaxLen);
+    LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
+    CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
 }
 
 LONG   DLLENTRY_DEF DTWAIN_GetSourceProductFamily( DTWAIN_SOURCE Source, LPTSTR szProduct, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, szProduct, nMaxLen))
     CTL_ITwainSource *p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
-    if (p)
-    {
-        const LONG Ret = GetSourceInfo(p, &CTL_ITwainSource::GetProductFamily, szProduct, nMaxLen);
-        LOG_FUNC_EXIT_PARAMS(Ret)
-    }
-    LOG_FUNC_EXIT_PARAMS(-1L)
-    CATCH_BLOCK(DTWAIN_FAILURE1)
+    const LONG Ret = GetSourceInfo(p, &CTL_ITwainSource::GetProductFamily, szProduct, nMaxLen);
+    LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
+    CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
 }
 
 LONG   DLLENTRY_DEF DTWAIN_GetSourceProductName(DTWAIN_SOURCE Source,LPTSTR szProduct,LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, szProduct, nMaxLen))
     CTL_ITwainSource *p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
-    if (p)
-    {
-        const LONG Ret = GetSourceInfo(p, &CTL_ITwainSource::GetProductName, szProduct, nMaxLen);
-        LOG_FUNC_EXIT_PARAMS(Ret)
-    }
-    LOG_FUNC_EXIT_PARAMS(-1L)
-    CATCH_BLOCK(DTWAIN_FAILURE1)
+    const LONG Ret = GetSourceInfo(p, &CTL_ITwainSource::GetProductName, szProduct, nMaxLen);
+    LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
+    CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetSourceVersionInfo(DTWAIN_SOURCE Source, LPTSTR szVInfo, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, szVInfo, nMaxLen))
     CTL_ITwainSource *p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
-    if (p)
-    {
-        const TW_VERSION *pV = p->GetVersion();
-        CTL_StringType pName = StringConversion::Convert_AnsiPtr_To_Native(pV->Info);
-        const size_t nLen = pName.length();
-        if ( szVInfo == nullptr)
-            LOG_FUNC_EXIT_PARAMS((LONG)nLen)
+    const TW_VERSION *pV = p->GetVersion();
+    CTL_StringType pName = StringConversion::Convert_AnsiPtr_To_Native(pV->Info);
+    const size_t nLen = pName.length();
+    if ( szVInfo == nullptr)
+        LOG_FUNC_EXIT_NONAME_PARAMS((LONG)nLen)
 
-        std::copy_n(pName.begin(), nLen, szVInfo);
-        szVInfo[nLen] = _T('\0');
-        LOG_FUNC_EXIT_PARAMS((LONG)nLen)
-    }
-    LOG_FUNC_EXIT_PARAMS(-1L)
-    CATCH_BLOCK(DTWAIN_FAILURE1)
+    std::copy_n(pName.begin(), nLen, szVInfo);
+    szVInfo[nLen] = _T('\0');
+    LOG_FUNC_EXIT_NONAME_PARAMS((LONG)nLen)
+    CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
 }
 
 LONG dynarithmic::GetSourceInfo(CTL_ITwainSource *p,SOURCEINFOFUNC pFunc,LPTSTR szInfo, LONG nMaxLen)
@@ -111,20 +95,17 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetSourceVersionNumber( DTWAIN_SOURCE Source, LP
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pMajor, pMinor))
     CTL_ITwainSource *p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
-    if (p)
-    {
-        const TW_VERSION *pV = p->GetVersion();
-        if ( pMajor )
-            *pMajor = pV->MajorNum;
-        if ( pMinor)
-            *pMinor = pV->MinorNum;
-        LOG_FUNC_EXIT_PARAMS(true)
-    }
+    const TW_VERSION *pV = p->GetVersion();
+    if ( pMajor )
+        *pMajor = pV->MajorNum;
+    if ( pMinor)
+        *pMinor = pV->MinorNum;
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     if ( pMajor )
         *pMajor = -1L;
     if ( pMinor )
         *pMinor = -1L;
-    LOG_FUNC_EXIT_PARAMS(false)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 

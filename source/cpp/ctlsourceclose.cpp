@@ -33,66 +33,56 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CloseSource(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = p->GetDTWAINHandle();
     bool bRetval = false;
-    if (p)
+    const auto sProductName = p->GetProductName();
+    bRetval = DTWAIN_CloseSourceUnconditional(pHandle, p)?true:false;
+    if (bRetval)
     {
-        const auto sProductName = p->GetProductName();
-        bRetval = DTWAIN_CloseSourceUnconditional(pHandle, p)?true:false;
-        if (bRetval)
-        {
-            pHandle->m_mapStringToSource.erase(sProductName);
-            pHandle->m_aFeederSources.erase(Source);
-        }
-        std::string sProductNameA = StringConversion::Convert_Native_To_Ansi(sProductName);
-        auto& sourceMap = CTL_StaticData::GetSourceStatusMap();
-        auto iter = sourceMap.find(sProductNameA);
-        if (iter != sourceMap.end())
-        {
-            iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, false);
-            iter->second.SetStatus(SourceStatus::SOURCE_STATUS_SELECECTED, false);
-            iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, false);
-            iter->second.SetSourceHandle({});
-            iter->second.SetThreadID({});
-        }
+        pHandle->m_mapStringToSource.erase(sProductName);
+        pHandle->m_aFeederSources.erase(Source);
     }
-    LOG_FUNC_EXIT_PARAMS(bRetval)
-    CATCH_BLOCK(false)
+    std::string sProductNameA = StringConversion::Convert_Native_To_Ansi(sProductName);
+    auto& sourceMap = CTL_StaticData::GetSourceStatusMap();
+    auto iter = sourceMap.find(sProductNameA);
+    if (iter != sourceMap.end())
+    {
+        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, false);
+        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_SELECECTED, false);
+        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, false);
+        iter->second.SetSourceHandle({});
+        iter->second.SetThreadID({});
+    }
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CloseSourceUI(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    if (p)
-    {
-        CTL_TwainAppMgr::EndTwainUI(pHandle->m_pTwainSession, p);
-        LOG_FUNC_EXIT_PARAMS(true)
-    }
-    LOG_FUNC_EXIT_PARAMS(false)
-    CATCH_BLOCK(false)
+    const auto pHandle = p->GetDTWAINHandle();
+    CTL_TwainAppMgr::EndTwainUI(pHandle->m_pTwainSession, p);
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 DTWAIN_BOOL DTWAIN_CloseSourceUnconditional(CTL_TwainDLLHandle *pHandle, CTL_ITwainSource *p)
 {
-    LOG_FUNC_ENTRY_PARAMS(())
+    LOG_FUNC_ENTRY_NONAME_PARAMS()
     bool bRetval = false;
 
-    if (p)
+    if (pHandle->m_nSourceCloseMode == DTWAIN_SourceCloseModeFORCE &&
+        p->IsAcquireAttempt())
     {
-        if (pHandle->m_nSourceCloseMode == DTWAIN_SourceCloseModeFORCE &&
-            p->IsAcquireAttempt())
-        {
-            CTL_TwainAppMgr::DisableUserInterface(p);
-            p->SetAcquireAttempt(false);
-        }
-        else
-            DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return p->IsAcquireAttempt(); },
-            DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
-
-        bRetval = CTL_TwainAppMgr::CloseSource(pHandle->m_pTwainSession, p)?true:false;
+        CTL_TwainAppMgr::DisableUserInterface(p);
+        p->SetAcquireAttempt(false);
     }
-    LOG_FUNC_EXIT_PARAMS(bRetval)
+    else
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return p->IsAcquireAttempt(); },
+        DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
+
+    bRetval = CTL_TwainAppMgr::CloseSource(pHandle->m_pTwainSession, p)?true:false;
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
     CATCH_BLOCK(false)
 }

@@ -37,7 +37,7 @@ namespace dynarithmic
         DTWAIN_ARRAY Array = 0;
         if (DTWAIN_GetCapValues(Source, Cap, DTWAIN_CAPGET, &Array))
         {
-            DTWAINArrayLL_RAII raii(Array);
+            DTWAINArrayLowLevel_RAII raii(static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle(), Array);
             DTWAIN_ARRAY tempArray = 0;
             DTWAIN_ARRAY arrayToUse = Array;
             DTWAINArrayLL_RAII raii2; 
@@ -72,7 +72,8 @@ namespace dynarithmic
             DTWAIN_ARRAY Array = DTWAIN_ArrayCreateFromCap(Source, Cap, 1);
             if (!Array)
                 return false;
-            DTWAINArrayLL_RAII a(Array);
+            const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+            DTWAINArrayLowLevel_RAII a(pHandle, Array);
 
             LONG SetType = DTWAIN_CAPSET;
             if (!bSetCurrent)
@@ -86,10 +87,9 @@ namespace dynarithmic
                 {
                     DTWAIN_ARRAY Array2 = 0;
                     DTWAIN_BOOL bRet = DTWAIN_GetCapValues(Source, Cap, DTWAIN_CAPGET, &Array2);
-                    DTWAINArrayLL_RAII a2(Array2);
+                    DTWAINArrayLowLevel_RAII a2(pHandle, Array2);
                     if (bRet)
                     {
-                        const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
                         LONG nSize = static_cast<LONG>(pHandle->m_ArrayFactory->size(Array2));
                         if (nSize > 0)
                             DTWAIN_RangeGetNearestValue(Source, SupportVal, SupportVal, DTWAIN_ROUNDNEAREST);
@@ -115,7 +115,7 @@ namespace dynarithmic
         }
         DTWAIN_ARRAY Array = 0;
         BOOL isSupported = DTWAIN_GetCapValues(Source, Cap, CapOp, &Array);
-        DTWAINArrayLL_RAII raii(Array);
+        DTWAINArrayLowLevel_RAII raii(pHandle, Array);
         if ( isSupported )
         {
             // get underlying vector and search it for the value

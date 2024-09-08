@@ -29,26 +29,20 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetManualDuplexMode(DTWAIN_SOURCE Source, LONG Flags, DTWAIN_BOOL bSet)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Flags, bSet))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, Source);
-    if (!pSource)
-        LOG_FUNC_EXIT_PARAMS(false)
+    CTL_ITwainSource *pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
     pSource->SetManualDuplexMode(Flags, bSet ? true : false);
-    LOG_FUNC_EXIT_PARAMS(true)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetManualDuplexCount(DTWAIN_SOURCE Source, LONG *pSide1, LONG *pSide2)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pSide1, pSide2))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, Source);
-    if (!pSource)
-        LOG_FUNC_EXIT_PARAMS(false)
+    CTL_ITwainSource *pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
     if (pSide1)
         *pSide1 = static_cast<LONG>(pSource->GetNumDuplexFiles(0));
     if (pSide2)
         *pSide2 = static_cast<LONG>(pSource->GetNumDuplexFiles(1));
-    LOG_FUNC_EXIT_PARAMS(true)
-   CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }

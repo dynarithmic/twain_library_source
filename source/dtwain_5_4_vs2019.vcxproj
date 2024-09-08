@@ -1493,6 +1493,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\dtwain_filetypes.h" />
     <ClInclude Include="h\dtwain_float_utils.h" />
     <ClInclude Include="h\dtwain_library_selector.h" />
+    <ClInclude Include="h\dtwain_paramlogger.h" />
     <ClInclude Include="h\dtwain_raii.h" />
     <ClInclude Include="h\dtwain_standard_defs.h" />
     <ClInclude Include="h\dtwain_version.h" />

@@ -35,9 +35,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SkipImageInfoError(DTWAIN_SOURCE Source, DTWAIN_
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     if (!p)
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
     p->SetImageInfoErrors(bSkip ? true : false);
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -50,8 +50,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSkipImageInfoError(DTWAIN_SOURCE Source)
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     if (!p)
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
     const LONG retval = p->SkipImageInfoErrors();
-    LOG_FUNC_EXIT_PARAMS(retval)
+    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
     CATCH_BLOCK(false)
 }

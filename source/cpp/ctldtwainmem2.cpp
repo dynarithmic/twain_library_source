@@ -31,7 +31,7 @@ HANDLE  DLLENTRY_DEF DTWAIN_AllocateMemory(LONG memSize)
 {
     LOG_FUNC_ENTRY_PARAMS((memSize))
     const HANDLE h = ImageMemoryHandler::GlobalAlloc(GHND, memSize);
-    LOG_FUNC_EXIT_PARAMS(h)
+    LOG_FUNC_EXIT_NONAME_PARAMS(h)
     CATCH_BLOCK(HANDLE())
 }
 
@@ -39,7 +39,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FreeMemory(HANDLE h)
 {
     LOG_FUNC_ENTRY_PARAMS((h))
     const DTWAIN_BOOL bRet = ImageMemoryHandler::GlobalFree(h) ? TRUE : FALSE;
-    LOG_FUNC_EXIT_PARAMS(bRet)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
 
@@ -47,7 +47,7 @@ DTWAIN_MEMORY_PTR DLLENTRY_DEF DTWAIN_LockMemory(HANDLE h)
 {
     LOG_FUNC_ENTRY_PARAMS((h))
     const DTWAIN_MEMORY_PTR ptr = ImageMemoryHandler::GlobalLock(h);
-    LOG_FUNC_EXIT_PARAMS(ptr)
+    LOG_FUNC_EXIT_NONAME_PARAMS(ptr)
     CATCH_BLOCK(DTWAIN_MEMORY_PTR())
 }
 
@@ -55,7 +55,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_UnlockMemory(HANDLE h)
 {
     LOG_FUNC_ENTRY_PARAMS((h))
     const DTWAIN_BOOL bRet = ImageMemoryHandler::GlobalUnlock(h);
-    LOG_FUNC_EXIT_PARAMS(bRet)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
 
@@ -67,7 +67,7 @@ HANDLE  DLLENTRY_DEF DTWAIN_AllocateMemoryEx(LONG memSize)
     HANDLE h = nullptr;
     if (pHandle->m_TwainMemoryFunc)
         h = pHandle->m_TwainMemoryFunc->AllocateMemory(memSize);
-    LOG_FUNC_EXIT_PARAMS(h)
+    LOG_FUNC_EXIT_NONAME_PARAMS(h)
     CATCH_BLOCK(HANDLE())
 }
 
@@ -82,7 +82,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FreeMemoryEx(HANDLE h)
         pHandle->m_TwainMemoryFunc->FreeMemory(h);
         bRet = TRUE;
     }
-    LOG_FUNC_EXIT_PARAMS(bRet)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
 
@@ -94,7 +94,7 @@ DTWAIN_MEMORY_PTR DLLENTRY_DEF DTWAIN_LockMemoryEx(HANDLE h)
     DTWAIN_MEMORY_PTR ptr = nullptr;
     if (pHandle->m_TwainMemoryFunc)
         ptr = pHandle->m_TwainMemoryFunc->LockMemory(h);
-    LOG_FUNC_EXIT_PARAMS(ptr)
+    LOG_FUNC_EXIT_NONAME_PARAMS(ptr)
     CATCH_BLOCK(DTWAIN_MEMORY_PTR())
 }
 
@@ -109,6 +109,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_UnlockMemoryEx(HANDLE h)
         pHandle->m_TwainMemoryFunc->UnlockMemory(h);
         bRet = TRUE;
     }
-    LOG_FUNC_EXIT_PARAMS(bRet)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }

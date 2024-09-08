@@ -29,16 +29,8 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIEnabled(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    if (!Source)
-        LOG_FUNC_EXIT_PARAMS(false)
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
-    if (!p)
-        LOG_FUNC_EXIT_PARAMS(false)
+    CTL_ITwainSource* p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
     const DTWAIN_BOOL bRet = p->IsUIOpen();
-    LOG_FUNC_EXIT_PARAMS(bRet)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
