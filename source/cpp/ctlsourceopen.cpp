@@ -35,7 +35,7 @@ static void DetermineIfSpecialXfer(CTL_ITwainSource* p);
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSourcesOnSelect(DTWAIN_BOOL bSet)
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS(bSet)
+    LOG_FUNC_ENTRY_PARAMS((bSet))
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     pHandle->m_bOpenSourceOnSelect = bSet ? true : false;
