@@ -276,7 +276,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapValues( DTWAIN_SOURCE Source, LONG lCap, L
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, pArray))
     const DTWAIN_BOOL bRet = DTWAIN_GetCapValuesEx2(Source, lCap, lGetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, pArray);
-    LOG_FUNC_EXIT_PARAMS(bRet)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
 
@@ -287,7 +287,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapValuesEx( DTWAIN_SOURCE Source, LONG lCap,
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, lContainerType, pArray))
     const DTWAIN_BOOL bRet = DTWAIN_GetCapValuesEx2(Source, lCap, lGetType, lContainerType, DTWAIN_DEFAULT, pArray);
-    LOG_FUNC_EXIT_PARAMS(bRet)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
 
@@ -297,22 +297,19 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap
                                                  LONG nDataType, LPDTWAIN_ARRAY pArray )
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, lContainerType, nDataType,pArray))
+    CTL_ITwainSource* p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    const auto pHandle = p->GetDTWAINHandle();
     DTWAIN_BOOL bRet = FALSE;
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle(static_cast<DTWAIN_HANDLE>(pHandle), Source);
-    if (p)
+    bool overrideDataType = true;
+    if (nDataType == DTWAIN_DEFAULT)
     {
-        bool overrideDataType = true;
-        if (nDataType == DTWAIN_DEFAULT)
-        {
-            nDataType = DTWAIN_GetCapDataType(Source, static_cast<CTL_EnumCapability>(lCap));
-            DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return nDataType < 0; }, nDataType, false, FUNC_MACRO);
-            overrideDataType = false;
-        }
-        bRet = DTWAIN_GetCapValuesEx_Internal(Source, static_cast<TW_UINT16>(lCap), lGetType, lContainerType, nDataType, pArray, overrideDataType);
+        nDataType = DTWAIN_GetCapDataType(Source, static_cast<CTL_EnumCapability>(lCap));
+        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return nDataType < 0; }, nDataType, false, FUNC_MACRO);
+        overrideDataType = false;
     }
-    LOG_FUNC_EXIT_PARAMS(bRet)
-    CATCH_BLOCK(false)
+    bRet = DTWAIN_GetCapValuesEx_Internal(Source, static_cast<TW_UINT16>(lCap), lGetType, lContainerType, nDataType, pArray, overrideDataType);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 static LONG GetTwainGetType(LONG gettype)
@@ -336,12 +333,8 @@ DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, lContainerType, nDataType, pArray,  bOverrideDataType?TRUE:FALSE))
 
-    const DTWAIN_HANDLE DLLHandle = GetDTWAINHandle_Internal();
-    CTL_ITwainSource *p = VerifySourceHandle(DLLHandle, Source);
-
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(DLLHandle);
-
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !p;}, DTWAIN_ERR_BAD_SOURCE, false, FUNC_MACRO);
+    CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
+    const auto pHandle = p->GetDTWAINHandle();
 
     // We clear the user array here, since we do not want to 
     // report information back to user if capability is not supported
@@ -360,88 +353,85 @@ DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap
 
 
     if( !p->IsCapNegotiableInState(static_cast<TW_UINT16>(lCap), p->GetState()) )
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
     DTWAIN_ARRAY ThisArray=nullptr;
     DTWAINArrayPtr_RAII arr(&ThisArray);
-    if( p )
+    if( nDataType == 0xFFFF )
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return nDataType == DTWAIN_CAPDATATYPE_UNKNOWN;},
+                                        DTWAIN_ERR_UNKNOWN_CAPDATATYPE, false, FUNC_MACRO);
+
+    // adjust the container types for GETHELP, GETLABEL, and GETLABELENUM
+    switch (lGetType)
     {
-        if( nDataType == 0xFFFF )
-            LOG_FUNC_EXIT_PARAMS(false)
+        case DTWAIN_CAPGETHELP:
+        case DTWAIN_CAPGETLABEL:
+            lContainerType = DTWAIN_CONTONEVALUE;
+        break;
+        case DTWAIN_CAPGETLABELENUM:
+            lContainerType = DTWAIN_CONTARRAY;
+        break;
+    }
 
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return nDataType == DTWAIN_CAPDATATYPE_UNKNOWN;},
-                                          DTWAIN_ERR_UNKNOWN_CAPDATATYPE, false, FUNC_MACRO);
-
-        // adjust the container types for GETHELP, GETLABEL, and GETLABELENUM
+    // get the default container type if specified
+    if (lContainerType == DTWAIN_CONTDEFAULT)
+    {
         switch (lGetType)
         {
+            // skip these, as they're already set up
             case DTWAIN_CAPGETHELP:
             case DTWAIN_CAPGETLABEL:
-                lContainerType = DTWAIN_CONTONEVALUE;
-            break;
             case DTWAIN_CAPGETLABELENUM:
-                lContainerType = DTWAIN_CONTARRAY;
+            break;
+
+            default:
+                lContainerType = DTWAIN_GetCapContainer(Source, lCap, lGetType);
             break;
         }
+    }
 
-        // get the default container type if specified
-        if (lContainerType == DTWAIN_CONTDEFAULT)
+    if (lGetType == DTWAIN_CAPGETHELP || lGetType == DTWAIN_CAPGETLABEL)
+        ThisArray = performGetCap<HANDLE>(pHandle, Source, lCap, nDataType, lContainerType, GetTwainGetType(lGetType), overrideDataType, CTL_ArrayHandleType);
+    else
+    if ( lGetType == DTWAIN_CAPGETLABELENUM )
+        ThisArray = performGetCap<std::string>(pHandle, Source, lCap, nDataType, lContainerType, GetTwainGetType(lGetType), overrideDataType, CTL_ArrayStringType);
+    else
+    {
+        if (IsIntCapType(static_cast<TW_UINT16>(nDataType)))
         {
-            switch (lGetType)
-            {
-                // skip these, as they're already set up
-                case DTWAIN_CAPGETHELP:
-                case DTWAIN_CAPGETLABEL:
-                case DTWAIN_CAPGETLABELENUM:
-                break;
-
-                default:
-                    lContainerType = DTWAIN_GetCapContainer(Source, lCap, lGetType);
-                break;
-            }
+            ThisArray = performGetCap<LONG>(pHandle, Source, lCap, nDataType, lContainerType, lGetType, overrideDataType, CTL_ArrayIntType);
+            if ( !ThisArray )
+                LOG_FUNC_EXIT_NONAME_PARAMS(false)
         }
-
-        if (lGetType == DTWAIN_CAPGETHELP || lGetType == DTWAIN_CAPGETLABEL)
-            ThisArray = performGetCap<HANDLE>(pHandle, Source, lCap, nDataType, lContainerType, GetTwainGetType(lGetType), overrideDataType, CTL_ArrayHandleType);
         else
-        if ( lGetType == DTWAIN_CAPGETLABELENUM )
-            ThisArray = performGetCap<std::string>(pHandle, Source, lCap, nDataType, lContainerType, GetTwainGetType(lGetType), overrideDataType, CTL_ArrayStringType);
-        else
+        if (IsFloatCapType(static_cast<TW_UINT16>(nDataType)))
         {
-            if (IsIntCapType(static_cast<TW_UINT16>(nDataType)))
-            {
-                ThisArray = performGetCap<LONG>(pHandle, Source, lCap, nDataType, lContainerType, lGetType, overrideDataType, CTL_ArrayIntType);
-                if ( !ThisArray )
-                    LOG_FUNC_EXIT_PARAMS(false)
-            }
-            else
-            if (IsFloatCapType(static_cast<TW_UINT16>(nDataType)))
-            {
-                ThisArray = performGetCap<double>(
-                    pHandle, Source, lCap, nDataType, lContainerType, lGetType, overrideDataType,
-                    CTL_ArrayDoubleType);
-                if (!ThisArray)
-                    LOG_FUNC_EXIT_PARAMS(false)
-            }
-            else
-            if ( IsStringCapType(static_cast<TW_UINT16>(nDataType)))
-            {
-                ThisArray = performGetCap<std::string/*, NullGetCapConverter*/>
-                            (pHandle, Source, lCap, nDataType, lContainerType, lGetType, overrideDataType, CTL_ArrayANSIStringType);
-                if (!ThisArray)
-                    LOG_FUNC_EXIT_PARAMS(false)
-            }
-            else
-            if ( IsFrameCapType(static_cast<TW_UINT16>(nDataType)))
-            {
-                ThisArray = performGetCap<TW_FRAME, TwainFrameInternal, FrameGetCapConverter>
-                    (pHandle, Source, lCap, nDataType, lContainerType, lGetType, overrideDataType, CTL_ArrayDTWAINFrameType);
-                if (!ThisArray)
-                    LOG_FUNC_EXIT_PARAMS(false)
-            }
-            else
-                LOG_FUNC_EXIT_PARAMS(false)
-         }
+            ThisArray = performGetCap<double>(
+                pHandle, Source, lCap, nDataType, lContainerType, lGetType, overrideDataType,
+                CTL_ArrayDoubleType);
+            if (!ThisArray)
+                LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        }
+        else
+        if ( IsStringCapType(static_cast<TW_UINT16>(nDataType)))
+        {
+            ThisArray = performGetCap<std::string/*, NullGetCapConverter*/>
+                        (pHandle, Source, lCap, nDataType, lContainerType, lGetType, overrideDataType, CTL_ArrayANSIStringType);
+            if (!ThisArray)
+                LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        }
+        else
+        if ( IsFrameCapType(static_cast<TW_UINT16>(nDataType)))
+        {
+            ThisArray = performGetCap<TW_FRAME, TwainFrameInternal, FrameGetCapConverter>
+                (pHandle, Source, lCap, nDataType, lContainerType, lGetType, overrideDataType, CTL_ArrayDTWAINFrameType);
+            if (!ThisArray)
+                LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        }
+        else
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
     }
     if (lCap >= CAP_CUSTOMBASE)
     {
@@ -467,7 +457,7 @@ DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap
         pHandle->m_ArrayFactory->destroy(*pArray);
     *pArray = ThisArray;
     DumpArrayContents(*pArray, lCap);
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -475,16 +465,9 @@ DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap
 // Sets capability values.  This function does not test if the
 // capability exists, or if the container type is valid.  Use
 // with caution!!
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValues( DTWAIN_SOURCE Source, LONG lCap, LONG lSetType, DTWAIN_ARRAY pArray )
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, lCap, lSetType, pArray))
-    const DTWAIN_BOOL bRet = DTWAIN_SetCapValuesEx(Source, lCap, lSetType, DTWAIN_CONTDEFAULT, pArray);
-    LOG_FUNC_EXIT_PARAMS(bRet)
-    CATCH_BLOCK(false)
-}
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap, LONG lSetType, LONG lContainerType,
-                                                LONG nDataType, DTWAIN_ARRAY pArray )
+static DTWAIN_BOOL SetCapValuesEx2_Internal( DTWAIN_SOURCE Source, LONG lCap, LONG lSetType, LONG lContainerType,
+                                             LONG nDataType, DTWAIN_ARRAY pArray )
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCap, lSetType, lContainerType, nDataType, pArray))
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
@@ -522,7 +505,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap
             DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bFoundType;}, DTWAIN_ERR_UNKNOWN_CAPDATATYPE, false, FUNC_MACRO);
         }
         if( nDataType == 0xFFFF )
-            LOG_FUNC_EXIT_PARAMS(false)
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return nDataType == DTWAIN_CAPDATATYPE_UNKNOWN;}, DTWAIN_ERR_UNKNOWN_CAPDATATYPE, false, FUNC_MACRO);
 
@@ -591,25 +574,40 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap
             }
         }
     }
-    LOG_FUNC_EXIT_PARAMS(bOk)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bOk)
     CATCH_BLOCK(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValues( DTWAIN_SOURCE Source, LONG lCap, LONG lSetType, DTWAIN_ARRAY pArray )
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, lCap, lSetType, pArray))
+    const DTWAIN_BOOL bRet = DTWAIN_SetCapValuesEx(Source, lCap, lSetType, DTWAIN_CONTDEFAULT, pArray);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap, LONG lSetType, LONG lContainerType,
+                                                LONG nDataType, DTWAIN_ARRAY pArray )
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, lCap, lSetType, lContainerType, nDataType, pArray))
+    VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    bool bRet = SetCapValuesEx2_Internal(Source, lCap, lSetType, lContainerType, nDataType, pArray);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValuesEx( DTWAIN_SOURCE Source, LONG lCap, LONG lSetType, LONG lContainerType,
                                                 DTWAIN_ARRAY pArray )
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCap, lSetType, lContainerType, pArray))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
+    CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    const auto pHandle = p->GetDTWAINHandle();
     DTWAIN_BOOL bRet = FALSE;
-    if( p )
-    {
-        const LONG nDataType = DTWAIN_GetCapDataType(Source, static_cast<CTL_EnumCapability>(lCap));
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return nDataType < 0;} , DTWAIN_ERR_BAD_CAP, false, FUNC_MACRO);
-        bRet = DTWAIN_SetCapValuesEx2(Source, lCap, lSetType, lContainerType, nDataType, pArray);
-    }
-    LOG_FUNC_EXIT_PARAMS(bRet)
-    CATCH_BLOCK(false)
+    const LONG nDataType = DTWAIN_GetCapDataType(Source, static_cast<CTL_EnumCapability>(lCap));
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return nDataType < 0;} , DTWAIN_ERR_BAD_CAP, false, FUNC_MACRO);
+    bRet = SetCapValuesEx2_Internal(Source, lCap, lSetType, lContainerType, nDataType, pArray);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 /////////////////////////////////////////////////////////////
@@ -619,13 +617,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValuesEx( DTWAIN_SOURCE Source, LONG lCap,
 HANDLE DLLENTRY_DEF DTWAIN_GetCustomDSData( DTWAIN_SOURCE Source, LPBYTE Data, LONG dSize, LPLONG pActualSize, LONG nFlags )
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Data, dSize, pActualSize, nFlags))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     const bool bSupported = DTWAIN_IsCapSupported(Source, CAP_CUSTOMDSDATA)?true:false;
 
     if( !bSupported )
-        LOG_FUNC_EXIT_PARAMS(NULL)
+        LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
 
+    auto *p = static_cast<CTL_ITwainSource*>(Source);
     // Call TWAIN to get the custom data
     const auto pSession = p->GetTwainSession();
     CTL_CustomDSTriplet DST(pSession, p, MSG_GET);
@@ -635,7 +632,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetCustomDSData( DTWAIN_SOURCE Source, LPBYTE Data, L
 
     // return if TWAIN cannot complete this request
     if( ret != TWRC_SUCCESS )
-        LOG_FUNC_EXIT_PARAMS(NULL)
+        LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
 
     // Copy actual size data to parameter
     if( pActualSize )
@@ -647,7 +644,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetCustomDSData( DTWAIN_SOURCE Source, LPBYTE Data, L
 
     // Return the handle if that is all user wants to do
     if( nFlags & DTWAINGCD_RETURNHANDLE )
-        LOG_FUNC_EXIT_PARAMS(h)
+        LOG_FUNC_EXIT_NONAME_PARAMS(h)
 
     // Copy data to user's data area.
     if( Data && (nFlags & DTWAINGCD_COPYDATA))
@@ -657,25 +654,27 @@ HANDLE DLLENTRY_DEF DTWAIN_GetCustomDSData( DTWAIN_SOURCE Source, LPBYTE Data, L
         memcpy(Data, pData, nMinCopy);
         ImageMemoryHandler::GlobalUnlock(h);
         ImageMemoryHandler::GlobalFree(h);
-        LOG_FUNC_EXIT_PARAMS(HANDLE(1))
+        LOG_FUNC_EXIT_NONAME_PARAMS(HANDLE(1))
     }
 
-    LOG_FUNC_EXIT_PARAMS(h)
+    LOG_FUNC_EXIT_NONAME_PARAMS(h)
     CATCH_BLOCK(HANDLE())
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomDSData( DTWAIN_SOURCE Source, HANDLE hData, LPCBYTE Data, LONG dSize, LONG nFlags )
 {
     LOG_FUNC_ENTRY_PARAMS((Source, hData, Data, dSize, nFlags))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
     const bool bSupported = DTWAIN_IsCapSupported(Source, CAP_CUSTOMDSDATA)?true:false;
 
-    if( !bSupported )
-        LOG_FUNC_EXIT_PARAMS(false)
+    if (!bSupported)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+
+    auto p = static_cast<CTL_ITwainSource*>(Source);
 
     // Set up triplet for CUSTOMDSDATA call
     const auto pSession = p->GetTwainSession();
+    auto pHandle = p->GetDTWAINHandle();
+
     CTL_CustomDSTriplet DST(pSession, p, MSG_SET);
 
     // Check what options the user wants to do
@@ -688,11 +687,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomDSData( DTWAIN_SOURCE Source, HANDLE hD
     if( dSize == -1 )
     {
         if( !DTWAIN_GetCustomDSData(Source, nullptr, 0, &dSize, DTWAINGCD_COPYDATA) )
-            LOG_FUNC_EXIT_PARAMS(false)
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
     }
 
     // Set data to the data passed in
-
     DTWAINGlobalHandleUnlockFree_RAII memHandler;
 
     if( nFlags & DTWAINSCD_USEDATA )
@@ -714,20 +712,18 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomDSData( DTWAIN_SOURCE Source, HANDLE hD
     if( ret != TWRC_SUCCESS )
     {
         pHandle->m_lLastError = -(IDS_TWRC_ERRORSTART + ret);
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
     }
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireStripSizes( DTWAIN_SOURCE Source, LPLONG lpMin, LPLONG lpMax,
-    LPLONG lpPreferred )
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireStripSizes( DTWAIN_SOURCE Source, LPLONG lpMin, LPLONG lpMax, LPLONG lpPreferred )
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpMin, lpMax, lpPreferred))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
+    CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    const auto pHandle = p->GetDTWAINHandle();
     // See if Source is opened
-
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !CTL_TwainAppMgr::IsSourceOpen(p);}, DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
     TW_SETUPMEMXFER Xfer;
     const bool bRet = CTL_TwainAppMgr::GetMemXferValues(p, &Xfer)?true:false;
@@ -743,23 +739,22 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireStripSizes( DTWAIN_SOURCE Source, LPLO
         if( lpPreferred )
             * lpPreferred = Xfer.Preferred;
     }
-    LOG_FUNC_EXIT_PARAMS(bRet)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireStripBuffer(DTWAIN_SOURCE Source, HANDLE hMem)
 {
     LOG_FUNC_ENTRY_PARAMS((Source,hMem))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle( pHandle, Source );
+    CTL_ITwainSource *p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
+    const auto pHandle = p->GetDTWAINHandle();
     // See if Source is opened
     DTWAIN_Check_Error_Condition_0_Ex (pHandle, [&] { return !CTL_TwainAppMgr::IsSourceOpen( p );},
                 DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
-
     if ( !hMem )
     {
         p->SetUserStripBuffer(nullptr);
-        LOG_FUNC_EXIT_PARAMS(true)
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
     }
     else
     {
@@ -768,15 +763,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireStripBuffer(DTWAIN_SOURCE Source, HAND
         p->SetUserStripBuffer(hMem);
         p->SetUserStripBufSize(dSize);
     }
-    LOG_FUNC_EXIT_PARAMS(true)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireStripSize(DTWAIN_SOURCE Source, LONG StripSize)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, StripSize))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle( pHandle, Source );
+    CTL_ITwainSource *p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
+    const auto pHandle = p->GetDTWAINHandle();
 
     // See if Source is opened
     DTWAIN_Check_Error_Condition_0_Ex (pHandle, [&]{return !CTL_TwainAppMgr::IsSourceOpen( p );}, DTWAIN_ERR_SOURCE_NOT_OPEN, false,
@@ -786,7 +781,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireStripSize(DTWAIN_SOURCE Source, LONG S
     if ( StripSize == 0 )
     {
         p->SetUserStripBufSize(StripSize);
-        LOG_FUNC_EXIT_PARAMS(true)
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
     }
 
     if ( DTWAIN_GetAcquireStripSizes(Source, &MinSize, &MaxSize, nullptr) )
@@ -798,20 +793,21 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireStripSize(DTWAIN_SOURCE Source, LONG S
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{ return true;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     p->SetUserStripBufSize(StripSize);
-    LOG_FUNC_EXIT_PARAMS(true)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 HANDLE DLLENTRY_DEF DTWAIN_GetAcquireStripBuffer(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    const CTL_ITwainSource *p = VerifySourceHandle( pHandle, Source );
+    auto p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
+    const auto pHandle = p->GetDTWAINHandle();
+
     // See if Source is opened
     DTWAIN_Check_Error_Condition_0_Ex (pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen( p );},DTWAIN_ERR_SOURCE_NOT_OPEN, NULL, FUNC_MACRO);
     const HANDLE h = p->GetUserStripBuffer();
-    LOG_FUNC_EXIT_PARAMS(h)
-    CATCH_BLOCK(HANDLE())
+    LOG_FUNC_EXIT_NONAME_PARAMS(h)
+    CATCH_BLOCK_LOG_PARAMS(HANDLE())
 }
 
 
@@ -821,8 +817,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireStripData(DTWAIN_SOURCE Source, LPLONG
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpCompression, lpBytesPerRow,lpColumns, lpRows, XOffset,YOffset, lpBytesWritten))
 
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    const CTL_ITwainSource *p = VerifySourceHandle( pHandle, Source );
+    auto p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    const auto pHandle = p->GetDTWAINHandle();
 
     // See if Source is opened
     DTWAIN_Check_Error_Condition_0_Ex (pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen( p );},DTWAIN_ERR_SOURCE_NOT_OPEN, false,
@@ -844,8 +840,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireStripData(DTWAIN_SOURCE Source, LPLONG
         *YOffset = pBuffer->YOffset;
     if ( lpBytesWritten)
         *lpBytesWritten = pBuffer->BytesWritten;
-    LOG_FUNC_EXIT_PARAMS(true)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 /* These functions can only be used in State 7   (when DTWAIN_TN_TRANSFERDONE notification is sent).
@@ -859,11 +855,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireStripData(DTWAIN_SOURCE Source, LPLONG
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Array))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle( pHandle, Source );
 
     if ( !DTWAIN_IsExtImageInfoSupported(Source))
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+
+    CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
+    auto pHandle = p->GetDTWAINHandle();
 
     CTL_IntArray r;
     if ( p->EnumExtImageInfo(r) )
@@ -875,7 +872,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDT
         *Array = ThisArray;
         return TRUE;
     }
-    LOG_FUNC_EXIT_PARAMS(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(false)
     CATCH_BLOCK(false)
 }
 
@@ -883,15 +880,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDT
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitExtImageInfo(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle( pHandle, Source );
+    CTL_ITwainSource *p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
+    const auto pHandle = p->GetDTWAINHandle();
     // See if Source is opened
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen( p );},DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return p->GetState() != SOURCE_STATE_TRANSFERRING;},DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
 
     p->InitExtImageInfo(0);
-    LOG_FUNC_EXIT_PARAMS(true)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 /* Application adds an item to query the image information.  Before getting the Extended
@@ -900,16 +897,16 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitExtImageInfo(DTWAIN_SOURCE Source)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddExtImageInfoQuery(DTWAIN_SOURCE Source, LONG ExtImageInfo)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, ExtImageInfo))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle( pHandle, Source );
-    if ( !DTWAIN_IsExtImageInfoSupported(Source))
-        LOG_FUNC_EXIT_PARAMS(false)
+    if (!DTWAIN_IsExtImageInfoSupported(Source))
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
+    const auto pHandle = p->GetDTWAINHandle();
 
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return p->GetState() != SOURCE_STATE_TRANSFERRING;},DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
     TW_INFO Info;
     Info.InfoID = static_cast<TW_UINT16>(ExtImageInfo);
     p->AddExtImageInfo( Info );
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -919,16 +916,16 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddExtImageInfoQuery(DTWAIN_SOURCE Source, LONG 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfo(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle( pHandle, Source );
-
     if ( !DTWAIN_IsExtImageInfoSupported(Source))
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+
+    CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
+    const auto pHandle = p->GetDTWAINHandle();
 
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return p->GetState() != SOURCE_STATE_TRANSFERRING;},DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
 
     p->GetExtImageInfo(TRUE);
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -944,11 +941,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoItem(DTWAIN_SOURCE Source,
                                                     LPLONG Type)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nWhich, InfoID, NumItems, Type))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle( pHandle, Source );
 
     if ( !DTWAIN_IsExtImageInfoSupported(Source))
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+
+    CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
+    const auto pHandle = p->GetDTWAINHandle();
 
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return p->GetState() != SOURCE_STATE_TRANSFERRING;},
                 DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
@@ -961,7 +959,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoItem(DTWAIN_SOURCE Source,
     if ( Type )
         *Type = Info.ItemType;
 
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -971,11 +969,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoItem(DTWAIN_SOURCE Source,
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG nWhich, LPDTWAIN_ARRAY Data)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nWhich, Data))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle( pHandle, Source );
 
     if ( !DTWAIN_IsExtImageInfoSupported(Source))
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+
+    CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
+    const auto pHandle = p->GetDTWAINHandle();
 
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return p->GetState() != SOURCE_STATE_TRANSFERRING;},DTWAIN_ERR_INVALID_STATE,
                                       false, FUNC_MACRO);
@@ -1014,7 +1013,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
             p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, factory->get_buffer(ExtInfoArray, i));
     }
     *Data = ExtInfoArray;
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -1022,15 +1021,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FreeExtImageInfo(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle( pHandle, Source );
 
     if ( !DTWAIN_IsExtImageInfoSupported(Source))
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
+    const auto pHandle = p->GetDTWAINHandle();
 
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return p->GetState() != SOURCE_STATE_TRANSFERRING;},DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
     p->DestroyExtImageInfo();
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -1267,7 +1266,8 @@ int GetMultiCapValues(DTWAIN_HANDLE DLLHandle,
     DTWAIN_ARRAY FrameArray = CreateArrayFromFactory(CTL_ArrayTWFrameType, 0);
     if ( !FrameArray )
         return 0;
-    DTWAINArrayLL_RAII fArr(FrameArray);
+    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+    DTWAINArrayLowLevel_RAII fArr(pHandle, FrameArray);
 
     const int bOk = GetMultiCapValuesImpl<TW_FRAME, TwainFrameInternal, CTL_ArrayType, VectorAdderFn<TW_FRAME>>::
                                  GetMultiCapValues(DLLHandle,Source,FrameArray, CTL_ArrayType(), 
@@ -1276,7 +1276,6 @@ int GetMultiCapValues(DTWAIN_HANDLE DLLHandle,
     if (!bOk)
         return 0;
 
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     auto& factory = pHandle->m_ArrayFactory;
     const size_t nSize = factory->size(FrameArray); 
 

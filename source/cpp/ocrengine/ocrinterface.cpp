@@ -69,7 +69,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetOCRText(DTWAIN_OCRENGINE Engine,
         const TW_MEMREF hMem = pHandle->m_TwainMemoryFunc->AllocateMemoryPtr(localActualSize*sizeof(TCHAR), &theHandle);
         memcpy(hMem, sText.c_str(), localActualSize*sizeof(TCHAR));
         pHandle->m_TwainMemoryFunc->UnlockMemory(theHandle);
-        LOG_FUNC_EXIT_PARAMS(theHandle)
+        LOG_FUNC_EXIT_NONAME_PARAMS(theHandle)
     }
     else
         if (nFlags & DTWAINOCR_COPYDATA)
@@ -77,7 +77,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetOCRText(DTWAIN_OCRENGINE Engine,
             if (!Data)
             {
                 // cache the info
-                LOG_FUNC_EXIT_PARAMS(HANDLE(1))
+                LOG_FUNC_EXIT_NONAME_PARAMS(HANDLE(1))
             }
             int nMinCopy;
 
@@ -86,9 +86,9 @@ HANDLE DLLENTRY_DEF DTWAIN_GetOCRText(DTWAIN_OCRENGINE Engine,
             nMinCopy = (std::max)((std::min)(dSize, static_cast<LONG>(localActualSize)), static_cast<LONG>(0));
 
             memcpy(Data, sText.data(), nMinCopy * sizeof(TCHAR));
-            LOG_FUNC_EXIT_PARAMS(HANDLE(1))
+            LOG_FUNC_EXIT_NONAME_PARAMS(HANDLE(1))
         }
-    LOG_FUNC_EXIT_PARAMS(NULL)
+    LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
     CATCH_BLOCK(HANDLE())
 }
 
@@ -111,7 +111,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRCapValues(DTWAIN_OCRENGINE Engine,LONG OCR
     {
         const LONG nDataType = pEngine->GetCapDataType(OCRCapValue);
         if (nDataType == -1)
-            LOG_FUNC_EXIT_PARAMS(false)
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
         switch (nDataType)
         {
             case DTWAIN_ARRAYLONG:
@@ -123,7 +123,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRCapValues(DTWAIN_OCRENGINE Engine,LONG OCR
                 for (LONG i = 0; i < static_cast<LONG>(vals.size()); ++i)
                     DTWAIN_ArraySetAtLong(theArray, i, vals[i]);
                 *CapValues = theArray;
-                LOG_FUNC_EXIT_PARAMS(true)
+                LOG_FUNC_EXIT_NONAME_PARAMS(true)
             }
             break;
             case DTWAIN_ARRAYSTRING:
@@ -134,13 +134,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRCapValues(DTWAIN_OCRENGINE Engine,LONG OCR
                 for (LONG i = 0; i < static_cast<LONG>(vals.size()); ++i)
                     DTWAIN_ArraySetAtStringA(theArray, i, vals[i].c_str());
                 *CapValues = theArray;
-                LOG_FUNC_EXIT_PARAMS(true)
+                LOG_FUNC_EXIT_NONAME_PARAMS(true)
             }
             break;
         default: ;
         }
     }
-    LOG_FUNC_EXIT_PARAMS(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(false)
     CATCH_BLOCK(false)
 }
 
@@ -163,21 +163,21 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetOCRCapValues(DTWAIN_OCRENGINE Engine, LONG OC
     {
         const LONG nDataType = pEngine->GetCapDataType(OCRCapValue);
         if (nDataType == -1)
-            LOG_FUNC_EXIT_PARAMS(false)
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
         switch (nDataType)
         {
             case DTWAIN_ARRAYLONG:
             {
                 OCREngine::OCRLongArrayValues vals;
                 auto& factory = pHandle->m_ArrayFactory;
-                const LONG nCount = factory->size(CapValues);
+                const LONG nCount = static_cast<LONG>(factory->size(CapValues));
                 if (nCount < 1)
-                    LOG_FUNC_EXIT_PARAMS(false)
-                    vals.resize(nCount);
+                    LOG_FUNC_EXIT_NONAME_PARAMS(false)
+                vals.resize(nCount);
                 auto ArrayStart = reinterpret_cast<LONG *>(factory->get_buffer(CapValues, 0));
                 std::copy_n(ArrayStart, nCount, vals.begin());
                 const BOOL bRet = pEngine->SetCapValues(OCRCapValue, SetType, vals);
-                LOG_FUNC_EXIT_PARAMS(bRet)
+                LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
             }
             break;
 
@@ -185,9 +185,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetOCRCapValues(DTWAIN_OCRENGINE Engine, LONG OC
             {
                 OCREngine::OCRStringArrayValues vals;
                 auto& factory = pHandle->m_ArrayFactory;
-                const LONG nCount = factory->size(CapValues);
+                const LONG nCount = static_cast<LONG>(factory->size(CapValues));
                 if (nCount < 1)
-                    LOG_FUNC_EXIT_PARAMS(false)
+                    LOG_FUNC_EXIT_NONAME_PARAMS(false)
                 vals.resize(nCount);
                 for (LONG i = 0; i < nCount; ++i)
                 {
@@ -196,12 +196,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetOCRCapValues(DTWAIN_OCRENGINE Engine, LONG OC
                     vals[i] = buffer;
                 }
                 const BOOL bRet = pEngine->SetCapValues(OCRCapValue, SetType, vals);
-                LOG_FUNC_EXIT_PARAMS(bRet)
+                LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
             }
         default: ;
         }
     }
-    LOG_FUNC_EXIT_PARAMS(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(false)
     CATCH_BLOCK(false)
 }
 
@@ -238,9 +238,9 @@ LONG   DLLENTRY_DEF DTWAIN_GetOCRManufacturer(DTWAIN_OCRENGINE Engine,LPTSTR szM
     {
         const LONG Ret = GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetManufacturer),
                                     szMan, nMaxLen);
-        LOG_FUNC_EXIT_PARAMS(Ret)
+        LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     }
-    LOG_FUNC_EXIT_PARAMS(-1L)
+    LOG_FUNC_EXIT_NONAME_PARAMS(-1L)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 
@@ -261,9 +261,9 @@ LONG   DLLENTRY_DEF DTWAIN_GetOCRProductFamily(DTWAIN_OCRENGINE Engine,LPTSTR sz
     if (pEngine)
     {
         const LONG Ret = GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetProductFamily), szMan, nMaxLen);
-        LOG_FUNC_EXIT_PARAMS(Ret)
+        LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     }
-    LOG_FUNC_EXIT_PARAMS(-1L)
+    LOG_FUNC_EXIT_NONAME_PARAMS(-1L)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 
@@ -286,9 +286,9 @@ LONG   DLLENTRY_DEF DTWAIN_GetOCRProductName(DTWAIN_OCRENGINE Engine,LPTSTR szMa
     if (pEngine)
     {
         const LONG Ret = GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetProductName), szMan, nMaxLen);
-        LOG_FUNC_EXIT_PARAMS(Ret)
+        LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     }
-    LOG_FUNC_EXIT_PARAMS(-1L)
+    LOG_FUNC_EXIT_NONAME_PARAMS(-1L)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 
@@ -306,7 +306,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ExecuteOCR(DTWAIN_OCRENGINE Engine, LPCTSTR szFi
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCRIsActive(pEngine); }, DTWAIN_ERR_OCR_NOTACTIVE, false, FUNC_MACRO);
 
     if (nStartPage > nEndPage)
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
     const CTL_StringType sFileName = szFileName;
     int stat;
@@ -314,7 +314,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ExecuteOCR(DTWAIN_OCRENGINE Engine, LPCTSTR szFi
     if (nPages < 0)
     {
         std::string s = pEngine->GetReturnCodeString(stat);
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
     }
     if (nStartPage == -1)
     {
@@ -346,7 +346,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ExecuteOCR(DTWAIN_OCRENGINE Engine, LPCTSTR szFi
         }
         ++curPage;
     }
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -370,7 +370,7 @@ DTWAIN_OCRTEXTINFOHANDLE DLLENTRY_DEF DTWAIN_GetOCRTextInfoHandle(DTWAIN_OCRENGI
 
     OCRCharacterInfo* pInfo = &cInfo[0];
     const auto pReturn = static_cast<DTWAIN_OCRTEXTINFOHANDLE>(pInfo);
-    LOG_FUNC_EXIT_PARAMS(pReturn)
+    LOG_FUNC_EXIT_NONAME_PARAMS(pReturn)
     CATCH_BLOCK(DTWAIN_OCRTEXTINFOHANDLE())
 }
 
@@ -421,7 +421,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoLong(DTWAIN_OCRTEXTINFOHANDLE OCRT
     }
     break;
     }
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -447,7 +447,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoFloat(DTWAIN_OCRTEXTINFOHANDLE OCR
     break;
 
     }
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -506,7 +506,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoLongEx(DTWAIN_OCRTEXTINFOHANDLE OC
         actualSize = (std::min)(bufSize, realSize);
     }
     std::copy_n(itStart, actualSize, pInfo);
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -533,7 +533,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoFloatEx(DTWAIN_OCRTEXTINFOHANDLE O
     break;
 
     }
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK(false)
 }
 
@@ -560,9 +560,9 @@ LONG DLLENTRY_DEF DTWAIN_SetPDFOCRConversion(DTWAIN_OCRENGINE Engine,LONG PageTy
         pEngine->m_OCRPDFInfo.PixelType[PageType] = PixelType;
         pEngine->m_OCRPDFInfo.BitDepth[PageType] = BitDepth;
         pEngine->SetBaseOption(OCROPTION_STORECLEANTEXT1, Options & OCROPTION_STORECLEANTEXT1);
-        LOG_FUNC_EXIT_PARAMS(1)
+        LOG_FUNC_EXIT_NONAME_PARAMS(1)
     }
-    LOG_FUNC_EXIT_PARAMS(bRet)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(-1L)
 }
 
@@ -629,7 +629,7 @@ LONG DLLENTRY_DEF DTWAIN_GetOCRVersionInfo(DTWAIN_OCRENGINE Engine, LPTSTR buffe
     const auto pEngine = static_cast<OCREngine*>(Engine);
     std::string sVersion = pEngine->GetOCRVersionInfo();
     const auto retVal = StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sVersion), buffer, maxBufSize);
-    LOG_FUNC_EXIT_PARAMS(retVal)
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(0)
 }
 
@@ -651,11 +651,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumOCRSupportedCaps(DTWAIN_OCRENGINE Engine, LP
     pEngine->GetSupportedCaps(vals);
     const DTWAIN_ARRAY theArray = CreateArrayFromFactory(DTWAIN_ARRAYLONG, static_cast<LONG>(vals.size()));
     if (!theArray)
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(theArray);
     std::copy(vals.begin(), vals.end(), vValues.begin());
     *SupportedCaps = theArray;
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -726,13 +726,13 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngineByName(LPCTSTR lpszName)
             ocrEngine_ = SelectedEngine.get();
         }
     }
-    LOG_FUNC_EXIT_PARAMS(ocrEngine_)
+    LOG_FUNC_EXIT_NONAME_PARAMS(ocrEngine_)
     CATCH_BLOCK(DTWAIN_OCRENGINE())
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitOCRInterface()
 {
-    LOG_FUNC_ENTRY_PARAMS(())
+    LOG_FUNC_ENTRY_NONAME_PARAMS()
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     // See if DLL Handle exists
@@ -741,7 +741,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitOCRInterface()
     if (pHandle->m_OCRInterfaceArray.empty())
         LoadOCRInterfaces(pHandle);
 
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -769,7 +769,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumOCRInterfaces(LPDTWAIN_ARRAY OCRArray)
 
         *OCRArray = theArray;
     }
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -788,7 +788,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShutdownOCREngine(DTWAIN_OCRENGINE Engine)
     const auto pEngine = static_cast<OCREngine*>(Engine);
     int status;
     pEngine->ShutdownOCR(status);
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -810,16 +810,16 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartupOCREngine(DTWAIN_OCRENGINE Engine)
     {
         const LONG bRet = pEngine->StartupOCREngine();
         if (bRet != 0)
-            LOG_FUNC_EXIT_PARAMS(false)
-            LOG_FUNC_EXIT_PARAMS(true)
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
+            LOG_FUNC_EXIT_NONAME_PARAMS(true)
     }
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
 DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectDefaultOCREngine()
 {
-    LOG_FUNC_ENTRY_PARAMS(())
+    LOG_FUNC_ENTRY_NONAME_PARAMS()
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     // See if DLL Handle exists
@@ -834,7 +834,7 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectDefaultOCREngine()
     if (!pEngine->IsActivated())
         pEngine->StartupOCREngine();
 
-    LOG_FUNC_EXIT_PARAMS(SelectedEngine)
+    LOG_FUNC_EXIT_NONAME_PARAMS(SelectedEngine)
     CATCH_BLOCK(DTWAIN_OCRENGINE())
 }
 
@@ -858,7 +858,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsOCREngineActivated(DTWAIN_OCRENGINE Engine)
         const bool bRet = pEngine->IsActivated();
         retVal = bRet ? TRUE : FALSE;
     }
-    LOG_FUNC_EXIT_PARAMS(retVal)
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(false)
 }
 
@@ -878,9 +878,9 @@ LONG DLLENTRY_DEF DTWAIN_GetOCRLastError(DTWAIN_OCRENGINE Engine)
     if (pEngine)
     {
         const LONG bRet = pEngine->GetLastError();
-        LOG_FUNC_EXIT_PARAMS(bRet)
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     }
-    LOG_FUNC_EXIT_PARAMS(0)
+    LOG_FUNC_EXIT_NONAME_PARAMS(0)
     CATCH_BLOCK(0)
 }
 
@@ -904,12 +904,12 @@ LONG DLLENTRY_DEF DTWAIN_GetOCRErrorString(DTWAIN_OCRENGINE Engine, LONG lError,
         {
             // This is a DTWAIN error, not an OCR specific error
             const LONG retval = DTWAIN_GetErrorString(lError, lpszBuffer, nMaxLen);
-            LOG_FUNC_EXIT_PARAMS(retval)
+            LOG_FUNC_EXIT_NONAME_PARAMS(retval)
         }
         const LONG nTotalBytes = StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(pEngine->GetErrorString(lError)), lpszBuffer, nMaxLen);
-        LOG_FUNC_EXIT_PARAMS(nTotalBytes)
+        LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)
     }
-    LOG_FUNC_EXIT_PARAMS(-1)
+    LOG_FUNC_EXIT_NONAME_PARAMS(-1)
     CATCH_BLOCK(-1)
 }
 
@@ -931,7 +931,7 @@ LRESULT CALLBACK DisplayOCRDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 
 DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine()
 {
-    LOG_FUNC_ENTRY_PARAMS(())
+    LOG_FUNC_ENTRY_NONAME_PARAMS()
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
     // See if DLL Handle exists
@@ -957,14 +957,14 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine()
                                                 reinterpret_cast<DLGPROC>(DisplayOCRDlgProc),
                                                 reinterpret_cast<LPARAM>(&S));
     if ( bRet == -1 )
-        LOG_FUNC_EXIT_PARAMS(0)
+        LOG_FUNC_EXIT_NONAME_PARAMS(0)
 
     // See if cancel was selected
     if ( S.SourceName.empty() || S.nItems == 0 )
-        LOG_FUNC_EXIT_PARAMS(0)
+        LOG_FUNC_EXIT_NONAME_PARAMS(0)
 
     const DTWAIN_OCRENGINE SelectedEngine = DTWAIN_SelectOCREngineByName(S.SourceName.c_str());
-    LOG_FUNC_EXIT_PARAMS((DTWAIN_OCRENGINE)SelectedEngine)
+    LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_OCRENGINE)SelectedEngine)
     CATCH_BLOCK(DTWAIN_OCRENGINE())
 }
 
@@ -1000,7 +1000,8 @@ LRESULT CALLBACK DisplayOCRDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             // Fill the list box with the sources
             DTWAIN_ARRAY Array = nullptr;
             DTWAIN_EnumOCRInterfaces(&Array);
-            DTWAINArrayLL_RAII raii(Array);
+            const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+            DTWAINArrayLowLevel_RAII raii(pHandle, Array);
             const int nCount = DTWAIN_ArrayGetCount(Array);
             pS->nItems = nCount;
             if ( nCount == 0 )

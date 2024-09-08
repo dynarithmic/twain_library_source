@@ -879,7 +879,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSessionDetails(LPTSTR szBuf, LONG nSize, LONG indent
         DTWAIN_ARRAY aAllSources = DTWAIN_EnumSourcesEx();
         DTWAINArrayPtr_RAII raii(&aAllSources);
         if ( !aAllSources )
-            LOG_FUNC_EXIT_PARAMS(0)
+            LOG_FUNC_EXIT_NONAME_PARAMS(0)
         std::vector<std::string> vAllSources;
         auto& vBuf = pHandle->m_ArrayFactory->underlying_container_t<CTL_ITwainSource*>(aAllSources);
         for (auto theSource : vBuf)
@@ -888,7 +888,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSessionDetails(LPTSTR szBuf, LONG nSize, LONG indent
         pHandle->m_strSessionDetails = details;
     }
     LONG retVal = StringWrapper::CopyInfoToCString(details, szBuf, nSize);
-    LOG_FUNC_EXIT_PARAMS(retVal)
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(0)
 }
 
@@ -913,6 +913,6 @@ LONG DLLENTRY_DEF DTWAIN_GetSourceDetails(LPCTSTR szSources, LPTSTR szBuf, LONG 
     else
         details = pHandle->m_strSourceDetails;
     LONG retVal = StringWrapper::CopyInfoToCString(details, szBuf, nSize);
-    LOG_FUNC_EXIT_PARAMS(retVal)
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(0)
 }

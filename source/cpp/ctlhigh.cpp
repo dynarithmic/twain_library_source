@@ -247,10 +247,10 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
     const LONG retVal = EnumCapInternal(Source, Cap, &ArrayValues, false, fn, func, paramLog);
     if (nLen > 0)
         value[0] = '\0';
-    DTWAINArrayLL_RAII arr(ArrayValues);
+    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+    DTWAINArrayLowLevel_RAII arr(pHandle, ArrayValues);
     if (retVal > 0)
     {
-        const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
         std::string sVal;
         pHandle->m_ArrayFactory->get_value(ArrayValues, 0, &sVal);
         StringWrapperA::CopyInfoToCString(sVal, value, nLen);
@@ -703,7 +703,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSourceValues(DTWAIN_SOURCE Source, LPCTSTR c
 {
     LOG_FUNC_ENTRY_PARAMS((Source, capName, pArray, expandIfRange))
     const DTWAIN_BOOL retVal = DTWAIN_GetCapValues(Source, CTL_TwainAppMgr::GetCapFromCapName(StringConversion::Convert_NativePtr_To_Ansi(capName).c_str()), DTWAIN_CAPGET, pArray);
-    LOG_FUNC_EXIT_PARAMS(retVal)
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(false)
 }
 
@@ -748,9 +748,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetResolution(DTWAIN_SOURCE Source, LPDTWAIN_FLO
     if ( DTWAIN_IsCapSupported( Source, DTWAIN_CV_ICAPXNATIVERESOLUTION))
          lCap = DTWAIN_CV_ICAPXNATIVERESOLUTION;
     else
-        LOG_FUNC_EXIT_PARAMS(FALSE)
+        LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
     const DTWAIN_BOOL bRet = GetDoubleCap( Source, lCap, Resolution);
-    LOG_FUNC_EXIT_PARAMS(bRet)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(FALSE)
 }
 
@@ -763,8 +763,10 @@ static bool GetDoubleCap( DTWAIN_SOURCE Source, LONG lCap, double *pValue )
         return false;
     DTWAIN_ARRAY Array = nullptr;
     bool bRet = DTWAIN_GetCapValues(Source, lCap, DTWAIN_CAPGETCURRENT, &Array) ? true : false;
-    DTWAINArrayLL_RAII arr(Array);
+    if (!bRet)
+        return false;
     const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+    DTWAINArrayLowLevel_RAII arr(pHandle, Array);
     const auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<double>(Array);
     if ( bRet && Array )
     {
@@ -779,74 +781,68 @@ static bool GetDoubleCap( DTWAIN_SOURCE Source, LONG lCap, double *pValue )
 static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, LONG GetType, DTWAIN_BOOL bExpandRange)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pArray, lCap, bExpandRange))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
+
+    // Get the handle
+    CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    const auto pHandle = p->GetDTWAINHandle();
     LONG nValues = 0;
 
-    // See if DLL Handle exists
-    if (!pHandle)
-        DTWAIN_Check_Bad_Handle_Ex(pHandle, 0, FUNC_MACRO);
     // See if Source is opened
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !CTL_TwainAppMgr::IsSourceOpen(p); }, DTWAIN_ERR_SOURCE_NOT_OPEN, 0, FUNC_MACRO);
+    DTWAIN_ARRAY OrigVals = nullptr;
 
-    if (p)
+    // we may use a brand new array
+    LPDTWAIN_ARRAY arrayToUse = &OrigVals;
+
+    // use what was passed in if it isn't null
+    if ( pArray )
+        arrayToUse = pArray;
+
+    DTWAINArrayPtr_RAII a(&OrigVals);
+
+    // get the capability values
+    if (DTWAIN_GetCapValues(Source, lCap, GetType, arrayToUse))
     {
-        DTWAIN_ARRAY OrigVals = nullptr;
-
-        // we may use a brand new array
-        LPDTWAIN_ARRAY arrayToUse = &OrigVals;
-
-        // use what was passed in if it isn't null
-        if ( pArray )
-            arrayToUse = pArray;
-
-        DTWAINArrayPtr_RAII a(&OrigVals);
-
-        // get the capability values
-        if (DTWAIN_GetCapValues(Source, lCap, GetType, arrayToUse))
+        // Gotten the value.  Check what container type holds the data
+        const LONG lContainer = DTWAIN_GetCapContainer(Source, lCap, GetType);
+        switch (lContainer)
         {
-            // Gotten the value.  Check what container type holds the data
-            const LONG lContainer = DTWAIN_GetCapContainer(Source, lCap, GetType);
-            switch (lContainer)
+            case DTWAIN_CONTRANGE:
             {
-                case DTWAIN_CONTRANGE:
+                if (bExpandRange)
                 {
-                    if (bExpandRange)
-                    {
-                        // we need to expand to a temporary
-                        DTWAIN_ARRAY tempArray = nullptr;
+                    // we need to expand to a temporary
+                    DTWAIN_ARRAY tempArray = nullptr;
 
-                        // throw this away when done
-                        DTWAINArrayPtr_RAII aTemp(&tempArray);
+                    // throw this away when done
+                    DTWAINArrayPtr_RAII aTemp(&tempArray);
 
-                        // expand the range into a temp array
-                        DTWAIN_RangeExpand(*arrayToUse, &tempArray);
+                    // expand the range into a temp array
+                    DTWAIN_RangeExpand(*arrayToUse, &tempArray);
 
-                        // destroy original and copy new values
-                        pHandle->m_ArrayFactory->destroy(*arrayToUse);
-                        *arrayToUse = CreateArrayCopyFromFactory(tempArray);
+                    // destroy original and copy new values
+                    pHandle->m_ArrayFactory->destroy(*arrayToUse);
+                    *arrayToUse = CreateArrayCopyFromFactory(tempArray);
 
-                        // get the count
-                        nValues = static_cast<LONG>(pHandle->m_ArrayFactory->size(*arrayToUse)); 
-                    }
-                    else
-                    {
-                        nValues = static_cast<LONG>(pHandle->m_ArrayFactory->size(*arrayToUse)); 
-                    }
+                    // get the count
+                    nValues = static_cast<LONG>(pHandle->m_ArrayFactory->size(*arrayToUse)); 
                 }
-                break;
-                case DTWAIN_CONTENUMERATION:
-                case DTWAIN_CONTONEVALUE:
-                case DTWAIN_CONTARRAY:
+                else
                 {
                     nValues = static_cast<LONG>(pHandle->m_ArrayFactory->size(*arrayToUse)); 
                 }
             }
+            break;
+            case DTWAIN_CONTENUMERATION:
+            case DTWAIN_CONTONEVALUE:
+            case DTWAIN_CONTARRAY:
+            {
+                nValues = static_cast<LONG>(pHandle->m_ArrayFactory->size(*arrayToUse)); 
+            }
         }
-        LOG_FUNC_EXIT_PARAMS(nValues)
     }
-    LOG_FUNC_EXIT_PARAMS(0)
-    CATCH_BLOCK(DTWAIN_FAILURE1)
+    LOG_FUNC_EXIT_NONAME_PARAMS(nValues)
+    CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
 }
 
 static LONG GetCurrentCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, DTWAIN_BOOL bExpandRange)

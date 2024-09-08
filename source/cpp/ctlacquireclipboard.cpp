@@ -33,9 +33,7 @@ DTWAIN_ARRAY  DLLENTRY_DEF DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source, LONG 
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, nTransferMode, bDiscardDibs, bShowUI, bCloseSource, pStatus))
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource* pSource = VerifySourceHandle(pHandle, Source);
-    if ( !pSource )
-        LOG_FUNC_EXIT_PARAMS(NULL)
+    VerifySourceHandle(pHandle, Source);
 
     SourceAcquireOptions opts = SourceAcquireOptions().setHandle(GetDTWAINHandle_Internal()).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
         setTransferMode(nTransferMode).setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).
@@ -47,13 +45,13 @@ DTWAIN_ARRAY  DLLENTRY_DEF DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source, LONG 
     if (aDibs && bDiscardDibs)
     {
         auto& factory = pHandle->m_ArrayFactory;
-        DTWAINArrayLL_RAII arrAcq(aDibs);
+        DTWAINArrayLowLevel_RAII arrAcq(pHandle, aDibs);
         auto& vValues = factory->underlying_container_t<HANDLE>(aDibs);
         const LONG nCount = static_cast<LONG>(vValues.size());
         for (LONG i = 0; i < nCount; i++)
         {
             DTWAIN_ARRAY aDibHandle = vValues[i];
-            DTWAINArrayLL_RAII arr(aDibHandle);
+            DTWAINArrayLowLevel_RAII arr(pHandle, aDibHandle);
             const auto& vDibs = factory->underlying_container_t<HANDLE>(aDibHandle);
 
             if (vDibs.empty())
@@ -78,14 +76,14 @@ DTWAIN_ARRAY  DLLENTRY_DEF DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source, LONG 
     }
     else
     if (!aDibs)
-        LOG_FUNC_EXIT_PARAMS(NULL)
+        LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
 
     if (!bDiscardDibs)
-        LOG_FUNC_EXIT_PARAMS(aDibs)
+        LOG_FUNC_EXIT_NONAME_PARAMS(aDibs)
 
     aDibs = reinterpret_cast<HANDLE>(1);
-    LOG_FUNC_EXIT_PARAMS(aDibs)
-    CATCH_BLOCK(DTWAIN_ARRAY(0))
+    LOG_FUNC_EXIT_NONAME_PARAMS(aDibs)
+    CATCH_BLOCK_LOG_PARAMS(DTWAIN_ARRAY(0))
 }
 
 DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireToClipboard(SourceAcquireOptions& opts)

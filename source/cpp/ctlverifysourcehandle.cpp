@@ -30,7 +30,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CheckHandles(DTWAIN_BOOL bCheck)
 {
     LOG_FUNC_ENTRY_PARAMS((bCheck))
     CTL_StaticData::s_bCheckHandles = bCheck ? true : false;
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -52,7 +52,11 @@ CTL_ITwainSource* dynarithmic::VerifySourceHandle(DTWAIN_HANDLE DLLHandle,  DTWA
                                           !CTL_TwainAppMgr::IsValidTwainSource(pHandle->m_pTwainSession, p); },
                                           DTWAIN_ERR_BAD_SOURCE, NULL, FUNC_MACRO);
     }
-    LOG_FUNC_EXIT_PARAMS(p)
-    CATCH_BLOCK(static_cast<CTL_ITwainSource *>(nullptr))
+    LOG_FUNC_EXIT_NONAME_PARAMS(p)
+    CATCH_BLOCK_END
+    catch (...)
+    {
+        throw nullptr;
+    }
 }
 

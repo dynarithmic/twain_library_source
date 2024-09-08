@@ -30,12 +30,7 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetMultipageScanMode(DTWAIN_SOURCE Source, LONG ScanType)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, ScanType))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, Source);
-    if (!pSource)
-        LOG_FUNC_EXIT_PARAMS(false)
-
+    CTL_ITwainSource *pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
     const bool bSaveIncomplete = ScanType & DTWAIN_FILESAVE_SAVEINCOMPLETE ? true : false;
 
     // remove the DTWAIN_FILESAVE_INCOMPLETE mask
@@ -57,20 +52,16 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetMultipageScanMode(DTWAIN_SOURCE Source, LONG 
     // Set the flag to save if file is incomplete (multipage scan cancelled)
     pSource->SetFileIncompleteSaveMode(bSaveIncomplete);
 
-    LOG_FUNC_EXIT_PARAMS(true)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FlushAcquiredPages(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, Source);
-    if (!pSource)
-        LOG_FUNC_EXIT_PARAMS(false)
+    CTL_ITwainSource *pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
     if (pSource->IsMultiPageModeContinuous())
         pSource->ProcessMultipageFile();
-
-    LOG_FUNC_EXIT_PARAMS(true)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }

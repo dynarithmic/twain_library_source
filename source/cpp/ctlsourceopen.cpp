@@ -23,6 +23,7 @@
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "../wildcards/wildcards.hpp"
+#include "dtwain_paramlogger.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -34,37 +35,34 @@ static void DetermineIfSpecialXfer(CTL_ITwainSource* p);
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSourcesOnSelect(DTWAIN_BOOL bSet)
 {
-    LOG_FUNC_ENTRY_PARAMS((bSet))
+    LOG_FUNC_ENTRY_NONAME_PARAMS(bSet)
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     pHandle->m_bOpenSourceOnSelect = bSet ? true : false;
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsOpenSourcesOnSelect(VOID_PROTOTYPE)
 {
-    LOG_FUNC_ENTRY_PARAMS(())
+    LOG_FUNC_ENTRY_NONAME_PARAMS()
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     const bool retVal = pHandle->m_bOpenSourceOnSelect;
-    LOG_FUNC_EXIT_PARAMS(retVal)
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
 
-    CTL_ITwainSource* pTheSource = VerifySourceHandle(pHandle, Source);
-    if (!pTheSource)
-        LOG_FUNC_EXIT_PARAMS(false)
+    CTL_ITwainSource* pTheSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    const auto pHandle = pTheSource->GetDTWAINHandle();
 
     // If source already opened, just return TRUE.
     if (pTheSource->IsOpened())
-        LOG_FUNC_EXIT_PARAMS(true)
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
 
     // Set up the opening of the source
     bool bRetval = false;
@@ -143,25 +141,17 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
         CTL_TwainAppMgr::WriteLogInfo(sName);
     }
 
-    LOG_FUNC_EXIT_PARAMS(bRetval)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceOpen(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    if ( !Source )
-        LOG_FUNC_EXIT_PARAMS(false)
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
-    if (!p)
-        LOG_FUNC_EXIT_PARAMS(false)
+    CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
     const DTWAIN_BOOL bRet = CTL_TwainAppMgr::IsSourceOpen(p);
-    LOG_FUNC_EXIT_PARAMS(bRet)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 void LogAndCachePixelTypes(CTL_ITwainSource *p)
@@ -184,8 +174,8 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
     DTWAIN_BOOL bOK = DTWAIN_GetCapValues(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPGET, &PixelTypes);
     if (bOK)
     {
-        DTWAINArrayLL_RAII arrP(PixelTypes);
         const auto pHandle = p->GetDTWAINHandle();
+        DTWAINArrayLowLevel_RAII arrP(pHandle, PixelTypes);
         auto& vPixelTypes = pHandle->m_ArrayFactory->underlying_container_t<LONG>(PixelTypes);
 
         LONG nCount = static_cast<LONG>(vPixelTypes.size());
@@ -193,7 +183,7 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
         {
             // create an array of 1
             DTWAIN_ARRAY vCurPixType = CreateArrayFromFactory(DTWAIN_ARRAYLONG, 1);
-            DTWAINArrayLL_RAII raii(vCurPixType);
+            DTWAINArrayLowLevel_RAII raii(pHandle, vCurPixType);
 
             // get pointer to internals of the array
             auto& vCurPixTypePtr = pHandle->m_ArrayFactory->underlying_container_t<LONG>(vCurPixType);
@@ -211,7 +201,7 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
                     DTWAIN_ARRAY BitDepths = nullptr;
                     if (DTWAIN_GetCapValues(p, DTWAIN_CV_ICAPBITDEPTH, DTWAIN_CAPGET, &BitDepths))
                     {
-                        DTWAINArrayLL_RAII arr(BitDepths);
+                        DTWAINArrayLowLevel_RAII arr(pHandle, BitDepths);
 
                         // Get the total number of bit depths.
                         auto& vBitDepths = pHandle->m_ArrayFactory->underlying_container_t<LONG>(BitDepths);

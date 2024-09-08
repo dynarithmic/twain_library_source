@@ -43,6 +43,6 @@ LONG DLLENTRY_DEF DTWAIN_GetPaperSizeName(LONG paperNumber, LPTSTR outName, LONG
         CTL_StringType pageName = StringConversion::Convert_Ansi_To_Native(iter->second.first);
         nActualCharactersCopied = StringWrapper::CopyInfoToCString(pageName, outName, nSize);
     }
-    LOG_FUNC_EXIT_PARAMS(nActualCharactersCopied)
+    LOG_FUNC_EXIT_NONAME_PARAMS(nActualCharactersCopied)
     CATCH_BLOCK(-1)
 }

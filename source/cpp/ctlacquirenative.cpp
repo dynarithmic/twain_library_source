@@ -22,6 +22,8 @@
 #include "ctltwmgr.h"
 #include "ctltwainmsgloop.h"
 #include "sourceacquireopts.h"
+#include "dtwain_paramlogger.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -29,36 +31,33 @@ using namespace dynarithmic;
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireNative(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus)
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, pStatus))
-    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(GetDTWAINHandle_Internal()).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
+    LOG_FUNC_ENTRY_NONAME_PARAMS(Source, PixelType, nMaxPages, bShowUI, bCloseSource, pStatus) 
+    auto* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pSource->GetDTWAINHandle()).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
                                                            setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setAcquireType(ACQUIRENATIVE);
     const DTWAIN_ARRAY aDibs = SourceAcquire(opts);
     if (pStatus)
         *pStatus = opts.getStatus();
-    LOG_FUNC_EXIT_PARAMS(aDibs)
-    CATCH_BLOCK(DTWAIN_ARRAY(0))
+    LOG_FUNC_EXIT_NONAME_PARAMS(aDibs)
+    CATCH_BLOCK_LOG_PARAMS(DTWAIN_ARRAY(0))
 }
 
 DTWAIN_BOOL   DLLENTRY_DEF  DTWAIN_AcquireNativeEx(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource,DTWAIN_ARRAY Acquisitions,
                                                    LPLONG pStatus)
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, Acquisitions, pStatus))
-
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource* pSource = VerifySourceHandle(pHandle, Source);
-    if (!pSource)
-        LOG_FUNC_EXIT_PARAMS(false)
+    LOG_FUNC_ENTRY_NONAME_PARAMS(Source, PixelType, nMaxPages, bShowUI, bCloseSource, Acquisitions, pStatus)
+    auto* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    auto pHandle = pSource->GetDTWAINHandle();
 
     SourceAcquireOptions opts = SourceAcquireOptions().setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
             setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setUserArray(Acquisitions).
-            setAcquireType(ACQUIRENATIVEEX).setHandle(GetDTWAINHandle_Internal());
-
+            setAcquireType(ACQUIRENATIVEEX).setHandle(pHandle);
 
     const bool bRet = AcquireExHelper(opts);
     if (pStatus)
         *pStatus = opts.getStatus();
-    LOG_FUNC_EXIT_PARAMS(bRet)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireNative(SourceAcquireOptions& opts)

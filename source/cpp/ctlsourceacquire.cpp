@@ -91,76 +91,50 @@ void CTL_TwainDLLHandle::EraseAcquireNum(DTWAIN_ACQUIRE nNum)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDoublePageCountOnDuplex(DTWAIN_SOURCE Source, DTWAIN_BOOL bDoubleCount)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, bDoubleCount))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource* p = VerifySourceHandle(pHandle, Source);
-    if (p)
-    {
-        p->SetDoublePageCountOnDuplex(bDoubleCount);
-        LOG_FUNC_EXIT_PARAMS(TRUE)
-    }
-    LOG_FUNC_EXIT_PARAMS(FALSE)
-    CATCH_BLOCK(false)
+    CTL_ITwainSource* p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    p->SetDoublePageCountOnDuplex(bDoubleCount);
+    LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsDoublePageCountOnDuplex(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    const CTL_ITwainSource* p = VerifySourceHandle(pHandle, Source);
-    if (p)
-    {
-        LOG_FUNC_EXIT_PARAMS(p->IsDoublePageCountOnDuplex())
-    }
-    LOG_FUNC_EXIT_PARAMS(FALSE)
-    CATCH_BLOCK(FALSE)
+    CTL_ITwainSource* p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    LOG_FUNC_EXIT_NONAME_PARAMS(p->IsDoublePageCountOnDuplex())
+    CATCH_BLOCK_LOG_PARAMS(FALSE)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceAcquiring(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    const CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
-    if (p)
-    {
-        // out of a TWAIN loop testing
-        const bool Ret = p->IsAcquireAttempt();
-        LOG_FUNC_EXIT_PARAMS(Ret)
-    }
-    LOG_FUNC_EXIT_PARAMS(false)
-    CATCH_BLOCK(false)
+    const CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    // out of a TWAIN loop testing
+    const bool Ret = p->IsAcquireAttempt();
+    LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceAcquiringEx(DTWAIN_SOURCE Source, BOOL bUIOnly)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, bUIOnly))
-    if ( !Source )
-        LOG_FUNC_EXIT_PARAMS(true)
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    const CTL_ITwainSource* p = VerifySourceHandle(pHandle, Source);
-    if (p)
-    {
-        if (bUIOnly)
-            LOG_FUNC_EXIT_PARAMS(p->IsUIOpen() ? true : false);
-        const bool stillAcquiring = (!pHandle->m_bTransferDone == true && !pHandle->m_bSourceClosed == true);
-        LOG_FUNC_EXIT_PARAMS(stillAcquiring)
-    }
-    LOG_FUNC_EXIT_PARAMS(false)
-    CATCH_BLOCK(false)
+    CTL_ITwainSource* p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    const auto pHandle = p->GetDTWAINHandle();
+    if (bUIOnly)
+        LOG_FUNC_EXIT_NONAME_PARAMS(p->IsUIOpen() ? true : false);
+    const bool stillAcquiring = (!pHandle->m_bTransferDone == true && !pHandle->m_bSourceClosed == true);
+    LOG_FUNC_EXIT_NONAME_PARAMS(stillAcquiring)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsMemFileXferSupported(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    const CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
-    if (p)
-    {
-        const bool Ret = CTL_TwainAppMgr::IsMemFileTransferSupported(p);
-        LOG_FUNC_EXIT_PARAMS(Ret)
-    }
-    LOG_FUNC_EXIT_PARAMS(false)
-    CATCH_BLOCK(false)
+    CTL_ITwainSource* p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    const bool Ret = CTL_TwainAppMgr::IsMemFileTransferSupported(p);
+    LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
@@ -173,13 +147,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, NULL, FUNC_MACRO);
 
-    // Check if Source is valid
-    const CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, opts.getSource());
-    if (!pSource)
-    {
-        opts.setStatus(DTWAIN_ERR_BAD_SOURCE);
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{return true; }, DTWAIN_ERR_BAD_SOURCE, NULL, FUNC_MACRO);
-    }
+    const CTL_ITwainSource *pSource = static_cast<CTL_ITwainSource*>(opts.getSource());
 
     if (!pHandle->m_bSessionAllocated)
     {
@@ -203,13 +171,13 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
         {
             if (!bSessionPreStarted)
                 DTWAIN_EndTwainSession();
-            LOG_FUNC_EXIT_PARAMS((DTWAIN_ARRAY)NULL)
+            LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
         }
         if (!DTWAIN_OpenSource(pRealSource))
         {
             if (!bSessionPreStarted)
                 DTWAIN_EndTwainSession();
-            LOG_FUNC_EXIT_PARAMS((DTWAIN_ARRAY)NULL)
+            LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
         }
     }
     else
@@ -311,7 +279,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     DTWAIN_ARRAY aAcquisitionArray = SourceAcquireWorkerThread(opts);
     if (DTWAIN_GetTwainMode() == DTWAIN_MODELESS)
     {
-        LOG_FUNC_EXIT_PARAMS(aAcquisitionArray)
+        LOG_FUNC_EXIT_NONAME_PARAMS(aAcquisitionArray)
     }
 
     if (aAcquisitionArray)
@@ -329,7 +297,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
         DTWAIN_EndTwainSession();
     if (!bSourcePreOpened)
         DTWAIN_CloseSource(pRealSource);
-    LOG_FUNC_EXIT_PARAMS(aAcquisitionArray)
+    LOG_FUNC_EXIT_NONAME_PARAMS(aAcquisitionArray)
     CATCH_BLOCK(DTWAIN_ARRAY(0))
 }
 
@@ -341,7 +309,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
 
     DTWAINArrayLL_RAII a1;
 
-    CTL_ITwainSource *pSource = VerifySourceHandle(opts.getHandle(), opts.getSource());
+    CTL_ITwainSource *pSource = static_cast<CTL_ITwainSource*>(opts.getSource());
     pSource->ResetAcquisitionAttempts(nullptr);
     aAcquisitionArray = static_cast<DTWAIN_ARRAY>(CreateArrayFromFactory(DTWAIN_ARRAYOFHANDLEARRAYS, 0));
     DTWAINArrayLL_RAII aAcq(aAcquisitionArray);
@@ -373,7 +341,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
             if (DTWAIN_LLAcquireNative(opts) == -1L)
             {
                 opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                LOG_FUNC_EXIT_PARAMS((DTWAIN_ARRAY)NULL)
+                LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
             }
             if (opts.getAcquireType() == ACQUIRENATIVEEX)
                 pSource->SetUserAcquisitionArray(opts.getUserArray());
@@ -384,7 +352,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
             if (DTWAIN_LLAcquireBuffered(opts) == -1L)
             {
                 opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                LOG_FUNC_EXIT_PARAMS((DTWAIN_ARRAY)NULL)
+                LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
             }
             if (opts.getAcquireType() == ACQUIREBUFFEREX)
                 pSource->SetUserAcquisitionArray(opts.getUserArray());
@@ -394,7 +362,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
             if (DTWAIN_LLAcquireToClipboard(opts) == -1L)
             {
                 opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                LOG_FUNC_EXIT_PARAMS((DTWAIN_ARRAY)NULL)
+                LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
             }
             break;
 
@@ -402,7 +370,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
             if (DTWAIN_LLAcquireFile(opts) == -1L)
             {
                 opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                LOG_FUNC_EXIT_PARAMS((DTWAIN_ARRAY)NULL)
+                LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
             }
             break;
 
@@ -411,7 +379,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
             if (DTWAIN_LLAcquireAudioNative(opts) == -1L)
             {
                 opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                LOG_FUNC_EXIT_PARAMS((DTWAIN_ARRAY)NULL)
+                LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
             }
             if (opts.getAcquireType() == ACQUIREAUDIONATIVEEX)
                 pSource->SetUserAcquisitionArray(opts.getUserArray());
@@ -421,7 +389,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
             if (DTWAIN_LLAcquireAudioFile(opts) == -1L)
             {
                 opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                LOG_FUNC_EXIT_PARAMS((DTWAIN_ARRAY)NULL)
+                LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
             }
             break;
 
@@ -436,7 +404,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
         pDLLHandle->m_lLastAcqError = DTWAIN_TN_ACQUIRESTARTED;
         opts.setStatus(DTWAIN_TN_ACQUIRESTARTED);
         pSource->m_pUserPtr = Array;
-        LOG_FUNC_EXIT_PARAMS(Array)
+        LOG_FUNC_EXIT_NONAME_PARAMS(Array)
     }
 
     pSource->ResetAcquisitionAttempts(aAcquisitionArray);
@@ -449,18 +417,18 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
     if (vValues.empty() && opts.getAcquireType() != ACQUIREFILE)
     {
         pSource->ResetAcquisitionAttempts(nullptr);
-        LOG_FUNC_EXIT_PARAMS(NULL)
+        LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
     }
     aAcq.release();
-    LOG_FUNC_EXIT_PARAMS(aAcquisitionArray)
+    LOG_FUNC_EXIT_NONAME_PARAMS(aAcquisitionArray)
     CATCH_BLOCK(DTWAIN_ARRAY())
 }
 
 bool dynarithmic::AcquireExHelper(SourceAcquireOptions& opts)
 {
     DTWAIN_ARRAY aDibs = SourceAcquire(opts);
-    DTWAINArrayLL_RAII arr(aDibs);
     auto pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
+    DTWAINArrayLowLevel_RAII arr(pSource->GetDTWAINHandle(), aDibs);
     if (!aDibs)
     {
         // Destroy internally generated acquisition array and
@@ -488,16 +456,13 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
     LOG_FUNC_ENTRY_PARAMS((opts))
     DTWAIN_ACQUIRE nNum = -1;
     LONG ClipboardTransferType = -1;
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     const DTWAIN_SOURCE Source = opts.getSource();
-    CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, Source);
-
-    if (!pSource)
-        LOG_FUNC_EXIT_PARAMS((DTWAIN_ACQUIRE)nNum)
+    CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
+    const auto pHandle = pSource->GetDTWAINHandle();
 
     // Open the source (if source is closed)
     if (!CTL_TwainAppMgr::OpenSource(pHandle->m_pTwainSession, pSource))
-        LOG_FUNC_EXIT_PARAMS((DTWAIN_ACQUIRE)nNum)
+        LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ACQUIRE)nNum)
 
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return DTWAIN_IsSourceAcquiring(Source); },
     DTWAIN_ERR_SOURCE_ACQUIRING, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
@@ -731,20 +696,16 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
     CTL_TwainAppMgr::SendTwainMsgToWindow(pHandle->m_pTwainSession, nullptr, DTWAIN_TN_ACQUIRESTARTED, reinterpret_cast<LPARAM>(pSource));
 
     // return the Acquire Number
-    LOG_FUNC_EXIT_PARAMS((DTWAIN_ACQUIRE)nNum)
+    LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ACQUIRE)nNum)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 
 bool dynarithmic::TileModeOn(DTWAIN_SOURCE Source)
 {
     BOOL bMode;
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
-    if (p)
-    {
-        if (CTL_TwainAppMgr::GetCurrentOneCapValue(p, &bMode, DTWAIN_CV_ICAPTILES, CTL_GetTypeGETCURRENT))
-            return static_cast<TW_BOOL>(bMode)?true:false;
-    }
+    CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
+    if (CTL_TwainAppMgr::GetCurrentOneCapValue(p, &bMode, DTWAIN_CV_ICAPTILES, CTL_GetTypeGETCURRENT))
+        return static_cast<TW_BOOL>(bMode)?true:false;
     return false;
 }
 

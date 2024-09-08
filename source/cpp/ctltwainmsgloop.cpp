@@ -36,8 +36,7 @@ std::pair<bool, DTWAIN_ACQUIRE> dynarithmic::StartModalMessageLoop(DTWAIN_SOURCE
     if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
         return { true, 0 };
 
-    CTL_ITwainSource* pSource = VerifySourceHandle(pHandle, Source);
-
+    CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
     if (!pSource)
         return { false, -1 };
 

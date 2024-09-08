@@ -38,7 +38,7 @@ LONG DLLENTRY_DEF  DTWAIN_GetCapFromName(LPCTSTR szName)
 
     const LONG Cap = CTL_TwainAppMgr::GetCapFromCapName(StringConversion::Convert_NativePtr_To_Ansi(szName).c_str());
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return Cap == TwainCap_INVALID; }, DTWAIN_ERR_BAD_CAP, 0L, FUNC_MACRO);
-    LOG_FUNC_EXIT_PARAMS((long)Cap)
+    LOG_FUNC_EXIT_NONAME_PARAMS((long)Cap)
     CATCH_BLOCK(0)
 }
 
@@ -50,7 +50,7 @@ LONG DLLENTRY_DEF DTWAIN_GetNameFromCap(LONG nCapValue, LPTSTR szValue, LONG nMa
     // See if DLL Handle exists
     DTWAIN_Check_Bad_Handle_Ex(pHandle, -1L, FUNC_MACRO);
     const LONG nTotalBytes = StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(CTL_TwainAppMgr::GetCapNameFromCap(nCapValue)), szValue, nMaxLen);
-    LOG_FUNC_EXIT_PARAMS(nTotalBytes)
+    LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)
     CATCH_BLOCK(-1)
 }
 
@@ -58,7 +58,7 @@ LONG DLLENTRY_DEF DTWAIN_GetExtCapFromName(LPCTSTR szName)
 {
     LOG_FUNC_ENTRY_PARAMS((szName))
     const LONG Cap = DTWAIN_GetCapFromName(szName);
-    LOG_FUNC_EXIT_PARAMS((long)Cap)
+    LOG_FUNC_EXIT_NONAME_PARAMS((long)Cap)
     CATCH_BLOCK(0)
 }
 
@@ -66,7 +66,7 @@ LONG DLLENTRY_DEF DTWAIN_GetExtNameFromCap(LONG nValue, LPTSTR szValue, LONG nMa
 {
     LOG_FUNC_ENTRY_PARAMS((nValue, szValue, nMaxLen))
     const LONG bRet = DTWAIN_GetNameFromCap(nValue + 1000, szValue, nMaxLen);
-    LOG_FUNC_EXIT_PARAMS(bRet)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(-1)
 }
 
@@ -95,7 +95,7 @@ BOOL DLLENTRY_DEF DTWAIN_GetTwainCountryName(LONG countryId, LPTSTR szName)
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, -1L, FUNC_MACRO);
     GetGenericTwainName(countryId, szName, CTL_StaticData::GetTwainCountryMap());
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -105,7 +105,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainCountryValue(LPCTSTR country)
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, -1L, FUNC_MACRO);
     const auto value = GetGenericTwainValue(country, CTL_StaticData::GetTwainCountryMap());
-    LOG_FUNC_EXIT_PARAMS(value)
+    LOG_FUNC_EXIT_NONAME_PARAMS(value)
     CATCH_BLOCK(-1L)
 }
 
@@ -115,7 +115,7 @@ BOOL DLLENTRY_DEF DTWAIN_GetTwainLanguageName(LONG nameId, LPTSTR szName)
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, -1L, FUNC_MACRO);
     GetGenericTwainName(nameId, szName, CTL_StaticData::GetTwainLanguageMap());
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -125,6 +125,6 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainLanguageValue(LPCTSTR szName)
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, -1L, FUNC_MACRO);
     const auto value = GetGenericTwainValue(szName, CTL_StaticData::GetTwainLanguageMap());
-    LOG_FUNC_EXIT_PARAMS(value)
+    LOG_FUNC_EXIT_NONAME_PARAMS(value)
     CATCH_BLOCK(-1L)
 }

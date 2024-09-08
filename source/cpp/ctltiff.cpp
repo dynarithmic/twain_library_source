@@ -30,43 +30,35 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTIFFInvert(DTWAIN_SOURCE Source, LONG Setting
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Setting))
     const auto p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
-    if (p)
-    {
-        p->SetPhotometric( !Setting );
-        LOG_FUNC_EXIT_PARAMS(true)
-    }
-    LOG_FUNC_EXIT_PARAMS(false)
-    CATCH_BLOCK(false)
+    p->SetPhotometric( !Setting );
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTIFFCompressType(DTWAIN_SOURCE Source, LONG Setting)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Setting))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     // Must be in state 4 or higher
-    const auto p = VerifySourceHandle( pHandle, Source );
-    if (p)
-    {
-        const SourceState theState = p->GetState();
-        const bool bIsTiff = p->IsFileTypeTIFF(static_cast<CTL_TwainFileFormatEnum>(Setting));
-        LONG curAcquireType = p->GetAcquireFileType();
-        const bool bIsCurTiff = p->IsFileTypeTIFF(static_cast<CTL_TwainFileFormatEnum>(curAcquireType));
+    const auto p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
+    const auto pHandle = p->GetDTWAINHandle();
+    const SourceState theState = p->GetState();
+    const bool bIsTiff = p->IsFileTypeTIFF(static_cast<CTL_TwainFileFormatEnum>(Setting));
+    LONG curAcquireType = p->GetAcquireFileType();
+    const bool bIsCurTiff = p->IsFileTypeTIFF(static_cast<CTL_TwainFileFormatEnum>(curAcquireType));
 
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return theState < SOURCE_STATE_UIENABLED;}, DTWAIN_ERR_INVALID_STATE, false,
-                                          FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return theState < SOURCE_STATE_UIENABLED;}, DTWAIN_ERR_INVALID_STATE, false,
+                                        FUNC_MACRO);
 
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !bIsTiff;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !bIsTiff;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !bIsCurTiff;}, DTWAIN_ERR_FILE_FORMAT, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !bIsCurTiff;}, DTWAIN_ERR_FILE_FORMAT, false, FUNC_MACRO);
 
-        const bool bIsTiffMulti = p->IsFileTypeMultiPage(static_cast<CTL_TwainFileFormatEnum>(curAcquireType));
-        if (bIsTiffMulti)
-            p->SetAcquireFileType(p->GetMultiPageType(static_cast<CTL_TwainFileFormatEnum>(Setting)));
-        else
-            p->SetAcquireFileType(static_cast<CTL_TwainFileFormatEnum>(Setting));
-        LOG_FUNC_EXIT_PARAMS(true)
-    }
-    LOG_FUNC_EXIT_PARAMS(false)
-    CATCH_BLOCK(false)
+    const bool bIsTiffMulti = p->IsFileTypeMultiPage(static_cast<CTL_TwainFileFormatEnum>(curAcquireType));
+    if (bIsTiffMulti)
+        p->SetAcquireFileType(p->GetMultiPageType(static_cast<CTL_TwainFileFormatEnum>(Setting)));
+    else
+        p->SetAcquireFileType(static_cast<CTL_TwainFileFormatEnum>(Setting));
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }

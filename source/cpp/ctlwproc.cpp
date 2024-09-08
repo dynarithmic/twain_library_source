@@ -47,8 +47,8 @@ static void SetNotification(CTL_TwainDLLHandle* pHandle, bool& notification, DTW
 
 LONG DLLENTRY_DEF DTWAIN_GetRegisteredMsg()
 {
-    LOG_FUNC_ENTRY_PARAMS(())
-    LOG_FUNC_EXIT_PARAMS(CTL_StaticData::s_nRegisteredDTWAINMsg)
+    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_EXIT_NONAME_PARAMS(CTL_StaticData::s_nRegisteredDTWAINMsg)
     CATCH_BLOCK(0L)
 }
 
@@ -58,7 +58,7 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_EnableMsgNotify(DTWAIN_BOOL bSet)
     LOG_FUNC_ENTRY_PARAMS((bSet))
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     SetNotification(pHandle, pHandle->m_bNotificationsUsed, bSet);
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -67,25 +67,25 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_EnableTripletsNotify(DTWAIN_BOOL bSet)
     LOG_FUNC_ENTRY_PARAMS((bSet))
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     SetNotification(pHandle, pHandle->m_bNotifyTripletsUsed, bSet);
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsMsgNotifyEnabled()
 {
-    LOG_FUNC_ENTRY_PARAMS(())
+    LOG_FUNC_ENTRY_NONAME_PARAMS()
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
      DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    LOG_FUNC_EXIT_PARAMS(pHandle->m_bNotificationsUsed)
+    LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_bNotificationsUsed)
     CATCH_BLOCK(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsNotifyTripletsEnabled()
 {
-    LOG_FUNC_ENTRY_PARAMS(())
+    LOG_FUNC_ENTRY_NONAME_PARAMS()
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    LOG_FUNC_EXIT_PARAMS(pHandle->m_bNotifyTripletsUsed)
+    LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_bNotifyTripletsUsed)
     CATCH_BLOCK(false)
 }
 
@@ -101,7 +101,7 @@ DTWAIN_CALLBACK_PROC DLLENTRY_DEF DTWAIN_SetCallback(DTWAIN_CALLBACK_PROC Fn, LO
     pHandle->m_lCallbackData = UserData;
     if (Fn)
         Fn(DTWAIN_TN_SETCALLBACKINIT, 0, UserData);
-    LOG_FUNC_EXIT_PARAMS(oldProc)
+    LOG_FUNC_EXIT_NONAME_PARAMS(oldProc)
     CATCH_BLOCK(DTWAIN_CALLBACK_PROC())
 }
 
@@ -116,32 +116,32 @@ DTWAIN_CALLBACK_PROC64 DLLENTRY_DEF DTWAIN_SetCallback64(DTWAIN_CALLBACK_PROC64 
     pHandle->m_lCallbackData64 = UserData;
     if (Fn)
         Fn(DTWAIN_TN_SETCALLBACK64INIT, 0, UserData);
-    LOG_FUNC_EXIT_PARAMS(oldProc)
+    LOG_FUNC_EXIT_NONAME_PARAMS(oldProc)
     CATCH_BLOCK(DTWAIN_CALLBACK_PROC64())
 }
 
 DTWAIN_CALLBACK_PROC DLLENTRY_DEF DTWAIN_GetCallback()
 {
-    LOG_FUNC_ENTRY_PARAMS(())
+    LOG_FUNC_ENTRY_NONAME_PARAMS()
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex( pHandle, NULL, FUNC_MACRO);
-    LOG_FUNC_EXIT_PARAMS(pHandle->m_pCallbackFn)
+    LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_pCallbackFn)
     CATCH_BLOCK(DTWAIN_CALLBACK_PROC())
 }
 
 DTWAIN_CALLBACK_PROC64 DLLENTRY_DEF DTWAIN_GetCallback64()
 {
-    LOG_FUNC_ENTRY_PARAMS(())
+    LOG_FUNC_ENTRY_NONAME_PARAMS()
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex( pHandle, NULL, FUNC_MACRO);
-    LOG_FUNC_EXIT_PARAMS(pHandle->m_pCallbackFn64)
+    LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_pCallbackFn64)
     CATCH_BLOCK(DTWAIN_CALLBACK_PROC64())
 }
 
 DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_AddCallback(DTWAIN_CALLBACK_PROC Fn, LONG UserData)
 {
     LOG_FUNC_ENTRY_PARAMS((Fn, UserData))
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -172,10 +172,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RemoveCallback(DTWAIN_CALLBACK_PROC Fn)
     if ( found != CTL_StaticData::s_aAllCallbacks.end())
     {
         CTL_StaticData::s_aAllCallbacks.erase(found);
-        LOG_FUNC_EXIT_PARAMS(true)
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
     }
 
-    LOG_FUNC_EXIT_PARAMS(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(false)
     CATCH_BLOCK(false)
 
 }
@@ -811,7 +811,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DisableAppWindow(HWND hWnd, DTWAIN_BOOL bDisable
    else
        CTL_StaticData::s_appWindowsToDisable.erase( hWnd );
    #endif
-   LOG_FUNC_EXIT_PARAMS(true)
+   LOG_FUNC_EXIT_NONAME_PARAMS(true)
    CATCH_BLOCK(false)
 }
 

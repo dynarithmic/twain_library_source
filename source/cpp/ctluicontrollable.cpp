@@ -30,13 +30,8 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, Source);
-    if (!pSource)
-        LOG_FUNC_EXIT_PARAMS(false)
+    CTL_ITwainSource* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    const auto pHandle = pSource->GetDTWAINHandle();
 
     // Open the source (if source is closed)
     bool bSourceOpen = false;
@@ -44,7 +39,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
         bSourceOpen = true;
     else
     if (!CTL_TwainAppMgr::OpenSource(pHandle->m_pTwainSession, pSource))
-       LOG_FUNC_EXIT_PARAMS(false)
+       LOG_FUNC_EXIT_NONAME_PARAMS(false)
     bool bOk = false;
 
     // Check if capability UICONTROLLABLE is supported
@@ -55,7 +50,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
         BOOL bGetUI = DTWAIN_GetCapValuesEx(Source, DTWAIN_CV_CAPUICONTROLLABLE, DTWAIN_CAPGET, DTWAIN_CONTONEVALUE, &CapArray);
         if (bGetUI && CapArray && !pHandle->m_ArrayFactory->empty(CapArray))
         {
-            DTWAINArrayLL_RAII arr(CapArray);
+            DTWAINArrayLowLevel_RAII arr(pHandle, CapArray);
             bOk = pHandle->m_ArrayFactory->underlying_container_t<LONG>(CapArray)[0] ? true : false;
         }
     }
@@ -67,6 +62,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
     // Close source if opened in this function
     if (!bSourceOpen)
         DTWAIN_CloseSource(Source);
-    LOG_FUNC_EXIT_PARAMS(bOk ? TRUE : FALSE)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bOk ? TRUE : FALSE)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }

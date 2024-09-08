@@ -30,10 +30,10 @@ using namespace dynarithmic;
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSourcesEx()
 {
-    LOG_FUNC_ENTRY_PARAMS(())
+    LOG_FUNC_ENTRY_NONAME_PARAMS()
     DTWAIN_ARRAY pArray = nullptr;
     DTWAIN_EnumSources(&pArray);
-    LOG_FUNC_EXIT_PARAMS(pArray)
+    LOG_FUNC_EXIT_NONAME_PARAMS(pArray)
     CATCH_BLOCK(DTWAIN_ARRAY{})
 }
 
@@ -48,7 +48,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     DTWAIN_ARRAY aSource = CreateArrayFromFactory(DTWAIN_ARRAYSOURCE, 0);
     if (!aSource)
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
     DTWAIN_ARRAY pDTWAINArray = aSource;
 
     const auto& factory = pHandle->m_ArrayFactory;
@@ -61,7 +61,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
     if (!pHandle->m_bSessionAllocated)
     {
         if (!DTWAIN_StartTwainSession(nullptr, nullptr))
-            LOG_FUNC_EXIT_PARAMS(false)
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
     }
 
     CTL_TwainAppMgr::EnumSources(pHandle->m_pTwainSession, SourceArray);
@@ -78,6 +78,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
             }
         });
     *Array = aSource;
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
