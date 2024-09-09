@@ -195,19 +195,20 @@
 3001 &Seleccione
 3002 &Cancelar
 3003 Origines:
-3005 Entering
-3006 Exiting
-3007 returning value of
+3005 Entrando
+3006 Salir
+3007 valor de retorno de
 3008 Exception Error
 3009 Module
 3010 No parameter info
 3011 Error in getting information for function
-3012 Input
-3013 Output: return code from DSM
+3012 Aporte
+3013 Producción: código de retorno de DSM
 3014 No information for 
 3015 returned error code
 3016 Error
 3017 El directorio de archivos temporales no existe
+3018 fue llamado
 5000 Courier
 5001 Courier-Bold
 5002 Courier-BoldOblique
