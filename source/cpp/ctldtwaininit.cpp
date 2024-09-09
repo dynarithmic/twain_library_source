@@ -95,7 +95,7 @@ static void RegisterTwainWindowClass();
 static std::pair<bool, std::vector<uint16_t>> OpenLogging(LPCTSTR pFileName, LONG logFlags, const FileLoggingTraits& fTraits = {});
 static void WriteVersionToLog();
 static bool SysDestroyHelper(CTL_TwainDLLHandle* pHandle, bool bCheck=true);
-static void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL);
+static void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL, bool bClear);
 static void LoadTransferReadyOverrides();
 static void LoadFlatbedOnlyOverrides();
 static void LoadOnSourceOpenProperties(CTL_TwainDLLHandle* pHandle);
@@ -437,19 +437,35 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadLanguageResource(LONG nLanguage)
     CATCH_BLOCK(false)
 }
 
+static bool GenericResourceLoader(CTL_TwainDLLHandle* pHandle, LPCTSTR sLangDLL, bool bClear)
+{
+    const std::string sLangDLLString = StringConversion::Convert_NativePtr_To_Ansi(sLangDLL);
+    // Add the resource to the registry.
+    const auto exists = pHandle->AddResourceToRegistry(sLangDLLString.c_str(), bClear).second;
+    bool bRet = false;
+    if (exists)
+        bRet = LoadLanguageResourceA(sLangDLLString.c_str(), pHandle->GetResourceRegistry(), bClear);
+    return bRet;
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResources(LPCTSTR sLangDLL)
 {
     LOG_FUNC_ENTRY_PARAMS((sLangDLL))
     auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-
-    const std::string sLangDLLString = StringConversion::Convert_NativePtr_To_Ansi(sLangDLL);
-    // Add the resource to the registry.
-    const auto exists = pHandle->AddResourceToRegistry(sLangDLLString.c_str()).second;
-    bool bRet = false;
-    if (exists)
-        bRet = LoadLanguageResourceA(sLangDLLString.c_str(), pHandle->GetResourceRegistry());
+    bool bRet = GenericResourceLoader(pHandle, sLangDLL, false);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bRet;}, DTWAIN_ERR_FILEOPEN, false, FUNC_MACRO);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesEx(LPCTSTR sLangDLL, DTWAIN_BOOL bClear)
+{
+    LOG_FUNC_ENTRY_PARAMS((sLangDLL, bClear))
+    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    bool bRet = GenericResourceLoader(pHandle, sLangDLL, bClear);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !bRet; }, DTWAIN_ERR_FILEOPEN, false, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -895,7 +911,7 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
                 pHandle->InitializeResourceRegistry();
 
                 // Load customized resources from INI
-                LoadCustomResourcesFromIni(pHandle, szLangDLL.c_str());
+                LoadCustomResourcesFromIni(pHandle, szLangDLL.c_str(), true);
 
                 // Load DS overrides for transfer ready / close UI requests
                 LoadTransferReadyOverrides();
@@ -945,7 +961,7 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
 }
 
 
-void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL)
+void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL, bool bClear)
 {
     // Load the resources
     CSimpleIniA customProfile;
@@ -953,12 +969,12 @@ void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL)
     if (err != SI_OK)
         return;
 
-    std::string szStr = customProfile.GetValue("Language", "dll",
+    std::string szStr = customProfile.GetValue("Language", "default",
                                                StringConversion::Convert_NativePtr_To_Ansi(szLangDLL).c_str());
-    if (!LoadLanguageResourceA(szStr, pHandle->GetResourceRegistry()))
+    if (!LoadLanguageResourceA(szStr, pHandle->GetResourceRegistry(), bClear))
     {
         // Use the English resources by default
-        if (!LoadLanguageResourceA("english", pHandle->GetResourceRegistry()))
+        if (!LoadLanguageResourceA("english", pHandle->GetResourceRegistry(), bClear))
         {
             // Too bad.  Last chance -- load english resources directly from internal rc.
             // Note that unlike the text resources that should have been loaded, 

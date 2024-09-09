@@ -54,6 +54,7 @@
 #include "ctlres.h"
 #include "dtwain.h"
 #include "twainframe.h"
+#include <boost/functional/hash.hpp>
 
 #include "notimpl.h"
 #include "sourceacquireopts.h"
@@ -245,6 +246,7 @@ namespace dynarithmic
     typedef std::vector<CallbackInfo<DTWAIN_CALLBACK_PROC, LONGLONG> > CTL_CallbackProcArray64;
     typedef std::unordered_map<LONG, CTL_StringType> CTL_StringToLongMap;
     typedef std::unordered_map<LONG, std::string> CTL_LongToStringMap;
+    typedef std::unordered_map<std::string, CTL_LongToStringMap> CTL_StringToMapLongToStringMap;
     typedef std::unordered_map<LONG, std::vector<LONG> > CTL_LongToVectorLongMap;
     typedef std::vector<CTL_MapThreadToDLLHandle>     CTL_HookInfoArray;
 
@@ -500,6 +502,17 @@ namespace dynarithmic
         CTL_ITwainSource* GetSourceHandle() const { return m_pSource; }
     };
 
+    struct CacheKeyHash 
+    {
+        std::size_t operator()(const std::pair<LONG, std::string>& key) const 
+        {
+            std::size_t seed = 0;
+            boost::hash_combine(seed, key.first);
+            boost::hash_combine(seed, key.second);
+            return seed;
+        }
+    };
+
     typedef std::map<std::string, SourceStatus> SourceStatusMap;
     typedef std::map<int, ImageResamplerData> ImageResamplerMap;
     typedef std::unordered_map<LONG, std::pair<std::string, std::string>> CTL_PDFMediaMap;
@@ -509,6 +522,7 @@ namespace dynarithmic
     typedef std::unordered_map<LONG, std::string> CTL_TwainLongToStringMap;
     typedef std::unordered_map<int32_t, std::string> CTL_ErrorToExtraInfoMap;
     typedef std::unordered_map<std::string, unsigned long> CTL_ThreadMap;
+    typedef std::unordered_map<std::pair<LONG, std::string>, std::string, CacheKeyHash> CTL_PairToStringMap;
 
     struct CTL_GeneralResourceInfo
     {
@@ -518,6 +532,7 @@ namespace dynarithmic
 
     struct CTL_StaticData
     {
+        static CTL_StringToMapLongToStringMap s_AllLoadedResourcesMap;
         static CTL_GeneralResourceInfo         s_ResourceInfo;
         static CTL_PDFMediaMap          s_PDFMediaMap;
         static CTL_TwainLongToStringMap s_TwainCountryMap;
@@ -554,7 +569,15 @@ namespace dynarithmic
         static ImageResamplerMap        s_ImageResamplerMap;
         static SourceStatusMap          s_SourceStatusMap;
         static CTL_StringType           s_ResourceVersion;
+        static std::string              s_CurrentResourceKey;
+        static CTL_PairToStringMap      s_ResourceCache;
 
+        static CTL_PairToStringMap& GetResourceCache() { return s_ResourceCache; }
+        static CTL_StringToMapLongToStringMap& GetAllLanguagesResourceMap() { return s_AllLoadedResourcesMap; }
+        static CTL_LongToStringMap* GetLanguageResource(std::string sLang);
+        static std::string&         GetCurrentLanguageResourceKey() { return s_CurrentResourceKey; }
+        static void SetCurrentLanguageResourceKey(std::string sLang) { s_CurrentResourceKey = sLang; }
+        static CTL_LongToStringMap* GetCurrentLanguageResource();
         static CTL_GeneralResourceInfo& GetGeneralResourceInfo() { return s_ResourceInfo; }
         static CTL_PDFMediaMap& GetPDFMediaMap() { return s_PDFMediaMap; }
         static CTL_TwainLongToStringMap& GetTwainCountryMap() { return s_TwainCountryMap; }
@@ -612,7 +635,7 @@ namespace dynarithmic
             void    RemoveAllSourceCapInfo();
             void    RemoveAllSourceMaps();
             void    InitializeResourceRegistry();
-            std::pair<CTL_ResourceRegistryMap::iterator, bool> AddResourceToRegistry(LPCSTR pLangDLL);
+            std::pair<CTL_ResourceRegistryMap::iterator, bool> AddResourceToRegistry(LPCSTR pLangDLL, bool bClear);
             CTL_ResourceRegistryMap& GetResourceRegistry() { return m_ResourceRegistry; }
             CTL_StringType GetVersionString() const { return  m_VersionString; }
             void        SetVersionString(CTL_StringType s) { m_VersionString = std::move(s); }
@@ -661,7 +684,6 @@ namespace dynarithmic
             CTL_StringType   m_strLibraryPath;   // path to the DTWAIN Library being used
             CTL_StringType   m_sWindowsVersionInfo; // Windows version information, cached.
             CTL_StringType   m_strDefaultSource; // Current default TWAIN source
-            CTL_LongToStringMap  m_mapResourceStrings;
             CTL_LoggerCallbackInfo m_LoggerCallbackInfo;
 
             HINSTANCE           m_hInstance;

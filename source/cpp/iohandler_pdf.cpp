@@ -495,7 +495,6 @@ int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, std::string& sT
     DTWAIN_ARRAY aValues = CreateArrayFromFactory(DTWAIN_ARRAYLONG, 1);
     if ( aValues )
     {
-        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
         DTWAINArrayLowLevel_RAII a(pHandle, aValues);
         DTWAIN_ArraySetAtLong(aValues, 0, fileType );
         const LONG bRet1 = DTWAIN_SetOCRCapValues(static_cast<DTWAIN_OCRENGINE>(pEngine), DTWAIN_OCRCV_IMAGEFILEFORMAT, DTWAIN_CAPSET, aValues);
