@@ -7,8 +7,8 @@ DTWAIN Version changes
 
 - Optimizations to internal functions.
 
-- Fix DTWAIN_SelectDefaultSource() for TWAIN 2.x data source managers.  Note that
-  DTWAIN_SelectDefaultSource() is not guaranteed to work for TWAIN 1.x data source managers.
+- Fix DTWAIN_SetDefaultSource() for TWAIN 2.x data source managers.  Note that
+  DTWAIN_SetDefaultSource() is not guaranteed to work for TWAIN 1.x data source managers.
 
   
 5.5.0
