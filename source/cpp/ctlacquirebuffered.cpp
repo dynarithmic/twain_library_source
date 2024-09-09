@@ -36,9 +36,8 @@ DTWAIN_BOOL   DLLENTRY_DEF DTWAIN_AcquireBufferedEx(DTWAIN_SOURCE Source, LONG P
                                                     LPLONG pStatus)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, Acquisitions, pStatus))
-
-    auto* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pSource->GetDTWAINHandle()).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
         setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setUserArray(Acquisitions).
         setAcquireType(ACQUIREBUFFEREX);
 
@@ -53,8 +52,8 @@ DTWAIN_BOOL   DLLENTRY_DEF DTWAIN_AcquireBufferedEx(DTWAIN_SOURCE Source, LONG P
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireBuffered(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG   pStatus)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, pStatus))
-    auto pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pSource->GetDTWAINHandle()).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
                                                         setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).
                                                         setAcquireType(ACQUIREBUFFER);
     const DTWAIN_ARRAY aDibs = SourceAcquire(opts);

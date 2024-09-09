@@ -451,8 +451,7 @@ static bool GenericResourceLoader(CTL_TwainDLLHandle* pHandle, LPCTSTR sLangDLL,
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResources(LPCTSTR sLangDLL)
 {
     LOG_FUNC_ENTRY_PARAMS((sLangDLL))
-    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    auto [pHandle, pSource] = VerifySourceHandle(nullptr, DTWAIN_TEST_HANDLE);
     bool bRet = GenericResourceLoader(pHandle, sLangDLL, false);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bRet;}, DTWAIN_ERR_FILEOPEN, false, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
@@ -462,8 +461,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResources(LPCTSTR sLangDLL)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesEx(LPCTSTR sLangDLL, DTWAIN_BOOL bClear)
 {
     LOG_FUNC_ENTRY_PARAMS((sLangDLL, bClear))
-    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    auto [pHandle, pSource] = VerifySourceHandle(nullptr, DTWAIN_TEST_HANDLE);
     bool bRet = GenericResourceLoader(pHandle, sLangDLL, bClear);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !bRet; }, DTWAIN_ERR_FILEOPEN, false, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
@@ -473,11 +471,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesEx(LPCTSTR sLangDLL, DT
 LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstant(LONG lConstantType, LONG lTwainConstant, LPTSTR lpszOut, LONG nSize)
 {
     LOG_FUNC_ENTRY_PARAMS((lConstantType, lTwainConstant, lpszOut, nSize))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-
+    auto [pHandle, pSource] = VerifySourceHandle(nullptr, DTWAIN_TEST_HANDLE);
     auto& constantsmap = CTL_StaticData::GetTwainConstantsMap();
     auto iter1 = constantsmap.find(lConstantType);
     if (iter1 == constantsmap.end())

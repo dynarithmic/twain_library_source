@@ -31,7 +31,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireAudioNative(DTWAIN_SOURCE Source, LONG n
                                                     DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nMaxAudioClips, bShowUI, bCloseSource, pStatus))
-    auto* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
     SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pSource->GetDTWAINHandle()).setSource(Source).
                                                            setMaxPages(nMaxAudioClips).
                                                            setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).
@@ -47,11 +47,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioNativeEx(DTWAIN_SOURCE Source, LONG 
                                                      DTWAIN_BOOL bCloseSource, DTWAIN_ARRAY Acquisitions, LPLONG pStatus)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nMaxAudioClips, bShowUI, bCloseSource, Acquisitions, pStatus))
-    auto* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
     SourceAcquireOptions opts = SourceAcquireOptions().setSource(Source).setMaxPages(nMaxAudioClips).
     setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setUserArray(Acquisitions).
-    setAcquireType(ACQUIREAUDIONATIVEEX).setHandle(pSource->GetDTWAINHandle());
+    setAcquireType(ACQUIREAUDIONATIVEEX).setHandle(pHandle);
 
     const bool bRet = AcquireExHelper(opts);
     if (pStatus)
@@ -65,9 +64,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioFile(DTWAIN_SOURCE Source, LPCTSTR l
                                                   LONG nMaxAudioClips, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpszFile, lFileFlags, nMaxAudioClips, bShowUI, bCloseSource, pStatus))
-    auto* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
     lFileFlags &= ~DTWAIN_USELIST;
-    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pSource->GetDTWAINHandle()).setSource(Source).
+    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).
                                 setFileName(lpszFile).setFileFlags(lFileFlags).
                                 setMaxPages(nMaxAudioClips).setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setAcquireType(ACQUIREAUDIOFILE);
     const bool bRetval = AcquireFileHelper(opts, ACQUIREAUDIOFILE);

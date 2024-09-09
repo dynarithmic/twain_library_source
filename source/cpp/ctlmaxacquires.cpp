@@ -30,15 +30,14 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetMaxAcquisitions(DTWAIN_SOURCE Source, LONG MaxAcquires)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, MaxAcquires))
-    CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const auto pHandle = p->GetDTWAINHandle();
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
     bool bRetval = false;
     // Check if array is of the correct type
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return MaxAcquires < 0L && MaxAcquires != DTWAIN_MAXACQUIRE; },
         DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     bRetval = true;
-    p->SetMaxAcquisitions(MaxAcquires);
-    p->SetUIMaxAcquisitions(MaxAcquires);
+    pSource->SetMaxAcquisitions(MaxAcquires);
+    pSource->SetUIMaxAcquisitions(MaxAcquires);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -46,8 +45,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetMaxAcquisitions(DTWAIN_SOURCE Source, LONG Ma
 LONG DLLENTRY_DEF DTWAIN_GetMaxAcquisitions(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const LONG Ret = p->GetMaxAcquisitions();
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    const LONG Ret = pSource->GetMaxAcquisitions();
     LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
 }
@@ -55,8 +54,8 @@ LONG DLLENTRY_DEF DTWAIN_GetMaxAcquisitions(DTWAIN_SOURCE Source)
 LONG DLLENTRY_DEF DTWAIN_GetMaxPagesToAcquire(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    CTL_ITwainSource* p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const LONG Ret = p->GetMaxAcquireCount();
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    const LONG Ret = pSource->GetMaxAcquireCount();
     LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE2)
 }

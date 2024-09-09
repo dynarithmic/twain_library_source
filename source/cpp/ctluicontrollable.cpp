@@ -30,8 +30,7 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    CTL_ITwainSource* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const auto pHandle = pSource->GetDTWAINHandle();
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
 
     // Open the source (if source is closed)
     bool bSourceOpen = false;

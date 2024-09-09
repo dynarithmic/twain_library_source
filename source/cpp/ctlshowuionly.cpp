@@ -33,13 +33,12 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    CTL_ITwainSource *pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const auto pHandle = pSource->GetDTWAINHandle();
-
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto pTheSource = pSource;
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return DTWAIN_IsSourceAcquiring(Source); },
     DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return pSource->IsUIOpen(); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return pTheSource->IsUIOpen(); },
     DTWAIN_ERR_UI_ALREADY_OPENED, false, FUNC_MACRO);
 
     // Open the source (if source is closed)
@@ -89,7 +88,7 @@ void dynarithmic::LLSetupUIOnly(CTL_ITwainSource* pSource)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ForceScanOnNoUI(DTWAIN_SOURCE Source, BOOL bSet)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, bSet))
-    CTL_ITwainSource* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
 
     // return the file name that would be acquired
     pSource->SetForceScanOnNoUI(bSet ? true : false);

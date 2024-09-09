@@ -29,7 +29,7 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetEOJDetectValue(DTWAIN_SOURCE Source, LONG nValue)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nValue))
-    CTL_ITwainSource* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
     pSource->SetEOJDetectedValue(nValue);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)

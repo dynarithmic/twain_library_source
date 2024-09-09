@@ -33,15 +33,15 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LONG DeviceEvents)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, DeviceEvents))
-    CTL_ITwainSource* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const auto pHandle = pSource->GetDTWAINHandle();
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto pTheSource = pSource;
 
     // See if Source is opened
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(pSource); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(pTheSource); },
                                       DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
     // See if Source supports the DEVICEEVENTS capability
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !DTWAIN_IsCapSupported(pSource, DTWAIN_CV_CAPDEVICEEVENT); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !DTWAIN_IsCapSupported(pTheSource, DTWAIN_CV_CAPDEVICEEVENT); },
                                       DTWAIN_ERR_DEVICEEVENT_NOT_SUPPORTED, false, FUNC_MACRO);
 
     // Set the notifications
@@ -88,18 +88,17 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceNotifications(DTWAIN_SOURCE Source, LPLONG lpDeviceEvents)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpDeviceEvents))
-    CTL_ITwainSource* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const auto pHandle = pSource->GetDTWAINHandle();
-
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto pTheSource = pSource;
     DTWAIN_ARRAY Array = nullptr;
     DTWAINArrayPtr_RAII raii(&Array);
 
     // See if Source is opened
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !CTL_TwainAppMgr::IsSourceOpen(pSource); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !CTL_TwainAppMgr::IsSourceOpen(pTheSource); },
         DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
     // See if Source supports the DEVICEEVENTS capability
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !DTWAIN_IsCapSupported(pSource, DTWAIN_CV_CAPDEVICEEVENT); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !DTWAIN_IsCapSupported(pTheSource, DTWAIN_CV_CAPDEVICEEVENT); },
                                         DTWAIN_ERR_DEVICEEVENT_NOT_SUPPORTED, false, FUNC_MACRO);
 
     const bool bRet = DTWAIN_GetCapValues(Source, DTWAIN_CV_CAPDEVICEEVENT, DTWAIN_CAPGETCURRENT, &Array) ? true : false;
@@ -123,7 +122,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceNotifications(DTWAIN_SOURCE Source, LPL
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEvent(DTWAIN_SOURCE Source, LPLONG lpEvent)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpEvent))
-    CTL_ITwainSource* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
     const CTL_DeviceEvent DeviceEvent = pSource->GetDeviceEvent();
     *lpEvent = DeviceEvent.GetEvent() + 1;
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -149,9 +148,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventEx(DTWAIN_SOURCE Source, LPLONG lp
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventInfo(DTWAIN_SOURCE Source, LONG nWhichInfo, LPVOID pValue)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nWhichInfo, pValue))
-
-    CTL_ITwainSource* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const auto pHandle = pSource->GetDTWAINHandle();
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
 
     const CTL_DeviceEvent DeviceEvent = pSource->GetDeviceEvent();
     switch (nWhichInfo)

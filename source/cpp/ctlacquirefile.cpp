@@ -54,8 +54,7 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
         DTWAIN_SetLastError(DTWAIN_ERR_FILE_FORMAT);
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
     }
-    auto* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    auto pHandle = pSource->GetDTWAINHandle();
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
 
     DTWAIN_ARRAY tempNames = nullptr;
     DTWAINArrayPtr_RAII tempRAII(&tempNames);
@@ -83,7 +82,7 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
 
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !bRetval; }, DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
 
-    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pSource->GetDTWAINHandle()).setSource(Source).setFileType(lFileType).setFileFlags(lFileFlags | DTWAIN_USELIST).
+    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).setFileType(lFileType).setFileFlags(lFileFlags | DTWAIN_USELIST).
                 setFileList(arrayToUse).setPixelType(PixelType).setMaxPages(lMaxPages).setShowUI(bShowUI ? true : false).
                 setRemainOpen(!(bCloseSource ? true : false));
 
@@ -105,9 +104,7 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFile(DTWAIN_SOURCE Source,
                                                   LPLONG pStatus)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpszFile, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus))
-
-    auto* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    auto pHandle = pSource->GetDTWAINHandle();
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
 
     // Check if the file format is valid
     auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
@@ -131,13 +128,10 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFile(DTWAIN_SOURCE Source,
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileAutoIncrement(DTWAIN_SOURCE Source, LONG nValue, DTWAIN_BOOL bResetOnAcquire, DTWAIN_BOOL bSet)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nValue, bResetOnAcquire, bSet))
-    auto* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
     pSource->SetFileAutoIncrement(bSet ? true : false, nValue);
     pSource->SetFileAutoIncrementFlags(bResetOnAcquire ? DTWAIN_INCREMENT_DYNAMIC : DTWAIN_INCREMENT_DEFAULT);
-    /*    if ( nInitial < -1 )
-    nInitial = 0;                                    */
-    pSource->SetFileAutoIncrementBase(0); //nInitial );
+    pSource->SetFileAutoIncrementBase(0);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
 }

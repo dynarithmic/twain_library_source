@@ -32,10 +32,8 @@ DTWAIN_ARRAY  DLLENTRY_DEF DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source, LONG 
     LPLONG pStatus)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, nTransferMode, bDiscardDibs, bShowUI, bCloseSource, pStatus))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    VerifySourceHandle(pHandle, Source);
-
-    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(GetDTWAINHandle_Internal()).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
         setTransferMode(nTransferMode).setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).
         setAcquireType(ACQUIRECLIPBOARD).setDiscardDibs(bDiscardDibs ? true : false);
 
