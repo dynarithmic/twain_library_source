@@ -205,7 +205,7 @@ void CTL_ErrorStructDecoder::StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDe
            CTL_StaticData::GetTwainNameFromResource(CTL_StaticData::GetDGResourceID(),static_cast<int>(nDG)) << ", " <<
            CTL_StaticData::GetTwainNameFromResource(CTL_StaticData::GetDATResourceID(),static_cast<int>(nDAT)) << ", " <<
            CTL_StaticData::GetTwainNameFromResource(CTL_StaticData::GetMSGResourceID(),static_cast<int>(nMSG)) << ", " <<
-           "TW_MEMREF=" << Data << "H) called\n";
+           "TW_MEMREF=" << Data << "H) " << GetResourceStringFromMap(IDS_LOGMSG_CALLEDTEXT) << "\n";
     s1 = sBuffer.str();
 
     std::string pSourceStr;

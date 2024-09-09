@@ -134,12 +134,12 @@ void LogExceptionToConsole(LPCSTR fname, const char* sAdditionalText)
             return;
         std::ostringstream strm;
         strm << boost::format("**** DTWAIN %1% ****.  %2%: %3%\n") %
-            pHandle->m_mapResourceStrings[IDS_LOGMSG_EXCEPTERRORTEXT].c_str() %
-            pHandle->m_mapResourceStrings[IDS_LOGMSG_MODULETEXT].c_str() % fname;
+            GetResourceStringFromMap(IDS_LOGMSG_EXCEPTERRORTEXT).c_str() %
+            GetResourceStringFromMap(IDS_LOGMSG_MODULETEXT).c_str() % fname;
         if (sAdditionalText)
             strm << "\nAdditional Information: " << sAdditionalText;
         #ifdef _WIN32
-        MessageBoxA(nullptr, strm.str().c_str(), pHandle->m_mapResourceStrings[IDS_LOGMSG_EXCEPTERRORTEXT].c_str(), MB_ICONSTOP);
+        MessageBoxA(nullptr, strm.str().c_str(), GetResourceStringFromMap(IDS_LOGMSG_EXCEPTERRORTEXT).c_str(), MB_ICONSTOP);
         #else
            std::cout << strm.str() << '\n';
         #endif

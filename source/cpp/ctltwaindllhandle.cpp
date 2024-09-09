@@ -87,14 +87,23 @@ void CTL_TwainDLLHandle::InitializeResourceRegistry()
         m_ResourceRegistry.insert({ default_values[i], filesys::exists(GetResourceFileNameA(default_values[i].c_str(), DTWAINLANGRESOURCEFILE)) });
     }
 
-std::pair<CTL_ResourceRegistryMap::iterator, bool> CTL_TwainDLLHandle::AddResourceToRegistry(LPCSTR pLangDLL)
+std::pair<CTL_ResourceRegistryMap::iterator, bool> CTL_TwainDLLHandle::AddResourceToRegistry(LPCSTR pLangDLL, bool bClear)
 {
-    std::string rName = pLangDLL;
-    m_ResourceRegistry.erase(rName);
-    return m_ResourceRegistry.insert({ rName, filesys::exists(GetResourceFileNameA(pLangDLL, DTWAINLANGRESOURCEFILE)) });
+    if (bClear)
+    {
+        m_ResourceRegistry.erase(pLangDLL);
+        return m_ResourceRegistry.insert({ pLangDLL, filesys::exists(GetResourceFileNameA(pLangDLL, DTWAINLANGRESOURCEFILE)) });
+    }
+    auto iter = m_ResourceRegistry.find(pLangDLL);
+    if (iter != m_ResourceRegistry.end())
+        return { iter, true };
+    return { iter, false };
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
+CTL_StringToMapLongToStringMap CTL_StaticData::s_AllLoadedResourcesMap;
+CTL_PairToStringMap         CTL_StaticData::s_ResourceCache;
+std::string                 CTL_StaticData::s_CurrentResourceKey;
 CTL_GeneralResourceInfo     CTL_StaticData::s_ResourceInfo;
 CTL_PDFMediaMap             CTL_StaticData::s_PDFMediaMap;
 CTL_TwainLongToStringMap    CTL_StaticData::s_TwainCountryMap;
@@ -131,6 +140,19 @@ CLogSystem                  CTL_StaticData::s_appLog;
 bool                        CTL_StaticData::s_ResourcesInitialized = false;
 ImageResamplerMap           CTL_StaticData::s_ImageResamplerMap;
 SourceStatusMap             CTL_StaticData::s_SourceStatusMap;
+
+CTL_LongToStringMap* CTL_StaticData::GetLanguageResource(std::string sLang)
+{
+    auto iter = s_AllLoadedResourcesMap.find(sLang);
+    if (iter != s_AllLoadedResourcesMap.end())
+        return &iter->second;
+    return nullptr;
+}
+
+CTL_LongToStringMap* CTL_StaticData::GetCurrentLanguageResource()
+{
+    return CTL_StaticData::GetLanguageResource(s_CurrentResourceKey);
+}
 
 ///////////////////////////////////////////////////////////////////////////
 void CTL_TwainDLLHandle::NotifyWindows(UINT /*nMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/)
