@@ -958,7 +958,14 @@ void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL)
     if (!LoadLanguageResourceA(szStr, pHandle->GetResourceRegistry()))
     {
         // Use the English resources by default
-        LoadLanguageResourceA("english", pHandle->GetResourceRegistry());
+        if (!LoadLanguageResourceA("english", pHandle->GetResourceRegistry()))
+        {
+            // Too bad.  Last chance -- load english resources directly from internal rc.
+            // Note that unlike the text resources that should have been loaded, 
+            // these internal resources should not be able to be edited without
+            // corrupting the DLL in terms of checking the hash value of the DLL file.
+            LoadLanguageResourceFromRC();
+        }
     }
     // Load error flags if defined
     struct ProfileSettingsInt
@@ -2191,6 +2198,9 @@ CTL_StringType dynarithmic::GetVersionString()
 
         strm << "\nUsing Resource file (twaininfo.txt) version: " << StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetResourceVersion());
         strm << "\nResource file path: " << StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetResourcePath());
+        strm << "\nText Resource Language: " << StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetGeneralResourceInfo().sResourceName);
+        if (CTL_StaticData::GetGeneralResourceInfo().bIsFromRC)
+            strm << " (Text resources are directly from DTWAIN DLL and not from a text resource file)";
         CTL_StaticData::s_VersionString = StringConversion::Convert_Ansi_To_Native(strm.str());
         return CTL_StaticData::s_VersionString;
     }
@@ -2208,7 +2218,7 @@ void WriteVersionToLog()
         if (sDSMPath.empty())
             sDSMPath = _T("(unknown or not queried)");
         sDSMPath = _T("Active DSM Path: ") + sDSMPath;
-        sVer += _T("\n") + sWinVer + sDSMPath + _T("\n");
+        sVer += _T("\n") + sWinVer + sDSMPath + _T("\n\n");
         #ifdef _WIN32
         // All log messages must be ANSI
         ansiVer = StringConversion::Convert_Native_To_Ansi(sVer);

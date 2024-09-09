@@ -459,6 +459,32 @@ namespace dynarithmic
         return open;
     }
 
+    bool LoadLanguageResourceFromRC()
+    {
+        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        pHandle->m_mapResourceStrings.clear();
+        std::string::value_type sVersion[100];
+        DTWAIN_GetShortVersionStringA(sVersion, 100);
+        // Assume resource ID's are numbered from 0 to 20000
+        char szBuffer[DTWAIN_USERRES_MAXSIZE + 1];
+        for (int i = 0; i < DTWAIN_USERRES_START; ++i)
+        {
+            if (::LoadStringA(CTL_StaticData::s_DLLInstance, i, szBuffer, DTWAIN_USERRES_MAXSIZE))
+            {
+                std::string descr = szBuffer;
+                StringWrapperA::TrimAll(descr);
+                descr = StringWrapperA::ReplaceAll(descr, "{short_version}", sVersion);
+                descr = StringWrapperA::ReplaceAll(descr, "{company_name}", DTWAIN_VERINFO_COMPANYNAME);
+                descr = StringWrapperA::ReplaceAll(descr, "{copyright}", DTWAIN_VERINFO_LEGALCOPYRIGHT);
+                pHandle->m_mapResourceStrings.insert({ i, descr });
+            }
+        }
+        auto& info = CTL_StaticData::GetGeneralResourceInfo();
+        info.sResourceName = _T("english");
+        info.bIsFromRC = true;
+        return true;
+    }
+
     std::string GetResourceFileNameA(LPCSTR lpszName, LPCTSTR szPrefix)
     {
         const auto resPath = createResourceFileName(szPrefix);
@@ -476,6 +502,12 @@ namespace dynarithmic
                 LOG_FUNC_EXIT_NONAME_PARAMS(false)
         }
         const bool retVal = LoadLanguageResourceA(lpszName);
+        if (retVal)
+        {
+            auto& info = CTL_StaticData::GetGeneralResourceInfo();
+            info.sResourceName = StringConversion::Convert_AnsiPtr_To_Native(lpszName);
+            info.bIsFromRC = false;
+        }
         LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
         CATCH_BLOCK(false)
     }

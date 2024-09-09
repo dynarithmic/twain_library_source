@@ -510,8 +510,15 @@ namespace dynarithmic
     typedef std::unordered_map<int32_t, std::string> CTL_ErrorToExtraInfoMap;
     typedef std::unordered_map<std::string, unsigned long> CTL_ThreadMap;
 
+    struct CTL_GeneralResourceInfo
+    {
+        CTL_StringType sResourceName;
+        bool bIsFromRC = false;
+    };
+
     struct CTL_StaticData
     {
+        static CTL_GeneralResourceInfo         s_ResourceInfo;
         static CTL_PDFMediaMap          s_PDFMediaMap;
         static CTL_TwainLongToStringMap s_TwainCountryMap;
         static CTL_TwainNameMap         s_TwainNameMap;
@@ -519,7 +526,7 @@ namespace dynarithmic
         static CTL_TwainConstantsMap s_TwainConstantsMap;
         static CTL_TwainLongToStringMap s_TwainLanguageMap;
         static bool s_bCheckHandles;
-        static CTL_StringType  s_strResourcePath;  // path to the DTWAIN resource strings
+        static CTL_StringType           s_strResourcePath;  // path to the DTWAIN resource strings
         static CTL_StringType           s_DLLPath;
         static CTL_StringType           s_sINIPath;
         static bool                     s_multipleThreads;
@@ -548,6 +555,7 @@ namespace dynarithmic
         static SourceStatusMap          s_SourceStatusMap;
         static CTL_StringType           s_ResourceVersion;
 
+        static CTL_GeneralResourceInfo& GetGeneralResourceInfo() { return s_ResourceInfo; }
         static CTL_PDFMediaMap& GetPDFMediaMap() { return s_PDFMediaMap; }
         static CTL_TwainLongToStringMap& GetTwainCountryMap() { return s_TwainCountryMap; }
         static CTL_TwainNameMap& GetTwainNameMap() { return s_TwainNameMap; }
