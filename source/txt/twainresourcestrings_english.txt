@@ -209,6 +209,7 @@
 3015 returned error code
 3016 Error
 3017 Temporary file directory does not exist
+3018 called
 5000 Courier
 5001 Courier-Bold
 5002 Courier-BoldOblique

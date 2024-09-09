@@ -202,12 +202,13 @@
 3009 Modulo
 3010 Nenhuma informação de parâmetro
 3011 Erro ao obter informações para a função
-3012 Input
+3012 Entrada
 3013 Saída: código de retorno do DSM
 3014 No information for 
 3015 returned error code
 3016 Erro
 3017 O diretório de arquivos temporários não existe
+3018 foi chamado
 5000 Courier
 5001 Courier-Bold
 5002 Courier-BoldOblique

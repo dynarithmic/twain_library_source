@@ -251,7 +251,7 @@
 #define DTWAIN_FONT_SYMBOL_               (DTWAIN_FONT_START_ + 12)
 #define DTWAIN_FONT_ZAPFDINGBATS_         (DTWAIN_FONT_START_ + 13)
 
-// Select Source dialog contants
+// Select Source dialog constants
 #define IDS_SELECT_SOURCE_TEXT              3000
 #define IDS_SELECT_TEXT                     3001
 #define IDS_CANCEL_TEXT                     3002
@@ -271,8 +271,9 @@
 #define IDS_LOGMSG_RETURNEDERRORTEXT        (IDS_LOGMSG_START + 10)
 #define IDS_LOGMSG_ERRORTEXT                (IDS_LOGMSG_START + 11)
 #define IDS_LOGMSG_TEMPFILENOTEXISTTEXT     (IDS_LOGMSG_START + 12)
+#define IDS_LOGMSG_CALLEDTEXT               (IDS_LOGMSG_START + 13)
 
-#define IDS_LOGMSG_END                      (IDS_LOGMSG_START + 12)
+#define IDS_LOGMSG_END                      (IDS_LOGMSG_START + 13)
 
 #define IDS_ErrCCLowMemory          TWAIN_ERR_LOW_MEMORY_
 #define IDS_ErrCCFalseAlarm         TWAIN_ERR_FALSE_ALARM_
