@@ -56,24 +56,22 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsOpenSourcesOnSelect(VOID_PROTOTYPE)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-
-    CTL_ITwainSource* pTheSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const auto pHandle = pTheSource->GetDTWAINHandle();
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
 
     // If source already opened, just return TRUE.
-    if (pTheSource->IsOpened())
+    if (pSource->IsOpened())
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
 
     // Set up the opening of the source
     bool bRetval = false;
 
     // Go through TWAIN to open the source
-    bRetval = CTL_TwainAppMgr::OpenSource(pHandle->m_pTwainSession, pTheSource);
+    bRetval = CTL_TwainAppMgr::OpenSource(pHandle->m_pTwainSession, pSource);
     if (bRetval)
     {
         // Set up status of the source 
         auto& sourcemap = CTL_StaticData::GetSourceStatusMap();
-        auto iter = sourcemap.insert({ pTheSource->GetProductNameA(), {} }).first;
+        auto iter = sourcemap.insert({ pSource->GetProductNameA(), {} }).first;
         iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, true);
         iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, false);
     }
@@ -90,27 +88,27 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
         pHandle->m_aFeederSources.insert(Source);
 
     // Get the supported transfer types
-    pTheSource->SetSupportedTransferMechanisms(CTL_TwainAppMgr::EnumTransferMechanisms(pTheSource));
+    pSource->SetSupportedTransferMechanisms(CTL_TwainAppMgr::EnumTransferMechanisms(pSource));
 
     // See if the source is one that has a bug in the MSG_XFERREADY sending on the 
     // TWAIN message queue
-    DetermineIfSpecialXfer(pTheSource);
+    DetermineIfSpecialXfer(pSource);
 
     // Get all the caps supported
     DTWAIN_ARRAY arr = nullptr;
     DTWAINArrayPtr_RAII raii(&arr);
-    CTL_TwainAppMgr::GatherCapabilityInfo(pTheSource);
+    CTL_TwainAppMgr::GatherCapabilityInfo(pSource);
 
     // Cache the pixel types and bit depths
-    LogAndCachePixelTypes(pTheSource);
+    LogAndCachePixelTypes(pSource);
 
     // get the list of caps created
-    CapList& theCapList = pTheSource->GetCapSupportedList();
+    CapList& theCapList = pSource->GetCapSupportedList();
 
     // if any logging is turned on, then get the capabilities and log the values
     if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
     {
-        CTL_StringType msg = _T("Source: ") + pTheSource->GetProductName() + _T(" has been opened successfully");
+        CTL_StringType msg = _T("Source: ") + pSource->GetProductName() + _T(" has been opened successfully");
         CTL_TwainAppMgr::WriteLogInfo(msg);
 
         // Log the caps if logging is turned on
@@ -126,7 +124,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
         CTL_StringStreamType strm;
         strm << theCapList.size();
         sName = _T("\n\nSource \"");
-        sName += pTheSource->GetProductName();
+        sName += pSource->GetProductName();
         sName += _T("\" contains the following ");
         sName += strm.str() + _T(" capabilities: \n{\n");
         if (theCapList.empty())
@@ -148,8 +146,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceOpen(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const DTWAIN_BOOL bRet = CTL_TwainAppMgr::IsSourceOpen(p);
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    const DTWAIN_BOOL bRet = CTL_TwainAppMgr::IsSourceOpen(pSource);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }

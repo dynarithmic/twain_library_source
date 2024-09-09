@@ -224,8 +224,8 @@ DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSource2Ex(HWND hWndParent,
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceSelected(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    CTL_ITwainSource* p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    bool bRet = p->IsSelected();
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    bool bRet = pSource->IsSelected();
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(FALSE)
 }
@@ -233,10 +233,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceSelected(DTWAIN_SOURCE Source)
 DTWAIN_SOURCE dynarithmic::SourceSelect(const SourceSelectionOptions& options)
 {
     LOG_FUNC_ENTRY_PARAMS((options))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, NULL, FUNC_MACRO);
+    auto [pHandle, p] = VerifySourceHandle(nullptr, DTWAIN_TEST_HANDLE);
 
     // Start a session if not already started by app
     if (!pHandle->m_bSessionAllocated)
@@ -429,14 +426,15 @@ DTWAIN_SOURCE dynarithmic::DTWAIN_LLSelectDefaultSource(const SourceSelectionOpt
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDefaultSource(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
+
     bool bRet = false;
-    bRet = CTL_TwainAppMgr::SetDefaultSource(p);
+    bRet = CTL_TwainAppMgr::SetDefaultSource(pSource);
     // Load the resources
     CSimpleIniA customProfile;
     CTL_StringType fullDirectory = dynarithmic::GetDTWAININIPath();
     customProfile.LoadFile(fullDirectory.c_str());
-    customProfile.SetValue("Sources", "Default", p->GetProductNameA().c_str());
+    customProfile.SetValue("Sources", "Default", pSource->GetProductNameA().c_str());
     customProfile.SaveFile(fullDirectory.c_str());
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)

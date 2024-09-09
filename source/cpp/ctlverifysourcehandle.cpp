@@ -34,29 +34,51 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CheckHandles(DTWAIN_BOOL bCheck)
     CATCH_BLOCK(false)
 }
 
-CTL_ITwainSource* dynarithmic::VerifySourceHandle(DTWAIN_HANDLE DLLHandle,  DTWAIN_SOURCE Source )
+std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> dynarithmic::VerifySourceHandle(DTWAIN_SOURCE Source, int Testing/* = DTWAIN_TEST_HANDLE | DTWAIN_TEST_SOURCE*/)
 {
-    LOG_FUNC_ENTRY_PARAMS((DLLHandle, Source))
-    CTL_ITwainSource *p;
-    if ( !CTL_StaticData::IsCheckHandles())
-        p = static_cast<CTL_ITwainSource *>(Source);
+    CTL_ITwainSource *pSource = nullptr;
+    CTL_TwainDLLHandle* pHandle = nullptr;
+    bool doThrow = !(Testing & DTWAIN_TEST_NOTHROW);
+    if (!CTL_StaticData::IsCheckHandles())
+    {
+        pSource = static_cast<CTL_ITwainSource*>(Source);
+        return { static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal()), pSource };
+    }
     else
     {
-        const auto pHandle = static_cast<CTL_TwainDLLHandle *>(DLLHandle);
-        // See if DLL Handle exists
-        DTWAIN_Check_Bad_Handle_Ex(pHandle, nullptr, FUNC_MACRO);
-        p = static_cast<CTL_ITwainSource *>(Source);
+        bool bHandleGood = true;
+        if (Testing & DTWAIN_TEST_HANDLE)
+        {
+            pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+            bHandleGood = DTWAIN_Check_Bad_Handle_Ex<std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*>>(pHandle, { nullptr, nullptr }, FUNC_MACRO, false);
+        }
+        if ( !bHandleGood )
+        {
+            if (doThrow )
+                throw DTWAIN_ERR_BAD_HANDLE;
+            return { nullptr, nullptr };
+        }
+        if ( Testing & DTWAIN_TEST_SOURCE )
+        {
+            if ( !pHandle )
+                pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
 
-        // Check if Source is valid
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !p ||
-                                          !CTL_TwainAppMgr::IsValidTwainSource(pHandle->m_pTwainSession, p); },
-                                          DTWAIN_ERR_BAD_SOURCE, NULL, FUNC_MACRO);
+            if (!pHandle)
+            {
+                if ( doThrow )
+                    throw DTWAIN_ERR_BAD_HANDLE;
+                return { nullptr, nullptr };
+            }
+
+            pSource = static_cast<CTL_ITwainSource*>(Source);
+            if (!pSource || !CTL_TwainAppMgr::IsValidTwainSource(pHandle->m_pTwainSession, pSource))
+            {
+                if ( doThrow )
+                    throw DTWAIN_ERR_BAD_SOURCE;
+                return { nullptr, nullptr };
+            }
+        }
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(p)
-    CATCH_BLOCK_END
-    catch (...)
-    {
-        throw nullptr;
-    }
+    return { pHandle, pSource };
 }
 

@@ -74,9 +74,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfo(DTWAIN_SOURCE Source,
                                             LPLONG Compression)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, XResolution, YResolution, Width, Length, NumSamples, BitsPerSample,BitsPerPixel, Planar, PixelType, Compression))
-    CTL_ITwainSource* p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const auto pHandle = p->GetDTWAINHandle();
-
+    auto [pHandle, p] = VerifySourceHandle(Source);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(p); },
     DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 

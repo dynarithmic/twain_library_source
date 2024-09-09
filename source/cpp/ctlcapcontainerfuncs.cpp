@@ -92,12 +92,12 @@ static LONG PerformCapContainerTest(CTL_TwainDLLHandle* pHandle, CTL_ITwainSourc
 LONG DLLENTRY_DEF DTWAIN_GetCapContainer(DTWAIN_SOURCE Source, LONG nCap, LONG lCapType)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nCap, lCapType))
-    auto* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const auto pHandle = pSource->GetDTWAINHandle();
-
     const DTWAIN_BOOL bCapSupported = DTWAIN_IsCapSupported(Source, nCap);
     if (!bCapSupported)
         LOG_FUNC_EXIT_NONAME_PARAMS(0L)
+    auto pSource = static_cast<CTL_ITwainSource*>(Source);
+    auto pHandle = pSource->GetDTWAINHandle();
+
     const CTL_CapInfoArrayPtr pArray = GetCapInfoArray(pHandle, pSource);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !pArray; }, DTWAIN_ERR_NO_CAPS_DEFINED, 0L, FUNC_MACRO);
 
@@ -152,11 +152,8 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainer(DTWAIN_SOURCE Source, LONG nCap, LONG l
 LONG DLLENTRY_DEF DTWAIN_GetCapDataType(DTWAIN_SOURCE Source, LONG nCap)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nCap))
+    auto [pHandle, pSource] = VerifySourceHandle(nullptr, DTWAIN_TEST_HANDLE);
     const auto nThisCap = static_cast<TW_UINT16>(nCap);
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, -1L, FUNC_MACRO);
     if (nThisCap >= CAP_CUSTOMBASE)
     {
         if (!Source)
@@ -174,7 +171,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCapDataType(DTWAIN_SOURCE Source, LONG nCap)
 LONG GetCustomCapDataType(DTWAIN_SOURCE Source, TW_UINT16 nCap)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nCap))
-    auto* p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    auto p = static_cast<CTL_ITwainSource*>(Source);
     auto pHandle = p->GetDTWAINHandle();
     if (!p->IsCapInSupportedList(static_cast<TW_UINT16>(nCap)))
     {
@@ -204,7 +201,7 @@ LONG GetCustomCapDataType(DTWAIN_SOURCE Source, TW_UINT16 nCap)
 LONG DLLENTRY_DEF DTWAIN_GetCapArrayType(DTWAIN_SOURCE Source, LONG nCap)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nCap))
-        const LONG lDataType = DTWAIN_GetCapDataType(Source, nCap);
+    const LONG lDataType = DTWAIN_GetCapDataType(Source, nCap);
     if (lDataType == DTWAIN_FAILURE1)
         LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
     const TW_UINT16 nDataType = static_cast<TW_UINT16>(lDataType);

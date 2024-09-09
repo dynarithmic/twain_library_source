@@ -32,11 +32,10 @@ static DTWAIN_BOOL DTWAIN_CloseSourceUnconditional(CTL_TwainDLLHandle *pHandle, 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CloseSource(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const auto pHandle = p->GetDTWAINHandle();
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
     bool bRetval = false;
-    const auto sProductName = p->GetProductName();
-    bRetval = DTWAIN_CloseSourceUnconditional(pHandle, p)?true:false;
+    const auto sProductName = pSource->GetProductName();
+    bRetval = DTWAIN_CloseSourceUnconditional(pHandle, pSource)?true:false;
     if (bRetval)
     {
         pHandle->m_mapStringToSource.erase(sProductName);
@@ -60,9 +59,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CloseSource(DTWAIN_SOURCE Source)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CloseSourceUI(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const auto pHandle = p->GetDTWAINHandle();
-    CTL_TwainAppMgr::EndTwainUI(pHandle->m_pTwainSession, p);
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    CTL_TwainAppMgr::EndTwainUI(pHandle->m_pTwainSession, pSource);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
 }

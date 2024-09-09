@@ -57,12 +57,11 @@ static bool GetCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, typename CapArray
                                  GetCapValuesFn /*capFn*/, const std::string& func, const std::string& paramLog)
 {
     DTWAIN_ARRAY ArrayValues = nullptr;
-
+    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     const LONG retVal = EnumCapInternal(Source, Cap, &ArrayValues, false, GetCurrentCapValues, func, paramLog);
-    DTWAINArrayLL_RAII arr(ArrayValues);
+    DTWAINArrayLowLevel_RAII arr(pHandle, ArrayValues);
     if (retVal > 0)
     {
-        const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
         auto& vOut = pHandle->m_ArrayFactory->underlying_container_t<typename CapArrayType::value_type>(ArrayValues);
         *value = vOut[0];
         return true;
@@ -781,10 +780,8 @@ static bool GetDoubleCap( DTWAIN_SOURCE Source, LONG lCap, double *pValue )
 static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, LONG GetType, DTWAIN_BOOL bExpandRange)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pArray, lCap, bExpandRange))
-
-    // Get the handle
-    CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const auto pHandle = p->GetDTWAINHandle();
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto p = pSource;
     LONG nValues = 0;
 
     // See if Source is opened

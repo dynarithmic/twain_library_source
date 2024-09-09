@@ -61,9 +61,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapabili
 
     static constexpr size_t DataTypeArraySize = std::size(DataTypeArray);
     static constexpr size_t ContainerArraySize = std::size(ContainerTypeArray);
-
-    CTL_ITwainSource* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const auto pHandle = pSource->GetDTWAINHandle();
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
 
     if (!CTL_TwainAppMgr::IsSourceOpen(pSource))
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, [] {return true; }, DTWAIN_ERR_SOURCE_NOT_OPEN, nullptr, FUNC_MACRO);
@@ -97,8 +95,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapabili
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsCapSupported(DTWAIN_SOURCE Source, LONG lCapability)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCapability))
-    CTL_ITwainSource* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const auto pHandle = pSource->GetDTWAINHandle();
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
 
     // Check if the source is open
     if (!CTL_TwainAppMgr::IsSourceOpen(pSource))

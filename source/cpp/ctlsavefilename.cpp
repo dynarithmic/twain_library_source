@@ -32,8 +32,8 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetSaveFileName(DTWAIN_SOURCE Source, LPCTSTR fileName)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, fileName))
-    CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    p->SetActualFileName(fileName);
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    pSource->SetActualFileName(fileName);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(-1)
 }
@@ -41,8 +41,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetSaveFileName(DTWAIN_SOURCE Source, LPCTSTR fi
 LONG DLLENTRY_DEF DTWAIN_GetSaveFileName(DTWAIN_SOURCE Source, LPTSTR fileName, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, fileName, nMaxLen))
-    CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const LONG nTotalBytes = StringWrapper::CopyInfoToCString(p->GetActualFileName(), fileName, nMaxLen);
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    const LONG nTotalBytes = StringWrapper::CopyInfoToCString(pSource->GetActualFileName(), fileName, nMaxLen);
     LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)
     CATCH_BLOCK_LOG_PARAMS(-1)
 }
@@ -50,7 +50,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSaveFileName(DTWAIN_SOURCE Source, LPTSTR fileName, 
 LONG DLLENTRY_DEF DTWAIN_GetCurrentFileName(DTWAIN_SOURCE Source, LPTSTR szName, LONG MaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, szName, MaxLen))
-    CTL_ITwainSource* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
     const CTL_StringType s = pSource->GetLastAcquiredFileName();
     const size_t sLen = s.length()  + 1;
     if (!szName)

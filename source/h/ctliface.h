@@ -787,14 +787,14 @@ namespace dynarithmic
         }
     }
 
+    #define DTWAIN_TEST_HANDLE  1
+    #define DTWAIN_TEST_SOURCE  2
+    #define DTWAIN_TEST_NOTHROW 4
+
     CTL_TwainDLLHandle* FindHandle(HWND hWnd, bool bIsDisplay);
     CTL_TwainDLLHandle* FindHandle(HINSTANCE hInst);
-    CTL_ITwainSource* VerifySourceHandle( DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source );
-
-
-
-    int GetResolutions(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, void* pArray,
-                       CTL_EnumGetType GetType);
+    std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> VerifySourceHandle(DTWAIN_SOURCE Source, int Testing = DTWAIN_TEST_HANDLE | DTWAIN_TEST_SOURCE );
+    int GetResolutions(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, void* pArray,CTL_EnumGetType GetType);
     bool GetImageSize( DTWAIN_HANDLE DLLHandle,
                        DTWAIN_SOURCE Source,
                        double *pLeft,
@@ -1195,6 +1195,7 @@ namespace dynarithmic
         DTWAINArrayLowLevel_DestroyTraitsEx traits;
         DTWAINArrayLowLevel_RAII(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY a) : m_pHandle(pHandle), m_Array(a), m_bDestroy(true) {}
         void SetDestroy(bool bSet) { m_bDestroy = bSet;  }
+        void SetArray(DTWAIN_ARRAY arr) { m_Array = arr;  }
         ~DTWAINArrayLowLevel_RAII() { traits(*this); }
     };
 

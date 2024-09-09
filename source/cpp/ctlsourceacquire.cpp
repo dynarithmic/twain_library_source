@@ -91,8 +91,8 @@ void CTL_TwainDLLHandle::EraseAcquireNum(DTWAIN_ACQUIRE nNum)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDoublePageCountOnDuplex(DTWAIN_SOURCE Source, DTWAIN_BOOL bDoubleCount)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, bDoubleCount))
-    CTL_ITwainSource* p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    p->SetDoublePageCountOnDuplex(bDoubleCount);
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    pSource->SetDoublePageCountOnDuplex(bDoubleCount);
     LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -100,17 +100,16 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDoublePageCountOnDuplex(DTWAIN_SOURCE Source,
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsDoublePageCountOnDuplex(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    CTL_ITwainSource* p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    LOG_FUNC_EXIT_NONAME_PARAMS(p->IsDoublePageCountOnDuplex())
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    LOG_FUNC_EXIT_NONAME_PARAMS(pSource->IsDoublePageCountOnDuplex())
     CATCH_BLOCK_LOG_PARAMS(FALSE)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceAcquiring(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    const CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    // out of a TWAIN loop testing
-    const bool Ret = p->IsAcquireAttempt();
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    const bool Ret = pSource->IsAcquireAttempt();
     LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -118,10 +117,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceAcquiring(DTWAIN_SOURCE Source)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceAcquiringEx(DTWAIN_SOURCE Source, BOOL bUIOnly)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, bUIOnly))
-    CTL_ITwainSource* p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const auto pHandle = p->GetDTWAINHandle();
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
     if (bUIOnly)
-        LOG_FUNC_EXIT_NONAME_PARAMS(p->IsUIOpen() ? true : false);
+        LOG_FUNC_EXIT_NONAME_PARAMS(pSource->IsUIOpen() ? true : false);
     const bool stillAcquiring = (!pHandle->m_bTransferDone == true && !pHandle->m_bSourceClosed == true);
     LOG_FUNC_EXIT_NONAME_PARAMS(stillAcquiring)
     CATCH_BLOCK_LOG_PARAMS(false)
@@ -131,8 +129,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceAcquiringEx(DTWAIN_SOURCE Source, BOOL b
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsMemFileXferSupported(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    CTL_ITwainSource* p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const bool Ret = CTL_TwainAppMgr::IsMemFileTransferSupported(p);
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    const bool Ret = CTL_TwainAppMgr::IsMemFileTransferSupported(pSource);
     LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -140,12 +138,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsMemFileXferSupported(DTWAIN_SOURCE Source)
 DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
 {
     LOG_FUNC_ENTRY_PARAMS((opts))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(opts.getHandle());
+    auto [pHandle, pS] = VerifySourceHandle(nullptr, DTWAIN_TEST_HANDLE);
     opts.setStatus(0);
     bool bSessionPreStarted = false;
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, NULL, FUNC_MACRO);
 
     const CTL_ITwainSource *pSource = static_cast<CTL_ITwainSource*>(opts.getSource());
 
@@ -307,15 +302,15 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
     DTWAIN_ARRAY Array = nullptr;
     DTWAIN_ARRAY aAcquisitionArray = nullptr;
 
-    DTWAINArrayLL_RAII a1;
+    CTL_TwainDLLHandle* pDLLHandle = static_cast<CTL_TwainDLLHandle*>(opts.getHandle());
+    DTWAINArrayLowLevel_RAII a1(pDLLHandle, nullptr);
 
     CTL_ITwainSource *pSource = static_cast<CTL_ITwainSource*>(opts.getSource());
     pSource->ResetAcquisitionAttempts(nullptr);
     aAcquisitionArray = static_cast<DTWAIN_ARRAY>(CreateArrayFromFactory(DTWAIN_ARRAYOFHANDLEARRAYS, 0));
-    DTWAINArrayLL_RAII aAcq(aAcquisitionArray);
+    DTWAINArrayLowLevel_RAII aAcq(pDLLHandle, aAcquisitionArray);
 
     pSource->m_pUserPtr = nullptr;
-    CTL_TwainDLLHandle *pDLLHandle = static_cast<CTL_TwainDLLHandle *>(opts.getHandle());
     pDLLHandle->m_bTransferDone = false;
     pDLLHandle->m_bSourceClosed = false;
     pDLLHandle->m_lLastError = 0;
@@ -323,12 +318,11 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
     if (DTWAIN_GetTwainMode() == DTWAIN_MODELESS)
     {
         Array = CreateArrayFromFactory(DTWAIN_ARRAYHANDLE, 0);
-        a1.reset(Array);
-        const auto pHandle = static_cast<CTL_TwainDLLHandle *>(opts.getHandle());
+        a1.SetArray(Array);
         if (!Array)
         {
             opts.setStatus(DTWAIN_ERR_OUT_OF_MEMORY);
-            DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{return true; }, DTWAIN_ERR_OUT_OF_MEMORY, NULL, FUNC_MACRO);
+            DTWAIN_Check_Error_Condition_0_Ex(pDLLHandle, []{return true; }, DTWAIN_ERR_OUT_OF_MEMORY, NULL, FUNC_MACRO);
         }
     }
     else
@@ -398,8 +392,8 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
     if (Array)  // This is an immediate return
     {
         // turn off RAII here
-        a1.release();
-        aAcq.release();
+        a1.SetDestroy(false);
+        aAcq.SetDestroy(false);
         pSource->ResetAcquisitionAttempts(aAcquisitionArray);
         pDLLHandle->m_lLastAcqError = DTWAIN_TN_ACQUIRESTARTED;
         opts.setStatus(DTWAIN_TN_ACQUIRESTARTED);
@@ -419,7 +413,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
         pSource->ResetAcquisitionAttempts(nullptr);
         LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
     }
-    aAcq.release();
+    aAcq.SetDestroy(false);
     LOG_FUNC_EXIT_NONAME_PARAMS(aAcquisitionArray)
     CATCH_BLOCK(DTWAIN_ARRAY())
 }

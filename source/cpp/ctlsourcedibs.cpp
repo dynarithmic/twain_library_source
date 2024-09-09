@@ -31,8 +31,8 @@ using namespace dynarithmic;
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetSourceAcquisitions(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    CTL_ITwainSource *p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const DTWAIN_ARRAY AcqArray = p->GetAcquisitionArray();
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    const DTWAIN_ARRAY AcqArray = pSource->GetAcquisitionArray();
     if (!AcqArray)
         LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
     LOG_FUNC_EXIT_NONAME_PARAMS(AcqArray)
@@ -83,7 +83,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAllSourceDibsEx(DTWAIN_SOURCE Source, LPDTWAI
 HANDLE DLLENTRY_DEF DTWAIN_GetCurrentAcquiredImage(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    CTL_ITwainSource *pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
     const int nCount = pSource->GetNumDibs();
     if (nCount == 0)
         LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
@@ -94,7 +94,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetCurrentAcquiredImage(DTWAIN_SOURCE Source)
 LONG DLLENTRY_DEF DTWAIN_GetCurrentPageNum(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    CTL_ITwainSource* pSource = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
     const LONG retval = static_cast<LONG>(pSource->GetPendingImageNum());
     LOG_FUNC_EXIT_NONAME_PARAMS(retval)
     CATCH_BLOCK_LOG_PARAMS(-1L)
@@ -147,10 +147,7 @@ struct NestedAcquisitionDestroyer
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyAcquisitionArray(DTWAIN_ARRAY aAcq, DTWAIN_BOOL bDestroyDibs)
 {
     LOG_FUNC_ENTRY_PARAMS((aAcq))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, nullptr);
+    auto [pHandle, pSource] = VerifySourceHandle(nullptr, DTWAIN_TEST_HANDLE);
 
     const auto& factory = pHandle->m_ArrayFactory;
 
@@ -178,27 +175,27 @@ static bool SetBitDepth(CTL_ITwainSource *p, LONG BitDepth);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ForceAcquireBitDepth(DTWAIN_SOURCE Source, LONG BitDepth)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, BitDepth))
-    CTL_ITwainSource* p = VerifySourceHandle(GetDTWAINHandle_Internal(), Source);
-    const auto pHandle = p->GetDTWAINHandle();
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(p); },
+    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto pTheSource = pSource;
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(pTheSource); },
                 DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
-    const DTWAIN_BOOL bRet = SetBitDepth(p, BitDepth);
+    const DTWAIN_BOOL bRet = SetBitDepth(pTheSource, BitDepth);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-static bool SetBitDepth(CTL_ITwainSource *p, LONG BitDepth)
+static bool SetBitDepth(CTL_ITwainSource *pTheSource, LONG BitDepth)
 {
     if (BitDepth == 1 ||
         BitDepth == 4 ||
         BitDepth == 8 ||
         BitDepth == 24)
     {
-        p->SetForcedImageBpp(BitDepth);
+        pTheSource->SetForcedImageBpp(BitDepth);
         return true;
     }
     else
-        p->SetForcedImageBpp(0);
+        pTheSource->SetForcedImageBpp(0);
     return true;
 }
