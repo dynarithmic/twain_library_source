@@ -95,6 +95,7 @@ std::pair<CTL_ResourceRegistryMap::iterator, bool> CTL_TwainDLLHandle::AddResour
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
+CTL_GeneralResourceInfo     CTL_StaticData::s_ResourceInfo;
 CTL_PDFMediaMap             CTL_StaticData::s_PDFMediaMap;
 CTL_TwainLongToStringMap    CTL_StaticData::s_TwainCountryMap;
 CTL_TwainNameMap            CTL_StaticData::s_TwainNameMap;
