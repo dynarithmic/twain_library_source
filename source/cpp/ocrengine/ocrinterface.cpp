@@ -95,11 +95,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetOCRText(DTWAIN_OCRENGINE Engine,
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRCapValues(DTWAIN_OCRENGINE Engine,LONG OCRCapValue,LONG GetType,LPDTWAIN_ARRAY CapValues)
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, OCRCapValue, GetType, CapValues))
-
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
 
     // check if Engine exists
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCREngineExists(pHandle, static_cast<OCREngine*>(Engine)); },
@@ -118,7 +114,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRCapValues(DTWAIN_OCRENGINE Engine,LONG OCR
             {
                 OCREngine::OCRLongArrayValues vals;
                 pEngine->GetCapValues(OCRCapValue, GetType, vals);
-                const DTWAIN_ARRAY theArray = CreateArrayFromFactory(DTWAIN_ARRAYLONG, static_cast<LONG>(vals.size()));
+                const DTWAIN_ARRAY theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(vals.size()));
 
                 for (LONG i = 0; i < static_cast<LONG>(vals.size()); ++i)
                     DTWAIN_ArraySetAtLong(theArray, i, vals[i]);
@@ -130,7 +126,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRCapValues(DTWAIN_OCRENGINE Engine,LONG OCR
             {
                 OCREngine::OCRStringArrayValues vals;
                 pEngine->GetCapValues(OCRCapValue, GetType, vals);
-                const DTWAIN_ARRAY theArray = CreateArrayFromFactory(DTWAIN_ARRAYSTRING, static_cast<LONG>(vals.size()));
+                const DTWAIN_ARRAY theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, static_cast<LONG>(vals.size()));
                 for (LONG i = 0; i < static_cast<LONG>(vals.size()); ++i)
                     DTWAIN_ArraySetAtStringA(theArray, i, vals[i].c_str());
                 *CapValues = theArray;
@@ -636,10 +632,7 @@ LONG DLLENTRY_DEF DTWAIN_GetOCRVersionInfo(DTWAIN_OCRENGINE Engine, LPTSTR buffe
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumOCRSupportedCaps(DTWAIN_OCRENGINE Engine, LPDTWAIN_ARRAY SupportedCaps)
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, SupportedCaps))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
 
     // check if Engine exists
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCREngineExists(pHandle, static_cast<OCREngine*>(Engine)); },
@@ -649,7 +642,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumOCRSupportedCaps(DTWAIN_OCRENGINE Engine, LP
 
     OCREngine::OCRLongArrayValues vals;
     pEngine->GetSupportedCaps(vals);
-    const DTWAIN_ARRAY theArray = CreateArrayFromFactory(DTWAIN_ARRAYLONG, static_cast<LONG>(vals.size()));
+    const DTWAIN_ARRAY theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(vals.size()));
     if (!theArray)
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(theArray);
@@ -748,16 +741,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitOCRInterface()
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumOCRInterfaces(LPDTWAIN_ARRAY OCRArray)
 {
     LOG_FUNC_ENTRY_PARAMS((OCRArray))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     if (pHandle->m_OCRInterfaceArray.empty())
         *OCRArray = nullptr;
     else
     {
-        const DTWAIN_ARRAY theArray = CreateArrayFromFactory(DTWAIN_ARRAYOCRENGINE, 0);
+        const DTWAIN_ARRAY theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYOCRENGINE, 0);
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !theArray; }, DTWAIN_ERR_OUT_OF_MEMORY, false, FUNC_MACRO);
 
         const auto& factory = pHandle->m_ArrayFactory;

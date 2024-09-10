@@ -29,7 +29,7 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJpegValues(DTWAIN_SOURCE Source, LONG Quality, LONG Progressive)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Quality, Progressive))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     pSource->SetJpegValues(Quality, Progressive?true:false);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
@@ -38,7 +38,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJpegValues(DTWAIN_SOURCE Source, LONG Quality
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetJpegValues(DTWAIN_SOURCE Source, LPLONG pQuality, LPLONG Progressive)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pQuality, Progressive))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     bool PrTemp;
     pSource->GetJpegValues(*pQuality, PrTemp);
     *Progressive = static_cast<LONG>(PrTemp);

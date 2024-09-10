@@ -48,7 +48,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageScaleString(DTWAIN_SOURCE Source,
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageNegative(DTWAIN_SOURCE Source, DTWAIN_BOOL IsNegative)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, IsNegative))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     pSource->SetImageNegative(IsNegative ? true : false);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
@@ -58,7 +58,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageNegative(DTWAIN_SOURCE Source, DT
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageScale(DTWAIN_SOURCE Source, DTWAIN_FLOAT  xscale, DTWAIN_FLOAT  yscale)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, xscale, yscale))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     auto pTheSource = pSource;
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(pTheSource); },
             DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);

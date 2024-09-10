@@ -257,7 +257,7 @@ namespace dynarithmic
                                            CTL_EnumTwainVersion TVersion,
                                            CTL_TwainCapArray & rArray);
             static std::string  GetCapNameFromCap( LONG Cap );
-            static UINT         GetDataTypeFromCap( CTL_EnumCapability Cap, CTL_ITwainSource *pSource=nullptr);
+            static int          GetDataTypeFromCap( CTL_EnumCapability Cap, CTL_ITwainSource *pSource=nullptr);
             static UINT         GetContainerTypesFromCap( CTL_EnumCapability Cap, bool nType );
             static bool         GetBestContainerType(CTL_TwainDLLHandle *pHandle,
                                                      const CTL_ITwainSource* pSource,

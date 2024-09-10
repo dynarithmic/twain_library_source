@@ -40,13 +40,9 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSourcesEx()
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
 {
     LOG_FUNC_ENTRY_PARAMS((Array))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    // Terminate if Array is NULL )
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-    DTWAIN_ARRAY aSource = CreateArrayFromFactory(DTWAIN_ARRAYSOURCE, 0);
+    DTWAIN_ARRAY aSource = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSOURCE, 0);
     if (!aSource)
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
     DTWAIN_ARRAY pDTWAINArray = aSource;

@@ -2209,13 +2209,18 @@ std::string CTL_TwainAppMgr::GetCapNameFromCap( LONG Cap )
     return sName;
 }
 
-UINT CTL_TwainAppMgr::GetDataTypeFromCap( CTL_EnumCapability Cap, CTL_ITwainSource *pSource/*=NULL*/ )
+int CTL_TwainAppMgr::GetDataTypeFromCap( CTL_EnumCapability Cap, CTL_ITwainSource *pSource/*=NULL*/ )
 {
-    if ( static_cast<unsigned>(Cap) >= CAP_CUSTOMBASE )
-        return DTWAIN_GetCapDataType(pSource, Cap);
+    const auto nThisCap = static_cast<TW_UINT16>(Cap);
+    if (nThisCap >= CAP_CUSTOMBASE)
+    {
+        if (!pSource)
+            return DTWAIN_FAILURE1;
+        return GetCustomCapDataType(pSource, nThisCap);
+    }
     const CTL_CapStruct cStruct = GetGeneralCapInfo(Cap);
     if ( static_cast<std::string>(cStruct).length() == 0 )
-        return 0xFFFF;
+        return (std::numeric_limits<int>::min)();
     return cStruct.m_nDataType;
 }
 

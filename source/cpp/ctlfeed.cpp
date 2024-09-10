@@ -284,7 +284,7 @@ bool ExecuteFeederState5Func(DTWAIN_SOURCE Source, LONG lCap)
 
     CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
     const auto pHandle = pSource->GetDTWAINHandle();
-    DTWAIN_ARRAY aValues = DTWAIN_ArrayCreateFromCap(nullptr, lCap, 0);
+    DTWAIN_ARRAY aValues = CreateArrayFromCap(pHandle, nullptr, lCap, 0);
     if ( !aValues )
         return false;
     DTWAINArrayLowLevel_RAII aRAII(pHandle, aValues);

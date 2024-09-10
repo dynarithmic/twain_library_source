@@ -34,7 +34,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CheckHandles(DTWAIN_BOOL bCheck)
     CATCH_BLOCK(false)
 }
 
-std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> dynarithmic::VerifySourceHandle(DTWAIN_SOURCE Source, int Testing/* = DTWAIN_TEST_HANDLE | DTWAIN_TEST_SOURCE*/)
+std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> dynarithmic::VerifyHandles(DTWAIN_SOURCE Source, int Testing/* = DTWAIN_TEST_DLLHANDLE | DTWAIN_TEST_SOURCE*/)
 {
     CTL_ITwainSource *pSource = nullptr;
     CTL_TwainDLLHandle* pHandle = nullptr;
@@ -48,7 +48,7 @@ std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> dynarithmic::VerifySourceHandl
     else
     {
         bool bHandleGood = true;
-        if (Testing & DTWAIN_TEST_HANDLE)
+        if (Testing & DTWAIN_VERIFY_DLLHANDLE)
         {
             pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
             bHandleGood = DTWAIN_Check_Bad_Handle_Ex<std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*>>(pHandle, { nullptr, nullptr }, FUNC_MACRO, false);
@@ -59,7 +59,7 @@ std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> dynarithmic::VerifySourceHandl
                 throw DTWAIN_ERR_BAD_HANDLE;
             return { nullptr, nullptr };
         }
-        if ( Testing & DTWAIN_TEST_SOURCE )
+        if ( Testing & DTWAIN_VERIFY_SOURCEHANDLE )
         {
             if ( !pHandle )
                 pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());

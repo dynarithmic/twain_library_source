@@ -30,7 +30,7 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetMultipageScanMode(DTWAIN_SOURCE Source, LONG ScanType)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, ScanType))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     const bool bSaveIncomplete = ScanType & DTWAIN_FILESAVE_SAVEINCOMPLETE ? true : false;
 
     // remove the DTWAIN_FILESAVE_INCOMPLETE mask
@@ -59,7 +59,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetMultipageScanMode(DTWAIN_SOURCE Source, LONG 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FlushAcquiredPages(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     if (pSource->IsMultiPageModeContinuous())
         pSource->ProcessMultipageFile();
     LOG_FUNC_EXIT_NONAME_PARAMS(true)

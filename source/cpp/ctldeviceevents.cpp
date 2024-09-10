@@ -33,7 +33,7 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LONG DeviceEvents)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, DeviceEvents))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     auto pTheSource = pSource;
 
     // See if Source is opened
@@ -46,7 +46,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
 
     // Set the notifications
     DTWAIN_ARRAY Array = nullptr;
-    DTWAINArrayPtr_RAII a(&Array);
+    DTWAINArrayPtr_RAII a(pHandle, &Array);
 
     LONG SetType = DTWAIN_CAPSET;
     if (!DeviceEvents)
@@ -63,7 +63,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
         if (nBits == 0)
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
-        Array = CreateArrayFromFactory(DTWAIN_ARRAYLONG, nBits);
+        Array = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, nBits);
 
         if (!Array)
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
@@ -88,10 +88,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceNotifications(DTWAIN_SOURCE Source, LPLONG lpDeviceEvents)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpDeviceEvents))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     auto pTheSource = pSource;
     DTWAIN_ARRAY Array = nullptr;
-    DTWAINArrayPtr_RAII raii(&Array);
+    DTWAINArrayPtr_RAII raii(pHandle, &Array);
 
     // See if Source is opened
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !CTL_TwainAppMgr::IsSourceOpen(pTheSource); },
@@ -122,7 +122,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceNotifications(DTWAIN_SOURCE Source, LPL
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEvent(DTWAIN_SOURCE Source, LPLONG lpEvent)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpEvent))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     const CTL_DeviceEvent DeviceEvent = pSource->GetDeviceEvent();
     *lpEvent = DeviceEvent.GetEvent() + 1;
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -148,7 +148,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventEx(DTWAIN_SOURCE Source, LPLONG lp
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventInfo(DTWAIN_SOURCE Source, LONG nWhichInfo, LPVOID pValue)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nWhichInfo, pValue))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
 
     const CTL_DeviceEvent DeviceEvent = pSource->GetDeviceEvent();
     switch (nWhichInfo)
