@@ -125,7 +125,7 @@ static DTWAIN_SOURCE SelectSourceHelper(CTL_TwainDLLHandle* pHandle, SourceSelec
 DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSource()
 {
     LOG_FUNC_ENTRY_NONAME_PARAMS()
-    auto [pHandle, pSource] = VerifySourceHandle(nullptr, DTWAIN_TEST_HANDLE);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     DTWAIN_SOURCE Source = SelectSourceHelper(pHandle, SourceSelectionOptions(), {indeterminate});
     LOG_FUNC_EXIT_NONAME_PARAMS(Source)
     CATCH_BLOCK(DTWAIN_SOURCE(0))
@@ -134,7 +134,7 @@ DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSource()
 DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectDefaultSource()
 {
     LOG_FUNC_ENTRY_NONAME_PARAMS()
-    auto [pHandle, pSource] = VerifySourceHandle(nullptr, DTWAIN_TEST_HANDLE);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     DTWAIN_SOURCE Source = SelectSourceHelper(pHandle, SourceSelectionOptions(SELECTDEFAULTSOURCE), {indeterminate});
     LOG_FUNC_EXIT_NONAME_PARAMS(Source)
     CATCH_BLOCK(DTWAIN_SOURCE(0))
@@ -143,7 +143,7 @@ DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectDefaultSource()
 DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSourceByName(LPCTSTR szProduct)
 {
     LOG_FUNC_ENTRY_PARAMS((szProduct))
-    auto [pHandle, pSource] = VerifySourceHandle(nullptr, DTWAIN_TEST_HANDLE);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const CTL_StringType sProduct = szProduct;
     DTWAIN_SOURCE Source = SelectSourceHelper(pHandle, SourceSelectionOptions(SELECTSOURCEBYNAME, sProduct.c_str()), { indeterminate });
     LOG_FUNC_EXIT_NONAME_PARAMS(Source)
@@ -153,7 +153,7 @@ DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSourceByName(LPCTSTR szProduct)
 DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSourceWithOpen(DTWAIN_BOOL bOpen)
 {
     LOG_FUNC_ENTRY_PARAMS((bOpen))
-    auto [pHandle, pSource] = VerifySourceHandle(nullptr, DTWAIN_TEST_HANDLE);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     DTWAIN_SOURCE Source = SelectSourceHelper(pHandle, SourceSelectionOptions(), bOpen?true:false);
     LOG_FUNC_EXIT_NONAME_PARAMS(Source)
     CATCH_BLOCK(DTWAIN_SOURCE(0))
@@ -162,7 +162,7 @@ DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSourceWithOpen(DTWAIN_BOOL bOpen)
 DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectDefaultSourceWithOpen(DTWAIN_BOOL bOpen)
 {
     LOG_FUNC_ENTRY_PARAMS((bOpen))
-    auto [pHandle, pSource] = VerifySourceHandle(nullptr, DTWAIN_TEST_HANDLE);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     DTWAIN_SOURCE Source = SelectSourceHelper(pHandle, SourceSelectionOptions(SELECTDEFAULTSOURCE), bOpen ? true : false);
     LOG_FUNC_EXIT_NONAME_PARAMS(Source)
     CATCH_BLOCK(DTWAIN_SOURCE(0))
@@ -171,7 +171,7 @@ DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectDefaultSourceWithOpen(DTWAIN_BOOL bOpen)
 DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSourceByNameWithOpen(LPCTSTR szProduct, DTWAIN_BOOL bOpen)
 {
     LOG_FUNC_ENTRY_PARAMS((szProduct, bOpen))
-    auto [pHandle, pSource] = VerifySourceHandle(nullptr, DTWAIN_TEST_HANDLE);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const CTL_StringType sProduct = szProduct;
     DTWAIN_SOURCE Source = SelectSourceHelper(pHandle, SourceSelectionOptions(SELECTSOURCEBYNAME, sProduct.c_str()), bOpen ? true : false);
     LOG_FUNC_EXIT_NONAME_PARAMS(Source)
@@ -185,7 +185,7 @@ DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSource2(HWND hWndParent,
                                                 LONG nOptions)
 {
     LOG_FUNC_ENTRY_PARAMS((hWndParent, szTitle, xPos, yPos, nOptions))
-    auto [pHandle, pSource] = VerifySourceHandle(nullptr, DTWAIN_TEST_HANDLE);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const DTWAIN_SOURCE Source = SelectAndOpenSource(pHandle, SourceSelectionOptions(SELECTSOURCE2, nullptr, hWndParent,
                                                                             szTitle, 
                                                                             xPos, yPos, 
@@ -207,7 +207,7 @@ DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSource2Ex(HWND hWndParent,
                                                   LONG nOptions)
 {
     LOG_FUNC_ENTRY_PARAMS((hWndParent, szTitle, xPos, yPos, szIncludeFilter, szExcludeFilter, szNameMapping, nOptions))
-    auto [pHandle, pSource] = VerifySourceHandle(nullptr, DTWAIN_TEST_HANDLE);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const CTL_StringType sInclude = szIncludeFilter? szIncludeFilter : _T("");
     const CTL_StringType sExclude = szExcludeFilter ? szExcludeFilter : _T("");
     const CTL_StringType sMapping = szNameMapping ? szNameMapping : _T("");
@@ -225,7 +225,7 @@ DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSource2Ex(HWND hWndParent,
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceSelected(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     bool bRet = pSource->IsSelected();
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(FALSE)
@@ -412,7 +412,7 @@ DTWAIN_SOURCE dynarithmic::DTWAIN_LLSelectDefaultSource(CTL_TwainDLLHandle* pHan
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDefaultSource(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     bool bRet = false;
     bRet = CTL_TwainAppMgr::SetDefaultSource(pSource);
     // Load the resources

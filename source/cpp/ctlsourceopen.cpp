@@ -56,7 +56,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsOpenSourcesOnSelect(VOID_PROTOTYPE)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
 
     // If source already opened, just return TRUE.
     if (pSource->IsOpened())
@@ -96,7 +96,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
 
     // Get all the caps supported
     DTWAIN_ARRAY arr = nullptr;
-    DTWAINArrayPtr_RAII raii(&arr);
+    DTWAINArrayPtr_RAII raii(pHandle, &arr);
     CTL_TwainAppMgr::GatherCapabilityInfo(pSource);
 
     // Cache the pixel types and bit depths
@@ -146,7 +146,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceOpen(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     const DTWAIN_BOOL bRet = CTL_TwainAppMgr::IsSourceOpen(pSource);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
@@ -180,7 +180,7 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
         if (nCount > 0)
         {
             // create an array of 1
-            DTWAIN_ARRAY vCurPixType = CreateArrayFromFactory(DTWAIN_ARRAYLONG, 1);
+            DTWAIN_ARRAY vCurPixType = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 1);
             DTWAINArrayLowLevel_RAII raii(pHandle, vCurPixType);
 
             // get pointer to internals of the array

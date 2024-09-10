@@ -61,12 +61,12 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapabili
 
     static constexpr size_t DataTypeArraySize = std::size(DataTypeArray);
     static constexpr size_t ContainerArraySize = std::size(ContainerTypeArray);
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
 
     if (!CTL_TwainAppMgr::IsSourceOpen(pSource))
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, [] {return true; }, DTWAIN_ERR_SOURCE_NOT_OPEN, nullptr, FUNC_MACRO);
 
-    DTWAIN_ARRAY outputArray = CreateArrayFromFactory(DTWAIN_ARRAYLONG, 0);
+    DTWAIN_ARRAY outputArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return outputArray == nullptr; }, DTWAIN_ERR_OUT_OF_MEMORY, nullptr, FUNC_MACRO);
 
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(outputArray);
@@ -77,7 +77,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapabili
         for (size_t j = 0; j < ContainerArraySize; ++j)
         {
             DTWAIN_ARRAY testArray;
-            DTWAINArrayPtr_RAII raii(&testArray);
+            DTWAINArrayPtr_RAII raii(pHandle, &testArray);
             bool ok = DTWAIN_GetCapValuesEx2(Source, lCapability, DTWAIN_CAPGET, ContainerTypeArray[j], DataTypeArray[i], &testArray);
             if (ok)
             {
@@ -95,7 +95,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapabili
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsCapSupported(DTWAIN_SOURCE Source, LONG lCapability)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCapability))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
 
     // Check if the source is open
     if (!CTL_TwainAppMgr::IsSourceOpen(pSource))

@@ -69,10 +69,11 @@ namespace dynarithmic
     {
         if (DTWAIN_IsCapSupported(Source, Cap))
         {
-            DTWAIN_ARRAY Array = DTWAIN_ArrayCreateFromCap(Source, Cap, 1);
+            auto pSource = static_cast<CTL_ITwainSource*>(Source);
+            const auto pHandle = pSource->GetDTWAINHandle();
+            DTWAIN_ARRAY Array = CreateArrayFromCap(pHandle, pSource, Cap, 1);
             if (!Array)
                 return false;
-            const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
             DTWAINArrayLowLevel_RAII a(pHandle, Array);
 
             LONG SetType = DTWAIN_CAPSET;
@@ -82,7 +83,7 @@ namespace dynarithmic
             // See if the container is a range, if so, get the nearest range value.
             if (SetType == DTWAIN_CAPSET)
             {
-                LONG nContainer = DTWAIN_GetCapContainer(Source, Cap, DTWAIN_CAPGET);
+                LONG nContainer = GetCapContainer(pSource, Cap, DTWAIN_CAPGET);
                 if (nContainer == DTWAIN_CONTRANGE)
                 {
                     DTWAIN_ARRAY Array2 = 0;

@@ -31,9 +31,7 @@
 
 using namespace dynarithmic;
 
-static bool GetImageSize(DTWAIN_SOURCE Source,
-    LPDTWAIN_ARRAY FloatArray,
-    CTL_EnumGetType GetType);
+static bool GetImageSize(CTL_TwainDLLHandle* pHandle,  DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, CTL_EnumGetType GetType);
 
 static bool GetImageSize2(CTL_ITwainSource *p,
     LPDTWAIN_FLOAT left,
@@ -69,12 +67,12 @@ static bool IsValidUnit(LONG Unit)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea(DTWAIN_SOURCE Source, LONG lGetType, LPDTWAIN_ARRAY FloatArray)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lGetType, FloatArray))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     CTL_ITwainSource* p = pSource;
     // See if Source is opened
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !CTL_TwainAppMgr::IsSourceOpen(p); },
         DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
-    const DTWAIN_BOOL bRet = GetImageSize(Source, FloatArray, static_cast<CTL_EnumGetType>(lGetType));
+    const DTWAIN_BOOL bRet = GetImageSize(pHandle, Source, FloatArray, static_cast<CTL_EnumGetType>(lGetType));
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -82,7 +80,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea(DTWAIN_SOURCE Source, LONG lGetTy
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea(DTWAIN_SOURCE Source, LONG lSetType, DTWAIN_ARRAY FloatArray, DTWAIN_ARRAY ActualArray)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lSetType, FloatArray, ActualArray))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     CTL_ITwainSource* p = pSource;
     // See if Source is opened
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(p); },
@@ -107,7 +105,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2String(DTWAIN_SOURCE Source, LPCT
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2(DTWAIN_SOURCE Source, DTWAIN_FLOAT left, DTWAIN_FLOAT top, DTWAIN_FLOAT right, DTWAIN_FLOAT bottom, LONG Unit, LONG flags)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit, flags))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     CTL_ITwainSource* p = pSource;
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(p); },
                                     DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
@@ -141,7 +139,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2String(DTWAIN_SOURCE Source, LPTS
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2(DTWAIN_SOURCE Source, LPDTWAIN_FLOAT  left, LPDTWAIN_FLOAT  top, LPDTWAIN_FLOAT  right, LPDTWAIN_FLOAT  bottom, LPLONG Unit)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     CTL_ITwainSource* p = pSource;
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(p); },
                                       DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
@@ -150,13 +148,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2(DTWAIN_SOURCE Source, LPDTWAIN_F
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-static bool GetImageSize(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, CTL_EnumGetType GetType)
+static bool GetImageSize(CTL_TwainDLLHandle* pHandle, DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, CTL_EnumGetType GetType)
 {
     CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
-    DTWAIN_ARRAY FloatArrayOut = CreateArrayFromFactory(DTWAIN_ARRAYFLOAT, 4);
+    DTWAIN_ARRAY FloatArrayOut = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYFLOAT, 4);
     if (!FloatArrayOut)
         return false;
-    auto pHandle = p->GetDTWAINHandle();
     DTWAINArrayLowLevel_RAII aFloat(pHandle, FloatArrayOut);
     CTL_RealArray Array;
     if (GetType == CTL_GetTypeGETCURRENT)
@@ -167,7 +164,7 @@ static bool GetImageSize(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, CTL_En
         return false;
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<double>(FloatArrayOut);
     std::copy(Array.begin(), Array.end(), vValues.begin());
-    const DTWAIN_ARRAY temp = CreateArrayCopyFromFactory(FloatArrayOut);
+    const DTWAIN_ARRAY temp = CreateArrayCopyFromFactory(pHandle, FloatArrayOut);
     if  (pHandle->m_ArrayFactory->is_valid(FloatArray))
         pHandle->m_ArrayFactory->destroy(FloatArray);
     if (temp)

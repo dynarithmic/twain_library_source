@@ -46,6 +46,7 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
 {
     LOG_FUNC_ENTRY_PARAMS((Source, aFileNames, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI,bCloseSource, pStatus))
     auto bRetval = true;
+    auto [pHandle, pSource] = VerifyHandles(Source);
 
     // Check if the file format is valid
     auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
@@ -54,10 +55,9 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
         DTWAIN_SetLastError(DTWAIN_ERR_FILE_FORMAT);
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
     }
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
 
     DTWAIN_ARRAY tempNames = nullptr;
-    DTWAINArrayPtr_RAII tempRAII(&tempNames);
+    DTWAINArrayPtr_RAII tempRAII(pHandle, &tempNames);
     DTWAIN_ARRAY arrayToUse = aFileNames;
     if (aFileNames)
     {
@@ -69,7 +69,7 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
         const auto idx = std::distance(validTypes.begin(), itArrType);
         if ( idx > 0 )
         {
-            tempNames = CreateArrayFromFactory(DTWAIN_ARRAYSTRING, 0);
+            tempNames = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, 0);
             if ( idx == 1 )
                 ArrayCopyAnsiToNative(pHandle, aFileNames, tempNames);
             else
@@ -104,7 +104,7 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFile(DTWAIN_SOURCE Source,
                                                   LPLONG pStatus)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpszFile, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
 
     // Check if the file format is valid
     auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
@@ -128,7 +128,7 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFile(DTWAIN_SOURCE Source,
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileAutoIncrement(DTWAIN_SOURCE Source, LONG nValue, DTWAIN_BOOL bResetOnAcquire, DTWAIN_BOOL bSet)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nValue, bResetOnAcquire, bSet))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     pSource->SetFileAutoIncrement(bSet ? true : false, nValue);
     pSource->SetFileAutoIncrementFlags(bResetOnAcquire ? DTWAIN_INCREMENT_DYNAMIC : DTWAIN_INCREMENT_DEFAULT);
     pSource->SetFileAutoIncrementBase(0);

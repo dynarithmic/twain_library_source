@@ -937,7 +937,7 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
             {
                 /* Allocate memory for the data */
                 szData = malloc(actualSize * sizeof(BYTE));
-                memset(szData, actualSize, 0);
+                memset(szData, 0, actualSize);
 
                 /* Second call actually gets the data */
                 DTWAIN_GetCustomDSData(g_CurrentSource, szData, actualSize, &actualSize, DTWAINGCD_COPYDATA);

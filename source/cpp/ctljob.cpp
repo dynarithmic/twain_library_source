@@ -30,7 +30,7 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJobControl(DTWAIN_SOURCE Source, LONG JobControl, DTWAIN_BOOL bSetCurrent)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, JobControl, bSetCurrent))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
 
     CHECK_IF_CAP_SUPPORTED(pSource, pHandle, DTWAIN_CV_CAPJOBCONTROL, false);
 
@@ -40,7 +40,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJobControl(DTWAIN_SOURCE Source, LONG JobCont
         SetType = DTWAIN_CAPRESET;
         JobControl = TWJC_NONE;
     }
-    DTWAIN_ARRAY Array = DTWAIN_ArrayCreateFromCap(nullptr, DTWAIN_CV_CAPJOBCONTROL, 1);
+    DTWAIN_ARRAY Array = CreateArrayFromCap(pHandle, nullptr, DTWAIN_CV_CAPJOBCONTROL, 1);
     if ( !Array )
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
     DTWAINArrayLowLevel_RAII a(pSource->GetDTWAINHandle(), Array);
@@ -89,7 +89,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsJobControlSupported(DTWAIN_SOURCE Source, LONG
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnableJobFileHandling(DTWAIN_SOURCE Source, DTWAIN_BOOL bSet)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, bSet))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     pSource->SetJobFileHandling(bSet?true:false);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)

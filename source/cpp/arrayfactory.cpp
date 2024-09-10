@@ -55,13 +55,13 @@ namespace dynarithmic
     void ArrayCopyWideToNative(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest)
     {
         ArrayToNativeArray<CTL_ArrayFactory::tagged_array_wstring>(pHandle, ArraySource, ArrayDest, CTL_ArrayFactory::arrayTag::WStringType,
-                                                                        [](const std::wstring& val) { return StringConversion::Convert_Wide_To_Native(val); });
+            [](const std::wstring& val) { return StringConversion::Convert_Wide_To_Native(val); });
     }
 
     void ArrayCopyAnsiToNative(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest)
     {
         ArrayToNativeArray<CTL_ArrayFactory::tagged_array_string>(pHandle, ArraySource, ArrayDest, CTL_ArrayFactory::arrayTag::StringType,
-                                                                       [](const std::string& val) { return StringConversion::Convert_Ansi_To_Native(val); });
+            [](const std::string& val) { return StringConversion::Convert_Ansi_To_Native(val); });
     }
 
     CTL_ArrayFactory::CTL_ArrayFactory()
@@ -200,7 +200,7 @@ namespace dynarithmic
     }
 
     // return a new tag that corresponds to the array type
-    CTL_ArrayFactory::arrayTag* CTL_ArrayFactory::create_array(CTL_ArrayType ArrayType, int *pStatus, size_t nInitialSize)
+    CTL_ArrayFactory::arrayTag* CTL_ArrayFactory::create_array(CTL_ArrayType ArrayType, int* pStatus, size_t nInitialSize)
     {
         arrayTag* pNewArray = nullptr;
         if (pStatus)
@@ -395,7 +395,7 @@ namespace dynarithmic
         return frame;
     }
 
-    void CTL_ArrayFactory::destroy_frame(arrayTag *frame)
+    void CTL_ArrayFactory::destroy_frame(arrayTag* frame)
     {
         destroy(frame);
     }
@@ -444,16 +444,9 @@ namespace dynarithmic
         return CTL_ArrayInvalid;
     }
 
-
     void DTWAINArrayLowLevel_DestroyTraits::Destroy(DTWAIN_ARRAY a)
     {
         const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
         pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(a));
-    }
-
-    void DTWAINArrayLowLevel_DestroyTraitsEx::Destroy(DTWAINArrayLowLevel_RAII& raii)
-    {
-        if (raii.m_bDestroy)
-            raii.m_pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(raii.m_Array));
     }
 }

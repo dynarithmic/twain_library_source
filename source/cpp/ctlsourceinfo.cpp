@@ -46,7 +46,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceValid(DTWAIN_SOURCE Source)
 LONG   DLLENTRY_DEF DTWAIN_GetSourceManufacturer( DTWAIN_SOURCE Source, LPTSTR szMan, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, szMan, nMaxLen))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     const LONG Ret = GetSourceInfo(pSource, &CTL_ITwainSource::GetManufacturer, szMan, nMaxLen);
     LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
@@ -55,7 +55,7 @@ LONG   DLLENTRY_DEF DTWAIN_GetSourceManufacturer( DTWAIN_SOURCE Source, LPTSTR s
 LONG   DLLENTRY_DEF DTWAIN_GetSourceProductFamily( DTWAIN_SOURCE Source, LPTSTR szProduct, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, szProduct, nMaxLen))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     const LONG Ret = GetSourceInfo(pSource, &CTL_ITwainSource::GetProductFamily, szProduct, nMaxLen);
     LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
@@ -64,7 +64,7 @@ LONG   DLLENTRY_DEF DTWAIN_GetSourceProductFamily( DTWAIN_SOURCE Source, LPTSTR 
 LONG   DLLENTRY_DEF DTWAIN_GetSourceProductName(DTWAIN_SOURCE Source,LPTSTR szProduct,LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, szProduct, nMaxLen))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     const LONG Ret = GetSourceInfo(pSource, &CTL_ITwainSource::GetProductName, szProduct, nMaxLen);
     LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
@@ -73,7 +73,7 @@ LONG   DLLENTRY_DEF DTWAIN_GetSourceProductName(DTWAIN_SOURCE Source,LPTSTR szPr
 LONG DLLENTRY_DEF DTWAIN_GetSourceVersionInfo(DTWAIN_SOURCE Source, LPTSTR szVInfo, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, szVInfo, nMaxLen))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     const TW_VERSION *pV = pSource->GetVersion();
     CTL_StringType pName = StringConversion::Convert_AnsiPtr_To_Native(pV->Info);
     const size_t nLen = pName.length();
@@ -94,7 +94,7 @@ LONG dynarithmic::GetSourceInfo(CTL_ITwainSource *p,SOURCEINFOFUNC pFunc,LPTSTR 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetSourceVersionNumber( DTWAIN_SOURCE Source, LPLONG pMajor, LPLONG pMinor)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pMajor, pMinor))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     const TW_VERSION *pV = pSource->GetVersion();
     if ( pMajor )
         *pMajor = pV->MajorNum;

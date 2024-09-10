@@ -29,7 +29,7 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTIFFInvert(DTWAIN_SOURCE Source, LONG Setting)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Setting))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     pSource->SetPhotometric( !Setting );
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
@@ -39,7 +39,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTIFFInvert(DTWAIN_SOURCE Source, LONG Setting
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTIFFCompressType(DTWAIN_SOURCE Source, LONG Setting)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Setting))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     // Must be in state 4 or higher
     const SourceState theState = pSource->GetState();
     const bool bIsTiff = pSource->IsFileTypeTIFF(static_cast<CTL_TwainFileFormatEnum>(Setting));

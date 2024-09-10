@@ -42,11 +42,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAvailablePrinters(DTWAIN_SOURCE Source, LONG 
     if ( !DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPPRINTER) )
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
-    DTWAIN_ARRAY Array = CreateArrayFromFactory(DTWAIN_ARRAYLONG, 32);
+    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+
+    DTWAIN_ARRAY Array = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 32);
     if ( !Array )
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
-
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
 
     // Destroys array when out of scope
     DTWAINArrayLowLevel_RAII a(pHandle, Array);
@@ -73,11 +73,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinter(DTWAIN_SOURCE Source, LONG nPrinter, 
     LOG_FUNC_ENTRY_PARAMS((Source, nPrinter, bSetCurrent))
     if ( !DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPPRINTER) )
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    DTWAIN_ARRAY Array = DTWAIN_ArrayCreateFromCap(nullptr, DTWAIN_CV_CAPPRINTER, 1);
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    DTWAIN_ARRAY Array = CreateArrayFromCap(pHandle, nullptr, DTWAIN_CV_CAPPRINTER, 1);
     if ( !Array )
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
-
-    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     DTWAINArrayLowLevel_RAII a(pHandle, Array);
 
     LONG SetType = DTWAIN_CAPSET;
@@ -110,11 +109,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterEx(DTWAIN_SOURCE Source, LONG nPrinter
     LOG_FUNC_ENTRY_PARAMS((Source, nPrinter, bSetCurrent))
     if (!DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPPRINTER))
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    DTWAIN_ARRAY Array = DTWAIN_ArrayCreateFromCap(nullptr, DTWAIN_CV_CAPPRINTER, 1);
+    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+    DTWAIN_ARRAY Array = CreateArrayFromCap(pHandle, nullptr, DTWAIN_CV_CAPPRINTER, 1);
     if (!Array)
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
-    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     DTWAINArrayLowLevel_RAII a(pHandle, Array);
 
     LONG SetType = DTWAIN_CAPSET;

@@ -61,7 +61,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionEx(DTWAIN_SOURCE Source, DT
                                                         LONG autodetect, LONG detectOpts, DTWAIN_BOOL bSet)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, threshold, autodetect, detectOpts, bSet))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     if (detectOpts & DTWAIN_BP_DETECTORIGINAL )
         pSource->SetBlankPageDetectionNoSampleOn(bSet ? true : false);
     if (detectOpts & DTWAIN_BP_DETECTADJUSTED)
@@ -78,7 +78,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionEx(DTWAIN_SOURCE Source, DT
 LONG DLLENTRY_DEF DTWAIN_GetBlankPageAutoDetection(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     const LONG retval = pSource->GetBlankPageAutoDetect();
     LOG_FUNC_EXIT_NONAME_PARAMS(retval)
     CATCH_BLOCK_LOG_PARAMS(-1)
@@ -87,7 +87,7 @@ LONG DLLENTRY_DEF DTWAIN_GetBlankPageAutoDetection(DTWAIN_SOURCE Source)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsBlankPageDetectionOn(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     const DTWAIN_BOOL retval = pSource->IsBlankPageDetectionOn()?1:0;
     LOG_FUNC_EXIT_NONAME_PARAMS(retval)
     CATCH_BLOCK_LOG_PARAMS(false)

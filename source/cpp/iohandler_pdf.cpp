@@ -21,6 +21,7 @@
 #include <unordered_map>
 #include <array>
 #include "ctldib.h"
+#include "arrayfactory.h"
 #include "ctliface.h"
 #include "ctltwmgr.h"
 #include "ctlfileutils.h"
@@ -492,7 +493,7 @@ int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, std::string& sT
         sFileToUse = std::move(szTempPath);
     }
     // Just OCR the text here
-    DTWAIN_ARRAY aValues = CreateArrayFromFactory(DTWAIN_ARRAYLONG, 1);
+    DTWAIN_ARRAY aValues = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 1);
     if ( aValues )
     {
         DTWAINArrayLowLevel_RAII a(pHandle, aValues);

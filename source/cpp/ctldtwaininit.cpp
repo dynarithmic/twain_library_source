@@ -448,7 +448,7 @@ static bool GenericResourceLoader(CTL_TwainDLLHandle* pHandle, LPCTSTR sLangDLL,
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResources(LPCTSTR sLangDLL)
 {
     LOG_FUNC_ENTRY_PARAMS((sLangDLL))
-    auto [pHandle, pSource] = VerifySourceHandle(nullptr, DTWAIN_TEST_HANDLE);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     bool bRet = GenericResourceLoader(pHandle, sLangDLL, false);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bRet;}, DTWAIN_ERR_FILEOPEN, false, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
@@ -458,7 +458,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResources(LPCTSTR sLangDLL)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesEx(LPCTSTR sLangDLL, DTWAIN_BOOL bClear)
 {
     LOG_FUNC_ENTRY_PARAMS((sLangDLL, bClear))
-    auto [pHandle, pSource] = VerifySourceHandle(nullptr, DTWAIN_TEST_HANDLE);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     bool bRet = GenericResourceLoader(pHandle, sLangDLL, bClear);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !bRet; }, DTWAIN_ERR_FILEOPEN, false, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
@@ -468,7 +468,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesEx(LPCTSTR sLangDLL, DT
 LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstant(LONG lConstantType, LONG lTwainConstant, LPTSTR lpszOut, LONG nSize)
 {
     LOG_FUNC_ENTRY_PARAMS((lConstantType, lTwainConstant, lpszOut, nSize))
-    auto [pHandle, pSource] = VerifySourceHandle(nullptr, DTWAIN_TEST_HANDLE);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto& constantsmap = CTL_StaticData::GetTwainConstantsMap();
     auto iter1 = constantsmap.find(lConstantType);
     if (iter1 == constantsmap.end())
@@ -1364,10 +1364,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSessionEnabled()
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lpszDLLName)
 {
     LOG_FUNC_ENTRY_PARAMS((hWndMsgNotify, lpszDLLName))
-    auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
     // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     if ( pHandle->m_bSessionAllocated )
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
 
@@ -1481,13 +1479,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lp
     CATCH_BLOCK(false)
 }
 
-static DTWAIN_ARRAY GetFileTypes(int nType)
+static DTWAIN_ARRAY GetFileTypes(CTL_TwainDLLHandle* pHandle, int nType)
 {
     constexpr const char *sNames[] = { "","-Single","-Multi" };
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    if (!pHandle)
-        return {};
-    DTWAIN_ARRAY aFileTypes = CreateArrayFromFactory(DTWAIN_ARRAYLONG, 0);
+    DTWAIN_ARRAY aFileTypes = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
     if (aFileTypes)
     {
         auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
@@ -1536,8 +1531,7 @@ static LONG GetFileTypeInfo(Fn infoFn, int nType, LPTSTR lpszName, LONG nMaxLen)
 LONG DLLENTRY_DEF DTWAIN_GetFileTypeName(LONG nType, LPTSTR lpszName, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((nType, lpszName, nMaxLen))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, -1, FUNC_MACRO);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypeInfo(&GetFileTypeNameInternal, nType, lpszName, nMaxLen))
     CATCH_BLOCK(-1)
 }
@@ -1545,8 +1539,7 @@ LONG DLLENTRY_DEF DTWAIN_GetFileTypeName(LONG nType, LPTSTR lpszName, LONG nMaxL
 LONG DLLENTRY_DEF DTWAIN_GetFileTypeExtensions(LONG nType, LPTSTR lpszName, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((nType, lpszName, nMaxLen))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, -1, FUNC_MACRO);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypeInfo(&GetFileTypeExtensionsInternal, nType, lpszName, nMaxLen))
     CATCH_BLOCK(-1)
 }
@@ -1554,30 +1547,24 @@ LONG DLLENTRY_DEF DTWAIN_GetFileTypeExtensions(LONG nType, LPTSTR lpszName, LONG
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSupportedFileTypes(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_NONAME_PARAMS()
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, nullptr, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypes(0))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypes(pHandle, 0))
     CATCH_BLOCK(nullptr)
 }
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSupportedMultiPageFileTypes(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_NONAME_PARAMS()
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, nullptr, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypes(2))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypes(pHandle, 2))
     CATCH_BLOCK(nullptr)
 }
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSupportedSinglePageFileTypes(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_NONAME_PARAMS()
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, nullptr, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypes(1))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypes(pHandle, 1))
     CATCH_BLOCK(nullptr)
 }
 
@@ -1635,12 +1622,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
 {
     LOG_FUNC_ENTRY_NONAME_PARAMS()
     // Delete it
-
-
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]{return DTWAIN_IsAcquiring()==1;}, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
 
     // Check if any source is still acquiring

@@ -31,12 +31,10 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetErrorBuffer(LPDTWAIN_ARRAY ArrayBuffer)
 {
     LOG_FUNC_ENTRY_PARAMS((ArrayBuffer))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    if ( !IsDLLHandleValid( pHandle, FALSE ) )
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
 
     const size_t nEntries = (std::min)(static_cast<size_t>(pHandle->m_nErrorBufferThreshold), pHandle->m_vErrorBuffer.size());
-    const DTWAIN_ARRAY A = CreateArrayFromFactory(DTWAIN_ARRAYLONG, static_cast<LONG>(nEntries));
+    const DTWAIN_ARRAY A = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(nEntries));
     if ( A )
     {
         auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(A);
@@ -52,9 +50,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetErrorBuffer(LPDTWAIN_ARRAY ArrayBuffer)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ClearErrorBuffer(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_NONAME_PARAMS()
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    if ( !IsDLLHandleValid( pHandle, FALSE ) )
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     std::deque<int> tempdeque;
     tempdeque.swap(pHandle->m_vErrorBuffer);
 
@@ -65,16 +61,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ClearErrorBuffer(VOID_PROTOTYPE)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetErrorBufferThreshold(LONG nErrors)
 {
     LOG_FUNC_ENTRY_PARAMS((nErrors))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    if ( !IsDLLHandleValid( pHandle, FALSE ) )
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
 
     // Minimum of 50 errors
     const LONG nEntries = (std::max)(nErrors, static_cast<LONG>(50));
 
     // clear buffer
     pHandle->m_nErrorBufferThreshold = nEntries;
-
 
     std::deque<int> tempdeque;
     tempdeque.swap(pHandle->m_vErrorBuffer);
@@ -86,10 +79,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetErrorBufferThreshold(LONG nErrors)
 LONG DLLENTRY_DEF DTWAIN_GetErrorBufferThreshold(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_NONAME_PARAMS()
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    if ( !IsDLLHandleValid( pHandle, -1 ) )
-        LOG_FUNC_EXIT_NONAME_PARAMS(-1)
-
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const LONG nValues = pHandle->m_nErrorBufferThreshold;
     LOG_FUNC_EXIT_NONAME_PARAMS(nValues)
     CATCH_BLOCK(-1)

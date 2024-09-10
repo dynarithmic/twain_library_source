@@ -33,7 +33,7 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     auto pTheSource = pSource;
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return DTWAIN_IsSourceAcquiring(Source); },
     DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
@@ -88,7 +88,7 @@ void dynarithmic::LLSetupUIOnly(CTL_ITwainSource* pSource)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ForceScanOnNoUI(DTWAIN_SOURCE Source, BOOL bSet)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, bSet))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
 
     // return the file name that would be acquired
     pSource->SetForceScanOnNoUI(bSet ? true : false);

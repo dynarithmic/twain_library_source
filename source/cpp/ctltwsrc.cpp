@@ -1019,7 +1019,8 @@ CTL_ITwainSource::~CTL_ITwainSource()
         ResetManualDuplexMode();
         CloseSource(true);
         m_pDLLHandle->m_mapPDFTextElement.erase(this);
-        m_pDLLHandle->m_ArrayFactory->destroy(m_pFileEnumerator);
+        if ( m_pFileEnumerator)
+            m_pDLLHandle->m_ArrayFactory->destroy(m_pFileEnumerator);
     }
     catch (...)
     {
@@ -1520,8 +1521,8 @@ bool isFloatCap(LONG capType)
 template <typename T>
 static DTWAIN_ARRAY PopulateArray(const std::vector<anytype_>& dataArray, CTL_ITwainSource* pSource, TW_UINT16 nCap)
 {
-    const DTWAIN_ARRAY theArray = DTWAIN_ArrayCreateFromCap(pSource, static_cast<LONG>(nCap), static_cast<LONG>(dataArray.size()));
     const auto pHandle = pSource->GetDTWAINHandle();
+    const DTWAIN_ARRAY theArray = CreateArrayFromCap(pHandle, pSource, static_cast<LONG>(nCap), static_cast<LONG>(dataArray.size()));
     auto& vVector = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
     std::transform(dataArray.begin(), dataArray.end(), vVector.begin(), [](anytype_ theAny) 
                     { return ANYTYPE_NAMESPACE any_cast<typename T::value_type>(theAny);});

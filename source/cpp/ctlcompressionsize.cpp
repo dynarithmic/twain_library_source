@@ -29,7 +29,7 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCompressionSize(DTWAIN_SOURCE Source, LPLONG lBytes)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lBytes))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     *lBytes = pSource->GetNumCompressBytes();
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)

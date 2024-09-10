@@ -780,7 +780,7 @@ static bool GetDoubleCap( DTWAIN_SOURCE Source, LONG lCap, double *pValue )
 static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, LONG GetType, DTWAIN_BOOL bExpandRange)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pArray, lCap, bExpandRange))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     auto p = pSource;
     LONG nValues = 0;
 
@@ -795,7 +795,7 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
     if ( pArray )
         arrayToUse = pArray;
 
-    DTWAINArrayPtr_RAII a(&OrigVals);
+    DTWAINArrayPtr_RAII a(pHandle, &OrigVals);
 
     // get the capability values
     if (DTWAIN_GetCapValues(Source, lCap, GetType, arrayToUse))
@@ -812,14 +812,14 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
                     DTWAIN_ARRAY tempArray = nullptr;
 
                     // throw this away when done
-                    DTWAINArrayPtr_RAII aTemp(&tempArray);
+                    DTWAINArrayPtr_RAII aTemp(pHandle, &tempArray);
 
                     // expand the range into a temp array
                     DTWAIN_RangeExpand(*arrayToUse, &tempArray);
 
                     // destroy original and copy new values
                     pHandle->m_ArrayFactory->destroy(*arrayToUse);
-                    *arrayToUse = CreateArrayCopyFromFactory(tempArray);
+                    *arrayToUse = CreateArrayCopyFromFactory(pHandle, tempArray);
 
                     // get the count
                     nValues = static_cast<LONG>(pHandle->m_ArrayFactory->size(*arrayToUse)); 

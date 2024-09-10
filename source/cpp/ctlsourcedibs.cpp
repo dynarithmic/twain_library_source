@@ -31,7 +31,7 @@ using namespace dynarithmic;
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetSourceAcquisitions(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     const DTWAIN_ARRAY AcqArray = pSource->GetAcquisitionArray();
     if (!AcqArray)
         LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
@@ -69,7 +69,8 @@ DTWAIN_BOOL dynarithmic::DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source, DTWAIN_AR
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAllSourceDibsEx(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY  pArray)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pArray))
-    const DTWAIN_ARRAY DibArray = CreateArrayFromFactory(DTWAIN_ARRAYHANDLE, 0);
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    const DTWAIN_ARRAY DibArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYHANDLE, 0);
     if (DibArray)
     {
         DTWAIN_GetAllSourceDibs(Source, DibArray);
@@ -83,7 +84,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAllSourceDibsEx(DTWAIN_SOURCE Source, LPDTWAI
 HANDLE DLLENTRY_DEF DTWAIN_GetCurrentAcquiredImage(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     const int nCount = pSource->GetNumDibs();
     if (nCount == 0)
         LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
@@ -94,7 +95,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetCurrentAcquiredImage(DTWAIN_SOURCE Source)
 LONG DLLENTRY_DEF DTWAIN_GetCurrentPageNum(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     const LONG retval = static_cast<LONG>(pSource->GetPendingImageNum());
     LOG_FUNC_EXIT_NONAME_PARAMS(retval)
     CATCH_BLOCK_LOG_PARAMS(-1L)
@@ -103,7 +104,8 @@ LONG DLLENTRY_DEF DTWAIN_GetCurrentPageNum(DTWAIN_SOURCE Source)
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_CreateAcquisitionArray()
 {
     LOG_FUNC_ENTRY_NONAME_PARAMS()
-    const DTWAIN_ARRAY AcqArray = static_cast<DTWAIN_ARRAY>(CreateArrayFromFactory(DTWAIN_ARRAYOFHANDLEARRAYS, 0));
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    const DTWAIN_ARRAY AcqArray = static_cast<DTWAIN_ARRAY>(CreateArrayFromFactory(pHandle, DTWAIN_ARRAYOFHANDLEARRAYS, 0));
     LOG_FUNC_EXIT_NONAME_PARAMS(AcqArray)
     CATCH_BLOCK(DTWAIN_ARRAY(0))
 }
@@ -147,7 +149,7 @@ struct NestedAcquisitionDestroyer
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyAcquisitionArray(DTWAIN_ARRAY aAcq, DTWAIN_BOOL bDestroyDibs)
 {
     LOG_FUNC_ENTRY_PARAMS((aAcq))
-    auto [pHandle, pSource] = VerifySourceHandle(nullptr, DTWAIN_TEST_HANDLE);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
 
     const auto& factory = pHandle->m_ArrayFactory;
 
@@ -175,7 +177,7 @@ static bool SetBitDepth(CTL_ITwainSource *p, LONG BitDepth);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ForceAcquireBitDepth(DTWAIN_SOURCE Source, LONG BitDepth)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, BitDepth))
-    auto [pHandle, pSource] = VerifySourceHandle(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     auto pTheSource = pSource;
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(pTheSource); },
                 DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
