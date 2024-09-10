@@ -39,6 +39,7 @@ std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> dynarithmic::VerifySourceHandl
     CTL_ITwainSource *pSource = nullptr;
     CTL_TwainDLLHandle* pHandle = nullptr;
     bool doThrow = !(Testing & DTWAIN_TEST_NOTHROW);
+    bool setLastError = Testing & DTWAIN_TEST_SETLASTERROR;
     if (!CTL_StaticData::IsCheckHandles())
     {
         pSource = static_cast<CTL_ITwainSource*>(Source);
@@ -73,6 +74,8 @@ std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> dynarithmic::VerifySourceHandl
             pSource = static_cast<CTL_ITwainSource*>(Source);
             if (!pSource || !CTL_TwainAppMgr::IsValidTwainSource(pHandle->m_pTwainSession, pSource))
             {
+                if (setLastError)
+                    pHandle->m_lLastError = DTWAIN_ERR_BAD_SOURCE;
                 if ( doThrow )
                     throw DTWAIN_ERR_BAD_SOURCE;
                 return { nullptr, nullptr };

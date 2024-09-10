@@ -790,10 +790,11 @@ namespace dynarithmic
     #define DTWAIN_TEST_HANDLE  1
     #define DTWAIN_TEST_SOURCE  2
     #define DTWAIN_TEST_NOTHROW 4
+    #define DTWAIN_TEST_SETLASTERROR 8
 
     CTL_TwainDLLHandle* FindHandle(HWND hWnd, bool bIsDisplay);
     CTL_TwainDLLHandle* FindHandle(HINSTANCE hInst);
-    std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> VerifySourceHandle(DTWAIN_SOURCE Source, int Testing = DTWAIN_TEST_HANDLE | DTWAIN_TEST_SOURCE );
+    std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> VerifySourceHandle(DTWAIN_SOURCE Source, int Testing = DTWAIN_TEST_HANDLE | DTWAIN_TEST_SOURCE | DTWAIN_TEST_SETLASTERROR);
     int GetResolutions(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, void* pArray,CTL_EnumGetType GetType);
     bool GetImageSize( DTWAIN_HANDLE DLLHandle,
                        DTWAIN_SOURCE Source,

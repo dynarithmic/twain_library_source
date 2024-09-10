@@ -317,9 +317,6 @@ LONG DLLENTRY_DEF DTWAIN_GetLastError()
             err = DTWAIN_ERR_RESOURCES_NOT_FOUND;
         LOG_FUNC_EXIT_NONAME_PARAMS(err)
     }
-    else
-    {
-    }
     LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_lLastError)
     CATCH_BLOCK(DTWAIN_ERR_BAD_HANDLE)
 }
