@@ -65,7 +65,7 @@ static LONG OpenSourceInternal(DTWAIN_SOURCE Source, const SourceSelectionOption
         p->SetSelected(true);
     else
         return DTWAIN_ERR_BAD_SOURCE;
-    if (opts.nOptions & DTWAIN_DLG_OPENONSELECT) // pHandle->m_bOpenSourceOnSelect)
+    if (opts.nOptions & DTWAIN_DLG_OPENONSELECT) 
     {
         const DTWAIN_BOOL retval = DTWAIN_OpenSource(Source);
         if (retval != TRUE)
@@ -115,7 +115,6 @@ static DTWAIN_SOURCE SelectSourceHelper(CTL_TwainDLLHandle* pHandle, SourceSelec
     }
     else
     {
-        opts.nOptions |= DTWAIN_DLG_OPENONSELECTOVERRIDE;
         if ( bOpen )
             opts.nOptions |= DTWAIN_DLG_OPENONSELECT;
     }
@@ -377,7 +376,7 @@ DTWAIN_SOURCE dynarithmic::DTWAIN_LLSelectSource2(CTL_TwainDLLHandle* pHandle,  
         if (iter != selectStruct.CS.mapNames.end())
             actualSourceName = iter->first;
     }
-    bool openWhenSelected = !(opts.nOptions & DTWAIN_DLG_OPENONSELECTOFF);
+    bool openWhenSelected = !(opts.nOptions & DTWAIN_DLG_NOOPENONSELECT)?true:false;
     DTWAIN_SOURCE Source = 
             SelectSourceHelper(pHandle, SourceSelectionOptions(SELECTSOURCEBYNAME, actualSourceName.c_str()), openWhenSelected);
 
@@ -634,6 +633,7 @@ LRESULT CALLBACK DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPA
             // Get the default Source
             DTWAIN_SOURCE DefSource = nullptr;
             std::vector<TCHAR> DefName;
+            bool bAlwaysHighlightFirst = pS->CS.nOptions & DTWAIN_DLG_HIGHLIGHTFIRST;
             if (bLogMessages)
                 CTL_TwainAppMgr::WriteLogInfoA("Initializing TWAIN Dialog -- Retrieving default TWAIN Source...\n");
             {
@@ -646,7 +646,7 @@ LRESULT CALLBACK DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPA
                 }
                 else
                 {
-                    if (!(pS->CS.nOptions & DTWAIN_DLG_HIGHLIGHTFIRST))
+                    if (!bAlwaysHighlightFirst)
                     {
                         // Turn off default open temporarily
                         openSourceSaver sourceSaver(pHandle->m_bOpenSourceOnSelect ? true : false);
@@ -763,7 +763,7 @@ LRESULT CALLBACK DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPA
                 if ( bLogMessages)
                     CTL_TwainAppMgr::WriteLogInfoA("TWAIN now finished comparing names...\n");
             }
-            if (DefName.empty())
+            if (bAlwaysHighlightFirst || DefName.empty())
                 DefIndex = 0;
 
             if (!TextExtents.empty())
