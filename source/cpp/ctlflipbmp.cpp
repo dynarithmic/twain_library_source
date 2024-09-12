@@ -29,47 +29,30 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FlipBitmap( HANDLE hDib )
 {
     LOG_FUNC_ENTRY_PARAMS((hDib))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-
     // Flip bitmap
     CTL_TwainDib ThisDib;
-
     ThisDib.SetHandle(hDib);
     ThisDib.FlipBitMap(TRUE);
-
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
 HANDLE DLLENTRY_DEF DTWAIN_ConvertDIBToBitmap(HANDLE hDib, HANDLE hPalette)
 {
     LOG_FUNC_ENTRY_PARAMS((hDib, hPalette))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, NULL, FUNC_MACRO);
-
     const auto retVal = CDibInterface::DIBToBitmap(hDib, static_cast<HPALETTE>(hPalette));
-
-    LOG_FUNC_EXIT_PARAMS(retVal)
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(HANDLE())
 }
 
 HANDLE DLLENTRY_DEF DTWAIN_ConvertDIBToFullBitmap(HANDLE hDib, DTWAIN_BOOL isBMP)
 {
     LOG_FUNC_ENTRY_PARAMS((hDib, isBMP))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, NULL, FUNC_MACRO);
     HANDLE returnHandle = {};
     if (isBMP)
     {
         returnHandle = CTL_TwainDib::CreateBMPBitmapFromDIB(hDib);
-        LOG_FUNC_EXIT_PARAMS(returnHandle);
+        LOG_FUNC_EXIT_NONAME_PARAMS(returnHandle);
     }
     else
     {
@@ -80,6 +63,6 @@ HANDLE DLLENTRY_DEF DTWAIN_ConvertDIBToFullBitmap(HANDLE hDib, DTWAIN_BOOL isBMP
         const LPBYTE bFullImage = raii2.getData();
         std::copy_n(pDibData, GlobalSize(hDib), &bFullImage[0]);
     }
-    LOG_FUNC_EXIT_PARAMS(returnHandle)
+    LOG_FUNC_EXIT_NONAME_PARAMS(returnHandle)
     CATCH_BLOCK(HANDLE())
 }

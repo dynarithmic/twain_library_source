@@ -29,29 +29,17 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SkipImageInfoError(DTWAIN_SOURCE Source, DTWAIN_BOOL bSkip)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, bSkip))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
-    if (!p)
-        LOG_FUNC_EXIT_PARAMS(false)
-    p->SetImageInfoErrors(bSkip ? true : false);
-    LOG_FUNC_EXIT_PARAMS(true)
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    pSource->SetImageInfoErrors(bSkip ? true : false);
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSkipImageInfoError(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
-    if (!p)
-        LOG_FUNC_EXIT_PARAMS(false)
-    const LONG retval = p->SkipImageInfoErrors();
-    LOG_FUNC_EXIT_PARAMS(retval)
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    const LONG retval = pSource->SkipImageInfoErrors();
+    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
     CATCH_BLOCK(false)
 }

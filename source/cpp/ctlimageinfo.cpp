@@ -57,7 +57,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfoString(DTWAIN_SOURCE Source,
         strm << boost::format("%1%") % tempY;
         StringWrapper::SafeStrcpy(YResolution, StringConversion::Convert_Ansi_To_Native(strm.str()).c_str());
     }
-    LOG_FUNC_EXIT_PARAMS(retVal)
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(false)
 }
 
@@ -74,20 +74,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfo(DTWAIN_SOURCE Source,
                                             LPLONG Compression)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, XResolution, YResolution, Width, Length, NumSamples, BitsPerSample,BitsPerPixel, Planar, PixelType, Compression))
-
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
-
-    if (!p)
-        LOG_FUNC_EXIT_PARAMS(false)
-
+    auto [pHandle, p] = VerifyHandles(Source);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(p); },
     DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
     CTL_ImageInfoTriplet II(pHandle->m_pTwainSession, p);
 
     if (!CTL_TwainAppMgr::GetImageInfo(p, &II))
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
         // Get the image information
     TW_IMAGEINFO *pInfo = II.GetImageInfoBuffer();
@@ -107,7 +101,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfo(DTWAIN_SOURCE Source,
 
     if (BitsPerSample)
     {
-        const DTWAIN_ARRAY Array = CreateArrayFromFactory(DTWAIN_ARRAYLONG, 8);
+        const DTWAIN_ARRAY Array = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 8);
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
         TW_INT16* pStart = &pInfo->BitsPerSample[0];
         TW_INT16* pEnd = &pInfo->BitsPerSample[8];
@@ -124,6 +118,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfo(DTWAIN_SOURCE Source,
     if (Compression)
         *Compression = pInfo->Compression;
 
-    LOG_FUNC_EXIT_PARAMS(true)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }

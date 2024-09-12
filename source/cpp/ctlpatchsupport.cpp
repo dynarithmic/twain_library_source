@@ -42,7 +42,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPatchCapsSupported(DTWAIN_SOURCE Source)
                                    { return DTWAIN_IsCapSupported(Source, val)?true:false;});
 
     const bool bRet = iter != std::end(nCapToTest);
-    LOG_FUNC_EXIT_PARAMS(bRet)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
 

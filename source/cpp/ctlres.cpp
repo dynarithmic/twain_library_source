@@ -114,7 +114,7 @@ namespace dynarithmic
 
     bool LoadTwainResources(ResourceLoadingInfo& retValue)
     {
-        LOG_FUNC_ENTRY_PARAMS(())
+        LOG_FUNC_ENTRY_NONAME_PARAMS()
         retValue.errorValue[0] = false;
         retValue.errorValue[1] = false;
         retValue.errorValue[2] = true;
@@ -378,7 +378,7 @@ namespace dynarithmic
             return false;
         }
         CTL_StaticData::s_ResourceVersion = StringConversion::Convert_Ansi_To_Native(origVersion);
-        LOG_FUNC_EXIT_PARAMS(true)
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK(false)
     }
 
@@ -415,21 +415,52 @@ namespace dynarithmic
         return StringWrapper::CopyInfoToCString(native_str, buffer, bufSize);
     }
 
-    std::string GetResourceStringFromMap(LONG nError)
+    std::string& GetResourceStringFromMap(LONG nError)
     {
-        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-        if (pHandle)
+        static std::string retString;
+
+        // Check if string is in cache
+        auto& sKey = CTL_StaticData::GetCurrentLanguageResourceKey();
+        auto& resCache = CTL_StaticData::GetResourceCache();
+        auto iter = resCache.find({ nError, sKey });
+        if (iter != resCache.end())
+            return iter->second;
+
+        // Get string the long way
+        auto currentResource = CTL_StaticData::GetCurrentLanguageResource();
+        if (currentResource)
         {
-            const auto found = pHandle->m_mapResourceStrings.find(nError);
-            if (found != pHandle->m_mapResourceStrings.end())
-                return found->second;
+            auto iterFound = currentResource->find(nError);
+            if (iterFound != currentResource->end())
+            {
+                resCache.insert({{ nError, sKey }, iterFound->second});
+                return iterFound->second;
+            }
         }
-        return {};
+        return retString;
     }
 
-    static bool LoadLanguageResourceFromFileA(const std::string& sPath, bool clearEntry)
+    static bool LoadLanguageResourceFromFileA(const char* szLangName, const std::string& sPath, bool clearEntry)
     {
-        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        auto& allLanguages = CTL_StaticData::GetAllLanguagesResourceMap();
+
+        // Search for language already loaded
+        auto iterLang = allLanguages.find(szLangName);
+        if (iterLang != allLanguages.end())
+        {
+            // language was already loaded, so set as the current language
+            CTL_StaticData::SetCurrentLanguageResourceKey(iterLang->first);
+
+            // If we don't want to clear the entries out, return
+            if ( !clearEntry )
+                return true;
+
+            // Clean out the string resources
+            iterLang->second.clear();
+        }
+
+        // Create an empty map
+        CTL_StringToMapLongToStringMap::mapped_type resourceMap;
         std::string::value_type sVersion[100];
         DTWAIN_GetShortVersionStringA(sVersion, 100);
         std::ifstream ifs(sPath);
@@ -438,8 +469,6 @@ namespace dynarithmic
         {
             std::string descr;
             int resourceID;
-            if ( clearEntry )
-                pHandle->m_mapResourceStrings.clear();
             open = true;
             std::string line;
             while (getline(ifs, line))
@@ -452,11 +481,57 @@ namespace dynarithmic
                     descr = StringWrapperA::ReplaceAll(descr, "{short_version}", sVersion);
                     descr = StringWrapperA::ReplaceAll(descr, "{company_name}", DTWAIN_VERINFO_COMPANYNAME);
                     descr = StringWrapperA::ReplaceAll(descr, "{copyright}", DTWAIN_VERINFO_LEGALCOPYRIGHT);
-                    pHandle->m_mapResourceStrings.insert({ resourceID, descr });
+                    resourceMap.insert({ resourceID, descr });
                 }
             }
+            allLanguages.insert({ szLangName, resourceMap });
+            CTL_StaticData::SetCurrentLanguageResourceKey(szLangName);
+            auto& info = CTL_StaticData::GetGeneralResourceInfo();
+            info.sResourceName = StringConversion::Convert_AnsiPtr_To_Native(szLangName);
+            info.bIsFromRC = false;
         }
         return open;
+    }
+
+    // Only works for english language
+    bool LoadLanguageResourceFromRC()
+    {
+        const char* lang = "english";
+        auto& allLanguages = CTL_StaticData::GetAllLanguagesResourceMap();
+
+        // Search for language already loaded
+        auto iterLang = allLanguages.find(lang);
+        if (iterLang != allLanguages.end())
+        {
+            // language was already loaded, so set as the current language
+            CTL_StaticData::SetCurrentLanguageResourceKey(lang);
+
+            // Clean out the string resources
+            iterLang->second.clear();
+        }
+        CTL_StringToMapLongToStringMap::mapped_type resourceMap;
+        std::string::value_type sVersion[100];
+        DTWAIN_GetShortVersionStringA(sVersion, 100);
+        // Assume resource ID's are numbered from 0 to 20000
+        char szBuffer[DTWAIN_USERRES_MAXSIZE + 1];
+        for (int i = 0; i < DTWAIN_USERRES_START; ++i)
+        {
+            if (::LoadStringA(CTL_StaticData::s_DLLInstance, i, szBuffer, DTWAIN_USERRES_MAXSIZE))
+            {
+                std::string descr = szBuffer;
+                StringWrapperA::TrimAll(descr);
+                descr = StringWrapperA::ReplaceAll(descr, "{short_version}", sVersion);
+                descr = StringWrapperA::ReplaceAll(descr, "{company_name}", DTWAIN_VERINFO_COMPANYNAME);
+                descr = StringWrapperA::ReplaceAll(descr, "{copyright}", DTWAIN_VERINFO_LEGALCOPYRIGHT);
+                resourceMap.insert({ i, descr });
+            }
+        }
+        allLanguages.insert({ lang, resourceMap});
+        CTL_StaticData::SetCurrentLanguageResourceKey(lang);
+        auto& info = CTL_StaticData::GetGeneralResourceInfo();
+        info.sResourceName = _T("english");
+        info.bIsFromRC = true;
+        return true;
     }
 
     std::string GetResourceFileNameA(LPCSTR lpszName, LPCTSTR szPrefix)
@@ -466,37 +541,43 @@ namespace dynarithmic
         return sPathA + lpszName + (std::string)".txt";
     }
 
-    bool LoadLanguageResourceA(LPCSTR lpszName, const CTL_ResourceRegistryMap& registryMap)
+    bool LoadLanguageResourceA(LPCSTR lpszName, const CTL_ResourceRegistryMap& registryMap, bool bClear)
     {
         LOG_FUNC_ENTRY_PARAMS((lpszName))
         const auto iter = registryMap.find(lpszName);
         if (iter != registryMap.end())
         {
             if ( !iter->second )
-                LOG_FUNC_EXIT_PARAMS(false)
+                LOG_FUNC_EXIT_NONAME_PARAMS(false)
         }
-        const bool retVal = LoadLanguageResourceA(lpszName);
-        LOG_FUNC_EXIT_PARAMS(retVal)
+        const bool retVal = LoadLanguageResourceA(lpszName, bClear);
+        if (!retVal)
+        {
+            auto& info = CTL_StaticData::GetGeneralResourceInfo();
+            info.sResourceName = {};
+            info.bIsFromRC = false;
+        }
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
         CATCH_BLOCK(false)
     }
 
-    bool LoadLanguageResourceA(LPCSTR lpszName)
+    bool LoadLanguageResourceA(LPCSTR lpszName, bool bClear)
     {
         LOG_FUNC_ENTRY_PARAMS((lpszName))
-        bool bReturn = LoadLanguageResourceFromFileA(GetResourceFileNameA(lpszName, DTWAINLANGRESOURCEFILE), true);
-        LoadLanguageResourceFromFileA(GetResourceFileNameA(lpszName, DTWAINCUSTOMRESOURCESFILE), false);
-        LOG_FUNC_EXIT_PARAMS(bReturn)
+        bool bReturn = LoadLanguageResourceFromFileA(lpszName, GetResourceFileNameA(lpszName, DTWAINLANGRESOURCEFILE), bClear);
+        LoadLanguageResourceFromFileA(lpszName, GetResourceFileNameA(lpszName, DTWAINCUSTOMRESOURCESFILE), false);
+        LOG_FUNC_EXIT_NONAME_PARAMS(bReturn)
         CATCH_BLOCK(false)
     }
 
-    bool LoadLanguageResourceA(const std::string& lpszName, const CTL_ResourceRegistryMap& registryMap)
+    bool LoadLanguageResourceA(const std::string& lpszName, const CTL_ResourceRegistryMap& registryMap, bool bClear)
     {
-        return LoadLanguageResourceA(lpszName.c_str(), registryMap);
+        return LoadLanguageResourceA(lpszName.c_str(), registryMap, bClear);
     }
 
-    bool LoadLanguageResourceA(const std::string& lpszName)
+    bool LoadLanguageResourceA(const std::string& lpszName, bool bClear)
     {
-        return LoadLanguageResourceA(lpszName.c_str());
+        return LoadLanguageResourceA(lpszName.c_str(), bClear);
     }
 
     bool LoadLanguageResourceXML(LPCTSTR sLangDLL)

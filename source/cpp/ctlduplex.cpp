@@ -42,17 +42,17 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, LPLONG lpDup
         {
             DTWAIN_ARRAY Array = nullptr;
             const DTWAIN_BOOL bRet2 = DTWAIN_GetCapValues(Source, DTWAIN_CV_CAPDUPLEX, DTWAIN_CAPGET, &Array) ? true : false;
-            DTWAINArrayLL_RAII arr(Array);
+            const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+            DTWAINArrayLowLevel_RAII arr(pHandle, Array);
             if ( bRet2 && Array)
             {
-                const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
                 auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
                 if ( !vValues.empty() )
                     *lpDupType = vValues.front();
             }
         }
     }
-    LOG_FUNC_EXIT_PARAMS(bRet)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
 
@@ -68,6 +68,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsDuplexSupported(DTWAIN_SOURCE Source)
              DupType == TWDX_2PASSDUPLEX )
             bRet = true;
     }
-    LOG_FUNC_EXIT_PARAMS(bRet)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }

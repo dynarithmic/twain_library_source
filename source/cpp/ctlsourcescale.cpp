@@ -41,35 +41,28 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageScaleString(DTWAIN_SOURCE Source,
     const DTWAIN_FLOAT xValue = StringWrapper::ToDouble(xscale);
     const DTWAIN_FLOAT yValue = StringWrapper::ToDouble(yscale);
     const DTWAIN_BOOL retVal = DTWAIN_SetAcquireImageScale(Source, xValue, yValue);
-    LOG_FUNC_EXIT_PARAMS(retVal)
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageNegative(DTWAIN_SOURCE Source, DTWAIN_BOOL IsNegative)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, IsNegative))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
-    if (!p)
-        LOG_FUNC_EXIT_PARAMS(false)
-    p->SetImageNegative(IsNegative ? true : false);
-    LOG_FUNC_EXIT_PARAMS(true)
-    CATCH_BLOCK(false)
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    pSource->SetImageNegative(IsNegative ? true : false);
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageScale(DTWAIN_SOURCE Source, DTWAIN_FLOAT  xscale, DTWAIN_FLOAT  yscale)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, xscale, yscale))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
-    if (!p)
-        LOG_FUNC_EXIT_PARAMS(false)
-
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(p); },
-    DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
-
-    const DTWAIN_BOOL bRet = SetImageScale(p, xscale, yscale);
-    LOG_FUNC_EXIT_PARAMS(bRet)
-    CATCH_BLOCK(false)
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    auto pTheSource = pSource;
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(pTheSource); },
+            DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+    const DTWAIN_BOOL bRet = SetImageScale(pSource, xscale, yscale);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }

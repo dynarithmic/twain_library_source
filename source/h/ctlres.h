@@ -33,10 +33,12 @@ namespace dynarithmic
 {
     typedef std::unordered_map<std::string, bool> CTL_ResourceRegistryMap;
 
-    bool LoadLanguageResourceA(LPCSTR lpszName, const CTL_ResourceRegistryMap& registryMap);
-    bool LoadLanguageResourceA(LPCSTR lpszName);
-    bool LoadLanguageResourceA(const std::string& lpszName, const CTL_ResourceRegistryMap& registryMap);
-    bool LoadLanguageResourceA(const std::string& lpszName);
+    bool LoadLanguageResourceA(LPCSTR lpszName, const CTL_ResourceRegistryMap& registryMap, bool bClear);
+    bool LoadLanguageResourceA(LPCSTR lpszName, bool bClear);
+    bool LoadLanguageResourceA(const std::string& lpszName, const CTL_ResourceRegistryMap& registryMap, bool bClear);
+    bool LoadLanguageResourceA(const std::string& lpszName, bool bClear);
+    bool LoadLanguageResourceFromRC();
+
 
     struct ResourceLoadingInfo
     {
@@ -51,6 +53,6 @@ namespace dynarithmic
     std::vector<std::string> GetLangResourceNames();
     std::string GetResourceFileNameA(LPCSTR lpszName, LPCTSTR szPrefix);
     std::string GetCustomResourceFileNameA(LPCSTR lpszName);
-    std::string GetResourceStringFromMap(LONG resourceNum);
+    std::string& GetResourceStringFromMap(LONG resourceNum);
 }
 #endif

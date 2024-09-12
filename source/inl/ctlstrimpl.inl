@@ -1614,6 +1614,24 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesA(LPCSTR sLangDLL)
 #endif
 }
 
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesExW(LPCWSTR sLangDLL, DTWAIN_BOOL bClear)
+{
+#ifdef _UNICODE
+    return DTWAIN_LoadCustomStringResourcesEx(sLangDLL, bClear);
+#else
+    return DTWAIN_LoadCustomStringResourcesEx(StringConversion::Convert_WidePtr_To_Native(sLangDLL).c_str(), bClear);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesExA(LPCSTR sLangDLL, DTWAIN_BOOL bClear)
+{
+#ifdef _UNICODE
+    return DTWAIN_LoadCustomStringResourcesEx(StringConversion::Convert_AnsiPtr_To_Native(sLangDLL).c_str(), bClear);
+#else
+    return DTWAIN_LoadCustomStringResourcesEx(sLangDLL, bClear);
+#endif
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LogMessageW(LPCWSTR message)
 {
 #ifdef _UNICODE

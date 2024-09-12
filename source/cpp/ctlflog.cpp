@@ -95,7 +95,7 @@ std::string dynarithmic::CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich,
 
 void dynarithmic::LogExceptionErrorA(LPCSTR fname, const char* sAdditionalText)
 {
-    if ( CTL_StaticData::s_lErrorFilterFlags == 0 )
+    if ( !(CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_SHOWEXCEPTIONS) )
          return;
     try
     {
@@ -115,8 +115,7 @@ void dynarithmic::LogExceptionErrorA(LPCSTR fname, const char* sAdditionalText)
        if (!(CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_USEFILE))
             s += "\n";
        CTL_TwainAppMgr::WriteLogInfoA(s, true);  // flush all writes to the log file
-       if ( CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_SHOWEXCEPTIONS)
-           LogExceptionToConsole(fname, sAdditionalText);
+       LogExceptionToConsole(fname, sAdditionalText);
     }
     catch(...)
     {
@@ -135,12 +134,12 @@ void LogExceptionToConsole(LPCSTR fname, const char* sAdditionalText)
             return;
         std::ostringstream strm;
         strm << boost::format("**** DTWAIN %1% ****.  %2%: %3%\n") %
-            pHandle->m_mapResourceStrings[IDS_LOGMSG_EXCEPTERRORTEXT].c_str() %
-            pHandle->m_mapResourceStrings[IDS_LOGMSG_MODULETEXT].c_str() % fname;
+            GetResourceStringFromMap(IDS_LOGMSG_EXCEPTERRORTEXT).c_str() %
+            GetResourceStringFromMap(IDS_LOGMSG_MODULETEXT).c_str() % fname;
         if (sAdditionalText)
             strm << "\nAdditional Information: " << sAdditionalText;
         #ifdef _WIN32
-        MessageBoxA(nullptr, strm.str().c_str(), pHandle->m_mapResourceStrings[IDS_LOGMSG_EXCEPTERRORTEXT].c_str(), MB_ICONSTOP);
+        MessageBoxA(nullptr, strm.str().c_str(), GetResourceStringFromMap(IDS_LOGMSG_EXCEPTERRORTEXT).c_str(), MB_ICONSTOP);
         #else
            std::cout << strm.str() << '\n';
         #endif
