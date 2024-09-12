@@ -114,6 +114,7 @@ void CTL_TwainAppMgr::Destroy()
 }
 
 CTL_ITwainSession* CTL_TwainAppMgr::CreateTwainSession(
+                                     CTL_TwainDLLHandle *pHandle,
                                      LPCTSTR pAppName/* = nullptr*/,
                                      HWND* hAppWnd,/* = nullptr*/
                                      TW_UINT16 nMajorNum/*    = 1*/,
@@ -140,7 +141,8 @@ CTL_ITwainSession* CTL_TwainAppMgr::CreateTwainSession(
             return nullptr;
     }
 
-    const auto pSession = CTL_ITwainSession::Create(pAppName,
+    const auto pSession = CTL_ITwainSession::Create(pHandle,
+                                                    pAppName,
                                                     hAppWnd,
                                                     nMajorNum,
                                                     nMinorNum,
@@ -156,8 +158,6 @@ CTL_ITwainSession* CTL_TwainAppMgr::CreateTwainSession(
         // to the proper levels here.  We support 1.9 for TWAIN_32.DLL (LEGACY) and 2.x for
         // TWAINDSM.DLL.
         // DTWAIN assumes 2.x, but must change for legacy TWAIN_32.DLL source manager
-        CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-
         if ( pHandle->m_SessionStruct.DSMName == TWAINDLLVERSION_1 )
         {
             TW_IDENTITY *pIdentity = pSession->GetAppIDPtr();
@@ -202,7 +202,7 @@ CTL_ITwainSession* CTL_TwainAppMgr::CreateTwainSession(
 
 bool CTL_TwainAppMgr::OpenSourceManager( CTL_ITwainSession* pSession )
 {
-    CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    CTL_TwainDLLHandle* pHandle = pSession->GetTwainDLLHandle();
     CTL_TwainOpenSMTriplet SM( pSession );
     if ( SM.Execute() != TWRC_SUCCESS )
         return false;
@@ -229,7 +229,7 @@ bool CTL_TwainAppMgr::OpenSourceManager( CTL_ITwainSession* pSession )
 
 bool CTL_TwainAppMgr::IsVersion2DSMUsed()
 {
-    CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     return pHandle->m_nDSMVersion == DTWAIN_TWAINDSM_VERSION2;
 }
 
@@ -376,6 +376,12 @@ CTL_ITwainSource* CTL_TwainAppMgr::SelectSource(CTL_ITwainSession* pSession, LPC
 CTL_ITwainSource*  CTL_TwainAppMgr::GetDefaultSource(CTL_ITwainSession* pSession)
 {
     return GenericSourceSelector(pSession, nullptr, nullptr, 2);
+}
+
+bool CTL_TwainAppMgr::SetDefaultSource(CTL_ITwainSource* pSource)
+{
+    const auto pSession = pSource->GetTwainSession();
+    return SetDefaultSource(pSession, pSource);
 }
 
 bool CTL_TwainAppMgr::OpenSource( CTL_ITwainSession* pSession, const CTL_ITwainSource* pSource/*=nullptr*/)
@@ -724,7 +730,7 @@ bool CTL_TwainAppMgr::ShowUserInterface( CTL_ITwainSource *pSource, bool bTest, 
                 DisableUserInterface(pSource);
 
                 // Force setting the transfer done now.
-                const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+                const auto pHandle = pSource->GetDTWAINHandle();
                 pHandle->m_bTransferDone = true;
 
                 SendTwainMsgToWindow(pSession,nullptr,DTWAIN_TN_UICLOSED,reinterpret_cast<LPARAM>(pSource));
@@ -1080,7 +1086,7 @@ int  CTL_TwainAppMgr::FileTransfer( CTL_ITwainSession *pSession,
     {
         CTL_StringType szTempPath;
         // Set the temp file name here
-        szTempPath = GetDTWAINTempFilePath();
+        szTempPath = GetDTWAINTempFilePath(pSource->GetDTWAINHandle());
         if ( szTempPath.empty() )
             return 0;
 
@@ -2203,13 +2209,18 @@ std::string CTL_TwainAppMgr::GetCapNameFromCap( LONG Cap )
     return sName;
 }
 
-UINT CTL_TwainAppMgr::GetDataTypeFromCap( CTL_EnumCapability Cap, CTL_ITwainSource *pSource/*=NULL*/ )
+int CTL_TwainAppMgr::GetDataTypeFromCap( CTL_EnumCapability Cap, CTL_ITwainSource *pSource/*=NULL*/ )
 {
-    if ( static_cast<unsigned>(Cap) >= CAP_CUSTOMBASE )
-        return DTWAIN_GetCapDataType(pSource, Cap);
+    const auto nThisCap = static_cast<TW_UINT16>(Cap);
+    if (nThisCap >= CAP_CUSTOMBASE)
+    {
+        if (!pSource)
+            return DTWAIN_FAILURE1;
+        return GetCustomCapDataType(pSource, nThisCap);
+    }
     const CTL_CapStruct cStruct = GetGeneralCapInfo(Cap);
     if ( static_cast<std::string>(cStruct).length() == 0 )
-        return 0xFFFF;
+        return (std::numeric_limits<int>::min)();
     return cStruct.m_nDataType;
 }
 
@@ -2643,7 +2654,7 @@ void CTL_TwainAppMgr::WriteLogInfo(const CTL_StringType& s, bool bFlush)
 
 void CTL_TwainAppMgr::GatherCapabilityInfo(CTL_ITwainSource* pSource)
 {
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto pHandle = pSource->GetDTWAINHandle();
     if (!pSource->RetrievedAllCaps())
     {
         // Get the capabilities using TWAIN

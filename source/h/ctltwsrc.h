@@ -111,6 +111,8 @@ namespace dynarithmic
                 mapToUse = &m_capToValuesMap_GD;
             return mapToUse->find(lCap) != mapToUse->end();
         }
+        CTL_TwainDLLHandle* GetDTWAINHandle() { return m_pDLLHandle; }
+        void SetDTWAINHandle(CTL_TwainDLLHandle* pHandle) { m_pDLLHandle = pHandle; }
 
         DTWAIN_ARRAY getCapCachedValues(TW_UINT16 lCap, LONG getType);
         bool setCapCachedValues(DTWAIN_ARRAY array, TW_UINT16 lCap, LONG getType);
@@ -466,7 +468,7 @@ namespace dynarithmic
 
 
     protected:
-        CTL_ITwainSource( CTL_ITwainSession* pSession, LPCTSTR lpszProductName );
+        CTL_ITwainSource( CTL_ITwainSession* pSession, LPCTSTR lpszProductName, CTL_TwainDLLHandle* pHandle );
         void SetDibHandleProc(HANDLE hDib, size_t nWhich, bool bCreatePalette) const;
 
     private:
@@ -583,6 +585,7 @@ namespace dynarithmic
         std::vector<int> m_aTransferMechanisms;
         bool            m_bExtendedCapsRetrieved;
         boost::logic::tribool m_tbIsFileSystemSupported;
+        CTL_TwainDLLHandle* m_pDLLHandle;
 
         struct tagCapCachInfo {
             TW_UINT16 nCap;

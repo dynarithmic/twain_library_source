@@ -36,56 +36,54 @@ DTWAIN_BOOL   DLLENTRY_DEF DTWAIN_AcquireBufferedEx(DTWAIN_SOURCE Source, LONG P
                                                     LPLONG pStatus)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, Acquisitions, pStatus))
-
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource* pSource = VerifySourceHandle(pHandle, Source);
-    if (!pSource)
-        LOG_FUNC_EXIT_PARAMS(false)
-
-    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(GetDTWAINHandle_Internal()).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
         setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setUserArray(Acquisitions).
         setAcquireType(ACQUIREBUFFEREX);
 
     const bool bRet = AcquireExHelper(opts);
     if (pStatus)
         *pStatus = opts.getStatus();
-    LOG_FUNC_EXIT_PARAMS(bRet)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireBuffered(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG   pStatus)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, pStatus))
-        SourceAcquireOptions opts = SourceAcquireOptions().setHandle(GetDTWAINHandle_Internal()).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
-                                                           setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).
-                                                           setAcquireType(ACQUIREBUFFER);
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
+                                                        setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).
+                                                        setAcquireType(ACQUIREBUFFER);
     const DTWAIN_ARRAY aDibs = SourceAcquire(opts);
     if (pStatus)
         *pStatus = opts.getStatus();
-    LOG_FUNC_EXIT_PARAMS(aDibs)
-    CATCH_BLOCK(DTWAIN_ARRAY(0))
+    LOG_FUNC_EXIT_NONAME_PARAMS(aDibs)
+    CATCH_BLOCK_LOG_PARAMS(DTWAIN_ARRAY(0))
 }
 
 DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireBuffered(SourceAcquireOptions& opts)
 {
     LOG_FUNC_ENTRY_PARAMS((opts))
     // Check if TILES are on.  If so, TILES are not currently supported.
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
     const DTWAIN_SOURCE Source = opts.getSource();
+    auto pSource = static_cast<CTL_ITwainSource*>(Source);
+    const auto pHandle = pSource->GetDTWAINHandle();
 
     if (DTWAIN_IsCapSupported(Source, DTWAIN_CV_ICAPTILES))
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return TileModeOn(Source); }, DTWAIN_ERR_TILES_NOT_SUPPORTED, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
+
     LONG compressionType;
+
     if (!DTWAIN_GetCompressionType(Source, &compressionType, TRUE))
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return false; }, DTWAIN_ERR_COMPRESSION, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
-    auto pSource = static_cast<CTL_ITwainSource*>(Source);
+
     pSource->SetCompressionType(compressionType);
     opts.setActualAcquireType(TWAINAcquireType_Buffer);
     if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
         return LLAcquireImage(opts);
     auto pr = dynarithmic::StartModalMessageLoop(opts.getSource(), opts);
-    LOG_FUNC_EXIT_PARAMS(pr.second)
+    LOG_FUNC_EXIT_NONAME_PARAMS(pr.second)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }

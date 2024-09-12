@@ -32,8 +32,9 @@ typedef std::vector<HANDLE>         CTL_HDIBArray;
 
 namespace dynarithmic
 {
-    void ArrayCopyWideToNative(DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest);
-    void ArrayCopyAnsiToNative(DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest);
+    class CTL_TwainDLLHandle;
+    void ArrayCopyWideToNative(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest);
+    void ArrayCopyAnsiToNative(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest);
 }
 
 #endif

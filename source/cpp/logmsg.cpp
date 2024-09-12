@@ -132,14 +132,15 @@ void Callback_Logger::trace(const std::string& msg)
 {
     // We have to convert the string to native format, since the user-defined logger handles both wide and non-wide
     // character strings
-    if (UserDefinedLoggerExists())
+    if (UserDefinedLoggerExists(m_pHandle))
     {
         auto fullMessage = getTime() + getThreadID() + msg;
-        WriteUserDefinedLogMsgA(fullMessage.c_str());
+        WriteUserDefinedLogMsgA(m_pHandle, fullMessage.c_str());
     }
 }
 
-CLogSystem::CLogSystem() : m_bEnable(false), m_bPrintTime(false), m_bPrintAppName(false), m_bFileOpenedOK(false), m_bErrorDisplayed(false)
+CLogSystem::CLogSystem() : m_bEnable(false), m_bPrintTime(false), m_bPrintAppName(false), m_bFileOpenedOK(false), m_bErrorDisplayed(false),
+m_pDLLHandle{}
 {}
 
 /////////////////////////////////////////////////////////////////////////////
@@ -188,7 +189,7 @@ bool CLogSystem::InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE h
             }
             break;
             case CALLBACK_LOGGING:
-                app_logger_map[CALLBACK_LOGGING] = std::make_shared<Callback_Logger>();
+                app_logger_map[CALLBACK_LOGGING] = std::make_shared<Callback_Logger>(m_pDLLHandle);
                 loggerSet = true;
             break;
             default:;
@@ -244,6 +245,11 @@ bool CLogSystem::InitFileLogging(LPCTSTR pOutputFilename, HINSTANCE hInst, const
     if (pOutputFilename)
         bLogOpen = InitLogger(FILE_LOGGING, pOutputFilename, hInst, fTraits);
     return bLogOpen;
+}
+
+void CLogSystem::SetDLLHandle(CTL_TwainDLLHandle* pHandle)
+{
+    m_pDLLHandle = pHandle;
 }
 
 void CLogSystem::PrintBanner(bool bStarted)

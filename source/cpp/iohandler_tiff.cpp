@@ -49,7 +49,7 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
             CTL_StringType szTempPath;
             // This is a postscript save, so
             // create a temp file
-            szTempPath = GetDTWAINTempFilePath();
+            szTempPath = GetDTWAINTempFilePath(m_ImageInfoEx.theSource->GetDTWAINHandle());
             if ( szTempPath.empty() )
                 return DTWAIN_ERR_FILEWRITE;
             szTempPath += StringWrapper::GetGUID() +  _T("TIF");

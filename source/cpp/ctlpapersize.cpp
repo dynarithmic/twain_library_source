@@ -30,11 +30,7 @@ using namespace dynarithmic;
 LONG DLLENTRY_DEF DTWAIN_GetPaperSizeName(LONG paperNumber, LPTSTR outName, LONG nSize)
 {
     LOG_FUNC_ENTRY_PARAMS((paperNumber, outName, nSize))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto& pdfmediamap = CTL_StaticData::GetPDFMediaMap();
     auto iter = pdfmediamap.find(paperNumber);
     LONG nActualCharactersCopied = 0;
@@ -43,6 +39,6 @@ LONG DLLENTRY_DEF DTWAIN_GetPaperSizeName(LONG paperNumber, LPTSTR outName, LONG
         CTL_StringType pageName = StringConversion::Convert_Ansi_To_Native(iter->second.first);
         nActualCharactersCopied = StringWrapper::CopyInfoToCString(pageName, outName, nSize);
     }
-    LOG_FUNC_EXIT_PARAMS(nActualCharactersCopied)
+    LOG_FUNC_EXIT_NONAME_PARAMS(nActualCharactersCopied)
     CATCH_BLOCK(-1)
 }

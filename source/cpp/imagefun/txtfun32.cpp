@@ -108,7 +108,7 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
         m_pTextPageInfo->fh = std::move(m_hFile);
 
         // This is a temp file
-        CTL_StringType szTempPath = GetDTWAINTempFilePath();
+        CTL_StringType szTempPath = GetDTWAINTempFilePath(m_ImageInfoEx.theSource->GetDTWAINHandle());
         if ( szTempPath.empty() )
             return DTWAIN_ERR_FILEWRITE;
 

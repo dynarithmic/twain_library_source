@@ -575,7 +575,7 @@ LONG ImageXferFileWriter::CopyDuplexDibToFile(CTL_TwainDibPtr pCurDib, bool bIsJ
         }
 
         // We need to create a temporary file here
-        auto szTempPath = GetDTWAINTempFilePath();
+        auto szTempPath = GetDTWAINTempFilePath(m_pSource->GetDTWAINHandle());
         if ( szTempPath.empty())
         {
             RecordBadDuplexPage();

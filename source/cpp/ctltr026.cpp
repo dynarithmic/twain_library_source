@@ -1569,8 +1569,8 @@ bool IsState7InfoNeeded(CTL_ITwainSource *pSource)
     DTWAINScopedLogControllerExclude scopedLog(DTWAIN_LOG_ERRORMSGBOX);
     if ( DTWAIN_GetCapValues(pSource, DTWAIN_CV_ICAPUNDEFINEDIMAGESIZE, DTWAIN_CAPGETCURRENT, &A))
     {
-        DTWAINArrayLL_RAII raii(A);
-        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        const auto pHandle = pSource->GetDTWAINHandle();
+        DTWAINArrayLowLevel_RAII raii(pHandle, A);
         const auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(A);
         if ( !vValues.empty())
             bRetval = vValues[0] > 0;
