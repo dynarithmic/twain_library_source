@@ -10,6 +10,8 @@ DTWAIN Version changes
 - Fix DTWAIN_SetDefaultSource() for TWAIN 2.x data source managers (TWAINDSM.DLL).  Note that
   DTWAIN_SetDefaultSource() is not guaranteed to work for TWAIN 1.x data source managers (TWAIN_32.DLL).
 
+- Fix issue with DTWAIN_SelectOCREngine() not working for Unicode builds of DTWAIN.
+
   
 5.5.0
 
