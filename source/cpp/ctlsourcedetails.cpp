@@ -75,10 +75,10 @@ static void create_stream(std::stringstream& strm, DTWAIN_SOURCE Source, LONG ca
 
 static void create_stream_from_strings(std::stringstream& strm, DTWAIN_SOURCE Source, LONG capValue)
 {
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     std::vector<std::string> imageVals;
     DTWAIN_ARRAY arr = nullptr;
-    DTWAIN_GetCapValues(Source, capValue, DTWAIN_CAPGET, &arr); //capInfo.get_cap_values<std::vector<std::string>>(capValue);
+    DTWAIN_GetCapValues(Source, capValue, DTWAIN_CAPGET, &arr); 
     DTWAINArrayPtr_RAII raii(pHandle, &arr);
     if (arr)
     {
@@ -441,7 +441,7 @@ AllCapInfo getAllCapInfo(CTL_ITwainSource* pSource)
 
 static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std::string>& allSources, LONG indentFactor, bool bWeOpenSource=false)
 {
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto pHandle = ts.GetTwainDLLHandle();
     using boost::algorithm::join;
     using boost::adaptors::transformed;
     using json = nlohmann::ordered_json;
@@ -497,15 +497,15 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
     struct SourceSelectStatusRAII
     {
         bool m_bSelectStatus;
-        SourceSelectStatusRAII(bool bStatus) : m_bSelectStatus(bStatus) {}
+        CTL_TwainDLLHandle* m_pHandle;
+        SourceSelectStatusRAII(CTL_TwainDLLHandle* pHandle, bool bStatus) : m_pHandle(pHandle),  m_bSelectStatus(bStatus) {}
         ~SourceSelectStatusRAII() 
         { 
-            auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-            pHandle->m_bOpenSourceOnSelect = m_bSelectStatus;
+            m_pHandle->m_bOpenSourceOnSelect = m_bSelectStatus;
         }
     };
 
-    SourceSelectStatusRAII sourceSelectraii(pHandle->m_bOpenSourceOnSelect);
+    SourceSelectStatusRAII sourceSelectraii(pHandle, pHandle->m_bOpenSourceOnSelect);
     pHandle->m_bOpenSourceOnSelect = false;
 
     auto& sourceStatusMap = CTL_StaticData::GetSourceStatusMap();
@@ -869,8 +869,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
 LONG DLLENTRY_DEF DTWAIN_GetSessionDetails(LPTSTR szBuf, LONG nSize, LONG indentFactor, BOOL bRefresh)
 {
     LOG_FUNC_ENTRY_PARAMS((szBuf, nSize, indentFactor))
-    auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     CTL_StringType details;
     if (!bRefresh &&  !pHandle->m_strSessionDetails.empty())
         details = pHandle->m_strSessionDetails;
@@ -895,9 +894,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSessionDetails(LPTSTR szBuf, LONG nSize, LONG indent
 LONG DLLENTRY_DEF DTWAIN_GetSourceDetails(LPCTSTR szSources, LPTSTR szBuf, LONG nSize, LONG indentFactor, BOOL bRefresh)
 {
     LOG_FUNC_ENTRY_PARAMS((szSources, szBuf, nSize, indentFactor))
-    auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     CTL_StringType details;
     if (bRefresh)
     {

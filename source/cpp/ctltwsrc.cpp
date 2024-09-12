@@ -1133,8 +1133,7 @@ double CTL_ITwainSource::GetCapCacheValue( LONG lCap, LONG *pTurnOn ) const
 
 void CTL_ITwainSource::AddDibsToAcquisition(DTWAIN_ARRAY aDibs) const
 {
-   const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-   const auto& factory = pHandle->m_ArrayFactory;
+   const auto& factory = m_pDLLHandle->m_ArrayFactory;
    factory->add_to_back(m_aAcqAttempts, aDibs, 1 );
    factory->add_to_back(m_PersistentArray, aDibs, 1);
 }
@@ -1530,9 +1529,8 @@ static DTWAIN_ARRAY PopulateArray(const std::vector<anytype_>& dataArray, CTL_IT
 }
 
 template <typename T>
-static bool PopulateCache(DTWAIN_ARRAY theArray, std::vector<anytype_>& dataArray)
+static bool PopulateCache(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY theArray, std::vector<anytype_>& dataArray)
 {
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     auto& vVector = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
     std::transform(vVector.begin(), vVector.end(), std::back_inserter(dataArray), [](typename T::value_type value){ return value;});
     return true;
@@ -1569,63 +1567,14 @@ bool CTL_ITwainSource::setCapCachedValues(DTWAIN_ARRAY array, TW_UINT16 lCap, LO
     if (iter != mapToUse->end())
         return true;
     container_values cValues;
-    cValues.m_dataType = DTWAIN_GetCapDataType(this, lCap);
+    cValues.m_dataType = dynarithmic::GetCapDataType(this, lCap);
     if (isIntCap(cValues.m_dataType))
     {
-        const bool retVal = PopulateCache<CTL_ArrayFactory::tagged_array_long>(array, cValues.m_data);
+        const bool retVal = PopulateCache<CTL_ArrayFactory::tagged_array_long>(m_pDLLHandle, array, cValues.m_data);
         if (retVal)
             return mapToUse->insert({lCap, cValues}).second;
     }
     return false;
 }
 
-/*std::string CreateFileNameFromNumber(const std::string& sFileName, int num, int nDigits)
-{
-    StringArray rArray;
-    StringWrapperA::SplitPath(sFileName, rArray);
-
-    // Adjust the file name
-    char szBuf[25];
-    sprintf(szBuf, "%0*d", nDigits, num);
-    std::string& sTemp = rArray[StringWrapperA::NAME_POS];
-    sTemp = sTemp.substr(0, sTemp.length() - nDigits) + szBuf;
-    return StringWrapperA::MakePath(rArray);
-}
-
-int GetInitialFileNumber(const std::string& sFileName, size_t &nDigits)
-{
-    StringArray rArray;
-    StringWrapperA::SplitPath(sFileName, rArray);
-    nDigits = 0;
-    std::string sTemp;
-
-    size_t nLen = rArray[StringWrapperA::NAME_POS].length();
-    for ( size_t i = nLen - 1; ; --i)
-    {
-        if ( StringTraitsA::IsDigit(rArray[StringWrapperA::NAME_POS][i]) )
-        {
-            sTemp = rArray[StringWrapperA::NAME_POS][i] + sTemp;
-            nDigits++;
-        }
-        else
-            break;
-        if ( i == 0 )
-            break;
-    }
-
-    // now loop until we get a good cast from the string we have
-    while (!sTemp.empty())
-    {
-        try
-        {
-            return boost::lexical_cast<int>(sTemp);
-        }
-        catch (boost::bad_lexical_cast&)
-        {
-            sTemp.erase(sTemp.begin());
-        }
-    }
-    return 0;
-}
-*/
 ///////////////////////////////////////////////////////////////////////////////////////////

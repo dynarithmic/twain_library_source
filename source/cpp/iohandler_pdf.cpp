@@ -194,7 +194,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
     // Now add this to PDF page
     CPDFImageHandler PDFHandler(szFile, m_ImageInfoEx);
     CTL_StringType szTempFile;
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = m_ImageInfoEx.theSource->GetDTWAINHandle();
 
     if (!pMultiPageStruct || pMultiPageStruct->Stage == DIB_MULTI_FIRST)
     {
@@ -213,7 +213,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
         {
             // Create a temporary JPEG file
             //...
-            szTempFile = GetDTWAINTempFilePath();
+            szTempFile = GetDTWAINTempFilePath(m_ImageInfoEx.theSource->GetDTWAINHandle());
             if ( szTempFile.empty() )
             {
                 return DTWAIN_ERR_FILEWRITE;
@@ -386,9 +386,8 @@ int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, std::string& sT
     CTL_StringType sFileToUse = filename;
 
     // Get the temp file path
-    auto szTempPath = GetDTWAINTempFilePath();
-
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = m_ImageInfoEx.theSource->GetDTWAINHandle();
+    auto szTempPath = GetDTWAINTempFilePath(pHandle);
 
     OCREngine *pEngine = pHandle->m_pOCRDefaultEngine.get();
     if (!pEngine)

@@ -93,7 +93,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainer(DTWAIN_SOURCE Source, LONG nCap, LONG l
     CATCH_BLOCK_LOG_PARAMS(0)
 }
 
-static LONG GetCapDataType(CTL_ITwainSource* pSource, LONG nCap)
+LONG dynarithmic::GetCapDataType(CTL_ITwainSource* pSource, LONG nCap)
 {
     auto nDataType = CTL_TwainAppMgr::GetDataTypeFromCap(static_cast<CTL_EnumCapability>(nCap), pSource);
     if (nDataType == (std::numeric_limits<int>::min)())

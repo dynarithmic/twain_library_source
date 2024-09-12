@@ -30,9 +30,9 @@ using namespace dynarithmic;
 TWAIN_IDENTITY DLLENTRY_DEF DTWAIN_GetTwainAppID()
 {
     LOG_FUNC_ENTRY_NONAME_PARAMS()
-    if (!DTWAIN_IsSessionEnabled())
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    if (!pHandle->m_bSessionAllocated)
         LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     TW_IDENTITY *pIdentity = pHandle->m_pTwainSession->GetAppIDPtr();
     LOG_FUNC_EXIT_NONAME_PARAMS(((TWAIN_IDENTITY)pIdentity))
     CATCH_BLOCK(TWAIN_IDENTITY(0))
@@ -71,7 +71,8 @@ LONG DLLENTRY_DEF DTWAIN_CallDSMProc(TWAIN_IDENTITY AppID, TWAIN_IDENTITY Source
 {
     LOG_FUNC_ENTRY_PARAMS((AppID, SourceId, lDG, lDAT, lMSG, pData))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !DTWAIN_IsSessionEnabled(); }, DTWAIN_ERR_NO_SESSION, -1L, FUNC_MACRO);
+    auto pH = pHandle;
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !pH->m_bSessionAllocated; }, DTWAIN_ERR_NO_SESSION, -1L, FUNC_MACRO);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !AppID && !SourceId; }, DTWAIN_ERR_INVALID_PARAM, -1L, FUNC_MACRO);
     const LONG Ret = CTL_TwainAppMgr::CallDSMEntryProc(static_cast<TW_IDENTITY*>(AppID),
                                                        static_cast<TW_IDENTITY*>(SourceId),
@@ -89,7 +90,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCurrentTwainTriplet(TW_IDENTITY* pAppID, TW_I
 {
     LOG_FUNC_ENTRY_PARAMS((pAppID, pSourceID, lpDAT, lpDG, lpMsg, lpMemRef))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !DTWAIN_IsSessionEnabled(); }, DTWAIN_ERR_NO_SESSION, -1L, FUNC_MACRO);
+    auto pH = pHandle;
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pH->m_bSessionAllocated; }, DTWAIN_ERR_NO_SESSION, -1L, FUNC_MACRO);
     const CTL_TwainTriplet* currentTriplet = CTL_TwainAppMgr::GetInstance()->GetCurrentTriplet();
     if (currentTriplet)
     {

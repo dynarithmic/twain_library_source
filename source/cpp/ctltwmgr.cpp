@@ -114,6 +114,7 @@ void CTL_TwainAppMgr::Destroy()
 }
 
 CTL_ITwainSession* CTL_TwainAppMgr::CreateTwainSession(
+                                     CTL_TwainDLLHandle *pHandle,
                                      LPCTSTR pAppName/* = nullptr*/,
                                      HWND* hAppWnd,/* = nullptr*/
                                      TW_UINT16 nMajorNum/*    = 1*/,
@@ -140,7 +141,8 @@ CTL_ITwainSession* CTL_TwainAppMgr::CreateTwainSession(
             return nullptr;
     }
 
-    const auto pSession = CTL_ITwainSession::Create(pAppName,
+    const auto pSession = CTL_ITwainSession::Create(pHandle,
+                                                    pAppName,
                                                     hAppWnd,
                                                     nMajorNum,
                                                     nMinorNum,
@@ -156,8 +158,6 @@ CTL_ITwainSession* CTL_TwainAppMgr::CreateTwainSession(
         // to the proper levels here.  We support 1.9 for TWAIN_32.DLL (LEGACY) and 2.x for
         // TWAINDSM.DLL.
         // DTWAIN assumes 2.x, but must change for legacy TWAIN_32.DLL source manager
-        CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-
         if ( pHandle->m_SessionStruct.DSMName == TWAINDLLVERSION_1 )
         {
             TW_IDENTITY *pIdentity = pSession->GetAppIDPtr();
@@ -202,7 +202,7 @@ CTL_ITwainSession* CTL_TwainAppMgr::CreateTwainSession(
 
 bool CTL_TwainAppMgr::OpenSourceManager( CTL_ITwainSession* pSession )
 {
-    CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    CTL_TwainDLLHandle* pHandle = pSession->GetTwainDLLHandle();
     CTL_TwainOpenSMTriplet SM( pSession );
     if ( SM.Execute() != TWRC_SUCCESS )
         return false;
@@ -229,7 +229,7 @@ bool CTL_TwainAppMgr::OpenSourceManager( CTL_ITwainSession* pSession )
 
 bool CTL_TwainAppMgr::IsVersion2DSMUsed()
 {
-    CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     return pHandle->m_nDSMVersion == DTWAIN_TWAINDSM_VERSION2;
 }
 
@@ -1086,7 +1086,7 @@ int  CTL_TwainAppMgr::FileTransfer( CTL_ITwainSession *pSession,
     {
         CTL_StringType szTempPath;
         // Set the temp file name here
-        szTempPath = GetDTWAINTempFilePath();
+        szTempPath = GetDTWAINTempFilePath(pSource->GetDTWAINHandle());
         if ( szTempPath.empty() )
             return 0;
 
