@@ -443,10 +443,4 @@ namespace dynarithmic
             return iter->second;
         return CTL_ArrayInvalid;
     }
-
-    void DTWAINArrayLowLevel_DestroyTraits::Destroy(DTWAIN_ARRAY a)
-    {
-        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-        pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(a));
-    }
 }

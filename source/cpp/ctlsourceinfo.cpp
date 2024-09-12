@@ -30,16 +30,8 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceValid(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    if (!Source)
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    bool bRet = false;
-    if (pHandle)
-    {
-        CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
-        bRet = CTL_TwainAppMgr::IsValidTwainSource(pHandle->m_pTwainSession, p);
-    }
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 

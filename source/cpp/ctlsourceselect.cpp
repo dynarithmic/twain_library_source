@@ -81,7 +81,7 @@ static LONG OpenSourceInternal(DTWAIN_SOURCE Source, const SourceSelectionOption
 
 static DTWAIN_SOURCE SelectAndOpenSource(CTL_TwainDLLHandle* pHandle, const SourceSelectionOptions& opts)
 {
-    const DTWAIN_SOURCE Source = SourceSelect(opts);
+    const DTWAIN_SOURCE Source = SourceSelect(pHandle, opts);
     auto& sourcemap = CTL_StaticData::GetSourceStatusMap();
     if (Source)
     {
@@ -230,10 +230,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceSelected(DTWAIN_SOURCE Source)
     CATCH_BLOCK_LOG_PARAMS(FALSE)
 }
 
-DTWAIN_SOURCE dynarithmic::SourceSelect(const SourceSelectionOptions& options)
+DTWAIN_SOURCE dynarithmic::SourceSelect(CTL_TwainDLLHandle* pHandle, const SourceSelectionOptions& options)
 {
     LOG_FUNC_ENTRY_PARAMS((options))
-    auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
 
     // Start a session if not already started by app
     if (!pHandle->m_bSessionAllocated)
@@ -323,6 +322,7 @@ DTWAIN_SOURCE dynarithmic::DTWAIN_LLSelectSource2(CTL_TwainDLLHandle* pHandle,  
     selectStruct.CS.nOptions = opts.nOptions;
     selectStruct.CS.hWndParent = opts.hWndParent;
     selectStruct.nItems = 0;
+    selectStruct.pHandle = pHandle;
     if ( opts.szTitle )
         selectStruct.CS.sTitle = opts.szTitle;
     else
@@ -601,7 +601,7 @@ LRESULT CALLBACK DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPA
 
             // Fill the list box with the sources
             DTWAIN_ARRAY Array = nullptr;
-            const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+            const auto pHandle = pS->pHandle;
             DTWAIN_EnumSources(&Array);
             DTWAINArrayLowLevel_RAII arr(pHandle, Array);
             auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<CTL_ITwainSource*>(Array);

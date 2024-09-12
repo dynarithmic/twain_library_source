@@ -99,7 +99,8 @@ namespace dynarithmic
 
             // Twain session management functions.  Each App utilizing
             // this DLL will get its own session.
-            static CTL_ITwainSession* CreateTwainSession(LPCTSTR pAppName = nullptr,
+            static CTL_ITwainSession* CreateTwainSession(CTL_TwainDLLHandle* pHandle,
+                                             LPCTSTR pAppName = nullptr,
                                              HWND* hAppWnd = nullptr,
                                              TW_UINT16 nMajorNum    = 1,
                                              TW_UINT16 nMinorNum    = 0,

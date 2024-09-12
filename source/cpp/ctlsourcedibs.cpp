@@ -42,12 +42,11 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetSourceAcquisitions(DTWAIN_SOURCE Source)
 DTWAIN_BOOL dynarithmic::DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source, DTWAIN_ARRAY pArray)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pArray))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
-
+    const auto pHandle = pSource->GetDTWAINHandle();
     const auto& factory = pHandle->m_ArrayFactory;
 
-        // Check if array is of the correct type
+    // Check if array is of the correct type
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !factory->is_valid(pArray, CTL_ArrayFactory::arrayTag::VoidPtrType); },
                                                     DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
     const DTWAIN_ARRAY pDTWAINArray = pArray;
@@ -113,20 +112,20 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_CreateAcquisitionArray()
 // class whose purpose is to destroy the image data array
 struct NestedAcquisitionDestroyer
 {
+    CTL_TwainDLLHandle* m_pHandle;
     bool m_bDestroyDibs;
-    NestedAcquisitionDestroyer(bool bDestroyDibs) : m_bDestroyDibs(bDestroyDibs) {}
+    NestedAcquisitionDestroyer(CTL_TwainDLLHandle* pHandle, bool bDestroyDibs) : m_pHandle(pHandle), m_bDestroyDibs(bDestroyDibs) {}
 
     void operator()(DTWAIN_ARRAY ImagesArray) const
     {
         // we want this array destroyed when we're finished
-        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-        DTWAINArrayLowLevel_RAII raii(pHandle, ImagesArray);
+        DTWAINArrayLowLevel_RAII raii(m_pHandle, ImagesArray);
 
         // Test if the DIB data should also be destroyed
         if (m_bDestroyDibs)
         {
             // get underlying vector of dibs
-            auto& vHandles = pHandle->m_ArrayFactory->underlying_container_t<void*>(ImagesArray);
+            auto& vHandles = m_pHandle->m_ArrayFactory->underlying_container_t<void*>(ImagesArray);
 
             // for each dib, destroy the data
             std::for_each(vHandles.begin(), vHandles.end(), DestroyDibData);
@@ -160,7 +159,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyAcquisitionArray(DTWAIN_ARRAY aAcq, DTWAI
     DTWAINArrayLowLevel_RAII raiiMain(pHandle, aAcq);
 
     // get instance of acquisition destroy class
-    const NestedAcquisitionDestroyer acqDestroyer(bDestroyDibs ? true : false);
+    const NestedAcquisitionDestroyer acqDestroyer(pHandle, bDestroyDibs ? true : false);
 
     // underlying images array
     auto& vImagesArray = factory->underlying_container_t<CTL_ArrayFactory::tagged_array_voidptr*>(aAcq);

@@ -90,7 +90,7 @@ int CTL_PSIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int /*fhFile*/,
     {
         // Create a temporary TIFF file
         //...
-        szTempPath = GetDTWAINTempFilePath();
+        szTempPath = GetDTWAINTempFilePath(m_ImageInfoEx.theSource->GetDTWAINHandle());
         if ( szTempPath.empty() )
             return DTWAIN_ERR_FILEWRITE;
 

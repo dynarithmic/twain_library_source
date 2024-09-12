@@ -156,7 +156,7 @@ template <typename T>
 static std::vector<T> FileListToVector(SourceAcquireOptions& opts)
 {
     std::vector<T> allNames;
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(opts.getHandle());
     auto fileList = opts.getFileList();
     if (fileList)
         allNames = pHandle->m_ArrayFactory->underlying_container_t<T>(fileList);
@@ -238,7 +238,7 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
     if (aDibs)
     {
         bRetval = TRUE;
-        if (DTWAIN_GetTwainMode() == DTWAIN_MODAL)
+        if (pHandle->m_lAcquireMode == DTWAIN_MODAL)
         {
             auto& factory = pHandle->m_ArrayFactory;
             auto pVariant = aDibs;
@@ -251,7 +251,7 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
         }
     }
 
-    if (DTWAIN_GetTwainMode() == DTWAIN_MODAL)
+    if (pHandle->m_lAcquireMode == DTWAIN_MODAL)
     {
         if (!aDibs)
             bRetval = false;
@@ -260,7 +260,7 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
             bRetval = true;
     }
     else
-    if (DTWAIN_GetTwainMode() == DTWAIN_MODELESS)
+    if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
         pSource->m_pUserPtr = nullptr;
 
     LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)

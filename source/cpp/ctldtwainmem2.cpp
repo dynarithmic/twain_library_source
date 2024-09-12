@@ -62,8 +62,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_UnlockMemory(HANDLE h)
 HANDLE  DLLENTRY_DEF DTWAIN_AllocateMemoryEx(LONG memSize)
 {
     LOG_FUNC_ENTRY_PARAMS((memSize))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, NULL, FUNC_MACRO);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     HANDLE h = nullptr;
     if (pHandle->m_TwainMemoryFunc)
         h = pHandle->m_TwainMemoryFunc->AllocateMemory(memSize);
@@ -74,8 +73,7 @@ HANDLE  DLLENTRY_DEF DTWAIN_AllocateMemoryEx(LONG memSize)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FreeMemoryEx(HANDLE h)
 {
     LOG_FUNC_ENTRY_PARAMS((h))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     DTWAIN_BOOL bRet = FALSE;
     if (pHandle->m_TwainMemoryFunc)
     {
@@ -89,8 +87,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FreeMemoryEx(HANDLE h)
 DTWAIN_MEMORY_PTR DLLENTRY_DEF DTWAIN_LockMemoryEx(HANDLE h)
 {
     LOG_FUNC_ENTRY_PARAMS((h))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, NULL, FUNC_MACRO);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     DTWAIN_MEMORY_PTR ptr = nullptr;
     if (pHandle->m_TwainMemoryFunc)
         ptr = pHandle->m_TwainMemoryFunc->LockMemory(h);
@@ -101,8 +98,7 @@ DTWAIN_MEMORY_PTR DLLENTRY_DEF DTWAIN_LockMemoryEx(HANDLE h)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_UnlockMemoryEx(HANDLE h)
 {
     LOG_FUNC_ENTRY_PARAMS((h))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     DTWAIN_BOOL bRet = FALSE;
     if (pHandle->m_TwainMemoryFunc)
     {

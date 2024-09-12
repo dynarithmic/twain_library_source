@@ -137,9 +137,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventEx(DTWAIN_SOURCE Source, LPLONG lp
     if (!pArray)
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
 
-    const CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
+    CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
     const CTL_DeviceEvent DeviceEvent = pSource->GetDeviceEvent();
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto pHandle = pSource->GetDTWAINHandle();
     const DTWAIN_BOOL bRet = DeviceEvent.GetEventInfoEx(pHandle, pArray);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)

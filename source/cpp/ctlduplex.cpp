@@ -42,7 +42,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, LPLONG lpDup
         {
             DTWAIN_ARRAY Array = nullptr;
             const DTWAIN_BOOL bRet2 = DTWAIN_GetCapValues(Source, DTWAIN_CV_CAPDUPLEX, DTWAIN_CAPGET, &Array) ? true : false;
-            const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+            const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
             DTWAINArrayLowLevel_RAII arr(pHandle, Array);
             if ( bRet2 && Array)
             {

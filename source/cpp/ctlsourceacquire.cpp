@@ -64,28 +64,26 @@ static void ParseFileNames(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY FileList, P
 
 DTWAIN_ACQUIRE CTL_TwainDLLHandle::GetNewAcquireNum()
 {
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    const auto iter = std::find(pHandle->m_aAcquireNum.begin(), pHandle->m_aAcquireNum.end(), -1L);
-    if (iter != pHandle->m_aAcquireNum.end())
+    const auto iter = std::find(m_aAcquireNum.begin(), m_aAcquireNum.end(), -1L);
+    if (iter != m_aAcquireNum.end())
     {
-        const DTWAIN_ACQUIRE num { std::distance(pHandle->m_aAcquireNum.begin(), iter) };
+        const DTWAIN_ACQUIRE num { std::distance(m_aAcquireNum.begin(), iter) };
         *iter = num;
         return num;
     }
 
-    const size_t nSize = pHandle->m_aAcquireNum.size();
-    pHandle->m_aAcquireNum.push_back(static_cast<LONG_PTR>(nSize));
+    const size_t nSize = m_aAcquireNum.size();
+    m_aAcquireNum.push_back(static_cast<LONG_PTR>(nSize));
     return static_cast<DTWAIN_ACQUIRE>(nSize);
 }
 
 
 void CTL_TwainDLLHandle::EraseAcquireNum(DTWAIN_ACQUIRE nNum)
 {
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    const size_t nSize = pHandle->m_aAcquireNum.size();
+    const size_t nSize = m_aAcquireNum.size();
     if (nNum >= static_cast<LONG_PTR>(nSize) || nNum < 0)
         return;
-    pHandle->m_aAcquireNum[nNum] = -1;
+    m_aAcquireNum[nNum] = -1;
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDoublePageCountOnDuplex(DTWAIN_SOURCE Source, DTWAIN_BOOL bDoubleCount)
@@ -161,7 +159,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     {
         bSourcePreOpened = false;
         SourceSelectionOptions selOpts(SELECTSOURCEBYNAME, p->GetProductName().c_str());
-        pRealSource = SourceSelect(selOpts);
+        pRealSource = SourceSelect(pHandle, selOpts);
         if (!pRealSource)
         {
             if (!bSessionPreStarted)

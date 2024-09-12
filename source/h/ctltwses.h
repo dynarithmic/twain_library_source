@@ -38,7 +38,8 @@ namespace dynarithmic
   class CTL_ITwainSession
   {
     public:
-        static CTL_ITwainSession*  Create(LPCTSTR pAppName,
+        static CTL_ITwainSession*  Create(CTL_TwainDLLHandle *pHandle,
+                                        LPCTSTR pAppName,
                                         HWND* hAppWnd,
                                         TW_UINT16 nMajorNum,
                                         TW_UINT16 nMinorNum,
@@ -50,7 +51,8 @@ namespace dynarithmic
                                         LPCTSTR lpszProduct
                                         );
         static void Destroy( CTL_ITwainSessionPtr& pSession );
-        CTL_ITwainSession(LPCTSTR pszAppName,
+        CTL_ITwainSession(CTL_TwainDLLHandle* pHandle,
+                          LPCTSTR pszAppName,
                           HWND* hAppWnd,
                           TW_UINT16 nMajorNum,
                           TW_UINT16 nMinorNum,
