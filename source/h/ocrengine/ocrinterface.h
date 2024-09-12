@@ -36,6 +36,7 @@
 #endif
 namespace dynarithmic
 {
+    class CTL_TwainDLLHandle;
     struct OCRJobOptions
     {
         std::string sFileName;
@@ -245,7 +246,7 @@ namespace dynarithmic
         OCRPDFInfo m_OCRPDFInfo;
         OCRCapInfo& GetOCRCapInfo(LONG nCap);
 
-        OCREngine();
+        OCREngine(CTL_TwainDLLHandle* m_pHandle);
         virtual ~OCREngine();
         virtual bool IsInitialized() const;
         virtual bool SetOptions(OCRJobOptions& options);
@@ -301,6 +302,7 @@ namespace dynarithmic
         std::vector<OCRCharacterInfo>& GetCharacterInfo(LONG nPage, int &status);
         void SetPageTextMap(LONG nPage, const std::string& sData);
         bool IsValidOCRPage(LONG nPage) const;
+        CTL_TwainDLLHandle* GetDTWAINHandle() { return m_pHandle; }
 
 
     protected:
@@ -319,6 +321,7 @@ namespace dynarithmic
         std::vector<OCRCharacterInfo> m_InvalidOCRCharInfo;
         bool m_bIsActivated;
         LONG m_nLastOCRError;
+        CTL_TwainDLLHandle* m_pHandle;
     };
 }
 #endif

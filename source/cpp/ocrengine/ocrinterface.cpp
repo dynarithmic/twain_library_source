@@ -33,7 +33,31 @@ static bool OCREngineExists(CTL_TwainDLLHandle* pHandle, OCREngine* pEngine);
 static bool OCRIsActive(const OCREngine* pEngine);
 static LONG GetOCRTextSupport(OCREngine* pEngine, LONG fileType, LONG pixelType, LONG bitDepth);
 
-typedef CTL_StringType(OCREngine::*OCRINFOFUNC)() const;
+typedef std::string (OCREngine::*OCRINFOFUNC)() const;
+
+static std::pair<CTL_TwainDLLHandle*, OCREngine*> VerifyOCRHandles(DTWAIN_OCRENGINE Engine=nullptr)
+{
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    if (!Engine)
+        return { pHandle, nullptr };
+
+    const auto pEngine = static_cast<OCREngine*>(Engine);
+
+    // check if Engine exists
+    if (OCREngineExists(pHandle, pEngine))
+        return { pHandle, pEngine };
+    pHandle->m_lLastError = DTWAIN_ERR_OCR_INVALIDENGINE;
+    throw DTWAIN_ERR_OCR_INVALIDENGINE;
+}
+
+static std::pair<CTL_TwainDLLHandle*, OCREngine*> VerifyOCRHandlesEx(DTWAIN_OCRENGINE Engine)
+{
+    auto [pHandle, pEngine] = VerifyOCRHandles(Engine);
+    if (Engine)
+        return { pHandle, pEngine };
+    pHandle->m_lLastError = DTWAIN_ERR_OCR_INVALIDENGINE;
+    throw DTWAIN_ERR_OCR_INVALIDENGINE;
+}
 
 HANDLE DLLENTRY_DEF DTWAIN_GetOCRText(DTWAIN_OCRENGINE Engine,
     LONG nPageNo,
@@ -43,17 +67,12 @@ HANDLE DLLENTRY_DEF DTWAIN_GetOCRText(DTWAIN_OCRENGINE Engine,
     LONG nFlags)
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, nPageNo, Data, dSize, pActualSize, nFlags))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // check if Engine exists
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCREngineExists(pHandle, static_cast<OCREngine*>(Engine)); },
-        DTWAIN_ERR_OCR_INVALIDENGINE, false, FUNC_MACRO);
-
-    const auto pEngine = static_cast<OCREngine*>(Engine);
+    auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
+    auto pEng = pEngine;
 
     // Check if OCR is active
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCRIsActive(pEngine); }, DTWAIN_ERR_OCR_NOTACTIVE, NULL, FUNC_MACRO);
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !pEngine->IsValidOCRPage(nPageNo); }, DTWAIN_ERR_OCR_INVALIDPAGENUM, NULL, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCRIsActive(pEng); }, DTWAIN_ERR_OCR_NOTACTIVE, NULL, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !pEng->IsValidOCRPage(nPageNo); }, DTWAIN_ERR_OCR_INVALIDPAGENUM, NULL, FUNC_MACRO);
 
     const std::string sText = pEngine->GetOCRText(nPageNo);
 
@@ -95,13 +114,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetOCRText(DTWAIN_OCRENGINE Engine,
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRCapValues(DTWAIN_OCRENGINE Engine,LONG OCRCapValue,LONG GetType,LPDTWAIN_ARRAY CapValues)
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, OCRCapValue, GetType, CapValues))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-
-    // check if Engine exists
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCREngineExists(pHandle, static_cast<OCREngine*>(Engine)); },
-        DTWAIN_ERR_OCR_INVALIDENGINE, false, FUNC_MACRO);
-
-    const auto pEngine = static_cast<OCREngine*>(Engine);
+    auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
 
     if (pEngine->IsCapSupported(OCRCapValue))
     {
@@ -143,17 +156,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRCapValues(DTWAIN_OCRENGINE Engine,LONG OCR
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetOCRCapValues(DTWAIN_OCRENGINE Engine, LONG OCRCapValue, LONG SetType, DTWAIN_ARRAY CapValues)
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, OCRCapValue, SetType, CapValues))
-
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-
-    // check if Engine exists
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCREngineExists(pHandle, static_cast<OCREngine*>(Engine)); },
-        DTWAIN_ERR_OCR_INVALIDENGINE, false, FUNC_MACRO);
-
-    const auto pEngine = static_cast<OCREngine*>(Engine);
+    auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
 
     if (pEngine->IsCapSupported(OCRCapValue))
     {
@@ -206,7 +209,7 @@ static LONG GetOCRInfo(OCREngine *pEngine,OCRINFOFUNC pFunc,LPTSTR szInfo, LONG 
 
 LONG GetOCRInfo(OCREngine *pEngine, OCRINFOFUNC pFunc, LPTSTR szInfo, LONG nMaxLen)
 {
-    const CTL_StringType pName = (pEngine->*pFunc)();
+    const CTL_StringType pName = StringConversion::Convert_Ansi_To_Native((pEngine->*pFunc)());
     const int nLen = static_cast<int>(pName.length());
     if (szInfo == nullptr)
         return static_cast<LONG>(nLen);
@@ -219,87 +222,39 @@ LONG GetOCRInfo(OCREngine *pEngine, OCRINFOFUNC pFunc, LPTSTR szInfo, LONG nMaxL
 LONG   DLLENTRY_DEF DTWAIN_GetOCRManufacturer(DTWAIN_OCRENGINE Engine,LPTSTR szMan,LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, szMan, nMaxLen))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-
-    // check if Engine exists
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCREngineExists(pHandle, static_cast<OCREngine*>(Engine)); },
-        DTWAIN_ERR_OCR_INVALIDENGINE, NULL, FUNC_MACRO);
-
-    const auto pEngine = static_cast<OCREngine*>(Engine);
-
-    if (pEngine)
-    {
-        const LONG Ret = GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetManufacturer),
-                                    szMan, nMaxLen);
-        LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
-    }
-    LOG_FUNC_EXIT_NONAME_PARAMS(-1L)
+    auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
+    const LONG Ret = GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetManufacturer),
+                                szMan, nMaxLen);
+    LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 
 LONG   DLLENTRY_DEF DTWAIN_GetOCRProductFamily(DTWAIN_OCRENGINE Engine,LPTSTR szMan,LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, szMan, nMaxLen))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-
-    // check if Engine exists
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCREngineExists(pHandle, static_cast<OCREngine*>(Engine)); },
-                DTWAIN_ERR_OCR_INVALIDENGINE, NULL, FUNC_MACRO);
-
-    const auto pEngine = static_cast<OCREngine*>(Engine);
-
-    if (pEngine)
-    {
-        const LONG Ret = GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetProductFamily), szMan, nMaxLen);
-        LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
-    }
-    LOG_FUNC_EXIT_NONAME_PARAMS(-1L)
+    auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
+    const LONG Ret = GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetProductFamily), szMan, nMaxLen);
+    LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 
-LONG   DLLENTRY_DEF DTWAIN_GetOCRProductName(DTWAIN_OCRENGINE Engine,LPTSTR szMan,LONG nMaxLen)
+LONG  DLLENTRY_DEF DTWAIN_GetOCRProductName(DTWAIN_OCRENGINE Engine,LPTSTR szMan,LONG nMaxLen)
 {
-    if (szMan)
-        szMan[0] = '\0';
     LOG_FUNC_ENTRY_PARAMS((Engine, szMan, nMaxLen))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-
-    // check if Engine exists
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCREngineExists(pHandle, static_cast<OCREngine*>(Engine)); },
-        DTWAIN_ERR_OCR_INVALIDENGINE, NULL, FUNC_MACRO);
-
-    const auto pEngine = static_cast<OCREngine*>(Engine);
-
-    if (pEngine)
-    {
-        const LONG Ret = GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetProductName), szMan, nMaxLen);
-        LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
-    }
-    LOG_FUNC_EXIT_NONAME_PARAMS(-1L)
+    auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
+    const LONG Ret = GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetProductName), szMan, nMaxLen);
+    LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ExecuteOCR(DTWAIN_OCRENGINE Engine, LPCTSTR szFileName, LONG nStartPage, LONG nEndPage)
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, szFileName, nStartPage, nEndPage))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    // check if Engine exists
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCREngineExists(pHandle, static_cast<OCREngine*>(Engine)); },
-        DTWAIN_ERR_OCR_INVALIDENGINE, false, FUNC_MACRO);
-
-    const auto pEngine = static_cast<OCREngine*>(Engine);
+    auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
+    auto pEng = pEngine;
 
     // Check if OCR is active
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCRIsActive(pEngine); }, DTWAIN_ERR_OCR_NOTACTIVE, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCRIsActive(pEng); }, DTWAIN_ERR_OCR_NOTACTIVE, false, FUNC_MACRO);
 
     if (nStartPage > nEndPage)
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
@@ -349,16 +304,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ExecuteOCR(DTWAIN_OCRENGINE Engine, LPCTSTR szFi
 DTWAIN_OCRTEXTINFOHANDLE DLLENTRY_DEF DTWAIN_GetOCRTextInfoHandle(DTWAIN_OCRENGINE Engine, LONG nPageNo)
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, nPageNo))
-        const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    // check if Engine exists
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCREngineExists(pHandle, static_cast<OCREngine*>(Engine)); },
-        DTWAIN_ERR_OCR_INVALIDENGINE, false, FUNC_MACRO);
-
-    const auto pEngine = static_cast<OCREngine*>(Engine);
-
+    auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
+    auto pEng = pEngine;
     // Check if OCR is active
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCRIsActive(pEngine); }, DTWAIN_ERR_OCR_NOTACTIVE, false, FUNC_MACRO);
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !pEngine->IsValidOCRPage(nPageNo); }, DTWAIN_ERR_OCR_INVALIDPAGENUM, NULL, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCRIsActive(pEng); }, DTWAIN_ERR_OCR_NOTACTIVE, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !pEng->IsValidOCRPage(nPageNo); }, DTWAIN_ERR_OCR_INVALIDPAGENUM, NULL, FUNC_MACRO);
 
     // If nNumInfo is not NULL, fill it in with the number of items
     int status;
@@ -374,9 +324,8 @@ DTWAIN_OCRTEXTINFOHANDLE DLLENTRY_DEF DTWAIN_GetOCRTextInfoHandle(DTWAIN_OCRENGI
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoLong(DTWAIN_OCRTEXTINFOHANDLE OCRTextInfo,LONG nCharPos,LONG nWhichItem,LPLONG pInfo)
 {
     LOG_FUNC_ENTRY_PARAMS((OCRTextInfo, nCharPos, nWhichItem, pInfo))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // check if Engine exists
+    auto [pHandle, pEngine] = VerifyOCRHandles();
+    
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !pInfo; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     const OCRCharacterInfo *cInfo = static_cast<OCRCharacterInfo*>(OCRTextInfo);
@@ -424,7 +373,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoLong(DTWAIN_OCRTEXTINFOHANDLE OCRT
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoFloat(DTWAIN_OCRTEXTINFOHANDLE OCRTextInfo,LONG nCharPos,LONG nWhichItem,LPDTWAIN_FLOAT pInfo)
 {
     LOG_FUNC_ENTRY_PARAMS((OCRTextInfo, nCharPos, nWhichItem, pInfo))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto [pHandle, pEngine] = VerifyOCRHandles();
 
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !pInfo; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
@@ -451,7 +400,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoLongEx(DTWAIN_OCRTEXTINFOHANDLE OC
 {
 
     LOG_FUNC_ENTRY_PARAMS((OCRTextInfo, nWhichItem, pInfo, bufSize))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto [pHandle, pEngine] = VerifyOCRHandles();
 
     // check if Engine exists
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !pInfo; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
@@ -509,7 +458,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoLongEx(DTWAIN_OCRTEXTINFOHANDLE OC
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoFloatEx(DTWAIN_OCRTEXTINFOHANDLE OCRTextInfo,LONG nWhichItem,LPDTWAIN_FLOAT pInfo,LONG bufSize)
 {
     LOG_FUNC_ENTRY_PARAMS((OCRTextInfo, nWhichItem, pInfo, bufSize))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto [pHandle, pEngine] = VerifyOCRHandles();
 
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !pInfo; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
@@ -536,17 +485,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoFloatEx(DTWAIN_OCRTEXTINFOHANDLE O
 LONG DLLENTRY_DEF DTWAIN_SetPDFOCRConversion(DTWAIN_OCRENGINE Engine,LONG PageType, LONG FileType,LONG PixelType, LONG BitDepth, LONG Options)
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, PageType, FileType, PixelType, BitDepth))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // check if Engine exists
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCREngineExists(pHandle, static_cast<OCREngine*>(Engine)); },
-        DTWAIN_ERR_OCR_INVALIDENGINE, NULL, FUNC_MACRO);
+    auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
 
     // check if PageType is OK
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !(PageType == 0 || PageType == 1); },
         DTWAIN_ERR_INVALID_PARAM, NULL, FUNC_MACRO);
-
-    const auto pEngine = static_cast<OCREngine*>(Engine);
 
     // Check if BW format, pixel type, and bit depth are supported
     const LONG bRet = GetOCRTextSupport(pEngine, FileType, PixelType, BitDepth);
@@ -613,16 +556,7 @@ LONG GetOCRTextSupport(OCREngine* pEngine, LONG fileType, LONG pixelType, LONG b
 LONG DLLENTRY_DEF DTWAIN_GetOCRVersionInfo(DTWAIN_OCRENGINE Engine, LPTSTR buffer, LONG maxBufSize)
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, buffer, maxBufSize))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-
-    // check if Engine exists
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCREngineExists(pHandle, static_cast<OCREngine*>(Engine)); },
-        DTWAIN_ERR_OCR_INVALIDENGINE, false, FUNC_MACRO);
-
-    const auto pEngine = static_cast<OCREngine*>(Engine);
+    auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
     std::string sVersion = pEngine->GetOCRVersionInfo();
     const auto retVal = StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sVersion), buffer, maxBufSize);
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
@@ -632,14 +566,7 @@ LONG DLLENTRY_DEF DTWAIN_GetOCRVersionInfo(DTWAIN_OCRENGINE Engine, LPTSTR buffe
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumOCRSupportedCaps(DTWAIN_OCRENGINE Engine, LPDTWAIN_ARRAY SupportedCaps)
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, SupportedCaps))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-
-    // check if Engine exists
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCREngineExists(pHandle, static_cast<OCREngine*>(Engine)); },
-        DTWAIN_ERR_OCR_INVALIDENGINE, false, FUNC_MACRO);
-
-    const OCREngine *pEngine = static_cast<OCREngine*>(Engine);
-
+    auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
     OCREngine::OCRLongArrayValues vals;
     pEngine->GetSupportedCaps(vals);
     const DTWAIN_ARRAY theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(vals.size()));
@@ -696,12 +623,9 @@ void dynarithmic::UnloadOCRInterfaces(CTL_TwainDLLHandle *pHandle)
 DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngineByName(LPCTSTR lpszName)
 {
     LOG_FUNC_ENTRY_PARAMS((lpszName))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto [pHandle, pEngine] = VerifyOCRHandles();
 
     const std::string sName = StringConversion::Convert_NativePtr_To_Ansi(lpszName);
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, NULL, FUNC_MACRO);
 
     // Get the OCR engine associated with the name
     const auto it = pHandle->m_OCRProdNameToEngine.find(sName);
@@ -726,11 +650,8 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngineByName(LPCTSTR lpszName)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitOCRInterface()
 {
     LOG_FUNC_ENTRY_NONAME_PARAMS()
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    
     if (pHandle->m_OCRInterfaceArray.empty())
         LoadOCRInterfaces(pHandle);
 
@@ -741,7 +662,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitOCRInterface()
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumOCRInterfaces(LPDTWAIN_ARRAY OCRArray)
 {
     LOG_FUNC_ENTRY_PARAMS((OCRArray))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    auto [pHandle, pEngine] = VerifyOCRHandles();
     if (pHandle->m_OCRInterfaceArray.empty())
         *OCRArray = nullptr;
     else
@@ -765,16 +686,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumOCRInterfaces(LPDTWAIN_ARRAY OCRArray)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShutdownOCREngine(DTWAIN_OCRENGINE Engine)
 {
     LOG_FUNC_ENTRY_PARAMS((Engine))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-
-    // check if Engine exists
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCREngineExists(pHandle, static_cast<OCREngine*>(Engine)); },
-        DTWAIN_ERR_OCR_INVALIDENGINE, false, FUNC_MACRO);
-
-    const auto pEngine = static_cast<OCREngine*>(Engine);
+    auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
     int status;
     pEngine->ShutdownOCR(status);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -784,17 +696,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShutdownOCREngine(DTWAIN_OCRENGINE Engine)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartupOCREngine(DTWAIN_OCRENGINE Engine)
 {
     LOG_FUNC_ENTRY_PARAMS((Engine))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-
-    // check if Engine exists
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCREngineExists(pHandle, static_cast<OCREngine*>(Engine)); },
-        DTWAIN_ERR_OCR_INVALIDENGINE, false, FUNC_MACRO);
-
-    const auto pEngine = static_cast<OCREngine*>(Engine);
-    //    int status;
+    auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
     if (!pEngine->IsActivated())
     {
         const LONG bRet = pEngine->StartupOCREngine();
@@ -809,16 +711,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartupOCREngine(DTWAIN_OCRENGINE Engine)
 DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectDefaultOCREngine()
 {
     LOG_FUNC_ENTRY_NONAME_PARAMS()
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, NULL, FUNC_MACRO);
+    auto [pHandle, pDummy] = VerifyOCRHandles();
+    auto pH = pHandle;
 
     // Get the OCR engine associated with the name
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return pHandle->m_OCRInterfaceArray.empty(); },
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return pH->m_OCRInterfaceArray.empty(); },
         DTWAIN_ERR_OCR_NOTACTIVE, 0, FUNC_MACRO);
     const auto SelectedEngine = static_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine.get());
-
     const auto pEngine = static_cast<OCREngine*>(SelectedEngine);
     if (!pEngine->IsActivated())
         pEngine->StartupOCREngine();
@@ -830,23 +729,10 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectDefaultOCREngine()
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsOCREngineActivated(DTWAIN_OCRENGINE Engine)
 {
     LOG_FUNC_ENTRY_PARAMS((Engine))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-
-    // check if Engine exists
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCREngineExists(pHandle, static_cast<OCREngine*>(Engine)); },
-        DTWAIN_ERR_OCR_INVALIDENGINE, NULL, FUNC_MACRO);
-
-    const auto pEngine = static_cast<OCREngine*>(Engine);
-
+    auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
     LONG retVal = FALSE;
-    if (pEngine)
-    {
-        const bool bRet = pEngine->IsActivated();
-        retVal = bRet ? TRUE : FALSE;
-    }
+    const bool bRet = pEngine->IsActivated();
+    retVal = bRet ? TRUE : FALSE;
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(false)
 }
@@ -855,50 +741,24 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsOCREngineActivated(DTWAIN_OCRENGINE Engine)
 LONG DLLENTRY_DEF DTWAIN_GetOCRLastError(DTWAIN_OCRENGINE Engine)
 {
     LOG_FUNC_ENTRY_PARAMS((Engine))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-
-    // check if Engine exists
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCREngineExists(pHandle, static_cast<OCREngine*>(Engine)); },
-        DTWAIN_ERR_OCR_INVALIDENGINE, NULL, FUNC_MACRO);
-
-    const auto pEngine = static_cast<OCREngine*>(Engine);
-    if (pEngine)
-    {
-        const LONG bRet = pEngine->GetLastError();
-        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    }
-    LOG_FUNC_EXIT_NONAME_PARAMS(0)
+    auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
+    const LONG bRet = pEngine->GetLastError();
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(0)
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetOCRErrorString(DTWAIN_OCRENGINE Engine, LONG lError, LPTSTR lpszBuffer, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, lError, lpszBuffer, nMaxLen))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, -1L, nullptr);
-
-    // check if Engine exists
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !OCREngineExists(pHandle, static_cast<OCREngine*>(Engine)); },
-        DTWAIN_ERR_OCR_INVALIDENGINE, NULL, FUNC_MACRO);
-
-    const auto pEngine = static_cast<OCREngine*>(Engine);
-
-    if (pEngine)
+    auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
+    if (lError < 0)
     {
-        if (lError < 0)
-        {
-            // This is a DTWAIN error, not an OCR specific error
-            const LONG retval = DTWAIN_GetErrorString(lError, lpszBuffer, nMaxLen);
-            LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-        }
-        const LONG nTotalBytes = StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(pEngine->GetErrorString(lError)), lpszBuffer, nMaxLen);
-        LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)
+        // This is a DTWAIN error, not an OCR specific error
+        const LONG retval = DTWAIN_GetErrorString(lError, lpszBuffer, nMaxLen);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retval)
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(-1)
+    const LONG nTotalBytes = StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(pEngine->GetErrorString(lError)), lpszBuffer, nMaxLen);
+    LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)
     CATCH_BLOCK(-1)
 }
 
@@ -921,10 +781,7 @@ LRESULT CALLBACK DisplayOCRDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine()
 {
     LOG_FUNC_ENTRY_NONAME_PARAMS()
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex( pHandle, NULL, FUNC_MACRO);
+    auto [pHandle, pEngine] = VerifyOCRHandles();
 
     // Get the resource for the Twain dialog
     const HGLOBAL hglb = LoadResource(CTL_StaticData::s_DLLInstance,
