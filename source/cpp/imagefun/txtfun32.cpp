@@ -114,7 +114,7 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
 
         szTempPath += StringWrapper::GetGUID() +  _T("OCR");
 
-        CTL_TwainAppMgr::WriteLogInfo(_T("Temporary Image File is ") + szTempPath + _T("\n"));
+        CTL_TwainAppMgr::WriteLogInfo(GetResourceStringFromMap_Native(IDS_LOGMSG_TEMPIMAGEFILETEXT) + _T(" ") + szTempPath + _T("\n"));
 
         // OK, now convert DIB to the correct file type -- only do this if the input format
         // is not DIB

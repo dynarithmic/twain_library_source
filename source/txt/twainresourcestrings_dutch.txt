@@ -188,9 +188,17 @@
 2088 Invalid color space.  Only RGB, Grayscale, and Black/White color spaces are supported
 2089 PDF not supported.
 2090 Missing or corrupt DTWTS.DLL.  TwainSave not available
-2100 Ongeldige OCR pagina
+2101 Ongeldig OCR-pagina opgegeven  
+2102 Ongeldig OCR  
+2103 OCR niet actief  
+2104 Ongeldig OCR-bestandstype  
+2105 Ongeldig OCR-pixeltype  
+2106 Ongeldige OCR-bitdiepte  
+2107 OCR-herkenningsfout  
 2500 Niet open TWAIN bron
 2501 Niet afsluiten TWAIN bron
+2502 Ongeldige afbeeldingsinformatie
+2503 Fout bij het schrijven van gegevens naar bestand
 3000 Selecteer bron
 3001 &Selecteer
 3002 &Annuleer
@@ -209,6 +217,9 @@
 3016 Fout
 3017 Tijdelijke bestandsmap bestaat niet
 3018 werd gebeld
+3019 Tijdelijk beeldbestand is
+3020 Fout bij het maken van een tijdelijk afbeeldingsbestand
+3021 Afbeeldingsbestand is succesvol aangemaakt
 5000 Courier
 5001 Courier-Bold
 5002 Courier-BoldOblique

@@ -415,6 +415,11 @@ namespace dynarithmic
         return StringWrapper::CopyInfoToCString(native_str, buffer, bufSize);
     }
 
+    CTL_StringType GetResourceStringFromMap_Native(LONG nError)
+    {
+        return StringConversion::Convert_Ansi_To_Native(GetResourceStringFromMap(nError));
+    }
+
     std::string& GetResourceStringFromMap(LONG nError)
     {
         static std::string retString;

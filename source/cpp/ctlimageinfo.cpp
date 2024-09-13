@@ -76,14 +76,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfo(DTWAIN_SOURCE Source,
     LOG_FUNC_ENTRY_PARAMS((Source, XResolution, YResolution, Width, Length, NumSamples, BitsPerSample,BitsPerPixel, Planar, PixelType, Compression))
     auto [pHandle, p] = VerifyHandles(Source);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(p); },
-    DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+                                        DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
     CTL_ImageInfoTriplet II(pHandle->m_pTwainSession, p);
 
-    if (!CTL_TwainAppMgr::GetImageInfo(p, &II))
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    // Call TWAIN to get the information
+    auto bOk = CTL_TwainAppMgr::GetImageInfo(p, &II);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !bOk; }, DTWAIN_ERR_IMAGEINFO_INVALID, false, FUNC_MACRO);
 
-        // Get the image information
+    // Retrieve the image information.
     TW_IMAGEINFO *pInfo = II.GetImageInfoBuffer();
     if (XResolution)
         *XResolution = static_cast<DTWAIN_FLOAT>(Fix32ToFloat(pInfo->XResolution));
@@ -97,7 +98,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfo(DTWAIN_SOURCE Source,
         *NumSamples = pInfo->SamplesPerPixel;
     if (BitsPerPixel)
         *BitsPerPixel = pInfo->BitsPerPixel;
-
 
     if (BitsPerSample)
     {

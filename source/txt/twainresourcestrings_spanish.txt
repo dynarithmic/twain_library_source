@@ -188,9 +188,17 @@
 2088 Invalid color space.  Only RGB, Grayscale, and Black/White color spaces are supported
 2089 PDF not supported.
 2090 Missing or corrupt DTWTS.DLL.  TwainSave not available
-2100 Invalid OCR page specified
+2101 Invalid OCR page specified
+2102 OCR inválido  
+2103 OCR no activo  
+2104 Tipo de archivo OCR inválido  
+2105 Tipo de píxel OCR inválido  
+2106 Profundidad de bits OCR inválida  
+2107 Error de reconocimiento OCR  
 2500 No le podríamos abrir a TWAIN origen
 2501 No le podríamos tapar a TWAIN origen
+2502 Información de imagen no válida
+2503 Error al escribir datos en el archivo
 3000 Seleccione Origen
 3001 &Seleccione
 3002 &Cancelar
@@ -209,6 +217,9 @@
 3016 Error
 3017 El directorio de archivos temporales no existe
 3018 fue llamado
+3019 El archivo de imagen temporal es
+3020 Error al crear un archivo de imagen temporal
+3021 Archivo de imagen creado exitosamente
 5000 Courier
 5001 Courier-Bold
 5002 Courier-BoldOblique

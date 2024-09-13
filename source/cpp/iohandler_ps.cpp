@@ -100,18 +100,18 @@ int CTL_PSIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int /*fhFile*/,
             {
                 szTempPath += StringWrapper::GetGUID() + _T("TIF");
                 const std::string szTempPathA = StringConversion::Convert_Native_To_Ansi(szTempPath);
-                CTL_TwainAppMgr::WriteLogInfoA("Temporary Image File is " + szTempPathA + "\n");
+                CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + szTempPathA + "\n");
 
                 // Create a TIFF file
                 m_pTiffHandler->SetDib(m_pDib);
                 const int bRet = m_pTiffHandler->WriteBitmap(szTempPath.c_str(), bOpenFile, 0, pMultiPageStruct);
                 if ( bRet != 0 )
                 {
-                    CTL_TwainAppMgr::WriteLogInfoA("Error creating temporary Image File " + szTempPathA + "\n");
+                    CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_TEMPFILECREATEERRORTEXT) + " " + szTempPathA + "\n");
                     return bRet;
                 }
                 else
-                    CTL_TwainAppMgr::WriteLogInfoA("Image file created successfully " + szTempPathA + "\n");
+                    CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_IMAGEFILESUCCESSTEXT) + " " + szTempPathA + "\n");
                 PSHandler.SetImageType(1);
             }
         }

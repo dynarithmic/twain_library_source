@@ -144,7 +144,7 @@ TW_UINT16 CTL_ProcessEventTriplet::ExecuteEventHandler()
                     {
                         if ( !pSource->SkipImageInfoErrors() )
                         {
-                            CTL_TwainAppMgr::WriteLogInfoA("Invalid Image Information on acquiring image");
+                            CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(DTWAIN_ERR_IMAGEINFO_INVALID_));
                             CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                                   nullptr,
                                                                   DTWAIN_TN_IMAGEINFOERROR,

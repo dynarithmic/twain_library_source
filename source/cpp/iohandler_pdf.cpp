@@ -226,19 +226,19 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
                 {
                     szTempFile += StringWrapper::GetGUID() + _T(".JPG");
                     auto szTempFileA = StringConversion::Convert_Native_To_Ansi(szTempFile);
-                    CTL_TwainAppMgr::WriteLogInfoA("Temporary Image File is " + szTempFileA + "\n");
+                    CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + szTempFileA + "\n");
 
                     // Create a JPEG
                     m_JpegHandler.SetDib(m_pDib);
                     bRet = m_JpegHandler.WriteBitmap(szTempFile.c_str(), bOpenFile, fhFile);
                     if ( bRet != 0 )
                     {
-                        CTL_TwainAppMgr::WriteLogInfoA("Error creating temporary Image File " + szTempFileA + "\n");
+                        CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_TEMPFILECREATEERRORTEXT) + " " + szTempFileA + "\n");
                         delete_file(szTempFile.c_str());
                         return bRet;
                     }
                     else
-                        CTL_TwainAppMgr::WriteLogInfoA("Image file created successfully " + szTempFileA + "\n");
+                        CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_IMAGEFILESUCCESSTEXT) + " " + szTempFileA + "\n");
                     PDFHandler.SetImageType(0);
                 }
                 else
@@ -248,7 +248,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
                     szTempFile += StringWrapper::GetGUID() + _T(".TIF");
                     auto szTempFileA = StringConversion::Convert_Native_To_Ansi(szTempFile);
 
-                    CTL_TwainAppMgr::WriteLogInfoA("Temporary Image File is " + szTempFileA + "\n");
+                    CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + szTempFileA + "\n");
 
                     // Create a TIFF file
                     m_TiffHandler.SetDib(m_pDib);
@@ -257,14 +257,14 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
 
                     if ( bRet != 0 )
                     {
-                        CTL_TwainAppMgr::WriteLogInfoA("Error creating temporary Image File " + szTempFileA + "\n");
+                        CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_TEMPFILECREATEERRORTEXT) + " " + szTempFileA + "\n");
                         return bRet;
                     }
                     else
                     {
                         dps.Stage = DIB_MULTI_LAST;
                         bRet = m_TiffHandler.WriteBitmap(szTempFile.c_str(), bOpenFile, 0, &dps);
-                        CTL_TwainAppMgr::WriteLogInfoA("Image file created successfully " + szTempFileA + "\n");
+                        CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_IMAGEFILESUCCESSTEXT) + " "+ szTempFileA + "\n");
                     }
                     PDFHandler.SetImageType(1);
                 }
