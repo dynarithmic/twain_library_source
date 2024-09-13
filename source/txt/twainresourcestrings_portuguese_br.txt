@@ -190,6 +190,8 @@
 2090 DTWTS.DLL ausente ou corrompido. TwainSave não disponível
 2500 Não foi possível abrir o dispositivo TWAIN
 2501 Não foi possível fechar o dispositivo TWAIN
+2502 Informações de imagem inválidas
+2503 Erro ao gravar dados no arquivo
 2100 Página OCR inválida especificada
 3000 Selecionar fonte
 3001 &Select

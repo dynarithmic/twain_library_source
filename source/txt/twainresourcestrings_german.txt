@@ -191,6 +191,8 @@
 2100 Invalid OCR page specified
 2500 TWAIN Quelle konnte nicht geöffnet werden
 2501 TWAIN Quelle konnte nicht geschlossen werden
+2502 Ungültige Bildinformationen
+2503 Fehler beim Schreiben der Daten in die Datei
 3000 Wählen TWAIN Quelle
 3001 &Wählen
 3002 &Abbrechen
