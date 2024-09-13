@@ -29,28 +29,20 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJpegValues(DTWAIN_SOURCE Source, LONG Quality, LONG Progressive)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Quality, Progressive))
-    CTL_ITwainSource *p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
-    if (p)
-    {
-        p->SetJpegValues(Quality, Progressive?true:false);
-        LOG_FUNC_EXIT_PARAMS(true)
-    }
-    LOG_FUNC_EXIT_PARAMS(false)
-    CATCH_BLOCK(false)
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    pSource->SetJpegValues(Quality, Progressive?true:false);
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetJpegValues(DTWAIN_SOURCE Source, LPLONG pQuality, LPLONG Progressive)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pQuality, Progressive))
-    CTL_ITwainSource *p = VerifySourceHandle( GetDTWAINHandle_Internal(), Source );
-    if (p)
-    {
-        bool PrTemp;
-        p->GetJpegValues(*pQuality, PrTemp);
-        *Progressive = static_cast<LONG>(PrTemp);
-        LOG_FUNC_EXIT_PARAMS(true)
-    }
-    LOG_FUNC_EXIT_PARAMS(false)
-    CATCH_BLOCK(false)
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    bool PrTemp;
+    pSource->GetJpegValues(*pQuality, PrTemp);
+    *Progressive = static_cast<LONG>(PrTemp);
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 

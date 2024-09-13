@@ -31,30 +31,32 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireAudioNative(DTWAIN_SOURCE Source, LONG n
                                                     DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nMaxAudioClips, bShowUI, bCloseSource, pStatus))
-        SourceAcquireOptions opts = SourceAcquireOptions().setHandle(GetDTWAINHandle_Internal()).setSource(Source).
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pSource->GetDTWAINHandle()).setSource(Source).
                                                            setMaxPages(nMaxAudioClips).
                                                            setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).
                                                            setAcquireType(ACQUIREAUDIONATIVE);
     const DTWAIN_ARRAY aDibs = SourceAcquire(opts);
     if (pStatus)
         *pStatus = opts.getStatus();
-    LOG_FUNC_EXIT_PARAMS(aDibs)
-    CATCH_BLOCK(DTWAIN_ARRAY(0))
+    LOG_FUNC_EXIT_NONAME_PARAMS(aDibs)
+    CATCH_BLOCK_LOG_PARAMS(DTWAIN_ARRAY(0))
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioNativeEx(DTWAIN_SOURCE Source, LONG nMaxAudioClips, DTWAIN_BOOL bShowUI,
                                                      DTWAIN_BOOL bCloseSource, DTWAIN_ARRAY Acquisitions, LPLONG pStatus)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nMaxAudioClips, bShowUI, bCloseSource, Acquisitions, pStatus))
-        SourceAcquireOptions opts = SourceAcquireOptions().setSource(Source).setMaxPages(nMaxAudioClips).
-        setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setUserArray(Acquisitions).
-        setAcquireType(ACQUIREAUDIONATIVEEX).setHandle(GetDTWAINHandle_Internal());
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    SourceAcquireOptions opts = SourceAcquireOptions().setSource(Source).setMaxPages(nMaxAudioClips).
+    setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setUserArray(Acquisitions).
+    setAcquireType(ACQUIREAUDIONATIVEEX).setHandle(pHandle);
 
     const bool bRet = AcquireExHelper(opts);
     if (pStatus)
         *pStatus = opts.getStatus();
-    LOG_FUNC_EXIT_PARAMS(bRet)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 
@@ -62,15 +64,16 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioFile(DTWAIN_SOURCE Source, LPCTSTR l
                                                   LONG nMaxAudioClips, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpszFile, lFileFlags, nMaxAudioClips, bShowUI, bCloseSource, pStatus))
+    auto [pHandle, pSource] = VerifyHandles(Source);
     lFileFlags &= ~DTWAIN_USELIST;
-    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(GetDTWAINHandle_Internal()).setSource(Source).
+    SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).
                                 setFileName(lpszFile).setFileFlags(lFileFlags).
                                 setMaxPages(nMaxAudioClips).setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setAcquireType(ACQUIREAUDIOFILE);
     const bool bRetval = AcquireFileHelper(opts, ACQUIREAUDIOFILE);
     if (pStatus)
         *pStatus = opts.getStatus();
-    LOG_FUNC_EXIT_PARAMS(bRetval)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireAudioNative(SourceAcquireOptions& opts)

@@ -218,7 +218,7 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
     if (m_MultiPageStruct.Stage != DIB_MULTI_LAST)
     {
         const auto pSource = pPDFInfo->ImageInfoEx.theSource;
-        const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+        const auto pHandle = pSource->GetDTWAINHandle();
         const auto iter = pHandle->m_mapPDFTextElement.find(pSource);
         if (iter != pHandle->m_mapPDFTextElement.end())
         {

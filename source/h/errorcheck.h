@@ -90,20 +90,23 @@ namespace dynarithmic
     }
 
     template <typename RetType>
-    void DTWAIN_Check_Bad_Handle_Ex(CTL_TwainDLLHandle* pHandle, RetType retErr, const std::string::value_type* fnName)
+    bool DTWAIN_Check_Bad_Handle_Ex(CTL_TwainDLLHandle* pHandle, RetType retErr, const std::string::value_type* fnName, bool willThrow=true)
     {
         if (CTL_StaticData::IsCheckHandles() && !IsDLLHandleValid(pHandle, false))
         {
             OutputDTWAINErrorA(nullptr, fnName);
-            throw retErr;
+            if ( willThrow )
+                throw retErr;
+            return false;
         }
+        return true;
     }
 
 #define CHECK_IF_CAP_SUPPORTED(pSource, pHandle, nCap, retValue) \
     if (!pSource->IsCapInSupportedList(nCap)) \
     { \
         pHandle->m_lLastError = DTWAIN_ERR_CAP_NO_SUPPORT; \
-        LOG_FUNC_EXIT_PARAMS(retValue) \
+        LOG_FUNC_EXIT_NONAME_PARAMS(retValue) \
     }
 }
 #endif

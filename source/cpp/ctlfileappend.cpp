@@ -30,14 +30,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitImageFileAppend(LPCTSTR szFile, LONG fType)
 #if 0
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     if ( !IsDLLHandleValid( pHandle, FALSE ) )
-        LOG_FUNC_EXIT_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
     if ( !pHandle->m_pDummySource )
         pHandle->m_pDummySource = CTL_ITwainSource::Create(nullptr, _T("DTWAIN DummySource"));
 
     // Test destruction here
     CTL_ITwainSource::Destroy(pHandle->m_pDummySource);
 #endif
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(DTWAIN_ERR_BAD_HANDLE)
 }
 

@@ -458,8 +458,8 @@ namespace dynarithmic
             // Read an image file
             static HANDLE      ReadDibBitmap(LPCSTR lpszFileName);
             // Write an image file
-            int         WriteDibBitmap(DTWAINImageInfoEx& ImageInfo, LPCTSTR szFile, int nFormat=BmpFormat,
-                                       bool bOpenFile=true, int fh=0);
+            int         WriteDibBitmap(DTWAINImageInfoEx& ImageInfo, LPCTSTR szFile, 
+                                       int nFormat=BmpFormat, bool bOpenFile=true, int fh=0);
 
             // Write a multi-page DIB file
             CTL_ImageIOHandlerPtr WriteFirstPageDibMulti(DTWAINImageInfoEx& ImageInfo, LPCTSTR szFile, int nFormat,

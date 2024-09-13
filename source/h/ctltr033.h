@@ -22,17 +22,14 @@
 #define CTLTR033_H
 
 #include "ctltr010.h"
+#include "ctltr001.h"
 namespace dynarithmic
 {
-    class CTL_SetDefaultSourceTriplet : public CTL_TwainTriplet
+    class CTL_SetDefaultSourceTriplet : public CTL_SourceTriplet
     {
         public:
             CTL_SetDefaultSourceTriplet(CTL_ITwainSession *pSession,
                                         CTL_ITwainSource* pSource);
-            TW_UINT16 Execute() override;
-
-        private:
-            TW_TWUNKIDENTITY    m_TWUNK;
     };
 }
 #endif

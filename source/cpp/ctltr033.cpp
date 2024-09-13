@@ -25,40 +25,5 @@ using namespace dynarithmic;
 
 CTL_SetDefaultSourceTriplet::CTL_SetDefaultSourceTriplet(CTL_ITwainSession *pSession,
                                                          CTL_ITwainSource* pSource)
-                                                         : CTL_TwainTriplet(), m_TWUNK()
-{
-    SetSessionPtr(pSession);
-    SetSourcePtr( pSource );
-
-    // Get the app manager's AppID
-    const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-    if ( pMgr && pMgr->IsValidTwainSession( pSession ))
-    {
-        if ( pSource )
-        {
-            memcpy(&m_TWUNK.identity, pSource->GetSourceIDPtr(), sizeof(TW_IDENTITY));
-            Init( pSession->GetAppIDPtr(),
-                  nullptr,
-                  DG_CONTROL,
-                  DAT_TWUNKIDENTITY,
-                  MSG_GET,
-                  static_cast<TW_MEMREF>(&m_TWUNK));
-            SetAlive (true);
-        }
-    }
-}
-
-TW_UINT16 CTL_SetDefaultSourceTriplet::Execute()
-{
-    const TW_UINT16 rc = CTL_TwainTriplet::Execute();
-    if ( rc != TWRC_SUCCESS )
-    {
-        // Process Condition code
-        return rc;
-    }
-#ifdef _WIN32
-    WriteProfileStringA("TWAIN", "DEFAULT SOURCE", m_TWUNK.dsPath);
-#endif
-    // Dispatch message that WIN.INI has changed
-    return rc;
-}
+                                                         : CTL_SourceTriplet(pSession, pSource, MSG_SET)
+{}

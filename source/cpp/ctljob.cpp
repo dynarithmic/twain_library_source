@@ -30,10 +30,7 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJobControl(DTWAIN_SOURCE Source, LONG JobControl, DTWAIN_BOOL bSetCurrent)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, JobControl, bSetCurrent))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *pSource = VerifySourceHandle( pHandle, Source );
-    if (!pSource)
-        LOG_FUNC_EXIT_PARAMS(false)
+    auto [pHandle, pSource] = VerifyHandles(Source);
 
     CHECK_IF_CAP_SUPPORTED(pSource, pHandle, DTWAIN_CV_CAPJOBCONTROL, false);
 
@@ -43,10 +40,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJobControl(DTWAIN_SOURCE Source, LONG JobCont
         SetType = DTWAIN_CAPRESET;
         JobControl = TWJC_NONE;
     }
-    DTWAIN_ARRAY Array = DTWAIN_ArrayCreateFromCap(nullptr, DTWAIN_CV_CAPJOBCONTROL, 1);
+    DTWAIN_ARRAY Array = CreateArrayFromCap(pHandle, nullptr, DTWAIN_CV_CAPJOBCONTROL, 1);
     if ( !Array )
-        LOG_FUNC_EXIT_PARAMS(false)
-    DTWAINArrayLL_RAII a(Array);
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    DTWAINArrayLowLevel_RAII a(pSource->GetDTWAINHandle(), Array);
 
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
     vValues[0] = JobControl;
@@ -57,8 +54,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJobControl(DTWAIN_SOURCE Source, LONG JobCont
         // Set the source value in the cache
         pSource->SetCurrentJobControl(static_cast<TW_UINT16>(JobControl));
     }
-    LOG_FUNC_EXIT_PARAMS(bRet)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 
@@ -69,34 +66,31 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsJobControlSupported(DTWAIN_SOURCE Source, LONG
     DTWAIN_BOOL bRet = FALSE;
     if ( DTWAIN_EnumJobControls(Source, &Array) )
     {
-        DTWAINArrayLL_RAII raii(Array);
-        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+        DTWAINArrayLowLevel_RAII raii(pHandle, Array);
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
         const LONG lCount = static_cast<LONG>(vValues.size());
         if ( lCount < 1 )
-            LOG_FUNC_EXIT_PARAMS(false)
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
         const LONG CurType = vValues[0];
         if ( lCount == 1 && CurType == TWJC_NONE)
-            LOG_FUNC_EXIT_PARAMS(false)
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
         if ( JobControl == DTWAIN_ANYSUPPORT )
-            LOG_FUNC_EXIT_PARAMS(true)
+            LOG_FUNC_EXIT_NONAME_PARAMS(true)
 
         const auto it = find(vValues.begin(), vValues.end(), JobControl);
         if ( it != vValues.end())
             bRet = TRUE;
     }
-    LOG_FUNC_EXIT_PARAMS(bRet)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnableJobFileHandling(DTWAIN_SOURCE Source, DTWAIN_BOOL bSet)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, bSet))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle( pHandle, Source );
-    if (!p)
-        LOG_FUNC_EXIT_PARAMS(false)
-    p->SetJobFileHandling(bSet?true:false);
-    LOG_FUNC_EXIT_PARAMS(true)
-    CATCH_BLOCK(false)
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    pSource->SetJobFileHandling(bSet?true:false);
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
