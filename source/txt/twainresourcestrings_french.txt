@@ -198,7 +198,13 @@
 2088 Invalid color space.  Only RGB, Grayscale, and Black/White color spaces are supported
 2089 PDF not supported.
 2090 Missing or corrupt DTWTS.DLL.  TwainSave not available
-2100 Invalid OCR page specified
+2101 Page OCR invalide spécifiée  
+2102 OCR invalide  
+2103 OCR inactif  
+2104 Type de fichier OCR invalide  
+2105 Type de pixel OCR invalide  
+2106 Profondeur de bits OCR invalide  
+2107 Erreur de reconnaissance OCR  
 2500 Ne pouvions pas ouvrir TWAIN la source
 2501 Ne pouvions pas fermer TWAIN la source
 2502 Informations sur l'image invalides

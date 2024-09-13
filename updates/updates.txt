@@ -12,6 +12,8 @@ DTWAIN Version changes
 
 - Fix issue with DTWAIN_SelectOCREngine() not working for Unicode builds of DTWAIN.
 
+- Adjust DTWAIN OCR error constants to match OCR error messages.
+
   
 5.5.0
 
