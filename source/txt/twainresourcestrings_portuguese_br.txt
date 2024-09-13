@@ -192,7 +192,13 @@
 2501 Não foi possível fechar o dispositivo TWAIN
 2502 Informações de imagem inválidas
 2503 Erro ao gravar dados no arquivo
-2100 Página OCR inválida especificada
+2101 Página OCR inválida especificada
+2102 OCR inválido  
+2103 OCR não ativo  
+2104 Tipo de arquivo OCR inválido  
+2105 Tipo de pixel OCR inválido  
+2106 Profundidade de bits OCR inválida  
+2107 Erro de reconhecimento OCR  
 3000 Selecionar fonte
 3001 &Select
 3002 &Cancel
