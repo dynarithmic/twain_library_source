@@ -54,7 +54,7 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
                 return DTWAIN_ERR_FILEWRITE;
             szTempPath += StringWrapper::GetGUID() +  _T("TIF");
 
-            CTL_TwainAppMgr::WriteLogInfoA("Temporary Image File is " + StringConversion::Convert_Native_To_Ansi(szTempPath) + "\n");
+            CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + StringConversion::Convert_Native_To_Ansi(szTempPath) + "\n");
 
             // OK, now remember that the file we are writing is a TIF file, and this is
             // the file that is created first

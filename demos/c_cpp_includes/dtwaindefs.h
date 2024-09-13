@@ -996,7 +996,11 @@
 #define DTWAIN_ERR_SOURCE_COULD_NOT_OPEN   (-2500)
 #define DTWAIN_ERR_SOURCE_COULD_NOT_CLOSE  (-2501)
 
-#define DTWAIN_ERR_LAST                    DTWAIN_ERR_SOURCE_COULD_NOT_CLOSE
+/* Miscellaneous errors */
+#define DTWAIN_ERR_IMAGEINFO_INVALID       (-2502)
+#define DTWAIN_ERR_WRITEDATA_TOFILE        (-2503)
+
+#define DTWAIN_ERR_LAST                    (DTWAIN_ERR_USER_START + 1)
 #define DTWAIN_ERR_USER_START              (-80000)  
 
 /* Device event constants (same as TWAIN 1.8 value plus 1)*/
