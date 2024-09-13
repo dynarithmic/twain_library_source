@@ -191,6 +191,8 @@
 2100 Ongeldige OCR pagina
 2500 Niet open TWAIN bron
 2501 Niet afsluiten TWAIN bron
+2502 Ongeldige afbeeldingsinformatie
+2503 Fout bij het schrijven van gegevens naar bestand
 3000 Selecteer bron
 3001 &Selecteer
 3002 &Annuleer

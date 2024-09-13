@@ -191,6 +191,8 @@
 2100 Invalid OCR page specified
 2500 Non colmando TWAIN. DLL
 2501 Non aprendo TWAIN Fonte
+2502 Informazioni sull'immagine non valide
+2503 Errore durante la scrittura dei dati nel file
 3000 Selezioni Fonte
 3001 &Selezionar
 3002 &Annullare

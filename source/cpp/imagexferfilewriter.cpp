@@ -604,7 +604,7 @@ LONG ImageXferFileWriter::CopyDuplexDibToFile(CTL_TwainDibPtr pCurDib, bool bIsJ
             if (fh.bad())
             {
                 CTL_StringStreamType strm;
-                strm << "Error writing data to file " << szTempPath;
+                strm << GetResourceStringFromMap(DTWAIN_ERR_WRITEDATA_TOFILE_) << szTempPath;
                 CTL_TwainAppMgr::WriteLogInfo(strm.str());
                 return DTWAIN_ERR_FILEWRITE;
             }

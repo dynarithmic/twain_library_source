@@ -192,6 +192,8 @@
 2100 Invalid OCR page specified
 2500 Could not open TWAIN source
 2501 Could not close TWAIN source
+2502 Invalid Image Information on acquiring image
+2503 Error writing data to file
 3000 Select Source
 3001 &Select
 3002 &Cancel
