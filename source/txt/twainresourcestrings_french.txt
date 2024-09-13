@@ -221,6 +221,9 @@
 3016 Erreur
 3017 Le répertoire de fichiers temporaires n'existe pas
 3018 appelé
+3019 Le fichier image temporaire est
+3020 Erreur lors de la création du fichier image temporaire
+3021 Fichier image créé avec succès
 5000 Courier
 5001 Courier-Bold
 5002 Courier-BoldOblique

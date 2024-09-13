@@ -1049,6 +1049,7 @@
     <ClInclude Include="h\sourceselectopts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="h\dtwain_paramlogger.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".\h\versioninfo.ipp">
@@ -1130,6 +1131,9 @@
       <Filter>INI Files</Filter>
     </None>
     <None Include="rc\resource_verinfo.rc2">
+      <Filter>RC Files</Filter>
+    </None>
+    <None Include="rc\twainresourcestrings_english.rc2">
       <Filter>RC Files</Filter>
     </None>
   </ItemGroup>

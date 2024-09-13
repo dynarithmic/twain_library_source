@@ -54,5 +54,6 @@ namespace dynarithmic
     std::string GetResourceFileNameA(LPCSTR lpszName, LPCTSTR szPrefix);
     std::string GetCustomResourceFileNameA(LPCSTR lpszName);
     std::string& GetResourceStringFromMap(LONG resourceNum);
+    CTL_StringType GetResourceStringFromMap_Native(LONG resourceNum);
 }
 #endif

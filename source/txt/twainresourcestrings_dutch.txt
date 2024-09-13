@@ -211,6 +211,9 @@
 3016 Fout
 3017 Tijdelijke bestandsmap bestaat niet
 3018 werd gebeld
+3019 Tijdelijk beeldbestand is
+3020 Fout bij het maken van een tijdelijk afbeeldingsbestand
+3021 Afbeeldingsbestand is succesvol aangemaakt
 5000 Courier
 5001 Courier-Bold
 5002 Courier-BoldOblique

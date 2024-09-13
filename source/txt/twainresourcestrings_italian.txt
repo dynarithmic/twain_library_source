@@ -211,6 +211,9 @@
 3016 Errore
 3017 La directory dei file temporanei non esiste
 3018 è stato chiamato
+3019 Il file di immagine temporaneo è
+3020 Errore durante la creazione del file immagine temporaneo
+3021 File immagine creato con successo
 5000 Courier
 5001 Courier-Bold
 5002 Courier-BoldOblique

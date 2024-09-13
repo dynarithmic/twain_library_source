@@ -211,6 +211,9 @@
 3016 Fehler
 3017 Das temporäre Dateiverzeichnis existiert nicht
 3018 wurde aufgerufen
+3019 Temporäre Bilddatei ist
+3020 Fehler beim Erstellen der temporären Bilddatei
+3021 Bilddatei erfolgreich erstellt
 5000 Courier
 5001 Courier-Bold
 5002 Courier-BoldOblique
