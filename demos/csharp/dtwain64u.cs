@@ -934,6 +934,10 @@ namespace Dynarithmic
         public const  int DTWAIN_ERR_OCR_RECOGNITIONERROR = (-2107);
         public const  int DTWAIN_ERR_OCR_LAST = (-2108);
         public const  int DTWAIN_ERR_LAST = DTWAIN_ERR_OCR_LAST;
+        public const  int DTWAIN_ERR_SOURCE_COULD_NOT_OPEN   = (-2500);
+        public const  int DTWAIN_ERR_SOURCE_COULD_NOT_CLOSE  = (-2501);
+        public const  int DTWAIN_ERR_IMAGEINFO_INVALID       = (-2502);
+        public const  int DTWAIN_ERR_WRITEDATA_TOFILE        = (-2503);
         public const  int DTWAIN_DE_CHKAUTOCAPTURE = 1;
         public const  int DTWAIN_DE_CHKBATTERY = 2;
         public const  int DTWAIN_DE_CHKDEVICEONLINE = 4;
