@@ -54,6 +54,7 @@
 #include "ctlres.h"
 #include "dtwain.h"
 #include "twainframe.h"
+#include <boost/functional/hash.hpp>
 
 #include "notimpl.h"
 #include "sourceacquireopts.h"
@@ -245,6 +246,7 @@ namespace dynarithmic
     typedef std::vector<CallbackInfo<DTWAIN_CALLBACK_PROC, LONGLONG> > CTL_CallbackProcArray64;
     typedef std::unordered_map<LONG, CTL_StringType> CTL_StringToLongMap;
     typedef std::unordered_map<LONG, std::string> CTL_LongToStringMap;
+    typedef std::unordered_map<std::string, CTL_LongToStringMap> CTL_StringToMapLongToStringMap;
     typedef std::unordered_map<LONG, std::vector<LONG> > CTL_LongToVectorLongMap;
     typedef std::vector<CTL_MapThreadToDLLHandle>     CTL_HookInfoArray;
 
@@ -294,6 +296,7 @@ namespace dynarithmic
     {
         CTL_StringType SourceName;
         CustomPlacement CS;
+        CTL_TwainDLLHandle* pHandle;
         int nItems;
     };
 
@@ -500,6 +503,17 @@ namespace dynarithmic
         CTL_ITwainSource* GetSourceHandle() const { return m_pSource; }
     };
 
+    struct CacheKeyHash 
+    {
+        std::size_t operator()(const std::pair<LONG, std::string>& key) const 
+        {
+            std::size_t seed = 0;
+            boost::hash_combine(seed, key.first);
+            boost::hash_combine(seed, key.second);
+            return seed;
+        }
+    };
+
     typedef std::map<std::string, SourceStatus> SourceStatusMap;
     typedef std::map<int, ImageResamplerData> ImageResamplerMap;
     typedef std::unordered_map<LONG, std::pair<std::string, std::string>> CTL_PDFMediaMap;
@@ -509,9 +523,18 @@ namespace dynarithmic
     typedef std::unordered_map<LONG, std::string> CTL_TwainLongToStringMap;
     typedef std::unordered_map<int32_t, std::string> CTL_ErrorToExtraInfoMap;
     typedef std::unordered_map<std::string, unsigned long> CTL_ThreadMap;
+    typedef std::unordered_map<std::pair<LONG, std::string>, std::string, CacheKeyHash> CTL_PairToStringMap;
+
+    struct CTL_GeneralResourceInfo
+    {
+        CTL_StringType sResourceName;
+        bool bIsFromRC = false;
+    };
 
     struct CTL_StaticData
     {
+        static CTL_StringToMapLongToStringMap s_AllLoadedResourcesMap;
+        static CTL_GeneralResourceInfo         s_ResourceInfo;
         static CTL_PDFMediaMap          s_PDFMediaMap;
         static CTL_TwainLongToStringMap s_TwainCountryMap;
         static CTL_TwainNameMap         s_TwainNameMap;
@@ -519,7 +542,7 @@ namespace dynarithmic
         static CTL_TwainConstantsMap s_TwainConstantsMap;
         static CTL_TwainLongToStringMap s_TwainLanguageMap;
         static bool s_bCheckHandles;
-        static CTL_StringType  s_strResourcePath;  // path to the DTWAIN resource strings
+        static CTL_StringType           s_strResourcePath;  // path to the DTWAIN resource strings
         static CTL_StringType           s_DLLPath;
         static CTL_StringType           s_sINIPath;
         static bool                     s_multipleThreads;
@@ -547,7 +570,16 @@ namespace dynarithmic
         static ImageResamplerMap        s_ImageResamplerMap;
         static SourceStatusMap          s_SourceStatusMap;
         static CTL_StringType           s_ResourceVersion;
+        static std::string              s_CurrentResourceKey;
+        static CTL_PairToStringMap      s_ResourceCache;
 
+        static CTL_PairToStringMap& GetResourceCache() { return s_ResourceCache; }
+        static CTL_StringToMapLongToStringMap& GetAllLanguagesResourceMap() { return s_AllLoadedResourcesMap; }
+        static CTL_LongToStringMap* GetLanguageResource(std::string sLang);
+        static std::string&         GetCurrentLanguageResourceKey() { return s_CurrentResourceKey; }
+        static void SetCurrentLanguageResourceKey(std::string sLang) { s_CurrentResourceKey = sLang; }
+        static CTL_LongToStringMap* GetCurrentLanguageResource();
+        static CTL_GeneralResourceInfo& GetGeneralResourceInfo() { return s_ResourceInfo; }
         static CTL_PDFMediaMap& GetPDFMediaMap() { return s_PDFMediaMap; }
         static CTL_TwainLongToStringMap& GetTwainCountryMap() { return s_TwainCountryMap; }
         static CTL_TwainNameMap& GetTwainNameMap() { return s_TwainNameMap; }
@@ -604,7 +636,7 @@ namespace dynarithmic
             void    RemoveAllSourceCapInfo();
             void    RemoveAllSourceMaps();
             void    InitializeResourceRegistry();
-            std::pair<CTL_ResourceRegistryMap::iterator, bool> AddResourceToRegistry(LPCSTR pLangDLL);
+            std::pair<CTL_ResourceRegistryMap::iterator, bool> AddResourceToRegistry(LPCSTR pLangDLL, bool bClear);
             CTL_ResourceRegistryMap& GetResourceRegistry() { return m_ResourceRegistry; }
             CTL_StringType GetVersionString() const { return  m_VersionString; }
             void        SetVersionString(CTL_StringType s) { m_VersionString = std::move(s); }
@@ -653,7 +685,6 @@ namespace dynarithmic
             CTL_StringType   m_strLibraryPath;   // path to the DTWAIN Library being used
             CTL_StringType   m_sWindowsVersionInfo; // Windows version information, cached.
             CTL_StringType   m_strDefaultSource; // Current default TWAIN source
-            CTL_LongToStringMap  m_mapResourceStrings;
             CTL_LoggerCallbackInfo m_LoggerCallbackInfo;
 
             HINSTANCE           m_hInstance;
@@ -757,14 +788,15 @@ namespace dynarithmic
         }
     }
 
+    #define DTWAIN_VERIFY_DLLHANDLE  1
+    #define DTWAIN_VERIFY_SOURCEHANDLE  2
+    #define DTWAIN_TEST_NOTHROW 4
+    #define DTWAIN_TEST_SETLASTERROR 8
+
     CTL_TwainDLLHandle* FindHandle(HWND hWnd, bool bIsDisplay);
     CTL_TwainDLLHandle* FindHandle(HINSTANCE hInst);
-    CTL_ITwainSource* VerifySourceHandle( DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source );
-
-
-
-    int GetResolutions(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, void* pArray,
-                       CTL_EnumGetType GetType);
+    std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> VerifyHandles(DTWAIN_SOURCE Source, int Testing = DTWAIN_VERIFY_DLLHANDLE | DTWAIN_VERIFY_SOURCEHANDLE | DTWAIN_TEST_SETLASTERROR);
+    int GetResolutions(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, void* pArray,CTL_EnumGetType GetType);
     bool GetImageSize( DTWAIN_HANDLE DLLHandle,
                        DTWAIN_SOURCE Source,
                        double *pLeft,
@@ -797,11 +829,14 @@ namespace dynarithmic
     bool IsStringCapType(TW_UINT16 nCap);
     bool IsFrameCapType(TW_UINT16 nCap);
     LONG GetArrayTypeFromCapType(TW_UINT16 CapType);
+    LONG GetCustomCapDataType(DTWAIN_SOURCE Source, TW_UINT16 nCap);
+    LONG GetCapContainer(CTL_ITwainSource* pSource, LONG nCap, LONG lCapType);
+    LONG GetCapArrayType(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG nCap);
 
     DTWAIN_BOOL    DTWAIN_ArrayFirst(DTWAIN_ARRAY pArray, LPVOID pVariant);
 
     DTWAIN_BOOL    DTWAIN_ArrayNext(DTWAIN_ARRAY pArray, LPVOID pVariant);
-    LONG           DTWAIN_ArrayType(DTWAIN_ARRAY pArray, bool bGetReal=true);
+    LONG           DTWAIN_ArrayType(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray);
     bool           DTWAINFRAMEToTWFRAME(DTWAIN_FRAME pDdtwil, pTW_FRAME pTwain);
     bool           TWFRAMEToDTWAINFRAME(TW_FRAME pTwain, DTWAIN_FRAME pDdtwil);
 
@@ -826,19 +861,17 @@ namespace dynarithmic
 
     void LogExceptionErrorA(LPCSTR fname, const char *sAdditionalText=nullptr);
     void LogDTWAINMessage(HWND, UINT, WPARAM, LPARAM, bool bCallback=false);
-    bool UserDefinedLoggerExists();
     bool UserDefinedLoggerExists(CTL_TwainDLLHandle* pHandle);
     bool AnyLoggerExists(CTL_TwainDLLHandle* pHandle);
-    bool AnyLoggerExists();
-    void WriteUserDefinedLogMsg(LPCTSTR sz);
-    void WriteUserDefinedLogMsgA(LPCSTR sz);
-    void WriteUserDefinedLogMsgW(LPCWSTR sz);
+    void WriteUserDefinedLogMsg(CTL_TwainDLLHandle* pHandle, LPCTSTR sz);
+    void WriteUserDefinedLogMsgA(CTL_TwainDLLHandle* pHandle, LPCSTR sz);
+    void WriteUserDefinedLogMsgW(CTL_TwainDLLHandle* pHandle, LPCWSTR sz);
     bool GetSupportString(DTWAIN_SOURCE Source, LPTSTR sz, LONG nLen, LONG Cap, LONG GetType);
     bool EnumSupported(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG Cap);
     LONG CheckEnabled(DTWAIN_SOURCE Source, LONG CapVal);
     bool SetSupportArray(DTWAIN_SOURCE Source, DTWAIN_ARRAY Array, LONG Cap);
     bool GetSupportArray(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array, LONG Cap, LONG GetType=DTWAIN_CAPGET);
-    CTL_StringType GetDTWAINTempFilePath();
+    CTL_StringType GetDTWAINTempFilePath(CTL_TwainDLLHandle* pHandle);
     size_t GetResourceStringA(UINT nResNumber, LPSTR buffer, LONG bufSize);
     size_t GetResourceStringW(UINT nResNumber, LPWSTR buffer, LONG bufSize);
     size_t GetResourceString(UINT nResNumber, LPTSTR buffer, LONG bufSize);
@@ -866,7 +899,7 @@ namespace dynarithmic
     DTWAIN_BOOL DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *p, CTL_TwainDLLHandle *pHandle, TW_UINT16 nCapToCache);
     DTWAIN_BOOL DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, CTL_TwainDLLHandle *pHandle, CTL_EnumeratorNode<LONG>::container_pointer_type vCaps);
     CTL_CapInfoArrayPtr GetCapInfoArray(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource *p);
-    DTWAIN_SOURCE SourceSelect(const SourceSelectionOptions& options);
+    DTWAIN_SOURCE SourceSelect(CTL_TwainDLLHandle* pHandle, const SourceSelectionOptions& options);
     DTWAIN_ARRAY  SourceAcquire(SourceAcquireOptions& opts);
     bool AcquireExHelper(SourceAcquireOptions& opts);
     bool AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType);
@@ -875,13 +908,14 @@ namespace dynarithmic
     void LLSetupUIOnly(CTL_ITwainSource* pSource);
     DTWAIN_HANDLE GetDTWAINHandle_Internal();
     bool TileModeOn(DTWAIN_SOURCE Source);
-    void DestroyArrayFromFactory(DTWAIN_ARRAY pArray);
-    void DestroyFrameFromFactory(DTWAIN_FRAME Frame);
-    DTWAIN_ARRAY CreateArrayFromFactory(LONG nEnumType, LONG nInitialSize);
-    DTWAIN_ARRAY CreateArrayCopyFromFactory(DTWAIN_ARRAY Source);
+    void DestroyArrayFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray);
+    void DestroyFrameFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_FRAME Frame);
+    DTWAIN_ARRAY CreateArrayFromFactory(CTL_TwainDLLHandle* pHandle, LONG nEnumType, LONG nInitialSize);
+    DTWAIN_ARRAY CreateArrayCopyFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Source);
     DTWAIN_FRAME CreateFrameArray(CTL_TwainDLLHandle* pHandle, double Left, double Top, double Right, double Bottom);
-    void SetArrayValueFromFactory(DTWAIN_ARRAY pArray, size_t lPos, LPVOID pVariant);
-
+    void SetArrayValueFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray, size_t lPos, LPVOID pVariant);
+    DTWAIN_ARRAY CreateArrayFromCap(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapType, LONG lSize);
+    LONG GetCapDataType(CTL_ITwainSource* pSource, LONG nCap);
 
     typedef CTL_StringType(CTL_ITwainSource::* SOURCEINFOFUNC)() const;
     LONG GetSourceInfo(CTL_ITwainSource* p, SOURCEINFOFUNC pFunc, LPTSTR szInfo, LONG nMaxLen);
@@ -894,7 +928,7 @@ namespace dynarithmic
     // outputs parameter and return values
     class ParamOutputter
     {
-        StringArray sv;
+        StringArray aParamNames;
         size_t nWhich;
         std::string argNames;
         std::ostringstream strm;
@@ -954,7 +988,7 @@ namespace dynarithmic
     public:
         ParamOutputter(const std::string& s, bool isReturnValue = false) : nWhich(0), m_bIsReturnValue(isReturnValue)
         {
-            StringWrapperA::Tokenize(s, "(, )", sv);
+            StringWrapperA::Tokenize(s, "(, )", aParamNames);
             if (!m_bIsReturnValue)
                 strm << "(";
             else
@@ -964,14 +998,14 @@ namespace dynarithmic
         template <typename T, typename ...P>
         ParamOutputter& outputParam(T t, P ...p)
         {
-            if (sv.empty() && !m_bIsReturnValue)
+            if (aParamNames.empty() && !m_bIsReturnValue)
                 return *this;
             const bool bIsNull = std::is_pointer_v<T> && !t;
             if (!m_bIsReturnValue)
             {
                 // Make sure we log input types correctly, especially character pointers.
                 // User may supply to us a writable char buffer that is not null-terminated!
-                LogInputType(sv[nWhich], t);
+                LogInputType(aParamNames[nWhich], t);
             }
             else
             {
@@ -982,7 +1016,7 @@ namespace dynarithmic
             }
             if (!m_bIsReturnValue)
             {
-              if (nWhich < sv.size() - 1)
+              if (nWhich < aParamNames.size() - 1)
                 strm << ", ";
               else
                 strm << ")";
@@ -1001,12 +1035,7 @@ namespace dynarithmic
         std::string getString() const { return strm.str(); }
     };
 
-    struct DTWAINArray_DestroyTraits
-    {
-        void operator()(DTWAIN_ARRAY a) { DestroyArrayFromFactory(a); }
-    };
-
-    struct DTWAINArrayPtr_DestroyTraits
+/*    struct DTWAINArrayPtr_DestroyTraits
     {
         static void Destroy(DTWAIN_ARRAY* a)
         {
@@ -1015,7 +1044,7 @@ namespace dynarithmic
         }
         void operator()(DTWAIN_ARRAY* a) { Destroy(a); }
     };
-
+    */
     struct DTWAINGlobalHandle_CloseTraits
     {
         static void Destroy(HANDLE h)
@@ -1091,11 +1120,6 @@ namespace dynarithmic
         void operator()(T* h) { Destroy(h); }
     };
 
-    struct DTWAINFrame_DestroyTraits
-    {
-        void operator()(DTWAIN_FRAME a) { DestroyFrameFromFactory(a); }
-    };
-
     struct DTWAINGlobalHandle_ReleaseDCTraits
     {
         static void Destroy(std::pair<HWND, HDC>& val)
@@ -1144,12 +1168,31 @@ namespace dynarithmic
         void operator()(HBITMAP* h) { Destroy(h); }
     };
 
-    struct DTWAINArrayLowLevel_DestroyTraits
+    template <typename ArrayType>
+    struct DTWAINArrayLowLevel_RAII_Impl
     {
-        void Destroy(DTWAIN_ARRAY a);
-        void operator()(DTWAIN_ARRAY a) { Destroy(a); }
+        CTL_TwainDLLHandle* m_pHandle;
+        ArrayType m_Array;
+        bool m_bDestroy;
+        DTWAINArrayLowLevel_RAII_Impl(CTL_TwainDLLHandle* pHandle, ArrayType a) : m_pHandle(pHandle), m_Array(a), m_bDestroy(true) {}
+        void SetDestroy(bool bSet) { m_bDestroy = bSet; }
+        void SetArray(ArrayType arr) { m_Array = arr; }
+        void Destroy()
+        {
+            if (m_bDestroy && m_Array)
+            {
+                m_pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(m_Array));
+                m_Array = {};
+            }
+        }
+        ~DTWAINArrayLowLevel_RAII_Impl()
+        {
+            Destroy();
+        }
     };
 
+    using DTWAINArrayLowLevel_RAII = DTWAINArrayLowLevel_RAII_Impl<DTWAIN_ARRAY>;
+    using DTWAINArrayLowLevelPtr_RAII = DTWAINArrayLowLevel_RAII_Impl<DTWAIN_ARRAY*>;
 
     // RAII Classes
     using DTWAINDeviceContextRelease_RAII = std::unique_ptr<std::pair<HWND, HDC>, DTWAINGlobalHandle_ReleaseDCTraits>;
@@ -1158,11 +1201,8 @@ namespace dynarithmic
     using DTWAINResourceUnlockFree_RAII = std::unique_ptr<void, DTWAINResource_UnlockFreeTraits>;
     using DTWAINHBITMAPFree_RAII = std::unique_ptr<HBITMAP, DTWAINResource_DeleteObjectTraits>;
     using DTWAINGlobalHandle_RAII = std::unique_ptr<void, DTWAINGlobalHandle_CloseTraits>;
-    using DTWAINArrayPtr_RAII = std::unique_ptr<DTWAIN_ARRAY, DTWAINArrayPtr_DestroyTraits>;
+    using DTWAINArrayPtr_RAII = DTWAINArrayLowLevelPtr_RAII;// std::unique_ptr<DTWAIN_ARRAY, DTWAINArrayPtr_DestroyTraits>;
     using DTWAINGlobalHandleUnlockFree_RAII = std::unique_ptr<void, DTWAINGlobalHandle_CloseFreeTraits>;
-    using DTWAINFrame_RAII = std::unique_ptr<void, DTWAINFrame_DestroyTraits>;
-    using DTWAINArray_RAII = std::unique_ptr<void, DTWAINArray_DestroyTraits>;
-    using DTWAINArrayLL_RAII = std::unique_ptr<void, DTWAINArrayLowLevel_DestroyTraits>;
     using DTWAINDSM2Lock_RAII = std::unique_ptr<void, 
             DTWAINGlobalHandle_GenericUnlockFreeTraits<HANDLE, DSM2UnlockTraits, DSM2NoFreeTraits>>;
     using DTWAINDSM2LockAndFree_RAII = std::unique_ptr<DSMPair,

@@ -53,7 +53,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileSavePos(HWND hWndParent, LPCTSTR szTitle,
             pHandle->m_CustomPlacement.sTitle = _T("");
     }
     #endif
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -67,7 +67,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomFileSave(OPENFILENAME* lpOpenFileName)
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     pHandle->m_pofn = lpOpenFileName;
     #endif
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 

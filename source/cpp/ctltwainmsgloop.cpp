@@ -32,14 +32,14 @@ std::queue<MSG> TwainMessageLoopV2::s_MessageQueue;
 
 std::pair<bool, DTWAIN_ACQUIRE> dynarithmic::StartModalMessageLoop(DTWAIN_SOURCE Source, SourceAcquireOptions& opts)
 {
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
+    if (!pSource)
+        return { false, -1 };
+
+    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
         return { true, 0 };
 
-    CTL_ITwainSource* pSource = VerifySourceHandle(pHandle, Source);
-
-    if (!pSource)
-        return { false, -1 };
 
     // Start a message loop here
     // TWAIN 1.x loop implementation

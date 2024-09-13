@@ -23,6 +23,7 @@
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "../wildcards/wildcards.hpp"
+#include "dtwain_paramlogger.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -35,47 +36,40 @@ static void DetermineIfSpecialXfer(CTL_ITwainSource* p);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSourcesOnSelect(DTWAIN_BOOL bSet)
 {
     LOG_FUNC_ENTRY_PARAMS((bSet))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     pHandle->m_bOpenSourceOnSelect = bSet ? true : false;
-    LOG_FUNC_EXIT_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsOpenSourcesOnSelect(VOID_PROTOTYPE)
 {
-    LOG_FUNC_ENTRY_PARAMS(())
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const bool retVal = pHandle->m_bOpenSourceOnSelect;
-    LOG_FUNC_EXIT_PARAMS(retVal)
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-
-    CTL_ITwainSource* pTheSource = VerifySourceHandle(pHandle, Source);
-    if (!pTheSource)
-        LOG_FUNC_EXIT_PARAMS(false)
+    auto [pHandle, pSource] = VerifyHandles(Source);
 
     // If source already opened, just return TRUE.
-    if (pTheSource->IsOpened())
-        LOG_FUNC_EXIT_PARAMS(true)
+    if (pSource->IsOpened())
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
 
     // Set up the opening of the source
     bool bRetval = false;
 
     // Go through TWAIN to open the source
-    bRetval = CTL_TwainAppMgr::OpenSource(pHandle->m_pTwainSession, pTheSource);
+    bRetval = CTL_TwainAppMgr::OpenSource(pHandle->m_pTwainSession, pSource);
     if (bRetval)
     {
         // Set up status of the source 
         auto& sourcemap = CTL_StaticData::GetSourceStatusMap();
-        auto iter = sourcemap.insert({ pTheSource->GetProductNameA(), {} }).first;
+        auto iter = sourcemap.insert({ pSource->GetProductNameA(), {} }).first;
         iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, true);
         iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, false);
     }
@@ -92,27 +86,27 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
         pHandle->m_aFeederSources.insert(Source);
 
     // Get the supported transfer types
-    pTheSource->SetSupportedTransferMechanisms(CTL_TwainAppMgr::EnumTransferMechanisms(pTheSource));
+    pSource->SetSupportedTransferMechanisms(CTL_TwainAppMgr::EnumTransferMechanisms(pSource));
 
     // See if the source is one that has a bug in the MSG_XFERREADY sending on the 
     // TWAIN message queue
-    DetermineIfSpecialXfer(pTheSource);
+    DetermineIfSpecialXfer(pSource);
 
     // Get all the caps supported
     DTWAIN_ARRAY arr = nullptr;
-    DTWAINArrayPtr_RAII raii(&arr);
-    CTL_TwainAppMgr::GatherCapabilityInfo(pTheSource);
+    DTWAINArrayPtr_RAII raii(pHandle, &arr);
+    CTL_TwainAppMgr::GatherCapabilityInfo(pSource);
 
     // Cache the pixel types and bit depths
-    LogAndCachePixelTypes(pTheSource);
+    LogAndCachePixelTypes(pSource);
 
     // get the list of caps created
-    CapList& theCapList = pTheSource->GetCapSupportedList();
+    CapList& theCapList = pSource->GetCapSupportedList();
 
     // if any logging is turned on, then get the capabilities and log the values
     if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
     {
-        CTL_StringType msg = _T("Source: ") + pTheSource->GetProductName() + _T(" has been opened successfully");
+        CTL_StringType msg = _T("Source: ") + pSource->GetProductName() + _T(" has been opened successfully");
         CTL_TwainAppMgr::WriteLogInfo(msg);
 
         // Log the caps if logging is turned on
@@ -128,7 +122,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
         CTL_StringStreamType strm;
         strm << theCapList.size();
         sName = _T("\n\nSource \"");
-        sName += pTheSource->GetProductName();
+        sName += pSource->GetProductName();
         sName += _T("\" contains the following ");
         sName += strm.str() + _T(" capabilities: \n{\n");
         if (theCapList.empty())
@@ -143,25 +137,17 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
         CTL_TwainAppMgr::WriteLogInfo(sName);
     }
 
-    LOG_FUNC_EXIT_PARAMS(bRetval)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceOpen(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    if ( !Source )
-        LOG_FUNC_EXIT_PARAMS(false)
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
-    if (!p)
-        LOG_FUNC_EXIT_PARAMS(false)
-    const DTWAIN_BOOL bRet = CTL_TwainAppMgr::IsSourceOpen(p);
-    LOG_FUNC_EXIT_PARAMS(bRet)
-    CATCH_BLOCK(false)
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    const DTWAIN_BOOL bRet = CTL_TwainAppMgr::IsSourceOpen(pSource);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 void LogAndCachePixelTypes(CTL_ITwainSource *p)
@@ -184,16 +170,16 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
     DTWAIN_BOOL bOK = DTWAIN_GetCapValues(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPGET, &PixelTypes);
     if (bOK)
     {
-        DTWAINArrayLL_RAII arrP(PixelTypes);
-        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+        const auto pHandle = p->GetDTWAINHandle();
+        DTWAINArrayLowLevel_RAII arrP(pHandle, PixelTypes);
         auto& vPixelTypes = pHandle->m_ArrayFactory->underlying_container_t<LONG>(PixelTypes);
 
         LONG nCount = static_cast<LONG>(vPixelTypes.size());
         if (nCount > 0)
         {
             // create an array of 1
-            DTWAIN_ARRAY vCurPixType = CreateArrayFromFactory(DTWAIN_ARRAYLONG, 1);
-            DTWAINArrayLL_RAII raii(vCurPixType);
+            DTWAIN_ARRAY vCurPixType = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 1);
+            DTWAINArrayLowLevel_RAII raii(pHandle, vCurPixType);
 
             // get pointer to internals of the array
             auto& vCurPixTypePtr = pHandle->m_ArrayFactory->underlying_container_t<LONG>(vCurPixType);
@@ -211,7 +197,7 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
                     DTWAIN_ARRAY BitDepths = nullptr;
                     if (DTWAIN_GetCapValues(p, DTWAIN_CV_ICAPBITDEPTH, DTWAIN_CAPGET, &BitDepths))
                     {
-                        DTWAINArrayLL_RAII arr(BitDepths);
+                        DTWAINArrayLowLevel_RAII arr(pHandle, BitDepths);
 
                         // Get the total number of bit depths.
                         auto& vBitDepths = pHandle->m_ArrayFactory->underlying_container_t<LONG>(BitDepths);

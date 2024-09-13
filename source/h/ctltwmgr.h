@@ -99,7 +99,8 @@ namespace dynarithmic
 
             // Twain session management functions.  Each App utilizing
             // this DLL will get its own session.
-            static CTL_ITwainSession* CreateTwainSession(LPCTSTR pAppName = nullptr,
+            static CTL_ITwainSession* CreateTwainSession(CTL_TwainDLLHandle* pHandle,
+                                             LPCTSTR pAppName = nullptr,
                                              HWND* hAppWnd = nullptr,
                                              TW_UINT16 nMajorNum    = 1,
                                              TW_UINT16 nMinorNum    = 0,
@@ -142,6 +143,8 @@ namespace dynarithmic
             static CTL_ITwainSource*  SelectSource( CTL_ITwainSession* pSession, LPCTSTR strSource);
 
             static CTL_ITwainSource*  GetDefaultSource(CTL_ITwainSession* pSession);
+            static bool SetDefaultSource(CTL_ITwainSource* pSource);
+
 
             // Select a source from a source object (NULL opens default
             // source)
@@ -255,7 +258,7 @@ namespace dynarithmic
                                            CTL_EnumTwainVersion TVersion,
                                            CTL_TwainCapArray & rArray);
             static std::string  GetCapNameFromCap( LONG Cap );
-            static UINT         GetDataTypeFromCap( CTL_EnumCapability Cap, CTL_ITwainSource *pSource=nullptr);
+            static int          GetDataTypeFromCap( CTL_EnumCapability Cap, CTL_ITwainSource *pSource=nullptr);
             static UINT         GetContainerTypesFromCap( CTL_EnumCapability Cap, bool nType );
             static bool         GetBestContainerType(CTL_TwainDLLHandle *pHandle,
                                                      const CTL_ITwainSource* pSource,

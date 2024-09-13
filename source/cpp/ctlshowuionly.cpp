@@ -33,18 +33,12 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, Source);
-    if (!pSource)
-        LOG_FUNC_EXIT_PARAMS(false)
-
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    auto pTheSource = pSource;
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return DTWAIN_IsSourceAcquiring(Source); },
     DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return pSource->IsUIOpen(); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return pTheSource->IsUIOpen(); },
     DTWAIN_ERR_UI_ALREADY_OPENED, false, FUNC_MACRO);
 
     // Open the source (if source is closed)
@@ -55,7 +49,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
     {
         bCloseSource = true;
         if (!DTWAIN_OpenSource(Source))
-            LOG_FUNC_EXIT_PARAMS(false)
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
     }
     else
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !bIsSourceOpen; }, DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
@@ -68,7 +62,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
     if (DTWAIN_GetTwainMode() == DTWAIN_MODELESS) // No thread
     {
         const DTWAIN_BOOL bRet2 = CTL_TwainAppMgr::ShowUserInterface(pSource, false, true);
-        LOG_FUNC_EXIT_PARAMS(bRet2)
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet2)
     }
 
     else
@@ -81,8 +75,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
     // Close the source if opened artificially
     if (bCloseSource)
         DTWAIN_CloseSource(Source);
-    LOG_FUNC_EXIT_PARAMS(true)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 void dynarithmic::LLSetupUIOnly(CTL_ITwainSource* pSource)
@@ -94,15 +88,11 @@ void dynarithmic::LLSetupUIOnly(CTL_ITwainSource* pSource)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ForceScanOnNoUI(DTWAIN_SOURCE Source, BOOL bSet)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, bSet))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    CTL_ITwainSource *pSource = VerifySourceHandle(pHandle, Source);
-    if (!pSource)
-        LOG_FUNC_EXIT_PARAMS(false)
+    auto [pHandle, pSource] = VerifyHandles(Source);
 
-        // return the file name that would be acquired
+    // return the file name that would be acquired
     pSource->SetForceScanOnNoUI(bSet ? true : false);
-    LOG_FUNC_EXIT_PARAMS(true)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 

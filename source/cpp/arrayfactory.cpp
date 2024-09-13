@@ -28,12 +28,12 @@
 namespace dynarithmic
 {
     template <typename ArraySourceT, typename ConversionFunc>
-    static void ArrayToNativeArray(DTWAIN_ARRAY ArraySource,
+    static void ArrayToNativeArray(CTL_TwainDLLHandle* pHandle, 
+                                   DTWAIN_ARRAY ArraySource,
                                    DTWAIN_ARRAY ArrayDest,
                                    int ArraySourceType,
                                    ConversionFunc fn)
     {
-        CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
         const auto& factory = pHandle->m_ArrayFactory;
         const auto TypeSource = factory->tag_type(CTL_ArrayFactory::from_void(ArraySource));
         const auto TypeDest = factory->tag_type(CTL_ArrayFactory::from_void(ArrayDest));
@@ -52,16 +52,16 @@ namespace dynarithmic
         }
     }
 
-    void ArrayCopyWideToNative(DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest)
+    void ArrayCopyWideToNative(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest)
     {
-        ArrayToNativeArray<CTL_ArrayFactory::tagged_array_wstring>(ArraySource, ArrayDest, CTL_ArrayFactory::arrayTag::WStringType,
-                                                                        [](const std::wstring& val) { return StringConversion::Convert_Wide_To_Native(val); });
+        ArrayToNativeArray<CTL_ArrayFactory::tagged_array_wstring>(pHandle, ArraySource, ArrayDest, CTL_ArrayFactory::arrayTag::WStringType,
+            [](const std::wstring& val) { return StringConversion::Convert_Wide_To_Native(val); });
     }
 
-    void ArrayCopyAnsiToNative(DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest)
+    void ArrayCopyAnsiToNative(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest)
     {
-        ArrayToNativeArray<CTL_ArrayFactory::tagged_array_string>(ArraySource, ArrayDest, CTL_ArrayFactory::arrayTag::StringType,
-                                                                       [](const std::string& val) { return StringConversion::Convert_Ansi_To_Native(val); });
+        ArrayToNativeArray<CTL_ArrayFactory::tagged_array_string>(pHandle, ArraySource, ArrayDest, CTL_ArrayFactory::arrayTag::StringType,
+            [](const std::string& val) { return StringConversion::Convert_Ansi_To_Native(val); });
     }
 
     CTL_ArrayFactory::CTL_ArrayFactory()
@@ -200,7 +200,7 @@ namespace dynarithmic
     }
 
     // return a new tag that corresponds to the array type
-    CTL_ArrayFactory::arrayTag* CTL_ArrayFactory::create_array(CTL_ArrayType ArrayType, int *pStatus, size_t nInitialSize)
+    CTL_ArrayFactory::arrayTag* CTL_ArrayFactory::create_array(CTL_ArrayType ArrayType, int* pStatus, size_t nInitialSize)
     {
         arrayTag* pNewArray = nullptr;
         if (pStatus)
@@ -395,7 +395,7 @@ namespace dynarithmic
         return frame;
     }
 
-    void CTL_ArrayFactory::destroy_frame(arrayTag *frame)
+    void CTL_ArrayFactory::destroy_frame(arrayTag* frame)
     {
         destroy(frame);
     }
@@ -442,11 +442,5 @@ namespace dynarithmic
         if (iter != mapTagToArrayType.end())
             return iter->second;
         return CTL_ArrayInvalid;
-    }
-
-    void DTWAINArrayLowLevel_DestroyTraits::Destroy(DTWAIN_ARRAY a)
-    {
-        const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-        pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(a));
     }
 }

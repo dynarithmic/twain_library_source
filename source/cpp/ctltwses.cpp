@@ -29,7 +29,8 @@
 using namespace dynarithmic;
 
 //////////////////// CTL_ITwainSession functions /////////////////////////////
-CTL_ITwainSession*  CTL_ITwainSession::Create(LPCTSTR pAppName,
+CTL_ITwainSession*  CTL_ITwainSession::Create(CTL_TwainDLLHandle *pHandle,
+                                            LPCTSTR pAppName,
                                             HWND* hAppWnd,
                                             TW_UINT16 nMajorNum,
                                             TW_UINT16 nMinorNum,
@@ -41,7 +42,7 @@ CTL_ITwainSession*  CTL_ITwainSession::Create(LPCTSTR pAppName,
                                             LPCTSTR lpszProduct
                                             )
 {
-    return new CTL_ITwainSession( pAppName, hAppWnd,
+    return new CTL_ITwainSession( pHandle, pAppName, hAppWnd,
                                   nMajorNum,
                                   nMinorNum, nLanguage, nCountry,
                                   lpszVersion, lpszMfg,
@@ -49,7 +50,8 @@ CTL_ITwainSession*  CTL_ITwainSession::Create(LPCTSTR pAppName,
 }
 
 
-CTL_ITwainSession::CTL_ITwainSession(LPCTSTR pAppName,
+CTL_ITwainSession::CTL_ITwainSession(CTL_TwainDLLHandle *pHandle,
+                                    LPCTSTR pAppName,
                                    HWND* hAppWnd,
                                    TW_UINT16 nMajorNum,
                                    TW_UINT16 nMinorNum,
@@ -66,7 +68,7 @@ CTL_ITwainSession::CTL_ITwainSession(LPCTSTR pAppName,
     if ( hAppWnd )
         m_AppWnd = *hAppWnd;
     m_bTwainWindowCreated = false;
-    SetTwainDLLHandle(static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal()));
+    SetTwainDLLHandle(pHandle);
 
     if ( !hAppWnd )
     {

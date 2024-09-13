@@ -47,7 +47,7 @@ bool CreateDirectoryTree(LPCTSTR lpszPath, DWORD* /*lasterror*/)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG CreationFlags)
 {
     LOG_FUNC_ENTRY_PARAMS((szFilePath, CreationFlags))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     if (CreationFlags == 0)
     {
         const filesys::path p(szFilePath);
@@ -60,13 +60,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG 
                if (!retVal.empty() && *retVal.rbegin() != filesys::path::preferred_separator)
                    retVal += filesys::path::preferred_separator;
                pHandle->m_sTempFilePath = CTL_StringType(retVal.begin(), retVal.end());
-               LOG_FUNC_EXIT_PARAMS(true)
+               LOG_FUNC_EXIT_NONAME_PARAMS(true)
             }
             else
                DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{ return false;}, DTWAIN_ERR_FILEOPEN, false, FUNC_MACRO);
         }
     }
-    LOG_FUNC_EXIT_PARAMS(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(false)
     CATCH_BLOCK(false)
 }
 
@@ -74,14 +74,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectory(LPCTSTR szFilePath)
 {
     LOG_FUNC_ENTRY_PARAMS((szFilePath))
     const DTWAIN_BOOL bRetval = DTWAIN_SetTempFileDirectoryEx(szFilePath, 0);
-    LOG_FUNC_EXIT_PARAMS(bRetval)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
     CATCH_BLOCK(false)
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetTempFileDirectory(LPTSTR szFilePath, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((szFilePath, nMaxLen))
-    const LONG nRealLen = StringWrapper::CopyInfoToCString(GetDTWAINTempFilePath(), szFilePath, nMaxLen);
-    LOG_FUNC_EXIT_PARAMS(nRealLen)
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    const LONG nRealLen = StringWrapper::CopyInfoToCString(GetDTWAINTempFilePath(pHandle), szFilePath, nMaxLen);
+    LOG_FUNC_EXIT_NONAME_PARAMS(nRealLen)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }

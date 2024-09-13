@@ -21,6 +21,7 @@
 #include <unordered_map>
 #include <array>
 #include "ctldib.h"
+#include "arrayfactory.h"
 #include "ctliface.h"
 #include "ctltwmgr.h"
 #include "ctlfileutils.h"
@@ -193,7 +194,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
     // Now add this to PDF page
     CPDFImageHandler PDFHandler(szFile, m_ImageInfoEx);
     CTL_StringType szTempFile;
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = m_ImageInfoEx.theSource->GetDTWAINHandle();
 
     if (!pMultiPageStruct || pMultiPageStruct->Stage == DIB_MULTI_FIRST)
     {
@@ -212,7 +213,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
         {
             // Create a temporary JPEG file
             //...
-            szTempFile = GetDTWAINTempFilePath();
+            szTempFile = GetDTWAINTempFilePath(m_ImageInfoEx.theSource->GetDTWAINHandle());
             if ( szTempFile.empty() )
             {
                 return DTWAIN_ERR_FILEWRITE;
@@ -225,19 +226,19 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
                 {
                     szTempFile += StringWrapper::GetGUID() + _T(".JPG");
                     auto szTempFileA = StringConversion::Convert_Native_To_Ansi(szTempFile);
-                    CTL_TwainAppMgr::WriteLogInfoA("Temporary Image File is " + szTempFileA + "\n");
+                    CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + szTempFileA + "\n");
 
                     // Create a JPEG
                     m_JpegHandler.SetDib(m_pDib);
                     bRet = m_JpegHandler.WriteBitmap(szTempFile.c_str(), bOpenFile, fhFile);
                     if ( bRet != 0 )
                     {
-                        CTL_TwainAppMgr::WriteLogInfoA("Error creating temporary Image File " + szTempFileA + "\n");
+                        CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_TEMPFILECREATEERRORTEXT) + " " + szTempFileA + "\n");
                         delete_file(szTempFile.c_str());
                         return bRet;
                     }
                     else
-                        CTL_TwainAppMgr::WriteLogInfoA("Image file created successfully " + szTempFileA + "\n");
+                        CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_IMAGEFILESUCCESSTEXT) + " " + szTempFileA + "\n");
                     PDFHandler.SetImageType(0);
                 }
                 else
@@ -247,7 +248,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
                     szTempFile += StringWrapper::GetGUID() + _T(".TIF");
                     auto szTempFileA = StringConversion::Convert_Native_To_Ansi(szTempFile);
 
-                    CTL_TwainAppMgr::WriteLogInfoA("Temporary Image File is " + szTempFileA + "\n");
+                    CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + szTempFileA + "\n");
 
                     // Create a TIFF file
                     m_TiffHandler.SetDib(m_pDib);
@@ -256,14 +257,14 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
 
                     if ( bRet != 0 )
                     {
-                        CTL_TwainAppMgr::WriteLogInfoA("Error creating temporary Image File " + szTempFileA + "\n");
+                        CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_TEMPFILECREATEERRORTEXT) + " " + szTempFileA + "\n");
                         return bRet;
                     }
                     else
                     {
                         dps.Stage = DIB_MULTI_LAST;
                         bRet = m_TiffHandler.WriteBitmap(szTempFile.c_str(), bOpenFile, 0, &dps);
-                        CTL_TwainAppMgr::WriteLogInfoA("Image file created successfully " + szTempFileA + "\n");
+                        CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_IMAGEFILESUCCESSTEXT) + " "+ szTempFileA + "\n");
                     }
                     PDFHandler.SetImageType(1);
                 }
@@ -385,9 +386,8 @@ int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, std::string& sT
     CTL_StringType sFileToUse = filename;
 
     // Get the temp file path
-    auto szTempPath = GetDTWAINTempFilePath();
-
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
+    const auto pHandle = m_ImageInfoEx.theSource->GetDTWAINHandle();
+    auto szTempPath = GetDTWAINTempFilePath(pHandle);
 
     OCREngine *pEngine = pHandle->m_pOCRDefaultEngine.get();
     if (!pEngine)
@@ -492,10 +492,10 @@ int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, std::string& sT
         sFileToUse = std::move(szTempPath);
     }
     // Just OCR the text here
-    DTWAIN_ARRAY aValues = CreateArrayFromFactory(DTWAIN_ARRAYLONG, 1);
+    DTWAIN_ARRAY aValues = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 1);
     if ( aValues )
     {
-        DTWAINArrayLL_RAII a(aValues);
+        DTWAINArrayLowLevel_RAII a(pHandle, aValues);
         DTWAIN_ArraySetAtLong(aValues, 0, fileType );
         const LONG bRet1 = DTWAIN_SetOCRCapValues(static_cast<DTWAIN_OCRENGINE>(pEngine), DTWAIN_OCRCV_IMAGEFILEFORMAT, DTWAIN_CAPSET, aValues);
         if ( bRet1 )

@@ -1042,3 +1042,6 @@ DTWAIN_IsTwainAvailableExA                        @31037
 DTWAIN_IsTwainAvailableExW                        @31038
 DTWAIN_TestGetCap                                 @31039
 DTWAIN_EnumCamerasEx                              @31040
+DTWAIN_LoadCustomStringResourcesExW               @31041
+DTWAIN_LoadCustomStringResourcesExA               @31042
+DTWAIN_LoadCustomStringResourcesEx                @31043

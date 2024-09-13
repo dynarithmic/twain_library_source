@@ -575,7 +575,7 @@ LONG ImageXferFileWriter::CopyDuplexDibToFile(CTL_TwainDibPtr pCurDib, bool bIsJ
         }
 
         // We need to create a temporary file here
-        auto szTempPath = GetDTWAINTempFilePath();
+        auto szTempPath = GetDTWAINTempFilePath(m_pSource->GetDTWAINHandle());
         if ( szTempPath.empty())
         {
             RecordBadDuplexPage();
@@ -604,7 +604,7 @@ LONG ImageXferFileWriter::CopyDuplexDibToFile(CTL_TwainDibPtr pCurDib, bool bIsJ
             if (fh.bad())
             {
                 CTL_StringStreamType strm;
-                strm << "Error writing data to file " << szTempPath;
+                strm << GetResourceStringFromMap_Native(DTWAIN_ERR_WRITEDATA_TOFILE_) << szTempPath;
                 CTL_TwainAppMgr::WriteLogInfo(strm.str());
                 return DTWAIN_ERR_FILEWRITE;
             }

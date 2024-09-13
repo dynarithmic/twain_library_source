@@ -33,34 +33,31 @@ static bool GetMetrics(DTWAIN_SOURCE Source, LPLONG ImageCount, LPLONG SheetCoun
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireMetrics(DTWAIN_SOURCE Source, LPLONG ImageCount, LPLONG SheetCount)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, ImageCount, SheetCount))
+    auto [pHandle, pSource] = VerifyHandles(Source);
     const DTWAIN_BOOL bRet = GetMetrics(Source, ImageCount, SheetCount)?TRUE:FALSE;
-    LOG_FUNC_EXIT_PARAMS(bRet)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 static bool GetMetrics(DTWAIN_SOURCE Source, LPLONG ImageCount, LPLONG SheetCount)
 {
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
-    if (p)
+    auto p = static_cast<CTL_ITwainSource*>(Source);
+    CTL_DSMMetricsTriplet triplet(p->GetTwainSession(), p);
+    const TW_UINT16 rc = triplet.Execute();
+    switch (rc)
     {
-        CTL_DSMMetricsTriplet triplet(p->GetTwainSession(), p);
-        const TW_UINT16 rc = triplet.Execute();
-        switch (rc)
+        case TWRC_SUCCESS:
         {
-            case TWRC_SUCCESS:
-            {
-                const TW_METRICS& metrics = triplet.getMetrics();
-                if (ImageCount)
-                    *ImageCount = static_cast<LONG>(metrics.ImageCount);
-                if (SheetCount)
-                    *SheetCount = static_cast<LONG>(metrics.SheetCount);
-                return true;
-            }
-            default:
-            {}
+            const TW_METRICS& metrics = triplet.getMetrics();
+            if (ImageCount)
+                *ImageCount = static_cast<LONG>(metrics.ImageCount);
+            if (SheetCount)
+                *SheetCount = static_cast<LONG>(metrics.SheetCount);
+            return true;
         }
-        CTL_TwainAppMgr::ProcessReturnCodeOneValue(p, rc);
+        default:
+        {}
     }
+    CTL_TwainAppMgr::ProcessReturnCodeOneValue(p, rc);
     return false;
 }

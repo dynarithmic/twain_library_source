@@ -30,59 +30,35 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetMaxRetryAttempts(DTWAIN_SOURCE Source, LONG nAttempts)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nAttempts))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
-    if (!p)
-        LOG_FUNC_EXIT_PARAMS(false)
-        p->SetMaxRetryAttempts(nAttempts);
-    LOG_FUNC_EXIT_PARAMS(true)
-        CATCH_BLOCK(false)
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    pSource->SetMaxRetryAttempts(nAttempts);
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetMaxRetryAttempts(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, -2L, FUNC_MACRO);
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
-    if (!p)
-        LOG_FUNC_EXIT_PARAMS(-2L)
-    const LONG retval = p->GetMaxRetryAttempts();
-    LOG_FUNC_EXIT_PARAMS(retval)
-        CATCH_BLOCK(DTWAIN_FAILURE2)
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    const LONG retval = pSource->GetMaxRetryAttempts();
+    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+    CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE2)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCurrentRetryCount(DTWAIN_SOURCE Source, LONG nCount)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nCount))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
-    if (!p)
-        LOG_FUNC_EXIT_PARAMS(false)
-        p->SetCurrentRetryCount(nCount);
-    LOG_FUNC_EXIT_PARAMS(true)
-        CATCH_BLOCK(false)
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    pSource->SetCurrentRetryCount(nCount);
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetCurrentRetryCount(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-
-    // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, -1L, FUNC_MACRO);
-    CTL_ITwainSource *p = VerifySourceHandle(pHandle, Source);
-    if (!p)
-        LOG_FUNC_EXIT_PARAMS(-1L)
-    const LONG retval = p->GetCurrentRetryCount();
-    LOG_FUNC_EXIT_PARAMS(retval)
-        CATCH_BLOCK(DTWAIN_FAILURE1)
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    const LONG retval = pSource->GetCurrentRetryCount();
+    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+    CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
 }

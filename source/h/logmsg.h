@@ -32,6 +32,7 @@
 /////////////////////////////////////////////////////////////////////////////
 namespace dynarithmic
 {
+    class CTL_TwainDLLHandle;
     struct FileLoggingTraits
     {
         CTL_StringType m_filename;
@@ -80,7 +81,9 @@ namespace dynarithmic
 
     class Callback_Logger final : public CBaseLogger
     {
+        CTL_TwainDLLHandle* m_pHandle = {};
         public:
+            Callback_Logger(CTL_TwainDLLHandle* pHandle) : m_pHandle(pHandle) {}
             void trace(const std::string& msg) override;
     };
 
@@ -132,8 +135,10 @@ namespace dynarithmic
        std::string GetAppName() const {return m_csAppName;}
        void OutputDebugStringFull(const std::string& s);
        std::string GetDebugStringFull(const std::string& s);
+       void SetDLLHandle(CTL_TwainDLLHandle* pHandle);
 
     protected:
+       CTL_TwainDLLHandle* m_pDLLHandle;
        std::string m_csAppName;
        std::string m_csFileName;
 
