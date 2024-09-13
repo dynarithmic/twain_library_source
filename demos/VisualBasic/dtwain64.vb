@@ -880,6 +880,10 @@ Class DTWAINAPI
     Public Const DTWAIN_ERR_OCR_RECOGNITIONERROR As Integer = (-2107)
     Public Const DTWAIN_ERR_OCR_LAST As Integer = (-2108)
     Public Const DTWAIN_ERR_LAST As Integer = DTWAIN_ERR_OCR_LAST
+    Public Const DTWAIN_ERR_SOURCE_COULD_NOT_OPEN  As Integer  = (-2500)
+    Public Const DTWAIN_ERR_SOURCE_COULD_NOT_CLOSE As Integer  = (-2501)
+    Public Const DTWAIN_ERR_IMAGEINFO_INVALID      As Integer  = (-2502)
+    Public Const DTWAIN_ERR_WRITEDATA_TOFILE       As Integer  = (-2503)
     Public Const DTWAIN_DE_CHKAUTOCAPTURE As Integer = 1
     Public Const DTWAIN_DE_CHKBATTERY As Integer = 2
     Public Const DTWAIN_DE_CHKDEVICEONLINE As Integer = 4
