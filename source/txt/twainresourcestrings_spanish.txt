@@ -211,6 +211,9 @@
 3016 Error
 3017 El directorio de archivos temporales no existe
 3018 fue llamado
+3019 El archivo de imagen temporal es
+3020 Error al crear un archivo de imagen temporal
+3021 Archivo de imagen creado exitosamente
 5000 Courier
 5001 Courier-Bold
 5002 Courier-BoldOblique

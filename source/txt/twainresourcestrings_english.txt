@@ -212,6 +212,9 @@
 3016 Error
 3017 Temporary file directory does not exist
 3018 called
+3019 Temporary Image File is
+3020 Error creating temporary Image File
+3021 Image file created successfully
 5000 Courier
 5001 Courier-Bold
 5002 Courier-BoldOblique
