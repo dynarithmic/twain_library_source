@@ -570,7 +570,7 @@ namespace dynarithmic
     {
         LOG_FUNC_ENTRY_PARAMS((lpszName))
         bool bReturn = LoadLanguageResourceFromFileA(lpszName, GetResourceFileNameA(lpszName, DTWAINLANGRESOURCEFILE), bClear);
-        LoadLanguageResourceFromFileA(lpszName, GetResourceFileNameA(lpszName, DTWAINCUSTOMRESOURCESFILE), false);
+        LoadLanguageResourceFromFileA(lpszName, GetResourceFileNameA(lpszName, DTWAINCUSTOMRESOURCESFILE), bClear);
         LOG_FUNC_EXIT_NONAME_PARAMS(bReturn)
         CATCH_BLOCK(false)
     }
