@@ -5651,6 +5651,18 @@ namespace Dynarithmic
         ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_GetVersionCopyright([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szBuf, int nSize);
 
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi,
+                ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_GetVersionCopyrightA(System.IntPtr szBuf, int nSize);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_GetVersionCopyrightW(System.IntPtr szBuf, int nSize);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_GetVersionCopyright(System.IntPtr szBuf, int nSize);
+
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
         ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_IsSourceValid(DTWAIN_SOURCE source);

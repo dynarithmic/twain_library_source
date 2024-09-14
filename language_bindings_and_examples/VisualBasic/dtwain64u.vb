@@ -2628,13 +2628,25 @@ Class DTWAINAPI
     Declare Unicode Function DTWAIN_GetSourceDetailsW Lib "dtwain64u.dll" (<MarshalAs(UnmanagedType.LPWStr)> szSources As String, <MarshalAs(UnmanagedType.LPWStr)> szOut As StringBuilder, ByVal nSize As Integer, ByVal indentFactor As Integer, ByVal bRefresh As Integer) As Integer
     Declare Auto Function DTWAIN_GetSourceDetails Lib "dtwain64u.dll" (<MarshalAs(UnmanagedType.LPTStr)> szSources As String, <MarshalAs(UnmanagedType.LPTStr)> szOut As StringBuilder, ByVal nSize As Integer, ByVal indentFactor As Integer, ByVal bRefresh As Integer) As Integer
 
+    Declare Ansi Function DTWAIN_GetSourceDetailsA Lib "dtwain64u.dll" (<MarshalAs(UnmanagedType.LPStr)> szSources As String, ByVal szOut As System.IntPtr, ByVal nSize As Integer, ByVal indentFactor As Integer, ByVal bRefresh As Integer) As Integer
+    Declare Unicode Function DTWAIN_GetSourceDetailsW Lib "dtwain64u.dll" (<MarshalAs(UnmanagedType.LPWStr)> szSources As String, ByVal szOut As System.IntPtr, ByVal nSize As Integer, ByVal indentFactor As Integer, ByVal bRefresh As Integer) As Integer
+    Declare Auto Function DTWAIN_GetSourceDetails Lib "dtwain64u.dll" (<MarshalAs(UnmanagedType.LPTStr)> szSources As String, ByVal szOut As System.IntPtr, ByVal nSize As Integer, ByVal indentFactor As Integer, ByVal bRefresh As Integer) As Integer
+
     Declare Ansi Function DTWAIN_GetSessionDetailsA Lib "dtwain64u.dll" (<MarshalAs(UnmanagedType.LPStr)> szOut As StringBuilder, ByVal nSize As Integer, ByVal indentSize As Integer, ByVal bRefresh As Integer) As Integer
     Declare Unicode Function DTWAIN_GetSessionDetailsW Lib "dtwain64u.dll" (<MarshalAs(UnmanagedType.LPWStr)> szOut As StringBuilder, ByVal nSize As Integer, ByVal indentSize As Integer, ByVal bRefresh As Integer) As Integer
     Declare Auto Function DTWAIN_GetSessionDetails Lib "dtwain64u.dll" (<MarshalAs(UnmanagedType.LPTStr)> szOut As StringBuilder, ByVal nSize As Integer, ByVal indentSize As Integer, ByVal bRefresh As Integer) As Integer
 
+    Declare Ansi Function DTWAIN_GetSessionDetailsA Lib "dtwain64u.dll" (ByVal szOut As System.IntPtr, ByVal nSize As Integer, ByVal indentSize As Integer, ByVal bRefresh As Integer) As Integer
+    Declare Unicode Function DTWAIN_GetSessionDetailsW Lib "dtwain64u.dll" (ByVal szOut As System.IntPtr, ByVal nSize As Integer, ByVal indentSize As Integer, ByVal bRefresh As Integer) As Integer
+    Declare Auto Function DTWAIN_GetSessionDetails Lib "dtwain64u.dll" (ByVal szOut As System.IntPtr, ByVal nSize As Integer, ByVal indentSize As Integer, ByVal bRefresh As Integer) As Integer
+
     Declare Ansi Function DTWAIN_GetVersionCopyrightA Lib "dtwain64u.dll" (<MarshalAs(UnmanagedType.LPStr)> szSources As StringBuilder, ByVal nSize As Integer) As Integer
     Declare Unicode Function DTWAIN_GetVersionCopyrightW Lib "dtwain64u.dll" (<MarshalAs(UnmanagedType.LPWStr)> szSources As StringBuilder, ByVal nSize As Integer) As Integer
     Declare Auto Function DTWAIN_GetVersionCopyright Lib "dtwain64u.dll" (<MarshalAs(UnmanagedType.LPTStr)> szSources As StringBuilder, ByVal nSize As Integer) As Integer
+
+    Declare Ansi Function DTWAIN_GetVersionCopyrightA Lib "dtwain64u.dll" (ByVal szOut As System.IntPtr, ByVal nSize As Integer) As Integer
+    Declare Unicode Function DTWAIN_GetVersionCopyrightW Lib "dtwain64u.dll" (ByVal szOut As System.IntPtr, ByVal nSize As Integer) As Integer
+    Declare Auto Function DTWAIN_GetVersionCopyright Lib "dtwain64u.dll" (ByVal szOut As System.IntPtr, ByVal nSize As Integer) As Integer
 
     Declare Auto Function DTWAIN_IsSourceValid Lib "dtwain64u.dll" (ByVal source As System.IntPtr) As Integer
     Declare Auto Function DTWAIN_EnableTripletsNotify Lib "dtwain64u.dll" (ByVal bEnable As Integer) As Integer
