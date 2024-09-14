@@ -73,12 +73,35 @@ static void create_stream(std::stringstream& strm, DTWAIN_SOURCE Source, LONG ca
         strm << "\"<not available>\"";
 }
 
+struct DefaultStringFnGetter
+{
+    static DTWAIN_ARRAY GetAllStringValues(DTWAIN_SOURCE Source, LONG capValue)
+    {
+        DTWAIN_ARRAY arr = nullptr;
+        DTWAIN_GetCapValues(Source, capValue, DTWAIN_CAPGET, &arr);
+        return arr;
+    }
+};
+
+struct CameraSystemStringFnGetter
+{
+    static DTWAIN_ARRAY GetAllStringValues(DTWAIN_SOURCE Source, LONG)
+    {
+        DTWAIN_ARRAY arr = nullptr;
+        if (DTWAIN_IsFileSystemSupported(Source))
+        {
+            DTWAIN_EnumCameras(Source, &arr);
+        }
+        return arr;
+    }
+};
+
+template <typename Fn>
 static void create_stream_from_strings(std::stringstream& strm, DTWAIN_SOURCE Source, LONG capValue)
 {
     const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     std::vector<std::string> imageVals;
-    DTWAIN_ARRAY arr = nullptr;
-    DTWAIN_GetCapValues(Source, capValue, DTWAIN_CAPGET, &arr); 
+    DTWAIN_ARRAY arr = Fn::GetAllStringValues(Source, capValue);
     DTWAINArrayPtr_RAII raii(pHandle, &arr);
     if (arr)
     {
@@ -475,7 +498,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
     std::vector<std::string> sNames = allSources;
     glob_json["device-names"] = sNames;
     std::string jsonString;
-    std::array<std::string,12> imageInfoString;
+    std::array<std::string,13> imageInfoString;
     std::array<std::string,10> deviceInfoString;
 
     struct CloserRAII
@@ -668,11 +691,12 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
 
                         resUnitInfo = strm.str() + resolutionTotalStr + "},";
                     }
-                    std::array<int, 10> imageInfoCaps = { ICAP_BRIGHTNESS, ICAP_CONTRAST, ICAP_GAMMA, ICAP_HIGHLIGHT, ICAP_SHADOW,
-                                                          ICAP_THRESHOLD, ICAP_ROTATION, ICAP_ORIENTATION, ICAP_OVERSCAN, ICAP_HALFTONES };
-                    std::array<std::string, 10> imageInfoCapsStr = { "\"brightness-values\":", "\"contrast-values\":", "\"gamma-values\":",
+                    static constexpr int SPECIAL_FILESYSTEM = -999;
+                    std::array<int, 11> imageInfoCaps = { ICAP_BRIGHTNESS, ICAP_CONTRAST, ICAP_GAMMA, ICAP_HIGHLIGHT, ICAP_SHADOW,
+                                                          ICAP_THRESHOLD, ICAP_ROTATION, ICAP_ORIENTATION, ICAP_OVERSCAN, ICAP_HALFTONES, SPECIAL_FILESYSTEM };
+                    std::array<std::string, 11> imageInfoCapsStr = { "\"brightness-values\":", "\"contrast-values\":", "\"gamma-values\":",
                         "\"highlight-values\":", "\"shadow-values\":", "\"threshold-values\":",
-                        "\"rotation-values\":", "\"orientation-values\":", "\"overscan-values\":", "\"halftone-values\":" };
+                        "\"rotation-values\":", "\"orientation-values\":", "\"overscan-values\":", "\"halftone-values\":", "\"filesystem-camera-values\":" };
                     for (size_t curImageCap = 0; curImageCap < imageInfoCaps.size(); ++curImageCap)
                     {
                         strm.str("");
@@ -684,7 +708,12 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                             create_stream<LONG>(strm, pCurrentSourcePtr, ICAP_OVERSCAN);
                         else
                         if (imageInfoCaps[curImageCap] == ICAP_HALFTONES)
-                            create_stream_from_strings(strm, pCurrentSourcePtr, ICAP_HALFTONES);
+                            create_stream_from_strings<DefaultStringFnGetter>(strm, pCurrentSourcePtr, ICAP_HALFTONES);
+                        else
+                        if ( imageInfoCaps[curImageCap] == SPECIAL_FILESYSTEM)
+                        {
+                            create_stream_from_strings<CameraSystemStringFnGetter>(strm, pCurrentSourcePtr, 0);
+                        }
                         else
                             create_stream<double>(strm, pCurrentSourcePtr, imageInfoCaps[curImageCap]);
                         imageInfoString[curImageCap] = strm.str();
@@ -703,7 +732,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     tempStrm << "\"capability-count\":[{\"all\":" << capInfo.mapCounts[0] << ","
                         "\"custom\":" << capInfo.mapCounts[2] << ","
                         "\"extended\":" << capInfo.mapCounts[1] << "}],\"capability-values\":" << capabilityString;
-                    imageInfoString[10] = tempStrm.str();
+                    imageInfoString[11] = tempStrm.str();
 
                     // Get the filetype info
                     tempStrm.str("");
@@ -738,7 +767,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     if (!customTypes.empty())
                         allFileTypes += "," + customTypes;
                     tempStrm << "\"filetype-info\":[" << allFileTypes << "]";
-                    imageInfoString[11] = tempStrm.str();
+                    imageInfoString[12] = tempStrm.str();
 
                     strm.str("");
                     std::array<int, 10> deviceInfoCaps = { CAP_FEEDERENABLED, CAP_FEEDERLOADED, CAP_UICONTROLLABLE,
@@ -821,6 +850,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     imageInfoString[9] = "\"halftone-values\":\"<not available>\"";
                     imageInfoString[10] = "\"capability-info\":\"<not available>\"";
                     imageInfoString[11] = "\"filetype-info\":\"<not available>\"";
+                    imageInfoString[12] = "\"filesystem-info\":\"<not available>\"";
 
                     std::string sStatus = "false";
                     if ( bNullSource )
