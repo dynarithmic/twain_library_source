@@ -31,7 +31,9 @@
 #include <dtwaindefs.h>
 #include <dtwain_version.h>
 #include <dtwpdft.h>
-#define DTWAIN_NOIMPORTLIB
+#ifndef DTWAIN_NOIMPORTLIB
+    #define DTWAIN_NOIMPORTLIB
+#endif
 #include <dtwain_library_selector.h>
 #ifdef __cplusplus
 extern "C" {
