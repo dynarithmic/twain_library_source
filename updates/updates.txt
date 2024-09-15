@@ -15,7 +15,7 @@ DTWAIN Version changes
 - Remove some resource constants from the language resource files.  These constants have now been moved to 
   twaininfo.txt
 
-- Add various language files (Romanian, Russian)- 
+- Add various language files (Romanian, Russian) 
 
 
 5.5.1
