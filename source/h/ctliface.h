@@ -26,27 +26,9 @@
 #pragma warning (disable : 4786)
 #pragma warning (disable : 4127)
 #endif
-/*#include <algorithm>
-#include <array>
-#include <bitset>
-#include <cstring>
-#include <deque>
-#include <list>
-#include <queue>
-#include <set>
-#include <stack>
-#include <tuple>
-#include <type_traits>
-#include <unordered_map>
-#include <unordered_set>
-#include <utility>
-#include <vector>
-#include <cstdlib>
-#include <boost/functional/hash.hpp>
-#include <boost/variant2/variant.hpp>
 
-#include "../tsl/ordered_map.h"*/
 #include <mutex>
+#include <memory>
 #include "ctltrp.h"
 #include "dtwain_raii.h"
 #include "ocrinterface.h"
@@ -55,7 +37,7 @@
 #include "dtwain.h"
 #include "twainframe.h"
 #include <boost/functional/hash.hpp>
-
+#include "../simpleini/simpleini.h"
 #include "notimpl.h"
 #include "sourceacquireopts.h"
 #ifdef _WIN32
@@ -63,8 +45,10 @@
 #else
 #include "linuxlibraryloader_impl.inl"
 #endif
+#ifdef _MSC_VER
 #undef min
 #undef max
+#endif
 template <typename T>
 struct dtwain_library_loader : library_loader_impl
 {
@@ -572,7 +556,12 @@ namespace dynarithmic
         static CTL_StringType           s_ResourceVersion;
         static std::string              s_CurrentResourceKey;
         static CTL_PairToStringMap      s_ResourceCache;
+        static bool                     s_bDoResampling;
+        static std::unique_ptr<CSimpleIniA>    s_iniInterface;
+        static bool                     s_bINIFileLoaded;
 
+        static CSimpleIniA* GetINIInterface() { return s_iniInterface.get(); }
+        static bool PerformResampling() { return s_bDoResampling; }
         static CTL_PairToStringMap& GetResourceCache() { return s_ResourceCache; }
         static CTL_StringToMapLongToStringMap& GetAllLanguagesResourceMap() { return s_AllLoadedResourcesMap; }
         static CTL_LongToStringMap* GetLanguageResource(std::string sLang);
@@ -644,7 +633,6 @@ namespace dynarithmic
 
             DTWAIN_ACQUIRE          GetNewAcquireNum();
             void                    EraseAcquireNum(DTWAIN_ACQUIRE nNum);
-
             CTL_TwainAppMgr* m_pAppMgr;
 
             struct tagSessionStruct

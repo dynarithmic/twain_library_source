@@ -1501,6 +1501,8 @@ bool CTL_ImageXferTriplet::ModifyAcquiredDib()
 // than what the image type expects.
 bool CTL_ImageXferTriplet::ResampleAcquiredDib()
 {
+    if (!CTL_StaticData::s_bDoResampling)
+        return false;
     CTL_ITwainSource* pSource = GetSourcePtr();
     const int nFileType = pSource->GetAcquireFileType();
 
