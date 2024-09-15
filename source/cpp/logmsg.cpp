@@ -221,6 +221,7 @@ bool CLogSystem::InitConsoleLogging(HINSTANCE hInst)
     if (bRet)
     {
         freopen_s(&fDummy, "CONOUT$", "w", stdout);
+        SetConsoleOutputCP(65001); // Use UTF-8 for console logging
 #endif
         InitLogger(CONSOLE_LOGGING, nullptr, hInst);
     }
