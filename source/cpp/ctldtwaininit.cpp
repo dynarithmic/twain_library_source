@@ -35,7 +35,6 @@
 #include "ctltwmgr.h"
 #include "ctlres.h"
 #include "../dtwinver/dtwinverex.h"
-#include "../simpleini/simpleini.h"
 #include "dtwain_verinfo.h"
 #include "dtwain_resource_constants.h"
 #include "errorcheck.h"
@@ -100,6 +99,8 @@ static void LoadTransferReadyOverrides();
 static void LoadFlatbedOnlyOverrides();
 static void LoadOnSourceOpenProperties(CTL_TwainDLLHandle* pHandle);
 static bool LoadGeneralResources(bool blockExecution);
+static void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle);
+
 
 #ifdef _WIN32
 static UINT_PTR APIENTRY FileSaveAsHookProc(HWND hWnd, UINT msg, WPARAM w, LPARAM lparam);
@@ -858,6 +859,17 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
         CTL_TwainDLLHandle* pHandle = pHandlePtr.get();
         if (!bMinimalSetup)
         {
+            // Open dtwain32.ini or dtwain64.ini
+            if ( !CTL_StaticData::s_iniInterface )
+                CTL_StaticData::s_iniInterface = std::make_unique<CSimpleIniA>();
+            auto* ptrIni = CTL_StaticData::GetINIInterface();
+            if (!CTL_StaticData::s_bINIFileLoaded)
+            {
+                auto err = ptrIni->LoadFile(dynarithmic::GetDTWAININIPathA().c_str());
+                CTL_StaticData::s_bINIFileLoaded = (err == SI_OK);
+                CTL_StaticData::s_sINIPath = GetDTWAININIPath();
+            }
+
             bool resourcesLoaded = LoadGeneralResources(block);
             if (!resourcesLoaded)
             {
@@ -892,6 +904,9 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
 
                 // Load check feeder on open status
                 LoadOnSourceOpenProperties(pHandle);
+
+                // Load image file related options
+                LoadImageFileOptions(pHandle);
 
                 // Initialize imaging code
                 FreeImage_Initialise(true);
@@ -935,12 +950,11 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
 void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL, bool bClear)
 {
     // Load the resources
-    CSimpleIniA customProfile;
-    auto err = customProfile.LoadFile(dynarithmic::GetDTWAININIPathA().c_str());
-    if (err != SI_OK)
+    auto* customProfile = CTL_StaticData::GetINIInterface();
+    if ( !customProfile )
         return;
 
-    std::string szStr = customProfile.GetValue("Language", "default",
+    std::string szStr = customProfile->GetValue("Language", "default",
                                                StringConversion::Convert_NativePtr_To_Ansi(szLangDLL).c_str());
     if (!LoadLanguageResourceA(szStr, pHandle->GetResourceRegistry(), bClear))
     {
@@ -973,20 +987,20 @@ void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL, 
         { "DSMErrorLogging", "BufferErrors", DTWAIN_LOG_USEBUFFER } };
     std::for_each(allIntProfiles, std::end(allIntProfiles), [&](const ProfileSettingsInt& ps)
     {
-        const auto nVal = customProfile.GetLongValue(ps.section, ps.name, 0);
+        const auto nVal = customProfile->GetLongValue(ps.section, ps.name, 0);
         if (nVal != 0)
             CTL_StaticData::s_lErrorFilterFlags |= ps.orValue;
     });
 
-    auto nVal = customProfile.GetLongValue("DSMErrorLogging", "EnableNone", 0);
+    auto nVal = customProfile->GetLongValue("DSMErrorLogging", "EnableNone", 0);
     if (nVal == 1)
         CTL_StaticData::s_lErrorFilterFlags = 0;
 
-    nVal = customProfile.GetLongValue("DSMErrorLogging", "EnableAll", 0);
+    nVal = customProfile->GetLongValue("DSMErrorLogging", "EnableAll", 0);
     if (nVal != 0)
         CTL_StaticData::s_lErrorFilterFlags = 0xFFFFFFFFL & ~DTWAIN_LOG_USEFILE;
 
-    szStr = customProfile.GetValue("DSMErrorLogging", "File", "");
+    szStr = customProfile->GetValue("DSMErrorLogging", "File", "");
     if (!szStr.empty())
     {
         CTL_StaticData::s_lErrorFilterFlags |= DTWAIN_LOG_USEFILE;
@@ -994,11 +1008,11 @@ void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL, 
         CTL_StaticData::s_appLog.StatusOutFast("In DTWAIN_SysInitialize()");
     }
 
-    nVal = customProfile.GetLongValue("DSMErrorLogging", "BufferErrorThreshold", 50);
+    nVal = customProfile->GetLongValue("DSMErrorLogging", "BufferErrorThreshold", 50);
     if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_USEBUFFER)
         DTWAIN_SetErrorBufferThreshold(nVal);
 
-    nVal = customProfile.GetLongValue("DSMErrorLogging", "AppHandlesExceptions", 0);
+    nVal = customProfile->GetLongValue("DSMErrorLogging", "AppHandlesExceptions", 0);
     CTL_StaticData::s_bThrowExceptions = nVal == 0 ? false : true;
 }
 
@@ -1684,6 +1698,16 @@ static bool SysDestroyHelper(CTL_TwainDLLHandle* pHandle, bool bCheck)
 
     UnloadOCRInterfaces(pHandle);
     #endif
+
+    // Close out any INI changes
+    auto* customProfile = CTL_StaticData::GetINIInterface();
+    if (customProfile)
+    {
+        customProfile->SaveFile(CTL_StaticData::GetINIPath().c_str());
+        CTL_StaticData::s_iniInterface.reset();
+        CTL_StaticData::s_bINIFileLoaded = false;
+    }
+
     // Remove the handle for this thread
     auto it = CTL_StaticData::s_mapThreadToDLLHandle.find(threadId);
     if ( it == CTL_StaticData::s_mapThreadToDLLHandle.end() )
@@ -2225,17 +2249,16 @@ void LoadTransferReadyOverrides()
     xfer_list.clear();
 
     // Get the section name
-    CSimpleIniA customProfile;
-    auto err = customProfile.LoadFile(dynarithmic::GetDTWAININIPathA().c_str());
-    if (err != SI_OK)
+    auto *customProfile = CTL_StaticData::GetINIInterface();
+    if (!customProfile)
         return;
     CSimpleIniA::TNamesDepend keys;
-    customProfile.GetAllKeys("SourceXferWaitInfo", keys);
+    customProfile->GetAllKeys("SourceXferWaitInfo", keys);
     auto iter = keys.begin();
     while (iter != keys.end())
     {
         CSimpleIniA::TNamesDepend vals;
-        customProfile.GetAllValues("SourceXferWaitInfo", iter->pItem, vals);
+        customProfile->GetAllValues("SourceXferWaitInfo", iter->pItem, vals);
         if (!vals.empty())
         {
                 auto iter2 = vals.begin();
@@ -2270,13 +2293,22 @@ void LoadTransferReadyOverrides()
 void LoadOnSourceOpenProperties(CTL_TwainDLLHandle* pHandle)
 {
     // Get the section name
-    CSimpleIniA feederProfile;
-    auto err = feederProfile.LoadFile(dynarithmic::GetDTWAININIPathA().c_str());
-    if (err != SI_OK)
+    auto* feederProfile = CTL_StaticData::GetINIInterface();
+    if (!feederProfile)
         return;
-    pHandle->m_OnSourceOpenProperties.m_bCheckFeederStatusOnOpen = feederProfile.GetBoolValue("SourceOpenProps", "CheckFeederStatus", true);
-    pHandle->m_OnSourceOpenProperties.m_bQueryBestCapContainer = feederProfile.GetBoolValue("SourceOpenProps", "QueryBestCapContainer", true);
-    pHandle->m_OnSourceOpenProperties.m_bQueryCapOperations = feederProfile.GetBoolValue("SourceOpenProps", "QueryCapOperations", true);
+
+    pHandle->m_OnSourceOpenProperties.m_bCheckFeederStatusOnOpen = feederProfile->GetBoolValue("SourceOpenProps", "CheckFeederStatus", true);
+    pHandle->m_OnSourceOpenProperties.m_bQueryBestCapContainer = feederProfile->GetBoolValue("SourceOpenProps", "QueryBestCapContainer", true);
+    pHandle->m_OnSourceOpenProperties.m_bQueryCapOperations = feederProfile->GetBoolValue("SourceOpenProps", "QueryCapOperations", true);
+}
+
+void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle)
+{
+    auto *customProfile = CTL_StaticData::GetINIInterface();
+    if (!customProfile)
+        return;
+    CTL_StaticData::s_bDoResampling = customProfile->GetBoolValue("ImageFile", "resample", true);
+    return;
 }
 
 // This loads DTWAIN32.INI or DTWAIN64.INI, and checks the [FlatbedOnly]
@@ -2288,17 +2320,16 @@ void LoadFlatbedOnlyOverrides()
     flatbed_list.clear();
 
     // Get the section name
-    CSimpleIniA customProfile;
-    auto err = customProfile.LoadFile(dynarithmic::GetDTWAININIPathA().c_str());
-    if (err != SI_OK)
+    auto* customProfile = CTL_StaticData::GetINIInterface();
+    if (!customProfile)
         return;
     CSimpleIniA::TNamesDepend keys;
-    customProfile.GetAllKeys("FlatbedOnly", keys);
+    customProfile->GetAllKeys("FlatbedOnly", keys);
     auto iter = keys.begin();
     while (iter != keys.end())
     {
         CSimpleIniA::TNamesDepend vals;
-        customProfile.GetAllValues("FlatbedOnly", iter->pItem, vals);
+        customProfile->GetAllValues("FlatbedOnly", iter->pItem, vals);
         flatbed_list.insert(iter->pItem);
         ++iter;
     }

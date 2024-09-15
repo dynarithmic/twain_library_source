@@ -101,6 +101,9 @@ std::pair<CTL_ResourceRegistryMap::iterator, bool> CTL_TwainDLLHandle::AddResour
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
+std::unique_ptr<CSimpleIniA>   CTL_StaticData::s_iniInterface;
+bool                         CTL_StaticData::s_bINIFileLoaded = false;
+bool                         CTL_StaticData::s_bDoResampling = true;
 CTL_StringToMapLongToStringMap CTL_StaticData::s_AllLoadedResourcesMap;
 CTL_PairToStringMap         CTL_StaticData::s_ResourceCache;
 std::string                 CTL_StaticData::s_CurrentResourceKey;
