@@ -445,7 +445,26 @@ namespace dynarithmic
         return retString;
     }
 
-    static bool LoadLanguageResourceFromFileA(const char* szLangName, const std::string& sPath, bool clearEntry)
+    static void ClearMapEntries(CTL_LongToStringMap& resourceMap, LONG border, bool deleteBeforeBorder = true)
+    {
+        if (resourceMap.empty())
+            return;
+        auto iterFirst = resourceMap.lower_bound(border);
+        if (iterFirst == resourceMap.end())
+        {
+            if (deleteBeforeBorder)
+                resourceMap.clear();
+            return;
+        }
+
+        if (deleteBeforeBorder)
+            resourceMap.erase(resourceMap.begin(), iterFirst);
+        else
+            resourceMap.erase(iterFirst, resourceMap.end());
+        return;
+    }
+
+    static bool LoadLanguageResourceFromFileA(const char* szLangName, const std::string& sPath, bool clearEntry, bool bIsCustom)
     {
         auto& allLanguages = CTL_StaticData::GetAllLanguagesResourceMap();
 
@@ -456,12 +475,10 @@ namespace dynarithmic
             // language was already loaded, so set as the current language
             CTL_StaticData::SetCurrentLanguageResourceKey(iterLang->first);
 
-            // If we don't want to clear the entries out, return
-            if ( !clearEntry )
+            if (clearEntry)
+                ClearMapEntries(iterLang->second, DTWAIN_USERRES_START, !bIsCustom);
+            else
                 return true;
-
-            // Clean out the string resources
-            iterLang->second.clear();
         }
 
         // Create an empty map
@@ -569,8 +586,8 @@ namespace dynarithmic
     bool LoadLanguageResourceA(LPCSTR lpszName, bool bClear)
     {
         LOG_FUNC_ENTRY_PARAMS((lpszName))
-        bool bReturn = LoadLanguageResourceFromFileA(lpszName, GetResourceFileNameA(lpszName, DTWAINLANGRESOURCEFILE), bClear);
-        LoadLanguageResourceFromFileA(lpszName, GetResourceFileNameA(lpszName, DTWAINCUSTOMRESOURCESFILE), bClear);
+        bool bReturn = LoadLanguageResourceFromFileA(lpszName, GetResourceFileNameA(lpszName, DTWAINLANGRESOURCEFILE), bClear, false);
+        LoadLanguageResourceFromFileA(lpszName, GetResourceFileNameA(lpszName, DTWAINCUSTOMRESOURCESFILE), bClear, true);
         LOG_FUNC_EXIT_NONAME_PARAMS(bReturn)
         CATCH_BLOCK(false)
     }

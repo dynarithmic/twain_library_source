@@ -466,17 +466,9 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstant(LONG lConstantType, LONG lTwai
 {
     LOG_FUNC_ENTRY_PARAMS((lConstantType, lTwainConstant, lpszOut, nSize))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto& constantsmap = CTL_StaticData::GetTwainConstantsMap();
-    auto iter1 = constantsmap.find(lConstantType);
-    if (iter1 == constantsmap.end())
-        LOG_FUNC_EXIT_NONAME_PARAMS(0)
-    auto iter2 = iter1->second.find(lTwainConstant);
-    if (iter2 == iter1->second.end())
-        LOG_FUNC_EXIT_NONAME_PARAMS(0)
-    LONG nActualCharactersCopied = 0;
-    CTL_StringType constantName = StringConversion::Convert_Ansi_To_Native(iter2->second);
-    nActualCharactersCopied = StringWrapper::CopyInfoToCString(constantName, lpszOut, nSize);
-    LOG_FUNC_EXIT_NONAME_PARAMS(nActualCharactersCopied)
+    auto ret = CTL_StaticData::GetTwainNameFromConstant(lConstantType, lTwainConstant);
+    auto numChars = StringWrapper::CopyInfoToCString(ret, lpszOut, nSize);
+    LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
     CATCH_BLOCK(-1)
 }
 
