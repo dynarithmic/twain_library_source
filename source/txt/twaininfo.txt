@@ -1575,6 +1575,21 @@
 2 TWCI_ERROR     
 3 TWCI_WARMUP    
 -9999
+5000 Courier
+5001 Courier-Bold
+5002 Courier-BoldOblique
+5003 Courier-Oblique
+5004 Helvetica
+5005 Helvetica-Bold
+5006 Helvetica-BoldOblique
+5007 Helvetica-Oblique
+5008 Times-Bold
+5009 Times-BoldItalic
+5010 Times-Roman
+5011 Times-Italic
+5012 Symbol
+5013 ZapfDingbats
+-9999
 [100] BMP        [1 4 8 16 24 32] [[]]
 [200] JPEG [8 16 24] [[1 24] [4 24] [32 24]]
 [250 251] Adobe PDF [1 8 16 24] [[32 24]]
@@ -1594,6 +1609,6 @@
 [8501] WEBP [24 32] [[1 24] [4 24] [8 24] [16 24]]
 [6000 6001] TXT [1] [[4 1][8 1][16 1][24 1] [32 1]]
 -9999
-5.5.0
+5.5.2
 END END END
 
