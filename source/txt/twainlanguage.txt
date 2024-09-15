@@ -6,3 +6,4 @@ german
 italian
 portuguese_br
 romanian
+russian
