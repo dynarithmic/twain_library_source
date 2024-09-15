@@ -141,6 +141,19 @@ bool                        CTL_StaticData::s_ResourcesInitialized = false;
 ImageResamplerMap           CTL_StaticData::s_ImageResamplerMap;
 SourceStatusMap             CTL_StaticData::s_SourceStatusMap;
 
+CTL_StringType CTL_StaticData::GetTwainNameFromConstant(int lConstantType, int lTwainConstant)
+{
+    auto& constantsmap = CTL_StaticData::GetTwainConstantsMap();
+    auto iter1 = constantsmap.find(lConstantType);
+    if (iter1 == constantsmap.end())
+        return {};
+    auto iter2 = iter1->second.find(lTwainConstant);
+    if (iter2 == iter1->second.end())
+        return {};
+    LONG nActualCharactersCopied = 0;
+    return StringConversion::Convert_Ansi_To_Native(iter2->second);
+}
+
 CTL_LongToStringMap* CTL_StaticData::GetLanguageResource(std::string sLang)
 {
     auto iter = s_AllLoadedResourcesMap.find(sLang);

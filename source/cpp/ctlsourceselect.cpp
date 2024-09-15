@@ -844,7 +844,7 @@ void DisplayLocalString(HWND hWnd, int nID, int resID)
     {
         const HWND hWndControl = GetDlgItem(hWnd, nID);
         if (hWndControl)
-            SetWindowTextA(hWndControl, sText.c_str());
+            SetDlgItemTextA(hWnd, nID, sText.c_str());
     }
 }
 #endif
