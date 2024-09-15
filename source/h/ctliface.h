@@ -245,7 +245,7 @@ namespace dynarithmic
     typedef std::vector<CallbackInfo<DTWAIN_CALLBACK_PROC, LONG> > CTL_CallbackProcArray;
     typedef std::vector<CallbackInfo<DTWAIN_CALLBACK_PROC, LONGLONG> > CTL_CallbackProcArray64;
     typedef std::unordered_map<LONG, CTL_StringType> CTL_StringToLongMap;
-    typedef std::unordered_map<LONG, std::string> CTL_LongToStringMap;
+    typedef std::map<LONG, std::string> CTL_LongToStringMap;
     typedef std::unordered_map<std::string, CTL_LongToStringMap> CTL_StringToMapLongToStringMap;
     typedef std::unordered_map<LONG, std::vector<LONG> > CTL_LongToVectorLongMap;
     typedef std::vector<CTL_MapThreadToDLLHandle>     CTL_HookInfoArray;
@@ -605,6 +605,7 @@ namespace dynarithmic
         static ImageResamplerMap& GetImageResamplerMap() { return s_ImageResamplerMap; }
         static SourceStatusMap& GetSourceStatusMap() { return s_SourceStatusMap;  }
         static CTL_StringType& GetResourceVersion() { return s_ResourceVersion; }
+        static CTL_StringType GetTwainNameFromConstant(int lConstantType, int lTwainConstant);
     };
 
     struct CTL_LoggerCallbackInfo
