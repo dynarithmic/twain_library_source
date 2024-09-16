@@ -4,6 +4,10 @@ DTWAIN Version changes
 
 - Fix issue with custom resource files being loaded into memory using DTWAIN_LoadCustomStringResources()
 
+- Add DTWAIN_LOG_CONSOLEWITHHANDLER to list of available flags to DTWAIN_SetTwainLog().  This flag is only
+  applicable when logging to the console.  This flag allows safe(r) shutdown of DTWAIN if the logging
+  console is terminated by Ctrl-C, closing the console window by clicking the 'X', etc.
+
 - Add some missing C# and VB interface functions to the DTWAIN DLL.
 
 - Ensure that when logging to the console, the console is using UTF-8 encoding.
