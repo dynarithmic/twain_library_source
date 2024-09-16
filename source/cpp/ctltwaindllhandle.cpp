@@ -153,7 +153,6 @@ CTL_StringType CTL_StaticData::GetTwainNameFromConstant(int lConstantType, int l
     auto iter2 = iter1->second.find(lTwainConstant);
     if (iter2 == iter1->second.end())
         return {};
-    LONG nActualCharactersCopied = 0;
     return StringConversion::Convert_Ansi_To_Native(iter2->second);
 }
 

@@ -41,13 +41,13 @@
 #include "notimpl.h"
 #include "sourceacquireopts.h"
 #ifdef _WIN32
-#include "winlibraryloader_impl.inl"
+    #include "winlibraryloader_impl.inl"
 #else
-#include "linuxlibraryloader_impl.inl"
+    #include "linuxlibraryloader_impl.inl"
 #endif
 #ifdef _MSC_VER
-#undef min
-#undef max
+    #undef min
+    #undef max
 #endif
 template <typename T>
 struct dtwain_library_loader : library_loader_impl
@@ -763,7 +763,7 @@ namespace dynarithmic
     template <int CapInfoIdx>
     void SetCapabilityInfo(CTL_TwainDLLHandle* pHandle, DTWAIN_SOURCE Source, LONG value, LONG lCap)
     {
-        CTL_ITwainSource* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
+        auto pSource = static_cast<CTL_ITwainSource*>(Source);
         const CTL_CapInfoArrayPtr pArray = GetCapInfoArray(pHandle, pSource);
 
         // Get the cap array values
@@ -785,32 +785,6 @@ namespace dynarithmic
     CTL_TwainDLLHandle* FindHandle(HWND hWnd, bool bIsDisplay);
     CTL_TwainDLLHandle* FindHandle(HINSTANCE hInst);
     std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> VerifyHandles(DTWAIN_SOURCE Source, int Testing = DTWAIN_VERIFY_DLLHANDLE | DTWAIN_VERIFY_SOURCEHANDLE | DTWAIN_TEST_SETLASTERROR);
-    int GetResolutions(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, void* pArray,CTL_EnumGetType GetType);
-    bool GetImageSize( DTWAIN_HANDLE DLLHandle,
-                       DTWAIN_SOURCE Source,
-                       double *pLeft,
-                       double *pRight,
-                       double *pTop,
-                       double *pBottom,
-                       CTL_EnumGetType GetType);
-
-    bool SetImageSize( DTWAIN_HANDLE DLLHandle,
-                       DTWAIN_SOURCE Source,
-                       double dLeft,
-                       double dRight,
-                       double dTop,
-                       double dBottom,
-                       CTL_EnumSetType SetType,
-                       std::vector<double>& rArray);
-
-    bool GetNativeResolution(DTWAIN_HANDLE DLLHandle,
-                             DTWAIN_SOURCE Source,
-                             double *pRes,
-                             CTL_EnumCapability Cap);
-
-    int SetResolutions(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, void** pResolutions,
-                        int nRes, void (*ResProc)(const CTL_ITwainSource *pSource,
-                                                  std::vector<double>& pArray ));
     bool CenterWindow(HWND hwnd, HWND hwndParent);
 
     bool IsIntCapType(TW_UINT16 nCap);
@@ -821,10 +795,6 @@ namespace dynarithmic
     LONG GetCustomCapDataType(DTWAIN_SOURCE Source, TW_UINT16 nCap);
     LONG GetCapContainer(CTL_ITwainSource* pSource, LONG nCap, LONG lCapType);
     LONG GetCapArrayType(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG nCap);
-
-    DTWAIN_BOOL    DTWAIN_ArrayFirst(DTWAIN_ARRAY pArray, LPVOID pVariant);
-
-    DTWAIN_BOOL    DTWAIN_ArrayNext(DTWAIN_ARRAY pArray, LPVOID pVariant);
     LONG           DTWAIN_ArrayType(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray);
     bool           DTWAINFRAMEToTWFRAME(DTWAIN_FRAME pDdtwil, pTW_FRAME pTwain);
     bool           TWFRAMEToDTWAINFRAME(TW_FRAME pTwain, DTWAIN_FRAME pDdtwil);
@@ -897,6 +867,7 @@ namespace dynarithmic
     void LLSetupUIOnly(CTL_ITwainSource* pSource);
     DTWAIN_HANDLE GetDTWAINHandle_Internal();
     bool TileModeOn(DTWAIN_SOURCE Source);
+    void SysDestroyNoCheck();
     void DestroyArrayFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray);
     void DestroyFrameFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_FRAME Frame);
     DTWAIN_ARRAY CreateArrayFromFactory(CTL_TwainDLLHandle* pHandle, LONG nEnumType, LONG nInitialSize);

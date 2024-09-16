@@ -407,7 +407,7 @@ struct AllCapInfo
    AllCapInfo() : mapCounts{} {}
 };
 
-AllCapInfo getAllCapInfo(CTL_ITwainSource* pSource)
+static AllCapInfo getAllCapInfo(CTL_ITwainSource* pSource)
 {
     const auto pHandle = pSource->GetDTWAINHandle();
     AllCapInfo allCapInfo;
@@ -433,9 +433,8 @@ AllCapInfo getAllCapInfo(CTL_ITwainSource* pSource)
     // Fill in the general info
     for (auto capVal : vCapBuf)
     {
-        char sz[100];
-        DTWAIN_GetNameFromCapA(capVal, sz, 100);
-        std::string quouteString = "\"" + std::string(sz) + "\"";
+        auto sz = CTL_TwainAppMgr::GetCapNameFromCap(capVal);
+        std::string quouteString = "\"" + sz + "\"";
         auto iter = capInfo.insert({ capVal, {quouteString, capVal, "\"standard\""}}).first;
         iter->second.capName = sz;
         iter->second.value = capVal;

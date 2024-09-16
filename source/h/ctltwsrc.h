@@ -330,7 +330,7 @@ namespace dynarithmic
         int          GetCurrentRetryCount() const { return m_nCurRetryCount;    }
         bool         SkipImageInfoErrors() const { return m_bSkipImageInfoErrors; }
         void         SetImageInfoErrors(bool bSet=true) { m_bSkipImageInfoErrors = bSet; }
-        void         SetImageInfo(TW_IMAGEINFO* pInfo) { memcpy(&m_ImageInfo, pInfo, sizeof(TW_IMAGEINFO)); }
+        void         SetImageInfo(const TW_IMAGEINFO* pInfo) { memcpy(&m_ImageInfo, pInfo, sizeof(TW_IMAGEINFO)); }
         void         GetImageInfo(TW_IMAGEINFO* pInfo) const { memcpy(pInfo, &m_ImageInfo, sizeof(TW_IMAGEINFO)); }
         void         SetImageLayout(const FloatRect* pInfo) { memcpy(&m_ImageLayout, pInfo, sizeof(FloatRect)); }
         void         GetImageLayout(FloatRect* pInfo) const { memcpy(pInfo, &m_ImageLayout, sizeof(FloatRect)); }

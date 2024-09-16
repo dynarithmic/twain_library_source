@@ -196,10 +196,7 @@ LRESULT CALLBACK_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                 {
                     // Send this message on
                     bPassMsg = true;
-                    DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,
-                                        static_cast<DTWAIN_HANDLE>(pHandle),
-                                        static_cast<DTWAIN_SOURCE>(pSource),
-                                        static_cast<WPARAM>(wParam), reinterpret_cast<LPARAM>(pSource) );
+                    DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,pHandle, pSource, wParam, reinterpret_cast<LPARAM>(pSource) );
                 }
             }
             break;
@@ -253,10 +250,7 @@ LRESULT CALLBACK_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                 if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) ||
                      !CTL_StaticData::s_aAllCallbacks.empty())
                     bPassMsg = true;
-                DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,
-                                    static_cast<DTWAIN_HANDLE>(pHandle),
-                                    static_cast<DTWAIN_SOURCE>(pSource),
-                                    wParam, reinterpret_cast<LPARAM>(pSource) );
+                DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,pHandle,pSource, wParam, reinterpret_cast<LPARAM>(pSource) );
             }
             break;
 
@@ -508,11 +502,11 @@ LRESULT CALLBACK_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                         if ( !pSource->IsUIOpenOnAcquire() && !pSource->ImagesStored())
                         {
                            // Save the image handles
-                            char buf[25];
+                            char buf[25] = {};
                             LOG_FUNC_STRING(No UI Mode Done -- Copying DIBS to Source...)
                             DTWAIN_ARRAY aDibs = nullptr;
                             aDibs = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYHANDLE, 0 );
-                            DTWAIN_GetAllSourceDibs( static_cast<DTWAIN_SOURCE>(pSource), aDibs );
+                            DTWAIN_GetAllSourceDibs( pSource, aDibs );
                             int nDibs = static_cast<int>(pHandle->m_ArrayFactory->size(aDibs));
                             StringStreamA strm;
                             strm << buf;
@@ -585,10 +579,8 @@ LRESULT CALLBACK_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
         case WM_DESTROY:
         {
             /* If this window was subclassed, the program must not close this window!!! */
-            if ( pHandle->m_hWndTwain && pHandle->m_bUseProxy )
-                DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,
-                                    static_cast<DTWAIN_HANDLE>(pHandle), nullptr,
-                                    static_cast<WPARAM>(DTWAIN_AcquireSourceClosed), 0 );
+            if ( pHandle && pHandle->m_hWndTwain && pHandle->m_bUseProxy )
+                DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE, pHandle, nullptr, DTWAIN_AcquireSourceClosed, 0 );
 
         }
         break;

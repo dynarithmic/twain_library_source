@@ -720,7 +720,6 @@ LONG TransymOCR::StartOCR(CTL_StringType filename)
             *boolFuncs[i] = !static_cast<VBBOOL>(vals[0]);
     }
 
-    const auto minToCopy = (std::min)(static_cast<int>(filename.size()), MAX_PATH);
     auto sInputFile = StringConversion::Convert_Native_To_Ansi(filename);
     JobInfo.InputFile = &sInputFile[0];
 

@@ -579,6 +579,11 @@ namespace dynarithmic
             info.sResourceName = {};
             info.bIsFromRC = false;
         }
+
+        // Regenerate the cached version information, since the language has changed
+        CTL_StaticData::s_VersionString.clear();
+        GetVersionString();
+
         LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
         CATCH_BLOCK(false)
     }
