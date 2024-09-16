@@ -91,7 +91,7 @@ namespace dynarithmic
     void DebugMonitor_Logger::trace(const std::string& msg) { generic_outstream(std::cout, applyDecoration()); }
     #endif
 
-    File_Logger::File_Logger(const LPCSTR filename, const FileLoggingTraits& fTraits)
+    File_Logger::File_Logger(const LPCSTR filename, const LoggingTraits& fTraits)
     {
         if (fTraits.m_bCreateDirectory)
         {
@@ -112,14 +112,42 @@ namespace dynarithmic
 
     File_Logger::~File_Logger()
     {
-        if (m_ostr.is_open())
-            m_ostr.close();
+        try
+        {
+            if (m_ostr.is_open())
+                m_ostr.close();
+        }
+        catch (...)
+        {
+        }
     }
 
     void File_Logger::trace(const std::string& msg)
     {
         if (m_ostr)
             generic_outstream(m_ostr, getTime() + getThreadID() + msg);
+    }
+
+    BOOL StdCout_Logger::ConsoleCtrlHandler(DWORD dwCtrlType)
+    {
+		switch (dwCtrlType) 
+        {
+		    case CTRL_C_EVENT:
+		    case CTRL_BREAK_EVENT:
+		    case CTRL_CLOSE_EVENT:
+		    case CTRL_LOGOFF_EVENT:
+		    case CTRL_SHUTDOWN_EVENT:
+                dynarithmic::SysDestroyNoCheck();
+			    return TRUE;
+		    default:
+			    return FALSE;
+		}
+    }
+
+    StdCout_Logger::StdCout_Logger(const LoggingTraits& lTraits)
+    {
+        if (lTraits.m_bSetConsoleHandler)
+            SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
     }
 
     StdCout_Logger::~StdCout_Logger()
@@ -159,7 +187,7 @@ void CLogSystem::GetModuleName(HINSTANCE hInst)
     #endif
 }
 
-bool CLogSystem::InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE hInst, const FileLoggingTraits& fTraits)
+bool CLogSystem::InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE hInst, const LoggingTraits& lTraits)
 {
     bool loggerSet = false;
     GetModuleName(hInst);
@@ -169,7 +197,7 @@ bool CLogSystem::InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE h
         switch (loggerType)
         {
             case CONSOLE_LOGGING:
-                app_logger_map[CONSOLE_LOGGING] = std::make_shared<StdCout_Logger>();
+                app_logger_map[CONSOLE_LOGGING] = std::make_shared<StdCout_Logger>(lTraits);
                 loggerSet = true;
             break;
             case DEBUG_WINDOW_LOGGING:
@@ -178,7 +206,7 @@ bool CLogSystem::InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE h
             break;
             case FILE_LOGGING:
             {
-                auto filelogging = std::make_shared<File_Logger>(StringConversion::Convert_NativePtr_To_Ansi(pOutputFilename).c_str(), fTraits);
+                auto filelogging = std::make_shared<File_Logger>(StringConversion::Convert_NativePtr_To_Ansi(pOutputFilename).c_str(), lTraits);
                 if (filelogging->IsFileCreated())
                 {
                     app_logger_map[FILE_LOGGING] = filelogging;
@@ -213,7 +241,7 @@ void CLogSystem::DisableAllLoggers()
     m_bEnable = false;
 }
 
-bool CLogSystem::InitConsoleLogging(HINSTANCE hInst)
+bool CLogSystem::InitConsoleLogging(HINSTANCE hInst, const LoggingTraits& lTraits)
 {
 #ifdef _WIN32
     FILE* fDummy;
@@ -223,7 +251,7 @@ bool CLogSystem::InitConsoleLogging(HINSTANCE hInst)
         freopen_s(&fDummy, "CONOUT$", "w", stdout);
         SetConsoleOutputCP(65001); // Use UTF-8 for console logging
 #endif
-        InitLogger(CONSOLE_LOGGING, nullptr, hInst);
+        InitLogger(CONSOLE_LOGGING, nullptr, hInst, lTraits);
     }
     return bRet ? true : false;
 }
@@ -240,7 +268,7 @@ bool  CLogSystem::InitCallbackLogging(HINSTANCE hInst)
     return true;
 }
 
-bool CLogSystem::InitFileLogging(LPCTSTR pOutputFilename, HINSTANCE hInst, const FileLoggingTraits& fTraits)
+bool CLogSystem::InitFileLogging(LPCTSTR pOutputFilename, HINSTANCE hInst, const LoggingTraits& fTraits)
 {
     bool bLogOpen = false;
     if (pOutputFilename)

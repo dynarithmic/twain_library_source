@@ -1237,6 +1237,9 @@ DTWAIN DLL are not displayed */
 /* Create directory if logging to file */
 #define DTWAIN_LOG_CREATEDIRECTORY 0x04000000
 
+/* Use DTWAIN's console handler if console logging is selected */
+#define DTWAIN_LOG_CONSOLEWITHHANDLER (0x08000000 | DTWAIN_LOG_CONSOLE)
+
 /* log everything, including displaying exceptions */
 #define DTWAIN_LOG_ALL_NOCALLBACK   (DTWAIN_LOG_ALL &~ (DTWAIN_LOG_USECALLBACK))
 
