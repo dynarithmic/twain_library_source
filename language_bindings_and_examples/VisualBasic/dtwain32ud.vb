@@ -1036,8 +1036,9 @@ Class DTWAINAPI
     Public Const DTWAIN_LOG_USECRLF As Integer = &H400000
     Public Const DTWAIN_LOG_CONSOLE As Integer = &H800000
     Public Const DTWAIN_LOG_DEBUGMONITOR As Integer = &H1000000
-    Public Const DTWAIN_LOG_USEWINDOW As Integer = &H2000000
-    Public Const DTWAIN_LOG_CREATEDIRECTORY As Integer = &H04000000
+    Public Const DTWAIN_LOG_USEWINDOW As Integer =       &H2000000
+    Public Const DTWAIN_LOG_CREATEDIRECTORY As Integer = &H4000000
+    Public Const DTWAIN_LOG_CONSOLEWITHHANDLER As Integer = (&H8000000 Or DTWAIN_LOG_CONSOLE)
 
     Public Const DTWAIN_LOG_NOCALLBACK As Integer = 8192
     Public Const DTWAIN_LOG_WRITE As Integer = 16384
