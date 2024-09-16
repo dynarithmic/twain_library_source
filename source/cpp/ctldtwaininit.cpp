@@ -91,7 +91,7 @@ static HWND CreateTwainWindow(CTL_TwainDLLHandle* pHandle,
                               HINSTANCE hInstance= nullptr,
                               HWND hWndParent= nullptr);
 static void RegisterTwainWindowClass();
-static std::pair<bool, std::vector<uint16_t>> OpenLogging(LPCTSTR pFileName, LONG logFlags, const FileLoggingTraits& fTraits = {});
+static std::pair<bool, std::vector<uint16_t>> OpenLogging(LPCTSTR pFileName, LONG logFlags, const LoggingTraits& fTraits = {});
 static void WriteVersionToLog(CTL_TwainDLLHandle* pHandle);
 static bool SysDestroyHelper(CTL_TwainDLLHandle* pHandle, bool bCheck=true);
 static void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL, bool bClear);
@@ -284,9 +284,9 @@ LONG DLLENTRY_DEF DTWAIN_GetAPIHandleStatus(DTWAIN_HANDLE pHandle)
 {
     LOG_FUNC_ENTRY_PARAMS((pHandle))
     LONG retVal = 0;
-    if (!IsDLLHandleValid(reinterpret_cast<CTL_TwainDLLHandle*>(pHandle), FALSE))
+    if (!IsDLLHandleValid(static_cast<CTL_TwainDLLHandle*>(pHandle), FALSE))
         LOG_FUNC_EXIT_NONAME_PARAMS(retVal);
-    retVal = IsDLLHandleValid(reinterpret_cast<CTL_TwainDLLHandle*>(pHandle), TRUE) ? DTWAIN_TWAINSESSIONOK : DTWAIN_APIHANDLEOK;
+    retVal = IsDLLHandleValid(static_cast<CTL_TwainDLLHandle*>(pHandle), TRUE) ? DTWAIN_TWAINSESSIONOK : DTWAIN_APIHANDLEOK;
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal);
     CATCH_BLOCK(0)
 }
@@ -1067,10 +1067,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLog(LONG LogFlags, LPCTSTR lpszLogFile)
         if ( LogFlags && !UserDefinedLoggerExists(pHandle))
             CTL_StaticData::s_lErrorFilterFlags &= ~DTWAIN_LOG_USECALLBACK;
 
-        FileLoggingTraits fTraits;
+        LoggingTraits fTraits;
         fTraits.m_bAppend = LogFlags & DTWAIN_LOG_FILEAPPEND?true:false;
         fTraits.m_bCreateDirectory = LogFlags & DTWAIN_LOG_CREATEDIRECTORY ? true : false;
         fTraits.m_filename = lpszLogFile;
+        fTraits.m_bSetConsoleHandler = LogFlags & DTWAIN_LOG_CONSOLEWITHHANDLER ? true : false;
         auto isLogOpen = OpenLogging(lpszLogFile, LogFlags, fTraits);
 
         // Write the version info
@@ -1169,7 +1170,7 @@ void dynarithmic::WriteUserDefinedLogMsgW(CTL_TwainDLLHandle* pHandle, LPCWSTR s
 #endif
 }
 
-std::pair<bool, std::vector<uint16_t>> OpenLogging(LPCTSTR pFileName, LONG logFlags, const FileLoggingTraits& fTraits)
+std::pair<bool, std::vector<uint16_t>> OpenLogging(LPCTSTR pFileName, LONG logFlags, const LoggingTraits& lTraits)
 {
     bool bLogOpen = false;
     uint16_t nWhichLogging = 0;
@@ -1177,16 +1178,16 @@ std::pair<bool, std::vector<uint16_t>> OpenLogging(LPCTSTR pFileName, LONG logFl
     std::vector<uint16_t> vBadLogs;
     if (pFileName && pFileName[0])
     {
-        bLogOpen = CTL_StaticData::s_appLog.InitFileLogging(pFileName, CTL_StaticData::s_DLLInstance, fTraits);
+        bLogOpen = CTL_StaticData::s_appLog.InitFileLogging(pFileName, CTL_StaticData::s_DLLInstance, lTraits);
         if (!bLogOpen)
             vBadLogs.push_back(nWhichLogging);
         ++totalLoggingOptions;
     }
     ++nWhichLogging;
-    std::array<std::function<bool(HINSTANCE)>, 3> vLoggingFuncs = {
-                            [&](HINSTANCE hinst) { return CTL_StaticData::s_appLog.InitConsoleLogging(hinst); },
-                            [&](HINSTANCE hinst) { return CTL_StaticData::s_appLog.InitDebugWindowLogging(hinst); },
-                            [&](HINSTANCE hinst) { return CTL_StaticData::s_appLog.InitCallbackLogging(hinst); }};
+    std::array<std::function<bool(HINSTANCE, const LoggingTraits&)>, 3> vLoggingFuncs = {
+                            [&](HINSTANCE hinst, const LoggingTraits& lTraits) { return CTL_StaticData::s_appLog.InitConsoleLogging(hinst, lTraits); },
+                            [&](HINSTANCE hinst, const LoggingTraits&) { return CTL_StaticData::s_appLog.InitDebugWindowLogging(hinst); },
+                            [&](HINSTANCE hinst, const LoggingTraits&) { return CTL_StaticData::s_appLog.InitCallbackLogging(hinst); }};
     std::array<long, 4> aLogFlags = { 0, DTWAIN_LOG_CONSOLE, DTWAIN_LOG_DEBUGMONITOR, DTWAIN_LOG_USECALLBACK };
     for (auto& fn : vLoggingFuncs)
     {
@@ -1194,7 +1195,7 @@ std::pair<bool, std::vector<uint16_t>> OpenLogging(LPCTSTR pFileName, LONG logFl
         if (logFlags & aLogFlags[nWhichLogging])
         {
             ++totalLoggingOptions;
-            bRet = fn(CTL_StaticData::s_DLLInstance);
+            bRet = fn(CTL_StaticData::s_DLLInstance, lTraits);
             if (!bRet)
                 vBadLogs.push_back(nWhichLogging);
         }
@@ -1673,6 +1674,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
     CATCH_BLOCK(false)
 }
 
+void dynarithmic::SysDestroyNoCheck()
+{
+
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SysDestroy()
 {
     std::lock_guard<std::mutex> lg(CTL_StaticData::s_mutexInitDestroy);
@@ -2101,7 +2107,7 @@ CTL_StringType dynarithmic::GetVersionString()
 
     LONG lMajor, lMinor, lVersionType, lPatch;
     // Write the version info
-    if ( DTWAIN_GetVersionEx(&lMajor, &lMinor, &lVersionType, &lPatch) )
+    if (DTWAIN_GetVersionInternal(&lMajor, &lMinor, &lVersionType, &lPatch) )
     {
         std::string s;
         std::string sBits = "(32-bit)";
