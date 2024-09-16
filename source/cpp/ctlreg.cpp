@@ -36,12 +36,6 @@ static std::string NormalizeCapName(const std::string& sName);
 
 bool SaveCapInfoToIni(const std::string& strSourceName, UINT nCap, const CTL_IntArray& rContainerTypes)
 {
-    #ifdef WIN32
-    const char *szName = "dtwain32.ini";
-    #else
-    const char *szName = "dtwain64.ini";
-    #endif
-
     // Saves the capability information to the DTWAIN16/32.INI
     std::string strKeyName;
     StringStreamOutA strm;

@@ -219,15 +219,9 @@ namespace dynarithmic
     struct OCRPDFInfo
     {
         typedef enum {PDFINFO_BW, PDFINFO_COLOR, PDFINFO_GRAY} enumPDFColorType;
-        LONG FileType[3];
-        LONG PixelType[3];
-        LONG BitDepth[3];
-        OCRPDFInfo()
-        {
-            std::fill(FileType, FileType + 3, 0);
-            std::fill(PixelType, PixelType + 3, 0);
-            std::fill(BitDepth, BitDepth + 3, 0);
-        }
+        std::array<LONG, 3> FileType = {};
+        std::array<LONG, 3> PixelType = {};
+        std::array<LONG, 3> BitDepth = {};
     };
 
     class OCREngine

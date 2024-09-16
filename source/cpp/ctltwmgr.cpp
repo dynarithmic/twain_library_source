@@ -75,8 +75,8 @@ bool SetOneTwainCapValue( const CTL_ITwainSource *pSource,
 }
 
 
-#define TWRC_Error      1
-#define TWCC_Error      2
+constexpr int TWRC_Error = 1;
+constexpr int TWCC_Error = 2;
 
 void CTL_TwainAppMgr::SetDLLInstance(HINSTANCE hDLLInstance)
 {
@@ -673,7 +673,6 @@ bool CTL_TwainAppMgr::ShowUserInterface( CTL_ITwainSource *pSource, bool bTest, 
 
     const auto pTempSource = static_cast<CTL_ITwainSource*>(pSource);
     const auto pSession = pTempSource->GetTwainSession();
-    const bool bOld = false;
 
     if ( pTempSource->IsUIOpen() )
         return true;
@@ -1719,10 +1718,8 @@ bool CTL_TwainAppMgr::IsCapabilitySupported(const CTL_ITwainSource *pSource, TW_
         case CTL_GetTypeGET:
         case CTL_GetTypeGETCURRENT:
         case CTL_GetTypeGETDEFAULT:
-            pTrip.reset(new CTL_CapabilityGetTriplet(pSession, pTempSource,
-                            static_cast<CTL_EnumGetType>(nType),
-                            static_cast<CTL_EnumCapability>(nCap),
-                            0));
+            pTrip = std::make_unique<CTL_CapabilityGetTriplet>(pSession, pTempSource, 
+                                    static_cast<CTL_EnumGetType>(nType), nCap, TW_UINT16{ 0 });
             break;
 
         default:
