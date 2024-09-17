@@ -764,7 +764,7 @@ LONG DLLENTRY_DEF DTWAIN_GetOCRErrorString(DTWAIN_OCRENGINE Engine, LONG lError,
 
 #ifdef _WIN32
 
-bool NewOCRJob(OCREngine *pEngine, LPCSTR szFileName)
+static bool NewOCRJob(const OCREngine *pEngine, LPCSTR szFileName)
 {
     std::string s1 = pEngine->GetCachedFile();
     std::string s2 = szFileName;
