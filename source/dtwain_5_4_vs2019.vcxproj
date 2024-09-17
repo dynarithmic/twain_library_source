@@ -1589,6 +1589,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <Text Include="txt\twainresourcestrings_italian.txt" />
     <Text Include="txt\twainresourcestrings_portuguese_br.txt" />
     <Text Include="txt\twainresourcestrings_romanian.txt" />
+    <Text Include="txt\twainresourcestrings_russian.txt" />
     <Text Include="txt\twainresourcestrings_spanish.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
