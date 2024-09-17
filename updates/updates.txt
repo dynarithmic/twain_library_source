@@ -2,13 +2,18 @@ DTWAIN Version changes
 
 5.5.2
 
+- Support for acquiring buffered images using tiled data (DTWAIN_SetBufferedTileMode()).  
+  Please note that to use this feature the application is required to declare a user-defined memory buffer 
+  (see API DTWAIN_SetAcquireStripBuffer()).  Also, the device must support the ICAP_TILES capability for
+  tiled data to be sent.
+
 - Fix issue with custom resource files being loaded into memory using DTWAIN_LoadCustomStringResources()
 
 - Add DTWAIN_LOG_CONSOLEWITHHANDLER to list of available flags to DTWAIN_SetTwainLog().  This flag is only
   applicable when logging to the console.  This flag allows safe(r) shutdown of DTWAIN if the logging
   console is terminated by Ctrl-C, closing the console window by clicking the 'X', etc.
 
-- Add some missing C# and VB interface functions to the DTWAIN DLL.
+- Add some missing C# and VB interface functions.
 
 - Ensure that when logging to the console, the console is using UTF-8 encoding.
 
@@ -19,9 +24,10 @@ DTWAIN Version changes
 - Remove some resource constants from the language resource files.  These constants have now been moved to 
   twaininfo.txt
 
-- Update code to detect the running Windows OS version when starting a DTWAIN log.
+- Updated code to detect the running Windows OS version when starting a DTWAIN log.  The new code
+  now detects the latest Windows 11 version(s).  The new code is courtesy of PJ Naughter.
 
-- Add various language files (Romanian, Russian) 
+- Add various language files (Romanian, Russian).
 
 
 5.5.1
