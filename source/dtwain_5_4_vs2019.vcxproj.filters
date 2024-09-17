@@ -1038,8 +1038,6 @@
     <ClInclude Include="h\imagefun\dtwpdf\crc32_aux.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="h\ctlccerr.h" />
-    <ClInclude Include="h\ctlutils.h" />
     <ClInclude Include="h\dtwain_anyutils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1049,7 +1047,15 @@
     <ClInclude Include="h\sourceselectopts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="h\dtwain_paramlogger.h" />
+    <ClInclude Include="h\dtwain_paramlogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctlccerr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctlutils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".\h\versioninfo.ipp">
@@ -1163,6 +1169,12 @@
       <Filter>Resource Text Files</Filter>
     </Text>
     <Text Include="txt\twainresourcestrings_spanish.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_romanian.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_russian.txt">
       <Filter>Resource Text Files</Filter>
     </Text>
   </ItemGroup>
