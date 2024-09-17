@@ -187,10 +187,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
 
                             if ( !pMem )
                             {
-                               CTL_TwainAppMgr::SetError(DTWAIN_ERR_OUT_OF_MEMORY, "", true);
-                               char szBuf[255];
-                               CTL_TwainAppMgr::GetLastErrorString(szBuf, 254);
-                               CTL_TwainAppMgr::WriteLogInfoA(szBuf);
+                               CTL_TwainAppMgr::SetAndLogError(DTWAIN_ERR_OUT_OF_MEMORY, "", true);
                                CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                                      nullptr, DTWAIN_TN_TRANSFERSTRIPFAILED,
                                                                      reinterpret_cast<LPARAM>(pSource));
@@ -494,10 +491,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                                                           static_cast<LPARAM>(pSource->GetAcquireNum()));
                 if ( errfile != 0 )
                 {
-                   CTL_TwainAppMgr::SetError(errfile, "", false);
-                   char szBuf[255];
-                   CTL_TwainAppMgr::GetLastErrorString(szBuf, 254);
-                   CTL_TwainAppMgr::WriteLogInfoA(szBuf);
+				   CTL_TwainAppMgr::SetAndLogError(errfile, "", false);
                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                          nullptr, DTWAIN_TN_INVALIDIMAGEFORMAT,
                                                          reinterpret_cast<LPARAM>(pSource));
