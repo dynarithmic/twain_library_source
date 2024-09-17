@@ -74,29 +74,29 @@ static int CheckBufferedMode(CTL_ITwainSource* pSource)
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBufferedTileMode(DTWAIN_SOURCE Source, DTWAIN_BOOL bTileMode)
 {
-	LOG_FUNC_ENTRY_PARAMS((Source, bTileMode))
+    LOG_FUNC_ENTRY_PARAMS((Source, bTileMode))
     auto [pHandle, pSource] = VerifyHandles(Source);
     auto bRet = CheckBufferedMode(pSource);
-	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return bRet != DTWAIN_NO_ERROR; }, bRet, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return bRet != DTWAIN_NO_ERROR; }, bRet, false, FUNC_MACRO);
     pSource->SetTileMode(bTileMode);
-	LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsBufferedTileModeOn(DTWAIN_SOURCE Source)
 {
-	LOG_FUNC_ENTRY_PARAMS((Source))
+    LOG_FUNC_ENTRY_PARAMS((Source))
     auto [pHandle, pSource] = VerifyHandles(Source);
-	LOG_FUNC_EXIT_NONAME_PARAMS(pSource->IsTileModeOn())
+    LOG_FUNC_EXIT_NONAME_PARAMS(pSource->IsTileModeOn())
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsBufferedTileModeSupported(DTWAIN_SOURCE Source)
 {
-	LOG_FUNC_ENTRY_PARAMS((Source))
+    LOG_FUNC_ENTRY_PARAMS((Source))
     auto [pHandle, pSource] = VerifyHandles(Source);
     auto bRet = CheckBufferedMode(pSource);
-	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return bRet != DTWAIN_NO_ERROR; }, bRet, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return bRet != DTWAIN_NO_ERROR; }, bRet, false, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(true);
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -113,8 +113,8 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireBuffered(SourceAcquireOptions& opts)
     {
         // User must be using the user-defined buffer, since DTWAIN does not handle
         // the Tiled image data.
-		const HANDLE hUserBuffer = pSource->GetUserStripBuffer();
-		DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !hUserBuffer; }, DTWAIN_ERR_TILEMODE_USERBUFFER, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
+        const HANDLE hUserBuffer = pSource->GetUserStripBuffer();
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !hUserBuffer; }, DTWAIN_ERR_TILEMODE_USERBUFFER, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
 
         // Set the ICAP_TILES capability on here
         DTWAIN_ARRAY arr = dynarithmic::CreateArrayFromCap(pHandle, pSource, ICAP_TILES, 1);
