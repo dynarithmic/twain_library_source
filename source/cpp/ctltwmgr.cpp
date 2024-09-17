@@ -1210,7 +1210,6 @@ int  CTL_TwainAppMgr::BufferTransfer( CTL_ITwainSession *pSession,
     }
     else
     {
-        // Did user
         // User has defined a buffer
         hGlobAcquire = pSource->GetUserStripBuffer();
         nSizeStrip = static_cast<TW_INT32>(pSource->GetUserStripBufSize());
@@ -1680,6 +1679,19 @@ LPSTR CTL_TwainAppMgr::GetErrorString(int nError, LPSTR lpszBuffer, int nSize)
         GetResourceStringA(nError, lpszBuffer, nSize);
     return lpszBuffer;
 }
+
+void CTL_TwainAppMgr::SetAndLogError(int nError, const std::string& extraInfo, bool bMustReportGeneralError)
+{
+    int nActualError = std::abs(nError);
+    CTL_TwainAppMgr::SetError(nActualError, extraInfo, bMustReportGeneralError);
+    if (CTL_StaticData::s_lErrorFilterFlags != 0)
+    {
+        char szBuf[DTWAIN_USERRES_MAXSIZE + 1] = {};
+        CTL_TwainAppMgr::GetLastErrorString(szBuf, DTWAIN_USERRES_MAXSIZE);
+        CTL_TwainAppMgr::WriteLogInfoA(szBuf);
+    }
+}
+
 
 ////////////////////////////////////////////////////////////////////////////
 ///////////////////  ******* Capability Code ******* //////////////////////

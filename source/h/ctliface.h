@@ -814,9 +814,9 @@ namespace dynarithmic
     void DTWAIN_InvokeCallback( int nWhich, DTWAIN_HANDLE pHandle, DTWAIN_SOURCE pSource, WPARAM lData1, LPARAM lData2 );
     DTWAIN_BOOL DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source, DTWAIN_ARRAY pArray);
 
-    void OutputDTWAINError(CTL_TwainDLLHandle *pHandle, LPCSTR pFunc=nullptr);
-    void OutputDTWAINErrorA(CTL_TwainDLLHandle *pHandle, LPCSTR pFunc=nullptr);
-    void OutputDTWAINErrorW(CTL_TwainDLLHandle *pHandle, LPCWSTR pFunc=nullptr);
+    void OutputDTWAINError(const CTL_TwainDLLHandle *pHandle, LPCSTR pFunc=nullptr);
+    void OutputDTWAINErrorA(const CTL_TwainDLLHandle *pHandle, LPCSTR pFunc=nullptr);
+    void OutputDTWAINErrorW(const CTL_TwainDLLHandle *pHandle, LPCWSTR pFunc=nullptr);
 
     void LogExceptionErrorA(LPCSTR fname, const char *sAdditionalText=nullptr);
     void LogDTWAINMessage(HWND, UINT, WPARAM, LPARAM, bool bCallback=false);

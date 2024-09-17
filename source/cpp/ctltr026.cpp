@@ -133,10 +133,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     else
                     {
                         // Not enough memory to copy the DIB
-                        CTL_TwainAppMgr::SetError(-DTWAIN_ERR_OUT_OF_MEMORY, "", true);
-                        char szBuf[255];
-                        CTL_TwainAppMgr::GetLastErrorString(szBuf, 254);
-                        CTL_TwainAppMgr::WriteLogInfoA(szBuf);
+                        CTL_TwainAppMgr::SetAndLogError(DTWAIN_ERR_OUT_OF_MEMORY, "", true);
                         FailAcquisition();
                         return rc;
                     }
@@ -240,10 +237,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                 {
                     bPageDiscarded = true;
                     // Set the error code
-                    CTL_TwainAppMgr::SetError(-DTWAIN_ERR_BAD_DIB_PAGE, "", false);
-                    char szBuf[255];
-                    CTL_TwainAppMgr::GetLastErrorString(szBuf, 254);
-                    CTL_TwainAppMgr::WriteLogInfoA(szBuf);
+					CTL_TwainAppMgr::SetAndLogError(DTWAIN_ERR_BAD_DIB_PAGE, "", false);
                     break;
                 }
 
@@ -1353,8 +1347,8 @@ void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pS
     CTL_TwainAppMgr::SetError(Error, extraInfo, true);
     if ( CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_DTWAINERRORS)
     {
-        char szBuf[1024];
-        CTL_TwainAppMgr::GetLastErrorString(szBuf, 1024);
+        char szBuf[DTWAIN_USERRES_MAXSIZE + 1];
+        CTL_TwainAppMgr::GetLastErrorString(szBuf, DTWAIN_USERRES_MAXSIZE);
         CTL_TwainAppMgr::WriteLogInfoA(szBuf);
     }
     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, static_cast<WPARAM>(ErrorMsg), reinterpret_cast<LPARAM>(pSource));

@@ -1926,7 +1926,7 @@ void UnhookAllDisplays()
 #endif
 }
 
-void dynarithmic::OutputDTWAINErrorW(CTL_TwainDLLHandle* pHandle, LPCWSTR pFunc)
+void dynarithmic::OutputDTWAINErrorW(const CTL_TwainDLLHandle* pHandle, LPCWSTR pFunc)
 {
     if ( pFunc )
         OutputDTWAINError(pHandle, StringConversion::Convert_Wide_To_Ansi(pFunc).c_str());
@@ -1934,16 +1934,16 @@ void dynarithmic::OutputDTWAINErrorW(CTL_TwainDLLHandle* pHandle, LPCWSTR pFunc)
         OutputDTWAINError(pHandle);
 }
 
-void dynarithmic::OutputDTWAINErrorA(CTL_TwainDLLHandle* pHandle, LPCSTR pFunc)
+void dynarithmic::OutputDTWAINErrorA(const CTL_TwainDLLHandle* pHandle, LPCSTR pFunc)
 {
     OutputDTWAINError(pHandle, pFunc);
 }
 
-void dynarithmic::OutputDTWAINError(CTL_TwainDLLHandle* pHandle, LPCSTR pFunc)
+void dynarithmic::OutputDTWAINError(const CTL_TwainDLLHandle* pHandle, LPCSTR pFunc)
 {
     if (!(CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_DTWAINERRORS) )
         return;
-    static constexpr int MaxMessage=1024;
+    static constexpr int MaxMessage = DTWAIN_USERRES_MAXSIZE;
     char szBuf[MaxMessage+1];
     if ( !pHandle )
         DTWAIN_GetErrorStringA( DTWAIN_ERR_BAD_HANDLE, szBuf,MaxMessage);
