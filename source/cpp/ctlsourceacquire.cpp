@@ -539,17 +539,6 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
                     DTWAIN_SetCompressionType(Source, Compression, TRUE);
             }
 
-            // Tiles not supported yet, so let user know this
-            if (lMode == DTWAIN_USEBUFFERED)
-            {
-                DTWAINScopedLogControllerExclude sLogger(DTWAIN_LOG_ERRORMSGBOX);
-                if (DTWAIN_IsCapSupported(Source, DTWAIN_CV_ICAPTILES))
-                {
-                    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return TileModeOn(Source); },
-                        DTWAIN_ERR_TILES_NOT_SUPPORTED, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
-                }
-            }
-
             pSource->SetSpecialTransferMode(lMode);
 
             // Determine the naming convention

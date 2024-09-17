@@ -241,7 +241,8 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_bDoublePageCountOnDuplex(true),
     m_bExtendedCapsRetrieved(false),
     m_tbIsFileSystemSupported(boost::logic::indeterminate),
-    m_pDLLHandle(pHandle)
+    m_pDLLHandle(pHandle),
+    m_bTileMode(false)
  {
     if ( lpszProduct )
         m_SourceId.set_product_name(StringConversion::Convert_NativePtr_To_Ansi(lpszProduct));
