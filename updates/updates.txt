@@ -3,9 +3,7 @@ DTWAIN Version changes
 5.5.2
 
 - Support for acquiring buffered images using tiled data (DTWAIN_SetBufferedTileMode()).  
-  Please note that to use this feature the application is required to declare a user-defined memory buffer 
-  (see API DTWAIN_SetAcquireStripBuffer()).  Also, the device must support the ICAP_TILES capability for
-  tiled data to be sent.
+  The device must support the ICAP_TILES capability for tiled data to be sent.
 
 - Fix issue with custom resource files being loaded into memory using DTWAIN_LoadCustomStringResources()
 
