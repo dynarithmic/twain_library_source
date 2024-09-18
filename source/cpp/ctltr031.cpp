@@ -60,21 +60,6 @@ CTL_ImageMemXferTriplet::CTL_ImageMemXferTriplet(CTL_ITwainSession *pSession,
     m_nCompression = nCompression;
 
     InitXferBuffer();
-
-    m_ImageMemXferBuffer.Compression = TWON_DONTCARE16;
-    m_ImageMemXferBuffer.BytesPerRow =
-    m_ImageMemXferBuffer.Columns =
-    m_ImageMemXferBuffer.Rows =
-    m_ImageMemXferBuffer.XOffset =
-    m_ImageMemXferBuffer.YOffset =
-    m_ImageMemXferBuffer.BytesWritten = TWON_DONTCARE32;
-
-    if ( nCompression != TWCP_NONE )
-    {
-        m_ImageMemXferBuffer.Compression = nCompression;
-        m_ImageMemXferBuffer.BytesPerRow = 0;
-    }
-
     InitVars( DAT_IMAGEMEMXFER, CTL_GetTypeGET, &m_ImageMemXferBuffer );
 
     m_DibStrip = hDib;
@@ -122,6 +107,13 @@ void CTL_ImageMemXferTriplet::InitXferBuffer()
     m_ImageMemXferBuffer.YOffset =
     m_ImageMemXferBuffer.BytesWritten = TWON_DONTCARE32;
 
+	if (GetSourcePtr()->IsTileModeOn())
+	{
+		m_ImageMemXferBuffer.Memory.Flags = TWMF_DSOWNS;
+		m_ImageMemXferBuffer.Memory.Length = TWON_DONTCARE32;
+		m_ImageMemXferBuffer.Memory.TheMem = NULL;
+	}
+
     if ( m_nCompression != TWCP_NONE )
     {
         m_ImageMemXferBuffer.Compression = m_nCompression;
@@ -160,13 +152,28 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
         switch (rc)
         {
             case TWRC_SUCCESS:
-                // Send message that a strip has been transferred successfully
+                // Send message that a strip or tile has been transferred successfully
+				pSource->GetBufferedXFerInfo() = m_ImageMemXferBuffer;
+                if (pSource->IsTileModeOn())
+                {
+                    // The application is informed that a tile has been transferred.  The application is responsible for
+                    // calling DTWAIN_GetBufferedTransferInfo() to retrieve all of the tiled transfer information and
+                    // handle the information
+                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_TRANSFERTILEDONE, reinterpret_cast<LPARAM>(pSource));
+                    // Deallocate the buffer
+					pSession->GetTwainDLLHandle()->m_TwainMemoryFunc->UnlockMemory(m_ImageMemXferBuffer.Memory.TheMem);
+					pSession->GetTwainDLLHandle()->m_TwainMemoryFunc->FreeMemory(m_ImageMemXferBuffer.Memory.TheMem);
+                    InitXferBuffer();
+                    break;
+                }
+
+                else
                 CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_TRANSFERSTRIPREADY, reinterpret_cast<LPARAM>(pSource));
                 if ( m_nCompression == TWCP_NONE )
                 {
                     m_nCompressPos += m_ImageMemXferBuffer.BytesWritten;
                     // If not user defined copy DIB data here
-                    if ( !pSource->GetUserStripBuffer())
+                    if ( !pSource->GetUserStripBuffer() && !pSource->IsTileModeOn())
                         m_ptrDib += m_ImageMemXferBuffer.BytesWritten;
 
                     m_ImageMemXferBuffer.Memory.TheMem = m_ptrDib;
@@ -178,6 +185,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                       */
                 {
                     {
+
                         // Need to Reallocate the pointer and copy strip to correct position
                         const HANDLE hUserBuffer = pSource->GetUserStripBuffer();
                         if ( !hUserBuffer )
@@ -224,6 +232,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
 
             case TWRC_CANCEL:
             {
+                if ( !pSource->IsTileModeOn() )
                 ImageMemoryHandler::GlobalUnlock(m_DibStrip);
                 CancelAcquisition();
             }
@@ -231,6 +240,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
 
             case TWRC_FAILURE:
             {
+				if (!pSource->IsTileModeOn())
                 ImageMemoryHandler::GlobalUnlock(m_DibStrip);
                 FailAcquisition();
                 return rc;
@@ -293,10 +303,20 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
 
                 const bool bExecuteEOJPageHandling = bEndOfJobDetected && pSource->IsJobFileHandlingOn();
 
-                // Get the image page
                 bool bInClip = false;
 
-
+                // Don't do anything, since the application is responsible to get the tiled
+                // data.
+				pSource->GetBufferedXFerInfo() = m_ImageMemXferBuffer;
+                if (pSource->IsTileModeOn())
+                {
+					pSession->GetTwainDLLHandle()->m_TwainMemoryFunc->UnlockMemory(m_ImageMemXferBuffer.Memory.TheMem);
+					pSession->GetTwainDLLHandle()->m_TwainMemoryFunc->FreeMemory(m_ImageMemXferBuffer.Memory.TheMem);
+                    pSource->SetTransferDone(true);
+                }
+                else
+                // we do strip processing to clean up
+                {
                 // Let Source set the handle
                 m_nCompressPos += m_ImageMemXferBuffer.BytesWritten;
                 pSource->SetNumCompressBytes(m_nCompressPos);
@@ -484,6 +504,8 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                         }
                     }
                 }
+                }
+
                 pSource->SetTransferDone(true);
                 if ( bInClip )
                     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,
@@ -496,7 +518,6 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                                                          nullptr, DTWAIN_TN_INVALIDIMAGEFORMAT,
                                                          reinterpret_cast<LPARAM>(pSource));
                 }
-
             }
             break;
             default:

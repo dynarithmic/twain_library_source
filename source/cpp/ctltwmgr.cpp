@@ -1221,7 +1221,13 @@ int  CTL_TwainAppMgr::BufferTransfer( CTL_ITwainSession *pSession,
     // hGlobAcquire is a handle to a DIB that will be used as the bitmap to display
     // Set up the transfer triplet
     // Get the default transfer strip
-    CTL_ImageMemXferTriplet IXfer(pSession, pSource, hGlobAcquire, TWMF_APPOWNS | TWMF_POINTER,
+    LONG nFlags = TWMF_APPOWNS | TWMF_POINTER;
+
+    // For tiled mode, the Source owns the memory
+    if (pSource->IsTileModeOn())
+        nFlags = TWMF_DSOWNS;
+
+    CTL_ImageMemXferTriplet IXfer(pSession, pSource, hGlobAcquire, nFlags,
                                   pInfo->PixelType, nSizeStrip, static_cast<TW_UINT16>(pSource->GetCompressionType()));
     return  StartTransfer( pSession, pSource, &IXfer );
 }

@@ -516,6 +516,10 @@
 /* Sent if document feeder has no paper loaded */
 #define DTWAIN_TN_FEEDERNOTLOADED           1200
 
+/* Sent when tiled data has been sent */
+#define DTWAIN_TN_TRANSFERTILEREADY         1300
+#define DTWAIN_TN_TRANSFERTILEDONE          1301
+
 /* PDF OCR clean text flags */
 #define DTWAIN_PDFOCR_CLEANTEXT1            1
 #define DTWAIN_PDFOCR_CLEANTEXT2            2

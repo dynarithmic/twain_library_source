@@ -1048,3 +1048,4 @@ DTWAIN_LoadCustomStringResourcesEx                @31043
 DTWAIN_SetBufferedTileMode                        @31044     
 DTWAIN_IsBufferedTileModeOn                       @31045	 
 DTWAIN_IsBufferedTileModeSupported                @31046 
+DTWAIN_GetBufferedTransferInfo                    @31047

@@ -235,6 +235,9 @@ DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_SetBufferedTileMode(DTWAIN_SOURCE Source
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_IsBufferedTileModeOn(DTWAIN_SOURCE Source);
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_IsBufferedTileModeSupported(DTWAIN_SOURCE Source);
 
+/* Use when a buffered transfer has sent a tile or strip */
+HANDLE         DLLENTRY_DEF      DTWAIN_GetBufferedTransferInfo(DTWAIN_SOURCE Source, LPDWORD Compression, LPDWORD BytesPerRow, LPDWORD Columns, LPDWORD Rows, LPDWORD XOffset, LPDWORD YOffset, LPDWORD Flags, LPDWORD BytesWritten, LPDWORD MemoryLength);
+
 /* Getting acquired images after successful acquisition */
 LONG           DLLENTRY_DEF      DTWAIN_GetNumAcquisitions( DTWAIN_ARRAY aAcq);
 LONG           DLLENTRY_DEF      DTWAIN_GetNumAcquiredImages( DTWAIN_ARRAY aAcq, LONG nWhich );

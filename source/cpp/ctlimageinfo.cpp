@@ -121,3 +121,31 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfo(DTWAIN_SOURCE Source,
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
+
+
+HANDLE DLLENTRY_DEF DTWAIN_GetBufferedTransferInfo(DTWAIN_SOURCE Source, 
+                                                   LPDWORD Compression, 
+                                                   LPDWORD BytesPerRow, 
+                                                   LPDWORD Columns, 
+                                                   LPDWORD Rows, 
+                                                   LPDWORD XOffset, 
+                                                   LPDWORD YOffset,
+                                                   LPDWORD Flags, 
+                                                   LPDWORD BytesWritten,
+                                                   LPDWORD MemoryLength)
+{
+	LOG_FUNC_ENTRY_PARAMS((Source, Compression, BytesPerRow, Columns, Rows, XOffset, YOffset, Flags, BytesWritten, MemoryLength))
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    auto& memxferInfo = pSource->GetBufferedXFerInfo();
+    std::array<LPDWORD, 9> userVals = { Compression, BytesPerRow, Columns, Rows, XOffset, YOffset, Flags, BytesWritten, MemoryLength };
+    std::array<TW_UINT32, 9> xferVals = { memxferInfo.Compression, memxferInfo.BytesPerRow, memxferInfo.Columns, memxferInfo.Rows,
+                                          memxferInfo.XOffset, memxferInfo.YOffset, memxferInfo.BytesWritten, memxferInfo.Memory.Flags, 
+                                          memxferInfo.Memory.Length };
+    for (size_t i = 0; i < userVals.size(); ++i)
+    {
+        if (userVals[i])
+            *(userVals[i]) = xferVals[i];
+    }
+    LOG_FUNC_EXIT_NONAME_PARAMS(memxferInfo.Memory.TheMem);
+    CATCH_BLOCK_LOG_PARAMS((HANDLE)0)
+}
