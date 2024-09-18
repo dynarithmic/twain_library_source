@@ -516,6 +516,10 @@
 /* Sent if document feeder has no paper loaded */
 #define DTWAIN_TN_FEEDERNOTLOADED           1200
 
+/* Sent when tiled data has been sent */
+#define DTWAIN_TN_TRANSFERTILEREADY         1300
+#define DTWAIN_TN_TRANSFERTILEDONE          1301
+
 /* PDF OCR clean text flags */
 #define DTWAIN_PDFOCR_CLEANTEXT1            1
 #define DTWAIN_PDFOCR_CLEANTEXT2            2
@@ -852,8 +856,10 @@
 #define DTWAIN_ERR_AREA_ARRAY_TOO_SMALL  (-1056)
 #define DTWAIN_ERR_LOG_CREATE_ERROR  (-1057)
 #define DTWAIN_ERR_FILESYSTEM_NOT_SUPPORTED (-1058)
+#define DTWAIN_ERR_TILEMODE_NOTSET (-1059)
+#define DTWAIN_ERR_TILEMODE_USERBUFFER (-1060)
 
-#define DTWAIN_ERR_LAST_1       DTWAIN_ERR_FILESYSTEM_NOT_SUPPORTED
+#define DTWAIN_ERR_LAST_1       DTWAIN_ERR_TILEMODE_ERROR
 
 #define TWAIN_ERR_LOW_MEMORY        (-1100)
 #define TWAIN_ERR_FALSE_ALARM       (-1101)
