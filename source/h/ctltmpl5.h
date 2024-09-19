@@ -133,7 +133,7 @@ namespace dynarithmic
 
             for ( size_t i = 0; i < nValues; i++ )
             {
-                T Value;
+                T Value = {};
                 if ( !bUseStrings )
                 {
                     memset(&Value,0,sizeof(T));
@@ -375,7 +375,7 @@ namespace dynarithmic
             const CTL_CapInfo* Info = GetCapInfo(pHandle, p, nCap);
             if ( !Info )
                 return false;
-            UINT nAll[3];
+            UINT nAll[3] = {};
             UINT nContainer = std::get<1>(*Info);
 
             size_t nMaxNum;
@@ -429,7 +429,6 @@ namespace dynarithmic
                 return false;
 
             // Populate the array
-            const size_t nSize = Array.size();
             auto&  pVector = pHandle->m_ArrayFactory->underlying_container_t<AssignType>(pArray);
             pVector.clear();
             std::copy(Array.begin(), Array.end(), std::back_inserter(pVector));
@@ -542,7 +541,7 @@ namespace dynarithmic
         const CTL_CapInfo* Info = GetCapInfo(pHandle, p, static_cast<TW_UINT16>(nCap));
         if ( !Info )
             return false;
-        UINT nAll[3];
+        UINT nAll[3] = {};
         UINT nContainer = std::get<1>(*Info);
 
         int nMaxNum;
@@ -612,7 +611,7 @@ namespace dynarithmic
         // Create array of the twain type
         DTWAIN_ARRAY pDTWAINArray = pArray;
         std::vector<TwainType> Array;
-        NativeType dValue;
+        NativeType dValue = {};
         const size_t nValues = pHandle->m_ArrayFactory->size(pDTWAINArray);
         int i;
 
@@ -627,7 +626,7 @@ namespace dynarithmic
         const CTL_CapInfo* Info = GetCapInfo(pHandle, p, static_cast<TW_UINT16>(nCap));
         if ( !Info )
             return false;
-        UINT nAll[3];
+        UINT nAll[3] = {};
         UINT nContainer = std::get<1>(*Info);
 
         int nMaxNum;

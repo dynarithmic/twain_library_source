@@ -33,11 +33,12 @@
 namespace dynarithmic
 {
     class CTL_TwainDLLHandle;
-    struct FileLoggingTraits
+    struct LoggingTraits
     {
         CTL_StringType m_filename;
-        bool m_bAppend;
-        bool m_bCreateDirectory;
+        bool m_bAppend = false;
+        bool m_bCreateDirectory = false;
+        bool m_bSetConsoleHandler = false;
     };
 
     class CBaseLogger
@@ -58,6 +59,8 @@ namespace dynarithmic
     {
         public:
             void trace(const std::string& msg) override;
+            static BOOL WINAPI ConsoleCtrlHandler(DWORD dwCtrlType);
+            StdCout_Logger(const LoggingTraits& lTraits);
             ~StdCout_Logger();
     };
 
@@ -73,7 +76,7 @@ namespace dynarithmic
         std::ofstream m_ostr;
         bool m_bFileCreated = false;
         public:
-            File_Logger(const LPCSTR filename, const FileLoggingTraits& fTraits);
+            File_Logger(const LPCSTR filename, const LoggingTraits& fTraits);
             ~File_Logger();
             bool IsFileCreated() const { return m_bFileCreated; }
             void trace(const std::string& msg) override;
@@ -98,8 +101,8 @@ namespace dynarithmic
        ~CLogSystem() = default;
 
        /////////////////////////////////////////////////////////////////////////////
-       bool     InitFileLogging(LPCTSTR pOutputFilename, HINSTANCE hInst, const FileLoggingTraits& fTraits);
-       bool     InitConsoleLogging(HINSTANCE hInst); // adds console.
+       bool     InitFileLogging(LPCTSTR pOutputFilename, HINSTANCE hInst, const LoggingTraits& fTraits);
+       bool     InitConsoleLogging(HINSTANCE hInst, const LoggingTraits& lTraits); // adds console.
        bool     InitDebugWindowLogging(HINSTANCE hInst); // adds win debug logging.
        bool     InitCallbackLogging(HINSTANCE hInst);
 
@@ -158,7 +161,7 @@ namespace dynarithmic
        bool WriteOnDemand(const std::string& fmt);
 
        private:
-           bool InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE hInst, const FileLoggingTraits& fTraits = {});
+           bool InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE hInst, const LoggingTraits& fTraits = {});
            static std::mutex s_logMutex;
     };
 }

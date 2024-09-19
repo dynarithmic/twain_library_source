@@ -330,7 +330,7 @@ namespace dynarithmic
         int          GetCurrentRetryCount() const { return m_nCurRetryCount;    }
         bool         SkipImageInfoErrors() const { return m_bSkipImageInfoErrors; }
         void         SetImageInfoErrors(bool bSet=true) { m_bSkipImageInfoErrors = bSet; }
-        void         SetImageInfo(TW_IMAGEINFO* pInfo) { memcpy(&m_ImageInfo, pInfo, sizeof(TW_IMAGEINFO)); }
+        void         SetImageInfo(const TW_IMAGEINFO* pInfo) { memcpy(&m_ImageInfo, pInfo, sizeof(TW_IMAGEINFO)); }
         void         GetImageInfo(TW_IMAGEINFO* pInfo) const { memcpy(pInfo, &m_ImageInfo, sizeof(TW_IMAGEINFO)); }
         void         SetImageLayout(const FloatRect* pInfo) { memcpy(&m_ImageLayout, pInfo, sizeof(FloatRect)); }
         void         GetImageLayout(FloatRect* pInfo) const { memcpy(pInfo, &m_ImageLayout, sizeof(FloatRect)); }
@@ -406,6 +406,8 @@ namespace dynarithmic
         bool         IsMultiPageModeContinuous() const { return !IsMultiPageModeDefaultMode() &&
                                                                 !IsMultiPageModeSaveAtEnd(); }
         bool         IsMultiPageModeSaveAtEnd() const { return m_nMultiPageScanMode == DTWAIN_FILESAVE_ENDACQUIRE; }
+        void         SetTileMode(bool bSet) { m_bTileMode = bSet; }
+        bool         IsTileModeOn() const { return m_bTileMode; }
 
         void         AddDuplexFileData(CTL_StringType fName, uint64_t nBytes, int nWhich,
                                        CTL_StringType RealName = {}, bool bIsJobControl=false);
@@ -458,6 +460,7 @@ namespace dynarithmic
         CapList&     GetCustomCapCache() { return m_aSupportedCustomCapCache; }
         boost::logic::tribool IsFileSystemSupported() const { return m_tbIsFileSystemSupported; }
         void         SetFileSystemSupported(bool bSet) { m_tbIsFileSystemSupported = bSet; }
+        TW_IMAGEMEMXFER& GetBufferedXFerInfo() { return m_BufferedXFerInfo; }
 
         // Only public member
         void *      m_pUserPtr;
@@ -582,10 +585,12 @@ namespace dynarithmic
         bool            m_bSkipImageInfoErrors;
         bool            m_bDoublePageCountOnDuplex;
         LONG            m_nForcedBpp;
+        bool            m_bTileMode;
         std::vector<int> m_aTransferMechanisms;
         bool            m_bExtendedCapsRetrieved;
         boost::logic::tribool m_tbIsFileSystemSupported;
         CTL_TwainDLLHandle* m_pDLLHandle;
+        TW_IMAGEMEMXFER m_BufferedXFerInfo;
 
         struct tagCapCachInfo {
             TW_UINT16 nCap;

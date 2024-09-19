@@ -36,12 +36,6 @@ static std::string NormalizeCapName(const std::string& sName);
 
 bool SaveCapInfoToIni(const std::string& strSourceName, UINT nCap, const CTL_IntArray& rContainerTypes)
 {
-    #ifdef WIN32
-    const char *szName = "dtwain32.ini";
-    #else
-    const char *szName = "dtwain64.ini";
-    #endif
-
     // Saves the capability information to the DTWAIN16/32.INI
     std::string strKeyName;
     StringStreamOutA strm;
@@ -70,9 +64,10 @@ bool SaveCapInfoToIni(const std::string& strSourceName, UINT nCap, const CTL_Int
     }
 
     // Get the section name
-    CSimpleIniA customProfile;
-    customProfile.LoadFile(szName);
-    customProfile.SetValue("TwainControl", strKeyName.c_str(), strValues.c_str());
+    auto *customProfile = CTL_StaticData::GetINIInterface();
+    if (!customProfile)
+        return false;
+    customProfile->SetValue("TwainControl", strKeyName.c_str(), strValues.c_str());
     return true;
 }
 
@@ -120,15 +115,7 @@ bool dynarithmic::GetCapInfoFromIni(const std::string& strCapName,
                     };
     static constexpr unsigned DataTypeArraySize = std::size(DataTypeArray);
 
-    #ifdef WIN32
-    CTL_StringType szName = _T("dtwain32.ini");
-    #else
-    CTL_StringType szName = _T("dtwain64.ini");
-    #endif
-
     bContainerInfoFound = false;
-
-    szName = CTL_StaticData::s_sINIPath + szName;
 
     // Initialize State Info to indicate states 4 - 7 are negotiable for capability
     rStateInfo = 0xFF;
@@ -142,21 +129,21 @@ bool dynarithmic::GetCapInfoFromIni(const std::string& strCapName,
 
     // Check if there are any entries for the Source
     // Get the section name
-    CSimpleIniA customProfile;
-    auto sName = StringConversion::Convert_Native_To_Ansi(szName);
-    customProfile.LoadFile(sName.c_str());
+    auto *customProfile = CTL_StaticData::GetINIInterface();
+    if (!customProfile)
+        return false;
 
     // Check if MSG_QUERYSUPPORT is actually supported
     // First get a global setting
-    rQuerySupport = customProfile.GetLongValue("AllSources", "QUERYSUPPORT", 1);
+    rQuerySupport = customProfile->GetLongValue("AllSources", "QUERYSUPPORT", 1);
 
     // Now check the job control detector value
-    rEOJValue     = customProfile.GetLongValue("AllSources", "EOJVALUE", 1);
+    rEOJValue     = customProfile->GetLongValue("AllSources", "EOJVALUE", 1);
 
     rEntryFound = 1;
 
     CSimpleIniA::TNamesDepend keys;
-    customProfile.GetAllKeys(strKeyName.c_str(), keys);
+    customProfile->GetAllKeys(strKeyName.c_str(), keys);
 
     if ( keys.empty() )
     {
@@ -166,7 +153,7 @@ bool dynarithmic::GetCapInfoFromIni(const std::string& strCapName,
 
     std::string strNormalizedCapName = NormalizeCapName(strCapName);
 
-    szBuffer =  customProfile.GetValue(strKeyName.c_str(), strNormalizedCapName.c_str(), " ");
+    szBuffer =  customProfile->GetValue(strKeyName.c_str(), strNormalizedCapName.c_str(), " ");
     bool bFound = true;
     if ( szBuffer.empty() )
     {
@@ -190,16 +177,16 @@ bool dynarithmic::GetCapInfoFromIni(const std::string& strCapName,
     }
     // Now see if there is the Source has a QUERYSUPPORT setting.  If not, the default setting found
     // above will be used
-    rQuerySupport = customProfile.GetLongValue(strKeyName.c_str(), "QUERYSUPPORT", rQuerySupport);
+    rQuerySupport = customProfile->GetLongValue(strKeyName.c_str(), "QUERYSUPPORT", rQuerySupport);
 
     // Now see if there is the Source has a QUERYSUPPORT setting.  If not, the default setting found
     // above will be used
-    rEOJValue = customProfile.GetLongValue(strKeyName.c_str(), "EOJVALUE", rEOJValue);
+    rEOJValue = customProfile->GetLongValue(strKeyName.c_str(), "EOJVALUE", rEOJValue);
 
     // Check the data type
     std::string strDataType = strNormalizedCapName + "_DATATYPE";
     std::string szDataType;
-    szDataType = customProfile.GetValue(strKeyName.c_str(), strDataType.c_str(), "");
+    szDataType = customProfile->GetValue(strKeyName.c_str(), strDataType.c_str(), "");
 
     // Trim the name found
     strDataType = StringWrapperA::TrimAll(strDataType);
@@ -216,7 +203,7 @@ bool dynarithmic::GetCapInfoFromIni(const std::string& strCapName,
     // Check if there is any state-related info
     std::string szStates;
     strStates = strCapName + "_STATES";
-    szStates = customProfile.GetValue(strKeyName.c_str(), strStates.c_str(), "");
+    szStates = customProfile->GetValue(strKeyName.c_str(), strStates.c_str(), "");
 
     if ( !bFound && szStates.empty() )
         return false;

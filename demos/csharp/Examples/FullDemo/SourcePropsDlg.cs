@@ -32,8 +32,9 @@ namespace TWAINDemo
         private void SourcePropsDlg_Load(object sender, EventArgs e)
         {
             StringBuilder szInfo = new StringBuilder(256);
-            TwainAPI.DTWAIN_GetSourceProductName(m_Source, szInfo, 255);
-            this.edProductName.Text = szInfo.ToString();
+            StringBuilder szNameInfo = new StringBuilder(256);
+            TwainAPI.DTWAIN_GetSourceProductName(m_Source, szNameInfo, 255);
+            this.edProductName.Text = szNameInfo.ToString();
             TwainAPI.DTWAIN_GetSourceProductFamily(m_Source, szInfo, 255);
             this.edFamilyName.Text = szInfo.ToString();
             TwainAPI.DTWAIN_GetSourceManufacturer(m_Source, szInfo, 255);
@@ -72,6 +73,13 @@ namespace TWAINDemo
             byte [] szCustomData = new byte[customDSLength];
             TwainAPI.DTWAIN_GetCustomDSData(m_Source, szCustomData, customDSLength, ref customDSLength, TwainAPI.DTWAINGCD_COPYDATA);
             this.txtDSData.Text = enc8.GetString(szCustomData, 0, customDSLength);
+
+            string sName = szNameInfo.ToString();
+            int nBytes = TwainAPI.DTWAIN_GetSourceDetails(sName, IntPtr.Zero, 0, 2, 1);
+            szInfo = new StringBuilder(nBytes);
+            TwainAPI.DTWAIN_GetSourceDetails(sName, szInfo, nBytes, 2, 1);
+            szInfo.Replace("\n", "\r\n");
+            this.txtJSON.Text = szInfo.ToString();
         }
     }
 }

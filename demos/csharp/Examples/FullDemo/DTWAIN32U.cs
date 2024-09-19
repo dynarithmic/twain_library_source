@@ -488,6 +488,8 @@ namespace Dynarithmic
         public const  int DTWAIN_TN_PROCESSEDAUDIOFILE = 1182;
         public const  int DTWAIN_TN_TWAINTRIPLETBEGIN = 1183;
         public const  int DTWAIN_TN_TWAINTRIPLETEND = 1184;
+        public const  int DTWAIN_TN_TRANSFERTILEREADY = 1300;
+        public const  int DTWAIN_TN_TRANSFERTILEDONE = 1301;
         public const  int DTWAIN_PDFOCR_CLEANTEXT1 = 1;
         public const  int DTWAIN_PDFOCR_CLEANTEXT2 = 2;
         public const  int DTWAIN_MODAL = 0;
@@ -800,8 +802,7 @@ namespace Dynarithmic
         public const int DTWAIN_ERR_AREA_ARRAY_TOO_SMALL = (-1056);
         public const int DTWAIN_ERR_LOG_CREATE_ERROR  = (-1057);
         public const int DTWAIN_ERR_FILESYSTEM_NOT_SUPPORTED = (-1058);
-
-        public const  int DTWAIN_ERR_LAST_1 = DTWAIN_ERR_DEMO_NOFILETYPE;
+        public const int DTWAIN_ERR_TILEMODE_NOTSET = (-1059);
         public const  int TWAIN_ERR_LOW_MEMORY = (-1100);
         public const  int TWAIN_ERR_FALSE_ALARM = (-1101);
         public const  int TWAIN_ERR_BUMMER = (-1102);
@@ -1080,6 +1081,8 @@ namespace Dynarithmic
         public const int DTWAIN_LOG_DEBUGMONITOR = 0x1000000 ;
         public const int DTWAIN_LOG_USEWINDOW = 0x2000000    ;
         public const int DTWAIN_LOG_CREATEDIRECTORY = 0x04000000;
+        public const int DTWAIN_LOG_CONSOLEWITHHANDLER = (0x08000000 | DTWAIN_LOG_CONSOLE);
+
         public const int DTWAIN_LOG_ALL = (DTWAIN_LOG_DECODE_SOURCE | DTWAIN_LOG_DECODE_DEST | DTWAIN_LOG_DECODE_TWEVENT
                         | DTWAIN_LOG_DECODE_TWMEMREF | DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG | DTWAIN_LOG_INITFAILURE
                         | DTWAIN_LOG_LOWLEVELTWAIN | DTWAIN_LOG_NOTIFICATIONS | DTWAIN_LOG_MISCELLANEOUS | DTWAIN_LOG_DTWAINERRORS
@@ -5651,6 +5654,18 @@ namespace Dynarithmic
         ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_GetVersionCopyright([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szBuf, int nSize);
 
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi,
+                ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_GetVersionCopyrightA(System.IntPtr szBuf, int nSize);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_GetVersionCopyrightW(System.IntPtr szBuf, int nSize);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_GetVersionCopyright(System.IntPtr szBuf, int nSize);
+
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
         ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_IsSourceValid(DTWAIN_SOURCE source);
@@ -5765,15 +5780,30 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi,
         ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern  int DTWAIN_LoadCustomStringResourcesExA([MarshalAs(UnmanagedType.LPStr)] string sLangDLL, int clearExisting);
+        public static extern int DTWAIN_LoadCustomStringResourcesExA([MarshalAs(UnmanagedType.LPStr)] string sLangDLL, int clearExisting);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode,
         ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern  int DTWAIN_LoadCustomStringResourcesExW([MarshalAs(UnmanagedType.LPWStr)] string sLangDLL, int clearExisting);
+        public static extern int DTWAIN_LoadCustomStringResourcesExW([MarshalAs(UnmanagedType.LPWStr)] string sLangDLL, int clearExisting);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
         ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern  int DTWAIN_LoadCustomStringResourcesEx([MarshalAs(UnmanagedType.LPTStr)] string sLangDLL, int clearExisting);
+        public static extern int DTWAIN_LoadCustomStringResourcesEx([MarshalAs(UnmanagedType.LPTStr)] string sLangDLL, int clearExisting);
 
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern DTWAIN_HANDLE DTWAIN_GetBufferedTransferInfo(DTWAIN_SOURCE Source, ref uint Compression, ref uint BytesPerRow, ref uint Columns, ref uint XOffset, ref uint YOffset, ref uint Flags, ref uint BytesWritten, ref uint MemoryLength);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_SetBufferedTileMode(DTWAIN_SOURCE Source, int nSet);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_IsBufferedTileModeOn(DTWAIN_SOURCE Source);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_IsBufferedTileModeSupported(DTWAIN_SOURCE Source);
     }
 }

@@ -63,16 +63,60 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireBuffered(DTWAIN_SOURCE Source, LONG Pixe
     CATCH_BLOCK_LOG_PARAMS(DTWAIN_ARRAY(0))
 }
 
+static int CheckTiledBufferedSupport(CTL_ITwainSource* pSource)
+{
+    if (!CTL_TwainAppMgr::IsSourceOpen(pSource))
+        return DTWAIN_ERR_SOURCE_NOT_OPEN;
+    if (!pSource->IsCapInSupportedList(ICAP_TILES))
+        return DTWAIN_ERR_TILES_NOT_SUPPORTED;
+    return DTWAIN_NO_ERROR;
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBufferedTileMode(DTWAIN_SOURCE Source, DTWAIN_BOOL bTileMode)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, bTileMode))
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    auto bRet = CheckTiledBufferedSupport(pSource);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return bRet != DTWAIN_NO_ERROR; }, bRet, false, FUNC_MACRO);
+    pSource->SetTileMode(bTileMode);
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsBufferedTileModeOn(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    LOG_FUNC_EXIT_NONAME_PARAMS(pSource->IsTileModeOn())
+    CATCH_BLOCK_LOG_PARAMS(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsBufferedTileModeSupported(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    auto bRet = CheckTiledBufferedSupport(pSource);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return bRet != DTWAIN_NO_ERROR; }, bRet, false, FUNC_MACRO);
+    LOG_FUNC_EXIT_NONAME_PARAMS(true);
+    CATCH_BLOCK_LOG_PARAMS(false)
+}
+
 DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireBuffered(SourceAcquireOptions& opts)
 {
     LOG_FUNC_ENTRY_PARAMS((opts))
-    // Check if TILES are on.  If so, TILES are not currently supported.
     const DTWAIN_SOURCE Source = opts.getSource();
     auto pSource = static_cast<CTL_ITwainSource*>(Source);
     const auto pHandle = pSource->GetDTWAINHandle();
 
-    if (DTWAIN_IsCapSupported(Source, DTWAIN_CV_ICAPTILES))
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return TileModeOn(Source); }, DTWAIN_ERR_TILES_NOT_SUPPORTED, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
+    if (pSource->IsTileModeOn())
+    {
+        // Set the ICAP_TILES capability on here
+        DTWAIN_ARRAY arr = dynarithmic::CreateArrayFromCap(pHandle, pSource, ICAP_TILES, 1);
+        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
+        vValues[0] = 1;
+        bool bTilesSet = DTWAIN_SetCapValues(Source, ICAP_TILES, DTWAIN_CAPSET, arr);
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !bTilesSet; }, DTWAIN_ERR_TILEMODE_NOTSET, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
+    }
 
     LONG compressionType;
 

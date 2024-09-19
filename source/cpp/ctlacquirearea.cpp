@@ -119,7 +119,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2(DTWAIN_SOURCE Source, DTWAIN_FLO
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2String(DTWAIN_SOURCE Source, LPTSTR left, LPTSTR top, LPTSTR right, LPTSTR bottom, LPLONG Unit)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit))
-    std::array<DTWAIN_FLOAT, 4> val;
+    std::array<DTWAIN_FLOAT, 4> val = {};
     std::array<LPTSTR*, 4> pStr = { &left, &top, &right, &bottom };
     const DTWAIN_BOOL bRet = DTWAIN_GetAcquireArea2(Source, &val[0], &val[1], &val[2], &val[3], Unit);
     if (bRet)

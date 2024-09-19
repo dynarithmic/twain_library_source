@@ -171,7 +171,7 @@ namespace dynarithmic
             return f.widen(src, src + len, dest);
         }
 
-        static const char_type CharToThisType(char ch)
+        static constexpr char_type CharToThisType(char ch)
         {
             return ch;
         }
@@ -551,7 +551,7 @@ namespace dynarithmic
 
         static StringType& TrimRight(StringType &str, CharType ch= StringTraits::GetSpace() )
         {
-            CharType sz[2];
+            CharType sz[2] = {};
             sz[0]=ch; sz[1] = 0;
             return TrimRight(str, sz);
         }
@@ -567,7 +567,7 @@ namespace dynarithmic
 
         static StringType& TrimLeft(StringType& str, CharType ch= StringTraits::GetSpace() )
         {
-            CharType sz[2];
+            CharType sz[2] = {};
             sz[0]=ch; sz[1] = 0;
             return TrimLeft(str, sz);
         }
@@ -767,7 +767,7 @@ namespace dynarithmic
 
         static StringType GetWindowsDirectory()
         {
-            CharType buffer[_MAX_PATH];
+            CharType buffer[_MAX_PATH] = {};
             const UINT retValue = StringTraits::GetWindowsDirectoryImpl(buffer);
             if ( retValue != 0 )
                 return buffer;
@@ -776,7 +776,7 @@ namespace dynarithmic
 
         static StringType GetSystemDirectory()
         {
-            CharType buffer[_MAX_PATH];
+            CharType buffer[_MAX_PATH] = {};
             const UINT retValue = StringTraits::GetSystemDirectoryImpl(buffer);
             if ( retValue != 0 )
                 return buffer;
@@ -926,7 +926,7 @@ namespace dynarithmic
 
         static typename StringTraits::string_type CreateFileNameFromNumber(typename StringTraits::string_type sFileName, int num, int nDigits)
         {
-            typename StringTraits::stringarray_type rArray;
+            typename StringTraits::stringarray_type rArray = {};
             SplitPath(sFileName, rArray);
 
             // Adjust the file name
@@ -940,7 +940,7 @@ namespace dynarithmic
 
         static int GetInitialFileNumber(typename StringTraits::string_type sFileName, size_t &nDigits)
         {
-            typename StringTraits::stringarray_type rArray;
+            typename StringTraits::stringarray_type rArray = {};
             SplitPath(sFileName, rArray);
             nDigits = 0;
             typename StringTraits::string_type sTemp;
@@ -982,7 +982,7 @@ namespace dynarithmic
             strFormat = strm.str();
             const int nLenFormat = static_cast<int>(strFormat.length());
 
-            typename StringTraits::stringarray_type rName;
+            typename StringTraits::stringarray_type rName = {};
             SplitPath(strBase, rName);
 
             auto strName = rName[NAME_POS];
