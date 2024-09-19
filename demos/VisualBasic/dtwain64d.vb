@@ -436,6 +436,8 @@ Class DTWAINAPI
     Public Const DTWAIN_TN_PROCESSEDAUDIOFILE As Integer = 1182
     Public Const DTWAIN_TN_TWAINTRIPLETBEGIN As Integer = 1183
     Public Const DTWAIN_TN_TWAINTRIPLETEND As Integer = 1184
+    Public Const DTWAIN_TN_TRANSFERTILEREADY As Integer = 1300
+    Public Const DTWAIN_TN_TRANSFERTILEDONE As Integer = 1301
     Public Const DTWAIN_PDFOCR_CLEANTEXT1 As Integer = 1
     Public Const DTWAIN_PDFOCR_CLEANTEXT2 As Integer = 2
     Public Const DTWAIN_MODAL As Integer = 0
@@ -2677,4 +2679,9 @@ Class DTWAINAPI
 
     Declare Auto Function DTWAIN_TestGetCap Lib "dtwain64d.dll" (ByVal Source As System.IntPtr, ByVal lCapability As Integer) As System.IntPtr
     Declare Auto Function DTWAIN_EnumCamerasEx Lib "dtwain64d.dll" (ByVal Source As System.IntPtr, ByVal lWhichCamera As Integer, ByRef Cameras As System.IntPtr) As Integer
-End Class
+
+    Declare Auto Function DTWAIN_GetBufferedTransferInfo Lib "dtwain64d.dll" (ByVal Source As System.IntPtr, ByRef Compression As UInteger, ByRef BytesPerRow As UInteger, ByRef Columns As UInteger, ByRef Rows As UInteger, ByRef XOffset As UInteger, ByRef YOffset As UInteger, ByRef Flags As UInteger, ByRef BytesWritten As UInteger, ByRef MemoryLength As UInteger) As System.IntPtr
+    Declare Auto Function DTWAIN_SetBufferedTileMode Lib "dtwain64d.dll" (ByVal Source As System.IntPtr, ByVal nSet As Integer) As Integer
+    Declare Auto Function DTWAIN_IsBufferedTileModeOn Lib "dtwain64d.dll" (ByVal Source As System.IntPtr) As Integer
+    Declare Auto Function DTWAIN_IsBufferedTileModeSupported Lib "dtwain64d.dll" (ByVal Source As System.IntPtr) As Integer
+   End Class

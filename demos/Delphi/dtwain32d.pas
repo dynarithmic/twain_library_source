@@ -530,6 +530,8 @@ const
   DTWAIN_TN_PROCESSEDAUDIOFILE = 1182;
   DTWAIN_TN_TWAINTRIPLETBEGIN = 1183;
   DTWAIN_TN_TWAINTRIPLETEND = 1184;
+  DTWAIN_TN_TRANSFERTILEREADY = 1300;
+  DTWAIN_TN_TRANSFERTILEDONE = 1301;
   DTWAIN_PDFOCR_CLEANTEXT1 = 1;
   DTWAIN_PDFOCR_CLEANTEXT2 = 2;
   DTWAIN_MODAL = 0;
@@ -2703,6 +2705,9 @@ function DTWAIN_GetTwainAvailabilityExA(lpszPath:LPSTR; nLength:LONG):LONG;overl
 function DTWAIN_GetTwainAvailabilityExW(lpszPath:LPWSTR; nLength:LONG):LONG;overload;stdcall; external 'dtwain32d.dll'   name 'DTWAIN_GetTwainAvailabilityExW';
 function DTWAIN_GetTwainAvailabilityEx(lpszPath:LPTSTR; nLength:LONG):LONG;overload;stdcall; external 'dtwain32d.dll'   name 'DTWAIN_GetTwainAvailabilityEx';
 function DTWAIN_TestGetCap(source:DTWAIN_SOURCE; nCapability:LONG):DTWAIN_ARRAY;stdcall; external 'dtwain32d.dll'   name 'DTWAIN_TestGetCap';
-
+function DTWAIN_GetBufferedTransferInfo(Source:DTWAIN_SOURCE; Compression:LPDWORD; BytesPerRow:LPDWORD; Columns:LPDWORD; XOffset:LPDWORD; YOffset:LPDWORD; Flags:LPDWORD; BytesWritten:LPDWORD; MemoryLength:LPDWORD):DTWAIN_HANDLE;stdcall; external 'dtwain32d.dll'   name 'DTWAIN_GetBufferedTransferInfo';
+function DTWAIN_SetBufferedTileMode(Source:DTWAIN_SOURCE, nSet:LONG):LONG;stdcall; external 'dtwain32d.dll'   name 'DTWAIN_SetBufferedTileMode';
+function DTWAIN_IsBufferedTileModeOn(Source:DTWAIN_SOURCE):LONG;stdcall; external 'dtwain32d.dll'   name 'DTWAIN_IsBufferedTileModeOn';
+function DTWAIN_IsBufferedTileModeSupported(Source:DTWAIN_SOURCE):LONG;stdcall; external 'dtwain32d.dll'   name 'DTWAIN_IsBufferedTileSupported';
     implementation
 end.
