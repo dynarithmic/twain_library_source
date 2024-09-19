@@ -228,7 +228,7 @@ DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_FrameIsValid(DTWAIN_FRAME Frame);
 DTWAIN_ARRAY   DLLENTRY_DEF      DTWAIN_AcquireNative(DTWAIN_SOURCE Source,LONG PixelType,LONG nMaxPages,DTWAIN_BOOL bShowUI,DTWAIN_BOOL bCloseSource,LPLONG pStatus);
 DTWAIN_ARRAY   DLLENTRY_DEF      DTWAIN_AcquireBuffered(DTWAIN_SOURCE Source,LONG PixelType,LONG nMaxPages,DTWAIN_BOOL bShowUI,DTWAIN_BOOL bCloseSource,LPLONG pStatus);
 DTWAIN_ARRAY   DLLENTRY_DEF      DTWAIN_AcquireToClipboard(DTWAIN_SOURCE Source,LONG PixelType,LONG nMaxPages,LONG nTransferMode,DTWAIN_BOOL bDiscardDibs,DTWAIN_BOOL bShowUI,DTWAIN_BOOL bCloseSource,LPLONG pStatus);
-DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,DTWAIN_ARRAY aFileNames,LONG     lFileType,LONG     lFileFlags,LONG     PixelType,LONG     lMaxPages,DTWAIN_BOOL bShowUI,DTWAIN_BOOL bCloseSource,LPLONG pStatus);
+DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,DTWAIN_ARRAY aFileNames,LONG lFileType,LONG lFileFlags,LONG PixelType,LONG lMaxPages,DTWAIN_BOOL bShowUI,DTWAIN_BOOL bCloseSource,LPLONG pStatus);
 
 /* Set whether a buffered transfer will use tile mode */
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_SetBufferedTileMode(DTWAIN_SOURCE Source, DTWAIN_BOOL bTileMode);
