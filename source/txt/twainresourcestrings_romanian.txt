@@ -72,6 +72,7 @@
 1056 Matricea de zonă este prea mică. Matricea ar trebui să aibă cel puțin 4 elemente.
 1057 Nu s-a putut crea fișierul de jurnal DTWAIN.  
 1058 Sursa nu suportă sistemul de fișiere TWAIN.  
+1059 Modul tile nu este suportat pentru această sursă TWAIN.
 1100 Codul de condiție TWAIN: Nu s-a putut finaliza operațiunea. Memorie insuficientă.  
 1101 Codul de condiție TWAIN: Fără eroare  
 1102 Codul de condiție TWAIN: Cauza eșecului este necunoscută  
