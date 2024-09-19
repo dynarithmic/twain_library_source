@@ -232,9 +232,8 @@ LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontName(LONG FontVal, LPTSTR szFont, LONG n
 {
     LOG_FUNC_ENTRY_PARAMS((FontVal, szFont, nChars))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    std::string& st = GetResourceStringFromMap(FontVal + DTWAIN_FONT_START_);
-    const LONG numChars = (std::min)(nChars, static_cast<LONG>(st.size()));
-    std::copy_n(st.begin(), numChars, szFont);
+    auto st = CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_FONTNAME, FontVal + DTWAIN_FONT_START_);
+    auto numChars = StringWrapper::CopyInfoToCString(st, szFont, nChars);
     LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
     CATCH_BLOCK(-1)
 }

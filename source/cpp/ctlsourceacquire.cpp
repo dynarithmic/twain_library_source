@@ -155,7 +155,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     auto p = static_cast<CTL_ITwainSource *>(opts.getSource());
     DTWAIN_SOURCE pRealSource;
     bool bSourcePreOpened = true;
-    if (!DTWAIN_IsSourceOpen(p))
+    if (!CTL_TwainAppMgr::IsSourceOpen(pSource))
     {
         bSourcePreOpened = false;
         SourceSelectionOptions selOpts(SELECTSOURCEBYNAME, p->GetProductName().c_str());
@@ -277,7 +277,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
 
     if (aAcquisitionArray)
     {
-        auto& vValues = pHandle->m_ArrayFactory->
+        const auto& vValues = pHandle->m_ArrayFactory->
                             underlying_container_t<CTL_ArrayFactory::tagged_array_voidptr*>(aAcquisitionArray);
         if (!vValues.empty())
             opts.setStatus(DTWAIN_TN_ACQUIREDONE);
@@ -300,12 +300,12 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
     DTWAIN_ARRAY Array = nullptr;
     DTWAIN_ARRAY aAcquisitionArray = nullptr;
 
-    CTL_TwainDLLHandle* pDLLHandle = static_cast<CTL_TwainDLLHandle*>(opts.getHandle());
+    const auto pDLLHandle = static_cast<CTL_TwainDLLHandle*>(opts.getHandle());
     DTWAINArrayLowLevel_RAII a1(pDLLHandle, nullptr);
 
-    CTL_ITwainSource *pSource = static_cast<CTL_ITwainSource*>(opts.getSource());
+    auto pSource = static_cast<CTL_ITwainSource*>(opts.getSource());
     pSource->ResetAcquisitionAttempts(nullptr);
-    aAcquisitionArray = static_cast<DTWAIN_ARRAY>(pDLLHandle, CreateArrayFromFactory(pDLLHandle, DTWAIN_ARRAYOFHANDLEARRAYS, 0));
+    aAcquisitionArray = CreateArrayFromFactory(pDLLHandle, DTWAIN_ARRAYOFHANDLEARRAYS, 0);
     DTWAINArrayLowLevel_RAII aAcq(pDLLHandle, aAcquisitionArray);
 
     pSource->m_pUserPtr = nullptr;
@@ -419,7 +419,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
 bool dynarithmic::AcquireExHelper(SourceAcquireOptions& opts)
 {
     DTWAIN_ARRAY aDibs = SourceAcquire(opts);
-    auto pSource = reinterpret_cast<CTL_ITwainSource*>(opts.getSource());
+    auto pSource = static_cast<CTL_ITwainSource*>(opts.getSource());
     DTWAINArrayLowLevel_RAII arr(pSource->GetDTWAINHandle(), aDibs);
     if (!aDibs)
     {
@@ -429,7 +429,7 @@ bool dynarithmic::AcquireExHelper(SourceAcquireOptions& opts)
         return false;
     }
 
-    CTL_TwainDLLHandle* pDLLHandle = static_cast<CTL_TwainDLLHandle*>(opts.getHandle());
+    const auto pDLLHandle = static_cast<CTL_TwainDLLHandle*>(opts.getHandle());
     const auto& vValues = pDLLHandle->m_ArrayFactory->underlying_container_t<void*>(aDibs);
 
     bool bRet = false;
@@ -449,7 +449,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
     DTWAIN_ACQUIRE nNum = -1;
     LONG ClipboardTransferType = -1;
     const DTWAIN_SOURCE Source = opts.getSource();
-    CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
+    auto pSource = static_cast<CTL_ITwainSource*>(Source);
     const auto pHandle = pSource->GetDTWAINHandle();
 
     // Open the source (if source is closed)
@@ -539,17 +539,6 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
                     DTWAIN_SetCompressionType(Source, Compression, TRUE);
             }
 
-            // Tiles not supported yet, so let user know this
-            if (lMode == DTWAIN_USEBUFFERED)
-            {
-                DTWAINScopedLogControllerExclude sLogger(DTWAIN_LOG_ERRORMSGBOX);
-                if (DTWAIN_IsCapSupported(Source, DTWAIN_CV_ICAPTILES))
-                {
-                    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return TileModeOn(Source); },
-                        DTWAIN_ERR_TILES_NOT_SUPPORTED, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
-                }
-            }
-
             pSource->SetSpecialTransferMode(lMode);
 
             // Determine the naming convention
@@ -571,7 +560,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
                     lFileFlags = lMode | DTWAIN_USELONGNAME;
 
                 // Allocate for array
-                DTWAIN_ARRAY pArray = static_cast<DTWAIN_ARRAY>(pSource->GetFileEnumerator());
+                auto pArray = static_cast<DTWAIN_ARRAY>(pSource->GetFileEnumerator());
                 if (!pArray)
                     pArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, 0);
                 if (!pArray)
@@ -695,7 +684,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
 bool dynarithmic::TileModeOn(DTWAIN_SOURCE Source)
 {
     BOOL bMode;
-    CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
+    auto p = static_cast<CTL_ITwainSource*>(Source);
     if (CTL_TwainAppMgr::GetCurrentOneCapValue(p, &bMode, DTWAIN_CV_ICAPTILES, CTL_GetTypeGETCURRENT))
         return static_cast<TW_BOOL>(bMode)?true:false;
     return false;

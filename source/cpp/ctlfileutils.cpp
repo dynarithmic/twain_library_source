@@ -46,7 +46,7 @@ namespace dynarithmic
     CTL_StringType get_parent_directory(LPCTSTR filename, bool bAddBackSlash)
     {
         auto p = filesys::path(filename);
-        const auto p2 = p.remove_filename();
+        const auto& p2 = p.remove_filename();
 #ifdef UNICODE
         auto str = p2.wstring();
 #else

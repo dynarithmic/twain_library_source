@@ -500,10 +500,10 @@ namespace dynarithmic
             CTL_TwainDib(const CTL_TwainDib& rDib);
             void swap(CTL_TwainDib& left, CTL_TwainDib& rt) noexcept;
 
-            static int         PixelToBytes(int n) { return (n+7)/8; }
+            static constexpr int PixelToBytes(int n) { return (n+7)/8; }
             WORD               PaletteSize (void* pv);
             HPALETTE           GetPalette() const {return m_TwainDibInfo.GetPalette(); }
-            static             int  WidthInBytes(int i)  { return (i+31)/32*4; }
+            static constexpr int WidthInBytes(int i)  { return (i+31)/32*4; }
             static             HANDLE CreateBMPBitmapFromDIB(HANDLE hDib);
 
             // Destruction
@@ -511,7 +511,6 @@ namespace dynarithmic
 
         protected:
             static int         DibNumColors(void* pv);
-            static LPBYTE DibBits(fipImage& lpdib);
             void        Init();
             void        SetEqual(const CTL_TwainDib& rDib);
 

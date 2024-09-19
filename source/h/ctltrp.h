@@ -29,7 +29,7 @@ namespace dynarithmic
 {
     struct TwainUtils
     {
-        static bool IsTwainStringType(TW_UINT16 nItemType)
+        static constexpr bool IsTwainStringType(TW_UINT16 nItemType)
         {
             return nItemType == TWTY_STR32 ||
                    nItemType == TWTY_STR64 ||

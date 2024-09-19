@@ -213,6 +213,8 @@ namespace dynarithmic
             static int      GetLastError();
             static LPSTR    GetLastErrorString(LPSTR lpszBuffer, int nSize);
             static LPSTR    GetErrorString(int nError, LPSTR lpszBuffer, int nSize);
+            static void     SetAndLogError(int nError, const std::string& extraInfo, bool bMustReportGeneralError);
+
             static void     SetDLLInstance(HINSTANCE hDLLInstance);
             // Generic capability setting functions
 
