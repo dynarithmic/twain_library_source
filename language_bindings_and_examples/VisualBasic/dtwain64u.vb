@@ -749,6 +749,8 @@ Class DTWAINAPI
     Public Const DTWAIN_ERR_NO_MEMFILE_XFER As Integer = (-1055)
     Public Const DTWAIN_ERR_AREA_ARRAY_TOO_SMALL As Integer = (-1056)
     Public Const DTWAIN_ERR_LOG_CREATE_ERROR As Integer = (-1057)
+    Public Const DTWAIN_ERR_FILESYSTEM_NOT_SUPPORTED As Integer = (-1058)
+    Public Const DTWAIN_ERR_TILEMODE_NOTSET As Integer = (-1059)
 
     Public Const DTWAIN_ERR_LAST_1 As Integer = DTWAIN_ERR_LOG_CREATE_ERROR
     Public Const TWAIN_ERR_LOW_MEMORY As Integer = (-1100)
