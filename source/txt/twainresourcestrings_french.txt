@@ -72,6 +72,7 @@
 1056 Area array est trop petit. Le tableau doit comporter au moins 4 éléments.
 1057 Impossible de créer le fichier journal.
 1058 Source does not support TWAIN file system.
+1059 Le mode de tuiles n'est pas pris en charge pour cette source TWAIN.
 1100 Condition de Twain ne pouvait pas Coder : ne pouvions pas parachever de l'opération.   Mémoire Insuffisante.
 1101 Faute de Code : de Condition de Twain
 1102 Twain Conditionne Code : Inconnu de la cause du raté

@@ -72,6 +72,7 @@
 1056 Area array è troppo piccolo. La matrice deve contenere almeno 4 elementi.
 1057 Errore di creazione del file di registro.
 1058 Source does not support TWAIN file system.
+1059 Modalità tile non supportata per questa sorgente TWAIN.
 1100 TWAIN Condizione non Cifri: non finendo operazione.   Insufficiente Memoria.
 1101 TWAIN Condizione Codice: Errore
 1102 TWAIN Condiziona Codice: Unknown causa di fallimento
