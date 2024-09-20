@@ -876,7 +876,7 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
         case WM_INITDIALOG:
         {
             TCHAR szBuf[256];
-            TCHAR szBufName[256];
+            char szBufName[256];
             LONG nMajor, nMinor;
             DTWAIN_ARRAY CapArray = 0;
             LONG nCapCount;
@@ -894,8 +894,8 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
             HWND hWndDSData = GetDlgItem(hDlg, IDC_edDSData);
             HWND hWndJSONDetails = GetDlgItem(hDlg, IDC_edJSONDetails);
 
-            DTWAIN_GetSourceProductName(g_CurrentSource, szBufName, 255);
-            SetWindowText(hWndName, szBufName);
+            DTWAIN_GetSourceProductNameA(g_CurrentSource, szBufName, 255);
+            SetWindowTextA(hWndName, szBufName);
 
             DTWAIN_GetSourceProductFamily(g_CurrentSource, szBuf, 255);
             SetWindowText(hWndFamily, szBuf);
