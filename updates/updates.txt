@@ -2,10 +2,13 @@ DTWAIN Version changes
 
 5.5.2
 
-- Support for acquiring buffered images using tiled data (DTWAIN_SetBufferedTileMode()).  
+- Add support for acquiring buffered images using tiled data (DTWAIN_SetBufferedTileMode()).  
   The device must support the ICAP_TILES capability for tiled data to be sent.
 
 - Fix issue with custom resource files being loaded into memory using DTWAIN_LoadCustomStringResources()
+
+- Fixed issue DTWAIN_EnumCameras returning strings that were not properly encoded when using Unicode
+  build of DTWAIN.
 
 - Add DTWAIN_LOG_CONSOLEWITHHANDLER to list of available flags to DTWAIN_SetTwainLog().  This flag is only
   applicable when logging to the console.  This flag allows safe(r) shutdown of DTWAIN if the logging
