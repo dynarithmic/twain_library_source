@@ -958,21 +958,21 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
                 LONG numChars = DTWAIN_GetSourceDetailsA(szBufName, NULL, 0, 2, TRUE);
                 if (numChars > 0)
                 {
-                    szData = malloc((numChars + 1) * sizeof(BYTE));
-                    char* szData2 = malloc((numChars * 2 + 1) * sizeof(BYTE));
+                    szData = malloc(numChars + 1);
                     if (szData)
                     {
-                        char* szData2 = malloc((numChars * 2 + 1) * sizeof(BYTE));
-                        if (szData2)
-                        {
                             /* Fill the memory with 0 */
                             memset(szData, 0, numChars + 1);
                             DTWAIN_GetSourceDetailsA(szBufName, szData, numChars, 2, FALSE);
 
                             /* Edit controls need \r\n and not \n new lines. */
-                            FormatMessageA(FORMAT_MESSAGE_FROM_STRING, szData, 0, 0, szData2, numChars * 2 + 1, NULL);
-                            SetWindowTextA(hWndJSONDetails, szData2);
-                            free(szData2);
+                        HANDLE h = DTWAIN_ConvertToAPIStringA(szData);
+                        if (h)
+                        {
+                            LPCSTR pData = GlobalLock(h);
+                            SetWindowTextA(hWndJSONDetails, pData);
+                            GlobalUnlock(h);
+                            GlobalFree(h);
                         }
                         free(szData);
                     }

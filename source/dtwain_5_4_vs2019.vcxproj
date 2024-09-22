@@ -1159,7 +1159,6 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include=".\cpp\ctlfeed.cpp" />
     <ClCompile Include=".\cpp\ctldevnt.cpp" />
     <ClCompile Include=".\cpp\ctlsupport.cpp" />
-    <ClCompile Include=".\cpp\ctlfsys.cpp" />
     <ClCompile Include=".\cpp\ctlverifysourcehandle.cpp" />
     <ClCompile Include=".\cpp\imagexferfilewriter.cpp" />
     <ClCompile Include=".\dtwinver\Dtwinver.cpp" />
@@ -1240,12 +1239,14 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include="cpp\ctlgetmetrics.cpp" />
     <ClCompile Include="cpp\ctlpapersize.cpp" />
     <ClCompile Include="cpp\ctlsourcedetails.cpp" />
+    <ClCompile Include="cpp\ctlstringutils.cpp" />
     <ClCompile Include="cpp\ctlthreadutils.cpp" />
     <ClCompile Include="cpp\ctltimeout.cpp" />
     <ClCompile Include="cpp\ctltr041.cpp" />
     <ClCompile Include="cpp\ctltr042.cpp" />
     <ClCompile Include="cpp\ctltr043.cpp" />
     <ClCompile Include="cpp\ctltsstub.cpp" />
+    <ClCompile Include="cpp\ctltwainfilesystem.cpp" />
     <ClCompile Include="cpp\ctlupdatedibproc.cpp" />
     <ClCompile Include="cpp\imagefun\resamplefactory.cpp" />
     <ClCompile Include="cpp\imagefun\tiffun32.cpp" />
