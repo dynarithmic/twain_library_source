@@ -942,7 +942,7 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
                 szData = malloc((actualSize + 1) * sizeof(BYTE));
                 if (szData)
                 {
-                    // Fill the memory with 0
+                    /* Fill the memory with 0 */
                     memset(szData, 0, actualSize + 1);
 
                     /* Second call actually gets the data */
