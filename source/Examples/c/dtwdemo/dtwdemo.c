@@ -954,18 +954,17 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
 
             /* Get JSON details of the Source */
             {
-
                 LONG numChars = DTWAIN_GetSourceDetailsA(szBufName, NULL, 0, 2, TRUE);
                 if (numChars > 0)
                 {
                     szData = malloc(numChars + 1);
                     if (szData)
                     {
-                            /* Fill the memory with 0 */
-                            memset(szData, 0, numChars + 1);
-                            DTWAIN_GetSourceDetailsA(szBufName, szData, numChars, 2, FALSE);
+                        /* Fill the memory with 0 */
+                        memset(szData, 0, numChars + 1);
+                        DTWAIN_GetSourceDetailsA(szBufName, szData, numChars, 2, FALSE);
 
-                            /* Edit controls need \r\n and not \n new lines. */
+                        /* Edit controls need \r\n and not \n new lines. */
                         HANDLE h = DTWAIN_ConvertToAPIStringA(szData);
                         if (h)
                         {
