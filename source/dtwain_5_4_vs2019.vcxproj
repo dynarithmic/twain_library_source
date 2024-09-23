@@ -1163,7 +1163,6 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include=".\cpp\imagexferfilewriter.cpp" />
     <ClCompile Include=".\dtwinver\Dtwinver.cpp" />
     <ClCompile Include=".\dtwinver\Getwinver.cpp" />
-    <ClCompile Include=".\cpp\ctlres.cpp" />
     <ClCompile Include=".\cpp\ctltwmgr.cpp" />
     <ClCompile Include=".\cpp\ctltwses.cpp" />
     <ClCompile Include=".\cpp\ctltwsrc.cpp" />
@@ -1237,6 +1236,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include="cpp\ctlfileappend.cpp" />
     <ClCompile Include="cpp\ctlfileutils.cpp" />
     <ClCompile Include="cpp\ctlgetmetrics.cpp" />
+    <ClCompile Include="cpp\ctlloadresources.cpp" />
     <ClCompile Include="cpp\ctlpapersize.cpp" />
     <ClCompile Include="cpp\ctlsourcedetails.cpp" />
     <ClCompile Include="cpp\ctlstringutils.cpp" />

@@ -97,9 +97,6 @@
     <ClCompile Include=".\cpp\ctlflog.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include=".\cpp\ctlfsys.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include=".\cpp\ctlgetcapinfo.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
@@ -155,9 +152,6 @@
       <Filter>C++ Files</Filter>
     </ClCompile>
     <ClCompile Include=".\cpp\ctlreg.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include=".\cpp\ctlres.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
     <ClCompile Include=".\cpp\ctlsavefilename.cpp">
@@ -654,6 +648,15 @@
     </ClCompile>
     <ClCompile Include="cximage\xmemfile.cpp">
       <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctltwainfilesystem.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlstringutils.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlloadresources.cpp">
+      <Filter>C++ Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
