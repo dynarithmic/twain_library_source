@@ -255,8 +255,13 @@ namespace dynarithmic
             while (std::getline(ifs, line))
             {
                 StringStreamInA strm(line);
-                LONG twainValue;
-                strm >> twainValue;
+                std::string strTwainValue;
+                strm >> strTwainValue;
+                LONG twainValue = 0;
+                if (StringWrapperA::StartsWith(strTwainValue, "0x"))
+                    twainValue = stol(strTwainValue, nullptr, 16);
+                else
+                    twainValue = stol(strTwainValue);
                 if (twainValue == -9999)
                     break;
                 std::string name;
