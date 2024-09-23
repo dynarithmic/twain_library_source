@@ -1723,6 +1723,15 @@ const
   DTWAIN_CONSTANT_TWSS    = 47;
   DTWAIN_CONSTANT_TWPH    = 48;
   DTWAIN_CONSTANT_TWCI    = 49;			
+  DTWAIN_CONSTANT_FONTNAME = 50;
+  DTWAIN_CONSTANT_TWEI     = 51;
+  DTWAIN_CONSTANT_TWEJ     = 52;
+  DTWAIN_CONSTANT_TWCC     = 53;
+  DTWAIN_CONSTANT_TWQC     = 54;
+  DTWAIN_CONSTANT_TWRC     = 55;
+  DTWAIN_CONSTANT_MSG      = 56;
+  DTWAIN_CONSTANT_TWLG     = 57;
+
   DTWAIN_USERRES_START    = 20000;
   DTWAIN_USERRES_MAXSIZE  = 8192;
 
@@ -2709,5 +2718,8 @@ function DTWAIN_GetBufferedTransferInfo(Source:DTWAIN_SOURCE; Compression:LPDWOR
 function DTWAIN_SetBufferedTileMode(Source:DTWAIN_SOURCE, nSet:LONG):LONG;stdcall; external 'dtwain32d.dll'   name 'DTWAIN_SetBufferedTileMode';
 function DTWAIN_IsBufferedTileModeOn(Source:DTWAIN_SOURCE):LONG;stdcall; external 'dtwain32d.dll'   name 'DTWAIN_IsBufferedTileModeOn';
 function DTWAIN_IsBufferedTileModeSupported(Source:DTWAIN_SOURCE):LONG;stdcall; external 'dtwain32d.dll'   name 'DTWAIN_IsBufferedTileSupported';
+function DTWAIN_ConvertToAPIStringA Lib(sString:LPCSTR):DTWAIN_HANDLE;stdcall; external 'dtwain32d.dll'   name 'DTWAIN_ConvertToAPIStringA';
+function DTWAIN_ConvertToAPIStringW Lib(sString:LPWSTR):DTWAIN_HANDLE;stdcall; external 'dtwain32d.dll'   name 'DTWAIN_ConvertToAPIStringW'; 
+function DTWAIN_ConvertToAPIString Lib(sString:LPTSTR):DTWAIN_HANDLE;stdcall; external 'dtwain32d.dll'   name 'DTWAIN_ConvertToAPIString'; 
     implementation
 end.

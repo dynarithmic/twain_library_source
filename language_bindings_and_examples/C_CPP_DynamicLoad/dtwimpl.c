@@ -173,6 +173,9 @@
     D_CLOSESOURCEFUNC                                                 DYNDTWAIN_API::DTWAIN_CloseSource = nullptr;
     D_CLOSESOURCEUIFUNC                                               DYNDTWAIN_API::DTWAIN_CloseSourceUI = nullptr;
     D_CONVERTDIBTOBITMAPFUNC                                          DYNDTWAIN_API::DTWAIN_ConvertDIBToBitmap = nullptr;
+    D_CONVERTTOAPISTRINGAFUNC                                         DYNDTWAIN_API::DTWAIN_ConvertToAPIStringA = nullptr;
+    D_CONVERTTOAPISTRINGFUNC                                          DYNDTWAIN_API::DTWAIN_ConvertToAPIString = nullptr;
+    D_CONVERTTOAPISTRINGWFUNC                                         DYNDTWAIN_API::DTWAIN_ConvertToAPIStringW = nullptr;
     D_CREATEACQUISITIONARRAYFUNC                                      DYNDTWAIN_API::DTWAIN_CreateAcquisitionArray = nullptr;
     D_CREATEPDFTEXTELEMENTFUNC                                        DYNDTWAIN_API::DTWAIN_CreatePDFTextElement = nullptr;
     D_DESTROYACQUISITIONARRAYFUNC                                     DYNDTWAIN_API::DTWAIN_DestroyAcquisitionArray = nullptr;
@@ -1030,7 +1033,6 @@
     D_UNLOCKMEMORYEXFUNC                                              DYNDTWAIN_API::DTWAIN_UnlockMemoryEx = nullptr;
     D_UNLOCKMEMORYFUNC                                                DYNDTWAIN_API::DTWAIN_UnlockMemory = nullptr;
     D_USEMULTIPLETHREADSFUNC                                          DYNDTWAIN_API::DTWAIN_UseMultipleThreads = nullptr;
-
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1222,6 +1224,9 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_CloseSource, hModule);
           LOADFUNCTIONIMPL(DTWAIN_CloseSourceUI, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ConvertDIBToBitmap, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_ConvertToAPIString, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_ConvertToAPIStringA, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_ConvertToAPIStringW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_CreateAcquisitionArray, hModule);
           LOADFUNCTIONIMPL(DTWAIN_CreatePDFTextElement, hModule);
           LOADFUNCTIONIMPL(DTWAIN_DestroyAcquisitionArray, hModule);
