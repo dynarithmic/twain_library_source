@@ -7,3 +7,5 @@ italian
 portuguese_br
 romanian
 russian
+portuguese
+simplified_chinese
