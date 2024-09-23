@@ -170,7 +170,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RemoveCallback(DTWAIN_CALLBACK_PROC Fn)
 }
 
 #ifdef _WIN32
-LRESULT CALLBACK_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
+LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                                    UINT uMsg,
                                    WPARAM wParam,
                                    LPARAM lParam)
