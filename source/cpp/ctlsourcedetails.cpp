@@ -619,7 +619,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
 
                         strm2 << "\"bitdepthinfo\":{";
                         int depthCount = 0;
-                        for (auto & pr : pixInfo)
+                        for (auto& pr : pixInfo)
                         {
                             strm2 << "\"depth_" << vPixNames[depthCount] << "\":[";
                             std::string bdepthStr = join_string(pr.second.begin(), pr.second.end());
@@ -648,11 +648,11 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         { ICAP_SUPPORTEDEXTIMAGEINFO,DTWAIN_CONSTANT_TWEI, "\"extendedimageinfo-supported-types\":", 5 }} };
                     for (auto& oneData : otherData)
                     {
-                    strm2.str("");
-                    {
+                        strm2.str("");
+                        {
                             auto vNames = getNamesFromConstants(pCurrentSourcePtr, oneData.cap, oneData.capConstant);
                             std::string allSizes;
-                        std::vector<std::string> vAdjustedNames;
+                            std::vector<std::string> vAdjustedNames;
                             std::transform(vNames.begin(), vNames.end(), std::back_inserter(vAdjustedNames),
                                 [&](auto& origName) { return "\"" + origName.substr(oneData.prefixCount) + "\""; });
 
