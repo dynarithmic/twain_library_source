@@ -1639,6 +1639,15 @@ Class DTWAINAPI
     Public Const DTWAIN_CONSTANT_TWSS As Integer = 47
     Public Const DTWAIN_CONSTANT_TWPH As Integer = 48
     Public Const DTWAIN_CONSTANT_TWCI As Integer = 49
+    Public Const DTWAIN_CONSTANT_FONTNAME As Integer = 50
+    Public Const DTWAIN_CONSTANT_TWEI  As Integer =   51
+    Public Const DTWAIN_CONSTANT_TWEJ  As Integer =   52
+    Public Const DTWAIN_CONSTANT_TWCC  As Integer =   53
+    Public Const DTWAIN_CONSTANT_TWQC  As Integer =   54
+    Public Const DTWAIN_CONSTANT_TWRC  As Integer =   55
+    Public Const  DTWAIN_CONSTANT_MSG  As Integer =   56
+    Public Const DTWAIN_CONSTANT_TWLG  As Integer =   57
+
     Public Const DTWAIN_USERRES_START As Integer = 20000
     Public Const DTWAIN_USERRES_MAXSIZE As Integer = 8192
 
@@ -2686,4 +2695,8 @@ Class DTWAINAPI
     Declare Auto Function DTWAIN_SetBufferedTileMode Lib "dtwain32ud.dll" (ByVal Source As System.IntPtr, ByVal nSet As Integer) As Integer
     Declare Auto Function DTWAIN_IsBufferedTileModeOn Lib "dtwain32ud.dll" (ByVal Source As System.IntPtr) As Integer
     Declare Auto Function DTWAIN_IsBufferedTileModeSupported Lib "dtwain32ud.dll" (ByVal Source As System.IntPtr) As Integer
+
+    Declare Ansi Function DTWAIN_ConvertToAPIStringA Lib "dtwain32ud.dll" (<MarshalAs(UnmanagedType.LPStr)> sString As String) As System.IntPtr
+    Declare Unicode Function DTWAIN_ConvertToAPIStringW Lib "dtwain32ud.dll" (<MarshalAs(UnmanagedType.LPWStr)> sString As String) As System.IntPtr
+    Declare Auto Function DTWAIN_ConvertToAPIString Lib "dtwain32ud.dll" (<MarshalAs(UnmanagedType.LPTStr)> sString As String) As System.IntPtr
    End Class
