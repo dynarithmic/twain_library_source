@@ -29,6 +29,7 @@
 #include "dtwstrfn.h"
 #include "ctldefsource.h"
 #include "resamplefactory.h"
+#include "crc32_aux.h"
 
 using namespace dynarithmic;
 
@@ -112,27 +113,61 @@ namespace dynarithmic
         return sPath + resName;
     }
 
+    static bool GetDataCRC(std::ifstream& ifs, int numTrailers)
+    {
+        std::queue<std::string> lineQueue;
+        std::string line;
+        std::string totalBuf;
+        for (int i = 0; i < numTrailers; ++i)
+        {
+            std::getline(ifs, line);
+            line.erase(std::remove_if(line.begin(), line.end(), [](char ch) { return isspace(ch); }), line.end());
+            lineQueue.push(line);
+        }
+        while (std::getline(ifs, line))
+        {
+            line.erase(std::remove_if(line.begin(), line.end(), [](char ch) { return isspace(ch); }), line.end());
+            totalBuf += lineQueue.front();
+            lineQueue.pop();
+            lineQueue.push(line);
+        }
+        auto crcVal = crc32_aux(0, (unsigned char*)totalBuf.data(), totalBuf.size());
+        try
+        {
+            uint64_t crc = std::stoul(lineQueue.front());
+            if (crc != crcVal)
+                return false;
+        }
+        catch (...)
+        {
+            return false;
+        }
+        return true;
+    }
+
     bool LoadTwainResources(ResourceLoadingInfo& retValue)
     {
         LOG_FUNC_ENTRY_NONAME_PARAMS()
-        retValue.errorValue[0] = false;
-        retValue.errorValue[1] = false;
-        retValue.errorValue[2] = true;
+        retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] = true;
+        retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INIFILE_LOADED] = true;
+        retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_VERSION_READ] = true;
+        retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_CRC_CHECK] = true;
         CTL_ErrorStruct ErrorStruct;
         int dg, dat, msg, structtype, retcode, successcode;
         auto sPath = createResourceFileName(DTWAINRESOURCEINFOFILE);
         auto sPathA = StringConversion::Convert_Native_To_Ansi(sPath);
         StringWrapperA::traits_type::inputfile_type ifs(sPathA);
-        if (ifs)
-            retValue.errorValue[0] = true;
+        retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] = ifs ? true : false;
+        
         // Test for the INI file existing
-        {
-            std::wifstream iniFile(GetDTWAININIPath());
-            if (iniFile)
-                retValue.errorValue[1] = true;
-        }
-        if (!retValue.errorValue[0] || !retValue.errorValue[1])
+        retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INIFILE_LOADED] = CTL_StaticData::s_bINIFileLoaded;
+
+        // Error if twaininfo.txt or the INI file is missing or cannot be opened
+        if (!retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] || 
+            !retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INIFILE_LOADED])
             return false;
+
+        auto iniInterface = CTL_StaticData::GetINIInterface();
 
         // Read in warning
         std::string sWarning;
@@ -266,6 +301,7 @@ namespace dynarithmic
                     break;
                 std::string name;
                 strm >> name;
+                std::replace(name.begin(), name.end(), '#', ' ');
                 name = StringWrapperA::TrimAll(name);
                 iter->second.insert({twainValue, name});
             }
@@ -378,11 +414,24 @@ namespace dynarithmic
         }
         if (badVersion)
         {
-            retValue.errorValue[0] = retValue.errorValue[1] = retValue.errorValue[2] = false;
+            retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_VERSION_READ] = false;
             retValue.errorMessage = StringConversion::Convert_Ansi_To_Native(origVersion);
             return false;
         }
+        else
+            retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_VERSION_READ] = true;
+
         CTL_StaticData::s_ResourceVersion = StringConversion::Convert_Ansi_To_Native(origVersion);
+        bool doResourceCheck = iniInterface->GetBoolValue("Miscellaneous", "resourcecheck", true);
+        if (doResourceCheck)
+        {
+            ifs.close();
+            ifs.open(sPathA);
+            retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_CRC_CHECK] = GetDataCRC(ifs, 2);
+        }
+        else
+            retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_CRC_CHECK] = true;
+
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
         CATCH_BLOCK(false)
     }
@@ -504,6 +553,9 @@ namespace dynarithmic
                 while (strm >> resourceID)
                 {
                     getline(strm, descr);
+                    if (resourceID == IDS_DTWAIN_APPTITLE)
+                        descr = StringConversion::Convert_Native_To_Ansi(
+                            CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DLLINFO, IDS_DTWAIN_APPTITLE));
                     StringWrapperA::TrimAll(descr);
                     descr = StringWrapperA::ReplaceAll(descr, "{short_version}", sVersion);
                     descr = StringWrapperA::ReplaceAll(descr, "{company_name}", DTWAIN_VERINFO_COMPANYNAME);

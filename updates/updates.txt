@@ -18,6 +18,9 @@ DTWAIN Version changes
 
 - Ensure that when logging to the console, the console is using UTF-8 encoding.
 
+- More thorough test for corruption of the twaininfo.txt resource file when DTWAIN_SysInitialize()
+  is called.
+
 - Update C/C++ full demo program (DTWDEMO32 and DTWDEMO64) to show the JSON description of the opened 
   TWAIN Source when displaying the source properties.  The C# and VB version of DTWDEMOxx has also 
   been updated to show this information (see the FullDemo projects for C# and VB).

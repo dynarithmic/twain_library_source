@@ -2350,27 +2350,33 @@ bool LoadGeneralResources(bool blockExecution)
     {
         ResourceLoadingInfo ret;
         fnBool(ret);
-        if (!ret.errorValue[0] || !ret.errorValue[1] || !ret.errorValue[2] )
+        if (std::any_of(ret.errorValue.begin(), ret.errorValue.end(), [](bool b) { return b == false; }))
         {
 #ifdef _WIN32
             if (blockExecution)
             {
-                CTL_StringType errorMsg = _T("Error.  DTWAIN Resource file(s) not found or corrupted: ");
+                CTL_StringType errorMsg = _T("Error.  DTWAIN Resource file(s) not found or corrupted:\r\n");
                 std::vector<CTL_StringType> vErrors;
-                if (!ret.errorValue[0])
+                if (!ret.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED])
                     vErrors.push_back(DTWAINRESOURCEINFOFILE);
-                if (!ret.errorValue[1])
+                if (!ret.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INIFILE_LOADED])
                     vErrors.push_back(DTWAIN_ININAME_NATIVE);
-                if (!ret.errorValue[2])
+                if (!ret.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_VERSION_READ])
                 {
                     CTL_StringType versionErrorMessage = _T("Error.  Bad or outdated TWAIN version of resources used: (");
                     versionErrorMessage += ret.errorMessage;
                     versionErrorMessage += _T(").  Expected minimum version: ");
                     versionErrorMessage += _T(DTWAIN_TEXTRESOURCE_FILEVERSION);
-                    versionErrorMessage += _T("\nPlease use the latest text resources found at \"https://github.com/dynarithmic/twain_library/tree/master/text_resources\"");
+                    versionErrorMessage += _T("\r\nPlease use the latest text resources found at \"https://github.com/dynarithmic/twain_library/tree/master/text_resources\"");
                     vErrors.push_back(versionErrorMessage);
                 }
-                CTL_StringType sAllErrors = errorMsg + StringWrapper::Join(vErrors, _T(",\n"));
+                if (!ret.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_CRC_CHECK])
+                {
+                    CTL_StringType versionErrorMessage = _T("Error.  CRC check failed");
+                    versionErrorMessage += ret.errorMessage;
+                    vErrors.push_back(versionErrorMessage);
+                }
+                CTL_StringType sAllErrors = errorMsg + StringWrapper::Join(vErrors, _T(",\r\n"));
                 MessageBox(nullptr, sAllErrors.c_str(), _T("DTWAIN Resource Error"), MB_ICONERROR);
             }
 #endif
