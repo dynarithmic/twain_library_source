@@ -1898,6 +1898,8 @@
  112 TWLG_URDU                  
  113 TWLG_VIETNAMESE            
 -9999
+9700 DTWAIN#Twain#Library,#v{short_version},#{company_name},#{copyright}
+-9999
 [100] BMP        [1 4 8 16 24 32] [[]]
 [200] JPEG [8 16 24] [[1 24] [4 24] [32 24]]
 [250 251] Adobe PDF [1 8 16 24] [[32 24]]
@@ -1918,5 +1920,5 @@
 [6000 6001] TXT [1] [[4 1][8 1][16 1][24 1] [32 1]]
 -9999
 5.5.2
+1174519865
 END END END
-
