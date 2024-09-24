@@ -153,6 +153,7 @@ namespace dynarithmic
         static const char_type* GetCompatStringLiteral(const char_type* x) { return x; }
         static constexpr char_type GetNewLineChar() { return '\n'; }
         static constexpr const char_type* GetNewLineString() { return "\n"; }
+        static constexpr const char_type* GetWindowsNewLineString() { return "\r\n"; }
         static size_t Length(const char_type* s) { return std::char_traits<char_type>::length(s); }
         static char_type* Copy(char_type* dest, const char_type* src) { return std::char_traits<char_type>::copy(dest, src, Length(src)); }
         static char_type* CopyN(char_type* dest, const char_type* src, size_t count) { return std::char_traits<char_type>::copy(dest, src, count); }
@@ -275,6 +276,7 @@ namespace dynarithmic
         static constexpr char_type GetZeroNumericString() { return L'0'; }
         static constexpr char_type GetNewLineChar() { return L'\n'; }
         static constexpr const char_type* GetNewLineString() { return L"\n"; }
+        static constexpr const char_type* GetWindowsNewLineString() { return L"\r\n"; }
         static const char_type* GetCompatStringLiteral(const char_type* x) { return x; }
         static size_t Length(const char_type* s) { return std::char_traits<char_type>::length(s); }
         static int Compare(const char_type* dest, const char_type* src, size_t count) { return std::char_traits<char_type>::compare(dest, src, count); }
@@ -823,6 +825,26 @@ namespace dynarithmic
                 StringTraits::GetModuleFileNameImpl( hModule, &szName[0], nBytes );
             }
             return &szName[0];
+        }
+
+        static StringType ConvertToAPIString(const StringType& origString)
+        {
+            return boost::algorithm::replace_all_copy(origString, StringTraits::GetNewLineString(), StringTraits::GetWindowsNewLineString());
+        }
+
+        static HANDLE ConvertToAPIStringEx(const StringType& origString)
+        {
+            StringType newString = ConvertToAPIString(origString);
+            HANDLE newHandle = GlobalAlloc(GHND, newString.size() * sizeof(StringTraits::char_type) + sizeof(StringTraits::char_type));
+            if (newHandle)
+            {
+                StringTraits::char_type* pData = (StringTraits::char_type*)GlobalLock(newHandle);
+                memset(pData, 0, GlobalSize(newHandle));
+                memcpy(pData, newString.data(), newString.size() * sizeof(StringTraits::char_type));
+                GlobalUnlock(newHandle);
+                return newHandle;
+            }
+            return NULL;
         }
 
         static int TokenizeEx(const StringType& str,

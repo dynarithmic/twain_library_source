@@ -23,12 +23,12 @@ DTWAIN Version changes
   been updated to show this information (see the FullDemo projects for C# and VB).
 
 - Remove some resource constants from the language resource files.  These constants have now been moved to 
-  twaininfo.txt
+  twaininfo.txt.
 
 - Updated code to detect the running Windows OS version when starting a DTWAIN log.  The new code
   now detects the latest Windows 11 version(s).  The new code is courtesy of PJ Naughter.
 
-- Add various language files (Romanian, Russian).
+- Add various language files (Romanian, Russian, Portuguese, Simplified Chinese).
 
 
 5.5.1

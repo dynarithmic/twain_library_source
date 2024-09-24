@@ -305,25 +305,22 @@ static pixelMap getPixelAndBitDepthInfo(CTL_ITwainSource* pSource)
     return pMap;
 }
 
-static std::vector<std::string> getPageSizeInfo(CTL_ITwainSource* pSource)
+static std::vector<std::string> getNamesFromConstants(CTL_ITwainSource *pSource, LONG capValue, LONG twainconstantID)
 {
+    DTWAIN_ARRAY arr = nullptr;
     const auto pHandle = pSource->GetDTWAINHandle();
-    std::vector<std::string> vSizeNames;
-    // get the paper sizes
-    DTWAIN_ARRAY aSupportedSizes = DTWAIN_EnumPaperSizesEx(pSource);
-    DTWAINArrayPtr_RAII raii(pHandle, &aSupportedSizes);
-    if (aSupportedSizes)
+    BOOL bRet = DTWAIN_GetCapValues(pSource, capValue, DTWAIN_CAPGET, &arr);
+    std::vector<std::string> allNames;
+    if (bRet)
     {
-        auto& vSupportedSizes = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aSupportedSizes);
-        for (auto val : vSupportedSizes)
-        {
-            char buf[100];
-            DTWAIN_GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWSS, val, buf, 100);
-            vSizeNames.push_back(buf);
-        }
+        DTWAINArrayPtr_RAII raii(pHandle, &arr);
+        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
+        for (LONG value : vValues)
+            allNames.push_back(StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetTwainNameFromConstant(twainconstantID, value)));
     }
-    return vSizeNames;
+    return allNames;
 }
+
 
 struct OneResInfo
 {
@@ -622,7 +619,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
 
                         strm2 << "\"bitdepthinfo\":{";
                         int depthCount = 0;
-                        for (auto & pr : pixInfo)
+                        for (auto& pr : pixInfo)
                         {
                             strm2 << "\"depth_" << vPixNames[depthCount] << "\":[";
                             std::string bdepthStr = join_string(pr.second.begin(), pr.second.end());
@@ -634,18 +631,39 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         allbdepths += "}";
                     }
 
-                    strm2.str("");
-                    // get the paper sizes
-                    {
-                        auto vSizeNames = getPageSizeInfo(pCurrentSourcePtr);
-                        std::vector<std::string> vAdjustedNames;
-                        std::transform(vSizeNames.begin(), vSizeNames.end(), std::back_inserter(vAdjustedNames),
-                            [](auto& origName) { return "\"" + origName.substr(5) + "\""; });
+                    jColorInfo += strm.str() + allbdepths + "},";
 
-                        std::string paperSizesStr = join_string(vAdjustedNames.begin(), vAdjustedNames.end());
-                        strm2 << "\"paper-sizes\":[" << paperSizesStr << "],";
-                        std::string allSizes = strm2.str();
-                        jColorInfo += strm.str() + allbdepths + "}," + allSizes;
+                    struct TwainDataItems
+                    {
+                        LONG cap;
+                        LONG capConstant;
+                        const char* name;
+                        int prefixCount;
+                    };
+
+                    std::array<TwainDataItems, 4> otherData = { {
+                        { ICAP_SUPPORTEDSIZES, DTWAIN_CONSTANT_TWSS, "\"paper-sizes\":", 5 },
+                        { ICAP_SUPPORTEDBARCODETYPES, DTWAIN_CONSTANT_TWBT, "\"barcode-supported-types\":", 5 },
+                        { ICAP_SUPPORTEDPATCHCODETYPES,DTWAIN_CONSTANT_TWPCH, "\"patchcode-supported-types\":", 6 },
+                        { ICAP_SUPPORTEDEXTIMAGEINFO,DTWAIN_CONSTANT_TWEI, "\"extendedimageinfo-supported-types\":", 5 }} };
+                    for (auto& oneData : otherData)
+                    {
+                        strm2.str("");
+                        {
+                            auto vNames = getNamesFromConstants(pCurrentSourcePtr, oneData.cap, oneData.capConstant);
+                            std::string allSizes;
+                            std::vector<std::string> vAdjustedNames;
+                            std::transform(vNames.begin(), vNames.end(), std::back_inserter(vAdjustedNames),
+                                [&](auto& origName) { return "\"" + origName.substr(oneData.prefixCount) + "\""; });
+
+                            std::string resultStr = join_string(vAdjustedNames.begin(), vAdjustedNames.end());
+                            if (!vNames.empty())
+                                strm2 << oneData.name << "[" << resultStr << "],";
+                            else
+                                strm2 << oneData.name << "\"<unsupported>\",";
+                            allSizes = strm2.str();
+                            jColorInfo += allSizes;
+                        }
                     }
 
                     // get the resolution info
@@ -690,6 +708,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
 
                         resUnitInfo = strm.str() + resolutionTotalStr + "},";
                     }
+
                     static constexpr int SPECIAL_FILESYSTEM = -999;
                     std::array<int, 11> imageInfoCaps = { ICAP_BRIGHTNESS, ICAP_CONTRAST, ICAP_GAMMA, ICAP_HIGHLIGHT, ICAP_SHADOW,
                                                           ICAP_THRESHOLD, ICAP_ROTATION, ICAP_ORIENTATION, ICAP_OVERSCAN, ICAP_HALFTONES, SPECIAL_FILESYSTEM };

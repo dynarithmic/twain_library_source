@@ -1678,6 +1678,15 @@ namespace Dynarithmic
         public const int DTWAIN_CONSTANT_TWSS    = 47;
         public const int DTWAIN_CONSTANT_TWPH    = 48;
         public const int DTWAIN_CONSTANT_TWCI    = 49;
+        public const int DTWAIN_CONSTANT_FONTNAME = 50;
+        public const int DTWAIN_CONSTANT_TWEI     = 51;
+        public const int DTWAIN_CONSTANT_TWEJ     = 52;
+        public const int DTWAIN_CONSTANT_TWCC     = 53;
+        public const int DTWAIN_CONSTANT_TWQC     = 54;
+        public const int DTWAIN_CONSTANT_TWRC     = 55;
+        public const int DTWAIN_CONSTANT_MSG      = 56;
+        public const int DTWAIN_CONSTANT_TWLG     = 57;
+
         public const int DTWAIN_USERRES_START    = 20000;
         public const int DTWAIN_USERRES_MAXSIZE  = 8192;
 
@@ -5805,5 +5814,17 @@ namespace Dynarithmic
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
         ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_IsBufferedTileModeSupported(DTWAIN_SOURCE Source);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern DTWAIN_HANDLE DTWAIN_ConvertToAPIString([MarshalAs(UnmanagedType.LPTStr)] string str);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern DTWAIN_HANDLE DTWAIN_ConvertToAPIStringA([MarshalAs(UnmanagedType.LPStr)] string str);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern DTWAIN_HANDLE DTWAIN_ConvertToAPIStringW([MarshalAs(UnmanagedType.LPWStr)] string str);
     }
 }
