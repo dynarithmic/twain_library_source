@@ -1,7 +1,15 @@
 ﻿Imports System.Windows.Forms
+Imports System.Runtime.InteropServices
+
 Imports System.Text
 
+
 Public Class SourcePropertiesDlg
+
+    Declare Auto Function GlobalLock Lib "kernel32.dll" (ByVal handle As IntPtr) As IntPtr
+    Declare Auto Function GlobalUnlock Lib "kernel32.dll" (ByVal handle As IntPtr) As Integer
+    Declare Auto Function GlobalFree Lib "kernel32.dll" (ByVal handle As IntPtr) As IntPtr
+
     Private m_Source As System.IntPtr
 
     Public Sub New(ByVal item As System.IntPtr)
@@ -70,10 +78,18 @@ Public Class SourcePropertiesDlg
         jsonLength = DTWAINAPI.DTWAIN_GetSourceDetails(sName, IntPtr.Zero, 0, 2, 1)
         szInfo = New StringBuilder(jsonLength)
         DTWAINAPI.DTWAIN_GetSourceDetails(sName, szInfo, jsonLength, 2, 1)
-        Dim sNameStr As String
-        sNameStr = szInfo.ToString()
-        sNameStr = sNameStr.Replace(vbLf, vbCrLf)
-        Me.txtJSON.Text = sNameStr
+
+        ' Convert string to one with /r/n, since these are the types of strings for edit controls
+        Dim Handle As IntPtr = DTWAINAPI.DTWAIN_ConvertToAPIString(szInfo.ToString())
+
+        ' Need to use WinAPI to lock the handle and get the string
+        Dim newData As IntPtr = GlobalLock(Handle)
+        Dim sNewData As String = Marshal.PtrToStringAuto(newData)
+        Me.txtJSON.Text = sNewData
+
+        ' Free the handle
+        GlobalUnlock(Handle)
+        GlobalFree(Handle)
 
     End Sub
 End Class

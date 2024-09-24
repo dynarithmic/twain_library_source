@@ -191,9 +191,7 @@
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
-      <Command>"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
-"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
-"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+      <Command>
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -225,9 +223,7 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
-"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
-"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+      <Command>
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -262,9 +258,7 @@
       <PreprocessorDefinitions>;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
-"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
-"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+      <Command>
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -295,9 +289,7 @@
       <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
-"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
-"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+      <Command>
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -328,9 +320,7 @@
       <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
-"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
-"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+      <Command>
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -355,9 +345,7 @@
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
-      <Command>"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
-"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
-"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+      <Command>
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -378,9 +366,7 @@
       <IgnoreSpecificDefaultLibraries>dtwain32.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
-"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
-"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+      <Command>
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -405,9 +391,7 @@
       <IgnoreSpecificDefaultLibraries>dtwain32u.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
-"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
-"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).exe SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+      <Command>
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

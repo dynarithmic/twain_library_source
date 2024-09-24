@@ -1049,3 +1049,6 @@ DTWAIN_SetBufferedTileMode                        @31044
 DTWAIN_IsBufferedTileModeOn                       @31045	 
 DTWAIN_IsBufferedTileModeSupported                @31046 
 DTWAIN_GetBufferedTransferInfo                    @31047
+DTWAIN_ConvertToAPIString                         @31050 
+DTWAIN_ConvertToAPIStringA                        @31051 
+DTWAIN_ConvertToAPIStringW                        @31052 
