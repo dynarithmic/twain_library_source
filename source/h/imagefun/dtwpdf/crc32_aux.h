@@ -20,14 +20,8 @@ OF THIRD PARTY RIGHTS.
 */
 #ifndef CRC32AUX_H
 #define CRC32AUX_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-unsigned long crc32_aux(unsigned long crc, unsigned char *buf, unsigned int len);
-
-#ifdef __cplusplus
+namespace dynarithmic
+{
+    unsigned int crc32_aux(unsigned long crc, const unsigned char* buf, unsigned int len);
 }
-#endif
 #endif
