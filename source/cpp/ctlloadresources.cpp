@@ -48,19 +48,6 @@ namespace dynarithmic
         return {};
     }
 
-    static bool load2valueMap(std::ifstream& ifs, CTL_TwainLongToStringMap& theMap)
-    {
-        int value1;
-        std::string value2;
-        while (ifs >> value1 >> value2)
-        {
-            if (value1 == -1000 && value2 == "END")
-                break;
-            theMap.insert({ value1, value2 });
-        }
-        return true;
-    }
-
     static std::vector<std::pair<uint16_t, uint16_t>> parseBracketedPairs(std::string bracketedPairs)
     {
         std::vector<std::pair<uint16_t, uint16_t>> retVal;
@@ -204,11 +191,6 @@ namespace dynarithmic
                 break;
             CTL_StaticData::s_TwainNameMap.insert({ { resourceID,twainID }, twainName });
         }
-
-        if (!load2valueMap(ifs, CTL_StaticData::GetTwainLanguageMap()))
-            return false;
-        if (!load2valueMap(ifs, CTL_StaticData::GetTwainCountryMap()))
-            return false;
 
         decltype(CTL_CapStruct::m_strCapName) capName;
         decltype(CTL_CapStruct::m_nDataType)  capType;
