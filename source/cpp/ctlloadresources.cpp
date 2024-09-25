@@ -40,6 +40,14 @@ LONG  TS_Command(LPCTSTR lpCommand);
 
 namespace dynarithmic
 {
+    static std::string LoadResourceFromRC(unsigned resNum)
+    {
+        char szBuffer[DTWAIN_USERRES_MAXSIZE + 1];
+        if (::LoadStringA(CTL_StaticData::s_DLLInstance, resNum, szBuffer, DTWAIN_USERRES_MAXSIZE))
+            return szBuffer;
+        return {};
+    }
+
     static bool load2valueMap(std::ifstream& ifs, CTL_TwainLongToStringMap& theMap)
     {
         int value1;
@@ -450,21 +458,32 @@ namespace dynarithmic
         return ret;
     }
 
+    static std::string GetResourceString_Internal(UINT nResNumber)
+    {
+        auto str = GetResourceStringFromMap(nResNumber);
+        // First check the external  resources
+        if (str.empty())
+            // Try the internal resources
+            str = LoadResourceFromRC(nResNumber);
+        return str;
+    }
+    
     size_t GetResourceStringA(UINT nResNumber, LPSTR buffer, LONG bufSize)
     {
-        return StringWrapperA::CopyInfoToCString(GetResourceStringFromMap(nResNumber), buffer, bufSize);
+        auto str = GetResourceString_Internal(nResNumber);
+        return StringWrapperA::CopyInfoToCString(str, buffer, bufSize);
     }
 
     size_t GetResourceStringW(UINT nResNumber, LPWSTR buffer, LONG bufSize)
     {
-        auto str = GetResourceStringFromMap(nResNumber);
+        auto str = GetResourceString_Internal(nResNumber);
         auto native_str = StringConversion::Convert_Ansi_To_Wide(str);
         return StringWrapperW::CopyInfoToCString(native_str, buffer, bufSize);
     }
 
     size_t GetResourceString(UINT nResNumber, LPTSTR buffer, LONG bufSize)
     {
-        auto str = GetResourceStringFromMap(nResNumber);
+        auto str = GetResourceString_Internal(nResNumber);
         auto native_str = StringConversion::Convert_Ansi_To_Native(str);
         return StringWrapper::CopyInfoToCString(native_str, buffer, bufSize);
     }
@@ -498,6 +517,7 @@ namespace dynarithmic
         }
         return retString;
     }
+
 
     static void ClearMapEntries(CTL_LongToStringMap& resourceMap, LONG border, bool deleteBeforeBorder = true)
     {

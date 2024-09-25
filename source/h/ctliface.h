@@ -559,7 +559,10 @@ namespace dynarithmic
         static bool                     s_bDoResampling;
         static std::unique_ptr<CSimpleIniA>    s_iniInterface;
         static bool                     s_bINIFileLoaded;
+        static int                      s_nLoadingError;
 
+        static int GetResourceLoadError() { return s_nLoadingError; }
+        static void SetResourceLoadError(int errNum) { s_nLoadingError = errNum; }
         static CSimpleIniA* GetINIInterface() { return s_iniInterface.get(); }
         static bool PerformResampling() { return s_bDoResampling; }
         static CTL_PairToStringMap& GetResourceCache() { return s_ResourceCache; }
