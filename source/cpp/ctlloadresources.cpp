@@ -116,12 +116,12 @@ namespace dynarithmic
         for (int i = 0; i < numTrailers; ++i)
         {
             std::getline(ifs, line);
-            line.erase(std::remove_if(line.begin(), line.end(), [](char ch) { return isspace(ch); }), line.end());
+            boost::trim(line);
             lineQueue.push(line);
         }
         while (std::getline(ifs, line))
         {
-            line.erase(std::remove_if(line.begin(), line.end(), [](char ch) { return isspace(ch); }), line.end());
+            boost::trim(line);
             totalBuf += lineQueue.front();
             lineQueue.pop();
             lineQueue.push(line);
