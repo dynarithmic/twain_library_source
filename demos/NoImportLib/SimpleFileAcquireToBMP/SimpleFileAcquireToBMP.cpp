@@ -2,8 +2,8 @@
 //
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
-#endif
 #include "stdafx.h"
+#endif
 #include <stdio.h>
 #include <string.h>
 #include <iostream>
@@ -76,10 +76,10 @@ int SimpleFileAcquireToBMP()
                                     TRUE,    /* Close the source when DTWAIN_AcquireFileA returns*/
                                     &status); /* return status */
 
-                                              /* Test if acquisition process was started and ended successfully.  
-                                              Please note that this will *not* tell you if the acquisition was cancelled, an error
-                                              occurred such as a paper jam, etc.  To check for specific errors such as these 
-                                              while the acquisition process is occurring, see the SimpleFileAcquireToBMPErrorHandling.c demo */
+    /* Test if acquisition process was started and ended successfully.
+    Please note that this will *not* tell you if the acquisition was cancelled, an error
+    occurred such as a paper jam, etc.  To check for specific errors such as these
+    while the acquisition process is occurring, see the SimpleFileAcquireToBMPErrorHandling.c demo */
     if ( fileError != DTWAIN_TRUE )
     {
         printf("File could not be acquired: %ld\nstatus code: %ld", API.DTWAIN_GetLastError(), status);
