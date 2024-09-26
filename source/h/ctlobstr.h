@@ -543,11 +543,7 @@ namespace dynarithmic
 
         static StringType&  TrimRight(StringType& str, const CharType *lpszTrimStr)
         {
-            typename StringType::size_type nPos = str.find_last_not_of(lpszTrimStr);
-            // No characters found, so string is already right trimmed
-            if ( nPos ==  StringType::npos )
-                return str;
-            str = str.substr(0, nPos+1);
+            boost::trim_right_if(str, boost::is_any_of(lpszTrimStr));
             return str;
         }
 
@@ -560,10 +556,7 @@ namespace dynarithmic
 
         static StringType& TrimLeft(StringType& str, const CharType * lpszTrimStr)
         {
-            typename StringType::size_type nPos = str.find_first_not_of(lpszTrimStr);
-            if ( nPos == StringType::npos )
-                return str;
-            str = str.substr(nPos);
+            boost::trim_left_if(str, boost::is_any_of(lpszTrimStr));
             return str;
         }
 
