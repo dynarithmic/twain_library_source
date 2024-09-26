@@ -644,7 +644,7 @@ namespace dynarithmic
                 static_assert(std::is_same<typename Container::value_type, supported_filetype_info>::value == 1,
                     "Container is not of type supported_filetype_info");
                 if (m_bStarted)
-                    get_filetypes_impl(C, m_singlepage_filetype_cache, &API_INSTANCE DTWAIN_EnumSupportedSinglePageFileTypes);
+                    get_filetypes_impl(C, m_singlepage_filetype_cache, API_INSTANCE DTWAIN_EnumSupportedSinglePageFileTypes);
                 return C;
             }
 
@@ -659,7 +659,7 @@ namespace dynarithmic
                 static_assert(std::is_same<typename Container::value_type, supported_filetype_info>::value == 1,
                     "Container is not of type supported_filetype_info");
                 if (m_bStarted)
-                    get_filetypes_impl(C, m_multipage_filetype_cache, &API_INSTANCE DTWAIN_EnumSupportedMultiPageFileTypes);
+                    get_filetypes_impl(C, m_multipage_filetype_cache, API_INSTANCE DTWAIN_EnumSupportedMultiPageFileTypes);
                 return C;
             }
 
