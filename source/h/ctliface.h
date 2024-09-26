@@ -520,11 +520,9 @@ namespace dynarithmic
         static CTL_StringToMapLongToStringMap s_AllLoadedResourcesMap;
         static CTL_GeneralResourceInfo         s_ResourceInfo;
         static CTL_PDFMediaMap          s_PDFMediaMap;
-        static CTL_TwainLongToStringMap s_TwainCountryMap;
         static CTL_TwainNameMap         s_TwainNameMap;
         static CTL_AvailableFileFormatsMap s_AvailableFileFormatsMap;
         static CTL_TwainConstantsMap s_TwainConstantsMap;
-        static CTL_TwainLongToStringMap s_TwainLanguageMap;
         static bool s_bCheckHandles;
         static CTL_StringType           s_strResourcePath;  // path to the DTWAIN resource strings
         static CTL_StringType           s_DLLPath;
@@ -559,7 +557,10 @@ namespace dynarithmic
         static bool                     s_bDoResampling;
         static std::unique_ptr<CSimpleIniA>    s_iniInterface;
         static bool                     s_bINIFileLoaded;
+        static int                      s_nLoadingError;
 
+        static int GetResourceLoadError() { return s_nLoadingError; }
+        static void SetResourceLoadError(int errNum) { s_nLoadingError = errNum; }
         static CSimpleIniA* GetINIInterface() { return s_iniInterface.get(); }
         static bool PerformResampling() { return s_bDoResampling; }
         static CTL_PairToStringMap& GetResourceCache() { return s_ResourceCache; }
@@ -570,13 +571,11 @@ namespace dynarithmic
         static CTL_LongToStringMap* GetCurrentLanguageResource();
         static CTL_GeneralResourceInfo& GetGeneralResourceInfo() { return s_ResourceInfo; }
         static CTL_PDFMediaMap& GetPDFMediaMap() { return s_PDFMediaMap; }
-        static CTL_TwainLongToStringMap& GetTwainCountryMap() { return s_TwainCountryMap; }
         static CTL_TwainNameMap& GetTwainNameMap() { return s_TwainNameMap; }
         static std::string GetTwainNameFromResource(int nWhichResourceID, int nWhichItem);
         static CTL_AvailableFileFormatsMap& GetAvailableFileFormatsMap() { return s_AvailableFileFormatsMap; }
         static CTL_TwainConstantsMap& GetTwainConstantsMap() { return s_TwainConstantsMap; }
         static CTL_TwainConstantToStringMapNode& GetTwainConstantsStrings(LONG nWhich) { return s_TwainConstantsMap[nWhich]; }
-        static CTL_TwainLongToStringMap& GetTwainLanguageMap() { return s_TwainLanguageMap; }
         static bool IsCheckHandles() { return s_bCheckHandles; }
         static int GetIDFromTwainName(std::string sName);
         static int GetDGResourceID() { return 8890; }
