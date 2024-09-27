@@ -2725,5 +2725,7 @@ function DTWAIN_IsBufferedTileModeSupported(Source:DTWAIN_SOURCE):LONG;stdcall; 
 function DTWAIN_ConvertToAPIStringA Lib(sString:LPCSTR):DTWAIN_HANDLE;stdcall; external 'dtwain64.dll'   name 'DTWAIN_ConvertToAPIStringA';
 function DTWAIN_ConvertToAPIStringW Lib(sString:LPWSTR):DTWAIN_HANDLE;stdcall; external 'dtwain64.dll'   name 'DTWAIN_ConvertToAPIStringW'; 
 function DTWAIN_ConvertToAPIString Lib(sString:LPTSTR):DTWAIN_HANDLE;stdcall; external 'dtwain64.dll'   name 'DTWAIN_ConvertToAPIString'; 
+function DTWAIN_IsSourceInUIOnlyMode(Source:DTWAIN_SOURCE):BOOL;stdcall; external 'dtwain64.dll'   name 'DTWAIN_IsSourceInUIOnlyMode';
+
     implementation
 end.

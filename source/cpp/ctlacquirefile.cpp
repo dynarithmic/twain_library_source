@@ -52,8 +52,16 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
     auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
     if (availableFileTypes.find(lFileType) == availableFileTypes.end())
     {
-        DTWAIN_SetLastError(DTWAIN_ERR_FILE_FORMAT);
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        // Not a universal file type, so see if this is a type supported
+        // by the Source's file transfer
+        BOOL bFileGood = FALSE;
+        if (lFileFlags & DTWAIN_USESOURCEMODE)
+            bFileGood = DTWAIN_IsFileXferSupported(Source, lFileType);
+        if (!bFileGood)
+        {
+            DTWAIN_SetLastError(DTWAIN_ERR_FILE_FORMAT);
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        }
     }
 
     DTWAIN_ARRAY tempNames = nullptr;
@@ -110,8 +118,16 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFile(DTWAIN_SOURCE Source,
     auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
     if (availableFileTypes.find(lFileType) == availableFileTypes.end())
     {
-        DTWAIN_SetLastError(DTWAIN_ERR_FILE_FORMAT);
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        // Not a universal file type, so see if this is a type supported
+        // by the Source's file transfer
+        BOOL bFileGood = FALSE;
+        if (lFileFlags & DTWAIN_USESOURCEMODE)
+            bFileGood = DTWAIN_IsFileXferSupported(Source, lFileType);
+        if (!bFileGood)
+        {
+            DTWAIN_SetLastError(DTWAIN_ERR_FILE_FORMAT);
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        }
     }
 
     lFileFlags &= ~DTWAIN_USELIST;
