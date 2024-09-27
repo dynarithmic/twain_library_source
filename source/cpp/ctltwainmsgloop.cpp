@@ -115,7 +115,11 @@ void TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource *pSource, 
 
         // If acquire has been terminated, break out of this loop
         if (IsAcquireTerminated(pSource, isUIOnly))
+        {
+            if (isUIOnly)
+                pSource->SetUIOnly(false);
             break;
+        }
 
         // If we haven't set up the TWAIN device for the acquisition,
         // do it now.  The LLAcquireImage() will also eventually show

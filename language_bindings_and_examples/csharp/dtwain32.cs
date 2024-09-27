@@ -5831,5 +5831,10 @@ namespace Dynarithmic
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode,
         ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern DTWAIN_HANDLE DTWAIN_ConvertToAPIStringW([MarshalAs(UnmanagedType.LPWStr)] string str);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern  int DTWAIN_IsSourceInUIOnlyMode(DTWAIN_SOURCE Source);
+
     }
 }
