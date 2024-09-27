@@ -2702,4 +2702,5 @@ Class DTWAINAPI
     Declare Ansi Function DTWAIN_ConvertToAPIStringA Lib "dtwain64.dll" (<MarshalAs(UnmanagedType.LPStr)> sString As String) As System.IntPtr
     Declare Unicode Function DTWAIN_ConvertToAPIStringW Lib "dtwain64.dll" (<MarshalAs(UnmanagedType.LPWStr)> sString As String) As System.IntPtr
     Declare Auto Function DTWAIN_ConvertToAPIString Lib "dtwain64.dll" (<MarshalAs(UnmanagedType.LPTStr)> sString As String) As System.IntPtr
-   End Class
+    Declare Auto Function DTWAIN_IsSourceInUIOnlyMode Lib "dtwain64.dll" (ByVal Source As System.IntPtr) As Integer
+    End Class
