@@ -443,7 +443,7 @@ void GenericAcquire(LONG nWhichOne)
     }
     else
     {
-        DTWAIN_AcquireBufferedEx(
+        bRet = DTWAIN_AcquireBufferedEx(
             g_CurrentSource,
             DTWAIN_PT_DEFAULT, /* Use default */
             DTWAIN_ACQUIREALL, /* Get all pages */
