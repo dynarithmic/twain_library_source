@@ -144,6 +144,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceOpen(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
+    if ( !Source )
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
     auto [pHandle, pSource] = VerifyHandles(Source);
     const DTWAIN_BOOL bRet = CTL_TwainAppMgr::IsSourceOpen(pSource);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
