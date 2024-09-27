@@ -666,7 +666,7 @@ bool CTL_TwainAppMgr::ShowUserInterface( CTL_ITwainSource *pSource, bool bTest, 
         {
             pSource->SetState(oldState);
             pSource->SetModal(isModal);
-            pSource->SetUIOnly(isUIOnly);
+            pSource->SetUIOnly(isUIOnly); 
             SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_UIOPENFAILURE, reinterpret_cast<LPARAM>(pSource));
         }
     };
@@ -1927,6 +1927,13 @@ int CTL_TwainAppMgr::SetTransferMechanism( const CTL_ITwainSource *pSource,CTL_T
     else
     if ( AcquireType == TWAINAcquireType_Clipboard)
         uTwainType = static_cast<TW_UINT16>(ClipboardTransferType);
+    else
+    if ( AcquireType == TWAINAcquireType_File)
+        uTwainType = TWSX_FILE;
+    else
+    if ( AcquireType == TWAINAcquireType_MemFile)
+        uTwainType = TWSX_MEMFILE;
+
     if ( AcquireType != TWAINAcquireType_AudioNative)
         SetOneTwainCapValue( pSource, uTwainType, CTL_SetTypeSET, TwainCap_XFERMECH, TWTY_UINT16);
     else
