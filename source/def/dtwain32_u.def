@@ -185,6 +185,7 @@ DTWAIN_GetSourceUnit                              @300
 DTWAIN_SetSourceUnit                              @301
 DTWAIN_EnumSourceUnits                            @302
 DTWAIN_ShowUIOnly                                 @310
+DTWAIN_IsSourceInUIOnlyMode                       @311
 DTWAIN_SetDeviceNotifications                     @350
 DTWAIN_GetDeviceNotifications                     @351
 DTWAIN_GetDeviceEvent                             @352
