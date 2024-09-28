@@ -101,17 +101,19 @@ std::pair<CTL_ResourceRegistryMap::iterator, bool> CTL_TwainDLLHandle::AddResour
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
+int                         CTL_StaticData::s_nLoadingError = DTWAIN_NO_ERROR;
+std::unique_ptr<CSimpleIniA>   CTL_StaticData::s_iniInterface;
+bool                         CTL_StaticData::s_bINIFileLoaded = false;
+bool                         CTL_StaticData::s_bDoResampling = true;
 CTL_StringToMapLongToStringMap CTL_StaticData::s_AllLoadedResourcesMap;
 CTL_PairToStringMap         CTL_StaticData::s_ResourceCache;
 std::string                 CTL_StaticData::s_CurrentResourceKey;
 CTL_GeneralResourceInfo     CTL_StaticData::s_ResourceInfo;
 CTL_PDFMediaMap             CTL_StaticData::s_PDFMediaMap;
-CTL_TwainLongToStringMap    CTL_StaticData::s_TwainCountryMap;
 CTL_TwainNameMap            CTL_StaticData::s_TwainNameMap;
 CTL_AvailableFileFormatsMap CTL_StaticData::s_AvailableFileFormatsMap;
 CTL_TwainConstantsMap       CTL_StaticData::s_TwainConstantsMap;
 bool                        CTL_StaticData::s_bCheckHandles = true;
-CTL_TwainLongToStringMap    CTL_StaticData::s_TwainLanguageMap;
 CTL_StringType              CTL_StaticData::s_strResourcePath;
 CTL_StringType              CTL_StaticData::s_ResourceVersion;
 CTL_StringType              CTL_StaticData::s_DLLPath;
@@ -140,6 +142,18 @@ CLogSystem                  CTL_StaticData::s_appLog;
 bool                        CTL_StaticData::s_ResourcesInitialized = false;
 ImageResamplerMap           CTL_StaticData::s_ImageResamplerMap;
 SourceStatusMap             CTL_StaticData::s_SourceStatusMap;
+
+CTL_StringType CTL_StaticData::GetTwainNameFromConstant(int lConstantType, int lTwainConstant)
+{
+    auto& constantsmap = CTL_StaticData::GetTwainConstantsMap();
+    auto iter1 = constantsmap.find(lConstantType);
+    if (iter1 == constantsmap.end())
+        return {};
+    auto iter2 = iter1->second.find(lTwainConstant);
+    if (iter2 == iter1->second.end())
+        return {};
+    return StringConversion::Convert_Ansi_To_Native(iter2->second);
+}
 
 CTL_LongToStringMap* CTL_StaticData::GetLanguageResource(std::string sLang)
 {

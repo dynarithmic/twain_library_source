@@ -746,11 +746,7 @@ void ImageXferFileWriter::EndProcessingImageFile(bool bSaveFile/*=true*/) const
 void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pSession, LONG Error, LONG ErrorMsg,
                           const std::string& extraInfo)
 {
-    static constexpr int MaxMessage = 1024;
-    CTL_TwainAppMgr::SetError(Error, extraInfo, true);
-    char szBuf[MaxMessage + 1];
-    CTL_TwainAppMgr::GetLastErrorString(szBuf, MaxMessage);
-    CTL_TwainAppMgr::WriteLogInfoA(szBuf);
+	CTL_TwainAppMgr::SetAndLogError(Error, extraInfo, true);
     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, ErrorMsg, reinterpret_cast<LPARAM>(pSource));
 }
 

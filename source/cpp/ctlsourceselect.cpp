@@ -415,11 +415,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDefaultSource(DTWAIN_SOURCE Source)
     bool bRet = false;
     bRet = CTL_TwainAppMgr::SetDefaultSource(pSource);
     // Load the resources
-    CSimpleIniA customProfile;
-    CTL_StringType fullDirectory = dynarithmic::GetDTWAININIPath();
-    customProfile.LoadFile(fullDirectory.c_str());
-    customProfile.SetValue("Sources", "Default", pSource->GetProductNameA().c_str());
-    customProfile.SaveFile(fullDirectory.c_str());
+    auto* customProfile = CTL_StaticData::GetINIInterface();
+    if (customProfile)
+    {
+        customProfile->SetValue("Sources", "Default", pSource->GetProductNameA().c_str());
+    }
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -427,12 +427,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDefaultSource(DTWAIN_SOURCE Source)
 static CTL_StringType GetDefaultSource()
 {
     // Load the resources
-    CSimpleIniA customProfile;
-    CTL_StringType fullDirectory = dynarithmic::GetDTWAININIPath();
-    customProfile.LoadFile(fullDirectory.c_str());
-    const char *defSource = customProfile.GetValue("Sources", "Default");
-    return StringConversion::Convert_AnsiPtr_To_Native(defSource);
+    auto *customProfile = CTL_StaticData::GetINIInterface();
+    if (customProfile)
+    {
+        const char* defSource = customProfile->GetValue("Sources", "Default");
+        return StringConversion::Convert_AnsiPtr_To_Native(defSource);
+    }
+    return {};
 }
+
 #ifdef _WIN32
 /////////////////////////////////////////////////////////////////////////////////
 /// TWAIN Dialog procedure
@@ -844,7 +847,7 @@ void DisplayLocalString(HWND hWnd, int nID, int resID)
     {
         const HWND hWndControl = GetDlgItem(hWnd, nID);
         if (hWndControl)
-            SetWindowTextA(hWndControl, sText.c_str());
+            SetDlgItemTextA(hWnd, nID, sText.c_str());
     }
 }
 #endif

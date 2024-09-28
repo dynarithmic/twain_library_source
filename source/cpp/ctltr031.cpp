@@ -60,21 +60,6 @@ CTL_ImageMemXferTriplet::CTL_ImageMemXferTriplet(CTL_ITwainSession *pSession,
     m_nCompression = nCompression;
 
     InitXferBuffer();
-
-    m_ImageMemXferBuffer.Compression = TWON_DONTCARE16;
-    m_ImageMemXferBuffer.BytesPerRow =
-    m_ImageMemXferBuffer.Columns =
-    m_ImageMemXferBuffer.Rows =
-    m_ImageMemXferBuffer.XOffset =
-    m_ImageMemXferBuffer.YOffset =
-    m_ImageMemXferBuffer.BytesWritten = TWON_DONTCARE32;
-
-    if ( nCompression != TWCP_NONE )
-    {
-        m_ImageMemXferBuffer.Compression = nCompression;
-        m_ImageMemXferBuffer.BytesPerRow = 0;
-    }
-
     InitVars( DAT_IMAGEMEMXFER, CTL_GetTypeGET, &m_ImageMemXferBuffer );
 
     m_DibStrip = hDib;
@@ -122,6 +107,13 @@ void CTL_ImageMemXferTriplet::InitXferBuffer()
     m_ImageMemXferBuffer.YOffset =
     m_ImageMemXferBuffer.BytesWritten = TWON_DONTCARE32;
 
+	if (GetSourcePtr()->IsTileModeOn())
+	{
+		m_ImageMemXferBuffer.Memory.Flags = TWMF_DSOWNS;
+		m_ImageMemXferBuffer.Memory.Length = TWON_DONTCARE32;
+		m_ImageMemXferBuffer.Memory.TheMem = NULL;
+	}
+
     if ( m_nCompression != TWCP_NONE )
     {
         m_ImageMemXferBuffer.Compression = m_nCompression;
@@ -160,13 +152,28 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
         switch (rc)
         {
             case TWRC_SUCCESS:
-                // Send message that a strip has been transferred successfully
-                CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_TRANSFERSTRIPREADY, reinterpret_cast<LPARAM>(pSource));
+                // Send message that a strip or tile has been transferred successfully
+				pSource->GetBufferedXFerInfo() = m_ImageMemXferBuffer;
+                if (pSource->IsTileModeOn())
+                {
+                    // The application is informed that a tile has been transferred.  The application is responsible for
+                    // calling DTWAIN_GetBufferedTransferInfo() to retrieve all of the tiled transfer information and
+                    // handle the information
+                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_TRANSFERTILEDONE, reinterpret_cast<LPARAM>(pSource));
+                    // Deallocate the buffer
+					pSession->GetTwainDLLHandle()->m_TwainMemoryFunc->UnlockMemory(m_ImageMemXferBuffer.Memory.TheMem);
+					pSession->GetTwainDLLHandle()->m_TwainMemoryFunc->FreeMemory(m_ImageMemXferBuffer.Memory.TheMem);
+                    InitXferBuffer();
+                    break;
+                }
+
+                else
+                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_TRANSFERSTRIPREADY, reinterpret_cast<LPARAM>(pSource));
                 if ( m_nCompression == TWCP_NONE )
                 {
                     m_nCompressPos += m_ImageMemXferBuffer.BytesWritten;
                     // If not user defined copy DIB data here
-                    if ( !pSource->GetUserStripBuffer())
+                    if ( !pSource->GetUserStripBuffer() && !pSource->IsTileModeOn())
                         m_ptrDib += m_ImageMemXferBuffer.BytesWritten;
 
                     m_ImageMemXferBuffer.Memory.TheMem = m_ptrDib;
@@ -178,6 +185,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                       */
                 {
                     {
+
                         // Need to Reallocate the pointer and copy strip to correct position
                         const HANDLE hUserBuffer = pSource->GetUserStripBuffer();
                         if ( !hUserBuffer )
@@ -187,10 +195,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
 
                             if ( !pMem )
                             {
-                               CTL_TwainAppMgr::SetError(DTWAIN_ERR_OUT_OF_MEMORY, "", true);
-                               char szBuf[255];
-                               CTL_TwainAppMgr::GetLastErrorString(szBuf, 254);
-                               CTL_TwainAppMgr::WriteLogInfoA(szBuf);
+                               CTL_TwainAppMgr::SetAndLogError(DTWAIN_ERR_OUT_OF_MEMORY, "", true);
                                CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                                      nullptr, DTWAIN_TN_TRANSFERSTRIPFAILED,
                                                                      reinterpret_cast<LPARAM>(pSource));
@@ -227,14 +232,16 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
 
             case TWRC_CANCEL:
             {
-                ImageMemoryHandler::GlobalUnlock(m_DibStrip);
+                if ( !pSource->IsTileModeOn() )
+                    ImageMemoryHandler::GlobalUnlock(m_DibStrip);
                 CancelAcquisition();
             }
             break;
 
             case TWRC_FAILURE:
             {
-                ImageMemoryHandler::GlobalUnlock(m_DibStrip);
+				if (!pSource->IsTileModeOn())
+					ImageMemoryHandler::GlobalUnlock(m_DibStrip);
                 FailAcquisition();
                 return rc;
             }
@@ -296,197 +303,209 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
 
                 const bool bExecuteEOJPageHandling = bEndOfJobDetected && pSource->IsJobFileHandlingOn();
 
-                // Get the image page
                 bool bInClip = false;
 
-
-                // Let Source set the handle
-                m_nCompressPos += m_ImageMemXferBuffer.BytesWritten;
-                pSource->SetNumCompressBytes(m_nCompressPos);
-
-                ImageMemoryHandler::GlobalUnlock(m_DibStrip);
-                if ( !pSource->GetUserStripBuffer() )
+                // Don't do anything, since the application is responsible to get the tiled
+                // data.
+				pSource->GetBufferedXFerInfo() = m_ImageMemXferBuffer;
+                if (pSource->IsTileModeOn())
                 {
-                    if ( m_nCompression == TWCP_NONE )
-                        pSource->SetDibHandle( m_DibStrip, nCurImage );
-                    else
-                    // This "DIB" is just a holder for the memory.
+					pSession->GetTwainDLLHandle()->m_TwainMemoryFunc->UnlockMemory(m_ImageMemXferBuffer.Memory.TheMem);
+					pSession->GetTwainDLLHandle()->m_TwainMemoryFunc->FreeMemory(m_ImageMemXferBuffer.Memory.TheMem);
+                    pSource->SetTransferDone(true);
+                }
+                else
+                // we do strip processing to clean up
+                {
+                    // Let Source set the handle
+                    m_nCompressPos += m_ImageMemXferBuffer.BytesWritten;
+                    pSource->SetNumCompressBytes(m_nCompressPos);
+
+                    ImageMemoryHandler::GlobalUnlock(m_DibStrip);
+                    if ( !pSource->GetUserStripBuffer() )
                     {
-                        // Copy the memory we got from the compressed transfer and
-                        // fake it that this is a DIB
-                        pSource->SetDibHandleNoPalette( ImageMemoryHandler::GlobalHandle(m_ptrDib), static_cast<int>(nCurImage) );
+                        if ( m_nCompression == TWCP_NONE )
+                            pSource->SetDibHandle( m_DibStrip, nCurImage );
+                        else
+                        // This "DIB" is just a holder for the memory.
+                        {
+                            // Copy the memory we got from the compressed transfer and
+                            // fake it that this is a DIB
+                            pSource->SetDibHandleNoPalette( ImageMemoryHandler::GlobalHandle(m_ptrDib), static_cast<int>(nCurImage) );
 
-                        // Unlock the memory used to store compressed image
-                        ImageMemoryHandler::GlobalUnlock(ImageMemoryHandler::GlobalHandle(m_ptrDib));
-                    }
+                            // Unlock the memory used to store compressed image
+                            ImageMemoryHandler::GlobalUnlock(ImageMemoryHandler::GlobalHandle(m_ptrDib));
+                        }
 
-                    //  Get the array of current array of DIBS
-                    // (this pointer allows changes to Source's internal DIB array)
-                    CTL_TwainDibArray* pArray = pSource->GetDibArray();
+                        //  Get the array of current array of DIBS
+                        // (this pointer allows changes to Source's internal DIB array)
+                        CTL_TwainDibArray* pArray = pSource->GetDibArray();
 
-                    // Get the dib from the array
-                    const size_t nLastDib = pArray->GetSize() - 1;
-                    const CTL_TwainDibPtr CurDib = pArray->GetAt(nLastDib);
-                    if ( CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_PROCESSEDDIB, reinterpret_cast<LPARAM>(pSource)) == 0 )
-                    {
-                        // User does not want to process the image further.
-                        // They are satisfied with the DIB as-is.
-                        CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_PROCESSDIBACCEPTED, reinterpret_cast<LPARAM>(pSource));
-                        bProcessDibEx = false;
-                        break;
-                    }
+                        // Get the dib from the array
+                        const size_t nLastDib = pArray->GetSize() - 1;
+                        const CTL_TwainDibPtr CurDib = pArray->GetAt(nLastDib);
+                        if ( CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_PROCESSEDDIB, reinterpret_cast<LPARAM>(pSource)) == 0 )
+                        {
+                            // User does not want to process the image further.
+                            // They are satisfied with the DIB as-is.
+                            CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_PROCESSDIBACCEPTED, reinterpret_cast<LPARAM>(pSource));
+                            bProcessDibEx = false;
+                            break;
+                        }
 
-                    // This may be a compressed image instead of a DIB.  Don't flip if this is an image
-                    if ( m_nCompression == TWCP_NONE )
-                    {
-                        // Here we can do a check for blank page.  The code has not been tested
-                        // To be done...
-                        if ( ProcessBlankPage(pSession, pSource, CurDib, false, DTWAIN_TN_BLANKPAGEDETECTED1,
-                                              DTWAIN_TN_BLANKPAGEDISCARDED1, DTWAIN_BP_AUTODISCARD_IMMEDIATE) == 0 )
+                        // This may be a compressed image instead of a DIB.  Don't flip if this is an image
+                        if ( m_nCompression == TWCP_NONE )
+                        {
+                            // Here we can do a check for blank page.  The code has not been tested
+                            // To be done...
+                            if ( ProcessBlankPage(pSession, pSource, CurDib, false, DTWAIN_TN_BLANKPAGEDETECTED1,
+                                                  DTWAIN_TN_BLANKPAGEDISCARDED1, DTWAIN_BP_AUTODISCARD_IMMEDIATE) == 0 )
+                            {
+                                bPageDiscarded = true;
+                                m_ptrOrig = nullptr;
+                                break;  // The page is discarded
+                            }
+
+                            CurDib->FlipBitMap(m_nPixelType == TWPT_RGB?1:0);
+                            auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
+
+                            // Callback function for access to change DIB
+                            if ( sessionHandle->m_pDibUpdateProc != nullptr)
+                            {
+                                const HANDLE hRetDib =
+                                    (sessionHandle->m_pDibUpdateProc)
+                                            (pSource, static_cast<int>(nCurImage), m_hDataHandle);
+                                if ( hRetDib && hRetDib != m_hDataHandle)
+                                {
+                                    // Application changed DIB.  So make this the current dib
+                                    ImageMemoryHandler::GlobalFree( m_hDataHandle );
+                                    m_hDataHandle = hRetDib;
+                                    pSource->SetDibHandle( m_hDataHandle, nLastDib );
+                                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_APPUPDATEDDIB, reinterpret_cast<LPARAM>(pSource));
+                                }
+                            }
+
+                            // Change bpp if necessary
+                            if (bProcessDibEx)
+                            {
+                                if (ModifyAcquiredDib())
+                                    m_ptrOrig = nullptr;
+                            }
+
+                            if ( CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_PROCESSEDDIBFINAL, reinterpret_cast<LPARAM>(pSource)) == 0 )
+                            {
+                                CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_PROCESSDIBFINALACCEPTED, reinterpret_cast<LPARAM>(pSource));
+                                // user is satisfied with the image, so break
+                                break;
+                            }
+                        }
+
+                        if ( ProcessBlankPage(pSession, pSource, CurDib, true, DTWAIN_TN_BLANKPAGEDETECTED2, DTWAIN_TN_BLANKPAGEDISCARDED2, DTWAIN_BP_AUTODISCARD_AFTERPROCESS) == 0 )
                         {
                             bPageDiscarded = true;
                             m_ptrOrig = nullptr;
                             break;  // The page is discarded
                         }
 
-                        CurDib->FlipBitMap(m_nPixelType == TWPT_RGB?1:0);
-                        auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
-
-                        // Callback function for access to change DIB
-                        if ( sessionHandle->m_pDibUpdateProc != nullptr)
+                        // Now see if we want to keep the bitmap
+                        // Query if the page should be thrown away
+                        const bool bKeepPage = QueryAndRemoveDib(TWAINAcquireType_Buffer, nLastDib);
+                        if (!bKeepPage)
                         {
-                            const HANDLE hRetDib =
-                                (sessionHandle->m_pDibUpdateProc)
-                                        (pSource, static_cast<int>(nCurImage), m_hDataHandle);
-                            if ( hRetDib && hRetDib != m_hDataHandle)
-                            {
-                                // Application changed DIB.  So make this the current dib
-                                ImageMemoryHandler::GlobalFree( m_hDataHandle );
-                                m_hDataHandle = hRetDib;
-                                pSource->SetDibHandle( m_hDataHandle, nLastDib );
-                                CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_APPUPDATEDDIB, reinterpret_cast<LPARAM>(pSource));
-                            }
-                        }
-
-                        // Change bpp if necessary
-                        if (bProcessDibEx)
-                        {
-                            if (ModifyAcquiredDib())
-                                m_ptrOrig = nullptr;
-                        }
-
-                        if ( CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_PROCESSEDDIBFINAL, reinterpret_cast<LPARAM>(pSource)) == 0 )
-                        {
-                            CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_PROCESSDIBFINALACCEPTED, reinterpret_cast<LPARAM>(pSource));
-                            // user is satisfied with the image, so break
+                            m_ptrOrig = nullptr;
                             break;
                         }
-                    }
 
-                    if ( ProcessBlankPage(pSession, pSource, CurDib, true, DTWAIN_TN_BLANKPAGEDETECTED2, DTWAIN_TN_BLANKPAGEDISCARDED2, DTWAIN_BP_AUTODISCARD_AFTERPROCESS) == 0 )
-                    {
-                        bPageDiscarded = true;
-                        m_ptrOrig = nullptr;
-                        break;  // The page is discarded
-                    }
-
-                    // Now see if we want to keep the bitmap
-                    // Query if the page should be thrown away
-                    const bool bKeepPage = QueryAndRemoveDib(TWAINAcquireType_Buffer, nLastDib);
-                    if (!bKeepPage)
-                    {
-                        m_ptrOrig = nullptr;
-                        break;
-                    }
-
-                    if ( pSource->GetAcquireType() == TWAINAcquireType_Clipboard )
-                    {
-                        // This may be a compressed image instead of a DIB.  Don't place in clipboard
-                        if ( m_nCompression == TWCP_NONE )
+                        if ( pSource->GetAcquireType() == TWAINAcquireType_Clipboard )
                         {
-                            if ( pSource->GetSpecialTransferMode() == DTWAIN_USEBUFFERED )
-                                bInClip = CopyDibToClipboard( pSession, CurDib->GetHandle());
-                        }
-                        else
-                            bInClip = false;
-                    }
-                    else
-                    if ( pSource->GetAcquireType() == TWAINAcquireType_FileUsingNative)
-                    {
-                        // This may be a compressed image instead of a DIB.  Use Raw IO handler to write this file
-                        if ( m_nCompression != TWCP_NONE )
-                            pSource->SetAcquireFileType(GetFileTypeFromCompression(m_nCompression));
-
-                        pSource->SetPromptPending(false);
-                        long lFlags   = pSource->GetAcquireFileFlags();
-                        if ( lFlags & DTWAIN_USEPROMPT )
-                        {
-                            pSource->SetPromptPending(true);
-                        }
-
-                        // resample the DIB
-                        if (m_nCompression == TWCP_NONE)
-                        {
-                            if (ResampleAcquiredDib())
-                                m_ptrOrig = nullptr;
-                        }
-
-                        // Check if multi page file is being used
-                        // Query if the page should be thrown away
-                        const bool bKeepPage2 = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_QUERYPAGEDISCARD,reinterpret_cast<LPARAM>(pSource))?true:false;
-                        if (bKeepPage2 )
-                        {
-                            // Check if multi page file is being used
-                            const bool bIsMultiPageFile = CTL_ITwainSource::IsFileTypeMultiPage(pSource->GetAcquireFileType());
-                            int nMultiStage = 0;
-                            if ( bIsMultiPageFile || pSource->IsMultiPageModeSaveAtEnd())
+                            // This may be a compressed image instead of a DIB.  Don't place in clipboard
+                            if ( m_nCompression == TWCP_NONE )
                             {
-                                // This is the fist page of the acquisition
-                                if (nLastDib == 0 || (pSource->IsNewJob() && pSource->IsJobFileHandlingOn()))
-                                    nMultiStage = DIB_MULTI_FIRST;
-                                else
-                                // This is a subsequent page of the acquisition
-                                    nMultiStage = DIB_MULTI_NEXT;
-
-                                // Now check if this we are in manual duplex mode
-                                if ( pSource->IsManualDuplexModeOn() ||
-                                     pSource->IsMultiPageModeContinuous() ||
-                               (pSource->IsMultiPageModeSaveAtEnd() && !bIsMultiPageFile))
-                                {
-                                    // We need to copy the data to a file and store info in
-                                    // vector of the source
-                                if ( !bEndOfJobDetected || // Not end -of-job
-                                    (bExecuteEOJPageHandling && !m_bJobControlPageRecorded) // write job control page
-                                    )
-                                    errfile = FileWriter.CopyDuplexDibToFile(CurDib, bExecuteEOJPageHandling);
-
-                                if ( !m_bJobControlPageRecorded && bExecuteEOJPageHandling)
-                                    m_bJobControlPageRecorded = true;
-                                }
-                                else
-                                    errfile = FileWriter.CopyDibToFile(CurDib, nMultiStage,
-                                                            pSource->GetImageHandlerPtr(), 0);
+                                if ( pSource->GetSpecialTransferMode() == DTWAIN_USEBUFFERED )
+                                    bInClip = CopyDibToClipboard( pSession, CurDib->GetHandle());
                             }
                             else
-                                errfile = FileWriter.CopyDibToFile(CurDib, nMultiStage, pSource->GetImageHandlerPtr(), 0);
-                            m_nTotalPagesSaved++;
+                                bInClip = false;
                         }
                         else
+                        if ( pSource->GetAcquireType() == TWAINAcquireType_FileUsingNative)
                         {
-                            m_ptrOrig = nullptr;
-                            CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,
-                                                                  DTWAIN_TN_PAGEDISCARDED,
-                                                                  reinterpret_cast<LPARAM>(pSource));
-                        }
-                        // Delete temporary bitmap here
-                        if ( !bKeepPage2 || pSource->IsDeleteDibOnScan() )
-                        {
-                            // Let array class handle deleting of the DIB (Global memory will be freed only)
-                            pArray->DeleteDibMemory( nLastDib );
-                            m_ptrOrig = nullptr;
+                            // This may be a compressed image instead of a DIB.  Use Raw IO handler to write this file
+                            if ( m_nCompression != TWCP_NONE )
+                                pSource->SetAcquireFileType(GetFileTypeFromCompression(m_nCompression));
+
+                            pSource->SetPromptPending(false);
+                            long lFlags   = pSource->GetAcquireFileFlags();
+                            if ( lFlags & DTWAIN_USEPROMPT )
+                            {
+                                pSource->SetPromptPending(true);
+                            }
+
+                            // resample the DIB
+                            if (m_nCompression == TWCP_NONE)
+                            {
+                                if (ResampleAcquiredDib())
+                                    m_ptrOrig = nullptr;
+                            }
+
+                            // Check if multi page file is being used
+                            // Query if the page should be thrown away
+                            const bool bKeepPage2 = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_QUERYPAGEDISCARD,reinterpret_cast<LPARAM>(pSource))?true:false;
+                            if (bKeepPage2 )
+                            {
+                                // Check if multi page file is being used
+                                const bool bIsMultiPageFile = CTL_ITwainSource::IsFileTypeMultiPage(pSource->GetAcquireFileType());
+                                int nMultiStage = 0;
+                                if ( bIsMultiPageFile || pSource->IsMultiPageModeSaveAtEnd())
+                                {
+                                    // This is the fist page of the acquisition
+                                    if (nLastDib == 0 || (pSource->IsNewJob() && pSource->IsJobFileHandlingOn()))
+                                        nMultiStage = DIB_MULTI_FIRST;
+                                    else
+                                    // This is a subsequent page of the acquisition
+                                        nMultiStage = DIB_MULTI_NEXT;
+
+                                    // Now check if this we are in manual duplex mode
+                                    if ( pSource->IsManualDuplexModeOn() ||
+                                         pSource->IsMultiPageModeContinuous() ||
+                                   (pSource->IsMultiPageModeSaveAtEnd() && !bIsMultiPageFile))
+                                    {
+                                        // We need to copy the data to a file and store info in
+                                        // vector of the source
+                                    if ( !bEndOfJobDetected || // Not end -of-job
+                                        (bExecuteEOJPageHandling && !m_bJobControlPageRecorded) // write job control page
+                                        )
+                                        errfile = FileWriter.CopyDuplexDibToFile(CurDib, bExecuteEOJPageHandling);
+
+                                    if ( !m_bJobControlPageRecorded && bExecuteEOJPageHandling)
+                                        m_bJobControlPageRecorded = true;
+                                    }
+                                    else
+                                        errfile = FileWriter.CopyDibToFile(CurDib, nMultiStage,
+                                                                pSource->GetImageHandlerPtr(), 0);
+                                }
+                                else
+                                    errfile = FileWriter.CopyDibToFile(CurDib, nMultiStage, pSource->GetImageHandlerPtr(), 0);
+                                m_nTotalPagesSaved++;
+                            }
+                            else
+                            {
+                                m_ptrOrig = nullptr;
+                                CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,
+                                                                      DTWAIN_TN_PAGEDISCARDED,
+                                                                      reinterpret_cast<LPARAM>(pSource));
+                            }
+                            // Delete temporary bitmap here
+                            if ( !bKeepPage2 || pSource->IsDeleteDibOnScan() )
+                            {
+                                // Let array class handle deleting of the DIB (Global memory will be freed only)
+                                pArray->DeleteDibMemory( nLastDib );
+                                m_ptrOrig = nullptr;
+                            }
                         }
                     }
                 }
+
                 pSource->SetTransferDone(true);
                 if ( bInClip )
                     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,
@@ -494,15 +513,11 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                                                           static_cast<LPARAM>(pSource->GetAcquireNum()));
                 if ( errfile != 0 )
                 {
-                   CTL_TwainAppMgr::SetError(errfile, "", false);
-                   char szBuf[255];
-                   CTL_TwainAppMgr::GetLastErrorString(szBuf, 254);
-                   CTL_TwainAppMgr::WriteLogInfoA(szBuf);
+				   CTL_TwainAppMgr::SetAndLogError(errfile, "", false);
                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                          nullptr, DTWAIN_TN_INVALIDIMAGEFORMAT,
                                                          reinterpret_cast<LPARAM>(pSource));
                 }
-
             }
             break;
             default:

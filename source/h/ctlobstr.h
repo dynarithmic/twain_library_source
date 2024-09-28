@@ -153,6 +153,7 @@ namespace dynarithmic
         static const char_type* GetCompatStringLiteral(const char_type* x) { return x; }
         static constexpr char_type GetNewLineChar() { return '\n'; }
         static constexpr const char_type* GetNewLineString() { return "\n"; }
+        static constexpr const char_type* GetWindowsNewLineString() { return "\r\n"; }
         static size_t Length(const char_type* s) { return std::char_traits<char_type>::length(s); }
         static char_type* Copy(char_type* dest, const char_type* src) { return std::char_traits<char_type>::copy(dest, src, Length(src)); }
         static char_type* CopyN(char_type* dest, const char_type* src, size_t count) { return std::char_traits<char_type>::copy(dest, src, count); }
@@ -171,7 +172,7 @@ namespace dynarithmic
             return f.widen(src, src + len, dest);
         }
 
-        static const char_type CharToThisType(char ch)
+        static constexpr char_type CharToThisType(char ch)
         {
             return ch;
         }
@@ -275,6 +276,7 @@ namespace dynarithmic
         static constexpr char_type GetZeroNumericString() { return L'0'; }
         static constexpr char_type GetNewLineChar() { return L'\n'; }
         static constexpr const char_type* GetNewLineString() { return L"\n"; }
+        static constexpr const char_type* GetWindowsNewLineString() { return L"\r\n"; }
         static const char_type* GetCompatStringLiteral(const char_type* x) { return x; }
         static size_t Length(const char_type* s) { return std::char_traits<char_type>::length(s); }
         static int Compare(const char_type* dest, const char_type* src, size_t count) { return std::char_traits<char_type>::compare(dest, src, count); }
@@ -541,33 +543,26 @@ namespace dynarithmic
 
         static StringType&  TrimRight(StringType& str, const CharType *lpszTrimStr)
         {
-            typename StringType::size_type nPos = str.find_last_not_of(lpszTrimStr);
-            // No characters found, so string is already right trimmed
-            if ( nPos ==  StringType::npos )
-                return str;
-            str = str.substr(0, nPos+1);
+            boost::trim_right_if(str, boost::is_any_of(lpszTrimStr));
             return str;
         }
 
         static StringType& TrimRight(StringType &str, CharType ch= StringTraits::GetSpace() )
         {
-            CharType sz[2];
+            CharType sz[2] = {};
             sz[0]=ch; sz[1] = 0;
             return TrimRight(str, sz);
         }
 
         static StringType& TrimLeft(StringType& str, const CharType * lpszTrimStr)
         {
-            typename StringType::size_type nPos = str.find_first_not_of(lpszTrimStr);
-            if ( nPos == StringType::npos )
-                return str;
-            str = str.substr(nPos);
+            boost::trim_left_if(str, boost::is_any_of(lpszTrimStr));
             return str;
         }
 
         static StringType& TrimLeft(StringType& str, CharType ch= StringTraits::GetSpace() )
         {
-            CharType sz[2];
+            CharType sz[2] = {};
             sz[0]=ch; sz[1] = 0;
             return TrimLeft(str, sz);
         }
@@ -767,7 +762,7 @@ namespace dynarithmic
 
         static StringType GetWindowsDirectory()
         {
-            CharType buffer[_MAX_PATH];
+            CharType buffer[_MAX_PATH] = {};
             const UINT retValue = StringTraits::GetWindowsDirectoryImpl(buffer);
             if ( retValue != 0 )
                 return buffer;
@@ -776,7 +771,7 @@ namespace dynarithmic
 
         static StringType GetSystemDirectory()
         {
-            CharType buffer[_MAX_PATH];
+            CharType buffer[_MAX_PATH] = {};
             const UINT retValue = StringTraits::GetSystemDirectoryImpl(buffer);
             if ( retValue != 0 )
                 return buffer;
@@ -823,6 +818,26 @@ namespace dynarithmic
                 StringTraits::GetModuleFileNameImpl( hModule, &szName[0], nBytes );
             }
             return &szName[0];
+        }
+
+        static StringType ConvertToAPIString(const StringType& origString)
+        {
+            return boost::algorithm::replace_all_copy(origString, StringTraits::GetNewLineString(), StringTraits::GetWindowsNewLineString());
+        }
+
+        static HANDLE ConvertToAPIStringEx(const StringType& origString)
+        {
+            StringType newString = ConvertToAPIString(origString);
+            HANDLE newHandle = GlobalAlloc(GHND, newString.size() * sizeof(StringTraits::char_type) + sizeof(StringTraits::char_type));
+            if (newHandle)
+            {
+                StringTraits::char_type* pData = (StringTraits::char_type*)GlobalLock(newHandle);
+                memset(pData, 0, GlobalSize(newHandle));
+                memcpy(pData, newString.data(), newString.size() * sizeof(StringTraits::char_type));
+                GlobalUnlock(newHandle);
+                return newHandle;
+            }
+            return NULL;
         }
 
         static int TokenizeEx(const StringType& str,
@@ -926,7 +941,7 @@ namespace dynarithmic
 
         static typename StringTraits::string_type CreateFileNameFromNumber(typename StringTraits::string_type sFileName, int num, int nDigits)
         {
-            typename StringTraits::stringarray_type rArray;
+            typename StringTraits::stringarray_type rArray = {};
             SplitPath(sFileName, rArray);
 
             // Adjust the file name
@@ -940,7 +955,7 @@ namespace dynarithmic
 
         static int GetInitialFileNumber(typename StringTraits::string_type sFileName, size_t &nDigits)
         {
-            typename StringTraits::stringarray_type rArray;
+            typename StringTraits::stringarray_type rArray = {};
             SplitPath(sFileName, rArray);
             nDigits = 0;
             typename StringTraits::string_type sTemp;
@@ -982,7 +997,7 @@ namespace dynarithmic
             strFormat = strm.str();
             const int nLenFormat = static_cast<int>(strFormat.length());
 
-            typename StringTraits::stringarray_type rName;
+            typename StringTraits::stringarray_type rName = {};
             SplitPath(strBase, rName);
 
             auto strName = rName[NAME_POS];

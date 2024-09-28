@@ -330,7 +330,7 @@ static LONG GetTwainGetType(LONG gettype)
 DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap, LONG lGetType, LONG lContainerType,
                                                          LONG nDataType, LPDTWAIN_ARRAY pArray, bool bOverrideDataType )
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, lContainerType, nDataType, pArray,  bOverrideDataType?TRUE:FALSE))
+    LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, lContainerType, nDataType, pArray, bOverrideDataType))
 
     CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
     const auto pHandle = p->GetDTWAINHandle();

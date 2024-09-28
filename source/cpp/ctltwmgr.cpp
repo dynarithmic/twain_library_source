@@ -75,8 +75,8 @@ bool SetOneTwainCapValue( const CTL_ITwainSource *pSource,
 }
 
 
-#define TWRC_Error      1
-#define TWCC_Error      2
+constexpr int TWRC_Error = 1;
+constexpr int TWCC_Error = 2;
 
 void CTL_TwainAppMgr::SetDLLInstance(HINSTANCE hDLLInstance)
 {
@@ -666,14 +666,13 @@ bool CTL_TwainAppMgr::ShowUserInterface( CTL_ITwainSource *pSource, bool bTest, 
         {
             pSource->SetState(oldState);
             pSource->SetModal(isModal);
-            pSource->SetUIOnly(isUIOnly);
+            pSource->SetUIOnly(isUIOnly); 
             SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_UIOPENFAILURE, reinterpret_cast<LPARAM>(pSource));
         }
     };
 
     const auto pTempSource = static_cast<CTL_ITwainSource*>(pSource);
     const auto pSession = pTempSource->GetTwainSession();
-    const bool bOld = false;
 
     if ( pTempSource->IsUIOpen() )
         return true;
@@ -1211,7 +1210,6 @@ int  CTL_TwainAppMgr::BufferTransfer( CTL_ITwainSession *pSession,
     }
     else
     {
-        // Did user
         // User has defined a buffer
         hGlobAcquire = pSource->GetUserStripBuffer();
         nSizeStrip = static_cast<TW_INT32>(pSource->GetUserStripBufSize());
@@ -1223,7 +1221,13 @@ int  CTL_TwainAppMgr::BufferTransfer( CTL_ITwainSession *pSession,
     // hGlobAcquire is a handle to a DIB that will be used as the bitmap to display
     // Set up the transfer triplet
     // Get the default transfer strip
-    CTL_ImageMemXferTriplet IXfer(pSession, pSource, hGlobAcquire, TWMF_APPOWNS | TWMF_POINTER,
+    LONG nFlags = TWMF_APPOWNS | TWMF_POINTER;
+
+    // For tiled mode, the Source owns the memory
+    if (pSource->IsTileModeOn())
+        nFlags = TWMF_DSOWNS;
+
+    CTL_ImageMemXferTriplet IXfer(pSession, pSource, hGlobAcquire, nFlags,
                                   pInfo->PixelType, nSizeStrip, static_cast<TW_UINT16>(pSource->GetCompressionType()));
     return  StartTransfer( pSession, pSource, &IXfer );
 }
@@ -1682,6 +1686,19 @@ LPSTR CTL_TwainAppMgr::GetErrorString(int nError, LPSTR lpszBuffer, int nSize)
     return lpszBuffer;
 }
 
+void CTL_TwainAppMgr::SetAndLogError(int nError, const std::string& extraInfo, bool bMustReportGeneralError)
+{
+    int nActualError = std::abs(nError);
+    CTL_TwainAppMgr::SetError(nActualError, extraInfo, bMustReportGeneralError);
+    if (CTL_StaticData::s_lErrorFilterFlags != 0)
+    {
+        char szBuf[DTWAIN_USERRES_MAXSIZE + 1] = {};
+        CTL_TwainAppMgr::GetLastErrorString(szBuf, DTWAIN_USERRES_MAXSIZE);
+        CTL_TwainAppMgr::WriteLogInfoA(szBuf);
+    }
+}
+
+
 ////////////////////////////////////////////////////////////////////////////
 ///////////////////  ******* Capability Code ******* //////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -1719,10 +1736,8 @@ bool CTL_TwainAppMgr::IsCapabilitySupported(const CTL_ITwainSource *pSource, TW_
         case CTL_GetTypeGET:
         case CTL_GetTypeGETCURRENT:
         case CTL_GetTypeGETDEFAULT:
-            pTrip.reset(new CTL_CapabilityGetTriplet(pSession, pTempSource,
-                            static_cast<CTL_EnumGetType>(nType),
-                            static_cast<CTL_EnumCapability>(nCap),
-                            0));
+            pTrip = std::make_unique<CTL_CapabilityGetTriplet>(pSession, pTempSource, 
+                                    static_cast<CTL_EnumGetType>(nType), nCap, TW_UINT16{ 0 });
             break;
 
         default:
@@ -1912,6 +1927,13 @@ int CTL_TwainAppMgr::SetTransferMechanism( const CTL_ITwainSource *pSource,CTL_T
     else
     if ( AcquireType == TWAINAcquireType_Clipboard)
         uTwainType = static_cast<TW_UINT16>(ClipboardTransferType);
+    else
+    if ( AcquireType == TWAINAcquireType_File)
+        uTwainType = TWSX_FILE;
+    else
+    if ( AcquireType == TWAINAcquireType_MemFile)
+        uTwainType = TWSX_MEMFILE;
+
     if ( AcquireType != TWAINAcquireType_AudioNative)
         SetOneTwainCapValue( pSource, uTwainType, CTL_SetTypeSET, TwainCap_XFERMECH, TWTY_UINT16);
     else
