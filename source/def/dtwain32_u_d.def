@@ -185,6 +185,7 @@ DTWAIN_GetSourceUnit                              @300
 DTWAIN_SetSourceUnit                              @301
 DTWAIN_EnumSourceUnits                            @302
 DTWAIN_ShowUIOnly                                 @310
+DTWAIN_IsSourceInUIOnlyMode                       @311
 DTWAIN_SetDeviceNotifications                     @350
 DTWAIN_GetDeviceNotifications                     @351
 DTWAIN_GetDeviceEvent                             @352
@@ -1045,3 +1046,10 @@ DTWAIN_EnumCamerasEx                              @31040
 DTWAIN_LoadCustomStringResourcesExW               @31041
 DTWAIN_LoadCustomStringResourcesExA               @31042
 DTWAIN_LoadCustomStringResourcesEx                @31043
+DTWAIN_SetBufferedTileMode                        @31044     
+DTWAIN_IsBufferedTileModeOn                       @31045	 
+DTWAIN_IsBufferedTileModeSupported                @31046 
+DTWAIN_GetBufferedTransferInfo                    @31047
+DTWAIN_ConvertToAPIString                         @31050 
+DTWAIN_ConvertToAPIStringA                        @31051 
+DTWAIN_ConvertToAPIStringW                        @31052 

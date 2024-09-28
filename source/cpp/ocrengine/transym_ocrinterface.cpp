@@ -65,10 +65,10 @@ TOCRSDK::TOCRSDK()
 static CTL_StringType GetTOCRDLLName()
 {
     // Load the resources
-    CSimpleIniA customProfile;
-    CTL_StringType fullDirectory = dynarithmic::GetDTWAININIPath();
-    customProfile.LoadFile(fullDirectory.c_str());
-    const char* defName = customProfile.GetValue("OCRLibrary", "Transym");
+    auto *customProfile = CTL_StaticData::GetINIInterface();
+    const char* defName = "Transym";
+    if ( customProfile )
+        defName = customProfile->GetValue("OCRLibrary", "Transym");
     auto val = StringConversion::Convert_AnsiPtr_To_Native(defName);
     if (val.empty())
         val = _T("TOCRDLL.DLL");
@@ -720,7 +720,6 @@ LONG TransymOCR::StartOCR(CTL_StringType filename)
             *boolFuncs[i] = !static_cast<VBBOOL>(vals[0]);
     }
 
-    const auto minToCopy = (std::min)(static_cast<int>(filename.size()), MAX_PATH);
     auto sInputFile = StringConversion::Convert_Native_To_Ansi(filename);
     JobInfo.InputFile = &sInputFile[0];
 

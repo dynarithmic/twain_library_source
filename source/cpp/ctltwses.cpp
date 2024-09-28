@@ -272,8 +272,13 @@ bool CTL_ITwainSession::CloseSource( const CTL_ITwainSource* pSource, bool bForc
 
 CTL_ITwainSession::~CTL_ITwainSession()
 {
-    DestroyAllSources();
-    DestroyTwainWindow();
+    // Only destroy if the DTWAIN internal handle is still
+    // valid for this thread
+    if (GetDTWAINHandle_Internal())
+    {
+        DestroyAllSources();
+        DestroyTwainWindow();
+    }
 }
 
 

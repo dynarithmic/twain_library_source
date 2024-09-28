@@ -44,8 +44,8 @@ namespace dynarithmic
             bool            IsCapabilitySupported();
             virtual bool    IsSupported();
             TW_UINT16       GetItemType() const { return m_nItemType; }
-            static bool IsCapOperationReset(LONG lCapOp) { return lCapOp == DTWAIN_CAPRESET || lCapOp == DTWAIN_CAPRESETALL; }
-            static bool IsCapOperationSet(LONG lCapOp) { return !IsCapOperationReset(lCapOp); }
+            static constexpr bool IsCapOperationReset(LONG lCapOp) { return lCapOp == DTWAIN_CAPRESET || lCapOp == DTWAIN_CAPRESETALL; }
+            static constexpr bool IsCapOperationSet(LONG lCapOp) { return !IsCapOperationReset(lCapOp); }
 
         protected:
             virtual void        Decode(void *pData);
