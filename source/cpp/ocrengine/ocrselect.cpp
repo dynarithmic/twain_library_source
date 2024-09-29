@@ -26,7 +26,7 @@
 #include "sourceselectopts.h"
 
 #ifdef _MSC_VER
-#pragma warning (disable:4505)
+    #pragma warning (disable:4505)
 #endif
 
 static std::vector<TCHAR> GetDefaultOCRName(SelectStruct& selectTraits);
@@ -100,7 +100,7 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine()
     SourceSelectionOptions opts(SELECTSOURCE,
                                 nullptr,
                                 nullptr,
-                                GetResourceStringFromMap_Native(IDS_SELECT_OCRENGINE_TEXT).c_str(),
+                                nullptr,
                                 0, 0, nullptr, nullptr, nullptr, DTWAIN_DLG_CENTER_SCREEN);
     auto retVal = SelectOCREngine(pHandle, opts);
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
@@ -118,7 +118,7 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine2(HWND hWndParent,
     SourceSelectionOptions opts(SELECTSOURCE,
                                 nullptr,
                                 hWndParent,
-                                GetResourceStringFromMap_Native(IDS_SELECT_OCRENGINE_TEXT).c_str(),
+                                szTitle,
                                 xPos, yPos, nullptr, nullptr, nullptr, nOptions);
     auto retVal = SelectOCREngine(pHandle, opts);
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
@@ -139,7 +139,7 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine2Ex(HWND hWndParent,
     SourceSelectionOptions opts(SELECTSOURCE,
                                 nullptr,
                                 hWndParent,
-                                GetResourceStringFromMap_Native(IDS_SELECT_OCRENGINE_TEXT).c_str(),
+                                szTitle,
                                 xPos, yPos, szIncludeFilter, szExcludeFilter, szNameMapping, nOptions);
 
     auto retVal = SelectOCREngine(pHandle, opts);
