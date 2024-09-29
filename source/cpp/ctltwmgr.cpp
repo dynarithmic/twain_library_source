@@ -1628,7 +1628,7 @@ void CTL_TwainAppMgr::SetError(int nError, const std::string& extraInfo, bool bM
     s_strLastError += " " + extraInfo;
     s_nLastError    = nError;
 
-    CTL_StaticData::s_mapExtraErrorInfo[-s_nLastError] = extraInfo;
+    CTL_StaticData::s_mapExtraErrorInfo[abs(s_nLastError)] = extraInfo;
     if ( CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_USEBUFFER )
     {
         // Push error onto error stack
