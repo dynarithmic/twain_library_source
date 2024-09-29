@@ -2991,4 +2991,22 @@ DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectOCREngine2ExW(HWND hWndParent, LPCWSTR s
 #endif
 }
 
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryExW(LPCWSTR sLangDLL, DTWAIN_BOOL bClear)
+{
+#ifdef _UNICODE
+    return DTWAIN_SetTempFileDirectoryEx(sLangDLL, bClear);
+#else
+    return DTWAIN_SetTempFileDirectoryEx(StringConversion::Convert_WidePtr_To_Native(sLangDLL).c_str(), bClear);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryExA(LPCSTR sLangDLL, DTWAIN_BOOL bClear)
+{
+#ifdef _UNICODE
+    return DTWAIN_SetTempFileDirectoryEx(StringConversion::Convert_AnsiPtr_To_Native(sLangDLL).c_str(), bClear);
+#else
+    return DTWAIN_SetTempFileDirectoryEx(sLangDLL, bClear);
+#endif
+}
+
 #endif // CTLSTRIMPL_INL
