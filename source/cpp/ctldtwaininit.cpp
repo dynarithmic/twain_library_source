@@ -324,14 +324,17 @@ LONG DLLENTRY_DEF DTWAIN_GetLastError()
 static LONG GetResourceStringInternal(LONG resourceID, LPTSTR lpszBuffer, LONG nMaxLen)
 {
     auto actualResourceID = std::abs(resourceID);
-    const size_t nBytes = GetResourceStringA(static_cast<UINT>(actualResourceID), nullptr, DTWAIN_USERRES_MAXSIZE);
+    CTL_StringType sCopy;
+    size_t nBytes = GetResourceStringA(static_cast<UINT>(actualResourceID), nullptr, DTWAIN_USERRES_MAXSIZE);
     if (nBytes == 0)
     {
         // Copy the error number to the buffer if we haven't been able to find the 
         // resource string
-        const CTL_StringType sCopy = StringWrapper::ToString(resourceID);
+        sCopy = StringWrapper::ToString(resourceID);
+        if (resourceID != DTWAIN_ERR_WIN32_ERROR)
         return StringWrapper::CopyInfoToCString(sCopy, lpszBuffer, nMaxLen);
     }
+    nBytes = DTWAIN_USERRES_MAXSIZE;
     resourceID = actualResourceID;
 
     size_t nAdditionalBytes = 0;
@@ -339,8 +342,8 @@ static LONG GetResourceStringInternal(LONG resourceID, LPTSTR lpszBuffer, LONG n
     if (iter != CTL_StaticData::s_mapExtraErrorInfo.end())
         nAdditionalBytes += iter->second.size();
 
-    std::vector<char> szTemp(nBytes);
-    GetResourceStringA(static_cast<UINT>(resourceID), &szTemp[0], static_cast<LONG>(nBytes));
+    std::vector<char> szTemp(nBytes, 0);
+    GetResourceStringA(static_cast<UINT>(resourceID), szTemp.data(), static_cast<LONG>(nBytes));
     if (nAdditionalBytes > 0)
     {
         while (!szTemp.empty() && szTemp.back() == 0)
@@ -351,8 +354,7 @@ static LONG GetResourceStringInternal(LONG resourceID, LPTSTR lpszBuffer, LONG n
         szTemp.insert(szTemp.end(), iter->second.begin(), iter->second.end());
         szTemp.push_back(0);
     }
-    const CTL_StringType sCopy = StringConversion::Convert_Ansi_To_Native(szTemp.data());
-
+    sCopy += StringConversion::Convert_Ansi_To_Native(szTemp.data());
     return StringWrapper::CopyInfoToCString(sCopy, lpszBuffer, nMaxLen);
 }
 
