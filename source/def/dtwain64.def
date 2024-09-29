@@ -1053,3 +1053,9 @@ DTWAIN_GetBufferedTransferInfo                    @31047
 DTWAIN_ConvertToAPIString                         @31050 
 DTWAIN_ConvertToAPIStringA                        @31051 
 DTWAIN_ConvertToAPIStringW                        @31052 
+DTWAIN_SelectOCREngine2A                          @31053
+DTWAIN_SelectOCREngine2W                          @31054
+DTWAIN_SelectOCREngine2                           @31055
+DTWAIN_SelectOCREngine2ExA                        @31056
+DTWAIN_SelectOCREngine2ExW                        @31057
+DTWAIN_SelectOCREngine2Ex                         @31058
