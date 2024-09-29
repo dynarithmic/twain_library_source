@@ -73,6 +73,11 @@
 1057 Protokolldatei konnte nicht erstellt werden
 1058 Source does not support TWAIN file system.
 1059 Kachelmodus wird für diese TWAIN-Quelle nicht unterstützt.
+1060 DTWAIN32.INI nicht gefunden  
+1061 DTWAIN64.INI nicht gefunden  
+1062 CRC-Prüfung fehlgeschlagen. Überprüfen Sie die beschädigte twaininfo.txt-Datei  
+1063 Die Version der twaininfo.txt-Datei ist ungültig für diese Version von DTWAIN  
+1064 Windows-API-Fehler  
 1100 TWAIN Zustandscode: Zu wenig Speicher
 1101 TWAIN Zustandscode: Kein Fehler
 1102 TWAIN Zustandscode: Unbekannte Fehlerursache
@@ -204,6 +209,7 @@
 3001 &Wählen
 3002 &Abbrechen
 3003 Quellen:
+3004 OCR auswählen
 3005 Eintreten
 3006 Verlassen
 3007 Rückgabewert von

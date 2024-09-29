@@ -73,6 +73,11 @@
 1057 Error de creación del archivo de registro.
 1058 Source does not support TWAIN file system.
 1059 Modo de azulejos no soportado para esta fuente TWAIN.
+1060 DTWAIN32.INI no encontrado  
+1061 DTWAIN64.INI no encontrado  
+1062 Fallo en la verificación de CRC. Verifique si el archivo twaininfo.txt está corrupto  
+1063 La versión del archivo twaininfo.txt es inválida para esta versión de DTWAIN  
+1064 Error de API de Windows  
 1100 Condición de TWAIN no podría Codificar a no podríamos completar funcionamiento.   Memoria Insuficiente.
 1101 Error de Código de Condición de TWAIN
 1102 TWAIN Condiciona Código Unknown causa del fracaso
@@ -204,6 +209,7 @@
 3001 &Seleccione
 3002 &Cancelar
 3003 Origines:
+3004 Seleccionar OCR
 3005 Entrando
 3006 Salir
 3007 valor de retorno de

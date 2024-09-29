@@ -73,6 +73,11 @@
 1057 Impossible de créer le fichier journal.
 1058 Source does not support TWAIN file system.
 1059 Le mode de tuiles n'est pas pris en charge pour cette source TWAIN.
+1060 DTWAIN32.INI non trouvé  
+1061 DTWAIN64.INI non trouvé  
+1062 Échec de la vérification CRC. Vérifiez le fichier twaininfo.txt corrompu  
+1063 La version du fichier twaininfo.txt est invalide pour cette version de DTWAIN  
+1064 Erreur de l'API Windows  
 1100 Condition de Twain ne pouvait pas Coder : ne pouvions pas parachever de l'opération.   Mémoire Insuffisante.
 1101 Faute de Code : de Condition de Twain
 1102 Twain Conditionne Code : Inconnu de la cause du raté
@@ -214,6 +219,7 @@
 3001 &Sélectionner
 3002 &Annuler
 3003 Sources:
+3004 Sélectionner OCR
 3005 Entrer
 3006 Sortie
 3007 valeur de retour de
