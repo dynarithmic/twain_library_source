@@ -2942,4 +2942,53 @@ LONG DLLENTRY_DEF DTWAIN_GetVersionCopyrightW(LPWSTR lpszApp, LONG nLength)
 #endif
 }
 
+DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine2A(HWND hWndParent, LPCSTR szTitle, LONG xPos, LONG yPos, LONG nOptions)
+{
+#ifdef _UNICODE
+    return DTWAIN_SelectOCREngine2(hWndParent, szTitle ? StringConversion::Convert_AnsiPtr_To_Native(szTitle).c_str() : nullptr, xPos, yPos, nOptions);
+#else
+    return DTWAIN_SelectOCREngine2(hWndParent, szTitle, xPos, yPos, nOptions);
+#endif
+}
+
+DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine2W(HWND hWndParent, LPCWSTR szTitle, LONG xPos, LONG yPos, LONG nOptions)
+{
+#ifdef _UNICODE
+    return DTWAIN_SelectOCREngine2(hWndParent, szTitle, xPos, yPos, nOptions);
+#else
+    return DTWAIN_SelectOCREngine2(hWndParent, 
+                                szTitle?StringConversion::Convert_WidePtr_To_Native(szTitle).c_str():NULL, xPos, yPos, nOptions);
+#endif
+}
+
+DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine2ExA(HWND hWndParent, LPCSTR szTitle, LONG xPos, LONG yPos,
+    LPCSTR szIncludeNames, LPCSTR szExcludeNames, LPCSTR szNameMapping, LONG nOptions)
+{
+#ifdef _UNICODE
+    return DTWAIN_SelectOCREngine2Ex(hWndParent,
+        szTitle ? StringConversion::Convert_AnsiPtr_To_Native(szTitle).c_str() : nullptr, xPos, yPos,
+        szIncludeNames ? StringConversion::Convert_AnsiPtr_To_Native(szIncludeNames).c_str() : nullptr,
+        szExcludeNames ? StringConversion::Convert_AnsiPtr_To_Native(szExcludeNames).c_str() : nullptr,
+        szNameMapping ? StringConversion::Convert_AnsiPtr_To_Native(szNameMapping).c_str() : nullptr,
+        nOptions);
+#else
+    return DTWAIN_SelectOCREngine2Ex(hWndParent, szTitle, xPos, yPos, szIncludeNames, szExcludeNames, szNameMapping, nOptions);
+#endif
+}
+
+DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectOCREngine2ExW(HWND hWndParent, LPCWSTR szTitle, LONG xPos, LONG yPos, LPCWSTR szIncludeNames, LPCWSTR szExcludeNames, LPCWSTR szNameMapping, LONG nOptions)
+{
+#ifdef _UNICODE
+    return DTWAIN_SelectOCREngine2Ex(hWndParent, szTitle, xPos, yPos, szIncludeNames, szExcludeNames, szNameMapping, nOptions);
+#else
+    return DTWAIN_SelectOCREngine2Ex(hWndParent,
+        szTitle ? StringConversion::Convert_WidePtr_To_Native(szTitle).c_str() : NULL,
+        xPos, yPos,
+        szIncludeNames ? StringConversion::Convert_WidePtr_To_Native(szIncludeNames).c_str() : NULL,
+        szExcludeNames ? StringConversion::Convert_WidePtr_To_Native(szExcludeNames).c_str() : NULL,
+        szNameMapping ? StringConversion::Convert_WidePtr_To_Native(szNameMapping).c_str() : NULL,
+        nOptions);
+#endif
+}
+
 #endif // CTLSTRIMPL_INL

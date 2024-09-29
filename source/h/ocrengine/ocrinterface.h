@@ -26,7 +26,7 @@
 #include <unordered_map>
 #include <bitset>
 #include <algorithm>
-
+#include <dtwtype.h>
 #include "ctlobstr.h"
 #define OCROPTION_GETINFO         0
 #define OCROPTION_STORECLEANTEXT1 1
@@ -317,5 +317,11 @@ namespace dynarithmic
         LONG m_nLastOCRError;
         CTL_TwainDLLHandle* m_pHandle;
     };
+
+    std::pair<CTL_TwainDLLHandle*, OCREngine*> VerifyOCRHandles(DTWAIN_OCRENGINE Engine = nullptr);
+    std::pair<CTL_TwainDLLHandle*, OCREngine*> VerifyOCRHandlesEx(DTWAIN_OCRENGINE Engine);
+
+    typedef std::string(OCREngine::* OCRINFOFUNC)() const;
+    LONG GetOCRInfo(OCREngine* pEngine, OCRINFOFUNC pFunc, LPTSTR szInfo, LONG nMaxLen);
 }
 #endif

@@ -29,6 +29,7 @@
 
 #include <mutex>
 #include <memory>
+#include <functional>
 #include "ctltrp.h"
 #include "dtwain_raii.h"
 #include "ocrinterface.h"
@@ -281,6 +282,8 @@ namespace dynarithmic
         CTL_StringType SourceName;
         CustomPlacement CS;
         CTL_TwainDLLHandle* pHandle;
+        std::function<std::vector<TCHAR>(SelectStruct&)> getDefaultFunc;
+        std::function<std::vector<CTL_StringType>(SelectStruct&)> getNameListFunc;
         int nItems;
     };
 
@@ -836,7 +839,7 @@ namespace dynarithmic
     bool LoadLanguageResourceXML(LPCTSTR sLangDLL);
     bool LoadLanguageResourceXMLImpl(LPCTSTR szFile);
     void DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap);
-    void LogWin32Error(DWORD lastError);
+    std::string LogWin32Error(DWORD lastError);
     void LoadOCRInterfaces(CTL_TwainDLLHandle *pHandle);
     void UnloadOCRInterfaces(CTL_TwainDLLHandle *pHandle);
     CTL_StringType GetVersionString();
@@ -857,7 +860,7 @@ namespace dynarithmic
     DTWAIN_BOOL DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *p, CTL_TwainDLLHandle *pHandle, TW_UINT16 nCapToCache);
     DTWAIN_BOOL DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, CTL_TwainDLLHandle *pHandle, CTL_EnumeratorNode<LONG>::container_pointer_type vCaps);
     CTL_CapInfoArrayPtr GetCapInfoArray(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource *p);
-    DTWAIN_SOURCE SourceSelect(CTL_TwainDLLHandle* pHandle, const SourceSelectionOptions& options);
+    DTWAIN_SOURCE SourceSelect(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& options);
     DTWAIN_ARRAY  SourceAcquire(SourceAcquireOptions& opts);
     bool AcquireExHelper(SourceAcquireOptions& opts);
     bool AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType);

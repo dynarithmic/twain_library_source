@@ -18,13 +18,12 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "dtwain.h"
 #include "ctliface.h"
-#include "dtwain_resource_constants.h"
 #include "ctltwmgr.h"
 #include "transym_ocrinterface.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable:4505)
 #endif
@@ -32,10 +31,15 @@
 static bool OCREngineExists(CTL_TwainDLLHandle* pHandle, OCREngine* pEngine);
 static bool OCRIsActive(const OCREngine* pEngine);
 static LONG GetOCRTextSupport(OCREngine* pEngine, LONG fileType, LONG pixelType, LONG bitDepth);
+static std::vector<CTL_StringType> GetNameList(SelectStruct& selectTraits);
 
-typedef std::string (OCREngine::*OCRINFOFUNC)() const;
+static BOOL CALLBACK ChildEnumFontProc(HWND hWnd, LPARAM lParam)
+{
+    SendMessage(hWnd, WM_SETFONT, static_cast<WPARAM>(lParam), 0);
+    return TRUE;
+}
 
-static std::pair<CTL_TwainDLLHandle*, OCREngine*> VerifyOCRHandles(DTWAIN_OCRENGINE Engine=nullptr)
+std::pair<CTL_TwainDLLHandle*, OCREngine*> dynarithmic::VerifyOCRHandles(DTWAIN_OCRENGINE Engine /*=nullptr*/)
 {
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     if (!Engine)
@@ -50,7 +54,7 @@ static std::pair<CTL_TwainDLLHandle*, OCREngine*> VerifyOCRHandles(DTWAIN_OCRENG
     throw DTWAIN_ERR_OCR_INVALIDENGINE;
 }
 
-static std::pair<CTL_TwainDLLHandle*, OCREngine*> VerifyOCRHandlesEx(DTWAIN_OCRENGINE Engine)
+std::pair<CTL_TwainDLLHandle*, OCREngine*> dynarithmic::VerifyOCRHandlesEx(DTWAIN_OCRENGINE Engine)
 {
     auto [pHandle, pEngine] = VerifyOCRHandles(Engine);
     if (Engine)
@@ -205,25 +209,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetOCRCapValues(DTWAIN_OCRENGINE Engine, LONG OC
 }
 
 //////////////////// OCR information functions /////////////////////////
-static LONG GetOCRInfo(OCREngine *pEngine,OCRINFOFUNC pFunc,LPTSTR szInfo, LONG nMaxLen);
-
-LONG GetOCRInfo(OCREngine *pEngine, OCRINFOFUNC pFunc, LPTSTR szInfo, LONG nMaxLen)
-{
-    const CTL_StringType pName = StringConversion::Convert_Ansi_To_Native((pEngine->*pFunc)());
-    const int nLen = static_cast<int>(pName.length());
-    if (szInfo == nullptr)
-        return static_cast<LONG>(nLen);
-    const int nRealLen = (std::min)(static_cast<int>(nMaxLen), nLen);
-    StringTraits::CopyN(szInfo, pName.c_str(), nRealLen);
-    szInfo[nRealLen] = _T('\0');
-    return nRealLen;
-}
-
 LONG   DLLENTRY_DEF DTWAIN_GetOCRManufacturer(DTWAIN_OCRENGINE Engine,LPTSTR szMan,LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, szMan, nMaxLen))
     auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
-    const LONG Ret = GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetManufacturer),
+    const LONG Ret = dynarithmic::GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetManufacturer),
                                 szMan, nMaxLen);
     LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     CATCH_BLOCK(DTWAIN_FAILURE1)
@@ -233,7 +223,7 @@ LONG   DLLENTRY_DEF DTWAIN_GetOCRProductFamily(DTWAIN_OCRENGINE Engine,LPTSTR sz
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, szMan, nMaxLen))
     auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
-    const LONG Ret = GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetProductFamily), szMan, nMaxLen);
+    const LONG Ret = dynarithmic::GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetProductFamily), szMan, nMaxLen);
     LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
@@ -242,7 +232,7 @@ LONG  DLLENTRY_DEF DTWAIN_GetOCRProductName(DTWAIN_OCRENGINE Engine,LPTSTR szMan
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, szMan, nMaxLen))
     auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
-    const LONG Ret = GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetProductName), szMan, nMaxLen);
+    const LONG Ret = dynarithmic::GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetProductName), szMan, nMaxLen);
     LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
@@ -620,33 +610,6 @@ void dynarithmic::UnloadOCRInterfaces(CTL_TwainDLLHandle *pHandle)
     pHandle->m_OCRInterfaceArray.clear();
 }
 
-DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngineByName(LPCTSTR lpszName)
-{
-    LOG_FUNC_ENTRY_PARAMS((lpszName))
-    auto [pHandle, pEngine] = VerifyOCRHandles();
-
-    const std::string sName = StringConversion::Convert_NativePtr_To_Ansi(lpszName);
-
-    // Get the OCR engine associated with the name
-    const auto it = pHandle->m_OCRProdNameToEngine.find(sName);
-    OCREnginePtr SelectedEngine;
-    DTWAIN_OCRENGINE ocrEngine_ = nullptr;
-    if (it != pHandle->m_OCRProdNameToEngine.end())
-    {
-        SelectedEngine = it->second;
-        if (SelectedEngine)
-        {
-            pHandle->m_pOCRDefaultEngine = SelectedEngine;
-
-            if (!SelectedEngine->IsActivated())
-                SelectedEngine->StartupOCREngine();
-            ocrEngine_ = SelectedEngine.get();
-        }
-    }
-    LOG_FUNC_EXIT_NONAME_PARAMS(ocrEngine_)
-    CATCH_BLOCK(DTWAIN_OCRENGINE())
-}
-
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitOCRInterface()
 {
     LOG_FUNC_ENTRY_NONAME_PARAMS()
@@ -708,24 +671,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartupOCREngine(DTWAIN_OCRENGINE Engine)
     CATCH_BLOCK(false)
 }
 
-DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectDefaultOCREngine()
-{
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
-    auto [pHandle, pDummy] = VerifyOCRHandles();
-    auto pH = pHandle;
-
-    // Get the OCR engine associated with the name
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return pH->m_OCRInterfaceArray.empty(); },
-        DTWAIN_ERR_OCR_NOTACTIVE, 0, FUNC_MACRO);
-    const auto SelectedEngine = static_cast<DTWAIN_OCRENGINE>(pHandle->m_pOCRDefaultEngine.get());
-    const auto pEngine = static_cast<OCREngine*>(SelectedEngine);
-    if (!pEngine->IsActivated())
-        pEngine->StartupOCREngine();
-
-    LOG_FUNC_EXIT_NONAME_PARAMS(SelectedEngine)
-    CATCH_BLOCK(DTWAIN_OCRENGINE())
-}
-
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsOCREngineActivated(DTWAIN_OCRENGINE Engine)
 {
     LOG_FUNC_ENTRY_PARAMS((Engine))
@@ -736,7 +681,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsOCREngineActivated(DTWAIN_OCRENGINE Engine)
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(false)
 }
-
 
 LONG DLLENTRY_DEF DTWAIN_GetOCRLastError(DTWAIN_OCRENGINE Engine)
 {
@@ -762,8 +706,6 @@ LONG DLLENTRY_DEF DTWAIN_GetOCRErrorString(DTWAIN_OCRENGINE Engine, LONG lError,
     CATCH_BLOCK(-1)
 }
 
-#ifdef _WIN32
-
 static bool NewOCRJob(const OCREngine *pEngine, LPCSTR szFileName)
 {
     std::string s1 = pEngine->GetCachedFile();
@@ -775,163 +717,3 @@ static bool NewOCRJob(const OCREngine *pEngine, LPCSTR szFileName)
     return s1 != s2;
 }
 
-LRESULT CALLBACK DisplayOCRDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-
-
-DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine()
-{
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
-    auto [pHandle, pEngine] = VerifyOCRHandles();
-
-    // Get the resource for the Twain dialog
-    const HGLOBAL hglb = LoadResource(CTL_StaticData::s_DLLInstance,
-                                      static_cast<HRSRC>(FindResource(CTL_StaticData::s_DLLInstance,
-                                                                      MAKEINTRESOURCE(10000), RT_DIALOG)));
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return  !hglb;}, DTWAIN_ERR_NULL_WINDOW, NULL, FUNC_MACRO);
-
-    const auto lpTemplate = static_cast<LPDLGTEMPLATE>(LockResource(hglb));
-
-    SelectStruct S;
-    S.CS.xpos = 0;
-    S.CS.ypos = 0;
-    S.CS.nOptions = DTWAIN_DLG_CENTER_SCREEN;
-    S.CS.hWndParent = nullptr;
-    S.nItems = 0;
-    S.CS.sTitle = _T("Select OCR Engine");
-    const INT_PTR bRet = DialogBoxIndirectParam(CTL_StaticData::s_DLLInstance,
-                                                lpTemplate, nullptr,
-                                                reinterpret_cast<DLGPROC>(DisplayOCRDlgProc),
-                                                reinterpret_cast<LPARAM>(&S));
-    if ( bRet == -1 )
-        LOG_FUNC_EXIT_NONAME_PARAMS(0)
-
-    // See if cancel was selected
-    if ( S.SourceName.empty() || S.nItems == 0 )
-        LOG_FUNC_EXIT_NONAME_PARAMS(0)
-
-    const DTWAIN_OCRENGINE SelectedEngine = DTWAIN_SelectOCREngineByName(S.SourceName.c_str());
-    LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_OCRENGINE)SelectedEngine)
-    CATCH_BLOCK(DTWAIN_OCRENGINE())
-}
-
-
-
-/////////////////////////////////////////////////////////////////////////////////
-/// DTWAIN OCR Dialog procedure
-static void DisplayLocalString(HWND hWnd, int nID, int resID);
-
-LRESULT CALLBACK DisplayOCRDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    static HWND lstSources;
-    static SelectStruct *pS;
-    switch (message)
-    {
-    case WM_INITDIALOG:
-        {
-            pS = reinterpret_cast<SelectStruct*>(lParam);
-
-            if ( pS->CS.nOptions & DTWAIN_DLG_CENTER_SCREEN )
-                CenterWindow(hWnd, nullptr);
-            else
-            if ( pS->CS.nOptions & DTWAIN_DLG_CENTER)
-                CenterWindow(hWnd, GetParent(hWnd));
-            else
-                SetWindowPos(hWnd, nullptr, pS->CS.xpos, pS->CS.ypos, 0, 0, SWP_NOSIZE);
-
-            lstSources = GetDlgItem(hWnd, IDC_LSTSOURCES);
-
-            // Set the title
-            ::SetWindowText(hWnd, pS->CS.sTitle.c_str());
-
-            // Fill the list box with the sources
-            DTWAIN_ARRAY Array = nullptr;
-            DTWAIN_EnumOCRInterfaces(&Array);
-            const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-            DTWAINArrayLowLevel_RAII raii(pHandle, Array);
-            const int nCount = DTWAIN_ArrayGetCount(Array);
-            pS->nItems = nCount;
-            if ( nCount == 0 )
-            {
-                const HWND hWndSelect = GetDlgItem(hWnd, IDOK);
-                if ( hWndSelect )
-                    EnableWindow(hWndSelect, FALSE);
-                return TRUE;
-            }
-
-            constexpr TCHAR DefName[255] = {0};
-            std::vector<CTL_StringType> SourceNames;
-            SourceNames.reserve(nCount);
-            int i;
-            DTWAIN_OCRENGINE TempOCR;
-            for ( i = 0; i < nCount; i++ )
-            {
-                DTWAIN_ArrayGetAt(Array, i, &TempOCR);
-                TCHAR ProdName[256];
-                DTWAIN_GetOCRProductName(TempOCR, ProdName, 255);
-                SourceNames.push_back(ProdName);
-            }
-
-            // Sort the names
-            if ( pS->CS.nOptions & DTWAIN_DLG_SORTNAMES)
-                sort(SourceNames.begin(), SourceNames.end());
-
-            LRESULT DefIndex = 0;
-            for ( i = 0; i < nCount; i++ )
-            {
-                const LRESULT index = SendMessage(lstSources, LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(SourceNames[i].c_str()));
-                if ( lstrcmp(SourceNames[i].c_str(), static_cast<LPCTSTR>(DefName)) == 0)
-                    DefIndex = index;
-            }
-            if ( i > 0 )
-                SendMessage(lstSources, LB_SETCURSEL, DefIndex, 0);
-
-            // Display the local strings if they are available:
-            DisplayLocalString(hWnd, IDOK, IDS_SELECT_TEXT);
-            DisplayLocalString(hWnd, IDCANCEL, IDS_CANCEL_TEXT);
-            DisplayLocalString(hWnd, IDC_SOURCETEXT, IDS_SOURCES_TEXT);
-            return TRUE;
-        }
-
-    case WM_COMMAND:
-        if (LOWORD(wParam) == IDOK)
-        {
-            TCHAR sz[255];
-            const LRESULT nSel = SendMessage(lstSources, LB_GETCURSEL, 0, 0);
-            SendMessage(lstSources, LB_GETTEXT, nSel, reinterpret_cast<LPARAM>(sz));
-            pS->SourceName = sz;
-            EndDialog(hWnd, LOWORD(wParam));
-            return TRUE;
-        }
-        else
-            if (LOWORD(wParam) == IDCANCEL)
-            {
-                pS->SourceName = {};
-                EndDialog(hWnd, LOWORD(wParam));
-                return TRUE;
-            }
-            break;
-    }
-    return FALSE;
-}
-
-static std::string GetTwainDlgTextFromResource(int nID, int& status)
-{
-    char buffer[256];
-    status = static_cast<int>(GetResourceStringA(nID, buffer, 255));
-    return buffer;
-}
-
-static void DisplayLocalString(HWND hWnd, int nID, int resID)
-{
-    std::string sText;
-    int status;
-    sText = GetTwainDlgTextFromResource(resID, status);
-    if ( status )
-    {
-        const HWND hWndControl = GetDlgItem(hWnd, nID);
-        if ( hWndControl )
-            SetWindowTextA(hWndControl, sText.c_str());
-    }
-}
-
-#endif

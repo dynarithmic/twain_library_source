@@ -658,6 +658,12 @@
     <ClCompile Include="cpp\ctlloadresources.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
+    <ClCompile Include="cpp\ctlselectdialog.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ocrengine\ocrselect.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp\pdflib32\a85encode.h">
@@ -1178,6 +1184,12 @@
       <Filter>Resource Text Files</Filter>
     </Text>
     <Text Include="txt\twainresourcestrings_russian.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_portuguese.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_simplified_chinese.txt">
       <Filter>Resource Text Files</Filter>
     </Text>
   </ItemGroup>
