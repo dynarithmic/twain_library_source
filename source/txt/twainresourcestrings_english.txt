@@ -73,6 +73,11 @@
 1057 Could not create DTWAIN log file.
 1058 Source does not support TWAIN file system.
 1059 Tile mode not supported for this TWAIN Source.
+1060 DTWAIN32.INI not found
+1061 DTWAIN64.INI not found
+1062 CRC check failed.  Check for corrupted twaininfo.txt file
+1063 The twaininfo.txt file version is invalid for this version of DTWAIN
+1064 Windows API Error
 1100 TWAIN Condition Code: Could not complete operation.  Insufficient Memory.
 1101 TWAIN Condition Code: No Error
 1102 TWAIN Condition Code: Unknown cause of failure
@@ -205,6 +210,7 @@
 3001 &Select
 3002 &Cancel
 3003 Sources:
+3004 Select OCR Engine
 3005 Entering
 3006 Exiting
 3007 returning value of
