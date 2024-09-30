@@ -97,7 +97,8 @@ std::pair<CTL_ResourceRegistryMap::iterator, bool> CTL_TwainDLLHandle::AddResour
     auto iter = m_ResourceRegistry.find(pLangDLL);
     if (iter != m_ResourceRegistry.end())
         return { iter, true };
-    return { iter, false };
+    // This is a new resource that may not have shown up in the "official" list of resources
+    return m_ResourceRegistry.insert({ pLangDLL, filesys::exists(GetResourceFileNameA(pLangDLL, DTWAINLANGRESOURCEFILE)) });
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
