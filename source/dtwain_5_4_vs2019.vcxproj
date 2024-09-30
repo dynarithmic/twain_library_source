@@ -1556,7 +1556,6 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <CustomBuildStep Include=".\cdtwain\cdtwain_internal\capstr.inl">
       <FileType>Document</FileType>
     </CustomBuildStep>
-    <None Include="doc.txt" />
     <None Include="inl\linuxget_twain.inl" />
     <None Include="inl\linuxinit_impl.inl" />
     <None Include="inl\linuxlibraryloader_impl.inl" />

@@ -51,6 +51,9 @@ void ToggleCheckedItem(UINT resId);
 BOOL GetToggleMenuState(UINT resID);
 BOOL IsTypeAvailable(LONG filetype);
 void DisplayLoggingOptions();
+void LoadLanguage(int message);
+DTWAIN_SOURCE DisplayCustomLangDlg();
+LRESULT CALLBACK EnterCustomLangNameProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
 BOOL bPageOK;
 LONG nPageCount=0;
@@ -80,6 +83,12 @@ typedef struct
     LONG DTWAINType;
     LPCTSTR defName;
 } AllTypes ;
+
+typedef struct  
+{
+    LONG langID;
+    LPCTSTR language;
+} AllLanguages;
 
 AllTypes g_allTypes[] = {   {_T("BMP File"), DTWAIN_BMP, _T("test.bmp")},
                             {_T("BMP File (RLE)"), DTWAIN_BMP_RLE, _T("test.bmp")},
@@ -118,13 +127,24 @@ AllTypes g_allTypes[] = {   {_T("BMP File"), DTWAIN_BMP, _T("test.bmp")},
 
                         };
 
-AllTypes g_allTypesDemo[] = {   {_T("BMP File"), DTWAIN_BMP, _T("test.bmp")},
+AllTypes g_allTypesDemo[] = {{_T("BMP File"), DTWAIN_BMP, _T("test.bmp")},
                             {_T("JPEG File"), DTWAIN_JPEG, _T("test.jpg")},
                             {_T("Adobe PDF File"), DTWAIN_PDFMULTI, _T("test.pdf")},
                             {_T("Text File"), DTWAIN_TEXTMULTI, _T("test.txt")},
                             {_T("TIFF (No compression)"), DTWAIN_TIFFNONEMULTI, _T("test.tif")},
                             {_T("TIFF (CCITT Group 4)"), DTWAIN_TIFFG4MULTI, _T("test.tif")},
                        };
+
+AllLanguages g_allLanguages[] = { {ID_LANGUAGE_ENGLISH               , _T("english")},
+                                 {ID_LANGUAGE_FRENCH                , _T("french")},
+                                 {ID_LANGUAGE_SPANISH               , _T("spanish")},
+                                 {ID_LANGUAGE_ITALIAN               , _T("italian")},
+                                 {ID_LANGUAGE_GERMAN                , _T("german")},
+                                 {ID_LANGUAGE_DUTCH                 , _T("dutch")},
+                                 {ID_LANGUAGE_RUSSIAN               , _T("russian")},
+                                 {ID_LANGUAGE_ROMANIAN              , _T("romanian")},
+                                 {ID_LANGUAGE_SIMPLIFIEDCHINESE     , _T("simplified_chinese")} 
+                                };
 
 int APIENTRY WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
@@ -304,6 +324,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     DisplayLoggingOptions();
                 break;
 
+                case ID_LANGUAGE_ENGLISH            : 
+                case ID_LANGUAGE_FRENCH             : 
+                case ID_LANGUAGE_SPANISH            : 
+                case ID_LANGUAGE_ITALIAN            : 
+                case ID_LANGUAGE_GERMAN             : 
+                case ID_LANGUAGE_DUTCH              : 
+                case ID_LANGUAGE_RUSSIAN            : 
+                case ID_LANGUAGE_ROMANIAN           : 
+                case ID_LANGUAGE_SIMPLIFIEDCHINESE  : 
+                    LoadLanguage(wmId);
+                break;
+
+                case ID_LANGUAGE_CUSTOMLANGUAGE:
+                    DisplayCustomLangDlg();
+                break;
+
                 case IDM_EXIT:
                    DestroyWindow(hWnd);
                    break;
@@ -318,6 +354,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             return DefWindowProc(hWnd, message, wParam, lParam);
    }
    return 0;
+}
+
+void LoadLanguage(int message)
+{
+    LPCSTR langugeToLoad = NULL;
+    int numLanguages = sizeof(g_allLanguages) / sizeof(g_allLanguages[0]);
+    for (int i = 0; i < numLanguages; ++i)
+    {
+        if (message == g_allLanguages[i].langID)
+        {
+            BOOL bRet = DTWAIN_LoadCustomStringResources(g_allLanguages[i].language);
+            if (!bRet)
+                MessageBox(NULL, _T("Could not load language resource"), _T("Language Resource Error"), MB_ICONSTOP);
+            return;
+        }
+    }
+    MessageBox(NULL, _T("Could not load language resource"), _T("Language Resource Error"), MB_ICONSTOP);
 }
 
 void ToggleCheckedItem(UINT resId)
@@ -358,7 +411,7 @@ void SelectTheSource(int nWhich)
     switch (nWhich)
     {
         case IDM_SELECT_SOURCE:
-            tempSource = DTWAIN_SelectSource2(NULL, _T("Select Source"),0,0, DTWAIN_DLG_CENTER_SCREEN | DTWAIN_DLG_SORTNAMES);
+            tempSource = DTWAIN_SelectSource2(NULL, NULL,0,0, DTWAIN_DLG_CENTER_SCREEN | DTWAIN_DLG_SORTNAMES);
         break;
 
         case IDM_SELECT_DEFAULT_SOURCE:
@@ -372,6 +425,7 @@ void SelectTheSource(int nWhich)
         case IDM_SELECT_SOURCE_CUSTOM:
             tempSource = DisplayCustomDlg();
         break;
+
 
     }
 
@@ -614,6 +668,13 @@ DTWAIN_SOURCE DisplayGetNameDlg()
     return g_NamedSource;
 }
 
+DTWAIN_SOURCE DisplayCustomLangDlg()
+{
+    g_NamedSource = NULL;
+    DialogBox(g_hInstance, (LPCTSTR)IDD_dlgEnterCustomLangName, g_hWnd, (DLGPROC)EnterCustomLangNameProc);
+    return g_NamedSource;
+}
+
 DTWAIN_SOURCE DisplayCustomDlg()
 {
     g_NamedSource = NULL;
@@ -672,7 +733,49 @@ void EnableSourceItems(BOOL bEnable)
 }
 
 
-/* Dialog box to display DIB */
+/* Dialog box to enter custom language name */
+LRESULT CALLBACK EnterCustomLangNameProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+        case WM_INITDIALOG:
+        {
+            return TRUE;
+        }
+
+        case WM_COMMAND:
+        {
+            int nControl = LOWORD(wParam);
+            int nNotification = HIWORD(wParam);
+
+            switch( nControl )
+            {
+                /* Quit the dialog */
+                case IDOK:
+                {
+                    HWND hWndEdit = GetDlgItem(hDlg, IDC_edLangName);
+                    TCHAR szBuf[256];
+                    GetWindowText(hWndEdit, szBuf, 255);
+                    BOOL bRet = DTWAIN_LoadCustomStringResources(szBuf);
+                    if ( !bRet )
+                        MessageBox(g_hWnd, _T("Could not load custom resource"), _T("Error"), MB_ICONSTOP);
+                    EndDialog(hDlg, LOWORD(wParam));
+                }
+                break;
+
+                case IDCANCEL:
+                    EndDialog(hDlg, LOWORD(wParam));
+                    return TRUE;
+                break;
+            }
+        }
+        break;
+    }
+    return FALSE;
+}
+
+
+/* Dialog box to display source name to open */
 LRESULT CALLBACK EnterSourceNameProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
