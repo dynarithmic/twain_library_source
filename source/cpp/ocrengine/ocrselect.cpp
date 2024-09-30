@@ -97,7 +97,7 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine()
 {
     LOG_FUNC_ENTRY_NONAME_PARAMS()
     auto [pHandle, pEngine] = VerifyOCRHandles();
-    SourceSelectionOptions opts(SELECTSOURCE,
+    SourceSelectionOptions opts(SELECTSOURCE, IDS_SELECT_OCRENGINE_TEXT,
                                 nullptr,
                                 nullptr,
                                 nullptr,
@@ -115,7 +115,7 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine2(HWND hWndParent,
 {
     LOG_FUNC_ENTRY_NONAME_PARAMS(hWndParent, szTitle, xPos, yPos, nOptions)
     auto [pHandle, pEngine] = VerifyOCRHandles();
-    SourceSelectionOptions opts(SELECTSOURCE,
+    SourceSelectionOptions opts(SELECTSOURCE, IDS_SELECT_OCRENGINE_TEXT,
                                 nullptr,
                                 hWndParent,
                                 szTitle,
@@ -136,7 +136,7 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine2Ex(HWND hWndParent,
 {
     LOG_FUNC_ENTRY_NONAME_PARAMS(hWndParent, szTitle, xPos, yPos, nOptions)
     auto [pHandle, pEngine] = VerifyOCRHandles();
-    SourceSelectionOptions opts(SELECTSOURCE,
+    SourceSelectionOptions opts(SELECTSOURCE, IDS_SELECT_OCRENGINE_TEXT,
                                 nullptr,
                                 hWndParent,
                                 szTitle,

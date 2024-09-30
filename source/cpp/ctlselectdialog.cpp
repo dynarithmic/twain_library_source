@@ -60,7 +60,7 @@ CTL_StringType dynarithmic::LLSelectionDialog(CTL_TwainDLLHandle* pHandle, const
     else
     {
         CTL_TwainAppMgr::WriteLogInfoA("Retrieving Dialog Resources...\n");
-        selectStruct.CS.sTitle = GetResourceStringFromMap_Native(IDS_SELECT_SOURCE_TEXT);
+        selectStruct.CS.sTitle = GetResourceStringFromMap_Native(opts.selectionResourceID);
         CTL_TwainAppMgr::WriteLogInfoA("Retrieved Dialog Resources successfully...\n");
         if (selectStruct.CS.sTitle.empty() )
             selectStruct.CS.sTitle = _T("Select Source");

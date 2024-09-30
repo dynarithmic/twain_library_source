@@ -166,7 +166,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     if (!CTL_TwainAppMgr::IsSourceOpen(pSource))
     {
         bSourcePreOpened = false;
-        SourceSelectionOptions selOpts(SELECTSOURCEBYNAME, p->GetProductName().c_str());
+        SourceSelectionOptions selOpts(SELECTSOURCEBYNAME, IDS_SELECT_SOURCE_TEXT, p->GetProductName().c_str());
         pRealSource = SourceSelect(pHandle, selOpts);
         if (!pRealSource)
         {
