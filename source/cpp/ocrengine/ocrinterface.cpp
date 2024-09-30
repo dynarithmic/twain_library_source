@@ -95,22 +95,22 @@ HANDLE DLLENTRY_DEF DTWAIN_GetOCRText(DTWAIN_OCRENGINE Engine,
         LOG_FUNC_EXIT_NONAME_PARAMS(theHandle)
     }
     else
-        if (nFlags & DTWAINOCR_COPYDATA)
+    if (nFlags & DTWAINOCR_COPYDATA)
+    {
+        if (!Data)
         {
-            if (!Data)
-            {
-                // cache the info
-                LOG_FUNC_EXIT_NONAME_PARAMS(HANDLE(1))
-            }
-            int nMinCopy;
-
-            if (dSize == -1)
-                nMinCopy = localActualSize;
-            nMinCopy = (std::max)((std::min)(dSize, static_cast<LONG>(localActualSize)), static_cast<LONG>(0));
-
-            memcpy(Data, sText.data(), nMinCopy * sizeof(TCHAR));
+            // cache the info
             LOG_FUNC_EXIT_NONAME_PARAMS(HANDLE(1))
         }
+        int nMinCopy;
+
+        if (dSize == -1)
+            nMinCopy = localActualSize;
+        nMinCopy = (std::max)((std::min)(dSize, static_cast<LONG>(localActualSize)), static_cast<LONG>(0));
+
+        memcpy(Data, sText.data(), nMinCopy * sizeof(TCHAR));
+        LOG_FUNC_EXIT_NONAME_PARAMS(HANDLE(1))
+    }
     LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
     CATCH_BLOCK(HANDLE())
 }
