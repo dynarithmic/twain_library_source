@@ -205,10 +205,10 @@
 2501 No le podríamos tapar a TWAIN origen
 2502 Información de imagen no válida
 2503 Error al escribir datos en el archivo
-3000 Seleccione Origen
-3001 &Seleccione
+3000 Seleccionar Fuente  
+3001 &Seleccionar  
 3002 &Cancelar
-3003 Origines:
+3003 Fuentes:  
 3004 Seleccionar OCR
 3005 Entrando
 3006 Salir

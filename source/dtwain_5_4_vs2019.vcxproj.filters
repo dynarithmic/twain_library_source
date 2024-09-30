@@ -1136,9 +1136,6 @@
     <None Include=".\def\dtwain32.def">
       <Filter>Module Definition Files</Filter>
     </None>
-    <None Include="doc.txt">
-      <Filter>Resource Text Files</Filter>
-    </None>
     <None Include="txt\dtwain32.ini">
       <Filter>INI Files</Filter>
     </None>
