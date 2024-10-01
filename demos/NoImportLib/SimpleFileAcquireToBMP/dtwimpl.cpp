@@ -46,6 +46,7 @@
 
 /* declare function pointers */
 #ifdef __cplusplus
+
     D_ACQUIREAUDIOFILEAFUNC                                           DYNDTWAIN_API::DTWAIN_AcquireAudioFileA = nullptr;
     D_ACQUIREAUDIOFILEFUNC                                            DYNDTWAIN_API::DTWAIN_AcquireAudioFile = nullptr;
     D_ACQUIREAUDIOFILEWFUNC                                           DYNDTWAIN_API::DTWAIN_AcquireAudioFileW = nullptr;
@@ -775,6 +776,12 @@
     D_SELECTDEFAULTOCRENGINEFUNC                                      DYNDTWAIN_API::DTWAIN_SelectDefaultOCREngine = nullptr;
     D_SELECTDEFAULTSOURCEFUNC                                         DYNDTWAIN_API::DTWAIN_SelectDefaultSource = nullptr;
     D_SELECTDEFAULTSOURCEWITHOPENFUNC                                 DYNDTWAIN_API::DTWAIN_SelectDefaultSourceWithOpen = nullptr;
+    D_SELECTOCRENGINE2AFUNC                                           DYNDTWAIN_API::DTWAIN_SelectOCREngine2A = nullptr;
+    D_SELECTOCRENGINE2EXAFUNC                                         DYNDTWAIN_API::DTWAIN_SelectOCREngine2ExA = nullptr;
+    D_SELECTOCRENGINE2EXFUNC                                          DYNDTWAIN_API::DTWAIN_SelectOCREngine2Ex = nullptr;
+    D_SELECTOCRENGINE2EXWFUNC                                         DYNDTWAIN_API::DTWAIN_SelectOCREngine2ExW = nullptr;
+    D_SELECTOCRENGINE2FUNC                                            DYNDTWAIN_API::DTWAIN_SelectOCREngine2 = nullptr;
+    D_SELECTOCRENGINE2WFUNC                                           DYNDTWAIN_API::DTWAIN_SelectOCREngine2W = nullptr;
     D_SELECTOCRENGINEBYNAMEAFUNC                                      DYNDTWAIN_API::DTWAIN_SelectOCREngineByNameA = nullptr;
     D_SELECTOCRENGINEBYNAMEFUNC                                       DYNDTWAIN_API::DTWAIN_SelectOCREngineByName = nullptr;
     D_SELECTOCRENGINEBYNAMEWFUNC                                      DYNDTWAIN_API::DTWAIN_SelectOCREngineByNameW = nullptr;
@@ -984,6 +991,9 @@
     D_SETSHADOWSTRINGWFUNC                                            DYNDTWAIN_API::DTWAIN_SetShadowStringW = nullptr;
     D_SETSOURCEUNITFUNC                                               DYNDTWAIN_API::DTWAIN_SetSourceUnit = nullptr;
     D_SETTEMPFILEDIRECTORYAFUNC                                       DYNDTWAIN_API::DTWAIN_SetTempFileDirectoryA = nullptr;
+    D_SETTEMPFILEDIRECTORYEXAFUNC                                     DYNDTWAIN_API::DTWAIN_SetTempFileDirectoryExA = nullptr;
+    D_SETTEMPFILEDIRECTORYEXFUNC                                      DYNDTWAIN_API::DTWAIN_SetTempFileDirectoryEx = nullptr;
+    D_SETTEMPFILEDIRECTORYEXWFUNC                                     DYNDTWAIN_API::DTWAIN_SetTempFileDirectoryExW = nullptr;
     D_SETTEMPFILEDIRECTORYFUNC                                        DYNDTWAIN_API::DTWAIN_SetTempFileDirectory = nullptr;
     D_SETTEMPFILEDIRECTORYWFUNC                                       DYNDTWAIN_API::DTWAIN_SetTempFileDirectoryW = nullptr;
     D_SETTHRESHOLDFUNC                                                DYNDTWAIN_API::DTWAIN_SetThreshold = nullptr;
@@ -1828,6 +1838,12 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_SelectDefaultSource, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SelectDefaultSourceWithOpen, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SelectOCREngine, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_SelectOCREngine2, hModule);                             
+          LOADFUNCTIONIMPL(DTWAIN_SelectOCREngine2A, hModule);              
+          LOADFUNCTIONIMPL(DTWAIN_SelectOCREngine2Ex, hModule);             
+          LOADFUNCTIONIMPL(DTWAIN_SelectOCREngine2ExA, hModule);            
+          LOADFUNCTIONIMPL(DTWAIN_SelectOCREngine2ExW, hModule);            
+          LOADFUNCTIONIMPL(DTWAIN_SelectOCREngine2W, hModule);              
           LOADFUNCTIONIMPL(DTWAIN_SelectOCREngineByName, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SelectOCREngineByNameA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SelectOCREngineByNameW, hModule);
@@ -2037,6 +2053,9 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_SetSourceUnit, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetTempFileDirectory, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetTempFileDirectoryA, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_SetTempFileDirectoryEx, hModule);         
+          LOADFUNCTIONIMPL(DTWAIN_SetTempFileDirectoryExA, hModule);        
+          LOADFUNCTIONIMPL(DTWAIN_SetTempFileDirectoryExW, hModule);        
           LOADFUNCTIONIMPL(DTWAIN_SetTempFileDirectoryW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetThreshold, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetThresholdString, hModule);
@@ -2095,4 +2114,3 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
 #ifdef __GNUC__
     #pragma GCC diagnostic pop
 #endif
-

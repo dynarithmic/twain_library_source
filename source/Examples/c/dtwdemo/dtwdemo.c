@@ -143,6 +143,7 @@ AllLanguages g_allLanguages[] = { {ID_LANGUAGE_ENGLISH               , _T("engli
                                  {ID_LANGUAGE_DUTCH                 , _T("dutch")},
                                  {ID_LANGUAGE_RUSSIAN               , _T("russian")},
                                  {ID_LANGUAGE_ROMANIAN              , _T("romanian")},
+                                 {ID_LANGUAGE_PORTUGUESE              , _T("portuguese")},
                                  {ID_LANGUAGE_SIMPLIFIEDCHINESE     , _T("simplified_chinese")} 
                                 };
 
@@ -333,6 +334,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 case ID_LANGUAGE_RUSSIAN            : 
                 case ID_LANGUAGE_ROMANIAN           : 
                 case ID_LANGUAGE_SIMPLIFIEDCHINESE  : 
+                case ID_LANGUAGE_PORTUGUESE:
                     LoadLanguage(wmId);
                 break;
 

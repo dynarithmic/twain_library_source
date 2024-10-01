@@ -49,6 +49,20 @@ BEGIN
     BEGIN
         MENUITEM "Logging Options...",          IDM_LOGGING_OPTIONS
     END
+    POPUP "Language"
+    BEGIN
+        MENUITEM "Dutch",                       ID_LANGUAGE_DUTCH
+        MENUITEM "English",                     ID_LANGUAGE_ENGLISH
+        MENUITEM "French",                      ID_LANGUAGE_FRENCH
+        MENUITEM "German",                      ID_LANGUAGE_GERMAN
+        MENUITEM "Italian",                     ID_LANGUAGE_ITALIAN
+        MENUITEM "Portuguese",                  ID_LANGUAGE_PORTUGUESE
+        MENUITEM "Romanian",                    ID_LANGUAGE_ROMANIAN
+        MENUITEM "Russian",                     ID_LANGUAGE_RUSSIAN
+        MENUITEM "Simplified Chinese",          ID_LANGUAGE_SIMPLIFIEDCHINESE
+        MENUITEM "Spanish",                     ID_LANGUAGE_SPANISH
+        MENUITEM "Custom Language...",          ID_LANGUAGE_CUSTOMLANGUAGE
+    END
 
     POPUP "&Help"
     BEGIN
@@ -96,6 +110,17 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,60,31,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,113,31,50,14
     LTEXT           "Source Name:",IDC_STATIC,7,14,46,8
+END
+
+IDD_dlgEnterCustomLangName DIALOG DISCARDABLE  0, 0, 175, 53
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Language Name"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_edLangName,61,13,101,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,60,31,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,113,31,50,14
+    LTEXT           "Language Name:",IDC_STATIC,7,14,46,8
 END
 
 IDD_dlgSelectCustom DIALOG DISCARDABLE  0, 0, 229, 133
