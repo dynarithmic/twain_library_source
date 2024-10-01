@@ -91,6 +91,7 @@ typedef LPVOID (DLLENTRY_DEF * D_ARRAYGETBUFFERFUNC)                            
 typedef LONG (DLLENTRY_DEF * D_ARRAYGETCOUNTFUNC)                               (DTWAIN_ARRAY);
 typedef LONG (DLLENTRY_DEF * D_ARRAYGETMAXSTRINGLENGTHFUNC)                     (DTWAIN_ARRAY);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_ARRAYGETSOURCEATFUNC)                     (DTWAIN_ARRAY, LONG, DTWAIN_SOURCE*);
+typedef DTWAIN_BOOL (DLLENTRY_DEF * D_ARRAYGETATSOURCEFUNC)                     (DTWAIN_ARRAY, LONG, DTWAIN_SOURCE*);
 typedef LONG (DLLENTRY_DEF * D_ARRAYGETSTRINGLENGTHFUNC)                        (DTWAIN_ARRAY, LONG);
 typedef LONG (DLLENTRY_DEF * D_ARRAYGETTYPEFUNC)                                (DTWAIN_ARRAY);
 typedef DTWAIN_ARRAY (DLLENTRY_DEF * D_ARRAYINITFUNC)                           (VOID_PROTOTYPE);
@@ -1025,7 +1026,7 @@ typedef LONG          (DLLENTRY_DEF*  D_GETTWAINSTRINGNAMEWFUNC)                
 typedef LONG          (DLLENTRY_DEF*  D_GETACTIVEDSMPATHFUNC)                    (LPTSTR, LONG);
 typedef LONG          (DLLENTRY_DEF*  D_GETACTIVEDSMPATHAFUNC)                   (LPSTR, LONG);
 typedef LONG          (DLLENTRY_DEF*  D_GETACTIVEDSMPATHWFUNC)                   (LPWSTR, LONG);
-typedef DTWAIN_BOOL   (DLLENTRY_DEF * D_ENUMCAMERASEXFUNC)                       (DTWAIN_SOURCE, LONG, LPDTWAIN_ARRAY);
+typedef DTWAIN_BOOL   (DLLENTRY_DEF*  D_ENUMCAMERASEXFUNC)                       (DTWAIN_SOURCE, LONG, LPDTWAIN_ARRAY);
 typedef DTWAIN_BOOL   (DLLENTRY_DEF*  D_SETBUFFEREDTILEMODEFUNC)                 (DTWAIN_SOURCE, DTWAIN_BOOL);
 typedef DTWAIN_BOOL   (DLLENTRY_DEF*  D_ISBUFFEREDTILEMODEONFUNC)                (DTWAIN_SOURCE);
 typedef DTWAIN_BOOL   (DLLENTRY_DEF*  D_ISBUFFEREDTILEMODESUPPORTEDFUNC)         (DTWAIN_SOURCE);
@@ -1127,6 +1128,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF* D_SETTEMPFILEDIRECTORYEXWFUNC)               
     STATIC D_ARRAYGETATFUNC                                 DTWAIN_ArrayGetAt;
     STATIC D_ARRAYGETATLONG64FUNC                           DTWAIN_ArrayGetAtLong64;
     STATIC D_ARRAYGETATLONGFUNC                             DTWAIN_ArrayGetAtLong;
+    STATIC D_ARRAYGETATSOURCEFUNC                           DTWAIN_ArrayGetAtSource;
     STATIC D_ARRAYGETATSTRINGAFUNC                          DTWAIN_ArrayGetAtStringA;
     STATIC D_ARRAYGETATSTRINGFUNC                           DTWAIN_ArrayGetAtString;
     STATIC D_ARRAYGETATSTRINGPTRFUNC                        DTWAIN_ArrayGetAtStringPtr;
@@ -1352,9 +1354,9 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF* D_SETTEMPFILEDIRECTORYEXWFUNC)               
     STATIC D_GETACQUIRESTRIPBUFFERFUNC                      DTWAIN_GetAcquireStripBuffer;
     STATIC D_GETACQUIRESTRIPDATAFUNC                        DTWAIN_GetAcquireStripData;
     STATIC D_GETACQUIRESTRIPSIZESFUNC                       DTWAIN_GetAcquireStripSizes;
-    STATIC D_GETACTIVEDSMPATHAFUNC                    DTWAIN_GetActiveDSMPathA;
+    STATIC D_GETACTIVEDSMPATHAFUNC                          DTWAIN_GetActiveDSMPathA;
     STATIC D_GETACTIVEDSMPATHFUNC                           DTWAIN_GetActiveDSMPath;
-    STATIC D_GETACTIVEDSMPATHWFUNC                    DTWAIN_GetActiveDSMPathW;
+    STATIC D_GETACTIVEDSMPATHWFUNC                          DTWAIN_GetActiveDSMPathW;
     STATIC D_GETALARMVOLUMEFUNC                             DTWAIN_GetAlarmVolume;
     STATIC D_GETAPIHANDLESTATUS                             DTWAIN_GetAPIHandleStatus;
     STATIC D_GETAPPINFOAFUNC                                DTWAIN_GetAppInfoA;
