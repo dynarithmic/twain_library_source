@@ -755,6 +755,7 @@ Class DTWAINAPI
     Public Const DTWAIN_ERR_INI64_NOT_FOUND As Integer = (-1061)
     Public Const DTWAIN_ERR_CRC_CHECK As Integer = (-1062)
     Public Const DTWAIN_ERR_RESOURCES_BAD_VERSION As Integer = (-1063)
+    Public Const DTWAIN_ERR_WIN32_ERROR As Integer = (-1064)
 
     Public Const TWAIN_ERR_LOW_MEMORY As Integer = (-1100)
     Public Const TWAIN_ERR_FALSE_ALARM As Integer = (-1101)
@@ -1055,7 +1056,7 @@ Class DTWAINAPI
                         Or DTWAIN_LOG_DECODE_BITMAP)
 
     Public Const DTWAIN_LOG_ALL_APPEND As Integer = &HFFFFFFFF
-
+    Public Const DTWAIN_TEMPDIR_CREATEDIRECTORY As Integer = DTWAIN_LOG_CREATEDIRECTORY
 
     Public Const DTWAINGCD_RETURNHANDLE As Integer = 1
     Public Const DTWAINGCD_COPYDATA As Integer = 2
@@ -2703,4 +2704,31 @@ Class DTWAINAPI
     Declare Unicode Function DTWAIN_ConvertToAPIStringW Lib "dtwain32.dll" (<MarshalAs(UnmanagedType.LPWStr)> sString As String) As System.IntPtr
     Declare Auto Function DTWAIN_ConvertToAPIString Lib "dtwain32.dll" (<MarshalAs(UnmanagedType.LPTStr)> sString As String) As System.IntPtr
     Declare Auto Function DTWAIN_IsSourceInUIOnlyMode Lib "dtwain32.dll" (ByVal Source As System.IntPtr) As Integer
-    End Class
+
+    Declare Ansi Function DTWAIN_SelectOCREngine2A Lib "dtwain32.dll" (ByVal hWndParent As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> szTitle As String, ByVal xPos As Integer, ByVal yPos As Integer, ByVal nOptions As Integer) As System.IntPtr
+    Declare Ansi Function DTWAIN_SelectOCREngine2ExA Lib "dtwain32.dll" (ByVal hWndParent As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> szTitle As String, ByVal xPos As Integer, ByVal yPos As Integer, <MarshalAs(UnmanagedType.LPStr)> szIncludeNames As String, <MarshalAs(UnmanagedType.LPStr)> szExcludeNames As String, <MarshalAs(UnmanagedType.LPStr)> szNameMapping As String, ByVal nOptions As Integer) As System.IntPtr
+    Declare Unicode Function DTWAIN_SelectOCREngine2ExW Lib "dtwain32.dll" (ByVal hWndParent As System.IntPtr, <MarshalAs(UnmanagedType.LPWStr)> szTitle As String, ByVal xPos As Integer, ByVal yPos As Integer, <MarshalAs(UnmanagedType.LPWStr)> szIncludeNames As String, <MarshalAs(UnmanagedType.LPWStr)> szExcludeNames As String, <MarshalAs(UnmanagedType.LPWStr)> szNameMapping As String, ByVal nOptions As Integer) As System.IntPtr
+    Declare Unicode Function DTWAIN_SelectOCREngine2W Lib "dtwain32.dll" (ByVal hWndParent As System.IntPtr, <MarshalAs(UnmanagedType.LPWStr)> szTitle As String, ByVal xPos As Integer, ByVal yPos As Integer, ByVal nOptions As Integer) As System.IntPtr
+    Declare Auto Function DTWAIN_SelectOCREngine2 Lib "dtwain32.dll" (ByVal hWndParent As System.IntPtr, <MarshalAs(UnmanagedType.LPTStr)> szTitle As String, ByVal xPos As Integer, ByVal yPos As Integer, ByVal nOptions As Integer) As System.IntPtr
+    Declare Auto Function DTWAIN_SelectOCREngine2Ex Lib "dtwain32.dll" (ByVal hWndParent As System.IntPtr, <MarshalAs(UnmanagedType.LPTStr)> szTitle As String, ByVal xPos As Integer, ByVal yPos As Integer, <MarshalAs(UnmanagedType.LPTStr)> szIncludeFilter As String, <MarshalAs(UnmanagedType.LPTStr)> szExcludeFilter As String, <MarshalAs(UnmanagedType.LPTStr)> szNameMapping As String, ByVal nOptions As Integer) As System.IntPtr
+
+    Declare Ansi Function DTWAIN_SelectOCREngine2A Lib "dtwain32.dll" (ByVal hWndParent As System.IntPtr, ByVal szTitle As System.IntPtr, ByVal xPos As Integer, ByVal yPos As Integer, ByVal nOptions As Integer) As System.IntPtr
+    Declare Ansi Function DTWAIN_SelectOCREngine2ExA Lib "dtwain32.dll" (ByVal hWndParent As System.IntPtr, ByVal szTitle As System.IntPtr, ByVal xPos As Integer, ByVal yPos As Integer, <MarshalAs(UnmanagedType.LPStr)> szIncludeNames As String, <MarshalAs(UnmanagedType.LPStr)> szExcludeNames As String, <MarshalAs(UnmanagedType.LPStr)> szNameMapping As String, ByVal nOptions As Integer) As System.IntPtr
+    Declare Unicode Function DTWAIN_SelectOCREngine2ExW Lib "dtwain32.dll" (ByVal hWndParent As System.IntPtr, ByVal szTitle As System.IntPtr, ByVal xPos As Integer, ByVal yPos As Integer, <MarshalAs(UnmanagedType.LPWStr)> szIncludeNames As String, <MarshalAs(UnmanagedType.LPWStr)> szExcludeNames As String, <MarshalAs(UnmanagedType.LPWStr)> szNameMapping As String, ByVal nOptions As Integer) As System.IntPtr
+    Declare Unicode Function DTWAIN_SelectOCREngine2W Lib "dtwain32.dll" (ByVal hWndParent As System.IntPtr, ByVal szTitle As System.IntPtr, ByVal xPos As Integer, ByVal yPos As Integer, ByVal nOptions As Integer) As System.IntPtr
+    Declare Auto Function DTWAIN_SelectOCREngine2 Lib "dtwain32.dll" (ByVal hWndParent As System.IntPtr, ByVal szTitle As System.IntPtr, ByVal xPos As Integer, ByVal yPos As Integer, ByVal nOptions As Integer) As System.IntPtr
+    Declare Auto Function DTWAIN_SelectOCREngine2Ex Lib "dtwain32.dll" (ByVal hWndParent As System.IntPtr, ByVal szTitle As System.IntPtr, ByVal xPos As Integer, ByVal yPos As Integer, <MarshalAs(UnmanagedType.LPTStr)> szIncludeFilter As String, <MarshalAs(UnmanagedType.LPTStr)> szExcludeFilter As String, <MarshalAs(UnmanagedType.LPTStr)> szNameMapping As String, ByVal nOptions As Integer) As System.IntPtr
+
+    Declare Ansi Function DTWAIN_SelectSource2A Lib "dtwain32.dll" (ByVal hWndParent As System.IntPtr, ByVal szTitle As System.IntPtr, ByVal xPos As Integer, ByVal yPos As Integer, ByVal nOptions As Integer) As System.IntPtr
+    Declare Ansi Function DTWAIN_SelectSource2ExA Lib "dtwain32.dll" (ByVal hWndParent As System.IntPtr, ByVal szTitle As System.IntPtr, ByVal xPos As Integer, ByVal yPos As Integer, <MarshalAs(UnmanagedType.LPStr)> szIncludeNames As String, <MarshalAs(UnmanagedType.LPStr)> szExcludeNames As String, <MarshalAs(UnmanagedType.LPStr)> szNameMapping As String, ByVal nOptions As Integer) As System.IntPtr
+    Declare Unicode Function DTWAIN_SelectSource2ExW Lib "dtwain32.dll" (ByVal hWndParent As System.IntPtr, ByVal szTitle As System.IntPtr, ByVal xPos As Integer, ByVal yPos As Integer, <MarshalAs(UnmanagedType.LPWStr)> szIncludeNames As String, <MarshalAs(UnmanagedType.LPWStr)> szExcludeNames As String, <MarshalAs(UnmanagedType.LPWStr)> szNameMapping As String, ByVal nOptions As Integer) As System.IntPtr
+    Declare Unicode Function DTWAIN_SelectSource2W Lib "dtwain32.dll" (ByVal hWndParent As System.IntPtr, ByVal szTitle As System.IntPtr, ByVal xPos As Integer, ByVal yPos As Integer, ByVal nOptions As Integer) As System.IntPtr
+    Declare Auto Function DTWAIN_SelectSource2 Lib "dtwain32.dll" (ByVal hWndParent As System.IntPtr, ByVal szTitle As System.IntPtr, ByVal xPos As Integer, ByVal yPos As Integer, ByVal nOptions As Integer) As System.IntPtr
+    Declare Auto Function DTWAIN_SelectSource2Ex Lib "dtwain32.dll" (ByVal hWndParent As System.IntPtr, ByVal szTitle As System.IntPtr, ByVal xPos As Integer, ByVal yPos As Integer, <MarshalAs(UnmanagedType.LPTStr)> szIncludeFilter As String, <MarshalAs(UnmanagedType.LPTStr)> szExcludeFilter As String, <MarshalAs(UnmanagedType.LPTStr)> szNameMapping As String, ByVal nOptions As Integer) As System.IntPtr
+
+    Declare Ansi Function DTWAIN_SetTempFileDirectoryExA Lib "dtwain32.dll" (<MarshalAs(UnmanagedType.LPStr)> szFilePath As String, ByVal options As UInteger) As Integer
+    Declare Unicode Function DTWAIN_SetTempFileDirectoryExW Lib "dtwain32.dll" (<MarshalAs(UnmanagedType.LPWStr)> szFilePath As String, ByVal options As UInteger) As Integer
+    Declare Auto Function DTWAIN_SetTempFileDirectoryEx Lib "dtwain32.dll" (<MarshalAs(UnmanagedType.LPTStr)> szFilePath As String, ByVal options As UInteger) As Integer
+
+    Declare Auto Function DTWAIN_ArrayGetAtSource Lib "dtwain32.dll" (ByVal pArray As System.IntPtr, ByVal nWhere As Integer, ByRef ppSource As System.IntPtr) As Integer
+End Class
