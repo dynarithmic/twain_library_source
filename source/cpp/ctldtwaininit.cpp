@@ -332,7 +332,7 @@ static LONG GetResourceStringInternal(LONG resourceID, LPTSTR lpszBuffer, LONG n
         // resource string
         sCopy = StringWrapper::ToString(resourceID);
         if (resourceID != DTWAIN_ERR_WIN32_ERROR)
-        return StringWrapper::CopyInfoToCString(sCopy, lpszBuffer, nMaxLen);
+            return StringWrapper::CopyInfoToCString(sCopy, lpszBuffer, nMaxLen);
     }
     nBytes = DTWAIN_USERRES_MAXSIZE;
     resourceID = actualResourceID;
