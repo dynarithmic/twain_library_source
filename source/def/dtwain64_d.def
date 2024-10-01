@@ -1062,4 +1062,5 @@ DTWAIN_SelectOCREngine2Ex                         @31058
 DTWAIN_SetTempFileDirectoryEx                     @31059
 DTWAIN_SetTempFileDirectoryExA                    @31060
 DTWAIN_SetTempFileDirectoryExW                    @31061
+DTWAIN_ArrayGetSourceAt                           @31062
 
