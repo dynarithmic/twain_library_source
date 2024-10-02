@@ -53,6 +53,7 @@ bool OCREngine::SetOCRVersionIdentity() { return false; }
 std::string OCREngine::GetManufacturer() const { return m_OCRIdentity.Manufacturer;}
 std::string OCREngine::GetProductFamily() const { return m_OCRIdentity.ProductFamily;}
 std::string OCREngine::GetProductName() const { return m_OCRIdentity.ProductName;}
+OCRVersionIdentity OCREngine::GetOCRVersionIdentity() { return m_OCRIdentity; }
 bool OCREngine::ShutdownOCR(int&) { return true; }
 bool OCREngine::IsActivated() const { return m_bIsActivated; }
 void OCREngine::SetActivated(bool bActive) { m_bIsActivated = bActive; }

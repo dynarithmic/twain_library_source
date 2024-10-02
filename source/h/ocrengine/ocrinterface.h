@@ -266,7 +266,7 @@ namespace dynarithmic
         std::string GetProductName() const;
         LONG GetPDFColorFileType() { return m_OCRPDFInfo.FileType[OCRPDFInfo::PDFINFO_COLOR]; }
         LONG GetPDFBWFileType() { return m_OCRPDFInfo.FileType[OCRPDFInfo::PDFINFO_BW]; }
-
+        OCRVersionIdentity GetOCRVersionIdentity();
         std::string GetCachedFile() const;
         std::string GetCachedText() const;
 

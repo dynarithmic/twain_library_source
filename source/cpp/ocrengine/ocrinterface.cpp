@@ -553,6 +553,18 @@ LONG DLLENTRY_DEF DTWAIN_GetOCRVersionInfo(DTWAIN_OCRENGINE Engine, LPTSTR buffe
     CATCH_BLOCK(0)
 }
 
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRMajorMinorVersion(DTWAIN_OCRENGINE Engine, LPLONG lpMajor, LPLONG lpMinor)
+{
+    LOG_FUNC_ENTRY_PARAMS((Engine, lpMajor, lpMinor))
+    auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
+    if (lpMajor)
+        *lpMajor = pEngine->GetOCRVersionIdentity().Version.MajorNum;
+    if (lpMinor)
+        *lpMinor = pEngine->GetOCRVersionIdentity().Version.MinorNum;
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK(false)
+}
+ 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumOCRSupportedCaps(DTWAIN_OCRENGINE Engine, LPDTWAIN_ARRAY SupportedCaps)
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, SupportedCaps))
