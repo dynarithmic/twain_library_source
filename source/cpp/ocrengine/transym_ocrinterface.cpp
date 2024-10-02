@@ -803,7 +803,7 @@ LONG TransymOCR::ProcessTOCRJob()
 bool TransymOCR::SetOCRVersionIdentity()
 {
     OCRVersionIdentity theIdentity;
-    const HMODULE hInst = ::GetModuleHandle(_T("TOCRDLL.DLL"));
+    const HMODULE hInst = ::GetModuleHandle(GetTOCRDLLName().c_str());
     if ( hInst )
     {
         try
@@ -862,7 +862,7 @@ std::string TransymOCR::GetOCRVersionInfo()
 
         if (retvalue == TOCR_OK)
         {
-            const HMODULE hInst = ::GetModuleHandle(_T("TOCRDLL.DLL"));
+            const HMODULE hInst = ::GetModuleHandle(GetTOCRDLLName().c_str());
             try
             {
                 const VersionInfoA ver(hInst);
@@ -1166,7 +1166,7 @@ int TransymOCR::GetNumPagesInFile(CTL_StringType szFileName, int& errCode)
 LONG TransymOCR::StartupOCREngine()
 {
     const LONG status = m_SDK.TOCRInitialise(&m_JobHandle);
-    if ( status == TOCR_OK )
+    if ( status == TOCR_OK ) 
         SetActivated(true);
     return status;
 }
