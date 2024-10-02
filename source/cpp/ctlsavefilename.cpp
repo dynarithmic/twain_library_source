@@ -20,7 +20,7 @@
  */
 #include <algorithm>
 #include "cppfunc.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "ctliface.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)

@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltr043.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "dtwain.h"
 #include "winbit32.h"
 

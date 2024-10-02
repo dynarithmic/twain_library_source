@@ -20,7 +20,7 @@
  */
 #include "ctldib.h"
 #include "ctliface.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "ctlfileutils.h"
 
 using namespace dynarithmic;

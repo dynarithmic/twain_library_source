@@ -22,7 +22,7 @@
 #define CTLTR007_H
 
 #include "ctltrp.h"
-#include "ctltwses.h"
+#include "ctltwainsession.h"
 namespace dynarithmic
 {
     class CTL_ConditionCodeTriplet : public CTL_TwainTriplet

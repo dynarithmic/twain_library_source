@@ -21,7 +21,7 @@
 #include "cppfunc.h"
 #include "dtwain.h"
 #include "ctliface.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "arrayfactory.h"
 using namespace dynarithmic;
 

@@ -31,7 +31,7 @@
 #include <memory>
 #include <pdflib32.h>
 #include "ctliface.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "ctlfileutils.h"
 #include "dtwain_float_utils.h"
 

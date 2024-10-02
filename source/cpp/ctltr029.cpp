@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltr029.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 
 using namespace dynarithmic;
 

@@ -26,7 +26,7 @@
 #include <algorithm>
 #include "cppfunc.h"
 #include "ctldib.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "ctltrall.h"
 #include "ctltmpl5.h"
 #include "errorcheck.h"

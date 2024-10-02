@@ -21,10 +21,10 @@
 #include <cstring>
 #include <algorithm>
 #include <utility>
-#include "ctltwses.h"
+#include "ctltwainsession.h"
 #include "ctltrall.h"
-#include "ctltwmgr.h"
-#include "ctltwsrc.h"
+#include "ctltwainmanager.h"
+#include "ctltwainsource.h"
 
 using namespace dynarithmic;
 

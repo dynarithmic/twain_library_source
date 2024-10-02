@@ -1061,3 +1061,4 @@ DTWAIN_SetTempFileDirectoryExA                    @31060
 DTWAIN_SetTempFileDirectoryExW                    @31061
 DTWAIN_ArrayGetAtSource                           @31062
 DTWAIN_GetOCRMajorMinorVersion                    @31063
+DTWAIN_GetSavedFilesCount                         @31064

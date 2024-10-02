@@ -22,7 +22,7 @@
 
 #include "ctliface.h"
 #include "ctltr010.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 
 using namespace dynarithmic;
 #ifdef _MSC_VER

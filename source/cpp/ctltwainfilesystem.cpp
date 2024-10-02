@@ -21,7 +21,7 @@
 #include "cppfunc.h"
 #include "dtwain.h"
 #include "ctliface.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "ctltr037.h"
 #include "errorcheck.h"
 #ifdef _MSC_VER

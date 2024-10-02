@@ -1163,10 +1163,6 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include=".\cpp\imagexferfilewriter.cpp" />
     <ClCompile Include=".\dtwinver\Dtwinver.cpp" />
     <ClCompile Include=".\dtwinver\Getwinver.cpp" />
-    <ClCompile Include=".\cpp\ctltwmgr.cpp" />
-    <ClCompile Include=".\cpp\ctltwses.cpp" />
-    <ClCompile Include=".\cpp\ctltwsrc.cpp" />
-    <ClCompile Include=".\cpp\ctlwproc.cpp" />
     <ClCompile Include=".\cpp\ctlflog.cpp" />
     <ClCompile Include=".\cpp\errstruc.cpp" />
     <ClCompile Include=".\cpp\logmsg.cpp">
@@ -1248,7 +1244,11 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include="cpp\ctltr043.cpp" />
     <ClCompile Include="cpp\ctltsstub.cpp" />
     <ClCompile Include="cpp\ctltwainfilesystem.cpp" />
+    <ClCompile Include="cpp\ctltwainmanager.cpp" />
+    <ClCompile Include="cpp\ctltwainsession.cpp" />
+    <ClCompile Include="cpp\ctltwainsource.cpp" />
     <ClCompile Include="cpp\ctlupdatedibproc.cpp" />
+    <ClCompile Include="cpp\ctlwindowproc.cpp" />
     <ClCompile Include="cpp\imagefun\resamplefactory.cpp" />
     <ClCompile Include="cpp\imagefun\tiffun32.cpp" />
     <ClCompile Include="cpp\imagefun\txtfun32.cpp" />
@@ -1442,9 +1442,6 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include=".\h\ctltr038.h" />
     <ClInclude Include=".\h\ctltrall.h" />
     <ClInclude Include=".\h\ctltrp.h" />
-    <ClInclude Include=".\h\ctltwmgr.h" />
-    <ClInclude Include=".\h\ctltwses.h" />
-    <ClInclude Include=".\h\ctltwsrc.h" />
     <ClInclude Include=".\h\dtwain.h" />
     <ClInclude Include=".\h\dtwain_verinfo.h" />
     <ClInclude Include=".\h\dtwainc.h" />
@@ -1487,7 +1484,10 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\ctltr042.h" />
     <ClInclude Include="h\ctltr043.h" />
     <ClInclude Include="h\ctltwainidentity.h" />
+    <ClInclude Include="h\ctltwainmanager.h" />
     <ClInclude Include="h\ctltwainmsgloop.h" />
+    <ClInclude Include="h\ctltwainsession.h" />
+    <ClInclude Include="h\ctltwainsource.h" />
     <ClInclude Include="h\ctlutils.h" />
     <ClInclude Include="h\dibinfox.h" />
     <ClInclude Include="h\dibmulti.h" />

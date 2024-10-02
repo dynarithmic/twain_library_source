@@ -25,7 +25,7 @@
 
 #include "ctliface.h"
 #include "ctltr026.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 
 #define DTWAIN_PAGEMISSINGSTR _T("<missing_page>")
 

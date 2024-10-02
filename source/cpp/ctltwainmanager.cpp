@@ -39,7 +39,7 @@
 #include <ctlccerr.h>
 #include "ctldib.h"
 #include "ctliface.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "twainfix32.h"
 
 using namespace dynarithmic;

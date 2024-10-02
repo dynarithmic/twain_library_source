@@ -22,7 +22,7 @@
 #define ERRORCHECK_H
 #include "cppfunc.h"
 #include "ctliface.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 
 namespace dynarithmic
 {

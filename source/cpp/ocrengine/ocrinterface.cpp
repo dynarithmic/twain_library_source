@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctliface.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "transym_ocrinterface.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"

@@ -30,7 +30,7 @@
 #include <boost/optional.hpp>
 #include "winconst.h"
 #include "winbit32.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "ctldib.h"
 #include "arrayfactory.h"
 #include "ctlfileutils.h"

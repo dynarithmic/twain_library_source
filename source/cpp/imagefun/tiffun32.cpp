@@ -27,7 +27,7 @@
 #include "tiffun32.h"
 #include "pdflib32.h"
 #include "ctliface.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "tiff.h"
 
 using namespace dynarithmic;

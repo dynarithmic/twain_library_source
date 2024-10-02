@@ -27,7 +27,7 @@
 #include "ctltr026.h"
 #include "ctltr027.h"
 #include "ctltr025.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "imagexferfilewriter.h"
 #include "ctldib.h"
 #include "dtwain.h"
