@@ -57,7 +57,6 @@ void DisplayCustomLangDlg();
 LRESULT CALLBACK EnterCustomLangNameProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
 BOOL bPageOK;
-LONG nPageCount=0;
 LONG nMajorVer, nMinorVer, nDTwainType;
 
 void WaitLoop();
@@ -653,19 +652,20 @@ void AcquireFile(BOOL bUseSource)
        (to be safe) */
     DTWAIN_ArrayDestroy( AFileNames );
     DTWAIN_OpenSource( g_CurrentSource );
-    if ( !bAcquireOK || nPageCount == 0 || !bPageOK )
+    LONG pageCount = DTWAIN_GetSavedFilesCount(g_CurrentSource);
+    if ( !bAcquireOK || pageCount == 0 || !bPageOK )
     {
         if ( !bAcquireOK)
             MessageBox(g_hWnd, szError, _T(""), MB_ICONSTOP);
         else
-            MessageBox(g_hWnd, _T("No Images Acquired"), _T(""), MB_ICONSTOP);
+            MessageBox(g_hWnd, _T("No Images Acquired"), _T(""), MB_OK);
         return;
     }
 	else
 	{
 		if (_taccess(g_FileName, 0) == 0)
 		{
-			MessageBox(g_hWnd, _T("Images Acquired"), _T(""), MB_ICONSTOP);
+			MessageBox(g_hWnd, _T("Images Acquired"), _T(""), MB_OK);
 			return;
 		}
     }
@@ -1305,7 +1305,6 @@ LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserDa
     {
         case DTWAIN_TN_ACQUIRESTARTED:
             bPageOK = TRUE;
-            nPageCount = 0;
 			pdf_page_count = 1;
         break;
 
@@ -1360,7 +1359,6 @@ LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserDa
 
         case DTWAIN_TN_FILESAVEOK:
             bPageOK = TRUE;
-            ++nPageCount;
             return 1;
 
         case DTWAIN_TN_PAGECONTINUE:

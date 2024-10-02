@@ -21,7 +21,7 @@
 #include <boost/format.hpp>
 
 #include "cppfunc.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "sourceacquireopts.h"
 #include "errorcheck.h"
 #include "sourceselectopts.h"

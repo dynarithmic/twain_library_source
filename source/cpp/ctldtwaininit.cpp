@@ -32,7 +32,7 @@
 #include <vector>
 
 #include "cppfunc.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "ctlres.h"
 #include "../dtwinver/dtwinverex.h"
 #include "dtwain_verinfo.h"

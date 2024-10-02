@@ -22,7 +22,7 @@
 #define CTLTR021_H
 
 #include "ctltrp.h"
-#include "ctltwses.h"
+#include "ctltwainsession.h"
 
 namespace dynarithmic
 {

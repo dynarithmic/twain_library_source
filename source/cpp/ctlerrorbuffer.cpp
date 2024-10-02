@@ -25,7 +25,7 @@
 #include "dtwain.h"
 #include "ctliface.h"
 #include "arrayfactory.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 using namespace dynarithmic;
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetErrorBuffer(LPDTWAIN_ARRAY ArrayBuffer)

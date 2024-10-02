@@ -61,7 +61,7 @@ struct dtwain_library_loader : library_loader_impl
 
 #include "capstruc.h"
 #include "ctltmpl4.h"
-#include "ctltwses.h"
+#include "ctltwainsession.h"
 #include "dtwain_resource_constants.h"
 #include "errstruc.h"
 #include "logmsg.h"

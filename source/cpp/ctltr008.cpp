@@ -21,11 +21,11 @@
 #include "ctltr008.h"
 #include "ctltr027.h"
 #include "ctltr034.h"
-#include "ctltwses.h"
-#include <ctltwsrc.h>
+#include "ctltwainsession.h"
+#include <ctltwainsource.h>
 
 #include "ctliface.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 
 using namespace dynarithmic;
 

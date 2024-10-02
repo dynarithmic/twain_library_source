@@ -22,7 +22,7 @@
 #include <string>
 
 #include "cppfunc.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "dtwain_resource_constants.h"
 #include "ctlobstr.h"
 #include "errorcheck.h"

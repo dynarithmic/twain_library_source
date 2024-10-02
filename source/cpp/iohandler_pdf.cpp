@@ -23,7 +23,7 @@
 #include "ctldib.h"
 #include "arrayfactory.h"
 #include "ctliface.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "ctlfileutils.h"
 
 using namespace dynarithmic;

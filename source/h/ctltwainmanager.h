@@ -18,8 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLTWMGR_H
-#define CTLTWMGR_H
+#ifndef CTLTWAINMANAGER_H
+#define CTLTWAINMANAGER_H
 #ifdef _MSC_VER
 #pragma warning( disable : 4786)
 #pragma warning( disable : 4996)
@@ -29,7 +29,7 @@
 #include <string>
 #include "ctlobstr.h"
 #include "ctlarray.h"
-#include "ctltwses.h"
+#include "ctltwainsession.h"
 #include "ctlenum.h"
 #include "capstruc.h"
 #include "errstruc.h"

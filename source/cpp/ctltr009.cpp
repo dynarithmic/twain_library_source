@@ -19,9 +19,9 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltr009.h"
-#include "ctltwses.h"
-#include "ctltwsrc.h"
-#include "ctltwmgr.h"
+#include "ctltwainsession.h"
+#include "ctltwainsource.h"
+#include "ctltwainmanager.h"
 using namespace dynarithmic;
 CTL_CloseSourceTriplet::CTL_CloseSourceTriplet(CTL_ITwainSession *pSession,
                                                CTL_ITwainSource* pSource)

@@ -18,8 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLTWSRC_H
-#define CTLTWSRC_H
+#ifndef CTLTWAINSOURCE_H
+#define CTLTWAINSOURCE_H
 
 #include <unordered_map>
 #include <vector>
@@ -33,7 +33,7 @@
 #include "ctlenum.h"
 #include "dtwtype.h"
 #include "ctldevnt.h"
-#include "ctltwses.h"
+#include "ctltwainsession.h"
 #include "ctltwainidentity.h"
 #include "dtwain_anyutils.h"
 
@@ -188,6 +188,9 @@ namespace dynarithmic
         void         SetAcquireFile(CTL_StringType szFile) { m_strAcquireFile = std::move(szFile); }
         long         GetAcquireFileFlags() const { return m_lFileFlags; }
         void         SetAcquireFileFlags(long lFileFlags) { m_lFileFlags = lFileFlags; }
+        void         SetFileSavePageCount(long pageCount) { m_FileSavePageCount = pageCount;} 
+        long         GetFileSavePageCount() const { return m_FileSavePageCount; } 
+
         static bool  IsFileTypeMultiPage(CTL_TwainFileFormatEnum FileType);
         static CTL_TwainFileFormatEnum GetMultiPageType(CTL_TwainFileFormatEnum FileType);
         static bool  IsFileTypeTIFF(CTL_TwainFileFormatEnum FileType);
@@ -588,6 +591,7 @@ namespace dynarithmic
         bool            m_bTileMode;
         std::vector<int> m_aTransferMechanisms;
         bool            m_bExtendedCapsRetrieved;
+        long            m_FileSavePageCount;
         boost::logic::tribool m_tbIsFileSystemSupported;
         CTL_TwainDLLHandle* m_pDLLHandle;
         TW_IMAGEMEMXFER m_BufferedXFerInfo;

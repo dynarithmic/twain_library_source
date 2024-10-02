@@ -20,7 +20,7 @@
  */
 #include "ctltr031.h"
 #include "ctltr027.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "imagexferfilewriter.h"
 #include "ctldib.h"
 #include "dtwain.h"

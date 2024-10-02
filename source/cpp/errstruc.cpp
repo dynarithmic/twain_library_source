@@ -23,7 +23,7 @@
 #include <array>
 #include "ctliface.h"
 #include "ctltr010.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "errstruc.h"
 #include "dtwain_resource_constants.h"
 #include "twainfix32.h"

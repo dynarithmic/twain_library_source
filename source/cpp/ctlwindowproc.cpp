@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "dtwain.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "ctliface.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
@@ -252,6 +252,8 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                 if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) ||
                      !CTL_StaticData::s_aAllCallbacks.empty())
                     bPassMsg = true;
+                if (wParam == DTWAIN_TN_FILEPAGESAVEOK)
+                    pSource->SetFileSavePageCount(pSource->GetFileSavePageCount() + 1);
                 DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,pHandle,pSource, wParam, reinterpret_cast<LPARAM>(pSource) );
             }
             break;

@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "../nlohmann/json.hpp"

@@ -26,9 +26,9 @@
 #include <string>
 #include <boost/lexical_cast.hpp>
 #include <utility>
-#include "ctltwsrc.h"
+#include "ctltwainsource.h"
 #include "ctltr009.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "ctldib.h"
 #include "dtwain.h"
 #include "ctltmpl3.h"
@@ -243,6 +243,7 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_tbIsFileSystemSupported(boost::logic::indeterminate),
     m_pDLLHandle(pHandle),
     m_bTileMode(false),
+    m_FileSavePageCount(0),
     m_BufferedXFerInfo{}
  {
     if ( lpszProduct )

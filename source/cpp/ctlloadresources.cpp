@@ -24,7 +24,7 @@
 #include "ctlres.h"
 
 #include "cppfunc.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "dtwain_verinfo.h"
 #include "dtwstrfn.h"
 #include "ctldefsource.h"

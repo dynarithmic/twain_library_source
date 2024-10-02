@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltr034.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 
 using namespace dynarithmic;
 CTL_DeviceEventTriplet::CTL_DeviceEventTriplet(CTL_ITwainSession *pSession,

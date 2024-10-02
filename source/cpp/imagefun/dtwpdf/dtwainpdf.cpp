@@ -76,7 +76,7 @@ using namespace dynarithmic;
 // Add DTWAIN stuff if internal to DTWAIN32.DLL
 #ifdef PDFLIB_INTERNAL
     #define IMGFUNC_IGNORE
-    #include "ctltwmgr.h"
+    #include "ctltwainmanager.h"
 
     #define WRITE_TO_LOG()
 #else
