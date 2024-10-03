@@ -462,7 +462,9 @@ namespace dynarithmic
         bool         IsDoublePageCountOnDuplex() const { return m_bDoublePageCountOnDuplex; }
         CapList&     GetCustomCapCache() { return m_aSupportedCustomCapCache; }
         boost::logic::tribool IsFileSystemSupported() const { return m_tbIsFileSystemSupported; }
+        boost::logic::tribool IsBufferedTileModeSupported() const { return m_tbIsTileModeSupported; }
         void         SetFileSystemSupported(bool bSet) { m_tbIsFileSystemSupported = bSet; }
+        void         SetBufferedTileModeSupported(bool bSet) { m_tbIsTileModeSupported = bSet; }
         TW_IMAGEMEMXFER& GetBufferedXFerInfo() { return m_BufferedXFerInfo; }
 
         // Only public member
@@ -593,6 +595,7 @@ namespace dynarithmic
         bool            m_bExtendedCapsRetrieved;
         long            m_FileSavePageCount;
         boost::logic::tribool m_tbIsFileSystemSupported;
+        boost::logic::tribool m_tbIsTileModeSupported;
         CTL_TwainDLLHandle* m_pDLLHandle;
         TW_IMAGEMEMXFER m_BufferedXFerInfo;
 
