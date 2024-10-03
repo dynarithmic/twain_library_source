@@ -984,7 +984,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
 
     const TW_INFO Info = p->GetExtImageInfoItem(nWhich, DTWAIN_BYID);
 
-    const LONG Count = Info.NumItems;
+    auto Count = Info.NumItems;
 
     // resize the array
     const auto& factory = pHandle->m_ArrayFactory;
@@ -992,7 +992,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
 
     for ( int i = 0; i < Count; ++i )
     {
-        if (CTL_ArrayFactory::tagtype_to_arraytype(pHandle->m_ArrayFactory->tag_type(ExtInfoArray) == DTWAIN_ARRAYSTRING))
+        auto eType = pHandle->m_ArrayFactory->tag_type(ExtInfoArray);
+        if (eType == CTL_ArrayFactory::arrayTag::StringType)
         {
             std::vector<char> Temp;
             size_t ItemSize;

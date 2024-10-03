@@ -1327,12 +1327,8 @@ bool CTL_ITwainSource::GetExtImageInfo(bool bExecute)
 
 TW_INFO CTL_ITwainSource::GetExtImageInfoItem(int nItem, int nSearchType ) const
 {
-    TW_INFO Info {};
-    Info.NumItems = static_cast<TW_UINT16>(-1);
-
     if ( !m_pExtImageTriplet )
-        return Info;
-
+        return {};
     return m_pExtImageTriplet->GetInfo(nItem, nSearchType );
 }
 
