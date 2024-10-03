@@ -657,6 +657,3 @@ namespace dynarithmic
     };
 }
 #endif
-
-
-
