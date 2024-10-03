@@ -9,7 +9,6 @@
 #include <ctype.h>
 #include "dibdisplay.h"
 #include <io.h>
-
 #include <tchar.h>
 #define MAX_LOADSTRING 100
 

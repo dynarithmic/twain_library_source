@@ -476,6 +476,7 @@
     D_GETOCRERRORSTRINGFUNC                                           DYNDTWAIN_API::DTWAIN_GetOCRErrorString = nullptr;
     D_GETOCRERRORSTRINGWFUNC                                          DYNDTWAIN_API::DTWAIN_GetOCRErrorStringW = nullptr;
     D_GETOCRLASTERRORFUNC                                             DYNDTWAIN_API::DTWAIN_GetOCRLastError = nullptr;
+    D_GETOCRMAJORMINORVERSIONFUNC                                     DYNDTWAIN_API::DTWAIN_GetOCRMajorMinorVersion = nullptr;
     D_GETOCRMANUFACTURERAFUNC                                         DYNDTWAIN_API::DTWAIN_GetOCRManufacturerA = nullptr;
     D_GETOCRMANUFACTURERFUNC                                          DYNDTWAIN_API::DTWAIN_GetOCRManufacturer = nullptr;
     D_GETOCRMANUFACTURERWFUNC                                         DYNDTWAIN_API::DTWAIN_GetOCRManufacturerW = nullptr;
@@ -533,6 +534,7 @@
     D_GETROTATIONSTRINGAFUNC                                          DYNDTWAIN_API::DTWAIN_GetRotationStringA = nullptr;
     D_GETROTATIONSTRINGFUNC                                           DYNDTWAIN_API::DTWAIN_GetRotationString = nullptr;
     D_GETROTATIONSTRINGWFUNC                                          DYNDTWAIN_API::DTWAIN_GetRotationStringW = nullptr;
+    D_GETSAVEDFILESCOUNTFUNC                                          DYNDTWAIN_API::DTWAIN_GetSavedFilesCount = nullptr;
     D_GETSAVEFILENAMEAFUNC                                            DYNDTWAIN_API::DTWAIN_GetSaveFileNameA = nullptr;
     D_GETSAVEFILENAMEFUNC                                             DYNDTWAIN_API::DTWAIN_GetSaveFileName = nullptr;
     D_GETSAVEFILENAMEWFUNC                                            DYNDTWAIN_API::DTWAIN_GetSaveFileNameW = nullptr;
@@ -1059,7 +1061,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
 #define LOADFUNCTIONIMPL(fn, module) do { if (!LoadFunction(fn, module, #fn)) return 0;} while(false);
 #else
 #define LOADFUNCTIONIMPL(fn, module) do { \
-        DTWAINAPI_ASSERT(DTWAIN_INSTANCE fn = GetProcAddress(module, #fn)); } while(false);
+        DTWAINAPI_ASSERT(DTWAIN_INSTANCE fn = GetProcAddress(module, #fn)); } while(0);
 #endif
 #ifdef __cplusplus
     #define DTWAIN_INSTANCE DYNDTWAIN_API::
@@ -1538,6 +1540,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetOCRErrorStringA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetOCRErrorStringW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetOCRLastError, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetOCRMajorMinorVersion, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetOCRManufacturer, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetOCRManufacturerA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetOCRManufacturerW, hModule);
@@ -1595,6 +1598,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetRotationString, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetRotationStringA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetRotationStringW, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetSavedFilesCount, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetSaveFileName, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetSaveFileNameA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetSaveFileNameW, hModule);

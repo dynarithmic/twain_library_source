@@ -36,6 +36,7 @@
 #endif
 #include <dtwain_library_selector.h>
 #ifdef __cplusplus
+#include <string>
 extern "C" {
 #endif
 
@@ -1043,7 +1044,8 @@ typedef DTWAIN_OCRENGINE (DLLENTRY_DEF* D_SELECTOCRENGINE2EXWFUNC)              
 typedef DTWAIN_BOOL (DLLENTRY_DEF* D_SETTEMPFILEDIRECTORYEXFUNC)                 (LPCTSTR, LONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF* D_SETTEMPFILEDIRECTORYEXAFUNC)                (LPCSTR, LONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF* D_SETTEMPFILEDIRECTORYEXWFUNC)                (LPCWSTR, LONG);
-
+typedef DTWAIN_BOOL (DLLENTRY_DEF* D_GETOCRMAJORMINORVERSIONFUNC)                (DTWAIN_OCRENGINE, LPLONG, LPLONG);
+typedef LONG        (DLLENTRY_DEF* D_GETSAVEDFILESCOUNTFUNC)                     (DTWAIN_SOURCE);
 #ifdef __cplusplus
 }
 #endif
@@ -1490,6 +1492,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF* D_SETTEMPFILEDIRECTORYEXWFUNC)               
     STATIC D_GETOCRERRORSTRINGFUNC                          DTWAIN_GetOCRErrorString;
     STATIC D_GETOCRERRORSTRINGWFUNC                         DTWAIN_GetOCRErrorStringW;
     STATIC D_GETOCRLASTERRORFUNC                            DTWAIN_GetOCRLastError;
+    STATIC D_GETOCRMAJORMINORVERSIONFUNC                    DTWAIN_GetOCRMajorMinorVersion;
     STATIC D_GETOCRMANUFACTURERAFUNC                        DTWAIN_GetOCRManufacturerA;
     STATIC D_GETOCRMANUFACTURERFUNC                         DTWAIN_GetOCRManufacturer;
     STATIC D_GETOCRMANUFACTURERWFUNC                        DTWAIN_GetOCRManufacturerW;
@@ -1547,6 +1550,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF* D_SETTEMPFILEDIRECTORYEXWFUNC)               
     STATIC D_GETROTATIONSTRINGAFUNC                         DTWAIN_GetRotationStringA;
     STATIC D_GETROTATIONSTRINGFUNC                          DTWAIN_GetRotationString;
     STATIC D_GETROTATIONSTRINGWFUNC                         DTWAIN_GetRotationStringW;
+    STATIC D_GETSAVEDFILESCOUNTFUNC                         DTWAIN_GetSavedFilesCount;
     STATIC D_GETSAVEFILENAMEAFUNC                           DTWAIN_GetSaveFileNameA;
     STATIC D_GETSAVEFILENAMEFUNC                            DTWAIN_GetSaveFileName;
     STATIC D_GETSAVEFILENAMEWFUNC                           DTWAIN_GetSaveFileNameW;
@@ -2063,6 +2067,57 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF* D_SETTEMPFILEDIRECTORYEXWFUNC)               
 #ifdef __cplusplus
         static int InitDTWAINInterface(DYNDTWAIN_API*, HMODULE h);
         static int InitDTWAINInterface(HMODULE h);
+};
+
+class DYNDTWAIN_API_Scoped
+{
+    HMODULE m_hModule;
+    std::string m_sModuleName;
+private:
+    void tryDLL_Load()
+    {
+        m_hModule = ::LoadLibraryA(m_sModuleName.c_str());
+        if (m_hModule)
+        {
+            int ret = DYNDTWAIN_API::InitDTWAINInterface(m_hModule);
+            if (!ret)
+                throw "DTWAIN Module failed to load";
+        }
+    }
+
+public:
+    DYNDTWAIN_API_Scoped(std::string moduleName = "") : m_hModule(NULL), m_sModuleName(moduleName)
+    {
+        if (!moduleName.empty())
+            tryDLL_Load();
+    }
+
+    DYNDTWAIN_API_Scoped(DYNDTWAIN_API_Scoped&);
+    DYNDTWAIN_API_Scoped& operator=(DYNDTWAIN_API_Scoped&);
+
+    void LoadDLL(std::string moduleName)
+    {
+        ::FreeLibrary(m_hModule);
+        m_sModuleName = moduleName;
+        tryDLL_Load();
+    }
+
+    HMODULE GetHandle() const
+    {
+        return m_hModule;
+    }
+
+    void FreeDLL()
+    {
+        if (m_hModule)
+            ::FreeLibrary(m_hModule);
+        m_hModule = NULL;
+    }
+
+    ~DYNDTWAIN_API_Scoped()
+    {
+        FreeDLL();
+    }
 };
 #else
 } DYNDTWAIN_API;
