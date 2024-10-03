@@ -52,11 +52,11 @@ BOOL GetToggleMenuState(UINT resID);
 BOOL IsTypeAvailable(LONG filetype);
 void DisplayLoggingOptions();
 void LoadLanguage(int message);
-DTWAIN_SOURCE DisplayCustomLangDlg();
+void LoadLanguageStrings(LPCTSTR szLang);
+void DisplayCustomLangDlg();
 LRESULT CALLBACK EnterCustomLangNameProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
 BOOL bPageOK;
-LONG nPageCount=0;
 LONG nMajorVer, nMinorVer, nDTwainType;
 
 void WaitLoop();
@@ -144,8 +144,9 @@ AllLanguages g_allLanguages[] = { {ID_LANGUAGE_ENGLISH               , _T("engli
                                  {ID_LANGUAGE_RUSSIAN               , _T("russian")},
                                  {ID_LANGUAGE_ROMANIAN              , _T("romanian")},
                                  {ID_LANGUAGE_PORTUGUESE              , _T("portuguese")},
-                                 {ID_LANGUAGE_SIMPLIFIEDCHINESE     , _T("simplified_chinese")}
+                                 {ID_LANGUAGE_SIMPLIFIEDCHINESE     , _T("simplified_chinese")} 
                                 };
+TCHAR g_CustomLanguage[256];
 
 int APIENTRY WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
@@ -366,13 +367,20 @@ void LoadLanguage(int message)
     {
         if (message == g_allLanguages[i].langID)
         {
-            BOOL bRet = DTWAIN_LoadCustomStringResources(g_allLanguages[i].language);
-            if (!bRet)
-                MessageBox(NULL, _T("Could not load language resource"), _T("Language Resource Error"), MB_ICONSTOP);
+            LoadLanguageStrings(g_allLanguages[i].language);
             return;
         }
     }
     MessageBox(NULL, _T("Could not load language resource"), _T("Language Resource Error"), MB_ICONSTOP);
+}
+
+void LoadLanguageStrings(LPCTSTR szLang)
+{
+    BOOL bRet = DTWAIN_LoadCustomStringResources(szLang);
+    if (!bRet)
+        MessageBox(NULL, _T("Could not load language resource"), _T("Language Resource Error"), MB_ICONSTOP);
+    else
+        MessageBox(g_hWnd, _T("Custom resource loaded.  Select a Source or choose Logging to see the new language being used"), _T("Success"), MB_OK);
 }
 
 void ToggleCheckedItem(UINT resId)
@@ -395,7 +403,7 @@ BOOL GetToggleMenuState(UINT resID)
 
 void SelectTheSource(int nWhich)
 {
-    DTWAIN_SOURCE tempSource=NULL;
+    DTWAIN_SOURCE tempSource = NULL;
     if ( g_CurrentSource )
     {
         int nReturn = MessageBox(g_hWnd, _T("For this demo, only one Source can be opened.\r\n")
@@ -644,19 +652,20 @@ void AcquireFile(BOOL bUseSource)
        (to be safe) */
     DTWAIN_ArrayDestroy( AFileNames );
     DTWAIN_OpenSource( g_CurrentSource );
-    if ( !bAcquireOK || nPageCount == 0 || !bPageOK )
+    LONG pageCount = DTWAIN_GetSavedFilesCount(g_CurrentSource);
+    if ( !bAcquireOK || pageCount == 0 || !bPageOK )
     {
         if ( !bAcquireOK)
             MessageBox(g_hWnd, szError, _T(""), MB_ICONSTOP);
         else
-            MessageBox(g_hWnd, _T("No Images Acquired"), _T(""), MB_ICONSTOP);
+            MessageBox(g_hWnd, _T("No Images Acquired"), _T(""), MB_OK);
         return;
     }
 	else
 	{
 		if (_taccess(g_FileName, 0) == 0)
 		{
-			MessageBox(g_hWnd, _T("Images Acquired"), _T(""), MB_ICONSTOP);
+			MessageBox(g_hWnd, _T("Images Acquired"), _T(""), MB_OK);
 			return;
 		}
     }
@@ -670,11 +679,9 @@ DTWAIN_SOURCE DisplayGetNameDlg()
     return g_NamedSource;
 }
 
-DTWAIN_SOURCE DisplayCustomLangDlg()
+void DisplayCustomLangDlg()
 {
-    g_NamedSource = NULL;
     DialogBox(g_hInstance, (LPCTSTR)IDD_dlgEnterCustomLangName, g_hWnd, (DLGPROC)EnterCustomLangNameProc);
-    return g_NamedSource;
 }
 
 DTWAIN_SOURCE DisplayCustomDlg()
@@ -756,11 +763,8 @@ LRESULT CALLBACK EnterCustomLangNameProc(HWND hDlg, UINT message, WPARAM wParam,
                 case IDOK:
                 {
                     HWND hWndEdit = GetDlgItem(hDlg, IDC_edLangName);
-                    TCHAR szBuf[256];
-                    GetWindowText(hWndEdit, szBuf, 255);
-                    BOOL bRet = DTWAIN_LoadCustomStringResources(szBuf);
-                    if ( !bRet )
-                        MessageBox(g_hWnd, _T("Could not load custom resource"), _T("Error"), MB_ICONSTOP);
+                    GetWindowText(hWndEdit, g_CustomLanguage, 255);
+                    LoadLanguageStrings(g_CustomLanguage);
                     EndDialog(hDlg, LOWORD(wParam));
                 }
                 break;
@@ -1301,7 +1305,6 @@ LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserDa
     {
         case DTWAIN_TN_ACQUIRESTARTED:
             bPageOK = TRUE;
-            nPageCount = 0;
 			pdf_page_count = 1;
         break;
 
@@ -1356,7 +1359,6 @@ LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserDa
 
         case DTWAIN_TN_FILESAVEOK:
             bPageOK = TRUE;
-            ++nPageCount;
             return 1;
 
         case DTWAIN_TN_PAGECONTINUE:

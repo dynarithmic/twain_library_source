@@ -12,27 +12,11 @@
 /* Change this to the output directory that fits your environment */
 char outputDir[1024] = "";
 
-struct DynamicHandler
-{
-    HMODULE h_;
-    DynamicHandler(HMODULE h) : h_(h) {}
-    ~DynamicHandler() { FreeLibrary(h_); }
-};
-
 int SimpleFileAcquireToBMP()
 {
     /* Dynamically load DTWAIN */
-    HMODULE hDTwainModule = ::LoadLibraryA(DTWAIN_DLLNAME);
-    if (!hDTwainModule)
-    {
-        std::cout << "Could not find DLL -- " << DTWAIN_DLLNAME << "\n";
-        return -1;
-    }
-
-    DynamicHandler dynHandler(hDTwainModule);
-
+    DYNDTWAIN_API_Scoped dynHandler(DTWAIN_DLLNAME);
     DYNDTWAIN_API API;
-    API.InitDTWAINInterface(hDTwainModule);
     
     /* Initialize DTWAIN */
     DTWAIN_HANDLE handle = API.DTWAIN_SysInitialize();
