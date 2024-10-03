@@ -202,7 +202,7 @@ namespace dynarithmic
         decltype(CTL_CapStruct::m_nResetContainer) capReset;
         decltype(CTL_CapStruct::m_nQuerySupportContainer) capQuery;
         LONG lCap;
-
+        auto& extendedImageInfoMap = CTL_StaticData::GetExtendedImageInfoMap();
         while (ifs >> lCap >> capName >> capType >> capGet >>
                 capGetCurrent >> capGetDefault >> capSet >> capSetConstraint >>
                 capReset >> capQuery)
@@ -220,6 +220,8 @@ namespace dynarithmic
             cStruct.m_nResetContainer = capReset;
             cStruct.m_nQuerySupportContainer = capQuery;
             CTL_StaticData::GetGeneralCapInfo().insert({ static_cast<TW_UINT16>(lCap), cStruct });
+            if (StringWrapperA::StartsWith(capName, "TWEI_"))
+                extendedImageInfoMap.insert({ lCap,capName });
         }
 
         auto& bppMap = CTL_ImageIOHandler::GetSupportedBPPMap();

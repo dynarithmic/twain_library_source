@@ -102,6 +102,7 @@ std::pair<CTL_ResourceRegistryMap::iterator, bool> CTL_TwainDLLHandle::AddResour
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
+CTL_TwainLongToStringMap    CTL_StaticData::s_MapExtendedImageInfo;
 int                         CTL_StaticData::s_nLoadingError = DTWAIN_NO_ERROR;
 std::unique_ptr<CSimpleIniA>   CTL_StaticData::s_iniInterface;
 bool                         CTL_StaticData::s_bINIFileLoaded = false;
