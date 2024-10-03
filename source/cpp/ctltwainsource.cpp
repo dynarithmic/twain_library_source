@@ -241,6 +241,7 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_bDoublePageCountOnDuplex(true),
     m_bExtendedCapsRetrieved(false),
     m_tbIsFileSystemSupported(boost::logic::indeterminate),
+    m_tbIsTileModeSupported(boost::logic::indeterminate),
     m_pDLLHandle(pHandle),
     m_bTileMode(false),
     m_FileSavePageCount(0),
