@@ -29,85 +29,6 @@ using namespace dynarithmic;
 #pragma warning (disable:4702)
 #endif
 
-TW_UINT16 CTL_ExtImageInfoTriplet::s_AllAttr[] = {
-        DTWAIN_EI_BARCODEX               ,
-        DTWAIN_EI_BARCODEY               ,
-        DTWAIN_EI_BARCODETEXT            ,
-        DTWAIN_EI_BARCODETYPE            ,
-        DTWAIN_EI_DESHADETOP             ,
-        DTWAIN_EI_DESHADELEFT            ,
-        DTWAIN_EI_DESHADEHEIGHT          ,
-        DTWAIN_EI_DESHADEWIDTH           ,
-        DTWAIN_EI_DESHADESIZE            ,
-        DTWAIN_EI_SPECKLESREMOVED        ,
-        DTWAIN_EI_HORZLINEXCOORD         ,
-        DTWAIN_EI_HORZLINEYCOORD         ,
-        DTWAIN_EI_HORZLINELENGTH         ,
-        DTWAIN_EI_HORZLINETHICKNESS      ,
-        DTWAIN_EI_VERTLINEXCOORD         ,
-        DTWAIN_EI_VERTLINEYCOORD         ,
-        DTWAIN_EI_VERTLINELENGTH         ,
-        DTWAIN_EI_VERTLINETHICKNESS      ,
-        DTWAIN_EI_PATCHCODE              ,
-        DTWAIN_EI_ENDORSEDTEXT           ,
-        DTWAIN_EI_FORMCONFIDENCE         ,
-        DTWAIN_EI_FORMTEMPLATEMATCH      ,
-        DTWAIN_EI_FORMTEMPLATEPAGEMATCH  ,
-        DTWAIN_EI_FORMHORZDOCOFFSET      ,
-        DTWAIN_EI_FORMVERTDOCOFFSET      ,
-        DTWAIN_EI_BARCODECOUNT           ,
-        DTWAIN_EI_BARCODECONFIDENCE      ,
-        DTWAIN_EI_BARCODEROTATION        ,
-        DTWAIN_EI_BARCODETEXTLENGTH      ,
-        DTWAIN_EI_DESHADECOUNT           ,
-        DTWAIN_EI_DESHADEBLACKCOUNTOLD   ,
-        DTWAIN_EI_DESHADEBLACKCOUNTNEW   ,
-        DTWAIN_EI_DESHADEBLACKRLMIN      ,
-        DTWAIN_EI_DESHADEBLACKRLMAX      ,
-        DTWAIN_EI_DESHADEWHITECOUNTOLD   ,
-        DTWAIN_EI_DESHADEWHITECOUNTNEW   ,
-        DTWAIN_EI_DESHADEWHITERLMIN      ,
-        DTWAIN_EI_DESHADEWHITERLAVE      ,
-        DTWAIN_EI_DESHADEWHITERLMAX      ,
-        DTWAIN_EI_BLACKSPECKLESREMOVED   ,
-        DTWAIN_EI_WHITESPECKLESREMOVED   ,
-        DTWAIN_EI_HORZLINECOUNT          ,
-        DTWAIN_EI_VERTLINECOUNT          ,
-        DTWAIN_EI_DESKEWSTATUS           ,
-        DTWAIN_EI_SKEWORIGINALANGLE      ,
-        DTWAIN_EI_SKEWFINALANGLE         ,
-        DTWAIN_EI_SKEWCONFIDENCE         ,
-        DTWAIN_EI_SKEWWINDOWX1           ,
-        DTWAIN_EI_SKEWWINDOWY1           ,
-        DTWAIN_EI_SKEWWINDOWX2           ,
-        DTWAIN_EI_SKEWWINDOWY2           ,
-        DTWAIN_EI_SKEWWINDOWX3           ,
-        DTWAIN_EI_SKEWWINDOWY3           ,
-        DTWAIN_EI_SKEWWINDOWX4           ,
-        DTWAIN_EI_SKEWWINDOWY4           ,
-        DTWAIN_EI_BOOKNAME               ,
-        DTWAIN_EI_CHAPTERNUMBER          ,
-        DTWAIN_EI_DOCUMENTNUMBER         ,
-        DTWAIN_EI_PAGENUMBER             ,
-        DTWAIN_EI_CAMERA                 ,
-        DTWAIN_EI_FRAMENUMBER            ,
-        DTWAIN_EI_FRAME                  ,
-        DTWAIN_EI_PIXELFLAVOR            ,
-        DTWAIN_EI_ICCPROFILE             ,
-        DTWAIN_EI_LASTSEGMENT            ,
-        DTWAIN_EI_SEGMENTNUMBER          ,
-        DTWAIN_EI_MAGDATA                ,
-        DTWAIN_EI_MAGTYPE                ,
-        DTWAIN_EI_PAGESIDE               ,
-        DTWAIN_EI_FILESYSTEMSOURCE       ,
-        DTWAIN_EI_IMAGEMERGED            ,
-        DTWAIN_EI_MAGDATALENGTH          ,
-        DTWAIN_EI_PAPERCOUNT             ,
-        DTWAIN_EI_PRINTERTEXT            ,
-        DTWAIN_EI_TWAINDIRECTMETADATA    ,
-        0};
-
-
 CTL_ExtImageInfoTriplet::CTL_ExtImageInfoTriplet(CTL_ITwainSession *pSession,
                                                  CTL_ITwainSource* pSource,
                                                  int nInfo)
@@ -141,24 +62,15 @@ void CTL_ExtImageInfoTriplet::InitInfo(CTL_ITwainSession *pSession,
     SetSourcePtr( pSource );
 
     // Make sure we have one item
-    if ( nInfo <= 0 )
-        nInfo = 1;
-    m_nNumInfo = nInfo;
-    TW_INFO Info;
-    m_vInfo.resize(0);
-    constexpr size_t NumAttr = std::size(s_AllAttr);
-    size_t i;
-    m_vInfo.reserve(NumAttr);
-    for ( i = 0; i < NumAttr; ++i )
+    auto& extImageInfoMap = CTL_StaticData::GetExtendedImageInfoMap();
+    for (auto& pr : extImageInfoMap)
     {
-        if ( s_AllAttr[i] == 0 )
-            break;
-       memset(&Info, 0, sizeof(TW_INFO));
-       Info.InfoID = s_AllAttr[i];
-       Info.ReturnCode = TWRC_DATANOTAVAILABLE;
-       m_vInfo.push_back(Info);
+        TW_INFO Info{};
+        Info.InfoID = pr.first;
+        Info.ReturnCode = TWRC_DATANOTAVAILABLE;
+        m_vInfo.push_back(Info);
     }
-    m_nNumInfo = i;
+    m_nNumInfo = extImageInfoMap.size();
 }
 
 void CTL_ExtImageInfoTriplet::DestroyInfo()
@@ -531,14 +443,14 @@ bool CTL_ExtImageInfoTriplet::EnumSupported(CTL_ITwainSource *pSource,
                                             CTL_IntArray &rArray)
 {
     rArray.clear();
-    constexpr int NumAttr = static_cast<int>(std::size(s_AllAttr));
+    size_t NumAttr = CTL_StaticData::GetExtendedImageInfoMap().size();
     CTL_ExtImageInfoTriplet Trip(pSession, pSource, NumAttr);
     const TW_UINT16 rc = Trip.Execute();
     switch (rc)
     {
         case TWRC_SUCCESS:
         {
-            for ( int i = 0; i < NumAttr && s_AllAttr[i] != 0; i++)
+            for ( int i = 0; i < NumAttr; i++)
             {
                 TW_INFO Info = Trip.GetInfo(i, DTWAIN_BYPOSITION);
                 if ( Info.ReturnCode != TWRC_INFONOTSUPPORTED && Info.ReturnCode != TWRC_DATANOTAVAILABLE)

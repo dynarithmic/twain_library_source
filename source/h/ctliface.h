@@ -520,6 +520,7 @@ namespace dynarithmic
 
     struct CTL_StaticData
     {
+        static CTL_TwainLongToStringMap     s_MapExtendedImageInfo;
         static CTL_StringToMapLongToStringMap s_AllLoadedResourcesMap;
         static CTL_GeneralResourceInfo         s_ResourceInfo;
         static CTL_PDFMediaMap          s_PDFMediaMap;
@@ -562,6 +563,7 @@ namespace dynarithmic
         static bool                     s_bINIFileLoaded;
         static int                      s_nLoadingError;
 
+        static CTL_TwainLongToStringMap& GetExtendedImageInfoMap() { return s_MapExtendedImageInfo; }
         static int GetResourceLoadError() { return s_nLoadingError; }
         static void SetResourceLoadError(int errNum) { s_nLoadingError = errNum; }
         static CSimpleIniA* GetINIInterface() { return s_iniInterface.get(); }

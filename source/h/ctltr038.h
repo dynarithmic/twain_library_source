@@ -79,7 +79,6 @@ namespace dynarithmic
             TW_HANDLE m_memHandle;
             size_t m_nNumInfo;
             TWINFOVector m_vInfo;
-            static TW_UINT16 s_AllAttr[80];
     };
 }
 #endif
