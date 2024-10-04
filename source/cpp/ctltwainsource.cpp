@@ -41,10 +41,10 @@
 using namespace dynarithmic;
 
 //////////////////////////////////////////////////////////////////////////////
-CTL_ITwainSource* CTL_ITwainSource::Create( CTL_ITwainSession* pSession,
-                                            LPCTSTR lpszProduct/*=nullptr*/ )
+CTL_ITwainSource* CTL_ITwainSource::Create(CTL_ITwainSession* pSession,
+    LPCTSTR lpszProduct/*=nullptr*/)
 {
-    return new CTL_ITwainSource( pSession, lpszProduct, static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal()));
+    return new CTL_ITwainSource(pSession, lpszProduct, static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal()));
 }
 
 void CTL_ITwainSource::Destroy(const CTL_ITwainSource* pSource)
@@ -56,11 +56,11 @@ void CTL_ITwainSource::SetUIOpen(bool bSet)
 void CTL_ITwainSource::SetActive(bool bSet)
 { m_bActive = bSet; }
 
-bool CTL_ITwainSource::IsSourceCompliant( CTL_EnumTwainVersion TVersion, CTL_TwainCapArray &rArray ) const
+bool CTL_ITwainSource::IsSourceCompliant(CTL_EnumTwainVersion TVersion, CTL_TwainCapArray& rArray) const
 {
     CTL_TwainCapArray Array;
     rArray.clear();
-    switch ( TVersion )
+    switch (TVersion)
     {
         case CTL_TwainVersion15:
             Array.push_back( DTWAIN_CV_CAPXFERCOUNT );
@@ -296,20 +296,20 @@ void CTL_ITwainSource::SetAlternateAcquireArea(double left, double top, double r
     }
     else
         m_AltAcquireArea.flags =
-            m_AltAcquireArea.flags &~ CROP_FLAG;
+        m_AltAcquireArea.flags & ~CROP_FLAG;
 }
 
 void CTL_ITwainSource::SetImageScale(double xscale, double yscale, bool bSet)
 {
-    if ( bSet )
+    if (bSet)
     {
         m_AltAcquireArea.m_rectScaling.left = xscale;
-        m_AltAcquireArea.m_rectScaling.top  = yscale;
+        m_AltAcquireArea.m_rectScaling.top = yscale;
         m_AltAcquireArea.flags |= SCALE_FLAG;
     }
     else
         m_AltAcquireArea.flags =
-            m_AltAcquireArea.flags &~ SCALE_FLAG;
+        m_AltAcquireArea.flags & ~SCALE_FLAG;
 }
 
 bool CTL_ITwainSource::SetManualDuplexMode(LONG nFlags, bool bSet)
@@ -364,7 +364,7 @@ void CTL_ITwainSource::SetCapCached(TW_UINT16 nCapability, bool bSet)
     const CachedCapMap::iterator found = m_aCapCache.find(static_cast<TW_UINT16>(nCapability));
     const TW_UINT16 nVal = nCapability;
     bool bCached = false;
-    if ( found != m_aCapCache.end())
+    if (found != m_aCapCache.end())
         bCached = true;
     // Check if setting and value is not cached
     if (bSet && !bCached)
@@ -944,10 +944,10 @@ CTL_StringType CTL_ITwainSource::PromptForFileName() const
         strm << m_nFileAcquireType <<_T(" format");
         szFilter = strm.str();
         szFilter.append(_T("*\0\0"), 3);
-            szExt = _T(".");
+        szExt = _T(".");
     }
 
-    #ifdef _WIN32
+#ifdef _WIN32
     TCHAR szFile[1024];
     // prompt for filename
     const auto pHandle = m_pDLLHandle;
@@ -960,21 +960,21 @@ CTL_StringType CTL_ITwainSource::PromptForFileName() const
     szFile[0] = _T('\0');
     pOfn->lStructSize = sizeof(OPENFILENAME);
     const auto sTitle = pHandle->m_CustomPlacement.sTitle;
-    if ( pOfn == &ofn )
+    if (pOfn == &ofn)
     {
         pOfn->hwndOwner = nullptr;
         pOfn->lpstrFilter = szFilter.data();
-        pOfn->lpstrFile= szFile;
+        pOfn->lpstrFile = szFile;
         pOfn->nMaxFile = sizeof szFile - 5;
         pOfn->Flags = OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY |
-                    OFN_NOREADONLYRETURN | OFN_EXPLORER;
-        if ( pHandle->m_CustomPlacement.nOptions != 0 )
+            OFN_NOREADONLYRETURN | OFN_EXPLORER;
+        if (pHandle->m_CustomPlacement.nOptions != 0)
         {
             pOfn->lpfnHook = pHandle->m_pSaveAsDlgProc;
             pOfn->Flags |= OFN_ENABLEHOOK;
             pOfn->lCustData = (LPARAM)&pHandle->m_CustomPlacement;
-            if ( !StringWrapper::IsEmpty(sTitle))
-                 pOfn->lpstrTitle = sTitle.c_str();
+            if (!StringWrapper::IsEmpty(sTitle))
+                pOfn->lpstrTitle = sTitle.c_str();
         }
     }
 
@@ -1002,10 +1002,10 @@ bool CTL_ITwainSource::SetDibAutoDelete(bool bSet)
     return true;
 }
 
-void CTL_ITwainSource:: SetAcquireType(CTL_TwainAcquireEnum AcquireType, LPCTSTR lpszFile)
+void CTL_ITwainSource::SetAcquireType(CTL_TwainAcquireEnum AcquireType, LPCTSTR lpszFile)
 {
     m_AcquireType = AcquireType;
-    if ( lpszFile )
+    if (lpszFile)
         m_strAcquireFile = lpszFile;
     else
         m_strAcquireFile.clear();
@@ -1023,7 +1023,7 @@ CTL_ITwainSource::~CTL_ITwainSource()
         ResetManualDuplexMode();
         CloseSource(true);
         m_pDLLHandle->m_mapPDFTextElement.erase(this);
-        if ( m_pFileEnumerator)
+        if (m_pFileEnumerator)
             m_pDLLHandle->m_ArrayFactory->destroy(m_pFileEnumerator);
     }
     catch (...)
@@ -1040,7 +1040,7 @@ HWND CTL_ITwainSource::GetOutputWindow() const
 
 
 ///////////// Specialized cap values that DTWAIN needs to keep in a cache ///////////////////
-void CTL_ITwainSource::SetCapCacheValue( LONG lCap, double dValue, bool bTurnOn )
+void CTL_ITwainSource::SetCapCacheValue(LONG lCap, double dValue, bool bTurnOn)
 {
     switch (lCap)
     {
@@ -1292,8 +1292,8 @@ bool CTL_ITwainSource::InitExtImageInfo(int nNum)
     if ( !nValue )
         return false;
 
-    m_pExtImageTriplet.reset(new CTL_ExtImageInfoTriplet(m_pSession, this, nNum));
-        return GetExtImageInfo(true);
+    m_pExtImageTriplet = std::make_unique<CTL_ExtImageInfoTriplet>(m_pSession, this, nNum);
+    return true;
     }
 
 
@@ -1318,8 +1318,8 @@ bool CTL_ITwainSource::GetExtImageInfo(bool bExecute)
         switch (rc)
         {
             case TWRC_SUCCESS:
-                m_pExtImageTriplet->RetrieveInfo(m_ExtImageVector);
-                return true;
+            m_pExtImageTriplet->RetrieveInfo();
+            return true;
         }
     }
     return false;
@@ -1338,11 +1338,11 @@ bool CTL_ITwainSource::DestroyExtImageInfo()
     return true;
 }
 
-bool CTL_ITwainSource::GetExtImageInfoData(int nWhichItem, int /*nSearch*/, int nWhichValue, LPVOID Data, size_t* pNumChars) const
+bool CTL_ITwainSource::GetExtImageInfoData(int nWhichItem, int /*nSearch*/, int nWhichValue, LPVOID Data, LPVOID* pHandleData, size_t* pNumChars) const
 {
     if ( !m_pExtImageTriplet )
         return false;
-    return m_pExtImageTriplet->GetItemData(nWhichItem, DTWAIN_BYID, nWhichValue, Data, pNumChars)?true:false;
+    return m_pExtImageTriplet->GetItemData(nWhichItem, DTWAIN_BYID, nWhichValue, Data, pHandleData, pNumChars) ? true : false;
 }
 
 bool CTL_ITwainSource::EnumExtImageInfo(CTL_IntArray& r)
@@ -1357,7 +1357,7 @@ bool CTL_ITwainSource::EnumExtImageInfo(CTL_IntArray& r)
 bool CTL_ITwainSource::IsExtendedCapNegotiable(LONG nCap)
 {
     if (find(m_aExtendedCaps.begin(), m_aExtendedCaps.end(), nCap) !=
-                m_aExtendedCaps.end())
+        m_aExtendedCaps.end())
         return true;
     return false;
 }

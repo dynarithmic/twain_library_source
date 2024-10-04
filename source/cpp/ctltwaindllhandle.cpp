@@ -170,6 +170,7 @@ CTL_LongToStringMap* CTL_StaticData::GetCurrentLanguageResource()
     return CTL_StaticData::GetLanguageResource(s_CurrentResourceKey);
 }
 
+
 ///////////////////////////////////////////////////////////////////////////
 void CTL_TwainDLLHandle::NotifyWindows(UINT /*nMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/)
 {

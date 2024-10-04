@@ -363,7 +363,7 @@ namespace dynarithmic
         bool         AddExtImageInfo(TW_INFO Info) const;
         bool         EnumExtImageInfo(CTL_IntArray& r);
         TW_INFO      GetExtImageInfoItem(int nItem, int nSearch) const;
-        bool         GetExtImageInfoData(int nWhichItem, int nSearch, int nWhichValue, LPVOID Data, size_t* pNumChars=nullptr) const;
+        bool         GetExtImageInfoData(int nWhichItem, int nSearch, int nWhichValue, LPVOID Data, LPVOID* pHandleData, size_t* pNumChars=nullptr) const;
         void         SetUserAcquisitionArray(DTWAIN_ARRAY UserArray) { m_PersistentArray = UserArray; }
         DTWAIN_ARRAY GetUserAcquisitionArray() const { return m_PersistentArray; }
 
