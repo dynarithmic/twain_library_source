@@ -875,6 +875,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAt( DTWAIN_ARRAY pArray, LONG nWhere, LP
             *pTheSource = static_cast<CTL_ITwainSource*>(factory->get_value(pArray, nWhere, pVariant));
         }
         break;
+        case CTL_ArrayFactory::arrayTag::VoidPtrType:
+        {
+            auto pTheData = static_cast<void**>(pVariant);
+            *pTheData = factory->get_value(pArray, nWhere, pVariant);
+        }
+        break;
         default:
             factory->get_value(pArray, nWhere, pVariant);
     }

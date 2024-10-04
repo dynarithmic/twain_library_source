@@ -599,6 +599,92 @@ namespace dynarithmic
         static SourceStatusMap& GetSourceStatusMap() { return s_SourceStatusMap;  }
         static CTL_StringType& GetResourceVersion() { return s_ResourceVersion; }
         static CTL_StringType GetTwainNameFromConstant(int lConstantType, int lTwainConstant);
+        static constexpr bool IsTwainStringType(TW_UINT16 nItemType)
+        {
+            switch (nItemType)
+            {
+                case TWTY_STR32:
+                case TWTY_STR64:
+                case TWTY_STR128:
+                case TWTY_STR255:
+                case TWTY_STR1024:
+                case TWTY_UNI512:
+                    return true;
+            }
+            return false;
+         }
+
+        static constexpr bool IsTwainIntegralType(TW_UINT16 nItemType)
+        {
+            switch (nItemType)
+            {
+                case TWTY_INT8:
+                case TWTY_INT16:
+                case TWTY_INT32:
+                case TWTY_UINT8:
+                case TWTY_UINT16:
+                case TWTY_UINT32:
+                case TWTY_BOOL:
+                    return true;
+            }
+            return false;
+        }
+
+        static constexpr bool IsTwainHandleType(TW_UINT16 nItemType)
+        {
+            return nItemType == TWTY_HANDLE;
+        }
+
+        static constexpr bool IsTwainFix32Type(TW_UINT16 nItemType)
+        {
+            return nItemType == TWTY_FIX32;
+        }
+
+        static constexpr bool IsTwainFrameType(TW_UINT16 nItemType)
+        {
+            return nItemType == TWTY_FRAME;
+        }
+
+        static constexpr TW_UINT16 GetTwainItemSize(TW_UINT16 nItemType)
+        {
+            switch (nItemType)
+            {
+                case TWTY_INT8:
+                    return sizeof(TW_INT8);
+                case TWTY_INT16:
+                    return sizeof(TW_INT16);
+                case TWTY_INT32:
+                    return sizeof(TW_INT32);
+                case TWTY_UINT8:
+                    return sizeof(TW_UINT8);
+                case TWTY_UINT16:
+                    return sizeof(TW_UINT16);
+                case TWTY_UINT32:
+                    return sizeof(TW_UINT32);
+                case TWTY_BOOL:
+                    return sizeof(TW_BOOL);
+                case TWTY_FIX32:
+                    return sizeof(TW_FIX32);
+                case TWTY_FRAME:
+                    return sizeof(TW_FRAME);
+                case TWTY_STR32:
+                    return sizeof(TW_STR32);
+                case TWTY_STR64:
+                    return sizeof(TW_STR64);
+                case TWTY_STR128:
+                    return sizeof(TW_STR128);
+                case TWTY_STR255:
+                    return sizeof(TW_STR255);
+                case TWTY_STR1024:
+                    return sizeof(TW_STR1024);
+                case TWTY_UNI512:
+                    return sizeof(TW_UNI512);
+                case TWTY_HANDLE:
+                    return sizeof(TW_HANDLE);
+            }
+            return 0;
+        }
+
     };
 
     struct CTL_LoggerCallbackInfo

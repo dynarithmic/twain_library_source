@@ -492,6 +492,7 @@ void GenericAcquire(LONG nWhichOne)
                                  GetToggleMenuState(IDM_DISCARD_BLANKS));
 
     BOOL bRet = FALSE;
+    EnableSourceItems(FALSE);
     if (nWhichOne == 0)
     {
         bRet = DTWAIN_AcquireNativeEx(
@@ -516,8 +517,12 @@ void GenericAcquire(LONG nWhichOne)
             &ErrStatus /* Error Status */
         );
     }
+    EnableSourceItems(TRUE);
     if (!bRet)
     {
+        if (ErrStatus == DTWAIN_TN_ACQUIRECANCELED)
+            MessageBox(NULL, _T("Acquisition cancelled without acquiring any images"), _T("Information"), MB_ICONSTOP);
+        else
         MessageBox(NULL, _T("Acquisition failed"), _T("TWAIN Error"), MB_ICONSTOP);
         return;
     }
@@ -630,6 +635,7 @@ void AcquireFile(BOOL bUseSource)
 
     /* Acquire the file */
     UseUI = GetToggleMenuState(IDM_USE_SOURCE_UI);
+    EnableSourceItems(FALSE);
     bAcquireOK = DTWAIN_AcquireFileEx(g_CurrentSource,
                                   AFileNames,
                                   FileType,
@@ -646,6 +652,7 @@ void AcquireFile(BOOL bUseSource)
     }
     WaitLoop();
     EnableWindow(g_hWnd, TRUE);
+    EnableSourceItems(TRUE);
 
     /* Reopen source since we closed it after the acquisition
        (to be safe) */

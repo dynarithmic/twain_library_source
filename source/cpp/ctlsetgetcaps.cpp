@@ -896,7 +896,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddExtImageInfoQuery(DTWAIN_SOURCE Source, LONG 
     const auto pHandle = pTheSource->GetDTWAINHandle();
 
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return pTheSource->GetState() != SOURCE_STATE_TRANSFERRING;},DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
-    TW_INFO Info;
+    TW_INFO Info = {};
     Info.InfoID = static_cast<TW_UINT16>(ExtImageInfo);
     pTheSource->AddExtImageInfo( Info );
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -997,14 +997,24 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
         {
             std::vector<char> Temp;
             size_t ItemSize;
-            if ( p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, nullptr, &ItemSize) )
+            if ( p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, nullptr, nullptr, &ItemSize) )
             {
-                p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, Temp.data(), nullptr);
-                SetArrayValueFromFactory(pHandle, ExtInfoArray, i, &Temp[0]);
+                Temp.resize(ItemSize);
+                p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, Temp.data(), nullptr, nullptr);
+                SetArrayValueFromFactory(pHandle, ExtInfoArray, i, Temp.data());
             }
         }
         else
-            p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, factory->get_buffer(ExtInfoArray, i));
+        if (eType == CTL_ArrayFactory::arrayTag::VoidPtrType) // This is a handle
+        {
+
+            TW_HANDLE pDataHandle = nullptr;
+            p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, nullptr, &pDataHandle, nullptr);
+            auto& vValues = factory->underlying_container_t<void*>(ExtInfoArray);
+            vValues[i] = pDataHandle;
+        }
+        else
+            p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, factory->get_buffer(ExtInfoArray, i), nullptr);
     }
     *Data = ExtInfoArray;
     LOG_FUNC_EXIT_NONAME_PARAMS(true)

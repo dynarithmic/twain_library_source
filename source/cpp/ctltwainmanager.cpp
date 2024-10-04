@@ -2463,10 +2463,22 @@ LONG CTL_TwainAppMgr::ExtImageInfoArrayType(LONG ExtType)
     switch(ExtType)
     {
         case DTWAIN_EI_BARCODETEXT:
+        case DTWAIN_EI_BARCODETEXT2:
+        case DTWAIN_EI_TWAINDIRECTMETADATA:
+            return DTWAIN_ARRAYHANDLE;
+
         case DTWAIN_EI_ENDORSEDTEXT:
         case DTWAIN_EI_FORMTEMPLATEMATCH:
         case DTWAIN_EI_BOOKNAME:
         case DTWAIN_EI_CAMERA:
+        case DTWAIN_EI_IAFIELDA_VALUE:
+        case DTWAIN_EI_IAFIELDB_VALUE:
+        case DTWAIN_EI_IAFIELDC_VALUE:
+        case DTWAIN_EI_IAFIELDD_VALUE:
+        case DTWAIN_EI_IAFIELDE_VALUE:
+        case DTWAIN_EI_FILESYSTEMSOURCE:
+        case DTWAIN_EI_PRINTERTEXT:
+        case DTWAIN_EI_ICCPROFILE:
             return DTWAIN_ARRAYSTRING;
 
         case DTWAIN_EI_FRAME:

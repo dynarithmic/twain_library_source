@@ -34,7 +34,7 @@ CTL_TwainTypeOb::CTL_TwainTypeOb( CTL_TwainDLLHandle* pHandle, TW_UINT16 nType, 
     m_hGlobal(nullptr)
 {
     if ( bGetTypeSize )
-        m_nSize = CTL_CapabilityTriplet::GetItemSize( nType );
+        m_nSize = CTL_StaticData::GetTwainItemSize( nType );
     else
         m_nSize = nType;
     m_hGlobal = pHandle->m_TwainMemoryFunc->AllocateMemory(m_nSize);
