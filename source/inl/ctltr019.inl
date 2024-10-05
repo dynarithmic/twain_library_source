@@ -67,7 +67,7 @@ bool CTL_CapabilitySetEnumTriplet<T>::Encode(const std::vector<T>& rArray, void 
     pArray->ItemType = CTL_CapabilitySetTripletBase::GetTwainType();
 
     // Get size of datatype
-    size_t nItemSize = CTL_CapabilityTriplet::GetItemSize( pArray->ItemType );
+    size_t nItemSize = CTL_StaticData::GetTwainItemSize( pArray->ItemType );
 
     // Set the items in the list
     size_t i = 0;
