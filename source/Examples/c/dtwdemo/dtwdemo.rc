@@ -157,7 +157,7 @@ BEGIN
     LTEXT           "Version Info:",IDC_STATIC,27,61,40,8
     LTEXT           "Version:",IDC_STATIC,41,77,26,8
     GROUPBOX        "General Info",IDC_STATIC,6,4,237,91
-    LISTBOX         IDC_lstCapabilities,13,114,116,98,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LISTBOX         IDC_lstCapabilities,13,114,116,98,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
     RTEXT           "Total Caps:",IDC_STATIC,147,116,37,8
     RTEXT           "Custom Caps:",IDC_STATIC,135,130,49,8
     RTEXT           "Extended Caps:",IDC_STATIC,133,145,51,8

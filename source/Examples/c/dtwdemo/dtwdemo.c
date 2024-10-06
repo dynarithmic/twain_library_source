@@ -523,7 +523,7 @@ void GenericAcquire(LONG nWhichOne)
         if (ErrStatus == DTWAIN_TN_ACQUIRECANCELED)
             MessageBox(NULL, _T("Acquisition cancelled without acquiring any images"), _T("Information"), MB_ICONSTOP);
         else
-        MessageBox(NULL, _T("Acquisition failed"), _T("TWAIN Error"), MB_ICONSTOP);
+            MessageBox(NULL, _T("Acquisition failed"), _T("TWAIN Error"), MB_ICONSTOP);
         return;
     }
 
@@ -995,7 +995,10 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
             HWND hWndNumExtendedCaps =  GetDlgItem(hDlg,  IDC_edExtendedCaps);
             HWND hWndDSData = GetDlgItem(hDlg, IDC_edDSData);
             HWND hWndJSONDetails = GetDlgItem(hDlg, IDC_edJSONDetails);
-
+            int maxTextLength = 0;
+            int curStringLength;
+            HDC hdcList = GetDC(hWndCaps);
+            SIZE textSize;
             DTWAIN_GetSourceProductNameA(g_CurrentSource, szBufName, 255);
             SetWindowTextA(hWndName, szBufName);
 
@@ -1019,7 +1022,13 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
                 DTWAIN_ArrayGetAt( CapArray, nIndex, &nCapValue );
                 DTWAIN_GetNameFromCap( nCapValue, szBuf, 255);
                 SendMessage( hWndCaps, LB_ADDSTRING, 0, (LPARAM)szBuf);
+                curStringLength = lstrlen(szBuf);
+                GetTextExtentPoint32(hdcList, szBuf, curStringLength, &textSize);
+                if (textSize.cx > maxTextLength)
+                    maxTextLength = textSize.cx;
             }
+            ReleaseDC(hWndCaps, hdcList);
+            SendMessage(hWndCaps, LB_SETHORIZONTALEXTENT, maxTextLength, 0);
 
             wsprintf(szBuf, _T("%d"), nCapCount);
             SetWindowText(hWndNumCaps, szBuf);
