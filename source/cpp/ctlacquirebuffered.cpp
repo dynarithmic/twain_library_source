@@ -70,10 +70,6 @@ static int CheckTiledBufferedSupport(CTL_ITwainSource* pSource)
     if (isSupported.value != boost::tribool::indeterminate_value)
         return isSupported ? DTWAIN_NO_ERROR : DTWAIN_ERR_TILES_NOT_SUPPORTED;
 
-    // Source must be open to do testing
-    if (!CTL_TwainAppMgr::IsSourceOpen(pSource))
-        return DTWAIN_ERR_SOURCE_NOT_OPEN;
-
     // Check if cap is in supported list
     if (!pSource->IsCapInSupportedList(ICAP_TILES))
     {
@@ -129,7 +125,7 @@ static int CheckTiledBufferedSupport(CTL_ITwainSource* pSource)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBufferedTileMode(DTWAIN_SOURCE Source, DTWAIN_BOOL bTileMode)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, bTileMode))
-    auto [pHandle, pSource] = VerifyHandles(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     auto bRet = CheckTiledBufferedSupport(pSource);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return bRet != DTWAIN_NO_ERROR; }, bRet, false, FUNC_MACRO);
     pSource->SetTileMode(bTileMode);

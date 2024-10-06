@@ -18,29 +18,33 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CAPSTRUCT_H
-#define CAPSTRUCT_H
+#ifndef CTLCONSTEXPRFIND_H
+#define CTLCONSTEXPRFIND_H
+#include <utility>
+#include <algorithm>
 
-#include <boost/container/flat_map.hpp>
 namespace dynarithmic
 {
-    // Define the cap info structure used
-    class CTL_CapStruct
+    template <typename Arr, typename Val>
+    static constexpr std::pair<bool, unsigned> generic_array_finder(const Arr& theArray, const Val& value)
     {
-        public:
-            CTL_CapStruct() = default;
-            UINT       m_nDataType = 0;
-            UINT       m_nGetContainer = 0;
-            UINT       m_nGetCurrentContainer = 0;
-            UINT       m_nGetDefaultContainer = 0;
-            UINT       m_nSetContainer = 0;
-            UINT       m_nSetConstraintContainer = 0;
-            UINT       m_nResetContainer = 0;
-            UINT       m_nQuerySupportContainer = 0;
-            std::string m_strCapName;
-            operator std::string() const;
-    };
+        for (auto iter = theArray.begin(); iter != theArray.end(); ++iter)
+        {
+            if (*iter == value)
+                return { true, static_cast<unsigned>(std::distance(theArray.begin(), iter)) };
+        }
+        return { false, 0 };
+    }
 
-    typedef boost::container::flat_map<TW_UINT16, CTL_CapStruct> CTL_GeneralCapInfo;
+    template <typename Arr, typename Fn>
+    static constexpr std::pair<bool, unsigned> generic_array_finder_if(const Arr& theArray, Fn fn)
+    {
+        for (auto iter = theArray.begin(); iter != theArray.end(); ++iter)
+        {
+            if (fn(*iter))
+                return { true, static_cast<unsigned>(std::distance(theArray.begin(), iter)) };
+        }
+        return { false,0 };
+    }
 }
 #endif

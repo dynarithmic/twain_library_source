@@ -22,6 +22,7 @@
 #define ARRAYFACTORY_H
 
 #include <vector>
+#include <array>
 #include <memory>
 #include <functional>
 #include <string>
@@ -31,6 +32,7 @@
 
 #include "twainframe.h"
 #include "twainfix32.h"
+#include "ctlconstexprfind.h"
 
 namespace dynarithmic
 {
@@ -419,9 +421,6 @@ namespace dynarithmic
         void destroy(arrayTag* pTag);
         void destroy(void* pTag) { destroy(from_void(pTag)); }
 
-        static int arraytype_to_tagtype(CTL_ArrayType ArrayType);
-        static CTL_ArrayType tagtype_to_arraytype(int tag);
-
         void copy(arrayTag* pTagDest, arrayTag* pTagSource);
         void copy(void * pTagDest, void* pTagSource) { return copy(from_void(pTagDest), from_void(pTagSource)); }
 
@@ -466,6 +465,50 @@ namespace dynarithmic
         bool is_frame_valid(const void *frame) const;
         void destroy_frame(arrayTag *frame);
         void destroy_frame(void* frame) { destroy_frame(from_void(frame)); }
+
+        static constexpr int arraytype_to_tagtype(CTL_ArrayType arrayType)
+        {
+            constexpr std::array<std::pair<CTL_ArrayType, int>, 12> mapArrayTypeToTag =
+            { {
+                {CTL_ArrayIntType, arrayTag::LongType},
+                {CTL_ArrayInt64Type, arrayTag::Long64Type},
+                {CTL_ArrayDoubleType, arrayTag::DoubleType},
+                {CTL_ArrayHandleType,arrayTag::VoidPtrType},
+                {CTL_ArrayPtrType, arrayTag::VoidPtrType},
+                {CTL_ArrayANSIStringType, arrayTag::StringType},
+                {CTL_ArrayWideStringType, arrayTag::WStringType},
+                {CTL_ArrayDTWAINFrameType, arrayTag::FrameType},
+                {CTL_ArrayTWFIX32Type, arrayTag::Fix32Type},
+                {CTL_ArraySourceType, arrayTag::SourceType},
+                {CTL_ArrayToHandleArray, arrayTag::ArrayOfArrayOfVoidPtrType},
+                {CTL_ArrayFrameSingleType, arrayTag::FrameSingleType} } };
+            auto iter = dynarithmic::generic_array_finder_if(mapArrayTypeToTag, [&](const auto& pr) { return pr.first == arrayType; });
+            if (iter.first)
+                return mapArrayTypeToTag[iter.second].second;
+            return arrayTag::UnknownType;
+        }
+
+        static constexpr CTL_ArrayType tagtype_to_arraytype(int tag)
+        {
+            constexpr std::array<std::pair<int, CTL_ArrayType>, 12> mapTagToArrayType = { {
+                {arrayTag::LongType,                            CTL_ArrayIntType},
+                {arrayTag::Long64Type,                          CTL_ArrayInt64Type},
+                {arrayTag::DoubleType,                          CTL_ArrayDoubleType},
+                {arrayTag::VoidPtrType,                         CTL_ArrayHandleType},
+                {arrayTag::VoidPtrType,                         CTL_ArrayPtrType},
+                {arrayTag::StringType,                          CTL_ArrayANSIStringType},
+                {arrayTag::WStringType,                         CTL_ArrayWideStringType},
+                {arrayTag::FrameType,                           CTL_ArrayDTWAINFrameType},
+                {arrayTag::Fix32Type,                           CTL_ArrayTWFIX32Type},
+                {arrayTag::SourceType,                          CTL_ArraySourceType},
+                {arrayTag::ArrayOfArrayOfVoidPtrType,           CTL_ArrayToHandleArray},
+                {arrayTag::FrameSingleType,                     CTL_ArrayFrameSingleType} } };
+
+            auto iter = dynarithmic::generic_array_finder_if(mapTagToArrayType, [&](const auto& pr) { return pr.first == tag; });
+            if (iter.first)
+                return mapTagToArrayType[iter.second].second;
+            return CTL_ArrayInvalid;
+        }
     };
 }
 #endif

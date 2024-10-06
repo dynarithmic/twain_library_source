@@ -38,9 +38,11 @@
 #include "dtwain.h"
 #include "twainframe.h"
 #include <boost/functional/hash.hpp>
+#include <boost/container/flat_map.hpp>
 #include "../simpleini/simpleini.h"
 #include "notimpl.h"
 #include "sourceacquireopts.h"
+#include "ctlconstexprutils.h"
 #ifdef _WIN32
     #include "winlibraryloader_impl.inl"
 #else
@@ -220,24 +222,24 @@ namespace dynarithmic
     #define CAPINFO_IDX_RESETCONTAINER 8    
     #define CAPINFO_IDX_QUERYSUPPORT 9    
 
-    typedef std::unordered_map<unsigned long, std::shared_ptr<CTL_TwainDLLHandle>> CTL_MapThreadToDLLHandle;
-    typedef std::unordered_map<LONG, int> CTL_LongToIntMap;
+    typedef boost::container::flat_map<unsigned long, std::shared_ptr<CTL_TwainDLLHandle>> CTL_MapThreadToDLLHandle;
+    typedef boost::container::flat_map<LONG, int> CTL_LongToIntMap;
     typedef BiDirectionalMap<std::pair<int, int>, std::string> CTL_TwainNameMap;
-    typedef std::unordered_map<CTL_StringType, CTL_ITwainSource*> CTL_StringToSourcePtrMap;
-    typedef std::unordered_map<CTL_StringType, int> CTL_StringToIntMap;
-    typedef std::unordered_map<LONG, HMODULE> CTL_LongToHMODULEMap;
-    typedef std::unordered_map<CTL_EnumCapability, CTL_CapInfo> CTL_EnumCapToInfoMap;
+    typedef boost::container::flat_map<CTL_StringType, CTL_ITwainSource*> CTL_StringToSourcePtrMap;
+    typedef boost::container::flat_map<CTL_StringType, int> CTL_StringToIntMap;
+    typedef boost::container::flat_map<LONG, HMODULE> CTL_LongToHMODULEMap;
+    typedef boost::container::flat_map<CTL_EnumCapability, CTL_CapInfo> CTL_EnumCapToInfoMap;
     typedef std::vector<CallbackInfo<DTWAIN_CALLBACK_PROC, LONG> > CTL_CallbackProcArray;
     typedef std::vector<CallbackInfo<DTWAIN_CALLBACK_PROC, LONGLONG> > CTL_CallbackProcArray64;
-    typedef std::unordered_map<LONG, CTL_StringType> CTL_StringToLongMap;
-    typedef std::map<LONG, std::string> CTL_LongToStringMap;
-    typedef std::unordered_map<std::string, CTL_LongToStringMap> CTL_StringToMapLongToStringMap;
-    typedef std::unordered_map<LONG, std::vector<LONG> > CTL_LongToVectorLongMap;
+    typedef boost::container::flat_map<LONG, CTL_StringType> CTL_StringToLongMap;
+    typedef boost::container::flat_map<LONG, std::string> CTL_LongToStringMap;
+    typedef boost::container::flat_map<std::string, CTL_LongToStringMap> CTL_StringToMapLongToStringMap;
+    typedef boost::container::flat_map<LONG, std::vector<LONG>> CTL_LongToVectorLongMap;
     typedef std::vector<CTL_MapThreadToDLLHandle>     CTL_HookInfoArray;
 
     // Create these dynamically whenever a new source is opened
     // and source cap info does not exist.  Add cap info statically.
-    typedef std::unordered_map<CTL_EnumCapability, CTL_CapInfo>  CTL_CapInfoArray;
+    typedef boost::container::flat_map<CTL_EnumCapability, CTL_CapInfo>  CTL_CapInfoArray;
     typedef std::shared_ptr<CTL_CapInfoArray> CTL_CapInfoArrayPtr;
 
     // Create this statically when initializing.  Initialize the second
@@ -502,14 +504,14 @@ namespace dynarithmic
     };
 
     typedef std::map<std::string, SourceStatus> SourceStatusMap;
-    typedef std::map<int, ImageResamplerData> ImageResamplerMap;
-    typedef std::unordered_map<LONG, std::pair<std::string, std::string>> CTL_PDFMediaMap;
+    typedef boost::container::flat_map<int, ImageResamplerData> ImageResamplerMap;
+    typedef boost::container::flat_map<LONG, std::pair<std::string, std::string>> CTL_PDFMediaMap;
     typedef tsl::ordered_map<LONG, FileFormatNode> CTL_AvailableFileFormatsMap;
     typedef tsl::ordered_map<LONG, std::string> CTL_TwainConstantToStringMapNode;
-    typedef std::unordered_map<LONG, CTL_TwainConstantToStringMapNode> CTL_TwainConstantsMap;
-    typedef std::unordered_map<LONG, std::string> CTL_TwainLongToStringMap;
-    typedef std::unordered_map<int32_t, std::string> CTL_ErrorToExtraInfoMap;
-    typedef std::unordered_map<std::string, unsigned long> CTL_ThreadMap;
+    typedef boost::container::flat_map<LONG, CTL_TwainConstantToStringMapNode> CTL_TwainConstantsMap;
+    typedef boost::container::flat_map<LONG, std::string> CTL_TwainLongToStringMap;
+    typedef boost::container::flat_map<int32_t, std::string> CTL_ErrorToExtraInfoMap;
+    typedef boost::container::flat_map<std::string, unsigned long> CTL_ThreadMap;
     typedef std::unordered_map<std::pair<LONG, std::string>, std::string, CacheKeyHash> CTL_PairToStringMap;
 
     struct CTL_GeneralResourceInfo
@@ -785,6 +787,10 @@ namespace dynarithmic
     #define DTWAIN_VERIFY_SOURCEHANDLE  2
     #define DTWAIN_TEST_NOTHROW 4
     #define DTWAIN_TEST_SETLASTERROR 8
+    #define DTWAIN_TEST_SOURCEOPEN  16
+    #define DTWAIN_TEST_SOURCEOPEN_SETLASTERROR (DTWAIN_TEST_SOURCEOPEN | DTWAIN_TEST_SETLASTERROR)
+    #define DTWAIN_TEST_DLLHANDLE_SETLASTERROR (DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_SETLASTERROR)
+    #define DTWAIN_VERIFY_SOURCEHANDLE_SETLASTERROR (DTWAIN_VERIFY_SOURCEHANDLE | DTWAIN_TEST_SETLASTERROR)
 
     CTL_TwainDLLHandle* FindHandle(HWND hWnd, bool bIsDisplay);
     CTL_TwainDLLHandle* FindHandle(HINSTANCE hInst);
@@ -1222,6 +1228,6 @@ namespace dynarithmic
         (lFileType == DTWAIN_POSTSCRIPT3MULTI)
 
     #define INVALID_LICENSE (0)
-    #include "ctlconstexprutils.inl"
 }
+
 #endif

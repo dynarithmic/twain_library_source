@@ -114,7 +114,7 @@ CTL_StringType dynarithmic::PromptForFileName(CTL_TwainDLLHandle* pHandle, CTL_T
     LPCTSTR szExt = nullptr;
 
     const auto it =
-        ConstexprUtils::generic_array_finder_if(saveFileMap, [&](const FileNode& fNode)
+        dynarithmic::generic_array_finder_if(saveFileMap, [&](const FileNode& fNode)
             { return fNode.fileType == nFileAcquireType; });
 
     if (it.first)

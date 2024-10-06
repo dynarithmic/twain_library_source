@@ -51,10 +51,10 @@ static std::vector<TCHAR> GetDefaultName(SelectStruct& selectTraits);
 static std::vector<CTL_StringType> GetNameList(SelectStruct& pS);
 
 typedef DTWAIN_SOURCE(*SourceFn)(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions&);
-static std::unordered_map<int, SourceFn> SourcefnMap = {{SELECTSOURCE, DTWAIN_LLSelectSource},
+static constexpr std::array<std::pair<int, SourceFn>, 4> SourcefnMap = { {{SELECTSOURCE, DTWAIN_LLSelectSource},
                                                         {SELECTDEFAULTSOURCE, DTWAIN_LLSelectDefaultSource},
                                                         {SELECTSOURCEBYNAME, DTWAIN_LLSelectSourceByName},
-                                                        {SELECTSOURCE2, DTWAIN_LLSelectSource2} 
+                                                        {SELECTSOURCE2, DTWAIN_LLSelectSource2}}
                                                         };
 
 static LONG OpenSourceInternal(DTWAIN_SOURCE Source, const SourceSelectionOptions& opts)
@@ -242,7 +242,8 @@ DTWAIN_SOURCE dynarithmic::SourceSelect(CTL_TwainDLLHandle* pHandle, SourceSelec
     }
 
     // Call the internal functions to select the source
-    const DTWAIN_SOURCE pSource = SourcefnMap[options.nWhich] (pHandle, options);
+    auto fnToCall = dynarithmic::generic_array_finder_if(SourcefnMap, [&](const auto& pr) { return pr.first == options.nWhich; }).second;
+    const DTWAIN_SOURCE pSource = SourcefnMap[fnToCall].second(pHandle, options);
 
     if (!pSource)
         LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_SOURCE)NULL)

@@ -1071,6 +1071,12 @@
     <ClInclude Include="h\ctlfilesave.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="h\ctlconstexprfind.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctlconstexprutils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".\h\versioninfo.ipp">
@@ -1153,9 +1159,6 @@
     </None>
     <None Include="rc\twainresourcestrings_english.rc2">
       <Filter>RC Files</Filter>
-    </None>
-    <None Include="inl\ctlconstexprutils.inl">
-      <Filter>Header Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

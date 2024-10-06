@@ -1474,6 +1474,8 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\ansiwideconverter_win32.h" />
     <ClInclude Include="h\arrayfactory.h" />
     <ClInclude Include="h\ctlccerr.h" />
+    <ClInclude Include="h\ctlconstexprfind.h" />
+    <ClInclude Include="h\ctlconstexprutils.h" />
     <ClInclude Include="h\ctldefsource.h" />
     <ClInclude Include="h\ctldib32.h" />
     <ClInclude Include="h\ctlfilesave.h" />
@@ -1558,7 +1560,6 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <CustomBuildStep Include=".\cdtwain\cdtwain_internal\capstr.inl">
       <FileType>Document</FileType>
     </CustomBuildStep>
-    <None Include="inl\ctlconstexprutils.inl" />
     <None Include="inl\linuxget_twain.inl" />
     <None Include="inl\linuxinit_impl.inl" />
     <None Include="inl\linuxlibraryloader_impl.inl" />

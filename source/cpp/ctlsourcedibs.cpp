@@ -176,12 +176,8 @@ static bool SetBitDepth(CTL_ITwainSource *p, LONG BitDepth);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ForceAcquireBitDepth(DTWAIN_SOURCE Source, LONG BitDepth)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, BitDepth))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    auto pTheSource = pSource;
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(pTheSource); },
-                DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
-
-    const DTWAIN_BOOL bRet = SetBitDepth(pTheSource, BitDepth);
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+    const DTWAIN_BOOL bRet = SetBitDepth(pSource, BitDepth);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }

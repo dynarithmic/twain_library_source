@@ -99,7 +99,7 @@ namespace dynarithmic
 
 class CTL_ErrorStructDecoder {
     public:
-        CTL_ErrorStructDecoder();
+        CTL_ErrorStructDecoder() = default;
         void StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDest, LONG nDG, UINT nDAT, UINT nMSG, TW_MEMREF Data,
                           ErrorStructTypes sType);
         static std::string DecodeBitmap(HANDLE hBitmap);
@@ -109,13 +109,6 @@ class CTL_ErrorStructDecoder {
         static std::string DecodeTWAINReturnCodeCC(TW_UINT16 retCode);
         void StartMessageDecoder(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam);
         const std::string& GetDecodedString() const { return m_pString; }
-        static CTL_ContainerToNameMap s_mapContainerType;
-        static CTL_ContainerToNameMap s_mapNotificationType;
-        static std::unordered_map<TW_UINT32, std::string> s_mapSupportedGroups;
-        static std::unordered_map<TW_UINT16, std::string> s_mapTwainDSMReturnCodes;
-
-        static bool s_bInit;
-
     protected:
         std::string m_pString;
 };

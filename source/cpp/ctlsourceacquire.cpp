@@ -512,7 +512,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
 
         nFileType = lFileType;
 
-        if (bUseSourceMode || ConstexprUtils::IsSupportedFileFormat(nFileType))
+        if (bUseSourceMode || dynarithmic::IsSupportedFileFormat(nFileType))
         {
             opts.setActualAcquireType(CTL_TwainAppMgr::GetCompatibleFileTransferType(pSource));
             if (!bUseSourceMode)
