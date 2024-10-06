@@ -1163,6 +1163,14 @@
 #define DTWAIN_EI_PAPERCOUNT             0x1249
 #define DTWAIN_EI_PRINTERTEXT            0x124A
 #define DTWAIN_EI_TWAINDIRECTMETADATA    0x124B
+#define DTWAIN_EI_IAFIELDA_VALUE         0x124C
+#define DTWAIN_EI_IAFIELDB_VALUE         0x124D
+#define DTWAIN_EI_IAFIELDC_VALUE         0x124E
+#define DTWAIN_EI_IAFIELDD_VALUE         0x124F
+#define DTWAIN_EI_IAFIELDE_VALUE         0x1250
+#define DTWAIN_EI_IALEVEL                0x1251
+#define DTWAIN_EI_PRINTER                0x1252
+#define DTWAIN_EI_BARCODETEXT2           0x1253
 
 /* TWAIN Data Source Error logging functions */
 #define DTWAIN_LOG_DECODE_SOURCE      0x00000001
