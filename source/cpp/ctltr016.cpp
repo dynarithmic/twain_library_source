@@ -72,7 +72,7 @@ void * CTL_CapabilitySetTripletBase::PreEncode()
     size_t nAggSize = GetAggregateSize();
     if ( nAggSize == 0 )
         nAggSize = 1;
-    const auto dMem = static_cast<DWORD>(nContainerSize + CTL_StaticData::GetTwainItemSize(m_nTwainType) * nAggSize);
+    const auto dMem = static_cast<DWORD>(nContainerSize + ConstexprUtils::GetTwainItemSize(m_nTwainType) * nAggSize);
     auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
     pCap->hContainer = sessionHandle->m_TwainMemoryFunc->AllocateMemory(dMem );
     return sessionHandle->m_TwainMemoryFunc->LockMemory( pCap->hContainer );
@@ -117,13 +117,13 @@ void CTL_CapabilitySetTripletBase::EncodeOneValue(pTW_ONEVALUE pVal, void *pData
             TW_STR1024 TempString = {};
             auto ptrString = static_cast<std::string*>(pData);
             std::copy(ptrString->begin(), ptrString->end(), TempString);
-            memcpy(&pVal->Item, TempString, CTL_StaticData::GetTwainItemSize( pVal->ItemType) );
+            memcpy(&pVal->Item, TempString, ConstexprUtils::GetTwainItemSize( pVal->ItemType) );
         }
         break;
 
         default:
         // Copy data to TW_CONTAINER
-            memcpy(&pVal->Item, pData, CTL_StaticData::GetTwainItemSize( pVal->ItemType) );
+            memcpy(&pVal->Item, pData, ConstexprUtils::GetTwainItemSize( pVal->ItemType) );
         break;
     }
 }
@@ -146,7 +146,7 @@ void CTL_CapabilitySetTripletBase::EncodeEnumValue(pTW_ENUMERATION pArray,
         TW_STR1024 TempString = {0};
         std::string *ptrString = reinterpret_cast<std::string*>(pData);
         std::copy(ptrString->begin(), ptrString->end(), TempString);
-        memcpy(&pArray->ItemList[valuePos], TempString, CTL_StaticData::GetTwainItemSize( pArray->ItemType) );
+        memcpy(&pArray->ItemList[valuePos], TempString, ConstexprUtils::GetTwainItemSize( pArray->ItemType) );
     }
     else
         memcpy( &pArray->ItemList[valuePos], pData, nItemSize );
@@ -159,7 +159,7 @@ void CTL_CapabilitySetTripletBase::EncodeRange(pTW_RANGE pVal,
                                                void *pData3) const
 {
     pVal->ItemType = GetTwainType();
-    const size_t nItemSize = CTL_StaticData::GetTwainItemSize( pVal->ItemType );
+    const size_t nItemSize = ConstexprUtils::GetTwainItemSize( pVal->ItemType );
 
     if ( pVal->ItemType == TWTY_FIX32 )
     {
@@ -190,7 +190,7 @@ void CTL_CapabilitySetTripletBase::EncodeArrayValue(pTW_ARRAY pArray,
                                                     void *pData)
 {
     // Get size of datatype
-    const TW_UINT16 nItemSize = CTL_StaticData::GetTwainItemSize( pArray->ItemType );
+    const TW_UINT16 nItemSize = ConstexprUtils::GetTwainItemSize( pArray->ItemType );
     if ( pArray->ItemType == TWTY_FIX32 )
     {
         // floats are stored as doubles in CTL
@@ -204,7 +204,7 @@ void CTL_CapabilitySetTripletBase::EncodeArrayValue(pTW_ARRAY pArray,
         TW_STR1024 TempString = {0};
         const auto pStrData = static_cast<std::string*>(pData);
         std::copy(pStrData->begin(), pStrData->end(), TempString);
-        memcpy(&pArray->ItemList[valuePos], TempString, CTL_StaticData::GetTwainItemSize( pArray->ItemType) );
+        memcpy(&pArray->ItemList[valuePos], TempString, ConstexprUtils::GetTwainItemSize( pArray->ItemType) );
     }
     else
         memcpy( &pArray->ItemList[valuePos], pData, nItemSize );

@@ -23,6 +23,7 @@
 #include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
+
 using namespace dynarithmic;
 
 /////////////////////////////  TIFF Settings ///////////////////////////////
@@ -42,9 +43,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTIFFCompressType(DTWAIN_SOURCE Source, LONG S
     auto [pHandle, pSource] = VerifyHandles(Source);
     // Must be in state 4 or higher
     const SourceState theState = pSource->GetState();
-    const bool bIsTiff = pSource->IsFileTypeTIFF(static_cast<CTL_TwainFileFormatEnum>(Setting));
+    const bool bIsTiff = ConstexprUtils::IsFileTypeTIFF(static_cast<CTL_TwainFileFormatEnum>(Setting));
     LONG curAcquireType = pSource->GetAcquireFileType();
-    const bool bIsCurTiff = pSource->IsFileTypeTIFF(static_cast<CTL_TwainFileFormatEnum>(curAcquireType));
+    const bool bIsCurTiff = ConstexprUtils::IsFileTypeTIFF(static_cast<CTL_TwainFileFormatEnum>(curAcquireType));
 
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return theState < SOURCE_STATE_UIENABLED;}, DTWAIN_ERR_INVALID_STATE, false,
                                         FUNC_MACRO);
@@ -53,9 +54,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTIFFCompressType(DTWAIN_SOURCE Source, LONG S
 
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !bIsCurTiff;}, DTWAIN_ERR_FILE_FORMAT, false, FUNC_MACRO);
 
-    const bool bIsTiffMulti = pSource->IsFileTypeMultiPage(static_cast<CTL_TwainFileFormatEnum>(curAcquireType));
+    const bool bIsTiffMulti = ConstexprUtils::IsFileTypeMultiPage(static_cast<CTL_TwainFileFormatEnum>(curAcquireType));
     if (bIsTiffMulti)
-        pSource->SetAcquireFileType(pSource->GetMultiPageType(static_cast<CTL_TwainFileFormatEnum>(Setting)));
+        pSource->SetAcquireFileType(ConstexprUtils::GetMultiPageType(static_cast<CTL_TwainFileFormatEnum>(Setting)));
     else
         pSource->SetAcquireFileType(static_cast<CTL_TwainFileFormatEnum>(Setting));
     LOG_FUNC_EXIT_NONAME_PARAMS(true)

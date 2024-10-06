@@ -87,7 +87,7 @@ namespace dynarithmic
                                               HINSTANCE hThisInstance,
                                               LPCTSTR lpszDLLName = nullptr);
 
-            static CTL_TwainAppMgrPtr GetInstance()
+            static CTL_TwainAppMgrPtr GetInstance() noexcept
             {
                 return s_pGlobalAppMgr;
             }
@@ -167,7 +167,7 @@ namespace dynarithmic
             // Get capabilities for selected source
             static void GetCapabilities(const CTL_ITwainSource *pSource,CTL_TwainCapArray& rArray);
 
-            static bool IsCustomCapability(LONG nCap) { return nCap >= DTWAIN_CV_CAPCUSTOMBASE; }
+            static constexpr bool IsCustomCapability(LONG nCap) { return nCap >= DTWAIN_CV_CAPCUSTOMBASE; }
 
             static void GetExtendedCapabilities(const CTL_ITwainSource *pSource, CTL_IntArray& rArray);
 
@@ -177,8 +177,6 @@ namespace dynarithmic
                                                 int nCap);
 
             static CTL_IntArray EnumTransferMechanisms( const CTL_ITwainSource *pSource );
-            static void EnumTwainFileFormats( const CTL_ITwainSource *pSource, CTL_IntArray & rArray );
-            static bool IsSupportedFileFormat( const CTL_ITwainSource* pSource, int nFileFormat );
             static bool GetFileTransferDefaults( CTL_ITwainSource *pSource, int &nFileType);
             static int SetTransferMechanism( const CTL_ITwainSource *pSource, CTL_TwainAcquireEnum AcquireType,
                                             LONG ClipboardTransferType);

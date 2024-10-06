@@ -599,92 +599,6 @@ namespace dynarithmic
         static SourceStatusMap& GetSourceStatusMap() { return s_SourceStatusMap;  }
         static CTL_StringType& GetResourceVersion() { return s_ResourceVersion; }
         static CTL_StringType GetTwainNameFromConstant(int lConstantType, int lTwainConstant);
-        static constexpr bool IsTwainStringType(TW_UINT16 nItemType)
-        {
-            switch (nItemType)
-            {
-                case TWTY_STR32:
-                case TWTY_STR64:
-                case TWTY_STR128:
-                case TWTY_STR255:
-                case TWTY_STR1024:
-                case TWTY_UNI512:
-                    return true;
-            }
-            return false;
-         }
-
-        static constexpr bool IsTwainIntegralType(TW_UINT16 nItemType)
-        {
-            switch (nItemType)
-            {
-                case TWTY_INT8:
-                case TWTY_INT16:
-                case TWTY_INT32:
-                case TWTY_UINT8:
-                case TWTY_UINT16:
-                case TWTY_UINT32:
-                case TWTY_BOOL:
-                    return true;
-            }
-            return false;
-        }
-
-        static constexpr bool IsTwainHandleType(TW_UINT16 nItemType)
-        {
-            return nItemType == TWTY_HANDLE;
-        }
-
-        static constexpr bool IsTwainFix32Type(TW_UINT16 nItemType)
-        {
-            return nItemType == TWTY_FIX32;
-        }
-
-        static constexpr bool IsTwainFrameType(TW_UINT16 nItemType)
-        {
-            return nItemType == TWTY_FRAME;
-        }
-
-        static constexpr TW_UINT16 GetTwainItemSize(TW_UINT16 nItemType)
-        {
-            switch (nItemType)
-            {
-                case TWTY_INT8:
-                    return sizeof(TW_INT8);
-                case TWTY_INT16:
-                    return sizeof(TW_INT16);
-                case TWTY_INT32:
-                    return sizeof(TW_INT32);
-                case TWTY_UINT8:
-                    return sizeof(TW_UINT8);
-                case TWTY_UINT16:
-                    return sizeof(TW_UINT16);
-                case TWTY_UINT32:
-                    return sizeof(TW_UINT32);
-                case TWTY_BOOL:
-                    return sizeof(TW_BOOL);
-                case TWTY_FIX32:
-                    return sizeof(TW_FIX32);
-                case TWTY_FRAME:
-                    return sizeof(TW_FRAME);
-                case TWTY_STR32:
-                    return sizeof(TW_STR32);
-                case TWTY_STR64:
-                    return sizeof(TW_STR64);
-                case TWTY_STR128:
-                    return sizeof(TW_STR128);
-                case TWTY_STR255:
-                    return sizeof(TW_STR255);
-                case TWTY_STR1024:
-                    return sizeof(TW_STR1024);
-                case TWTY_UNI512:
-                    return sizeof(TW_UNI512);
-                case TWTY_HANDLE:
-                    return sizeof(TW_HANDLE);
-            }
-            return 0;
-        }
-
     };
 
     struct CTL_LoggerCallbackInfo
@@ -877,17 +791,13 @@ namespace dynarithmic
     std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> VerifyHandles(DTWAIN_SOURCE Source, int Testing = DTWAIN_VERIFY_DLLHANDLE | DTWAIN_VERIFY_SOURCEHANDLE | DTWAIN_TEST_SETLASTERROR);
     bool CenterWindow(HWND hwnd, HWND hwndParent);
 
-    bool IsIntCapType(TW_UINT16 nCap);
-    bool IsFloatCapType(TW_UINT16 nCap);
-    bool IsStringCapType(TW_UINT16 nCap);
-    bool IsFrameCapType(TW_UINT16 nCap);
     LONG GetArrayTypeFromCapType(TW_UINT16 CapType);
     LONG GetCustomCapDataType(DTWAIN_SOURCE Source, TW_UINT16 nCap);
     LONG GetCapContainer(CTL_ITwainSource* pSource, LONG nCap, LONG lCapType);
     LONG GetCapArrayType(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG nCap);
-    LONG           DTWAIN_ArrayType(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray);
-    bool           DTWAINFRAMEToTWFRAME(DTWAIN_FRAME pDdtwil, pTW_FRAME pTwain);
-    bool           TWFRAMEToDTWAINFRAME(TW_FRAME pTwain, DTWAIN_FRAME pDdtwil);
+    LONG DTWAIN_ArrayType(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray);
+    bool DTWAINFRAMEToTWFRAME(DTWAIN_FRAME pDdtwil, pTW_FRAME pTwain);
+    bool TWFRAMEToDTWAINFRAME(TW_FRAME pTwain, DTWAIN_FRAME pDdtwil);
 
     #ifdef __cplusplus
     extern "C" {
@@ -1085,16 +995,6 @@ namespace dynarithmic
         std::string getString() const { return strm.str(); }
     };
 
-/*    struct DTWAINArrayPtr_DestroyTraits
-    {
-        static void Destroy(DTWAIN_ARRAY* a)
-        {
-            if (a && *a)
-               DestroyArrayFromFactory(*a);
-        }
-        void operator()(DTWAIN_ARRAY* a) { Destroy(a); }
-    };
-    */
     struct DTWAINGlobalHandle_CloseTraits
     {
         static void Destroy(HANDLE h)
@@ -1322,5 +1222,6 @@ namespace dynarithmic
         (lFileType == DTWAIN_POSTSCRIPT3MULTI)
 
     #define INVALID_LICENSE (0)
+    #include "ctlconstexprutils.inl"
 }
 #endif

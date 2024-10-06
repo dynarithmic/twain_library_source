@@ -454,7 +454,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                             if (bKeepPage2 )
                             {
                                 // Check if multi page file is being used
-                                const bool bIsMultiPageFile = CTL_ITwainSource::IsFileTypeMultiPage(pSource->GetAcquireFileType());
+                                const bool bIsMultiPageFile = ConstexprUtils::IsFileTypeMultiPage(pSource->GetAcquireFileType());
                                 int nMultiStage = 0;
                                 if ( bIsMultiPageFile || pSource->IsMultiPageModeSaveAtEnd())
                                 {

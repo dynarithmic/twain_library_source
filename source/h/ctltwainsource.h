@@ -191,18 +191,11 @@ namespace dynarithmic
         void         SetFileSavePageCount(long pageCount) { m_FileSavePageCount = pageCount;} 
         long         GetFileSavePageCount() const { return m_FileSavePageCount; } 
 
-        static bool  IsFileTypeMultiPage(CTL_TwainFileFormatEnum FileType);
-        static CTL_TwainFileFormatEnum GetMultiPageType(CTL_TwainFileFormatEnum FileType);
-        static bool  IsFileTypeTIFF(CTL_TwainFileFormatEnum FileType);
-        static bool  IsFileTypeBigTiff(CTL_TwainFileFormatEnum FileType);
-
-        static bool  IsFileTypePostscript(CTL_TwainFileFormatEnum FileType);
-
         void         SetPendingImageNum( long nImageNum )
-                    { m_nImageNum = nImageNum; }
-        long        GetPendingImageNum() const { return m_nImageNum; }
+                     { m_nImageNum = nImageNum; }
+        long         GetPendingImageNum() const { return m_nImageNum; }
         void         SetPendingJobNum( int nJobNum )
-                    { m_nJobNum = nJobNum; }
+                     { m_nJobNum = nJobNum; }
         int          GetPendingJobNum() const { return m_nJobNum; }
         bool         IsNewJob() const;
         void         ResetJob() { m_bJobStarted = false; }
@@ -230,7 +223,6 @@ namespace dynarithmic
         bool         GetTransferDone() const { return m_bTransferDone; }
         void         SetCapCacheValue( LONG lCap, double dValue, bool bTurnOn );
         double       GetCapCacheValue( LONG lCap, LONG *pTurnOn ) const;
-        CTL_StringType PromptForFileName() const;
         bool         IsAcquireStarted() const { return m_bAcquireStarted; }
         void         SetAcquireStarted(bool bSet) { m_bAcquireStarted = bSet; }
         void         SetModal(bool bSet) { m_bDialogModal = bSet; }
@@ -643,17 +635,6 @@ namespace dynarithmic
         DuplexData m_DuplexFileData;
         bool    m_bImageInfoRetrieved;
         bool    m_bSupportedCustomCapsRetrieved;
-
-        struct FileFormatInfo
-        {
-            LPCTSTR filter;
-            unsigned int len;
-            LPCTSTR extension;
-            FileFormatInfo(LPCTSTR f=nullptr, unsigned int l=0, LPCTSTR e=nullptr) : filter(f), len(l), extension(e) {}
-        };
-
-        mutable std::unordered_map<int, FileFormatInfo> m_saveFileMap;
-        void initFileSaveMap() const;
     };
 }
 #endif

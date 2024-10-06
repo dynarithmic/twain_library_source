@@ -90,7 +90,7 @@ void CTL_ExtImageInfoTriplet::DestroyInfo()
             continue;
 
         // Remove the items
-        if (CTL_StaticData::GetTwainItemSize(pInfo->ItemType) * pInfo->NumItems > sizeof(TW_HANDLE))
+        if (ConstexprUtils::GetTwainItemSize(pInfo->ItemType) * pInfo->NumItems > sizeof(TW_HANDLE))
         {
             TW_HANDLE SubHandle = reinterpret_cast<TW_HANDLE>(pInfo->Item);
             if (pInfo->ItemType == TWTY_HANDLE)
@@ -259,7 +259,7 @@ bool CTL_ExtImageInfoTriplet::GetItemData(int nWhichItem, int nSearch, int nWhic
         Info.ReturnCode == TWRC_DATANOTAVAILABLE)
         return false;
 
-    const TW_UINT16 nSize = CTL_StaticData::GetTwainItemSize(Info.ItemType);
+    const TW_UINT16 nSize = ConstexprUtils::GetTwainItemSize(Info.ItemType);
     if (Data && (nSize * Info.NumItems > sizeof(TW_HANDLE)))
     {
         TW_HANDLE SubHandle = reinterpret_cast<TW_HANDLE>(Info.Item);
