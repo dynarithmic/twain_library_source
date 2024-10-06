@@ -42,16 +42,11 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCustomCapsEx2(DTWAIN_SOURCE Source)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Array))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    CTL_ITwainSource* pTheSource = pSource;
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
 
     // Check if Array is nullptr
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return Array == nullptr; },
                                       DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-
-    // See if Source is opened
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(pTheSource); },
-                                      DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
     auto& factory = pHandle->m_ArrayFactory;
 
@@ -64,10 +59,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
 
     if (ThisArray)
     {
-        if (pTheSource->RetrievedAllCaps())
+        if (pSource->RetrievedAllCaps())
         {
             // Check if this source has had capabilities negotiated and tested
-            const auto strProdName = pTheSource->GetProductName();
+            const auto strProdName = pSource->GetProductName();
             int nWhere;
             FindFirstValue(strProdName, &pHandle->m_aSourceCapInfo, &nWhere);
 
@@ -89,15 +84,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
         CTL_TwainCapArray rArray;
 
         // loop through all capabilities
-        CTL_TwainAppMgr::GetCapabilities(pTheSource, rArray);
+        CTL_TwainAppMgr::GetCapabilities(pSource, rArray);
 
         // copy caps to our DTWAIN array
         std::copy(rArray.begin(), rArray.end(), std::back_inserter(vCaps));
         vCaps.erase(std::remove(vCaps.begin(), vCaps.end(), 0), vCaps.end());
 
         // Cache this information and set source's flag that all caps were retrieved
-        DTWAIN_CacheCapabilityInfo(pTheSource, pHandle, &vCaps);
-        pTheSource->SetRetrievedAllCaps(true);
+        DTWAIN_CacheCapabilityInfo(pSource, pHandle, &vCaps);
+        pSource->SetRetrievedAllCaps(true);
         const bool bFound = !vCaps.empty();
         *Array = CreateArrayCopyFromFactory(pHandle, ThisArray);
         if (bFound)
@@ -228,15 +223,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCap
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAllCapsToDefault(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    auto pTheSource = pSource;
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !CTL_TwainAppMgr::IsSourceOpen(pTheSource); },
-                                      DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
-    {
-        DTWAIN_ARRAY a = nullptr;
-        DTWAINArrayPtr_RAII arr(pHandle, &a);
-        DTWAIN_EnumSupportedCaps(Source, &a);
-    }
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+    CTL_ITwainSource* pTheSource = pSource;
+    DTWAIN_ARRAY a = nullptr;
+    DTWAINArrayPtr_RAII arr(pHandle, &a);
+    DTWAIN_EnumSupportedCaps(Source, &a);
 
     const CTL_CapInfoArrayPtr pArray = GetCapInfoArray(pHandle, pSource);
 

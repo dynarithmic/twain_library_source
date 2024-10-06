@@ -59,7 +59,7 @@ std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> dynarithmic::VerifyHandles(DTW
                 throw DTWAIN_ERR_BAD_HANDLE;
             return { nullptr, nullptr };
         }
-        if ( Testing & DTWAIN_VERIFY_SOURCEHANDLE )
+        if ( (Testing & DTWAIN_VERIFY_SOURCEHANDLE) || (Testing & DTWAIN_TEST_SOURCEOPEN))
         {
             if ( !pHandle )
                 pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
@@ -79,6 +79,18 @@ std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> dynarithmic::VerifyHandles(DTW
                 if ( doThrow )
                     throw DTWAIN_ERR_BAD_SOURCE;
                 return { nullptr, nullptr };
+            }
+            if (Testing & DTWAIN_TEST_SOURCEOPEN)
+            {
+                auto sourceOpen = CTL_TwainAppMgr::IsSourceOpen(pSource);
+                if (!sourceOpen)
+                {
+                    if (setLastError)
+                        pHandle->m_lLastError = DTWAIN_ERR_SOURCE_NOT_OPEN;
+                    if (doThrow)
+                        throw DTWAIN_ERR_SOURCE_NOT_OPEN;
+                    return { nullptr, nullptr };
+                }
             }
         }
     }

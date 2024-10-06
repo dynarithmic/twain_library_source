@@ -194,7 +194,7 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
     std::unique_ptr<CTL_ImageIOHandler> pHandler;
     ImageInfo.IsPDF = false;
     ResolvePostscriptOptions(ImageInfo, nFormat);
-    ImageInfo.IsBigTiff = ConstexprUtils::IsFileTypeBigTiff(static_cast<dynarithmic::CTL_TwainFileFormatEnum>(nFormat));
+    ImageInfo.IsBigTiff = dynarithmic::IsFileTypeBigTiff(static_cast<dynarithmic::CTL_TwainFileFormatEnum>(nFormat));
     switch (nFormat )
     {
         case BmpFormat:
@@ -349,7 +349,7 @@ CTL_ImageIOHandlerPtr CTL_TwainDib::WriteFirstPageDibMulti(DTWAINImageInfoEx& Im
     CTL_ImageIOHandlerPtr pHandler;
     ImageInfo.IsPDF = false;
     ResolvePostscriptOptions(ImageInfo, nFormat);
-    ImageInfo.IsBigTiff = ConstexprUtils::IsFileTypeBigTiff(static_cast<dynarithmic::CTL_TwainFileFormatEnum>(nFormat));
+    ImageInfo.IsBigTiff = dynarithmic::IsFileTypeBigTiff(static_cast<dynarithmic::CTL_TwainFileFormatEnum>(nFormat));
     nStatus = DTWAIN_NO_ERROR;
     switch (nFormat)
     {

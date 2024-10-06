@@ -818,9 +818,9 @@ namespace dynarithmic
             return false;
         }
 
-        bool twain_source::is_uionlysupported() const
-        {
-            if (m_theSource)
+		bool twain_source::is_uionlysupported() const
+		{
+			if (m_theSource)
                 return tribool::true_(m_bUIOnlySupported) ? true : false;
             return false;
         }
@@ -861,7 +861,7 @@ namespace dynarithmic
                     return ci.is_feederloaded_supported();
                 }
             }
-            return false;
-        }
+			return false;
+		}
 	}
 }

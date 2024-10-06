@@ -625,7 +625,7 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
         nCurImage = 0;
 
     if ( GetCurrentJobControl() != TWJC_NONE &&
-        ConstexprUtils::IsFileTypeMultiPage(GetAcquireFileType()) &&
+        dynarithmic::IsFileTypeMultiPage(GetAcquireFileType()) &&
         IsJobFileHandlingOn())
     {
         // Get the next job number if multipage and job control
@@ -1179,7 +1179,7 @@ void CTL_ITwainSource::ProcessMultipageFile()
 
 bool isIntCap(DTWAIN_SOURCE Source, LONG nCap)
 {
-    return ConstexprUtils::IsTwainIntegralType(static_cast<TW_UINT16>(DTWAIN_GetCapDataType(Source, nCap)));
+    return dynarithmic::IsTwainIntegralType(static_cast<TW_UINT16>(DTWAIN_GetCapDataType(Source, nCap)));
 }
 
 template <typename T>
@@ -1214,10 +1214,10 @@ DTWAIN_ARRAY CTL_ITwainSource::getCapCachedValues(TW_UINT16 lCap, LONG getType)
     if (iter == mapToUse->end() )
         return nullptr;
     const container_values& cValues = (*iter).second;
-    if (ConstexprUtils::IsTwainIntegralType(static_cast<TW_UINT16>(cValues.m_dataType)))
+    if (dynarithmic::IsTwainIntegralType(static_cast<TW_UINT16>(cValues.m_dataType)))
         return PopulateArray<CTL_ArrayFactory::tagged_array_long>(cValues.m_data, this, lCap);
     else
-    if ( ConstexprUtils::IsTwainFix32Type(static_cast<TW_UINT16>(cValues.m_dataType)))
+    if ( dynarithmic::IsTwainFix32Type(static_cast<TW_UINT16>(cValues.m_dataType)))
         return PopulateArray<CTL_ArrayFactory::tagged_array_double>(cValues.m_data, this, lCap);
     return nullptr;
 }
@@ -1233,7 +1233,7 @@ bool CTL_ITwainSource::setCapCachedValues(DTWAIN_ARRAY array, TW_UINT16 lCap, LO
         return true;
     container_values cValues;
     cValues.m_dataType = dynarithmic::GetCapDataType(this, lCap);
-    if (ConstexprUtils::IsTwainIntegralType(static_cast<TW_UINT16>(cValues.m_dataType)))
+    if (dynarithmic::IsTwainIntegralType(static_cast<TW_UINT16>(cValues.m_dataType)))
     {
         const bool retVal = PopulateCache<CTL_ArrayFactory::tagged_array_long>(m_pDLLHandle, array, cValues.m_data);
         if (retVal)

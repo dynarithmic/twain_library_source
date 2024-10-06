@@ -172,16 +172,16 @@ int ImageXferFileWriter::CopyDibToFileEx(CTL_TwainDibPtr pCurDib,
     // Now check for Postscript file types.  We alias these
     // types as TIFF format
     const CTL_TwainFileFormatEnum FileType = m_pSource->GetAcquireFileType();
-    if ( ConstexprUtils::IsFileTypePostscript( FileType ) )
+    if ( dynarithmic::IsFileTypePostscript( FileType ) )
     {
         ImageInfo.IsPostscript = true;
         ImageInfo.IsPostscriptMultipage =
-            ConstexprUtils::IsFileTypeMultiPage( FileType );
+            dynarithmic::IsFileTypeMultiPage( FileType );
         ImageInfo.PostscriptType = static_cast<LONG>(FileType);
     }
 
     if ( MultipageOption == 0 || (m_pSource->IsMultiPageModeSaveAtEnd()
-        && !ConstexprUtils::IsFileTypeMultiPage( FileType ))
+        && !dynarithmic::IsFileTypeMultiPage( FileType ))
     )
     {
         const int retval = pCurDib->WriteDibBitmap(ImageInfo, strTempFile.c_str(), m_pSource->GetAcquireFileType());
@@ -673,7 +673,7 @@ LONG ImageXferFileWriter::CloseMultiPageDibFile(bool bSaveFile/*=true*/) const
 {
     if( m_pSource->GetAcquireType() == TWAINAcquireType_FileUsingNative )
     {
-        const bool bTrueMultiPage = ConstexprUtils::IsFileTypeMultiPage(m_pSource->GetAcquireFileType());
+        const bool bTrueMultiPage = dynarithmic::IsFileTypeMultiPage(m_pSource->GetAcquireFileType());
         const bool bIsMultiPageFile = bTrueMultiPage || m_pSource->IsMultiPageModeSaveAtEnd();
         if ( bIsMultiPageFile )
         {
@@ -734,7 +734,7 @@ LONG ImageXferFileWriter::CloseMultiPageDibFile(bool bSaveFile/*=true*/) const
 void ImageXferFileWriter::EndProcessingImageFile(bool bSaveFile/*=true*/) const
 {
     if ( m_pSource->IsMultiPageModeSaveAtEnd() &&
-         !ConstexprUtils::IsFileTypeMultiPage( m_pSource->GetAcquireFileType() ))
+         !dynarithmic::IsFileTypeMultiPage( m_pSource->GetAcquireFileType() ))
     {
         m_pSource->ProcessMultipageFile();
     }

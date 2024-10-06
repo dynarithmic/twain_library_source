@@ -18,7 +18,14 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-struct ConstexprUtils
+#ifndef CTLCONSTEXPRUTILS_H
+#define CTLCONSTEXPRUTILS_H
+
+#include "ctlconstexprfind.h"
+#include "twain.h"
+#include "ctlenum.h"
+
+namespace dynarithmic
 {
     static constexpr bool IsTwainStringType(TW_UINT16 nItemType)
     {
@@ -132,28 +139,6 @@ struct ConstexprUtils
             FileType == DTWAIN_FF_TIFFMULTI;
     }
 
-    template <typename Arr, typename Val>
-    static constexpr bool generic_array_finder(const Arr& theArray, const Val& value)
-    {
-        for (auto iter = theArray.begin(); iter != theArray.end(); ++iter)
-        {
-            if (*iter == value)
-                return true;
-        }
-        return false;
-    }
-
-    template <typename Arr, typename Fn>
-    static constexpr std::pair<bool, unsigned> generic_array_finder_if(const Arr& theArray, Fn fn)
-    {
-        for (auto iter = theArray.begin(); iter != theArray.end(); ++iter)
-        {
-            if (fn(*iter))
-                return { true, static_cast<unsigned>(std::distance(theArray.begin(), iter)) };
-        }
-        return { false,0 };
-    }
-
     static constexpr bool IsFileTypeTIFF(CTL_TwainFileFormatEnum FileType)
     {
         constexpr std::array<CTL_TwainFileFormatEnum,29> setInfo = {
@@ -186,7 +171,7 @@ struct ConstexprUtils
                                 TWAINFileFormat_BIGTIFFGROUP4MULTI,
                                 TWAINFileFormat_BIGTIFFJPEG,
                                 TWAINFileFormat_BIGTIFFJPEGMULTI };
-        return generic_array_finder(setInfo, FileType);
+        return generic_array_finder(setInfo, FileType).first;
     }
 
     static constexpr bool IsFileTypeBigTiff(CTL_TwainFileFormatEnum FileType)
@@ -206,7 +191,7 @@ struct ConstexprUtils
                                 TWAINFileFormat_BIGTIFFGROUP4MULTI,
                                 TWAINFileFormat_BIGTIFFJPEG,
                                 TWAINFileFormat_BIGTIFFJPEGMULTI };
-        return generic_array_finder(setInfo, FileType);
+        return generic_array_finder(setInfo, FileType).first;
     }
 
     static constexpr bool IsFileTypePostscript(CTL_TwainFileFormatEnum FileType)
@@ -273,9 +258,10 @@ struct ConstexprUtils
 
     static constexpr bool IsSupportedFileFormat(int nFileFormat)
     {
-        auto iArray = ConstexprUtils::EnumTwainFileFormats();
+        auto iArray = EnumTwainFileFormats();
         if (iArray.empty())
             return nFileFormat != TWFF_BMP ? false : true;
-        return generic_array_finder(iArray, nFileFormat);
+        return generic_array_finder(iArray, nFileFormat).first;
     }
 };
+#endif

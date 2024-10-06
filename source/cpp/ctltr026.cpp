@@ -340,7 +340,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     ResampleAcquiredDib();
 
                     // Check if multi page file is being used
-                    bool bIsMultiPageFile = ConstexprUtils::IsFileTypeMultiPage(pSource->GetAcquireFileType());
+                    bool bIsMultiPageFile = dynarithmic::IsFileTypeMultiPage(pSource->GetAcquireFileType());
 
                     // Query if the page should be thrown away
                     bKeepPage = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_QUERYPAGEDISCARD, reinterpret_cast<LPARAM>(pSource))?true:false;
@@ -640,7 +640,7 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
     bool bUserCancelled = false;
     bool bJobControlContinue = false;
     bool bEndOfJobDetected = false;
-    bool bProcessSinglePage = (!ConstexprUtils::IsFileTypeMultiPage(pSource->GetAcquireFileType()) &&
+    bool bProcessSinglePage = (!dynarithmic::IsFileTypeMultiPage(pSource->GetAcquireFileType()) &&
                                errFile == 0);
     switch( rc )
     {
@@ -743,13 +743,13 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
                         if ( pSource->GetPendingImageNum() + 1 - pSource->GetBlankPageCount() > 0)
                         {
                             if ( pSource->IsMultiPageModeSaveAtEnd() &&
-                                 !ConstexprUtils::IsFileTypeMultiPage( pSource->GetAcquireFileType() ))
+                                 !dynarithmic::IsFileTypeMultiPage( pSource->GetAcquireFileType() ))
                             {
                                 pSource->ProcessMultipageFile();
                             }
                             else
                             if ( (!pSource->IsMultiPageModeContinuous()) ||
-                                 (pSource->IsMultiPageModeContinuous() && !ConstexprUtils::IsFileTypeMultiPage(pSource->GetAcquireFileType())))
+                                 (pSource->IsMultiPageModeContinuous() && !dynarithmic::IsFileTypeMultiPage(pSource->GetAcquireFileType())))
                             {
                                 if ( !pSource->GetTransferDone())
                                 {
@@ -814,7 +814,7 @@ void CTL_ImageXferTriplet::SaveJobPages(const ImageXferFileWriter& FileWriter)
     if ( m_nTotalPagesSaved > 0)
     {
         if ( pSource->IsMultiPageModeSaveAtEnd() &&
-             !ConstexprUtils::IsFileTypeMultiPage( pSource->GetAcquireFileType() ))
+             !dynarithmic::IsFileTypeMultiPage( pSource->GetAcquireFileType() ))
         {
             pSource->ProcessMultipageFile();
         }
@@ -962,7 +962,7 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
     const ImageXferFileWriter FileWriter(this, pSession, pSource);
 
     // Check if multi page file is being used
-    const bool bIsMultiPageFile = ConstexprUtils::IsFileTypeMultiPage(pSource->GetAcquireFileType());
+    const bool bIsMultiPageFile = dynarithmic::IsFileTypeMultiPage(pSource->GetAcquireFileType());
     int nMultiStage = 0;
     if ( bIsMultiPageFile )
     {
@@ -1040,11 +1040,11 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
             // Now check for Postscript file types.  We alias these
             // types as TIFF format
             const CTL_TwainFileFormatEnum FileType = pSource->GetAcquireFileType();
-            if ( ConstexprUtils::IsFileTypePostscript( FileType ) )
+            if ( dynarithmic::IsFileTypePostscript( FileType ) )
             {
                 ImageInfo.IsPostscript = true;
                 ImageInfo.IsPostscriptMultipage =
-                    ConstexprUtils::IsFileTypeMultiPage( FileType );
+                    dynarithmic::IsFileTypeMultiPage( FileType );
                 ImageInfo.PostscriptType = static_cast<LONG>(FileType);
             }
 
