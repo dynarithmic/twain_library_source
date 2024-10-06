@@ -1556,16 +1556,6 @@ bool CTL_TwainAppMgr::IsMemFileTransferSupported(const CTL_ITwainSource *pSource
     return (std::find(iArray.begin(), iArray.end(), TWSX_MEMFILE) != iArray.end());
 }
 
-bool CTL_TwainAppMgr::IsSupportedFileFormat( const CTL_ITwainSource* pSource, int nFileFormat )
-{
-    CTL_IntArray iArray;
-    EnumTwainFileFormats( pSource, iArray );
-    if ( iArray.empty() )
-        return nFileFormat != TWFF_BMP?false:true;
-
-    return std::find(iArray.begin(), iArray.end(), nFileFormat) != iArray.end()?true:false;
-}
-
 HINSTANCE CTL_TwainAppMgr::GetAppInstance()
 {
     if ( s_pGlobalAppMgr )
@@ -1952,26 +1942,6 @@ CTL_IntArray CTL_TwainAppMgr::EnumTransferMechanisms( const CTL_ITwainSource *pS
 ////////////////////// Pixel and Bit Depth settings /////////////////
 void CTL_TwainAppMgr::SetPixelAndBitDepth(const CTL_ITwainSource * /*pSource*/)
 {}
-
-
-/////////////// Supported formats for File transfers ////////////////
-void CTL_TwainAppMgr::EnumTwainFileFormats( const CTL_ITwainSource * /*pSource*/, CTL_IntArray & rArray )
-{
-    static const CTL_IntArray ca = {
-        TWAINFileFormat_BMP, TWAINFileFormat_BMPRLE, TWAINFileFormat_PCX, TWAINFileFormat_DCX, TWAINFileFormat_TIFFLZW,
-        TWAINFileFormat_PDF, TWAINFileFormat_PDFMULTI, TWAINFileFormat_TIFFNONE, TWAINFileFormat_TIFFGROUP3,TWAINFileFormat_TIFFGROUP4,
-        TWAINFileFormat_TIFFPACKBITS, TWAINFileFormat_TIFFDEFLATE, TWAINFileFormat_TIFFJPEG, TWAINFileFormat_TIFFNONEMULTI,
-        TWAINFileFormat_TIFFGROUP3MULTI, TWAINFileFormat_TIFFGROUP4MULTI, TWAINFileFormat_TIFFPACKBITSMULTI,TWAINFileFormat_TIFFDEFLATEMULTI,TWAINFileFormat_TIFFJPEGMULTI,
-        TWAINFileFormat_TIFFLZWMULTI ,TWAINFileFormat_WMF,TWAINFileFormat_EMF,TWAINFileFormat_PSD,TWAINFileFormat_JPEG,TWAINFileFormat_TGA,
-        TWAINFileFormat_JPEG2000,TWAINFileFormat_POSTSCRIPT1,TWAINFileFormat_POSTSCRIPT1MULTI,TWAINFileFormat_POSTSCRIPT2,TWAINFileFormat_POSTSCRIPT2MULTI,
-        TWAINFileFormat_POSTSCRIPT3,TWAINFileFormat_POSTSCRIPT3MULTI,TWAINFileFormat_GIF,TWAINFileFormat_PNG,TWAINFileFormat_TEXT,
-        TWAINFileFormat_TEXTMULTI,TWAINFileFormat_ICO,TWAINFileFormat_ICO_VISTA, TwainFileFormat_ICO_RESIZED, TwainFileFormat_WBMP_RESIZED,
-        TWAINFileFormat_WBMP, TWAINFileFormat_WEBP, TWAINFileFormat_PBM, TWAINFileFormat_TGARLE, TWAINFileFormat_BIGTIFFLZW, TWAINFileFormat_BIGTIFFLZWMULTI,
-        TWAINFileFormat_BIGTIFFNONE, TWAINFileFormat_BIGTIFFNONEMULTI, TWAINFileFormat_BIGTIFFPACKBITS, TWAINFileFormat_BIGTIFFPACKBITSMULTI, 
-        TWAINFileFormat_BIGTIFFDEFLATE, TWAINFileFormat_BIGTIFFDEFLATEMULTI, TWAINFileFormat_BIGTIFFGROUP3, TWAINFileFormat_BIGTIFFGROUP3MULTI,
-        TWAINFileFormat_BIGTIFFGROUP4, TWAINFileFormat_BIGTIFFGROUP4MULTI, TWAINFileFormat_BIGTIFFJPEG, TWAINFileFormat_BIGTIFFJPEGMULTI };
-      rArray = ca;
-}
 
 struct FindTriplet
 {

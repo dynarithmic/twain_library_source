@@ -26,6 +26,7 @@
 #include "ctliface.h"
 #include "ctltr026.h"
 #include "ctltwainmanager.h"
+#include "ctlfilesave.h"
 
 #define DTWAIN_PAGEMISSINGSTR _T("<missing_page>")
 
@@ -65,8 +66,16 @@ int ImageXferFileWriter::CopyDibToFile(CTL_TwainDibPtr pCurDib,
         // or if this is the first page of a multi-page scan
         if ( MultipageOption == 0 || MultipageOption == DIB_MULTI_FIRST)
         {
-            if ( lFlags & DTWAIN_USEPROMPT )
-                strTempFile = m_pSource->PromptForFileName();
+            if (lFlags & DTWAIN_USEPROMPT)
+            {
+                strTempFile = PromptForFileName(m_pSource->GetDTWAINHandle(), m_pSource->GetAcquireFileType());
+                if (strTempFile.empty())
+                {
+                    // send out notification that the file save dialog was canceled
+                    CTL_TwainAppMgr::SendTwainMsgToWindow(m_pSource->GetTwainSession(), nullptr, DTWAIN_TN_FILESAVECANCELED, reinterpret_cast<LPARAM>(m_pSource));
+                    return 0;
+                }
+            }
             else
                 strTempFile = m_pSource->GetCurrentImageFileName();
 
@@ -163,16 +172,16 @@ int ImageXferFileWriter::CopyDibToFileEx(CTL_TwainDibPtr pCurDib,
     // Now check for Postscript file types.  We alias these
     // types as TIFF format
     const CTL_TwainFileFormatEnum FileType = m_pSource->GetAcquireFileType();
-    if ( CTL_ITwainSource::IsFileTypePostscript( FileType ) )
+    if ( ConstexprUtils::IsFileTypePostscript( FileType ) )
     {
         ImageInfo.IsPostscript = true;
         ImageInfo.IsPostscriptMultipage =
-            CTL_ITwainSource::IsFileTypeMultiPage( FileType );
+            ConstexprUtils::IsFileTypeMultiPage( FileType );
         ImageInfo.PostscriptType = static_cast<LONG>(FileType);
     }
 
     if ( MultipageOption == 0 || (m_pSource->IsMultiPageModeSaveAtEnd()
-        && !CTL_ITwainSource::IsFileTypeMultiPage( FileType ))
+        && !ConstexprUtils::IsFileTypeMultiPage( FileType ))
     )
     {
         const int retval = pCurDib->WriteDibBitmap(ImageInfo, strTempFile.c_str(), m_pSource->GetAcquireFileType());
@@ -664,7 +673,7 @@ LONG ImageXferFileWriter::CloseMultiPageDibFile(bool bSaveFile/*=true*/) const
 {
     if( m_pSource->GetAcquireType() == TWAINAcquireType_FileUsingNative )
     {
-        const bool bTrueMultiPage = CTL_ITwainSource::IsFileTypeMultiPage(m_pSource->GetAcquireFileType());
+        const bool bTrueMultiPage = ConstexprUtils::IsFileTypeMultiPage(m_pSource->GetAcquireFileType());
         const bool bIsMultiPageFile = bTrueMultiPage || m_pSource->IsMultiPageModeSaveAtEnd();
         if ( bIsMultiPageFile )
         {
@@ -725,7 +734,7 @@ LONG ImageXferFileWriter::CloseMultiPageDibFile(bool bSaveFile/*=true*/) const
 void ImageXferFileWriter::EndProcessingImageFile(bool bSaveFile/*=true*/) const
 {
     if ( m_pSource->IsMultiPageModeSaveAtEnd() &&
-         !CTL_ITwainSource::IsFileTypeMultiPage( m_pSource->GetAcquireFileType() ))
+         !ConstexprUtils::IsFileTypeMultiPage( m_pSource->GetAcquireFileType() ))
     {
         m_pSource->ProcessMultipageFile();
     }

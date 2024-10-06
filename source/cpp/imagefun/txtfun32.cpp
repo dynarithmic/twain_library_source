@@ -121,7 +121,7 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
         if ( m_InputFormat == DTWAIN_BMP)
             m_pTextPageInfo->m_pOrigHandler.reset(new CTL_BmpIOHandler(m_pDib, m_ImageInfoEx));
         else
-        if ( CTL_ITwainSource::IsFileTypeTIFF(static_cast<CTL_TwainFileFormatEnum>(m_InputFormat)))
+        if ( ConstexprUtils::IsFileTypeTIFF(static_cast<CTL_TwainFileFormatEnum>(m_InputFormat)))
         {
             m_ImageInfoEx.IsOCRTempImage = true;
             m_pTextPageInfo->m_pOrigHandler.reset(new CTL_TiffIOHandler(m_pDib, m_InputFormat, m_ImageInfoEx));

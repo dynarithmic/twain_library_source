@@ -32,31 +32,6 @@
 #include "errorcheck.h"
 #include "ctlutils.h"
 using namespace dynarithmic;
-bool dynarithmic::IsIntCapType(TW_UINT16 nCap)
-{
-    return  nCap == TWTY_INT16 ||
-        nCap == TWTY_INT32 ||
-        nCap == TWTY_BOOL ||
-        nCap == TWTY_INT8 ||
-        nCap == TWTY_UINT8 ||
-        nCap == TWTY_UINT16 ||
-        nCap == TWTY_UINT32;
-}
-
-bool dynarithmic::IsFloatCapType(TW_UINT16 nCap)
-{ return nCap == TWTY_FIX32; }
-
-bool dynarithmic::IsStringCapType(TW_UINT16 nCap)
-{
-    return nCap == TWTY_STR32 ||
-        nCap == TWTY_STR64 ||
-        nCap == TWTY_STR128 ||
-        nCap == TWTY_STR255 ||
-        nCap == TWTY_STR1024;
-}
-
-bool dynarithmic::IsFrameCapType(TW_UINT16 nCap)
-{ return nCap == TWTY_FRAME; }
 
 LONG dynarithmic::GetArrayTypeFromCapType(TW_UINT16 CapType)
 {
@@ -398,14 +373,14 @@ DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap
         ThisArray = PerformGetCap<std::string>(pHandle, Source, lCap, nDataType, lContainerType, GetTwainGetType(lGetType), overrideDataType, CTL_ArrayStringType);
     else
     {
-        if (IsIntCapType(static_cast<TW_UINT16>(nDataType)))
+        if (ConstexprUtils::IsTwainIntegralType(static_cast<TW_UINT16>(nDataType)))
         {
             ThisArray = PerformGetCap<LONG>(pHandle, Source, lCap, nDataType, lContainerType, lGetType, overrideDataType, CTL_ArrayIntType);
             if ( !ThisArray )
                 LOG_FUNC_EXIT_NONAME_PARAMS(false)
         }
         else
-        if (IsFloatCapType(static_cast<TW_UINT16>(nDataType)))
+        if (ConstexprUtils::IsTwainFix32Type(static_cast<TW_UINT16>(nDataType)))
         {
             ThisArray = PerformGetCap<double>(
                 pHandle, Source, lCap, nDataType, lContainerType, lGetType, overrideDataType,
@@ -414,7 +389,7 @@ DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap
                 LOG_FUNC_EXIT_NONAME_PARAMS(false)
         }
         else
-        if ( IsStringCapType(static_cast<TW_UINT16>(nDataType)))
+        if (ConstexprUtils::IsTwainStringType(static_cast<TW_UINT16>(nDataType)))
         {
             ThisArray = PerformGetCap<std::string/*, NullGetCapConverter*/>
                         (pHandle, Source, lCap, nDataType, lContainerType, lGetType, overrideDataType, CTL_ArrayANSIStringType);
@@ -422,7 +397,7 @@ DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap
                 LOG_FUNC_EXIT_NONAME_PARAMS(false)
         }
         else
-        if ( IsFrameCapType(static_cast<TW_UINT16>(nDataType)))
+        if (ConstexprUtils::IsTwainFrameType(static_cast<TW_UINT16>(nDataType)))
         {
             ThisArray = PerformGetCap<TW_FRAME, TwainFrameInternal, FrameGetCapConverter>
                 (pHandle, Source, lCap, nDataType, lContainerType, lGetType, overrideDataType, CTL_ArrayDTWAINFrameType);
@@ -534,17 +509,17 @@ static DTWAIN_BOOL SetCapValuesEx2_Internal( DTWAIN_SOURCE Source, LONG lCap, LO
     auto allContainers = dynarithmic::getSetBitsAsVector(lContainerType);
     for (auto& containerType : allContainers)
     {
-        if (IsIntCapType(static_cast<TW_UINT16>(nDataType)))
+        if (ConstexprUtils::IsTwainIntegralType(static_cast<TW_UINT16>(nDataType)))
             bOk = performSetCap<LONG, TW_UINT32>(pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::LongType, CTL_ArrayIntType, nDataType);
         else
-        if (IsFloatCapType(static_cast<TW_UINT16>(nDataType)))
+        if (ConstexprUtils::IsTwainFix32Type(static_cast<TW_UINT16>(nDataType)))
             bOk = performSetCap<double, double>(pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::DoubleType, CTL_ArrayDoubleType, nDataType);
         else
-        if ( IsStringCapType(static_cast<TW_UINT16>(nDataType)))
+        if (ConstexprUtils::IsTwainStringType(static_cast<TW_UINT16>(nDataType)))
             bOk = performSetCap<std::string, std::string, std::string, StringSetCapConverterA>
                             (pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::StringType, CTL_ArrayStringType, nDataType);
         else
-        if ( IsFrameCapType(static_cast<TW_UINT16>(nDataType)))
+        if (ConstexprUtils::IsTwainFrameType(static_cast<TW_UINT16>(nDataType)))
         {
             bOk = performSetCap<TW_FRAME, TW_FRAME, TwainFrameInternal, FrameSetCapConverter>
             (pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::FrameType, CTL_ArrayTWFrameType, nDataType);

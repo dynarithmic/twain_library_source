@@ -54,7 +54,7 @@ bool CTL_CapabilityGetEnumTriplet::EnumCapValues( void *pCapData )
     TW_UINT16 nItemType = GetEffectiveItemType(pValEnum->ItemType);
 
     // Get sizeof each item in enumeration
-    const int nItemSize = CTL_StaticData::GetTwainItemSize( nItemType );
+    const int nItemSize = ConstexprUtils::GetTwainItemSize( nItemType );
 
     // Unknown item type.  Do error condition here??
     if ( nItemSize == 0 )

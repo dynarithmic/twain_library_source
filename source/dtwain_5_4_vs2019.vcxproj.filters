@@ -664,6 +664,9 @@
     <ClCompile Include="cpp\ctlwindowproc.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
+    <ClCompile Include="cpp\ctlfilesave.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp\pdflib32\a85encode.h">
@@ -1065,6 +1068,9 @@
     <ClInclude Include="h\ctltwainmanager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="h\ctlfilesave.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".\h\versioninfo.ipp">
@@ -1147,6 +1153,9 @@
     </None>
     <None Include="rc\twainresourcestrings_english.rc2">
       <Filter>RC Files</Filter>
+    </None>
+    <None Include="inl\ctlconstexprutils.inl">
+      <Filter>Header Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

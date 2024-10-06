@@ -1230,6 +1230,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include="cpp\ctlerrorbuffer.cpp" />
     <ClCompile Include="cpp\ctlerrorcallback.cpp" />
     <ClCompile Include="cpp\ctlfileappend.cpp" />
+    <ClCompile Include="cpp\ctlfilesave.cpp" />
     <ClCompile Include="cpp\ctlfileutils.cpp" />
     <ClCompile Include="cpp\ctlgetmetrics.cpp" />
     <ClCompile Include="cpp\ctlloadresources.cpp" />
@@ -1475,6 +1476,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\ctlccerr.h" />
     <ClInclude Include="h\ctldefsource.h" />
     <ClInclude Include="h\ctldib32.h" />
+    <ClInclude Include="h\ctlfilesave.h" />
     <ClInclude Include="h\ctlfileutils.h" />
     <ClInclude Include="h\ctlres.h" />
     <ClInclude Include="h\ctlsupport.h" />
@@ -1556,6 +1558,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <CustomBuildStep Include=".\cdtwain\cdtwain_internal\capstr.inl">
       <FileType>Document</FileType>
     </CustomBuildStep>
+    <None Include="inl\ctlconstexprutils.inl" />
     <None Include="inl\linuxget_twain.inl" />
     <None Include="inl\linuxinit_impl.inl" />
     <None Include="inl\linuxlibraryloader_impl.inl" />

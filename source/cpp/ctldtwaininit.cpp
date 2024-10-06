@@ -1018,7 +1018,6 @@ void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL, 
     CTL_StaticData::s_bThrowExceptions = nVal == 0 ? false : true;
 }
 
-
 void LoadStaticData(CTL_TwainDLLHandle* pHandle)
 {
     if ( pHandle->m_mapDTWAINArrayToTwainType.empty() )

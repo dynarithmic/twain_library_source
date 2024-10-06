@@ -99,42 +99,42 @@ bool CTL_ITwainSource::IsSourceCompliant(CTL_EnumTwainVersion TVersion, CTL_Twai
         int nValue = 0;
         const int nMask = CTL_TwainAppMgr::GetCapMaskFromCap(Cap);
 
-        if ( CTL_TwainAppMgr::IsCapMaskOn( Cap, static_cast<CTL_EnumGetType>(CTL_CapMaskGET) ) )
+        if (CTL_TwainAppMgr::IsCapMaskOn(Cap, static_cast<CTL_EnumGetType>(CTL_CapMaskGET)))
         {
-            bIsCompliant = CTL_TwainAppMgr::IsCapabilitySupported( this, Cap, CTL_GetTypeGET );
-            if ( bIsCompliant )
+            bIsCompliant = CTL_TwainAppMgr::IsCapabilitySupported(this, Cap, CTL_GetTypeGET);
+            if (bIsCompliant)
                 nValue |= CTL_CapMaskGET;
         }
 
-        if ( CTL_TwainAppMgr::IsCapMaskOn( Cap, static_cast<CTL_EnumGetType>(CTL_CapMaskGETCURRENT) ) )
+        if (CTL_TwainAppMgr::IsCapMaskOn(Cap, static_cast<CTL_EnumGetType>(CTL_CapMaskGETCURRENT)))
         {
-            bIsCompliant = CTL_TwainAppMgr::IsCapabilitySupported( this, Cap, CTL_GetTypeGETCURRENT );
-            if ( bIsCompliant )
+            bIsCompliant = CTL_TwainAppMgr::IsCapabilitySupported(this, Cap, CTL_GetTypeGETCURRENT);
+            if (bIsCompliant)
                 nValue |= CTL_CapMaskGETCURRENT;
         }
 
-        if ( CTL_TwainAppMgr::IsCapMaskOn( Cap, static_cast<CTL_EnumGetType>(CTL_CapMaskGETDEFAULT) ) )
+        if (CTL_TwainAppMgr::IsCapMaskOn(Cap, static_cast<CTL_EnumGetType>(CTL_CapMaskGETDEFAULT)))
         {
-            bIsCompliant = CTL_TwainAppMgr::IsCapabilitySupported( this, Cap, CTL_GetTypeGETDEFAULT );
-            if ( bIsCompliant )
+            bIsCompliant = CTL_TwainAppMgr::IsCapabilitySupported(this, Cap, CTL_GetTypeGETDEFAULT);
+            if (bIsCompliant)
                 nValue |= CTL_CapMaskGETDEFAULT;
         }
 
-        if ( CTL_TwainAppMgr::IsCapMaskOn( Cap, static_cast<CTL_EnumSetType>(CTL_CapMaskSET) ) )
+        if (CTL_TwainAppMgr::IsCapMaskOn(Cap, static_cast<CTL_EnumSetType>(CTL_CapMaskSET)))
         {
             nValue |= CTL_CapMaskSET;
         }
 
-        if ( CTL_TwainAppMgr::IsCapMaskOn( Cap, static_cast<CTL_EnumSetType>(CTL_CapMaskRESET) ) )
+        if (CTL_TwainAppMgr::IsCapMaskOn(Cap, static_cast<CTL_EnumSetType>(CTL_CapMaskRESET)))
         {
             nValue |= CTL_CapMaskRESET;
         }
 
-        if ( nValue != nMask )
-            rArray.push_back( Cap );
+        if (nValue != nMask)
+            rArray.push_back(Cap);
     }
 
-    if ( !rArray.empty() )
+    if (!rArray.empty())
         return false;
     return true;
 }
@@ -145,7 +145,7 @@ bool CTL_ITwainSource::IsActive() const
     return m_bActive;
 }
 
-CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProduct, CTL_TwainDLLHandle *pHandle)
+CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProduct, CTL_TwainDLLHandle* pHandle)
     :
     m_pUserPtr(nullptr),
     CapCacheInfo(),
@@ -173,7 +173,7 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_nAcquireCount(-1),
     m_lAcquireNum(-1L),
     m_pFileEnumerator(nullptr),
-    m_bTransferDone ( false ),
+    m_bTransferDone(false),
     m_bAcquireStarted(false),
     m_bDialogModal(true),
     m_bOpenAfterAcquire(false),
@@ -191,48 +191,48 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_bCapCached(false),
     m_bRetrievedAllCaps(false),
     m_bFastCapRetrieval(true),
-    m_nJpegQuality ( 0 ),
-    m_bJpegProgressive ( false ),
+    m_nJpegQuality(0),
+    m_bJpegProgressive(false),
     m_bAutoFeed(true),
-    m_nJobControl ( TWJC_NONE ),
-    m_nFailAction ( DTWAIN_PAGEFAIL_RETRY ),
-    m_nMaxRetryAttempts ( DTWAIN_MAXRETRY_ATTEMPTS ),
-    m_nCurRetryCount ( 0 ),
+    m_nJobControl(TWJC_NONE),
+    m_nFailAction(DTWAIN_PAGEFAIL_RETRY),
+    m_nMaxRetryAttempts(DTWAIN_MAXRETRY_ATTEMPTS),
+    m_nCurRetryCount(0),
     m_pImageHandler(nullptr),
     m_hAcquireStrip(nullptr),
-    m_bUserStripUsed ( false ),
-    m_nUserStripSize ( 0 ),
-    m_bImagesStored ( false ),
-    m_bAutoIncrementFile ( false ),
-    m_nCurFileNum ( 0 ),
-    m_nFileNameBaseNum ( DTWAIN_INCREMENT_DEFAULT ),
-    m_nFileIncrement ( 1 ),
-    m_nFileDigits ( 0 ),
-    m_nAutoIncrementFlags ( DTWAIN_INCREMENT_DYNAMIC ),
-    m_nStartFileNum ( 0 ),
-    m_bManualDuplexModeOn ( false ),
-    m_nManualDuplexModeFlags ( DTWAIN_MANDUP_FACEDOWNBOTTOMPAGE ),
-    m_nMultiPageScanMode ( DTWAIN_FILESAVE_DEFAULT ),
-    m_nCurrentSideAcquired ( 0 ),
+    m_bUserStripUsed(false),
+    m_nUserStripSize(0),
+    m_bImagesStored(false),
+    m_bAutoIncrementFile(false),
+    m_nCurFileNum(0),
+    m_nFileNameBaseNum(DTWAIN_INCREMENT_DEFAULT),
+    m_nFileIncrement(1),
+    m_nFileDigits(0),
+    m_nAutoIncrementFlags(DTWAIN_INCREMENT_DYNAMIC),
+    m_nStartFileNum(0),
+    m_bManualDuplexModeOn(false),
+    m_nManualDuplexModeFlags(DTWAIN_MANDUP_FACEDOWNBOTTOMPAGE),
+    m_nMultiPageScanMode(DTWAIN_FILESAVE_DEFAULT),
+    m_nCurrentSideAcquired(0),
     m_bDuplexSideDone{ false,false },
-    m_EOJDetectedValue ( 1 ),
-    m_bIsFileSaveIncomplete ( false ),
-    m_nJobNum ( 0 ),
-    m_bJobStarted ( false ),
-    m_bJobFileHandling ( false ),
-    m_bImageLayoutValid ( false ),
-    m_bIsBlankPageDetectionOn ( false ),
+    m_EOJDetectedValue(1),
+    m_bIsFileSaveIncomplete(false),
+    m_nJobNum(0),
+    m_bJobStarted(false),
+    m_bJobFileHandling(false),
+    m_bImageLayoutValid(false),
+    m_bIsBlankPageDetectionOn(false),
     m_bIsBlankPageDetectionNoSampleOn(false),
     m_bIsBlankPageDetectionSampleOn(false),
-    m_lBlankPageAutoDetect ( DTWAIN_BP_AUTODISCARD_NONE ),
-    m_dBlankPageThreshold ( 0.99 ),
-    m_nBlankPageCount ( 0 ),
-    m_bForceScanOnNoUI ( false ),
-    m_bImageNegative ( false ),
-    m_bProcessingPixelInfo ( false ),
-    m_bSkipImageInfoErrors ( false ),
-    m_nForcedBpp ( 0 ),
-    m_ImageInfo (),
+    m_lBlankPageAutoDetect(DTWAIN_BP_AUTODISCARD_NONE),
+    m_dBlankPageThreshold(0.99),
+    m_nBlankPageCount(0),
+    m_bForceScanOnNoUI(false),
+    m_bImageNegative(false),
+    m_bProcessingPixelInfo(false),
+    m_bSkipImageInfoErrors(false),
+    m_nForcedBpp(0),
+    m_ImageInfo(),
     m_FileSystem(),
     m_pImageMemXfer(nullptr),
     m_PersistentArray(nullptr),
@@ -246,8 +246,8 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_bTileMode(false),
     m_FileSavePageCount(0),
     m_BufferedXFerInfo{}
- {
-    if ( lpszProduct )
+{
+    if (lpszProduct)
         m_SourceId.set_product_name(StringConversion::Convert_NativePtr_To_Ansi(lpszProduct));
 
     // Image information default values
@@ -625,7 +625,7 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
         nCurImage = 0;
 
     if ( GetCurrentJobControl() != TWJC_NONE &&
-        IsFileTypeMultiPage(GetAcquireFileType()) &&
+        ConstexprUtils::IsFileTypeMultiPage(GetAcquireFileType()) &&
         IsJobFileHandlingOn())
     {
         // Get the next job number if multipage and job control
@@ -633,7 +633,7 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
         nCurImage = GetPendingJobNum();
     }
 
-    long lFlags   = GetAcquireFileFlags();
+    long lFlags = GetAcquireFileFlags();
 
     if ( m_bAutoIncrementFile )
     {
@@ -677,323 +677,6 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
             return strTemp;
     }
     return m_strAcquireFile;
-}
-
-bool CTL_ITwainSource::IsFileTypeMultiPage(CTL_TwainFileFormatEnum FileType) // static function
-{
-    return FileType == TWAINFileFormat_TIFFGROUP3MULTI ||
-        FileType == TWAINFileFormat_TIFFGROUP4MULTI ||
-        FileType == TWAINFileFormat_TIFFNONEMULTI   ||
-        FileType == TWAINFileFormat_TIFFJPEGMULTI   ||
-        FileType == TWAINFileFormat_TIFFPACKBITSMULTI ||
-        FileType == TWAINFileFormat_TIFFDEFLATEMULTI ||
-        FileType == TWAINFileFormat_PDFMULTI        ||
-        FileType == TWAINFileFormat_POSTSCRIPT1MULTI ||
-        FileType == TWAINFileFormat_POSTSCRIPT2MULTI ||
-        FileType == TWAINFileFormat_POSTSCRIPT3MULTI ||
-        FileType == TWAINFileFormat_TIFFLZWMULTI ||
-        FileType == TWAINFileFormat_TIFFPIXARLOGMULTI ||
-        FileType == TWAINFileFormat_DCX           ||
-        FileType == TWAINFileFormat_TEXTMULTI ||
-        FileType == TWAINFileFormat_BIGTIFFLZWMULTI ||
-        FileType == TWAINFileFormat_BIGTIFFNONEMULTI ||
-        FileType == TWAINFileFormat_BIGTIFFPACKBITSMULTI ||
-        FileType == TWAINFileFormat_BIGTIFFDEFLATEMULTI ||
-        FileType == TWAINFileFormat_BIGTIFFGROUP3MULTI ||
-        FileType == TWAINFileFormat_BIGTIFFGROUP4MULTI ||
-        FileType == TWAINFileFormat_BIGTIFFJPEGMULTI ||
-        FileType == DTWAIN_FF_TIFFMULTI;
-}
-
-CTL_TwainFileFormatEnum CTL_ITwainSource::GetMultiPageType(CTL_TwainFileFormatEnum FileType)
-{
-    static const std::unordered_map<CTL_TwainFileFormatEnum, CTL_TwainFileFormatEnum> pageMap =
-    {
-        { TWAINFileFormat_TIFFGROUP3,      TWAINFileFormat_TIFFGROUP3MULTI },
-        { TWAINFileFormat_TIFFGROUP4,      TWAINFileFormat_TIFFGROUP4MULTI },
-        { TWAINFileFormat_TIFFNONE,        TWAINFileFormat_TIFFNONEMULTI },
-        { TWAINFileFormat_TIFFJPEG,        TWAINFileFormat_TIFFJPEGMULTI },
-        { TWAINFileFormat_TIFFPACKBITS,    TWAINFileFormat_TIFFPACKBITSMULTI },
-        { TWAINFileFormat_TIFFDEFLATE,     TWAINFileFormat_TIFFDEFLATEMULTI },
-        { TWAINFileFormat_PDF,             TWAINFileFormat_PDFMULTI },
-        { TWAINFileFormat_POSTSCRIPT1,     TWAINFileFormat_POSTSCRIPT1MULTI },
-        { TWAINFileFormat_POSTSCRIPT2,     TWAINFileFormat_POSTSCRIPT2MULTI },
-        { TWAINFileFormat_POSTSCRIPT3,     TWAINFileFormat_POSTSCRIPT3MULTI },
-        { TWAINFileFormat_TIFFLZW,         TWAINFileFormat_TIFFLZWMULTI },
-        { TWAINFileFormat_BIGTIFFLZW,      TWAINFileFormat_BIGTIFFLZWMULTI },
-        { TWAINFileFormat_BIGTIFFNONE,     TWAINFileFormat_BIGTIFFNONEMULTI },
-        { TWAINFileFormat_BIGTIFFPACKBITS, TWAINFileFormat_BIGTIFFPACKBITSMULTI },
-        { TWAINFileFormat_BIGTIFFDEFLATE,  TWAINFileFormat_BIGTIFFDEFLATEMULTI },
-        { TWAINFileFormat_BIGTIFFGROUP3,   TWAINFileFormat_BIGTIFFGROUP3MULTI },
-        { TWAINFileFormat_BIGTIFFGROUP4,   TWAINFileFormat_BIGTIFFGROUP4MULTI },
-        { TWAINFileFormat_BIGTIFFJPEG,     TWAINFileFormat_BIGTIFFJPEGMULTI },
-        { TWAINFileFormat_TIFFPIXARLOG,    TWAINFileFormat_TIFFPIXARLOGMULTI },
-        { TWAINFileFormat_PCX,             TWAINFileFormat_DCX },
-        { TWAINFileFormat_TEXT,            TWAINFileFormat_TEXTMULTI }
-    };
-
-    const auto iter = pageMap.find(FileType);
-    if (iter != pageMap.end())
-        return iter->second;
-    return FileType;
-}
-
-bool CTL_ITwainSource::IsFileTypeTIFF(CTL_TwainFileFormatEnum FileType)
-{
-    static const std::unordered_set<CTL_TwainFileFormatEnum> setInfo = {
-                            TWAINFileFormat_TIFFGROUP3MULTI,
-                            TWAINFileFormat_TIFFGROUP4MULTI,
-                            TWAINFileFormat_TIFFNONEMULTI,
-                            TWAINFileFormat_TIFFJPEGMULTI,
-                            TWAINFileFormat_TIFFPACKBITSMULTI,
-                            TWAINFileFormat_TIFFDEFLATEMULTI,
-                            TWAINFileFormat_TIFFLZWMULTI,
-                            TWAINFileFormat_TIFFGROUP4,
-                            TWAINFileFormat_TIFFGROUP3,
-                            TWAINFileFormat_TIFFNONE,
-                            TWAINFileFormat_TIFFJPEG,
-                            TWAINFileFormat_TIFFPACKBITS,
-                            TWAINFileFormat_TIFFDEFLATE,
-                            TWAINFileFormat_TIFFPIXARLOG,
-                            TWAINFileFormat_TIFFLZW,
-                            TWAINFileFormat_BIGTIFFLZW,
-                            TWAINFileFormat_BIGTIFFLZWMULTI,
-                            TWAINFileFormat_BIGTIFFNONE,
-                            TWAINFileFormat_BIGTIFFNONEMULTI,
-                            TWAINFileFormat_BIGTIFFPACKBITS,
-                            TWAINFileFormat_BIGTIFFPACKBITSMULTI,
-                            TWAINFileFormat_BIGTIFFDEFLATE,
-                            TWAINFileFormat_BIGTIFFDEFLATEMULTI,
-                            TWAINFileFormat_BIGTIFFGROUP3,
-                            TWAINFileFormat_BIGTIFFGROUP3MULTI,
-                            TWAINFileFormat_BIGTIFFGROUP4,
-                            TWAINFileFormat_BIGTIFFGROUP4MULTI,
-                            TWAINFileFormat_BIGTIFFJPEG,
-                            TWAINFileFormat_BIGTIFFJPEGMULTI,
-    };
-    return setInfo.count(FileType) == 1;
-}
-
-bool CTL_ITwainSource::IsFileTypeBigTiff(CTL_TwainFileFormatEnum FileType) // static function
-{
-    static const std::unordered_set<CTL_TwainFileFormatEnum> setInfo = {
-                            TWAINFileFormat_BIGTIFFLZWMULTI,
-                            TWAINFileFormat_BIGTIFFLZW,
-                            TWAINFileFormat_BIGTIFFNONEMULTI,
-                            TWAINFileFormat_BIGTIFFNONE,
-                            TWAINFileFormat_BIGTIFFPACKBITS,
-                            TWAINFileFormat_BIGTIFFPACKBITSMULTI,
-                            TWAINFileFormat_BIGTIFFDEFLATE,
-                            TWAINFileFormat_BIGTIFFDEFLATEMULTI,
-                            TWAINFileFormat_BIGTIFFGROUP3,
-                            TWAINFileFormat_BIGTIFFGROUP3MULTI,
-                            TWAINFileFormat_BIGTIFFGROUP4,
-                            TWAINFileFormat_BIGTIFFGROUP4MULTI,
-                            TWAINFileFormat_BIGTIFFJPEG,
-                            TWAINFileFormat_BIGTIFFJPEGMULTI
-                    };
-    return setInfo.count(FileType) == 1;
-}
-
-void CTL_ITwainSource::initFileSaveMap() const
-{
-    #define MAKE_FILE_FORMAT_INFO(T, E) FileFormatInfo((_T(T)), sizeof(T)-1, (_T(E)))
-
-    if ( m_saveFileMap.empty() )
-    {
-        m_saveFileMap[TWAINFileFormat_TIFFLZW] =
-            m_saveFileMap[TWAINFileFormat_TIFFLZWMULTI] = MAKE_FILE_FORMAT_INFO("TIFF Format (LZW) (*.tif)\0*.tif\0\0", ".tif");
-
-        m_saveFileMap[TWAINFileFormat_BIGTIFFLZW] =
-            m_saveFileMap[TWAINFileFormat_BIGTIFFLZWMULTI] = MAKE_FILE_FORMAT_INFO("Big TIFF Format (LZW) (*.tif)\0*.tif\0\0", ".tif");
-
-        m_saveFileMap[TWAINFileFormat_BIGTIFFNONE] =
-            m_saveFileMap[TWAINFileFormat_BIGTIFFNONEMULTI] = MAKE_FILE_FORMAT_INFO("Big TIFF Format (Uncompressed) (*.tif)\0*.tif\0\0", ".tif");
-
-        m_saveFileMap[TWAINFileFormat_TIFFNONE] =
-            m_saveFileMap[TWAINFileFormat_TIFFNONEMULTI] =
-            m_saveFileMap[DTWAIN_FF_TIFF] = MAKE_FILE_FORMAT_INFO("TIFF Uncompressed Format (*.tif)\0*.tif\0\0", ".tif");
-
-        m_saveFileMap[TWAINFileFormat_TIFFGROUP3] =
-            m_saveFileMap[TWAINFileFormat_TIFFGROUP3MULTI] = MAKE_FILE_FORMAT_INFO("TIFF Fax Group 3 Format (*.tif)\0*.tif\0\0", ".tif");
-
-        m_saveFileMap[TWAINFileFormat_TIFFGROUP4] =
-            m_saveFileMap[TWAINFileFormat_TIFFGROUP4MULTI] = MAKE_FILE_FORMAT_INFO("TIFF Fax Group 4 Format (*.tif)\0*.tif\0\0", ".tif");
-
-        m_saveFileMap[TWAINFileFormat_BIGTIFFGROUP3] =
-            m_saveFileMap[TWAINFileFormat_BIGTIFFGROUP3MULTI] = MAKE_FILE_FORMAT_INFO("Big TIFF Fax Group 3 Format (*.tif)\0*.tif\0\0", ".tif");
-
-        m_saveFileMap[TWAINFileFormat_BIGTIFFGROUP4] =
-            m_saveFileMap[TWAINFileFormat_BIGTIFFGROUP4MULTI] = MAKE_FILE_FORMAT_INFO("Big TIFF Fax Group 4 Format (*.tif)\0*.tif\0\0", ".tif");
-
-        m_saveFileMap[TWAINFileFormat_TIFFPIXARLOG] =
-            m_saveFileMap[TWAINFileFormat_TIFFPIXARLOGMULTI] = MAKE_FILE_FORMAT_INFO("TIFF (Pixar-Log Compression) (*.tif)\0*.tif\0\0", ".tif");
-
-        m_saveFileMap[TWAINFileFormat_TIFFJPEG] =
-            m_saveFileMap[TWAINFileFormat_TIFFJPEGMULTI] = MAKE_FILE_FORMAT_INFO("TIFF (JPEG Compression) (*.tif)\0*.tif\0\0", ".tif");
-
-        m_saveFileMap[TWAINFileFormat_BIGTIFFJPEG] =
-            m_saveFileMap[TWAINFileFormat_BIGTIFFJPEGMULTI] = MAKE_FILE_FORMAT_INFO("Big TIFF (JPEG Compression) (*.tif)\0*.tif\0\0", ".tif");
-
-        m_saveFileMap[DTWAIN_TIFFPACKBITS] =
-            m_saveFileMap[DTWAIN_TIFFPACKBITSMULTI] = MAKE_FILE_FORMAT_INFO("TIFF (Macintosh RLE Compression) (*.tif)\0*.tif\0\0", ".tif");
-
-        m_saveFileMap[DTWAIN_TIFFDEFLATE] =
-            m_saveFileMap[DTWAIN_TIFFDEFLATEMULTI] = MAKE_FILE_FORMAT_INFO("TIFF (ZLib Deflate Compression) (*.tif)\0*.tif\0\0", ".tif");
-
-        m_saveFileMap[DTWAIN_BIGTIFFDEFLATE] =
-            m_saveFileMap[DTWAIN_BIGTIFFDEFLATEMULTI] = MAKE_FILE_FORMAT_INFO("Big TIFF (ZLib Deflate Compression) (*.tif)\0*.tif\0\0", ".tif");
-
-        m_saveFileMap[DTWAIN_BIGTIFFPACKBITS] =
-            m_saveFileMap[DTWAIN_BIGTIFFPACKBITSMULTI] = MAKE_FILE_FORMAT_INFO("Big TIFF (Macintosh RLE Compression) (*.tif)\0*.tif\0\0", ".tif");
-
-        m_saveFileMap[TWAINFileFormat_JBIG] = MAKE_FILE_FORMAT_INFO("JBIG Format (*.jbg)\0*.jbg\0\0", ".jbg");
-
-        m_saveFileMap[TWAINFileFormat_JPEG2000] = MAKE_FILE_FORMAT_INFO("JPEG-2000 Format (*.jp2)\0*.jp2\0\0",".jp2");
-
-        m_saveFileMap[TWAINFileFormat_WMF] = MAKE_FILE_FORMAT_INFO("Windows MetaFile (*.wmf)\0*.wmf\0\0",".wmf");
-
-        m_saveFileMap[TWAINFileFormat_EMF] = MAKE_FILE_FORMAT_INFO("Windows Enhanced MetaFile (*.emf)\0*.emf\0\0",".emf");
-
-        m_saveFileMap[TWAINFileFormat_PSD] = MAKE_FILE_FORMAT_INFO("Adobe Photoshop Format (*.psd)\0*.psd\0\0",".psd");
-
-        m_saveFileMap[DTWAIN_FF_TIFFMULTI] = MAKE_FILE_FORMAT_INFO("Multipage TIFF Format (*.tif)\0*.tif\0\0", ".tif");
-
-        m_saveFileMap[TWAINFileFormat_BMP] =
-            m_saveFileMap[DTWAIN_FF_BMP] = MAKE_FILE_FORMAT_INFO("Windows Bitmap Format (*.bmp)\0*.bmp\0\0", ".bmp");
-
-        m_saveFileMap[TWAINFileFormat_BMPRLE] = MAKE_FILE_FORMAT_INFO("Windows Bitmap Format (RLE) (*.bmp)\0*.bmp\0\0", ".bmp");
-
-        m_saveFileMap[TWAINFileFormat_JPEG] =
-            m_saveFileMap[DTWAIN_FF_JFIF] = MAKE_FILE_FORMAT_INFO("JFIF (JPEG) Format (*.jpg)\0*.jpg\0\0",".jpg");
-
-        m_saveFileMap[TWAINFileFormat_PDF] =
-            m_saveFileMap[TWAINFileFormat_PDFMULTI] = MAKE_FILE_FORMAT_INFO("Adobe Acrobat Format (*.pdf)\0*.pdf\0\0",".pdf");
-
-        m_saveFileMap[TWAINFileFormat_TEXT] =
-            m_saveFileMap[TWAINFileFormat_TEXTMULTI] = MAKE_FILE_FORMAT_INFO("Text file (*.txt)\0*.txt\0\0",".txt");
-
-        m_saveFileMap[TWAINFileFormat_ICO] = m_saveFileMap[TwainFileFormat_ICO_RESIZED] =
-            m_saveFileMap[TWAINFileFormat_ICO_VISTA] = MAKE_FILE_FORMAT_INFO("Icon file (*.ico)\0*.ico\0\0",".ico");
-
-        m_saveFileMap[DTWAIN_FF_SPIFF] = MAKE_FILE_FORMAT_INFO("SPIFF Format (*.spf)\0*.spf\0\0",".spf");
-
-        m_saveFileMap[DTWAIN_FF_EXIF] = MAKE_FILE_FORMAT_INFO("EXIF Format (*.exf)\0*.exf\0\0",".exf");
-
-        m_saveFileMap[TWAINFileFormat_PCX] = MAKE_FILE_FORMAT_INFO("PCX Format (*.pcx)\0*.pcx\0\0",".pcx");
-
-        m_saveFileMap[TWAINFileFormat_DCX] = MAKE_FILE_FORMAT_INFO("DCX Format (*.dcx)\0*.dcx\0\0", ".dcx");
-
-        m_saveFileMap[TWAINFileFormat_WBMP] = m_saveFileMap[TwainFileFormat_WBMP_RESIZED] = 
-                        MAKE_FILE_FORMAT_INFO("WBMP (Wireless Bitmap Format) (*.wbmp)\0*.wbmp\0\0", ".wbmp");
-
-        m_saveFileMap[TWAINFileFormat_PNG] =
-            m_saveFileMap[DTWAIN_FF_PNG] = MAKE_FILE_FORMAT_INFO("PNG Format (*.png)\0*.png\0\0",".png");
-
-        m_saveFileMap[TWAINFileFormat_TGA] = MAKE_FILE_FORMAT_INFO("Targa (TGA) Format (*.tga)\0*.tga\0\0",".tga");
-
-        m_saveFileMap[TWAINFileFormat_TGARLE] = MAKE_FILE_FORMAT_INFO("Targa (TGA) Format (Run Length Encoded) (*.tga)\0*.tga\0\0", ".tga");
-
-        m_saveFileMap[DTWAIN_POSTSCRIPT1] =
-            m_saveFileMap[DTWAIN_POSTSCRIPT1MULTI] = MAKE_FILE_FORMAT_INFO("Postscript Level 1 Format (*.ps)\0*.ps\0\0",".ps");
-
-        m_saveFileMap[DTWAIN_POSTSCRIPT2] =
-            m_saveFileMap[DTWAIN_POSTSCRIPT2MULTI] = MAKE_FILE_FORMAT_INFO("Postscript Level 2 Format (*.ps)\0*.ps\0\0",".ps");
-
-        m_saveFileMap[DTWAIN_POSTSCRIPT3] =
-            m_saveFileMap[DTWAIN_POSTSCRIPT3MULTI] = MAKE_FILE_FORMAT_INFO("Postscript Level 3 Format (*.ps)\0*.ps\0\0",".ps");
-
-        m_saveFileMap[TWAINFileFormat_GIF] = MAKE_FILE_FORMAT_INFO("GIF Format (*.gif)\0*.gif\0\0",".gif");
-
-        m_saveFileMap[DTWAIN_FF_FPX] = MAKE_FILE_FORMAT_INFO("Flash Picture (*.fpx)\0*.fpx\0\0",".fpx");
-
-        m_saveFileMap[DTWAIN_FF_PICT] = MAKE_FILE_FORMAT_INFO("Macintosh PICT format (*.pic)\0*.pic\0\0",".pic");
-
-        m_saveFileMap[DTWAIN_FF_XBM] = MAKE_FILE_FORMAT_INFO("XBM format (*.xbm)\0*.xbm\0\0",".xbm");
-
-        m_saveFileMap[DTWAIN_WEBP] = MAKE_FILE_FORMAT_INFO("webp format (*.webp)\0*.webp\0\0", ".webp");
-        m_saveFileMap[DTWAIN_PBM] = MAKE_FILE_FORMAT_INFO("pbm format (*.pbm)\0*.pbm\0\0", ".pbm");
-    }
-}
-
-bool CTL_ITwainSource::IsFileTypePostscript(CTL_TwainFileFormatEnum FileType)
-{
-    return FileType == TWAINFileFormat_POSTSCRIPT1 ||
-        FileType == TWAINFileFormat_POSTSCRIPT1MULTI ||
-        FileType == TWAINFileFormat_POSTSCRIPT2 ||
-        FileType == TWAINFileFormat_POSTSCRIPT2MULTI ||
-        FileType == TWAINFileFormat_POSTSCRIPT3 ||
-        FileType == TWAINFileFormat_POSTSCRIPT3MULTI;
-}
-
-CTL_StringType CTL_ITwainSource::PromptForFileName() const
-{
-    CTL_StringType szFilter;
-    LPCTSTR szExt;
-
-    initFileSaveMap();
-    const auto it = m_saveFileMap.find(m_nFileAcquireType);
-    if ( it != m_saveFileMap.end() )
-    {
-        szFilter.append(it->second.filter, it->second.len);
-        szExt = it->second.extension;
-    }
-    else
-    {
-        CTL_StringStreamType strm;
-        strm << m_nFileAcquireType <<_T(" format");
-        szFilter = strm.str();
-        szFilter.append(_T("*\0\0"), 3);
-        szExt = _T(".");
-    }
-
-#ifdef _WIN32
-    TCHAR szFile[1024];
-    // prompt for filename
-    const auto pHandle = m_pDLLHandle;
-
-    OPENFILENAME ofn = {};
-    OPENFILENAME* pOfn = &ofn;
-
-    if (pHandle->m_pofn)
-        pOfn = pHandle->m_pofn.get();
-    szFile[0] = _T('\0');
-    pOfn->lStructSize = sizeof(OPENFILENAME);
-    const auto sTitle = pHandle->m_CustomPlacement.sTitle;
-    if (pOfn == &ofn)
-    {
-        pOfn->hwndOwner = nullptr;
-        pOfn->lpstrFilter = szFilter.data();
-        pOfn->lpstrFile = szFile;
-        pOfn->nMaxFile = sizeof szFile - 5;
-        pOfn->Flags = OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY |
-            OFN_NOREADONLYRETURN | OFN_EXPLORER;
-        if (pHandle->m_CustomPlacement.nOptions != 0)
-        {
-            pOfn->lpfnHook = pHandle->m_pSaveAsDlgProc;
-            pOfn->Flags |= OFN_ENABLEHOOK;
-            pOfn->lCustData = (LPARAM)&pHandle->m_CustomPlacement;
-            if (!StringWrapper::IsEmpty(sTitle))
-                pOfn->lpstrTitle = sTitle.c_str();
-        }
-    }
-
-    if (!GetSaveFileName(pOfn))
-    {
-        return {};                    // user canceled dialog
-    }
-
-    // supply default extension - GetOpenFileName doesn't seem to do it!
-    int nExt = pOfn->nFileExtension;
-    if (nExt && !szFile[nExt])
-    {
-        // no extension
-        lstrcat(szFile, szExt);
-    }
-    return szFile;
-#else
-    return {};
-#endif
 }
 
 bool CTL_ITwainSource::SetDibAutoDelete(bool bSet)
@@ -1086,7 +769,7 @@ void CTL_ITwainSource::SetCapCacheValue(LONG lCap, double dValue, bool bTurnOn)
     }
 }
 
-double CTL_ITwainSource::GetCapCacheValue( LONG lCap, LONG *pTurnOn ) const
+double CTL_ITwainSource::GetCapCacheValue(LONG lCap, LONG* pTurnOn) const
 {
     double dValue = 0;
     switch (lCap)
@@ -1494,27 +1177,9 @@ void CTL_ITwainSource::ProcessMultipageFile()
     ClearPDFText(); // clear the text elements
 }
 
-static bool isIntCap(LONG capType);
-
 bool isIntCap(DTWAIN_SOURCE Source, LONG nCap)
 {
-    return isIntCap(DTWAIN_GetCapDataType(Source, nCap));
-}
-
-bool isIntCap(LONG capType)
-{
-    return  capType == TWTY_INT16 ||
-        capType == TWTY_INT32 ||
-        capType == TWTY_BOOL ||
-        capType == TWTY_INT8 ||
-        capType == TWTY_UINT8 ||
-        capType == TWTY_UINT16 ||
-        capType == TWTY_UINT32;
-}
-
-bool isFloatCap(LONG capType)
-{
-    return  capType == TWTY_FIX32;
+    return ConstexprUtils::IsTwainIntegralType(static_cast<TW_UINT16>(DTWAIN_GetCapDataType(Source, nCap)));
 }
 
 template <typename T>
@@ -1549,10 +1214,10 @@ DTWAIN_ARRAY CTL_ITwainSource::getCapCachedValues(TW_UINT16 lCap, LONG getType)
     if (iter == mapToUse->end() )
         return nullptr;
     const container_values& cValues = (*iter).second;
-    if (isIntCap(cValues.m_dataType))
+    if (ConstexprUtils::IsTwainIntegralType(static_cast<TW_UINT16>(cValues.m_dataType)))
         return PopulateArray<CTL_ArrayFactory::tagged_array_long>(cValues.m_data, this, lCap);
     else
-    if ( isFloatCap(cValues.m_dataType))
+    if ( ConstexprUtils::IsTwainFix32Type(static_cast<TW_UINT16>(cValues.m_dataType)))
         return PopulateArray<CTL_ArrayFactory::tagged_array_double>(cValues.m_data, this, lCap);
     return nullptr;
 }
@@ -1568,7 +1233,7 @@ bool CTL_ITwainSource::setCapCachedValues(DTWAIN_ARRAY array, TW_UINT16 lCap, LO
         return true;
     container_values cValues;
     cValues.m_dataType = dynarithmic::GetCapDataType(this, lCap);
-    if (isIntCap(cValues.m_dataType))
+    if (ConstexprUtils::IsTwainIntegralType(static_cast<TW_UINT16>(cValues.m_dataType)))
     {
         const bool retVal = PopulateCache<CTL_ArrayFactory::tagged_array_long>(m_pDLLHandle, array, cValues.m_data);
         if (retVal)
