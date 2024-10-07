@@ -30,19 +30,51 @@
 #include <memory>
 #include <cstring>
 #include <sstream>
+#include <array>
 #include <boost/format.hpp>
 #include <boost/dll/shared_library.hpp>
 #include "dtwain_resource_constants.h"
 #include "dtwain_filesystem.h"
 #include "dtwain.h"
 #include "ctltrall.h"
-#include <ctlccerr.h>
 #include "ctldib.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "twainfix32.h"
-
+#include "dtwinverex.h"
 using namespace dynarithmic;
+
+static constexpr std::array<std::pair<int, int>, 30> mapCondCode = { {
+    {TWCC_SUCCESS         ,IDS_ErrCCFalseAlarm},
+    {TWCC_BUMMER          ,IDS_ErrCCBummer},
+    {TWCC_LOWMEMORY       ,IDS_ErrCCLowMemory},
+    {TWCC_NODS            ,IDS_ErrCCNoDataSource},
+    {TWCC_MAXCONNECTIONS  ,IDS_ErrCCMaxConnections},
+    {TWCC_OPERATIONERROR  ,IDS_ErrCCOperationError},
+    {TWCC_BADCAP          ,IDS_ErrCCBadCapability},
+    {TWCC_BADPROTOCOL     ,IDS_ErrCCBadProtocol},
+    {TWCC_BADVALUE        ,IDS_ErrCCBadValue},
+    {TWCC_SEQERROR        ,IDS_ErrCCSequenceError},
+    {TWCC_BADDEST         ,IDS_ErrCCBadDestination},
+    {TWCC_CAPUNSUPPORTED  ,IDS_ErrCCCapNotSupported},
+    {TWCC_CAPBADOPERATION ,IDS_ErrCCCapBadOperation},
+    {TWCC_CAPSEQERROR     ,IDS_ErrCCCapSequenceError},
+    {TWCC_DENIED          ,IDS_ErrCCFileProtected},
+    {TWCC_FILEEXISTS      ,IDS_ErrCCFileExists},
+    {TWCC_FILENOTFOUND    ,IDS_ErrCCFileNotFound},
+    {TWCC_NOTEMPTY        ,IDS_ErrCCDirectoryNotEmpty},
+    {TWCC_PAPERJAM        ,IDS_ErrCCFeederJammed},
+    {TWCC_PAPERDOUBLEFEED ,IDS_ErrCCFeederMultPages},
+    {TWCC_FILEWRITEERROR  ,IDS_ErrCCFileWriteError},
+    {TWCC_CHECKDEVICEONLINE,IDS_ErrCCDeviceOffline},
+    {TWCC_INTERLOCK,       IDS_ErrCCInterlock},
+    {TWCC_DAMAGEDCORNER,   IDS_ErrCCDamagedCorner},
+    {TWCC_FOCUSERROR,      IDS_ErrCCFocusError},
+    {TWCC_DOCTOOLIGHT,     IDS_ErrCCDoctooLight},
+    {TWCC_DOCTOODARK,      IDS_ErrCCDoctooDark},
+    {TWCC_NOMEDIA   ,      IDS_ErrCCNoMedia},
+    {TWAIN_ERR_NULL_CONTAINER_, TWAIN_ERR_NULL_CONTAINER_},
+    {DTWAIN_ERR_EXCEPTION_ERROR_, DTWAIN_ERR_EXCEPTION_ERROR_}} };
 
 template <class T>
 bool SetOneTwainCapValue( const CTL_ITwainSource *pSource,
@@ -105,7 +137,6 @@ void CTL_TwainAppMgr::Destroy()
     if ( s_pGlobalAppMgr )
     {
         s_pGlobalAppMgr->DestroyAllTwainSessions();
-        s_pGlobalAppMgr->RemoveAllConditionCodeErrors();
         s_pGlobalAppMgr->CloseLogFile();
         /* Use for this APP only */
         s_pGlobalAppMgr->UnloadSourceManager();
@@ -845,11 +876,11 @@ TW_UINT16 dynarithmic::CTL_TwainAppMgr::GetConditionCode( CTL_ITwainSession *pSe
 
 bool CTL_TwainAppMgr::ProcessConditionCodeError(TW_UINT16 nError)
 {
-    CTL_CondCodeInfo p = FindConditionCode(nError);
-    if ( p.IsValidCode())
+    auto resID = FindConditionCode(nError);
+    if ( IsValidConditionCode(resID))
     {
-        static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal())->m_lLastError = p.m_nResourceID; 
-        DTWAIN_ERROR_CONDITION(p.m_nResourceID, false, false)
+        static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal())->m_lLastError = resID; 
+        DTWAIN_ERROR_CONDITION(resID, false, false)
     }
     return true;
 }
@@ -2162,23 +2193,12 @@ bool CTL_TwainAppMgr::IsProgressIndicatorOn(const CTL_ITwainSource* pSource)
     return false;
 }
 
-void CTL_TwainAppMgr::AddConditionCodeError(TW_UINT16 nCode, int nResource)
+int CTL_TwainAppMgr::FindConditionCode(TW_UINT16 nCode)
 {
-    const CTL_CondCodeInfo Code( nCode, nResource );
-    s_mapCondCode[nCode] = Code;
-}
-
-CTL_CondCodeInfo CTL_TwainAppMgr::FindConditionCode(TW_UINT16 nCode)
-{
-    const auto it = s_mapCondCode.find(nCode);
-    if ( it == s_mapCondCode.end() )
-        return {static_cast<TW_UINT16>(-9999), static_cast<TW_UINT16>(-9999)};
-    return (*it).second;
-}
-
-void CTL_TwainAppMgr::RemoveAllConditionCodeErrors()
-{
-    s_mapCondCode.clear();
+    const auto it = dynarithmic::generic_array_finder_if(mapCondCode, [&](const auto& pr) { return pr.first == nCode; });
+    if (!it.first)
+        return INVALID_CONDITION_CODE;
+    return mapCondCode[it.second].second;
 }
 
 std::string CTL_TwainAppMgr::GetCapNameFromCap( LONG Cap )
@@ -2477,47 +2497,8 @@ CTL_TwainAppMgr::CTL_TwainAppMgr(CTL_TwainDLLHandle *pHandle,
 
     // Record the instance
     m_Instance = hInstance;
-
-    // Set up the error messages for condition codes
-    AddConditionCodeError(TWCC_SUCCESS         ,IDS_ErrCCFalseAlarm );
-    AddConditionCodeError(TWCC_BUMMER          ,IDS_ErrCCBummer     );
-    AddConditionCodeError(TWCC_LOWMEMORY       ,IDS_ErrCCLowMemory );
-    AddConditionCodeError(TWCC_NODS            ,IDS_ErrCCNoDataSource );
-    AddConditionCodeError(TWCC_MAXCONNECTIONS  ,IDS_ErrCCMaxConnections );
-    AddConditionCodeError(TWCC_OPERATIONERROR  ,IDS_ErrCCOperationError );
-    AddConditionCodeError(TWCC_BADCAP          ,IDS_ErrCCBadCapability );
-    AddConditionCodeError(TWCC_BADPROTOCOL     ,IDS_ErrCCBadProtocol );
-    AddConditionCodeError(TWCC_BADVALUE        ,IDS_ErrCCBadValue );
-    AddConditionCodeError(TWCC_SEQERROR        ,IDS_ErrCCSequenceError );
-    AddConditionCodeError(TWCC_BADDEST         ,IDS_ErrCCBadDestination );
-    AddConditionCodeError(TWCC_CAPUNSUPPORTED  ,IDS_ErrCCCapNotSupported );
-    AddConditionCodeError(TWCC_CAPBADOPERATION ,IDS_ErrCCCapBadOperation );
-    AddConditionCodeError(TWCC_CAPSEQERROR     ,IDS_ErrCCCapSequenceError );
-
-    AddConditionCodeError(TWCC_DENIED          ,IDS_ErrCCFileProtected);
-    AddConditionCodeError(TWCC_FILEEXISTS      ,IDS_ErrCCFileExists);
-    AddConditionCodeError(TWCC_FILENOTFOUND    ,IDS_ErrCCFileNotFound);
-    AddConditionCodeError(TWCC_NOTEMPTY        ,IDS_ErrCCDirectoryNotEmpty);
-    AddConditionCodeError(TWCC_PAPERJAM        ,IDS_ErrCCFeederJammed);
-    AddConditionCodeError(TWCC_PAPERDOUBLEFEED ,IDS_ErrCCFeederMultPages);
-    AddConditionCodeError(TWCC_FILEWRITEERROR  ,IDS_ErrCCFileWriteError);
-    AddConditionCodeError(TWCC_CHECKDEVICEONLINE,IDS_ErrCCDeviceOffline);
-    AddConditionCodeError(TWCC_INTERLOCK,       IDS_ErrCCInterlock);
-    AddConditionCodeError(TWCC_DAMAGEDCORNER,   IDS_ErrCCDamagedCorner);
-    AddConditionCodeError(TWCC_FOCUSERROR,      IDS_ErrCCFocusError);
-    AddConditionCodeError(TWCC_DOCTOOLIGHT,     IDS_ErrCCDoctooLight);
-    AddConditionCodeError(TWCC_DOCTOODARK,      IDS_ErrCCDoctooDark);
-    AddConditionCodeError(TWCC_NOMEDIA   ,      IDS_ErrCCNoMedia);
-
-
-    // Special condition code
-    AddConditionCodeError(static_cast<TW_UINT16>(TWAIN_ERR_NULL_CONTAINER), TWAIN_ERR_NULL_CONTAINER_);
-    AddConditionCodeError(DTWAIN_ERR_EXCEPTION_ERROR_, DTWAIN_ERR_EXCEPTION_ERROR_);
-
     EnumNoTimeoutTriplets();
-
     m_lpDSMEntry = nullptr;
-
 }
 
 void CTL_TwainAppMgr::OpenLogFile(LPCSTR lpszFile)
@@ -2607,8 +2588,10 @@ bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
                 DTWAIN_ERROR_CONDITION_EX(IDS_ErrTwainDLLNotFound, StringConversion::Convert_Native_To_Ansi(dllName), false, true)
             }
         }
+        m_strTwainDSMVersionInfo = dynarithmic::GetVersionInfo(m_hLibModule.native(), 0);
         CTL_StringStreamType strm;
-        strm << _T("TWAIN DSM \"") + m_strTwainDSMPath + _T("\" is found and will be used for this TWAIN session");
+        strm << _T("TWAIN DSM \"") + m_strTwainDSMPath + _T("\" is found and will be used for this TWAIN session...\n");
+        strm << _T("Version information for \"") << m_strTwainDSMPath << _T("\":\n") << dynarithmic::GetVersionInfo(m_hLibModule.native(), 4);
         LogToDebugMonitor(strm.str());
         if (CTL_StaticData::s_lErrorFilterFlags != 0)
             DTWAIN_LogMessageA(StringConversion::Convert_Native_To_Ansi(strm.str()).c_str());
@@ -2869,6 +2852,14 @@ CTL_StringType CTL_TwainAppMgr::GetDSMPath()
     return {};
 }
 
+CTL_StringType CTL_TwainAppMgr::GetDSMVersionInfo()
+{
+    const auto mgr = GetInstance();
+    if (mgr)
+        return mgr->m_strTwainDSMVersionInfo;
+    return {};
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -2880,7 +2871,6 @@ CTL_ITwainSession* CTL_TwainAppMgr::s_pSelectedSession = nullptr;
 int          CTL_TwainAppMgr::s_nLastError = 0;
 std::string  CTL_TwainAppMgr::s_strLastError;
 HINSTANCE    CTL_TwainAppMgr::s_ThisInstance = static_cast<HINSTANCE>(nullptr);
-mapCondCodeInfo  CTL_TwainAppMgr::s_mapCondCode;
 std::vector<RawTwainTriplet> CTL_TwainAppMgr::s_NoTimeoutTriplets;
 SourceToXferReadyMap CTL_TwainAppMgr::s_SourceToXferReadyMap;
 SourceToXferReadyList CTL_TwainAppMgr::s_SourceToXferReadyList;

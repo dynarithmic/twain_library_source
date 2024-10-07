@@ -27,6 +27,7 @@ OF THIRD PARTY RIGHTS.
 #include <vector>
 #include <utility>
 #include <boost/optional.hpp>
+#include <boost/container/flat_map.hpp>
 #include "dibmulti.h"
 #include "dibinfox.h"
 #include "fltrect.h"
@@ -70,7 +71,7 @@ namespace dynarithmic
             static bool IsValidBitDepth(LONG FileType, LONG bitDepth);
             int SaveToFile(HANDLE hDib, LPCTSTR szFile, FREE_IMAGE_FORMAT fmt, int flags, UINT unitOfMeasure,
                            std::pair<LONG, LONG> res, const std::tuple<double, double, double, double>& multipler_pr = { 1,1, 0.5, 0.5 }) const;
-            static std::unordered_map<LONG, std::vector<int>>& GetSupportedBPPMap() { return s_supportedBitDepths; }
+            static auto& GetSupportedBPPMap() { return s_supportedBitDepths; }
 
         protected:
             CTL_TwainDib *m_pDib;
@@ -85,7 +86,7 @@ namespace dynarithmic
             unsigned m_nPage;
             bool m_bAllWritten;
             bool m_bOnePageWritten;
-            static std::unordered_map<LONG, std::vector<int>> s_supportedBitDepths;
+            static boost::container::flat_map<LONG, std::vector<int>> s_supportedBitDepths;
     };
 
     typedef std::shared_ptr<CTL_ImageIOHandler> CTL_ImageIOHandlerPtr;

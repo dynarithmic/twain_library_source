@@ -335,23 +335,24 @@ static int NoCompress(const std::string& inData, std::string& outData)
 static int EncodeVectorStream(const std::vector<char>& InputStream,
                               size_t InputLength,std::vector<char>& OutStream,PdfDocument::CompressTypes compresstype)
 {
+    static std::array<
+        std::pair<PdfDocument::CompressTypes, std::function<int(const std::string&, std::string&)>>,4>
+        compress_fn = { {{ PdfDocument::NO_COMPRESS, NoCompress},
+                        { PdfDocument::A85_COMPRESS, ASCII85Encode},
+                        { PdfDocument::AHEX_COMPRESS, ASCIIHexEncode},
+                        { PdfDocument::FLATE_COMPRESS, FlateEncode}, } };
 
-    static std::unordered_map<PdfDocument::CompressTypes, std::function<int(const std::string&, std::string&)>>
-                compress_fn = { { PdfDocument::NO_COMPRESS, NoCompress},
-                                { PdfDocument::A85_COMPRESS, ASCII85Encode},
-                                { PdfDocument::AHEX_COMPRESS, ASCIIHexEncode},
-                                { PdfDocument::FLATE_COMPRESS, FlateEncode}, };
-
-    const auto fnCall = compress_fn.find(compresstype);
-        if (fnCall != compress_fn.end())
-        {
-            std::string sTemp;
-            std::string sOut;
-            sTemp.append(InputStream.data(), InputLength);
-            fnCall->second(sTemp, sOut);
-            OutStream.resize(sOut.size());
-            std::copy(sOut.begin(), sOut.end(), OutStream.begin());
-            return 1;
+    auto iter = dynarithmic::generic_array_finder_if(compress_fn, [&](const auto& pr) { return pr.first == compresstype; });
+    if ( iter.first)
+    {
+        auto fnCall = compress_fn[iter.second].second;
+        std::string sTemp;
+        std::string sOut;
+        sTemp.append(InputStream.data(), InputLength);
+        fnCall(sTemp, sOut);
+        OutStream.resize(sOut.size());
+        std::copy(sOut.begin(), sOut.end(), OutStream.begin());
+        return 1;
     }
     return 0;
 }

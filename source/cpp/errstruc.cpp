@@ -198,12 +198,13 @@ void CTL_ErrorStructDecoder::StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDe
 
     m_pString.clear();
     std::string s1;
+    auto sDG = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DG, nDG);
+    auto sDAT = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DAT, nDAT);
+    auto sMSG = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_MSG, nMSG);
+
     sBuffer << "\nDSM_Entry(pSource=" << pSource << "H, " <<
-                "pDest=" << pDest << "H, " <<
-           CTL_StaticData::GetTwainNameFromResource(CTL_StaticData::GetDGResourceID(),static_cast<int>(nDG)) << ", " <<
-           CTL_StaticData::GetTwainNameFromResource(CTL_StaticData::GetDATResourceID(),static_cast<int>(nDAT)) << ", " <<
-           CTL_StaticData::GetTwainNameFromResource(CTL_StaticData::GetMSGResourceID(),static_cast<int>(nMSG)) << ", " <<
-           "TW_MEMREF=" << Data << "H) " << GetResourceStringFromMap(IDS_LOGMSG_CALLEDTEXT) << "\n";
+                "pDest=" << pDest << "H, " << sDG << ", " << sDAT << ", " << sMSG << ", " <<
+                "TW_MEMREF=" << Data << "H) " << GetResourceStringFromMap(IDS_LOGMSG_CALLEDTEXT) << "\n";
     s1 = sBuffer.str();
 
     std::string pSourceStr;
@@ -496,7 +497,6 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
 
             case ERRSTRUCT_TW_STATUSUTF8:
             {
-                CTL_ContainerToNameMap::iterator it;
                 auto pSTATUSUTF8 = static_cast<pTW_STATUSUTF8>(pData);
                 pTW_STATUS pStatus = &pSTATUSUTF8->Status;
                 sBuffer << "\nTW_MEMREF is TW_STATUSUTF8:\n{\n" <<

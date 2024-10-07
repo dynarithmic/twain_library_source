@@ -33,7 +33,6 @@
 #include "ctlenum.h"
 #include "capstruc.h"
 #include "errstruc.h"
-#include "ctlccerr.h"
 #include "ctltrp.h"
 #include "ctltr011.h"
 #include "ctltr012.h"
@@ -43,11 +42,8 @@
 #include "capconst.h"
 namespace dynarithmic
 {
-    typedef std::unordered_map<TW_UINT16, CTL_CondCodeInfo> mapCondCodeInfo;
-
     class CTL_TwainDibArray;
     class CTL_CapabilityGetTriplet;
-    class CTL_CondCodeInfo;
     class CTL_ImageXferTriplet;
     class CTL_ImageInfoTriplet;
 
@@ -72,6 +68,8 @@ namespace dynarithmic
 
     class CTL_TwainAppMgr;
     typedef std::shared_ptr<CTL_TwainAppMgr> CTL_TwainAppMgrPtr;
+
+    static constexpr int INVALID_CONDITION_CODE = -9999;
 
     class CTL_TwainAppMgr
     {
@@ -123,6 +121,7 @@ namespace dynarithmic
             static bool OpenSourceManager( CTL_ITwainSession* pSession );
             static bool CloseSourceManager(CTL_ITwainSession* pSession);
             static bool IsTwainMsg(MSG *pMsg, bool bFromUserQueue=false);
+            static bool IsValidConditionCode(int nCode) { return nCode != INVALID_CONDITION_CODE; }
             static unsigned int GetRegisteredMsg();
             static bool IsVersion2DSMUsed();
             static void GatherCapabilityInfo(CTL_ITwainSource* pSource);
@@ -223,10 +222,7 @@ namespace dynarithmic
                                              LPARAM lParam = 0L);
 
             static bool ProcessConditionCodeError(TW_UINT16 nError);
-            static CTL_CondCodeInfo FindConditionCode(TW_UINT16 nCode);
-            static void AddConditionCodeError(TW_UINT16 nCode, int nResource);
-            static void RemoveAllConditionCodeErrors();
-
+            static int  FindConditionCode(TW_UINT16 nCode);
             static bool IsCapabilitySupported(const CTL_ITwainSource *pSource,
                                               TW_UINT16 nCap,
                                               int nType=CTL_GetTypeGET);
@@ -300,6 +296,8 @@ namespace dynarithmic
             static CTL_CapStruct GetGeneralCapInfo(LONG Cap);
             static bool GetCurrentOneCapValue(const CTL_ITwainSource *pSource, void *pValue, TW_UINT16 Cap, TW_UINT16 nDataType );
             static CTL_StringType GetDSMPath();
+            static CTL_StringType GetDSMVersionInfo();
+            auto GetDSMModuleHandle() const { return m_hLibModule.native(); }
             static SourceToXferReadyMap& GetSourceToXferReadyMap() { return s_SourceToXferReadyMap; }
             static SourceToXferReadyList& GetSourceToXferReadyList() { return s_SourceToXferReadyList; }
             static SourceFlatbedOnlyList& GetSourceFlatbedOnlyList() { return s_SourceFlatbedOnlyList; }
@@ -498,6 +496,7 @@ namespace dynarithmic
             static CTL_ITwainSession* s_pSelectedSession; // Current selected
                                                                 // session
             CTL_StringType  m_strTwainDSMPath;   // Twain DLL path
+            CTL_StringType  m_strTwainDSMVersionInfo; // TWAIN DLL version information
             boost::dll::shared_library m_hLibModule;         // Twain DLL module handle
             DSMENTRYPROC    m_lpDSMEntry;        // Proc entry point for DSM_ENTRY
             TW_UINT16       m_nErrorTWRC;
@@ -509,7 +508,6 @@ namespace dynarithmic
             static int               s_nLastError;
             static std::string        s_strLastError;
             static HINSTANCE         s_ThisInstance;
-            static mapCondCodeInfo   s_mapCondCode;
             static std::vector<RawTwainTriplet> s_NoTimeoutTriplets;
             static VOID CALLBACK TwainTimeOutProc(HWND, UINT, ULONG, DWORD);
             static SourceToXferReadyMap s_SourceToXferReadyMap;

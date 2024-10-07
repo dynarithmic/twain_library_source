@@ -33,7 +33,7 @@
 
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
-#include "ctlres.h"
+#include "ctlloadresources.h"
 #include "../dtwinver/dtwinverex.h"
 #include "dtwain_verinfo.h"
 #include "dtwain_resource_constants.h"
@@ -747,6 +747,15 @@ LONG DLLENTRY_DEF DTWAIN_GetActiveDSMPath(LPTSTR szDLLName, LONG nMaxLen)
     LOG_FUNC_ENTRY_PARAMS((szDLLName, nMaxLen))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     return StringWrapper::CopyInfoToCString(CTL_TwainAppMgr::GetDSMPath(), szDLLName, nMaxLen);
+    LOG_FUNC_EXIT_NONAME_PARAMS(-1)
+    CATCH_BLOCK(-1)
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetActiveDSMVersionInfo(LPTSTR szDLLInfo, LONG nMaxLen)
+{
+    LOG_FUNC_ENTRY_PARAMS((szDLLInfo, nMaxLen))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    return StringWrapper::CopyInfoToCString(CTL_TwainAppMgr::GetDSMVersionInfo(), szDLLInfo, nMaxLen);
     LOG_FUNC_EXIT_NONAME_PARAMS(-1)
     CATCH_BLOCK(-1)
 }
@@ -2035,13 +2044,13 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainStringName(LONG category, LONG TwainID, LPTSTR 
     switch (category)
     {
         case DTWAIN_DGNAME:
-            sValue = CTL_StaticData::GetTwainNameFromResource(CTL_StaticData::GetDGResourceID(), static_cast<int>(TwainID));
+            sValue = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DG, TwainID);
         break;
         case DTWAIN_DATNAME:
-            sValue = CTL_StaticData::GetTwainNameFromResource(CTL_StaticData::GetDATResourceID(), static_cast<int>(TwainID));
+            sValue = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DAT, TwainID);
         break;
         case DTWAIN_MSGNAME:
-            sValue = CTL_StaticData::GetTwainNameFromResource(CTL_StaticData::GetMSGResourceID(), static_cast<int>(TwainID));
+            sValue = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_MSG, TwainID);
         break;
     }
     const LONG RetVal = StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sValue), lpszBuffer, nMaxLen);
@@ -2053,9 +2062,10 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainIDFromName(LPCTSTR lpszBuffer)
 {
     LOG_FUNC_ENTRY_PARAMS((lpszBuffer))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const LONG RetVal = CTL_StaticData::GetIDFromTwainName(StringConversion::Convert_NativePtr_To_Ansi(lpszBuffer));
-    LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
-    CATCH_BLOCK(-1)
+    auto retVal = CTL_StaticData::GetIDFromTwainName(StringConversion::Convert_NativePtr_To_Ansi(lpszBuffer));
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !retVal.first; }, DTWAIN_ERR_STRINGID_NOTFOUND, retVal.second, FUNC_MACRO);
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second);
+    CATCH_BLOCK(std::numeric_limits<int32_t>::min())
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetWindowsVersionInfo(LPTSTR lpszBuffer, LONG nMaxLen)
@@ -2154,10 +2164,16 @@ void WriteVersionToLog(CTL_TwainDLLHandle *pHandle)
         auto sVer = GetVersionString();
         const auto sWinVer = GetWinVersion();
         auto sDSMPath = CTL_TwainAppMgr::GetDSMPath();
+        auto sDSMVersionInfo = dynarithmic::GetVersionInfo(CTL_TwainAppMgr::GetInstance()->GetDSMModuleHandle(), 4);
         if (sDSMPath.empty())
+        {
             sDSMPath = _T("(unknown or not queried)");
+            sDSMVersionInfo.clear();
+        }
+        else
+            sDSMVersionInfo = _T("\nDSM Version Information:\n") + sDSMVersionInfo;
         sDSMPath = _T("Active DSM Path: ") + sDSMPath;
-        sVer += _T("\n") + sWinVer + sDSMPath + _T("\n\n");
+        sVer += _T("\n") + sWinVer + sDSMPath + sDSMVersionInfo + _T("\n");
         #ifdef _WIN32
         // All log messages must be ANSI
         ansiVer = StringConversion::Convert_Native_To_Ansi(sVer);

@@ -25,6 +25,8 @@
 #include <vector>
 #include <unordered_set>
 #include <boost/logic/tribool.hpp>
+#include <boost/container/flat_map.hpp>
+#include <boost/container/flat_set.hpp>
 #include <array>
 
 #include "ctlobstr.h"
@@ -39,8 +41,8 @@
 
 namespace dynarithmic
 {
-    typedef std::unordered_map<TW_UINT16, short int> CapToStateMap;
-    typedef std::unordered_set<TW_UINT16> CapList;
+    typedef boost::container::flat_map<TW_UINT16, short int> CapToStateMap;
+    typedef boost::container::flat_set<TW_UINT16> CapList;
     typedef std::vector<TW_UINT16> JobControlList;
     typedef std::vector<TW_INFO> TWINFOVector;
 
@@ -86,7 +88,7 @@ namespace dynarithmic
             std::vector<anytype_> m_data;
         };
 
-        typedef std::unordered_map<TW_UINT16, container_values> CapToValuesMap;
+        typedef boost::container::flat_map<TW_UINT16, container_values> CapToValuesMap;
         CapToValuesMap m_capToValuesMap_G;
         CapToValuesMap m_capToValuesMap_GD;
 
@@ -595,10 +597,10 @@ namespace dynarithmic
             TW_UINT16 nCap;
             bool      m_bSupported;
         };
-        typedef std::unordered_map<TW_UINT16, bool> CachedCapMap;
+        typedef boost::container::flat_map<TW_UINT16, bool> CachedCapMap;
 
         public:
-            typedef std::unordered_map<int, std::vector<int> > CachedPixelTypeMap;
+            typedef boost::container::flat_map<int, std::vector<int> > CachedPixelTypeMap;
             void        AddPixelTypeAndBitDepth(int PixelType, int BitDepth);
             CachedPixelTypeMap::iterator FindPixelType(int PixelType);
             bool IsBitDepthSupported(int PixelType, int BitDepth);
