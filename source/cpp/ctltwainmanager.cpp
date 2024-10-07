@@ -2449,7 +2449,7 @@ LONG CTL_TwainAppMgr::ExtImageInfoArrayType(LONG ExtType)
         case DTWAIN_EI_FILESYSTEMSOURCE:
         case DTWAIN_EI_PRINTERTEXT:
         case DTWAIN_EI_ICCPROFILE:
-            return DTWAIN_ARRAYSTRING;
+            return DTWAIN_ARRAYANSISTRING;
 
         case DTWAIN_EI_FRAME:
             return  DTWAIN_ARRAYFRAME;
