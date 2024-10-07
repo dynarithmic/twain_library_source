@@ -21,7 +21,7 @@
 #include <sstream>
 #include <boost/format.hpp>
 #include "ctliface.h"
-#include "ctlres.h"
+#include "ctlloadresources.h"
 
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
@@ -182,16 +182,6 @@ namespace dynarithmic
         }
 
         // Load the TWAIN data resources
-        int resourceID;
-        int twainID;
-        std::string twainName;
-        while (ifs >> resourceID >> twainID >> twainName)
-        {
-            if (resourceID == -1000 && twainID == -1000)
-                break;
-            CTL_StaticData::s_TwainNameMap.insert({ { resourceID,twainID }, twainName });
-        }
-
         decltype(CTL_CapStruct::m_strCapName) capName;
         decltype(CTL_CapStruct::m_nDataType)  capType;
         decltype(CTL_CapStruct::m_nGetContainer)  capGet;

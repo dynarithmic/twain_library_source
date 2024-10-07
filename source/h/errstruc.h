@@ -95,8 +95,6 @@ namespace dynarithmic
                             ERRSTRUCT_TW_METRICS
    };
 
-   typedef std::unordered_map<WPARAM, std::string> CTL_ContainerToNameMap;
-
 class CTL_ErrorStructDecoder {
     public:
         CTL_ErrorStructDecoder() = default;

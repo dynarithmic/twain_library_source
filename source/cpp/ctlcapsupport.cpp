@@ -114,7 +114,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsCapSupported(DTWAIN_SOURCE Source, LONG lCapab
     {
         // Get the cap array values
         const CTL_SourceCapInfo& Info = pHandle->m_aSourceCapInfo[nWhere];
-        CTL_CapInfoArrayPtr pArray = std::get<1>(Info);
+        CTL_CapInfoMapPtr pArray = std::get<1>(Info);
         const CTL_EnumCapability nCap = static_cast<CTL_EnumCapability>(lCapability);
         if (pArray->find(nCap) != pArray->end())
             LOG_FUNC_EXIT_NONAME_PARAMS(true)

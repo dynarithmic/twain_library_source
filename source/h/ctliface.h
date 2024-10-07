@@ -34,7 +34,7 @@
 #include "dtwain_raii.h"
 #include "ocrinterface.h"
 #include "pdffont_basic.h"
-#include "ctlres.h"
+#include "ctlloadresources.h"
 #include "dtwain.h"
 #include "twainframe.h"
 #include <boost/functional/hash.hpp>
@@ -229,23 +229,23 @@ namespace dynarithmic
     typedef boost::container::flat_map<CTL_StringType, int> CTL_StringToIntMap;
     typedef boost::container::flat_map<LONG, HMODULE> CTL_LongToHMODULEMap;
     typedef boost::container::flat_map<CTL_EnumCapability, CTL_CapInfo> CTL_EnumCapToInfoMap;
-    typedef std::vector<CallbackInfo<DTWAIN_CALLBACK_PROC, LONG> > CTL_CallbackProcArray;
-    typedef std::vector<CallbackInfo<DTWAIN_CALLBACK_PROC, LONGLONG> > CTL_CallbackProcArray64;
+    typedef std::vector<CallbackInfo<DTWAIN_CALLBACK_PROC, LONG>> CTL_CallbackProcArray;
+    typedef std::vector<CallbackInfo<DTWAIN_CALLBACK_PROC, LONGLONG>> CTL_CallbackProcArray64;
     typedef boost::container::flat_map<LONG, CTL_StringType> CTL_StringToLongMap;
     typedef boost::container::flat_map<LONG, std::string> CTL_LongToStringMap;
     typedef boost::container::flat_map<std::string, CTL_LongToStringMap> CTL_StringToMapLongToStringMap;
     typedef boost::container::flat_map<LONG, std::vector<LONG>> CTL_LongToVectorLongMap;
-    typedef std::vector<CTL_MapThreadToDLLHandle>     CTL_HookInfoArray;
+    typedef std::vector<CTL_MapThreadToDLLHandle> CTL_HookInfoArray;
 
     // Create these dynamically whenever a new source is opened
     // and source cap info does not exist.  Add cap info statically.
-    typedef boost::container::flat_map<CTL_EnumCapability, CTL_CapInfo>  CTL_CapInfoArray;
-    typedef std::shared_ptr<CTL_CapInfoArray> CTL_CapInfoArrayPtr;
+    typedef boost::container::flat_map<CTL_EnumCapability, CTL_CapInfo>  CTL_CapInfoMap;
+    typedef std::shared_ptr<CTL_CapInfoMap> CTL_CapInfoMapPtr;
 
     // Create this statically when initializing.  Initialize the second
-    // value with the dynamically created CTL_CapInfoArray above
+    // value with the dynamically created CTL_CapInfoMap above
     typedef CTL_ClassValues10<CTL_StringType, /* Product Name */
-                             CTL_CapInfoArrayPtr, /* Array of cap info*/
+                             CTL_CapInfoMapPtr, /* Array of cap info*/
                              int,       /* dummy */
                              int,        /* dummy */
                              char,
@@ -526,7 +526,6 @@ namespace dynarithmic
         static CTL_StringToMapLongToStringMap s_AllLoadedResourcesMap;
         static CTL_GeneralResourceInfo         s_ResourceInfo;
         static CTL_PDFMediaMap          s_PDFMediaMap;
-        static CTL_TwainNameMap         s_TwainNameMap;
         static CTL_AvailableFileFormatsMap s_AvailableFileFormatsMap;
         static CTL_TwainConstantsMap s_TwainConstantsMap;
         static bool s_bCheckHandles;
@@ -578,13 +577,11 @@ namespace dynarithmic
         static CTL_LongToStringMap* GetCurrentLanguageResource();
         static CTL_GeneralResourceInfo& GetGeneralResourceInfo() { return s_ResourceInfo; }
         static CTL_PDFMediaMap& GetPDFMediaMap() { return s_PDFMediaMap; }
-        static CTL_TwainNameMap& GetTwainNameMap() { return s_TwainNameMap; }
-        static std::string GetTwainNameFromResource(int nWhichResourceID, int nWhichItem);
         static CTL_AvailableFileFormatsMap& GetAvailableFileFormatsMap() { return s_AvailableFileFormatsMap; }
         static CTL_TwainConstantsMap& GetTwainConstantsMap() { return s_TwainConstantsMap; }
         static CTL_TwainConstantToStringMapNode& GetTwainConstantsStrings(LONG nWhich) { return s_TwainConstantsMap[nWhich]; }
         static bool IsCheckHandles() { return s_bCheckHandles; }
-        static int GetIDFromTwainName(std::string sName);
+        static std::pair<bool, int32_t> GetIDFromTwainName(std::string sName);
         static int GetDGResourceID() { return 8890; }
         static int GetDATResourceID() { return 8891; }
         static int GetMSGResourceID() { return 8892; }
@@ -601,6 +598,8 @@ namespace dynarithmic
         static SourceStatusMap& GetSourceStatusMap() { return s_SourceStatusMap;  }
         static CTL_StringType& GetResourceVersion() { return s_ResourceVersion; }
         static CTL_StringType GetTwainNameFromConstant(int lConstantType, int lTwainConstant);
+        static std::string GetTwainNameFromConstantA(int lConstantType, int lTwainConstant);
+        static std::wstring GetTwainNameFromConstantW(int lConstantType, int lTwainConstant);
     };
 
     struct CTL_LoggerCallbackInfo
@@ -770,7 +769,7 @@ namespace dynarithmic
     void SetCapabilityInfo(CTL_TwainDLLHandle* pHandle, DTWAIN_SOURCE Source, LONG value, LONG lCap)
     {
         auto pSource = static_cast<CTL_ITwainSource*>(Source);
-        const CTL_CapInfoArrayPtr pArray = GetCapInfoArray(pHandle, pSource);
+        const CTL_CapInfoMapPtr pArray = GetCapInfoArray(pHandle, pSource);
 
         // Get the cap array values
         const auto iter = pArray->find(static_cast<TW_UINT16>(lCap));
@@ -791,7 +790,7 @@ namespace dynarithmic
     #define DTWAIN_TEST_SOURCEOPEN_SETLASTERROR (DTWAIN_TEST_SOURCEOPEN | DTWAIN_TEST_SETLASTERROR)
     #define DTWAIN_TEST_DLLHANDLE_SETLASTERROR (DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_SETLASTERROR)
     #define DTWAIN_VERIFY_SOURCEHANDLE_SETLASTERROR (DTWAIN_VERIFY_SOURCEHANDLE | DTWAIN_TEST_SETLASTERROR)
-
+    
     CTL_TwainDLLHandle* FindHandle(HWND hWnd, bool bIsDisplay);
     CTL_TwainDLLHandle* FindHandle(HINSTANCE hInst);
     std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> VerifyHandles(DTWAIN_SOURCE Source, int Testing = DTWAIN_VERIFY_DLLHANDLE | DTWAIN_VERIFY_SOURCEHANDLE | DTWAIN_TEST_SETLASTERROR);
@@ -863,7 +862,7 @@ namespace dynarithmic
 
     DTWAIN_BOOL DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *p, CTL_TwainDLLHandle *pHandle, TW_UINT16 nCapToCache);
     DTWAIN_BOOL DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, CTL_TwainDLLHandle *pHandle, CTL_EnumeratorNode<LONG>::container_pointer_type vCaps);
-    CTL_CapInfoArrayPtr GetCapInfoArray(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource *p);
+    CTL_CapInfoMapPtr GetCapInfoArray(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource *p);
     DTWAIN_SOURCE SourceSelect(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& options);
     DTWAIN_ARRAY  SourceAcquire(SourceAcquireOptions& opts);
     bool AcquireExHelper(SourceAcquireOptions& opts);

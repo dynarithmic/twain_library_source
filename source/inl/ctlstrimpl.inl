@@ -1516,6 +1516,29 @@ LONG DLLENTRY_DEF DTWAIN_GetActiveDSMPathA(LPSTR lpszBuffer, LONG nLength)
 #endif
 }
 
+
+LONG DLLENTRY_DEF DTWAIN_GetActiveDSMVersionInfoW(LPWSTR lpszBuffer, LONG nLength)
+{
+#ifdef _UNICODE
+    return DTWAIN_GetActiveDSMVersionInfo(lpszBuffer, nLength);
+#else
+    std::string args((std::max)(nLength, 0L), 0);
+    LONG retVal = DTWAIN_GetActiveDSMVersionInfo((nLength > 0 && lpszBuffer) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    return null_terminator_copier(get_view(args), lpszBuffer, retVal);
+#endif
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetActiveDSMVersionInfoA(LPSTR lpszBuffer, LONG nLength)
+{
+#ifdef _UNICODE
+    std::wstring args((std::max)(nLength, 0L), 0);
+    const LONG retVal = DTWAIN_GetActiveDSMVersionInfo((nLength > 0 && lpszBuffer) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    return null_terminator_copier(get_view(args), lpszBuffer, retVal);
+#else
+    return DTWAIN_GetActiveDSMVersionInfo(lpszBuffer, nLength);
+#endif
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetXResolutionStringA(DTWAIN_SOURCE Source, LPSTR Resolution)
 {
 #ifdef _UNICODE

@@ -704,7 +704,7 @@ void DisplaySourceProps()
 
 void DisplayLoggingOptions()
 {
-    LONG LogFlags = DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_LOWLEVELTWAIN | DTWAIN_LOG_DECODE_TWEVENT | DTWAIN_LOG_DECODE_TWMEMREF | DTWAIN_LOG_ISTWAINMSG;
+    LONG LogFlags = DTWAIN_LOG_ALL &~ (DTWAIN_LOG_ISTWAINMSG | DTWAIN_LOG_USEFILE | DTWAIN_LOG_DEBUGMONITOR | DTWAIN_LOG_CONSOLE);
     if ( DialogBox(g_hInstance, (LPCTSTR)IDD_dlgDebug, g_hWnd, (DLGPROC)DisplayLoggingProc) == IDOK )
     {
         // Make sure we make this exclusive by turning off all logging

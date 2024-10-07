@@ -18,11 +18,12 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLRES_H
-#define CTLRES_H
+#ifndef CTLLOADRESOURCES_H
+#define CTLLOADRESOURCES_H
 #include <vector>
 #include <string>
 #include <array>
+#include <boost/container/flat_map.hpp>
 
 #define DTWAINLANGRESOURCEFILE _T("twainresourcestrings_")
 #define DTWAINRESOURCEINFOFILE _T("twaininfo.txt")
@@ -31,14 +32,13 @@
 
 namespace dynarithmic
 {
-    typedef std::unordered_map<std::string, bool> CTL_ResourceRegistryMap;
+    typedef boost::container::flat_map<std::string, bool> CTL_ResourceRegistryMap;
 
     bool LoadLanguageResourceA(LPCSTR lpszName, const CTL_ResourceRegistryMap& registryMap, bool bClear);
     bool LoadLanguageResourceA(LPCSTR lpszName, bool bClear);
     bool LoadLanguageResourceA(const std::string& lpszName, const CTL_ResourceRegistryMap& registryMap, bool bClear);
     bool LoadLanguageResourceA(const std::string& lpszName, bool bClear);
     bool LoadLanguageResourceFromRC();
-
 
     struct ResourceLoadingInfo
     {

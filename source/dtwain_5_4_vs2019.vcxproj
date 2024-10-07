@@ -1473,14 +1473,13 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\ansiwideconverter_generic.h" />
     <ClInclude Include="h\ansiwideconverter_win32.h" />
     <ClInclude Include="h\arrayfactory.h" />
-    <ClInclude Include="h\ctlccerr.h" />
     <ClInclude Include="h\ctlconstexprfind.h" />
     <ClInclude Include="h\ctlconstexprutils.h" />
     <ClInclude Include="h\ctldefsource.h" />
     <ClInclude Include="h\ctldib32.h" />
     <ClInclude Include="h\ctlfilesave.h" />
     <ClInclude Include="h\ctlfileutils.h" />
-    <ClInclude Include="h\ctlres.h" />
+    <ClInclude Include="h\ctlloadresources.h" />
     <ClInclude Include="h\ctlsupport.h" />
     <ClInclude Include="h\ctlthreadutils.h" />
     <ClInclude Include="h\ctltr037.h" />

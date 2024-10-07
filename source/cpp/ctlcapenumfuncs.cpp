@@ -70,8 +70,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
             {
                 // Get the cap array values
                 const CTL_SourceCapInfo Info = pHandle->m_aSourceCapInfo[nWhere];
-                CTL_CapInfoArray *pCapInfoArray = std::get<1>(Info).get();
-                std::for_each(pCapInfoArray->begin(), pCapInfoArray->end(), [&vCaps](const CTL_CapInfoArray::value_type& CapInfo)
+                CTL_CapInfoMap *pCapInfoArray = std::get<1>(Info).get();
+                std::for_each(pCapInfoArray->begin(), pCapInfoArray->end(), [&vCaps](const CTL_CapInfoMap::value_type& CapInfo)
                                 { vCaps.push_back(static_cast<int>(std::get<0>(CapInfo))); });
                 *Array = CreateArrayCopyFromFactory(pHandle, ThisArray);
                 LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -229,11 +229,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAllCapsToDefault(DTWAIN_SOURCE Source)
     DTWAINArrayPtr_RAII arr(pHandle, &a);
     DTWAIN_EnumSupportedCaps(Source, &a);
 
-    const CTL_CapInfoArrayPtr pArray = GetCapInfoArray(pHandle, pSource);
+    const CTL_CapInfoMapPtr pArray = GetCapInfoArray(pHandle, pSource);
 
     std::vector<int> Array;
     Array.push_back(0);
-    for_each(pArray->begin(), pArray->end(), [&](const CTL_CapInfoArray::value_type& InfoVal)
+    for_each(pArray->begin(), pArray->end(), [&](const CTL_CapInfoMap::value_type& InfoVal)
     {
         const CTL_CapInfo Info = InfoVal.second;
         if (pTheSource->IsCapNegotiableInState(static_cast<TW_UINT16>(std::get<0>(Info)), pTheSource->GetState()))

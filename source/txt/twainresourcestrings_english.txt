@@ -78,6 +78,7 @@
 1062 CRC check failed.  Check for corrupted twaininfo.txt file
 1063 The twaininfo.txt file version is invalid for this version of DTWAIN
 1064 Windows API Error
+1065 No TWAIN ID matches the string
 1100 TWAIN Condition Code: Could not complete operation.  Insufficient Memory.
 1101 TWAIN Condition Code: No Error
 1102 TWAIN Condition Code: Unknown cause of failure

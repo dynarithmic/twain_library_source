@@ -31,7 +31,7 @@ CTL_StringType GetTwainDirFullName(LPCTSTR strTwainDLLName,
                                     boost::dll::shared_library *pModule = nullptr)
 {
     auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-	static std::unordered_map<LONG, std::string> searchOrderMap = {
+    static constexpr std::array<std::pair<LONG, const char*>, 15> searchOrderMap = { {
 		{DTWAIN_TWAINDSMSEARCH_WSO,"WSO"},
 		{ DTWAIN_TWAINDSMSEARCH_WOS,"WOS" },
 		{ DTWAIN_TWAINDSMSEARCH_SWO,"SWO" },
@@ -46,13 +46,12 @@ CTL_StringType GetTwainDirFullName(LPCTSTR strTwainDLLName,
 		{ DTWAIN_TWAINDSMSEARCH_SW,"SW" },
 		{ DTWAIN_TWAINDSMSEARCH_SO,"SO" },
 		{ DTWAIN_TWAINDSMSEARCH_OW,"OW" },
-		{ DTWAIN_TWAINDSMSEARCH_OS,"OS" } };
+        { DTWAIN_TWAINDSMSEARCH_OS,"OS" } } };
 
-    auto iter = searchOrderMap.find(pHandle->m_TwainDSMSearchOrder);
-	if (iter != searchOrderMap.end())
+    auto iter = dynarithmic::generic_array_finder_if(searchOrderMap, [&](const auto& pr) { return pr.first == pHandle->m_TwainDSMSearchOrder; });
+	if (iter.first)
 	{
-        
-        pHandle->m_TwainDSMSearchOrderStr = iter->second + "CU";
+        pHandle->m_TwainDSMSearchOrderStr = searchOrderMap[iter.second].second + std::string("CU");
         return GetTwainDirFullNameEx(pHandle, strTwainDLLName, bLeaveLoaded, pModule);
 	}
     // This will completely use the Ex version of finding the directory
@@ -77,13 +76,13 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
     // if TWAIN isn't found there, check system directory.
     // if not there, then use the Windows path search logic
     std::set<CTL_StringType> strSet;
-	static std::unordered_map<StringWrapperA::traits_type::char_type, int> searchMap = { 
+    static constexpr std::array<std::pair<StringWrapperA::traits_type::char_type, int>, 5> searchMap = { {
 		{'C',CurDirPos},
 		{'W',WinDirPos},
 		{'S',SysDirPos},
 		{'O',SysPathPos},
         {'U',UserDefPos },
-     };
+     } };
 
     std::vector<CTL_StringType> dirNames(searchMap.size());
 
@@ -100,7 +99,8 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
 	for (int i = 0; i < minSize; ++i)
     {
         // skip this search if -1 is given
-        const int nCurDir = searchMap[curSearchOrder[i]];
+        auto curOrder = dynarithmic::generic_array_finder_if(searchMap, [&](const auto& pr) { return pr.first == curSearchOrder[i]; });
+        const int nCurDir = searchMap[curOrder.second].second;
         if (nCurDir == -1)
             continue;
 

@@ -1039,7 +1039,7 @@ bool CTL_ITwainSource::EnumExtImageInfo(CTL_IntArray& r)
 ///////////////////////////////////////////////
 bool CTL_ITwainSource::IsExtendedCapNegotiable(LONG nCap)
 {
-    if (find(m_aExtendedCaps.begin(), m_aExtendedCaps.end(), nCap) !=
+    if (std::find(m_aExtendedCaps.begin(), m_aExtendedCaps.end(), nCap) !=
         m_aExtendedCaps.end())
         return true;
     return false;

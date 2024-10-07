@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltwainmanager.h"
-#include "ctlres.h"
+#include "ctlloadresources.h"
 #include "ctliface.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -112,7 +112,6 @@ CTL_PairToStringMap         CTL_StaticData::s_ResourceCache;
 std::string                 CTL_StaticData::s_CurrentResourceKey;
 CTL_GeneralResourceInfo     CTL_StaticData::s_ResourceInfo;
 CTL_PDFMediaMap             CTL_StaticData::s_PDFMediaMap;
-CTL_TwainNameMap            CTL_StaticData::s_TwainNameMap;
 CTL_AvailableFileFormatsMap CTL_StaticData::s_AvailableFileFormatsMap;
 CTL_TwainConstantsMap       CTL_StaticData::s_TwainConstantsMap;
 bool                        CTL_StaticData::s_bCheckHandles = true;
@@ -145,7 +144,7 @@ bool                        CTL_StaticData::s_ResourcesInitialized = false;
 ImageResamplerMap           CTL_StaticData::s_ImageResamplerMap;
 SourceStatusMap             CTL_StaticData::s_SourceStatusMap;
 
-CTL_StringType CTL_StaticData::GetTwainNameFromConstant(int lConstantType, int lTwainConstant)
+std::string CTL_StaticData::GetTwainNameFromConstantA(int lConstantType, int lTwainConstant)
 {
     auto& constantsmap = CTL_StaticData::GetTwainConstantsMap();
     auto iter1 = constantsmap.find(lConstantType);
@@ -154,7 +153,17 @@ CTL_StringType CTL_StaticData::GetTwainNameFromConstant(int lConstantType, int l
     auto iter2 = iter1->second.find(lTwainConstant);
     if (iter2 == iter1->second.end())
         return {};
-    return StringConversion::Convert_Ansi_To_Native(iter2->second);
+    return iter2->second;
+}
+
+CTL_StringType CTL_StaticData::GetTwainNameFromConstant(int lConstantType, int lTwainConstant)
+{
+    return StringConversion::Convert_Ansi_To_Native(CTL_StaticData::GetTwainNameFromConstantA(lConstantType, lTwainConstant));
+}
+
+std::wstring CTL_StaticData::GetTwainNameFromConstantW(int lConstantType, int lTwainConstant)
+{
+    return StringConversion::Convert_Ansi_To_Wide(CTL_StaticData::GetTwainNameFromConstantA(lConstantType, lTwainConstant));
 }
 
 CTL_LongToStringMap* CTL_StaticData::GetLanguageResource(std::string sLang)
@@ -176,25 +185,28 @@ void CTL_TwainDLLHandle::NotifyWindows(UINT /*nMsg*/, WPARAM /*wParam*/, LPARAM 
 {
 }
 
-std::string CTL_StaticData::GetTwainNameFromResource(int nWhichResourceID, int nWhichItem)
+std::pair<bool, int32_t> CTL_StaticData::GetIDFromTwainName(std::string sName)
 {
-    auto& name_map = CTL_StaticData::GetTwainNameMap();
-    const auto iter = name_map.Left().find({ nWhichResourceID,nWhichItem });
-    if (iter != name_map.Left().end())
-        return iter->second;
-    return {};
+    std::string actualName = StringWrapperA::TrimAll(sName);
+    auto& constantsMap = CTL_StaticData::GetTwainConstantsMap();
+    for (auto& prMap : constantsMap)
+    {
+        auto& maptwainIDs = prMap.second;
+        auto iterFound = std::find_if(maptwainIDs.begin(), maptwainIDs.end(), [&](const auto& pr) { return pr.second == actualName; });
+        if (iterFound != maptwainIDs.end())
+            return { true, iterFound->first };
+    }
+    return { false, (std::numeric_limits<int32_t>::min)() };
 }
 
-int CTL_StaticData::GetIDFromTwainName(std::string sName)
-{
-    auto& name_map = CTL_StaticData::GetTwainNameMap();
+/*    auto& name_map = CTL_StaticData::GetTwainNameMap();
     StringWrapperA::MakeUpperCase(StringWrapperA::TrimAll(sName));
     const auto iter = name_map.Right().find(sName);
     if (iter != name_map.Right().end())
         return iter->second.second;
     return{};
 }
-
+*/
 /////////////////////////////////////////////////////////////////////////
 // static definitions
 CTL_TwainDLLHandle* dynarithmic::FindHandle(HWND hWnd, bool bIsDisplay)

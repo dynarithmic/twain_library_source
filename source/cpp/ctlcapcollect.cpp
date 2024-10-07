@@ -70,7 +70,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
     // Check if this source has had capabilities negotiated and tested
     int nWhere;
 
-    CTL_CapInfoArrayPtr pArray;
+    CTL_CapInfoMapPtr pArray;
     bool bNewArray = false;
 
     // get the array of cap info for this source
@@ -78,7 +78,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
     if (!pArray)
     {
         // create a new one
-        pArray.reset(new CTL_CapInfoArray);
+        pArray.reset(new CTL_CapInfoMap);
         bNewArray = true;
     }
 

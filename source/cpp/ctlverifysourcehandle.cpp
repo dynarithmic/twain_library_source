@@ -40,6 +40,7 @@ std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> dynarithmic::VerifyHandles(DTW
     CTL_TwainDLLHandle* pHandle = nullptr;
     bool doThrow = !(Testing & DTWAIN_TEST_NOTHROW);
     bool setLastError = Testing & DTWAIN_TEST_SETLASTERROR;
+
     if (!CTL_StaticData::IsCheckHandles())
     {
         pSource = static_cast<CTL_ITwainSource*>(Source);
@@ -59,6 +60,7 @@ std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> dynarithmic::VerifyHandles(DTW
                 throw DTWAIN_ERR_BAD_HANDLE;
             return { nullptr, nullptr };
         }
+
         if ( (Testing & DTWAIN_VERIFY_SOURCEHANDLE) || (Testing & DTWAIN_TEST_SOURCEOPEN))
         {
             if ( !pHandle )
@@ -94,6 +96,9 @@ std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> dynarithmic::VerifyHandles(DTW
             }
         }
     }
+    // no error
+    if (Testing & DTWAIN_TEST_SETLASTERROR)
+        pHandle->m_lLastError = DTWAIN_NO_ERROR;
     return { pHandle, pSource };
 }
 
