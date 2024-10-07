@@ -154,8 +154,9 @@ bool VersionInfoImpl<charTraits>::getit( typename charTraits::TraitsCharType con
 }
 
 template <typename charTraits>
-void VersionInfoImpl<charTraits>::printit(typename charTraits::TraitsBaseOutputStreamType& stream, const char_type* eol) const
+void VersionInfoImpl<charTraits>::printit(typename charTraits::TraitsBaseOutputStreamType& stream, int indent, const char_type* eol) const
 {
+    charTraits::TraitsStringType indentStr(indent, charTraits::SpaceChar);
     for ( auto it = m_verStrings.begin( )
         ; it != m_verStrings.end( )
         ; ++it
@@ -163,7 +164,7 @@ void VersionInfoImpl<charTraits>::printit(typename charTraits::TraitsBaseOutputS
     {
         if ( (*it).second.empty() )
         {
-            stream << (*it).first.c_str( ) << charTraits::Compat(": (none)");
+            stream << indentStr << (*it).first.c_str( ) << charTraits::Compat(": (none)");
             if ( !eol )
                 stream << std::endl;
             else
@@ -171,7 +172,7 @@ void VersionInfoImpl<charTraits>::printit(typename charTraits::TraitsBaseOutputS
         }
         else
         {
-            stream << (*it).first.c_str( ) << charTraits::Compat(": ") << (*it).second.c_str( );
+            stream << indentStr << (*it).first.c_str( ) << charTraits::Compat(": ") << (*it).second.c_str( );
             if ( !eol )
                 stream << std::endl;
             else
@@ -185,6 +186,6 @@ template <typename charTraits>
 typename charTraits::TraitsBaseOutputStreamType& operator << (typename charTraits::TraitsBaseOutputStreamType& os,
                                                      const VersionInfoImpl<charTraits>& vi)
 {
-    vi.printit( os );
+    vi.printit( os, 0 );
     return os;
 }
