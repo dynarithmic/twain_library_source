@@ -23,7 +23,7 @@
 
 #include "dtwain_version.h"
 
-#define DTWAIN_VERINFO_COMMENTS             "Patch Level " DTWAIN_VERINFO_PATCHLEVEL_VERSION "\0"
+#define DTWAIN_VERINFO_COMMENTS             DTWAIN_VERINFO_FILEVERSION " Build " DTWAIN_BUILDVERSION "\0"
 #define DTWAIN_VERINFO_COMPANYNAME          "Dynarithmic Software\0"
 #define DTWAIN_VERINFO_LEGALCOPYRIGHT       "Copyright © 2020-2024\0"
 #define DTWAIN_VERINFO_PRODUCTNAME          "Dynarithmic Software Twain Library " UNICODE_VERSION "\0"

@@ -358,52 +358,17 @@ namespace dynarithmic
         // Read in the minimum version number for this resource
         // Check if resource version if >= running version
         std::getline(ifs, totalLine);
-
-        // Check that all components are integers
-        auto origVersion = totalLine;
-        std::replace(totalLine.begin(), totalLine.end(), '.', ' ');
-        std::istringstream strmVersion(totalLine);
-        std::string oneNumber;
-        constexpr std::array<int, 3> componentNames = 
-            { 
-              DTWAIN_TEXTRESOURCE_MIN_MAJOR_VERSION, 
-              DTWAIN_TEXTRESOURCE_MIN_MINOR_VERSION, 
-              DTWAIN_TEXTRESOURCE_MIN_PATCHLEVEL_VERSION 
-            };
-        int currentComponent = 0;
-        bool badVersion = false;
-
-        // Test that the version number for the twain resource found is at least 
-        // equal to or higher than the version number built into the DTWAIN library
-        while (strmVersion >> oneNumber)
-        {
-            try
-            {
-                auto num = std::stoi(oneNumber);
-                if (num < componentNames[currentComponent])
-                {
-                    badVersion = true;
-                    break;
-                }
-                ++currentComponent;
-                if (currentComponent >= static_cast<int>(componentNames.size()))
-                    break;
-            }
-            catch (...)
-            {
-                badVersion = true;
-            }
-        }
-        if (badVersion)
+        bool goodVersion = (DTWAIN_TEXTRESOURCE_FILEVERSION == totalLine);
+        if (!goodVersion)
         {
             retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_VERSION_READ] = false;
-            retValue.errorMessage = StringConversion::Convert_Ansi_To_Native(origVersion);
+            retValue.errorMessage = StringConversion::Convert_Ansi_To_Native(totalLine);
             return false;
         }
         else
             retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_VERSION_READ] = true;
 
-        CTL_StaticData::s_ResourceVersion = StringConversion::Convert_Ansi_To_Native(origVersion);
+        CTL_StaticData::s_ResourceVersion = StringConversion::Convert_Ansi_To_Native(DTWAIN_TEXTRESOURCE_FILEVERSION);
         bool doResourceCheck = iniInterface->GetBoolValue("Miscellaneous", "resourcecheck", true);
         if (doResourceCheck)
         {
