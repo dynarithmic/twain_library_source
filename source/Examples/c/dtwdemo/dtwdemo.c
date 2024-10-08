@@ -451,12 +451,16 @@ void SelectTheSource(int nWhich)
         }
         else
             MessageBox(g_hWnd, _T("Error Opening Source"), _T("TWAIN Error"), MB_ICONSTOP);
-
     }
     else
-        MessageBox(g_hWnd, _T("Error Selecting Source"), _T("TWAIN Error"), MB_ICONSTOP);
+    {
+        LONG lastError = DTWAIN_GetLastError();
+        if (lastError == DTWAIN_ERR_SOURCESELECTION_CANCELED)
+            MessageBox(g_hWnd, _T("Canceled Selecting Source"), _T("Information"), MB_ICONSTOP);
+        else
+            MessageBox(g_hWnd, _T("Error Selecting Source"), _T("TWAIN Error"), MB_ICONSTOP);
+    }
 }
-
 
 void SetCaptionToSourceName()
 {
