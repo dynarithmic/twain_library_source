@@ -51,7 +51,7 @@ namespace dynarithmic
     static std::vector<std::pair<uint16_t, uint16_t>> parseBracketedPairs(std::string bracketedPairs)
     {
         std::vector<std::pair<uint16_t, uint16_t>> retVal;
-        auto pos = 0;
+        size_t pos = 0;
         while (true)
         {
             pos = bracketedPairs.find_first_of('[');
@@ -126,7 +126,7 @@ namespace dynarithmic
             lineQueue.pop();
             lineQueue.push(line);
         }
-        auto crcVal = crc32_aux(0, (unsigned char*)totalBuf.data(), totalBuf.size());
+        auto crcVal = crc32_aux(0, (unsigned char*)totalBuf.data(), static_cast<unsigned int>(totalBuf.size()));
         try
         {
             uint64_t crc = std::stoul(lineQueue.front());
