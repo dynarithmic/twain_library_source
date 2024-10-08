@@ -309,6 +309,8 @@ DTWAIN_SOURCE dynarithmic::DTWAIN_LLSelectSource2(CTL_TwainDLLHandle* pHandle,  
     opts.getDefaultFunc = &GetDefaultName;
     opts.getNameListFunc = &GetNameList;
     CTL_StringType actualSourceName = LLSelectionDialog(pHandle, opts);
+    if ( actualSourceName.empty() )
+        LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
     bool openWhenSelected = !(opts.nOptions & DTWAIN_DLG_NOOPENONSELECT)?true:false;
     DTWAIN_SOURCE Source = 
             SelectSourceHelper(pHandle, SourceSelectionOptions(SELECTSOURCEBYNAME, IDS_SELECT_SOURCE_TEXT, actualSourceName.c_str()), openWhenSelected);
