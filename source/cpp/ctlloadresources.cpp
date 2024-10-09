@@ -192,14 +192,50 @@ namespace dynarithmic
         decltype(CTL_CapStruct::m_nSetConstraintContainer) capSetConstraint;
         decltype(CTL_CapStruct::m_nResetContainer) capReset;
         decltype(CTL_CapStruct::m_nQuerySupportContainer) capQuery;
+
+        // First load the offset for the extended information constants
+        std::string sOffset;
+        int32_t extOffset = 0;
+        ifs >> sOffset;
+        try
+        {
+            extOffset = stol(sOffset);
+        }
+        catch (...)
+        {
+            retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] = false;
+            return false;
+        }
+        CTL_StaticData::SetExtImageInfoOffset(extOffset);
+
+        std::string sCap;
         LONG lCap;
         auto& extendedImageInfoMap = CTL_StaticData::GetExtendedImageInfoMap();
-        while (ifs >> lCap >> capName >> capType >> capGet >>
+        while (ifs >> sCap >> capName >> capType >> capGet >>
                 capGetCurrent >> capGetDefault >> capSet >> capSetConstraint >>
                 capReset >> capQuery)
         {
+            try
+            {
+                if (StringWrapperA::StartsWith(sCap, "0x"))
+                    lCap = std::stol(sCap, nullptr, 16);
+                else
+                    lCap = std::stol(sCap);
+            }
+            catch (...)
+            {
+                retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] = false;
+                return false;
+            }
+
             if (lCap == -1000 && capName == "END")
                 break;
+            bool isTWEIName = StringWrapperA::StartsWith(capName, "TWEI_");
+            if (isTWEIName)
+            {
+                extendedImageInfoMap.insert({ lCap ,capName });
+                lCap += extOffset;
+            }
             CTL_CapStruct cStruct;
             cStruct.m_nDataType = capType;
             cStruct.m_nGetContainer = capGet;
@@ -211,8 +247,6 @@ namespace dynarithmic
             cStruct.m_nResetContainer = capReset;
             cStruct.m_nQuerySupportContainer = capQuery;
             CTL_StaticData::GetGeneralCapInfo().insert({ static_cast<TW_UINT16>(lCap), cStruct });
-            if (StringWrapperA::StartsWith(capName, "TWEI_"))
-                extendedImageInfoMap.insert({ lCap - 1000 ,capName });
         }
 
         auto& bppMap = CTL_ImageIOHandler::GetSupportedBPPMap();
