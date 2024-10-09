@@ -2450,29 +2450,22 @@ std::pair<bool, CTL_StringType> CTL_TwainAppMgr::CheckTwainExistence(CTL_StringT
 
 LONG CTL_TwainAppMgr::ExtImageInfoArrayType(LONG ExtType)
 {
-    switch(ExtType)
+    auto& capInfo = CTL_StaticData::GetGeneralCapInfo();
+    auto iter = capInfo.find(static_cast<TW_UINT16>(ExtType));
+    if (iter != capInfo.end())
     {
-        case DTWAIN_EI_BARCODETEXT:
-        case DTWAIN_EI_BARCODETEXT2:
-        case DTWAIN_EI_TWAINDIRECTMETADATA:
-            return DTWAIN_ARRAYHANDLE;
-
-        case DTWAIN_EI_ENDORSEDTEXT:
-        case DTWAIN_EI_FORMTEMPLATEMATCH:
-        case DTWAIN_EI_BOOKNAME:
-        case DTWAIN_EI_CAMERA:
-        case DTWAIN_EI_IAFIELDA_VALUE:
-        case DTWAIN_EI_IAFIELDB_VALUE:
-        case DTWAIN_EI_IAFIELDC_VALUE:
-        case DTWAIN_EI_IAFIELDD_VALUE:
-        case DTWAIN_EI_IAFIELDE_VALUE:
-        case DTWAIN_EI_FILESYSTEMSOURCE:
-        case DTWAIN_EI_PRINTERTEXT:
-        case DTWAIN_EI_ICCPROFILE:
+        auto& capStruct = iter->second;
+        TW_UINT16 actualType = static_cast<TW_UINT16>(capStruct.m_nDataType);
+        if (dynarithmic::IsTwainIntegralType(actualType))
+            return DTWAIN_ARRAYLONG;
+        if (dynarithmic::IsTwainStringType(actualType))
             return DTWAIN_ARRAYANSISTRING;
-
-        case DTWAIN_EI_FRAME:
-            return  DTWAIN_ARRAYFRAME;
+        if (dynarithmic::IsTwainHandleType(actualType))
+            return DTWAIN_ARRAYHANDLE;
+        if (dynarithmic::IsTwainFrameType(actualType))
+            return DTWAIN_ARRAYFRAME;
+        if (dynarithmic::IsTwainFix32Type(actualType))
+            return DTWAIN_ARRAYFLOAT;
     }
     return DTWAIN_ARRAYLONG;
 }

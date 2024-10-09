@@ -61,7 +61,7 @@ namespace dynarithmic
             bool AddInfo(TW_INFO Info);
 
             // Utility functions
-            bool GetItemData(int nWhichItem, int nSearch, int nWhichValue, LPVOID Data, LPVOID* pHandleData, size_t *pItemSize= nullptr) const;
+            std::pair<bool, int32_t> GetItemData(int nWhichItem, int nSearch, int nWhichValue, LPVOID Data, LPVOID* pHandleData, size_t *pItemSize= nullptr) const;
 
             bool IsItemHandle(size_t nWhich) const;
 
