@@ -927,7 +927,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
     // Check if array exists
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !Data;}, DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
     // Create the array that corresponds with the correct type
-    const DTWAIN_ARRAY ExtInfoArray = CreateArrayFromFactory(pHandle, CTL_TwainAppMgr::ExtImageInfoArrayType(nWhich), 0);
+    const DTWAIN_ARRAY ExtInfoArray = CreateArrayFromFactory(pHandle, 
+                    CTL_TwainAppMgr::ExtImageInfoArrayType(nWhich + CTL_StaticData::GetExtImageInfoOffset()), 0);
     if ( !ExtInfoArray )
     {
         // Check if array exists
@@ -941,7 +942,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
     // resize the array
     const auto& factory = pHandle->m_ArrayFactory;
     factory->resize(ExtInfoArray, Count);
-
+    std::pair<bool, int32_t> finalRet = { true, DTWAIN_NO_ERROR };
     for ( int i = 0; i < Count; ++i )
     {
         auto eType = pHandle->m_ArrayFactory->tag_type(ExtInfoArray);
@@ -949,26 +950,38 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
         {
             std::vector<char> Temp;
             size_t ItemSize;
-            if ( p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, nullptr, nullptr, &ItemSize) )
+            finalRet = p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, nullptr, nullptr, &ItemSize);
+            if ( finalRet.first )
             {
                 Temp.resize(ItemSize);
-                p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, Temp.data(), nullptr, nullptr);
-                SetArrayValueFromFactory(pHandle, ExtInfoArray, i, Temp.data());
+                finalRet = p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, Temp.data(), nullptr, nullptr);
+                if ( finalRet.first)
+                    SetArrayValueFromFactory(pHandle, ExtInfoArray, i, Temp.data());
             }
         }
         else
         if (eType == CTL_ArrayFactory::arrayTag::VoidPtrType) // This is a handle
         {
-
             TW_HANDLE pDataHandle = nullptr;
-            p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, nullptr, &pDataHandle, nullptr);
-            auto& vValues = factory->underlying_container_t<void*>(ExtInfoArray);
-            vValues[i] = pDataHandle;
+            finalRet = p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, nullptr, &pDataHandle, nullptr);
+            if (finalRet.first)
+            {
+                auto& vValues = factory->underlying_container_t<void*>(ExtInfoArray);
+                vValues[i] = pDataHandle;
+            }
         }
         else
-            p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, factory->get_buffer(ExtInfoArray, i), nullptr);
+        {
+            finalRet = p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, factory->get_buffer(ExtInfoArray, i), nullptr);
+        }
     }
     *Data = ExtInfoArray;
+    if (!finalRet.first)
+    {
+        // Error occurred
+        CTL_TwainAppMgr::SetError(finalRet.second, "", false);
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    }
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }

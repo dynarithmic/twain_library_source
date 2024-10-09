@@ -168,49 +168,8 @@ void CTL_ExtImageInfoTriplet::ResolveTypes()
     int i = 0;
     for (auto& pr : m_ExtInfoMap)
     {
-        TW_INFO& theInfo = pr.second;
-        if (theInfo.InfoID < CAP_CUSTOMBASE )
-        {
-            switch (theInfo.InfoID)
-            {
-                case DTWAIN_EI_BARCODETEXT:
-                case DTWAIN_EI_BARCODETEXT2:
-                    theInfo.ItemType = 0;
-                break;
-
-                case DTWAIN_EI_ENDORSEDTEXT:
-                case DTWAIN_EI_FORMTEMPLATEMATCH:
-                case DTWAIN_EI_BOOKNAME:
-                case DTWAIN_EI_CAMERA:
-                    theInfo.ItemType = TWTY_STR255;
-                break;
-
-                case TWEI_IAFIELDA_VALUE:
-                case TWEI_IAFIELDB_VALUE:
-                case TWEI_IAFIELDC_VALUE:
-                case TWEI_IAFIELDD_VALUE:
-                case TWEI_IAFIELDE_VALUE:
-                    theInfo.ItemType = TWTY_STR32;
-                break;
-
-                case DTWAIN_EI_FRAME:
-                    theInfo.ItemType = TWTY_FRAME;
-                break;
-
-                case DTWAIN_EI_PIXELFLAVOR:
-                case DTWAIN_EI_IALEVEL:
-                case DTWAIN_EI_PRINTER:
-                    theInfo.ItemType = TWTY_UINT16;
-                break;
-
-                default:
-                    theInfo.ItemType = TWTY_UINT32;
-                break;
-            }
-        }
-
         // Set the info within the allocated memory here
-        TW_INFO Info = pr.second;
+        TW_INFO& Info = pr.second;
         memcpy(&m_pExtImageInfo->Info[i], &Info, sizeof(TW_INFO));
         // Go to next INFO entry
         ++i;
@@ -243,11 +202,11 @@ CTL_ExtImageInfoTriplet::~CTL_ExtImageInfoTriplet()
     }
 }
 
-bool CTL_ExtImageInfoTriplet::GetItemData(int nWhichItem, int nSearch, int nWhichValue, LPVOID Data, LPVOID* pHandleData, size_t* pItemSize/*=NULL*/) const
+std::pair<bool, int32_t> CTL_ExtImageInfoTriplet::GetItemData(int nWhichItem, int nSearch, int nWhichValue, LPVOID Data, LPVOID* pHandleData, size_t* pItemSize/*=NULL*/) const
 {
     auto sessionHandle = GetSourcePtr()->GetDTWAINHandle();
     if (!sessionHandle)
-        return false;
+        return { false, DTWAIN_ERR_BAD_HANDLE };
 
     TW_INFO Info = {};
 
@@ -256,12 +215,12 @@ bool CTL_ExtImageInfoTriplet::GetItemData(int nWhichItem, int nSearch, int nWhic
 
     // Check the number of items
     if ( nWhichValue >= Info.NumItems )
-        return false;
+        return { false, DTWAIN_ERR_INDEX_BOUNDS };
 
     // Go to next item if not really supported
     if (Info.ReturnCode == TWRC_INFONOTSUPPORTED ||
         Info.ReturnCode == TWRC_DATANOTAVAILABLE)
-        return false;
+        return { false, Info.ReturnCode == TWRC_INFONOTSUPPORTED ? DTWAIN_ERR_UNSUPPORTED_EXTINFO : DTWAIN_ERR_UNAVAILABLE_EXTINFO };
 
     const TW_UINT16 nSize = dynarithmic::GetTwainItemSize(Info.ItemType);
     if (Data && (nSize * Info.NumItems > sizeof(TW_HANDLE)))
@@ -308,7 +267,7 @@ bool CTL_ExtImageInfoTriplet::GetItemData(int nWhichItem, int nSearch, int nWhic
     }
     if (pItemSize)
         *pItemSize = nSize;
-    return true;
+    return { true, DTWAIN_NO_ERROR };
 }
 
 TW_INFO CTL_ExtImageInfoTriplet::GetInfo(size_t nWhich, int nSearch) const

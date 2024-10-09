@@ -1021,11 +1021,11 @@ bool CTL_ITwainSource::DestroyExtImageInfo()
     return true;
 }
 
-bool CTL_ITwainSource::GetExtImageInfoData(int nWhichItem, int /*nSearch*/, int nWhichValue, LPVOID Data, LPVOID* pHandleData, size_t* pNumChars) const
+std::pair<bool, int32_t>CTL_ITwainSource::GetExtImageInfoData(int nWhichItem, int /*nSearch*/, int nWhichValue, LPVOID Data, LPVOID* pHandleData, size_t* pNumChars) const
 {
     if ( !m_pExtImageTriplet )
-        return false;
-    return m_pExtImageTriplet->GetItemData(nWhichItem, DTWAIN_BYID, nWhichValue, Data, pHandleData, pNumChars) ? true : false;
+        return { false, DTWAIN_ERR_OUT_OF_MEMORY };
+    return m_pExtImageTriplet->GetItemData(nWhichItem, DTWAIN_BYID, nWhichValue, Data, pHandleData, pNumChars);
 }
 
 bool CTL_ITwainSource::EnumExtImageInfo(CTL_IntArray& r)
