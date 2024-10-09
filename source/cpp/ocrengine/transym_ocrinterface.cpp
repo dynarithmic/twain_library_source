@@ -842,13 +842,11 @@ bool TransymOCR::SetOCRVersionIdentity()
 
 std::string TransymOCR::GetOCRVersionInfo()
 {
-    static std::unordered_map<int, std::string> LicenseMap;
-    if (LicenseMap.empty())
-    {
-        LicenseMap[TOCRLICENCE_EUROUPGRADE] = "Standard License upgraded to European License";
-        LicenseMap[TOCRLICENCE_EURO] = "European License";
-        LicenseMap[TOCRLICENCE_STANDARD] = "Standard License";
-    }
+    static constexpr std::array<std::pair<int, const char*>, 3> LicenseMap = { {
+        {TOCRLICENCE_EUROUPGRADE, "Standard License upgraded to European License"},
+        {TOCRLICENCE_EURO, "European License"},
+        {TOCRLICENCE_STANDARD, "Standard License"}
+        } };
 
     if (m_SDK.TOCRGetLicenceInfoEx)
     {
@@ -865,6 +863,12 @@ std::string TransymOCR::GetOCRVersionInfo()
             const HMODULE hInst = ::GetModuleHandle(GetTOCRDLLName().c_str());
             try
             {
+                const char* pLicenseFeature = nullptr;
+                auto it = dynarithmic::generic_array_finder_if(LicenseMap, [&](const auto& pr) { return pr.first == TOCRLicenseValue; });
+                if (it.first)
+                    pLicenseFeature = LicenseMap[it.second].second;
+                else
+                    pLicenseFeature = "(unavailable)";
                 const VersionInfoA ver(hInst);
                 const std::string sVer = ver.getProductVersion();
                 std::ostringstream strm;
@@ -873,7 +877,7 @@ std::string TransymOCR::GetOCRVersionInfo()
                         "\nVolume: " << VolumeLicense <<
                         "\nLicense Time: " << LicenseTime <<
                         "\nRemaining License Time: " << RemainingTime <<
-                        "\nLicense Feature: " << LicenseMap[TOCRLicenseValue];
+                        "\nLicense Feature: " << pLicenseFeature;
                 return strm.str();
             }
             catch(...)

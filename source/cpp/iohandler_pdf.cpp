@@ -31,19 +31,19 @@ using namespace dynarithmic;
 struct PDFDimensions
 {
     std::array<double,4> mediabox{};
-    PDFDimensions() : mediabox{ 0,0,0,0 } { }
+    constexpr PDFDimensions() : mediabox{ 0,0,0,0 } { }
 
-    PDFDimensions(double d1, double d2, double d3, double d4) : mediabox {}
+    constexpr PDFDimensions(double d1, double d2, double d3, double d4) : mediabox {}
     {
         SetDimensions(d1, d2, d3, d4);
     }
 
-    void SetDimensions(double d1, double d2, double d3, double d4)
+    constexpr void SetDimensions(double d1, double d2, double d3, double d4)
     {
         mediabox[0] = d1; mediabox[1] = d2; mediabox[2] = d3; mediabox[3] = d4;
     }
 
-    void GetDimensions(double& d1, double &d2, double& d3, double& d4) const
+    constexpr void GetDimensions(double& d1, double &d2, double& d3, double& d4) const
     {
         d1 = mediabox[0]; d2 = mediabox[1]; d3 = mediabox[2]; d4 = mediabox[3];
     }
@@ -51,67 +51,64 @@ struct PDFDimensions
 
 typedef std::pair<double, double> PDFPosition;
 
-typedef std::unordered_map<LONG, PDFDimensions> PDFDimensionsMap;
 typedef std::vector<PDFTextElement> PDFStringToTextElement;
 
 struct AllPDFDimensions
 {
-    PDFDimensionsMap m_mediaMap;
-    AllPDFDimensions()
-    {
-        m_mediaMap[ DTWAIN_FS_USLETTER    ] =  PDFDimensions(0,0, 612.00, 792.00);
-        m_mediaMap[ DTWAIN_FS_USLEGAL     ] =  PDFDimensions(0,0, 612.00, 1008.00);
-        m_mediaMap[ DTWAIN_FS_USEXECUTIVE ] =  PDFDimensions(0,0, 521.86, 756.00);
-        m_mediaMap[ DTWAIN_FS_USLEDGER    ] =  PDFDimensions(0,0, 792.00, 1224.00);
-        m_mediaMap[ DTWAIN_FS_USSTATEMENT ] =  PDFDimensions(0,0, 396.00, 792.00);
-        m_mediaMap[ DTWAIN_FS_BUSINESSCARD] =  PDFDimensions(0,0, 144.00, 290.00);
-        m_mediaMap[ DTWAIN_FS_4A0         ] =  PDFDimensions(0,0, 4767.87, 6740.79);
-        m_mediaMap[ DTWAIN_FS_2A0         ] =  PDFDimensions(0,0, 3370.39, 4767.87);
-        m_mediaMap[ DTWAIN_FS_A0          ] =  PDFDimensions(0,0, 2383.94, 3370.39);
-        m_mediaMap[ DTWAIN_FS_A1          ] =  PDFDimensions(0,0, 1683.78, 2383.94);
-        m_mediaMap[ DTWAIN_FS_A2          ] =  PDFDimensions(0,0, 1190.55, 1683.78);
-        m_mediaMap[ DTWAIN_FS_A3          ] =  PDFDimensions(0,0, 841.89, 1190.55);
-        m_mediaMap[ DTWAIN_FS_A4          ] =  PDFDimensions(0,0, 595.28, 841.89);
-        m_mediaMap[ DTWAIN_FS_A5          ] =  PDFDimensions(0,0, 419.53, 595.28);
-        m_mediaMap[ DTWAIN_FS_A6          ] =  PDFDimensions(0,0, 297.64, 419.53);
-        m_mediaMap[ DTWAIN_FS_A7          ] =  PDFDimensions(0,0, 209.76, 297.64);
-        m_mediaMap[ DTWAIN_FS_A8          ] =  PDFDimensions(0,0, 147.40, 209.76);
-        m_mediaMap[ DTWAIN_FS_A9          ] =  PDFDimensions(0,0, 104.88, 147.40);
-        m_mediaMap[ DTWAIN_FS_A10         ] =  PDFDimensions(0,0, 73.70, 104.88);
-        m_mediaMap[ DTWAIN_FS_ISOB0       ] =  PDFDimensions(0,0, 2834.65, 4008.19);
-        m_mediaMap[ DTWAIN_FS_ISOB1       ] =  PDFDimensions(0,0, 2004.09, 2834.65);
-        m_mediaMap[ DTWAIN_FS_ISOB2       ] =  PDFDimensions(0,0, 1417.32, 2004.09);
-        m_mediaMap[ DTWAIN_FS_ISOB3       ] =  PDFDimensions(0,0, 1000.63, 1417.32);
-        m_mediaMap[ DTWAIN_FS_ISOB4       ] =  PDFDimensions(0,0, 708.66, 1000.63);
-        m_mediaMap[ DTWAIN_FS_ISOB5       ] =  PDFDimensions(0,0, 498.90, 708.66);
-        m_mediaMap[ DTWAIN_FS_ISOB6       ] =  PDFDimensions(0,0, 354.33, 498.90);
-        m_mediaMap[ DTWAIN_FS_ISOB7       ] =  PDFDimensions(0,0, 249.45, 354.33);
-        m_mediaMap[ DTWAIN_FS_ISOB8       ] =  PDFDimensions(0,0, 175.75, 249.45);
-        m_mediaMap[ DTWAIN_FS_ISOB9       ] =  PDFDimensions(0,0, 124.72, 175.75);
-        m_mediaMap[ DTWAIN_FS_ISOB10      ] =  PDFDimensions(0,0, 87.87, 124.72);
-        m_mediaMap[ DTWAIN_FS_C0          ] =  PDFDimensions(0,0, 2599.37, 3676.54);
-        m_mediaMap[ DTWAIN_FS_C1          ] =  PDFDimensions(0,0, 1836.85, 2599.37);
-        m_mediaMap[ DTWAIN_FS_C2          ] =  PDFDimensions(0,0, 1298.27, 1836.85);
-        m_mediaMap[ DTWAIN_FS_C3          ] =  PDFDimensions(0,0, 918.43, 1298.27);
-        m_mediaMap[ DTWAIN_FS_C4          ] =  PDFDimensions(0,0, 649.13, 918.43);
-        m_mediaMap[ DTWAIN_FS_C5          ] =  PDFDimensions(0,0, 459.21, 649.13);
-        m_mediaMap[ DTWAIN_FS_C6          ] =  PDFDimensions(0,0, 323.15, 459.21);
-        m_mediaMap[ DTWAIN_FS_C7          ] =  PDFDimensions(0,0, 229.61, 323.15);
-        m_mediaMap[ DTWAIN_FS_C8          ] =  PDFDimensions(0,0, 161.57, 229.61);
-        m_mediaMap[ DTWAIN_FS_C9          ] =  PDFDimensions(0,0, 113.39, 161.57);
-        m_mediaMap[ DTWAIN_FS_C10         ] =  PDFDimensions(0,0, 79.37, 113.39);
-        m_mediaMap[ DTWAIN_FS_JISB0       ] =  PDFDimensions(0,0, 2923.2, 4125.6);
-        m_mediaMap[ DTWAIN_FS_JISB1       ] =  PDFDimensions(0,0, 2066.4, 2923.2);
-        m_mediaMap[ DTWAIN_FS_JISB2       ] =  PDFDimensions(0,0, 1461.6, 2066.4);
-        m_mediaMap[ DTWAIN_FS_JISB3       ] =  PDFDimensions(0,0, 1029.6, 1461.6);
-        m_mediaMap[ DTWAIN_FS_JISB4       ] =  PDFDimensions(0,0, 727.2,  1029.6);
-        m_mediaMap[ DTWAIN_FS_JISB5       ] =  PDFDimensions(0,0, 518.4,  727.2);
-        m_mediaMap[ DTWAIN_FS_JISB6       ] =  PDFDimensions(0,0, 360,  518.4);
-        m_mediaMap[ DTWAIN_FS_JISB7       ] =  PDFDimensions(0,0, 259.2, 360);
-        m_mediaMap[ DTWAIN_FS_JISB8       ] =  PDFDimensions(0,0, 180, 259.2);
-        m_mediaMap[ DTWAIN_FS_JISB9       ] =  PDFDimensions(0,0, 129.6, 180);
-        m_mediaMap[ DTWAIN_FS_JISB10      ] =  PDFDimensions(0,0, 93.6, 129.6);
-    }
+    static constexpr std::array<std::pair<LONG, PDFDimensions>, 52> m_mediamap = { {
+    {DTWAIN_FS_USLETTER, {0, 0, 612.00, 792.00}},
+    {DTWAIN_FS_USLEGAL, {0, 0, 612.00, 1008.00}},
+    {DTWAIN_FS_USEXECUTIVE, {0, 0, 521.86, 756.00}},
+    {DTWAIN_FS_USLEDGER, {0, 0, 792.00, 1224.00}},
+    {DTWAIN_FS_USSTATEMENT, {0, 0, 396.00, 792.00}},
+    {DTWAIN_FS_BUSINESSCARD, {0, 0, 144.00, 290.00}},
+    {DTWAIN_FS_4A0, {0, 0, 4767.87, 6740.79}},
+    {DTWAIN_FS_2A0, {0, 0, 3370.39, 4767.87}},
+    {DTWAIN_FS_A0, {0, 0, 2383.94, 3370.39}},
+    {DTWAIN_FS_A1, {0, 0, 1683.78, 2383.94}},
+    {DTWAIN_FS_A2, {0, 0, 1190.55, 1683.78}},
+    {DTWAIN_FS_A3, {0, 0, 841.89, 1190.55}},
+    {DTWAIN_FS_A4, {0, 0, 595.28, 841.89}},
+    {DTWAIN_FS_A5, {0, 0, 419.53, 595.28}},
+    {DTWAIN_FS_A6, {0, 0, 297.64, 419.53}},
+    {DTWAIN_FS_A7, {0, 0, 209.76, 297.64}},
+    {DTWAIN_FS_A8, {0, 0, 147.40, 209.76}},
+    {DTWAIN_FS_A9, {0, 0, 104.88, 147.40}},
+    {DTWAIN_FS_A10, {0, 0, 73.70, 104.88}},
+    {DTWAIN_FS_ISOB0, {0, 0, 2834.65, 4008.19}},
+    {DTWAIN_FS_ISOB1, {0, 0, 2004.09, 2834.65}},
+    {DTWAIN_FS_ISOB2, {0, 0, 1417.32, 2004.09}},
+    {DTWAIN_FS_ISOB3, {0, 0, 1000.63, 1417.32}},
+    {DTWAIN_FS_ISOB4, {0, 0, 708.66, 1000.63}},
+    {DTWAIN_FS_ISOB5, {0, 0, 498.90, 708.66}},
+    {DTWAIN_FS_ISOB6, {0, 0, 354.33, 498.90}},
+    {DTWAIN_FS_ISOB7, {0, 0, 249.45, 354.33}},
+    {DTWAIN_FS_ISOB8, {0, 0, 175.75, 249.45}},
+    {DTWAIN_FS_ISOB9, {0, 0, 124.72, 175.75}},
+    {DTWAIN_FS_ISOB10, {0, 0, 87.87, 124.72}},
+    {DTWAIN_FS_C0, {0, 0, 2599.37, 3676.54}},
+    {DTWAIN_FS_C1, {0, 0, 1836.85, 2599.37}},
+    {DTWAIN_FS_C2, {0, 0, 1298.27, 1836.85}},
+    {DTWAIN_FS_C3, {0, 0, 918.43, 1298.27}},
+    {DTWAIN_FS_C4, {0, 0, 649.13, 918.43}},
+    {DTWAIN_FS_C5, {0, 0, 459.21, 649.13}},
+    {DTWAIN_FS_C6, {0, 0, 323.15, 459.21}},
+    {DTWAIN_FS_C7, {0, 0, 229.61, 323.15}},
+    {DTWAIN_FS_C8, {0, 0, 161.57, 229.61}},
+    {DTWAIN_FS_C9, {0, 0, 113.39, 161.57}},
+    {DTWAIN_FS_C10, {0, 0, 79.37, 113.39}},
+    {DTWAIN_FS_JISB0, {0, 0, 2923.2, 4125.6}},
+    {DTWAIN_FS_JISB1, {0, 0, 2066.4, 2923.2}},
+    {DTWAIN_FS_JISB2, {0, 0, 1461.6, 2066.4}},
+    {DTWAIN_FS_JISB3, {0, 0, 1029.6, 1461.6}},
+    {DTWAIN_FS_JISB4, {0, 0, 727.2, 1029.6}},
+    {DTWAIN_FS_JISB5, {0, 0, 518.4, 727.2}},
+    {DTWAIN_FS_JISB6, {0, 0, 360, 518.4}},
+    {DTWAIN_FS_JISB7, {0, 0, 259.2, 360}},
+    {DTWAIN_FS_JISB8, {0, 0, 180, 259.2}},
+    {DTWAIN_FS_JISB9, {0, 0, 129.6, 180}},
+    {DTWAIN_FS_JISB10, {0, 0, 93.6, 129.6}}
+    } };
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -589,11 +586,11 @@ bool GetOCRCharacterInformation( OCREngine* pEngine, OCRTextInfo& tInfo, HANDLE 
 
     // test scaling of normal PDF page
     AllPDFDimensions pdfdims;
-    const PDFDimensionsMap::const_iterator it = pdfdims.m_mediaMap.find(imageInfoEx.PDFPageSize);
-    if ( it != pdfdims.m_mediaMap.end() )
+    auto it = dynarithmic::generic_array_finder_if(pdfdims.m_mediamap, [&](const auto& pr) { return pr.first == imageInfoEx.PDFPageSize; });
+    if ( it.first )
     {
         double d1, d2, d3, d4;
-        it->second.GetDimensions(d1, d2, d3, d4);
+        pdfdims.m_mediamap[it.second].second.GetDimensions(d1, d2, d3, d4);
         tInfo.m_ScaledDimensions.SetDimensions(d1, d2, d3, d4);
     }
     else
