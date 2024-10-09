@@ -21,6 +21,7 @@ using DTWAIN_LONG64 = System.Int64;
 using DTWAIN_PDFTEXTELEMENT = System.IntPtr;
 using DTWAIN_RANGE = System.IntPtr;
 using DTWAIN_SOURCE = System.IntPtr;
+using DTWAIN_HANDLE = System.IntPtr;
     
 /*  Use this instead of above for 64-bit compilation
     using DTWAIN_ARRAY = System.Int64;
@@ -84,27 +85,33 @@ namespace TWAINDemo
         private MenuItem idlang_spanish;
         private MenuItem idlang_custom;
         private String sOrigTitle;
+        private Boolean initialized;
 
         public DTwainDemo()
 		{
-			//
-			// Required for Windows Form Designer support
-			//
-			InitializeComponent();
+            initialized = false;
+            InitializeComponent();
 
-			//
-			// TODO: Add any constructor code after InitializeComponent call
-			//
             sOrigTitle = this.Text;
-			TwainAPI.DTWAIN_SysInitialize();
-            SelectedSource = IntPtr.Zero;
-			if ( TwainAPI.DTWAIN_IsTwainAvailable() == 0)
-			{
-				SelectSource.Enabled = false;
-				SelectSourceByNameBox.Enabled = false;
-			}
+			DTWAIN_HANDLE handle = TwainAPI.DTWAIN_SysInitialize();
+            if (handle == IntPtr.Zero)
+            {
+                initialized = false;
+                return;
+            }
+            else
+            {
+                initialized = true;
+                SelectedSource = IntPtr.Zero;
+                if (TwainAPI.DTWAIN_IsTwainAvailable() == 0)
+                {
+                    SelectSource.Enabled = false;
+                    SelectSourceByNameBox.Enabled = false;
+                }
+            }
 		}
 
+        public Boolean InitializedOk() { return initialized; }
 		/// <summary>
 		/// Clean up any resources being used.
 		/// </summary>
@@ -432,7 +439,9 @@ namespace TWAINDemo
 		[STAThread]
 		static void Main() 
 		{
-			Application.Run(new DTwainDemo());
+            DTwainDemo theDemo = new DTwainDemo();
+            if (theDemo.InitializedOk())
+                Application.Run(theDemo);
 		}
 
 		
@@ -498,7 +507,8 @@ namespace TWAINDemo
                 case 0:
                     // Select the source
                     SelectedSource = TwainAPI.DTWAIN_SelectSource2(IntPtr.Zero, IntPtr.Zero,0,0, 
-                            TwainAPI.DTWAIN_DLG_CENTER_SCREEN  | TwainAPI.DTWAIN_DLG_HIGHLIGHTFIRST | TwainAPI.DTWAIN_DLG_SORTNAMES);
+                            TwainAPI.DTWAIN_DLG_CENTER_SCREEN  | TwainAPI.DTWAIN_DLG_HIGHLIGHTFIRST | TwainAPI.DTWAIN_DLG_SORTNAMES
+                            | TwainAPI.DTWAIN_DLG_TOPMOSTWINDOW);
                 break;
 
                 case 1:
@@ -541,7 +551,15 @@ namespace TWAINDemo
             }
             else
             {
-                MessageBox.Show("Error Selecting Source", "TWAIN Error", MessageBoxButtons.OK);
+                int lastError = TwainAPI.DTWAIN_GetLastError();
+                if (lastError == TwainAPI.DTWAIN_ERR_SOURCESELECTION_CANCELED)
+                    MessageBox.Show("Source selection canceled", "TWAIN Info", MessageBoxButtons.OK);
+                else
+                {
+                    StringBuilder szErr = new StringBuilder(100);
+                    TwainAPI.DTWAIN_GetErrorString(lastError, szErr, 100);
+                    MessageBox.Show("Error Selecting and/or opening Source.\r\n" + szErr.ToString(), "TWAIN Error", MessageBoxButtons.OK);
+                }
                 SetCaptionToSourceName();
                 EnableSourceItems(false);
             }
@@ -733,10 +751,17 @@ namespace TWAINDemo
                                     );
 
                 if (bError == 0)
-                    MessageBox.Show("Error acquiring or saving file.");
+                {
+                    StringBuilder errorString = new StringBuilder(256);
+                    TwainAPI.DTWAIN_GetErrorString(TwainAPI.DTWAIN_GetLastError(), errorString, 256);
+                    MessageBox.Show("Error acquiring or saving file.  " + errorString.ToString());
+                }
                 else
                 if (status == TwainAPI.DTWAIN_TN_ACQUIREDONE)
                     MessageBox.Show("Image file saved successfully");
+                else
+                if (TwainAPI.DTWAIN_GetSavedFilesCount(SelectedSource) == 0)
+                    MessageBox.Show("No Images acquired");
                 else
                     MessageBox.Show("The acquisition returned a status of " + status.ToString());
                 this.Enabled = true;

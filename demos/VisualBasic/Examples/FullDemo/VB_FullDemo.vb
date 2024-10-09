@@ -337,6 +337,8 @@ Public Class VB_FullDemo
             If TwainHandle <> 0 Then
                 DTWAINAPI.DTWAIN_EnableMsgNotify(1)
                 DTWAINAPI.DTWAIN_SetCallback(cb, 0)
+            Else
+                Application.Exit()
             End If
         End If
         EnableSourceItems(False)
@@ -384,7 +386,8 @@ Public Class VB_FullDemo
         Me.Enabled = False
         Select Case nWhich
             Case 0
-                SelectedSource = DTWAINAPI.DTWAIN_SelectSource2(IntPtr.Zero, IntPtr.Zero, 0, 0, DTWAINAPI.DTWAIN_DLG_CENTER_SCREEN Or DTWAINAPI.DTWAIN_DLG_TOPMOSTWINDOW)
+                SelectedSource = DTWAINAPI.DTWAIN_SelectSource2(IntPtr.Zero, IntPtr.Zero, 0, 0,
+                                                                DTWAINAPI.DTWAIN_DLG_CENTER_SCREEN Or DTWAINAPI.DTWAIN_DLG_TOPMOSTWINDOW)
             Case 1
                 Dim objSelectSourceByName As SelectSourceByName = New SelectSourceByName()
                 Dim nResult As DialogResult = objSelectSourceByName.ShowDialog()
@@ -413,7 +416,15 @@ Public Class VB_FullDemo
                 EnableSourceItems(False)
             End If
         Else
-            MessageBox.Show("Error Selecting Source", "TWAIN Error", MessageBoxButtons.OK)
+            Dim lastError As Integer
+            lastError = DTWAINAPI.DTWAIN_GetLastError()
+            If lastError = DTWAINAPI.DTWAIN_ERR_SOURCESELECTION_CANCELED Then
+                MessageBox.Show("Source selection canceled", "TWAIN Info", MessageBoxButtons.OK)
+            Else
+                Dim szErr As StringBuilder = New StringBuilder(100)
+                DTWAINAPI.DTWAIN_GetErrorString(lastError, szErr, 100)
+                MessageBox.Show("Error Selecting and/or opening Source.\r\n" + szErr.ToString(), "TWAIN Error", MessageBoxButtons.OK)
+            End If
             SetCaptionToSourceName()
             EnableSourceItems(False)
         End If
@@ -462,9 +473,16 @@ Public Class VB_FullDemo
         Me.Enabled = False
         Dim Status As Integer
         If SelectedSource <> 0 Then
-            If DTWAINAPI.DTWAIN_AcquireFile(SelectedSource, FileName, FileType, DTWAINAPI.DTWAIN_USENATIVE + DTWAINAPI.DTWAIN_USELONGNAME + DTWAINAPI.DTWAIN_CREATE_DIRECTORY,
+            If DTWAINAPI.DTWAIN_AcquireFile(SelectedSource, FileName, FileType,
+                                            DTWAINAPI.DTWAIN_USENATIVE + DTWAINAPI.DTWAIN_USELONGNAME + DTWAINAPI.DTWAIN_CREATE_DIRECTORY,
                                             DTWAINAPI.DTWAIN_PT_DEFAULT, DTWAINAPI.DTWAIN_ACQUIREALL, 1, 0, Status) Then
                 MsgBox(FileName + " has been created")
+            Else
+                Dim numFiles As Integer
+                numFiles = DTWAINAPI.DTWAIN_GetSavedFilesCount(SelectedSource)
+                If numFiles = 0 Then
+                    MessageBox.Show("No files were acquired", "TWAIN Info", MessageBoxButtons.OK)
+                End If
             End If
         End If
         Me.Enabled = True

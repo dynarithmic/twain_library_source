@@ -808,6 +808,7 @@ namespace Dynarithmic
         public const int DTWAIN_ERR_CRC_CHECK = (-1062);
         public const int DTWAIN_ERR_RESOURCES_BAD_VERSION = (-1063);
         public const int DTWAIN_ERR_WIN32_ERROR = (-1064);
+        public const int DTWAIN_ERR_STRINGID_NOTFOUND = (-1065);
 
         public const  int TWAIN_ERR_LOW_MEMORY = (-1100);
         public const  int TWAIN_ERR_FALSE_ALARM = (-1101);
@@ -1693,6 +1694,10 @@ namespace Dynarithmic
         public const int DTWAIN_CONSTANT_TWRC     = 55;
         public const int DTWAIN_CONSTANT_MSG      = 56;
         public const int DTWAIN_CONSTANT_TWLG     = 57;
+        public const int DTWAIN_CONSTANT_DLLINFO  = 58;
+        public const int DTWAIN_CONSTANT_DG       = 59;
+        public const int DTWAIN_CONSTANT_DAT      = 60;
+        public const int DTWAIN_CONSTANT_DF       = 61;
 
         public const int DTWAIN_USERRES_START    = 20000;
         public const int DTWAIN_USERRES_MAXSIZE  = 8192;
@@ -5925,5 +5930,61 @@ namespace Dynarithmic
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
         ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern  int DTWAIN_ArrayGetAtSource(DTWAIN_ARRAY pArray, int nWhere, ref DTWAIN_SOURCE Source);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_GetOCRMajorMinorVersion(DTWAIN_OCRENGINE engine, ref int major, ref int minor);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_GetSavedFilesCount(DTWAIN_SOURCE Source);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern  int DTWAIN_GetActiveDSMPathA([MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder lpszPath, int nLength);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern  int DTWAIN_GetActiveDSMPathW([MarshalAs(UnmanagedType.LPWStr)] System.Text.StringBuilder lpszPath, int nLength);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern  int DTWAIN_GetActiveDSMPath([MarshalAs(UnmanagedType.LPTStr)]  System.Text.StringBuilder lpszPath, int nLength);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern  int DTWAIN_GetActiveDSMPathA(System.IntPtr sz, int nLength);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern  int DTWAIN_GetActiveDSMPathW(System.IntPtr sz, int nLength);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern  int DTWAIN_GetActiveDSMPath(System.IntPtr sz, int nLength);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern  int DTWAIN_GetActiveDSMVersionInfoA([MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder lpszVersionInfo, int nLength);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern  int DTWAIN_GetActiveDSMVersionInfoW([MarshalAs(UnmanagedType.LPWStr)] System.Text.StringBuilder lpszVersionInfo, int nLength);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern  int DTWAIN_GetActiveDSMVersionInfo([MarshalAs(UnmanagedType.LPTStr)]  System.Text.StringBuilder lpszVersionInfo, int nLength);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern  int DTWAIN_GetActiveDSMVersionInfoA(System.IntPtr sz, int nLength);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern  int DTWAIN_GetActiveDSMVersionInfoW(System.IntPtr sz, int nLength);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern  int DTWAIN_GetActiveDSMVersionInfo(System.IntPtr sz, int nLength);
     }
 }

@@ -756,6 +756,7 @@ Class DTWAINAPI
     Public Const DTWAIN_ERR_CRC_CHECK As Integer = (-1062)
     Public Const DTWAIN_ERR_RESOURCES_BAD_VERSION As Integer = (-1063)
     Public Const DTWAIN_ERR_WIN32_ERROR As Integer = (-1064)
+    Public Const DTWAIN_ERR_STRINGID_NOTFOUND As Integer = (-1065)
 
     Public Const TWAIN_ERR_LOW_MEMORY As Integer = (-1100)
     Public Const TWAIN_ERR_FALSE_ALARM As Integer = (-1101)
@@ -1651,6 +1652,10 @@ Class DTWAINAPI
     Public Const DTWAIN_CONSTANT_TWRC  As Integer =   55
     Public Const  DTWAIN_CONSTANT_MSG  As Integer =   56
     Public Const DTWAIN_CONSTANT_TWLG  As Integer =   57
+    Public Const DTWAIN_CONSTANT_DLLINFO  As Integer = 58
+    Public Const DTWAIN_CONSTANT_DG       As Integer = 59
+    Public Const DTWAIN_CONSTANT_DAT      As Integer= 60
+    Public Const DTWAIN_CONSTANT_DF       As Integer= 61
 
     Public Const DTWAIN_USERRES_START As Integer = 20000
     Public Const DTWAIN_USERRES_MAXSIZE As Integer = 8192
@@ -2731,4 +2736,21 @@ Class DTWAINAPI
     Declare Auto Function DTWAIN_SetTempFileDirectoryEx Lib "dtwain32.dll" (<MarshalAs(UnmanagedType.LPTStr)> szFilePath As String, ByVal options As UInteger) As Integer
 
     Declare Auto Function DTWAIN_ArrayGetAtSource Lib "dtwain32.dll" (ByVal pArray As System.IntPtr, ByVal nWhere As Integer, ByRef ppSource As System.IntPtr) As Integer
+    Declare Auto Function DTWAIN_GetSavedFilesCount Lib "dtwain32.dll" (ByVal Source As System.IntPtr) As Integer
+    Declare Auto Function DTWAIN_GetOCRMajorMinorVersion Lib "dtwain32.dll" (ByVal OCREngine As System.IntPtr, ByRef lpMajor As Integer, ByRef lpMinor As Integer) As Integer
+
+    Declare Ansi Function DTWAIN_GetActiveDSMPathA Lib "dtwain32.dll" (<MarshalAs(UnmanagedType.LPTStr)> lpszPath As StringBuilder, ByVal nLength As Integer) As Integer
+    Declare Unicode Function DTWAIN_GetActiveDSMPathW Lib "dtwain32.dll" (<MarshalAs(UnmanagedType.LPWStr)> lpszPath As StringBuilder, ByVal nLength As Integer) As Integer
+    Declare Auto Function DTWAIN_GetActiveDSMPath Lib "dtwain32.dll" (<MarshalAs(UnmanagedType.LPTStr)> lpszPath As StringBuilder, ByVal nLength As Integer) As Integer
+    Declare Ansi Function DTWAIN_GetActiveDSMPathA Lib "dtwain32.dll" (ByVal sz As System.IntPtr, ByVal nLength As Integer) As Integer
+    Declare Unicode Function DTWAIN_GetActiveDSMPathW Lib "dtwain32.dll" (ByVal sz As System.IntPtr, ByVal nLength As Integer) As Integer
+    Declare Auto Function DTWAIN_GetActiveDSMPath Lib "dtwain32.dll" (ByVal sz As System.IntPtr, ByVal nLength As Integer) As Integer
+
+    Declare Ansi Function DTWAIN_GetActiveDSMVersionInfoA Lib "dtwain32.dll" (<MarshalAs(UnmanagedType.LPTStr)> lpszVersionInfo As StringBuilder, ByVal nLength As Integer) As Integer
+    Declare Unicode Function DTWAIN_GetActiveDSMVersionInfoW Lib "dtwain32.dll" (<MarshalAs(UnmanagedType.LPWStr)> lpszVersionInfo As StringBuilder, ByVal nLength As Integer) As Integer
+    Declare Auto Function DTWAIN_GetActiveDSMVersionInfo Lib "dtwain32.dll" (<MarshalAs(UnmanagedType.LPTStr)> lpszVersionInfo As StringBuilder, ByVal nLength As Integer) As Integer
+    Declare Ansi Function DTWAIN_GetActiveDSMVersionInfoA Lib "dtwain32.dll" (ByVal sz As System.IntPtr, ByVal nLength As Integer) As Integer
+    Declare Unicode Function DTWAIN_GetActiveDSMVersionInfoW Lib "dtwain32.dll" (ByVal sz As System.IntPtr, ByVal nLength As Integer) As Integer
+    Declare Auto Function DTWAIN_GetActiveDSMVersionInfo Lib "dtwain32.dll" (ByVal sz As System.IntPtr, ByVal nLength As Integer) As Integer
+
 End Class
