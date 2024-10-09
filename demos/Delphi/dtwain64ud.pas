@@ -850,6 +850,7 @@ const
   DTWAIN_ERR_CRC_CHECK = (-1062);
   DTWAIN_ERR_RESOURCES_BAD_VERSION = (-1063);
   DTWAIN_ERR_WIN32_ERROR = (-1064);
+  DTWAIN_ERR_STRINGID_NOTFOUND = (-1065);
 
   TWAIN_ERR_LOW_MEMORY = (-1100);
   TWAIN_ERR_FALSE_ALARM = (-1101);
@@ -1738,6 +1739,10 @@ const
   DTWAIN_CONSTANT_TWRC     = 55;
   DTWAIN_CONSTANT_MSG      = 56;
   DTWAIN_CONSTANT_TWLG     = 57;
+  DTWAIN_CONSTANT_DLLINFO   = 58;
+  DTWAIN_CONSTANT_DG        = 59;
+  DTWAIN_CONSTANT_DAT       = 60;
+  DTWAIN_CONSTANT_DF        = 61;
 
   DTWAIN_USERRES_START    = 20000;
   DTWAIN_USERRES_MAXSIZE  = 8192;
@@ -2738,6 +2743,16 @@ function DTWAIN_TestGetCap(source:DTWAIN_SOURCE; nCapability:LONG):DTWAIN_ARRAY;
 function DTWAIN_UnlockMemory(h:DTWAIN_HANDLE):BOOL;stdcall; external 'dtwain64ud.dll'   name 'DTWAIN_UnlockMemory';
 function DTWAIN_UnlockMemoryEx(h:DTWAIN_HANDLE):BOOL;stdcall; external 'dtwain64ud.dll'   name 'DTWAIN_UnlockMemoryEx';
 function DTWAIN_UseMultipleThreads(bSet:BOOL):BOOL;stdcall; external 'dtwain64ud.dll'   name 'DTWAIN_UseMultipleThreads';
+
+function DTWAIN_GetActiveDSMPath(LpszPath:LPTSTR; nLength:LONG):LONG;overload;stdcall; external 'dtwain64ud.dll'   name 'DTWAIN_GetActiveDSMPath';
+function DTWAIN_GetActiveDSMPathA(LpszPath:LPSTR; nLength:LONG):LONG;overload;stdcall; external 'dtwain64ud.dll'   name 'DTWAIN_GetActiveDSMPathA';
+function DTWAIN_GetActiveDSMPathW(LpszPath:LPWSTR; nLength:LONG):LONG;overload;stdcall; external 'dtwain64ud.dll'   name 'DTWAIN_GetActiveDSMPathW';
+function DTWAIN_GetActiveDSMVersionInfo(LpszPath:LPTSTR; nLength:LONG):LONG;overload;stdcall; external 'dtwain64ud.dll'   name 'DTWAIN_GetActiveDSMVersionInfo';
+function DTWAIN_GetActiveDSMVersionInfoA(LpszPath:LPSTR; nLength:LONG):LONG;overload;stdcall; external 'dtwain64ud.dll'   name 'DTWAIN_GetActiveDSMVersionInfoA';
+function DTWAIN_GetActiveDSMVersionInfoW(LpszPath:LPWSTR; nLength:LONG):LONG;overload;stdcall; external 'dtwain64ud.dll'   name 'DTWAIN_GetActiveDSMVersionInfoW';
+function DTWAIN_GetOCRMajorMinorVersion(ocrEngine:DTWAIN_OCRENGINE; lpMajor:LPLONG; lpMinor:LPLONG; lpVersionType:LPLONG):BOOL;stdcall; external 'dtwain64ud.dll' name 'DTWAIN_GetOCRMajorMinorVersion';
+function DTWAIN_GetSavedFilesCount(source:DTWAIN_SOURCE):LONG;stdcall; external 'dtwain64ud.dll' name 'DTWAIN_GetSavedFilesCount';
+
 implementation
 
 end.
