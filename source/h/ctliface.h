@@ -523,6 +523,7 @@ namespace dynarithmic
 
     struct CTL_StaticData
     {
+        static int32_t                      s_nExtImageInfoOffset;
         static CTL_StringToConstantMap      s_MapStringToConstant;
         static CTL_TwainLongToStringMap     s_MapExtendedImageInfo;
         static CTL_StringToMapLongToStringMap s_AllLoadedResourcesMap;
@@ -566,6 +567,8 @@ namespace dynarithmic
         static bool                     s_bINIFileLoaded;
         static int                      s_nLoadingError;
 
+        static int32_t GetExtImageInfoOffset() { return s_nExtImageInfoOffset; }
+        static void SetExtImageInfoOffset(int32_t offset) { s_nExtImageInfoOffset = offset; }
         static CTL_StringToConstantMap& GetStringToConstantMap() { return s_MapStringToConstant; }
         static CTL_TwainLongToStringMap& GetExtendedImageInfoMap() { return s_MapExtendedImageInfo; }
         static int GetResourceLoadError() { return s_nLoadingError; }
