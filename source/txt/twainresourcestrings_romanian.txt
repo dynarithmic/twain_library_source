@@ -78,6 +78,9 @@
 1062 Verificarea CRC a eșuat. Verificați fișierul twaininfo.txt corupt  
 1063 Versiunea fișierului twaininfo.txt este invalidă pentru această versiune de DTWAIN  
 1064 Eroare API Windows  
+1065 Niciun ID TWAIN nu se potrivește cu șirul  
+1066 ID de resursă duplicat găsit  
+1067 Valoare de informații extinse despre imagine indisponibilă  
 1100 Codul de condiție TWAIN: Nu s-a putut finaliza operațiunea. Memorie insuficientă.  
 1101 Codul de condiție TWAIN: Fără eroare  
 1102 Codul de condiție TWAIN: Cauza eșecului este necunoscută  

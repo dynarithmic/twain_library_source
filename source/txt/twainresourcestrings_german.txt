@@ -78,6 +78,9 @@
 1062 CRC-Prüfung fehlgeschlagen. Überprüfen Sie die beschädigte twaininfo.txt-Datei  
 1063 Die Version der twaininfo.txt-Datei ist ungültig für diese Version von DTWAIN  
 1064 Windows-API-Fehler  
+1065 Keine TWAIN-ID entspricht der Zeichenfolge  
+1066 Doppelte Ressourcen-ID gefunden  
+1067 Nicht verfügbarer Wert für erweiterte Bildinformationen
 1100 TWAIN Zustandscode: Zu wenig Speicher
 1101 TWAIN Zustandscode: Kein Fehler
 1102 TWAIN Zustandscode: Unbekannte Fehlerursache

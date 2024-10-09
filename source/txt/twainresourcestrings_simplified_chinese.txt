@@ -77,6 +77,9 @@
 1062 CRC 检查失败。检查是否损坏了 twaininfo.txt 文件  
 1063 twaininfo.txt 文件版本与此版本的 DTWAIN 无效  
 1064 Windows API 错误  
+1065 没有与字符串匹配的 TWAIN ID  
+1066 找到重复的资源 ID  
+1067 不可用的扩展图像信息值  
 1100 TWAIN 条件代码：无法完成操作。内存不足。  
 1101 TWAIN 条件代码：没有错误  
 1102 TWAIN 条件代码：未知的故障原因  

@@ -78,6 +78,9 @@
 1062 Verifica CRC fallita. Controlla il file twaininfo.txt corrotto  
 1063 La versione del file twaininfo.txt non è valida per questa versione di DTWAIN  
 1064 Errore API di Windows  
+1065 Nessun ID TWAIN corrisponde alla stringa  
+1066 ID risorsa duplicato trovato  
+1067 Valore di info immagine estesa non disponibile  
 1100 TWAIN Condizione non Cifri: non finendo operazione.   Insufficiente Memoria.
 1101 TWAIN Condizione Codice: Errore
 1102 TWAIN Condiziona Codice: Unknown causa di fallimento

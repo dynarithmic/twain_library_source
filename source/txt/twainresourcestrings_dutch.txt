@@ -78,6 +78,9 @@
 1062 CRC-controle mislukt. Controleer op een beschadigd twaininfo.txt-bestand  
 1063 De versie van het twaininfo.txt-bestand is ongeldig voor deze versie van DTWAIN  
 1064 Windows API-fout  
+1065 Geen TWAIN-ID komt overeen met de string  
+1066 Dubbele resource-ID gevonden  
+1067 Beschikbare uitgebreide afbeeldingsinformatie waarde
 1100 TWAIN Gesteldheid niet Code: niet voleindigde operaties.   Ontoerijkende Herinnering
 1101 TWAIN Gesteldheid Code: Vergissing
 1102 TWAIN Gesteldheid Code: Unknown oorzaak of mislukking

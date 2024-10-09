@@ -102,6 +102,7 @@ BEGIN
 	1064,"Windows API Error"
 	1065,"No TWAIN ID matches the string"
 	1066,"Duplicate TWAIN string ID found"
+	1067,"Unavailable extended image info value"
 	1100,"TWAIN Condition Code: Could not complete operation.  Insufficient Memory."
 	1101,"TWAIN Condition Code: No Error"
 	1102,"TWAIN Condition Code: Unknown cause of failure"
