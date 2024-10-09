@@ -147,6 +147,7 @@ namespace dynarithmic
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INIFILE_LOADED] = true;
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_VERSION_READ] = true;
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_CRC_CHECK] = true;
+        retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_NODUPLICATE_ID] = true;
         CTL_ErrorStruct ErrorStruct;
         int dg, dat, msg, structtype, retcode, successcode;
         auto sPath = createResourceFileName(DTWAINRESOURCEINFOFILE);
@@ -266,6 +267,7 @@ namespace dynarithmic
 
         // Read in the TWAIN constants
         auto& constantsMap = CTL_StaticData::GetTwainConstantsMap();
+        auto& stringToConstantMap = CTL_StaticData::GetStringToConstantMap();
         for ( int constantVal = 0; constantVal < CTL_TwainDLLHandle::NumTwainMapValues; ++constantVal)
         { 
             auto iter = constantsMap.insert({constantVal, {}}).first;
@@ -286,6 +288,12 @@ namespace dynarithmic
                 std::replace(name.begin(), name.end(), '#', ' ');
                 name = StringWrapperA::TrimAll(name);
                 iter->second.insert({twainValue, name});
+                if (stringToConstantMap.find(name) != stringToConstantMap.end())
+                {
+                    retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_NODUPLICATE_ID] = false;
+                    return false;
+                }
+                stringToConstantMap.insert({ name, twainValue });
             }
         }
 
