@@ -512,6 +512,7 @@ namespace dynarithmic
     typedef boost::container::flat_map<LONG, std::string> CTL_TwainLongToStringMap;
     typedef boost::container::flat_map<int32_t, std::string> CTL_ErrorToExtraInfoMap;
     typedef boost::container::flat_map<std::string, unsigned long> CTL_ThreadMap;
+    typedef boost::container::flat_map<std::string, int32_t> CTL_StringToConstantMap;
     typedef std::unordered_map<std::pair<LONG, std::string>, std::string, CacheKeyHash> CTL_PairToStringMap;
 
     struct CTL_GeneralResourceInfo
@@ -522,6 +523,7 @@ namespace dynarithmic
 
     struct CTL_StaticData
     {
+        static CTL_StringToConstantMap      s_MapStringToConstant;
         static CTL_TwainLongToStringMap     s_MapExtendedImageInfo;
         static CTL_StringToMapLongToStringMap s_AllLoadedResourcesMap;
         static CTL_GeneralResourceInfo         s_ResourceInfo;
@@ -564,6 +566,7 @@ namespace dynarithmic
         static bool                     s_bINIFileLoaded;
         static int                      s_nLoadingError;
 
+        static CTL_StringToConstantMap& GetStringToConstantMap() { return s_MapStringToConstant; }
         static CTL_TwainLongToStringMap& GetExtendedImageInfoMap() { return s_MapExtendedImageInfo; }
         static int GetResourceLoadError() { return s_nLoadingError; }
         static void SetResourceLoadError(int errNum) { s_nLoadingError = errNum; }

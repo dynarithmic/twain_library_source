@@ -102,6 +102,7 @@ std::pair<CTL_ResourceRegistryMap::iterator, bool> CTL_TwainDLLHandle::AddResour
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
+CTL_StringToConstantMap     CTL_StaticData::s_MapStringToConstant;
 CTL_TwainLongToStringMap    CTL_StaticData::s_MapExtendedImageInfo;
 int                         CTL_StaticData::s_nLoadingError = DTWAIN_NO_ERROR;
 std::unique_ptr<CSimpleIniA>   CTL_StaticData::s_iniInterface;
@@ -188,25 +189,13 @@ void CTL_TwainDLLHandle::NotifyWindows(UINT /*nMsg*/, WPARAM /*wParam*/, LPARAM 
 std::pair<bool, int32_t> CTL_StaticData::GetIDFromTwainName(std::string sName)
 {
     std::string actualName = StringWrapperA::TrimAll(sName);
-    auto& constantsMap = CTL_StaticData::GetTwainConstantsMap();
-    for (auto& prMap : constantsMap)
-    {
-        auto& maptwainIDs = prMap.second;
-        auto iterFound = std::find_if(maptwainIDs.begin(), maptwainIDs.end(), [&](const auto& pr) { return pr.second == actualName; });
-        if (iterFound != maptwainIDs.end())
-            return { true, iterFound->first };
-    }
+    auto& constantsMap = CTL_StaticData::GetStringToConstantMap();
+    auto iter = constantsMap.find(sName);
+    if (iter != constantsMap.end())
+        return { true, iter->second };
     return { false, (std::numeric_limits<int32_t>::min)() };
 }
 
-/*    auto& name_map = CTL_StaticData::GetTwainNameMap();
-    StringWrapperA::MakeUpperCase(StringWrapperA::TrimAll(sName));
-    const auto iter = name_map.Right().find(sName);
-    if (iter != name_map.Right().end())
-        return iter->second.second;
-    return{};
-}
-*/
 /////////////////////////////////////////////////////////////////////////
 // static definitions
 CTL_TwainDLLHandle* dynarithmic::FindHandle(HWND hWnd, bool bIsDisplay)

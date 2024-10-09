@@ -42,8 +42,9 @@ namespace dynarithmic
 
     struct ResourceLoadingInfo
     {
-        enum {DTWAIN_RESLOAD_INFOFILE_LOADED, DTWAIN_RESLOAD_INIFILE_LOADED, DTWAIN_RESLOAD_INFOFILE_VERSION_READ, DTWAIN_RESLOAD_CRC_CHECK};
-        std::array<bool, 4> errorValue;
+        enum {DTWAIN_RESLOAD_INFOFILE_LOADED, DTWAIN_RESLOAD_INIFILE_LOADED, DTWAIN_RESLOAD_INFOFILE_VERSION_READ, DTWAIN_RESLOAD_CRC_CHECK,
+              DTWAIN_RESLOAD_NODUPLICATE_ID};
+        std::array<bool, 5> errorValue;
         CTL_StringType errorMessage;
         ResourceLoadingInfo() : errorValue{} { errorValue[2] = true; }
     };
