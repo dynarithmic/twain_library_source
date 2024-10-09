@@ -493,6 +493,7 @@ void GenericAcquire(LONG nWhichOne)
                                  GetToggleMenuState(IDM_DISCARD_BLANKS));
 
     BOOL bRet = FALSE;
+    EnableSourceItems(FALSE);
     if (nWhichOne == 0)
     {
         bRet = DTWAIN_AcquireNativeEx(
@@ -517,8 +518,12 @@ void GenericAcquire(LONG nWhichOne)
             &ErrStatus /* Error Status */
         );
     }
+    EnableSourceItems(TRUE);
     if (!bRet)
     {
+        if (ErrStatus == DTWAIN_TN_ACQUIRECANCELED)
+            MessageBox(NULL, _T("Acquisition cancelled without acquiring any images"), _T("Information"), MB_ICONSTOP);
+        else
         MessageBox(NULL, _T("Acquisition failed"), _T("TWAIN Error"), MB_ICONSTOP);
         return;
     }
@@ -631,6 +636,7 @@ void AcquireFile(BOOL bUseSource)
 
     /* Acquire the file */
     UseUI = GetToggleMenuState(IDM_USE_SOURCE_UI);
+    EnableSourceItems(FALSE);
     bAcquireOK = DTWAIN_AcquireFileEx(g_CurrentSource,
                                   AFileNames,
                                   FileType,
@@ -647,6 +653,7 @@ void AcquireFile(BOOL bUseSource)
     }
     WaitLoop();
     EnableWindow(g_hWnd, TRUE);
+    EnableSourceItems(TRUE);
 
     /* Reopen source since we closed it after the acquisition
        (to be safe) */
@@ -698,7 +705,7 @@ void DisplaySourceProps()
 
 void DisplayLoggingOptions()
 {
-    LONG LogFlags = DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_LOWLEVELTWAIN | DTWAIN_LOG_DECODE_TWEVENT | DTWAIN_LOG_DECODE_TWMEMREF | DTWAIN_LOG_ISTWAINMSG;
+    LONG LogFlags = DTWAIN_LOG_ALL &~ (DTWAIN_LOG_ISTWAINMSG | DTWAIN_LOG_USEFILE | DTWAIN_LOG_DEBUGMONITOR | DTWAIN_LOG_CONSOLE);
     if ( DialogBox(g_hInstance, (LPCTSTR)IDD_dlgDebug, g_hWnd, (DLGPROC)DisplayLoggingProc) == IDOK )
     {
         // Make sure we make this exclusive by turning off all logging
@@ -989,7 +996,10 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
             HWND hWndNumExtendedCaps =  GetDlgItem(hDlg,  IDC_edExtendedCaps);
             HWND hWndDSData = GetDlgItem(hDlg, IDC_edDSData);
             HWND hWndJSONDetails = GetDlgItem(hDlg, IDC_edJSONDetails);
-
+            int maxTextLength = 0;
+            int curStringLength;
+            HDC hdcList = GetDC(hWndCaps);
+            SIZE textSize;
             DTWAIN_GetSourceProductNameA(g_CurrentSource, szBufName, 255);
             SetWindowTextA(hWndName, szBufName);
 
@@ -1013,7 +1023,13 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
                 DTWAIN_ArrayGetAt( CapArray, nIndex, &nCapValue );
                 DTWAIN_GetNameFromCap( nCapValue, szBuf, 255);
                 SendMessage( hWndCaps, LB_ADDSTRING, 0, (LPARAM)szBuf);
+                curStringLength = lstrlen(szBuf);
+                GetTextExtentPoint32(hdcList, szBuf, curStringLength, &textSize);
+                if (textSize.cx > maxTextLength)
+                    maxTextLength = textSize.cx;
             }
+            ReleaseDC(hWndCaps, hdcList);
+            SendMessage(hWndCaps, LB_SETHORIZONTALEXTENT, maxTextLength, 0);
 
             wsprintf(szBuf, _T("%d"), nCapCount);
             SetWindowText(hWndNumCaps, szBuf);
