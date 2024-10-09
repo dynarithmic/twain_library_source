@@ -2398,7 +2398,8 @@ bool LoadGeneralResources(bool blockExecution)
             }
             if (!ret.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_CRC_CHECK])
                 CTL_StaticData::SetResourceLoadError(DTWAIN_ERR_CRC_CHECK);
-
+            if (!ret.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_NODUPLICATE_ID])
+                CTL_StaticData::SetResourceLoadError(DTWAIN_ERR_RESOURCES_DUPLICATEID_FOUND);
             // Only display the error message box if DTWAIN_SysInitialize() was called
             // instead of DTWAIN_SysInitialNoBlocking()
             if (blockExecution)
