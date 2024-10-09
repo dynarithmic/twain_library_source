@@ -729,9 +729,6 @@
     <ClInclude Include=".\h\ctlreg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="h\ctlres.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="h\ctlsupport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1053,9 +1050,6 @@
     <ClInclude Include="h\dtwain_paramlogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="h\ctlccerr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="h\ctlutils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1075,6 +1069,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h\ctlconstexprutils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctlloadresources.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

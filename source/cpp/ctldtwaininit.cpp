@@ -1198,7 +1198,7 @@ std::pair<bool, std::vector<uint16_t>> OpenLogging(LPCTSTR pFileName, LONG logFl
                             [&](HINSTANCE hinst, const LoggingTraits& lTraits) { return CTL_StaticData::s_appLog.InitConsoleLogging(hinst, lTraits); },
                             [&](HINSTANCE hinst, const LoggingTraits&) { return CTL_StaticData::s_appLog.InitDebugWindowLogging(hinst); },
                             [&](HINSTANCE hinst, const LoggingTraits&) { return CTL_StaticData::s_appLog.InitCallbackLogging(hinst); }};
-    std::array<long, 4> aLogFlags = { 0, DTWAIN_LOG_CONSOLE, DTWAIN_LOG_DEBUGMONITOR, DTWAIN_LOG_USECALLBACK };
+    static constexpr std::array<long, 4> aLogFlags = { 0, DTWAIN_LOG_CONSOLE, DTWAIN_LOG_DEBUGMONITOR, DTWAIN_LOG_USECALLBACK };
     for (auto& fn : vLoggingFuncs)
     {
         bool bRet = true;
