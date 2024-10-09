@@ -109,6 +109,10 @@ void CTL_ExtImageInfoTriplet::DestroyInfo()
             sessionHandle->m_TwainMemoryFunc->FreeMemory(SubHandle);
         }
     }
+
+    // Free the TW_EXTIMAGEINFO structure that was allocated
+    sessionHandle->m_TwainMemoryFunc->UnlockMemory(m_memHandle);
+    sessionHandle->m_TwainMemoryFunc->FreeMemory(m_memHandle);
 }
 
 
