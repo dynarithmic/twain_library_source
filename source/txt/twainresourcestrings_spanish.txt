@@ -78,6 +78,9 @@
 1062 Fallo en la verificación de CRC. Verifique si el archivo twaininfo.txt está corrupto  
 1063 La versión del archivo twaininfo.txt es inválida para esta versión de DTWAIN  
 1064 Error de API de Windows  
+1065 No coincide ninguna ID de TWAIN con la cadena  
+1066 Se encontró un ID de recurso duplicado  
+1067 Valor de información de imagen extendida no disponible  
 1100 Condición de TWAIN no podría Codificar a no podríamos completar funcionamiento.   Memoria Insuficiente.
 1101 Error de Código de Condición de TWAIN
 1102 TWAIN Condiciona Código Unknown causa del fracaso
