@@ -757,6 +757,8 @@ Class DTWAINAPI
     Public Const DTWAIN_ERR_RESOURCES_BAD_VERSION As Integer = (-1063)
     Public Const DTWAIN_ERR_WIN32_ERROR As Integer = (-1064)
     Public Const DTWAIN_ERR_STRINGID_NOTFOUND As Integer = (-1065)
+    Public Const DTWAIN_ERR_RESOURCES_DUPLICATEID_FOUND As Integer = (-1066)
+    Public Const DTWAIN_ERR_UNAVAILABLE_EXTINFO As Integer = (-1067)
 
     Public Const TWAIN_ERR_LOW_MEMORY As Integer = (-1100)
     Public Const TWAIN_ERR_FALSE_ALARM As Integer = (-1101)
