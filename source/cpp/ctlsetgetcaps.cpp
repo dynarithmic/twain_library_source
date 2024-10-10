@@ -818,7 +818,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDT
         std::copy(r.begin(), r.end(), vValues.begin());
 
         // Dump contents of the enumerated values to the log
-        if (CTL_StaticData::s_logFilterFlags)
+        if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
         {
             DTWAIN_ARRAY aStrings = DTWAIN_ArrayCreate(DTWAIN_ARRAYANSISTRING, 0);
             DTWAINArrayLowLevel_RAII raii(pHandle, aStrings);
