@@ -843,7 +843,7 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
 
         CTL_StaticData::s_DLLInstance = ::GetModuleHandle( szName );
     }
-    CTL_StaticData::s_lErrorFilterFlags = 0;
+    CTL_StaticData::s_logFilterFlags = 0;
     CTL_StaticData::s_nRegisteredDTWAINMsg = ::RegisterWindowMessage(REGISTERED_DTWAIN_MSG);
 #endif
     LOG_FUNC_ENTRY_NONAME_PARAMS()
@@ -1000,27 +1000,27 @@ void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL, 
     {
         const auto nVal = customProfile->GetLongValue(ps.section, ps.name, 0);
         if (nVal != 0)
-            CTL_StaticData::s_lErrorFilterFlags |= ps.orValue;
+            CTL_StaticData::s_logFilterFlags |= ps.orValue;
     });
 
     auto nVal = customProfile->GetLongValue("DSMErrorLogging", "EnableNone", 0);
     if (nVal == 1)
-        CTL_StaticData::s_lErrorFilterFlags = 0;
+        CTL_StaticData::s_logFilterFlags = 0;
 
     nVal = customProfile->GetLongValue("DSMErrorLogging", "EnableAll", 0);
     if (nVal != 0)
-        CTL_StaticData::s_lErrorFilterFlags = 0xFFFFFFFFL & ~DTWAIN_LOG_USEFILE;
+        CTL_StaticData::s_logFilterFlags = 0xFFFFFFFFL & ~DTWAIN_LOG_USEFILE;
 
     szStr = customProfile->GetValue("DSMErrorLogging", "File", "");
     if (!szStr.empty())
     {
-        CTL_StaticData::s_lErrorFilterFlags |= DTWAIN_LOG_USEFILE;
-        OpenLogging(StringConversion::Convert_Ansi_To_Native(szStr).c_str(), CTL_StaticData::s_lErrorFilterFlags);
+        CTL_StaticData::s_logFilterFlags |= DTWAIN_LOG_USEFILE;
+        OpenLogging(StringConversion::Convert_Ansi_To_Native(szStr).c_str(), CTL_StaticData::s_logFilterFlags);
         CTL_StaticData::s_appLog.StatusOutFast("In DTWAIN_SysInitialize()");
     }
 
     nVal = customProfile->GetLongValue("DSMErrorLogging", "BufferErrorThreshold", 50);
-    if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_USEBUFFER)
+    if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_USEBUFFER)
         DTWAIN_SetErrorBufferThreshold(nVal);
 
     nVal = customProfile->GetLongValue("DSMErrorLogging", "AppHandlesExceptions", 0);
@@ -1069,13 +1069,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLog(LONG LogFlags, LPCTSTR lpszLogFile)
     {
         CTL_StaticData::s_appLog.PrintBanner(false);
         CTL_StaticData::s_appLog.DisableAllLoggers();
-        CTL_StaticData::s_lErrorFilterFlags = LogFlags;
+        CTL_StaticData::s_logFilterFlags = LogFlags;
     }
     else
     {
-        CTL_StaticData::s_lErrorFilterFlags = LogFlags;
+        CTL_StaticData::s_logFilterFlags = LogFlags;
         if ( LogFlags && !UserDefinedLoggerExists(pHandle))
-            CTL_StaticData::s_lErrorFilterFlags &= ~DTWAIN_LOG_USECALLBACK;
+            CTL_StaticData::s_logFilterFlags &= ~DTWAIN_LOG_USECALLBACK;
 
         LoggingTraits fTraits;
         fTraits.m_bAppend = LogFlags & DTWAIN_LOG_FILEAPPEND?true:false;
@@ -1107,7 +1107,7 @@ bool dynarithmic::UserDefinedLoggerExists(CTL_TwainDLLHandle* pHandle)
 
 bool dynarithmic::AnyLoggerExists(CTL_TwainDLLHandle* pHandle)
 {
-    return UserDefinedLoggerExists(pHandle) || CTL_StaticData::s_lErrorFilterFlags != 0;
+    return UserDefinedLoggerExists(pHandle) || CTL_StaticData::s_logFilterFlags != 0;
 }
 
 void dynarithmic::WriteUserDefinedLogMsg(CTL_TwainDLLHandle* pHandle, LPCTSTR sz)
@@ -1632,13 +1632,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
         }
         catch(...)
         {
-            if (CTL_StaticData::s_lErrorFilterFlags)
+            if (CTL_StaticData::s_logFilterFlags)
             {
                 StringTraitsA::string_type sClosingManager = GetResourceStringFromMap(IDS_DTWAIN_ERROR_CLOSING_DTWAIN_MANAGER) + "\n";
                 CTL_TwainAppMgr::WriteLogInfoA(sClosingManager);
             }
         }
-        if (CTL_StaticData::s_lErrorFilterFlags)
+        if (CTL_StaticData::s_logFilterFlags)
         {
             StringTraitsA::string_type sClosingDTWAIN = GetResourceStringFromMap(IDS_CLOSING_DTWAIN) + "\n";
             CTL_TwainAppMgr::WriteLogInfoA(sClosingDTWAIN);
@@ -1670,7 +1670,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
         }
         catch(...)
         {
-            if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+            if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
             {
                 StringTraitsA::string_type sRemoveWindow = GetResourceStringFromMap(IDS_DTWAIN_ERROR_REMOVE_WINDOW) + "\n";
                 CTL_TwainAppMgr::WriteLogInfoA(sRemoveWindow);
@@ -1699,7 +1699,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SysDestroy()
     const DTWAIN_BOOL bRet = SysDestroyHelper(pHandle);
 
 #ifdef DTWAIN_DEBUG_CALL_STACK
-    if (CTL_StaticData::s_lErrorFilterFlags)
+    if (CTL_StaticData::s_logFilterFlags)
         CTL_LogFunctionCall(__FUNC__, 1);
 #endif
     return bRet;
@@ -1931,7 +1931,7 @@ LONG DLLENTRY_DEF DTWAIN_CallCallback64(WPARAM wParam, LPARAM lParam, LONGLONG U
 void UnhookAllDisplays()
 {
 #ifdef _WIN32
-    if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_CONSOLE)
+    if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_CONSOLE)
         FreeConsole();
 #endif
 }
@@ -1951,7 +1951,7 @@ void dynarithmic::OutputDTWAINErrorA(const CTL_TwainDLLHandle* pHandle, LPCSTR p
 
 void dynarithmic::OutputDTWAINError(const CTL_TwainDLLHandle* pHandle, LPCSTR pFunc)
 {
-    if (!(CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_DTWAINERRORS) )
+    if (!(CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_DTWAINERRORS) )
         return;
     static constexpr int MaxMessage = DTWAIN_USERRES_MAXSIZE;
     char szBuf[MaxMessage+1];
@@ -1964,10 +1964,10 @@ void dynarithmic::OutputDTWAINError(const CTL_TwainDLLHandle* pHandle, LPCSTR pF
     if ( !pHandle )
         CTL_TwainAppMgr::WriteLogInfoA(s);
 
-    if ( CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_ERRORMSGBOX && pHandle)
+    if ( CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_ERRORMSGBOX && pHandle)
         LogDTWAINErrorToMsgBox(pHandle->m_lLastError, pFunc, s);
     else
-    if ( !pHandle && CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_INITFAILURE)
+    if ( !pHandle && CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_INITFAILURE)
         LogDTWAINErrorToMsgBox(DTWAIN_ERR_BAD_HANDLE, nullptr, s);
 }
 
@@ -2159,7 +2159,7 @@ CTL_StringType dynarithmic::GetVersionString()
 void WriteVersionToLog(CTL_TwainDLLHandle *pHandle)
 {
     std::string ansiVer;
-    if (CTL_StaticData::s_lErrorFilterFlags)
+    if (CTL_StaticData::s_logFilterFlags)
     {
         auto sVer = GetVersionString();
         const auto sWinVer = GetWinVersion();
@@ -2177,7 +2177,7 @@ void WriteVersionToLog(CTL_TwainDLLHandle *pHandle)
         #ifdef _WIN32
         // All log messages must be ANSI
         ansiVer = StringConversion::Convert_Native_To_Ansi(sVer);
-        if (CTL_StaticData::s_lErrorFilterFlags & (DTWAIN_LOG_USEFILE | DTWAIN_LOG_CONSOLE))
+        if (CTL_StaticData::s_logFilterFlags & (DTWAIN_LOG_USEFILE | DTWAIN_LOG_CONSOLE))
         {
             if (!CTL_StaticData::s_appLog.StatusOutFast(ansiVer.c_str()))
             {
@@ -2185,7 +2185,7 @@ void WriteVersionToLog(CTL_TwainDLLHandle *pHandle)
                 LogToDebugMonitorA(ansiVer);
             }
         }
-        if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_DEBUGMONITOR)
+        if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_DEBUGMONITOR)
         {
             sVer += _T("\n");
             LogToDebugMonitor(sVer);

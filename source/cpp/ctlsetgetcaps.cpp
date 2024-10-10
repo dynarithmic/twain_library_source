@@ -816,6 +816,18 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDT
         DTWAIN_ARRAY ThisArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(nCount));
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(ThisArray);
         std::copy(r.begin(), r.end(), vValues.begin());
+
+        // Dump contents of the enumerated values to the log
+        if (CTL_StaticData::s_logFilterFlags)
+        {
+            DTWAIN_ARRAY aStrings = DTWAIN_ArrayCreate(DTWAIN_ARRAYANSISTRING, 0);
+            DTWAINArrayLowLevel_RAII raii(pHandle, aStrings);
+            auto& aValues = pHandle->m_ArrayFactory->underlying_container_t<std::string>(aStrings);
+            for (auto val : vValues)
+                aValues.push_back(CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, val));
+            CTL_TwainAppMgr::WriteLogInfoA("Supported Extended Image Info types:");
+            DumpArrayContents(aStrings, 0);
+        }
         *Array = ThisArray;
         return TRUE;
     }
@@ -1115,32 +1127,32 @@ static void DumpArrayNativeString(DTWAIN_ARRAY Array)
 static void DumpArrayWideString(DTWAIN_ARRAY Array)
 {
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    const auto& vCaps = pHandle->m_ArrayFactory->underlying_container_t<std::wstring>(Array);
-    for (auto& str : vCaps)
-        CTL_TwainAppMgr::WriteLogInfoW(str + UnicodeStringTraits::CharToThisType('\n'));
+    const auto& vData = pHandle->m_ArrayFactory->underlying_container_t<std::wstring>(Array);
+    std::wstring allValues = L"\n" + StringWrapperW::Join(vData.begin(), vData.end(), L"\n") + L"\n";
+    CTL_TwainAppMgr::WriteLogInfoW(allValues);
 }
 
 static void DumpArrayAnsiString(DTWAIN_ARRAY Array)
 {
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    const auto& vCaps = pHandle->m_ArrayFactory->underlying_container_t<std::string>(Array);
-    for (auto& str : vCaps)
-        CTL_TwainAppMgr::WriteLogInfoA(str + ANSIStringTraits::CharToThisType('\n'));
+    const auto& vData = pHandle->m_ArrayFactory->underlying_container_t<std::string>(Array);
+    std::string allValues = "\n" + StringWrapperA::Join(vData.begin(), vData.end(), "\n") + "\n";
+    CTL_TwainAppMgr::WriteLogInfoA(allValues);
 }
 
 static void DumpArrayFrame(DTWAIN_ARRAY Array)
 {
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    const auto& vCaps = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(Array);
+    const auto& vData = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(Array);
     size_t n;
     CTL_StringStreamType strm;
-    std::for_each(vCaps.begin(), vCaps.end(), StreamerImplFrame(&strm, &n));
+    std::for_each(vData.begin(), vData.end(), StreamerImplFrame(&strm, &n));
     CTL_TwainAppMgr::WriteLogInfo( strm.str() );
 }
 
 void dynarithmic::DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap)
 {
-    if ( !(CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS ))
+    if ( !(CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS ))
         return;
 
     std::string szBuf;

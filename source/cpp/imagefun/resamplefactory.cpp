@@ -30,7 +30,7 @@ namespace dynarithmic
 {
     void ImageResampler::LogMsg(int nWhich, int fromRes, int toRes, HANDLE dataHandle) const
     {
-        if (!(CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS))
+        if (!(CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS))
             return;
         switch (nWhich)
         {

@@ -41,7 +41,7 @@ std::string dynarithmic::CTL_LogFunctionCallA(LPCSTR pFuncName, int nWhich, LPCS
 
 std::string dynarithmic::CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich, LPCSTR pString/*=NULL*/)
 {
-    if (CTL_StaticData::s_lErrorFilterFlags == 0 )
+    if (CTL_StaticData::s_logFilterFlags == 0 )
          return {};
     static int nIndent = 0;
     std::string s;
@@ -80,7 +80,7 @@ std::string dynarithmic::CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich,
         s += s2;
     if ( nWhich != LOG_INDENT_IN && nWhich != LOG_INDENT_OUT)
     {
-        if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_USEFILE)
+        if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_USEFILE)
         {
             if (!CTL_StaticData::s_appLog.StatusOutFast( s.c_str() ) )
                 CTL_StaticData::s_appLog.OutputDebugStringFull(s);
@@ -95,7 +95,7 @@ std::string dynarithmic::CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich,
 
 void dynarithmic::LogExceptionErrorA(LPCSTR fname, const char* sAdditionalText)
 {
-    if ( !(CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_SHOWEXCEPTIONS) )
+    if ( !(CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_SHOWEXCEPTIONS) )
          return;
     try
     {
@@ -112,7 +112,7 @@ void dynarithmic::LogExceptionErrorA(LPCSTR fname, const char* sAdditionalText)
           output << "\nAdditional Information: " << sAdditionalText;
 
        std::string s = output.str();
-       if (!(CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_USEFILE))
+       if (!(CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_USEFILE))
             s += "\n";
        CTL_TwainAppMgr::WriteLogInfoA(s, true);  // flush all writes to the log file
        LogExceptionToConsole(fname, sAdditionalText);

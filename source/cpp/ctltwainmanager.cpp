@@ -1650,7 +1650,7 @@ void CTL_TwainAppMgr::SetError(int nError, const std::string& extraInfo, bool bM
     s_nLastError    = nError;
 
     CTL_StaticData::s_mapExtraErrorInfo[abs(s_nLastError)] = extraInfo;
-    if ( CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_USEBUFFER )
+    if ( CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_USEBUFFER )
     {
         // Push error onto error stack
         const std::deque<int>::size_type nEntries = pHandle->m_vErrorBuffer.size();
@@ -1711,7 +1711,7 @@ void CTL_TwainAppMgr::SetAndLogError(int nError, const std::string& extraInfo, b
 {
     int nActualError = std::abs(nError);
     CTL_TwainAppMgr::SetError(nActualError, extraInfo, bMustReportGeneralError);
-    if (CTL_StaticData::s_lErrorFilterFlags != 0)
+    if (CTL_StaticData::s_logFilterFlags != 0)
     {
         char szBuf[DTWAIN_USERRES_MAXSIZE + 1] = {};
         CTL_TwainAppMgr::GetLastErrorString(szBuf, DTWAIN_USERRES_MAXSIZE);
@@ -1884,7 +1884,7 @@ int CTL_TwainAppMgr::GetTransferCount( const CTL_ITwainSource *pSource )
 int CTL_TwainAppMgr::SetTransferCount( const CTL_ITwainSource *pSource,
                                        int nCount )
 {
-    if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS )
+    if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS )
     {
         StringStreamA strm;
         strm << boost::format("\nSetting Transfer Count.  Transfer Count = %1%\n") % nCount;
@@ -2586,7 +2586,7 @@ bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
         strm << _T("TWAIN DSM \"") + m_strTwainDSMPath + _T("\" is found and will be used for this TWAIN session...\n");
         strm << _T("Version information for \"") << m_strTwainDSMPath << _T("\":\n") << dynarithmic::GetVersionInfo(m_hLibModule.native(), 4);
         LogToDebugMonitor(strm.str());
-        if (CTL_StaticData::s_lErrorFilterFlags != 0)
+        if (CTL_StaticData::s_logFilterFlags != 0)
             DTWAIN_LogMessageA(StringConversion::Convert_Native_To_Ansi(strm.str()).c_str());
     }
     return LoadDSM();
@@ -2611,10 +2611,10 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( TW_IDENTITY *pOrigin, TW_IDENTITY* 
 
 void CTL_TwainAppMgr::WriteLogInfoA(const std::string& s, bool bFlush)
 {
-    if (!CTL_StaticData::s_lErrorFilterFlags)
+    if (!CTL_StaticData::s_logFilterFlags)
         return;
 
-    if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_USECRLF)
+    if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_USECRLF)
         std::string crlf = "\n";
 
     CTL_StaticData::s_appLog.StatusOutFast(s.c_str());
@@ -2692,7 +2692,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
     TW_UINT16    nMSG    = pTriplet.GetMSG();
     TW_MEMREF    pData   = pTriplet.GetMemRef();
 
-    if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_LOWLEVELTWAIN)
+    if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_LOWLEVELTWAIN)
     {
         e = GetGeneralErrorInfo(nDG, nDAT, nMSG);
         s = e.GetIdentityAndDataInfo(pOrigin, pDest, pData);
@@ -2748,7 +2748,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
             KillTimer(nullptr, CTL_StaticData::s_nTimeoutID);
         #endif
         retcode = DTWAIN_ERR_EXCEPTION_ERROR_;
-        if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_LOWLEVELTWAIN)
+        if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_LOWLEVELTWAIN)
         {
             std::string sz;
             std::ostringstream strm;
@@ -2768,7 +2768,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         // Send out that we have ended processing the TWAIN triplet
         SendTwainMsgToWindow(pTriplet.GetSessionPtr(), nullptr, DTWAIN_TN_TWAINTRIPLETEND, 0);
     }
-    if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_LOWLEVELTWAIN)
+    if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_LOWLEVELTWAIN)
     {
         std::string sz;
         std::ostringstream strm;

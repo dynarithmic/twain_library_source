@@ -137,7 +137,7 @@ std::unordered_set<HWND>    CTL_StaticData::s_appWindowsToDisable;
 CTL_CallbackProcArray       CTL_StaticData::s_aAllCallbacks;
 CTL_StringType              CTL_StaticData::s_strLangResourcePath;
 CTL_GeneralErrorInfo        CTL_StaticData::s_mapGeneralErrorInfo;
-long                        CTL_StaticData::s_lErrorFilterFlags = 0;
+long                        CTL_StaticData::s_logFilterFlags = 0;
 UINT_PTR                    CTL_StaticData::s_nTimeoutID = 0;
 bool                        CTL_StaticData::s_bTimerIDSet = false;
 UINT                        CTL_StaticData::s_nTimeoutMilliseconds = 0;

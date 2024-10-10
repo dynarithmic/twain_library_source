@@ -385,7 +385,7 @@ struct closeSourceRAII
 
 static std::vector<TCHAR> GetDefaultName(SelectStruct& selectTraits)
 {
-    bool bLogMessages = (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS) ? true : false;
+    bool bLogMessages = (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS) ? true : false;
     bool bAlwaysHighlightFirst = selectTraits.CS.nOptions & DTWAIN_DLG_HIGHLIGHTFIRST;
     std::vector<TCHAR> DefName;
     DTWAIN_SOURCE DefSource = nullptr;

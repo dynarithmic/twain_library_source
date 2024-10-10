@@ -693,7 +693,7 @@ std::pair<bool, CTL_TEXTELEMENTPTRLIST::iterator> CheckPDFTextElement(DTWAIN_PDF
 
     auto it2 = std::find_if(it->second.begin(), it->second.end(), [&](const auto& ptr) { return ptr->pTwainSource == pPtr->pTwainSource; });
 
-    if ( CTL_StaticData::s_lErrorFilterFlags )
+    if ( CTL_StaticData::s_logFilterFlags )
     {
         std::string sOut = "PDF TextElement Info: \n";
         sOut += CTL_ErrorStructDecoder::DecodePDFTextElement(pPtr);

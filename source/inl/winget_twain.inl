@@ -120,7 +120,7 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
         const UINT nOldError = SetErrorMode(SEM_NOOPENFILEERRORBOX);
         #endif
 
-        if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS )
+        if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS )
         { 
             CTL_StringType msg = _T("Testing TWAIN availability for file \"") + fNameTotal + _T("\" ...");
             CTL_TwainAppMgr::WriteLogInfo(msg);
@@ -135,7 +135,7 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
 
         if (ec != boost::system::errc::success)
         {
-            if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+            if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
             {
                 CTL_StringType msg = _T("Testing TWAIN availability for file \"") + fNameTotal + _T("\" failed");
                 CTL_TwainAppMgr::WriteLogInfo(msg);
@@ -147,7 +147,7 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
         DSMENTRYPROC lpDSMEntry = nullptr;
         try 
         {
-            if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+            if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
             {
                 CTL_StringType msg = _T("Testing if file \"") + fNameTotal + _T("\" is a valid Twain DSM...");
                 CTL_TwainAppMgr::WriteLogInfo(msg);
@@ -160,7 +160,7 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
 
         if (lpDSMEntry)
         {
-            if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+            if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
             {
                 CTL_StringType msg = _T("Testing if file \"") + fNameTotal + _T("\" is a valid Twain DSM (success) ...");
                 CTL_TwainAppMgr::WriteLogInfo(msg);
@@ -179,7 +179,7 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
         }
         else
         {
-            if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+            if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
             {
                 CTL_StringType msg = _T("Testing if file \"") + fNameTotal + _T("\" is a valid DSM (failed) ...");
                 CTL_TwainAppMgr::WriteLogInfo(msg);

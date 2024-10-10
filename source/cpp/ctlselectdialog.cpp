@@ -82,7 +82,7 @@ CTL_StringType dynarithmic::LLSelectionDialog(CTL_TwainDLLHandle* pHandle, const
                 selectStruct.CS.mapNames.insert({ onePair.front(), onePair.back() });
         }
     }
-    if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+    if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
         CTL_TwainAppMgr::WriteLogInfoA("Displaying TWAIN Dialog...\n");
     const INT_PTR bRet = DialogBoxIndirectParam(CTL_StaticData::s_DLLInstance, lpTemplate, opts.hWndParent,
                                                 reinterpret_cast<DLGPROC>(DisplayTwainDlgProc), reinterpret_cast<LPARAM>(&selectStruct));
@@ -234,7 +234,7 @@ static CTL_StringType GetPossibleMappedName(CustomPlacement CS, TCHAR* szSelecte
 LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static SelectStruct* pS;
-    bool bLogMessages = (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS) ? true : false;
+    bool bLogMessages = (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS) ? true : false;
     switch (message)
     {
     case WM_INITDIALOG:
