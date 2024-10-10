@@ -977,7 +977,7 @@ bool CTL_ITwainSource::InitExtImageInfo(int nNum)
 
     m_pExtImageTriplet = std::make_unique<CTL_ExtImageInfoTriplet>(m_pSession, this, nNum);
     return true;
-    }
+}
 
 
 bool CTL_ITwainSource::AddExtImageInfo(TW_INFO Info) const
@@ -1001,7 +1001,7 @@ bool CTL_ITwainSource::GetExtImageInfo(bool bExecute)
         switch (rc)
         {
             case TWRC_SUCCESS:
-            m_pExtImageTriplet->RetrieveInfo();
+                m_pExtImageTriplet->RetrieveInfo();
             return true;
         }
     }
@@ -1031,7 +1031,7 @@ std::pair<bool, int32_t>CTL_ITwainSource::GetExtImageInfoData(int nWhichItem, in
 bool CTL_ITwainSource::EnumExtImageInfo(CTL_IntArray& r)
 {
     // Function assumes that DAT_EXTIMAGEINFO exists for the Source
-    if (CTL_ExtImageInfoTriplet::EnumSupported(this, m_pSession, r))
+    if ( CTL_ExtImageInfoTriplet::EnumSupported(this, m_pSession, r) )
         return true;
     return false;
 }

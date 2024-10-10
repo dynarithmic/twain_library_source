@@ -32,7 +32,7 @@ using namespace dynarithmic;
 CTL_ExtImageInfoTriplet::CTL_ExtImageInfoTriplet(CTL_ITwainSession *pSession,
                                                  CTL_ITwainSource* pSource,
                                                  int nInfo)
-                                               :  CTL_TwainTriplet(), m_pExtImageInfo{},m_memHandle{}, m_nNumInfo{}
+                                               :  CTL_TwainTriplet(), m_pExtImageInfo{},m_memHandle{}, m_nNumInfo{}, m_bRetrievedInfo{}
 {
     InitInfo(pSession, pSource, nInfo);
 }
@@ -43,6 +43,7 @@ void CTL_ExtImageInfoTriplet::swap(CTL_ExtImageInfoTriplet& left, const CTL_ExtI
     left.m_memHandle = right.m_memHandle;
     left.m_nNumInfo = right.m_nNumInfo;
     left.m_ExtInfoMap = right.m_ExtInfoMap;
+    left.m_bRetrievedInfo = right.m_bRetrievedInfo;
 }
 
 CTL_ExtImageInfoTriplet::CTL_ExtImageInfoTriplet(CTL_ExtImageInfoTriplet&& rhs) noexcept
@@ -52,6 +53,7 @@ CTL_ExtImageInfoTriplet::CTL_ExtImageInfoTriplet(CTL_ExtImageInfoTriplet&& rhs) 
     rhs.m_memHandle = {};
     rhs.m_nNumInfo = {};
     rhs.m_ExtInfoMap = {};
+    rhs.m_bRetrievedInfo = {};
 }
 
 void CTL_ExtImageInfoTriplet::InitInfo(CTL_ITwainSession *pSession,
@@ -131,11 +133,12 @@ void CTL_ExtImageInfoTriplet::DestroyInfo()
 
 TW_UINT16 CTL_ExtImageInfoTriplet::Execute()
 {
-    if ( !m_ExtInfoMap.empty())
+    if (!m_ExtInfoMap.empty())
     {
         CreateExtImageInfo();
         ResolveTypes();
         const TW_UINT16 rc = CTL_TwainTriplet::Execute();
+        m_bRetrievedInfo = true;
         CopyInfoToVector();
         return rc;
     }
@@ -335,24 +338,24 @@ bool CTL_ExtImageInfoTriplet::EnumSupported(CTL_ITwainSource *pSource,
     rArray.clear();
 
     // Set up a TWAIN triplet
-    CTL_ExtImageInfoTriplet Trip(pSession, pSource, NumAttr);
+    CTL_ExtImageInfoTriplet Trip(pSession, pSource, static_cast<int>(NumAttr));
     CTL_ExtImageInfoTriplet* pTripletToUse = &Trip;
 
-    // See if we already got this information
-    auto triplet = pSource->GetExtImageInfoTriplet();
     TW_UINT16 rc = TWRC_SUCCESS;
+    auto triplet = pSource->GetExtImageInfoTriplet();
 
-    // First time retrieving the information, so execute the triplet
+    // No member variable triplet, so use local instance
     if (!triplet)
-    {
         rc = Trip.Execute();
-    }
     else
     {
-        // Just get the cached information from the initial run of
-        // the ExtImageInfo triplet
+        // member variable triplet exists, so use it
         pTripletToUse = triplet.get();
+        if (!triplet->HasRetrievedInfo())
+            // not retrieved the info yet, so do this.
+            rc = triplet->Execute();
     }
+
     switch (rc)
     {
         case TWRC_SUCCESS:

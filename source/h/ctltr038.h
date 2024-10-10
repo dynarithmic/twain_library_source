@@ -33,7 +33,7 @@ namespace dynarithmic
         using ExtInfoMap = std::map<TW_UINT16, TW_INFO>;
         public:
             // Only MSG_GET is supported
-            CTL_ExtImageInfoTriplet() : m_pExtImageInfo(nullptr), m_memHandle{}, m_nNumInfo{} { }
+            CTL_ExtImageInfoTriplet() : m_pExtImageInfo(nullptr), m_memHandle{}, m_nNumInfo{}, m_bRetrievedInfo{} { }
             CTL_ExtImageInfoTriplet(CTL_ITwainSession *pSession,
                                    CTL_ITwainSource* pSource,
                                    int nInfo);
@@ -72,6 +72,7 @@ namespace dynarithmic
                                       CTL_IntArray &rArray);
 
             ExtInfoMap& RetrieveInfo() noexcept { return m_ExtInfoMap; } 
+            bool HasRetrievedInfo() const { return m_bRetrievedInfo; }
 
         private:
             void ResolveTypes();
@@ -82,6 +83,7 @@ namespace dynarithmic
             TW_HANDLE m_memHandle;
             size_t m_nNumInfo;
             ExtInfoMap m_ExtInfoMap;
+            bool m_bRetrievedInfo;
     };
 }
 #endif
