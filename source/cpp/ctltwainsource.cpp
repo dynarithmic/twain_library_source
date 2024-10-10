@@ -272,6 +272,7 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_ImageInfoEx.theSource = this;
     m_AltAcquireArea.UnitOfMeasure = DTWAIN_INCHES;
     m_ImageInfoEx.IsCreateDirectory = false;
+    m_pExtImageTriplet = std::make_unique<CTL_ExtImageInfoTriplet>(m_pSession, this, 0);
     char commentStr[256] = {};
     GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
     SetPDFValue(PDFPRODUCERKEY, StringConversion::Convert_Ansi_To_Native(commentStr));
@@ -974,8 +975,6 @@ bool CTL_ITwainSource::InitExtImageInfo(int nNum)
 
     if ( !nValue )
         return false;
-
-    m_pExtImageTriplet = std::make_unique<CTL_ExtImageInfoTriplet>(m_pSession, this, nNum);
     return true;
 }
 

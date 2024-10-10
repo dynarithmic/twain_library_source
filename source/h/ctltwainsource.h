@@ -460,7 +460,7 @@ namespace dynarithmic
         void         SetFileSystemSupported(bool bSet) { m_tbIsFileSystemSupported = bSet; }
         void         SetBufferedTileModeSupported(bool bSet) { m_tbIsTileModeSupported = bSet; }
         TW_IMAGEMEMXFER& GetBufferedXFerInfo() { return m_BufferedXFerInfo; }
-        auto GetExtImageInfoTriplet() { return m_pExtImageTriplet; }
+        CTL_ExtImageInfoTriplet* GetExtImageInfoTriplet() { return m_pExtImageTriplet.get(); }
 
         // Only public member
         void *      m_pUserPtr;
@@ -631,7 +631,7 @@ namespace dynarithmic
         TW_FILESYSTEM   m_FileSystem;
         DTWAINImageInfoEx m_ImageInfoEx;
         TW_IMAGEMEMXFER* m_pImageMemXfer;
-        std::shared_ptr<CTL_ExtImageInfoTriplet> m_pExtImageTriplet;
+        std::unique_ptr<CTL_ExtImageInfoTriplet> m_pExtImageTriplet;
         TWINFOVector m_ExtImageVector;
         DTWAIN_ARRAY    m_PersistentArray;
         CapList    m_aExtendedCaps;

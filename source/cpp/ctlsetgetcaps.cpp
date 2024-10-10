@@ -808,6 +808,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDT
 
     CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
     auto pHandle = pSource->GetDTWAINHandle();
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pSource->GetState() != SOURCE_STATE_TRANSFERRING; }, 
+                                        DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
 
     CTL_IntArray r;
     if ( pSource->EnumExtImageInfo(r) )
