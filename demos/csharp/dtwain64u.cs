@@ -809,6 +809,8 @@ namespace Dynarithmic
         public const int DTWAIN_ERR_RESOURCES_BAD_VERSION = (-1063);
         public const int DTWAIN_ERR_WIN32_ERROR = (-1064);
         public const int DTWAIN_ERR_STRINGID_NOTFOUND = (-1065);
+        public const int DTWAIN_ERR_RESOURCES_DUPLICATEID_FOUND = (-1066);
+        public const int DTWAIN_ERR_UNAVAILABLE_EXTINFO = (-1067);
 
         public const  int TWAIN_ERR_LOW_MEMORY = (-1100);
         public const  int TWAIN_ERR_FALSE_ALARM = (-1101);
