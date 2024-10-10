@@ -186,7 +186,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID /*plvReserved*/)
     {
         if (fdwReason == DLL_PROCESS_ATTACH)
         {
-            CTL_StaticData::s_lErrorFilterFlags = 0;
+            CTL_StaticData::s_logFilterFlags = 0;
         }
         CTL_StaticData::s_DLLInstance = hinstDll;
     }

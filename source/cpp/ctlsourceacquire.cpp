@@ -188,7 +188,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     // the default bit depth.  The user should use DTWAIN_SetPixelType and DTWAIN_SetBitDepth before
     // calling the DTWAIN_Acquirexxx() function to override this behavior.
     LONG PixelType = opts.getPixelType();
-    bool bWriteMisc = (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)?true:false;
+    bool bWriteMisc = (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)?true:false;
     if (PixelType != DTWAIN_PT_DEFAULT && opts.getAcquireType() != ACQUIREAUDIONATIVE)
     {
         CTL_StringType sBuf;

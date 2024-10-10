@@ -331,17 +331,35 @@ bool CTL_ExtImageInfoTriplet::EnumSupported(CTL_ITwainSource *pSource,
                                             CTL_ITwainSession *pSession,
                                             CTL_IntArray &rArray)
 {
-    rArray.clear();
     size_t NumAttr = CTL_StaticData::GetExtendedImageInfoMap().size();
+    rArray.clear();
+
+    // Set up a TWAIN triplet
     CTL_ExtImageInfoTriplet Trip(pSession, pSource, NumAttr);
-    const TW_UINT16 rc = Trip.Execute();
+    CTL_ExtImageInfoTriplet* pTripletToUse = &Trip;
+
+    // See if we already got this information
+    auto triplet = pSource->GetExtImageInfoTriplet();
+    TW_UINT16 rc = TWRC_SUCCESS;
+
+    // First time retrieving the information, so execute the triplet
+    if (!triplet)
+    {
+        rc = Trip.Execute();
+    }
+    else
+    {
+        // Just get the cached information from the initial run of
+        // the ExtImageInfo triplet
+        pTripletToUse = triplet.get();
+    }
     switch (rc)
     {
         case TWRC_SUCCESS:
         {
             for ( size_t i = 0; i < NumAttr; i++)
             {
-                TW_INFO Info = Trip.GetInfo(i, DTWAIN_BYPOSITION);
+                TW_INFO Info = pTripletToUse->GetInfo(i, DTWAIN_BYPOSITION);
                 if ( Info.ReturnCode != TWRC_INFONOTSUPPORTED && Info.ReturnCode != TWRC_DATANOTAVAILABLE)
                     rArray.push_back(Info.InfoID);
             }

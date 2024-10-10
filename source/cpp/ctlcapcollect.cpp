@@ -157,7 +157,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
 
         if (bOk)
         {
-            if (CTL_StaticData::s_lErrorFilterFlags)
+            if (CTL_StaticData::s_logFilterFlags)
             {
                 StringStreamOutA strm;
                 strm << "Using capability info from DTWAIN32.INI (Source="

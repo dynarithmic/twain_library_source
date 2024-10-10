@@ -634,7 +634,7 @@ LRESULT ExecuteCallback(CallbackType Fn, HWND hWnd, UINT uMsg,
     }
     catch (...)
     {
-        if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+        if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
         {
             const std::string sError = "In ExecuteCallback: Exception encountered when logging using callback...\n";
             CTL_TwainAppMgr::WriteLogInfoA(sError);
@@ -772,7 +772,7 @@ LRESULT ExecuteDTWAINCallbacks(CTL_TwainDLLHandle *pHandle, HWND hWnd, UINT uMsg
 
 void dynarithmic::LogDTWAINMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, bool bToCallback)
 {
-    if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_NOTIFICATIONS)
+    if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_NOTIFICATIONS)
     {
         CTL_ErrorStruct e;
         std::string s;

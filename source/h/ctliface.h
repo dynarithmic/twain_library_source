@@ -551,7 +551,7 @@ namespace dynarithmic
         static CTL_CallbackProcArray    s_aAllCallbacks;
         static CTL_StringType           s_strLangResourcePath;
         static CTL_GeneralErrorInfo     s_mapGeneralErrorInfo;
-        static long                     s_lErrorFilterFlags;
+        static long                     s_logFilterFlags;
         static CLogSystem               s_appLog;
         static UINT_PTR                 s_nTimeoutID;
         static UINT                     s_nTimeoutMilliseconds;
@@ -599,7 +599,7 @@ namespace dynarithmic
         static CTL_GeneralCapInfo& GetGeneralCapInfo() { return s_mapGeneralCapInfo; }
         static HINSTANCE GetDLLInstanceHandle() { return s_DLLInstance; }
         static CTL_GeneralErrorInfo& GetGeneralErrorInfo() { return s_mapGeneralErrorInfo; }
-        static long GetErrorFilterFlags() { return s_lErrorFilterFlags; }
+        static long GetErrorFilterFlags() { return s_logFilterFlags; }
         static ImageResamplerMap& GetImageResamplerMap() { return s_ImageResamplerMap; }
         static SourceStatusMap& GetSourceStatusMap() { return s_SourceStatusMap;  }
         static CTL_StringType& GetResourceVersion() { return s_ResourceVersion; }
@@ -1173,9 +1173,9 @@ namespace dynarithmic
     struct DTWAINScopedLogController
     {
         long m_ErrorFilterFlags;
-        DTWAINScopedLogController(long newFilter) : m_ErrorFilterFlags(CTL_StaticData::s_lErrorFilterFlags)
-        { CTL_StaticData::s_lErrorFilterFlags = newFilter; }
-        ~DTWAINScopedLogController() { CTL_StaticData::s_lErrorFilterFlags = m_ErrorFilterFlags; }
+        DTWAINScopedLogController(long newFilter) : m_ErrorFilterFlags(CTL_StaticData::s_logFilterFlags)
+        { CTL_StaticData::s_logFilterFlags = newFilter; }
+        ~DTWAINScopedLogController() { CTL_StaticData::s_logFilterFlags = m_ErrorFilterFlags; }
         DTWAINScopedLogController(DTWAINScopedLogController&) = delete;
         DTWAINScopedLogController& operator=(DTWAINScopedLogController&) = delete;
     };
@@ -1191,10 +1191,10 @@ namespace dynarithmic
     };
 
     struct LogTraitsOff
-    { static long Apply(long turnOff) { return CTL_StaticData::s_lErrorFilterFlags &~turnOff; } };
+    { static long Apply(long turnOff) { return CTL_StaticData::s_logFilterFlags &~turnOff; } };
 
     struct LogTraitsOn
-    { static long Apply(long turnOn) { return CTL_StaticData::s_lErrorFilterFlags  | turnOn; } };
+    { static long Apply(long turnOn) { return CTL_StaticData::s_logFilterFlags  | turnOn; } };
 
     template <typename LogTraits>
     struct DTWAINScopedLogControllerEx
