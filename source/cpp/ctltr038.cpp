@@ -76,11 +76,15 @@ void CTL_ExtImageInfoTriplet::InitInfo(CTL_ITwainSession *pSession,
 
 void CTL_ExtImageInfoTriplet::DestroyInfo()
 {
-    if ( !m_pExtImageInfo )
+    if (!m_pExtImageInfo)
         return;
     auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
     if (!sessionHandle)
         return;
+
+    // Use a std::set to gather the handles, since this ensures we will 
+    // not be unlocking and calling free two (or more times) on the same handle.
+    std::set<TW_HANDLE> allocatedHandleSet;
     for (TW_UINT32 i = 0; i < m_pExtImageInfo->NumInfos; i++)
     {
         TW_INFO* pInfo = &m_pExtImageInfo->Info[i];
@@ -89,32 +93,41 @@ void CTL_ExtImageInfoTriplet::DestroyInfo()
             pInfo->ReturnCode == TWRC_DATANOTAVAILABLE)
             continue;
 
-        // Remove the items
+        // "Remove" the items by adding to the set
         if (dynarithmic::GetTwainItemSize(pInfo->ItemType) * pInfo->NumItems > sizeof(TW_HANDLE))
         {
             TW_HANDLE SubHandle = reinterpret_cast<TW_HANDLE>(pInfo->Item);
             if (pInfo->ItemType == TWTY_HANDLE)
             {
-                // Currently, the application using DTWAIN has to process the handles
+                // Only "top-level" TWTY_HANDLE's are deallocated by DTWAIN.  If the TWTY_HANDLE points
+                // to a sub-level set of TWTY_HANDLE's that may have been allocated, DTWAIN does not know 
+                // for certain that the handles were actually allocated.  Therefore the application  
+                // using DTWAIN has to process these sub-handles when destroying the TW_EXTIMAGEINFO data.
                 const TW_HANDLE* pHandle = (TW_HANDLE*)sessionHandle->m_TwainMemoryFunc->LockMemory(SubHandle);
                 if (pHandle)
                 {
-                    for (int curHandle = 0; curHandle < pInfo->NumItems; curHandle++)
+                    // Empty, since right now, it is the app that has to figure out what to do with these
+                    // handles.
+                    for (int curHandle = 1; curHandle < pInfo->NumItems; curHandle++)
                     {
                     }
                 }
             }
-            // This items can be safely removed by DTWAIN
-            sessionHandle->m_TwainMemoryFunc->UnlockMemory(SubHandle);
-            sessionHandle->m_TwainMemoryFunc->FreeMemory(SubHandle);
+            // This item can be safely removed by DTWAIN, so add to the allocated handle set
+            allocatedHandleSet.insert(SubHandle);
         }
     }
 
-    // Free the TW_EXTIMAGEINFO structure that was allocated
-    sessionHandle->m_TwainMemoryFunc->UnlockMemory(m_memHandle);
-    sessionHandle->m_TwainMemoryFunc->FreeMemory(m_memHandle);
-}
+    // Add the original memory handle for the TW_EXTIMAGEINFO struct to our set of handles to delete
+    allocatedHandleSet.insert(m_memHandle);
 
+    // Delete all the allocated handles
+    std::for_each(allocatedHandleSet.begin(), allocatedHandleSet.end(), [&](TW_HANDLE h)
+        {
+            sessionHandle->m_TwainMemoryFunc->UnlockMemory(h);
+            sessionHandle->m_TwainMemoryFunc->FreeMemory(h);
+        });
+}
 
 TW_UINT16 CTL_ExtImageInfoTriplet::Execute()
 {
@@ -227,6 +240,7 @@ std::pair<bool, int32_t> CTL_ExtImageInfoTriplet::GetItemData(int nWhichItem, in
     {
         TW_HANDLE SubHandle = reinterpret_cast<TW_HANDLE>(Info.Item);
         const TW_HANDLE* pHandle = (TW_HANDLE*)sessionHandle->m_TwainMemoryFunc->LockMemory(SubHandle);
+
         // Check if this is a handle
         if (pHandle && Info.ItemType == TWTY_HANDLE)
         {
