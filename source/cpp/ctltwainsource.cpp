@@ -1016,7 +1016,7 @@ TW_INFO CTL_ITwainSource::GetExtImageInfoItem(int nItem, int nSearchType ) const
 
 bool CTL_ITwainSource::DestroyExtImageInfo()
 {
-    m_pExtImageTriplet.reset();
+    m_pExtImageTriplet->DestroyInfo();
     return true;
 }
 
@@ -1239,6 +1239,13 @@ bool CTL_ITwainSource::setCapCachedValues(DTWAIN_ARRAY array, TW_UINT16 lCap, LO
             return mapToUse->insert({lCap, cValues}).second;
     }
     return false;
+}
+
+CTL_ExtImageInfoTriplet* CTL_ITwainSource::GetExtImageInfoTriplet()
+{
+    if (!m_pExtImageTriplet)
+        m_pExtImageTriplet = std::make_unique<CTL_ExtImageInfoTriplet>(m_pSession, this, 0);
+    return m_pExtImageTriplet.get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
