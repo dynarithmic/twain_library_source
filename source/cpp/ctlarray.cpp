@@ -858,7 +858,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAt( DTWAIN_ARRAY pArray, LONG nWhere, LP
     const auto& factory = pHandle->m_ArrayFactory; 
 
     // Do something special for strings
-    DTWAIN_BOOL bRet = FALSE;
+    DTWAIN_BOOL bRet = TRUE;
     switch (factory->tag_type(pArray))
     {
         case CTL_ArrayFactory::arrayTag::WStringType:
