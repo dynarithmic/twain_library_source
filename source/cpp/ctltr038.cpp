@@ -84,6 +84,10 @@ void CTL_ExtImageInfoTriplet::DestroyInfo()
     if (!sessionHandle)
         return;
 
+    // Return if there is no top level TW_EXTIMAGEINFO allocated
+    if (!m_memHandle)
+        return;
+
     // Use a std::set to gather the handles, since this ensures we will 
     // not be unlocking and calling free two (or more times) on the same handle.
     std::set<TW_HANDLE> allocatedHandleSet;
@@ -129,6 +133,9 @@ void CTL_ExtImageInfoTriplet::DestroyInfo()
             sessionHandle->m_TwainMemoryFunc->UnlockMemory(h);
             sessionHandle->m_TwainMemoryFunc->FreeMemory(h);
         });
+
+    // Set the original handle to null
+    m_memHandle = NULL;
 }
 
 TW_UINT16 CTL_ExtImageInfoTriplet::Execute()

@@ -460,7 +460,7 @@ namespace dynarithmic
         void         SetFileSystemSupported(bool bSet) { m_tbIsFileSystemSupported = bSet; }
         void         SetBufferedTileModeSupported(bool bSet) { m_tbIsTileModeSupported = bSet; }
         TW_IMAGEMEMXFER& GetBufferedXFerInfo() { return m_BufferedXFerInfo; }
-        CTL_ExtImageInfoTriplet* GetExtImageInfoTriplet() { return m_pExtImageTriplet.get(); }
+        CTL_ExtImageInfoTriplet* GetExtImageInfoTriplet();
 
         // Only public member
         void *      m_pUserPtr;
