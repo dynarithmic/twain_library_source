@@ -935,11 +935,19 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
     CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
     const auto pHandle = p->GetDTWAINHandle();
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return p->GetState() != SOURCE_STATE_TRANSFERRING;},DTWAIN_ERR_INVALID_STATE,
-                                      false, FUNC_MACRO);
+    // Must be in State 7 for this function to be called
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return p->GetState() != SOURCE_STATE_TRANSFERRING;},
+                                      DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
 
     // Check if array exists
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !Data;}, DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
+
+    // We clear the user array here, since we do not want to 
+    // report information back to user if capability is not supported
+    bool bArrayExists = pHandle->m_ArrayFactory->is_valid(*Data);
+    if (bArrayExists)
+        pHandle->m_ArrayFactory->clear(*Data);
+
     // Create the array that corresponds with the correct type
     const DTWAIN_ARRAY ExtInfoArray = CreateArrayFromFactory(pHandle, 
                     CTL_TwainAppMgr::ExtImageInfoArrayType(nWhich + CTL_StaticData::GetExtImageInfoOffset()), 0);
@@ -985,10 +993,19 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
             }
         }
         else
+        if (eType == CTL_ArrayFactory::arrayTag::FrameType) // This is a frame
+        {
+            TW_FRAME oneFrame = {};
+            finalRet = p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, &oneFrame, nullptr);
+            dynarithmic::TWFRAMEToDTWAINFRAME(oneFrame, ExtInfoArray);
+        }
+        else
         {
             finalRet = p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, factory->get_buffer(ExtInfoArray, i), nullptr);
         }
     }
+    if (bArrayExists)
+        pHandle->m_ArrayFactory->destroy(*Data);
     *Data = ExtInfoArray;
     if (!finalRet.first)
     {
