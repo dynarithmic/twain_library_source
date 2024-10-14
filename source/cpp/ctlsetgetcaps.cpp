@@ -949,15 +949,32 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
         pHandle->m_ArrayFactory->clear(*Data);
 
     // Create the array that corresponds with the correct type
-    const DTWAIN_ARRAY ExtInfoArray = CreateArrayFromFactory(pHandle, 
-                    CTL_TwainAppMgr::ExtImageInfoArrayType(nWhich + CTL_StaticData::GetExtImageInfoOffset()), 0);
+    const TW_INFO Info = p->GetExtImageInfoItem(nWhich, DTWAIN_BYID);
+
+    // Check if type returned by device is what the TWAIN specification indicates
+    auto lTypeReportedByDevice = Info.ItemType;
+    auto lTypeRequiredByTWAIN = CTL_TwainAppMgr::GetGeneralCapInfo(nWhich + CTL_StaticData::GetExtImageInfoOffset()).m_nDataType;
+
+    if (lTypeReportedByDevice != static_cast<LONG>(lTypeRequiredByTWAIN))
+    {
+        // Just log this condition.  We will still get the data, even though TWAIN spec was violated.
+        if (CTL_StaticData::s_logFilterFlags)
+        {
+            StringTraitsA::string_type sBadType = GetResourceStringFromMap(IDS_DTWAIN_ERROR_REPORTED_TYPE_MISMATCH);
+            sBadType += "  Extended Image Info Value: " + CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, nWhich);
+            sBadType += " - {Device Type=" + CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWTY, lTypeReportedByDevice);
+            sBadType += ", Twain Required Type=" + CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWTY, lTypeRequiredByTWAIN) + "}";
+            CTL_TwainAppMgr::WriteLogInfoA(sBadType);
+        }
+    }
+
+    const DTWAIN_ARRAY ExtInfoArray = CreateArrayFromFactory(pHandle, CTL_TwainAppMgr::ExtImageInfoArrayType(Info.ItemType), 0);
+
     if ( !ExtInfoArray )
     {
         // Check if array exists
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !ExtInfoArray;}, DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
     }
-
-    const TW_INFO Info = p->GetExtImageInfoItem(nWhich, DTWAIN_BYID);
 
     auto Count = Info.NumItems;
 
