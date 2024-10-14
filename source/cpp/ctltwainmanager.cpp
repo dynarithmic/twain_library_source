@@ -2450,23 +2450,17 @@ std::pair<bool, CTL_StringType> CTL_TwainAppMgr::CheckTwainExistence(CTL_StringT
 
 LONG CTL_TwainAppMgr::ExtImageInfoArrayType(LONG ExtType)
 {
-    auto& capInfo = CTL_StaticData::GetGeneralCapInfo();
-    auto iter = capInfo.find(static_cast<TW_UINT16>(ExtType));
-    if (iter != capInfo.end())
-    {
-        auto& capStruct = iter->second;
-        TW_UINT16 actualType = static_cast<TW_UINT16>(capStruct.m_nDataType);
-        if (dynarithmic::IsTwainIntegralType(actualType))
-            return DTWAIN_ARRAYLONG;
-        if (dynarithmic::IsTwainStringType(actualType))
-            return DTWAIN_ARRAYANSISTRING;
-        if (dynarithmic::IsTwainHandleType(actualType))
-            return DTWAIN_ARRAYHANDLE;
-        if (dynarithmic::IsTwainFrameType(actualType))
-            return DTWAIN_ARRAYFRAME;
-        if (dynarithmic::IsTwainFix32Type(actualType))
-            return DTWAIN_ARRAYFLOAT;
-    }
+    TW_UINT16 actualType = static_cast<TW_UINT16>(ExtType);
+    if (dynarithmic::IsTwainIntegralType(actualType))
+        return DTWAIN_ARRAYLONG;
+    if (dynarithmic::IsTwainStringType(actualType))
+        return DTWAIN_ARRAYANSISTRING;
+    if (dynarithmic::IsTwainHandleType(actualType))
+        return DTWAIN_ARRAYHANDLE;
+    if (dynarithmic::IsTwainFrameType(actualType))
+        return DTWAIN_ARRAYFRAME;
+    if (dynarithmic::IsTwainFix32Type(actualType))
+        return DTWAIN_ARRAYFLOAT;
     return DTWAIN_ARRAYLONG;
 }
 

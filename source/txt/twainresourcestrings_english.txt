@@ -239,3 +239,4 @@
 10003 Error in closing DTWAIN Manager
 10004 TWAIN Source Manager, Session, and DTWAIN closed successfully
 10005 Could not remove subclass from user window
+10006 Device type and TWAIN required type do not match.
