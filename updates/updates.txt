@@ -6,6 +6,9 @@ DTWAIN Version changes
   imprinter text, etc.) from TWAIN Sources using the DTWAIN Extended Image Information retrieval 
   functions (DTWAIN_InitExtImageInfo, DTWAIN_GetExtImageInfoData, etc.).
 
+- Fixed issue with DTWAIN_ArrayGet...() functions possibly returning the incorrect status
+  code.
+
 - TWAIN Select Source dialog and OCR Select Engine dialogs are now similar and have the same
   functionality.  This includes adding DTWAIN_SelectOCREngine2() function that is similar
   to the current DTWAIN_SelectSource2() function, which allows positioning, sorting of the names
@@ -18,7 +21,6 @@ DTWAIN Version changes
   (for example, French, German, etc.) while the demo is running.  The changes in the
   language will be seen in the TWAIN Select Source dialog, and in the logging text if
   logging is chosen.
-
 
 
 5.5.2
