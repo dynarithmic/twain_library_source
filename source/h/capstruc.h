@@ -21,7 +21,7 @@
 #ifndef CAPSTRUCT_H
 #define CAPSTRUCT_H
 
-#include <unordered_map>
+#include <boost/container/flat_map.hpp>
 namespace dynarithmic
 {
     // Define the cap info structure used
@@ -41,6 +41,6 @@ namespace dynarithmic
             operator std::string() const;
     };
 
-    typedef std::unordered_map<TW_UINT16, CTL_CapStruct> CTL_GeneralCapInfo;
+    typedef boost::container::flat_map<TW_UINT16, CTL_CapStruct> CTL_GeneralCapInfo;
 }
 #endif

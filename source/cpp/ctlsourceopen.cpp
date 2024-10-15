@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "cppfunc.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "../wildcards/wildcards.hpp"
@@ -104,7 +104,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     CapList& theCapList = pSource->GetCapSupportedList();
 
     // if any logging is turned on, then get the capabilities and log the values
-    if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+    if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
     {
         CTL_StringType msg = _T("Source: ") + pSource->GetProductName() + _T(" has been opened successfully");
         CTL_TwainAppMgr::WriteLogInfo(msg);
@@ -160,7 +160,7 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
 
     p->SetCurrentlyProcessingPixelInfo(true);
     TCHAR szName[MaxMessage + 1];
-    LONG oldflags = CTL_StaticData::s_lErrorFilterFlags;
+    LONG oldflags = CTL_StaticData::s_logFilterFlags;
 
     GetSourceInfo(p, &CTL_ITwainSource::GetProductName, szName, MaxMessage);
 

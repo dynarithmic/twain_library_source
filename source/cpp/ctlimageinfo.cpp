@@ -21,7 +21,7 @@
 #include <boost/format.hpp>
 
 #include "cppfunc.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctltr025.h"
@@ -74,10 +74,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfo(DTWAIN_SOURCE Source,
                                             LPLONG Compression)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, XResolution, YResolution, Width, Length, NumSamples, BitsPerSample,BitsPerPixel, Planar, PixelType, Compression))
-    auto [pHandle, p] = VerifyHandles(Source);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(p); },
-                                        DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
+    auto [pHandle, p] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     CTL_ImageInfoTriplet II(pHandle->m_pTwainSession, p);
 
     // Call TWAIN to get the information
@@ -135,7 +133,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetBufferedTransferInfo(DTWAIN_SOURCE Source,
                                                    LPDWORD MemoryLength)
 {
 	LOG_FUNC_ENTRY_PARAMS((Source, Compression, BytesPerRow, Columns, Rows, XOffset, YOffset, Flags, BytesWritten, MemoryLength))
-    auto [pHandle, pSource] = VerifyHandles(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     auto& memxferInfo = pSource->GetBufferedXFerInfo();
     std::array<LPDWORD, 9> userVals = { Compression, BytesPerRow, Columns, Rows, XOffset, YOffset, Flags, BytesWritten, MemoryLength };
     std::array<TW_UINT32, 9> xferVals = { memxferInfo.Compression, memxferInfo.BytesPerRow, memxferInfo.Columns, memxferInfo.Rows,

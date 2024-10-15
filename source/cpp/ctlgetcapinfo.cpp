@@ -25,7 +25,7 @@
 #endif
 using namespace dynarithmic;
 
-CTL_CapInfoArrayPtr dynarithmic::GetCapInfoArray(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource *p)
+CTL_CapInfoMapPtr dynarithmic::GetCapInfoArray(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource *p)
 {
     // Check if the capability is supported
     const auto strProdName = p->GetProductName();
@@ -34,17 +34,17 @@ CTL_CapInfoArrayPtr dynarithmic::GetCapInfoArray(CTL_TwainDLLHandle* pHandle, co
     int nWhere;
     FindFirstValue(strProdName, &pHandle->m_aSourceCapInfo, &nWhere);
     if (nWhere == -1)
-        return CTL_CapInfoArrayPtr();
+        return CTL_CapInfoMapPtr();
 
     // Get the cap array values
     const CTL_SourceCapInfo Info = pHandle->m_aSourceCapInfo[nWhere];
-    CTL_CapInfoArrayPtr pArray = std::get<1>(Info);
+    CTL_CapInfoMapPtr pArray = std::get<1>(Info);
     return pArray;
 }
 
 CTL_CapInfo* dynarithmic::GetCapInfo(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource* p, TW_UINT16 nCap)
 {
-    const CTL_CapInfoArrayPtr pArray = GetCapInfoArray(pHandle, p);
+    const CTL_CapInfoMapPtr pArray = GetCapInfoArray(pHandle, p);
     CTL_CapInfo* CapInfo = nullptr;
     if (!pArray)
     {

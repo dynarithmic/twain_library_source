@@ -358,15 +358,6 @@
     <ClCompile Include=".\cpp\ctltwainmsgloop.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include=".\cpp\ctltwmgr.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include=".\cpp\ctltwses.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include=".\cpp\ctltwsrc.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include=".\cpp\ctluicontrollable.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
@@ -380,9 +371,6 @@
       <Filter>C++ Files</Filter>
     </ClCompile>
     <ClCompile Include=".\cpp\ctlverifysourcehandle.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include=".\cpp\ctlwproc.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
     <ClCompile Include=".\cpp\ctlxmlparse.cpp">
@@ -658,6 +646,27 @@
     <ClCompile Include="cpp\ctlloadresources.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
+    <ClCompile Include="cpp\ctlselectdialog.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ocrengine\ocrselect.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctltwainsource.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctltwainsession.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctltwainmanager.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlwindowproc.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlfilesave.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp\pdflib32\a85encode.h">
@@ -718,9 +727,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include=".\h\ctlreg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="h\ctlres.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h\ctlsupport.h">
@@ -880,15 +886,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h\ctltwainmsgloop.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include=".\h\ctltwmgr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include=".\h\ctltwses.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include=".\h\ctltwsrc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h\dibinfox.h">
@@ -1053,10 +1050,28 @@
     <ClInclude Include="h\dtwain_paramlogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="h\ctlccerr.h">
+    <ClInclude Include="h\ctlutils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="h\ctlutils.h">
+    <ClInclude Include="h\ctltwainsource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctltwainsession.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctltwainmanager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctlfilesave.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctlconstexprfind.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctlconstexprutils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctlloadresources.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1130,9 +1145,6 @@
     <None Include=".\def\dtwain32.def">
       <Filter>Module Definition Files</Filter>
     </None>
-    <None Include="doc.txt">
-      <Filter>Resource Text Files</Filter>
-    </None>
     <None Include="txt\dtwain32.ini">
       <Filter>INI Files</Filter>
     </None>
@@ -1178,6 +1190,12 @@
       <Filter>Resource Text Files</Filter>
     </Text>
     <Text Include="txt\twainresourcestrings_russian.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_portuguese.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_simplified_chinese.txt">
       <Filter>Resource Text Files</Filter>
     </Text>
   </ItemGroup>

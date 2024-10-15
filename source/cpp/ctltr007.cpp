@@ -19,9 +19,9 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltr007.h"
-#include "ctltwses.h"
-#include "ctltwsrc.h"
-#include "ctltwmgr.h"
+#include "ctltwainsession.h"
+#include "ctltwainsource.h"
+#include "ctltwainmanager.h"
 using namespace dynarithmic;
 CTL_ConditionCodeTriplet::CTL_ConditionCodeTriplet(CTL_ITwainSession *pSession,
                                                    CTL_ITwainSource* pSource/* = nullptr*/) :

@@ -18,7 +18,7 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "errorcheck.h"
 #include <boost/format.hpp>
 #include "cppfunc.h"
@@ -67,11 +67,7 @@ static bool IsValidUnit(LONG Unit)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea(DTWAIN_SOURCE Source, LONG lGetType, LPDTWAIN_ARRAY FloatArray)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lGetType, FloatArray))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    CTL_ITwainSource* p = pSource;
-    // See if Source is opened
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !CTL_TwainAppMgr::IsSourceOpen(p); },
-        DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     const DTWAIN_BOOL bRet = GetImageSize(pHandle, Source, FloatArray, static_cast<CTL_EnumGetType>(lGetType));
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
@@ -80,11 +76,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea(DTWAIN_SOURCE Source, LONG lGetTy
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea(DTWAIN_SOURCE Source, LONG lSetType, DTWAIN_ARRAY FloatArray, DTWAIN_ARRAY ActualArray)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lSetType, FloatArray, ActualArray))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    CTL_ITwainSource* p = pSource;
-    // See if Source is opened
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(p); },
-                                      DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     const DTWAIN_BOOL bRet = SetImageSize(Source, FloatArray, ActualArray,static_cast<CTL_EnumSetType>(lSetType));
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
@@ -105,10 +97,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2String(DTWAIN_SOURCE Source, LPCT
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2(DTWAIN_SOURCE Source, DTWAIN_FLOAT left, DTWAIN_FLOAT top, DTWAIN_FLOAT right, DTWAIN_FLOAT bottom, LONG Unit, LONG flags)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit, flags))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    CTL_ITwainSource* p = pSource;
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(p); },
-                                    DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !IsValidUnit(Unit); },
                                     DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     const DTWAIN_BOOL bRet = SetImageSize2(pSource, left, top, right, bottom, Unit, flags);
@@ -139,11 +128,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2String(DTWAIN_SOURCE Source, LPTS
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2(DTWAIN_SOURCE Source, LPDTWAIN_FLOAT  left, LPDTWAIN_FLOAT  top, LPDTWAIN_FLOAT  right, LPDTWAIN_FLOAT  bottom, LPLONG Unit)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    CTL_ITwainSource* p = pSource;
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(p); },
-                                      DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
-    const DTWAIN_BOOL bRet = GetImageSize2(p, left, top, right, bottom, Unit);
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+    const DTWAIN_BOOL bRet = GetImageSize2(pSource, left, top, right, bottom, Unit);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }

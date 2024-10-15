@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2023 Dynarithmic Software.
+    Copyright (c) 2002-2024 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -154,8 +154,9 @@ bool VersionInfoImpl<charTraits>::getit( typename charTraits::TraitsCharType con
 }
 
 template <typename charTraits>
-void VersionInfoImpl<charTraits>::printit(typename charTraits::TraitsBaseOutputStreamType& stream, const char_type* eol) const
+void VersionInfoImpl<charTraits>::printit(typename charTraits::TraitsBaseOutputStreamType& stream, int indent, const char_type* eol) const
 {
+    charTraits::TraitsStringType indentStr(indent, charTraits::SpaceChar);
     for ( auto it = m_verStrings.begin( )
         ; it != m_verStrings.end( )
         ; ++it
@@ -163,7 +164,7 @@ void VersionInfoImpl<charTraits>::printit(typename charTraits::TraitsBaseOutputS
     {
         if ( (*it).second.empty() )
         {
-            stream << (*it).first.c_str( ) << charTraits::Compat(": (none)");
+            stream << indentStr << (*it).first.c_str( ) << charTraits::Compat(": (none)");
             if ( !eol )
                 stream << std::endl;
             else
@@ -171,7 +172,7 @@ void VersionInfoImpl<charTraits>::printit(typename charTraits::TraitsBaseOutputS
         }
         else
         {
-            stream << (*it).first.c_str( ) << charTraits::Compat(": ") << (*it).second.c_str( );
+            stream << indentStr << (*it).first.c_str( ) << charTraits::Compat(": ") << (*it).second.c_str( );
             if ( !eol )
                 stream << std::endl;
             else
@@ -185,6 +186,6 @@ template <typename charTraits>
 typename charTraits::TraitsBaseOutputStreamType& operator << (typename charTraits::TraitsBaseOutputStreamType& os,
                                                      const VersionInfoImpl<charTraits>& vi)
 {
-    vi.printit( os );
+    vi.printit( os, 0 );
     return os;
 }

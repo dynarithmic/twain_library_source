@@ -912,13 +912,10 @@ DTWAIN_SelectSource2ExW                           @30087
 DTWAIN_GetTwainAppIDEx                            @30090
 DTWAIN_GetSourceIDEx                              @30091
 DTWAIN_ArrayGetSourceAt                           @30100
-
 DTWAIN_ConvertDIBToBitmap                         @30101
 DTWAIN_ConvertDIBToFullBitmap                     @30102
 DTWAIN_DeleteDIB                                  @30103
-
 DTWAIN_SysInitializeNoBlocking                    @30200
-
 DTWAIN_RangeGetAllFloatStringA                    @30201
 DTWAIN_RangeGetAllFloatStringW                    @30202
 DTWAIN_RangeSetAllFloatStringA                    @30203
@@ -1053,3 +1050,18 @@ DTWAIN_GetBufferedTransferInfo                    @31047
 DTWAIN_ConvertToAPIString                         @31050 
 DTWAIN_ConvertToAPIStringA                        @31051 
 DTWAIN_ConvertToAPIStringW                        @31052 
+DTWAIN_SelectOCREngine2A                          @31053
+DTWAIN_SelectOCREngine2W                          @31054
+DTWAIN_SelectOCREngine2                           @31055
+DTWAIN_SelectOCREngine2ExA                        @31056
+DTWAIN_SelectOCREngine2ExW                        @31057
+DTWAIN_SelectOCREngine2Ex                         @31058
+DTWAIN_SetTempFileDirectoryEx                     @31059
+DTWAIN_SetTempFileDirectoryExA                    @31060
+DTWAIN_SetTempFileDirectoryExW                    @31061
+DTWAIN_ArrayGetAtSource                           @31062
+DTWAIN_GetOCRMajorMinorVersion                    @31063
+DTWAIN_GetSavedFilesCount                         @31064
+DTWAIN_GetActiveDSMVersionInfo                    @31065
+DTWAIN_GetActiveDSMVersionInfoA                   @31066
+DTWAIN_GetActiveDSMVersionInfoW                   @31067

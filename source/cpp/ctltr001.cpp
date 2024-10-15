@@ -20,7 +20,7 @@
  */
 //#include <stdafx.h>
 #include "ctltr001.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 using namespace dynarithmic;
 //////////////////////////////////////////////////////////////////////////////
 CTL_SourceTriplet::CTL_SourceTriplet(CTL_ITwainSession *pSession,

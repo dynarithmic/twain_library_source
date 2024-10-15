@@ -25,7 +25,7 @@
 #include <boost/format.hpp>
 
 #include "cppfunc.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "ctltrall.h"
 #include "ctltmpl5.h"
 #include "errorcheck.h"
@@ -837,6 +837,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetSourceAt(DTWAIN_ARRAY pArray, LONG nWher
     CATCH_BLOCK(false)
 }
 
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtSource(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_SOURCE* ppSource)
+{
+    LOG_FUNC_ENTRY_PARAMS((pArray, nWhere, ppSource))
+    LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_ArrayGetSourceAt(pArray, nWhere, ppSource))
+    CATCH_BLOCK(false)
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAt( DTWAIN_ARRAY pArray, LONG nWhere, LPVOID pVariant)
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, nWhere, pVariant))
@@ -851,7 +858,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAt( DTWAIN_ARRAY pArray, LONG nWhere, LP
     const auto& factory = pHandle->m_ArrayFactory; 
 
     // Do something special for strings
-    DTWAIN_BOOL bRet = FALSE;
+    DTWAIN_BOOL bRet = TRUE;
     switch (factory->tag_type(pArray))
     {
         case CTL_ArrayFactory::arrayTag::WStringType:
@@ -866,6 +873,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAt( DTWAIN_ARRAY pArray, LONG nWhere, LP
         {
             auto pTheSource = static_cast<CTL_ITwainSource **>(pVariant);
             *pTheSource = static_cast<CTL_ITwainSource*>(factory->get_value(pArray, nWhere, pVariant));
+        }
+        break;
+        case CTL_ArrayFactory::arrayTag::VoidPtrType:
+        {
+            auto pTheData = static_cast<void**>(pVariant);
+            *pTheData = factory->get_value(pArray, nWhere, pVariant);
         }
         break;
         default:

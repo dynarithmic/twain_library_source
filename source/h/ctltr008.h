@@ -21,7 +21,7 @@
 #ifndef CTLTR008_H
 #define CTLTR008_H
 #include "ctltrp.h"
-#include "ctltwses.h"
+#include "ctltwainsession.h"
 namespace dynarithmic
 {
     class CTL_ProcessEventTriplet : public CTL_TwainTriplet

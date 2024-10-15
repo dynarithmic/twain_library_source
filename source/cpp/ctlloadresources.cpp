@@ -21,10 +21,10 @@
 #include <sstream>
 #include <boost/format.hpp>
 #include "ctliface.h"
-#include "ctlres.h"
+#include "ctlloadresources.h"
 
 #include "cppfunc.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "dtwain_verinfo.h"
 #include "dtwstrfn.h"
 #include "ctldefsource.h"
@@ -51,7 +51,7 @@ namespace dynarithmic
     static std::vector<std::pair<uint16_t, uint16_t>> parseBracketedPairs(std::string bracketedPairs)
     {
         std::vector<std::pair<uint16_t, uint16_t>> retVal;
-        auto pos = 0;
+        size_t pos = 0;
         while (true)
         {
             pos = bracketedPairs.find_first_of('[');
@@ -126,7 +126,7 @@ namespace dynarithmic
             lineQueue.pop();
             lineQueue.push(line);
         }
-        auto crcVal = crc32_aux(0, (unsigned char*)totalBuf.data(), totalBuf.size());
+        auto crcVal = crc32_aux(0, (unsigned char*)totalBuf.data(), static_cast<unsigned int>(totalBuf.size()));
         try
         {
             uint64_t crc = std::stoul(lineQueue.front());
@@ -147,6 +147,7 @@ namespace dynarithmic
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INIFILE_LOADED] = true;
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_VERSION_READ] = true;
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_CRC_CHECK] = true;
+        retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_NODUPLICATE_ID] = true;
         CTL_ErrorStruct ErrorStruct;
         int dg, dat, msg, structtype, retcode, successcode;
         auto sPath = createResourceFileName(DTWAINRESOURCEINFOFILE);
@@ -182,16 +183,6 @@ namespace dynarithmic
         }
 
         // Load the TWAIN data resources
-        int resourceID;
-        int twainID;
-        std::string twainName;
-        while (ifs >> resourceID >> twainID >> twainName)
-        {
-            if (resourceID == -1000 && twainID == -1000)
-                break;
-            CTL_StaticData::s_TwainNameMap.insert({ { resourceID,twainID }, twainName });
-        }
-
         decltype(CTL_CapStruct::m_strCapName) capName;
         decltype(CTL_CapStruct::m_nDataType)  capType;
         decltype(CTL_CapStruct::m_nGetContainer)  capGet;
@@ -201,14 +192,50 @@ namespace dynarithmic
         decltype(CTL_CapStruct::m_nSetConstraintContainer) capSetConstraint;
         decltype(CTL_CapStruct::m_nResetContainer) capReset;
         decltype(CTL_CapStruct::m_nQuerySupportContainer) capQuery;
-        LONG lCap;
 
-        while (ifs >> lCap >> capName >> capType >> capGet >>
+        // First load the offset for the extended information constants
+        std::string sOffset;
+        int32_t extOffset = 0;
+        ifs >> sOffset;
+        try
+        {
+            extOffset = stol(sOffset);
+        }
+        catch (...)
+        {
+            retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] = false;
+            return false;
+        }
+        CTL_StaticData::SetExtImageInfoOffset(extOffset);
+
+        std::string sCap;
+        LONG lCap;
+        auto& extendedImageInfoMap = CTL_StaticData::GetExtendedImageInfoMap();
+        while (ifs >> sCap >> capName >> capType >> capGet >>
                 capGetCurrent >> capGetDefault >> capSet >> capSetConstraint >>
                 capReset >> capQuery)
         {
+            try
+            {
+                if (StringWrapperA::StartsWith(sCap, "0x"))
+                    lCap = std::stol(sCap, nullptr, 16);
+                else
+                    lCap = std::stol(sCap);
+            }
+            catch (...)
+            {
+                retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] = false;
+                return false;
+            }
+
             if (lCap == -1000 && capName == "END")
                 break;
+            bool isTWEIName = StringWrapperA::StartsWith(capName, "TWEI_");
+            if (isTWEIName)
+            {
+                extendedImageInfoMap.insert({ lCap ,capName });
+                lCap += extOffset;
+            }
             CTL_CapStruct cStruct;
             cStruct.m_nDataType = capType;
             cStruct.m_nGetContainer = capGet;
@@ -274,6 +301,7 @@ namespace dynarithmic
 
         // Read in the TWAIN constants
         auto& constantsMap = CTL_StaticData::GetTwainConstantsMap();
+        auto& stringToConstantMap = CTL_StaticData::GetStringToConstantMap();
         for ( int constantVal = 0; constantVal < CTL_TwainDLLHandle::NumTwainMapValues; ++constantVal)
         { 
             auto iter = constantsMap.insert({constantVal, {}}).first;
@@ -294,6 +322,12 @@ namespace dynarithmic
                 std::replace(name.begin(), name.end(), '#', ' ');
                 name = StringWrapperA::TrimAll(name);
                 iter->second.insert({twainValue, name});
+                if (stringToConstantMap.find(name) != stringToConstantMap.end())
+                {
+                    retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_NODUPLICATE_ID] = false;
+                    return false;
+                }
+                stringToConstantMap.insert({ name, twainValue });
             }
         }
 
@@ -366,52 +400,17 @@ namespace dynarithmic
         // Read in the minimum version number for this resource
         // Check if resource version if >= running version
         std::getline(ifs, totalLine);
-
-        // Check that all components are integers
-        auto origVersion = totalLine;
-        std::replace(totalLine.begin(), totalLine.end(), '.', ' ');
-        std::istringstream strmVersion(totalLine);
-        std::string oneNumber;
-        constexpr std::array<int, 3> componentNames = 
-            { 
-              DTWAIN_TEXTRESOURCE_MIN_MAJOR_VERSION, 
-              DTWAIN_TEXTRESOURCE_MIN_MINOR_VERSION, 
-              DTWAIN_TEXTRESOURCE_MIN_PATCHLEVEL_VERSION 
-            };
-        int currentComponent = 0;
-        bool badVersion = false;
-
-        // Test that the version number for the twain resource found is at least 
-        // equal to or higher than the version number built into the DTWAIN library
-        while (strmVersion >> oneNumber)
-        {
-            try
-            {
-                auto num = std::stoi(oneNumber);
-                if (num < componentNames[currentComponent])
-                {
-                    badVersion = true;
-                    break;
-                }
-                ++currentComponent;
-                if (currentComponent >= static_cast<int>(componentNames.size()))
-                    break;
-            }
-            catch (...)
-            {
-                badVersion = true;
-            }
-        }
-        if (badVersion)
+        bool goodVersion = (DTWAIN_TEXTRESOURCE_FILEVERSION == totalLine);
+        if (!goodVersion)
         {
             retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_VERSION_READ] = false;
-            retValue.errorMessage = StringConversion::Convert_Ansi_To_Native(origVersion);
+            retValue.errorMessage = StringConversion::Convert_Ansi_To_Native(totalLine);
             return false;
         }
         else
             retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_VERSION_READ] = true;
 
-        CTL_StaticData::s_ResourceVersion = StringConversion::Convert_Ansi_To_Native(origVersion);
+        CTL_StaticData::s_ResourceVersion = StringConversion::Convert_Ansi_To_Native(DTWAIN_TEXTRESOURCE_FILEVERSION);
         bool doResourceCheck = iniInterface->GetBoolValue("Miscellaneous", "resourcecheck", true);
         if (doResourceCheck)
         {

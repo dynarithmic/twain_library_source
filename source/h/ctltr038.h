@@ -24,13 +24,16 @@
 #include "ctltrp.h"
 
 #include <vector>
+#include <map>
+
 namespace dynarithmic
 {
     class CTL_ExtImageInfoTriplet : public CTL_TwainTriplet
     {
+        using ExtInfoMap = std::map<TW_UINT16, TW_INFO>;
         public:
             // Only MSG_GET is supported
-            CTL_ExtImageInfoTriplet() : m_pExtImageInfo(nullptr), m_memHandle{}, m_nNumInfo{} { }
+            CTL_ExtImageInfoTriplet() : m_pExtImageInfo(nullptr), m_memHandle{}, m_nNumInfo{}, m_bRetrievedInfo{} { }
             CTL_ExtImageInfoTriplet(CTL_ITwainSession *pSession,
                                    CTL_ITwainSource* pSource,
                                    int nInfo);
@@ -58,7 +61,7 @@ namespace dynarithmic
             bool AddInfo(TW_INFO Info);
 
             // Utility functions
-            bool GetItemData(int nWhichItem, int nSearch, int nWhichValue, LPVOID Data, size_t *pItemSize= nullptr) const;
+            std::pair<bool, int32_t> GetItemData(int nWhichItem, int nSearch, int nWhichValue, LPVOID Data, LPVOID* pHandleData, size_t *pItemSize= nullptr) const;
 
             bool IsItemHandle(size_t nWhich) const;
 
@@ -68,7 +71,8 @@ namespace dynarithmic
                                       CTL_ITwainSession *pSession,
                                       CTL_IntArray &rArray);
 
-            bool RetrieveInfo(TWINFOVector &v) const;
+            ExtInfoMap& RetrieveInfo() noexcept { return m_ExtInfoMap; } 
+            bool HasRetrievedInfo() const { return m_bRetrievedInfo; }
 
         private:
             void ResolveTypes();
@@ -78,8 +82,8 @@ namespace dynarithmic
             TW_EXTIMAGEINFO *m_pExtImageInfo;
             TW_HANDLE m_memHandle;
             size_t m_nNumInfo;
-            TWINFOVector m_vInfo;
-            static TW_UINT16 s_AllAttr[80];
+            ExtInfoMap m_ExtInfoMap;
+            bool m_bRetrievedInfo;
     };
 }
 #endif

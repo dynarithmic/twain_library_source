@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "cppfunc.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "ctltwainmsgloop.h"
 #include "sourceacquireopts.h"
 #include "dtwain_paramlogger.h"

@@ -29,17 +29,20 @@
 
 #include <mutex>
 #include <memory>
+#include <functional>
 #include "ctltrp.h"
 #include "dtwain_raii.h"
 #include "ocrinterface.h"
 #include "pdffont_basic.h"
-#include "ctlres.h"
+#include "ctlloadresources.h"
 #include "dtwain.h"
 #include "twainframe.h"
 #include <boost/functional/hash.hpp>
+#include <boost/container/flat_map.hpp>
 #include "../simpleini/simpleini.h"
 #include "notimpl.h"
 #include "sourceacquireopts.h"
+#include "ctlconstexprutils.h"
 #ifdef _WIN32
     #include "winlibraryloader_impl.inl"
 #else
@@ -60,7 +63,7 @@ struct dtwain_library_loader : library_loader_impl
 
 #include "capstruc.h"
 #include "ctltmpl4.h"
-#include "ctltwses.h"
+#include "ctltwainsession.h"
 #include "dtwain_resource_constants.h"
 #include "errstruc.h"
 #include "logmsg.h"
@@ -219,30 +222,30 @@ namespace dynarithmic
     #define CAPINFO_IDX_RESETCONTAINER 8    
     #define CAPINFO_IDX_QUERYSUPPORT 9    
 
-    typedef std::unordered_map<unsigned long, std::shared_ptr<CTL_TwainDLLHandle>> CTL_MapThreadToDLLHandle;
-    typedef std::unordered_map<LONG, int> CTL_LongToIntMap;
+    typedef boost::container::flat_map<unsigned long, std::shared_ptr<CTL_TwainDLLHandle>> CTL_MapThreadToDLLHandle;
+    typedef boost::container::flat_map<LONG, int> CTL_LongToIntMap;
     typedef BiDirectionalMap<std::pair<int, int>, std::string> CTL_TwainNameMap;
-    typedef std::unordered_map<CTL_StringType, CTL_ITwainSource*> CTL_StringToSourcePtrMap;
-    typedef std::unordered_map<CTL_StringType, int> CTL_StringToIntMap;
-    typedef std::unordered_map<LONG, HMODULE> CTL_LongToHMODULEMap;
-    typedef std::unordered_map<CTL_EnumCapability, CTL_CapInfo> CTL_EnumCapToInfoMap;
-    typedef std::vector<CallbackInfo<DTWAIN_CALLBACK_PROC, LONG> > CTL_CallbackProcArray;
-    typedef std::vector<CallbackInfo<DTWAIN_CALLBACK_PROC, LONGLONG> > CTL_CallbackProcArray64;
-    typedef std::unordered_map<LONG, CTL_StringType> CTL_StringToLongMap;
-    typedef std::map<LONG, std::string> CTL_LongToStringMap;
-    typedef std::unordered_map<std::string, CTL_LongToStringMap> CTL_StringToMapLongToStringMap;
-    typedef std::unordered_map<LONG, std::vector<LONG> > CTL_LongToVectorLongMap;
-    typedef std::vector<CTL_MapThreadToDLLHandle>     CTL_HookInfoArray;
+    typedef boost::container::flat_map<CTL_StringType, CTL_ITwainSource*> CTL_StringToSourcePtrMap;
+    typedef boost::container::flat_map<CTL_StringType, int> CTL_StringToIntMap;
+    typedef boost::container::flat_map<LONG, HMODULE> CTL_LongToHMODULEMap;
+    typedef boost::container::flat_map<CTL_EnumCapability, CTL_CapInfo> CTL_EnumCapToInfoMap;
+    typedef std::vector<CallbackInfo<DTWAIN_CALLBACK_PROC, LONG>> CTL_CallbackProcArray;
+    typedef std::vector<CallbackInfo<DTWAIN_CALLBACK_PROC, LONGLONG>> CTL_CallbackProcArray64;
+    typedef boost::container::flat_map<LONG, CTL_StringType> CTL_StringToLongMap;
+    typedef boost::container::flat_map<LONG, std::string> CTL_LongToStringMap;
+    typedef boost::container::flat_map<std::string, CTL_LongToStringMap> CTL_StringToMapLongToStringMap;
+    typedef boost::container::flat_map<LONG, std::vector<LONG>> CTL_LongToVectorLongMap;
+    typedef std::vector<CTL_MapThreadToDLLHandle> CTL_HookInfoArray;
 
     // Create these dynamically whenever a new source is opened
     // and source cap info does not exist.  Add cap info statically.
-    typedef std::unordered_map<CTL_EnumCapability, CTL_CapInfo>  CTL_CapInfoArray;
-    typedef std::shared_ptr<CTL_CapInfoArray> CTL_CapInfoArrayPtr;
+    typedef boost::container::flat_map<CTL_EnumCapability, CTL_CapInfo>  CTL_CapInfoMap;
+    typedef std::shared_ptr<CTL_CapInfoMap> CTL_CapInfoMapPtr;
 
     // Create this statically when initializing.  Initialize the second
-    // value with the dynamically created CTL_CapInfoArray above
+    // value with the dynamically created CTL_CapInfoMap above
     typedef CTL_ClassValues10<CTL_StringType, /* Product Name */
-                             CTL_CapInfoArrayPtr, /* Array of cap info*/
+                             CTL_CapInfoMapPtr, /* Array of cap info*/
                              int,       /* dummy */
                              int,        /* dummy */
                              char,
@@ -281,6 +284,8 @@ namespace dynarithmic
         CTL_StringType SourceName;
         CustomPlacement CS;
         CTL_TwainDLLHandle* pHandle;
+        std::function<std::vector<TCHAR>(SelectStruct&)> getDefaultFunc;
+        std::function<std::vector<CTL_StringType>(SelectStruct&)> getNameListFunc;
         int nItems;
     };
 
@@ -499,14 +504,15 @@ namespace dynarithmic
     };
 
     typedef std::map<std::string, SourceStatus> SourceStatusMap;
-    typedef std::map<int, ImageResamplerData> ImageResamplerMap;
-    typedef std::unordered_map<LONG, std::pair<std::string, std::string>> CTL_PDFMediaMap;
+    typedef boost::container::flat_map<int, ImageResamplerData> ImageResamplerMap;
+    typedef boost::container::flat_map<LONG, std::pair<std::string, std::string>> CTL_PDFMediaMap;
     typedef tsl::ordered_map<LONG, FileFormatNode> CTL_AvailableFileFormatsMap;
     typedef tsl::ordered_map<LONG, std::string> CTL_TwainConstantToStringMapNode;
-    typedef std::unordered_map<LONG, CTL_TwainConstantToStringMapNode> CTL_TwainConstantsMap;
-    typedef std::unordered_map<LONG, std::string> CTL_TwainLongToStringMap;
-    typedef std::unordered_map<int32_t, std::string> CTL_ErrorToExtraInfoMap;
-    typedef std::unordered_map<std::string, unsigned long> CTL_ThreadMap;
+    typedef boost::container::flat_map<LONG, CTL_TwainConstantToStringMapNode> CTL_TwainConstantsMap;
+    typedef boost::container::flat_map<LONG, std::string> CTL_TwainLongToStringMap;
+    typedef boost::container::flat_map<int32_t, std::string> CTL_ErrorToExtraInfoMap;
+    typedef boost::container::flat_map<std::string, unsigned long> CTL_ThreadMap;
+    typedef boost::container::flat_map<std::string, int32_t> CTL_StringToConstantMap;
     typedef std::unordered_map<std::pair<LONG, std::string>, std::string, CacheKeyHash> CTL_PairToStringMap;
 
     struct CTL_GeneralResourceInfo
@@ -517,10 +523,12 @@ namespace dynarithmic
 
     struct CTL_StaticData
     {
+        static int32_t                      s_nExtImageInfoOffset;
+        static CTL_StringToConstantMap      s_MapStringToConstant;
+        static CTL_TwainLongToStringMap     s_MapExtendedImageInfo;
         static CTL_StringToMapLongToStringMap s_AllLoadedResourcesMap;
         static CTL_GeneralResourceInfo         s_ResourceInfo;
         static CTL_PDFMediaMap          s_PDFMediaMap;
-        static CTL_TwainNameMap         s_TwainNameMap;
         static CTL_AvailableFileFormatsMap s_AvailableFileFormatsMap;
         static CTL_TwainConstantsMap s_TwainConstantsMap;
         static bool s_bCheckHandles;
@@ -543,7 +551,7 @@ namespace dynarithmic
         static CTL_CallbackProcArray    s_aAllCallbacks;
         static CTL_StringType           s_strLangResourcePath;
         static CTL_GeneralErrorInfo     s_mapGeneralErrorInfo;
-        static long                     s_lErrorFilterFlags;
+        static long                     s_logFilterFlags;
         static CLogSystem               s_appLog;
         static UINT_PTR                 s_nTimeoutID;
         static UINT                     s_nTimeoutMilliseconds;
@@ -559,6 +567,10 @@ namespace dynarithmic
         static bool                     s_bINIFileLoaded;
         static int                      s_nLoadingError;
 
+        static int32_t GetExtImageInfoOffset() { return s_nExtImageInfoOffset; }
+        static void SetExtImageInfoOffset(int32_t offset) { s_nExtImageInfoOffset = offset; }
+        static CTL_StringToConstantMap& GetStringToConstantMap() { return s_MapStringToConstant; }
+        static CTL_TwainLongToStringMap& GetExtendedImageInfoMap() { return s_MapExtendedImageInfo; }
         static int GetResourceLoadError() { return s_nLoadingError; }
         static void SetResourceLoadError(int errNum) { s_nLoadingError = errNum; }
         static CSimpleIniA* GetINIInterface() { return s_iniInterface.get(); }
@@ -571,13 +583,11 @@ namespace dynarithmic
         static CTL_LongToStringMap* GetCurrentLanguageResource();
         static CTL_GeneralResourceInfo& GetGeneralResourceInfo() { return s_ResourceInfo; }
         static CTL_PDFMediaMap& GetPDFMediaMap() { return s_PDFMediaMap; }
-        static CTL_TwainNameMap& GetTwainNameMap() { return s_TwainNameMap; }
-        static std::string GetTwainNameFromResource(int nWhichResourceID, int nWhichItem);
         static CTL_AvailableFileFormatsMap& GetAvailableFileFormatsMap() { return s_AvailableFileFormatsMap; }
         static CTL_TwainConstantsMap& GetTwainConstantsMap() { return s_TwainConstantsMap; }
         static CTL_TwainConstantToStringMapNode& GetTwainConstantsStrings(LONG nWhich) { return s_TwainConstantsMap[nWhich]; }
         static bool IsCheckHandles() { return s_bCheckHandles; }
-        static int GetIDFromTwainName(std::string sName);
+        static std::pair<bool, int32_t> GetIDFromTwainName(std::string sName);
         static int GetDGResourceID() { return 8890; }
         static int GetDATResourceID() { return 8891; }
         static int GetMSGResourceID() { return 8892; }
@@ -589,11 +599,13 @@ namespace dynarithmic
         static CTL_GeneralCapInfo& GetGeneralCapInfo() { return s_mapGeneralCapInfo; }
         static HINSTANCE GetDLLInstanceHandle() { return s_DLLInstance; }
         static CTL_GeneralErrorInfo& GetGeneralErrorInfo() { return s_mapGeneralErrorInfo; }
-        static long GetErrorFilterFlags() { return s_lErrorFilterFlags; }
+        static long GetErrorFilterFlags() { return s_logFilterFlags; }
         static ImageResamplerMap& GetImageResamplerMap() { return s_ImageResamplerMap; }
         static SourceStatusMap& GetSourceStatusMap() { return s_SourceStatusMap;  }
         static CTL_StringType& GetResourceVersion() { return s_ResourceVersion; }
         static CTL_StringType GetTwainNameFromConstant(int lConstantType, int lTwainConstant);
+        static std::string GetTwainNameFromConstantA(int lConstantType, int lTwainConstant);
+        static std::wstring GetTwainNameFromConstantW(int lConstantType, int lTwainConstant);
     };
 
     struct CTL_LoggerCallbackInfo
@@ -763,7 +775,7 @@ namespace dynarithmic
     void SetCapabilityInfo(CTL_TwainDLLHandle* pHandle, DTWAIN_SOURCE Source, LONG value, LONG lCap)
     {
         auto pSource = static_cast<CTL_ITwainSource*>(Source);
-        const CTL_CapInfoArrayPtr pArray = GetCapInfoArray(pHandle, pSource);
+        const CTL_CapInfoMapPtr pArray = GetCapInfoArray(pHandle, pSource);
 
         // Get the cap array values
         const auto iter = pArray->find(static_cast<TW_UINT16>(lCap));
@@ -780,23 +792,23 @@ namespace dynarithmic
     #define DTWAIN_VERIFY_SOURCEHANDLE  2
     #define DTWAIN_TEST_NOTHROW 4
     #define DTWAIN_TEST_SETLASTERROR 8
-
+    #define DTWAIN_TEST_SOURCEOPEN  16
+    #define DTWAIN_TEST_SOURCEOPEN_SETLASTERROR (DTWAIN_TEST_SOURCEOPEN | DTWAIN_TEST_SETLASTERROR)
+    #define DTWAIN_TEST_DLLHANDLE_SETLASTERROR (DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_SETLASTERROR)
+    #define DTWAIN_VERIFY_SOURCEHANDLE_SETLASTERROR (DTWAIN_VERIFY_SOURCEHANDLE | DTWAIN_TEST_SETLASTERROR)
+    
     CTL_TwainDLLHandle* FindHandle(HWND hWnd, bool bIsDisplay);
     CTL_TwainDLLHandle* FindHandle(HINSTANCE hInst);
     std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> VerifyHandles(DTWAIN_SOURCE Source, int Testing = DTWAIN_VERIFY_DLLHANDLE | DTWAIN_VERIFY_SOURCEHANDLE | DTWAIN_TEST_SETLASTERROR);
     bool CenterWindow(HWND hwnd, HWND hwndParent);
 
-    bool IsIntCapType(TW_UINT16 nCap);
-    bool IsFloatCapType(TW_UINT16 nCap);
-    bool IsStringCapType(TW_UINT16 nCap);
-    bool IsFrameCapType(TW_UINT16 nCap);
     LONG GetArrayTypeFromCapType(TW_UINT16 CapType);
     LONG GetCustomCapDataType(DTWAIN_SOURCE Source, TW_UINT16 nCap);
     LONG GetCapContainer(CTL_ITwainSource* pSource, LONG nCap, LONG lCapType);
     LONG GetCapArrayType(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG nCap);
-    LONG           DTWAIN_ArrayType(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray);
-    bool           DTWAINFRAMEToTWFRAME(DTWAIN_FRAME pDdtwil, pTW_FRAME pTwain);
-    bool           TWFRAMEToDTWAINFRAME(TW_FRAME pTwain, DTWAIN_FRAME pDdtwil);
+    LONG DTWAIN_ArrayType(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray);
+    bool DTWAINFRAMEToTWFRAME(DTWAIN_FRAME pDdtwil, pTW_FRAME pTwain);
+    bool TWFRAMEToDTWAINFRAME(TW_FRAME pTwain, DTWAIN_FRAME pDdtwil);
 
     #ifdef __cplusplus
     extern "C" {
@@ -836,7 +848,7 @@ namespace dynarithmic
     bool LoadLanguageResourceXML(LPCTSTR sLangDLL);
     bool LoadLanguageResourceXMLImpl(LPCTSTR szFile);
     void DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap);
-    void LogWin32Error(DWORD lastError);
+    std::string LogWin32Error(DWORD lastError);
     void LoadOCRInterfaces(CTL_TwainDLLHandle *pHandle);
     void UnloadOCRInterfaces(CTL_TwainDLLHandle *pHandle);
     CTL_StringType GetVersionString();
@@ -856,8 +868,8 @@ namespace dynarithmic
 
     DTWAIN_BOOL DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *p, CTL_TwainDLLHandle *pHandle, TW_UINT16 nCapToCache);
     DTWAIN_BOOL DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, CTL_TwainDLLHandle *pHandle, CTL_EnumeratorNode<LONG>::container_pointer_type vCaps);
-    CTL_CapInfoArrayPtr GetCapInfoArray(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource *p);
-    DTWAIN_SOURCE SourceSelect(CTL_TwainDLLHandle* pHandle, const SourceSelectionOptions& options);
+    CTL_CapInfoMapPtr GetCapInfoArray(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource *p);
+    DTWAIN_SOURCE SourceSelect(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& options);
     DTWAIN_ARRAY  SourceAcquire(SourceAcquireOptions& opts);
     bool AcquireExHelper(SourceAcquireOptions& opts);
     bool AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType);
@@ -994,16 +1006,6 @@ namespace dynarithmic
         std::string getString() const { return strm.str(); }
     };
 
-/*    struct DTWAINArrayPtr_DestroyTraits
-    {
-        static void Destroy(DTWAIN_ARRAY* a)
-        {
-            if (a && *a)
-               DestroyArrayFromFactory(*a);
-        }
-        void operator()(DTWAIN_ARRAY* a) { Destroy(a); }
-    };
-    */
     struct DTWAINGlobalHandle_CloseTraits
     {
         static void Destroy(HANDLE h)
@@ -1171,9 +1173,9 @@ namespace dynarithmic
     struct DTWAINScopedLogController
     {
         long m_ErrorFilterFlags;
-        DTWAINScopedLogController(long newFilter) : m_ErrorFilterFlags(CTL_StaticData::s_lErrorFilterFlags)
-        { CTL_StaticData::s_lErrorFilterFlags = newFilter; }
-        ~DTWAINScopedLogController() { CTL_StaticData::s_lErrorFilterFlags = m_ErrorFilterFlags; }
+        DTWAINScopedLogController(long newFilter) : m_ErrorFilterFlags(CTL_StaticData::s_logFilterFlags)
+        { CTL_StaticData::s_logFilterFlags = newFilter; }
+        ~DTWAINScopedLogController() { CTL_StaticData::s_logFilterFlags = m_ErrorFilterFlags; }
         DTWAINScopedLogController(DTWAINScopedLogController&) = delete;
         DTWAINScopedLogController& operator=(DTWAINScopedLogController&) = delete;
     };
@@ -1189,10 +1191,10 @@ namespace dynarithmic
     };
 
     struct LogTraitsOff
-    { static long Apply(long turnOff) { return CTL_StaticData::s_lErrorFilterFlags &~turnOff; } };
+    { static long Apply(long turnOff) { return CTL_StaticData::s_logFilterFlags &~turnOff; } };
 
     struct LogTraitsOn
-    { static long Apply(long turnOn) { return CTL_StaticData::s_lErrorFilterFlags  | turnOn; } };
+    { static long Apply(long turnOn) { return CTL_StaticData::s_logFilterFlags  | turnOn; } };
 
     template <typename LogTraits>
     struct DTWAINScopedLogControllerEx
@@ -1232,4 +1234,5 @@ namespace dynarithmic
 
     #define INVALID_LICENSE (0)
 }
+
 #endif

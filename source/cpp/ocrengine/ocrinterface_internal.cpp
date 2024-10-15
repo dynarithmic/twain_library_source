@@ -53,6 +53,7 @@ bool OCREngine::SetOCRVersionIdentity() { return false; }
 std::string OCREngine::GetManufacturer() const { return m_OCRIdentity.Manufacturer;}
 std::string OCREngine::GetProductFamily() const { return m_OCRIdentity.ProductFamily;}
 std::string OCREngine::GetProductName() const { return m_OCRIdentity.ProductName;}
+OCRVersionIdentity OCREngine::GetOCRVersionIdentity() { return m_OCRIdentity; }
 bool OCREngine::ShutdownOCR(int&) { return true; }
 bool OCREngine::IsActivated() const { return m_bIsActivated; }
 void OCREngine::SetActivated(bool bActive) { m_bIsActivated = bActive; }
@@ -272,4 +273,17 @@ bool OCREngine::SetPDFFileTypes(OCRPDFInfo::enumPDFColorType nWhich, LONG fileTy
     m_OCRPDFInfo.BitDepth[nWhich] = bitDepth;
     m_OCRPDFInfo.PixelType[nWhich] = pixelType;
     return true;
+}
+
+typedef std::string(OCREngine::* OCRINFOFUNC)() const;
+LONG dynarithmic::GetOCRInfo(OCREngine* pEngine, OCRINFOFUNC pFunc, LPTSTR szInfo, LONG nMaxLen)
+{
+    const CTL_StringType pName = StringConversion::Convert_Ansi_To_Native((pEngine->*pFunc)());
+    const int nLen = static_cast<int>(pName.length());
+    if (szInfo == nullptr)
+        return static_cast<LONG>(nLen);
+    const int nRealLen = (std::min)(static_cast<int>(nMaxLen), nLen);
+    StringTraits::CopyN(szInfo, pName.c_str(), nRealLen);
+    szInfo[nRealLen] = _T('\0');
+    return nRealLen;
 }
