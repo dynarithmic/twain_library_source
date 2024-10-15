@@ -233,8 +233,9 @@
 9700 DTWAIN Twain Library, v{short_version}, {company_name}, {copyright}
 9999 Ocorreu um erro de exceção durante a chamada para o Twain DSM. Possível sessão Twain corrompida
 10000 [Mensagem do usuário]
-10001 Error in closing Twain DSM
-10002 Error in closing Twain Session
-10003 Error in closing DTWAIN Manager
-10004 TWAIN Source Manager, Session, and DTWAIN closed successfully
-10005 Could not remove subclass from user window
+10001 Erro ao fechar o DSM do Twain  
+10002 Erro ao fechar a sessão do Twain  
+10003 Erro ao fechar o gerenciador DTWAIN  
+10004 Gerenciador de fonte TWAIN, sessão e DTWAIN fechados com sucesso  
+10005 Não foi possível remover a subclasse da janela do usuário  
+10006 O tipo de dispositivo e o tipo exigido pelo TWAIN não correspondem.

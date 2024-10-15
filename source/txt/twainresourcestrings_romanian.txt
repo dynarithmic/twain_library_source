@@ -234,8 +234,9 @@
 9700 DTWAIN Twain Library, v{short_version}, {company_name}, {copyright}
 9999 A apărut o eroare de excepție în timpul apelului la DSM Twain. Sesiune Twain posibil coruptă?
 10000 [Mesaj utilizator]
-10001 Eroare la închiderea DSM Twain
-10002 Eroare la închiderea sesiunii Twain
-10003 Eroare la închiderea Managerului DTWAIN
-10004 Managerul surselor TWAIN, sesiunea și DTWAIN au fost închise cu succes
-10005 Nu s-a putut elimina subclasa din fereastra utilizatorului
+10001 Eroare la închiderea DSM Twain  
+10002 Eroare la închiderea sesiunii Twain  
+10003 Eroare la închiderea managerului DTWAIN  
+10004 Managerul surselor TWAIN, sesiunea și DTWAIN s-au închis cu succes  
+10005 Nu s-a putut elimina subclasa din fereastra utilizatorului  
+10006 Tipul de dispozitiv și tipul necesar TWAIN nu se potrivesc.

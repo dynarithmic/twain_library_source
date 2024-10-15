@@ -233,8 +233,9 @@
 9700 DTWAIN Twain Library, v{short_version}, {company_name}, {copyright}
 9999 在调用 Twain DSM 时发生异常错误。可能是 Twain 会话损坏？
 10000 [用户消息]
-10001 关闭 Twain DSM 时出错
-10002 关闭 Twain 会话时出错
-10003 关闭 DTWAIN 管理器时出错
-10004 TWAIN 源管理器、会话和 DTWAIN 成功关闭
-10005 无法从用户窗口中移除子类
+10001 关闭 Twain DSM 时出错  
+10002 关闭 Twain 会话时出错  
+10003 关闭 DTWAIN 管理器时出错  
+10004 TWAIN 源管理器、会话和 DTWAIN 成功关闭  
+10005 无法从用户窗口中移除子类  
+10006 设备类型与所需的 TWAIN 类型不匹配。
