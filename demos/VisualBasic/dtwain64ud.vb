@@ -1658,6 +1658,7 @@ Class DTWAINAPI
     Public Const DTWAIN_CONSTANT_DG       As Integer = 59
     Public Const DTWAIN_CONSTANT_DAT      As Integer= 60
     Public Const DTWAIN_CONSTANT_DF       As Integer= 61
+    Public Const DTWAIN_CONSTANT_TWTY     As Integer= 62
 
     Public Const DTWAIN_USERRES_START As Integer = 20000
     Public Const DTWAIN_USERRES_MAXSIZE As Integer = 8192

@@ -1589,7 +1589,8 @@ DTWAIN DLL are not displayed */
 #define DTWAIN_CONSTANT_DG       59
 #define DTWAIN_CONSTANT_DAT      60
 #define DTWAIN_CONSTANT_DF       61
-#define DTWAIN_CONSTANT_LAST     (DTWAIN_CONSTANT_DF + 1) 
+#define DTWAIN_CONSTANT_TWTY     62
+#define DTWAIN_CONSTANT_LAST     (DTWAIN_CONSTANT_TWTY + 1) 
 
 /* This ID is the start of user-defined custom resources */
 #define DTWAIN_USERRES_START     20000
