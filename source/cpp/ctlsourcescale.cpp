@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "cppfunc.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "errorcheck.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -58,10 +58,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageNegative(DTWAIN_SOURCE Source, DT
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageScale(DTWAIN_SOURCE Source, DTWAIN_FLOAT  xscale, DTWAIN_FLOAT  yscale)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, xscale, yscale))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    auto pTheSource = pSource;
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !CTL_TwainAppMgr::IsSourceOpen(pTheSource); },
-            DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     const DTWAIN_BOOL bRet = SetImageScale(pSource, xscale, yscale);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)

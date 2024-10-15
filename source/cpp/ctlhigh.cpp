@@ -22,7 +22,7 @@
 #include <type_traits>
 
 #include "cppfunc.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctlsupport.h"
@@ -50,7 +50,7 @@ static LONG EnumCapInternal(DTWAIN_SOURCE Source,
                             const std::string& paramLog);
 
 #define GENERATE_PARAM_LOG(argVals) \
-        (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK) ? (ParamOutputter((#argVals)).outputParam argVals.getString()) : ("")
+        (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_CALLSTACK) ? (ParamOutputter((#argVals)).outputParam argVals.getString()) : ("")
 
 template <typename CapArrayType>
 static bool GetCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, typename CapArrayType::value_type* value,
@@ -107,7 +107,7 @@ struct SetSupportFn2 : public SetSupportFn1<T>
 template <typename T, typename FnToCall>
 static T FunctionCaller(FnToCall fn, const std::string& func, const std::string& paramLog)
 {
-    const bool doLog = CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_CALLSTACK ? true : false;
+    const bool doLog = CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_CALLSTACK ? true : false;
     try
     {
         T bRet {};
@@ -780,12 +780,9 @@ static bool GetDoubleCap( DTWAIN_SOURCE Source, LONG lCap, double *pValue )
 static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, LONG GetType, DTWAIN_BOOL bExpandRange)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pArray, lCap, bExpandRange))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    auto p = pSource;
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     LONG nValues = 0;
 
-    // See if Source is opened
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !CTL_TwainAppMgr::IsSourceOpen(p); }, DTWAIN_ERR_SOURCE_NOT_OPEN, 0, FUNC_MACRO);
     DTWAIN_ARRAY OrigVals = nullptr;
 
     // we may use a brand new array
@@ -839,7 +836,7 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
         }
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(nValues)
-    CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)
+    CATCH_BLOCK_LOG_PARAMS(0) //DTWAIN_FAILURE1)
 }
 
 static LONG GetCurrentCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, DTWAIN_BOOL bExpandRange)

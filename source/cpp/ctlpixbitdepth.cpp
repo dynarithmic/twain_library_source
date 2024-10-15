@@ -21,7 +21,7 @@
 #include "cppfunc.h"
 #include "dtwain.h"
 #include "ctliface.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
 using namespace dynarithmic;
@@ -33,7 +33,7 @@ static DTWAIN_BOOL DTWAIN_SetPixelTypeHelper(DTWAIN_SOURCE Source, LONG PixelTyp
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPixelType(DTWAIN_SOURCE Source, LONG PixelType, LONG BitDepth, DTWAIN_BOOL bSetCurrent)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PixelType, BitDepth, bSetCurrent))
-    auto [pHandle, pSource] = VerifyHandles(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     // reset the values first
     DTWAIN_BOOL bRet = TRUE;
     if (PixelType == DTWAIN_PT_DEFAULT && BitDepth == DTWAIN_DEFAULT)
@@ -104,7 +104,6 @@ DTWAIN_BOOL DTWAIN_SetPixelTypeHelper(DTWAIN_SOURCE Source, LONG PixelType, LONG
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPixelType(DTWAIN_SOURCE Source, LPLONG PixelType, LPLONG BitDepth, DTWAIN_BOOL bCurrent)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PixelType, BitDepth, bCurrent))
-    VerifyHandles(Source);
     LONG GetType = DTWAIN_CAPGETDEFAULT;
     if ( bCurrent )
         GetType = DTWAIN_CAPGETCURRENT;
@@ -139,7 +138,7 @@ DTWAIN_BOOL GetPixelType(DTWAIN_SOURCE Source, LPLONG PixelType, LPLONG BitDepth
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBitDepth(DTWAIN_SOURCE Source, LONG BitDepth, DTWAIN_BOOL bSetCurrent)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, BitDepth, bSetCurrent))
-    auto [pHandle, pSource] = VerifyHandles(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     LONG SetType = DTWAIN_CAPSET;
     if ( !bSetCurrent )
         SetType = DTWAIN_CAPRESET;
@@ -172,7 +171,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBitDepth(DTWAIN_SOURCE Source, LONG BitDepth,
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetBitDepth(DTWAIN_SOURCE Source, LPLONG BitDepth, DTWAIN_BOOL bCurrent)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, BitDepth, bCurrent))
-    auto [pHandle, pSource] = VerifyHandles(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     DTWAIN_ARRAY Array = nullptr;
     LONG GetType = DTWAIN_CAPGETCURRENT;
     if ( !bCurrent )

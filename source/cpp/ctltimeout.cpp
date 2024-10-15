@@ -21,7 +21,7 @@
 #include "cppfunc.h"
 #include "dtwain.h"
 #include "ctliface.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 using namespace dynarithmic;
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainTimeout( LONG milliseconds )

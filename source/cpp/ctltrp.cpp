@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltrp.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "dtwain_resource_constants.h"
 
 using namespace dynarithmic;

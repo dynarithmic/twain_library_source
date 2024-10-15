@@ -40,6 +40,7 @@ struct charTraitsUNICODE
   typedef std::wostringstream   TraitsStringStreamType;
   typedef std::wostream         TraitsBaseOutputStreamType;
   typedef wchar_t               TraitsCharType;
+  static constexpr wchar_t      SpaceChar = L' ';
   static DWORD GetModuleFileNameImpl(HMODULE hModule, LPWCH lpFilename, DWORD nSize)
   { return GetModuleFileNameW(hModule, lpFilename, nSize); }
 
@@ -66,6 +67,7 @@ struct charTraitsANSI
     typedef std::ostringstream   TraitsStringStreamType;
     typedef std::ostream         TraitsBaseOutputStreamType;
     typedef char                 TraitsCharType;
+    static constexpr char        SpaceChar = ' ';
 
     static DWORD GetModuleFileNameImpl(HMODULE hModule, LPCH lpFilename, DWORD nSize)
     { return GetModuleFileNameA(hModule, lpFilename, nSize); }
@@ -148,7 +150,7 @@ class VersionInfoImpl
         const char_type* getSpecialBuild() const { return findVersionStringData(lookupName_SpecialBuild);}
 
         VersionInfoImpl( HMODULE hMod= nullptr);
-        void printit( typename charTraits::TraitsBaseOutputStreamType& stream, const char_type *eol=nullptr ) const;
+        void printit( typename charTraits::TraitsBaseOutputStreamType& stream, int indent, const char_type *eol=nullptr ) const;
 
         DWORD m_dwSignature;
         DWORD m_dwStrucVersion;

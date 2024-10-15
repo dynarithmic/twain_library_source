@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "cppfunc.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctlutils.h"
@@ -121,7 +121,7 @@ LONG dynarithmic::GetCapContainer(CTL_ITwainSource* pSource, LONG nCap, LONG lCa
         return 0;
 
     auto pHandle = pSource->GetDTWAINHandle();
-    const CTL_CapInfoArrayPtr pArray = GetCapInfoArray(pHandle, pSource);
+    const CTL_CapInfoMapPtr pArray = GetCapInfoArray(pHandle, pSource);
     if (!pArray)
         return DTWAIN_ERR_NO_CAPS_DEFINED;
 
@@ -186,7 +186,7 @@ LONG dynarithmic::GetCustomCapDataType(DTWAIN_SOURCE Source, TW_UINT16 nCap)
     }
 
     DTWAIN_CacheCapabilityInfo(p, pHandle, nCap);
-    CTL_CapInfoArrayPtr pArray = GetCapInfoArray(pHandle, p);
+    CTL_CapInfoMapPtr pArray = GetCapInfoArray(pHandle, p);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !pArray; }, DTWAIN_ERR_NO_CAPS_DEFINED, 0L, FUNC_MACRO);
 
     const auto iter = pArray->find(static_cast<TW_UINT16>(nCap));

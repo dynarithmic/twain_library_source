@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "cppfunc.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "errorcheck.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)

@@ -21,7 +21,7 @@
 #include <sstream>
 #include "ctldib.h"
 #include "ctliface.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "ctlfileutils.h"
 #include "tiff.h"
 using namespace dynarithmic;

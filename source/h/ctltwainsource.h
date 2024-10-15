@@ -18,13 +18,15 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLTWSRC_H
-#define CTLTWSRC_H
+#ifndef CTLTWAINSOURCE_H
+#define CTLTWAINSOURCE_H
 
 #include <unordered_map>
 #include <vector>
 #include <unordered_set>
 #include <boost/logic/tribool.hpp>
+#include <boost/container/flat_map.hpp>
+#include <boost/container/flat_set.hpp>
 #include <array>
 
 #include "ctlobstr.h"
@@ -33,14 +35,14 @@
 #include "ctlenum.h"
 #include "dtwtype.h"
 #include "ctldevnt.h"
-#include "ctltwses.h"
+#include "ctltwainsession.h"
 #include "ctltwainidentity.h"
 #include "dtwain_anyutils.h"
 
 namespace dynarithmic
 {
-    typedef std::unordered_map<TW_UINT16, short int> CapToStateMap;
-    typedef std::unordered_set<TW_UINT16> CapList;
+    typedef boost::container::flat_map<TW_UINT16, short int> CapToStateMap;
+    typedef boost::container::flat_set<TW_UINT16> CapList;
     typedef std::vector<TW_UINT16> JobControlList;
     typedef std::vector<TW_INFO> TWINFOVector;
 
@@ -86,7 +88,7 @@ namespace dynarithmic
             std::vector<anytype_> m_data;
         };
 
-        typedef std::unordered_map<TW_UINT16, container_values> CapToValuesMap;
+        typedef boost::container::flat_map<TW_UINT16, container_values> CapToValuesMap;
         CapToValuesMap m_capToValuesMap_G;
         CapToValuesMap m_capToValuesMap_GD;
 
@@ -188,18 +190,14 @@ namespace dynarithmic
         void         SetAcquireFile(CTL_StringType szFile) { m_strAcquireFile = std::move(szFile); }
         long         GetAcquireFileFlags() const { return m_lFileFlags; }
         void         SetAcquireFileFlags(long lFileFlags) { m_lFileFlags = lFileFlags; }
-        static bool  IsFileTypeMultiPage(CTL_TwainFileFormatEnum FileType);
-        static CTL_TwainFileFormatEnum GetMultiPageType(CTL_TwainFileFormatEnum FileType);
-        static bool  IsFileTypeTIFF(CTL_TwainFileFormatEnum FileType);
-        static bool  IsFileTypeBigTiff(CTL_TwainFileFormatEnum FileType);
-
-        static bool  IsFileTypePostscript(CTL_TwainFileFormatEnum FileType);
+        void         SetFileSavePageCount(long pageCount) { m_FileSavePageCount = pageCount;} 
+        long         GetFileSavePageCount() const { return m_FileSavePageCount; } 
 
         void         SetPendingImageNum( long nImageNum )
-                    { m_nImageNum = nImageNum; }
-        long        GetPendingImageNum() const { return m_nImageNum; }
+                     { m_nImageNum = nImageNum; }
+        long         GetPendingImageNum() const { return m_nImageNum; }
         void         SetPendingJobNum( int nJobNum )
-                    { m_nJobNum = nJobNum; }
+                     { m_nJobNum = nJobNum; }
         int          GetPendingJobNum() const { return m_nJobNum; }
         bool         IsNewJob() const;
         void         ResetJob() { m_bJobStarted = false; }
@@ -227,7 +225,6 @@ namespace dynarithmic
         bool         GetTransferDone() const { return m_bTransferDone; }
         void         SetCapCacheValue( LONG lCap, double dValue, bool bTurnOn );
         double       GetCapCacheValue( LONG lCap, LONG *pTurnOn ) const;
-        CTL_StringType PromptForFileName() const;
         bool         IsAcquireStarted() const { return m_bAcquireStarted; }
         void         SetAcquireStarted(bool bSet) { m_bAcquireStarted = bSet; }
         void         SetModal(bool bSet) { m_bDialogModal = bSet; }
@@ -360,7 +357,7 @@ namespace dynarithmic
         bool         AddExtImageInfo(TW_INFO Info) const;
         bool         EnumExtImageInfo(CTL_IntArray& r);
         TW_INFO      GetExtImageInfoItem(int nItem, int nSearch) const;
-        bool         GetExtImageInfoData(int nWhichItem, int nSearch, int nWhichValue, LPVOID Data, size_t* pNumChars=nullptr) const;
+        std::pair<bool, int32_t> GetExtImageInfoData(int nWhichItem, int nSearch, int nWhichValue, LPVOID Data, LPVOID* pHandleData, size_t* pNumChars=nullptr) const;
         void         SetUserAcquisitionArray(DTWAIN_ARRAY UserArray) { m_PersistentArray = UserArray; }
         DTWAIN_ARRAY GetUserAcquisitionArray() const { return m_PersistentArray; }
 
@@ -459,8 +456,11 @@ namespace dynarithmic
         bool         IsDoublePageCountOnDuplex() const { return m_bDoublePageCountOnDuplex; }
         CapList&     GetCustomCapCache() { return m_aSupportedCustomCapCache; }
         boost::logic::tribool IsFileSystemSupported() const { return m_tbIsFileSystemSupported; }
+        boost::logic::tribool IsBufferedTileModeSupported() const { return m_tbIsTileModeSupported; }
         void         SetFileSystemSupported(bool bSet) { m_tbIsFileSystemSupported = bSet; }
+        void         SetBufferedTileModeSupported(bool bSet) { m_tbIsTileModeSupported = bSet; }
         TW_IMAGEMEMXFER& GetBufferedXFerInfo() { return m_BufferedXFerInfo; }
+        CTL_ExtImageInfoTriplet* GetExtImageInfoTriplet();
 
         // Only public member
         void *      m_pUserPtr;
@@ -588,7 +588,9 @@ namespace dynarithmic
         bool            m_bTileMode;
         std::vector<int> m_aTransferMechanisms;
         bool            m_bExtendedCapsRetrieved;
+        long            m_FileSavePageCount;
         boost::logic::tribool m_tbIsFileSystemSupported;
+        boost::logic::tribool m_tbIsTileModeSupported;
         CTL_TwainDLLHandle* m_pDLLHandle;
         TW_IMAGEMEMXFER m_BufferedXFerInfo;
 
@@ -596,10 +598,10 @@ namespace dynarithmic
             TW_UINT16 nCap;
             bool      m_bSupported;
         };
-        typedef std::unordered_map<TW_UINT16, bool> CachedCapMap;
+        typedef boost::container::flat_map<TW_UINT16, bool> CachedCapMap;
 
         public:
-            typedef std::unordered_map<int, std::vector<int> > CachedPixelTypeMap;
+            typedef boost::container::flat_map<int, std::vector<int> > CachedPixelTypeMap;
             void        AddPixelTypeAndBitDepth(int PixelType, int BitDepth);
             CachedPixelTypeMap::iterator FindPixelType(int PixelType);
             bool IsBitDepthSupported(int PixelType, int BitDepth);
@@ -629,27 +631,13 @@ namespace dynarithmic
         TW_FILESYSTEM   m_FileSystem;
         DTWAINImageInfoEx m_ImageInfoEx;
         TW_IMAGEMEMXFER* m_pImageMemXfer;
-        std::shared_ptr<CTL_ExtImageInfoTriplet> m_pExtImageTriplet;
+        std::unique_ptr<CTL_ExtImageInfoTriplet> m_pExtImageTriplet;
         TWINFOVector m_ExtImageVector;
         DTWAIN_ARRAY    m_PersistentArray;
         CapList    m_aExtendedCaps;
         DuplexData m_DuplexFileData;
         bool    m_bImageInfoRetrieved;
         bool    m_bSupportedCustomCapsRetrieved;
-
-        struct FileFormatInfo
-        {
-            LPCTSTR filter;
-            unsigned int len;
-            LPCTSTR extension;
-            FileFormatInfo(LPCTSTR f=nullptr, unsigned int l=0, LPCTSTR e=nullptr) : filter(f), len(l), extension(e) {}
-        };
-
-        mutable std::unordered_map<int, FileFormatInfo> m_saveFileMap;
-        void initFileSaveMap() const;
     };
 }
 #endif
-
-
-

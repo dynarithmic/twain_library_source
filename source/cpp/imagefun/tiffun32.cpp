@@ -27,7 +27,7 @@
 #include "tiffun32.h"
 #include "pdflib32.h"
 #include "ctliface.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "tiff.h"
 
 using namespace dynarithmic;
@@ -88,14 +88,15 @@ void CTIFFImageHandler::DestroyAllObjects()
 
 int CTIFFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR path, HANDLE bitmap, void *pUserInfo/*=NULL*/)
 {
-    const std::unordered_map<int, int> compressionFlags = {{COMPRESSION_PACKBITS, TIFF_PACKBITS},
+    static constexpr std::array<std::pair<unsigned long, int>, 7> compressionFlags = 
+                                                    { {{COMPRESSION_PACKBITS, TIFF_PACKBITS},
                                                      {COMPRESSION_ADOBE_DEFLATE, TIFF_ADOBE_DEFLATE},
                                                      {COMPRESSION_NONE, TIFF_NONE},
                                                      {COMPRESSION_CCITTFAX3, TIFF_CCITTFAX3},
                                                      {COMPRESSION_CCITTFAX4, TIFF_CCITTFAX4},
                                                      {COMPRESSION_LZW, TIFF_LZW},
                                                      {COMPRESSION_JPEG, TIFF_JPEG}
-    };
+                                                    } };
 
     // Check if this is first page of multi-page TIFF or
     // if only a single page TIFF
@@ -150,7 +151,7 @@ int CTIFFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR 
     ft.setKeyValue("Comment", commentStr);
     im.setMetadata(FIMD_COMMENTS, "Comment", ft);
 
-    const auto iter = compressionFlags.find(static_cast<int>(compression));
+    const auto iter = dynarithmic::generic_array_finder_if(compressionFlags, [&](const auto& pr) { return pr.first == compression; });
     // Set the TIFF type to write (regular or BigTiff)
     int32_t flagsWord = 0;
     if (m_ImageInfoEx.IsBigTiff)
@@ -159,8 +160,8 @@ int CTIFFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR 
     if (m_MultiPageStruct.Stage == 0)
     {
 
-        // Set the flags for the TIFF plugin to tuse
-        const int32_t flagsValue = flagsWord | iter->second;
+        // Set the flags for the TIFF plugin to use
+        const int32_t flagsValue = flagsWord | compressionFlags[iter.second].second;
         const auto retVal2 = im.saveEx(FIF_TIFF, StringConversion::Convert_Native_To_Ansi(path).c_str(), m_MultiPageStruct.Page, flagsValue);
 
         if (retVal2 == 1)
@@ -174,7 +175,7 @@ int CTIFFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR 
     // this is a multipage write
     if (!ptrTiffData)
         return DTWAIN_ERR_FILEWRITE; // Issue with writing the file.  File to write may not be valid.
-    FreeImage_AppendPageEx(ptrTiffData->fp, im, flagsWord | iter->second);
+    FreeImage_AppendPageEx(ptrTiffData->fp, im, flagsWord | compressionFlags[iter.second].second);
     FreeImage_SetPageNumberEx(ptrTiffData->fp, FreeImage_GetPageNumber(ptrTiffData->fp) + 1);
     ++m_MultiPageStruct.Page;
     return 0;

@@ -18,7 +18,7 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "errorcheck.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -40,6 +40,7 @@ std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> dynarithmic::VerifyHandles(DTW
     CTL_TwainDLLHandle* pHandle = nullptr;
     bool doThrow = !(Testing & DTWAIN_TEST_NOTHROW);
     bool setLastError = Testing & DTWAIN_TEST_SETLASTERROR;
+
     if (!CTL_StaticData::IsCheckHandles())
     {
         pSource = static_cast<CTL_ITwainSource*>(Source);
@@ -59,7 +60,8 @@ std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> dynarithmic::VerifyHandles(DTW
                 throw DTWAIN_ERR_BAD_HANDLE;
             return { nullptr, nullptr };
         }
-        if ( Testing & DTWAIN_VERIFY_SOURCEHANDLE )
+
+        if ( (Testing & DTWAIN_VERIFY_SOURCEHANDLE) || (Testing & DTWAIN_TEST_SOURCEOPEN))
         {
             if ( !pHandle )
                 pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
@@ -80,8 +82,23 @@ std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> dynarithmic::VerifyHandles(DTW
                     throw DTWAIN_ERR_BAD_SOURCE;
                 return { nullptr, nullptr };
             }
+            if (Testing & DTWAIN_TEST_SOURCEOPEN)
+            {
+                auto sourceOpen = CTL_TwainAppMgr::IsSourceOpen(pSource);
+                if (!sourceOpen)
+                {
+                    if (setLastError)
+                        pHandle->m_lLastError = DTWAIN_ERR_SOURCE_NOT_OPEN;
+                    if (doThrow)
+                        throw DTWAIN_ERR_SOURCE_NOT_OPEN;
+                    return { nullptr, nullptr };
+                }
+            }
         }
     }
+    // no error
+    if (Testing & DTWAIN_TEST_SETLASTERROR)
+        pHandle->m_lLastError = DTWAIN_NO_ERROR;
     return { pHandle, pSource };
 }
 

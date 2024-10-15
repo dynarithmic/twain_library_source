@@ -21,7 +21,7 @@
 #include <boost/format.hpp>
 
 #include "cppfunc.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "sourceacquireopts.h"
 #include "errorcheck.h"
 #include "sourceselectopts.h"
@@ -166,7 +166,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     if (!CTL_TwainAppMgr::IsSourceOpen(pSource))
     {
         bSourcePreOpened = false;
-        SourceSelectionOptions selOpts(SELECTSOURCEBYNAME, p->GetProductName().c_str());
+        SourceSelectionOptions selOpts(SELECTSOURCEBYNAME, IDS_SELECT_SOURCE_TEXT, p->GetProductName().c_str());
         pRealSource = SourceSelect(pHandle, selOpts);
         if (!pRealSource)
         {
@@ -188,7 +188,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     // the default bit depth.  The user should use DTWAIN_SetPixelType and DTWAIN_SetBitDepth before
     // calling the DTWAIN_Acquirexxx() function to override this behavior.
     LONG PixelType = opts.getPixelType();
-    bool bWriteMisc = (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)?true:false;
+    bool bWriteMisc = (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)?true:false;
     if (PixelType != DTWAIN_PT_DEFAULT && opts.getAcquireType() != ACQUIREAUDIONATIVE)
     {
         CTL_StringType sBuf;
@@ -512,8 +512,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
 
         nFileType = lFileType;
 
-        if (bUseSourceMode || /*lFileFlags & */CTL_TwainAppMgr::IsSupportedFileFormat(pSource,
-            nFileType))
+        if (bUseSourceMode || dynarithmic::IsSupportedFileFormat(nFileType))
         {
             opts.setActualAcquireType(CTL_TwainAppMgr::GetCompatibleFileTransferType(pSource));
             if (!bUseSourceMode)

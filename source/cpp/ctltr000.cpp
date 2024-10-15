@@ -20,8 +20,8 @@
  */
 #include "ctltr000.h"
 #include "ctltr007.h"
-#include "ctltwses.h"
-#include "ctltwmgr.h"
+#include "ctltwainsession.h"
+#include "ctltwainmanager.h"
 #include "dtwain_resource_constants.h"
 using namespace dynarithmic;
 #pragma warning (disable : 4714)

@@ -21,7 +21,7 @@
 #include "cppfunc.h"
 #include "dtwain.h"
 #include "ctliface.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
 
@@ -30,8 +30,7 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJobControl(DTWAIN_SOURCE Source, LONG JobControl, DTWAIN_BOOL bSetCurrent)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, JobControl, bSetCurrent))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     CHECK_IF_CAP_SUPPORTED(pSource, pHandle, DTWAIN_CV_CAPJOBCONTROL, false);
 
     LONG SetType = DTWAIN_CAPSET;

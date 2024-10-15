@@ -22,7 +22,7 @@
 #include <string>
 
 #include "cppfunc.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "dtwain_resource_constants.h"
 #include "ctlobstr.h"
 #include "errorcheck.h"
@@ -54,17 +54,37 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG 
 
         if (exists(p))
         {
-           if (is_directory(p))
-           {
-               auto retVal = p.generic_string();
-               if (!retVal.empty() && *retVal.rbegin() != filesys::path::preferred_separator)
-                   retVal += filesys::path::preferred_separator;
-               pHandle->m_sTempFilePath = CTL_StringType(retVal.begin(), retVal.end());
-               LOG_FUNC_EXIT_NONAME_PARAMS(true)
+            if (is_directory(p))
+            {
+                #ifdef _UNICODE
+                auto retVal = p.generic_wstring();
+                #else
+                auto retVal = p.generic_string();
+                #endif
+                pHandle->m_sTempFilePath = retVal;
+                LOG_FUNC_EXIT_NONAME_PARAMS(true)
             }
             else
-               DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{ return false;}, DTWAIN_ERR_FILEOPEN, false, FUNC_MACRO);
+                DTWAIN_Check_Error_Condition_0_Ex(pHandle, [] { return false; }, DTWAIN_ERR_FILEOPEN, false, FUNC_MACRO);
         }
+    }
+    else
+    if (CreationFlags & DTWAIN_TEMPDIR_CREATEDIRECTORY)
+    {
+        bool bLogMessages = (CTL_StaticData::s_logFilterFlags) ? true : false;
+        CTL_StringType sTemp = StringWrapper::RemoveBackslashFromDirectory(szFilePath);
+        auto dirCreated = create_directory(sTemp.c_str());
+        if (!dirCreated.first)
+        {
+            if (bLogMessages)
+            {
+                std::string sMessage = "Could not create temp directory " + StringWrapperA::QuoteString(dirCreated.second);
+                CTL_TwainAppMgr::WriteLogInfoA(sMessage);
+            }
+            DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return false; }, DTWAIN_ERR_CREATE_DIRECTORY, false, FUNC_MACRO);
+        }
+        pHandle->m_sTempFilePath = StringWrapper::AddBackslashToDirectory(sTemp);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(false)
     CATCH_BLOCK(false)

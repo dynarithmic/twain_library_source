@@ -39,8 +39,11 @@ namespace dynarithmic
         LPCTSTR szExcludeNames;
         LPCTSTR szNameMapping;
         LONG nOptions;
+        int selectionResourceID;
+        std::function<std::vector<TCHAR>(SelectStruct&)> getDefaultFunc;
+        std::function<std::vector<CTL_StringType>(SelectStruct&)> getNameListFunc;
 
-        SourceSelectionOptions(int n = SELECTSOURCE, LPCTSTR sProd=nullptr, HWND parent=nullptr, LPCTSTR title=nullptr, LONG xP = 0, LONG yP = 0,
+        SourceSelectionOptions(int n, int resourceID,  LPCTSTR sProd=nullptr, HWND parent=nullptr, LPCTSTR title=nullptr, LONG xP = 0, LONG yP = 0,
                                LPCTSTR sIncludeNames=nullptr, LPCTSTR sExcludeNames=nullptr, LPCTSTR sNameMapping=nullptr, LONG opt = 0) :
                                nWhich(n),
                                szProduct(sProd),
@@ -51,7 +54,8 @@ namespace dynarithmic
                                szIncludeNames(sIncludeNames),
                                szExcludeNames(sExcludeNames),
                                szNameMapping(sNameMapping),
-                               nOptions(opt) {}
+                               nOptions(opt),
+                               selectionResourceID(resourceID) {}
         friend OutputBaseStreamA& operator << (OutputBaseStreamA& strm, const SourceSelectionOptions& src);
         friend OutputBaseStreamW& operator << (OutputBaseStreamW& strm, const SourceSelectionOptions& src);
     };
@@ -88,9 +92,11 @@ namespace dynarithmic
         return strm;
     }
 
-    DTWAIN_SOURCE     DTWAIN_LLSelectSource(CTL_TwainDLLHandle* pHandle, const SourceSelectionOptions& opts);
-    DTWAIN_SOURCE     DTWAIN_LLSelectSourceByName(CTL_TwainDLLHandle* pHandle, const SourceSelectionOptions& opts);
-    DTWAIN_SOURCE     DTWAIN_LLSelectDefaultSource(CTL_TwainDLLHandle* pHandle, const SourceSelectionOptions& opts);
-    DTWAIN_SOURCE     DTWAIN_LLSelectSource2(CTL_TwainDLLHandle* pHandle, const SourceSelectionOptions& opts);
+    DTWAIN_SOURCE     DTWAIN_LLSelectSource(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& opts);
+    DTWAIN_SOURCE     DTWAIN_LLSelectSourceByName(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& opts);
+    DTWAIN_SOURCE     DTWAIN_LLSelectDefaultSource(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& opts);
+    DTWAIN_SOURCE     DTWAIN_LLSelectSource2(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& opts);
+    LRESULT CALLBACK  DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+    CTL_StringType    LLSelectionDialog(CTL_TwainDLLHandle* pHandle, const SourceSelectionOptions& opts);
 }
 #endif
