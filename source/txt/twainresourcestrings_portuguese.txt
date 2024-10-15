@@ -235,8 +235,9 @@
 9999 Exception error occurred during call to Twain DSM.  Possible corrupted Twain session?
 9999 Ocorreu um erro de exceção durante a chamada ao DSM Twain. Sessão Twain possivelmente corrompida?
 10000 [Mensagem do Usuário]
-10001 Erro ao fechar o DSM Twain
-10002 Erro ao fechar a Sessão Twain
-10003 Erro ao fechar o Gerenciador DTWAIN
-10004 Gerenciador de Fonte TWAIN, Sessão e DTWAIN fechados com sucesso
-10005 Não foi possível remover a subclasse da janela do usuário
+10001 Erro ao fechar o DSM do Twain  
+10002 Erro ao fechar a sessão do Twain  
+10003 Erro ao fechar o gerenciador DTWAIN  
+10004 Gerenciador de fonte TWAIN, sessão e DTWAIN fechados com sucesso  
+10005 Não foi possível remover a subclasse da janela do usuário  
+10006 O tipo de dispositivo e o tipo exigido pelo TWAIN não correspondem.

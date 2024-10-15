@@ -242,9 +242,9 @@
 3021 Fichier image créé avec succès
 9700 DTWAIN Twain Library, v{short_version}, {company_name}, {copyright}
 9999 Exception error occurred during call to Twain DSM.  Possible corrupted Twain session?
-10000 Message de l'utilisateur
-10001 Error in closing Twain DSM
-10002 Error in closing Twain Session
-10003 Error in closing DTWAIN Manager
-10004 TWAIN Source Manager, Session, and DTWAIN closed successfully
-10005 Could not remove subclass from user window
+10001 Erreur lors de la fermeture de Twain DSM  
+10002 Erreur lors de la fermeture de la session Twain  
+10003 Erreur lors de la fermeture du gestionnaire DTWAIN  
+10004 Gestionnaire de source TWAIN, session et DTWAIN fermés avec succès  
+10005 Impossible de retirer la sous-classe de la fenêtre utilisateur  
+10006 Le type de périphérique et le type requis par TWAIN ne correspondent pas.
