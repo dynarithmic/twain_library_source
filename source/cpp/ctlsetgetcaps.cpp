@@ -948,8 +948,24 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
     if (bArrayExists)
         pHandle->m_ArrayFactory->clear(*Data);
 
-    // Create the array that corresponds with the correct type
+    // Get the info 
     const TW_INFO Info = p->GetExtImageInfoItem(nWhich, DTWAIN_BYID);
+
+    // Check if the info type is supported
+    bool bNotSupported = false;
+    int nErrorCode = 0;
+    if (Info.ReturnCode == TWRC_DATANOTAVAILABLE)
+    {
+        nErrorCode = DTWAIN_ERR_UNAVAILABLE_EXTINFO;
+        bNotSupported = true;
+    }
+    else
+    if (Info.ReturnCode == TWRC_INFONOTSUPPORTED)
+    {
+        nErrorCode = DTWAIN_ERR_UNSUPPORTED_EXTINFO;
+        bNotSupported = true;
+    }
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return bNotSupported; }, nErrorCode, false, FUNC_MACRO);
 
     // Check if type returned by device is what the TWAIN specification indicates
     auto lTypeReportedByDevice = Info.ItemType;
@@ -978,13 +994,16 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
 
     auto Count = Info.NumItems;
 
-    // resize the array
     const auto& factory = pHandle->m_ArrayFactory;
+    auto eType = factory->tag_type(ExtInfoArray);
+
+    // resize the array if this is not a frame
+    if ( eType != CTL_ArrayFactory::arrayTag::FrameSingleType)
     factory->resize(ExtInfoArray, Count);
+
     std::pair<bool, int32_t> finalRet = { true, DTWAIN_NO_ERROR };
     for ( int i = 0; i < Count; ++i )
     {
-        auto eType = pHandle->m_ArrayFactory->tag_type(ExtInfoArray);
         if (eType == CTL_ArrayFactory::arrayTag::StringType)
         {
             std::vector<char> Temp;
@@ -1010,7 +1029,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
             }
         }
         else
-        if (eType == CTL_ArrayFactory::arrayTag::FrameType) // This is a frame
+        if (eType == CTL_ArrayFactory::arrayTag::FrameSingleType) // This is a frame
         {
             TW_FRAME oneFrame = {};
             finalRet = p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, &oneFrame, nullptr);
