@@ -1038,7 +1038,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
         {
             TW_FRAME oneFrame = {};
             if (bTypesMatch) // Only do this if the types match up.
-            finalRet = pTheSource->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, &oneFrame, nullptr);
+                finalRet = pTheSource->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, &oneFrame, nullptr);
             dynarithmic::TWFRAMEToDTWAINFRAME(oneFrame, ExtInfoArray);
         }
         else
