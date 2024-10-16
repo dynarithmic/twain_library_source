@@ -62,18 +62,8 @@ void CTL_ExtImageInfoTriplet::InitInfo(CTL_ITwainSession *pSession,
 {
     SetSessionPtr(pSession);
     SetSourcePtr( pSource );
-
-    // Make sure we have one item
-    auto& extImageInfoMap = CTL_StaticData::GetExtendedImageInfoMap();
-    m_ExtInfoMap.clear();
-    for (auto& pr : extImageInfoMap)
-    {
-       TW_INFO Info{};
-       Info.InfoID = static_cast<TW_UINT16>(pr.first);
-       Info.ReturnCode = TWRC_DATANOTAVAILABLE;
-       m_ExtInfoMap.insert({ static_cast<TW_UINT16>(pr.first), Info });
-    }
-    m_nNumInfo = extImageInfoMap.size();
+    m_ExtInfoMap = CTL_StaticData::GetIntToTwainInfoMap();
+    m_nNumInfo = m_ExtInfoMap.size();
 }
 
 void CTL_ExtImageInfoTriplet::DestroyInfo()

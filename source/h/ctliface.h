@@ -513,6 +513,8 @@ namespace dynarithmic
     typedef boost::container::flat_map<int32_t, std::string> CTL_ErrorToExtraInfoMap;
     typedef boost::container::flat_map<std::string, unsigned long> CTL_ThreadMap;
     typedef boost::container::flat_map<std::string, int32_t> CTL_StringToConstantMap;
+    typedef boost::container::flat_map<TW_UINT16, TW_INFO> CTL_UINT16ToInfoMap;
+
     typedef std::unordered_map<std::pair<LONG, std::string>, std::string, CacheKeyHash> CTL_PairToStringMap;
 
     struct CTL_GeneralResourceInfo
@@ -524,6 +526,7 @@ namespace dynarithmic
     struct CTL_StaticData
     {
         static int32_t                      s_nExtImageInfoOffset;
+        static CTL_UINT16ToInfoMap          s_IntToTwainInfoMap;
         static CTL_StringToConstantMap      s_MapStringToConstant;
         static CTL_TwainLongToStringMap     s_MapExtendedImageInfo;
         static CTL_StringToMapLongToStringMap s_AllLoadedResourcesMap;
@@ -567,6 +570,7 @@ namespace dynarithmic
         static bool                     s_bINIFileLoaded;
         static int                      s_nLoadingError;
 
+        static CTL_UINT16ToInfoMap& GetIntToTwainInfoMap() { return s_IntToTwainInfoMap; }
         static int32_t GetExtImageInfoOffset() { return s_nExtImageInfoOffset; }
         static void SetExtImageInfoOffset(int32_t offset) { s_nExtImageInfoOffset = offset; }
         static CTL_StringToConstantMap& GetStringToConstantMap() { return s_MapStringToConstant; }
