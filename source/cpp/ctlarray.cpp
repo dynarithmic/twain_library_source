@@ -304,6 +304,8 @@ DTWAIN_ARRAY dynarithmic::CreateArrayFromFactory(CTL_TwainDLLHandle* pHandle, LO
         default:;
     }
     int dummy = 0;
+    if (nEnumType == DTWAIN_ARRAYFRAME)
+        return pHandle->m_ArrayFactory->create_frame(0,0,0,0);
     return pHandle->m_ArrayFactory->create_array(static_cast<CTL_ArrayType>(nEnumType), &dummy, nInitialSize);
 }
 
