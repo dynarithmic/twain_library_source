@@ -802,14 +802,19 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireStripData(DTWAIN_SOURCE Source, LPLONG
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Array))
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+    CTL_ITwainSource* pS = pSource;
 
-    if ( !DTWAIN_IsExtImageInfoSupported(Source))
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pS->IsExtendedImageInfoSupported(); },
+                                        DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO);
 
-    CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
-    auto pHandle = pSource->GetDTWAINHandle();
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pSource->GetState() != SOURCE_STATE_TRANSFERRING; }, 
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pS->GetState() != SOURCE_STATE_TRANSFERRING; }, 
                                         DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
+    // We clear the user array here, since we do not want to 
+    // report information back to user if capability is not supported
+    bool bArrayExists = pHandle->m_ArrayFactory->is_valid(*Array);
+    if (bArrayExists)
+        pHandle->m_ArrayFactory->clear(*Array);
 
     CTL_IntArray r;
     if ( pSource->EnumExtImageInfo(r) )
@@ -830,7 +835,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDT
             CTL_TwainAppMgr::WriteLogInfoA("Supported Extended Image Info types:");
             DumpArrayContents(aStrings, 0);
         }
-        *Array = ThisArray;
+        dynarithmic::AssignArray(pHandle, Array, &ThisArray);
         return TRUE;
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(false)
@@ -856,12 +861,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitExtImageInfo(DTWAIN_SOURCE Source)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddExtImageInfoQuery(DTWAIN_SOURCE Source, LONG ExtImageInfo)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, ExtImageInfo))
-    if (!DTWAIN_IsExtImageInfoSupported(Source))
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     CTL_ITwainSource* pTheSource = static_cast<CTL_ITwainSource*>(Source);
-    const auto pHandle = pTheSource->GetDTWAINHandle();
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return pTheSource->GetState() != SOURCE_STATE_TRANSFERRING;},DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pTheSource->IsExtendedImageInfoSupported(); },
+                                        DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO);
+
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pTheSource->GetState() != SOURCE_STATE_TRANSFERRING; }, 
+                                        DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
     TW_INFO Info = {};
     Info.InfoID = static_cast<TW_UINT16>(ExtImageInfo);
     pTheSource->AddExtImageInfo( Info );
@@ -875,15 +882,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddExtImageInfoQuery(DTWAIN_SOURCE Source, LONG 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfo(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    if ( !DTWAIN_IsExtImageInfoSupported(Source))
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
-
-    CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
-    const auto pHandle = p->GetDTWAINHandle();
-
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return p->GetState() != SOURCE_STATE_TRANSFERRING;},DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
-
-    p->GetExtImageInfo(TRUE);
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+    CTL_ITwainSource* pTheSource = pSource;
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pTheSource->IsExtendedImageInfoSupported(); },
+                                        DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pTheSource->GetState() != SOURCE_STATE_TRANSFERRING; }, 
+                                        DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
+    pTheSource->GetExtImageInfo(TRUE);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -901,16 +906,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoItem(DTWAIN_SOURCE Source,
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nWhich, InfoID, NumItems, Type))
 
-    if ( !DTWAIN_IsExtImageInfoSupported(Source))
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
-
-    CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
-    const auto pHandle = p->GetDTWAINHandle();
-
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return p->GetState() != SOURCE_STATE_TRANSFERRING;},
-                DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
-
-    const TW_INFO Info = p->GetExtImageInfoItem(nWhich, DTWAIN_BYID);
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+    CTL_ITwainSource* pTheSource = pSource;
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pTheSource->IsExtendedImageInfoSupported(); },
+                                        DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pTheSource->GetState() != SOURCE_STATE_TRANSFERRING; }, 
+                                        DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
+    const TW_INFO Info = pTheSource->GetExtImageInfoItem(nWhich, DTWAIN_BYID);
     if ( InfoID )
         *InfoID = Info.InfoID;
     if ( NumItems )
@@ -928,16 +930,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoItem(DTWAIN_SOURCE Source,
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG nWhich, LPDTWAIN_ARRAY Data)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nWhich, Data))
-
-    if ( !DTWAIN_IsExtImageInfoSupported(Source))
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
-
-    CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
-    const auto pHandle = p->GetDTWAINHandle();
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+    CTL_ITwainSource* pTheSource = pSource;
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pTheSource->IsExtendedImageInfoSupported(); },
+                                        DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO);
 
     // Must be in State 7 for this function to be called
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return p->GetState() != SOURCE_STATE_TRANSFERRING;},
-                                      DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pTheSource->GetState() != SOURCE_STATE_TRANSFERRING; },
+                                        DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
 
     // Check if array exists
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !Data;}, DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
@@ -947,9 +947,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
     bool bArrayExists = pHandle->m_ArrayFactory->is_valid(*Data);
     if (bArrayExists)
         pHandle->m_ArrayFactory->clear(*Data);
-
+        
     // Get the info 
-    const TW_INFO Info = p->GetExtImageInfoItem(nWhich, DTWAIN_BYID);
+    TW_INFO Info = pTheSource->GetExtImageInfoItem(nWhich, DTWAIN_BYID);
 
     // Check if the info type is supported
     bool bNotSupported = false;
@@ -970,9 +970,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
     // Check if type returned by device is what the TWAIN specification indicates
     auto lTypeReportedByDevice = Info.ItemType;
     auto lTypeRequiredByTWAIN = CTL_TwainAppMgr::GetGeneralCapInfo(nWhich + CTL_StaticData::GetExtImageInfoOffset()).m_nDataType;
-
+    bool bTypesMatch = true;
     if (lTypeReportedByDevice != static_cast<LONG>(lTypeRequiredByTWAIN))
     {
+        bTypesMatch = false;
         // Just log this condition.  We will still get the data, even though TWAIN spec was violated.
         if (CTL_StaticData::s_logFilterFlags)
         {
@@ -982,14 +983,18 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
             sBadType += ", Twain Required Type=" + CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWTY, lTypeRequiredByTWAIN) + "}";
             CTL_TwainAppMgr::WriteLogInfoA(sBadType);
         }
+
+        // If the mismatch type is TW_FRAME, we should fake it out and pretend that the types match
+        if (Info.InfoID == TWEI_FRAME)
+            Info.ItemType = TWTY_FRAME;
     }
 
-    const DTWAIN_ARRAY ExtInfoArray = CreateArrayFromFactory(pHandle, CTL_TwainAppMgr::ExtImageInfoArrayType(Info.ItemType), 0);
+    DTWAIN_ARRAY ExtInfoArray = CreateArrayFromFactory(pHandle, CTL_TwainAppMgr::ExtImageInfoArrayType(Info.ItemType), 0);
 
-    if ( !ExtInfoArray )
+    if (!ExtInfoArray)
     {
         // Check if array exists
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !ExtInfoArray;}, DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !ExtInfoArray; }, DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
     }
 
     auto Count = Info.NumItems;
@@ -999,7 +1004,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
 
     // resize the array if this is not a frame
     if ( eType != CTL_ArrayFactory::arrayTag::FrameSingleType)
-    factory->resize(ExtInfoArray, Count);
+        factory->resize(ExtInfoArray, Count);
 
     std::pair<bool, int32_t> finalRet = { true, DTWAIN_NO_ERROR };
     for ( int i = 0; i < Count; ++i )
@@ -1008,11 +1013,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
         {
             std::vector<char> Temp;
             size_t ItemSize;
-            finalRet = p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, nullptr, nullptr, &ItemSize);
+            finalRet = pTheSource->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, nullptr, nullptr, &ItemSize);
             if ( finalRet.first )
             {
                 Temp.resize(ItemSize);
-                finalRet = p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, Temp.data(), nullptr, nullptr);
+                finalRet = pTheSource->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, Temp.data(), nullptr, nullptr);
                 if ( finalRet.first)
                     SetArrayValueFromFactory(pHandle, ExtInfoArray, i, Temp.data());
             }
@@ -1021,7 +1026,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
         if (eType == CTL_ArrayFactory::arrayTag::VoidPtrType) // This is a handle
         {
             TW_HANDLE pDataHandle = nullptr;
-            finalRet = p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, nullptr, &pDataHandle, nullptr);
+            finalRet = pTheSource->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, nullptr, &pDataHandle, nullptr);
             if (finalRet.first)
             {
                 auto& vValues = factory->underlying_container_t<void*>(ExtInfoArray);
@@ -1032,17 +1037,16 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
         if (eType == CTL_ArrayFactory::arrayTag::FrameSingleType) // This is a frame
         {
             TW_FRAME oneFrame = {};
-            finalRet = p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, &oneFrame, nullptr);
+            if (bTypesMatch) // Only do this if the types match up.
+            finalRet = pTheSource->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, &oneFrame, nullptr);
             dynarithmic::TWFRAMEToDTWAINFRAME(oneFrame, ExtInfoArray);
         }
         else
         {
-            finalRet = p->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, factory->get_buffer(ExtInfoArray, i), nullptr);
+            finalRet = pTheSource->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, factory->get_buffer(ExtInfoArray, i), nullptr);
         }
     }
-    if (bArrayExists)
-        pHandle->m_ArrayFactory->destroy(*Data);
-    *Data = ExtInfoArray;
+    dynarithmic::AssignArray(pHandle, Data, &ExtInfoArray);
     if (!finalRet.first)
     {
         // Error occurred
@@ -1057,14 +1061,17 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FreeExtImageInfo(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+    CTL_ITwainSource* pTheSource = pSource;
+    
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pTheSource->IsExtendedImageInfoSupported(); },
+        DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO);
 
-    if ( !DTWAIN_IsExtImageInfoSupported(Source))
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
-    const auto pHandle = p->GetDTWAINHandle();
+    // Must be in State 7 for this function to be called
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pTheSource->GetState() != SOURCE_STATE_TRANSFERRING; },
+        DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return p->GetState() != SOURCE_STATE_TRANSFERRING;},DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
-    p->DestroyExtImageInfo();
+    pTheSource->DestroyExtImageInfo();
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }

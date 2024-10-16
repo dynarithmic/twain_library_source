@@ -49,9 +49,7 @@ namespace dynarithmic
         double Top() const;
         double Right() const;
         double Bottom() const;
-
-        private:
-            void SetFrame(double left, double top, double right, double bottom);
+        void SetFrame(double left, double top, double right, double bottom);
     };
 }
 #endif // TWAINFRAME_H

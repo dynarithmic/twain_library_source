@@ -352,6 +352,8 @@ namespace dynarithmic
         TW_FILESYSTEM*  GetFileSystem() { return &m_FileSystem; }
 
         // Extended image info functions
+        bool         IsExtendedImageInfoSupported() const { return m_bExtendedImageInfoSupported; }
+        void         SetExtendedImageInfoSupported(bool bSet) { m_bExtendedImageInfoSupported = bSet; }
         bool         InitExtImageInfo(int nNum);
         bool         GetExtImageInfo(bool bExecute);
         bool         AddExtImageInfo(TW_INFO Info) const;
@@ -637,6 +639,7 @@ namespace dynarithmic
         CapList    m_aExtendedCaps;
         DuplexData m_DuplexFileData;
         bool    m_bImageInfoRetrieved;
+        bool    m_bExtendedImageInfoSupported;
         bool    m_bSupportedCustomCapsRetrieved;
     };
 }

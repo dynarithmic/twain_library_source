@@ -886,6 +886,7 @@ namespace dynarithmic
     DTWAIN_FRAME CreateFrameArray(CTL_TwainDLLHandle* pHandle, double Left, double Top, double Right, double Bottom);
     void SetArrayValueFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray, size_t lPos, LPVOID pVariant);
     DTWAIN_ARRAY CreateArrayFromCap(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapType, LONG lSize);
+    bool AssignArray(CTL_TwainDLLHandle* pHandle, LPDTWAIN_ARRAY aDestination, LPDTWAIN_ARRAY aSource);
     LONG GetCapDataType(CTL_ITwainSource* pSource, LONG nCap);
 
     typedef CTL_StringType(CTL_ITwainSource::* SOURCEINFOFUNC)() const;
