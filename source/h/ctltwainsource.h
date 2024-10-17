@@ -463,7 +463,10 @@ namespace dynarithmic
         void         SetBufferedTileModeSupported(bool bSet) { m_tbIsTileModeSupported = bSet; }
         TW_IMAGEMEMXFER& GetBufferedXFerInfo() { return m_BufferedXFerInfo; }
         CTL_ExtImageInfoTriplet* GetExtImageInfoTriplet();
-
+        void        SetShutdownAcquire(bool bSet) { m_bShutdownAcquire = bSet; }
+        bool        IsShutdownAcquire() const { return m_bShutdownAcquire; }
+        int         GetLastAcquireError() const { return m_nLastAcquireError; }
+        void        SetLastAcquireError(int err) { m_nLastAcquireError = err; }
         // Only public member
         void *      m_pUserPtr;
 
@@ -590,7 +593,9 @@ namespace dynarithmic
         bool            m_bTileMode;
         std::vector<int> m_aTransferMechanisms;
         bool            m_bExtendedCapsRetrieved;
+        bool            m_bShutdownAcquire;
         long            m_FileSavePageCount;
+        int             m_nLastAcquireError;
         boost::logic::tribool m_tbIsFileSystemSupported;
         boost::logic::tribool m_tbIsTileModeSupported;
         CTL_TwainDLLHandle* m_pDLLHandle;

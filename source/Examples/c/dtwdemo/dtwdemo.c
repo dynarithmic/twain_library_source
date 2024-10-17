@@ -524,10 +524,15 @@ void GenericAcquire(LONG nWhichOne)
     EnableSourceItems(TRUE);
     if (!bRet)
     {
+        LONG lastError = DTWAIN_GetLastError();
+        char szError[1024];
         if (ErrStatus == DTWAIN_TN_ACQUIRECANCELED)
             MessageBox(NULL, _T("Acquisition cancelled without acquiring any images"), _T("Information"), MB_ICONSTOP);
         else
-            MessageBox(NULL, _T("Acquisition failed"), _T("TWAIN Error"), MB_ICONSTOP);
+        {
+            DTWAIN_GetErrorStringA(lastError, szError, 1023);
+            MessageBoxA(NULL, szError, "TWAIN Error", MB_ICONSTOP);
+        }
         return;
     }
 
