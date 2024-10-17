@@ -38,6 +38,7 @@ TCHAR         g_LogFileName[MAX_PATH];
 
 void SelectTheSource(int nWhich);
 void EnableSourceItems(BOOL bEnable);
+void EnableSelectSourceItems(BOOL bEnable);
 DTWAIN_SOURCE DisplayGetNameDlg();
 DTWAIN_SOURCE DisplayCustomDlg();
 void DisplaySourceProps();
@@ -417,6 +418,7 @@ void SelectTheSource(int nWhich)
             return;
     }
 
+    EnableSelectSourceItems(FALSE);
     switch (nWhich)
     {
         case IDM_SELECT_SOURCE:
@@ -434,10 +436,8 @@ void SelectTheSource(int nWhich)
         case IDM_SELECT_SOURCE_CUSTOM:
             tempSource = DisplayCustomDlg();
         break;
-
-
     }
-
+    EnableSelectSourceItems(TRUE);
     if ( tempSource )
     {
         if ( DTWAIN_OpenSource(tempSource) )
@@ -756,6 +756,19 @@ void EnableSourceItems(BOOL bEnable)
     EnableMenuItem(g_Menu,IDM_ACQUIRE_OPTIONS, nOptions);
 }
 
+void EnableSelectSourceItems(BOOL bEnable)
+{
+    UINT nOptions;
+    if (!bEnable)
+        nOptions = MF_BYCOMMAND | MF_GRAYED;
+    else
+        nOptions = MF_BYCOMMAND | MF_ENABLED;
+    EnableMenuItem(g_Menu, IDM_SELECT_SOURCE, nOptions);
+    EnableMenuItem(g_Menu, IDM_SELECT_SOURCE_BY_NAME, nOptions);
+    EnableMenuItem(g_Menu, IDM_SELECT_SOURCE_CUSTOM, nOptions);
+    EnableMenuItem(g_Menu, IDM_SELECT_DEFAULT_SOURCE, nOptions);
+    EnableMenuItem(g_Menu, IDM_EXIT, nOptions);
+}
 
 /* Dialog box to enter custom language name */
 LRESULT CALLBACK EnterCustomLangNameProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
