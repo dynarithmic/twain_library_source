@@ -491,6 +491,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
     std::vector<capabilityInfo> vCapabilityInfo;
 
     json glob_json;
+    glob_json["dtwain-version"] = DTWAIN_VERINFO_FILEVERSION;
     glob_json["session-twain-identity"] = json::parse(CTL_TwainIdentity(ts.GetAppIDPtr()).to_json());
     glob_json["device-count"] = allSources.size();
     json array_twain_identity;
@@ -499,7 +500,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
     glob_json["device-names"] = sNames;
     std::string jsonString;
     std::array<std::string,13> imageInfoString;
-    std::array<std::string,10> deviceInfoString;
+    std::array<std::string,11> deviceInfoString;
 
     struct CloserRAII
     {
@@ -546,7 +547,8 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
         deviceInfoString[6] = "\"duplex-supported\":false";
         deviceInfoString[7] = "\"jobcontrol-supported\":false";
         deviceInfoString[8] = "\"transparencyunit-supported\":false";
-        deviceInfoString[9] = "\"filesystem-supported\":false";
+        deviceInfoString[9] = "\"extendedimageinfo-supported\":false"; 
+        deviceInfoString[10] = "\"filesystem-supported\":false";
         bool devOpen[] = { false, false };
 
         // Check if we need to select and open the source to see
@@ -792,11 +794,11 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     imageInfoString[12] = tempStrm.str();
 
                     strm.str("");
-                    std::array<int, 10> deviceInfoCaps = { CAP_FEEDERENABLED, CAP_FEEDERLOADED, CAP_UICONTROLLABLE,
+                    std::array<int, 11> deviceInfoCaps = { CAP_FEEDERENABLED, CAP_FEEDERLOADED, CAP_UICONTROLLABLE,
                                                           ICAP_AUTOBRIGHT, ICAP_AUTOMATICDESKEW,
-                                                          CAP_PRINTER, CAP_DUPLEX, CAP_JOBCONTROL, ICAP_LIGHTPATH, 0};
+                                                          CAP_PRINTER, CAP_DUPLEX, CAP_JOBCONTROL, ICAP_EXTIMAGEINFO, ICAP_LIGHTPATH, 0};
 
-                    std::array<std::string, 10> deviceInfoCapsStr; 
+                    std::array<std::string, 11> deviceInfoCapsStr; 
                     std::copy(deviceInfoString.begin(), deviceInfoString.end(), deviceInfoCapsStr.begin());
                     for (auto& s : deviceInfoCapsStr)
                         s.resize(s.size() - 5);
@@ -805,14 +807,14 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         if (curDevice > 0)
                             strm << ",";
                         bool value = false;
+                        if (deviceInfoCaps[curDevice] == ICAP_EXTIMAGEINFO)
+                            value = DTWAIN_IsExtImageInfoSupported(pCurrentSourcePtr) ? true : false;
+                        else
                         if (deviceInfoCaps[curDevice] == CAP_FEEDERENABLED)
                             value = DTWAIN_IsFeederSupported(pCurrentSourcePtr) ? true : false;
                         else
                         if (deviceInfoCaps[curDevice] == CAP_UICONTROLLABLE)
-                        {
-                            auto vValue = DTWAIN_IsUIControllable(pCurrentSourcePtr) ? true : false;
-                            value = vValue;
-                        }
+                            value = DTWAIN_IsUIControllable(pCurrentSourcePtr) ? true : false;
                         else
                         if (deviceInfoCaps[curDevice] == CAP_PRINTER)
                         {
@@ -886,7 +888,8 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     deviceInfoString[6] = "\"duplex-supported\":\"" + sStatus + "\""; 
                     deviceInfoString[7] = "\"jobcontrol-supported\":\"" + sStatus + "\""; 
                     deviceInfoString[8] = "\"transparencyunit-supported\":\"" + sStatus + "\""; 
-                    deviceInfoString[9] = "\"filesystem-supported\":\"" + sStatus + "\"";
+                    deviceInfoString[9] = "\"extendedimageinfo-supported\":\"" + sStatus + "\"";
+                    deviceInfoString[10] = "\"filesystem-supported\":\"" + sStatus + "\"";
                 }
                 std::string partString = "\"device-name\":\"" + curSource + "\",";
                 std::string strStatus;
