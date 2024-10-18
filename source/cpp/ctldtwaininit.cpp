@@ -2164,14 +2164,22 @@ void WriteVersionToLog(CTL_TwainDLLHandle *pHandle)
         auto sVer = GetVersionString();
         const auto sWinVer = GetWinVersion();
         auto sDSMPath = CTL_TwainAppMgr::GetDSMPath();
-        auto sDSMVersionInfo = dynarithmic::GetVersionInfo(CTL_TwainAppMgr::GetInstance()->GetDSMModuleHandle(), 4);
+        CTL_StringType sDSMVersionInfo;
         if (sDSMPath.empty())
         {
             sDSMPath = _T("(unknown or not queried)");
             sDSMVersionInfo.clear();
+            sDSMVersionInfo = _T("\nDSM Version Information: ");
+            sDSMVersionInfo += _T("(unknown or not queried)");
         }
         else
-            sDSMVersionInfo = _T("\nDSM Version Information:\n") + sDSMVersionInfo;
+        {
+            sDSMVersionInfo = _T("\nDSM Version Information:\n");
+            if ( CTL_TwainAppMgr::GetInstance() )
+                sDSMVersionInfo += dynarithmic::GetVersionInfo(CTL_TwainAppMgr::GetInstance()->GetDSMModuleHandle(), 4, _T("\n"));
+            else
+                sDSMVersionInfo += _T("(unknown or not queried)");
+        }
         sDSMPath = _T("Active DSM Path: ") + sDSMPath;
         sVer += _T("\n") + sWinVer + sDSMPath + sDSMVersionInfo + _T("\n");
         #ifdef _WIN32
