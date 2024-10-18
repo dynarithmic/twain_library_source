@@ -312,6 +312,8 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
     DTWAINArrayLowLevel_RAII a1(pDLLHandle, nullptr);
 
     auto pSource = static_cast<CTL_ITwainSource*>(opts.getSource());
+    pSource->SetShutdownAcquire(false);
+    pSource->SetLastAcquireError(0);
     pSource->ResetAcquisitionAttempts(nullptr);
     aAcquisitionArray = CreateArrayFromFactory(pDLLHandle, DTWAIN_ARRAYOFHANDLEARRAYS, 0);
     DTWAINArrayLowLevel_RAII aAcq(pDLLHandle, aAcquisitionArray);
