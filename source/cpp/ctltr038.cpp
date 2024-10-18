@@ -62,18 +62,8 @@ void CTL_ExtImageInfoTriplet::InitInfo(CTL_ITwainSession *pSession,
 {
     SetSessionPtr(pSession);
     SetSourcePtr( pSource );
-
-    // Make sure we have one item
-    auto& extImageInfoMap = CTL_StaticData::GetExtendedImageInfoMap();
-    m_ExtInfoMap.clear();
-    for (auto& pr : extImageInfoMap)
-    {
-       TW_INFO Info{};
-       Info.InfoID = static_cast<TW_UINT16>(pr.first);
-       Info.ReturnCode = TWRC_DATANOTAVAILABLE;
-       m_ExtInfoMap.insert({ static_cast<TW_UINT16>(pr.first), Info });
-    }
-    m_nNumInfo = extImageInfoMap.size();
+    m_ExtInfoMap = CTL_StaticData::GetIntToTwainInfoMap();
+    m_nNumInfo = m_ExtInfoMap.size();
 }
 
 void CTL_ExtImageInfoTriplet::DestroyInfo()
@@ -201,15 +191,19 @@ void CTL_ExtImageInfoTriplet::ResolveTypes()
 
 void CTL_ExtImageInfoTriplet::CopyInfoToVector()
 {
-    auto it = m_ExtInfoMap.begin();
-    int i = 0;
-    while ( it != m_ExtInfoMap.end())
-    {
-        memcpy(&it->second, &m_pExtImageInfo->Info[i], sizeof(TW_INFO));
+    auto nEntries = m_ExtInfoMap.size();
+    std::set<TW_UINT16> keySeen;
 
-        // Go to next INFO entry
-        ++it;
-        ++i;
+    for (size_t i = 0; i < nEntries; ++i)
+    {
+        auto key = m_pExtImageInfo->Info[i].InfoID;
+        if ( !keySeen.count(key) )
+        {
+            auto iter = m_ExtInfoMap.find(key);
+            if (iter != m_ExtInfoMap.end())
+                iter->second = m_pExtImageInfo->Info[i];
+            keySeen.insert(key);
+        }
     }
 }
 
@@ -269,6 +263,14 @@ std::pair<bool, int32_t> CTL_ExtImageInfoTriplet::GetItemData(int nWhichItem, in
             if (pActualData)
                 memcpy(Data, pActualData, nSize);
             sessionHandle->m_TwainMemoryFunc->UnlockMemory(actualHandle);
+        }
+        else
+        if (pHandle && Info.ItemType == TWTY_FRAME)
+        {
+            TW_FRAME* theFrame = (TW_FRAME*)pHandle;
+            theFrame += nWhichValue;
+            // The Data passed in is a TW_FRAME
+            memcpy(Data, theFrame, sizeof(TW_FRAME)); 
         }
         else
         {

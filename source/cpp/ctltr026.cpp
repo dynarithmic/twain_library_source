@@ -111,6 +111,27 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     BITMAPINFOHEADER* thisBitmap =
                         (BITMAPINFOHEADER*)sessionHandle->m_TwainMemoryFunc->LockMemory((HBITMAP)m_hDataHandleFromDevice);
 
+                    if (!thisBitmap)
+                    {
+                        // This is an error if the source didn't give us a valid handle on return.
+                        // Since this is a native transfer, there is no point in going further trying
+                        // to acquire images.
+                        CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_INVALID_TWAINDSM2_BITMAP, 
+                                                              reinterpret_cast<LPARAM>(pSource));
+
+                        // Log the error
+                        auto sErr = dynarithmic::GetResourceStringFromMap(-DTWAIN_ERR_TWAINDSM2_BADBITMAP);
+                        sErr += " (" + pSource->GetProductNameA() + ")";
+                        CTL_TwainAppMgr::SetAndLogError(DTWAIN_ERR_TWAINDSM2_BADBITMAP, sErr, true);
+                        pSource->SetLastAcquireError(DTWAIN_ERR_TWAINDSM2_BADBITMAP);
+
+                        // Stop the acquisition
+                        pSource->SetShutdownAcquire(true);
+                        FailAcquisition();
+                        AbortTransfer(true, errfile);
+                        return TWRC_FAILURE;
+                    }
+
                     // Make sure we unlock and free this memory once out of this scope
                     auto dsmPair = DSMPair(sessionHandle, m_hDataHandleFromDevice);
                     DTWAINDSM2LockAndFree_RAII raii(&dsmPair);
@@ -622,9 +643,9 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
     CTL_ITwainSource *pSource = GetSourcePtr();
     ImageXferFileWriter FileWriter(this, pSession, pSource);
 
-    TW_PENDINGXFERS pPending;
-    TW_PENDINGXFERS *ptrPending;
-    TW_UINT16 rc;
+    TW_PENDINGXFERS pPending = {};
+    TW_PENDINGXFERS* ptrPending = {};
+    TW_UINT16 rc = {};
     if ( !IsPendingXfersDone() )
     {
         rc = GetImagePendingInfo( &pPending );
@@ -794,6 +815,7 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
             CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, TWRC_FAILURE, ccode);
             if ( !pSource->IsUIOpenOnAcquire())
                 CTL_TwainAppMgr::EndTwainUI(pSession, pSource);
+            *ptrPending = {};
         }
         break;
     }

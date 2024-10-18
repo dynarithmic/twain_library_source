@@ -102,6 +102,7 @@ std::pair<CTL_ResourceRegistryMap::iterator, bool> CTL_TwainDLLHandle::AddResour
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
+CTL_UINT16ToInfoMap         CTL_StaticData::s_IntToTwainInfoMap;
 int32_t                     CTL_StaticData::s_nExtImageInfoOffset = 0;
 CTL_StringToConstantMap     CTL_StaticData::s_MapStringToConstant;
 CTL_TwainLongToStringMap    CTL_StaticData::s_MapExtendedImageInfo;

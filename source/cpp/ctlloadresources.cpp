@@ -211,6 +211,8 @@ namespace dynarithmic
         std::string sCap;
         LONG lCap;
         auto& extendedImageInfoMap = CTL_StaticData::GetExtendedImageInfoMap();
+        auto& intToInfoMap = CTL_StaticData::GetIntToTwainInfoMap();
+
         while (ifs >> sCap >> capName >> capType >> capGet >>
                 capGetCurrent >> capGetDefault >> capSet >> capSetConstraint >>
                 capReset >> capQuery)
@@ -234,6 +236,10 @@ namespace dynarithmic
             if (isTWEIName)
             {
                 extendedImageInfoMap.insert({ lCap ,capName });
+                TW_INFO Info{};
+                Info.InfoID = lCap;
+                Info.ReturnCode = TWRC_DATANOTAVAILABLE;
+                intToInfoMap.insert({ lCap, Info });
                 lCap += extOffset;
             }
             CTL_CapStruct cStruct;

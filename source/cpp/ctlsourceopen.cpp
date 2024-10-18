@@ -103,6 +103,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     // get the list of caps created
     CapList& theCapList = pSource->GetCapSupportedList();
 
+    // See if extended image info is supported and cache the results
+    pSource->SetExtendedImageInfoSupported(theCapList.count(ICAP_EXTIMAGEINFO));
+
     // if any logging is turned on, then get the capabilities and log the values
     if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
     {
