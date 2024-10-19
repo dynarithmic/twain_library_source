@@ -11,11 +11,11 @@ namespace dynarithmic
         return GetVersionInfo(CTL_StaticData::s_DLLInstance, 0);
     }
 
-    CTL_StringType GetVersionInfo(HMODULE dllModule, int indent)
+    CTL_StringType GetVersionInfo(HMODULE dllModule, int indent, CTL_StringType crlf)
     {
         const VersionInfo vInfo(dllModule);
         CTL_StringStreamType strm;
-        vInfo.printit(strm, indent, _T("\r\n"));
+        vInfo.printit(strm, indent, crlf.c_str());
         return strm.str();
     }
 }
