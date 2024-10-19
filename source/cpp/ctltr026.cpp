@@ -27,13 +27,14 @@
 #include "ctltr026.h"
 #include "ctltr027.h"
 #include "ctltr025.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "imagexferfilewriter.h"
 #include "ctldib.h"
 #include "dtwain.h"
 #include "arrayfactory.h"
 #include "ctlfileutils.h"
 #include "resamplefactory.h"
+#include "ctlfilesave.h"
 using namespace dynarithmic;
 
 static void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pSession,
@@ -109,6 +110,27 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     // Lock the DIB returned by the device
                     BITMAPINFOHEADER* thisBitmap =
                         (BITMAPINFOHEADER*)sessionHandle->m_TwainMemoryFunc->LockMemory((HBITMAP)m_hDataHandleFromDevice);
+
+                    if (!thisBitmap)
+                    {
+                        // This is an error if the source didn't give us a valid handle on return.
+                        // Since this is a native transfer, there is no point in going further trying
+                        // to acquire images.
+                        CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_INVALID_TWAINDSM2_BITMAP, 
+                                                              reinterpret_cast<LPARAM>(pSource));
+
+                        // Log the error
+                        auto sErr = dynarithmic::GetResourceStringFromMap(-DTWAIN_ERR_TWAINDSM2_BADBITMAP);
+                        sErr += " (" + pSource->GetProductNameA() + ")";
+                        CTL_TwainAppMgr::SetAndLogError(DTWAIN_ERR_TWAINDSM2_BADBITMAP, sErr, true);
+                        pSource->SetLastAcquireError(DTWAIN_ERR_TWAINDSM2_BADBITMAP);
+
+                        // Stop the acquisition
+                        pSource->SetShutdownAcquire(true);
+                        FailAcquisition();
+                        AbortTransfer(true, errfile);
+                        return TWRC_FAILURE;
+                    }
 
                     // Make sure we unlock and free this memory once out of this scope
                     auto dsmPair = DSMPair(sessionHandle, m_hDataHandleFromDevice);
@@ -241,7 +263,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     break;
                 }
 
-                if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_DECODE_BITMAP)
+                if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_DECODE_BITMAP)
                 {
                     std::string sOut = "Original bitmap from device: \n";
                     sOut += CTL_ErrorStructDecoder::DecodeBitmap(m_hDataHandle);
@@ -339,7 +361,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     ResampleAcquiredDib();
 
                     // Check if multi page file is being used
-                    bool bIsMultiPageFile = CTL_ITwainSource::IsFileTypeMultiPage(pSource->GetAcquireFileType());
+                    bool bIsMultiPageFile = dynarithmic::IsFileTypeMultiPage(pSource->GetAcquireFileType());
 
                     // Query if the page should be thrown away
                     bKeepPage = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_QUERYPAGEDISCARD, reinterpret_cast<LPARAM>(pSource))?true:false;
@@ -405,7 +427,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
 
                     if ( lFlags & TWAINFileFlag_PROMPT )
                     {
-                        CTL_StringType strTempFile = pSource->PromptForFileName();
+                        CTL_StringType strTempFile = PromptForFileName(pSource->GetDTWAINHandle(), pSource->GetAcquireFileType());
                         StringWrapper::TrimAll(strTempFile);
                         if ( strTempFile.empty())
                         {
@@ -615,15 +637,15 @@ TW_UINT16 CTL_ImageXferTriplet::GetImagePendingInfo(TW_PENDINGXFERS *pPI, TW_UIN
 
 std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int errFile)
 {
-    if ( CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+    if ( CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
         CTL_TwainAppMgr::WriteLogInfoA("Potentially aborting transfer..\n");
     CTL_ITwainSession *pSession = GetSessionPtr();
     CTL_ITwainSource *pSource = GetSourcePtr();
     ImageXferFileWriter FileWriter(this, pSession, pSource);
 
-    TW_PENDINGXFERS pPending;
-    TW_PENDINGXFERS *ptrPending;
-    TW_UINT16 rc;
+    TW_PENDINGXFERS pPending = {};
+    TW_PENDINGXFERS* ptrPending = {};
+    TW_UINT16 rc = {};
     if ( !IsPendingXfersDone() )
     {
         rc = GetImagePendingInfo( &pPending );
@@ -639,7 +661,7 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
     bool bUserCancelled = false;
     bool bJobControlContinue = false;
     bool bEndOfJobDetected = false;
-    bool bProcessSinglePage = (!CTL_ITwainSource::IsFileTypeMultiPage(pSource->GetAcquireFileType()) &&
+    bool bProcessSinglePage = (!dynarithmic::IsFileTypeMultiPage(pSource->GetAcquireFileType()) &&
                                errFile == 0);
     switch( rc )
     {
@@ -742,13 +764,13 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
                         if ( pSource->GetPendingImageNum() + 1 - pSource->GetBlankPageCount() > 0)
                         {
                             if ( pSource->IsMultiPageModeSaveAtEnd() &&
-                                 !CTL_ITwainSource::IsFileTypeMultiPage( pSource->GetAcquireFileType() ))
+                                 !dynarithmic::IsFileTypeMultiPage( pSource->GetAcquireFileType() ))
                             {
                                 pSource->ProcessMultipageFile();
                             }
                             else
                             if ( (!pSource->IsMultiPageModeContinuous()) ||
-                                 (pSource->IsMultiPageModeContinuous() && !CTL_ITwainSource::IsFileTypeMultiPage(pSource->GetAcquireFileType())))
+                                 (pSource->IsMultiPageModeContinuous() && !dynarithmic::IsFileTypeMultiPage(pSource->GetAcquireFileType())))
                             {
                                 if ( !pSource->GetTransferDone())
                                 {
@@ -793,6 +815,7 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
             CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, TWRC_FAILURE, ccode);
             if ( !pSource->IsUIOpenOnAcquire())
                 CTL_TwainAppMgr::EndTwainUI(pSession, pSource);
+            *ptrPending = {};
         }
         break;
     }
@@ -813,7 +836,7 @@ void CTL_ImageXferTriplet::SaveJobPages(const ImageXferFileWriter& FileWriter)
     if ( m_nTotalPagesSaved > 0)
     {
         if ( pSource->IsMultiPageModeSaveAtEnd() &&
-             !CTL_ITwainSource::IsFileTypeMultiPage( pSource->GetAcquireFileType() ))
+             !dynarithmic::IsFileTypeMultiPage( pSource->GetAcquireFileType() ))
         {
             pSource->ProcessMultipageFile();
         }
@@ -961,7 +984,7 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
     const ImageXferFileWriter FileWriter(this, pSession, pSource);
 
     // Check if multi page file is being used
-    const bool bIsMultiPageFile = CTL_ITwainSource::IsFileTypeMultiPage(pSource->GetAcquireFileType());
+    const bool bIsMultiPageFile = dynarithmic::IsFileTypeMultiPage(pSource->GetAcquireFileType());
     int nMultiStage = 0;
     if ( bIsMultiPageFile )
     {
@@ -992,7 +1015,7 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
     CTL_StringType strTempFile;
     if ( nMultiStage == 0 || nMultiStage == DIB_MULTI_FIRST)
     {
-        strTempFile = pSource->PromptForFileName();
+        strTempFile = PromptForFileName(pSource->GetDTWAINHandle(), pSource->GetAcquireFileType());
         if ( strTempFile.empty() )
         {
             SendFileAcquireError(pSource, pSession,
@@ -1039,11 +1062,11 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
             // Now check for Postscript file types.  We alias these
             // types as TIFF format
             const CTL_TwainFileFormatEnum FileType = pSource->GetAcquireFileType();
-            if ( CTL_ITwainSource::IsFileTypePostscript( FileType ) )
+            if ( dynarithmic::IsFileTypePostscript( FileType ) )
             {
                 ImageInfo.IsPostscript = true;
                 ImageInfo.IsPostscriptMultipage =
-                    CTL_ITwainSource::IsFileTypeMultiPage( FileType );
+                    dynarithmic::IsFileTypeMultiPage( FileType );
                 ImageInfo.PostscriptType = static_cast<LONG>(FileType);
             }
 
@@ -1345,7 +1368,7 @@ void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pS
                           LONG Error, LONG ErrorMsg, const std::string& extraInfo)
 {
     CTL_TwainAppMgr::SetError(Error, extraInfo, true);
-    if ( CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_DTWAINERRORS)
+    if ( CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_DTWAINERRORS)
     {
         char szBuf[DTWAIN_USERRES_MAXSIZE + 1];
         CTL_TwainAppMgr::GetLastErrorString(szBuf, DTWAIN_USERRES_MAXSIZE);
@@ -1373,7 +1396,7 @@ void CTL_ImageXferTriplet::ResolveImageResolution(CTL_ITwainSource *pSource,  DT
                               &ResolutionY,
                               nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr))
         {
-            bool bWriteMisc = CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
+            bool bWriteMisc = CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
             std::string sError;
             if (bWriteMisc)
             {
@@ -1399,7 +1422,7 @@ void CTL_ImageXferTriplet::ResolveImageResolution(CTL_ITwainSource *pSource,  DT
     if ( !bGotResolution && !bGetResFromDriver )
     {
         // Get the image info from when we started
-        bool bWriteMisc = CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
+        bool bWriteMisc = CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
         if ( bWriteMisc )
         {
             CTL_TwainAppMgr::WriteLogInfoA("Getting image resolution from state 6.\n");
@@ -1420,7 +1443,7 @@ void CTL_ImageXferTriplet::ResolveImageResolution(CTL_ITwainSource *pSource,  DT
 
     if ( !bGotResolution )
     {
-        bool bWriteMisc = CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
+        bool bWriteMisc = CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
         // Try TWAIN driver setting
         if ( DTWAIN_GetResolution(pSource, &Resolution) )
         {
@@ -1478,7 +1501,7 @@ bool CTL_ImageXferTriplet::ModifyAcquiredDib()
         {
             // reset the dib handle if adjusted
             pSource->SetDibHandle(m_hDataHandle = CurDib->GetHandle(), nLastDib);
-            if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+            if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
             {
                 std::string sOut = msg[i];
                 sOut += CTL_ErrorStructDecoder::DecodeBitmap(m_hDataHandle);

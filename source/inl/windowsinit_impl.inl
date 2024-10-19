@@ -186,7 +186,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID /*plvReserved*/)
     {
         if (fdwReason == DLL_PROCESS_ATTACH)
         {
-            CTL_StaticData::s_lErrorFilterFlags = 0;
+            CTL_StaticData::s_logFilterFlags = 0;
         }
         CTL_StaticData::s_DLLInstance = hinstDll;
     }
@@ -209,7 +209,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID /*plvReserved*/)
 }
 #endif
 
-void dynarithmic::LogWin32Error(DWORD lastError)
+std::string dynarithmic::LogWin32Error(DWORD lastError)
 {
     LPSTR lpMsgBuf = nullptr;
 
@@ -217,7 +217,7 @@ void dynarithmic::LogWin32Error(DWORD lastError)
         FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
         nullptr,
         lastError,
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
         (LPSTR)&lpMsgBuf,
         0,
         nullptr
@@ -225,13 +225,21 @@ void dynarithmic::LogWin32Error(DWORD lastError)
 
     // Display the string.
     std::string sError = lpMsgBuf;
-    StringWrapperA::TrimRight(sError, " \n");
+    while (!sError.empty())
+    {
+        if (std::iscntrl(sError.back()))
+            sError.pop_back();
+        else
+            break;
+    }
     StringStreamA strm;
     strm << boost::format("Win32 Error: %1% (%2%)") % lastError % sError;
     CTL_TwainAppMgr::WriteLogInfoA(strm.str());
 
     // Free the buffer.
     LocalFree(lpMsgBuf);
+
+    return strm.str();
 }
 
 void LogDTWAINErrorToMsgBox(int nError, LPCSTR func, const std::string& s)

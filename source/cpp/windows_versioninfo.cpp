@@ -2,14 +2,20 @@
 #include "ctlobstr.h"
 #include "ctliface.h"
 #include "versioninfo.h"
+#include "dtwinverex.h"
 
 namespace dynarithmic
 {
     CTL_StringType GetVersionInfo()
     {
-        const VersionInfo vInfo(CTL_StaticData::s_DLLInstance);
+        return GetVersionInfo(CTL_StaticData::s_DLLInstance, 0);
+    }
+
+    CTL_StringType GetVersionInfo(HMODULE dllModule, int indent, CTL_StringType crlf)
+    {
+        const VersionInfo vInfo(dllModule);
         CTL_StringStreamType strm;
-        vInfo.printit(strm, _T("\r\n"));
+        vInfo.printit(strm, indent, crlf.c_str());
         return strm.str();
     }
 }

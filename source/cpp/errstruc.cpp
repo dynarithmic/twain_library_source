@@ -23,7 +23,7 @@
 #include <array>
 #include "ctliface.h"
 #include "ctltr010.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "errstruc.h"
 #include "dtwain_resource_constants.h"
 #include "twainfix32.h"
@@ -38,140 +38,137 @@ static std::string DecodeTW_INFO(pTW_INFO pInfo, LPCSTR pMem);
 static std::string DecodeSupportedGroups(TW_UINT32 SupportedGroups);
 static std::string IndentDefinition() { return std::string(4, ' '); }
 
-CTL_ContainerToNameMap CTL_ErrorStructDecoder::s_mapContainerType;
-CTL_ContainerToNameMap CTL_ErrorStructDecoder::s_mapNotificationType;
-std::unordered_map<TW_UINT32, std::string> CTL_ErrorStructDecoder::s_mapSupportedGroups;
-std::unordered_map<TW_UINT16, std::string> CTL_ErrorStructDecoder::s_mapTwainDSMReturnCodes;
-
-bool CTL_ErrorStructDecoder::s_bInit=false;
-
 #define ADD_ERRORCODE_TO_MAP(theMap, start, x) theMap[(start) + x] = #x;
+#define ADD_ERRORCODE_TO_MAP2(x, y) {x + y, #y}
 
-CTL_ErrorStructDecoder::CTL_ErrorStructDecoder()
-{
-    if ( !s_bInit )
-    {
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWRC_ERRORSTART, TWRC_SUCCESS)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWRC_ERRORSTART, TWRC_FAILURE)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWRC_ERRORSTART, TWRC_CHECKSTATUS)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWRC_ERRORSTART, TWRC_CANCEL)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWRC_ERRORSTART, TWRC_DSEVENT)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWRC_ERRORSTART, TWRC_NOTDSEVENT)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWRC_ERRORSTART, TWRC_XFERDONE)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWRC_ERRORSTART, TWRC_ENDOFLIST)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWRC_ERRORSTART, TWRC_INFONOTSUPPORTED)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWRC_ERRORSTART, TWRC_DATANOTAVAILABLE)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWRC_ERRORSTART, TWRC_BUSY)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWRC_ERRORSTART, TWRC_SCANNERLOCKED)
+static constexpr std::array<std::pair<uint32_t, const char*>, 41> mapTwainDSMReturnCodes =
+{ {
+    ADD_ERRORCODE_TO_MAP2(IDS_TWRC_ERRORSTART, TWRC_SUCCESS),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWRC_ERRORSTART, TWRC_FAILURE),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWRC_ERRORSTART, TWRC_CHECKSTATUS),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWRC_ERRORSTART, TWRC_CANCEL),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWRC_ERRORSTART, TWRC_DSEVENT),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWRC_ERRORSTART, TWRC_NOTDSEVENT),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWRC_ERRORSTART, TWRC_XFERDONE),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWRC_ERRORSTART, TWRC_ENDOFLIST),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWRC_ERRORSTART, TWRC_INFONOTSUPPORTED),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWRC_ERRORSTART, TWRC_DATANOTAVAILABLE),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWRC_ERRORSTART, TWRC_BUSY),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWRC_ERRORSTART, TWRC_SCANNERLOCKED),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_SUCCESS),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_BUMMER),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_LOWMEMORY),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_NODS),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_MAXCONNECTIONS),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_OPERATIONERROR),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_BADCAP),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_BADPROTOCOL),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_BADVALUE),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_SEQERROR),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_BADDEST),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_CAPUNSUPPORTED),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_CAPBADOPERATION),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_CAPSEQERROR),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_DENIED),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_FILEEXISTS),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_FILENOTFOUND),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_NOTEMPTY),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_PAPERJAM),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_PAPERDOUBLEFEED),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_FILEWRITEERROR),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_CHECKDEVICEONLINE),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_INTERLOCK),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_DAMAGEDCORNER),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_FOCUSERROR),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_DOCTOOLIGHT),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_DOCTOODARK),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_NOMEDIA),
+    ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_DOCTOOLIGHT)
+} };
 
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_SUCCESS)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_BUMMER)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_LOWMEMORY)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_NODS)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_MAXCONNECTIONS)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_OPERATIONERROR)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_BADCAP)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_BADPROTOCOL)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_BADVALUE)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_SEQERROR)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_BADDEST)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_CAPUNSUPPORTED)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_CAPBADOPERATION)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_CAPSEQERROR)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_DENIED)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_FILEEXISTS)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_FILENOTFOUND)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_NOTEMPTY)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_PAPERJAM)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_PAPERDOUBLEFEED)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_FILEWRITEERROR)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_CHECKDEVICEONLINE)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_INTERLOCK)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_DAMAGEDCORNER)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_FOCUSERROR)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_DOCTOOLIGHT)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_DOCTOODARK)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_NOMEDIA)
-        ADD_ERRORCODE_TO_MAP(s_mapTwainDSMReturnCodes,IDS_TWCC_ERRORSTART, TWCC_DOCTOOLIGHT)
+static constexpr std::array<std::pair<uint32_t, const char*>, 62> mapNotificationType =
+{ {
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_ACQUIREDONE),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_ACQUIREFAILED),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_ACQUIRECANCELLED),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_ACQUIRESTARTED),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_PAGECONTINUE),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_PAGEFAILED),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_PAGECANCELLED),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_TRANSFERREADY),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_TRANSFERDONE),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_ACQUIREPAGEDONE),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_UICLOSING),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_UICLOSED),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_UIOPENED),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_CLIPTRANSFERDONE),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_INVALIDIMAGEFORMAT),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_ACQUIRETERMINATED),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_TRANSFERSTRIPREADY),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_TRANSFERSTRIPDONE),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_IMAGEINFOERROR),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_DEVICEEVENT),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_FILESAVECANCELLED),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_FILESAVEOK),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_FILESAVEERROR),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_FILEPAGESAVEOK),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_FILEPAGESAVEERROR),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_PROCESSEDDIB),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_PROCESSDIBACCEPTED),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_PROCESSDIBFINALACCEPTED),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_TRANSFERSTRIPFAILED),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_IMAGEINFOERROR),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_TRANSFERCANCELLED),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_UIOPENING),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MANDUPFLIPPAGES),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MANDUPSIDE1DONE),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MANDUPSIDE2DONE),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MANDUPPAGECOUNTERROR),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MANDUPACQUIREDONE),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MANDUPSIDE1START),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MANDUPSIDE2START),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MANDUPMERGEERROR),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MANDUPMEMORYERROR),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MANDUPFILEERROR),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MANDUPFILESAVEERROR),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_ENDOFJOBDETECTED),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_EOJDETECTED_XFERDONE),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_TWAINPAGECANCELLED),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_TWAINPAGEFAILED),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_QUERYPAGEDISCARD),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_PAGEDISCARDED),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_APPUPDATEDDIB),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_FILEPAGESAVING),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_CROPFAILED),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_PROCESSEDDIBFINAL),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_BLANKPAGEDETECTED1),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_BLANKPAGEDETECTED2),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_BLANKPAGEDETECTED3),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_BLANKPAGEDISCARDED1),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_BLANKPAGEDISCARDED2),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MESSAGELOOPERROR),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_SETUPMODALACQUISITION),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_TWAINTRIPLETBEGIN),
+    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_TWAINTRIPLETEND)
+} };
 
-        ADD_ERRORCODE_TO_MAP(s_mapSupportedGroups, 0, DG_CONTROL)
-        ADD_ERRORCODE_TO_MAP(s_mapSupportedGroups, 0, DG_IMAGE)
-        ADD_ERRORCODE_TO_MAP(s_mapSupportedGroups, 0, DG_AUDIO)
-        ADD_ERRORCODE_TO_MAP(s_mapSupportedGroups, 0, DF_DSM2)
-        ADD_ERRORCODE_TO_MAP(s_mapSupportedGroups, 0, DF_APP2)
-        ADD_ERRORCODE_TO_MAP(s_mapSupportedGroups, 0, DF_DS2)
+static constexpr std::array<std::pair<uint32_t, const char*>, 6> mapSupportedGroups =
+{ {
+    ADD_ERRORCODE_TO_MAP2(0, DG_CONTROL),
+    ADD_ERRORCODE_TO_MAP2(0, DG_IMAGE),
+    ADD_ERRORCODE_TO_MAP2(0, DG_AUDIO),
+    ADD_ERRORCODE_TO_MAP2(0, DF_DSM2),
+    ADD_ERRORCODE_TO_MAP2(0, DF_APP2),
+    ADD_ERRORCODE_TO_MAP2(0, DF_DS2)
+} };
 
-        s_mapContainerType[TWON_ARRAY]          = "TW_ARRAY";
-        s_mapContainerType[TWON_ENUMERATION]    = "TW_ENUMERATION";
-        s_mapContainerType[TWON_ONEVALUE]       = "TW_ONEVALUE";
-        s_mapContainerType[TWON_RANGE]          = "TW_RANGE";
-
-        // Map of DTWAIN window messages to strings
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_ACQUIREDONE       )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_ACQUIREFAILED     )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_ACQUIRECANCELLED  )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_ACQUIRESTARTED    )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_PAGECONTINUE      )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_PAGEFAILED        )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_PAGECANCELLED     )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_TRANSFERREADY     )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_TRANSFERDONE      )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_ACQUIREPAGEDONE   )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_UICLOSING         )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_UICLOSED          )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_UIOPENED          )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_CLIPTRANSFERDONE  )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_INVALIDIMAGEFORMAT)
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_ACQUIRETERMINATED )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_TRANSFERSTRIPREADY)
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_TRANSFERSTRIPDONE )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_IMAGEINFOERROR    )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_DEVICEEVENT       )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_FILESAVECANCELLED     )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_FILESAVEOK            )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_FILESAVEERROR         )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_FILEPAGESAVEOK        )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_FILEPAGESAVEERROR     )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_PROCESSEDDIB          )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_PROCESSDIBACCEPTED      )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_PROCESSDIBFINALACCEPTED )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_TRANSFERSTRIPFAILED   )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_IMAGEINFOERROR        )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_TRANSFERCANCELLED     )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_UIOPENING             )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_MANDUPFLIPPAGES       )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_MANDUPSIDE1DONE       )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_MANDUPSIDE2DONE       )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_MANDUPPAGECOUNTERROR  )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_MANDUPACQUIREDONE     )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_MANDUPSIDE1START      )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_MANDUPSIDE2START      )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_MANDUPMERGEERROR      )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_MANDUPMEMORYERROR     )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_MANDUPFILEERROR       )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_MANDUPFILESAVEERROR   )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_ENDOFJOBDETECTED      )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_EOJDETECTED_XFERDONE  )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_TWAINPAGECANCELLED    )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_TWAINPAGEFAILED       )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_QUERYPAGEDISCARD      )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_PAGEDISCARDED         )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_APPUPDATEDDIB         )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_FILEPAGESAVING        )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_CROPFAILED        )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_PROCESSEDDIBFINAL )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_BLANKPAGEDETECTED1    )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_BLANKPAGEDETECTED2    )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_BLANKPAGEDETECTED3    )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_BLANKPAGEDISCARDED1   )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_BLANKPAGEDISCARDED2   )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_MESSAGELOOPERROR   )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_SETUPMODALACQUISITION )
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_TWAINTRIPLETBEGIN)
-        ADD_ERRORCODE_TO_MAP(s_mapNotificationType, 0,  DTWAIN_TN_TWAINTRIPLETEND)
-        s_bInit = true;
-    }
-}
+static constexpr std::array<std::pair<uint32_t, const char*>, 4> mapContainerType =
+{ {
+    {TWON_ARRAY, "TW_ARRAY"},
+    {TWON_ENUMERATION, "TW_ENUMERATION"},
+    {TWON_ONEVALUE, "TW_ONEVALUE"},
+    {TWON_RANGE, "TW_RANGE"}
+} };
 
 void CTL_ErrorStructDecoder::StartMessageDecoder(HWND hWnd, UINT nMsg,
                                                  WPARAM wParam, LPARAM lParam)
@@ -179,10 +176,11 @@ void CTL_ErrorStructDecoder::StartMessageDecoder(HWND hWnd, UINT nMsg,
     StringStreamA sBuffer;
 
     m_pString.clear();
-    if ( s_mapNotificationType.find(wParam) != s_mapNotificationType.end())
+    auto it = dynarithmic::generic_array_finder_if(mapNotificationType, [&](const auto& pr) { return pr.first == wParam; });
+    if ( it.first )
         sBuffer << "\nDTWAIN Message(HWND = " << hWnd << ", " <<
                                     "MSG = " << nMsg << ", " <<
-                                    "Notification code = " << s_mapNotificationType[wParam] << ", " <<
+                                    "Notification code = " << mapNotificationType[it.second].second << ", " <<
                                     "LPARAM = " << lParam;
     else
         sBuffer << "\nDTWAIN Message(HWND = " << hWnd << ", " <<
@@ -200,12 +198,13 @@ void CTL_ErrorStructDecoder::StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDe
 
     m_pString.clear();
     std::string s1;
+    auto sDG = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DG, nDG);
+    auto sDAT = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DAT, nDAT);
+    auto sMSG = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_MSG, nMSG);
+
     sBuffer << "\nDSM_Entry(pSource=" << pSource << "H, " <<
-                "pDest=" << pDest << "H, " <<
-           CTL_StaticData::GetTwainNameFromResource(CTL_StaticData::GetDGResourceID(),static_cast<int>(nDG)) << ", " <<
-           CTL_StaticData::GetTwainNameFromResource(CTL_StaticData::GetDATResourceID(),static_cast<int>(nDAT)) << ", " <<
-           CTL_StaticData::GetTwainNameFromResource(CTL_StaticData::GetMSGResourceID(),static_cast<int>(nMSG)) << ", " <<
-           "TW_MEMREF=" << Data << "H) " << GetResourceStringFromMap(IDS_LOGMSG_CALLEDTEXT) << "\n";
+                "pDest=" << pDest << "H, " << sDG << ", " << sDAT << ", " << sMSG << ", " <<
+                "TW_MEMREF=" << Data << "H) " << GetResourceStringFromMap(IDS_LOGMSG_CALLEDTEXT) << "\n";
     s1 = sBuffer.str();
 
     std::string pSourceStr;
@@ -301,9 +300,9 @@ std::string CTL_ErrorStructDecoder::DecodeTWAINReturnCodeCC(TW_UINT16 retCode)
 std::string CTL_ErrorStructDecoder::DecodeTWAINCode(TW_UINT16 retCode, TW_UINT16 errStart, const std::string& defMessage)
 {
     const TW_UINT16 actualCode = retCode + errStart;
-    const auto it = s_mapTwainDSMReturnCodes.find(actualCode);
-    if ( it != s_mapTwainDSMReturnCodes.end() )
-        return it->second;
+    const auto it = dynarithmic::generic_array_finder_if(mapTwainDSMReturnCodes, [&](const auto& pr) { return pr.first == actualCode; });
+    if (it.first)
+        return mapTwainDSMReturnCodes[it.second].second;
     return defMessage;
 }
 
@@ -483,12 +482,11 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
 
             case ERRSTRUCT_TW_CAPABILITY:
             {
-                CTL_ContainerToNameMap::iterator it;
                 auto pCAPABILITY = static_cast<pTW_CAPABILITY>(pData);
-                it = CTL_ErrorStructDecoder::s_mapContainerType.find(static_cast<int>(pCAPABILITY->ConType));
+                auto it = dynarithmic::generic_array_finder_if(mapContainerType, [&](const auto& pr) { return pr.first == pCAPABILITY->ConType; });
                 std::string s = "Unspecified (TWON_DONTCARE)";
-                if (it != CTL_ErrorStructDecoder::s_mapContainerType.end() )
-                    s = (*it).second;
+                if (it.first)
+                    s = mapContainerType[it.second].second;
 
                 sBuffer << "\nTW_MEMREF is TW_CAPABILITY:\n{\n" <<
                         indenter << "Cap=" << CTL_TwainAppMgr::GetCapNameFromCap(pCAPABILITY->Cap) << "\n" <<
@@ -499,7 +497,6 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
 
             case ERRSTRUCT_TW_STATUSUTF8:
             {
-                CTL_ContainerToNameMap::iterator it;
                 auto pSTATUSUTF8 = static_cast<pTW_STATUSUTF8>(pData);
                 pTW_STATUS pStatus = &pSTATUSUTF8->Status;
                 sBuffer << "\nTW_MEMREF is TW_STATUSUTF8:\n{\n" <<
@@ -513,9 +510,10 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
             {
                 auto pSTATUS = static_cast<pTW_STATUS>(pData);
                 std::string sConditionCode = "(Unknown)";
-                if (CTL_ErrorStructDecoder::s_mapTwainDSMReturnCodes.find(IDS_TWCC_ERRORSTART + pSTATUS->ConditionCode)
-                    != CTL_ErrorStructDecoder::s_mapTwainDSMReturnCodes.end())
-                    sConditionCode = "" + CTL_ErrorStructDecoder::s_mapTwainDSMReturnCodes[IDS_TWCC_ERRORSTART + pSTATUS->ConditionCode] + "";
+                uint32_t finderValue = IDS_TWCC_ERRORSTART + pSTATUS->ConditionCode;
+                auto it = dynarithmic::generic_array_finder_if(mapTwainDSMReturnCodes, [&](const auto& pr) { return pr.first == finderValue; });
+                if (it.first)
+                    sConditionCode = std::string() + mapTwainDSMReturnCodes[it.second].second + "";
                 sBuffer << "\nTW_MEMREF is TW_STATUS:\n{\n" <<
                         indenter << "ConditionCode=" << pSTATUS->ConditionCode << "  " << sConditionCode << "\n}\n";
             }
@@ -869,9 +867,9 @@ std::string DecodeSupportedGroups(TW_UINT32 SupportedGroups)
         const unsigned int curGroup = static_cast<TW_UINT32>(1) << i;
         if ( SupportedGroups & curGroup )
         {
-            auto it = CTL_ErrorStructDecoder::s_mapSupportedGroups.find( curGroup );
-            if ( it != CTL_ErrorStructDecoder::s_mapSupportedGroups.end() )
-                allGroups.push_back(it->second);
+            auto it = dynarithmic::generic_array_finder_if(mapSupportedGroups, [&](const auto& pr) { return pr.first == curGroup; });
+            if ( it.first)
+                allGroups.push_back(mapSupportedGroups[it.second].second);
             else
                 allGroups.push_back("Unknown (" + std::to_string(curGroup) + ")");
         }

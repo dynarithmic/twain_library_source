@@ -50,7 +50,7 @@ bool CTL_CapabilityGetOneValTriplet::EnumCapValues( void *pCapData )
     const int nItemType = GetEffectiveItemType(pValOne->ItemType);
 
     // Get sizeof each item in enumeration
-    const int nItemSize = GetItemSize( pValOne->ItemType );
+    const int nItemSize = dynarithmic::GetTwainItemSize( pValOne->ItemType );
 
     // Unknown item type.  Do error condition here??
     if ( nItemSize == 0 )

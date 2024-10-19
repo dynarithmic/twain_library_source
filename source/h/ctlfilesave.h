@@ -14,25 +14,17 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 
-    FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BYe
+    FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLCCERR_H
-#define CTLCCERR_H
+#ifndef CTLFILESAVE_H
+#define CTLFILESAVE_H
 
-#include "ctlobstr.h"
+#include "ctliface.h"
+
 namespace dynarithmic
 {
-    class CTL_CondCodeInfo
-    {
-        public:
-            CTL_CondCodeInfo() : m_nCode(9999), m_nResourceID(0) { }
-            CTL_CondCodeInfo(TW_UINT16 nCode, int nResourceID) :
-                        m_nCode(nCode), m_nResourceID(nResourceID) {}
-            TW_UINT16       m_nCode;
-            int             m_nResourceID;
-            bool        IsValidCode() { return (m_nCode != 9999); }
-    };
+    CTL_StringType PromptForFileName(CTL_TwainDLLHandle* pHandle, CTL_TwainFileFormatEnum nFileAcquireType);
 }
 #endif

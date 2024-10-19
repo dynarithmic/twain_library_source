@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "dtwain.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "ctliface.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
@@ -244,6 +244,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
             case DTWAIN_TN_UIOPENING:
             case DTWAIN_TN_FILENAMECHANGING:
             case DTWAIN_TN_FILENAMECHANGED:
+            case DTWAIN_TN_INVALID_TWAINDSM2_BITMAP:
             {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 if ( wParam == DTWAIN_TN_ACQUIRESTARTED )
@@ -252,6 +253,8 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                 if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) ||
                      !CTL_StaticData::s_aAllCallbacks.empty())
                     bPassMsg = true;
+                if (wParam == DTWAIN_TN_FILEPAGESAVEOK)
+                    pSource->SetFileSavePageCount(pSource->GetFileSavePageCount() + 1);
                 DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,pHandle,pSource, wParam, reinterpret_cast<LPARAM>(pSource) );
             }
             break;
@@ -632,7 +635,7 @@ LRESULT ExecuteCallback(CallbackType Fn, HWND hWnd, UINT uMsg,
     }
     catch (...)
     {
-        if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+        if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
         {
             const std::string sError = "In ExecuteCallback: Exception encountered when logging using callback...\n";
             CTL_TwainAppMgr::WriteLogInfoA(sError);
@@ -770,7 +773,7 @@ LRESULT ExecuteDTWAINCallbacks(CTL_TwainDLLHandle *pHandle, HWND hWnd, UINT uMsg
 
 void dynarithmic::LogDTWAINMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, bool bToCallback)
 {
-    if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_NOTIFICATIONS)
+    if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_NOTIFICATIONS)
     {
         CTL_ErrorStruct e;
         std::string s;

@@ -18,14 +18,14 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLTWSES_H
-#define CTLTWSES_H
+#ifndef CTLTWAINSESSION_H
+#define CTLTWAINSESSION_H
 #include <vector>
 #include <memory>
 #include <unordered_set>
 #include "ctlobstr.h"
 #include "ctlenum.h"
-#include "ctltwsrc.h"
+#include "ctltwainsource.h"
 #include "ctltwainidentity.h"
 
 namespace dynarithmic

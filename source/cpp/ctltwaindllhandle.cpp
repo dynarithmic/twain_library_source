@@ -18,8 +18,8 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctltwmgr.h"
-#include "ctlres.h"
+#include "ctltwainmanager.h"
+#include "ctlloadresources.h"
 #include "ctliface.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -97,10 +97,15 @@ std::pair<CTL_ResourceRegistryMap::iterator, bool> CTL_TwainDLLHandle::AddResour
     auto iter = m_ResourceRegistry.find(pLangDLL);
     if (iter != m_ResourceRegistry.end())
         return { iter, true };
-    return { iter, false };
+    // This is a new resource that may not have shown up in the "official" list of resources
+    return m_ResourceRegistry.insert({ pLangDLL, filesys::exists(GetResourceFileNameA(pLangDLL, DTWAINLANGRESOURCEFILE)) });
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
+CTL_UINT16ToInfoMap         CTL_StaticData::s_IntToTwainInfoMap;
+int32_t                     CTL_StaticData::s_nExtImageInfoOffset = 0;
+CTL_StringToConstantMap     CTL_StaticData::s_MapStringToConstant;
+CTL_TwainLongToStringMap    CTL_StaticData::s_MapExtendedImageInfo;
 int                         CTL_StaticData::s_nLoadingError = DTWAIN_NO_ERROR;
 std::unique_ptr<CSimpleIniA>   CTL_StaticData::s_iniInterface;
 bool                         CTL_StaticData::s_bINIFileLoaded = false;
@@ -110,7 +115,6 @@ CTL_PairToStringMap         CTL_StaticData::s_ResourceCache;
 std::string                 CTL_StaticData::s_CurrentResourceKey;
 CTL_GeneralResourceInfo     CTL_StaticData::s_ResourceInfo;
 CTL_PDFMediaMap             CTL_StaticData::s_PDFMediaMap;
-CTL_TwainNameMap            CTL_StaticData::s_TwainNameMap;
 CTL_AvailableFileFormatsMap CTL_StaticData::s_AvailableFileFormatsMap;
 CTL_TwainConstantsMap       CTL_StaticData::s_TwainConstantsMap;
 bool                        CTL_StaticData::s_bCheckHandles = true;
@@ -134,7 +138,7 @@ std::unordered_set<HWND>    CTL_StaticData::s_appWindowsToDisable;
 CTL_CallbackProcArray       CTL_StaticData::s_aAllCallbacks;
 CTL_StringType              CTL_StaticData::s_strLangResourcePath;
 CTL_GeneralErrorInfo        CTL_StaticData::s_mapGeneralErrorInfo;
-long                        CTL_StaticData::s_lErrorFilterFlags = 0;
+long                        CTL_StaticData::s_logFilterFlags = 0;
 UINT_PTR                    CTL_StaticData::s_nTimeoutID = 0;
 bool                        CTL_StaticData::s_bTimerIDSet = false;
 UINT                        CTL_StaticData::s_nTimeoutMilliseconds = 0;
@@ -143,7 +147,7 @@ bool                        CTL_StaticData::s_ResourcesInitialized = false;
 ImageResamplerMap           CTL_StaticData::s_ImageResamplerMap;
 SourceStatusMap             CTL_StaticData::s_SourceStatusMap;
 
-CTL_StringType CTL_StaticData::GetTwainNameFromConstant(int lConstantType, int lTwainConstant)
+std::string CTL_StaticData::GetTwainNameFromConstantA(int lConstantType, int lTwainConstant)
 {
     auto& constantsmap = CTL_StaticData::GetTwainConstantsMap();
     auto iter1 = constantsmap.find(lConstantType);
@@ -152,7 +156,17 @@ CTL_StringType CTL_StaticData::GetTwainNameFromConstant(int lConstantType, int l
     auto iter2 = iter1->second.find(lTwainConstant);
     if (iter2 == iter1->second.end())
         return {};
-    return StringConversion::Convert_Ansi_To_Native(iter2->second);
+    return iter2->second;
+}
+
+CTL_StringType CTL_StaticData::GetTwainNameFromConstant(int lConstantType, int lTwainConstant)
+{
+    return StringConversion::Convert_Ansi_To_Native(CTL_StaticData::GetTwainNameFromConstantA(lConstantType, lTwainConstant));
+}
+
+std::wstring CTL_StaticData::GetTwainNameFromConstantW(int lConstantType, int lTwainConstant)
+{
+    return StringConversion::Convert_Ansi_To_Wide(CTL_StaticData::GetTwainNameFromConstantA(lConstantType, lTwainConstant));
 }
 
 CTL_LongToStringMap* CTL_StaticData::GetLanguageResource(std::string sLang)
@@ -168,28 +182,20 @@ CTL_LongToStringMap* CTL_StaticData::GetCurrentLanguageResource()
     return CTL_StaticData::GetLanguageResource(s_CurrentResourceKey);
 }
 
+
 ///////////////////////////////////////////////////////////////////////////
 void CTL_TwainDLLHandle::NotifyWindows(UINT /*nMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/)
 {
 }
 
-std::string CTL_StaticData::GetTwainNameFromResource(int nWhichResourceID, int nWhichItem)
+std::pair<bool, int32_t> CTL_StaticData::GetIDFromTwainName(std::string sName)
 {
-    auto& name_map = CTL_StaticData::GetTwainNameMap();
-    const auto iter = name_map.Left().find({ nWhichResourceID,nWhichItem });
-    if (iter != name_map.Left().end())
-        return iter->second;
-    return {};
-}
-
-int CTL_StaticData::GetIDFromTwainName(std::string sName)
-{
-    auto& name_map = CTL_StaticData::GetTwainNameMap();
-    StringWrapperA::MakeUpperCase(StringWrapperA::TrimAll(sName));
-    const auto iter = name_map.Right().find(sName);
-    if (iter != name_map.Right().end())
-        return iter->second.second;
-    return{};
+    std::string actualName = StringWrapperA::TrimAll(sName);
+    auto& constantsMap = CTL_StaticData::GetStringToConstantMap();
+    auto iter = constantsMap.find(sName);
+    if (iter != constantsMap.end())
+        return { true, iter->second };
+    return { false, (std::numeric_limits<int32_t>::min)() };
 }
 
 /////////////////////////////////////////////////////////////////////////

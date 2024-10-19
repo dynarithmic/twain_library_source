@@ -18,7 +18,7 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "errorcheck.h"
 #include "ctltmpl5.h"
 #ifdef _MSC_VER
@@ -61,10 +61,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapabili
 
     static constexpr size_t DataTypeArraySize = std::size(DataTypeArray);
     static constexpr size_t ContainerArraySize = std::size(ContainerTypeArray);
-    auto [pHandle, pSource] = VerifyHandles(Source);
-
-    if (!CTL_TwainAppMgr::IsSourceOpen(pSource))
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [] {return true; }, DTWAIN_ERR_SOURCE_NOT_OPEN, nullptr, FUNC_MACRO);
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
 
     DTWAIN_ARRAY outputArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return outputArray == nullptr; }, DTWAIN_ERR_OUT_OF_MEMORY, nullptr, FUNC_MACRO);
@@ -95,11 +92,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapabili
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsCapSupported(DTWAIN_SOURCE Source, LONG lCapability)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCapability))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-
-    // Check if the source is open
-    if (!CTL_TwainAppMgr::IsSourceOpen(pSource))
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [] {return true; }, DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
 
     // Turn off error message box logging for this function
     DTWAINScopedLogControllerExclude sLogger(DTWAIN_LOG_ERRORMSGBOX);
@@ -121,7 +114,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsCapSupported(DTWAIN_SOURCE Source, LONG lCapab
     {
         // Get the cap array values
         const CTL_SourceCapInfo& Info = pHandle->m_aSourceCapInfo[nWhere];
-        CTL_CapInfoArrayPtr pArray = std::get<1>(Info);
+        CTL_CapInfoMapPtr pArray = std::get<1>(Info);
         const CTL_EnumCapability nCap = static_cast<CTL_EnumCapability>(lCapability);
         if (pArray->find(nCap) != pArray->end())
             LOG_FUNC_EXIT_NONAME_PARAMS(true)

@@ -22,96 +22,17 @@
 
 #include "ctliface.h"
 #include "ctltr010.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 
 using namespace dynarithmic;
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 
-TW_UINT16 CTL_ExtImageInfoTriplet::s_AllAttr[] = {
-        DTWAIN_EI_BARCODEX               ,
-        DTWAIN_EI_BARCODEY               ,
-        DTWAIN_EI_BARCODETEXT            ,
-        DTWAIN_EI_BARCODETYPE            ,
-        DTWAIN_EI_DESHADETOP             ,
-        DTWAIN_EI_DESHADELEFT            ,
-        DTWAIN_EI_DESHADEHEIGHT          ,
-        DTWAIN_EI_DESHADEWIDTH           ,
-        DTWAIN_EI_DESHADESIZE            ,
-        DTWAIN_EI_SPECKLESREMOVED        ,
-        DTWAIN_EI_HORZLINEXCOORD         ,
-        DTWAIN_EI_HORZLINEYCOORD         ,
-        DTWAIN_EI_HORZLINELENGTH         ,
-        DTWAIN_EI_HORZLINETHICKNESS      ,
-        DTWAIN_EI_VERTLINEXCOORD         ,
-        DTWAIN_EI_VERTLINEYCOORD         ,
-        DTWAIN_EI_VERTLINELENGTH         ,
-        DTWAIN_EI_VERTLINETHICKNESS      ,
-        DTWAIN_EI_PATCHCODE              ,
-        DTWAIN_EI_ENDORSEDTEXT           ,
-        DTWAIN_EI_FORMCONFIDENCE         ,
-        DTWAIN_EI_FORMTEMPLATEMATCH      ,
-        DTWAIN_EI_FORMTEMPLATEPAGEMATCH  ,
-        DTWAIN_EI_FORMHORZDOCOFFSET      ,
-        DTWAIN_EI_FORMVERTDOCOFFSET      ,
-        DTWAIN_EI_BARCODECOUNT           ,
-        DTWAIN_EI_BARCODECONFIDENCE      ,
-        DTWAIN_EI_BARCODEROTATION        ,
-        DTWAIN_EI_BARCODETEXTLENGTH      ,
-        DTWAIN_EI_DESHADECOUNT           ,
-        DTWAIN_EI_DESHADEBLACKCOUNTOLD   ,
-        DTWAIN_EI_DESHADEBLACKCOUNTNEW   ,
-        DTWAIN_EI_DESHADEBLACKRLMIN      ,
-        DTWAIN_EI_DESHADEBLACKRLMAX      ,
-        DTWAIN_EI_DESHADEWHITECOUNTOLD   ,
-        DTWAIN_EI_DESHADEWHITECOUNTNEW   ,
-        DTWAIN_EI_DESHADEWHITERLMIN      ,
-        DTWAIN_EI_DESHADEWHITERLAVE      ,
-        DTWAIN_EI_DESHADEWHITERLMAX      ,
-        DTWAIN_EI_BLACKSPECKLESREMOVED   ,
-        DTWAIN_EI_WHITESPECKLESREMOVED   ,
-        DTWAIN_EI_HORZLINECOUNT          ,
-        DTWAIN_EI_VERTLINECOUNT          ,
-        DTWAIN_EI_DESKEWSTATUS           ,
-        DTWAIN_EI_SKEWORIGINALANGLE      ,
-        DTWAIN_EI_SKEWFINALANGLE         ,
-        DTWAIN_EI_SKEWCONFIDENCE         ,
-        DTWAIN_EI_SKEWWINDOWX1           ,
-        DTWAIN_EI_SKEWWINDOWY1           ,
-        DTWAIN_EI_SKEWWINDOWX2           ,
-        DTWAIN_EI_SKEWWINDOWY2           ,
-        DTWAIN_EI_SKEWWINDOWX3           ,
-        DTWAIN_EI_SKEWWINDOWY3           ,
-        DTWAIN_EI_SKEWWINDOWX4           ,
-        DTWAIN_EI_SKEWWINDOWY4           ,
-        DTWAIN_EI_BOOKNAME               ,
-        DTWAIN_EI_CHAPTERNUMBER          ,
-        DTWAIN_EI_DOCUMENTNUMBER         ,
-        DTWAIN_EI_PAGENUMBER             ,
-        DTWAIN_EI_CAMERA                 ,
-        DTWAIN_EI_FRAMENUMBER            ,
-        DTWAIN_EI_FRAME                  ,
-        DTWAIN_EI_PIXELFLAVOR            ,
-        DTWAIN_EI_ICCPROFILE             ,
-        DTWAIN_EI_LASTSEGMENT            ,
-        DTWAIN_EI_SEGMENTNUMBER          ,
-        DTWAIN_EI_MAGDATA                ,
-        DTWAIN_EI_MAGTYPE                ,
-        DTWAIN_EI_PAGESIDE               ,
-        DTWAIN_EI_FILESYSTEMSOURCE       ,
-        DTWAIN_EI_IMAGEMERGED            ,
-        DTWAIN_EI_MAGDATALENGTH          ,
-        DTWAIN_EI_PAPERCOUNT             ,
-        DTWAIN_EI_PRINTERTEXT            ,
-        DTWAIN_EI_TWAINDIRECTMETADATA    ,
-        0};
-
-
 CTL_ExtImageInfoTriplet::CTL_ExtImageInfoTriplet(CTL_ITwainSession *pSession,
                                                  CTL_ITwainSource* pSource,
                                                  int nInfo)
-                                               :  CTL_TwainTriplet(), m_pExtImageInfo{},m_memHandle{}, m_nNumInfo{}
+                                               :  CTL_TwainTriplet(), m_pExtImageInfo{},m_memHandle{}, m_nNumInfo{}, m_bRetrievedInfo{}
 {
     InitInfo(pSession, pSource, nInfo);
 }
@@ -121,7 +42,8 @@ void CTL_ExtImageInfoTriplet::swap(CTL_ExtImageInfoTriplet& left, const CTL_ExtI
     left.m_pExtImageInfo = right.m_pExtImageInfo;
     left.m_memHandle = right.m_memHandle;
     left.m_nNumInfo = right.m_nNumInfo;
-    left.m_vInfo = right.m_vInfo;
+    left.m_ExtInfoMap = right.m_ExtInfoMap;
+    left.m_bRetrievedInfo = right.m_bRetrievedInfo;
 }
 
 CTL_ExtImageInfoTriplet::CTL_ExtImageInfoTriplet(CTL_ExtImageInfoTriplet&& rhs) noexcept
@@ -130,7 +52,8 @@ CTL_ExtImageInfoTriplet::CTL_ExtImageInfoTriplet(CTL_ExtImageInfoTriplet&& rhs) 
     rhs.m_pExtImageInfo = nullptr;
     rhs.m_memHandle = {};
     rhs.m_nNumInfo = {};
-    rhs.m_vInfo = {};
+    rhs.m_ExtInfoMap = {};
+    rhs.m_bRetrievedInfo = {};
 }
 
 void CTL_ExtImageInfoTriplet::InitInfo(CTL_ITwainSession *pSession,
@@ -139,33 +62,25 @@ void CTL_ExtImageInfoTriplet::InitInfo(CTL_ITwainSession *pSession,
 {
     SetSessionPtr(pSession);
     SetSourcePtr( pSource );
-
-    // Make sure we have one item
-    if ( nInfo <= 0 )
-        nInfo = 1;
-    m_nNumInfo = nInfo;
-    TW_INFO Info;
-    m_vInfo.resize(0);
-    constexpr size_t NumAttr = std::size(s_AllAttr);
-    size_t i;
-    m_vInfo.reserve(NumAttr);
-    for ( i = 0; i < NumAttr; ++i )
-    {
-        if ( s_AllAttr[i] == 0 )
-            break;
-       memset(&Info, 0, sizeof(TW_INFO));
-       Info.InfoID = s_AllAttr[i];
-       Info.ReturnCode = TWRC_DATANOTAVAILABLE;
-       m_vInfo.push_back(Info);
-    }
-    m_nNumInfo = i;
+    m_ExtInfoMap = CTL_StaticData::GetIntToTwainInfoMap();
+    m_nNumInfo = m_ExtInfoMap.size();
 }
 
 void CTL_ExtImageInfoTriplet::DestroyInfo()
 {
-    if ( !m_pExtImageInfo )
+    if (!m_pExtImageInfo)
         return;
     auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
+    if (!sessionHandle)
+        return;
+
+    // Return if there is no top level TW_EXTIMAGEINFO allocated
+    if (!m_memHandle)
+        return;
+
+    // Use a std::set to gather the handles, since this ensures we will 
+    // not be unlocking and calling free two (or more times) on the same handle.
+    std::set<TW_HANDLE> allocatedHandleSet;
     for (TW_UINT32 i = 0; i < m_pExtImageInfo->NumInfos; i++)
     {
         TW_INFO* pInfo = &m_pExtImageInfo->Info[i];
@@ -174,85 +89,53 @@ void CTL_ExtImageInfoTriplet::DestroyInfo()
             pInfo->ReturnCode == TWRC_DATANOTAVAILABLE)
             continue;
 
-        // Remove the items
-        if (CTL_CapabilityTriplet::GetItemSize(pInfo->ItemType) * pInfo->NumItems > sizeof(TW_HANDLE))
+        // "Remove" the items by adding to the set
+        if (dynarithmic::GetTwainItemSize(pInfo->ItemType) * pInfo->NumItems > sizeof(TW_HANDLE))
         {
-            // Get the data
-            auto h = reinterpret_cast<TW_HANDLE>(pInfo->Item);
-            TW_UINT16 Count = pInfo->NumItems;
-            for (size_t j = 0; j < Count; ++j)
+            TW_HANDLE SubHandle = reinterpret_cast<TW_HANDLE>(pInfo->Item);
+            if (pInfo->ItemType == TWTY_HANDLE)
             {
-                TW_HANDLE TempHandle = nullptr;
-                switch (pInfo->ItemType)
+                // Only "top-level" TWTY_HANDLE's are deallocated by DTWAIN.  If the TWTY_HANDLE points
+                // to a sub-level set of TWTY_HANDLE's that may have been allocated, DTWAIN does not know 
+                // for certain that the handles were actually allocated.  Therefore the application  
+                // using DTWAIN has to process these sub-handles when destroying the TW_EXTIMAGEINFO data.
+                const TW_HANDLE* pHandle = (TW_HANDLE*)sessionHandle->m_TwainMemoryFunc->LockMemory(SubHandle);
+                if (pHandle)
                 {
-                case TWTY_UINT32:
-                    TempHandle = reinterpret_cast<TW_HANDLE>(static_cast<TW_UINTPTR*>(h)[j]);
-                    break;
-
-                case TWTY_UINT16:
-                    TempHandle = reinterpret_cast<TW_HANDLE>(static_cast<TW_UINT16*>(h)[j]);
-                    break;
-
-                case TWTY_STR255:
-                    TempHandle = static_cast<TW_HANDLE>(static_cast<TW_STR255*>(h)[j]);
-                    break;
-
-                case TWTY_FRAME:
-                {
-                    LPCSTR pH = static_cast<LPCSTR>(h)+sizeof(TW_FRAME) * j;
-                    TempHandle = (TW_HANDLE)pH;
-                }
-                break;
-
-                default:
-                {
-                    // Check for text items
-                    if (pInfo->InfoID == DTWAIN_EI_BARCODETEXT)
+                    // Empty, since right now, it is the app that has to figure out what to do with these
+                    // handles.
+                    for (int curHandle = 1; curHandle < pInfo->NumItems; curHandle++)
                     {
-                        // Get the count of characters
-                        LONG CountChars;
-                        bool CountItems = GetItemData(DTWAIN_EI_BARCODECOUNT, DTWAIN_BYID, static_cast<int>(j), &CountChars);
-
-                        // Check if we have the count.  Return if failure
-                        if (!CountItems)
-                            continue;
-
-                        // If this is the first item, then this is easy
-                        if (j == 0)
-                        {
-                            // Copy the characters
-                            TempHandle = reinterpret_cast<TW_HANDLE>(static_cast<TW_UINT8*>(h)[0]);
-                        }
-                        else
-                        {
-                            // If this is the second or later item, need the count for the previous item
-                            size_t HandlePos;
-                            CountItems = GetItemData(DTWAIN_EI_BARCODECOUNT, DTWAIN_BYID, static_cast<int>(j - 1), &HandlePos);
-                            if (!CountItems)
-                                continue;
-                            TempHandle = reinterpret_cast<TW_HANDLE>(static_cast<TW_UINT8*>(h)[HandlePos]);
-                        }
                     }
                 }
-                break;
-                }
-                sessionHandle->m_TwainMemoryFunc->UnlockMemory(TempHandle);
-                sessionHandle->m_TwainMemoryFunc->FreeMemory(TempHandle);
             }
+            // This item can be safely removed by DTWAIN, so add to the allocated handle set
+            allocatedHandleSet.insert(SubHandle);
         }
     }
-    sessionHandle->m_TwainMemoryFunc->UnlockMemory(m_memHandle);
-    sessionHandle->m_TwainMemoryFunc->FreeMemory(m_memHandle);
-}
 
+    // Add the original memory handle for the TW_EXTIMAGEINFO struct to our set of handles to delete
+    allocatedHandleSet.insert(m_memHandle);
+
+    // Delete all the allocated handles
+    std::for_each(allocatedHandleSet.begin(), allocatedHandleSet.end(), [&](TW_HANDLE h)
+        {
+            sessionHandle->m_TwainMemoryFunc->UnlockMemory(h);
+            sessionHandle->m_TwainMemoryFunc->FreeMemory(h);
+        });
+
+    // Set the original handle to null
+    m_memHandle = NULL;
+}
 
 TW_UINT16 CTL_ExtImageInfoTriplet::Execute()
 {
-    if ( !m_vInfo.empty())
+    if (!m_ExtInfoMap.empty())
     {
         CreateExtImageInfo();
         ResolveTypes();
-        TW_UINT16 rc = CTL_TwainTriplet::Execute();
+        const TW_UINT16 rc = CTL_TwainTriplet::Execute();
+        m_bRetrievedInfo = true;
         CopyInfoToVector();
         return rc;
     }
@@ -264,7 +147,7 @@ bool CTL_ExtImageInfoTriplet::CreateExtImageInfo()
     CTL_ITwainSession *pSession = GetSessionPtr();
     CTL_ITwainSource *pSource = GetSourcePtr();
     auto sessionHandle = pSession->GetTwainDLLHandle();
-    const size_t nInfos = m_vInfo.size();
+    const size_t nInfos = m_ExtInfoMap.size();
 
     // Allocate memory for TW_INFO structure
     m_memHandle = sessionHandle->m_TwainMemoryFunc->AllocateMemory(static_cast<TW_UINT32>(sizeof(TW_INFO) * nInfos + sizeof(TW_EXTIMAGEINFO)));
@@ -295,61 +178,32 @@ bool CTL_ExtImageInfoTriplet::CreateExtImageInfo()
 
 void CTL_ExtImageInfoTriplet::ResolveTypes()
 {
-    auto it = m_vInfo.begin();
     int i = 0;
-    while ( it != m_vInfo.end())
+    for (auto& pr : m_ExtInfoMap)
     {
-        if ( (*it).InfoID < CAP_CUSTOMBASE )
-        {
-            switch ((*it).InfoID)
-            {
-                case DTWAIN_EI_BARCODETEXT:
-                    (*it).ItemType = 0;
-                break;
-
-                case DTWAIN_EI_ENDORSEDTEXT:
-                case DTWAIN_EI_FORMTEMPLATEMATCH:
-                case DTWAIN_EI_BOOKNAME:
-                case DTWAIN_EI_CAMERA:
-                    (*it).ItemType = TWTY_STR255;
-                break;
-
-                case DTWAIN_EI_FRAME:
-                    (*it).ItemType = TWTY_FRAME;
-                break;
-
-                case DTWAIN_EI_PIXELFLAVOR:
-                    (*it).ItemType = TWTY_UINT16;
-                break;
-
-                default:
-                    (*it).ItemType = TWTY_UINT32;
-                break;
-            }
-        }
-
         // Set the info within the allocated memory here
-        TW_INFO Info = *it;
-
+        TW_INFO& Info = pr.second;
         memcpy(&m_pExtImageInfo->Info[i], &Info, sizeof(TW_INFO));
-
         // Go to next INFO entry
-        ++it;
         ++i;
     }
 }
 
 void CTL_ExtImageInfoTriplet::CopyInfoToVector()
 {
-    auto it = m_vInfo.begin();
-    int i = 0;
-    while ( it != m_vInfo.end())
-    {
-        memcpy(&m_vInfo[i], &m_pExtImageInfo->Info[i], sizeof(TW_INFO));
+    auto nEntries = m_ExtInfoMap.size();
+    std::set<TW_UINT16> keySeen;
 
-        // Go to next INFO entry
-        ++it;
-        ++i;
+    for (size_t i = 0; i < nEntries; ++i)
+    {
+        auto key = m_pExtImageInfo->Info[i].InfoID;
+        if ( !keySeen.count(key) )
+        {
+            auto iter = m_ExtInfoMap.find(key);
+            if (iter != m_ExtInfoMap.end())
+                iter->second = m_pExtImageInfo->Info[i];
+            keySeen.insert(key);
+        }
     }
 }
 
@@ -365,117 +219,86 @@ CTL_ExtImageInfoTriplet::~CTL_ExtImageInfoTriplet()
     }
 }
 
-bool CTL_ExtImageInfoTriplet::GetItemData(int nWhichItem, int nSearch, int nWhichValue, LPVOID Data, size_t* pItemSize/*=NULL*/) const
+std::pair<bool, int32_t> CTL_ExtImageInfoTriplet::GetItemData(int nWhichItem, int nSearch, int nWhichValue, LPVOID Data, LPVOID* pHandleData, size_t* pItemSize/*=NULL*/) const
 {
-    TW_INFO Info;
+    auto sessionHandle = GetSourcePtr()->GetDTWAINHandle();
+    if (!sessionHandle)
+        return { false, DTWAIN_ERR_BAD_HANDLE };
+
+    TW_INFO Info = {};
 
     // Check if info has been found
     Info = GetInfo(nWhichItem, nSearch);
 
     // Check the number of items
     if ( nWhichValue >= Info.NumItems )
-        return false;
+        return { false, DTWAIN_ERR_INDEX_BOUNDS };
 
     // Go to next item if not really supported
     if (Info.ReturnCode == TWRC_INFONOTSUPPORTED ||
         Info.ReturnCode == TWRC_DATANOTAVAILABLE)
-        return false;
+        return { false, Info.ReturnCode == TWRC_INFONOTSUPPORTED ? DTWAIN_ERR_UNSUPPORTED_EXTINFO : DTWAIN_ERR_UNAVAILABLE_EXTINFO };
 
-    // Check if this is a handle
-    const TW_UINT16 nSize = CTL_CapabilityTriplet::GetItemSize(Info.ItemType);
-    if ( nSize * Info.NumItems > sizeof(TW_HANDLE))
+    const TW_UINT16 nSize = dynarithmic::GetTwainItemSize(Info.ItemType);
+    if (Data && (nSize * Info.NumItems > sizeof(TW_HANDLE)))
     {
-        // Get the data
-        const TW_HANDLE h = reinterpret_cast<TW_HANDLE>(Info.Item);
-        const char *p = static_cast<char*>(h) + nSize * nWhichValue;
-        switch ( Info.ItemType)
+        TW_HANDLE SubHandle = reinterpret_cast<TW_HANDLE>(Info.Item);
+        const TW_HANDLE* pHandle = (TW_HANDLE*)sessionHandle->m_TwainMemoryFunc->LockMemory(SubHandle);
+
+        // Check if this is a handle
+        if (pHandle && Info.ItemType == TWTY_HANDLE)
         {
-            case TWTY_UINT32:
-                if ( Data )
-                    memcpy(Data, p, nSize);
-                if ( pItemSize )
-                    *pItemSize = nSize;
-            break;
-
-            case TWTY_UINT16:
-            {
-                const LONG nValue = static_cast<LONG>(static_cast<TW_UINT16*>(h)[nWhichValue]);
-                if ( Data )
-                    memcpy(Data, &nValue, sizeof(LONG));
-                if ( pItemSize )
-                    *pItemSize = sizeof(LONG);
-            }
-            break;
-
-            case TWTY_STR255:
-                if ( Data )
-                    memcpy(Data, &static_cast<TW_STR255*>(h)[nWhichValue], nSize);
-                if ( pItemSize )
-                    *pItemSize = nSize;
-            break;
-
-            case TWTY_FRAME:
-                if ( Data )
-                    memcpy(Data, &static_cast<TW_FRAME*>(h)[nWhichValue], nSize);
-                if ( pItemSize )
-                    *pItemSize = nSize;
-            break;
-
-            default:
-            {
-                // Check for text items
-                if ( Info.InfoID == DTWAIN_EI_BARCODETEXT )
-                {
-                    // Get the count of characters
-                    LONG Count;
-                    bool CountItems = GetItemData(DTWAIN_EI_BARCODECOUNT, DTWAIN_BYID, nWhichValue, &Count);
-
-                    // Check if we have the count.  Return if failure
-                    if ( !CountItems )
-                        return false;
-
-                    // If this is the first item, then this is easy
-                    if ( nWhichValue == 0 )
-                    {
-                        if ( Data )
-                            // Copy the characters
-                            memcpy(Data, reinterpret_cast<void*>(static_cast<TW_UINT8*>(h)[0]), Count);
-                        if ( pItemSize )
-                            *pItemSize = Count;
-                        return true;
-                    }
-
-                    // If this is the second or later item, need the count for the previous item
-                    LONG HandlePos;
-                    CountItems = GetItemData(DTWAIN_EI_BARCODECOUNT, DTWAIN_BYID, nWhichValue - 1, &HandlePos);
-                    if ( !CountItems )
-                        return false;
-                    if ( Data )
-                        memcpy(Data, reinterpret_cast<void*>(static_cast<TW_UINT8*>(h)[HandlePos]), Count);
-                    if ( pItemSize )
-                        *pItemSize = Count;
-                    return true;
-                }
-            }
+            // Just get the handle and let application figure out to lock this handle
+            // or not.  This is the safest thing to do, given the vagueness of the 
+            // TWAIN specification.
+            HANDLE actualHandle = static_cast<HANDLE*>(SubHandle)[nWhichValue];
+            *pHandleData = actualHandle;
         }
-        return true;
+        else
+        if ( Info.ItemType == TWTY_STR255)
+        {
+            // This needs to be locked to get the data, according to the TWAIN spec.
+            HANDLE actualHandle = static_cast<HANDLE*>(SubHandle)[nWhichValue];
+            char* pActualData = (char*)sessionHandle->m_TwainMemoryFunc->LockMemory(actualHandle);
+            if (pActualData)
+                memcpy(Data, pActualData, nSize);
+            sessionHandle->m_TwainMemoryFunc->UnlockMemory(actualHandle);
+        }
+        else
+        if (pHandle && Info.ItemType == TWTY_FRAME)
+        {
+            TW_FRAME* theFrame = (TW_FRAME*)pHandle;
+            theFrame += nWhichValue;
+            // The Data passed in is a TW_FRAME
+            memcpy(Data, theFrame, sizeof(TW_FRAME)); 
+        }
+        else
+        {
+            // Just "regular" data that doesn't need to be locked.
+            HANDLE actualHandle = static_cast<HANDLE*>(SubHandle)[nWhichValue];
+            memcpy(Data, &actualHandle, nSize);
+        }
+        sessionHandle->m_TwainMemoryFunc->UnlockMemory(SubHandle);
     }
     else
     {
-        if ( Data )
+        if (Info.ItemType == TWTY_HANDLE)
+            // The application has to deal with this
+            *pHandleData = reinterpret_cast<HANDLE>(Info.Item);
+        else
+        // Data that is < sizeof(HANDLE) byte threshold
+        if (Data)
             // just return the item data
             memcpy(Data, &Info.Item, nSize);
-        if ( pItemSize )
-            *pItemSize = nSize;
-        return true;
     }
-    return false;
+    if (pItemSize)
+        *pItemSize = nSize;
+    return { true, DTWAIN_NO_ERROR };
 }
 
 TW_INFO CTL_ExtImageInfoTriplet::GetInfo(size_t nWhich, int nSearch) const
 {
     TW_INFO Info = {};
-    Info.NumItems = static_cast<TW_UINT16>(-1);
     if ( nSearch == DTWAIN_BYPOSITION )
     {
         if ( nWhich >= m_nNumInfo || !m_pExtImageInfo )
@@ -487,11 +310,9 @@ TW_INFO CTL_ExtImageInfoTriplet::GetInfo(size_t nWhich, int nSearch) const
     else
     if ( nSearch == DTWAIN_BYID )
     {
-        for ( size_t i = 0; i < m_nNumInfo; i++ )
-        {
-            if ( m_pExtImageInfo->Info[i].InfoID == nWhich )
-                return m_pExtImageInfo->Info[i];
-        }
+        auto iter = m_ExtInfoMap.find(static_cast<TW_UINT16>(nWhich));
+        if (iter != m_ExtInfoMap.end())
+            return iter->second;
     }
     return Info;
 }
@@ -513,34 +334,32 @@ bool CTL_ExtImageInfoTriplet::IsItemHandle(size_t nWhich) const
 // Alternate
 bool CTL_ExtImageInfoTriplet::AddInfo(TW_INFO Info)
 {
-    m_vInfo.push_back(Info);
+    m_ExtInfoMap.insert({ Info.InfoID, Info });
     return true;
 }
-
-bool CTL_ExtImageInfoTriplet::RetrieveInfo(TWINFOVector &v) const
-{
-    v.clear();
-    v = m_vInfo;
-    return true;
-}
-
 
 // Function assumes that DAT_EXTIMAGEINFO exists for the Source
 bool CTL_ExtImageInfoTriplet::EnumSupported(CTL_ITwainSource *pSource,
                                             CTL_ITwainSession *pSession,
                                             CTL_IntArray &rArray)
 {
+    size_t NumAttr = CTL_StaticData::GetExtendedImageInfoMap().size();
     rArray.clear();
-    constexpr int NumAttr = static_cast<int>(std::size(s_AllAttr));
-    CTL_ExtImageInfoTriplet Trip(pSession, pSource, NumAttr);
-    const TW_UINT16 rc = Trip.Execute();
+
+    TW_UINT16 rc = TWRC_SUCCESS;
+    auto triplet = pSource->GetExtImageInfoTriplet();
+
+    if (!triplet->HasRetrievedInfo())
+    // not retrieved the info yet, so do this.
+        rc = triplet->Execute();
+    
     switch (rc)
     {
         case TWRC_SUCCESS:
         {
-            for ( int i = 0; i < NumAttr && s_AllAttr[i] != 0; i++)
+            for ( size_t i = 0; i < NumAttr; i++)
             {
-                TW_INFO Info = Trip.GetInfo(i, DTWAIN_BYPOSITION);
+                TW_INFO Info = triplet->GetInfo(i, DTWAIN_BYPOSITION);
                 if ( Info.ReturnCode != TWRC_INFONOTSUPPORTED && Info.ReturnCode != TWRC_DATANOTAVAILABLE)
                     rArray.push_back(Info.InfoID);
             }
