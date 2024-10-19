@@ -22,7 +22,7 @@
 #include <sstream>
 #include "winbit32.h"
 #include "ctliface.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "ctlfileutils.h"
 #include "FreeImagePlus.h"
 #include "../cximage/ximage.h"

@@ -22,7 +22,7 @@
 #include "ctltr011.h"
 
 #include "ctliface.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 using namespace dynarithmic;
 CTL_CapabilityGetTriplet::CTL_CapabilityGetTriplet(CTL_ITwainSession* pSession,
                                                     CTL_ITwainSource* pSource,
@@ -53,7 +53,7 @@ CTL_EnumCapability CTL_CapabilityGetTriplet::CapToRetrieve()const
 TW_UINT16 CTL_CapabilityGetTriplet::GetEffectiveItemType(TW_UINT16 curDataType) const
 {
     const TW_UINT16 itemType = GetItemType();
-    if (CTL_StaticData::s_lErrorFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+    if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
     {
         StringStreamA strm;
         strm << "Getting cap value: " << m_gCap << "  requested item type: " << itemType <<

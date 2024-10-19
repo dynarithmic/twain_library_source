@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "cppfunc.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "errorcheck.h"
 #include "ctltr040.h"
 #include "ctltwainmsgloop.h"
@@ -33,7 +33,7 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifyHandles(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     auto pTheSource = pSource;
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return DTWAIN_IsSourceAcquiring(Source); },
     DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);

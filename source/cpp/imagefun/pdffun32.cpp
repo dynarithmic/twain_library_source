@@ -31,7 +31,7 @@
 #include <memory>
 #include <pdflib32.h>
 #include "ctliface.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "ctlfileutils.h"
 #include "dtwain_float_utils.h"
 
@@ -318,7 +318,7 @@ int CPDFImageHandler::InitializePDFPage(const PDFINFO* pPDFInfo, HANDLE bitmap)
         sDimensions = sBuf.str();
         pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_MEDIABOX, sDimensions.c_str());
 
-        if ( CTL_StaticData::s_lErrorFilterFlags )
+        if ( CTL_StaticData::s_logFilterFlags )
         {
             std::string sOut = "PDF Computed media box: ";
             sOut += sDimensions;

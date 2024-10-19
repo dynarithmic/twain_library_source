@@ -21,11 +21,11 @@
 #include "ctltr008.h"
 #include "ctltr027.h"
 #include "ctltr034.h"
-#include "ctltwses.h"
-#include <ctltwsrc.h>
+#include "ctltwainsession.h"
+#include <ctltwainsource.h>
 
 #include "ctliface.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 
 using namespace dynarithmic;
 
@@ -98,7 +98,7 @@ TW_UINT16 CTL_ProcessEventTriplet::ExecuteEventHandler()
             if (iter->second.m_CurrentCount >= iter->second.m_MaxThreshold)
             {
                 // ran out of messages, so close the UI 
-                CloseUI(pSource);
+                CloseUI();
             }
         }
     }
@@ -180,18 +180,7 @@ TW_UINT16 CTL_ProcessEventTriplet::ExecuteEventHandler()
                                                                              reinterpret_cast<LPARAM>(pSource))?true:false;
                 if ( !bContinue )
                 {
-                    // Transfer aborted by callback
-                    ResetTransfer();
-
-                    // Send a message to close things down if
-                    // there was no user interface chosen
-                    if ( !pSource->IsUIOpenOnAcquire() )
-                        CTL_TwainAppMgr::EndTwainUI(pSession, pSource);
-
-                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
-                                                          nullptr,
-                                                          DTWAIN_TN_TRANSFERCANCELLED,
-                                                          reinterpret_cast<LPARAM>(pSource));
+                    ResetAndCloseUI();
                     bPending = 0;
                 }
                 else
@@ -203,8 +192,19 @@ TW_UINT16 CTL_ProcessEventTriplet::ExecuteEventHandler()
                     else
                         bNextAttemptIsRetry = true;
                 }
+
+                // Something happened to require a shutdown of the current
+                // acquisition
+                if (pSource->IsShutdownAcquire())
+                {
+                    ResetAndCloseUI();
+                    bPending = 0;
+                }
             }
-            pSource->SetState(SOURCE_STATE_UIENABLED);
+            if (bPending != 0)
+                pSource->SetState(SOURCE_STATE_UIENABLED);
+            else
+                pSource->SetState(SOURCE_STATE_OPENED);
             if ( !pSource->GetTransferDone() && nCount <= 1 )
             {
                 CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
@@ -230,13 +230,13 @@ TW_UINT16 CTL_ProcessEventTriplet::ExecuteEventHandler()
             if (iter != user_map.end())
                 iter->second.m_bSeenUIClose = true;
             else
-                CloseUI(pSource);
+                CloseUI();
         }
         break;
 
         // Possible device event
         case MSG_DEVICEEVENT:
-            DeviceEvent(pSource);
+            DeviceEvent();
         break;
 
         case MSG_NULL:
@@ -248,7 +248,7 @@ TW_UINT16 CTL_ProcessEventTriplet::ExecuteEventHandler()
     {
         // If we have seen both the transfer ready and close, then close the UI
         if (iter->second.m_bSeenXferReady && iter->second.m_bSeenUIClose)
-            CloseUI(pSource);
+            CloseUI();
     }
     return rc;
 }
@@ -276,16 +276,38 @@ bool CTL_ProcessEventTriplet::ResetTransfer(TW_UINT16 Msg/*=MSG_RESET*/)
     return false;
 }
 
-void CTL_ProcessEventTriplet::CloseUI(CTL_ITwainSource* pSource)
+void CTL_ProcessEventTriplet::CloseUI()
 {
+    CTL_ITwainSource* pSource = GetSourcePtr();
     // The source UI must be closed
     CTL_TwainAppMgr::EndTwainUI(pSource->GetTwainSession(), pSource);
 }
 
-void CTL_ProcessEventTriplet::DeviceEvent(CTL_ITwainSource* pSource)
+void CTL_ProcessEventTriplet::ResetAndCloseUI()
+{
+    CTL_ITwainSource* pSource = GetSourcePtr();
+    CTL_ITwainSession* pSession = GetSessionPtr();
+
+    // Transfer aborted
+    ResetTransfer();
+
+    // Send a message to close things down if
+    // there was no user interface chosen
+    if (!pSource->IsUIOpenOnAcquire())
+        CTL_TwainAppMgr::EndTwainUI(pSession, pSource);
+
+    CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
+                                        nullptr,
+                                        DTWAIN_TN_TRANSFERCANCELLED,
+                                        reinterpret_cast<LPARAM>(pSource));
+    CloseUI();
+}
+
+void CTL_ProcessEventTriplet::DeviceEvent()
 {
     // Some dude has changed something on the device!!
     // Get the change
+    auto* pSource = GetSourcePtr();
     auto pSession = pSource->GetTwainSession();
     CTL_DeviceEventTriplet DevTrip(pSession, pSource);
     DevTrip.Execute();

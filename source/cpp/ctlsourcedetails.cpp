@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "../nlohmann/json.hpp"
@@ -123,10 +123,10 @@ static void create_stream_from_strings(std::stringstream& strm, DTWAIN_SOURCE So
 
 static std::string get_source_file_types(DTWAIN_SOURCE Source)
 {
-    using sourceMapType = std::unordered_map<LONG, std::string>;
-    static sourceMapType source_map =
+    using sourceMapType = std::array<std::pair<LONG, const char*>, 28>;
+    static constexpr sourceMapType source_map =
     {
-        {DTWAIN_FF_BMP,"\"bmp1_mode2\""},
+        {{DTWAIN_FF_BMP,"\"bmp1_mode2\""},
         {DTWAIN_FF_BMP,"\"bmp2_mode2\""},
         {DTWAIN_FF_BMP,"\"bmp3_mode2\""},
         {DTWAIN_FF_BMP,"\"bmp4_mode2\""},
@@ -153,11 +153,11 @@ static std::string get_source_file_types(DTWAIN_SOURCE Source)
         {DTWAIN_FF_TIFF,"\"tiff7_mode2\""},
         {DTWAIN_FF_TIFF,"\"tiff8_mode2\""},
         {DTWAIN_FF_TIFF,"\"tiff9_mode2\""},
-        {DTWAIN_FF_XBM,"\"xbm_mode2\""}
+        {DTWAIN_FF_XBM,"\"xbm_mode2\""}}
     };
 
     static sourceMapType tiffMap =
-    {
+    { {
         {TWCP_NONE,"\"tiff1_mode2\""},
         {TWCP_GROUP31D,"\"tiff2_mode2\""},
         {TWCP_GROUP31DEOL,"\"tiff3_mode2\""},
@@ -166,25 +166,29 @@ static std::string get_source_file_types(DTWAIN_SOURCE Source)
         {TWCP_JPEG,"\"tiff6_mode2\""},
         {TWCP_LZW,"\"tiff7_mode2\""},
         {TWCP_JBIG,"\"tiff8_mode2\""},
-        {TWCP_ZIP,"\"tiff9_mode2\""}
+        {TWCP_ZIP,"\"tiff9_mode2\""}}
     };
 
     static sourceMapType bmpMap =
-    {
+    { {
         {TWCP_NONE,"\"bmp1_mode2\""},
         {TWCP_RLE4,"\"bmp2_mode2\""},
         {TWCP_RLE8,"\"bmp3_mode2\""},
-        {TWCP_BITFIELDS,"\"bmp4_mode2\""}
+        {TWCP_BITFIELDS,"\"bmp4_mode2\""}}
     };
 
     static sourceMapType spiffMap =
-    {
+    { {
         {TWCP_JPEG, "\"spiff1_mode2\""},
-        {TWCP_JBIG, "\"spiff2_mode2\""}
+        {TWCP_JBIG, "\"spiff2_mode2\""}}
     };
 
-    std::map<LONG, const sourceMapType*> compToMap =
-    { {TWFF_TIFF, &tiffMap}, {TWFF_BMP, &bmpMap}, {TWFF_SPIFF, &spiffMap} };
+    static const std::array<std::pair<LONG, sourceMapType*>, 3> compToMap =
+    { {
+        {TWFF_TIFF, &tiffMap},
+        {TWFF_BMP, &bmpMap},
+        {TWFF_SPIFF, &spiffMap}
+    } };
 
     struct resetAll
     {
@@ -251,26 +255,26 @@ static std::string get_source_file_types(DTWAIN_SOURCE Source)
                 for (auto fformat : vFileFormats) 
                 {
                     tempBuffer[0] = fformat;
-                    auto compIter = compToMap.find(fformat);
-                    if (compIter != compToMap.end())
+                    auto compIter = dynarithmic::generic_array_finder_if(compToMap, [&](const auto& pr) { return pr.first == fformat; });
+                    if (compIter.first)
                     {
-                        const std::unordered_map<LONG, std::string>* ptr = compIter->second;
+                        const sourceMapType* ptr = compToMap[compIter.second].second;
                         DTWAIN_SetCapValues(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPSET, tempArray);
                         auto tempCompression = DTWAIN_EnumCompressionTypesEx(Source);
                         DTWAINArrayPtr_RAII raii5(pHandle, &tempCompression);
                         auto& compressBuf = pHandle->m_ArrayFactory->underlying_container_t<LONG>(tempCompression);
                         for (auto comp : compressBuf )
                         {
-                            auto iter = ptr->find(comp);
-                            if (iter != ptr->end())
-                                returnFileTypes.push_back(iter->second);
+                            auto iter = dynarithmic::generic_array_finder_if(*ptr, [&](const auto& pr) { return pr.first == comp; });
+                            if (iter.first)
+                                returnFileTypes.push_back((*ptr)[iter.second].second);
                         }
                     }
                     else
                     {
-                        auto sourceIter = source_map.find(fformat);
-                        if (sourceIter != source_map.end())
-                            returnFileTypes.push_back(sourceIter->second);
+                        auto sourceIter = dynarithmic::generic_array_finder_if(source_map, [&](const auto& pr) { return pr.first == fformat; });
+                        if (sourceIter.first)
+                            returnFileTypes.push_back(source_map[sourceIter.second].second);
                     }
                 }
                 return join_string(returnFileTypes.begin(), returnFileTypes.end());
@@ -487,6 +491,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
     std::vector<capabilityInfo> vCapabilityInfo;
 
     json glob_json;
+    glob_json["dtwain-version"] = DTWAIN_VERINFO_FILEVERSION;
     glob_json["session-twain-identity"] = json::parse(CTL_TwainIdentity(ts.GetAppIDPtr()).to_json());
     glob_json["device-count"] = allSources.size();
     json array_twain_identity;
@@ -495,7 +500,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
     glob_json["device-names"] = sNames;
     std::string jsonString;
     std::array<std::string,13> imageInfoString;
-    std::array<std::string,10> deviceInfoString;
+    std::array<std::string,11> deviceInfoString;
 
     struct CloserRAII
     {
@@ -542,7 +547,8 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
         deviceInfoString[6] = "\"duplex-supported\":false";
         deviceInfoString[7] = "\"jobcontrol-supported\":false";
         deviceInfoString[8] = "\"transparencyunit-supported\":false";
-        deviceInfoString[9] = "\"filesystem-supported\":false";
+        deviceInfoString[9] = "\"extendedimageinfo-supported\":false"; 
+        deviceInfoString[10] = "\"filesystem-supported\":false";
         bool devOpen[] = { false, false };
 
         // Check if we need to select and open the source to see
@@ -788,11 +794,11 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     imageInfoString[12] = tempStrm.str();
 
                     strm.str("");
-                    std::array<int, 10> deviceInfoCaps = { CAP_FEEDERENABLED, CAP_FEEDERLOADED, CAP_UICONTROLLABLE,
+                    std::array<int, 11> deviceInfoCaps = { CAP_FEEDERENABLED, CAP_FEEDERLOADED, CAP_UICONTROLLABLE,
                                                           ICAP_AUTOBRIGHT, ICAP_AUTOMATICDESKEW,
-                                                          CAP_PRINTER, CAP_DUPLEX, CAP_JOBCONTROL, ICAP_LIGHTPATH, 0};
+                                                          CAP_PRINTER, CAP_DUPLEX, CAP_JOBCONTROL, ICAP_EXTIMAGEINFO, ICAP_LIGHTPATH, 0};
 
-                    std::array<std::string, 10> deviceInfoCapsStr; 
+                    std::array<std::string, 11> deviceInfoCapsStr; 
                     std::copy(deviceInfoString.begin(), deviceInfoString.end(), deviceInfoCapsStr.begin());
                     for (auto& s : deviceInfoCapsStr)
                         s.resize(s.size() - 5);
@@ -801,14 +807,14 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         if (curDevice > 0)
                             strm << ",";
                         bool value = false;
+                        if (deviceInfoCaps[curDevice] == ICAP_EXTIMAGEINFO)
+                            value = DTWAIN_IsExtImageInfoSupported(pCurrentSourcePtr) ? true : false;
+                        else
                         if (deviceInfoCaps[curDevice] == CAP_FEEDERENABLED)
                             value = DTWAIN_IsFeederSupported(pCurrentSourcePtr) ? true : false;
                         else
                         if (deviceInfoCaps[curDevice] == CAP_UICONTROLLABLE)
-                        {
-                            auto vValue = DTWAIN_IsUIControllable(pCurrentSourcePtr) ? true : false;
-                            value = vValue;
-                        }
+                            value = DTWAIN_IsUIControllable(pCurrentSourcePtr) ? true : false;
                         else
                         if (deviceInfoCaps[curDevice] == CAP_PRINTER)
                         {
@@ -882,7 +888,8 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     deviceInfoString[6] = "\"duplex-supported\":\"" + sStatus + "\""; 
                     deviceInfoString[7] = "\"jobcontrol-supported\":\"" + sStatus + "\""; 
                     deviceInfoString[8] = "\"transparencyunit-supported\":\"" + sStatus + "\""; 
-                    deviceInfoString[9] = "\"filesystem-supported\":\"" + sStatus + "\"";
+                    deviceInfoString[9] = "\"extendedimageinfo-supported\":\"" + sStatus + "\"";
+                    deviceInfoString[10] = "\"filesystem-supported\":\"" + sStatus + "\"";
                 }
                 std::string partString = "\"device-name\":\"" + curSource + "\",";
                 std::string strStatus;

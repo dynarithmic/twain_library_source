@@ -18,7 +18,7 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "sourceacquireopts.h"
 #include "ctltr040.h"
 #include "ctltwainmsgloop.h"
@@ -64,6 +64,8 @@ std::pair<bool, DTWAIN_ACQUIRE> dynarithmic::StartModalMessageLoop(DTWAIN_SOURCE
     pImpl->PrepareLoop();
     pImpl->SetAcquireOptions(opts);
     pImpl->PerformMessageLoop(pSource, opts.getIsUIOnly());
+    if (pSource->IsShutdownAcquire())
+        return { false, -1 };
     return { true, pImpl->GetAcquireNum() };
 }
 
@@ -76,6 +78,8 @@ bool TwainMessageLoopImpl::IsSourceOpen(CTL_ITwainSource* pSource, bool bUIOnly)
 
 bool TwainMessageLoopImpl::IsAcquireTerminated(CTL_ITwainSource* pSource, bool bUIOnly)
 {
+    if (pSource->IsShutdownAcquire())
+        return true;
     if (bUIOnly)
         return !pSource->IsUIOpen();
     return !IsSourceOpen(pSource, bUIOnly);

@@ -22,7 +22,7 @@
 #define CTLTR010_H
 
 #include "ctltrp.h"
-#include "ctltwses.h"
+#include "ctltwainsession.h"
 #include "ctlobtyp.h"
 namespace dynarithmic
 {
@@ -40,7 +40,6 @@ namespace dynarithmic
             bool            IsTesting() const;
             bool            IsFindDefaultItemType() const { return m_bGetDefaultType; }
             void            SetFindDefaultItemType(bool bSet) { m_bGetDefaultType = bSet; }
-            static TW_UINT16 GetItemSize( TW_UINT16 nTwainItem );
             bool            IsCapabilitySupported();
             virtual bool    IsSupported();
             TW_UINT16       GetItemType() const { return m_nItemType; }

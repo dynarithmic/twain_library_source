@@ -22,15 +22,17 @@
 #define ARRAYFACTORY_H
 
 #include <vector>
+#include <array>
 #include <memory>
 #include <functional>
 #include <string>
 #include <unordered_map>
 #include <algorithm>
 #include <stdexcept>
-
+#include <boost/container/flat_map.hpp>
 #include "twainframe.h"
 #include "twainfix32.h"
+#include "ctlconstexprfind.h"
 
 namespace dynarithmic
 {
@@ -94,6 +96,8 @@ namespace dynarithmic
             void push_back_ptr(T value) { vData.push_back(value); }
         };
 
+        #define FNMAPTYPE boost::container::flat_map
+
         using tagged_array_long = tagged_array<LONG>;
         using tagged_array_double = tagged_array<double>;
         using tagged_array_string = tagged_array<std::string>;
@@ -105,39 +109,39 @@ namespace dynarithmic
         using tagged_array_twframe = tagged_array<TW_FRAME>;
         using tagged_array_fix32 = tagged_array<TW_FIX32Ex>;
         using tagged_array_long64 = tagged_array<LONG64>;
-
+        
         using voidAddFn = std::function<void(arrayTag*, std::size_t, void*)>;
-        using voidAddFnMap = std::unordered_map<int, voidAddFn>;
+        using voidAddFnMap = FNMAPTYPE<int, voidAddFn>;
 
         using voidGetFn = std::function<void*(arrayTag*, std::size_t, void*)>;
-        using voidGetFnMap = std::unordered_map<int, voidGetFn>;
+        using voidGetFnMap = FNMAPTYPE<int, voidGetFn>;
 
         using voidFindFn = std::function<std::size_t(arrayTag*, void*, double)>;
-        using voidFindFnMap = std::unordered_map<int, voidFindFn>;
+        using voidFindFnMap = FNMAPTYPE<int, voidFindFn>;
 
         using voidInserterFn = std::function<void(arrayTag*, std::size_t, std::size_t, void*)>;
-        using voidInserterFnMap = std::unordered_map<int, voidInserterFn>;
+        using voidInserterFnMap = FNMAPTYPE<int, voidInserterFn>;
 
         using voidCopierFn = std::function<void(arrayTag*, arrayTag*)>;
-        using voidCopierFnMap = std::unordered_map<int, voidCopierFn>;
+        using voidCopierFnMap = FNMAPTYPE<int, voidCopierFn>;
 
         using voidRemoverFn = std::function<void(arrayTag*, std::size_t, std::size_t)>;
-        using voidRemoverFnMap = std::unordered_map<int, voidRemoverFn>;
+        using voidRemoverFnMap = FNMAPTYPE<int, voidRemoverFn>;
 
         using voidClearerFn = std::function<void(arrayTag*)>;
-        using voidClearerFnMap = std::unordered_map<int, voidClearerFn>;
+        using voidClearerFnMap = FNMAPTYPE<int, voidClearerFn>;
 
         using voidResizerFn = std::function<void(arrayTag*, std::size_t)>;
-        using voidResizerFnMap = std::unordered_map<int, voidResizerFn>;
+        using voidResizerFnMap = FNMAPTYPE<int, voidResizerFn>;
 
         using intCounterFn = std::function<std::size_t(arrayTag*)>;
-        using intCounterFnMap = std::unordered_map<int, intCounterFn>;
+        using intCounterFnMap = FNMAPTYPE<int, intCounterFn>;
 
         using voidSetterFn = std::function<void(arrayTag*, std::size_t, void* value)>;
-        using voidSetterFnMap = std::unordered_map<int, voidSetterFn>;
+        using voidSetterFnMap = FNMAPTYPE<int, voidSetterFn>;
 
         using voidGetBufferFn = std::function<void*(arrayTag*, std::size_t)>;
-        using voidGetBufferFnMap = std::unordered_map<int, voidGetBufferFn>;
+        using voidGetBufferFnMap = FNMAPTYPE<int, voidGetBufferFn>;
 
         template <typename T>
         auto& underlying_container_t(arrayTag* pTag) const
@@ -381,7 +385,7 @@ namespace dynarithmic
         }
 
     private:
-        std::unordered_map <arrayTag*, std::pair<int, std::shared_ptr<arrayTag>>> m_tagMap;
+        FNMAPTYPE<arrayTag*, std::pair<int, std::shared_ptr<arrayTag>>> m_tagMap;
         voidAddFnMap m_vfnAddMap;
         voidGetFnMap m_vfnGetMap;
         voidFindFnMap m_vfnFindMap;
@@ -418,9 +422,6 @@ namespace dynarithmic
 
         void destroy(arrayTag* pTag);
         void destroy(void* pTag) { destroy(from_void(pTag)); }
-
-        static int arraytype_to_tagtype(CTL_ArrayType ArrayType);
-        static CTL_ArrayType tagtype_to_arraytype(int tag);
 
         void copy(arrayTag* pTagDest, arrayTag* pTagSource);
         void copy(void * pTagDest, void* pTagSource) { return copy(from_void(pTagDest), from_void(pTagSource)); }
@@ -466,6 +467,50 @@ namespace dynarithmic
         bool is_frame_valid(const void *frame) const;
         void destroy_frame(arrayTag *frame);
         void destroy_frame(void* frame) { destroy_frame(from_void(frame)); }
+
+        static constexpr int arraytype_to_tagtype(CTL_ArrayType arrayType)
+        {
+            constexpr std::array<std::pair<CTL_ArrayType, int>, 12> mapArrayTypeToTag =
+            { {
+                {CTL_ArrayIntType, arrayTag::LongType},
+                {CTL_ArrayInt64Type, arrayTag::Long64Type},
+                {CTL_ArrayDoubleType, arrayTag::DoubleType},
+                {CTL_ArrayHandleType,arrayTag::VoidPtrType},
+                {CTL_ArrayPtrType, arrayTag::VoidPtrType},
+                {CTL_ArrayANSIStringType, arrayTag::StringType},
+                {CTL_ArrayWideStringType, arrayTag::WStringType},
+                {CTL_ArrayDTWAINFrameType, arrayTag::FrameType},
+                {CTL_ArrayTWFIX32Type, arrayTag::Fix32Type},
+                {CTL_ArraySourceType, arrayTag::SourceType},
+                {CTL_ArrayToHandleArray, arrayTag::ArrayOfArrayOfVoidPtrType},
+                {CTL_ArrayFrameSingleType, arrayTag::FrameSingleType} } };
+            auto iter = dynarithmic::generic_array_finder_if(mapArrayTypeToTag, [&](const auto& pr) { return pr.first == arrayType; });
+            if (iter.first)
+                return mapArrayTypeToTag[iter.second].second;
+            return arrayTag::UnknownType;
+        }
+
+        static constexpr CTL_ArrayType tagtype_to_arraytype(int tag)
+        {
+            constexpr std::array<std::pair<int, CTL_ArrayType>, 12> mapTagToArrayType = { {
+                {arrayTag::LongType,                            CTL_ArrayIntType},
+                {arrayTag::Long64Type,                          CTL_ArrayInt64Type},
+                {arrayTag::DoubleType,                          CTL_ArrayDoubleType},
+                {arrayTag::VoidPtrType,                         CTL_ArrayHandleType},
+                {arrayTag::VoidPtrType,                         CTL_ArrayPtrType},
+                {arrayTag::StringType,                          CTL_ArrayANSIStringType},
+                {arrayTag::WStringType,                         CTL_ArrayWideStringType},
+                {arrayTag::FrameType,                           CTL_ArrayDTWAINFrameType},
+                {arrayTag::Fix32Type,                           CTL_ArrayTWFIX32Type},
+                {arrayTag::SourceType,                          CTL_ArraySourceType},
+                {arrayTag::ArrayOfArrayOfVoidPtrType,           CTL_ArrayToHandleArray},
+                {arrayTag::FrameSingleType,                     CTL_ArrayFrameSingleType} } };
+
+            auto iter = dynarithmic::generic_array_finder_if(mapTagToArrayType, [&](const auto& pr) { return pr.first == tag; });
+            if (iter.first)
+                return mapTagToArrayType[iter.second].second;
+            return CTL_ArrayInvalid;
+        }
     };
 }
 #endif

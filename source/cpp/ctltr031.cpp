@@ -20,7 +20,7 @@
  */
 #include "ctltr031.h"
 #include "ctltr027.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "imagexferfilewriter.h"
 #include "ctldib.h"
 #include "dtwain.h"
@@ -454,7 +454,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                             if (bKeepPage2 )
                             {
                                 // Check if multi page file is being used
-                                const bool bIsMultiPageFile = CTL_ITwainSource::IsFileTypeMultiPage(pSource->GetAcquireFileType());
+                                const bool bIsMultiPageFile = dynarithmic::IsFileTypeMultiPage(pSource->GetAcquireFileType());
                                 int nMultiStage = 0;
                                 if ( bIsMultiPageFile || pSource->IsMultiPageModeSaveAtEnd())
                                 {

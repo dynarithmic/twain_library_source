@@ -25,7 +25,7 @@
 #include <boost/format.hpp>
 
 #include "cppfunc.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "ctltrall.h"
 #include "ctltmpl5.h"
 #include "errorcheck.h"
@@ -304,6 +304,8 @@ DTWAIN_ARRAY dynarithmic::CreateArrayFromFactory(CTL_TwainDLLHandle* pHandle, LO
         default:;
     }
     int dummy = 0;
+    if (nEnumType == DTWAIN_ARRAYFRAME)
+        return pHandle->m_ArrayFactory->create_frame(0,0,0,0);
     return pHandle->m_ArrayFactory->create_array(static_cast<CTL_ArrayType>(nEnumType), &dummy, nInitialSize);
 }
 
@@ -371,6 +373,26 @@ DTWAIN_ARRAY dynarithmic::CreateArrayFromCap(CTL_TwainDLLHandle* pHandle, CTL_IT
     if (lType == DTWAIN_FAILURE1)
         return nullptr;
     return CreateArrayFromFactory(pHandle, lType, lSize);
+}
+
+bool dynarithmic::AssignArray(CTL_TwainDLLHandle* pHandle, LPDTWAIN_ARRAY aDestination, LPDTWAIN_ARRAY aSource)
+{
+    // We clear the user array here, since we do not want to 
+    // report information back to user if capability is not supported
+    bool bSourceArrayExists = pHandle->m_ArrayFactory->is_valid(*aSource);
+    if (!bSourceArrayExists)
+        return false;
+
+    bool bDestinationArrayExists = pHandle->m_ArrayFactory->is_valid(*aDestination);
+    if (bDestinationArrayExists && (*aDestination == *aSource))
+        return true;
+
+    if (bDestinationArrayExists)
+        pHandle->m_ArrayFactory->destroy(*aDestination);
+
+    *aDestination = *aSource;
+    *aSource = nullptr;
+    return true;
 }
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayCreateFromCap(DTWAIN_SOURCE Source, LONG lCapType, LONG lSize)
@@ -837,6 +859,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetSourceAt(DTWAIN_ARRAY pArray, LONG nWher
     CATCH_BLOCK(false)
 }
 
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtSource(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_SOURCE* ppSource)
+{
+    LOG_FUNC_ENTRY_PARAMS((pArray, nWhere, ppSource))
+    LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_ArrayGetSourceAt(pArray, nWhere, ppSource))
+    CATCH_BLOCK(false)
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAt( DTWAIN_ARRAY pArray, LONG nWhere, LPVOID pVariant)
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, nWhere, pVariant))
@@ -851,7 +880,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAt( DTWAIN_ARRAY pArray, LONG nWhere, LP
     const auto& factory = pHandle->m_ArrayFactory; 
 
     // Do something special for strings
-    DTWAIN_BOOL bRet = FALSE;
+    DTWAIN_BOOL bRet = TRUE;
     switch (factory->tag_type(pArray))
     {
         case CTL_ArrayFactory::arrayTag::WStringType:
@@ -866,6 +895,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAt( DTWAIN_ARRAY pArray, LONG nWhere, LP
         {
             auto pTheSource = static_cast<CTL_ITwainSource **>(pVariant);
             *pTheSource = static_cast<CTL_ITwainSource*>(factory->get_value(pArray, nWhere, pVariant));
+        }
+        break;
+        case CTL_ArrayFactory::arrayTag::VoidPtrType:
+        {
+            auto pTheData = static_cast<void**>(pVariant);
+            *pTheData = factory->get_value(pArray, nWhere, pVariant);
         }
         break;
         default:
@@ -2015,8 +2050,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetAll(DTWAIN_FRAME Frame,DTWAIN_FLOAT Left
     bool frameValid = DTWAIN_FrameIsValid(Frame);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !frameValid; },
                                       DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
-    auto& pPtr = *static_cast<TwainFrameInternal*>(Frame);
-    pPtr = TwainFrameInternal(Left, Top, Right, Bottom);
+    auto& vOne = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(Frame);
+    auto& pPtr = vOne.front();
+    pPtr.SetFrame(Left, Top, Right, Bottom);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -2050,8 +2086,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetValue(DTWAIN_FRAME Frame, LONG nWhich, L
                                       DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
     const bool bCheck = TwainFrameInternal::IsValidComponent(nWhich);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !bCheck;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-    auto pPtr = static_cast<TwainFrameInternal*>(Frame);
-    *Value = pPtr->m_FrameComponent[nWhich];
+    auto& vOne = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(Frame);
+    auto& pPtr = vOne.front();
+    *Value = pPtr.m_FrameComponent[nWhich];
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -2065,8 +2102,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetValue(DTWAIN_FRAME Frame, LONG nWhich, D
                                       DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
     const bool bCheck = TwainFrameInternal::IsValidComponent(nWhich);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !bCheck;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-    auto pPtr = static_cast<TwainFrameInternal*>(Frame);
-    pPtr->m_FrameComponent[nWhich] = Value;
+    auto& vOne = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(Frame);
+    auto& pPtr = vOne.front();
+    pPtr.m_FrameComponent[nWhich] = Value;
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }

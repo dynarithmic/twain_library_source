@@ -26,7 +26,7 @@
 #include "ctlreg.h"
 
 #include "ctliface.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "ctlobstr.h"
 #include "../simpleini/simpleini.h"
 #undef min

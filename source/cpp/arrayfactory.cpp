@@ -399,48 +399,4 @@ namespace dynarithmic
     {
         destroy(frame);
     }
-
-    int CTL_ArrayFactory::arraytype_to_tagtype(CTL_ArrayType arrayType)
-    {
-        static std::unordered_map<CTL_ArrayType, int> mapArrayTypeToTag = {
-            {CTL_ArrayIntType, arrayTag::LongType},
-            {CTL_ArrayInt64Type, arrayTag::Long64Type},
-            {CTL_ArrayDoubleType, arrayTag::DoubleType},
-            {CTL_ArrayHandleType,arrayTag::VoidPtrType},
-            {CTL_ArrayPtrType, arrayTag::VoidPtrType},
-            {CTL_ArrayANSIStringType, arrayTag::StringType},
-            {CTL_ArrayWideStringType, arrayTag::WStringType},
-            {CTL_ArrayDTWAINFrameType, arrayTag::FrameType},
-            {CTL_ArrayTWFIX32Type, arrayTag::Fix32Type},
-            {CTL_ArraySourceType, arrayTag::SourceType},
-            {CTL_ArrayToHandleArray, arrayTag::ArrayOfArrayOfVoidPtrType},
-            {CTL_ArrayFrameSingleType, arrayTag::FrameSingleType} };
-
-        const auto iter = mapArrayTypeToTag.find(arrayType);
-        if (iter != mapArrayTypeToTag.end())
-            return iter->second;
-        return arrayTag::UnknownType;
-    }
-
-    CTL_ArrayType CTL_ArrayFactory::tagtype_to_arraytype(int tag)
-    {
-        static std::unordered_map<int, CTL_ArrayType> mapTagToArrayType = {
-            {arrayTag::LongType,                            CTL_ArrayIntType},
-            {arrayTag::Long64Type,                          CTL_ArrayInt64Type},
-            {arrayTag::DoubleType,                          CTL_ArrayDoubleType},
-            {arrayTag::VoidPtrType,                         CTL_ArrayHandleType},
-            {arrayTag::VoidPtrType,                         CTL_ArrayPtrType},
-            {arrayTag::StringType,                          CTL_ArrayANSIStringType},
-            {arrayTag::WStringType,                         CTL_ArrayWideStringType},
-            {arrayTag::FrameType,                           CTL_ArrayDTWAINFrameType},
-            {arrayTag::Fix32Type,                           CTL_ArrayTWFIX32Type},
-            {arrayTag::SourceType,                          CTL_ArraySourceType},
-            {arrayTag::ArrayOfArrayOfVoidPtrType,           CTL_ArrayToHandleArray},
-            {arrayTag::FrameSingleType,                     CTL_ArrayFrameSingleType} };
-
-        const auto iter = mapTagToArrayType.find(tag);
-        if (iter != mapTagToArrayType.end())
-            return iter->second;
-        return CTL_ArrayInvalid;
-    }
 }

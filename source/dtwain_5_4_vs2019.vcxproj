@@ -1163,10 +1163,6 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include=".\cpp\imagexferfilewriter.cpp" />
     <ClCompile Include=".\dtwinver\Dtwinver.cpp" />
     <ClCompile Include=".\dtwinver\Getwinver.cpp" />
-    <ClCompile Include=".\cpp\ctltwmgr.cpp" />
-    <ClCompile Include=".\cpp\ctltwses.cpp" />
-    <ClCompile Include=".\cpp\ctltwsrc.cpp" />
-    <ClCompile Include=".\cpp\ctlwproc.cpp" />
     <ClCompile Include=".\cpp\ctlflog.cpp" />
     <ClCompile Include=".\cpp\errstruc.cpp" />
     <ClCompile Include=".\cpp\logmsg.cpp">
@@ -1234,10 +1230,12 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include="cpp\ctlerrorbuffer.cpp" />
     <ClCompile Include="cpp\ctlerrorcallback.cpp" />
     <ClCompile Include="cpp\ctlfileappend.cpp" />
+    <ClCompile Include="cpp\ctlfilesave.cpp" />
     <ClCompile Include="cpp\ctlfileutils.cpp" />
     <ClCompile Include="cpp\ctlgetmetrics.cpp" />
     <ClCompile Include="cpp\ctlloadresources.cpp" />
     <ClCompile Include="cpp\ctlpapersize.cpp" />
+    <ClCompile Include="cpp\ctlselectdialog.cpp" />
     <ClCompile Include="cpp\ctlsourcedetails.cpp" />
     <ClCompile Include="cpp\ctlstringutils.cpp" />
     <ClCompile Include="cpp\ctlthreadutils.cpp" />
@@ -1247,13 +1245,18 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include="cpp\ctltr043.cpp" />
     <ClCompile Include="cpp\ctltsstub.cpp" />
     <ClCompile Include="cpp\ctltwainfilesystem.cpp" />
+    <ClCompile Include="cpp\ctltwainmanager.cpp" />
+    <ClCompile Include="cpp\ctltwainsession.cpp" />
+    <ClCompile Include="cpp\ctltwainsource.cpp" />
     <ClCompile Include="cpp\ctlupdatedibproc.cpp" />
+    <ClCompile Include="cpp\ctlwindowproc.cpp" />
     <ClCompile Include="cpp\imagefun\resamplefactory.cpp" />
     <ClCompile Include="cpp\imagefun\tiffun32.cpp" />
     <ClCompile Include="cpp\imagefun\txtfun32.cpp" />
     <ClCompile Include="cpp\iohandler_pbm.cpp" />
     <ClCompile Include="cpp\iohandler_webp.cpp" />
     <ClCompile Include="cpp\linux_versioninfo.cpp" />
+    <ClCompile Include="cpp\ocrengine\ocrselect.cpp" />
     <ClCompile Include="cpp\pdflib32\a85encode.cpp" />
     <ClCompile Include="cpp\pdflib32\ahexencode.cpp" />
     <ClCompile Include="cpp\pdflib32\flateencode.cpp" />
@@ -1440,9 +1443,6 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include=".\h\ctltr038.h" />
     <ClInclude Include=".\h\ctltrall.h" />
     <ClInclude Include=".\h\ctltrp.h" />
-    <ClInclude Include=".\h\ctltwmgr.h" />
-    <ClInclude Include=".\h\ctltwses.h" />
-    <ClInclude Include=".\h\ctltwsrc.h" />
     <ClInclude Include=".\h\dtwain.h" />
     <ClInclude Include=".\h\dtwain_verinfo.h" />
     <ClInclude Include=".\h\dtwainc.h" />
@@ -1473,11 +1473,13 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\ansiwideconverter_generic.h" />
     <ClInclude Include="h\ansiwideconverter_win32.h" />
     <ClInclude Include="h\arrayfactory.h" />
-    <ClInclude Include="h\ctlccerr.h" />
+    <ClInclude Include="h\ctlconstexprfind.h" />
+    <ClInclude Include="h\ctlconstexprutils.h" />
     <ClInclude Include="h\ctldefsource.h" />
     <ClInclude Include="h\ctldib32.h" />
+    <ClInclude Include="h\ctlfilesave.h" />
     <ClInclude Include="h\ctlfileutils.h" />
-    <ClInclude Include="h\ctlres.h" />
+    <ClInclude Include="h\ctlloadresources.h" />
     <ClInclude Include="h\ctlsupport.h" />
     <ClInclude Include="h\ctlthreadutils.h" />
     <ClInclude Include="h\ctltr037.h" />
@@ -1485,7 +1487,10 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\ctltr042.h" />
     <ClInclude Include="h\ctltr043.h" />
     <ClInclude Include="h\ctltwainidentity.h" />
+    <ClInclude Include="h\ctltwainmanager.h" />
     <ClInclude Include="h\ctltwainmsgloop.h" />
+    <ClInclude Include="h\ctltwainsession.h" />
+    <ClInclude Include="h\ctltwainsource.h" />
     <ClInclude Include="h\ctlutils.h" />
     <ClInclude Include="h\dibinfox.h" />
     <ClInclude Include="h\dibmulti.h" />
@@ -1554,7 +1559,6 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <CustomBuildStep Include=".\cdtwain\cdtwain_internal\capstr.inl">
       <FileType>Document</FileType>
     </CustomBuildStep>
-    <None Include="doc.txt" />
     <None Include="inl\linuxget_twain.inl" />
     <None Include="inl\linuxinit_impl.inl" />
     <None Include="inl\linuxlibraryloader_impl.inl" />
@@ -1588,9 +1592,11 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <Text Include="txt\twainresourcestrings_french.txt" />
     <Text Include="txt\twainresourcestrings_german.txt" />
     <Text Include="txt\twainresourcestrings_italian.txt" />
+    <Text Include="txt\twainresourcestrings_portuguese.txt" />
     <Text Include="txt\twainresourcestrings_portuguese_br.txt" />
     <Text Include="txt\twainresourcestrings_romanian.txt" />
     <Text Include="txt\twainresourcestrings_russian.txt" />
+    <Text Include="txt\twainresourcestrings_simplified_chinese.txt" />
     <Text Include="txt\twainresourcestrings_spanish.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

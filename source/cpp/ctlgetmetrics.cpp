@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "cppfunc.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "ctltr041.h"
 #include "ctliface.h"
 #ifdef _MSC_VER
@@ -33,7 +33,7 @@ static bool GetMetrics(DTWAIN_SOURCE Source, LPLONG ImageCount, LPLONG SheetCoun
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireMetrics(DTWAIN_SOURCE Source, LPLONG ImageCount, LPLONG SheetCount)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, ImageCount, SheetCount))
-    auto [pHandle, pSource] = VerifyHandles(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     const DTWAIN_BOOL bRet = GetMetrics(Source, ImageCount, SheetCount)?TRUE:FALSE;
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)

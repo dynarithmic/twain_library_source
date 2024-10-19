@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltr005.h"
-#include "ctltwses.h"
+#include "ctltwainsession.h"
 using namespace dynarithmic;
 CTL_GetDefaultSourceTriplet::CTL_GetDefaultSourceTriplet(
                             CTL_ITwainSession *pSession) :

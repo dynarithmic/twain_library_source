@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "cppfunc.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "sourceacquireopts.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -39,6 +39,8 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireAudioNative(DTWAIN_SOURCE Source, LONG n
     const DTWAIN_ARRAY aDibs = SourceAcquire(opts);
     if (pStatus)
         *pStatus = opts.getStatus();
+    if (pSource->GetLastAcquireError() != 0)
+        CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
     LOG_FUNC_EXIT_NONAME_PARAMS(aDibs)
     CATCH_BLOCK_LOG_PARAMS(DTWAIN_ARRAY(0))
 }
@@ -55,6 +57,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioNativeEx(DTWAIN_SOURCE Source, LONG 
     const bool bRet = AcquireExHelper(opts);
     if (pStatus)
         *pStatus = opts.getStatus();
+    if (pSource->GetLastAcquireError() != 0)
+        CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -72,6 +76,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioFile(DTWAIN_SOURCE Source, LPCTSTR l
     const bool bRetval = AcquireFileHelper(opts, ACQUIREAUDIOFILE);
     if (pStatus)
         *pStatus = opts.getStatus();
+    if (pSource->GetLastAcquireError() != 0)
+        CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
     CATCH_BLOCK_LOG_PARAMS(false)
 }

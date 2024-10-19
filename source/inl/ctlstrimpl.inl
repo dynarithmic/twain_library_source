@@ -1516,6 +1516,29 @@ LONG DLLENTRY_DEF DTWAIN_GetActiveDSMPathA(LPSTR lpszBuffer, LONG nLength)
 #endif
 }
 
+
+LONG DLLENTRY_DEF DTWAIN_GetActiveDSMVersionInfoW(LPWSTR lpszBuffer, LONG nLength)
+{
+#ifdef _UNICODE
+    return DTWAIN_GetActiveDSMVersionInfo(lpszBuffer, nLength);
+#else
+    std::string args((std::max)(nLength, 0L), 0);
+    LONG retVal = DTWAIN_GetActiveDSMVersionInfo((nLength > 0 && lpszBuffer) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    return null_terminator_copier(get_view(args), lpszBuffer, retVal);
+#endif
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetActiveDSMVersionInfoA(LPSTR lpszBuffer, LONG nLength)
+{
+#ifdef _UNICODE
+    std::wstring args((std::max)(nLength, 0L), 0);
+    const LONG retVal = DTWAIN_GetActiveDSMVersionInfo((nLength > 0 && lpszBuffer) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
+    return null_terminator_copier(get_view(args), lpszBuffer, retVal);
+#else
+    return DTWAIN_GetActiveDSMVersionInfo(lpszBuffer, nLength);
+#endif
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetXResolutionStringA(DTWAIN_SOURCE Source, LPSTR Resolution)
 {
 #ifdef _UNICODE
@@ -2939,6 +2962,73 @@ LONG DLLENTRY_DEF DTWAIN_GetVersionCopyrightW(LPWSTR lpszApp, LONG nLength)
     std::string args((std::max)(nLength, 0L), 0);
     const LONG retVal = DTWAIN_GetVersionCopyright((nLength > 0 && lpszApp) ? &args[0] : nullptr, static_cast<LONG>(args.size()));
     return null_terminator_copier(get_view(args), lpszApp, retVal);
+#endif
+}
+
+DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine2A(HWND hWndParent, LPCSTR szTitle, LONG xPos, LONG yPos, LONG nOptions)
+{
+#ifdef _UNICODE
+    return DTWAIN_SelectOCREngine2(hWndParent, szTitle ? StringConversion::Convert_AnsiPtr_To_Native(szTitle).c_str() : nullptr, xPos, yPos, nOptions);
+#else
+    return DTWAIN_SelectOCREngine2(hWndParent, szTitle, xPos, yPos, nOptions);
+#endif
+}
+
+DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine2W(HWND hWndParent, LPCWSTR szTitle, LONG xPos, LONG yPos, LONG nOptions)
+{
+#ifdef _UNICODE
+    return DTWAIN_SelectOCREngine2(hWndParent, szTitle, xPos, yPos, nOptions);
+#else
+    return DTWAIN_SelectOCREngine2(hWndParent, 
+                                szTitle?StringConversion::Convert_WidePtr_To_Native(szTitle).c_str():NULL, xPos, yPos, nOptions);
+#endif
+}
+
+DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine2ExA(HWND hWndParent, LPCSTR szTitle, LONG xPos, LONG yPos,
+    LPCSTR szIncludeNames, LPCSTR szExcludeNames, LPCSTR szNameMapping, LONG nOptions)
+{
+#ifdef _UNICODE
+    return DTWAIN_SelectOCREngine2Ex(hWndParent,
+        szTitle ? StringConversion::Convert_AnsiPtr_To_Native(szTitle).c_str() : nullptr, xPos, yPos,
+        szIncludeNames ? StringConversion::Convert_AnsiPtr_To_Native(szIncludeNames).c_str() : nullptr,
+        szExcludeNames ? StringConversion::Convert_AnsiPtr_To_Native(szExcludeNames).c_str() : nullptr,
+        szNameMapping ? StringConversion::Convert_AnsiPtr_To_Native(szNameMapping).c_str() : nullptr,
+        nOptions);
+#else
+    return DTWAIN_SelectOCREngine2Ex(hWndParent, szTitle, xPos, yPos, szIncludeNames, szExcludeNames, szNameMapping, nOptions);
+#endif
+}
+
+DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectOCREngine2ExW(HWND hWndParent, LPCWSTR szTitle, LONG xPos, LONG yPos, LPCWSTR szIncludeNames, LPCWSTR szExcludeNames, LPCWSTR szNameMapping, LONG nOptions)
+{
+#ifdef _UNICODE
+    return DTWAIN_SelectOCREngine2Ex(hWndParent, szTitle, xPos, yPos, szIncludeNames, szExcludeNames, szNameMapping, nOptions);
+#else
+    return DTWAIN_SelectOCREngine2Ex(hWndParent,
+        szTitle ? StringConversion::Convert_WidePtr_To_Native(szTitle).c_str() : NULL,
+        xPos, yPos,
+        szIncludeNames ? StringConversion::Convert_WidePtr_To_Native(szIncludeNames).c_str() : NULL,
+        szExcludeNames ? StringConversion::Convert_WidePtr_To_Native(szExcludeNames).c_str() : NULL,
+        szNameMapping ? StringConversion::Convert_WidePtr_To_Native(szNameMapping).c_str() : NULL,
+        nOptions);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryExW(LPCWSTR sLangDLL, DTWAIN_BOOL bClear)
+{
+#ifdef _UNICODE
+    return DTWAIN_SetTempFileDirectoryEx(sLangDLL, bClear);
+#else
+    return DTWAIN_SetTempFileDirectoryEx(StringConversion::Convert_WidePtr_To_Native(sLangDLL).c_str(), bClear);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryExA(LPCSTR sLangDLL, DTWAIN_BOOL bClear)
+{
+#ifdef _UNICODE
+    return DTWAIN_SetTempFileDirectoryEx(StringConversion::Convert_AnsiPtr_To_Native(sLangDLL).c_str(), bClear);
+#else
+    return DTWAIN_SetTempFileDirectoryEx(sLangDLL, bClear);
 #endif
 }
 

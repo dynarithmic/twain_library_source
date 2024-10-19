@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include "ctltr039.h"
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 
 using namespace dynarithmic;
 CTL_EntryPointTriplet::CTL_EntryPointTriplet(CTL_ITwainSession *pSession, TW_UINT16 msg) :

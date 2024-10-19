@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
 #include <algorithm>
-#include "ctltwmgr.h"
+#include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "sourceacquireopts.h"
@@ -97,6 +97,8 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
     bRetval = AcquireFileHelper(opts, ACQUIREFILE);
     if (pStatus)
         *pStatus = opts.getStatus();
+    if (pSource->GetLastAcquireError() != 0)
+        CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -137,6 +139,8 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFile(DTWAIN_SOURCE Source,
     const bool bRetval = AcquireFileHelper(opts, ACQUIREFILE);
     if (pStatus)
         *pStatus = opts.getStatus();
+    if (pSource->GetLastAcquireError() != 0)
+        CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -150,6 +154,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileAutoIncrement(DTWAIN_SOURCE Source, LONG 
     pSource->SetFileAutoIncrementBase(0);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetSavedFilesCount(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    LOG_FUNC_EXIT_NONAME_PARAMS(pSource->GetFileSavePageCount());
+    CATCH_BLOCK_LOG_PARAMS(-1)
 }
 
 DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireFile(SourceAcquireOptions& opts)
@@ -209,6 +221,10 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
     // if the auto-create is not on, let's do a quick test to see if the file can be written to the
     // directory specified.
     const auto pHandle = pSource->GetDTWAINHandle();
+
+    // Set the total file saving page count to 0
+    pSource->SetFileSavePageCount(0);
+
     bool bUsePrompt = opts.getFileFlags() & DTWAIN_USEPROMPT;
     if (!bUsePrompt)
     {
