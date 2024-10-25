@@ -75,6 +75,7 @@ namespace dynarithmic
         m_vfnAddMap.insert({ arrayTag::VoidPtrType, [&](arrayTag* tag, std::size_t nSize, void* value) { pointer_pushback<tagged_array_voidptr>(tag, value, nSize); } });
         m_vfnAddMap.insert({ arrayTag::ArrayOfArrayOfVoidPtrType, [&](arrayTag* tag, std::size_t nSize, void* value) { pointer_pushback<tagged_array_tagged_array_voidptr>(tag, value, nSize); } });
         m_vfnAddMap.insert({ arrayTag::FrameType, [&](arrayTag* tag, std::size_t nSize, void* value) { simple_pushback<tagged_array_frame>(tag, value, nSize); } });
+        m_vfnAddMap.insert({ arrayTag::FrameSingleType, [&](arrayTag* tag, std::size_t nSize, void* value) { simple_pushback<tagged_array_frame>(tag, value, nSize); } });
         m_vfnAddMap.insert({ arrayTag::TWFrameType, [&](arrayTag* tag, std::size_t nSize, void* value) { simple_pushback<tagged_array_twframe>(tag, value, nSize); } });
         m_vfnAddMap.insert({ arrayTag::Fix32Type, [&](arrayTag* tag, std::size_t nSize, void* value) { simple_pushback<tagged_array_fix32>(tag, value, nSize); } });
 
@@ -87,6 +88,7 @@ namespace dynarithmic
         m_vfnGetMap.insert({ arrayTag::VoidPtrType, [&](arrayTag* tag, std::size_t nWhere, void* value) { return pointer_getter<tagged_array_voidptr>(tag, nWhere, value); } });
         m_vfnGetMap.insert({ arrayTag::ArrayOfArrayOfVoidPtrType, [&](arrayTag* tag, std::size_t nWhere, void* value) { return pointer_getter<tagged_array_tagged_array_voidptr>(tag, nWhere, value); } });
         m_vfnGetMap.insert({ arrayTag::FrameType, [&](arrayTag* tag, std::size_t nWhere, void* value) { return simple_getter<tagged_array_frame>(tag, nWhere, value); } });
+        m_vfnGetMap.insert({ arrayTag::FrameSingleType, [&](arrayTag* tag, std::size_t nWhere, void* value) { return simple_getter<tagged_array_frame>(tag, nWhere, value); } });
         m_vfnGetMap.insert({ arrayTag::TWFrameType, [&](arrayTag* tag, std::size_t nWhere, void* value) { return simple_getter<tagged_array_twframe>(tag, nWhere, value); } });
         m_vfnGetMap.insert({ arrayTag::Fix32Type, [&](arrayTag* tag, std::size_t nWhere, void* value) { return simple_getter<tagged_array_fix32>(tag, nWhere, value); } });
 
@@ -99,6 +101,7 @@ namespace dynarithmic
         m_vfnFindMap.insert({ arrayTag::VoidPtrType, [&](arrayTag* tag, void* value, double) { return simple_finder<tagged_array_voidptr>(tag, value, {}, pointer_finder_t()); } });
         m_vfnFindMap.insert({ arrayTag::ArrayOfArrayOfVoidPtrType, [&](arrayTag* tag, void* value, double) { return simple_finder<tagged_array_tagged_array_voidptr>(tag, value, {}, pointer_finder_t()); } });
         m_vfnFindMap.insert({ arrayTag::FrameType, [&](arrayTag* tag, void* value, double) { return simple_finder<tagged_array_frame>(tag, value, {}, simple_finder_t()); } });
+        m_vfnFindMap.insert({ arrayTag::FrameSingleType, [&](arrayTag* tag, void* value, double) { return simple_finder<tagged_array_frame>(tag, value, {}, simple_finder_t()); } });
         m_vfnFindMap.insert({ arrayTag::TWFrameType, [&](arrayTag* tag, void* value, double) { return simple_finder<tagged_array_twframe>(tag, value, {}, frame_finder_t()); } });
         m_vfnFindMap.insert({ arrayTag::Fix32Type, [&](arrayTag* tag, void* value, double) { return simple_finder<tagged_array_fix32>(tag, value, {}, simple_finder_t()); } });
 
@@ -108,6 +111,7 @@ namespace dynarithmic
         m_vfnInserterMap.insert({ arrayTag::StringType, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount, void* value) { string_inserter<tagged_array_string>(tag, nWhere, nCount, value); } });
         m_vfnInserterMap.insert({ arrayTag::WStringType, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount, void* value) { string_inserter<tagged_array_wstring>(tag, nWhere, nCount, value); } });
         m_vfnInserterMap.insert({ arrayTag::FrameType, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount, void* value) { simple_inserter<tagged_array_frame>(tag, nWhere, nCount, value); } });
+        m_vfnInserterMap.insert({ arrayTag::FrameSingleType, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount, void* value) { simple_inserter<tagged_array_frame>(tag, nWhere, nCount, value); } });
         m_vfnInserterMap.insert({ arrayTag::TWFrameType, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount, void* value) { simple_inserter<tagged_array_twframe>(tag, nWhere, nCount, value); } });
         m_vfnInserterMap.insert({ arrayTag::Fix32Type, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount, void* value) { simple_inserter<tagged_array_fix32>(tag, nWhere, nCount, value); } });
         m_vfnInserterMap.insert({ arrayTag::SourceType, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount, void* value) { pointer_inserter<tagged_array_sourceptr>(tag, nWhere, nCount, value); } });
@@ -120,6 +124,7 @@ namespace dynarithmic
         m_vfnCopierMap.insert({ arrayTag::StringType, [&](arrayTag* tagDest, arrayTag* tagSrc) { simple_copier<tagged_array_string>(tagDest, tagSrc); } });
         m_vfnCopierMap.insert({ arrayTag::WStringType, [&](arrayTag* tagDest, arrayTag* tagSrc) { simple_copier<tagged_array_wstring>(tagDest, tagSrc); } });
         m_vfnCopierMap.insert({ arrayTag::FrameType, [&](arrayTag* tagDest, arrayTag* tagSrc) { simple_copier<tagged_array_frame>(tagDest, tagSrc); } });
+        m_vfnCopierMap.insert({ arrayTag::FrameSingleType, [&](arrayTag* tagDest, arrayTag* tagSrc) { simple_copier<tagged_array_frame>(tagDest, tagSrc); } });
         m_vfnCopierMap.insert({ arrayTag::TWFrameType, [&](arrayTag* tagDest, arrayTag* tagSrc) { simple_copier<tagged_array_twframe>(tagDest, tagSrc); } });
         m_vfnCopierMap.insert({ arrayTag::Fix32Type, [&](arrayTag* tagDest, arrayTag* tagSrc) { simple_copier<tagged_array_fix32>(tagDest, tagSrc); } });
         m_vfnCopierMap.insert({ arrayTag::SourceType, [&](arrayTag* tagDest, arrayTag* tagSrc) { simple_copier<tagged_array_sourceptr>(tagDest, tagSrc); } });
@@ -132,6 +137,7 @@ namespace dynarithmic
         m_vfnRemoverMap.insert({ arrayTag::StringType, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount) { simple_remover<tagged_array_string>(tag, nWhere, nCount); } });
         m_vfnRemoverMap.insert({ arrayTag::WStringType, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount) { simple_remover<tagged_array_wstring>(tag, nWhere, nCount); } });
         m_vfnRemoverMap.insert({ arrayTag::FrameType, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount) { simple_remover<tagged_array_frame>(tag, nWhere, nCount); } });
+        m_vfnRemoverMap.insert({ arrayTag::FrameSingleType, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount) { simple_remover<tagged_array_frame>(tag, nWhere, nCount); } });
         m_vfnRemoverMap.insert({ arrayTag::TWFrameType, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount) { simple_remover<tagged_array_twframe>(tag, nWhere, nCount); } });
         m_vfnRemoverMap.insert({ arrayTag::Fix32Type, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount) { simple_remover<tagged_array_fix32>(tag, nWhere, nCount); } });
         m_vfnRemoverMap.insert({ arrayTag::SourceType, [&](arrayTag* tag, std::size_t nWhere, std::size_t nCount) { simple_remover<tagged_array_sourceptr>(tag, nWhere, nCount); } });
@@ -144,6 +150,7 @@ namespace dynarithmic
         m_vfnClearerMap.insert({ arrayTag::StringType, [&](arrayTag* tag) { simple_clearer<tagged_array_string>(tag); } });
         m_vfnClearerMap.insert({ arrayTag::WStringType, [&](arrayTag* tag) { simple_clearer<tagged_array_wstring>(tag); } });
         m_vfnClearerMap.insert({ arrayTag::FrameType, [&](arrayTag* tag) { simple_clearer<tagged_array_frame>(tag); } });
+        m_vfnClearerMap.insert({ arrayTag::FrameSingleType, [&](arrayTag* tag) { simple_clearer<tagged_array_frame>(tag); } });
         m_vfnClearerMap.insert({ arrayTag::TWFrameType, [&](arrayTag* tag) { simple_clearer<tagged_array_twframe>(tag); } });
         m_vfnClearerMap.insert({ arrayTag::Fix32Type, [&](arrayTag* tag) { simple_clearer<tagged_array_fix32>(tag); } });
         m_vfnClearerMap.insert({ arrayTag::SourceType, [&](arrayTag* tag) { simple_clearer<tagged_array_sourceptr>(tag); } });
@@ -156,6 +163,7 @@ namespace dynarithmic
         m_vfnResizerMap.insert({ arrayTag::StringType, [&](arrayTag* tag, std::size_t num) { simple_resizer<tagged_array_string>(tag, num); } });
         m_vfnResizerMap.insert({ arrayTag::WStringType, [&](arrayTag* tag, std::size_t num) { simple_resizer<tagged_array_wstring>(tag, num); } });
         m_vfnResizerMap.insert({ arrayTag::FrameType, [&](arrayTag* tag, std::size_t num) { simple_resizer<tagged_array_frame>(tag, num); } });
+        m_vfnResizerMap.insert({ arrayTag::FrameSingleType, [&](arrayTag* tag, std::size_t num) { simple_resizer<tagged_array_frame>(tag, num); } });
         m_vfnResizerMap.insert({ arrayTag::TWFrameType, [&](arrayTag* tag, std::size_t num) { simple_resizer<tagged_array_twframe>(tag, num); } });
         m_vfnResizerMap.insert({ arrayTag::Fix32Type, [&](arrayTag* tag, std::size_t num) { simple_resizer<tagged_array_fix32>(tag, num); } });
         m_vfnResizerMap.insert({ arrayTag::SourceType, [&](arrayTag* tag, std::size_t num) { simple_resizer<tagged_array_sourceptr>(tag, num); } });
@@ -168,6 +176,7 @@ namespace dynarithmic
         m_vfnCounterMap.insert({ arrayTag::StringType, [&](arrayTag* tag) { return simple_counter<tagged_array_string>(tag); } });
         m_vfnCounterMap.insert({ arrayTag::WStringType, [&](arrayTag* tag) { return simple_counter<tagged_array_wstring>(tag); } });
         m_vfnCounterMap.insert({ arrayTag::FrameType, [&](arrayTag* tag) { return simple_counter<tagged_array_frame>(tag); } });
+        m_vfnCounterMap.insert({ arrayTag::FrameSingleType, [&](arrayTag* tag) { return simple_counter<tagged_array_frame>(tag); } });
         m_vfnCounterMap.insert({ arrayTag::TWFrameType, [&](arrayTag* tag) { return simple_counter<tagged_array_twframe>(tag); } });
         m_vfnCounterMap.insert({ arrayTag::Fix32Type, [&](arrayTag* tag) { return simple_counter<tagged_array_fix32>(tag); } });
         m_vfnCounterMap.insert({ arrayTag::SourceType, [&](arrayTag* tag) { return simple_counter<tagged_array_sourceptr>(tag); } });
@@ -180,6 +189,7 @@ namespace dynarithmic
         m_vfnSetterMap.insert({ arrayTag::StringType, [&](arrayTag* tag, size_t nWhere, void* value) { string_setter<tagged_array_string>(tag, nWhere, value); } });
         m_vfnSetterMap.insert({ arrayTag::WStringType, [&](arrayTag* tag, size_t nWhere, void* value) { string_setter<tagged_array_wstring>(tag, nWhere, value); } });
         m_vfnSetterMap.insert({ arrayTag::FrameType, [&](arrayTag* tag, size_t nWhere, void* value) { simple_setter<tagged_array_frame>(tag, nWhere, value); } });
+        m_vfnSetterMap.insert({ arrayTag::FrameSingleType, [&](arrayTag* tag, size_t nWhere, void* value) { simple_setter<tagged_array_frame>(tag, nWhere, value); } });
         m_vfnSetterMap.insert({ arrayTag::TWFrameType, [&](arrayTag* tag, size_t nWhere, void* value) { simple_setter<tagged_array_twframe>(tag, nWhere, value); } });
         m_vfnSetterMap.insert({ arrayTag::Fix32Type, [&](arrayTag* tag, size_t nWhere, void* value) { simple_setter<tagged_array_fix32>(tag, nWhere, value); } });
         m_vfnSetterMap.insert({ arrayTag::SourceType, [&](arrayTag* tag, size_t nWhere, void* value) { pointer_setter<tagged_array_sourceptr>(tag, nWhere, value); } });
@@ -192,6 +202,7 @@ namespace dynarithmic
         m_vfnGetBufferMap.insert({ arrayTag::StringType, [&](arrayTag* tag, size_t nWhere) { return simple_buffer_getter<tagged_array_string>(tag, nWhere); } });
         m_vfnGetBufferMap.insert({ arrayTag::WStringType, [&](arrayTag* tag, size_t nWhere) { return simple_buffer_getter<tagged_array_wstring>(tag, nWhere); } });
         m_vfnGetBufferMap.insert({ arrayTag::FrameType, [&](arrayTag* tag, size_t nWhere) { return simple_buffer_getter<tagged_array_frame>(tag, nWhere); } });
+        m_vfnGetBufferMap.insert({ arrayTag::FrameSingleType, [&](arrayTag* tag, size_t nWhere) { return simple_buffer_getter<tagged_array_frame>(tag, nWhere); } });
         m_vfnGetBufferMap.insert({ arrayTag::TWFrameType, [&](arrayTag* tag, size_t nWhere) { return simple_buffer_getter<tagged_array_twframe>(tag, nWhere); } });
         m_vfnGetBufferMap.insert({ arrayTag::Fix32Type, [&](arrayTag* tag, size_t nWhere) { return simple_buffer_getter<tagged_array_fix32>(tag, nWhere); } });
         m_vfnGetBufferMap.insert({ arrayTag::SourceType, [&](arrayTag* tag, size_t nWhere) { return simple_buffer_getter<tagged_array_sourceptr>(tag, nWhere); } });
@@ -289,13 +300,27 @@ namespace dynarithmic
         return -1;
     }
 
+    template <typename MapType>
+    typename MapType::const_iterator perform_operation(const MapType& theMap, int tag, const char* op)
+    {
+        typename MapType::const_iterator iter = theMap.find(tag);
+        if (iter != theMap.end())
+            return iter;
+        else
+        {
+            std::ostringstream strm;
+            strm << op << " not supported for array type " << tag;
+            throw std::invalid_argument::invalid_argument(strm.str().c_str());
+        }
+    }
+
     void CTL_ArrayFactory::copy(arrayTag *pTagDest, arrayTag* pTagSource)
     {
         if (!is_valid(pTagDest) || !is_valid(pTagSource))
             return;
         if (pTagDest->getTag() != pTagSource->getTag())
             return;
-        m_vfnCopierMap[pTagDest->getTag()](pTagDest, pTagSource);
+        perform_operation(m_vfnCopierMap, pTagDest->getTag(), "copy()")->second(pTagDest, pTagSource);
     }
 
     void CTL_ArrayFactory::destroy(arrayTag *pTag)
@@ -311,52 +336,49 @@ namespace dynarithmic
     {
         if (!is_valid(pTag))
             return;
-        m_vfnAddMap[pTag->getTag()](pTag, num, value);
+        perform_operation(m_vfnAddMap, pTag->getTag(), "add_to_back()")->second(pTag, num, value);
     }
 
     void* CTL_ArrayFactory::get_value(arrayTag *pTag, size_t nWhere, void *value) const
     {
         if (!is_valid(pTag))
             return nullptr;
-        const auto iter = m_vfnGetMap.find(pTag->getTag());
-        return iter->second(pTag, nWhere, value);
+        return perform_operation(m_vfnGetMap, pTag->getTag(), "get_value()")->second(pTag, nWhere, value);
     }
 
     void CTL_ArrayFactory::insert(arrayTag* pTag, void* value, size_t nWhere, size_t num)
     {
         if (!is_valid(pTag))
             return;
-        m_vfnInserterMap[pTag->getTag()](pTag, nWhere, num, value);
+        perform_operation(m_vfnInserterMap, pTag->getTag(), "insert()")->second(pTag, nWhere, num, value);
     }
 
     void CTL_ArrayFactory::remove(arrayTag* pTag, std::size_t nWhere, std::size_t num)
     {
         if (!is_valid(pTag))
             return;
-        m_vfnRemoverMap[pTag->getTag()](pTag, nWhere, num);
+        perform_operation(m_vfnRemoverMap, pTag->getTag(), "remove()")->second(pTag, nWhere, num);
     }
 
     void CTL_ArrayFactory::clear(arrayTag *pTag)
     {
         if (!is_valid(pTag))
             return;
-        m_vfnClearerMap[pTag->getTag()](pTag);
+        perform_operation(m_vfnClearerMap, pTag->getTag(), "clear()")->second(pTag);
     }
-
 
     void CTL_ArrayFactory::resize(arrayTag* pTag, std::size_t num)
     {
         if (!is_valid(pTag))
             return;
-        m_vfnResizerMap[pTag->getTag()](pTag, num);
+        perform_operation(m_vfnResizerMap, pTag->getTag(), "resize()")->second(pTag, num);
     }
 
     size_t CTL_ArrayFactory::size(arrayTag* pTag) const
     {
         if (!is_valid(pTag))
             return 0;
-        const auto iter = m_vfnCounterMap.find(pTag->getTag());
-        return iter->second(pTag);
+        return perform_operation(m_vfnCounterMap, pTag->getTag(), "size()")->second(pTag);
     }
 
     size_t CTL_ArrayFactory::find(arrayTag *pTag, void *value, double tol)
@@ -364,22 +386,22 @@ namespace dynarithmic
         if (!is_valid(pTag))
             return 0;
         if (pTag->getTag() == arrayTag::DoubleType)
-            return m_vfnFindMap[arrayTag::DoubleType](pTag, value, tol);
-        return m_vfnFindMap[pTag->getTag()](pTag, value, {});
+            return perform_operation(m_vfnFindMap, pTag->getTag(), "find()")->second(pTag, value, tol);
+        return perform_operation(m_vfnFindMap, pTag->getTag(), "find()")->second(pTag, value, {});
     }
 
     void CTL_ArrayFactory::set_value(arrayTag *pTag, std::size_t nWhere, void *value)
     {
         if (!is_valid(pTag))
             return;
-        m_vfnSetterMap[pTag->getTag()](pTag, nWhere, value);
+        perform_operation(m_vfnSetterMap, pTag->getTag(), "set_value()")->second(pTag, nWhere, value);
     }
 
     void* CTL_ArrayFactory::get_buffer(arrayTag *pTag, std::size_t nWhere)
     {
         if (!is_valid(pTag))
             return nullptr;
-        return m_vfnGetBufferMap[pTag->getTag()](pTag, nWhere);
+        return perform_operation(m_vfnGetBufferMap, pTag->getTag(), "get_buffer()")->second(pTag, nWhere);
     }
 
     CTL_ArrayFactory::arrayTag* CTL_ArrayFactory::create_frame(double left, double top, double right, double bottom)
