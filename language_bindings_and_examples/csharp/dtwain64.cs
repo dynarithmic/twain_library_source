@@ -1705,6 +1705,16 @@ namespace Dynarithmic
         public const int DTWAIN_CONSTANT_DAT      = 60;
         public const int DTWAIN_CONSTANT_DF       = 61;
         public const int DTWAIN_CONSTANT_TWTY     = 62;
+        public const int DTWAIN_CONSTANT_TWCB     = 63;
+        public const int DTWAIN_CONSTANT_TWAF     = 64;
+        public const int DTWAIN_CONSTANT_TWFS     = 65;
+        public const int DTWAIN_CONSTANT_TWJS     = 66;
+        public const int DTWAIN_CONSTANT_TWMR     = 67;
+        public const int DTWAIN_CONSTANT_TWDP     = 68;
+        public const int DTWAIN_CONSTANT_TWUS     = 69;
+        public const int DTWAIN_CONSTANT_TWDF     = 70;
+        public const int DTWAIN_CONSTANT_TWFM     = 71;
+        public const int DTWAIN_CONSTANT_TWSG     = 72;
 
         public const int DTWAIN_USERRES_START    = 20000;
         public const int DTWAIN_USERRES_MAXSIZE  = 8192;
