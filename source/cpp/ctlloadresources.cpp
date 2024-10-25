@@ -308,6 +308,8 @@ namespace dynarithmic
         // Read in the TWAIN constants
         auto& constantsMap = CTL_StaticData::GetTwainConstantsMap();
         auto& stringToConstantMap = CTL_StaticData::GetStringToConstantMap();
+        constantsMap.clear();
+        stringToConstantMap.clear();
         for ( int constantVal = 0; constantVal < CTL_TwainDLLHandle::NumTwainMapValues; ++constantVal)
         { 
             auto iter = constantsMap.insert({constantVal, {}}).first;
