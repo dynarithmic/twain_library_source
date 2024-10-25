@@ -1660,9 +1660,19 @@ Class DTWAINAPI
     Public Const DTWAIN_CONSTANT_TWLG  As Integer =   57
     Public Const DTWAIN_CONSTANT_DLLINFO  As Integer = 58
     Public Const DTWAIN_CONSTANT_DG       As Integer = 59
-    Public Const DTWAIN_CONSTANT_DAT      As Integer= 60
-    Public Const DTWAIN_CONSTANT_DF       As Integer= 61
-    Public Const DTWAIN_CONSTANT_TWTY     As Integer= 62
+    Public Const DTWAIN_CONSTANT_DAT      As Integer = 60
+    Public Const DTWAIN_CONSTANT_DF       As Integer = 61
+    Public Const DTWAIN_CONSTANT_TWTY     As Integer = 62
+    Public Const DTWAIN_CONSTANT_TWCB     As Integer = 63
+    Public Const DTWAIN_CONSTANT_TWAF     As Integer = 64
+    Public Const DTWAIN_CONSTANT_TWFS     As Integer = 65
+    Public Const DTWAIN_CONSTANT_TWJS     As Integer = 66
+    Public Const DTWAIN_CONSTANT_TWMR     As Integer = 67
+    Public Const DTWAIN_CONSTANT_TWDP     As Integer = 68
+    Public Const DTWAIN_CONSTANT_TWUS     As Integer = 69
+    Public Const DTWAIN_CONSTANT_TWDF     As Integer = 70
+    Public Const DTWAIN_CONSTANT_TWFM     As Integer = 71
+    Public Const DTWAIN_CONSTANT_TWSG     As Integer = 72
 
     Public Const DTWAIN_USERRES_START As Integer = 20000
     Public Const DTWAIN_USERRES_MAXSIZE As Integer = 8192
