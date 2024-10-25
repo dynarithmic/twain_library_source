@@ -2259,24 +2259,41 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayConvertFloatToFix32(DTWAIN_ARRAY FloatArra
     const bool bIsValid = factory->is_valid(FloatArrayV);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !bIsValid; }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
 
-    auto bIsFloat = factory->tag_type(FloatArrayV);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return bIsFloat != CTL_ArrayFactory::arrayTag::DoubleType; }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
+    auto bIsFloat = factory->tag_type(FloatArrayV) == CTL_ArrayFactory::arrayTag::DoubleType;
+    auto bIsFrame = factory->tag_type(FloatArrayV) == CTL_ArrayFactory::arrayTag::FrameSingleType;
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !(bIsFloat || bIsFrame); }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
 
     int nStatus;
     // get count
     const size_t Count = factory->size(FloatArrayV);
 
-    // create a new enumerator
+    // create a new array
     auto aFix32 = factory->create_array(CTL_ArrayTWFIX32Type, &nStatus, Count);
 
     // get the underlying vectors
-    auto vIn = static_cast<double*>(factory->get_buffer(FloatArrayV, 0));
-    auto vOut = static_cast<TW_FIX32Ex*>(factory->get_buffer(aFix32, 0));
+    if (bIsFloat)
+    {
+        auto vIn = static_cast<double*>(factory->get_buffer(FloatArrayV, 0));
+        auto vOut = static_cast<TW_FIX32Ex*>(factory->get_buffer(aFix32, 0));
 
-    // call transform to create array of TW_FIX32 values
-    std::transform(vIn, vIn + Count, vOut, [&](double d) 
-					{ return FloatToFix32(static_cast<float>(d)); });
-
+        // call transform to create array of TW_FIX32 values
+        std::transform(vIn, vIn + Count, vOut, [&](double d)
+            { return FloatToFix32(static_cast<float>(d)); });
+    }
+    else
+    {
+        auto vIn = static_cast<TwainFrameInternal*>(factory->get_buffer(FloatArrayV, 0));
+        auto& vOutContainer = pHandle->m_ArrayFactory->underlying_container_t<TW_FIX32Ex>(aFix32);
+        vOutContainer.resize(Count * 4);
+        // call transform to create array of TW_FIX32 values
+        for (size_t curFrame = 0; curFrame < Count; ++curFrame)
+        {
+            vOutContainer[curFrame * 4 + TwainFrameInternal::FRAMELEFT] = (TW_FIX32Ex)FloatToFix32(static_cast<float>(vIn[curFrame].Left()));
+            vOutContainer[curFrame * 4 + TwainFrameInternal::FRAMETOP] = (TW_FIX32Ex)FloatToFix32(static_cast<float>(vIn[curFrame].Top()));
+            vOutContainer[curFrame * 4 + TwainFrameInternal::FRAMERIGHT] = (TW_FIX32Ex)FloatToFix32(static_cast<float>(vIn[curFrame].Right()));
+            vOutContainer[curFrame * 4 + TwainFrameInternal::FRAMEBOTTOM] = (TW_FIX32Ex)FloatToFix32(static_cast<float>(vIn[curFrame].Bottom()));
+        }
+    }
     // remove the old array
     factory->destroy(FloatArrayV);
 
