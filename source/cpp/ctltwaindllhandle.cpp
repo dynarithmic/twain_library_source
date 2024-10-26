@@ -102,50 +102,9 @@ std::pair<CTL_ResourceRegistryMap::iterator, bool> CTL_TwainDLLHandle::AddResour
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-CTL_UINT16ToInfoMap         CTL_StaticData::s_IntToTwainInfoMap;
-int32_t                     CTL_StaticData::s_nExtImageInfoOffset = 0;
-CTL_StringToConstantMap     CTL_StaticData::s_MapStringToConstant;
-CTL_TwainLongToStringMap    CTL_StaticData::s_MapExtendedImageInfo;
-int                         CTL_StaticData::s_nLoadingError = DTWAIN_NO_ERROR;
+CTL_StaticDataStruct        CTL_StaticData::s_StaticData;
 std::unique_ptr<CSimpleIniA>   CTL_StaticData::s_iniInterface;
-bool                         CTL_StaticData::s_bINIFileLoaded = false;
-bool                         CTL_StaticData::s_bDoResampling = true;
-CTL_StringToMapLongToStringMap CTL_StaticData::s_AllLoadedResourcesMap;
-CTL_PairToStringMap         CTL_StaticData::s_ResourceCache;
-std::string                 CTL_StaticData::s_CurrentResourceKey;
-CTL_GeneralResourceInfo     CTL_StaticData::s_ResourceInfo;
-CTL_PDFMediaMap             CTL_StaticData::s_PDFMediaMap;
-CTL_AvailableFileFormatsMap CTL_StaticData::s_AvailableFileFormatsMap;
-CTL_TwainConstantsMap       CTL_StaticData::s_TwainConstantsMap;
-bool                        CTL_StaticData::s_bCheckHandles = true;
-CTL_StringType              CTL_StaticData::s_strResourcePath;
-CTL_StringType              CTL_StaticData::s_ResourceVersion;
-CTL_StringType              CTL_StaticData::s_DLLPath;
-CTL_StringType              CTL_StaticData::s_sINIPath;
-bool                        CTL_StaticData::s_multipleThreads = false;
-CTL_LongToStringMap         CTL_StaticData::s_ErrorCodes;
-CTL_StringType              CTL_StaticData::s_VersionString;
-HFONT                       CTL_StaticData::s_DialogFont = nullptr;
-CTL_ErrorToExtraInfoMap     CTL_StaticData::s_mapExtraErrorInfo;
-CTL_GeneralCapInfo          CTL_StaticData::s_mapGeneralCapInfo;
-LONG                        CTL_StaticData::s_nRegisteredDTWAINMsg = 0;
 std::mutex                  CTL_StaticData::s_mutexInitDestroy;
-CTL_MapThreadToDLLHandle    CTL_StaticData::s_mapThreadToDLLHandle;
-CTL_ThreadMap               CTL_StaticData::s_ThreadMap;
-bool                        CTL_StaticData::s_bThrowExceptions = false;
-HINSTANCE                   CTL_StaticData::s_DLLInstance = nullptr;
-std::unordered_set<HWND>    CTL_StaticData::s_appWindowsToDisable;
-CTL_CallbackProcArray       CTL_StaticData::s_aAllCallbacks;
-CTL_StringType              CTL_StaticData::s_strLangResourcePath;
-CTL_GeneralErrorInfo        CTL_StaticData::s_mapGeneralErrorInfo;
-long                        CTL_StaticData::s_logFilterFlags = 0;
-UINT_PTR                    CTL_StaticData::s_nTimeoutID = 0;
-bool                        CTL_StaticData::s_bTimerIDSet = false;
-UINT                        CTL_StaticData::s_nTimeoutMilliseconds = 0;
-CLogSystem                  CTL_StaticData::s_appLog;
-bool                        CTL_StaticData::s_ResourcesInitialized = false;
-ImageResamplerMap           CTL_StaticData::s_ImageResamplerMap;
-SourceStatusMap             CTL_StaticData::s_SourceStatusMap;
 
 std::string CTL_StaticData::GetTwainNameFromConstantA(int lConstantType, int lTwainConstant)
 {
@@ -171,15 +130,15 @@ std::wstring CTL_StaticData::GetTwainNameFromConstantW(int lConstantType, int lT
 
 CTL_LongToStringMap* CTL_StaticData::GetLanguageResource(std::string sLang)
 {
-    auto iter = s_AllLoadedResourcesMap.find(sLang);
-    if (iter != s_AllLoadedResourcesMap.end())
+    auto iter = s_StaticData.s_AllLoadedResourcesMap.find(sLang);
+    if (iter != s_StaticData.s_AllLoadedResourcesMap.end())
         return &iter->second;
     return nullptr;
 }
 
 CTL_LongToStringMap* CTL_StaticData::GetCurrentLanguageResource()
 {
-    return CTL_StaticData::GetLanguageResource(s_CurrentResourceKey);
+    return CTL_StaticData::GetLanguageResource(s_StaticData.s_CurrentResourceKey);
 }
 
 
@@ -202,26 +161,26 @@ std::pair<bool, int32_t> CTL_StaticData::GetIDFromTwainName(std::string sName)
 // static definitions
 CTL_TwainDLLHandle* dynarithmic::FindHandle(HWND hWnd, bool bIsDisplay)
 {
-    const auto it = std::find_if(CTL_StaticData::s_mapThreadToDLLHandle.begin(), 
-                                 CTL_StaticData::s_mapThreadToDLLHandle.end(),
+    auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
+    const auto it = std::find_if(threadMap.begin(), threadMap.end(),
                                  [&](auto& ptr)
                                  {
                                      if ( bIsDisplay)
                                          return false;
                                      return ptr.second.get() && ptr.second.get()->m_hWndTwain == hWnd;
                                  });
-    if (it != CTL_StaticData::s_mapThreadToDLLHandle.end())
+    if (it != threadMap.end())
         return it->second.get();
     return nullptr;
 }
 
 CTL_TwainDLLHandle* dynarithmic::FindHandle(HINSTANCE hInst)
 {
-    const auto it = std::find_if(CTL_StaticData::s_mapThreadToDLLHandle.begin(), 
-                                 CTL_StaticData::s_mapThreadToDLLHandle.end(),
+    auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
+    const auto it = std::find_if(threadMap.begin(), threadMap.end(),
                                  [&](auto& ptr)
                                  { return ptr.second.get() && ptr.second.get()->m_hInstance == hInst; });
-    if (it != CTL_StaticData::s_mapThreadToDLLHandle.end())
+    if (it != threadMap.end())
         return it->second.get();
     return nullptr;
 }

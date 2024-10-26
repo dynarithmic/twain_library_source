@@ -263,7 +263,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     break;
                 }
 
-                if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_DECODE_BITMAP)
+                if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_DECODE_BITMAP)
                 {
                     std::string sOut = "Original bitmap from device: \n";
                     sOut += CTL_ErrorStructDecoder::DecodeBitmap(m_hDataHandle);
@@ -637,7 +637,7 @@ TW_UINT16 CTL_ImageXferTriplet::GetImagePendingInfo(TW_PENDINGXFERS *pPI, TW_UIN
 
 std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int errFile)
 {
-    if ( CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+    if ( CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
         CTL_TwainAppMgr::WriteLogInfoA("Potentially aborting transfer..\n");
     CTL_ITwainSession *pSession = GetSessionPtr();
     CTL_ITwainSource *pSource = GetSourcePtr();
@@ -1368,7 +1368,7 @@ void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pS
                           LONG Error, LONG ErrorMsg, const std::string& extraInfo)
 {
     CTL_TwainAppMgr::SetError(Error, extraInfo, true);
-    if ( CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_DTWAINERRORS)
+    if ( CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_DTWAINERRORS)
     {
         char szBuf[DTWAIN_USERRES_MAXSIZE + 1];
         CTL_TwainAppMgr::GetLastErrorString(szBuf, DTWAIN_USERRES_MAXSIZE);
@@ -1396,7 +1396,7 @@ void CTL_ImageXferTriplet::ResolveImageResolution(CTL_ITwainSource *pSource,  DT
                               &ResolutionY,
                               nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr))
         {
-            bool bWriteMisc = CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
+            bool bWriteMisc = CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS;
             std::string sError;
             if (bWriteMisc)
             {
@@ -1422,7 +1422,7 @@ void CTL_ImageXferTriplet::ResolveImageResolution(CTL_ITwainSource *pSource,  DT
     if ( !bGotResolution && !bGetResFromDriver )
     {
         // Get the image info from when we started
-        bool bWriteMisc = CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
+        bool bWriteMisc = CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS;
         if ( bWriteMisc )
         {
             CTL_TwainAppMgr::WriteLogInfoA("Getting image resolution from state 6.\n");
@@ -1443,7 +1443,7 @@ void CTL_ImageXferTriplet::ResolveImageResolution(CTL_ITwainSource *pSource,  DT
 
     if ( !bGotResolution )
     {
-        bool bWriteMisc = CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS;
+        bool bWriteMisc = CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS;
         // Try TWAIN driver setting
         if ( DTWAIN_GetResolution(pSource, &Resolution) )
         {
@@ -1501,7 +1501,7 @@ bool CTL_ImageXferTriplet::ModifyAcquiredDib()
         {
             // reset the dib handle if adjusted
             pSource->SetDibHandle(m_hDataHandle = CurDib->GetHandle(), nLastDib);
-            if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+            if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
             {
                 std::string sOut = msg[i];
                 sOut += CTL_ErrorStructDecoder::DecodeBitmap(m_hDataHandle);
@@ -1518,7 +1518,7 @@ bool CTL_ImageXferTriplet::ModifyAcquiredDib()
 // than what the image type expects.
 bool CTL_ImageXferTriplet::ResampleAcquiredDib()
 {
-    if (!CTL_StaticData::s_bDoResampling)
+    if (!CTL_StaticData::IsResamplingDone())
         return false;
     CTL_ITwainSource* pSource = GetSourcePtr();
     const int nFileType = pSource->GetAcquireFileType();

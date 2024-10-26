@@ -31,6 +31,21 @@ static HANDLE ConvertToAPIString_Internal(PointerType lpOrigString)
 
 }
 
+template <typename WrapperToUse, typename PointerTypeIn, typename PointerTypeOut>
+static LONG ConvertToAPIString_InternalEx(PointerTypeIn lpOrigString, PointerTypeOut outString, LONG nLength)
+{
+    auto retval = WrapperToUse::ConvertToAPIStringEx(lpOrigString);
+    if (retval)
+    {
+        HandleRAII raii(retval);
+        PointerTypeIn ptrData = (PointerTypeIn)raii.getData();
+        auto len = WrapperToUse::traits_type::Length(ptrData);
+        WrapperToUse::traits_type::string_type str(ptrData, len);
+        return StringWrapper::CopyInfoToCString(str, outString, nLength);
+    }
+    return 0;
+}
+
 HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIString(LPCTSTR lpOrigString)
 {
     LOG_FUNC_ENTRY_PARAMS((lpOrigString))
@@ -54,3 +69,28 @@ HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringW(LPCWSTR lpOrigString)
     LOG_FUNC_EXIT_NONAME_PARAMS(retval)
     CATCH_BLOCK((HANDLE)NULL)
 }
+
+LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringEx(LPCTSTR lpOrigString, LPTSTR lpOutString, LONG nSize)
+{
+    LOG_FUNC_ENTRY_PARAMS((lpOrigString, lpOutString, nSize))
+    LONG retval = ConvertToAPIString_InternalEx<StringWrapper>(lpOrigString, lpOutString, nSize);
+    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+    CATCH_BLOCK(0)
+}
+
+/*HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringA(LPCSTR lpOrigString)
+{
+    LOG_FUNC_ENTRY_PARAMS((lpOrigString))
+    auto retval = ConvertToAPIString_Internal<StringWrapperA,LPCSTR>(lpOrigString);
+    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+    CATCH_BLOCK((HANDLE)NULL)
+}
+
+HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringW(LPCWSTR lpOrigString)
+{
+    LOG_FUNC_ENTRY_PARAMS((lpOrigString))
+    auto retval = ConvertToAPIString_Internal<StringWrapperW,LPCWSTR>(lpOrigString);
+    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
+    CATCH_BLOCK((HANDLE)NULL)
+}
+*/

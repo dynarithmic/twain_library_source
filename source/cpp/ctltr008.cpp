@@ -320,7 +320,7 @@ void CTL_ProcessEventTriplet::DeviceEvent()
         // if there is a callback, call it now with the error notifications
         if ( pHandle->m_pCallbackFn )
         {
-            const UINT uMsg = CTL_StaticData::s_nRegisteredDTWAINMsg;
+            const UINT uMsg = CTL_StaticData::GetRegisteredMessage();
             LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_DEVICEEVENT, 0, true);
             #ifdef WIN64
                 (*pHandle->m_pCallbackFn)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG_PTR>(pSource));
@@ -332,7 +332,7 @@ void CTL_ProcessEventTriplet::DeviceEvent()
         // if there is a 64-bit callback, call it now with the error notifications
         if ( pHandle->m_pCallbackFn64 )
         {
-            const UINT uMsg = CTL_StaticData::s_nRegisteredDTWAINMsg;
+            const UINT uMsg = CTL_StaticData::GetRegisteredMessage();
             LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_DEVICEEVENT, 0, true);
             (*pHandle->m_pCallbackFn64)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG_PTR>(pSource));
         }

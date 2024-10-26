@@ -5,10 +5,6 @@
     #include <filesystem>
     namespace filesys = std::filesystem;
 #else
-    #pragma warning (push)
-    #pragma warning (disable : 4714)
-    #include <boost/filesystem.hpp>
-    namespace filesys = boost::filesystem;
-    #pragma warning (pop)
+    #error Must use a C++17 compliant compiler
 #endif
 #endif

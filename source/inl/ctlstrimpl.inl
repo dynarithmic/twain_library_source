@@ -3032,4 +3032,32 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryExA(LPCSTR sLangDLL, DTWAIN_
 #endif
 }
 
+
+//LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringExA(LPCSTR lpOrigString, LPSTR lpOutString, LONG nSize);
+//LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringExW(LPCWSTR lpOrigString, LPWSTR lpOutString, LONG nSize);
+
+LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringExA(LPCSTR lpOrigString, LPSTR lpOutString, LONG nSize)
+{
+#ifdef _UNICODE
+    std::wstring arg(nSize + 1, 0);
+    const DTWAIN_BOOL retVal = DTWAIN_ConvertToAPIStringEx(StringConversion::Convert_AnsiPtr_To_Native(lpOrigString).c_str(),
+                                                          lpOutString?&arg[0]:nullptr, nSize);
+    return null_terminator_copier(get_view(arg), lpOutString, retVal);
+#else
+    return DTWAIN_ConvertToAPIStringEx(lpOrigString, lpOutString, nSize);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ConvertToAPIStringExW(LPCWSTR lpOrigString, LPWSTR lpOutString, LONG nSize)
+{
+#ifdef _UNICODE
+    return DTWAIN_ConvertToAPIStringEx(lpOrigString, lpOutString, nSize);
+#else
+    std::string arg(nSize + 1, 0);
+    DTWAIN_BOOL retVal = DTWAIN_ConvertToAPIStringEx(StringConversion::Convert_WidePtr_To_Native(lpOrigString).c_str(),
+                                                    lpOutString?&arg[0]:nullptr, nSize);
+    return null_terminator_copier(get_view(arg), lpOutString, retVal);
+#endif
+}
+
 #endif // CTLSTRIMPL_INL

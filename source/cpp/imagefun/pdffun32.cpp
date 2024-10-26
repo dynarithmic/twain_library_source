@@ -318,7 +318,7 @@ int CPDFImageHandler::InitializePDFPage(const PDFINFO* pPDFInfo, HANDLE bitmap)
         sDimensions = sBuf.str();
         pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_MEDIABOX, sDimensions.c_str());
 
-        if ( CTL_StaticData::s_logFilterFlags )
+        if ( CTL_StaticData::GetLogFilterFlags() )
         {
             std::string sOut = "PDF Computed media box: ";
             sOut += sDimensions;

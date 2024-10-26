@@ -825,7 +825,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDT
         std::copy(r.begin(), r.end(), vValues.begin());
 
         // Dump contents of the enumerated values to the log
-        if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
         {
             DTWAIN_ARRAY aStrings = DTWAIN_ArrayCreate(DTWAIN_ARRAYANSISTRING, 0);
             DTWAINArrayLowLevel_RAII raii(pHandle, aStrings);
@@ -975,7 +975,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
     {
         bTypesMatch = false;
         // Just log this condition.  We will still get the data, even though TWAIN spec was violated.
-        if (CTL_StaticData::s_logFilterFlags)
+        if (CTL_StaticData::GetLogFilterFlags())
         {
             StringTraitsA::string_type sBadType = GetResourceStringFromMap(IDS_DTWAIN_ERROR_REPORTED_TYPE_MISMATCH);
             sBadType += "  Extended Image Info Value: " + CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, nWhich);
@@ -1214,7 +1214,7 @@ static void DumpArrayFrame(DTWAIN_ARRAY Array)
 
 void dynarithmic::DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap)
 {
-    if ( !(CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS ))
+    if ( !(CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS ))
         return;
 
     std::string szBuf;
