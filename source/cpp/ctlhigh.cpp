@@ -50,7 +50,7 @@ static LONG EnumCapInternal(DTWAIN_SOURCE Source,
                             const std::string& paramLog);
 
 #define GENERATE_PARAM_LOG(argVals) \
-        (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_CALLSTACK) ? (ParamOutputter((#argVals)).outputParam argVals.getString()) : ("")
+        (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) ? (ParamOutputter((#argVals)).outputParam argVals.getString()) : ("")
 
 template <typename CapArrayType>
 static bool GetCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, typename CapArrayType::value_type* value,
@@ -107,7 +107,7 @@ struct SetSupportFn2 : public SetSupportFn1<T>
 template <typename T, typename FnToCall>
 static T FunctionCaller(FnToCall fn, const std::string& func, const std::string& paramLog)
 {
-    const bool doLog = CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_CALLSTACK ? true : false;
+    const bool doLog = CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK ? true : false;
     try
     {
         T bRet {};
@@ -132,7 +132,7 @@ static T FunctionCaller(FnToCall fn, const std::string& func, const std::string&
     catch (...)
     {
         LogExceptionErrorA(func.c_str());
-        if (CTL_StaticData::s_bThrowExceptions)
+        if (CTL_StaticData::IsThrowExceptions())
             DTWAIN_InternalThrowException();
         return {};
     }

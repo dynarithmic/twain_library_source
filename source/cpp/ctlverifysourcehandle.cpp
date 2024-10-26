@@ -29,7 +29,7 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CheckHandles(DTWAIN_BOOL bCheck)
 {
     LOG_FUNC_ENTRY_PARAMS((bCheck))
-    CTL_StaticData::s_bCheckHandles = bCheck ? true : false;
+    CTL_StaticData::SetCheckHandles(bCheck ? true : false);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }

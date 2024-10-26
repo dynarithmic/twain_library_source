@@ -8,7 +8,7 @@ namespace dynarithmic
 {
     CTL_StringType GetVersionInfo()
     {
-        return GetVersionInfo(CTL_StaticData::s_DLLInstance, 0);
+        return GetVersionInfo(CTL_StaticData::GetDLLInstanceHandle(), 0);
     }
 
     CTL_StringType GetVersionInfo(HMODULE dllModule, int indent, CTL_StringType crlf)

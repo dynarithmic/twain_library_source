@@ -102,7 +102,7 @@ static HWND CreateTwainWindow(CTL_TwainDLLHandle * /*pHandle*/,
     HWND hWndParent)
 {
     if (hInstance == nullptr)
-        hInstance = CTL_StaticData::s_DLLInstance;
+        hInstance = CTL_StaticData::GetDLLInstanceHandle();
     HWND hWndP;
     if (!hWndParent)
         hWndP = GetDesktopWindow();
@@ -151,7 +151,7 @@ void dynarithmic::DTWAIN_InvokeCallback(int nWhich, DTWAIN_HANDLE p, DTWAIN_SOUR
 
 void RegisterTwainWindowClass()
 {
-    CTL_StaticData::s_nRegisteredDTWAINMsg = ::RegisterWindowMessage(REGISTERED_DTWAIN_MSG);
+    CTL_StaticData::GetRegisteredMessage() = ::RegisterWindowMessage(REGISTERED_DTWAIN_MSG);
     WNDCLASS wndclass;
     memset(&wndclass, 0, sizeof(WNDCLASS));
 #ifdef DTWAIN_LIB
@@ -162,7 +162,7 @@ void RegisterTwainWindowClass()
     wndclass.lpfnWndProc = DTWAIN_WindowProc;
     wndclass.cbClsExtra = 0;
     wndclass.cbWndExtra = 0;
-    wndclass.hInstance = CTL_StaticData::s_DLLInstance;
+    wndclass.hInstance = CTL_StaticData::GetDLLInstanceHandle();
     wndclass.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
     wndclass.hCursor = LoadCursor(nullptr, IDC_ARROW);
     wndclass.hbrBackground = static_cast<HBRUSH>(GetStockObject(WHITE_BRUSH));
@@ -173,7 +173,7 @@ void RegisterTwainWindowClass()
 
 void UnregisterTwainWindowClass()
 {
-    UnregisterClass(_T("DTWAINWindowClass"), static_cast<HINSTANCE>(CTL_StaticData::s_DLLInstance));
+    UnregisterClass(_T("DTWAINWindowClass"), static_cast<HINSTANCE>(CTL_StaticData::GetDLLInstanceHandle()));
 }
 
 #ifndef DTWAIN_LIB
@@ -186,9 +186,9 @@ BOOL WINAPI DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID /*plvReserved*/)
     {
         if (fdwReason == DLL_PROCESS_ATTACH)
         {
-            CTL_StaticData::s_logFilterFlags = 0;
+            CTL_StaticData::GetLogFilterFlags() = 0;
         }
-        CTL_StaticData::s_DLLInstance = hinstDll;
+        CTL_StaticData::SetDLLInstanceHandle(hinstDll);
     }
     return TRUE;
 

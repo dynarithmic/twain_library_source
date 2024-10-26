@@ -39,8 +39,8 @@ CTL_StringType dynarithmic::LLSelectionDialog(CTL_TwainDLLHandle* pHandle, const
     return {};
     #else
     // Get the resource for the Twain dialog
-    const HGLOBAL hglb = LoadResource(CTL_StaticData::s_DLLInstance,
-                                      static_cast<HRSRC>(FindResource(CTL_StaticData::s_DLLInstance,
+    auto dllHandle = CTL_StaticData::GetDLLInstanceHandle();
+    const HGLOBAL hglb = LoadResource(dllHandle, static_cast<HRSRC>(FindResource(dllHandle,
                                                                       MAKEINTRESOURCE(10000), RT_DIALOG)));
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]{ return !hglb;}, DTWAIN_ERR_NULL_WINDOW, NULL, FUNC_MACRO);
 
@@ -82,9 +82,9 @@ CTL_StringType dynarithmic::LLSelectionDialog(CTL_TwainDLLHandle* pHandle, const
                 selectStruct.CS.mapNames.insert({ onePair.front(), onePair.back() });
         }
     }
-    if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+    if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
         CTL_TwainAppMgr::WriteLogInfoA("Displaying TWAIN Dialog...\n");
-    const INT_PTR bRet = DialogBoxIndirectParam(CTL_StaticData::s_DLLInstance, lpTemplate, opts.hWndParent,
+    const INT_PTR bRet = DialogBoxIndirectParam(dllHandle, lpTemplate, opts.hWndParent,
                                                 reinterpret_cast<DLGPROC>(DisplayTwainDlgProc), reinterpret_cast<LPARAM>(&selectStruct));
     if (bRet == -1)
     {
@@ -234,16 +234,16 @@ static CTL_StringType GetPossibleMappedName(CustomPlacement CS, TCHAR* szSelecte
 LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static SelectStruct* pS;
-    bool bLogMessages = (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS) ? true : false;
+    bool bLogMessages = (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS) ? true : false;
     switch (message)
     {
     case WM_INITDIALOG:
     {
         DTWAINDeviceContextRelease_RAII contextRAII;
-        if (CTL_StaticData::s_DialogFont)
+        if (CTL_StaticData::GetDialogFont())
         {
-            SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(CTL_StaticData::s_DialogFont), 0);
-            EnumChildWindows(hWnd, ChildEnumFontProc, reinterpret_cast<LPARAM>(CTL_StaticData::s_DialogFont));
+            SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(CTL_StaticData::GetDialogFont()), 0);
+            EnumChildWindows(hWnd, ChildEnumFontProc, reinterpret_cast<LPARAM>(CTL_StaticData::GetDialogFont()));
         }
 
         HWND lstSources;

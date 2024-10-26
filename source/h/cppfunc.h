@@ -31,7 +31,7 @@
 #define NAG_FOR_LICENSE (0)
 
 #define THROW_EXCEPTION \
-    { if ( CTL_StaticData::s_bThrowExceptions )  DTWAIN_InternalThrowException(); }
+    { if ( CTL_StaticData::IsThrowExceptions() )  DTWAIN_InternalThrowException(); }
 
      #define STRING_PARAM_LIST(x) _T(#x)
 
@@ -39,24 +39,24 @@
     #ifndef DTWAIN_NO_LOGGING
         #define TRY_BLOCK try {
         #define LOG_FUNC_STRING(x) \
-            if ( CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_CALLSTACK) { \
+            if ( CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) { \
             CTL_LogFunctionCallA((""), LOG_INDENT_CONSOLE, (#x)); \
             CTL_LogFunctionCallA((""), LOG_INDENT_OUT, (#x)); }
 
         #define LOG_FUNC_VALUES(x) \
-            if ( CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_CALLSTACK) {\
+            if ( CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) {\
             CTL_LogFunctionCallA((""), LOG_INDENT_CONSOLE, (x)); \
             CTL_LogFunctionCallA((""), LOG_INDENT_OUT, (#x)); }
 
 
         #define LOG_FUNC_ENTRY_PARAMS_ISTWAINMSG(argVals) \
             TRY_BLOCK \
-            if ((CTL_StaticData::s_logFilterFlags & (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG)) == \
+            if ((CTL_StaticData::GetLogFilterFlags() & (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG)) == \
                     (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG)) \
             CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_IN) + ParamOutputter((#argVals)).outputParam argVals.getString());
 
         #define LOG_FUNC_EXIT_PARAMS_ISTWAINMSG(x) { \
-            if ((CTL_StaticData::s_logFilterFlags & (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG)) == \
+            if ((CTL_StaticData::GetLogFilterFlags() & (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG)) == \
                     (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG)) \
             CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO, LOG_INDENT_OUT) + ParamOutputter((""), true).outputParam(x).getString()); \
             return(x); \
@@ -64,7 +64,7 @@
 
         #define LOG_FUNC_ENTRY_PARAMS(argVals) \
             TRY_BLOCK \
-            if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_CALLSTACK) \
+            if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) \
             CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_IN) + ParamOutputter((#argVals)).outputParam argVals.getString());
 
         #define LOG_FUNC_ENTRY_NONAME_PARAMS(...) \
@@ -73,13 +73,13 @@
         #define LOG_FUNC_EXIT_NONAME_PARAMS(x) { LogValue(FUNC_MACRO, false, x); return(x); }
 
         #define LOG_FUNC_EXIT_PARAMS(x) { \
-            if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_CALLSTACK) \
+            if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) \
             CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO, LOG_INDENT_OUT) + ParamOutputter((""), true).outputParam(x).getString()); \
             return(x); \
                 }
 
         #define LOG_FUNC_VALUES_EX(argvals) { \
-            if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_CALLSTACK) \
+            if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) \
             CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA((""),LOG_INDENT_IN) + ParamOutputter((#argvals)).outputParam argvals.getString()); \
         }
 
