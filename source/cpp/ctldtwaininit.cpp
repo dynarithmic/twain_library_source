@@ -93,7 +93,7 @@ static HWND CreateTwainWindow(CTL_TwainDLLHandle* pHandle,
 static void RegisterTwainWindowClass();
 static std::pair<bool, std::vector<uint16_t>> OpenLogging(LPCTSTR pFileName, LONG logFlags, const LoggingTraits& fTraits = {});
 static void WriteVersionToLog(CTL_TwainDLLHandle* pHandle);
-static bool SysDestroyHelper(CTL_TwainDLLHandle* pHandle, bool bCheck=true);
+static bool SysDestroyHelper(const char* pParentFunc, CTL_TwainDLLHandle* pHandle, bool bCheck=true);
 static void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL, bool bClear);
 static void LoadTransferReadyOverrides();
 static void LoadFlatbedOnlyOverrides();
@@ -1701,8 +1701,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SysDestroy()
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     if (!DTWAIN_EndTwainSession())
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    const DTWAIN_BOOL bRet = SysDestroyHelper(pHandle);
-
+    const DTWAIN_BOOL bRet = SysDestroyHelper(FUNC_MACRO, pHandle);
+    if (!bRet)
+    {
+        LogValue(FUNC_MACRO, false, false);
+    }
 #ifdef DTWAIN_DEBUG_CALL_STACK
     if (CTL_StaticData::GetLogFilterFlags())
         CTL_LogFunctionCall(__FUNC__, 1);
@@ -1711,7 +1714,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SysDestroy()
     CATCH_BLOCK(false)
 }
 
-static bool SysDestroyHelper(CTL_TwainDLLHandle* pHandle, bool bCheck)
+static bool SysDestroyHelper(const char* pParentFunc, CTL_TwainDLLHandle* pHandle, bool bCheck)
 {
     #ifdef _WIN32
     // Unload the OCR interfaces
@@ -1735,17 +1738,30 @@ static bool SysDestroyHelper(CTL_TwainDLLHandle* pHandle, bool bCheck)
     if ( it == threadMap.end() )
         return false;
 
-    UnhookAllDisplays();
-    pHandle->RemoveAllEnumerators();
-    pHandle->RemoveAllSourceCapInfo();
-    pHandle->RemoveAllSourceMaps();
-    pHandle->m_CallbackMsg = nullptr;
-    pHandle->m_CallbackError = nullptr;
-    RemoveThreadIdFromAssociation(threadId);
-    CTL_StaticData::Reset();
-    FreeImage_ClearPlugins();
-    FreeImage_DeInitialise();
-    return TRUE;
+    // Log the parent function, and the assumption that the 
+    // return value from this point on is "true". 
+    LogValue(pParentFunc, false, true);
+
+    try
+    {
+        // Note that the assumption is that no exception is thrown from
+        // this point on.
+        UnhookAllDisplays();
+        pHandle->RemoveAllEnumerators();
+        pHandle->RemoveAllSourceCapInfo();
+        pHandle->RemoveAllSourceMaps();
+        pHandle->m_CallbackMsg = nullptr;
+        pHandle->m_CallbackError = nullptr;
+        RemoveThreadIdFromAssociation(threadId);
+        CTL_StaticData::Reset();
+        FreeImage_ClearPlugins();
+        FreeImage_DeInitialise();
+        return true;
+    }
+    catch (...)
+    {
+        OutputDebugString(_T("Exception error in DTWAIN_SysDestroy()"));
+    }
 }
 
 /* This function tests all open DLL handles to see if any source is acquiring */
