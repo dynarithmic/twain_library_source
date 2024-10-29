@@ -56,8 +56,16 @@ std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> dynarithmic::VerifyHandles(DTW
         }
         if ( !bHandleGood )
         {
-            if (doThrow )
-                throw DTWAIN_ERR_BAD_HANDLE;
+            if (doThrow)
+            {
+                std::error_code ec(DTWAIN_ERR_BAD_HANDLE, std::system_category());
+                std::system_error err(ec, "Invalid DTWAIN Handle");
+                // Since the handle is bad, the only way to report the
+                // error visually to the app is to write to whatever debug
+                // logger may be attached to the program.
+                OutputDebugStringA(err.what());
+                throw err;
+            }
             return { nullptr, nullptr };
         }
 
@@ -68,8 +76,16 @@ std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> dynarithmic::VerifyHandles(DTW
 
             if (!pHandle)
             {
-                if ( doThrow )
-                    throw DTWAIN_ERR_BAD_HANDLE;
+                if (doThrow)
+                {
+                    std::error_code ec(DTWAIN_ERR_BAD_HANDLE, std::system_category());
+                    std::system_error err(ec, "Invalid DTWAIN Handle");
+                    // Since the handle is bad, the only way to report the
+                    // error visually to the app is to write to whatever debug
+                    // logger may be attached to the program.
+                    OutputDebugStringA(err.what());
+                    throw err;
+                }
                 return { nullptr, nullptr };
             }
 
