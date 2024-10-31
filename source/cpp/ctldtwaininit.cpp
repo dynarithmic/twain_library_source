@@ -363,6 +363,7 @@ LONG DLLENTRY_DEF  DTWAIN_GetResourceString(LONG ResourceID, LPTSTR lpszBuffer, 
 {
     LOG_FUNC_ENTRY_PARAMS((ResourceID, lpszBuffer, nMaxLen))
     auto nTotalBytes = GetResourceStringInternal(ResourceID, lpszBuffer, nMaxLen);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszBuffer))
     LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)
     CATCH_BLOCK(0)
 }
@@ -371,6 +372,7 @@ LONG DLLENTRY_DEF  DTWAIN_GetErrorString(LONG lError, LPTSTR lpszBuffer, LONG nM
 {
     LOG_FUNC_ENTRY_PARAMS((lError, lpszBuffer, nMaxLen))
     auto nTotalBytes = GetResourceStringInternal(lError, lpszBuffer, nMaxLen);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszBuffer))
     LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)
     CATCH_BLOCK(0)
 }
@@ -396,6 +398,7 @@ LONG DLLENTRY_DEF DTWAIN_GetConditionCodeString(LONG CC, LPTSTR lpszBuffer, LONG
     LOG_FUNC_ENTRY_PARAMS((CC, lpszBuffer, nMaxLen))
     const LONG lError = -(IDS_TWCC_ERRORSTART + CC);
     const LONG Retval = DTWAIN_GetErrorString(lError, lpszBuffer, nMaxLen);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszBuffer))
     LOG_FUNC_EXIT_NONAME_PARAMS(Retval)
     CATCH_BLOCK(0)
 }
@@ -472,6 +475,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstant(LONG lConstantType, LONG lTwai
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto ret = CTL_StaticData::GetTwainNameFromConstant(lConstantType, lTwainConstant);
     auto numChars = StringWrapper::CopyInfoToCString(ret, lpszOut, nSize);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
     LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
     CATCH_BLOCK(-1)
 }
@@ -738,6 +742,7 @@ LONG DLLENTRY_DEF DTWAIN_GetDSMFullName(LONG DSMType, LPTSTR szDLLName, LONG nMa
     CTL_StringType sDLLName;
     std::copy(strToSet->begin(), strToSet->end(), std::back_inserter(sDLLName));
     nTotalBytes = StringWrapper::CopyInfoToCString(sDLLName, szDLLName, nMaxLen);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szDLLName))
     LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)
     CATCH_BLOCK(0)
 }
@@ -747,6 +752,7 @@ LONG DLLENTRY_DEF DTWAIN_GetActiveDSMPath(LPTSTR szDLLName, LONG nMaxLen)
     LOG_FUNC_ENTRY_PARAMS((szDLLName, nMaxLen))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     return StringWrapper::CopyInfoToCString(CTL_TwainAppMgr::GetDSMPath(), szDLLName, nMaxLen);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szDLLName))
     LOG_FUNC_EXIT_NONAME_PARAMS(-1)
     CATCH_BLOCK(-1)
 }
@@ -756,6 +762,7 @@ LONG DLLENTRY_DEF DTWAIN_GetActiveDSMVersionInfo(LPTSTR szDLLInfo, LONG nMaxLen)
     LOG_FUNC_ENTRY_PARAMS((szDLLInfo, nMaxLen))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     return StringWrapper::CopyInfoToCString(CTL_TwainAppMgr::GetDSMVersionInfo(), szDLLInfo, nMaxLen);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szDLLInfo))
     LOG_FUNC_EXIT_NONAME_PARAMS(-1)
     CATCH_BLOCK(-1)
 }
@@ -1762,6 +1769,7 @@ static bool SysDestroyHelper(const char* pParentFunc, CTL_TwainDLLHandle* pHandl
     {
         OutputDebugString(_T("Exception error in DTWAIN_SysDestroy()"));
     }
+    return false;
 }
 
 /* This function tests all open DLL handles to see if any source is acquiring */
@@ -2024,6 +2032,7 @@ LONG DLLENTRY_DEF DTWAIN_GetVersionString(LPTSTR lpszVer, LONG nLength)
 {
     LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
     const LONG RetVal = StringWrapper::CopyInfoToCString(GetVersionString(), lpszVer, nLength);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszVer))
     LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
     CATCH_BLOCK(-1)
 }
@@ -2032,6 +2041,7 @@ LONG DLLENTRY_DEF DTWAIN_GetLibraryPath(LPTSTR lpszVer, LONG nLength)
 {
     LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
     const LONG RetVal = StringWrapper::CopyInfoToCString(GetDTWAINDLLPath(), lpszVer, nLength);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszVer))
     LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
     CATCH_BLOCK(-1)
 }
@@ -2040,6 +2050,7 @@ LONG DLLENTRY_DEF DTWAIN_GetShortVersionString(LPTSTR lpszVer, LONG nLength)
 {
     LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
     const LONG RetVal = StringWrapper::CopyInfoToCString(GetDTWAINDLLVersionInfoStr(), lpszVer, nLength);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszVer))
     LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
     CATCH_BLOCK(-1)
 }
@@ -2048,6 +2059,7 @@ LONG DLLENTRY_DEF DTWAIN_GetVersionInfo(LPTSTR lpszVer, LONG nLength)
 {
     LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
     const LONG RetVal = StringWrapper::CopyInfoToCString(GetVersionInfo(), lpszVer, nLength);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszVer))
     LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
     CATCH_BLOCK(-1)
 }
@@ -2056,6 +2068,7 @@ LONG DLLENTRY_DEF DTWAIN_GetVersionCopyright(LPTSTR lpszVer, LONG nLength)
 {
     LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
     const LONG RetVal = static_cast<LONG>(GetResourceString(IDS_DTWAIN_APPTITLE, lpszVer, nLength));
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszVer))
     LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
     CATCH_BLOCK(-1)
 }
@@ -2078,6 +2091,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainStringName(LONG category, LONG TwainID, LPTSTR 
         break;
     }
     const LONG RetVal = StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sValue), lpszBuffer, nMaxLen);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszBuffer))
     LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
     CATCH_BLOCK(-1)
 }
@@ -2110,6 +2124,7 @@ LONG DLLENTRY_DEF DTWAIN_GetWindowsVersionInfo(LPTSTR lpszBuffer, LONG nMaxLen)
     }
     else
         RetVal = StringWrapper::CopyInfoToCString(GetWinVersion(), lpszBuffer, nMaxLen);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszBuffer))
     LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
     CATCH_BLOCK(-1)
 }

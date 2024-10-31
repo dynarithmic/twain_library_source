@@ -43,6 +43,7 @@ LONG DLLENTRY_DEF DTWAIN_GetNameFromCap(LONG nCapValue, LPTSTR szValue, LONG nMa
     LOG_FUNC_ENTRY_PARAMS((nCapValue, szValue, nMaxLen))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const LONG nTotalBytes = StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(CTL_TwainAppMgr::GetCapNameFromCap(nCapValue)), szValue, nMaxLen);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szValue));
     LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)
     CATCH_BLOCK(-1)
 }
@@ -59,6 +60,7 @@ LONG DLLENTRY_DEF DTWAIN_GetExtNameFromCap(LONG nValue, LPTSTR szValue, LONG nMa
 {
     LOG_FUNC_ENTRY_PARAMS((nValue, szValue, nMaxLen))
     const LONG bRet = DTWAIN_GetNameFromCap(nValue + 1000, szValue, nMaxLen);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szValue));
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(-1)
 }
@@ -84,6 +86,7 @@ BOOL DLLENTRY_DEF DTWAIN_GetTwainCountryName(LONG countryId, LPTSTR szName)
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto ret = CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_TWCY, countryId);
     StringWrapper::CopyInfoToCString(ret, szName, 32);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szName));
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -103,6 +106,7 @@ BOOL DLLENTRY_DEF DTWAIN_GetTwainLanguageName(LONG nameId, LPTSTR szName)
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto ret = CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_TWLG, nameId);
     StringWrapper::CopyInfoToCString(ret, szName, 32);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szName));
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }

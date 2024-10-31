@@ -151,19 +151,19 @@ class CTL_ErrorStruct
         bool    IsValid() const { return GetDG() || GetDAT() || GetMSG(); }
 
         std::string GetIdentityAndDataInfo(pTW_IDENTITY pOrigin, pTW_IDENTITY pDest, TW_MEMREF pData)
-                {
-                    m_pOrigin = pOrigin; m_pDest = pDest; m_pData = pData;
-                    m_Decoder.StartDecoder(m_pOrigin, m_pDest, GetDG(),
-                                           GetDAT(), GetMSG(), m_pData,
-                                           static_cast<ErrorStructTypes>(m_nStructType));
-                    return m_Decoder.GetDecodedString();
-                }
+        {
+            m_pOrigin = pOrigin; m_pDest = pDest; m_pData = pData;
+            m_Decoder.StartDecoder(m_pOrigin, m_pDest, GetDG(),
+                                    GetDAT(), GetMSG(), m_pData,
+                                    static_cast<ErrorStructTypes>(m_nStructType));
+            return m_Decoder.GetDecodedString();
+        }
 
         std::string GetDTWAINMessageAndDataInfo(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
-                {
-                    m_Decoder.StartMessageDecoder(hWnd, nMsg, wParam, lParam);
-                    return m_Decoder.GetDecodedString();
-                }
+        {
+            m_Decoder.StartMessageDecoder(hWnd, nMsg, wParam, lParam);
+            return m_Decoder.GetDecodedString();
+        }
 
         static std::string GetTWAINDSMError(TW_UINT16 retcode)
         {

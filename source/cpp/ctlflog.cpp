@@ -60,6 +60,7 @@ std::string dynarithmic::CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich,
             nIndent += 3;
         }
         else
+        if ( nWhich == LOG_INDENT_OUT )
         {
             nIndent -= 3;
             nIndent = (std::max)(0, nIndent);
@@ -69,16 +70,24 @@ std::string dynarithmic::CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich,
                 resText = "Exiting";
             s = sTemp + static_cast<std::string>("<<<===") + resText + " ";
         }
+        else
+        if (nWhich == LOG_INDENT_USELAST)
+        {
+            const std::string sTemp(nIndent + 3, ' '); 
+            std::ostringstream strm;
+            strm << sTemp << pFuncName << ": " << GetResourceStringFromMap(IDS_LOGMSG_RETURNSETVALUES) << ": ";
+            s = strm.str();
+        }
     }
     else
     {
         s = std::string(nIndent, ' ');
     }
-    if ( !pString )
+    if ( !pString && nWhich != LOG_INDENT_USELAST )
         s += pFuncName;
     else
         s += s2;
-    if ( nWhich != LOG_INDENT_IN && nWhich != LOG_INDENT_OUT)
+    if ( nWhich != LOG_INDENT_IN && nWhich != LOG_INDENT_OUT && nWhich != LOG_INDENT_USELAST)
     {
         if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_USEFILE)
         {
