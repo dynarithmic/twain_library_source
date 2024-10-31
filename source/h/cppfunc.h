@@ -74,9 +74,8 @@
         #define LOG_FUNC_EXIT_DEREFERENCE_POINTERS(argVals) \
             if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) \
             { \
-                ParamOutputter paramOut((#argVals));\
-                paramOut.setOutputAsString(true); \
-                CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_USELAST) + paramOut.outputParam argVals.getString());\
+                CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_USELAST) + \
+                            ParamOutputter((#argVals)).setOutputAsString(true).outputParam argVals.getString());\
             }
 
         #define LOG_FUNC_EXIT_NONAME_PARAMS(x) { LogValue(FUNC_MACRO, false, x); return(x); }

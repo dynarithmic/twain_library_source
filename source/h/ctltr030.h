@@ -21,7 +21,7 @@
 #ifndef CTLTR030_H
 #define CTLTR030_H
 
-#include "ctltrp.h"
+#include "ctltripletbase.h"
 namespace dynarithmic
 {
     class CTL_Palette8Triplet : public CTL_TwainTriplet

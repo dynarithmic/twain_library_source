@@ -664,6 +664,7 @@ LONG DLLENTRY_DEF DTWAIN_IsTwainAvailableEx(LPTSTR directories, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_NONAME_PARAMS()
     auto retVal = IsTwainAvailableHelper(directories, nMaxLen);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((directories))
     LOG_FUNC_EXIT_NONAME_PARAMS((std::max)(retVal, 0L));
     CATCH_BLOCK(0)
 }
@@ -701,7 +702,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainAvailabilityEx(LPTSTR directories, LONG nMaxLen
     CTL_StringType sDirs;
     auto joinedString = StringWrapper::Join(availability.second, _T("|"));
     StringWrapper::CopyInfoToCString(joinedString, directories, nMaxLen);
-
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((directories))
     LOG_FUNC_EXIT_NONAME_PARAMS(static_cast<LONG>(joinedString.length()));
     CATCH_BLOCK(0)
 }
@@ -1305,6 +1306,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAppInfo(LPTSTR szVerStr, LPTSTR szManu, LPTST
         std::copy(pHandle->m_SessionStruct.szFamily.begin(), pHandle->m_SessionStruct.szFamily.end(), szProdFam);
     if ( szProdName )
         std::copy(pHandle->m_SessionStruct.szProduct.begin(), pHandle->m_SessionStruct.szProduct.end(), szProdName);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szVerStr, szManu, szProdFam, szProdName))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -1508,6 +1510,7 @@ LONG DLLENTRY_DEF DTWAIN_GetFileTypeName(LONG nType, LPTSTR lpszName, LONG nMaxL
 {
     LOG_FUNC_ENTRY_PARAMS((nType, lpszName, nMaxLen))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszName))
     LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypeInfo(&GetFileTypeNameInternal, nType, lpszName, nMaxLen))
     CATCH_BLOCK(-1)
 }
@@ -1516,6 +1519,7 @@ LONG DLLENTRY_DEF DTWAIN_GetFileTypeExtensions(LONG nType, LPTSTR lpszName, LONG
 {
     LOG_FUNC_ENTRY_PARAMS((nType, lpszName, nMaxLen))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszName))
     LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypeInfo(&GetFileTypeExtensionsInternal, nType, lpszName, nMaxLen))
     CATCH_BLOCK(-1)
 }

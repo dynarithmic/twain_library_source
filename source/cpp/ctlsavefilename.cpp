@@ -43,6 +43,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSaveFileName(DTWAIN_SOURCE Source, LPTSTR fileName, 
     LOG_FUNC_ENTRY_PARAMS((Source, fileName, nMaxLen))
     auto [pHandle, pSource] = VerifyHandles(Source);
     const LONG nTotalBytes = StringWrapper::CopyInfoToCString(pSource->GetActualFileName(), fileName, nMaxLen);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((fileName))
     LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)
     CATCH_BLOCK_LOG_PARAMS(-1)
 }
@@ -52,14 +53,8 @@ LONG DLLENTRY_DEF DTWAIN_GetCurrentFileName(DTWAIN_SOURCE Source, LPTSTR szName,
     LOG_FUNC_ENTRY_PARAMS((Source, szName, MaxLen))
     auto [pHandle, pSource] = VerifyHandles(Source);
     const CTL_StringType s = pSource->GetLastAcquiredFileName();
-    const size_t sLen = s.length()  + 1;
-    if (!szName)
-        LOG_FUNC_EXIT_NONAME_PARAMS((LONG)sLen)
-
-    const size_t nLenToUse = (std::min)(sLen, static_cast<size_t>(MaxLen));
-    const CTL_StringType::value_type* sCopy = s.c_str();
-    std::copy(sCopy, sCopy + nLenToUse - 1, szName);
-    szName[nLenToUse-1] = _T('\0');
+    auto sLen = StringWrapper::CopyInfoToCString(s, szName, MaxLen);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szName))
     LOG_FUNC_EXIT_NONAME_PARAMS((LONG)sLen)
     CATCH_BLOCK_LOG_PARAMS(-1L)
 }

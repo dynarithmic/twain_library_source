@@ -245,9 +245,9 @@ namespace dynarithmic
             {
                 extendedImageInfoMap.insert({ lCap ,capName });
                 TW_INFO Info{};
-                Info.InfoID = lCap;
+                Info.InfoID = static_cast<TW_UINT16>(lCap);
                 Info.ReturnCode = TWRC_DATANOTAVAILABLE;
-                intToInfoMap.insert({ lCap, Info });
+                intToInfoMap.insert({ static_cast<TW_UINT16>(lCap), Info });
                 lCap += extOffset;
             }
             CTL_CapStruct cStruct;
@@ -432,6 +432,7 @@ namespace dynarithmic
         else
             retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_VERSION_READ] = true;
 
+        // Check the CRC value
         CTL_StaticData::GetResourceVersion() = StringConversion::Convert_Ansi_To_Native(DTWAIN_TEXTRESOURCE_FILEVERSION);
         bool doResourceCheck = iniInterface->GetBoolValue("Miscellaneous", "resourcecheck", true);
         if (doResourceCheck)

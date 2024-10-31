@@ -346,9 +346,6 @@
     <ClCompile Include="cpp\ctltr043.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include=".\cpp\ctltrp.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include="cpp\ctltsstub.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
@@ -517,9 +514,6 @@
     <ClCompile Include=".\cpp\ocrengine\transym_ocrinterface.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include="cpp\twainfix32.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include="cpp\twainframe.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
@@ -665,6 +659,9 @@
       <Filter>C++ Files</Filter>
     </ClCompile>
     <ClCompile Include="cpp\ctlfilesave.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctltripletbase.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -879,9 +876,6 @@
     <ClInclude Include=".\h\ctltrall.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include=".\h\ctltrp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="h\ctltwainidentity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1072,6 +1066,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h\ctlloadresources.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctltripletbase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

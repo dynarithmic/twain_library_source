@@ -24,6 +24,7 @@ OF THIRD PARTY RIGHTS.
 #include <windows.h>
 #endif
 #include <twain.h>
+#include "ctlconstexprutils.h"
 
 namespace dynarithmic
 {
@@ -52,8 +53,9 @@ namespace dynarithmic
         }
     };
 
-    float Fix32ToFloat(TW_FIX32 Fix32);
-    TW_FIX32  FloatToFix32(float fnum);
-    TW_FIX32Ex FloatToFix32Ex(float fnum);
+    inline TW_FIX32Ex FloatToFix32Ex(float fnum)
+    {
+        return FloatToFix32(fnum);
+    }
 }
 #endif

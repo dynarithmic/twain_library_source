@@ -73,15 +73,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSourceVersionInfo(DTWAIN_SOURCE Source, LPTSTR szVIn
     auto [pHandle, pSource] = VerifyHandles(Source);
     const TW_VERSION *pV = pSource->GetVersion();
     CTL_StringType pName = StringConversion::Convert_AnsiPtr_To_Native(pV->Info);
-    const size_t nLen = pName.length();
-    if (szVInfo == nullptr)
-    {
-        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szVInfo))
-        LOG_FUNC_EXIT_NONAME_PARAMS((LONG)nLen)
-    }
-
-    std::copy_n(pName.begin(), nLen, szVInfo);
-    szVInfo[nLen] = _T('\0');
+    auto nLen = StringWrapper::CopyInfoToCString(pName, szVInfo, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szVInfo))
     LOG_FUNC_EXIT_NONAME_PARAMS((LONG)nLen)
     CATCH_BLOCK_LOG_PARAMS(DTWAIN_FAILURE1)

@@ -103,6 +103,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTempFileDirectory(LPTSTR szFilePath, LONG nMaxLen)
     LOG_FUNC_ENTRY_PARAMS((szFilePath, nMaxLen))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const LONG nRealLen = StringWrapper::CopyInfoToCString(GetDTWAINTempFilePath(pHandle), szFilePath, nMaxLen);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szFilePath))
     LOG_FUNC_EXIT_NONAME_PARAMS(nRealLen)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }

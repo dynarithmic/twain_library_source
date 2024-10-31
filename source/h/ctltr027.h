@@ -21,7 +21,7 @@
 #ifndef CTLTR027_H
 #define CTLTR027_H
 
-#include "ctltrp.h"
+#include "ctltripletbase.h"
 namespace dynarithmic
 {
     class CTL_ImagePendingTriplet : public CTL_TwainTriplet

@@ -95,37 +95,26 @@ TW_UINT16 CTL_CapabilitySetTripletBase::PostEncode(TW_UINT16 rc)
 void CTL_CapabilitySetTripletBase::EncodeOneValue(pTW_ONEVALUE pVal, void *pData)
 {
     // Do Fix32 special case
-    switch (pVal->ItemType )
+    if ( IsTwainFix32Type(pVal->ItemType))
     {
-        case TWTY_FIX32:
-        {
-            const float fnum = static_cast<float>(*static_cast<double*>(pData));
-            TW_FIX32 ffix32 = FloatToFix32( fnum );
-            memcpy(&pVal->Item, &ffix32, sizeof(TW_FIX32));
-        }
-        break;
-
-        case TWTY_STR32:
-        case TWTY_STR64:
-        case TWTY_STR128:
-        case TWTY_STR255:
-        case TWTY_STR1024:
-        {
-            // The data is in the CTL_StringType type.  Must extract
-            // Copy data to TW_CONTAINER
-            // Make sure that string is fully null terminated
-            TW_STR1024 TempString = {};
-            auto ptrString = static_cast<std::string*>(pData);
-            std::copy(ptrString->begin(), ptrString->end(), TempString);
-            memcpy(&pVal->Item, TempString, dynarithmic::GetTwainItemSize( pVal->ItemType) );
-        }
-        break;
-
-        default:
-        // Copy data to TW_CONTAINER
-            memcpy(&pVal->Item, pData, dynarithmic::GetTwainItemSize( pVal->ItemType) );
-        break;
+        const float fnum = static_cast<float>(*static_cast<double*>(pData));
+        TW_FIX32 ffix32 = FloatToFix32( fnum );
+        memcpy(&pVal->Item, &ffix32, sizeof(TW_FIX32));
     }
+    else
+    if (IsTwainStringType(pVal->ItemType) || IsTwainLongStringType(pVal->ItemType))
+    {
+        // The data is in the CTL_StringType type.  Must extract
+        // Copy data to TW_CONTAINER
+        // Make sure that string is fully null terminated
+        TW_STR1024 TempString = {};
+        auto ptrString = static_cast<std::string*>(pData);
+        std::copy(ptrString->begin(), ptrString->end(), TempString);
+        memcpy(&pVal->Item, TempString, dynarithmic::GetTwainItemSize( pVal->ItemType) );
+    }
+    else
+        // Copy data to TW_CONTAINER
+        memcpy(&pVal->Item, pData, dynarithmic::GetTwainItemSize( pVal->ItemType) );
 }
 
 void CTL_CapabilitySetTripletBase::EncodeEnumValue(pTW_ENUMERATION pArray,
@@ -133,7 +122,7 @@ void CTL_CapabilitySetTripletBase::EncodeEnumValue(pTW_ENUMERATION pArray,
                                                    size_t nItemSize,
                                                    void *pData)
 {
-    if ( pArray->ItemType == TWTY_FIX32 )
+    if ( IsTwainFix32Type(pArray->ItemType))
     {
         // floats are stored as doubles in CTL
         const float fnum = static_cast<float>(*static_cast<double*>(pData));
@@ -141,7 +130,7 @@ void CTL_CapabilitySetTripletBase::EncodeEnumValue(pTW_ENUMERATION pArray,
         memcpy(&pArray->ItemList[valuePos], &ffix32, sizeof(TW_FIX32));
     }
     else
-    if ( TwainUtils::IsTwainStringType(pArray->ItemType) )
+    if ( IsTwainStringType(pArray->ItemType) )
     {
         TW_STR1024 TempString = {0};
         std::string *ptrString = reinterpret_cast<std::string*>(pData);
@@ -161,7 +150,7 @@ void CTL_CapabilitySetTripletBase::EncodeRange(pTW_RANGE pVal,
     pVal->ItemType = GetTwainType();
     const size_t nItemSize = dynarithmic::GetTwainItemSize( pVal->ItemType );
 
-    if ( pVal->ItemType == TWTY_FIX32 )
+    if ( IsTwainFix32Type(pVal->ItemType))
     {
         auto fnum = static_cast<float>(*static_cast<double*>(pData1));   // Min Value
         TW_FIX32 ffix32 = FloatToFix32( fnum );
@@ -191,7 +180,7 @@ void CTL_CapabilitySetTripletBase::EncodeArrayValue(pTW_ARRAY pArray,
 {
     // Get size of datatype
     const TW_UINT16 nItemSize = dynarithmic::GetTwainItemSize( pArray->ItemType );
-    if ( pArray->ItemType == TWTY_FIX32 )
+    if ( IsTwainFix32Type(pArray->ItemType))
     {
         // floats are stored as doubles in CTL
         const float fnum = static_cast<float>(*static_cast<double*>(pData));
@@ -199,7 +188,7 @@ void CTL_CapabilitySetTripletBase::EncodeArrayValue(pTW_ARRAY pArray,
         memcpy(&pArray->ItemList[valuePos], &ffix32, sizeof(TW_FIX32));
     }
     else
-    if ( TwainUtils::IsTwainStringType(pArray->ItemType) )
+    if ( IsTwainStringType(pArray->ItemType) )
     {
         TW_STR1024 TempString = {0};
         const auto pStrData = static_cast<std::string*>(pData);

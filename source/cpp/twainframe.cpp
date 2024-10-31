@@ -21,6 +21,7 @@ OF THIRD PARTY RIGHTS.
 #include <array>
 #include "twainframe.h"
 #include "twainfix32.h"
+#include "ctlconstexprutils.h"
 
 namespace dynarithmic
 {

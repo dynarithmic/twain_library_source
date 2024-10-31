@@ -21,7 +21,7 @@
 #ifndef CTLTR039_H
 #define CTLTR039_H
 
-#include "ctltrp.h"
+#include "ctltripletbase.h"
 namespace dynarithmic
 {
     class CTL_ITwainSession;

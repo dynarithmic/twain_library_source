@@ -57,6 +57,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfoString(DTWAIN_SOURCE Source,
         strm << boost::format("%1%") % tempY;
         StringWrapper::SafeStrcpy(YResolution, StringConversion::Convert_Ansi_To_Native(strm.str()).c_str());
     }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((XResolution, YResolution))
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(false)
 }

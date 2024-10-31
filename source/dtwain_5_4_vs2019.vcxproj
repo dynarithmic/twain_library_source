@@ -1145,7 +1145,6 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include=".\cpp\ctltr037.cpp" />
     <ClCompile Include=".\cpp\ctltr038.cpp" />
     <ClCompile Include=".\cpp\ctltr039.cpp" />
-    <ClCompile Include=".\cpp\ctltrp.cpp" />
     <ClCompile Include=".\cpp\ctlobtyp.cpp" />
     <ClCompile Include=".\cpp\ctlunicodeimpl.cpp" />
     <ClCompile Include=".\cpp\ctlhigh.cpp">
@@ -1243,6 +1242,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include="cpp\ctltr041.cpp" />
     <ClCompile Include="cpp\ctltr042.cpp" />
     <ClCompile Include="cpp\ctltr043.cpp" />
+    <ClCompile Include="cpp\ctltripletbase.cpp" />
     <ClCompile Include="cpp\ctltsstub.cpp" />
     <ClCompile Include="cpp\ctltwainfilesystem.cpp" />
     <ClCompile Include="cpp\ctltwainmanager.cpp" />
@@ -1275,7 +1275,6 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="cpp\twainfix32.cpp" />
     <ClCompile Include="cpp\twainframe.cpp" />
     <ClCompile Include="cpp\windows_versioninfo.cpp" />
     <ClCompile Include="cximage\ximabmp.cpp" />
@@ -1442,7 +1441,6 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include=".\h\ctltr036.h" />
     <ClInclude Include=".\h\ctltr038.h" />
     <ClInclude Include=".\h\ctltrall.h" />
-    <ClInclude Include=".\h\ctltrp.h" />
     <ClInclude Include=".\h\dtwain.h" />
     <ClInclude Include=".\h\dtwain_verinfo.h" />
     <ClInclude Include=".\h\dtwainc.h" />
@@ -1486,6 +1484,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\ctltr041.h" />
     <ClInclude Include="h\ctltr042.h" />
     <ClInclude Include="h\ctltr043.h" />
+    <ClInclude Include="h\ctltripletbase.h" />
     <ClInclude Include="h\ctltwainidentity.h" />
     <ClInclude Include="h\ctltwainmanager.h" />
     <ClInclude Include="h\ctltwainmsgloop.h" />

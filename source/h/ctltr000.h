@@ -21,7 +21,7 @@
 #ifndef CTLTR000_H
 #define CTLTR000_H
 
-#include "ctltrp.h"
+#include "ctltripletbase.h"
 
 namespace dynarithmic
 {
