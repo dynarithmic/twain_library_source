@@ -20,7 +20,7 @@
  */
 #ifndef CTLTR008_H
 #define CTLTR008_H
-#include "ctltrp.h"
+#include "ctltripletbase.h"
 #include "ctltwainsession.h"
 namespace dynarithmic
 {

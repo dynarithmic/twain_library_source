@@ -33,29 +33,6 @@
 #include "ctlutils.h"
 using namespace dynarithmic;
 
-LONG dynarithmic::GetArrayTypeFromCapType(TW_UINT16 CapType)
-{
-    switch (CapType)
-    {
-        case TWTY_STR32:
-        case TWTY_STR64:
-        case TWTY_STR128:
-        case TWTY_STR255:
-        case TWTY_STR1024:
-            return DTWAIN_ARRAYANSISTRING;
-
-        case TWTY_FRAME:
-            return DTWAIN_ARRAYFRAME;
-
-        case TWTY_FIX32:
-            return DTWAIN_ARRAYFLOAT;
-
-        default:
-            return DTWAIN_ARRAYLONG;
-     }
-}
-
-
 static DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap,
                                                    LONG lGetType, LONG lContainerType,
                                                    LONG nDataType, LPDTWAIN_ARRAY pArray,
@@ -989,7 +966,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
             Info.ItemType = TWTY_FRAME;
     }
 
-    DTWAIN_ARRAY ExtInfoArray = CreateArrayFromFactory(pHandle, CTL_TwainAppMgr::ExtImageInfoArrayType(Info.ItemType), 0);
+    DTWAIN_ARRAY ExtInfoArray = CreateArrayFromFactory(pHandle, ExtImageInfoArrayType(Info.ItemType), 0);
 
     if (!ExtInfoArray)
     {

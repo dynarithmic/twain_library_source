@@ -97,7 +97,7 @@ bool CTL_ITwainSource::IsSourceCompliant(CTL_EnumTwainVersion TVersion, CTL_Twai
     for (unsigned short Cap : Array)
     {
         int nValue = 0;
-        const int nMask = CTL_TwainAppMgr::GetCapMaskFromCap(Cap);
+        const int nMask = GetCapMaskFromCap(Cap);
 
         if (CTL_TwainAppMgr::IsCapMaskOn(Cap, static_cast<CTL_EnumGetType>(CTL_CapMaskGET)))
         {

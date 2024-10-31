@@ -53,7 +53,7 @@ static bool SetImageSize2(CTL_ITwainSource *p,
     LONG Unit,
     LONG flags);
 
-static bool IsValidUnit(LONG Unit)
+static constexpr bool IsValidUnit(LONG Unit)
 {
     return Unit == DTWAIN_INCHES ||
         Unit == DTWAIN_CENTIMETERS ||
@@ -121,8 +121,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2String(DTWAIN_SOURCE Source, LPTS
             if (pStr[i])
             {
                 std::string sResult = strm.str();
-                StringWrapper::SafeStrcpy(pStr[i], StringConversion::Convert_Ansi_To_Native(sResult).c_str());
-                pStr[i][sResult.size()] = 0;
+                StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sResult), pStr[i], sResult.size());
             }
             strm.str("");
         }

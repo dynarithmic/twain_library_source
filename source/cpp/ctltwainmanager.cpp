@@ -2350,50 +2350,6 @@ void CTL_TwainAppMgr::GetContainerNamesFromType( int nType, StringArray &rArray 
         rArray.push_back( "TW_RANGE");
 }
 
-
-int CTL_TwainAppMgr::GetCapMaskFromCap( CTL_EnumCapability Cap )
-{
-    // Jump table
-    constexpr int CapAll = CTL_CapMaskGET | CTL_CapMaskGETCURRENT | CTL_CapMaskGETDEFAULT |
-                        CTL_CapMaskSET | CTL_CapMaskRESET;
-
-    constexpr int CapSupport = CTL_CapMaskGET | CTL_CapMaskGETCURRENT | CTL_CapMaskGETDEFAULT |
-                            CTL_CapMaskRESET;
-    constexpr int CapAllGets = CTL_CapMaskGET | CTL_CapMaskGETCURRENT | CTL_CapMaskGETDEFAULT;
-
-    switch (Cap)
-    {
-        case TwainCap_XFERCOUNT     :
-        case TwainCap_AUTOFEED      :
-        case TwainCap_CLEARPAGE     :
-        case TwainCap_REWINDPAGE    :
-            return CapAll;
-
-        case TwainCap_COMPRESSION   :
-        case TwainCap_PIXELTYPE     :
-        case TwainCap_UNITS         :
-        case TwainCap_XFERMECH      :
-        case TwainCap_BITDEPTH      :
-        case TwainCap_BITORDER      :
-        case TwainCap_XRESOLUTION   :
-        case TwainCap_YRESOLUTION   :
-            return CapSupport;
-
-        case TwainCap_UICONTROLLABLE :
-        case TwainCap_SUPPORTEDCAPS  :
-            return CTL_CapMaskGET;
-
-        case TwainCap_PLANARCHUNKY   :
-        case TwainCap_PHYSICALHEIGHT :
-        case TwainCap_PHYSICALWIDTH  :
-        case TwainCap_PIXELFLAVOR    :
-        case TwainCap_FEEDERENABLED  :
-        case TwainCap_FEEDERLOADED   :
-            return CapAllGets;
-    }
-    return 0;
-}
-
 bool CTL_TwainAppMgr::IsCapMaskOn( CTL_EnumCapability Cap, CTL_EnumGetType GetType)
 {
     int CapMask = GetCapMaskFromCap( Cap );
@@ -2453,23 +2409,6 @@ std::pair<bool, CTL_StringType> CTL_TwainAppMgr::CheckTwainExistence(CTL_StringT
         return { false, str };
     return { true, str };
 }
-
-LONG CTL_TwainAppMgr::ExtImageInfoArrayType(LONG ExtType)
-{
-    TW_UINT16 actualType = static_cast<TW_UINT16>(ExtType);
-    if (dynarithmic::IsTwainIntegralType(actualType))
-        return DTWAIN_ARRAYLONG;
-    if (dynarithmic::IsTwainStringType(actualType))
-        return DTWAIN_ARRAYANSISTRING;
-    if (dynarithmic::IsTwainHandleType(actualType))
-        return DTWAIN_ARRAYHANDLE;
-    if (dynarithmic::IsTwainFrameType(actualType))
-        return DTWAIN_ARRAYFRAME;
-    if (dynarithmic::IsTwainFix32Type(actualType))
-        return DTWAIN_ARRAYFLOAT;
-    return DTWAIN_ARRAYLONG;
-}
-
 
 /////////////////////////****************//////////////////////////////////
 /////////////// member functions for the CTL_TwainAppMgr///////////////////

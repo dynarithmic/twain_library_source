@@ -21,7 +21,7 @@
 #ifndef CTLTR024_H
 #define CTLTR024_H
 
-#include "ctltrp.h"
+#include "ctltripletbase.h"
 #include "ctltwainsession.h"
 #include "ctlobtyp.h"
 

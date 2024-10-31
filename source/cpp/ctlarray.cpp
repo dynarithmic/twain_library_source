@@ -972,6 +972,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtString(DTWAIN_ARRAY pArray, LONG nWher
     else
         bRet = StringGetterEx<CTL_StringTypeW, CTL_StringType>(pHandle, pArray, nWhere, pStr,
                                 [](CTL_StringTypeW& val) {return StringConversion::Convert_Wide_To_Native(val); });
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStr))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -1672,6 +1673,7 @@ DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_RangeGetExpValueFloatString( DTWAIN_RANG
         strm << boost::format("%1%") % d;
         StringWrapper::SafeStrcpy(pVal, StringConversion::Convert_Ansi_To_Native(strm.str()).c_str());
     }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pVal))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -1930,9 +1932,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeNearestValueFloat( DTWAIN_RANGE pArray, DTW
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeNearestValueFloatString( DTWAIN_RANGE pArray, LPCTSTR dIn,
-                                                                      LPTSTR pOut, LONG RoundType)
+                                                                      LPTSTR pOutput, LONG RoundType)
 {
-    LOG_FUNC_ENTRY_PARAMS((pArray, dIn, pOut, RoundType))
+    LOG_FUNC_ENTRY_PARAMS((pArray, dIn, pOutput, RoundType))
     const double d = StringWrapper::ToDouble(dIn);
     double dOut;
     const DTWAIN_BOOL bRet = DTWAIN_RangeNearestValueFloat(pArray, d, &dOut,RoundType);
@@ -1940,8 +1942,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeNearestValueFloatString( DTWAIN_RANGE pArra
     {
         StringStreamA strm;
         strm << boost::format("%1%") % dOut;
-        StringWrapper::SafeStrcpy(pOut, StringConversion::Convert_Ansi_To_Native(strm.str()).c_str());
+        StringWrapper::SafeStrcpy(pOutput, StringConversion::Convert_Ansi_To_Native(strm.str()).c_str());
     }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pOutput))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }

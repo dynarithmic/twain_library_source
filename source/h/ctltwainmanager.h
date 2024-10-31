@@ -33,7 +33,7 @@
 #include "ctlenum.h"
 #include "capstruc.h"
 #include "errstruc.h"
-#include "ctltrp.h"
+#include "ctltripletbase.h"
 #include "ctltr011.h"
 #include "ctltr012.h"
 #include "ctltr014.h"
@@ -247,7 +247,6 @@ namespace dynarithmic
                                                          TW_UINT16 rc);
 
             static TW_UINT16 GetMemXferValues(CTL_ITwainSource *pSource, TW_SETUPMEMXFER *pXfer);
-            static int  GetCapMaskFromCap( CTL_EnumCapability Cap );
             static bool IsCapMaskOn( CTL_EnumCapability Cap, CTL_EnumGetType GetType);
             static bool IsCapMaskOn( CTL_EnumCapability Cap, CTL_EnumSetType SetType);
             static bool IsSourceCompliant( const CTL_ITwainSource *pSource,
@@ -283,8 +282,6 @@ namespace dynarithmic
             static TW_UINT16 CallDSMEntryProc( TW_IDENTITY *pOrigin, TW_IDENTITY* pDest,
                                                TW_UINT32 dg, TW_UINT16 dat, TW_UINT16 msg, TW_MEMREF pMemref);
 
-
-            static LONG ExtImageInfoArrayType(LONG ExtType);
             static CTL_StringType GetTwainDirFullName(LPCTSTR szTwainDLLName,
                                                       LPLONG pWhichSearch,
                                                       bool leaveLoaded = false,

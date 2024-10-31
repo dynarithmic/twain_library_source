@@ -42,6 +42,39 @@ namespace dynarithmic
         return false;
     }
 
+    static constexpr bool IsTwainShortStringType(TW_UINT16 nItemType)
+    {
+        switch (nItemType)
+        {
+            case TWTY_STR32:
+            case TWTY_STR64:
+            case TWTY_STR128:
+            case TWTY_STR255:
+                return true;
+        }
+        return false;
+    }
+
+    static constexpr bool IsTwainLongStringType(TW_UINT16 nItemType)
+    {
+        switch (nItemType)
+        {
+            case TWTY_STR1024:
+                return true;
+        }
+        return false;
+    }
+
+    static constexpr bool IsTwainUnicodeStringType(TW_UINT16 nItemType)
+    {
+        switch (nItemType)
+        {
+            case TWTY_UNI512:
+                return true;
+        }
+        return false;
+    }
+
     static constexpr bool IsTwainIntegralType(TW_UINT16 nItemType)
     {
         switch (nItemType)
@@ -262,6 +295,91 @@ namespace dynarithmic
         if (iArray.empty())
             return nFileFormat != TWFF_BMP ? false : true;
         return generic_array_finder(iArray, nFileFormat).first;
+    }
+
+    static constexpr LONG GetArrayTypeFromCapType(TW_UINT16 CapType)
+    {
+        if (IsTwainShortStringType(CapType) || IsTwainLongStringType(CapType))
+            return DTWAIN_ARRAYANSISTRING;
+        if ( IsTwainFrameType(CapType))
+            return DTWAIN_ARRAYFRAME;
+        if ( IsTwainFix32Type(CapType))
+            return DTWAIN_ARRAYFLOAT;
+        return DTWAIN_ARRAYLONG;
+    }
+
+    static constexpr LONG ExtImageInfoArrayType(LONG ExtType)
+    {
+        TW_UINT16 actualType = static_cast<TW_UINT16>(ExtType);
+        if (IsTwainIntegralType(actualType))
+            return DTWAIN_ARRAYLONG;
+        if (IsTwainStringType(actualType))
+            return DTWAIN_ARRAYANSISTRING;
+        if (IsTwainHandleType(actualType))
+            return DTWAIN_ARRAYHANDLE;
+        if (IsTwainFrameType(actualType))
+            return DTWAIN_ARRAYFRAME;
+        if (IsTwainFix32Type(actualType))
+            return DTWAIN_ARRAYFLOAT;
+        return DTWAIN_ARRAYLONG;
+    }
+
+    static constexpr int GetCapMaskFromCap(CTL_EnumCapability Cap)
+    {
+        // Jump table
+        constexpr int CapAll = CTL_CapMaskGET | CTL_CapMaskGETCURRENT | CTL_CapMaskGETDEFAULT |
+            CTL_CapMaskSET | CTL_CapMaskRESET;
+
+        constexpr int CapSupport = CTL_CapMaskGET | CTL_CapMaskGETCURRENT | CTL_CapMaskGETDEFAULT |
+            CTL_CapMaskRESET;
+        constexpr int CapAllGets = CTL_CapMaskGET | CTL_CapMaskGETCURRENT | CTL_CapMaskGETDEFAULT;
+
+        switch (Cap)
+        {
+            case TwainCap_XFERCOUNT:
+            case TwainCap_AUTOFEED:
+            case TwainCap_CLEARPAGE:
+            case TwainCap_REWINDPAGE:
+                return CapAll;
+
+            case TwainCap_COMPRESSION:
+            case TwainCap_PIXELTYPE:
+            case TwainCap_UNITS:
+            case TwainCap_XFERMECH:
+            case TwainCap_BITDEPTH:
+            case TwainCap_BITORDER:
+            case TwainCap_XRESOLUTION:
+            case TwainCap_YRESOLUTION:
+                return CapSupport;
+
+            case TwainCap_UICONTROLLABLE:
+            case TwainCap_SUPPORTEDCAPS:
+                return CTL_CapMaskGET;
+
+            case TwainCap_PLANARCHUNKY:
+            case TwainCap_PHYSICALHEIGHT:
+            case TwainCap_PHYSICALWIDTH:
+            case TwainCap_PIXELFLAVOR:
+            case TwainCap_FEEDERENABLED:
+            case TwainCap_FEEDERLOADED:
+                return CapAllGets;
+        }
+        return 0;
+    }
+
+    static constexpr float Fix32ToFloat(TW_FIX32 Fix32) noexcept
+    {
+        return static_cast<float>(Fix32.Whole) + static_cast<float>(Fix32.Frac) / static_cast<float>(65536.0);
+    }
+
+    static constexpr TW_FIX32 FloatToFix32(float fnum) noexcept
+    {
+        TW_FIX32 fix32_value{};
+        const bool sign = fnum < 0 ? true : false;
+        auto value = static_cast<TW_INT32>(fnum * 65536.0 + (sign ? -0.5 : 0.5));
+        fix32_value.Whole = static_cast<TW_INT16>(value >> 16);
+        fix32_value.Frac = static_cast<TW_UINT16>(value & 0x0000ffffL);
+        return fix32_value;
     }
 };
 #endif
