@@ -411,8 +411,13 @@ CTL_ITwainSource*  CTL_TwainAppMgr::GetDefaultSource(CTL_ITwainSession* pSession
 
 bool CTL_TwainAppMgr::SetDefaultSource(CTL_ITwainSource* pSource)
 {
-    const auto pSession = pSource->GetTwainSession();
-    return SetDefaultSource(pSession, pSource);
+    // This only works for TWAIN DSM 2.x and above
+    if (pSource && pSource->GetDTWAINHandle()->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_VERSION2)
+    {
+        const auto pSession = pSource->GetTwainSession();
+        return SetDefaultSource(pSession, pSource);
+    }
+    return false;
 }
 
 bool CTL_TwainAppMgr::OpenSource( CTL_ITwainSession* pSession, const CTL_ITwainSource* pSource/*=nullptr*/)
