@@ -27,6 +27,7 @@
 #define LOG_NO_INDENT   1
 #define LOG_INDENT_IN   2
 #define LOG_INDENT_OUT  3
+#define LOG_INDENT_USELAST 4
 
 #define NAG_FOR_LICENSE (0)
 
@@ -69,6 +70,14 @@
 
         #define LOG_FUNC_ENTRY_NONAME_PARAMS(...) \
             TRY_BLOCK LogValue(FUNC_MACRO, true, int(0), __VA_ARGS__);
+
+        #define LOG_FUNC_EXIT_DEREFERENCE_POINTERS(argVals) \
+            if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) \
+            { \
+                ParamOutputter paramOut((#argVals));\
+                paramOut.setOutputAsString(true); \
+                CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_USELAST) + paramOut.outputParam argVals.getString());\
+            }
 
         #define LOG_FUNC_EXIT_NONAME_PARAMS(x) { LogValue(FUNC_MACRO, false, x); return(x); }
 

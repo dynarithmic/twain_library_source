@@ -202,7 +202,7 @@ void CTL_ErrorStructDecoder::StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDe
     auto sDAT = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DAT, nDAT);
     auto sMSG = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_MSG, nMSG);
 
-    sBuffer << "\nDSM_Entry(pSource=" << pSource << "H, " <<
+    sBuffer << "DSM_Entry(pSource=" << pSource << "H, " <<
                 "pDest=" << pDest << "H, " << sDG << ", " << sDAT << ", " << sMSG << ", " <<
                 "TW_MEMREF=" << Data << "H) " << GetResourceStringFromMap(IDS_LOGMSG_CALLEDTEXT) << "\n";
     s1 = sBuffer.str();

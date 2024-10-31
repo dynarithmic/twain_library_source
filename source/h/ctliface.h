@@ -945,66 +945,122 @@ namespace dynarithmic
         std::string argNames;
         std::ostringstream strm;
         bool m_bIsReturnValue;
+        bool m_bOutputAsString;
 
     private:
-        void LogInputType(std::string outStr, const char *ptr)
+        void LogType(std::string outStr, const char *ptr)
         {
-            // ptr is a valid string supplied by the user, so just write it out
-            if ( ptr )
-                strm << outStr << "=" << ptr;
-            else
-                strm << outStr << "=" << "(null)";
-        }
-
-        void LogInputType(std::string outStr, const wchar_t *ptr)
-        {
+            // ptr is a valid string supplied by the user, but we can't ensure it is null terminated
+            // (It doesn't have to be null-terminated, as the DTWAIN function will eventually put the NULL
+            //  terminated value into the output string).
+            // So for now, we just output the pointer value of the string
             if (ptr)
-                strm << outStr << "=" << StringConversion::Convert_WidePtr_To_Ansi(ptr);
+            {
+                if (!m_bOutputAsString)
+                    strm << outStr << "=" << static_cast<const void*>(ptr);
+                else
+                    strm << outStr << "=\"" << ptr << "\"";
+            }
             else
-                strm << outStr << "=" << "(null)";
+                strm << outStr << "=(null)";
         }
 
-        void LogInputType(std::string outStr, char *ptr)
+        void LogType(std::string outStr, const wchar_t* ptr)
         {
             // ptr is a valid string supplied by the user, but we can't ensure it is null terminated
             // (It doesn't have to be null-terminated, as the DTWAIN function will eventually put the NULL
             //  terminated value into the output string).
             // So for now, we just output the pointer value of the string
-            strm << outStr << "=" << static_cast<void*>(ptr);
-        }
-
-        void LogInputType(std::string outStr, wchar_t *ptr)
-        {
-            // ptr is a valid string supplied by the user, but we can't ensure it is null terminated
-            // (It doesn't have to be null-terminated, as the DTWAIN function will eventually put the NULL
-            //  terminated value into the output string).
-            // So for now, we just output the pointer value of the string
-            strm << outStr << "=" << static_cast<void*>(ptr);
+            if (ptr)
+            {
+                if (!m_bOutputAsString)
+                    strm << outStr << "=" << static_cast<const void*>(ptr);
+                else
+                    strm << outStr << "=\"" << StringConversion::Convert_WidePtr_To_Ansi(ptr) << "\"";
+            }
+            else
+                strm << outStr << "=(null)";
         }
 
         template <typename T>
-        void LogInputType(std::string outStr, T t, std::enable_if_t<std::is_pointer_v<T> >* = nullptr)
+        void LogType(std::string outStr, const T* ptr)
         {
-            if (t)
+            // ptr is a valid pointer to double supplied by the user
+            if (ptr)
+            {
+                if (!m_bOutputAsString)
+                    strm << outStr << "=" << static_cast<const void*>(ptr);
+                else
+                    strm << outStr << *ptr;
+            }
+            else
+                strm << outStr << "=(null)";
+        }
+
+        template <typename T>
+        void LogType(std::string outStr, T t, std::enable_if_t<std::is_pointer_v<T> >* = nullptr)
+        {
+            if constexpr (std::is_same_v<T, wchar_t*>)
+            {
+                LogType(outStr, static_cast<const wchar_t*>(t));
+            }
+            else
+            if constexpr (std::is_same_v<T, char*>)
+            {
+                LogType(outStr, static_cast<const char*>(t));
+            }
+            else
+            if constexpr (std::is_pointer_v<T> && !std::is_same_v<T, void *> 
+                && std::is_fundamental_v<std::remove_pointer_t<T>>)
+            {
+                if (m_bOutputAsString)
+                {
+                    if (t)
+                        strm << outStr << "=" << *t;
+                    else
+                        strm << outStr << "=" << "(null)";
+                }
+                else
+                {
+                    if (t)
+                        strm << outStr << "=" << t;
+                    else
+                        strm << outStr << "=" << "(null)";
+                }
+            }
+            else
+            if constexpr (std::is_pointer_v<T>)
+            {
+                if (t)
+                    strm << outStr << "=" << t;
+                else
+                    strm << outStr << "=" << "(null)";
+            }
+            else
                 strm << outStr << "=" << t;
-            else
-                strm << outStr << "=" << "(null)";
         }
 
         template <typename T>
-        void LogInputType(std::string outStr, T t, std::enable_if_t<!std::is_pointer_v<T> >* = nullptr)
+        void LogType(std::string outStr, T t, std::enable_if_t<!std::is_pointer_v<T> >* = nullptr)
         {
             strm << outStr << "=" << t;
         }
 
     public:
-        ParamOutputter(const std::string& s, bool isReturnValue = false) : nWhich(0), m_bIsReturnValue(isReturnValue)
+        ParamOutputter(const std::string& s, bool isReturnValue = false) : 
+            nWhich(0), m_bIsReturnValue(isReturnValue), m_bOutputAsString(false)
         {
             StringWrapperA::Tokenize(s, "(, )", aParamNames);
             if (!m_bIsReturnValue)
                 strm << "(";
             else
                 strm << s << " " << dynarithmic::GetResourceStringFromMap(IDS_LOGMSG_RETURNTEXT) << " ";
+        }
+
+        ParamOutputter& setOutputAsString(bool bSet) noexcept
+        {
+            m_bOutputAsString = bSet;
+            return *this;
         }
 
         template <typename T, typename ...P>
@@ -1015,9 +1071,9 @@ namespace dynarithmic
             const bool bIsNull = std::is_pointer_v<T> && !t;
             if (!m_bIsReturnValue)
             {
-                // Make sure we log input types correctly, especially character pointers.
+                // Make sure we log types correctly, especially character pointers.
                 // User may supply to us a writable char buffer that is not null-terminated!
-                LogInputType(aParamNames[nWhich], t);
+                LogType(aParamNames[nWhich], t);
             }
             else
             {

@@ -1459,6 +1459,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetValueFloatString( DTWAIN_RANGE pArray, L
         strm << boost::format("%1%") % d;
         StringWrapper::SafeStrcpy(pVal, StringConversion::Convert_Ansi_To_Native(strm.str()).c_str());
     }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pVal));
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -1573,15 +1574,25 @@ DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_RangeGetAllFloatString( DTWAIN_RANGE pAr
     const DTWAIN_BOOL bRet = DTWAIN_RangeGetAllFloat(pArray, &d[0], &d[1], &d[2], &d[3], &d[4]);
     if ( bRet )
     {
-        LPTSTR* vals[] = { &dLow, &dUp, &dStep, &dDefault, &dCurrent };
+        LPTSTR vals[] = { dLow?dLow:nullptr, 
+                           dUp?dUp:nullptr, 
+                           dStep?dStep:nullptr, 
+                           dDefault?dDefault:nullptr, 
+                           dCurrent?dCurrent:nullptr};
         StringStreamA strm;
         for (int i = 0; i < 5; ++i )
         {
             strm << boost::format("%1%") % d[i];
-            StringWrapper::SafeStrcpy(*vals[i], StringConversion::Convert_Ansi_To_Native(strm.str()).c_str());
-            strm.str("");
+            if (vals[i])
+            {
+                std::string sResult = strm.str();
+                StringWrapper::SafeStrcpy(vals[i], StringConversion::Convert_Ansi_To_Native(sResult).c_str());
+                vals[i][sResult.size()];
+                strm.str("");
+            }
         }
     }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((dLow, dUp, dStep, dDefault, dCurrent))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -2140,16 +2151,21 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetAllString(DTWAIN_FRAME Frame, LPTSTR Lef
     LOG_FUNC_ENTRY_PARAMS((Frame, Left, Top, Right, Bottom))
     std::array<double, 4> aFrameComponent;
     const DTWAIN_BOOL bRet = DTWAIN_FrameGetAll(Frame, &aFrameComponent[0], &aFrameComponent[1], &aFrameComponent[2], &aFrameComponent[3]);
-    if ( !bRet )
+    if (!bRet)
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    std::array<LPTSTR*, 4> vals= {&Left, &Top, &Right, &Bottom};
+
+    std::array<LPTSTR*, 4> vals= {Left?&Left:nullptr, Top?&Top:nullptr, Right?&Right:nullptr, Bottom?&Bottom:nullptr};
     StringStreamA strm;
     for (size_t i = 0; i < aFrameComponent.size(); ++i )
     {
         strm << boost::format("%1%") % aFrameComponent[i];
-        StringWrapper::SafeStrcpy(*vals[i], StringConversion::Convert_Ansi_To_Native(strm.str()).c_str());
-        strm.str("");
+        if (vals[i])
+        {
+            StringWrapper::SafeStrcpy(*vals[i], StringConversion::Convert_Ansi_To_Native(strm.str()).c_str());
+            strm.str("");
+        }
     }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Left, Top, Right, Bottom));
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -2159,11 +2175,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetValueString(DTWAIN_FRAME Frame, LONG nWh
     LOG_FUNC_ENTRY_PARAMS((Frame, nWhich, Value))
     double d;
     const DTWAIN_BOOL bRet = DTWAIN_FrameGetValue(Frame, nWhich, &d);
-    if ( !bRet )
+    if (!bRet)
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    StringStreamA strm;
-    strm << boost::format("%1%") % d;
-    StringWrapper::SafeStrcpy(Value, StringConversion::Convert_Ansi_To_Native(strm.str()).c_str());
+    if (Value)
+    {
+        StringStreamA strm;
+        strm << boost::format("%1%") % d;
+        StringWrapper::SafeStrcpy(Value, StringConversion::Convert_Ansi_To_Native(strm.str()).c_str());
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Value))
+    }
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
