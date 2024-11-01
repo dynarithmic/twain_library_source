@@ -135,6 +135,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetVersion(LPLONG lMajor, LPLONG lMinor, LPLONG 
 {
     LOG_FUNC_ENTRY_PARAMS((lMajor, lMinor, lVersionType))
     const bool bRetVal = DTWAIN_GetVersionInternal(lMajor, lMinor, lVersionType, nullptr) ? true : false;
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lMajor, lMinor, lVersionType))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRetVal)
     CATCH_BLOCK(false)
 }
@@ -143,6 +144,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetVersionEx(LPLONG lMajor, LPLONG lMinor, LPLON
 {
     LOG_FUNC_ENTRY_PARAMS((lMajor,lMinor,lVersionType, lPatchLevel))
     const bool bRetVal = DTWAIN_GetVersionInternal(lMajor, lMinor, lVersionType, lPatchLevel)?true:false;
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lMajor, lMinor, lVersionType, lPatchLevel))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRetVal)
     CATCH_BLOCK(false)
 }
@@ -743,7 +745,7 @@ LONG DLLENTRY_DEF DTWAIN_GetDSMFullName(LONG DSMType, LPTSTR szDLLName, LONG nMa
     CTL_StringType sDLLName;
     std::copy(strToSet->begin(), strToSet->end(), std::back_inserter(sDLLName));
     nTotalBytes = StringWrapper::CopyInfoToCString(sDLLName, szDLLName, nMaxLen);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szDLLName))
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szDLLName, pWhichSearch))
     LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)
     CATCH_BLOCK(0)
 }

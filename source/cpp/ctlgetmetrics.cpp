@@ -35,6 +35,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireMetrics(DTWAIN_SOURCE Source, LPLONG I
     LOG_FUNC_ENTRY_PARAMS((Source, ImageCount, SheetCount))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     const DTWAIN_BOOL bRet = GetMetrics(Source, ImageCount, SheetCount)?TRUE:FALSE;
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((ImageCount, SheetCount))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }

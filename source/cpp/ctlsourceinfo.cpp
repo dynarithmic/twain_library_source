@@ -93,12 +93,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetSourceVersionNumber( DTWAIN_SOURCE Source, LP
         *pMajor = pV->MajorNum;
     if ( pMinor)
         *pMinor = pV->MinorNum;
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pMajor, pMinor))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    if ( pMajor )
-        *pMajor = -1L;
-    if ( pMinor )
-        *pMinor = -1L;
-    LOG_FUNC_EXIT_NONAME_PARAMS(false)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 

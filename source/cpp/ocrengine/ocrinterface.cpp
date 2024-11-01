@@ -359,6 +359,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoLong(DTWAIN_OCRTEXTINFOHANDLE OCRT
     }
     break;
     }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pInfo))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -444,6 +445,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoLongEx(DTWAIN_OCRTEXTINFOHANDLE OC
         actualSize = (std::min)(bufSize, realSize);
     }
     std::copy_n(itStart, actualSize, pInfo);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pInfo))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -564,6 +566,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRMajorMinorVersion(DTWAIN_OCRENGINE Engine,
         *lpMajor = pEngine->GetOCRVersionIdentity().Version.MajorNum;
     if (lpMinor)
         *lpMinor = pEngine->GetOCRVersionIdentity().Version.MinorNum;
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpMajor, lpMinor))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }

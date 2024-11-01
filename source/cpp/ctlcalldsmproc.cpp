@@ -125,6 +125,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCurrentTwainTriplet(TW_IDENTITY* pAppID, TW_I
                 *lpMemRef = {};
         }
     }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpDG, lpDAT, lpMsg, lpMemRef))
     LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
     CATCH_BLOCK(FALSE)
 }

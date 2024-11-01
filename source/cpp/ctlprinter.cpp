@@ -205,6 +205,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterStrings(DTWAIN_SOURCE Source, DTWAIN_A
         if ( pNumStrings )
             *pNumStrings = 0;
     }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pNumStrings))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }

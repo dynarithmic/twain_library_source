@@ -116,7 +116,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfo(DTWAIN_SOURCE Source,
 
     if (Compression)
         *Compression = pInfo->Compression;
-
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((XResolution, YResolution, Width, Length, NumSamples, BitsPerSample, BitsPerPixel, Planar, PixelType, Compression))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -145,6 +145,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetBufferedTransferInfo(DTWAIN_SOURCE Source,
         if (userVals[i])
             *(userVals[i]) = xferVals[i];
     }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Compression, BytesPerRow, Columns, Rows, XOffset, YOffset, Flags, BytesWritten, MemoryLength))
     LOG_FUNC_EXIT_NONAME_PARAMS(memxferInfo.Memory.TheMem);
     CATCH_BLOCK_LOG_PARAMS((HANDLE)0)
 }

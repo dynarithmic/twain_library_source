@@ -95,7 +95,7 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     }
     //    int nRes = m_pDib->GetResolution();
     int nLibTiff;
-    switch( m_nFormat ) 
+    switch( m_nFormat )
     {
         case CTL_TwainDib::TiffFormatLZW:
         case CTL_TwainDib::TiffFormatLZWMULTI:
@@ -113,7 +113,7 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
 
         case CTL_TwainDib::TiffFormatGROUP3:
         case CTL_TwainDib::TiffFormatGROUP3MULTI:
-        case CTL_TwainDib::BigTiffFormatGROUP3: 
+        case CTL_TwainDib::BigTiffFormatGROUP3:
         case CTL_TwainDib::BigTiffFormatGROUP3MULTI:
             nLibTiff = COMPRESSION_CCITTFAX3;
             break;

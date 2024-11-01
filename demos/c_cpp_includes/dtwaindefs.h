@@ -902,7 +902,7 @@
 #define TWAIN_ERR_DOCTOODARK          (-1127)
 #define TWAIN_ERR_NOMEDIA             (-1128)
 
-/* File errors generated when calling DTWAIN_AcquireFile or DTWAIN_AcquireFileEx */
+/* General errors  */
 #define DTWAIN_ERR_FILEXFERSTART    (-2000)
 #define DTWAIN_ERR_MEM              (-2001)
 #define DTWAIN_ERR_FILEOPEN         (-2002)
@@ -1016,6 +1016,7 @@
 /* Miscellaneous errors */
 #define DTWAIN_ERR_IMAGEINFO_INVALID       (-2502)
 #define DTWAIN_ERR_WRITEDATA_TOFILE        (-2503)
+#define DTWAIN_ERR_OPERATION_NOTSUPPORTED  (-2504)
 
 #define DTWAIN_ERR_LAST                    (DTWAIN_ERR_USER_START + 1)
 #define DTWAIN_ERR_USER_START              (-80000)  

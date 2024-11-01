@@ -216,6 +216,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCap
             // Replace 0 with what TWAIN found out about the supported operations
             std::get<CAPINFO_IDX_SUPPORTEDOPS>(*CapInfo) = *lpOps;
     }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpOps))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }

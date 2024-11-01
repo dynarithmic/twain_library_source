@@ -121,7 +121,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2String(DTWAIN_SOURCE Source, LPTS
             if (pStr[i])
             {
                 std::string sResult = strm.str();
-                StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sResult), pStr[i], sResult.size());
+                StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sResult), pStr[i], sResult.size() + 1);
             }
             strm.str("");
         }
