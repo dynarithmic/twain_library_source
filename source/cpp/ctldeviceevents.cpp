@@ -107,6 +107,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceNotifications(DTWAIN_SOURCE Source, LPL
         if (Value < 32 && Value > 0L)
             *lpDeviceEvents |= 1L << (Value - 1L);
     });
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpDeviceEvents))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -118,6 +119,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEvent(DTWAIN_SOURCE Source, LPLONG lpEv
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     const CTL_DeviceEvent DeviceEvent = pSource->GetDeviceEvent();
     *lpEvent = DeviceEvent.GetEvent() + 1;
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpEvent))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -134,6 +136,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventEx(DTWAIN_SOURCE Source, LPLONG lp
     const CTL_DeviceEvent DeviceEvent = pSource->GetDeviceEvent();
     const auto pHandle = pSource->GetDTWAINHandle();
     const DTWAIN_BOOL bRet = DeviceEvent.GetEventInfoEx(pHandle, pArray);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpEvent))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }

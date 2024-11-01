@@ -604,7 +604,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetCustomDSData( DTWAIN_SOURCE Source, LPBYTE Data, L
         ImageMemoryHandler::GlobalFree(h);
         LOG_FUNC_EXIT_NONAME_PARAMS(HANDLE(1))
     }
-
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Data, pActualSize))
     LOG_FUNC_EXIT_NONAME_PARAMS(h)
     CATCH_BLOCK(HANDLE())
 }
@@ -684,6 +684,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireStripSizes( DTWAIN_SOURCE Source, LPLO
         if( lpPreferred )
             * lpPreferred = Xfer.Preferred;
     }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpMin, lpMax, lpPreferred))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -764,6 +765,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireStripData(DTWAIN_SOURCE Source, LPLONG
         *YOffset = pBuffer->YOffset;
     if ( lpBytesWritten)
         *lpBytesWritten = pBuffer->BytesWritten;
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpCompression, lpBytesPerRow, lpColumns, lpRows, XOffset, YOffset, lpBytesWritten))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -897,6 +899,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoItem(DTWAIN_SOURCE Source,
     if ( Type )
         *Type = Info.ItemType;
 
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((InfoID, NumItems, Type))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }

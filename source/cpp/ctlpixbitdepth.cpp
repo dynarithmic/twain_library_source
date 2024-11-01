@@ -108,6 +108,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPixelType(DTWAIN_SOURCE Source, LPLONG PixelT
     if ( bCurrent )
         GetType = DTWAIN_CAPGETCURRENT;
     const DTWAIN_BOOL bRet = GetPixelType(Source, PixelType, BitDepth, GetType);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((PixelType, BitDepth))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -189,7 +190,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetBitDepth(DTWAIN_SOURCE Source, LPLONG BitDept
     }
     else
         *BitDepth = DTWAIN_DEFAULT;
-
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((BitDepth))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
