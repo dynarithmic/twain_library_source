@@ -47,8 +47,8 @@
 #include "ctldefsource.h"
 
 #ifdef _MSC_VER
-#pragma warning (disable:4702)
-#pragma comment (lib, "shlwapi")
+    #pragma warning (disable:4702)
+    #pragma comment (lib, "shlwapi")
 #endif
 #ifdef _WIN64
     #pragma message ("Compiling 64-bit DTWAIN")
@@ -70,14 +70,6 @@
     #else
         #define DTWAINSTUB _T("dtwainu_stub")
     #endif
-#endif
-
-#ifdef DTWAIN_DEMO_VERSION
-    #include "splash.h"
-#endif
-
-#ifdef USE_NAMESPACES
-
 #endif
 
 using namespace dynarithmic;
@@ -105,7 +97,6 @@ static void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle);
 #ifdef _WIN32
 static UINT_PTR APIENTRY FileSaveAsHookProc(HWND hWnd, UINT msg, WPARAM w, LPARAM lparam);
 static WNDPROC SubclassTwainMsgWindow(HWND hWnd, WNDPROC wProcIn = nullptr);
-//LRESULT ProcessHook(int nCode, WPARAM wParam, LPARAM lParam, int nValue);
 #define     TWSubclassWindow(hwnd, lpfn)  \
             (reinterpret_cast<WNDPROC>(SetWindowLongPtr((hwnd), GWLP_WNDPROC, (LONG_PTR)(WNDPROC)(lpfn))))
 #endif

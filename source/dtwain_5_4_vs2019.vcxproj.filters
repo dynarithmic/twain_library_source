@@ -900,9 +900,6 @@
     <ClInclude Include=".\h\dtwain_resource_constants2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="h\dtwain_standard_defs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include=".\h\dtwain_verinfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1069,6 +1066,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h\ctltripletbase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\dtwain_config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\dtwain_standard_defs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
