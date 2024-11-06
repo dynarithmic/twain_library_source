@@ -42,6 +42,9 @@
 #include "ctltwainmanager.h"
 #include "twainfix32.h"
 #include "dtwinverex.h"
+#include "cppfunc.h"
+#include "logwriterutils.h"
+
 using namespace dynarithmic;
 
 static constexpr std::array<std::pair<int, int>, 30> mapCondCode = { {
@@ -218,7 +221,7 @@ CTL_ITwainSession* CTL_TwainAppMgr::CreateTwainSession(
                     pHandle->m_TwainMemoryFunc = &pHandle->m_Twain2Func;
                     break;
                 default:
-                    WriteLogInfoA("The entry points for the TWAINDSM.DLL were not found");
+                    LogWriterUtils::WriteLogInfoIndentedA("The entry points for the TWAINDSM.DLL were not found");
                     DestroyTwainSession(pSession);
                     return nullptr;
             }
@@ -529,10 +532,10 @@ bool CTL_TwainAppMgr::GetBestContainerType(CTL_TwainDLLHandle* pHandle,
                 else
                 {
                     StringStreamA strm;
-                    strm << boost::format("\nError: Source %1%: Capability %2% container defaults to TW_ONEVALUE\n") %
+                    strm << boost::format("Error: Source %1%: Capability %2% container defaults to TW_ONEVALUE\n") %
                                           StringConversion::Convert_Native_To_Ansi(pSource->GetProductName()) % GetCapNameFromCap(nCap);
                     nDataType = static_cast<UINT>(DTWAIN_CAPDATATYPE_UNKNOWN);
-                    WriteLogInfoA(strm.str());
+                    LogWriterUtils::WriteLogInfoIndentedA(strm.str());
                     rContainerGet = TwainContainer_ONEVALUE;
                 }
             }
@@ -576,10 +579,10 @@ bool CTL_TwainAppMgr::GetBestCapDataType(const CTL_ITwainSource* pSource, TW_UIN
         else
         {
             StringStreamA strm;
-            strm << boost::format("\nError: Source %1%: Data type for capability %2% was not retrieved\n") %
+            strm << boost::format("Error: Source %1%: Data type for capability %2% was not retrieved\n") %
                                   StringConversion::Convert_Native_To_Ansi(pSource->GetProductName()) % GetCapNameFromCap(nCap);
             nDataType = static_cast<UINT>(DTWAIN_CAPDATATYPE_UNKNOWN);
-            WriteLogInfoA(strm.str());
+            LogWriterUtils::WriteLogInfoIndentedA(strm.str());
         }
     }
     return false;
@@ -1720,7 +1723,7 @@ void CTL_TwainAppMgr::SetAndLogError(int nError, const std::string& extraInfo, b
     {
         char szBuf[DTWAIN_USERRES_MAXSIZE + 1] = {};
         CTL_TwainAppMgr::GetLastErrorString(szBuf, DTWAIN_USERRES_MAXSIZE);
-        CTL_TwainAppMgr::WriteLogInfoA(szBuf);
+        LogWriterUtils::WriteLogInfoIndentedA(szBuf);
     }
 }
 
@@ -1893,7 +1896,7 @@ int CTL_TwainAppMgr::SetTransferCount( const CTL_ITwainSource *pSource,
     {
         StringStreamA strm;
         strm << boost::format("\nSetting Transfer Count.  Transfer Count = %1%\n") % nCount;
-        WriteLogInfoA(strm.str());
+        LogWriterUtils::WriteLogInfoA(strm.str());
     }
 
     // If the device supports the CAP_SHEETCOUNT capability, use that to set the number of
@@ -2548,29 +2551,6 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( TW_IDENTITY *pOrigin, TW_IDENTITY* 
     return s_pGlobalAppMgr->CallDSMEntryProc( CTL_TwainTriplet(pOrigin, pDest, dg, dat, msg, pMemref) );
 }
 
-void CTL_TwainAppMgr::WriteLogInfoA(const std::string& s, bool bFlush)
-{
-    if (!CTL_StaticData::GetLogFilterFlags())
-        return;
-
-    if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_USECRLF)
-        std::string crlf = "\n";
-
-    CTL_StaticData::GetLogger().StatusOutFast(s.c_str());
-    if (bFlush)
-        CTL_StaticData::GetLogger().Flush();
-}
-
-void CTL_TwainAppMgr::WriteLogInfoW(const std::wstring& s, bool bFlush)
-{
-    WriteLogInfoA(StringConversion::Convert_Wide_To_Ansi(s), bFlush);
-}
-
-void CTL_TwainAppMgr::WriteLogInfo(const CTL_StringType& s, bool bFlush)
-{
-    WriteLogInfoA(StringConversion::Convert_Native_To_Ansi(s));
-}
-
 void CTL_TwainAppMgr::GatherCapabilityInfo(CTL_ITwainSource* pSource)
 {
     const auto pHandle = pSource->GetDTWAINHandle();
@@ -2636,7 +2616,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         e = GetGeneralErrorInfo(nDG, nDAT, nMSG);
         s = e.GetIdentityAndDataInfo(pOrigin, pDest, pData);
         s = GetResourceStringFromMap(IDS_LOGMSG_INPUTTEXT) + ": " + s;
-        WriteLogInfoA(s);
+        LogWriterUtils::WriteMultiLineInfoIndentedA(s, "\n");
     }
 
     TripletSaveRestore tSaveRestore(&m_pCurrentTriplet);
@@ -2694,7 +2674,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
             sz = e.GetTWAINDSMErrorCC(IDS_TWCC_EXCEPTION);
             s = e.GetIdentityAndDataInfo(pOrigin, pDest, pData);
             strm << boost::format("%1%=%2% (%3%)\n%4%") % GetResourceStringFromMap(IDS_LOGMSG_OUTPUTDSMTEXT) % retcode % sz % s;
-            WriteLogInfoA(strm.str());
+            LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
         }
         return retcode;
     }
@@ -2716,7 +2696,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         std::string s1 = GetResourceStringFromMap(IDS_LOGMSG_OUTPUTDSMTEXT);
         boost::format fmt("%1%=%2% (%3%)\n%4%\n");
         strm << fmt % s1.c_str() % retcode % sz % s;
-        WriteLogInfoA(strm.str());
+        LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
     }
     if ( retcode != TWRC_SUCCESS )
         SetLastTwainError( retcode, TWRC_Error );
@@ -2770,7 +2750,7 @@ VOID CALLBACK CTL_TwainAppMgr::TwainTimeOutProc(HWND, UINT, ULONG, DWORD)
 #ifdef _WIN32
     KillTimer(nullptr, CTL_StaticData::GetTimeoutID());
 
-    WriteLogInfoA("The last TWAIN triplet was not completed due to time out");
+    LogWriterUtils::WriteLogInfoIndentedA("The last TWAIN triplet was not completed due to time out");
     SetError(DTWAIN_ERR_TIMEOUT, "", false);
     throw DTWAIN_ERR_TIMEOUT;
 #endif

@@ -1621,7 +1621,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
     }
     catch(...)
     {
-        CTL_TwainAppMgr::WriteLogInfoA(sClosingDSM);
+        LogWriterUtils::WriteLogInfoIndentedA(sClosingDSM);
     }
 
     try
@@ -1630,7 +1630,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
     }
     catch(...)
     {
-        CTL_TwainAppMgr::WriteLogInfoA(sClosingTwainSession);
+        LogWriterUtils::WriteLogInfoIndentedA(sClosingTwainSession);
     }
     if ( CTL_StaticData::GetThreadToDLLHandleMap().size() == 1 )
     {
@@ -1643,14 +1643,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
         {
             if (logFilterFlags)
             {
-                StringTraitsA::string_type sClosingManager = GetResourceStringFromMap(IDS_DTWAIN_ERROR_CLOSING_DTWAIN_MANAGER) + "\n";
-                CTL_TwainAppMgr::WriteLogInfoA(sClosingManager);
+                StringTraitsA::string_type sClosingManager = GetResourceStringFromMap(IDS_DTWAIN_ERROR_CLOSING_DTWAIN_MANAGER);
+                LogWriterUtils::WriteLogInfoIndentedA(sClosingManager);
             }
         }
         if (logFilterFlags)
         {
-            StringTraitsA::string_type sClosingDTWAIN = GetResourceStringFromMap(IDS_CLOSING_DTWAIN) + "\n";
-            CTL_TwainAppMgr::WriteLogInfoA(sClosingDTWAIN);
+            LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_CLOSING_DTWAIN));
         }
     }
 
@@ -1681,8 +1680,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
         {
             if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
             {
-                StringTraitsA::string_type sRemoveWindow = GetResourceStringFromMap(IDS_DTWAIN_ERROR_REMOVE_WINDOW) + "\n";
-                CTL_TwainAppMgr::WriteLogInfoA(sRemoveWindow);
+                LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_DTWAIN_ERROR_REMOVE_WINDOW));
             }
         }
     }
@@ -1989,9 +1987,8 @@ void dynarithmic::OutputDTWAINError(const CTL_TwainDLLHandle* pHandle, LPCSTR pF
     else
         DTWAIN_GetErrorStringA( pHandle->m_lLastError, szBuf, MaxMessage);
     std::string s(szBuf);
-    s += "\n";
     if ( !pHandle )
-        CTL_TwainAppMgr::WriteLogInfoA(s);
+        LogWriterUtils::WriteLogInfoIndentedA(s);
 
     if (logFilterFlags & DTWAIN_LOG_ERRORMSGBOX && pHandle)
         LogDTWAINErrorToMsgBox(pHandle->m_lLastError, pFunc, s);
@@ -2290,11 +2287,15 @@ CTL_StringType dynarithmic::GetDTWAINTempFilePath(CTL_TwainDLLHandle* pHandle)
     {
         const auto tempPath = temp_directory_path();
         if (tempPath.empty())
-            CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_ERRORTEXT) + ": " + GetResourceStringFromMap(IDS_LOGMSG_TEMPFILENOTEXISTTEXT) + "\n");
+        {
+            std::string msg = GetResourceStringFromMap(IDS_LOGMSG_ERRORTEXT) + ": " + GetResourceStringFromMap(IDS_LOGMSG_TEMPFILENOTEXISTTEXT);
+            LogWriterUtils::WriteLogInfoIndentedA(msg);
+        }
         else
             pHandle->m_sTempFilePath = tempPath;
     }
-    CTL_TwainAppMgr::WriteLogInfoA("Temp path is " +  StringConversion::Convert_Native_To_Ansi(pHandle->m_sTempFilePath) + "\n");
+    std::string msg = "Temp path is " + StringConversion::Convert_Native_To_Ansi(pHandle->m_sTempFilePath);
+    LogWriterUtils::WriteLogInfoIndentedA(msg);
     return pHandle->m_sTempFilePath;
 }
 

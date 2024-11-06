@@ -416,7 +416,7 @@ static std::vector<TCHAR> GetDefaultName(SelectStruct& selectTraits)
                 DefName.resize(nCharacters);
                 GetSourceInfo(reinterpret_cast<CTL_ITwainSource*>(DefSource), &CTL_ITwainSource::GetProductName, DefName.data(), nCharacters);
                 if (bLogMessages)
-                    CTL_TwainAppMgr::WriteLogInfoA("Initializing TWAIN Dialog -- Retrieved default TWAIN Source name...\n");
+                    LogWriterUtils::WriteLogInfoIndentedA("Initializing TWAIN Dialog -- Retrieved default TWAIN Source name...");
             }
         }
     }

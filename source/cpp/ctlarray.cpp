@@ -1595,7 +1595,7 @@ DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_RangeGetAllFloatString( DTWAIN_RANGE pAr
         {
             strm << boost::format("%1%") % d[i];
             auto sVal = strm.str();
-            StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sVal), vals[i], sVal.size() + 1);
+            StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sVal), vals[i], static_cast<int32_t>(sVal.size()) + 1);
             strm.str("");
         }
     }
@@ -1957,7 +1957,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeNearestValueFloatString( DTWAIN_RANGE pArra
         StringStreamA strm;
         strm << boost::format("%1%") % dOut;
         auto sVal = strm.str();
-        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sVal), pOutput, sVal.size() + 1);
+        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sVal), pOutput, static_cast<int32_t>(sVal.size()) + 1);
     }
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pOutput))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
@@ -2178,7 +2178,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetAllString(DTWAIN_FRAME Frame, LPTSTR Lef
     {
         strm << boost::format("%1%") % aFrameComponent[i];
         auto sVal = strm.str();
-        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sVal), vals[i], sVal.size() + 1);
+        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sVal), vals[i], static_cast<int32_t>(sVal.size()) + 1);
         strm.str("");
     }
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Left, Top, Right, Bottom));
@@ -2198,7 +2198,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetValueString(DTWAIN_FRAME Frame, LONG nWh
         StringStreamA strm;
         strm << boost::format("%1%") % d;
         auto sVal = strm.str();
-        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sVal), Value, sVal.size() + 1);
+        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sVal), Value, static_cast<int32_t>(sVal.size()) + 1);
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Value))
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(true)

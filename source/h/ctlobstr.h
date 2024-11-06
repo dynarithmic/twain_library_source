@@ -847,6 +847,8 @@ namespace dynarithmic
                               std::vector<unsigned>* positionArray= nullptr)
         {
             rArray.clear();
+            if (!lpszTokStr)
+                return 0;
             typedef boost::tokenizer<boost::char_separator<CharType>,
                                      typename StringType::const_iterator,
                                      StringType> tokenizer;

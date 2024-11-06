@@ -162,8 +162,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
                 StringStreamOutA strm;
                 strm << "Using capability info from DTWAIN32.INI (Source="
                      << sProdNameA << ", Cap=" << CTL_TwainAppMgr::GetCapNameFromCap(nCap) << ")\n";
-
-                CTL_TwainAppMgr::WriteLogInfoA(strm.str());
+                LogWriterUtils::WriteLogInfoIndentedA(strm.str());
             }
 
             if (bContainerInfoFound)

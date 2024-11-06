@@ -113,7 +113,7 @@ static T FunctionCaller(FnToCall fn, const std::string& func, const std::string&
         T bRet {};
         if (doLog)
         {
-            try { CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_IN) + paramLog); }
+            try { LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_IN) + paramLog); }
             catch (...) {}
         }
         bRet = fn();
@@ -121,7 +121,7 @@ static T FunctionCaller(FnToCall fn, const std::string& func, const std::string&
         {
             try
             {
-                CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_OUT) + ParamOutputter("", true).outputParam(bRet).getString());
+                LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_OUT) + ParamOutputter("", true).outputParam(bRet).getString());
             }
             catch (...)
             { return bRet; }

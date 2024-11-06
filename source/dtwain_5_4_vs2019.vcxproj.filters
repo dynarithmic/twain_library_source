@@ -664,6 +664,9 @@
     <ClCompile Include="cpp\ctltripletbase.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
+    <ClCompile Include="cpp\logwriterutils.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp\pdflib32\a85encode.h">
@@ -1072,6 +1075,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h\dtwain_standard_defs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\logwriterutils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

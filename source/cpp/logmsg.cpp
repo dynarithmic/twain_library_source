@@ -167,8 +167,10 @@ void Callback_Logger::trace(const std::string& msg)
     }
 }
 
-CLogSystem::CLogSystem() : m_bEnable(false), m_bPrintTime(false), m_bPrintAppName(false), m_bFileOpenedOK(false), m_bErrorDisplayed(false),
-m_pDLLHandle{}
+CLogSystem::CLogSystem() : m_bEnable(false), m_bPrintTime(false), 
+                           m_bPrintAppName(false), m_bFileOpenedOK(false), 
+                           m_bErrorDisplayed(false), m_nIndentSize(3), m_nCurrentIndentLevel(0),
+                           m_pDLLHandle{}
 {}
 
 /////////////////////////////////////////////////////////////////////////////

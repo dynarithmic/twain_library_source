@@ -1256,6 +1256,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include="cpp\iohandler_pbm.cpp" />
     <ClCompile Include="cpp\iohandler_webp.cpp" />
     <ClCompile Include="cpp\linux_versioninfo.cpp" />
+    <ClCompile Include="cpp\logwriterutils.cpp" />
     <ClCompile Include="cpp\ocrengine\ocrselect.cpp" />
     <ClCompile Include="cpp\pdflib32\a85encode.cpp" />
     <ClCompile Include="cpp\pdflib32\ahexencode.cpp" />
@@ -1516,6 +1517,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\imagefun\wmffun32.h" />
     <ClInclude Include="h\imagexferfilewriter.h" />
     <ClInclude Include="h\logmsg.h" />
+    <ClInclude Include="h\logwriterutils.h" />
     <ClInclude Include="h\notimpl.h" />
     <ClInclude Include="h\sourceacquireopts.h" />
     <ClInclude Include="h\sourceselectopts.h" />

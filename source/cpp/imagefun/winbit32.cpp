@@ -26,6 +26,7 @@
 #include "ctlfileutils.h"
 #include "FreeImagePlus.h"
 #include "../cximage/ximage.h"
+#include "logwriterutils.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4244)
@@ -92,7 +93,7 @@ int  CDibInterface::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR pat
         bi->biClrUsed = nUsedColors;
         StringStreamA strm;
         strm << nUsedColors;
-        CTL_TwainAppMgr::WriteLogInfoA("Image has " + strm.str() + " colors\n");
+        LogWriterUtils::WriteLogInfoA("Image has " + strm.str() + " colors\n");
 
         err = WriteImage(ptrHandler,
             pImage2,

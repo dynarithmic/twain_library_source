@@ -238,7 +238,7 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
                 // Check for existing writable directory
                 if (!dynarithmic::directory_writeable(fileName.c_str()))
                 {
-                    CTL_TwainAppMgr::WriteLogInfoA(GetDirectoryCreationError(dynarithmic::get_parent_directory(fileName.c_str(), false)));
+                    LogWriterUtils::WriteLogInfoIndentedA(GetDirectoryCreationError(dynarithmic::get_parent_directory(fileName.c_str(), false)));
                     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]{ return true; }, DTWAIN_ERR_INVALID_DIRECTORY, false, FUNC_MACRO);
                 }
             }
@@ -254,7 +254,7 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
                     if (!dirCreated.first)
                     {
                         // directory creation failed for one of the files.  
-                        CTL_TwainAppMgr::WriteLogInfoA(GetDirectoryCreationError(testDir));
+                        LogWriterUtils::WriteLogInfoIndentedA(GetDirectoryCreationError(testDir));
                         DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]
                             { return dirCreated.first == false;  }, DTWAIN_ERR_CREATE_DIRECTORY, false, FUNC_MACRO);
                     }
