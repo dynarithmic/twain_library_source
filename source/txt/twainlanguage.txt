@@ -9,3 +9,5 @@ romanian
 russian
 portuguese
 simplified_chinese
+traditional_chinese
+japanese

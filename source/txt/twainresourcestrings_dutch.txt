@@ -209,6 +209,7 @@
 2501 Niet afsluiten TWAIN bron
 2502 Ongeldige afbeeldingsinformatie
 2503 Fout bij het schrijven van gegevens naar bestand
+2504 Operatie niet ondersteund  
 3000 Selecteer bron
 3001 &Selecteer
 3002 &Annuleer
@@ -231,6 +232,7 @@
 3019 Tijdelijk beeldbestand is
 3020 Fout bij het maken van een tijdelijk afbeeldingsbestand
 3021 Afbeeldingsbestand is succesvol aangemaakt
+3022 Waarden ingesteld bij terugkeer
 9700 DTWAIN Twain Library, v{short_version}, {company_name}, {copyright}
 9999 Exception error occurred during call to Twain DSM.  Possible corrupted Twain session?
 10000 [Gebruikersbericht]

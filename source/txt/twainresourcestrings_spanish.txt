@@ -209,6 +209,7 @@
 2501 No le podríamos tapar a TWAIN origen
 2502 Información de imagen no válida
 2503 Error al escribir datos en el archivo
+2504 Operación no soportada  
 3000 Seleccionar Fuente  
 3001 &Seleccionar  
 3002 &Cancelar
@@ -231,6 +232,7 @@
 3019 El archivo de imagen temporal es
 3020 Error al crear un archivo de imagen temporal
 3021 Archivo de imagen creado exitosamente
+3022 Valores establecidos en el retorno
 9700 DTWAIN Twain Library, v{short_version}, {company_name}, {copyright}
 9999 Exception error occurred during call to Twain DSM.  Possible corrupted Twain session?
 10000 [Mensaje de usuario]

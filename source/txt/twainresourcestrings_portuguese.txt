@@ -210,6 +210,7 @@
 2501 Não foi possível fechar a fonte TWAIN  
 2502 Informações de imagem inválidas ao adquirir imagem  
 2503 Erro ao gravar dados no arquivo  
+2504 Operação não suportada  
 3000 Selecionar Fonte  
 3001 &Selecionar  
 3002 &Cancelar  
@@ -232,6 +233,7 @@
 3019 Arquivo de Imagem Temporário é  
 3020 Erro ao criar arquivo de Imagem Temporário  
 3021 Arquivo de imagem criado com sucesso  
+3022 Valores definidos no retorno
 9700 DTWAIN Twain Library, v{short_version}, {company_name}, {copyright}
 9999 Exception error occurred during call to Twain DSM.  Possible corrupted Twain session?
 9999 Ocorreu um erro de exceção durante a chamada ao DSM Twain. Sessão Twain possivelmente corrompida?
