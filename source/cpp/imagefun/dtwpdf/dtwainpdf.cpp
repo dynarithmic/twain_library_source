@@ -19,7 +19,7 @@
     OF THIRD PARTY RIGHTS.
  */
  #ifdef _MSC_VER
-#pragma warning (disable:4786 4702)
+#pragma warning (disable:4786 4702 4996)
 #endif
 #define PROTOTYPES 1
 #define HAVE_PROTOTYPES
@@ -52,6 +52,7 @@
 #ifdef _MSC_VER
 #pragma warning (push)
 #pragma  warning (disable : 4702)
+#pragma  warning (disable : 4996)
 #endif
 #include <md5c.h>
 #include "a85encode.h"
@@ -61,6 +62,8 @@
 #include "tif_config.h"
 #include "tiffio.h"
 #include "dtwain_float_utils.h"
+#include "logwriterutils.h"
+
 #ifdef _MSC_VER
 #pragma warning (pop)
 #endif
@@ -516,7 +519,7 @@ bool PdfDocument::OpenNewPDFFile(CTL_StringType sFile)
     {
         CTL_StringStreamType strm;
         strm << _T("File name to be saved: ") << sFile;
-        CTL_TwainAppMgr::WriteLogInfo(strm.str());
+        LogWriterUtils::WriteLogInfo(strm.str());
     }
 
     m_outFile.open(sFile, std::ios::binary|std::ios::out);

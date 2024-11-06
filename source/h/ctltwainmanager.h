@@ -20,10 +20,7 @@
  */
 #ifndef CTLTWAINMANAGER_H
 #define CTLTWAINMANAGER_H
-#ifdef _MSC_VER
-#pragma warning( disable : 4786)
-#pragma warning( disable : 4996)
-#endif
+
 #include <memory>
 #include <map>
 #include <string>
@@ -275,9 +272,6 @@ namespace dynarithmic
             static LONG         GetCapFromCapName( const char *szCapName );
             static bool         SetDefaultSource( CTL_ITwainSession *pSession,
                                                   const CTL_ITwainSource *pSource );
-            static void         WriteLogInfo(const CTL_StringType& s, bool bFlush=false);
-            static void         WriteLogInfoA(const std::string& s, bool bFlush = false);
-            static void         WriteLogInfoW(const std::wstring& s, bool bFlush = false);
 
             static TW_UINT16 CallDSMEntryProc( TW_IDENTITY *pOrigin, TW_IDENTITY* pDest,
                                                TW_UINT32 dg, TW_UINT16 dat, TW_UINT16 msg, TW_MEMREF pMemref);

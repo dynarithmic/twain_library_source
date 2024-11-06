@@ -139,11 +139,19 @@ namespace dynarithmic
        void OutputDebugStringFull(const std::string& s);
        std::string GetDebugStringFull(const std::string& s);
        void SetDLLHandle(CTL_TwainDLLHandle* pHandle);
+       int GetCurrentIndentLevel() const { return m_nCurrentIndentLevel; }
+       void SetCurrentIndentLevel(int nLevel) { m_nCurrentIndentLevel = nLevel; }
+       void IndentLine() { m_nCurrentIndentLevel += m_nIndentSize; }
+       void OutdentLine() { m_nCurrentIndentLevel -= m_nIndentSize; m_nCurrentIndentLevel = std::max(0, m_nCurrentIndentLevel); }
+       int GetIndentSize() const { return m_nIndentSize; }
+       void SetIndentSize(int nSize) { m_nIndentSize = nSize; }
 
     protected:
        CTL_TwainDLLHandle* m_pDLLHandle;
        std::string m_csAppName;
        std::string m_csFileName;
+       int m_nCurrentIndentLevel;
+       int m_nIndentSize;
 
        /////////////////////////////////////////////////////////////////////////////
        // controlling stuff

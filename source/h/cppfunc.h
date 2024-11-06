@@ -23,11 +23,14 @@
 
 #include "dtwain_config.h"
 #include <funcmac.h>
+#include "logwriterutils.h"
+
 #define LOG_INDENT_CONSOLE 0
 #define LOG_NO_INDENT   1
 #define LOG_INDENT_IN   2
 #define LOG_INDENT_OUT  3
 #define LOG_INDENT_USELAST 4
+#define LOG_INDENT_USELAST_NOFUNCTION 5
 
 #define NAG_FOR_LICENSE (0)
 
@@ -56,36 +59,36 @@
         TRY_BLOCK \
         if ((CTL_StaticData::GetLogFilterFlags() & (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG)) == \
                 (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG)) \
-        CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_IN) + ParamOutputter((#argVals)).outputParam argVals.getString());
+        LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_IN) + ParamOutputter((#argVals)).outputParam argVals.getString());
 
     #define LOG_FUNC_EXIT_PARAMS_ISTWAINMSG(x) { \
         if ((CTL_StaticData::GetLogFilterFlags() & (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG)) == \
                 (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG)) \
-        CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO, LOG_INDENT_OUT) + ParamOutputter((""), true).outputParam(x).getString()); \
+        LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO, LOG_INDENT_OUT) + ParamOutputter((""), true).outputParam(x).getString()); \
         return(x); \
             }
 
     #define LOG_FUNC_ENTRY_PARAMS(argVals) \
         TRY_BLOCK \
         if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) \
-        CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_IN) + ParamOutputter((#argVals)).outputParam argVals.getString());
+        LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_IN) + ParamOutputter((#argVals)).outputParam argVals.getString());
 
     #define LOG_FUNC_ENTRY_NONAME_PARAMS(...) \
         TRY_BLOCK LogValue(FUNC_MACRO, true, int(0), __VA_ARGS__);
 
     #if DTWAIN_LOGRETURN_POINTERS == 1
     #ifdef _MSC_VER
-        #pragma message ("Building DTWAIN with logging pointer derefencing on return")
+        #pragma message ("Building DTWAIN with logging pointer dereferencing on return")
     #endif
         #define LOG_FUNC_EXIT_DEREFERENCE_POINTERS(argVals) \
             if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) \
             { \
-                CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_USELAST) + \
+                LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_USELAST) + \
                             ParamOutputter((#argVals)).setOutputAsString(true).outputParam argVals.getString());\
             }
     #else
         #ifdef _MSC_VER
-            #pragma message ("Building DTWAIN with no logging pointer derefencing on return")
+            #pragma message ("Building DTWAIN with no logging pointer dereferencing on return")
         #endif
         #define LOG_FUNC_EXIT_DEREFERENCE_POINTERS(argVals) 
     #endif
@@ -94,13 +97,13 @@
 
     #define LOG_FUNC_EXIT_PARAMS(x) { \
         if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) \
-        CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO, LOG_INDENT_OUT) + ParamOutputter((""), true).outputParam(x).getString()); \
+        LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO, LOG_INDENT_OUT) + ParamOutputter((""), true).outputParam(x).getString()); \
         return(x); \
             }
 
     #define LOG_FUNC_VALUES_EX(argvals) { \
         if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) \
-        CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA((""),LOG_INDENT_IN) + ParamOutputter((#argvals)).outputParam argvals.getString()); \
+        LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA((""),LOG_INDENT_IN) + ParamOutputter((#argvals)).outputParam argvals.getString()); \
     }
 
     #define CATCH_BLOCK_END }

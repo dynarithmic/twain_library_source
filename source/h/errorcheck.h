@@ -44,7 +44,7 @@ namespace dynarithmic
             OutputDTWAINErrorA(Handle, fnName);
             if (logError && (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK))
             {
-                CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(fnName, LOG_INDENT_OUT) +
+                LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(fnName, LOG_INDENT_OUT) +
                     ParamOutputter("", true).outputParam(retErr).getString());
             }
             if (doThrow)

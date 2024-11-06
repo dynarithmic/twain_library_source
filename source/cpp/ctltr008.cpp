@@ -22,11 +22,10 @@
 #include "ctltr027.h"
 #include "ctltr034.h"
 #include "ctltwainsession.h"
-#include <ctltwainsource.h>
-
+#include "ctltwainsource.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
-
+#include "logwriterutils.h"
 using namespace dynarithmic;
 
 /* Transfer started */
@@ -144,7 +143,7 @@ TW_UINT16 CTL_ProcessEventTriplet::ExecuteEventHandler()
                     {
                         if ( !pSource->SkipImageInfoErrors() )
                         {
-                            CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(DTWAIN_ERR_IMAGEINFO_INVALID_));
+                            LogWriterUtils::WriteLogInfoA(GetResourceStringFromMap(DTWAIN_ERR_IMAGEINFO_INVALID_));
                             CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                                   nullptr,
                                                                   DTWAIN_TN_IMAGEINFOERROR,

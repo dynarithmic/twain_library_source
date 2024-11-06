@@ -178,12 +178,12 @@ void CTL_ErrorStructDecoder::StartMessageDecoder(HWND hWnd, UINT nMsg,
     m_pString.clear();
     auto it = dynarithmic::generic_array_finder_if(mapNotificationType, [&](const auto& pr) { return pr.first == wParam; });
     if ( it.first )
-        sBuffer << "\nDTWAIN Message(HWND = " << hWnd << ", " <<
+        sBuffer << "DTWAIN Message(HWND = " << hWnd << ", " <<
                                     "MSG = " << nMsg << ", " <<
                                     "Notification code = " << mapNotificationType[it.second].second << ", " <<
                                     "LPARAM = " << lParam;
     else
-        sBuffer << "\nDTWAIN Message(HWND = " << hWnd << ", " <<
+        sBuffer << "DTWAIN Message(HWND = " << hWnd << ", " <<
                                     "MSG = " << nMsg << ", " <<
                                     "Notification code = " << wParam << ", " <<
                                     "LPARAM = " << lParam;
@@ -533,7 +533,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                         indenter << "ModalUI=" << (pUSERINTERFACE->ModalUI?"TRUE":"FALSE") << "\n" <<
                         indenter << "hParent=" << pUSERINTERFACE->hParent << "\n" <<
                         indenter << "hParent.Title=" << sz << "\n" <<
-                        indenter << "hParent.ScreenPos= {" << StringWrapperA::Join(aRect, ",") << "}\n";
+                        indenter << "hParent.ScreenPos= {" << StringWrapperA::Join(aRect, ",") << "}\n}";
             #endif
             }
             break;

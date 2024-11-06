@@ -118,7 +118,7 @@ namespace dynarithmic
                 s = CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_IN) + ParamOutputter2(false, std::forward<P>(p)...).getString();
             else
                 s = CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_OUT) + ParamOutputter2(true, retValue).getString();
-            CTL_TwainAppMgr::WriteLogInfoA(s);
+            LogWriterUtils::WriteLogInfoA(s);
         }
         return s;
     }

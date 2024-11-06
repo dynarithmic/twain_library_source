@@ -22,6 +22,7 @@
 #include <utility>
 #include <dtwain_filesystem.h>
 #include "imagexferfilewriter.h"
+#include "logwriterutils.h"
 
 #include "ctliface.h"
 #include "ctltr026.h"
@@ -614,7 +615,7 @@ LONG ImageXferFileWriter::CopyDuplexDibToFile(CTL_TwainDibPtr pCurDib, bool bIsJ
             {
                 CTL_StringStreamType strm;
                 strm << GetResourceStringFromMap_Native(DTWAIN_ERR_WRITEDATA_TOFILE_) << szTempPath;
-                CTL_TwainAppMgr::WriteLogInfo(strm.str());
+                LogWriterUtils::WriteLogInfo(strm.str());
                 return DTWAIN_ERR_FILEWRITE;
             }
         }

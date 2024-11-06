@@ -934,6 +934,7 @@ namespace dynarithmic
     //#ifdef DTWAIN_DEBUG_CALL_STACK
     std::string CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich, LPCSTR pOptionalString=nullptr);
     std::string CTL_LogFunctionCallA(LPCSTR pFuncName, int nWhich, LPCSTR pOptionalString=nullptr);
+
     //#endif
 
     // outputs parameter and return values

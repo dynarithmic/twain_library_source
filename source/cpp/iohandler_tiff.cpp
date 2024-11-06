@@ -24,6 +24,7 @@
 #include "ctltwainmanager.h"
 #include "ctlfileutils.h"
 #include "tiff.h"
+#include "logwriterutils.h"
 using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* pMultiPageStruct)
@@ -31,7 +32,7 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     HANDLE hDib = nullptr;
 
     // Check if this is the first page
-    CTL_TwainAppMgr::WriteLogInfoA("Writing TIFF or Postscript file\n");
+    LogWriterUtils::WriteLogInfoIndentedA("Writing TIFF or Postscript file");
 
     // Get the current TIFF type from the Source
     if ( m_ImageInfoEx.theSource &&
@@ -54,7 +55,7 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
                 return DTWAIN_ERR_FILEWRITE;
             szTempPath += StringWrapper::GetGUID() +  _T("TIF");
 
-            CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + StringConversion::Convert_Native_To_Ansi(szTempPath) + "\n");
+            LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + StringConversion::Convert_Native_To_Ansi(szTempPath));
 
             // OK, now remember that the file we are writing is a TIF file, and this is
             // the file that is created first
@@ -68,7 +69,7 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
 
             // Attempt to delete the file
             if ( !delete_file(sActualFileName.c_str()) )
-                CTL_TwainAppMgr::WriteLogInfoA("Could not delete existing file " + StringConversion::Convert_Native_To_Ansi(sActualFileName) + "\n");
+                LogWriterUtils::WriteLogInfoIndentedA("Could not delete existing file " + StringConversion::Convert_Native_To_Ansi(sActualFileName));
         }
     }
 
@@ -80,16 +81,16 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
             bNotLastFile = true;
     if ( bNotLastFile )
     {
-        CTL_TwainAppMgr::WriteLogInfoA("Retrieving DIB:\n");
+        LogWriterUtils::WriteLogInfoIndentedA("Retrieving DIB:");
         if ( !m_pDib )
         {
-            CTL_TwainAppMgr::WriteLogInfoA("Dib not found!\n");
+            LogWriterUtils::WriteLogInfoIndentedA("Dib not found!");
             return DTWAIN_ERR_DIB;
         }
         hDib = m_pDib->GetHandle();
         if ( !hDib )
         {
-            CTL_TwainAppMgr::WriteLogInfoA("Dib handle not found!\n");
+            LogWriterUtils::WriteLogInfoIndentedA("Dib handle not found!");
             return DTWAIN_ERR_DIB;
         }
     }
@@ -168,21 +169,21 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     if ( bNotLastFile )
     {
         SetNumPagesWritten(GetNumPagesWritten()+1);
-        CTL_TwainAppMgr::WriteLogInfoA("Writing TIFF / PS page\n");
+        LogWriterUtils::WriteLogInfoIndentedA("Writing TIFF / PS page");
         retval = TIFFHandler.WriteGraphicFile(this, sActualFileName.c_str(), hDib);
         if ( retval != 0 )
             SetPagesOK(false);
         else
             SetOnePageWritten(true);
-        CTL_TwainAppMgr::WriteLogInfoA("Writing TIFF / PS page\n");
+        LogWriterUtils::WriteLogInfoIndentedA("Writing TIFF / PS page");
         StringStreamA strm;
-        strm << "Return from writing intermediate image = " << retval << "\n";
-        CTL_TwainAppMgr::WriteLogInfoA(strm.str());
+        strm << "Return from writing intermediate image = " << retval;
+        LogWriterUtils::WriteLogInfoIndentedA(strm.str());
     }
     else
     {
         // Close the multi-page TIFF file
-        CTL_TwainAppMgr::WriteLogInfoA("Closing TIFF / PS file\n");
+        LogWriterUtils::WriteLogInfoIndentedA("Closing TIFF / PS file");
         retval = TIFFHandler.WriteImage(this,nullptr,0,0,0,0, nullptr);
         if ( !AllPagesOK() )
         {
@@ -193,8 +194,8 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
             }
         }
         StringStreamA strm;
-        strm << "Return from writing last image = " << retval << "\n";
-        CTL_TwainAppMgr::WriteLogInfoA(strm.str());
+        strm << "Return from writing last image = " << retval;
+        LogWriterUtils::WriteLogInfoIndentedA(strm.str());
     }
     if ( (!pMultiPageStruct || pMultiPageStruct->Stage == DIB_MULTI_LAST) && retval == 0 )
     {

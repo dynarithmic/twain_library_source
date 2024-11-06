@@ -25,6 +25,7 @@
 #include "ctltwainmanager.h"
 #include "../cximage/ximage.h"
 #include "resamplefactory.h"
+#include "cppfunc.h"
 
 namespace dynarithmic
 {
@@ -35,22 +36,22 @@ namespace dynarithmic
         switch (nWhich)
         {
             case NO_RESAMPLING:
-                CTL_TwainAppMgr::WriteLogInfoA("No resampling done for " + m_ImageType);
+                LogWriterUtils::WriteLogInfoIndentedA("No resampling done for " + m_ImageType);
             break;
 
             case START_RESAMPLING:
-                CTL_TwainAppMgr::WriteLogInfoA("Resampling bitmap data for image type " + m_ImageType + 
+                LogWriterUtils::WriteLogInfoIndentedA("Resampling bitmap data for image type " + m_ImageType + 
                                 ".  From " + std::to_string(fromRes) + " bpp to " + std::to_string(toRes) + " bpp ...");
             break;
 
             case FAILED_RESAMPLING:
-                CTL_TwainAppMgr::WriteLogInfoA("Resampling bitmap data for image type " + m_ImageType + " failed...");
+                LogWriterUtils::WriteLogInfoIndentedA("Resampling bitmap data for image type " + m_ImageType + " failed...");
             break;
 
             case SUCCESS_RESAMPLING:
-                CTL_TwainAppMgr::WriteLogInfoA("Resampling bitmap data for image type " + m_ImageType + " success...");
+                LogWriterUtils::WriteLogInfoIndentedA("Resampling bitmap data for image type " + m_ImageType + " success...");
                 std::string sOut = CTL_ErrorStructDecoder::DecodeBitmap(dataHandle);
-                CTL_TwainAppMgr::WriteLogInfoA(sOut);
+                LogWriterUtils::WriteMultiLineInfoIndentedA(sOut, "\n");
             break;
         }
     }

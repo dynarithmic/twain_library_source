@@ -110,7 +110,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
     {
         CTL_StringType msg = _T("Source: ") + pSource->GetProductName() + _T(" has been opened successfully");
-        CTL_TwainAppMgr::WriteLogInfo(msg);
+        LogWriterUtils::WriteLogInfoIndented(msg);
 
         // Log the caps if logging is turned on
         CTL_StringType sName;
@@ -135,9 +135,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
             sName += _T("    ");
             sName += StringConversion::Convert_Ansi_To_Native(StringWrapperA::Join(VecString, "\n    "));
         }
-        sName += _T("\n}\n");
+        sName += _T("\n}");
 
-        CTL_TwainAppMgr::WriteLogInfo(sName);
+        LogWriterUtils::WriteMultiLineInfoIndented(sName, _T("\n"));
     }
 
     LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
@@ -235,10 +235,10 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
         }
     }
     if (oldflags && bOK )
-        CTL_TwainAppMgr::WriteLogInfoA(sBitDepths);
+        LogWriterUtils::WriteMultiLineInfoIndentedA(sBitDepths, "\n");
     else
     if (!bOK)
-        CTL_TwainAppMgr::WriteLogInfoA("Could not retrieve bit depth information\n");
+        LogWriterUtils::WriteLogInfoIndentedA("Could not retrieve bit depth information");
     p->SetCurrentlyProcessingPixelInfo(false);
 }
 
@@ -269,4 +269,3 @@ void DetermineIfSpecialXfer(CTL_ITwainSource* p)
         ++iterSearch;
     }
 }
-

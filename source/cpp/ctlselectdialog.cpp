@@ -59,9 +59,11 @@ CTL_StringType dynarithmic::LLSelectionDialog(CTL_TwainDLLHandle* pHandle, const
         selectStruct.CS.sTitle = opts.szTitle;
     else
     {
-        CTL_TwainAppMgr::WriteLogInfoA("Retrieving Dialog Resources...\n");
+        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
+            LogWriterUtils::WriteLogInfoIndentedA("Retrieving Dialog Resources...");
         selectStruct.CS.sTitle = GetResourceStringFromMap_Native(opts.selectionResourceID);
-        CTL_TwainAppMgr::WriteLogInfoA("Retrieved Dialog Resources successfully...\n");
+        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
+            LogWriterUtils::WriteLogInfoIndentedA("Retrieved Dialog Resources successfully...");
         if (selectStruct.CS.sTitle.empty() )
             selectStruct.CS.sTitle = _T("Select Source");
     }
@@ -83,7 +85,7 @@ CTL_StringType dynarithmic::LLSelectionDialog(CTL_TwainDLLHandle* pHandle, const
         }
     }
     if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
-        CTL_TwainAppMgr::WriteLogInfoA("Displaying TWAIN Dialog...\n");
+        LogWriterUtils::WriteLogInfoIndentedA("Displaying TWAIN Dialog...");
     const INT_PTR bRet = DialogBoxIndirectParam(dllHandle, lpTemplate, opts.hWndParent,
                                                 reinterpret_cast<DLGPROC>(DisplayTwainDlgProc), reinterpret_cast<LPARAM>(&selectStruct));
     if (bRet == -1)
@@ -248,7 +250,7 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
 
         HWND lstSources;
         if (bLogMessages)
-            CTL_TwainAppMgr::WriteLogInfoA("Initializing TWAIN Dialog...\n");
+            LogWriterUtils::WriteLogInfoIndentedA("Initializing TWAIN Dialog...");
         pS = reinterpret_cast<SelectStruct*>(lParam);
 
         if (pS->CS.nOptions & DTWAIN_DLG_CENTER_SCREEN)
@@ -277,7 +279,7 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
             if (hWndSelect)
                 EnableWindow(hWndSelect, FALSE);
             if (bLogMessages)
-                CTL_TwainAppMgr::WriteLogInfoA("Finished Adding names to Selection dialog...\n");
+                LogWriterUtils::WriteLogInfoIndentedA("Finished Adding names to Selection dialog...");
 
             // Display the local strings if they are available:
             DisplayLocalString(hWnd, IDOK, IDS_SELECT_TEXT);
@@ -285,7 +287,7 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
             DisplayLocalString(hWnd, IDC_SOURCETEXT, IDS_SOURCES_TEXT);
             SetFocus(hWnd);
             if (bLogMessages)
-                CTL_TwainAppMgr::WriteLogInfoA("Finished Initializing Selection Dialog...\n");
+                LogWriterUtils::WriteLogInfoIndentedA("Finished Initializing Selection Dialog...");
             return TRUE;
         }
 
@@ -293,18 +295,18 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
         std::vector<TCHAR> DefName;
         bool bAlwaysHighlightFirst = pS->CS.nOptions & DTWAIN_DLG_HIGHLIGHTFIRST;
         if (bLogMessages)
-            CTL_TwainAppMgr::WriteLogInfoA("Initializing Selection Dialog -- Retrieving default TWAIN Source...\n");
+            LogWriterUtils::WriteLogInfoIndentedA("Initializing Selection Dialog -- Retrieving default TWAIN Source...");
         DefName = pS->getDefaultFunc(*pS);
         if (bLogMessages)
         {
             if (DefName.empty())
-                CTL_TwainAppMgr::WriteLogInfoA("The Selection default name has no characters...\n");
+                LogWriterUtils::WriteLogInfoIndentedA("The Selection default name has no characters...");
             else
             {
                 StringStreamA strm;
                 strm << "The default Selection source is \"" <<
-                    StringConversion::Convert_NativePtr_To_Ansi(DefName.data()).c_str() << "\" ...\n";
-                CTL_TwainAppMgr::WriteLogInfoA(strm.str());
+                    StringConversion::Convert_NativePtr_To_Ansi(DefName.data()).c_str() << "\" ...";
+                LogWriterUtils::WriteLogInfoIndentedA(strm.str());
             }
         }
 
@@ -344,7 +346,7 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
             if (pS->CS.nOptions & DTWAIN_DLG_SORTNAMES)
             {
                 if (bLogMessages)
-                    CTL_TwainAppMgr::WriteLogInfoA("Initializing Selection Dialog -- Sorting Selection Source names...\n");
+                    LogWriterUtils::WriteLogInfoIndentedA("Initializing Selection Dialog -- Sorting Selection Source names...");
                 sort(vNewSourceNames.begin(), vNewSourceNames.end());
             }
         }
@@ -353,10 +355,12 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
         if (bLogMessages)
         {
             StringStreamA strm;
-            CTL_TwainAppMgr::WriteLogInfoA("Initializing Selection Dialog -- Adding names to dialog...\n");
-            strm << "Selection found " << vNewSourceNames.size() << " source names to add to Selection dialog...\n";
-            strm << "The Selection dialog window handle to add names is " << lstSources << "\n";
-            CTL_TwainAppMgr::WriteLogInfoA(strm.str());
+            LogWriterUtils::WriteLogInfoIndentedA("Initializing Selection Dialog -- Adding names to dialog...");
+            strm << "Selection found " << vNewSourceNames.size() << " source names to add to Selection dialog...";
+            LogWriterUtils::WriteLogInfoIndentedA(strm.str());
+            strm.str("");
+            strm << "The Selection dialog window handle to add names is " << lstSources << "";
+            LogWriterUtils::WriteLogInfoIndentedA(strm.str());
         }
         CTL_StringStreamType strm2;
         for (auto& sName : vNewSourceNames)
@@ -364,14 +368,14 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
             if (bLogMessages)
             {
                 strm2.str(_T(""));
-                strm2 << _T("The Selection name being added is ") << sName << _T("\n");
-                CTL_TwainAppMgr::WriteLogInfo(strm2.str());
+                strm2 << _T("The Selection name being added is ") << sName;
+                LogWriterUtils::WriteLogInfoIndented(strm2.str());
             }
             index = SendMessage(lstSources, LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(sName.c_str()));
             if (bLogMessages)
             {
-                CTL_TwainAppMgr::WriteLogInfoA("LB_ADDSTRING was sent to Selection dialog...\n");
-                CTL_TwainAppMgr::WriteLogInfoA("Selection now comparing names...\n");
+                LogWriterUtils::WriteLogInfoIndentedA("LB_ADDSTRING was sent to Selection dialog...");
+                LogWriterUtils::WriteLogInfoIndentedA("Selection now comparing names...");
             }
             if (!DefName.empty())
             {
@@ -379,7 +383,7 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
                     DefIndex = index;
             }
             if (bLogMessages)
-                CTL_TwainAppMgr::WriteLogInfoA("Selection now finished comparing names...\n");
+                LogWriterUtils::WriteLogInfoIndentedA("Selection now finished comparing names...");
         }
         if (bAlwaysHighlightFirst || DefName.empty())
             DefIndex = 0;
@@ -394,7 +398,7 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
             SendMessage(lstSources, LB_SETCURSEL, DefIndex, 0);
 
         if (bLogMessages)
-            CTL_TwainAppMgr::WriteLogInfoA("Finished Adding names to Selection dialog...\n");
+            LogWriterUtils::WriteLogInfoIndentedA("Finished Adding names to Selection dialog...");
 
         // Display the local strings if they are available:
         DisplayLocalString(hWnd, IDOK, IDS_SELECT_TEXT);
@@ -416,7 +420,7 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
         }
         SetFocus(hWnd);
         if (bLogMessages)
-            CTL_TwainAppMgr::WriteLogInfoA("Finished Initializing Selection Dialog...\n");
+            LogWriterUtils::WriteLogInfoIndentedA("Finished Initializing Selection Dialog...");
         return TRUE;
     }
 
@@ -434,20 +438,20 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
             if (bLogMessages)
             {
                 StringWrapper::traits_type::outputstream_type strm;
-                strm << _T("Selected Source name in dialog = \"") << sz << _T("\", Actual Source name = \"") << pS->SourceName << _T("\"\n");
-                CTL_TwainAppMgr::WriteLogInfo(strm.str());
-                CTL_TwainAppMgr::WriteLogInfoA("Finished Initializing Selection Dialog...\n");
+                strm << _T("Selected Source name in dialog = \"") << sz << _T("\", Actual Source name = \"") << pS->SourceName << _T("\"");
+                LogWriterUtils::WriteLogInfoIndented(strm.str());
+                LogWriterUtils::WriteLogInfoIndentedA("Finished Initializing Selection Dialog...");
             }
             EndDialog(hWnd, LOWORD(wParam));
             return TRUE;
         }
         else
-            if (LOWORD(wParam) == IDCANCEL)
-            {
-                pS->SourceName.clear();
-                EndDialog(hWnd, LOWORD(wParam));
-                return TRUE;
-            }
+        if (LOWORD(wParam) == IDCANCEL)
+        {
+            pS->SourceName.clear();
+            EndDialog(hWnd, LOWORD(wParam));
+            return TRUE;
+        }
         break;
     }
     return FALSE;

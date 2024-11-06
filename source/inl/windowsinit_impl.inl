@@ -234,7 +234,7 @@ std::string dynarithmic::LogWin32Error(DWORD lastError)
     }
     StringStreamA strm;
     strm << boost::format("Win32 Error: %1% (%2%)") % lastError % sError;
-    CTL_TwainAppMgr::WriteLogInfoA(strm.str());
+    LogWriterUtils::WriteLogInfoIndentedA(strm.str());
 
     // Free the buffer.
     LocalFree(lpMsgBuf);

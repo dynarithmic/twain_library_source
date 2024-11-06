@@ -700,7 +700,7 @@ std::pair<bool, CTL_TEXTELEMENTPTRLIST::iterator> CheckPDFTextElement(DTWAIN_PDF
     {
         std::string sOut = "PDF TextElement Info: \n";
         sOut += CTL_ErrorStructDecoder::DecodePDFTextElement(pPtr);
-        CTL_TwainAppMgr::WriteLogInfoA(sOut);
+        LogWriterUtils::WriteMultiLineInfoIndentedA(sOut, "\n");
     }
     return { true, it2 };
 }
