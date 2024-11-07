@@ -916,8 +916,8 @@ std::string DecodeTW_ELEMENT8(pTW_ELEMENT8 pEl, LPCSTR pMem)
 std::string DecodeTW_INFO(pTW_INFO pInfo, LPCSTR pMem)
 {
     StringStreamA sBuffer;
-    sBuffer << "{InfoId=" << pInfo->InfoID << ", " <<
-               "ItemType=" << pInfo->ItemType << ", " <<
+    sBuffer << "{InfoId=" << CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, pInfo->InfoID) << ", " <<
+               "ItemType=" << CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWTY, pInfo->ItemType) << ", " <<
                "NumItems=" << pInfo->NumItems << ", " <<
                "ReturnCode=" << pInfo->ReturnCode << ", " <<
                "Item=" << pInfo->Item << "}";
