@@ -57,6 +57,7 @@ BEGIN
         MENUITEM "German",                      ID_LANGUAGE_GERMAN
         MENUITEM "Italian",                     ID_LANGUAGE_ITALIAN
         MENUITEM "Japanese"                     ID_LANGUAGE_JAPANESE
+        MENUITEM "Korean"                       ID_LANGUAGE_KOREAN
         MENUITEM "Portuguese",                  ID_LANGUAGE_PORTUGUESE
         MENUITEM "Romanian",                    ID_LANGUAGE_ROMANIAN
         MENUITEM "Russian",                     ID_LANGUAGE_RUSSIAN
