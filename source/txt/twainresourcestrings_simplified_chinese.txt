@@ -233,6 +233,7 @@
 3020 创建临时图像文件时出错  
 3021 图像文件创建成功  
 3022 返回时设置的值
+3023 更多
 9700 DTWAIN Twain Library, v{short_version}, {company_name}, {copyright}
 9999 在调用 Twain DSM 时发生异常错误。可能是 Twain 会话损坏？
 10000 [用户消息]

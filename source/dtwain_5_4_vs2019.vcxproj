@@ -1594,12 +1594,15 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <Text Include="txt\twainresourcestrings_french.txt" />
     <Text Include="txt\twainresourcestrings_german.txt" />
     <Text Include="txt\twainresourcestrings_italian.txt" />
+    <Text Include="txt\twainresourcestrings_japanese.txt" />
+    <Text Include="txt\twainresourcestrings_korean.txt" />
     <Text Include="txt\twainresourcestrings_portuguese.txt" />
     <Text Include="txt\twainresourcestrings_portuguese_br.txt" />
     <Text Include="txt\twainresourcestrings_romanian.txt" />
     <Text Include="txt\twainresourcestrings_russian.txt" />
     <Text Include="txt\twainresourcestrings_simplified_chinese.txt" />
     <Text Include="txt\twainresourcestrings_spanish.txt" />
+    <Text Include="txt\twainresourcestrings_traditional_chinese.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

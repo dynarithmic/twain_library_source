@@ -233,6 +233,7 @@
 3020 Fout bij het maken van een tijdelijk afbeeldingsbestand
 3021 Afbeeldingsbestand is succesvol aangemaakt
 3022 Waarden ingesteld bij terugkeer
+3023 Meer
 9700 DTWAIN Twain Library, v{short_version}, {company_name}, {copyright}
 9999 Exception error occurred during call to Twain DSM.  Possible corrupted Twain session?
 10000 [Gebruikersbericht]

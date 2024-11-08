@@ -232,6 +232,7 @@
 3020 Erro ao criar arquivo de imagem temporário
 3021 Arquivo de imagem criado com sucesso
 3022 Valores definidos no retorno2101 Página OCR inválida especificada
+3023 Mais
 9700 DTWAIN Twain Library, v{short_version}, {company_name}, {copyright}
 9999 Ocorreu um erro de exceção durante a chamada para o Twain DSM. Possível sessão Twain corrompida
 10000 [Mensagem do usuário]

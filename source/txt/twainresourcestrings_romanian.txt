@@ -234,6 +234,7 @@
 3020 Eroare la crearea fișierului de imagine temporar  
 3021 Fișierul de imagine a fost creat cu succes  
 3022 Valori setate la returnare
+3023 Mai mult
 9700 DTWAIN Twain Library, v{short_version}, {company_name}, {copyright}
 9999 A apărut o eroare de excepție în timpul apelului la DSM Twain. Sesiune Twain posibil coruptă?
 10000 [Mesaj utilizator]
