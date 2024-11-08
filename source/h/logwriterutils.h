@@ -29,6 +29,7 @@ namespace dynarithmic
 {
     struct LogWriterUtils
     {
+        static constexpr int maxOutput = 256;
         static void  WriteLogInfo(const CTL_StringType& s, bool bFlush = false);
         static void  WriteLogInfoA(const std::string& s, bool bFlush = false);
         static void  WriteLogInfoW(const std::wstring& s, bool bFlush = false);

@@ -49,6 +49,19 @@ namespace dynarithmic
 
     void LogWriterUtils::WriteLogInfoIndentedA(const std::string& s)
     {
+        // Truncate if text is too long
+        if (s.size() > maxOutput)
+        {
+            auto tempS = s;
+            std::string MoreText = "...(" + GetResourceStringFromMap(IDS_LOGMSG_MORETEXT) + ")...";
+            tempS.resize(maxOutput);
+            tempS += MoreText;
+            if (tempS.size() < s.size())
+            {
+                CTL_LogFunctionCallA(tempS.c_str(), LOG_INDENT_USELAST_NOFUNCTION);
+                return;
+            }
+        }
         CTL_LogFunctionCallA(s.c_str(), LOG_INDENT_USELAST_NOFUNCTION);
     }
 

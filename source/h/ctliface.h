@@ -97,7 +97,6 @@ namespace dynarithmic
     #define  DTWAIN_RETRY_EX                          9997
 
         // modal processing messages
-    #define DTWAIN_TN_SETUPMODALACQUISITION           1300
     #define DTWAIN_TN_MESSAGELOOPERROR                1500
     #define REGISTERED_DTWAIN_MSG _T("DTWAIN_NOTIFY-{37AE5C3E-34B6-472f-A0BC-74F3CB199F2B}")
 

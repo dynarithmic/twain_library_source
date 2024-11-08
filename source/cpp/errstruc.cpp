@@ -86,72 +86,6 @@ static constexpr std::array<std::pair<uint32_t, const char*>, 41> mapTwainDSMRet
     ADD_ERRORCODE_TO_MAP2(IDS_TWCC_ERRORSTART, TWCC_DOCTOOLIGHT)
 } };
 
-static constexpr std::array<std::pair<uint32_t, const char*>, 62> mapNotificationType =
-{ {
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_ACQUIREDONE),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_ACQUIREFAILED),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_ACQUIRECANCELLED),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_ACQUIRESTARTED),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_PAGECONTINUE),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_PAGEFAILED),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_PAGECANCELLED),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_TRANSFERREADY),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_TRANSFERDONE),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_ACQUIREPAGEDONE),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_UICLOSING),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_UICLOSED),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_UIOPENED),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_CLIPTRANSFERDONE),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_INVALIDIMAGEFORMAT),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_ACQUIRETERMINATED),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_TRANSFERSTRIPREADY),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_TRANSFERSTRIPDONE),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_IMAGEINFOERROR),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_DEVICEEVENT),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_FILESAVECANCELLED),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_FILESAVEOK),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_FILESAVEERROR),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_FILEPAGESAVEOK),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_FILEPAGESAVEERROR),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_PROCESSEDDIB),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_PROCESSDIBACCEPTED),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_PROCESSDIBFINALACCEPTED),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_TRANSFERSTRIPFAILED),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_IMAGEINFOERROR),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_TRANSFERCANCELLED),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_UIOPENING),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MANDUPFLIPPAGES),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MANDUPSIDE1DONE),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MANDUPSIDE2DONE),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MANDUPPAGECOUNTERROR),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MANDUPACQUIREDONE),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MANDUPSIDE1START),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MANDUPSIDE2START),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MANDUPMERGEERROR),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MANDUPMEMORYERROR),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MANDUPFILEERROR),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MANDUPFILESAVEERROR),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_ENDOFJOBDETECTED),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_EOJDETECTED_XFERDONE),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_TWAINPAGECANCELLED),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_TWAINPAGEFAILED),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_QUERYPAGEDISCARD),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_PAGEDISCARDED),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_APPUPDATEDDIB),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_FILEPAGESAVING),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_CROPFAILED),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_PROCESSEDDIBFINAL),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_BLANKPAGEDETECTED1),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_BLANKPAGEDETECTED2),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_BLANKPAGEDETECTED3),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_BLANKPAGEDISCARDED1),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_BLANKPAGEDISCARDED2),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_MESSAGELOOPERROR),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_SETUPMODALACQUISITION),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_TWAINTRIPLETBEGIN),
-    ADD_ERRORCODE_TO_MAP2(0, DTWAIN_TN_TWAINTRIPLETEND)
-} };
-
 static constexpr std::array<std::pair<uint32_t, const char*>, 6> mapSupportedGroups =
 { {
     ADD_ERRORCODE_TO_MAP2(0, DG_CONTROL),
@@ -162,31 +96,22 @@ static constexpr std::array<std::pair<uint32_t, const char*>, 6> mapSupportedGro
     ADD_ERRORCODE_TO_MAP2(0, DF_DS2)
 } };
 
-static constexpr std::array<std::pair<uint32_t, const char*>, 4> mapContainerType =
-{ {
-    {TWON_ARRAY, "TW_ARRAY"},
-    {TWON_ENUMERATION, "TW_ENUMERATION"},
-    {TWON_ONEVALUE, "TW_ONEVALUE"},
-    {TWON_RANGE, "TW_RANGE"}
-} };
-
 void CTL_ErrorStructDecoder::StartMessageDecoder(HWND hWnd, UINT nMsg,
                                                  WPARAM wParam, LPARAM lParam)
 {
     StringStreamA sBuffer;
-
     m_pString.clear();
-    auto it = dynarithmic::generic_array_finder_if(mapNotificationType, [&](const auto& pr) { return pr.first == wParam; });
-    if ( it.first )
-        sBuffer << "DTWAIN Message(HWND = " << hWnd << ", " <<
-                                    "MSG = " << nMsg << ", " <<
-                                    "Notification code = " << mapNotificationType[it.second].second << ", " <<
-                                    "LPARAM = " << lParam;
+    auto notification_name = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DTWAIN_TN, wParam);
+    if ( !notification_name.empty() )
+        sBuffer << "DTWAIN Message(HWND=" << hWnd << ", " <<
+                                    "MSG=" << nMsg << ", " <<
+                                    "Notification code=" << notification_name << ", " <<
+                                    "LPARAM=" << lParam << ")";
     else
-        sBuffer << "DTWAIN Message(HWND = " << hWnd << ", " <<
-                                    "MSG = " << nMsg << ", " <<
-                                    "Notification code = " << wParam << ", " <<
-                                    "LPARAM = " << lParam;
+        sBuffer << "DTWAIN Message(HWND=" << hWnd << ", " <<
+                                    "MSG=" << nMsg << ", " <<
+                                    "Notification code=" << wParam << ", " <<
+                                    "LPARAM=" << lParam << ")";
     m_pString = sBuffer.str();
 }
 
@@ -334,7 +259,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
             {
                 auto pDEVICEEVENT = static_cast<pTW_DEVICEEVENT>(pData);
                 sBuffer << "\nTW_MEMREF is TW_DEVICEEVENT:\n{\n" <<
-                            "Event=" << pDEVICEEVENT->Event << "\n" <<
+                            "Event=" << CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWDE, pDEVICEEVENT->Event) << "\n" <<
                             "DeviceName=" << pDEVICEEVENT->DeviceName << "\n" <<
                             "BatteryMinutes=" << pDEVICEEVENT->BatteryMinutes << "\n" <<
                             "BatteryPercentage=" << pDEVICEEVENT->BatteryPercentage << "\n" <<
@@ -431,7 +356,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                 sBuffer <<
                 "\nTW_MEMREF is handle to window (HWND):\n{\n" <<
                 indenter << "HWND=" << *pHWND << "\n" <<
-                indenter << "Screen Pos.= " << StringWrapperA::Join(aRect, ",") << "\n}\n";
+                indenter << "Screen Pos.=" << StringWrapperA::Join(aRect, ",") << "\n}\n";
             #endif
             }
             break;
@@ -483,10 +408,10 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
             case ERRSTRUCT_TW_CAPABILITY:
             {
                 auto pCAPABILITY = static_cast<pTW_CAPABILITY>(pData);
-                auto it = dynarithmic::generic_array_finder_if(mapContainerType, [&](const auto& pr) { return pr.first == pCAPABILITY->ConType; });
                 std::string s = "Unspecified (TWON_DONTCARE)";
-                if (it.first)
-                    s = mapContainerType[it.second].second;
+                std::string container_type = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWON, pCAPABILITY->ConType);
+                if (!container_type.empty())
+                    s = container_type;
 
                 sBuffer << "\nTW_MEMREF is TW_CAPABILITY:\n{\n" <<
                         indenter << "Cap=" << CTL_TwainAppMgr::GetCapNameFromCap(pCAPABILITY->Cap) << "\n" <<
@@ -675,7 +600,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                 // Get the CIE info
                 for ( size_t i = 0; i < CIEPointNames.size(); i++ )
                 {
-                    sBuffer << "CIEPoint " << CIEPointNames[i] << " = {" <<
+                    sBuffer << "CIEPoint " << CIEPointNames[i] << "={" <<
                                 Fix32ToFloat(aPoints[i]->X) << "," <<
                                 Fix32ToFloat(aPoints[i]->Y) << "," <<
                                 Fix32ToFloat(aPoints[i]->Z) << "}\n";
@@ -742,16 +667,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
             {
                 StringStreamA TempStream;
                 auto pEXTIMAGEINFO = static_cast<pTW_EXTIMAGEINFO>(pData);
-                TempStream << "\nTW_MEMREF is TW_EXTIMAGINFO:\n{\n" << "NumInfos=" << pEXTIMAGEINFO->NumInfos << "\n";
-
-                std::string sAllInfo = TempStream.str();
-                StringStreamA strm;
-                for (TW_UINT32 i = 0; i < pEXTIMAGEINFO->NumInfos; i++ )
-                {
-                    strm << boost::format("Info[%1%]=%2%\n") % i % DecodeTW_INFO(&pEXTIMAGEINFO->Info[i], nullptr);
-                }
-                sAllInfo += strm.str();
-                sBuffer << sAllInfo << "}\n";
+                sBuffer << "\nTW_MEMREF is TW_EXTIMAGINFO:\n{\n" << "NumInfos=" << pEXTIMAGEINFO->NumInfos << "}";
             }
             break;
 
@@ -763,7 +679,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                     dsPath = pTWUNKIDENTITY->dsPath;
                 sBuffer << "\nTW_MEMREF is TW_TWUNKIDENTITY:\n{\n" <<
                             indenter << DecodeSourceInfo(pIdentity, "TW_TWUNKIDENTITY") << "\n" <<
-                            indenter << "dsPath = " << dsPath << "\n}";
+                            indenter << "dsPath=" << dsPath << "\n}";
             }
             break;
 
@@ -916,8 +832,8 @@ std::string DecodeTW_ELEMENT8(pTW_ELEMENT8 pEl, LPCSTR pMem)
 std::string DecodeTW_INFO(pTW_INFO pInfo, LPCSTR pMem)
 {
     StringStreamA sBuffer;
-    sBuffer << "{InfoId=" << CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, pInfo->InfoID) << ", " <<
-               "ItemType=" << CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWTY, pInfo->ItemType) << ", " <<
+    sBuffer << "{InfoId=" << pInfo->InfoID << ", " <<
+               "ItemType=" << pInfo->ItemType << ", " <<
                "NumItems=" << pInfo->NumItems << ", " <<
                "ReturnCode=" << pInfo->ReturnCode << ", " <<
                "Item=" << pInfo->Item << "}";
