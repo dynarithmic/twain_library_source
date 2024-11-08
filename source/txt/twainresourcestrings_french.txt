@@ -243,6 +243,7 @@
 3020 Erreur lors de la création du fichier image temporaire
 3021 Fichier image créé avec succès
 3022 Valeurs définies au retour
+3023 Plus
 9700 DTWAIN Twain Library, v{short_version}, {company_name}, {copyright}
 9999 Exception error occurred during call to Twain DSM.  Possible corrupted Twain session?
 10001 Erreur lors de la fermeture de Twain DSM  
