@@ -90,6 +90,7 @@
 #define ID_LANGUAGE_JAPANESE            32782
 #define ID_LANGUAGE_TRADITIONALCHINESE  32783
 #define ID_LANGUAGE_KOREAN              32784
+#define ID_LANGUAGE_GREEK               32785
 
 
 #endif

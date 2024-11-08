@@ -1593,6 +1593,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <Text Include="txt\twainresourcestrings_english.txt" />
     <Text Include="txt\twainresourcestrings_french.txt" />
     <Text Include="txt\twainresourcestrings_german.txt" />
+    <Text Include="txt\twainresourcestrings_greek.txt" />
     <Text Include="txt\twainresourcestrings_italian.txt" />
     <Text Include="txt\twainresourcestrings_japanese.txt" />
     <Text Include="txt\twainresourcestrings_korean.txt" />

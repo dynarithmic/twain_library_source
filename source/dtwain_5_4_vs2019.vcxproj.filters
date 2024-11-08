@@ -1207,10 +1207,13 @@
     <Text Include="txt\twainresourcestrings_japanese.txt">
       <Filter>Resource Text Files</Filter>
     </Text>
+    <Text Include="txt\twainresourcestrings_korean.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
     <Text Include="txt\twainresourcestrings_traditional_chinese.txt">
       <Filter>Resource Text Files</Filter>
     </Text>
-    <Text Include="txt\twainresourcestrings_korean.txt">
+    <Text Include="txt\twainresourcestrings_greek.txt">
       <Filter>Resource Text Files</Filter>
     </Text>
   </ItemGroup>
