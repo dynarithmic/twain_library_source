@@ -3,6 +3,7 @@ french
 spanish
 dutch
 german
+greek
 italian
 portuguese_br
 romanian

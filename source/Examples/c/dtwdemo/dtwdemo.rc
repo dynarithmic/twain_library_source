@@ -55,6 +55,7 @@ BEGIN
         MENUITEM "English",                     ID_LANGUAGE_ENGLISH
         MENUITEM "French",                      ID_LANGUAGE_FRENCH
         MENUITEM "German",                      ID_LANGUAGE_GERMAN
+        MENUITEM "Greek",                       ID_LANGUAGE_GREEK
         MENUITEM "Italian",                     ID_LANGUAGE_ITALIAN
         MENUITEM "Japanese"                     ID_LANGUAGE_JAPANESE
         MENUITEM "Korean"                       ID_LANGUAGE_KOREAN
