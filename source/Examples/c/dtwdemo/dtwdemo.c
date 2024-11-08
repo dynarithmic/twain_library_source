@@ -146,7 +146,8 @@ AllLanguages g_allLanguages[] = { {ID_LANGUAGE_ENGLISH               , _T("engli
                                  {ID_LANGUAGE_PORTUGUESE              , _T("portuguese")},
                                  {ID_LANGUAGE_SIMPLIFIEDCHINESE     , _T("simplified_chinese")},
                                  {ID_LANGUAGE_TRADITIONALCHINESE    , _T("traditional_chinese")},
-                                 {ID_LANGUAGE_JAPANESE              , _T("japanese")}
+                                 {ID_LANGUAGE_JAPANESE              , _T("japanese")},
+                                 {ID_LANGUAGE_KOREAN                , _T("korean")}
                                 };
 TCHAR g_CustomLanguage[256];
 
@@ -335,6 +336,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 case ID_LANGUAGE_GERMAN             : 
                 case ID_LANGUAGE_DUTCH              : 
                 case ID_LANGUAGE_JAPANESE           :
+                case ID_LANGUAGE_KOREAN             :
                 case ID_LANGUAGE_TRADITIONALCHINESE :
                 case ID_LANGUAGE_RUSSIAN            : 
                 case ID_LANGUAGE_ROMANIAN           : 
