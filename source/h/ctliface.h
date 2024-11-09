@@ -949,34 +949,19 @@ namespace dynarithmic
     private:
         void LogType(std::string outStr, const char *ptr)
         {
-            // ptr is a valid string supplied by the user, but we can't ensure it is null terminated
-            // (It doesn't have to be null-terminated, as the DTWAIN function will eventually put the NULL
-            //  terminated value into the output string).
-            // So for now, we just output the pointer value of the string
+            // ptr must be a pointer to a valid null terminated string, or nullptr.
             if (ptr)
-            {
-                if (!m_bOutputAsString)
-                    strm << outStr << "=" << static_cast<const void*>(ptr);
-                else
-                    strm << outStr << "=\"" << ptr << "\"";
-            }
+                strm << outStr << "=\"" << ptr << "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")";
             else
                 strm << outStr << "=(null)";
         }
 
         void LogType(std::string outStr, const wchar_t* ptr)
         {
-            // ptr is a valid string supplied by the user, but we can't ensure it is null terminated
-            // (It doesn't have to be null-terminated, as the DTWAIN function will eventually put the NULL
-            //  terminated value into the output string).
-            // So for now, we just output the pointer value of the string
+            // ptr must be a pointer to a valid null terminated string, or nullptr.
             if (ptr)
-            {
-                if (!m_bOutputAsString)
-                    strm << outStr << "=" << static_cast<const void*>(ptr);
-                else
-                    strm << outStr << "=\"" << StringConversion::Convert_WidePtr_To_Ansi(ptr) << "\"";
-            }
+                strm << outStr << "=\"" << StringConversion::Convert_WidePtr_To_Ansi(ptr) << 
+                                    "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")";
             else
                 strm << outStr << "=(null)";
         }
@@ -988,7 +973,7 @@ namespace dynarithmic
             if (ptr)
             {
                 if (!m_bOutputAsString)
-                    strm << outStr << "=" << static_cast<const void*>(ptr);
+                    strm << outStr << "=0x" << std::hex << static_cast<const void*>(ptr);
                 else
                     strm << outStr << *ptr;
             }
@@ -999,14 +984,36 @@ namespace dynarithmic
         template <typename T>
         void LogType(std::string outStr, T t, std::enable_if_t<std::is_pointer_v<T> >* = nullptr)
         {
+            struct asStringRAII
+            {
+                bool* pAsString;
+                bool orig;
+                asStringRAII(bool* asString) : pAsString(asString), orig(*asString) {}
+                ~asStringRAII() { *pAsString = orig; }
+            };
+
+            asStringRAII raii(&m_bOutputAsString);
+
             if constexpr (std::is_same_v<T, wchar_t*>)
             {
-                LogType(outStr, static_cast<const wchar_t*>(t));
+                if ( m_bOutputAsString )
+                    LogType(outStr, static_cast<const wchar_t*>(t));
+                else
+                if ( t )
+                    strm << outStr << "0x" << std::hex << t;
+                else
+                    strm << outStr << "=(null)";
             }
             else
             if constexpr (std::is_same_v<T, char*>)
             {
-                LogType(outStr, static_cast<const char*>(t));
+                if (m_bOutputAsString)
+                    LogType(outStr, static_cast<const char*>(t));
+                else
+                if ( t )
+                    strm << outStr << "0x" << std::hex << t;
+                else
+                    strm << outStr << "=(null)";
             }
             else
             if constexpr (std::is_pointer_v<T> && !std::is_same_v<T, void *> 
@@ -1031,7 +1038,7 @@ namespace dynarithmic
             if constexpr (std::is_pointer_v<T>)
             {
                 if (t)
-                    strm << outStr << "=" << t;
+                    strm << outStr << "=0x" << std::hex << static_cast<const void*>(t);
                 else
                     strm << outStr << "=" << "(null)";
             }
