@@ -127,9 +127,10 @@ void CTL_ErrorStructDecoder::StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDe
     auto sDAT = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DAT, nDAT);
     auto sMSG = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_MSG, nMSG);
 
-    sBuffer << "DSM_Entry(pSource=" << pSource << "H, " <<
-                "pDest=" << pDest << "H, " << sDG << ", " << sDAT << ", " << sMSG << ", " <<
-                "TW_MEMREF=" << Data << "H) " << GetResourceStringFromMap(IDS_LOGMSG_CALLEDTEXT) << "\n";
+    sBuffer << "DSM_Entry(pSource=0x" << std::hex << pSource << ", " <<
+        "pDest=0x" << std::hex << pDest << ", " << sDG << ", " << sDAT << ", " << sMSG << ", " <<
+        "TW_MEMREF=0x" << std::hex << Data << ") " << GetResourceStringFromMap(IDS_LOGMSG_CALLEDTEXT) << "\n";
+
     s1 = sBuffer.str();
 
     std::string pSourceStr;
