@@ -82,6 +82,7 @@
 1066 Dubbele resource-ID gevonden  
 1067 Beschikbare uitgebreide afbeeldingsinformatie waarde
 1068 Ongeldig bitmap teruggegeven door TWAIN-bron (TWAINDSM 2.x)
+1069 Geen afbeeldingen verkregen.
 1100 TWAIN Gesteldheid niet Code: niet voleindigde operaties.   Ontoerijkende Herinnering
 1101 TWAIN Gesteldheid Code: Vergissing
 1102 TWAIN Gesteldheid Code: Unknown oorzaak of mislukking

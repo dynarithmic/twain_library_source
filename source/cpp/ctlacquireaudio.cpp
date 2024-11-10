@@ -39,6 +39,9 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireAudioNative(DTWAIN_SOURCE Source, LONG n
     const DTWAIN_ARRAY aDibs = SourceAcquire(opts);
     if (pStatus)
         *pStatus = opts.getStatus();
+    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
+        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
+    else
     if (pSource->GetLastAcquireError() != 0)
         CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
@@ -58,6 +61,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioNativeEx(DTWAIN_SOURCE Source, LONG 
     const bool bRet = AcquireExHelper(opts);
     if (pStatus)
         *pStatus = opts.getStatus();
+    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
+        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
+    else
     if (pSource->GetLastAcquireError() != 0)
         CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
@@ -78,6 +84,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioFile(DTWAIN_SOURCE Source, LPCTSTR l
     const bool bRetval = AcquireFileHelper(opts, ACQUIREAUDIOFILE);
     if (pStatus)
         *pStatus = opts.getStatus();
+    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
+        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
+    else
     if (pSource->GetLastAcquireError() != 0)
         CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))

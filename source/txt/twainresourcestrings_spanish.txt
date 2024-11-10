@@ -82,6 +82,7 @@
 1066 Se encontró un ID de recurso duplicado  
 1067 Valor de información de imagen extendida no disponible  
 1068 Bitmap inválido devuelto por la fuente TWAIN (TWAINDSM 2.x)
+1069 No se adquirieron imágenes.
 1100 Condición de TWAIN no podría Codificar a no podríamos completar funcionamiento.   Memoria Insuficiente.
 1101 Error de Código de Condición de TWAIN
 1102 TWAIN Condiciona Código Unknown causa del fracaso

@@ -97,6 +97,9 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
     bRetval = AcquireFileHelper(opts, ACQUIREFILE);
     if (pStatus)
         *pStatus = opts.getStatus();
+    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
+        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
+    else
     if (pSource->GetLastAcquireError() != 0)
         CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
@@ -140,6 +143,9 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFile(DTWAIN_SOURCE Source,
     const bool bRetval = AcquireFileHelper(opts, ACQUIREFILE);
     if (pStatus)
         *pStatus = opts.getStatus();
+    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
+        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
+    else
     if (pSource->GetLastAcquireError() != 0)
         CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
