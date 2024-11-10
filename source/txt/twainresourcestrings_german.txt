@@ -82,6 +82,7 @@
 1066 Doppelte Ressourcen-ID gefunden  
 1067 Nicht verfügbarer Wert für erweiterte Bildinformationen
 1068 Ungültiges Bitmap von TWAIN-Quelle zurückgegeben (TWAINDSM 2.x)
+1069 Keine Bilder erfasst.
 1100 TWAIN Zustandscode: Zu wenig Speicher
 1101 TWAIN Zustandscode: Kein Fehler
 1102 TWAIN Zustandscode: Unbekannte Fehlerursache

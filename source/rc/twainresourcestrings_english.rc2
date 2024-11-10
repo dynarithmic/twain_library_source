@@ -104,6 +104,7 @@ BEGIN
 	1066,"Duplicate TWAIN string ID found"
 	1067,"Unavailable extended image info value"
 	1068,"Invalid bitmap returned by TWAIN Source(TWAINDSM 2.x)"
+	1069,"No images acquired."
 	1100,"TWAIN Condition Code: Could not complete operation.  Insufficient Memory."
 	1101,"TWAIN Condition Code: No Error"
 	1102,"TWAIN Condition Code: Unknown cause of failure"
