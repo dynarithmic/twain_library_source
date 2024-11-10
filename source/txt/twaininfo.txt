@@ -1665,6 +1665,18 @@
  0xffff     TWON_DONTCARE16      
  0xffffffff TWON_DONTCARE32      
 -9999
+0x0001 TWMF_APPOWNS     
+0x0002 TWMF_DSMOWNS     
+0x0004 TWMF_DSOWNS      
+0x0008 TWMF_POINTER     
+0x0010 TWMF_HANDLE      
+-9999
+0 TWSX_NATIVE              
+1 TWSX_FILE                
+2 TWSX_MEMORY              
+3 TWSX_FILE2
+4 TWSX_MEMFILE             
+-9999
 [100] BMP  [1 4 8 16 24 32] [[]]
 [200] JPEG [8 16 24] [[1 24] [4 24] [32 24]]
 [250 251] Adobe PDF [1 8 16 24] [[32 24]]
@@ -1685,5 +1697,5 @@
 [6000 6001] TXT [1] [[4 1][8 1][16 1][24 1] [32 1]]
 -9999
 5.5.5
-379765706
+1120919122
 END END END
