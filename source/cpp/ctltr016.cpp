@@ -57,6 +57,9 @@ TW_UINT16 CTL_CapabilitySetTripletBase::GetTwainType() const
     return m_nTwainType;
 }
 
+// The PreEncode() function allocates memory used for the
+// TWAIN container, plus memory allocated for the item the 
+// TWAIN container will hold
 void * CTL_CapabilitySetTripletBase::PreEncode()
 {
     TW_CAPABILITY *pCap = GetCapabilityBuffer();
@@ -78,6 +81,9 @@ void * CTL_CapabilitySetTripletBase::PreEncode()
     return sessionHandle->m_TwainMemoryFunc->LockMemory( pCap->hContainer );
 }
 
+// The PostEncode() releases the memory allocated by PreEncode().  This
+// is done after the capability triplet call to TWAIN has been executed
+// and processed.
 TW_UINT16 CTL_CapabilitySetTripletBase::PostEncode(TW_UINT16 rc)
 {
     auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
@@ -99,7 +105,10 @@ void CTL_CapabilitySetTripletBase::EncodeOneValue(pTW_ONEVALUE pVal, void *pData
     {
         const float fnum = static_cast<float>(*static_cast<double*>(pData));
         TW_FIX32 ffix32 = FloatToFix32( fnum );
-        memcpy(&pVal->Item, &ffix32, sizeof(TW_FIX32));
+		// Note that pVal->Item actually points to the entire allocated memory block
+		// set up by the PreEncode() call.
+		void* pItem = &pVal->Item;
+        memcpy(pItem, &ffix32, sizeof(TW_FIX32));
     }
     else
     if (IsTwainStringType(pVal->ItemType) || IsTwainLongStringType(pVal->ItemType))
@@ -110,7 +119,11 @@ void CTL_CapabilitySetTripletBase::EncodeOneValue(pTW_ONEVALUE pVal, void *pData
         TW_STR1024 TempString = {};
         auto ptrString = static_cast<std::string*>(pData);
         std::copy(ptrString->begin(), ptrString->end(), TempString);
-        memcpy(&pVal->Item, TempString, dynarithmic::GetTwainItemSize( pVal->ItemType) );
+
+        // Note that pVal->Item actually points to the entire allocated memory block
+        // set up by the PreEncode() call, and is not a memory overwrite.
+        void* pItem = &pVal->Item;
+        memcpy(pItem, TempString, dynarithmic::GetTwainItemSize( pVal->ItemType) );
     }
     else
         // Copy data to TW_CONTAINER
