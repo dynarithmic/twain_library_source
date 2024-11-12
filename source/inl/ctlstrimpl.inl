@@ -35,6 +35,8 @@
 #pragma warning (disable:4244)
 #endif
 
+using namespace dynarithmic;
+
 template <typename StringTypeIn>
 strview::basic_string_view<typename StringTypeIn::value_type> get_view(const StringTypeIn& str)
 {
