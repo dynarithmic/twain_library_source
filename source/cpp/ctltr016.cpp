@@ -105,9 +105,9 @@ void CTL_CapabilitySetTripletBase::EncodeOneValue(pTW_ONEVALUE pVal, void *pData
     {
         const float fnum = static_cast<float>(*static_cast<double*>(pData));
         TW_FIX32 ffix32 = FloatToFix32( fnum );
-		// Note that pVal->Item actually points to the entire allocated memory block
-		// set up by the PreEncode() call.
-		void* pItem = &pVal->Item;
+        // Note that pVal->Item actually points to the entire allocated memory block
+        // set up by the PreEncode() call.
+        void* pItem = &pVal->Item;
         memcpy(pItem, &ffix32, sizeof(TW_FIX32));
     }
     else
