@@ -74,7 +74,7 @@ LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringEx(LPCTSTR lpOrigString, LPTSTR lpOut
 {
     LOG_FUNC_ENTRY_PARAMS((lpOrigString, lpOutString, nSize))
     LONG retval = ConvertToAPIString_InternalEx<StringWrapper>(lpOrigString, lpOutString, nSize);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpOutString));
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpOutString))
     LOG_FUNC_EXIT_NONAME_PARAMS(retval)
     CATCH_BLOCK(0)
 }

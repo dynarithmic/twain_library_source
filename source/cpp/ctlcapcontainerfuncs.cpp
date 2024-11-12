@@ -48,8 +48,8 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainerEx(LONG nCap, DTWAIN_BOOL bSetContainer,
     if (nCap < CAP_CUSTOMBASE)
     {
         auto& factory = pHandle->m_ArrayFactory;
-        LONG lValue = CTL_TwainAppMgr::GetContainerTypesFromCap(static_cast<CTL_EnumCapability>(nCap),
-                                                                bSetContainer ? true : false);
+        LONG lValue = static_cast<LONG>(CTL_TwainAppMgr::GetContainerTypesFromCap(static_cast<CTL_EnumCapability>(nCap),
+                                                                                  bSetContainer ? true : false));
         if (pDTWAINArray)
         {
             auto& vLong = factory->underlying_container_t<LONG>(pDTWAINArray);

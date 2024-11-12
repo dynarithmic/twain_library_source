@@ -27,8 +27,6 @@
 #include "ctltwainmanager.h"
 #include "dtwain_verinfo.h"
 #include "dtwstrfn.h"
-#include "ctldefsource.h"
-#include "resamplefactory.h"
 #include "crc32_aux.h"
 
 using namespace dynarithmic;
@@ -51,10 +49,9 @@ namespace dynarithmic
     static std::vector<std::pair<uint16_t, uint16_t>> parseBracketedPairs(std::string bracketedPairs)
     {
         std::vector<std::pair<uint16_t, uint16_t>> retVal;
-        size_t pos = 0;
         while (true)
         {
-            pos = bracketedPairs.find_first_of('[');
+            size_t pos = bracketedPairs.find_first_of('[');
             if (pos != std::string::npos)
             {
                 auto pos2 = bracketedPairs.find_first_of(']', pos + 1);

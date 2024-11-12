@@ -18,8 +18,6 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <math.h>
-#include <sstream>
 #include "winbit32.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
@@ -67,9 +65,9 @@ namespace dynarithmic
 
         // Get the sampling to be done
         auto iter = m_mapSampleFromTo.find(static_cast<uint16_t>(depth));
-        bool bOk = false;
         if (iter != m_mapSampleFromTo.end())
         {
+            bool bOk = false;
             int toDepth = iter->second;
             LogMsg(START_RESAMPLING, depth, toDepth);
             if (depth < toDepth)

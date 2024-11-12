@@ -117,7 +117,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceAcquiringEx(DTWAIN_SOURCE Source, BOOL b
     LOG_FUNC_ENTRY_PARAMS((Source, bUIOnly))
     auto [pHandle, pSource] = VerifyHandles(Source);
     if (bUIOnly)
-        LOG_FUNC_EXIT_NONAME_PARAMS(pSource->IsUIOpen() ? true : false);
+        LOG_FUNC_EXIT_NONAME_PARAMS(pSource->IsUIOpen() ? true : false)
     const bool stillAcquiring = (!pHandle->m_bTransferDone == true && !pHandle->m_bSourceClosed == true);
     LOG_FUNC_EXIT_NONAME_PARAMS(stillAcquiring)
     CATCH_BLOCK_LOG_PARAMS(false)
@@ -127,7 +127,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceInUIOnlyMode(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    LOG_FUNC_EXIT_NONAME_PARAMS(pSource->IsUIOnly());
+    LOG_FUNC_EXIT_NONAME_PARAMS(pSource->IsUIOnly())
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 

@@ -24,7 +24,6 @@
 #include "dtwain.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
-#include "errorcheck.h"
 using namespace dynarithmic;
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionExString(DTWAIN_SOURCE Source, LPCTSTR threshold,

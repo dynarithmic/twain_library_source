@@ -19,7 +19,6 @@ DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRING
 OF THIRD PARTY RIGHTS.
 */
 #include "a85encode.h"
-#include <algorithm>
 #include <string>
 
 class A85Encoder

@@ -693,9 +693,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsOCREngineActivated(DTWAIN_OCRENGINE Engine)
 {
     LOG_FUNC_ENTRY_PARAMS((Engine))
     auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
-    LONG retVal = FALSE;
     const bool bRet = pEngine->IsActivated();
-    retVal = bRet ? TRUE : FALSE;
+    LONG retVal = bRet ? TRUE : FALSE;
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(false)
 }

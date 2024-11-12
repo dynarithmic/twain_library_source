@@ -29,7 +29,6 @@
 #include <pdfconst.h>
 #include <utility>
 #include <memory>
-#include <pdflib32.h>
 #include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "ctlfileutils.h"

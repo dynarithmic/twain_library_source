@@ -278,9 +278,9 @@ LONG DLLENTRY_DEF DTWAIN_GetAPIHandleStatus(DTWAIN_HANDLE pHandle)
     LOG_FUNC_ENTRY_PARAMS((pHandle))
     LONG retVal = 0;
     if (!IsDLLHandleValid(static_cast<CTL_TwainDLLHandle*>(pHandle), FALSE))
-        LOG_FUNC_EXIT_NONAME_PARAMS(retVal);
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     retVal = IsDLLHandleValid(static_cast<CTL_TwainDLLHandle*>(pHandle), TRUE) ? DTWAIN_TWAINSESSIONOK : DTWAIN_APIHANDLEOK;
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal);
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(0)
 }
 
@@ -612,9 +612,9 @@ static LONG IsTwainAvailableHelper(LPTSTR directories, LONG nMaxLen)
     // Save the filter flags
     DTWAINScopedLogController sLogContoller(0);
     bool bMustDestroy = false;
-    CTL_TwainDLLHandle* pHandle = nullptr;
     try
     {
+        CTL_TwainDLLHandle* pHandle = nullptr;
         // Check if DTWAIN already initialized
         pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
         if (!pHandle)
@@ -622,7 +622,7 @@ static LONG IsTwainAvailableHelper(LPTSTR directories, LONG nMaxLen)
             // Temporarily set up a handle without loading everything
             pHandle = static_cast<CTL_TwainDLLHandle*> (SysInitializeHelper(false, true));
             if (!pHandle)
-                LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_ERR_BAD_HANDLE);
+                LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_ERR_BAD_HANDLE)
             bMustDestroy = true;
         }
     }
@@ -649,7 +649,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTwainAvailable()
 {
     LOG_FUNC_ENTRY_NONAME_PARAMS()
     auto retVal = IsTwainAvailableHelper(nullptr, 0);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal > 0 ? true : false);
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal > 0 ? true : false)
     CATCH_BLOCK(0)
 }
 
@@ -658,7 +658,7 @@ LONG DLLENTRY_DEF DTWAIN_IsTwainAvailableEx(LPTSTR directories, LONG nMaxLen)
     LOG_FUNC_ENTRY_NONAME_PARAMS()
     auto retVal = IsTwainAvailableHelper(directories, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((directories))
-    LOG_FUNC_EXIT_NONAME_PARAMS((std::max)(retVal, 0L));
+    LOG_FUNC_EXIT_NONAME_PARAMS((std::max)(retVal, 0L))
     CATCH_BLOCK(0)
 }
 
@@ -696,7 +696,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainAvailabilityEx(LPTSTR directories, LONG nMaxLen
     auto joinedString = StringWrapper::Join(availability.second, _T("|"));
     StringWrapper::CopyInfoToCString(joinedString, directories, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((directories))
-    LOG_FUNC_EXIT_NONAME_PARAMS(static_cast<LONG>(joinedString.length()));
+    LOG_FUNC_EXIT_NONAME_PARAMS(static_cast<LONG>(joinedString.length()))
     CATCH_BLOCK(0)
 }
 
@@ -745,9 +745,9 @@ LONG DLLENTRY_DEF DTWAIN_GetActiveDSMPath(LPTSTR szDLLName, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((szDLLName, nMaxLen))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    return StringWrapper::CopyInfoToCString(CTL_TwainAppMgr::GetDSMPath(), szDLLName, nMaxLen);
+    auto retVal = StringWrapper::CopyInfoToCString(CTL_TwainAppMgr::GetDSMPath(), szDLLName, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szDLLName))
-    LOG_FUNC_EXIT_NONAME_PARAMS(-1)
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(-1)
 }
 
@@ -755,9 +755,9 @@ LONG DLLENTRY_DEF DTWAIN_GetActiveDSMVersionInfo(LPTSTR szDLLInfo, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((szDLLInfo, nMaxLen))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    return StringWrapper::CopyInfoToCString(CTL_TwainAppMgr::GetDSMVersionInfo(), szDLLInfo, nMaxLen);
+    auto retVal = StringWrapper::CopyInfoToCString(CTL_TwainAppMgr::GetDSMVersionInfo(), szDLLInfo, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szDLLInfo))
-    LOG_FUNC_EXIT_NONAME_PARAMS(-1)
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(-1)
 }
 
@@ -1185,12 +1185,12 @@ void dynarithmic::WriteUserDefinedLogMsgW(CTL_TwainDLLHandle* pHandle, LPCWSTR s
 
 std::pair<bool, std::vector<uint16_t>> OpenLogging(LPCTSTR pFileName, LONG logFlags, const LoggingTraits& lTraits)
 {
-    bool bLogOpen = false;
     uint16_t nWhichLogging = 0;
     uint16_t totalLoggingOptions = 0;
     std::vector<uint16_t> vBadLogs;
     if (pFileName && pFileName[0])
     {
+        bool bLogOpen = false;
         bLogOpen = CTL_StaticData::GetLogger().InitFileLogging(pFileName, CTL_StaticData::GetDLLInstanceHandle(), lTraits);
         if (!bLogOpen)
             vBadLogs.push_back(nWhichLogging);
@@ -1198,15 +1198,15 @@ std::pair<bool, std::vector<uint16_t>> OpenLogging(LPCTSTR pFileName, LONG logFl
     }
     ++nWhichLogging;
     std::array<std::function<bool(HINSTANCE, const LoggingTraits&)>, 3> vLoggingFuncs = {
-                            [&](HINSTANCE hinst, const LoggingTraits& lTraits) { return CTL_StaticData::GetLogger().InitConsoleLogging(hinst, lTraits); },
+                            [&](HINSTANCE hinst, const LoggingTraits& theTraits) { return CTL_StaticData::GetLogger().InitConsoleLogging(hinst, theTraits); },
                             [&](HINSTANCE hinst, const LoggingTraits&) { return CTL_StaticData::GetLogger().InitDebugWindowLogging(hinst); },
                             [&](HINSTANCE hinst, const LoggingTraits&) { return CTL_StaticData::GetLogger().InitCallbackLogging(hinst); }};
     static constexpr std::array<long, 4> aLogFlags = { 0, DTWAIN_LOG_CONSOLE, DTWAIN_LOG_DEBUGMONITOR, DTWAIN_LOG_USECALLBACK };
     for (auto& fn : vLoggingFuncs)
     {
-        bool bRet = true;
         if (logFlags & aLogFlags[nWhichLogging])
         {
+            bool bRet = true;
             ++totalLoggingOptions;
             bRet = fn(CTL_StaticData::GetDLLInstanceHandle(), lTraits);
             if (!bRet)
@@ -2096,7 +2096,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainIDFromName(LPCTSTR lpszBuffer)
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto retVal = CTL_StaticData::GetIDFromTwainName(StringConversion::Convert_NativePtr_To_Ansi(lpszBuffer));
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !retVal.first; }, DTWAIN_ERR_STRINGID_NOTFOUND, retVal.second, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second);
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second)
     CATCH_BLOCK(std::numeric_limits<int32_t>::min())
 }
 

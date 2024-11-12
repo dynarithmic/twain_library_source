@@ -248,7 +248,8 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_BufferedXFerInfo{},
     m_bExtendedImageInfoSupported(false),
     m_nLastAcquireError(false),
-    m_bShutdownAcquire(false)
+    m_bShutdownAcquire(false),
+    m_bSupportedCustomCapsRetrieved(false)
 {
     if (lpszProduct)
         m_SourceId.set_product_name(StringConversion::Convert_NativePtr_To_Ansi(lpszProduct));

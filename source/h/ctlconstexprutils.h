@@ -291,10 +291,7 @@ namespace dynarithmic
 
     static constexpr bool IsSupportedFileFormat(int nFileFormat)
     {
-        auto iArray = EnumTwainFileFormats();
-        if (iArray.empty())
-            return nFileFormat != TWFF_BMP ? false : true;
-        return generic_array_finder(iArray, nFileFormat).first;
+        return generic_array_finder(EnumTwainFileFormats(), nFileFormat).first;
     }
 
     static constexpr LONG GetArrayTypeFromCapType(TW_UINT16 CapType)
