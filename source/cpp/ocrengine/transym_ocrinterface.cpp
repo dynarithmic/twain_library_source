@@ -31,7 +31,6 @@
 #include "ctlfileutils.h"
 #include "errorcheck.h"
 #include "ctliface.h"
-#include "ctldefsource.h"
 #include "../simpleini/simpleini.h"
 
 #ifdef VERSINFO_STANDALONE
@@ -680,7 +679,7 @@ LONG TransymOCR::StartOCR(CTL_StringType filename)
         {
             // Errors will be reported to the file specified by the ERRORREPORTFILE cap
             std::vector<std::string> valStr;
-            bRet = GetCapValues(DTWAIN_OCRCV_ERRORREPORTFILE, DTWAIN_CAPGETCURRENT, valStr);
+            GetCapValues(DTWAIN_OCRCV_ERRORREPORTFILE, DTWAIN_CAPGETCURRENT, valStr);
 
             // Turn off the TOCR message box if reporting to a file.
             m_SDK.TOCRSetErrorMode(m_JobHandle, TOCRERRORMODE_NONE);

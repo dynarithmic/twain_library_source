@@ -49,7 +49,7 @@ namespace dynarithmic
             CBaseLogger() = default;
             CBaseLogger& operator=(const CBaseLogger&) = default;
             virtual void trace(const std::string& msg) = 0;
-            std::string applyDecoration(const std::string& msg);
+            static std::string applyDecoration(const std::string& msg);
             static void generic_outstream(std::ostream& os, const std::string& msg);
             static std::string getTime();
             static std::string getThreadID();

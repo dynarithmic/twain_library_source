@@ -2181,7 +2181,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetAllString(DTWAIN_FRAME Frame, LPTSTR Lef
         StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sVal), vals[i], static_cast<int32_t>(sVal.size()) + 1);
         strm.str("");
     }
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Left, Top, Right, Bottom));
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Left, Top, Right, Bottom))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }

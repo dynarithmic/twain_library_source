@@ -1212,10 +1212,6 @@ namespace dynarithmic
     {
         static void Destroy(HGLOBAL h)
         {
-            #ifdef _WIN32
-            if (h)
-                FreeResource(h);
-            #endif
         }
         void operator()(HGLOBAL h) { Destroy(h); }
     };

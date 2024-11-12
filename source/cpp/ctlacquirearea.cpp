@@ -126,7 +126,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2String(DTWAIN_SOURCE Source, LPTS
             strm.str("");
         }
     }
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((left, top, right, bottom, Unit));
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((left, top, right, bottom, Unit))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -157,8 +157,8 @@ static bool GetImageSize(CTL_TwainDLLHandle* pHandle, DTWAIN_SOURCE Source, LPDT
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<double>(FloatArrayOut);
     std::copy(Array.begin(), Array.end(), vValues.begin());
     const DTWAIN_ARRAY temp = CreateArrayCopyFromFactory(pHandle, FloatArrayOut);
-    if  (pHandle->m_ArrayFactory->is_valid(FloatArray))
-        pHandle->m_ArrayFactory->destroy(FloatArray);
+    if  (pHandle->m_ArrayFactory->is_valid(static_cast<void*>(FloatArray)))
+        pHandle->m_ArrayFactory->destroy(static_cast<void*>(FloatArray));
     if (temp)
     {
         *FloatArray = temp;
