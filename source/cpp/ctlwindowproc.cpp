@@ -244,6 +244,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
             case DTWAIN_TN_FILENAMECHANGING:
             case DTWAIN_TN_FILENAMECHANGED:
             case DTWAIN_TN_INVALID_TWAINDSM2_BITMAP:
+            case DTWAIN_TN_IMAGE_RESAMPLE_FAILURE:
             {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 if ( wParam == DTWAIN_TN_ACQUIRESTARTED )

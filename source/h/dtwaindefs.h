@@ -454,6 +454,9 @@
    when using TWAINDSM.DLL as the data source manager */
 #define DTWAIN_TN_INVALID_TWAINDSM2_BITMAP 1058
 
+/* Sent if a resampling of an acquired image was attempted, but failed */
+#define DTWAIN_TN_IMAGE_RESAMPLE_FAILURE 1059
+
 /* Device event for TWAIN 1.8 Sources */
 #define  DTWAIN_TN_DEVICEEVENT                    1100
 
@@ -869,8 +872,9 @@
 #define DTWAIN_ERR_UNAVAILABLE_EXTINFO (-1067)
 #define DTWAIN_ERR_TWAINDSM2_BADBITMAP (-1068)
 #define DTWAIN_ERR_ACQUISITION_CANCELED (-1069)
+#define DTWAIN_ERR_IMAGE_RESAMPLED (-1070)
 
-#define DTWAIN_ERR_LAST_1           DTWAIN_ERR_ACQUISITION_CANCELED
+#define DTWAIN_ERR_LAST_1           DTWAIN_ERR_IMAGE_RESAMPLED
 
 #define TWAIN_ERR_LOW_MEMORY        (-1100)
 #define TWAIN_ERR_FALSE_ALARM       (-1101)

@@ -1545,6 +1545,12 @@ bool CTL_ImageXferTriplet::ResampleAcquiredDib()
             pSource->SetDibHandle(m_hDataHandle = CurDib->GetHandle(), nLastDib);
             return true;
         }
+        if ( ptr->GetResampleStatus() != DTWAIN_NO_ERROR )
+        {
+            // This is an error if the image could not be resampled
+            CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(), nullptr, DTWAIN_TN_IMAGE_RESAMPLE_FAILURE,
+                                                  reinterpret_cast<LPARAM>(pSource));
+        }
     }
     return false;
 }

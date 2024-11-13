@@ -132,14 +132,14 @@ void dynarithmic::DTWAIN_InvokeCallback(int nWhich, DTWAIN_HANDLE p, DTWAIN_SOUR
     {
         switch (nWhich)
         {
-        case DTWAIN_CallbackMESSAGE:
-            cProc = pHandle->m_CallbackMsg;
-            break;
-        case DTWAIN_CallbackERROR:
-            cProc = pHandle->m_CallbackError;
-            break;
-        default:
-            return;
+            case DTWAIN_CallbackMESSAGE:
+                cProc = pHandle->m_CallbackMsg;
+                break;
+            case DTWAIN_CallbackERROR:
+                cProc = pHandle->m_CallbackError;
+                break;
+            default:
+                return;
         }
 
         if (!cProc)
@@ -277,21 +277,21 @@ void dynarithmic::LogToDebugMonitor(CTL_StringType sMsg)
 DTWAIN_BOOL dynarithmic::DTWAIN_SetCallbackProc(DTWAIN_CALLBACK fnCall, LONG nWhich)
 {
     LOG_FUNC_ENTRY_PARAMS((fnCall, nWhich))
-        // See if DLL Handle exists
+    // See if DLL Handle exists
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
     switch (nWhich)
     {
-    case DTWAIN_CallbackERROR:
-        pHandle->m_CallbackError = fnCall;
-        break;
+        case DTWAIN_CallbackERROR:
+            pHandle->m_CallbackError = fnCall;
+            break;
 
-    case DTWAIN_CallbackMESSAGE:
-        pHandle->m_CallbackMsg = fnCall;
-        break;
+        case DTWAIN_CallbackMESSAGE:
+            pHandle->m_CallbackMsg = fnCall;
+            break;
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
-        CATCH_BLOCK(false)
+    CATCH_BLOCK(false)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileSavePos(HWND hWndParent, LPCTSTR szTitle, LONG xPos, LONG yPos, LONG nFlags)

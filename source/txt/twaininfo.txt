@@ -1614,6 +1614,7 @@
 1056 DTWAIN_TN_PROCESSDIBFINALACCEPTED                                                 
 1057 DTWAIN_TN_CLOSEDIBFAILED                                                               
 1058 DTWAIN_TN_INVALID_TWAINDSM2_BITMAP                                                 
+1059 DTWAIN_TN_IMAGE_RESAMPLE_FAILURE
 1100 DTWAIN_TN_DEVICEEVENT                                                       
 1105 DTWAIN_TN_TWAINPAGECANCELED                     
 1106 DTWAIN_TN_TWAINPAGEFAILED                                                          
@@ -1697,5 +1698,5 @@
 [6000 6001] TXT [1] [[4 1][8 1][16 1][24 1] [32 1]]
 -9999
 5.5.5
-1120919122
+400051307
 END END END
