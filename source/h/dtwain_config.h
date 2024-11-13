@@ -21,11 +21,11 @@ OF THIRD PARTY RIGHTS.
 #ifndef DTWAIN_CONFIG_H
 #define DTWAIN_CONFIG_H
 
-/* Build with DTWAIN logging */
-#define DTWAIN_USELOGGING  1 
+/* Build with DTWAIN logging of call stack */
+#define DTWAIN_BUILD_LOGCALLSTACK 1 
 
-/* Build without DTWAIN logging pointer values on return of functions 
-   Note that DTWAIN_USELOGGING must be 1 for this to take effect */
-#define DTWAIN_LOGRETURN_POINTERS 1
+/* Build without DTWAIN logging pointer values on return of functions. 
+   Note that DTWAIN_BUILD_LOGCALLSTACK must be 1 for this to take effect */
+#define DTWAIN_BUILD_LOGPOINTERS 1
 
 #endif
