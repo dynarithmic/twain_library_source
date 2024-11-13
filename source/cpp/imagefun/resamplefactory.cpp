@@ -69,6 +69,7 @@ namespace dynarithmic
         {
             bool bOk = false;
             int toDepth = iter->second;
+            m_nResampleStatus = DTWAIN_NO_ERROR;
             LogMsg(START_RESAMPLING, depth, toDepth);
             if (depth < toDepth)
                 bOk = CurDib.IncreaseBpp(toDepth);
@@ -77,7 +78,10 @@ namespace dynarithmic
             if (bOk)
                 LogMsg(SUCCESS_RESAMPLING, depth, toDepth, CurDib.GetHandle());
             else
+            {
                 LogMsg(FAILED_RESAMPLING, depth, toDepth);
+                m_nResampleStatus = DTWAIN_ERR_IMAGE_RESAMPLED;
+            }
             return bOk;
         }
         return false;
