@@ -1468,7 +1468,8 @@ DTWAIN DLL are not displayed */
 #define DTWAIN_64BIT_VERSION                    0x00400000
 #define DTWAIN_UNICODE_VERSION                  0x00800000
 #define DTWAIN_OPENSOURCE_VERSION               0x01000000
-
+#define DTWAIN_CALLSTACK_LOGGING                0x02000000
+#define DTWAIN_CALLSTACK_LOGGING_PLUS           0x04000000
 
 /* OCR defines */
 #define DTWAINOCR_RETURNHANDLE                  1
