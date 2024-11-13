@@ -39,7 +39,7 @@
 
      #define STRING_PARAM_LIST(x) _T(#x)
 
-#if  DTWAIN_USELOGGING == 1
+#if  DTWAIN_BUILD_LOGCALLSTACK == 1
     #ifdef _MSC_VER
         #pragma message ("Building DTWAIN with logging code")
     #endif

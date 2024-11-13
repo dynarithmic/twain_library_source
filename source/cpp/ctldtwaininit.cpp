@@ -142,102 +142,108 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetVersionEx(LPLONG lMajor, LPLONG lMinor, LPLON
 
 DTWAIN_BOOL DTWAIN_GetVersionInternal(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatch)
 {
-    LOG_FUNC_ENTRY_PARAMS((lMajor,lMinor,lVersionType))
+    LOG_FUNC_ENTRY_PARAMS((lMajor, lMinor, lVersionType))
     LONG nDistr = 0;
 
-    #ifdef DTWAIN_OPENSOURCE_DISTRIBUTION
-        #pragma message ("Building Open Source Distribution version")
-        nDistr |= DTWAIN_OPENSOURCE_VERSION;
-    #endif
+#ifdef DTWAIN_OPENSOURCE_DISTRIBUTION
+#pragma message ("Building Open Source Distribution version")
+    nDistr |= DTWAIN_OPENSOURCE_VERSION;
+#endif
 
-    #ifdef DTWAIN_LIB
-            CTL_StringType strVer = _T(DTWAIN_VERINFO_BASEVERSION)
-                                    _T(DTWAIN_PATCHLEVEL_VERSION);
-            CTL_StringArrayType aInfo;
-            StringWrapper::Tokenize(strVer, _T("."), aInfo);
-            *lMajor = _ttol(aInfo[0].c_str());
-            *lMinor = _ttol(aInfo[1].c_str());
-            if ( lPatch )
-                *lPatch = _ttol(aInfo[3].c_str());
-    #endif
-    #ifdef DTWAIN_LIB
+#ifdef DTWAIN_LIB
+    CTL_StringType strVer = _T(DTWAIN_VERINFO_BASEVERSION)
+        _T(DTWAIN_PATCHLEVEL_VERSION);
+    CTL_StringArrayType aInfo;
+    StringWrapper::Tokenize(strVer, _T("."), aInfo);
+    *lMajor = _ttol(aInfo[0].c_str());
+    *lMinor = _ttol(aInfo[1].c_str());
+    if (lPatch)
+        *lPatch = _ttol(aInfo[3].c_str());
+#endif
+#ifdef DTWAIN_LIB
     GetVersionFromResource(lMajor, lMinor, lPatch);
-    #else
+#else
     const bool modRet = GetDTWAINDLLVersionInfo(CTL_StaticData::GetDLLInstanceHandle(), lMajor, lMinor, lPatch);
-     if ( !modRet )
-     {
-         LOG_FUNC_EXIT_NONAME_PARAMS(false)
-     }
-    #endif
-
+    if (!modRet)
+    {
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    }
+#endif
     *lVersionType = nDistr;
+#ifdef UNICODE
+    *lVersionType |= DTWAIN_UNICODE_VERSION;
+#endif
 
-    #ifdef UNICODE
-        *lVersionType |= DTWAIN_UNICODE_VERSION;
-    #endif
+#ifdef DTWAIN_DEBUG
+    *lVersionType |= DTWAIN_DEVELOP_VERSION;
+#endif
 
-    #ifdef DTWAIN_DEBUG
-        *lVersionType |= DTWAIN_DEVELOP_VERSION;
-    #endif
+#if defined (WIN64) || defined(_WIN64)
+    *lVersionType |= DTWAIN_64BIT_VERSION;
+#else
+#if defined (WIN32) || defined(_WIN32)
+    *lVersionType |= DTWAIN_32BIT_VERSION;
+#endif
+#endif
 
-    #if defined (WIN64) || defined(_WIN64)
-        *lVersionType |= DTWAIN_64BIT_VERSION;
+#ifdef DTWAIN_LIB
+    #ifndef DTWAIN_STDCALL
+        *lVersionType |= DTWAIN_STATICLIB_VERSION;
     #else
-    #if defined (WIN32) || defined(_WIN32)
-        *lVersionType |= DTWAIN_32BIT_VERSION;
+        *lVersionType |= DTWAIN_STATICLIB_STDCALL_VERSION;
     #endif
+    #ifdef DTWAIN_ACTIVEX
+        *lVersionType |= DTWAIN_ACTIVEX_VERSION;
     #endif
+#endif
 
-    #ifdef DTWAIN_LIB
-        #ifndef DTWAIN_STDCALL
-            *lVersionType |= DTWAIN_STATICLIB_VERSION;
-        #else
-            *lVersionType |= DTWAIN_STATICLIB_STDCALL_VERSION;
-        #endif
-        #ifdef DTWAIN_ACTIVEX
-            *lVersionType |= DTWAIN_ACTIVEX_VERSION;
-        #endif
-    #endif
-
-    #ifndef DTWAIN_LIMITED_VERSION
-        #ifdef PDFLIB_INTERNAL
-            #ifdef DTWAIN_LIB
-                #ifndef DTWAIN_STDCALL
-                    *lVersionType |= DTWAIN_PDF_VERSION;
-                #else
-                    *lVersionType |= DTWAIN_PDF_VERSION;
-                #endif
+#ifndef DTWAIN_LIMITED_VERSION
+    #ifdef PDFLIB_INTERNAL
+        #ifdef DTWAIN_LIB
+            #ifndef DTWAIN_STDCALL
+                *lVersionType |= DTWAIN_PDF_VERSION;
             #else
+                *lVersionType |= DTWAIN_PDF_VERSION;
+            #endif
+        #else
             #ifndef DTWAIN_DEMO_VERSION
                 *lVersionType |= DTWAIN_PDF_VERSION;
             #else
                 *lVersionType |= DTWAIN_PDF_VERSION;
             #endif
-            #endif
         #endif
     #endif
+#endif
 
-    #ifndef DTWAIN_LIMITED_VERSION
-        #ifdef TWAINSAVE_INTERNAL
-            #ifdef DTWAIN_LIB
-                #ifndef DTWAIN_STDCALL
-                    *lVersionType |= DTWAIN_TWAINSAVE_VERSION;
-                #else
-                    *lVersionType |= DTWAIN_TWAINSAVE_VERSION;
-                #endif
+#ifndef DTWAIN_LIMITED_VERSION
+    #ifdef TWAINSAVE_INTERNAL
+        #ifdef DTWAIN_LIB
+            #ifndef DTWAIN_STDCALL
+                *lVersionType |= DTWAIN_TWAINSAVE_VERSION;
             #else
-                #ifndef DTWAIN_DEMO_VERSION
-                    *lVersionType |= DTWAIN_TWAINSAVE_VERSION;
-                #else
-                    *lVersionType |= DTWAIN_TWAINSAVE_VERSION;
-                #endif
+                *lVersionType |= DTWAIN_TWAINSAVE_VERSION;
+            #endif
+            #else
+            #ifndef DTWAIN_DEMO_VERSION
+                *lVersionType |= DTWAIN_TWAINSAVE_VERSION;
+            #else
+                *lVersionType |= DTWAIN_TWAINSAVE_VERSION;
             #endif
         #endif
     #endif
+#endif
 
-    #ifdef DTWAIN_DEVELOP_DLL
-        *lVersionType |= DTWAIN_DEVELOP_VERSION;
-    #endif
+#ifdef DTWAIN_DEVELOP_DLL
+    *lVersionType |= DTWAIN_DEVELOP_VERSION;
+#endif
+
+#if DTWAIN_BUILD_LOGCALLSTACK == 1
+    *lVersionType |= DTWAIN_CALLSTACK_LOGGING;
+#endif
+
+#if DTWAIN_BUILD_LOGCALLSTACK == 1 && DTWAIN_BUILD_LOGPOINTERS == 1
+    *lVersionType |= DTWAIN_CALLSTACK_LOGGING_PLUS;
+#endif
 
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
@@ -2165,6 +2171,12 @@ CTL_StringType dynarithmic::GetVersionString()
 
         if (lVersionType & DTWAIN_DEVELOP_VERSION)
             s += " [Debug]";
+
+        if (lVersionType & DTWAIN_CALLSTACK_LOGGING_PLUS)
+            s += " [Log Calls+]";
+        else
+        if (lVersionType & DTWAIN_CALLSTACK_LOGGING)
+            s += " [Log Calls]";
 
         s += " ";
         s += sBits;
