@@ -1712,7 +1712,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SysDestroy()
     const DTWAIN_BOOL bRet = SysDestroyHelper(FUNC_MACRO, pHandle);
     if (!bRet)
     {
+        #if DTWAIN_BUILD_LOGCALLSTACK
         LogValue(FUNC_MACRO, false, false);
+        #endif
     }
 #ifdef DTWAIN_DEBUG_CALL_STACK
     if (CTL_StaticData::GetLogFilterFlags())
@@ -1745,11 +1747,11 @@ static bool SysDestroyHelper(const char* pParentFunc, CTL_TwainDLLHandle* pHandl
     auto it = threadMap.find(threadId);
     if ( it == threadMap.end() )
         return false;
-
+    #if DTWAIN_BUILD_LOGCALLSTACK
     // Log the parent function, and the assumption that the 
     // return value from this point on is "true". 
     LogValue(pParentFunc, false, true);
-
+    #endif
     try
     {
         // Note that the assumption is that no exception is thrown from
