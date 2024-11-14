@@ -41,7 +41,7 @@
 
 #if  DTWAIN_BUILD_LOGCALLSTACK == 1
     #ifdef _MSC_VER
-        #pragma message ("Building DTWAIN with logging code")
+        #pragma message ("Building DTWAIN with call stack logging")
     #endif
     #define TRY_BLOCK try {
     #define LOG_FUNC_STRING(x) \
@@ -143,7 +143,7 @@
             }
 #else
     #ifdef _MSC_VER
-        #pragma message ("Building DTWAIN with no logging code")
+        #pragma message ("Building DTWAIN with minimal logging code")
     #endif
 
     #define CATCH_BLOCK_END }
