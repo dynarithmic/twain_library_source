@@ -42,11 +42,13 @@ namespace dynarithmic
             Handle->m_lLastError = Err;
             CTL_TwainAppMgr::SetError(Err, extraInfo, false);
             OutputDTWAINErrorA(Handle, fnName);
+            #if DTWAIN_BUILD_LOGCALLSTACK == 1
             if (logError && (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK))
             {
                 LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(fnName, LOG_INDENT_OUT) +
                     ParamOutputter("", true).outputParam(retErr).getString());
             }
+            #endif
             if (doThrow)
             throw retErr;
         }
