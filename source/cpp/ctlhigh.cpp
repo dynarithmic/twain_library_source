@@ -111,12 +111,16 @@ static T FunctionCaller(FnToCall fn, const std::string& func, const std::string&
     try
     {
         T bRet {};
+        #if DTWAIN_BUILD_LOGCALLSTACK == 1
         if (doLog)
         {
             try { LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_IN) + paramLog); }
             catch (...) {}
         }
+        #endif
         bRet = fn();
+
+        #if DTWAIN_BUILD_LOGCALLSTACK == 1
         if (doLog)
         {
             try
@@ -126,6 +130,7 @@ static T FunctionCaller(FnToCall fn, const std::string& func, const std::string&
             catch (...)
             { return bRet; }
         }
+        #endif
         return bRet;
     }
     catch (T var) { return var; }
