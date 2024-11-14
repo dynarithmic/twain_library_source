@@ -1718,7 +1718,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SysDestroy()
     }
     #if DTWAIN_BUILD_LOGCALLSTACK == 1
     if (CTL_StaticData::GetLogFilterFlags())
-        CTL_LogFunctionCall(__FUNC__, 1);
+        CTL_LogFunctionCallA(FUNC_MACRO, 1);
     #endif
     return bRet;
     CATCH_BLOCK(false)
