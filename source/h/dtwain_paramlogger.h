@@ -1,6 +1,7 @@
 #ifndef DTWAIN_PARAMLOGGER_H
 #define DTWAIN_PARAMLOGGER_H
 
+#if DTWAIN_BUILD_LOGCALLSTACK == 1
 #include <string>
 #include <sstream>
 #include "dtwaindefs.h"
@@ -123,4 +124,5 @@ namespace dynarithmic
         return s;
     }
 }
+#endif
 #endif
