@@ -1712,14 +1712,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SysDestroy()
     const DTWAIN_BOOL bRet = SysDestroyHelper(FUNC_MACRO, pHandle);
     if (!bRet)
     {
-        #if DTWAIN_BUILD_LOGCALLSTACK
+        #if DTWAIN_BUILD_LOGCALLSTACK == 1
         LogValue(FUNC_MACRO, false, false);
         #endif
     }
-#ifdef DTWAIN_DEBUG_CALL_STACK
+    #if DTWAIN_BUILD_LOGCALLSTACK == 1
     if (CTL_StaticData::GetLogFilterFlags())
         CTL_LogFunctionCall(__FUNC__, 1);
-#endif
+    #endif
     return bRet;
     CATCH_BLOCK(false)
 }
