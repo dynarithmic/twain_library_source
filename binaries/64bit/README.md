@@ -13,7 +13,7 @@ If you are not concerned with sizes of the DLL's, the **full_logging** should be
 ### How to distinguish between full and partial logging DLLs
 Since the names of the DLL's are the same, there are a few ways to distinguish which one is being used:
 
-1) Inspecting the properties of the DLL will show **[Logging+]** in the **Product Name** section if the DLL has full logging enabled.  You can use Window's File Explorer or other utility to inspect the properties of a DLL file.
+1) Inspecting the properties of the DLL will show **[Logging+]** in the **Product Version** section if the DLL has full logging enabled.  You can use Window's File Explorer or other utility to inspect the properties of a DLL file.
 
 2) Calling **DTWAIN_SetTwainLog** will show **[Logging+]** in the header information when the log is started.
 
