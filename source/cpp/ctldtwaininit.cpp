@@ -2174,15 +2174,7 @@ CTL_StringType dynarithmic::GetVersionString()
         if (lVersionType & DTWAIN_DEVELOP_VERSION)
             s += " [Debug]";
 
-        if (lVersionType & DTWAIN_CALLSTACK_LOGGING_PLUS)
-            s += " [Log Call Stack+]";
-        else
-        if (lVersionType & DTWAIN_CALLSTACK_LOGGING)
-            s += " [Log Call Stack]";
-        else
-        if (!(lVersionType & DTWAIN_CALLSTACK_LOGGING))
-            s += " [Minimal Logging]";
-
+        s += DTWAIN_BUILD_LOGGINGNAME;
         s += " ";
         s += sBits;
         StringStreamA strm;
