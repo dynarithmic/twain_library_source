@@ -76,7 +76,7 @@
     #define LOG_FUNC_ENTRY_NONAME_PARAMS(...) \
         TRY_BLOCK LogValue(FUNC_MACRO, true, int(0), __VA_ARGS__);
 
-    #if DTWAIN_LOGRETURN_POINTERS == 1
+    #if DTWAIN_BUILD_LOGPOINTERS == 1
     #ifdef _MSC_VER
         #pragma message ("Building DTWAIN with logging pointer dereferencing on return")
     #endif
