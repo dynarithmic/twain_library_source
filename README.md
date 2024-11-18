@@ -137,7 +137,7 @@ The **DTWAIN_BUILD_LOGPOINTERS** denotes whether the libraries will be built wit
         64bit/dtwain64d.dll -64-bit Debug ANSI (MBCS) DLL
         64bit/dtwain64ud.dll -64-bit Debug Unicode DLL
 
-* Note -- the resulting "*.lib* files that reside in these directories are import libraries compatible with the Visual Studio toolset.  Other compilers will require converting these .lib files to your compiler's import library format, or you can use the LoadLibrary / GetProcAddress approach (we have a wrapper for this -- see below in the "Getting DTWAIN to work with other programming languages" section).
+* Note -- the resulting "*.lib* files that reside in these directories are import libraries compatible with the Visual Studio toolset.  Other compilers will require converting these .lib files to your compiler's import library format, or you can use the [LoadLibrary / GetProcAddress approach](https://github.com/dynarithmic/twain_library?tab=readme-ov-file#what-if-i-dont-have-visual-c-as-the-compiler-to-use-when-building-an-application--the-visual-c-import-libraries-will-not-work-for-me--i-use-embarcaderogclangmingw-fill-in-with-your-favorite-compiler-or-ide--so-how-do-i-use-the-library) to remove the need for import libraries.
 
 * If the IMPLIB.EXE program from Embarcadero is available on the path, it will be called to create Embarcadero C++ compatible import libraries for the 32-bit DLL's.  The names of the Embarcadero import libraries will have a **_embarcadero** appended to the library name.
 
