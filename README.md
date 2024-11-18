@@ -116,6 +116,16 @@ Note that the C++ source code should be able to be built with any C++17 complian
 
 * Start Visual Studio, and open one of the DTWAIN solution.  The DTWAIN solution files are found in the [source](https://github.com/dynarithmic/twain_library_source/tree/master/source) directory.  Open **dtwain_5_vs2019.sln**.
 
+* The **dtwain_config.h** file has the following entries:
+
+```cpp
+#define DTWAIN_BUILD_LOGCALLSTACK 1 
+#define DTWAIN_BUILD_LOGPOINTERS 1
+```
+The **DTWAIN_BUILD_LOGCALLSTACK** denotes whether the libraries will be built with full call stack logging enabled.  If this value is **1**, then the libraries will be built with call stack logging.  Otherwise if the value is **0**, no call stack logging will be built.  
+
+The **DTWAIN_BUILD_LOGPOINTERS** denotes whether the libraries will be built with the logging of any pointer values on return of a DTWAIN function that have output pointers as parameters.  As with **DTWAIN_BUILD_LOGCALLSTACK**, the values of **0** or **1** denote whether this option will be built into the DTWAIN DLL's.  Note that **DTWAIN_BUILD_CALLSTACK** must be **1** for **DTWAIN_BUILD_LOGPOINTERS** to take effect.
+
 * A full rebuild of all the configurations available is recommended.  Use the "Build -> Batch Build..." option in the Visual Studio IDE and check all of the configurations to build everything (take a coffee break -- this could take a while).  This will create a "binaries" directory that will contain the following DLLs:
 
         32bit/dtwain32.dll -32-bit ANSI (MBCS) DLL
