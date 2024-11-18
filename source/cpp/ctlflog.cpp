@@ -41,9 +41,10 @@ std::string dynarithmic::CTL_LogFunctionCallA(LPCSTR pFuncName, int nWhich, LPCS
 
 std::string dynarithmic::CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich, LPCSTR pString/*=NULL*/)
 {
-    if (CTL_StaticData::s_logFilterFlags == 0 )
+    if (CTL_StaticData::GetLogFilterFlags() == 0 )
          return {};
-    static int nIndent = 0;
+    auto& theLogger = CTL_StaticData::GetLogger();
+    int nIndent = theLogger.GetCurrentIndentLevel();
     std::string s;
     std::string s2;
     if ( pString )
@@ -57,37 +58,55 @@ std::string dynarithmic::CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich,
             if (resText.empty())
                 resText = "Entering";
             s = sTemp + static_cast<std::string>("===>>>") + resText + " ";
-            nIndent += 3;
+            theLogger.IndentLine();
         }
         else
+        if ( nWhich == LOG_INDENT_OUT )
         {
-            nIndent -= 3;
-            nIndent = (std::max)(0, nIndent);
+            theLogger.OutdentLine();
+            nIndent = theLogger.GetCurrentIndentLevel();
             const std::string sTemp(nIndent, ' ');
             auto resText = GetResourceStringFromMap(IDS_LOGMSG_EXITTEXT);
             if (resText.empty())
                 resText = "Exiting";
             s = sTemp + static_cast<std::string>("<<<===") + resText + " ";
         }
+        else
+        if (nWhich == LOG_INDENT_USELAST)
+        {
+            const std::string sTemp(nIndent, ' '); 
+            std::ostringstream strm;
+            strm << sTemp << pFuncName << ": " << GetResourceStringFromMap(IDS_LOGMSG_RETURNSETVALUES) << ": ";
+            s = strm.str();
+        }
+        else
+        if (nWhich == LOG_INDENT_USELAST_NOFUNCTION)
+        {
+            const std::string sTemp(nIndent + theLogger.GetIndentSize(), ' '); 
+            std::ostringstream strm;
+            strm << sTemp << pFuncName;
+            s = strm.str();
+        }
+
     }
     else
     {
         s = std::string(nIndent, ' ');
     }
-    if ( !pString )
+    if ( !pString && nWhich != LOG_INDENT_USELAST && nWhich != LOG_INDENT_USELAST_NOFUNCTION)
         s += pFuncName;
     else
         s += s2;
-    if ( nWhich != LOG_INDENT_IN && nWhich != LOG_INDENT_OUT)
+    if ( nWhich != LOG_INDENT_IN && nWhich != LOG_INDENT_OUT && nWhich != LOG_INDENT_USELAST)
     {
-        if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_USEFILE)
+        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_USEFILE)
         {
-            if (!CTL_StaticData::s_appLog.StatusOutFast( s.c_str() ) )
-                CTL_StaticData::s_appLog.OutputDebugStringFull(s);
+            if (!CTL_StaticData::GetLogger().StatusOutFast( s.c_str() ) )
+                CTL_StaticData::GetLogger().OutputDebugStringFull(s);
         }
         else
         {
-           CTL_StaticData::s_appLog.OutputDebugStringFull(s);
+           CTL_StaticData::GetLogger().OutputDebugStringFull(s);
         }
     }
     return s;
@@ -95,7 +114,7 @@ std::string dynarithmic::CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich,
 
 void dynarithmic::LogExceptionErrorA(LPCSTR fname, const char* sAdditionalText)
 {
-    if ( !(CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_SHOWEXCEPTIONS) )
+    if ( !(CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_SHOWEXCEPTIONS) )
          return;
     try
     {
@@ -112,9 +131,9 @@ void dynarithmic::LogExceptionErrorA(LPCSTR fname, const char* sAdditionalText)
           output << "\nAdditional Information: " << sAdditionalText;
 
        std::string s = output.str();
-       if (!(CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_USEFILE))
+       if (!(CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_USEFILE))
             s += "\n";
-       CTL_TwainAppMgr::WriteLogInfoA(s, true);  // flush all writes to the log file
+       LogWriterUtils::WriteLogInfoIndentedA(s);  // flush all writes to the log file
        LogExceptionToConsole(fname, sAdditionalText);
     }
     catch(...)

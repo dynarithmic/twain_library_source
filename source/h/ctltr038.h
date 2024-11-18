@@ -21,7 +21,7 @@
 #ifndef CTLTR038_H
 #define CTLTR038_H
 
-#include "ctltrp.h"
+#include "ctltripletbase.h"
 
 #include <vector>
 #include <map>

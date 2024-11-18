@@ -46,6 +46,14 @@ namespace dynarithmic
               DTWAIN_RESLOAD_NODUPLICATE_ID};
         std::array<bool, 5> errorValue;
         CTL_StringType errorMessage;
+        CTL_StringType resourcePath;
+        struct DuplicateInfo
+        {
+            int lineNumber = -1;
+            int duplicateID = -1;
+            std::string line;
+        };
+        DuplicateInfo m_dupInfo;
         ResourceLoadingInfo() : errorValue{} { errorValue[2] = true; }
     };
 

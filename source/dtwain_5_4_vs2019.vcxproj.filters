@@ -346,9 +346,6 @@
     <ClCompile Include="cpp\ctltr043.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include=".\cpp\ctltrp.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include="cpp\ctltsstub.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
@@ -517,9 +514,6 @@
     <ClCompile Include=".\cpp\ocrengine\transym_ocrinterface.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include="cpp\twainfix32.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include="cpp\twainframe.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
@@ -665,6 +659,12 @@
       <Filter>C++ Files</Filter>
     </ClCompile>
     <ClCompile Include="cpp\ctlfilesave.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctltripletbase.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\logwriterutils.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -879,9 +879,6 @@
     <ClInclude Include=".\h\ctltrall.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include=".\h\ctltrp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="h\ctltwainidentity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -904,9 +901,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include=".\h\dtwain_resource_constants2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="h\dtwain_standard_defs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include=".\h\dtwain_verinfo.h">
@@ -1074,6 +1068,18 @@
     <ClInclude Include="h\ctlloadresources.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="h\ctltripletbase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\dtwain_config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\dtwain_standard_defs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\logwriterutils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".\h\versioninfo.ipp">
@@ -1196,6 +1202,18 @@
       <Filter>Resource Text Files</Filter>
     </Text>
     <Text Include="txt\twainresourcestrings_simplified_chinese.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_japanese.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_korean.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_traditional_chinese.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_greek.txt">
       <Filter>Resource Text Files</Filter>
     </Text>
   </ItemGroup>

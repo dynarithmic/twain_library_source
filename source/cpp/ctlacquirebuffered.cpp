@@ -44,6 +44,9 @@ DTWAIN_BOOL   DLLENTRY_DEF DTWAIN_AcquireBufferedEx(DTWAIN_SOURCE Source, LONG P
     const bool bRet = AcquireExHelper(opts);
     if (pStatus)
         *pStatus = opts.getStatus();
+    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
+        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
+    else
     if (pSource->GetLastAcquireError() != 0)
         CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
@@ -61,8 +64,12 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireBuffered(DTWAIN_SOURCE Source, LONG Pixe
     const DTWAIN_ARRAY aDibs = SourceAcquire(opts);
     if (pStatus)
         *pStatus = opts.getStatus();
+    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
+        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
+    else
     if (pSource->GetLastAcquireError() != 0)
         CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
     LOG_FUNC_EXIT_NONAME_PARAMS(aDibs)
     CATCH_BLOCK_LOG_PARAMS(DTWAIN_ARRAY(0))
 }
@@ -108,11 +115,9 @@ static int CheckTiledBufferedSupport(CTL_ITwainSource* pSource)
     auto origValue = vTiles[0];
     vTiles[0] = 1;
 
-    int finalReturnValue = DTWAIN_NO_ERROR;
-
     // Set the capability to see if it accepts TRUE for the ICAP_TILES cap
     bRet = DTWAIN_SetCapValues(pSource, ICAP_TILES, DTWAIN_CAPSET, arr);
-    finalReturnValue = bRet?DTWAIN_NO_ERROR:DTWAIN_ERR_TILES_NOT_SUPPORTED;
+    const int finalReturnValue = bRet ? DTWAIN_NO_ERROR : DTWAIN_ERR_TILES_NOT_SUPPORTED;
 
     // Reset to original value
     if (origValue != vTiles[0])
@@ -151,7 +156,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsBufferedTileModeSupported(DTWAIN_SOURCE Source
     auto [pHandle, pSource] = VerifyHandles(Source);
     auto bRet = CheckTiledBufferedSupport(pSource);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return bRet != DTWAIN_NO_ERROR; }, bRet, false, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true);
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 

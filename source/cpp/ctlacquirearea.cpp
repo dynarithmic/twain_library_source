@@ -53,7 +53,7 @@ static bool SetImageSize2(CTL_ITwainSource *p,
     LONG Unit,
     LONG flags);
 
-static bool IsValidUnit(LONG Unit)
+static constexpr bool IsValidUnit(LONG Unit)
 {
     return Unit == DTWAIN_INCHES ||
         Unit == DTWAIN_CENTIMETERS ||
@@ -109,18 +109,24 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2String(DTWAIN_SOURCE Source, LPTS
 {
     LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit))
     std::array<DTWAIN_FLOAT, 4> val = {};
-    std::array<LPTSTR*, 4> pStr = { &left, &top, &right, &bottom };
+    std::array<LPTSTR, 4> pStr = { left?left:nullptr, top?top:nullptr, right?right:nullptr, bottom?bottom:nullptr };
     const DTWAIN_BOOL bRet = DTWAIN_GetAcquireArea2(Source, &val[0], &val[1], &val[2], &val[3], Unit);
     if (bRet)
     {
         std::ostringstream strm;
+        auto numDigits = strm.precision();
         for (size_t i = 0; i < val.size(); ++i)
         {
-            strm << boost::format("%1%") % val[i];
-            StringWrapper::SafeStrcpy(*pStr[i], StringConversion::Convert_Ansi_To_Native(strm.str()).c_str());
+            strm << std::setprecision(numDigits) << boost::format("%1%") % val[i];
+            if (pStr[i])
+            {
+                std::string sResult = strm.str();
+                StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sResult), pStr[i], static_cast<int32_t>(sResult.size()) + 1);
+            }
             strm.str("");
         }
     }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((left, top, right, bottom, Unit))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -151,8 +157,8 @@ static bool GetImageSize(CTL_TwainDLLHandle* pHandle, DTWAIN_SOURCE Source, LPDT
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<double>(FloatArrayOut);
     std::copy(Array.begin(), Array.end(), vValues.begin());
     const DTWAIN_ARRAY temp = CreateArrayCopyFromFactory(pHandle, FloatArrayOut);
-    if  (pHandle->m_ArrayFactory->is_valid(FloatArray))
-        pHandle->m_ArrayFactory->destroy(FloatArray);
+    if  (pHandle->m_ArrayFactory->is_valid(static_cast<void*>(FloatArray)))
+        pHandle->m_ArrayFactory->destroy(static_cast<void*>(FloatArray));
     if (temp)
     {
         *FloatArray = temp;

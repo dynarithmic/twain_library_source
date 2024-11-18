@@ -116,6 +116,16 @@ Note that the C++ source code should be able to be built with any C++17 complian
 
 * Start Visual Studio, and open one of the DTWAIN solution.  The DTWAIN solution files are found in the [source](https://github.com/dynarithmic/twain_library_source/tree/master/source) directory.  Open **dtwain_5_vs2019.sln**.
 
+* The **dtwain_config.h** file has the following entries:
+
+```cpp
+#define DTWAIN_BUILD_LOGCALLSTACK 1 
+#define DTWAIN_BUILD_LOGPOINTERS 1
+```
+The **DTWAIN_BUILD_LOGCALLSTACK** denotes whether the libraries will be built with full call stack logging enabled.  If this value is **1**, then the libraries will be built with call stack logging.  Otherwise if the value is **0**, no call stack logging will be built.  
+
+The **DTWAIN_BUILD_LOGPOINTERS** denotes whether the libraries will be built with the logging of any pointer values on return of a DTWAIN function that have output pointers as parameters.  As with **DTWAIN_BUILD_LOGCALLSTACK**, the values of **0** or **1** denote whether this option will be built into the DTWAIN DLL's.  Note that **DTWAIN_BUILD_CALLSTACK** must be **1** for **DTWAIN_BUILD_LOGPOINTERS** to take effect.
+
 * A full rebuild of all the configurations available is recommended.  Use the "Build -> Batch Build..." option in the Visual Studio IDE and check all of the configurations to build everything (take a coffee break -- this could take a while).  This will create a "binaries" directory that will contain the following DLLs:
 
         32bit/dtwain32.dll -32-bit ANSI (MBCS) DLL
@@ -127,7 +137,7 @@ Note that the C++ source code should be able to be built with any C++17 complian
         64bit/dtwain64d.dll -64-bit Debug ANSI (MBCS) DLL
         64bit/dtwain64ud.dll -64-bit Debug Unicode DLL
 
-* Note -- the resulting "*.lib* files that reside in these directories are import libraries compatible with the Visual Studio toolset.  Other compilers will require converting these .lib files to your compiler's import library format, or you can use the LoadLibrary / GetProcAddress approach (we have a wrapper for this -- see below in the "Getting DTWAIN to work with other programming languages" section).
+* Note -- the resulting "*.lib* files that reside in these directories are import libraries compatible with the Visual Studio toolset.  Other compilers will require converting these .lib files to your compiler's import library format, or you can use the [LoadLibrary / GetProcAddress approach](https://github.com/dynarithmic/twain_library?tab=readme-ov-file#what-if-i-dont-have-visual-c-as-the-compiler-to-use-when-building-an-application--the-visual-c-import-libraries-will-not-work-for-me--i-use-embarcaderogclangmingw-fill-in-with-your-favorite-compiler-or-ide--so-how-do-i-use-the-library) to remove the need for import libraries.
 
 * If the IMPLIB.EXE program from Embarcadero is available on the path, it will be called to create Embarcadero C++ compatible import libraries for the 32-bit DLL's.  The names of the Embarcadero import libraries will have a **_embarcadero** appended to the library name.
 

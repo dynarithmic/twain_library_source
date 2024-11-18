@@ -25,6 +25,7 @@
 #include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "ctlfileutils.h"
+#include "logwriterutils.h"
 
 using namespace dynarithmic;
 
@@ -223,19 +224,19 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
                 {
                     szTempFile += StringWrapper::GetGUID() + _T(".JPG");
                     auto szTempFileA = StringConversion::Convert_Native_To_Ansi(szTempFile);
-                    CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + szTempFileA + "\n");
+                    LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + szTempFileA);
 
                     // Create a JPEG
                     m_JpegHandler.SetDib(m_pDib);
                     bRet = m_JpegHandler.WriteBitmap(szTempFile.c_str(), bOpenFile, fhFile);
                     if ( bRet != 0 )
                     {
-                        CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_TEMPFILECREATEERRORTEXT) + " " + szTempFileA + "\n");
+                        LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_TEMPFILECREATEERRORTEXT) + " " + szTempFileA);
                         delete_file(szTempFile.c_str());
                         return bRet;
                     }
                     else
-                        CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_IMAGEFILESUCCESSTEXT) + " " + szTempFileA + "\n");
+                        LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_IMAGEFILESUCCESSTEXT) + " " + szTempFileA);
                     PDFHandler.SetImageType(0);
                 }
                 else
@@ -245,7 +246,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
                     szTempFile += StringWrapper::GetGUID() + _T(".TIF");
                     auto szTempFileA = StringConversion::Convert_Native_To_Ansi(szTempFile);
 
-                    CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + szTempFileA + "\n");
+                    LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + szTempFileA);
 
                     // Create a TIFF file
                     m_TiffHandler.SetDib(m_pDib);
@@ -254,14 +255,14 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
 
                     if ( bRet != 0 )
                     {
-                        CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_TEMPFILECREATEERRORTEXT) + " " + szTempFileA + "\n");
+                        LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_TEMPFILECREATEERRORTEXT) + " " + szTempFileA);
                         return bRet;
                     }
                     else
                     {
                         dps.Stage = DIB_MULTI_LAST;
                         bRet = m_TiffHandler.WriteBitmap(szTempFile.c_str(), bOpenFile, 0, &dps);
-                        CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_IMAGEFILESUCCESSTEXT) + " "+ szTempFileA + "\n");
+                        LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_IMAGEFILESUCCESSTEXT) + " "+ szTempFileA);
                     }
                     PDFHandler.SetImageType(1);
                 }
@@ -350,9 +351,9 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
         }
     }
 
-    CTL_TwainAppMgr::WriteLogInfoA("Writing 1 page of PDF file...\n");
+    LogWriterUtils::WriteLogInfoIndentedA("Writing 1 page of PDF file...");
     bRet = PDFHandler.WriteGraphicFile(this, szTempFile.c_str(), m_pDib?m_pDib->GetHandle(): nullptr, &m_ImageInfoEx);
-    CTL_TwainAppMgr::WriteLogInfoA("Finished writing 1 page of PDF file...\n");
+    LogWriterUtils::WriteLogInfoIndentedA("Finished writing 1 page of PDF file...");
 
     // Destroy the local text elements
     if (nCount > 0 )
@@ -483,7 +484,7 @@ int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, std::string& sT
 
         if ( bRetWrite != 0 )
         {
-            CTL_TwainAppMgr::WriteLogInfo(_T("Error creating temporary OCR Image File ") + szTempPath + _T("\n"));
+            LogWriterUtils::WriteLogInfo(_T("Error creating temporary OCR Image File ") + szTempPath + _T("\n"));
             return bRetWrite;
         }
         sFileToUse = std::move(szTempPath);

@@ -97,7 +97,7 @@ bool CTL_ITwainSource::IsSourceCompliant(CTL_EnumTwainVersion TVersion, CTL_Twai
     for (unsigned short Cap : Array)
     {
         int nValue = 0;
-        const int nMask = CTL_TwainAppMgr::GetCapMaskFromCap(Cap);
+        const int nMask = GetCapMaskFromCap(Cap);
 
         if (CTL_TwainAppMgr::IsCapMaskOn(Cap, static_cast<CTL_EnumGetType>(CTL_CapMaskGET)))
         {
@@ -248,7 +248,8 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_BufferedXFerInfo{},
     m_bExtendedImageInfoSupported(false),
     m_nLastAcquireError(false),
-    m_bShutdownAcquire(false)
+    m_bShutdownAcquire(false),
+    m_bSupportedCustomCapsRetrieved(false)
 {
     if (lpszProduct)
         m_SourceId.set_product_name(StringConversion::Convert_NativePtr_To_Ansi(lpszProduct));

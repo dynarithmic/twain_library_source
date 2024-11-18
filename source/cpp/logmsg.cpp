@@ -48,7 +48,12 @@ namespace dynarithmic
     {
         const auto currentDateTime = std::chrono::system_clock::now();
         const auto currentDateTimeTimeT = std::chrono::system_clock::to_time_t(currentDateTime);
-        const auto currentDateTimeLocalTime = *std::localtime(&currentDateTimeTimeT);
+        std::tm currentDateTimeLocalTime = {};
+        #ifdef _MSC_VER
+        ::localtime_s(&currentDateTimeLocalTime, &currentDateTimeTimeT);
+        #else
+        ::localtime_r(&currentDateTimeLocalTime, &currentDateTimeTimeT);
+        #endif
         const auto ms = std::chrono::time_point_cast<std::chrono::milliseconds>(currentDateTime).time_since_epoch().count() % 1000;
         std::ostringstream strm;
         strm << std::put_time(&currentDateTimeLocalTime, "[%Y-%m-%d %X")
@@ -58,9 +63,8 @@ namespace dynarithmic
 
     std::string CBaseLogger::getThreadID()
     {
-        std::string result;
         auto str = dynarithmic::getThreadIdAsString();
-        result = "Thread [" + str + "] ";
+        std::string result = "Thread [" + str + "] ";
         return result;
     }
 
@@ -167,8 +171,10 @@ void Callback_Logger::trace(const std::string& msg)
     }
 }
 
-CLogSystem::CLogSystem() : m_bEnable(false), m_bPrintTime(false), m_bPrintAppName(false), m_bFileOpenedOK(false), m_bErrorDisplayed(false),
-m_pDLLHandle{}
+CLogSystem::CLogSystem() : m_pDLLHandle{}, m_nCurrentIndentLevel(0),
+                           m_nIndentSize(3), m_bEnable(false),
+                           m_bPrintTime(false), m_bPrintAppName(false), m_bFileOpenedOK(false),
+                           m_bErrorDisplayed(false)
 {}
 
 /////////////////////////////////////////////////////////////////////////////

@@ -31,30 +31,8 @@
 #include "ctltmpl5.h"
 #include "errorcheck.h"
 #include "ctlutils.h"
+#include "cppfunc.h"
 using namespace dynarithmic;
-
-LONG dynarithmic::GetArrayTypeFromCapType(TW_UINT16 CapType)
-{
-    switch (CapType)
-    {
-        case TWTY_STR32:
-        case TWTY_STR64:
-        case TWTY_STR128:
-        case TWTY_STR255:
-        case TWTY_STR1024:
-            return DTWAIN_ARRAYANSISTRING;
-
-        case TWTY_FRAME:
-            return DTWAIN_ARRAYFRAME;
-
-        case TWTY_FIX32:
-            return DTWAIN_ARRAYFLOAT;
-
-        default:
-            return DTWAIN_ARRAYLONG;
-     }
-}
-
 
 static DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap,
                                                    LONG lGetType, LONG lContainerType,
@@ -627,7 +605,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetCustomDSData( DTWAIN_SOURCE Source, LPBYTE Data, L
         ImageMemoryHandler::GlobalFree(h);
         LOG_FUNC_EXIT_NONAME_PARAMS(HANDLE(1))
     }
-
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Data, pActualSize))
     LOG_FUNC_EXIT_NONAME_PARAMS(h)
     CATCH_BLOCK(HANDLE())
 }
@@ -707,6 +685,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireStripSizes( DTWAIN_SOURCE Source, LPLO
         if( lpPreferred )
             * lpPreferred = Xfer.Preferred;
     }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpMin, lpMax, lpPreferred))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -787,6 +766,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireStripData(DTWAIN_SOURCE Source, LPLONG
         *YOffset = pBuffer->YOffset;
     if ( lpBytesWritten)
         *lpBytesWritten = pBuffer->BytesWritten;
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpCompression, lpBytesPerRow, lpColumns, lpRows, XOffset, YOffset, lpBytesWritten))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -825,14 +805,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDT
         std::copy(r.begin(), r.end(), vValues.begin());
 
         // Dump contents of the enumerated values to the log
-        if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
         {
             DTWAIN_ARRAY aStrings = DTWAIN_ArrayCreate(DTWAIN_ARRAYANSISTRING, 0);
             DTWAINArrayLowLevel_RAII raii(pHandle, aStrings);
             auto& aValues = pHandle->m_ArrayFactory->underlying_container_t<std::string>(aStrings);
             for (auto val : vValues)
                 aValues.push_back(CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, val));
-            CTL_TwainAppMgr::WriteLogInfoA("Supported Extended Image Info types:");
+            LogWriterUtils::WriteLogInfoIndentedA("Supported Extended Image Info types:");
             DumpArrayContents(aStrings, 0);
         }
         dynarithmic::AssignArray(pHandle, Array, &ThisArray);
@@ -920,6 +900,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoItem(DTWAIN_SOURCE Source,
     if ( Type )
         *Type = Info.ItemType;
 
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((InfoID, NumItems, Type))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -975,13 +956,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
     {
         bTypesMatch = false;
         // Just log this condition.  We will still get the data, even though TWAIN spec was violated.
-        if (CTL_StaticData::s_logFilterFlags)
+        if (CTL_StaticData::GetLogFilterFlags())
         {
             StringTraitsA::string_type sBadType = GetResourceStringFromMap(IDS_DTWAIN_ERROR_REPORTED_TYPE_MISMATCH);
             sBadType += "  Extended Image Info Value: " + CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, nWhich);
             sBadType += " - {Device Type=" + CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWTY, lTypeReportedByDevice);
             sBadType += ", Twain Required Type=" + CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWTY, lTypeRequiredByTWAIN) + "}";
-            CTL_TwainAppMgr::WriteLogInfoA(sBadType);
+            LogWriterUtils::WriteLogInfoIndentedA(sBadType);
         }
 
         // If the mismatch type is TW_FRAME, we should fake it out and pretend that the types match
@@ -989,7 +970,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
             Info.ItemType = TWTY_FRAME;
     }
 
-    DTWAIN_ARRAY ExtInfoArray = CreateArrayFromFactory(pHandle, CTL_TwainAppMgr::ExtImageInfoArrayType(Info.ItemType), 0);
+    DTWAIN_ARRAY ExtInfoArray = CreateArrayFromFactory(pHandle, ExtImageInfoArrayType(Info.ItemType), 0);
 
     if (!ExtInfoArray)
     {
@@ -1080,7 +1061,9 @@ template <typename T>
 struct StreamerImpl
 {
     static void streamMe(OutputBaseStreamA* strm, size_t* pCur, T& val)
-    { *strm << "Array[" << *pCur << "] = " << val << "\n"; }
+    { 
+        *strm << "Array[" << *pCur << "] = " << val << "\n"; 
+    }
 };
 
 struct StreamerImplFrame
@@ -1138,7 +1121,7 @@ static void genericDumper(DTWAIN_ARRAY Array)
     size_t n;
 
     std::for_each(vCaps.begin(), vCaps.end(), oStreamer<typename T::value_type>(&strm, &n));
-    CTL_TwainAppMgr::WriteLogInfoA( strm.str() );
+    LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
 }
 
 static void DumpArrayLONG(DTWAIN_ARRAY Array, LONG lCap)
@@ -1166,7 +1149,7 @@ static void DumpArrayLONG(DTWAIN_ARRAY Array, LONG lCap)
 
         // stream the cap information from the cap names
         std::for_each(CapNames.begin(), CapNames.end(), oStreamer<std::string>(&strm, &n));
-        CTL_TwainAppMgr::WriteLogInfoA( strm.str() );
+        LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
     }
 }
 
@@ -1190,16 +1173,16 @@ static void DumpArrayWideString(DTWAIN_ARRAY Array)
 {
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     const auto& vData = pHandle->m_ArrayFactory->underlying_container_t<std::wstring>(Array);
-    std::wstring allValues = L"\n" + StringWrapperW::Join(vData.begin(), vData.end(), L"\n") + L"\n";
-    CTL_TwainAppMgr::WriteLogInfoW(allValues);
+    std::wstring allValues = StringWrapperW::Join(vData.begin(), vData.end(), L"\n");
+    LogWriterUtils::WriteMultiLineInfoIndentedW(allValues, L"\n");
 }
 
 static void DumpArrayAnsiString(DTWAIN_ARRAY Array)
 {
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     const auto& vData = pHandle->m_ArrayFactory->underlying_container_t<std::string>(Array);
-    std::string allValues = "\n" + StringWrapperA::Join(vData.begin(), vData.end(), "\n") + "\n";
-    CTL_TwainAppMgr::WriteLogInfoA(allValues);
+    std::string allValues = StringWrapperA::Join(vData.begin(), vData.end(), "\n");
+    LogWriterUtils::WriteMultiLineInfoIndentedA(allValues, "\n");
 }
 
 static void DumpArrayFrame(DTWAIN_ARRAY Array)
@@ -1209,12 +1192,12 @@ static void DumpArrayFrame(DTWAIN_ARRAY Array)
     size_t n;
     CTL_StringStreamType strm;
     std::for_each(vData.begin(), vData.end(), StreamerImplFrame(&strm, &n));
-    CTL_TwainAppMgr::WriteLogInfo( strm.str() );
+    LogWriterUtils::WriteMultiLineInfoIndented(strm.str(), _T("\n"));
 }
 
 void dynarithmic::DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap)
 {
-    if ( !(CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS ))
+    if ( !(CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS ))
         return;
 
     std::string szBuf;
@@ -1228,7 +1211,7 @@ void dynarithmic::DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap)
             {
                 szBuf = "DTWAIN_ARRAY is NULL\n";
                 // Turn on the error logging flags
-                CTL_TwainAppMgr::WriteLogInfoA(szBuf);
+                LogWriterUtils::WriteLogInfoIndentedA(szBuf);
                 return;
             }
         }
@@ -1237,14 +1220,14 @@ void dynarithmic::DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap)
         StringStreamA strm;
         if ( nCount < 0 )
         {
-            strm << "Could not dump contents of DTWAIN_ARRAY " << Array << "\nNumber of elements: " << nCount << "\n";
+            strm << "Could not dump contents of DTWAIN_ARRAY " << Array << "\nNumber of elements: " << nCount;
             return;
         }
-        strm << "Dumping contents of DTWAIN_ARRAY " << Array << "\nNumber of elements: " << nCount << "\n";
+        strm << "Dumping contents of DTWAIN_ARRAY " << Array << "   : Number of elements: " << nCount;
         szBuf = strm.str();
     }
 
-    CTL_TwainAppMgr::WriteLogInfoA(szBuf);
+    LogWriterUtils::WriteLogInfoIndentedA(szBuf);
 
     // determine the type
     const LONG nType = CTL_ArrayFactory::tagtype_to_arraytype(pHandle->m_ArrayFactory->tag_type(Array));

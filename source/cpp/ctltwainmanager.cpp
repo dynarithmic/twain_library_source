@@ -42,6 +42,9 @@
 #include "ctltwainmanager.h"
 #include "twainfix32.h"
 #include "dtwinverex.h"
+#include "cppfunc.h"
+#include "logwriterutils.h"
+
 using namespace dynarithmic;
 
 static constexpr std::array<std::pair<int, int>, 30> mapCondCode = { {
@@ -218,7 +221,7 @@ CTL_ITwainSession* CTL_TwainAppMgr::CreateTwainSession(
                     pHandle->m_TwainMemoryFunc = &pHandle->m_Twain2Func;
                     break;
                 default:
-                    WriteLogInfoA("The entry points for the TWAINDSM.DLL were not found");
+                    LogWriterUtils::WriteLogInfoIndentedA("The entry points for the TWAINDSM.DLL were not found");
                     DestroyTwainSession(pSession);
                     return nullptr;
             }
@@ -411,8 +414,13 @@ CTL_ITwainSource*  CTL_TwainAppMgr::GetDefaultSource(CTL_ITwainSession* pSession
 
 bool CTL_TwainAppMgr::SetDefaultSource(CTL_ITwainSource* pSource)
 {
-    const auto pSession = pSource->GetTwainSession();
-    return SetDefaultSource(pSession, pSource);
+    // This only works for TWAIN DSM 2.x and above
+    if (pSource && pSource->GetDTWAINHandle()->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_VERSION2)
+    {
+        const auto pSession = pSource->GetTwainSession();
+        return SetDefaultSource(pSession, pSource);
+    }
+    return false;
 }
 
 bool CTL_TwainAppMgr::OpenSource( CTL_ITwainSession* pSession, const CTL_ITwainSource* pSource/*=nullptr*/)
@@ -524,10 +532,10 @@ bool CTL_TwainAppMgr::GetBestContainerType(CTL_TwainDLLHandle* pHandle,
                 else
                 {
                     StringStreamA strm;
-                    strm << boost::format("\nError: Source %1%: Capability %2% container defaults to TW_ONEVALUE\n") %
+                    strm << boost::format("Error: Source %1%: Capability %2% container defaults to TW_ONEVALUE\n") %
                                           StringConversion::Convert_Native_To_Ansi(pSource->GetProductName()) % GetCapNameFromCap(nCap);
                     nDataType = static_cast<UINT>(DTWAIN_CAPDATATYPE_UNKNOWN);
-                    WriteLogInfoA(strm.str());
+                    LogWriterUtils::WriteLogInfoIndentedA(strm.str());
                     rContainerGet = TwainContainer_ONEVALUE;
                 }
             }
@@ -571,10 +579,10 @@ bool CTL_TwainAppMgr::GetBestCapDataType(const CTL_ITwainSource* pSource, TW_UIN
         else
         {
             StringStreamA strm;
-            strm << boost::format("\nError: Source %1%: Data type for capability %2% was not retrieved\n") %
+            strm << boost::format("Error: Source %1%: Data type for capability %2% was not retrieved\n") %
                                   StringConversion::Convert_Native_To_Ansi(pSource->GetProductName()) % GetCapNameFromCap(nCap);
             nDataType = static_cast<UINT>(DTWAIN_CAPDATATYPE_UNKNOWN);
-            WriteLogInfoA(strm.str());
+            LogWriterUtils::WriteLogInfoIndentedA(strm.str());
         }
     }
     return false;
@@ -1649,8 +1657,8 @@ void CTL_TwainAppMgr::SetError(int nError, const std::string& extraInfo, bool bM
     s_strLastError += " " + extraInfo;
     s_nLastError    = nError;
 
-    CTL_StaticData::s_mapExtraErrorInfo[abs(s_nLastError)] = extraInfo;
-    if ( CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_USEBUFFER )
+    CTL_StaticData::GetExtraErrorInfoMap()[abs(s_nLastError)] = extraInfo;
+    if ( CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_USEBUFFER )
     {
         // Push error onto error stack
         const std::deque<int>::size_type nEntries = pHandle->m_vErrorBuffer.size();
@@ -1663,7 +1671,7 @@ void CTL_TwainAppMgr::SetError(int nError, const std::string& extraInfo, bool bM
             pHandle->m_vErrorBuffer.resize(pHandle->m_nErrorBufferThreshold);
     }
 
-    const UINT uMsg = CTL_StaticData::s_nRegisteredDTWAINMsg;
+    const UINT uMsg = CTL_StaticData::GetRegisteredMessage();
     LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_GENERALERROR, -nError, true);
 
     // if there is a callback and we want to report the general error, 
@@ -1711,11 +1719,11 @@ void CTL_TwainAppMgr::SetAndLogError(int nError, const std::string& extraInfo, b
 {
     int nActualError = std::abs(nError);
     CTL_TwainAppMgr::SetError(nActualError, extraInfo, bMustReportGeneralError);
-    if (CTL_StaticData::s_logFilterFlags != 0)
+    if (CTL_StaticData::GetLogFilterFlags() != 0)
     {
         char szBuf[DTWAIN_USERRES_MAXSIZE + 1] = {};
         CTL_TwainAppMgr::GetLastErrorString(szBuf, DTWAIN_USERRES_MAXSIZE);
-        CTL_TwainAppMgr::WriteLogInfoA(szBuf);
+        LogWriterUtils::WriteLogInfoIndentedA(szBuf);
     }
 }
 
@@ -1884,11 +1892,11 @@ int CTL_TwainAppMgr::GetTransferCount( const CTL_ITwainSource *pSource )
 int CTL_TwainAppMgr::SetTransferCount( const CTL_ITwainSource *pSource,
                                        int nCount )
 {
-    if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS )
+    if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS )
     {
         StringStreamA strm;
         strm << boost::format("\nSetting Transfer Count.  Transfer Count = %1%\n") % nCount;
-        WriteLogInfoA(strm.str());
+        LogWriterUtils::WriteLogInfoA(strm.str());
     }
 
     // If the device supports the CAP_SHEETCOUNT capability, use that to set the number of
@@ -2243,9 +2251,9 @@ CTL_CapStruct CTL_TwainAppMgr::GetGeneralCapInfo(LONG Cap)
 
     CTL_CapStruct cStruct;
     bool bFoundCap = false;
-
-    const auto it = CTL_StaticData::s_mapGeneralCapInfo.find( static_cast<short>(Cap) );
-    if ( it != CTL_StaticData::s_mapGeneralCapInfo.end() )
+    auto& generalInfo = CTL_StaticData::GetGeneralCapInfo();
+    const auto it = generalInfo.find( static_cast<short>(Cap) );
+    if ( it != generalInfo.end() )
     {
         bFoundCap = true;
         cStruct = (*it).second;
@@ -2253,7 +2261,7 @@ CTL_CapStruct CTL_TwainAppMgr::GetGeneralCapInfo(LONG Cap)
 
     if ( !bFoundCap )
     {
-        cStruct = CTL_StaticData::s_mapGeneralCapInfo[static_cast<short>(Cap)];
+        cStruct = generalInfo[static_cast<short>(Cap)];
     }
     return cStruct;
 }
@@ -2293,9 +2301,9 @@ LONG CTL_TwainAppMgr::GetCapFromCapName(const char *szCapName )
             return CAP_CUSTOMBASE + nNum;
         }
     }
-
-    const auto it = CTL_StaticData::s_mapGeneralCapInfo.begin();
-    const auto itend = CTL_StaticData::s_mapGeneralCapInfo.end();
+    auto& generalInfo = CTL_StaticData::GetGeneralCapInfo();
+    const auto it = generalInfo.begin();
+    const auto itend = generalInfo.end();
     int subtractor = 0;
     if (StringWrapperA::Left(strCap, 5) == "TWEI_")
         subtractor = 1000;
@@ -2325,8 +2333,9 @@ UINT CTL_TwainAppMgr::GetContainerTypesFromCap( CTL_EnumCapability Cap, bool nTy
 CTL_ErrorStruct CTL_TwainAppMgr::GetGeneralErrorInfo(LONG nDG, UINT nDAT, UINT nMSG)
 {
     CTL_ErrorStruct eStruct;
-    const auto it = CTL_StaticData::s_mapGeneralErrorInfo.find(std::make_tuple(nDG, nDAT, nMSG));
-    if ( it != CTL_StaticData::s_mapGeneralErrorInfo.end() )
+    auto& errorInfoMap = CTL_StaticData::GetGeneralErrorInfoMap();
+    const auto it = errorInfoMap.find(std::make_tuple(nDG, nDAT, nMSG));
+    if ( it != errorInfoMap.end() )
         eStruct = (*it).second;
     return eStruct;
 }
@@ -2342,50 +2351,6 @@ void CTL_TwainAppMgr::GetContainerNamesFromType( int nType, StringArray &rArray 
         rArray.push_back( "TW_ARRAY");
     if ( nType & TwainContainer_RANGE )
         rArray.push_back( "TW_RANGE");
-}
-
-
-int CTL_TwainAppMgr::GetCapMaskFromCap( CTL_EnumCapability Cap )
-{
-    // Jump table
-    constexpr int CapAll = CTL_CapMaskGET | CTL_CapMaskGETCURRENT | CTL_CapMaskGETDEFAULT |
-                        CTL_CapMaskSET | CTL_CapMaskRESET;
-
-    constexpr int CapSupport = CTL_CapMaskGET | CTL_CapMaskGETCURRENT | CTL_CapMaskGETDEFAULT |
-                            CTL_CapMaskRESET;
-    constexpr int CapAllGets = CTL_CapMaskGET | CTL_CapMaskGETCURRENT | CTL_CapMaskGETDEFAULT;
-
-    switch (Cap)
-    {
-        case TwainCap_XFERCOUNT     :
-        case TwainCap_AUTOFEED      :
-        case TwainCap_CLEARPAGE     :
-        case TwainCap_REWINDPAGE    :
-            return CapAll;
-
-        case TwainCap_COMPRESSION   :
-        case TwainCap_PIXELTYPE     :
-        case TwainCap_UNITS         :
-        case TwainCap_XFERMECH      :
-        case TwainCap_BITDEPTH      :
-        case TwainCap_BITORDER      :
-        case TwainCap_XRESOLUTION   :
-        case TwainCap_YRESOLUTION   :
-            return CapSupport;
-
-        case TwainCap_UICONTROLLABLE :
-        case TwainCap_SUPPORTEDCAPS  :
-            return CTL_CapMaskGET;
-
-        case TwainCap_PLANARCHUNKY   :
-        case TwainCap_PHYSICALHEIGHT :
-        case TwainCap_PHYSICALWIDTH  :
-        case TwainCap_PIXELFLAVOR    :
-        case TwainCap_FEEDERENABLED  :
-        case TwainCap_FEEDERLOADED   :
-            return CapAllGets;
-    }
-    return 0;
 }
 
 bool CTL_TwainAppMgr::IsCapMaskOn( CTL_EnumCapability Cap, CTL_EnumGetType GetType)
@@ -2447,23 +2412,6 @@ std::pair<bool, CTL_StringType> CTL_TwainAppMgr::CheckTwainExistence(CTL_StringT
         return { false, str };
     return { true, str };
 }
-
-LONG CTL_TwainAppMgr::ExtImageInfoArrayType(LONG ExtType)
-{
-    TW_UINT16 actualType = static_cast<TW_UINT16>(ExtType);
-    if (dynarithmic::IsTwainIntegralType(actualType))
-        return DTWAIN_ARRAYLONG;
-    if (dynarithmic::IsTwainStringType(actualType))
-        return DTWAIN_ARRAYANSISTRING;
-    if (dynarithmic::IsTwainHandleType(actualType))
-        return DTWAIN_ARRAYHANDLE;
-    if (dynarithmic::IsTwainFrameType(actualType))
-        return DTWAIN_ARRAYFRAME;
-    if (dynarithmic::IsTwainFix32Type(actualType))
-        return DTWAIN_ARRAYFLOAT;
-    return DTWAIN_ARRAYLONG;
-}
-
 
 /////////////////////////****************//////////////////////////////////
 /////////////// member functions for the CTL_TwainAppMgr///////////////////
@@ -2580,7 +2528,7 @@ bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
         strm << _T("TWAIN DSM \"") + m_strTwainDSMPath + _T("\" is found and will be used for this TWAIN session...\n");
         strm << _T("Version information for \"") << m_strTwainDSMPath << _T("\":\n") << dynarithmic::GetVersionInfo(m_hLibModule.native(), 4);
         LogToDebugMonitor(strm.str());
-        if (CTL_StaticData::s_logFilterFlags != 0)
+        if (CTL_StaticData::GetLogFilterFlags() != 0)
             DTWAIN_LogMessageA(StringConversion::Convert_Native_To_Ansi(strm.str()).c_str());
     }
     return LoadDSM();
@@ -2601,29 +2549,6 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( TW_IDENTITY *pOrigin, TW_IDENTITY* 
                                              TW_MEMREF pMemref)
 {
     return s_pGlobalAppMgr->CallDSMEntryProc( CTL_TwainTriplet(pOrigin, pDest, dg, dat, msg, pMemref) );
-}
-
-void CTL_TwainAppMgr::WriteLogInfoA(const std::string& s, bool bFlush)
-{
-    if (!CTL_StaticData::s_logFilterFlags)
-        return;
-
-    if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_USECRLF)
-        std::string crlf = "\n";
-
-    CTL_StaticData::s_appLog.StatusOutFast(s.c_str());
-    if (bFlush)
-        CTL_StaticData::s_appLog.Flush();
-}
-
-void CTL_TwainAppMgr::WriteLogInfoW(const std::wstring& s, bool bFlush)
-{
-    WriteLogInfoA(StringConversion::Convert_Wide_To_Ansi(s), bFlush);
-}
-
-void CTL_TwainAppMgr::WriteLogInfo(const CTL_StringType& s, bool bFlush)
-{
-    WriteLogInfoA(StringConversion::Convert_Native_To_Ansi(s));
 }
 
 void CTL_TwainAppMgr::GatherCapabilityInfo(CTL_ITwainSource* pSource)
@@ -2686,12 +2611,12 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
     TW_UINT16    nMSG    = pTriplet.GetMSG();
     TW_MEMREF    pData   = pTriplet.GetMemRef();
 
-    if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_LOWLEVELTWAIN)
+    if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_LOWLEVELTWAIN)
     {
         e = GetGeneralErrorInfo(nDG, nDAT, nMSG);
         s = e.GetIdentityAndDataInfo(pOrigin, pDest, pData);
         s = GetResourceStringFromMap(IDS_LOGMSG_INPUTTEXT) + ": " + s;
-        WriteLogInfoA(s);
+        LogWriterUtils::WriteMultiLineInfoIndentedA(s, "\n");
     }
 
     TripletSaveRestore tSaveRestore(&m_pCurrentTriplet);
@@ -2705,7 +2630,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
 
     bool bTimeOutInEffect = false;
     #ifdef _WIN32
-    if ( CTL_StaticData::s_nTimeoutMilliseconds > 0 )
+    if ( CTL_StaticData::GetTimeoutValue() > 0 )
     {
         // Check if time out is to be applied to this triplet
         RawTwainTriplet rtrip{};
@@ -2716,9 +2641,9 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
                                         s_NoTimeoutTriplets.end(),
                                         FindTriplet(rtrip)) == s_NoTimeoutTriplets.end())
         {
-            CTL_StaticData::s_nTimeoutID = SetTimer(nullptr, 0,
-                                                        CTL_StaticData::s_nTimeoutMilliseconds, reinterpret_cast<TIMERPROC>(
-                                                            TwainTimeOutProc));
+            CTL_StaticData::SetTimeoutID(SetTimer(nullptr, 0,
+                                        CTL_StaticData::GetTimeoutValue(), reinterpret_cast<TIMERPROC>(
+                                        TwainTimeOutProc)));
             bTimeOutInEffect = true;
         }
     }
@@ -2739,30 +2664,30 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         // To do later...
         #ifdef _WIN32
         if ( bTimeOutInEffect )
-            KillTimer(nullptr, CTL_StaticData::s_nTimeoutID);
+            KillTimer(nullptr, CTL_StaticData::GetTimeoutID());
         #endif
         retcode = DTWAIN_ERR_EXCEPTION_ERROR_;
-        if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_LOWLEVELTWAIN)
+        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_LOWLEVELTWAIN)
         {
             std::string sz;
             std::ostringstream strm;
             sz = e.GetTWAINDSMErrorCC(IDS_TWCC_EXCEPTION);
             s = e.GetIdentityAndDataInfo(pOrigin, pDest, pData);
             strm << boost::format("%1%=%2% (%3%)\n%4%") % GetResourceStringFromMap(IDS_LOGMSG_OUTPUTDSMTEXT) % retcode % sz % s;
-            WriteLogInfoA(strm.str());
+            LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
         }
         return retcode;
     }
     #ifdef _WIN32
     if ( bTimeOutInEffect )
-        KillTimer(nullptr, CTL_StaticData::s_nTimeoutID);
+        KillTimer(nullptr, CTL_StaticData::GetTimeoutID());
     #endif
     if (m_pDLLHandle->m_bNotifyTripletsUsed)
     {
         // Send out that we have ended processing the TWAIN triplet
         SendTwainMsgToWindow(pTriplet.GetSessionPtr(), nullptr, DTWAIN_TN_TWAINTRIPLETEND, 0);
     }
-    if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_LOWLEVELTWAIN)
+    if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_LOWLEVELTWAIN)
     {
         std::string sz;
         std::ostringstream strm;
@@ -2771,7 +2696,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         std::string s1 = GetResourceStringFromMap(IDS_LOGMSG_OUTPUTDSMTEXT);
         boost::format fmt("%1%=%2% (%3%)\n%4%\n");
         strm << fmt % s1.c_str() % retcode % sz % s;
-        WriteLogInfoA(strm.str());
+        LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
     }
     if ( retcode != TWRC_SUCCESS )
         SetLastTwainError( retcode, TWRC_Error );
@@ -2823,9 +2748,9 @@ bool CTL_TwainAppMgr::SetDependentCaps( const CTL_ITwainSource *pSource, CTL_Enu
 VOID CALLBACK CTL_TwainAppMgr::TwainTimeOutProc(HWND, UINT, ULONG, DWORD)
 {
 #ifdef _WIN32
-    KillTimer(nullptr, CTL_StaticData::s_nTimeoutID);
+    KillTimer(nullptr, CTL_StaticData::GetTimeoutID());
 
-    WriteLogInfoA("The last TWAIN triplet was not completed due to time out");
+    LogWriterUtils::WriteLogInfoIndentedA("The last TWAIN triplet was not completed due to time out");
     SetError(DTWAIN_ERR_TIMEOUT, "", false);
     throw DTWAIN_ERR_TIMEOUT;
 #endif

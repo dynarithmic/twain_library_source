@@ -18,39 +18,38 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <math.h>
-#include <sstream>
 #include "winbit32.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "../cximage/ximage.h"
 #include "resamplefactory.h"
+#include "cppfunc.h"
 
 namespace dynarithmic
 {
     void ImageResampler::LogMsg(int nWhich, int fromRes, int toRes, HANDLE dataHandle) const
     {
-        if (!(CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS))
+        if (!(CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS))
             return;
         switch (nWhich)
         {
             case NO_RESAMPLING:
-                CTL_TwainAppMgr::WriteLogInfoA("No resampling done for " + m_ImageType);
+                LogWriterUtils::WriteLogInfoIndentedA("No resampling done for " + m_ImageType);
             break;
 
             case START_RESAMPLING:
-                CTL_TwainAppMgr::WriteLogInfoA("Resampling bitmap data for image type " + m_ImageType + 
+                LogWriterUtils::WriteLogInfoIndentedA("Resampling bitmap data for image type " + m_ImageType + 
                                 ".  From " + std::to_string(fromRes) + " bpp to " + std::to_string(toRes) + " bpp ...");
             break;
 
             case FAILED_RESAMPLING:
-                CTL_TwainAppMgr::WriteLogInfoA("Resampling bitmap data for image type " + m_ImageType + " failed...");
+                LogWriterUtils::WriteLogInfoIndentedA("Resampling bitmap data for image type " + m_ImageType + " failed...");
             break;
 
             case SUCCESS_RESAMPLING:
-                CTL_TwainAppMgr::WriteLogInfoA("Resampling bitmap data for image type " + m_ImageType + " success...");
+                LogWriterUtils::WriteLogInfoIndentedA("Resampling bitmap data for image type " + m_ImageType + " success...");
                 std::string sOut = CTL_ErrorStructDecoder::DecodeBitmap(dataHandle);
-                CTL_TwainAppMgr::WriteLogInfoA(sOut);
+                LogWriterUtils::WriteMultiLineInfoIndentedA(sOut, "\n");
             break;
         }
     }
@@ -66,10 +65,11 @@ namespace dynarithmic
 
         // Get the sampling to be done
         auto iter = m_mapSampleFromTo.find(static_cast<uint16_t>(depth));
-        bool bOk = false;
         if (iter != m_mapSampleFromTo.end())
         {
+            bool bOk = false;
             int toDepth = iter->second;
+            m_nResampleStatus = DTWAIN_NO_ERROR;
             LogMsg(START_RESAMPLING, depth, toDepth);
             if (depth < toDepth)
                 bOk = CurDib.IncreaseBpp(toDepth);
@@ -78,7 +78,10 @@ namespace dynarithmic
             if (bOk)
                 LogMsg(SUCCESS_RESAMPLING, depth, toDepth, CurDib.GetHandle());
             else
+            {
                 LogMsg(FAILED_RESAMPLING, depth, toDepth);
+                m_nResampleStatus = DTWAIN_ERR_IMAGE_RESAMPLED;
+            }
             return bOk;
         }
         return false;

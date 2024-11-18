@@ -21,7 +21,6 @@
 #include "ctldib.h"
 #include "ctliface.h"
 #include "ctlfileutils.h"
-#include "../cximage/ximage.h"
 
 using namespace dynarithmic;
 

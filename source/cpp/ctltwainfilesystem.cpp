@@ -138,7 +138,7 @@ TW_MEMREF DTWAIN_FSGetFirstFile(DTWAIN_SOURCE Source, LPTSTR szDir)
     auto retVal = PerfomFileSystemOperation<LPTSTR>(pSource, szDir, nullptr, nullptr, GET_FIRST);
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return retVal.first != DTWAIN_NO_ERROR; },
                                       retVal.first, false, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.second);
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.second)
     CATCH_BLOCK_LOG_PARAMS(nullptr)
 }
 
@@ -150,7 +150,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSGetNextFile(DTWAIN_SOURCE Source, LPTSTR szDir
     auto retVal = PerfomFileSystemOperation<LPTSTR>(pSource, szDir, nullptr, FSHandle, GET_NEXT);
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return retVal.first != DTWAIN_NO_ERROR; },
                                       retVal.first, false, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.first);
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.first)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
@@ -389,12 +389,12 @@ DTWAIN_BOOL FSGetFileInfo(CTL_ITwainSource* pSource, LPCTSTR szFileName, TW_FILE
         {
             const TW_UINT16 cc = CTL_TwainAppMgr::GetConditionCode(pSession, pSource);
             CTL_TwainAppMgr::ProcessConditionCodeError(cc);
-            LOG_FUNC_EXIT_NONAME_PARAMS(FALSE);
+            LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
         }
         break;
         default: {}
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(FALSE);
+    LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
     CATCH_BLOCK(FALSE)
 }
 

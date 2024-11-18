@@ -23,6 +23,7 @@
 
 #include "ctliface.h"
 #include "ctltwainmanager.h"
+#include "cppfunc.h"
 using namespace dynarithmic;
 CTL_CapabilityGetTriplet::CTL_CapabilityGetTriplet(CTL_ITwainSession* pSession,
                                                     CTL_ITwainSource* pSource,
@@ -53,14 +54,17 @@ CTL_EnumCapability CTL_CapabilityGetTriplet::CapToRetrieve()const
 TW_UINT16 CTL_CapabilityGetTriplet::GetEffectiveItemType(TW_UINT16 curDataType) const
 {
     const TW_UINT16 itemType = GetItemType();
-    if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+    if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
     {
         StringStreamA strm;
         strm << "Getting cap value: " << m_gCap << "  requested item type: " << itemType <<
                 "  Observed item type: " << curDataType;
-        CTL_TwainAppMgr::WriteLogInfoA(strm.str());
-        CTL_TwainAppMgr::WriteLogInfoA("Observed and requested data types " + std::string(itemType ==
-            curDataType ? "equal" : "not equal"));
+        LogWriterUtils::WriteLogInfoIndentedA(strm.str());
+
+        std::string msg = "Observed and requested data types " + std::string(itemType ==
+            curDataType ? "equal" : "not equal");
+
+        LogWriterUtils::WriteLogInfoIndentedA(msg);
     }
 
     // If we're the same, or if we must return the correct type as returned by the Source ...

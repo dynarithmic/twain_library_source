@@ -21,7 +21,6 @@ OF THIRD PARTY RIGHTS.
 #ifdef _MSC_VER
 #pragma warning (disable:4786)
 #endif
-#include <pdflib32.h>
 #include <dtwainpdf.h>
 #include <vector>
 

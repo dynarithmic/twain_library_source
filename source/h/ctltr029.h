@@ -21,7 +21,7 @@
 #ifndef CTLTR029_H
 #define CTLTR029_H
 
-#include "ctltrp.h"
+#include "ctltripletbase.h"
 namespace dynarithmic
 {
     class CTL_SetupMemXferTriplet : public CTL_TwainTriplet

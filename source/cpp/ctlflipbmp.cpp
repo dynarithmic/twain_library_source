@@ -52,7 +52,7 @@ HANDLE DLLENTRY_DEF DTWAIN_ConvertDIBToFullBitmap(HANDLE hDib, DTWAIN_BOOL isBMP
     if (isBMP)
     {
         returnHandle = CTL_TwainDib::CreateBMPBitmapFromDIB(hDib);
-        LOG_FUNC_EXIT_NONAME_PARAMS(returnHandle);
+        LOG_FUNC_EXIT_NONAME_PARAMS(returnHandle)
     }
     else
     {

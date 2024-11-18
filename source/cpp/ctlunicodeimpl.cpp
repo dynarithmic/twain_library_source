@@ -22,49 +22,6 @@
 #include "ctliface.h"
 #include "arrayfactory.h"
 
-using namespace dynarithmic;
-
-struct ArrayRAII
-{
-    DTWAIN_ARRAY theArray;
-    ArrayRAII(DTWAIN_ARRAY arr) : theArray(arr) {}
-    ~ArrayRAII(){ DTWAIN_ArrayDestroy(theArray); }
-};
-
-
-template <typename SourceString,
-          typename DestString,
-          typename fn,
-          CTL_ArrayType enumTypeIn,
-          CTL_ArrayType enumTypeOut
-         >
-static DTWAIN_ARRAY CreateArrayFromArray(LPVOID ArraySource, fn f)
-{
-    if ( ArraySource )
-    {
-        const CTL_ArrayType eType = EnumeratorFunctionImpl::GetEnumeratorType(ArraySource);
-        if ( eType != enumTypeIn )
-            return nullptr;
-        int status;
-        const LPVOID TempSource = EnumeratorFunctionImpl::GetNewEnumerator(enumTypeOut,&status, 0, 0);
-        if ( TempSource )
-        {
-            const LONG nItems = EnumeratorFunctionImpl::EnumeratorGetCount(ArraySource);
-            SourceString sVal;
-            DestString sVal2;
-            for (LONG i = 0; i < nItems; ++i )
-            {
-                EnumeratorFunctionImpl::EnumeratorGetAt(ArraySource, i, &sVal);
-                sVal2 = f(sVal);
-                EnumeratorFunctionImpl::EnumeratorAddValue(TempSource, &sVal2, 1);
-            }
-            return TempSource;
-        }
-    }
-    return nullptr;
-}
-
-
 #ifdef UNICODE
     #pragma message ("Creating UNICODE version of DTWAIN functions")
 #else

@@ -42,6 +42,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetJpegValues(DTWAIN_SOURCE Source, LPLONG pQual
     bool PrTemp;
     pSource->GetJpegValues(*pQuality, PrTemp);
     *Progressive = static_cast<LONG>(PrTemp);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pQuality, Progressive))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
 }

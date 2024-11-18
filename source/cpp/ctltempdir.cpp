@@ -71,7 +71,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG 
     else
     if (CreationFlags & DTWAIN_TEMPDIR_CREATEDIRECTORY)
     {
-        bool bLogMessages = (CTL_StaticData::s_logFilterFlags) ? true : false;
+        bool bLogMessages = (CTL_StaticData::GetLogFilterFlags()) ? true : false;
         CTL_StringType sTemp = StringWrapper::RemoveBackslashFromDirectory(szFilePath);
         auto dirCreated = create_directory(sTemp.c_str());
         if (!dirCreated.first)
@@ -79,7 +79,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG 
             if (bLogMessages)
             {
                 std::string sMessage = "Could not create temp directory " + StringWrapperA::QuoteString(dirCreated.second);
-                CTL_TwainAppMgr::WriteLogInfoA(sMessage);
+                LogWriterUtils::WriteLogInfoIndentedA(sMessage);
             }
             DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return false; }, DTWAIN_ERR_CREATE_DIRECTORY, false, FUNC_MACRO);
         }
@@ -103,6 +103,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTempFileDirectory(LPTSTR szFilePath, LONG nMaxLen)
     LOG_FUNC_ENTRY_PARAMS((szFilePath, nMaxLen))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const LONG nRealLen = StringWrapper::CopyInfoToCString(GetDTWAINTempFilePath(pHandle), szFilePath, nMaxLen);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szFilePath))
     LOG_FUNC_EXIT_NONAME_PARAMS(nRealLen)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }

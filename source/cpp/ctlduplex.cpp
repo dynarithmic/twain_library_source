@@ -52,6 +52,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, LPLONG lpDup
             }
         }
     }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpDupType))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
