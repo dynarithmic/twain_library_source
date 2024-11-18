@@ -50,7 +50,7 @@ static LONG EnumCapInternal(DTWAIN_SOURCE Source,
                             const std::string& paramLog);
 
 #define GENERATE_PARAM_LOG(argVals) \
-        (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_CALLSTACK) ? (ParamOutputter((#argVals)).outputParam argVals.getString()) : ("")
+        (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) ? (ParamOutputter((#argVals)).outputParam argVals.getString()) : ("")
 
 template <typename CapArrayType>
 static bool GetCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, typename CapArrayType::value_type* value,
@@ -107,32 +107,37 @@ struct SetSupportFn2 : public SetSupportFn1<T>
 template <typename T, typename FnToCall>
 static T FunctionCaller(FnToCall fn, const std::string& func, const std::string& paramLog)
 {
-    const bool doLog = CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_CALLSTACK ? true : false;
+    const bool doLog = CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK ? true : false;
     try
     {
         T bRet {};
+        #if DTWAIN_BUILD_LOGCALLSTACK == 1
         if (doLog)
         {
-            try { CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_IN) + paramLog); }
+            try { LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_IN) + paramLog); }
             catch (...) {}
         }
+        #endif
         bRet = fn();
+
+        #if DTWAIN_BUILD_LOGCALLSTACK == 1
         if (doLog)
         {
             try
             {
-                CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_OUT) + ParamOutputter("", true).outputParam(bRet).getString());
+                LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_OUT) + ParamOutputter("", true).outputParam(bRet).getString());
             }
             catch (...)
             { return bRet; }
         }
+        #endif
         return bRet;
     }
     catch (T var) { return var; }
     catch (...)
     {
         LogExceptionErrorA(func.c_str());
-        if (CTL_StaticData::s_bThrowExceptions)
+        if (CTL_StaticData::IsThrowExceptions())
             DTWAIN_InternalThrowException();
         return {};
     }
@@ -335,7 +340,9 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
 #define EXPORT_GET_CAP_VALUE_STRING(FuncName) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName##String(DTWAIN_SOURCE Source, LPTSTR value)\
     {\
-       return GetCapabilityByString(GetDeviceCapsByStringFn(Source, value, FuncName), __FUNCTION__, GENERATE_PARAM_LOG((Source, value)));\
+        auto retVal = GetCapabilityByString(GetDeviceCapsByStringFn(Source, value, FuncName), __FUNCTION__, GENERATE_PARAM_LOG((Source, value)));\
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((value)) \
+        return retVal; \
     }
 
 #define EXPORT_SET_CAP_VALUE_STRING(FuncName) \
@@ -363,6 +370,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
                                           GetCurrentCapValues, __FUNCTION__, GENERATE_PARAM_LOG((Source, value))); \
         valueTemp.resize(NumChars); \
         StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp), value, NumChars); \
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((value)) \
         return retVal;\
     }
 
@@ -374,6 +382,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
                                          __FUNCTION__, GENERATE_PARAM_LOG((Source, value))); \
         valueTemp.resize(MaxLen); \
         StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp), value, MaxLen); \
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((value)) \
         return retVal;\
     }
 
@@ -393,6 +402,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
                             GENERATE_PARAM_LOG((Source, value, GetType))); \
         valueTemp.resize(NumChars); \
         StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp), value, NumChars); \
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((value)) \
         return retval; \
     }
 

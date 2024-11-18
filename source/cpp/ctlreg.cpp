@@ -113,7 +113,6 @@ bool dynarithmic::GetCapInfoFromIni(const std::string& strCapName,
                     {"TWTY_UNI512",  TWTY_UNI512},
                     {"TWTY_FRAME",   TWTY_FRAME}
                     };
-    static constexpr unsigned DataTypeArraySize = std::size(DataTypeArray);
 
     bContainerInfoFound = false;
 

@@ -24,7 +24,7 @@
 #include <unordered_map>
 
 #include "capconst.h"
-#include "ctltrp.h"
+#include "ctltripletbase.h"
 
 namespace dynarithmic
 {

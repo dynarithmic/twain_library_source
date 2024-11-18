@@ -234,6 +234,7 @@ LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontName(LONG FontVal, LPTSTR szFont, LONG n
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto st = CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_FONTNAME, FontVal + DTWAIN_FONT_START_);
     auto numChars = StringWrapper::CopyInfoToCString(st, szFont, nChars);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szFont))
     LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
     CATCH_BLOCK(-1)
 }
@@ -622,6 +623,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPDFTextElementLong(DTWAIN_PDFTEXTELEMENT Text
         default:
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
     }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((val1, val2, Flags))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -640,16 +642,17 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPDFTextElementString(DTWAIN_PDFTEXTELEMENT Te
     switch (Flags)
     {
         case DTWAIN_PDFTEXTELEMENT_FONTNAME:
-            StringWrapper::SafeStrcpy(lpszStr, StringConversion::Convert_Ansi_To_Native(pPtr->m_font.m_fontName).c_str(), maxLen);
+            StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(pPtr->m_font.m_fontName), lpszStr, maxLen);
         break;
 
         case DTWAIN_PDFTEXTELEMENT_TEXT:
-            StringWrapper::SafeStrcpy(lpszStr, StringConversion::Convert_Ansi_To_Native(pPtr->m_text).c_str(), maxLen);
+            StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(pPtr->m_text), lpszStr, maxLen);
         break;
 
         default:
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
     }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszStr))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -693,11 +696,11 @@ std::pair<bool, CTL_TEXTELEMENTPTRLIST::iterator> CheckPDFTextElement(DTWAIN_PDF
 
     auto it2 = std::find_if(it->second.begin(), it->second.end(), [&](const auto& ptr) { return ptr->pTwainSource == pPtr->pTwainSource; });
 
-    if ( CTL_StaticData::s_logFilterFlags )
+    if ( CTL_StaticData::GetLogFilterFlags() )
     {
         std::string sOut = "PDF TextElement Info: \n";
         sOut += CTL_ErrorStructDecoder::DecodePDFTextElement(pPtr);
-        CTL_TwainAppMgr::WriteLogInfoA(sOut);
+        LogWriterUtils::WriteMultiLineInfoIndentedA(sOut, "\n");
     }
     return { true, it2 };
 }

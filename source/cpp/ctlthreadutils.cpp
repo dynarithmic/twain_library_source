@@ -29,13 +29,14 @@ namespace dynarithmic
 {
     static CTL_ThreadMap::iterator getThreadIdIter()
     {
+        auto& threadMap = CTL_StaticData::GetThreadMap();
         std::string threadId = boost::lexical_cast<std::string>(std::this_thread::get_id());
-        auto iter = CTL_StaticData::s_ThreadMap.find(threadId);
-        if (iter == CTL_StaticData::s_ThreadMap.end())
+        auto iter = threadMap.find(threadId);
+        if (iter == threadMap.end())
         {
             unsigned long threadNumber = 0;
             sscanf(threadId.c_str(), "%lx", &threadNumber);
-            iter = CTL_StaticData::s_ThreadMap.insert({ threadId, threadNumber }).first;
+            iter = threadMap.insert({ threadId, threadNumber }).first;
         }
         return iter;
     }

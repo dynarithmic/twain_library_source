@@ -48,7 +48,7 @@ static void SetNotification(CTL_TwainDLLHandle* pHandle, bool& notification, DTW
 LONG DLLENTRY_DEF DTWAIN_GetRegisteredMsg()
 {
     LOG_FUNC_ENTRY_NONAME_PARAMS()
-    LOG_FUNC_EXIT_NONAME_PARAMS(CTL_StaticData::s_nRegisteredDTWAINMsg)
+    LOG_FUNC_EXIT_NONAME_PARAMS(CTL_StaticData::GetRegisteredMessage())
     CATCH_BLOCK(0L)
 }
 
@@ -154,13 +154,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RemoveCallback(DTWAIN_CALLBACK_PROC Fn)
     LOG_FUNC_ENTRY_PARAMS((Fn))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const CallbackFinder<DTWAIN_CALLBACK_PROC,LONG> Finder(Fn);
+    auto& callbacks = CTL_StaticData::GetCallbacks();
+    const auto found = std::find_if(callbacks.begin(), callbacks.end(), Finder);
 
-    const auto found = std::find_if(CTL_StaticData::s_aAllCallbacks.begin(),
-                                    CTL_StaticData::s_aAllCallbacks.end(), Finder);
-
-    if ( found != CTL_StaticData::s_aAllCallbacks.end())
+    if ( found != callbacks.end())
     {
-        CTL_StaticData::s_aAllCallbacks.erase(found);
+        callbacks.erase(found);
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
     }
 
@@ -181,9 +180,10 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
     {
     }
 
-    if ( uMsg == static_cast<UINT>(CTL_StaticData::s_nRegisteredDTWAINMsg) )
+    if ( uMsg == static_cast<UINT>(CTL_StaticData::GetRegisteredMessage()) )
     {
         LogDTWAINMessage(hWnd, uMsg, wParam, lParam);
+        auto& callbacks = CTL_StaticData::GetCallbacks();
         switch( wParam )
         {
             case DTWAIN_TWAINAcquireStarted:
@@ -191,8 +191,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 pSource->SetAcquireStarted(true);
                 pSource->ResetFileAutoIncrementData();
-                if ((pHandle && (pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle))) ||
-                     !CTL_StaticData::s_aAllCallbacks.empty())
+                if ((pHandle && (pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle))) || !callbacks.empty())
                 {
                     // Send this message on
                     bPassMsg = true;
@@ -245,13 +244,13 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
             case DTWAIN_TN_FILENAMECHANGING:
             case DTWAIN_TN_FILENAMECHANGED:
             case DTWAIN_TN_INVALID_TWAINDSM2_BITMAP:
+            case DTWAIN_TN_IMAGE_RESAMPLE_FAILURE:
             {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 if ( wParam == DTWAIN_TN_ACQUIRESTARTED )
                     pSource->SetImagesStored(false);
 
-                if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) ||
-                     !CTL_StaticData::s_aAllCallbacks.empty())
+                if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) || !callbacks.empty())
                     bPassMsg = true;
                 if (wParam == DTWAIN_TN_FILEPAGESAVEOK)
                     pSource->SetFileSavePageCount(pSource->GetFileSavePageCount() + 1);
@@ -264,8 +263,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
             case DTWAIN_TN_ACQUIREDONE_EX:
             {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
-                if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) ||
-                    !CTL_StaticData::s_aAllCallbacks.empty() )
+                if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) || !callbacks.empty() )
                     bPassMsg = true;
                 DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,
                                     static_cast<DTWAIN_HANDLE>(pHandle),
@@ -318,13 +316,11 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                 pHandle->m_ArrayFactory->destroy(pSource->m_pUserPtr);
 
                 // Couldn't acquire the first page, so acquire failed totally!
-                if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) ||
-                    !CTL_StaticData::s_aAllCallbacks.empty())
+                if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) || !callbacks.empty())
                     bPassMsg = true;
                 if ( pSource->GetPendingImageNum() == 0 )
                 {
-                    if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) ||
-                        !CTL_StaticData::s_aAllCallbacks.empty())
+                    if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) || !callbacks.empty())
                         bPassMsg = true;
                 }
 
@@ -342,8 +338,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
             case DTWAIN_TN_TRANSFERDONE:
             {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
-                if (  pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) ||
-                      !CTL_StaticData::s_aAllCallbacks.empty())
+                if (  pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) || !callbacks.empty())
                       bPassMsg = true;
                 DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,
                                     static_cast<DTWAIN_HANDLE>(pHandle),
@@ -369,8 +364,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
           case DTWAIN_TN_TWAINTRIPLETEND:
           {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
-                if (  pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) ||
-                    !CTL_StaticData::s_aAllCallbacks.empty())
+                if (  pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) || !callbacks.empty())
                     bPassMsg = true;
                 else
                 {
@@ -391,8 +385,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
             {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 pHandle->m_ArrayFactory->destroy(pSource->m_pUserPtr);
-                if (  pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) ||
-                    !CTL_StaticData::s_aAllCallbacks.empty())
+                if (  pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) || !callbacks.empty())
                     bPassMsg = true;
                 // Couldn't acquire the first page, so acquire failed totally!
                 DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,
@@ -408,8 +401,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                 if ( pSource->GetPendingImageNum() == 0 )
                 {
                     wParam = DTWAIN_TN_ACQUIRECANCELLED_EX;
-                    if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) ||
-                    !CTL_StaticData::s_aAllCallbacks.empty())
+                    if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) || !callbacks.empty())
                         bPassMsg = true;
                 }
             }
@@ -424,8 +416,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                     pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                     pHandle->m_ArrayFactory->destroy(pSource->m_pUserPtr);
                 }
-                if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) ||
-                    !CTL_StaticData::s_aAllCallbacks.empty())
+                if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) || !callbacks.empty())
                     bPassMsg = true;
                 DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,
                                     static_cast<DTWAIN_HANDLE>(pHandle),
@@ -444,8 +435,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
             case DTWAIN_TN_UICLOSING:
             case DTWAIN_TN_ENDOFJOBDETECTED:
             case DTWAIN_TN_EOJDETECTED_XFERDONE:
-                if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) ||
-                    !CTL_StaticData::s_aAllCallbacks.empty())
+                if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) || !callbacks.empty())
                     bPassMsg = true;
             break;
 
@@ -455,8 +445,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
 
                 if ( pSource->IsUIOnly() )
                 {
-                    if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) ||
-                    !CTL_StaticData::s_aAllCallbacks.empty())
+                    if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) || !callbacks.empty())
                         bPassMsg = true;
                     pSource->SetUIOnly(FALSE);
                     pSource->SetUIOpen(FALSE);
@@ -476,8 +465,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                 if ( pSource->IsAcquireAttempt() ) // Didn't really acquire the image
                     pSource->SetAcquireAttempt(FALSE);
 
-                if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) ||
-                    !CTL_StaticData::s_aAllCallbacks.empty())
+                if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) || !callbacks.empty())
                     bPassMsg = true;
 
                 DisableAppWindows(false);
@@ -532,8 +520,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                         // Close the source
                         CTL_TwainAppMgr::CloseSource( pSession, pSource );
 
-                        if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) ||
-                                !CTL_StaticData::s_aAllCallbacks.empty())
+                        if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) || !callbacks.empty())
                             bPassMsg = true;
                         DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,
                                             static_cast<DTWAIN_HANDLE>(pHandle),
@@ -555,8 +542,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 if ( pSource )
                 {
-                    if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) ||
-                        !CTL_StaticData::s_aAllCallbacks.empty())
+                    if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) || !callbacks.empty())
                         bPassMsg = true;
                     DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,
                                         static_cast<DTWAIN_HANDLE>(pHandle),
@@ -635,10 +621,10 @@ LRESULT ExecuteCallback(CallbackType Fn, HWND hWnd, UINT uMsg,
     }
     catch (...)
     {
-        if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
         {
-            const std::string sError = "In ExecuteCallback: Exception encountered when logging using callback...\n";
-            CTL_TwainAppMgr::WriteLogInfoA(sError);
+            const std::string sError = "In ExecuteCallback: Exception encountered when logging using callback...";
+            LogWriterUtils::WriteLogInfoIndentedA(sError);
         }
     }
     return lResult;
@@ -647,6 +633,7 @@ LRESULT ExecuteCallback(CallbackType Fn, HWND hWnd, UINT uMsg,
 LRESULT ExecuteDTWAINCallbacks(CTL_TwainDLLHandle *pHandle, HWND hWnd, UINT uMsg,
                                WPARAM wParam, LPARAM lParam, bool bPassMsg, bool bCallDefProcs)
 {
+    auto& callbacks = CTL_StaticData::GetCallbacks();
     LRESULT lResult = 0;
     if ( pHandle )
     {
@@ -673,14 +660,12 @@ LRESULT ExecuteDTWAINCallbacks(CTL_TwainDLLHandle *pHandle, HWND hWnd, UINT uMsg
                 lResult = ExecuteCallback<DTWAIN_CALLBACK_PROC64, LONGLONG>(pHandle->m_pCallbackFn64, hWnd, uMsg,
                                                                             wParam, lParam, pHandle->m_lCallbackData64);
             // call the callbacks that are in the queue
-            if ( !CTL_StaticData::s_aAllCallbacks.empty())
+            if ( !callbacks.empty())
             {
                 LogDTWAINMessage(hWnd, uMsg, wParam, lParam, true);
                 const CallBatchProcessor<DTWAIN_CALLBACK_PROC, LONG> BP(wParam, lParam);
-                std::for_each(CTL_StaticData::s_aAllCallbacks.begin(),
-                              CTL_StaticData::s_aAllCallbacks.end(),
-                              BP);
-                lResult = CTL_StaticData::s_aAllCallbacks.back().retvalue;
+                std::for_each(callbacks.begin(), callbacks.end(), BP);
+                lResult = callbacks.back().retvalue;
             }
 
             return lResult;
@@ -695,7 +680,7 @@ LRESULT ExecuteDTWAINCallbacks(CTL_TwainDLLHandle *pHandle, HWND hWnd, UINT uMsg
             if ( bCallDefProcs )
                 lResult = ::DefWindowProc(hWnd, uMsg, wParam, lParam);
             #endif
-            if ( bPassMsg && (CALLBACK_EXISTS(pHandle) || !CTL_StaticData::s_aAllCallbacks.empty()))
+            if ( bPassMsg && (CALLBACK_EXISTS(pHandle) || !callbacks.empty()))
             {
                 // Called if only callback exists
                 if (CALLBACK32_EXISTS(pHandle))
@@ -707,14 +692,12 @@ LRESULT ExecuteDTWAINCallbacks(CTL_TwainDLLHandle *pHandle, HWND hWnd, UINT uMsg
                     wParam, lParam, pHandle->m_lCallbackData64);
 
                 // call the callbacks that are in the queue
-                if ( !CTL_StaticData::s_aAllCallbacks.empty())
+                if ( !callbacks.empty())
                 {
                     LogDTWAINMessage(hWnd, uMsg, wParam, lParam, true);
                     const CallBatchProcessor<DTWAIN_CALLBACK_PROC, LONG> BP(wParam, lParam);
-                    std::for_each(CTL_StaticData::s_aAllCallbacks.begin(),
-                                  CTL_StaticData::s_aAllCallbacks.end(),
-                                  BP);
-                    lResult = CTL_StaticData::s_aAllCallbacks.back().retvalue;
+                    std::for_each(callbacks.begin(), callbacks.end(),BP);
+                    lResult = callbacks.back().retvalue;
                 }
             }
             return lResult;
@@ -737,7 +720,7 @@ LRESULT ExecuteDTWAINCallbacks(CTL_TwainDLLHandle *pHandle, HWND hWnd, UINT uMsg
         }
         else
         // Now test for just a callback
-        if ( bPassMsg && (CALLBACK_EXISTS(pHandle) || !CTL_StaticData::s_aAllCallbacks.empty()))
+        if ( bPassMsg && (CALLBACK_EXISTS(pHandle) || !callbacks.empty()))
         {
             LogDTWAINMessage(hWnd, uMsg, wParam, lParam, true);
             // Now check if there is a Callback defined
@@ -751,14 +734,12 @@ LRESULT ExecuteDTWAINCallbacks(CTL_TwainDLLHandle *pHandle, HWND hWnd, UINT uMsg
                 wParam, lParam, pHandle->m_lCallbackData64);
 
             // call the callbacks that are in the queue
-            if ( !CTL_StaticData::s_aAllCallbacks.empty())
+            if ( !callbacks.empty())
             {
                 LogDTWAINMessage(hWnd, uMsg, wParam, lParam, true);
                 const CallBatchProcessor<DTWAIN_CALLBACK_PROC, LONG> BP(wParam, lParam);
-                std::for_each(CTL_StaticData::s_aAllCallbacks.begin(),
-                              CTL_StaticData::s_aAllCallbacks.end(),
-                              BP);
-                lResult = CTL_StaticData::s_aAllCallbacks.back().retvalue;
+                std::for_each(callbacks.begin(), callbacks.end(),BP);
+                lResult = callbacks.back().retvalue;
             }
 
             return lResult;
@@ -773,15 +754,14 @@ LRESULT ExecuteDTWAINCallbacks(CTL_TwainDLLHandle *pHandle, HWND hWnd, UINT uMsg
 
 void dynarithmic::LogDTWAINMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, bool bToCallback)
 {
-    if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_NOTIFICATIONS)
+    if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_NOTIFICATIONS)
     {
         CTL_ErrorStruct e;
         std::string s;
         if ( bToCallback )
             s = "To callback: ";
         s += e.GetDTWAINMessageAndDataInfo(hWnd, uMsg, wParam, lParam);
-        s += "\n";
-        CTL_TwainAppMgr::WriteLogInfoA(s);
+        LogWriterUtils::WriteMultiLineInfoIndentedA(s, "\n");
     }
 }
 
@@ -792,10 +772,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DisableAppWindow(HWND hWnd, DTWAIN_BOOL bDisable
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !IsWindow( hWnd );}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
+   auto& appWindows = CTL_StaticData::GetAppWindowsToDisable();
    if ( bDisable )
-       CTL_StaticData::s_appWindowsToDisable.insert( hWnd );
+       appWindows.insert( hWnd );
    else
-       CTL_StaticData::s_appWindowsToDisable.erase( hWnd );
+       appWindows.erase( hWnd );
    #endif
    LOG_FUNC_EXIT_NONAME_PARAMS(true)
    CATCH_BLOCK(false)
@@ -804,9 +785,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DisableAppWindow(HWND hWnd, DTWAIN_BOOL bDisable
 void DisableAppWindows(bool bDisable)
 {
 #ifdef _WIN32
-    std::for_each(CTL_StaticData::s_appWindowsToDisable.begin(),
-                  CTL_StaticData::s_appWindowsToDisable.end(),
-                    [&](HWND TheWnd) 
+    auto& appWindows = CTL_StaticData::GetAppWindowsToDisable();
+    std::for_each(appWindows.begin(), appWindows.end(), [&](HWND TheWnd) 
                     {
                     if (IsWindow(TheWnd))
                         EnableWindow(TheWnd, !bDisable);

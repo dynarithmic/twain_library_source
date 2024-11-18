@@ -40,7 +40,7 @@ using namespace boost::logic;
 LONG DLLENTRY_DEF DTWAIN_SetTwainDialogFont(HFONT font)
 {
     LOG_FUNC_ENTRY_PARAMS((font))
-    CTL_StaticData::s_DialogFont = font;
+    CTL_StaticData::GetDialogFont() = font;
     LOG_FUNC_EXIT_NONAME_PARAMS(1)
     CATCH_BLOCK(0)
 }
@@ -385,7 +385,7 @@ struct closeSourceRAII
 
 static std::vector<TCHAR> GetDefaultName(SelectStruct& selectTraits)
 {
-    bool bLogMessages = (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS) ? true : false;
+    bool bLogMessages = (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS) ? true : false;
     bool bAlwaysHighlightFirst = selectTraits.CS.nOptions & DTWAIN_DLG_HIGHLIGHTFIRST;
     std::vector<TCHAR> DefName;
     DTWAIN_SOURCE DefSource = nullptr;
@@ -416,7 +416,7 @@ static std::vector<TCHAR> GetDefaultName(SelectStruct& selectTraits)
                 DefName.resize(nCharacters);
                 GetSourceInfo(reinterpret_cast<CTL_ITwainSource*>(DefSource), &CTL_ITwainSource::GetProductName, DefName.data(), nCharacters);
                 if (bLogMessages)
-                    CTL_TwainAppMgr::WriteLogInfoA("Initializing TWAIN Dialog -- Retrieved default TWAIN Source name...\n");
+                    LogWriterUtils::WriteLogInfoIndentedA("Initializing TWAIN Dialog -- Retrieved default TWAIN Source name...");
             }
         }
     }

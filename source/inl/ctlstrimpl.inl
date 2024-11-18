@@ -35,6 +35,8 @@
 #pragma warning (disable:4244)
 #endif
 
+using namespace dynarithmic;
+
 template <typename StringTypeIn>
 strview::basic_string_view<typename StringTypeIn::value_type> get_view(const StringTypeIn& str)
 {
@@ -3029,6 +3031,34 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryExA(LPCSTR sLangDLL, DTWAIN_
     return DTWAIN_SetTempFileDirectoryEx(StringConversion::Convert_AnsiPtr_To_Native(sLangDLL).c_str(), bClear);
 #else
     return DTWAIN_SetTempFileDirectoryEx(sLangDLL, bClear);
+#endif
+}
+
+
+//LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringExA(LPCSTR lpOrigString, LPSTR lpOutString, LONG nSize);
+//LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringExW(LPCWSTR lpOrigString, LPWSTR lpOutString, LONG nSize);
+
+LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringExA(LPCSTR lpOrigString, LPSTR lpOutString, LONG nSize)
+{
+#ifdef _UNICODE
+    std::wstring arg(nSize + 1, 0);
+    const DTWAIN_BOOL retVal = DTWAIN_ConvertToAPIStringEx(StringConversion::Convert_AnsiPtr_To_Native(lpOrigString).c_str(),
+                                                          lpOutString?&arg[0]:nullptr, nSize);
+    return null_terminator_copier(get_view(arg), lpOutString, retVal);
+#else
+    return DTWAIN_ConvertToAPIStringEx(lpOrigString, lpOutString, nSize);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ConvertToAPIStringExW(LPCWSTR lpOrigString, LPWSTR lpOutString, LONG nSize)
+{
+#ifdef _UNICODE
+    return DTWAIN_ConvertToAPIStringEx(lpOrigString, lpOutString, nSize);
+#else
+    std::string arg(nSize + 1, 0);
+    DTWAIN_BOOL retVal = DTWAIN_ConvertToAPIStringEx(StringConversion::Convert_WidePtr_To_Native(lpOrigString).c_str(),
+                                                    lpOutString?&arg[0]:nullptr, nSize);
+    return null_terminator_copier(get_view(arg), lpOutString, retVal);
 #endif
 }
 

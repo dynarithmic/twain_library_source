@@ -22,6 +22,7 @@
 #include "winbit32.h"
 #include "ctltwainmanager.h"
 #include "ctlfileutils.h"
+#include "logwriterutils.h"
 
 using namespace dynarithmic;
 std::string CTextImageHandler::GetFileExtension() const
@@ -114,7 +115,7 @@ int CTextImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImag
 
         szTempPath += StringWrapper::GetGUID() +  _T("OCR");
 
-        CTL_TwainAppMgr::WriteLogInfo(GetResourceStringFromMap_Native(IDS_LOGMSG_TEMPIMAGEFILETEXT) + _T(" ") + szTempPath + _T("\n"));
+        LogWriterUtils::WriteLogInfo(GetResourceStringFromMap_Native(IDS_LOGMSG_TEMPIMAGEFILETEXT) + _T(" ") + szTempPath + _T("\n"));
 
         // OK, now convert DIB to the correct file type -- only do this if the input format
         // is not DIB

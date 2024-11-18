@@ -410,6 +410,7 @@ Class DTWAINAPI
     Public Const DTWAIN_TN_PROCESSDIBFINALACCEPTED As Integer = 1056
     Public Const DTWAIN_TN_CLOSEDIBFAILED As Integer = 1057
     Public Const DTWAIN_TN_INVALID_TWAINDSM2_BITMAP As Integer = 1058
+    Public Const DTWAIN_TN_IMAGE_RESAMPLE_FAILURE As Integer = 1059
 
     Public Const DTWAIN_TN_DEVICEEVENT As Integer = 1100
     Public Const DTWAIN_TN_TWAINPAGECANCELLED As Integer = 1105
@@ -763,6 +764,8 @@ Class DTWAINAPI
     Public Const DTWAIN_ERR_RESOURCES_DUPLICATEID_FOUND As Integer = (-1066)
     Public Const DTWAIN_ERR_UNAVAILABLE_EXTINFO As Integer = (-1067)
     Public Const DTWAIN_ERR_TWAINDSM2_BADBITMAP As Integer = (-1068)
+    Public Const DTWAIN_ERR_ACQUISITION_CANCELED As Integer = (-1069)
+    Public Const DTWAIN_ERR_IMAGE_RESAMPLED As Integer = (-1070)
 
     Public Const TWAIN_ERR_LOW_MEMORY As Integer = (-1100)
     Public Const TWAIN_ERR_FALSE_ALARM As Integer = (-1101)
@@ -1673,6 +1676,10 @@ Class DTWAINAPI
     Public Const DTWAIN_CONSTANT_TWDF     As Integer = 70
     Public Const DTWAIN_CONSTANT_TWFM     As Integer = 71
     Public Const DTWAIN_CONSTANT_TWSG     As Integer = 72
+    Public Const DTWAIN_CONSTANT_DTWAIN_TN As Integer = 73
+    Public Const DTWAIN_CONSTANT_TWON     As Integer = 74
+    Public Const DTWAIN_CONSTANT_TWMF     As Integer = 75
+    Public Const DTWAIN_CONSTANT_TWSX     As Integer = 76
 
     Public Const DTWAIN_USERRES_START As Integer = 20000
     Public Const DTWAIN_USERRES_MAXSIZE As Integer = 8192

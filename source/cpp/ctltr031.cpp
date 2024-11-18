@@ -25,7 +25,7 @@
 #include "ctldib.h"
 #include "dtwain.h"
 #include "winbit32.h"
-
+#include "logwriterutils.h"
 using namespace dynarithmic;
 
 CTL_ImageMemXferTriplet::CTL_ImageMemXferTriplet(CTL_ITwainSession *pSession,
@@ -523,8 +523,8 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
             default:
             {
                 StringStreamA strm;
-                strm << "Unknown return code " << rc << " from DSM during transfer!  Twain driver unstable!\n";
-                CTL_TwainAppMgr::WriteLogInfoA(strm.str());
+                strm << "Unknown return code " << rc << " from DSM during transfer!  Twain driver unstable!";
+                LogWriterUtils::WriteLogInfoIndentedA(strm.str());
                 break;
             }
         }

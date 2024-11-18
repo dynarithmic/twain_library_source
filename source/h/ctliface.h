@@ -30,7 +30,7 @@
 #include <mutex>
 #include <memory>
 #include <functional>
-#include "ctltrp.h"
+#include "ctltripletbase.h"
 #include "dtwain_raii.h"
 #include "ocrinterface.h"
 #include "pdffont_basic.h"
@@ -97,7 +97,6 @@ namespace dynarithmic
     #define  DTWAIN_RETRY_EX                          9997
 
         // modal processing messages
-    #define DTWAIN_TN_SETUPMODALACQUISITION           1300
     #define DTWAIN_TN_MESSAGELOOPERROR                1500
     #define REGISTERED_DTWAIN_MSG _T("DTWAIN_NOTIFY-{37AE5C3E-34B6-472f-A0BC-74F3CB199F2B}")
 
@@ -523,93 +522,129 @@ namespace dynarithmic
         bool bIsFromRC = false;
     };
 
+    struct CTL_StaticDataStruct
+    {
+        int32_t                      s_nExtImageInfoOffset = 0;
+        int                          s_nLoadingError = DTWAIN_NO_ERROR;
+        bool                         s_bINIFileLoaded = false;
+        bool                         s_bDoResampling = true;
+        bool                         s_bCheckHandles = true;
+        bool                         s_multipleThreads = false;
+        HFONT                        s_DialogFont = nullptr;
+        LONG                         s_nRegisteredDTWAINMsg = 0;
+        bool                         s_bThrowExceptions = false;
+        HINSTANCE                    s_DLLInstance = nullptr;
+        long                         s_logFilterFlags = 0;
+        UINT_PTR                     s_nTimeoutID = 0;
+        UINT                         s_nTimeoutMilliseconds = 0;
+        bool                         s_ResourcesInitialized = false;
+        bool                         s_bTimerIDSet = false;
+        CTL_UINT16ToInfoMap          s_IntToTwainInfoMap;
+        CTL_StringToConstantMap      s_MapStringToConstant;
+        CTL_TwainLongToStringMap     s_MapExtendedImageInfo;
+        CTL_StringToMapLongToStringMap s_AllLoadedResourcesMap;
+        CTL_GeneralResourceInfo         s_ResourceInfo;
+        CTL_PDFMediaMap          s_PDFMediaMap;
+        CTL_AvailableFileFormatsMap s_AvailableFileFormatsMap;
+        CTL_TwainConstantsMap s_TwainConstantsMap;
+        CTL_StringType           s_strResourcePath;  // path to the DTWAIN resource strings
+        CTL_StringType           s_DLLPath;
+        CTL_StringType           s_sINIPath;
+        CTL_LongToStringMap      s_ErrorCodes;
+        CTL_StringType           s_VersionString;
+        CTL_ErrorToExtraInfoMap  s_mapExtraErrorInfo;
+        CTL_GeneralCapInfo       s_mapGeneralCapInfo;
+        CTL_MapThreadToDLLHandle s_mapThreadToDLLHandle;
+        CTL_ThreadMap            s_ThreadMap;
+        std::unordered_set<HWND> s_appWindowsToDisable;
+        CTL_CallbackProcArray    s_aAllCallbacks;
+        CTL_StringType           s_strLangResourcePath;
+        CTL_GeneralErrorInfo     s_mapGeneralErrorInfo;
+        CLogSystem               s_appLog;
+        ImageResamplerMap        s_ImageResamplerMap;
+        SourceStatusMap          s_SourceStatusMap;
+        CTL_StringType           s_ResourceVersion;
+        std::string              s_CurrentResourceKey;
+        CTL_PairToStringMap      s_ResourceCache;
+    };
+
     struct CTL_StaticData
     {
-        static int32_t                      s_nExtImageInfoOffset;
-        static CTL_UINT16ToInfoMap          s_IntToTwainInfoMap;
-        static CTL_StringToConstantMap      s_MapStringToConstant;
-        static CTL_TwainLongToStringMap     s_MapExtendedImageInfo;
-        static CTL_StringToMapLongToStringMap s_AllLoadedResourcesMap;
-        static CTL_GeneralResourceInfo         s_ResourceInfo;
-        static CTL_PDFMediaMap          s_PDFMediaMap;
-        static CTL_AvailableFileFormatsMap s_AvailableFileFormatsMap;
-        static CTL_TwainConstantsMap s_TwainConstantsMap;
-        static bool s_bCheckHandles;
-        static CTL_StringType           s_strResourcePath;  // path to the DTWAIN resource strings
-        static CTL_StringType           s_DLLPath;
-        static CTL_StringType           s_sINIPath;
-        static bool                     s_multipleThreads;
-        static CTL_LongToStringMap      s_ErrorCodes;
-        static CTL_StringType           s_VersionString;
-        static HFONT                    s_DialogFont;
-        static CTL_ErrorToExtraInfoMap  s_mapExtraErrorInfo;
-        static CTL_GeneralCapInfo       s_mapGeneralCapInfo;
-        static LONG                     s_nRegisteredDTWAINMsg;
         static std::mutex               s_mutexInitDestroy;
-        static CTL_MapThreadToDLLHandle s_mapThreadToDLLHandle;
-        static CTL_ThreadMap            s_ThreadMap;
-        static bool                     s_bThrowExceptions;
-        static HINSTANCE                s_DLLInstance;
-        static std::unordered_set<HWND> s_appWindowsToDisable;
-        static CTL_CallbackProcArray    s_aAllCallbacks;
-        static CTL_StringType           s_strLangResourcePath;
-        static CTL_GeneralErrorInfo     s_mapGeneralErrorInfo;
-        static long                     s_logFilterFlags;
-        static CLogSystem               s_appLog;
-        static UINT_PTR                 s_nTimeoutID;
-        static UINT                     s_nTimeoutMilliseconds;
-        static bool                     s_bTimerIDSet;
-        static bool                     s_ResourcesInitialized;
-        static ImageResamplerMap        s_ImageResamplerMap;
-        static SourceStatusMap          s_SourceStatusMap;
-        static CTL_StringType           s_ResourceVersion;
-        static std::string              s_CurrentResourceKey;
-        static CTL_PairToStringMap      s_ResourceCache;
-        static bool                     s_bDoResampling;
         static std::unique_ptr<CSimpleIniA>    s_iniInterface;
-        static bool                     s_bINIFileLoaded;
-        static int                      s_nLoadingError;
-
-        static CTL_UINT16ToInfoMap& GetIntToTwainInfoMap() { return s_IntToTwainInfoMap; }
-        static int32_t GetExtImageInfoOffset() { return s_nExtImageInfoOffset; }
-        static void SetExtImageInfoOffset(int32_t offset) { s_nExtImageInfoOffset = offset; }
-        static CTL_StringToConstantMap& GetStringToConstantMap() { return s_MapStringToConstant; }
-        static CTL_TwainLongToStringMap& GetExtendedImageInfoMap() { return s_MapExtendedImageInfo; }
-        static int GetResourceLoadError() { return s_nLoadingError; }
-        static void SetResourceLoadError(int errNum) { s_nLoadingError = errNum; }
+        static CTL_StaticDataStruct s_StaticData;
+        static UINT_PTR GetTimeoutID() { return s_StaticData.s_nTimeoutID; }
+        static void SetTimeoutID(UINT_PTR val) { s_StaticData.s_nTimeoutID = val; }
+        static UINT GetTimeoutValue() { return s_StaticData.s_nTimeoutMilliseconds; }
+        static void SetTimeoutValue(UINT value) { s_StaticData.s_nTimeoutMilliseconds = value; }
+        static CTL_ThreadMap& GetThreadMap() { return s_StaticData.s_ThreadMap; }
+        static HFONT& GetDialogFont() { return s_StaticData.s_DialogFont; }
+        static CLogSystem& GetLogger() { return s_StaticData.s_appLog; }
+        static LONG& GetRegisteredMessage() { return s_StaticData.s_nRegisteredDTWAINMsg; }
+        static bool IsResamplingDone() { return s_StaticData.s_bDoResampling;  }
+        static void SetResamplingDone(bool bSet) { s_StaticData.s_bDoResampling = bSet; }
+        static CTL_StringType& GetVersionString() { return s_StaticData.s_VersionString; }
+        static bool IsINIFileLoaded() { return s_StaticData.s_bINIFileLoaded; }
+        static void SetINIFileLoaded(bool bSet) { s_StaticData.s_bINIFileLoaded = bSet; }
+        static CTL_StringType& GetLanguageResourcePath() { return s_StaticData.s_strLangResourcePath; }
+        static CTL_ErrorToExtraInfoMap& GetExtraErrorInfoMap() { return s_StaticData.s_mapExtraErrorInfo; }
+        static CTL_MapThreadToDLLHandle& GetThreadToDLLHandleMap() { return s_StaticData.s_mapThreadToDLLHandle; }
+        static bool ResourcesLoaded() { return s_StaticData.s_ResourcesInitialized; }
+        static void Reset() 
+        { 
+            CTL_StaticDataStruct tempStruct; 
+            tempStruct.s_DLLPath = s_StaticData.s_DLLPath;
+            tempStruct.s_DLLInstance = s_StaticData.s_DLLInstance;
+            s_StaticData = tempStruct;
+        }
+        static long& GetLogFilterFlags() { return s_StaticData.s_logFilterFlags; }
+        static bool IsThrowExceptions() { return s_StaticData.s_bThrowExceptions; }
+        static void SetThrowExceptions(bool bSet) { s_StaticData.s_bThrowExceptions = bSet; }
+        static CTL_UINT16ToInfoMap& GetIntToTwainInfoMap() { return s_StaticData.s_IntToTwainInfoMap; }
+        static int32_t GetExtImageInfoOffset() { return s_StaticData.s_nExtImageInfoOffset; }
+        static void SetExtImageInfoOffset(int32_t offset) { s_StaticData.s_nExtImageInfoOffset = offset; }
+        static CTL_StringToConstantMap& GetStringToConstantMap() { return s_StaticData.s_MapStringToConstant; }
+        static CTL_TwainLongToStringMap& GetExtendedImageInfoMap() { return s_StaticData.s_MapExtendedImageInfo; }
+        static int GetResourceLoadError() { return s_StaticData.s_nLoadingError; }
+        static void SetResourceLoadError(int errNum) { s_StaticData.s_nLoadingError = errNum; }
         static CSimpleIniA* GetINIInterface() { return s_iniInterface.get(); }
-        static bool PerformResampling() { return s_bDoResampling; }
-        static CTL_PairToStringMap& GetResourceCache() { return s_ResourceCache; }
-        static CTL_StringToMapLongToStringMap& GetAllLanguagesResourceMap() { return s_AllLoadedResourcesMap; }
+        static bool PerformResampling() { return s_StaticData.s_bDoResampling; }
+        static CTL_PairToStringMap& GetResourceCache() { return s_StaticData.s_ResourceCache; }
+        static CTL_StringToMapLongToStringMap& GetAllLanguagesResourceMap() { return s_StaticData.s_AllLoadedResourcesMap; }
         static CTL_LongToStringMap* GetLanguageResource(std::string sLang);
-        static std::string&         GetCurrentLanguageResourceKey() { return s_CurrentResourceKey; }
-        static void SetCurrentLanguageResourceKey(std::string sLang) { s_CurrentResourceKey = sLang; }
+        static std::string&         GetCurrentLanguageResourceKey() { return s_StaticData.s_CurrentResourceKey; }
+        static void SetCurrentLanguageResourceKey(std::string sLang) { s_StaticData.s_CurrentResourceKey = sLang; }
         static CTL_LongToStringMap* GetCurrentLanguageResource();
-        static CTL_GeneralResourceInfo& GetGeneralResourceInfo() { return s_ResourceInfo; }
-        static CTL_PDFMediaMap& GetPDFMediaMap() { return s_PDFMediaMap; }
-        static CTL_AvailableFileFormatsMap& GetAvailableFileFormatsMap() { return s_AvailableFileFormatsMap; }
-        static CTL_TwainConstantsMap& GetTwainConstantsMap() { return s_TwainConstantsMap; }
-        static CTL_TwainConstantToStringMapNode& GetTwainConstantsStrings(LONG nWhich) { return s_TwainConstantsMap[nWhich]; }
-        static bool IsCheckHandles() { return s_bCheckHandles; }
+        static CTL_GeneralResourceInfo& GetGeneralResourceInfo() { return s_StaticData.s_ResourceInfo; }
+        static CTL_PDFMediaMap& GetPDFMediaMap() { return s_StaticData.s_PDFMediaMap; }
+        static CTL_AvailableFileFormatsMap& GetAvailableFileFormatsMap() { return s_StaticData.s_AvailableFileFormatsMap; }
+        static CTL_TwainConstantsMap& GetTwainConstantsMap() { return s_StaticData.s_TwainConstantsMap; }
+        static CTL_TwainConstantToStringMapNode& GetTwainConstantsStrings(LONG nWhich) { return s_StaticData.s_TwainConstantsMap[nWhich]; }
+        static bool IsCheckHandles() { return s_StaticData.s_bCheckHandles; }
+        static void SetCheckHandles(bool bSet) { s_StaticData.s_bCheckHandles = bSet; }
         static std::pair<bool, int32_t> GetIDFromTwainName(std::string sName);
-        static int GetDGResourceID() { return 8890; }
-        static int GetDATResourceID() { return 8891; }
-        static int GetMSGResourceID() { return 8892; }
-        static CTL_StringType& GetResourcePath() { return s_strResourcePath; }
-        static CTL_StringType& GetDLLPath() { return s_DLLPath; }
-        static CTL_StringType& GetINIPath() { return s_sINIPath; }
-        static bool IsUsingMultipleThreads() { return s_multipleThreads; }
-        static CTL_LongToStringMap& GetErrorCodes() { return s_ErrorCodes; }
-        static CTL_GeneralCapInfo& GetGeneralCapInfo() { return s_mapGeneralCapInfo; }
-        static HINSTANCE GetDLLInstanceHandle() { return s_DLLInstance; }
-        static CTL_GeneralErrorInfo& GetGeneralErrorInfo() { return s_mapGeneralErrorInfo; }
-        static long GetErrorFilterFlags() { return s_logFilterFlags; }
-        static ImageResamplerMap& GetImageResamplerMap() { return s_ImageResamplerMap; }
-        static SourceStatusMap& GetSourceStatusMap() { return s_SourceStatusMap;  }
-        static CTL_StringType& GetResourceVersion() { return s_ResourceVersion; }
+        static constexpr int GetDGResourceID() { return 8890; }
+        static constexpr int GetDATResourceID() { return 8891; }
+        static constexpr int GetMSGResourceID() { return 8892; }
+        static CTL_StringType& GetResourcePath() { return s_StaticData.s_strResourcePath; }
+        static CTL_StringType& GetDLLPath() { return s_StaticData.s_DLLPath; }
+        static CTL_StringType& GetINIPath() { return s_StaticData.s_sINIPath; }
+        static bool IsUsingMultipleThreads() { return s_StaticData.s_multipleThreads; }
+        static void SetUseMultipleThreads(bool bSet) { s_StaticData.s_multipleThreads = bSet; }
+        static CTL_LongToStringMap& GetErrorCodes() { return s_StaticData.s_ErrorCodes; }
+        static CTL_GeneralCapInfo& GetGeneralCapInfo() { return s_StaticData.s_mapGeneralCapInfo; }
+        static HINSTANCE GetDLLInstanceHandle() { return s_StaticData.s_DLLInstance; }
+        static CTL_GeneralErrorInfo& GetGeneralErrorInfoMap() { return s_StaticData.s_mapGeneralErrorInfo; }
+        static void SetDLLInstanceHandle(HINSTANCE h) { s_StaticData.s_DLLInstance = h; }
+        static long GetErrorFilterFlags() { return s_StaticData.s_logFilterFlags; }
+        static ImageResamplerMap& GetImageResamplerMap() { return s_StaticData.s_ImageResamplerMap; }
+        static SourceStatusMap& GetSourceStatusMap() { return s_StaticData.s_SourceStatusMap;  }
+        static CTL_StringType& GetResourceVersion() { return s_StaticData.s_ResourceVersion; }
         static CTL_StringType GetTwainNameFromConstant(int lConstantType, int lTwainConstant);
         static std::string GetTwainNameFromConstantA(int lConstantType, int lTwainConstant);
         static std::wstring GetTwainNameFromConstantW(int lConstantType, int lTwainConstant);
+        static CTL_CallbackProcArray& GetCallbacks() { return s_StaticData.s_aAllCallbacks; }
+        static auto& GetAppWindowsToDisable() { return s_StaticData.s_appWindowsToDisable; }
     };
 
     struct CTL_LoggerCallbackInfo
@@ -766,9 +801,9 @@ namespace dynarithmic
         if (!pHandle)
             return {};
         // Check handles registered to the thread id's
-        if (std::find_if(CTL_StaticData::s_mapThreadToDLLHandle.begin(),
-            CTL_StaticData::s_mapThreadToDLLHandle.end(), [&](auto& pr) { return pr.second.get() == pHandle; }) ==
-            CTL_StaticData::s_mapThreadToDLLHandle.end())
+        auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
+        if (std::find_if(threadMap.begin(), threadMap.end(), [&](auto& pr) { return pr.second.get() == pHandle; }) ==
+            threadMap.end())
             return {};
         if (!pHandle->m_bSessionAllocated && bCheckSession)
             return {};
@@ -806,7 +841,6 @@ namespace dynarithmic
     std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> VerifyHandles(DTWAIN_SOURCE Source, int Testing = DTWAIN_VERIFY_DLLHANDLE | DTWAIN_VERIFY_SOURCEHANDLE | DTWAIN_TEST_SETLASTERROR);
     bool CenterWindow(HWND hwnd, HWND hwndParent);
 
-    LONG GetArrayTypeFromCapType(TW_UINT16 CapType);
     LONG GetCustomCapDataType(DTWAIN_SOURCE Source, TW_UINT16 nCap);
     LONG GetCapContainer(CTL_ITwainSource* pSource, LONG nCap, LONG lCapType);
     LONG GetCapArrayType(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG nCap);
@@ -899,6 +933,7 @@ namespace dynarithmic
     //#ifdef DTWAIN_DEBUG_CALL_STACK
     std::string CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich, LPCSTR pOptionalString=nullptr);
     std::string CTL_LogFunctionCallA(LPCSTR pFuncName, int nWhich, LPCSTR pOptionalString=nullptr);
+
     //#endif
 
     // outputs parameter and return values
@@ -909,66 +944,129 @@ namespace dynarithmic
         std::string argNames;
         std::ostringstream strm;
         bool m_bIsReturnValue;
+        bool m_bOutputAsString;
 
     private:
-        void LogInputType(std::string outStr, const char *ptr)
+        void LogType(std::string outStr, const char *ptr)
         {
-            // ptr is a valid string supplied by the user, so just write it out
-            if ( ptr )
-                strm << outStr << "=" << ptr;
-            else
-                strm << outStr << "=" << "(null)";
-        }
-
-        void LogInputType(std::string outStr, const wchar_t *ptr)
-        {
+            // ptr must be a pointer to a valid null terminated string, or nullptr.
             if (ptr)
-                strm << outStr << "=" << StringConversion::Convert_WidePtr_To_Ansi(ptr);
+                strm << outStr << "=\"" << ptr << "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")";
             else
-                strm << outStr << "=" << "(null)";
+                strm << outStr << "=(null)";
         }
 
-        void LogInputType(std::string outStr, char *ptr)
+        void LogType(std::string outStr, const wchar_t* ptr)
         {
-            // ptr is a valid string supplied by the user, but we can't ensure it is null terminated
-            // (It doesn't have to be null-terminated, as the DTWAIN function will eventually put the NULL
-            //  terminated value into the output string).
-            // So for now, we just output the pointer value of the string
-            strm << outStr << "=" << static_cast<void*>(ptr);
-        }
-
-        void LogInputType(std::string outStr, wchar_t *ptr)
-        {
-            // ptr is a valid string supplied by the user, but we can't ensure it is null terminated
-            // (It doesn't have to be null-terminated, as the DTWAIN function will eventually put the NULL
-            //  terminated value into the output string).
-            // So for now, we just output the pointer value of the string
-            strm << outStr << "=" << static_cast<void*>(ptr);
+            // ptr must be a pointer to a valid null terminated string, or nullptr.
+            if (ptr)
+                strm << outStr << "=\"" << StringConversion::Convert_WidePtr_To_Ansi(ptr) << 
+                                    "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")";
+            else
+                strm << outStr << "=(null)";
         }
 
         template <typename T>
-        void LogInputType(std::string outStr, T t, std::enable_if_t<std::is_pointer_v<T> >* = nullptr)
+        void LogType(std::string outStr, const T* ptr)
         {
-            if (t)
+            // ptr is a valid pointer to double supplied by the user
+            if (ptr)
+            {
+                if (!m_bOutputAsString)
+                    strm << outStr << "=0x" << std::hex << static_cast<const void*>(ptr);
+                else
+                    strm << outStr << *ptr;
+            }
+            else
+                strm << outStr << "=(null)";
+        }
+
+        template <typename T>
+        void LogType(std::string outStr, T t, std::enable_if_t<std::is_pointer_v<T> >* = nullptr)
+        {
+            struct asStringRAII
+            {
+                bool* pAsString;
+                bool orig;
+                asStringRAII(bool* asString) : pAsString(asString), orig(*asString) {}
+                ~asStringRAII() { *pAsString = orig; }
+            };
+
+            asStringRAII raii(&m_bOutputAsString);
+
+            if constexpr (std::is_same_v<T, wchar_t*>)
+            {
+                if ( m_bOutputAsString )
+                    LogType(outStr, static_cast<const wchar_t*>(t));
+                else
+                if ( t )
+                    strm << outStr << "0x" << std::hex << t;
+                else
+                    strm << outStr << "=(null)";
+            }
+            else
+            if constexpr (std::is_same_v<T, char*>)
+            {
+                if (m_bOutputAsString)
+                    LogType(outStr, static_cast<const char*>(t));
+                else
+                if ( t )
+                    strm << outStr << "0x" << std::hex << t;
+                else
+                    strm << outStr << "=(null)";
+            }
+            else
+            if constexpr (std::is_pointer_v<T> && !std::is_same_v<T, void *> 
+                && std::is_fundamental_v<std::remove_pointer_t<T>>)
+            {
+                if (m_bOutputAsString)
+                {
+                    if (t)
+                        strm << outStr << "=" << *t;
+                    else
+                        strm << outStr << "=" << "(null)";
+                }
+                else
+                {
+                    if (t)
+                        strm << outStr << "=" << t;
+                    else
+                        strm << outStr << "=" << "(null)";
+                }
+            }
+            else
+            if constexpr (std::is_pointer_v<T>)
+            {
+                if (t)
+                    strm << outStr << "=0x" << std::hex << static_cast<const void*>(t);
+                else
+                    strm << outStr << "=" << "(null)";
+            }
+            else
                 strm << outStr << "=" << t;
-            else
-                strm << outStr << "=" << "(null)";
         }
 
         template <typename T>
-        void LogInputType(std::string outStr, T t, std::enable_if_t<!std::is_pointer_v<T> >* = nullptr)
+        void LogType(std::string outStr, T t, std::enable_if_t<!std::is_pointer_v<T> >* = nullptr)
         {
             strm << outStr << "=" << t;
         }
 
     public:
-        ParamOutputter(const std::string& s, bool isReturnValue = false) : nWhich(0), m_bIsReturnValue(isReturnValue)
+        ParamOutputter(const std::string& s, bool isReturnValue = false) : 
+            nWhich(0), m_bIsReturnValue(isReturnValue), m_bOutputAsString(false)
         {
             StringWrapperA::Tokenize(s, "(, )", aParamNames);
             if (!m_bIsReturnValue)
                 strm << "(";
             else
                 strm << s << " " << dynarithmic::GetResourceStringFromMap(IDS_LOGMSG_RETURNTEXT) << " ";
+        }
+
+        ParamOutputter& setOutputAsString(bool bSet) noexcept
+        {
+            m_bOutputAsString = bSet;
+            return *this;
         }
 
         template <typename T, typename ...P>
@@ -979,9 +1077,9 @@ namespace dynarithmic
             const bool bIsNull = std::is_pointer_v<T> && !t;
             if (!m_bIsReturnValue)
             {
-                // Make sure we log input types correctly, especially character pointers.
+                // Make sure we log types correctly, especially character pointers.
                 // User may supply to us a writable char buffer that is not null-terminated!
-                LogInputType(aParamNames[nWhich], t);
+                LogType(aParamNames[nWhich], t);
             }
             else
             {
@@ -1114,10 +1212,6 @@ namespace dynarithmic
     {
         static void Destroy(HGLOBAL h)
         {
-            #ifdef _WIN32
-            if (h)
-                FreeResource(h);
-            #endif
         }
         void operator()(HGLOBAL h) { Destroy(h); }
     };
@@ -1178,9 +1272,11 @@ namespace dynarithmic
     struct DTWAINScopedLogController
     {
         long m_ErrorFilterFlags;
-        DTWAINScopedLogController(long newFilter) : m_ErrorFilterFlags(CTL_StaticData::s_logFilterFlags)
-        { CTL_StaticData::s_logFilterFlags = newFilter; }
-        ~DTWAINScopedLogController() { CTL_StaticData::s_logFilterFlags = m_ErrorFilterFlags; }
+        DTWAINScopedLogController(long newFilter) : m_ErrorFilterFlags(CTL_StaticData::GetLogFilterFlags())
+        { 
+            CTL_StaticData::GetLogFilterFlags() = newFilter; 
+        }
+        ~DTWAINScopedLogController() { CTL_StaticData::GetLogFilterFlags() = m_ErrorFilterFlags; }
         DTWAINScopedLogController(DTWAINScopedLogController&) = delete;
         DTWAINScopedLogController& operator=(DTWAINScopedLogController&) = delete;
     };
@@ -1196,10 +1292,10 @@ namespace dynarithmic
     };
 
     struct LogTraitsOff
-    { static long Apply(long turnOff) { return CTL_StaticData::s_logFilterFlags &~turnOff; } };
+    { static long Apply(long turnOff) { return CTL_StaticData::GetLogFilterFlags() &~turnOff; } };
 
     struct LogTraitsOn
-    { static long Apply(long turnOn) { return CTL_StaticData::s_logFilterFlags  | turnOn; } };
+    { static long Apply(long turnOn) { return CTL_StaticData::GetLogFilterFlags() | turnOn; } };
 
     template <typename LogTraits>
     struct DTWAINScopedLogControllerEx

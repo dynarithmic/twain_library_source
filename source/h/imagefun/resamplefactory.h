@@ -43,12 +43,14 @@ namespace dynarithmic
             std::vector<uint16_t> m_vectNoSamplingDone;
             std::string m_ImageType;
             void LogMsg(int nWhich, int high, int low, HANDLE dataHandle = {}) const;
+            int m_nResampleStatus;
 
         public:
             bool Resample(CTL_TwainDib&);
             ImageResampler(const std::vector<uint16_t>& vNoSamples = {}, const std::map<uint16_t, uint16_t>& mFromTo = {},
                 std::string sImgType ="") :
-                m_mapSampleFromTo(mFromTo), m_vectNoSamplingDone(vNoSamples), m_ImageType(sImgType) {}
+                m_mapSampleFromTo(mFromTo), m_vectNoSamplingDone(vNoSamples), m_ImageType(sImgType), m_nResampleStatus(0) {}
+            int GetResampleStatus() const { return m_nResampleStatus; }
     };
 
     class ResampleFactory

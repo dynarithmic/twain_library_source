@@ -18,7 +18,7 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctltrp.h"
+#include "ctltripletbase.h"
 #include "ctltwainmanager.h"
 #include "dtwain_resource_constants.h"
 

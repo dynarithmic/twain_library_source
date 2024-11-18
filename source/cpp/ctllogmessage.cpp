@@ -21,6 +21,7 @@
 #include "dtwain.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
+#include "logwriterutils.h"
 using namespace dynarithmic;
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LogMessage(LPCTSTR message)
@@ -30,7 +31,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LogMessage(LPCTSTR message)
     {
         auto prefix = StringConversion::Convert_Ansi_To_Native(GetResourceStringFromMap(IDS_DTWAIN_USERMSG_INDICATOR));
         const CTL_StringType sMsg = prefix + StringTraits::GetSpace() + message;
-        CTL_TwainAppMgr::WriteLogInfo(sMsg);
+        LogWriterUtils::WriteLogInfo(sMsg);
         return TRUE;
     }
     return FALSE;

@@ -44,9 +44,6 @@
 #define LPBimage(lpbi)  ((HPSTR)lpbi+lpbi->biSize+(long)(lpbi->biClrUsed*sizeof(RGBQUAD)))
 #define LPBlinewidth(lpbi) (WIDTHBYTES((WORD)lpbi->biWidth*lpbi->biBitCount))
 
-#ifdef USE_NAMESPACES
-
-#endif
 using namespace dynarithmic;
 
 CTL_TwainDibInfo::CTL_TwainDibInfo() : m_hDib(nullptr), m_hPal(nullptr)

@@ -26,13 +26,6 @@
 #endif
 using namespace dynarithmic;
 
-template <typename LoggerProc, typename CallBackType, typename UserDataType>
-static void LoggerCallBackSetter(LoggerProc lprocIn, LoggerProc& lProcOut, UserDataType& userOut, DTWAIN_LONG64 UserData)
-{
-    lProcOut = lprocIn;
-    userOut = UserData;
-}
-
 DTWAIN_LOGGER_PROC DLLENTRY_DEF DTWAIN_GetLoggerCallback(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_NONAME_PARAMS()

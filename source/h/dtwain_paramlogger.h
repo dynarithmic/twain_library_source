@@ -1,6 +1,7 @@
 #ifndef DTWAIN_PARAMLOGGER_H
 #define DTWAIN_PARAMLOGGER_H
 
+#if DTWAIN_BUILD_LOGCALLSTACK == 1
 #include <string>
 #include <sstream>
 #include "dtwaindefs.h"
@@ -112,15 +113,16 @@ namespace dynarithmic
     std::string LogValue(std::string func, bool isIn, T retValue, P ...p)
     {
         std::string s;
-        if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_CALLSTACK)
+        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK)
         {
             if (isIn)
                 s = CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_IN) + ParamOutputter2(false, std::forward<P>(p)...).getString();
             else
                 s = CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_OUT) + ParamOutputter2(true, retValue).getString();
-            CTL_TwainAppMgr::WriteLogInfoA(s);
+            LogWriterUtils::WriteLogInfoA(s);
         }
         return s;
     }
 }
+#endif
 #endif

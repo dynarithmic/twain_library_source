@@ -29,11 +29,11 @@
 #include <pdfconst.h>
 #include <utility>
 #include <memory>
-#include <pdflib32.h>
 #include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "ctlfileutils.h"
 #include "dtwain_float_utils.h"
+#include "logwriterutils.h"
 
 using namespace dynarithmic;
 
@@ -318,11 +318,11 @@ int CPDFImageHandler::InitializePDFPage(const PDFINFO* pPDFInfo, HANDLE bitmap)
         sDimensions = sBuf.str();
         pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_MEDIABOX, sDimensions.c_str());
 
-        if ( CTL_StaticData::s_logFilterFlags )
+        if ( CTL_StaticData::GetLogFilterFlags() )
         {
             std::string sOut = "PDF Computed media box: ";
             sOut += sDimensions;
-            CTL_TwainAppMgr::WriteLogInfoA(sOut);
+            LogWriterUtils::WriteLogInfoIndentedA(sOut);
         }
     }
 
