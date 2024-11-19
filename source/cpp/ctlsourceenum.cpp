@@ -30,7 +30,7 @@ using namespace dynarithmic;
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSourcesEx()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     DTWAIN_ARRAY pArray = nullptr;
     DTWAIN_EnumSources(&pArray);
     LOG_FUNC_EXIT_NONAME_PARAMS(pArray)
