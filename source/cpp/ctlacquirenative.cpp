@@ -31,7 +31,7 @@ using namespace dynarithmic;
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireNative(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus)
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS(Source, PixelType, nMaxPages, bShowUI, bCloseSource, pStatus) 
+    LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, pStatus)) 
     auto [pHandle, pSource] = VerifyHandles(Source);
     SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pSource->GetDTWAINHandle()).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
                                                            setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setAcquireType(ACQUIRENATIVE);
@@ -51,7 +51,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireNative(DTWAIN_SOURCE Source, LONG PixelT
 DTWAIN_BOOL   DLLENTRY_DEF  DTWAIN_AcquireNativeEx(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource,DTWAIN_ARRAY Acquisitions,
                                                    LPLONG pStatus)
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS(Source, PixelType, nMaxPages, bShowUI, bCloseSource, Acquisitions, pStatus)
+    LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, Acquisitions, pStatus))
     auto [pHandle, pSource] = VerifyHandles(Source);
     SourceAcquireOptions opts = SourceAcquireOptions().setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
             setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setUserArray(Acquisitions).

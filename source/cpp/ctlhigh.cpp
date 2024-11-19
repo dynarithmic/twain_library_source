@@ -49,8 +49,12 @@ static LONG EnumCapInternal(DTWAIN_SOURCE Source,
                             const std::string& func,
                             const std::string& paramLog);
 
-#define GENERATE_PARAM_LOG(argVals) \
-        (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) ? (ParamOutputter((#argVals)).outputParam argVals.getString()) : ("")
+#if DTWAIN_BUILD_LOGCALLSTACK == 1
+    #define GENERATE_PARAM_LOG(argVals) \
+            (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) ? (ParamOutputter((#argVals)).outputParam argVals.getString()) : ("")
+#else
+    #define GENERATE_PARAM_LOG(argVals) {}
+#endif
 
 template <typename CapArrayType>
 static bool GetCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, typename CapArrayType::value_type* value,
@@ -107,11 +111,11 @@ struct SetSupportFn2 : public SetSupportFn1<T>
 template <typename T, typename FnToCall>
 static T FunctionCaller(FnToCall fn, const std::string& func, const std::string& paramLog)
 {
-    const bool doLog = CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK ? true : false;
     try
     {
         T bRet {};
         #if DTWAIN_BUILD_LOGCALLSTACK == 1
+        const bool doLog = CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK ? true : false;
         if (doLog)
         {
             try { LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_IN) + paramLog); }
@@ -160,7 +164,7 @@ struct CapSetterFn
     LPCTSTR value;
     SetByStringFn fn;
     CapSetterFn(DTWAIN_SOURCE src, LPCTSTR val, SetByStringFn theFn) : Source(src), value(val), fn(theFn) {}
-    DTWAIN_BOOL operator()()
+    DTWAIN_BOOL operator()() const
     {
         return DTWAIN_SetDeviceCapByString(Source, value, fn);
     }

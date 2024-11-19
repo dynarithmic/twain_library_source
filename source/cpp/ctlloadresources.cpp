@@ -140,7 +140,7 @@ namespace dynarithmic
 
     bool LoadTwainResources(ResourceLoadingInfo& retValue)
     {
-        LOG_FUNC_ENTRY_NONAME_PARAMS()
+        LOG_FUNC_ENTRY_PARAMS(())
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] = true;
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INIFILE_LOADED] = true;
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_VERSION_READ] = true;
