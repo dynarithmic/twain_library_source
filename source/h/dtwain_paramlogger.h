@@ -6,8 +6,184 @@
 #include <sstream>
 #include "dtwaindefs.h"
 #include "dtwain_resource_constants2.h"
+#include "ctlobstr.h"
+#include "ctlloadresources.h"
+
 namespace dynarithmic
 {
+    // outputs parameter and return values
+    class ParamOutputter
+    {
+        StringArray aParamNames;
+        size_t nWhich;
+        std::string argNames;
+        std::ostringstream strm;
+        bool m_bIsReturnValue;
+        bool m_bOutputAsString;
+
+    private:
+        void LogType(std::string outStr, const char* ptr)
+        {
+            // ptr must be a pointer to a valid null terminated string, or nullptr.
+            if (ptr)
+                strm << outStr << "=\"" << ptr << "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")";
+            else
+                strm << outStr << "=(null)";
+        }
+
+        void LogType(std::string outStr, const wchar_t* ptr)
+        {
+            // ptr must be a pointer to a valid null terminated string, or nullptr.
+            if (ptr)
+                strm << outStr << "=\"" << StringConversion::Convert_WidePtr_To_Ansi(ptr) <<
+                "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")";
+            else
+                strm << outStr << "=(null)";
+        }
+
+        template <typename T>
+        void LogType(std::string outStr, const T* ptr)
+        {
+            // ptr is a valid pointer to double supplied by the user
+            if (ptr)
+            {
+                if (!m_bOutputAsString)
+                    strm << outStr << "=0x" << std::hex << static_cast<const void*>(ptr);
+                else
+                    strm << outStr << *ptr;
+            }
+            else
+                strm << outStr << "=(null)";
+        }
+
+        template <typename T>
+        void LogType(std::string outStr, T t, std::enable_if_t<std::is_pointer_v<T> >* = nullptr)
+        {
+            struct asStringRAII
+            {
+                bool* pAsString;
+                bool orig;
+                asStringRAII(bool* asString) : pAsString(asString), orig(*asString) {}
+                ~asStringRAII() { *pAsString = orig; }
+            };
+
+            asStringRAII raii(&m_bOutputAsString);
+
+            if constexpr (std::is_same_v<T, wchar_t*>)
+            {
+                if (m_bOutputAsString)
+                    LogType(outStr, static_cast<const wchar_t*>(t));
+                else
+                    if (t)
+                        strm << outStr << "0x" << std::hex << t;
+                    else
+                        strm << outStr << "=(null)";
+            }
+            else
+                if constexpr (std::is_same_v<T, char*>)
+                {
+                    if (m_bOutputAsString)
+                        LogType(outStr, static_cast<const char*>(t));
+                    else
+                        if (t)
+                            strm << outStr << "0x" << std::hex << t;
+                        else
+                            strm << outStr << "=(null)";
+                }
+                else
+                    if constexpr (std::is_pointer_v<T> && !std::is_same_v<T, void*>
+                        && std::is_fundamental_v<std::remove_pointer_t<T>>)
+                    {
+                        if (m_bOutputAsString)
+                        {
+                            if (t)
+                                strm << outStr << "=" << *t;
+                            else
+                                strm << outStr << "=" << "(null)";
+                        }
+                        else
+                        {
+                            if (t)
+                                strm << outStr << "=" << t;
+                            else
+                                strm << outStr << "=" << "(null)";
+                        }
+                    }
+                    else
+                        if constexpr (std::is_pointer_v<T>)
+                        {
+                            if (t)
+                                strm << outStr << "=0x" << std::hex << static_cast<const void*>(t);
+                            else
+                                strm << outStr << "=" << "(null)";
+                        }
+                        else
+                            strm << outStr << "=" << t;
+        }
+
+        template <typename T>
+        void LogType(std::string outStr, T t, std::enable_if_t<!std::is_pointer_v<T> >* = nullptr)
+        {
+            strm << outStr << "=" << t;
+        }
+
+    public:
+        ParamOutputter(const std::string& s, bool isReturnValue = false) :
+            nWhich(0), m_bIsReturnValue(isReturnValue), m_bOutputAsString(false)
+        {
+            StringWrapperA::Tokenize(s, "(, )", aParamNames);
+            if (!m_bIsReturnValue)
+                strm << "(";
+            else
+                strm << s << " " << dynarithmic::GetResourceStringFromMap(IDS_LOGMSG_RETURNTEXT) << " ";
+        }
+
+        ParamOutputter& setOutputAsString(bool bSet) noexcept
+        {
+            m_bOutputAsString = bSet;
+            return *this;
+        }
+
+        template <typename T, typename ...P>
+        ParamOutputter& outputParam(T t, P ...p)
+        {
+            if (aParamNames.empty() && !m_bIsReturnValue)
+                return *this;
+            const bool bIsNull = std::is_pointer_v<T> && !t;
+            if (!m_bIsReturnValue)
+            {
+                // Make sure we log types correctly, especially character pointers.
+                // User may supply to us a writable char buffer that is not null-terminated!
+                LogType(aParamNames[nWhich], t);
+            }
+            else
+            {
+                if (bIsNull)
+                    strm << "(null)";
+                else
+                    strm << t;
+            }
+            if (!m_bIsReturnValue)
+            {
+                if (nWhich < aParamNames.size() - 1)
+                    strm << ", ";
+                else
+                    strm << ")";
+            }
+            ++nWhich;
+            if (sizeof...(p))
+                outputParam(p...);
+            return *this;
+        }
+
+        ParamOutputter& outputParam()
+        {
+            strm << ")"; return *this;
+        }
+
+        std::string getString() const { return strm.str(); }
+    };
+
     class ParamOutputter2
     {
         int nWhich;

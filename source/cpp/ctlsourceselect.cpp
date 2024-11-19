@@ -123,7 +123,7 @@ static DTWAIN_SOURCE SelectSourceHelper(CTL_TwainDLLHandle* pHandle, SourceSelec
 
 DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSource()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     DTWAIN_SOURCE Source = SelectSourceHelper(pHandle, SourceSelectionOptions(SELECTSOURCE, IDS_SELECT_SOURCE_TEXT), {indeterminate});
     LOG_FUNC_EXIT_NONAME_PARAMS(Source)
@@ -132,7 +132,7 @@ DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSource()
 
 DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectDefaultSource()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     DTWAIN_SOURCE Source = SelectSourceHelper(pHandle, SourceSelectionOptions(SELECTDEFAULTSOURCE, IDS_SELECT_SOURCE_TEXT), {indeterminate});
     LOG_FUNC_EXIT_NONAME_PARAMS(Source)
@@ -295,7 +295,7 @@ DTWAIN_SOURCE dynarithmic::SourceSelect(CTL_TwainDLLHandle* pHandle, SourceSelec
 
 DTWAIN_SOURCE dynarithmic::DTWAIN_LLSelectSource(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& /*opt*/)
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     // Select a source from the source dialog
     const CTL_ITwainSource *pSource = CTL_TwainAppMgr::SelectSourceDlg( pHandle->m_pTwainSession );
     // Check if a source was selected

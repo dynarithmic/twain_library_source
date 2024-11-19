@@ -101,7 +101,7 @@ void CTL_ErrorStructDecoder::StartMessageDecoder(HWND hWnd, UINT nMsg,
 {
     StringStreamA sBuffer;
     m_pString.clear();
-    auto notification_name = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DTWAIN_TN, wParam);
+    auto notification_name = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DTWAIN_TN, static_cast<int>(wParam));
     if ( !notification_name.empty() )
         sBuffer << "DTWAIN Message(HWND=" << hWnd << ", " <<
                                     "MSG=" << nMsg << ", " <<

@@ -251,7 +251,7 @@ DTWAIN_BOOL DTWAIN_GetVersionInternal(LPLONG lMajor, LPLONG lMinor, LPLONG lVers
 
 LONG DLLENTRY_DEF DTWAIN_GetStaticLibVersion()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     #ifndef DTWAIN_LIB
         LOG_FUNC_EXIT_NONAME_PARAMS(0)
         #pragma message ("Compiling DLL -- no static library")
@@ -307,7 +307,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTwainMsg(MSG *pMsg)
 
 LONG DLLENTRY_DEF DTWAIN_GetLastError()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
     if ( !pHandle )
     {
@@ -482,7 +482,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstant(LONG lConstantType, LONG lTwai
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsInitialized()
 {
     // Get the Current task
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     const DWORD hTask = getThreadId();
 
 #ifdef DTWAIN_LIB
@@ -557,7 +557,7 @@ DTWAIN_HANDLE dynarithmic::GetDTWAINHandle_Internal()
 
 DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_GetDTWAINHandle()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     LOG_FUNC_EXIT_NONAME_PARAMS(::GetDTWAINHandle_Internal())
     CATCH_BLOCK(DTWAIN_HANDLE(0))
 }
@@ -653,7 +653,7 @@ static LONG IsTwainAvailableHelper(LPTSTR directories, LONG nMaxLen)
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTwainAvailable()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto retVal = IsTwainAvailableHelper(nullptr, 0);
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal > 0 ? true : false)
     CATCH_BLOCK(0)
@@ -661,7 +661,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTwainAvailable()
 
 LONG DLLENTRY_DEF DTWAIN_IsTwainAvailableEx(LPTSTR directories, LONG nMaxLen)
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto retVal = IsTwainAvailableHelper(directories, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((directories))
     LOG_FUNC_EXIT_NONAME_PARAMS((std::max)(retVal, 0L))
@@ -671,7 +671,7 @@ LONG DLLENTRY_DEF DTWAIN_IsTwainAvailableEx(LPTSTR directories, LONG nMaxLen)
 // Test which version of TWAIN is available.
 LONG DLLENTRY_DEF DTWAIN_GetTwainAvailability()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto availability = GetTwainAvailablityInternal();
     LOG_FUNC_EXIT_NONAME_PARAMS(availability.first)
@@ -681,7 +681,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainAvailability()
 // Test which version of TWAIN is available.
 LONG DLLENTRY_DEF DTWAIN_GetTwainAvailabilityEx(LPTSTR directories, LONG nMaxLen)
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto availability = GetTwainAvailablityInternal();
 
@@ -853,7 +853,7 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
     CTL_StaticData::GetLogFilterFlags() = 0;
     CTL_StaticData::s_nRegisteredDTWAINMsg = ::RegisterWindowMessage(REGISTERED_DTWAIN_MSG);
 #endif
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
 
     CTL_TwainDLLHandlePtr pHandlePtr;
     // Return handle if already registered
@@ -932,13 +932,13 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
                 WriteVersionToLog(pHandle);
                 pHandle->SetVersionString(GetVersionString());
             }
-            LOG_FUNC_ENTRY_NONAME_PARAMS()
+            LOG_FUNC_ENTRY_PARAMS(())
             LOG_FUNC_EXIT_NONAME_PARAMS(static_cast<DTWAIN_HANDLE>(pHandle))
             CATCH_BLOCK(DTWAIN_HANDLE(0))
         }
         else
         {
-            LOG_FUNC_ENTRY_NONAME_PARAMS()
+            LOG_FUNC_ENTRY_PARAMS(())
             LOG_FUNC_EXIT_NONAME_PARAMS(static_cast<DTWAIN_HANDLE>(pHandle))
             CATCH_BLOCK(DTWAIN_HANDLE(0))
         }
@@ -1250,7 +1250,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetLanguage(LONG nLanguage)
 
 LONG DLLENTRY_DEF DTWAIN_GetCountry()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_SessionStruct.nCountry)
     CATCH_BLOCK(DTWAIN_FAILURE1)
@@ -1258,7 +1258,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCountry()
 
 LONG DLLENTRY_DEF DTWAIN_GetLanguage()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_SessionStruct.nLanguage)
     CATCH_BLOCK(DTWAIN_FAILURE1)
@@ -1322,7 +1322,7 @@ DTWAIN_BOOL DTWAIN_SetSourceCloseMode(LONG lCloseMode)
 
 LONG DTWAIN_GetSourceCloseMode()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_nSourceCloseMode)
     CATCH_BLOCK(0)
@@ -1330,7 +1330,7 @@ LONG DTWAIN_GetSourceCloseMode()
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSessionEnabled()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     if ( pHandle->m_bSessionAllocated )
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -1525,7 +1525,7 @@ LONG DLLENTRY_DEF DTWAIN_GetFileTypeExtensions(LONG nType, LPTSTR lpszName, LONG
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSupportedFileTypes(VOID_PROTOTYPE)
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypes(pHandle, 0))
     CATCH_BLOCK(nullptr)
@@ -1533,7 +1533,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSupportedFileTypes(VOID_PROTOTYPE)
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSupportedMultiPageFileTypes(VOID_PROTOTYPE)
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypes(pHandle, 2))
     CATCH_BLOCK(nullptr)
@@ -1541,7 +1541,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSupportedMultiPageFileTypes(VOID_PROTOTYPE)
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSupportedSinglePageFileTypes(VOID_PROTOTYPE)
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypes(pHandle, 1))
     CATCH_BLOCK(nullptr)
@@ -1601,7 +1601,7 @@ static bool FindTask( DWORD hTask )
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     // Delete it
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&]{return DTWAIN_IsAcquiring()==1;}, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
@@ -1705,7 +1705,7 @@ void dynarithmic::SysDestroyNoCheck()
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SysDestroy()
 {
     std::lock_guard<std::mutex> lg(CTL_StaticData::s_mutexInitDestroy);
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     if (!DTWAIN_EndTwainSession())
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
@@ -1778,7 +1778,7 @@ static bool SysDestroyHelper(const char* pParentFunc, CTL_TwainDLLHandle* pHandl
 /* This function tests all open DLL handles to see if any source is acquiring */
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsAcquiring()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const auto iter = std::find_if(pHandle->m_mapStringToSource.begin(),
                                    pHandle->m_mapStringToSource.end(), 
@@ -1791,7 +1791,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsAcquiring()
 
 HWND  DLLENTRY_DEF  DTWAIN_GetTwainHwnd()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_hWndTwain)
     CATCH_BLOCK(HWND(0))
@@ -1799,7 +1799,7 @@ HWND  DLLENTRY_DEF  DTWAIN_GetTwainHwnd()
 
 LONG DTWAIN_CloseAllSources()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
 
     // See if DLL Handle exists
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
@@ -1820,7 +1820,7 @@ LONG DTWAIN_CloseAllSources()
 
 LONG DLLENTRY_DEF DTWAIN_GetTwainMode()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_lAcquireMode)
     CATCH_BLOCK(-1L)
@@ -1845,7 +1845,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainMode(LONG lMode)
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTIFFSupported(VOID_PROTOTYPE)
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
@@ -1854,21 +1854,21 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTIFFSupported(VOID_PROTOTYPE)
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPDFSupported(VOID_PROTOTYPE)
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPNGSupported(VOID_PROTOTYPE)
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsJPEGSupported(VOID_PROTOTYPE)
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
@@ -1909,7 +1909,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDSMSearchOrder(LONG SearchOrder)
 
 LONG DLLENTRY_DEF DTWAIN_GetDSMSearchOrder(VOID_PROTOTYPE)
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const LONG SearchOrder = pHandle->m_TwainDSMSearchOrder;
     LOG_FUNC_EXIT_NONAME_PARAMS(SearchOrder)

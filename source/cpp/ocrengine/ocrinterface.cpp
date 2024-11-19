@@ -630,7 +630,7 @@ void dynarithmic::UnloadOCRInterfaces(CTL_TwainDLLHandle *pHandle)
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitOCRInterface()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     
     if (pHandle->m_OCRInterfaceArray.empty())
