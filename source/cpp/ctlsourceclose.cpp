@@ -67,7 +67,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CloseSourceUI(DTWAIN_SOURCE Source)
 
 DTWAIN_BOOL DTWAIN_CloseSourceUnconditional(CTL_TwainDLLHandle *pHandle, CTL_ITwainSource *p)
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     bool bRetval = false;
 
     if (pHandle->m_nSourceCloseMode == DTWAIN_SourceCloseModeFORCE &&

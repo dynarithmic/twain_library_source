@@ -37,7 +37,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainTimeout( LONG milliseconds )
 
 LONG DLLENTRY_DEF DTWAIN_GetTwainTimeout()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     if ( !IsDLLHandleValid( pHandle, FALSE ) )
         LOG_FUNC_EXIT_NONAME_PARAMS(-1)

@@ -47,7 +47,7 @@ static void SetNotification(CTL_TwainDLLHandle* pHandle, bool& notification, DTW
 
 LONG DLLENTRY_DEF DTWAIN_GetRegisteredMsg()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     LOG_FUNC_EXIT_NONAME_PARAMS(CTL_StaticData::GetRegisteredMessage())
     CATCH_BLOCK(0L)
 }
@@ -73,7 +73,7 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_EnableTripletsNotify(DTWAIN_BOOL bSet)
 
 DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsMsgNotifyEnabled()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_bNotificationsUsed)
     CATCH_BLOCK(false)
@@ -81,7 +81,7 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsMsgNotifyEnabled()
 
 DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsNotifyTripletsEnabled()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_bNotifyTripletsUsed)
     CATCH_BLOCK(false)
@@ -115,7 +115,7 @@ DTWAIN_CALLBACK_PROC64 DLLENTRY_DEF DTWAIN_SetCallback64(DTWAIN_CALLBACK_PROC64 
 
 DTWAIN_CALLBACK_PROC DLLENTRY_DEF DTWAIN_GetCallback()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_pCallbackFn)
     CATCH_BLOCK(DTWAIN_CALLBACK_PROC())
@@ -123,7 +123,7 @@ DTWAIN_CALLBACK_PROC DLLENTRY_DEF DTWAIN_GetCallback()
 
 DTWAIN_CALLBACK_PROC64 DLLENTRY_DEF DTWAIN_GetCallback64()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_pCallbackFn64)
     CATCH_BLOCK(DTWAIN_CALLBACK_PROC64())

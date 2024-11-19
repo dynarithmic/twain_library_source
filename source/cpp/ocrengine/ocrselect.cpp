@@ -50,7 +50,7 @@ static DTWAIN_OCRENGINE SelectOCREngine(CTL_TwainDLLHandle* pHandle, SourceSelec
 
 DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectDefaultOCREngine()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pDummy] = VerifyOCRHandles();
     auto pH = pHandle;
 
@@ -95,7 +95,7 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngineByName(LPCTSTR lpszName)
 
 DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pEngine] = VerifyOCRHandles();
     SourceSelectionOptions opts(SELECTSOURCE, IDS_SELECT_OCRENGINE_TEXT,
                                 nullptr,
@@ -113,7 +113,7 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine2(HWND hWndParent,
                                                       LONG yPos,
                                                       LONG nOptions)
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS(hWndParent, szTitle, xPos, yPos, nOptions)
+    LOG_FUNC_ENTRY_PARAMS((hWndParent, szTitle, xPos, yPos, nOptions))
     auto [pHandle, pEngine] = VerifyOCRHandles();
     SourceSelectionOptions opts(SELECTSOURCE, IDS_SELECT_OCRENGINE_TEXT,
                                 nullptr,
@@ -134,7 +134,7 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine2Ex(HWND hWndParent,
                                                         LPCTSTR szNameMapping,
                                                         LONG nOptions)
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS(hWndParent, szTitle, xPos, yPos, nOptions)
+    LOG_FUNC_ENTRY_PARAMS((hWndParent, szTitle, xPos, yPos, nOptions))
     auto [pHandle, pEngine] = VerifyOCRHandles();
     SourceSelectionOptions opts(SELECTSOURCE, IDS_SELECT_OCRENGINE_TEXT,
                                 nullptr,
