@@ -83,6 +83,9 @@
 1067 Beschikbare uitgebreide afbeeldingsinformatie waarde
 1068 Ongeldig bitmap teruggegeven door TWAIN-bron (TWAINDSM 2.x)
 1069 Geen afbeeldingen verkregen.
+1070 Afbeeldingsfout  
+1071 Onbekende TWAIN Terugkeer Code  
+1072 Onbekende TWAIN Voorwaarde Code  
 1100 TWAIN Gesteldheid niet Code: niet voleindigde operaties.   Ontoerijkende Herinnering
 1101 TWAIN Gesteldheid Code: Vergissing
 1102 TWAIN Gesteldheid Code: Unknown oorzaak of mislukking
@@ -235,6 +238,8 @@
 3021 Afbeeldingsbestand is succesvol aangemaakt
 3022 Waarden ingesteld bij terugkeer
 3023 Meer
+3024 Capaciteitenlijst
+3025 Standaardbron
 9700 DTWAIN Twain Library, v{short_version}, {company_name}, {copyright}
 9999 Exception error occurred during call to Twain DSM.  Possible corrupted Twain session?
 10000 [Gebruikersbericht]

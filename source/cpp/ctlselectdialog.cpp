@@ -21,13 +21,9 @@
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
 #include "ctltmpl5.h"
-#include "dtwstrfn.h"
 #include "sourceselectopts.h"
 #include "errorcheck.h"
 #include "../simpleini/simpleini.h"
-#include "ctlfileutils.h"
-#include "ctldefsource.h"
-#include "ctlthreadutils.h"
 #include <boost/logic/tribool.hpp>
 
 using namespace dynarithmic;
@@ -239,192 +235,165 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
     bool bLogMessages = (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS) ? true : false;
     switch (message)
     {
-    case WM_INITDIALOG:
-    {
-        DTWAINDeviceContextRelease_RAII contextRAII;
-        if (CTL_StaticData::GetDialogFont())
+        case WM_INITDIALOG:
         {
-            SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(CTL_StaticData::GetDialogFont()), 0);
-            EnumChildWindows(hWnd, ChildEnumFontProc, reinterpret_cast<LPARAM>(CTL_StaticData::GetDialogFont()));
-        }
+            DTWAINDeviceContextRelease_RAII contextRAII;
+            if (CTL_StaticData::GetDialogFont())
+            {
+                SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(CTL_StaticData::GetDialogFont()), 0);
+                EnumChildWindows(hWnd, ChildEnumFontProc, reinterpret_cast<LPARAM>(CTL_StaticData::GetDialogFont()));
+            }
 
-        HWND lstSources;
-        if (bLogMessages)
-            LogWriterUtils::WriteLogInfoIndentedA("Initializing TWAIN Dialog...");
-        pS = reinterpret_cast<SelectStruct*>(lParam);
+            HWND lstSources;
+            pS = reinterpret_cast<SelectStruct*>(lParam);
 
-        if (pS->CS.nOptions & DTWAIN_DLG_CENTER_SCREEN)
-            CenterWindow(hWnd, nullptr);
-        else
-        if (pS->CS.nOptions & DTWAIN_DLG_CENTER)
-            CenterWindow(hWnd, GetParent(hWnd));
-        else
-            SetWindowPos(hWnd, nullptr, pS->CS.xpos, pS->CS.ypos, 0, 0, SWP_NOSIZE);
-        lstSources = GetDlgItem(hWnd, IDC_LSTSOURCES);
+            if (pS->CS.nOptions & DTWAIN_DLG_CENTER_SCREEN)
+                CenterWindow(hWnd, nullptr);
+            else
+            if (pS->CS.nOptions & DTWAIN_DLG_CENTER)
+                CenterWindow(hWnd, GetParent(hWnd));
+            else
+                SetWindowPos(hWnd, nullptr, pS->CS.xpos, pS->CS.ypos, 0, 0, SWP_NOSIZE);
+            lstSources = GetDlgItem(hWnd, IDC_LSTSOURCES);
 
-        // Set the title
-        ::SetWindowText(hWnd, pS->CS.sTitle.c_str());
+            // Set the title
+            ::SetWindowText(hWnd, pS->CS.sTitle.c_str());
 
-        // Fill the list box with the sources
-        auto vValues = pS->getNameListFunc(*pS);
-        int nCount;
-        if (vValues.empty())
-            nCount = 0;
-        else
-            nCount = static_cast<int>(vValues.size());
-        pS->nItems = nCount;
-        if (nCount == 0)
-        {
-            HWND hWndSelect = GetDlgItem(hWnd, IDOK);
-            if (hWndSelect)
-                EnableWindow(hWndSelect, FALSE);
+            // Fill the list box with the sources
+            auto vValues = pS->getNameListFunc(*pS);
+            int nCount;
+            if (vValues.empty())
+                nCount = 0;
+            else
+                nCount = static_cast<int>(vValues.size());
+            pS->nItems = nCount;
+            if (nCount == 0)
+            {
+                HWND hWndSelect = GetDlgItem(hWnd, IDOK);
+                if (hWndSelect)
+                    EnableWindow(hWndSelect, FALSE);
+
+                // Display the local strings if they are available:
+                DisplayLocalString(hWnd, IDOK, IDS_SELECT_TEXT);
+                DisplayLocalString(hWnd, IDCANCEL, IDS_CANCEL_TEXT);
+                DisplayLocalString(hWnd, IDC_SOURCETEXT, IDS_SOURCES_TEXT);
+                SetFocus(hWnd);
+                return TRUE;
+            }
+
+            // Get the default Source
+            std::vector<TCHAR> DefName;
+            bool bAlwaysHighlightFirst = pS->CS.nOptions & DTWAIN_DLG_HIGHLIGHTFIRST;
+            DefName = pS->getDefaultFunc(*pS);
             if (bLogMessages)
-                LogWriterUtils::WriteLogInfoIndentedA("Finished Adding names to Selection dialog...");
+            {
+                StringStreamA strm;
+                strm << GetResourceStringFromMap(IDS_LOGMSG_DEFAULTSOURCE) << ": \"" <<
+                    StringConversion::Convert_NativePtr_To_Ansi(DefName.data()).c_str() << "\" ...";
+                LogWriterUtils::WriteLogInfoIndentedA(strm.str());
+            }
+
+            std::vector<SIZE> TextExtents;
+            HDC hdcList = nullptr;
+            if (pS->CS.nOptions & DTWAIN_DLG_HORIZONTALSCROLL)
+            {
+                hdcList = GetDC(lstSources);
+                auto pr = std::make_pair(lstSources, hdcList);
+                contextRAII.reset(&pr);
+            }
+
+            std::vector<CTL_StringType> vSourceNames = vValues;
+            std::vector<CTL_StringType> vNewSourceNames;
+
+            if (!vValues.empty())
+            {
+                // Remove and rename sources depending on the options
+                vNewSourceNames = AdjustSourceNames(vSourceNames, pS->CS);
+                for (auto& sName : vNewSourceNames)
+                {
+                    SIZE szType;
+                    if (hdcList)
+                    {
+                        auto cstr = sName.c_str();
+                        ::GetTextExtentPoint32(hdcList, cstr, static_cast<int>(StringWrapper::traits_type::Length(cstr)), &szType);
+                        TextExtents.push_back(szType);
+                    }
+                }
+
+                if (hdcList)
+                {
+                    sort(TextExtents.begin(), TextExtents.end(), [](SIZE sz1, SIZE sz2) { return sz1.cx > sz2.cx; });
+                }
+
+                // Sort the names
+                if (pS->CS.nOptions & DTWAIN_DLG_SORTNAMES)
+                {
+                    sort(vNewSourceNames.begin(), vNewSourceNames.end());
+                }
+            }
+            LRESULT index;
+            LRESULT DefIndex = 0;
+            if (bLogMessages)
+            {
+                int nCounter = 1;
+                CTL_StringStreamType strm2;
+                auto nl = StringWrapper::traits_type::GetNewLineString();
+                strm2 << nl << "----- " << GetResourceStringFromMap_Native(IDS_SOURCES_TEXT) << nl <<
+                    StringWrapper::JoinEx(vNewSourceNames.begin(), vNewSourceNames.end(),
+                        [&](const CTL_StringType& str, const CTL_StringType& val)
+                        {
+                            CTL_StringStreamType strmInner;
+                            strmInner << str << nl << nCounter << _T(") ") << val;
+                            ++nCounter;
+                            return strmInner.str();
+                        }
+                    ) << nl << "-----";
+                LogWriterUtils::WriteMultiLineInfoIndented(strm2.str(), nl);
+            }
+            for (auto& sName : vNewSourceNames)
+            {
+                index = SendMessage(lstSources, LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(sName.c_str()));
+                if (!DefName.empty())
+                {
+                    if (StringWrapper::traits_type::Compare(sName.c_str(), static_cast<LPCTSTR>(DefName.data())) == 0)
+                        DefIndex = index;
+                }
+            }
+            if (bAlwaysHighlightFirst || DefName.empty())
+                DefIndex = 0;
+
+            if (!TextExtents.empty())
+            {
+                SendMessage(lstSources, LB_SETCURSEL, DefIndex, 0);
+                if (pS->CS.nOptions & DTWAIN_DLG_HORIZONTALSCROLL)
+                    SendMessage(lstSources, LB_SETHORIZONTALEXTENT, TextExtents[0].cx, 0);
+            }
+            else
+                SendMessage(lstSources, LB_SETCURSEL, DefIndex, 0);
 
             // Display the local strings if they are available:
             DisplayLocalString(hWnd, IDOK, IDS_SELECT_TEXT);
             DisplayLocalString(hWnd, IDCANCEL, IDS_CANCEL_TEXT);
             DisplayLocalString(hWnd, IDC_SOURCETEXT, IDS_SOURCES_TEXT);
+
+            // Display the window as topmost if topmost flag is on
+            if (pS->CS.nOptions & DTWAIN_DLG_TOPMOSTWINDOW)
+            {
+                ::SetForegroundWindow(hWnd);
+                ::SetWindowPos(hWnd,       // handle to window
+                    HWND_TOPMOST,  // placement-order handle
+                    0,     // horizontal position
+                    0,      // vertical position
+                    0,  // width
+                    0, // height
+                    SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE// window-positioning options
+                );
+            }
             SetFocus(hWnd);
-            if (bLogMessages)
-                LogWriterUtils::WriteLogInfoIndentedA("Finished Initializing Selection Dialog...");
             return TRUE;
         }
 
-        // Get the default Source
-        std::vector<TCHAR> DefName;
-        bool bAlwaysHighlightFirst = pS->CS.nOptions & DTWAIN_DLG_HIGHLIGHTFIRST;
-        if (bLogMessages)
-            LogWriterUtils::WriteLogInfoIndentedA("Initializing Selection Dialog -- Retrieving default TWAIN Source...");
-        DefName = pS->getDefaultFunc(*pS);
-        if (bLogMessages)
-        {
-            if (DefName.empty())
-                LogWriterUtils::WriteLogInfoIndentedA("The Selection default name has no characters...");
-            else
-            {
-                StringStreamA strm;
-                strm << "The default Selection source is \"" <<
-                    StringConversion::Convert_NativePtr_To_Ansi(DefName.data()).c_str() << "\" ...";
-                LogWriterUtils::WriteLogInfoIndentedA(strm.str());
-            }
-        }
-
-        std::vector<SIZE> TextExtents;
-        HDC hdcList = nullptr;
-        if (pS->CS.nOptions & DTWAIN_DLG_HORIZONTALSCROLL)
-        {
-            hdcList = GetDC(lstSources);
-            auto pr = std::make_pair(lstSources, hdcList);
-            contextRAII.reset(&pr);
-        }
-
-        std::vector<CTL_StringType> vSourceNames = vValues;
-        std::vector<CTL_StringType> vNewSourceNames;
-
-        if (!vValues.empty())
-        {
-            // Remove and rename sources depending on the options
-            vNewSourceNames = AdjustSourceNames(vSourceNames, pS->CS);
-            for (auto& sName : vNewSourceNames)
-            {
-                SIZE szType;
-                if (hdcList)
-                {
-                    auto cstr = sName.c_str();
-                    ::GetTextExtentPoint32(hdcList, cstr, static_cast<int>(StringWrapper::traits_type::Length(cstr)), &szType);
-                    TextExtents.push_back(szType);
-                }
-            }
-
-            if (hdcList)
-            {
-                sort(TextExtents.begin(), TextExtents.end(), [](SIZE sz1, SIZE sz2) { return sz1.cx > sz2.cx; });
-            }
-
-            // Sort the names
-            if (pS->CS.nOptions & DTWAIN_DLG_SORTNAMES)
-            {
-                if (bLogMessages)
-                    LogWriterUtils::WriteLogInfoIndentedA("Initializing Selection Dialog -- Sorting Selection Source names...");
-                sort(vNewSourceNames.begin(), vNewSourceNames.end());
-            }
-        }
-        LRESULT index;
-        LRESULT DefIndex = 0;
-        if (bLogMessages)
-        {
-            StringStreamA strm;
-            LogWriterUtils::WriteLogInfoIndentedA("Initializing Selection Dialog -- Adding names to dialog...");
-            strm << "Selection found " << vNewSourceNames.size() << " source names to add to Selection dialog...";
-            LogWriterUtils::WriteLogInfoIndentedA(strm.str());
-            strm.str("");
-            strm << "The Selection dialog window handle to add names is " << lstSources << "";
-            LogWriterUtils::WriteLogInfoIndentedA(strm.str());
-        }
-        CTL_StringStreamType strm2;
-        for (auto& sName : vNewSourceNames)
-        {
-            if (bLogMessages)
-            {
-                strm2.str(_T(""));
-                strm2 << _T("The Selection name being added is ") << sName;
-                LogWriterUtils::WriteLogInfoIndented(strm2.str());
-            }
-            index = SendMessage(lstSources, LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(sName.c_str()));
-            if (bLogMessages)
-            {
-                LogWriterUtils::WriteLogInfoIndentedA("LB_ADDSTRING was sent to Selection dialog...");
-                LogWriterUtils::WriteLogInfoIndentedA("Selection now comparing names...");
-            }
-            if (!DefName.empty())
-            {
-                if (StringWrapper::traits_type::Compare(sName.c_str(), static_cast<LPCTSTR>(&DefName[0])) == 0)
-                    DefIndex = index;
-            }
-            if (bLogMessages)
-                LogWriterUtils::WriteLogInfoIndentedA("Selection now finished comparing names...");
-        }
-        if (bAlwaysHighlightFirst || DefName.empty())
-            DefIndex = 0;
-
-        if (!TextExtents.empty())
-        {
-            SendMessage(lstSources, LB_SETCURSEL, DefIndex, 0);
-            if (pS->CS.nOptions & DTWAIN_DLG_HORIZONTALSCROLL)
-                SendMessage(lstSources, LB_SETHORIZONTALEXTENT, TextExtents[0].cx, 0);
-        }
-        else
-            SendMessage(lstSources, LB_SETCURSEL, DefIndex, 0);
-
-        if (bLogMessages)
-            LogWriterUtils::WriteLogInfoIndentedA("Finished Adding names to Selection dialog...");
-
-        // Display the local strings if they are available:
-        DisplayLocalString(hWnd, IDOK, IDS_SELECT_TEXT);
-        DisplayLocalString(hWnd, IDCANCEL, IDS_CANCEL_TEXT);
-        DisplayLocalString(hWnd, IDC_SOURCETEXT, IDS_SOURCES_TEXT);
-
-        // Display the window as topmost if topmost flag is on
-        if (pS->CS.nOptions & DTWAIN_DLG_TOPMOSTWINDOW)
-        {
-            ::SetForegroundWindow(hWnd);
-            ::SetWindowPos(hWnd,       // handle to window
-                HWND_TOPMOST,  // placement-order handle
-                0,     // horizontal position
-                0,      // vertical position
-                0,  // width
-                0, // height
-                SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE// window-positioning options
-            );
-        }
-        SetFocus(hWnd);
-        if (bLogMessages)
-            LogWriterUtils::WriteLogInfoIndentedA("Finished Initializing Selection Dialog...");
-        return TRUE;
-    }
-
-    case WM_COMMAND:
+        case WM_COMMAND:
         if (LOWORD(wParam) == IDOK)
         {
             HWND lstSources = GetDlgItem(hWnd, IDC_LSTSOURCES);
@@ -440,7 +409,6 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
                 StringWrapper::traits_type::outputstream_type strm;
                 strm << _T("Selected Source name in dialog = \"") << sz << _T("\", Actual Source name = \"") << pS->SourceName << _T("\"");
                 LogWriterUtils::WriteLogInfoIndented(strm.str());
-                LogWriterUtils::WriteLogInfoIndentedA("Finished Initializing Selection Dialog...");
             }
             EndDialog(hWnd, LOWORD(wParam));
             return TRUE;

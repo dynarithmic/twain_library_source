@@ -22,10 +22,7 @@
 #pragma warning (disable : 4786)
 #endif
 #include <cstring>
-#include <cstdio>
-#include <cstdlib>
 #include <algorithm>
-#include <functional>
 #include <memory>
 #include <boost/optional.hpp>
 #include "winconst.h"

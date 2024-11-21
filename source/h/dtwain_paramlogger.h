@@ -8,6 +8,7 @@
 #include "dtwain_resource_constants2.h"
 #include "ctlobstr.h"
 #include "ctlloadresources.h"
+#include "ctlstringutils.h"
 
 namespace dynarithmic
 {
@@ -26,7 +27,8 @@ namespace dynarithmic
         {
             // ptr must be a pointer to a valid null terminated string, or nullptr.
             if (ptr)
-                strm << outStr << "=\"" << ptr << "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")";
+                strm << outStr << "=\"" << TruncateStringWithMore(ptr, 256)
+                     << "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")";
             else
                 strm << outStr << "=(null)";
         }
@@ -35,7 +37,8 @@ namespace dynarithmic
         {
             // ptr must be a pointer to a valid null terminated string, or nullptr.
             if (ptr)
-                strm << outStr << "=\"" << StringConversion::Convert_WidePtr_To_Ansi(ptr) <<
+                strm << outStr << "=\"" << 
+                TruncateStringWithMore(StringConversion::Convert_WidePtr_To_Ansi(ptr), 256) <<
                 "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")";
             else
                 strm << outStr << "=(null)";

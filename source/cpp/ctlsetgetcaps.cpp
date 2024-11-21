@@ -31,7 +31,6 @@
 #include "ctltmpl5.h"
 #include "errorcheck.h"
 #include "ctlutils.h"
-#include "cppfunc.h"
 using namespace dynarithmic;
 
 static DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap,

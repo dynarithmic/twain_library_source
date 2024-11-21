@@ -22,7 +22,6 @@
 #include "ctltr007.h"
 #include "ctltwainsession.h"
 #include "ctltwainmanager.h"
-#include "dtwain_resource_constants.h"
 using namespace dynarithmic;
 #pragma warning (disable : 4714)
 ///////////////// Open Data source manager triplet /////////////////////////
