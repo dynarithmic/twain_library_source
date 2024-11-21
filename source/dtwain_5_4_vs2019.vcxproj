@@ -1479,6 +1479,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\ctlfilesave.h" />
     <ClInclude Include="h\ctlfileutils.h" />
     <ClInclude Include="h\ctlloadresources.h" />
+    <ClInclude Include="h\ctlstringutils.h" />
     <ClInclude Include="h\ctlsupport.h" />
     <ClInclude Include="h\ctlthreadutils.h" />
     <ClInclude Include="h\ctltr037.h" />

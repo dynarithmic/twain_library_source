@@ -83,6 +83,9 @@
 1067 Valor de informação de imagem estendida indisponível
 1068 Bitmap inválido retornado pela Fonte TWAIN (TWAINDSM 2.x)
 1069 Nenhuma imagem adquirida.
+1070 Erro de imagem  
+1071 Código de retorno TWAIN desconhecido  
+1072 Código de condição TWAIN desconhecido  
 1100 Código de Condição TWAIN: Não foi possível completar a operação. Memória insuficiente.
 1101 Código de Condição TWAIN: Sem Erro  
 1102 Código de Condição TWAIN: Causa desconhecida da falha  
@@ -236,6 +239,8 @@
 3021 Arquivo de imagem criado com sucesso  
 3022 Valores definidos no retorno
 3023 Mais
+3024 Lista de Capacidades
+3025 Fonte Padrão
 9700 DTWAIN Twain Library, v{short_version}, {company_name}, {copyright}
 9999 Exception error occurred during call to Twain DSM.  Possible corrupted Twain session?
 9999 Ocorreu um erro de exceção durante a chamada ao DSM Twain. Sessão Twain possivelmente corrompida?

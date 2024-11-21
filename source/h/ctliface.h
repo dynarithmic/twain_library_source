@@ -883,6 +883,7 @@ namespace dynarithmic
     size_t GetResourceStringA(UINT nResNumber, LPSTR buffer, LONG bufSize);
     size_t GetResourceStringW(UINT nResNumber, LPWSTR buffer, LONG bufSize);
     size_t GetResourceString(UINT nResNumber, LPTSTR buffer, LONG bufSize);
+    std::string GetErrorString_Internal(int nError);
     bool LoadLanguageResourceXML(LPCTSTR sLangDLL);
     bool LoadLanguageResourceXMLImpl(LPCTSTR szFile);
     void DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap);

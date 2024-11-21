@@ -63,9 +63,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
     CTL_TwainAppMgr::EnumSources(pHandle->m_pTwainSession, SourceArray);
     std::copy(SourceArray.begin(), SourceArray.end(), std::back_inserter(vEnum));
     auto& status_map = CTL_StaticData::GetSourceStatusMap();
-    std::for_each(SourceArray.begin(), SourceArray.end(), [&](CTL_ITwainSource* pSource)
+    std::for_each(SourceArray.begin(), SourceArray.end(), [&](const CTL_ITwainSource* pSourceInner)
         {
-            std::string sname = pSource->GetProductNameA();
+            std::string sname = pSourceInner->GetProductNameA();
             auto iter = status_map.find(sname);
             if (iter == status_map.end())
             {
