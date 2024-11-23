@@ -83,45 +83,45 @@ namespace dynarithmic
                         strm << outStr << "=(null)";
             }
             else
-                if constexpr (std::is_same_v<T, char*>)
+            if constexpr (std::is_same_v<T, char*>)
+            {
+                if (m_bOutputAsString)
+                    LogType(outStr, static_cast<const char*>(t));
+                else
+                if (t)
+                    strm << outStr << "0x" << std::hex << t;
+                else
+                    strm << outStr << "=(null)";
+            }
+            else
+            if constexpr (std::is_pointer_v<T> && !std::is_same_v<T, void*>
+                && std::is_fundamental_v<std::remove_pointer_t<T>>)
+            {
+                if (m_bOutputAsString)
                 {
-                    if (m_bOutputAsString)
-                        LogType(outStr, static_cast<const char*>(t));
+                    if (t)
+                        strm << outStr << "=" << *t;
                     else
-                        if (t)
-                            strm << outStr << "0x" << std::hex << t;
-                        else
-                            strm << outStr << "=(null)";
+                        strm << outStr << "=" << "(null)";
                 }
                 else
-                    if constexpr (std::is_pointer_v<T> && !std::is_same_v<T, void*>
-                        && std::is_fundamental_v<std::remove_pointer_t<T>>)
-                    {
-                        if (m_bOutputAsString)
-                        {
-                            if (t)
-                                strm << outStr << "=" << *t;
-                            else
-                                strm << outStr << "=" << "(null)";
-                        }
-                        else
-                        {
-                            if (t)
-                                strm << outStr << "=" << t;
-                            else
-                                strm << outStr << "=" << "(null)";
-                        }
-                    }
+                {
+                    if (t)
+                        strm << outStr << "=" << t;
                     else
-                        if constexpr (std::is_pointer_v<T>)
-                        {
-                            if (t)
-                                strm << outStr << "=0x" << std::hex << static_cast<const void*>(t);
-                            else
-                                strm << outStr << "=" << "(null)";
-                        }
-                        else
-                            strm << outStr << "=" << t;
+                        strm << outStr << "=" << "(null)";
+                }
+            }
+            else
+            if constexpr (std::is_pointer_v<T>)
+            {
+                if (t)
+                    strm << outStr << "=0x" << std::hex << static_cast<const void*>(t);
+                else
+                    strm << outStr << "=" << "(null)";
+            }
+            else
+                strm << outStr << "=" << t;
         }
 
         template <typename T>
