@@ -85,12 +85,18 @@ std::string dynarithmic::TruncateStringWithMore(const std::string& origString, s
     // Truncate if text is too long
     if (origString.size() > maxLen)
     {
-        auto tempS = origString;
+        // Get the "More" text
         std::string MoreText = "...(" + GetResourceStringFromMap(IDS_LOGMSG_MORETEXT) + ")...";
-        tempS.resize(maxLen);
+
+		// Get original string and resize it
+		auto tempS = origString.substr(0, maxLen);
+
+        // Add the "More" text
         tempS += MoreText;
-        if (tempS.size() < origString.size())
+        if ( tempS.size() < origString.size() )
             return tempS;
     }
+
+    // Just return the original string
     return origString;
 }
