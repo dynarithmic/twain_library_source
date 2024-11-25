@@ -77,10 +77,10 @@ namespace dynarithmic
                 if (m_bOutputAsString)
                     LogType(outStr, static_cast<const wchar_t*>(t));
                 else
-                    if (t)
-                        strm << outStr << "0x" << std::hex << t;
-                    else
-                        strm << outStr << "=(null)";
+                if (t)
+                    strm << outStr << "0x" << std::hex << t;
+                else
+                    strm << outStr << "=(null)";
             }
             else
             if constexpr (std::is_same_v<T, char*>)
