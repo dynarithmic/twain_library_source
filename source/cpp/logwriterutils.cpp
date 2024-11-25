@@ -66,7 +66,7 @@ namespace dynarithmic
     void LogWriterUtils::MultiLineWriter(const std::string& s, const char* pszDelim, int nWhich)
     {
         StringWrapperA::StringArrayType sArray;
-        StringWrapperA::Tokenize(s, pszDelim, sArray);
+        StringWrapperA::Tokenize(s, pszDelim, sArray, true);
         for (auto& oneString : sArray)
             CTL_LogFunctionCallA(oneString.c_str(), nWhich);
     }

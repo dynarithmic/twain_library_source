@@ -338,7 +338,7 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
                 int nCounter = 1;
                 CTL_StringStreamType strm2;
                 auto nl = StringWrapper::traits_type::GetNewLineString();
-                strm2 << nl << "----- " << GetResourceStringFromMap_Native(IDS_SOURCES_TEXT) << nl <<
+                strm2 << "----- " << GetResourceStringFromMap_Native(IDS_SOURCES_TEXT) <<
                     StringWrapper::JoinEx(vNewSourceNames.begin(), vNewSourceNames.end(),
                         [&](const CTL_StringType& str, const CTL_StringType& val)
                         {

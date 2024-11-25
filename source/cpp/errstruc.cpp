@@ -252,7 +252,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                 auto pCUSTOMDSDATA = static_cast<pTW_CUSTOMDSDATA>(pData);
                 sBuffer << "\nTW_MEMREF <==> TW_CUSTOMDATA:\n{\n" <<
                             "InfoLength=" << pCUSTOMDSDATA->InfoLength << "\n" <<
-                            "hData=" << pCUSTOMDSDATA->hData << "\n}\n";
+                            "hData=" << pCUSTOMDSDATA->hData << "\n}";
             }
             break;
 
@@ -270,7 +270,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                             "FlashUsed2=" << pDEVICEEVENT->FlashUsed2 << "\n" <<
                             "AutomaticCapture=" << pDEVICEEVENT->AutomaticCapture << "\n" <<
                             "TimeBeforeFirstCapture=" << pDEVICEEVENT->TimeBeforeFirstCapture << "\n" <<
-                            "TimeBetweenCaptures=" << pDEVICEEVENT->TimeBetweenCaptures << "\n}\n";
+                            "TimeBetweenCaptures=" << pDEVICEEVENT->TimeBetweenCaptures << "\n}";
             }
             break;
 
@@ -293,7 +293,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                                 ", point.x=" << pmsg->pt.x <<
                                 ", point.y=" << pmsg->pt.y <<
                                 " }\n" <<
-                                indenter << "DS Message=" << p->TWMessage << "\n}\n";
+                                indenter << "DS Message=" << p->TWMessage << "\n}";
                 }
             }
             break;
@@ -330,7 +330,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                     "\nTW_MEMREF <==> TW_MEMORY:\n{\n" <<
                     indenter << "Flags=" << pMEMORY->Flags<< "\n" <<
                     indenter << "Length=" << pMEMORY->Length << "\n" <<
-                    indenter << "TheMem=" << pMEMORY->TheMem << "\n}\n";
+                    indenter << "TheMem=" << pMEMORY->TheMem << "\n}";
             }
             break;
 
@@ -343,7 +343,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                     indenter << "DSMEntry=" << &pENTRYPOINT->DSM_Entry << "\n" <<
                     indenter << "DSMMemAllocate=" << &pENTRYPOINT->DSM_MemAllocate << "\n" <<
                     indenter << "DSMMemLock=" << &pENTRYPOINT->DSM_MemLock << "\n" <<
-                    indenter << "DSMMemUnlock=" << &pENTRYPOINT->DSM_MemUnlock << "\n}\n";
+                    indenter << "DSMMemUnlock=" << &pENTRYPOINT->DSM_MemUnlock << "\n}";
             }
             break;
 
@@ -357,7 +357,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                 sBuffer <<
                 "\nTW_MEMREF <==> handle to window (HWND):\n{\n" <<
                 indenter << "HWND=" << *pHWND << "\n" <<
-                indenter << "Screen Pos.=" << StringWrapperA::Join(aRect, ",") << "\n}\n";
+                indenter << "Screen Pos.=" << StringWrapperA::Join(aRect, ",") << "\n}";
             #endif
             }
             break;
@@ -372,7 +372,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                 indenter << "Direction=" << pPASSTHRU->Direction << "\n" <<
                 indenter << "pDataBuffer=" << pPASSTHRU->pData << "H\n" <<
                 indenter << "DataBytes=" << pPASSTHRU->DataBytes << "\n" <<
-                indenter << "DataBytesXfered=" << pPASSTHRU->DataBytesXfered << "\n}\n";
+                indenter << "DataBytesXfered=" << pPASSTHRU->DataBytesXfered << "\n}";
             }
             break;
 
@@ -381,7 +381,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                 auto pPENDINGXFERS = static_cast<pTW_PENDINGXFERS>(pData);
                 sBuffer << "\nTW_MEMREF <==> TW_PENDINGXFERS:\n{\n" <<
                             indenter << "Count=" << pPENDINGXFERS->Count << "\n" <<
-                            indenter << "EOJ=" << pPENDINGXFERS->EOJ << "\n}\n";
+                            indenter << "EOJ=" << pPENDINGXFERS->EOJ << "\n}";
             }
             break;
 
@@ -392,7 +392,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                 "\nTW_MEMREF <==> TW_SETUPFILEXFER:\n{\n" <<
                 indenter << "FileName=" << pSETUPFILEXFER->FileName << "\n" <<
                 indenter << "Format=" << pSETUPFILEXFER->Format << "\n" <<
-                indenter << "VRefNum=" << pSETUPFILEXFER->VRefNum << "\n}\n";
+                indenter << "VRefNum=" << pSETUPFILEXFER->VRefNum << "\n}";
             }
             break;
 
@@ -402,7 +402,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                 sBuffer << "\nTW_MEMREF <==> TW_SETUPMEMXFER:\n{\n" <<
                         indenter << "MinBufSize=" << pSETUPMEMXFER->MinBufSize << "\n" <<
                         indenter << "MaxBufSize=" << pSETUPMEMXFER->MaxBufSize << "\n" <<
-                        indenter << "Preferred=" << pSETUPMEMXFER->Preferred << "\n}\n";
+                        indenter << "Preferred=" << pSETUPMEMXFER->Preferred << "\n}";
             }
             break;
 
@@ -417,7 +417,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                 sBuffer << "\nTW_MEMREF <==> TW_CAPABILITY:\n{\n" <<
                         indenter << "Cap=" << CTL_TwainAppMgr::GetCapNameFromCap(pCAPABILITY->Cap) << "\n" <<
                         indenter << "ContainerType=" << s << "\n" <<
-                        indenter << "hContainer=" << pCAPABILITY->hContainer << "\n}\n";
+                        indenter << "hContainer=" << pCAPABILITY->hContainer << "\n}";
             }
             break;
 
@@ -428,7 +428,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                 sBuffer << "\nTW_MEMREF <==> TW_STATUSUTF8:\n{\n" <<
                     indenter << "Status ConditionCode=" << pStatus->ConditionCode << "\n" <<
                     indenter << "Size=" << pSTATUSUTF8->Size << "\n" <<
-                    indenter << "UTF8string=" << pSTATUSUTF8->UTF8string << "\n}\n";
+                    indenter << "UTF8string=" << pSTATUSUTF8->UTF8string << "\n}";
             }
             break;
 
@@ -441,7 +441,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                 if (it.first)
                     sConditionCode = std::string() + mapTwainDSMReturnCodes[it.second].second + "";
                 sBuffer << "\nTW_MEMREF <==> TW_STATUS:\n{\n" <<
-                        indenter << "ConditionCode=" << pSTATUS->ConditionCode << "  " << sConditionCode << "\n}\n";
+                        indenter << "ConditionCode=" << pSTATUS->ConditionCode << "  " << sConditionCode << "\n}";
             }
             break;
 
@@ -485,7 +485,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                         indenter << "BitsPerPixel=" << pIMAGEINFO->BitsPerPixel << "\n" <<
                         indenter << "Planar=" << (pIMAGEINFO->Planar?"TRUE":"FALSE") << "\n" <<
                         indenter << "PixelType=" << pIMAGEINFO->PixelType << "\n" <<
-                        indenter << "Compression=" << pIMAGEINFO->Compression << "\n}\n";
+                        indenter << "Compression=" << pIMAGEINFO->Compression << "\n}";
             }
             break;
 
@@ -501,7 +501,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                 Fix32ToFloat(pIMAGELAYOUT->Frame.Bottom) << "\n" <<
                 indenter << "DocmentNumber=" << pIMAGELAYOUT->DocumentNumber << "\n" <<
                 indenter << "PageNumber=" << pIMAGELAYOUT->PageNumber << "\n" <<
-                indenter << "FrameNumber=" << pIMAGELAYOUT->FrameNumber << "\n}\n";
+                indenter << "FrameNumber=" << pIMAGELAYOUT->FrameNumber << "\n}";
             }
             break;
 
@@ -516,7 +516,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                             indenter << "XOffset=" << pIMAGEMEMXFER->XOffset << "\n" <<
                             indenter << "YOffset=" << pIMAGEMEMXFER->YOffset << "\n" <<
                             indenter << "BytesWritten=" << pIMAGEMEMXFER->BytesWritten << "\n" <<
-                            indenter << DecodeTW_MEMORY(&pIMAGEMEMXFER->Memory,"Memory") << "\n}\n";
+                            indenter << DecodeTW_MEMORY(&pIMAGEMEMXFER->Memory,"Memory") << "\n}";
             }
             break;
 
@@ -524,7 +524,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
             {
                 auto handle = static_cast<HANDLE>(pData);
                 sBuffer << "\nTW_MEMREF <==> a DIB:\n{\n" <<
-                            indenter << "DIB Handle=" << handle << "\n}\n";
+                            indenter << "DIB Handle=" << handle << "\n}";
             }
             break;
 
@@ -550,7 +550,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
             {
                 sBuffer << "\nTW_MEMREF <==> TW_UINT32 pointer:\n{\n" <<
                             indenter << "Address=" << pData << "H\n" <<
-                            indenter << "Value at Address=" << *static_cast<TW_UINT32*>(pData) << "\n}\n";
+                            indenter << "Value at Address=" << *static_cast<TW_UINT32*>(pData) << "\n}";
             }
             break;
 
@@ -586,7 +586,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                           "EndOut=" << Fix32ToFloat(pCurTransform->Decode[i].EndOut) << ", \n" <<
                           "Gamma=" << Fix32ToFloat(pCurTransform->Decode[i].Gamma) << ", " <<
                           "SampleCount=" << Fix32ToFloat(pCurTransform->Decode[i].SampleCount) <<
-                          "\n}\n";
+                          "\n}";
                     }
                     for ( size_t i = 0; i < numMixes; i++ )
                     {
@@ -616,7 +616,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                 auto pGRAYRESPONSE = static_cast<pTW_GRAYRESPONSE>(pData);
                 sBuffer << "\nTW_MEMREF <==> TW_GRAYRESPONSE:\n{\n" <<
                             DecodeTW_ELEMENT8(&pGRAYRESPONSE->Response[0], "Response[0]") <<
-                            "\n}\n";
+                            "\n}";
             }
             break;
             case ERRSTRUCT_TW_RGBRESPONSE:
@@ -624,7 +624,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                 auto pRGBRESPONSE = static_cast<pTW_RGBRESPONSE>(pData);
                 sBuffer << "\nTW_MEMREF <==> TW_RGBRESPONSE:\n{\n" <<
                             DecodeTW_ELEMENT8(&pRGBRESPONSE->Response[0], "Response[0]") <<
-                            "\n}\n";
+                            "\n}";
             }
             break;
             case ERRSTRUCT_TW_JPEGCOMPRESSION:
@@ -660,7 +660,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                             indenter << DecodeTW_MEMORY(&pJPEGCOMPRESSION->HuffmanAC[0],"HuffmanAC[0]") <<
                             "\n" <<
                             indenter << DecodeTW_MEMORY(&pJPEGCOMPRESSION->HuffmanAC[1],"HuffmanAC[1]") <<
-                            "\n}\n";
+                            "\n}";
             }
             break;
 
@@ -689,7 +689,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                 auto pAUDIOINFO = static_cast<pTW_AUDIOINFO>(pData);
                 sBuffer << "\nTW_MEMREF <==> TW_AUDIOINFO:\n{\n" <<
                     indenter << "Name=" << pAUDIOINFO->Name << "\n" <<
-                    indenter << "Reserved=" << pAUDIOINFO->Reserved << "\n}\n";
+                    indenter << "Reserved=" << pAUDIOINFO->Reserved << "\n}";
             }
             break;
 
@@ -700,7 +700,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                 #if defined(__APPLE__)
                     sBuffer << indenter << "Refcon=" << pCALLBACK->RefCon << "\n";
                 #endif
-                    sBuffer << indenter << "Message=" << pCALLBACK->Message << "\n}\n";
+                    sBuffer << indenter << "Message=" << pCALLBACK->Message << "\n}";
             }
             break;
 
@@ -710,7 +710,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                 sBuffer << "\nTW_MEMREF <==> TW_CALLBACK2:\n{\n";
                 sBuffer << indenter << "CallbackProc=" << pCALLBACK2->CallBackProc << "\n";
                 sBuffer << indenter << "Refcon=" << pCALLBACK2->RefCon << "\n";
-                sBuffer << indenter << "Message=" << pCALLBACK2->Message << "\n}\n";
+                sBuffer << indenter << "Message=" << pCALLBACK2->Message << "\n}";
             }
             break;
 
@@ -720,7 +720,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                 sBuffer << "\nTW_MEMREF <==> TW_METRICS:\n{\n";
                 sBuffer << indenter << "SizeOf=" << pMETRICS->SizeOf << "\n";
                 sBuffer << indenter << "ImageCount=" << pMETRICS->ImageCount << "\n";
-                sBuffer << indenter << "SheetCount=" << pMETRICS->SheetCount << "\n}\n";
+                sBuffer << indenter << "SheetCount=" << pMETRICS->SheetCount << "\n}";
             }
             break;
 
@@ -733,7 +733,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                 sBuffer << indenter << "Send=" << pTWAINDIRECT->Send << "\n";
                 sBuffer << indenter << "SendSize=" << pTWAINDIRECT->SendSize << "\n";
                 sBuffer << indenter << "Receive=" << pTWAINDIRECT->Receive << "\n";
-                sBuffer << indenter << "ReceiveSize=" << pTWAINDIRECT->ReceiveSize << "\n}\n";
+                sBuffer << indenter << "ReceiveSize=" << pTWAINDIRECT->ReceiveSize << "\n}";
             }
             break;
             case ERRSTRUCT_TW_TWUNKDSENTRYPARAMS: break;
@@ -753,7 +753,6 @@ std::string DecodeSourceInfo(pTW_IDENTITY pIdentity, LPCSTR sPrefix)
     {
         const std::string indenter = IndentDefinition();
         sBuffer << "Decoded " << sPrefix << ":\n{\n" <<
-
         indenter << "Id=" << pIdentity->Id << "\n" <<
         indenter << "Version Number=" << pIdentity->Version.MajorNum << "." << pIdentity->Version.MinorNum << "\n" <<
         indenter << "Version Language=" << pIdentity->Version.Language << "\n" <<
@@ -764,13 +763,11 @@ std::string DecodeSourceInfo(pTW_IDENTITY pIdentity, LPCSTR sPrefix)
         indenter << "SupportedGroups=" << DecodeSupportedGroups(pIdentity->SupportedGroups) << "\n" <<
         indenter << "Manufacturer=" << pIdentity->Manufacturer << "\n" <<
         indenter << "Product Family=" << pIdentity->ProductFamily << "\n" <<
-        indenter << "Product Name=" << pIdentity->ProductName <<
-
-        "\n}\n";
+        indenter << "Product Name=" << pIdentity->ProductName << "\n}";
     }
     else
     {
-        sBuffer << "\nNo information for " << sPrefix << "\n";
+        sBuffer << "\nNo information for " << sPrefix;
     }
     return sBuffer.str();
 }
