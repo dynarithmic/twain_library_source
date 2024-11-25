@@ -267,8 +267,8 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
 
                 if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_DECODE_BITMAP)
                 {
-                    std::string sOut = "Original bitmap from device: \n";
-                    sOut += CTL_ErrorStructDecoder::DecodeBitmap(m_hDataHandle);
+                    std::string sOut = "\nOriginal bitmap from device: \n";
+                    sOut += "{\n" + CTL_ErrorStructDecoder::DecodeBitmap(m_hDataHandle) + "\n}\n";
                     LogWriterUtils::WriteMultiLineInfoIndentedA(sOut, "\n");
                 }
 
