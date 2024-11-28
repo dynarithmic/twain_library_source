@@ -352,7 +352,6 @@ namespace dynarithmic
         // Read in the image resampling data
         auto& imageMap = CTL_StaticData::GetImageResamplerMap();
         imageMap.clear();
-        std::string sImageConstants, sImageName, sNoResampleVals, sResampleVals;
         std::string totalLine;
         while (std::getline(ifs, totalLine))
         {
@@ -491,8 +490,7 @@ namespace dynarithmic
     size_t GetResourceString(UINT nResNumber, LPTSTR buffer, LONG bufSize)
     {
         auto str = GetResourceString_Internal(nResNumber);
-        auto native_str = StringConversion::Convert_Ansi_To_Native(str);
-        return StringWrapper::CopyInfoToCString(native_str, buffer, bufSize);
+        return StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(str), buffer, bufSize);
     }
 
     CTL_StringType GetResourceStringFromMap_Native(LONG nResourceID)

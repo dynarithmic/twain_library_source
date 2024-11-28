@@ -89,8 +89,8 @@ namespace dynarithmic
 
         static std::string get_supported_groups_string(uint32_t sgroups)
         {
-            static constexpr uint32_t dgroups[] = { DG_CONTROL, DG_IMAGE, DG_AUDIO, DF_DSM2, DF_APP2, DF_DS2 };
-            static constexpr char* dgroupsStr[] = { "DG_CONTROL", "DG_IMAGE", "DG_AUDIO", "DF_DSM2", "DF_APP2", "DF_DS2" };
+            constexpr uint32_t dgroups[] = { DG_CONTROL, DG_IMAGE, DG_AUDIO, DF_DSM2, DF_APP2, DF_DS2 };
+            constexpr char* dgroupsStr[] = { "DG_CONTROL", "DG_IMAGE", "DG_AUDIO", "DF_DSM2", "DF_APP2", "DF_DS2" };
             std::string ret;
             int i = 0;
             for (auto g : dgroups)

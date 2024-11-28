@@ -1041,11 +1041,7 @@ bool CTL_TwainDibArray::RemoveDib( HANDLE hDib )
 
 CTL_TwainDibPtr CTL_TwainDibArray::GetAt(size_t nPos)
 {
-    #ifdef NO_STL_AT_DEFINED
-    return m_TwainDibArray[nPos];
-    #else
     return m_TwainDibArray.at(nPos);
-    #endif
 }
 
 CTL_TwainDibPtr CTL_TwainDibArray::operator[](size_t nPos)
