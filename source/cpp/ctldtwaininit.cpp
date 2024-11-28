@@ -1627,7 +1627,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
     }
     catch(...)
     {
-        LogWriterUtils::WriteLogInfoIndentedA(sClosingDSM);
+        try
+        {
+            LogWriterUtils::WriteLogInfoIndentedA(sClosingDSM);
+        }
+        catch (...)
+        {
+            OutputDebugStringA("Could not close TWAIN DSM!");
+        }
     }
 
     try
