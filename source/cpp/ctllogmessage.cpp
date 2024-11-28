@@ -29,8 +29,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LogMessage(LPCTSTR message)
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
     if ( pHandle )
     {
-        auto prefix = StringConversion::Convert_Ansi_To_Native(GetResourceStringFromMap(IDS_DTWAIN_USERMSG_INDICATOR));
-        const CTL_StringType sMsg = prefix + StringTraits::GetSpace() + message;
+        const CTL_StringType sMsg = StringConversion::Convert_Ansi_To_Native(GetResourceStringFromMap(IDS_DTWAIN_USERMSG_INDICATOR)) 
+                                    + StringTraits::GetSpace() + message;
         LogWriterUtils::WriteLogInfo(sMsg);
         return TRUE;
     }

@@ -2430,7 +2430,6 @@ bool LoadGeneralResources(bool blockExecution)
         if (std::any_of(ret.errorValue.begin(), ret.errorValue.end(), [](bool b) { return b == false; }))
         {
             CTL_StringType versionErrorMessage;
-            CTL_StringType errorMsg = _T("Error.  DTWAIN Resource file(s) not found or corrupted:\r\n");
             std::vector<CTL_StringType> vErrors;
             if (!ret.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED])
             {
@@ -2471,7 +2470,8 @@ bool LoadGeneralResources(bool blockExecution)
                 #ifdef _WIN32
                 TCHAR szBuf[DTWAIN_USERRES_MAXSIZE + 1] = {};
                 DTWAIN_GetErrorString(CTL_StaticData::GetResourceLoadError(), szBuf, DTWAIN_USERRES_MAXSIZE);
-                CTL_StringType sAllErrors = _T("Error in reading resource file:\r\n") + ret.resourcePath + _T("\r\n") + 
+				CTL_StringType errorMsg = _T("Error.  DTWAIN Resource file(s) not found or corrupted:\r\n");
+                CTL_StringType sAllErrors = _T("Error in reading resource file:\r\n") + ret.resourcePath + _T("\r\n") +
                     errorMsg + szBuf + versionErrorMessage;
                 MessageBox(nullptr, sAllErrors.c_str(), _T("DTWAIN Resource Error"), MB_ICONERROR);
                 #endif

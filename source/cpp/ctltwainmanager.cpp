@@ -2650,6 +2650,8 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
     #endif
     try
     {
+        // This is the actual low-level call to the TWAIN Data Source Manager 
+        // (TWAIN_32.DLL or TWAINDSM.DLL)
         retcode = (*m_lpDSMEntry)( pOrigin, pDest, nDG, nDAT, nMSG, pData );
     }
     catch(...)
