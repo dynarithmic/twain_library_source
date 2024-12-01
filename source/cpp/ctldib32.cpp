@@ -22,10 +22,7 @@
 #pragma warning (disable : 4786)
 #endif
 #include <cstring>
-#include <cstdio>
-#include <cstdlib>
 #include <algorithm>
-#include <functional>
 #include <memory>
 #include <boost/optional.hpp>
 #include "winconst.h"
@@ -1044,11 +1041,7 @@ bool CTL_TwainDibArray::RemoveDib( HANDLE hDib )
 
 CTL_TwainDibPtr CTL_TwainDibArray::GetAt(size_t nPos)
 {
-    #ifdef NO_STL_AT_DEFINED
-    return m_TwainDibArray[nPos];
-    #else
     return m_TwainDibArray.at(nPos);
-    #endif
 }
 
 CTL_TwainDibPtr CTL_TwainDibArray::operator[](size_t nPos)

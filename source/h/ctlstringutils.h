@@ -18,22 +18,17 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "dtwain.h"
-#include "ctliface.h"
-#include "ctltwainmanager.h"
-#include "logwriterutils.h"
-using namespace dynarithmic;
+#ifndef CTLSTRINGUTILS_H
+#define CTLSTRINGUTILS_H
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LogMessage(LPCTSTR message)
+#include <string>
+
+namespace dynarithmic
 {
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
-    if ( pHandle )
-    {
-        const CTL_StringType sMsg = StringConversion::Convert_Ansi_To_Native(GetResourceStringFromMap(IDS_DTWAIN_USERMSG_INDICATOR)) 
-                                    + StringTraits::GetSpace() + message;
-        LogWriterUtils::WriteLogInfo(sMsg);
-        return TRUE;
-    }
-    return FALSE;
+    // Truncate a string if it goes over maxLen, and replace truncated contents with
+    // the text "More".
+    std::string TruncateStringWithMore(const std::string& origString, size_t maxLen);
 }
+#endif
+
 

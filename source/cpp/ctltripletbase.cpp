@@ -20,7 +20,6 @@
  */
 #include "ctltripletbase.h"
 #include "ctltwainmanager.h"
-#include "dtwain_resource_constants.h"
 
 using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////

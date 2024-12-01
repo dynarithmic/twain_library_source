@@ -23,7 +23,6 @@
 #include "dtwain.h"
 #include "ctliface.h"
 #include "ctldib.h"
-#include "errorcheck.h"
 using namespace dynarithmic;
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FlipBitmap( HANDLE hDib )

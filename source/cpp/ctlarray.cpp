@@ -265,9 +265,9 @@ void DTWAIN_RangeSetter(CTL_TwainDLLHandle* pHandle,
                         LPVOID pDefault)
 {
     Traits* pBuffer = static_cast<Traits*>(pHandle->m_ArrayFactory->get_buffer(a, 0));
-    pBuffer[DTWAIN_RANGEMIN] = *static_cast<typename Traits*>(valueLow);
-    pBuffer[DTWAIN_RANGEMAX] = *static_cast<typename Traits*>(valueUp);
-    pBuffer[DTWAIN_RANGESTEP] = *static_cast<typename Traits*>(valueStep);
+    pBuffer[DTWAIN_RANGEMIN] = *static_cast<Traits*>(valueLow);
+    pBuffer[DTWAIN_RANGEMAX] = *static_cast<Traits*>(valueUp);
+    pBuffer[DTWAIN_RANGESTEP] = *static_cast<Traits*>(valueStep);
 
     if ( pDefault )
         pBuffer[DTWAIN_RANGEDEFAULT] = *static_cast<Traits*>(pDefault);
@@ -1468,7 +1468,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetValueFloatString( DTWAIN_RANGE pArray, L
         strm << boost::format("%1%") % d;
         StringWrapper::SafeStrcpy(pVal, StringConversion::Convert_Ansi_To_Native(strm.str()).c_str());
     }
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pVal));
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pVal))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -2032,12 +2032,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayFrameSetAt(DTWAIN_ARRAY FrameArray, LONG nW
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayFrameSetFrameAt(DTWAIN_ARRAY FrameArray, LONG nWhere, DTWAIN_FRAME theFrame)
 {
     LOG_FUNC_ENTRY_PARAMS((FrameArray, nWhere, theFrame))
-    DTWAIN_BOOL bRet = FALSE;
     if ( !DTWAIN_FrameIsValid(theFrame))
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
     double left, top, right, bottom;
     DTWAIN_FrameGetAll(theFrame, &left, &top, &right, &bottom);
-    bRet = DTWAIN_ArrayFrameSetAt(FrameArray, nWhere, left, top, right, bottom);
+    DTWAIN_BOOL bRet = DTWAIN_ArrayFrameSetAt(FrameArray, nWhere, left, top, right, bottom);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -2449,11 +2448,9 @@ HANDLE DLLENTRY_DEF DTWAIN_GetAcquiredImage( DTWAIN_ARRAY aAcq, LONG nWhichAcq, 
     const int nDibs = GetNumAcquiredImages(pHandle, aAcq, nWhichAcq );
     if ( nDibs == DTWAIN_FAILURE1 || nWhichDib >= nDibs )
         LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
-    DTWAIN_ARRAY aDib = nullptr;
     auto& factory = pHandle->m_ArrayFactory;
-    aDib = factory->get_value(aAcq, nWhichAcq, nullptr);
-    HANDLE hDib = nullptr;
-    hDib = factory->get_value(aDib, nWhichDib, nullptr);
+    DTWAIN_ARRAY aDib = factory->get_value(aAcq, nWhichAcq, nullptr);
+    HANDLE hDib = factory->get_value(aDib, nWhichDib, nullptr);
     LOG_FUNC_EXIT_NONAME_PARAMS(hDib)
     CATCH_BLOCK(DTWAIN_ARRAY(0))
 }
@@ -2467,9 +2464,8 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetAcquiredImageArray(DTWAIN_ARRAY aAcq, LONG n
         LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
 
     //use a copy
-    DTWAIN_ARRAY aDib = nullptr;
     auto& factory = pHandle->m_ArrayFactory;
-    aDib = factory->get_value(aAcq, nWhichAcq, nullptr);
+    DTWAIN_ARRAY aDib = factory->get_value(aAcq, nWhichAcq, nullptr);
     const DTWAIN_ARRAY aCopy = CreateArrayCopyFromFactory(pHandle, aDib);
     LOG_FUNC_EXIT_NONAME_PARAMS(aCopy)
     CATCH_BLOCK(DTWAIN_ARRAY(NULL))

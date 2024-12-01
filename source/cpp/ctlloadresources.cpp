@@ -352,7 +352,6 @@ namespace dynarithmic
         // Read in the image resampling data
         auto& imageMap = CTL_StaticData::GetImageResamplerMap();
         imageMap.clear();
-        std::string sImageConstants, sImageName, sNoResampleVals, sResampleVals;
         std::string totalLine;
         while (std::getline(ifs, totalLine))
         {
@@ -461,14 +460,20 @@ namespace dynarithmic
 
     static std::string GetResourceString_Internal(UINT nResNumber)
     {
-        auto str = GetResourceStringFromMap(nResNumber);
-        // First check the external  resources
+        // First check the external resources
+        auto str = GetResourceStringFromMap(static_cast<LONG>(nResNumber));
         if (str.empty())
             // Try the internal resources
             str = LoadResourceFromRC(nResNumber);
         return str;
     }
-    
+
+    std::string GetErrorString_Internal(int nError)
+    {
+        UINT nRealError = std::abs(nError);
+        return GetResourceString_Internal(nRealError);
+    }
+
     size_t GetResourceStringA(UINT nResNumber, LPSTR buffer, LONG bufSize)
     {
         auto str = GetResourceString_Internal(nResNumber);
@@ -485,23 +490,22 @@ namespace dynarithmic
     size_t GetResourceString(UINT nResNumber, LPTSTR buffer, LONG bufSize)
     {
         auto str = GetResourceString_Internal(nResNumber);
-        auto native_str = StringConversion::Convert_Ansi_To_Native(str);
-        return StringWrapper::CopyInfoToCString(native_str, buffer, bufSize);
+        return StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(str), buffer, bufSize);
     }
 
-    CTL_StringType GetResourceStringFromMap_Native(LONG nError)
+    CTL_StringType GetResourceStringFromMap_Native(LONG nResourceID)
     {
-        return StringConversion::Convert_Ansi_To_Native(GetResourceStringFromMap(nError));
+        return StringConversion::Convert_Ansi_To_Native(GetResourceStringFromMap(nResourceID));
     }
 
-    std::string& GetResourceStringFromMap(LONG nError)
+    std::string& GetResourceStringFromMap(LONG nResourceID)
     {
         static std::string retString;
 
         // Check if string is in cache
         auto& sKey = CTL_StaticData::GetCurrentLanguageResourceKey();
         auto& resCache = CTL_StaticData::GetResourceCache();
-        auto iter = resCache.find({ nError, sKey });
+        auto iter = resCache.find({ nResourceID, sKey });
         if (iter != resCache.end())
             return iter->second;
 
@@ -509,10 +513,10 @@ namespace dynarithmic
         auto currentResource = CTL_StaticData::GetCurrentLanguageResource();
         if (currentResource)
         {
-            auto iterFound = currentResource->find(nError);
+            auto iterFound = currentResource->find(nResourceID);
             if (iterFound != currentResource->end())
             {
-                resCache.insert({{ nError, sKey }, iterFound->second});
+                resCache.insert({{ nResourceID, sKey }, iterFound->second});
                 return iterFound->second;
             }
         }
@@ -557,13 +561,11 @@ namespace dynarithmic
         }
 
         // Create an empty map
-        CTL_StringToMapLongToStringMap::mapped_type resourceMap;
-        std::string::value_type sVersion[100];
-        DTWAIN_GetShortVersionStringA(sVersion, 100);
         std::ifstream ifs(sPath);
         bool open = false;
         if (ifs)
         {
+            CTL_StringToMapLongToStringMap::mapped_type resourceMap;
             std::string descr;
             int resourceID;
             open = true;
@@ -578,7 +580,7 @@ namespace dynarithmic
                         descr = StringConversion::Convert_Native_To_Ansi(
                             CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DLLINFO, IDS_DTWAIN_APPTITLE));
                     StringWrapperA::TrimAll(descr);
-                    descr = StringWrapperA::ReplaceAll(descr, "{short_version}", sVersion);
+                    descr = StringWrapperA::ReplaceAll(descr, "{short_version}", DTWAIN_VERINFO_FILEVERSION);
                     descr = StringWrapperA::ReplaceAll(descr, "{company_name}", DTWAIN_VERINFO_COMPANYNAME);
                     descr = StringWrapperA::ReplaceAll(descr, "{copyright}", DTWAIN_VERINFO_LEGALCOPYRIGHT);
                     resourceMap.insert({ resourceID, descr });

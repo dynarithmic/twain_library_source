@@ -25,8 +25,6 @@
 #include "sourceselectopts.h"
 #include "errorcheck.h"
 #include "../simpleini/simpleini.h"
-#include "ctlfileutils.h"
-#include "ctldefsource.h"
 #include "ctlthreadutils.h"
 #include <boost/logic/tribool.hpp>
 
@@ -45,8 +43,6 @@ LONG DLLENTRY_DEF DTWAIN_SetTwainDialogFont(HFONT font)
     CATCH_BLOCK(0)
 }
 
-static void DisplayLocalString(HWND hWnd, int nID, int ResID);
-static CTL_StringType GetPossibleMappedName(CustomPlacement CS, TCHAR* szSelectedSourceName);
 static std::vector<TCHAR> GetDefaultName(SelectStruct& selectTraits);
 static std::vector<CTL_StringType> GetNameList(SelectStruct& pS);
 
@@ -344,8 +340,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDefaultSource(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    bool bRet = false;
-    bRet = CTL_TwainAppMgr::SetDefaultSource(pSource);
+    bool bRet = CTL_TwainAppMgr::SetDefaultSource(pSource);
     // Load the resources
     auto* customProfile = CTL_StaticData::GetINIInterface();
     if (customProfile)

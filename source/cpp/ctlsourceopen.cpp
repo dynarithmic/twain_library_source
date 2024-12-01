@@ -61,10 +61,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
 
     // Set up the opening of the source
-    bool bRetval = false;
 
     // Go through TWAIN to open the source
-    bRetval = CTL_TwainAppMgr::OpenSource(pHandle->m_pTwainSession, pSource);
+    bool bRetval = CTL_TwainAppMgr::OpenSource(pHandle->m_pTwainSession, pSource);
     if (bRetval)
     {
         // Set up status of the source 
@@ -124,10 +123,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
         std::sort(VecString.begin(), VecString.end());
         CTL_StringStreamType strm;
         strm << theCapList.size();
-        sName = _T("\n\nSource \"");
-        sName += pSource->GetProductName();
-        sName += _T("\" contains the following ");
-        sName += strm.str() + _T(" capabilities: \n{\n");
+        sName = _T("\n\n");
+        sName += GetResourceStringFromMap_Native(IDS_LOGMSG_CAPABILITYLISTING);
+        sName += _T(" (") + pSource->GetProductName() + _T(")");
+        sName += _T(" (") + strm.str() + _T("):\n{\n");
         if (theCapList.empty())
             sName += _T(" No capabilities:\n");
         else

@@ -36,7 +36,6 @@
 #include "ctltr014.h"
 #include "ctltr015.h"
 #include <boost/dll/shared_library.hpp>
-#include "capconst.h"
 namespace dynarithmic
 {
     class CTL_TwainDibArray;

@@ -74,7 +74,6 @@ namespace dynarithmic
         {
             return {false, e.what()};
         }
-        return {true,""};
     }
 
     bool file_exists(LPCTSTR filename)
@@ -110,7 +109,6 @@ namespace dynarithmic
         {
             return {false, e.what()};
         }
-        return{ directory_created, "" };
     }
 
     bool directory_writeable(LPCTSTR filename)

@@ -50,7 +50,6 @@ CTL_ImageXferTriplet::CTL_ImageXferTriplet(CTL_ITwainSession *pSession,
                      m_pImgHandler(nullptr),
                      m_hDataHandle(nullptr),
                      m_nTotalPagesSaved(0),
-                     m_hDataHandleFromDevice(nullptr),
                      m_bJobControlPageRecorded(false),
                      m_bJobMarkerNeedsToBeWritten(false),
                      m_bScanPending(true),
@@ -60,6 +59,7 @@ CTL_ImageXferTriplet::CTL_ImageXferTriplet(CTL_ITwainSession *pSession,
                      m_bPendingXfersDone(false),
                      m_PendingXfers{},
                      m_lastPendingXferCode(0),
+                     m_hDataHandleFromDevice(nullptr),
                      m_IsBuffered(false),
                      m_bEndTwainUI(true)
 {
@@ -267,8 +267,8 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
 
                 if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_DECODE_BITMAP)
                 {
-                    std::string sOut = "Original bitmap from device: \n";
-                    sOut += CTL_ErrorStructDecoder::DecodeBitmap(m_hDataHandle);
+                    std::string sOut = "\nOriginal bitmap from device: \n";
+                    sOut += "{\n" + CTL_ErrorStructDecoder::DecodeBitmap(m_hDataHandle) + "\n}\n";
                     LogWriterUtils::WriteMultiLineInfoIndentedA(sOut, "\n");
                 }
 

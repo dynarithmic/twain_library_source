@@ -21,6 +21,7 @@
 #include "logwriterutils.h"
 #include "ctliface.h"
 #include "cppfunc.h"
+#include "ctlstringutils.h"
 
 namespace dynarithmic
 {
@@ -49,20 +50,7 @@ namespace dynarithmic
 
     void LogWriterUtils::WriteLogInfoIndentedA(const std::string& s)
     {
-        // Truncate if text is too long
-        if (s.size() > maxOutput)
-        {
-            auto tempS = s;
-            std::string MoreText = "...(" + GetResourceStringFromMap(IDS_LOGMSG_MORETEXT) + ")...";
-            tempS.resize(maxOutput);
-            tempS += MoreText;
-            if (tempS.size() < s.size())
-            {
-                CTL_LogFunctionCallA(tempS.c_str(), LOG_INDENT_USELAST_NOFUNCTION);
-                return;
-            }
-        }
-        CTL_LogFunctionCallA(s.c_str(), LOG_INDENT_USELAST_NOFUNCTION);
+        CTL_LogFunctionCallA(TruncateStringWithMore(s, maxOutput).c_str(), LOG_INDENT_USELAST_NOFUNCTION);
     }
 
     void LogWriterUtils::WriteLogInfoIndentedW(const std::wstring& s)
@@ -78,7 +66,7 @@ namespace dynarithmic
     void LogWriterUtils::MultiLineWriter(const std::string& s, const char* pszDelim, int nWhich)
     {
         StringWrapperA::StringArrayType sArray;
-        StringWrapperA::Tokenize(s, pszDelim, sArray);
+        StringWrapperA::Tokenize(s, pszDelim, sArray, true);
         for (auto& oneString : sArray)
             CTL_LogFunctionCallA(oneString.c_str(), nWhich);
     }
