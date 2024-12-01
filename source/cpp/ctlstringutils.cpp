@@ -21,6 +21,7 @@
 #include "ctltwainmanager.h"
 #include "ctliface.h"
 #include "cppfunc.h"
+#include "ctlstringutils.h"
 
 using namespace dynarithmic;
 
@@ -40,7 +41,7 @@ static LONG ConvertToAPIString_InternalEx(PointerTypeIn lpOrigString, PointerTyp
         HandleRAII raii(retval);
         PointerTypeIn ptrData = (PointerTypeIn)raii.getData();
         auto len = WrapperToUse::traits_type::Length(ptrData);
-        WrapperToUse::traits_type::string_type str(ptrData, len);
+        typename WrapperToUse::traits_type::string_type str(ptrData, len);
         return StringWrapper::CopyInfoToCString(str, outString, nLength);
     }
     return 0;
@@ -77,4 +78,25 @@ LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringEx(LPCTSTR lpOrigString, LPTSTR lpOut
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpOutString))
     LOG_FUNC_EXIT_NONAME_PARAMS(retval)
     CATCH_BLOCK(0)
+}
+
+std::string dynarithmic::TruncateStringWithMore(const std::string& origString, size_t maxLen)
+{
+    // Truncate if text is too long
+    if (origString.size() > maxLen)
+    {
+        // Get the "More" text
+        std::string MoreText = "...(" + GetResourceStringFromMap(IDS_LOGMSG_MORETEXT) + ")...";
+
+		// Get original string and resize it
+		auto tempS = origString.substr(0, maxLen);
+
+        // Add the "More" text
+        tempS += MoreText;
+        if ( tempS.size() < origString.size() )
+            return tempS;
+    }
+
+    // Just return the original string
+    return origString;
 }

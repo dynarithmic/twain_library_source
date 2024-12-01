@@ -8,6 +8,7 @@
 #include "dtwain_resource_constants2.h"
 #include "ctlobstr.h"
 #include "ctlloadresources.h"
+#include "ctlstringutils.h"
 
 namespace dynarithmic
 {
@@ -26,7 +27,8 @@ namespace dynarithmic
         {
             // ptr must be a pointer to a valid null terminated string, or nullptr.
             if (ptr)
-                strm << outStr << "=\"" << ptr << "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")";
+                strm << outStr << "=\"" << TruncateStringWithMore(ptr, 256)
+                     << "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")";
             else
                 strm << outStr << "=(null)";
         }
@@ -35,7 +37,8 @@ namespace dynarithmic
         {
             // ptr must be a pointer to a valid null terminated string, or nullptr.
             if (ptr)
-                strm << outStr << "=\"" << StringConversion::Convert_WidePtr_To_Ansi(ptr) <<
+                strm << outStr << "=\"" << 
+                TruncateStringWithMore(StringConversion::Convert_WidePtr_To_Ansi(ptr), 256) <<
                 "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")";
             else
                 strm << outStr << "=(null)";
@@ -74,51 +77,51 @@ namespace dynarithmic
                 if (m_bOutputAsString)
                     LogType(outStr, static_cast<const wchar_t*>(t));
                 else
-                    if (t)
-                        strm << outStr << "0x" << std::hex << t;
-                    else
-                        strm << outStr << "=(null)";
+                if (t)
+                    strm << outStr << "0x" << std::hex << t;
+                else
+                    strm << outStr << "=(null)";
             }
             else
-                if constexpr (std::is_same_v<T, char*>)
+            if constexpr (std::is_same_v<T, char*>)
+            {
+                if (m_bOutputAsString)
+                    LogType(outStr, static_cast<const char*>(t));
+                else
+                if (t)
+                    strm << outStr << "0x" << std::hex << t;
+                else
+                    strm << outStr << "=(null)";
+            }
+            else
+            if constexpr (std::is_pointer_v<T> && !std::is_same_v<T, void*>
+                && std::is_fundamental_v<std::remove_pointer_t<T>>)
+            {
+                if (m_bOutputAsString)
                 {
-                    if (m_bOutputAsString)
-                        LogType(outStr, static_cast<const char*>(t));
+                    if (t)
+                        strm << outStr << "=" << *t;
                     else
-                        if (t)
-                            strm << outStr << "0x" << std::hex << t;
-                        else
-                            strm << outStr << "=(null)";
+                        strm << outStr << "=" << "(null)";
                 }
                 else
-                    if constexpr (std::is_pointer_v<T> && !std::is_same_v<T, void*>
-                        && std::is_fundamental_v<std::remove_pointer_t<T>>)
-                    {
-                        if (m_bOutputAsString)
-                        {
-                            if (t)
-                                strm << outStr << "=" << *t;
-                            else
-                                strm << outStr << "=" << "(null)";
-                        }
-                        else
-                        {
-                            if (t)
-                                strm << outStr << "=" << t;
-                            else
-                                strm << outStr << "=" << "(null)";
-                        }
-                    }
+                {
+                    if (t)
+                        strm << outStr << "=" << t;
                     else
-                        if constexpr (std::is_pointer_v<T>)
-                        {
-                            if (t)
-                                strm << outStr << "=0x" << std::hex << static_cast<const void*>(t);
-                            else
-                                strm << outStr << "=" << "(null)";
-                        }
-                        else
-                            strm << outStr << "=" << t;
+                        strm << outStr << "=" << "(null)";
+                }
+            }
+            else
+            if constexpr (std::is_pointer_v<T>)
+            {
+                if (t)
+                    strm << outStr << "=0x" << std::hex << static_cast<const void*>(t);
+                else
+                    strm << outStr << "=" << "(null)";
+            }
+            else
+                strm << outStr << "=" << t;
         }
 
         template <typename T>

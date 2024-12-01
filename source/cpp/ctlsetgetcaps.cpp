@@ -31,7 +31,6 @@
 #include "ctltmpl5.h"
 #include "errorcheck.h"
 #include "ctlutils.h"
-#include "cppfunc.h"
 using namespace dynarithmic;
 
 static DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap,
@@ -281,12 +280,15 @@ static LONG GetTwainGetType(LONG gettype)
 }
 
 DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap, LONG lGetType, LONG lContainerType,
-                                                         LONG nDataType, LPDTWAIN_ARRAY pArray, bool bOverrideDataType )
+                                            LONG nDataType, LPDTWAIN_ARRAY pArray, bool bOverrideDataType )
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, lContainerType, nDataType, pArray, bOverrideDataType))
 
     CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
     const auto pHandle = p->GetDTWAINHandle();
+
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return pArray == nullptr; },
+                                      DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     // We clear the user array here, since we do not want to 
     // report information back to user if capability is not supported
@@ -294,7 +296,6 @@ DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap
     if ( bEnumeratorExists )
         pHandle->m_ArrayFactory->clear(*pArray);
     else
-    if (pArray)
         *pArray = nullptr;
 
 	CHECK_IF_CAP_SUPPORTED(p, pHandle, lCap, false)

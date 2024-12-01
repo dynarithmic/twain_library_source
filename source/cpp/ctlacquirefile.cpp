@@ -201,7 +201,7 @@ static std::vector<T> FileListToVector(SourceAcquireOptions& opts)
     return allNames;
 }
 
-static std::string GetDirectoryCreationError(CTL_StringType fileName)
+static std::string GetDirectoryCreationError(const CTL_StringType& fileName)
 {
     return  GetResourceStringFromMap(IDS_LOGMSG_ERRORTEXT) + ": DTWAIN_AcquireFile: " +
             GetResourceStringFromMap(DTWAIN_ERR_CREATE_DIRECTORY_) + ": " +

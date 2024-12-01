@@ -1895,8 +1895,8 @@ int CTL_TwainAppMgr::SetTransferCount( const CTL_ITwainSource *pSource,
     if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS )
     {
         StringStreamA strm;
-        strm << boost::format("\nSetting Transfer Count.  Transfer Count = %1%\n") % nCount;
-        LogWriterUtils::WriteLogInfoA(strm.str());
+        strm << boost::format("Setting Transfer Count.  Transfer Count = %1%") % nCount;
+        LogWriterUtils::WriteLogInfoIndentedA(strm.str());
     }
 
     // If the device supports the CAP_SHEETCOUNT capability, use that to set the number of
@@ -2650,6 +2650,8 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
     #endif
     try
     {
+        // This is the actual low-level call to the TWAIN Data Source Manager 
+        // (TWAIN_32.DLL or TWAINDSM.DLL)
         retcode = (*m_lpDSMEntry)( pOrigin, pDest, nDG, nDAT, nMSG, pData );
     }
     catch(...)

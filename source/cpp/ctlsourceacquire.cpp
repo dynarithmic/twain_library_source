@@ -26,9 +26,7 @@
 #include "errorcheck.h"
 #include "sourceselectopts.h"
 #include "arrayfactory.h"
-#include "ctltr040.h"
 #include "dtwstrfn.h"
-#include "ctltwainmsgloop.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -306,7 +304,6 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
 {
     LOG_FUNC_ENTRY_PARAMS((opts))
     DTWAIN_ARRAY Array = nullptr;
-    DTWAIN_ARRAY aAcquisitionArray = nullptr;
 
     const auto pDLLHandle = static_cast<CTL_TwainDLLHandle*>(opts.getHandle());
     DTWAINArrayLowLevel_RAII a1(pDLLHandle, nullptr);
@@ -315,7 +312,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
     pSource->SetShutdownAcquire(false);
     pSource->SetLastAcquireError(0);
     pSource->ResetAcquisitionAttempts(nullptr);
-    aAcquisitionArray = CreateArrayFromFactory(pDLLHandle, DTWAIN_ARRAYOFHANDLEARRAYS, 0);
+    DTWAIN_ARRAY aAcquisitionArray = CreateArrayFromFactory(pDLLHandle, DTWAIN_ARRAYOFHANDLEARRAYS, 0);
     DTWAINArrayLowLevel_RAII aAcq(pDLLHandle, aAcquisitionArray);
 
     pSource->m_pUserPtr = nullptr;
@@ -443,7 +440,7 @@ bool dynarithmic::AcquireExHelper(SourceAcquireOptions& opts)
     const auto& vValues = pDLLHandle->m_ArrayFactory->underlying_container_t<void*>(aDibs);
 
     bool bRet = false;
-        bRet = !vValues.empty() ? true: false;
+    bRet = !vValues.empty() ? true: false;
     if (opts.getStatus() == DTWAIN_TN_ACQUIRESTARTED && !vValues.empty())
         bRet = true;
 
@@ -555,8 +552,8 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
             if (lFileFlags & DTWAIN_USEPROMPT)
                 bUsePrompt = true;
             else
-                if (!(lFileFlags & (DTWAIN_USENAME | DTWAIN_USELONGNAME)))
-                    bUsePrompt = true;
+            if (!(lFileFlags & (DTWAIN_USENAME | DTWAIN_USELONGNAME)))
+                bUsePrompt = true;
 
             if (bUsePrompt)
                 lFileFlags = lMode | DTWAIN_USEPROMPT;

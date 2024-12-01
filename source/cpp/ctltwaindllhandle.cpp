@@ -149,7 +149,6 @@ void CTL_TwainDLLHandle::NotifyWindows(UINT /*nMsg*/, WPARAM /*wParam*/, LPARAM 
 
 std::pair<bool, int32_t> CTL_StaticData::GetIDFromTwainName(std::string sName)
 {
-    std::string actualName = StringWrapperA::TrimAll(sName);
     auto& constantsMap = CTL_StaticData::GetStringToConstantMap();
     auto iter = constantsMap.find(sName);
     if (iter != constantsMap.end())

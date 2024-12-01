@@ -21,7 +21,6 @@
 #include "ctltripletbase.h"
 #include "ctltr010.h"
 #include "ctldevnt.h"
-#include "dtwain.h"
 #include "twainfix32.h"
 #include "arrayfactory.h"
 
