@@ -23,17 +23,20 @@ If you want to rebuild the libraries, you will need the following tools and comp
 
 * One of the following development environments:
 
-      Visual Studio 2019 (Community or Professional)
-      Visual Studio 2022 (Community or Professional)
+      Visual Studio 2019 (Community or Professional) with Platform Toolset v142 installed.
+      Visual Studio 2022 (Community or Professional) with Platform Toolset v142 or v143 installed.
       
+By default Visual Studio 2019 has Platform Toolset v142 installed.  
+By default Visual Studio 2022 has Platform Toolset v143 installed. 
+
 In addition, you will need 
 
 1) At least 20 GB of free disk space.
-2) An installation of the [Boost](http://www.boost.org/) library (version 1.70 or above).  
+2) An installation of the [Boost](http://www.boost.org/) library (version 1.80 or above).  
 I recommend getting the pre-built boost libraries found at [SourceForge](https://sourceforge.net/projects/boost/files/boost-binaries/).  When installed, you will get the boost **include** files, plus the library files.  Please download the version of boost that fits your compiler.  
 
 ```plaintext
-For Visual Studio 2019 (using platform toolset v142) -- Download files with "14.2" in the file name.
+For Visual Studio 2019 or 2022 (using platform toolset v142) -- Download files with "14.2" in the file name.
 For Visual Studio 2022 (using platform toolset v143) -- Download files with "14.3" in the file name.
 ```
 
@@ -42,20 +45,25 @@ For Visual Studio 2022 (using platform toolset v143) -- Download files with "14.
 5) The following environment variables must be set before compilation (these variables must be set before starting the Visual Studio IDE):
 
 *    BOOST_INCLUDE_DIR
-*    BOOST_LIBRARY_DIR_V142_32
-*    BOOST_LIBRARY_DIR_V142_64    
-*    BOOST_LIBRARY_DIR_V143_32
-*    BOOST_LIBRARY_DIR_V143_64    
 *    ZIP7_UTIL_CMD
 *    DIRHASH_UTIL_CMD
 
-The **BOOST_INCLUDE_DIR** should point to your boost installation folder.  This is usually **C:\boost_install_directory**, where this folder contains a subsequent **Boost** folder, containing the **Boost** header files.  For example:
+The following environment variables should be set, depending on the platform toolset being used when building DTWAIN using Visual Studio:
+
+*    BOOST_LIBRARY_DIR_V142_32 -- (required: Visual Studio 2019 and Visual Studio 2022 using Platform Toolset v142)
+*    BOOST_LIBRARY_DIR_V142_64 -- (required: Visual Studio 2019 and Visual Studio 2022 using Platform Toolset v142)   
+*    BOOST_LIBRARY_DIR_V143_32 -- (required: Visual Studio 2022, Platform Toolset v143)
+*    BOOST_LIBRARY_DIR_V143_64 -- (required: Visual Studio 2022, Platform Toolset v143)   
+
+#### Definition of environment variables:
+
+* The **BOOST_INCLUDE_DIR** should point to your boost installation folder that points to the base of the boost C++ header files.  This is usually **C:\boost_install_directory**, where this folder contains a subsequent **Boost** folder, containing the **Boost** header files.  For example:
 
 ```plaintext
 SET BOOST_INCLUDE_DIR=C:\boost_installation\boost
 ```
 
-The environment variables named **BOOST_LIBRARY_DIR_xxxx_32**, where **xxxx** is the platform toolset you are using to build DTWAIN with, is the directory where the 32-bit boost libraries are installed.  These libraries would be named similar to **libboost_xxxxxxxx-vcyyy-zzzz-x32.lib**.  
+* The environment variables named **BOOST_LIBRARY_DIR_xxxx_32**, where **xxxx** is the platform toolset you are using to build DTWAIN with, is the directory where the 32-bit boost libraries are installed.  These libraries would be named similar to **libboost_xxxxxxxx-vcyyy-zzzz-x32.lib**.  
 
 For example, the following will set the boost environment variable to allow the usage of the 32-bit version of Boost for the v142 platform toolset:
 
@@ -72,13 +80,13 @@ SET BOOST_LIBRARY_DIR_V142_64=C:\boost_installation\lib64-msvc-14.2
 If the **BOOST_LIBRARY_DIR_xxxx_32** or **BOOST_LIBRARY_DIR_xxxx_64** environment variables are not set or are set incorrectly, the final build of DTWAIN will not link, with the error message stating that the linker could not find the **libboost...** libraries.
 
 ----
-The **ZIP7_UTIL_CMD** is the full path name of the executable file **7z.exe** of the **7-Zip** archiving utility.  For example:
+* The **ZIP7_UTIL_CMD** is the full path name of the executable file **7z.exe** of the **7-Zip** archiving utility.  For example:
 
 ```plaintext
 SET ZIP7_UTIL_CMD=C:\7-Zip\7z.exe
 ```
 ----
-The **DIRHASH_UTIL_CMD** is the full path name of the executable file **DirHash.exe** of the **DirHash** hash value computing utility.  For example:
+* The **DIRHASH_UTIL_CMD** is the full path name of the executable file **DirHash.exe** of the **DirHash** hash value computing utility.  For example:
 
 ```plaintext
 SET DIRHASH_UTIL_CMD=C:\DirHash\DirHash.exe
@@ -110,14 +118,14 @@ The **DTWAIN_BUILD_LOGPOINTERS** denotes whether the libraries will be built wit
 
 * A full rebuild of all the configurations available is recommended.  Use the "Build -> Batch Build..." option in the Visual Studio IDE and check all of the configurations to build everything (take a coffee break -- this could take a while).  This will create a "binaries" directory that will contain the following DLLs:
 
-        32bit/dtwain32.dll -32-bit ANSI (MBCS) DLL
-        32bit/dtwain32u.dll -32-bit Unicode DLL
-        32bit/dtwain32d.dll -32-bit Debug ANSI (MBCS) DLL
-        32bit/dtwain32ud.dll -32-bit Debug Unicode DLL
-        64bit/dtwain64.dll -64-bit ANSI (MBCS) DLL
-        64bit/dtwain64u.dll -64-bit Unicode DLL
-        64bit/dtwain64d.dll -64-bit Debug ANSI (MBCS) DLL
-        64bit/dtwain64ud.dll -64-bit Debug Unicode DLL
+        32bit/dtwain32.dll   - 32-bit ANSI (MBCS) DLL
+        32bit/dtwain32u.dll  - 32-bit Unicode DLL
+        32bit/dtwain32d.dll  - 32-bit Debug ANSI (MBCS) DLL
+        32bit/dtwain32ud.dll - 32-bit Debug Unicode DLL
+        64bit/dtwain64.dll   - 64-bit ANSI (MBCS) DLL
+        64bit/dtwain64u.dll  - 64-bit Unicode DLL
+        64bit/dtwain64d.dll  - 64-bit Debug ANSI (MBCS) DLL
+        64bit/dtwain64ud.dll - 64-bit Debug Unicode DLL
 
 * Note -- the resulting "*.lib* files that reside in these directories are import libraries compatible with the Visual Studio toolset.  Other compilers will require converting these .lib files to your compiler's import library format, or you can use the [LoadLibrary / GetProcAddress approach](https://github.com/dynarithmic/twain_library?tab=readme-ov-file#what-if-i-dont-have-visual-c-as-the-compiler-to-use-when-building-an-application--the-visual-c-import-libraries-will-not-work-for-me--i-use-embarcaderogclangmingw-fill-in-with-your-favorite-compiler-or-ide--so-how-do-i-use-the-library) to remove the need for import libraries.
 
