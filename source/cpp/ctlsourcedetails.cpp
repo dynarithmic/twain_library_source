@@ -645,13 +645,14 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         LONG capConstant;
                         const char* name;
                         int prefixCount;
+                        char* prefix;
                     };
 
                     std::array<TwainDataItems, 4> otherData = { {
-                        { ICAP_SUPPORTEDSIZES, DTWAIN_CONSTANT_TWSS, "\"paper-sizes\":", 5 },
-                        { ICAP_SUPPORTEDBARCODETYPES, DTWAIN_CONSTANT_TWBT, "\"barcode-supported-types\":", 5 },
-                        { ICAP_SUPPORTEDPATCHCODETYPES,DTWAIN_CONSTANT_TWPCH, "\"patchcode-supported-types\":", 6 },
-                        { ICAP_SUPPORTEDEXTIMAGEINFO,DTWAIN_CONSTANT_TWEI, "\"extendedimageinfo-supported-types\":", 5 }} };
+                        { ICAP_SUPPORTEDSIZES, DTWAIN_CONSTANT_TWSS, "\"paper-sizes\":", 5, "TWSS_" },
+                        { ICAP_SUPPORTEDBARCODETYPES, DTWAIN_CONSTANT_TWBT, "\"barcode-supported-types\":", 5, "TWBT_" },
+                        { ICAP_SUPPORTEDPATCHCODETYPES,DTWAIN_CONSTANT_TWPCH, "\"patchcode-supported-types\":", 6, "TWPCH_" },
+                        { ICAP_SUPPORTEDEXTIMAGEINFO,DTWAIN_CONSTANT_TWEI, "\"extendedimageinfo-supported-types\":", 5, "TWEI_" }} };
                     for (auto& oneData : otherData)
                     {
                         strm2.str("");
@@ -660,7 +661,12 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                             std::string allSizes;
                             std::vector<std::string> vAdjustedNames;
                             std::transform(vNames.begin(), vNames.end(), std::back_inserter(vAdjustedNames),
-                                [&](auto& origName) { return "\"" + origName.substr(oneData.prefixCount) + "\""; });
+                                [&](auto& origName)
+                                {
+                                    if (!StringWrapperA::StartsWith(origName, oneData.prefix))
+                                        return "\"" + origName + "\"";
+                                    return "\"" +  origName.substr(oneData.prefixCount) + "\"";
+                                });
 
                             std::string resultStr = join_string(vAdjustedNames.begin(), vAdjustedNames.end());
                             if (!vNames.empty())
