@@ -111,10 +111,10 @@ std::string CTL_StaticData::GetTwainNameFromConstantA(int lConstantType, int lTw
     auto& constantsmap = CTL_StaticData::GetTwainConstantsMap();
     auto iter1 = constantsmap.find(lConstantType);
     if (iter1 == constantsmap.end())
-        return {};
+        return std::to_string(lTwainConstant);
     auto iter2 = iter1->second.find(lTwainConstant);
     if (iter2 == iter1->second.end())
-        return {};
+        return std::to_string(lTwainConstant);
     return iter2->second;
 }
 
