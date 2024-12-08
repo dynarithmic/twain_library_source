@@ -456,6 +456,10 @@ static AllCapInfo getAllCapInfo(CTL_ITwainSource* pSource)
         auto iter = capInfo.find(capVal);
         if (iter != capInfo.end())
             iter->second.capType = "\"custom\"";
+        // Check if this is also an extended cap
+        auto iter2 = std::find(vExtBuf.begin(), vExtBuf.end(), capVal);
+        if ( iter2 != vExtBuf.end())
+            iter->second.capType = "\"custom, extended\"";
     }
     allCapInfo.mapCounts = {vCapBuf.size(), vExtBuf.size(), vCustomBuf.size()};
     return allCapInfo;
@@ -667,7 +671,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                                         return "\"" + origName + "\"";
                                     return "\"" +  origName.substr(oneData.prefixCount) + "\"";
                                 });
-
+                            std::sort(vAdjustedNames.begin(), vAdjustedNames.end());
                             std::string resultStr = join_string(vAdjustedNames.begin(), vAdjustedNames.end());
                             if (!vNames.empty())
                                 strm2 << oneData.name << "[" << resultStr << "],";
