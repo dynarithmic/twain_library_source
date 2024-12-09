@@ -2,6 +2,8 @@ DTWAIN Version changes
 
 5.5.5
 
+- Change internal TWAIN message loop to loop indefinitely until the Source UI is closed.
+
 - Create versions of DTWAIN DLL that contains full logging and minimal logging.  The minimal
   logging versions of DTWAIN results in smaller sizes for the DLL files.
 
@@ -19,6 +21,9 @@ DTWAIN Version changes
 
 - DTWAIN_SelectDefaultSource() will now only make a call to the TWAIN DSM if the DSM is version 2
   or greater (TWAINDSM.DLL).
+
+- DTWAIN_GetSourceDetails() now correctly reports custom capabilities that are also extended capabilities.
+
 
 
 5.5.4
