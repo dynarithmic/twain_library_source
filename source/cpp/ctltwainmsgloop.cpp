@@ -107,9 +107,13 @@ void TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource *pSource, 
     HWND theWnd = *pSource->GetTwainSession()->GetWindowHandlePtr();
     ::PostMessage(theWnd, WM_NULL, static_cast<WPARAM>(0), static_cast<LPARAM>(0));
 
-    // Start the message loop
-    while (GetMessage(&msg, nullptr, 0, 0))
+    // Start the message loop.  We want to loop indefinitely until
+    // the source is closed.  We cannot rely on the return value of
+    // PeekMessage() or GetMessage() to control how the loop is executed.
+    while (true)
     {
+        PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE);
+
         // If in UIOnly mode, set it up here
         if (isUIOnly && !bInitializeAcquisitionProcess)
         {
