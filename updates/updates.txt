@@ -4,6 +4,8 @@ DTWAIN Version changes
 
 - Change internal TWAIN message loop to loop indefinitely until the Source UI is closed.
 
+- Ensure setting string capabilities uses ANSI strings.
+
 - Create versions of DTWAIN DLL that contains full logging and minimal logging.  The minimal
   logging versions of DTWAIN results in smaller sizes for the DLL files.
 
