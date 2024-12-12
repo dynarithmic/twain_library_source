@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -496,7 +496,7 @@ static DTWAIN_BOOL SetCapValuesEx2_Internal( DTWAIN_SOURCE Source, LONG lCap, LO
         else
         if (dynarithmic::IsTwainStringType(static_cast<TW_UINT16>(nDataType)))
             bOk = performSetCap<std::string, std::string, std::string, StringSetCapConverterA>
-                            (pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::StringType, CTL_ArrayStringType, nDataType);
+                            (pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::StringType, CTL_ArrayANSIStringType, nDataType);
         else
         if (dynarithmic::IsTwainFrameType(static_cast<TW_UINT16>(nDataType)))
         {
