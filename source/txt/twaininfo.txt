@@ -127,7 +127,7 @@
 4135      CAP_PRINTERENABLED                      6    48   32   32   32   48   32   32                                 
 4136      CAP_PRINTERINDEX                        5    96   32   32   32   32   32   32                                 
 4137      CAP_PRINTERMODE                         4    48   32   32   32   48   32   32                                 
-4138      CAP_PRINTERSTRING                       12   48   32   32   48   48   32   32                                 
+4138      CAP_PRINTERSTRING                       12   48   32   32   32   32   32   32                                 
 4139      CAP_PRINTERSUFFIX                       12   32   32   32   32   32   32   32                                 
 4140      CAP_LANGUAGE                            4    48   32   32   32   48   32   32                                 
 4141      CAP_FEEDERALIGNMENT                     4    48   32   32   32   32   32   32                                 
@@ -1698,5 +1698,5 @@
 [6000 6001] TXT [1] [[4 1][8 1][16 1][24 1] [32 1]]
 -9999
 5.5.5
-400051307
+645028301
 END END END
