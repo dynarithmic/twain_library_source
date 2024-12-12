@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -111,10 +111,10 @@ std::string CTL_StaticData::GetTwainNameFromConstantA(int lConstantType, int lTw
     auto& constantsmap = CTL_StaticData::GetTwainConstantsMap();
     auto iter1 = constantsmap.find(lConstantType);
     if (iter1 == constantsmap.end())
-        return {};
+        return std::to_string(lTwainConstant);
     auto iter2 = iter1->second.find(lTwainConstant);
     if (iter2 == iter1->second.end())
-        return {};
+        return std::to_string(lTwainConstant);
     return iter2->second;
 }
 

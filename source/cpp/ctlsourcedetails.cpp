@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -456,6 +456,10 @@ static AllCapInfo getAllCapInfo(CTL_ITwainSource* pSource)
         auto iter = capInfo.find(capVal);
         if (iter != capInfo.end())
             iter->second.capType = "\"custom\"";
+        // Check if this is also an extended cap
+        auto iter2 = std::find(vExtBuf.begin(), vExtBuf.end(), capVal);
+        if ( iter2 != vExtBuf.end())
+            iter->second.capType = "\"custom, extended\"";
     }
     allCapInfo.mapCounts = {vCapBuf.size(), vExtBuf.size(), vCustomBuf.size()};
     return allCapInfo;
@@ -645,13 +649,14 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         LONG capConstant;
                         const char* name;
                         int prefixCount;
+                        char* prefix;
                     };
 
                     std::array<TwainDataItems, 4> otherData = { {
-                        { ICAP_SUPPORTEDSIZES, DTWAIN_CONSTANT_TWSS, "\"paper-sizes\":", 5 },
-                        { ICAP_SUPPORTEDBARCODETYPES, DTWAIN_CONSTANT_TWBT, "\"barcode-supported-types\":", 5 },
-                        { ICAP_SUPPORTEDPATCHCODETYPES,DTWAIN_CONSTANT_TWPCH, "\"patchcode-supported-types\":", 6 },
-                        { ICAP_SUPPORTEDEXTIMAGEINFO,DTWAIN_CONSTANT_TWEI, "\"extendedimageinfo-supported-types\":", 5 }} };
+                        { ICAP_SUPPORTEDSIZES, DTWAIN_CONSTANT_TWSS, "\"paper-sizes\":", 5, "TWSS_" },
+                        { ICAP_SUPPORTEDBARCODETYPES, DTWAIN_CONSTANT_TWBT, "\"barcode-supported-types\":", 5, "TWBT_" },
+                        { ICAP_SUPPORTEDPATCHCODETYPES,DTWAIN_CONSTANT_TWPCH, "\"patchcode-supported-types\":", 6, "TWPCH_" },
+                        { ICAP_SUPPORTEDEXTIMAGEINFO,DTWAIN_CONSTANT_TWEI, "\"extendedimageinfo-supported-types\":", 5, "TWEI_" }} };
                     for (auto& oneData : otherData)
                     {
                         strm2.str("");
@@ -660,8 +665,13 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                             std::string allSizes;
                             std::vector<std::string> vAdjustedNames;
                             std::transform(vNames.begin(), vNames.end(), std::back_inserter(vAdjustedNames),
-                                [&](auto& origName) { return "\"" + origName.substr(oneData.prefixCount) + "\""; });
-
+                                [&](auto& origName)
+                                {
+                                    if (!StringWrapperA::StartsWith(origName, oneData.prefix))
+                                        return "\"" + origName + "\"";
+                                    return "\"" +  origName.substr(oneData.prefixCount) + "\"";
+                                });
+                            std::sort(vAdjustedNames.begin(), vAdjustedNames.end());
                             std::string resultStr = join_string(vAdjustedNames.begin(), vAdjustedNames.end());
                             if (!vNames.empty())
                                 strm2 << oneData.name << "[" << resultStr << "],";
