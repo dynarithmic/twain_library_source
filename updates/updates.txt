@@ -2,6 +2,8 @@ DTWAIN Version changes
 
 5.5.5
 
+- Update CAP_PRINTERSTRING to use (by default) TWON_ONEVALUE container on setting capability.
+
 - Change internal TWAIN message loop to loop indefinitely until the Source UI is closed.
 
 - Ensure setting string capabilities uses ANSI strings.
