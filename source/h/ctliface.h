@@ -506,12 +506,13 @@ namespace dynarithmic
     typedef boost::container::flat_map<int, ImageResamplerData> ImageResamplerMap;
     typedef boost::container::flat_map<LONG, std::pair<std::string, std::string>> CTL_PDFMediaMap;
     typedef tsl::ordered_map<LONG, FileFormatNode> CTL_AvailableFileFormatsMap;
-    typedef tsl::ordered_map<LONG, std::string> CTL_TwainConstantToStringMapNode;
+    using TwainConstantType = int64_t;
+    typedef tsl::ordered_map<TwainConstantType, std::string> CTL_TwainConstantToStringMapNode;
     typedef boost::container::flat_map<LONG, CTL_TwainConstantToStringMapNode> CTL_TwainConstantsMap;
-    typedef boost::container::flat_map<LONG, std::string> CTL_TwainLongToStringMap;
+    typedef boost::container::flat_map<TwainConstantType, std::string> CTL_TwainIDToStringMap;
     typedef boost::container::flat_map<int32_t, std::string> CTL_ErrorToExtraInfoMap;
     typedef boost::container::flat_map<std::string, unsigned long> CTL_ThreadMap;
-    typedef boost::container::flat_map<std::string, int32_t> CTL_StringToConstantMap;
+    typedef boost::container::flat_map<std::string, TwainConstantType> CTL_StringToConstantMap;
     typedef boost::container::flat_map<TW_UINT16, TW_INFO> CTL_UINT16ToInfoMap;
 
     typedef std::unordered_map<std::pair<LONG, std::string>, std::string, CacheKeyHash> CTL_PairToStringMap;
@@ -541,7 +542,7 @@ namespace dynarithmic
         bool                         s_bTimerIDSet = false;
         CTL_UINT16ToInfoMap          s_IntToTwainInfoMap;
         CTL_StringToConstantMap      s_MapStringToConstant;
-        CTL_TwainLongToStringMap     s_MapExtendedImageInfo;
+        CTL_TwainIDToStringMap     s_MapExtendedImageInfo;
         CTL_StringToMapLongToStringMap s_AllLoadedResourcesMap;
         CTL_GeneralResourceInfo         s_ResourceInfo;
         CTL_PDFMediaMap          s_PDFMediaMap;
@@ -604,7 +605,7 @@ namespace dynarithmic
         static int32_t GetExtImageInfoOffset() { return s_StaticData.s_nExtImageInfoOffset; }
         static void SetExtImageInfoOffset(int32_t offset) { s_StaticData.s_nExtImageInfoOffset = offset; }
         static CTL_StringToConstantMap& GetStringToConstantMap() { return s_StaticData.s_MapStringToConstant; }
-        static CTL_TwainLongToStringMap& GetExtendedImageInfoMap() { return s_StaticData.s_MapExtendedImageInfo; }
+        static CTL_TwainIDToStringMap& GetExtendedImageInfoMap() { return s_StaticData.s_MapExtendedImageInfo; }
         static int GetResourceLoadError() { return s_StaticData.s_nLoadingError; }
         static void SetResourceLoadError(int errNum) { s_StaticData.s_nLoadingError = errNum; }
         static CSimpleIniA* GetINIInterface() { return s_iniInterface.get(); }
@@ -622,7 +623,7 @@ namespace dynarithmic
         static CTL_TwainConstantToStringMapNode& GetTwainConstantsStrings(LONG nWhich) { return s_StaticData.s_TwainConstantsMap[nWhich]; }
         static bool IsCheckHandles() { return s_StaticData.s_bCheckHandles; }
         static void SetCheckHandles(bool bSet) { s_StaticData.s_bCheckHandles = bSet; }
-        static std::pair<bool, int32_t> GetIDFromTwainName(std::string sName);
+        static std::pair<bool, TwainConstantType> GetIDFromTwainName(std::string sName);
         static constexpr int GetDGResourceID() { return 8890; }
         static constexpr int GetDATResourceID() { return 8891; }
         static constexpr int GetMSGResourceID() { return 8892; }
@@ -640,9 +641,9 @@ namespace dynarithmic
         static ImageResamplerMap& GetImageResamplerMap() { return s_StaticData.s_ImageResamplerMap; }
         static SourceStatusMap& GetSourceStatusMap() { return s_StaticData.s_SourceStatusMap;  }
         static CTL_StringType& GetResourceVersion() { return s_StaticData.s_ResourceVersion; }
-        static CTL_StringType GetTwainNameFromConstant(int lConstantType, int lTwainConstant);
-        static std::string GetTwainNameFromConstantA(int lConstantType, int lTwainConstant);
-        static std::wstring GetTwainNameFromConstantW(int lConstantType, int lTwainConstant);
+        static CTL_StringType GetTwainNameFromConstant(int lConstantType, TwainConstantType lTwainConstant);
+        static std::string GetTwainNameFromConstantA(int lConstantType, TwainConstantType lTwainConstant);
+        static std::wstring GetTwainNameFromConstantW(int lConstantType, TwainConstantType lTwainConstant);
         static CTL_CallbackProcArray& GetCallbacks() { return s_StaticData.s_aAllCallbacks; }
         static auto& GetAppWindowsToDisable() { return s_StaticData.s_appWindowsToDisable; }
     };

@@ -33,7 +33,7 @@ static DTWAIN_BOOL DTWAIN_SetPixelTypeHelper(DTWAIN_SOURCE Source, LONG PixelTyp
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPixelType(DTWAIN_SOURCE Source, LONG PixelType, LONG BitDepth, DTWAIN_BOOL bSetCurrent)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PixelType, BitDepth, bSetCurrent))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+    VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     // reset the values first
     DTWAIN_BOOL bRet = TRUE;
     if (PixelType == DTWAIN_PT_DEFAULT && BitDepth == DTWAIN_DEFAULT)
@@ -71,7 +71,7 @@ DTWAIN_BOOL DTWAIN_SetPixelTypeHelper(DTWAIN_SOURCE Source, LONG PixelType, LONG
 
     vValues[0] = PixelType;
 
-    const DTWAIN_BOOL bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_ICAPPIXELTYPE, SetType, Array );
+    const DTWAIN_BOOL bRet = DTWAIN_SetCapValuesEx2(Source, DTWAIN_CV_ICAPPIXELTYPE, SetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array );
     if ( bRet )
     {
         // Set the source value in the cache
@@ -117,7 +117,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPixelType(DTWAIN_SOURCE Source, LPLONG PixelT
 DTWAIN_BOOL GetPixelType(DTWAIN_SOURCE Source, LPLONG PixelType, LPLONG BitDepth, LONG GetType)
 {
     DTWAIN_ARRAY Array = nullptr;
-    const DTWAIN_BOOL bRet = DTWAIN_GetCapValues(Source, DTWAIN_CV_ICAPPIXELTYPE, GetType, &Array );
+    const DTWAIN_BOOL bRet = DTWAIN_GetCapValuesEx2(Source, DTWAIN_CV_ICAPPIXELTYPE,  GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array );
     if ( bRet )
     {
         const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
@@ -152,7 +152,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBitDepth(DTWAIN_SOURCE Source, LONG BitDepth,
     if ( !vIn.empty())
     {
         vIn[0] = BitDepth;
-        bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_ICAPBITDEPTH, SetType, Array);
+        bRet = DTWAIN_SetCapValuesEx2(Source, DTWAIN_CV_ICAPBITDEPTH, SetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array);
         if ( !bRet )
         {
             DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return true;},
@@ -179,7 +179,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetBitDepth(DTWAIN_SOURCE Source, LPLONG BitDept
         GetType = DTWAIN_CAPGETDEFAULT;
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !BitDepth;} ,
                                  DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-    const DTWAIN_BOOL bRet = DTWAIN_GetCapValues(Source, DTWAIN_CV_ICAPBITDEPTH, GetType, &Array);
+    const DTWAIN_BOOL bRet = DTWAIN_GetCapValuesEx2(Source, DTWAIN_CV_ICAPBITDEPTH, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array);
     if ( bRet && Array )
     {
         const auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);

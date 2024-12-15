@@ -36,7 +36,6 @@ static std::string DecodeTW_INFO(pTW_INFO pInfo, LPCSTR pMem);
 static std::string DecodeSupportedGroups(TW_UINT32 SupportedGroups);
 static std::string IndentDefinition() { return std::string(4, ' '); }
 
-#define ADD_ERRORCODE_TO_MAP(theMap, start, x) theMap[(start) + x] = #x;
 #define ADD_ERRORCODE_TO_MAP2(x, y) {x + y, #y}
 
 static constexpr std::array<std::pair<uint32_t, const char*>, 41> mapTwainDSMReturnCodes =
@@ -114,7 +113,7 @@ void CTL_ErrorStructDecoder::StartMessageDecoder(HWND hWnd, UINT nMsg,
 }
 
 void CTL_ErrorStructDecoder::StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDest,
-                                         LONG nDG, UINT nDAT, UINT nMSG, TW_MEMREF Data,
+                                         TW_UINT32 nDG, TW_UINT16 nDAT, TW_UINT16 nMSG, TW_MEMREF Data,
                                          ErrorStructTypes sType)
 {
     StringStreamA sBuffer;

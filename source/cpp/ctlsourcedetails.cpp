@@ -47,7 +47,7 @@ template <typename T>
 static void create_stream(std::stringstream& strm, DTWAIN_SOURCE Source, LONG capValue)
 {
     DTWAIN_ARRAY arr = nullptr;
-    DTWAIN_GetCapValues(Source, capValue, DTWAIN_CAPGET, &arr);
+    DTWAIN_GetCapValuesEx2(Source, capValue, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
     if (pHandle && arr)
     {
@@ -78,7 +78,7 @@ struct DefaultStringFnGetter
     static DTWAIN_ARRAY GetAllStringValues(DTWAIN_SOURCE Source, LONG capValue)
     {
         DTWAIN_ARRAY arr = nullptr;
-        DTWAIN_GetCapValues(Source, capValue, DTWAIN_CAPGET, &arr);
+        DTWAIN_GetCapValuesEx2(Source, capValue, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
         return arr;
     }
 };
@@ -207,10 +207,10 @@ static std::string get_source_file_types(DTWAIN_SOURCE Source)
                     DTWAINArrayPtr_RAII raii(pHandle, &arr);
                     auto& buf = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
                     buf[0] = curFormat;
-                    DTWAIN_SetCapValues(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPSET, arr);
+                    DTWAIN_SetCapValuesEx2(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
                     buf[0] = curCompression;
                     if (curCompression != -1)
-                        DTWAIN_SetCapValues(Source, ICAP_COMPRESSION, DTWAIN_CAPSET, arr);
+                        DTWAIN_SetCapValuesEx2(Source, ICAP_COMPRESSION, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
                 }
             }
             catch (...)
@@ -223,21 +223,21 @@ static std::string get_source_file_types(DTWAIN_SOURCE Source)
     const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     DTWAIN_ARRAY aFileFormats = nullptr;
     DTWAIN_ARRAY aCurrentFileFormat = nullptr;
-    DTWAIN_GetCapValues(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPGET, &aFileFormats);
+    DTWAIN_GetCapValuesEx2(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aFileFormats);
 
     if ( aFileFormats)
     {
         DTWAINArrayPtr_RAII raii1(pHandle, &aFileFormats);
         auto& vFileFormats = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aFileFormats);
 
-        DTWAIN_GetCapValues(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPGETCURRENT, &aCurrentFileFormat);
+        DTWAIN_GetCapValuesEx2(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aCurrentFileFormat);
         if ( aCurrentFileFormat )
         {
             DTWAINArrayPtr_RAII raii2(pHandle, &aCurrentFileFormat);
             auto& vCurrentFormat = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aCurrentFileFormat);
 
             DTWAIN_ARRAY aCurrentCompress = nullptr;
-            DTWAIN_GetCapValues(Source, ICAP_COMPRESSION, DTWAIN_CAPGETCURRENT, &aCurrentCompress);
+            DTWAIN_GetCapValuesEx2(Source, ICAP_COMPRESSION, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aCurrentCompress);
             if (aCurrentCompress)
             {
                 DTWAINArrayPtr_RAII raii3(pHandle, &aCurrentCompress);
@@ -259,7 +259,7 @@ static std::string get_source_file_types(DTWAIN_SOURCE Source)
                     if (compIter.first)
                     {
                         const sourceMapType* ptr = compToMap[compIter.second].second;
-                        DTWAIN_SetCapValues(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPSET, tempArray);
+                        DTWAIN_SetCapValuesEx2(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, tempArray);
                         auto tempCompression = DTWAIN_EnumCompressionTypesEx(Source);
                         DTWAINArrayPtr_RAII raii5(pHandle, &tempCompression);
                         auto& compressBuf = pHandle->m_ArrayFactory->underlying_container_t<LONG>(tempCompression);
@@ -313,7 +313,7 @@ static std::vector<std::string> getNamesFromConstants(CTL_ITwainSource *pSource,
 {
     DTWAIN_ARRAY arr = nullptr;
     const auto pHandle = pSource->GetDTWAINHandle();
-    BOOL bRet = DTWAIN_GetCapValues(pSource, capValue, DTWAIN_CAPGET, &arr);
+    BOOL bRet = DTWAIN_GetCapValuesEx2(pSource, capValue, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
     std::vector<std::string> allNames;
     if (bRet)
     {
@@ -352,7 +352,7 @@ ResInfoMap getResolutionInfo(CTL_ITwainSource* pSource)
         auto& pSetUnitsVal = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aSetUnit);
         DTWAINArrayPtr_RAII raii2(pHandle, &aSetUnit);
         DTWAIN_ARRAY curUnit = nullptr;
-        DTWAIN_GetCapValues(pSource, ICAP_UNITS, DTWAIN_CAPGETCURRENT, &curUnit);
+        DTWAIN_GetCapValuesEx2(pSource, ICAP_UNITS, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &curUnit);
         if ( curUnit )
         {
             auto& pCurUnit = pHandle->m_ArrayFactory->underlying_container_t<LONG>(curUnit);
@@ -364,12 +364,12 @@ ResInfoMap getResolutionInfo(CTL_ITwainSource* pSource)
                     resMap.insert({pUnitsVals[i],{}});
                     // Set the current unit of measure
                     pSetUnitsVal[0] = pUnitsVals[i];
-                    if (DTWAIN_SetCapValues(pSource, ICAP_UNITS, DTWAIN_CAPSET, aSetUnit))
+                    if (DTWAIN_SetCapValuesEx2(pSource, ICAP_UNITS, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, aSetUnit))
                     {
                         // Get the resolution values for this unit of measure
                         DTWAIN_ARRAY aResolutions;
                         DTWAINArrayPtr_RAII raii3(pHandle, &aResolutions);
-                        DTWAIN_GetCapValues(pSource, ICAP_XRESOLUTION, DTWAIN_CAPGET, &aResolutions);
+                        DTWAIN_GetCapValuesEx2(pSource, ICAP_XRESOLUTION, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aResolutions);
                         if ( aResolutions )
                         {
                             auto& pResolutions = pHandle->m_ArrayFactory->underlying_container_t<double>(aResolutions);
@@ -384,7 +384,7 @@ ResInfoMap getResolutionInfo(CTL_ITwainSource* pSource)
                 }
 
                 // Set the unit back to the original
-                DTWAIN_SetCapValues(pSource, ICAP_UNITS, DTWAIN_CAPSET, curUnit);
+                DTWAIN_SetCapValuesEx2(pSource, ICAP_UNITS, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, curUnit);
             }
         }
     }
@@ -649,7 +649,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         LONG capConstant;
                         const char* name;
                         int prefixCount;
-                        char* prefix;
+                        const char* prefix;
                     };
 
                     std::array<TwainDataItems, 4> otherData = { {
@@ -829,7 +829,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         if (deviceInfoCaps[curDevice] == CAP_PRINTER)
                         {
                             DTWAIN_ARRAY aPrinter = nullptr;
-                            DTWAIN_GetCapValues(pCurrentSourcePtr, CAP_PRINTER, DTWAIN_CAPGET, &aPrinter);
+                            DTWAIN_GetCapValuesEx2(pCurrentSourcePtr, CAP_PRINTER, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aPrinter);
                             DTWAINArrayPtr_RAII aPrinterRaii(pHandle, &aPrinter);
                             if ( aPrinter )
                             {

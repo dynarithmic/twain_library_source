@@ -106,7 +106,7 @@ CTL_StaticDataStruct        CTL_StaticData::s_StaticData;
 std::unique_ptr<CSimpleIniA>   CTL_StaticData::s_iniInterface;
 std::mutex                  CTL_StaticData::s_mutexInitDestroy;
 
-std::string CTL_StaticData::GetTwainNameFromConstantA(int lConstantType, int lTwainConstant)
+std::string CTL_StaticData::GetTwainNameFromConstantA(int lConstantType, TwainConstantType lTwainConstant)
 {
     auto& constantsmap = CTL_StaticData::GetTwainConstantsMap();
     auto iter1 = constantsmap.find(lConstantType);
@@ -118,12 +118,12 @@ std::string CTL_StaticData::GetTwainNameFromConstantA(int lConstantType, int lTw
     return iter2->second;
 }
 
-CTL_StringType CTL_StaticData::GetTwainNameFromConstant(int lConstantType, int lTwainConstant)
+CTL_StringType CTL_StaticData::GetTwainNameFromConstant(int lConstantType, TwainConstantType lTwainConstant)
 {
     return StringConversion::Convert_Ansi_To_Native(CTL_StaticData::GetTwainNameFromConstantA(lConstantType, lTwainConstant));
 }
 
-std::wstring CTL_StaticData::GetTwainNameFromConstantW(int lConstantType, int lTwainConstant)
+std::wstring CTL_StaticData::GetTwainNameFromConstantW(int lConstantType, TwainConstantType lTwainConstant)
 {
     return StringConversion::Convert_Ansi_To_Wide(CTL_StaticData::GetTwainNameFromConstantA(lConstantType, lTwainConstant));
 }
@@ -147,13 +147,13 @@ void CTL_TwainDLLHandle::NotifyWindows(UINT /*nMsg*/, WPARAM /*wParam*/, LPARAM 
 {
 }
 
-std::pair<bool, int32_t> CTL_StaticData::GetIDFromTwainName(std::string sName)
+std::pair<bool, TwainConstantType> CTL_StaticData::GetIDFromTwainName(std::string sName)
 {
     auto& constantsMap = CTL_StaticData::GetStringToConstantMap();
     auto iter = constantsMap.find(sName);
     if (iter != constantsMap.end())
         return { true, iter->second };
-    return { false, (std::numeric_limits<int32_t>::min)() };
+    return { false, (std::numeric_limits<TwainConstantType>::min)() };
 }
 
 /////////////////////////////////////////////////////////////////////////

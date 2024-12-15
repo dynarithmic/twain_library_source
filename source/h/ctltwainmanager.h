@@ -470,7 +470,7 @@ namespace dynarithmic
                    }
             };
 
-            static CTL_ErrorStruct GetGeneralErrorInfo(LONG nDG, UINT nDAT, UINT nMSG);
+            static CTL_ErrorStruct GetGeneralErrorInfo(TW_UINT32 nDG, TW_UINT16 nDAT, TW_UINT16 nMSG);
 
             void DestroySession(const CTL_ITwainSession* pSession);
             void DestroyAllTwainSessions();
