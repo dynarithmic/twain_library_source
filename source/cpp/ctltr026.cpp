@@ -1594,7 +1594,7 @@ bool IsState7InfoNeeded(CTL_ITwainSource *pSource)
     bool bRetval = false;
     DTWAIN_ARRAY A = nullptr;
     DTWAINScopedLogControllerExclude scopedLog(DTWAIN_LOG_ERRORMSGBOX);
-    if ( DTWAIN_GetCapValues(pSource, DTWAIN_CV_ICAPUNDEFINEDIMAGESIZE, DTWAIN_CAPGETCURRENT, &A))
+    if ( DTWAIN_GetCapValuesEx2(pSource, DTWAIN_CV_ICAPUNDEFINEDIMAGESIZE, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &A))
     {
         const auto pHandle = pSource->GetDTWAINHandle();
         DTWAINArrayLowLevel_RAII raii(pHandle, A);

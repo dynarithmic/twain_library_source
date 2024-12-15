@@ -30,7 +30,7 @@ using namespace dynarithmic;
 LONG DLLENTRY_DEF DTWAIN_GetPaperSizeName(LONG paperNumber, LPTSTR outName, LONG nSize)
 {
     LOG_FUNC_ENTRY_PARAMS((paperNumber, outName, nSize))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto& pdfmediamap = CTL_StaticData::GetPDFMediaMap();
     auto iter = pdfmediamap.find(paperNumber);
     LONG nActualCharactersCopied = 0;

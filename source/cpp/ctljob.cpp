@@ -47,7 +47,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJobControl(DTWAIN_SOURCE Source, LONG JobCont
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
     vValues[0] = JobControl;
 
-    const DTWAIN_BOOL bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPJOBCONTROL, SetType, Array );
+    const DTWAIN_BOOL bRet = DTWAIN_SetCapValuesEx2(Source, DTWAIN_CV_CAPJOBCONTROL, SetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array );
     if ( bRet )
     {
         // Set the source value in the cache

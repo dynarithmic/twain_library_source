@@ -65,19 +65,19 @@ LONG DLLENTRY_DEF DTWAIN_GetExtNameFromCap(LONG nValue, LPTSTR szValue, LONG nMa
     CATCH_BLOCK(-1)
 }
 
-static LONG GetGenericTwainValue(LONG lConstantType, LPCTSTR name)
+static TwainConstantType GetGenericTwainValue(LONG lConstantType, LPCTSTR name)
 {
     auto& constantsmap = CTL_StaticData::GetTwainConstantsMap();
     auto iter1 = constantsmap.find(lConstantType);
     if (iter1 == constantsmap.end())
-        return -1L;
+        return -1LL;
     auto& twainMap = iter1->second;
     const std::string s = StringConversion::Convert_Native_To_Ansi(name);
-    const auto iter = std::find_if(twainMap.begin(), twainMap.end(), [&](const CTL_TwainLongToStringMap::value_type& vt)
+    const auto iter = std::find_if(twainMap.begin(), twainMap.end(), [&](const CTL_TwainIDToStringMap::value_type& vt)
                                    {return vt.second == s; });
     if (iter != twainMap.end())
         return iter->first;
-    return -1L;
+    return -1LL;
 }
 
 BOOL DLLENTRY_DEF DTWAIN_GetTwainCountryName(LONG countryId, LPTSTR szName)
@@ -96,7 +96,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainCountryValue(LPCTSTR country)
     LOG_FUNC_ENTRY_PARAMS((country))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const auto value = GetGenericTwainValue(DTWAIN_CONSTANT_TWCY, country);
-    LOG_FUNC_EXIT_NONAME_PARAMS(value)
+    LOG_FUNC_EXIT_NONAME_PARAMS(static_cast<LONG>(value))
     CATCH_BLOCK(-1L)
 }
 
@@ -116,6 +116,6 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainLanguageValue(LPCTSTR szName)
     LOG_FUNC_ENTRY_PARAMS((szName))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const auto value = GetGenericTwainValue(DTWAIN_CONSTANT_TWLG, szName);
-    LOG_FUNC_EXIT_NONAME_PARAMS(value)
+    LOG_FUNC_EXIT_NONAME_PARAMS(static_cast<LONG>(value))
     CATCH_BLOCK(-1L)
 }
