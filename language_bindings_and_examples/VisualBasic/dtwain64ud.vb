@@ -820,7 +820,7 @@ Class DTWAINAPI
     Public Const DTWAIN_ERR_NOTIFFLZW As Integer = (-2021)
     Public Const DTWAIN_ERR_INVALIDPCX As Integer = (-2022)
     Public Const DTWAIN_ERR_CREATEBMP As Integer = (-2023)
-    Public Const DTWAIN_ERR_NOLINES As Integer = (-2025)
+    Public Const DTWAIN_ERR_NOLINES As Integer = (-2024)
     Public Const DTWAIN_ERR_GETDIB As Integer = (-2025)
     Public Const DTWAIN_ERR_NODEVOP As Integer = (-2026)
     Public Const DTWAIN_ERR_INVALIDWMF As Integer = (-2027)
