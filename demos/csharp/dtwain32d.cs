@@ -873,7 +873,7 @@ namespace Dynarithmic
         public const  int DTWAIN_ERR_NOTIFFLZW = (-2021);
         public const  int DTWAIN_ERR_INVALIDPCX = (-2022);
         public const  int DTWAIN_ERR_CREATEBMP = (-2023);
-        public const  int DTWAIN_ERR_NOLINES = (-2025);
+        public const  int DTWAIN_ERR_NOLINES = (-2024);
         public const  int DTWAIN_ERR_GETDIB = (-2025);
         public const  int DTWAIN_ERR_NODEVOP = (-2026);
         public const  int DTWAIN_ERR_INVALIDWMF = (-2027);
