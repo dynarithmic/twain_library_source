@@ -34,7 +34,7 @@ namespace dynarithmic
             TW_UINT32   GetDataSize() const;
             HANDLE      GetData() const;
             void        SetDataSize(TW_UINT32 nSize);
-            TW_UINT16   SetData(HANDLE hData, int nSize);
+            TW_UINT16   SetData(HANDLE hData, TW_UINT32 nSize);
 
         private:
             TW_CUSTOMDSDATA     m_CustomDSData;

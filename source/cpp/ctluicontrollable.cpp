@@ -46,7 +46,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
     {
         // Get the capability value
         DTWAIN_ARRAY CapArray = nullptr;
-        BOOL bGetUI = DTWAIN_GetCapValuesEx(Source, DTWAIN_CV_CAPUICONTROLLABLE, DTWAIN_CAPGET, DTWAIN_CONTONEVALUE, &CapArray);
+        BOOL bGetUI = DTWAIN_GetCapValuesEx2(Source, DTWAIN_CV_CAPUICONTROLLABLE, DTWAIN_CAPGET, 
+                                DTWAIN_CONTONEVALUE, DTWAIN_DEFAULT, &CapArray);
         if (bGetUI && CapArray && !pHandle->m_ArrayFactory->empty(CapArray))
         {
             DTWAINArrayLowLevel_RAII arr(pHandle, CapArray);

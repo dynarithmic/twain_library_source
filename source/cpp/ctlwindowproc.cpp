@@ -152,7 +152,7 @@ struct CallbackFinder
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RemoveCallback(DTWAIN_CALLBACK_PROC Fn)
 {
     LOG_FUNC_ENTRY_PARAMS((Fn))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const CallbackFinder<DTWAIN_CALLBACK_PROC,LONG> Finder(Fn);
     auto& callbacks = CTL_StaticData::GetCallbacks();
     const auto found = std::find_if(callbacks.begin(), callbacks.end(), Finder);
@@ -277,8 +277,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                 if ( wParam == DTWAIN_TN_ACQUIREDONE && !pSource->ImagesStored() )
                 {
                     LOG_FUNC_STRING(DTWAIN_ACQUIREDONE -- Copying DIBS to Source...)
-                    DTWAIN_ARRAY aDibs = nullptr;
-                    aDibs = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYHANDLE, 0 );
+                    DTWAIN_ARRAY aDibs = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYHANDLE, 0);
                     DTWAIN_GetAllSourceDibs( static_cast<DTWAIN_SOURCE>(pSource), aDibs );
                     pSource->AddDibsToAcquisition(aDibs);
                     LOG_FUNC_STRING(DTWAIN_ACQUIREDONE -- Finished Copying DIBS to Source...)
@@ -497,8 +496,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                            // Save the image handles
                             char buf[25] = {};
                             LOG_FUNC_STRING(No UI Mode Done -- Copying DIBS to Source...)
-                            DTWAIN_ARRAY aDibs = nullptr;
-                            aDibs = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYHANDLE, 0 );
+                            DTWAIN_ARRAY aDibs = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYHANDLE, 0);
                             DTWAIN_GetAllSourceDibs( pSource, aDibs );
                             int nDibs = static_cast<int>(pHandle->m_ArrayFactory->size(aDibs));
                             StringStreamA strm;

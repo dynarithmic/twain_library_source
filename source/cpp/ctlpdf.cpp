@@ -231,7 +231,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFOCRMode(DTWAIN_SOURCE Source, DTWAIN_BOOL 
 LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontName(LONG FontVal, LPTSTR szFont, LONG nChars)
 {
     LOG_FUNC_ENTRY_PARAMS((FontVal, szFont, nChars))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto st = CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_FONTNAME, FontVal + DTWAIN_FONT_START_);
     auto numChars = StringWrapper::CopyInfoToCString(st, szFont, nChars);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szFont))
@@ -242,7 +242,7 @@ LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontName(LONG FontVal, LPTSTR szFont, LONG n
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextEx(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement, LONG Flags)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, TextElement))
-    auto [pHandle, pSource] = VerifyHandles(Source);
+    VerifyHandles(Source);
     const PDFTextElement* pElement = static_cast<PDFTextElement*>(TextElement);
     const DTWAIN_BOOL retVal = DTWAIN_AddPDFText(Source,
                                                  StringConversion::Convert_Ansi_To_Native(pElement->m_text).c_str(),

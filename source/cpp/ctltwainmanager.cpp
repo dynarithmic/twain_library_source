@@ -2241,7 +2241,7 @@ int CTL_TwainAppMgr::GetDataTypeFromCap( CTL_EnumCapability Cap, CTL_ITwainSourc
     const CTL_CapStruct cStruct = GetGeneralCapInfo(Cap);
     if ( static_cast<std::string>(cStruct).length() == 0 )
         return (std::numeric_limits<int>::min)();
-    return cStruct.m_nDataType;
+    return static_cast<int>(cStruct.m_nDataType);
 }
 
 CTL_CapStruct CTL_TwainAppMgr::GetGeneralCapInfo(LONG Cap)
@@ -2330,7 +2330,7 @@ UINT CTL_TwainAppMgr::GetContainerTypesFromCap( CTL_EnumCapability Cap, bool nTy
     return cStruct.m_nSetContainer;
 }
 
-CTL_ErrorStruct CTL_TwainAppMgr::GetGeneralErrorInfo(LONG nDG, UINT nDAT, UINT nMSG)
+CTL_ErrorStruct CTL_TwainAppMgr::GetGeneralErrorInfo(TW_UINT32 nDG, TW_UINT16 nDAT, TW_UINT16 nMSG)
 {
     CTL_ErrorStruct eStruct;
     auto& errorInfoMap = CTL_StaticData::GetGeneralErrorInfoMap();

@@ -541,7 +541,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap
                                                 LONG nDataType, DTWAIN_ARRAY pArray )
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCap, lSetType, lContainerType, nDataType, pArray))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+    VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     bool bRet = SetCapValuesEx2_Internal(Source, lCap, lSetType, lContainerType, nDataType, pArray);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
@@ -564,7 +564,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValuesEx( DTWAIN_SOURCE Source, LONG lCap,
 // Custom cap data functions
 #include "ctltr036.h"
 
-HANDLE DLLENTRY_DEF DTWAIN_GetCustomDSData( DTWAIN_SOURCE Source, LPBYTE Data, LONG dSize, LPLONG pActualSize, LONG nFlags )
+HANDLE DLLENTRY_DEF DTWAIN_GetCustomDSData( DTWAIN_SOURCE Source, LPBYTE Data, DWORD dSize, LPDWORD pActualSize, LONG nFlags )
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Data, dSize, pActualSize, nFlags))
     const bool bSupported = DTWAIN_IsCapSupported(Source, CAP_CUSTOMDSDATA)?true:false;
@@ -587,7 +587,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetCustomDSData( DTWAIN_SOURCE Source, LPBYTE Data, L
     // Copy actual size data to parameter
     if( pActualSize )
         *pActualSize = DST.GetDataSize();
-    const int localActualSize = DST.GetDataSize();
+    auto localActualSize = DST.GetDataSize();
 
     // Get the returned handle from TWAIN
     const HANDLE h = DST.GetData();
@@ -600,7 +600,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetCustomDSData( DTWAIN_SOURCE Source, LPBYTE Data, L
     if( Data && (nFlags & DTWAINGCD_COPYDATA))
     {
         const char *pData = static_cast<char *>(ImageMemoryHandler::GlobalLock(h));
-        const int nMinCopy = (std::max)((std::min)(dSize, static_cast<LONG>(localActualSize)), 0L);
+        auto nMinCopy = (std::max)((std::min)(dSize, static_cast<DWORD>(localActualSize)), 0UL);
         memcpy(Data, pData, nMinCopy);
         ImageMemoryHandler::GlobalUnlock(h);
         ImageMemoryHandler::GlobalFree(h);
@@ -611,7 +611,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetCustomDSData( DTWAIN_SOURCE Source, LPBYTE Data, L
     CATCH_BLOCK(HANDLE())
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomDSData( DTWAIN_SOURCE Source, HANDLE hData, LPCBYTE Data, LONG dSize, LONG nFlags )
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomDSData( DTWAIN_SOURCE Source, HANDLE hData, LPCBYTE Data, DWORD dSize, LONG nFlags )
 {
     LOG_FUNC_ENTRY_PARAMS((Source, hData, Data, dSize, nFlags))
     const bool bSupported = DTWAIN_IsCapSupported(Source, CAP_CUSTOMDSDATA)?true:false;
@@ -643,7 +643,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomDSData( DTWAIN_SOURCE Source, HANDLE hD
     // Set data to the data passed in
     DTWAINGlobalHandleUnlockFree_RAII memHandler;
 
-    if( nFlags & DTWAINSCD_USEDATA )
+    if( Data && (nFlags & DTWAINSCD_USEDATA ))
     {
         // Allocate local copy of handle
         pData = static_cast<char*>(ImageMemoryHandler::GlobalAllocPr(GMEM_DDESHARE, dSize));
@@ -668,7 +668,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomDSData( DTWAIN_SOURCE Source, HANDLE hD
     CATCH_BLOCK(false)
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireStripSizes( DTWAIN_SOURCE Source, LPLONG lpMin, LPLONG lpMax, LPLONG lpPreferred )
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireStripSizes( DTWAIN_SOURCE Source, LPDWORD lpMin, LPDWORD lpMax, LPDWORD lpPreferred )
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpMin, lpMax, lpPreferred))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
@@ -678,13 +678,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireStripSizes( DTWAIN_SOURCE Source, LPLO
     if( bRet )
     {
         if( lpMin )
-            * lpMin = Xfer.MinBufSize;
+            *lpMin = Xfer.MinBufSize;
 
         if( lpMax )
-            * lpMax = Xfer.MaxBufSize;
+            *lpMax = Xfer.MaxBufSize;
 
         if( lpPreferred )
-            * lpPreferred = Xfer.Preferred;
+            *lpPreferred = Xfer.Preferred;
     }
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpMin, lpMax, lpPreferred))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
@@ -711,11 +711,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireStripBuffer(DTWAIN_SOURCE Source, HAND
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireStripSize(DTWAIN_SOURCE Source, LONG StripSize)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireStripSize(DTWAIN_SOURCE Source, DWORD StripSize)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, StripSize))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    LONG MinSize, MaxSize;
+    DWORD MinSize, MaxSize;
     if ( StripSize == 0 )
     {
         pSource->SetUserStripBufSize(StripSize);
@@ -745,9 +745,9 @@ HANDLE DLLENTRY_DEF DTWAIN_GetAcquireStripBuffer(DTWAIN_SOURCE Source)
 }
 
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireStripData(DTWAIN_SOURCE Source, LPLONG lpCompression, LPLONG lpBytesPerRow,
-                                                    LPLONG lpColumns, LPLONG lpRows, LPLONG XOffset,
-                                                    LPLONG YOffset, LPLONG lpBytesWritten)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireStripData(DTWAIN_SOURCE Source, LPLONG lpCompression, LPDWORD lpBytesPerRow,
+                                                    LPDWORD lpColumns, LPDWORD lpRows, LPDWORD XOffset,
+                                                    LPDWORD YOffset, LPDWORD lpBytesWritten)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpCompression, lpBytesPerRow,lpColumns, lpRows, XOffset,YOffset, lpBytesWritten))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);

@@ -168,7 +168,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSavedFilesCount(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    LOG_FUNC_EXIT_NONAME_PARAMS(pSource->GetFileSavePageCount());
+    LOG_FUNC_EXIT_NONAME_PARAMS(pSource->GetFileSavePageCount())
     CATCH_BLOCK_LOG_PARAMS(-1)
 }
 

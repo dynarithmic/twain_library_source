@@ -46,19 +46,19 @@ bool dynarithmic::GetSupportString(DTWAIN_SOURCE Source, LPTSTR sz, LONG nLen, L
 
 bool dynarithmic::EnumSupported(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG Cap)
 {
-    const bool bRet = DTWAIN_GetCapValues(Source, Cap, DTWAIN_CAPGET, pArray)?true:false;
+    const bool bRet = DTWAIN_GetCapValuesEx2(Source, Cap, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, pArray)?true:false;
     return bRet;
 }
 
 
 bool dynarithmic::SetSupportArray(DTWAIN_SOURCE Source, DTWAIN_ARRAY Array, LONG Cap)
 {
-    return DTWAIN_SetCapValues(Source, Cap, DTWAIN_CAPSETAVAILABLE, Array)?true:false;
+    return DTWAIN_SetCapValuesEx2(Source, Cap, DTWAIN_CAPSETAVAILABLE, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array)?true:false;
 }
 
 bool dynarithmic::GetSupportArray(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array, LONG Cap, LONG GetType/*=DTWAIN_CAPGET*/)
 {
-    return DTWAIN_GetCapValues(Source, Cap, GetType, Array)?true:false;
+    return DTWAIN_GetCapValuesEx2(Source, Cap, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array)?true:false;
 }
 
 LONG dynarithmic::CheckEnabled(DTWAIN_SOURCE Source, LONG CapVal)

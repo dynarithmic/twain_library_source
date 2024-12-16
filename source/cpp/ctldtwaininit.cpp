@@ -406,7 +406,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadLanguageResource(LONG nLanguage)
 {
     LOG_FUNC_ENTRY_PARAMS((nLanguage))
     LPCTSTR pLangDLL;
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     switch(nLanguage)
     {
         case DTWAIN_RES_ENGLISH:
@@ -471,7 +471,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesEx(LPCTSTR sLangDLL, DT
 LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstant(LONG lConstantType, LONG lTwainConstant, LPTSTR lpszOut, LONG nSize)
 {
     LOG_FUNC_ENTRY_PARAMS((lConstantType, lTwainConstant, lpszOut, nSize))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto ret = CTL_StaticData::GetTwainNameFromConstant(lConstantType, lTwainConstant);
     auto numChars = StringWrapper::CopyInfoToCString(ret, lpszOut, nSize);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
@@ -523,7 +523,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndThread( DTWAIN_HANDLE DLLHandle )
     auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
     if ( threadMap.size() == 1)
         LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto iter = std::find_if(threadMap.begin(), threadMap.end(),[&](const auto& pr)
         { return pr.second.get() == static_cast<CTL_TwainDLLHandle*>(DLLHandle); });
 
@@ -672,7 +672,7 @@ LONG DLLENTRY_DEF DTWAIN_IsTwainAvailableEx(LPTSTR directories, LONG nMaxLen)
 LONG DLLENTRY_DEF DTWAIN_GetTwainAvailability()
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto availability = GetTwainAvailablityInternal();
     LOG_FUNC_EXIT_NONAME_PARAMS(availability.first)
     CATCH_BLOCK(0)
@@ -750,7 +750,7 @@ LONG DLLENTRY_DEF DTWAIN_GetDSMFullName(LONG DSMType, LPTSTR szDLLName, LONG nMa
 LONG DLLENTRY_DEF DTWAIN_GetActiveDSMPath(LPTSTR szDLLName, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((szDLLName, nMaxLen))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto retVal = StringWrapper::CopyInfoToCString(CTL_TwainAppMgr::GetDSMPath(), szDLLName, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szDLLName))
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
@@ -760,7 +760,7 @@ LONG DLLENTRY_DEF DTWAIN_GetActiveDSMPath(LPTSTR szDLLName, LONG nMaxLen)
 LONG DLLENTRY_DEF DTWAIN_GetActiveDSMVersionInfo(LPTSTR szDLLInfo, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((szDLLInfo, nMaxLen))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto retVal = StringWrapper::CopyInfoToCString(CTL_TwainAppMgr::GetDSMVersionInfo(), szDLLInfo, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szDLLInfo))
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
@@ -1508,7 +1508,7 @@ static LONG GetFileTypeInfo(Fn infoFn, int nType, LPTSTR lpszName, LONG nMaxLen)
 LONG DLLENTRY_DEF DTWAIN_GetFileTypeName(LONG nType, LPTSTR lpszName, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((nType, lpszName, nMaxLen))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszName))
     LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypeInfo(&GetFileTypeNameInternal, nType, lpszName, nMaxLen))
     CATCH_BLOCK(-1)
@@ -1517,7 +1517,7 @@ LONG DLLENTRY_DEF DTWAIN_GetFileTypeName(LONG nType, LPTSTR lpszName, LONG nMaxL
 LONG DLLENTRY_DEF DTWAIN_GetFileTypeExtensions(LONG nType, LPTSTR lpszName, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((nType, lpszName, nMaxLen))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszName))
     LOG_FUNC_EXIT_NONAME_PARAMS(GetFileTypeInfo(&GetFileTypeExtensionsInternal, nType, lpszName, nMaxLen))
     CATCH_BLOCK(-1)
@@ -1853,7 +1853,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainMode(LONG lMode)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTIFFSupported(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -1862,21 +1862,21 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTIFFSupported(VOID_PROTOTYPE)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPDFSupported(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPNGSupported(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsJPEGSupported(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -2085,7 +2085,7 @@ LONG DLLENTRY_DEF DTWAIN_GetVersionCopyright(LPTSTR lpszVer, LONG nLength)
 LONG DLLENTRY_DEF DTWAIN_GetTwainStringName(LONG category, LONG TwainID, LPTSTR lpszBuffer, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((category, TwainID, lpszBuffer, nMaxLen))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     std::string sValue;
     switch (category)
     {
@@ -2111,8 +2111,8 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainIDFromName(LPCTSTR lpszBuffer)
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto retVal = CTL_StaticData::GetIDFromTwainName(StringConversion::Convert_NativePtr_To_Ansi(lpszBuffer));
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !retVal.first; }, DTWAIN_ERR_STRINGID_NOTFOUND, retVal.second, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second)
-    CATCH_BLOCK(std::numeric_limits<int32_t>::min())
+    LOG_FUNC_EXIT_NONAME_PARAMS((LONG)retVal.second)
+    CATCH_BLOCK(std::numeric_limits<LONG>::min())
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetWindowsVersionInfo(LPTSTR lpszBuffer, LONG nMaxLen)
@@ -2449,6 +2449,14 @@ bool LoadGeneralResources(bool blockExecution)
                 #else
                 CTL_StaticData::SetResourceLoadError(DTWAIN_ERR_INI32_NOT_FOUND);
                 #endif
+            }
+            if ( !ret.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK])
+            {
+                CTL_StringStreamType strm;
+                strm << _T("\r\n\r\nBad data found:\r\n") << _T("Line number: ") << ret.m_dupInfo.lineNumber;
+                strm << _T("\r\nLine starts with: ") << StringConversion::Convert_Ansi_To_Native(ret.m_dupInfo.line);
+                versionErrorMessage = strm.str();
+                CTL_StaticData::SetResourceLoadError(DTWAIN_ERR_RESOURCES_DATA_EXCEPTION);
             }
             if (!ret.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_VERSION_READ])
             {
