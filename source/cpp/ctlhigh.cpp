@@ -369,7 +369,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
 #define EXPORT_GET_CAP_VALUE_S(FuncName, Cap, NumChars) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, LPTSTR value)\
     {\
-        std::string valueTemp(NumChars + 1, '\0');\
+        std::string valueTemp((NumChars) + 1, '\0');\
         auto retVal = GetStringCapability(Source, Cap, &valueTemp[0], NumChars, \
                                           GetCurrentCapValues, __FUNCTION__, GENERATE_PARAM_LOG((Source, value))); \
         valueTemp.resize(NumChars); \
@@ -401,7 +401,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
         else\
         if ( GetType == DTWAIN_CAPGETDEFAULT) \
            fn = GetDefaultCapValues;\
-        std::string valueTemp(NumChars + 1, '\0');\
+        std::string valueTemp((NumChars) + 1, '\0');\
         auto retval = GetStringCapability(Source, Cap, &valueTemp[0], NumChars, fn, __FUNCTION__, \
                             GENERATE_PARAM_LOG((Source, value, GetType))); \
         valueTemp.resize(NumChars); \
@@ -715,7 +715,8 @@ EXPORT_ENUM_CAP_VALUES_EX(DTWAIN_EnumThresholdValuesEx, DTWAIN_CV_ICAPTHRESHOLD)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSourceValues(DTWAIN_SOURCE Source, LPCTSTR capName, LPDTWAIN_ARRAY pArray, DTWAIN_BOOL expandIfRange)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, capName, pArray, expandIfRange))
-    const DTWAIN_BOOL retVal = DTWAIN_GetCapValues(Source, CTL_TwainAppMgr::GetCapFromCapName(StringConversion::Convert_NativePtr_To_Ansi(capName).c_str()), DTWAIN_CAPGET, pArray);
+    const DTWAIN_BOOL retVal = DTWAIN_GetCapValuesEx2(Source, CTL_TwainAppMgr::GetCapFromCapName(StringConversion::Convert_NativePtr_To_Ansi(capName).c_str()), 
+        DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, pArray);
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(false)
 }
@@ -775,7 +776,7 @@ static bool GetDoubleCap( DTWAIN_SOURCE Source, LONG lCap, double *pValue )
     if (DTWAIN_GetCapDataType(Source, lCap) != TWTY_FIX32)
         return false;
     DTWAIN_ARRAY Array = nullptr;
-    bool bRet = DTWAIN_GetCapValues(Source, lCap, DTWAIN_CAPGETCURRENT, &Array) ? true : false;
+    bool bRet = DTWAIN_GetCapValuesEx2(Source, lCap, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
     if (!bRet)
         return false;
     const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
@@ -809,7 +810,7 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
     DTWAINArrayPtr_RAII a(pHandle, &OrigVals);
 
     // get the capability values
-    if (DTWAIN_GetCapValues(Source, lCap, GetType, arrayToUse))
+    if (DTWAIN_GetCapValuesEx2(Source, lCap, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arrayToUse))
     {
         // Gotten the value.  Check what container type holds the data
         const LONG lContainer = DTWAIN_GetCapContainer(Source, lCap, GetType);

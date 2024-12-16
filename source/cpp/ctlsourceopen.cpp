@@ -76,6 +76,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     // Check for failure to open the source
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return bRetval == false; }, DTWAIN_ERR_SOURCE_COULD_NOT_OPEN, false, FUNC_MACRO);
 
+    // Get all the caps supported
+    DTWAIN_ARRAY arr = nullptr;
+    DTWAINArrayPtr_RAII raii(pHandle, &arr);
+    CTL_TwainAppMgr::GatherCapabilityInfo(pSource);
+
     // If this source has a feeder, check the status of whether we should check.
     // If the check is on, add it to the feeder sources container.
     //
@@ -90,11 +95,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     // See if the source is one that has a bug in the MSG_XFERREADY sending on the 
     // TWAIN message queue
     DetermineIfSpecialXfer(pSource);
-
-    // Get all the caps supported
-    DTWAIN_ARRAY arr = nullptr;
-    DTWAINArrayPtr_RAII raii(pHandle, &arr);
-    CTL_TwainAppMgr::GatherCapabilityInfo(pSource);
 
     // Cache the pixel types and bit depths
     LogAndCachePixelTypes(pSource);
@@ -171,7 +171,7 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
     DTWAIN_ARRAY PixelTypes;
 
     // enumerate all of the pixel types
-    DTWAIN_BOOL bOK = DTWAIN_GetCapValues(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPGET, &PixelTypes);
+    DTWAIN_BOOL bOK = DTWAIN_GetCapValuesEx2(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &PixelTypes);
     if (bOK)
     {
         const auto pHandle = p->GetDTWAINHandle();
@@ -194,12 +194,12 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
                 vCurPixTypePtr[0] = vPixelTypes[i];
                 LONG& curPixType = vCurPixTypePtr[0];
                 // Set the pixel type temporarily
-                if (DTWAIN_SetCapValues(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPSET, vCurPixType))
+                if (DTWAIN_SetCapValuesEx2(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, vCurPixType))
                 {
                     // Add to source list
                     // Now get the bit depths for this pixel type
                     DTWAIN_ARRAY BitDepths = nullptr;
-                    if (DTWAIN_GetCapValues(p, DTWAIN_CV_ICAPBITDEPTH, DTWAIN_CAPGET, &BitDepths))
+                    if (DTWAIN_GetCapValuesEx2(p, DTWAIN_CV_ICAPBITDEPTH, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &BitDepths))
                     {
                         DTWAINArrayLowLevel_RAII arr(pHandle, BitDepths);
 
@@ -230,7 +230,7 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
                     }
                 }
             }
-            DTWAIN_SetCapValues(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPRESET, nullptr);
+            DTWAIN_SetCapValuesEx2(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPRESET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, nullptr);
         }
     }
     if (oldflags && bOK )

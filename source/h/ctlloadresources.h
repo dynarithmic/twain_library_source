@@ -42,15 +42,19 @@ namespace dynarithmic
 
     struct ResourceLoadingInfo
     {
-        enum {DTWAIN_RESLOAD_INFOFILE_LOADED, DTWAIN_RESLOAD_INIFILE_LOADED, DTWAIN_RESLOAD_INFOFILE_VERSION_READ, DTWAIN_RESLOAD_CRC_CHECK,
-              DTWAIN_RESLOAD_NODUPLICATE_ID};
-        std::array<bool, 5> errorValue;
+        enum {DTWAIN_RESLOAD_INFOFILE_LOADED,
+              DTWAIN_RESLOAD_INIFILE_LOADED,
+              DTWAIN_RESLOAD_INFOFILE_VERSION_READ,
+              DTWAIN_RESLOAD_CRC_CHECK,
+              DTWAIN_RESLOAD_NODUPLICATE_ID,
+              DTWAIN_RESLOAD_EXCEPTION_OK};
+        std::array<bool, 6> errorValue;
         CTL_StringType errorMessage;
         CTL_StringType resourcePath;
         struct DuplicateInfo
         {
             int lineNumber = -1;
-            int duplicateID = -1;
+            int64_t duplicateID = -1;
             std::string line;
         };
         DuplicateInfo m_dupInfo;

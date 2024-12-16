@@ -69,7 +69,7 @@ void CTL_CustomDSTriplet::SetDataSize(TW_UINT32 nSize)
     m_CustomDSData.InfoLength = nSize;
 }
 
-TW_UINT16 CTL_CustomDSTriplet::SetData(HANDLE hData, int /*nSize*/)
+TW_UINT16 CTL_CustomDSTriplet::SetData(HANDLE hData, TW_UINT32 /*nSize*/)
 {
     m_CustomDSData.hData = hData;
     return Execute();

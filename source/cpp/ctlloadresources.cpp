@@ -146,8 +146,11 @@ namespace dynarithmic
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_VERSION_READ] = true;
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_CRC_CHECK] = true;
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_NODUPLICATE_ID] = true;
+        retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = true;
         CTL_ErrorStruct ErrorStruct;
-        int dg, dat, msg, structtype, retcode, successcode;
+        TW_UINT32 dg;
+        TW_UINT16 dat, msg;
+        int structtype, retcode, successcode;
         auto sPath = createResourceFileName(DTWAINRESOURCEINFOFILE);
         retValue.resourcePath = sPath;
         auto sPathA = StringConversion::Convert_Native_To_Ansi(sPath);
@@ -170,12 +173,13 @@ namespace dynarithmic
         std::getline(ifs, sWarning);
         ++curLine;
 
+        static constexpr TW_UINT32 stopper = 9999;
         // Read in the Twain triplet information
         auto& genralErrorMap = CTL_StaticData::GetGeneralErrorInfoMap();
         while (ifs >> dg >> dat >> msg >> structtype >> retcode >> successcode)
         { 
             ++curLine;
-            if (dg == -1000 && dat == -1000)
+            if (dg == stopper)
                 break;
             auto structKey = CTL_GeneralErrorInfo::key_type{ dg,dat,msg };
             ErrorStruct.SetKey(structKey);
@@ -207,7 +211,9 @@ namespace dynarithmic
         }
         catch (...)
         {
-            retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] = false;
+            retValue.m_dupInfo.lineNumber = curLine;
+            retValue.m_dupInfo.line = sOffset;
+            retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = false;
             return false;
         }
         CTL_StaticData::SetExtImageInfoOffset(extOffset);
@@ -231,7 +237,9 @@ namespace dynarithmic
             }
             catch (...)
             {
-                retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] = false;
+                retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = false;
+                retValue.m_dupInfo.lineNumber = curLine;
+                retValue.m_dupInfo.line = sCap;
                 return false;
             }
 
@@ -325,11 +333,21 @@ namespace dynarithmic
                 StringStreamInA strm(line);
                 std::string strTwainValue;
                 strm >> strTwainValue;
-                LONG twainValue = 0;
-                if (StringWrapperA::StartsWith(strTwainValue, "0x"))
-                    twainValue = stol(strTwainValue, nullptr, 16);
-                else
-                    twainValue = stol(strTwainValue);
+                int64_t twainValue = 0;
+                try
+                {
+                    if (StringWrapperA::StartsWith(strTwainValue, "0x"))
+                        twainValue = stoll(strTwainValue, nullptr, 16);
+                    else
+                        twainValue = stoll(strTwainValue);
+                }
+                catch (...)
+                {
+                    retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = false;
+                    retValue.m_dupInfo.lineNumber = curLine;
+                    retValue.m_dupInfo.line = line;
+                    return false;
+                }
                 if (twainValue == -9999)
                     break;
                 std::string name;
@@ -346,6 +364,10 @@ namespace dynarithmic
                     return false;
                 }
                 stringToConstantMap.insert({ name, twainValue });
+                OutputDebugStringA(name.c_str());
+                OutputDebugStringA("\n");
+                if ( name == "TWON_DONTCARE16")
+                    OutputDebugStringA("\n");
             }
         }
 
