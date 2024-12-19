@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -31,15 +31,19 @@ using namespace dynarithmic;
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireNative(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus)
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS(Source, PixelType, nMaxPages, bShowUI, bCloseSource, pStatus) 
+    LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, pStatus)) 
     auto [pHandle, pSource] = VerifyHandles(Source);
     SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pSource->GetDTWAINHandle()).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
                                                            setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setAcquireType(ACQUIRENATIVE);
     const DTWAIN_ARRAY aDibs = SourceAcquire(opts);
     if (pStatus)
         *pStatus = opts.getStatus();
+    if ( opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED )
+        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
+    else
     if (pSource->GetLastAcquireError() != 0)
         CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(),"",false);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
     LOG_FUNC_EXIT_NONAME_PARAMS(aDibs)
     CATCH_BLOCK_LOG_PARAMS(DTWAIN_ARRAY(0))
 }
@@ -47,7 +51,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireNative(DTWAIN_SOURCE Source, LONG PixelT
 DTWAIN_BOOL   DLLENTRY_DEF  DTWAIN_AcquireNativeEx(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource,DTWAIN_ARRAY Acquisitions,
                                                    LPLONG pStatus)
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS(Source, PixelType, nMaxPages, bShowUI, bCloseSource, Acquisitions, pStatus)
+    LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, Acquisitions, pStatus))
     auto [pHandle, pSource] = VerifyHandles(Source);
     SourceAcquireOptions opts = SourceAcquireOptions().setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
             setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setUserArray(Acquisitions).
@@ -56,8 +60,12 @@ DTWAIN_BOOL   DLLENTRY_DEF  DTWAIN_AcquireNativeEx(DTWAIN_SOURCE Source, LONG Pi
     const bool bRet = AcquireExHelper(opts);
     if (pStatus)
         *pStatus = opts.getStatus();
+    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
+        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
+    else
     if (pSource->GetLastAcquireError() != 0)
         CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }

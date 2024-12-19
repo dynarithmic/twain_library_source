@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,23 +18,17 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#ifndef CTLSTRINGUTILS_H
+#define CTLSTRINGUTILS_H
 
-#include "twainfix32.h"
+#include <string>
 
 namespace dynarithmic
 {
-    float Fix32ToFloat(TW_FIX32 Fix32)
-    {
-        return static_cast<float>(Fix32.Whole) + static_cast<float>(Fix32.Frac) / static_cast<float>(65536.0);
-    }
-
-    TW_FIX32 FloatToFix32(float fnum)
-    {
-        TW_FIX32 fix32_value {};
-        const bool sign = fnum < 0 ? true : false;
-        auto value = static_cast<TW_INT32>(fnum * 65536.0 + (sign ? -0.5 : 0.5));
-        fix32_value.Whole = static_cast<TW_INT16>(value >> 16);
-        fix32_value.Frac = static_cast<TW_UINT16>(value & 0x0000ffffL);
-        return fix32_value;
-    }
+    // Truncate a string if it goes over maxLen, and replace truncated contents with
+    // the text "More".
+    std::string TruncateStringWithMore(const std::string& origString, size_t maxLen);
 }
+#endif
+
+

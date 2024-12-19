@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -41,7 +41,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, LPLONG lpDup
         if ( lpDupType )
         {
             DTWAIN_ARRAY Array = nullptr;
-            const DTWAIN_BOOL bRet2 = DTWAIN_GetCapValues(Source, DTWAIN_CV_CAPDUPLEX, DTWAIN_CAPGET, &Array) ? true : false;
+            const DTWAIN_BOOL bRet2 = DTWAIN_GetCapValuesEx2(Source, DTWAIN_CV_CAPDUPLEX, DTWAIN_CAPGET, 
+                                                DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
             const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
             DTWAINArrayLowLevel_RAII arr(pHandle, Array);
             if ( bRet2 && Array)
@@ -52,6 +53,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, LPLONG lpDup
             }
         }
     }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpDupType))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -60,14 +62,24 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, LPLONG lpDup
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsDuplexSupported(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    LONG DupType;
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+
+    auto getSupport = pSource->IsDuplexSupported();
+
+    // If already determined that source does not support
+    // duplex, return error.
+    if (getSupport.value != boost::tribool::indeterminate_value)
+        LOG_FUNC_EXIT_NONAME_PARAMS(getSupport?true:false)
+
     bool bRet = false;
-    if ( DTWAIN_GetDuplexType(Source, &DupType) )
+    LONG DupType;
+    if (DTWAIN_GetDuplexType(Source, &DupType))
     {
-        if ( DupType == TWDX_1PASSDUPLEX ||
-             DupType == TWDX_2PASSDUPLEX )
+        if (DupType == TWDX_1PASSDUPLEX ||
+            DupType == TWDX_2PASSDUPLEX)
             bRet = true;
     }
+    pSource->SetDuplexSupported(bRet);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }

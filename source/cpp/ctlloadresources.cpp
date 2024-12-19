@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -27,8 +27,6 @@
 #include "ctltwainmanager.h"
 #include "dtwain_verinfo.h"
 #include "dtwstrfn.h"
-#include "ctldefsource.h"
-#include "resamplefactory.h"
 #include "crc32_aux.h"
 
 using namespace dynarithmic;
@@ -43,7 +41,7 @@ namespace dynarithmic
     static std::string LoadResourceFromRC(unsigned resNum)
     {
         char szBuffer[DTWAIN_USERRES_MAXSIZE + 1];
-        if (::LoadStringA(CTL_StaticData::s_DLLInstance, resNum, szBuffer, DTWAIN_USERRES_MAXSIZE))
+        if (::LoadStringA(CTL_StaticData::GetDLLInstanceHandle(), resNum, szBuffer, DTWAIN_USERRES_MAXSIZE))
             return szBuffer;
         return {};
     }
@@ -51,10 +49,9 @@ namespace dynarithmic
     static std::vector<std::pair<uint16_t, uint16_t>> parseBracketedPairs(std::string bracketedPairs)
     {
         std::vector<std::pair<uint16_t, uint16_t>> retVal;
-        size_t pos = 0;
         while (true)
         {
-            pos = bracketedPairs.find_first_of('[');
+            size_t pos = bracketedPairs.find_first_of('[');
             if (pos != std::string::npos)
             {
                 auto pos2 = bracketedPairs.find_first_of(']', pos + 1);
@@ -103,8 +100,9 @@ namespace dynarithmic
         else
             sPath = StringWrapper::RemoveBackslashFromDirectory(CTL_StaticData::GetResourcePath());
         sPath = StringWrapper::AddBackslashToDirectory(sPath);
-        if (CTL_StaticData::GetResourcePath().empty())
-            CTL_StaticData::s_strResourcePath = sPath;
+        auto& resourcePath = CTL_StaticData::GetResourcePath();
+        if (resourcePath.empty())
+            resourcePath = sPath;
         return sPath + resName;
     }
 
@@ -142,21 +140,25 @@ namespace dynarithmic
 
     bool LoadTwainResources(ResourceLoadingInfo& retValue)
     {
-        LOG_FUNC_ENTRY_NONAME_PARAMS()
+        LOG_FUNC_ENTRY_PARAMS(())
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] = true;
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INIFILE_LOADED] = true;
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_VERSION_READ] = true;
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_CRC_CHECK] = true;
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_NODUPLICATE_ID] = true;
+        retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = true;
         CTL_ErrorStruct ErrorStruct;
-        int dg, dat, msg, structtype, retcode, successcode;
+        TW_UINT32 dg;
+        TW_UINT16 dat, msg;
+        int structtype, retcode, successcode;
         auto sPath = createResourceFileName(DTWAINRESOURCEINFOFILE);
+        retValue.resourcePath = sPath;
         auto sPathA = StringConversion::Convert_Native_To_Ansi(sPath);
         StringWrapperA::traits_type::inputfile_type ifs(sPathA);
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] = ifs ? true : false;
         
         // Test for the INI file existing
-        retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INIFILE_LOADED] = CTL_StaticData::s_bINIFileLoaded;
+        retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INIFILE_LOADED] = CTL_StaticData::IsINIFileLoaded();
 
         // Error if twaininfo.txt or the INI file is missing or cannot be opened
         if (!retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] || 
@@ -167,19 +169,24 @@ namespace dynarithmic
 
         // Read in warning
         std::string sWarning;
+        int curLine = 0;
         std::getline(ifs, sWarning);
+        ++curLine;
 
+        static constexpr TW_UINT32 stopper = 9999;
         // Read in the Twain triplet information
+        auto& genralErrorMap = CTL_StaticData::GetGeneralErrorInfoMap();
         while (ifs >> dg >> dat >> msg >> structtype >> retcode >> successcode)
-        {
-            if (dg == -1000 && dat == -1000)
+        { 
+            ++curLine;
+            if (dg == stopper)
                 break;
             auto structKey = CTL_GeneralErrorInfo::key_type{ dg,dat,msg };
             ErrorStruct.SetKey(structKey);
             ErrorStruct.SetDataType(structtype);
             ErrorStruct.SetFailureCodes(retcode);
             ErrorStruct.SetSuccessCodes(successcode);
-            CTL_StaticData::s_mapGeneralErrorInfo.insert({ structKey, ErrorStruct });
+            genralErrorMap.insert({ structKey, ErrorStruct });
         }
 
         // Load the TWAIN data resources
@@ -197,13 +204,16 @@ namespace dynarithmic
         std::string sOffset;
         int32_t extOffset = 0;
         ifs >> sOffset;
+        ++curLine;
         try
         {
             extOffset = stol(sOffset);
         }
         catch (...)
         {
-            retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] = false;
+            retValue.m_dupInfo.lineNumber = curLine;
+            retValue.m_dupInfo.line = sOffset;
+            retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = false;
             return false;
         }
         CTL_StaticData::SetExtImageInfoOffset(extOffset);
@@ -217,6 +227,7 @@ namespace dynarithmic
                 capGetCurrent >> capGetDefault >> capSet >> capSetConstraint >>
                 capReset >> capQuery)
         {
+            ++curLine;
             try
             {
                 if (StringWrapperA::StartsWith(sCap, "0x"))
@@ -226,7 +237,9 @@ namespace dynarithmic
             }
             catch (...)
             {
-                retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] = false;
+                retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = false;
+                retValue.m_dupInfo.lineNumber = curLine;
+                retValue.m_dupInfo.line = sCap;
                 return false;
             }
 
@@ -237,9 +250,9 @@ namespace dynarithmic
             {
                 extendedImageInfoMap.insert({ lCap ,capName });
                 TW_INFO Info{};
-                Info.InfoID = lCap;
+                Info.InfoID = static_cast<TW_UINT16>(lCap);
                 Info.ReturnCode = TWRC_DATANOTAVAILABLE;
-                intToInfoMap.insert({ lCap, Info });
+                intToInfoMap.insert({ static_cast<TW_UINT16>(lCap), Info });
                 lCap += extOffset;
             }
             CTL_CapStruct cStruct;
@@ -259,6 +272,7 @@ namespace dynarithmic
         std::string line;
         while (std::getline(ifs, line))
         {
+            ++curLine;
             StringStreamInA strm(line);
             LONG imgType;
             strm >> imgType;
@@ -272,6 +286,7 @@ namespace dynarithmic
         auto& mediamap = CTL_StaticData::GetPDFMediaMap();
         while (std::getline(ifs, line))
         {
+            ++curLine;
             StringStreamInA strm(line);
             LONG pageType;
             strm >> pageType;
@@ -290,6 +305,7 @@ namespace dynarithmic
         auto& availableFileMap = CTL_StaticData::GetAvailableFileFormatsMap();
         while (std::getline(ifs, line))
         {
+            ++curLine;
             StringStreamInA strm(line);
             LONG fileType;
             strm >> fileType;
@@ -308,21 +324,30 @@ namespace dynarithmic
         // Read in the TWAIN constants
         auto& constantsMap = CTL_StaticData::GetTwainConstantsMap();
         auto& stringToConstantMap = CTL_StaticData::GetStringToConstantMap();
-        constantsMap.clear();
-        stringToConstantMap.clear();
         for ( int constantVal = 0; constantVal < CTL_TwainDLLHandle::NumTwainMapValues; ++constantVal)
         { 
             auto iter = constantsMap.insert({constantVal, {}}).first;
             while (std::getline(ifs, line))
             {
+                ++curLine;
                 StringStreamInA strm(line);
                 std::string strTwainValue;
                 strm >> strTwainValue;
-                LONG twainValue = 0;
-                if (StringWrapperA::StartsWith(strTwainValue, "0x"))
-                    twainValue = stol(strTwainValue, nullptr, 16);
-                else
-                    twainValue = stol(strTwainValue);
+                int64_t twainValue = 0;
+                try
+                {
+                    if (StringWrapperA::StartsWith(strTwainValue, "0x"))
+                        twainValue = stoll(strTwainValue, nullptr, 16);
+                    else
+                        twainValue = stoll(strTwainValue);
+                }
+                catch (...)
+                {
+                    retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = false;
+                    retValue.m_dupInfo.lineNumber = curLine;
+                    retValue.m_dupInfo.line = line;
+                    return false;
+                }
                 if (twainValue == -9999)
                     break;
                 std::string name;
@@ -332,20 +357,27 @@ namespace dynarithmic
                 iter->second.insert({twainValue, name});
                 if (stringToConstantMap.find(name) != stringToConstantMap.end())
                 {
+                    retValue.m_dupInfo.line = line;
+                    retValue.m_dupInfo.lineNumber = curLine;
+                    retValue.m_dupInfo.duplicateID = twainValue;
                     retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_NODUPLICATE_ID] = false;
                     return false;
                 }
                 stringToConstantMap.insert({ name, twainValue });
+                OutputDebugStringA(name.c_str());
+                OutputDebugStringA("\n");
+                if ( name == "TWON_DONTCARE16")
+                    OutputDebugStringA("\n");
             }
         }
 
         // Read in the image resampling data
         auto& imageMap = CTL_StaticData::GetImageResamplerMap();
         imageMap.clear();
-        std::string sImageConstants, sImageName, sNoResampleVals, sResampleVals;
         std::string totalLine;
         while (std::getline(ifs, totalLine))
         {
+            ++curLine;
             // break up the line into the 4 components
             // image constants
             if (totalLine.compare(0, 3, "END") == 0)
@@ -418,7 +450,8 @@ namespace dynarithmic
         else
             retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_VERSION_READ] = true;
 
-        CTL_StaticData::s_ResourceVersion = StringConversion::Convert_Ansi_To_Native(DTWAIN_TEXTRESOURCE_FILEVERSION);
+        // Check the CRC value
+        CTL_StaticData::GetResourceVersion() = StringConversion::Convert_Ansi_To_Native(DTWAIN_TEXTRESOURCE_FILEVERSION);
         bool doResourceCheck = iniInterface->GetBoolValue("Miscellaneous", "resourcecheck", true);
         if (doResourceCheck)
         {
@@ -449,14 +482,20 @@ namespace dynarithmic
 
     static std::string GetResourceString_Internal(UINT nResNumber)
     {
-        auto str = GetResourceStringFromMap(nResNumber);
-        // First check the external  resources
+        // First check the external resources
+        auto str = GetResourceStringFromMap(static_cast<LONG>(nResNumber));
         if (str.empty())
             // Try the internal resources
             str = LoadResourceFromRC(nResNumber);
         return str;
     }
-    
+
+    std::string GetErrorString_Internal(int nError)
+    {
+        UINT nRealError = std::abs(nError);
+        return GetResourceString_Internal(nRealError);
+    }
+
     size_t GetResourceStringA(UINT nResNumber, LPSTR buffer, LONG bufSize)
     {
         auto str = GetResourceString_Internal(nResNumber);
@@ -473,23 +512,22 @@ namespace dynarithmic
     size_t GetResourceString(UINT nResNumber, LPTSTR buffer, LONG bufSize)
     {
         auto str = GetResourceString_Internal(nResNumber);
-        auto native_str = StringConversion::Convert_Ansi_To_Native(str);
-        return StringWrapper::CopyInfoToCString(native_str, buffer, bufSize);
+        return StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(str), buffer, bufSize);
     }
 
-    CTL_StringType GetResourceStringFromMap_Native(LONG nError)
+    CTL_StringType GetResourceStringFromMap_Native(LONG nResourceID)
     {
-        return StringConversion::Convert_Ansi_To_Native(GetResourceStringFromMap(nError));
+        return StringConversion::Convert_Ansi_To_Native(GetResourceStringFromMap(nResourceID));
     }
 
-    std::string& GetResourceStringFromMap(LONG nError)
+    std::string& GetResourceStringFromMap(LONG nResourceID)
     {
         static std::string retString;
 
         // Check if string is in cache
         auto& sKey = CTL_StaticData::GetCurrentLanguageResourceKey();
         auto& resCache = CTL_StaticData::GetResourceCache();
-        auto iter = resCache.find({ nError, sKey });
+        auto iter = resCache.find({ nResourceID, sKey });
         if (iter != resCache.end())
             return iter->second;
 
@@ -497,10 +535,10 @@ namespace dynarithmic
         auto currentResource = CTL_StaticData::GetCurrentLanguageResource();
         if (currentResource)
         {
-            auto iterFound = currentResource->find(nError);
+            auto iterFound = currentResource->find(nResourceID);
             if (iterFound != currentResource->end())
             {
-                resCache.insert({{ nError, sKey }, iterFound->second});
+                resCache.insert({{ nResourceID, sKey }, iterFound->second});
                 return iterFound->second;
             }
         }
@@ -545,13 +583,11 @@ namespace dynarithmic
         }
 
         // Create an empty map
-        CTL_StringToMapLongToStringMap::mapped_type resourceMap;
-        std::string::value_type sVersion[100];
-        DTWAIN_GetShortVersionStringA(sVersion, 100);
         std::ifstream ifs(sPath);
         bool open = false;
         if (ifs)
         {
+            CTL_StringToMapLongToStringMap::mapped_type resourceMap;
             std::string descr;
             int resourceID;
             open = true;
@@ -566,7 +602,7 @@ namespace dynarithmic
                         descr = StringConversion::Convert_Native_To_Ansi(
                             CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DLLINFO, IDS_DTWAIN_APPTITLE));
                     StringWrapperA::TrimAll(descr);
-                    descr = StringWrapperA::ReplaceAll(descr, "{short_version}", sVersion);
+                    descr = StringWrapperA::ReplaceAll(descr, "{short_version}", DTWAIN_VERINFO_FILEVERSION);
                     descr = StringWrapperA::ReplaceAll(descr, "{company_name}", DTWAIN_VERINFO_COMPANYNAME);
                     descr = StringWrapperA::ReplaceAll(descr, "{copyright}", DTWAIN_VERINFO_LEGALCOPYRIGHT);
                     resourceMap.insert({ resourceID, descr });
@@ -604,7 +640,7 @@ namespace dynarithmic
         char szBuffer[DTWAIN_USERRES_MAXSIZE + 1];
         for (int i = 0; i < DTWAIN_USERRES_START; ++i)
         {
-            if (::LoadStringA(CTL_StaticData::s_DLLInstance, i, szBuffer, DTWAIN_USERRES_MAXSIZE))
+            if (::LoadStringA(CTL_StaticData::GetDLLInstanceHandle(), i, szBuffer, DTWAIN_USERRES_MAXSIZE))
             {
                 std::string descr = szBuffer;
                 StringWrapperA::TrimAll(descr);
@@ -647,7 +683,7 @@ namespace dynarithmic
         }
 
         // Regenerate the cached version information, since the language has changed
-        CTL_StaticData::s_VersionString.clear();
+        CTL_StaticData::GetVersionString().clear();
         GetVersionString();
 
         LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
@@ -685,12 +721,12 @@ namespace dynarithmic
 
     void UnloadStringResources()
     {
-        CTL_StaticData::s_mapGeneralCapInfo.clear();
+        CTL_StaticData::GetGeneralCapInfo().clear();
     }
 
     void UnloadErrorResources()
     {
-        CTL_StaticData::s_mapGeneralErrorInfo.clear();
+        CTL_StaticData::GetGeneralErrorInfoMap().clear();
     }
 
     /////////////////////////////////////////////////////////////////////

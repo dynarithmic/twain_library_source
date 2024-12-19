@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ using namespace dynarithmic;
 LONG DLLENTRY_DEF DTWAIN_GetPaperSizeName(LONG paperNumber, LPTSTR outName, LONG nSize)
 {
     LOG_FUNC_ENTRY_PARAMS((paperNumber, outName, nSize))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto& pdfmediamap = CTL_StaticData::GetPDFMediaMap();
     auto iter = pdfmediamap.find(paperNumber);
     LONG nActualCharactersCopied = 0;
@@ -39,6 +39,7 @@ LONG DLLENTRY_DEF DTWAIN_GetPaperSizeName(LONG paperNumber, LPTSTR outName, LONG
         CTL_StringType pageName = StringConversion::Convert_Ansi_To_Native(iter->second.first);
         nActualCharactersCopied = StringWrapper::CopyInfoToCString(pageName, outName, nSize);
     }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((outName))
     LOG_FUNC_EXIT_NONAME_PARAMS(nActualCharactersCopied)
     CATCH_BLOCK(-1)
 }

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -138,7 +138,7 @@ TW_MEMREF DTWAIN_FSGetFirstFile(DTWAIN_SOURCE Source, LPTSTR szDir)
     auto retVal = PerfomFileSystemOperation<LPTSTR>(pSource, szDir, nullptr, nullptr, GET_FIRST);
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return retVal.first != DTWAIN_NO_ERROR; },
                                       retVal.first, false, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.second);
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.second)
     CATCH_BLOCK_LOG_PARAMS(nullptr)
 }
 
@@ -150,7 +150,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSGetNextFile(DTWAIN_SOURCE Source, LPTSTR szDir
     auto retVal = PerfomFileSystemOperation<LPTSTR>(pSource, szDir, nullptr, FSHandle, GET_NEXT);
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return retVal.first != DTWAIN_NO_ERROR; },
                                       retVal.first, false, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.first);
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.first)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
@@ -162,7 +162,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSGetClose(DTWAIN_SOURCE Source, TW_MEMREF FSHan
     auto retVal = PerfomFileSystemOperation<LPTSTR>(pSource, nullptr, nullptr, FSHandle, GET_CLOSE);
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return retVal.first != DTWAIN_NO_ERROR; },
                                       retVal.first, false, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.first);
+    LOG_FUNC_EXIT_NONAME_PARAMS(retVal.second.first)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
@@ -303,7 +303,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCamera(DTWAIN_SOURCE Source, LPCTSTR szCamera)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, szCamera))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+    VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     const DTWAIN_BOOL bRet = DTWAIN_FSChangeDirectory(Source, szCamera);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
@@ -389,12 +389,12 @@ DTWAIN_BOOL FSGetFileInfo(CTL_ITwainSource* pSource, LPCTSTR szFileName, TW_FILE
         {
             const TW_UINT16 cc = CTL_TwainAppMgr::GetConditionCode(pSession, pSource);
             CTL_TwainAppMgr::ProcessConditionCodeError(cc);
-            LOG_FUNC_EXIT_NONAME_PARAMS(FALSE);
+            LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
         }
         break;
         default: {}
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(FALSE);
+    LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
     CATCH_BLOCK(FALSE)
 }
 

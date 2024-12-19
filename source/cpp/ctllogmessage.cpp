@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include "dtwain.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
+#include "logwriterutils.h"
 using namespace dynarithmic;
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LogMessage(LPCTSTR message)
@@ -28,9 +29,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LogMessage(LPCTSTR message)
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
     if ( pHandle )
     {
-        auto prefix = StringConversion::Convert_Ansi_To_Native(GetResourceStringFromMap(IDS_DTWAIN_USERMSG_INDICATOR));
-        const CTL_StringType sMsg = prefix + StringTraits::GetSpace() + message;
-        CTL_TwainAppMgr::WriteLogInfo(sMsg);
+        const CTL_StringType sMsg = StringConversion::Convert_Ansi_To_Native(GetResourceStringFromMap(IDS_DTWAIN_USERMSG_INDICATOR)) 
+                                    + StringTraits::GetSpace() + message;
+        LogWriterUtils::WriteLogInfo(sMsg);
         return TRUE;
     }
     return FALSE;

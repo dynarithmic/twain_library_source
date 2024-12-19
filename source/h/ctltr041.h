@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 #ifndef CTLTR041_H
 #define CTLTR041_H
 
-#include "ctltrp.h"
+#include "ctltripletbase.h"
 namespace dynarithmic
 {
     class CTL_ITwainSession;
