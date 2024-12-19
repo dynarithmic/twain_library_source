@@ -469,6 +469,8 @@ namespace dynarithmic
         bool        IsShutdownAcquire() const { return m_bShutdownAcquire; }
         int         GetLastAcquireError() const { return m_nLastAcquireError; }
         void        SetLastAcquireError(int err) { m_nLastAcquireError = err; }
+        void        SetUsePeekMessage(bool bSet) { m_bUsePeekMessage = bSet; }
+        bool        IsUsePeekMessage() const { return m_bUsePeekMessage;  }
         // Only public member
         void *      m_pUserPtr;
 
@@ -596,6 +598,7 @@ namespace dynarithmic
         std::vector<int> m_aTransferMechanisms;
         bool            m_bExtendedCapsRetrieved;
         bool            m_bShutdownAcquire;
+        bool            m_bUsePeekMessage;
         long            m_FileSavePageCount;
         int             m_nLastAcquireError;
         boost::logic::tribool m_tbIsFileSystemSupported;

@@ -85,7 +85,24 @@ bool TwainMessageLoopImpl::IsAcquireTerminated(CTL_ITwainSource* pSource, bool b
     return !IsSourceOpen(pSource, bUIOnly);
 }
 
-void TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource *pSource, bool isUIOnly)
+// Depending on the setting in pSource, we want to either loop
+// on PeekMessage(), or rely on the return value of GetMessage().
+// The settings are found in dtwain32.ini or dtwain64.ini under the
+// "TwainLoopPeek" section.
+static bool ContinueTwainLoop(CTL_ITwainSource* pSource, MSG *msg)
+{
+    if (pSource->IsUsePeekMessage())
+    {
+        PeekMessage(msg, nullptr, 0, 0, PM_REMOVE);
+        return true;
+    }
+    BOOL bRet = GetMessage(msg, nullptr, 0, 0);
+    if (bRet == -1)
+        return false;
+    return bRet;
+}
+
+void TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource* pSource, bool isUIOnly)
 {
     MSG msg;
     struct UIScopedRAII
@@ -107,14 +124,10 @@ void TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource *pSource, 
     HWND theWnd = *pSource->GetTwainSession()->GetWindowHandlePtr();
     ::PostMessage(theWnd, WM_NULL, static_cast<WPARAM>(0), static_cast<LPARAM>(0));
 
-    // Start the message loop.  We want to loop indefinitely until
-    // the source is closed.  We cannot rely on the return value of
-    // PeekMessage() or GetMessage() to control how the loop is executed.
-    while (true)
+    // Start the message loop.
+    while (ContinueTwainLoop(pSource, &msg))
     {
-        PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE);
-
-        // If in UIOnly mode, set it up here
+         // If in UIOnly mode, set it up here
         if (isUIOnly && !bInitializeAcquisitionProcess)
         {
             LLSetupUIOnly(pSource);
