@@ -364,10 +364,6 @@ namespace dynarithmic
                     return false;
                 }
                 stringToConstantMap.insert({ name, twainValue });
-                OutputDebugStringA(name.c_str());
-                OutputDebugStringA("\n");
-                if ( name == "TWON_DONTCARE16")
-                    OutputDebugStringA("\n");
             }
         }
 
