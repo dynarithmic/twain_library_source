@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <utility>
 #include <dtwain_filesystem.h>
 #include "imagexferfilewriter.h"
+#include "logwriterutils.h"
 
 #include "ctliface.h"
 #include "ctltr026.h"
@@ -614,7 +615,7 @@ LONG ImageXferFileWriter::CopyDuplexDibToFile(CTL_TwainDibPtr pCurDib, bool bIsJ
             {
                 CTL_StringStreamType strm;
                 strm << GetResourceStringFromMap_Native(DTWAIN_ERR_WRITEDATA_TOFILE_) << szTempPath;
-                CTL_TwainAppMgr::WriteLogInfo(strm.str());
+                LogWriterUtils::WriteLogInfo(strm.str());
                 return DTWAIN_ERR_FILEWRITE;
             }
         }

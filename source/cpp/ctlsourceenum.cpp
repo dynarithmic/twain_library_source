@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ using namespace dynarithmic;
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSourcesEx()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     DTWAIN_ARRAY pArray = nullptr;
     DTWAIN_EnumSources(&pArray);
     LOG_FUNC_EXIT_NONAME_PARAMS(pArray)
@@ -63,9 +63,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
     CTL_TwainAppMgr::EnumSources(pHandle->m_pTwainSession, SourceArray);
     std::copy(SourceArray.begin(), SourceArray.end(), std::back_inserter(vEnum));
     auto& status_map = CTL_StaticData::GetSourceStatusMap();
-    std::for_each(SourceArray.begin(), SourceArray.end(), [&](CTL_ITwainSource* pSource)
+    std::for_each(SourceArray.begin(), SourceArray.end(), [&](const CTL_ITwainSource* pSourceInner)
         {
-            std::string sname = pSource->GetProductNameA();
+            std::string sname = pSourceInner->GetProductNameA();
             auto iter = status_map.find(sname);
             if (iter == status_map.end())
             {

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSourcesOnSelect(DTWAIN_BOOL bSet)
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsOpenSourcesOnSelect(VOID_PROTOTYPE)
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const bool retVal = pHandle->m_bOpenSourceOnSelect;
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
@@ -61,10 +61,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
 
     // Set up the opening of the source
-    bool bRetval = false;
 
     // Go through TWAIN to open the source
-    bRetval = CTL_TwainAppMgr::OpenSource(pHandle->m_pTwainSession, pSource);
+    bool bRetval = CTL_TwainAppMgr::OpenSource(pHandle->m_pTwainSession, pSource);
     if (bRetval)
     {
         // Set up status of the source 
@@ -76,6 +75,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
 
     // Check for failure to open the source
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return bRetval == false; }, DTWAIN_ERR_SOURCE_COULD_NOT_OPEN, false, FUNC_MACRO);
+
+    // Get all the caps supported
+    DTWAIN_ARRAY arr = nullptr;
+    DTWAINArrayPtr_RAII raii(pHandle, &arr);
+    CTL_TwainAppMgr::GatherCapabilityInfo(pSource);
 
     // If this source has a feeder, check the status of whether we should check.
     // If the check is on, add it to the feeder sources container.
@@ -92,11 +96,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     // TWAIN message queue
     DetermineIfSpecialXfer(pSource);
 
-    // Get all the caps supported
-    DTWAIN_ARRAY arr = nullptr;
-    DTWAINArrayPtr_RAII raii(pHandle, &arr);
-    CTL_TwainAppMgr::GatherCapabilityInfo(pSource);
-
     // Cache the pixel types and bit depths
     LogAndCachePixelTypes(pSource);
 
@@ -104,13 +103,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     CapList& theCapList = pSource->GetCapSupportedList();
 
     // See if extended image info is supported and cache the results
-    pSource->SetExtendedImageInfoSupported(theCapList.count(ICAP_EXTIMAGEINFO));
+    pSource->SetExtendedImageInfoSupported(theCapList.count(static_cast<TW_UINT16>(ICAP_EXTIMAGEINFO))?true:false);
 
     // if any logging is turned on, then get the capabilities and log the values
-    if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+    if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
     {
         CTL_StringType msg = _T("Source: ") + pSource->GetProductName() + _T(" has been opened successfully");
-        CTL_TwainAppMgr::WriteLogInfo(msg);
+        LogWriterUtils::WriteLogInfoIndented(msg);
 
         // Log the caps if logging is turned on
         CTL_StringType sName;
@@ -124,10 +123,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
         std::sort(VecString.begin(), VecString.end());
         CTL_StringStreamType strm;
         strm << theCapList.size();
-        sName = _T("\n\nSource \"");
-        sName += pSource->GetProductName();
-        sName += _T("\" contains the following ");
-        sName += strm.str() + _T(" capabilities: \n{\n");
+        sName = _T("\n\n");
+        sName += GetResourceStringFromMap_Native(IDS_LOGMSG_CAPABILITYLISTING);
+        sName += _T(" (") + pSource->GetProductName() + _T(")");
+        sName += _T(" (") + strm.str() + _T("):\n{\n");
         if (theCapList.empty())
             sName += _T(" No capabilities:\n");
         else
@@ -135,9 +134,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
             sName += _T("    ");
             sName += StringConversion::Convert_Ansi_To_Native(StringWrapperA::Join(VecString, "\n    "));
         }
-        sName += _T("\n}\n");
+        sName += _T("\n}");
 
-        CTL_TwainAppMgr::WriteLogInfo(sName);
+        LogWriterUtils::WriteMultiLineInfoIndented(sName, _T("\n"));
     }
 
     LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
@@ -163,7 +162,7 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
 
     p->SetCurrentlyProcessingPixelInfo(true);
     TCHAR szName[MaxMessage + 1];
-    LONG oldflags = CTL_StaticData::s_logFilterFlags;
+    LONG oldflags = CTL_StaticData::GetLogFilterFlags();
 
     GetSourceInfo(p, &CTL_ITwainSource::GetProductName, szName, MaxMessage);
 
@@ -172,7 +171,7 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
     DTWAIN_ARRAY PixelTypes;
 
     // enumerate all of the pixel types
-    DTWAIN_BOOL bOK = DTWAIN_GetCapValues(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPGET, &PixelTypes);
+    DTWAIN_BOOL bOK = DTWAIN_GetCapValuesEx2(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &PixelTypes);
     if (bOK)
     {
         const auto pHandle = p->GetDTWAINHandle();
@@ -195,12 +194,12 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
                 vCurPixTypePtr[0] = vPixelTypes[i];
                 LONG& curPixType = vCurPixTypePtr[0];
                 // Set the pixel type temporarily
-                if (DTWAIN_SetCapValues(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPSET, vCurPixType))
+                if (DTWAIN_SetCapValuesEx2(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, vCurPixType))
                 {
                     // Add to source list
                     // Now get the bit depths for this pixel type
                     DTWAIN_ARRAY BitDepths = nullptr;
-                    if (DTWAIN_GetCapValues(p, DTWAIN_CV_ICAPBITDEPTH, DTWAIN_CAPGET, &BitDepths))
+                    if (DTWAIN_GetCapValuesEx2(p, DTWAIN_CV_ICAPBITDEPTH, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &BitDepths))
                     {
                         DTWAINArrayLowLevel_RAII arr(pHandle, BitDepths);
 
@@ -231,14 +230,14 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
                     }
                 }
             }
-            DTWAIN_SetCapValues(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPRESET, nullptr);
+            DTWAIN_SetCapValuesEx2(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPRESET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, nullptr);
         }
     }
     if (oldflags && bOK )
-        CTL_TwainAppMgr::WriteLogInfoA(sBitDepths);
+        LogWriterUtils::WriteMultiLineInfoIndentedA(sBitDepths, "\n");
     else
     if (!bOK)
-        CTL_TwainAppMgr::WriteLogInfoA("Could not retrieve bit depth information\n");
+        LogWriterUtils::WriteLogInfoIndentedA("Could not retrieve bit depth information");
     p->SetCurrentlyProcessingPixelInfo(false);
 }
 
@@ -269,4 +268,3 @@ void DetermineIfSpecialXfer(CTL_ITwainSource* p)
         ++iterSearch;
     }
 }
-

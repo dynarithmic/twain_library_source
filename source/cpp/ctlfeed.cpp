@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -37,36 +37,56 @@ static bool IsFeederEnabledFunc(DTWAIN_SOURCE Source, IsEnabledFunc Func);
 static bool ExecuteFeederState5Func(DTWAIN_SOURCE Source, LONG lCap);
 static VOID CALLBACK ThisTimerProc(HWND hwnd, UINT uMsg, ULONG idEvent,DWORD dwTime);
 
-DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsFeederSupported(DTWAIN_SOURCE Source)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFeederSupported(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
 
-    // Check if feeder has been enabled.  If so, then device has a feeder
-    DTWAIN_ARRAY arr = nullptr;
-    const BOOL bOk = DTWAIN_GetCapValues(Source, DTWAIN_CV_CAPFEEDERENABLED, DTWAIN_CAPGETCURRENT, &arr);
-    if (!bOk)
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+    auto getSupport = pSource->IsFeederSupported();
 
-    CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
-    const auto pHandle = pSource->GetDTWAINHandle();
-    DTWAINArrayLowLevel_RAII a(pHandle, arr);
+    // If already determined that source does not support
+    // feeder, return error.
+    if (getSupport.value != boost::tribool::indeterminate_value)
+        LOG_FUNC_EXIT_NONAME_PARAMS(getSupport ? true : false)
 
-    auto& vFeeder = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
-    if (vFeeder.empty())
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    BOOL bRet = false;
+    if (getSupport.value == boost::tribool::indeterminate_value)
+    {
+        // Check if feeder has been enabled.  If so, then device has a feeder
+        DTWAIN_ARRAY arr = nullptr;
+        const BOOL bOk = DTWAIN_GetCapValuesEx2(Source, DTWAIN_CV_CAPFEEDERENABLED, 
+                                        DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
+        if (!bOk)
+        {
+            pSource->SetFeederSupported(false);
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        }
+        DTWAINArrayLowLevel_RAII a(pHandle, arr);
 
-    if (vFeeder[0] == 1)
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
-
-    // Enable the feeder temporarily to test if setting it will work.
-    vFeeder[0] = 1;
-    BOOL bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPFEEDERENABLED, DTWAIN_CAPSET, arr);
-    if (!bRet)
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
-
-    // Disable the feeder
-    vFeeder[0] = 0; 
-    bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPFEEDERENABLED, DTWAIN_CAPSET, arr);
+        auto& vFeeder = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
+        if (vFeeder.empty())
+        {
+            pSource->SetFeederSupported(false);
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        }
+        if (vFeeder[0] == 1)
+        {
+            pSource->SetFeederSupported(true);
+            LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        }
+        // Enable the feeder temporarily to test if setting it will work.
+        vFeeder[0] = 1;
+        bRet = DTWAIN_SetCapValuesEx2(Source, DTWAIN_CV_CAPFEEDERENABLED, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
+        if (!bRet)
+        {
+            pSource->SetFeederSupported(false);
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        }
+        // Disable the feeder
+        vFeeder[0] = 0; 
+        bRet = DTWAIN_SetCapValuesEx2(Source, DTWAIN_CV_CAPFEEDERENABLED, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
+    }
+    pSource->SetFeederSupported(bRet);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -79,7 +99,8 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsFeederLoaded(DTWAIN_SOURCE Source)
         CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
         const auto pHandle = pSource->GetDTWAINHandle();
         DTWAIN_ARRAY a = nullptr;
-        const DTWAIN_BOOL bReturn = DTWAIN_GetCapValues(Source, DTWAIN_CV_CAPFEEDERLOADED, DTWAIN_CAPGETCURRENT, &a);
+        const DTWAIN_BOOL bReturn = DTWAIN_GetCapValuesEx2(Source, DTWAIN_CV_CAPFEEDERLOADED, 
+                                                    DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &a);
         DTWAINArrayLowLevel_RAII arr(pHandle, a);
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bReturn;}, DTWAIN_ERR_NO_FEEDER_QUERY, false, FUNC_MACRO);
         auto& vFeeder = pHandle->m_ArrayFactory->underlying_container_t<LONG>(a);
@@ -142,7 +163,8 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_EnableFeeder(DTWAIN_SOURCE Source, DTWAIN_BOOL 
     {
         DTWAIN_ARRAY aExtendedCaps = nullptr;
         CHECK_IF_CAP_SUPPORTED(p, pHandle, DTWAIN_CV_CAPEXTENDEDCAPS, bRet)
-        const DTWAIN_BOOL bOk = DTWAIN_GetCapValues( Source, DTWAIN_CV_CAPEXTENDEDCAPS, DTWAIN_CAPGETCURRENT, &aExtendedCaps);
+        const DTWAIN_BOOL bOk = DTWAIN_GetCapValuesEx2( Source, DTWAIN_CV_CAPEXTENDEDCAPS, 
+                                                DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aExtendedCaps);
         if ( bOk && aExtendedCaps )
         {
             LONG Caps[] = { DTWAIN_CV_CAPFEEDPAGE, DTWAIN_CV_CAPREWINDPAGE, DTWAIN_CV_CAPCLEARPAGE };
@@ -155,7 +177,7 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_EnableFeeder(DTWAIN_SOURCE Source, DTWAIN_BOOL 
                     vCaps.push_back(n);
             });
             if (vCaps.size() > oldSize)
-                DTWAIN_SetCapValues( Source, DTWAIN_CV_CAPEXTENDEDCAPS, DTWAIN_CAPSET, aExtendedCaps);
+                DTWAIN_SetCapValuesEx2( Source, DTWAIN_CV_CAPEXTENDEDCAPS, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, aExtendedCaps);
         }
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
@@ -183,7 +205,7 @@ bool EnableFeederFunc(DTWAIN_SOURCE Source, LONG lCap, CTL_ITwainSource* p, SetF
     DTWAIN_ARRAY aValues = nullptr;
 
     // Check the current value
-    DTWAIN_BOOL bReturn = DTWAIN_GetCapValues(Source, lCap, DTWAIN_CAPGETCURRENT, &aValues);
+    DTWAIN_BOOL bReturn = DTWAIN_GetCapValuesEx2(Source, lCap, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aValues);
     if (!bReturn)
         return false;
     const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
@@ -207,7 +229,7 @@ bool EnableFeederFunc(DTWAIN_SOURCE Source, LONG lCap, CTL_ITwainSource* p, SetF
 
     // Set here
     vFeeder[0] = bValue;
-    bReturn = DTWAIN_SetCapValues( Source, lCap, DTWAIN_CAPSETCURRENT, aValues)?true:false;
+    bReturn = DTWAIN_SetCapValuesEx2( Source, lCap, DTWAIN_CAPSETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, aValues)?true:false;
     if ( bReturn )
         (p->*Func)(bValue);
     else
@@ -290,7 +312,7 @@ bool ExecuteFeederState5Func(DTWAIN_SOURCE Source, LONG lCap)
     DTWAINArrayLowLevel_RAII aRAII(pHandle, aValues);
     auto& vCaps = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
     vCaps.push_back(true);
-    DTWAIN_SetCapValues(Source, lCap, DTWAIN_CAPSET, aValues);
+    DTWAIN_SetCapValuesEx2(Source, lCap, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, aValues);
     return false;
 }
 

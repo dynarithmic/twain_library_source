@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -98,7 +98,7 @@ namespace dynarithmic
 class CTL_ErrorStructDecoder {
     public:
         CTL_ErrorStructDecoder() = default;
-        void StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDest, LONG nDG, UINT nDAT, UINT nMSG, TW_MEMREF Data,
+        void StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDest, TW_UINT32 nDG, TW_UINT16 nDAT, TW_UINT16 nMSG, TW_MEMREF Data,
                           ErrorStructTypes sType);
         static std::string DecodeBitmap(HANDLE hBitmap);
         static std::string DecodePDFTextElement(PDFTextElement* pEl);
@@ -115,7 +115,7 @@ class CTL_ErrorStructDecoder {
 class CTL_ErrorStruct
 {
     public:
-        typedef std::tuple<int, int, int> key_type;
+        typedef std::tuple<TW_UINT32, TW_UINT16, TW_UINT16> key_type;
         CTL_ErrorStruct() :
             m_nStructType(0),
             m_nTWCCErrorCodes(0),
@@ -123,9 +123,10 @@ class CTL_ErrorStruct
             m_pOrigin(nullptr),
             m_pDest(nullptr),
             m_pData(nullptr),
-            m_Key(0,0,0) {}
+            m_Key({}, {}, {}) {
+        }
 
-        CTL_ErrorStruct(LONG nDG, UINT nDAT, UINT nMsg) :
+        CTL_ErrorStruct(TW_UINT32 nDG, TW_UINT16 nDAT, TW_UINT16 nMsg) :
                 m_nStructType(0),
                 m_nTWCCErrorCodes(0),
                 m_nTWRCCodes(0),
@@ -137,9 +138,9 @@ class CTL_ErrorStruct
 
         void    SetKey(const key_type& nVal) { m_Key = nVal; }
         const   key_type&  GetKey() const { return m_Key; }
-        LONG    GetDG() const { return std::get<0>(m_Key); }
-        UINT    GetDAT() const { return std::get<1>(m_Key); }
-        UINT    GetMSG() const { return std::get<2>(m_Key); }
+        TW_UINT32    GetDG() const { return std::get<0>(m_Key); }
+        TW_UINT16    GetDAT() const { return std::get<1>(m_Key); }
+        TW_UINT16    GetMSG() const { return std::get<2>(m_Key); }
         UINT    GetDataType() const { return m_nStructType; }
         void    SetDataType(UINT nType) { m_nStructType = nType; }
         LONG    GetFailureCodes() const { return m_nTWCCErrorCodes; }
@@ -151,19 +152,19 @@ class CTL_ErrorStruct
         bool    IsValid() const { return GetDG() || GetDAT() || GetMSG(); }
 
         std::string GetIdentityAndDataInfo(pTW_IDENTITY pOrigin, pTW_IDENTITY pDest, TW_MEMREF pData)
-                {
-                    m_pOrigin = pOrigin; m_pDest = pDest; m_pData = pData;
-                    m_Decoder.StartDecoder(m_pOrigin, m_pDest, GetDG(),
-                                           GetDAT(), GetMSG(), m_pData,
-                                           static_cast<ErrorStructTypes>(m_nStructType));
-                    return m_Decoder.GetDecodedString();
-                }
+        {
+            m_pOrigin = pOrigin; m_pDest = pDest; m_pData = pData;
+            m_Decoder.StartDecoder(m_pOrigin, m_pDest, GetDG(),
+                                    GetDAT(), GetMSG(), m_pData,
+                                    static_cast<ErrorStructTypes>(m_nStructType));
+            return m_Decoder.GetDecodedString();
+        }
 
         std::string GetDTWAINMessageAndDataInfo(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
-                {
-                    m_Decoder.StartMessageDecoder(hWnd, nMsg, wParam, lParam);
-                    return m_Decoder.GetDecodedString();
-                }
+        {
+            m_Decoder.StartMessageDecoder(hWnd, nMsg, wParam, lParam);
+            return m_Decoder.GetDecodedString();
+        }
 
         static std::string GetTWAINDSMError(TW_UINT16 retcode)
         {

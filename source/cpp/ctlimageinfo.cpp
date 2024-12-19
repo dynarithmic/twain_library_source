@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -57,6 +57,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfoString(DTWAIN_SOURCE Source,
         strm << boost::format("%1%") % tempY;
         StringWrapper::SafeStrcpy(YResolution, StringConversion::Convert_Ansi_To_Native(strm.str()).c_str());
     }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((XResolution, YResolution))
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(false)
 }
@@ -115,7 +116,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfo(DTWAIN_SOURCE Source,
 
     if (Compression)
         *Compression = pInfo->Compression;
-
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((XResolution, YResolution, Width, Length, NumSamples, BitsPerSample, BitsPerPixel, Planar, PixelType, Compression))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -144,6 +145,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetBufferedTransferInfo(DTWAIN_SOURCE Source,
         if (userVals[i])
             *(userVals[i]) = xferVals[i];
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(memxferInfo.Memory.TheMem);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Compression, BytesPerRow, Columns, Rows, XOffset, YOffset, Flags, BytesWritten, MemoryLength))
+    LOG_FUNC_EXIT_NONAME_PARAMS(memxferInfo.Memory.TheMem)
     CATCH_BLOCK_LOG_PARAMS((HANDLE)0)
 }

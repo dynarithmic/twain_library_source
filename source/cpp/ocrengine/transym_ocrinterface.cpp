@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@
 #include "ctlfileutils.h"
 #include "errorcheck.h"
 #include "ctliface.h"
-#include "ctldefsource.h"
 #include "../simpleini/simpleini.h"
 
 #ifdef VERSINFO_STANDALONE
@@ -680,7 +679,7 @@ LONG TransymOCR::StartOCR(CTL_StringType filename)
         {
             // Errors will be reported to the file specified by the ERRORREPORTFILE cap
             std::vector<std::string> valStr;
-            bRet = GetCapValues(DTWAIN_OCRCV_ERRORREPORTFILE, DTWAIN_CAPGETCURRENT, valStr);
+            GetCapValues(DTWAIN_OCRCV_ERRORREPORTFILE, DTWAIN_CAPGETCURRENT, valStr);
 
             // Turn off the TOCR message box if reporting to a file.
             m_SDK.TOCRSetErrorMode(m_JobHandle, TOCRERRORMODE_NONE);

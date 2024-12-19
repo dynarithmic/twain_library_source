@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@
 #include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "ctlfileutils.h"
+#include "logwriterutils.h"
+
 using namespace dynarithmic;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,18 +102,18 @@ int CTL_PSIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int /*fhFile*/,
             {
                 szTempPath += StringWrapper::GetGUID() + _T("TIF");
                 const std::string szTempPathA = StringConversion::Convert_Native_To_Ansi(szTempPath);
-                CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + szTempPathA + "\n");
+                LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + szTempPathA);
 
                 // Create a TIFF file
                 m_pTiffHandler->SetDib(m_pDib);
                 const int bRet = m_pTiffHandler->WriteBitmap(szTempPath.c_str(), bOpenFile, 0, pMultiPageStruct);
                 if ( bRet != 0 )
                 {
-                    CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_TEMPFILECREATEERRORTEXT) + " " + szTempPathA + "\n");
+                    LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_TEMPFILECREATEERRORTEXT) + " " + szTempPathA);
                     return bRet;
                 }
                 else
-                    CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_IMAGEFILESUCCESSTEXT) + " " + szTempPathA + "\n");
+                    LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_IMAGEFILESUCCESSTEXT) + " " + szTempPathA);
                 PSHandler.SetImageType(1);
             }
         }

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -39,8 +39,12 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireAudioNative(DTWAIN_SOURCE Source, LONG n
     const DTWAIN_ARRAY aDibs = SourceAcquire(opts);
     if (pStatus)
         *pStatus = opts.getStatus();
+    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
+        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
+    else
     if (pSource->GetLastAcquireError() != 0)
         CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
     LOG_FUNC_EXIT_NONAME_PARAMS(aDibs)
     CATCH_BLOCK_LOG_PARAMS(DTWAIN_ARRAY(0))
 }
@@ -57,8 +61,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioNativeEx(DTWAIN_SOURCE Source, LONG 
     const bool bRet = AcquireExHelper(opts);
     if (pStatus)
         *pStatus = opts.getStatus();
+    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
+        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
+    else
     if (pSource->GetLastAcquireError() != 0)
         CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -76,8 +84,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioFile(DTWAIN_SOURCE Source, LPCTSTR l
     const bool bRetval = AcquireFileHelper(opts, ACQUIREAUDIOFILE);
     if (pStatus)
         *pStatus = opts.getStatus();
+    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
+        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
+    else
     if (pSource->GetLastAcquireError() != 0)
         CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
     CATCH_BLOCK_LOG_PARAMS(false)
 }

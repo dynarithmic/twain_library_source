@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,9 +21,7 @@
 #ifndef CTLTWAINSOURCE_H
 #define CTLTWAINSOURCE_H
 
-#include <unordered_map>
 #include <vector>
-#include <unordered_set>
 #include <boost/logic/tribool.hpp>
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
@@ -459,8 +457,12 @@ namespace dynarithmic
         CapList&     GetCustomCapCache() { return m_aSupportedCustomCapCache; }
         boost::logic::tribool IsFileSystemSupported() const { return m_tbIsFileSystemSupported; }
         boost::logic::tribool IsBufferedTileModeSupported() const { return m_tbIsTileModeSupported; }
+        boost::logic::tribool IsFeederSupported() const { return m_tbIsFeederSupported; }
+        boost::logic::tribool IsDuplexSupported() const { return m_tbIsDuplexSupported; }
         void         SetFileSystemSupported(bool bSet) { m_tbIsFileSystemSupported = bSet; }
         void         SetBufferedTileModeSupported(bool bSet) { m_tbIsTileModeSupported = bSet; }
+        void         SetFeederSupported(bool bSet) { m_tbIsFeederSupported = bSet; }
+        void         SetDuplexSupported(bool bSet) { m_tbIsDuplexSupported = bSet; }
         TW_IMAGEMEMXFER& GetBufferedXFerInfo() { return m_BufferedXFerInfo; }
         CTL_ExtImageInfoTriplet* GetExtImageInfoTriplet();
         void        SetShutdownAcquire(bool bSet) { m_bShutdownAcquire = bSet; }
@@ -598,6 +600,8 @@ namespace dynarithmic
         int             m_nLastAcquireError;
         boost::logic::tribool m_tbIsFileSystemSupported;
         boost::logic::tribool m_tbIsTileModeSupported;
+        boost::logic::tribool m_tbIsFeederSupported;
+        boost::logic::tribool m_tbIsDuplexSupported;
         CTL_TwainDLLHandle* m_pDLLHandle;
         TW_IMAGEMEMXFER m_BufferedXFerInfo;
 

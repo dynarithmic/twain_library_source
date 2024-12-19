@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -89,8 +89,8 @@ namespace dynarithmic
 
         static std::string get_supported_groups_string(uint32_t sgroups)
         {
-            static constexpr uint32_t dgroups[] = { DG_CONTROL, DG_IMAGE, DG_AUDIO, DF_DSM2, DF_APP2, DF_DS2 };
-            static constexpr char* dgroupsStr[] = { "DG_CONTROL", "DG_IMAGE", "DG_AUDIO", "DF_DSM2", "DF_APP2", "DF_DS2" };
+            constexpr uint32_t dgroups[] = { DG_CONTROL, DG_IMAGE, DG_AUDIO, DF_DSM2, DF_APP2, DF_DS2 };
+            constexpr char* dgroupsStr[] = { "DG_CONTROL", "DG_IMAGE", "DG_AUDIO", "DF_DSM2", "DF_APP2", "DF_DS2" };
             std::string ret;
             int i = 0;
             for (auto g : dgroups)

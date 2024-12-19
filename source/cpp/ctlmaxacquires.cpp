@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -31,14 +31,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetMaxAcquisitions(DTWAIN_SOURCE Source, LONG Ma
 {
     LOG_FUNC_ENTRY_PARAMS((Source, MaxAcquires))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    bool bRetval = false;
     // Check if array is of the correct type
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return MaxAcquires < 0L && MaxAcquires != DTWAIN_MAXACQUIRE; },
         DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-    bRetval = true;
     pSource->SetMaxAcquisitions(MaxAcquires);
     pSource->SetUIMaxAcquisitions(MaxAcquires);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 

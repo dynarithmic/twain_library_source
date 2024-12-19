@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,10 +22,7 @@
 #pragma warning (disable : 4786)
 #endif
 #include <cstring>
-#include <cstdio>
-#include <cstdlib>
 #include <algorithm>
-#include <functional>
 #include <memory>
 #include <boost/optional.hpp>
 #include "winconst.h"
@@ -35,18 +32,17 @@
 #include "arrayfactory.h"
 #include "ctlfileutils.h"
 /* Header signatures for various resources */
-#define BFT_ICON   0x4349   /* 'IC' */
-#define BFT_BITMAP 0x4d42   /* 'BM' */
-#define BFT_CURSOR 0x5450   /* 'PT' */
-#define MAXREAD     65535
-#define BOUND(x,min,max) ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x)))
+constexpr auto BFT_ICON = 0x4349   /* 'IC' */;
+constexpr auto BFT_BITMAP = 0x4d42   /* 'BM' */;
+constexpr auto BFT_CURSOR = 0x5450   /* 'PT' */;
+constexpr auto MAXREAD = 65535;
+
+template<typename T1, typename T2, typename T3>
+constexpr auto BOUND(T1 x, T2 min, T3 max) { return ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x))); }
 
 #define LPBimage(lpbi)  ((HPSTR)lpbi+lpbi->biSize+(long)(lpbi->biClrUsed*sizeof(RGBQUAD)))
 #define LPBlinewidth(lpbi) (WIDTHBYTES((WORD)lpbi->biWidth*lpbi->biBitCount))
 
-#ifdef USE_NAMESPACES
-
-#endif
 using namespace dynarithmic;
 
 CTL_TwainDibInfo::CTL_TwainDibInfo() : m_hDib(nullptr), m_hPal(nullptr)
@@ -1047,11 +1043,7 @@ bool CTL_TwainDibArray::RemoveDib( HANDLE hDib )
 
 CTL_TwainDibPtr CTL_TwainDibArray::GetAt(size_t nPos)
 {
-    #ifdef NO_STL_AT_DEFINED
-    return m_TwainDibArray[nPos];
-    #else
     return m_TwainDibArray.at(nPos);
-    #endif
 }
 
 CTL_TwainDibPtr CTL_TwainDibArray::operator[](size_t nPos)
