@@ -7,7 +7,10 @@ DTWAIN Version changes
 
 - Update CAP_PRINTERSTRING to use (by default) TWON_ONEVALUE container on setting capability.
 
-- Change internal TWAIN message loop to loop indefinitely until the Source UI is closed.
+- Allow internal TWAIN message loop to loop indefinitely until the Source UI is closed.  A new
+  DTWAIN32.INI and DTWAIN64.INI section ("TwainLoopPeek") will list the TWAIN Product
+  Names that will use the new looping mechanism.  By default, the looping method used will be
+  the same as previous versions of DTWAIN.
 
 - Ensure setting string capabilities uses ANSI strings.
 
