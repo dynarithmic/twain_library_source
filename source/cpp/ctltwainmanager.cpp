@@ -2789,3 +2789,4 @@ std::vector<RawTwainTriplet> CTL_TwainAppMgr::s_NoTimeoutTriplets;
 SourceToXferReadyMap CTL_TwainAppMgr::s_SourceToXferReadyMap;
 SourceToXferReadyList CTL_TwainAppMgr::s_SourceToXferReadyList;
 SourceFlatbedOnlyList CTL_TwainAppMgr::s_SourceFlatbedOnlyList;
+SourcePeekMessageList CTL_TwainAppMgr::s_SourcePeekMessageList;

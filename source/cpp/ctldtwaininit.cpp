@@ -89,6 +89,7 @@ static bool SysDestroyHelper(const char* pParentFunc, CTL_TwainDLLHandle* pHandl
 static void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL, bool bClear);
 static void LoadTransferReadyOverrides();
 static void LoadFlatbedOnlyOverrides();
+static void LoadTwainLoopOverrides();
 static void LoadOnSourceOpenProperties(CTL_TwainDLLHandle* pHandle);
 static bool LoadGeneralResources(bool blockExecution);
 static void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle);
@@ -916,6 +917,9 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
 
                 // Load DS overrides for transfer ready / close UI requests
                 LoadTransferReadyOverrides();
+
+                // Load Twain message loop overrides for peek message
+                LoadTwainLoopOverrides();
 
                 // Load flatbed only list of devices
                 LoadFlatbedOnlyOverrides();
@@ -2348,8 +2352,8 @@ void LoadTransferReadyOverrides()
         customProfile->GetAllValues("SourceXferWaitInfo", iter->pItem, vals);
         if (!vals.empty())
         {
-                auto iter2 = vals.begin();
-                if ( !vals.empty())
+            auto iter2 = vals.begin();
+            if ( !vals.empty())
             {
                 try
                 {
@@ -2370,6 +2374,27 @@ void LoadTransferReadyOverrides()
                 }
             }
         }
+        ++iter;
+    }
+}
+
+// This loads the sources that rely on the TWAIN loop when processing the acquisitions
+// to use PeekMessage() instead of GetMessage().
+void LoadTwainLoopOverrides()
+{
+    auto& peekloop_list = CTL_TwainAppMgr::GetSourcePeekMessageList();
+    peekloop_list.clear();
+
+    // Get the section name
+    auto* customProfile = CTL_StaticData::GetINIInterface();
+    if (!customProfile)
+        return;
+    CSimpleIniA::TNamesDepend keys;
+    customProfile->GetAllKeys("TwainLoopPeek", keys);
+    auto iter = keys.begin();
+    while (iter != keys.end())
+    {
+        peekloop_list.insert(iter->pItem);
         ++iter;
     }
 }
