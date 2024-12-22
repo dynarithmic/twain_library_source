@@ -25,10 +25,40 @@
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
+#include <cppfunc.h>
+#include <errorcheck.h>
 
 using namespace dynarithmic;
 
 std::queue<MSG> TwainMessageLoopV2::s_MessageQueue;
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnablePeekMessageLoop(DTWAIN_SOURCE Source, BOOL bSet)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, bSet))
+    if ( !Source )
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    auto pS = pSource;
+
+    // Cannot change TWAIN message loop implementation while acquiring images
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return pS->IsTwainLoopStarted(); },
+                                        DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
+
+    pSource->SetUsePeekMessage(bSet);
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPeekMessageLoopEnabled(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    if ( !Source )
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    auto bRet = pSource->IsUsePeekMessage();
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK_LOG_PARAMS(false)
+}
 
 std::pair<bool, DTWAIN_ACQUIRE> dynarithmic::StartModalMessageLoop(DTWAIN_SOURCE Source, SourceAcquireOptions& opts)
 {
@@ -109,8 +139,9 @@ void TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource* pSource, 
     {
         CTL_ITwainSource* m_pSource;
         bool m_bOld;
-        UIScopedRAII(CTL_ITwainSource* pSource) : m_pSource(pSource), m_bOld(m_pSource->IsUIOnly()) {}
-        ~UIScopedRAII() { m_pSource->SetUIOnly(m_bOld); }
+        UIScopedRAII(CTL_ITwainSource* pSource) : m_pSource(pSource), m_bOld(m_pSource->IsUIOnly()) 
+        { m_pSource->SetTwainLoopStarted(true); }
+        ~UIScopedRAII() { m_pSource->SetTwainLoopStarted(false); m_pSource->SetUIOnly(m_bOld); }
     };
 
     UIScopedRAII raii(pSource);

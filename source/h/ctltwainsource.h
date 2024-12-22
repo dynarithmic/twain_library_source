@@ -471,6 +471,8 @@ namespace dynarithmic
         void        SetLastAcquireError(int err) { m_nLastAcquireError = err; }
         void        SetUsePeekMessage(bool bSet) { m_bUsePeekMessage = bSet; }
         bool        IsUsePeekMessage() const { return m_bUsePeekMessage;  }
+        bool        IsTwainLoopStarted() const { return m_bTwainMsgLoopStarted; }
+        void        SetTwainLoopStarted(bool bSet) { m_bTwainMsgLoopStarted = bSet; }
         // Only public member
         void *      m_pUserPtr;
 
@@ -601,6 +603,7 @@ namespace dynarithmic
         bool            m_bUsePeekMessage;
         long            m_FileSavePageCount;
         int             m_nLastAcquireError;
+        bool            m_bTwainMsgLoopStarted;
         boost::logic::tribool m_tbIsFileSystemSupported;
         boost::logic::tribool m_tbIsTileModeSupported;
         boost::logic::tribool m_tbIsFeederSupported;
