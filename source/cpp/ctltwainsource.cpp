@@ -153,7 +153,6 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_bXferReadySent(false),
     m_bIsOpened(false),
     m_bIsSelected(false),
-    m_SourceId{},
     m_pSession(pSession),
     m_bUIOpened(false),
     m_bPromptPending(false),
@@ -240,10 +239,12 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_bUsePeekMessage(false),
     m_FileSavePageCount(0),
     m_nLastAcquireError(false),
+    m_bTwainMsgLoopStarted(false),
     m_tbIsFileSystemSupported(boost::logic::indeterminate),
     m_tbIsTileModeSupported(boost::logic::indeterminate),
     m_tbIsFeederSupported(boost::logic::indeterminate),
     m_tbIsDuplexSupported(boost::logic::indeterminate),
+    m_tbIsAudioTransferSupported(boost::logic::indeterminate),
     m_pDLLHandle(pHandle),
     m_BufferedXFerInfo{},
     m_ImageInfo(),
@@ -252,8 +253,7 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_PersistentArray(nullptr),
     m_bImageInfoRetrieved(false),
     m_bExtendedImageInfoSupported(false),
-    m_bSupportedCustomCapsRetrieved(false),
-    m_bTwainMsgLoopStarted(false)
+    m_bSupportedCustomCapsRetrieved(false)
 {
     if (lpszProduct)
         m_SourceId.set_product_name(StringConversion::Convert_NativePtr_To_Ansi(lpszProduct));

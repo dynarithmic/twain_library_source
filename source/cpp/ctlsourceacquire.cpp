@@ -139,6 +139,85 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsMemFileXferSupported(DTWAIN_SOURCE Source)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
+static std::pair<bool, LONG>
+        ConfigurePixelTypesAndBitDepth(SourceAcquireOptions& opts, CTL_TwainDLLHandle* pHandle, DTWAIN_SOURCE pRealSource)
+{
+    // Set the PixelType capability.  If we need to set the pixel type, then DTWAIN must default to use
+    // the default bit depth.  The user should use DTWAIN_SetPixelType and DTWAIN_SetBitDepth before
+    // calling the DTWAIN_Acquirexxx() function to override this behavior.
+    LONG PixelType = opts.getPixelType();
+    bool bWriteMisc = (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS) ? true : false;
+    if (PixelType != DTWAIN_PT_DEFAULT)
+    {
+        CTL_StringType sBuf;
+        if (bWriteMisc)
+            LogWriterUtils::WriteLogInfoIndentedA("Verifying Current Pixel Type ...");
+
+        if (DTWAIN_IsPixelTypeSupported(pRealSource, PixelType))
+        {
+            if (bWriteMisc)
+            {
+                StringStreamA strm;
+                strm << boost::format("Pixel Type of %1% is supported.  Checking if we need to set it...") % PixelType;
+                LogWriterUtils::WriteLogInfoIndentedA(strm.str());
+            }
+            LONG curPixelType;
+            LONG curBitDepth;
+
+            // Now check if current pixel type is the same as desired pixel type
+            if (DTWAIN_GetPixelType(pRealSource, &curPixelType, &curBitDepth, TRUE))
+            {
+                if (bWriteMisc)
+                {
+                    StringStreamA strm2;
+                    strm2 << boost::format("Current pixel type is %1%, bit depth is %2%") % curPixelType % curBitDepth;
+                    LogWriterUtils::WriteLogInfoIndentedA(strm2.str());
+                }
+                // set the pixel type if not the same
+                if (curPixelType != PixelType)
+                {
+                    if (bWriteMisc)
+                        LogWriterUtils::WriteLogInfoIndentedA("Current and desired pixel type not equal.  Setting to desired...");
+                    if (!DTWAIN_SetPixelType(pRealSource, PixelType, DTWAIN_DEFAULT, TRUE))
+                    {
+                        if (bWriteMisc)
+                            LogWriterUtils::WriteLogInfoIndentedA("Warning: Could not set pixel type!");
+                    }
+                }
+                else
+                    // pixel type is supported
+                {
+                    if (bWriteMisc)
+                        LogWriterUtils::WriteLogInfoIndentedA("Current and desired pixel type equal.  End processing pixel type and bit depth...");
+                }
+            }
+            else
+            {
+                if (bWriteMisc)
+                    LogWriterUtils::WriteLogInfoIndentedA("Could not get current pixel type!");
+                opts.setStatus(DTWAIN_ERR_BAD_PIXTYPE);
+                return { false, DTWAIN_ERR_BAD_PIXTYPE };
+            }
+        }
+        else
+        {
+            if (bWriteMisc)
+            {
+                // pixel type not supported
+                StringStreamA strm2;
+                strm2 << boost::format("Pixel Type of %1% is not supported.  Setting to default...") % PixelType;
+                LogWriterUtils::WriteLogInfoIndentedA(strm2.str());
+            }
+            if (!DTWAIN_SetPixelType(pRealSource, DTWAIN_PT_DEFAULT, DTWAIN_DEFAULT, TRUE))
+            {
+                opts.setStatus(DTWAIN_ERR_BAD_PIXTYPE);
+                return { false, DTWAIN_ERR_BAD_PIXTYPE };
+            }
+        }
+    }
+    return { true, DTWAIN_NO_ERROR };
+}
+
 DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
 {
     LOG_FUNC_ENTRY_PARAMS((opts))
@@ -182,77 +261,18 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     else
         pRealSource = p;
 
-    // Set the PixelType capability.  If we need to set the pixel type, then DTWAIN must default to use
-    // the default bit depth.  The user should use DTWAIN_SetPixelType and DTWAIN_SetBitDepth before
-    // calling the DTWAIN_Acquirexxx() function to override this behavior.
-    LONG PixelType = opts.getPixelType();
-    bool bWriteMisc = (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)?true:false;
-    if (PixelType != DTWAIN_PT_DEFAULT && opts.getAcquireType() != ACQUIREAUDIONATIVE)
+    const auto acqType = opts.getAcquireType();
+    switch (acqType)
     {
-        CTL_StringType sBuf;
-        if ( bWriteMisc)
-            LogWriterUtils::WriteLogInfoIndentedA("Verifying Current Pixel Type ...");
-
-        if (DTWAIN_IsPixelTypeSupported(pRealSource, PixelType))
+        case ACQUIREAUDIONATIVE:
+        case ACQUIREAUDIOFILE:
+        case ACQUIREAUDIONATIVEEX:
+            break;
+        default:
         {
-            if ( bWriteMisc )
-            {
-                StringStreamA strm;
-                strm << boost::format("Pixel Type of %1% is supported.  Checking if we need to set it...") % PixelType;
-                LogWriterUtils::WriteLogInfoIndentedA(strm.str());
-            }
-            LONG curPixelType;
-            LONG curBitDepth;
-
-            // Now check if current pixel type is the same as desired pixel type
-            if (DTWAIN_GetPixelType(pRealSource, &curPixelType, &curBitDepth, TRUE))
-            {
-                if ( bWriteMisc)
-                {
-                    StringStreamA strm2;
-                    strm2 << boost::format("Current pixel type is %1%, bit depth is %2%") % curPixelType % curBitDepth;
-                    LogWriterUtils::WriteLogInfoIndentedA(strm2.str());
-                }
-                // set the pixel type if not the same
-                if (curPixelType != PixelType)
-                {
-                    if ( bWriteMisc )
-                        LogWriterUtils::WriteLogInfoIndentedA("Current and desired pixel type not equal.  Setting to desired...");
-                    if (!DTWAIN_SetPixelType(pRealSource, PixelType, DTWAIN_DEFAULT, TRUE))
-                    {
-                        if ( bWriteMisc)
-                            LogWriterUtils::WriteLogInfoIndentedA("Warning: Could not set pixel type!");
-                    }
-                }
-                else
-                    // pixel type is supported
-                {
-                    if (bWriteMisc)
-                        LogWriterUtils::WriteLogInfoIndentedA("Current and desired pixel type equal.  End processing pixel type and bit depth...");
-                }
-            }
-            else
-            {
-                if ( bWriteMisc )
-                    LogWriterUtils::WriteLogInfoIndentedA("Could not get current pixel type!");
-                opts.setStatus(DTWAIN_ERR_BAD_PIXTYPE);
-                DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{return true; }, DTWAIN_ERR_BAD_PIXTYPE, NULL, FUNC_MACRO);
-            }
-        }
-        else
-        {
-            if ( bWriteMisc )
-            {
-                // pixel type not supported
-                StringStreamA strm2;
-                strm2 << boost::format("Pixel Type of %1% is not supported.  Setting to default...") % PixelType;
-                LogWriterUtils::WriteLogInfoIndentedA(strm2.str());
-            }
-            if (!DTWAIN_SetPixelType(pRealSource, DTWAIN_PT_DEFAULT, DTWAIN_DEFAULT, TRUE))
-            {
-                opts.setStatus(DTWAIN_ERR_BAD_PIXTYPE);
-                DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{return true; }, DTWAIN_ERR_BAD_PIXTYPE, NULL, FUNC_MACRO);
-            }
+            auto retVal = ConfigurePixelTypesAndBitDepth(opts, pHandle, pRealSource);
+            if ( !retVal.first )
+                DTWAIN_Check_Error_Condition_0_Ex(pHandle, [] {return true; }, retVal.second, NULL, FUNC_MACRO);
         }
     }
 
