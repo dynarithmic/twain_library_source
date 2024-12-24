@@ -66,8 +66,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsDuplexSupported(DTWAIN_SOURCE Source)
 
     auto getSupport = pSource->IsDuplexSupported();
 
-    // If already determined that source does not support
-    // duplex, return error.
+    // If status of duplex support already determined, return result.
     if (getSupport.value != boost::tribool::indeterminate_value)
         LOG_FUNC_EXIT_NONAME_PARAMS(getSupport?true:false)
 
