@@ -109,6 +109,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     // See if extended image info is supported and cache the results
     pSource->SetExtendedImageInfoSupported(theCapList.count(static_cast<TW_UINT16>(ICAP_EXTIMAGEINFO))?true:false);
 
+    // See if audio transfers are supported
+    pSource->SetAudioTransferSupported(DTWAIN_IsAudioXferSupported(Source, DTWAIN_ANYSUPPORT)?true:false);
+
     // if any logging is turned on, then get the capabilities and log the values
     if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
     {

@@ -459,10 +459,12 @@ namespace dynarithmic
         boost::logic::tribool IsBufferedTileModeSupported() const { return m_tbIsTileModeSupported; }
         boost::logic::tribool IsFeederSupported() const { return m_tbIsFeederSupported; }
         boost::logic::tribool IsDuplexSupported() const { return m_tbIsDuplexSupported; }
+        boost::logic::tribool IsAudioTransferSupported() const { return m_tbIsAudioTransferSupported; }
         void         SetFileSystemSupported(bool bSet) { m_tbIsFileSystemSupported = bSet; }
         void         SetBufferedTileModeSupported(bool bSet) { m_tbIsTileModeSupported = bSet; }
         void         SetFeederSupported(bool bSet) { m_tbIsFeederSupported = bSet; }
         void         SetDuplexSupported(bool bSet) { m_tbIsDuplexSupported = bSet; }
+        void         SetAudioTransferSupported(bool bSet) { m_tbIsAudioTransferSupported = bSet; }
         TW_IMAGEMEMXFER& GetBufferedXFerInfo() { return m_BufferedXFerInfo; }
         CTL_ExtImageInfoTriplet* GetExtImageInfoTriplet();
         void        SetShutdownAcquire(bool bSet) { m_bShutdownAcquire = bSet; }
@@ -608,6 +610,7 @@ namespace dynarithmic
         boost::logic::tribool m_tbIsTileModeSupported;
         boost::logic::tribool m_tbIsFeederSupported;
         boost::logic::tribool m_tbIsDuplexSupported;
+        boost::logic::tribool m_tbIsAudioTransferSupported;
         CTL_TwainDLLHandle* m_pDLLHandle;
         TW_IMAGEMEMXFER m_BufferedXFerInfo;
 

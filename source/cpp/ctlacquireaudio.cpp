@@ -20,7 +20,9 @@
  */
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
+#include "errorcheck.h"
 #include "sourceacquireopts.h"
+#include "sourceselectopts.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -32,6 +34,13 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireAudioNative(DTWAIN_SOURCE Source, LONG n
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nMaxAudioClips, bShowUI, bCloseSource, pStatus))
     auto [pHandle, pSource] = VerifyHandles(Source);
+
+    // Check if audio transfers are supported
+    auto val = pSource->IsAudioTransferSupported();
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !val; }, DTWAIN_ERR_AUDIO_TRANSFER_NOTSUPPORTED, nullptr, FUNC_MACRO);
+
+    AcquireAttemptRAII aRaii(pSource);
+
     SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pSource->GetDTWAINHandle()).setSource(Source).
                                                            setMaxPages(nMaxAudioClips).
                                                            setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).
@@ -54,6 +63,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioNativeEx(DTWAIN_SOURCE Source, LONG 
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nMaxAudioClips, bShowUI, bCloseSource, Acquisitions, pStatus))
     auto [pHandle, pSource] = VerifyHandles(Source);
+
+    // Check if audio transfers are supported
+    auto val = pSource->IsAudioTransferSupported();
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !val; }, DTWAIN_ERR_AUDIO_TRANSFER_NOTSUPPORTED, nullptr, FUNC_MACRO);
+
+    AcquireAttemptRAII aRaii(pSource);
+
     SourceAcquireOptions opts = SourceAcquireOptions().setSource(Source).setMaxPages(nMaxAudioClips).
     setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setUserArray(Acquisitions).
     setAcquireType(ACQUIREAUDIONATIVEEX).setHandle(pHandle);
@@ -77,6 +93,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioFile(DTWAIN_SOURCE Source, LPCTSTR l
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpszFile, lFileFlags, nMaxAudioClips, bShowUI, bCloseSource, pStatus))
     auto [pHandle, pSource] = VerifyHandles(Source);
+
+    // Check if audio transfers are supported
+    auto val = pSource->IsAudioTransferSupported();
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !val; }, DTWAIN_ERR_AUDIO_TRANSFER_NOTSUPPORTED, nullptr, FUNC_MACRO);
+
+    AcquireAttemptRAII aRaii(pSource);
+
     lFileFlags &= ~DTWAIN_USELIST;
     SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).
                                 setFileName(lpszFile).setFileFlags(lFileFlags).

@@ -24,6 +24,7 @@
 #include "errorcheck.h"
 #include "sourceacquireopts.h"
 #include "ctltwainmsgloop.h"
+#include "sourceselectopts.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -37,6 +38,7 @@ DTWAIN_BOOL   DLLENTRY_DEF DTWAIN_AcquireBufferedEx(DTWAIN_SOURCE Source, LONG P
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, Acquisitions, pStatus))
     auto [pHandle, pSource] = VerifyHandles(Source);
+    AcquireAttemptRAII aRaii(pSource);
     SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
         setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setUserArray(Acquisitions).
         setAcquireType(ACQUIREBUFFEREX);
@@ -58,6 +60,8 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireBuffered(DTWAIN_SOURCE Source, LONG Pixe
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, pStatus))
     auto [pHandle, pSource] = VerifyHandles(Source);
+    AcquireAttemptRAII aRaii(pSource);
+
     SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
                                                         setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).
                                                         setAcquireType(ACQUIREBUFFER);
