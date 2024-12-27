@@ -420,9 +420,7 @@ namespace dynarithmic
         void         SetFileIncompleteSaveMode( bool bSaveIncomplete ) { m_bIsFileSaveIncomplete = bSaveIncomplete; }
         bool         IsFileIncompleteSave() const { return m_bIsFileSaveIncomplete; }
         bool         IsBlankPageDetectionOn() const { return m_bIsBlankPageDetectionOn &&
-            m_nJobControl < DTWAIN_JCBP_JSIC
-            || IsBlankPageDetectionSampleOn() ||
-                                                           IsBlankPageDetectionNoSampleOn(); }
+                            m_nJobControl < DTWAIN_JCBP_JSIC || IsBlankPageDetectionSampleOn() ||IsBlankPageDetectionNoSampleOn(); }
         void         SetBlankPageDetectionOn(bool bSet=true) { m_bIsBlankPageDetectionOn = bSet; }
         bool         IsBlankPageDetectionNoSampleOn() const { return m_bIsBlankPageDetectionNoSampleOn &&
                                                                     m_nJobControl < DTWAIN_JCBP_JSIC; }
@@ -458,13 +456,15 @@ namespace dynarithmic
         boost::logic::tribool IsFileSystemSupported() const { return m_tbIsFileSystemSupported; }
         boost::logic::tribool IsBufferedTileModeSupported() const { return m_tbIsTileModeSupported; }
         boost::logic::tribool IsFeederSupported() const { return m_tbIsFeederSupported; }
-        boost::logic::tribool IsDuplexSupported() const { return m_tbIsDuplexSupported; }
+        std::pair<boost::logic::tribool, int> GetDuplexSupport() const { return m_tbIsDuplexSupported; }
         boost::logic::tribool IsAudioTransferSupported() const { return m_tbIsAudioTransferSupported; }
+        boost::logic::tribool IsUIControllable() const { return m_tbUIControllable; }
         void         SetFileSystemSupported(bool bSet) { m_tbIsFileSystemSupported = bSet; }
         void         SetBufferedTileModeSupported(bool bSet) { m_tbIsTileModeSupported = bSet; }
         void         SetFeederSupported(bool bSet) { m_tbIsFeederSupported = bSet; }
-        void         SetDuplexSupported(bool bSet) { m_tbIsDuplexSupported = bSet; }
+        void         SetDuplexSupport(bool bSet, int duplexType) { m_tbIsDuplexSupported = { bSet,duplexType }; }
         void         SetAudioTransferSupported(bool bSet) { m_tbIsAudioTransferSupported = bSet; }
+        void         SetUIControllable(bool bSet) { m_tbUIControllable = bSet; }
         TW_IMAGEMEMXFER& GetBufferedXFerInfo() { return m_BufferedXFerInfo; }
         CTL_ExtImageInfoTriplet* GetExtImageInfoTriplet();
         void        SetShutdownAcquire(bool bSet) { m_bShutdownAcquire = bSet; }
@@ -609,8 +609,9 @@ namespace dynarithmic
         boost::logic::tribool m_tbIsFileSystemSupported;
         boost::logic::tribool m_tbIsTileModeSupported;
         boost::logic::tribool m_tbIsFeederSupported;
-        boost::logic::tribool m_tbIsDuplexSupported;
+        std::pair<boost::logic::tribool, int> m_tbIsDuplexSupported;
         boost::logic::tribool m_tbIsAudioTransferSupported;
+        boost::logic::tribool m_tbUIControllable;
         CTL_TwainDLLHandle* m_pDLLHandle;
         TW_IMAGEMEMXFER m_BufferedXFerInfo;
 
