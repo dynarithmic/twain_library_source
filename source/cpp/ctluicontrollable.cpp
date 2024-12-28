@@ -32,6 +32,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
     LOG_FUNC_ENTRY_PARAMS((Source))
     auto [pHandle, pSource] = VerifyHandles(Source);
 
+    auto getSupport = pSource->IsUIControllable();
+
+    // If status of UI support already determined, return result.
+    if (getSupport.value != boost::tribool::indeterminate_value)
+        LOG_FUNC_EXIT_NONAME_PARAMS(getSupport ? true : false)
+
     // Open the source (if source is closed)
     bool bSourceOpen = false;
     if (CTL_TwainAppMgr::IsSourceOpen(pSource))
@@ -39,6 +45,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
     else
     if (!CTL_TwainAppMgr::OpenSource(pHandle->m_pTwainSession, pSource))
        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+
     bool bOk = false;
 
     // Check if capability UICONTROLLABLE is supported
@@ -62,6 +69,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
     // Close source if opened in this function
     if (!bSourceOpen)
         DTWAIN_CloseSource(Source);
+    pSource->SetUIControllable(bOk);
     LOG_FUNC_EXIT_NONAME_PARAMS(bOk ? TRUE : FALSE)
     CATCH_BLOCK_LOG_PARAMS(false)
 }

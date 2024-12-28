@@ -23,6 +23,7 @@
 #include "ctltwainmsgloop.h"
 #include "sourceacquireopts.h"
 #include "dtwain_paramlogger.h"
+#include "sourceselectopts.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -33,6 +34,8 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireNative(DTWAIN_SOURCE Source, LONG PixelT
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, pStatus)) 
     auto [pHandle, pSource] = VerifyHandles(Source);
+    AcquireAttemptRAII aRaii(pSource);
+
     SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pSource->GetDTWAINHandle()).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
                                                            setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setAcquireType(ACQUIRENATIVE);
     const DTWAIN_ARRAY aDibs = SourceAcquire(opts);
@@ -53,6 +56,7 @@ DTWAIN_BOOL   DLLENTRY_DEF  DTWAIN_AcquireNativeEx(DTWAIN_SOURCE Source, LONG Pi
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, Acquisitions, pStatus))
     auto [pHandle, pSource] = VerifyHandles(Source);
+    AcquireAttemptRAII aRaii(pSource);
     SourceAcquireOptions opts = SourceAcquireOptions().setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
             setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setUserArray(Acquisitions).
             setAcquireType(ACQUIRENATIVEEX).setHandle(pHandle);

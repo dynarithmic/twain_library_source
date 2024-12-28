@@ -32,7 +32,7 @@ bool dynarithmic::GetSupportString(DTWAIN_SOURCE Source, LPTSTR sz, LONG nLen, L
     if ( nLen > 0 )
         sz[0] = _T('\0');
     DTWAIN_ARRAY Array = nullptr;
-    const bool bRet = DTWAIN_GetCapValues(Source, Cap, GetType, &Array)?true:false;
+    const bool bRet = DTWAIN_GetCapValuesEx2(Source, Cap, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array)?true:false;
     if (!bRet)
         return false;
     const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();

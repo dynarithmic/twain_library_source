@@ -303,7 +303,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                     }
                 }
                 if ( !pSource->IsModal())
-                    pSource->SetAcquireAttempt(FALSE); // Reset.  UI may still
+                    pSource->SetAcquireAttempt(false); // Reset.  UI may still
                                                 // be open for more acquisitions!!
             }
             break;
@@ -311,7 +311,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
             case DTWAIN_TN_PAGEFAILED:
             {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
-                pSource->SetAcquireAttempt(FALSE);
+                pSource->SetAcquireAttempt(false);
                 pHandle->m_ArrayFactory->destroy(pSource->m_pUserPtr);
 
                 // Couldn't acquire the first page, so acquire failed totally!
@@ -462,7 +462,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                 }
 
                 if ( pSource->IsAcquireAttempt() ) // Didn't really acquire the image
-                    pSource->SetAcquireAttempt(FALSE);
+                    pSource->SetAcquireAttempt(false);
 
                 if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) || !callbacks.empty())
                     bPassMsg = true;
@@ -486,7 +486,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 if ( pSource && pSource->IsOpened() )
                 {
-                    pSource->SetAcquireAttempt(FALSE);
+                    pSource->SetAcquireAttempt(false);
                     // Close Source only if modal and Source wasn't started by client app
                     if (!pSource->IsOpenAfterAcquire() )
                     {
