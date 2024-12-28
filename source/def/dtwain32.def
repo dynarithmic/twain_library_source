@@ -1068,3 +1068,5 @@ DTWAIN_GetActiveDSMVersionInfoW                   @31067
 DTWAIN_ConvertToAPIStringExA                      @31068
 DTWAIN_ConvertToAPIStringExW                      @31069
 DTWAIN_ConvertToAPIStringEx                       @31070
+DTWAIN_EnablePeekMessageLoop                      @31071
+DTWAIN_IsPeekMessageLoopEnabled                   @31072

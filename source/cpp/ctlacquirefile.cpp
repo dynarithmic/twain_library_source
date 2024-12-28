@@ -27,6 +27,7 @@
 #include "ctltwainmsgloop.h"
 
 #include "cppfunc.h"
+#include "sourceselectopts.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #pragma warning (disable:4714)
@@ -47,6 +48,8 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
     LOG_FUNC_ENTRY_PARAMS((Source, aFileNames, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI,bCloseSource, pStatus))
     auto bRetval = true;
     auto [pHandle, pSource] = VerifyHandles(Source);
+
+    AcquireAttemptRAII aRaii(pSource);
 
     // Check if the file format is valid
     auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
@@ -135,6 +138,8 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFile(DTWAIN_SOURCE Source,
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
         }
     }
+
+    AcquireAttemptRAII aRaii(pSource);
 
     lFileFlags &= ~DTWAIN_USELIST;
     SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).

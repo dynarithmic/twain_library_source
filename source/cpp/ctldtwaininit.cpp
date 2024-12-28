@@ -452,9 +452,7 @@ static bool GenericResourceLoader(CTL_TwainDLLHandle* pHandle, LPCTSTR sLangDLL,
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResources(LPCTSTR sLangDLL)
 {
     LOG_FUNC_ENTRY_PARAMS((sLangDLL))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    bool bRet = GenericResourceLoader(pHandle, sLangDLL, false);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bRet;}, DTWAIN_ERR_FILEOPEN, false, FUNC_MACRO);
+    auto bRet = DTWAIN_LoadCustomStringResourcesEx(sLangDLL, false);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -2175,7 +2173,7 @@ CTL_StringType dynarithmic::GetVersionString()
     if (DTWAIN_GetVersionInternal(&lMajor, &lMinor, &lVersionType, &lPatch) )
     {
         std::string s;
-        std::string sBits = "(32-bit)";
+        const char *sBits = "(32-bit)";
         if ( lVersionType & DTWAIN_64BIT_VERSION )
             sBits = "(64-bit)";
 
