@@ -25,33 +25,48 @@
 #include "arrayfactory.h"
 using namespace dynarithmic;
 
-/* Duplex Scanner support */
+static std::pair<bool, int> GetDuplexType(DTWAIN_SOURCE Source)
+{
+    if (!DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPDUPLEX))
+        return { false, TWDX_NONE };
+
+    DTWAIN_ARRAY Array = nullptr;
+    const DTWAIN_BOOL bRet2 = DTWAIN_GetCapValuesEx2(Source, DTWAIN_CV_CAPDUPLEX, DTWAIN_CAPGET,
+        DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
+    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+    DTWAINArrayLowLevel_RAII arr(pHandle, Array);
+    if (bRet2 && Array)
+    {
+        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
+        if (!vValues.empty())
+            return { true, vValues.front() };
+    }
+    return { false, TWDX_NONE };
+}
+
+// Duplex Scanner support 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDuplexType(DTWAIN_SOURCE Source, LPLONG lpDupType)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpDupType))
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     bool bRet = true;
-    if ( !DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPDUPLEX))
+
+    auto getSupport = pSource->GetDuplexSupport();
+
+    // If status of duplex support already determined, return result.
+    if (getSupport.first.value != boost::tribool::indeterminate_value)
     {
-        if ( lpDupType )
-            lpDupType = nullptr;
-        bRet = false;
+        if (lpDupType)
+            *lpDupType = getSupport.second;
+        bRet = getSupport.first.value;
     }
     else
     {
-        if ( lpDupType )
-        {
-            DTWAIN_ARRAY Array = nullptr;
-            const DTWAIN_BOOL bRet2 = DTWAIN_GetCapValuesEx2(Source, DTWAIN_CV_CAPDUPLEX, DTWAIN_CAPGET, 
-                                                DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
-            const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
-            DTWAINArrayLowLevel_RAII arr(pHandle, Array);
-            if ( bRet2 && Array)
-            {
-                auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
-                if ( !vValues.empty() )
-                    *lpDupType = vValues.front();
-            }
-        }
+        auto dupType = GetDuplexType(Source);
+        pSource->SetDuplexSupport(dupType.first, dupType.second);
+        if (lpDupType)
+            *lpDupType = dupType.second;
+        bRet = dupType.first;
     }
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpDupType))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
@@ -64,22 +79,20 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsDuplexSupported(DTWAIN_SOURCE Source)
     LOG_FUNC_ENTRY_PARAMS((Source))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
 
-    auto getSupport = pSource->IsDuplexSupported();
+    auto getSupport = pSource->GetDuplexSupport();
 
-    // If already determined that source does not support
-    // duplex, return error.
-    if (getSupport.value != boost::tribool::indeterminate_value)
-        LOG_FUNC_EXIT_NONAME_PARAMS(getSupport?true:false)
+    // If status of duplex support already determined, return result.
+    if (getSupport.first.value != boost::tribool::indeterminate_value)
+        LOG_FUNC_EXIT_NONAME_PARAMS(getSupport.first?true:false)
 
     bool bRet = false;
-    LONG DupType;
-    if (DTWAIN_GetDuplexType(Source, &DupType))
-    {
-        if (DupType == TWDX_1PASSDUPLEX ||
-            DupType == TWDX_2PASSDUPLEX)
-            bRet = true;
-    }
-    pSource->SetDuplexSupported(bRet);
+
+    auto retValue = GetDuplexType(Source);
+    if (retValue.second == TWDX_1PASSDUPLEX ||
+        retValue.second == TWDX_2PASSDUPLEX)
+        bRet = true;
+
+    pSource->SetDuplexSupport(retValue.first, retValue.second);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }

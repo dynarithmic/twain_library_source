@@ -89,6 +89,7 @@ static bool SysDestroyHelper(const char* pParentFunc, CTL_TwainDLLHandle* pHandl
 static void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL, bool bClear);
 static void LoadTransferReadyOverrides();
 static void LoadFlatbedOnlyOverrides();
+static void LoadTwainLoopOverrides();
 static void LoadOnSourceOpenProperties(CTL_TwainDLLHandle* pHandle);
 static bool LoadGeneralResources(bool blockExecution);
 static void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle);
@@ -451,9 +452,7 @@ static bool GenericResourceLoader(CTL_TwainDLLHandle* pHandle, LPCTSTR sLangDLL,
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResources(LPCTSTR sLangDLL)
 {
     LOG_FUNC_ENTRY_PARAMS((sLangDLL))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    bool bRet = GenericResourceLoader(pHandle, sLangDLL, false);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bRet;}, DTWAIN_ERR_FILEOPEN, false, FUNC_MACRO);
+    auto bRet = DTWAIN_LoadCustomStringResourcesEx(sLangDLL, false);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
@@ -916,6 +915,9 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
 
                 // Load DS overrides for transfer ready / close UI requests
                 LoadTransferReadyOverrides();
+
+                // Load Twain message loop overrides for peek message
+                LoadTwainLoopOverrides();
 
                 // Load flatbed only list of devices
                 LoadFlatbedOnlyOverrides();
@@ -2171,7 +2173,7 @@ CTL_StringType dynarithmic::GetVersionString()
     if (DTWAIN_GetVersionInternal(&lMajor, &lMinor, &lVersionType, &lPatch) )
     {
         std::string s;
-        std::string sBits = "(32-bit)";
+        const char *sBits = "(32-bit)";
         if ( lVersionType & DTWAIN_64BIT_VERSION )
             sBits = "(64-bit)";
 
@@ -2348,8 +2350,8 @@ void LoadTransferReadyOverrides()
         customProfile->GetAllValues("SourceXferWaitInfo", iter->pItem, vals);
         if (!vals.empty())
         {
-                auto iter2 = vals.begin();
-                if ( !vals.empty())
+            auto iter2 = vals.begin();
+            if ( !vals.empty())
             {
                 try
                 {
@@ -2370,6 +2372,27 @@ void LoadTransferReadyOverrides()
                 }
             }
         }
+        ++iter;
+    }
+}
+
+// This loads the sources that rely on the TWAIN loop when processing the acquisitions
+// to use PeekMessage() instead of GetMessage().
+void LoadTwainLoopOverrides()
+{
+    auto& peekloop_list = CTL_TwainAppMgr::GetSourcePeekMessageList();
+    peekloop_list.clear();
+
+    // Get the section name
+    auto* customProfile = CTL_StaticData::GetINIInterface();
+    if (!customProfile)
+        return;
+    CSimpleIniA::TNamesDepend keys;
+    customProfile->GetAllKeys("TwainLoopPeek", keys);
+    auto iter = keys.begin();
+    while (iter != keys.end())
+    {
+        peekloop_list.insert(iter->pItem);
         ++iter;
     }
 }

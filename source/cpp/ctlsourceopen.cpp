@@ -32,6 +32,7 @@ using namespace dynarithmic;
 
 static void LogAndCachePixelTypes(CTL_ITwainSource *p);
 static void DetermineIfSpecialXfer(CTL_ITwainSource* p);
+static void DetermineIfPeekMessage(CTL_ITwainSource* p);
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSourcesOnSelect(DTWAIN_BOOL bSet)
 {
@@ -96,6 +97,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     // TWAIN message queue
     DetermineIfSpecialXfer(pSource);
 
+    // See if the source uses PeekMessage processing for the TWAIN message loop
+    DetermineIfPeekMessage(pSource);
+
     // Cache the pixel types and bit depths
     LogAndCachePixelTypes(pSource);
 
@@ -104,6 +108,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
 
     // See if extended image info is supported and cache the results
     pSource->SetExtendedImageInfoSupported(theCapList.count(static_cast<TW_UINT16>(ICAP_EXTIMAGEINFO))?true:false);
+
+    // See if audio transfers are supported
+    pSource->SetAudioTransferSupported(DTWAIN_IsAudioXferSupported(Source, DTWAIN_ANYSUPPORT)?true:false);
 
     // if any logging is turned on, then get the capabilities and log the values
     if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
@@ -263,6 +270,26 @@ void DetermineIfSpecialXfer(CTL_ITwainSource* p)
             // Add this source as one that will require special MSG_XFERREADY processing
             auto insertPr = xfer_map.insert({ sourceName, {} });
             insertPr.first->second.m_MaxThreshold = iterSearch->second;
+            return;
+        }
+        ++iterSearch;
+    }
+}
+
+void DetermineIfPeekMessage(CTL_ITwainSource* pSource)
+{
+    using wildcards::match;
+    auto& peekmsg_list = CTL_TwainAppMgr::GetSourcePeekMessageList();
+    std::string sourceName = pSource->GetProductNameA();
+    
+    // Search vector for a matching name
+    auto iterSearch = peekmsg_list.begin();
+    while (iterSearch != peekmsg_list.end())
+    {
+        bool matches = match(sourceName, *iterSearch);
+        if (matches)
+        {
+            pSource->SetUsePeekMessage(true);
             return;
         }
         ++iterSearch;

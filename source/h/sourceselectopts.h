@@ -98,5 +98,16 @@ namespace dynarithmic
     DTWAIN_SOURCE     DTWAIN_LLSelectSource2(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& opts);
     LRESULT CALLBACK  DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
     CTL_StringType    LLSelectionDialog(CTL_TwainDLLHandle* pHandle, const SourceSelectionOptions& opts);
+
+    struct AcquireAttemptRAII
+    {
+        CTL_ITwainSource* m_pSource;
+        AcquireAttemptRAII(CTL_ITwainSource* pSource) :m_pSource(pSource) {}
+        ~AcquireAttemptRAII()
+        {
+            if (m_pSource->GetDTWAINHandle()->m_lAcquireMode == DTWAIN_MODAL) m_pSource->SetAcquireAttempt(false);
+        }
+    };
+
 }
 #endif

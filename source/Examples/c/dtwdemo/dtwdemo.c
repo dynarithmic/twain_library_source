@@ -180,7 +180,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     /* Initialize DTWAIN.  Quit if error! */
     if ( !DTWAIN_SysInitialize( )) 
         return 0;
-
     DTWAIN_SetAppInfoA("1.0","Demo Program Menu", "Demo Program Family", "Demo Program Name");
 
     /* Allow DTWAIN messages to be sent directly to our Window proc */
@@ -1337,10 +1336,6 @@ void WaitLoop()
         }
     }
 }
-
-// if the following line doesn't compile, please change "LONG_PTR" to LONG
-
-INT_PTR g_nDiscardDibRetVal;
 
 LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserData)
 {

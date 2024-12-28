@@ -37,12 +37,13 @@ namespace dynarithmic
         DTWAIN_ARRAY Array = 0;
         if (DTWAIN_GetCapValuesEx2(Source, Cap, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array))
         {
-            auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+            auto pSource = static_cast<CTL_ITwainSource*>(Source);
+            auto pHandle = pSource->GetDTWAINHandle();
             DTWAINArrayLowLevel_RAII raii(pHandle, Array);
             DTWAIN_ARRAY tempArray = 0;
             DTWAIN_ARRAY arrayToUse = Array;
             DTWAINArrayLowLevel_RAII raii2(pHandle, nullptr); 
-            if (DTWAIN_GetCapContainer(Source, Cap, DTWAIN_CAPGET) == DTWAIN_CONTRANGE)
+            if (GetCapContainer(pSource, Cap, DTWAIN_CAPGET) == DTWAIN_CONTRANGE)
             {
                 // expand range if we find that the underlying values are in a range
                 try
