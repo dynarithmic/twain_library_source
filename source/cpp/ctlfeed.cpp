@@ -44,8 +44,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFeederSupported(DTWAIN_SOURCE Source)
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     auto getSupport = pSource->IsFeederSupported();
 
-    // If already determined that source does not support
-    // feeder, return error.
+    // If status of feeder support already determined, return result.
     if (getSupport.value != boost::tribool::indeterminate_value)
         LOG_FUNC_EXIT_NONAME_PARAMS(getSupport ? true : false)
 
