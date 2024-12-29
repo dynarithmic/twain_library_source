@@ -804,9 +804,10 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     imageInfoString[12] = tempStrm.str();
 
                     strm.str("");
+
                     std::array<int, 11> deviceInfoCaps = { CAP_FEEDERENABLED, CAP_FEEDERLOADED, CAP_UICONTROLLABLE,
                                                           ICAP_AUTOBRIGHT, ICAP_AUTOMATICDESKEW,
-                                                          CAP_PRINTER, CAP_DUPLEX, CAP_JOBCONTROL, ICAP_EXTIMAGEINFO, ICAP_LIGHTPATH, 0};
+                                                          CAP_PRINTER, CAP_DUPLEX, CAP_JOBCONTROL, ICAP_LIGHTPATH, ICAP_EXTIMAGEINFO, 0};
 
                     std::array<std::string, 11> deviceInfoCapsStr; 
                     std::copy(deviceInfoString.begin(), deviceInfoString.end(), deviceInfoCapsStr.begin());
