@@ -448,8 +448,11 @@ namespace dynarithmic
         void         SetOpenFlag(bool bOpened) { m_bIsOpened = bOpened; }
         bool         CloseSource(bool bForce);
         const std::vector<int>& GetSupportedTransferMechanisms() const { return m_aTransferMechanisms; }
+        const std::vector<TW_UINT32>& GetSupportedDATS() const { return m_aSupportedDATS; }
         void         SetSupportedTransferMechanisms(const std::vector<int>& aTransferMechanisms)
                             { m_aTransferMechanisms = aTransferMechanisms; }
+        void         SetSupportedDATS(const std::vector<TW_UINT32>& aSupportedDATS)
+                            { m_aSupportedDATS = aSupportedDATS; }
         void         SetDoublePageCountOnDuplex(bool bSet) { m_bDoublePageCountOnDuplex = bSet; }
         bool         IsDoublePageCountOnDuplex() const { return m_bDoublePageCountOnDuplex; }
         CapList&     GetCustomCapCache() { return m_aSupportedCustomCapCache; }
@@ -600,6 +603,7 @@ namespace dynarithmic
         LONG            m_nForcedBpp;
         bool            m_bTileMode;
         std::vector<int> m_aTransferMechanisms;
+        std::vector<TW_UINT32> m_aSupportedDATS;
         bool            m_bExtendedCapsRetrieved;
         bool            m_bShutdownAcquire;
         bool            m_bUsePeekMessage;
