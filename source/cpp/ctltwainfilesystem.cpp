@@ -70,7 +70,16 @@ static int CheckFileSystemSupport(CTL_ITwainSource* pSource)
     if (getSupport.value == boost::tribool::indeterminate_value)
     {
         // Test if source supports file system
-        const DTWAIN_BOOL bRet = FSDirectory(pSource, _T("/"), CHANGE_DIRECTORY).first;
+
+        // See if DAT_FILESYSTEM is one of the supported DATS
+        DTWAIN_BOOL bRet = false;
+        const auto& vDats = pSource->GetSupportedDATS();
+        if (std::find_if(vDats.begin(), vDats.end(), 
+            [](TW_UINT32 val) { return (val & 0x0000FFFF) == DAT_FILESYSTEM; }) != vDats.end())
+                bRet = true;
+        else
+            // No support directly, so try changing to the root directory
+            bRet = FSDirectory(pSource, _T("/"), CHANGE_DIRECTORY).first;
         pSource->SetFileSystemSupported(bRet);
 
         // return results

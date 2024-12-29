@@ -1976,6 +1976,14 @@ CTL_IntArray CTL_TwainAppMgr::EnumTransferMechanisms( const CTL_ITwainSource *pS
     GetMultiValuesImpl<CTL_IntArray, TW_UINT16>::GetMultipleTwainCapValues(pSource, rArray, TwainCap_XFERMECH, TWTY_UINT16);
     return rArray;
 }
+
+std::vector<TW_UINT32> CTL_TwainAppMgr::EnumSupportedDATS(const CTL_ITwainSource* pSource)
+{
+    std::vector<TW_UINT32> rArray;
+    GetMultiValuesImpl<std::vector<TW_UINT32>, TW_UINT32>::GetMultipleTwainCapValues(pSource, rArray, CAP_SUPPORTEDDATS, TWTY_UINT32);
+    return rArray;
+}
+
 //////////////////////////////////////////////////////////////////////
 
 ////////////////////// Pixel and Bit Depth settings /////////////////

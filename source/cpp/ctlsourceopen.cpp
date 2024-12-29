@@ -93,6 +93,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     // Get the supported transfer types
     pSource->SetSupportedTransferMechanisms(CTL_TwainAppMgr::EnumTransferMechanisms(pSource));
 
+    // Get the supported DAT types
+    pSource->SetSupportedDATS(CTL_TwainAppMgr::EnumSupportedDATS(pSource));
+
     // See if the source is one that has a bug in the MSG_XFERREADY sending on the 
     // TWAIN message queue
     DetermineIfSpecialXfer(pSource);
