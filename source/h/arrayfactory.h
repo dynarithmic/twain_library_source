@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,6 +18,10 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+
+/* The array factory allows creation of DTWAIN Arrays using std::vector<type> as 
+   the backing container for all DTWAIN arrays. 
+*/   
 #ifndef ARRAYFACTORY_H
 #define ARRAYFACTORY_H
 
@@ -26,7 +30,6 @@
 #include <memory>
 #include <functional>
 #include <string>
-#include <unordered_map>
 #include <algorithm>
 #include <stdexcept>
 #include <boost/container/flat_map.hpp>
@@ -36,6 +39,7 @@
 
 namespace dynarithmic
 {
+    // All the array types supported by the DTWAIN library and internal functions
     enum CTL_ArrayType
     {
         CTL_ArrayPtrType = 1,
@@ -60,8 +64,12 @@ namespace dynarithmic
 
     class CTL_ITwainSource;
 
+    /* The CTL_ArrayFactory contains the infrastructure that maintains all of the 
+    DTWAIN Arrays created.*/
     struct CTL_ArrayFactory
     {
+        // The arrayTag is used to distinguish the type of DTWAIN array that was
+        // created, i.e. LONG, double, string, etc.
         struct arrayTag
         {
             static constexpr int LongType = 0;
@@ -84,20 +92,20 @@ namespace dynarithmic
             explicit arrayTag(int tag = 0) noexcept : nTag(tag) {}
         };
 
+        // This is the basic class that is created for each DTWAIN Array
         template <typename T>
         struct tagged_array : arrayTag
         {
-            using value_type = T;
-            using container_type = std::vector<T>;
+            using value_type = T;  // The underlying array type
+            using container_type = std::vector<T>; // the backing container for the array values
             container_type vData;
-            container_type& get_container() noexcept { return vData; }
-            void push_back(const value_type& value) { vData.push_back(value); }
-            void push_back_v(T *value) { vData.push_back(*value); }
-            void push_back_ptr(T value) { vData.push_back(value); }
+            container_type& get_container() noexcept { return vData; }  // returns the vector
+            void push_back(const value_type& value) { vData.push_back(value); } // adds a new item to the vector
+            void push_back_v(T *value) { vData.push_back(*value); } // Adds a dereferenced value to the vector
+            void push_back_ptr(T value) { vData.push_back(value); } // Adds a pointer to the value
         };
 
-        #define FNMAPTYPE boost::container::flat_map
-
+        // all of the DTWAIN array types.
         using tagged_array_long = tagged_array<LONG>;
         using tagged_array_double = tagged_array<double>;
         using tagged_array_string = tagged_array<std::string>;
@@ -109,54 +117,72 @@ namespace dynarithmic
         using tagged_array_twframe = tagged_array<TW_FRAME>;
         using tagged_array_fix32 = tagged_array<TW_FIX32Ex>;
         using tagged_array_long64 = tagged_array<LONG64>;
-        
+
+        // Map type that maps the array tag to a function that manipulates the 
+        // DTWAIN array
+        #define FNMAPTYPE boost::container::flat_map
+
+        // Function that adds a value to the DTWAIN Array
         using voidAddFn = std::function<void(arrayTag*, std::size_t, void*)>;
         using voidAddFnMap = FNMAPTYPE<int, voidAddFn>;
 
+        // Function that gets a value to the DTWAIN Array
         using voidGetFn = std::function<void*(arrayTag*, std::size_t, void*)>;
         using voidGetFnMap = FNMAPTYPE<int, voidGetFn>;
 
+        // Function that finds a value to the DTWAIN Array
         using voidFindFn = std::function<std::size_t(arrayTag*, void*, double)>;
         using voidFindFnMap = FNMAPTYPE<int, voidFindFn>;
 
+        // Function that inserts a value to the DTWAIN Array
         using voidInserterFn = std::function<void(arrayTag*, std::size_t, std::size_t, void*)>;
         using voidInserterFnMap = FNMAPTYPE<int, voidInserterFn>;
 
+        // Function that copies from one array to another of the same type
         using voidCopierFn = std::function<void(arrayTag*, arrayTag*)>;
         using voidCopierFnMap = FNMAPTYPE<int, voidCopierFn>;
 
+        // Function that removes a value from the DTWAIN Array
         using voidRemoverFn = std::function<void(arrayTag*, std::size_t, std::size_t)>;
         using voidRemoverFnMap = FNMAPTYPE<int, voidRemoverFn>;
 
+        // Function that clears the DTWAIN Array
         using voidClearerFn = std::function<void(arrayTag*)>;
         using voidClearerFnMap = FNMAPTYPE<int, voidClearerFn>;
 
+        // Function that resizes the DTWAIN Array
         using voidResizerFn = std::function<void(arrayTag*, std::size_t)>;
         using voidResizerFnMap = FNMAPTYPE<int, voidResizerFn>;
 
+        // Function that returns the size of the DTWAIN array
         using intCounterFn = std::function<std::size_t(arrayTag*)>;
         using intCounterFnMap = FNMAPTYPE<int, intCounterFn>;
 
+        // Function that sets an existing value in the DTWAIN Array
         using voidSetterFn = std::function<void(arrayTag*, std::size_t, void* value)>;
         using voidSetterFnMap = FNMAPTYPE<int, voidSetterFn>;
 
+        // Function that gets a pointer to the underlying DTWAIN Array buffer
         using voidGetBufferFn = std::function<void*(arrayTag*, std::size_t)>;
         using voidGetBufferFnMap = FNMAPTYPE<int, voidGetBufferFn>;
 
+        // Returns the underlying std::vector that the DTWAIN Array is wrapping.
         template <typename T>
         auto& underlying_container_t(arrayTag* pTag) const
         {
+            // Get the tagged_array<T> that represents the DTWAIN Array
 	        if (auto* p = static_cast<tagged_array<T>*>(pTag))
-                return p->get_container();
+                return p->get_container(); // Return the std::vector
             throw (std::invalid_argument::invalid_argument("underlying_container_t argument cannot be nullptr"));
         }
 
         template <typename T>
         auto& underlying_container_t(void* pTag) const
         {
+            // Given a void*, convert to an array_tag and get
+            // the underlying container
             return underlying_container_t<T>(from_void(pTag));
         }
-
 
         template <typename T>
         auto& underlying_container(arrayTag* tag)
@@ -170,29 +196,52 @@ namespace dynarithmic
             return underlying_container<T>(from_void(tag));
         }
 
+        // Adds a value to a DTWAIN Array that is a fundamental type,
+        // i.e. int, double, etc.
+        // The nSize is the number of copies to add
         template <typename T>
         void simple_pushback(arrayTag* tag, void* value, size_t nSize) const
         {
+            // Convert the void* to the actual type.  The value is a pointer
+            // to the value we will add.
             auto vvalue = static_cast<typename T::value_type *>(value);
+
+            // Get the tagged_array type from the tag
             auto p = static_cast<T*>(tag);
+
+            // Add the values
             for (size_t i = 0; i < nSize; ++i)
                 p->push_back(*vvalue);
         }
 
+        // Adds a std::string or std::wstring to a DTWAIN Array.
         template <typename T>
         void string_pushback(arrayTag* tag, void* value, size_t nSize) const
         {
+            // Convert the void* to the actual string type.  Note that
+            // we need to dereference the pointer to get the string.
             auto vvalue = *static_cast<typename T::value_type *>(value);
+
+            // Get the tagged_array type
             auto p = static_cast<T*>(tag);
+
+            // Add nSize copies to the array
             for (size_t i = 0; i < nSize; ++i)
                 p->push_back(vvalue); 
         }
 
+        // Adds a pointer to a DTWAIN Array
         template <typename T>
         void pointer_pushback(arrayTag* tag, void* value, size_t nSize) const
         {
+            // The type is already a pointer, so value is the type we want
+            // to store
             auto vvalue = static_cast<typename T::value_type>(value);
+
+            // Get the array type
             auto p = static_cast<T*>(tag);
+
+            // Call the specialized push_back for pointers
             for (size_t i = 0; i < nSize; ++i)
                 p->push_back_ptr(vvalue);
         }

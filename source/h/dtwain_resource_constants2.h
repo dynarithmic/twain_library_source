@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -263,7 +263,10 @@
 #define IDS_LOGMSG_TEMPIMAGEFILETEXT        (IDS_LOGMSG_START + 14)
 #define IDS_LOGMSG_TEMPFILECREATEERRORTEXT  (IDS_LOGMSG_START + 15)
 #define IDS_LOGMSG_IMAGEFILESUCCESSTEXT     (IDS_LOGMSG_START + 16)
-
+#define IDS_LOGMSG_RETURNSETVALUES          (IDS_LOGMSG_START + 17)
+#define IDS_LOGMSG_MORETEXT                 (IDS_LOGMSG_START + 18)
+#define IDS_LOGMSG_CAPABILITYLISTING        (IDS_LOGMSG_START + 19)
+#define IDS_LOGMSG_DEFAULTSOURCE            (IDS_LOGMSG_START + 20)
 #define IDS_LOGMSG_END                      (4999)
 
 // PDF Font text

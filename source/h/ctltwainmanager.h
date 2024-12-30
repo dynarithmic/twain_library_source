@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -20,10 +20,7 @@
  */
 #ifndef CTLTWAINMANAGER_H
 #define CTLTWAINMANAGER_H
-#ifdef _MSC_VER
-#pragma warning( disable : 4786)
-#pragma warning( disable : 4996)
-#endif
+
 #include <memory>
 #include <map>
 #include <string>
@@ -33,13 +30,12 @@
 #include "ctlenum.h"
 #include "capstruc.h"
 #include "errstruc.h"
-#include "ctltrp.h"
+#include "ctltripletbase.h"
 #include "ctltr011.h"
 #include "ctltr012.h"
 #include "ctltr014.h"
 #include "ctltr015.h"
 #include <boost/dll/shared_library.hpp>
-#include "capconst.h"
 namespace dynarithmic
 {
     class CTL_TwainDibArray;
@@ -65,6 +61,7 @@ namespace dynarithmic
     using SourceToXferReadyMap = std::map<std::string, SourceXferReadyOverride>;
     using SourceToXferReadyList = std::vector<std::pair<std::string, uint32_t>>;
     using SourceFlatbedOnlyList = std::unordered_set<std::string>;
+    using SourcePeekMessageList = std::unordered_set<std::string>;
 
     class CTL_TwainAppMgr;
     typedef std::shared_ptr<CTL_TwainAppMgr> CTL_TwainAppMgrPtr;
@@ -176,6 +173,8 @@ namespace dynarithmic
                                                 int nCap);
 
             static CTL_IntArray EnumTransferMechanisms( const CTL_ITwainSource *pSource );
+            static std::vector<TW_UINT32> EnumSupportedDATS(const CTL_ITwainSource* pSource);
+
             static bool GetFileTransferDefaults( CTL_ITwainSource *pSource, int &nFileType);
             static int SetTransferMechanism( const CTL_ITwainSource *pSource, CTL_TwainAcquireEnum AcquireType,
                                             LONG ClipboardTransferType);
@@ -247,7 +246,6 @@ namespace dynarithmic
                                                          TW_UINT16 rc);
 
             static TW_UINT16 GetMemXferValues(CTL_ITwainSource *pSource, TW_SETUPMEMXFER *pXfer);
-            static int  GetCapMaskFromCap( CTL_EnumCapability Cap );
             static bool IsCapMaskOn( CTL_EnumCapability Cap, CTL_EnumGetType GetType);
             static bool IsCapMaskOn( CTL_EnumCapability Cap, CTL_EnumSetType SetType);
             static bool IsSourceCompliant( const CTL_ITwainSource *pSource,
@@ -276,15 +274,10 @@ namespace dynarithmic
             static LONG         GetCapFromCapName( const char *szCapName );
             static bool         SetDefaultSource( CTL_ITwainSession *pSession,
                                                   const CTL_ITwainSource *pSource );
-            static void         WriteLogInfo(const CTL_StringType& s, bool bFlush=false);
-            static void         WriteLogInfoA(const std::string& s, bool bFlush = false);
-            static void         WriteLogInfoW(const std::wstring& s, bool bFlush = false);
 
             static TW_UINT16 CallDSMEntryProc( TW_IDENTITY *pOrigin, TW_IDENTITY* pDest,
                                                TW_UINT32 dg, TW_UINT16 dat, TW_UINT16 msg, TW_MEMREF pMemref);
 
-
-            static LONG ExtImageInfoArrayType(LONG ExtType);
             static CTL_StringType GetTwainDirFullName(LPCTSTR szTwainDLLName,
                                                       LPLONG pWhichSearch,
                                                       bool leaveLoaded = false,
@@ -301,6 +294,7 @@ namespace dynarithmic
             static SourceToXferReadyMap& GetSourceToXferReadyMap() { return s_SourceToXferReadyMap; }
             static SourceToXferReadyList& GetSourceToXferReadyList() { return s_SourceToXferReadyList; }
             static SourceFlatbedOnlyList& GetSourceFlatbedOnlyList() { return s_SourceFlatbedOnlyList; }
+            static SourcePeekMessageList& GetSourcePeekMessageList() { return s_SourcePeekMessageList; }
             const CTL_TwainTriplet* GetCurrentTriplet() const { return m_pCurrentTriplet;}
 
         private:
@@ -480,7 +474,7 @@ namespace dynarithmic
                    }
             };
 
-            static CTL_ErrorStruct GetGeneralErrorInfo(LONG nDG, UINT nDAT, UINT nMSG);
+            static CTL_ErrorStruct GetGeneralErrorInfo(TW_UINT32 nDG, TW_UINT16 nDAT, TW_UINT16 nMSG);
 
             void DestroySession(const CTL_ITwainSession* pSession);
             void DestroyAllTwainSessions();
@@ -513,6 +507,7 @@ namespace dynarithmic
             static SourceToXferReadyMap s_SourceToXferReadyMap;
             static SourceToXferReadyList s_SourceToXferReadyList;
             static SourceFlatbedOnlyList s_SourceFlatbedOnlyList;
+            static SourcePeekMessageList s_SourcePeekMessageList;
     };
 
     #define DTWAIN_ERROR_CONDITION(Err, RetVal, mustReport) {               \

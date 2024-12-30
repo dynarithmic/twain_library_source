@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ template <typename T>
 static void create_stream(std::stringstream& strm, DTWAIN_SOURCE Source, LONG capValue)
 {
     DTWAIN_ARRAY arr = nullptr;
-    DTWAIN_GetCapValues(Source, capValue, DTWAIN_CAPGET, &arr);
+    DTWAIN_GetCapValuesEx2(Source, capValue, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
     if (pHandle && arr)
     {
@@ -78,7 +78,7 @@ struct DefaultStringFnGetter
     static DTWAIN_ARRAY GetAllStringValues(DTWAIN_SOURCE Source, LONG capValue)
     {
         DTWAIN_ARRAY arr = nullptr;
-        DTWAIN_GetCapValues(Source, capValue, DTWAIN_CAPGET, &arr);
+        DTWAIN_GetCapValuesEx2(Source, capValue, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
         return arr;
     }
 };
@@ -207,10 +207,10 @@ static std::string get_source_file_types(DTWAIN_SOURCE Source)
                     DTWAINArrayPtr_RAII raii(pHandle, &arr);
                     auto& buf = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
                     buf[0] = curFormat;
-                    DTWAIN_SetCapValues(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPSET, arr);
+                    DTWAIN_SetCapValuesEx2(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
                     buf[0] = curCompression;
                     if (curCompression != -1)
-                        DTWAIN_SetCapValues(Source, ICAP_COMPRESSION, DTWAIN_CAPSET, arr);
+                        DTWAIN_SetCapValuesEx2(Source, ICAP_COMPRESSION, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
                 }
             }
             catch (...)
@@ -223,21 +223,21 @@ static std::string get_source_file_types(DTWAIN_SOURCE Source)
     const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     DTWAIN_ARRAY aFileFormats = nullptr;
     DTWAIN_ARRAY aCurrentFileFormat = nullptr;
-    DTWAIN_GetCapValues(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPGET, &aFileFormats);
+    DTWAIN_GetCapValuesEx2(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aFileFormats);
 
     if ( aFileFormats)
     {
         DTWAINArrayPtr_RAII raii1(pHandle, &aFileFormats);
         auto& vFileFormats = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aFileFormats);
 
-        DTWAIN_GetCapValues(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPGETCURRENT, &aCurrentFileFormat);
+        DTWAIN_GetCapValuesEx2(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aCurrentFileFormat);
         if ( aCurrentFileFormat )
         {
             DTWAINArrayPtr_RAII raii2(pHandle, &aCurrentFileFormat);
             auto& vCurrentFormat = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aCurrentFileFormat);
 
             DTWAIN_ARRAY aCurrentCompress = nullptr;
-            DTWAIN_GetCapValues(Source, ICAP_COMPRESSION, DTWAIN_CAPGETCURRENT, &aCurrentCompress);
+            DTWAIN_GetCapValuesEx2(Source, ICAP_COMPRESSION, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aCurrentCompress);
             if (aCurrentCompress)
             {
                 DTWAINArrayPtr_RAII raii3(pHandle, &aCurrentCompress);
@@ -259,7 +259,7 @@ static std::string get_source_file_types(DTWAIN_SOURCE Source)
                     if (compIter.first)
                     {
                         const sourceMapType* ptr = compToMap[compIter.second].second;
-                        DTWAIN_SetCapValues(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPSET, tempArray);
+                        DTWAIN_SetCapValuesEx2(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, tempArray);
                         auto tempCompression = DTWAIN_EnumCompressionTypesEx(Source);
                         DTWAINArrayPtr_RAII raii5(pHandle, &tempCompression);
                         auto& compressBuf = pHandle->m_ArrayFactory->underlying_container_t<LONG>(tempCompression);
@@ -309,18 +309,44 @@ static pixelMap getPixelAndBitDepthInfo(CTL_ITwainSource* pSource)
     return pMap;
 }
 
-static std::vector<std::string> getNamesFromConstants(CTL_ITwainSource *pSource, LONG capValue, LONG twainconstantID)
+template <typename FnAdjuster>
+static std::vector<std::string> getNamesFromConstants(CTL_ITwainSource *pSource, LONG capValue, LONG twainconstantID, FnAdjuster fn)
 {
     DTWAIN_ARRAY arr = nullptr;
     const auto pHandle = pSource->GetDTWAINHandle();
-    BOOL bRet = DTWAIN_GetCapValues(pSource, capValue, DTWAIN_CAPGET, &arr);
+    BOOL bRet = DTWAIN_GetCapValuesEx2(pSource, capValue, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
     std::vector<std::string> allNames;
     if (bRet)
     {
         DTWAINArrayPtr_RAII raii(pHandle, &arr);
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
         for (LONG value : vValues)
+        {
+            value = fn(value);
             allNames.push_back(StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetTwainNameFromConstant(twainconstantID, value)));
+        }
+    }
+    return allNames;
+}
+
+static std::vector<std::string> getDGDATNamesFromConstants(CTL_ITwainSource* pSource)
+{
+    DTWAIN_ARRAY arr = nullptr;
+    const auto pHandle = pSource->GetDTWAINHandle();
+    BOOL bRet = DTWAIN_GetCapValuesEx2(pSource, CAP_SUPPORTEDDATS, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
+    std::vector<std::string> allNames;
+    if (bRet)
+    {
+        DTWAINArrayPtr_RAII raii(pHandle, &arr);
+        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<TW_UINT32>(arr);
+        for (auto value : vValues)
+        {
+            auto valueDG = (value & 0xFFFF0000) >> 16;
+            auto valueDAT = value & 0x0000FFFF;
+            std::string dgName = StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DG, valueDG));
+            std::string datName = StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DAT, valueDAT));
+            allNames.push_back(dgName + " / " + datName); 
+        }
     }
     return allNames;
 }
@@ -352,7 +378,7 @@ ResInfoMap getResolutionInfo(CTL_ITwainSource* pSource)
         auto& pSetUnitsVal = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aSetUnit);
         DTWAINArrayPtr_RAII raii2(pHandle, &aSetUnit);
         DTWAIN_ARRAY curUnit = nullptr;
-        DTWAIN_GetCapValues(pSource, ICAP_UNITS, DTWAIN_CAPGETCURRENT, &curUnit);
+        DTWAIN_GetCapValuesEx2(pSource, ICAP_UNITS, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &curUnit);
         if ( curUnit )
         {
             auto& pCurUnit = pHandle->m_ArrayFactory->underlying_container_t<LONG>(curUnit);
@@ -364,12 +390,12 @@ ResInfoMap getResolutionInfo(CTL_ITwainSource* pSource)
                     resMap.insert({pUnitsVals[i],{}});
                     // Set the current unit of measure
                     pSetUnitsVal[0] = pUnitsVals[i];
-                    if (DTWAIN_SetCapValues(pSource, ICAP_UNITS, DTWAIN_CAPSET, aSetUnit))
+                    if (DTWAIN_SetCapValuesEx2(pSource, ICAP_UNITS, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, aSetUnit))
                     {
                         // Get the resolution values for this unit of measure
                         DTWAIN_ARRAY aResolutions;
                         DTWAINArrayPtr_RAII raii3(pHandle, &aResolutions);
-                        DTWAIN_GetCapValues(pSource, ICAP_XRESOLUTION, DTWAIN_CAPGET, &aResolutions);
+                        DTWAIN_GetCapValuesEx2(pSource, ICAP_XRESOLUTION, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aResolutions);
                         if ( aResolutions )
                         {
                             auto& pResolutions = pHandle->m_ArrayFactory->underlying_container_t<double>(aResolutions);
@@ -384,7 +410,7 @@ ResInfoMap getResolutionInfo(CTL_ITwainSource* pSource)
                 }
 
                 // Set the unit back to the original
-                DTWAIN_SetCapValues(pSource, ICAP_UNITS, DTWAIN_CAPSET, curUnit);
+                DTWAIN_SetCapValuesEx2(pSource, ICAP_UNITS, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, curUnit);
             }
         }
     }
@@ -456,6 +482,10 @@ static AllCapInfo getAllCapInfo(CTL_ITwainSource* pSource)
         auto iter = capInfo.find(capVal);
         if (iter != capInfo.end())
             iter->second.capType = "\"custom\"";
+        // Check if this is also an extended cap
+        auto iter2 = std::find(vExtBuf.begin(), vExtBuf.end(), capVal);
+        if ( iter2 != vExtBuf.end())
+            iter->second.capType = "\"custom, extended\"";
     }
     allCapInfo.mapCounts = {vCapBuf.size(), vExtBuf.size(), vCustomBuf.size()};
     return allCapInfo;
@@ -645,23 +675,38 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         LONG capConstant;
                         const char* name;
                         int prefixCount;
+                        const char* prefix;
+                        bool usefullName;
                     };
 
-                    std::array<TwainDataItems, 4> otherData = { {
-                        { ICAP_SUPPORTEDSIZES, DTWAIN_CONSTANT_TWSS, "\"paper-sizes\":", 5 },
-                        { ICAP_SUPPORTEDBARCODETYPES, DTWAIN_CONSTANT_TWBT, "\"barcode-supported-types\":", 5 },
-                        { ICAP_SUPPORTEDPATCHCODETYPES,DTWAIN_CONSTANT_TWPCH, "\"patchcode-supported-types\":", 6 },
-                        { ICAP_SUPPORTEDEXTIMAGEINFO,DTWAIN_CONSTANT_TWEI, "\"extendedimageinfo-supported-types\":", 5 }} };
+                    std::array<TwainDataItems, 5> otherData = { {
+                        { ICAP_SUPPORTEDSIZES, DTWAIN_CONSTANT_TWSS, "\"paper-sizes\":", 5, "TWSS_", false },
+                        { ICAP_SUPPORTEDBARCODETYPES, DTWAIN_CONSTANT_TWBT, "\"barcode-supported-types\":", 5, "TWBT_", false },
+                        { ICAP_SUPPORTEDPATCHCODETYPES,DTWAIN_CONSTANT_TWPCH, "\"patchcode-supported-types\":", 6, "TWPCH_", false },
+                        { ICAP_SUPPORTEDEXTIMAGEINFO,DTWAIN_CONSTANT_TWEI, "\"extendedimageinfo-supported-types\":", 5, "TWEI_", false },
+                        { CAP_SUPPORTEDDATS,DTWAIN_CONSTANT_DAT, "\"supported-dat-types\":", 4, "DAT_", true }
+                    } };
                     for (auto& oneData : otherData)
                     {
                         strm2.str("");
                         {
-                            auto vNames = getNamesFromConstants(pCurrentSourcePtr, oneData.cap, oneData.capConstant);
+                            std::vector<std::string> vNames;
+                            if ( oneData.cap == CAP_SUPPORTEDDATS)
+                                vNames = getDGDATNamesFromConstants(pCurrentSourcePtr);
+                            else
+                                vNames = getNamesFromConstants(pCurrentSourcePtr, oneData.cap, oneData.capConstant, [](LONG v) { return v; });
                             std::string allSizes;
                             std::vector<std::string> vAdjustedNames;
                             std::transform(vNames.begin(), vNames.end(), std::back_inserter(vAdjustedNames),
-                                [&](auto& origName) { return "\"" + origName.substr(oneData.prefixCount) + "\""; });
-
+                                [&](auto& origName)
+                                {
+                                    if (!StringWrapperA::StartsWith(origName, oneData.prefix))
+                                        return "\"" + origName + "\"";
+                                    if (oneData.usefullName)
+                                        return "\"" + origName + "\"";
+                                    return "\"" +  origName.substr(oneData.prefixCount) + "\"";
+                                });
+                            std::sort(vAdjustedNames.begin(), vAdjustedNames.end());
                             std::string resultStr = join_string(vAdjustedNames.begin(), vAdjustedNames.end());
                             if (!vNames.empty())
                                 strm2 << oneData.name << "[" << resultStr << "],";
@@ -794,9 +839,10 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     imageInfoString[12] = tempStrm.str();
 
                     strm.str("");
+
                     std::array<int, 11> deviceInfoCaps = { CAP_FEEDERENABLED, CAP_FEEDERLOADED, CAP_UICONTROLLABLE,
                                                           ICAP_AUTOBRIGHT, ICAP_AUTOMATICDESKEW,
-                                                          CAP_PRINTER, CAP_DUPLEX, CAP_JOBCONTROL, ICAP_EXTIMAGEINFO, ICAP_LIGHTPATH, 0};
+                                                          CAP_PRINTER, CAP_DUPLEX, CAP_JOBCONTROL, ICAP_LIGHTPATH, ICAP_EXTIMAGEINFO, 0};
 
                     std::array<std::string, 11> deviceInfoCapsStr; 
                     std::copy(deviceInfoString.begin(), deviceInfoString.end(), deviceInfoCapsStr.begin());
@@ -819,7 +865,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         if (deviceInfoCaps[curDevice] == CAP_PRINTER)
                         {
                             DTWAIN_ARRAY aPrinter = nullptr;
-                            DTWAIN_GetCapValues(pCurrentSourcePtr, CAP_PRINTER, DTWAIN_CAPGET, &aPrinter);
+                            DTWAIN_GetCapValuesEx2(pCurrentSourcePtr, CAP_PRINTER, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aPrinter);
                             DTWAINArrayPtr_RAII aPrinterRaii(pHandle, &aPrinter);
                             if ( aPrinter )
                             {
@@ -942,6 +988,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSessionDetails(LPTSTR szBuf, LONG nSize, LONG indent
         pHandle->m_strSessionDetails = details;
     }
     LONG retVal = StringWrapper::CopyInfoToCString(details, szBuf, nSize);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szBuf))
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(0)
 }
@@ -965,6 +1012,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSourceDetails(LPCTSTR szSources, LPTSTR szBuf, LONG 
     else
         details = pHandle->m_strSourceDetails;
     LONG retVal = StringWrapper::CopyInfoToCString(details, szBuf, nSize);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szBuf))
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(0)
 }

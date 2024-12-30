@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -29,11 +29,11 @@
 #include <pdfconst.h>
 #include <utility>
 #include <memory>
-#include <pdflib32.h>
 #include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "ctlfileutils.h"
 #include "dtwain_float_utils.h"
+#include "logwriterutils.h"
 
 using namespace dynarithmic;
 
@@ -318,11 +318,11 @@ int CPDFImageHandler::InitializePDFPage(const PDFINFO* pPDFInfo, HANDLE bitmap)
         sDimensions = sBuf.str();
         pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pPDFInfo->pPDFdoc, PDF_MEDIABOX, sDimensions.c_str());
 
-        if ( CTL_StaticData::s_logFilterFlags )
+        if ( CTL_StaticData::GetLogFilterFlags() )
         {
             std::string sOut = "PDF Computed media box: ";
             sOut += sDimensions;
-            CTL_TwainAppMgr::WriteLogInfoA(sOut);
+            LogWriterUtils::WriteLogInfoIndentedA(sOut);
         }
     }
 

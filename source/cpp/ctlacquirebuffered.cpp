@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include "errorcheck.h"
 #include "sourceacquireopts.h"
 #include "ctltwainmsgloop.h"
+#include "sourceselectopts.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -37,6 +38,7 @@ DTWAIN_BOOL   DLLENTRY_DEF DTWAIN_AcquireBufferedEx(DTWAIN_SOURCE Source, LONG P
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, Acquisitions, pStatus))
     auto [pHandle, pSource] = VerifyHandles(Source);
+    AcquireAttemptRAII aRaii(pSource);
     SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
         setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).setUserArray(Acquisitions).
         setAcquireType(ACQUIREBUFFEREX);
@@ -44,6 +46,9 @@ DTWAIN_BOOL   DLLENTRY_DEF DTWAIN_AcquireBufferedEx(DTWAIN_SOURCE Source, LONG P
     const bool bRet = AcquireExHelper(opts);
     if (pStatus)
         *pStatus = opts.getStatus();
+    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
+        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
+    else
     if (pSource->GetLastAcquireError() != 0)
         CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
@@ -55,14 +60,20 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireBuffered(DTWAIN_SOURCE Source, LONG Pixe
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PixelType, nMaxPages, bShowUI, bCloseSource, pStatus))
     auto [pHandle, pSource] = VerifyHandles(Source);
+    AcquireAttemptRAII aRaii(pSource);
+
     SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).setPixelType(PixelType).setMaxPages(nMaxPages).
                                                         setShowUI(bShowUI ? true : false).setRemainOpen(!(bCloseSource ? true : false)).
                                                         setAcquireType(ACQUIREBUFFER);
     const DTWAIN_ARRAY aDibs = SourceAcquire(opts);
     if (pStatus)
         *pStatus = opts.getStatus();
+    if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
+        CTL_TwainAppMgr::SetError(DTWAIN_ERR_ACQUISITION_CANCELED, "", false);
+    else
     if (pSource->GetLastAcquireError() != 0)
         CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
     LOG_FUNC_EXIT_NONAME_PARAMS(aDibs)
     CATCH_BLOCK_LOG_PARAMS(DTWAIN_ARRAY(0))
 }
@@ -87,7 +98,8 @@ static int CheckTiledBufferedSupport(CTL_ITwainSource* pSource)
     DTWAINArrayPtr_RAII tempRAII(pHandle, &arr);
 
     // Get the original capability
-    auto bRet = DTWAIN_GetCapValues(pSource, ICAP_TILES, DTWAIN_CAPGET, &arr);
+    auto bRet = DTWAIN_GetCapValuesEx2(pSource, ICAP_TILES, DTWAIN_CAPGET, 
+                                    DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
     if (!bRet)
     {
         pSource->SetBufferedTileModeSupported(false);
@@ -108,17 +120,16 @@ static int CheckTiledBufferedSupport(CTL_ITwainSource* pSource)
     auto origValue = vTiles[0];
     vTiles[0] = 1;
 
-    int finalReturnValue = DTWAIN_NO_ERROR;
-
     // Set the capability to see if it accepts TRUE for the ICAP_TILES cap
-    bRet = DTWAIN_SetCapValues(pSource, ICAP_TILES, DTWAIN_CAPSET, arr);
-    finalReturnValue = bRet?DTWAIN_NO_ERROR:DTWAIN_ERR_TILES_NOT_SUPPORTED;
+    bRet = DTWAIN_SetCapValuesEx2(pSource, ICAP_TILES, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, 
+                         DTWAIN_DEFAULT, arr);
+    const int finalReturnValue = bRet ? DTWAIN_NO_ERROR : DTWAIN_ERR_TILES_NOT_SUPPORTED;
 
     // Reset to original value
     if (origValue != vTiles[0])
     {
         vTiles[0] = origValue;
-        bRet = DTWAIN_SetCapValues(pSource, ICAP_TILES, DTWAIN_CAPSET, arr);
+        bRet = DTWAIN_SetCapValuesEx2(pSource, ICAP_TILES, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
     }
 
     // Set the support and return the final results
@@ -151,7 +162,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsBufferedTileModeSupported(DTWAIN_SOURCE Source
     auto [pHandle, pSource] = VerifyHandles(Source);
     auto bRet = CheckTiledBufferedSupport(pSource);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return bRet != DTWAIN_NO_ERROR; }, bRet, false, FUNC_MACRO);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true);
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
@@ -168,7 +179,7 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireBuffered(SourceAcquireOptions& opts)
         DTWAIN_ARRAY arr = dynarithmic::CreateArrayFromCap(pHandle, pSource, ICAP_TILES, 1);
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
         vValues[0] = 1;
-        bool bTilesSet = DTWAIN_SetCapValues(Source, ICAP_TILES, DTWAIN_CAPSET, arr);
+        bool bTilesSet = DTWAIN_SetCapValuesEx2(Source, ICAP_TILES, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !bTilesSet; }, DTWAIN_ERR_TILEMODE_NOTSET, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
     }
 

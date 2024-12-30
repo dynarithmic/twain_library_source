@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -42,11 +42,13 @@ namespace dynarithmic
             Handle->m_lLastError = Err;
             CTL_TwainAppMgr::SetError(Err, extraInfo, false);
             OutputDTWAINErrorA(Handle, fnName);
-            if (logError && CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_CALLSTACK)
+            #if DTWAIN_BUILD_LOGCALLSTACK == 1
+            if (logError && (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK))
             {
-                CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(fnName, LOG_INDENT_OUT) +
+                LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(fnName, LOG_INDENT_OUT) +
                     ParamOutputter("", true).outputParam(retErr).getString());
             }
+            #endif
             if (doThrow)
             throw retErr;
         }

@@ -1065,3 +1065,8 @@ DTWAIN_GetSavedFilesCount                         @31064
 DTWAIN_GetActiveDSMVersionInfo                    @31065
 DTWAIN_GetActiveDSMVersionInfoA                   @31066
 DTWAIN_GetActiveDSMVersionInfoW                   @31067
+DTWAIN_ConvertToAPIStringExA                      @31068
+DTWAIN_ConvertToAPIStringExW                      @31069
+DTWAIN_ConvertToAPIStringEx                       @31070
+DTWAIN_EnablePeekMessageLoop                      @31071
+DTWAIN_IsPeekMessageLoopEnabled                   @31072

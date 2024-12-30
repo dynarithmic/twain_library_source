@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -29,13 +29,14 @@ namespace dynarithmic
 {
     static CTL_ThreadMap::iterator getThreadIdIter()
     {
+        auto& threadMap = CTL_StaticData::GetThreadMap();
         std::string threadId = boost::lexical_cast<std::string>(std::this_thread::get_id());
-        auto iter = CTL_StaticData::s_ThreadMap.find(threadId);
-        if (iter == CTL_StaticData::s_ThreadMap.end())
+        auto iter = threadMap.find(threadId);
+        if (iter == threadMap.end())
         {
             unsigned long threadNumber = 0;
             sscanf(threadId.c_str(), "%lx", &threadNumber);
-            iter = CTL_StaticData::s_ThreadMap.insert({ threadId, threadNumber }).first;
+            iter = threadMap.insert({ threadId, threadNumber }).first;
         }
         return iter;
     }

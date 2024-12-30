@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -138,6 +138,7 @@ namespace dynarithmic
         }
 
         static constexpr char_type GetSpace() { return ' ';}
+        static constexpr const char_type* GetSpaceString() { return " "; }
         static constexpr const char_type* GetEmptyString() { return ""; }
         static constexpr char_type GetZeroString() { return '\0'; }
         static constexpr char_type EscapeChar() { return '\\';}
@@ -262,6 +263,7 @@ namespace dynarithmic
         }
 
         static constexpr char_type GetSpace() { return L' ';}
+        static constexpr const char_type* GetSpaceString() { return L" "; }
         static constexpr const char_type* GetEmptyString() { return L""; }
         static constexpr char_type GetZeroString() { return L'\0'; }
         static constexpr char_type EscapeChar() { return L'\\'; }
@@ -587,19 +589,37 @@ namespace dynarithmic
             return Join(ct.begin(), ct.end(), seperator);
         }
 
-        template <typename Iter>
-        static StringType Join(Iter iter1, Iter iter2, const StringType& seperator = StringTraits::GetEmptyString())
+        template <typename strtraits, typename val>
+        static typename strtraits::string_type defaultJoinImpl(const typename strtraits::string_type& str, 
+                                                                        const val& value,
+                                                                        const typename strtraits::char_type* separator
+                                                                        = typename strtraits::GetEmptyString())
         {
-            StringTraits::outputstream_type strm;
+            typename strtraits::outputstream_type strm;
+            if (!str.empty())
+                strm << str << separator << value;
+            else
+                strm << value;
+            return strm.str();
+        }
+
+        template <typename Iter>
+        static StringType Join(Iter iter1, Iter iter2, const StringType& separator = StringTraits::GetEmptyString())
+        {
             return std::accumulate(iter1, iter2, StringType(),
                 [&](const auto& str, typename std::iterator_traits<Iter>::value_type val)
                 {
-                    strm.str(StringTraits::GetEmptyString());
-                    if (!str.empty())
-                        strm << str << seperator << val;
-                    else
-                        strm << val;
-                    return strm.str();
+                    return defaultJoinImpl<traits_type>(str, val, separator.c_str());
+                });
+        }
+
+        template <typename Iter, typename Fn>
+        static StringType JoinEx(Iter iter1, Iter iter2, Fn concatFn)
+        {
+            return std::accumulate(iter1, iter2, StringType(),
+                [&](const auto& str, typename std::iterator_traits<Iter>::value_type val)
+                {
+                    return concatFn(str, val);
                 });
         }
 
@@ -847,6 +867,8 @@ namespace dynarithmic
                               std::vector<unsigned>* positionArray= nullptr)
         {
             rArray.clear();
+            if (!lpszTokStr)
+                return 0;
             typedef boost::tokenizer<boost::char_separator<CharType>,
                                      typename StringType::const_iterator,
                                      StringType> tokenizer;

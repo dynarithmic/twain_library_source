@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,11 +22,10 @@
 #include "ctltr027.h"
 #include "ctltr034.h"
 #include "ctltwainsession.h"
-#include <ctltwainsource.h>
-
+#include "ctltwainsource.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
-
+#include "logwriterutils.h"
 using namespace dynarithmic;
 
 /* Transfer started */
@@ -144,7 +143,7 @@ TW_UINT16 CTL_ProcessEventTriplet::ExecuteEventHandler()
                     {
                         if ( !pSource->SkipImageInfoErrors() )
                         {
-                            CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(DTWAIN_ERR_IMAGEINFO_INVALID_));
+                            LogWriterUtils::WriteLogInfoA(GetResourceStringFromMap(DTWAIN_ERR_IMAGEINFO_INVALID_));
                             CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                                   nullptr,
                                                                   DTWAIN_TN_IMAGEINFOERROR,
@@ -320,7 +319,7 @@ void CTL_ProcessEventTriplet::DeviceEvent()
         // if there is a callback, call it now with the error notifications
         if ( pHandle->m_pCallbackFn )
         {
-            const UINT uMsg = CTL_StaticData::s_nRegisteredDTWAINMsg;
+            const UINT uMsg = CTL_StaticData::GetRegisteredMessage();
             LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_DEVICEEVENT, 0, true);
             #ifdef WIN64
                 (*pHandle->m_pCallbackFn)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG_PTR>(pSource));
@@ -332,7 +331,7 @@ void CTL_ProcessEventTriplet::DeviceEvent()
         // if there is a 64-bit callback, call it now with the error notifications
         if ( pHandle->m_pCallbackFn64 )
         {
-            const UINT uMsg = CTL_StaticData::s_nRegisteredDTWAINMsg;
+            const UINT uMsg = CTL_StaticData::GetRegisteredMessage();
             LogDTWAINMessage(nullptr, uMsg, DTWAIN_TN_DEVICEEVENT, 0, true);
             (*pHandle->m_pCallbackFn64)(DTWAIN_TN_DEVICEEVENT, 0, reinterpret_cast<LONG_PTR>(pSource));
         }

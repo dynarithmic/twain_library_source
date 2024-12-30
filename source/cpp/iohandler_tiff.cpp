@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -24,14 +24,69 @@
 #include "ctltwainmanager.h"
 #include "ctlfileutils.h"
 #include "tiff.h"
+#include "logwriterutils.h"
 using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+static constexpr int GetTiffCompressionFromFormat(int m_nFormat)
+{
+    switch( m_nFormat )
+    {
+        case CTL_TwainDib::TiffFormatLZW:
+        case CTL_TwainDib::TiffFormatLZWMULTI:
+        case CTL_TwainDib::BigTiffFormatLZW:
+        case CTL_TwainDib::BigTiffFormatLZWMULTI:
+                return COMPRESSION_LZW;  
+
+        case CTL_TwainDib::TiffFormatNONE:
+        case CTL_TwainDib::TiffFormatNONEMULTI:
+        case CTL_TwainDib::BigTiffFormatNONE:
+        case CTL_TwainDib::BigTiffFormatNONEMULTI:
+                return COMPRESSION_NONE;
+
+        case CTL_TwainDib::TiffFormatGROUP3:
+        case CTL_TwainDib::TiffFormatGROUP3MULTI:
+        case CTL_TwainDib::BigTiffFormatGROUP3:
+        case CTL_TwainDib::BigTiffFormatGROUP3MULTI:
+            return COMPRESSION_CCITTFAX3;
+
+        case CTL_TwainDib::TiffFormatGROUP4:
+        case CTL_TwainDib::TiffFormatGROUP4MULTI:
+        case CTL_TwainDib::BigTiffFormatGROUP4:
+        case CTL_TwainDib::BigTiffFormatGROUP4MULTI:
+            return COMPRESSION_CCITTFAX4;
+
+        case CTL_TwainDib::TiffFormatPACKBITS:
+        case CTL_TwainDib::TiffFormatPACKBITSMULTI:
+        case CTL_TwainDib::BigTiffFormatPACKBITS:
+        case CTL_TwainDib::BigTiffFormatPACKBITSMULTI:
+            return COMPRESSION_PACKBITS;
+
+        case CTL_TwainDib::TiffFormatDEFLATE:
+        case CTL_TwainDib::TiffFormatDEFLATEMULTI:
+        case CTL_TwainDib::BigTiffFormatDEFLATE:
+        case CTL_TwainDib::BigTiffFormatDEFLATEMULTI:
+            return COMPRESSION_ADOBE_DEFLATE;
+
+        case CTL_TwainDib::TiffFormatJPEG:
+        case CTL_TwainDib::TiffFormatJPEGMULTI:
+        case CTL_TwainDib::BigTiffFormatJPEG:
+        case CTL_TwainDib::BigTiffFormatJPEGMULTI:
+            return COMPRESSION_JPEG;
+
+        case CTL_TwainDib::TiffFormatPIXARLOG:
+        case CTL_TwainDib::TiffFormatPIXARLOGMULTI:
+            return COMPRESSION_PIXARLOG;
+    }
+    return DTWAIN_ERR_INVALID_BITDEPTH;
+}
+
 int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* pMultiPageStruct)
 {
     HANDLE hDib = nullptr;
 
     // Check if this is the first page
-    CTL_TwainAppMgr::WriteLogInfoA("Writing TIFF or Postscript file\n");
+    LogWriterUtils::WriteLogInfoIndentedA("Writing TIFF or Postscript file");
 
     // Get the current TIFF type from the Source
     if ( m_ImageInfoEx.theSource &&
@@ -54,7 +109,7 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
                 return DTWAIN_ERR_FILEWRITE;
             szTempPath += StringWrapper::GetGUID() +  _T("TIF");
 
-            CTL_TwainAppMgr::WriteLogInfoA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + StringConversion::Convert_Native_To_Ansi(szTempPath) + "\n");
+            LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(IDS_LOGMSG_TEMPIMAGEFILETEXT) + " " + StringConversion::Convert_Native_To_Ansi(szTempPath));
 
             // OK, now remember that the file we are writing is a TIF file, and this is
             // the file that is created first
@@ -68,7 +123,7 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
 
             // Attempt to delete the file
             if ( !delete_file(sActualFileName.c_str()) )
-                CTL_TwainAppMgr::WriteLogInfoA("Could not delete existing file " + StringConversion::Convert_Native_To_Ansi(sActualFileName) + "\n");
+                LogWriterUtils::WriteLogInfoIndentedA("Could not delete existing file " + StringConversion::Convert_Native_To_Ansi(sActualFileName));
         }
     }
 
@@ -80,80 +135,23 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
             bNotLastFile = true;
     if ( bNotLastFile )
     {
-        CTL_TwainAppMgr::WriteLogInfoA("Retrieving DIB:\n");
+        LogWriterUtils::WriteLogInfoIndentedA("Retrieving DIB:");
         if ( !m_pDib )
         {
-            CTL_TwainAppMgr::WriteLogInfoA("Dib not found!\n");
+            LogWriterUtils::WriteLogInfoIndentedA("Dib not found!");
             return DTWAIN_ERR_DIB;
         }
         hDib = m_pDib->GetHandle();
         if ( !hDib )
         {
-            CTL_TwainAppMgr::WriteLogInfoA("Dib handle not found!\n");
+            LogWriterUtils::WriteLogInfoIndentedA("Dib handle not found!");
             return DTWAIN_ERR_DIB;
         }
     }
-    //    int nRes = m_pDib->GetResolution();
-    int nLibTiff;
-    switch( m_nFormat )
-    {
-        case CTL_TwainDib::TiffFormatLZW:
-        case CTL_TwainDib::TiffFormatLZWMULTI:
-        case CTL_TwainDib::BigTiffFormatLZW:
-        case CTL_TwainDib::BigTiffFormatLZWMULTI:
-                nLibTiff = COMPRESSION_LZW;  
-            break;
 
-        case CTL_TwainDib::TiffFormatNONE:
-        case CTL_TwainDib::TiffFormatNONEMULTI:
-        case CTL_TwainDib::BigTiffFormatNONE:
-        case CTL_TwainDib::BigTiffFormatNONEMULTI:
-                nLibTiff = COMPRESSION_NONE;
-            break;
-
-        case CTL_TwainDib::TiffFormatGROUP3:
-        case CTL_TwainDib::TiffFormatGROUP3MULTI:
-        case CTL_TwainDib::BigTiffFormatGROUP3:
-        case CTL_TwainDib::BigTiffFormatGROUP3MULTI:
-            nLibTiff = COMPRESSION_CCITTFAX3;
-            break;
-
-        case CTL_TwainDib::TiffFormatGROUP4:
-        case CTL_TwainDib::TiffFormatGROUP4MULTI:
-        case CTL_TwainDib::BigTiffFormatGROUP4:
-        case CTL_TwainDib::BigTiffFormatGROUP4MULTI:
-            nLibTiff = COMPRESSION_CCITTFAX4;
-            break;
-
-        case CTL_TwainDib::TiffFormatPACKBITS:
-        case CTL_TwainDib::TiffFormatPACKBITSMULTI:
-        case CTL_TwainDib::BigTiffFormatPACKBITS:
-        case CTL_TwainDib::BigTiffFormatPACKBITSMULTI:
-            nLibTiff = COMPRESSION_PACKBITS;
-            break;
-
-        case CTL_TwainDib::TiffFormatDEFLATE:
-        case CTL_TwainDib::TiffFormatDEFLATEMULTI:
-        case CTL_TwainDib::BigTiffFormatDEFLATE:
-        case CTL_TwainDib::BigTiffFormatDEFLATEMULTI:
-            nLibTiff = COMPRESSION_ADOBE_DEFLATE;
-            break;
-
-        case CTL_TwainDib::TiffFormatJPEG:
-        case CTL_TwainDib::TiffFormatJPEGMULTI:
-        case CTL_TwainDib::BigTiffFormatJPEG:
-        case CTL_TwainDib::BigTiffFormatJPEGMULTI:
-            nLibTiff = COMPRESSION_JPEG;
-            break;
-
-        case CTL_TwainDib::TiffFormatPIXARLOG:
-        case CTL_TwainDib::TiffFormatPIXARLOGMULTI:
-            nLibTiff = COMPRESSION_PIXARLOG;
-            break;
-
-        default:
-             return DTWAIN_ERR_INVALID_BITDEPTH;
-    }
+    int nLibTiff = GetTiffCompressionFromFormat(m_nFormat);
+    if (nLibTiff == DTWAIN_ERR_INVALID_BITDEPTH)
+        return DTWAIN_ERR_INVALID_BITDEPTH;
 
     if (bNotLastFile && !IsValidBitDepth(m_nFormat, m_pDib->GetBitsPerPixel()) )
         return DTWAIN_ERR_INVALID_BITDEPTH;
@@ -168,21 +166,21 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     if ( bNotLastFile )
     {
         SetNumPagesWritten(GetNumPagesWritten()+1);
-        CTL_TwainAppMgr::WriteLogInfoA("Writing TIFF / PS page\n");
+        LogWriterUtils::WriteLogInfoIndentedA("Writing TIFF / PS page");
         retval = TIFFHandler.WriteGraphicFile(this, sActualFileName.c_str(), hDib);
         if ( retval != 0 )
             SetPagesOK(false);
         else
             SetOnePageWritten(true);
-        CTL_TwainAppMgr::WriteLogInfoA("Writing TIFF / PS page\n");
+        LogWriterUtils::WriteLogInfoIndentedA("Writing TIFF / PS page");
         StringStreamA strm;
-        strm << "Return from writing intermediate image = " << retval << "\n";
-        CTL_TwainAppMgr::WriteLogInfoA(strm.str());
+        strm << "Return from writing intermediate image = " << retval;
+        LogWriterUtils::WriteLogInfoIndentedA(strm.str());
     }
     else
     {
         // Close the multi-page TIFF file
-        CTL_TwainAppMgr::WriteLogInfoA("Closing TIFF / PS file\n");
+        LogWriterUtils::WriteLogInfoIndentedA("Closing TIFF / PS file");
         retval = TIFFHandler.WriteImage(this,nullptr,0,0,0,0, nullptr);
         if ( !AllPagesOK() )
         {
@@ -193,8 +191,8 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
             }
         }
         StringStreamA strm;
-        strm << "Return from writing last image = " << retval << "\n";
-        CTL_TwainAppMgr::WriteLogInfoA(strm.str());
+        strm << "Return from writing last image = " << retval;
+        LogWriterUtils::WriteLogInfoIndentedA(strm.str());
     }
     if ( (!pMultiPageStruct || pMultiPageStruct->Stage == DIB_MULTI_LAST) && retval == 0 )
     {

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -102,7 +102,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCurrentPageNum(DTWAIN_SOURCE Source)
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_CreateAcquisitionArray()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const DTWAIN_ARRAY AcqArray = static_cast<DTWAIN_ARRAY>(CreateArrayFromFactory(pHandle, DTWAIN_ARRAYOFHANDLEARRAYS, 0));
     LOG_FUNC_EXIT_NONAME_PARAMS(AcqArray)

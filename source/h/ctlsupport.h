@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -35,14 +35,15 @@ namespace dynarithmic
         if (getAnySupport)
             return true;
         DTWAIN_ARRAY Array = 0;
-        if (DTWAIN_GetCapValues(Source, Cap, DTWAIN_CAPGET, &Array))
+        if (DTWAIN_GetCapValuesEx2(Source, Cap, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array))
         {
-            auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+            auto pSource = static_cast<CTL_ITwainSource*>(Source);
+            auto pHandle = pSource->GetDTWAINHandle();
             DTWAINArrayLowLevel_RAII raii(pHandle, Array);
             DTWAIN_ARRAY tempArray = 0;
             DTWAIN_ARRAY arrayToUse = Array;
             DTWAINArrayLowLevel_RAII raii2(pHandle, nullptr); 
-            if (DTWAIN_GetCapContainer(Source, Cap, DTWAIN_CAPGET) == DTWAIN_CONTRANGE)
+            if (GetCapContainer(pSource, Cap, DTWAIN_CAPGET) == DTWAIN_CONTRANGE)
             {
                 // expand range if we find that the underlying values are in a range
                 try
@@ -87,7 +88,8 @@ namespace dynarithmic
                 if (nContainer == DTWAIN_CONTRANGE)
                 {
                     DTWAIN_ARRAY Array2 = 0;
-                    DTWAIN_BOOL bRet = DTWAIN_GetCapValues(Source, Cap, DTWAIN_CAPGET, &Array2);
+                    DTWAIN_BOOL bRet = DTWAIN_GetCapValuesEx2(Source, Cap, DTWAIN_CAPGET, 
+                                                 DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array2);
                     DTWAINArrayLowLevel_RAII a2(pHandle, Array2);
                     if (bRet)
                     {
@@ -97,9 +99,8 @@ namespace dynarithmic
                     }
                 }
             }
-
-            DTWAIN_ArraySetAt(Array, 0, SupportVal);
-            BOOL bRet = DTWAIN_SetCapValues(Source, Cap, SetType, Array);
+            SetArrayValueFromFactory(pHandle, Array, 0, SupportVal);
+            BOOL bRet = DTWAIN_SetCapValuesEx2(Source, Cap, SetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array);
             return bRet ? true : false;
         }
         return false;
@@ -115,7 +116,7 @@ namespace dynarithmic
             return -1;
         }
         DTWAIN_ARRAY Array = 0;
-        BOOL isSupported = DTWAIN_GetCapValues(Source, Cap, CapOp, &Array);
+        BOOL isSupported = DTWAIN_GetCapValuesEx2(Source, Cap, CapOp, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array);
         DTWAINArrayLowLevel_RAII raii(pHandle, Array);
         if ( isSupported )
         {

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -32,6 +32,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
     LOG_FUNC_ENTRY_PARAMS((Source))
     auto [pHandle, pSource] = VerifyHandles(Source);
 
+    auto getSupport = pSource->IsUIControllable();
+
+    // If status of UI support already determined, return result.
+    if (getSupport.value != boost::tribool::indeterminate_value)
+        LOG_FUNC_EXIT_NONAME_PARAMS(getSupport ? true : false)
+
     // Open the source (if source is closed)
     bool bSourceOpen = false;
     if (CTL_TwainAppMgr::IsSourceOpen(pSource))
@@ -39,6 +45,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
     else
     if (!CTL_TwainAppMgr::OpenSource(pHandle->m_pTwainSession, pSource))
        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+
     bool bOk = false;
 
     // Check if capability UICONTROLLABLE is supported
@@ -46,7 +53,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
     {
         // Get the capability value
         DTWAIN_ARRAY CapArray = nullptr;
-        BOOL bGetUI = DTWAIN_GetCapValuesEx(Source, DTWAIN_CV_CAPUICONTROLLABLE, DTWAIN_CAPGET, DTWAIN_CONTONEVALUE, &CapArray);
+        BOOL bGetUI = DTWAIN_GetCapValuesEx2(Source, DTWAIN_CV_CAPUICONTROLLABLE, DTWAIN_CAPGET, 
+                                DTWAIN_CONTONEVALUE, DTWAIN_DEFAULT, &CapArray);
         if (bGetUI && CapArray && !pHandle->m_ArrayFactory->empty(CapArray))
         {
             DTWAINArrayLowLevel_RAII arr(pHandle, CapArray);
@@ -61,6 +69,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
     // Close source if opened in this function
     if (!bSourceOpen)
         DTWAIN_CloseSource(Source);
+    pSource->SetUIControllable(bOk);
     LOG_FUNC_EXIT_NONAME_PARAMS(bOk ? TRUE : FALSE)
     CATCH_BLOCK_LOG_PARAMS(false)
 }

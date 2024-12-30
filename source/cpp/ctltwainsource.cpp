@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -97,7 +97,7 @@ bool CTL_ITwainSource::IsSourceCompliant(CTL_EnumTwainVersion TVersion, CTL_Twai
     for (unsigned short Cap : Array)
     {
         int nValue = 0;
-        const int nMask = CTL_TwainAppMgr::GetCapMaskFromCap(Cap);
+        const int nMask = GetCapMaskFromCap(Cap);
 
         if (CTL_TwainAppMgr::IsCapMaskOn(Cap, static_cast<CTL_EnumGetType>(CTL_CapMaskGET)))
         {
@@ -150,9 +150,9 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_pUserPtr(nullptr),
     CapCacheInfo(),
     m_bDSMVersion2(false),
+    m_bXferReadySent(false),
     m_bIsOpened(false),
     m_bIsSelected(false),
-    m_SourceId{},
     m_pSession(pSession),
     m_bUIOpened(false),
     m_bPromptPending(false),
@@ -231,24 +231,30 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_bImageNegative(false),
     m_bProcessingPixelInfo(false),
     m_bSkipImageInfoErrors(false),
+    m_bDoublePageCountOnDuplex(true),
     m_nForcedBpp(0),
+    m_bTileMode(false),
+    m_bExtendedCapsRetrieved(false),
+    m_bShutdownAcquire(false),
+    m_bUsePeekMessage(false),
+    m_FileSavePageCount(0),
+    m_nLastAcquireError(false),
+    m_bTwainMsgLoopStarted(false),
+    m_tbIsFileSystemSupported(boost::logic::indeterminate),
+    m_tbIsTileModeSupported(boost::logic::indeterminate),
+    m_tbIsFeederSupported(boost::logic::indeterminate),
+    m_tbIsDuplexSupported({ boost::logic::indeterminate, TWDX_NONE }),
+    m_tbIsAudioTransferSupported(boost::logic::indeterminate),
+    m_tbUIControllable(boost::logic::indeterminate),
+    m_pDLLHandle(pHandle),
+    m_BufferedXFerInfo{},
     m_ImageInfo(),
     m_FileSystem(),
     m_pImageMemXfer(nullptr),
     m_PersistentArray(nullptr),
     m_bImageInfoRetrieved(false),
-    m_bXferReadySent(false),
-    m_bDoublePageCountOnDuplex(true),
-    m_bExtendedCapsRetrieved(false),
-    m_tbIsFileSystemSupported(boost::logic::indeterminate),
-    m_tbIsTileModeSupported(boost::logic::indeterminate),
-    m_pDLLHandle(pHandle),
-    m_bTileMode(false),
-    m_FileSavePageCount(0),
-    m_BufferedXFerInfo{},
     m_bExtendedImageInfoSupported(false),
-    m_nLastAcquireError(false),
-    m_bShutdownAcquire(false)
+    m_bSupportedCustomCapsRetrieved(false)
 {
     if (lpszProduct)
         m_SourceId.set_product_name(StringConversion::Convert_NativePtr_To_Ansi(lpszProduct));
