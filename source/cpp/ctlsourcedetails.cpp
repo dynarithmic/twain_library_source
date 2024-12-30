@@ -309,7 +309,8 @@ static pixelMap getPixelAndBitDepthInfo(CTL_ITwainSource* pSource)
     return pMap;
 }
 
-static std::vector<std::string> getNamesFromConstants(CTL_ITwainSource *pSource, LONG capValue, LONG twainconstantID)
+template <typename FnAdjuster>
+static std::vector<std::string> getNamesFromConstants(CTL_ITwainSource *pSource, LONG capValue, LONG twainconstantID, FnAdjuster fn)
 {
     DTWAIN_ARRAY arr = nullptr;
     const auto pHandle = pSource->GetDTWAINHandle();
@@ -320,7 +321,32 @@ static std::vector<std::string> getNamesFromConstants(CTL_ITwainSource *pSource,
         DTWAINArrayPtr_RAII raii(pHandle, &arr);
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
         for (LONG value : vValues)
+        {
+            value = fn(value);
             allNames.push_back(StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetTwainNameFromConstant(twainconstantID, value)));
+        }
+    }
+    return allNames;
+}
+
+static std::vector<std::string> getDGDATNamesFromConstants(CTL_ITwainSource* pSource)
+{
+    DTWAIN_ARRAY arr = nullptr;
+    const auto pHandle = pSource->GetDTWAINHandle();
+    BOOL bRet = DTWAIN_GetCapValuesEx2(pSource, CAP_SUPPORTEDDATS, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
+    std::vector<std::string> allNames;
+    if (bRet)
+    {
+        DTWAINArrayPtr_RAII raii(pHandle, &arr);
+        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<TW_UINT32>(arr);
+        for (auto value : vValues)
+        {
+            auto valueDG = (value & 0xFFFF0000) >> 16;
+            auto valueDAT = value & 0x0000FFFF;
+            std::string dgName = StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DG, valueDG));
+            std::string datName = StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DAT, valueDAT));
+            allNames.push_back(dgName + " / " + datName); 
+        }
     }
     return allNames;
 }
@@ -650,24 +676,33 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         const char* name;
                         int prefixCount;
                         const char* prefix;
+                        bool usefullName;
                     };
 
-                    std::array<TwainDataItems, 4> otherData = { {
-                        { ICAP_SUPPORTEDSIZES, DTWAIN_CONSTANT_TWSS, "\"paper-sizes\":", 5, "TWSS_" },
-                        { ICAP_SUPPORTEDBARCODETYPES, DTWAIN_CONSTANT_TWBT, "\"barcode-supported-types\":", 5, "TWBT_" },
-                        { ICAP_SUPPORTEDPATCHCODETYPES,DTWAIN_CONSTANT_TWPCH, "\"patchcode-supported-types\":", 6, "TWPCH_" },
-                        { ICAP_SUPPORTEDEXTIMAGEINFO,DTWAIN_CONSTANT_TWEI, "\"extendedimageinfo-supported-types\":", 5, "TWEI_" }} };
+                    std::array<TwainDataItems, 5> otherData = { {
+                        { ICAP_SUPPORTEDSIZES, DTWAIN_CONSTANT_TWSS, "\"paper-sizes\":", 5, "TWSS_", false },
+                        { ICAP_SUPPORTEDBARCODETYPES, DTWAIN_CONSTANT_TWBT, "\"barcode-supported-types\":", 5, "TWBT_", false },
+                        { ICAP_SUPPORTEDPATCHCODETYPES,DTWAIN_CONSTANT_TWPCH, "\"patchcode-supported-types\":", 6, "TWPCH_", false },
+                        { ICAP_SUPPORTEDEXTIMAGEINFO,DTWAIN_CONSTANT_TWEI, "\"extendedimageinfo-supported-types\":", 5, "TWEI_", false },
+                        { CAP_SUPPORTEDDATS,DTWAIN_CONSTANT_DAT, "\"supported-dat-types\":", 4, "DAT_", true }
+                    } };
                     for (auto& oneData : otherData)
                     {
                         strm2.str("");
                         {
-                            auto vNames = getNamesFromConstants(pCurrentSourcePtr, oneData.cap, oneData.capConstant);
+                            std::vector<std::string> vNames;
+                            if ( oneData.cap == CAP_SUPPORTEDDATS)
+                                vNames = getDGDATNamesFromConstants(pCurrentSourcePtr);
+                            else
+                                vNames = getNamesFromConstants(pCurrentSourcePtr, oneData.cap, oneData.capConstant, [](LONG v) { return v; });
                             std::string allSizes;
                             std::vector<std::string> vAdjustedNames;
                             std::transform(vNames.begin(), vNames.end(), std::back_inserter(vAdjustedNames),
                                 [&](auto& origName)
                                 {
                                     if (!StringWrapperA::StartsWith(origName, oneData.prefix))
+                                        return "\"" + origName + "\"";
+                                    if (oneData.usefullName)
                                         return "\"" + origName + "\"";
                                     return "\"" +  origName.substr(oneData.prefixCount) + "\"";
                                 });

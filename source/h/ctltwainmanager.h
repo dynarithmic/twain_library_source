@@ -173,6 +173,8 @@ namespace dynarithmic
                                                 int nCap);
 
             static CTL_IntArray EnumTransferMechanisms( const CTL_ITwainSource *pSource );
+            static std::vector<TW_UINT32> EnumSupportedDATS(const CTL_ITwainSource* pSource);
+
             static bool GetFileTransferDefaults( CTL_ITwainSource *pSource, int &nFileType);
             static int SetTransferMechanism( const CTL_ITwainSource *pSource, CTL_TwainAcquireEnum AcquireType,
                                             LONG ClipboardTransferType);

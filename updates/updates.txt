@@ -18,6 +18,8 @@ DTWAIN Version changes
   loop will be executed with a given TWAIN Source.  By default, the message loop uses the 
   Windows API function GetMessage() instead of PeekMessage().
 
+- Fix issue with determining if TWAIN source supports DAT_FILESYSTEM functionality.
+
 - Ensure setting string capabilities uses ANSI strings.
 
 - Change parameters to certain API functions from LONG to DWORD to delineate signed versus unsigned values.  
