@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ LONG DLLENTRY_DEF DTWAIN_GetNameFromCap(LONG nCapValue, LPTSTR szValue, LONG nMa
     LOG_FUNC_ENTRY_PARAMS((nCapValue, szValue, nMaxLen))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const LONG nTotalBytes = StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(CTL_TwainAppMgr::GetCapNameFromCap(nCapValue)), szValue, nMaxLen);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szValue))
     LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)
     CATCH_BLOCK(-1)
 }
@@ -59,23 +60,24 @@ LONG DLLENTRY_DEF DTWAIN_GetExtNameFromCap(LONG nValue, LPTSTR szValue, LONG nMa
 {
     LOG_FUNC_ENTRY_PARAMS((nValue, szValue, nMaxLen))
     const LONG bRet = DTWAIN_GetNameFromCap(nValue + 1000, szValue, nMaxLen);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szValue))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(-1)
 }
 
-static LONG GetGenericTwainValue(LONG lConstantType, LPCTSTR name)
+static TwainConstantType GetGenericTwainValue(LONG lConstantType, LPCTSTR name)
 {
     auto& constantsmap = CTL_StaticData::GetTwainConstantsMap();
     auto iter1 = constantsmap.find(lConstantType);
     if (iter1 == constantsmap.end())
-        return -1L;
+        return -1LL;
     auto& twainMap = iter1->second;
     const std::string s = StringConversion::Convert_Native_To_Ansi(name);
-    const auto iter = std::find_if(twainMap.begin(), twainMap.end(), [&](const CTL_TwainLongToStringMap::value_type& vt)
+    const auto iter = std::find_if(twainMap.begin(), twainMap.end(), [&](const CTL_TwainIDToStringMap::value_type& vt)
                                    {return vt.second == s; });
     if (iter != twainMap.end())
         return iter->first;
-    return -1L;
+    return -1LL;
 }
 
 BOOL DLLENTRY_DEF DTWAIN_GetTwainCountryName(LONG countryId, LPTSTR szName)
@@ -84,6 +86,7 @@ BOOL DLLENTRY_DEF DTWAIN_GetTwainCountryName(LONG countryId, LPTSTR szName)
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto ret = CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_TWCY, countryId);
     StringWrapper::CopyInfoToCString(ret, szName, 32);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szName))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -93,7 +96,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainCountryValue(LPCTSTR country)
     LOG_FUNC_ENTRY_PARAMS((country))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const auto value = GetGenericTwainValue(DTWAIN_CONSTANT_TWCY, country);
-    LOG_FUNC_EXIT_NONAME_PARAMS(value)
+    LOG_FUNC_EXIT_NONAME_PARAMS(static_cast<LONG>(value))
     CATCH_BLOCK(-1L)
 }
 
@@ -103,6 +106,7 @@ BOOL DLLENTRY_DEF DTWAIN_GetTwainLanguageName(LONG nameId, LPTSTR szName)
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto ret = CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_TWLG, nameId);
     StringWrapper::CopyInfoToCString(ret, szName, 32);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szName))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -112,6 +116,6 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainLanguageValue(LPCTSTR szName)
     LOG_FUNC_ENTRY_PARAMS((szName))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const auto value = GetGenericTwainValue(DTWAIN_CONSTANT_TWLG, szName);
-    LOG_FUNC_EXIT_NONAME_PARAMS(value)
+    LOG_FUNC_EXIT_NONAME_PARAMS(static_cast<LONG>(value))
     CATCH_BLOCK(-1L)
 }

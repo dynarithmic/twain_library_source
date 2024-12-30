@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -120,10 +120,10 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
         const UINT nOldError = SetErrorMode(SEM_NOOPENFILEERRORBOX);
         #endif
 
-        if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS )
+        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS )
         { 
             CTL_StringType msg = _T("Testing TWAIN availability for file \"") + fNameTotal + _T("\" ...");
-            CTL_TwainAppMgr::WriteLogInfo(msg);
+            LogWriterUtils::WriteLogInfo(msg);
         }
         boost::dll::shared_library libloader;
         boost::system::error_code ec;
@@ -135,10 +135,10 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
 
         if (ec != boost::system::errc::success)
         {
-            if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+            if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
             {
                 CTL_StringType msg = _T("Testing TWAIN availability for file \"") + fNameTotal + _T("\" failed");
-                CTL_TwainAppMgr::WriteLogInfo(msg);
+                LogWriterUtils::WriteLogInfo(msg);
             }
             continue;
         }
@@ -147,10 +147,10 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
         DSMENTRYPROC lpDSMEntry = nullptr;
         try 
         {
-            if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+            if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
             {
                 CTL_StringType msg = _T("Testing if file \"") + fNameTotal + _T("\" is a valid Twain DSM...");
-                CTL_TwainAppMgr::WriteLogInfo(msg);
+                LogWriterUtils::WriteLogInfo(msg);
             }
             lpDSMEntry = dtwain_library_loader<DSMENTRYPROC>::get_func_ptr(libloader.native(), "DSM_Entry");
         }
@@ -160,10 +160,10 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
 
         if (lpDSMEntry)
         {
-            if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+            if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
             {
                 CTL_StringType msg = _T("Testing if file \"") + fNameTotal + _T("\" is a valid Twain DSM (success) ...");
-                CTL_TwainAppMgr::WriteLogInfo(msg);
+                LogWriterUtils::WriteLogInfo(msg);
             }
             // We need the full module name
             fNameTotal = StringWrapper::traits_type::PathGenericString(libloader.location());
@@ -179,10 +179,10 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
         }
         else
         {
-            if (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS)
+            if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
             {
                 CTL_StringType msg = _T("Testing if file \"") + fNameTotal + _T("\" is a valid DSM (failed) ...");
-                CTL_TwainAppMgr::WriteLogInfo(msg);
+                LogWriterUtils::WriteLogInfo(msg);
             }
         }
         libloader.unload();

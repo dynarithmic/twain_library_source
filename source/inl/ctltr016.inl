@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -34,15 +34,31 @@ CTL_CapabilitySetTriplet<T>::CTL_CapabilitySetTriplet(CTL_ITwainSession *pSessio
 template <class T>
 TW_UINT16 CTL_CapabilitySetTriplet<T>::Execute()
 {
-    TW_UINT16   rc = TWRC_FAILURE;
-    void *pCapPtr = PreEncode();
-    if ( pCapPtr )
+    // Ensures we clean up any memory if an exception is thrown
+    struct PrePostEncoderRAII
     {
-        if ( Encode(m_Array, pCapPtr) )
-            // Call base class
-            rc = CTL_TwainTriplet::Execute();
+        TW_UINT16* m_pRC;
+        CTL_CapabilitySetTriplet<T>* m_pThis;
+        PrePostEncoderRAII(CTL_CapabilitySetTriplet<T>* pThis, TW_UINT16* pRC) : m_pThis(pThis), m_pRC(pRC) {}
+
+        // The PostEncode() releases any memory allocated by PreEncode().
+        ~PrePostEncoderRAII() { m_pThis->PostEncode(*m_pRC); }
+    };
+
+    TW_UINT16 rc = TWRC_FAILURE;
+    {
+        PrePostEncoderRAII raii(this, &rc);
+
+        // Allocate memory for the container.
+        void* pCapPtr = PreEncode();
+        if (pCapPtr)
+        {
+            if (Encode(m_Array, pCapPtr))
+                // Call base class
+                rc = CTL_TwainTriplet::Execute();
+        }
     }
-    return PostEncode(rc);
+    return rc;
 }
 
 #endif // CTLTR016_INL

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -49,8 +49,12 @@ static LONG EnumCapInternal(DTWAIN_SOURCE Source,
                             const std::string& func,
                             const std::string& paramLog);
 
-#define GENERATE_PARAM_LOG(argVals) \
-        (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_CALLSTACK) ? (ParamOutputter((#argVals)).outputParam argVals.getString()) : ("")
+#if DTWAIN_BUILD_LOGCALLSTACK == 1
+    #define GENERATE_PARAM_LOG(argVals) \
+            (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) ? (ParamOutputter((#argVals)).outputParam argVals.getString()) : ("")
+#else
+    #define GENERATE_PARAM_LOG(argVals) {}
+#endif
 
 template <typename CapArrayType>
 static bool GetCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, typename CapArrayType::value_type* value,
@@ -107,32 +111,37 @@ struct SetSupportFn2 : public SetSupportFn1<T>
 template <typename T, typename FnToCall>
 static T FunctionCaller(FnToCall fn, const std::string& func, const std::string& paramLog)
 {
-    const bool doLog = CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_CALLSTACK ? true : false;
     try
     {
         T bRet {};
+        #if DTWAIN_BUILD_LOGCALLSTACK == 1
+        const bool doLog = CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK ? true : false;
         if (doLog)
         {
-            try { CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_IN) + paramLog); }
+            try { LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_IN) + paramLog); }
             catch (...) {}
         }
+        #endif
         bRet = fn();
+
+        #if DTWAIN_BUILD_LOGCALLSTACK == 1
         if (doLog)
         {
             try
             {
-                CTL_TwainAppMgr::WriteLogInfoA(CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_OUT) + ParamOutputter("", true).outputParam(bRet).getString());
+                LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_OUT) + ParamOutputter("", true).outputParam(bRet).getString());
             }
             catch (...)
             { return bRet; }
         }
+        #endif
         return bRet;
     }
     catch (T var) { return var; }
     catch (...)
     {
         LogExceptionErrorA(func.c_str());
-        if (CTL_StaticData::s_bThrowExceptions)
+        if (CTL_StaticData::IsThrowExceptions())
             DTWAIN_InternalThrowException();
         return {};
     }
@@ -155,7 +164,7 @@ struct CapSetterFn
     LPCTSTR value;
     SetByStringFn fn;
     CapSetterFn(DTWAIN_SOURCE src, LPCTSTR val, SetByStringFn theFn) : Source(src), value(val), fn(theFn) {}
-    DTWAIN_BOOL operator()()
+    DTWAIN_BOOL operator()() const
     {
         return DTWAIN_SetDeviceCapByString(Source, value, fn);
     }
@@ -335,7 +344,9 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
 #define EXPORT_GET_CAP_VALUE_STRING(FuncName) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName##String(DTWAIN_SOURCE Source, LPTSTR value)\
     {\
-       return GetCapabilityByString(GetDeviceCapsByStringFn(Source, value, FuncName), __FUNCTION__, GENERATE_PARAM_LOG((Source, value)));\
+        auto retVal = GetCapabilityByString(GetDeviceCapsByStringFn(Source, value, FuncName), __FUNCTION__, GENERATE_PARAM_LOG((Source, value)));\
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((value)) \
+        return retVal; \
     }
 
 #define EXPORT_SET_CAP_VALUE_STRING(FuncName) \
@@ -358,11 +369,12 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
 #define EXPORT_GET_CAP_VALUE_S(FuncName, Cap, NumChars) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, LPTSTR value)\
     {\
-        std::string valueTemp(NumChars + 1, '\0');\
+        std::string valueTemp((NumChars) + 1, '\0');\
         auto retVal = GetStringCapability(Source, Cap, &valueTemp[0], NumChars, \
                                           GetCurrentCapValues, __FUNCTION__, GENERATE_PARAM_LOG((Source, value))); \
         valueTemp.resize(NumChars); \
         StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp), value, NumChars); \
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((value)) \
         return retVal;\
     }
 
@@ -374,6 +386,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
                                          __FUNCTION__, GENERATE_PARAM_LOG((Source, value))); \
         valueTemp.resize(MaxLen); \
         StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp), value, MaxLen); \
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((value)) \
         return retVal;\
     }
 
@@ -388,11 +401,12 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
         else\
         if ( GetType == DTWAIN_CAPGETDEFAULT) \
            fn = GetDefaultCapValues;\
-        std::string valueTemp(NumChars + 1, '\0');\
+        std::string valueTemp((NumChars) + 1, '\0');\
         auto retval = GetStringCapability(Source, Cap, &valueTemp[0], NumChars, fn, __FUNCTION__, \
                             GENERATE_PARAM_LOG((Source, value, GetType))); \
         valueTemp.resize(NumChars); \
         StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp), value, NumChars); \
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((value)) \
         return retval; \
     }
 
@@ -701,7 +715,8 @@ EXPORT_ENUM_CAP_VALUES_EX(DTWAIN_EnumThresholdValuesEx, DTWAIN_CV_ICAPTHRESHOLD)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSourceValues(DTWAIN_SOURCE Source, LPCTSTR capName, LPDTWAIN_ARRAY pArray, DTWAIN_BOOL expandIfRange)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, capName, pArray, expandIfRange))
-    const DTWAIN_BOOL retVal = DTWAIN_GetCapValues(Source, CTL_TwainAppMgr::GetCapFromCapName(StringConversion::Convert_NativePtr_To_Ansi(capName).c_str()), DTWAIN_CAPGET, pArray);
+    const DTWAIN_BOOL retVal = DTWAIN_GetCapValuesEx2(Source, CTL_TwainAppMgr::GetCapFromCapName(StringConversion::Convert_NativePtr_To_Ansi(capName).c_str()), 
+        DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, pArray);
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(false)
 }
@@ -761,7 +776,7 @@ static bool GetDoubleCap( DTWAIN_SOURCE Source, LONG lCap, double *pValue )
     if (DTWAIN_GetCapDataType(Source, lCap) != TWTY_FIX32)
         return false;
     DTWAIN_ARRAY Array = nullptr;
-    bool bRet = DTWAIN_GetCapValues(Source, lCap, DTWAIN_CAPGETCURRENT, &Array) ? true : false;
+    bool bRet = DTWAIN_GetCapValuesEx2(Source, lCap, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
     if (!bRet)
         return false;
     const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
@@ -795,7 +810,7 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
     DTWAINArrayPtr_RAII a(pHandle, &OrigVals);
 
     // get the capability values
-    if (DTWAIN_GetCapValues(Source, lCap, GetType, arrayToUse))
+    if (DTWAIN_GetCapValuesEx2(Source, lCap, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arrayToUse))
     {
         // Gotten the value.  Check what container type holds the data
         const LONG lContainer = DTWAIN_GetCapContainer(Source, lCap, GetType);

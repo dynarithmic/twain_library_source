@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,9 +21,7 @@
 #ifndef CTLTWAINSOURCE_H
 #define CTLTWAINSOURCE_H
 
-#include <unordered_map>
 #include <vector>
-#include <unordered_set>
 #include <boost/logic/tribool.hpp>
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
@@ -422,9 +420,7 @@ namespace dynarithmic
         void         SetFileIncompleteSaveMode( bool bSaveIncomplete ) { m_bIsFileSaveIncomplete = bSaveIncomplete; }
         bool         IsFileIncompleteSave() const { return m_bIsFileSaveIncomplete; }
         bool         IsBlankPageDetectionOn() const { return m_bIsBlankPageDetectionOn &&
-            m_nJobControl < DTWAIN_JCBP_JSIC
-            || IsBlankPageDetectionSampleOn() ||
-                                                           IsBlankPageDetectionNoSampleOn(); }
+                            m_nJobControl < DTWAIN_JCBP_JSIC || IsBlankPageDetectionSampleOn() ||IsBlankPageDetectionNoSampleOn(); }
         void         SetBlankPageDetectionOn(bool bSet=true) { m_bIsBlankPageDetectionOn = bSet; }
         bool         IsBlankPageDetectionNoSampleOn() const { return m_bIsBlankPageDetectionNoSampleOn &&
                                                                     m_nJobControl < DTWAIN_JCBP_JSIC; }
@@ -452,21 +448,36 @@ namespace dynarithmic
         void         SetOpenFlag(bool bOpened) { m_bIsOpened = bOpened; }
         bool         CloseSource(bool bForce);
         const std::vector<int>& GetSupportedTransferMechanisms() const { return m_aTransferMechanisms; }
+        const std::vector<TW_UINT32>& GetSupportedDATS() const { return m_aSupportedDATS; }
         void         SetSupportedTransferMechanisms(const std::vector<int>& aTransferMechanisms)
                             { m_aTransferMechanisms = aTransferMechanisms; }
+        void         SetSupportedDATS(const std::vector<TW_UINT32>& aSupportedDATS)
+                            { m_aSupportedDATS = aSupportedDATS; }
         void         SetDoublePageCountOnDuplex(bool bSet) { m_bDoublePageCountOnDuplex = bSet; }
         bool         IsDoublePageCountOnDuplex() const { return m_bDoublePageCountOnDuplex; }
         CapList&     GetCustomCapCache() { return m_aSupportedCustomCapCache; }
         boost::logic::tribool IsFileSystemSupported() const { return m_tbIsFileSystemSupported; }
         boost::logic::tribool IsBufferedTileModeSupported() const { return m_tbIsTileModeSupported; }
+        boost::logic::tribool IsFeederSupported() const { return m_tbIsFeederSupported; }
+        std::pair<boost::logic::tribool, int> GetDuplexSupport() const { return m_tbIsDuplexSupported; }
+        boost::logic::tribool IsAudioTransferSupported() const { return m_tbIsAudioTransferSupported; }
+        boost::logic::tribool IsUIControllable() const { return m_tbUIControllable; }
         void         SetFileSystemSupported(bool bSet) { m_tbIsFileSystemSupported = bSet; }
         void         SetBufferedTileModeSupported(bool bSet) { m_tbIsTileModeSupported = bSet; }
+        void         SetFeederSupported(bool bSet) { m_tbIsFeederSupported = bSet; }
+        void         SetDuplexSupport(bool bSet, int duplexType) { m_tbIsDuplexSupported = { bSet,duplexType }; }
+        void         SetAudioTransferSupported(bool bSet) { m_tbIsAudioTransferSupported = bSet; }
+        void         SetUIControllable(bool bSet) { m_tbUIControllable = bSet; }
         TW_IMAGEMEMXFER& GetBufferedXFerInfo() { return m_BufferedXFerInfo; }
         CTL_ExtImageInfoTriplet* GetExtImageInfoTriplet();
         void        SetShutdownAcquire(bool bSet) { m_bShutdownAcquire = bSet; }
         bool        IsShutdownAcquire() const { return m_bShutdownAcquire; }
         int         GetLastAcquireError() const { return m_nLastAcquireError; }
         void        SetLastAcquireError(int err) { m_nLastAcquireError = err; }
+        void        SetUsePeekMessage(bool bSet) { m_bUsePeekMessage = bSet; }
+        bool        IsUsePeekMessage() const { return m_bUsePeekMessage;  }
+        bool        IsTwainLoopStarted() const { return m_bTwainMsgLoopStarted; }
+        void        SetTwainLoopStarted(bool bSet) { m_bTwainMsgLoopStarted = bSet; }
         // Only public member
         void *      m_pUserPtr;
 
@@ -592,12 +603,19 @@ namespace dynarithmic
         LONG            m_nForcedBpp;
         bool            m_bTileMode;
         std::vector<int> m_aTransferMechanisms;
+        std::vector<TW_UINT32> m_aSupportedDATS;
         bool            m_bExtendedCapsRetrieved;
         bool            m_bShutdownAcquire;
+        bool            m_bUsePeekMessage;
         long            m_FileSavePageCount;
         int             m_nLastAcquireError;
+        bool            m_bTwainMsgLoopStarted;
         boost::logic::tribool m_tbIsFileSystemSupported;
         boost::logic::tribool m_tbIsTileModeSupported;
+        boost::logic::tribool m_tbIsFeederSupported;
+        std::pair<boost::logic::tribool, int> m_tbIsDuplexSupported;
+        boost::logic::tribool m_tbIsAudioTransferSupported;
+        boost::logic::tribool m_tbUIControllable;
         CTL_TwainDLLHandle* m_pDLLHandle;
         TW_IMAGEMEMXFER m_BufferedXFerInfo;
 

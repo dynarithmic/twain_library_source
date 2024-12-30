@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@
 #include "sourceselectopts.h"
 #include "errorcheck.h"
 #include "../simpleini/simpleini.h"
-#include "ctlfileutils.h"
-#include "ctldefsource.h"
 #include "ctlthreadutils.h"
 #include <boost/logic/tribool.hpp>
 
@@ -40,13 +38,11 @@ using namespace boost::logic;
 LONG DLLENTRY_DEF DTWAIN_SetTwainDialogFont(HFONT font)
 {
     LOG_FUNC_ENTRY_PARAMS((font))
-    CTL_StaticData::s_DialogFont = font;
+    CTL_StaticData::GetDialogFont() = font;
     LOG_FUNC_EXIT_NONAME_PARAMS(1)
     CATCH_BLOCK(0)
 }
 
-static void DisplayLocalString(HWND hWnd, int nID, int ResID);
-static CTL_StringType GetPossibleMappedName(CustomPlacement CS, TCHAR* szSelectedSourceName);
 static std::vector<TCHAR> GetDefaultName(SelectStruct& selectTraits);
 static std::vector<CTL_StringType> GetNameList(SelectStruct& pS);
 
@@ -123,7 +119,7 @@ static DTWAIN_SOURCE SelectSourceHelper(CTL_TwainDLLHandle* pHandle, SourceSelec
 
 DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSource()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     DTWAIN_SOURCE Source = SelectSourceHelper(pHandle, SourceSelectionOptions(SELECTSOURCE, IDS_SELECT_SOURCE_TEXT), {indeterminate});
     LOG_FUNC_EXIT_NONAME_PARAMS(Source)
@@ -132,7 +128,7 @@ DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectSource()
 
 DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_SelectDefaultSource()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     DTWAIN_SOURCE Source = SelectSourceHelper(pHandle, SourceSelectionOptions(SELECTDEFAULTSOURCE, IDS_SELECT_SOURCE_TEXT), {indeterminate});
     LOG_FUNC_EXIT_NONAME_PARAMS(Source)
@@ -295,7 +291,7 @@ DTWAIN_SOURCE dynarithmic::SourceSelect(CTL_TwainDLLHandle* pHandle, SourceSelec
 
 DTWAIN_SOURCE dynarithmic::DTWAIN_LLSelectSource(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& /*opt*/)
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     // Select a source from the source dialog
     const CTL_ITwainSource *pSource = CTL_TwainAppMgr::SelectSourceDlg( pHandle->m_pTwainSession );
     // Check if a source was selected
@@ -344,8 +340,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDefaultSource(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    bool bRet = false;
-    bRet = CTL_TwainAppMgr::SetDefaultSource(pSource);
+    bool bRet = CTL_TwainAppMgr::SetDefaultSource(pSource);
     // Load the resources
     auto* customProfile = CTL_StaticData::GetINIInterface();
     if (customProfile)
@@ -385,7 +380,7 @@ struct closeSourceRAII
 
 static std::vector<TCHAR> GetDefaultName(SelectStruct& selectTraits)
 {
-    bool bLogMessages = (CTL_StaticData::s_logFilterFlags & DTWAIN_LOG_MISCELLANEOUS) ? true : false;
+    bool bLogMessages = (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS) ? true : false;
     bool bAlwaysHighlightFirst = selectTraits.CS.nOptions & DTWAIN_DLG_HIGHLIGHTFIRST;
     std::vector<TCHAR> DefName;
     DTWAIN_SOURCE DefSource = nullptr;
@@ -416,7 +411,7 @@ static std::vector<TCHAR> GetDefaultName(SelectStruct& selectTraits)
                 DefName.resize(nCharacters);
                 GetSourceInfo(reinterpret_cast<CTL_ITwainSource*>(DefSource), &CTL_ITwainSource::GetProductName, DefName.data(), nCharacters);
                 if (bLogMessages)
-                    CTL_TwainAppMgr::WriteLogInfoA("Initializing TWAIN Dialog -- Retrieved default TWAIN Source name...\n");
+                    LogWriterUtils::WriteLogInfoIndentedA("Initializing TWAIN Dialog -- Retrieved default TWAIN Source name...");
             }
         }
     }

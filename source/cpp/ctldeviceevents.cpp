@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
             }
         }
     }
-    const bool bRet = DTWAIN_SetCapValues(Source, DTWAIN_CV_CAPDEVICEEVENT, SetType, Array)?true:false;
+    const bool bRet = DTWAIN_SetCapValuesEx2(Source, DTWAIN_CV_CAPDEVICEEVENT, SetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array)?true:false;
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -94,7 +94,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceNotifications(DTWAIN_SOURCE Source, LPL
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !CTL_TwainAppMgr::IsCapabilitySupported(pTheSource, DTWAIN_CV_CAPDEVICEEVENT); },
         DTWAIN_ERR_DEVICEEVENT_NOT_SUPPORTED, false, FUNC_MACRO);
 
-    const bool bRet = DTWAIN_GetCapValues(Source, DTWAIN_CV_CAPDEVICEEVENT, DTWAIN_CAPGETCURRENT, &Array) ? true : false;
+    const bool bRet = DTWAIN_GetCapValuesEx2(Source, DTWAIN_CV_CAPDEVICEEVENT, DTWAIN_CAPGETCURRENT, 
+                                DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
     if (!bRet)
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
@@ -107,6 +108,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceNotifications(DTWAIN_SOURCE Source, LPL
         if (Value < 32 && Value > 0L)
             *lpDeviceEvents |= 1L << (Value - 1L);
     });
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpDeviceEvents))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -118,6 +120,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEvent(DTWAIN_SOURCE Source, LPLONG lpEv
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     const CTL_DeviceEvent DeviceEvent = pSource->GetDeviceEvent();
     *lpEvent = DeviceEvent.GetEvent() + 1;
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpEvent))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -134,6 +137,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventEx(DTWAIN_SOURCE Source, LPLONG lp
     const CTL_DeviceEvent DeviceEvent = pSource->GetDeviceEvent();
     const auto pHandle = pSource->GetDTWAINHandle();
     const DTWAIN_BOOL bRet = DeviceEvent.GetEventInfoEx(pHandle, pArray);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpEvent))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }

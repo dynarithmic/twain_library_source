@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -215,24 +215,27 @@ LONG   DLLENTRY_DEF DTWAIN_GetOCRManufacturer(DTWAIN_OCRENGINE Engine,LPTSTR szM
     auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
     const LONG Ret = dynarithmic::GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetManufacturer),
                                 szMan, nMaxLen);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szMan))
     LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 
-LONG   DLLENTRY_DEF DTWAIN_GetOCRProductFamily(DTWAIN_OCRENGINE Engine,LPTSTR szMan,LONG nMaxLen)
+LONG   DLLENTRY_DEF DTWAIN_GetOCRProductFamily(DTWAIN_OCRENGINE Engine,LPTSTR szProdFamily,LONG nMaxLen)
 {
-    LOG_FUNC_ENTRY_PARAMS((Engine, szMan, nMaxLen))
+    LOG_FUNC_ENTRY_PARAMS((Engine, szProdFamily, nMaxLen))
     auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
-    const LONG Ret = dynarithmic::GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetProductFamily), szMan, nMaxLen);
+    const LONG Ret = dynarithmic::GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetProductFamily), szProdFamily, nMaxLen);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szProdFamily))
     LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 
-LONG  DLLENTRY_DEF DTWAIN_GetOCRProductName(DTWAIN_OCRENGINE Engine,LPTSTR szMan,LONG nMaxLen)
+LONG  DLLENTRY_DEF DTWAIN_GetOCRProductName(DTWAIN_OCRENGINE Engine,LPTSTR szProdName,LONG nMaxLen)
 {
-    LOG_FUNC_ENTRY_PARAMS((Engine, szMan, nMaxLen))
+    LOG_FUNC_ENTRY_PARAMS((Engine, szProdName, nMaxLen))
     auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
-    const LONG Ret = dynarithmic::GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetProductName), szMan, nMaxLen);
+    const LONG Ret = dynarithmic::GetOCRInfo(pEngine, reinterpret_cast<OCRINFOFUNC>(&OCREngine::GetProductName), szProdName, nMaxLen);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szProdName))
     LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
@@ -356,6 +359,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoLong(DTWAIN_OCRTEXTINFOHANDLE OCRT
     }
     break;
     }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pInfo))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -441,6 +445,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRTextInfoLongEx(DTWAIN_OCRTEXTINFOHANDLE OC
         actualSize = (std::min)(bufSize, realSize);
     }
     std::copy_n(itStart, actualSize, pInfo);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pInfo))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -561,6 +566,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRMajorMinorVersion(DTWAIN_OCRENGINE Engine,
         *lpMajor = pEngine->GetOCRVersionIdentity().Version.MajorNum;
     if (lpMinor)
         *lpMinor = pEngine->GetOCRVersionIdentity().Version.MinorNum;
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpMajor, lpMinor))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -624,7 +630,7 @@ void dynarithmic::UnloadOCRInterfaces(CTL_TwainDLLHandle *pHandle)
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitOCRInterface()
 {
-    LOG_FUNC_ENTRY_NONAME_PARAMS()
+    LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     
     if (pHandle->m_OCRInterfaceArray.empty())
@@ -687,9 +693,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsOCREngineActivated(DTWAIN_OCRENGINE Engine)
 {
     LOG_FUNC_ENTRY_PARAMS((Engine))
     auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
-    LONG retVal = FALSE;
     const bool bRet = pEngine->IsActivated();
-    retVal = bRet ? TRUE : FALSE;
+    LONG retVal = bRet ? TRUE : FALSE;
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(false)
 }
@@ -714,6 +719,7 @@ LONG DLLENTRY_DEF DTWAIN_GetOCRErrorString(DTWAIN_OCRENGINE Engine, LONG lError,
         LOG_FUNC_EXIT_NONAME_PARAMS(retval)
     }
     const LONG nTotalBytes = StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(pEngine->GetErrorString(lError)), lpszBuffer, nMaxLen);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszBuffer))
     LOG_FUNC_EXIT_NONAME_PARAMS(nTotalBytes)
     CATCH_BLOCK(-1)
 }

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ namespace dynarithmic
             TW_UINT32   GetDataSize() const;
             HANDLE      GetData() const;
             void        SetDataSize(TW_UINT32 nSize);
-            TW_UINT16   SetData(HANDLE hData, int nSize);
+            TW_UINT16   SetData(HANDLE hData, TW_UINT32 nSize);
 
         private:
             TW_CUSTOMDSDATA     m_CustomDSData;

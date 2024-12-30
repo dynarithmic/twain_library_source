@@ -1,6 +1,6 @@
 /*
 This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-Copyright (c) 2002-2024 Dynarithmic Software.
+Copyright (c) 2002-2025 Dynarithmic Software.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,7 +18,14 @@ FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
 DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
 OF THIRD PARTY RIGHTS.
 */
-#ifndef DTWAIN_RETAIL_DEF_H
-#define DTWAIN_RETAIL_DEF_H
+#ifndef DTWAIN_CONFIG_H
+#define DTWAIN_CONFIG_H
+
+/* Build with DTWAIN logging of call stack */
+#define DTWAIN_BUILD_LOGCALLSTACK 1 
+
+/* Build without DTWAIN logging pointer values on return of functions. 
+   Note that DTWAIN_BUILD_LOGCALLSTACK must be 1 for this to take effect */
+#define DTWAIN_BUILD_LOGPOINTERS 1
 
 #endif

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -25,10 +25,40 @@
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
+#include <cppfunc.h>
+#include <errorcheck.h>
 
 using namespace dynarithmic;
 
 std::queue<MSG> TwainMessageLoopV2::s_MessageQueue;
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnablePeekMessageLoop(DTWAIN_SOURCE Source, BOOL bSet)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, bSet))
+    if ( !Source )
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    auto pS = pSource;
+
+    // Cannot change TWAIN message loop implementation while acquiring images
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return pS->IsTwainLoopStarted(); },
+                                        DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
+
+    pSource->SetUsePeekMessage(bSet);
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPeekMessageLoopEnabled(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    if ( !Source )
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    auto bRet = pSource->IsUsePeekMessage();
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK_LOG_PARAMS(false)
+}
 
 std::pair<bool, DTWAIN_ACQUIRE> dynarithmic::StartModalMessageLoop(DTWAIN_SOURCE Source, SourceAcquireOptions& opts)
 {
@@ -85,15 +115,33 @@ bool TwainMessageLoopImpl::IsAcquireTerminated(CTL_ITwainSource* pSource, bool b
     return !IsSourceOpen(pSource, bUIOnly);
 }
 
-void TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource *pSource, bool isUIOnly)
+// Depending on the setting in pSource, we want to either loop
+// on PeekMessage(), or rely on the return value of GetMessage().
+// The settings are found in dtwain32.ini or dtwain64.ini under the
+// "TwainLoopPeek" section.
+static bool ContinueTwainLoop(CTL_ITwainSource* pSource, MSG *msg)
+{
+    if (pSource->IsUsePeekMessage())
+    {
+        PeekMessage(msg, nullptr, 0, 0, PM_REMOVE);
+        return true;
+    }
+    BOOL bRet = GetMessage(msg, nullptr, 0, 0);
+    if (bRet == -1)
+        return false;
+    return bRet;
+}
+
+void TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource* pSource, bool isUIOnly)
 {
     MSG msg;
     struct UIScopedRAII
     {
         CTL_ITwainSource* m_pSource;
         bool m_bOld;
-        UIScopedRAII(CTL_ITwainSource* pSource) : m_pSource(pSource), m_bOld(m_pSource->IsUIOnly()) {}
-        ~UIScopedRAII() { m_pSource->SetUIOnly(m_bOld); }
+        UIScopedRAII(CTL_ITwainSource* pSource) : m_pSource(pSource), m_bOld(m_pSource->IsUIOnly()) 
+        { m_pSource->SetTwainLoopStarted(true); }
+        ~UIScopedRAII() { m_pSource->SetTwainLoopStarted(false); m_pSource->SetUIOnly(m_bOld); }
     };
 
     UIScopedRAII raii(pSource);
@@ -107,10 +155,10 @@ void TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource *pSource, 
     HWND theWnd = *pSource->GetTwainSession()->GetWindowHandlePtr();
     ::PostMessage(theWnd, WM_NULL, static_cast<WPARAM>(0), static_cast<LPARAM>(0));
 
-    // Start the message loop
-    while (GetMessage(&msg, nullptr, 0, 0))
+    // Start the message loop.
+    while (ContinueTwainLoop(pSource, &msg))
     {
-        // If in UIOnly mode, set it up here
+         // If in UIOnly mode, set it up here
         if (isUIOnly && !bInitializeAcquisitionProcess)
         {
             LLSetupUIOnly(pSource);

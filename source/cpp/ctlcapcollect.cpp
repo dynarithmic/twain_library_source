@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2024 Dynarithmic Software.
+    Copyright (c) 2002-2025 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -157,13 +157,12 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
 
         if (bOk)
         {
-            if (CTL_StaticData::s_logFilterFlags)
+            if (CTL_StaticData::GetLogFilterFlags())
             {
                 StringStreamOutA strm;
                 strm << "Using capability info from DTWAIN32.INI (Source="
                      << sProdNameA << ", Cap=" << CTL_TwainAppMgr::GetCapNameFromCap(nCap) << ")\n";
-
-                CTL_TwainAppMgr::WriteLogInfoA(strm.str());
+                LogWriterUtils::WriteLogInfoIndentedA(strm.str());
             }
 
             if (bContainerInfoFound)
