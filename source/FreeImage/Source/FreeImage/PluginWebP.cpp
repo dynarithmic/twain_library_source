@@ -27,6 +27,14 @@
 #include "../LibWebP/src/webp/decode.h"
 #include "../LibWebP/src/webp/encode.h"
 #include "../LibWebP/src/webp/mux.h"
+#include "../LibWebP/src/mux/muxi.h"
+
+#define STRINGER_2_(x) #x
+#define STRINGER_(x) STRINGER_2_(x)
+
+#ifdef _MSC_VER
+    #pragma message("Using LibWebP version " STRINGER_(MUX_MAJ_VERSION) "." STRINGER_(MUX_MIN_VERSION) "." STRINGER_(MUX_REV_VERSION))
+#endif
 
 // ==========================================================
 // Plugin Interface

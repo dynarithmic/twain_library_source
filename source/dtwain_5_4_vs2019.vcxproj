@@ -1167,7 +1167,6 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include=".\cpp\logmsg.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">false</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include=".\cpp\ctlreg.cpp" />
     <ClCompile Include=".\cpp\ctlxmlparse.cpp" />
     <ClCompile Include=".\cpp\a85decoder.cpp" />
     <ClCompile Include=".\cpp\ctltempdir.cpp" />
@@ -1403,7 +1402,6 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include=".\h\ctliface.h" />
     <ClInclude Include=".\h\ctlobstr.h" />
     <ClInclude Include=".\h\ctlobtyp.h" />
-    <ClInclude Include=".\h\ctlreg.h" />
     <ClInclude Include=".\h\ctltmpl3.h" />
     <ClInclude Include=".\h\ctltmpl4.h" />
     <ClInclude Include=".\h\ctltmpl5.h" />

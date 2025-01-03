@@ -68,9 +68,11 @@
 #define TIFF_GCC_DEPRECATED
 #endif
 #ifdef _MSC_VER
+#define TIFF_MSC_DEPRECATED                                                    \
+    __declspec(deprecated("libtiff type deprecated; please use corresponding " \
+                          "C99 stdint.h type"))
 #include <stdint.h>
 #include <inttypes.h>
-#define TIFF_MSC_DEPRECATED __declspec(deprecated("libtiff type deprecated; please use corresponding C99 stdint.h type"))
 #else
 #define TIFF_MSC_DEPRECATED
 #endif
@@ -88,7 +90,6 @@ typedef TIFF_MSC_DEPRECATED uint32_t uint32 TIFF_GCC_DEPRECATED;
 typedef TIFF_MSC_DEPRECATED int64_t  int64  TIFF_GCC_DEPRECATED;
 typedef TIFF_MSC_DEPRECATED uint64_t uint64 TIFF_GCC_DEPRECATED;
 #endif /* TIFF_DISABLE_DEPRECATED */
-
 
 /*
  * Some types as promoted in a variable argument list
