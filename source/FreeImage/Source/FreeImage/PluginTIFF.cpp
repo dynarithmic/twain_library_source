@@ -45,6 +45,11 @@
 
 #include "FreeImageIO.h"
 #include "PSDParser.h"
+#include "zlib.h"
+#ifdef _MSC_VER
+    #pragma message("Using LibTiff version " TIFFLIB_VERSION_STR_MAJ_MIN_MIC)
+    #pragma message("Using Zlib version " ZLIB_VERSION)
+#endif
 
 #define MAX_BYTES_IN_MARKER 65533L		// maximum data length of a TIFF marker
 

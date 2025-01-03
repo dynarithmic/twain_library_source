@@ -711,12 +711,12 @@ Save(FreeImageIO *io, FIBITMAP *dib, fi_handle handle, int page, int flags, void
 		// ...
 		
 		// save the icon descriptions
-
-		ICONDIRENTRY *icon_list = (ICONDIRENTRY *)malloc(icon_header->idCount * sizeof(ICONDIRENTRY));
-		if(!icon_list) {
+		std::vector<ICONDIRENTRY> icon_list(icon_header->idCount);
+//		ICONDIRENTRY *icon_list = (ICONDIRENTRY *)malloc(icon_header->idCount * sizeof(ICONDIRENTRY));
+/*		if(!icon_list) {
 			throw FI_MSG_ERROR_MEMORY;
-		}
-		memset(icon_list, 0, icon_header->idCount * sizeof(ICONDIRENTRY));
+		}*/
+//		memset(icon_list, 0, icon_header->idCount * sizeof(ICONDIRENTRY));
 
 		for(k = 0; k < icon_header->idCount; k++) {
 			icon_dib = (FIBITMAP*)vPages[k];
@@ -741,10 +741,10 @@ Save(FreeImageIO *io, FIBITMAP *dib, fi_handle handle, int page, int flags, void
 
 		// make a room for icon dir entries, until later update
 		const long directory_start = io->tell_proc(handle);
-		io->write_proc(icon_list, sizeof(ICONDIRENTRY) * icon_header->idCount, 1, handle);
+		io->write_proc((char *)icon_list.data(), sizeof(ICONDIRENTRY) * icon_header->idCount, 1, handle);
 
 		// write the image bits for each image
-		
+
 		DWORD dwImageOffset = (DWORD)io->tell_proc(handle);
 
 		for(k = 0; k < icon_header->idCount; k++) {
@@ -773,10 +773,10 @@ Save(FreeImageIO *io, FIBITMAP *dib, fi_handle handle, int page, int flags, void
 #ifdef FREEIMAGE_BIGENDIAN
 		SwapIconDirEntries(icon_list, icon_header->idCount);
 #endif
-		io->write_proc(icon_list, sizeof(ICONDIRENTRY) * icon_header->idCount, 1, handle);
+		io->write_proc((char *)icon_list.data(), sizeof(ICONDIRENTRY) * icon_header->idCount, 1, handle);
 		io->seek_proc(handle, current_pos, SEEK_SET);
 
-		free(icon_list);
+//		free(icon_list);
 
 		// free the vector class
 		for(k = 0; k < icon_header->idCount; k++) {

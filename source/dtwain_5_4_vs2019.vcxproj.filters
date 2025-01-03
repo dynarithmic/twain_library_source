@@ -151,9 +151,6 @@
     <ClCompile Include=".\cpp\ctlprinter.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include=".\cpp\ctlreg.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include=".\cpp\ctlsavefilename.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
@@ -724,9 +721,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include=".\h\ctlobtyp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include=".\h\ctlreg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h\ctlsupport.h">

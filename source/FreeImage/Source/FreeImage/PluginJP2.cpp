@@ -24,6 +24,13 @@
 #include "../LibOpenJPEG/openjpeg.h"
 #include "J2KHelper.h"
 
+#define STRINGER_2_(x) #x
+#define STRINGER_(x) STRINGER_2_(x)
+
+#ifdef _MSC_VER
+    #pragma message("Using LibOpenJPEG version " STRINGER_(OPJ_VERSION_MAJOR) "."  STRINGER_(OPJ_VERSION_MINOR) "." STRINGER_(OPJ_VERSION_BUILD))
+#endif
+
 // ==========================================================
 // Plugin Interface
 // ==========================================================

@@ -31,6 +31,13 @@ OF THIRD PARTY RIGHTS.
 #include "../cryptolib/filters.h"
 #include "../cryptolib/md5.h"
 
+#define STRINGER_2_(x) #x
+#define STRINGER_(x) STRINGER_2_(x)
+
+#ifdef _MSC_VER
+    #pragma message("Using Crypto++ version " STRINGER_(CRYPTOPP_MAJOR) "." STRINGER_(CRYPTOPP_MINOR) "." STRINGER_(CRYPTOPP_REVISION))
+#endif
+
 std::string GetSystemTimeInMilliseconds();
 #ifdef _MSC_VER
 #pragma warning (disable:4244)
@@ -135,9 +142,9 @@ static unsigned char ConvertToHex(unsigned char hi, unsigned char lo)
     char retval;
     int temp = toupper(hi);
     if ( temp >= '0' && temp <= '9' )
-        retval = temp - '0' << 4;
+        retval = (temp - '0') << 4;
     else
-        retval = temp - 'A' + 10 << 4;
+        retval = (temp - 'A' + 10) << 4;
 
     temp = toupper(lo);
     if ( temp >= '0' && temp <= '9' )

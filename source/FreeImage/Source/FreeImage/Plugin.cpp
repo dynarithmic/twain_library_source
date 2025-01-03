@@ -820,15 +820,15 @@ FreeImage_GetFIFFromFilenameU(const wchar_t *filename) {
     wchar_t *place = wcsrchr((wchar_t *)filename, '.'); 
     if (place == NULL) return FIF_UNKNOWN;
     // convert to single character - no national chars in extensions
-    char *extension = (char *)malloc(wcslen(place)+1);
+    std::vector<char> extension(wcslen(place) + 1);
+//    char *extension = (char *)malloc(wcslen(place)+1);
     unsigned int i=0;
     for(; i < wcslen(place); i++) // convert 16-bit to 8-bit
         extension[i] = (char)(place[i] & 0x00FF);
     // set terminating 0
     extension[i]=0;
-    FREE_IMAGE_FORMAT fRet = FreeImage_GetFIFFromFilename(extension);
-    free(extension);
-
+    FREE_IMAGE_FORMAT fRet = FreeImage_GetFIFFromFilename(extension.data());
+//    free(extension);
     return fRet;
 #else
     return FIF_UNKNOWN;
