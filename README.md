@@ -100,7 +100,7 @@ The final hashes of the files are stored as text in the **binaries\32bit** and *
 ----------
 ### <a name="visual-studio-details"></a>Starting Visual Studio ###
 
-* Start the Microsoft Visual Studio, and open the DTWAIN solution file found in the [source](https://github.com/dynarithmic/twain_library_source/tree/master/source) directory named **dtwain_5_vs2019.sln**.
+* Start the Microsoft Visual Studio, and open the DTWAIN solution file found in the [source](https://github.com/dynarithmic/twain_library_source/tree/master/source) directory named **dtwain_5_4_vs2019.sln**.
 
 When you load the solution and project files in the Visual Studio IDE, you may be prompted to upgrade the platform toolset from v142 to the latest version that is supported by the particular Visual Studio compiler you are using.  You can choose to leave the platform toolset as-is, or decide to upgrade to the latest one.  However the platform toolset must be v142 or v143, and your current installation must have this toolset installed for your compiler.
 
