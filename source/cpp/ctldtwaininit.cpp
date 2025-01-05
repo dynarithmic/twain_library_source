@@ -90,6 +90,7 @@ static void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLa
 static void LoadTransferReadyOverrides();
 static void LoadFlatbedOnlyOverrides();
 static void LoadTwainLoopOverrides();
+static void LoadPaperDetectionOverrides();
 static void LoadOnSourceOpenProperties(CTL_TwainDLLHandle* pHandle);
 static bool LoadGeneralResources(bool blockExecution);
 static void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle);
@@ -918,6 +919,9 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
 
                 // Load Twain message loop overrides for peek message
                 LoadTwainLoopOverrides();
+
+                // Load whether paper detection is supported
+                LoadPaperDetectionOverrides();
 
                 // Load flatbed only list of devices
                 LoadFlatbedOnlyOverrides();
@@ -2393,6 +2397,27 @@ void LoadTwainLoopOverrides()
     while (iter != keys.end())
     {
         peekloop_list.insert(iter->pItem);
+        ++iter;
+    }
+}
+
+// This loads the sources that will override DTWAIN_IsFeederSensitive() with 
+// whether the source supports checking for paper loaded in feeder
+void LoadPaperDetectionOverrides()
+{
+    auto& paperdetectable_map = CTL_TwainAppMgr::GetSourcePaperDetectionMap();
+    paperdetectable_map.clear();
+
+    auto* customProfile = CTL_StaticData::GetINIInterface();
+    if (!customProfile)
+        return;
+    CSimpleIniA::TNamesDepend keys;
+    customProfile->GetAllKeys("PaperDetectionStatus", keys);
+    auto iter = keys.begin();
+    while (iter != keys.end())
+    {
+        bool isPaperDetectable = customProfile->GetBoolValue("PaperDetectionStatus", iter->pItem, true);
+        paperdetectable_map[iter->pItem] = isPaperDetectable;
         ++iter;
     }
 }
