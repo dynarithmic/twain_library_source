@@ -469,7 +469,7 @@ namespace dynarithmic
         void         SetDuplexSupport(bool bSet, int duplexType) { m_tbIsDuplexSupported = { bSet,duplexType }; }
         void         SetAudioTransferSupported(bool bSet) { m_tbIsAudioTransferSupported = bSet; }
         void         SetUIControllable(bool bSet) { m_tbUIControllable = bSet; }
-        void         SetFeederSensitive(bool bSet) { m_tbIsFeederSensitive; }
+        void         SetFeederSensitive(bool bSet) { m_tbIsFeederSensitive = bSet; }
         TW_IMAGEMEMXFER& GetBufferedXFerInfo() { return m_BufferedXFerInfo; }
         CTL_ExtImageInfoTriplet* GetExtImageInfoTriplet();
         void        SetShutdownAcquire(bool bSet) { m_bShutdownAcquire = bSet; }
