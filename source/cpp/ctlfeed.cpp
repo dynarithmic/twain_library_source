@@ -49,48 +49,46 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFeederSupported(DTWAIN_SOURCE Source)
         LOG_FUNC_EXIT_NONAME_PARAMS(getSupport ? true : false)
 
     BOOL bRet = false;
-    if (getSupport.value == boost::tribool::indeterminate_value)
-    {
-        // Check if feeder has been enabled.  If so, then device has a feeder
-        DTWAIN_ARRAY arr = nullptr;
-        const BOOL bOk = DTWAIN_GetCapValuesEx2(Source, DTWAIN_CV_CAPFEEDERENABLED, 
-                                        DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
-        if (!bOk)
-        {
-            pSource->SetFeederSupported(false);
-            LOG_FUNC_EXIT_NONAME_PARAMS(false)
-        }
-        DTWAINArrayLowLevel_RAII a(pHandle, arr);
 
-        auto& vFeeder = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
-        if (vFeeder.empty())
-        {
-            pSource->SetFeederSupported(false);
-            LOG_FUNC_EXIT_NONAME_PARAMS(false)
-        }
-        if (vFeeder[0] == 1)
-        {
-            pSource->SetFeederSupported(true);
-            LOG_FUNC_EXIT_NONAME_PARAMS(true)
-        }
-        // Enable the feeder temporarily to test if setting it will work.
-        vFeeder[0] = 1;
-        bRet = DTWAIN_SetCapValuesEx2(Source, DTWAIN_CV_CAPFEEDERENABLED, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
-        if (!bRet)
-        {
-            pSource->SetFeederSupported(false);
-            LOG_FUNC_EXIT_NONAME_PARAMS(false)
-        }
-        // Disable the feeder
-        vFeeder[0] = 0; 
-        bRet = DTWAIN_SetCapValuesEx2(Source, DTWAIN_CV_CAPFEEDERENABLED, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
+    // Check if feeder has been enabled.  If so, then device has a feeder
+    DTWAIN_ARRAY arr = nullptr;
+    const BOOL bOk = DTWAIN_GetCapValuesEx2(Source, DTWAIN_CV_CAPFEEDERENABLED, 
+                                    DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
+    if (!bOk)
+    {
+        pSource->SetFeederSupported(false);
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
     }
+    DTWAINArrayLowLevel_RAII a(pHandle, arr);
+
+    auto& vFeeder = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
+    if (vFeeder.empty())
+    {
+        pSource->SetFeederSupported(false);
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    }
+    if (vFeeder[0] == 1)
+    {
+        pSource->SetFeederSupported(true);
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    }
+    // Enable the feeder temporarily to test if setting it will work.
+    vFeeder[0] = 1;
+    bRet = DTWAIN_SetCapValuesEx2(Source, DTWAIN_CV_CAPFEEDERENABLED, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
+    if (!bRet)
+    {
+        pSource->SetFeederSupported(false);
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    }
+    // Disable the feeder
+    vFeeder[0] = 0; 
+    bRet = DTWAIN_SetCapValuesEx2(Source, DTWAIN_CV_CAPFEEDERENABLED, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
     pSource->SetFeederSupported(bRet);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
 
-DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_IsFeederLoaded(DTWAIN_SOURCE Source)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFeederLoaded(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     if ( DTWAIN_IsFeederSupported(Source) )
@@ -236,19 +234,32 @@ bool EnableFeederFunc(DTWAIN_SOURCE Source, LONG lCap, CTL_ITwainSource* p, SetF
     return true;
 }
 //*********************************************************************************************
-
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFeederSensitive(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    if ( !DTWAIN_IsFeederEnabled(Source))
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+    auto getSupport = pSource->IsFeederSensitive();
 
-    if ( DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPFEEDERLOADED) )
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    // If status of feeder paper sensor support already determined, return result.
+    if (getSupport.value != boost::tribool::indeterminate_value)
+        LOG_FUNC_EXIT_NONAME_PARAMS(getSupport ? true : false)
 
-    LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    bool bRet = false;
+
+    // Check if paper detectable
+    bRet = DTWAIN_IsPaperDetectable(Source);
+    pSource->SetFeederSensitive(bRet);
+
+    // We will see if the source is compliant
+    if (!DTWAIN_IsCapSupported(Source, CAP_PAPERDETECTABLE))
+    {
+        BOOL bSupported = DTWAIN_IsFeederSupported(Source);
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return bSupported; }, DTWAIN_ERR_FEEDER_COMPLIANCY, false, FUNC_MACRO);
+    }
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
+
 //*********************************************************************************************
 // Only called in State 5
 DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_FeedPage(DTWAIN_SOURCE Source)

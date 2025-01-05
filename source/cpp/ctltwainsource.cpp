@@ -246,6 +246,7 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_tbIsDuplexSupported({ boost::logic::indeterminate, TWDX_NONE }),
     m_tbIsAudioTransferSupported(boost::logic::indeterminate),
     m_tbUIControllable(boost::logic::indeterminate),
+    m_tbIsFeederSensitive(boost::logic::indeterminate),
     m_pDLLHandle(pHandle),
     m_BufferedXFerInfo{},
     m_ImageInfo(),
