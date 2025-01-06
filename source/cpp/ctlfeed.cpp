@@ -251,10 +251,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFeederSensitive(DTWAIN_SOURCE Source)
     pSource->SetFeederSensitive(bRet);
 
     // We will see if the source is compliant
-    if (!DTWAIN_IsCapSupported(Source, CAP_PAPERDETECTABLE))
+    if (!bRet && !DTWAIN_IsCapSupported(Source, CAP_PAPERDETECTABLE))
     {
         BOOL bSupported = DTWAIN_IsFeederSupported(Source);
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return bSupported; }, DTWAIN_ERR_FEEDER_COMPLIANCY, false, FUNC_MACRO);
+        if ( bSupported )
+        {
+            CTL_TwainAppMgr::SetError(DTWAIN_ERR_FEEDER_COMPLIANCY, pSource->GetProductNameA(), false);
+            LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        }
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
