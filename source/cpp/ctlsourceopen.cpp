@@ -83,12 +83,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     DTWAINArrayPtr_RAII raii(pHandle, &arr);
     CTL_TwainAppMgr::GatherCapabilityInfo(pSource);
 
+    // See if there is an override for paper detectable
+    DetermineIfPaperDetectable(pSource);
+
     // If this source has a feeder, check the status of whether we should check.
     // If the check is on, add it to the feeder sources container.
     //
-    // Since this operation may rely on the device hardware to respond to CAP_FEEDERLOADED
+    // Since this operation may rely on the device hardware to respond to CAP_PAPERDETECTABLE
     // there is an optional check done that can be set in the DTWAIN INI file(s).
-    if (pHandle->m_OnSourceOpenProperties.m_bCheckFeederStatusOnOpen && DTWAIN_IsFeederSensitive(Source))
+    if (pHandle->m_OnSourceOpenProperties.m_bCheckFeederStatusOnOpen && DTWAIN_IsPaperDetectable(Source))
         pHandle->m_aFeederSources.insert(Source);
 
     // Get the supported transfer types
@@ -103,9 +106,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
 
     // See if the source uses PeekMessage processing for the TWAIN message loop
     DetermineIfPeekMessage(pSource);
-
-    // See if there is an override for paper detectable
-    DetermineIfPaperDetectable(pSource);
 
     // Cache the pixel types and bit depths
     LogAndCachePixelTypes(pSource);
