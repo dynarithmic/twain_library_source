@@ -448,7 +448,8 @@ namespace dynarithmic
 
         // Check the CRC value
         CTL_StaticData::GetResourceVersion() = StringConversion::Convert_Ansi_To_Native(DTWAIN_TEXTRESOURCE_FILEVERSION);
-        bool doResourceCheck = iniInterface->GetBoolValue("Miscellaneous", "resourcecheck", true);
+        bool doResourceCheck = iniInterface->GetBoolValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_MISCELLANEOUS_KEY).data(),
+                                                          CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_RESOURCECHECK_ITEM).data(), true);
         if (doResourceCheck)
         {
             ifs.close();

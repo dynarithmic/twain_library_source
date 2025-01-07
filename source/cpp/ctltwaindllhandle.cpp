@@ -105,6 +105,26 @@ std::pair<CTL_ResourceRegistryMap::iterator, bool> CTL_TwainDLLHandle::AddResour
 CTL_StaticDataStruct        CTL_StaticData::s_StaticData;
 std::unique_ptr<CSimpleIniA>   CTL_StaticData::s_iniInterface;
 std::mutex                  CTL_StaticData::s_mutexInitDestroy;
+CTL_StaticDataStruct::CTL_StaticDataStruct() : 
+    s_aINIKeys{ 
+                {{INI_SOURCEXFERWAITINFO_KEY,    "SourceXferWaitInfo",   },
+                {INI_TWAINLOOPPEEK_KEY,          "TwainLoopPeek",        },
+                {INI_PAPERDETECTIONSTATUS_KEY,   "PaperDetectionStatus", },
+                {INI_FLATBEDONLY_KEY,            "FlatbedOnly",          },
+                {INI_SOURCEOPENPROPS_KEY,        "SourceOpenProps",      },
+                {INI_CHECKFEEDERSTATUS_ITEM,     "CheckFeederStatus",    },
+                {INI_QUERYBESTCAPCONTAINER_ITEM, "QueryBestCapContainer",},
+                {INI_QUERYCAPOPERATIONS_ITEM,    "QueryCapOperations",   },
+                {INI_IMAGEGILE_KEY,              "ImageFile",            },
+                {INI_MISCELLANEOUS_KEY,          "Miscellaneous",        },
+                {INI_RESOURCECHECK_ITEM,         "resourcecheck",        },
+                {INI_RESAMPLE_ITEM,              "resample",             },
+                {INI_OCRLIBRARY_KEY,             "OCRLibrary",           },
+                {INI_LANGUAGE_KEY,               "language",             },
+                {INI_DEFAULT_ITEM,               "default",              },
+                {INI_SOURCES_KEY,                "Sources",              },
+                {INI_DSMERRORLOGGING_KEY,        "DSMErrorLogging"}}
+             } {}
 
 std::string CTL_StaticData::GetTwainNameFromConstantA(int lConstantType, TwainConstantType lTwainConstant)
 {

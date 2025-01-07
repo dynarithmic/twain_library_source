@@ -525,6 +525,25 @@ namespace dynarithmic
 
     struct CTL_StaticDataStruct
     {
+        enum { INI_SOURCEXFERWAITINFO_KEY, 
+               INI_TWAINLOOPPEEK_KEY, 
+               INI_PAPERDETECTIONSTATUS_KEY, 
+               INI_FLATBEDONLY_KEY, 
+               INI_SOURCEOPENPROPS_KEY, 
+               INI_CHECKFEEDERSTATUS_ITEM, 
+               INI_QUERYBESTCAPCONTAINER_ITEM, 
+               INI_QUERYCAPOPERATIONS_ITEM, 
+               INI_IMAGEGILE_KEY, 
+               INI_MISCELLANEOUS_KEY, 
+               INI_RESOURCECHECK_ITEM,
+               INI_RESAMPLE_ITEM, 
+               INI_OCRLIBRARY_KEY, 
+               INI_LANGUAGE_KEY, 
+               INI_DEFAULT_ITEM,
+               INI_SOURCES_KEY, 
+               INI_DSMERRORLOGGING_KEY, 
+               LASTINIENTRY };
+        std::array<std::pair<int, std::string_view>, LASTINIENTRY> s_aINIKeys;
         int32_t                      s_nExtImageInfoOffset = 0;
         int                          s_nLoadingError = DTWAIN_NO_ERROR;
         bool                         s_bINIFileLoaded = false;
@@ -567,6 +586,7 @@ namespace dynarithmic
         CTL_StringType           s_ResourceVersion;
         std::string              s_CurrentResourceKey;
         CTL_PairToStringMap      s_ResourceCache;
+        CTL_StaticDataStruct();
     };
 
     struct CTL_StaticData
@@ -646,6 +666,7 @@ namespace dynarithmic
         static std::wstring GetTwainNameFromConstantW(int lConstantType, TwainConstantType lTwainConstant);
         static CTL_CallbackProcArray& GetCallbacks() { return s_StaticData.s_aAllCallbacks; }
         static auto& GetAppWindowsToDisable() { return s_StaticData.s_appWindowsToDisable; }
+        static constexpr std::string_view GetINIKey(int nWhich) { return s_StaticData.s_aINIKeys[nWhich].second; }
     };
 
     struct CTL_LoggerCallbackInfo

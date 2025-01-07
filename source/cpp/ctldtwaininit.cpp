@@ -978,7 +978,8 @@ void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL, 
     if ( !customProfile )
         return;
 
-    std::string szStr = customProfile->GetValue("Language", "default",
+    std::string szStr = customProfile->GetValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_LANGUAGE_KEY).data(),
+                                                CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_DEFAULT_ITEM).data(),
                                                StringConversion::Convert_NativePtr_To_Ansi(szLangDLL).c_str());
     if (!LoadLanguageResourceA(szStr, pHandle->GetResourceRegistry(), bClear))
     {
@@ -2346,12 +2347,13 @@ void LoadTransferReadyOverrides()
     if (!customProfile)
         return;
     CSimpleIniA::TNamesDepend keys;
-    customProfile->GetAllKeys("SourceXferWaitInfo", keys);
+    auto iniKey = CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCEXFERWAITINFO_KEY).data();
+    customProfile->GetAllKeys(iniKey, keys);
     auto iter = keys.begin();
     while (iter != keys.end())
     {
         CSimpleIniA::TNamesDepend vals;
-        customProfile->GetAllValues("SourceXferWaitInfo", iter->pItem, vals);
+        customProfile->GetAllValues(iniKey, iter->pItem, vals);
         if (!vals.empty())
         {
             auto iter2 = vals.begin();
@@ -2392,7 +2394,7 @@ void LoadTwainLoopOverrides()
     if (!customProfile)
         return;
     CSimpleIniA::TNamesDepend keys;
-    customProfile->GetAllKeys("TwainLoopPeek", keys);
+    customProfile->GetAllKeys(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_TWAINLOOPPEEK_KEY).data(), keys);
     auto iter = keys.begin();
     while (iter != keys.end())
     {
@@ -2412,11 +2414,12 @@ void LoadPaperDetectionOverrides()
     if (!customProfile)
         return;
     CSimpleIniA::TNamesDepend keys;
-    customProfile->GetAllKeys("PaperDetectionStatus", keys);
+    auto iniKey = CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_PAPERDETECTIONSTATUS_KEY).data();
+    customProfile->GetAllKeys(iniKey, keys);
     auto iter = keys.begin();
     while (iter != keys.end())
     {
-        bool isPaperDetectable = customProfile->GetBoolValue("PaperDetectionStatus", iter->pItem, true);
+        bool isPaperDetectable = customProfile->GetBoolValue(iniKey, iter->pItem, true);
         paperdetectable_map[iter->pItem] = isPaperDetectable;
         ++iter;
     }
@@ -2431,10 +2434,10 @@ void LoadOnSourceOpenProperties(CTL_TwainDLLHandle* pHandle)
     auto* feederProfile = CTL_StaticData::GetINIInterface();
     if (!feederProfile)
         return;
-
-    pHandle->m_OnSourceOpenProperties.m_bCheckFeederStatusOnOpen = feederProfile->GetBoolValue("SourceOpenProps", "CheckFeederStatus", true);
-    pHandle->m_OnSourceOpenProperties.m_bQueryBestCapContainer = feederProfile->GetBoolValue("SourceOpenProps", "QueryBestCapContainer", true);
-    pHandle->m_OnSourceOpenProperties.m_bQueryCapOperations = feederProfile->GetBoolValue("SourceOpenProps", "QueryCapOperations", true);
+    auto iniKey = CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCEOPENPROPS_KEY).data();
+    pHandle->m_OnSourceOpenProperties.m_bCheckFeederStatusOnOpen = feederProfile->GetBoolValue(iniKey, CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_CHECKFEEDERSTATUS_ITEM).data(), true);
+    pHandle->m_OnSourceOpenProperties.m_bQueryBestCapContainer = feederProfile->GetBoolValue(iniKey, CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_QUERYBESTCAPCONTAINER_ITEM).data(), true);
+    pHandle->m_OnSourceOpenProperties.m_bQueryCapOperations = feederProfile->GetBoolValue(iniKey, CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_QUERYBESTCAPCONTAINER_ITEM).data(), true);
 }
 
 void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle)
@@ -2442,7 +2445,8 @@ void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle)
     auto *customProfile = CTL_StaticData::GetINIInterface();
     if (!customProfile)
         return;
-    CTL_StaticData::SetResamplingDone(customProfile->GetBoolValue("ImageFile", "resample", true));
+    CTL_StaticData::SetResamplingDone(customProfile->GetBoolValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_IMAGEGILE_KEY).data(), 
+                                        CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_RESAMPLE_ITEM).data(), true));
     return;
 }
 
@@ -2459,12 +2463,13 @@ void LoadFlatbedOnlyOverrides()
     if (!customProfile)
         return;
     CSimpleIniA::TNamesDepend keys;
-    customProfile->GetAllKeys("FlatbedOnly", keys);
+    auto iniKey = CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_FLATBEDONLY_KEY).data();
+    customProfile->GetAllKeys(iniKey, keys);
     auto iter = keys.begin();
     while (iter != keys.end())
     {
         CSimpleIniA::TNamesDepend vals;
-        customProfile->GetAllValues("FlatbedOnly", iter->pItem, vals);
+        customProfile->GetAllValues(iniKey, iter->pItem, vals);
         flatbed_list.insert(iter->pItem);
         ++iter;
     }
