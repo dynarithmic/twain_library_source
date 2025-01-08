@@ -502,6 +502,17 @@ namespace dynarithmic
         }
     };
 
+    struct FileSaveNode
+    {
+        int m_FileType;
+        CTL_StringType m_sTotalFilter;
+        CTL_StringType m_sExtension;
+        FileSaveNode();
+        FileSaveNode(int fType, CTL_StringType filter1, CTL_StringType filter2, CTL_StringType ext);
+        CTL_StringType& GetTotalFilter() { return m_sTotalFilter; }
+        CTL_StringType& GetExtension() { return m_sExtension; }
+    };
+
     typedef std::map<std::string, SourceStatus> SourceStatusMap;
     typedef boost::container::flat_map<int, ImageResamplerData> ImageResamplerMap;
     typedef boost::container::flat_map<LONG, std::pair<std::string, std::string>> CTL_PDFMediaMap;
@@ -514,6 +525,7 @@ namespace dynarithmic
     typedef boost::container::flat_map<std::string, unsigned long> CTL_ThreadMap;
     typedef boost::container::flat_map<std::string, TwainConstantType> CTL_StringToConstantMap;
     typedef boost::container::flat_map<TW_UINT16, TW_INFO> CTL_UINT16ToInfoMap;
+    typedef boost::container::flat_map<int, FileSaveNode> CTL_FileSaveMap;
 
     typedef std::unordered_map<std::pair<LONG, std::string>, std::string, CacheKeyHash> CTL_PairToStringMap;
 
@@ -586,6 +598,7 @@ namespace dynarithmic
         CTL_StringType           s_ResourceVersion;
         std::string              s_CurrentResourceKey;
         CTL_PairToStringMap      s_ResourceCache;
+        CTL_FileSaveMap          s_FileSaveMap;
         CTL_StaticDataStruct();
     };
 
@@ -610,6 +623,7 @@ namespace dynarithmic
         static CTL_StringType& GetLanguageResourcePath() { return s_StaticData.s_strLangResourcePath; }
         static CTL_ErrorToExtraInfoMap& GetExtraErrorInfoMap() { return s_StaticData.s_mapExtraErrorInfo; }
         static CTL_MapThreadToDLLHandle& GetThreadToDLLHandleMap() { return s_StaticData.s_mapThreadToDLLHandle; }
+        static CTL_FileSaveMap& GetFileSaveMap() { return s_StaticData.s_FileSaveMap; }
         static bool ResourcesLoaded() { return s_StaticData.s_ResourcesInitialized; }
         static void Reset() 
         { 

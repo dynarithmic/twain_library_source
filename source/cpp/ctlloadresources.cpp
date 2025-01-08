@@ -433,6 +433,44 @@ namespace dynarithmic
                     imgNode.m_mapFromTo.insert(pr);
             }
         }
+        // Read in the file save constants when saving image to a file
+        std::vector<std::string> vParsedComponents;
+        auto& fileSaveMap = CTL_StaticData::GetFileSaveMap();
+        int fileType = 0;
+        while (std::getline(ifs, totalLine))
+        {
+            ++curLine;
+            if (totalLine == "END")
+                break;
+
+            // Parse the line containing the file save dialog information for the 
+            // file type being saved
+            StringWrapperA::TokenizeQuoted(totalLine, " ", vParsedComponents);
+            if (vParsedComponents.size() != 5)
+            {
+                retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = false;
+                retValue.m_dupInfo.lineNumber = curLine;
+                retValue.m_dupInfo.line = line;
+                return false;
+            }
+
+            try
+            {
+                fileType = std::stoi(vParsedComponents[0]);
+            }
+            catch (...)
+            {
+                retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = false;
+                retValue.m_dupInfo.lineNumber = curLine;
+                retValue.m_dupInfo.line = sCap;
+                return false;
+            }
+
+            fileSaveMap[fileType] = { fileType,
+                StringConversion::Convert_Ansi_To_Native(vParsedComponents[2]),
+                StringConversion::Convert_Ansi_To_Native(vParsedComponents[3]),
+                StringConversion::Convert_Ansi_To_Native(vParsedComponents[4]) };
+        }
         // Read in the minimum version number for this resource
         // Check if resource version if >= running version
         std::getline(ifs, totalLine);
