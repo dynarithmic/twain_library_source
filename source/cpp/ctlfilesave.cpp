@@ -22,18 +22,6 @@
 
 using namespace dynarithmic;
 
-#define CREATEFILEFORMATINFO(T,E) _T(T), _T(E), sizeof(T)-1
-
-struct FileNode
-{
-    int fileType;
-    LPCTSTR filter;
-    LPCTSTR extension;
-    int filtersize;
-    constexpr FileNode(int fType, LPCTSTR fil, LPCTSTR ext, int filSize) :
-        fileType(fType), filter(fil), extension(ext), filtersize(filSize - 1) {}
-};
-
 CTL_StringType dynarithmic::PromptForFileName(CTL_TwainDLLHandle* pHandle, CTL_TwainFileFormatEnum nFileAcquireType)
 {
     CTL_StringType szFilter;
