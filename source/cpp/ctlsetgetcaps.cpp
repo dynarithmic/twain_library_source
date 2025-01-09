@@ -532,7 +532,7 @@ static DTWAIN_BOOL SetCapValuesEx2_Internal( DTWAIN_SOURCE Source, LONG lCap, LO
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValues( DTWAIN_SOURCE Source, LONG lCap, LONG lSetType, DTWAIN_ARRAY pArray )
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCap, lSetType, pArray))
-    const DTWAIN_BOOL bRet = DTWAIN_SetCapValuesEx(Source, lCap, lSetType, DTWAIN_CONTDEFAULT, pArray);
+    const DTWAIN_BOOL bRet = DTWAIN_SetCapValuesEx2(Source, lCap, lSetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, pArray);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }

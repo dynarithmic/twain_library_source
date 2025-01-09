@@ -170,8 +170,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterStrings(DTWAIN_SOURCE Source, DTWAIN_A
         bRet = DTWAIN_SetCapValuesEx2(Source, DTWAIN_CV_CAPPRINTERSTRING, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, ArrayString)?true:false;
         if ( !bRet )
         // Try enumerations
-            bRet = DTWAIN_SetCapValuesEx(Source, DTWAIN_CV_CAPPRINTERSTRING, DTWAIN_CAPSETAVAILABLE,
-                                      DTWAIN_CONTENUMERATION, ArrayString)?true:false;
+            bRet = DTWAIN_SetCapValuesEx2(Source, DTWAIN_CV_CAPPRINTERSTRING, DTWAIN_CAPSETAVAILABLE, 
+                             DTWAIN_CONTENUMERATION, DTWAIN_DEFAULT, ArrayString)?true:false;
         if ( bRet )
         {
             if ( pNumStrings )
@@ -181,8 +181,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinterStrings(DTWAIN_SOURCE Source, DTWAIN_A
     else
     {
         // Try enumerations
-        bRet = DTWAIN_SetCapValuesEx(Source, DTWAIN_CV_CAPPRINTERSTRING, DTWAIN_CAPSETAVAILABLE,
-                                  DTWAIN_CONTENUMERATION, ArrayString)?true:false;
+        bRet = DTWAIN_SetCapValuesEx2(Source, DTWAIN_CV_CAPPRINTERSTRING, DTWAIN_CAPSETAVAILABLE,
+                         DTWAIN_CONTENUMERATION, DTWAIN_DEFAULT, ArrayString)?true:false;
         if ( bRet )
         {
             if ( pNumStrings )
