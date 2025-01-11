@@ -520,6 +520,7 @@ static AllCapInfo getAllCapInfo(CTL_ITwainSource* pSource)
 
 static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std::string>& allSources, LONG indentFactor, bool bWeOpenSource=false)
 {
+    static constexpr int numOneValueDeviceInfo = 12;
     const auto pHandle = ts.GetTwainDLLHandle();
     using boost::algorithm::join;
     using boost::adaptors::transformed;
@@ -556,7 +557,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
     glob_json["device-names"] = sNames;
     std::string jsonString;
     std::array<std::string,13> imageInfoString;
-    std::array<std::string,11> deviceInfoString;
+    std::array<std::string, numOneValueDeviceInfo> deviceInfoString;
 
     struct CloserRAII
     {
@@ -605,6 +606,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
         deviceInfoString[8] = "\"transparencyunit-supported\":false";
         deviceInfoString[9] = "\"extendedimageinfo-supported\":false"; 
         deviceInfoString[10] = "\"filesystem-supported\":false";
+        deviceInfoString[11] = "\"progessindicator-supported\":false";
         bool devOpen[] = { false, false };
 
         // Check if we need to select and open the source to see
@@ -862,15 +864,16 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     if (!customTypes.empty())
                         allFileTypes += "," + customTypes;
                     tempStrm << "\"filetype-info\":[" << allFileTypes << "]";
-                    imageInfoString[12] = tempStrm.str();
+                    imageInfoString[numOneValueDeviceInfo] = tempStrm.str();
 
                     strm.str("");
 
-                    std::array<int, 11> deviceInfoCaps = { CAP_FEEDERENABLED, CAP_FEEDERLOADED, CAP_UICONTROLLABLE,
+                    std::array<int, numOneValueDeviceInfo> deviceInfoCaps = { CAP_FEEDERENABLED, CAP_FEEDERLOADED, CAP_UICONTROLLABLE,
                                                           ICAP_AUTOBRIGHT, ICAP_AUTOMATICDESKEW,
-                                                          CAP_PRINTER, CAP_DUPLEX, CAP_JOBCONTROL, ICAP_LIGHTPATH, ICAP_EXTIMAGEINFO, 0};
+                                                          CAP_PRINTER, CAP_DUPLEX, CAP_JOBCONTROL, ICAP_LIGHTPATH, ICAP_EXTIMAGEINFO, 
+                                                          0, CAP_INDICATORS};
 
-                    std::array<std::string, 11> deviceInfoCapsStr; 
+                    std::array<std::string, numOneValueDeviceInfo> deviceInfoCapsStr;
                     std::copy(deviceInfoString.begin(), deviceInfoString.end(), deviceInfoCapsStr.begin());
                     for (auto& s : deviceInfoCapsStr)
                         s.resize(s.size() - 5);
@@ -962,6 +965,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     deviceInfoString[8] = "\"transparencyunit-supported\":\"" + sStatus + "\""; 
                     deviceInfoString[9] = "\"extendedimageinfo-supported\":\"" + sStatus + "\"";
                     deviceInfoString[10] = "\"filesystem-supported\":\"" + sStatus + "\"";
+                    deviceInfoString[11] = "\"progressindicator-supported\":\"" + sStatus + "\"";
                 }
                 std::string partString = "\"device-name\":\"" + curSource + "\",";
                 std::string strStatus;
