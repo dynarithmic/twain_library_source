@@ -140,14 +140,19 @@ CTL_StaticDataStruct::CTL_StaticDataStruct() :
 
 std::string CTL_StaticData::GetTwainNameFromConstantA(int lConstantType, TwainConstantType lTwainConstant)
 {
+    // Get the map of constant types
     auto& constantsmap = CTL_StaticData::GetTwainConstantsMap();
     auto iter1 = constantsmap.find(lConstantType);
     if (iter1 == constantsmap.end())
         return std::to_string(lTwainConstant);
+
+    // Now get the map of the constant value(s)
     auto iter2 = iter1->second.find(lTwainConstant);
     if (iter2 == iter1->second.end())
         return std::to_string(lTwainConstant);
-    return iter2->second;
+
+    // Return the first constant name (the primary name)
+    return iter2->second.front();
 }
 
 CTL_StringType CTL_StaticData::GetTwainNameFromConstant(int lConstantType, TwainConstantType lTwainConstant)

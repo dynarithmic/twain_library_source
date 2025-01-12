@@ -73,8 +73,8 @@ static TwainConstantType GetGenericTwainValue(LONG lConstantType, LPCTSTR name)
         return -1LL;
     auto& twainMap = iter1->second;
     const std::string s = StringConversion::Convert_Native_To_Ansi(name);
-    const auto iter = std::find_if(twainMap.begin(), twainMap.end(), [&](const CTL_TwainIDToStringMap::value_type& vt)
-                                   {return vt.second == s; });
+    const auto iter = std::find_if(twainMap.begin(), twainMap.end(), [&](const auto& vt)
+                                   {return std::find(vt.second.begin(), vt.second.end(), s) != vt.second.end(); });
     if (iter != twainMap.end())
         return iter->first;
     return -1LL;
