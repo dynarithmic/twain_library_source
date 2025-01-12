@@ -354,7 +354,11 @@ namespace dynarithmic
                 strm >> name;
                 std::replace(name.begin(), name.end(), '#', ' ');
                 name = StringWrapperA::TrimAll(name);
-                iter->second.insert({twainValue, name});
+
+                // Get all the names associated with this constant
+                std::vector<std::string> saNames;
+                StringWrapperA::Tokenize(name, ", ", saNames);
+                iter->second.insert({twainValue, saNames});
                 if (stringToConstantMap.find(name) != stringToConstantMap.end())
                 {
                     retValue.m_dupInfo.line = line;
@@ -363,7 +367,14 @@ namespace dynarithmic
                     retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_NODUPLICATE_ID] = false;
                     return false;
                 }
-                stringToConstantMap.insert({ name, twainValue });
+
+                // Always insert the special name that has more than one entry
+                if (saNames.size() > 1)
+                    stringToConstantMap.insert({ name, twainValue });
+
+                // Insert the actual entries
+                for (auto& oneName : saNames)
+                    stringToConstantMap.insert({ oneName, twainValue });
             }
         }
 

@@ -606,7 +606,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
         deviceInfoString[8] = "\"transparencyunit-supported\":false";
         deviceInfoString[9] = "\"extendedimageinfo-supported\":false"; 
         deviceInfoString[10] = "\"filesystem-supported\":false";
-        deviceInfoString[11] = "\"progessindicator-supported\":false";
+        deviceInfoString[11] = "\"progressindicator-supported\":false";
         bool devOpen[] = { false, false };
 
         // Check if we need to select and open the source to see

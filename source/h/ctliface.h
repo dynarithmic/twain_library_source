@@ -518,7 +518,7 @@ namespace dynarithmic
     typedef boost::container::flat_map<LONG, std::pair<std::string, std::string>> CTL_PDFMediaMap;
     typedef tsl::ordered_map<LONG, FileFormatNode> CTL_AvailableFileFormatsMap;
     using TwainConstantType = int64_t;
-    typedef tsl::ordered_map<TwainConstantType, std::string> CTL_TwainConstantToStringMapNode;
+    typedef tsl::ordered_map<TwainConstantType, std::vector<std::string>> CTL_TwainConstantToStringMapNode;
     typedef boost::container::flat_map<LONG, CTL_TwainConstantToStringMapNode> CTL_TwainConstantsMap;
     typedef boost::container::flat_map<TwainConstantType, std::string> CTL_TwainIDToStringMap;
     typedef boost::container::flat_map<int32_t, std::string> CTL_ErrorToExtraInfoMap;
