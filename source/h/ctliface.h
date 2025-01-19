@@ -485,7 +485,7 @@ namespace dynarithmic
         bool IsOpen() const { return m_Status[SOURCE_STATUS_OPEN]; }
         bool IsClosed() const { return !IsOpen(); }
         bool IsUnknown() const { return m_Status[SOURCE_STATUS_UNKNOWN]; }
-        SourceStatus& SetThreadID(std::string threadId) { m_ThreadId = threadId; return *this; }
+        SourceStatus& SetThreadID(const std::string& threadId) { m_ThreadId = threadId; return *this; }
         SourceStatus& SetSourceHandle(CTL_ITwainSource* Source) { m_pSource = Source; return *this; }
         std::string GetThreadID() const { return m_ThreadId; }
         CTL_ITwainSource* GetSourceHandle() const { return m_pSource; }
@@ -646,9 +646,9 @@ namespace dynarithmic
         static bool PerformResampling() { return s_StaticData.s_bDoResampling; }
         static CTL_PairToStringMap& GetResourceCache() { return s_StaticData.s_ResourceCache; }
         static CTL_StringToMapLongToStringMap& GetAllLanguagesResourceMap() { return s_StaticData.s_AllLoadedResourcesMap; }
-        static CTL_LongToStringMap* GetLanguageResource(std::string sLang);
+        static CTL_LongToStringMap* GetLanguageResource(const std::string& sLang);
         static std::string&         GetCurrentLanguageResourceKey() { return s_StaticData.s_CurrentResourceKey; }
-        static void SetCurrentLanguageResourceKey(std::string sLang) { s_StaticData.s_CurrentResourceKey = sLang; }
+        static void SetCurrentLanguageResourceKey(const std::string& sLang) { s_StaticData.s_CurrentResourceKey = sLang; }
         static CTL_LongToStringMap* GetCurrentLanguageResource();
         static CTL_GeneralResourceInfo& GetGeneralResourceInfo() { return s_StaticData.s_ResourceInfo; }
         static CTL_PDFMediaMap& GetPDFMediaMap() { return s_StaticData.s_PDFMediaMap; }
@@ -657,7 +657,7 @@ namespace dynarithmic
         static CTL_TwainConstantToStringMapNode& GetTwainConstantsStrings(LONG nWhich) { return s_StaticData.s_TwainConstantsMap[nWhich]; }
         static bool IsCheckHandles() { return s_StaticData.s_bCheckHandles; }
         static void SetCheckHandles(bool bSet) { s_StaticData.s_bCheckHandles = bSet; }
-        static std::pair<bool, TwainConstantType> GetIDFromTwainName(std::string sName);
+        static std::pair<bool, TwainConstantType> GetIDFromTwainName(const std::string& sName);
         static constexpr int GetDGResourceID() { return 8890; }
         static constexpr int GetDATResourceID() { return 8891; }
         static constexpr int GetMSGResourceID() { return 8892; }

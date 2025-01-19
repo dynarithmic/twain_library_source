@@ -124,7 +124,7 @@ namespace dynarithmic
             lineQueue.pop();
             lineQueue.push(line);
         }
-        auto crcVal = crc32_aux(0, (unsigned char*)totalBuf.data(), static_cast<unsigned int>(totalBuf.size()));
+        auto crcVal = crc32_aux(0, reinterpret_cast<unsigned char*>(totalBuf.data()), static_cast<unsigned int>(totalBuf.size()));
         try
         {
             uint64_t crc = std::stoul(lineQueue.front());
