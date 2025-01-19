@@ -28,6 +28,9 @@ OF THIRD PARTY RIGHTS.
 #undef min
 #undef max
 #include "pdfencrypt.h"
+
+#include "aes.h"
+#include "modes.h"
 #include "../cryptolib/filters.h"
 #include "../cryptolib/md5.h"
 
@@ -494,47 +497,40 @@ void PDFEncryptionRC4::Encrypt(char *dataIn, int len)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#if 0
 void PDFEncryptionAES::PrepareKey()
 {
-/*  PrepareRC4Key(key, 0, keySize);
+    PrepareRC4Key(key, 0, keySize);
     IVGenerator iv;
     PDFEncryption::UCHARArray arr = iv.getIV(CryptoPP::AES::BLOCKSIZE);
-    memcpy(m_ivValue, &arr[0], CryptoPP::AES::BLOCKSIZE);*/
+    memcpy(m_ivValue, &arr[0], CryptoPP::AES::BLOCKSIZE);
 }
 
 // save encrypted data to new string
 void PDFEncryptionAES::Encrypt(const std::string& dataIn, std::string& dataOut)
 {
-/*  CryptoPP::AES::Encryption aesEncryption(&key[0], CryptoPP::AES::DEFAULT_KEYLENGTH);
+    CryptoPP::AES::Encryption aesEncryption(&key[0], CryptoPP::AES::DEFAULT_KEYLENGTH);
     CryptoPP::CBC_Mode_ExternalCipher::Encryption cbcEncryption(aesEncryption, m_ivValue);
     CryptoPP::StreamTransformationFilter stfEncryptor(cbcEncryption, new CryptoPP::StringSink(dataOut));
     stfEncryptor.Put(reinterpret_cast<const unsigned char*>(dataIn.c_str()), dataIn.length() + 1);
-    stfEncryptor.MessageEnd();*/
+    stfEncryptor.MessageEnd();
 }
 
 PDFEncryption::UCHARArray PDFEncryptionAES::GetExtendedKey(int number, int generation)
 {
     // copies "sAlT" to extended key string
-/*  const char AESString[] = { 0x73, 0x41, 0x6c, 0x54 };
+    constexpr char AESString[] = { 0x73, 0x41, 0x6c, 0x54 };
 
     // first get the original MD5 key string
     UCHARArray extra = PDFEncryption::GetExtendedKey(number, generation);
 
     // now attach "sAlT" string to this
-    std::copy(AESString, AESString + 4, std::back_inserter(extra));
+    std::copy_n(AESString, 4, std::back_inserter(extra));
 
-    return extra;*/
-    return UCHARArray();
+    return extra;
 }
-#endif
 
 // save encrypted data
-/*void PDFEncryptionRC4::Encrypt(char *dataIn, int len)
+void PDFEncryptionAES::Encrypt(char *dataIn, int len)
 {
-    UCHARArray dIn(len);
-    std::copy(dataIn, dataIn + len, dIn.begin());
-    EncryptRC4(dIn);
-    std::copy(dIn.begin(), dIn.end(), dataIn);
-}*/
+}
 
