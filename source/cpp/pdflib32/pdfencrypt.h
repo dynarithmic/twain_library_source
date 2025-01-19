@@ -22,6 +22,8 @@ OF THIRD PARTY RIGHTS.
 #define PDFENCRYPT_H
 #include <vector>
 #include <string>
+
+#include "aes.h"
 //#include "..\cryptolib\md5.h"
 //#include "..\cryptolib\aes.h"
 
@@ -84,7 +86,7 @@ class PDFEncryption
 
     public:
         PDFEncryption();
-        virtual ~PDFEncryption() {}
+        virtual ~PDFEncryption() = default;
         UCHARArray ComputeOwnerKey(const UCHARArray& userPad,
                                    const UCHARArray& ownerPad,
                                    bool strength128Bits);
@@ -118,7 +120,7 @@ class PDFEncryptionRC4 : public PDFEncryption
         void PrepareKey() override;
 
 };
-/*
+
 class PDFEncryptionAES: public PDFEncryption
 {
     protected:
@@ -126,9 +128,9 @@ class PDFEncryptionAES: public PDFEncryption
     private:
         unsigned char m_ivValue[CryptoPP::AES::BLOCKSIZE];
     public:
-        void Encrypt(const std::string& dataIn, std::string& dataOut);
-//      void Encrypt(char *dataIn, int len);
-        void PrepareKey();
-};*/
+        void Encrypt(const std::string& dataIn, std::string& dataOut) override;
+        void Encrypt(char *dataIn, int len) override;
+        void PrepareKey() override;
+};
 
 #endif
