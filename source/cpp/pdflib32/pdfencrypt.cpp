@@ -497,6 +497,8 @@ void PDFEncryptionRC4::Encrypt(char *dataIn, int len)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///
+#ifdef DTWAIN_SUPPORT_AES
 void PDFEncryptionAES::PrepareKey()
 {
     PrepareRC4Key(key, 0, keySize);
@@ -529,8 +531,13 @@ PDFEncryption::UCHARArray PDFEncryptionAES::GetExtendedKey(int number, int gener
     return extra;
 }
 
+
 // save encrypted data
 void PDFEncryptionAES::Encrypt(char *dataIn, int len)
 {
 }
+#else
+    #pragma message ("AES encryption is not supported")
+#endif
+
 
