@@ -23,7 +23,9 @@ OF THIRD PARTY RIGHTS.
 #include <vector>
 #include <string>
 
-#include "aes.h"
+#ifdef DTWAIN_SUPPORT_AES
+    #include "aes.h"
+#endif
 //#include "..\cryptolib\md5.h"
 //#include "..\cryptolib\aes.h"
 
@@ -121,6 +123,7 @@ class PDFEncryptionRC4 : public PDFEncryption
 
 };
 
+#ifdef DTWAIN_SUPPORT_AES
 class PDFEncryptionAES: public PDFEncryption
 {
     protected:
@@ -132,5 +135,5 @@ class PDFEncryptionAES: public PDFEncryption
         void Encrypt(char *dataIn, int len) override;
         void PrepareKey() override;
 };
-
+#endif
 #endif

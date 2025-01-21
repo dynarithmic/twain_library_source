@@ -2295,7 +2295,9 @@ void PdfDocument::SetEncryption(const CTL_StringType& ownerPassword,
     // set the encryption to AES
     if (m_bIsAESEncrypted)
     {
+#ifdef DTWAIN_SUPPORT_AES
         m_Encryption.reset(new PDFEncryptionAES);
+#endif
         m_bIsStrongEncryption = true; // always uses strong encryption for AES
 
         // must set to PDF version 1.6
