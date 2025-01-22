@@ -28,4 +28,9 @@ OF THIRD PARTY RIGHTS.
    Note that DTWAIN_BUILD_LOGCALLSTACK must be 1 for this to take effect */
 #define DTWAIN_BUILD_LOGPOINTERS 1
 
+/* This indicates that the build requires Visual C++ runtime if set to 1*/
+/* Since there is no way to set the runtime to use at compile time, this */
+/* setting must match the link-time options */
+#define DTWAIN_BUILD_NEEDVCRUNTIME 0
+
 #endif
