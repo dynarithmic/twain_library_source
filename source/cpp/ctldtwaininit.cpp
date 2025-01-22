@@ -2189,6 +2189,7 @@ CTL_StringType dynarithmic::GetVersionString()
             s += " [Debug]";
 
         s += DTWAIN_BUILD_LOGGINGNAME;
+        s += DTWAIN_VCRUNTIME_BUILDNAME;
         s += " ";
         s += sBits;
         StringStreamA strm;
