@@ -2798,3 +2798,4 @@ SourceToXferReadyMap CTL_TwainAppMgr::s_SourceToXferReadyMap;
 SourceToXferReadyList CTL_TwainAppMgr::s_SourceToXferReadyList;
 SourceFlatbedOnlyList CTL_TwainAppMgr::s_SourceFlatbedOnlyList;
 SourcePeekMessageList CTL_TwainAppMgr::s_SourcePeekMessageList;
+SourcePaperDetectableMap CTL_TwainAppMgr::s_SourcePaperDetectableMap;

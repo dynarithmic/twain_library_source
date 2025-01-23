@@ -1388,15 +1388,12 @@ Save(FreeImageIO *io, FIBITMAP *dib, fi_handle handle, int page, int flags, void
 		}
 
 		// write the bitmap data... if RLE compression is enable, use it
-
 		if ((dst_bpp == 8) && ((flags & BMP_SAVE_RLE) == BMP_SAVE_RLE)) {
-			BYTE *buffer = (BYTE*)malloc(dst_pitch * 2 * sizeof(BYTE));
-
+			std::vector<BYTE> buffer(dst_pitch * 2 * sizeof(BYTE));
 			for (unsigned i = 0; i < dst_height; ++i) {
-				int size = RLEEncodeLine(buffer, FreeImage_GetScanLine(dib, i), FreeImage_GetLine(dib));
+				int size = RLEEncodeLine(buffer.data(), FreeImage_GetScanLine(dib, i), FreeImage_GetLine(dib));
 
-				if (io->write_proc(buffer, size, 1, handle) != 1) {
-					free(buffer);
+				if (io->write_proc(buffer.data(), size, 1, handle) != 1) {
 					return FALSE;
 				}
 			}
@@ -1404,12 +1401,11 @@ Save(FreeImageIO *io, FIBITMAP *dib, fi_handle handle, int page, int flags, void
 			buffer[0] = RLE_COMMAND;
 			buffer[1] = RLE_ENDOFBITMAP;
 
-			if (io->write_proc(buffer, 2, 1, handle) != 1) {
-				free(buffer);
+			if (io->write_proc(buffer.data(), 2, 1, handle) != 1) {
 				return FALSE;
 			}
 
-			free(buffer);
+//			free(buffer);
 #ifdef FREEIMAGE_BIGENDIAN
 		} else if (bpp == 16) {
 			int padding = dst_pitch - dst_width * sizeof(WORD);

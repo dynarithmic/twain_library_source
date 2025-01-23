@@ -33,6 +33,7 @@ using namespace dynarithmic;
 static void LogAndCachePixelTypes(CTL_ITwainSource *p);
 static void DetermineIfSpecialXfer(CTL_ITwainSource* p);
 static void DetermineIfPeekMessage(CTL_ITwainSource* p);
+static void DetermineIfPaperDetectable(CTL_ITwainSource* p);
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSourcesOnSelect(DTWAIN_BOOL bSet)
 {
@@ -82,12 +83,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     DTWAINArrayPtr_RAII raii(pHandle, &arr);
     CTL_TwainAppMgr::GatherCapabilityInfo(pSource);
 
+    // See if there is an override for paper detectable
+    DetermineIfPaperDetectable(pSource);
+
     // If this source has a feeder, check the status of whether we should check.
     // If the check is on, add it to the feeder sources container.
     //
-    // Since this operation may rely on the device hardware to respond to CAP_FEEDERLOADED
+    // Since this operation may rely on the device hardware to respond to CAP_PAPERDETECTABLE
     // there is an optional check done that can be set in the DTWAIN INI file(s).
-    if (pHandle->m_OnSourceOpenProperties.m_bCheckFeederStatusOnOpen && DTWAIN_IsFeederSensitive(Source))
+    if (pHandle->m_OnSourceOpenProperties.m_bCheckFeederStatusOnOpen && DTWAIN_IsPaperDetectable(Source))
         pHandle->m_aFeederSources.insert(Source);
 
     // Get the supported transfer types
@@ -273,6 +277,26 @@ void DetermineIfSpecialXfer(CTL_ITwainSource* p)
             // Add this source as one that will require special MSG_XFERREADY processing
             auto insertPr = xfer_map.insert({ sourceName, {} });
             insertPr.first->second.m_MaxThreshold = iterSearch->second;
+            return;
+        }
+        ++iterSearch;
+    }
+}
+
+void DetermineIfPaperDetectable(CTL_ITwainSource* p)
+{
+    using wildcards::match;
+    auto& paperdetectable_map = CTL_TwainAppMgr::GetSourcePaperDetectionMap();
+    std::string sourceName = p->GetProductNameA();
+
+    // Search map for a matching name
+    auto iterSearch = paperdetectable_map.begin();
+    while (iterSearch != paperdetectable_map.end())
+    {
+        bool matches = match(sourceName, iterSearch->first);
+        if (matches)
+        {
+            p->SetFeederSensitive(iterSearch->second);
             return;
         }
         ++iterSearch;

@@ -44,7 +44,7 @@ static std::string remove_quotes(std::string s)
 }
 
 template <typename T>
-static void create_stream(std::stringstream& strm, DTWAIN_SOURCE Source, LONG capValue)
+static void create_stream(std::stringstream& strm, DTWAIN_SOURCE Source, LONG capValue, LONG twainConstantID, bool useTwainName = false)
 {
     DTWAIN_ARRAY arr = nullptr;
     DTWAIN_GetCapValuesEx2(Source, capValue, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
@@ -62,11 +62,37 @@ static void create_stream(std::stringstream& strm, DTWAIN_SOURCE Source, LONG ca
 
             // check if range
             LONG status;
-            if (DTWAIN_RangeIsValid(arr, &status))
+            bool isRange = DTWAIN_GetCapContainer(Source, capValue, DTWAIN_CAPGET) == DTWAIN_CONTRANGE;
+            if (isRange && DTWAIN_RangeIsValid(arr, &status))
                 strm << "\"data-type\":\"range\",";
             else
                 strm << "\"data-type\":\"discrete\",";
-            strm << "\"data-values\":[" << join_string(vValues.begin(), vValues.end()) << "]}";
+            std::string joined_names;
+            if constexpr (std::is_integral_v<T>)
+            {
+                char szConstantName[100] = {};
+                if (!isRange && useTwainName)
+                {
+                    std::vector<std::string> vTwainNames;
+                    for (auto& val : vValues)
+                    {
+                        DTWAIN_GetTwainNameFromConstantA(twainConstantID, val, szConstantName, 99);
+                        std::vector<std::string> saParsedNames;
+                        StringWrapperA::Tokenize(szConstantName, ", ", saParsedNames);
+                        for (auto& sName : saParsedNames)
+                        {
+                            std::string sTotalName = "\"" + std::string(sName) + "\"";
+                            vTwainNames.push_back(sTotalName);
+                        }
+                    }
+                    joined_names = join_string(vTwainNames.begin(), vTwainNames.end());
+                }
+                else
+                    joined_names = join_string(vValues.begin(), vValues.end());
+            }
+            else
+                joined_names = join_string(vValues.begin(), vValues.end());
+            strm << "\"data-values\":[" << joined_names << "]}";
         }
     }
     else
@@ -494,6 +520,7 @@ static AllCapInfo getAllCapInfo(CTL_ITwainSource* pSource)
 
 static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std::string>& allSources, LONG indentFactor, bool bWeOpenSource=false)
 {
+    static constexpr int numOneValueDeviceInfo = 12;
     const auto pHandle = ts.GetTwainDLLHandle();
     using boost::algorithm::join;
     using boost::adaptors::transformed;
@@ -530,7 +557,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
     glob_json["device-names"] = sNames;
     std::string jsonString;
     std::array<std::string,13> imageInfoString;
-    std::array<std::string,11> deviceInfoString;
+    std::array<std::string, numOneValueDeviceInfo> deviceInfoString;
 
     struct CloserRAII
     {
@@ -579,6 +606,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
         deviceInfoString[8] = "\"transparencyunit-supported\":false";
         deviceInfoString[9] = "\"extendedimageinfo-supported\":false"; 
         deviceInfoString[10] = "\"filesystem-supported\":false";
+        deviceInfoString[11] = "\"progressindicator-supported\":false";
         bool devOpen[] = { false, false };
 
         // Check if we need to select and open the source to see
@@ -643,7 +671,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                             char szName[20];
                             DTWAIN_GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWPT, pr.first, szName, 20);
                             std::string sName = szName;
-                            vPixNames.push_back(StringWrapperA::LowerCase(sName.substr(5)));
+                            vPixNames.push_back(sName);
                             vPixNamesEx.push_back("\"" + vPixNames.back() + "\"");
                         }
                         strm << "\"num-colors\":" << pixInfo.size() << ",";
@@ -653,11 +681,11 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         std::string joinStr = join_string(vPixNamesEx.begin(), vPixNamesEx.end());
                         strm << "\"color-types\":[" << joinStr << "],";
 
-                        strm2 << "\"bitdepthinfo\":{";
+                        strm2 << "\"bitdepth-info\":{";
                         int depthCount = 0;
                         for (auto& pr : pixInfo)
                         {
-                            strm2 << "\"depth_" << vPixNames[depthCount] << "\":[";
+                            strm2 << "\"" << vPixNames[depthCount] << "\":[";
                             std::string bdepthStr = join_string(pr.second.begin(), pr.second.end());
                             strm2 << bdepthStr << "],";
                             ++depthCount;
@@ -771,10 +799,10 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         strm.str("");
                         strm << imageInfoCapsStr[curImageCap];
                         if (imageInfoCaps[curImageCap] == ICAP_ORIENTATION)
-                            create_stream<LONG>(strm, pCurrentSourcePtr, ICAP_ORIENTATION);
+                            create_stream<LONG>(strm, pCurrentSourcePtr, ICAP_ORIENTATION, DTWAIN_CONSTANT_TWOR, true);
                         else
                         if (imageInfoCaps[curImageCap] == ICAP_OVERSCAN)
-                            create_stream<LONG>(strm, pCurrentSourcePtr, ICAP_OVERSCAN);
+                            create_stream<LONG>(strm, pCurrentSourcePtr, ICAP_OVERSCAN, DTWAIN_CONSTANT_TWOV, true);
                         else
                         if (imageInfoCaps[curImageCap] == ICAP_HALFTONES)
                             create_stream_from_strings<DefaultStringFnGetter>(strm, pCurrentSourcePtr, ICAP_HALFTONES);
@@ -784,7 +812,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                             create_stream_from_strings<CameraSystemStringFnGetter>(strm, pCurrentSourcePtr, 0);
                         }
                         else
-                            create_stream<double>(strm, pCurrentSourcePtr, imageInfoCaps[curImageCap]);
+                            create_stream<double>(strm, pCurrentSourcePtr, imageInfoCaps[curImageCap], 0);
                         imageInfoString[curImageCap] = strm.str();
                     }
 
@@ -836,15 +864,16 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     if (!customTypes.empty())
                         allFileTypes += "," + customTypes;
                     tempStrm << "\"filetype-info\":[" << allFileTypes << "]";
-                    imageInfoString[12] = tempStrm.str();
+                    imageInfoString[numOneValueDeviceInfo] = tempStrm.str();
 
                     strm.str("");
 
-                    std::array<int, 11> deviceInfoCaps = { CAP_FEEDERENABLED, CAP_FEEDERLOADED, CAP_UICONTROLLABLE,
+                    std::array<int, numOneValueDeviceInfo> deviceInfoCaps = { CAP_FEEDERENABLED, CAP_FEEDERLOADED, CAP_UICONTROLLABLE,
                                                           ICAP_AUTOBRIGHT, ICAP_AUTOMATICDESKEW,
-                                                          CAP_PRINTER, CAP_DUPLEX, CAP_JOBCONTROL, ICAP_LIGHTPATH, ICAP_EXTIMAGEINFO, 0};
+                                                          CAP_PRINTER, CAP_DUPLEX, CAP_JOBCONTROL, ICAP_LIGHTPATH, ICAP_EXTIMAGEINFO, 
+                                                          0, CAP_INDICATORS};
 
-                    std::array<std::string, 11> deviceInfoCapsStr; 
+                    std::array<std::string, numOneValueDeviceInfo> deviceInfoCapsStr;
                     std::copy(deviceInfoString.begin(), deviceInfoString.end(), deviceInfoCapsStr.begin());
                     for (auto& s : deviceInfoCapsStr)
                         s.resize(s.size() - 5);
@@ -936,6 +965,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     deviceInfoString[8] = "\"transparencyunit-supported\":\"" + sStatus + "\""; 
                     deviceInfoString[9] = "\"extendedimageinfo-supported\":\"" + sStatus + "\"";
                     deviceInfoString[10] = "\"filesystem-supported\":\"" + sStatus + "\"";
+                    deviceInfoString[11] = "\"progressindicator-supported\":\"" + sStatus + "\"";
                 }
                 std::string partString = "\"device-name\":\"" + curSource + "\",";
                 std::string strStatus;

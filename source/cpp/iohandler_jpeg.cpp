@@ -21,6 +21,7 @@
 #include "ctldib.h"
 #include "ctliface.h"
 #include "FreeImage.h"
+
 using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CTL_JpegIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct*)

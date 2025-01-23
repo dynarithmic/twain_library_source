@@ -81,6 +81,7 @@ namespace dynarithmic
             int     WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE *pImage2, UINT32 wid, UINT32 ht,
                                UINT32 bpp, UINT32 cpal, RGBQUAD *pPal, void *pUserInfo= nullptr) override;
 
+
             void SetMultiPageStatus(DibMultiPageStruct *pStruct) override;
             void GetMultiPageStatus(DibMultiPageStruct *pStruct) override;
 
