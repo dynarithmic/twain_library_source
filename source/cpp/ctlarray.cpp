@@ -972,10 +972,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtString(DTWAIN_ARRAY pArray, LONG nWher
     bool bRet = false;
     if (checkStatus.IsAnsiArray())
         bRet = StringGetterEx<CTL_StringTypeA, CTL_StringType>(pHandle, pArray, nWhere, pStr, 
-                                [](CTL_StringTypeA& val) {return StringConversion::Convert_Ansi_To_Native(val); });
+                                [](const CTL_StringTypeA& val) {return StringConversion::Convert_Ansi_To_Native(val); });
     else
         bRet = StringGetterEx<CTL_StringTypeW, CTL_StringType>(pHandle, pArray, nWhere, pStr,
-                                [](CTL_StringTypeW& val) {return StringConversion::Convert_Wide_To_Native(val); });
+                                [](const CTL_StringTypeW& val) {return StringConversion::Convert_Wide_To_Native(val); });
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStr))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)

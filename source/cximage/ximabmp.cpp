@@ -156,7 +156,7 @@ bool CxImageBMP::Decode(CxFile * hFile)
 			if (bf.bfOffBits != 0L) hFile->Seek(off + bf.bfOffBits,SEEK_SET);
 			if (dwCompression == BI_BITFIELDS || dwCompression == BI_RGB){
 				int32_t imagesize=4*head.biHeight*head.biWidth;
-				std::vector<uint8_t> buff32(imagesize); // = (uint8_t*)malloc(imagesize);
+				std::vector<uint8_t> buff32(imagesize); 
 				hFile->Read(buff32.data(), imagesize,1); // read in the pixels
 
 #if CXIMAGE_SUPPORT_ALPHA

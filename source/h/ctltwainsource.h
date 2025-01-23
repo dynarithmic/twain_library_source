@@ -462,12 +462,14 @@ namespace dynarithmic
         std::pair<boost::logic::tribool, int> GetDuplexSupport() const { return m_tbIsDuplexSupported; }
         boost::logic::tribool IsAudioTransferSupported() const { return m_tbIsAudioTransferSupported; }
         boost::logic::tribool IsUIControllable() const { return m_tbUIControllable; }
+        boost::logic::tribool IsFeederSensitive() const { return m_tbIsFeederSensitive; }
         void         SetFileSystemSupported(bool bSet) { m_tbIsFileSystemSupported = bSet; }
         void         SetBufferedTileModeSupported(bool bSet) { m_tbIsTileModeSupported = bSet; }
         void         SetFeederSupported(bool bSet) { m_tbIsFeederSupported = bSet; }
         void         SetDuplexSupport(bool bSet, int duplexType) { m_tbIsDuplexSupported = { bSet,duplexType }; }
         void         SetAudioTransferSupported(bool bSet) { m_tbIsAudioTransferSupported = bSet; }
         void         SetUIControllable(bool bSet) { m_tbUIControllable = bSet; }
+        void         SetFeederSensitive(bool bSet) { m_tbIsFeederSensitive = bSet; }
         TW_IMAGEMEMXFER& GetBufferedXFerInfo() { return m_BufferedXFerInfo; }
         CTL_ExtImageInfoTriplet* GetExtImageInfoTriplet();
         void        SetShutdownAcquire(bool bSet) { m_bShutdownAcquire = bSet; }
@@ -616,6 +618,7 @@ namespace dynarithmic
         std::pair<boost::logic::tribool, int> m_tbIsDuplexSupported;
         boost::logic::tribool m_tbIsAudioTransferSupported;
         boost::logic::tribool m_tbUIControllable;
+        boost::logic::tribool m_tbIsFeederSensitive;
         CTL_TwainDLLHandle* m_pDLLHandle;
         TW_IMAGEMEMXFER m_BufferedXFerInfo;
 

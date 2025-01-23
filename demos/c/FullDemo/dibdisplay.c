@@ -152,14 +152,15 @@ LRESULT CALLBACK DisplayDIBProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 
             /* Enable/Disabe Next, Prev buttons */
             nCurrentAcquisition = 0;
-            EnablePageButtons(hWndPrev, hWndNext, hWndCurPage, hWndNumPages, 
-                hwndPage, hWndOf, hwndBlank, nCurDib,
-                (int)nCurrentAcquisition, AcquireArray);
 
-            /* Fill Acquisition Combo */
-			if (!DisplayOne)
+            if (!DisplayOne)
 			{
-				nCount = DTWAIN_GetNumAcquisitions(AcquireArray);
+                /* Enable/Disable Next, Prev buttons */
+                EnablePageButtons(hWndPrev, hWndNext, hWndCurPage, hWndNumPages,
+                    hwndPage, hWndOf, hwndBlank, nCurDib,
+                    (int)nCurrentAcquisition, AcquireArray);
+
+                nCount = DTWAIN_GetNumAcquisitions(AcquireArray);
 				for (i = 1; i <= nCount; i++)
 				{
 					wsprintf(sz, _T("%d"), i);
@@ -280,6 +281,10 @@ void EnablePageButtons(HWND hPrev, HWND hNext, HWND hWndCurPage, HWND hWndNumPag
 {
     TCHAR szNum1[10];
     TCHAR szNum2[10];
+
+    /* There are no page buttons, since there is only one DIB */
+    if (!AcquireArray)
+        return;
 
     /* Get number of acquired images */
     LONG nCount = DTWAIN_GetNumAcquiredImages(AcquireArray, nCurrentAcquisition);

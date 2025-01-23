@@ -75,9 +75,9 @@ namespace dynarithmic
     }
 }
 
-    bool PDFInterface::DTWLIB_PDFStartCreation(PdfDocumentPtr pDoc)
+    bool PDFInterface::DTWLIB_PDFStartCreation(PdfDocumentPtr pDoc, int majorv, int minorv)
     {
-        return pDoc->StartPDFCreation();
+        return pDoc->StartPDFCreation(majorv, minorv);
     }
 
     bool PDFInterface::DTWLIB_PDFEndCreation(PdfDocumentPtr pDoc)

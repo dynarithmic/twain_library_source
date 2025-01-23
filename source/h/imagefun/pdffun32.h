@@ -44,7 +44,7 @@ namespace dynarithmic
         bool DTWLIB_PDFOpenNewFile(PdfDocumentPtr pDoc, LPCTSTR szFile);
         void DTWLIB_PDFSetCompression(PdfDocumentPtr pDoc, bool bCompress);
         void DTWLIB_PDFSetNameField(PdfDocumentPtr pDoc, int32_t nWhich, const char* szName);
-        bool DTWLIB_PDFStartCreation(PdfDocumentPtr pDoc);
+        bool DTWLIB_PDFStartCreation(PdfDocumentPtr pDoc, int majorv, int minorv);
         bool DTWLIB_PDFEndCreation(PdfDocumentPtr pDoc);
         void DTWLIB_PDFSetImageType(PdfDocumentPtr pDoc, int32_t iType);
         void DTWLIB_PDFSetLongField(PdfDocumentPtr pDoc, int32_t nWhich, int32_t nValue);

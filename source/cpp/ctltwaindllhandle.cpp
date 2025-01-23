@@ -106,16 +106,53 @@ CTL_StaticDataStruct        CTL_StaticData::s_StaticData;
 std::unique_ptr<CSimpleIniA>   CTL_StaticData::s_iniInterface;
 std::mutex                  CTL_StaticData::s_mutexInitDestroy;
 
+FileSaveNode::FileSaveNode() : m_FileType(0) {}
+
+FileSaveNode::FileSaveNode(int fType, CTL_StringType filter1, CTL_StringType filter2, CTL_StringType ext) : m_FileType(fType)
+{
+    m_sTotalFilter = filter1;
+    m_sTotalFilter += _T('\0');
+    m_sTotalFilter += filter2;
+    m_sTotalFilter.append(_T("\0\0"), 2);
+    m_sExtension = ext;
+}
+
+CTL_StaticDataStruct::CTL_StaticDataStruct() : 
+    s_aINIKeys{ 
+                {{INI_SOURCEXFERWAITINFO_KEY,    "SourceXferWaitInfo",   },
+                {INI_TWAINLOOPPEEK_KEY,          "TwainLoopPeek",        },
+                {INI_PAPERDETECTIONSTATUS_KEY,   "PaperDetectionStatus", },
+                {INI_FLATBEDONLY_KEY,            "FlatbedOnly",          },
+                {INI_SOURCEOPENPROPS_KEY,        "SourceOpenProps",      },
+                {INI_CHECKFEEDERSTATUS_ITEM,     "CheckFeederStatus",    },
+                {INI_QUERYBESTCAPCONTAINER_ITEM, "QueryBestCapContainer",},
+                {INI_QUERYCAPOPERATIONS_ITEM,    "QueryCapOperations",   },
+                {INI_IMAGEGILE_KEY,              "ImageFile",            },
+                {INI_MISCELLANEOUS_KEY,          "Miscellaneous",        },
+                {INI_RESOURCECHECK_ITEM,         "resourcecheck",        },
+                {INI_RESAMPLE_ITEM,              "resample",             },
+                {INI_OCRLIBRARY_KEY,             "OCRLibrary",           },
+                {INI_LANGUAGE_KEY,               "language",             },
+                {INI_DEFAULT_ITEM,               "default",              },
+                {INI_SOURCES_KEY,                "Sources",              },
+                {INI_DSMERRORLOGGING_KEY,        "DSMErrorLogging"}}
+             } {}
+
 std::string CTL_StaticData::GetTwainNameFromConstantA(int lConstantType, TwainConstantType lTwainConstant)
 {
+    // Get the map of constant types
     auto& constantsmap = CTL_StaticData::GetTwainConstantsMap();
     auto iter1 = constantsmap.find(lConstantType);
     if (iter1 == constantsmap.end())
         return std::to_string(lTwainConstant);
+
+    // Now get the map of the constant value(s)
     auto iter2 = iter1->second.find(lTwainConstant);
     if (iter2 == iter1->second.end())
         return std::to_string(lTwainConstant);
-    return iter2->second;
+
+    // Return the first constant name (the primary name)
+    return iter2->second.front();
 }
 
 CTL_StringType CTL_StaticData::GetTwainNameFromConstant(int lConstantType, TwainConstantType lTwainConstant)
@@ -128,7 +165,7 @@ std::wstring CTL_StaticData::GetTwainNameFromConstantW(int lConstantType, TwainC
     return StringConversion::Convert_Ansi_To_Wide(CTL_StaticData::GetTwainNameFromConstantA(lConstantType, lTwainConstant));
 }
 
-CTL_LongToStringMap* CTL_StaticData::GetLanguageResource(std::string sLang)
+CTL_LongToStringMap* CTL_StaticData::GetLanguageResource(const std::string& sLang)
 {
     auto iter = s_StaticData.s_AllLoadedResourcesMap.find(sLang);
     if (iter != s_StaticData.s_AllLoadedResourcesMap.end())
@@ -147,7 +184,7 @@ void CTL_TwainDLLHandle::NotifyWindows(UINT /*nMsg*/, WPARAM /*wParam*/, LPARAM 
 {
 }
 
-std::pair<bool, TwainConstantType> CTL_StaticData::GetIDFromTwainName(std::string sName)
+std::pair<bool, TwainConstantType> CTL_StaticData::GetIDFromTwainName(const std::string& sName)
 {
     auto& constantsMap = CTL_StaticData::GetStringToConstantMap();
     auto iter = constantsMap.find(sName);

@@ -29,20 +29,11 @@
  * TIFF I/O library definitions which provide C++ streams API.
  */
 
-#include <iostream>
 #include "tiff.h"
 #include "tiffio.h"
+#include <iostream>
 
 extern TIFF* TIFFStreamOpen(const char*, std::ostream *);
 extern TIFF* TIFFStreamOpen(const char*, std::istream *);
 
 #endif /* _TIFFIO_HXX_ */
-
-/* vim: set ts=8 sts=8 sw=8 noet: */
-/*
- * Local Variables:
- * mode: c++
- * c-basic-offset: 8
- * fill-column: 78
- * End:
- */

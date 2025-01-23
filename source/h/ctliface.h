@@ -485,7 +485,7 @@ namespace dynarithmic
         bool IsOpen() const { return m_Status[SOURCE_STATUS_OPEN]; }
         bool IsClosed() const { return !IsOpen(); }
         bool IsUnknown() const { return m_Status[SOURCE_STATUS_UNKNOWN]; }
-        SourceStatus& SetThreadID(std::string threadId) { m_ThreadId = threadId; return *this; }
+        SourceStatus& SetThreadID(const std::string& threadId) { m_ThreadId = threadId; return *this; }
         SourceStatus& SetSourceHandle(CTL_ITwainSource* Source) { m_pSource = Source; return *this; }
         std::string GetThreadID() const { return m_ThreadId; }
         CTL_ITwainSource* GetSourceHandle() const { return m_pSource; }
@@ -502,18 +502,30 @@ namespace dynarithmic
         }
     };
 
+    struct FileSaveNode
+    {
+        int m_FileType;
+        CTL_StringType m_sTotalFilter;
+        CTL_StringType m_sExtension;
+        FileSaveNode();
+        FileSaveNode(int fType, CTL_StringType filter1, CTL_StringType filter2, CTL_StringType ext);
+        CTL_StringType& GetTotalFilter() { return m_sTotalFilter; }
+        CTL_StringType& GetExtension() { return m_sExtension; }
+    };
+
     typedef std::map<std::string, SourceStatus> SourceStatusMap;
     typedef boost::container::flat_map<int, ImageResamplerData> ImageResamplerMap;
     typedef boost::container::flat_map<LONG, std::pair<std::string, std::string>> CTL_PDFMediaMap;
     typedef tsl::ordered_map<LONG, FileFormatNode> CTL_AvailableFileFormatsMap;
     using TwainConstantType = int64_t;
-    typedef tsl::ordered_map<TwainConstantType, std::string> CTL_TwainConstantToStringMapNode;
+    typedef tsl::ordered_map<TwainConstantType, std::vector<std::string>> CTL_TwainConstantToStringMapNode;
     typedef boost::container::flat_map<LONG, CTL_TwainConstantToStringMapNode> CTL_TwainConstantsMap;
     typedef boost::container::flat_map<TwainConstantType, std::string> CTL_TwainIDToStringMap;
     typedef boost::container::flat_map<int32_t, std::string> CTL_ErrorToExtraInfoMap;
     typedef boost::container::flat_map<std::string, unsigned long> CTL_ThreadMap;
     typedef boost::container::flat_map<std::string, TwainConstantType> CTL_StringToConstantMap;
     typedef boost::container::flat_map<TW_UINT16, TW_INFO> CTL_UINT16ToInfoMap;
+    typedef boost::container::flat_map<int, FileSaveNode> CTL_FileSaveMap;
 
     typedef std::unordered_map<std::pair<LONG, std::string>, std::string, CacheKeyHash> CTL_PairToStringMap;
 
@@ -525,6 +537,25 @@ namespace dynarithmic
 
     struct CTL_StaticDataStruct
     {
+        enum { INI_SOURCEXFERWAITINFO_KEY, 
+               INI_TWAINLOOPPEEK_KEY, 
+               INI_PAPERDETECTIONSTATUS_KEY, 
+               INI_FLATBEDONLY_KEY, 
+               INI_SOURCEOPENPROPS_KEY, 
+               INI_CHECKFEEDERSTATUS_ITEM, 
+               INI_QUERYBESTCAPCONTAINER_ITEM, 
+               INI_QUERYCAPOPERATIONS_ITEM, 
+               INI_IMAGEGILE_KEY, 
+               INI_MISCELLANEOUS_KEY, 
+               INI_RESOURCECHECK_ITEM,
+               INI_RESAMPLE_ITEM, 
+               INI_OCRLIBRARY_KEY, 
+               INI_LANGUAGE_KEY, 
+               INI_DEFAULT_ITEM,
+               INI_SOURCES_KEY, 
+               INI_DSMERRORLOGGING_KEY, 
+               LASTINIENTRY };
+        std::array<std::pair<int, std::string_view>, LASTINIENTRY> s_aINIKeys;
         int32_t                      s_nExtImageInfoOffset = 0;
         int                          s_nLoadingError = DTWAIN_NO_ERROR;
         bool                         s_bINIFileLoaded = false;
@@ -567,6 +598,8 @@ namespace dynarithmic
         CTL_StringType           s_ResourceVersion;
         std::string              s_CurrentResourceKey;
         CTL_PairToStringMap      s_ResourceCache;
+        CTL_FileSaveMap          s_FileSaveMap;
+        CTL_StaticDataStruct();
     };
 
     struct CTL_StaticData
@@ -590,6 +623,7 @@ namespace dynarithmic
         static CTL_StringType& GetLanguageResourcePath() { return s_StaticData.s_strLangResourcePath; }
         static CTL_ErrorToExtraInfoMap& GetExtraErrorInfoMap() { return s_StaticData.s_mapExtraErrorInfo; }
         static CTL_MapThreadToDLLHandle& GetThreadToDLLHandleMap() { return s_StaticData.s_mapThreadToDLLHandle; }
+        static CTL_FileSaveMap& GetFileSaveMap() { return s_StaticData.s_FileSaveMap; }
         static bool ResourcesLoaded() { return s_StaticData.s_ResourcesInitialized; }
         static void Reset() 
         { 
@@ -612,9 +646,9 @@ namespace dynarithmic
         static bool PerformResampling() { return s_StaticData.s_bDoResampling; }
         static CTL_PairToStringMap& GetResourceCache() { return s_StaticData.s_ResourceCache; }
         static CTL_StringToMapLongToStringMap& GetAllLanguagesResourceMap() { return s_StaticData.s_AllLoadedResourcesMap; }
-        static CTL_LongToStringMap* GetLanguageResource(std::string sLang);
+        static CTL_LongToStringMap* GetLanguageResource(const std::string& sLang);
         static std::string&         GetCurrentLanguageResourceKey() { return s_StaticData.s_CurrentResourceKey; }
-        static void SetCurrentLanguageResourceKey(std::string sLang) { s_StaticData.s_CurrentResourceKey = sLang; }
+        static void SetCurrentLanguageResourceKey(const std::string& sLang) { s_StaticData.s_CurrentResourceKey = sLang; }
         static CTL_LongToStringMap* GetCurrentLanguageResource();
         static CTL_GeneralResourceInfo& GetGeneralResourceInfo() { return s_StaticData.s_ResourceInfo; }
         static CTL_PDFMediaMap& GetPDFMediaMap() { return s_StaticData.s_PDFMediaMap; }
@@ -623,7 +657,7 @@ namespace dynarithmic
         static CTL_TwainConstantToStringMapNode& GetTwainConstantsStrings(LONG nWhich) { return s_StaticData.s_TwainConstantsMap[nWhich]; }
         static bool IsCheckHandles() { return s_StaticData.s_bCheckHandles; }
         static void SetCheckHandles(bool bSet) { s_StaticData.s_bCheckHandles = bSet; }
-        static std::pair<bool, TwainConstantType> GetIDFromTwainName(std::string sName);
+        static std::pair<bool, TwainConstantType> GetIDFromTwainName(const std::string& sName);
         static constexpr int GetDGResourceID() { return 8890; }
         static constexpr int GetDATResourceID() { return 8891; }
         static constexpr int GetMSGResourceID() { return 8892; }
@@ -646,6 +680,7 @@ namespace dynarithmic
         static std::wstring GetTwainNameFromConstantW(int lConstantType, TwainConstantType lTwainConstant);
         static CTL_CallbackProcArray& GetCallbacks() { return s_StaticData.s_aAllCallbacks; }
         static auto& GetAppWindowsToDisable() { return s_StaticData.s_appWindowsToDisable; }
+        static constexpr std::string_view GetINIKey(int nWhich) { return s_StaticData.s_aINIKeys[nWhich].second; }
     };
 
     struct CTL_LoggerCallbackInfo

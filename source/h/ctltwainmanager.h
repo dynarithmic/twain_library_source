@@ -62,6 +62,7 @@ namespace dynarithmic
     using SourceToXferReadyList = std::vector<std::pair<std::string, uint32_t>>;
     using SourceFlatbedOnlyList = std::unordered_set<std::string>;
     using SourcePeekMessageList = std::unordered_set<std::string>;
+    using SourcePaperDetectableMap = std::map<std::string, bool>;
 
     class CTL_TwainAppMgr;
     typedef std::shared_ptr<CTL_TwainAppMgr> CTL_TwainAppMgrPtr;
@@ -295,6 +296,7 @@ namespace dynarithmic
             static SourceToXferReadyList& GetSourceToXferReadyList() { return s_SourceToXferReadyList; }
             static SourceFlatbedOnlyList& GetSourceFlatbedOnlyList() { return s_SourceFlatbedOnlyList; }
             static SourcePeekMessageList& GetSourcePeekMessageList() { return s_SourcePeekMessageList; }
+            static SourcePaperDetectableMap& GetSourcePaperDetectionMap() { return s_SourcePaperDetectableMap; }
             const CTL_TwainTriplet* GetCurrentTriplet() const { return m_pCurrentTriplet;}
 
         private:
@@ -508,6 +510,7 @@ namespace dynarithmic
             static SourceToXferReadyList s_SourceToXferReadyList;
             static SourceFlatbedOnlyList s_SourceFlatbedOnlyList;
             static SourcePeekMessageList s_SourcePeekMessageList;
+            static SourcePaperDetectableMap s_SourcePaperDetectableMap;
     };
 
     #define DTWAIN_ERROR_CONDITION(Err, RetVal, mustReport) {               \

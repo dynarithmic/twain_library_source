@@ -43,6 +43,10 @@
 #include "../ZLib/zlib.h"
 #include "../LibPNG/png.h"
 
+#ifdef _MSC_VER
+    #pragma message("Using LibPNG version " PNG_LIBPNG_VER_STRING)
+#endif
+
 // ----------------------------------------------------------
 
 typedef struct {
