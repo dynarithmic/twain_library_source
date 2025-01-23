@@ -1,0 +1,1615 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Win32_DTWAINDLL_D|Win32">
+      <Configuration>Win32_DTWAINDLL_D</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Win32_DTWAINDLL_U_D|Win32">
+      <Configuration>Win32_DTWAINDLL_U_D</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Win32_DTWAINDLL_U|Win32">
+      <Configuration>Win32_DTWAINDLL_U</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Win32_DTWAINDLL|Win32">
+      <Configuration>Win32_DTWAINDLL</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Win64_DTWAINDLL_D|x64">
+      <Configuration>Win64_DTWAINDLL_D</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Win64_DTWAINDLL_U_D|x64">
+      <Configuration>Win64_DTWAINDLL_U_D</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Win64_DTWAINDLL_U|x64">
+      <Configuration>Win64_DTWAINDLL_U</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Win64_DTWAINDLL|x64">
+      <Configuration>Win64_DTWAINDLL</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>DTWAIN_DLL</ProjectName>
+    <ProjectGuid>{CCA03A98-B8AB-41CA-985F-4100371FE5ED}</ProjectGuid>
+    <RootNamespace>DTWAIN_ALL</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
+    <PlatformToolset>v90</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Template|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">binaries\$(PlatformArchitecture)bit\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">binaries\$(PlatformArchitecture)bit\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">binaries\$(PlatformArchitecture)bit\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">binaries\$(PlatformArchitecture)bit\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">.\obj\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">.\obj\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">.\obj\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_Release|Win32'">false</GenerateManifest>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">false</GenerateManifest>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">false</GenerateManifest>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">false</GenerateManifest>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">false</GenerateManifest>
+    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">false</EmbedManifest>
+    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">false</EmbedManifest>
+    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">false</EmbedManifest>
+    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">false</EmbedManifest>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">.\obj\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">.\obj\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">.\obj\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">.\obj\$(Configuration)\</IntDir>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'" />
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">dtwain$(PlatformArchitecture)ud</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">dtwain$(PlatformArchitecture)u</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">dtwain$(PlatformArchitecture)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">dtwain$(PlatformArchitecture)d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">
+    <OutDir>binaries\$(PlatformArchitecture)bit\</OutDir>
+    <TargetName>dtwain$(PlatformArchitecture)ud</TargetName>
+    <TargetExt>.dll</TargetExt>
+    <EmbedManifest>false</EmbedManifest>
+    <LinkIncremental>false</LinkIncremental>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">
+    <OutDir>binaries\$(PlatformArchitecture)bit\</OutDir>
+    <TargetName>dtwain$(PlatformArchitecture)u</TargetName>
+    <TargetExt>.dll</TargetExt>
+    <EmbedManifest>false</EmbedManifest>
+    <LinkIncremental>false</LinkIncremental>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">
+    <OutDir>binaries\$(PlatformArchitecture)bit\</OutDir>
+    <TargetName>dtwain$(PlatformArchitecture)</TargetName>
+    <TargetExt>.dll</TargetExt>
+    <EmbedManifest>false</EmbedManifest>
+    <GenerateManifest>false</GenerateManifest>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">
+    <OutDir>binaries\$(PlatformArchitecture)bit\</OutDir>
+    <TargetName>dtwain$(PlatformArchitecture)d</TargetName>
+    <TargetExt>.dll</TargetExt>
+    <EmbedManifest>false</EmbedManifest>
+    <GenerateManifest>false</GenerateManifest>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">
+    <IntDir>.\obj\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">
+    <CustomBuildStep>
+      <Command>
+      </Command>
+      <Outputs>%(Outputs)</Outputs>
+    </CustomBuildStep>
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\bin\Win32_Release_6_PDF_Debug/twil32_new.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;USE_DTWAIN_DEBUG_LIB;_DEBUG;_UNICODE;_SCL_SECURE_NO_WARNINGS;DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions);FREEIMAGE_CPP_LIB;DTWAIN_DEBUG;BUILDING_DTWAINDLL;;USE_DTWAIN_DEBUG_LIB;DTWAIN_DLL</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeaderOutputFile>dtwain$(PlatformArchitecture)ud.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
+      <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
+      <ProgramDataBaseFileName>.\obj\$(Configuration)\</ProgramDataBaseFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;DTWAIN_OPENSOURCE_DISTRIBUTION;_DEBUG;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/fixed:no %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;vfw32.lib;%(AdditionalDependencies);FreeImageLib.lib;cryptlib.lib</AdditionalDependencies>
+      <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)ud$(TargetExt)</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>.\def\dtwain32_u_d.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <BaseAddress>0x67900000</BaseAddress>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
+      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_32);$(BOOST_LIBRARY_DIR_V142_32);$(BOOST_LIBRARY_DIR_V141_32);$(BOOST_LIBRARY_DIR_V140_32);.\FreeImage\Source\FreeImageLib\$(Platform)\DebugU;$(SolutionDir)cryptolib\$(PlatformTarget)\DebugU</AdditionalLibraryDirectories>
+      <FullProgramDatabaseFile>true</FullProgramDatabaseFile>
+      <AssemblyDebug>true</AssemblyDebug>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+    <PostBuildEvent>
+      <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
+copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).dll
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName)_embarcadero.lib
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).pdb
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).lib
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip MD5 -t $(TargetDir)debug_libraries_zip_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA1 -t $(TargetDir)debug_libraries_zip_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_libraries_zip_sha256hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
+del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt $(TargetDir)debug_ziphashes$(PlatformArchitecture).txt
+del $(TargetDir)debug_libraries_zip_md5hash.txt
+del $(TargetDir)debug_libraries_zip_sha1hash.txt
+del $(TargetDir)debug_libraries_zip_sha256hash.txt
+del $(TargetDir)$(TargetName)_md5hash.txt  
+del $(TargetDir)$(TargetName)_sha1hash.txt  
+del $(TargetDir)$(TargetName)_sha256hash.txt 
+cd $(SolutionDir)
+cd ..
+md demos\c_cpp_includes
+cd demos\c_cpp_includes
+copy $(SolutionDir)h\capconst.h .
+copy $(SolutionDir)h\dtwain.h .
+copy $(SolutionDir)h\dtwainc.h .
+copy $(SolutionDir)h\dtwaindefs.h .
+copy $(SolutionDir)h\dtwainx.h .
+copy $(SolutionDir)h\dtwain_filetypes.h .
+copy $(SolutionDir)h\dtwain_standard_defs.h .
+copy $(SolutionDir)h\dtwain_version.h .
+copy $(SolutionDir)h\dtwpdft.h .
+copy $(SolutionDir)h\dtwstrfn.h .
+copy $(SolutionDir)h\dtwtype.h .
+copy $(SolutionDir)h\twain.h .
+copy $(SolutionDir)h\winconst.h .
+copy $(SolutionDir)h\dtwain_library_selector.h .
+cd $(SolutionDir)
+cd ..
+md demos\binaries\$(PlatformArchitecture)bit
+cd demos\binaries\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).dll .
+copy $(TargetDir)twain*.txt .
+copy $(TargetDir)dtwain$(PlatformArchitecture).ini .
+cd $(SolutionDir)
+cd ..
+md demos\libs\$(PlatformArchitecture)bit
+cd demos\libs\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).lib .
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">
+    <CustomBuildStep>
+      <Command>
+      </Command>
+      <Outputs>%(Outputs)</Outputs>
+    </CustomBuildStep>
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\bin\Win32_Release_6_PDF_Debug/twil32_new.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>MinSpace</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;FREEIMAGE_CPP_LIB;_UNICODE;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL;DTWAIN_NO_LOGGING</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeaderOutputFile>dtwain$(PlatformArchitecture)u.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
+      <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
+      <ProgramDataBaseFileName>.\obj\$(Configuration)\</ProgramDataBaseFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;NDEBUG;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/fixed:no %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;vfw32.lib;%(AdditionalDependencies);FreeImageLib.lib;cryptlib.lib</AdditionalDependencies>
+      <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)u$(TargetExt)</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>.\def\dtwain32_u.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <BaseAddress>0x67900000</BaseAddress>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
+      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_32);$(BOOST_LIBRARY_DIR_V142_32);$(BOOST_LIBRARY_DIR_V141_32);$(BOOST_LIBRARY_DIR_V140_32);.\FreeImage\Source\FreeImageLib\Win32\ReleaseU;$(SolutionDir)cryptolib\$(PlatformTarget)\ReleaseU</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+    <PostBuildEvent>
+      <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
+copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).dll
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName)_embarcadero.lib
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).pdb
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).lib
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip MD5 -t $(TargetDir)release_libraries_zip_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA1 -t $(TargetDir)release_libraries_zip_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)release_libraries_zip_sha256hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
+del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt $(TargetDir)release_ziphashes$(PlatformArchitecture).txt
+del $(TargetDir)release_libraries_zip_md5hash.txt
+del $(TargetDir)release_libraries_zip_sha1hash.txt
+del $(TargetDir)release_libraries_zip_sha256hash.txt
+del $(TargetDir)$(TargetName)_md5hash.txt  
+del $(TargetDir)$(TargetName)_sha1hash.txt  
+del $(TargetDir)$(TargetName)_sha256hash.txt 
+cd $(SolutionDir)
+cd ..
+md demos\c_cpp_includes
+cd demos\c_cpp_includes
+copy $(SolutionDir)h\capconst.h .
+copy $(SolutionDir)h\dtwain.h .
+copy $(SolutionDir)h\dtwainc.h .
+copy $(SolutionDir)h\dtwaindefs.h .
+copy $(SolutionDir)h\dtwainx.h .
+copy $(SolutionDir)h\dtwain_filetypes.h .
+copy $(SolutionDir)h\dtwain_standard_defs.h .
+copy $(SolutionDir)h\dtwain_version.h .
+copy $(SolutionDir)h\dtwpdft.h .
+copy $(SolutionDir)h\dtwstrfn.h .
+copy $(SolutionDir)h\dtwtype.h .
+copy $(SolutionDir)h\twain.h .
+copy $(SolutionDir)h\winconst.h .
+copy $(SolutionDir)h\dtwain_library_selector.h .
+cd $(SolutionDir)
+cd ..
+md demos\binaries\$(PlatformArchitecture)bit
+cd demos\binaries\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).dll .
+copy $(TargetDir)twain*.txt .
+copy $(TargetDir)dtwain$(PlatformArchitecture).ini .
+cd $(SolutionDir)
+cd ..
+md demos\libs\$(PlatformArchitecture)bit
+cd demos\libs\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).lib .</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">
+    <CustomBuildStep>
+      <Command>
+      </Command>
+      <Outputs>%(Outputs)</Outputs>
+    </CustomBuildStep>
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\bin\Win32_Release_6_PDF_Debug/twil32_new.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>MinSpace</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);USE_DTWAIN_DEBUG_LIB;DTWAIN_DLL</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeaderOutputFile>dtwain$(PlatformArchitecture).pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
+      <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
+      <ProgramDataBaseFileName>.\obj\$(Configuration)\</ProgramDataBaseFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;NDEBUG;PDFLIB_INTERNAL;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/fixed:no %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;vfw32.lib;%(AdditionalDependencies);FreeImageLib.lib;cryptlib.lib</AdditionalDependencies>
+      <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)$(TargetExt)</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>.\def\dtwain32.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <BaseAddress>0x67900000</BaseAddress>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
+      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_32);$(BOOST_LIBRARY_DIR_V142_32);$(BOOST_LIBRARY_DIR_V141_32);$(BOOST_LIBRARY_DIR_V140_32);.\FreeImage\Source\FreeImageLib\Win32\Release;$(SolutionDir)cryptolib\$(PlatformTarget)\Release</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+    <PostBuildEvent>
+      <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
+copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).dll
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName)_embarcadero.lib
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).pdb
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).lib
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip MD5 -t $(TargetDir)release_libraries_zip_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA1 -t $(TargetDir)release_libraries_zip_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)release_libraries_zip_sha256hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
+del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt $(TargetDir)release_ziphashes$(PlatformArchitecture).txt
+del $(TargetDir)release_libraries_zip_md5hash.txt
+del $(TargetDir)release_libraries_zip_sha1hash.txt
+del $(TargetDir)release_libraries_zip_sha256hash.txt
+del $(TargetDir)$(TargetName)_md5hash.txt  
+del $(TargetDir)$(TargetName)_sha1hash.txt  
+del $(TargetDir)$(TargetName)_sha256hash.txt 
+cd $(SolutionDir)
+cd ..
+md demos\c_cpp_includes
+cd demos\c_cpp_includes
+copy $(SolutionDir)h\capconst.h .
+copy $(SolutionDir)h\dtwain.h .
+copy $(SolutionDir)h\dtwainc.h .
+copy $(SolutionDir)h\dtwaindefs.h .
+copy $(SolutionDir)h\dtwainx.h .
+copy $(SolutionDir)h\dtwain_filetypes.h .
+copy $(SolutionDir)h\dtwain_standard_defs.h .
+copy $(SolutionDir)h\dtwain_version.h .
+copy $(SolutionDir)h\dtwpdft.h .
+copy $(SolutionDir)h\dtwstrfn.h .
+copy $(SolutionDir)h\dtwtype.h .
+copy $(SolutionDir)h\twain.h .
+copy $(SolutionDir)h\winconst.h .
+copy $(SolutionDir)h\dtwain_library_selector.h .
+cd $(SolutionDir)
+cd ..
+md demos\binaries\$(PlatformArchitecture)bit
+cd demos\binaries\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).dll .
+copy $(TargetDir)twain*.txt .
+copy $(TargetDir)dtwain$(PlatformArchitecture).ini .
+cd $(SolutionDir)
+cd ..
+md demos\libs\$(PlatformArchitecture)bit
+cd demos\libs\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).lib .</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">
+    <CustomBuildStep>
+      <Command>
+      </Command>
+      <Outputs>%(Outputs)</Outputs>
+    </CustomBuildStep>
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\bin\Win32_Release_6_PDF_Debug/twil32_new.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;USE_DTWAIN_DEBUG_LIB;_DEBUG;FREEIMAGE_CPP_LIB;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;_SCL_SECURE_NO_WARNINGS;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);USE_DTWAIN_DEBUG_LIB;DTWAIN_DLL</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeaderOutputFile>dtwain$(PlatformArchitecture)d.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
+      <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
+      <ProgramDataBaseFileName>.\obj\$(Configuration)\</ProgramDataBaseFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;DTWAIN_OPENSOURCE_DISTRIBUTION;_DEBUG;PDFLIB_INTERNAL;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/fixed:no %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;vfw32.lib;FreeImageLib.lib;cryptlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)d$(TargetExt)</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>.\def\dtwain32_d.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <BaseAddress>0x67900000</BaseAddress>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
+      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_32);$(BOOST_LIBRARY_DIR_V142_32);$(BOOST_LIBRARY_DIR_V141_32);$(BOOST_LIBRARY_DIR_V140_32);.\FreeImage\Source\FreeImageLib\Win32\Debug;$(SolutionDir)cryptolib\$(PlatformTarget)\Debug</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+    <PostBuildEvent>
+      <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
+copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).dll
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName)_embarcadero.lib
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).pdb
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).lib
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip MD5 -t $(TargetDir)debug_libraries_zip_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA1 -t $(TargetDir)debug_libraries_zip_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_libraries_zip_sha256hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
+del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt $(TargetDir)debug_ziphashes$(PlatformArchitecture).txt
+del $(TargetDir)debug_libraries_zip_md5hash.txt
+del $(TargetDir)debug_libraries_zip_sha1hash.txt
+del $(TargetDir)debug_libraries_zip_sha256hash.txt
+del $(TargetDir)$(TargetName)_md5hash.txt  
+del $(TargetDir)$(TargetName)_sha1hash.txt  
+del $(TargetDir)$(TargetName)_sha256hash.txt 
+cd $(SolutionDir)
+cd ..
+md demos\c_cpp_includes
+cd demos\c_cpp_includes
+copy $(SolutionDir)h\capconst.h .
+copy $(SolutionDir)h\dtwain.h .
+copy $(SolutionDir)h\dtwainc.h .
+copy $(SolutionDir)h\dtwaindefs.h .
+copy $(SolutionDir)h\dtwainx.h .
+copy $(SolutionDir)h\dtwain_filetypes.h .
+copy $(SolutionDir)h\dtwain_standard_defs.h .
+copy $(SolutionDir)h\dtwain_version.h .
+copy $(SolutionDir)h\dtwpdft.h .
+copy $(SolutionDir)h\dtwstrfn.h .
+copy $(SolutionDir)h\dtwtype.h .
+copy $(SolutionDir)h\twain.h .
+copy $(SolutionDir)h\winconst.h .
+copy $(SolutionDir)h\dtwain_library_selector.h .
+cd $(SolutionDir)
+cd ..
+md demos\binaries\$(PlatformArchitecture)bit
+cd demos\binaries\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).dll .
+copy $(TargetDir)twain*.txt .
+copy $(TargetDir)dtwain$(PlatformArchitecture).ini .
+cd $(SolutionDir)
+cd ..
+md demos\libs\$(PlatformArchitecture)bit
+cd demos\libs\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).lib .
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;USE_DTWAIN_DEBUG_LIB;_DEBUG;NOMINMAX;FREEIMAGE_CPP_LIB;_UNICODE;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);;USE_DTWAIN_DEBUG_LIB;DTWAIN_DLL</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
+      <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
+      <ProgramDataBaseFileName>.\obj\$(Configuration)\</ProgramDataBaseFileName>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeaderOutputFile>dtwain$(PlatformArchitecture)ud.pch</PrecompiledHeaderOutputFile>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
+      <ModuleDefinitionFile>.\def\dtwain64_u_d.def</ModuleDefinitionFile>
+      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_64);$(BOOST_LIBRARY_DIR_V142_64);$(BOOST_LIBRARY_DIR_V141_64);$(BOOST_LIBRARY_DIR_V140_64);.\FreeImage\Source\FreeImageLib\$(PlatformTarget)\DebugU;$(SolutionDir)cryptolib\$(PlatformTarget)\DebugU</AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)ud$(TargetExt)</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);FreeImageLib.lib;cryptlib.lib</AdditionalDependencies>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;DTWAIN_OPENSOURCE_DISTRIBUTION;_DEBUG;WIN64;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </ResourceCompile>
+    <PostBuildEvent>
+      <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
+copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).dll
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).pdb
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).lib
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip MD5 -t $(TargetDir)debug_libraries_zip_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA1 -t $(TargetDir)debug_libraries_zip_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_libraries_zip_sha256hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
+del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt $(TargetDir)debug_ziphashes$(PlatformArchitecture).txt
+del $(TargetDir)debug_libraries_zip_md5hash.txt
+del $(TargetDir)debug_libraries_zip_sha1hash.txt
+del $(TargetDir)debug_libraries_zip_sha256hash.txt
+del $(TargetDir)$(TargetName)_md5hash.txt  
+del $(TargetDir)$(TargetName)_sha1hash.txt  
+del $(TargetDir)$(TargetName)_sha256hash.txt 
+cd $(SolutionDir)
+cd ..
+md demos\c_cpp_includes
+cd demos\c_cpp_includes
+copy $(SolutionDir)h\capconst.h .
+copy $(SolutionDir)h\dtwain.h .
+copy $(SolutionDir)h\dtwainc.h .
+copy $(SolutionDir)h\dtwaindefs.h .
+copy $(SolutionDir)h\dtwainx.h .
+copy $(SolutionDir)h\dtwain_filetypes.h .
+copy $(SolutionDir)h\dtwain_standard_defs.h .
+copy $(SolutionDir)h\dtwain_version.h .
+copy $(SolutionDir)h\dtwpdft.h .
+copy $(SolutionDir)h\dtwstrfn.h .
+copy $(SolutionDir)h\dtwtype.h .
+copy $(SolutionDir)h\twain.h .
+copy $(SolutionDir)h\winconst.h .
+copy $(SolutionDir)h\dtwain_library_selector.h .
+cd $(SolutionDir)
+cd ..
+md demos\binaries\$(PlatformArchitecture)bit
+cd demos\binaries\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).dll .
+copy $(TargetDir)twain*.txt .
+copy $(TargetDir)dtwain$(PlatformArchitecture).ini .
+cd $(SolutionDir)
+cd ..
+md demos\libs\$(PlatformArchitecture)bit
+cd demos\libs\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).lib .</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>MinSpace</Optimization>
+      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;FREEIMAGE_CPP_LIB;_UNICODE;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
+      <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
+      <ProgramDataBaseFileName>.\obj\$(Configuration)\</ProgramDataBaseFileName>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeaderOutputFile>dtwain$(PlatformArchitecture)u.pch</PrecompiledHeaderOutputFile>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
+      <ModuleDefinitionFile>.\def\dtwain64_u.def</ModuleDefinitionFile>
+      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_64);$(BOOST_LIBRARY_DIR_V142_64);$(BOOST_LIBRARY_DIR_V141_64);$(BOOST_LIBRARY_DIR_V140_64);.\FreeImage\Source\FreeImageLib\$(PlatformTarget)\ReleaseU;$(SolutionDir)cryptolib\$(PlatformTarget)\ReleaseU</AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)u$(TargetExt)</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);FreeImageLib.lib;cryptlib.lib</AdditionalDependencies>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;NDEBUG;WIN64;PDFLIB_INTERNAL;UNICODE;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </ResourceCompile>
+    <PostBuildEvent>
+      <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
+copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).dll
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).pdb
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).lib
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip MD5 -t $(TargetDir)release_libraries_zip_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA1 -t $(TargetDir)release_libraries_zip_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)release_libraries_zip_sha256hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
+del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt $(TargetDir)release_ziphashes$(PlatformArchitecture).txt
+del $(TargetDir)release_libraries_zip_md5hash.txt
+del $(TargetDir)release_libraries_zip_sha1hash.txt
+del $(TargetDir)release_libraries_zip_sha256hash.txt
+del $(TargetDir)$(TargetName)_md5hash.txt  
+del $(TargetDir)$(TargetName)_sha1hash.txt  
+del $(TargetDir)$(TargetName)_sha256hash.txt 
+cd $(SolutionDir)
+cd ..
+md demos\c_cpp_includes
+cd demos\c_cpp_includes
+copy $(SolutionDir)h\capconst.h .
+copy $(SolutionDir)h\dtwain.h .
+copy $(SolutionDir)h\dtwainc.h .
+copy $(SolutionDir)h\dtwaindefs.h .
+copy $(SolutionDir)h\dtwainx.h .
+copy $(SolutionDir)h\dtwain_filetypes.h .
+copy $(SolutionDir)h\dtwain_standard_defs.h .
+copy $(SolutionDir)h\dtwain_version.h .
+copy $(SolutionDir)h\dtwpdft.h .
+copy $(SolutionDir)h\dtwstrfn.h .
+copy $(SolutionDir)h\dtwtype.h .
+copy $(SolutionDir)h\twain.h .
+copy $(SolutionDir)h\winconst.h .
+copy $(SolutionDir)h\dtwain_library_selector.h .
+cd $(SolutionDir)
+cd ..
+md demos\binaries\$(PlatformArchitecture)bit
+cd demos\binaries\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).dll .
+copy $(TargetDir)twain*.txt .
+copy $(TargetDir)dtwain$(PlatformArchitecture).ini .
+cd $(SolutionDir)
+cd ..
+md demos\libs\$(PlatformArchitecture)bit
+cd demos\libs\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).lib .
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>MinSpace</Optimization>
+      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;FREEIMAGE_CPP_LIB;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;_DEBUGNDEBUG;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);USE_DTWAIN_DEBUG_LIB;DTWAIN_DLL;DTWAIN_NO_LOGGING</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
+      <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
+      <ProgramDataBaseFileName>.\obj\$(Configuration)\</ProgramDataBaseFileName>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeaderOutputFile>dtwain$(PlatformArchitecture).pch</PrecompiledHeaderOutputFile>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
+      <ModuleDefinitionFile>.\def\dtwain64.def</ModuleDefinitionFile>
+      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_64);$(BOOST_LIBRARY_DIR_V142_64);$(BOOST_LIBRARY_DIR_V141_64);$(BOOST_LIBRARY_DIR_V140_64);.\FreeImage\Source\FreeImageLib\x64\Release;$(SolutionDir)cryptolib\$(PlatformTarget)\Release</AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)$(TargetExt)</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);FreeImageLib.lib;cryptlib.lib</AdditionalDependencies>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>DTWAIN_OPENSOURCE_DISTRIBUTION;NDEBUG;WIN64;PDFLIB_INTERNAL;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </ResourceCompile>
+    <PostBuildEvent>
+      <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
+copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).dll
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).pdb
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).lib
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip MD5 -t $(TargetDir)release_libraries_zip_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA1 -t $(TargetDir)release_libraries_zip_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)release_libraries_zip_sha256hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
+del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt $(TargetDir)release_ziphashes$(PlatformArchitecture).txt
+del $(TargetDir)release_libraries_zip_md5hash.txt
+del $(TargetDir)release_libraries_zip_sha1hash.txt
+del $(TargetDir)release_libraries_zip_sha256hash.txt
+del $(TargetDir)$(TargetName)_md5hash.txt  
+del $(TargetDir)$(TargetName)_sha1hash.txt  
+del $(TargetDir)$(TargetName)_sha256hash.txt 
+cd $(SolutionDir)
+cd ..
+md demos\c_cpp_includes
+cd demos\c_cpp_includes
+copy $(SolutionDir)h\capconst.h .
+copy $(SolutionDir)h\dtwain.h .
+copy $(SolutionDir)h\dtwainc.h .
+copy $(SolutionDir)h\dtwaindefs.h .
+copy $(SolutionDir)h\dtwainx.h .
+copy $(SolutionDir)h\dtwain_filetypes.h .
+copy $(SolutionDir)h\dtwain_standard_defs.h .
+copy $(SolutionDir)h\dtwain_version.h .
+copy $(SolutionDir)h\dtwpdft.h .
+copy $(SolutionDir)h\dtwstrfn.h .
+copy $(SolutionDir)h\dtwtype.h .
+copy $(SolutionDir)h\twain.h .
+copy $(SolutionDir)h\winconst.h .
+copy $(SolutionDir)h\dtwain_library_selector.h .
+cd $(SolutionDir)
+cd ..
+md demos\binaries\$(PlatformArchitecture)bit
+cd demos\binaries\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).dll .
+copy $(TargetDir)twain*.txt .
+copy $(TargetDir)dtwain$(PlatformArchitecture).ini .
+cd $(SolutionDir)
+cd ..
+md demos\libs\$(PlatformArchitecture)bit
+cd demos\libs\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).lib .
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;USE_DTWAIN_DEBUG_LIB;_DEBUG;NOMINMAX;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
+      <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
+      <ProgramDataBaseFileName>.\obj\$(Configuration)\</ProgramDataBaseFileName>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <DisableSpecificWarnings>4800;4714;4510;4610;4100;4706;4127;4516;4512;4702;4310;4206;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeaderOutputFile>dtwain$(PlatformArchitecture)d.pch</PrecompiledHeaderOutputFile>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
+      <ModuleDefinitionFile>.\def\dtwain64_d.def</ModuleDefinitionFile>
+      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_64);$(BOOST_LIBRARY_DIR_V142_64);$(BOOST_LIBRARY_DIR_V141_64);$(BOOST_LIBRARY_DIR_V140_64);.\FreeImage\Source\FreeImageLib\x64\Debug;$(SolutionDir)cryptolib\$(PlatformTarget)\Debug</AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)d$(TargetExt)</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);FreeImageLib.lib;cryptlib.lib</AdditionalDependencies>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>USE_DTWAIN_DEBUG_LIB;DTWAIN_OPENSOURCE_DISTRIBUTION;_DEBUG;WIN64;PDFLIB_INTERNAL;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\h;C:\Microsoft Visual Studio 8\VC\PlatformSDK\Include;C:\Microsoft Visual Studio 8\VC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </ResourceCompile>
+    <PostBuildEvent>
+      <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
+copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).dll
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).pdb
+"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).lib
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip MD5 -t $(TargetDir)debug_libraries_zip_md5hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA1 -t $(TargetDir)debug_libraries_zip_sha1hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_libraries_zip_sha256hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
+del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt $(TargetDir)debug_ziphashes$(PlatformArchitecture).txt
+del $(TargetDir)debug_libraries_zip_md5hash.txt
+del $(TargetDir)debug_libraries_zip_sha1hash.txt
+del $(TargetDir)debug_libraries_zip_sha256hash.txt
+del $(TargetDir)$(TargetName)_md5hash.txt  
+del $(TargetDir)$(TargetName)_sha1hash.txt  
+del $(TargetDir)$(TargetName)_sha256hash.txt 
+cd $(SolutionDir)
+cd ..
+md demos\c_cpp_includes
+cd demos\c_cpp_includes
+copy $(SolutionDir)h\capconst.h .
+copy $(SolutionDir)h\dtwain.h .
+copy $(SolutionDir)h\dtwainc.h .
+copy $(SolutionDir)h\dtwaindefs.h .
+copy $(SolutionDir)h\dtwainx.h .
+copy $(SolutionDir)h\dtwain_filetypes.h .
+copy $(SolutionDir)h\dtwain_standard_defs.h .
+copy $(SolutionDir)h\dtwain_version.h .
+copy $(SolutionDir)h\dtwpdft.h .
+copy $(SolutionDir)h\dtwstrfn.h .
+copy $(SolutionDir)h\dtwtype.h .
+copy $(SolutionDir)h\twain.h .
+copy $(SolutionDir)h\winconst.h .
+copy $(SolutionDir)h\dtwain_library_selector.h .
+cd $(SolutionDir)
+cd ..
+md demos\binaries\$(PlatformArchitecture)bit
+cd demos\binaries\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).dll .
+copy $(TargetDir)twain*.txt .
+copy $(TargetDir)dtwain$(PlatformArchitecture).ini .
+cd $(SolutionDir)
+cd ..
+md demos\libs\$(PlatformArchitecture)bit
+cd demos\libs\$(PlatformArchitecture)bit
+copy $(TargetDir)$(TargetName).lib .</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include=".\cpp\ctlacquirearea.cpp">
+      <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">false</PreprocessToFile>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlacquirebuffered.cpp" />
+    <ClCompile Include=".\cpp\ctlacquireclipboard.cpp" />
+    <ClCompile Include=".\cpp\ctlacquirefile.cpp" />
+    <ClCompile Include=".\cpp\ctlacquirenative.cpp" />
+    <ClCompile Include=".\cpp\ctlarray.cpp" />
+    <ClCompile Include=".\cpp\ctlblankpage.cpp" />
+    <ClCompile Include=".\cpp\ctlcalldsmproc.cpp" />
+    <ClCompile Include=".\cpp\ctlcapcollect.cpp" />
+    <ClCompile Include=".\cpp\ctlcapcontainerfuncs.cpp" />
+    <ClCompile Include=".\cpp\ctlcapenumfuncs.cpp" />
+    <ClCompile Include=".\cpp\ctlcapsupport.cpp" />
+    <ClCompile Include=".\cpp\ctlcompressionsize.cpp" />
+    <ClCompile Include=".\cpp\ctldeviceevents.cpp" />
+    <ClCompile Include=".\cpp\ctldtwaininit.cpp" />
+    <ClCompile Include=".\cpp\ctldtwainmem2.cpp" />
+    <ClCompile Include=".\cpp\ctlduplex.cpp" />
+    <ClCompile Include=".\cpp\ctlflipbmp.cpp" />
+    <ClCompile Include=".\cpp\ctlgetcapinfo.cpp" />
+    <ClCompile Include=".\cpp\ctlimageerrorskip.cpp" />
+    <ClCompile Include=".\cpp\ctlimageinfo.cpp" />
+    <ClCompile Include=".\cpp\ctlloggercallback.cpp" />
+    <ClCompile Include=".\cpp\ctllogmessage.cpp" />
+    <ClCompile Include=".\cpp\ctlmanualduplex.cpp" />
+    <ClCompile Include=".\cpp\ctlmaxacquires.cpp" />
+    <ClCompile Include=".\cpp\ctlmultipagescan.cpp" />
+    <ClCompile Include=".\cpp\ctlpatchsupport.cpp" />
+    <ClCompile Include=".\cpp\ctlpixbitdepth.cpp" />
+    <ClCompile Include=".\cpp\ctlprinter.cpp" />
+    <ClCompile Include=".\cpp\ctlsavefilename.cpp" />
+    <ClCompile Include=".\cpp\ctlsetgetcaps.cpp" />
+    <ClCompile Include=".\cpp\ctlshowuionly.cpp" />
+    <ClCompile Include=".\cpp\ctlsourceacquire.cpp" />
+    <ClCompile Include=".\cpp\ctlsourceclose.cpp" />
+    <ClCompile Include=".\cpp\ctlsourcedibs.cpp" />
+    <ClCompile Include=".\cpp\ctlsourceenum.cpp" />
+    <ClCompile Include=".\cpp\ctlsourceinfo.cpp" />
+    <ClCompile Include=".\cpp\ctlsourcenames.cpp" />
+    <ClCompile Include=".\cpp\ctlsourceopen.cpp" />
+    <ClCompile Include=".\cpp\ctlsourceretries.cpp" />
+    <ClCompile Include=".\cpp\ctlsourcescale.cpp" />
+    <ClCompile Include=".\cpp\ctlsourceselect.cpp" />
+    <ClCompile Include=".\cpp\ctlsrceoj.cpp" />
+    <ClCompile Include=".\cpp\ctltr032.cpp" />
+    <ClCompile Include=".\cpp\ctltr040.cpp" />
+    <ClCompile Include=".\cpp\ctltwaindllhandle.cpp" />
+    <ClCompile Include=".\cpp\ctltwainmsgloop.cpp" />
+    <ClCompile Include=".\cpp\ctluicontrollable.cpp" />
+    <ClCompile Include=".\cpp\ctluienabled.cpp" />
+    <ClCompile Include=".\cpp\ctltr000.cpp" />
+    <ClCompile Include=".\cpp\ctltr001.cpp" />
+    <ClCompile Include=".\cpp\ctltr002.cpp" />
+    <ClCompile Include=".\cpp\ctltr003.cpp" />
+    <ClCompile Include=".\cpp\ctltr004.cpp" />
+    <ClCompile Include=".\cpp\ctltr005.cpp" />
+    <ClCompile Include=".\cpp\ctltr006.cpp" />
+    <ClCompile Include=".\cpp\ctltr007.cpp" />
+    <ClCompile Include=".\cpp\ctltr008.cpp" />
+    <ClCompile Include=".\cpp\ctltr009.cpp" />
+    <ClCompile Include=".\cpp\ctltr010.cpp" />
+    <ClCompile Include=".\cpp\ctltr011.cpp" />
+    <ClCompile Include=".\cpp\ctltr012.cpp" />
+    <ClCompile Include=".\cpp\ctltr013.cpp" />
+    <ClCompile Include=".\cpp\ctltr014.cpp" />
+    <ClCompile Include=".\cpp\ctltr015.cpp" />
+    <ClCompile Include=".\cpp\ctltr016.cpp" />
+    <ClCompile Include=".\cpp\ctltr017.cpp" />
+    <ClCompile Include=".\cpp\ctltr018.cpp" />
+    <ClCompile Include=".\cpp\ctltr019.cpp" />
+    <ClCompile Include=".\cpp\ctltr020.cpp" />
+    <ClCompile Include=".\cpp\ctltr021.cpp" />
+    <ClCompile Include=".\cpp\ctltr022.cpp" />
+    <ClCompile Include=".\cpp\ctltr023.cpp" />
+    <ClCompile Include=".\cpp\ctltr024.cpp" />
+    <ClCompile Include=".\cpp\ctltr025.cpp" />
+    <ClCompile Include=".\cpp\ctltr026.cpp" />
+    <ClCompile Include=".\cpp\ctltr027.cpp" />
+    <ClCompile Include=".\cpp\ctltr028.cpp" />
+    <ClCompile Include=".\cpp\ctltr029.cpp" />
+    <ClCompile Include=".\cpp\ctltr030.cpp" />
+    <ClCompile Include=".\cpp\ctltr031.cpp" />
+    <ClCompile Include=".\cpp\ctltr033.cpp" />
+    <ClCompile Include=".\cpp\ctltr034.cpp" />
+    <ClCompile Include=".\cpp\ctltr035.cpp" />
+    <ClCompile Include=".\cpp\ctltr036.cpp" />
+    <ClCompile Include=".\cpp\ctltr037.cpp" />
+    <ClCompile Include=".\cpp\ctltr038.cpp" />
+    <ClCompile Include=".\cpp\ctltr039.cpp" />
+    <ClCompile Include=".\cpp\ctlobtyp.cpp" />
+    <ClCompile Include=".\cpp\ctlunicodeimpl.cpp" />
+    <ClCompile Include=".\cpp\ctlhigh.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">false</PreprocessToFile>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctljob.cpp" />
+    <ClCompile Include=".\cpp\ctlfeed.cpp" />
+    <ClCompile Include=".\cpp\ctldevnt.cpp" />
+    <ClCompile Include=".\cpp\ctlsupport.cpp" />
+    <ClCompile Include=".\cpp\ctlverifysourcehandle.cpp" />
+    <ClCompile Include=".\cpp\imagexferfilewriter.cpp" />
+    <ClCompile Include=".\dtwinver\Dtwinver.cpp" />
+    <ClCompile Include=".\dtwinver\Getwinver.cpp" />
+    <ClCompile Include=".\cpp\ctlflog.cpp" />
+    <ClCompile Include=".\cpp\errstruc.cpp" />
+    <ClCompile Include=".\cpp\logmsg.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlxmlparse.cpp" />
+    <ClCompile Include=".\cpp\a85decoder.cpp" />
+    <ClCompile Include=".\cpp\ctltempdir.cpp" />
+    <ClCompile Include=".\cpp\ocrengine\ocrinterface.cpp" />
+    <ClCompile Include=".\cpp\ocrengine\ocrinterface_internal.cpp" />
+    <ClCompile Include=".\cpp\ocrengine\transym_ocrinterface.cpp" />
+    <ClCompile Include=".\c\imagefun\dtwpdf\crc32_aux.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctljpeg.cpp" />
+    <ClCompile Include=".\cpp\ctltiff.cpp" />
+    <ClCompile Include=".\cpp\imagefun\pcxfun32.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctldib32.cpp" />
+    <ClCompile Include=".\cpp\iohandler_base.cpp" />
+    <ClCompile Include=".\cpp\iohandler_bmp.cpp" />
+    <ClCompile Include=".\cpp\iohandler_gif.cpp" />
+    <ClCompile Include=".\cpp\iohandler_ico.cpp" />
+    <ClCompile Include=".\cpp\iohandler_jpeg.cpp" />
+    <ClCompile Include=".\cpp\iohandler_jpeg2k.cpp" />
+    <ClCompile Include=".\cpp\iohandler_pcx.cpp" />
+    <ClCompile Include=".\cpp\iohandler_pdf.cpp" />
+    <ClCompile Include=".\cpp\iohandler_png.cpp" />
+    <ClCompile Include=".\cpp\iohandler_ps.cpp" />
+    <ClCompile Include=".\cpp\iohandler_psd.cpp" />
+    <ClCompile Include=".\cpp\iohandler_text.cpp" />
+    <ClCompile Include=".\cpp\iohandler_tga.cpp" />
+    <ClCompile Include=".\cpp\iohandler_tiff.cpp" />
+    <ClCompile Include=".\cpp\iohandler_wbmp.cpp" />
+    <ClCompile Include=".\cpp\iohandler_wmf.cpp" />
+    <ClCompile Include=".\cpp\imagefun\winbit32.cpp" />
+    <ClCompile Include=".\cpp\imagefun\wmffun32.cpp" />
+    <ClCompile Include=".\cpp\ctlpdf.cpp">
+    </ClCompile>
+    <ClCompile Include=".\cpp\imagefun\pdffun32.cpp">
+    </ClCompile>
+    <ClCompile Include=".\cpp\imagefun\dtwpdf\dtwainpdf.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">NotUsing</PrecompiledHeader>
+      <ShowIncludes Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">false</ShowIncludes>
+      <ShowIncludes Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">false</ShowIncludes>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include=".\cpp\imagefun\dtwpdf\dtwgetopt.cpp">
+    </ClCompile>
+    <ClCompile Include=".\cpp\imagefun\dtwpdf\dtwtiff2ps.cpp">
+    </ClCompile>
+    <ClCompile Include="cpp\arrayfactory.cpp" />
+    <ClCompile Include="cpp\ctlacquireaudio.cpp" />
+    <ClCompile Include="cpp\ctlerrorbuffer.cpp" />
+    <ClCompile Include="cpp\ctlerrorcallback.cpp" />
+    <ClCompile Include="cpp\ctlfileappend.cpp" />
+    <ClCompile Include="cpp\ctlfilesave.cpp" />
+    <ClCompile Include="cpp\ctlfileutils.cpp" />
+    <ClCompile Include="cpp\ctlgetmetrics.cpp" />
+    <ClCompile Include="cpp\ctlloadresources.cpp" />
+    <ClCompile Include="cpp\ctlpapersize.cpp" />
+    <ClCompile Include="cpp\ctlselectdialog.cpp" />
+    <ClCompile Include="cpp\ctlsourcedetails.cpp" />
+    <ClCompile Include="cpp\ctlstringutils.cpp" />
+    <ClCompile Include="cpp\ctlthreadutils.cpp" />
+    <ClCompile Include="cpp\ctltimeout.cpp" />
+    <ClCompile Include="cpp\ctltr041.cpp" />
+    <ClCompile Include="cpp\ctltr042.cpp" />
+    <ClCompile Include="cpp\ctltr043.cpp" />
+    <ClCompile Include="cpp\ctltripletbase.cpp" />
+    <ClCompile Include="cpp\ctltsstub.cpp" />
+    <ClCompile Include="cpp\ctltwainfilesystem.cpp" />
+    <ClCompile Include="cpp\ctltwainmanager.cpp" />
+    <ClCompile Include="cpp\ctltwainsession.cpp" />
+    <ClCompile Include="cpp\ctltwainsource.cpp" />
+    <ClCompile Include="cpp\ctlupdatedibproc.cpp" />
+    <ClCompile Include="cpp\ctlwindowproc.cpp" />
+    <ClCompile Include="cpp\imagefun\resamplefactory.cpp" />
+    <ClCompile Include="cpp\imagefun\tiffun32.cpp" />
+    <ClCompile Include="cpp\imagefun\txtfun32.cpp" />
+    <ClCompile Include="cpp\iohandler_pbm.cpp" />
+    <ClCompile Include="cpp\iohandler_webp.cpp" />
+    <ClCompile Include="cpp\linux_versioninfo.cpp" />
+    <ClCompile Include="cpp\logwriterutils.cpp" />
+    <ClCompile Include="cpp\ocrengine\ocrselect.cpp" />
+    <ClCompile Include="cpp\pdflib32\a85encode.cpp" />
+    <ClCompile Include="cpp\pdflib32\ahexencode.cpp" />
+    <ClCompile Include="cpp\pdflib32\flateencode.cpp" />
+    <ClCompile Include="cpp\pdflib32\md5class.cpp" />
+    <ClCompile Include="cpp\pdflib32\md5class2.cpp" />
+    <ClCompile Include="cpp\pdflib32\pdfencrypt.cpp" />
+    <ClCompile Include="cpp\pdflib32\pdflib32.cpp" />
+    <ClCompile Include="cpp\pdflib32\pslib32.cpp" />
+    <ClCompile Include="cpp\stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="cpp\twainframe.cpp" />
+    <ClCompile Include="cpp\windows_versioninfo.cpp" />
+    <ClCompile Include="cximage\ximabmp.cpp" />
+    <ClCompile Include="cximage\ximadsp.cpp" />
+    <ClCompile Include="cximage\ximaenc.cpp" />
+    <ClCompile Include="cximage\ximaexif.cpp" />
+    <ClCompile Include="cximage\ximage.cpp" />
+    <ClCompile Include="cximage\ximagif.cpp" />
+    <ClCompile Include="cximage\ximahist.cpp" />
+    <ClCompile Include="cximage\ximaico.cpp" />
+    <ClCompile Include="cximage\ximainfo.cpp" />
+    <ClCompile Include="cximage\ximaint.cpp" />
+    <ClCompile Include="cximage\ximajas.cpp" />
+    <ClCompile Include="cximage\ximajbg.cpp" />
+    <ClCompile Include="cximage\ximajpg.cpp" />
+    <ClCompile Include="cximage\ximalpha.cpp" />
+    <ClCompile Include="cximage\ximalyr.cpp" />
+    <ClCompile Include="cximage\ximamng.cpp" />
+    <ClCompile Include="cximage\ximapal.cpp" />
+    <ClCompile Include="cximage\ximapcx.cpp" />
+    <ClCompile Include="cximage\ximapng.cpp" />
+    <ClCompile Include="cximage\ximapsd.cpp" />
+    <ClCompile Include="cximage\ximaraw.cpp" />
+    <ClCompile Include="cximage\ximasel.cpp" />
+    <ClCompile Include="cximage\ximaska.cpp" />
+    <ClCompile Include="cximage\ximatga.cpp" />
+    <ClCompile Include="cximage\ximath.cpp" />
+    <ClCompile Include="cximage\ximatif.cpp" />
+    <ClCompile Include="cximage\ximatran.cpp" />
+    <ClCompile Include="cximage\ximawbmp.cpp" />
+    <ClCompile Include="cximage\ximawmf.cpp" />
+    <ClCompile Include="cximage\ximawnd.cpp" />
+    <ClCompile Include="cximage\xmemfile.cpp" />
+    <ClCompile Include="c\imagefun\dtwpdf\crc32_aux.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="c\imagefun\dtwpdf\md5c.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="c\imagefun\dtwpdf\md5c.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipImage.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipMemoryIO.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipMetadataFind.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipMultiPage.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipTag.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipWinImage.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include=".\h\ctltr040.h" />
+    <ClInclude Include=".\h\dtwain_resource_constants.h" />
+    <ClInclude Include=".\h\dtwain_resource_constants2.h" />
+    <ClInclude Include=".\h\errorcheck.h" />
+    <ClInclude Include=".\h\capconst.h" />
+    <ClInclude Include=".\h\capstruc.h" />
+    <ClInclude Include=".\h\cppfunc.h" />
+    <ClInclude Include=".\h\ctlarray.h" />
+    <ClInclude Include=".\h\ctlcntry.h" />
+    <ClInclude Include=".\h\ctldevnt.h" />
+    <ClInclude Include=".\h\ctldib.h" />
+    <ClInclude Include=".\h\ctlenum.h" />
+    <ClInclude Include=".\h\ctliface.h" />
+    <ClInclude Include=".\h\ctlobstr.h" />
+    <ClInclude Include=".\h\ctlobtyp.h" />
+    <ClInclude Include=".\h\ctltmpl3.h" />
+    <ClInclude Include=".\h\ctltmpl4.h" />
+    <ClInclude Include=".\h\ctltmpl5.h" />
+    <ClInclude Include=".\h\ctltr000.h" />
+    <ClInclude Include=".\h\ctltr001.h" />
+    <ClInclude Include=".\h\ctltr002.h" />
+    <ClInclude Include=".\h\ctltr007.h" />
+    <ClInclude Include=".\h\ctltr008.h" />
+    <ClInclude Include=".\h\ctltr009.h" />
+    <ClInclude Include=".\h\ctltr010.h" />
+    <ClInclude Include=".\h\ctltr011.h" />
+    <ClInclude Include=".\h\ctltr012.h" />
+    <ClInclude Include=".\h\ctltr013.h" />
+    <ClInclude Include=".\h\ctltr014.h" />
+    <ClInclude Include=".\h\ctltr015.h" />
+    <ClInclude Include=".\h\ctltr016.h" />
+    <ClInclude Include=".\h\ctltr017.h" />
+    <ClInclude Include=".\h\ctltr018.h" />
+    <ClInclude Include=".\h\ctltr019.h" />
+    <ClInclude Include=".\h\ctltr020.h" />
+    <ClInclude Include=".\h\ctltr021.h" />
+    <ClInclude Include=".\h\ctltr022.h" />
+    <ClInclude Include=".\h\ctltr023.h" />
+    <ClInclude Include=".\h\ctltr024.h" />
+    <ClInclude Include=".\h\ctltr025.h" />
+    <ClInclude Include=".\h\ctltr026.h" />
+    <ClInclude Include=".\h\ctltr027.h" />
+    <ClInclude Include=".\h\ctltr028.h" />
+    <ClInclude Include=".\h\ctltr029.h" />
+    <ClInclude Include=".\h\ctltr030.h" />
+    <ClInclude Include=".\h\ctltr031.h" />
+    <ClInclude Include=".\h\ctltr032.h" />
+    <ClInclude Include=".\h\ctltr033.h" />
+    <ClInclude Include=".\h\ctltr034.h" />
+    <ClInclude Include=".\h\ctltr035.h" />
+    <ClInclude Include=".\h\ctltr036.h" />
+    <ClInclude Include=".\h\ctltr038.h" />
+    <ClInclude Include=".\h\ctltrall.h" />
+    <ClInclude Include=".\h\dtwain.h" />
+    <ClInclude Include=".\h\dtwain_verinfo.h" />
+    <ClInclude Include=".\h\dtwainc.h" />
+    <ClInclude Include=".\h\dtwaindefs.h" />
+    <ClInclude Include=".\h\dtwainx.h" />
+    <ClInclude Include=".\h\dtwpdft.h" />
+    <ClInclude Include=".\h\dtwstrfn.h" />
+    <ClInclude Include=".\h\funcmac.h" />
+    <ClInclude Include=".\h\ocrengine\ocrinterface.h" />
+    <ClInclude Include=".\h\ocrengine\transym_ocrinterface.h" />
+    <ClInclude Include=".\h\twain.h" />
+    <ClInclude Include=".\h\versioninfo.h" />
+    <ClInclude Include=".\h\winconst.h" />
+    <ClInclude Include=".\h\ctltr003.h" />
+    <ClInclude Include=".\h\ctltr004.h" />
+    <ClInclude Include=".\h\ctltr005.h" />
+    <ClInclude Include=".\h\ctltr006.h" />
+    <ClInclude Include=".\h\ctltr039.h" />
+    <ClInclude Include="cpp\pdflib32\a85encode.h" />
+    <ClInclude Include="cpp\pdflib32\ahexencode.h" />
+    <ClInclude Include="cpp\pdflib32\flateencode.h" />
+    <ClInclude Include="cpp\pdflib32\md5class.h" />
+    <ClInclude Include="cpp\pdflib32\pdfencrypt.h" />
+    <ClInclude Include="cpp\pdflib32\pdflib32.h" />
+    <ClInclude Include="cximage\ximage.h" />
+    <ClInclude Include="FreeImage\Source\FreeImage.h" />
+    <ClInclude Include="FreeImage\Wrapper\FreeImagePlus\FreeImagePlus.h" />
+    <ClInclude Include="h\ansiwideconverter_generic.h" />
+    <ClInclude Include="h\ansiwideconverter_win32.h" />
+    <ClInclude Include="h\arrayfactory.h" />
+    <ClInclude Include="h\ctlconstexprfind.h" />
+    <ClInclude Include="h\ctlconstexprutils.h" />
+    <ClInclude Include="h\ctldefsource.h" />
+    <ClInclude Include="h\ctldib32.h" />
+    <ClInclude Include="h\ctlfilesave.h" />
+    <ClInclude Include="h\ctlfileutils.h" />
+    <ClInclude Include="h\ctlloadresources.h" />
+    <ClInclude Include="h\ctlstringutils.h" />
+    <ClInclude Include="h\ctlsupport.h" />
+    <ClInclude Include="h\ctlthreadutils.h" />
+    <ClInclude Include="h\ctltr037.h" />
+    <ClInclude Include="h\ctltr041.h" />
+    <ClInclude Include="h\ctltr042.h" />
+    <ClInclude Include="h\ctltr043.h" />
+    <ClInclude Include="h\ctltripletbase.h" />
+    <ClInclude Include="h\ctltwainidentity.h" />
+    <ClInclude Include="h\ctltwainmanager.h" />
+    <ClInclude Include="h\ctltwainmsgloop.h" />
+    <ClInclude Include="h\ctltwainsession.h" />
+    <ClInclude Include="h\ctltwainsource.h" />
+    <ClInclude Include="h\ctlutils.h" />
+    <ClInclude Include="h\dibinfox.h" />
+    <ClInclude Include="h\dibmulti.h" />
+    <ClInclude Include="h\dtwain_anyutils.h" />
+    <ClInclude Include="h\dtwain_config.h" />
+    <ClInclude Include="h\dtwain_filesystem.h" />
+    <ClInclude Include="h\dtwain_filetypes.h" />
+    <ClInclude Include="h\dtwain_float_utils.h" />
+    <ClInclude Include="h\dtwain_library_selector.h" />
+    <ClInclude Include="h\dtwain_paramlogger.h" />
+    <ClInclude Include="h\dtwain_raii.h" />
+    <ClInclude Include="h\dtwain_standard_defs.h" />
+    <ClInclude Include="h\dtwain_version.h" />
+    <ClInclude Include="h\dtwtype.h" />
+    <ClInclude Include="h\errstruc.h" />
+    <ClInclude Include="h\imagefun\dtwpdf\crc32_aux.h" />
+    <ClInclude Include="h\imagefun\dtwpdf\dtwainpdf.h" />
+    <ClInclude Include="h\imagefun\pcxfun32.h" />
+    <ClInclude Include="h\imagefun\pdffun32.h" />
+    <ClInclude Include="h\imagefun\resamplefactory.h" />
+    <ClInclude Include="h\imagefun\tiffun32.h" />
+    <ClInclude Include="h\imagefun\txtfun32.h" />
+    <ClInclude Include="h\imagefun\winbit32.h" />
+    <ClInclude Include="h\imagefun\wmffun32.h" />
+    <ClInclude Include="h\imagexferfilewriter.h" />
+    <ClInclude Include="h\logmsg.h" />
+    <ClInclude Include="h\logwriterutils.h" />
+    <ClInclude Include="h\notimpl.h" />
+    <ClInclude Include="h\sourceacquireopts.h" />
+    <ClInclude Include="h\sourceselectopts.h" />
+    <ClInclude Include="h\twainfix32.h" />
+    <ClInclude Include="h\twainframe.h" />
+    <ClInclude Include="simpleini\SimpleIni.h" />
+    <CustomBuildStep Include=".\cdtwain\cdtwain_internal\buftrans.h" />
+    <CustomBuildStep Include=".\cdtwain\cdtwain_internal\cdtenum.h" />
+    <CustomBuildStep Include=".\cdtwain\cdtwain_internal\cdtwain.h" />
+    <CustomBuildStep Include=".\cpp\twainsave_internal\commandlineparser.h" />
+    <CustomBuildStep Include=".\cpp\twainsave_internal\extfuncs.h" />
+    <CustomBuildStep Include=".\cpp\twainsave_internal\messages.h" />
+    <CustomBuildStep Include=".\cpp\twainsave_internal\scanstruct.h" />
+    <ClInclude Include=".\h\ImageFun\dtwpdf\pdffont_basic.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".\def\dtwain32.def" />
+    <None Include=".\def\dtwain32_d.def" />
+    <None Include=".\def\dtwain32_u.def" />
+    <None Include=".\def\dtwain32_u_d.def" />
+    <None Include=".\def\dtwain64.def" />
+    <None Include=".\def\dtwain64_d.def" />
+    <None Include=".\def\dtwain64_u.def" />
+    <None Include=".\def\dtwain64_u_d.def" />
+    <None Include=".\h\versioninfo.ipp" />
+    <None Include=".\inl\ctlstrimpl.inl" />
+    <None Include=".\inl\ctltr016.inl" />
+    <None Include=".\inl\ctltr017.inl" />
+    <None Include=".\inl\ctltr018.inl" />
+    <None Include=".\inl\ctltr019.inl" />
+    <None Include=".\inl\ctltr020.inl" />
+    <CustomBuildStep Include=".\cdtwain\cdtwain_internal\capfrm.inl">
+      <FileType>Document</FileType>
+    </CustomBuildStep>
+    <CustomBuildStep Include=".\cdtwain\cdtwain_internal\capint.inl">
+      <FileType>Document</FileType>
+    </CustomBuildStep>
+    <CustomBuildStep Include=".\cdtwain\cdtwain_internal\capsall.inl">
+      <FileType>Document</FileType>
+    </CustomBuildStep>
+    <CustomBuildStep Include=".\cdtwain\cdtwain_internal\capstr.inl">
+      <FileType>Document</FileType>
+    </CustomBuildStep>
+    <None Include="inl\linuxget_twain.inl" />
+    <None Include="inl\linuxinit_impl.inl" />
+    <None Include="inl\linuxlibraryloader_impl.inl" />
+    <None Include="inl\unix_info.inl" />
+    <None Include="inl\windowsinit_impl.inl" />
+    <None Include="inl\windows_info.inl" />
+    <None Include="inl\winget_twain.inl" />
+    <None Include="inl\winlibraryloader_impl.inl" />
+    <None Include="rc\resource_verinfo.rc2" />
+    <None Include="rc\twainresourcestrings_english.rc2" />
+    <None Include="txt\dtwain32.ini" />
+    <None Include="txt\dtwain64.ini" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include=".\rc\twil32.rc">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">\rc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">\rc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">\rc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">\rc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="txt\twaininfo.txt" />
+    <Text Include="txt\twainlanguage.txt" />
+    <Text Include="txt\twainresourcestrings_dutch.txt" />
+    <Text Include="txt\twainresourcestrings_english.txt" />
+    <Text Include="txt\twainresourcestrings_french.txt" />
+    <Text Include="txt\twainresourcestrings_german.txt" />
+    <Text Include="txt\twainresourcestrings_greek.txt" />
+    <Text Include="txt\twainresourcestrings_italian.txt" />
+    <Text Include="txt\twainresourcestrings_japanese.txt" />
+    <Text Include="txt\twainresourcestrings_korean.txt" />
+    <Text Include="txt\twainresourcestrings_portuguese.txt" />
+    <Text Include="txt\twainresourcestrings_portuguese_br.txt" />
+    <Text Include="txt\twainresourcestrings_romanian.txt" />
+    <Text Include="txt\twainresourcestrings_russian.txt" />
+    <Text Include="txt\twainresourcestrings_simplified_chinese.txt" />
+    <Text Include="txt\twainresourcestrings_spanish.txt" />
+    <Text Include="txt\twainresourcestrings_traditional_chinese.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties DevPartner_IsInstrumented="0" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
