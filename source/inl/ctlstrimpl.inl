@@ -1454,7 +1454,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainStringNameA(LONG category, LONG TwainID, LPSTR 
 #endif
 }
 
-LONG DLLENTRY_DEF DTWAIN_GetTwainIDFromNameA(LPSTR lpszBuffer)
+LONG DLLENTRY_DEF DTWAIN_GetTwainIDFromNameA(LPCSTR lpszBuffer)
 {
 #ifdef _UNICODE
     return DTWAIN_GetTwainIDFromName(StringConversion::Convert_AnsiPtr_To_Native(lpszBuffer).c_str());
@@ -1463,7 +1463,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainIDFromNameA(LPSTR lpszBuffer)
 #endif
 }
 
-LONG DLLENTRY_DEF DTWAIN_GetTwainIDFromNameW(LPWSTR lpszBuffer)
+LONG DLLENTRY_DEF DTWAIN_GetTwainIDFromNameW(LPCWSTR lpszBuffer)
 {
 #ifdef _UNICODE
     return DTWAIN_GetTwainIDFromName(lpszBuffer);
