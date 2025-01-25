@@ -2,6 +2,20 @@ DTWAIN Version changes
 
 5.6.0
 
+- Added versions of the DTWAIN DLL that requires an installation of the Visual C++
+  Runtime on the target machine.  This further reduces the disk size of the DTWAIN DLL's.
+
+  The application must run on a system that has the Visual C++ Redistributables 
+  (versions 2015 and above) already installed.  Since many applications would have 
+  already installed the VC++ redistributables, the reduction in size of the DTWAIN DLL's 
+  may be advantageous for your application. 
+
+  For more information on this and receiving the VC++ redistributables (if you want to install these
+  files yourself):
+
+  https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#visual-studio-2015-2017-2019-and-2022
+
+
 - Upgraded following internal image libraries:
 
       libpng   --> 1.6.44
