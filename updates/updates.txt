@@ -10,7 +10,7 @@ DTWAIN Version changes
   already installed the VC++ redistributables, the reduction in size of the DTWAIN DLL's 
   may be advantageous for your application. 
 
-  For more information on this and receiving the VC++ redistributables (if you want to install these
+  For more information on this, and receiving the VC++ redistributables (if you want to install these
   files yourself):
 
   https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#visual-studio-2015-2017-2019-and-2022
@@ -25,15 +25,20 @@ DTWAIN Version changes
   
 - Changed determination of whether a TWAIN source can sense paper by
   querying the CAP_PAPERDETECTABLE capability, and if not supported
-  query the CAP_FEEDERENABLED capability (for source compliancy testing --
+  query the CAP_FEEDERENABLED capability (for TWAIN driver compliancy testing --
   see the update below).  
 
 - Report TWAIN compliancy error if CAP_PAPERDETECTABLE is not supported,
   but CAP_FEEDERENABLED is supported (CAP_PAPERDETECTABLE must be supported
-  for a source that supports a document feeder to be TWAIN compliant).
+  for a source/driver that supports a document feeder to be TWAIN compliant).
+
+- For DTWAIN_AcquireFile(), when using the source file transfer mode, send 
+  DTWAIN_TN_FILEPAGESAVEOK and DTWAIN_TN_FILESAVEOK notifications on successful
+  file transfer.  Ccurrently, these two notifications are only sent when using 
+  the native or buffered transfer modes when acquiring to an image file).
 
 - For the above issues with CAP_PAPERDETECABLE, allow overrides of whether a 
-  source supports a paper sensor by introducing a [PaperDetectionStatus] setting
+  source/driver supports a paper sensor by introducing a [PaperDetectionStatus] setting
   in dtwain32.ini and dtwain64.ini.  Currently, only the Avision 176U scanners are
   set for this override.  
 
