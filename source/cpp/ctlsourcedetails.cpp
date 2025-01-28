@@ -44,7 +44,7 @@ static std::string remove_quotes(std::string s)
 }
 
 template <typename T>
-static void create_stream(std::stringstream& strm, DTWAIN_SOURCE Source, LONG capValue, LONG twainConstantID, bool useTwainName = false)
+static void create_stream(std::ostringstream& strm, DTWAIN_SOURCE Source, LONG capValue, LONG twainConstantID, bool useTwainName = false)
 {
     DTWAIN_ARRAY arr = nullptr;
     DTWAIN_GetCapValuesEx2(Source, capValue, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
@@ -123,7 +123,7 @@ struct CameraSystemStringFnGetter
 };
 
 template <typename Fn>
-static void create_stream_from_strings(std::stringstream& strm, DTWAIN_SOURCE Source, LONG capValue)
+static void create_stream_from_strings(std::ostringstream& strm, DTWAIN_SOURCE Source, LONG capValue)
 {
     const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     std::vector<std::string> imageVals;
@@ -149,165 +149,26 @@ static void create_stream_from_strings(std::stringstream& strm, DTWAIN_SOURCE So
 
 static std::string get_source_file_types(DTWAIN_SOURCE Source)
 {
-    using sourceMapType = std::array<std::pair<LONG, const char*>, 28>;
-    static constexpr sourceMapType source_map =
-    {
-        {{DTWAIN_FF_BMP,"\"bmp1_mode2\""},
-        {DTWAIN_FF_BMP,"\"bmp2_mode2\""},
-        {DTWAIN_FF_BMP,"\"bmp3_mode2\""},
-        {DTWAIN_FF_BMP,"\"bmp4_mode2\""},
-        {DTWAIN_FF_DEJAVU,"\"dejavu_mode2\""},
-        {DTWAIN_FF_EXIF,"\"exif_mode2\""},
-        {DTWAIN_FF_FPX,"\"fpx_mode2\""},
-        {DTWAIN_FF_JFIF,"\"jfif_mode2\""},
-        {DTWAIN_JPEG,"\"jpeg_mode2\""},
-        {DTWAIN_FF_JP2,"\"jp2_mode2\""},
-        {DTWAIN_FF_JPX,"\"jpx_mode2\""},
-        {DTWAIN_FF_PDF,"\"pdf_mode2\""},
-        {DTWAIN_FF_PDFA,"\"pdfa1_mode2\""},
-        {DTWAIN_FF_PDFA2,"\"pdfa2_mode2\""},
-        {DTWAIN_FF_PICT,"\"pict_mode2\""},
-        {DTWAIN_FF_PNG,"\"png_mode2\""},
-        {DTWAIN_FF_SPIFF,"\"spiff1_mode2\""},
-        {DTWAIN_FF_SPIFF,"\"spiff2_mode2\""},
-        {DTWAIN_FF_TIFF,"\"tiff1_mode2\""},
-        {DTWAIN_FF_TIFF,"\"tiff2_mode2\""},
-        {DTWAIN_FF_TIFF,"\"tiff3_mode2\""},
-        {DTWAIN_FF_TIFF,"\"tiff4_mode2\""},
-        {DTWAIN_FF_TIFF,"\"tiff5_mode2\""},
-        {DTWAIN_FF_TIFF,"\"tiff6_mode2\""},
-        {DTWAIN_FF_TIFF,"\"tiff7_mode2\""},
-        {DTWAIN_FF_TIFF,"\"tiff8_mode2\""},
-        {DTWAIN_FF_TIFF,"\"tiff9_mode2\""},
-        {DTWAIN_FF_XBM,"\"xbm_mode2\""}}
-    };
-
-    static sourceMapType tiffMap =
-    { {
-        {TWCP_NONE,"\"tiff1_mode2\""},
-        {TWCP_GROUP31D,"\"tiff2_mode2\""},
-        {TWCP_GROUP31DEOL,"\"tiff3_mode2\""},
-        {TWCP_GROUP32D,"\"tiff4_mode2\""},
-        {TWCP_GROUP4,"\"tiff5_mode2\""},
-        {TWCP_JPEG,"\"tiff6_mode2\""},
-        {TWCP_LZW,"\"tiff7_mode2\""},
-        {TWCP_JBIG,"\"tiff8_mode2\""},
-        {TWCP_ZIP,"\"tiff9_mode2\""}}
-    };
-
-    static sourceMapType bmpMap =
-    { {
-        {TWCP_NONE,"\"bmp1_mode2\""},
-        {TWCP_RLE4,"\"bmp2_mode2\""},
-        {TWCP_RLE8,"\"bmp3_mode2\""},
-        {TWCP_BITFIELDS,"\"bmp4_mode2\""}}
-    };
-
-    static sourceMapType spiffMap =
-    { {
-        {TWCP_JPEG, "\"spiff1_mode2\""},
-        {TWCP_JBIG, "\"spiff2_mode2\""}}
-    };
-
-    static const std::array<std::pair<LONG, sourceMapType*>, 3> compToMap =
-    { {
-        {TWFF_TIFF, &tiffMap},
-        {TWFF_BMP, &bmpMap},
-        {TWFF_SPIFF, &spiffMap}
-    } };
-
-    struct resetAll
-    {
-        LONG curFormat;
-        LONG curCompression;
-        DTWAIN_SOURCE Source;
-        resetAll(DTWAIN_SOURCE cInfo, LONG cF, LONG cC) : curFormat(cF), curCompression(cC), Source(cInfo) {}
-        ~resetAll()
-        {
-            try
-            {
-                const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
-                DTWAIN_ARRAY arr = CreateArrayFromCap(pHandle, nullptr, ICAP_IMAGEFILEFORMAT, 1);
-                if (arr)
-                {
-                    DTWAINArrayPtr_RAII raii(pHandle, &arr);
-                    auto& buf = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
-                    buf[0] = curFormat;
-                    DTWAIN_SetCapValuesEx2(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
-                    buf[0] = curCompression;
-                    if (curCompression != -1)
-                        DTWAIN_SetCapValuesEx2(Source, ICAP_COMPRESSION, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
-                }
-            }
-            catch (...)
-            {
-            }
-        }
-    };
-
     // get all the image file formats
     const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     DTWAIN_ARRAY aFileFormats = nullptr;
-    DTWAIN_ARRAY aCurrentFileFormat = nullptr;
-    DTWAIN_GetCapValuesEx2(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aFileFormats);
+    auto bOk = DTWAIN_GetCapValuesEx2(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aFileFormats);
+    if (!bOk || !aFileFormats)
+        return {};
 
-    if ( aFileFormats)
-    {
         DTWAINArrayPtr_RAII raii1(pHandle, &aFileFormats);
         auto& vFileFormats = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aFileFormats);
-
-        DTWAIN_GetCapValuesEx2(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aCurrentFileFormat);
-        if ( aCurrentFileFormat )
-        {
-            DTWAINArrayPtr_RAII raii2(pHandle, &aCurrentFileFormat);
-            auto& vCurrentFormat = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aCurrentFileFormat);
-
-            DTWAIN_ARRAY aCurrentCompress = nullptr;
-            DTWAIN_GetCapValuesEx2(Source, ICAP_COMPRESSION, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aCurrentCompress);
-            if (aCurrentCompress)
-            {
-                DTWAINArrayPtr_RAII raii3(pHandle, &aCurrentCompress);
-                auto& vCurrentCompress = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aCurrentCompress);
-
-                // get the current image file format
-                if (vCurrentFormat.empty())
-                    return "";
-                resetAll ra(Source, vCurrentFormat.front(), vCurrentCompress.empty() ? -1 : vCurrentCompress.front());
-                std::vector<std::string> returnFileTypes;
-                DTWAIN_ARRAY tempArray = CreateArrayFromCap(pHandle, nullptr, ICAP_IMAGEFILEFORMAT, 1);
-                DTWAINArrayPtr_RAII raii4(pHandle, &tempArray);
-                auto& tempBuffer = pHandle->m_ArrayFactory->underlying_container_t<LONG>(tempArray);
-
-                for (auto fformat : vFileFormats) 
-                {
-                    tempBuffer[0] = fformat;
-                    auto compIter = dynarithmic::generic_array_finder_if(compToMap, [&](const auto& pr) { return pr.first == fformat; });
-                    if (compIter.first)
-                    {
-                        const sourceMapType* ptr = compToMap[compIter.second].second;
-                        DTWAIN_SetCapValuesEx2(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, tempArray);
-                        auto tempCompression = DTWAIN_EnumCompressionTypesEx(Source);
-                        DTWAINArrayPtr_RAII raii5(pHandle, &tempCompression);
-                        auto& compressBuf = pHandle->m_ArrayFactory->underlying_container_t<LONG>(tempCompression);
-                        for (auto comp : compressBuf )
-                        {
-                            auto iter = dynarithmic::generic_array_finder_if(*ptr, [&](const auto& pr) { return pr.first == comp; });
-                            if (iter.first)
-                                returnFileTypes.push_back((*ptr)[iter.second].second);
-                        }
-                    }
-                    else
-                    {
-                        auto sourceIter = dynarithmic::generic_array_finder_if(source_map, [&](const auto& pr) { return pr.first == fformat; });
-                        if (sourceIter.first)
-                            returnFileTypes.push_back(source_map[sourceIter.second].second);
-                    }
-                }
-                return join_string(returnFileTypes.begin(), returnFileTypes.end());
-            }
-        }
-    }
+    if (vFileFormats.empty())
     return {};
+
+    std::vector<std::string> vRetVal;
+    char szFileFormat[100];
+    for (auto curFormat : vFileFormats)
+    {
+        DTWAIN_GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWFF, curFormat, szFileFormat, 99);
+        vRetVal.push_back(StringWrapperA::QuoteString(szFileFormat)); 
+    }
+    return join_string(vRetVal.begin(), vRetVal.end());
 }
 
 using pixelMap = std::map<LONG, std::vector<LONG>>;
@@ -521,6 +382,7 @@ static AllCapInfo getAllCapInfo(CTL_ITwainSource* pSource)
 static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std::string>& allSources, LONG indentFactor, bool bWeOpenSource=false)
 {
     static constexpr int numOneValueDeviceInfo = 12;
+    static constexpr int numImageInfoString = 13;
     const auto pHandle = ts.GetTwainDLLHandle();
     using boost::algorithm::join;
     using boost::adaptors::transformed;
@@ -556,7 +418,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
     std::vector<std::string> sNames = allSources;
     glob_json["device-names"] = sNames;
     std::string jsonString;
-    std::array<std::string,13> imageInfoString;
+    std::array<std::string, numImageInfoString> imageInfoString;
     std::array<std::string, numOneValueDeviceInfo> deviceInfoString;
 
     struct CloserRAII
@@ -655,8 +517,8 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     devOpen[1] = true;
                     jsonString = pCurrentSourcePtr->GetSourceInfo();
                     jColorInfo = "\"color-info\":{";
-                    std::stringstream strm;
-                    std::stringstream strm2;
+                    std::ostringstream strm;
+                    std::ostringstream strm2;
                     std::string allbdepths;
 
                     // Get the pixel information
@@ -707,12 +569,13 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         bool usefullName;
                     };
 
-                    std::array<TwainDataItems, 5> otherData = { {
+                    std::array<TwainDataItems, 6> otherData = { {
                         { ICAP_SUPPORTEDSIZES, DTWAIN_CONSTANT_TWSS, "\"paper-sizes\":", 5, "TWSS_", false },
                         { ICAP_SUPPORTEDBARCODETYPES, DTWAIN_CONSTANT_TWBT, "\"barcode-supported-types\":", 5, "TWBT_", false },
                         { ICAP_SUPPORTEDPATCHCODETYPES,DTWAIN_CONSTANT_TWPCH, "\"patchcode-supported-types\":", 6, "TWPCH_", false },
                         { ICAP_SUPPORTEDEXTIMAGEINFO,DTWAIN_CONSTANT_TWEI, "\"extendedimageinfo-supported-types\":", 5, "TWEI_", false },
-                        { CAP_SUPPORTEDDATS,DTWAIN_CONSTANT_DAT, "\"supported-dat-types\":", 4, "DAT_", true }
+                        { CAP_SUPPORTEDDATS,DTWAIN_CONSTANT_DAT, "\"supported-dat-types\":", 4, "DAT_", true },
+                        { ICAP_COMPRESSION, DTWAIN_CONSTANT_TWCP, "\"filecompression-types\":", 5, "TWCP_", true }
                     } };
                     for (auto& oneData : otherData)
                     {
@@ -860,11 +723,15 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                                                             "\"webp\"" };
 
                     std::string allFileTypes = std::accumulate(fileTypes.begin(), fileTypes.end(), std::string());
-                    std::string customTypes = get_source_file_types(pCurrentSourcePtr);
+                    std::string customTypes = get_source_file_types(pCurrentSourcePtr); // .str();
                     if (!customTypes.empty())
+                    {
+//                        customTypes = "\"device-filetype-info\":" + customTypes;
                         allFileTypes += "," + customTypes;
+                    }
+
                     tempStrm << "\"filetype-info\":[" << allFileTypes << "]";
-                    imageInfoString[numOneValueDeviceInfo] = tempStrm.str();
+                    imageInfoString[12] = tempStrm.str();
 
                     strm.str("");
 
