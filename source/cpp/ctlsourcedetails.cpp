@@ -682,8 +682,13 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     strm2.str("");
                     // get the capability string
                     auto capInfo = getAllCapInfo(pCurrentSourcePtr);
+                    std::vector<OneCapInfo> vCapInfos;
                     for ( auto& pr : capInfo.m_infoMap )
-                        strm2 << "{ \"name\":\"" << pr.second.capName << "\",\"value\":" << pr.second.value << ",\"type\":" << pr.second.capType << "},";
+                        vCapInfos.push_back(pr.second);
+                    std::sort(vCapInfos.begin(), vCapInfos.end(),
+                        [&](const auto& val1, const auto& val2) { return val1.capName < val2.capName;  });
+                    for (auto& oneVal : vCapInfos)
+                        strm2 << "{ \"name\":\"" << oneVal.capName << "\",\"value\":" << oneVal.value << ",\"type\":" << oneVal.capType << "},";
                     capabilityString = strm2.str();
                     capabilityString.pop_back();
                     capabilityString = "[" + capabilityString + "]";

@@ -558,11 +558,36 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
                 // transfer will continue!
                 DTWAIN_SetFileXferFormat(Source, nFileType, TRUE);
 
-                // See if compression needs to be set and if so,
-                // it must be done here for file transfers
-                LONG Compression;
-                if (DTWAIN_GetCompressionType(Source, &Compression, DTWAIN_CAPGETCURRENT))
-                    DTWAIN_SetCompressionType(Source, Compression, TRUE);
+                // We need to set the transfer mechanism here to ensure compression is set correctly
+                CTL_TwainAppMgr::SetTransferMechanism(pSource, TWAINAcquireType_File, ClipboardTransferType);
+
+                // Set the compression
+                DTWAIN_SetCompressionType(Source, pSource->GetCompressionType(), TRUE);
+
+                // Warn application if the compression chosen is not one recognized to match the
+                // file format chosen
+                bool bSupported = true;
+                auto& compressionMap = CTL_StaticData::GetCompressionMap();
+                auto iter = compressionMap.find(pSource->GetCompressionType());
+                bSupported = (iter != compressionMap.end());
+                if ( bSupported )
+                {
+                    auto iter2 = std::find(iter->second.begin(), iter->second.end(), nFileType);
+                    bSupported = (iter2 != iter->second.end());
+                }
+                if ( !bSupported ) // Compression is unknown, or it doesn't match the file type chosen
+                {
+                    bool bLogMessages = (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS) ? true : false;
+                    if ( bLogMessages )
+                    {
+                        std::string warningMsg = GetResourceStringFromMap(IDS_DTWAIN_FILE_COMPRESS_TYPE_MISMATCH);
+                        std::ostringstream strm;
+                        strm << warningMsg << ": FileType=" << nFileType << "  Compression=" << pSource->GetCompressionType();
+                        LogWriterUtils::WriteLogInfoIndentedA(strm.str());
+                    }
+                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(),
+                        nullptr, DTWAIN_TN_FILECOMPRESSTYPEMISMATCH, reinterpret_cast<LPARAM>(pSource));
+                }
             }
 
             pSource->SetSpecialTransferMode(lMode);
