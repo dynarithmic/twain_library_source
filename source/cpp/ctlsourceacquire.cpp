@@ -582,7 +582,9 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
                     {
                         std::string warningMsg = GetResourceStringFromMap(IDS_DTWAIN_FILE_COMPRESS_TYPE_MISMATCH);
                         std::ostringstream strm;
-                        strm << warningMsg << ": FileType=" << nFileType << "  Compression=" << pSource->GetCompressionType();
+                        strm << warningMsg << "  FileType=" << 
+                            CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWFF, nFileType) << "  Compression=" << 
+                            CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWCP, pSource->GetCompressionType());
                         LogWriterUtils::WriteLogInfoIndentedA(strm.str());
                     }
                     CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(),
