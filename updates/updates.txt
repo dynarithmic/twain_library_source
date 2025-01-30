@@ -32,11 +32,6 @@ DTWAIN Version changes
   but CAP_FEEDERENABLED is supported (CAP_PAPERDETECTABLE must be supported
   for a source/driver that supports a document feeder to be TWAIN compliant).
 
-- For DTWAIN_AcquireFile(), when using the source file transfer mode, send 
-  DTWAIN_TN_FILEPAGESAVEOK and DTWAIN_TN_FILESAVEOK notifications on successful
-  file transfer.  Ccurrently, these two notifications are only sent when using 
-  the native or buffered transfer modes when acquiring to an image file).
-
 - For the above issues with CAP_PAPERDETECABLE, allow overrides of whether a 
   source/driver supports a paper sensor by introducing a [PaperDetectionStatus] setting
   in dtwain32.ini and dtwain64.ini.  Currently, only the Avision 176U scanners are
@@ -46,6 +41,20 @@ DTWAIN Version changes
   the underlying calls to the TWAIN subsystem were always done after the first time 
   the device was queried for this information.  As of this version, the first results are
   now cached instead of having to go to the TWAIN subsystem on subsequent queries.
+
+- For DTWAIN_AcquireFile(), when using the source file transfer mode, send 
+  DTWAIN_TN_FILEPAGESAVEOK and DTWAIN_TN_FILESAVEOK notifications on successful
+  file transfer.  Currently, these two notifications are only sent when using 
+  the native or buffered transfer modes when acquiring to an image file).
+
+- Add function DTWAIN_SetFileCompressionType() and DTWAIN_GetFileCompressionType() to 
+  ensure that the compression type used by source file transfer mode is utilized.
+  Currently, the compression type other than TWCP_NONE is not guaranteed to be
+  used, even if the compression type is supported.  
+
+  The DTWAIN_SetFileCompressionType() function should be called before DTWAIN_AcquireFile()
+  or DTWAIN_AcquireFileEx() (with the DTWAIN_USESOURCEFLAG mode set for these calls) to
+  ensure the compression type will be used for the file transfer.
 
 - Some internal code improvements.
 
