@@ -238,6 +238,41 @@ static std::vector<std::string> getDGDATNamesFromConstants(CTL_ITwainSource* pSo
     return allNames;
 }
 
+static std::vector<std::string> getCompressionNames(CTL_ITwainSource* pSource)
+{
+    const auto pHandle = pSource->GetDTWAINHandle();
+    std::set<LONG> compressionSets;
+
+    // Enumerate all the file types available for file transfer
+    DTWAIN_ARRAY aFileTypes = DTWAIN_EnumFileXferFormatsEx(pSource);
+    if (!aFileTypes)
+        return {};
+
+    DTWAINArrayLowLevel_RAII raii(pHandle, aFileTypes);
+
+    auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aFileTypes);
+
+    if (vValues.empty())
+        return {};
+    std::vector<std::string> allNames;
+
+    for (auto& fileType : vValues)
+    {
+        // Call function to enumerate the compressions types for the fileType image type
+        auto allCompressionTypes = DTWAIN_EnumCompressionTypesEx2(pSource, fileType, false);
+        if (!allCompressionTypes)
+            continue;
+        DTWAINArrayLowLevel_RAII raii2(pHandle, allCompressionTypes);
+        auto& vCompression = pHandle->m_ArrayFactory->underlying_container_t<LONG>(allCompressionTypes);
+        compressionSets.insert(vCompression.begin(), vCompression.end());
+    }
+    for (auto value : compressionSets)
+    {
+        std::string compressName = StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_TWCP, value));
+        allNames.push_back(compressName);
+    }
+    return allNames;
+}
 
 struct OneResInfo
 {
@@ -584,6 +619,9 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                             std::vector<std::string> vNames;
                             if ( oneData.cap == CAP_SUPPORTEDDATS)
                                 vNames = getDGDATNamesFromConstants(pCurrentSourcePtr);
+                            else
+                            if (oneData.cap == ICAP_COMPRESSION)
+                                vNames = getCompressionNames(pCurrentSourcePtr);
                             else
                                 vNames = getNamesFromConstants(pCurrentSourcePtr, oneData.cap, oneData.capConstant, [](LONG v) { return v; });
                             std::string allSizes;
