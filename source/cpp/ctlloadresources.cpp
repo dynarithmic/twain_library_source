@@ -456,7 +456,7 @@ namespace dynarithmic
 
             // Parse the line containing the file save dialog information for the 
             // file type being saved
-            StringWrapperA::TokenizeQuoted(totalLine, " ", vParsedComponents);
+            StringWrapperA::TokenizeQuoted(StringWrapperA::TrimAll(totalLine), " ", vParsedComponents);
             if (vParsedComponents.size() != 5)
             {
                 retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = false;
