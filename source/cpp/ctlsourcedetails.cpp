@@ -210,7 +210,7 @@ static std::vector<std::string> getNamesFromConstants(CTL_ITwainSource *pSource,
         for (LONG value : vValues)
         {
             value = fn(value);
-            allNames.push_back(StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetTwainNameFromConstant(twainconstantID, value)));
+            allNames.push_back(CTL_StaticData::GetTwainNameFromConstantA(twainconstantID, value));
         }
     }
     return allNames;
@@ -230,8 +230,8 @@ static std::vector<std::string> getDGDATNamesFromConstants(CTL_ITwainSource* pSo
         {
             auto valueDG = (value & 0xFFFF0000) >> 16;
             auto valueDAT = value & 0x0000FFFF;
-            std::string dgName = StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DG, valueDG));
-            std::string datName = StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DAT, valueDAT));
+            std::string dgName = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DG, valueDG);
+            std::string datName = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DAT, valueDAT);
             allNames.push_back(dgName + " / " + datName); 
         }
     }
@@ -268,7 +268,7 @@ static std::vector<std::string> getCompressionNames(CTL_ITwainSource* pSource)
     }
     for (auto value : compressionSets)
     {
-        std::string compressName = StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_TWCP, value));
+        std::string compressName = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWCP, value);
         allNames.push_back(compressName);
     }
     return allNames;
