@@ -605,10 +605,10 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     };
 
                     std::array<TwainDataItems, 6> otherData = { {
-                        { ICAP_SUPPORTEDSIZES, DTWAIN_CONSTANT_TWSS, "\"paper-sizes\":", 5, "TWSS_", false },
-                        { ICAP_SUPPORTEDBARCODETYPES, DTWAIN_CONSTANT_TWBT, "\"barcode-supported-types\":", 5, "TWBT_", false },
-                        { ICAP_SUPPORTEDPATCHCODETYPES,DTWAIN_CONSTANT_TWPCH, "\"patchcode-supported-types\":", 6, "TWPCH_", false },
-                        { ICAP_SUPPORTEDEXTIMAGEINFO,DTWAIN_CONSTANT_TWEI, "\"extendedimageinfo-supported-types\":", 5, "TWEI_", false },
+                        { ICAP_SUPPORTEDSIZES, DTWAIN_CONSTANT_TWSS, "\"paper-sizes\":", 5, "TWSS_", true },
+                        { ICAP_SUPPORTEDBARCODETYPES, DTWAIN_CONSTANT_TWBT, "\"barcode-supported-types\":", 5, "TWBT_", true },
+                        { ICAP_SUPPORTEDPATCHCODETYPES,DTWAIN_CONSTANT_TWPCH, "\"patchcode-supported-types\":", 6, "TWPCH_", true },
+                        { ICAP_SUPPORTEDEXTIMAGEINFO,DTWAIN_CONSTANT_TWEI, "\"extendedimageinfo-supported-types\":", 5, "TWEI_", true},
                         { CAP_SUPPORTEDDATS,DTWAIN_CONSTANT_DAT, "\"supported-dat-types\":", 4, "DAT_", true },
                         { ICAP_COMPRESSION, DTWAIN_CONSTANT_TWCP, "\"filecompression-types\":", 5, "TWCP_", true }
                     } };
