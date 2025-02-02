@@ -208,7 +208,7 @@ struct EnumCapInternalFn
 {
     DTWAIN_SOURCE theSource;
     TW_UINT16 theCap;
-    LPDTWAIN_ARRAY theArray;
+    LPDTWAIN_ARRAY theArray = {};
     bool theExpand;
     GetCapValuesFn theFn;
     EnumCapInternalFn(DTWAIN_SOURCE Src, TW_UINT16 cap, LPDTWAIN_ARRAY arr, bool expand, GetCapValuesFn fn) :

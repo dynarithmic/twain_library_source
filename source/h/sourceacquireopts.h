@@ -40,7 +40,7 @@ namespace dynarithmic
         int nOrigAcquireType;
         int nActualAcquireType;
         LONG   return_status;
-        DTWAIN_ARRAY UserArray; // = NULL,
+        DTWAIN_ARRAY UserArray = {};
         bool     bDiscardDibs; // = false,
         LONG     lFileType; // = -1,
         LONG     lFileFlags; // = 0,

@@ -182,7 +182,7 @@ void LogAndCachePixelTypes(CTL_ITwainSource *p)
 
     std::string sName = StringConversion::Convert_NativePtr_To_Ansi(szName);
     std::string sBitDepths;
-    DTWAIN_ARRAY PixelTypes;
+    DTWAIN_ARRAY PixelTypes = {};
 
     // enumerate all of the pixel types
     DTWAIN_BOOL bOK = DTWAIN_GetCapValuesEx2(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &PixelTypes);
