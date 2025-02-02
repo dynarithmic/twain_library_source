@@ -348,7 +348,7 @@ LONG             DLLENTRY_DEF DTWAIN_CallDSMProc(DTWAIN_IDENTITY AppID, DTWAIN_I
 /* Compression support for buffered transfer */
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCompressionType(DTWAIN_SOURCE Source, LPLONG lpCompression, DTWAIN_BOOL bCurrent);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCompressionType(DTWAIN_SOURCE Source, LONG lCompression, DTWAIN_BOOL bSetCurrent);
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetFileCompressionType(DTWAIN_SOURCE Source, LPLONG lpCompression);
+LONG        DLLENTRY_DEF DTWAIN_GetFileCompressionType(DTWAIN_SOURCE Source);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileCompressionType(DTWAIN_SOURCE Source, LONG lCompression, DTWAIN_BOOL bIsCustom);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCompressionTypes(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCompressionTypesEx(DTWAIN_SOURCE Source);
