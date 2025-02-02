@@ -213,9 +213,9 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, L
         }
 
         // Get the current xfermech format
-        DTWAIN_ARRAY aCurrentXferMech;
+        DTWAIN_ARRAY aCurrentXferMech = {};
         DTWAIN_GetCapValuesEx2(Source, ICAP_XFERMECH, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aCurrentXferMech);
-        DTWAINArrayLowLevel_RAII raii3(pHandle, aCurrentXferMech);
+        DTWAINArrayLowLevelPtr_RAII raii3(pHandle, &aCurrentXferMech);
         auto& vCurrentXferMech = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aCurrentXferMech);
 
         auto bChangedOk = ImageFileFormatCapHandler(Source, pHandle, lFileType, currentMode);
