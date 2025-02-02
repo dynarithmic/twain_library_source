@@ -53,15 +53,13 @@ static bool ImageFileFormatCapHandler(DTWAIN_SOURCE Source, CTL_TwainDLLHandle* 
     return true;
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetFileCompressionType(DTWAIN_SOURCE Source, LPLONG lpCompression)
+LONG DLLENTRY_DEF DTWAIN_GetFileCompressionType(DTWAIN_SOURCE Source)
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, lpCompression))
+    LOG_FUNC_ENTRY_PARAMS((Source))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    if (lpCompression)
-        *lpCompression = pSource->GetCompressionType();
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpCompression))
-    LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
-    CATCH_BLOCK(FALSE)
+    auto compression = pSource->GetCompressionType();
+    LOG_FUNC_EXIT_NONAME_PARAMS(compression)
+    CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileCompressionType(DTWAIN_SOURCE Source, LONG lCompression, DTWAIN_BOOL bIsCustom)
