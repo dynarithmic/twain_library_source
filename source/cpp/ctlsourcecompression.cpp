@@ -33,11 +33,12 @@ using namespace dynarithmic;
 // Sets the ICAP_XFERMECH and ICAP_COMPRESSION caps with the Mode and lFileType values
 static bool ImageFileFormatCapHandler(DTWAIN_SOURCE Source, CTL_TwainDLLHandle* pHandle, LONG lFileType, LONG Mode)
 {
+    static constexpr std::array<LONG, 2> aOnePassXferMech = { TWSX_NATIVE, TWSX_MEMORY };
     std::array<std::pair<LONG, LONG>, 2> capsToSet = { { {ICAP_XFERMECH, Mode}, {ICAP_IMAGEFILEFORMAT, lFileType} } };
     for (auto& val : capsToSet)
     {
         DTWAIN_ARRAY tempArray1 = CreateArrayFromCap(pHandle, nullptr, val.first, 1);
-        DTWAINArrayPtr_RAII raii1(pHandle, &tempArray1);
+        DTWAINArrayLowLevel_RAII raii1(pHandle, tempArray1);
         auto& tempBuffer1 = pHandle->m_ArrayFactory->underlying_container_t<LONG>(tempArray1);
         tempBuffer1[0] = val.second;
 
@@ -46,8 +47,9 @@ static bool ImageFileFormatCapHandler(DTWAIN_SOURCE Source, CTL_TwainDLLHandle* 
         if (!bOk)
             return false;
 
-        // Don't set the file format
-        if (val.first == ICAP_XFERMECH && Mode == TWSX_MEMORY)
+        // Don't set the file format if the transfer mechanism is one where the file type is not needed
+        if (val.first == ICAP_XFERMECH && 
+            std::find(aOnePassXferMech.begin(), aOnePassXferMech.end(), Mode) != aOnePassXferMech.end())
             return bOk;
     }
     return true;
@@ -119,103 +121,141 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, L
     if (!Source)
         LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
     auto [pHandle, pSource] = VerifyHandles(Source);
-    auto lMode = bUseBufferedMode ? TWSX_MEMORY : TWSX_FILE;
+    std::array<LONG, 2> lMode;
+    if ( bUseBufferedMode )
+    {
+        lMode[0] = TWSX_MEMORY;
+        lMode[1] = -1;
+    }
+    else
+    {
+        lMode[0] = TWSX_FILE;
+        lMode[1] = TWSX_MEMFILE;
+    }
+
+    std::set<LONG> setAllTypes;
 
     // Check if already retrieved.
     auto& compressionMap = pSource->GetCompressionMap();
-    auto iter1 = compressionMap.find(lMode);
-    if ( iter1 != compressionMap.end())
+
+    for (auto currentMode : lMode)
     {
-        // Already did the compression transfer type.  See if the file type has been done
-        std::vector<LONG>* vValues = nullptr;
-        auto& mapValues = iter1->second;
-        if ( lMode == TWSX_MEMORY )
-            vValues = &mapValues[0];
-        else
+        if (currentMode == -1 || currentMode == TWSX_MEMFILE)
+            break;
+        auto iter1 = compressionMap.find(currentMode);
+        if (iter1 != compressionMap.end())
         {
-            // See if the file type was resolved already
-            auto iter2 = mapValues.find(lFileType);
-            if (iter2 != mapValues.end())
-                vValues = &iter2->second;
-        }
-        if (vValues)
-        {
-            // Already resolved, so just create an array, copy, and return
-            DTWAIN_ARRAY aValues = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, vValues->size());
-            if (aValues)
-            {
-                auto& vCurrentValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
-                std::copy(vValues->begin(), vValues->end(), vCurrentValues.begin());
-                return aValues;
-            }
+            // Already did the compression transfer type.  See if the file type has been done
+            std::vector<LONG>* vValues = nullptr;
+            auto& mapValues = iter1->second;
+            if (currentMode == TWSX_MEMORY)
+                vValues = &mapValues[0];
             else
             {
-                // No memory, so return error
-                DTWAIN_SetLastError(DTWAIN_ERR_MEM);
+                // See if the file type was resolved already
+                auto iter2 = mapValues.find(lFileType);
+                if (iter2 != mapValues.end())
+                    vValues = &iter2->second;
+            }
+            if (vValues)
+            {
+                // Already resolved, so just create an array, copy, and return
+                DTWAIN_ARRAY aValues = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, vValues->size());
+                if (aValues)
+                {
+                    auto& vCurrentValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
+                    std::copy(vValues->begin(), vValues->end(), vCurrentValues.begin());
+                    return aValues;
+                }
+                else
+                {
+                    // No memory, so return error
+                    DTWAIN_SetLastError(DTWAIN_ERR_MEM);
+                    LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
+                }
+            }
+        }
+
+        // Check if the file type is supported
+        bool isFileTransfer = (currentMode == TWSX_FILE || currentMode == TWSX_MEMFILE);
+        if (isFileTransfer)
+        {
+            BOOL bFileGood = FALSE;
+            bFileGood = DTWAIN_IsFileXferSupported(Source, lFileType);
+            if ( currentMode == TWSX_MEMFILE )
+                bFileGood = DTWAIN_IsMemFileXferSupported(Source);
+            if (!bFileGood)
+            {
+                // Set the compression map file type to empty vector
+                compressionMap[currentMode][lFileType] = {};
+
+                // Not supported, so return error
+                DTWAIN_SetLastError(DTWAIN_ERR_FILE_FORMAT);
                 LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
             }
         }
-    }
 
-    // Check if the file type is supported
-    if (lMode == TWSX_FILE)
-    {
-        BOOL bFileGood = DTWAIN_IsFileXferSupported(Source, lFileType);
-        if (!bFileGood)
+        // Get the current file format
+        DTWAIN_ARRAY aCurrentFileFormat = {};
+        DTWAINArrayLowLevelPtr_RAII raii2(pHandle, &aCurrentFileFormat);
+        std::vector<LONG>* ptrVectCurrentFormat = nullptr;
+        bool bGotCurrentFileFormat = DTWAIN_GetCapValuesEx2(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aCurrentFileFormat);
+        if (bGotCurrentFileFormat && isFileTransfer)
         {
-            // Set the compression map file type to empty vector
-            compressionMap[TWSX_FILE][lFileType] = {};
-
-            // Not supported, so return error
-            DTWAIN_SetLastError(DTWAIN_ERR_FILE_FORMAT);
-            LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
+            auto& vCurrentFormat = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aCurrentFileFormat);
+            if (vCurrentFormat.empty())
+            {
+                // return error
+                DTWAIN_SetLastError(DTWAIN_ERR_FILE_FORMAT);
+                LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
+            }
+            ptrVectCurrentFormat = &vCurrentFormat;
         }
-    }
 
-    // 1) Get the current file format
-    DTWAIN_ARRAY aCurrentFileFormat;
-    std::vector<LONG>* ptrVectCurrentFormat = nullptr;
-    bool bGotCurrentFileFormat = DTWAIN_GetCapValuesEx2(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aCurrentFileFormat);
-    if (bGotCurrentFileFormat && lMode == TWSX_FILE)
-    {
-        DTWAINArrayPtr_RAII raii2(pHandle, &aCurrentFileFormat);
-        auto& vCurrentFormat = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aCurrentFileFormat);
-        if (vCurrentFormat.empty())
+        // Get the current xfermech format
+        DTWAIN_ARRAY aCurrentXferMech;
+        DTWAIN_GetCapValuesEx2(Source, ICAP_XFERMECH, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aCurrentXferMech);
+        DTWAINArrayLowLevel_RAII raii3(pHandle, aCurrentXferMech);
+        auto& vCurrentXferMech = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aCurrentXferMech);
+
+        auto bChangedOk = ImageFileFormatCapHandler(Source, pHandle, lFileType, currentMode);
+        if (!bChangedOk)
         {
             // return error
             DTWAIN_SetLastError(DTWAIN_ERR_FILE_FORMAT);
             LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
         }
-        ptrVectCurrentFormat = &pHandle->m_ArrayFactory->underlying_container_t<LONG>(aCurrentFileFormat);
+
+        // This resets the ICAP_IMAGEFILEFORMAT and ICAP_XFERMECH caps back to the original value on each iteration
+        ResetImageFormatRAII resetter(Source, pHandle, { ptrVectCurrentFormat ? ptrVectCurrentFormat->front() : -1, vCurrentXferMech.front() });
+
+        // Get the compressions for this type
+        auto tempCompression = DTWAIN_EnumCompressionTypesEx(Source);
+
+        if (!tempCompression)
+            continue;
+
+        // Set the compression map
+        DTWAINArrayLowLevel_RAII raii4(pHandle, tempCompression);
+
+        auto& vAllTypes = pHandle->m_ArrayFactory->underlying_container_t<LONG>(tempCompression);
+        if (!isFileTransfer)
+            lFileType = 0;
+        setAllTypes.insert(vAllTypes.begin(), vAllTypes.end());
+        compressionMap[currentMode][lFileType] = vAllTypes;
     }
 
-    // 3) Get the current xfermech format
-    DTWAIN_ARRAY aCurrentXferMech;
-    DTWAIN_GetCapValuesEx2(Source, ICAP_XFERMECH, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aCurrentXferMech);
-    DTWAINArrayPtr_RAII raii3(pHandle, &aCurrentXferMech);
-    auto& vCurrentXferMech= pHandle->m_ArrayFactory->underlying_container_t<LONG>(aCurrentXferMech);
-
-    auto bChangedOk = ImageFileFormatCapHandler(Source, pHandle, lFileType, lMode);
-    if (!bChangedOk)
+    DTWAIN_ARRAY aRetValue = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, setAllTypes.size());
+    if ( !aRetValue)
     {
-        // return error
-        DTWAIN_SetLastError(DTWAIN_ERR_FILE_FORMAT);
+        // No memory, so return error
+        DTWAIN_SetLastError(DTWAIN_ERR_MEM);
         LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
     }
+    auto& vAll = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aRetValue);
+    std::transform(setAllTypes.begin(), setAllTypes.end(), vAll.begin(), [&](LONG n) { return n; });
 
-    // This resets the ICAP_IMAGEFILEFORMAT and ICAP_XFERMECH caps back to the original value on return
-    ResetImageFormatRAII resetter(Source, pHandle, { ptrVectCurrentFormat?ptrVectCurrentFormat->front():-1, vCurrentXferMech.front() });
-
-    // 5) Get the compressions for this type
-    auto tempCompression = DTWAIN_EnumCompressionTypesEx(Source);
-
-    // 6) Set the compression map
-    auto& vAllTypes = pHandle->m_ArrayFactory->underlying_container_t<LONG>(tempCompression);
-    if (lMode == TWSX_MEMORY)
-        lFileType = 0;
-    compressionMap[lMode][lFileType] = vAllTypes;
-
-    LOG_FUNC_EXIT_NONAME_PARAMS(tempCompression)
+    LOG_FUNC_EXIT_NONAME_PARAMS(aRetValue)
     CATCH_BLOCK(DTWAIN_ARRAY{})
 }
 
