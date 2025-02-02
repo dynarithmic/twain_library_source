@@ -315,7 +315,7 @@ ResInfoMap getResolutionInfo(CTL_ITwainSource* pSource)
                     if (DTWAIN_SetCapValuesEx2(pSource, ICAP_UNITS, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, aSetUnit))
                     {
                         // Get the resolution values for this unit of measure
-                        DTWAIN_ARRAY aResolutions;
+                        DTWAIN_ARRAY aResolutions = {};
                         DTWAINArrayPtr_RAII raii3(pHandle, &aResolutions);
                         DTWAIN_GetCapValuesEx2(pSource, ICAP_XRESOLUTION, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aResolutions);
                         if ( aResolutions )
