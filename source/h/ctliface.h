@@ -1109,7 +1109,10 @@ namespace dynarithmic
         {
             if (m_bDestroy && m_Array)
             {
-                m_pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(m_Array));
+                if constexpr (std::is_same_v<ArrayType, DTWAIN_ARRAY*>)
+                    m_pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(*m_Array));
+                else
+                    m_pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(m_Array));
                 m_Array = {};
             }
         }
@@ -1121,6 +1124,7 @@ namespace dynarithmic
 
     using DTWAINArrayLowLevel_RAII = DTWAINArrayLowLevel_RAII_Impl<DTWAIN_ARRAY>;
     using DTWAINArrayLowLevelPtr_RAII = DTWAINArrayLowLevel_RAII_Impl<DTWAIN_ARRAY*>;
+    using DTWAINArrayPtr_RAII = DTWAINArrayLowLevelPtr_RAII;
 
     // RAII Classes
     using DTWAINDeviceContextRelease_RAII = std::unique_ptr<std::pair<HWND, HDC>, DTWAINGlobalHandle_ReleaseDCTraits>;
@@ -1129,7 +1133,6 @@ namespace dynarithmic
     using DTWAINResourceUnlockFree_RAII = std::unique_ptr<void, DTWAINResource_UnlockFreeTraits>;
     using DTWAINHBITMAPFree_RAII = std::unique_ptr<HBITMAP, DTWAINResource_DeleteObjectTraits>;
     using DTWAINGlobalHandle_RAII = std::unique_ptr<void, DTWAINGlobalHandle_CloseTraits>;
-    using DTWAINArrayPtr_RAII = DTWAINArrayLowLevelPtr_RAII;// std::unique_ptr<DTWAIN_ARRAY, DTWAINArrayPtr_DestroyTraits>;
     using DTWAINGlobalHandleUnlockFree_RAII = std::unique_ptr<void, DTWAINGlobalHandle_CloseFreeTraits>;
     using DTWAINDSM2Lock_RAII = std::unique_ptr<void, 
             DTWAINGlobalHandle_GenericUnlockFreeTraits<HANDLE, DSM2UnlockTraits, DSM2NoFreeTraits>>;
