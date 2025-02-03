@@ -56,7 +56,7 @@ DTWAIN Version changes
   or DTWAIN_AcquireFileEx() (with the DTWAIN_USESOURCEFLAG mode set for these calls) to
   ensure the compression type will be used for the file transfer.
 
-- Some internal code improvements.
+- Fixed memory leak in DTWAIN_ARRAY internal handling.
 
 
 5.5.5
