@@ -6076,10 +6076,10 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
         ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_GetFileCompressionType(DTWAIN_SOURCE Source, ref int lpCompression);
+        public static extern int DTWAIN_GetFileCompressionType(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
         ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_SetFileCompressionType(DTWAIN_SOURCE Source, int lpCompression);
+        public static extern int DTWAIN_SetFileCompressionType(DTWAIN_SOURCE Source, int lCompression);
     }
 }

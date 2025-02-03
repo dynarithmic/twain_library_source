@@ -4994,9 +4994,9 @@ namespace Dynarithmic
         public static extern DTWAIN_ARRAY DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, int lFileType, int bUseBufferedMode);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
-        public static extern int DTWAIN_GetFileCompressionType(DTWAIN_SOURCE Source, ref int lpCompression);
+        public static extern int DTWAIN_GetFileCompressionType(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
-        public static extern int DTWAIN_SetFileCompressionType(DTWAIN_SOURCE Source, int lpCompression);
+        public static extern int DTWAIN_SetFileCompressionType(DTWAIN_SOURCE Source, int lCompression);
     }
 }
