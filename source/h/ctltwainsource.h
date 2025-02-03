@@ -26,6 +26,7 @@
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
 #include <array>
+#include <map>
 
 #include "ctlobstr.h"
 #include "ctlarray.h"
@@ -78,6 +79,8 @@ namespace dynarithmic
              std::vector<sDuplexFileData>,
              std::vector<sDuplexFileData> > DuplexData;
 
+    using SourceCompressionMap = std::map<int, std::map<int, std::vector<LONG>>>;
+
     class CTL_ITwainSource
     {
         struct container_values
@@ -89,6 +92,7 @@ namespace dynarithmic
         typedef boost::container::flat_map<TW_UINT16, container_values> CapToValuesMap;
         CapToValuesMap m_capToValuesMap_G;
         CapToValuesMap m_capToValuesMap_GD;
+        SourceCompressionMap m_CompressionMap;
 
     public:
         CTL_ITwainSource(const CTL_ITwainSource&) = delete;
@@ -131,6 +135,7 @@ namespace dynarithmic
         std::string GetProductFamilyA() const { return m_SourceId.get_product_family(); }
         std::string GetProductNameA() const { return m_SourceId.get_product_name(); }
         std::string GetSourceInfo() const { return m_SourceId.to_json(); }
+        SourceCompressionMap& GetCompressionMap() { return m_CompressionMap; }
 
         std::wstring GetManufacturerW() const 
         {

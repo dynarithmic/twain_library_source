@@ -239,7 +239,7 @@ BEGIN
         2501,"Could not close TWAIN source"
         2502,"Invalid Image Information on acquiring image"
         2503,"Error writing data to file"
-    2504,"Operation not supported"
+        2504,"Operation not supported"
         3000,"Select Source"
         3001,"&Select"
         3002,"&Cancel"
@@ -275,4 +275,5 @@ BEGIN
         10004,"TWAIN Source Manager, Session, and DTWAIN closed successfully"
         10005,"Could not remove subclass from user window"
         10006,"Device type and TWAIN required type do not match."
+        10007,"Warning: File compression type is unknown, or does not match the chosen image type."
 END

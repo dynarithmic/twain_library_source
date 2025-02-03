@@ -456,7 +456,7 @@ namespace dynarithmic
 
             // Parse the line containing the file save dialog information for the 
             // file type being saved
-            StringWrapperA::TokenizeQuoted(totalLine, " ", vParsedComponents);
+            StringWrapperA::TokenizeQuoted(StringWrapperA::TrimAll(totalLine), " ", vParsedComponents);
             if (vParsedComponents.size() != 5)
             {
                 retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = false;
@@ -481,6 +481,49 @@ namespace dynarithmic
                 StringConversion::Convert_Ansi_To_Native(vParsedComponents[2]),
                 StringConversion::Convert_Ansi_To_Native(vParsedComponents[3]),
                 StringConversion::Convert_Ansi_To_Native(vParsedComponents[4]) };
+        }
+
+        // Now read in the Twain compression -> image type mapping
+        while (std::getline(ifs, totalLine))
+        {
+            ++curLine;
+            if (totalLine == "END")
+                break;
+            // Get the compression type
+            auto& compressionMap = CTL_StaticData::GetCompressionMap();
+            auto bracketPosStart = totalLine.find_first_of("[");
+            auto bracketPosEnd = totalLine.find_first_of("]");
+            if ( bracketPosStart == std::string::npos ||
+                 bracketPosEnd == std::string::npos)
+            {
+                retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = false;
+                retValue.m_dupInfo.lineNumber = curLine;
+                retValue.m_dupInfo.line = line;
+                return false;
+            }
+            auto twainIDName = totalLine.substr(0, bracketPosStart);
+            StringWrapperA::TrimAll(twainIDName);
+            auto compressionValuePr = CTL_StaticData::GetIDFromTwainName(twainIDName.c_str());
+            if ( !compressionValuePr.first)
+            {
+                retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = false;
+                retValue.m_dupInfo.lineNumber = curLine;
+                retValue.m_dupInfo.line = line;
+                return false;
+            }
+            auto compressionValue = compressionValuePr.second;
+            auto allFileTypes = totalLine.substr(bracketPosStart+1);
+            StringWrapperA::TrimAll(allFileTypes);
+            allFileTypes.pop_back();
+
+            // Parse the file types
+            std::vector<std::string> sVector;
+            StringWrapperA::Tokenize(allFileTypes, " ", sVector);
+            for (auto& str : sVector)
+            {
+                auto oneVal = CTL_StaticData::GetIDFromTwainName(str);
+                compressionMap[static_cast<int>(compressionValue)].push_back(static_cast<int>(oneVal.second));
+            }
         }
         // Read in the minimum version number for this resource
         // Check if resource version if >= running version

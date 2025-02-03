@@ -526,6 +526,7 @@ namespace dynarithmic
     typedef boost::container::flat_map<std::string, TwainConstantType> CTL_StringToConstantMap;
     typedef boost::container::flat_map<TW_UINT16, TW_INFO> CTL_UINT16ToInfoMap;
     typedef boost::container::flat_map<int, FileSaveNode> CTL_FileSaveMap;
+    typedef boost::container::flat_map<int, std::vector<int>> CTL_CompressionMap;
 
     typedef std::unordered_map<std::pair<LONG, std::string>, std::string, CacheKeyHash> CTL_PairToStringMap;
 
@@ -599,6 +600,7 @@ namespace dynarithmic
         std::string              s_CurrentResourceKey;
         CTL_PairToStringMap      s_ResourceCache;
         CTL_FileSaveMap          s_FileSaveMap;
+        CTL_CompressionMap       s_CompressionMap;
         CTL_StaticDataStruct();
     };
 
@@ -624,6 +626,7 @@ namespace dynarithmic
         static CTL_ErrorToExtraInfoMap& GetExtraErrorInfoMap() { return s_StaticData.s_mapExtraErrorInfo; }
         static CTL_MapThreadToDLLHandle& GetThreadToDLLHandleMap() { return s_StaticData.s_mapThreadToDLLHandle; }
         static CTL_FileSaveMap& GetFileSaveMap() { return s_StaticData.s_FileSaveMap; }
+        static CTL_CompressionMap& GetCompressionMap() { return s_StaticData.s_CompressionMap; }
         static bool ResourcesLoaded() { return s_StaticData.s_ResourcesInitialized; }
         static void Reset() 
         { 
@@ -1106,7 +1109,10 @@ namespace dynarithmic
         {
             if (m_bDestroy && m_Array)
             {
-                m_pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(m_Array));
+                if constexpr (std::is_same_v<ArrayType, DTWAIN_ARRAY*>)
+                    m_pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(*m_Array));
+                else
+                    m_pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(m_Array));
                 m_Array = {};
             }
         }
@@ -1118,6 +1124,7 @@ namespace dynarithmic
 
     using DTWAINArrayLowLevel_RAII = DTWAINArrayLowLevel_RAII_Impl<DTWAIN_ARRAY>;
     using DTWAINArrayLowLevelPtr_RAII = DTWAINArrayLowLevel_RAII_Impl<DTWAIN_ARRAY*>;
+    using DTWAINArrayPtr_RAII = DTWAINArrayLowLevelPtr_RAII;
 
     // RAII Classes
     using DTWAINDeviceContextRelease_RAII = std::unique_ptr<std::pair<HWND, HDC>, DTWAINGlobalHandle_ReleaseDCTraits>;
@@ -1126,7 +1133,6 @@ namespace dynarithmic
     using DTWAINResourceUnlockFree_RAII = std::unique_ptr<void, DTWAINResource_UnlockFreeTraits>;
     using DTWAINHBITMAPFree_RAII = std::unique_ptr<HBITMAP, DTWAINResource_DeleteObjectTraits>;
     using DTWAINGlobalHandle_RAII = std::unique_ptr<void, DTWAINGlobalHandle_CloseTraits>;
-    using DTWAINArrayPtr_RAII = DTWAINArrayLowLevelPtr_RAII;// std::unique_ptr<DTWAIN_ARRAY, DTWAINArrayPtr_DestroyTraits>;
     using DTWAINGlobalHandleUnlockFree_RAII = std::unique_ptr<void, DTWAINGlobalHandle_CloseFreeTraits>;
     using DTWAINDSM2Lock_RAII = std::unique_ptr<void, 
             DTWAINGlobalHandle_GenericUnlockFreeTraits<HANDLE, DSM2UnlockTraits, DSM2NoFreeTraits>>;

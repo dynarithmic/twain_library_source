@@ -185,7 +185,7 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_UserInterface{},
     m_aAcqAttempts(nullptr),
     m_bShowUIOnly(false),
-    m_nCompression(DTWAIN_CP_NONE),
+    m_nCompression(TWCP_NONE),
     m_nState(SOURCE_STATE_CLOSED),
     m_nCompressBytes(0),
     m_bCapCached(false),
