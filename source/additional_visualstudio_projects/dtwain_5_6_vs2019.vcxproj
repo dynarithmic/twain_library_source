@@ -1234,6 +1234,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include="cpp\ctlloadresources.cpp" />
     <ClCompile Include="cpp\ctlpapersize.cpp" />
     <ClCompile Include="cpp\ctlselectdialog.cpp" />
+    <ClCompile Include="cpp\ctlsourcecompression.cpp" />
     <ClCompile Include="cpp\ctlsourcedetails.cpp" />
     <ClCompile Include="cpp\ctlstringutils.cpp" />
     <ClCompile Include="cpp\ctlthreadutils.cpp" />
