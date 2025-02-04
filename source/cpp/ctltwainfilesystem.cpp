@@ -263,7 +263,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FSGetFileType(DTWAIN_SOURCE Source, LPCTSTR szFi
 }
 
 struct CameraStruct {
-    DTWAIN_ARRAY aCameras;
+    DTWAIN_ARRAY aCameras = {};
     TW_UINT16 CameraType;
 };
 

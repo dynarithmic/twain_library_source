@@ -1,0 +1,1251 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include=".\cpp\a85decoder.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\pdflib32\a85encode.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\pdflib32\ahexencode.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\arrayfactory.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlacquirearea.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlacquireaudio.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlacquirebuffered.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlacquireclipboard.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlacquirefile.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlacquirenative.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlarray.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlblankpage.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlcalldsmproc.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlcapcollect.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlcapenumfuncs.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlcapsupport.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlcompressionsize.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctldeviceevents.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctldevnt.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctldib32.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctldtwaininit.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctldtwainmem2.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlduplex.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlerrorbuffer.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlerrorcallback.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="c\imagefun\dtwpdf\crc32_aux.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlcapcontainerfuncs.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlfeed.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlfileappend.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlfileutils.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlflipbmp.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlflog.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlgetcapinfo.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlgetmetrics.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlhigh.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlimageerrorskip.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlimageinfo.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctljob.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctljpeg.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlloggercallback.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctllogmessage.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlmanualduplex.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlmaxacquires.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlmultipagescan.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlobtyp.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlpapersize.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlpatchsupport.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlpdf.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlpixbitdepth.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlprinter.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlsavefilename.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlsetgetcaps.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlshowuionly.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlsourceacquire.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlsourceclose.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlsourcedetails.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlsourcedibs.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlsourceenum.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlsourceinfo.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlsourcenames.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlsourceopen.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlsourceretries.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlsourcescale.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlsourceselect.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlsrceoj.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlsupport.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltempdir.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlthreadutils.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltiff.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctltimeout.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr000.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr001.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr002.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr003.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr004.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr005.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr006.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr007.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr008.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr009.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr010.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr011.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr012.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr013.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr014.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr015.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr016.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr017.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr018.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr019.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr020.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr021.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr022.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr023.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr024.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr025.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr026.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr027.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr028.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr029.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr030.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr031.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr032.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr033.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr034.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr035.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr036.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr037.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr038.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr039.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltr040.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctltr041.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctltr042.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctltr043.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctltsstub.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltwaindllhandle.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctltwainmsgloop.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctluicontrollable.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctluienabled.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlunicodeimpl.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlupdatedibproc.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlverifysourcehandle.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ctlxmlparse.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\imagefun\dtwpdf\dtwainpdf.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\imagefun\dtwpdf\dtwgetopt.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\dtwinver\Dtwinver.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\imagefun\dtwpdf\dtwtiff2ps.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\errstruc.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipImage.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipMemoryIO.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipMetadataFind.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipMultiPage.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipTag.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipWinImage.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\pdflib32\flateencode.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\dtwinver\Getwinver.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\imagexferfilewriter.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\iohandler_base.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\iohandler_bmp.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\iohandler_gif.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\iohandler_ico.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\iohandler_jpeg.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\iohandler_jpeg2k.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\iohandler_pbm.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\iohandler_pcx.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\iohandler_pdf.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\iohandler_png.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\iohandler_ps.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\iohandler_psd.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\iohandler_text.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\iohandler_tga.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\iohandler_tiff.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\iohandler_wbmp.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\iohandler_webp.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\iohandler_wmf.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\linux_versioninfo.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\logmsg.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="c\imagefun\dtwpdf\md5c.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\pdflib32\md5class.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\pdflib32\md5class2.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ocrengine\ocrinterface.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ocrengine\ocrinterface_internal.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\imagefun\pcxfun32.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\pdflib32\pdfencrypt.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\imagefun\pdffun32.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\pdflib32\pdflib32.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\pdflib32\pslib32.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\resamplefactory.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\tiffun32.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\ocrengine\transym_ocrinterface.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\twainframe.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\imagefun\txtfun32.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\imagefun\winbit32.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\windows_versioninfo.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\cpp\imagefun\wmffun32.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="c\imagefun\dtwpdf\md5c.c">
+      <Filter>C Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".\c\imagefun\dtwpdf\crc32_aux.c">
+      <Filter>C Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\stdafx.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximabmp.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximadsp.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximaenc.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximaexif.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximage.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximagif.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximahist.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximaico.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximainfo.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximaint.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximajas.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximajbg.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximajpg.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximalpha.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximalyr.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximamng.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximapal.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximapcx.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximapng.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximapsd.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximaraw.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximasel.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximaska.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximatga.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximath.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximatif.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximatran.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximawbmp.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximawmf.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\ximawnd.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cximage\xmemfile.cpp">
+      <Filter>CXImage Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctltwainfilesystem.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlstringutils.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlloadresources.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlselectdialog.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ocrengine\ocrselect.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctltwainsource.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctltwainsession.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctltwainmanager.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlwindowproc.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlfilesave.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctltripletbase.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\logwriterutils.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlsourcecompression.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="cpp\pdflib32\a85encode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp\pdflib32\ahexencode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\arrayfactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\capconst.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\capstruc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\cppfunc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ansiwideconverter_generic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ansiwideconverter_win32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctlarray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctlcntry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctldefsource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctldevnt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctldib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctldib32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctlenum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctlfileutils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctliface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctlobstr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctlobtyp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctlsupport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctlthreadutils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltmpl3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltmpl4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltmpl5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr000.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr001.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr002.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr003.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr004.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr005.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr006.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr007.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr008.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr009.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr010.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr011.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr012.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr013.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr014.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr015.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr016.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr017.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr018.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr019.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr020.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr021.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr022.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr023.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr024.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr025.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr026.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr027.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr028.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr029.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr030.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr031.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr032.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr033.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr034.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr035.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr036.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctltr037.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr038.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr039.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltr040.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctltr041.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctltr042.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctltr043.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ctltrall.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctltwainidentity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctltwainmsgloop.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\dibinfox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\dibmulti.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\dtwain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\dtwain_raii.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\dtwain_resource_constants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\dtwain_resource_constants2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\dtwain_verinfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\dtwain_version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\dtwainc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\dtwpdf\dtwainpdf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\dtwainx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\dtwpdft.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\dtwstrfn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\dtwtype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\errorcheck.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\errstruc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp\pdflib32\flateencode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeImage\Source\FreeImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\funcmac.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagexferfilewriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\logmsg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp\pdflib32\md5class.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\notimpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ocrengine\ocrinterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\pcxfun32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp\pdflib32\pdfencrypt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\pdffun32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp\pdflib32\pdflib32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\resamplefactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\tiffun32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleini\SimpleIni.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\twain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\twainfix32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\twainframe.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\versioninfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\winbit32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\winconst.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\wmffun32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\txtfun32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ImageFun\dtwpdf\pdffont_basic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\ocrengine\transym_ocrinterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\dtwain_filesystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\dtwain_float_utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\dtwain_library_selector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".\h\dtwaindefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeImage\Wrapper\FreeImagePlus\FreeImagePlus.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cximage\ximage.h">
+      <Filter>CXImage Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\dtwain_filetypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\imagefun\dtwpdf\crc32_aux.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\dtwain_anyutils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\sourceacquireopts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\sourceselectopts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\dtwain_paramlogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctlutils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctltwainsource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctltwainsession.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctltwainmanager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctlfilesave.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctlconstexprfind.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctlconstexprutils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctlloadresources.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctltripletbase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\dtwain_config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\dtwain_standard_defs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\logwriterutils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctlstringutils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".\h\versioninfo.ipp">
+      <Filter>C++ Files</Filter>
+    </None>
+    <None Include=".\inl\ctlstrimpl.inl">
+      <Filter>C++ Files</Filter>
+    </None>
+    <None Include=".\inl\ctltr016.inl">
+      <Filter>C++ Files</Filter>
+    </None>
+    <None Include=".\inl\ctltr017.inl">
+      <Filter>C++ Files</Filter>
+    </None>
+    <None Include=".\inl\ctltr018.inl">
+      <Filter>C++ Files</Filter>
+    </None>
+    <None Include=".\inl\ctltr019.inl">
+      <Filter>C++ Files</Filter>
+    </None>
+    <None Include=".\inl\ctltr020.inl">
+      <Filter>C++ Files</Filter>
+    </None>
+    <None Include="inl\linuxget_twain.inl">
+      <Filter>C++ Files</Filter>
+    </None>
+    <None Include="inl\linuxinit_impl.inl">
+      <Filter>C++ Files</Filter>
+    </None>
+    <None Include="inl\linuxlibraryloader_impl.inl">
+      <Filter>C++ Files</Filter>
+    </None>
+    <None Include="inl\unix_info.inl">
+      <Filter>C++ Files</Filter>
+    </None>
+    <None Include="inl\windows_info.inl">
+      <Filter>C++ Files</Filter>
+    </None>
+    <None Include="inl\windowsinit_impl.inl">
+      <Filter>C++ Files</Filter>
+    </None>
+    <None Include="inl\winget_twain.inl">
+      <Filter>C++ Files</Filter>
+    </None>
+    <None Include="inl\winlibraryloader_impl.inl">
+      <Filter>C++ Files</Filter>
+    </None>
+    <None Include=".\def\dtwain32_d.def">
+      <Filter>Module Definition Files</Filter>
+    </None>
+    <None Include=".\def\dtwain32_u.def">
+      <Filter>Module Definition Files</Filter>
+    </None>
+    <None Include=".\def\dtwain32_u_d.def">
+      <Filter>Module Definition Files</Filter>
+    </None>
+    <None Include=".\def\dtwain64.def">
+      <Filter>Module Definition Files</Filter>
+    </None>
+    <None Include=".\def\dtwain64_d.def">
+      <Filter>Module Definition Files</Filter>
+    </None>
+    <None Include=".\def\dtwain64_u.def">
+      <Filter>Module Definition Files</Filter>
+    </None>
+    <None Include=".\def\dtwain64_u_d.def">
+      <Filter>Module Definition Files</Filter>
+    </None>
+    <None Include=".\def\dtwain32.def">
+      <Filter>Module Definition Files</Filter>
+    </None>
+    <None Include="txt\dtwain32.ini">
+      <Filter>INI Files</Filter>
+    </None>
+    <None Include="txt\dtwain64.ini">
+      <Filter>INI Files</Filter>
+    </None>
+    <None Include="rc\resource_verinfo.rc2">
+      <Filter>RC Files</Filter>
+    </None>
+    <None Include="rc\twainresourcestrings_english.rc2">
+      <Filter>RC Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="txt\twaininfo.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainlanguage.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_dutch.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_english.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_french.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_german.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_italian.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_portuguese_br.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_spanish.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_romanian.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_russian.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_portuguese.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_simplified_chinese.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_japanese.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_korean.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_traditional_chinese.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+    <Text Include="txt\twainresourcestrings_greek.txt">
+      <Filter>Resource Text Files</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{92689b59-56c2-4da3-b129-e298bae45927}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="C++ Files">
+      <UniqueIdentifier>{ba170b71-6dbf-4e32-9922-1895be88174d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="C Files">
+      <UniqueIdentifier>{3ce19879-49bb-4ac9-9fb5-50d7736d8015}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Module Definition Files">
+      <UniqueIdentifier>{9f23cfc6-05f2-418a-85d8-7a6a75182eb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="INI Files">
+      <UniqueIdentifier>{2338c179-c265-4397-9082-46db71f1304b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RC Files">
+      <UniqueIdentifier>{46282271-4371-43c5-a01b-72184354f8fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Text Files">
+      <UniqueIdentifier>{3002b771-4293-4f50-83e4-5b3d3ec18c43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CXImage Files">
+      <UniqueIdentifier>{65e5fb4a-3fd2-42d8-a860-64e1e4f61e0f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include=".\rc\twil32.rc">
+      <Filter>RC Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

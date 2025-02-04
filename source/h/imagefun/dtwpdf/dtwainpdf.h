@@ -351,7 +351,7 @@ namespace dynarithmic
             void SetOrientation( int oType ) { m_Orientation = oType; }
             void SetScaling(double xscale, double yscale) {m_xscale = xscale; m_yscale = yscale;}
             void SetScaleType(int scaletype) { m_scaletype = scaletype; }
-            bool StartPDFCreation();
+            bool StartPDFCreation(int majorv, int minorv);
             bool EndPDFCreation();
             bool IsDuplicateImage(unsigned long CRCVal, unsigned long& ObjNum);
             void AddDuplicateImage(unsigned long CRCVal, unsigned long nObjNum);

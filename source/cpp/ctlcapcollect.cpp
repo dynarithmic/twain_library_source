@@ -22,7 +22,6 @@
 #include "ctltmpl5.h"
 #include "ctliface.h"
 #include "cppfunc.h"
-#include "ctlreg.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -82,13 +81,6 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
         bNewArray = true;
     }
 
-    static const ContainerMap mapContainer = {{"TW_ONEVALUE", DTWAIN_CONTONEVALUE},
-                                                  {"TW_ENUMERATION", DTWAIN_CONTENUMERATION},
-                                                  {"TW_RANGE", DTWAIN_CONTRANGE},
-                                                  {"TW_ARRAY", DTWAIN_CONTARRAY},
-                                                  {"-1", static_cast<UINT>(-1)},
-                                                  {"0", 0}};
-
     FindFirstValue(pSource->GetProductName(), &pHandle->m_aSourceCapInfo, &nWhere);
 
     auto vIt = vCaps->begin();
@@ -103,12 +95,8 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
         // Create these dynamically whenever a new source is opened
         // and source cap info does not exist.  Add cap info statically.
 
-        bool bGetINIEntry = true;
-
-        bool bOk = false;
-
         // search the current cap array for the cap value to be tested
-        if (pArray->find(static_cast<TW_UINT16>(*vIt)) != pArray->end()) //find_if(pArray->begin(), pArray->end(), CapFinder(pSource, *vIt)) != pArray->end() )
+        if (pArray->find(static_cast<TW_UINT16>(*vIt)) != pArray->end()) 
         {
             pSource->SetCapCached(static_cast<TW_UINT16>(*vIt), true);
             continue;
@@ -121,61 +109,12 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
         pSource->AddCapToStateInfo(CAP_CUSTOMDSDATA, DTWAIN_STATE4);
 
         // Test the capability and see which container works.
-        UINT cGet = 0;
-        UINT cGetCurrent = 0;
-        UINT cGetDefault = 0;
-        UINT cSetCurrent = 0;
-        UINT cSetAvailable = 0;
         UINT cQuerySupport = 0;
-        UINT cEOJValue = 0;
-        UINT cEntryFound = 0;
-        UINT cResetSupport = 0;
-        UINT cQueryContainer = 0;
-        bool bContainerInfoFound = false;
 
-        TW_UINT16 cStateInfo = 0xFF;
-        UINT nDataType = 0;
         std::string strName = CTL_TwainAppMgr::GetCapNameFromCap(nCap);
         std::string sProdNameA = StringConversion::Convert_Native_To_Ansi(pSource->GetProductName());
 
-        bOk = GetCapInfoFromIni(strName, sProdNameA, static_cast<UINT>(nCap), cGet, cGetCurrent,
-                                cGetDefault, cSetCurrent, cSetAvailable, cResetSupport, cQueryContainer, cQuerySupport,
-                                cEOJValue, cStateInfo, nDataType, cEntryFound, bContainerInfoFound, mapContainer);
-
         bCanQuerySupport = cQuerySupport ? true : false;
-
-        if (cEntryFound)
-            pSource->SetEOJDetectedValue(cEOJValue);
-
-        if (!cEntryFound)
-            bGetINIEntry = false;
-        else
-        {
-            if (cStateInfo != 0xFF)
-                pSource->AddCapToStateInfo(nCap, cStateInfo);
-        }
-
-        if (bOk)
-        {
-            if (CTL_StaticData::GetLogFilterFlags())
-            {
-                StringStreamOutA strm;
-                strm << "Using capability info from DTWAIN32.INI (Source="
-                     << sProdNameA << ", Cap=" << CTL_TwainAppMgr::GetCapNameFromCap(nCap) << ")\n";
-                LogWriterUtils::WriteLogInfoIndentedA(strm.str());
-            }
-
-            if (bContainerInfoFound)
-            {
-                CTL_CapStruct capData;
-                capData.m_nGetContainer = cGet;
-
-                CTL_CapInfo Info(static_cast<CTL_EnumCapability>(nCap), cGet, cSetCurrent, nDataType, 0, cGetCurrent, 
-                                                            cGetDefault, cSetAvailable, cResetSupport, cQueryContainer);
-                pArray->insert(make_pair(nCap, Info));
-                return true;
-            }
-        }
 
         auto& allCapInfo = CTL_StaticData::GetGeneralCapInfo();
         auto thisCapInfo = allCapInfo.find(nCap);

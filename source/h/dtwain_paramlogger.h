@@ -23,7 +23,7 @@ namespace dynarithmic
         bool m_bOutputAsString;
 
     private:
-        void LogType(std::string outStr, const char* ptr)
+        void LogType(const std::string& outStr, const char* ptr)
         {
             // ptr must be a pointer to a valid null terminated string, or nullptr.
             if (ptr)
@@ -33,7 +33,7 @@ namespace dynarithmic
                 strm << outStr << "=(null)";
         }
 
-        void LogType(std::string outStr, const wchar_t* ptr)
+        void LogType(const std::string& outStr, const wchar_t* ptr)
         {
             // ptr must be a pointer to a valid null terminated string, or nullptr.
             if (ptr)
@@ -45,7 +45,7 @@ namespace dynarithmic
         }
 
         template <typename T>
-        void LogType(std::string outStr, const T* ptr)
+        void LogType(const std::string& outStr, const T* ptr)
         {
             // ptr is a valid pointer to double supplied by the user
             if (ptr)
@@ -60,7 +60,7 @@ namespace dynarithmic
         }
 
         template <typename T>
-        void LogType(std::string outStr, T t, std::enable_if_t<std::is_pointer_v<T> >* = nullptr)
+        void LogType(const std::string& outStr, T t, std::enable_if_t<std::is_pointer_v<T> >* = nullptr)
         {
             struct asStringRAII
             {
@@ -125,7 +125,7 @@ namespace dynarithmic
         }
 
         template <typename T>
-        void LogType(std::string outStr, T t, std::enable_if_t<!std::is_pointer_v<T> >* = nullptr)
+        void LogType(const std::string& outStr, T t, std::enable_if_t<!std::is_pointer_v<T> >* = nullptr)
         {
             strm << outStr << "=" << t;
         }
@@ -196,7 +196,7 @@ namespace dynarithmic
         int nArgs = 0;
 
     private:
-        void LogInputType(std::string outStr, const char* ptr)
+        void LogInputType(const std::string& outStr, const char* ptr)
         {
             // ptr is a valid string supplied by the user, so just write it out
             if (ptr)
@@ -205,7 +205,7 @@ namespace dynarithmic
                 strm << outStr << "=" << "(null)";
         }
 
-        void LogInputType(std::string outStr, char* ptr)
+        void LogInputType(const std::string& outStr, char* ptr)
         {
             // ptr is a valid string supplied by the user, but we can't ensure it is null terminated
             // (It doesn't have to be null-terminated, as the DTWAIN function will eventually put the NULL
@@ -214,7 +214,7 @@ namespace dynarithmic
             strm << outStr << "=" << static_cast<void*>(ptr);
         }
 
-        void LogInputType(std::string outStr, wchar_t* ptr)
+        void LogInputType(const std::string& outStr, wchar_t* ptr)
         {
             // ptr is a valid string supplied by the user, but we can't ensure it is null terminated
             // (It doesn't have to be null-terminated, as the DTWAIN function will eventually put the NULL
@@ -224,7 +224,7 @@ namespace dynarithmic
         }
 
         template <typename T>
-        void LogInputType(std::string outStr, T t, std::enable_if_t<std::is_pointer_v<T> >* = nullptr)
+        void LogInputType(const std::string& outStr, T t, std::enable_if_t<std::is_pointer_v<T> >* = nullptr)
         {
             if (t)
                 strm << outStr << "=" << t;
@@ -233,7 +233,7 @@ namespace dynarithmic
         }
 
         template <typename T>
-        void LogInputType(std::string outStr, T t, std::enable_if_t<!std::is_pointer_v<T> >* = nullptr)
+        void LogInputType(const std::string& outStr, T t, std::enable_if_t<!std::is_pointer_v<T> >* = nullptr)
         {
             strm << outStr << "=" << t;
         }
@@ -289,7 +289,7 @@ namespace dynarithmic
     };
 
     template <typename T, typename ...P>
-    std::string LogValue(std::string func, bool isIn, T retValue, P ...p)
+    std::string LogValue(const std::string& func, bool isIn, T retValue, P ...p)
     {
         std::string s;
         if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK)

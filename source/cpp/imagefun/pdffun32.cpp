@@ -124,7 +124,14 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
         pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pDocument, PDF_SUBJECT, m_sSubject.c_str());
         pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pDocument, PDF_CREATOR, m_sCreator.c_str());
 
-        if ( !pPDFInfo->m_Interface->DTWLIB_PDFStartCreation(pDocument) )
+        // Set the PDF standard to 1.3 or 1.6, depending on encryption setting
+        int major_version = 1;
+        int minor_version = 3;
+        auto& imageinfo = pPDFInfo->ImageInfoEx;
+        if ( imageinfo.bIsPDFEncrypted && imageinfo.bUseStrongEncryption && imageinfo.bIsAESEncrypted)
+            minor_version = 6;
+
+        if ( !pPDFInfo->m_Interface->DTWLIB_PDFStartCreation(pDocument, major_version, minor_version) )
         {
             pPDFInfo->IsPDFStarted = false;
             pPDFInfo->m_Interface->DTWLIB_PDFReleaseDocument (pDocument);
@@ -132,7 +139,6 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
             return DTWAIN_ERR_FILEWRITE;
         }
 
-        auto& imageinfo = pPDFInfo->ImageInfoEx;
         pPDFInfo->m_Interface->DTWLIB_PDFSetPolarity(pDocument, imageinfo.nPDFPolarity);
         // Test the encryption here
         if ( pPDFInfo->ImageInfoEx.bIsPDFEncrypted)

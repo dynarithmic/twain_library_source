@@ -304,9 +304,6 @@ namespace dynarithmic
             virtual void SetMultiPageStatus(DibMultiPageStruct * /*pStruct*/) { }
             virtual void GetMultiPageStatus(DibMultiPageStruct * /*pStruct*/) { }
             virtual int WriteGraphicFile(CTL_ImageIOHandler* /*pThis*/, LPCTSTR /*path*/, HANDLE /*bitmap*/, void * /*pUserInfo*/ = nullptr);
-            virtual int WriteGraphicFile(CTL_ImageIOHandler* /*pThis*/, LPCTSTR /*path*/, HANDLE /*bitmap*/, bool /*bUsefh*/ =false,
-                                          int /*fhToUse*/ = 0, LONG /*Info*/ =0) { return 1; }
-
             static HANDLE CreateDIB(int width, int height, int bpp, LPSTR palette= nullptr);
 
             static int CalculateLine(int width, int bitdepth) {

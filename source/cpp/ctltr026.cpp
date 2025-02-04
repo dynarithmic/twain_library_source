@@ -573,6 +573,14 @@ bool CTL_ImageXferTriplet::FailAcquisition()
     const TW_UINT16 ccode = CTL_TwainAppMgr::GetConditionCode(pSession, nullptr);
     CTL_TwainAppMgr::ProcessConditionCodeError(ccode);
 
+    const CTL_TwainAcquireEnum nAcquireType = pSource->GetAcquireType();
+    if (nAcquireType == TWAINAcquireType_File) // The TWAIN source is solely responsible for the file handling
+    {
+        // Send notification that file save failed
+        CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(),
+            nullptr, DTWAIN_TN_FILESAVEERROR, reinterpret_cast<LPARAM>(pSource));
+    }
+
     // Get what to do, either from user-notification or from default
     // TWAIN Window Proc
     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_TWAINPAGEFAILED, reinterpret_cast<LPARAM>(pSource));

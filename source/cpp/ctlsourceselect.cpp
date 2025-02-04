@@ -357,7 +357,8 @@ static CTL_StringType GetDefaultSource()
     auto* customProfile = CTL_StaticData::GetINIInterface();
     if (customProfile)
     {
-        const char* defSource = customProfile->GetValue("Sources", "Default");
+        const char* defSource = customProfile->GetValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCES_KEY).data(), 
+                                                        CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_DEFAULT_ITEM).data());
         return StringConversion::Convert_AnsiPtr_To_Native(defSource);
     }
     return {};
