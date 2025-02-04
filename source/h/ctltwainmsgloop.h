@@ -49,7 +49,7 @@ namespace dynarithmic
 
         virtual ~TwainMessageLoopImpl() = default;
         virtual void PrepareLoop() {}
-        void SetAcquireOptions(SourceAcquireOptions opts) { sOpts = opts; }
+        void SetAcquireOptions(const SourceAcquireOptions& opts) { sOpts = opts; }
         virtual void PerformMessageLoop(CTL_ITwainSource* /*pSource*/, bool /*bUIOnly*/) {}
         DTWAIN_ACQUIRE GetAcquireNum() const { return m_AcquireNum; }
     };

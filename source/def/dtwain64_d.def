@@ -1070,3 +1070,6 @@ DTWAIN_ConvertToAPIStringExW                      @31069
 DTWAIN_ConvertToAPIStringEx                       @31070
 DTWAIN_EnablePeekMessageLoop                      @31071
 DTWAIN_IsPeekMessageLoopEnabled                   @31072
+DTWAIN_EnumCompressionTypesEx2                    @31073
+DTWAIN_GetFileCompressionType                     @31074
+DTWAIN_SetFileCompressionType                     @31075

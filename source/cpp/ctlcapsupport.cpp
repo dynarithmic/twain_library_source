@@ -73,7 +73,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapabili
     {
         for (size_t j = 0; j < ContainerArraySize; ++j)
         {
-            DTWAIN_ARRAY testArray;
+            DTWAIN_ARRAY testArray = {};
             DTWAINArrayPtr_RAII raii(pHandle, &testArray);
             bool ok = DTWAIN_GetCapValuesEx2(Source, lCapability, DTWAIN_CAPGET, ContainerTypeArray[j], DataTypeArray[i], &testArray);
             if (ok)

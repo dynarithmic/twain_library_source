@@ -67,7 +67,7 @@ static CTL_StringType GetTOCRDLLName()
     auto *customProfile = CTL_StaticData::GetINIInterface();
     const char* defName = "Transym";
     if ( customProfile )
-        defName = customProfile->GetValue("OCRLibrary", "Transym");
+        defName = customProfile->GetValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_OCRLIBRARY_KEY).data(), defName);
     auto val = StringConversion::Convert_AnsiPtr_To_Native(defName);
     if (val.empty())
         val = _T("TOCRDLL.DLL");

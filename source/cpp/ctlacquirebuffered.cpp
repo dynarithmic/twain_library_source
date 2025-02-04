@@ -94,7 +94,7 @@ static int CheckTiledBufferedSupport(CTL_ITwainSource* pSource)
 
     // Test for capability setting
     auto pHandle = pSource->GetDTWAINHandle();
-    DTWAIN_ARRAY arr;
+    DTWAIN_ARRAY arr = {};
     DTWAINArrayPtr_RAII tempRAII(pHandle, &arr);
 
     // Get the original capability

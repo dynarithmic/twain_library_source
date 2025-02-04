@@ -1556,6 +1556,13 @@ int CTL_TwainAppMgr::StartTransfer( CTL_ITwainSession * /*pSession*/,
                     }
                 }
             }
+            else
+            if ( nAcquireType == TWAINAcquireType_File ) // The TWAIN source is solely responsible for the file handling
+            {
+                // Send notification that file save was successful
+                CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(),
+                    nullptr, DTWAIN_TN_FILEPAGESAVEOK, reinterpret_cast<LPARAM>(pSource));
+            }
         }
         break;
     }
@@ -2798,3 +2805,4 @@ SourceToXferReadyMap CTL_TwainAppMgr::s_SourceToXferReadyMap;
 SourceToXferReadyList CTL_TwainAppMgr::s_SourceToXferReadyList;
 SourceFlatbedOnlyList CTL_TwainAppMgr::s_SourceFlatbedOnlyList;
 SourcePeekMessageList CTL_TwainAppMgr::s_SourcePeekMessageList;
+SourcePaperDetectableMap CTL_TwainAppMgr::s_SourcePaperDetectableMap;

@@ -26,6 +26,7 @@
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
 #include <array>
+#include <map>
 
 #include "ctlobstr.h"
 #include "ctlarray.h"
@@ -78,6 +79,8 @@ namespace dynarithmic
              std::vector<sDuplexFileData>,
              std::vector<sDuplexFileData> > DuplexData;
 
+    using SourceCompressionMap = std::map<int, std::map<int, std::vector<LONG>>>;
+
     class CTL_ITwainSource
     {
         struct container_values
@@ -89,6 +92,7 @@ namespace dynarithmic
         typedef boost::container::flat_map<TW_UINT16, container_values> CapToValuesMap;
         CapToValuesMap m_capToValuesMap_G;
         CapToValuesMap m_capToValuesMap_GD;
+        SourceCompressionMap m_CompressionMap;
 
     public:
         CTL_ITwainSource(const CTL_ITwainSource&) = delete;
@@ -131,6 +135,7 @@ namespace dynarithmic
         std::string GetProductFamilyA() const { return m_SourceId.get_product_family(); }
         std::string GetProductNameA() const { return m_SourceId.get_product_name(); }
         std::string GetSourceInfo() const { return m_SourceId.to_json(); }
+        SourceCompressionMap& GetCompressionMap() { return m_CompressionMap; }
 
         std::wstring GetManufacturerW() const 
         {
@@ -462,12 +467,14 @@ namespace dynarithmic
         std::pair<boost::logic::tribool, int> GetDuplexSupport() const { return m_tbIsDuplexSupported; }
         boost::logic::tribool IsAudioTransferSupported() const { return m_tbIsAudioTransferSupported; }
         boost::logic::tribool IsUIControllable() const { return m_tbUIControllable; }
+        boost::logic::tribool IsFeederSensitive() const { return m_tbIsFeederSensitive; }
         void         SetFileSystemSupported(bool bSet) { m_tbIsFileSystemSupported = bSet; }
         void         SetBufferedTileModeSupported(bool bSet) { m_tbIsTileModeSupported = bSet; }
         void         SetFeederSupported(bool bSet) { m_tbIsFeederSupported = bSet; }
         void         SetDuplexSupport(bool bSet, int duplexType) { m_tbIsDuplexSupported = { bSet,duplexType }; }
         void         SetAudioTransferSupported(bool bSet) { m_tbIsAudioTransferSupported = bSet; }
         void         SetUIControllable(bool bSet) { m_tbUIControllable = bSet; }
+        void         SetFeederSensitive(bool bSet) { m_tbIsFeederSensitive = bSet; }
         TW_IMAGEMEMXFER& GetBufferedXFerInfo() { return m_BufferedXFerInfo; }
         CTL_ExtImageInfoTriplet* GetExtImageInfoTriplet();
         void        SetShutdownAcquire(bool bSet) { m_bShutdownAcquire = bSet; }
@@ -616,6 +623,7 @@ namespace dynarithmic
         std::pair<boost::logic::tribool, int> m_tbIsDuplexSupported;
         boost::logic::tribool m_tbIsAudioTransferSupported;
         boost::logic::tribool m_tbUIControllable;
+        boost::logic::tribool m_tbIsFeederSensitive;
         CTL_TwainDLLHandle* m_pDLLHandle;
         TW_IMAGEMEMXFER m_BufferedXFerInfo;
 

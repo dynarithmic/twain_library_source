@@ -38,13 +38,16 @@ extern "C" {
 #include "../LibJPEG/jinclude.h"
 #include "../LibJPEG/jpeglib.h"
 #include "../LibJPEG/jerror.h"
+#include "../LibJPEG/jversion.h"
 }
 
 #include "FreeImage.h"
 #include "Utilities.h"
 
 #include "../Metadata/FreeImageTag.h"
-
+#ifdef _MSC_VER
+    #pragma message("Using LibJPeg version " JVERSION)
+#endif
 
 // ==========================================================
 // Plugin Interface

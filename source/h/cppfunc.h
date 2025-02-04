@@ -25,6 +25,19 @@
 #include <funcmac.h>
 #include "logwriterutils.h"
 
+ /* This indicates that the build requires Visual C++ runtime if set to 1*/
+ /* Since there is no way to set the runtime to use at compile time, this */
+ /* setting must match the link-time options */
+#if DTWAIN_BUILD_NEEDVCRUNTIME == 0
+    #ifdef _MSC_VER
+        #pragma message ("Build does not require external Visual C++ runtime")
+    #endif
+#else
+    #ifdef _MSC_VER
+        #pragma message ("Build requires external Visual C++ runtime")
+    #endif
+#endif
+
 #define LOG_INDENT_CONSOLE 0
 #define LOG_NO_INDENT   1
 #define LOG_INDENT_IN   2

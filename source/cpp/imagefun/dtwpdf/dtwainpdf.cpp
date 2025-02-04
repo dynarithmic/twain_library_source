@@ -432,7 +432,7 @@ int PDFObject::EncryptBlock(const std::string& sIn, std::string& sOut, int objec
 PdfDocument::PdfDocument() :
     m_byteOffset(0),
     m_sPDFVer("1.3"),
-    m_sPDFHeader("DTWAIN PDF, 2022"),
+    m_sPDFHeader("DTWAIN PDF, 2025"),
     m_sCurSysTime(GetSystemTimeInMilliseconds()),
     m_nPolarity(DTWAIN_PDFPOLARITY_POSITIVE),
     m_nCurContentsObj(0),
@@ -780,7 +780,7 @@ bool PdfDocument::WriteObject(PDFObject* pObj)
     return true;
 }
 
-bool PdfDocument::StartPDFCreation()
+bool PdfDocument::StartPDFCreation(int majorv, int minorv)
 {
     // Open the file here
     // Every PDF needs a database
@@ -792,8 +792,7 @@ bool PdfDocument::StartPDFCreation()
     m_nCurObjNum = 3;
     m_byteOffset = 0;
     m_nCurPage = 0;
-    if (m_bIsAESEncrypted)
-        SetPDFVersion(1,6);
+    SetPDFVersion(majorv, minorv);
     WriteHeaderInfo();
 
     // Write the initial catalog
@@ -2296,11 +2295,13 @@ void PdfDocument::SetEncryption(const CTL_StringType& ownerPassword,
     // set the encryption to AES
     if (m_bIsAESEncrypted)
     {
-/*      m_Encryption.reset(new PDFEncryptionAES);
+#ifdef DTWAIN_SUPPORT_AES
+        m_Encryption.reset(new PDFEncryptionAES);
+#endif
         m_bIsStrongEncryption = true; // always uses strong encryption for AES
 
         // must set to PDF version 1.6
-        SetPDFVersion(1,6);*/
+        SetPDFVersion(1,6);
     }
 
     const std::string s = GetSystemTimeInMilliseconds().substr(0,13) + "+1359064+" + m_sCurSysTime.substr(0,13);

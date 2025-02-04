@@ -124,7 +124,7 @@ namespace dynarithmic
             lineQueue.pop();
             lineQueue.push(line);
         }
-        auto crcVal = crc32_aux(0, (unsigned char*)totalBuf.data(), static_cast<unsigned int>(totalBuf.size()));
+        auto crcVal = crc32_aux(0, reinterpret_cast<unsigned char*>(totalBuf.data()), static_cast<unsigned int>(totalBuf.size()));
         try
         {
             uint64_t crc = std::stoul(lineQueue.front());
@@ -354,7 +354,11 @@ namespace dynarithmic
                 strm >> name;
                 std::replace(name.begin(), name.end(), '#', ' ');
                 name = StringWrapperA::TrimAll(name);
-                iter->second.insert({twainValue, name});
+
+                // Get all the names associated with this constant
+                std::vector<std::string> saNames;
+                StringWrapperA::Tokenize(name, ", ", saNames);
+                iter->second.insert({twainValue, saNames});
                 if (stringToConstantMap.find(name) != stringToConstantMap.end())
                 {
                     retValue.m_dupInfo.line = line;
@@ -363,7 +367,14 @@ namespace dynarithmic
                     retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_NODUPLICATE_ID] = false;
                     return false;
                 }
-                stringToConstantMap.insert({ name, twainValue });
+
+                // Always insert the special name that has more than one entry
+                if (saNames.size() > 1)
+                    stringToConstantMap.insert({ name, twainValue });
+
+                // Insert the actual entries
+                for (auto& oneName : saNames)
+                    stringToConstantMap.insert({ oneName, twainValue });
             }
         }
 
@@ -433,6 +444,87 @@ namespace dynarithmic
                     imgNode.m_mapFromTo.insert(pr);
             }
         }
+        // Read in the file save constants when saving image to a file
+        std::vector<std::string> vParsedComponents;
+        auto& fileSaveMap = CTL_StaticData::GetFileSaveMap();
+        int fileType = 0;
+        while (std::getline(ifs, totalLine))
+        {
+            ++curLine;
+            if (totalLine == "END")
+                break;
+
+            // Parse the line containing the file save dialog information for the 
+            // file type being saved
+            StringWrapperA::TokenizeQuoted(StringWrapperA::TrimAll(totalLine), " ", vParsedComponents);
+            if (vParsedComponents.size() != 5)
+            {
+                retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = false;
+                retValue.m_dupInfo.lineNumber = curLine;
+                retValue.m_dupInfo.line = line;
+                return false;
+            }
+
+            try
+            {
+                fileType = std::stoi(vParsedComponents[0]);
+            }
+            catch (...)
+            {
+                retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = false;
+                retValue.m_dupInfo.lineNumber = curLine;
+                retValue.m_dupInfo.line = sCap;
+                return false;
+            }
+
+            fileSaveMap[fileType] = { fileType,
+                StringConversion::Convert_Ansi_To_Native(vParsedComponents[2]),
+                StringConversion::Convert_Ansi_To_Native(vParsedComponents[3]),
+                StringConversion::Convert_Ansi_To_Native(vParsedComponents[4]) };
+        }
+
+        // Now read in the Twain compression -> image type mapping
+        while (std::getline(ifs, totalLine))
+        {
+            ++curLine;
+            if (totalLine == "END")
+                break;
+            // Get the compression type
+            auto& compressionMap = CTL_StaticData::GetCompressionMap();
+            auto bracketPosStart = totalLine.find_first_of("[");
+            auto bracketPosEnd = totalLine.find_first_of("]");
+            if ( bracketPosStart == std::string::npos ||
+                 bracketPosEnd == std::string::npos)
+            {
+                retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = false;
+                retValue.m_dupInfo.lineNumber = curLine;
+                retValue.m_dupInfo.line = line;
+                return false;
+            }
+            auto twainIDName = totalLine.substr(0, bracketPosStart);
+            StringWrapperA::TrimAll(twainIDName);
+            auto compressionValuePr = CTL_StaticData::GetIDFromTwainName(twainIDName.c_str());
+            if ( !compressionValuePr.first)
+            {
+                retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = false;
+                retValue.m_dupInfo.lineNumber = curLine;
+                retValue.m_dupInfo.line = line;
+                return false;
+            }
+            auto compressionValue = compressionValuePr.second;
+            auto allFileTypes = totalLine.substr(bracketPosStart+1);
+            StringWrapperA::TrimAll(allFileTypes);
+            allFileTypes.pop_back();
+
+            // Parse the file types
+            std::vector<std::string> sVector;
+            StringWrapperA::Tokenize(allFileTypes, " ", sVector);
+            for (auto& str : sVector)
+            {
+                auto oneVal = CTL_StaticData::GetIDFromTwainName(str);
+                compressionMap[static_cast<int>(compressionValue)].push_back(static_cast<int>(oneVal.second));
+            }
+        }
         // Read in the minimum version number for this resource
         // Check if resource version if >= running version
         std::getline(ifs, totalLine);
@@ -448,7 +540,8 @@ namespace dynarithmic
 
         // Check the CRC value
         CTL_StaticData::GetResourceVersion() = StringConversion::Convert_Ansi_To_Native(DTWAIN_TEXTRESOURCE_FILEVERSION);
-        bool doResourceCheck = iniInterface->GetBoolValue("Miscellaneous", "resourcecheck", true);
+        bool doResourceCheck = iniInterface->GetBoolValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_MISCELLANEOUS_KEY).data(),
+                                                          CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_RESOURCECHECK_ITEM).data(), true);
         if (doResourceCheck)
         {
             ifs.close();
