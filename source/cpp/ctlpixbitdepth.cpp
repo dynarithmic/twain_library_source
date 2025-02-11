@@ -220,7 +220,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumBitDepthsEx(DTWAIN_SOURCE Source, LONG Pixel
         const DTWAIN_ARRAY arr = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
         auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
         const CTL_ITwainSource::CachedPixelTypeMap& theMap = pSource->GetPixelTypeMap();
-        const std::vector<int>& pBitDepths = theMap.find(PixelType)->second;
+        auto& pBitDepths = theMap.find(PixelType)->second;
         std::copy(pBitDepths.begin(), pBitDepths.end(), std::back_inserter(vIn));
         *Array = arr;
         LOG_FUNC_EXIT_NONAME_PARAMS(true)

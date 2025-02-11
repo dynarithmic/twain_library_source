@@ -2574,6 +2574,28 @@ void CTL_TwainAppMgr::GatherCapabilityInfo(CTL_ITwainSource* pSource)
         // Get the capabilities using TWAIN
         CTL_TwainCapArray rArray;
         CTL_TwainAppMgr::GetCapabilities(pSource, rArray);
+
+        // Report TWAIN compliance issue if retrieving capabilities returns no values
+        bool logErrors = (CTL_StaticData::GetLogFilterFlags());
+        if ( rArray.empty() && logErrors)
+        {
+            std::string s1 = GetResourceStringFromMap(DTWAIN_ERR_SUPPORTEDCAPS_COMPLIANCY1);
+            s1 += " - " + StringWrapperA::QuoteString(pSource->GetProductNameA());
+            LogWriterUtils::WriteLogInfoIndentedA(s1);
+        }
+        if (!rArray.empty() && logErrors)
+        {
+            static constexpr std::array<TW_UINT16, 3> mandatoryCaps = { CAP_SUPPORTEDCAPS, ICAP_XFERMECH, ICAP_PIXELTYPE };
+            bool bOk = true;
+            for (auto cap : mandatoryCaps)
+                bOk = bOk && (std::find(rArray.begin(), rArray.end(), cap) != rArray.end());
+            if (!bOk)
+            {
+                std::string s1 = GetResourceStringFromMap(DTWAIN_ERR_SUPPORTEDCAPS_COMPLIANCY2);
+                s1 += " - " + StringWrapperA::QuoteString(pSource->GetProductNameA());
+                LogWriterUtils::WriteLogInfoIndentedA(s1);
+            }
+        }
         pSource->SetCapSupportedList(rArray);
 
         // Get the capabilities from the list in the Source

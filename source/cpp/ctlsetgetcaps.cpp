@@ -600,7 +600,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetCustomDSData( DTWAIN_SOURCE Source, LPBYTE Data, D
     if( Data && (nFlags & DTWAINGCD_COPYDATA))
     {
         const char *pData = static_cast<char *>(ImageMemoryHandler::GlobalLock(h));
-        auto nMinCopy = (std::max)((std::min)(dSize, static_cast<DWORD>(localActualSize)), 0UL);
+        auto nMinCopy = (std::max)((std::min<DWORD>)(dSize, localActualSize), 0UL);
         memcpy(Data, pData, nMinCopy);
         ImageMemoryHandler::GlobalUnlock(h);
         ImageMemoryHandler::GlobalFree(h);

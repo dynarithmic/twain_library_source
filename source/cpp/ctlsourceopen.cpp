@@ -34,6 +34,7 @@ static void LogAndCachePixelTypes(CTL_ITwainSource *p);
 static void DetermineIfSpecialXfer(CTL_ITwainSource* p);
 static void DetermineIfPeekMessage(CTL_ITwainSource* p);
 static void DetermineIfPaperDetectable(CTL_ITwainSource* p);
+static std::pair<bool, int> PerformPixelTypeCompliancyTest(CTL_ITwainSource * p);
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSourcesOnSelect(DTWAIN_BOOL bSet)
 {
@@ -168,91 +169,173 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceOpen(DTWAIN_SOURCE Source)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
+std::pair<bool, int> PerformPixelTypeCompliancyTest(CTL_ITwainSource* p)
+{
+    // Resets the pixel type to the original setting before the compliancy tests were run
+    struct ResetPixelType
+    {
+        LONG origValue;
+        CTL_ITwainSource* m_pSource;
+        ResetPixelType(CTL_ITwainSource* pSource, LONG oValue) : m_pSource(pSource), origValue(oValue) {}
+        ~ResetPixelType()
+        {
+            try
+            {
+                DTWAIN_ARRAY arr = CreateArrayFromFactory(m_pSource->GetDTWAINHandle(), DTWAIN_ARRAYLONG, 1);
+                DTWAINArrayLowLevelPtr_RAII raii(m_pSource->GetDTWAINHandle(), &arr);
+                // get pointer to internals of the array
+                auto& vCurPtr = m_pSource->GetDTWAINHandle()->m_ArrayFactory->underlying_container_t<LONG>(arr);
+                vCurPtr[0] = origValue;
+                DTWAIN_SetCapValuesEx2(m_pSource, ICAP_PIXELTYPE, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
+            }
+            catch (...)
+            {
+            }
+        }
+    };
+
+    std::pair<bool, int> returnPair = { true, DTWAIN_NO_ERROR };
+
+    DTWAIN_ARRAY PixelTypes = {};
+    auto pHandle = p->GetDTWAINHandle();
+    DTWAINArrayLowLevelPtr_RAII arrP(pHandle, &PixelTypes);
+    DTWAIN_BOOL bOK = DTWAIN_GetCapValuesEx2(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &PixelTypes);
+    if (!bOK || !PixelTypes)
+    {
+        returnPair = { false, DTWAIN_ERR_ICAPPIXELTYPE_COMPLIANCY1 };
+    }
+    else
+    {
+        // get pointer to internals of the array
+        auto& vCurPixTypePtr = pHandle->m_ArrayFactory->underlying_container_t<LONG>(PixelTypes);
+
+        if (vCurPixTypePtr.empty())
+            returnPair = { false, DTWAIN_ERR_ICAPPIXELTYPE_COMPLIANCY2 };
+
+        // Get the current pixel type
+        DTWAIN_ARRAY CurrentPixelType = {};
+        DTWAINArrayLowLevelPtr_RAII arr2(pHandle, &CurrentPixelType);
+        bOK = DTWAIN_GetCapValuesEx2(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &CurrentPixelType);
+        if (!bOK)
+            returnPair = { false, DTWAIN_ERR_ICAPPIXELTYPE_COMPLIANCY1 };
+
+        // get pointer to internals of the array
+        auto& vCurPixTypePtr2 = pHandle->m_ArrayFactory->underlying_container_t<LONG>(CurrentPixelType);
+        if (vCurPixTypePtr2.empty())
+            returnPair = { false, DTWAIN_ERR_ICAPPIXELTYPE_COMPLIANCY1 };
+
+        // Make sure we reset the pixel type on return
+        ResetPixelType resetter(p, vCurPixTypePtr2[0]);
+
+        // Test 3, 4, 5 as per TWAIN Specification Standard Capability Compliancy tests
+        DTWAIN_ARRAY aBitDepths = {};
+        DTWAINArrayLowLevelPtr_RAII raiiBitDepths(pHandle, &aBitDepths);
+
+        // Pixel types to check
+        static constexpr std::array<TW_UINT16, 3> aPixelTypes = { TWPT_BW, TWPT_GRAY, TWPT_RGB };
+
+        // Invalid bit depths to check
+        std::vector<std::set<int>> setBitDepths = { {24}, {1,24}, {1} };
+
+        // Get any pixel types that do not need to go through compliancy checks
+        std::vector<LONG> aOtherPixelTypes = vCurPixTypePtr;
+
+        aOtherPixelTypes.erase(std::remove_if(aOtherPixelTypes.begin(), aOtherPixelTypes.end(),
+            [&](LONG val) { return std::find(aPixelTypes.begin(), aPixelTypes.end(), val) != aPixelTypes.end(); }),
+            aOtherPixelTypes.end());
+
+        size_t curSet = 0;
+        for (auto val : aPixelTypes)
+        {
+            vCurPixTypePtr2[0] = val;
+            // Set the pixel type
+            bOK = DTWAIN_SetCapValuesEx2(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, CurrentPixelType);
+            if (bOK)
+            {
+                // Get the current bit depths
+                bOK = DTWAIN_GetCapValuesEx2(p, DTWAIN_CV_ICAPBITDEPTH, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aBitDepths);
+                auto& vCurBitDepths = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aBitDepths);
+                if (vCurBitDepths.empty())
+                    returnPair = { false, DTWAIN_ERR_ICAPBITDEPTH_COMPLIANCY1 };
+
+                // Check if list of bit depths do not contain the invalid bit depth
+                if (std::find_if(vCurBitDepths.begin(), vCurBitDepths.end(),
+                    [&](LONG val) { return setBitDepths[curSet].count(val); }) != vCurBitDepths.end())
+                    returnPair = { false, DTWAIN_ERR_ICAPBITDEPTH_COMPLIANCY1 };
+                for (auto curBitDepth : vCurBitDepths)
+                    p->AddPixelTypeAndBitDepth(val, curBitDepth);
+            }
+        }
+
+        // Process other bit depths
+        for (auto val : aOtherPixelTypes)
+        {
+            vCurPixTypePtr2[0] = val;
+            // Set the pixel type
+            bOK = DTWAIN_SetCapValuesEx2(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, CurrentPixelType);
+            if (bOK)
+            {
+                // Get the current bit depths
+                bOK = DTWAIN_GetCapValuesEx2(p, DTWAIN_CV_ICAPBITDEPTH, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aBitDepths);
+                auto& vCurBitDepths = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aBitDepths);
+                for (auto curBitDepth : vCurBitDepths)
+                    p->AddPixelTypeAndBitDepth(val, curBitDepth);
+            }
+        }
+    }
+    return returnPair;
+}
+
 void LogAndCachePixelTypes(CTL_ITwainSource *p)
 {
+    struct ProcessingRAII
+    {
+        CTL_ITwainSource* m_pSource;
+        ProcessingRAII(CTL_ITwainSource* pSource) : m_pSource(pSource) {}
+        ~ProcessingRAII() { m_pSource->SetCurrentlyProcessingPixelInfo(false); }
+    };
+
     static constexpr int MaxMessage = 1024;
     if (p->PixelTypesRetrieved())
         return;
 
     p->SetCurrentlyProcessingPixelInfo(true);
-    TCHAR szName[MaxMessage + 1];
-    LONG oldflags = CTL_StaticData::GetLogFilterFlags();
+    ProcessingRAII raii(p);
 
-    GetSourceInfo(p, &CTL_ITwainSource::GetProductName, szName, MaxMessage);
-
-    std::string sName = StringConversion::Convert_NativePtr_To_Ansi(szName);
-    std::string sBitDepths;
-    DTWAIN_ARRAY PixelTypes = {};
-
-    // enumerate all of the pixel types
-    DTWAIN_BOOL bOK = DTWAIN_GetCapValuesEx2(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &PixelTypes);
-    if (bOK)
+    // Do compliancy and retrieval test.
+    auto pr = PerformPixelTypeCompliancyTest(p);
+    if (!pr.first)
     {
-        const auto pHandle = p->GetDTWAINHandle();
-        DTWAINArrayLowLevel_RAII arrP(pHandle, PixelTypes);
-        auto& vPixelTypes = pHandle->m_ArrayFactory->underlying_container_t<LONG>(PixelTypes);
-
-        LONG nCount = static_cast<LONG>(vPixelTypes.size());
-        if (nCount > 0)
+        if (CTL_StaticData::GetLogFilterFlags())
         {
-            // create an array of 1
-            DTWAIN_ARRAY vCurPixType = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 1);
-            DTWAINArrayLowLevel_RAII raii(pHandle, vCurPixType);
-
-            // get pointer to internals of the array
-            auto& vCurPixTypePtr = pHandle->m_ArrayFactory->underlying_container_t<LONG>(vCurPixType);
-
-            for (LONG i = 0; i < nCount; ++i)
-            {
-                // current pixel type
-                vCurPixTypePtr[0] = vPixelTypes[i];
-                LONG& curPixType = vCurPixTypePtr[0];
-                // Set the pixel type temporarily
-                if (DTWAIN_SetCapValuesEx2(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, vCurPixType))
-                {
-                    // Add to source list
-                    // Now get the bit depths for this pixel type
-                    DTWAIN_ARRAY BitDepths = nullptr;
-                    if (DTWAIN_GetCapValuesEx2(p, DTWAIN_CV_ICAPBITDEPTH, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &BitDepths))
-                    {
-                        DTWAINArrayLowLevel_RAII arr(pHandle, BitDepths);
-
-                        // Get the total number of bit depths.
-                        auto& vBitDepths = pHandle->m_ArrayFactory->underlying_container_t<LONG>(BitDepths);
-
-                        LONG nCountBPP = static_cast<LONG>(vBitDepths.size());
-                        if (oldflags & DTWAIN_LOG_MISCELLANEOUS)
-                        {
-                            StringStreamA strm;
-                            strm << "\nFor source \"" << sName << "\", there are (is) " <<
-                                nCountBPP << " available bit depth(s) for pixel type " <<
-                                curPixType << "\n";
-                            sBitDepths += strm.str();
-                        }
-                        LONG nCurBitDepth;
-                        for (LONG j = 0; j < nCountBPP; ++j)
-                        {
-                            nCurBitDepth = vBitDepths[j];
-                            p->AddPixelTypeAndBitDepth(curPixType, nCurBitDepth);
-                            if (oldflags & DTWAIN_LOG_MISCELLANEOUS)
-                            {
-                                StringStreamA strm;
-                                strm << "Bit depth[" << j << "] = " << nCurBitDepth << "\n";
-                                sBitDepths += strm.str();
-                            }
-                        }
-                    }
-                }
-            }
-            DTWAIN_SetCapValuesEx2(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPRESET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, nullptr);
+            std::string s1 = GetResourceStringFromMap(pr.second);
+            s1 += " - " + StringWrapperA::QuoteString(p->GetProductNameA());
+            LogWriterUtils::WriteLogInfoIndentedA(s1);
         }
     }
-    if (oldflags && bOK )
+
+    // Print information on the pixel types found
+    const auto& pixelBitDepthMap = p->GetPixelTypeMap();
+
+    StringStreamA strm;
+    std::string sBitDepths;
+    LONG oldflags = CTL_StaticData::GetLogFilterFlags();
+    for (auto& mapPr : pixelBitDepthMap)
+    {
+        strm.str("");
+        strm << "\nFor source \"" << p->GetProductNameA() << "\", there are (is) " <<
+            mapPr.second.size() << " available bit depth(s) for pixel type " <<
+            CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWPT, mapPr.first) << "\n";
+        size_t j = 0;
+        for (auto& val : mapPr.second)
+        {
+            strm << "Bit depth[" << j << "] = " << val << "\n";
+            ++j;
+        }
+        sBitDepths += strm.str();
+    }
+    if (oldflags)
         LogWriterUtils::WriteMultiLineInfoIndentedA(sBitDepths, "\n");
-    else
-    if (!bOK)
-        LogWriterUtils::WriteLogInfoIndentedA("Could not retrieve bit depth information");
-    p->SetCurrentlyProcessingPixelInfo(false);
 }
 
 void DetermineIfSpecialXfer(CTL_ITwainSource* p)

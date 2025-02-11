@@ -634,7 +634,7 @@ namespace dynarithmic
         typedef boost::container::flat_map<TW_UINT16, bool> CachedCapMap;
 
         public:
-            typedef boost::container::flat_map<int, std::vector<int> > CachedPixelTypeMap;
+            typedef boost::container::flat_map<int, std::set<int> > CachedPixelTypeMap;
             void        AddPixelTypeAndBitDepth(int PixelType, int BitDepth);
             CachedPixelTypeMap::iterator FindPixelType(int PixelType);
             bool IsBitDepthSupported(int PixelType, int BitDepth);

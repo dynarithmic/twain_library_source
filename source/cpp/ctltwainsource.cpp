@@ -585,23 +585,7 @@ bool CTL_ITwainSource::IsNewJob() const
 
 void CTL_ITwainSource::AddPixelTypeAndBitDepth(int PixelType, int BitDepth)
 {
-    const auto it = FindPixelType(PixelType);
-    if ( it == m_aPixelTypeMap.end())
-    {
-        // pixel type not found, so add it
-        std::vector<int> BitDepths;
-        BitDepths.push_back( BitDepth );
-        m_aPixelTypeMap[PixelType] = std::move(BitDepths);
-    }
-    else
-    {
-        // pixel type found, so see if bit depth exists
-        if ( !IsBitDepthSupported( PixelType, BitDepth ))
-        {
-            // add the bit depth
-            (*it).second.push_back(BitDepth);
-        }
-    }
+    m_aPixelTypeMap[PixelType].insert(BitDepth);
 }
 
 CTL_ITwainSource::CachedPixelTypeMap::iterator CTL_ITwainSource::FindPixelType(int PixelType)
@@ -619,7 +603,7 @@ bool CTL_ITwainSource::IsBitDepthSupported(int PixelType, int BitDepth)
     const auto it = FindPixelType(PixelType);
     if ( it != m_aPixelTypeMap.end())
         // search for bit depth
-        return std::find((*it).second.begin(), (*it).second.end(), BitDepth) != (*it).second.end();
+        return it->second.count(BitDepth);
     return false;
 }
 
