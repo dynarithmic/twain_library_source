@@ -190,7 +190,7 @@ static bool performSetCap(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, TW_UINT
     bool bOk = false;
     DTWAIN_ARRAY pDTWAINArray = pArray;
     const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
-    if (lSetType != DTWAIN_CAPRESET)
+    if (lSetType != DTWAIN_CAPRESET && lSetType != DTWAIN_CAPRESETALL)
     {
         auto tagType = pHandle->m_ArrayFactory->tag_type(pArray);
         const bool isArrayOk = (tagType == nDTWAIN_ArrayType);
@@ -429,16 +429,16 @@ static DTWAIN_BOOL SetCapValuesEx2_Internal( DTWAIN_SOURCE Source, LONG lCap, LO
     bool bOk = false;
     CHECK_IF_CAP_SUPPORTED(pSource, pHandle, static_cast<TW_UINT16>(lCap), false)
 
+    if (nDataType == DTWAIN_DEFAULT)
+    {
+        nDataType = DTWAIN_GetCapDataType(Source, static_cast<CTL_EnumCapability>(lCap));
+        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return nDataType < 0; }, nDataType, false, FUNC_MACRO);
+    }
+
     if ( !CTL_CapabilityTriplet::IsCapOperationReset(lSetType) )
     {
         auto nCount = pHandle->m_ArrayFactory->size(pArray);
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return nCount == 0; }, DTWAIN_ERR_EMPTY_ARRAY, false, FUNC_MACRO);
-
-        if (nDataType == DTWAIN_DEFAULT)
-        {
-            nDataType = DTWAIN_GetCapDataType(Source, static_cast<CTL_EnumCapability>(lCap));
-            DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return nDataType < 0; }, nDataType, false, FUNC_MACRO);
-        }
 
         bool bFoundType = false;
 
@@ -476,7 +476,7 @@ static DTWAIN_BOOL SetCapValuesEx2_Internal( DTWAIN_SOURCE Source, LONG lCap, LO
     if (lSetType == DTWAIN_CAPSETCURRENT)
         lSetType = DTWAIN_CAPSET;
     else
-    if (lSetType == DTWAIN_CAPSETAVAILABLE || lSetType == DTWAIN_CAPSETCONSTRAINT)
+    if (lSetType == DTWAIN_CAPSETCONSTRAINT)
         lSetType = MSG_SETCONSTRAINT;
 
     // Change to the real TWAIN set-constraint type

@@ -196,10 +196,13 @@ namespace dynarithmic
         // Check if this is a "Reset"
         if (CTL_CapabilityTriplet::IsCapOperationReset(SetType))
         {
-            pSetTriplet = std::make_unique<CTL_CapabilityResetTriplet>(pSession,
-                                                                     pTempSource,
-                                                                     nCap,
-                                                                     static_cast<TW_UINT16>(SetType ));
+            if (SetType == DTWAIN_CAPRESET)
+                pSetTriplet = std::make_unique<CTL_CapabilityResetTriplet>(pSession,
+                                                                         pTempSource,
+                                                                         nCap);
+            else
+                pSetTriplet = std::make_unique<CTL_CapabilityResetAllTriplet>(pSession,
+                                                                              pTempSource);
         }
         else
         // Try the array version
