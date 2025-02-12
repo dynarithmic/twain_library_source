@@ -27,6 +27,7 @@
 #include <boost/lexical_cast.hpp>
 #include <utility>
 #include "ctltwainsource.h"
+#include "ctltwaincompliancy.h"
 #include "ctltr009.h"
 #include "ctltwainmanager.h"
 #include "ctldib.h"
@@ -253,6 +254,7 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_FileSystem(),
     m_pImageMemXfer(nullptr),
     m_PersistentArray(nullptr),
+    m_TwainCompliancy(this),
     m_bImageInfoRetrieved(false),
     m_bExtendedImageInfoSupported(false),
     m_bSupportedCustomCapsRetrieved(false)

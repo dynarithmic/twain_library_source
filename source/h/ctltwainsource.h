@@ -36,6 +36,7 @@
 #include "ctldevnt.h"
 #include "ctltwainsession.h"
 #include "ctltwainidentity.h"
+#include "ctltwaincompliancy.h"
 #include "dtwain_anyutils.h"
 
 namespace dynarithmic
@@ -641,7 +642,7 @@ namespace dynarithmic
             bool IsPixelTypeSupported(int PixelType);
             bool PixelTypesRetrieved() const;
             const CachedPixelTypeMap& GetPixelTypeMap() const { return m_aPixelTypeMap; }
-
+            TWAINCompliancyTester& GetCompliancyTester() { return m_TwainCompliancy; }
 
         private:
         struct AltAcquireArea {
@@ -669,6 +670,7 @@ namespace dynarithmic
         DTWAIN_ARRAY    m_PersistentArray;
         CapList    m_aExtendedCaps;
         DuplexData m_DuplexFileData;
+        TWAINCompliancyTester m_TwainCompliancy;
         bool    m_bImageInfoRetrieved;
         bool    m_bExtendedImageInfoSupported;
         bool    m_bSupportedCustomCapsRetrieved;
