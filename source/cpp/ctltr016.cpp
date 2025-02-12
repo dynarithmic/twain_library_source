@@ -231,7 +231,7 @@ CTL_CapabilityResetTriplet::CTL_CapabilityResetTriplet(CTL_ITwainSession *pSessi
 
 CTL_CapabilityResetAllTriplet::CTL_CapabilityResetAllTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource) : 
     CTL_CapabilityResetTriplet(pSession, pSource, CAP_SUPPORTEDCAPS, CTL_SetTypeRESETALL)
-{};
+{}
 
 
 #ifdef USE_EXPLICIT_TEMPLATE_INSTANTIATIONS

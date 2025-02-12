@@ -2097,7 +2097,7 @@ UINT CTL_TwainAppMgr::GetCapOps(const CTL_ITwainSource *pSource, int nCap, bool 
 {
     UINT nOps = 0;
     if ( bCanQuery )
-        nOps = GetCapabilityOperations(pSource, nCap);
+        nOps = GetCapabilityOperations(pSource, nCap).GetSupport();
 
     if ( nOps == 0 )
     {
@@ -2109,25 +2109,25 @@ UINT CTL_TwainAppMgr::GetCapOps(const CTL_ITwainSource *pSource, int nCap, bool 
     return nOps;
 }
 
-UINT CTL_TwainAppMgr::GetCapabilityOperations(const CTL_ITwainSource *pSource, int nCap)
+CTL_CapabilityQueryTriplet CTL_TwainAppMgr::GetCapabilityOperations(const CTL_ITwainSource *pSource, int nCap)
 {
     const auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
-    if ( !pSource )
-        return 0;
+    if (!pSource)
+        return {nullptr, nullptr, 0};
 
     const auto pSession = pTempSource->GetTwainSession();
 
-    if ( !IsValidTwainSession(pSession) )
-        return 0;
+    if (!IsValidTwainSession(pSession))
+        return { nullptr, nullptr, 0 };
 
-    if ( !s_pGlobalAppMgr->IsSourceOpen( pSource ) )
-        return 0;
+    if (!s_pGlobalAppMgr->IsSourceOpen(pSource))
+        return { nullptr, nullptr, 0 };
 
     CTL_CapabilityQueryTriplet QT(pSession, pTempSource, static_cast<CTL_EnumCapability>(nCap));
     const TW_UINT16 rc = QT.Execute();
-    if ( rc != TWRC_SUCCESS )
-        return 0;
-    return QT.GetSupport();
+    if (rc != TWRC_SUCCESS)
+        return { nullptr, nullptr, 0 };
+    return QT;
 }
 
 ////////////////// End Capabilities that should be supported /////////////////

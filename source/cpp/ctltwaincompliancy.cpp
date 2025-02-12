@@ -20,6 +20,7 @@
  */
 #include "ctltwaincompliancy.h"
 #include "ctltwainsource.h"
+#include "ctltwainmanager.h"
 #include "arrayfactory.h"
 
 using namespace dynarithmic;
@@ -223,6 +224,41 @@ std::pair<bool, int> TWAINCompliancyTester::TestStandardCapabilitiesCompliancy()
         {
             returnPair = { false, DTWAIN_ERR_STANDARDCAPS_COMPLIANCY };
             break;
+        }
+    }
+    if (returnPair.first)
+    {
+        // Try each supported cap
+        auto& allCaps = m_pSource->GetCapSupportedList();
+        for (auto& oneCap : allCaps)
+        {
+            if (oneCap >= CAP_CUSTOMBASE)
+                continue;
+            const auto& ops = CTL_TwainAppMgr::GetCapabilityOperations(m_pSource, oneCap);
+            if ( ops.GetSupport() == 0 )
+            { 
+                returnPair = { false, DTWAIN_ERR_STANDARDCAPS_COMPLIANCY };
+                break;
+            }
+            // check MSG_GET, MSG_GETCURRENT, MSG_GETDEFAULT
+            if (ops.IsGet() || ops.IsGetCurrent() || ops.IsGetDefault())
+            {
+                bOK = (ops.IsGet() && ops.IsGetCurrent() && ops.IsGetDefault());
+                if (!bOK)
+                {
+                    returnPair = { false, DTWAIN_ERR_STANDARDCAPS_COMPLIANCY };
+                    break;
+                }
+            }
+            if (ops.IsSet() || ops.IsReset())
+            {
+                bOK = (ops.IsSet() && ops.IsReset() && ops.IsGet() && ops.IsGetCurrent() && ops.IsGetDefault());
+                if (!bOK)
+                {
+                    returnPair = { false, DTWAIN_ERR_STANDARDCAPS_COMPLIANCY };
+                    break;
+                }
+            }
         }
     }
     m_ResultCode[TWAIN_CAPABILITY_TESTS] = returnPair.second;

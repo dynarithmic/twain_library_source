@@ -35,6 +35,7 @@
 #include "ctltr012.h"
 #include "ctltr014.h"
 #include "ctltr015.h"
+#include "ctltr035.h"
 #include <boost/dll/shared_library.hpp>
 namespace dynarithmic
 {
@@ -170,7 +171,7 @@ namespace dynarithmic
 
             static UINT GetCapOps(const CTL_ITwainSource *pSource, int nCap, bool bCanQuery); // Does extra checking here
 
-            static UINT GetCapabilityOperations(const CTL_ITwainSource *pSource, // Uses the MSG_QUERYSUPPORT triplet
+            static CTL_CapabilityQueryTriplet GetCapabilityOperations(const CTL_ITwainSource *pSource, // Uses the MSG_QUERYSUPPORT triplet
                                                 int nCap);
 
             static CTL_IntArray EnumTransferMechanisms( const CTL_ITwainSource *pSource );
