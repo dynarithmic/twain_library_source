@@ -172,7 +172,7 @@ namespace dynarithmic
             static UINT GetCapOps(const CTL_ITwainSource *pSource, int nCap, bool bCanQuery); // Does extra checking here
 
             static CTL_CapabilityQueryTriplet GetCapabilityOperations(const CTL_ITwainSource *pSource, // Uses the MSG_QUERYSUPPORT triplet
-                                                int nCap);
+                                                                      int nCap);
 
             static CTL_IntArray EnumTransferMechanisms( const CTL_ITwainSource *pSource );
             static std::vector<TW_UINT32> EnumSupportedDATS(const CTL_ITwainSource* pSource);

@@ -365,7 +365,13 @@ namespace dynarithmic
                 return false;
 
             // Check if array is of the correct type
-            const auto actualEnumType = pHandle->m_ArrayFactory->arraytype_to_tagtype(EnumType);
+            auto EnumTypeToCheck = EnumType;
+
+            // Frames are special, since the array was created using low-level create_frame() function
+            if (EnumType == CTL_ArrayDTWAINFrameType)
+                EnumTypeToCheck = CTL_ArrayFrameSingleType;
+
+            auto actualEnumType = pHandle->m_ArrayFactory->arraytype_to_tagtype(EnumTypeToCheck);
             if ( !pHandle->m_ArrayFactory->is_valid(pArray, actualEnumType ) )
                 return false;
             std::vector<TwainType> Array;
