@@ -887,7 +887,9 @@ bool CTL_TwainAppMgr::ProcessConditionCodeError(TW_UINT16 nError)
     auto resID = FindConditionCode(nError);
     if ( IsValidConditionCode(resID))
     {
-        static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal())->m_lLastError = resID; 
+        static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal())->m_lLastError = resID;
+        if ( s_pGlobalAppMgr )
+            s_pGlobalAppMgr->SetLastTwainError(nError, TWCC_Error);
         DTWAIN_ERROR_CONDITION(resID, false, false)
     }
     return true;
@@ -2756,6 +2758,13 @@ int CTL_TwainAppMgr::GetLastTwainError()
     if (s_pGlobalAppMgr)
         return s_pGlobalAppMgr->m_nErrorTWRC;
     return TWRC_SUCCESS;
+}
+
+int CTL_TwainAppMgr::GetLastConditionCodeError()
+{
+    if (s_pGlobalAppMgr)
+        return s_pGlobalAppMgr->m_nErrorTWCC;
+    return TWCC_SUCCESS;
 }
 
 bool CTL_TwainAppMgr::SetDefaultSource( CTL_ITwainSession *pSession, const CTL_ITwainSource *pSource )

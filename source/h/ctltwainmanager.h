@@ -210,6 +210,8 @@ namespace dynarithmic
             static void     SetError(int nError, const std::string& extraInfo, bool bMustReportGeneralError);
             static int      GetLastError();
             static int      GetLastTwainError();
+            static int      GetLastConditionCodeError();
+
             static LPSTR    GetLastErrorString(LPSTR lpszBuffer, int nSize);
             static LPSTR    GetErrorString(int nError, LPSTR lpszBuffer, int nSize);
             static void     SetAndLogError(int nError, const std::string& extraInfo, bool bMustReportGeneralError);

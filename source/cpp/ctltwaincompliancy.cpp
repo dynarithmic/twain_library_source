@@ -276,7 +276,7 @@ std::pair<bool, int> TWAINCompliancyTester::TestStandardCapabilitiesCompliancy()
                     bOK = DTWAIN_GetCapValuesEx2(m_pSource, oneCap, optsToUse[curOp], DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arrTest);
                     if (!bOK)
                     {
-                        auto conditionCode = CTL_TwainAppMgr::GetConditionCode(m_pSource->GetTwainSession(), m_pSource);
+                        auto conditionCode = CTL_TwainAppMgr::GetLastConditionCodeError();
                         if (conditionCode == TWCC_SEQERROR)
                             continue;
                         else
@@ -327,7 +327,7 @@ std::pair<bool, int> TWAINCompliancyTester::TestStandardCapabilitiesCompliancy()
                         if (!bOK)
                         {
                             auto lastTwainError = CTL_TwainAppMgr::GetLastTwainError();
-                            auto conditionCode = CTL_TwainAppMgr::GetConditionCode(m_pSource->GetTwainSession(), m_pSource);
+                            auto conditionCode = CTL_TwainAppMgr::GetLastConditionCodeError();
                             if (conditionCode == TWCC_SEQERROR || conditionCode == TWCC_SUCCESS || lastTwainError == TWRC_CHECKSTATUS)
                                 continue;
                             returnPair = { false, DTWAIN_ERR_STANDARDCAPS_COMPLIANCY };
