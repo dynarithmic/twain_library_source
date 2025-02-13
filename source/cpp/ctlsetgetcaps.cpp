@@ -418,7 +418,6 @@ DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap
 // Sets capability values.  This function does not test if the
 // capability exists, or if the container type is valid.  Use
 // with caution!!
-
 static DTWAIN_BOOL SetCapValuesEx2_Internal( DTWAIN_SOURCE Source, LONG lCap, LONG lSetType, LONG lContainerType,
                                              LONG nDataType, DTWAIN_ARRAY pArray )
 {
@@ -437,9 +436,6 @@ static DTWAIN_BOOL SetCapValuesEx2_Internal( DTWAIN_SOURCE Source, LONG lCap, LO
 
     if ( !CTL_CapabilityTriplet::IsCapOperationReset(lSetType) )
     {
-        auto nCount = pHandle->m_ArrayFactory->size(pArray);
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return nCount == 0; }, DTWAIN_ERR_EMPTY_ARRAY, false, FUNC_MACRO);
-
         bool bFoundType = false;
 
         // Get the array type, given the tag type of the DTWAIN Array
@@ -501,7 +497,7 @@ static DTWAIN_BOOL SetCapValuesEx2_Internal( DTWAIN_SOURCE Source, LONG lCap, LO
         if (dynarithmic::IsTwainFrameType(static_cast<TW_UINT16>(nDataType)))
         {
             bOk = performSetCap<TW_FRAME, TW_FRAME, TwainFrameInternal, FrameSetCapConverter>
-            (pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::FrameType, CTL_ArrayTWFrameType, nDataType);
+            (pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::FrameSingleType, CTL_ArrayTWFrameType, nDataType);
         }
         if (bOk)
         {

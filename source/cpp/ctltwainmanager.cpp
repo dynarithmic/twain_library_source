@@ -2751,6 +2751,13 @@ void CTL_TwainAppMgr::SetLastTwainError( TW_UINT16 nError,
         m_nErrorTWCC = nError;
 }
 
+int CTL_TwainAppMgr::GetLastTwainError()
+{
+    if (s_pGlobalAppMgr)
+        return s_pGlobalAppMgr->m_nErrorTWRC;
+    return TWRC_SUCCESS;
+}
+
 bool CTL_TwainAppMgr::SetDefaultSource( CTL_ITwainSession *pSession, const CTL_ITwainSource *pSource )
 {
     const auto pTemp = const_cast<CTL_ITwainSource*>(pSource);

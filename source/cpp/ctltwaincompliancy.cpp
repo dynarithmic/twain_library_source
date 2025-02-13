@@ -259,10 +259,10 @@ std::pair<bool, int> TWAINCompliancyTester::TestStandardCapabilitiesCompliancy()
                     break;
                 }
             }
+            std::array<bool, 3> getops = { ops.IsGet(), ops.IsGetCurrent(), ops.IsGetDefault() };
+            static constexpr std::array<LONG, 3> optsToUse = { DTWAIN_CAPGET, DTWAIN_CAPGETCURRENT, DTWAIN_CAPGETDEFAULT };
             if (returnPair.first)
             {
-                std::array<bool, 3> getops = { ops.IsGet(), ops.IsGetCurrent(), ops.IsGetDefault() };
-                static constexpr std::array<LONG, 3> optsToUse = { DTWAIN_CAPGET, DTWAIN_CAPGETCURRENT, DTWAIN_CAPGETDEFAULT };
                 int curOp = 0;
                 for (auto op : getops)
                 {
@@ -306,6 +306,34 @@ std::pair<bool, int> TWAINCompliancyTester::TestStandardCapabilitiesCompliancy()
                         break;
                     }
                     ++curOp;
+                }
+
+                // Test get and set in combination
+                if (ops.IsSet() && ops.IsGet())
+                {
+                    curOp = 0;
+                    for (auto op : getops)
+                    {
+                        DTWAIN_ARRAY arrTest = {};
+                        DTWAINArrayLowLevelPtr_RAII arrTestRAII(pHandle, &arrTest);
+                        bOK = DTWAIN_GetCapValuesEx2(m_pSource, oneCap, op, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arrTest);
+                        if (!bOK)
+                        {
+                            returnPair = { false, DTWAIN_ERR_STANDARDCAPS_COMPLIANCY };
+                            break;
+                        }
+                        // Test the set
+                        bOK = DTWAIN_SetCapValuesEx2(m_pSource, oneCap, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arrTest);
+                        if (!bOK)
+                        {
+                            auto lastTwainError = CTL_TwainAppMgr::GetLastTwainError();
+                            auto conditionCode = CTL_TwainAppMgr::GetConditionCode(m_pSource->GetTwainSession(), m_pSource);
+                            if (conditionCode == TWCC_SEQERROR || conditionCode == TWCC_SUCCESS || lastTwainError == TWRC_CHECKSTATUS)
+                                continue;
+                            returnPair = { false, DTWAIN_ERR_STANDARDCAPS_COMPLIANCY };
+                            break;
+                        }
+                    }
                 }
             }
         }
