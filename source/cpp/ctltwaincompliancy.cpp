@@ -222,6 +222,9 @@ std::pair<bool, int> TWAINCompliancyTester::TestStandardCapabilitiesCompliancy()
         bOK = DTWAIN_SetCapValuesEx2(m_pSource, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPRESETALL, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, CurrentPixelType);
         if (!bOK)
         {
+            auto conditionCode = CTL_TwainAppMgr::GetLastConditionCodeError();
+            if (conditionCode == TWCC_BADPROTOCOL)
+                continue;
             returnPair = { false, DTWAIN_ERR_STANDARDCAPS_COMPLIANCY };
             break;
         }
