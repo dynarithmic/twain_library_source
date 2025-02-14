@@ -1,5 +1,27 @@
 DTWAIN Version changes
 
+5.7.0
+
+- Fixed issue with setting the ICAP_FRAMES capability when calling 
+  DTWAIN_GetCapValues() and DTWAIN_SetCapValues().
+
+- Ensure that the TWAIN condition code (TWCC_xxxx) is retrieved for every call
+  to the TWAIN Data Source Manager.  This included successful calls to the
+  TWAIN DSM as well as calls that fail.  
+
+- Internal code added to do rudimentary TWAIN compliancy checks for TWAIN
+  data sources.  
+
+  Only a subset of the capability tests described in the  TWAIN Specification 2.5 
+ (TWAIN Standard Capability Tests, Chapter 13) has been implemented.  TWAIN sources, 
+  when initially opened, will always go through the ICAP_PIXELTYPE and ICAP_BITDEPTH tests 
+  only once.
+
+  For version 5.7.0, there will not be an exported DLL function to the internal compliancy
+  checking functions that will be available to the application, however the exported 
+  functions will be added for future versions of DTWAIN.
+
+
 5.6.0
 
 - Added versions of the DTWAIN DLL that requires an installation of the Visual C++
