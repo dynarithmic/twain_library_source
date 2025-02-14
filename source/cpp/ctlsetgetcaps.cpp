@@ -497,7 +497,7 @@ static DTWAIN_BOOL SetCapValuesEx2_Internal( DTWAIN_SOURCE Source, LONG lCap, LO
         if (dynarithmic::IsTwainFrameType(static_cast<TW_UINT16>(nDataType)))
         {
             bOk = performSetCap<TW_FRAME, TW_FRAME, TwainFrameInternal, FrameSetCapConverter>
-            (pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::FrameSingleType, CTL_ArrayTWFrameType, nDataType);
+            (pHandle, Source, static_cast<TW_UINT16>(lCap), pArray, containerType, lSetType, CTL_ArrayFactory::arrayTag::FrameSingleType, CTL_ArrayDTWAINFrameType /*CTL_ArrayTWFrameType*/, nDataType);
         }
         if (bOk)
         {

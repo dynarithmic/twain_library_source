@@ -2002,7 +2002,7 @@ DTWAIN_FRAME DLLENTRY_DEF DTWAIN_ArrayFrameGetFrameAt(DTWAIN_ARRAY FrameArray, L
     LOG_FUNC_ENTRY_PARAMS((FrameArray, nWhere))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const auto checkStatus = ArrayChecker().SetArray1(FrameArray).SetArrayPos(nWhere).
-                    SetExplicitTypeCheck(CTL_ArrayFactory::arrayTag::FrameType).
+                    SetExplicitTypeCheck(CTL_ArrayFactory::arrayTag::FrameSingleType).
                     SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS | ArrayChecker::CHECK_ARRAY_BOUNDS | ArrayChecker::CHECK_ARRAY_EXPLICIT_TYPE);
     if ( checkStatus.Check(pHandle) != DTWAIN_NO_ERROR )
         LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_ARRAY(NULL))
