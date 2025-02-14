@@ -5,6 +5,8 @@ DTWAIN Version changes
 - Fixed issue with setting the ICAP_FRAMES capability when calling 
   DTWAIN_GetCapValues() and DTWAIN_SetCapValues().
 
+- Fixed issue with capability setting using MSG_RESETALL operation.
+
 - Ensure that the TWAIN condition code (TWCC_xxxx) is retrieved for every call
   to the TWAIN Data Source Manager.  This included successful calls to the
   TWAIN DSM as well as calls that fail.  
