@@ -970,7 +970,7 @@ bool CTL_ImageXferTriplet::ResetTransfer(TW_UINT16 Msg/*=MSG_RESET*/)
         case TWRC_FAILURE:
         {
             LogWriterUtils::WriteLogInfoIndentedA("Reset Transfer failed...");
-            const TW_UINT16 ccode = CTL_TwainAppMgr::GetLastConditionCodeError();
+            auto ccode = CTL_TwainAppMgr::GetLastConditionCodeError();
             CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, TWRC_FAILURE, ccode);
             return false;
         }
