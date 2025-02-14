@@ -381,13 +381,8 @@ namespace dynarithmic
                 // Execute the TWAIN triplet
                 const TW_UINT16 rc = pTrip->Execute();
 
-                const CTL_ITwainSource *pTempSource = const_cast<CTL_ITwainSource*>(pSource);
-
                 if ( rc == TWRC_FAILURE ) // Check if there is a real failure
                 {
-                    const auto pSession = pTempSource->GetTwainSession();
-                    const TW_UINT16 ccode = GetConditionCode(pSession, nullptr);
-                    ProcessConditionCodeError(ccode);
                     return false;
                 }
 

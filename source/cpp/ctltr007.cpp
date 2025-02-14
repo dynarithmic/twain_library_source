@@ -29,25 +29,33 @@ CTL_ConditionCodeTriplet::CTL_ConditionCodeTriplet(CTL_ITwainSession *pSession,
 {
     SetSourcePtr(const_cast<CTL_ITwainSource*>(pSource));
     SetSessionPtr(pSession);
-
-    // Get the app manager's AppID
     const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-
-    if ( pMgr && pMgr->IsValidTwainSession( pSession ))
+    if (pMgr && pMgr->IsValidTwainSession(pSession))
     {
-        if ( pSource )
-            Init( pSession->GetAppIDPtr(), pSource->GetSourceIDPtr(), DG_CONTROL, DAT_STATUS,
-                  MSG_GET, static_cast<TW_MEMREF>(&m_Status) );
+        if (pSource)
+            SetValues(pSession->GetAppIDPtr(), pSource->GetSourceIDPtr());
         else
-            Init( pSession->GetAppIDPtr(), nullptr, DG_CONTROL, DAT_STATUS,
-                  MSG_GET, static_cast<TW_MEMREF>(&m_Status) );
-
-        SetAlive (true);
+            SetValues(pSession->GetAppIDPtr(), nullptr);
     }
 }
 
+CTL_ConditionCodeTriplet::CTL_ConditionCodeTriplet(TW_IDENTITY* pSession, TW_IDENTITY* pSourceID)
+{
+    SetValues(pSession, pSourceID);
+}
+
+void CTL_ConditionCodeTriplet::SetValues(TW_IDENTITY* pSession, TW_IDENTITY* pSourceID)
+{
+    Init(pSession, pSourceID, DG_CONTROL, DAT_STATUS, MSG_GET, static_cast<TW_MEMREF>(&m_Status));
+    SetAlive(true);
+}
 
 TW_UINT16 CTL_ConditionCodeTriplet::GetConditionCode() const
 {
     return m_Status.ConditionCode;
+}
+
+TW_UINT16 CTL_ConditionCodeTriplet::GetData() const
+{
+    return m_Status.Data;
 }

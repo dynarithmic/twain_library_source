@@ -289,8 +289,7 @@ const CTL_ITwainSource* CTL_TwainAppMgr::SelectSourceDlg(  CTL_ITwainSession *pS
 
         case TWRC_FAILURE:
         {
-            const TW_UINT16 ccode = GetConditionCode(pSession, nullptr);
-            ProcessConditionCodeError(ccode);
+            auto ccode = CTL_TwainAppMgr::GetLastConditionCodeError();
             SendTwainMsgToWindow(pSession, nullptr, DTWAIN_SelectSourceFailed, ccode);
             return nullptr;
         }
@@ -615,14 +614,6 @@ bool CTL_TwainAppMgr::GetImageLayoutSize(const CTL_ITwainSource* pSource,
         rArray.push_back( LayoutTrip.GetBottom() );
         return true;
     }
-    else
-    {
-        const TW_UINT16 ccode = GetConditionCode(pSession, pTempSource);
-        if ( ccode != TWCC_SUCCESS )
-        {
-            ProcessConditionCodeError(ccode);
-        }
-    }
     return false;
 }
 
@@ -664,9 +655,6 @@ bool CTL_TwainAppMgr::SetImageLayoutSize(const CTL_ITwainSource* pSource,
 
         default:
         {
-            const TW_UINT16 ccode = GetConditionCode(pSession, pTempSource);
-            if ( ccode != TWCC_SUCCESS )
-                ProcessConditionCodeError(ccode);
         }
         return false;
     }
@@ -740,10 +728,6 @@ bool CTL_TwainAppMgr::ShowUserInterface( CTL_ITwainSource *pSource, bool bTest, 
     // Failed to show the UI
     if (rc != TWRC_SUCCESS )
     {
-        const TW_UINT16 ccode = GetConditionCode(pSession, pTempSource);
-        if ( ccode != TWCC_SUCCESS )
-            ProcessConditionCodeError(ccode);
-
         oState.restoreState();
 
         switch ( rc )
@@ -794,10 +778,9 @@ bool CTL_TwainAppMgr::DisableUserInterface(const CTL_ITwainSource *pSource)
     // Turn off user interface
     if ( UI.Execute() != TWRC_SUCCESS )
     {
-        const TW_UINT16 ccode = GetConditionCode(pSession, pTempSource);
+        auto ccode = GetLastConditionCodeError();
         if ( ccode != TWCC_SUCCESS )
         {
-            ProcessConditionCodeError(ccode);
             bRet = false;
         }
     }
@@ -841,12 +824,9 @@ bool CTL_TwainAppMgr::GetImageInfo(CTL_ITwainSource *pSource, CTL_ImageInfoTripl
         pTrip = &ImageInfo;
     if ( pTrip->Execute() != TWRC_SUCCESS )
     {
-        const TW_UINT16 ccode = GetConditionCode(pSession, pTempSource);
+        auto ccode = GetLastConditionCodeError();
         if ( ccode != TWCC_SUCCESS )
-        {
-            ProcessConditionCodeError(ccode);
             return false;
-        }
         return true;
     }
     pSource->SetImageInfo(pTrip->GetImageInfoBuffer());
@@ -890,7 +870,8 @@ bool CTL_TwainAppMgr::ProcessConditionCodeError(TW_UINT16 nError)
         static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal())->m_lLastError = resID;
         if ( s_pGlobalAppMgr )
             s_pGlobalAppMgr->SetLastTwainError(nError, TWCC_Error);
-        DTWAIN_ERROR_CONDITION(resID, false, false)
+        if ( nError != TWCC_SUCCESS)
+            DTWAIN_ERROR_CONDITION(resID, false, false)
     }
     return true;
 }
@@ -929,8 +910,6 @@ bool CTL_TwainAppMgr::IsTwainMsg(MSG *pMsg, bool bFromUserQueue/*=false*/)
 
         case TWRC_FAILURE:
         {
-            const TW_UINT16 CC = GetConditionCode( s_pSelectedSession, ptrSource );
-            ProcessConditionCodeError(CC);
             retVal = false;
         }
         break;
@@ -1079,14 +1058,6 @@ bool CTL_TwainAppMgr::StoreImageLayout(CTL_ITwainSource *pSource)
         pTempSource->SetImageLayout(&fRect);
         return true;
     }
-    else
-    {
-        const TW_UINT16 ccode = GetConditionCode(pSession, pTempSource);
-        if ( ccode != TWCC_SUCCESS )
-        {
-            ProcessConditionCodeError(ccode);
-        }
-    }
     return false;
 }
 
@@ -1158,12 +1129,9 @@ int  CTL_TwainAppMgr::FileTransfer( CTL_ITwainSession *pSession,
     // Set the file type and name
     if ( FileXferSetup.Execute() == TWRC_FAILURE )
     {
-        TW_UINT16 ccode = GetConditionCode(pSession, pSource);
+        auto ccode = GetLastConditionCodeError();
         if ( ccode != TWCC_SUCCESS )
-        {
-            ProcessConditionCodeError(ccode);
             return 0;
-        }
         return 1;
     }
 
@@ -1194,12 +1162,9 @@ int  CTL_TwainAppMgr::FileTransfer( CTL_ITwainSession *pSession,
         // Set the file type and name
         if (AudioXFer.Execute() == TWRC_FAILURE)
         {
-            TW_UINT16 ccode = GetConditionCode(pSession, pSource);
+            auto ccode = GetLastConditionCodeError();
             if (ccode != TWCC_SUCCESS)
-            {
-                ProcessConditionCodeError(ccode);
                 return 0;
-            }
             return 1;
         }
     }
@@ -1878,10 +1843,7 @@ bool CTL_TwainAppMgr::GetOneTwainCapValue( const CTL_ITwainSource *pSource,
         }
         break;
         case TWRC_FAILURE:
-            pSession = pTempSource->GetTwainSession();
-        const TW_UINT16 ccode = GetConditionCode(pSession, nullptr);
-            ProcessConditionCodeError(ccode);
-            SendTwainMsgToWindow(pSession, nullptr, TWRC_FAILURE, ccode);
+            SendTwainMsgToWindow(pSession, nullptr, TWRC_FAILURE, GetLastConditionCodeError());
             return false;
         break;
     }
@@ -1944,10 +1906,7 @@ TW_UINT16 CTL_TwainAppMgr::ProcessReturnCodeOneValue(CTL_ITwainSource *pSource, 
             return 1;
 
         case TWRC_FAILURE:
-            pSession = pSource->GetTwainSession();
-            const TW_UINT16 ccode = GetConditionCode(pSession, nullptr);
-            ProcessConditionCodeError(ccode);
-            SendTwainMsgToWindow(pSession, nullptr, TWRC_FAILURE, ccode);
+            SendTwainMsgToWindow(pSession, nullptr, TWRC_FAILURE, GetLastConditionCodeError());
             return 0;
           break;
     }
@@ -2639,7 +2598,28 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
     if (!m_lpDSMEntry)
         return 0;
 
-    TW_UINT16 retcode;
+    // This runs on exit to ensure a condition code is always produced for each TWAIN DSM call
+    struct ConditionCodeRAII
+    {
+        TW_UINT16* m_pRetCode = nullptr;
+        TW_IDENTITY* m_pSession = nullptr;
+        TW_IDENTITY* m_pIdentity = nullptr;
+        bool m_bRunConditionCode = true;
+        ConditionCodeRAII(TW_IDENTITY* pSession, TW_IDENTITY* pIdentity, TW_UINT16* pRetCode, bool bRunConditionCode) : 
+                            m_pRetCode(pRetCode), m_pSession(pSession), m_pIdentity(pIdentity), m_bRunConditionCode(bRunConditionCode) {}
+        ~ConditionCodeRAII()
+        {
+            if (m_bRunConditionCode)
+            {
+                CTL_ConditionCodeTriplet CC(m_pSession, m_pIdentity);
+                CC.Execute();
+                ProcessConditionCodeError(CC.GetConditionCode());
+            }
+        }
+    };
+
+    TW_UINT16 retcode = TWRC_SUCCESS;
+
     CTL_ErrorStruct e;
     std::string s;
 
@@ -2649,6 +2629,12 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
     TW_UINT16    nDAT    = pTriplet.GetDAT();
     TW_UINT16    nMSG    = pTriplet.GetMSG();
     TW_MEMREF    pData   = pTriplet.GetMemRef();
+
+    bool isConditionCode = (nDG == DG_CONTROL && nDAT == DAT_STATUS && nMSG == MSG_GET);
+
+    // To avoid infinite loop, only run the exit condition code triplet for 
+    // triplets that are not DG_CONTROL / DAT_STATUS / MSG_GET
+    ConditionCodeRAII raii(pOrigin, pDest, &retcode, !isConditionCode);
 
     if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_LOWLEVELTWAIN)
     {
@@ -2774,10 +2760,9 @@ bool CTL_TwainAppMgr::SetDefaultSource( CTL_ITwainSession *pSession, const CTL_I
     const TW_UINT16 rc = Trip.Execute();
     if ( rc != TWRC_SUCCESS )
     {
-        const TW_UINT16 ccode = GetConditionCode(pSession, pTemp);
-        if ( ccode != TWCC_SUCCESS )
-            ProcessConditionCodeError(ccode);
-        return false;
+        auto ccode = GetLastConditionCodeError();
+        if (ccode != TWCC_SUCCESS)
+            return false;
     }
     return true;
 }

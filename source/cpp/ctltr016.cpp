@@ -90,11 +90,6 @@ TW_UINT16 CTL_CapabilitySetTripletBase::PostEncode(TW_UINT16 rc)
     const TW_CAPABILITY *pCap = GetCapabilityBuffer();
     sessionHandle->m_TwainMemoryFunc->UnlockMemory( pCap->hContainer );
     sessionHandle->m_TwainMemoryFunc->FreeMemory( pCap->hContainer );
-    if ( rc != TWRC_SUCCESS )
-    {
-        const TW_UINT16 cc = CTL_TwainAppMgr::GetConditionCode( GetSessionPtr(), GetSourcePtr() );
-        CTL_TwainAppMgr::ProcessConditionCodeError(cc);
-    }
     return rc;
 }
 

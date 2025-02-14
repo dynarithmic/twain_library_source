@@ -187,7 +187,6 @@ void TestAndCachePixelTypes(CTL_ITwainSource* p)
 
     // Do pixel type compliancy and retrieval test.
     auto& compliancyTester = p->GetCompliancyTester();
-    auto& resultCodes = compliancyTester.GetResultCodes();
     auto pr = compliancyTester.TestPixelTypeCompliancy();
     if (!pr.first)
     {

@@ -56,6 +56,9 @@ std::pair<bool, int> TWAINCompliancyTester::TestPixelTypeCompliancy()
     if (results != boost::logic::indeterminate)
         return { results.value, DTWAIN_ERR_ICAPPIXELTYPE_COMPLIANCY1 };
 
+    if (m_pSource->GetState() != SOURCE_STATE_OPENED)
+        return { false, DTWAIN_ERR_INVALID_STATE };
+
     std::pair<bool, int> returnPair = { true, DTWAIN_NO_ERROR };
 
     DTWAIN_ARRAY PixelTypes = {};
@@ -159,6 +162,9 @@ std::pair<bool, int> TWAINCompliancyTester::TestXfermechCompliancy()
     if (results != boost::logic::indeterminate)
         return { results.value, m_ResultCode[TWAIN_XFERMECH_TESTS]};
 
+    if (m_pSource->GetState() != SOURCE_STATE_OPENED)
+        return { false, DTWAIN_ERR_INVALID_STATE };
+
     std::pair<bool, int> returnPair = { true, DTWAIN_NO_ERROR };
 
     DTWAIN_ARRAY XFerMechs = {};
@@ -189,6 +195,9 @@ std::pair<bool, int> TWAINCompliancyTester::TestStandardCapabilitiesCompliancy()
     auto& results = m_TestResults[TWAIN_CAPABILITY_TESTS];
     if (results != boost::logic::indeterminate)
         return { results.value, m_ResultCode[TWAIN_CAPABILITY_TESTS] };
+
+    if (m_pSource->GetState() != SOURCE_STATE_OPENED)
+        return { false, DTWAIN_ERR_INVALID_STATE };
 
     std::pair<bool, int> returnPair = { true, DTWAIN_NO_ERROR };
 

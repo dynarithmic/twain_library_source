@@ -468,8 +468,6 @@ bool CTL_ITwainSource::CloseSource(bool bForce)
             const TW_UINT16 rc = CS.Execute();
             if ( rc != TWRC_SUCCESS )
             {
-                CTL_TwainAppMgr::ProcessConditionCodeError(
-                    CTL_TwainAppMgr::GetConditionCode( m_pSession, nullptr, rc ));
                 m_bIsOpened = false;
                 return false;
             }
