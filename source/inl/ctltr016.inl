@@ -55,7 +55,7 @@ TW_UINT16 CTL_CapabilitySetTriplet<T>::Execute()
         {
             if (Encode(m_Array, pCapPtr))
                 // Call base class
-                rc = CTL_TwainTriplet::Execute();
+                rc = CTL_CapabilityTriplet::Execute();
         }
     }
     return rc;

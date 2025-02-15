@@ -107,9 +107,7 @@ namespace dynarithmic
     class CTL_CapabilityResetAllTriplet : public CTL_CapabilityResetTriplet
     {
         public:
-            CTL_CapabilityResetAllTriplet(CTL_ITwainSession *pSession,
-                CTL_ITwainSource* pSource,
-                CTL_EnumCapability sCap) : CTL_CapabilityResetTriplet(pSession, pSource, sCap, CTL_SetTypeRESETALL) {}
+            CTL_CapabilityResetAllTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource);
     };
 }
 #endif
