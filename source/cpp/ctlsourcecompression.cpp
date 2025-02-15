@@ -160,7 +160,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, L
             if (vValues)
             {
                 // Already resolved, so just create an array, copy, and return
-                DTWAIN_ARRAY aValues = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, vValues->size());
+                DTWAIN_ARRAY aValues = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, static_cast<LONG>(vValues->size()));
                 if (aValues)
                 {
                     auto& vCurrentValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
@@ -245,7 +245,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, L
         compressionMap[currentMode][lFileType] = vAllTypes;
     }
 
-    DTWAIN_ARRAY aRetValue = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, setAllTypes.size());
+    DTWAIN_ARRAY aRetValue = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, static_cast<LONG>(setAllTypes.size()));
     if ( !aRetValue)
     {
         // No memory, so return error

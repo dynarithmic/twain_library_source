@@ -408,11 +408,11 @@ HANDLE CDibInterface::CropDIB(HANDLE handle, const FloatRect& ActualRect, const 
     const int newbottom = height - static_cast<UINT32>(top);
     const int newtop = height - static_cast<UINT32>(bottom);
 
-    long startx = (std::max)(0L, (std::min)(static_cast<long>(left), static_cast<long>(width)));
-    long endx = (std::max)(0L, (std::min)(static_cast<long>(right), static_cast<long>(width)));
+    long startx = (std::max)(0L, (std::min<long>)(left, width));
+    long endx = (std::max)(0L, (std::min<long>)(right, width));
 
-    long starty = (std::max)(0L,(std::min)(static_cast<long>(newtop), static_cast<long>(height)));
-    long endy =   (std::max)(0L,(std::min)(static_cast<long>(newbottom), static_cast<long>(height)));
+    long starty = (std::max)(0L,(std::min<long>)(newtop, height));
+    long endy =   (std::max)(0L,(std::min<long>)(newbottom, height));
 
     if (startx==endx || starty==endy)
     {
