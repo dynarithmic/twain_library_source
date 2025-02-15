@@ -36,6 +36,7 @@
 #include "ctldevnt.h"
 #include "ctltwainsession.h"
 #include "ctltwainidentity.h"
+#include "ctltwaincompliancy.h"
 #include "dtwain_anyutils.h"
 
 namespace dynarithmic
@@ -634,14 +635,14 @@ namespace dynarithmic
         typedef boost::container::flat_map<TW_UINT16, bool> CachedCapMap;
 
         public:
-            typedef boost::container::flat_map<int, std::vector<int> > CachedPixelTypeMap;
+            typedef boost::container::flat_map<int, std::set<int> > CachedPixelTypeMap;
             void        AddPixelTypeAndBitDepth(int PixelType, int BitDepth);
             CachedPixelTypeMap::iterator FindPixelType(int PixelType);
             bool IsBitDepthSupported(int PixelType, int BitDepth);
             bool IsPixelTypeSupported(int PixelType);
             bool PixelTypesRetrieved() const;
             const CachedPixelTypeMap& GetPixelTypeMap() const { return m_aPixelTypeMap; }
-
+            TWAINCompliancyTester& GetCompliancyTester() { return m_TwainCompliancy; }
 
         private:
         struct AltAcquireArea {
@@ -669,6 +670,7 @@ namespace dynarithmic
         DTWAIN_ARRAY    m_PersistentArray;
         CapList    m_aExtendedCaps;
         DuplexData m_DuplexFileData;
+        TWAINCompliancyTester m_TwainCompliancy;
         bool    m_bImageInfoRetrieved;
         bool    m_bExtendedImageInfoSupported;
         bool    m_bSupportedCustomCapsRetrieved;
