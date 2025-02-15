@@ -2601,12 +2601,11 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
     // This runs on exit to ensure a condition code is always produced for each TWAIN DSM call
     struct ConditionCodeRAII
     {
-        TW_UINT16* m_pRetCode = nullptr;
         TW_IDENTITY* m_pSession = nullptr;
         TW_IDENTITY* m_pIdentity = nullptr;
         bool m_bRunConditionCode = true;
-        ConditionCodeRAII(TW_IDENTITY* pSession, TW_IDENTITY* pIdentity, TW_UINT16* pRetCode, bool bRunConditionCode) : 
-                            m_pRetCode(pRetCode), m_pSession(pSession), m_pIdentity(pIdentity), m_bRunConditionCode(bRunConditionCode) {}
+        ConditionCodeRAII(TW_IDENTITY* pSession, TW_IDENTITY* pIdentity, bool bRunConditionCode) : 
+                            m_pSession(pSession), m_pIdentity(pIdentity), m_bRunConditionCode(bRunConditionCode) {}
         ~ConditionCodeRAII()
         {
             if (m_bRunConditionCode)
@@ -2634,7 +2633,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
 
     // To avoid infinite loop, only run the exit condition code triplet for 
     // triplets that are not DG_CONTROL / DAT_STATUS / MSG_GET
-    ConditionCodeRAII raii(pOrigin, pDest, &retcode, !isConditionCode);
+    ConditionCodeRAII raii(pOrigin, pDest, !isConditionCode);
 
     if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_LOWLEVELTWAIN)
     {
