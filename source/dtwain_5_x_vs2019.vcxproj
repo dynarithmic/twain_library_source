@@ -1244,6 +1244,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include="cpp\ctltr043.cpp" />
     <ClCompile Include="cpp\ctltripletbase.cpp" />
     <ClCompile Include="cpp\ctltsstub.cpp" />
+    <ClCompile Include="cpp\ctltwaincompliancy.cpp" />
     <ClCompile Include="cpp\ctltwainfilesystem.cpp" />
     <ClCompile Include="cpp\ctltwainmanager.cpp" />
     <ClCompile Include="cpp\ctltwainsession.cpp" />
@@ -1486,6 +1487,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\ctltr042.h" />
     <ClInclude Include="h\ctltr043.h" />
     <ClInclude Include="h\ctltripletbase.h" />
+    <ClInclude Include="h\ctltwaincompliancy.h" />
     <ClInclude Include="h\ctltwainidentity.h" />
     <ClInclude Include="h\ctltwainmanager.h" />
     <ClInclude Include="h\ctltwainmsgloop.h" />
