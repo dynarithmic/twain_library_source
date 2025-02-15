@@ -240,8 +240,6 @@ bool CTL_ITwainSession::OpenSource( const CTL_ITwainSource* pSource )
         CTL_OpenSourceTriplet ST( this, pTemp );
         if ( ST.Execute() != TWRC_SUCCESS )
         {
-            const TW_UINT16 cc = CTL_TwainAppMgr::GetConditionCode( this, nullptr );
-            CTL_TwainAppMgr::ProcessConditionCodeError(cc);
             return false;
         }
         pTemp->SetState(SOURCE_STATE_OPENED);
@@ -324,9 +322,6 @@ void CTL_ITwainSession::EnumSources()
     }
     else
     {
-        // Get the condition code
-        const TW_UINT16 cc = CTL_TwainAppMgr::GetConditionCode( this, nullptr );
-        CTL_TwainAppMgr::ProcessConditionCodeError(cc);
         CTL_ITwainSource::Destroy( ST1.GetSourceIDPtr() );
         return;
     }
@@ -413,12 +408,6 @@ CTL_ITwainSource* CTL_ITwainSession::GetDefaultSource()
         AddTwainSource(ST.GetSourceIDPtr());
 //        m_arrTwainSource.insert(ST.GetSourceIDPtr());
         return  ST.GetSourceIDPtr();
-    }
-    else
-    {
-        // Get the condition code
-        const TW_UINT16 cc = CTL_TwainAppMgr::GetConditionCode(this, nullptr);
-        CTL_TwainAppMgr::ProcessConditionCodeError(cc);
     }
     return nullptr;
 }

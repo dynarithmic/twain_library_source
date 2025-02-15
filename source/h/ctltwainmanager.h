@@ -35,6 +35,7 @@
 #include "ctltr012.h"
 #include "ctltr014.h"
 #include "ctltr015.h"
+#include "ctltr035.h"
 #include <boost/dll/shared_library.hpp>
 namespace dynarithmic
 {
@@ -170,8 +171,8 @@ namespace dynarithmic
 
             static UINT GetCapOps(const CTL_ITwainSource *pSource, int nCap, bool bCanQuery); // Does extra checking here
 
-            static UINT GetCapabilityOperations(const CTL_ITwainSource *pSource, // Uses the MSG_QUERYSUPPORT triplet
-                                                int nCap);
+            static CTL_CapabilityQueryTriplet GetCapabilityOperations(const CTL_ITwainSource *pSource, // Uses the MSG_QUERYSUPPORT triplet
+                                                                      int nCap);
 
             static CTL_IntArray EnumTransferMechanisms( const CTL_ITwainSource *pSource );
             static std::vector<TW_UINT32> EnumSupportedDATS(const CTL_ITwainSource* pSource);
@@ -208,6 +209,9 @@ namespace dynarithmic
 
             static void     SetError(int nError, const std::string& extraInfo, bool bMustReportGeneralError);
             static int      GetLastError();
+            static int      GetLastTwainError();
+            static int      GetLastConditionCodeError();
+
             static LPSTR    GetLastErrorString(LPSTR lpszBuffer, int nSize);
             static LPSTR    GetErrorString(int nError, LPSTR lpszBuffer, int nSize);
             static void     SetAndLogError(int nError, const std::string& extraInfo, bool bMustReportGeneralError);
@@ -377,13 +381,8 @@ namespace dynarithmic
                 // Execute the TWAIN triplet
                 const TW_UINT16 rc = pTrip->Execute();
 
-                const CTL_ITwainSource *pTempSource = const_cast<CTL_ITwainSource*>(pSource);
-
                 if ( rc == TWRC_FAILURE ) // Check if there is a real failure
                 {
-                    const auto pSession = pTempSource->GetTwainSession();
-                    const TW_UINT16 ccode = GetConditionCode(pSession, nullptr);
-                    ProcessConditionCodeError(ccode);
                     return false;
                 }
 
