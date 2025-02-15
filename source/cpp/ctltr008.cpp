@@ -266,9 +266,8 @@ bool CTL_ProcessEventTriplet::ResetTransfer(TW_UINT16 Msg/*=MSG_RESET*/)
 
         case TWRC_FAILURE:
         {
-            const TW_UINT16 ccode = CTL_TwainAppMgr::GetConditionCode(pSession, nullptr);
-            CTL_TwainAppMgr::ProcessConditionCodeError(ccode);
-            CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, TWRC_FAILURE, ccode);
+            CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, TWRC_FAILURE, 
+                                                  CTL_TwainAppMgr::GetInstance()->GetLastConditionCodeError());
             return false;
         }
     }

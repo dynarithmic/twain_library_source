@@ -30,8 +30,14 @@ namespace dynarithmic
         public:
             CTL_ConditionCodeTriplet(CTL_ITwainSession* pSession,
                                      CTL_ITwainSource* pSource = nullptr);
+
+            CTL_ConditionCodeTriplet(TW_IDENTITY* pSession,
+                                     TW_IDENTITY* pSourceID);
+
             TW_UINT16   GetConditionCode() const;
+            TW_UINT16   GetData() const;
         private:
+            void SetValues(TW_IDENTITY* pSession, TW_IDENTITY* pSourceID);
             TW_STATUS   m_Status;
 
     };
