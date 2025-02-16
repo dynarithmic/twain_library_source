@@ -108,13 +108,12 @@ std::mutex                  CTL_StaticData::s_mutexInitDestroy;
 
 FileSaveNode::FileSaveNode() : m_FileType(0) {}
 
-FileSaveNode::FileSaveNode(int fType, CTL_StringType filter1, CTL_StringType filter2, CTL_StringType ext) : m_FileType(fType)
+FileSaveNode::FileSaveNode(int fType, CTL_StringType filter1, CTL_StringType filter2, CTL_StringType ext) :
+                            m_FileType(fType), m_sTotalFilter(filter1), m_sExtension(ext)
 {
-    m_sTotalFilter = filter1;
     m_sTotalFilter += _T('\0');
     m_sTotalFilter += filter2;
     m_sTotalFilter.append(_T("\0\0"), 2);
-    m_sExtension = ext;
 }
 
 CTL_StaticDataStruct::CTL_StaticDataStruct() : 

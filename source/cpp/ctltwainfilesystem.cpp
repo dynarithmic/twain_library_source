@@ -396,8 +396,6 @@ DTWAIN_BOOL FSGetFileInfo(CTL_ITwainSource* pSource, LPCTSTR szFileName, TW_FILE
 
         case TWRC_FAILURE:
         {
-            const TW_UINT16 cc = CTL_TwainAppMgr::GetConditionCode(pSession, pSource);
-            CTL_TwainAppMgr::ProcessConditionCodeError(cc);
             LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
         }
         break;
@@ -523,8 +521,6 @@ bool GetResults(CTL_ITwainSource* pSource, CTL_FileSystemTriplet* pFST, TW_UINT1
 
         case TWRC_FAILURE:
         {
-            const TW_UINT16 cc = CTL_TwainAppMgr::GetConditionCode(pSession, pSource);
-            CTL_TwainAppMgr::ProcessConditionCodeError(cc);
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
         }
 
