@@ -116,7 +116,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFJpegQuality(DTWAIN_SOURCE Source, LONG Qua
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Quality))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    Quality = (std::max)(static_cast<LONG>(1), (std::min)(static_cast<LONG>(100), Quality));
+    Quality = (std::max<LONG>)(1, (std::min<LONG>)(100, Quality));
     pSource->SetPDFValue(PDFJPEGQUALITYKEY, Quality);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
@@ -486,7 +486,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementLong(DTWAIN_PDFTEXTELEMENT Text
         break;
 
         case DTWAIN_PDFTEXTELEMENT_TRANSFORMORDER:
-            pPtr->textTransform = (std::max)(static_cast<LONG>(0), (std::min)(val1, static_cast<LONG>(DTWAIN_PDFTEXTTRANSFORM_KTRS)));
+            pPtr->textTransform = (std::max<LONG>)(0, (std::min<LONG>)(val1, DTWAIN_PDFTEXTTRANSFORM_KTRS));
         break;
 
         default:

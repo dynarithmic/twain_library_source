@@ -89,13 +89,6 @@ TW_UINT16 CTL_CapabilityTriplet::Execute()
     if ( rc != TWRC_SUCCESS )
     {
         m_bSupported = FALSE;
-
-        const TW_UINT16 ccode =
-            CTL_TwainAppMgr::GetConditionCode(GetSessionPtr(), GetSourcePtr(), rc);
-        if ( ccode != TWCC_SUCCESS )
-        {
-            CTL_TwainAppMgr::ProcessConditionCodeError(ccode);
-        }
         return rc;
     }
 
