@@ -118,14 +118,14 @@ std::pair<bool, int> TWAINCompliancyTester::TestPixelTypeCompliancy()
             if (bOK)
             {
                 // Get the current bit depths
-                bOK = DTWAIN_GetCapValuesEx2(m_pSource, DTWAIN_CV_ICAPBITDEPTH, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aBitDepths);
+                DTWAIN_GetCapValuesEx2(m_pSource, DTWAIN_CV_ICAPBITDEPTH, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aBitDepths);
                 auto& vCurBitDepths = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aBitDepths);
                 if (vCurBitDepths.empty())
                     returnPair = { false, DTWAIN_ERR_ICAPBITDEPTH_COMPLIANCY1 };
 
                 // Check if list of bit depths do not contain the invalid bit depth
                 if (std::find_if(vCurBitDepths.begin(), vCurBitDepths.end(),
-                    [&](LONG val) { return setBitDepths[curSet].count(val); }) != vCurBitDepths.end())
+                    [&](LONG bitDepth) { return setBitDepths[curSet].count(bitDepth); }) != vCurBitDepths.end())
                     returnPair = { false, DTWAIN_ERR_ICAPBITDEPTH_COMPLIANCY1 };
                 for (auto curBitDepth : vCurBitDepths)
                     m_pSource->AddPixelTypeAndBitDepth(val, curBitDepth);
@@ -142,7 +142,7 @@ std::pair<bool, int> TWAINCompliancyTester::TestPixelTypeCompliancy()
             if (bOK)
             {
                 // Get the current bit depths
-                bOK = DTWAIN_GetCapValuesEx2(m_pSource, DTWAIN_CV_ICAPBITDEPTH, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aBitDepths);
+                DTWAIN_GetCapValuesEx2(m_pSource, DTWAIN_CV_ICAPBITDEPTH, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aBitDepths);
                 auto& vCurBitDepths = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aBitDepths);
                 for (auto curBitDepth : vCurBitDepths)
                     m_pSource->AddPixelTypeAndBitDepth(val, curBitDepth);
@@ -323,7 +323,6 @@ std::pair<bool, int> TWAINCompliancyTester::TestStandardCapabilitiesCompliancy()
                 // Test get and set in combination
                 if (ops.IsSet() && ops.IsGet())
                 {
-                    curOp = 0;
                     for (auto op : getops)
                     {
                         DTWAIN_ARRAY arrTest = {};
