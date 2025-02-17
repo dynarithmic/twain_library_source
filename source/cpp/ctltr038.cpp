@@ -369,8 +369,6 @@ bool CTL_ExtImageInfoTriplet::EnumSupported(CTL_ITwainSource *pSource,
 
         case TWRC_FAILURE:
         {
-            const TW_UINT16 cc = CTL_TwainAppMgr::GetConditionCode(pSession, pSource);
-            CTL_TwainAppMgr::ProcessConditionCodeError(cc);
             return false;
         }
 

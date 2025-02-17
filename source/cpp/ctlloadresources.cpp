@@ -491,8 +491,8 @@ namespace dynarithmic
                 break;
             // Get the compression type
             auto& compressionMap = CTL_StaticData::GetCompressionMap();
-            auto bracketPosStart = totalLine.find_first_of("[");
-            auto bracketPosEnd = totalLine.find_first_of("]");
+            auto bracketPosStart = totalLine.find_first_of('[');
+            auto bracketPosEnd = totalLine.find_first_of(']');
             if ( bracketPosStart == std::string::npos ||
                  bracketPosEnd == std::string::npos)
             {
@@ -503,7 +503,7 @@ namespace dynarithmic
             }
             auto twainIDName = totalLine.substr(0, bracketPosStart);
             StringWrapperA::TrimAll(twainIDName);
-            auto compressionValuePr = CTL_StaticData::GetIDFromTwainName(twainIDName.c_str());
+            auto compressionValuePr = CTL_StaticData::GetIDFromTwainName(twainIDName);
             if ( !compressionValuePr.first)
             {
                 retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_EXCEPTION_OK] = false;

@@ -528,7 +528,7 @@ namespace dynarithmic
                 {CTL_ArrayPtrType, arrayTag::VoidPtrType},
                 {CTL_ArrayANSIStringType, arrayTag::StringType},
                 {CTL_ArrayWideStringType, arrayTag::WStringType},
-                {CTL_ArrayDTWAINFrameType, arrayTag::FrameType},
+                {CTL_ArrayDTWAINFrameType, arrayTag::FrameSingleType},
                 {CTL_ArrayTWFIX32Type, arrayTag::Fix32Type},
                 {CTL_ArraySourceType, arrayTag::SourceType},
                 {CTL_ArrayToHandleArray, arrayTag::ArrayOfArrayOfVoidPtrType},
@@ -553,7 +553,7 @@ namespace dynarithmic
                 {arrayTag::Fix32Type,                           CTL_ArrayTWFIX32Type},
                 {arrayTag::SourceType,                          CTL_ArraySourceType},
                 {arrayTag::ArrayOfArrayOfVoidPtrType,           CTL_ArrayToHandleArray},
-                {arrayTag::FrameSingleType,                     CTL_ArrayFrameSingleType} } };
+                {arrayTag::FrameSingleType,                     CTL_ArrayDTWAINFrameType}}};
 
             auto iter = dynarithmic::generic_array_finder_if(mapTagToArrayType, [&](const auto& pr) { return pr.first == tag; });
             if (iter.first)

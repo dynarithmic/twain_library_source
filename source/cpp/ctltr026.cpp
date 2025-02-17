@@ -570,8 +570,6 @@ bool CTL_ImageXferTriplet::FailAcquisition()
 
     pSource->SetState(SOURCE_STATE_UIENABLED); // Transition to state 5
     pSource->SetTransferDone(false);
-    const TW_UINT16 ccode = CTL_TwainAppMgr::GetConditionCode(pSession, nullptr);
-    CTL_TwainAppMgr::ProcessConditionCodeError(ccode);
 
     const CTL_TwainAcquireEnum nAcquireType = pSource->GetAcquireType();
     if (nAcquireType == TWAINAcquireType_File) // The TWAIN source is solely responsible for the file handling
@@ -820,9 +818,7 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
 
         case TWRC_FAILURE:
         {
-            const TW_UINT16 ccode = CTL_TwainAppMgr::GetConditionCode(pSession, nullptr);
-            CTL_TwainAppMgr::ProcessConditionCodeError(ccode);
-            CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, TWRC_FAILURE, ccode);
+            CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, TWRC_FAILURE, CTL_TwainAppMgr::GetInstance()->GetLastConditionCodeError());
             if ( !pSource->IsUIOpenOnAcquire())
                 CTL_TwainAppMgr::EndTwainUI(pSession, pSource);
             *ptrPending = {};
@@ -974,8 +970,7 @@ bool CTL_ImageXferTriplet::ResetTransfer(TW_UINT16 Msg/*=MSG_RESET*/)
         case TWRC_FAILURE:
         {
             LogWriterUtils::WriteLogInfoIndentedA("Reset Transfer failed...");
-            const TW_UINT16 ccode = CTL_TwainAppMgr::GetConditionCode(pSession, nullptr);
-            CTL_TwainAppMgr::ProcessConditionCodeError(ccode);
+            auto ccode = CTL_TwainAppMgr::GetLastConditionCodeError();
             CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, TWRC_FAILURE, ccode);
             return false;
         }
