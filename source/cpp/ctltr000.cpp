@@ -63,9 +63,6 @@ TW_UINT16 CTL_TwainSMTriplet::Execute()
     const TW_UINT16 rc = CTL_TwainTriplet::Execute();
     if ( rc != TWRC_SUCCESS )
     {
-        CTL_ConditionCodeTriplet CC(GetSessionPtr(), GetSourcePtr());
-        if ( CC.Execute() == TWRC_SUCCESS )
-            CTL_TwainAppMgr::ProcessConditionCodeError(CC.GetConditionCode());
         DTWAIN_ERROR_CONDITION(m_nErr, TWRC_FAILURE, true)
     }
     return TWRC_SUCCESS;

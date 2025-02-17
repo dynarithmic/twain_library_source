@@ -64,7 +64,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetErrorBufferThreshold(LONG nErrors)
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
 
     // Minimum of 50 errors
-    const LONG nEntries = (std::max)(nErrors, static_cast<LONG>(50));
+    const LONG nEntries = (std::max<LONG>)(nErrors, 50);
 
     // clear buffer
     pHandle->m_nErrorBufferThreshold = nEntries;

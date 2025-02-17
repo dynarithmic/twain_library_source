@@ -30,10 +30,11 @@
 
 using namespace dynarithmic;
 
-static void LogAndCachePixelTypes(CTL_ITwainSource *p);
+static void TestAndCachePixelTypes(CTL_ITwainSource *p);
 static void DetermineIfSpecialXfer(CTL_ITwainSource* p);
 static void DetermineIfPeekMessage(CTL_ITwainSource* p);
 static void DetermineIfPaperDetectable(CTL_ITwainSource* p);
+static std::pair<bool, int> PerformPixelTypeCompliancyTest(CTL_ITwainSource * p);
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSourcesOnSelect(DTWAIN_BOOL bSet)
 {
@@ -108,7 +109,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     DetermineIfPeekMessage(pSource);
 
     // Cache the pixel types and bit depths
-    LogAndCachePixelTypes(pSource);
+    TestAndCachePixelTypes(pSource);
 
     // get the list of caps created
     CapList& theCapList = pSource->GetCapSupportedList();
@@ -168,91 +169,58 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsSourceOpen(DTWAIN_SOURCE Source)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-void LogAndCachePixelTypes(CTL_ITwainSource *p)
+void TestAndCachePixelTypes(CTL_ITwainSource* p)
 {
+    struct ProcessingRAII
+    {
+        CTL_ITwainSource* m_pSource;
+        ProcessingRAII(CTL_ITwainSource* pSource) : m_pSource(pSource) {}
+        ~ProcessingRAII() { m_pSource->SetCurrentlyProcessingPixelInfo(false); }
+    };
+
     static constexpr int MaxMessage = 1024;
     if (p->PixelTypesRetrieved())
         return;
 
     p->SetCurrentlyProcessingPixelInfo(true);
-    TCHAR szName[MaxMessage + 1];
-    LONG oldflags = CTL_StaticData::GetLogFilterFlags();
+    ProcessingRAII raii(p);
 
-    GetSourceInfo(p, &CTL_ITwainSource::GetProductName, szName, MaxMessage);
-
-    std::string sName = StringConversion::Convert_NativePtr_To_Ansi(szName);
-    std::string sBitDepths;
-    DTWAIN_ARRAY PixelTypes = {};
-
-    // enumerate all of the pixel types
-    DTWAIN_BOOL bOK = DTWAIN_GetCapValuesEx2(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &PixelTypes);
-    if (bOK)
+    // Do pixel type compliancy and retrieval test.
+    auto& compliancyTester = p->GetCompliancyTester();
+    auto pr = compliancyTester.TestPixelTypeCompliancy();
+    if (!pr.first)
     {
-        const auto pHandle = p->GetDTWAINHandle();
-        DTWAINArrayLowLevel_RAII arrP(pHandle, PixelTypes);
-        auto& vPixelTypes = pHandle->m_ArrayFactory->underlying_container_t<LONG>(PixelTypes);
-
-        LONG nCount = static_cast<LONG>(vPixelTypes.size());
-        if (nCount > 0)
+        // TWAIN source is not compliant with respect to pixel type
+        if (CTL_StaticData::GetLogFilterFlags())
         {
-            // create an array of 1
-            DTWAIN_ARRAY vCurPixType = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 1);
-            DTWAINArrayLowLevel_RAII raii(pHandle, vCurPixType);
-
-            // get pointer to internals of the array
-            auto& vCurPixTypePtr = pHandle->m_ArrayFactory->underlying_container_t<LONG>(vCurPixType);
-
-            for (LONG i = 0; i < nCount; ++i)
-            {
-                // current pixel type
-                vCurPixTypePtr[0] = vPixelTypes[i];
-                LONG& curPixType = vCurPixTypePtr[0];
-                // Set the pixel type temporarily
-                if (DTWAIN_SetCapValuesEx2(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, vCurPixType))
-                {
-                    // Add to source list
-                    // Now get the bit depths for this pixel type
-                    DTWAIN_ARRAY BitDepths = nullptr;
-                    if (DTWAIN_GetCapValuesEx2(p, DTWAIN_CV_ICAPBITDEPTH, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &BitDepths))
-                    {
-                        DTWAINArrayLowLevel_RAII arr(pHandle, BitDepths);
-
-                        // Get the total number of bit depths.
-                        auto& vBitDepths = pHandle->m_ArrayFactory->underlying_container_t<LONG>(BitDepths);
-
-                        LONG nCountBPP = static_cast<LONG>(vBitDepths.size());
-                        if (oldflags & DTWAIN_LOG_MISCELLANEOUS)
-                        {
-                            StringStreamA strm;
-                            strm << "\nFor source \"" << sName << "\", there are (is) " <<
-                                nCountBPP << " available bit depth(s) for pixel type " <<
-                                curPixType << "\n";
-                            sBitDepths += strm.str();
-                        }
-                        LONG nCurBitDepth;
-                        for (LONG j = 0; j < nCountBPP; ++j)
-                        {
-                            nCurBitDepth = vBitDepths[j];
-                            p->AddPixelTypeAndBitDepth(curPixType, nCurBitDepth);
-                            if (oldflags & DTWAIN_LOG_MISCELLANEOUS)
-                            {
-                                StringStreamA strm;
-                                strm << "Bit depth[" << j << "] = " << nCurBitDepth << "\n";
-                                sBitDepths += strm.str();
-                            }
-                        }
-                    }
-                }
-            }
-            DTWAIN_SetCapValuesEx2(p, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPRESET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, nullptr);
+            std::string s1 = GetResourceStringFromMap(pr.second);
+            s1 += " - " + StringWrapperA::QuoteString(p->GetProductNameA());
+            LogWriterUtils::WriteLogInfoIndentedA(s1);
         }
     }
-    if (oldflags && bOK )
+
+    // Print information on the pixel types found
+    const auto& pixelBitDepthMap = p->GetPixelTypeMap();
+
+    StringStreamA strm;
+    std::string sBitDepths;
+    LONG oldflags = CTL_StaticData::GetLogFilterFlags();
+    for (auto& mapPr : pixelBitDepthMap)
+    {
+        strm.str("");
+        strm << "\nFor source \"" << p->GetProductNameA() << "\", there are (is) " <<
+            mapPr.second.size() << " available bit depth(s) for pixel type " <<
+            CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWPT, mapPr.first) << "\n";
+        size_t j = 0;
+        for (auto& val : mapPr.second)
+        {
+            strm << "Bit depth[" << j << "] = " << val << "\n";
+            ++j;
+        }
+        sBitDepths += strm.str();
+    }
+    if (oldflags)
         LogWriterUtils::WriteMultiLineInfoIndentedA(sBitDepths, "\n");
-    else
-    if (!bOK)
-        LogWriterUtils::WriteLogInfoIndentedA("Could not retrieve bit depth information");
-    p->SetCurrentlyProcessingPixelInfo(false);
 }
 
 void DetermineIfSpecialXfer(CTL_ITwainSource* p)
