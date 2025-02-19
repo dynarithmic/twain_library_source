@@ -992,7 +992,7 @@ int CTL_TwainAppMgr::TransferImage(const CTL_ITwainSource *pSource, int nImageNu
 
         case TWAINAcquireType_FileUsingNative:
         {
-            long lFileFlags = pSource->GetAcquireFileFlags();
+            long lFileFlags = pSource->GetAcquireFileStatus().GetAcquireFileFlags();
             if ( lFileFlags & DTWAIN_USENATIVE )
                 return NativeTransfer(pSession, pTempSource);
             else
@@ -1090,9 +1090,10 @@ int  CTL_TwainAppMgr::FileTransfer( CTL_ITwainSession *pSession,
                                     CTL_ITwainSource  *pSource,
                                     CTL_TwainAcquireEnum AcquireType)
 {
+    auto& acquireFileStatus = pSource->GetAcquireFileStatusRef();
     // Set the file type
     CTL_StringType sFileName;
-    long lFlags = pSource->GetAcquireFileFlags();
+    long lFlags = pSource->GetAcquireFileStatus().GetAcquireFileFlags();
     if ( lFlags & DTWAIN_USEPROMPT)
     {
         CTL_StringType szTempPath;
@@ -1104,17 +1105,17 @@ int  CTL_TwainAppMgr::FileTransfer( CTL_ITwainSession *pSession,
         auto sGUID = StringWrapper::GetGUID();
         szTempPath += sGUID + _T(".IDT");
         StringWrapper::TrimAll(szTempPath);
-        pSource->SetAcquireFile(szTempPath);
+        pSource->GetAcquireFileStatus().SetAcquireFileName(szTempPath);
     }
     else
     {
         sFileName = pSource->GetCurrentImageFileName();
 
         // See if name should be changed by sending notification to user
-        pSource->SetActualFileName(sFileName);
+        acquireFileStatus.SetActualFileName(sFileName);
         SendTwainMsgToWindow(pSource->GetTwainSession(), nullptr, DTWAIN_TN_FILENAMECHANGING, reinterpret_cast<LPARAM>(pSource));
         // check if name has changed
-        auto sFileNameNew = pSource->GetActualFileName();
+        auto sFileNameNew = acquireFileStatus.GetActualFileName();
         if ( sFileName != sFileNameNew )
             SendTwainMsgToWindow(pSource->GetTwainSession(), nullptr, DTWAIN_TN_FILENAMECHANGED, reinterpret_cast<LPARAM>(pSource));
         std::swap(sFileNameNew, sFileName);  // swap the names, even if they may not have changed.
@@ -1123,7 +1124,7 @@ int  CTL_TwainAppMgr::FileTransfer( CTL_ITwainSession *pSession,
     CTL_SetupFileXferTriplet  FileXferSetup(pSession,
                                        pSource,
                                        static_cast<int>(CTL_SetTypeSET),
-                                       pSource->GetAcquireFileType(),
+                                       acquireFileStatus.GetAcquireFileFormat(),
                                        sFileName
                                        );
     // Set the file type and name
@@ -1510,7 +1511,7 @@ int CTL_TwainAppMgr::StartTransfer( CTL_ITwainSession * /*pSession*/,
             if ( nAcquireType == TWAINAcquireType_FileUsingNative )
             {
                 // Check if using Prompt
-                long lFlags   = pSource->GetAcquireFileFlags();
+                long lFlags   = pSource->GetAcquireFileStatusRef().GetAcquireFileFlags();
                 if ( lFlags & DTWAIN_USEPROMPT && pSource->IsPromptPending())
                 {
                     pTrip->PromptAndSaveImage( nCurImage );

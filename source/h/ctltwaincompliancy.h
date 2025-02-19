@@ -52,7 +52,7 @@ namespace dynarithmic
         private:
             CTL_ITwainSource* m_pSource = nullptr;
             std::array<boost::tribool, NUM_COMPLIANCY_TESTS> m_TestResults;
-            std::array<int, NUM_COMPLIANCY_TESTS> m_ResultCode;
+            std::array<std::vector<int>, NUM_COMPLIANCY_TESTS> m_ResultCodes;
 
         public:
             static constexpr std::array<std::string_view, 8> MainTests = {
@@ -68,18 +68,17 @@ namespace dynarithmic
             TWAINCompliancyTester(CTL_ITwainSource* p = nullptr) : m_pSource(p)
             {
                 std::fill_n(m_TestResults.begin(), NUM_COMPLIANCY_TESTS, boost::logic::indeterminate);
-                std::fill_n(m_ResultCode.begin(), NUM_COMPLIANCY_TESTS, DTWAIN_NO_ERROR);
             }
 
             void SetSource(CTL_ITwainSource* p) noexcept { m_pSource = p;  }
             const CTL_ITwainSource* GetSource() noexcept { return m_pSource; }
             std::array<boost::tribool, NUM_COMPLIANCY_TESTS>& GetCompliancyResults() noexcept { return m_TestResults; }
-            std::array<int, NUM_COMPLIANCY_TESTS>& GetResultCodes() noexcept { return m_ResultCode; }
+            std::array<std::vector<int>, NUM_COMPLIANCY_TESTS>& GetResultCodes() noexcept { return m_ResultCodes; }
 
-            std::pair<bool, int> TestStandardCapabilitiesCompliancy();
+            std::pair<bool, std::vector<int>> TestStandardCapabilitiesCompliancy();
             std::pair<bool, int> TestVendorCustomCapabilities();
             std::pair<bool, int> TestPixelTypeCompliancy();
-            std::pair<bool, int> TestXfermechCompliancy();
+            std::pair<bool, std::vector<int>> TestXfermechCompliancy();
     };
 }
 #endif

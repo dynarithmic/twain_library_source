@@ -168,8 +168,6 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_nCurDibPage(0),
     m_bDeleteOnScan(false),
     m_bUIOnAcquire(true),
-    m_nFileAcquireType(TWAINFileFormat_Invalid),
-    m_lFileFlags(0L),
     m_bAcquireAttempt(false),
     m_nAcquireCount(-1),
     m_lAcquireNum(-1L),
@@ -238,7 +236,6 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_bExtendedCapsRetrieved(false),
     m_bShutdownAcquire(false),
     m_bUsePeekMessage(false),
-    m_FileSavePageCount(0),
     m_nLastAcquireError(false),
     m_bTwainMsgLoopStarted(false),
     m_tbIsFileSystemSupported(boost::logic::indeterminate),
@@ -620,7 +617,7 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
         nCurImage = 0;
 
     if ( GetCurrentJobControl() != TWJC_NONE &&
-        dynarithmic::IsFileTypeMultiPage(GetAcquireFileType()) &&
+        dynarithmic::IsFileTypeMultiPage(m_AcquireFileStatus.GetAcquireFileFormat()) &&
         IsJobFileHandlingOn())
     {
         // Get the next job number if multipage and job control
@@ -628,25 +625,25 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
         nCurImage = GetPendingJobNum();
     }
 
-    long lFlags = GetAcquireFileFlags();
+    long lFlags = m_AcquireFileStatus.GetAcquireFileFlags();
+    auto strAcquireFile = m_AcquireFileStatus.GetAcquireFileNameRef();
 
     if ( m_bAutoIncrementFile )
     {
-        CTL_StringType strTemp;
         const DTWAIN_ARRAY pDTWAINArray = m_pFileEnumerator;
         if ( !pDTWAINArray )
-            return m_strAcquireFile;
+            return strAcquireFile;
         const auto& factory = m_pDLLHandle->m_ArrayFactory;
         const int nCount = static_cast<int>(factory->size(pDTWAINArray));
         if ( nCount > 0 )
         {
-            strTemp = factory->get_value<CTL_StringType>(pDTWAINArray, 0); 
-            m_strAcquireFile = StringWrapper::CreateFileNameFromNumber(strTemp, m_nCurFileNum, static_cast<int>(m_nFileDigits));
+            auto strTemp = factory->get_value<CTL_StringType>(pDTWAINArray, 0); 
+            strAcquireFile = StringWrapper::CreateFileNameFromNumber(strTemp, m_nCurFileNum, static_cast<int>(m_nFileDigits));
         }
         else
-            m_strAcquireFile.clear();
+            strAcquireFile.clear();
         m_nCurFileNum += m_nFileIncrement;
-        return m_strAcquireFile;
+        return strAcquireFile;
     }
 
     if ( lFlags & (DTWAIN_USENAME | DTWAIN_USELONGNAME)) //TWAINFileFlag_USELIST )
@@ -655,7 +652,7 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
         CTL_StringType strTemp;
         const DTWAIN_ARRAY pDTWAINArray = m_pFileEnumerator;
         if ( !pDTWAINArray )
-            return m_strAcquireFile;
+            return strAcquireFile;
         const auto& factory = m_pDLLHandle->m_ArrayFactory;
         bool bNameAvailable = nCurImage < static_cast<int>(factory->size(pDTWAINArray));
         if ( bNameAvailable )
@@ -665,13 +662,13 @@ CTL_StringType CTL_ITwainSource::GetCurrentImageFileName()// const
             const int nCount = static_cast<int>(factory->size(pDTWAINArray));
             bNameAvailable = factory->get_value(pDTWAINArray, nCount-1, &strTemp)?true:false;
             if ( !bNameAvailable )
-                return m_strAcquireFile;
+                return strAcquireFile;
             return StringWrapper::GetPageFileName( strTemp, nCurImage, lFlags & DTWAIN_USELONGNAME?true:false );
         }
         else
             return strTemp;
     }
-    return m_strAcquireFile;
+    return strAcquireFile;
 }
 
 bool CTL_ITwainSource::SetDibAutoDelete(bool bSet)
@@ -684,9 +681,9 @@ void CTL_ITwainSource::SetAcquireType(CTL_TwainAcquireEnum AcquireType, LPCTSTR 
 {
     m_AcquireType = AcquireType;
     if (lpszFile)
-        m_strAcquireFile = lpszFile;
+        m_AcquireFileStatus.SetAcquireFileName(lpszFile);
     else
-        m_strAcquireFile.clear();
+        m_AcquireFileStatus.GetAcquireFileNameRef().clear();
 }
 
 int CTL_ITwainSource::GetNumDibs() const
