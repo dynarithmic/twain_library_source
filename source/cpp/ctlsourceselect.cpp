@@ -278,7 +278,8 @@ DTWAIN_SOURCE dynarithmic::SourceSelect(CTL_TwainDLLHandle* pHandle, SourceSelec
             if (pRealSource != pDead)
             {
                 const auto pSession = CTL_TwainAppMgr::GetCurrentSession();
-                pSession->DestroyOneSource(pRealSource);
+                if ( pSession )
+                    pSession->DestroyOneSource(pRealSource);
             }
             CTL_TwainAppMgr::SetDefaultSource(static_cast<CTL_ITwainSource*>(pDead));
             LOG_FUNC_EXIT_NONAME_PARAMS(pDead)
