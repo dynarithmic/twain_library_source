@@ -430,12 +430,14 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                         else
                         if ( pSource->GetAcquireType() == TWAINAcquireType_FileUsingNative)
                         {
+                            auto& acquireFileStatus = pSource->GetAcquireFileStatusRef();
+
                             // This may be a compressed image instead of a DIB.  Use Raw IO handler to write this file
                             if ( m_nCompression != TWCP_NONE )
-                                pSource->SetAcquireFileType(GetFileTypeFromCompression(m_nCompression));
+                                acquireFileStatus.SetAcquireFileFormat(GetFileTypeFromCompression(m_nCompression));
 
                             pSource->SetPromptPending(false);
-                            long lFlags   = pSource->GetAcquireFileFlags();
+                            long lFlags   = pSource->GetAcquireFileStatusRef().GetAcquireFileFlags();
                             if ( lFlags & DTWAIN_USEPROMPT )
                             {
                                 pSource->SetPromptPending(true);
@@ -454,7 +456,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                             if (bKeepPage2 )
                             {
                                 // Check if multi page file is being used
-                                const bool bIsMultiPageFile = dynarithmic::IsFileTypeMultiPage(pSource->GetAcquireFileType());
+                                const bool bIsMultiPageFile = dynarithmic::IsFileTypeMultiPage(acquireFileStatus.GetAcquireFileFormat());
                                 int nMultiStage = 0;
                                 if ( bIsMultiPageFile || pSource->IsMultiPageModeSaveAtEnd())
                                 {

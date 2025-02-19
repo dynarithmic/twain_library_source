@@ -248,13 +248,14 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
             case DTWAIN_TN_FILECOMPRESSTYPEMISMATCH:
             {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
+                auto& acquireFileStatus = pSource->GetAcquireFileStatusRef();
                 if ( wParam == DTWAIN_TN_ACQUIRESTARTED )
                     pSource->SetImagesStored(false);
 
                 if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) || !callbacks.empty())
                     bPassMsg = true;
                 if (wParam == DTWAIN_TN_FILEPAGESAVEOK)
-                    pSource->SetFileSavePageCount(pSource->GetFileSavePageCount() + 1);
+                    acquireFileStatus.SetFileSavePageCount(acquireFileStatus.GetFileSavePageCount() + 1);
                 DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,pHandle,pSource, wParam, reinterpret_cast<LPARAM>(pSource) );
             }
             break;
