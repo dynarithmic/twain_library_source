@@ -213,7 +213,7 @@ void TestAndCachePixelTypes(CTL_ITwainSource* p)
         strm.str("");
         strm << "\nFor source \"" << p->GetProductNameA() << "\", there are (is) " <<
             mapPr.second.size() << " available bit depth(s) for pixel type " <<
-            CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWPT, mapPr.first) << "\n";
+            CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWPT, mapPr.first).second << "\n";
         size_t j = 0;
         for (auto& val : mapPr.second)
         {

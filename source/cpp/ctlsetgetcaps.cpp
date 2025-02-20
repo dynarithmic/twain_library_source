@@ -808,7 +808,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDT
             DTWAINArrayLowLevel_RAII raii(pHandle, aStrings);
             auto& aValues = pHandle->m_ArrayFactory->underlying_container_t<std::string>(aStrings);
             for (auto val : vValues)
-                aValues.push_back(CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, val));
+                aValues.push_back(CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, val).second);
             LogWriterUtils::WriteLogInfoIndentedA("Supported Extended Image Info types:");
             DumpArrayContents(aStrings, 0);
         }
@@ -956,9 +956,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
         if (CTL_StaticData::GetLogFilterFlags())
         {
             StringTraitsA::string_type sBadType = GetResourceStringFromMap(IDS_DTWAIN_ERROR_REPORTED_TYPE_MISMATCH);
-            sBadType += "  Extended Image Info Value: " + CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, nWhich);
-            sBadType += " - {Device Type=" + CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWTY, lTypeReportedByDevice);
-            sBadType += ", Twain Required Type=" + CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWTY, lTypeRequiredByTWAIN) + "}";
+            sBadType += "  Extended Image Info Value: " + CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, nWhich).second;
+            sBadType += " - {Device Type=" + CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWTY, lTypeReportedByDevice).second;
+            sBadType += ", Twain Required Type=" + CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWTY, lTypeRequiredByTWAIN).second + "}";
             LogWriterUtils::WriteLogInfoIndentedA(sBadType);
         }
 
