@@ -678,9 +678,9 @@ namespace dynarithmic
         static ImageResamplerMap& GetImageResamplerMap() { return s_StaticData.s_ImageResamplerMap; }
         static SourceStatusMap& GetSourceStatusMap() { return s_StaticData.s_SourceStatusMap;  }
         static CTL_StringType& GetResourceVersion() { return s_StaticData.s_ResourceVersion; }
-        static CTL_StringType GetTwainNameFromConstant(int lConstantType, TwainConstantType lTwainConstant);
-        static std::string GetTwainNameFromConstantA(int lConstantType, TwainConstantType lTwainConstant);
-        static std::wstring GetTwainNameFromConstantW(int lConstantType, TwainConstantType lTwainConstant);
+        static std::pair<bool, CTL_StringType> GetTwainNameFromConstant(int lConstantType, TwainConstantType lTwainConstant);
+        static std::pair<bool, std::string> GetTwainNameFromConstantA(int lConstantType, TwainConstantType lTwainConstant);
+        static std::pair<bool, std::wstring> GetTwainNameFromConstantW(int lConstantType, TwainConstantType lTwainConstant);
         static CTL_CallbackProcArray& GetCallbacks() { return s_StaticData.s_aAllCallbacks; }
         static auto& GetAppWindowsToDisable() { return s_StaticData.s_appWindowsToDisable; }
         static constexpr std::string_view GetINIKey(int nWhich) { return s_StaticData.s_aINIKeys[nWhich].second; }

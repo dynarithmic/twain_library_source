@@ -98,7 +98,7 @@ void CTL_ErrorStructDecoder::StartMessageDecoder(HWND hWnd, UINT nMsg,
 {
     StringStreamA sBuffer;
     m_pString.clear();
-    auto notification_name = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DTWAIN_TN, static_cast<int>(wParam));
+    auto notification_name = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DTWAIN_TN, static_cast<int>(wParam)).second;
     if ( !notification_name.empty() )
         sBuffer << "DTWAIN Message(HWND=" << hWnd << ", " <<
                                     "MSG=" << nMsg << ", " <<
@@ -120,9 +120,9 @@ void CTL_ErrorStructDecoder::StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDe
 
     m_pString.clear();
     std::string s1;
-    auto sDG = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DG, nDG);
-    auto sDAT = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DAT, nDAT);
-    auto sMSG = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_MSG, nMSG);
+    auto sDG = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DG, nDG).second;
+    auto sDAT = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DAT, nDAT).second;
+    auto sMSG = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_MSG, nMSG).second;
 
     sBuffer << "DSM_Entry(pSource=0x" << std::hex << pSource << ", " <<
         "pDest=0x" << std::hex << pDest << ", " << sDG << ", " << sDAT << ", " << sMSG << ", " <<
@@ -259,7 +259,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
             {
                 auto pDEVICEEVENT = static_cast<pTW_DEVICEEVENT>(pData);
                 sBuffer << "\nTW_MEMREF <==> TW_DEVICEEVENT:\n{\n" <<
-                            "Event=" << CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWDE, pDEVICEEVENT->Event) << "\n" <<
+                            "Event=" << CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWDE, pDEVICEEVENT->Event).second << "\n" <<
                             "DeviceName=" << pDEVICEEVENT->DeviceName << "\n" <<
                             "BatteryMinutes=" << pDEVICEEVENT->BatteryMinutes << "\n" <<
                             "BatteryPercentage=" << pDEVICEEVENT->BatteryPercentage << "\n" <<
@@ -409,7 +409,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
             {
                 auto pCAPABILITY = static_cast<pTW_CAPABILITY>(pData);
                 std::string s = "Unspecified (TWON_DONTCARE)";
-                std::string container_type = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWON, pCAPABILITY->ConType);
+                std::string container_type = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWON, pCAPABILITY->ConType).second;
                 if (!container_type.empty())
                     s = container_type;
 

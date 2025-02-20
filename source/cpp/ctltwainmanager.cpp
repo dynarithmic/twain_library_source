@@ -2188,8 +2188,6 @@ int CTL_TwainAppMgr::FindConditionCode(TW_UINT16 nCode)
 
 std::string CTL_TwainAppMgr::GetCapNameFromCap( LONG Cap )
 {
-    std::string sName = GetGeneralCapInfo(Cap);
-    StringWrapperA::TrimAll(sName);
     if ( static_cast<UINT>(Cap) >= CAP_CUSTOMBASE )
     {
         StringStreamOutA strm;
@@ -2197,13 +2195,18 @@ std::string CTL_TwainAppMgr::GetCapNameFromCap( LONG Cap )
         return strm.str();
     }
     else
-    if ( sName.empty())
     {
-        StringStreamOutA strm;
-        strm << std::hex << Cap;
-        sName += "Unknown capability.  Hex value: " + strm.str();
+        static constexpr std::array<int, 3> aConstantTypes = { {DTWAIN_CONSTANT_ICAP, DTWAIN_CONSTANT_CAP, DTWAIN_CONSTANT_TWEI} };
+        for (auto constantType : aConstantTypes)
+        {
+            auto pr = CTL_StaticData::GetTwainNameFromConstantA(constantType, Cap);
+            if (pr.first)
+                return pr.second;
+        }
     }
-    return sName;
+    StringStreamOutA strm;
+    strm << std::hex << Cap;
+    return "Unknown capability.  Hex value: " + strm.str();
 }
 
 int CTL_TwainAppMgr::GetDataTypeFromCap( CTL_EnumCapability Cap, CTL_ITwainSource *pSource/*=NULL*/ )
@@ -2243,23 +2246,22 @@ CTL_CapStruct CTL_TwainAppMgr::GetGeneralCapInfo(LONG Cap)
     return cStruct;
 }
 
-LONG CTL_TwainAppMgr::GetCapFromCapName(const char *szCapName )
+LONG CTL_TwainAppMgr::GetCapFromCapName(const char* szCapName)
 {
-    CTL_CapStruct cStruct;
-
     std::string strCap = szCapName;
     StringWrapperA::TrimAll(strCap);
     StringWrapperA::MakeUpperCase(strCap);
-    if ( strCap.empty() )
+    if (strCap.empty())
         return TwainCap_INVALID;
 
-    if ( StringWrapperA::Left(strCap, 14) == "CAP_CUSTOMBASE")
+    // Check if the cap name is CAP_CUSTOMBASE
+    if (StringWrapperA::StartsWith(strCap, "CAP_CUSTOMBASE"))
     {
         // Extract the integer portion
         StringArray sArray;
         StringWrapperA::Tokenize(StringWrapperA::Mid(strCap, 14), "+ ", sArray);
         const size_t nSize = sArray.size();
-        if ( nSize > 0 )
+        if (nSize > 0)
         {
             std::string sNum = sArray[nSize - 1];
             int nNum = 0;
@@ -2278,20 +2280,22 @@ LONG CTL_TwainAppMgr::GetCapFromCapName(const char *szCapName )
             return CAP_CUSTOMBASE + nNum;
         }
     }
-    auto& generalInfo = CTL_StaticData::GetGeneralCapInfo();
-    const auto it = generalInfo.begin();
-    const auto itend = generalInfo.end();
-    int subtractor = 0;
-    if (StringWrapperA::Left(strCap, 5) == "TWEI_")
-        subtractor = 1000;
-    const auto foundIter = std::find_if(it, itend, [&](CTL_GeneralCapInfo::value_type& vt)
+
+    // Handle TWEI_, ICAP_, or CAP_ names
+    static constexpr std::array<std::string_view, 3> startPrefix = { {"TWEI_","ICAP_","CAP_"} };
+    size_t count = 0;
+    for (; count < startPrefix.size(); ++count)
     {
-        if (static_cast<std::string>(vt.second) == strCap)
-            return true;
-        return false;
-    });
-    if (foundIter != itend)
-        return static_cast<CTL_EnumCapability>(foundIter->first) - subtractor;
+        if (StringWrapperA::StartsWith(strCap, startPrefix[count].data()))
+        {
+            // Get the id, given the TWAIN name
+            auto retVal = CTL_StaticData::GetIDFromTwainName(StringConversion::Convert_Native_To_Ansi(strCap));
+            if (retVal.first)
+                return static_cast<LONG>(retVal.second);
+            else
+                return TwainCap_INVALID;
+        }
+    }
     return TwainCap_INVALID;
 }
 
