@@ -180,7 +180,7 @@ std::string CTL_ErrorStructDecoder::DecodeBitmap(HANDLE hBitmap)
             "biXPelsPerMeter=" << pbi->biXPelsPerMeter << "\n" <<
             "biYPelsPerMeter=" << pbi->biYPelsPerMeter << "\n" <<
             "biClrUsed=" << pbi->biClrUsed << "\n" <<
-            "biClrImportant=" << pbi->biClrImportant << "\n\n";
+            "biClrImportant=" << pbi->biClrImportant << "\n";
     return sBuffer.str();
 }
 
