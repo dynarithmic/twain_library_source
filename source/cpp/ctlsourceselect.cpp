@@ -81,7 +81,7 @@ static DTWAIN_SOURCE SelectAndOpenSource(CTL_TwainDLLHandle* pHandle, SourceSele
     auto& sourcemap = CTL_StaticData::GetSourceStatusMap();
     if (Source)
     {
-        CTL_ITwainSource* pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
+        auto pSource = static_cast<CTL_ITwainSource*>(Source);
         auto iter = sourcemap.insert({ pSource->GetProductNameA(), {} }).first;
         iter->second.SetStatus(SourceStatus::SOURCE_STATUS_SELECECTED, true);
         iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, false);
@@ -407,11 +407,11 @@ static std::vector<TCHAR> GetDefaultName(SelectStruct& selectTraits)
         if (DefSource)
         {
             closeSourceRAII cs(DefSource);
-            LONG nCharacters = GetSourceInfo(reinterpret_cast<CTL_ITwainSource*>(DefSource), &CTL_ITwainSource::GetProductName, nullptr, 0);
+            LONG nCharacters = GetSourceInfo(static_cast<CTL_ITwainSource*>(DefSource), &CTL_ITwainSource::GetProductName, nullptr, 0);
             if (nCharacters > 0)
             {
                 DefName.resize(nCharacters);
-                GetSourceInfo(reinterpret_cast<CTL_ITwainSource*>(DefSource), &CTL_ITwainSource::GetProductName, DefName.data(), nCharacters);
+                GetSourceInfo(static_cast<CTL_ITwainSource*>(DefSource), &CTL_ITwainSource::GetProductName, DefName.data(), nCharacters);
                 if (bLogMessages)
                     LogWriterUtils::WriteLogInfoIndentedA("Initializing TWAIN Dialog -- Retrieved default TWAIN Source name...");
             }

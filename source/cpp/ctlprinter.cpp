@@ -73,7 +73,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinter(DTWAIN_SOURCE Source, LONG nPrinter, 
     LOG_FUNC_ENTRY_PARAMS((Source, nPrinter, bSetCurrent))
     if ( !DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPPRINTER) )
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    auto pSource = reinterpret_cast<CTL_ITwainSource*>(Source);
+    auto pSource = static_cast<CTL_ITwainSource*>(Source);
     auto pHandle = pSource->GetDTWAINHandle();
     DTWAIN_ARRAY Array = CreateArrayFromCap(pHandle, nullptr, DTWAIN_CV_CAPPRINTER, 1);
     if ( !Array )
