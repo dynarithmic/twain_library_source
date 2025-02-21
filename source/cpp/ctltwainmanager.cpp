@@ -2289,7 +2289,7 @@ LONG CTL_TwainAppMgr::GetCapFromCapName(const char* szCapName)
         if (StringWrapperA::StartsWith(strCap, startPrefix[count].data()))
         {
             // Get the id, given the TWAIN name
-            auto retVal = CTL_StaticData::GetIDFromTwainName(StringConversion::Convert_Native_To_Ansi(strCap));
+            auto retVal = CTL_StaticData::GetIDFromTwainName(strCap);
             if (retVal.first)
                 return static_cast<LONG>(retVal.second);
             else
