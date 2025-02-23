@@ -1,5 +1,19 @@
 DTWAIN Version changes
 
+5.6.2
+
+- Fix potential exception from occurring when attempting to close a TWAIN source that did not 
+  open successfully.
+
+Low Level Changes: These changes should be only used by programmers who are utilizing the 
+DTWAIN_CallDSMProc() interface to call through to the Data Source Manager directly, and the call
+requires the application to allocate memory for the triplet call.
+
+    - Change parameters to DTWAIN_AllocateMemory() and DTWAIN_AllocateMemoryEx() to unsigned integers.
+
+    - Add DTWAIN_AllocateMemory64() to allow allocation of memory greater than 4 GB.
+
+
 5.6.1
 
 - Fixed issue with setting the ICAP_FRAMES capability when calling 
