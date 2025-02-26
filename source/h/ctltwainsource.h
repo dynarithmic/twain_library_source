@@ -38,6 +38,7 @@
 #include "ctltwainidentity.h"
 #include "ctltwaincompliancy.h"
 #include "dtwain_anyutils.h"
+#include "extendedimageinfo.h"
 
 namespace dynarithmic
 {
@@ -502,6 +503,7 @@ namespace dynarithmic
         void        SetTwainLoopStarted(bool bSet) { m_bTwainMsgLoopStarted = bSet; }
         AcquireFileStatus& GetAcquireFileStatusRef() { return m_AcquireFileStatus; }
         AcquireFileStatus GetAcquireFileStatus() const { return m_AcquireFileStatus; }
+        ExtendedImageInformation* GetExtendedImageInfo() { return m_pExtendedImageInformation.get(); }
         // Only public member
         void *      m_pUserPtr;
 
@@ -677,6 +679,7 @@ namespace dynarithmic
         DTWAINImageInfoEx m_ImageInfoEx;
         TW_IMAGEMEMXFER* m_pImageMemXfer;
         std::unique_ptr<CTL_ExtImageInfoTriplet> m_pExtImageTriplet;
+        std::unique_ptr<ExtendedImageInformation> m_pExtendedImageInformation;
         TWINFOVector m_ExtImageVector;
         DTWAIN_ARRAY    m_PersistentArray;
         CapList    m_aExtendedCaps;
