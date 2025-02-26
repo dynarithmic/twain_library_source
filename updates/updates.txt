@@ -14,6 +14,7 @@ requires the application to allocate memory for the triplet call.
     - Add DTWAIN_AllocateMemory64() to allow allocation of memory greater than 4 GB.
 
 
+
 5.6.1
 
 - Fixed issue with setting the ICAP_FRAMES capability when calling 

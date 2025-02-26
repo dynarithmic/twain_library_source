@@ -35,6 +35,43 @@ namespace dynarithmic
     class CTL_TwainDLLHandle;
     void ArrayCopyWideToNative(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest);
     void ArrayCopyAnsiToNative(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest);
-}
 
+    template <typename Container, typename DTWAINArrayType>
+    static void CopyContainer(CTL_TwainDLLHandle* pHandle, const Container& theContainer, DTWAIN_ARRAY theArray)
+    {
+        auto& vect = pHandle->m_ArrayFactory->underlying_container_t<DTWAINArrayType>(theArray);
+        std::copy(theContainer.begin(), theContainer.end(), vect.begin());
+    }
+
+    template <typename Container>
+    DTWAIN_ARRAY CreateArrayFromContainer(CTL_TwainDLLHandle* pHandle, const Container& theContainer)
+    {
+        DTWAIN_ARRAY theArray = {};
+        LONG nSize = static_cast<LONG>(theContainer.size());
+        if constexpr (std::is_integral_v<Container::value_type>)
+        {
+            theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, nSize);
+            CopyContainer<Container, LONG>(pHandle, theContainer, theArray);
+        }
+        else
+        if constexpr (std::is_floating_point_v<Container::value_type>)
+        {
+            theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYFLOAT, nSize);
+            CopyContainer<Container, double>(pHandle, theContainer, theArray);
+        }
+        else
+        if constexpr (std::is_same_v<Container::value_type, std::string>)
+        {
+            theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYANSISTRING, nSize);
+            CopyContainer<Container, std::string>(pHandle, theContainer, theArray);
+        }
+        else 
+        if constexpr (std::is_same_v<Container::value_type, TwainFrameInternal>)
+        {
+            theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYFRAME, nSize);
+            CopyContainer<Container, TwainFrameInternal>(pHandle, theContainer, theArray);
+        }
+        return theArray;
+    }
+}
 #endif
