@@ -1102,12 +1102,14 @@ namespace dynarithmic
         CTL_TwainDLLHandle* m_pHandle;
         ArrayType m_Array;
         bool m_bDestroy;
+        DTWAINArrayLowLevel_RAII_Impl() : m_pHandle{}, m_Array{}, m_bDestroy(true) {}
         DTWAINArrayLowLevel_RAII_Impl(CTL_TwainDLLHandle* pHandle, ArrayType a) : m_pHandle(pHandle), m_Array(a), m_bDestroy(true) {}
         void SetDestroy(bool bSet) { m_bDestroy = bSet; }
         void SetArray(ArrayType arr) { m_Array = arr; }
+        void SetHandle(CTL_TwainDLLHandle* pHandle) { m_pHandle = pHandle; }
         void Destroy()
         {
-            if (m_bDestroy && m_Array)
+            if (m_pHandle && m_bDestroy && m_Array)
             {
                 if constexpr (std::is_same_v<ArrayType, DTWAIN_ARRAY*>)
                     m_pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(*m_Array));

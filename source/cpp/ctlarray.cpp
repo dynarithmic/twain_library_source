@@ -279,15 +279,14 @@ void DTWAIN_RangeSetter(CTL_TwainDLLHandle* pHandle,
         pBuffer[DTWAIN_RANGECURRENT] = {};
 }
 
+void dynarithmic::DestroyFrameFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_FRAME Frame)
+{
+    pHandle->m_ArrayFactory->destroy(Frame);
+}
 
 void dynarithmic::DestroyArrayFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray)
 {
     pHandle->m_ArrayFactory->destroy(pArray);
-}
-
-void dynarithmic::DestroyFrameFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_FRAME Frame)
-{
-    pHandle->m_ArrayFactory->destroy(Frame);
 }
 
 DTWAIN_ARRAY dynarithmic::CreateArrayFromFactory(CTL_TwainDLLHandle* pHandle, LONG nEnumType, LONG nInitialSize)
@@ -356,6 +355,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayInit()
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayCreate( LONG nEnumType, LONG nInitialSize )
 {
+    static_assert(sizeof(DWORD) == sizeof(LONG), "Error -- DWORD must have the same size as LONG");
     LOG_FUNC_ENTRY_PARAMS((nEnumType, nInitialSize))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const DTWAIN_ARRAY Array = CreateArrayFromFactory(pHandle, nEnumType, nInitialSize);
