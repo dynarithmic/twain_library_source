@@ -576,6 +576,7 @@ return the actual data, only the information as to the number of items, data typ
 that the Source reports for the data item.  Use DTWAIN_GetExtImageInfoData to get the
 data */
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoItem(DTWAIN_SOURCE Source, LONG nWhich, LPLONG InfoID, LPLONG NumItems, LPLONG Type);
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoItemEx(DTWAIN_SOURCE Source, LONG nWhich, LPLONG InfoID, LPLONG NumItems, LPLONG Type, LPLONG ReturnCode);
 
 /* Uninitializes the Extended Inmage information interface.  This also must be called  */
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FreeExtImageInfo(DTWAIN_SOURCE Source);

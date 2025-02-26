@@ -282,6 +282,7 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_AltAcquireArea.UnitOfMeasure = DTWAIN_INCHES;
     m_ImageInfoEx.IsCreateDirectory = false;
     m_pExtImageTriplet = std::make_unique<CTL_ExtImageInfoTriplet>(m_pSession, this, 0);
+    m_pExtendedImageInformation = std::make_unique<ExtendedImageInformation>(this);
     char commentStr[256] = {};
     GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
     SetPDFValue(PDFPRODUCERKEY, StringConversion::Convert_Ansi_To_Native(commentStr));
@@ -695,6 +696,7 @@ CTL_ITwainSource::~CTL_ITwainSource()
 {
     try
     {
+        DestroyExtImageInfo();
         ResetManualDuplexMode();
         CloseSource(true);
         m_pDLLHandle->m_mapPDFTextElement.erase(this);
@@ -1008,6 +1010,7 @@ TW_INFO CTL_ITwainSource::GetExtImageInfoItem(int nItem, int nSearchType ) const
 bool CTL_ITwainSource::DestroyExtImageInfo()
 {
     m_pExtImageTriplet->DestroyInfo();
+    m_pExtendedImageInformation->ClearInfo();
     return true;
 }
 
@@ -1238,5 +1241,4 @@ CTL_ExtImageInfoTriplet* CTL_ITwainSource::GetExtImageInfoTriplet()
         m_pExtImageTriplet = std::make_unique<CTL_ExtImageInfoTriplet>(m_pSession, this, 0);
     return m_pExtImageTriplet.get();
 }
-
 ///////////////////////////////////////////////////////////////////////////////////////////
