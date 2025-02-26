@@ -18,19 +18,9 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <cstdio>
-#include <cstring>
-#include <sstream>
-#include <boost/scope_exit.hpp>
-#include <functional>
-#include <algorithm>
-#include "cppfunc.h"
-#include "ctldib.h"
-#include "ctltwainmanager.h"
-#include "ctltrall.h"
 #include "ctltmpl5.h"
 #include "errorcheck.h"
-#include "ctlutils.h"
+#include "twain.h"
 using namespace dynarithmic;
 /* These functions can only be used in State 7   (when DTWAIN_TN_TRANSFERDONE notification is sent).
    This means that only languages that can utilize DTWAIN_SetCallback or can intercept Window's
