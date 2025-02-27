@@ -1249,3 +1249,15 @@ DTWAIN_ARRAY ExtendedImageInformation::GetExtendedImageInfo25(long nWhichInfo)
     }
     return nullptr;
 }
+
+DTWAIN_ARRAY ExtendedImageInformation::GetPatchCodeInfo(long nWhichInfo)
+{
+    switch (nWhichInfo)
+    {
+        case TWEI_PATCHCODE:
+            return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(),
+                { m_InfoBlock.m_extendedImagePatchCode.m_patchCode });
+        break;
+    }
+    return nullptr;
+}
