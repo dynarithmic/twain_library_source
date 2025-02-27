@@ -274,6 +274,7 @@ namespace dynarithmic
         DTWAIN_ARRAY GetExtendedImageInfo23(long nWhichInfo);
         DTWAIN_ARRAY GetExtendedImageInfo24(long nWhichInfo);
         DTWAIN_ARRAY GetExtendedImageInfo25(long nWhichInfo);
+        DTWAIN_ARRAY GetPatchCodeInfo(long nWhichInfo);
     };
 }
 #endif
