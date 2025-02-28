@@ -130,13 +130,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDT
     if (bArrayExists)
         pHandle->m_ArrayFactory->clear(*Array);
 
-    CTL_IntArray r;
-    if ( pSource->EnumExtImageInfo(r) )
+    CTL_IntArray vExtImageInfo;
+    if (pSource->EnumExtImageInfo(vExtImageInfo))
     {
-        const size_t nCount = r.size();
-        DTWAIN_ARRAY ThisArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(nCount));
+        const size_t nCount = vExtImageInfo.size();
+        DTWAIN_ARRAY ThisArray = CreateArrayFromContainer<std::vector<int>>(pHandle, vExtImageInfo);
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(ThisArray);
-        std::copy(r.begin(), r.end(), vValues.begin());
 
         // Dump contents of the enumerated values to the log
         if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
