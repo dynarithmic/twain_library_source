@@ -26,22 +26,21 @@
 #include <array>
 #include <twain.h>
 
+/* The ExtendedImageInfo and helper classes maintain a cache of the TWAIN Source's
+   "Extended Image Information.  For more information, see the TWAIN Specification 2.5, 
+    Chapter 9, "Extended Image Information Definitions*/
 namespace dynarithmic
 {
-    struct ExtendedImageInfo_BarcodeInfo
-    {
-        TW_UINT32 confidence = 0;
-        TW_UINT32 rotation = 0;
-        TW_UINT32 length = 0;
-        TW_UINT32 xCoordinate = 0;
-        TW_UINT32 yCoordinate = 0;
-        TW_UINT32 type = 0;
-        std::string text;
-    };
-
     struct ExtendedImageInfo_Barcode
     {
-        std::vector<ExtendedImageInfo_BarcodeInfo> m_vBarInfos;
+        TW_UINT32 count = 0;
+        std::vector<TW_UINT32> vConfidence;
+        std::vector<TW_UINT32> vRotation;
+        std::vector<TW_UINT32> vLength;
+        std::vector<TW_UINT32> vXCoordinate;
+        std::vector<TW_UINT32> vYCoordinate;
+        std::vector<TW_UINT32> vType;
+        std::vector<std::string> vText;
     };
 
     struct ExtendedImageInfo_PageSourceInfo
@@ -109,7 +108,7 @@ namespace dynarithmic
         std::vector<TW_UINT32> whiteRLAvgV;
     };
 
-    struct ExtendedImageInfo_ShadedAreaDection
+    struct ExtendedImageInfo_ShadedAreaDetection
     {
         std::vector<ExtendedImageInfo_ShadedAreaDetectionInfo> m_vShadeInfos;
     };
@@ -241,6 +240,9 @@ namespace dynarithmic
         bool IsInfoRetrieved() const { return infoRetrieved; }
         void SetInfoRetrieved(bool bSet) { infoRetrieved = bSet; }
         bool IsInfoBeingFilled() const { return m_bIsFillingInfo; }
+
+        /* The "Fill" functions get the extended information from the Source
+         * and fills in the requisite structures with the information found */
         bool FillAllInfo();
         bool FillBarcodeInfo();
         bool FillPageSourceInfo();
@@ -259,6 +261,10 @@ namespace dynarithmic
         bool FillExtendedImageInfo24();
         bool FillExtendedImageInfo25();
         bool FillPatchCodeInfo();
+
+        /* The "Get" functions takes the information from the structs,
+           and returns it in the form of a DTWAIN_ARRAY for the application
+           to query and process */
         DTWAIN_ARRAY GetBarcodeInfo(long nWhichInfo);
         DTWAIN_ARRAY GetPageSourceInfo(long nWhichInfo);
         DTWAIN_ARRAY GetSkewInfo(long nWhichInfo);
