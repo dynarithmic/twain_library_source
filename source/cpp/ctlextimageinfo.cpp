@@ -186,7 +186,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitExtImageInfo(DTWAIN_SOURCE Source)
 }
 
 /* !!DEPRECATED as of version 5.6.2 !!
-/* Application adds an item to query the image information.  Before getting the Extended
+   Application adds an item to query the image information.  Before getting the Extended
    Image Information, the application will call DTWAIN_AddExtImageInfoQuery multiple times,
    each time for each Image Information desired  */
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddExtImageInfoQuery(DTWAIN_SOURCE Source, LONG ExtImageInfo)
