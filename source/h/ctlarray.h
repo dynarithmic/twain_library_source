@@ -22,6 +22,8 @@
 #define CTLARRAY_H
 
 #include <vector>
+#include <algorithm>
+#include <limits>
 #include "dtwtype.h"
 #include "twain.h"
 
@@ -72,6 +74,38 @@ namespace dynarithmic
             CopyContainer<Container, TwainFrameInternal>(pHandle, theContainer, theArray);
         }
         return theArray;
+    }
+
+    template <typename Container, typename ArrayType>
+    Container CreateContainerHelper(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY theArray, size_t maxElements)
+    {
+        Container theContainer;
+        auto& pVector = pHandle->m_ArrayFactory->underlying_container_t<ArrayType>(theArray);
+        if ( maxElements == (std::numeric_limits<size_t>::max)())
+            std::copy(pVector.begin(), pVector.end(), std::back_inserter(theContainer));
+        else
+        {
+            size_t minToCopy = (std::min)(maxElements, pVector.size());
+            std::copy(pVector.begin(), pVector.begin() + minToCopy, std::back_inserter(theContainer));
+        }
+        return theContainer;
+    }
+
+    template <typename Container>
+    Container CreateContainerFromArray(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY theArray, 
+                                        size_t maxElements = (std::numeric_limits<size_t>::max)())
+    {
+        if (!theArray)
+            return {};
+        if constexpr (std::is_integral_v<Container::value_type>)
+            return CreateContainerHelper<Container, LONG>(pHandle, theArray, maxElements);
+        else
+        if constexpr (std::is_same_v<Container::value_type, double>)
+            return CreateContainerHelper<Container, double>(pHandle, theArray, maxElements);
+        else
+        if constexpr (std::is_same_v<Container::value_type, std::string>)
+            return CreateContainerHelper<Container, std::string>(pHandle, theArray, maxElements);
+        return {};
     }
 }
 #endif

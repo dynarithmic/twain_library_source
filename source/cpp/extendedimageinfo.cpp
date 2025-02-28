@@ -37,8 +37,11 @@ void ExtendedImageInformation::ClearInfo()
     infoRetrieved = false;
 }
 
+// This triggers the retrieval process of the Extended Image Information
 bool ExtendedImageInformation::BeginRetrieval()
 {
+
+    // Make sure we turn off the filling flag on return
     struct IsFillingRAII
     {
         bool* m_pFilling = nullptr;
@@ -48,6 +51,7 @@ bool ExtendedImageInformation::BeginRetrieval()
 
     IsFillingRAII raii(&m_bIsFillingInfo);
 
+    // Clear the Extended Image Information from a previous "run"
     ClearInfo();
     m_vFoundTypes.clear();
     bool bOk = m_theSource->GetExtImageInfo(true);
@@ -57,16 +61,20 @@ bool ExtendedImageInformation::BeginRetrieval()
     DTWAIN_ARRAY aValues = {};
     DTWAINArrayPtr_RAII raii2(m_theSource->GetDTWAINHandle(), &aValues);
     auto pHandle = m_theSource->GetDTWAINHandle();
+
+    // Get all of the Extended Image Information types supported by the source
     DTWAIN_EnumExtImageInfoTypes(m_theSource, &aValues);
-    if (!aValues)
-        return false;
-    auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
-    for (auto val : vValues)
-        m_vFoundTypes.push_back(val);
-    if (!vValues.empty())
+    m_vFoundTypes = CreateContainerFromArray<std::vector<LONG>>(pHandle, aValues);
+    if (!m_vFoundTypes.empty())
     {
+        // we retrieved the number of info items
         infoRetrieved = true;
+
+        // signal that we are in the process of filling the structs 
+        // with the data
         m_bIsFillingInfo = true;
+
+        // Start filling the information into the structs
         FillAllInfo();
     }
     return infoRetrieved;
@@ -93,71 +101,42 @@ bool ExtendedImageInformation::FillBarcodeInfo()
     // Get the barcode count information
     LONG barCodeCount = 0;
     DTWAIN_GetExtImageInfoData(m_theSource, TWEI_BARCODECOUNT, &aCount);
-    if (!aCount)
+    auto vect = CreateContainerFromArray<std::vector<TW_UINT32>>(pHandle, aCount, 1);
+    if (vect.empty() || vect.front() == 0)
         return true;
-    auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aCount);
-    if (vValues.empty())
-        return true;
-    barCodeCount = vValues.front();
-    if (barCodeCount == 0)
-        return true;
-
-    m_InfoBlock.m_barcodeInfo.m_vBarInfos.resize(barCodeCount);
+    m_InfoBlock.m_barcodeInfo.count = vect.front();
 
     // Get the barcode details
     DTWAIN_GetExtImageInfoData(m_theSource, TWEI_BARCODEX, &aCountX);
+    m_InfoBlock.m_barcodeInfo.vXCoordinate = CreateContainerFromArray<std::vector<TW_UINT32>>(pHandle, aCountX);
     DTWAIN_GetExtImageInfoData(m_theSource, TWEI_BARCODEY, &aCountY);
+    m_InfoBlock.m_barcodeInfo.vYCoordinate = CreateContainerFromArray<std::vector<TW_UINT32>>(pHandle, aCountY);
     DTWAIN_GetExtImageInfoData(m_theSource, TWEI_BARCODETYPE, &aType);
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_BARCODETEXT, &aText);
+    m_InfoBlock.m_barcodeInfo.vType = CreateContainerFromArray<std::vector<TW_UINT32>>(pHandle, aType);
     DTWAIN_GetExtImageInfoData(m_theSource, TWEI_BARCODEROTATION, &aRotation);
+    m_InfoBlock.m_barcodeInfo.vRotation = CreateContainerFromArray<std::vector<TW_UINT32>>(pHandle, aRotation);
     DTWAIN_GetExtImageInfoData(m_theSource, TWEI_BARCODECONFIDENCE, &aConfidence);
+    m_InfoBlock.m_barcodeInfo.vConfidence = CreateContainerFromArray<std::vector<TW_UINT32>>(pHandle, aConfidence);
     DTWAIN_GetExtImageInfoData(m_theSource, TWEI_BARCODETEXTLENGTH, &aTextLength);
+    m_InfoBlock.m_barcodeInfo.vLength = CreateContainerFromArray<std::vector<TW_UINT32>>(pHandle, aTextLength);
+    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_BARCODETEXT, &aText);
 
     int lastLen = 0;
 
     // Fill in the barcode texts
     auto& vHandles = pHandle->m_ArrayFactory->underlying_container_t<DTWAIN_HANDLE>(aText);
-    auto& vLengths = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aTextLength);
     for (int i = 0; i < barCodeCount; ++i)
     {
         std::string szBarText;
         DTWAIN_HANDLE sHandle = vHandles[i];
-        LONG length = vLengths[i];
+        LONG length = m_InfoBlock.m_barcodeInfo.vLength[i];
         HandleRAII raii(sHandle);
         char* pText = (char*)raii.getData();
         if (pText)
             szBarText = std::string(pText + lastLen, length);
         lastLen += length;
-        m_InfoBlock.m_barcodeInfo.m_vBarInfos[i].text = szBarText;
+        m_InfoBlock.m_barcodeInfo.vText.push_back(szBarText);
     }
-
-    // Fill in the other information
-    std::array<LONG, 5> aCounts = { aCountX ? static_cast<LONG>(pHandle->m_ArrayFactory->underlying_container_t<LONG>(aCountX).size()) : 0,
-                                    aCountY ? static_cast<LONG>(pHandle->m_ArrayFactory->underlying_container_t<LONG>(aCountY).size()) : 0,
-                                    aType ? static_cast<LONG>(pHandle->m_ArrayFactory->underlying_container_t<LONG>(aType).size()) : 0,
-                                    aRotation ? static_cast<LONG>(pHandle->m_ArrayFactory->underlying_container_t<LONG>(aRotation).size()) : 0,
-                                    aConfidence ? static_cast<LONG>(pHandle->m_ArrayFactory->underlying_container_t<LONG>(aConfidence).size()) : 0 };
-    
-    LONG* pBufferX = aCounts[0] ? pHandle->m_ArrayFactory->underlying_container_t<LONG>(aCountX).data() : nullptr; 
-    LONG* pBufferY = aCounts[1] ? pHandle->m_ArrayFactory->underlying_container_t<LONG>(aCountY).data() : nullptr;
-
-    for (int i = 0; i < (std::min)(aCounts[0], aCounts[1]); ++i)
-    {
-        m_InfoBlock.m_barcodeInfo.m_vBarInfos[i].xCoordinate = pBufferX[i];
-        m_InfoBlock.m_barcodeInfo.m_vBarInfos[i].yCoordinate = pBufferY[i];
-    }
-
-    LONG* pType = aCounts[2] ? pHandle->m_ArrayFactory->underlying_container_t<LONG>(aType).data() : nullptr; 
-    for (int i = 0; i < aCounts[2]; ++i)
-        m_InfoBlock.m_barcodeInfo.m_vBarInfos[i].type = pType[i];
-
-    LONG* pRotation = aCounts[3] ? pHandle->m_ArrayFactory->underlying_container_t<LONG>(aRotation).data() : nullptr; 
-    for (int i = 0; i < aCounts[3]; ++i)
-        m_InfoBlock.m_barcodeInfo.m_vBarInfos[i].rotation = pRotation[i];
-
-    LONG* pConfidence = aCounts[4] ? pHandle->m_ArrayFactory->underlying_container_t<LONG>(aConfidence).data() : nullptr;
-    for (int i = 0; i < aCounts[4]; ++i)
-        m_InfoBlock.m_barcodeInfo.m_vBarInfos[i].confidence = pConfidence[i];
 
     return true;
 }
@@ -180,7 +159,7 @@ bool ExtendedImageInformation::FillPageSourceInfo()
             continue;
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<std::string>(aValues);
         if (!vValues.empty())
-            *(refStrings[i]) = vValues[i];
+            *(refStrings[i]) = vValues.front();
     }
 
     {
@@ -331,12 +310,9 @@ bool ExtendedImageInformation::FillShadedAreaInfo()
                                                         &m_InfoBlock.m_shadedInfo.whiteRLAvgV };
     for (size_t i = 0; i < intItems.size(); ++i)
     {
+        auto* curVect = ptrVect[i];
         DTWAIN_GetExtImageInfoData(m_theSource, intItems[i], &aValues);
-        if (!aValues)
-            continue;
-        auto& vValues2 = pHandle->m_ArrayFactory->underlying_container_t<DWORD>(aValues);
-        for (auto val : vValues2)
-            ptrVect[i]->push_back(val);
+        *curVect = CreateContainerFromArray<std::vector<TW_UINT32>>(pHandle, aValues);
     }
     std::for_each(ptrVect.begin(), ptrVect.end(), [&](auto* pVect) { pVect->resize(m_InfoBlock.m_shadedInfo.count);  });
     return true;
@@ -414,7 +390,7 @@ bool ExtendedImageInformation::GenericFillLineInfo(ExtendedImageInfo_LineDetecti
         if (aAllValues[i])
         {
             auto& vValues2 = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aAllValues[i]);
-            allCounts[i] = vValues2.size();
+            allCounts[i] = static_cast<LONG>(vValues2.size());
             vAllValues[i] = &vValues2;
         }
         else
@@ -465,11 +441,7 @@ bool ExtendedImageInformation::FillFormsRecognitionInfo()
 
     // Get the template match information
     DTWAIN_GetExtImageInfoData(m_theSource, TWEI_FORMTEMPLATEMATCH, &aValues);
-    if (!aValues)
-        return true;
-    auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<std::string>(aValues);
-    for (auto& str : vValues)
-        m_InfoBlock.m_formsRecognitionInfo.m_vTemplateMatch.push_back(str);
+    m_InfoBlock.m_formsRecognitionInfo.m_vTemplateMatch = CreateContainerFromArray<std::vector<std::string>>(pHandle, aValues);
 
     std::array<int32_t, 4> intTypes = { TWEI_FORMCONFIDENCE, TWEI_FORMTEMPLATEPAGEMATCH, TWEI_FORMHORZDOCOFFSET, TWEI_FORMVERTDOCOFFSET };
     std::array<std::vector<TW_UINT32>*, 4> ptrVects = { &m_InfoBlock.m_formsRecognitionInfo.m_vConfidence, &m_InfoBlock.m_formsRecognitionInfo.m_vTemplatePageMatch,
@@ -477,10 +449,7 @@ bool ExtendedImageInformation::FillFormsRecognitionInfo()
     for (size_t i = 0; i < intTypes.size(); ++i)
     {
         DTWAIN_GetExtImageInfoData(m_theSource, intTypes[i], &aValues);
-        if (!aValues)
-            continue;
-        auto& vValues2 = pHandle->m_ArrayFactory->underlying_container_t<DWORD>(aValues);
-        std::transform(vValues2.begin(), vValues2.end(), std::back_inserter(*(ptrVects[i])), [&](LONG val) { return static_cast<TW_UINT32>(val); });
+        *(ptrVects[i]) = CreateContainerFromArray<std::vector<TW_UINT32>>(pHandle, aValues);
     }
     return true;
 }
@@ -818,49 +787,36 @@ bool ExtendedImageInformation::FillAllInfo()
 
 DTWAIN_ARRAY ExtendedImageInformation::GetBarcodeInfo(long nWhichInfo)
 {
-    std::vector<TW_UINT32> tempV;
     std::vector<std::string> tempVS;
     switch (nWhichInfo)
     {
         case TWEI_BARCODECOUNT:
-            return CreateArrayFromContainer<std::vector<DWORD>>(m_theSource->GetDTWAINHandle(), 
-                                                { static_cast<DWORD>(m_InfoBlock.m_barcodeInfo.m_vBarInfos.size()) });
+            return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(), 
+                                                { static_cast<DWORD>(m_InfoBlock.m_barcodeInfo.count) });
         break;
         case TWEI_BARCODEX:
-            std::transform(m_InfoBlock.m_barcodeInfo.m_vBarInfos.begin(),
-                           m_InfoBlock.m_barcodeInfo.m_vBarInfos.end(),
-                            std::back_inserter(tempV), [&](auto& oneInfo) { return oneInfo.xCoordinate; });
-            return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(), tempV);
+            return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(),
+                                                                    m_InfoBlock.m_barcodeInfo.vXCoordinate );
         break;
         case TWEI_BARCODEY:
-            std::transform(m_InfoBlock.m_barcodeInfo.m_vBarInfos.begin(),
-                m_InfoBlock.m_barcodeInfo.m_vBarInfos.end(),
-                std::back_inserter(tempV), [&](auto& oneInfo) { return oneInfo.yCoordinate; });
-            return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(), tempV);
+            return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(),
+                                                                    m_InfoBlock.m_barcodeInfo.vYCoordinate);
         break;
         case TWEI_BARCODECONFIDENCE:
-            std::transform(m_InfoBlock.m_barcodeInfo.m_vBarInfos.begin(),
-                m_InfoBlock.m_barcodeInfo.m_vBarInfos.end(),
-                std::back_inserter(tempV), [&](auto& oneInfo) { return oneInfo.confidence; });
-            return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(), tempV);
+            return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(),
+                                                                    m_InfoBlock.m_barcodeInfo.vConfidence);
         break;
         case TWEI_BARCODEROTATION:
-            std::transform(m_InfoBlock.m_barcodeInfo.m_vBarInfos.begin(),
-                m_InfoBlock.m_barcodeInfo.m_vBarInfos.end(),
-                std::back_inserter(tempV), [&](auto& oneInfo) { return oneInfo.rotation; });
-            return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(), tempV);
+            return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(),
+                                                                    m_InfoBlock.m_barcodeInfo.vRotation);
         break;
         case TWEI_BARCODETYPE:
-            std::transform(m_InfoBlock.m_barcodeInfo.m_vBarInfos.begin(),
-                m_InfoBlock.m_barcodeInfo.m_vBarInfos.end(),
-                std::back_inserter(tempV), [&](auto& oneInfo) { return oneInfo.type; });
-            return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(), tempV);
+            return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(),
+                                                                    m_InfoBlock.m_barcodeInfo.vType);
         break;
         case TWEI_BARCODETEXT:
-            std::transform(m_InfoBlock.m_barcodeInfo.m_vBarInfos.begin(),
-                m_InfoBlock.m_barcodeInfo.m_vBarInfos.end(),
-                std::back_inserter(tempVS), [&](auto& oneInfo) { return oneInfo.text; });
-            return CreateArrayFromContainer<std::vector<std::string>>(m_theSource->GetDTWAINHandle(), tempVS);
+            return CreateArrayFromContainer<std::vector<std::string>>(m_theSource->GetDTWAINHandle(), 
+                                                                      m_InfoBlock.m_barcodeInfo.vText);
         break;
     }
     return nullptr;
