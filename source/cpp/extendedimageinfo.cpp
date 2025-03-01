@@ -99,7 +99,6 @@ bool ExtendedImageInformation::FillBarcodeInfo()
     }
 
     // Get the barcode count information
-    LONG barCodeCount = 0;
     DTWAIN_GetExtImageInfoData(m_theSource, TWEI_BARCODECOUNT, &aCount);
     auto vect = CreateContainerFromArray<std::vector<TW_UINT32>>(pHandle, aCount, 1);
     if (vect.empty() || vect.front() == 0)
@@ -125,7 +124,7 @@ bool ExtendedImageInformation::FillBarcodeInfo()
 
     // Fill in the barcode texts
     auto& vHandles = pHandle->m_ArrayFactory->underlying_container_t<DTWAIN_HANDLE>(aText);
-    for (int i = 0; i < barCodeCount; ++i)
+    for (int i = 0; i < m_InfoBlock.m_barcodeInfo.count; ++i)
     {
         std::string szBarText;
         DTWAIN_HANDLE sHandle = vHandles[i];
