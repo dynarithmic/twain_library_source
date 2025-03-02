@@ -1007,6 +1007,10 @@ DTWAIN_ARRAY ExtendedImageInformation::GetHorizontalVerticalLineInfo(long nWhich
                            m_InfoBlock.m_horizontalLineInfo.m_vLineInfo.end(),
                             std::back_inserter(tempV), [&](auto& oneInfo) { return oneInfo.thickness; });
         break;
+        case TWEI_VERTLINECOUNT:
+            return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(),
+                { static_cast<TW_UINT32>(m_InfoBlock.m_verticalLineInfo.m_vLineInfo.size()) });
+        break;
         case TWEI_VERTLINEXCOORD:
             std::transform(m_InfoBlock.m_verticalLineInfo.m_vLineInfo.begin(),
                            m_InfoBlock.m_verticalLineInfo.m_vLineInfo.end(),

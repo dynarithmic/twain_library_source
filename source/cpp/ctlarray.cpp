@@ -2514,7 +2514,10 @@ LONG DLLENTRY_DEF DTWAIN_ArrayGetStringLength(DTWAIN_ARRAY theArray, LONG nWhich
     int nWhich = 0;
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !IsValidStringArray(pH, theArray, nWhich); },
                                       DTWAIN_ERR_WRONG_ARRAY_TYPE, DTWAIN_ERR_WRONG_ARRAY_TYPE, FUNC_MACRO);
-
+    auto checkStatus = ArrayChecker().SetArray1(theArray).SetCheckType(ArrayChecker::CHECK_ARRAY_BOUNDS).SetArrayPos(nWhichString);
+    auto val = checkStatus.Check(pHandle);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return val == DTWAIN_ERR_INDEX_BOUNDS; },
+        DTWAIN_ERR_INDEX_BOUNDS, DTWAIN_ERR_INDEX_BOUNDS, FUNC_MACRO);
     LONG retValue;
     if ( nWhich == 2 )
         retValue = ArrayStringLength_Internal<CTL_ArrayFactory::tagged_array_wstring>(pHandle, theArray, nWhichString);
