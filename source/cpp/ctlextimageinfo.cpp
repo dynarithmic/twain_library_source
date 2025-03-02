@@ -344,6 +344,7 @@ static std::pair<bool, int> GetCachedExtImageInfoData(CTL_TwainDLLHandle* pHandl
         break;
 
         case TWEI_HORZLINECOUNT:
+        case TWEI_VERTLINECOUNT:
         case TWEI_HORZLINEXCOORD:
         case TWEI_HORZLINEYCOORD:
         case TWEI_HORZLINELENGTH:
