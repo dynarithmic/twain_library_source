@@ -1047,6 +1047,10 @@ DTWAIN_ARRAY ExtendedImageInformation::GetFillFormsRecognitionInfo(long nWhichIn
             return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(),
                                     m_InfoBlock.m_formsRecognitionInfo.m_vTemplatePageMatch);
         break;
+        case TWEI_FORMCONFIDENCE:
+            return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(),
+                m_InfoBlock.m_formsRecognitionInfo.m_vConfidence);
+            break;
         case TWEI_FORMHORZDOCOFFSET:
             return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(),
                                     m_InfoBlock.m_formsRecognitionInfo.m_vHorizontalDocOffset);
