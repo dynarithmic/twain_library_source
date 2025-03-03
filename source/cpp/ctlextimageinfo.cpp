@@ -360,6 +360,7 @@ static std::pair<bool, int> GetCachedExtImageInfoData(CTL_TwainDLLHandle* pHandl
         case TWEI_FORMTEMPLATEPAGEMATCH:
         case TWEI_FORMHORZDOCOFFSET:
         case TWEI_FORMVERTDOCOFFSET:
+        case TWEI_FORMCONFIDENCE:
             theArray = pExtendedImageInfo->GetFillFormsRecognitionInfo(nWhich);
         break;
 
