@@ -1057,6 +1057,8 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF* D_ENABLEPEEKMESSAGELOOPFUNC)                 
 typedef DTWAIN_ARRAY (DLLENTRY_DEF* D_ENUMCOMPRESSIONTYPESEX2FUNC)               (DTWAIN_SOURCE, LONG, DTWAIN_BOOL);  
 typedef LONG        (DLLENTRY_DEF* D_GETFILECOMPRESSIONTYPEFUNC)                 (DTWAIN_SOURCE);
 typedef DTWAIN_BOOL (DLLENTRY_DEF* D_SETFILECOMPRESSIONTYPEFUNC)                 (DTWAIN_SOURCE, LONG);
+typedef HANDLE      (DLLENTRY_DEF* D_ALLOCATEMEMORY64FUNC)                       (ULONG64);
+typedef DTWAIN_BOOL (DLLENTRY_DEF* D_GETEXTIMAGEINFOITEMEXFUNC)                  (DTWAIN_SOURCE, LONG, LPLONG, LPLONG, LPLONG, LPLONG);
 
 #ifdef __cplusplus
 }
@@ -1091,6 +1093,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF* D_SETFILECOMPRESSIONTYPEFUNC)                
     STATIC D_ADDPDFTEXTWFUNC                                DTWAIN_AddPDFTextW;
     STATIC D_ALLOCATEMEMORYEXFUNC                           DTWAIN_AllocateMemoryEx;
     STATIC D_ALLOCATEMEMORYFUNC                             DTWAIN_AllocateMemory;
+    STATIC D_ALLOCATEMEMORY64FUNC                           DTWAIN_AllocateMemory64;
     STATIC D_APPHANDLESEXCEPTIONSFUNC                       DTWAIN_AppHandlesExceptions;
     STATIC D_ARRAYADDANSISTRINGFUNC                         DTWAIN_ArrayAddANSIString;
     STATIC D_ARRAYADDANSISTRINGNFUNC                        DTWAIN_ArrayAddANSIStringN;
@@ -1456,6 +1459,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF* D_SETFILECOMPRESSIONTYPEFUNC)                
     STATIC D_GETEXTIMAGEINFODATAFUNC                        DTWAIN_GetExtImageInfoData;
     STATIC D_GETEXTIMAGEINFOFUNC                            DTWAIN_GetExtImageInfo;
     STATIC D_GETEXTIMAGEINFOITEMFUNC                        DTWAIN_GetExtImageInfoItem;
+    STATIC D_GETEXTIMAGEINFOITEMEXFUNC                      DTWAIN_GetExtImageInfoItemEx;
     STATIC D_GETEXTNAMEFROMCAPAFUNC                         DTWAIN_GetExtNameFromCapA;
     STATIC D_GETEXTNAMEFROMCAPFUNC                          DTWAIN_GetExtNameFromCap;
     STATIC D_GETEXTNAMEFROMCAPWFUNC                         DTWAIN_GetExtNameFromCapW;
@@ -2087,7 +2091,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF* D_SETFILECOMPRESSIONTYPEFUNC)                
     STATIC D_UNLOCKMEMORYEXFUNC                             DTWAIN_UnlockMemoryEx;
     STATIC D_UNLOCKMEMORYFUNC                               DTWAIN_UnlockMemory;
     STATIC D_USEMULTIPLETHREADSFUNC                         DTWAIN_UseMultipleThreads;
-
+    
 #ifdef __cplusplus
         static int InitDTWAINInterface(DYNDTWAIN_API*, HMODULE h);
         static int InitDTWAINInterface(HMODULE h);

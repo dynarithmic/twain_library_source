@@ -67,6 +67,7 @@
     D_ADDPDFTEXTEXFUNC                                                DYNDTWAIN_API::DTWAIN_AddPDFTextEx = nullptr;
     D_ADDPDFTEXTFUNC                                                  DYNDTWAIN_API::DTWAIN_AddPDFText = nullptr;
     D_ADDPDFTEXTWFUNC                                                 DYNDTWAIN_API::DTWAIN_AddPDFTextW = nullptr;
+    D_ALLOCATEMEMORY64FUNC                                            DYNDTWAIN_API::DTWAIN_AllocateMemory64 = nullptr;
     D_ALLOCATEMEMORYEXFUNC                                            DYNDTWAIN_API::DTWAIN_AllocateMemoryEx = nullptr;
     D_ALLOCATEMEMORYFUNC                                              DYNDTWAIN_API::DTWAIN_AllocateMemory = nullptr;
     D_APPHANDLESEXCEPTIONSFUNC                                        DYNDTWAIN_API::DTWAIN_AppHandlesExceptions = nullptr;
@@ -429,6 +430,7 @@
     D_GETEXTCAPFROMNAMEWFUNC                                          DYNDTWAIN_API::DTWAIN_GetExtCapFromNameW = nullptr;
     D_GETEXTIMAGEINFODATAFUNC                                         DYNDTWAIN_API::DTWAIN_GetExtImageInfoData = nullptr;
     D_GETEXTIMAGEINFOFUNC                                             DYNDTWAIN_API::DTWAIN_GetExtImageInfo = nullptr;
+    D_GETEXTIMAGEINFOITEMEXFUNC                                       DYNDTWAIN_API::DTWAIN_GetExtImageInfoItemEx = nullptr;
     D_GETEXTIMAGEINFOITEMFUNC                                         DYNDTWAIN_API::DTWAIN_GetExtImageInfoItem = nullptr;
     D_GETEXTNAMEFROMCAPAFUNC                                          DYNDTWAIN_API::DTWAIN_GetExtNameFromCapA = nullptr;
     D_GETEXTNAMEFROMCAPFUNC                                           DYNDTWAIN_API::DTWAIN_GetExtNameFromCap = nullptr;
@@ -1059,7 +1061,6 @@
     D_UNLOCKMEMORYEXFUNC                                              DYNDTWAIN_API::DTWAIN_UnlockMemoryEx = nullptr;
     D_UNLOCKMEMORYFUNC                                                DYNDTWAIN_API::DTWAIN_UnlockMemory = nullptr;
     D_USEMULTIPLETHREADSFUNC                                          DYNDTWAIN_API::DTWAIN_UseMultipleThreads = nullptr;
-
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1144,6 +1145,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_AddPDFTextEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_AddPDFTextW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_AllocateMemory, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_AllocateMemory64, hModule);
           LOADFUNCTIONIMPL(DTWAIN_AllocateMemoryEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_AppHandlesExceptions, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayAdd, hModule);
@@ -1506,6 +1508,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetExtImageInfo, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetExtImageInfoData, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetExtImageInfoItem, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetExtImageInfoItemEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetExtNameFromCap, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetExtNameFromCapA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetExtNameFromCapW, hModule);
