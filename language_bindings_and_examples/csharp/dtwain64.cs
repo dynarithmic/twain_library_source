@@ -828,6 +828,14 @@ namespace Dynarithmic
         public const int DTWAIN_ERR_RESOURCES_DATA_EXCEPTION = (-1073);
         public const int DTWAIN_ERR_AUDIO_TRANSFER_NOTSUPPORTED = (-1074);
         public const int DTWAIN_ERR_FEEDER_COMPLIANCY = (-1075);
+        public const int DTWAIN_ERR_SUPPORTEDCAPS_COMPLIANCY1 = (-1076);
+        public const int DTWAIN_ERR_SUPPORTEDCAPS_COMPLIANCY2 = (-1077);
+        public const int DTWAIN_ERR_ICAPPIXELTYPE_COMPLIANCY1 = (-1078);
+        public const int DTWAIN_ERR_ICAPPIXELTYPE_COMPLIANCY2 = (-1079);
+        public const int DTWAIN_ERR_ICAPBITDEPTH_COMPLIANCY1  = (-1080);
+        public const int DTWAIN_ERR_XFERMECH_COMPLIANCY       = (-1081);
+        public const int DTWAIN_ERR_STANDARDCAPS_COMPLIANCY   = (-1082);
+        public const int DTWAIN_ERR_EXTIMAGEINFO_DATATYPE_MISMATCH = (-1083);
 
         public const  int TWAIN_ERR_LOW_MEMORY = (-1100);
         public const  int TWAIN_ERR_FALSE_ALARM = (-1101);
@@ -1734,6 +1742,8 @@ namespace Dynarithmic
         public const int DTWAIN_CONSTANT_TWON     = 74;
         public const int DTWAIN_CONSTANT_TWMF     = 75;
         public const int DTWAIN_CONSTANT_TWSX     = 76;
+        public const int DTWAIN_CONSTANT_CAP      = 77;
+        public const int DTWAIN_CONSTANT_ICAP     = 78;
 
         public const int DTWAIN_USERRES_START    = 20000;
         public const int DTWAIN_USERRES_MAXSIZE  = 8192;
