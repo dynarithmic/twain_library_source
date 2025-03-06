@@ -199,8 +199,6 @@ void TestAndCachePixelTypes(CTL_ITwainSource* p)
         }
     }
 
-    // Test
-    compliancyTester.TestStandardCapabilitiesCompliancy();
 
     // Print information on the pixel types found
     const auto& pixelBitDepthMap = p->GetPixelTypeMap();
