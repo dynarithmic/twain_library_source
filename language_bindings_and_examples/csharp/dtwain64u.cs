@@ -36,6 +36,9 @@ namespace Dynarithmic
     using TW_UINT32 = System.UInt32;
     using TW_BOOL = System.UInt16;
     using DTWAIN_MEMORY_PTR = System.IntPtr;
+    using ULONG64 = System.UInt64;
+    using DWORD = System.UInt32;
+    using LONG = System.Int32;
 
     public class TwainAPI
     {
@@ -4998,5 +5001,11 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
         public static extern int DTWAIN_SetFileCompressionType(DTWAIN_SOURCE Source, int lCompression);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
+        public static extern DTWAIN_HANDLE DTWAIN_AllocateMemoryEx(DWORD nBytes);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
+        public static extern int DTWAIN_GetExtImageInfoItemEx(DTWAIN_SOURCE Source, LONG nWhich, ref LONG InfoID, ref LONG NumItems, ref LONG Type, ref LONG ReturnCode);
     }
 }

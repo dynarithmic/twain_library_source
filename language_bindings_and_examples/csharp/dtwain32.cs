@@ -36,6 +36,9 @@ namespace Dynarithmic
     using TW_UINT32 = System.UInt32;
     using TW_BOOL = System.UInt16;
     using DTWAIN_MEMORY_PTR = System.IntPtr;
+    using ULONG64 = System.UInt64;
+    using DWORD = System.UInt32;
+    using LONG = System.Int32;
 
     public class TwainAPI
     {
@@ -825,6 +828,14 @@ namespace Dynarithmic
         public const int DTWAIN_ERR_RESOURCES_DATA_EXCEPTION = (-1073);
         public const int DTWAIN_ERR_AUDIO_TRANSFER_NOTSUPPORTED = (-1074);
         public const int DTWAIN_ERR_FEEDER_COMPLIANCY = (-1075);
+        public const int DTWAIN_ERR_SUPPORTEDCAPS_COMPLIANCY1 = (-1076);
+        public const int DTWAIN_ERR_SUPPORTEDCAPS_COMPLIANCY2 = (-1077);
+        public const int DTWAIN_ERR_ICAPPIXELTYPE_COMPLIANCY1 = (-1078);
+        public const int DTWAIN_ERR_ICAPPIXELTYPE_COMPLIANCY2 = (-1079);
+        public const int DTWAIN_ERR_ICAPBITDEPTH_COMPLIANCY1  = (-1080);
+        public const int DTWAIN_ERR_XFERMECH_COMPLIANCY       = (-1081);
+        public const int DTWAIN_ERR_STANDARDCAPS_COMPLIANCY   = (-1082);
+        public const int DTWAIN_ERR_EXTIMAGEINFO_DATATYPE_MISMATCH = (-1083);
 
         public const  int TWAIN_ERR_LOW_MEMORY = (-1100);
         public const  int TWAIN_ERR_FALSE_ALARM = (-1101);
@@ -1731,6 +1742,8 @@ namespace Dynarithmic
         public const int DTWAIN_CONSTANT_TWON     = 74;
         public const int DTWAIN_CONSTANT_TWMF     = 75;
         public const int DTWAIN_CONSTANT_TWSX     = 76;
+        public const int DTWAIN_CONSTANT_CAP      = 77;
+        public const int DTWAIN_CONSTANT_ICAP     = 78;
 
         public const int DTWAIN_USERRES_START    = 20000;
         public const int DTWAIN_USERRES_MAXSIZE  = 8192;
@@ -6081,5 +6094,13 @@ namespace Dynarithmic
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
         ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_SetFileCompressionType(DTWAIN_SOURCE Source, int lCompression);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern DTWAIN_HANDLE DTWAIN_AllocateMemoryEx(DWORD nBytes);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_GetExtImageInfoItemEx(DTWAIN_SOURCE Source, LONG nWhich, ref LONG InfoID, ref LONG NumItems, ref LONG Type, ref LONG ReturnCode);
     }
 }
