@@ -772,6 +772,14 @@ Class DTWAINAPI
     Public Const DTWAIN_ERR_RESOURCES_DATA_EXCEPTION As Integer = (-1073)
     Public Const DTWAIN_ERR_AUDIO_TRANSFER_NOTSUPPORTED As Integer = (-1074)
     Public Const DTWAIN_ERR_FEEDER_COMPLIANCY As Integer = (-1075)
+    Public Const DTWAIN_ERR_SUPPORTEDCAPS_COMPLIANCY1 As Integer = (-1076)
+    Public Const DTWAIN_ERR_SUPPORTEDCAPS_COMPLIANCY2 As Integer = (-1077)
+    Public Const DTWAIN_ERR_ICAPPIXELTYPE_COMPLIANCY1 As Integer = (-1078)
+    Public Const DTWAIN_ERR_ICAPPIXELTYPE_COMPLIANCY2 As Integer = (-1079)
+    Public Const DTWAIN_ERR_ICAPBITDEPTH_COMPLIANCY1 As Integer = (-1080)
+    Public Const DTWAIN_ERR_XFERMECH_COMPLIANCY      As Integer = (-1081)
+    Public Const DTWAIN_ERR_STANDARDCAPS_COMPLIANCY  As Integer = (-1082)
+    Public Const DTWAIN_ERR_EXTIMAGEINFO_DATATYPE_MISMATCH As Integer = (-1083)
 
     Public Const TWAIN_ERR_LOW_MEMORY As Integer = (-1100)
     Public Const TWAIN_ERR_FALSE_ALARM As Integer = (-1101)
@@ -1688,6 +1696,8 @@ Class DTWAINAPI
     Public Const DTWAIN_CONSTANT_TWON As Integer = 74
     Public Const DTWAIN_CONSTANT_TWMF As Integer = 75
     Public Const DTWAIN_CONSTANT_TWSX As Integer = 76
+    Public Const DTWAIN_CONSTANT_CAP As Integer =  77
+    Public Const DTWAIN_CONSTANT_ICAP As Integer = 78
 
     Public Const DTWAIN_USERRES_START As Integer = 20000
     Public Const DTWAIN_USERRES_MAXSIZE As Integer = 8192
@@ -2808,4 +2818,6 @@ Class DTWAINAPI
     Declare Auto Function DTWAIN_GetFileCompressionType Lib "dtwain64u.dll" (Source As System.IntPtr) As Integer
     Declare Auto Function DTWAIN_SetFileCompressionType Lib "dtwain64u.dll" (Source As System.IntPtr, FileType As Long) As Integer
 
+    Declare Auto Function DTWAIN_AllocateMemoryEx Lib "dtwain64u.dll" (nBytes As System.UInt32) As System.IntPtr
+    Declare Auto Function DTWAIN_GetExtImageInfoItemEx Lib "dtwain64u.dll" (Source As System.IntPtr, nWhich As Integer, InfoID As Integer, ByRef NumItems As Integer, ByRef ItemType As Integer, ByRef ReturnCode As Integer) As Integer
 End Class
