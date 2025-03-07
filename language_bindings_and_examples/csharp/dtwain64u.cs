@@ -5013,7 +5013,7 @@ namespace Dynarithmic
         public static extern int DTWAIN_SetFileCompressionType(DTWAIN_SOURCE Source, int lCompression);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
-        public static extern DTWAIN_HANDLE DTWAIN_AllocateMemoryEx(DWORD nBytes);
+        public static extern DTWAIN_HANDLE DTWAIN_AllocateMemory64(UINT64 nBytes);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
         public static extern int DTWAIN_GetExtImageInfoItemEx(DTWAIN_SOURCE Source, LONG nWhich, ref LONG InfoID, ref LONG NumItems, ref LONG Type, ref LONG ReturnCode);

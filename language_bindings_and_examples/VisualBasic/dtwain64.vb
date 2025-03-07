@@ -2818,6 +2818,6 @@ Class DTWAINAPI
     Declare Auto Function DTWAIN_GetFileCompressionType Lib "dtwain64.dll" (Source As System.IntPtr) As Integer
     Declare Auto Function DTWAIN_SetFileCompressionType Lib "dtwain64.dll" (Source As System.IntPtr, FileType As Long) As Integer
 
-    Declare Auto Function DTWAIN_AllocateMemoryEx Lib "dtwain64.dll" (nBytes As System.UInt32) As System.IntPtr
+    Declare Auto Function DTWAIN_AllocateMemory64 Lib "dtwain64.dll" (nBytes As System.UInt64) As System.IntPtr
     Declare Auto Function DTWAIN_GetExtImageInfoItemEx Lib "dtwain64.dll" (Source As System.IntPtr, nWhich As Integer, InfoID As Integer, ByRef NumItems As Integer, ByRef ItemType As Integer, ByRef ReturnCode As Integer) As Integer
 End Class
