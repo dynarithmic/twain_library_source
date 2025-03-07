@@ -866,6 +866,14 @@ const
   DTWAIN_ERR_RESOURCES_DATA_EXCEPTION = (-1073);
   DTWAIN_ERR_AUDIO_TRANSFER_NOTSUPPORTED = (-1074);
   DTWAIN_ERR_FEEDER_COMPLIANCY = (-1075);
+  DTWAIN_ERR_SUPPORTEDCAPS_COMPLIANCY1 = (-1076);
+  DTWAIN_ERR_SUPPORTEDCAPS_COMPLIANCY2 = (-1077);
+  DTWAIN_ERR_ICAPPIXELTYPE_COMPLIANCY1 = (-1078);
+  DTWAIN_ERR_ICAPPIXELTYPE_COMPLIANCY2 = (-1079);
+  DTWAIN_ERR_ICAPBITDEPTH_COMPLIANCY1  = (-1080);
+  DTWAIN_ERR_XFERMECH_COMPLIANCY       = (-1081);
+  DTWAIN_ERR_STANDARDCAPS_COMPLIANCY   = (-1082);
+  DTWAIN_ERR_EXTIMAGEINFO_DATATYPE_MISMATCH = (-1083);
 
   TWAIN_ERR_LOW_MEMORY = (-1100);
   TWAIN_ERR_FALSE_ALARM = (-1101);
@@ -1773,6 +1781,8 @@ const
   DTWAIN_CONSTANT_TWON       = 74;
   DTWAIN_CONSTANT_TWMF       = 75;
   DTWAIN_CONSTANT_TWSX       = 76;
+  DTWAIN_CONSTANT_CAP        = 77;
+  DTWAIN_CONSTANT_ICAP       = 78;
 
   DTWAIN_USERRES_START    = 20000;
   DTWAIN_USERRES_MAXSIZE  = 8192;
@@ -2798,6 +2808,9 @@ function DTWAIN_IsPeekMessageLoopEnabled(Source:DTWAIN_SOURCE):BOOL; external 'd
 function DTWAIN_EnumCompressionTypesEx2(Source:DTWAIN_SOURCE; FileType:LONG; UseBufferedMode:LONG):DTWAIN_ARRAY; external 'dtwain64d.dll' name 'DTWAIN_EnumCompressionTypesEx2';
 function DTWAIN_GetFileCompressionType(Source:DTWAIN_SOURCE):LONG; external 'dtwain64d.dll' name 'DTWAIN_GetFileCompressionType';
 function DTWAIN_SetFileCompressionType(Source:DTWAIN_SOURCE; FileType:LONG; bIsCustom:BOOL):BOOL; external 'dtwain64d.dll' name 'DTWAIN_SetFileCompressionType';
+
+function DTWAIN_AllocateMemory64(nBytes:UInt64):DTWAIN_HANDLE; external 'dtwain64d.dll' name 'DTWAIN_AllocateMemory64';
+function DTWAIN_GetExtImageInfoItemEx(Source:DTWAIN_SOURCE; nWhich:LONG; InfoID:LPLONG; NumItems:LPLONG; DataType:LPLONG; ReturnCode:LPLONG):BOOL; external 'dtwain64d.dll' name 'DTWAIN_GetExtImageInfoItemEx'; 
 
 implementation
 
