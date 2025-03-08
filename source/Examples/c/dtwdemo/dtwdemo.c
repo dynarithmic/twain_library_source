@@ -16,6 +16,7 @@
 HINSTANCE hInst;                                // current instance
 TCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 TCHAR szWindowClass[MAX_LOADSTRING];            // The title bar text
+char szBarCodeText[500000];
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -68,6 +69,7 @@ LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserDa
 // Dialog functions
 LRESULT CALLBACK EnterSourceNameProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK DisplayCustomSelectProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK DisplayBarCodeInfoProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 //LRESULT CALLBACK DisplayDIBProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK DisplayAcquireSettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
@@ -264,7 +266,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             EnableSourceItems(FALSE);
             CheckMenuItem(g_Menu, IDM_USE_SOURCE_UI, MF_BYCOMMAND | MF_CHECKED);
 			CheckMenuItem(g_Menu, IDM_SHOW_PREVIEW, MF_BYCOMMAND | MF_CHECKED);
-        break;
+            CheckMenuItem(g_Menu, IDM_SHOW_BARCODEINFO, MF_BYCOMMAND | MF_CHECKED);
+            break;
 
         case WM_COMMAND:
             wmId    = LOWORD(wParam);
@@ -324,6 +327,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				case IDM_SHOW_PREVIEW:
 					ToggleCheckedItem(IDM_SHOW_PREVIEW);
   			    break;
+
+                case IDM_SHOW_BARCODEINFO:
+                    ToggleCheckedItem(IDM_SHOW_BARCODEINFO);
+                break;
 
                 case IDM_LOGGING_OPTIONS:
                     DisplayLoggingOptions();
@@ -449,6 +456,11 @@ void SelectTheSource(int nWhich)
     {
         if ( DTWAIN_OpenSource(tempSource) )
         {
+            DTWAIN_ARRAY aExt;
+            if ( !DTWAIN_IsExtImageInfoSupported(tempSource) )
+                EnableMenuItem(g_Menu, IDM_SHOW_BARCODEINFO, MF_BYCOMMAND | MF_GRAYED);
+            else
+                EnableMenuItem(g_Menu, IDM_SHOW_BARCODEINFO, MF_BYCOMMAND| MF_ENABLED);
             g_CurrentSource = tempSource;
             EnableSourceItems(TRUE);
             if ( !DTWAIN_IsFileXferSupported(tempSource, DTWAIN_ANYSUPPORT))
@@ -488,7 +500,6 @@ void SetCaptionToSourceName()
 void GenericAcquire(LONG nWhichOne)
 {
     LONG ErrStatus;
-    g_AcquireArray = DTWAIN_CreateAcquisitionArray();
     /* Disable main window */
     DTWAIN_DisableAppWindow(g_hWnd, TRUE);
 
@@ -503,6 +514,7 @@ void GenericAcquire(LONG nWhichOne)
 
     BOOL bRet = FALSE;
     EnableSourceItems(FALSE);
+    g_AcquireArray = DTWAIN_CreateAcquisitionArray();
     if (nWhichOne == 0)
     {
         bRet = DTWAIN_AcquireNativeEx(
@@ -562,7 +574,6 @@ void AcquireBuffered()
 {
     GenericAcquire(1);
 }
-
 
 void AcquireFile(BOOL bUseSource)
 {
@@ -703,6 +714,11 @@ DTWAIN_SOURCE DisplayGetNameDlg()
 void DisplayCustomLangDlg()
 {
     DialogBox(g_hInstance, (LPCTSTR)IDD_dlgEnterCustomLangName, g_hWnd, (DLGPROC)EnterCustomLangNameProc);
+}
+
+void DisplayBarCodeInfo()
+{
+    DialogBox(g_hInstance, (LPCTSTR)IDD_dlgBarCodes, g_hWnd, (DLGPROC)DisplayBarCodeInfoProc);
 }
 
 DTWAIN_SOURCE DisplayCustomDlg()
@@ -913,6 +929,122 @@ LRESULT CALLBACK DisplayLoggingProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
                     EndDialog(hDlg, LOWORD(wParam));
                     return TRUE;
                     break;
+            }
+        }
+        break;
+    }
+    return FALSE;
+}
+
+LRESULT CALLBACK DisplayBarCodeInfoProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+        case WM_INITDIALOG:
+        {
+            memset(szBarCodeText, 0, sizeof(szBarCodeText));
+
+            /* Start the extended information for reporting of barcodes */
+            BOOL bOk = DTWAIN_InitExtImageInfo(g_CurrentSource);
+            if ( !bOk )
+            {
+                /* No Extended Info, or there was an error */
+                EndDialog(hDlg, 0);
+                return FALSE;
+            }
+
+            HWND hWndBarCodes = GetDlgItem(hDlg, IDC_edBarCodes);
+            char* pOrigText = szBarCodeText;
+            char oneText[256];
+            DTWAIN_ARRAY aText;
+            DTWAIN_ARRAY aType;
+            DTWAIN_ARRAY aCount;
+
+            /* Get the bar code count */
+            bOk = DTWAIN_GetExtImageInfoData(g_CurrentSource, TWEI_BARCODECOUNT, &aCount);
+
+            if (bOk && aCount && DTWAIN_ArrayGetCount(aCount) > 0)
+            {
+                LONG barCount;
+                DTWAIN_ArrayGetAtLong(aCount, 0, &barCount);
+                DTWAIN_ArrayDestroy(aCount);
+                if (barCount == 0)
+                {
+                    EndDialog(hDlg, 0);
+
+                    /* Release the memory */
+                    DTWAIN_FreeExtImageInfo(g_CurrentSource);
+                    return FALSE;
+                }
+                int nChars = wsprintfA(pOrigText, "Bar Code Count: %d\r\n\r\n", barCount);
+                pOrigText += nChars;
+
+                /* Get the bar code text, and the bar code type */
+                bOk = DTWAIN_GetExtImageInfoData(g_CurrentSource, TWEI_BARCODETEXT, &aText);
+                bOk = DTWAIN_GetExtImageInfoData(g_CurrentSource, TWEI_BARCODETYPE, &aType);
+                LONG totalChars = 0;
+                if (bOk)
+                {
+                    LONG i;
+                    for (i = 0; i < barCount; ++i)
+                    {
+                        nChars = wsprintfA(pOrigText, "Bar Code %d:\r\n", i + 1);
+                        pOrigText += nChars;
+                        totalChars += nChars;
+                        if (totalChars >= 100000)
+                            break;
+
+                        /* Get the bar code text associated with bar code i + 1 */
+                        const char *oneString = DTWAIN_ArrayGetAtANSIStringPtr(aText, i);
+                        nChars = wsprintfA(pOrigText, "     Text: %s\r\n", oneString);
+                        pOrigText += nChars;
+                        totalChars += nChars;
+                        if (totalChars >= 100000)
+                            break;
+                        LONG nType = 0;
+                        DTWAIN_ArrayGetAtLong(aType, i, &nType);
+                        char szType[100];
+
+                        /* Translate the bar code type to a string defined by the TWAIN specification*/
+                        DTWAIN_GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWBT, nType, szType, 100);
+                        nChars = wsprintfA(pOrigText, "     Type: %s\r\n\r\n", szType);
+                        totalChars += nChars;
+                        if (totalChars >= 100000)
+                            break;
+                        pOrigText += nChars;
+                    }
+
+                    /* Set the edit control to the text */
+                    SendMessageA(hWndBarCodes, WM_SETTEXT, 0, (LPARAM)szBarCodeText);
+                }
+                DTWAIN_ArrayDestroy(aText);
+                DTWAIN_ArrayDestroy(aType);
+            }
+            else
+            {
+                MessageBoxA(NULL, "No Barcodes available.  Source does not support TWEI_BARCODECOUNT or barcode count is 0.", "Barcode error", MB_OK);
+                EndDialog(hDlg, 0);
+                DTWAIN_FreeExtImageInfo(g_CurrentSource);
+                return FALSE;
+            }
+            DTWAIN_FreeExtImageInfo(g_CurrentSource);
+            return TRUE;
+        }
+        break;
+        case WM_COMMAND:
+        {
+            int nControl = LOWORD(wParam);
+            int nNotification = HIWORD(wParam);
+
+            switch (nControl)
+            {
+                /* Quit the dialog */
+            case IDOK:
+            case IDCANCEL:
+            {
+                EndDialog(hDlg, 1);
+            }
+            break;
             }
         }
         break;
@@ -1347,6 +1479,13 @@ LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserDa
 			pdf_page_count = 1;
         break;
 
+        case DTWAIN_TN_TRANSFERDONE:
+        {
+            BOOL showBarCodes = GetToggleMenuState(IDM_SHOW_BARCODEINFO);
+            if (showBarCodes)
+                DisplayBarCodeInfo();
+        }
+        break;
 		/* See if we want to keep the DIB */
 		case DTWAIN_TN_QUERYPAGEDISCARD:
 		{
