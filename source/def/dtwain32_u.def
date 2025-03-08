@@ -1075,3 +1075,4 @@ DTWAIN_GetFileCompressionType                     @31074
 DTWAIN_SetFileCompressionType                     @31075
 DTWAIN_AllocateMemory64                           @31076
 DTWAIN_GetExtImageInfoItemEx                      @31077
+DTWAIN_EnumSupportedExtImageInfo                  @31078

@@ -470,10 +470,16 @@ namespace dynarithmic
         bool         CloseSource(bool bForce);
         const std::vector<int>& GetSupportedTransferMechanisms() const { return m_aTransferMechanisms; }
         const std::vector<TW_UINT32>& GetSupportedDATS() const { return m_aSupportedDATS; }
+        const std::vector<LONG>& GetSupportedExtImageInfos() const { return m_aSupportedExtImageInfos; }
+        bool         IsSupportedExtImageInfoCap() const { return m_bSupportedExtImageInfo; }
+        void         SetSupportedExtImageInfoCap(bool bSet) { m_bSupportedExtImageInfo = bSet; }
+
         void         SetSupportedTransferMechanisms(const std::vector<int>& aTransferMechanisms)
                             { m_aTransferMechanisms = aTransferMechanisms; }
         void         SetSupportedDATS(const std::vector<TW_UINT32>& aSupportedDATS)
                             { m_aSupportedDATS = aSupportedDATS; }
+        void         SetSupportedExtImageInfos(const std::vector<LONG>& aSupportedExtImageInfos) 
+                            { m_aSupportedExtImageInfos = aSupportedExtImageInfos; }
         void         SetDoublePageCountOnDuplex(bool bSet) { m_bDoublePageCountOnDuplex = bSet; }
         bool         IsDoublePageCountOnDuplex() const { return m_bDoublePageCountOnDuplex; }
         CapList&     GetCustomCapCache() { return m_aSupportedCustomCapCache; }
@@ -626,6 +632,7 @@ namespace dynarithmic
         bool            m_bTileMode;
         std::vector<int> m_aTransferMechanisms;
         std::vector<TW_UINT32> m_aSupportedDATS;
+        std::vector<LONG> m_aSupportedExtImageInfos;
         bool            m_bExtendedCapsRetrieved;
         bool            m_bShutdownAcquire;
         bool            m_bUsePeekMessage;
@@ -687,6 +694,7 @@ namespace dynarithmic
         TWAINCompliancyTester m_TwainCompliancy;
         bool    m_bImageInfoRetrieved;
         bool    m_bExtendedImageInfoSupported;
+        bool    m_bSupportedExtImageInfo;
         bool    m_bSupportedCustomCapsRetrieved;
     };
 }

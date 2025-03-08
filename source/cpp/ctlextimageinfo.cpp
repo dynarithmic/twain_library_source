@@ -110,9 +110,58 @@ static constexpr std::array<TW_UINT16, 81> aRequiredTypeMatches = {TWEI_BARCODEC
                                                                    TWEI_BARCODETEXT2,
                                                                    TWEI_PATCHCODE };
 
-/* Return all the supported ExtImageInfo types.  This function is useful if your app
-   wants to know what types of Extended Image Information is supported by the Source.
-   This function does not need DTWAIN_InitExtImageInfo to execute correctly.  */
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedExtImageInfo(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, Array))
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+    CTL_ITwainSource* pS = pSource;
+    CTL_TwainDLLHandle* pH = pHandle;
+    // We clear the user array here, since we do not want to 
+    // report information back to user if capability is not supported
+    bool bArrayExists = pHandle->m_ArrayFactory->is_valid(*Array);
+    if (bArrayExists)
+        pHandle->m_ArrayFactory->clear(*Array);
+
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pS->IsExtendedImageInfoSupported(); },
+                                        DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO);
+    if (!pS->IsSupportedExtImageInfoCap())
+    {
+        // This is done for TWAIN 1.x sources or 2.x sources that do not have the ICAP_SUPPORTEDEXTIMAGEINFO
+        // capability (but do have the ICAP_EXTIMAGEINFO available).
+        // Note that for sources that do not have ICAP_SUPPORTEDEXTIMAGEINFO, the retrieval of
+        // the Extended Image Info types must be done in State 7, thus the available ext image info
+        // items can change, depending on various criteria while the source is transferring images.
+
+        // Enumerate the types now
+        DTWAIN_EnumExtImageInfoTypes(Source, Array);
+
+        // If there is an issue with reporting the types, must return error
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pH->m_lLastError != DTWAIN_NO_ERROR; },
+                                          pH->m_lLastError, false, FUNC_MACRO);
+
+        // Set the types supported into the Source object.
+        pS->SetSupportedExtImageInfos(CreateContainerFromArray<std::vector<LONG>>(pHandle, Array));
+    }
+    else
+    {
+        // The source supports ICAP_SUPPORTEDEXTIMAGEINFO, so we are ok in just returning the
+        // cached list of supported TWEI_x values.
+        auto& vVect = pS->GetSupportedExtImageInfos();
+        DTWAIN_ARRAY ThisArray = CreateArrayFromContainer<std::vector<LONG>>(pHandle, vVect);
+        dynarithmic::AssignArray(pHandle, Array, &ThisArray);
+    }
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK(false)
+}
+
+ //  Return all the supported ExtImageInfo types.  This function is useful if your app
+ //  wants to know what types of Extended Image Information is supported by the Source.
+ //  This function does not need DTWAIN_InitExtImageInfo to execute correctly.  
+ //  
+ //  Note that this function checks if the source is in state 7 (transferring).
+ //  If you want to know the ext image types outside of state 7, you must call
+ //  DTWAIN_EnumSupportedExtImageInfo() on a source that supports the ICAP_SUPPORTEDEXTIMAGEINFO
+ //  capability.
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Array))
@@ -151,6 +200,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDT
         dynarithmic::AssignArray(pHandle, Array, &ThisArray);
         return TRUE;
     }
+    else
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_EXTIMAGEINFO_RETRIEVAL, false, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(false)
     CATCH_BLOCK(false)
 }
