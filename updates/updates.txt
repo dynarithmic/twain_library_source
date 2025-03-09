@@ -5,14 +5,23 @@ DTWAIN Version changes
 - Fix potential exception from occurring when attempting to close a TWAIN source that did not 
   open successfully.
 
-Low Level Changes: These changes should be only used by programmers who are utilizing the 
-DTWAIN_CallDSMProc() interface to call through to the Data Source Manager directly, and the call
-requires the application to allocate memory for the triplet call.
+- Update DTWDEMO program to show bar code information while transferring images.
 
-    - Change parameters to DTWAIN_AllocateMemory() and DTWAIN_AllocateMemoryEx() to unsigned integers.
+- Add DTWAIN_EnumSupportedExtImageInfo() function that returns a DTWAIN_ARRAY of the
+  supported TWEI_* extended image info types that the TWAIN source supports.  
 
-    - Add DTWAIN_AllocateMemory64() to allow allocation of memory greater than 4 GB.
+  Note that this function can be called even if the Source is not acquiring images, provided
+  that the Source is TWAIN 2.1 compliant.  If the source is not at least TWAIN 2.1 compliant,
+  DTWAIN_EnumSupportedExtImageInfo() can only report the TWEI_* types when acquiring images
+  (State 7 or when the DTWAIN_TN_TRANSFERDONE notification is sent to the application).
 
+- Low Level Changes: These changes should be only used by programmers who are utilizing the 
+  DTWAIN_CallDSMProc() interface to call through to the Data Source Manager directly, and the call
+  requires the application to allocate memory for the triplet call.
+
+     - Change parameters to DTWAIN_AllocateMemory() and DTWAIN_AllocateMemoryEx() to unsigned integers.
+
+     - Add DTWAIN_AllocateMemory64() to allow allocation of memory greater than 4 GB.
 
 
 5.6.1
