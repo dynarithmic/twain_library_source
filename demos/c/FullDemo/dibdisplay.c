@@ -150,7 +150,6 @@ LRESULT CALLBACK DisplayDIBProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
             else
                 MessageBox(hDlg, _T("Image was discarded or not available"), _T("Image not available"), MB_OK);
 
-            /* Enable/Disabe Next, Prev buttons */
             nCurrentAcquisition = 0;
 
             if (!DisplayOne)

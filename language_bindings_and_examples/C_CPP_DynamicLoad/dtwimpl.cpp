@@ -294,6 +294,7 @@
     D_ENUMSUPPORTEDCAPSEX2FUNC                                        DYNDTWAIN_API::DTWAIN_EnumSupportedCapsEx2 = nullptr;
     D_ENUMSUPPORTEDCAPSEXFUNC                                         DYNDTWAIN_API::DTWAIN_EnumSupportedCapsEx = nullptr;
     D_ENUMSUPPORTEDCAPSFUNC                                           DYNDTWAIN_API::DTWAIN_EnumSupportedCaps = nullptr;
+    D_ENUMSUPPORTEDEXTIMAGEINFOFUNC                                   DYNDTWAIN_API::DTWAIN_EnumSupportedExtImageInfo = nullptr;
     D_ENUMSUPPORTEDMULTIPAGEFILETYPES                                 DYNDTWAIN_API::DTWAIN_EnumSupportedMultiPageFileTypes = nullptr;
     D_ENUMSUPPORTEDSINGLEPAGEFILETYPES                                DYNDTWAIN_API::DTWAIN_EnumSupportedSinglePageFileTypes = nullptr;
     D_ENUMTHRESHOLDVALUESEXFUNC                                       DYNDTWAIN_API::DTWAIN_EnumThresholdValuesEx = nullptr;
@@ -1371,6 +1372,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_EnumSupportedCaps, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumSupportedCapsEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumSupportedCapsEx2, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_EnumSupportedExtImageInfo, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumSupportedMultiPageFileTypes, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumSupportedSinglePageFileTypes, hModule);
           LOADFUNCTIONIMPL(DTWAIN_EnumThresholdValues, hModule);

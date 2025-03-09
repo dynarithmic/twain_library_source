@@ -874,6 +874,7 @@ const
   DTWAIN_ERR_XFERMECH_COMPLIANCY       = (-1081);
   DTWAIN_ERR_STANDARDCAPS_COMPLIANCY   = (-1082);
   DTWAIN_ERR_EXTIMAGEINFO_DATATYPE_MISMATCH = (-1083);
+  DTWAIN_ERR_EXTIMAGEINFO_RETRIEVAL = (-1084);
 
   TWAIN_ERR_LOW_MEMORY = (-1100);
   TWAIN_ERR_FALSE_ALARM = (-1101);
@@ -2811,6 +2812,7 @@ function DTWAIN_SetFileCompressionType(Source:DTWAIN_SOURCE; FileType:LONG; bIsC
 
 function DTWAIN_AllocateMemory64(nBytes:UInt64):DTWAIN_HANDLE; external 'dtwain64d.dll' name 'DTWAIN_AllocateMemory64';
 function DTWAIN_GetExtImageInfoItemEx(Source:DTWAIN_SOURCE; nWhich:LONG; InfoID:LPLONG; NumItems:LPLONG; DataType:LPLONG; ReturnCode:LPLONG):BOOL; external 'dtwain64d.dll' name 'DTWAIN_GetExtImageInfoItemEx'; 
+function DTWAIN_EnumSupportedExtImageInfo(Source:DTWAIN_SOURCE; pArray:LPDTWAIN_ARRAY):BOOL; external 'dtwain64d.dll'   name 'DTWAIN_EnumSupportedExtImageInfo';
 
 implementation
 

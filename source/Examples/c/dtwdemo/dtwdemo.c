@@ -456,7 +456,6 @@ void SelectTheSource(int nWhich)
     {
         if ( DTWAIN_OpenSource(tempSource) )
         {
-            DTWAIN_ARRAY aExt;
             if ( !DTWAIN_IsExtImageInfoSupported(tempSource) )
                 EnableMenuItem(g_Menu, IDM_SHOW_BARCODEINFO, MF_BYCOMMAND | MF_GRAYED);
             else
@@ -955,7 +954,6 @@ LRESULT CALLBACK DisplayBarCodeInfoProc(HWND hDlg, UINT message, WPARAM wParam, 
 
             HWND hWndBarCodes = GetDlgItem(hDlg, IDC_edBarCodes);
             char* pOrigText = szBarCodeText;
-            char oneText[256];
             DTWAIN_ARRAY aText;
             DTWAIN_ARRAY aType;
             DTWAIN_ARRAY aCount;
