@@ -836,6 +836,7 @@ namespace Dynarithmic
         public const int DTWAIN_ERR_XFERMECH_COMPLIANCY       = (-1081);
         public const int DTWAIN_ERR_STANDARDCAPS_COMPLIANCY   = (-1082);
         public const int DTWAIN_ERR_EXTIMAGEINFO_DATATYPE_MISMATCH = (-1083);
+        public const int DTWAIN_ERR_EXTIMAGEINFO_RETRIEVAL = (-1084);
 
         public const  int TWAIN_ERR_LOW_MEMORY = (-1100);
         public const  int TWAIN_ERR_FALSE_ALARM = (-1101);
@@ -6102,5 +6103,9 @@ namespace Dynarithmic
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
         ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_GetExtImageInfoItemEx(DTWAIN_SOURCE Source, LONG nWhich, ref LONG InfoID, ref LONG NumItems, ref LONG Type, ref LONG ReturnCode);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern  int DTWAIN_EnumSupportedExtImageInfo(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
     }
 }

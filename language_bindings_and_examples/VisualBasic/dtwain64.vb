@@ -780,6 +780,7 @@ Class DTWAINAPI
     Public Const DTWAIN_ERR_XFERMECH_COMPLIANCY      As Integer = (-1081)
     Public Const DTWAIN_ERR_STANDARDCAPS_COMPLIANCY  As Integer = (-1082)
     Public Const DTWAIN_ERR_EXTIMAGEINFO_DATATYPE_MISMATCH As Integer = (-1083)
+    Public Const DTWAIN_ERR_EXTIMAGEINFO_RETRIEVAL As Integer = (-1084)
 
     Public Const TWAIN_ERR_LOW_MEMORY As Integer = (-1100)
     Public Const TWAIN_ERR_FALSE_ALARM As Integer = (-1101)
@@ -2820,4 +2821,6 @@ Class DTWAINAPI
 
     Declare Auto Function DTWAIN_AllocateMemory64 Lib "dtwain64.dll" (nBytes As System.UInt64) As System.IntPtr
     Declare Auto Function DTWAIN_GetExtImageInfoItemEx Lib "dtwain64.dll" (Source As System.IntPtr, nWhich As Integer, InfoID As Integer, ByRef NumItems As Integer, ByRef ItemType As Integer, ByRef ReturnCode As Integer) As Integer
+    Declare Auto Function DTWAIN_EnumSupportedExtImageInfo Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
+
 End Class
