@@ -1076,3 +1076,7 @@ DTWAIN_SetFileCompressionType                     @31075
 DTWAIN_AllocateMemory64                           @31076
 DTWAIN_GetExtImageInfoItemEx                      @31077
 DTWAIN_EnumSupportedExtImageInfo                  @31078
+DTWAIN_ArrayAddFrameN                             @31079 
+DTWAIN_ArrayAddFrame                              @31080
+DTWAIN_ArrayInsertAtFrameN                        @31081
+DTWAIN_ArrayInsertAtFrame                         @31082
