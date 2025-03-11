@@ -305,7 +305,7 @@ DTWAIN_ARRAY dynarithmic::CreateArrayFromFactory(CTL_TwainDLLHandle* pHandle, LO
     if (nEnumType == DTWAIN_ARRAYFRAME)
     {
         DTWAIN_ARRAY frameArray = pHandle->m_ArrayFactory->create_frame(0, 0, 0, 0);
-        if (frameArray && (nInitialSize > 1))
+        if (frameArray)
         {
             auto& vect = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(frameArray);
             vect.resize(nInitialSize);
@@ -2112,6 +2112,22 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayFrameSetAt(DTWAIN_ARRAY FrameArray, LONG nW
         theFrame = TwainFrameInternal(left, top, right, bottom);
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK(false)
+}
+
+DTWAIN_FRAME DLLENTRY_DEF DTWAIN_ArrayGetAtFrame(DTWAIN_ARRAY FrameArray, LONG nWhere)
+{
+    LOG_FUNC_ENTRY_PARAMS((FrameArray, nWhere))
+    auto val = DTWAIN_ArrayFrameGetFrameAt(FrameArray, nWhere);
+    LOG_FUNC_EXIT_NONAME_PARAMS(val)
+    CATCH_BLOCK(DTWAIN_ARRAY(NULL))
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFrame(DTWAIN_ARRAY FrameArray, LONG nWhere, DTWAIN_FRAME theFrame)
+{
+    LOG_FUNC_ENTRY_PARAMS((FrameArray, nWhere, theFrame))
+    auto val = DTWAIN_ArrayFrameSetFrameAt(FrameArray, nWhere, theFrame);
+    LOG_FUNC_EXIT_NONAME_PARAMS(val)
     CATCH_BLOCK(false)
 }
 
