@@ -97,6 +97,7 @@
 1081 Fallimento del test di conformità per ICAP_XFERMECH.  
 1082 Fallimento del test di conformità per le capacità standard.  
 1083 Incongruenza del tipo di informazione sull'immagine estesa. Fallimento di conformità TWAIN.  
+1084 Errore nel recuperare informazioni estese sull'immagine.
 1100 TWAIN Condizione non Cifri: non finendo operazione.   Insufficiente Memoria.
 1101 TWAIN Condizione Codice: Errore
 1102 TWAIN Condiziona Codice: Unknown causa di fallimento
