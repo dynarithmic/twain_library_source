@@ -147,7 +147,7 @@ namespace dynarithmic
                     }
                     else
                     {
-                        curObject->m_text = get_text_from_info(aDTwainArrays[barcode_info::TEXT_SUPPORTED], curInfo);
+                        curObject->m_text = get_text_from_info(aDTwainArrays[barcode_info::TEXT_SUPPORTED], static_cast<int>(curInfo));
                     }
                 }
             }
@@ -426,12 +426,12 @@ namespace dynarithmic
             filllinedetection_info(TWEI_VERTLINECOUNT,
                 { TWEI_VERTLINEXCOORD, TWEI_VERTLINEYCOORD, TWEI_VERTLINELENGTH, TWEI_VERTLINETHICKNESS },
                   m_linedetectionInfo.m_vVerticalLineInfos);
-            m_linedetectionInfo.set_vertical_count(m_linedetectionInfo.m_vVerticalLineInfos.size());
+            m_linedetectionInfo.set_vertical_count(static_cast<uint32_t>(m_linedetectionInfo.m_vVerticalLineInfos.size()));
 
             filllinedetection_info(TWEI_HORZLINECOUNT,
                 { TWEI_HORZLINEXCOORD, TWEI_HORZLINEYCOORD, TWEI_HORZLINELENGTH, TWEI_HORZLINETHICKNESS },
                  m_linedetectionInfo.m_vHorizontalLineInfos);
-            m_linedetectionInfo.set_horizontal_count(m_linedetectionInfo.m_vHorizontalLineInfos.size());
+            m_linedetectionInfo.set_horizontal_count(static_cast<uint32_t>(m_linedetectionInfo.m_vHorizontalLineInfos.size()));
         }
 
         void extendedimage_info::filllinedetection_info(int nWhichLineInfo, const std::vector<int>& lineInfos,
