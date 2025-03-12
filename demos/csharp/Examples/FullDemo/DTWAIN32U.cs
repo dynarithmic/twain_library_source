@@ -6107,5 +6107,29 @@ namespace Dynarithmic
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
         ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern  int DTWAIN_EnumSupportedExtImageInfo(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern  int DTWAIN_ArrayAddFrameN(DTWAIN_ARRAY pArray, DTWAIN_FRAME theFrame, LONG num);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern  int DTWAIN_ArrayAddFrame(DTWAIN_ARRAY pArray, DTWAIN_FRAME theFrame);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern  int DTWAIN_ArrayInsertAtFrameN(DTWAIN_ARRAY pArray, LONG insertPoint, DTWAIN_FRAME theFrame, LONG num);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern  int DTWAIN_ArrayInsertAtFrame(DTWAIN_ARRAY pArray, LONG insertPoint, DTWAIN_FRAME theFrame);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern DTWAIN_FRAME DTWAIN_ArrayGetAtFrame(DTWAIN_ARRAY pArray, LONG nWhere);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
+        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_ArraySetAtFrame(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_FRAME theFrame);
     }
 }

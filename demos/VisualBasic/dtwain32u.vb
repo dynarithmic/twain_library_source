@@ -2823,4 +2823,10 @@ Class DTWAINAPI
     Declare Auto Function DTWAIN_GetExtImageInfoItemEx Lib "dtwain32u.dll" (Source As System.IntPtr, nWhich As Integer, InfoID As Integer, ByRef NumItems As Integer, ByRef ItemType As Integer, ByRef ReturnCode As Integer) As Integer
     Declare Auto Function DTWAIN_EnumSupportedExtImageInfo Lib "dtwain32u.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
 
+    Declare Auto Function DTWAIN_ArrayAddFrameN Lib "dtwain32u.dll" (theArray As System.IntPtr, theFrame As System.IntPtr, NumCopies As Integer) As Integer
+    Declare Auto Function DTWAIN_ArrayAddFrame Lib "dtwain32u.dll" (theArray As System.IntPtr, theFrame As System.IntPtr) As Integer
+    Declare Auto Function DTWAIN_ArrayInsertAtFrameN Lib "dtwain32u.dll" (theArray As System.IntPtr, InsertPoint As Integer, theFrame As System.IntPtr, NumCopies As Integer) As Integer
+    Declare Auto Function DTWAIN_ArrayInsertAtFrame Lib "dtwain32u.dll" (theArray As System.IntPtr, InsertPoint As Integer, theFrame As System.IntPtr) As Integer
+    Declare Auto Function DTWAIN_ArrayGetAtFrame Lib "dtwain32u.dll" (theArray As System.IntPtr, nWhere As Integer) As System.IntPtr
+    Declare Auto Function DTWAIN_ArraySetAtFrame Lib "dtwain32u.dll" (theArray As System.IntPtr, nWhere As Integer, theFrame As System.IntPtr) As Integer
 End Class

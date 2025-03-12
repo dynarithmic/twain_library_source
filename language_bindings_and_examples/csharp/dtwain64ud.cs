@@ -5014,7 +5014,7 @@ namespace Dynarithmic
         public static extern int DTWAIN_SetFileCompressionType(DTWAIN_SOURCE Source, int lCompression);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
-        public static extern DTWAIN_HANDLE DTWAIN_AllocateMemory64(UINT64 nBytes);
+        public static extern DTWAIN_HANDLE DTWAIN_AllocateMemory64(ULONG64 nBytes);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
         public static extern int DTWAIN_GetExtImageInfoItemEx(DTWAIN_SOURCE Source, LONG nWhich, ref LONG InfoID, ref LONG NumItems, ref LONG Type, ref LONG ReturnCode);
@@ -5022,5 +5022,22 @@ namespace Dynarithmic
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
         public static extern  int DTWAIN_EnumSupportedExtImageInfo(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
 
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
+        public static extern  int DTWAIN_ArrayAddFrameN(DTWAIN_ARRAY pArray, DTWAIN_FRAME theFrame, LONG num);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
+        public static extern  int DTWAIN_ArrayAddFrame(DTWAIN_ARRAY pArray, DTWAIN_FRAME theFrame);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
+        public static extern  int DTWAIN_ArrayInsertAtFrameN(DTWAIN_ARRAY pArray, LONG insertPoint, DTWAIN_FRAME theFrame, LONG num);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
+        public static extern  int DTWAIN_ArrayInsertAtFrame(DTWAIN_ARRAY pArray, LONG insertPoint, DTWAIN_FRAME theFrame);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
+        public static extern DTWAIN_FRAME DTWAIN_ArrayGetAtFrame(DTWAIN_ARRAY pArray, LONG nWhere);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
+        public static extern int DTWAIN_ArraySetAtFrame(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_FRAME theFrame);
     }
 }
