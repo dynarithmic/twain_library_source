@@ -47,7 +47,7 @@ type
   DTWAIN_DIBUPDATE_PROC = Pointer;
   DTWAIN_LOGGER_PROC = Pointer;
   DWORD = UInt32;
-  BOOL = LongBool;
+  BOOL = LONG;
   PBOOL = ^BOOL;
   PByte = ^Byte;
   PINT = ^Integer;
@@ -2193,7 +2193,6 @@ function DTWAIN_GetJpegValues(Source:DTWAIN_SOURCE; pQuality:LPLONG; Progressive
 function DTWAIN_GetLanguage:LONG; external 'dtwain64.dll'   name 'DTWAIN_GetLanguage';
 function DTWAIN_GetLastError:LONG; external 'dtwain64.dll'   name 'DTWAIN_GetLastError';
 function DTWAIN_GetLibraryPath(lpszPath:LPTSTR; nLength:LONG):LONG;overload; external 'dtwain64.dll'   name 'DTWAIN_GetLibraryPath';
-function DTWAIN_GetLibraryPath(sz:LPWSTR; nLength:LONG):LONG;overload; external 'dtwain64.dll'   name 'DTWAIN_GetLibraryPath';
 function DTWAIN_GetLibraryPathA(lpszPath:LPSTR; nLength:LONG):LONG;overload; external 'dtwain64.dll'   name 'DTWAIN_GetLibraryPathA';
 function DTWAIN_GetLibraryPathW(lpszPathr:LPWSTR; nLength:LONG):LONG;overload; external 'dtwain64.dll'   name 'DTWAIN_GetLibraryPathW';
 function DTWAIN_GetLightPath(Source:DTWAIN_SOURCE; lpLightPath:LPLONG):BOOL; external 'dtwain64.dll'   name 'DTWAIN_GetLightPath';
