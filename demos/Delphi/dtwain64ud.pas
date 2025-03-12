@@ -2814,6 +2814,13 @@ function DTWAIN_AllocateMemory64(nBytes:UInt64):DTWAIN_HANDLE; external 'dtwain6
 function DTWAIN_GetExtImageInfoItemEx(Source:DTWAIN_SOURCE; nWhich:LONG; InfoID:LPLONG; NumItems:LPLONG; DataType:LPLONG; ReturnCode:LPLONG):BOOL; external 'dtwain64ud.dll' name 'DTWAIN_GetExtImageInfoItemEx'; 
 function DTWAIN_EnumSupportedExtImageInfo(Source:DTWAIN_SOURCE; pArray:LPDTWAIN_ARRAY):BOOL; external 'dtwain64ud.dll'   name 'DTWAIN_EnumSupportedExtImageInfo';
 
+function DTWAIN_ArrayAddFrameN(pArray:DTWAIN_ARRAY; theFrame:DTWAIN_FRAME; num:LONG):LONG;  external 'dtwain64ud.dll' name 'DTWAIN_ArrayAddFrameN'; 
+function DTWAIN_ArrayAddFrame(pArray:DTWAIN_ARRAY; theFrame:DTWAIN_FRAME):LONG;  external 'dtwain64ud.dll' name 'DTWAIN_ArrayAddFrame'; 
+function DTWAIN_ArrayInsertAtFrameN(pArray:DTWAIN_ARRAY; insertPoint:LONG; theFrame:DTWAIN_FRAME; num:LONG):LONG;  external 'dtwain64ud.dll' name 'DTWAIN_ArrayInsertAtFrameN'; 
+function DTWAIN_ArrayInsertAtFrame(pArray:DTWAIN_ARRAY; insertPoint:LONG; theFrame:DTWAIN_FRAME):LONG;  external 'dtwain64ud.dll' name 'DTWAIN_ArrayInsertAtFrame'; 
+function DTWAIN_ArrayGetAtFrame(pArray:DTWAIN_ARRAY; nWhere:LONG):DTWAIN_FRAME;  external 'dtwain64ud.dll' name 'DTWAIN_ArrayGetAtFrame'; 
+function DTWAIN_ArraySetAtFrame(pArray:DTWAIN_ARRAY; nWhere:LONG; theFrame:DTWAIN_FRAME):LONG;  external 'dtwain64ud.dll' name 'DTWAIN_ArraySetAtFrame'; 
+
 implementation
 
 end.
