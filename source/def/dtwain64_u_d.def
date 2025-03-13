@@ -1080,3 +1080,5 @@ DTWAIN_ArrayAddFrameN                             @31079
 DTWAIN_ArrayAddFrame                              @31080
 DTWAIN_ArrayInsertAtFrameN                        @31081
 DTWAIN_ArrayInsertAtFrame                         @31082
+DTWAIN_ArrayGetAtFrame                            @31083
+DTWAIN_ArraySetAtFrame                            @31084
