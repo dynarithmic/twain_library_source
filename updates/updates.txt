@@ -7,6 +7,12 @@ DTWAIN Version changes
 
 - Update DTWDEMO program to show bar code information while transferring images.
 
+- Fix issue with handling TW_FRAME values when issuing calls to DTWAIN_SetCapValues() and
+  DTWAIN_GetCapValues() that use TW_FRAME.
+
+- Update Delphi language binding to properly handle the BOOL data type when calling DTWAIN
+  functions that receive and return BOOL values.
+  
 - Add DTWAIN_EnumSupportedExtImageInfo() function that returns a DTWAIN_ARRAY of the
   supported TWEI_* extended image info types that the TWAIN source supports.  
 
