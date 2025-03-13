@@ -301,8 +301,8 @@
     D_ENUMSUPPORTEDCAPSEXFUNC                                         DYNDTWAIN_API::DTWAIN_EnumSupportedCapsEx = nullptr;
     D_ENUMSUPPORTEDCAPSFUNC                                           DYNDTWAIN_API::DTWAIN_EnumSupportedCaps = nullptr;
     D_ENUMSUPPORTEDEXTIMAGEINFOFUNC                                   DYNDTWAIN_API::DTWAIN_EnumSupportedExtImageInfo = nullptr;
-    D_ENUMSUPPORTEDMULTIPAGEFILETYPES                                 DYNDTWAIN_API::DTWAIN_EnumSupportedMultiPageFileTypes = nullptr;
-    D_ENUMSUPPORTEDSINGLEPAGEFILETYPES                                DYNDTWAIN_API::DTWAIN_EnumSupportedSinglePageFileTypes = nullptr;
+    D_ENUMSUPPORTEDMULTIPAGEFILETYPESFUNC                             DYNDTWAIN_API::DTWAIN_EnumSupportedMultiPageFileTypes = nullptr;
+    D_ENUMSUPPORTEDSINGLEPAGEFILETYPESFUNC                            DYNDTWAIN_API::DTWAIN_EnumSupportedSinglePageFileTypes = nullptr;
     D_ENUMTHRESHOLDVALUESEXFUNC                                       DYNDTWAIN_API::DTWAIN_EnumThresholdValuesEx = nullptr;
     D_ENUMTHRESHOLDVALUESFUNC                                         DYNDTWAIN_API::DTWAIN_EnumThresholdValues = nullptr;
     D_ENUMTOPCAMERASFUNC                                              DYNDTWAIN_API::DTWAIN_EnumTopCameras = nullptr;
