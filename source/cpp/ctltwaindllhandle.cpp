@@ -137,31 +137,33 @@ CTL_StaticDataStruct::CTL_StaticDataStruct() :
                 {INI_DSMERRORLOGGING_KEY,        "DSMErrorLogging"}}
              } {}
 
-std::string CTL_StaticData::GetTwainNameFromConstantA(int lConstantType, TwainConstantType lTwainConstant)
+std::pair<bool, std::string> CTL_StaticData::GetTwainNameFromConstantA(int lConstantType, TwainConstantType lTwainConstant)
 {
     // Get the map of constant types
     auto& constantsmap = CTL_StaticData::GetTwainConstantsMap();
     auto iter1 = constantsmap.find(lConstantType);
     if (iter1 == constantsmap.end())
-        return std::to_string(lTwainConstant);
+        return { false, std::to_string(lTwainConstant) };
 
     // Now get the map of the constant value(s)
     auto iter2 = iter1->second.find(lTwainConstant);
     if (iter2 == iter1->second.end())
-        return std::to_string(lTwainConstant);
+        return { false, std::to_string(lTwainConstant) };
 
     // Return the first constant name (the primary name)
-    return iter2->second.front();
+    return { true, iter2->second.front() };
 }
 
-CTL_StringType CTL_StaticData::GetTwainNameFromConstant(int lConstantType, TwainConstantType lTwainConstant)
+std::pair<bool, CTL_StringType> CTL_StaticData::GetTwainNameFromConstant(int lConstantType, TwainConstantType lTwainConstant)
 {
-    return StringConversion::Convert_Ansi_To_Native(CTL_StaticData::GetTwainNameFromConstantA(lConstantType, lTwainConstant));
+    auto pr = CTL_StaticData::GetTwainNameFromConstantA(lConstantType, lTwainConstant);
+    return { pr.first, StringConversion::Convert_Ansi_To_Native(pr.second) };
 }
 
-std::wstring CTL_StaticData::GetTwainNameFromConstantW(int lConstantType, TwainConstantType lTwainConstant)
+std::pair<bool, std::wstring> CTL_StaticData::GetTwainNameFromConstantW(int lConstantType, TwainConstantType lTwainConstant)
 {
-    return StringConversion::Convert_Ansi_To_Wide(CTL_StaticData::GetTwainNameFromConstantA(lConstantType, lTwainConstant));
+    auto pr = CTL_StaticData::GetTwainNameFromConstantA(lConstantType, lTwainConstant);
+    return { pr.first, StringConversion::Convert_Ansi_To_Wide(pr.second) };
 }
 
 CTL_LongToStringMap* CTL_StaticData::GetLanguageResource(const std::string& sLang)

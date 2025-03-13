@@ -509,7 +509,6 @@ FileSysRetType FSGetFile(CTL_ITwainSource* pSource, LPTSTR sDir, TW_MEMREF FSHan
 bool GetResults(CTL_ITwainSource* pSource, CTL_FileSystemTriplet* pFST, TW_UINT16 rc)
 {
     LOG_FUNC_ENTRY_PARAMS((pSource, pFST, rc))
-    const auto pSession = pSource->GetTwainSession();
     switch (rc)
     {
         case TWRC_SUCCESS:

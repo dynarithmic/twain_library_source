@@ -678,9 +678,9 @@ namespace dynarithmic
         static ImageResamplerMap& GetImageResamplerMap() { return s_StaticData.s_ImageResamplerMap; }
         static SourceStatusMap& GetSourceStatusMap() { return s_StaticData.s_SourceStatusMap;  }
         static CTL_StringType& GetResourceVersion() { return s_StaticData.s_ResourceVersion; }
-        static CTL_StringType GetTwainNameFromConstant(int lConstantType, TwainConstantType lTwainConstant);
-        static std::string GetTwainNameFromConstantA(int lConstantType, TwainConstantType lTwainConstant);
-        static std::wstring GetTwainNameFromConstantW(int lConstantType, TwainConstantType lTwainConstant);
+        static std::pair<bool, CTL_StringType> GetTwainNameFromConstant(int lConstantType, TwainConstantType lTwainConstant);
+        static std::pair<bool, std::string> GetTwainNameFromConstantA(int lConstantType, TwainConstantType lTwainConstant);
+        static std::pair<bool, std::wstring> GetTwainNameFromConstantW(int lConstantType, TwainConstantType lTwainConstant);
         static CTL_CallbackProcArray& GetCallbacks() { return s_StaticData.s_aAllCallbacks; }
         static auto& GetAppWindowsToDisable() { return s_StaticData.s_appWindowsToDisable; }
         static constexpr std::string_view GetINIKey(int nWhich) { return s_StaticData.s_aINIKeys[nWhich].second; }
@@ -1102,12 +1102,14 @@ namespace dynarithmic
         CTL_TwainDLLHandle* m_pHandle;
         ArrayType m_Array;
         bool m_bDestroy;
+        DTWAINArrayLowLevel_RAII_Impl() : m_pHandle{}, m_Array{}, m_bDestroy(true) {}
         DTWAINArrayLowLevel_RAII_Impl(CTL_TwainDLLHandle* pHandle, ArrayType a) : m_pHandle(pHandle), m_Array(a), m_bDestroy(true) {}
         void SetDestroy(bool bSet) { m_bDestroy = bSet; }
         void SetArray(ArrayType arr) { m_Array = arr; }
+        void SetHandle(CTL_TwainDLLHandle* pHandle) { m_pHandle = pHandle; }
         void Destroy()
         {
-            if (m_bDestroy && m_Array)
+            if (m_pHandle && m_bDestroy && m_Array)
             {
                 if constexpr (std::is_same_v<ArrayType, DTWAIN_ARRAY*>)
                     m_pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(*m_Array));

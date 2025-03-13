@@ -141,7 +141,7 @@ void CTL_CapabilitySetTripletBase::EncodeEnumValue(pTW_ENUMERATION pArray,
     if ( IsTwainStringType(pArray->ItemType) )
     {
         TW_STR1024 TempString = {0};
-        std::string *ptrString = reinterpret_cast<std::string*>(pData);
+        auto ptrString = static_cast<std::string*>(pData);
         std::copy(ptrString->begin(), ptrString->end(), TempString);
         memcpy(&pArray->ItemList[valuePos], TempString, dynarithmic::GetTwainItemSize( pArray->ItemType) );
     }

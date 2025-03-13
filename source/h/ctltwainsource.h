@@ -38,6 +38,7 @@
 #include "ctltwainidentity.h"
 #include "ctltwaincompliancy.h"
 #include "dtwain_anyutils.h"
+#include "extendedimageinfo.h"
 
 namespace dynarithmic
 {
@@ -81,6 +82,34 @@ namespace dynarithmic
              std::vector<sDuplexFileData> > DuplexData;
 
     using SourceCompressionMap = std::map<int, std::map<int, std::vector<LONG>>>;
+
+    struct AcquireFileStatus
+    {
+        private:
+            CTL_StringType  m_strAcquireFile;
+            CTL_StringType  m_strLastAcquiredFile;
+            CTL_StringType  m_ActualFileName;
+            long m_lFileFlags = 0;
+            long m_FileSavePageCount = 0;
+            CTL_TwainFileFormatEnum m_nFileFormat = TWAINFileFormat_Invalid;
+
+        public:
+            CTL_StringType GetAcquireFileName() const { return m_strAcquireFile; }
+            CTL_StringType& GetAcquireFileNameRef() { return m_strAcquireFile; }
+            CTL_StringType GetActualFileName() const { return m_ActualFileName; }
+            CTL_StringType& GetActualFileNameRef() { return m_ActualFileName; }
+            CTL_StringType GetLastAcquiredFileName() const { return m_strLastAcquiredFile; }
+            CTL_StringType& GetLastAcquiredFileNameRef() { return m_strLastAcquiredFile; }
+            void  SetActualFileName(CTL_StringType szFile) { m_ActualFileName = std::move(szFile); }
+            void  SetAcquireFileName(CTL_StringType szFile) { m_strAcquireFile = std::move(szFile); }
+            long  GetAcquireFileFlags() const { return m_lFileFlags; }
+            void  SetAcquireFileFlags(long lFileFlags) { m_lFileFlags = lFileFlags; }
+            void  SetFileSavePageCount(long pageCount) { m_FileSavePageCount = pageCount; }
+            long  GetFileSavePageCount() const { return m_FileSavePageCount; }
+            void  SetLastAcquiredFileName(CTL_StringType szFile) { m_strLastAcquiredFile = std::move(szFile); }
+            CTL_TwainFileFormatEnum GetAcquireFileFormat() const { return m_nFileFormat; }
+            void  SetAcquireFileFormat(CTL_TwainFileFormatEnum file_format) { m_nFileFormat = file_format; }
+    };
 
     class CTL_ITwainSource
     {
@@ -163,9 +192,6 @@ namespace dynarithmic
         bool         IsUIOpen() const { return m_bUIOpened; }
         void         SetUIOpenOnAcquire(bool bSet) { m_bUIOnAcquire = bSet; }
         bool         IsUIOpenOnAcquire() const { return m_bUIOnAcquire; }
-        void         SetAcquireFileType(CTL_TwainFileFormatEnum FileType)
-                                        { m_nFileAcquireType = FileType; }
-        CTL_TwainFileFormatEnum GetAcquireFileType() const { return m_nFileAcquireType; }
         void         Clone(const CTL_ITwainSource* pSource);
         void         SetActive(bool bSet);
         bool         IsActive() const;
@@ -190,13 +216,6 @@ namespace dynarithmic
         long         GetMaxAcquireCount() const { return m_nAcquireCount; }
         void         SetMaxAcquireCount(int nAcquire) { m_nAcquireCount = nAcquire; }
         CTL_TwainAcquireEnum  GetAcquireType() const { return m_AcquireType; }
-        CTL_StringType GetAcquireFile() const { return m_strAcquireFile; }
-        void         SetAcquireFile(CTL_StringType szFile) { m_strAcquireFile = std::move(szFile); }
-        long         GetAcquireFileFlags() const { return m_lFileFlags; }
-        void         SetAcquireFileFlags(long lFileFlags) { m_lFileFlags = lFileFlags; }
-        void         SetFileSavePageCount(long pageCount) { m_FileSavePageCount = pageCount;} 
-        long         GetFileSavePageCount() const { return m_FileSavePageCount; } 
-
         void         SetPendingImageNum( long nImageNum )
                      { m_nImageNum = nImageNum; }
         long         GetPendingImageNum() const { return m_nImageNum; }
@@ -221,7 +240,7 @@ namespace dynarithmic
         bool         IsAcquireAttempt() const { return m_bAcquireAttempt; }
         bool         IsSourceCompliant( CTL_EnumTwainVersion TVersion, CTL_TwainCapArray& rArray ) const;
         void         RemoveAllDibs() const;
-        CTL_StringType GetCurrentImageFileName(); // const;
+        CTL_StringType GetCurrentImageFileName(); 
         CTL_StringType GetImageFileName(int curFile=0) const;
         void         SetFileEnumerator(DTWAIN_ARRAY pDTWAINArray) { m_pFileEnumerator = pDTWAINArray; }
         DTWAIN_ARRAY GetFileEnumerator() const { return m_pFileEnumerator; }
@@ -351,8 +370,6 @@ namespace dynarithmic
 
         void         SetImagesStored(bool bSet=true) { m_bImagesStored = bSet; }
         bool         ImagesStored() const { return m_bImagesStored; }
-        CTL_StringType GetLastAcquiredFileName() const { return m_strLastAcquiredFile; }
-        void         SetLastAcquiredFileName(CTL_StringType sName) { m_strLastAcquiredFile = std::move(sName); }
         TW_FILESYSTEM*  GetFileSystem() { return &m_FileSystem; }
 
         // Extended image info functions
@@ -449,16 +466,20 @@ namespace dynarithmic
         void         ClearPDFText();
         bool         IsTwainVersion2() const { return m_bDSMVersion2; }
         void         SetTwainVersion2(bool bSet = true) { m_bDSMVersion2 = bSet;  }
-        void         SetActualFileName(CTL_StringType sName) { m_ActualFileName = std::move(sName);  }
-        CTL_StringType GetActualFileName() const { return m_ActualFileName;  }
         void         SetOpenFlag(bool bOpened) { m_bIsOpened = bOpened; }
         bool         CloseSource(bool bForce);
         const std::vector<int>& GetSupportedTransferMechanisms() const { return m_aTransferMechanisms; }
         const std::vector<TW_UINT32>& GetSupportedDATS() const { return m_aSupportedDATS; }
+        const std::vector<LONG>& GetSupportedExtImageInfos() const { return m_aSupportedExtImageInfos; }
+        bool         IsSupportedExtImageInfoCap() const { return m_bSupportedExtImageInfo; }
+        void         SetSupportedExtImageInfoCap(bool bSet) { m_bSupportedExtImageInfo = bSet; }
+
         void         SetSupportedTransferMechanisms(const std::vector<int>& aTransferMechanisms)
                             { m_aTransferMechanisms = aTransferMechanisms; }
         void         SetSupportedDATS(const std::vector<TW_UINT32>& aSupportedDATS)
                             { m_aSupportedDATS = aSupportedDATS; }
+        void         SetSupportedExtImageInfos(const std::vector<LONG>& aSupportedExtImageInfos) 
+                            { m_aSupportedExtImageInfos = aSupportedExtImageInfos; }
         void         SetDoublePageCountOnDuplex(bool bSet) { m_bDoublePageCountOnDuplex = bSet; }
         bool         IsDoublePageCountOnDuplex() const { return m_bDoublePageCountOnDuplex; }
         CapList&     GetCustomCapCache() { return m_aSupportedCustomCapCache; }
@@ -486,6 +507,9 @@ namespace dynarithmic
         bool        IsUsePeekMessage() const { return m_bUsePeekMessage;  }
         bool        IsTwainLoopStarted() const { return m_bTwainMsgLoopStarted; }
         void        SetTwainLoopStarted(bool bSet) { m_bTwainMsgLoopStarted = bSet; }
+        AcquireFileStatus& GetAcquireFileStatusRef() { return m_AcquireFileStatus; }
+        AcquireFileStatus GetAcquireFileStatus() const { return m_AcquireFileStatus; }
+        ExtendedImageInformation* GetExtendedImageInfo() { return m_pExtendedImageInformation.get(); }
         // Only public member
         void *      m_pUserPtr;
 
@@ -519,6 +543,7 @@ namespace dynarithmic
                 unsigned int UsePixelType:1;
             } CapCacheInfo;
 
+        AcquireFileStatus m_AcquireFileStatus;
         bool            m_bDSMVersion2;
         bool            m_bXferReadySent;
         bool            m_bIsOpened;
@@ -533,16 +558,11 @@ namespace dynarithmic
         bool            m_bUseFeeder;
         bool            m_bUseAutomaticSenseMediumEnabledMode;
         bool            m_bDibAutoDelete;
-        CTL_StringType  m_strAcquireFile;
-        CTL_StringType  m_strLastAcquiredFile;
-        CTL_StringType  m_ActualFileName;
         CTL_TwainAcquireEnum m_AcquireType;
         long            m_nImageNum;
         int             m_nCurDibPage;
         bool            m_bDeleteOnScan;
         bool            m_bUIOnAcquire;
-        CTL_TwainFileFormatEnum m_nFileAcquireType;
-        long            m_lFileFlags;
         bool            m_bAcquireAttempt;
         int             m_nAcquireCount;
         LONG_PTR        m_lAcquireNum;
@@ -612,10 +632,10 @@ namespace dynarithmic
         bool            m_bTileMode;
         std::vector<int> m_aTransferMechanisms;
         std::vector<TW_UINT32> m_aSupportedDATS;
+        std::vector<LONG> m_aSupportedExtImageInfos;
         bool            m_bExtendedCapsRetrieved;
         bool            m_bShutdownAcquire;
         bool            m_bUsePeekMessage;
-        long            m_FileSavePageCount;
         int             m_nLastAcquireError;
         bool            m_bTwainMsgLoopStarted;
         boost::logic::tribool m_tbIsFileSystemSupported;
@@ -666,6 +686,7 @@ namespace dynarithmic
         DTWAINImageInfoEx m_ImageInfoEx;
         TW_IMAGEMEMXFER* m_pImageMemXfer;
         std::unique_ptr<CTL_ExtImageInfoTriplet> m_pExtImageTriplet;
+        std::unique_ptr<ExtendedImageInformation> m_pExtendedImageInformation;
         TWINFOVector m_ExtImageVector;
         DTWAIN_ARRAY    m_PersistentArray;
         CapList    m_aExtendedCaps;
@@ -673,6 +694,7 @@ namespace dynarithmic
         TWAINCompliancyTester m_TwainCompliancy;
         bool    m_bImageInfoRetrieved;
         bool    m_bExtendedImageInfoSupported;
+        bool    m_bSupportedExtImageInfo;
         bool    m_bSupportedCustomCapsRetrieved;
     };
 }

@@ -173,7 +173,7 @@ LONG DLLENTRY_DEF DTWAIN_GetSavedFilesCount(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    LOG_FUNC_EXIT_NONAME_PARAMS(pSource->GetFileSavePageCount())
+    LOG_FUNC_EXIT_NONAME_PARAMS(pSource->GetAcquireFileStatusRef().GetFileSavePageCount())
     CATCH_BLOCK_LOG_PARAMS(-1)
 }
 
@@ -236,7 +236,7 @@ bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType
     const auto pHandle = pSource->GetDTWAINHandle();
 
     // Set the total file saving page count to 0
-    pSource->SetFileSavePageCount(0);
+    pSource->GetAcquireFileStatusRef().SetFileSavePageCount(0);
 
     bool bUsePrompt = opts.getFileFlags() & DTWAIN_USEPROMPT;
     if (!bUsePrompt)
