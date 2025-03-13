@@ -981,8 +981,8 @@ typedef DTWAIN_HANDLE (DLLENTRY_DEF * D_SYSINITIALIZEEX2FUNC)                   
 typedef DTWAIN_HANDLE (DLLENTRY_DEF * D_SYSINITIALIZELIBEXFUNC)                 (HINSTANCE, LPCTSTR);
 typedef DTWAIN_HANDLE (DLLENTRY_DEF * D_SYSINITIALIZELIBEX2FUNC)                (HINSTANCE, LPCTSTR, LPCTSTR, LPCTSTR);
 typedef LONG        (DLLENTRY_DEF * D_CALLDSMPROC)                              (DTWAIN_IDENTITY AppID, DTWAIN_IDENTITY SourceId, LONG lDG, LONG lDAT, LONG lMSG, LPVOID pData);
-typedef DTWAIN_ARRAY(DLLENTRY_DEF* D_ENUMSUPPORTEDSINGLEPAGEFILETYPES)          (VOID_PROTOTYPE);
-typedef DTWAIN_ARRAY(DLLENTRY_DEF* D_ENUMSUPPORTEDMULTIPAGEFILETYPES)           (VOID_PROTOTYPE);
+typedef DTWAIN_ARRAY(DLLENTRY_DEF* D_ENUMSUPPORTEDSINGLEPAGEFILETYPESFUNC)      (VOID_PROTOTYPE);
+typedef DTWAIN_ARRAY(DLLENTRY_DEF* D_ENUMSUPPORTEDMULTIPAGEFILETYPESFUNC)       (VOID_PROTOTYPE);
 typedef LONG        (DLLENTRY_DEF* D_GETTWAINNAMEFROMCONSTANT)                  (LONG, LONG, LPTSTR, LONG nSize);
 typedef LONG        (DLLENTRY_DEF* D_GETTWAINNAMEFROMCONSTANTA)                 (LONG, LONG, LPSTR, LONG nSize);
 typedef LONG        (DLLENTRY_DEF* D_GETTWAINNAMEFROMCONSTANTW)                 (LONG, LONG, LPWSTR, LONG nSize);
@@ -1057,6 +1057,15 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF* D_ENABLEPEEKMESSAGELOOPFUNC)                 
 typedef DTWAIN_ARRAY (DLLENTRY_DEF* D_ENUMCOMPRESSIONTYPESEX2FUNC)               (DTWAIN_SOURCE, LONG, DTWAIN_BOOL);  
 typedef LONG        (DLLENTRY_DEF* D_GETFILECOMPRESSIONTYPEFUNC)                 (DTWAIN_SOURCE);
 typedef DTWAIN_BOOL (DLLENTRY_DEF* D_SETFILECOMPRESSIONTYPEFUNC)                 (DTWAIN_SOURCE, LONG);
+typedef HANDLE      (DLLENTRY_DEF* D_ALLOCATEMEMORY64FUNC)                       (ULONG64);
+typedef DTWAIN_BOOL (DLLENTRY_DEF* D_GETEXTIMAGEINFOITEMEXFUNC)                  (DTWAIN_SOURCE, LONG, LPLONG, LPLONG, LPLONG, LPLONG);
+typedef DTWAIN_BOOL (DLLENTRY_DEF* D_ENUMSUPPORTEDEXTIMAGEINFOFUNC)              (DTWAIN_SOURCE, LPDTWAIN_ARRAY);
+typedef DTWAIN_BOOL (DLLENTRY_DEF* D_ARRAYADDFRAMENFUNC)                         (DTWAIN_ARRAY, DTWAIN_FRAME, LONG);
+typedef DTWAIN_BOOL (DLLENTRY_DEF* D_ARRAYADDFRAMEFUNC)                          (DTWAIN_ARRAY, DTWAIN_FRAME);
+typedef DTWAIN_BOOL (DLLENTRY_DEF* D_ARRAYINSERTATFRAMENFUNC)                    (DTWAIN_ARRAY, LONG, DTWAIN_FRAME, LONG); 
+typedef DTWAIN_BOOL (DLLENTRY_DEF* D_ARRAYINSERTATFRAMEFUNC)                     (DTWAIN_ARRAY, LONG, DTWAIN_FRAME);
+typedef DTWAIN_FRAME (DLLENTRY_DEF* D_ARRAYGETATFRAMEFUNC)                       (DTWAIN_ARRAY, LONG);
+typedef DTWAIN_BOOL (DLLENTRY_DEF* D_ARRAYSETATFRAMEFUNC)                        (DTWAIN_ARRAY, LONG, DTWAIN_FRAME);
 
 #ifdef __cplusplus
 }
@@ -1089,6 +1098,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF* D_SETFILECOMPRESSIONTYPEFUNC)                
     STATIC D_ADDPDFTEXTEXFUNC                               DTWAIN_AddPDFTextEx;
     STATIC D_ADDPDFTEXTFUNC                                 DTWAIN_AddPDFText;
     STATIC D_ADDPDFTEXTWFUNC                                DTWAIN_AddPDFTextW;
+    STATIC D_ALLOCATEMEMORY64FUNC                           DTWAIN_AllocateMemory64;
     STATIC D_ALLOCATEMEMORYEXFUNC                           DTWAIN_AllocateMemoryEx;
     STATIC D_ALLOCATEMEMORYFUNC                             DTWAIN_AllocateMemory;
     STATIC D_APPHANDLESEXCEPTIONSFUNC                       DTWAIN_AppHandlesExceptions;
@@ -1096,6 +1106,8 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF* D_SETFILECOMPRESSIONTYPEFUNC)                
     STATIC D_ARRAYADDANSISTRINGNFUNC                        DTWAIN_ArrayAddANSIStringN;
     STATIC D_ARRAYADDFLOATFUNC                              DTWAIN_ArrayAddFloat;
     STATIC D_ARRAYADDFLOATNFUNC                             DTWAIN_ArrayAddFloatN;
+    STATIC D_ARRAYADDFRAMEFUNC                              DTWAIN_ArrayAddFrame;
+    STATIC D_ARRAYADDFRAMENFUNC                             DTWAIN_ArrayAddFrameN;
     STATIC D_ARRAYADDFUNC                                   DTWAIN_ArrayAdd;
     STATIC D_ARRAYADDLONG64FUNC                             DTWAIN_ArrayAddLong64;
     STATIC D_ARRAYADDLONG64NFUNC                            DTWAIN_ArrayAddLong64N;
@@ -1139,6 +1151,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF* D_SETFILECOMPRESSIONTYPEFUNC)                
     STATIC D_ARRAYGETATANSISTRINGFUNC                       DTWAIN_ArrayGetAtANSIString;
     STATIC D_ARRAYGETATANSISTRINGPTRFUNC                    DTWAIN_ArrayGetAtANSIStringPtr;
     STATIC D_ARRAYGETATFLOATFUNC                            DTWAIN_ArrayGetAtFloat;
+    STATIC D_ARRAYGETATFRAMEFUNC                            DTWAIN_ArrayGetAtFrame;
     STATIC D_ARRAYGETATFUNC                                 DTWAIN_ArrayGetAt;
     STATIC D_ARRAYGETATLONG64FUNC                           DTWAIN_ArrayGetAtLong64;
     STATIC D_ARRAYGETATLONGFUNC                             DTWAIN_ArrayGetAtLong;
@@ -1160,6 +1173,8 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF* D_SETFILECOMPRESSIONTYPEFUNC)                
     STATIC D_ARRAYINSERTATANSISTRINGNFUNC                   DTWAIN_ArrayInsertAtANSIStringN;
     STATIC D_ARRAYINSERTATFLOATFUNC                         DTWAIN_ArrayInsertAtFloat;
     STATIC D_ARRAYINSERTATFLOATNFUNC                        DTWAIN_ArrayInsertAtFloatN;
+    STATIC D_ARRAYINSERTATFRAMEFUNC                         DTWAIN_ArrayInsertAtFrame;
+    STATIC D_ARRAYINSERTATFRAMENFUNC                        DTWAIN_ArrayInsertAtFrameN;
     STATIC D_ARRAYINSERTATFUNC                              DTWAIN_ArrayInsertAt;
     STATIC D_ARRAYINSERTATLONG64FUNC                        DTWAIN_ArrayInsertAtLong64;
     STATIC D_ARRAYINSERTATLONG64NFUNC                       DTWAIN_ArrayInsertAtLong64N;
@@ -1180,6 +1195,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF* D_SETFILECOMPRESSIONTYPEFUNC)                
     STATIC D_ARRAYRESIZEFUNC                                DTWAIN_ArrayResize;
     STATIC D_ARRAYSETATANSISTRINGFUNC                       DTWAIN_ArraySetAtANSIString;
     STATIC D_ARRAYSETATFLOATFUNC                            DTWAIN_ArraySetAtFloat;
+    STATIC D_ARRAYSETATFRAMEFUNC                            DTWAIN_ArraySetAtFrame;
     STATIC D_ARRAYSETATFUNC                                 DTWAIN_ArraySetAt;
     STATIC D_ARRAYSETATLONG64FUNC                           DTWAIN_ArraySetAtLong64;
     STATIC D_ARRAYSETATLONGFUNC                             DTWAIN_ArraySetAtLong;
@@ -1317,8 +1333,9 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF* D_SETFILECOMPRESSIONTYPEFUNC)                
     STATIC D_ENUMSUPPORTEDCAPSEX2FUNC                       DTWAIN_EnumSupportedCapsEx2;
     STATIC D_ENUMSUPPORTEDCAPSEXFUNC                        DTWAIN_EnumSupportedCapsEx;
     STATIC D_ENUMSUPPORTEDCAPSFUNC                          DTWAIN_EnumSupportedCaps;
-    STATIC D_ENUMSUPPORTEDMULTIPAGEFILETYPES                DTWAIN_EnumSupportedMultiPageFileTypes;
-    STATIC D_ENUMSUPPORTEDSINGLEPAGEFILETYPES               DTWAIN_EnumSupportedSinglePageFileTypes;
+    STATIC D_ENUMSUPPORTEDEXTIMAGEINFOFUNC                  DTWAIN_EnumSupportedExtImageInfo;
+    STATIC D_ENUMSUPPORTEDMULTIPAGEFILETYPESFUNC            DTWAIN_EnumSupportedMultiPageFileTypes;
+    STATIC D_ENUMSUPPORTEDSINGLEPAGEFILETYPESFUNC           DTWAIN_EnumSupportedSinglePageFileTypes;
     STATIC D_ENUMTHRESHOLDVALUESEXFUNC                      DTWAIN_EnumThresholdValuesEx;
     STATIC D_ENUMTHRESHOLDVALUESFUNC                        DTWAIN_EnumThresholdValues;
     STATIC D_ENUMTOPCAMERASFUNC                             DTWAIN_EnumTopCameras;
@@ -1455,6 +1472,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF* D_SETFILECOMPRESSIONTYPEFUNC)                
     STATIC D_GETEXTCAPFROMNAMEWFUNC                         DTWAIN_GetExtCapFromNameW;
     STATIC D_GETEXTIMAGEINFODATAFUNC                        DTWAIN_GetExtImageInfoData;
     STATIC D_GETEXTIMAGEINFOFUNC                            DTWAIN_GetExtImageInfo;
+    STATIC D_GETEXTIMAGEINFOITEMEXFUNC                      DTWAIN_GetExtImageInfoItemEx;
     STATIC D_GETEXTIMAGEINFOITEMFUNC                        DTWAIN_GetExtImageInfoItem;
     STATIC D_GETEXTNAMEFROMCAPAFUNC                         DTWAIN_GetExtNameFromCapA;
     STATIC D_GETEXTNAMEFROMCAPFUNC                          DTWAIN_GetExtNameFromCap;
@@ -2087,7 +2105,6 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF* D_SETFILECOMPRESSIONTYPEFUNC)                
     STATIC D_UNLOCKMEMORYEXFUNC                             DTWAIN_UnlockMemoryEx;
     STATIC D_UNLOCKMEMORYFUNC                               DTWAIN_UnlockMemory;
     STATIC D_USEMULTIPLETHREADSFUNC                         DTWAIN_UseMultipleThreads;
-
 #ifdef __cplusplus
         static int InitDTWAINInterface(DYNDTWAIN_API*, HMODULE h);
         static int InitDTWAINInterface(HMODULE h);

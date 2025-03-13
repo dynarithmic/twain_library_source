@@ -149,23 +149,23 @@ std::pair<bool, int> TWAINCompliancyTester::TestPixelTypeCompliancy()
             }
         }
     }
-    m_ResultCode[TWAIN_PIXELTYPE_TESTS] = returnPair.second;
+    m_ResultCodes[TWAIN_PIXELTYPE_TESTS] = std::vector<int>{ returnPair.second };
     m_TestResults[TWAIN_PIXELTYPE_TESTS] = returnPair.first;
     return returnPair;
 }
 
-std::pair<bool, int> TWAINCompliancyTester::TestXfermechCompliancy()
+std::pair<bool, std::vector<int>> TWAINCompliancyTester::TestXfermechCompliancy()
 {
     if (!m_pSource)
-        return { false, DTWAIN_NO_ERROR };
+        return { false, {} };
     auto& results = m_TestResults[TWAIN_XFERMECH_TESTS];
     if (results != boost::logic::indeterminate)
-        return { results.value, m_ResultCode[TWAIN_XFERMECH_TESTS]};
+        return { results.value, m_ResultCodes[TWAIN_XFERMECH_TESTS]};
 
     if (m_pSource->GetState() != SOURCE_STATE_OPENED)
-        return { false, DTWAIN_ERR_INVALID_STATE };
+        return { false, {} };
 
-    std::pair<bool, int> returnPair = { true, DTWAIN_NO_ERROR };
+    std::pair<bool, std::vector<int>> returnPair = {true, {}};
 
     DTWAIN_ARRAY XFerMechs = {};
     auto pHandle = m_pSource->GetDTWAINHandle();
@@ -173,7 +173,8 @@ std::pair<bool, int> TWAINCompliancyTester::TestXfermechCompliancy()
     DTWAIN_BOOL bOK = DTWAIN_GetCapValuesEx2(m_pSource, DTWAIN_CV_ICAPXFERMECH, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &XFerMechs);
     if (!bOK || !XFerMechs)
     {
-        returnPair = { false, DTWAIN_ERR_XFERMECH_COMPLIANCY };
+        returnPair.first = false;
+        returnPair.second.push_back(DTWAIN_ERR_XFERMECH_COMPLIANCY);
     }
     else
     {
@@ -181,25 +182,28 @@ std::pair<bool, int> TWAINCompliancyTester::TestXfermechCompliancy()
         auto& vCurXFerMechs = pHandle->m_ArrayFactory->underlying_container_t<LONG>(XFerMechs);
 
         if (vCurXFerMechs.size() < 2)
-            returnPair = { false, DTWAIN_ERR_XFERMECH_COMPLIANCY };
+        {
+            returnPair.first = false;
+            returnPair.second.push_back(DTWAIN_ERR_XFERMECH_COMPLIANCY);
+        }
     }
-    m_ResultCode[TWAIN_XFERMECH_TESTS] = returnPair.second;
+    m_ResultCodes[TWAIN_XFERMECH_TESTS] = returnPair.second;
     m_TestResults[TWAIN_XFERMECH_TESTS] = returnPair.first;
     return returnPair;
 }
 
-std::pair<bool, int> TWAINCompliancyTester::TestStandardCapabilitiesCompliancy()
+std::pair<bool, std::vector<int>> TWAINCompliancyTester::TestStandardCapabilitiesCompliancy()
 {
     if (!m_pSource)
-        return { false, DTWAIN_NO_ERROR };
+        return { false, {DTWAIN_NO_ERROR} };
     auto& results = m_TestResults[TWAIN_CAPABILITY_TESTS];
     if (results != boost::logic::indeterminate)
-        return { results.value, m_ResultCode[TWAIN_CAPABILITY_TESTS] };
+        return { results.value, m_ResultCodes[TWAIN_CAPABILITY_TESTS] };
 
     if (m_pSource->GetState() != SOURCE_STATE_OPENED)
-        return { false, DTWAIN_ERR_INVALID_STATE };
+        return { false, {} };
 
-    std::pair<bool, int> returnPair = { true, DTWAIN_NO_ERROR };
+    std::pair<bool, std::vector<int>> returnPair = { true, {} };
 
     auto& pixelTypeMap = m_pSource->GetPixelTypeMap();
     auto pHandle = m_pSource->GetDTWAINHandle();
@@ -209,13 +213,19 @@ std::pair<bool, int> TWAINCompliancyTester::TestStandardCapabilitiesCompliancy()
     DTWAINArrayLowLevelPtr_RAII arr2(pHandle, &CurrentPixelType);
     bool bOK = DTWAIN_GetCapValuesEx2(m_pSource, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &CurrentPixelType);
     if (!bOK)
-        returnPair = { false, DTWAIN_ERR_STANDARDCAPS_COMPLIANCY };
+    {
+        returnPair.first = false;
+        returnPair.second.push_back(DTWAIN_ERR_STANDARDCAPS_COMPLIANCY);
+    }
 
     // get pointer to internals of the array
     auto& vCurPixTypePtr2 = pHandle->m_ArrayFactory->underlying_container_t<LONG>(CurrentPixelType);
     if (vCurPixTypePtr2.empty())
-        returnPair = { false, DTWAIN_ERR_STANDARDCAPS_COMPLIANCY };
-
+    {
+        returnPair.first = false;
+        returnPair.second.push_back(DTWAIN_ERR_STANDARDCAPS_COMPLIANCY);
+    }
+    
     // Make sure we reset the pixel type on return
     ResetPixelType resetter(m_pSource, vCurPixTypePtr2[0]);
 
@@ -225,8 +235,8 @@ std::pair<bool, int> TWAINCompliancyTester::TestStandardCapabilitiesCompliancy()
         bOK = DTWAIN_SetCapValuesEx2(m_pSource, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, CurrentPixelType);
         if (!bOK)
         {
-            returnPair = { false, DTWAIN_ERR_STANDARDCAPS_COMPLIANCY };
-            break;
+            returnPair.first = false;
+            returnPair.second.push_back(DTWAIN_ERR_STANDARDCAPS_COMPLIANCY);
         }
         bOK = DTWAIN_SetCapValuesEx2(m_pSource, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPRESETALL, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, CurrentPixelType);
         if (!bOK)
@@ -234,7 +244,8 @@ std::pair<bool, int> TWAINCompliancyTester::TestStandardCapabilitiesCompliancy()
             auto conditionCode = CTL_TwainAppMgr::GetLastConditionCodeError();
             if (conditionCode == TWCC_BADPROTOCOL)
                 continue;
-            returnPair = { false, DTWAIN_ERR_STANDARDCAPS_COMPLIANCY };
+            returnPair.first = false;
+            returnPair.second.push_back(DTWAIN_ERR_STANDARDCAPS_COMPLIANCY);
             break;
         }
     }
@@ -249,7 +260,8 @@ std::pair<bool, int> TWAINCompliancyTester::TestStandardCapabilitiesCompliancy()
             const auto& ops = CTL_TwainAppMgr::GetCapabilityOperations(m_pSource, oneCap);
             if ( ops.GetSupport() == 0 )
             { 
-                returnPair = { false, DTWAIN_ERR_STANDARDCAPS_COMPLIANCY };
+                returnPair.first = false;
+                returnPair.second.push_back(DTWAIN_ERR_STANDARDCAPS_COMPLIANCY);
                 break;
             }
             // check MSG_GET, MSG_GETCURRENT, MSG_GETDEFAULT
@@ -258,8 +270,8 @@ std::pair<bool, int> TWAINCompliancyTester::TestStandardCapabilitiesCompliancy()
                 bOK = (ops.IsGet() && ops.IsGetCurrent() && ops.IsGetDefault());
                 if (!bOK)
                 {
-                    returnPair = { false, DTWAIN_ERR_STANDARDCAPS_COMPLIANCY };
-                    break;
+                    returnPair.first = false;
+                    returnPair.second.push_back(DTWAIN_ERR_STANDARDCAPS_COMPLIANCY);
                 }
             }
             if (ops.IsSet() || ops.IsReset())
@@ -267,7 +279,8 @@ std::pair<bool, int> TWAINCompliancyTester::TestStandardCapabilitiesCompliancy()
                 bOK = (ops.IsSet() && ops.IsReset() && ops.IsGet() && ops.IsGetCurrent() && ops.IsGetDefault());
                 if (!bOK)
                 {
-                    returnPair = { false, DTWAIN_ERR_STANDARDCAPS_COMPLIANCY };
+                    returnPair.first = false;
+                    returnPair.second.push_back(DTWAIN_ERR_STANDARDCAPS_COMPLIANCY);
                     break;
                 }
             }
@@ -293,8 +306,8 @@ std::pair<bool, int> TWAINCompliancyTester::TestStandardCapabilitiesCompliancy()
                             continue;
                         else
                         {
-                            returnPair = { false, DTWAIN_ERR_STANDARDCAPS_COMPLIANCY };
-                            break;
+                            returnPair.first = false;
+                            returnPair.second.push_back(DTWAIN_ERR_STANDARDCAPS_COMPLIANCY);
                         }
                     }
                     ++curOp;
@@ -314,8 +327,8 @@ std::pair<bool, int> TWAINCompliancyTester::TestStandardCapabilitiesCompliancy()
                     bOK = DTWAIN_SetCapValuesEx2(m_pSource, oneCap, resetoptsToUse[curOp], DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, NULL);
                     if (!bOK)
                     {
-                        returnPair = { false, DTWAIN_ERR_STANDARDCAPS_COMPLIANCY };
-                        break;
+                        returnPair.first = false;
+                        returnPair.second.push_back(DTWAIN_ERR_STANDARDCAPS_COMPLIANCY);
                     }
                     ++curOp;
                 }
@@ -330,8 +343,8 @@ std::pair<bool, int> TWAINCompliancyTester::TestStandardCapabilitiesCompliancy()
                         bOK = DTWAIN_GetCapValuesEx2(m_pSource, oneCap, op, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arrTest);
                         if (!bOK)
                         {
-                            returnPair = { false, DTWAIN_ERR_STANDARDCAPS_COMPLIANCY };
-                            break;
+                            returnPair.first = false;
+                            returnPair.second.push_back(DTWAIN_ERR_STANDARDCAPS_COMPLIANCY);
                         }
                         // Test the set
                         bOK = DTWAIN_SetCapValuesEx2(m_pSource, oneCap, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arrTest);
@@ -341,15 +354,52 @@ std::pair<bool, int> TWAINCompliancyTester::TestStandardCapabilitiesCompliancy()
                             auto conditionCode = CTL_TwainAppMgr::GetLastConditionCodeError();
                             if (conditionCode == TWCC_SEQERROR || conditionCode == TWCC_SUCCESS || lastTwainError == TWRC_CHECKSTATUS)
                                 continue;
-                            returnPair = { false, DTWAIN_ERR_STANDARDCAPS_COMPLIANCY };
-                            break;
+                            returnPair.first = false;
+                            returnPair.second.push_back(DTWAIN_ERR_STANDARDCAPS_COMPLIANCY);
                         }
                     }
+                }
+
+                // Test the capabilities that use TW_ARRAY and MSG_SET
+                if ( ops.IsSet() )
+                {
+                    auto containerType = GetCapContainer(m_pSource, oneCap, DTWAIN_CAPSET);
+                    if (containerType == DTWAIN_CONTARRAY)
+                    {
+                        DTWAIN_ARRAY arrTest = {};
+                        DTWAINArrayLowLevelPtr_RAII arrTestRAII(pHandle, &arrTest);
+                        arrTest = CreateArrayFromCap(m_pSource->GetDTWAINHandle(), m_pSource, oneCap, 5);
+                        bOK = DTWAIN_SetCapValuesEx2(m_pSource, oneCap, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arrTest);
+                        if (!bOK)
+                        {
+                            auto lastTwainError = CTL_TwainAppMgr::GetLastTwainError();
+                            if (lastTwainError == TWRC_CHECKSTATUS)
+                                continue;
+                            returnPair.first = false;
+                            returnPair.second.push_back(DTWAIN_ERR_STANDARDCAPS_COMPLIANCY);
+                        }
+                    }
+                
+/*                    7.3.7.5.2.1.Action: MSG_SET the value using a
+                        TW_ARRAY container
+                        7.3.7.5.2.1.1.Test : If result is not
+                        TWRC_SUCCESS or
+                        TWRC_CHECKSTATUS, then
+                        end with error
+                        7.3.7.5.2.2.Action : If TW_CAPABILITY.ConType is
+                        TWON_ARRAY then do the following :
+                    7.3.7.5.2.2.1.Action : MSG_SET the value
+                        using a TW_ARRAY
+                        container, setting the value
+                        to 22222 (which is expected
+                            to be an illegal value)
+                        7.3.7.5.2.3.Test : If result is not TWRC_BADVALUE or
+                        TWRC_CHECKSTATUS, then end with error*/
                 }
             }
         }
     }
-    m_ResultCode[TWAIN_CAPABILITY_TESTS] = returnPair.second;
+    m_ResultCodes[TWAIN_CAPABILITY_TESTS] = returnPair.second;
     m_TestResults[TWAIN_CAPABILITY_TESTS] = returnPair.first;
     return returnPair;
 }

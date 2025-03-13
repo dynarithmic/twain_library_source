@@ -268,7 +268,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                 if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_DECODE_BITMAP)
                 {
                     std::string sOut = "\nOriginal bitmap from device: \n";
-                    sOut += "{\n" + CTL_ErrorStructDecoder::DecodeBitmap(m_hDataHandle) + "\n}\n";
+                    sOut += "{" + CTL_ErrorStructDecoder::DecodeBitmap(m_hDataHandle) + "}";
                     LogWriterUtils::WriteMultiLineInfoIndentedA(sOut, "\n");
                 }
 
@@ -345,6 +345,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
             }
 
             // Use for native and native/file transfers
+            auto& acquireFileStatus = pSource->GetAcquireFileStatusRef();
             switch( pSource->GetAcquireType() )
             {
                 // Check if source acquire is file using native mode
@@ -353,7 +354,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     if ( m_IsBuffered )
                         break;
                     pSource->SetPromptPending(false);
-                    long lFlags   = pSource->GetAcquireFileFlags();
+                    long lFlags   = acquireFileStatus.GetAcquireFileFlags();
                     if ( lFlags & DTWAIN_USEPROMPT )
                     {
                         pSource->SetPromptPending(true);
@@ -363,7 +364,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     ResampleAcquiredDib();
 
                     // Check if multi page file is being used
-                    bool bIsMultiPageFile = dynarithmic::IsFileTypeMultiPage(pSource->GetAcquireFileType());
+                    bool bIsMultiPageFile = dynarithmic::IsFileTypeMultiPage(pSource->GetAcquireFileStatus().GetAcquireFileFormat());
 
                     // Query if the page should be thrown away
                     bKeepPage = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_QUERYPAGEDISCARD, reinterpret_cast<LPARAM>(pSource))?true:false;
@@ -425,37 +426,37 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                         CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_PROCESSEDDIB,reinterpret_cast<LPARAM>(pSource));
                     else
                         CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_PROCESSEDAUDIOFILE, reinterpret_cast<LPARAM>(pSource));
-                    long lFlags = pSource->GetAcquireFileFlags();
+                    long lFlags = acquireFileStatus.GetAcquireFileFlags();
 
                     if ( lFlags & TWAINFileFlag_PROMPT )
                     {
-                        CTL_StringType strTempFile = PromptForFileName(pSource->GetDTWAINHandle(), pSource->GetAcquireFileType());
+                        CTL_StringType strTempFile = PromptForFileName(pSource->GetDTWAINHandle(), acquireFileStatus.GetAcquireFileFormat());
                         StringWrapper::TrimAll(strTempFile);
                         if ( strTempFile.empty())
                         {
                             SendFileAcquireError(pSource, pSession, DTWAIN_ERR_BAD_FILENAME, DTWAIN_TN_FILESAVECANCELLED,
-                                                 StringConversion::Convert_Native_To_Ansi(pSource->GetActualFileName()));
-                            pSource->SetLastAcquiredFileName( StringWrapper::traits_type::GetEmptyString() );
+                                                 StringConversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
+                            acquireFileStatus.SetLastAcquiredFileName( StringWrapper::traits_type::GetEmptyString() );
                         }
                         else
                         {
                             // Copy default file name to the new file
-                            if ( CTL_TwainAppMgr::CopyFile(pSource->GetAcquireFile(), strTempFile) != 1 )
+                            if ( CTL_TwainAppMgr::CopyFile(acquireFileStatus.GetAcquireFileName(), strTempFile) != 1 )
                             {
                                 // Error in copying the file
                                 SendFileAcquireError(pSource, pSession, DTWAIN_ERR_FILEWRITE, DTWAIN_TN_FILESAVEERROR,
-                                                     StringConversion::Convert_Native_To_Ansi(pSource->GetActualFileName()));
-                                pSource->SetLastAcquiredFileName( StringWrapper::traits_type::GetEmptyString() );
+                                                     StringConversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
+                                acquireFileStatus.SetLastAcquiredFileName( StringWrapper::traits_type::GetEmptyString() );
                             }
                             else
-                                pSource->SetLastAcquiredFileName( strTempFile );
+                                acquireFileStatus.SetLastAcquiredFileName( strTempFile );
 
                             // Remove the temporary file
-                            if (delete_file(pSource->GetAcquireFile().c_str()))
-                                pSource->SetAcquireFile(StringWrapper::traits_type::GetEmptyString());
+                            if (delete_file(acquireFileStatus.GetAcquireFileName().c_str()))
+                                acquireFileStatus.SetAcquireFileName(StringWrapper::traits_type::GetEmptyString());
 
                         }
-                        pSource->SetLastAcquiredFileName( strTempFile );
+                        acquireFileStatus.SetLastAcquiredFileName( strTempFile );
                     }
                     else
                     {
@@ -479,7 +480,7 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
 
             if ( errfile != 0 )
                SendFileAcquireError(pSource, pSession, errfile, DTWAIN_TN_FILESAVEERROR, 
-                                    StringConversion::Convert_Native_To_Ansi(pSource->GetActualFileName()));
+                                    StringConversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
             break;
         }
 
@@ -669,8 +670,8 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
     bool bUserCancelled = false;
     bool bJobControlContinue = false;
     bool bEndOfJobDetected = false;
-    bool bProcessSinglePage = (!dynarithmic::IsFileTypeMultiPage(pSource->GetAcquireFileType()) &&
-                               errFile == 0);
+    auto& acquireFileStatus = pSource->GetAcquireFileStatusRef();
+    bool bProcessSinglePage = (!dynarithmic::IsFileTypeMultiPage(acquireFileStatus.GetAcquireFileFormat()) && errFile == 0);
     switch( rc )
     {
         case TWRC_SUCCESS:
@@ -772,13 +773,13 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
                         if ( pSource->GetPendingImageNum() + 1 - pSource->GetBlankPageCount() > 0)
                         {
                             if ( pSource->IsMultiPageModeSaveAtEnd() &&
-                                 !dynarithmic::IsFileTypeMultiPage( pSource->GetAcquireFileType() ))
+                                 !dynarithmic::IsFileTypeMultiPage( acquireFileStatus.GetAcquireFileFormat()))
                             {
                                 pSource->ProcessMultipageFile();
                             }
                             else
                             if ( (!pSource->IsMultiPageModeContinuous()) ||
-                                 (pSource->IsMultiPageModeContinuous() && !dynarithmic::IsFileTypeMultiPage(pSource->GetAcquireFileType())))
+                                 (pSource->IsMultiPageModeContinuous() && !dynarithmic::IsFileTypeMultiPage(acquireFileStatus.GetAcquireFileFormat())))
                             {
                                 if ( !pSource->GetTransferDone())
                                 {
@@ -833,7 +834,7 @@ void CTL_ImageXferTriplet::SaveJobPages(const ImageXferFileWriter& FileWriter)
 {
     CTL_ITwainSource *pSource = GetSourcePtr();
     const CTL_ITwainSession *pSession = GetSessionPtr();
-
+    auto& acquireFileStatus = pSource->GetAcquireFileStatusRef();
 
     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                           nullptr, DTWAIN_TN_EOJBEGINFILESAVE,
@@ -842,7 +843,7 @@ void CTL_ImageXferTriplet::SaveJobPages(const ImageXferFileWriter& FileWriter)
     if ( m_nTotalPagesSaved > 0)
     {
         if ( pSource->IsMultiPageModeSaveAtEnd() &&
-             !dynarithmic::IsFileTypeMultiPage( pSource->GetAcquireFileType() ))
+             !dynarithmic::IsFileTypeMultiPage( acquireFileStatus.GetAcquireFileFormat()))
         {
             pSource->ProcessMultipageFile();
         }
@@ -987,9 +988,10 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
     CTL_ITwainSource* pSource = GetSourcePtr();
     CTL_ITwainSession* pSession = GetSessionPtr();
     const ImageXferFileWriter FileWriter(this, pSession, pSource);
+    auto& acquireFileStatus = pSource->GetAcquireFileStatusRef();
 
     // Check if multi page file is being used
-    const bool bIsMultiPageFile = dynarithmic::IsFileTypeMultiPage(pSource->GetAcquireFileType());
+    const bool bIsMultiPageFile = dynarithmic::IsFileTypeMultiPage(acquireFileStatus.GetAcquireFileFormat());
     int nMultiStage = 0;
     if ( bIsMultiPageFile )
     {
@@ -1020,12 +1022,12 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
     CTL_StringType strTempFile;
     if ( nMultiStage == 0 || nMultiStage == DIB_MULTI_FIRST)
     {
-        strTempFile = PromptForFileName(pSource->GetDTWAINHandle(), pSource->GetAcquireFileType());
+        strTempFile = PromptForFileName(pSource->GetDTWAINHandle(), acquireFileStatus.GetAcquireFileFormat());
         if ( strTempFile.empty() )
         {
             SendFileAcquireError(pSource, pSession,
                                  DTWAIN_ERR_BAD_FILENAME, DTWAIN_TN_FILESAVECANCELLED,
-                                 StringConversion::Convert_Native_To_Ansi(pSource->GetActualFileName()));
+                                 StringConversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
             return 0;
         }
         const filesys::path p{ strTempFile };
@@ -1033,7 +1035,7 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
         if ( !ofs )
         {
             SendFileAcquireError(pSource, pSession, DTWAIN_ERR_FILEWRITE, DTWAIN_TN_FILESAVEERROR,
-                                 StringConversion::Convert_Native_To_Ansi(pSource->GetActualFileName()));
+                                 StringConversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
             return 0;
         }
         ofs.close();
@@ -1066,7 +1068,7 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
 
             // Now check for Postscript file types.  We alias these
             // types as TIFF format
-            const CTL_TwainFileFormatEnum FileType = pSource->GetAcquireFileType();
+            const CTL_TwainFileFormatEnum FileType = acquireFileStatus.GetAcquireFileFormat();
             if ( dynarithmic::IsFileTypePostscript( FileType ) )
             {
                 ImageInfo.IsPostscript = true;
@@ -1079,12 +1081,12 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
             if (!CurDib)
             {
                 SendFileAcquireError(pSource, pSession, DTWAIN_ERR_INVALIDBMP, DTWAIN_TN_FILEPAGESAVEERROR,
-                                     StringConversion::Convert_Native_To_Ansi(pSource->GetActualFileName()));
+                                     StringConversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
                 return DTWAIN_ERR_INVALIDBMP;
             }
 
             if ( nMultiStage == 0)
-                retval = CurDib->WriteDibBitmap(ImageInfo, strTempFile.c_str(), pSource->GetAcquireFileType() );
+                retval = CurDib->WriteDibBitmap(ImageInfo, strTempFile.c_str(), acquireFileStatus.GetAcquireFileFormat() );
             else
             {
                 // Write a multi page file
@@ -1092,7 +1094,7 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
 
                 if ( nMultiStage == DIB_MULTI_FIRST)
                     pHandler = CurDib->WriteFirstPageDibMulti(ImageInfo, strTempFile.c_str(),
-                                                               pSource->GetAcquireFileType(), false, 0, retval);
+                                                               acquireFileStatus.GetAcquireFileFormat(), false, 0, retval);
                 else
                     CurDib->WriteNextPageDibMulti(pHandler, retval, ImageInfo);
             }
@@ -1100,18 +1102,18 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
             if ( retval != 0)
             {
                 SendFileAcquireError(pSource, pSession, retval, DTWAIN_TN_INVALIDIMAGEFORMAT,
-                                     StringConversion::Convert_Native_To_Ansi(pSource->GetActualFileName()));
+                                     StringConversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
                 if ( nMultiStage )
                     SendFileAcquireError(pSource, pSession, retval, DTWAIN_TN_FILEPAGESAVEERROR,
-                                         StringConversion::Convert_Native_To_Ansi(pSource->GetActualFileName()));
+                                         StringConversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
                 else
                     SendFileAcquireError(pSource, pSession, retval, DTWAIN_TN_FILESAVEERROR,
-                                         StringConversion::Convert_Native_To_Ansi(pSource->GetActualFileName()));
+                                         StringConversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
             }
             else
             {
                 if ( !nMultiStage || nMultiStage == DIB_MULTI_FIRST )
-                    pSource->SetLastAcquiredFileName( strTempFile );
+                    acquireFileStatus.SetLastAcquiredFileName( strTempFile );
                 if ( nMultiStage )
                     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                           nullptr, DTWAIN_TN_FILEPAGESAVEOK,
@@ -1142,8 +1144,8 @@ int CTL_ImageXferTriplet::PromptAndSaveImage(size_t nImageNum)
         {
             // Copy default file name to the new file
             // Check if default file exists
-            if (file_exists( pSource->GetAcquireFile().c_str()))
-                CTL_TwainAppMgr::CopyFile(pSource->GetAcquireFile(), strTempFile);
+            if (file_exists( acquireFileStatus.GetAcquireFileName().c_str()))
+                CTL_TwainAppMgr::CopyFile(acquireFileStatus.GetAcquireFileName(), strTempFile);
             else
                 return 0;
         }
@@ -1526,7 +1528,7 @@ bool CTL_ImageXferTriplet::ResampleAcquiredDib()
     if (!CTL_StaticData::IsResamplingDone())
         return false;
     CTL_ITwainSource* pSource = GetSourcePtr();
-    const int nFileType = pSource->GetAcquireFileType();
+    const int nFileType = pSource->GetAcquireFileStatusRef().GetAcquireFileFormat();
 
     CTL_TwainDibArray* pArray = pSource->GetDibArray();
 

@@ -495,6 +495,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
     pSource->SetXferReadySent(false);
     if (opts.getActualAcquireType() == TWAINAcquireType_File)
     {
+        auto& acquireFileStatus = pSource->GetAcquireFileStatusRef();
         CTL_StringType strFile;
         int nFileType;
         LONG lFileFlags = opts.getFileFlags();
@@ -538,7 +539,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
                 opts.setActualAcquireType(TWAINAcquireType_FileUsingNative);
 
             pSource->SetAcquireType(static_cast<CTL_TwainAcquireEnum>(opts.getActualAcquireType()), strFile.c_str());
-            pSource->SetAcquireFileType(static_cast<CTL_TwainFileFormatEnum>(nFileType));
+            acquireFileStatus.SetAcquireFileFormat(static_cast<CTL_TwainFileFormatEnum>(nFileType));
 
             LONG lMode = lFileFlags;
 
@@ -583,8 +584,8 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
                         std::string warningMsg = GetResourceStringFromMap(IDS_DTWAIN_FILE_COMPRESS_TYPE_MISMATCH);
                         std::ostringstream strm;
                         strm << warningMsg << "  FileType=" << 
-                            CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWFF, nFileType) << "  Compression=" << 
-                            CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWCP, pSource->GetCompressionType());
+                            CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWFF, nFileType).second << "  Compression=" << 
+                            CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWCP, pSource->GetCompressionType()).second;
                         LogWriterUtils::WriteLogInfoIndentedA(strm.str());
                     }
                     CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(),
@@ -653,7 +654,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
                     pSource->InitFileAutoIncrementData(szName);
                 }
             }
-            pSource->SetAcquireFileFlags(lFileFlags);
+            pSource->GetAcquireFileStatusRef().SetAcquireFileFlags(lFileFlags);
 
         }
         else

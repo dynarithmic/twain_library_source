@@ -26,11 +26,65 @@
 
 using namespace dynarithmic;
 
-// DTWAIN 2.0 memory related functions
-HANDLE  DLLENTRY_DEF DTWAIN_AllocateMemory(LONG memSize)
+// TWAINDSM 2.0 memory related functions
+template <typename VarType>
+struct TwainAllocation
+{
+    CTL_TwainDLLHandle* m_pHandle = nullptr;
+    TwainAllocation(CTL_TwainDLLHandle* pHandle) : m_pHandle(pHandle) {}
+    HANDLE operator()(VarType memSize)
+    {
+        HANDLE h = {};
+        if (m_pHandle->m_TwainMemoryFunc)
+            h = m_pHandle->m_TwainMemoryFunc->AllocateMemory(memSize);
+        return h;
+    }
+};
+
+// General Windows memory allocation functions
+template <typename VarType>
+struct SystemAllocation
+{
+    HANDLE operator()(VarType memSize)
+    {
+        HANDLE h = ImageMemoryHandler::GlobalAlloc(GHND, memSize);
+        #ifdef WIN32
+        if (!h)
+            dynarithmic::LogWin32Error(ImageMemoryHandler::GetLastError());
+        #endif
+        return h;
+    }
+};
+
+template <typename AllocationFunc, typename VarType>
+static HANDLE GeneralAllocator(ULONG64 memSize, AllocationFunc fn)
+{
+    // Call the memory allocation function
+    return fn(static_cast<VarType>(memSize)); 
+}
+
+HANDLE  DLLENTRY_DEF DTWAIN_AllocateMemory(DWORD memSize)
 {
     LOG_FUNC_ENTRY_PARAMS((memSize))
-    const HANDLE h = ImageMemoryHandler::GlobalAlloc(GHND, memSize);
+    auto h = GeneralAllocator<SystemAllocation<SIZE_T>, SIZE_T>(memSize, SystemAllocation<SIZE_T>{});
+    LOG_FUNC_EXIT_NONAME_PARAMS(h)
+    CATCH_BLOCK(HANDLE())
+}
+
+// DTWAIN 2.0 memory related functions for 64-bit allocations
+HANDLE  DLLENTRY_DEF DTWAIN_AllocateMemory64(ULONG64 memSize)
+{
+    LOG_FUNC_ENTRY_PARAMS((memSize))
+    #ifndef _WIN64
+        #ifdef WIN32
+            // Make sure that the amount of memory is not > 4GB
+            SIZE_T maxMemory = static_cast<SIZE_T>(std::min<ULONG64>(memSize, std::numeric_limits<SIZE_T>::max()));
+            auto h = GeneralAllocator<SystemAllocation<SIZE_T>, SIZE_T>(maxMemory, SystemAllocation<SIZE_T>{});
+        #endif
+    #else
+        // 64-bit, so we don't care what memSize is.
+        auto h = GeneralAllocator<SystemAllocation<SIZE_T>, SIZE_T>(memSize, SystemAllocation<SIZE_T>{});
+    #endif
     LOG_FUNC_EXIT_NONAME_PARAMS(h)
     CATCH_BLOCK(HANDLE())
 }
@@ -59,13 +113,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_UnlockMemory(HANDLE h)
     CATCH_BLOCK(false)
 }
 
-HANDLE  DLLENTRY_DEF DTWAIN_AllocateMemoryEx(LONG memSize)
+HANDLE  DLLENTRY_DEF DTWAIN_AllocateMemoryEx(DWORD memSize)
 {
     LOG_FUNC_ENTRY_PARAMS((memSize))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    HANDLE h = nullptr;
-    if (pHandle->m_TwainMemoryFunc)
-        h = pHandle->m_TwainMemoryFunc->AllocateMemory(memSize);
+    TwainAllocation<DWORD> allocation(pHandle);
+    auto h = GeneralAllocator<TwainAllocation<DWORD>, DWORD>(memSize, allocation);
     LOG_FUNC_EXIT_NONAME_PARAMS(h)
     CATCH_BLOCK(HANDLE())
 }

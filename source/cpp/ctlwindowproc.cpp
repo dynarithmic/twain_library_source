@@ -248,13 +248,14 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
             case DTWAIN_TN_FILECOMPRESSTYPEMISMATCH:
             {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
-                if ( wParam == DTWAIN_TN_ACQUIRESTARTED )
+                auto& acquireFileStatus = pSource->GetAcquireFileStatusRef();
+                if (wParam == DTWAIN_TN_ACQUIRESTARTED)
                     pSource->SetImagesStored(false);
 
                 if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) || !callbacks.empty())
                     bPassMsg = true;
                 if (wParam == DTWAIN_TN_FILEPAGESAVEOK)
-                    pSource->SetFileSavePageCount(pSource->GetFileSavePageCount() + 1);
+                    acquireFileStatus.SetFileSavePageCount(acquireFileStatus.GetFileSavePageCount() + 1);
                 DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,pHandle,pSource, wParam, reinterpret_cast<LPARAM>(pSource) );
             }
             break;
@@ -491,45 +492,47 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                     // Close Source only if modal and Source wasn't started by client app
                     if (!pSource->IsOpenAfterAcquire() )
                     {
-                        // Check if UI-less mode.  DIBs need to be saved here
-                        if ( !pSource->IsUIOpenOnAcquire() && !pSource->ImagesStored())
+                        if (!pSource->ImagesStored())
                         {
-                           // Save the image handles
-                            char buf[25] = {};
-                            LOG_FUNC_STRING(No UI Mode Done -- Copying DIBS to Source...)
-                            DTWAIN_ARRAY aDibs = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYHANDLE, 0);
-                            DTWAIN_GetAllSourceDibs( pSource, aDibs );
-                            int nDibs = static_cast<int>(pHandle->m_ArrayFactory->size(aDibs));
-                            StringStreamA strm;
-                            strm << buf;
-                            LOG_FUNC_VALUES(strm.str().c_str())
-                            LOG_FUNC_STRING(No UI Mode -- Finished Copying DIBS to Source...)
-                            if ( nDibs > 0 )
-                                pSource->AddDibsToAcquisition(aDibs);
-                            else
-                                pHandle->m_ArrayFactory->destroy(aDibs);
-                            pSource->SetImagesStored(true);
+                            // Check if UI-less mode.  DIBs need to be saved here
+                            if (!pSource->IsUIOpenOnAcquire())
+                            {
+                                // Save the image handles
+                                char buf[25] = {};
+                                LOG_FUNC_STRING(No UI Mode Done -- Copying DIBS to Source...)
+                                DTWAIN_ARRAY aDibs = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYHANDLE, 0);
+                                DTWAIN_GetAllSourceDibs(pSource, aDibs);
+                                int nDibs = static_cast<int>(pHandle->m_ArrayFactory->size(aDibs));
+                                StringStreamA strm;
+                                strm << buf;
+                                LOG_FUNC_VALUES(strm.str().c_str())
+                                LOG_FUNC_STRING(No UI Mode -- Finished Copying DIBS to Source...)
+                                if (nDibs > 0)
+                                    pSource->AddDibsToAcquisition(aDibs);
+                                else
+                                    pHandle->m_ArrayFactory->destroy(aDibs);
+                                pSource->SetImagesStored(true);
+                            }
+
+                            // Check if there is a pending prompt for a filename save
+                            if (pSource->IsPromptPending())
+                            {
+
+                            }
+                            // Close the source
+                            CTL_TwainAppMgr::CloseSource(pSession, pSource);
+
+                            if (pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) || !callbacks.empty())
+                                bPassMsg = true;
+                            DTWAIN_InvokeCallback(DTWAIN_CallbackMESSAGE,
+                                static_cast<DTWAIN_HANDLE>(pHandle),
+                                static_cast<DTWAIN_SOURCE>(pSource),
+                                wParam, 0);
+
+                            // Check if source should be reopened after acquisition
+                            if (pSource->IsReopenAfterAcquire())
+                                CTL_TwainAppMgr::OpenSource(pSession, pSource);
                         }
-
-                        // Check if there is a pending prompt for a filename save
-                        if ( pSource->IsPromptPending())
-                        {
-
-                        }
-                        // Close the source
-                        CTL_TwainAppMgr::CloseSource( pSession, pSource );
-
-                        if ( pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) || !callbacks.empty())
-                            bPassMsg = true;
-                        DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE,
-                                            static_cast<DTWAIN_HANDLE>(pHandle),
-                                            static_cast<DTWAIN_SOURCE>(pSource),
-                                            wParam, 0 );
-
-                        // Check if source should be reopened after acquisition
-                        if (pSource->IsReopenAfterAcquire())
-                            CTL_TwainAppMgr::OpenSource(pSession, pSource);
-
                     }
                     pHandle->EraseAcquireNum( pSource->GetAcquireNum() );
                 }
