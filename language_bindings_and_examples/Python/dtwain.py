@@ -1635,7 +1635,7 @@ DTWAIN_USERRES_MAXSIZE  = 8192
 # import dtwain
 # import ctypes
 # ...
-# dtwain_dll = ctypes.windll.LoadLibrary("dtwain32u.dll") 
+# dtwain_dll = ctypes.windll.LoadLibrary("dtwain64u.dll") 
 # dtwain.setup_windll(dtwain_dll)
 #
 def setup_windll(theDLL):
