@@ -124,7 +124,7 @@ bool ExtendedImageInformation::FillBarcodeInfo()
 
     // Fill in the barcode texts
     auto& vHandles = pHandle->m_ArrayFactory->underlying_container_t<DTWAIN_HANDLE>(aText);
-    for (int i = 0; i < m_InfoBlock.m_barcodeInfo.count; ++i)
+    for (TW_UINT32 i = 0; i < m_InfoBlock.m_barcodeInfo.count; ++i)
     {
         std::string szBarText;
         DTWAIN_HANDLE sHandle = vHandles[i];

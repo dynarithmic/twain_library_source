@@ -26,6 +26,7 @@
 #include <sstream>
 #include <cctype>
 #include <numeric>
+#include <type_traits>
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string.hpp>
@@ -188,10 +189,6 @@ namespace dynarithmic
                     { return GetWindowsDirectoryA(buffer, _MAX_PATH); }
         static UINT GetSystemDirectoryImpl(char_type* buffer)
                     { return GetSystemDirectoryA(buffer, _MAX_PATH); }
-        static char_type* AddBackslashImpl(char_type* buffer)
-                    { return PathAddBackslashA(buffer); }
-        static char_type* RemoveBackslashImpl(char_type* buffer)
-                    { return PathRemoveBackslashA(buffer); }
         static DWORD GetModuleFileNameImpl(HMODULE hModule, char_type* lpFileName, DWORD nSize)
                     { return GetModuleFileNameA(hModule, lpFileName, nSize); }
         #else
@@ -199,26 +196,6 @@ namespace dynarithmic
         { getcwd(buffer, 8096); return 1; }
         static UINT GetSystemDirectoryImpl(char_type* buffer)
         { getcwd(buffer, 8096); return 1; }
-        static char_type* AddBackslashImpl(char_type* buffer)
-        {
-            auto ps = filesys::path::preferred_separator;
-            auto len = Length(buffer);
-            if (buffer[len-1] != ps)
-            {
-                buffer[len] = ps;
-                buffer[len+1] = 0;
-            }
-            return buffer;
-        }
-
-        static char_type* RemoveBackslashImpl(char_type* buffer)
-        {
-            auto ps = filesys::path::preferred_separator;
-            auto len = Length(buffer);
-            if (buffer[len - 1] == ps)
-                buffer[len - 1] = 0;
-            return buffer;
-        }
 
         static DWORD GetModuleFileNameImpl(HMODULE hModule, char_type* lpFileName, DWORD nSize)
         {
@@ -315,10 +292,6 @@ namespace dynarithmic
         { return GetWindowsDirectoryW(buffer, _MAX_PATH); }
         static UINT GetSystemDirectoryImpl(char_type* buffer)
         { return GetSystemDirectoryW(buffer, _MAX_PATH); }
-        static LPWSTR AddBackslashImpl(char_type* buffer)
-        { return PathAddBackslashW(buffer); }
-        static char_type* RemoveBackslashImpl(char_type* buffer)
-        { return PathRemoveBackslashW(buffer); }
         static DWORD GetModuleFileNameImpl(HMODULE hModule, char_type* lpFileName, DWORD nSize)
         { return GetModuleFileNameW(hModule, lpFileName, nSize); }
         #else
@@ -332,25 +305,6 @@ namespace dynarithmic
         static UINT GetSystemDirectoryImpl(char_type* buffer)
         {
             return GetWindowsDirectoryImpl(buffer);
-        }
-        static char_type* AddBackslashImpl(char_type* buffer)
-        {
-            auto ps = filesys::path::preferred_separator;
-            auto len = Length(buffer);
-            if (buffer[len - 1] != ps)
-            {
-                buffer[len] = ps;
-                buffer[len + 1] = 0;
-            }
-            return buffer;
-        }
-        static char_type* RemoveBackslashImpl(char_type* buffer)
-        {
-            auto ps = filesys::path::preferred_separator;
-            auto len = Length(buffer);
-            if (buffer[len - 1] == ps)
-                buffer[len - 1] = 0;
-            return buffer;
         }
 
         static DWORD GetModuleFileNameImpl(HMODULE hModule, char_type* lpFileName, DWORD nSize)
@@ -738,13 +692,29 @@ namespace dynarithmic
 
         static void SplitPath(const StringType& str, StringArrayType & rArray)
         {
+            static constexpr int numComponents = 5;
             typename StringTraits::FILESYSTEM_PATHTYPE p(str.c_str());
             rArray.clear();
+            if (str.empty())
+            {
+                rArray.resize(numComponents);
+                return;
+            }
             rArray.push_back(StringTraits::PathGenericString(p.root_name()));
             rArray.push_back(StringTraits::PathGenericString(p.root_directory()));
             rArray.push_back(StringTraits::PathGenericString(p.parent_path()));
             rArray.push_back(StringTraits::PathGenericString(p.stem()));
             rArray.push_back(StringTraits::PathGenericString(p.extension()));
+            for (auto& name : rArray)
+            {
+                if (!name.empty())
+                {
+                    if constexpr (std::is_same_v<StringType, std::string>)
+                        name = std::filesystem::path(name).make_preferred().string();
+                    else
+                        name = std::filesystem::path(name).make_preferred().native();
+                }
+            }
         }
 
         static StringArrayType SplitPath(const StringType& str)
@@ -800,18 +770,22 @@ namespace dynarithmic
 
         static StringType AddBackslashToDirectory(const StringType& pathName)
         {
-            std::vector<CharType> buffer(_MAX_PATH,0);
-            SafeStrcpy(buffer.data(), pathName.c_str(), _MAX_PATH);
-            StringTraits::AddBackslashImpl(buffer.data());
-            return buffer.data();
+            std::filesystem::path fsPath(pathName);
+            fsPath /= StringTraits::GetEmptyString();
+            if constexpr (std::is_same_v<std::string, StringType>)
+                return fsPath.string();
+            else
+                return fsPath.native();
         }
 
-        static StringType RemoveBackslashFromDirectory(const StringType& pathName)
+        static StringType RemoveBackslashFromDirectory(StringType pathName)
         {
-            std::vector<CharType> buffer(_MAX_PATH, 0);
-            SafeStrcpy(buffer.data(), pathName.c_str(), _MAX_PATH);
-            StringTraits::RemoveBackslashImpl(buffer.data());
-            return buffer.data();
+            if (!pathName.empty())
+            {
+                if (pathName.back() == filesys::path::preferred_separator)
+                    pathName.pop_back();
+            }
+            return pathName;
         }
 
         static StringType GetGUID()
