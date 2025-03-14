@@ -228,10 +228,8 @@ std::pair<bool, int32_t> CTL_ExtImageInfoTriplet::GetItemData(int nWhichItem, in
     if (!sessionHandle)
         return { false, DTWAIN_ERR_BAD_HANDLE };
 
-    TW_INFO Info = {};
-
     // Check if info has been found
-    Info = GetInfo(nWhichItem, nSearch);
+    TW_INFO Info = GetInfo(nWhichItem, nSearch);
 
     // Check the number of items
     if ( nWhichValue >= Info.NumItems )
