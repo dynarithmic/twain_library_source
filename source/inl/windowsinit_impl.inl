@@ -278,8 +278,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_SetCallbackProc(DTWAIN_CALLBACK fnCall, LONG nWh
 {
     LOG_FUNC_ENTRY_PARAMS((fnCall, nWhich))
     // See if DLL Handle exists
-    const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     switch (nWhich)
     {
         case DTWAIN_CallbackERROR:
@@ -297,9 +296,8 @@ DTWAIN_BOOL dynarithmic::DTWAIN_SetCallbackProc(DTWAIN_CALLBACK fnCall, LONG nWh
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileSavePos(HWND hWndParent, LPCTSTR szTitle, LONG xPos, LONG yPos, LONG nFlags)
 {
     LOG_FUNC_ENTRY_PARAMS((hWndParent, szTitle, xPos, yPos, nFlags))
-        const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     if (nFlags & DTWAIN_DLG_CLEAR_PARAMS)
         pHandle->m_CustomPlacement.nOptions = 0;
     else
@@ -321,9 +319,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileSavePos(HWND hWndParent, LPCTSTR szTitle,
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomFileSave(OPENFILENAME* lpOpenFileName)
 {
     LOG_FUNC_ENTRY_PARAMS((lpOpenFileName))
-        const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     // See if DLL Handle exists
-    DTWAIN_Check_Bad_Handle_Ex(pHandle, false, FUNC_MACRO);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+
 	pHandle->m_pofn = std::make_unique<OPENFILENAME>();
 	memcpy(pHandle->m_pofn.get(), lpOpenFileName, sizeof(OPENFILENAME));
     LOG_FUNC_EXIT_NONAME_PARAMS(true)

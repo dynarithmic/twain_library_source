@@ -561,9 +561,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
         const auto& factory = pHandle->m_ArrayFactory;
         auto eType = factory->tag_type(ExtInfoArray);
 
-        // resize the array if this is not a frame
-        if ( eType != CTL_ArrayFactory::arrayTag::FrameSingleType)
-            factory->resize(ExtInfoArray, Count);
+        factory->resize(ExtInfoArray, Count);
 
         std::pair<bool, int32_t> finalRet = { true, DTWAIN_NO_ERROR };
         for ( int i = 0; i < Count; ++i )
