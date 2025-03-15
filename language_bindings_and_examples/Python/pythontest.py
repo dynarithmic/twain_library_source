@@ -43,7 +43,7 @@ def test_dtwain():
         for i in range(arrcount):
             long_val = ct.c_long(0)
             dtwain_dll.DTWAIN_ArrayGetAtLong(dtwain_array, i, ct.byref(long_val))
-            dtwain_dll.DTWAIN_GetNameFromCapA(long_val, mystrbuf, len(mystrbuf));
+            dtwain_dll.DTWAIN_GetNameFromCapA(long_val, mystrbuf, len(mystrbuf))
             print(f"Capability {i+1}: {mystrbuf.value}  Value: {long_val.value}")
 
         # Destroy the array when done
