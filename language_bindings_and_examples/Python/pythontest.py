@@ -8,9 +8,9 @@ def test_dtwain():
     # You can use a full pathname here also, to ensure python finds the dll
     # check for the python environment, and load the 64-bit or 32-bit DLL
     if struct.calcsize("P") * 8 == 64:
-        dtwain_dll = dtwain.load_dtwaindll("c:\\dtwain_bin\\dtwain64u.dll")
+        dtwain_dll = dtwain.load_dtwaindll("dtwain64u.dll")
     else:
-        dtwain_dll = dtwain.load_dtwaindll("c:\\dtwain_bin\\dtwain32u.dll")
+        dtwain_dll = dtwain.load_dtwaindll("dtwain32u.dll")
 
     # Initialize DTWAIN
     dtwain_dll.DTWAIN_SysInitialize()
