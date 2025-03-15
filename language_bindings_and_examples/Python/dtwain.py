@@ -22,6 +22,8 @@
 # 
 
 import ctypes as ct
+import struct 
+import os
 
 DTWAIN_FF_TIFF = 0
 DTWAIN_FF_PICT = 1
@@ -1625,19 +1627,39 @@ DTWAIN_CONSTANT_ICAP     = 78
 DTWAIN_USERRES_START    = 20000
 DTWAIN_USERRES_MAXSIZE  = 8192
 
-# the application should use ctypes for access to the DTWAIN functions.
-# This allows the proper marshalling of 32-bit and 64-bit pointer return
-# values between DTWAIN and the python application.
-#
 # Example:
 # load the 64-bit unicode version of the dtwain dll
 #
 # import dtwain
 # import ctypes
 # ...
-# dtwain_dll = ctypes.windll.LoadLibrary("dtwain64u.dll") 
-# dtwain.setup_windll(dtwain_dll)
-#
+# dtwain_funcs = dtwain.load_dtwaindll("dtwain64u.dll") 
+# 
+# raise exceptions if the DLL name is not valid for the python runtime environment,
+# misspelled DLL name, or if the DLL is not found or cannot be loaded.
+def load_dtwaindll(dllName):
+    all64 = ["dtwain64.dll", "dtwain64u.dll", "dtwain64d.dll", "dtwain64ud.dll"]
+    all32 = ["dtwain32.dll", "dtwain32u.dll", "dtwain32d.dll", "dtwain32ud.dll"]
+    file_name = os.path.basename(dllName)
+    file_name = file_name.lower().rstrip()
+
+    # check python runtime environment
+    if struct.calcsize("P") * 8 == 64:
+          if not file_name in all64:
+               raise FileNotFoundError("The DTWAIN DLL base name " + file_name + " is not valid.  Valid names are: " + ", ".join(all64))  
+    else:
+          if not file_name in all32:
+               raise FileNotFoundError("The DTWAIN DLL base name " + file_name + " is not valid.  Valid names are: " + ", ".join(all32))  
+    try:
+        # load the dll  
+        dtwain_dll = ct.windll.LoadLibrary(dllName)
+        setup_windll(dtwain_dll)
+        return dtwain_dll
+    except FileNotFoundError as e:
+        print(f"Error: {e}")
+        raise e
+
+# sets up the DTWAIN functions that return 32 or 64 bit pointers.  
 def setup_windll(theDLL):
      theDLL.DTWAIN_AcquireAudioNative.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_AcquireBuffered.restype = ct.POINTER(ct.c_void_p)
