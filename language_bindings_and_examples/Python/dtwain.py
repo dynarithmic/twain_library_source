@@ -22,6 +22,8 @@
 # 
 
 import ctypes as ct
+import struct 
+import os
 
 DTWAIN_FF_TIFF = 0
 DTWAIN_FF_PICT = 1
@@ -1625,19 +1627,39 @@ DTWAIN_CONSTANT_ICAP     = 78
 DTWAIN_USERRES_START    = 20000
 DTWAIN_USERRES_MAXSIZE  = 8192
 
-# the application should use ctypes for access to the DTWAIN functions.
-# This allows the proper marshalling of 32-bit and 64-bit pointer return
-# values between DTWAIN and the python application.
-#
 # Example:
 # load the 64-bit unicode version of the dtwain dll
 #
 # import dtwain
 # import ctypes
 # ...
-# dtwain_dll = ctypes.windll.LoadLibrary("dtwain64u.dll") 
-# dtwain.setup_windll(dtwain_dll)
-#
+# dtwain_funcs = dtwain.load_dtwaindll("dtwain64u.dll") 
+# 
+# raise exceptions if the DLL name is not valid for the python runtime environment,
+# misspelled DLL name, or if the DLL is not found or cannot be loaded.
+def load_dtwaindll(dllName):
+    all64 = ["dtwain64.dll", "dtwain64u.dll", "dtwain64d.dll", "dtwain64ud.dll"]
+    all32 = ["dtwain32.dll", "dtwain32u.dll", "dtwain32d.dll", "dtwain32ud.dll"]
+    file_name = os.path.basename(dllName)
+    file_name = file_name.lower().rstrip()
+
+    # check python runtime environment
+    if struct.calcsize("P") * 8 == 64:
+          if not file_name in all64:
+               raise FileNotFoundError("The DTWAIN DLL base name " + file_name + " is not valid.  Valid names are: " + ", ".join(all64))  
+    else:
+          if not file_name in all32:
+               raise FileNotFoundError("The DTWAIN DLL base name " + file_name + " is not valid.  Valid names are: " + ", ".join(all32))  
+    try:
+        # load the dll  
+        dtwain_dll = ct.windll.LoadLibrary(dllName)
+        setup_windll(dtwain_dll)
+        return dtwain_dll
+    except FileNotFoundError as e:
+        print(f"Error: {e}")
+        raise e
+
+# sets up the DTWAIN functions that return 32 or 64 bit pointers.  
 def setup_windll(theDLL):
      theDLL.DTWAIN_AcquireAudioNative.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_AcquireBuffered.restype = ct.POINTER(ct.c_void_p)
@@ -1662,7 +1684,6 @@ def setup_windll(theDLL):
      theDLL.DTWAIN_EnumAutomaticSenseMediumEx.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_EnumBitDepthsEx2.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_EnumBrightnessValuesEx.restype = ct.POINTER(ct.c_void_p)
-     theDLL.DTWAIN_EnumCompressionTypesEx2.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_EnumCompressionTypesEx.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_EnumContrastValuesEx.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_EnumCustomCapsEx2.restype = ct.POINTER(ct.c_void_p)
@@ -1697,6 +1718,9 @@ def setup_windll(theDLL):
      theDLL.DTWAIN_EnumTwainPrintersEx.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_GetAcquiredImageArray.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_GetSourceAcquisitions.restype = ct.POINTER(ct.c_void_p)
+     theDLL.DTWAIN_EnumCompressionTypesEx2.restype = ct.POINTER(ct.c_void_p)
+     theDLL.DTWAIN_EnumSupportedMultiPageFileTypes.restype = ct.POINTER(ct.c_void_p)
+     theDLL.DTWAIN_EnumSupportedSinglePageFileTypes.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_GetCallback.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_SetCallback.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_GetCallback64.restype = ct.POINTER(ct.c_void_p)
@@ -1705,11 +1729,11 @@ def setup_windll(theDLL):
      theDLL.DTWAIN_GetErrorCallback.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_GetErrorCallback64.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_ArrayFrameGetFrameAt.restype = ct.POINTER(ct.c_void_p)
-     theDLL.DTWAIN_ArrayGetAtFrame.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_FrameCreate.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_FrameCreateStringA.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_FrameCreateString.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_FrameCreateStringW.restype = ct.POINTER(ct.c_void_p)
+     theDLL.DTWAIN_ArrayGetAtFrame.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_GetDTWAINHandle.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_SysInitializeEx2A.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_SysInitializeEx2.restype = ct.POINTER(ct.c_void_p)
@@ -1734,22 +1758,21 @@ def setup_windll(theDLL):
      theDLL.DTWAIN_LockMemoryEx.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_LockMemory.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_SelectDefaultOCREngine.restype = ct.POINTER(ct.c_void_p)
+     theDLL.DTWAIN_SelectOCREngineByNameA.restype = ct.POINTER(ct.c_void_p)
+     theDLL.DTWAIN_SelectOCREngineByName.restype = ct.POINTER(ct.c_void_p)
+     theDLL.DTWAIN_SelectOCREngineByNameW.restype = ct.POINTER(ct.c_void_p)
+     theDLL.DTWAIN_SelectOCREngine.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_SelectOCREngine2A.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_SelectOCREngine2ExA.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_SelectOCREngine2Ex.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_SelectOCREngine2ExW.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_SelectOCREngine2.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_SelectOCREngine2W.restype = ct.POINTER(ct.c_void_p)
-     theDLL.DTWAIN_SelectOCREngineByNameA.restype = ct.POINTER(ct.c_void_p)
-     theDLL.DTWAIN_SelectOCREngineByName.restype = ct.POINTER(ct.c_void_p)
-     theDLL.DTWAIN_SelectOCREngineByNameW.restype = ct.POINTER(ct.c_void_p)
-     theDLL.DTWAIN_SelectOCREngine.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_GetOCRTextInfoHandle.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_CreatePDFTextElement.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_RangeCreateFromCap.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_RangeCreate.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_SelectDefaultSource.restype = ct.POINTER(ct.c_void_p)
-     theDLL.DTWAIN_SelectDefaultSourceWithOpen.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_SelectSource2A.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_SelectSource2ExA.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_SelectSource2Ex.restype = ct.POINTER(ct.c_void_p)
@@ -1759,10 +1782,11 @@ def setup_windll(theDLL):
      theDLL.DTWAIN_SelectSourceByNameA.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_SelectSourceByName.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_SelectSourceByNameW.restype = ct.POINTER(ct.c_void_p)
+     theDLL.DTWAIN_SelectSource.restype = ct.POINTER(ct.c_void_p)
+     theDLL.DTWAIN_SelectDefaultSourceWithOpen.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_SelectSourceByNameWithOpenA.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_SelectSourceByNameWithOpen.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_SelectSourceByNameWithOpenW.restype = ct.POINTER(ct.c_void_p)
-     theDLL.DTWAIN_SelectSource.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_SelectSourceWithOpen.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_ConvertToAPIStringA.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_ConvertToAPIString.restype = ct.POINTER(ct.c_void_p)
