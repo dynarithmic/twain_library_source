@@ -361,7 +361,7 @@
     D_GETACTIVEDSMVERSIONINFOFUNC                                     DYNDTWAIN_API::DTWAIN_GetActiveDSMVersionInfo = nullptr;
     D_GETACTIVEDSMVERSIONINFOWFUNC                                    DYNDTWAIN_API::DTWAIN_GetActiveDSMVersionInfoW = nullptr;
     D_GETALARMVOLUMEFUNC                                              DYNDTWAIN_API::DTWAIN_GetAlarmVolume = nullptr;
-    D_GETAPIHANDLESTATUS                                              DYNDTWAIN_API::DTWAIN_GetAPIHandleStatus = nullptr;
+    D_GETAPIHANDLESTATUSFUNC                                          DYNDTWAIN_API::DTWAIN_GetAPIHandleStatus = nullptr;
     D_GETAPPINFOAFUNC                                                 DYNDTWAIN_API::DTWAIN_GetAppInfoA = nullptr;
     D_GETAPPINFOFUNC                                                  DYNDTWAIN_API::DTWAIN_GetAppInfo = nullptr;
     D_GETAPPINFOWFUNC                                                 DYNDTWAIN_API::DTWAIN_GetAppInfoW = nullptr;
