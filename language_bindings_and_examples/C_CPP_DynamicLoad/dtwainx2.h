@@ -987,7 +987,7 @@ typedef LONG        (DLLENTRY_DEF* D_GETTWAINNAMEFROMCONSTANTFUNC)              
 typedef LONG        (DLLENTRY_DEF* D_GETTWAINNAMEFROMCONSTANTAFUNC)             (LONG, LONG, LPSTR, LONG nSize);
 typedef LONG        (DLLENTRY_DEF* D_GETTWAINNAMEFROMCONSTANTWFUNC)             (LONG, LONG, LPWSTR, LONG nSize);
 typedef LONG        (DLLENTRY_DEF* D_SETLASTERRORFUNC)                          (LONG);
-typedef LONG        (DLLENTRY_DEF* D_GETAPIHANDLESTATUS)                        (DTWAIN_HANDLE);
+typedef LONG        (DLLENTRY_DEF* D_GETAPIHANDLESTATUSFUNC)                    (DTWAIN_HANDLE);
 typedef LONG        (DLLENTRY_DEF* D_GETFILETYPENAMEAFUNC)                      (LONG, LPSTR, LONG);
 typedef LONG        (DLLENTRY_DEF* D_GETFILETYPENAMEWFUNC)                      (LONG, LPWSTR, LONG);
 typedef LONG        (DLLENTRY_DEF* D_GETFILETYPENAMEFUNC)                       (LONG, LPTSTR, LONG);
@@ -1394,7 +1394,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF* D_ARRAYSETATFRAMEFUNC)                       
     STATIC D_GETACTIVEDSMVERSIONINFOFUNC                    DTWAIN_GetActiveDSMVersionInfo;
     STATIC D_GETACTIVEDSMVERSIONINFOWFUNC                   DTWAIN_GetActiveDSMVersionInfoW;
     STATIC D_GETALARMVOLUMEFUNC                             DTWAIN_GetAlarmVolume;
-    STATIC D_GETAPIHANDLESTATUS                             DTWAIN_GetAPIHandleStatus;
+    STATIC D_GETAPIHANDLESTATUSFUNC                         DTWAIN_GetAPIHandleStatus;
     STATIC D_GETAPPINFOAFUNC                                DTWAIN_GetAppInfoA;
     STATIC D_GETAPPINFOFUNC                                 DTWAIN_GetAppInfo;
     STATIC D_GETAPPINFOWFUNC                                DTWAIN_GetAppInfoW;
