@@ -117,6 +117,22 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     // See if extended image info is supported and cache the results
     pSource->SetExtendedImageInfoSupported(theCapList.count(static_cast<TW_UINT16>(ICAP_EXTIMAGEINFO))?true:false);
 
+    // Cache the supported TWEI_x values for extended image information
+    if (pSource->IsExtendedImageInfoSupported())
+    {
+        DTWAIN_ARRAY extArray = {};
+        DTWAINArrayPtr_RAII temp_(pHandle, &extArray);
+        bool bOk = DTWAIN_GetCapValuesEx2(pSource, ICAP_SUPPORTEDEXTIMAGEINFO, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &extArray);
+        if (bOk && extArray)
+        {
+            auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(extArray);
+            pSource->SetSupportedExtImageInfos(vValues);
+            pSource->SetSupportedExtImageInfoCap(true);
+        }
+        else
+            pSource->SetSupportedExtImageInfoCap(false);
+    }
+
     // See if audio transfers are supported
     pSource->SetAudioTransferSupported(DTWAIN_IsAudioXferSupported(Source, DTWAIN_ANYSUPPORT)?true:false);
 
@@ -210,7 +226,7 @@ void TestAndCachePixelTypes(CTL_ITwainSource* p)
         strm.str("");
         strm << "\nFor source \"" << p->GetProductNameA() << "\", there are (is) " <<
             mapPr.second.size() << " available bit depth(s) for pixel type " <<
-            CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWPT, mapPr.first) << "\n";
+            CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWPT, mapPr.first).second << "\n";
         size_t j = 0;
         for (auto& val : mapPr.second)
         {

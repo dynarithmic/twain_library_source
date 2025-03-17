@@ -149,6 +149,9 @@ bool CTL_ExtImageInfoTriplet::CreateExtImageInfo()
     auto sessionHandle = pSession->GetTwainDLLHandle();
     const size_t nInfos = m_ExtInfoMap.size();
 
+    // Destroy previous memory 
+    DestroyInfo();
+
     // Allocate memory for TW_INFO structure
     m_memHandle = sessionHandle->m_TwainMemoryFunc->AllocateMemory(static_cast<TW_UINT32>(sizeof(TW_INFO) * nInfos + sizeof(TW_EXTIMAGEINFO)));
     m_pExtImageInfo = static_cast<TW_EXTIMAGEINFO*>(sessionHandle->m_TwainMemoryFunc->LockMemory(m_memHandle));
@@ -225,10 +228,8 @@ std::pair<bool, int32_t> CTL_ExtImageInfoTriplet::GetItemData(int nWhichItem, in
     if (!sessionHandle)
         return { false, DTWAIN_ERR_BAD_HANDLE };
 
-    TW_INFO Info = {};
-
     // Check if info has been found
-    Info = GetInfo(nWhichItem, nSearch);
+    TW_INFO Info = GetInfo(nWhichItem, nSearch);
 
     // Check the number of items
     if ( nWhichValue >= Info.NumItems )

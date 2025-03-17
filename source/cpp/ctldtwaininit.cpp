@@ -472,7 +472,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstant(LONG lConstantType, LONG lTwai
 {
     LOG_FUNC_ENTRY_PARAMS((lConstantType, lTwainConstant, lpszOut, nSize))
     VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto ret = CTL_StaticData::GetTwainNameFromConstant(lConstantType, lTwainConstant);
+    auto ret = CTL_StaticData::GetTwainNameFromConstant(lConstantType, lTwainConstant).second;
     auto numChars = StringWrapper::CopyInfoToCString(ret, lpszOut, nSize);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
     LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
@@ -2098,13 +2098,13 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainStringName(LONG category, LONG TwainID, LPTSTR 
     switch (category)
     {
         case DTWAIN_DGNAME:
-            sValue = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DG, TwainID);
+            sValue = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DG, TwainID).second;
         break;
         case DTWAIN_DATNAME:
-            sValue = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DAT, TwainID);
+            sValue = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DAT, TwainID).second;
         break;
         case DTWAIN_MSGNAME:
-            sValue = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_MSG, TwainID);
+            sValue = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_MSG, TwainID).second;
         break;
     }
     const LONG RetVal = StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sValue), lpszBuffer, nMaxLen);

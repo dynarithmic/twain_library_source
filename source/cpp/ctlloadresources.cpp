@@ -689,7 +689,7 @@ namespace dynarithmic
                     getline(strm, descr);
                     if (resourceID == IDS_DTWAIN_APPTITLE)
                         descr = StringConversion::Convert_Native_To_Ansi(
-                            CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DLLINFO, IDS_DTWAIN_APPTITLE));
+                            CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_DLLINFO, IDS_DTWAIN_APPTITLE).second);
                     StringWrapperA::TrimAll(descr);
                     descr = StringWrapperA::ReplaceAll(descr, "{short_version}", DTWAIN_VERINFO_FILEVERSION);
                     descr = StringWrapperA::ReplaceAll(descr, "{company_name}", DTWAIN_VERINFO_COMPANYNAME);

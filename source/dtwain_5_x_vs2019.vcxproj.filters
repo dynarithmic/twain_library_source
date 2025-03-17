@@ -670,6 +670,12 @@
     <ClCompile Include="cpp\ctltwaincompliancy.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
+    <ClCompile Include="cpp\extendedimageinfo.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlextimageinfo.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp\pdflib32\a85encode.h">
@@ -1084,6 +1090,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h\ctltwaincompliancy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\extendedimageinfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

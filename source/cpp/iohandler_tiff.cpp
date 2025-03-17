@@ -94,7 +94,7 @@ int CTL_TiffIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
         !m_ImageInfoEx.IsPostscript &&
         !m_ImageInfoEx.IsPostscriptMultipage &&
         !m_ImageInfoEx.IsOCRTempImage)
-        m_nFormat = m_ImageInfoEx.theSource->GetAcquireFileType();
+        m_nFormat = m_ImageInfoEx.theSource->GetAcquireFileStatusRef().GetAcquireFileFormat();
 
     if ( !pMultiPageStruct || pMultiPageStruct->Stage == DIB_MULTI_FIRST )
     {
