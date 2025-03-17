@@ -84,7 +84,7 @@ BOOL DLLENTRY_DEF DTWAIN_GetTwainCountryName(LONG countryId, LPTSTR szName)
 {
     LOG_FUNC_ENTRY_PARAMS((countryId, szName))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto ret = CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_TWCY, countryId);
+    auto ret = CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_TWCY, countryId).second;
     StringWrapper::CopyInfoToCString(ret, szName, 32);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szName))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -104,7 +104,7 @@ BOOL DLLENTRY_DEF DTWAIN_GetTwainLanguageName(LONG nameId, LPTSTR szName)
 {
     LOG_FUNC_ENTRY_PARAMS((nameId, szName))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto ret = CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_TWLG, nameId);
+    auto ret = CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_TWLG, nameId).second;
     StringWrapper::CopyInfoToCString(ret, szName, 32);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szName))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)

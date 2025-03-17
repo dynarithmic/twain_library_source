@@ -1227,6 +1227,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include="cpp\ctlacquireaudio.cpp" />
     <ClCompile Include="cpp\ctlerrorbuffer.cpp" />
     <ClCompile Include="cpp\ctlerrorcallback.cpp" />
+    <ClCompile Include="cpp\ctlextimageinfo.cpp" />
     <ClCompile Include="cpp\ctlfileappend.cpp" />
     <ClCompile Include="cpp\ctlfilesave.cpp" />
     <ClCompile Include="cpp\ctlfileutils.cpp" />
@@ -1251,6 +1252,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include="cpp\ctltwainsource.cpp" />
     <ClCompile Include="cpp\ctlupdatedibproc.cpp" />
     <ClCompile Include="cpp\ctlwindowproc.cpp" />
+    <ClCompile Include="cpp\extendedimageinfo.cpp" />
     <ClCompile Include="cpp\imagefun\resamplefactory.cpp" />
     <ClCompile Include="cpp\imagefun\tiffun32.cpp" />
     <ClCompile Include="cpp\imagefun\txtfun32.cpp" />
@@ -1508,6 +1510,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\dtwain_version.h" />
     <ClInclude Include="h\dtwtype.h" />
     <ClInclude Include="h\errstruc.h" />
+    <ClInclude Include="h\extendedimageinfo.h" />
     <ClInclude Include="h\imagefun\dtwpdf\crc32_aux.h" />
     <ClInclude Include="h\imagefun\dtwpdf\dtwainpdf.h" />
     <ClInclude Include="h\imagefun\pcxfun32.h" />

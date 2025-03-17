@@ -232,7 +232,7 @@ LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontName(LONG FontVal, LPTSTR szFont, LONG n
 {
     LOG_FUNC_ENTRY_PARAMS((FontVal, szFont, nChars))
     VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto st = CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_FONTNAME, FontVal + DTWAIN_FONT_START_);
+    auto st = CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_FONTNAME, FontVal + DTWAIN_FONT_START_).second;
     auto numChars = StringWrapper::CopyInfoToCString(st, szFont, nChars);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szFont))
     LOG_FUNC_EXIT_NONAME_PARAMS(numChars)

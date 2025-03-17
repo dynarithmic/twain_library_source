@@ -1073,3 +1073,12 @@ DTWAIN_IsPeekMessageLoopEnabled                   @31072
 DTWAIN_EnumCompressionTypesEx2                    @31073
 DTWAIN_GetFileCompressionType                     @31074
 DTWAIN_SetFileCompressionType                     @31075
+DTWAIN_AllocateMemory64                           @31076
+DTWAIN_GetExtImageInfoItemEx                      @31077
+DTWAIN_EnumSupportedExtImageInfo                  @31078
+DTWAIN_ArrayAddFrameN                             @31079 
+DTWAIN_ArrayAddFrame                              @31080
+DTWAIN_ArrayInsertAtFrameN                        @31081
+DTWAIN_ArrayInsertAtFrame                         @31082
+DTWAIN_ArrayGetAtFrame                            @31083
+DTWAIN_ArraySetAtFrame                            @31084
