@@ -1565,23 +1565,8 @@ bool CTL_ImageXferTriplet::QueryAndRemoveDib(CTL_TwainAcquireEnum acquireType, s
     if (GetDAT() == DAT_AUDIONATIVEXFER)
         return true;
     CTL_ITwainSource* pSource = GetSourcePtr();
-    CTL_TwainDibArray* pArray = pSource->GetDibArray();
-    const CTL_ITwainSession* pSession = GetSessionPtr();
-    bool bKeepPage = true;
-
-    if (pSource->GetAcquireType() == acquireType)
-    {
-        bKeepPage = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_QUERYPAGEDISCARD, reinterpret_cast<LPARAM>(pSource)) ? true : false;
-        // Do not keep the page
-        if (!bKeepPage)
-        {
-            // throw this dib away (remove from the dib array)
-            pArray->DeleteDibMemory(nWhich);
-            pArray->RemoveDib(nWhich);
-            CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_PAGEDISCARDED, reinterpret_cast<LPARAM>(pSource));
-        }
-    }
-    return bKeepPage;
+    CTL_ImageTriplet img(GetSessionPtr(), pSource);
+    return img.QueryAndRemoveDib(acquireType, *(pSource->GetDibArray()), nWhich);
 }
 
 void CTL_ImageXferTriplet::SetBufferedTransfer(bool bSet)
