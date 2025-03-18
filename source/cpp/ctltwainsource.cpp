@@ -1010,7 +1010,6 @@ TW_INFO CTL_ITwainSource::GetExtImageInfoItem(int nItem, int nSearchType ) const
 
 bool CTL_ITwainSource::DestroyExtImageInfo()
 {
-    m_pExtImageTriplet->DestroyInfo();
     m_pExtendedImageInformation->ClearInfo();
     return true;
 }
