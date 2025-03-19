@@ -211,17 +211,26 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDT
    in STATE 7 of the source */
 static bool RetrieveExtImageInfo(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pTheSource)
 {
+    struct RetrieveRAII
+    {
+        CTL_ITwainSource* m_p;
+        RetrieveRAII(CTL_ITwainSource* p) : m_p(p) {}
+        ~RetrieveRAII() 
+        { 
+            // It is safe to delete the original Extended Image Info retrieved from the 
+            // TWAIN triplet, since we have cached all the information into our local containers
+            auto* pTrip = m_p->GetExtImageInfoTriplet();
+            pTrip->DestroyInfo();
+        }
+    };
+
+    // Ensure we clean up the memory allocated for the Extended Image Info
+    RetrieveRAII raii(pTheSource);
+
     auto* pExtendedImageInfo = pTheSource->GetExtendedImageInfo();
-    bool bOk = true;
     pExtendedImageInfo->SetInfoRetrieved(false);
     pTheSource->InitExtImageInfo(0);
-    bOk = pExtendedImageInfo->BeginRetrieval();
-
-    // It is safe to delete the original Extended Image Info retrieved from the 
-    // TWAIN triplet, since we have cached all the information into our local containers
-    auto *pTrip = pTheSource->GetExtImageInfoTriplet();
-    pTrip->DestroyInfo();
-    return bOk;
+    return pExtendedImageInfo->BeginRetrieval();
 }
 
 
