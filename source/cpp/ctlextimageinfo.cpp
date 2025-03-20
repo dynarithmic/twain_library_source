@@ -356,6 +356,7 @@ static std::pair<bool, int> GetCachedExtImageInfoData(CTL_TwainDLLHandle* pHandl
         case TWEI_BARCODEY:
         case TWEI_BARCODEROTATION:
         case TWEI_BARCODETEXT:
+        case TWEI_BARCODETEXTLENGTH:                
         case TWEI_BARCODETYPE:
             theArray = pExtendedImageInfo->GetBarcodeInfo(nWhich);
         break;
