@@ -813,6 +813,10 @@ DTWAIN_ARRAY ExtendedImageInformation::GetBarcodeInfo(long nWhichInfo)
             return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(),
                                                                     m_InfoBlock.m_barcodeInfo.vType);
         break;
+        case TWEI_BARCODETEXTLENGTH:
+            return CreateArrayFromContainer<std::vector<TW_UINT32>>(m_theSource->GetDTWAINHandle(),
+                                                                    m_InfoBlock.m_barcodeInfo.vLength);
+        break;
         case TWEI_BARCODETEXT:
             return CreateArrayFromContainer<std::vector<std::string>>(m_theSource->GetDTWAINHandle(), 
                                                                       m_InfoBlock.m_barcodeInfo.vText);
