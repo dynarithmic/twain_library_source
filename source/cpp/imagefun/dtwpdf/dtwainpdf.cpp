@@ -2108,8 +2108,7 @@ void ImageObject::ComposeObject()
     if (!pParent)
         return;
 
-    // do a85 encoding here for a test
-    if ( pParent->IsASCIICompressed() || pParent->IsAESEncrypted() )
+    if ( pParent->IsASCIICompressed())
     {
         std::string sOut;
         std::string sIn;
