@@ -185,10 +185,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFCompression(DTWAIN_SOURCE Source, DTWAIN_B
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFAESEncryption(DTWAIN_SOURCE Source, DTWAIN_BOOL bUseAES)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, bUseAES))
-    auto [pHandle, pSource] = VerifyHandles(Source);
-    pSource->SetPDFValue(PDFAESKEY, static_cast<LONG>(bUseAES));
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK_LOG_PARAMS(false)
+    #ifndef DTWAIN_SUPPORT_AES
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    #else
+        auto [pHandle, pSource] = VerifyHandles(Source);
+        pSource->SetPDFValue(PDFAESKEY, static_cast<LONG>(bUseAES));
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        CATCH_BLOCK_LOG_PARAMS(false)
+    #endif
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFASCIICompression(DTWAIN_SOURCE Source, DTWAIN_BOOL bCompression)

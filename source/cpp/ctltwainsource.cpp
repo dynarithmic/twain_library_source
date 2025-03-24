@@ -897,7 +897,11 @@ void CTL_ITwainSource::SetPDFValue(const CTL_StringType& nWhich, LONG nValue)
         m_ImageInfoEx.nPDFPolarity = nValue;
     else
     if (nWhich == PDFAESKEY )
+    {
         m_ImageInfoEx.bIsAESEncrypted = nValue?true:false;
+        m_ImageInfoEx.bUseStrongEncryption = nValue ? true : false;
+        m_ImageInfoEx.bIsPDFEncrypted = nValue ? true : false;
+    }
 }
 
 void CTL_ITwainSource::SetPDFValue(const CTL_StringType& nWhich, DTWAIN_FLOAT f1, DTWAIN_FLOAT f2)
