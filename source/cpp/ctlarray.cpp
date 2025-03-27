@@ -264,19 +264,16 @@ void DTWAIN_RangeSetter(CTL_TwainDLLHandle* pHandle,
                         LPVOID pDefault)
 {
     Traits* pBuffer = static_cast<Traits*>(pHandle->m_ArrayFactory->get_buffer(a, 0));
-    pBuffer[DTWAIN_RANGEMIN] = *static_cast<Traits*>(valueLow);
-    pBuffer[DTWAIN_RANGEMAX] = *static_cast<Traits*>(valueUp);
-    pBuffer[DTWAIN_RANGESTEP] = *static_cast<Traits*>(valueStep);
-
+    if (valueLow)
+        pBuffer[DTWAIN_RANGEMIN] = *static_cast<Traits*>(valueLow);
+    if ( valueUp )
+        pBuffer[DTWAIN_RANGEMAX] = *static_cast<Traits*>(valueUp);
+    if ( valueStep )
+        pBuffer[DTWAIN_RANGESTEP] = *static_cast<Traits*>(valueStep);
     if ( pDefault )
         pBuffer[DTWAIN_RANGEDEFAULT] = *static_cast<Traits*>(pDefault);
-    else
-        pBuffer[DTWAIN_RANGEDEFAULT] = {};
-
     if (valueCurrent)
         pBuffer[DTWAIN_RANGECURRENT] = *static_cast<Traits*>(valueCurrent);
-    else
-        pBuffer[DTWAIN_RANGECURRENT] = {};
 }
 
 void dynarithmic::DestroyFrameFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_FRAME Frame)
@@ -326,6 +323,8 @@ DTWAIN_ARRAY dynarithmic::CreateArrayCopyFromFactory(CTL_TwainDLLHandle* pHandle
 
 void dynarithmic::SetArrayValueFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray, size_t lPos, LPVOID pVariant)
 {
+    if (!pVariant)
+        return;
     const auto& factory = pHandle->m_ArrayFactory;
     const int enumType = factory->tag_type(pArray);
     switch (enumType)
@@ -484,6 +483,9 @@ DTWAIN_BOOL  DLLENTRY_DEF DTWAIN_ArrayAddN( DTWAIN_ARRAY pArray, LPVOID pVariant
     auto checkStatus = ArrayChecker().SetArray1(pArray).SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS);
     if (checkStatus.Check(pHandle) != DTWAIN_NO_ERROR)
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
+
+    if (!pVariant)
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
 
     auto& factory = pHandle->m_ArrayFactory;
     const auto tag_type = factory->tag_type(pArray);
@@ -963,6 +965,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAt( DTWAIN_ARRAY pArray, LONG nWhere, LP
     if ( checkStatus.Check(pHandle) != DTWAIN_NO_ERROR )
         LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
 
+    if ( !pVariant )
+        LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
+
     const auto& factory = pHandle->m_ArrayFactory; 
 
     // Do something special for strings
@@ -1134,6 +1139,8 @@ LONG  DLLENTRY_DEF DTWAIN_ArrayFind( DTWAIN_ARRAY pArray, LPVOID pVariant )
     const auto checkStatus = ArrayChecker().SetArray1(pArray).SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS);
     if (checkStatus.Check(pHandle) != DTWAIN_NO_ERROR)
         LOG_FUNC_EXIT_NONAME_PARAMS(-1)
+    if ( !pVariant )
+        LOG_FUNC_EXIT_NONAME_PARAMS(-1)
 
     auto FoundPos = ArrayFindInternal(pHandle, pArray, pVariant, 0.0, false);
     LOG_FUNC_EXIT_NONAME_PARAMS(FoundPos)
@@ -1176,11 +1183,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtN( DTWAIN_ARRAY pArray, LONG nWhere
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, nWhere, pVariant, num))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const auto& factory = pHandle->m_ArrayFactory; 
+    const auto& factory = pHandle->m_ArrayFactory;
     const auto checkStatus = ArrayChecker().SetArray1(pArray).
                                         SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS | ArrayChecker::CHECK_ARRAY_BOUNDS);
     if (checkStatus.Check(pHandle) != DTWAIN_NO_ERROR)
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    if ( !pVariant )
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
     factory->insert(pArray, pVariant, nWhere, num);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
@@ -1520,6 +1529,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetValue( DTWAIN_RANGE pArray, LONG nWhich,
     const LONG lResult = IsValidRangeArray( pHandle, pArray );
     if ( lResult != 1 && lResult != DTWAIN_ERR_INVALID_RANGE)
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    if ( !pVariant )
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
     const DTWAIN_BOOL bRet = DTWAIN_ArrayGetAt(static_cast<DTWAIN_ARRAY>(pArray), nWhich, pVariant);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -1588,10 +1599,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeSetAllLong( DTWAIN_RANGE pArray, LONG lLow,
     CATCH_BLOCK(false)
 }
 
-DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_RangeSetAllFloat( DTWAIN_RANGE pArray, DTWAIN_FLOAT dLow,
-                                                         DTWAIN_FLOAT dUp, DTWAIN_FLOAT dStep,
-                                                         DTWAIN_FLOAT dDefault,
-                                                         DTWAIN_FLOAT dCurrent )
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeSetAllFloat( DTWAIN_RANGE pArray, DTWAIN_FLOAT dLow,
+                                                  DTWAIN_FLOAT dUp, DTWAIN_FLOAT dStep,
+                                                  DTWAIN_FLOAT dDefault,
+                                                  DTWAIN_FLOAT dCurrent )
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, dLow, dUp,dStep,dDefault,dCurrent ))
     const DTWAIN_BOOL bRet = DTWAIN_RangeSetAll(pArray,&dLow,&dUp,&dStep,&dDefault,&dCurrent);
@@ -1600,14 +1611,14 @@ DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_RangeSetAllFloat( DTWAIN_RANGE pArray, D
 }
 
 
-DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_RangeSetAllFloatString( DTWAIN_RANGE pArray, LPCTSTR dLow,
-                                                                LPCTSTR dUp, LPCTSTR dStep, LPCTSTR dDefault,LPCTSTR dCurrent )
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeSetAllFloatString(DTWAIN_RANGE pArray, LPCTSTR dLow,
+                                                       LPCTSTR dUp, LPCTSTR dStep, LPCTSTR dDefault,LPCTSTR dCurrent )
 {
-    LOG_FUNC_ENTRY_PARAMS((pArray, dLow, dUp,dStep,dDefault,dCurrent ))
+    LOG_FUNC_ENTRY_PARAMS((pArray, dLow, dUp, dStep, dDefault, dCurrent ))
     double d[5];
     LPCTSTR* vals[] = {&dLow, &dUp, &dStep, &dDefault, &dCurrent};
     for (int i = 0; i < 5; ++i )
-      d[i] = StringWrapper::ToDouble(*vals[i]);
+      d[i] = vals[i]?StringWrapper::ToDouble(*vals[i]):0;
     const DTWAIN_BOOL bRet = DTWAIN_RangeSetAllFloat(pArray, d[0], d[1], d[2], d[3], d[4]);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -1637,7 +1648,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetAll( DTWAIN_RANGE pArray, LPVOID pVarian
     CATCH_BLOCK(false)
 }
 
-DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_RangeGetAllLong( DTWAIN_RANGE pArray, LPLONG lLow,
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetAllLong( DTWAIN_RANGE pArray, LPLONG lLow,
                                                         LPLONG lUp, LPLONG lStep,
                                                         LPLONG lDefault,
                                                         LPLONG lCurrent )
@@ -1720,6 +1731,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetExpValue( DTWAIN_RANGE pArray, LONG lPos
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     if (IsValidRangeArray( pHandle, static_cast<DTWAIN_ARRAY>(pArray) ) < 0 )
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    if ( !pVariant )
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+
     // Check if (low < high) and 0 < step < (high - low)
     auto eType = pHandle->m_ArrayFactory->tag_type(pArray);
     if ( eType == CTL_ArrayFactory::arrayTag::LongType)
@@ -1738,7 +1752,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetExpValue( DTWAIN_RANGE pArray, LONG lPos
     CATCH_BLOCK(false)
 }
 
-DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_RangeGetExpValueLong( DTWAIN_RANGE pArray, LONG lPos, LPLONG pVal )
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetExpValueLong( DTWAIN_RANGE pArray, LONG lPos, LPLONG pVal )
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, lPos, pVal))
     const DTWAIN_BOOL bRet = DTWAIN_RangeGetExpValue(pArray,lPos,pVal);
@@ -1747,7 +1761,7 @@ DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_RangeGetExpValueLong( DTWAIN_RANGE pArra
     CATCH_BLOCK(false)
 }
 
-DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_RangeGetExpValueFloat( DTWAIN_RANGE pArray, LONG lPos, LPDTWAIN_FLOAT pVal )
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetExpValueFloat( DTWAIN_RANGE pArray, LONG lPos, LPDTWAIN_FLOAT pVal )
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, lPos, pVal))
     const DTWAIN_BOOL bRet = DTWAIN_RangeGetExpValue(pArray,lPos,pVal);
@@ -1756,7 +1770,7 @@ DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_RangeGetExpValueFloat( DTWAIN_RANGE pArr
     CATCH_BLOCK(false)
 }
 
-DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_RangeGetExpValueFloatString( DTWAIN_RANGE pArray, LONG lPos, LPTSTR pVal )
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetExpValueFloatString( DTWAIN_RANGE pArray, LONG lPos, LPTSTR pVal )
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, lPos, pVal))
     double d;
@@ -1778,6 +1792,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetPos( DTWAIN_RANGE pArray, LPVOID pVarian
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     if (IsValidRangeArray(pHandle, static_cast<DTWAIN_ARRAY>(pArray) ) < 0 )
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    if (!pVariant || !pPos)
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
     auto eType = pHandle->m_ArrayFactory->tag_type(pArray);
     if ( eType == CTL_ArrayFactory::arrayTag::LongType )
     {
@@ -1812,10 +1828,19 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetPosFloat( DTWAIN_RANGE pArray, DTWAIN_FL
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetPosFloatString( DTWAIN_RANGE pArray, LPCTSTR Val, LPLONG pPos )
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, Val, pPos))
-    const double d = StringWrapper::ToDouble(Val);
-    const DTWAIN_BOOL bRet = DTWAIN_RangeGetPosFloat(pArray, d, pPos);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pPos))
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    DTWAIN_BOOL bRet = TRUE;
+    if ( Val && pPos)
+    {
+        const double d = StringWrapper::ToDouble(Val);
+        bRet = DTWAIN_RangeGetPosFloat(pArray, d, pPos);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pPos))
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    }
+    else
+    {
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pPos))
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    }
     CATCH_BLOCK(false)
 }
 
@@ -1835,7 +1860,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeExpand(DTWAIN_RANGE Range, LPDTWAIN_ARRAY A
     if (IsValidRangeArray(pHandle, static_cast<DTWAIN_ARRAY>(Range) ) < 0 )
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
-    // Check if array exists
+    // Check if DTWAIN_ARRAY pointer is not NULL
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !Array; }, DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
+
     // Instance of class that takes an array that takes a handle (pointer)
     const LONG nArrayType = DTWAIN_ArrayGetType(Range);
     const LONG lCount = DTWAIN_RangeGetCount( Range );
@@ -1886,6 +1913,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetNearestValue( DTWAIN_RANGE pArray, LPVOI
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     if (IsValidRangeArray(pHandle, static_cast<DTWAIN_ARRAY>(pArray) ) < 0 )
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
+
+    if ( !pVariantIn || !pVariantOut)
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     auto eType = pHandle->m_ArrayFactory->tag_type(pArray);
 
@@ -2035,6 +2065,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeNearestValueFloatString( DTWAIN_RANGE pArra
                                                               LPTSTR pOutput, LONG RoundType)
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, dIn, pOutput, RoundType))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    if ( !dIn || !pOutput )
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+
     const double d = StringWrapper::ToDouble(dIn);
     double dOut;
     const DTWAIN_BOOL bRet = DTWAIN_RangeNearestValueFloat(pArray, d, &dOut,RoundType);
