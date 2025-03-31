@@ -111,9 +111,6 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
         // Test the capability and see which container works.
         UINT cQuerySupport = 0;
 
-        std::string strName = CTL_TwainAppMgr::GetCapNameFromCap(nCap);
-        std::string sProdNameA = StringConversion::Convert_Native_To_Ansi(pSource->GetProductName());
-
         bCanQuerySupport = cQuerySupport ? true : false;
 
         auto& allCapInfo = CTL_StaticData::GetGeneralCapInfo();
