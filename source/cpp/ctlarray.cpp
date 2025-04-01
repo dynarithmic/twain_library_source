@@ -711,25 +711,55 @@ DTWAIN_ARRAY  DLLENTRY_DEF  DTWAIN_ArrayCreateFromReals(double* pCArray, LONG nS
     CATCH_BLOCK(DTWAIN_ARRAY(0))
 }
 
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayCreateFromStrings(LPCTSTR* pCArray, LONG nSize)
+template <typename PointerType, typename StringType, typename ArrayType>
+static DTWAIN_ARRAY CreateStringArrayFromFactory(PointerType* pCArray, CTL_TwainDLLHandle* pHandle, int nWhich, LONG nSize)
 {
-    LOG_FUNC_ENTRY_PARAMS((pCArray, nSize))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const DTWAIN_ARRAY Dest = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, nSize);
-    if ( !Dest )
-        LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
-    CTL_StringArrayType tempArray;
+    ArrayType tempArray;
     for (LONG i = 0; i < nSize; ++i)
     {
         tempArray.push_back(*pCArray);
         ++pCArray;
     }
-#ifdef _UNICODE
-    auto& vect = pHandle->m_ArrayFactory->underlying_container_t<std::wstring>(Dest);
-#else
-    auto& vect = pHandle->m_ArrayFactory->underlying_container_t<std::string>(Dest);
-#endif
-    vect.insert(vect.end(), tempArray.begin(), tempArray.end());
+    const DTWAIN_ARRAY Dest = CreateArrayFromFactory(pHandle, nWhich, nSize);
+    if (!Dest)
+        return nullptr;
+    auto& vect = pHandle->m_ArrayFactory->underlying_container_t<StringType>(Dest);
+    std::copy_n(tempArray.begin(), nSize, vect.begin());
+    return Dest;
+}
+
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayCreateFromStringsA(LPCSTR* pCArray, LONG nSize)
+{
+    LOG_FUNC_ENTRY_PARAMS((pCArray, nSize))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    const DTWAIN_ARRAY Dest = CreateStringArrayFromFactory<LPCSTR, std::string, StringWrapperA::StringArrayType>(pCArray, pHandle, DTWAIN_ARRAYANSISTRING, nSize);
+    if (!Dest)
+        LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
+    LOG_FUNC_EXIT_NONAME_PARAMS(Dest)
+    CATCH_BLOCK(DTWAIN_ARRAY(NULL))
+}
+
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayCreateFromStringsW(LPCWSTR* pCArray, LONG nSize)
+{
+    LOG_FUNC_ENTRY_PARAMS((pCArray, nSize))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    const DTWAIN_ARRAY Dest = CreateStringArrayFromFactory<LPCWSTR, std::wstring, StringWrapperW::StringArrayType>(pCArray, pHandle, DTWAIN_ARRAYWIDESTRING, nSize);
+    if (!Dest)
+        LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
+    LOG_FUNC_EXIT_NONAME_PARAMS(Dest)
+    CATCH_BLOCK(DTWAIN_ARRAY(NULL))
+}
+
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayCreateFromStrings(LPCTSTR* pCArray, LONG nSize)
+{
+    LOG_FUNC_ENTRY_PARAMS((pCArray, nSize))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    DTWAIN_ARRAY Dest = {};
+    #ifdef _UNICODE
+        Dest = CreateStringArrayFromFactory<LPCWSTR, std::wstring, StringWrapperW::StringArrayType>(pCArray, pHandle, DTWAIN_ARRAYWIDESTRING, nSize);
+    #else
+        Dest = CreateStringArrayFromFactory<LPCSTR, std::string, StringWrapperA::StringArrayType>(pCArray, pHandle, DTWAIN_ARRAYANSISTRING, nSize);
+    #endif
     LOG_FUNC_EXIT_NONAME_PARAMS(Dest)
     CATCH_BLOCK(DTWAIN_ARRAY(NULL))
 }
@@ -2085,6 +2115,17 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeNearestValueFloatString( DTWAIN_RANGE pArra
 }
 
 ///////////////////////////////////////////////// Frame functions //////////////////////////////////////////
+static std::pair<bool, int> CheckValidFrame(CTL_TwainDLLHandle *pHandle, DTWAIN_FRAME frame)
+{
+    const auto checkStatus = ArrayChecker().SetArray1(frame).
+    SetArrayPos(0).
+    SetExplicitTypeCheck(CTL_ArrayFactory::arrayTag::FrameSingleType).
+    SetCheckType(ArrayChecker::CHECK_ARRAY_BOUNDS | ArrayChecker::CHECK_ARRAY_EXISTS | ArrayChecker::CHECK_ARRAY_EXPLICIT_TYPE);
+    if (checkStatus.Check(pHandle) != DTWAIN_NO_ERROR)
+        return { false, DTWAIN_ERR_INVALID_DTWAIN_FRAME };
+    return { true, DTWAIN_NO_ERROR };
+}
+
 DTWAIN_FRAME DLLENTRY_DEF DTWAIN_FrameCreate(DTWAIN_FLOAT Left, DTWAIN_FLOAT Top, DTWAIN_FLOAT Right, DTWAIN_FLOAT Bottom)
 {
     LOG_FUNC_ENTRY_PARAMS((Left, Top, Right, Bottom))
@@ -2168,8 +2209,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFrame(DTWAIN_ARRAY FrameArray, LONG nW
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayFrameSetFrameAt(DTWAIN_ARRAY FrameArray, LONG nWhere, DTWAIN_FRAME theFrame)
 {
     LOG_FUNC_ENTRY_PARAMS((FrameArray, nWhere, theFrame))
-    if ( !DTWAIN_FrameIsValid(theFrame))
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    auto pr = CheckValidFrame(pHandle, theFrame);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pr.first; }, DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
     double left, top, right, bottom;
     DTWAIN_FrameGetAll(theFrame, &left, &top, &right, &bottom);
     DTWAIN_BOOL bRet = DTWAIN_ArrayFrameSetAt(FrameArray, nWhere, left, top, right, bottom);
@@ -2181,13 +2223,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameIsValid(DTWAIN_FRAME Frame)
 {
     LOG_FUNC_ENTRY_PARAMS((Frame))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const auto checkStatus = ArrayChecker().SetArray1(Frame).
-                SetArrayPos(0).
-                SetExplicitTypeCheck(CTL_ArrayFactory::arrayTag::FrameSingleType).
-                SetCheckType(ArrayChecker::CHECK_ARRAY_BOUNDS | ArrayChecker::CHECK_ARRAY_EXISTS | ArrayChecker::CHECK_ARRAY_EXPLICIT_TYPE);
-    if ( checkStatus.Check(pHandle) != DTWAIN_NO_ERROR)
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return true; },
-                                          DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
+    auto pr = CheckValidFrame(pHandle, Frame);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pr.first; }, DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -2198,9 +2235,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameDestroy(DTWAIN_FRAME Frame)
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     if ( !Frame )
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    bool isValid = DTWAIN_FrameIsValid(Frame);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !isValid;},
-                                      DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
+    auto pr = CheckValidFrame(pHandle, Frame);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pr.first; }, DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
     DestroyFrameFromFactory(pHandle, Frame);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
@@ -2212,9 +2248,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetAll(DTWAIN_FRAME Frame,DTWAIN_FLOAT Left
 {
     LOG_FUNC_ENTRY_PARAMS((Frame, Left, Top, Right, Bottom))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    bool frameValid = DTWAIN_FrameIsValid(Frame);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !frameValid; },
-                                      DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
+    auto pr = CheckValidFrame(pHandle, Frame);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pr.first; }, DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
     auto& vOne = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(Frame);
     auto& pPtr = vOne.front();
     pPtr.SetFrame(Left, Top, Right, Bottom);
@@ -2228,9 +2263,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetAll(DTWAIN_FRAME Frame, LPDTWAIN_FLOAT L
 {
     LOG_FUNC_ENTRY_PARAMS((Frame, Left, Top, Right, Bottom))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    bool frameValid = DTWAIN_FrameIsValid(Frame);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !frameValid; },
-                                      DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
+    auto pr = CheckValidFrame(pHandle, Frame);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pr.first; }, DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
     auto& vOne = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(Frame);
     auto& pPtr = vOne.front();
 
@@ -2250,9 +2284,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetValue(DTWAIN_FRAME Frame, LONG nWhich, L
 {
     LOG_FUNC_ENTRY_PARAMS((Frame, nWhich, Value))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    bool frameValid = DTWAIN_FrameIsValid(Frame);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !frameValid; },
-                                      DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
+    auto pr = CheckValidFrame(pHandle, Frame);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pr.first; }, DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
     if (Value)
     {
         const bool bCheck = TwainFrameInternal::IsValidComponent(nWhich);
@@ -2269,9 +2302,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetValue(DTWAIN_FRAME Frame, LONG nWhich, D
 {
     LOG_FUNC_ENTRY_PARAMS((Frame, nWhich, Value))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    bool frameValid = DTWAIN_FrameIsValid(Frame);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !frameValid; },
-                                      DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
+    auto pr = CheckValidFrame(pHandle, Frame);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pr.first; }, DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
     const bool bCheck = TwainFrameInternal::IsValidComponent(nWhich);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !bCheck;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     auto& vOne = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(Frame);
@@ -2299,9 +2331,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetAllString(DTWAIN_FRAME Frame, LPCTSTR Le
 {
     LOG_FUNC_ENTRY_PARAMS((Frame, Left, Top, Right, Bottom))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    bool frameValid = DTWAIN_FrameIsValid(Frame);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !frameValid; },
-                                      DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
+    auto pr = CheckValidFrame(pHandle, Frame);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pr.first; }, DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
     std::array<double, 4> aComponents;
     aComponents[0] = Left?StringWrapper::ToDouble(Left):0;
     aComponents[1] = Top?StringWrapper::ToDouble(Top):0;
