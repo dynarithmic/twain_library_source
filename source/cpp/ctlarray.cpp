@@ -158,7 +158,7 @@ struct ArrayChecker
         }
 };
 
-static LONG IsValidRangeArray( CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray );
+static LONG IsValidRangeArray( CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray, size_t nWhich = 0 );
 static LONG IsValidAcqArray(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray );
 
 template <typename T, typename U>
@@ -1460,7 +1460,92 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeIsValid(DTWAIN_RANGE Range, LPLONG pStatus 
     CATCH_BLOCK(false)
 }
 
-static LONG IsValidRangeArray( CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray )
+template <typename RangeType, typename ZeroCheckFn>
+std::pair<bool, int> static GeneralRangeCheck(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray,  ZeroCheckFn chkFn, size_t nWhichItem = 0)
+{
+    const auto& factory = pHandle->m_ArrayFactory;
+    auto& pVals = factory->underlying_container_t<RangeType>(pArray);
+
+    // Check if the array has 5 elements
+    if (pVals.size() != 5)
+        return { false, DTWAIN_ERR_INVALID_RANGE };
+
+    // Check item position
+    if ( nWhichItem >= DTWAIN_RANGECURRENT)
+        return { false, DTWAIN_ERR_INDEX_BOUNDS };
+
+    const RangeType lLow = pVals[0];
+    const RangeType lUp = pVals[1];
+    const RangeType lStep = pVals[2];
+    if (lLow > lUp)
+        return { false, DTWAIN_ERR_INVALID_RANGE };
+    if (lStep < 0)
+        return { false, DTWAIN_ERR_INVALID_RANGE };
+    if (chkFn(lStep, static_cast<RangeType>(0)) && lLow < lUp)
+        return { false, DTWAIN_ERR_INVALID_RANGE };
+    return { true, DTWAIN_NO_ERROR };
+}
+
+template <typename RangeType>
+static void GenericRangeGetter(CTL_TwainDLLHandle* pHandle, DTWAIN_RANGE pArray,
+    RangeType* pLow, RangeType* pUp,
+    RangeType* pStep, RangeType* pDefault, RangeType* pCurrent)
+{
+    const auto& factory = pHandle->m_ArrayFactory;
+    auto& pVals = factory->underlying_container_t<RangeType>(pArray);
+    if (pLow)
+        *pLow = pVals[DTWAIN_RANGEMIN];
+    if (pUp)
+        *pUp = pVals[DTWAIN_RANGEMAX];
+    if (pStep)
+        *pStep = pVals[DTWAIN_RANGESTEP];
+    if (pDefault)
+        *pDefault = pVals[DTWAIN_RANGEDEFAULT];
+    if (pCurrent)
+        *pCurrent = pVals[DTWAIN_RANGECURRENT];
+}
+
+template <typename RangeType, typename RangeCountFn>
+static LONG GenericRangeCounter(CTL_TwainDLLHandle* pHandle, DTWAIN_RANGE pArray, RangeCountFn countFn)
+{
+    RangeType* pBuffer = static_cast<RangeType*>(pHandle->m_ArrayFactory->get_buffer(pArray, 0));
+    return static_cast<LONG>(countFn(pBuffer[DTWAIN_RANGEMIN], pBuffer[DTWAIN_RANGEMAX], pBuffer[DTWAIN_RANGESTEP]));
+}
+
+template <typename RangeType, typename ZCompareFn>
+static std::pair<bool, int> GenericRangePosition(CTL_TwainDLLHandle* pHandle, DTWAIN_RANGE pArray, RangeType* pVariant, LPLONG pPos, ZCompareFn compFn)
+{
+    RangeType* pBuffer = static_cast<RangeType*>(pHandle->m_ArrayFactory->get_buffer(pArray, 0));
+    if (compFn(pBuffer[DTWAIN_RANGESTEP]))
+        return { false, DTWAIN_ERR_RANGE_STEPISZERO };
+    if ( *pVariant < pBuffer[DTWAIN_RANGEMIN] || *pVariant > pBuffer[DTWAIN_RANGEMAX])
+        return { false, DTWAIN_ERR_RANGE_OUTOFBOUNDS };
+    *pPos = static_cast<LONG>((*pVariant - pBuffer[DTWAIN_RANGEMIN]) / pBuffer[DTWAIN_RANGESTEP]);
+    return { true, DTWAIN_NO_ERROR };
+}
+
+template <typename RangeType>
+static void GenericRangeGetExpValue(CTL_TwainDLLHandle* pHandle, DTWAIN_RANGE pArray, LONG lPos, RangeType* pVariant)
+{
+    RangeType* pBuffer = static_cast<RangeType*>(pHandle->m_ArrayFactory->get_buffer(pArray, 0));
+    *pVariant = pBuffer[DTWAIN_RANGEMIN] + pBuffer[DTWAIN_RANGESTEP] * lPos;
+}
+
+template <typename RangeType>
+static void GenericRangeExpand(CTL_TwainDLLHandle* pHandle, DTWAIN_RANGE Range, DTWAIN_ARRAY pDest, LONG lCount)
+{
+    RangeType* pBuffer = static_cast<RangeType*>(pHandle->m_ArrayFactory->get_buffer(Range, 0));
+    RangeType* pArrayBuf = static_cast<RangeType*>(pHandle->m_ArrayFactory->get_buffer(pDest, 0));
+    LONG i = 0;
+    std::transform(pArrayBuf, pArrayBuf + lCount, pArrayBuf, [&](RangeType /*n*/)
+        {
+            const RangeType retVal = pBuffer[DTWAIN_RANGEMIN] + pBuffer[DTWAIN_RANGESTEP] * i;
+            ++i;
+            return retVal;
+        });
+}
+
+static LONG IsValidRangeArray( CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray, size_t index)
 {
     LOG_FUNC_ENTRY_PARAMS((pArray))
 
@@ -1468,49 +1553,15 @@ static LONG IsValidRangeArray( CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray 
 
     // Check if array is a valid type for ranges
     auto enumType = factory->tag_type(pArray);
-    if ( enumType != CTL_ArrayFactory::arrayTag::LongType && enumType != CTL_ArrayFactory::arrayTag::DoubleType)
+    if (enumType != CTL_ArrayFactory::arrayTag::LongType && enumType != CTL_ArrayFactory::arrayTag::DoubleType)
         LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_ERR_WRONG_ARRAY_TYPE)
-
-    // Check if (low < high) and 0 < step < (high - low)
+    std::pair<bool, int> pr = {};
     if ( enumType == CTL_ArrayFactory::arrayTag::LongType)
-    {
-        auto& pVals = factory->underlying_container_t<LONG>(pArray);
-
-        // Check if the array has 5 elements
-        if ( pVals.size() != 5 )
-            LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_ERR_BAD_ARRAY)
-
-        const LONG lLow = pVals[0];
-        const LONG lUp = pVals[1];
-        const LONG lStep = pVals[2];
-
-        LOG_FUNC_VALUES_EX((lLow, lUp, lStep))
-
-        if ( lLow > lUp )
-            LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_ERR_INVALID_RANGE)
-        if ( lStep < 0 )
-            LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_ERR_INVALID_RANGE)
-         if ( lStep == 0 && lLow < lUp )
-            LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_ERR_INVALID_RANGE)
-    }
+        pr = GeneralRangeCheck<LONG>(pHandle, pArray, [](LONG val, LONG zero) { return val == zero; }, index);
     else
-    {
-        auto& pVals = factory->underlying_container_t<double>(pArray);
-
-        // Check if the array has 5 elements
-        if (pVals.size() != 5)
-            LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_ERR_BAD_ARRAY)
-        const double dLow = pVals[0];
-        const double dUp = pVals[1];
-        const double dStep = pVals[2];
-        LOG_FUNC_VALUES_EX((dLow, dUp, dStep))
-        if ( dLow > dUp )
-            LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_ERR_INVALID_RANGE)
-        if ( dStep < 0 )
-            LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_ERR_INVALID_RANGE)
-        if ( float_equal(dStep,0.0) && dLow < dUp )
-            LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_ERR_INVALID_RANGE)
-    }
+        pr = GeneralRangeCheck<double>(pHandle, pArray, [](double val, double zero) { return float_equal(val, 0.0); }, index);
+    if (!pr.first)
+        LOG_FUNC_EXIT_NONAME_PARAMS(pr.second);
     LOG_FUNC_EXIT_NONAME_PARAMS(1)
     CATCH_BLOCK(0)
 }
@@ -1519,7 +1570,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeSetValue( DTWAIN_RANGE pArray, LONG nWhich,
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, nWhich, pVariant))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const LONG lResult = IsValidRangeArray( pHandle, pArray );
+    const LONG lResult = IsValidRangeArray( pHandle, pArray, static_cast<size_t>(nWhich) );
     if ( lResult != 1 && lResult != DTWAIN_ERR_INVALID_RANGE)
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
     SetArrayValueFromFactory(pHandle, pArray, nWhich, pVariant);
@@ -1556,7 +1607,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetValue( DTWAIN_RANGE pArray, LONG nWhich,
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, nWhich, pVariant))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const LONG lResult = IsValidRangeArray( pHandle, pArray );
+    const LONG lResult = IsValidRangeArray( pHandle, pArray, static_cast<size_t>(nWhich) );
     if ( lResult != 1 && lResult != DTWAIN_ERR_INVALID_RANGE)
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
     if ( !pVariant )
@@ -1606,7 +1657,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeSetAll( DTWAIN_RANGE pArray, LPVOID pVarian
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, pVariantLow, pVariantUp, pVariantStep, pDefault, pCurrent))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const LONG lResult = IsValidRangeArray(pHandle, pArray );
+    const LONG lResult = IsValidRangeArray(pHandle, pArray);
     if ( lResult != 1 && lResult != DTWAIN_ERR_INVALID_RANGE)
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
@@ -1654,26 +1705,26 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeSetAllFloatString(DTWAIN_RANGE pArray, LPCT
     CATCH_BLOCK(false)
 }
 
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetAll( DTWAIN_RANGE pArray, LPVOID pVariantLow,
                                             LPVOID pVariantUp, LPVOID pVariantStep,
                                             LPVOID pDefault, LPVOID pCurrent )
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, pVariantLow, pVariantUp, pVariantStep, pDefault, pCurrent))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const LONG lResult = IsValidRangeArray(pHandle, pArray );
+    const LONG lResult = IsValidRangeArray(pHandle, pArray);
     if ( lResult != 1 && lResult != DTWAIN_ERR_INVALID_RANGE)
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    
-    if ( pVariantLow )
-        DTWAIN_ArrayGetAt(pArray, DTWAIN_RANGEMIN, pVariantLow);
-    if ( pVariantUp )
-        DTWAIN_ArrayGetAt(pArray, DTWAIN_RANGEMAX, pVariantUp);
-    if ( pVariantStep )
-        DTWAIN_ArrayGetAt(pArray, DTWAIN_RANGESTEP, pVariantStep);
-    if ( pDefault )
-        DTWAIN_ArrayGetAt(pArray, DTWAIN_RANGEDEFAULT, pDefault);
-    if ( pCurrent )
-        DTWAIN_ArrayGetAt(pArray, DTWAIN_RANGECURRENT, pCurrent);
+
+    auto enumType = pHandle->m_ArrayFactory->tag_type(pArray);
+    if (enumType == CTL_ArrayFactory::arrayTag::LongType)
+        GenericRangeGetter<LONG>(pHandle, pArray, 
+            reinterpret_cast<LONG*>(pVariantLow), reinterpret_cast<LONG*>(pVariantUp), 
+            reinterpret_cast<LONG*>(pVariantStep), reinterpret_cast<LONG*>(pDefault), reinterpret_cast<LONG*>(pCurrent));
+    else
+        GenericRangeGetter<double>(pHandle, pArray,
+            reinterpret_cast<double*>(pVariantLow), reinterpret_cast<double*>(pVariantUp),
+            reinterpret_cast<double*>(pVariantStep), reinterpret_cast<double*>(pDefault), reinterpret_cast<double*>(pCurrent));
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -1690,7 +1741,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetAllLong( DTWAIN_RANGE pArray, LPLONG lLo
     CATCH_BLOCK(false)
 }
 
-DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_RangeGetAllFloat( DTWAIN_RANGE pArray, LPDTWAIN_FLOAT dLow,
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetAllFloat( DTWAIN_RANGE pArray, LPDTWAIN_FLOAT dLow,
                                                          LPDTWAIN_FLOAT dUp, LPDTWAIN_FLOAT dStep,
                                                          LPDTWAIN_FLOAT dDefault,
                                                          LPDTWAIN_FLOAT dCurrent )
@@ -1702,7 +1753,7 @@ DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_RangeGetAllFloat( DTWAIN_RANGE pArray, L
     CATCH_BLOCK(false)
 }
 
-DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_RangeGetAllFloatString( DTWAIN_RANGE pArray, LPTSTR dLow,
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetAllFloatString( DTWAIN_RANGE pArray, LPTSTR dLow,
                                                          LPTSTR dUp, LPTSTR dStep,
                                                          LPTSTR dDefault,
                                                          LPTSTR dCurrent )
@@ -1735,22 +1786,18 @@ LONG DLLENTRY_DEF DTWAIN_RangeGetCount( DTWAIN_RANGE pArray )
 {
     LOG_FUNC_ENTRY_PARAMS((pArray))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    if (IsValidRangeArray(pHandle, static_cast<DTWAIN_ARRAY>(pArray) ) < 0 )
+    if (IsValidRangeArray(pHandle, static_cast<DTWAIN_ARRAY>(pArray)) < 0 )
         LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
 
     // Check if (low < high) and 0 < step < (high - low)
     LONG nNumItems;
     auto eType = pHandle->m_ArrayFactory->tag_type(pArray);
-    if ( eType == CTL_ArrayFactory::arrayTag::LongType)
-    {
-        LONG* pBuffer = static_cast<LONG*>(pHandle->m_ArrayFactory->get_buffer(pArray, 0));
-        nNumItems = abs(pBuffer[DTWAIN_RANGEMAX] - pBuffer[DTWAIN_RANGEMIN]) / pBuffer[DTWAIN_RANGESTEP] + 1;
-    }
+    if (eType == CTL_ArrayFactory::arrayTag::LongType)
+        nNumItems = GenericRangeCounter<LONG>(pHandle, pArray, [](LONG rMin, LONG rMax, LONG rStep)
+            { return abs(rMax - rMin) / rStep + 1; });
     else
-    {
-        double * pBuffer = static_cast<double*>(pHandle->m_ArrayFactory->get_buffer(pArray, 0));
-        nNumItems = static_cast<LONG>(fabs(pBuffer[DTWAIN_RANGEMAX] - pBuffer[DTWAIN_RANGEMIN]) / pBuffer[DTWAIN_RANGESTEP] + 1);
-    }
+        nNumItems = GenericRangeCounter<double>(pHandle, pArray, [](double rMin, double rMax, double rStep)
+            { return fabs(rMax - rMin) / rStep + 1; });
     LOG_FUNC_EXIT_NONAME_PARAMS(nNumItems)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
@@ -1759,25 +1806,17 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetExpValue( DTWAIN_RANGE pArray, LONG lPos
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, lPos, pVariant))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    if (IsValidRangeArray( pHandle, static_cast<DTWAIN_ARRAY>(pArray) ) < 0 )
+    if (IsValidRangeArray( pHandle, static_cast<DTWAIN_ARRAY>(pArray)) < 0 )
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
     if ( !pVariant )
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
 
     // Check if (low < high) and 0 < step < (high - low)
     auto eType = pHandle->m_ArrayFactory->tag_type(pArray);
-    if ( eType == CTL_ArrayFactory::arrayTag::LongType)
-    {
-        LONG* pBuffer = static_cast<LONG*>(pHandle->m_ArrayFactory->get_buffer(pArray, 0));
-        LONG* pLong = static_cast<LONG*>(pVariant);
-        *pLong = pBuffer[DTWAIN_RANGEMIN] + pBuffer[DTWAIN_RANGESTEP] * lPos;
-    }
+    if (eType == CTL_ArrayFactory::arrayTag::LongType)
+        GenericRangeGetExpValue(pHandle, pArray, lPos, static_cast<LONG*>(pVariant));
     else
-    {
-        const auto pFloat = static_cast<double*>(pVariant);
-        double* pBuffer = static_cast<double*>(pHandle->m_ArrayFactory->get_buffer(pArray, 0));
-        *pFloat = pBuffer[DTWAIN_RANGEMIN] + pBuffer[DTWAIN_RANGESTEP] * lPos; 
-    }
+        GenericRangeGetExpValue(pHandle, pArray, lPos, static_cast<double*>(pVariant));
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -1820,27 +1859,20 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetPos( DTWAIN_RANGE pArray, LPVOID pVarian
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, pVariant, pPos))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    if (IsValidRangeArray(pHandle, static_cast<DTWAIN_ARRAY>(pArray) ) < 0 )
+    if (IsValidRangeArray(pHandle, static_cast<DTWAIN_ARRAY>(pArray)) < 0 )
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
     if (!pVariant || !pPos)
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    std::pair<bool, int> pr = {};
     auto eType = pHandle->m_ArrayFactory->tag_type(pArray);
-    if ( eType == CTL_ArrayFactory::arrayTag::LongType )
-    {
-        auto pLong = static_cast<LONG*>(pVariant);
-        LONG* pBuffer = static_cast<LONG*>(pHandle->m_ArrayFactory->get_buffer(pArray, 0));
-        if (pBuffer[DTWAIN_RANGESTEP] == 0 )
-            LOG_FUNC_EXIT_NONAME_PARAMS(false)
-        *pPos = (*pLong - pBuffer[DTWAIN_RANGEMIN]) / pBuffer[DTWAIN_RANGESTEP];
-    }
+    if (eType == CTL_ArrayFactory::arrayTag::LongType)
+        pr = GenericRangePosition<LONG>(pHandle, pArray, static_cast<LONG*>(pVariant), pPos, [](LONG v1) { return v1 == 0; });
     else
-    {
-        const double *pFloat = static_cast<double*>(pVariant);
-        double* pBuffer = static_cast<double*>(pHandle->m_ArrayFactory->get_buffer(pArray, 0));
-        if (float_equal(0.0, pBuffer[DTWAIN_RANGESTEP]))
-            LOG_FUNC_EXIT_NONAME_PARAMS(false)
-        *pPos = static_cast<LONG>((*pFloat - pBuffer[DTWAIN_RANGEMIN]) / pBuffer[DTWAIN_RANGESTEP]);
-    }
+        pr = GenericRangePosition<double>(pHandle, pArray, static_cast<double*>(pVariant), pPos, [](double v1)
+            { return float_equal(0.0, v1); });
+
+    // Check if there was an error when retrieving the position of the value in the range
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pr.first; }, pr.second, false, FUNC_MACRO);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pPos))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
@@ -1903,30 +1935,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeExpand(DTWAIN_RANGE Range, LPDTWAIN_ARRAY A
 
     auto eType = pHandle->m_ArrayFactory->tag_type(Range);
 
-    if ( eType == CTL_ArrayFactory::arrayTag::LongType )
-    {
-        LONG* pBuffer = static_cast<LONG*>(pHandle->m_ArrayFactory->get_buffer(Range, 0));
-        LONG* pArrayBuf = static_cast<LONG*>(pHandle->m_ArrayFactory->get_buffer(pDest, 0));
-        LONG i = 0;
-        std::transform(pArrayBuf, pArrayBuf + lCount, pArrayBuf, [&](int /*n*/)
-        {
-            const int retVal = static_cast<int>(pBuffer[DTWAIN_RANGEMIN] + pBuffer[DTWAIN_RANGESTEP] * i);
-            ++i;
-            return retVal;
-        });
-    }
+    if (eType == CTL_ArrayFactory::arrayTag::LongType)
+        GenericRangeExpand<LONG>(pHandle, Range, pDest, lCount);
     else
-    {
-        LONG i = 0;
-        double* pBuffer = static_cast<double*>(pHandle->m_ArrayFactory->get_buffer(Range, 0));
-        double *pArrayBuf =  static_cast<double*>(pHandle->m_ArrayFactory->get_buffer(pDest, 0));
-        std::transform(pArrayBuf, pArrayBuf + lCount, pArrayBuf, [&](double /*d*/)
-        {
-            const double dValue = pBuffer[DTWAIN_RANGEMIN] + pBuffer[DTWAIN_RANGESTEP] * i;
-            ++i;
-            return dValue;
-        });
-    }
+        GenericRangeExpand<double>(pHandle, Range, pDest, lCount);
     // Destroy the user array if one is supplied
     if (pHandle->m_ArrayFactory->is_valid(*Array))
         pHandle->m_ArrayFactory->destroy(*Array);
