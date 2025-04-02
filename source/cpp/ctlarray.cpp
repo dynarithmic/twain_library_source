@@ -1545,6 +1545,64 @@ static void GenericRangeExpand(CTL_TwainDLLHandle* pHandle, DTWAIN_RANGE Range, 
         });
 }
 
+template <typename RangeType, typename CompEqFn, typename DivFn, typename AbsFn>
+static bool GenericRangeGetNearestValue(CTL_TwainDLLHandle* pHandle, DTWAIN_RANGE pArray, 
+                                  RangeType* pVariantIn, RangeType* pVariantOut, 
+                                  LONG RoundType, CompEqFn compFn, DivFn divFn, AbsFn absfn)
+{
+    // Get the values
+    RangeType* pBuffer = static_cast<RangeType*>(pHandle->m_ArrayFactory->get_buffer(pArray, 0));
+
+    // Get the value passed in
+    RangeType inputVal = *pVariantIn;
+
+    // Check if value passed in is out of bounds
+    if (compFn(pBuffer[DTWAIN_RANGEMIN], inputVal) ||
+        compFn(0, pBuffer[DTWAIN_RANGESTEP]) ||
+        inputVal < pBuffer[DTWAIN_RANGEMIN])
+    {
+        *pVariantOut = pBuffer[DTWAIN_RANGEMIN];
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    }
+    else
+    if (compFn(pBuffer[DTWAIN_RANGEMAX], inputVal) || inputVal > pBuffer[DTWAIN_RANGEMAX])
+    {
+        *pVariantOut = pBuffer[DTWAIN_RANGEMAX];
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    }
+
+    // Get the nearest value to *pVariantIn;
+    // First get the bias value from 0
+    RangeType dBias = 0;
+    if (!compFn(pBuffer[DTWAIN_RANGEMIN], 0))
+        dBias = -pBuffer[DTWAIN_RANGEMIN];
+
+    inputVal += dBias;
+    const RangeType Remainder = divFn(inputVal, pBuffer[DTWAIN_RANGESTEP]);
+    const RangeType Dividend = static_cast<RangeType>(static_cast<LONG>((inputVal / pBuffer[DTWAIN_RANGESTEP])));
+
+    if (compFn(Remainder, 0))
+    {
+        *pVariantOut = inputVal - dBias;
+        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    }
+
+    // Check if round to lowest or highest valid value
+    if (RoundType == DTWAIN_ROUNDNEAREST)
+    {
+        if (Remainder >= absfn(pBuffer[DTWAIN_RANGESTEP]) / 2)
+            RoundType = DTWAIN_ROUNDUP;
+        else
+            RoundType = DTWAIN_ROUNDDOWN;
+    }
+    if (RoundType == DTWAIN_ROUNDDOWN)
+        *pVariantOut = Dividend * pBuffer[DTWAIN_RANGESTEP] - dBias;
+    else
+    if (RoundType == DTWAIN_ROUNDUP)
+        *pVariantOut = (Dividend + 1) * pBuffer[DTWAIN_RANGESTEP] - dBias;
+    return true;
+}
+
 static LONG IsValidRangeArray( CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray, size_t index)
 {
     LOG_FUNC_ENTRY_PARAMS((pArray))
@@ -1949,7 +2007,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeExpand(DTWAIN_RANGE Range, LPDTWAIN_ARRAY A
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetNearestValue( DTWAIN_RANGE pArray, LPVOID pVariantIn,
-                                                     LPVOID pVariantOut, LONG RoundType)
+                                                      LPVOID pVariantOut, LONG RoundType)
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, pVariantIn, pVariantOut, RoundType))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
@@ -1959,127 +2017,30 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetNearestValue( DTWAIN_RANGE pArray, LPVOI
     if ( !pVariantIn || !pVariantOut)
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
+    bool bOk = true;
     auto eType = pHandle->m_ArrayFactory->tag_type(pArray);
 
-    if ( eType == CTL_ArrayFactory::arrayTag::LongType )
+    if (eType == CTL_ArrayFactory::arrayTag::LongType)
     {
-        // Get the values
-        LONG* pBuffer = static_cast<LONG*>(pHandle->m_ArrayFactory->get_buffer(pArray, 0));
-
-        // Get the value passed in
-        LONG lInVal = *static_cast<LONG*>(pVariantIn);
-        LONG *pOutVal = static_cast<LONG*>(pVariantOut);
-
-        // return immediately if step is 0
-        if ( pBuffer[DTWAIN_RANGESTEP] == 0 )
-        {
-            *pOutVal = pBuffer[DTWAIN_RANGEMIN];
-            LOG_FUNC_EXIT_NONAME_PARAMS(true)
-        }
-
-        // Check if value passed in is out of bounds
-        if ( lInVal < pBuffer[DTWAIN_RANGEMIN])
-        {
-            *pOutVal = pBuffer[DTWAIN_RANGEMIN];
-            LOG_FUNC_EXIT_NONAME_PARAMS(true)
-        }
-        else
-        if ( lInVal > pBuffer[DTWAIN_RANGEMAX])
-        {
-            *pOutVal = pBuffer[DTWAIN_RANGEMAX];
-            LOG_FUNC_EXIT_NONAME_PARAMS(true)
-        }
-
-        // Get the nearest value to *pVariantIn;
-        // First get the bias value from 0
-        LONG lBias = 0;
-        if (pBuffer[DTWAIN_RANGEMIN] != 0 )
-            lBias = -pBuffer[DTWAIN_RANGEMIN];
-
-        lInVal += lBias;
-
-        const LONG Remainder = abs(lInVal % pBuffer[DTWAIN_RANGESTEP]);
-        const LONG Dividend = lInVal / pBuffer[DTWAIN_RANGESTEP];
-
-        if ( Remainder == 0 )
-        {
-            *pOutVal = lInVal - lBias;
-            LOG_FUNC_EXIT_NONAME_PARAMS(true)
-        }
-
-        // Check if round to lowest or highest valid value
-        if ( RoundType == DTWAIN_ROUNDNEAREST )
-        {
-            if ( Remainder >= abs(pBuffer[DTWAIN_RANGESTEP]) / 2 )
-                RoundType = DTWAIN_ROUNDUP;
-            else
-                RoundType = DTWAIN_ROUNDDOWN;
-        }
-
-        if ( RoundType == DTWAIN_ROUNDDOWN )
-            *pOutVal = Dividend * pBuffer[DTWAIN_RANGESTEP]- lBias;
-        else
-            if ( RoundType == DTWAIN_ROUNDUP )
-                *pOutVal = (Dividend + 1) * pBuffer[DTWAIN_RANGESTEP] - lBias;
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        bOk = GenericRangeGetNearestValue(pHandle, pArray, static_cast<LONG*>(pVariantIn),
+            static_cast<LONG*>(pVariantOut), RoundType,
+            [](LONG v1, LONG v2)->bool { return v1 == v2; },
+            [](LONG v1, LONG v2)->LONG { return abs(v1 % v2); },
+            [](LONG v1)->LONG { return abs(v1); });
+        LONG* pVariantOut1 = static_cast<LONG*>(pVariantOut);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pVariantOut1))
     }
     else
-    if ( eType == CTL_ArrayDoubleType )
     {
-        // Get the values
-        double* pBuffer = static_cast<double*>(pHandle->m_ArrayFactory->get_buffer(pArray, 0));
-
-        // Get the value passed in
-        double dInVal = *static_cast<double*>(pVariantIn);
-        const auto pOutVal = static_cast<double*>(pVariantOut);
-
-        // Check if value passed in is out of bounds
-        if (float_equal(pBuffer[DTWAIN_RANGEMIN], dInVal) ||
-            float_equal(0.0, pBuffer[DTWAIN_RANGESTEP]) ||
-            dInVal < pBuffer[DTWAIN_RANGEMIN])
-        {
-            *pOutVal = pBuffer[DTWAIN_RANGEMIN];
-            LOG_FUNC_EXIT_NONAME_PARAMS(true)
-        }
-        else
-        if (float_equal(pBuffer[DTWAIN_RANGEMAX], dInVal) || dInVal > pBuffer[DTWAIN_RANGEMAX])
-        {
-            *pOutVal = pBuffer[DTWAIN_RANGEMAX];
-            LOG_FUNC_EXIT_NONAME_PARAMS(true)
-        }
-
-        // Get the nearest value to *pVariantIn;
-        // First get the bias value from 0
-        double dBias = 0;
-        if (pBuffer[DTWAIN_RANGEMIN] != 0 )
-            dBias = -pBuffer[DTWAIN_RANGEMIN];
-
-        dInVal += dBias;
-        const double Remainder = fabs(fmod(dInVal, pBuffer[DTWAIN_RANGESTEP]));
-        const double Dividend = static_cast<double>(static_cast<LONG>(dInVal / pBuffer[DTWAIN_RANGESTEP]));
-
-        if ( float_equal(Remainder,0.0 ))
-        {
-            *pOutVal = dInVal - dBias;
-            LOG_FUNC_EXIT_NONAME_PARAMS(true)
-        }
-
-        // Check if round to lowest or highest valid value
-        if ( RoundType == DTWAIN_ROUNDNEAREST )
-        {
-            if ( Remainder >= fabs(pBuffer[DTWAIN_RANGESTEP]) / 2.0 )
-                RoundType = DTWAIN_ROUNDUP;
-            else
-                RoundType = DTWAIN_ROUNDDOWN;
-        }
-        if ( RoundType == DTWAIN_ROUNDDOWN )
-            *pOutVal = Dividend * pBuffer[DTWAIN_RANGESTEP]- dBias;
-        else
-            if ( RoundType == DTWAIN_ROUNDUP )
-                *pOutVal = (Dividend + 1.0) * pBuffer[DTWAIN_RANGESTEP]- dBias;
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
+        bOk = GenericRangeGetNearestValue(pHandle, pArray, static_cast<double*>(pVariantIn),
+            static_cast<double*>(pVariantOut), RoundType,
+            [](double v1, double v2)->bool { return float_equal(v1, v2); },
+            [](double v1, double v2)->double { return fabs(fmod(v1, v2)); },
+            [](double v1)->double { return fabs(v1); });
+        double* pVariantOut1 = static_cast<double*>(pVariantOut);
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pVariantOut1))
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bOk)
     CATCH_BLOCK(false)
 }
 
