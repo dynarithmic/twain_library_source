@@ -4,6 +4,8 @@ DTWAIN Version changes
 
 - Fix code to check for invalid DTWAIN_FRAMEs being passed to DTWAIN_Frame...() functions.
 
+- Fix issue with DTWAIN_RangeGetNearestValue() when using floating point range values.
+
 - Various NULL pointer checks for some DTWAIN API functions that allow pointer values to be
   passed.
 
