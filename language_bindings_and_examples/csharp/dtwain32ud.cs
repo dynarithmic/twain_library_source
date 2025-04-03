@@ -837,6 +837,8 @@ namespace Dynarithmic
         public const int DTWAIN_ERR_STANDARDCAPS_COMPLIANCY   = (-1082);
         public const int DTWAIN_ERR_EXTIMAGEINFO_DATATYPE_MISMATCH = (-1083);
         public const int DTWAIN_ERR_EXTIMAGEINFO_RETRIEVAL = (-1084);
+        public const int DTWAIN_ERR_RANGE_OUTOFBOUNDS = (-1085);
+        public const int DTWAIN_ERR_RANGE_STEPISZERO  = (-1086);
 
         public const  int TWAIN_ERR_LOW_MEMORY = (-1100);
         public const  int TWAIN_ERR_FALSE_ALARM = (-1101);

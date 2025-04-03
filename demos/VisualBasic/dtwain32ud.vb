@@ -781,6 +781,8 @@ Class DTWAINAPI
     Public Const DTWAIN_ERR_STANDARDCAPS_COMPLIANCY  As Integer = (-1082)
     Public Const DTWAIN_ERR_EXTIMAGEINFO_DATATYPE_MISMATCH As Integer = (-1083)
     Public Const DTWAIN_ERR_EXTIMAGEINFO_RETRIEVAL As Integer = (-1084)
+    Public Const DTWAIN_ERR_RANGE_OUTOFBOUNDS As Integer = (-1085)
+    Public Const DTWAIN_ERR_RANGE_STEPISZERO As Integer = (-1086)
 
     Public Const TWAIN_ERR_LOW_MEMORY As Integer = (-1100)
     Public Const TWAIN_ERR_FALSE_ALARM As Integer = (-1101)
