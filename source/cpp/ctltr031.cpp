@@ -147,6 +147,7 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
     do
     {
         // Call base function
+        m_ImageMemXferBuffer.Compression = m_nCompression;
         rc = CTL_ImageXferTriplet::Execute();
 
         switch (rc)

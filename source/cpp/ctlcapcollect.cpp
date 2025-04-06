@@ -24,10 +24,8 @@
 #include "cppfunc.h"
 
 #ifdef _MSC_VER
-#pragma warning (disable:4702)
+    #pragma warning (disable:4702)
 #endif
-#undef min
-#undef max
 
 using namespace dynarithmic;
 
