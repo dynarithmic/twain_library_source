@@ -227,7 +227,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;.\plusaes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;USE_DTWAIN_DEBUG_LIB;_DEBUG;_UNICODE;_SCL_SECURE_NO_WARNINGS;DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions);FREEIMAGE_CPP_LIB;DTWAIN_DEBUG;BUILDING_DTWAINDLL;DTWAIN_DLL</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
@@ -789,7 +789,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>MinSpace</Optimization>
-      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;NOMINMAX;FREEIMAGE_CPP_LIB;_UNICODE;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;FREEIMAGE_CPP_LIB;_UNICODE;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
@@ -1106,7 +1106,6 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include=".\cpp\ctltwainmsgloop.cpp" />
     <ClCompile Include=".\cpp\ctluicontrollable.cpp" />
     <ClCompile Include=".\cpp\ctluienabled.cpp" />
-    <ClCompile Include=".\cpp\ctltr000.cpp" />
     <ClCompile Include=".\cpp\ctltr001.cpp" />
     <ClCompile Include=".\cpp\ctltr002.cpp" />
     <ClCompile Include=".\cpp\ctltr003.cpp" />
@@ -1243,7 +1242,6 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include="cpp\ctltr041.cpp" />
     <ClCompile Include="cpp\ctltr042.cpp" />
     <ClCompile Include="cpp\ctltr043.cpp" />
-    <ClCompile Include="cpp\ctltr044.cpp" />
     <ClCompile Include="cpp\ctltripletbase.cpp" />
     <ClCompile Include="cpp\ctltsstub.cpp" />
     <ClCompile Include="cpp\ctltwaincompliancy.cpp" />

@@ -23,15 +23,34 @@
 
 #include "ctltripletbase.h"
 #include "ctltwainsession.h"
+#include "ctltwainmanager.h"
 
 namespace dynarithmic
 {
+    template <TW_UINT16 nMsg = MSG_GET>
     class CTL_JPEGCompressionTriplet : public CTL_TwainTriplet
     {
         public:
-            CTL_JPEGCompressionTriplet(CTL_ITwainSession *pSession,
-                                     CTL_ITwainSource *pSource,
-                                     TW_UINT16 nMsg);
+            CTL_JPEGCompressionTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource)
+            {
+                SetSessionPtr(nullptr);
+                SetSourcePtr(nullptr);
+
+                // Get the app manager's AppID
+                const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
+
+                if (pMgr && pMgr->IsValidTwainSession(pSession))
+                {
+                    SetSourcePtr(pSource);
+                    SetSessionPtr(pSession);
+                    if (pSource)
+                    {
+                        Init(pSession->GetAppIDPtr(), pSource->GetSourceIDPtr(), DG_IMAGE, DAT_JPEGCOMPRESSION, nMsg,
+                            static_cast<TW_MEMREF>(&m_JPEGCompressionInfo));
+                        SetAlive(true);
+                    }
+                }
+            }
 
             TW_JPEGCOMPRESSION& GetJPEGCompressionInfo() { return m_JPEGCompressionInfo; }
 
@@ -39,37 +58,10 @@ namespace dynarithmic
             TW_JPEGCOMPRESSION    m_JPEGCompressionInfo;
     };
 
-    class CTL_JPEGCompressionGetTriplet : public CTL_JPEGCompressionTriplet
-    {
-        public:
-            CTL_JPEGCompressionGetTriplet(CTL_ITwainSession *pSession,
-                                          CTL_ITwainSource *pSource) : 
-                        CTL_JPEGCompressionTriplet(pSession, pSource, MSG_GET) {}
-    };
-
-    class CTL_JPEGCompressionGetDefaultTriplet : public CTL_JPEGCompressionTriplet
-    {
-        public:
-            CTL_JPEGCompressionGetDefaultTriplet(CTL_ITwainSession* pSession,
-                CTL_ITwainSource* pSource) :
-                CTL_JPEGCompressionTriplet(pSession, pSource, MSG_GETDEFAULT) {}
-    };
-
-    class CTL_JPEGCompressionSetTriplet : public CTL_JPEGCompressionTriplet
-    {
-        public:
-            CTL_JPEGCompressionSetTriplet(CTL_ITwainSession *pSession,
-                                          CTL_ITwainSource *pSource) : 
-                        CTL_JPEGCompressionTriplet(pSession, pSource, MSG_SET) {}
-    };
-
-    class CTL_JPEGCompressionResetTriplet : public CTL_JPEGCompressionTriplet
-    {
-        public:
-            CTL_JPEGCompressionResetTriplet(CTL_ITwainSession* pSession,
-                CTL_ITwainSource* pSource) :
-                CTL_JPEGCompressionTriplet(pSession, pSource, MSG_RESET) {}
-    };
+    using CTL_JPEGCompressionGetTriplet = CTL_JPEGCompressionTriplet<MSG_GET>;
+    using CTL_JPEGCompressionGetDefaultTriplet = CTL_JPEGCompressionTriplet<MSG_GETDEFAULT>;
+    using CTL_JPEGCompressionSetTriplet = CTL_JPEGCompressionTriplet<MSG_SET>;
+    using CTL_JPEGCompressionResetTriplet = CTL_JPEGCompressionTriplet<MSG_RESET>;
 }
 #endif
 
