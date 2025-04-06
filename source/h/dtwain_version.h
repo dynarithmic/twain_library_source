@@ -50,7 +50,7 @@
     #define  DTWAIN_DEBUG_COMPILE_MSG " (Debug)"
 #else
     #define DTWAIN_DEVELOP_SUFFIX ""
-    #define  DTWAIN_DEBUG_COMPILE_MSG ""
+    #define  DTWAIN_DEBUG_COMPILE_MSG " (Release)"
 #endif
 
 #ifdef _MSC_VER
