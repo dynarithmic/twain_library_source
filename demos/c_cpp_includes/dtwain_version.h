@@ -45,18 +45,20 @@
 #define DTWAIN_BUILDVERSION_BOTTOM 3
 #define DTWAIN_BUILDVERSION DTWAIN_STRINGER_(DTWAIN_BUILDVERSION_TOP) DTWAIN_STRINGER_(DTWAIN_BUILDVERSION_MIDDLE) DTWAIN_STRINGER_(DTWAIN_BUILDVERSION_BOTTOM)
 
-#ifdef _MSC_VER
-    #ifdef BUILDING_DTWAINDLL
-        #pragma message ( "Building DTWAIN Version " DTWAIN_VERINFO_FILEVERSION " Build " DTWAIN_BUILDVERSION)
-    #else
-        #pragma message ( "Compiling using DTWAIN Version " DTWAIN_VERINFO_FILEVERSION " Build " DTWAIN_BUILDVERSION)
-    #endif
-#endif
-
 #ifdef USE_DTWAIN_DEBUG_LIB
-    #define DTWAIN_DEVELOP_SUFFIX "d"
+    #define  DTWAIN_DEVELOP_SUFFIX "d"
+    #define  DTWAIN_DEBUG_COMPILE_MSG " (Debug)"
 #else
     #define DTWAIN_DEVELOP_SUFFIX ""
+    #define  DTWAIN_DEBUG_COMPILE_MSG " (Release)"
+#endif
+
+#ifdef _MSC_VER
+    #ifdef BUILDING_DTWAINDLL
+        #pragma message ( "Building DTWAIN Version " DTWAIN_VERINFO_FILEVERSION " Build " DTWAIN_BUILDVERSION DTWAIN_DEBUG_COMPILE_MSG)
+    #else
+        #pragma message ( "Compiling using DTWAIN Version " DTWAIN_VERINFO_FILEVERSION " Build " DTWAIN_BUILDVERSION DTWAIN_DEBUG_COMPILE_MSG)
+    #endif
 #endif
 
 #ifdef _WIN32
