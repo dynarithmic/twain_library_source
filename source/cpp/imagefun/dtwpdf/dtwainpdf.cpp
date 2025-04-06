@@ -67,8 +67,6 @@
 #ifdef _MSC_VER
 #pragma warning (pop)
 #endif
-#undef min
-#undef max
 #include <cmath>
 #include <MD5Checksum.h>
 #define D_TO_R_SCALEFACTOR (3.14159265358979323846 / 180.0)
