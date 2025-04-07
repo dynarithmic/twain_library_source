@@ -212,7 +212,7 @@ CTL_ITwainSession* CTL_TwainAppMgr::CreateTwainSession(
         if (pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_LATESTVERSION ||
             pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_VERSION2)
         {
-            CTL_EntryPointTriplet entryPoints(pSession, MSG_GET);
+            CTL_EntryPointGetTriplet entryPoints(pSession);
             TW_UINT16 rc = entryPoints.Execute();
             switch (rc)
             {
@@ -247,7 +247,7 @@ bool CTL_TwainAppMgr::OpenSourceManager( CTL_ITwainSession* pSession )
     if ( pHandle->m_nDSMVersion == DTWAIN_TWAINDSM_VERSION2)
     {
         // For 2.0 data sources.  Set the handle to the memory functions
-        CTL_EntryPointTripletGet EntryPoint( pSession );
+        CTL_EntryPointGetTriplet EntryPoint( pSession );
         if ( EntryPoint.Execute() == TWRC_SUCCESS )
         {
             // assign the memory functions to whatever the DSM has returned for
