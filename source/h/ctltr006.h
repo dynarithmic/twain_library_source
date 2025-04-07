@@ -20,17 +20,5 @@
  */
 #ifndef CTLTR006_H
 #define CTLTR006_H
-
-#ifndef CTLTR001_H
 #include "ctltr001.h"
-#endif
-namespace dynarithmic
-{
-    class CTL_OpenSourceTriplet : public CTL_SourceTriplet
-    {
-        public:
-            CTL_OpenSourceTriplet(CTL_ITwainSession *pSession,
-                                  CTL_ITwainSource* pSource);
-    };
-}
 #endif

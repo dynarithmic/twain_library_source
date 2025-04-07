@@ -76,15 +76,19 @@ namespace dynarithmic
             const CTL_ITwainSession* GetSessionPtr() const
             { return m_pSession; }
 
-        protected:
             CTL_ITwainSession* GetSessionPtr()
             { return m_pSession; }
 
+            const CTL_ITwainSource* GetSourcePtr() const
+            { return m_pSource; }
+
+            CTL_ITwainSource* GetSourcePtr()
+            { return m_pSource; }
+
+        protected:
+
             void SetSessionPtr(CTL_ITwainSession* pSession)
             { m_pSession = pSession; }
-
-            CTL_ITwainSource*  GetSourcePtr() const
-            { return m_pSource; }
 
             void SetSourcePtr(CTL_ITwainSource* pSource)
             { m_pSource = pSource; }

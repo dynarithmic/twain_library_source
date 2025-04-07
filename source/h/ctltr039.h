@@ -22,33 +22,45 @@
 #define CTLTR039_H
 
 #include "ctltripletbase.h"
+#include "ctltwainmanager.h"
+
 namespace dynarithmic
 {
     class CTL_ITwainSession;
 
+    template <TW_UINT16 msg>
     class CTL_EntryPointTriplet : public CTL_TwainTriplet
     {
         public:
-            CTL_EntryPointTriplet(CTL_ITwainSession *pSession, TW_UINT16 msg);
-            TW_UINT16 Execute() override;
+            CTL_EntryPointTriplet(CTL_ITwainSession* pSession) :
+                CTL_TwainTriplet(), m_bTripletFound(false)
+            {
+                SetSessionPtr(pSession);
+                const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
+                if (pMgr && pMgr->IsValidTwainSession(pSession))
+                {
+                    m_EntryPoint.Size = sizeof(TW_ENTRYPOINT);
+                    Init(pSession->GetAppIDPtr(), nullptr, DG_CONTROL, DAT_ENTRYPOINT, msg, &m_EntryPoint);
+                    SetAlive(true);
+                }
+            }
+            TW_UINT16 Execute() override
+            {
+                const TW_UINT16 retVal = CTL_TwainTriplet::Execute();
+                if (retVal == TWRC_SUCCESS)
+                    m_bTripletFound = true;
+                return retVal;
+            }
+
             TW_ENTRYPOINT& getEntryPoint() { return m_EntryPoint; }
+
             bool isTripletFound() const { return m_bTripletFound; }
 
         private:
             TW_ENTRYPOINT m_EntryPoint{};
             bool m_bTripletFound;
     };
-
-    class CTL_EntryPointTripletGet : public CTL_EntryPointTriplet
-    {
-        public:
-            CTL_EntryPointTripletGet(CTL_ITwainSession *pSession) : CTL_EntryPointTriplet(pSession, MSG_GET){}
-    };
-
-    class CTL_EntryPointTripletSet : public CTL_EntryPointTriplet
-    {
-        public:
-            CTL_EntryPointTripletSet(CTL_ITwainSession *pSession) : CTL_EntryPointTriplet(pSession, MSG_SET){}
-    };
+    using CTL_EntryPointGetTriplet = CTL_EntryPointTriplet<MSG_GET>;
+    using CTL_EntryPointSetTriplet = CTL_EntryPointTriplet<MSG_SET>; 
 }
 #endif

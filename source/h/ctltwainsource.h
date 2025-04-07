@@ -146,6 +146,7 @@ namespace dynarithmic
             return mapToUse->find(lCap) != mapToUse->end();
         }
         CTL_TwainDLLHandle* GetDTWAINHandle() { return m_pDLLHandle; }
+        const CTL_TwainDLLHandle* GetDTWAINHandle() const { return m_pDLLHandle; }
         void SetDTWAINHandle(CTL_TwainDLLHandle* pHandle) { m_pDLLHandle = pHandle; }
 
         DTWAIN_ARRAY getCapCachedValues(TW_UINT16 lCap, LONG getType);
