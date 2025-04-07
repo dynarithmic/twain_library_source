@@ -211,34 +211,10 @@
     <ClCompile Include="cpp\ctltimeout.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include=".\cpp\ctltr000.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include=".\cpp\ctltr001.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include=".\cpp\ctltr002.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include=".\cpp\ctltr003.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include=".\cpp\ctltr004.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include=".\cpp\ctltr005.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include=".\cpp\ctltr006.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include=".\cpp\ctltr007.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
     <ClCompile Include=".\cpp\ctltr008.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include=".\cpp\ctltr009.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
     <ClCompile Include=".\cpp\ctltr010.cpp">
@@ -310,9 +286,6 @@
     <ClCompile Include=".\cpp\ctltr032.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include=".\cpp\ctltr033.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include=".\cpp\ctltr034.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
@@ -326,9 +299,6 @@
       <Filter>C++ Files</Filter>
     </ClCompile>
     <ClCompile Include=".\cpp\ctltr038.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include=".\cpp\ctltr039.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
     <ClCompile Include=".\cpp\ctltr040.cpp">
@@ -674,9 +644,6 @@
       <Filter>C++ Files</Filter>
     </ClCompile>
     <ClCompile Include="cpp\ctlextimageinfo.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\ctltr044.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
   </ItemGroup>
