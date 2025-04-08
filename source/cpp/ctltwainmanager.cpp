@@ -587,7 +587,6 @@ bool CTL_TwainAppMgr::GetBestCapDataType(const CTL_ITwainSource* pSource, TW_UIN
     return false;
 }
 
-
 bool CTL_TwainAppMgr::GetImageLayoutSize(const CTL_ITwainSource* pSource,
                                          CTL_RealArray& rArray,
                                          CTL_EnumGetType GetType)
@@ -1444,9 +1443,7 @@ bool CTL_TwainAppMgr::SetupMemXferDIB(CTL_ITwainSession* pSession, CTL_ITwainSou
         case TWPT_CIEXYZ:
         default:
         {
-            CTL_Palette8Triplet  Palette8(pSession,
-                                          pSource,
-                                          CTL_GetTypeGET);
+            CTL_GetPalette8Triplet  Palette8(pSession, pSource);
 
             if ( Palette8.Execute() == TWRC_FAILURE )
             {

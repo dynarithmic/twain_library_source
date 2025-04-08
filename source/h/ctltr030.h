@@ -22,20 +22,53 @@
 #define CTLTR030_H
 
 #include "ctltripletbase.h"
+#include "ctltwainmanager.h"
+
 namespace dynarithmic
 {
+    template <TW_UINT16 MsgType>
     class CTL_Palette8Triplet : public CTL_TwainTriplet
     {
         public:
-            CTL_Palette8Triplet(CTL_ITwainSession *pSession,
-                                CTL_ITwainSource* pSource,
-                                CTL_EnumGetType   GetType);
+            CTL_Palette8Triplet(CTL_ITwainSession* pSession,
+                                CTL_ITwainSource* pSource) : CTL_TwainTriplet(), m_Palette8()
+            {
+                SetSessionPtr(pSession);
+                SetSourcePtr(pSource);
 
-            TW_PALETTE8 *        GetPalette8Buffer();
+                // Get the app manager's AppID
+                const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
+
+                if (pMgr && pMgr->IsValidTwainSession(pSession))
+                {
+                    if (pSource)
+                    {
+                        Init(pSession->GetAppIDPtr(),
+                            pSource->GetSourceIDPtr(),
+                            DG_IMAGE,
+                            DAT_PALETTE8,
+                            MsgType,
+                            static_cast<TW_MEMREF>(&m_Palette8));
+
+                        SetAlive(true);
+                    }
+                }
+            }
+
+
+            TW_PALETTE8* GetPalette8Buffer()
+            {
+                return &m_Palette8;
+            }
 
         private:
             TW_PALETTE8         m_Palette8;
     };
+
+    using CTL_GetPalette8Triplet = CTL_Palette8Triplet<MSG_GET>;
+    using CTL_GetDefaultPalette8Triplet = CTL_Palette8Triplet<MSG_GETDEFAULT>;
+    using CTL_SetPalette8Triplet = CTL_Palette8Triplet<MSG_SET>;
+    using CTL_ResetPalette8Triplet = CTL_Palette8Triplet<MSG_RESET>;
 }
 #endif
 

@@ -277,9 +277,6 @@
     <ClCompile Include=".\cpp\ctltr029.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include=".\cpp\ctltr030.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include=".\cpp\ctltr031.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
