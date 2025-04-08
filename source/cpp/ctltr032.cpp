@@ -48,7 +48,6 @@ CTL_ImageLayoutTriplet::CTL_ImageLayoutTriplet(CTL_ITwainSession *pSession,
     }
 }
 
-
 double CTL_ImageLayoutTriplet::GetLeft() const
 {
     return Fix32ToFloat(m_ImageLayout.Frame.Left);

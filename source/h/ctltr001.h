@@ -27,7 +27,7 @@ namespace dynarithmic
     class CTL_ITwainSource;
     class CTL_ITwainSession;
 
-    struct CTL_DefaultExecute
+    struct CTL_DefaultTripletExecute
     {
         static TW_UINT16 Execute(CTL_TwainTriplet& pTrip)
         {
@@ -136,9 +136,9 @@ namespace dynarithmic
             bool m_bSourceCreated;
     };
 
-    using CTL_GetFirstSourceTriplet = CTL_SourceTripletUsingName<MSG_GETFIRST, CTL_DefaultExecute>;
-    using CTL_GetNextSourceTriplet = CTL_SourceTripletUsingName<MSG_GETNEXT, CTL_DefaultExecute>;
-    using CTL_GetDefaultSourceTriplet = CTL_SourceTripletUsingName<MSG_GETDEFAULT, CTL_DefaultExecute>;
+    using CTL_GetFirstSourceTriplet = CTL_SourceTripletUsingName<MSG_GETFIRST, CTL_DefaultTripletExecute>;
+    using CTL_GetNextSourceTriplet = CTL_SourceTripletUsingName<MSG_GETNEXT, CTL_DefaultTripletExecute>;
+    using CTL_GetDefaultSourceTriplet = CTL_SourceTripletUsingName<MSG_GETDEFAULT, CTL_DefaultTripletExecute>;
     using CTL_SelectSourceDlgTriplet = CTL_SourceTripletUsingName<MSG_USERSELECT, CTL_SelectSourceExecute>;
     using CTL_OpenSourceTriplet = CTL_SourceOpenCloseTriplet<MSG_OPENDS>;
     using CTL_CloseSourceTriplet = CTL_SourceOpenCloseTriplet<MSG_CLOSEDS>;
