@@ -271,9 +271,6 @@
     <ClCompile Include=".\cpp\ctltr027.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include=".\cpp\ctltr028.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include=".\cpp\ctltr029.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
@@ -287,9 +284,6 @@
       <Filter>C++ Files</Filter>
     </ClCompile>
     <ClCompile Include=".\cpp\ctltr035.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include=".\cpp\ctltr036.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
     <ClCompile Include=".\cpp\ctltr037.cpp">
