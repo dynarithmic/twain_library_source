@@ -1120,9 +1120,8 @@ int  CTL_TwainAppMgr::FileTransfer( CTL_ITwainSession *pSession,
         std::swap(sFileNameNew, sFileName);  // swap the names, even if they may not have changed.
     }
 
-    CTL_SetupFileXferTriplet  FileXferSetup(pSession,
+    CTL_SetupFileXferSetTriplet  FileXferSetup(pSession,
                                        pSource,
-                                       static_cast<int>(CTL_SetTypeSET),
                                        acquireFileStatus.GetAcquireFileFormat(),
                                        sFileName
                                        );
@@ -1539,8 +1538,7 @@ bool CTL_TwainAppMgr::GetFileTransferDefaults(CTL_ITwainSource *pSource, int &nF
 {
     const auto pTempSource = static_cast<CTL_ITwainSource*>(pSource);
     const auto pSession = pTempSource->GetTwainSession();
-    CTL_SetupFileXferTriplet  FileXferGetDef( pSession, pTempSource,
-                                            static_cast<int>(CTL_GetTypeGETDEFAULT),
+    CTL_SetupFileXferGetDefaultTriplet  FileXferGetDef( pSession, pTempSource,
                                             static_cast<CTL_TwainFileFormatEnum>(0),{});
     if ( FileXferGetDef.Execute() == TWRC_SUCCESS )
     {
