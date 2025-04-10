@@ -64,6 +64,7 @@ namespace dynarithmic
             bool    IsMSGGetType() const;
             bool    IsMSGSetType() const;
             bool    IsMSGResetType() const;
+            bool    IsMSGSetOrResetType() const;
 
             pTW_IDENTITY GetOriginID() const { return std::get<ORIGINPOS_>(m_TwainTripletArg); }
             pTW_IDENTITY GetDestinationID() const { return std::get<DESTPOS_>(m_TwainTripletArg); }
@@ -100,6 +101,15 @@ namespace dynarithmic
             CTL_ITwainSource*       m_pSource;
             CTL_ITwainSession*      m_pSession;
     };
+
+    struct CTL_DefaultTripletExecute
+    {
+        static TW_UINT16 Execute(CTL_TwainTriplet& pTrip)
+        {
+            return pTrip.CTL_TwainTriplet::Execute();
+        }
+    };
+
 }
 #endif
 

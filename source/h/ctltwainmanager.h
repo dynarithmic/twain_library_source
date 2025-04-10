@@ -187,7 +187,7 @@ namespace dynarithmic
             static CTL_TwainUnitEnum GetCurrentUnitMeasure(const CTL_ITwainSource *pSource);
             static void GetCompressionTypes( const CTL_ITwainSource *pSource, CTL_IntArray & rArray );
             static void GetUnitTypes( const CTL_ITwainSource *pSource, CTL_IntArray & rArray );
-            static bool GetImageLayoutSize(const CTL_ITwainSource* pSource, CTL_RealArray& rArray, CTL_EnumGetType GetType);
+            static bool GetImageLayoutSize(const CTL_ITwainSource* pSource, CTL_RealArray& rArray, TW_UINT16 GetType);
             static bool SetImageLayoutSize(const CTL_ITwainSource* pSource, const CTL_RealArray& rArray, CTL_RealArray& rActual,
                                              CTL_EnumSetType SetType);
 

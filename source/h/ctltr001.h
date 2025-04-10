@@ -27,14 +27,6 @@ namespace dynarithmic
     class CTL_ITwainSource;
     class CTL_ITwainSession;
 
-    struct CTL_DefaultTripletExecute
-    {
-        static TW_UINT16 Execute(CTL_TwainTriplet& pTrip)
-        {
-            return pTrip.CTL_TwainTriplet::Execute();
-        }
-    };
-
     struct CTL_SelectSourceExecute
     {
         static TW_UINT16 Execute(CTL_TwainTriplet& pTrip)
@@ -77,7 +69,7 @@ namespace dynarithmic
     class CTL_SourceTripletUsingName : public CTL_TwainTriplet
     {
         public:
-            CTL_SourceTripletUsingName(CTL_ITwainSession *pSession, LPCTSTR pProduct = nullptr)
+            CTL_SourceTripletUsingName(CTL_ITwainSession *pSession, LPCTSTR pProduct = nullptr) : m_bSourceCreated(false)
             {
                 SetSessionPtr(nullptr);
                 SetSourcePtr(nullptr);

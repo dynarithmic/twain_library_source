@@ -1100,13 +1100,11 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include=".\cpp\ctlsourcescale.cpp" />
     <ClCompile Include=".\cpp\ctlsourceselect.cpp" />
     <ClCompile Include=".\cpp\ctlsrceoj.cpp" />
-    <ClCompile Include=".\cpp\ctltr032.cpp" />
     <ClCompile Include=".\cpp\ctltr040.cpp" />
     <ClCompile Include=".\cpp\ctltwaindllhandle.cpp" />
     <ClCompile Include=".\cpp\ctltwainmsgloop.cpp" />
     <ClCompile Include=".\cpp\ctluicontrollable.cpp" />
     <ClCompile Include=".\cpp\ctluienabled.cpp" />
-    <ClCompile Include=".\cpp\ctltr007.cpp" />
     <ClCompile Include=".\cpp\ctltr008.cpp" />
     <ClCompile Include=".\cpp\ctltr010.cpp" />
     <ClCompile Include=".\cpp\ctltr011.cpp" />
@@ -1119,9 +1117,6 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include=".\cpp\ctltr018.cpp" />
     <ClCompile Include=".\cpp\ctltr019.cpp" />
     <ClCompile Include=".\cpp\ctltr020.cpp" />
-    <ClCompile Include=".\cpp\ctltr021.cpp" />
-    <ClCompile Include=".\cpp\ctltr022.cpp" />
-    <ClCompile Include=".\cpp\ctltr023.cpp" />
     <ClCompile Include=".\cpp\ctltr024.cpp" />
     <ClCompile Include=".\cpp\ctltr025.cpp" />
     <ClCompile Include=".\cpp\ctltr026.cpp" />

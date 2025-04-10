@@ -58,25 +58,22 @@ void dynarithmic::CTL_TwainTriplet::Init( const pTW_IDENTITY pOrigin,
 
 bool CTL_TwainTriplet::IsMSGGetType() const
 {
-    const TW_UINT16 msgType = GetMSG();
-    return  msgType == MSG_GET ||
-            msgType == MSG_GETCURRENT ||
-            msgType == MSG_GETDEFAULT ||
-            msgType == MSG_GETHELP ||
-            msgType == MSG_GETLABEL ||
-            msgType == MSG_GETLABELENUM;
+    return ::IsMSGGetType(GetMSG());
 }
 
 bool CTL_TwainTriplet::IsMSGSetType() const
 {
-    const TW_UINT16 msgType = GetMSG();
-    return msgType == MSG_SET || msgType == MSG_SETCONSTRAINT;
+    return ::IsMSGSetType(GetMSG());
 }
 
 bool CTL_TwainTriplet::IsMSGResetType() const
 {
-    const TW_UINT16 msgType = GetMSG();
-    return msgType == MSG_RESET || msgType == MSG_RESETALL;
+    return ::IsMSGResetType(GetMSG());
+}
+
+bool CTL_TwainTriplet::IsMSGSetOrResetType() const
+{
+    return ::IsMSGSetOrResetType(GetMSG());
 }
 
 TW_UINT16 CTL_TwainTriplet::Execute()
