@@ -127,10 +127,10 @@ namespace dynarithmic
             TW_SETUPFILEXFER        m_SetupFileXfer;
     };
 
-    using CTL_SetupFileXferGetTriplet = CTL_SetupFileXferTripletImpl<MSG_GET>;
-    using CTL_SetupFileXferGetDefaultTriplet = CTL_SetupFileXferTripletImpl<MSG_GETDEFAULT>;
-    using CTL_SetupFileXferSetTriplet = CTL_SetupFileXferTripletImpl<MSG_SET>;
-    using CTL_SetupFileXferResetTriplet = CTL_SetupFileXferTripletImpl<MSG_RESET>;
+    using CTL_GetSetupFileXferTriplet = CTL_SetupFileXferTripletImpl<MSG_GET>;
+    using CTL_GetDefaultSetupFileXferTriplet = CTL_SetupFileXferTripletImpl<MSG_GETDEFAULT>;
+    using CTL_SetSetupFileXferTriplet = CTL_SetupFileXferTripletImpl<MSG_SET>;
+    using CTL_ResetSetupFileXferTriplet = CTL_SetupFileXferTripletImpl<MSG_RESET>;
 
     class CTL_AudioFileXferTriplet : public CTL_TwainTriplet
     {

@@ -24,36 +24,98 @@
 #include "ctltr010.h"
 namespace dynarithmic
 {
-    class CTL_ImageLayoutTriplet : public CTL_TwainTriplet
+    template <TW_UINT16 GetSetType>
+    class CTL_ImageLayoutTripletImpl: public CTL_TwainTriplet
     {
         public:
-            CTL_ImageLayoutTriplet(CTL_ITwainSession *pSession,
-                                   CTL_ITwainSource* pSource,
-                                   TW_UINT16 GetSetType);
+            CTL_ImageLayoutTripletImpl(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource,
+                                       const CTL_RealArray* rArray = nullptr) : CTL_TwainTriplet(), m_ImageLayout{}
+            {
+                SetSessionPtr(pSession);
+                SetSourcePtr(pSource);
 
-            double      GetLeft() const;
-            double      GetRight() const;
-            double      GetTop() const;
-            double      GetBottom() const;
-            TW_UINT32   GetDocumentNumber() const;
-            TW_UINT32   GetPageNumber() const;
-            TW_UINT32   GetFrameNumber() const;
-            TW_FRAME    GetFrame() const;
+                // Get the app manager's AppID
+                const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
+                if (pMgr && pMgr->IsValidTwainSession(pSession))
+                {
+                    if (pSource)
+                    {
+                        Init(pSession->GetAppIDPtr(),
+                            pSource->GetSourceIDPtr(),
+                            DG_IMAGE,
+                            DAT_IMAGELAYOUT,
+                            GetSetType,
+                            static_cast<TW_MEMREF>(&m_ImageLayout));
+                        SetAlive(true);
+                    }
+                }
+
+                if (::IsMSGSetOrResetType(GetSetType))
+                {
+                    TW_IMAGELAYOUT* pLayout = GetImageLayout();
+                    if (GetSetType != MSG_RESET && rArray && rArray->size() >= 4)
+                    {
+                        pLayout->Frame.Left = FloatToFix32(static_cast<float>((*rArray)[0]));
+                        pLayout->Frame.Top = FloatToFix32(static_cast<float>((*rArray)[1]));
+                        pLayout->Frame.Right = FloatToFix32(static_cast<float>((*rArray)[2]));
+                        pLayout->Frame.Bottom = FloatToFix32(static_cast<float>((*rArray)[3]));
+                    }
+                    pLayout->DocumentNumber = static_cast<TW_UINT32>(-1);
+                    pLayout->PageNumber = static_cast<TW_UINT32>(-1);
+                    pLayout->FrameNumber = static_cast<TW_UINT32>(-1);
+                }
+            }
+
+            double CTL_ImageLayoutTripletImpl::GetLeft() const
+            {
+                return Fix32ToFloat(m_ImageLayout.Frame.Left);
+            }
+
+            double CTL_ImageLayoutTripletImpl::GetRight() const
+            {
+                return Fix32ToFloat(m_ImageLayout.Frame.Right);
+            }
+
+            double CTL_ImageLayoutTripletImpl::GetTop() const
+            {
+                return Fix32ToFloat(m_ImageLayout.Frame.Top);
+            }
+
+            double CTL_ImageLayoutTripletImpl::GetBottom() const
+            {
+                return Fix32ToFloat(m_ImageLayout.Frame.Bottom);
+            }
+
+            TW_UINT32 CTL_ImageLayoutTripletImpl::GetDocumentNumber() const
+            {
+                return m_ImageLayout.DocumentNumber;
+            }
+
+            TW_UINT32 CTL_ImageLayoutTripletImpl::GetPageNumber() const
+            {
+                return m_ImageLayout.PageNumber;
+            }
+
+            TW_UINT32 CTL_ImageLayoutTripletImpl::GetFrameNumber() const
+            {
+                return m_ImageLayout.FrameNumber;
+            }
+
+            TW_FRAME CTL_ImageLayoutTripletImpl::GetFrame() const
+            {
+                return m_ImageLayout.Frame;
+            }
+
             TW_IMAGELAYOUT* GetImageLayout() { return &m_ImageLayout; }
 
         private:
             TW_IMAGELAYOUT  m_ImageLayout;
     };
 
-
-    class CTL_ImageSetLayoutTriplet : public CTL_ImageLayoutTriplet
-    {
-        public:
-            CTL_ImageSetLayoutTriplet(CTL_ITwainSession *pSession,
-                                   CTL_ITwainSource* pSource,
-                                   const CTL_RealArray &rArray,
-                                   TW_UINT16   SetType);
-    };
+    using CTL_GetImageLayoutTriplet = CTL_ImageLayoutTripletImpl<MSG_GET>;
+    using CTL_GetDefaultImageLayoutTriplet = CTL_ImageLayoutTripletImpl<MSG_GETDEFAULT>;
+    using CTL_SetImageLayoutTriplet = CTL_ImageLayoutTripletImpl<MSG_SET>;
+    using CTL_ResetImageLayoutTriplet = CTL_ImageLayoutTripletImpl<MSG_RESET>;
 }
 #endif
 

@@ -23,21 +23,50 @@
 
 #include "ctltripletbase.h"
 #include "ctltwainsession.h"
+#include "ctltwainmanager.h"
+
 namespace dynarithmic
 {
     class CTL_ConditionCodeTriplet : public CTL_TwainTriplet
     {
         public:
-            CTL_ConditionCodeTriplet(CTL_ITwainSession* pSession,
-                                     CTL_ITwainSource* pSource = nullptr);
+            CTL_ConditionCodeTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource/* = nullptr*/) :
+                CTL_TwainTriplet(), m_Status{}
+            {
+                SetSourcePtr(const_cast<CTL_ITwainSource*>(pSource));
+                SetSessionPtr(pSession);
+                const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
+                if (pMgr && pMgr->IsValidTwainSession(pSession))
+                {
+                    if (pSource)
+                        SetValues(pSession->GetAppIDPtr(), pSource->GetSourceIDPtr());
+                    else
+                        SetValues(pSession->GetAppIDPtr(), nullptr);
+                }
+            }
 
-            CTL_ConditionCodeTriplet(TW_IDENTITY* pSession,
-                                     TW_IDENTITY* pSourceID);
+            CTL_ConditionCodeTriplet(TW_IDENTITY* pSession, TW_IDENTITY* pSourceID)
+            {
+                SetValues(pSession, pSourceID);
+            }
 
-            TW_UINT16   GetConditionCode() const;
-            TW_UINT16   GetData() const;
+            TW_UINT16 CTL_ConditionCodeTriplet::GetConditionCode() const
+            {
+                return m_Status.ConditionCode;
+            }
+
+            TW_UINT16 CTL_ConditionCodeTriplet::GetData() const
+            {
+                return m_Status.Data;
+            }
+
         private:
-            void SetValues(TW_IDENTITY* pSession, TW_IDENTITY* pSourceID);
+            void SetValues(TW_IDENTITY* pSession, TW_IDENTITY* pSourceID)
+            {
+                Init(pSession, pSourceID, DG_CONTROL, DAT_STATUS, MSG_GET, static_cast<TW_MEMREF>(&m_Status));
+                SetAlive(true);
+            }
+
             TW_STATUS   m_Status;
 
     };

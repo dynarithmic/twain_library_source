@@ -32,7 +32,7 @@ namespace dynarithmic
     class CTL_TwainSMTriplet : public CTL_TwainTriplet
     {
         public:
-            CTL_TwainSMTriplet(CTL_ITwainSession* pSession)
+            CTL_TwainSMTriplet(CTL_ITwainSession* pSession) : m_nDSMVersion(DTWAIN_TWAINDSM_LEGACY)
             {
                 // Get the app manager's AppID
                 m_nErr = nErr;

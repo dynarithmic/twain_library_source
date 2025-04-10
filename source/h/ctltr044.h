@@ -58,10 +58,10 @@ namespace dynarithmic
             TW_JPEGCOMPRESSION    m_JPEGCompressionInfo;
     };
 
-    using CTL_JPEGCompressionGetTriplet = CTL_JPEGCompressionTriplet<MSG_GET>;
-    using CTL_JPEGCompressionGetDefaultTriplet = CTL_JPEGCompressionTriplet<MSG_GETDEFAULT>;
-    using CTL_JPEGCompressionSetTriplet = CTL_JPEGCompressionTriplet<MSG_SET>;
-    using CTL_JPEGCompressionResetTriplet = CTL_JPEGCompressionTriplet<MSG_RESET>;
+    using CTL_GetJPEGCompressionTriplet = CTL_JPEGCompressionTriplet<MSG_GET>;
+    using CTL_GetDefaultJPEGCompressionTriplet = CTL_JPEGCompressionTriplet<MSG_GETDEFAULT>;
+    using CTL_SetJPEGCompressionTriplet = CTL_JPEGCompressionTriplet<MSG_SET>;
+    using CTL_ResetJPEGCompressionTriplet = CTL_JPEGCompressionTriplet<MSG_RESET>;
 }
 #endif
 

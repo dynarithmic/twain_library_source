@@ -60,7 +60,7 @@ namespace dynarithmic
             TW_ENTRYPOINT m_EntryPoint{};
             bool m_bTripletFound;
     };
-    using CTL_EntryPointGetTriplet = CTL_EntryPointTriplet<MSG_GET>;
-    using CTL_EntryPointSetTriplet = CTL_EntryPointTriplet<MSG_SET>; 
+    using CTL_GetEntryPointTriplet = CTL_EntryPointTriplet<MSG_GET>;
+    using CTL_SetEntryPointTriplet = CTL_EntryPointTriplet<MSG_SET>; 
 }
 #endif
