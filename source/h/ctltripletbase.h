@@ -21,9 +21,10 @@
 #ifndef CTLTRIPLETBASE_H
 #define CTLTRIPLETBASE_H
 
+#include <tuple>
+#include <utility>
 #include "ctltwainsession.h"
 #include "ctlobstr.h"
-#include <tuple>
 
 namespace dynarithmic
 {
@@ -93,6 +94,9 @@ namespace dynarithmic
 
             void SetSourcePtr(CTL_ITwainSource* pSource)
             { m_pSource = pSource; }
+
+            bool InitGeneric(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource, TW_UINT32 nDG, 
+                TW_UINT16 nDat, TW_UINT16 MsgType, TW_MEMREF pType, std::pair<bool, bool> prInit = { true, true });
 
         private:
             TwainTripletArgs m_TwainTripletArg;

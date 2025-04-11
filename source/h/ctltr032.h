@@ -31,24 +31,7 @@ namespace dynarithmic
             CTL_ImageLayoutTripletImpl(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource,
                                        const CTL_RealArray* rArray = nullptr) : CTL_TwainTriplet(), m_ImageLayout{}
             {
-                SetSessionPtr(pSession);
-                SetSourcePtr(pSource);
-
-                // Get the app manager's AppID
-                const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-                if (pMgr && pMgr->IsValidTwainSession(pSession))
-                {
-                    if (pSource)
-                    {
-                        Init(pSession->GetAppIDPtr(),
-                            pSource->GetSourceIDPtr(),
-                            DG_IMAGE,
-                            DAT_IMAGELAYOUT,
-                            GetSetType,
-                            static_cast<TW_MEMREF>(&m_ImageLayout));
-                        SetAlive(true);
-                    }
-                }
+                InitGeneric(pSession, pSource, DG_IMAGE, DAT_IMAGELAYOUT, GetSetType, &m_ImageLayout);
 
                 if (::IsMSGSetOrResetType(GetSetType))
                 {

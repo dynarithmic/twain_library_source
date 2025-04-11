@@ -33,16 +33,7 @@ namespace dynarithmic
             CTL_ConditionCodeTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource/* = nullptr*/) :
                 CTL_TwainTriplet(), m_Status{}
             {
-                SetSourcePtr(const_cast<CTL_ITwainSource*>(pSource));
-                SetSessionPtr(pSession);
-                const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-                if (pMgr && pMgr->IsValidTwainSession(pSession))
-                {
-                    if (pSource)
-                        SetValues(pSession->GetAppIDPtr(), pSource->GetSourceIDPtr());
-                    else
-                        SetValues(pSession->GetAppIDPtr(), nullptr);
-                }
+                InitGeneric(pSession, pSource, DG_CONTROL, DAT_STATUS, MSG_GET, &m_Status);
             }
 
             CTL_ConditionCodeTriplet(TW_IDENTITY* pSession, TW_IDENTITY* pSourceID)
@@ -68,7 +59,6 @@ namespace dynarithmic
             }
 
             TW_STATUS   m_Status;
-
     };
 }
 #endif

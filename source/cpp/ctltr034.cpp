@@ -26,24 +26,7 @@ CTL_DeviceEventTriplet::CTL_DeviceEventTriplet(CTL_ITwainSession *pSession,
                                                CTL_ITwainSource* pSource)
                                                :  CTL_TwainTriplet()
 {
-    SetSessionPtr(pSession);
-    SetSourcePtr( pSource );
-
-    // Get the app manager's AppID
-    const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-    if ( pMgr && pMgr->IsValidTwainSession( pSession ))
-    {
-        if ( pSource )
-        {
-            Init( pSession->GetAppIDPtr(),
-                  pSource->GetSourceIDPtr(),
-                  DG_CONTROL,
-                  DAT_DEVICEEVENT,
-                  MSG_GET,
-                  static_cast<TW_MEMREF>((pTW_DEVICEEVENT)m_DeviceEvent));
-            SetAlive (true);
-        }
-    }
+    InitGeneric(pSession, pSource, DG_CONTROL, DAT_DEVICEEVENT, MSG_GET, &m_DeviceEvent);
     m_bPassed = false;
 }
 

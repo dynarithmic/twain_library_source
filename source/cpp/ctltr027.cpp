@@ -27,29 +27,7 @@ CTL_ImagePendingTriplet::CTL_ImagePendingTriplet(CTL_ITwainSession *pSession,
                                                  TW_UINT16 nMsg)
     : CTL_TwainTriplet(), m_nMsg(nMsg), m_PendingXfers{}
 {
-    SetSessionPtr( pSession );
-    SetSourcePtr( pSource );
-
-    // Get the app manager's AppID
-    const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-
-    if ( pMgr && pMgr->IsValidTwainSession( pSession ))
-    {
-        if ( pSource )
-        {
-            Init( pSession->GetAppIDPtr(), pSource->GetSourceIDPtr(),
-                  DG_CONTROL,
-                  DAT_PENDINGXFERS,
-                  m_nMsg,
-                  static_cast<TW_MEMREF>(&m_PendingXfers));
-
-            SetAlive (true);
-        }
-        else
-            SetAlive(false);
-    }
-    else
-        SetAlive(false);
+    InitGeneric(pSession, pSource, DG_CONTROL, DAT_PENDINGXFERS, m_nMsg, &m_PendingXfers);
 }
 
 bool CTL_ImagePendingTriplet::Reset( TW_UINT16 nMsg )

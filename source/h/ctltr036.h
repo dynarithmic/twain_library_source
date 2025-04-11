@@ -32,24 +32,7 @@ namespace dynarithmic
             CTL_CustomDSTripletImpl(CTL_ITwainSession* pSession,
                 CTL_ITwainSource* pSource) : CTL_TwainTriplet(), m_CustomDSData{}
             {
-                SetSessionPtr(pSession);
-                SetSourcePtr(pSource);
-
-                // Get the app manager's AppID
-                const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-                if (pMgr && pMgr->IsValidTwainSession(pSession))
-                {
-                    if (pSource)
-                    {
-                        Init(pSession->GetAppIDPtr(),
-                            pSource->GetSourceIDPtr(),
-                            DG_CONTROL,
-                            DAT_CUSTOMDSDATA,
-                            nMsg,
-                            static_cast<TW_MEMREF>(&m_CustomDSData));
-                        SetAlive(true);
-                    }
-                }
+                InitGeneric(pSession, pSource, DG_CONTROL, DAT_CUSTOMDSDATA, nMsg, &m_CustomDSData);
             }
 
             TW_UINT16 Execute()

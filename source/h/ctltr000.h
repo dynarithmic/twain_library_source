@@ -36,13 +36,7 @@ namespace dynarithmic
             {
                 // Get the app manager's AppID
                 m_nErr = nErr;
-                const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-                if (pMgr && pMgr->IsValidTwainSession(pSession))
-                {
-                    Init(pSession->GetAppIDPtr(), nullptr, DG_CONTROL, DAT_PARENT,
-                        nMsg, static_cast<TW_MEMREF>(pSession->GetWindowHandlePtr()));
-                    SetAlive(true);
-                }
+                InitGeneric(pSession, nullptr, DG_CONTROL, DAT_PARENT, nMsg, pSession->GetWindowHandlePtr());
             }
 
             TW_UINT16 Execute() override
