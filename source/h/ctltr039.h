@@ -33,16 +33,10 @@ namespace dynarithmic
     {
         public:
             CTL_EntryPointTriplet(CTL_ITwainSession* pSession) :
-                CTL_TwainTriplet(), m_bTripletFound(false)
+                CTL_TwainTriplet(), m_bTripletFound(false), m_EntryPoint{}
             {
-                SetSessionPtr(pSession);
-                const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-                if (pMgr && pMgr->IsValidTwainSession(pSession))
-                {
-                    m_EntryPoint.Size = sizeof(TW_ENTRYPOINT);
-                    Init(pSession->GetAppIDPtr(), nullptr, DG_CONTROL, DAT_ENTRYPOINT, msg, &m_EntryPoint);
-                    SetAlive(true);
-                }
+                m_EntryPoint.Size = sizeof(TW_ENTRYPOINT);
+                InitGeneric(pSession, nullptr, DG_CONTROL, DAT_ENTRYPOINT, msg, &m_EntryPoint);
             }
             TW_UINT16 Execute() override
             {

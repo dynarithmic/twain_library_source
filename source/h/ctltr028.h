@@ -46,23 +46,7 @@ namespace dynarithmic
 
                 m_SetupFileXfer.Format = static_cast<TW_UINT16>(FileFormat);
 
-                // Get the app manager's AppID
-                const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-
-                if (pMgr && pMgr->IsValidTwainSession(pSession))
-                {
-                    if (pSource)
-                    {
-                        Init(pSession->GetAppIDPtr(),
-                            pSource->GetSourceIDPtr(),
-                            DG_CONTROL,
-                            DAT_SETUPFILEXFER,
-                            GetSetType,
-                            static_cast<TW_MEMREF>(&m_SetupFileXfer));
-
-                        SetAlive(true);
-                    }
-                }
+                InitGeneric(pSession, pSource, DG_CONTROL, DAT_SETUPFILEXFER, GetSetType, &m_SetupFileXfer);
 
                 // Set the capability map if this is a set type
                 const bool bIsSet = IsMSGSetType();
@@ -137,24 +121,7 @@ namespace dynarithmic
         public:
             CTL_AudioFileXferTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource) : CTL_TwainTriplet()
             {
-                SetSessionPtr(pSession);
-                SetSourcePtr(pSource);
-                // Get the app manager's AppID
-                const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-
-                if (pMgr && pMgr->IsValidTwainSession(pSession))
-                {
-                    if (pSource)
-                    {
-                        Init(pSession->GetAppIDPtr(),
-                            pSource->GetSourceIDPtr(),
-                            DG_CONTROL,
-                            DAT_AUDIOFILEXFER,
-                            MSG_GET,
-                            nullptr);
-                        SetAlive(true);
-                    }
-                }
+                InitGeneric(pSession, pSource, DG_CONTROL, DAT_AUDIOFILEXFER, MSG_GET, nullptr);
             }
     };
 }

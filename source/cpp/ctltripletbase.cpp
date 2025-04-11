@@ -45,7 +45,36 @@ CTL_TwainTriplet::CTL_TwainTriplet(  pTW_IDENTITY pOrigin,
     Init(pOrigin, pDest, nDG, nDAT,  nMSG, pData);
 }
 
-void dynarithmic::CTL_TwainTriplet::Init( const pTW_IDENTITY pOrigin,
+// High-level initialization of triplet components.  
+bool CTL_TwainTriplet::InitGeneric(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource, 
+                                   TW_UINT32 nDG, TW_UINT16 nDat, TW_UINT16 MsgType, TW_MEMREF pType, 
+                                    std::pair<bool, bool> prInit)
+{
+    // Optionally set session and source pointers
+    if ( prInit.first )
+        SetSessionPtr(pSession);
+    if ( prInit.second )
+        SetSourcePtr(pSource);
+
+    const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
+
+    // Only Initialize if App Manager is valid
+    if (pMgr && pMgr->IsValidTwainSession(pSession))
+    {
+        Init(pSession?pSession->GetAppIDPtr():nullptr,
+            pSource?pSource->GetSourceIDPtr():nullptr,
+            nDG,
+            nDat,
+            MsgType,
+            pType);
+        SetAlive(true);
+        return true;
+    }
+    return false;
+}
+
+
+void CTL_TwainTriplet::Init( const pTW_IDENTITY pOrigin,
                              const pTW_IDENTITY pDest,
                              TW_UINT32 nDG,
                              TW_UINT16 nDAT,
@@ -102,4 +131,3 @@ bool CTL_TwainTriplet::IsAlive() const
 {
     return m_bAlive;
 }
-

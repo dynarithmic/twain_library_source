@@ -36,26 +36,13 @@ namespace dynarithmic
                                         TW_USERINTERFACE* pTWUI,
                                         TW_BOOL bShowUI = TRUE)
                                         : CTL_TwainTriplet(), m_pUserInterface(pTWUI)
-{
-                SetSessionPtr(pSession);
-                SetSourcePtr(pSource);
+            {
                 m_pUserInterface->ShowUI = bShowUI;
                 m_pUserInterface->ModalUI = 0;
                 const HWND* pWnd = pSession->GetWindowHandlePtr();
 
                 m_pUserInterface->hParent = static_cast<TW_HANDLE>(*pWnd);
-                // Get the app manager's AppID
-                const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-                if (pMgr && pMgr->IsValidTwainSession(pSession))
-                {
-                    if (pSource)
-                    {
-                        Init(pSession->GetAppIDPtr(), pSource->GetSourceIDPtr(),
-                            DG_CONTROL, DAT_USERINTERFACE, nMsg,
-                            static_cast<TW_MEMREF>(m_pUserInterface));
-                        SetAlive(true);
-                    }
-                }
+                InitGeneric(pSession, pSource, DG_CONTROL, DAT_USERINTERFACE, nMsg, m_pUserInterface);
             }
 
             bool    IsModal() const { return m_pUserInterface->ModalUI?true:false; }

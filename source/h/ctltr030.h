@@ -33,28 +33,8 @@ namespace dynarithmic
             CTL_Palette8Triplet(CTL_ITwainSession* pSession,
                                 CTL_ITwainSource* pSource) : CTL_TwainTriplet(), m_Palette8()
             {
-                SetSessionPtr(pSession);
-                SetSourcePtr(pSource);
-
-                // Get the app manager's AppID
-                const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-
-                if (pMgr && pMgr->IsValidTwainSession(pSession))
-                {
-                    if (pSource)
-                    {
-                        Init(pSession->GetAppIDPtr(),
-                            pSource->GetSourceIDPtr(),
-                            DG_IMAGE,
-                            DAT_PALETTE8,
-                            MsgType,
-                            static_cast<TW_MEMREF>(&m_Palette8));
-
-                        SetAlive(true);
-                    }
-                }
+                InitGeneric(pSession, pSource, DG_IMAGE, DAT_PALETTE8, MsgType, &m_Palette8);
             }
-
 
             TW_PALETTE8* GetPalette8Buffer()
             {

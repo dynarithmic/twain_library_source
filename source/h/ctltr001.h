@@ -83,13 +83,7 @@ namespace dynarithmic
                     CTL_ITwainSource* pSource = CTL_ITwainSource::Create(pSession, pProduct);
                     SetSourcePtr(pSource);
                     m_bSourceCreated = true;
-                    SetSessionPtr(pSession);
-                    if (pSource)
-                    {
-                        Init(pSession->GetAppIDPtr(), nullptr, DG_CONTROL, DAT_IDENTITY,
-                            nMsg, static_cast<TW_MEMREF>(pSource->GetSourceIDPtr()));
-                        SetAlive(true);
-                    }
+                    InitGeneric(pSession, nullptr, DG_CONTROL, DAT_IDENTITY, nMsg, pSource->GetSourceIDPtr(), { true, false });
                 }
             }
             CTL_ITwainSource* GetSourceIDPtr() { return GetSourcePtr(); }
@@ -108,19 +102,8 @@ namespace dynarithmic
         public:
             CTL_SourceOpenCloseTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource) : m_bSourceCreated(false)
             {
-                SetSessionPtr(pSession);
                 SetSourcePtr(pSource);
-
-                // Get the app manager's AppID
-                const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-
-                if (pMgr && pMgr->IsValidTwainSession(pSession))
-                {
-                    // Don't add this source to permanent list
-                    Init(pSession->GetAppIDPtr(), nullptr, DG_CONTROL, DAT_IDENTITY,
-                        nMsg, static_cast<TW_MEMREF>(pSource->GetSourceIDPtr()));
-                    SetAlive(true);
-                }
+                InitGeneric(pSession, nullptr, DG_CONTROL, DAT_IDENTITY, nMsg, pSource->GetSourceIDPtr(), {true, false});
             }
             CTL_ITwainSource* GetSourceIDPtr() { return GetSourcePtr(); }
 

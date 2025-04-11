@@ -33,23 +33,7 @@ namespace dynarithmic
         public:
             CTL_JPEGCompressionTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource)
             {
-                SetSessionPtr(nullptr);
-                SetSourcePtr(nullptr);
-
-                // Get the app manager's AppID
-                const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-
-                if (pMgr && pMgr->IsValidTwainSession(pSession))
-                {
-                    SetSourcePtr(pSource);
-                    SetSessionPtr(pSession);
-                    if (pSource)
-                    {
-                        Init(pSession->GetAppIDPtr(), pSource->GetSourceIDPtr(), DG_IMAGE, DAT_JPEGCOMPRESSION, nMsg,
-                            static_cast<TW_MEMREF>(&m_JPEGCompressionInfo));
-                        SetAlive(true);
-                    }
-                }
+                InitGeneric(pSession, pSource, DG_IMAGE, DAT_JPEGCOMPRESSION, nMsg, &m_JPEGCompressionInfo);
             }
 
             TW_JPEGCOMPRESSION& GetJPEGCompressionInfo() { return m_JPEGCompressionInfo; }

@@ -27,8 +27,10 @@ namespace dynarithmic
     class CTL_SetupMemXferTriplet : public CTL_TwainTriplet
     {
         public:
-            CTL_SetupMemXferTriplet(CTL_ITwainSession *pSession,
-                                    CTL_ITwainSource* pSource);
+            CTL_SetupMemXferTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource) : CTL_TwainTriplet(), m_SetupMemXfer{}
+            {
+                InitGeneric(pSession, pSource, DG_CONTROL, DAT_SETUPMEMXFER, MSG_GET, &m_SetupMemXfer);
+            }
 
             TW_SETUPMEMXFER *  GetSetupMemXferBuffer() { return &m_SetupMemXfer; }
 
