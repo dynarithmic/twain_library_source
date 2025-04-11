@@ -87,7 +87,7 @@ namespace dynarithmic
 
     using CTL_EnableUserInterfaceTriplet = CTL_UserInterfaceTripletImpl<MSG_ENABLEDS, CTL_ExecuteEnableUIFn>;
     using CTL_DisableUserInterfaceTriplet = CTL_UserInterfaceTripletImpl<MSG_DISABLEDS, CTL_ExecuteDisableUIFn>;
-    using CTL_DisplayUserInterfaceOnlyTriplet = CTL_UserInterfaceTripletImpl<MSG_ENABLEDSUIONLY>;
+    using CTL_DisplayUserInterfaceOnlyTriplet = CTL_UserInterfaceTripletImpl<MSG_ENABLEDSUIONLY, CTL_ExecuteEnableUIFn>;
 }
 #endif
 
