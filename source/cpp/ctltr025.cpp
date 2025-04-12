@@ -24,10 +24,9 @@ using namespace dynarithmic;
 
 CTL_ImageInfoTriplet::CTL_ImageInfoTriplet(CTL_ITwainSession* pSession,
                                            CTL_ITwainSource*  pSource)
-
                                            : CTL_ImageTriplet(pSession, pSource), m_ImageInfo()
 {
-    InitVars(DAT_IMAGEINFO, CTL_GetTypeGET, &m_ImageInfo );
+    InitGeneric(pSession, pSource, DG_IMAGE, DAT_IMAGEINFO, MSG_GET, &m_ImageInfo);
 }
 
 

@@ -24,9 +24,7 @@
 using namespace dynarithmic;
 
 CTL_ImageTriplet::CTL_ImageTriplet(CTL_ITwainSession *pSession,
-                                   CTL_ITwainSource* pSource)
-
-                       :  CTL_TwainTriplet()
+                                   CTL_ITwainSource* pSource) :  CTL_TwainTriplet()
 {
     SetSessionPtr(pSession);
     SetSourcePtr(pSource);
@@ -41,18 +39,10 @@ CTL_ImageTriplet::CTL_ImageTriplet(CTL_ITwainSession *pSession,
 
 
 void CTL_ImageTriplet::InitVars(TW_UINT16 nType,
-                                CTL_EnumGetType nGetType,
+                                TW_UINT16 nGetType,
                                 void *pData)
 {
-    if ( IsAlive() )
-    {
-        Init( GetSessionPtr()->GetAppIDPtr(),
-              GetSourcePtr()->GetSourceIDPtr(),
-              DG_IMAGE,
-              nType,
-              static_cast<TW_UINT16>(nGetType),
-              static_cast<TW_MEMREF>(pData));
-    }
+    InitGeneric(GetSessionPtr(), GetSourcePtr(), DG_IMAGE, nType, nGetType, pData);
 }
 
 

@@ -24,7 +24,6 @@
 #include "ctltr026.h"
 #include "ctliface.h"
 
-
 namespace dynarithmic
 {
     class CTL_ImageMemXferTriplet : public CTL_ImageXferTriplet
