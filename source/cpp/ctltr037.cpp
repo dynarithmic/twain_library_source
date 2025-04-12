@@ -28,24 +28,7 @@ CTL_FileSystemTriplet::CTL_FileSystemTriplet(CTL_ITwainSession *pSession,
                                          TW_UINT16 nMsg)
                                          : CTL_TwainTriplet(), m_FileSystem()
 {
-    SetSessionPtr(pSession);
-    SetSourcePtr( pSource );
-
-    // Get the app manager's AppID
-    const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-    if ( pMgr && pMgr->IsValidTwainSession( pSession ))
-    {
-        if ( pSource )
-        {
-            Init( pSession->GetAppIDPtr(),
-                  pSource->GetSourceIDPtr(),
-                  DG_CONTROL,
-                  DAT_FILESYSTEM,
-                  nMsg,
-                  static_cast<TW_MEMREF>(static_cast<pTW_FILESYSTEM>(&m_FileSystem)));
-            SetAlive (true);
-        }
-    }
+    InitGeneric(pSession, pSource, DG_CONTROL, DAT_FILESYSTEM, nMsg, &m_FileSystem);
 }
 
 TW_UINT16 CTL_FileSystemTriplet::SelectAutoCaptureDirectory( const CTL_StringType& sDir )

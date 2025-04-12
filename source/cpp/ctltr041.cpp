@@ -24,12 +24,5 @@
 using namespace dynarithmic;
 CTL_DSMMetricsTriplet::CTL_DSMMetricsTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource) : m_DSMMetrics{}
 {
-    SetSessionPtr(pSession);
-    const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-    if (pMgr && pMgr->IsValidTwainSession(pSession))
-    {
-        Init(pSession->GetAppIDPtr(), pSource->GetSourceIDPtr(), DG_CONTROL, DAT_METRICS, MSG_GET, &m_DSMMetrics);
-        m_DSMMetrics.SizeOf = sizeof m_DSMMetrics;
-        SetAlive(true);
-    }
+    InitGeneric(pSession, pSource, DG_CONTROL, DAT_METRICS, MSG_GET, &m_DSMMetrics);
 }

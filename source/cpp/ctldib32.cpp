@@ -1041,12 +1041,17 @@ bool CTL_TwainDibArray::RemoveDib( HANDLE hDib )
     return false;
 }
 
-CTL_TwainDibPtr CTL_TwainDibArray::GetAt(size_t nPos)
+CTL_TwainDibPtr& CTL_TwainDibArray::GetAt(size_t nPos)
 {
     return m_TwainDibArray.at(nPos);
 }
 
-CTL_TwainDibPtr CTL_TwainDibArray::operator[](size_t nPos)
+CTL_TwainDibPtr& CTL_TwainDibArray::operator[](size_t nPos)
+{
+    return GetAt(nPos);
+}
+
+const CTL_TwainDibPtr& CTL_TwainDibArray::operator[](size_t nPos) const
 {
     return GetAt(nPos);
 }

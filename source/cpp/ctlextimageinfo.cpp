@@ -20,6 +20,7 @@
  */
 #include "ctltmpl5.h"
 #include "errorcheck.h"
+#include "ctltr038.h"
 #include "twain.h"
 using namespace dynarithmic;
 /* These functions can only be used in State 7   (when DTWAIN_TN_TRANSFERDONE notification is sent).
@@ -210,12 +211,26 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDT
    in STATE 7 of the source */
 static bool RetrieveExtImageInfo(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pTheSource)
 {
+    struct RetrieveRAII
+    {
+        CTL_ITwainSource* m_p;
+        RetrieveRAII(CTL_ITwainSource* p) : m_p(p) {}
+        ~RetrieveRAII() 
+        { 
+            // It is safe to delete the original Extended Image Info retrieved from the 
+            // TWAIN triplet, since we have cached all the information into our local containers
+            auto* pTrip = m_p->GetExtImageInfoTriplet();
+            pTrip->DestroyInfo();
+        }
+    };
+
+    // Ensure we clean up the memory allocated for the Extended Image Info
+    RetrieveRAII raii(pTheSource);
+
     auto* pExtendedImageInfo = pTheSource->GetExtendedImageInfo();
-    bool bOk = true;
     pExtendedImageInfo->SetInfoRetrieved(false);
     pTheSource->InitExtImageInfo(0);
-    bOk = pExtendedImageInfo->BeginRetrieval();
-    return bOk;
+    return pExtendedImageInfo->BeginRetrieval();
 }
 
 
@@ -232,6 +247,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_InitExtImageInfo(DTWAIN_SOURCE Source)
 
     // Retrieve all of the extended image information now.
     auto val = RetrieveExtImageInfo(pHandle, pTheSource);
+
     LOG_FUNC_EXIT_NONAME_PARAMS(val)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -340,6 +356,7 @@ static std::pair<bool, int> GetCachedExtImageInfoData(CTL_TwainDLLHandle* pHandl
         case TWEI_BARCODEY:
         case TWEI_BARCODEROTATION:
         case TWEI_BARCODETEXT:
+        case TWEI_BARCODETEXTLENGTH:                
         case TWEI_BARCODETYPE:
             theArray = pExtendedImageInfo->GetBarcodeInfo(nWhich);
         break;

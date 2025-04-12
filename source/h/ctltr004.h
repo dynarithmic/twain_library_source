@@ -20,16 +20,5 @@
  */
 #ifndef CTLTR004_H
 #define CTLTR004_H
-
 #include "ctltr001.h"
-namespace dynarithmic
-{
-    class CTL_SelectSourceDlgTriplet : public CTL_SourceTriplet
-    {
-        public:
-            CTL_SelectSourceDlgTriplet(CTL_ITwainSession *pSession,
-                                       LPCTSTR pszProduct=nullptr);
-            TW_UINT16 Execute() override;
-    };
-}
 #endif

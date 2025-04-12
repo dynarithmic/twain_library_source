@@ -67,8 +67,6 @@
 #ifdef _MSC_VER
 #pragma warning (pop)
 #endif
-#undef min
-#undef max
 #include <cmath>
 #include <MD5Checksum.h>
 #define D_TO_R_SCALEFACTOR (3.14159265358979323846 / 180.0)
@@ -1118,41 +1116,70 @@ void InfoObject::ComposeObject()
 
 void EncryptionObject::ComposeObject()
 {
-    char szBuf[100];
+    char szBuf[200] = {};
     SetContents("<<\n");
-    // R Value, Length;
-    if (m_bAESEncrypted)
+    if ( m_bAESEncrypted )
     {
-        sprintf(szBuf, "<</CF<</StdCF<</AuthEvent/DocOpen/CFM/AESV2/Length 16>>>>");
+        AppendContents("/CF <<\n/StdCF <<\n/AuthEvent /DocOpen\n/CFM /AESV2\n/Length 16\n/Type /CryptFilter\n>>\n>>\n/EncryptMetadata true\n/Filter /Standard\n/Length 128\n");
+        AppendContents(szBuf);
+        // Now for the owner and user passwords
+        std::string enc1;
+        std::string enc2;
+        auto& engine = GetParent()->GetEncryptionEngine();
+        const PDFEncryption::UCHARArray enc1Array = engine.GetOwnerKey();
+        const PDFEncryption::UCHARArray enc2Array = engine.GetUserKey();
+        enc1.append(reinterpret_cast<const char*>(enc1Array.data()), 32);
+        enc2.append(reinterpret_cast<const char*>(enc2Array.data()), 32);
+        AppendContents("/O (");
+        enc1 = MakeCompatiblePDFString(enc1);
+        WriteRaw(enc1.data(), enc1.length());
+        AppendContents(")\n/U (");
+        enc2 = MakeCompatiblePDFString(enc2);
+        WriteRaw(enc2.data(), enc2.length());
+        sprintf(szBuf, ")\n/P %d\n/V %d\n", engine.GetPermissions(), m_nVValue);
+        AppendContents(szBuf);
+        if (m_RValue == 3)
+            sprintf(szBuf, "/R %d\n/Length %d\n", m_RValue, m_nLength);
+        else
+            sprintf(szBuf, "/R %d\n", m_RValue);
+        AppendContents(szBuf);
+        sprintf(szBuf, "/StmF /StdCF /StrF /StdCF\n>>");
         AppendContents(szBuf);
     }
-    if ( m_RValue == 3 )
-        sprintf(szBuf,"/R %d\n/Length %d\n", m_RValue, m_nLength);
     else
-        sprintf(szBuf,"/R %d\n", m_RValue);
-    AppendContents(szBuf);
-    AppendContents("/Filter /Standard\n");
-
-    // Now for the owner and user passwords
-    std::string enc1;
-    std::string enc2;
-    auto& engine = GetParent()->GetEncryptionEngine();
-    const PDFEncryption::UCHARArray enc1Array = engine.GetOwnerKey();
-    const PDFEncryption::UCHARArray enc2Array = engine.GetUserKey();
-    enc1.append(reinterpret_cast<const char *>(enc1Array.data()), 32);
-    enc2.append(reinterpret_cast<const char *>(enc2Array.data()), 32);
-    AppendContents("/O (");
-    enc1 = MakeCompatiblePDFString(enc1);
-    WriteRaw(enc1.data(), enc1.length());
-    AppendContents(")\n/U (");
-    enc2 = MakeCompatiblePDFString(enc2);
-    WriteRaw(enc2.data(), enc2.length());
-    sprintf(szBuf,")\n/P %d\n/V %d\n>>", engine.GetPermissions(), m_nVValue);
-    AppendContents(szBuf);
-    if (m_bAESEncrypted)
     {
-        sprintf(szBuf, "/StmF /StdCF /StrF /StdCF");
+        if ( m_RValue == 3 )
+            sprintf(szBuf,"/R %d\n/Length %d\n", m_RValue, m_nLength);
+        else
+            sprintf(szBuf,"/R %d\n", m_RValue);
         AppendContents(szBuf);
+        char szLengthBuf[100] = {};
+        if (m_bAESEncrypted)
+            sprintf(szLengthBuf, " /Length 128");
+        sprintf(szBuf, "/Filter /Standard%s\n", szLengthBuf);;
+        AppendContents(szBuf);
+
+        // Now for the owner and user passwords
+        std::string enc1;
+        std::string enc2;
+        auto& engine = GetParent()->GetEncryptionEngine();
+        const PDFEncryption::UCHARArray enc1Array = engine.GetOwnerKey();
+        const PDFEncryption::UCHARArray enc2Array = engine.GetUserKey();
+        enc1.append(reinterpret_cast<const char *>(enc1Array.data()), 32);
+        enc2.append(reinterpret_cast<const char *>(enc2Array.data()), 32);
+        AppendContents("/O (");
+        enc1 = MakeCompatiblePDFString(enc1);
+        WriteRaw(enc1.data(), enc1.length());
+        AppendContents(")\n/U (");
+        enc2 = MakeCompatiblePDFString(enc2);
+        WriteRaw(enc2.data(), enc2.length());
+        sprintf(szBuf,")\n/P %d\n/V %d\n>>", engine.GetPermissions(), m_nVValue);
+        AppendContents(szBuf);
+        if (m_bAESEncrypted)
+        {
+            sprintf(szBuf, "/StmF /StdCF /StrF /StdCF");
+            AppendContents(szBuf);
+        }
     }
 }
 
@@ -2079,8 +2106,7 @@ void ImageObject::ComposeObject()
     if (!pParent)
         return;
 
-    // do a85 encoding here for a test
-    if ( pParent->IsASCIICompressed() )
+    if ( pParent->IsASCIICompressed())
     {
         std::string sOut;
         std::string sIn;

@@ -22,6 +22,7 @@
 #include "dtwain.h"
 #include "ctliface.h"
 #include "ctltwainmanager.h"
+#include "ctltr044.h"
 
 using namespace dynarithmic;
 
@@ -47,3 +48,21 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetJpegValues(DTWAIN_SOURCE Source, LPLONG pQual
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
+#if 0
+LONG DLLENTRY_DEF DTWAIN_GetJpegInternalCompressInfo(DTWAIN_SOURCE Source, LPCTSTR szInfo, LONG maxLen)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, szInfo, maxLen))
+    auto [pHandle, pSource] = VerifyHandles(Source);
+
+    // Create a JPEG triplet
+    CTL_JPEGCompressionGetDefaultTriplet triplet(pSource->GetTwainSession(), pSource);
+    auto ret = triplet.Execute();
+    if (ret == TWRC_SUCCESS)
+    {
+        auto& info = triplet.GetJPEGCompressionInfo();
+        info.ColorSpace = info.ColorSpace;
+    }
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
+}
+#endif

@@ -21,14 +21,4 @@
 #ifndef CTLTR009_H
 #define CTLTR009_H
 #include "ctltr001.h"
-
-namespace dynarithmic
-{
-    class CTL_CloseSourceTriplet : public CTL_SourceTriplet
-    {
-        public:
-            CTL_CloseSourceTriplet(CTL_ITwainSession* pSession,
-                                   CTL_ITwainSource* pSource);
-    };
-}
 #endif

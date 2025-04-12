@@ -25,11 +25,5 @@ using namespace dynarithmic;
 CTL_DSMCallbackTriplet::CTL_DSMCallbackTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource, TW_UINT16 msg) : 
     m_DSMEntryProc{}, m_TWCallback{}
 {
-    SetSessionPtr( pSession );
-    const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-    if ( pMgr && pMgr->IsValidTwainSession( pSession ))
-    {
-        Init( pSession->GetAppIDPtr(), pSource->GetSourceIDPtr(), DG_CONTROL, DAT_CALLBACK, msg, &m_TWCallback);
-        SetAlive (true);
-    }
+    InitGeneric(pSession, pSource, DG_CONTROL, DAT_CALLBACK, msg, &m_TWCallback);
 }

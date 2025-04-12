@@ -2553,8 +2553,6 @@ bool LoadGeneralResources(bool blockExecution)
     return bResourcesLoaded;
 }
 
-#undef min
-#undef max
 #include <sstream>
 
 #ifdef DTWAIN_LIB

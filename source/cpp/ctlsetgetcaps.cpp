@@ -571,7 +571,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetCustomDSData( DTWAIN_SOURCE Source, LPBYTE Data, D
     auto *p = static_cast<CTL_ITwainSource*>(Source);
     // Call TWAIN to get the custom data
     const auto pSession = p->GetTwainSession();
-    CTL_CustomDSTriplet DST(pSession, p, MSG_GET);
+    CTL_GetCustomDSTriplet DST(pSession, p);
 
     // Get the custom data
     const int ret = DST.Execute();
@@ -621,7 +621,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCustomDSData( DTWAIN_SOURCE Source, HANDLE hD
     const auto pSession = p->GetTwainSession();
     auto pHandle = p->GetDTWAINHandle();
 
-    CTL_CustomDSTriplet DST(pSession, p, MSG_SET);
+    CTL_SetCustomDSTriplet DST(pSession, p);
 
     // Check what options the user wants to do
     char *pData = nullptr;
