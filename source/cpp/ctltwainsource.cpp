@@ -464,11 +464,14 @@ bool CTL_ITwainSource::CloseSource(bool bForce)
         {
             ProcessMultipageFile();
             CTL_CloseSourceTriplet CS( m_pSession, this );
-            const TW_UINT16 rc = CS.Execute();
-            if ( rc != TWRC_SUCCESS )
+            if (CS.IsAlive())
             {
-                m_bIsOpened = false;
-                return false;
+                const TW_UINT16 rc = CS.Execute();
+                if (rc != TWRC_SUCCESS)
+                {
+                    m_bIsOpened = false;
+                    return false;
+                }
             }
             m_nState = SOURCE_STATE_CLOSED;
         }
