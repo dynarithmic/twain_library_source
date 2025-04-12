@@ -60,7 +60,7 @@ CTL_ImageMemXferTriplet::CTL_ImageMemXferTriplet(CTL_ITwainSession *pSession,
     m_nCompression = nCompression;
 
     InitXferBuffer();
-    InitVars( DAT_IMAGEMEMXFER, CTL_GetTypeGET, &m_ImageMemXferBuffer );
+    InitGeneric(GetSessionPtr(), GetSourcePtr(), DG_IMAGE, DAT_IMAGEMEMXFER, MSG_GET, &m_ImageMemXferBuffer);
 
     m_DibStrip = hDib;
 

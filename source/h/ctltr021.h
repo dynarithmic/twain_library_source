@@ -66,10 +66,7 @@ namespace dynarithmic
                 return TWRC_SUCCESS;
 
             const TW_UINT16 rc = CTL_DefaultTripletExecute::Execute(pTrip);
-            if (rc == TWRC_SUCCESS)
-                pSource->SetUIOpen(true);
-            else
-                pSource->SetUIOpen(false);
+            pSource->SetUIOpen(rc == TWRC_SUCCESS);
             return rc;
         }
     };
@@ -80,7 +77,7 @@ namespace dynarithmic
         {
             const TW_UINT16 rc = CTL_DefaultTripletExecute::Execute(pTrip);
             if (rc == TWRC_SUCCESS)
-                pTrip.GetSourcePtr()->SetUIOpen(FALSE);
+                pTrip.GetSourcePtr()->SetUIOpen(false);
             return rc;
         }
     };
