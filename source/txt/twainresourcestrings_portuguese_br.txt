@@ -13,6 +13,7 @@
 12 O dispositivo TWAIN deve ser aberto antes da execução do comando.
 27 Não foi possível concluir a verificação. Resoluções X / Y definidas para valores diferentes
 28 Nome de arquivo especificado é inválido
+32 Triplo TWAIN não executado. Gerenciador Twain inválido.
 1000 ***
 1001 DTWAIN_HANDLE inválido
 1002 DTWAIN_SOURCE inválido

@@ -13,6 +13,7 @@
 12 TWAIN Quelle muß geöffnet werden bevor dieser Befehl ausgeführt werden kann.
 27 Scanvorgang konnte nicht vollständig ausgeführt werden. X/Y Auflösung enthält unterschiedliche Werte
 28 Ungültiger Dateiname
+32 TWAIN-Dreifach nicht ausgeführt. Ungültiger Twain-Manager
 1000 ***
 1001 Ungültiges DTWAIN_HANDLE
 1002 Ungültige DTWAIN_SOURCE
