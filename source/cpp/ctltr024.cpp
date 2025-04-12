@@ -36,16 +36,6 @@ CTL_ImageTriplet::CTL_ImageTriplet(CTL_ITwainSession *pSession,
         SetAlive(pSource?true:false);
 }
 
-
-
-void CTL_ImageTriplet::InitVars(TW_UINT16 nType,
-                                TW_UINT16 nGetType,
-                                void *pData)
-{
-    InitGeneric(GetSessionPtr(), GetSourcePtr(), DG_IMAGE, nType, nGetType, pData);
-}
-
-
 bool CTL_ImageTriplet::QueryAndRemoveDib(CTL_TwainAcquireEnum acquireType, CTL_TwainDibArray& pArray, size_t nWhich)
 {
     int bKeepPage = true;
