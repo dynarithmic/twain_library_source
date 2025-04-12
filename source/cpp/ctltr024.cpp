@@ -24,9 +24,7 @@
 using namespace dynarithmic;
 
 CTL_ImageTriplet::CTL_ImageTriplet(CTL_ITwainSession *pSession,
-                                   CTL_ITwainSource* pSource)
-
-                       :  CTL_TwainTriplet()
+                                   CTL_ITwainSource* pSource) :  CTL_TwainTriplet()
 {
     SetSessionPtr(pSession);
     SetSourcePtr(pSource);
@@ -41,24 +39,16 @@ CTL_ImageTriplet::CTL_ImageTriplet(CTL_ITwainSession *pSession,
 
 
 void CTL_ImageTriplet::InitVars(TW_UINT16 nType,
-                                CTL_EnumGetType nGetType,
+                                TW_UINT16 nGetType,
                                 void *pData)
 {
-    if ( IsAlive() )
-    {
-        Init( GetSessionPtr()->GetAppIDPtr(),
-              GetSourcePtr()->GetSourceIDPtr(),
-              DG_IMAGE,
-              nType,
-              static_cast<TW_UINT16>(nGetType),
-              static_cast<TW_MEMREF>(pData));
-    }
+    InitGeneric(GetSessionPtr(), GetSourcePtr(), DG_IMAGE, nType, nGetType, pData);
 }
 
 
 bool CTL_ImageTriplet::QueryAndRemoveDib(CTL_TwainAcquireEnum acquireType, CTL_TwainDibArray& pArray, size_t nWhich)
 {
-    bool bKeepPage = true;
+    int bKeepPage = true;
     const CTL_ITwainSession* pSession = GetSessionPtr();
     CTL_ITwainSource* pSource = GetSourcePtr();
 
@@ -66,13 +56,17 @@ bool CTL_ImageTriplet::QueryAndRemoveDib(CTL_TwainAcquireEnum acquireType, CTL_T
     {
         bKeepPage = CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_QUERYPAGEDISCARD, reinterpret_cast<LPARAM>(pSource)) ? true : false;
         // Keep the page
-        if (!bKeepPage)
+        if (bKeepPage == 0 || bKeepPage == 2)
         {
-            // throw this dib away (remove from the dib array)
-            pArray.DeleteDibMemory(nWhich);
+            if (bKeepPage == 0)
+            {
+                // throw this dib away (delete memory) 
+                pArray.DeleteDibMemory(nWhich);
+            }
+            // Remove this handle from DIB array handle
             pArray.RemoveDib(nWhich);
             CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_PAGEDISCARDED, reinterpret_cast<LPARAM>(pSource));
         }
     }
-    return bKeepPage;
+    return bKeepPage == 1;
 }

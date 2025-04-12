@@ -44,7 +44,7 @@
 #include "dtwinverex.h"
 #include "cppfunc.h"
 #include "logwriterutils.h"
-
+#include "ctltripletbase.h"
 using namespace dynarithmic;
 
 static constexpr std::array<std::pair<int, int>, 30> mapCondCode = { {
@@ -212,7 +212,7 @@ CTL_ITwainSession* CTL_TwainAppMgr::CreateTwainSession(
         if (pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_LATESTVERSION ||
             pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_VERSION2)
         {
-            CTL_EntryPointTriplet entryPoints(pSession, MSG_GET);
+            CTL_GetEntryPointTriplet entryPoints(pSession);
             TW_UINT16 rc = entryPoints.Execute();
             switch (rc)
             {
@@ -247,7 +247,7 @@ bool CTL_TwainAppMgr::OpenSourceManager( CTL_ITwainSession* pSession )
     if ( pHandle->m_nDSMVersion == DTWAIN_TWAINDSM_VERSION2)
     {
         // For 2.0 data sources.  Set the handle to the memory functions
-        CTL_EntryPointTripletGet EntryPoint( pSession );
+        CTL_GetEntryPointTriplet EntryPoint( pSession );
         if ( EntryPoint.Execute() == TWRC_SUCCESS )
         {
             // assign the memory functions to whatever the DSM has returned for
@@ -587,10 +587,16 @@ bool CTL_TwainAppMgr::GetBestCapDataType(const CTL_ITwainSource* pSource, TW_UIN
     return false;
 }
 
-
-bool CTL_TwainAppMgr::GetImageLayoutSize(const CTL_ITwainSource* pSource,
-                                         CTL_RealArray& rArray,
-                                         CTL_EnumGetType GetType)
+template <typename LayoutTriplet>
+static void GetLayoutComponents(LayoutTriplet* LayoutTrip, CTL_RealArray& rArray)
+{
+    rArray.push_back(LayoutTrip->GetLeft());
+    rArray.push_back(LayoutTrip->GetTop());
+    rArray.push_back(LayoutTrip->GetRight());
+    rArray.push_back(LayoutTrip->GetBottom());
+}
+    
+bool CTL_TwainAppMgr::GetImageLayoutSize(const CTL_ITwainSource* pSource, CTL_RealArray& rArray, TW_UINT16 GetType)
 {
     if ( !s_pGlobalAppMgr )
         return false;
@@ -602,16 +608,19 @@ bool CTL_TwainAppMgr::GetImageLayoutSize(const CTL_ITwainSource* pSource,
     const auto pSession = pTempSource->GetTwainSession();
 
     rArray.clear();
+    std::unique_ptr<CTL_TwainTriplet> layOutTriplet;
+    if (GetType == MSG_GET)
+        layOutTriplet = std::make_unique<CTL_GetImageLayoutTriplet>(pSession, pTempSource);
+    else
+        layOutTriplet = std::make_unique<CTL_GetDefaultImageLayoutTriplet>(pSession, pTempSource);
 
-    CTL_ImageLayoutTriplet LayoutTrip( pSession, pTempSource, static_cast<TW_UINT16>(GetType) );
-
-    const TW_UINT16 rc = LayoutTrip.Execute();
+    const TW_UINT16 rc = layOutTriplet->Execute();
     if ( rc == TWRC_SUCCESS )
     {
-        rArray.push_back( LayoutTrip.GetLeft() );
-        rArray.push_back( LayoutTrip.GetTop() );
-        rArray.push_back( LayoutTrip.GetRight() );
-        rArray.push_back( LayoutTrip.GetBottom() );
+        if ( GetType == MSG_GET )
+            GetLayoutComponents(static_cast<CTL_GetImageLayoutTriplet*>(layOutTriplet.get()), rArray);
+        else
+            GetLayoutComponents(static_cast<CTL_GetDefaultImageLayoutTriplet*>(layOutTriplet.get()), rArray);
         return true;
     }
     return false;
@@ -634,22 +643,23 @@ bool CTL_TwainAppMgr::SetImageLayoutSize(const CTL_ITwainSource* pSource,
     const auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
     const auto pSession = pTempSource->GetTwainSession();
 
-    CTL_ImageSetLayoutTriplet LayoutTrip( pSession,
-                                          pTempSource,
-                                          rArray,
-                                          static_cast<TW_UINT16>(SetType) );
+    std::unique_ptr<CTL_TwainTriplet> layOutTriplet;
+    if (::IsMSGResetType(static_cast<TW_UINT16>(SetType)))
+        layOutTriplet = std::make_unique<CTL_ResetImageLayoutTriplet>(pSession, pTempSource, nullptr);
+    else
+        layOutTriplet = std::make_unique<CTL_SetImageLayoutTriplet>(pSession, pTempSource, &rArray);
 
-    TW_UINT16 rc = LayoutTrip.Execute();
+    TW_UINT16 rc = layOutTriplet->Execute();
     switch ( rc )
     {
         case TWRC_SUCCESS:
-            GetImageLayoutSize( pSource, rActual, CTL_GetTypeGET );
+            GetImageLayoutSize( pSource, rActual, MSG_GET );
             return true;
 
         case TWRC_CHECKSTATUS:
         {
             // Get the results and set them in the array
-            GetImageLayoutSize( pSource, rActual, CTL_GetTypeGET );
+            GetImageLayoutSize( pSource, rActual, MSG_GET );
             return true;
         }
 
@@ -709,17 +719,17 @@ bool CTL_TwainAppMgr::ShowUserInterface( CTL_ITwainSource *pSource, bool bTest, 
         return false;  // Just return that UI can not be tested.  Assume no UI cannot be done.
     }
 
-    CTL_UserInterfaceTriplet *pUITrip;
-    CTL_UserInterfaceUIOnlyTriplet UIOnly(pSession, pTempSource, pTempSource->GetTWUserInterface());
+    std::unique_ptr<CTL_TwainTriplet> pUITrip;
+/*    CTL_UserInterfaceUIOnlyTriplet UIOnly(pSession, pTempSource, pTempSource->GetTWUserInterface());
     CTL_UserInterfaceEnableTriplet UIEnabled(pSession, pTempSource,
                                                       pTempSource->GetTWUserInterface(),
                                                       static_cast<TW_BOOL>(pTempSource->IsUIOpenOnAcquire()));
-
+                                                      */
     if ( bShowUIOnly )
-        pUITrip = &UIOnly;
+        pUITrip = std::make_unique<CTL_DisplayUserInterfaceOnlyTriplet>(pSession, pTempSource, pTempSource->GetTWUserInterface());
     else
-        pUITrip = &UIEnabled;
-
+        pUITrip = std::make_unique<CTL_EnableUserInterfaceTriplet>(pSession, pTempSource, pTempSource->GetTWUserInterface(),
+                                                                   static_cast<TW_BOOL>(pTempSource->IsUIOpenOnAcquire()));
     origSourceState oState(pTempSource, pSession);
 
     // Show the user interface (UI) now.
@@ -772,7 +782,7 @@ bool CTL_TwainAppMgr::DisableUserInterface(const CTL_ITwainSource *pSource)
     const auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
     const auto pSession = pTempSource->GetTwainSession();
     TW_USERINTERFACE *pTWUI = pTempSource->GetTWUserInterface();
-    CTL_UserInterfaceDisableTriplet UI(pSession, pTempSource, pTWUI );
+    CTL_DisableUserInterfaceTriplet UI(pSession, pTempSource, pTWUI );
     bool bRet = true;
 
     // Turn off user interface
@@ -1044,7 +1054,7 @@ bool CTL_TwainAppMgr::StoreImageLayout(CTL_ITwainSource *pSource)
         }
     }
 
-    CTL_ImageLayoutTriplet LayoutTrip( pSession, pTempSource, MSG_GET );
+    CTL_GetImageLayoutTriplet LayoutTrip( pSession, pTempSource );
 
     TW_UINT16 rc = LayoutTrip.Execute();
     if ( rc == TWRC_SUCCESS )
@@ -1121,9 +1131,8 @@ int  CTL_TwainAppMgr::FileTransfer( CTL_ITwainSession *pSession,
         std::swap(sFileNameNew, sFileName);  // swap the names, even if they may not have changed.
     }
 
-    CTL_SetupFileXferTriplet  FileXferSetup(pSession,
+    CTL_SetSetupFileXferTriplet  FileXferSetup(pSession,
                                        pSource,
-                                       static_cast<int>(CTL_SetTypeSET),
                                        acquireFileStatus.GetAcquireFileFormat(),
                                        sFileName
                                        );
@@ -1444,9 +1453,7 @@ bool CTL_TwainAppMgr::SetupMemXferDIB(CTL_ITwainSession* pSession, CTL_ITwainSou
         case TWPT_CIEXYZ:
         default:
         {
-            CTL_Palette8Triplet  Palette8(pSession,
-                                          pSource,
-                                          CTL_GetTypeGET);
+            CTL_GetPalette8Triplet  Palette8(pSession, pSource);
 
             if ( Palette8.Execute() == TWRC_FAILURE )
             {
@@ -1542,8 +1549,7 @@ bool CTL_TwainAppMgr::GetFileTransferDefaults(CTL_ITwainSource *pSource, int &nF
 {
     const auto pTempSource = static_cast<CTL_ITwainSource*>(pSource);
     const auto pSession = pTempSource->GetTwainSession();
-    CTL_SetupFileXferTriplet  FileXferGetDef( pSession, pTempSource,
-                                            static_cast<int>(CTL_GetTypeGETDEFAULT),
+    CTL_GetDefaultSetupFileXferTriplet  FileXferGetDef( pSession, pTempSource,
                                             static_cast<CTL_TwainFileFormatEnum>(0),{});
     if ( FileXferGetDef.Execute() == TWRC_SUCCESS )
     {

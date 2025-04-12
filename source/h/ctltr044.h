@@ -18,25 +18,34 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLTR024_H
-#define CTLTR024_H
+#ifndef CTLTR044_H
+#define CTLTR044_H
 
 #include "ctltripletbase.h"
 #include "ctltwainsession.h"
-#include "ctlobtyp.h"
+#include "ctltwainmanager.h"
 
 namespace dynarithmic
 {
-    class CTL_ImageTriplet : public CTL_TwainTriplet
+    template <TW_UINT16 nMsg = MSG_GET>
+    class CTL_JPEGCompressionTriplet : public CTL_TwainTriplet
     {
         public:
-            CTL_ImageTriplet(CTL_ITwainSession *pSession,
-                             CTL_ITwainSource *pSource);
-            bool QueryAndRemoveDib(CTL_TwainAcquireEnum acquireType, CTL_TwainDibArray& pArray, size_t nWhich);
+            CTL_JPEGCompressionTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource)
+            {
+                InitGeneric(pSession, pSource, DG_IMAGE, DAT_JPEGCOMPRESSION, nMsg, &m_JPEGCompressionInfo);
+            }
+
+            TW_JPEGCOMPRESSION& GetJPEGCompressionInfo() { return m_JPEGCompressionInfo; }
 
         protected:
-            void  InitVars(TW_UINT16 nType, TW_UINT16 nGet, void *pData);
+            TW_JPEGCOMPRESSION    m_JPEGCompressionInfo;
     };
+
+    using CTL_GetJPEGCompressionTriplet = CTL_JPEGCompressionTriplet<MSG_GET>;
+    using CTL_GetDefaultJPEGCompressionTriplet = CTL_JPEGCompressionTriplet<MSG_GETDEFAULT>;
+    using CTL_SetJPEGCompressionTriplet = CTL_JPEGCompressionTriplet<MSG_SET>;
+    using CTL_ResetJPEGCompressionTriplet = CTL_JPEGCompressionTriplet<MSG_RESET>;
 }
 #endif
 

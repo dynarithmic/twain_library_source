@@ -98,6 +98,9 @@
 1082 Compliancy test failure for the standard capabilities
 1083 Extended Image Information type mismatch.  TWAIN compliancy failure.
 1084 Error retrieving Extended Image Information.
+1085 DTWAIN_RANGE value is out of bounds
+1086 DTWAIN_RANGE has a step size of 0
+
 1100 TWAIN Condition Code: Could not complete operation.  Insufficient Memory.
 1101 TWAIN Condition Code: No Error
 1102 TWAIN Condition Code: Unknown cause of failure

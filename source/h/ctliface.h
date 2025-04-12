@@ -48,10 +48,6 @@
 #else
     #include "linuxlibraryloader_impl.inl"
 #endif
-#ifdef _MSC_VER
-    #undef min
-    #undef max
-#endif
 template <typename T>
 struct dtwain_library_loader : library_loader_impl
 {

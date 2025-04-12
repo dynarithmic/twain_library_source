@@ -552,12 +552,20 @@ namespace dynarithmic
             void RemoveAllDibs();
 
             // Provide conversion for retrieval
-            CTL_TwainDibPtr        GetAt(size_t nPos);
-            CTL_TwainDibPtr        operator[](size_t nPos);
+            const CTL_TwainDibPtr& CTL_TwainDibArray::GetAt(size_t nPos) const
+            { return m_TwainDibArray.at(nPos); }
+            CTL_TwainDibPtr&       GetAt(size_t nPos);
+            CTL_TwainDibPtr&       operator[](size_t nPos);
+            const CTL_TwainDibPtr&  operator[](size_t nPos) const;
+            CTL_TwainDibPtr&       Back() noexcept { return m_TwainDibArray.back(); }
+            CTL_TwainDibPtr&       Front() noexcept { return m_TwainDibArray[0]; }
+            CTL_TwainDibPtr&       BackAt() { return GetAt(GetSize() - 1); }
+            CTL_TwainDibPtr&       FrontAt() { return GetAt(0); }
 
             // Deletion of globally locked dib memory.  If TRUE, dib memory is deallocated when Dib object is deleted
             bool    IsAutoDelete() const;
             size_t  GetSize() const { return m_TwainDibArray.size(); }
+
 
         private:
             CTL_TwainDibPtr InitializeDibInfo(CTL_TwainDibPtr Dib);

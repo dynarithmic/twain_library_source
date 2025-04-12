@@ -28,7 +28,7 @@
 #include <utility>
 #include "ctltwainsource.h"
 #include "ctltwaincompliancy.h"
-#include "ctltr009.h"
+#include "ctltr001.h"
 #include "ctltwainmanager.h"
 #include "ctldib.h"
 #include "dtwain.h"
@@ -897,7 +897,11 @@ void CTL_ITwainSource::SetPDFValue(const CTL_StringType& nWhich, LONG nValue)
         m_ImageInfoEx.nPDFPolarity = nValue;
     else
     if (nWhich == PDFAESKEY )
+    {
         m_ImageInfoEx.bIsAESEncrypted = nValue?true:false;
+        m_ImageInfoEx.bUseStrongEncryption = nValue ? true : false;
+        m_ImageInfoEx.bIsPDFEncrypted = nValue ? true : false;
+    }
 }
 
 void CTL_ITwainSource::SetPDFValue(const CTL_StringType& nWhich, DTWAIN_FLOAT f1, DTWAIN_FLOAT f2)
@@ -1010,7 +1014,6 @@ TW_INFO CTL_ITwainSource::GetExtImageInfoItem(int nItem, int nSearchType ) const
 
 bool CTL_ITwainSource::DestroyExtImageInfo()
 {
-    m_pExtImageTriplet->DestroyInfo();
     m_pExtendedImageInformation->ClearInfo();
     return true;
 }
