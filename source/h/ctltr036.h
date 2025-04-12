@@ -37,8 +37,7 @@ namespace dynarithmic
 
             TW_UINT16 Execute()
             {
-                const TW_UINT16 rc = CTL_TwainTriplet::Execute();
-                return rc;
+                return CTL_TwainTriplet::Execute(); 
             }
 
             TW_UINT32 GetDataSize() const
