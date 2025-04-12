@@ -13,6 +13,7 @@
 12 TWAIN Fonte apra avanti eseguendo comando.
 27 Non finendo scan.   X/Y o Risolutezze calo da diverso valute
 28 Invalido Archivia Nome Precisato
+32 triplet TWAIN non eseguito.  Twain Manager non valido.
 1000 ***
 1001 Invalido DTWAIN_HANDLE
 1002 Invalido DTWAIN_SOURCE

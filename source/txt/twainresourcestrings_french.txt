@@ -13,6 +13,7 @@
 12 Source de Twain doit être ouverte au-devant exécuter le commande
 27 Ne pouvions pas parachever échographie.   X/Y ou Résolutions met pour les valeurs différentes
 28 Mauvais Dossier Nomme Spécifié
+32 triplet TWAIN non exécuté. Gestionnaire Twain invalide.
 1000 ***
 1001 Invalide DTWAIN_HANDLE
 1002 Invalide DTWAIN_SOURCE

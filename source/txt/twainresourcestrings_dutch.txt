@@ -13,6 +13,7 @@
 12 TWAIN bron before uitgevoerd bevel.
 27 Niet voleindigde scan.   X/Y Resolutions want verschillende waarden
 28 Kwalijkene File Namen Gespecificeerd
+32 TWAIN-drieling niet uitgevoerd. Ongeldige Twain Manager
 1000 ***
 1001 Kwalijken DTWAIN_HANDLE
 1002 Kwalijken DTWAIN_SOURCE
