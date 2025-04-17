@@ -13,6 +13,7 @@
 12 A fonte TWAIN deve ser aberta antes de executar o comando.  
 27 Não foi possível completar a digitalização. Resoluções X/Y definidas para valores diferentes  
 28 Nome de Arquivo Inválido Especificado  
+32 Triplo TWAIN não executado. Gerenciador Twain inválido.
 1000 ***  
 1001 Manipulador DTWAIN Inválido  
 1002 Fonte DTWAIN Inválida  

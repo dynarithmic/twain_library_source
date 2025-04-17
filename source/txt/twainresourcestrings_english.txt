@@ -13,6 +13,7 @@
 12 TWAIN source must be opened before executing command.
 27 Could not complete scan.  X/Y Resolutions set for different values
 28 Invalid File Name Specified
+32 TWAIN triplet not executed.  Invalid Twain Manager
 1000 ***
 1001 Invalid DTWAIN_HANDLE
 1002 Invalid DTWAIN_SOURCE

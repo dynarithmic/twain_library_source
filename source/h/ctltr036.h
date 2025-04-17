@@ -35,11 +35,6 @@ namespace dynarithmic
                 InitGeneric(pSession, pSource, DG_CONTROL, DAT_CUSTOMDSDATA, nMsg, &m_CustomDSData);
             }
 
-            TW_UINT16 Execute()
-            {
-                return CTL_TwainTriplet::Execute(); 
-            }
-
             TW_UINT32 GetDataSize() const
             {
                 return m_CustomDSData.InfoLength;

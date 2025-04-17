@@ -286,19 +286,23 @@ implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA512 -t $(TargetDir)$(TargetName)_sha512hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip MD5 -t $(TargetDir)debug_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA1 -t $(TargetDir)debug_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_libraries_zip_sha256hash.txt -lowercase -overwrite
-copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA512 -t $(TargetDir)debug_libraries_zip_sha512hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt + $(TargetDir)$(TargetName)_sha512hash.txt $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
 del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
-copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt $(TargetDir)debug_ziphashes$(PlatformArchitecture).txt
+copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt + $(TargetDir)debug_libraries_zip_sha512hash.txt$ (TargetDir)debug_ziphashes$(PlatformArchitecture).txt
 del $(TargetDir)debug_libraries_zip_md5hash.txt
 del $(TargetDir)debug_libraries_zip_sha1hash.txt
 del $(TargetDir)debug_libraries_zip_sha256hash.txt
+del $(TargetDir)debug_libraries_zip_sha512hash.txt
 del $(TargetDir)$(TargetName)_md5hash.txt  
 del $(TargetDir)$(TargetName)_sha1hash.txt  
 del $(TargetDir)$(TargetName)_sha256hash.txt 
+del $(TargetDir)$(TargetName)_sha512hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
@@ -406,19 +410,23 @@ implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA512 -t $(TargetDir)$(TargetName)_sha512hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip MD5 -t $(TargetDir)release_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA1 -t $(TargetDir)release_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)release_libraries_zip_sha256hash.txt -lowercase -overwrite
-copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA512 -t $(TargetDir)release_libraries_zip_sha512hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt + $(TargetDir)$(TargetName)_sha512hash.txt $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
 del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
-copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt $(TargetDir)release_ziphashes$(PlatformArchitecture).txt
+copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt + $(TargetDir)release_libraries_zip_sha512hash.txt $(TargetDir)release_ziphashes$(PlatformArchitecture).txt
 del $(TargetDir)release_libraries_zip_md5hash.txt
 del $(TargetDir)release_libraries_zip_sha1hash.txt
 del $(TargetDir)release_libraries_zip_sha256hash.txt
+del $(TargetDir)release_libraries_zip_sha512hash.txt
 del $(TargetDir)$(TargetName)_md5hash.txt  
 del $(TargetDir)$(TargetName)_sha1hash.txt  
 del $(TargetDir)$(TargetName)_sha256hash.txt 
+del $(TargetDir)$(TargetName)_sha512hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
@@ -529,19 +537,23 @@ implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA512 -t $(TargetDir)$(TargetName)_sha512hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip MD5 -t $(TargetDir)release_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA1 -t $(TargetDir)release_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)release_libraries_zip_sha256hash.txt -lowercase -overwrite
-copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA512 -t $(TargetDir)release_libraries_zip_sha512hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt + $(TargetDir)$(TargetName)_sha512hash.txt $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
 del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
-copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt $(TargetDir)release_ziphashes$(PlatformArchitecture).txt
+copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt + $(TargetDir)release_libraries_zip_sha512hash.txt$ (TargetDir)release_ziphashes$(PlatformArchitecture).txt
 del $(TargetDir)release_libraries_zip_md5hash.txt
 del $(TargetDir)release_libraries_zip_sha1hash.txt
 del $(TargetDir)release_libraries_zip_sha256hash.txt
+del $(TargetDir)release_libraries_zip_sha512hash.txt
 del $(TargetDir)$(TargetName)_md5hash.txt  
 del $(TargetDir)$(TargetName)_sha1hash.txt  
 del $(TargetDir)$(TargetName)_sha256hash.txt 
+del $(TargetDir)$(TargetName)_sha512hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
@@ -649,19 +661,23 @@ implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA512 -t $(TargetDir)$(TargetName)_sha512hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip MD5 -t $(TargetDir)debug_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA1 -t $(TargetDir)debug_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_libraries_zip_sha256hash.txt -lowercase -overwrite
-copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA512 -t $(TargetDir)debug_libraries_zip_sha512hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt + $(TargetDir)$(TargetName)_sha512hash.txt $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
 del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
-copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt $(TargetDir)debug_ziphashes$(PlatformArchitecture).txt
+copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt + $(TargetDir)debug_libraries_zip_sha512hash.txt $(TargetDir)debug_ziphashes$(PlatformArchitecture).txt
 del $(TargetDir)debug_libraries_zip_md5hash.txt
 del $(TargetDir)debug_libraries_zip_sha1hash.txt
 del $(TargetDir)debug_libraries_zip_sha256hash.txt
+del $(TargetDir)debug_libraries_zip_sha512hash.txt
 del $(TargetDir)$(TargetName)_md5hash.txt  
 del $(TargetDir)$(TargetName)_sha1hash.txt  
 del $(TargetDir)$(TargetName)_sha256hash.txt 
+del $(TargetDir)$(TargetName)_sha512hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
@@ -739,19 +755,23 @@ copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA512 -t $(TargetDir)$(TargetName)_sha512hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip MD5 -t $(TargetDir)debug_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA1 -t $(TargetDir)debug_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_libraries_zip_sha256hash.txt -lowercase -overwrite
-copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA512 -t $(TargetDir)debug_libraries_zip_sha512hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  + $(TargetDir)$(TargetName)_sha512hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
 del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
-copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt $(TargetDir)debug_ziphashes$(PlatformArchitecture).txt
+copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt  + $(TargetDir)debug_libraries_zip_sha512hash.txt $(TargetDir)debug_ziphashes$(PlatformArchitecture).txt
 del $(TargetDir)debug_libraries_zip_md5hash.txt
 del $(TargetDir)debug_libraries_zip_sha1hash.txt
 del $(TargetDir)debug_libraries_zip_sha256hash.txt
+del $(TargetDir)debug_libraries_zip_sha512hash.txt
 del $(TargetDir)$(TargetName)_md5hash.txt  
 del $(TargetDir)$(TargetName)_sha1hash.txt  
 del $(TargetDir)$(TargetName)_sha256hash.txt 
+del $(TargetDir)$(TargetName)_sha512hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
@@ -827,19 +847,23 @@ copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA512 -t $(TargetDir)$(TargetName)_sha512hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip MD5 -t $(TargetDir)release_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA1 -t $(TargetDir)release_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)release_libraries_zip_sha256hash.txt -lowercase -overwrite
-copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA512 -t $(TargetDir)release_libraries_zip_sha512hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  + $(TargetDir)$(TargetName)_sha512hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
 del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
-copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt $(TargetDir)release_ziphashes$(PlatformArchitecture).txt
+copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt + $(TargetDir)release_libraries_zip_sha512hash.txt $(TargetDir)release_ziphashes$(PlatformArchitecture).txt
 del $(TargetDir)release_libraries_zip_md5hash.txt
 del $(TargetDir)release_libraries_zip_sha1hash.txt
 del $(TargetDir)release_libraries_zip_sha256hash.txt
+del $(TargetDir)release_libraries_zip_sha512hash.txt
 del $(TargetDir)$(TargetName)_md5hash.txt  
 del $(TargetDir)$(TargetName)_sha1hash.txt  
 del $(TargetDir)$(TargetName)_sha256hash.txt 
+del $(TargetDir)$(TargetName)_sha512hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
@@ -920,19 +944,23 @@ copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA512 -t $(TargetDir)$(TargetName)_sha512hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip MD5 -t $(TargetDir)release_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA1 -t $(TargetDir)release_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)release_libraries_zip_sha256hash.txt -lowercase -overwrite
-copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA512 -t $(TargetDir)release_libraries_zip_sha512hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  + $(TargetDir)$(TargetName)_sha512hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
 del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
-copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt $(TargetDir)release_ziphashes$(PlatformArchitecture).txt
+copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt + $(TargetDir)release_libraries_zip_sha512hash.txt $(TargetDir)release_ziphashes$(PlatformArchitecture).txt
 del $(TargetDir)release_libraries_zip_md5hash.txt
 del $(TargetDir)release_libraries_zip_sha1hash.txt
 del $(TargetDir)release_libraries_zip_sha256hash.txt
+del $(TargetDir)release_libraries_zip_sha512hash.txt
 del $(TargetDir)$(TargetName)_md5hash.txt  
 del $(TargetDir)$(TargetName)_sha1hash.txt  
 del $(TargetDir)$(TargetName)_sha256hash.txt 
+del $(TargetDir)$(TargetName)_sha512hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
@@ -1009,19 +1037,23 @@ copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA512 -t $(TargetDir)$(TargetName)_sha512hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip MD5 -t $(TargetDir)debug_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA1 -t $(TargetDir)debug_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_libraries_zip_sha256hash.txt -lowercase -overwrite
-copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA512 -t $(TargetDir)debug_libraries_zip_sha512hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  + $(TargetDir)$(TargetName)_sha512hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
 del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
-copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt $(TargetDir)debug_ziphashes$(PlatformArchitecture).txt
+copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt  + $(TargetDir)debug_libraries_zip_sha512hash.txt $(TargetDir)debug_ziphashes$(PlatformArchitecture).txt
 del $(TargetDir)debug_libraries_zip_md5hash.txt
 del $(TargetDir)debug_libraries_zip_sha1hash.txt
 del $(TargetDir)debug_libraries_zip_sha256hash.txt
+del $(TargetDir)debug_libraries_zip_sha512hash.txt
 del $(TargetDir)$(TargetName)_md5hash.txt  
 del $(TargetDir)$(TargetName)_sha1hash.txt  
 del $(TargetDir)$(TargetName)_sha256hash.txt 
+del $(TargetDir)$(TargetName)_sha512hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
