@@ -1,4 +1,5 @@
-﻿MD5 hash of "debug_libraries.zip" (16 bytes) = f6ddf79662403854c018996ee115a571
-﻿SHA1 hash of "debug_libraries.zip" (20 bytes) = 3f712f890ea130179509ff82b3d1efc57215ba97
-﻿SHA256 hash of "debug_libraries.zip" (32 bytes) = 80abea717a1b7699120b29281cb5e91edc7fdb92e8289888fd3db96672161ccc
+﻿MD5 hash of "debug_libraries.zip" (16 bytes) = d23c833bf7070a650d54da5a137e9e8a
+﻿SHA1 hash of "debug_libraries.zip" (20 bytes) = 8d9e173fa039946b8665e602d547f24debebdfd9
+﻿SHA256 hash of "debug_libraries.zip" (32 bytes) = 4d9228cee26ffd19343e064f3d7acb4ae01564af11e648190ea16f9599bbcd59
+﻿SHA512 hash of "debug_libraries.zip" (64 bytes) = 173c17cb14ba08e571703a1a46c60b4d17ef26a44528accc19f8bdd04b542e26eb728f97d20dd9a3c8b33d17aa61c97a4421aa220f65b0069577f0f0aea36cf3
 

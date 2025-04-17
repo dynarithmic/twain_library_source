@@ -67,11 +67,11 @@ CTL_ImageXferTriplet::CTL_ImageXferTriplet(CTL_ITwainSession *pSession,
     {
         case DAT_IMAGENATIVEXFER:
         case DAT_AUDIONATIVEXFER:
-            InitVars(nType, CTL_GetTypeGET, &m_hDataHandleFromDevice);
-        break;
+            InitGeneric(pSession, pSource, DG_IMAGE, nType, MSG_GET, &m_hDataHandleFromDevice);
+            break;
         case DAT_IMAGEFILEXFER:
         case DAT_IMAGEMEMFILEXFER:
-            InitVars(nType, CTL_GetTypeGET, nullptr );
+            InitGeneric(pSession, pSource, DG_IMAGE, nType, MSG_GET, nullptr);
         break;
     }
 }

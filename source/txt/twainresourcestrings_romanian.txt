@@ -13,6 +13,7 @@
 12 Sursa TWAIN trebuie să fie deschisă înainte de a executa comanda.  
 27 Nu s-a putut finaliza scanarea. Rezoluțiile X/Y setate pentru valori diferite  
 28 Nume de fișier specificat invalid  
+32 TWAIN triplet nu a fost executat. Managerul Twain este invalid.
 1000 ***  
 1001 DTWAIN_HANDLE invalid  
 1002 DTWAIN_SOURCE invalid  

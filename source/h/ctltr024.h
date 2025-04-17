@@ -33,9 +33,6 @@ namespace dynarithmic
             CTL_ImageTriplet(CTL_ITwainSession *pSession,
                              CTL_ITwainSource *pSource);
             bool QueryAndRemoveDib(CTL_TwainAcquireEnum acquireType, CTL_TwainDibArray& pArray, size_t nWhich);
-
-        protected:
-            void  InitVars(TW_UINT16 nType, TW_UINT16 nGet, void *pData);
     };
 }
 #endif

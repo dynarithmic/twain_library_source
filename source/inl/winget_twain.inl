@@ -58,6 +58,14 @@ CTL_StringType GetTwainDirFullName(LPCTSTR strTwainDLLName,
     return GetTwainDirFullNameEx(pHandle, strTwainDLLName, bLeaveLoaded, pModule);
 }
 
+template <typename ErrorCodeType>
+static int LoadTwainDLL(boost::dll::shared_library& libloader, const CTL_StringType& fNameTotal)
+{
+    ErrorCodeType ec;
+    libloader.load(fNameTotal, ec, boost::dll::load_mode::search_system_folders);
+    return ec.value();
+}
+
 CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwainDLLName, bool bLeaveLoaded, boost::dll::shared_library *pModule)
 {
     static constexpr int WinDirPos = 0;
@@ -87,6 +95,9 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
     std::vector<CTL_StringType> dirNames(searchMap.size());
 
     const auto dllPath = GetDTWAINDLLPath();
+    constexpr int boost_version_minor = (BOOST_VERSION / 100) % 1000;
+    constexpr int boost_version_major = BOOST_VERSION / 100000;
+
     dirNames[WinDirPos] = StringWrapper::GetWindowsDirectory();
     dirNames[SysDirPos] = StringWrapper::GetSystemDirectory();
     dirNames[SysPathPos] = {};
@@ -126,18 +137,29 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
             LogWriterUtils::WriteLogInfo(msg);
         }
         boost::dll::shared_library libloader;
-        boost::system::error_code ec;
-        libloader.load(fNameTotal, ec, boost::dll::load_mode::search_system_folders);
+        int loadReturnCode = 0;
+
+        if constexpr(boost_version_major == 1 && boost_version_minor >= 88)
+        {
+            // Boost has changed return code status for version 1.88 and higher
+            loadReturnCode = LoadTwainDLL<std::error_code>(libloader, fNameTotal);
+        }
+        else
+        {
+            // Use boost 1.87 and below compatible code
+            loadReturnCode = LoadTwainDLL<boost::system::error_code>(libloader, fNameTotal);
+        }
 
         #ifdef _WIN32
         SetErrorMode(nOldError);
         #endif
 
-        if (ec != boost::system::errc::success)
+        if (loadReturnCode != boost::system::errc::success)
         {
             if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
             {
-                CTL_StringType msg = _T("Testing TWAIN availability for file \"") + fNameTotal + _T("\" failed");
+                CTL_StringType msg = _T("Testing TWAIN availability for file \"") + fNameTotal + _T("\" failed with error code: ");
+                msg += StringWrapper::ToString(loadReturnCode);
                 LogWriterUtils::WriteLogInfo(msg);
             }
             continue;

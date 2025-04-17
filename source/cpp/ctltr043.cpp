@@ -41,7 +41,7 @@ CTL_ImageMemFileXferTriplet::CTL_ImageMemFileXferTriplet(CTL_ITwainSession *pSes
     m_ImageMemXferBuffer.YOffset =
     m_ImageMemXferBuffer.BytesWritten = TWON_DONTCARE32;
 
-    InitVars( DAT_IMAGEMEMFILEXFER, CTL_GetTypeGET, &m_ImageMemXferBuffer );
+    InitGeneric(pSession, pSource, DG_IMAGE, DAT_IMAGEMEMFILEXFER, MSG_GET, &m_ImageMemXferBuffer);
 
     m_ImageMemXferBuffer.Memory.Length = numBytes;
 
