@@ -23,25 +23,68 @@
 
 #include "ctltripletbase.h"
 #include "ctltwainsession.h"
+#include "ctltwainmanager.h"
 
 namespace dynarithmic
 {
-    class CTL_UserInterfaceTriplet : public CTL_TwainTriplet
+    template <TW_UINT16 nMsg, typename ExecuteFn = CTL_DefaultTripletExecute>
+    class CTL_UserInterfaceTripletImpl : public CTL_TwainTriplet
     {
         public:
-            CTL_UserInterfaceTriplet(CTL_ITwainSession *pSession,
-                                     CTL_ITwainSource *pSource,
-                                     TW_UINT16 nMsg,
-                                     TW_USERINTERFACE *pTWUI,
-                                     TW_BOOL bShowUI=TRUE
-                                     );
+            CTL_UserInterfaceTripletImpl(CTL_ITwainSession* pSession,
+                                        CTL_ITwainSource* pSource,
+                                        TW_USERINTERFACE* pTWUI,
+                                        TW_BOOL bShowUI = TRUE)
+                                        : CTL_TwainTriplet(), m_pUserInterface(pTWUI)
+            {
+                m_pUserInterface->ShowUI = bShowUI;
+                m_pUserInterface->ModalUI = 0;
+                const HWND* pWnd = pSession->GetWindowHandlePtr();
+
+                m_pUserInterface->hParent = static_cast<TW_HANDLE>(*pWnd);
+                InitGeneric(pSession, pSource, DG_CONTROL, DAT_USERINTERFACE, nMsg, m_pUserInterface);
+            }
 
             bool    IsModal() const { return m_pUserInterface->ModalUI?true:false; }
             TW_USERINTERFACE *GetTWUserInterface() const { return m_pUserInterface; }
 
+            virtual TW_UINT16 Execute()
+            {
+                return ExecuteFn::Execute(*this);
+            }
         private:
             TW_USERINTERFACE    *m_pUserInterface;
     };
+
+    struct CTL_ExecuteEnableUIFn
+    {
+        static TW_UINT16 Execute(CTL_TwainTriplet& pTrip)
+        {
+            CTL_ITwainSource* pSource = pTrip.GetSourcePtr();
+
+            if (pSource->IsUIOpen())
+                return TWRC_SUCCESS;
+
+            const TW_UINT16 rc = CTL_DefaultTripletExecute::Execute(pTrip);
+            pSource->SetUIOpen(rc == TWRC_SUCCESS);
+            return rc;
+        }
+    };
+
+    struct CTL_ExecuteDisableUIFn
+    {
+        static TW_UINT16 Execute(CTL_TwainTriplet& pTrip)
+        {
+            const TW_UINT16 rc = CTL_DefaultTripletExecute::Execute(pTrip);
+            if (rc == TWRC_SUCCESS)
+                pTrip.GetSourcePtr()->SetUIOpen(false);
+            return rc;
+        }
+    };
+
+    using CTL_EnableUserInterfaceTriplet = CTL_UserInterfaceTripletImpl<MSG_ENABLEDS, CTL_ExecuteEnableUIFn>;
+    using CTL_DisableUserInterfaceTriplet = CTL_UserInterfaceTripletImpl<MSG_DISABLEDS, CTL_ExecuteDisableUIFn>;
+    using CTL_DisplayUserInterfaceOnlyTriplet = CTL_UserInterfaceTripletImpl<MSG_ENABLEDSUIONLY, CTL_ExecuteEnableUIFn>;
 }
 #endif
 

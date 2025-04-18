@@ -228,7 +228,7 @@
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;USE_DTWAIN_DEBUG_LIB;_DEBUG;_UNICODE;_SCL_SECURE_NO_WARNINGS;DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions);FREEIMAGE_CPP_LIB;DTWAIN_DEBUG;BUILDING_DTWAINDLL;;USE_DTWAIN_DEBUG_LIB;DTWAIN_DLL</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;USE_DTWAIN_DEBUG_LIB;_DEBUG;_UNICODE;_SCL_SECURE_NO_WARNINGS;DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions);FREEIMAGE_CPP_LIB;DTWAIN_DEBUG;BUILDING_DTWAINDLL;DTWAIN_DLL</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -286,19 +286,23 @@ implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA512 -t $(TargetDir)$(TargetName)_sha512hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip MD5 -t $(TargetDir)debug_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA1 -t $(TargetDir)debug_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_libraries_zip_sha256hash.txt -lowercase -overwrite
-copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA512 -t $(TargetDir)debug_libraries_zip_sha512hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt + $(TargetDir)$(TargetName)_sha512hash.txt $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
 del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
-copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt $(TargetDir)debug_ziphashes$(PlatformArchitecture).txt
+copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt + $(TargetDir)debug_libraries_zip_sha512hash.txt$ (TargetDir)debug_ziphashes$(PlatformArchitecture).txt
 del $(TargetDir)debug_libraries_zip_md5hash.txt
 del $(TargetDir)debug_libraries_zip_sha1hash.txt
 del $(TargetDir)debug_libraries_zip_sha256hash.txt
+del $(TargetDir)debug_libraries_zip_sha512hash.txt
 del $(TargetDir)$(TargetName)_md5hash.txt  
 del $(TargetDir)$(TargetName)_sha1hash.txt  
 del $(TargetDir)$(TargetName)_sha256hash.txt 
+del $(TargetDir)$(TargetName)_sha512hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
@@ -351,7 +355,7 @@ copy $(TargetDir)$(TargetName).lib .
       <Optimization>MinSpace</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;FREEIMAGE_CPP_LIB;_UNICODE;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL;DTWAIN_NO_LOGGING</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;FREEIMAGE_CPP_LIB;_UNICODE;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL;DTWAIN_NO_LOGGING</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -406,19 +410,23 @@ implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA512 -t $(TargetDir)$(TargetName)_sha512hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip MD5 -t $(TargetDir)release_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA1 -t $(TargetDir)release_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)release_libraries_zip_sha256hash.txt -lowercase -overwrite
-copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA512 -t $(TargetDir)release_libraries_zip_sha512hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt + $(TargetDir)$(TargetName)_sha512hash.txt $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
 del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
-copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt $(TargetDir)release_ziphashes$(PlatformArchitecture).txt
+copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt + $(TargetDir)release_libraries_zip_sha512hash.txt $(TargetDir)release_ziphashes$(PlatformArchitecture).txt
 del $(TargetDir)release_libraries_zip_md5hash.txt
 del $(TargetDir)release_libraries_zip_sha1hash.txt
 del $(TargetDir)release_libraries_zip_sha256hash.txt
+del $(TargetDir)release_libraries_zip_sha512hash.txt
 del $(TargetDir)$(TargetName)_md5hash.txt  
 del $(TargetDir)$(TargetName)_sha1hash.txt  
 del $(TargetDir)$(TargetName)_sha256hash.txt 
+del $(TargetDir)$(TargetName)_sha512hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
@@ -470,7 +478,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <Optimization>MinSpace</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);USE_DTWAIN_DEBUG_LIB;DTWAIN_DLL</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -529,19 +537,23 @@ implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA512 -t $(TargetDir)$(TargetName)_sha512hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip MD5 -t $(TargetDir)release_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA1 -t $(TargetDir)release_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)release_libraries_zip_sha256hash.txt -lowercase -overwrite
-copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA512 -t $(TargetDir)release_libraries_zip_sha512hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt + $(TargetDir)$(TargetName)_sha512hash.txt $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
 del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
-copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt $(TargetDir)release_ziphashes$(PlatformArchitecture).txt
+copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt + $(TargetDir)release_libraries_zip_sha512hash.txt$ (TargetDir)release_ziphashes$(PlatformArchitecture).txt
 del $(TargetDir)release_libraries_zip_md5hash.txt
 del $(TargetDir)release_libraries_zip_sha1hash.txt
 del $(TargetDir)release_libraries_zip_sha256hash.txt
+del $(TargetDir)release_libraries_zip_sha512hash.txt
 del $(TargetDir)$(TargetName)_md5hash.txt  
 del $(TargetDir)$(TargetName)_sha1hash.txt  
 del $(TargetDir)$(TargetName)_sha256hash.txt 
+del $(TargetDir)$(TargetName)_sha512hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
@@ -593,7 +605,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;USE_DTWAIN_DEBUG_LIB;_DEBUG;FREEIMAGE_CPP_LIB;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;_SCL_SECURE_NO_WARNINGS;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);USE_DTWAIN_DEBUG_LIB;DTWAIN_DLL</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;USE_DTWAIN_DEBUG_LIB;_DEBUG;FREEIMAGE_CPP_LIB;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;_SCL_SECURE_NO_WARNINGS;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -649,19 +661,23 @@ implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA512 -t $(TargetDir)$(TargetName)_sha512hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip MD5 -t $(TargetDir)debug_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA1 -t $(TargetDir)debug_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_libraries_zip_sha256hash.txt -lowercase -overwrite
-copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA512 -t $(TargetDir)debug_libraries_zip_sha512hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt + $(TargetDir)$(TargetName)_sha512hash.txt $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
 del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
-copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt $(TargetDir)debug_ziphashes$(PlatformArchitecture).txt
+copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt + $(TargetDir)debug_libraries_zip_sha512hash.txt $(TargetDir)debug_ziphashes$(PlatformArchitecture).txt
 del $(TargetDir)debug_libraries_zip_md5hash.txt
 del $(TargetDir)debug_libraries_zip_sha1hash.txt
 del $(TargetDir)debug_libraries_zip_sha256hash.txt
+del $(TargetDir)debug_libraries_zip_sha512hash.txt
 del $(TargetDir)$(TargetName)_md5hash.txt  
 del $(TargetDir)$(TargetName)_sha1hash.txt  
 del $(TargetDir)$(TargetName)_sha256hash.txt 
+del $(TargetDir)$(TargetName)_sha512hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
@@ -700,7 +716,7 @@ copy $(TargetDir)$(TargetName).lib .
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;USE_DTWAIN_DEBUG_LIB;_DEBUG;NOMINMAX;FREEIMAGE_CPP_LIB;_UNICODE;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);;USE_DTWAIN_DEBUG_LIB;DTWAIN_DLL</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;USE_DTWAIN_DEBUG_LIB;_DEBUG;FREEIMAGE_CPP_LIB;_UNICODE;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
@@ -739,19 +755,23 @@ copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA512 -t $(TargetDir)$(TargetName)_sha512hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip MD5 -t $(TargetDir)debug_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA1 -t $(TargetDir)debug_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_libraries_zip_sha256hash.txt -lowercase -overwrite
-copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA512 -t $(TargetDir)debug_libraries_zip_sha512hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  + $(TargetDir)$(TargetName)_sha512hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
 del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
-copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt $(TargetDir)debug_ziphashes$(PlatformArchitecture).txt
+copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt  + $(TargetDir)debug_libraries_zip_sha512hash.txt $(TargetDir)debug_ziphashes$(PlatformArchitecture).txt
 del $(TargetDir)debug_libraries_zip_md5hash.txt
 del $(TargetDir)debug_libraries_zip_sha1hash.txt
 del $(TargetDir)debug_libraries_zip_sha256hash.txt
+del $(TargetDir)debug_libraries_zip_sha512hash.txt
 del $(TargetDir)$(TargetName)_md5hash.txt  
 del $(TargetDir)$(TargetName)_sha1hash.txt  
 del $(TargetDir)$(TargetName)_sha256hash.txt 
+del $(TargetDir)$(TargetName)_sha512hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
@@ -827,19 +847,23 @@ copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA512 -t $(TargetDir)$(TargetName)_sha512hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip MD5 -t $(TargetDir)release_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA1 -t $(TargetDir)release_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)release_libraries_zip_sha256hash.txt -lowercase -overwrite
-copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA512 -t $(TargetDir)release_libraries_zip_sha512hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  + $(TargetDir)$(TargetName)_sha512hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
 del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
-copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt $(TargetDir)release_ziphashes$(PlatformArchitecture).txt
+copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt + $(TargetDir)release_libraries_zip_sha512hash.txt $(TargetDir)release_ziphashes$(PlatformArchitecture).txt
 del $(TargetDir)release_libraries_zip_md5hash.txt
 del $(TargetDir)release_libraries_zip_sha1hash.txt
 del $(TargetDir)release_libraries_zip_sha256hash.txt
+del $(TargetDir)release_libraries_zip_sha512hash.txt
 del $(TargetDir)$(TargetName)_md5hash.txt  
 del $(TargetDir)$(TargetName)_sha1hash.txt  
 del $(TargetDir)$(TargetName)_sha256hash.txt 
+del $(TargetDir)$(TargetName)_sha512hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
@@ -878,7 +902,7 @@ copy $(TargetDir)$(TargetName).lib .
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>MinSpace</Optimization>
-      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;FREEIMAGE_CPP_LIB;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;_DEBUGNDEBUG;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);USE_DTWAIN_DEBUG_LIB;DTWAIN_DLL;DTWAIN_NO_LOGGING</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;FREEIMAGE_CPP_LIB;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;_DEBUGNDEBUG;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL;DTWAIN_NO_LOGGING</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
@@ -920,19 +944,23 @@ copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA512 -t $(TargetDir)$(TargetName)_sha512hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip MD5 -t $(TargetDir)release_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA1 -t $(TargetDir)release_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA256 -t $(TargetDir)release_libraries_zip_sha256hash.txt -lowercase -overwrite
-copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)release_libraries.zip SHA512 -t $(TargetDir)release_libraries_zip_sha512hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  + $(TargetDir)$(TargetName)_sha512hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
 del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
-copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt $(TargetDir)release_ziphashes$(PlatformArchitecture).txt
+copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt + $(TargetDir)release_libraries_zip_sha512hash.txt $(TargetDir)release_ziphashes$(PlatformArchitecture).txt
 del $(TargetDir)release_libraries_zip_md5hash.txt
 del $(TargetDir)release_libraries_zip_sha1hash.txt
 del $(TargetDir)release_libraries_zip_sha256hash.txt
+del $(TargetDir)release_libraries_zip_sha512hash.txt
 del $(TargetDir)$(TargetName)_md5hash.txt  
 del $(TargetDir)$(TargetName)_sha1hash.txt  
 del $(TargetDir)$(TargetName)_sha256hash.txt 
+del $(TargetDir)$(TargetName)_sha512hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
@@ -971,7 +999,7 @@ copy $(TargetDir)$(TargetName).lib .
       <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;USE_DTWAIN_DEBUG_LIB;_DEBUG;NOMINMAX;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;USE_DTWAIN_DEBUG_LIB;_DEBUG;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
@@ -1009,19 +1037,23 @@ copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA1 -t $(TargetDir)$(TargetName)_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA256 -t $(TargetDir)$(TargetName)_sha256hash.txt -lowercase -overwrite
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll SHA512 -t $(TargetDir)$(TargetName)_sha512hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip MD5 -t $(TargetDir)debug_libraries_zip_md5hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA1 -t $(TargetDir)debug_libraries_zip_sha1hash.txt -lowercase -overwrite
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA256 -t $(TargetDir)debug_libraries_zip_sha256hash.txt -lowercase -overwrite
-copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
+"$(DIRHASH_UTIL_CMD)" $(TargetDir)debug_libraries.zip SHA512 -t $(TargetDir)debug_libraries_zip_sha512hash.txt -lowercase -overwrite
+copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt  + $(TargetDir)$(TargetName)_sha512hash.txt  $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
 del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
-copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt $(TargetDir)debug_ziphashes$(PlatformArchitecture).txt
+copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt  + $(TargetDir)debug_libraries_zip_sha512hash.txt $(TargetDir)debug_ziphashes$(PlatformArchitecture).txt
 del $(TargetDir)debug_libraries_zip_md5hash.txt
 del $(TargetDir)debug_libraries_zip_sha1hash.txt
 del $(TargetDir)debug_libraries_zip_sha256hash.txt
+del $(TargetDir)debug_libraries_zip_sha512hash.txt
 del $(TargetDir)$(TargetName)_md5hash.txt  
 del $(TargetDir)$(TargetName)_sha1hash.txt  
 del $(TargetDir)$(TargetName)_sha256hash.txt 
+del $(TargetDir)$(TargetName)_sha512hash.txt 
 cd $(SolutionDir)
 cd ..
 md demos\c_cpp_includes
@@ -1100,22 +1132,12 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include=".\cpp\ctlsourcescale.cpp" />
     <ClCompile Include=".\cpp\ctlsourceselect.cpp" />
     <ClCompile Include=".\cpp\ctlsrceoj.cpp" />
-    <ClCompile Include=".\cpp\ctltr032.cpp" />
     <ClCompile Include=".\cpp\ctltr040.cpp" />
     <ClCompile Include=".\cpp\ctltwaindllhandle.cpp" />
     <ClCompile Include=".\cpp\ctltwainmsgloop.cpp" />
     <ClCompile Include=".\cpp\ctluicontrollable.cpp" />
     <ClCompile Include=".\cpp\ctluienabled.cpp" />
-    <ClCompile Include=".\cpp\ctltr000.cpp" />
-    <ClCompile Include=".\cpp\ctltr001.cpp" />
-    <ClCompile Include=".\cpp\ctltr002.cpp" />
-    <ClCompile Include=".\cpp\ctltr003.cpp" />
-    <ClCompile Include=".\cpp\ctltr004.cpp" />
-    <ClCompile Include=".\cpp\ctltr005.cpp" />
-    <ClCompile Include=".\cpp\ctltr006.cpp" />
-    <ClCompile Include=".\cpp\ctltr007.cpp" />
     <ClCompile Include=".\cpp\ctltr008.cpp" />
-    <ClCompile Include=".\cpp\ctltr009.cpp" />
     <ClCompile Include=".\cpp\ctltr010.cpp" />
     <ClCompile Include=".\cpp\ctltr011.cpp" />
     <ClCompile Include=".\cpp\ctltr012.cpp" />
@@ -1127,24 +1149,14 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include=".\cpp\ctltr018.cpp" />
     <ClCompile Include=".\cpp\ctltr019.cpp" />
     <ClCompile Include=".\cpp\ctltr020.cpp" />
-    <ClCompile Include=".\cpp\ctltr021.cpp" />
-    <ClCompile Include=".\cpp\ctltr022.cpp" />
-    <ClCompile Include=".\cpp\ctltr023.cpp" />
     <ClCompile Include=".\cpp\ctltr024.cpp" />
     <ClCompile Include=".\cpp\ctltr025.cpp" />
     <ClCompile Include=".\cpp\ctltr026.cpp" />
     <ClCompile Include=".\cpp\ctltr027.cpp" />
-    <ClCompile Include=".\cpp\ctltr028.cpp" />
-    <ClCompile Include=".\cpp\ctltr029.cpp" />
-    <ClCompile Include=".\cpp\ctltr030.cpp" />
     <ClCompile Include=".\cpp\ctltr031.cpp" />
-    <ClCompile Include=".\cpp\ctltr033.cpp" />
-    <ClCompile Include=".\cpp\ctltr034.cpp" />
     <ClCompile Include=".\cpp\ctltr035.cpp" />
-    <ClCompile Include=".\cpp\ctltr036.cpp" />
     <ClCompile Include=".\cpp\ctltr037.cpp" />
     <ClCompile Include=".\cpp\ctltr038.cpp" />
-    <ClCompile Include=".\cpp\ctltr039.cpp" />
     <ClCompile Include=".\cpp\ctlobtyp.cpp" />
     <ClCompile Include=".\cpp\ctlunicodeimpl.cpp" />
     <ClCompile Include=".\cpp\ctlhigh.cpp">
@@ -1488,6 +1500,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\ctltr041.h" />
     <ClInclude Include="h\ctltr042.h" />
     <ClInclude Include="h\ctltr043.h" />
+    <ClInclude Include="h\ctltr044.h" />
     <ClInclude Include="h\ctltripletbase.h" />
     <ClInclude Include="h\ctltwaincompliancy.h" />
     <ClInclude Include="h\ctltwainidentity.h" />

@@ -86,6 +86,7 @@ namespace dynarithmic
                                     { return m_bTwainMessageFlag; }
         bool                IsAllSourcesRetrieved() const { return m_bAllSourcesRetrieved; }
         void                DestroyOneSource(CTL_ITwainSource *pSource);
+        void                DestroyAllSources();
         CTL_TwainDLLHandle* GetTwainDLLHandle() { return m_pTwainDLLHandle; }
         void                SetTwainDLLHandle(CTL_TwainDLLHandle* pHandle) { m_pTwainDLLHandle = pHandle; }
         virtual ~CTL_ITwainSession();
@@ -93,7 +94,6 @@ namespace dynarithmic
     protected:
         CTL_ITwainSource* IsSourceSelected( LPCTSTR pPsourceName);
 
-        void            DestroyAllSources();
         static HWND     CreateTwainWindow();
         bool            IsTwainWindowActive() const;
         void            DestroyTwainWindow();

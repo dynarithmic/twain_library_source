@@ -1629,6 +1629,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
     StringTraitsA::string_type sClosingDSM = dynarithmic::GetResourceStringFromMap(IDS_DTWAIN_ERROR_CLOSING_DSM) + "\n";
     StringTraitsA::string_type sClosingTwainSession = dynarithmic::GetResourceStringFromMap(IDS_DTWAIN_ERROR_CLOSING_TWAIN_SESSION) + "\n";
 
+    // Close any sources
+    pHandle->m_pTwainSession->DestroyAllSources();
+
+    // Close the source manager
     try
     {
         CTL_TwainAppMgr::CloseSourceManager(pHandle->m_pTwainSession);
@@ -1645,6 +1649,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
         }
     }
 
+    // close the general TWAIN session
     try
     {
         CTL_TwainAppMgr::DestroyTwainSession(pHandle->m_pTwainSession);
@@ -2553,8 +2558,6 @@ bool LoadGeneralResources(bool blockExecution)
     return bResourcesLoaded;
 }
 
-#undef min
-#undef max
 #include <sstream>
 
 #ifdef DTWAIN_LIB

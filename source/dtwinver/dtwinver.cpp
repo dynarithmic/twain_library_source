@@ -507,6 +507,8 @@ History: PJN / 24-02-1997 A number of updates including support for NT 3.1,
                           6. Provided a new IsDatacenterWindowsServer2025 method.
                           7. Provided a new IsDomainControllerWindowsServer2025 method.
          PJN / 07-04-2024 1. Provided a new IsWindows11Version24H2 method.
+         PJN / 07-11-2024 1. Provided a new IsWindowsServer2025ActiveDevelopmentBranch method.
+                          2. Provided a new IsWindowsServerVersion24H2 method.
 
 Copyright (c) 1997 - 2024 by PJ Naughter (Web: www.naughter.com, Email: pjna@naughter.com)
 
@@ -1996,7 +1998,7 @@ _Success_(return != FALSE) BOOL COSVersion::GetVersion(_Inout_ LPOS_VERSION_INFO
     lpVersionInformation->dwUnderlyingMinorVersion = osvi.dwMinorVersion;
     lpVersionInformation->dwUnderlyingBuildNumber = LOWORD(osvi.dwBuildNumber); //ignore HIWORD
     _fstrcpy(lpVersionInformation->szUnderlyingCSDVersion, osvi.szCSDVersion);
-       
+
     //Explicitly map the win32 dwPlatformId to our own values
     if (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
     {
@@ -4223,8 +4225,8 @@ void COSVersion::_GetVersion(_In_ DWORD dwMajorVersion, _In_ DWORD dwMinorVersio
     lpVersionInformation->EmulatedPlatform = WindowsNT;
     lpVersionInformation->dwSuiteMask2 |= COSVERSION_SUITE2_WIN32S;
 
-    lpVersionInformation->dwUnderlyingMajorVersion = 3; 
-    lpVersionInformation->dwUnderlyingMinorVersion = 10; 
+    lpVersionInformation->dwUnderlyingMajorVersion = 3;
+    lpVersionInformation->dwUnderlyingMinorVersion = 10;
     lpVersionInformation->dwUnderlyingBuildNumber = 0;
     lpVersionInformation->UnderlyingPlatform = Windows3x;
   }
@@ -4272,7 +4274,7 @@ _Success_(return != FALSE) BOOL COSVersion::IsWindowsCE(_In_ LPCOS_VERSION_INFO 
 
 _Success_(return != FALSE) BOOL COSVersion::IsWindowsCENET(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
-  //Windows CE. NET is any version of CE 4.X where X > 0		
+  //Windows CE. NET is any version of CE 4.X where X > 0
   if (bCheckUnderlying)
     return ((lpVersionInformation->UnderlyingPlatform == WindowsCE) &&
             (lpVersionInformation->dwUnderlyingMajorVersion == 4) &&
@@ -4545,7 +4547,7 @@ _Success_(return != FALSE) BOOL COSVersion::IsWindows10OrWindowsServer2016(_In_ 
             ((lpVersionInformation->dwEmulatedMajorVersion > 6) ||
             ((lpVersionInformation->dwEmulatedMajorVersion == 6) && lpVersionInformation->dwEmulatedMinorVersion >= 4))) &&
             !IsWindowsServer2019(lpVersionInformation, bCheckUnderlying) &&
-            !IsWindowsServer2022(lpVersionInformation, bCheckUnderlying) && 
+            !IsWindowsServer2022(lpVersionInformation, bCheckUnderlying) &&
             !IsWindowsServer2025(lpVersionInformation, bCheckUnderlying) &&
             !IsWindows11(lpVersionInformation, bCheckUnderlying);
 }
@@ -4666,6 +4668,22 @@ _Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2025(_In_ LPCOS_VERSI
            ((lpVersionInformation->dwEmulatedMajorVersion == 6) && lpVersionInformation->dwEmulatedMinorVersion >= 4)) &&
            (lpVersionInformation->dwEmulatedBuildNumber >= 25921) &&
            ((lpVersionInformation->OSType == Server) || ((lpVersionInformation->OSType == DomainController))));
+}
+
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServer2025ActiveDevelopmentBranch(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+{
+  if (bCheckUnderlying)
+    return IsWindowsServer2025(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->dwUnderlyingBuildNumber > 26100);
+  else
+    return IsWindowsServer2025(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->dwEmulatedBuildNumber > 26100);
+}
+
+_Success_(return != FALSE) BOOL COSVersion::IsWindowsServerVersion24H2(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+{
+  if (bCheckUnderlying)
+    return IsWindowsServer2025(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->dwUnderlyingBuildNumber == 26100) && !IsAzure(lpVersionInformation);
+  else
+    return IsWindowsServer2025(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->dwEmulatedBuildNumber == 26100) && !IsAzure(lpVersionInformation);
 }
 
 _Success_(return != FALSE) BOOL COSVersion::IsWindows10(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)

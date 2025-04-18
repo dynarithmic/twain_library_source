@@ -20,15 +20,5 @@
  */
 #ifndef CTLTR003_H
 #define CTLTR003_H
-
 #include "ctltr001.h"
-namespace dynarithmic
-{
-
-    class CTL_GetNextSourceTriplet : public CTL_SourceTriplet
-    {
-        public:
-            CTL_GetNextSourceTriplet( CTL_ITwainSession *pSession );
-    };
-}
 #endif

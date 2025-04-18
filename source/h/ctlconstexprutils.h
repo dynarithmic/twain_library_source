@@ -378,5 +378,30 @@ namespace dynarithmic
         fix32_value.Frac = static_cast<TW_UINT16>(value & 0x0000ffffL);
         return fix32_value;
     }
+
+    static constexpr bool IsMSGGetType(TW_UINT16 msgType) noexcept
+    {
+        return  msgType == MSG_GET ||
+            msgType == MSG_GETCURRENT ||
+            msgType == MSG_GETDEFAULT ||
+            msgType == MSG_GETHELP ||
+            msgType == MSG_GETLABEL ||
+            msgType == MSG_GETLABELENUM;
+    }
+
+    static constexpr bool IsMSGSetType(TW_UINT16 msgType) noexcept
+    {
+        return msgType == MSG_SET || msgType == MSG_SETCONSTRAINT;
+    }
+
+    static constexpr bool IsMSGResetType(TW_UINT16 msgType) noexcept
+    {
+        return msgType == MSG_RESET || msgType == MSG_RESETALL;
+    }
+
+    static constexpr bool IsMSGSetOrResetType(TW_UINT16 msgType) noexcept
+    {
+        return msgType == MSG_RESET || msgType == MSG_RESETALL || msgType == MSG_SET || msgType == MSG_SETCONSTRAINT;
+    }
 };
 #endif

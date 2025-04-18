@@ -31,7 +31,7 @@
 
 using namespace dynarithmic;
 
-static bool GetImageSize(CTL_TwainDLLHandle* pHandle,  DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, CTL_EnumGetType GetType);
+static bool GetImageSize(CTL_TwainDLLHandle* pHandle,  DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, TW_UINT16 GetType);
 
 static bool GetImageSize2(CTL_ITwainSource *p,
     LPDTWAIN_FLOAT left,
@@ -68,7 +68,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea(DTWAIN_SOURCE Source, LONG lGetTy
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lGetType, FloatArray))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    const DTWAIN_BOOL bRet = GetImageSize(pHandle, Source, FloatArray, static_cast<CTL_EnumGetType>(lGetType));
+    const DTWAIN_BOOL bRet = GetImageSize(pHandle, Source, FloatArray, static_cast<TW_UINT16>(lGetType));
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -140,7 +140,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2(DTWAIN_SOURCE Source, LPDTWAIN_F
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-static bool GetImageSize(CTL_TwainDLLHandle* pHandle, DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, CTL_EnumGetType GetType)
+static bool GetImageSize(CTL_TwainDLLHandle* pHandle, DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, TW_UINT16 GetType)
 {
     CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
     DTWAIN_ARRAY FloatArrayOut = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYFLOAT, 4);
@@ -148,8 +148,8 @@ static bool GetImageSize(CTL_TwainDLLHandle* pHandle, DTWAIN_SOURCE Source, LPDT
         return false;
     DTWAINArrayLowLevel_RAII aFloat(pHandle, FloatArrayOut);
     CTL_RealArray Array;
-    if (GetType == CTL_GetTypeGETCURRENT)
-        GetType = CTL_GetTypeGET;
+    if (GetType == MSG_GETCURRENT)
+        GetType = MSG_GET;
 
     const bool bOk = CTL_TwainAppMgr::GetImageLayoutSize(p, Array, GetType);
     if (!bOk)

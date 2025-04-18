@@ -45,7 +45,36 @@ CTL_TwainTriplet::CTL_TwainTriplet(  pTW_IDENTITY pOrigin,
     Init(pOrigin, pDest, nDG, nDAT,  nMSG, pData);
 }
 
-void dynarithmic::CTL_TwainTriplet::Init( const pTW_IDENTITY pOrigin,
+// High-level initialization of triplet components.  
+bool CTL_TwainTriplet::InitGeneric(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource, 
+                                   TW_UINT32 nDG, TW_UINT16 nDat, TW_UINT16 MsgType, TW_MEMREF pType, 
+                                    std::pair<bool, bool> prInit)
+{
+    // Optionally set session and source pointers
+    if ( prInit.first )
+        SetSessionPtr(pSession);
+    if ( prInit.second )
+        SetSourcePtr(pSource);
+
+    const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
+
+    // Only Initialize if App Manager is valid
+    if (pMgr && pMgr->IsValidTwainSession(pSession))
+    {
+        Init(pSession?pSession->GetAppIDPtr():nullptr,
+            pSource?pSource->GetSourceIDPtr():nullptr,
+            nDG,
+            nDat,
+            MsgType,
+            pType);
+        SetAlive(true);
+        return true;
+    }
+    return false;
+}
+
+
+void CTL_TwainTriplet::Init( const pTW_IDENTITY pOrigin,
                              const pTW_IDENTITY pDest,
                              TW_UINT32 nDG,
                              TW_UINT16 nDAT,
@@ -58,25 +87,22 @@ void dynarithmic::CTL_TwainTriplet::Init( const pTW_IDENTITY pOrigin,
 
 bool CTL_TwainTriplet::IsMSGGetType() const
 {
-    const TW_UINT16 msgType = GetMSG();
-    return  msgType == MSG_GET ||
-            msgType == MSG_GETCURRENT ||
-            msgType == MSG_GETDEFAULT ||
-            msgType == MSG_GETHELP ||
-            msgType == MSG_GETLABEL ||
-            msgType == MSG_GETLABELENUM;
+    return ::IsMSGGetType(GetMSG());
 }
 
 bool CTL_TwainTriplet::IsMSGSetType() const
 {
-    const TW_UINT16 msgType = GetMSG();
-    return msgType == MSG_SET || msgType == MSG_SETCONSTRAINT;
+    return ::IsMSGSetType(GetMSG());
 }
 
 bool CTL_TwainTriplet::IsMSGResetType() const
 {
-    const TW_UINT16 msgType = GetMSG();
-    return msgType == MSG_RESET || msgType == MSG_RESETALL;
+    return ::IsMSGResetType(GetMSG());
+}
+
+bool CTL_TwainTriplet::IsMSGSetOrResetType() const
+{
+    return ::IsMSGSetOrResetType(GetMSG());
 }
 
 TW_UINT16 CTL_TwainTriplet::Execute()
@@ -105,4 +131,3 @@ bool CTL_TwainTriplet::IsAlive() const
 {
     return m_bAlive;
 }
-

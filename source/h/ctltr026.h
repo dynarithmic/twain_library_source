@@ -24,7 +24,6 @@
 #include "ctltr024.h"
 namespace dynarithmic
 {
-
     class CTL_ImageIOHandler;
     class ImageXferFileWriter;
 

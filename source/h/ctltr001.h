@@ -21,27 +21,102 @@
 #ifndef CTLTR001_H
 #define CTLTR001_H
 #include "ctltripletbase.h"
+#include "ctltwainmanager.h"
 namespace dynarithmic
 {
     class CTL_ITwainSource;
     class CTL_ITwainSession;
 
-    class CTL_SourceTriplet : public CTL_TwainTriplet
+    struct CTL_SelectSourceExecute
+    {
+        static TW_UINT16 Execute(CTL_TwainTriplet& pTrip)
+        {
+            const TW_UINT16 rc = pTrip.CTL_TwainTriplet::Execute();
+
+            auto pSession = pTrip.GetSessionPtr();
+            auto pCurSource = pTrip.GetSourcePtr();
+
+            switch (rc)
+            {
+                case TWRC_SUCCESS:
+                {
+                    // Check if source exists
+                    CTL_ITwainSource* pSource = pSession->Find(pCurSource);
+                    if (!pSource)
+                    {
+                        pSession->AddTwainSource(pCurSource);
+                        pSession->SetSelectedSource(pCurSource);
+                    }
+                    else
+                    {
+                        pSession->SetSelectedSource(pSource);
+                        pCurSource->SetActive(FALSE);
+                        CTL_ITwainSource::Destroy(pCurSource);
+                    }
+                }
+                break;
+
+                case TWRC_FAILURE:
+                case TWRC_CANCEL:
+                    CTL_ITwainSource::Destroy(pCurSource);
+                    break;
+            }
+            return rc;
+        }
+    };
+
+    template <TW_UINT16 nMsg, typename ExecuteFn>
+    class CTL_SourceTripletUsingName : public CTL_TwainTriplet
     {
         public:
-            CTL_SourceTriplet(CTL_ITwainSession *pSession,
-                              LPCTSTR pProduct,
-                              TW_UINT16 nMsg);
+            CTL_SourceTripletUsingName(CTL_ITwainSession *pSession, LPCTSTR pProduct = nullptr) : m_bSourceCreated(false)
+            {
+                SetSessionPtr(nullptr);
+                SetSourcePtr(nullptr);
 
-            CTL_SourceTriplet(CTL_ITwainSession *pSession,
-                              CTL_ITwainSource* pSource,
-                              TW_UINT16 nMsg);
+                // Get the app manager's AppID
+                const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
 
+                if (pMgr && pMgr->IsValidTwainSession(pSession))
+                {
+                    // Don't add this source to permanent list
+                    CTL_ITwainSource* pSource = CTL_ITwainSource::Create(pSession, pProduct);
+                    SetSourcePtr(pSource);
+                    m_bSourceCreated = true;
+                    InitGeneric(pSession, nullptr, DG_CONTROL, DAT_IDENTITY, nMsg, pSource->GetSourceIDPtr(), { true, false });
+                }
+            }
+            CTL_ITwainSource* GetSourceIDPtr() { return GetSourcePtr(); }
+
+            TW_UINT16 Execute() override
+            {
+                return ExecuteFn::Execute(*this);
+            }
+        private:
+            bool m_bSourceCreated;
+    };
+
+    template <TW_UINT16 nMsg>
+    class CTL_SourceOpenCloseTriplet : public CTL_TwainTriplet
+    {
+        public:
+            CTL_SourceOpenCloseTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource) : m_bSourceCreated(false)
+            {
+                SetSourcePtr(pSource);
+                InitGeneric(pSession, nullptr, DG_CONTROL, DAT_IDENTITY, nMsg, pSource->GetSourceIDPtr(), {true, false});
+            }
             CTL_ITwainSource* GetSourceIDPtr() { return GetSourcePtr(); }
 
         private:
             bool m_bSourceCreated;
-
     };
+
+    using CTL_GetFirstSourceTriplet = CTL_SourceTripletUsingName<MSG_GETFIRST, CTL_DefaultTripletExecute>;
+    using CTL_GetNextSourceTriplet = CTL_SourceTripletUsingName<MSG_GETNEXT, CTL_DefaultTripletExecute>;
+    using CTL_GetDefaultSourceTriplet = CTL_SourceTripletUsingName<MSG_GETDEFAULT, CTL_DefaultTripletExecute>;
+    using CTL_SelectSourceDlgTriplet = CTL_SourceTripletUsingName<MSG_USERSELECT, CTL_SelectSourceExecute>;
+    using CTL_OpenSourceTriplet = CTL_SourceOpenCloseTriplet<MSG_OPENDS>;
+    using CTL_CloseSourceTriplet = CTL_SourceOpenCloseTriplet<MSG_CLOSEDS>;
+    using CTL_SetDefaultSourceTriplet = CTL_SourceOpenCloseTriplet<MSG_SET>;
 }
 #endif
