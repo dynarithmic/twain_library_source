@@ -21,28 +21,4 @@
 #ifndef CTLTR022_H
 #define CTLTR022_H
 #include "ctltr021.h"
-
-namespace dynarithmic
-{
-    class CTL_UserInterfaceEnableTriplet : public CTL_UserInterfaceTriplet
-    {
-        public:
-            CTL_UserInterfaceEnableTriplet(CTL_ITwainSession *pSession,
-                                           CTL_ITwainSource *pSource,
-                                           TW_USERINTERFACE *pUI,
-                                           TW_BOOL bShowUI = true,
-                                           TW_UINT16 nMsg = MSG_ENABLEDS);
-
-            TW_UINT16   Execute() override;
-
-    };
-
-    class CTL_UserInterfaceUIOnlyTriplet : public CTL_UserInterfaceEnableTriplet
-    {
-        public:
-             CTL_UserInterfaceUIOnlyTriplet(CTL_ITwainSession *pSession,
-                                              CTL_ITwainSource *pSource,
-                                              TW_USERINTERFACE *pUI);
-    };
-}
 #endif

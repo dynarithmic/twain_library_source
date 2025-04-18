@@ -32,12 +32,6 @@ namespace dynarithmic
         public:
             CTL_ImageTriplet(CTL_ITwainSession *pSession,
                              CTL_ITwainSource *pSource);
-
-        protected:
-            void  InitVars(TW_UINT16 nType,
-                           CTL_EnumGetType nGet,
-                           void *pData);
-
             bool QueryAndRemoveDib(CTL_TwainAcquireEnum acquireType, CTL_TwainDibArray& pArray, size_t nWhich);
     };
 }

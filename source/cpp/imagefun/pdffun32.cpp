@@ -22,8 +22,6 @@
 #pragma warning (disable:4786)
 #endif
 #include "pdffun32.h"
-#undef min
-#undef max
 #include <string>
 #include <cmath>
 #include <pdfconst.h>

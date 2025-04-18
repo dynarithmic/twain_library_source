@@ -38,21 +38,7 @@ CTL_CapabilityTriplet::CTL_CapabilityTriplet(CTL_ITwainSession *pSession,
                             m_nItemType(TwainType),
                             m_bGetDefaultType(false)
 {
-    SetSessionPtr( pSession );
-    SetSourcePtr( pSource );
-
-    // Get the app manager's AppID
-    const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-    if ( pMgr && pMgr->IsValidTwainSession( pSession ))
-    {
-        if ( pSource )
-        {
-            Init( pSession->GetAppIDPtr(), pSource->GetSourceIDPtr(),
-                    DG_CONTROL, DAT_CAPABILITY, nMsg,
-                    static_cast<TW_MEMREF>(&m_Capability));
-            SetAlive (true);
-        }
-    }
+    InitGeneric(pSession, pSource, DG_CONTROL, DAT_CAPABILITY, nMsg, &m_Capability);
 }
 
 CTL_CapabilityTriplet::~CTL_CapabilityTriplet()

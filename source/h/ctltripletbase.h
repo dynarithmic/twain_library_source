@@ -21,9 +21,10 @@
 #ifndef CTLTRIPLETBASE_H
 #define CTLTRIPLETBASE_H
 
+#include <tuple>
+#include <utility>
 #include "ctltwainsession.h"
 #include "ctlobstr.h"
-#include <tuple>
 
 namespace dynarithmic
 {
@@ -64,6 +65,7 @@ namespace dynarithmic
             bool    IsMSGGetType() const;
             bool    IsMSGSetType() const;
             bool    IsMSGResetType() const;
+            bool    IsMSGSetOrResetType() const;
 
             pTW_IDENTITY GetOriginID() const { return std::get<ORIGINPOS_>(m_TwainTripletArg); }
             pTW_IDENTITY GetDestinationID() const { return std::get<DESTPOS_>(m_TwainTripletArg); }
@@ -76,18 +78,25 @@ namespace dynarithmic
             const CTL_ITwainSession* GetSessionPtr() const
             { return m_pSession; }
 
-        protected:
             CTL_ITwainSession* GetSessionPtr()
             { return m_pSession; }
+
+            const CTL_ITwainSource* GetSourcePtr() const
+            { return m_pSource; }
+
+            CTL_ITwainSource* GetSourcePtr()
+            { return m_pSource; }
+
+        protected:
 
             void SetSessionPtr(CTL_ITwainSession* pSession)
             { m_pSession = pSession; }
 
-            CTL_ITwainSource*  GetSourcePtr() const
-            { return m_pSource; }
-
             void SetSourcePtr(CTL_ITwainSource* pSource)
             { m_pSource = pSource; }
+
+            bool InitGeneric(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource, TW_UINT32 nDG, 
+                TW_UINT16 nDat, TW_UINT16 MsgType, TW_MEMREF pType, std::pair<bool, bool> prInit = { true, true });
 
         private:
             TwainTripletArgs m_TwainTripletArg;
@@ -96,6 +105,15 @@ namespace dynarithmic
             CTL_ITwainSource*       m_pSource;
             CTL_ITwainSession*      m_pSession;
     };
+
+    struct CTL_DefaultTripletExecute
+    {
+        static TW_UINT16 Execute(CTL_TwainTriplet& pTrip)
+        {
+            return pTrip.CTL_TwainTriplet::Execute();
+        }
+    };
+
 }
 #endif
 

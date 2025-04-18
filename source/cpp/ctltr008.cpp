@@ -40,26 +40,12 @@ CTL_ProcessEventTriplet::CTL_ProcessEventTriplet(CTL_ITwainSession* pSession,
                                                  MSG *pMsg,
                                                  bool isDSM2) : m_Event{}, m_bDSM2Used(isDSM2)
 {
-    SetSourcePtr(const_cast<CTL_ITwainSource*>(pSource));
-    SetSessionPtr(pSession);
     m_pMsg = pMsg;
-    m_Event.pEvent      = static_cast<TW_MEMREF>(pMsg);
-    m_Event.TWMessage   = MSG_NULL;
+    m_Event.pEvent = static_cast<TW_MEMREF>(pMsg);
+    m_Event.TWMessage = MSG_NULL;
     if (m_bDSM2Used)
         m_Event.TWMessage = static_cast<TW_UINT16>(pMsg->message);
-
-    // Get the app manager's AppID
-    const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-
-    if (pMgr && pMgr->IsValidTwainSession(pSession))
-    {
-        if (pSource)
-        {
-            Init(pSession->GetAppIDPtr(), pSource->GetSourceIDPtr(), DG_CONTROL, DAT_EVENT,
-                MSG_PROCESSEVENT, static_cast<TW_MEMREF>(&m_Event));
-            SetAlive(true);
-        }
-    }
+    InitGeneric(pSession, pSource, DG_CONTROL, DAT_EVENT, MSG_PROCESSEVENT, &m_Event);
 }
 
 

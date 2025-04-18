@@ -18,8 +18,6 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#undef min
-#undef max
 #include <boost/crc.hpp>
 #include "crc32_aux.h"
 using namespace boost;

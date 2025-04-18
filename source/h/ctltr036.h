@@ -22,22 +22,45 @@
 #define CTLTR036_H
 
 #include "ctltr010.h"
+#include "ctltwainmanager.h"
 namespace dynarithmic
 {
-    class CTL_CustomDSTriplet : public CTL_TwainTriplet
+    template <TW_UINT16 nMsg>
+    class CTL_CustomDSTripletImpl : public CTL_TwainTriplet
     {
         public:
-            CTL_CustomDSTriplet(CTL_ITwainSession *pSession,
-                                CTL_ITwainSource* pSource,
-                                TW_UINT16 nMsg);
-            TW_UINT16   Execute() override;
-            TW_UINT32   GetDataSize() const;
-            HANDLE      GetData() const;
-            void        SetDataSize(TW_UINT32 nSize);
-            TW_UINT16   SetData(HANDLE hData, TW_UINT32 nSize);
+            CTL_CustomDSTripletImpl(CTL_ITwainSession* pSession,
+                CTL_ITwainSource* pSource) : CTL_TwainTriplet(), m_CustomDSData{}
+            {
+                InitGeneric(pSession, pSource, DG_CONTROL, DAT_CUSTOMDSDATA, nMsg, &m_CustomDSData);
+            }
+
+            TW_UINT32 GetDataSize() const
+            {
+                return m_CustomDSData.InfoLength;
+            }
+
+            HANDLE GetData() const
+            {
+                return m_CustomDSData.hData;
+            }
+
+            void SetDataSize(TW_UINT32 nSize)
+            {
+                m_CustomDSData.InfoLength = nSize;
+            }
+
+            TW_UINT16 SetData(HANDLE hData, TW_UINT32 /*nSize*/)
+            {
+                m_CustomDSData.hData = hData;
+                return Execute();
+            }
 
         private:
             TW_CUSTOMDSDATA     m_CustomDSData;
     };
+
+    using CTL_GetCustomDSTriplet = CTL_CustomDSTripletImpl<MSG_GET>;
+    using CTL_SetCustomDSTriplet = CTL_CustomDSTripletImpl<MSG_SET>;
 }
 #endif

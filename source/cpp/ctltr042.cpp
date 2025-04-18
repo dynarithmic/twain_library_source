@@ -24,12 +24,5 @@
 using namespace dynarithmic;
 CTL_TwainDirectTriplet::CTL_TwainDirectTriplet(CTL_ITwainSession *pSession, CTL_ITwainSource* pSource) : CTL_TwainTriplet(), m_TwainDirect{}
 {
-    SetSessionPtr(pSession);
-    const CTL_TwainAppMgrPtr pMgr = CTL_TwainAppMgr::GetInstance();
-    if (pMgr && pMgr->IsValidTwainSession(pSession))
-    {
-        Init(pSession->GetAppIDPtr(), pSource->GetSourceIDPtr(), DG_CONTROL, DAT_TWAINDIRECT, MSG_SETTASK, &m_TwainDirect);
-        m_TwainDirect.SizeOf = sizeof m_TwainDirect;
-        SetAlive(true);
-    }
+    InitGeneric(pSession, pSource, DG_CONTROL, DAT_TWAINDIRECT, MSG_SETTASK, &m_TwainDirect);
 }

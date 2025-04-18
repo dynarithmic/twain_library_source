@@ -56,12 +56,12 @@ static constexpr std::array<std::pair<int, SourceFn>, 4> SourcefnMap = { {{SELEC
 static LONG OpenSourceInternal(DTWAIN_SOURCE Source, const SourceSelectionOptions& opts)
 {
     const auto p = static_cast<CTL_ITwainSource *>(Source);
-    auto* pHandle = p->GetDTWAINHandle();
     if (p)
         p->SetSelected(true);
     else
         return DTWAIN_ERR_BAD_SOURCE;
-    if (opts.nOptions & DTWAIN_DLG_OPENONSELECT) 
+    auto* pHandle = p->GetDTWAINHandle();
+    if (opts.nOptions & DTWAIN_DLG_OPENONSELECT)
     {
         const DTWAIN_BOOL retval = DTWAIN_OpenSource(Source);
         if (retval != TRUE)

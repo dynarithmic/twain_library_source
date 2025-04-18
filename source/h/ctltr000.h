@@ -22,34 +22,46 @@
 #define CTLTR000_H
 
 #include "ctltripletbase.h"
+#include "ctltwainmanager.h"
 
 namespace dynarithmic
 {
     class CTL_ITwainSession;
 
+    template <TW_UINT16 nMsg, int nErr>
     class CTL_TwainSMTriplet : public CTL_TwainTriplet
     {
         public:
-            CTL_TwainSMTriplet(CTL_ITwainSession *pSession, TW_UINT16 nMsg, int nErr);
-            TW_UINT16       Execute() override;
-            int GetDSMVersion() const;
+            CTL_TwainSMTriplet(CTL_ITwainSession* pSession) : m_nDSMVersion(DTWAIN_TWAINDSM_LEGACY)
+            {
+                // Get the app manager's AppID
+                m_nErr = nErr;
+                InitGeneric(pSession, nullptr, DG_CONTROL, DAT_PARENT, nMsg, pSession->GetWindowHandlePtr());
+            }
+
+            TW_UINT16 Execute() override
+            {
+                const TW_UINT16 rc = CTL_TwainTriplet::Execute();
+                if (rc != TWRC_SUCCESS)
+                {
+                    DTWAIN_ERROR_CONDITION(m_nErr, TWRC_FAILURE, true)
+                }
+                return TWRC_SUCCESS;
+            }
+
+            int GetDSMVersion() const
+            {
+                if (std::get<0>(GetTripletArgs())->SupportedGroups & DF_DSM2)
+                    return DTWAIN_TWAINDSM_VERSION2;
+                return DTWAIN_TWAINDSM_LEGACY;
+            }
 
         private:
             int     m_nErr;
             int     m_nDSMVersion;
     };
 
-    class CTL_TwainOpenSMTriplet : public CTL_TwainSMTriplet
-    {
-        public:
-            CTL_TwainOpenSMTriplet(CTL_ITwainSession *pSession);
-            TW_UINT16       Execute() override;
-    };
-
-    class CTL_TwainCloseSMTriplet : public CTL_TwainSMTriplet
-    {
-        public:
-            CTL_TwainCloseSMTriplet(CTL_ITwainSession *pSession);
-    };
+    using CTL_TwainCloseSMTriplet = CTL_TwainSMTriplet<MSG_CLOSEDSM, IDS_ErrSourceMgrClose>;
+    using CTL_TwainOpenSMTriplet = CTL_TwainSMTriplet<MSG_OPENDSM, IDS_ErrSourceMgrOpen>;
 }
 #endif
