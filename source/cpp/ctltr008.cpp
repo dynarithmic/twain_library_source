@@ -129,7 +129,7 @@ TW_UINT16 CTL_ProcessEventTriplet::ExecuteEventHandler()
                     {
                         if ( !pSource->SkipImageInfoErrors() )
                         {
-                            LogWriterUtils::WriteLogInfoA(GetResourceStringFromMap(DTWAIN_ERR_IMAGEINFO_INVALID_));
+                            LogWriterUtils::WriteLogInfoA(GetResourceStringFromMap(-DTWAIN_ERR_IMAGEINFO_INVALID));
                             CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                                   nullptr,
                                                                   DTWAIN_TN_IMAGEINFOERROR,
