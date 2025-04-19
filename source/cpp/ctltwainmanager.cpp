@@ -47,7 +47,7 @@
 #include "ctltripletbase.h"
 using namespace dynarithmic;
 
-static constexpr std::array<std::pair<int, int>, 30> mapCondCode = { {
+static constexpr std::array<std::pair<int, int>, 32> mapCondCode = { {
     {TWCC_SUCCESS         ,IDS_ErrCCFalseAlarm},
     {TWCC_BUMMER          ,IDS_ErrCCBummer},
     {TWCC_LOWMEMORY       ,IDS_ErrCCLowMemory},
@@ -76,8 +76,10 @@ static constexpr std::array<std::pair<int, int>, 30> mapCondCode = { {
     {TWCC_DOCTOOLIGHT,     IDS_ErrCCDoctooLight},
     {TWCC_DOCTOODARK,      IDS_ErrCCDoctooDark},
     {TWCC_NOMEDIA   ,      IDS_ErrCCNoMedia},
-    {TWAIN_ERR_NULL_CONTAINER_, TWAIN_ERR_NULL_CONTAINER_},
-    {DTWAIN_ERR_EXCEPTION_ERROR_, DTWAIN_ERR_EXCEPTION_ERROR_}} };
+    {TWAIN_ERR_NULL_CONTAINER, TWAIN_ERR_NULL_CONTAINER},
+    {DTWAIN_ERR_EXCEPTION_ERROR, DTWAIN_ERR_EXCEPTION_ERROR},
+    {-TWAIN_ERR_NULL_CONTAINER, TWAIN_ERR_NULL_CONTAINER},
+    {-DTWAIN_ERR_EXCEPTION_ERROR, DTWAIN_ERR_EXCEPTION_ERROR}} };
 
 template <class T>
 bool SetOneTwainCapValue( const CTL_ITwainSource *pSource,
@@ -863,7 +865,7 @@ TW_UINT16 dynarithmic::CTL_TwainAppMgr::GetConditionCode( CTL_ITwainSession *pSe
                                              CTL_ITwainSource *pSource/*=nullptr*/,
                                              TW_UINT16 rc/*=1*/)
 {
-    if ( rc == DTWAIN_ERR_EXCEPTION_ERROR_ )
+    if ( rc == -DTWAIN_ERR_EXCEPTION_ERROR )
         return TWRC_FAILURE;
     CTL_ConditionCodeTriplet CC(pSession, pSource);
     if ( CC.Execute() == TWRC_SUCCESS )
@@ -2703,7 +2705,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         if ( bTimeOutInEffect )
             KillTimer(nullptr, CTL_StaticData::GetTimeoutID());
         #endif
-        retcode = DTWAIN_ERR_EXCEPTION_ERROR_;
+        retcode = -DTWAIN_ERR_EXCEPTION_ERROR;
         if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_LOWLEVELTWAIN)
         {
             std::string sz;

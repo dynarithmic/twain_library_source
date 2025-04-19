@@ -25,17 +25,6 @@
 
 namespace dynarithmic
 {
-    template <typename Arr, typename Val>
-    static constexpr std::pair<bool, unsigned> generic_array_finder(const Arr& theArray, const Val& value)
-    {
-        for (auto iter = theArray.begin(); iter != theArray.end(); ++iter)
-        {
-            if (*iter == value)
-                return { true, static_cast<unsigned>(std::distance(theArray.begin(), iter)) };
-        }
-        return { false, 0 };
-    }
-
     template <typename Arr, typename Fn>
     static constexpr std::pair<bool, unsigned> generic_array_finder_if(const Arr& theArray, Fn fn)
     {
@@ -46,5 +35,12 @@ namespace dynarithmic
         }
         return { false,0 };
     }
+
+    template <typename Arr, typename Val>
+    static constexpr std::pair<bool, unsigned> generic_array_finder(const Arr& theArray, const Val& value)
+    {
+        return generic_array_finder_if(theArray, [&](int val) { return val == value; });
+    }
+
 }
 #endif

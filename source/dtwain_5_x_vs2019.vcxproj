@@ -1480,6 +1480,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="cpp\pdflib32\md5class.h" />
     <ClInclude Include="cpp\pdflib32\pdfencrypt.h" />
     <ClInclude Include="cpp\pdflib32\pdflib32.h" />
+    <ClInclude Include="cximage\ximacfg.h" />
     <ClInclude Include="cximage\ximage.h" />
     <ClInclude Include="FreeImage\Source\FreeImage.h" />
     <ClInclude Include="FreeImage\Wrapper\FreeImagePlus\FreeImagePlus.h" />
