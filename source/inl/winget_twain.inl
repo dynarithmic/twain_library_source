@@ -58,16 +58,43 @@ CTL_StringType GetTwainDirFullName(LPCTSTR strTwainDLLName,
     return GetTwainDirFullNameEx(pHandle, strTwainDLLName, bLeaveLoaded, pModule);
 }
 
+enum { dll_already_loaded, dll_loaded, dll_notfound};
+
 template <typename ErrorCodeType>
-static int LoadTwainDLL(boost::dll::shared_library& libloader, const CTL_StringType& fNameTotal)
+static std::pair<int, int> LoadTwainDLL(boost::dll::shared_library& libloader, const CTL_StringType& fNameTotal)
 {
     ErrorCodeType ec;
+    HMODULE hMod = ::GetModuleHandle(fNameTotal.c_str()); 
+    if (hMod)
+        return { dll_already_loaded, boost::system::errc::success };
     libloader.load(fNameTotal, ec, boost::dll::load_mode::search_system_folders);
-    return ec.value();
+    int val = ec.value();
+    if (val != boost::system::errc::success)
+        return { dll_notfound, val };
+    return { dll_loaded, val };
 }
 
 CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwainDLLName, bool bLeaveLoaded, boost::dll::shared_library *pModule)
 {
+    struct libLoadRAII
+    {
+        bool* m_pLeaveLoaded = nullptr;
+        boost::dll::shared_library* m_pSharedLibrary = nullptr;
+        libLoadRAII(boost::dll::shared_library* pSharedLibrary, bool* pLeaveLoaded) :
+            m_pSharedLibrary(pSharedLibrary), m_pLeaveLoaded(pLeaveLoaded) {}
+        void LeaveLoaded(bool bSet) { *m_pLeaveLoaded = bSet; }
+        ~libLoadRAII()
+        {
+            try
+            {
+                if (!(*m_pLeaveLoaded))
+                    m_pSharedLibrary->unload();
+            }
+            catch (...)
+            {}
+        }
+    };
+
     static constexpr int WinDirPos = 0;
     static constexpr int SysDirPos = 1;
     static constexpr int SysPathPos = 2;
@@ -137,7 +164,9 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
             LogWriterUtils::WriteLogInfo(msg);
         }
         boost::dll::shared_library libloader;
-        int loadReturnCode = 0;
+        libLoadRAII raii(&libloader, &bLeaveLoaded);
+
+        std::pair<int, int> loadReturnCode;
 
         if constexpr(boost_version_major == 1 && boost_version_minor >= 88)
         {
@@ -154,16 +183,21 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
         SetErrorMode(nOldError);
         #endif
 
-        if (loadReturnCode != boost::system::errc::success)
+        if (loadReturnCode.second != boost::system::errc::success)
         {
+            // Error loading the source manager DLL
             if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
             {
                 CTL_StringType msg = _T("Testing TWAIN availability for file \"") + fNameTotal + _T("\" failed with error code: ");
-                msg += StringWrapper::ToString(loadReturnCode);
+                msg += StringWrapper::ToString(loadReturnCode.second);
                 LogWriterUtils::WriteLogInfo(msg);
             }
             continue;
         }
+
+        // Leave the DLL loaded if it was already loaded, otherwise respect the bLeaveLoaded setting
+        if (loadReturnCode.first == dll_already_loaded)
+            bLeaveLoaded = true;
 
         // Try to load the source manager
         DSMENTRYPROC lpDSMEntry = nullptr;
@@ -189,9 +223,6 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
             }
             // We need the full module name
             fNameTotal = StringWrapper::traits_type::PathGenericString(libloader.location());
-            if (!bLeaveLoaded)
-                // Unload the library
-                libloader.unload();
             if (pModule)
             {
                 if (bLeaveLoaded)
@@ -201,13 +232,14 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
         }
         else
         {
+            // This is not a TWAIN DSM.  Unload the library
+            libloader.unload();
             if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
             {
                 CTL_StringType msg = _T("Testing if file \"") + fNameTotal + _T("\" is a valid DSM (failed) ...");
                 LogWriterUtils::WriteLogInfo(msg);
             }
         }
-        libloader.unload();
     }
     return {};
 }
