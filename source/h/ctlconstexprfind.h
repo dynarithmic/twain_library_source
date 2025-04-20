@@ -39,8 +39,8 @@ namespace dynarithmic
             if (fn(*iter))
                 return { true, static_cast<unsigned>(std::distance(theArray.begin(), iter)) };
         }
-        return { false,0 };
         #endif
+        return { false,0 };
     }
 
     template <typename Arr, typename Val>
