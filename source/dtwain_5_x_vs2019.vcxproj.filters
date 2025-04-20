@@ -1041,6 +1041,12 @@
     <ClInclude Include="cximage\ximacfg.h">
       <Filter>CXImage Files</Filter>
     </ClInclude>
+    <ClInclude Include="h\ctllogfunctioncall.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\capinfomap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".\h\versioninfo.ipp">

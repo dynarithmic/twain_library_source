@@ -156,7 +156,7 @@ bool VersionInfoImpl<charTraits>::getit( typename charTraits::TraitsCharType con
 template <typename charTraits>
 void VersionInfoImpl<charTraits>::printit(typename charTraits::TraitsBaseOutputStreamType& stream, int indent, const char_type* eol) const
 {
-    charTraits::TraitsStringType indentStr(indent, charTraits::SpaceChar);
+    typename charTraits::TraitsStringType indentStr(indent, charTraits::SpaceChar);
     for ( auto it = m_verStrings.begin( )
         ; it != m_verStrings.end( )
         ; ++it

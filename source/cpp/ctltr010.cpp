@@ -126,7 +126,7 @@ TW_UINT16 CTL_CapabilityTriplet::Execute()
         {
             // No capability data
             rc = 1;
-            CTL_TwainAppMgr::ProcessConditionCodeError(TWAIN_ERR_NULL_CONTAINER);
+            CTL_TwainAppMgr::ProcessConditionCodeError(-TWAIN_ERR_NULL_CONTAINER);
             return rc;
         }
 

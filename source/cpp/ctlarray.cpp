@@ -32,7 +32,6 @@
 #include "dtwstrfn.h"
 #include "dtwain_float_utils.h"
 #include "arrayfactory.h"
-
 typedef LPVOID* LPLPVOID;
 
 using namespace dynarithmic;
