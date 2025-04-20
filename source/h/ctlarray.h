@@ -24,8 +24,11 @@
 #include <vector>
 #include <algorithm>
 #include <limits>
+#include <memory>
 #include "dtwtype.h"
 #include "twain.h"
+#include "dtwaindefs.h"
+#include "arrayfactory.h"
 
 typedef std::vector<int>            CTL_IntArray;
 typedef std::vector<TW_UINT16>      CTL_TwainCapArray;
@@ -37,38 +40,39 @@ namespace dynarithmic
     class CTL_TwainDLLHandle;
     void ArrayCopyWideToNative(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest);
     void ArrayCopyAnsiToNative(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ArraySource, DTWAIN_ARRAY ArrayDest);
+    std::shared_ptr<CTL_ArrayFactory>& GetArrayFactoryFromHandle(CTL_TwainDLLHandle* pHandle);
 
     template <typename Container, typename DTWAINArrayType>
     static void CopyContainer(CTL_TwainDLLHandle* pHandle, const Container& theContainer, DTWAIN_ARRAY theArray)
     {
-        auto& vect = pHandle->m_ArrayFactory->underlying_container_t<DTWAINArrayType>(theArray);
+        auto& vect = GetArrayFactoryFromHandle(pHandle)->underlying_container_t<DTWAINArrayType>(theArray);
         std::copy(theContainer.begin(), theContainer.end(), vect.begin());
     }
-
+    
     template <typename Container>
     DTWAIN_ARRAY CreateArrayFromContainer(CTL_TwainDLLHandle* pHandle, const Container& theContainer)
     {
         DTWAIN_ARRAY theArray = {};
         LONG nSize = static_cast<LONG>(theContainer.size());
-        if constexpr (std::is_integral_v<Container::value_type>)
+        if constexpr (std::is_integral_v<typename Container::value_type>)
         {
             theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, nSize);
             CopyContainer<Container, LONG>(pHandle, theContainer, theArray);
         }
         else
-        if constexpr (std::is_floating_point_v<Container::value_type>)
+        if constexpr (std::is_floating_point_v<typename Container::value_type>)
         {
             theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYFLOAT, nSize);
             CopyContainer<Container, double>(pHandle, theContainer, theArray);
         }
         else
-        if constexpr (std::is_same_v<Container::value_type, std::string>)
+        if constexpr (std::is_same_v<typename Container::value_type, std::string>)
         {
             theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYANSISTRING, nSize);
             CopyContainer<Container, std::string>(pHandle, theContainer, theArray);
         }
         else 
-        if constexpr (std::is_same_v<Container::value_type, TwainFrameInternal>)
+        if constexpr (std::is_same_v<typename Container::value_type, TwainFrameInternal>)
         {
             theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYFRAME, nSize);
             CopyContainer<Container, TwainFrameInternal>(pHandle, theContainer, theArray);
@@ -80,7 +84,7 @@ namespace dynarithmic
     Container CreateContainerHelper(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY theArray, size_t maxElements)
     {
         Container theContainer;
-        auto& pVector = pHandle->m_ArrayFactory->underlying_container_t<ArrayType>(theArray);
+        auto& pVector = GetArrayFactoryFromHandle(pHandle)->underlying_container_t<ArrayType>(theArray);
         if ( maxElements == (std::numeric_limits<size_t>::max)())
             std::copy(pVector.begin(), pVector.end(), std::back_inserter(theContainer));
         else
@@ -90,20 +94,20 @@ namespace dynarithmic
         }
         return theContainer;
     }
-
+    
     template <typename Container>
     Container CreateContainerFromArray(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY theArray, 
                                         size_t maxElements = (std::numeric_limits<size_t>::max)())
     {
         if (!theArray)
             return {};
-        if constexpr (std::is_integral_v<Container::value_type>)
+        if constexpr (std::is_integral_v<typename Container::value_type>)
             return CreateContainerHelper<Container, LONG>(pHandle, theArray, maxElements);
         else
-        if constexpr (std::is_same_v<Container::value_type, double>)
+        if constexpr (std::is_same_v<typename Container::value_type, double>)
             return CreateContainerHelper<Container, double>(pHandle, theArray, maxElements);
         else
-        if constexpr (std::is_same_v<Container::value_type, std::string>)
+        if constexpr (std::is_same_v<typename Container::value_type, std::string>)
             return CreateContainerHelper<Container, std::string>(pHandle, theArray, maxElements);
         return {};
     }

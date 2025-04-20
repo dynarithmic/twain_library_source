@@ -64,6 +64,11 @@ namespace dynarithmic
             [](const std::string& val) { return StringConversion::Convert_Ansi_To_Native(val); });
     }
 
+    std::shared_ptr<CTL_ArrayFactory>& GetArrayFactoryFromHandle(CTL_TwainDLLHandle* pHandle)
+    {
+        return pHandle->m_ArrayFactory;
+    }
+
     CTL_ArrayFactory::CTL_ArrayFactory()
     {
         m_vfnAddMap.insert({ arrayTag::LongType, [&](arrayTag* tag, std::size_t nSize, void* value) { simple_pushback<tagged_array_long>(tag, value, nSize); } });

@@ -457,7 +457,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
                         indenter << "ShowUI=" <<  (pUSERINTERFACE->ShowUI?"TRUE":"FALSE") << "\n" <<
                         indenter << "ModalUI=" << (pUSERINTERFACE->ModalUI?"TRUE":"FALSE") << "\n" <<
                         indenter << "hParent=" << pUSERINTERFACE->hParent << "\n" <<
-                        indenter << "hParent.Title=" << sz << "\n" <<
+                        indenter << "hParent.Title=" << StringConversion::Convert_NativePtr_To_Ansi(sz) << "\n" <<
                         indenter << "hParent.ScreenPos= {" << StringWrapperA::Join(aRect, ",") << "}\n}";
             #endif
             }

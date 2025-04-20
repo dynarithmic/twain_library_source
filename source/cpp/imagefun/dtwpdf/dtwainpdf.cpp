@@ -208,7 +208,7 @@ std::string HexString(unsigned char *input, int length/*=-1*/)
 std::string CreateIDString(const std::string& sName, std::string& ID1, std::string& ID2)
 {
     char szBuf[1024];
-
+    char szBuf2[] = "001";
     const std::string sNow = GetPDFDate();
     WRITE_TO_LOG()
     sprintf(szBuf, "%s-%s", sNow.c_str(), sName.c_str());
@@ -216,7 +216,7 @@ std::string CreateIDString(const std::string& sName, std::string& ID1, std::stri
     std::vector<unsigned char> hash = MD5Hash(reinterpret_cast<unsigned char*>(szBuf));
     hash.resize(32,'\0');
     WRITE_TO_LOG()
-    std::vector<unsigned char> version = MD5Hash(reinterpret_cast<unsigned char*>("001"));
+    std::vector<unsigned char> version = MD5Hash(reinterpret_cast<unsigned char*>(szBuf2));
     version.resize(32,'\0');
     WRITE_TO_LOG()
     std::string hexHash;
