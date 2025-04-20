@@ -2479,20 +2479,50 @@ CTL_StringType CTL_TwainAppMgr::GetLatestDSMVersion()
     return {};
 }
 
+template <typename ErrorCodeType>
+static int LoadSourceManagerImpl(boost::dll::shared_library& libloader, const CTL_StringType& fNameTotal)
+{
+    ErrorCodeType ec;
+    libloader.load(fNameTotal, ec, boost::dll::load_mode::search_system_folders);
+    return ec.value();
+}
+
 bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
 {
+    constexpr int boost_version_minor = (BOOST_VERSION / 100) % 1000;
+    constexpr int boost_version_major = BOOST_VERSION / 100000;
     if ( pszDLLName != nullptr && pszDLLName[0] )
     {
         // This is a custom path, so user knows what they're doing.
+ 
         m_strTwainDSMPath = pszDLLName;
         // Attempt to load TWAIN DLL
         boost::dll::shared_library libloader;
-        boost::system::error_code ec;
-        libloader.load(m_strTwainDSMPath, ec);
-        if ( ec != boost::system::errc::success)
+        int loadReturnCode = 0;
+        if constexpr (boost_version_major == 1 && boost_version_minor >= 88)
+        {
+            // Boost has changed return code status for version 1.88 and higher
+            loadReturnCode = LoadSourceManagerImpl<std::error_code>(libloader, m_strTwainDSMPath);
+        }
+        else
+        {
+            // Use boost 1.87 and below compatible code
+            loadReturnCode = LoadSourceManagerImpl<boost::system::error_code>(libloader, m_strTwainDSMPath);
+        }
+
+        if ( loadReturnCode != boost::system::errc::success)
         {
             const CTL_StringType dllName = _T(" : ") + m_strTwainDSMPath;
             DTWAIN_ERROR_CONDITION_EX(IDS_ErrTwainDLLNotFound, StringConversion::Convert_Native_To_Ansi(dllName), false, true)
+        }
+
+        // Attempt to load the DSM_Entry point
+        bool bLoadedDSM = LoadDSM();
+        if (!bLoadedDSM)
+        {
+            // This DLL cannot be used to communicate with TWAIN due to the lack of a DSM entry point
+            libloader.unload();
+            return false;
         }
         m_hLibModule = libloader;
     }
@@ -2519,8 +2549,11 @@ bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
         LogToDebugMonitor(strm.str());
         if (CTL_StaticData::GetLogFilterFlags() != 0)
             DTWAIN_LogMessageA(StringConversion::Convert_Native_To_Ansi(strm.str()).c_str());
+
+        // Load the entry point for these DLL's
+        LoadDSM();
     }
-    return LoadDSM();
+    return true;
 }
 
 bool CTL_TwainAppMgr::LoadDSM()
@@ -2737,8 +2770,15 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         strm << fmt % s1.c_str() % retcode % sz % s;
         LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
     }
-    if ( retcode != TWRC_SUCCESS )
+    if (retcode != TWRC_SUCCESS)
         SetLastTwainError( retcode, TWRC_Error );
+    else
+    {
+        // Make sure we don't try to get condition codes on a successful
+        // closure of the DSM
+        if (nDG == DG_CONTROL && nDAT == DAT_PARENT && nMSG == MSG_CLOSEDSM)
+            raii.m_bRunConditionCode = false;
+    }
     return retcode;
 }
 
