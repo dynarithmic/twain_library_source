@@ -235,7 +235,7 @@ namespace dynarithmic
             if (t)
             {
                 if constexpr (std::is_same_v<wchar_t*, T> || std::is_same_v<const wchar_t*, T>)
-                    strm << StringConversion::Convert_NativePtr_To_Ansi(t).c_str();
+                    strm << StringConversion::Convert_WidePtr_To_Ansi(t).c_str();
                 else
                     strm << outStr << "=" << t;
             }
@@ -277,7 +277,7 @@ namespace dynarithmic
                     strm << "(null)";
                 else
                 if constexpr (std::is_same_v<wchar_t*, T> || std::is_same_v<const wchar_t*, T>)
-                    strm << StringConversion::Convert_NativePtr_To_Ansi(t).c_str();
+                    strm << StringConversion::Convert_WidePtr_To_Ansi(t).c_str();
                 else
                     strm << t;
             }
