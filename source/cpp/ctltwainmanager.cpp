@@ -47,7 +47,7 @@
 #include "ctltripletbase.h"
 using namespace dynarithmic;
 
-static constexpr std::array<std::pair<int, int>, 30> mapCondCode = { {
+static constexpr std::array<std::pair<int, int>, 32> mapCondCode = { {
     {TWCC_SUCCESS         ,IDS_ErrCCFalseAlarm},
     {TWCC_BUMMER          ,IDS_ErrCCBummer},
     {TWCC_LOWMEMORY       ,IDS_ErrCCLowMemory},
@@ -76,8 +76,10 @@ static constexpr std::array<std::pair<int, int>, 30> mapCondCode = { {
     {TWCC_DOCTOOLIGHT,     IDS_ErrCCDoctooLight},
     {TWCC_DOCTOODARK,      IDS_ErrCCDoctooDark},
     {TWCC_NOMEDIA   ,      IDS_ErrCCNoMedia},
-    {TWAIN_ERR_NULL_CONTAINER_, TWAIN_ERR_NULL_CONTAINER_},
-    {DTWAIN_ERR_EXCEPTION_ERROR_, DTWAIN_ERR_EXCEPTION_ERROR_}} };
+    {TWAIN_ERR_NULL_CONTAINER, TWAIN_ERR_NULL_CONTAINER},
+    {DTWAIN_ERR_EXCEPTION_ERROR, DTWAIN_ERR_EXCEPTION_ERROR},
+    {-TWAIN_ERR_NULL_CONTAINER, TWAIN_ERR_NULL_CONTAINER},
+    {-DTWAIN_ERR_EXCEPTION_ERROR, DTWAIN_ERR_EXCEPTION_ERROR}} };
 
 template <class T>
 bool SetOneTwainCapValue( const CTL_ITwainSource *pSource,
@@ -451,142 +453,6 @@ LONG CTL_TwainAppMgr::DoCapContainerTest(CTL_TwainDLLHandle* pHandle, CTL_ITwain
     return 0;
 }
 
-bool CTL_TwainAppMgr::GetBestContainerType(CTL_TwainDLLHandle* pHandle,
-                                           const CTL_ITwainSource* pSource,
-                                           CTL_EnumCapability nCap,
-                                           UINT & rContainerGet,
-                                           UINT & rContainerSet,
-                                           UINT & nDataType,
-                                           UINT lGetType,
-                                           bool *flags)
-{
-    if ( !s_pGlobalAppMgr )
-        return false;
-
-    if ( !s_pGlobalAppMgr->IsSourceOpen( pSource ))
-        return false;
-
-    const auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
-    const auto pSession = pTempSource->GetTwainSession();
-
-    const UINT setSave = rContainerSet;
-
-    // Get the data from the capability (only for "normal" cap values)
-    if ( nCap < CAP_CUSTOMBASE)
-    {
-        if ( !flags[5] )
-        nDataType = GetDataTypeFromCap( nCap, pTempSource );
-    }
-
-    const bool bGetTheCap =
-         lGetType == CTL_GetTypeGET && !flags[0] ||
-         lGetType == CTL_GetTypeGETCURRENT && !flags[1] ||
-         lGetType == CTL_GetTypeGETDEFAULT && !flags[2];
-
-    // Get the possible container types for the get cap.  We can skip
-    // this test if the startup option to perform this test is set to false
-
-    // Get the possible container types for the set cap.  We always need to 
-    // do this "manually", and not try to use TWAIN to test what works for 
-    // SETxxx operations
-    rContainerSet = GetContainerTypesFromCap(nCap, 1);
-
-    // Go through the GETxxx testing to determine the best container
-    // to use for those operations.  We can use TWAIN for this, as 
-    // all we are doing is getting values and seeing what container
-    // we can use.
-    //
-    // Only perform this operation if the startup options in DTWAINxx.INI
-    // state we should do this.  Otherwise we get the GET containers on an
-    // individual basis if the user calls DTWAIN_GetCapValues or similar
-    // function.
-    if (pHandle->m_OnSourceOpenProperties.m_bQueryBestCapContainer && bGetTheCap)
-    {
-        rContainerGet = GetContainerTypesFromCap( nCap, 0 );
-
-        // Check if there is only one type of "Get"
-        if ( !( rContainerGet == TwainContainer_ONEVALUE ||
-             rContainerGet == TwainContainer_ENUMERATION ||
-             rContainerGet == TwainContainer_ARRAY ||
-                rContainerGet == TwainContainer_RANGE ))
-        {
-            // Need to test for getting container
-            // First, set the dependent capabilities
-            if ( SetDependentCaps( pSource, nCap ) )
-            {
-                CTL_CapabilityGetTriplet CapTester(pSession,
-                    pTempSource,
-                    static_cast<CTL_EnumGetType>(lGetType),
-                    static_cast<TW_UINT16>(nCap),
-                    0
-                );
-                CapTester.SetTestMode(true);
-                const TW_UINT16 rc = CapTester.Execute();
-                if ( rc == TWRC_SUCCESS )
-                {
-                    rContainerGet = CapTester.GetSupportedContainer();
-                    if ( !flags[5] )
-                    nDataType = CapTester.GetItemType();
-                }
-                else
-                {
-                    StringStreamA strm;
-                    strm << boost::format("Error: Source %1%: Capability %2% container defaults to TW_ONEVALUE\n") %
-                                          StringConversion::Convert_Native_To_Ansi(pSource->GetProductName()) % GetCapNameFromCap(nCap);
-                    nDataType = static_cast<UINT>(DTWAIN_CAPDATATYPE_UNKNOWN);
-                    LogWriterUtils::WriteLogInfoIndentedA(strm.str());
-                    rContainerGet = TwainContainer_ONEVALUE;
-                }
-            }
-        }
-    }
-    // Now determine Set container for custom caps
-    if ( nCap >= CAP_CUSTOMBASE )
-    {
-        if (lGetType == CTL_GetTypeGET && !flags[3] ||
-            lGetType == CTL_GetTypeGETCURRENT && !flags[4])
-            rContainerSet = rContainerGet; // assume that setting and getting use the same
-        else
-            rContainerSet = setSave;
-        // we need to ensure that TW_ONEVALUEs are possible for custom container setting
-        if (!(rContainerSet & DTWAIN_CONTONEVALUE))
-            rContainerSet |= DTWAIN_CONTONEVALUE;
-    }
-
-    // container.  No way to know for sure.
-    return true;
-}
-
-
-bool CTL_TwainAppMgr::GetBestCapDataType(const CTL_ITwainSource* pSource, TW_UINT16 nCap, UINT &nDataType)
-{
-    const auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
-    const auto pSession = pTempSource->GetTwainSession();
-
-    if ( SetDependentCaps( pSource, nCap ) )
-    {
-        CTL_CapabilityGetTriplet CapTester(pSession, pTempSource,
-                                            CTL_GetTypeGET,
-                                            static_cast<CTL_EnumCapability>(nCap), 0);
-        CapTester.SetTestMode(true);
-        const TW_UINT16 rc = CapTester.Execute();
-        if ( rc == TWRC_SUCCESS )
-        {
-            nDataType = CapTester.GetItemType();
-            return true;
-        }
-        else
-        {
-            StringStreamA strm;
-            strm << boost::format("Error: Source %1%: Data type for capability %2% was not retrieved\n") %
-                                  StringConversion::Convert_Native_To_Ansi(pSource->GetProductName()) % GetCapNameFromCap(nCap);
-            nDataType = static_cast<UINT>(DTWAIN_CAPDATATYPE_UNKNOWN);
-            LogWriterUtils::WriteLogInfoIndentedA(strm.str());
-        }
-    }
-    return false;
-}
-
 template <typename LayoutTriplet>
 static void GetLayoutComponents(LayoutTriplet* LayoutTrip, CTL_RealArray& rArray)
 {
@@ -720,11 +586,6 @@ bool CTL_TwainAppMgr::ShowUserInterface( CTL_ITwainSource *pSource, bool bTest, 
     }
 
     std::unique_ptr<CTL_TwainTriplet> pUITrip;
-/*    CTL_UserInterfaceUIOnlyTriplet UIOnly(pSession, pTempSource, pTempSource->GetTWUserInterface());
-    CTL_UserInterfaceEnableTriplet UIEnabled(pSession, pTempSource,
-                                                      pTempSource->GetTWUserInterface(),
-                                                      static_cast<TW_BOOL>(pTempSource->IsUIOpenOnAcquire()));
-                                                      */
     if ( bShowUIOnly )
         pUITrip = std::make_unique<CTL_DisplayUserInterfaceOnlyTriplet>(pSession, pTempSource, pTempSource->GetTWUserInterface());
     else
@@ -863,7 +724,7 @@ TW_UINT16 dynarithmic::CTL_TwainAppMgr::GetConditionCode( CTL_ITwainSession *pSe
                                              CTL_ITwainSource *pSource/*=nullptr*/,
                                              TW_UINT16 rc/*=1*/)
 {
-    if ( rc == DTWAIN_ERR_EXCEPTION_ERROR_ )
+    if ( rc == -DTWAIN_ERR_EXCEPTION_ERROR )
         return TWRC_FAILURE;
     CTL_ConditionCodeTriplet CC(pSession, pSource);
     if ( CC.Execute() == TWRC_SUCCESS )
@@ -2477,20 +2338,50 @@ CTL_StringType CTL_TwainAppMgr::GetLatestDSMVersion()
     return {};
 }
 
+template <typename ErrorCodeType>
+static int LoadSourceManagerImpl(boost::dll::shared_library& libloader, const CTL_StringType& fNameTotal)
+{
+    ErrorCodeType ec;
+    libloader.load(fNameTotal, ec, boost::dll::load_mode::search_system_folders);
+    return ec.value();
+}
+
 bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
 {
+    constexpr int boost_version_minor = (BOOST_VERSION / 100) % 1000;
+    constexpr int boost_version_major = BOOST_VERSION / 100000;
     if ( pszDLLName != nullptr && pszDLLName[0] )
     {
         // This is a custom path, so user knows what they're doing.
+ 
         m_strTwainDSMPath = pszDLLName;
         // Attempt to load TWAIN DLL
         boost::dll::shared_library libloader;
-        boost::system::error_code ec;
-        libloader.load(m_strTwainDSMPath, ec);
-        if ( ec != boost::system::errc::success)
+        int loadReturnCode = 0;
+        if constexpr (boost_version_major == 1 && boost_version_minor >= 88)
+        {
+            // Boost has changed return code status for version 1.88 and higher
+            loadReturnCode = LoadSourceManagerImpl<std::error_code>(libloader, m_strTwainDSMPath);
+        }
+        else
+        {
+            // Use boost 1.87 and below compatible code
+            loadReturnCode = LoadSourceManagerImpl<boost::system::error_code>(libloader, m_strTwainDSMPath);
+        }
+
+        if ( loadReturnCode != boost::system::errc::success)
         {
             const CTL_StringType dllName = _T(" : ") + m_strTwainDSMPath;
             DTWAIN_ERROR_CONDITION_EX(IDS_ErrTwainDLLNotFound, StringConversion::Convert_Native_To_Ansi(dllName), false, true)
+        }
+
+        // Attempt to load the DSM_Entry point
+        bool bLoadedDSM = LoadDSM();
+        if (!bLoadedDSM)
+        {
+            // This DLL cannot be used to communicate with TWAIN due to the lack of a DSM entry point
+            libloader.unload();
+            return false;
         }
         m_hLibModule = libloader;
     }
@@ -2517,8 +2408,11 @@ bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
         LogToDebugMonitor(strm.str());
         if (CTL_StaticData::GetLogFilterFlags() != 0)
             DTWAIN_LogMessageA(StringConversion::Convert_Native_To_Ansi(strm.str()).c_str());
+
+        // Load the entry point for these DLL's
+        LoadDSM();
     }
-    return LoadDSM();
+    return true;
 }
 
 bool CTL_TwainAppMgr::LoadDSM()
@@ -2703,7 +2597,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         if ( bTimeOutInEffect )
             KillTimer(nullptr, CTL_StaticData::GetTimeoutID());
         #endif
-        retcode = DTWAIN_ERR_EXCEPTION_ERROR_;
+        retcode = -DTWAIN_ERR_EXCEPTION_ERROR;
         if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_LOWLEVELTWAIN)
         {
             std::string sz;
@@ -2735,8 +2629,15 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         strm << fmt % s1.c_str() % retcode % sz % s;
         LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
     }
-    if ( retcode != TWRC_SUCCESS )
+    if (retcode != TWRC_SUCCESS)
         SetLastTwainError( retcode, TWRC_Error );
+    else
+    {
+        // Make sure we don't try to get condition codes on a successful
+        // closure of the DSM
+        if (nDG == DG_CONTROL && nDAT == DAT_PARENT && nMSG == MSG_CLOSEDSM)
+            raii.m_bRunConditionCode = false;
+    }
     return retcode;
 }
 

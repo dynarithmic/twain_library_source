@@ -25,26 +25,29 @@
 
 namespace dynarithmic
 {
-    template <typename Arr, typename Val>
-    static constexpr std::pair<bool, unsigned> generic_array_finder(const Arr& theArray, const Val& value)
-    {
-        for (auto iter = theArray.begin(); iter != theArray.end(); ++iter)
-        {
-            if (*iter == value)
-                return { true, static_cast<unsigned>(std::distance(theArray.begin(), iter)) };
-        }
-        return { false, 0 };
-    }
-
     template <typename Arr, typename Fn>
     static constexpr std::pair<bool, unsigned> generic_array_finder_if(const Arr& theArray, Fn fn)
     {
+        // C++ 20 has constexpr std::find_if
+        #if ((defined(_MSVC_LANG) && _MSVC_LANG >= 202002L ) || __cplusplus >= 202002L)
+        auto iter = std::find_if(theArray.begin(), theArray.end(), fn);
+        if (iter != theArray.end())
+            return { true, static_cast<unsigned>(std::distance(theArray.begin(), iter)) };
+        #else
         for (auto iter = theArray.begin(); iter != theArray.end(); ++iter)
         {
             if (fn(*iter))
                 return { true, static_cast<unsigned>(std::distance(theArray.begin(), iter)) };
         }
+        #endif
         return { false,0 };
     }
+
+    template <typename Arr, typename Val>
+    static constexpr std::pair<bool, unsigned> generic_array_finder(const Arr& theArray, const Val& value)
+    {
+        return generic_array_finder_if(theArray, [&](const Val& val) { return val == value; });
+    }
+
 }
 #endif

@@ -305,8 +305,16 @@ namespace dynarithmic
             template <typename container>
             typename container::iterator find(container& c, TW_FRAME& value, double)
             {
-                return std::find_if(c.begin(), c.end(), [&](const TW_FRAME& frm) 
-                    { return frm == value; });
+                return std::find_if(c.begin(), c.end(), [&](const TW_FRAME& frm)
+                    { return std::tie(frm.Left.Whole, frm.Left.Frac,
+                                      frm.Top.Whole, frm.Top.Frac,
+                                      frm.Right.Whole, frm.Right.Frac,
+                                      frm.Bottom.Whole, frm.Bottom.Frac) 
+                                    ==
+                              std::tie(value.Left.Whole, value.Left.Frac,
+                                       value.Top.Whole, value.Top.Frac,
+                                       value.Right.Whole, value.Right.Frac,
+                                       value.Bottom.Whole, value.Bottom.Frac); });
             }
         };
 

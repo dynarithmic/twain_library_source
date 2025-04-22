@@ -9,6 +9,7 @@
 #include "ctlobstr.h"
 #include "ctlloadresources.h"
 #include "ctlstringutils.h"
+#include "ctllogfunctioncall.h"
 
 namespace dynarithmic
 {
@@ -78,7 +79,7 @@ namespace dynarithmic
                     LogType(outStr, static_cast<const wchar_t*>(t));
                 else
                 if (t)
-                    strm << outStr << "0x" << std::hex << t;
+                    strm << outStr << "0x" << std::hex << StringConversion::Convert_WidePtr_To_Ansi(t).c_str();
                 else
                     strm << outStr << "=(null)";
             }
@@ -164,7 +165,12 @@ namespace dynarithmic
                 if (bIsNull)
                     strm << "(null)";
                 else
-                    strm << t;
+                {
+                    if constexpr (std::is_same_v<wchar_t*, T> || std::is_same_v<const wchar_t*, T>)
+                        strm << StringConversion::Convert_WidePtr_To_Ansi(t).c_str();
+                    else
+                        strm << t;
+                }
             }
             if (!m_bIsReturnValue)
             {
@@ -227,7 +233,12 @@ namespace dynarithmic
         void LogInputType(const std::string& outStr, T t, std::enable_if_t<std::is_pointer_v<T> >* = nullptr)
         {
             if (t)
-                strm << outStr << "=" << t;
+            {
+                if constexpr (std::is_same_v<wchar_t*, T> || std::is_same_v<const wchar_t*, T>)
+                    strm << StringConversion::Convert_WidePtr_To_Ansi(t).c_str();
+                else
+                    strm << outStr << "=" << t;
+            }
             else
                 strm << outStr << "=" << "(null)";
         }
@@ -265,6 +276,9 @@ namespace dynarithmic
                 if (bIsNull)
                     strm << "(null)";
                 else
+                if constexpr (std::is_same_v<wchar_t*, T> || std::is_same_v<const wchar_t*, T>)
+                    strm << StringConversion::Convert_WidePtr_To_Ansi(t).c_str();
+                else
                     strm << t;
             }
             if (!m_bIsReturnValue)
@@ -292,7 +306,7 @@ namespace dynarithmic
     std::string LogValue(const std::string& func, bool isIn, T retValue, P ...p)
     {
         std::string s;
-        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK)
+        if (GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK)
         {
             if (isIn)
                 s = CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_IN) + ParamOutputter2(false, std::forward<P>(p)...).getString();

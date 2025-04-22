@@ -32,6 +32,7 @@ namespace dynarithmic
 {
   class CTL_ITwainSession;
   class CTL_TwainDLLHandle;
+  class CTL_ITwainSource;
   using CTL_ITwainSessionPtr = std::unique_ptr<CTL_ITwainSession>;
   using CTL_TwainSourceSet = std::unordered_set<CTL_ITwainSource*>;
 

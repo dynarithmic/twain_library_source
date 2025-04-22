@@ -209,7 +209,7 @@ static std::vector<T> FileListToVector(SourceAcquireOptions& opts)
 static std::string GetDirectoryCreationError(const CTL_StringType& fileName)
 {
     return  GetResourceStringFromMap(IDS_LOGMSG_ERRORTEXT) + ": DTWAIN_AcquireFile: " +
-            GetResourceStringFromMap(DTWAIN_ERR_CREATE_DIRECTORY_) + ": " +
+            GetResourceStringFromMap(-DTWAIN_ERR_CREATE_DIRECTORY) + ": " +
             StringConversion::Convert_Native_To_Ansi(fileName);
 }
 
