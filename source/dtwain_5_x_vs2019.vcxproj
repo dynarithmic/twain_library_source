@@ -1480,12 +1480,14 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="cpp\pdflib32\md5class.h" />
     <ClInclude Include="cpp\pdflib32\pdfencrypt.h" />
     <ClInclude Include="cpp\pdflib32\pdflib32.h" />
+    <ClInclude Include="cximage\ximacfg.h" />
     <ClInclude Include="cximage\ximage.h" />
     <ClInclude Include="FreeImage\Source\FreeImage.h" />
     <ClInclude Include="FreeImage\Wrapper\FreeImagePlus\FreeImagePlus.h" />
     <ClInclude Include="h\ansiwideconverter_generic.h" />
     <ClInclude Include="h\ansiwideconverter_win32.h" />
     <ClInclude Include="h\arrayfactory.h" />
+    <ClInclude Include="h\capinfomap.h" />
     <ClInclude Include="h\ctlconstexprfind.h" />
     <ClInclude Include="h\ctlconstexprutils.h" />
     <ClInclude Include="h\ctldefsource.h" />
@@ -1493,6 +1495,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClInclude Include="h\ctlfilesave.h" />
     <ClInclude Include="h\ctlfileutils.h" />
     <ClInclude Include="h\ctlloadresources.h" />
+    <ClInclude Include="h\ctllogfunctioncall.h" />
     <ClInclude Include="h\ctlstringutils.h" />
     <ClInclude Include="h\ctlsupport.h" />
     <ClInclude Include="h\ctlthreadutils.h" />

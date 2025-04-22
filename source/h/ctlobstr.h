@@ -825,7 +825,7 @@ namespace dynarithmic
             HANDLE newHandle = GlobalAlloc(GHND, newString.size() * sizeof(StringTraits::char_type) + sizeof(StringTraits::char_type));
             if (newHandle)
             {
-                StringTraits::char_type* pData = (StringTraits::char_type*)GlobalLock(newHandle);
+                typename StringTraits::char_type* pData = (typename StringTraits::char_type*)GlobalLock(newHandle);
                 memset(pData, 0, GlobalSize(newHandle));
                 memcpy(pData, newString.data(), newString.size() * sizeof(StringTraits::char_type));
                 GlobalUnlock(newHandle);

@@ -183,7 +183,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDT
     CTL_IntArray vExtImageInfo;
     if (pSource->EnumExtImageInfo(vExtImageInfo))
     {
-        const size_t nCount = vExtImageInfo.size();
         DTWAIN_ARRAY ThisArray = CreateArrayFromContainer<std::vector<int>>(pHandle, vExtImageInfo);
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(ThisArray);
 

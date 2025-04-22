@@ -22,6 +22,11 @@
 #define CAPSTRUCT_H
 
 #include <boost/container/flat_map.hpp>
+#include "ctlenum.h"
+#include "twain.h"
+#include "winconst.h"
+#include "ctltmpl4.h"
+
 namespace dynarithmic
 {
     // Define the cap info structure used
@@ -42,5 +47,17 @@ namespace dynarithmic
     };
 
     typedef boost::container::flat_map<TW_UINT16, CTL_CapStruct> CTL_GeneralCapInfo;
+
+    typedef CTL_ClassValues10<CTL_EnumCapability,/* Capability*/
+        UINT, /* Container for Get */
+        UINT, /* Container for Set*/
+        UINT,  /* Data Type */
+        UINT,  /* Available cap support */
+        UINT,  /* Container for Get Current */
+        UINT,   /* Container for Get Default  */
+        UINT,  /* Container for Set Constraint */
+        UINT,  /* Container for Reset */
+        UINT                 /* Container for Query Support*/
+    > CTL_CapInfo;
 }
 #endif
