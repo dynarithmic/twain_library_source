@@ -139,6 +139,8 @@ namespace dynarithmic
         }
 
         static constexpr char_type GetSpace() { return ' ';}
+        static constexpr char_type GetLeftCurlyBrace() { return '{'; }
+        static constexpr char_type GetRightCurlyBrace() { return '}'; }
         static constexpr const char_type* GetSpaceString() { return " "; }
         static constexpr const char_type* GetEmptyString() { return ""; }
         static constexpr char_type GetZeroString() { return '\0'; }
@@ -273,6 +275,8 @@ namespace dynarithmic
         }
 
         static constexpr char_type GetSpace() { return L' ';}
+        static constexpr char_type GetLeftCurlyBrace() { return L'{'; }
+        static constexpr char_type GetRightCurlyBrace() { return L'}'; }
         static constexpr const char_type* GetSpaceString() { return L" "; }
         static constexpr const char_type* GetEmptyString() { return L""; }
         static constexpr char_type GetZeroString() { return L'\0'; }
@@ -860,12 +864,9 @@ namespace dynarithmic
         static StringType GetGUID()
         {
             const boost::uuids::uuid u = boost::uuids::random_generator()();
-            std::ostringstream strm;
-            strm << "{" + to_string(u) + "}";
-            StringType sTemp;
-            std::string sTempIn = strm.str();
-            std::copy(sTempIn.begin(), sTempIn.end(), std::back_inserter(sTemp));
-            return sTemp;
+            return StringTraits::GetLeftCurlyBrace() +
+                   StringTraits::ConvertToBoostUUIDString(u) +
+                   StringTraits::GetRightCurlyBrace();
         }
 
         static StringType GetModuleFileName(HMODULE hModule)
