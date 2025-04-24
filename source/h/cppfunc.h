@@ -24,6 +24,7 @@
 #include "dtwain_config.h"
 #include <funcmac.h>
 #include "logwriterutils.h"
+#include <boost/version.hpp>
 
  /* This indicates that the build requires Visual C++ runtime if set to 1*/
  /* Since there is no way to set the runtime to use at compile time, this */
@@ -36,6 +37,10 @@
     #ifdef _MSC_VER
         #pragma message ("Build requires external Visual C++ runtime")
     #endif
+#endif
+
+#ifdef _MSC_VER
+    #pragma message ("Building using Boost Library version " BOOST_LIB_VERSION)
 #endif
 
 #define LOG_INDENT_CONSOLE 0
