@@ -2167,10 +2167,9 @@ CTL_StringType dynarithmic::GetDTWAINDLLPath()
     auto& dllPath = CTL_StaticData::GetDLLPath();
     if ( !dllPath.empty())
         return dllPath;
-    TCHAR buffer[1024];
-    boost::winapi::GetModuleFileName(CTL_StaticData::GetDLLInstanceHandle(), buffer, 1024);
-    dllPath = buffer;
-    return buffer;
+    dllPath.resize(1024);
+    boost::winapi::GetModuleFileName(CTL_StaticData::GetDLLInstanceHandle(), dllPath.data(), 1024);
+    return dllPath;
 }
 
 CTL_StringType dynarithmic::GetVersionString()
@@ -2289,7 +2288,11 @@ bool GetDTWAINDLLVersionInfo(HMODULE hMod, LONG* lMajor, LONG* lMinor, LONG *pPa
 
 CTL_StringType GetDTWAINDLLVersionInfoStr()
 {
-    return StringConversion::Convert_AnsiPtr_To_Native(DTWAIN_VERINFO_FILEVERSION);
+    auto& versionString = CTL_StaticData::GetShortVersionString();
+    if (!versionString.empty())
+        return versionString;
+    versionString = StringConversion::Convert_AnsiPtr_To_Native(DTWAIN_VERINFO_FILEVERSION);
+    return versionString;
 }
 
 CTL_StringType GetDTWAINInternalBuildNumber()
@@ -2299,8 +2302,12 @@ CTL_StringType GetDTWAINInternalBuildNumber()
 
 CTL_StringType dynarithmic::GetDTWAININIPath()
 {
+    auto& iniPathCache = CTL_StaticData::GetINIPath();
+    if (!iniPathCache.empty())
+        return iniPathCache;
     CTL_StringType szName = DTWAIN_ININAME_NATIVE; 
-    return get_parent_directory(GetDTWAINDLLPath().c_str()) + szName;
+    iniPathCache = get_parent_directory(GetDTWAINDLLPath().c_str()) + szName;
+    return iniPathCache;
 }
 
 std::string dynarithmic::GetDTWAININIPathA()
