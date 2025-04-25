@@ -32,8 +32,7 @@ By default Visual Studio 2022 has Platform Toolset v143 installed.
 In addition, you will need 
 
 1) At least 20 GB of free disk space.
-2) An installation of the [Boost](http://www.boost.org/) library (version 1.80 or above, until version 1.87).  There is an issue using version 1.88 and above, which will be remedied in version 5.6.4 and above of the DTWAIN source code.
-I recommend getting the pre-built boost libraries found at [SourceForge](https://sourceforge.net/projects/boost/files/boost-binaries/).  When installed, you will get the boost **include** files, plus the library files.  Please download the version of boost that fits your compiler.  
+2) An installation of the [Boost](http://www.boost.org/) library (version 1.80 or above).  I recommend getting the pre-built Boost libraries found at [SourceForge](https://sourceforge.net/projects/boost/files/boost-binaries/).  When installed, you will get the boost **include** files, plus the library files.  Please download the version of boost that fits your compiler.  
 
 ```plaintext
 For Visual Studio 2019 or 2022 (using platform toolset v142) -- Download files with "14.2" in the file name.
