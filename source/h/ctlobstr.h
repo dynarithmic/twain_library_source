@@ -394,7 +394,6 @@ namespace dynarithmic
     #endif
     struct StringConversion
     {
-
         #ifdef UNICODE
         static std::wstring          Convert_Ansi_To_Native(const std::string& x) { return ANSIToWide(x); }
         static std::wstring          Convert_AnsiPtr_To_Native(const char *x) { return ANSIToWide(x?x:""); }
@@ -444,7 +443,6 @@ namespace dynarithmic
 
         static std::wstring   Convert_Native_To_Wide(const std::string& x, size_t len) { return ANSIToWide(x, len); }
         static std::wstring   Convert_NativePtr_To_Wide(const char* x, size_t len) { return ANSIToWide(x ? x : "", len); }
-
         #endif
         static std::string     Convert_Wide_To_Ansi(const std::wstring& x) { return WideToANSI(x); }
         static std::wstring    Convert_Ansi_To_Wide(const std::string& x) { return ANSIToWide(x); }
