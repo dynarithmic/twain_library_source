@@ -47,7 +47,7 @@ public:
 private:
     void Init(LPCWSTR psz, size_t len = (std::numeric_limits<size_t>::max)())
     {
-        if (psz == nullptr)
+        if (psz == nullptr || psz[0] == L'\0')
             return;
         size_t nLengthW;
         if (len == (std::numeric_limits<size_t>::max)())
@@ -93,7 +93,7 @@ public:
 private:
     void Init(LPCSTR psz, size_t len = (std::numeric_limits<size_t>::max)())
     {
-        if (psz == nullptr)
+        if (psz == nullptr || psz[0] == '\0')
             return;
         size_t nLengthA;
         if (len == (std::numeric_limits<size_t>::max)())
