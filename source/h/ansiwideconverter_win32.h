@@ -47,7 +47,7 @@ public:
 private:
     void Init(LPCWSTR psz, size_t len = (std::numeric_limits<size_t>::max)())
     {
-        if (psz == nullptr)
+        if (psz == nullptr || psz[0] == L'\0')
             return;
         size_t nLengthW;
         if (len == (std::numeric_limits<size_t>::max)())
@@ -55,20 +55,17 @@ private:
         else
             nLengthW = len;
         int nLengthA = static_cast<int>(nLengthW * 4);
-        std::vector<char> szBuffer(nLengthA);
-        bool bFailed = 0 == WideCharToMultiByte(nConvertCodePage, 0, psz, static_cast<int>(nLengthW), szBuffer.data(), nLengthA, nullptr, nullptr) ? true : false;
+        m_sz.resize(nLengthA);
+        bool bFailed = 0 == WideCharToMultiByte(nConvertCodePage, 0, psz, static_cast<int>(nLengthW), m_sz.data(), nLengthA, nullptr, nullptr) ? true : false;
         if (bFailed)
         {
             if (GetLastError() == ERROR_INSUFFICIENT_BUFFER)
             {
                 nLengthA = WideCharToMultiByte(nConvertCodePage, 0, psz, static_cast<int>(nLengthW), nullptr, 0, nullptr, nullptr);
-                szBuffer.resize(nLengthA);
-                bFailed = 0 == WideCharToMultiByte(nConvertCodePage, 0, psz, static_cast<int>(nLengthW), szBuffer.data(), nLengthA, nullptr, nullptr) ? true : false;
+                m_sz.resize(nLengthA);
+                bFailed = 0 == WideCharToMultiByte(nConvertCodePage, 0, psz, static_cast<int>(nLengthW), m_sz.data(), nLengthA, nullptr, nullptr) ? true : false;
             }
         }
-        if (bFailed)
-            return;
-        m_sz = std::string(szBuffer.data(), szBuffer.size());
     }
 };
 
@@ -96,7 +93,7 @@ public:
 private:
     void Init(LPCSTR psz, size_t len = (std::numeric_limits<size_t>::max)())
     {
-        if (psz == nullptr)
+        if (psz == nullptr || psz[0] == '\0')
             return;
         size_t nLengthA;
         if (len == (std::numeric_limits<size_t>::max)())
@@ -104,20 +101,17 @@ private:
         else
             nLengthA = len;
         int nLengthW = static_cast<int>(nLengthA);
-        std::vector<wchar_t> szBuffer(nLengthW);
-        bool bFailed = 0 == MultiByteToWideChar(nConvertCodePage, 0, psz, static_cast<int>(nLengthA), szBuffer.data(), nLengthW) ? true : false;
+        m_sz.resize(nLengthW);
+        bool bFailed = 0 == MultiByteToWideChar(nConvertCodePage, 0, psz, static_cast<int>(nLengthA), m_sz.data(), nLengthW) ? true : false;
         if (bFailed)
         {
             if (GetLastError() == ERROR_INSUFFICIENT_BUFFER)
             {
                 nLengthW = MultiByteToWideChar(nConvertCodePage, 0, psz, static_cast<int>(nLengthA), nullptr, 0);
-                szBuffer.resize(nLengthW);
-                bFailed = 0 == MultiByteToWideChar(nConvertCodePage, 0, psz, static_cast<int>(nLengthA), szBuffer.data(), nLengthW) ? true : false;
+                m_sz.resize(nLengthW);
+                bFailed = 0 == MultiByteToWideChar(nConvertCodePage, 0, psz, static_cast<int>(nLengthA), m_sz.data(), nLengthW) ? true : false;
             }
         }
-        if (bFailed)
-            return;
-        m_sz = std::wstring(szBuffer.data(), szBuffer.size());
     }
 };
 #endif // ANSIWIDECONVERTER_WIN32_H

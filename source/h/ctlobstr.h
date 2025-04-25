@@ -139,6 +139,8 @@ namespace dynarithmic
         }
 
         static constexpr char_type GetSpace() { return ' ';}
+        static constexpr char_type GetLeftCurlyBrace() { return '{'; }
+        static constexpr char_type GetRightCurlyBrace() { return '}'; }
         static constexpr const char_type* GetSpaceString() { return " "; }
         static constexpr const char_type* GetEmptyString() { return ""; }
         static constexpr char_type GetZeroString() { return '\0'; }
@@ -191,12 +193,45 @@ namespace dynarithmic
                     { return GetSystemDirectoryA(buffer, _MAX_PATH); }
         static DWORD GetModuleFileNameImpl(HMODULE hModule, char_type* lpFileName, DWORD nSize)
                     { return GetModuleFileNameA(hModule, lpFileName, nSize); }
+        static UINT GetWindowsDirectoryImpl(string_type& buffer)
+        {
+            buffer.resize(_MAX_PATH);
+            auto nSize = GetWindowsDirectoryA(&buffer[0], _MAX_PATH);
+            buffer.resize(nSize);
+            return nSize;
+        }
+        static UINT GetSystemDirectoryImpl(string_type& buffer)
+        {
+            buffer.resize(_MAX_PATH);
+            auto nSize = GetSystemDirectoryA(&buffer[0], _MAX_PATH);
+            buffer.resize(nSize);
+            return nSize;
+        }
+        static DWORD GetModuleFileNameImpl(HMODULE hModule, string_type& lpFileName, DWORD nSize)
+        {
+            lpFileName.resize(nSize);
+            auto actualSize = GetModuleFileNameA(hModule, &lpFileName[0], nSize);
+            if (actualSize < nSize)
+                lpFileName.resize(actualSize);
+            return actualSize;
+        }
         #else
         static UINT GetWindowsDirectoryImpl(char_type* buffer)
         { getcwd(buffer, 8096); return 1; }
         static UINT GetSystemDirectoryImpl(char_type* buffer)
         { getcwd(buffer, 8096); return 1; }
-
+        static UINT GetWindowsDirectoryImpl(string_type& buffer)
+        {
+            buffer.resize(8096);
+            getcwd(&buffer[0], 8096); 
+            return 1;
+        }
+        static UINT GetSystemDirectoryImpl(string_type& buffer)
+        {
+            buffer.resize(8096);
+            getcwd(&buffer[0], 8096);
+            return 1;
+        }
         static DWORD GetModuleFileNameImpl(HMODULE hModule, char_type* lpFileName, DWORD nSize)
         {
             return 0; // ::GetModuleFileNameA(hModule, lpFileName, nSize);
@@ -240,6 +275,8 @@ namespace dynarithmic
         }
 
         static constexpr char_type GetSpace() { return L' ';}
+        static constexpr char_type GetLeftCurlyBrace() { return L'{'; }
+        static constexpr char_type GetRightCurlyBrace() { return L'}'; }
         static constexpr const char_type* GetSpaceString() { return L" "; }
         static constexpr const char_type* GetEmptyString() { return L""; }
         static constexpr char_type GetZeroString() { return L'\0'; }
@@ -294,6 +331,31 @@ namespace dynarithmic
         { return GetSystemDirectoryW(buffer, _MAX_PATH); }
         static DWORD GetModuleFileNameImpl(HMODULE hModule, char_type* lpFileName, DWORD nSize)
         { return GetModuleFileNameW(hModule, lpFileName, nSize); }
+
+        static UINT GetWindowsDirectoryImpl(string_type& buffer)
+        {
+            buffer.resize(_MAX_PATH);
+            auto nSize = GetWindowsDirectoryW(&buffer[0], _MAX_PATH);
+            buffer.resize(nSize);
+            return nSize;
+        }
+
+        static UINT GetSystemDirectoryImpl(string_type& buffer)
+        {
+            buffer.resize(_MAX_PATH);
+            auto nSize = GetSystemDirectoryW(&buffer[0], _MAX_PATH);
+            buffer.resize(nSize);
+            return nSize;
+        }
+
+        static DWORD GetModuleFileNameImpl(HMODULE hModule, string_type& lpFileName, DWORD nSize)
+        {
+            lpFileName.resize(nSize);
+            auto actualSize = GetModuleFileNameW(hModule, &lpFileName[0], nSize);
+            if (actualSize < nSize)
+                lpFileName.resize(actualSize);
+            return actualSize;
+        }
         #else
         static UINT GetWindowsDirectoryImpl(char_type* buffer)
         {
@@ -305,6 +367,17 @@ namespace dynarithmic
         static UINT GetSystemDirectoryImpl(char_type* buffer)
         {
             return GetWindowsDirectoryImpl(buffer);
+        }
+
+        static UINT GetWindowsDirectoryImpl(string_type& buffer)
+        {
+            buffer.resize(8096);
+            return GetWindowsDirectoryImpl(&buffer[0]);
+        }
+        static UINT GetSystemDirectoryImpl(string_type& buffer)
+        {
+            buffer.resize(8096);
+            return GetSystemDirectoryImpl(&buffer[0]);
         }
 
         static DWORD GetModuleFileNameImpl(HMODULE hModule, char_type* lpFileName, DWORD nSize)
@@ -321,7 +394,6 @@ namespace dynarithmic
     #endif
     struct StringConversion
     {
-
         #ifdef UNICODE
         static std::wstring          Convert_Ansi_To_Native(const std::string& x) { return ANSIToWide(x); }
         static std::wstring          Convert_AnsiPtr_To_Native(const char *x) { return ANSIToWide(x?x:""); }
@@ -371,8 +443,7 @@ namespace dynarithmic
 
         static std::wstring   Convert_Native_To_Wide(const std::string& x, size_t len) { return ANSIToWide(x, len); }
         static std::wstring   Convert_NativePtr_To_Wide(const char* x, size_t len) { return ANSIToWide(x ? x : "", len); }
-
-#endif
+        #endif
         static std::string     Convert_Wide_To_Ansi(const std::wstring& x) { return WideToANSI(x); }
         static std::wstring    Convert_Ansi_To_Wide(const std::string& x) { return ANSIToWide(x); }
         static std::string     Convert_WidePtr_To_Ansi(const wchar_t *x) { return x ? WideToANSI(x) : ""; }
@@ -752,7 +823,7 @@ namespace dynarithmic
 
         static StringType GetWindowsDirectory()
         {
-            CharType buffer[_MAX_PATH] = {};
+            StringType buffer;
             const UINT retValue = StringTraits::GetWindowsDirectoryImpl(buffer);
             if ( retValue != 0 )
                 return buffer;
@@ -761,7 +832,7 @@ namespace dynarithmic
 
         static StringType GetSystemDirectory()
         {
-            CharType buffer[_MAX_PATH] = {};
+            StringType buffer;
             const UINT retValue = StringTraits::GetSystemDirectoryImpl(buffer);
             if ( retValue != 0 )
                 return buffer;
@@ -791,27 +862,24 @@ namespace dynarithmic
         static StringType GetGUID()
         {
             const boost::uuids::uuid u = boost::uuids::random_generator()();
-            std::ostringstream strm;
-            strm << "{" + to_string(u) + "}";
-            StringType sTemp;
-            std::string sTempIn = strm.str();
-            std::copy(sTempIn.begin(), sTempIn.end(), std::back_inserter(sTemp));
-            return sTemp;
+            return StringTraits::GetLeftCurlyBrace() +
+                   StringTraits::ConvertToBoostUUIDString(u) +
+                   StringTraits::GetRightCurlyBrace();
         }
 
         static StringType GetModuleFileName(HMODULE hModule)
         {
             // Try 1024 bytes for the app name
-            std::vector<CharType> szName(1024,0);
-            DWORD nBytes = StringTraits::GetModuleFileNameImpl(hModule, &szName[0], 1024);
+            StringType szName(1024,0);
+            DWORD nBytes = StringTraits::GetModuleFileNameImpl(hModule, szName, 1024);
 
             // Get the file name safely
-            if ( nBytes > 1024 )
+            if (nBytes > 1024)
             {
-                szName.resize(nBytes+1,0);
-                StringTraits::GetModuleFileNameImpl( hModule, &szName[0], nBytes );
+                szName.resize(nBytes + 1, 0);
+                StringTraits::GetModuleFileNameImpl(hModule, szName, nBytes);
             }
-            return &szName[0];
+            return szName;
         }
 
         static StringType ConvertToAPIString(const StringType& origString)
