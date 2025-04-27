@@ -113,7 +113,7 @@ static bool GetDTWAINDLLVersionInfo(HMODULE hMod, LONG* lMajor, LONG* lMinor, LO
 static CTL_StringType GetDTWAINDLLVersionInfoStr();
 static CTL_StringType GetDTWAINInternalBuildNumber();
 static DTWAIN_BOOL DTWAIN_GetVersionInternal(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatch);
-static std::string CheckSearchOrderString(std::string);
+static CTL_StringType CheckSearchOrderString(CTL_StringType);
 
 #ifdef DTWAIN_LIB
     static void GetVersionFromResource(LPLONG lMajor, LPLONG lMinor, LPLONG patch);
@@ -936,6 +936,16 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
                 FreeImage_Initialise(true);
 
                 WriteVersionToLog(pHandle);
+                // Store the user defined search order for the
+                // TWAIN datasource manager
+                auto& searchOrder = CTL_StaticData::GetStartupDSMSearchOrder();
+                auto& searchOrderDir = CTL_StaticData::GetStartupDSMSearchOrderDir();
+                if (!searchOrder.empty())
+                {
+                    pHandle->m_TwainDSMSearchOrderStr = searchOrder;
+                    pHandle->m_TwainDSMUserDirectory = searchOrderDir;
+                    pHandle->m_TwainDSMSearchOrder = -1;
+                }
                 pHandle->SetVersionString(GetVersionString());
             }
             LOG_FUNC_ENTRY_PARAMS(())
@@ -1950,12 +1960,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDSMSearchOrderEx(LPCTSTR SearchOrder, LPCTSTR
     }
     else
     {
-        const std::string strValidString = CheckSearchOrderString(StringConversion::Convert_NativePtr_To_Ansi(SearchOrder));
+        auto strValidString = CheckSearchOrderString(SearchOrder);
         if (!strValidString.empty())
         {
             pHandle->m_TwainDSMSearchOrderStr = strValidString;
             pHandle->m_TwainDSMUserDirectory = UserDirectory ? UserDirectory : StringWrapper::traits_type::GetEmptyString();
             pHandle->m_TwainDSMSearchOrder = -1;
+            CTL_StaticData::GetStartupDSMSearchOrder() =  SearchOrder;
+            CTL_StaticData::GetStartupDSMSearchOrderDir() = UserDirectory ? UserDirectory : _T("");
             LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
         }
     }
@@ -2348,12 +2360,12 @@ CTL_StringType dynarithmic::GetDTWAINTempFilePath(CTL_TwainDLLHandle* pHandle)
 }
 
 
-std::string CheckSearchOrderString(std::string str)
+CTL_StringType CheckSearchOrderString(CTL_StringType str)
 {
-    static std::set<char> setValidChars = {'C','W','O','U','S'};
-    std::string strOut;
-    StringWrapperA::MakeUpperCase(str);
-    std::copy_if(str.begin(), str.end(), std::back_inserter(strOut), [&](char ch) { return setValidChars.count(ch); });
+    static std::set<TCHAR> setValidChars = {_T('C'),_T('W'),_T('O'),_T('U'), _T('S')};
+    CTL_StringType strOut;
+    StringWrapper::MakeUpperCase(str);
+    std::copy_if(str.begin(), str.end(), std::back_inserter(strOut), [&](TCHAR ch) { return setValidChars.count(ch); });
     return strOut;
 }
 
