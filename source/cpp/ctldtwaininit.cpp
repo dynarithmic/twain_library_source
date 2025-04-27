@@ -1930,7 +1930,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDSMSearchOrder(LONG SearchOrder)
 LONG DLLENTRY_DEF DTWAIN_GetDSMSearchOrder(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
     const LONG SearchOrder = pHandle->m_TwainDSMSearchOrder;
     LOG_FUNC_EXIT_NONAME_PARAMS(SearchOrder)
     CATCH_BLOCK(0)
@@ -1938,15 +1938,26 @@ LONG DLLENTRY_DEF DTWAIN_GetDSMSearchOrder(VOID_PROTOTYPE)
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDSMSearchOrderEx(LPCTSTR SearchOrder, LPCTSTR UserDirectory)
 {
-    LOG_FUNC_ENTRY_PARAMS((SearchOrder))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const std::string strValidString = CheckSearchOrderString(StringConversion::Convert_NativePtr_To_Ansi(SearchOrder));
-    if ( !strValidString.empty() )
+    LOG_FUNC_ENTRY_PARAMS((SearchOrder, UserDirectory))
+    if (!SearchOrder)
+        LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
+    if (!pHandle)
     {
-        pHandle->m_TwainDSMSearchOrderStr = strValidString;
-        pHandle->m_TwainDSMUserDirectory = UserDirectory?UserDirectory:StringWrapper::traits_type::GetEmptyString();
-        pHandle->m_TwainDSMSearchOrder = -1;
+        CTL_StaticData::GetStartupDSMSearchOrder() = SearchOrder;
+        CTL_StaticData::GetStartupDSMSearchOrderDir() = UserDirectory ? UserDirectory : _T("");
         LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
+    }
+    else
+    {
+        const std::string strValidString = CheckSearchOrderString(StringConversion::Convert_NativePtr_To_Ansi(SearchOrder));
+        if (!strValidString.empty())
+        {
+            pHandle->m_TwainDSMSearchOrderStr = strValidString;
+            pHandle->m_TwainDSMUserDirectory = UserDirectory ? UserDirectory : StringWrapper::traits_type::GetEmptyString();
+            pHandle->m_TwainDSMSearchOrder = -1;
+            LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
+        }
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
     CATCH_BLOCK(false)
