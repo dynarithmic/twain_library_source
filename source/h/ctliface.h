@@ -567,6 +567,8 @@ namespace dynarithmic
         CTL_StringType           s_DLLPath;
         CTL_StringType           s_sINIPath;
         CTL_StringType           s_ShortVersionString;
+        CTL_StringType           s_StartupDSMSearchOrder;
+        CTL_StringType           s_StartupDSMSearchOrderDir;
         CTL_LongToStringMap      s_ErrorCodes;
         CTL_StringType           s_VersionString;
         CTL_ErrorToExtraInfoMap  s_mapExtraErrorInfo;
@@ -652,6 +654,8 @@ namespace dynarithmic
         static CTL_StringType& GetDLLPath() { return s_StaticData.s_DLLPath; }
         static CTL_StringType& GetINIPath() { return s_StaticData.s_sINIPath; }
         static CTL_StringType& GetShortVersionString() { return s_StaticData.s_ShortVersionString; }
+        static CTL_StringType& GetStartupDSMSearchOrder() { return s_StaticData.s_StartupDSMSearchOrder; }
+        static CTL_StringType& GetStartupDSMSearchOrderDir() { return s_StaticData.s_StartupDSMSearchOrderDir; }
         static bool IsUsingMultipleThreads() { return s_StaticData.s_multipleThreads; }
         static void SetUseMultipleThreads(bool bSet) { s_StaticData.s_multipleThreads = bSet; }
         static CTL_LongToStringMap& GetErrorCodes() { return s_StaticData.s_ErrorCodes; }

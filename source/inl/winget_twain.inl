@@ -129,9 +129,18 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
     dirNames[SysDirPos] = StringWrapper::GetSystemDirectory();
     dirNames[SysPathPos] = {};
 	dirNames[CurDirPos] = StringWrapper::SplitPath(dllPath)[StringWrapper::DIRECTORY_POS];
-    dirNames[UserDefPos] = StringWrapper::SplitPath(pHandle->m_TwainDSMUserDirectory)[StringWrapper::DIRECTORY_POS];
+    auto& startupSearchOrder = CTL_StaticData::GetStartupDSMSearchOrder();
+    auto& startupSearchOrderDir = CTL_StaticData::GetStartupDSMSearchOrderDir();
+    CTL_StringType pDirToUse = pHandle->m_TwainDSMUserDirectory;
+    std::string pSearchOrderToUse = pHandle->m_TwainDSMSearchOrderStr;
+    if (!startupSearchOrder.empty())
+    {
+        pSearchOrderToUse = StringConversion::Convert_Native_To_Ansi(startupSearchOrder);
+        pDirToUse = startupSearchOrderDir;
+    }
+    dirNames[UserDefPos] = StringWrapper::SplitPath(pDirToUse)[StringWrapper::DIRECTORY_POS];
 
-    const std::string curSearchOrder = pHandle->m_TwainDSMSearchOrderStr;
+    const std::string curSearchOrder = pSearchOrderToUse;
     CTL_StringType fNameTotal;
     const int minSize = static_cast<int>((std::min)(dirNames.size(), curSearchOrder.size()));
 	for (int i = 0; i < minSize; ++i)
