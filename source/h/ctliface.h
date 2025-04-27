@@ -567,7 +567,7 @@ namespace dynarithmic
         CTL_StringType           s_DLLPath;
         CTL_StringType           s_sINIPath;
         CTL_StringType           s_ShortVersionString;
-        CTL_StringType           s_StartupDSMSearchOrder;
+        CTL_StringType           s_StartupDSMSearchOrder = _T("CWSOU");
         CTL_StringType           s_StartupDSMSearchOrderDir;
         CTL_LongToStringMap      s_ErrorCodes;
         CTL_StringType           s_VersionString;
@@ -619,6 +619,8 @@ namespace dynarithmic
             CTL_StaticDataStruct tempStruct; 
             tempStruct.s_DLLPath = s_StaticData.s_DLLPath;
             tempStruct.s_DLLInstance = s_StaticData.s_DLLInstance;
+            tempStruct.s_StartupDSMSearchOrder = s_StaticData.s_StartupDSMSearchOrder;
+            tempStruct.s_StartupDSMSearchOrderDir = s_StaticData.s_StartupDSMSearchOrderDir;
             s_StaticData = tempStruct;
         }
         static long& GetLogFilterFlags() { return s_StaticData.s_logFilterFlags; }
@@ -816,7 +818,7 @@ namespace dynarithmic
             DTWAIN_DIBUPDATE_PROC           m_pDibUpdateProc = nullptr;
             std::unordered_set<DTWAIN_SOURCE> m_aFeederSources;
             int                             m_TwainDSMSearchOrder = DTWAIN_TWAINDSMSEARCH_WSO;
-            std::string                     m_TwainDSMSearchOrderStr = "CWSOU";
+            CTL_StringType                  m_TwainDSMSearchOrderStr = _T("CWSOU");
             CTL_StringType                  m_TwainDSMUserDirectory;
             CTL_StringType                  m_strSessionDetails;
             CTL_StringType                  m_strSourceDetails;
