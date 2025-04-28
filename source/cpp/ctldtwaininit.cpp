@@ -2121,21 +2121,7 @@ LONG DLLENTRY_DEF DTWAIN_GetVersionCopyright(LPTSTR lpszVer, LONG nLength)
 LONG DLLENTRY_DEF DTWAIN_GetTwainStringName(LONG category, LONG TwainID, LPTSTR lpszBuffer, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((category, TwainID, lpszBuffer, nMaxLen))
-    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    std::string sValue;
-    switch (category)
-    {
-        case DTWAIN_DGNAME:
-            sValue = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DG, TwainID).second;
-        break;
-        case DTWAIN_DATNAME:
-            sValue = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DAT, TwainID).second;
-        break;
-        case DTWAIN_MSGNAME:
-            sValue = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_MSG, TwainID).second;
-        break;
-    }
-    const LONG RetVal = StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sValue), lpszBuffer, nMaxLen);
+    const LONG RetVal = DTWAIN_GetTwainNameFromConstant(category, TwainID, lpszBuffer, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszBuffer))
     LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
     CATCH_BLOCK(-1)
