@@ -135,6 +135,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFPageSizeString(DTWAIN_SOURCE Source, LONG 
                                                      LPCTSTR CustomWidth, LPCTSTR CustomHeight)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PageSize, CustomWidth, CustomHeight))
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !CustomWidth || !CustomHeight; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     const DTWAIN_BOOL bRet = SetPDFStringFunc(Source, PageSize, CustomWidth, CustomHeight, &DTWAIN_SetPDFPageSize);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -144,6 +146,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFPageScaleString(DTWAIN_SOURCE Source, LONG
                                                       LPCTSTR xScale, LPCTSTR yScale)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nOptions,xScale, yScale))
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !xScale|| !yScale; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     const DTWAIN_BOOL bRet = SetPDFStringFunc(Source, nOptions, xScale, yScale, &DTWAIN_SetPDFPageScale);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -505,6 +509,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementString(DTWAIN_PDFTEXTELEMENT Te
 {
     LOG_FUNC_ENTRY_PARAMS((TextElement, val1, Flags))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !val1; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     LONG ConditionCode;
     const auto it = CheckPDFTextElement(TextElement, ConditionCode);
     if ( !it.first )
