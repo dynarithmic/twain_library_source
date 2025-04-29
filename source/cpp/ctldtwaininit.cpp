@@ -462,6 +462,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesEx(LPCTSTR sLangDLL, DT
 {
     LOG_FUNC_ENTRY_PARAMS((sLangDLL, bClear))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !sLangDLL; }, DTWAIN_ERR_BLANKNAMEDETECTED, false, FUNC_MACRO);
     bool bRet = GenericResourceLoader(pHandle, sLangDLL, bClear);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !bRet; }, DTWAIN_ERR_FILEOPEN, false, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
