@@ -40,6 +40,7 @@
 #include <iomanip>
 #include <locale>
 #include <iostream>
+#include <cctype>
 #include <boost/lexical_cast.hpp>
 #include <dtwain_filesystem.h>
 #include "dtwain_standard_defs.h"
@@ -163,6 +164,11 @@ namespace dynarithmic
         static char_type* CopyN(char_type* dest, const char_type* src, size_t count) { return std::char_traits<char_type>::copy(dest, src, count); }
         static int Compare(const char_type* dest, const char_type* src, size_t count) { return std::char_traits<char_type>::compare(dest, src, count); }
         static int Compare(const char_type* dest, const char_type* src) { return std::char_traits<char_type>::compare(dest, src, (std::min)(Length(dest), Length(src))); }
+
+        static bool IsAllSpace(const char_type* src)
+        {
+            return std::all_of(src, src + Length(src), [](char ch) { return std::isspace(static_cast<unsigned char>(ch)); });
+        }
 
         static const char_type* ConvertToOther(wchar_t* dest, const char_type* src)
         {
@@ -297,6 +303,11 @@ namespace dynarithmic
         static size_t Length(const char_type* s) { return std::char_traits<char_type>::length(s); }
         static int Compare(const char_type* dest, const char_type* src, size_t count) { return std::char_traits<char_type>::compare(dest, src, count); }
         static int Compare(const char_type* dest, const char_type* src) { return std::char_traits<char_type>::compare(dest, src, (std::min)(Length(dest), Length(src))); }
+
+        static bool IsAllSpace(const char_type* src)
+        {
+            return std::all_of(src, src + Length(src), [](wint_t ch) { return std::iswspace(static_cast<wint_t>(ch)); });
+        }
 
         static const char_type* ConvertToOther(char* dest, const char_type* src)
         {
@@ -556,6 +567,11 @@ namespace dynarithmic
         static bool IsEmpty(const StringType& str)
         {
             return str.empty();
+        }
+
+        static bool IsAllSpace(const StringType& str)
+        {
+            return StringTraits::IsAllSpace(str.c_str());
         }
 
         static void Empty(StringType &str )

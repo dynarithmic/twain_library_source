@@ -85,21 +85,16 @@
 
     #define LOG_FUNC_ENTRY_PARAMS_ISTWAINMSG(argVals) \
         TRY_BLOCK \
-        if ((CTL_StaticData::GetLogFilterFlags() & (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG)) == \
-                (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG)) \
-        LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_IN) + ParamOutputter((#argVals)).outputParam argVals.getString());
+        LogWriterUtils::WriteLogInfoExA(DTWAIN_LOG_ISTWAINMSG, CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_IN) + ParamOutputter((#argVals)).outputParam argVals.getString());
 
     #define LOG_FUNC_EXIT_PARAMS_ISTWAINMSG(x) { \
-        if ((CTL_StaticData::GetLogFilterFlags() & (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG)) == \
-                (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG)) \
-        LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO, LOG_INDENT_OUT) + ParamOutputter((""), true).outputParam(x).getString()); \
+        LogWriterUtils::WriteLogInfoExA(DTWAIN_LOG_ISTWAINMSG, CTL_LogFunctionCallA(FUNC_MACRO, LOG_INDENT_OUT) + ParamOutputter((""), true).outputParam(x).getString()); \
         return(x); \
             }
 
     #define LOG_FUNC_ENTRY_PARAMS(argVals) \
         TRY_BLOCK \
-        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) \
-        LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_IN) + ParamOutputter((#argVals)).outputParam argVals.getString());
+        LogWriterUtils::WriteLogInfoExA(DTWAIN_LOG_CALLSTACK, CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_IN) + ParamOutputter((#argVals)).outputParam argVals.getString());
 
     #define LOG_FUNC_ENTRY_NONAME_PARAMS(...) \
         TRY_BLOCK LogValue(FUNC_MACRO, true, int(0), __VA_ARGS__);
@@ -109,11 +104,8 @@
         #pragma message ("Building DTWAIN with logging pointer dereferencing on return")
     #endif
         #define LOG_FUNC_EXIT_DEREFERENCE_POINTERS(argVals) \
-            if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) \
-            { \
-                LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_USELAST) + \
-                            ParamOutputter((#argVals)).setOutputAsString(true).outputParam argVals.getString());\
-            }
+                LogWriterUtils::WriteLogInfoExA(DTWAIN_LOG_CALLSTACK, CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_USELAST) + \
+                            ParamOutputter((#argVals)).setOutputAsString(true).outputParam argVals.getString());
     #else
         #ifdef _MSC_VER
             #pragma message ("Building DTWAIN with no logging pointer dereferencing on return")
@@ -124,14 +116,12 @@
     #define LOG_FUNC_EXIT_NONAME_PARAMS(x) { LogValue(FUNC_MACRO, false, x); return(x); }
 
     #define LOG_FUNC_EXIT_PARAMS(x) { \
-        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) \
-        LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO, LOG_INDENT_OUT) + ParamOutputter((""), true).outputParam(x).getString()); \
+        LogWriterUtils::WriteLogInfoExA(DTWAIN_LOG_CALLSTACK, CTL_LogFunctionCallA(FUNC_MACRO, LOG_INDENT_OUT) + ParamOutputter((""), true).outputParam(x).getString()); \
         return(x); \
             }
 
     #define LOG_FUNC_VALUES_EX(argvals) { \
-        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) \
-        LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA((""),LOG_INDENT_IN) + ParamOutputter((#argvals)).outputParam argvals.getString()); \
+        LogWriterUtils::WriteLogInfoExA(DTWAIN_LOG_CALLSTACK, CTL_LogFunctionCallA((""),LOG_INDENT_IN) + ParamOutputter((#argvals)).outputParam argvals.getString()); \
     }
 
     #define CATCH_BLOCK_END }
