@@ -12,8 +12,8 @@
     distributed under the License is distributed on an "AS IS" BASIS,
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
-    limitations under the License. 
-    
+    limitations under the License.
+
     FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
@@ -22,49 +22,49 @@
 #define WINGET_TWAIN_INL
 #ifdef _WIN32
 static CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwainDLLName,
-									bool bLeaveLoaded = false,
-									boost::dll::shared_library *pModule = nullptr);
+    bool bLeaveLoaded = false,
+    boost::dll::shared_library* pModule = nullptr);
 
-CTL_StringType GetTwainDirFullName(LPCTSTR strTwainDLLName, 
-                                    LPLONG pWhichSearch, 
-                                    bool bLeaveLoaded = false, 
-                                    boost::dll::shared_library *pModule = nullptr)
+CTL_StringType GetTwainDirFullName(LPCTSTR strTwainDLLName,
+    LPLONG pWhichSearch,
+    bool bLeaveLoaded = false,
+    boost::dll::shared_library* pModule = nullptr)
 {
     auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    static constexpr std::array<std::pair<LONG, const char*>, 15> searchOrderMap = { {
-		{DTWAIN_TWAINDSMSEARCH_WSO,"WSO"},
-		{ DTWAIN_TWAINDSMSEARCH_WOS,"WOS" },
-		{ DTWAIN_TWAINDSMSEARCH_SWO,"SWO" },
-        { DTWAIN_TWAINDSMSEARCH_SOW,"SOW" },
-        { DTWAIN_TWAINDSMSEARCH_OWS,"OWS" },
-        { DTWAIN_TWAINDSMSEARCH_OSW,"OSW" },
-        { DTWAIN_TWAINDSMSEARCH_W,"W" },
-		{ DTWAIN_TWAINDSMSEARCH_S,"S" },
-		{ DTWAIN_TWAINDSMSEARCH_O,"O" },
-		{ DTWAIN_TWAINDSMSEARCH_WS,"WS" },
-		{ DTWAIN_TWAINDSMSEARCH_WO,"WO" },
-		{ DTWAIN_TWAINDSMSEARCH_SW,"SW" },
-		{ DTWAIN_TWAINDSMSEARCH_SO,"SO" },
-		{ DTWAIN_TWAINDSMSEARCH_OW,"OW" },
-        { DTWAIN_TWAINDSMSEARCH_OS,"OS" } } };
+    static constexpr std::array<std::pair<LONG, TCHAR*>, 15> searchOrderMap = { {
+        {DTWAIN_TWAINDSMSEARCH_WSO, _T("WSO")},
+        { DTWAIN_TWAINDSMSEARCH_WOS,_T("WOS") },
+        { DTWAIN_TWAINDSMSEARCH_SWO,_T("SWO") },
+        { DTWAIN_TWAINDSMSEARCH_SOW,_T("SOW") },
+        { DTWAIN_TWAINDSMSEARCH_OWS,_T("OWS") },
+        { DTWAIN_TWAINDSMSEARCH_OSW,_T("OSW") },
+        { DTWAIN_TWAINDSMSEARCH_W,_T("W") },
+        { DTWAIN_TWAINDSMSEARCH_S,_T("S") },
+        { DTWAIN_TWAINDSMSEARCH_O,_T("O") },
+        { DTWAIN_TWAINDSMSEARCH_WS,_T("WS") },
+        { DTWAIN_TWAINDSMSEARCH_WO,_T("WO") },
+        { DTWAIN_TWAINDSMSEARCH_SW,_T("SW") },
+        { DTWAIN_TWAINDSMSEARCH_SO,_T("SO") },
+        { DTWAIN_TWAINDSMSEARCH_OW,_T("OW") },
+        { DTWAIN_TWAINDSMSEARCH_OS,_T("OS") } } };
 
     auto iter = dynarithmic::generic_array_finder_if(searchOrderMap, [&](const auto& pr) { return pr.first == pHandle->m_TwainDSMSearchOrder; });
-	if (iter.first)
-	{
-        pHandle->m_TwainDSMSearchOrderStr = searchOrderMap[iter.second].second + std::string("CU");
+    if (iter.first)
+    {
+        pHandle->m_TwainDSMSearchOrderStr = searchOrderMap[iter.second].second + CTL_StringType(_T("C"));
         return GetTwainDirFullNameEx(pHandle, strTwainDLLName, bLeaveLoaded, pModule);
-	}
+    }
     // This will completely use the Ex version of finding the directory
     return GetTwainDirFullNameEx(pHandle, strTwainDLLName, bLeaveLoaded, pModule);
 }
 
-enum { dll_already_loaded, dll_loaded, dll_notfound};
+enum { dll_already_loaded, dll_loaded, dll_notfound };
 
 template <typename ErrorCodeType>
 static std::pair<int, int> LoadTwainDLL(boost::dll::shared_library& libloader, const CTL_StringType& fNameTotal)
 {
     ErrorCodeType ec;
-    HMODULE hMod = ::GetModuleHandle(fNameTotal.c_str()); 
+    HMODULE hMod = ::GetModuleHandle(fNameTotal.c_str());
     if (hMod)
         return { dll_already_loaded, boost::system::errc::success };
     libloader.load(fNameTotal, ec, boost::dll::load_mode::search_system_folders);
@@ -74,7 +74,7 @@ static std::pair<int, int> LoadTwainDLL(boost::dll::shared_library& libloader, c
     return { dll_loaded, val };
 }
 
-CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwainDLLName, bool bLeaveLoaded, boost::dll::shared_library *pModule)
+CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwainDLLName, bool bLeaveLoaded, boost::dll::shared_library* pModule)
 {
     struct libLoadRAII
     {
@@ -91,7 +91,8 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
                     m_pSharedLibrary->unload();
             }
             catch (...)
-            {}
+            {
+            }
         }
     };
 
@@ -111,12 +112,12 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
     // if TWAIN isn't found there, check system directory.
     // if not there, then use the Windows path search logic
     std::set<CTL_StringType> strSet;
-    static constexpr std::array<std::pair<StringWrapperA::traits_type::char_type, int>, 5> searchMap = { {
-		{'C',CurDirPos},
-		{'W',WinDirPos},
-		{'S',SysDirPos},
-		{'O',SysPathPos},
-        {'U',UserDefPos },
+    static constexpr std::array<std::pair<StringWrapper::traits_type::char_type, int>, 5> searchMap = { {
+        {_T('C'),CurDirPos},
+        {_T('W'),WinDirPos},
+        {_T('S'),SysDirPos},
+        {_T('O'),SysPathPos},
+        {_T('U'),UserDefPos },
      } };
 
     std::vector<CTL_StringType> dirNames(searchMap.size());
@@ -128,13 +129,39 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
     dirNames[WinDirPos] = StringWrapper::GetWindowsDirectory();
     dirNames[SysDirPos] = StringWrapper::GetSystemDirectory();
     dirNames[SysPathPos] = {};
-	dirNames[CurDirPos] = StringWrapper::SplitPath(dllPath)[StringWrapper::DIRECTORY_POS];
-    dirNames[UserDefPos] = StringWrapper::SplitPath(pHandle->m_TwainDSMUserDirectory)[StringWrapper::DIRECTORY_POS];
+    dirNames[CurDirPos] = StringWrapper::SplitPath(dllPath)[StringWrapper::DIRECTORY_POS];
+    auto& startupSearchOrder = CTL_StaticData::GetStartupDSMSearchOrder();
+    auto& startupSearchOrderDir = CTL_StaticData::GetStartupDSMSearchOrderDir();
+    CTL_StringType dirToUse = pHandle->m_TwainDSMUserDirectory;
+    CTL_StringType searchOrderToUse = pHandle->m_TwainDSMSearchOrderStr;
+    if (!startupSearchOrder.empty())
+    {
+        searchOrderToUse = startupSearchOrder;
+        dirToUse = startupSearchOrderDir;
+    }
+    dirNames[UserDefPos] = StringWrapper::SplitPath(dirToUse)[StringWrapper::DIRECTORY_POS];
 
-    const std::string curSearchOrder = pHandle->m_TwainDSMSearchOrderStr;
+    struct SetErrorModeRAII
+    {
+        UINT m_OldError;
+        SetErrorModeRAII()
+        {
+#ifdef _WIN32
+            m_OldError = SetErrorMode(SEM_NOOPENFILEERRORBOX);
+#endif
+        }
+        ~SetErrorModeRAII()
+        {
+#ifdef _WIN32
+            SetErrorMode(m_OldError);
+#endif
+        }
+    };
+
+    const CTL_StringType curSearchOrder = searchOrderToUse;
     CTL_StringType fNameTotal;
     const int minSize = static_cast<int>((std::min)(dirNames.size(), curSearchOrder.size()));
-	for (int i = 0; i < minSize; ++i)
+    for (int i = 0; i < minSize; ++i)
     {
         // skip this search if -1 is given
         auto curOrder = dynarithmic::generic_array_finder_if(searchMap, [&](const auto& pr) { return pr.first == curSearchOrder[i]; });
@@ -154,12 +181,14 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
             fNameTotal = StringWrapper::AddBackslashToDirectory(dirNameToUse) + fName;
         else
             fNameTotal = fName;
-        #ifdef _WIN32
-        const UINT nOldError = SetErrorMode(SEM_NOOPENFILEERRORBOX);
-        #endif
 
-        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS )
-        { 
+        // Set the DLL load error code, and ensure that the error mode
+        // is set back to its original state when done searching for 
+        // the TWAIN DSM.
+        SetErrorModeRAII errMode;
+
+        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
+        {
             CTL_StringType msg = _T("Testing TWAIN availability for file \"") + fNameTotal + _T("\" ...");
             LogWriterUtils::WriteLogInfo(msg);
         }
@@ -168,7 +197,7 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
 
         std::pair<int, int> loadReturnCode;
 
-        if constexpr(boost_version_major == 1 && boost_version_minor >= 88)
+        if constexpr (boost_version_major == 1 && boost_version_minor >= 88)
         {
             // Boost has changed return code status for version 1.88 and higher
             loadReturnCode = LoadTwainDLL<std::error_code>(libloader, fNameTotal);
@@ -178,10 +207,6 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
             // Use boost 1.87 and below compatible code
             loadReturnCode = LoadTwainDLL<boost::system::error_code>(libloader, fNameTotal);
         }
-
-        #ifdef _WIN32
-        SetErrorMode(nOldError);
-        #endif
 
         if (loadReturnCode.second != boost::system::errc::success)
         {
@@ -201,7 +226,7 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
 
         // Try to load the source manager
         DSMENTRYPROC lpDSMEntry = nullptr;
-        try 
+        try
         {
             if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
             {

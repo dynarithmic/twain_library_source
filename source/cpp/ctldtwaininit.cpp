@@ -113,7 +113,7 @@ static bool GetDTWAINDLLVersionInfo(HMODULE hMod, LONG* lMajor, LONG* lMinor, LO
 static CTL_StringType GetDTWAINDLLVersionInfoStr();
 static CTL_StringType GetDTWAINInternalBuildNumber();
 static DTWAIN_BOOL DTWAIN_GetVersionInternal(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatch);
-static std::string CheckSearchOrderString(std::string);
+static CTL_StringType CheckSearchOrderString(CTL_StringType);
 
 #ifdef DTWAIN_LIB
     static void GetVersionFromResource(LPLONG lMajor, LPLONG lMinor, LPLONG patch);
@@ -462,6 +462,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesEx(LPCTSTR sLangDLL, DT
 {
     LOG_FUNC_ENTRY_PARAMS((sLangDLL, bClear))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !sLangDLL; }, DTWAIN_ERR_BLANKNAMEDETECTED, false, FUNC_MACRO);
     bool bRet = GenericResourceLoader(pHandle, sLangDLL, bClear);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !bRet; }, DTWAIN_ERR_FILEOPEN, false, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
@@ -936,6 +937,16 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
                 FreeImage_Initialise(true);
 
                 WriteVersionToLog(pHandle);
+                // Store the user defined search order for the
+                // TWAIN datasource manager
+                auto& searchOrder = CTL_StaticData::GetStartupDSMSearchOrder();
+                auto& searchOrderDir = CTL_StaticData::GetStartupDSMSearchOrderDir();
+                if (!searchOrder.empty())
+                {
+                    pHandle->m_TwainDSMSearchOrderStr = searchOrder;
+                    pHandle->m_TwainDSMUserDirectory = searchOrderDir;
+                    pHandle->m_TwainDSMSearchOrder = -1;
+                }
                 pHandle->SetVersionString(GetVersionString());
             }
             LOG_FUNC_ENTRY_PARAMS(())
@@ -1930,7 +1941,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDSMSearchOrder(LONG SearchOrder)
 LONG DLLENTRY_DEF DTWAIN_GetDSMSearchOrder(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
     const LONG SearchOrder = pHandle->m_TwainDSMSearchOrder;
     LOG_FUNC_EXIT_NONAME_PARAMS(SearchOrder)
     CATCH_BLOCK(0)
@@ -1938,15 +1949,28 @@ LONG DLLENTRY_DEF DTWAIN_GetDSMSearchOrder(VOID_PROTOTYPE)
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDSMSearchOrderEx(LPCTSTR SearchOrder, LPCTSTR UserDirectory)
 {
-    LOG_FUNC_ENTRY_PARAMS((SearchOrder))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const std::string strValidString = CheckSearchOrderString(StringConversion::Convert_NativePtr_To_Ansi(SearchOrder));
-    if ( !strValidString.empty() )
+    LOG_FUNC_ENTRY_PARAMS((SearchOrder, UserDirectory))
+    if (!SearchOrder)
+        LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
+    if (!pHandle)
     {
-        pHandle->m_TwainDSMSearchOrderStr = strValidString;
-        pHandle->m_TwainDSMUserDirectory = UserDirectory?UserDirectory:StringWrapper::traits_type::GetEmptyString();
-        pHandle->m_TwainDSMSearchOrder = -1;
+        CTL_StaticData::GetStartupDSMSearchOrder() = SearchOrder;
+        CTL_StaticData::GetStartupDSMSearchOrderDir() = UserDirectory ? UserDirectory : _T("");
         LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
+    }
+    else
+    {
+        auto strValidString = CheckSearchOrderString(SearchOrder);
+        if (!strValidString.empty())
+        {
+            pHandle->m_TwainDSMSearchOrderStr = strValidString;
+            pHandle->m_TwainDSMUserDirectory = UserDirectory ? UserDirectory : StringWrapper::traits_type::GetEmptyString();
+            pHandle->m_TwainDSMSearchOrder = -1;
+            CTL_StaticData::GetStartupDSMSearchOrder() =  SearchOrder;
+            CTL_StaticData::GetStartupDSMSearchOrderDir() = UserDirectory ? UserDirectory : _T("");
+            LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
+        }
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
     CATCH_BLOCK(false)
@@ -2098,21 +2122,7 @@ LONG DLLENTRY_DEF DTWAIN_GetVersionCopyright(LPTSTR lpszVer, LONG nLength)
 LONG DLLENTRY_DEF DTWAIN_GetTwainStringName(LONG category, LONG TwainID, LPTSTR lpszBuffer, LONG nMaxLen)
 {
     LOG_FUNC_ENTRY_PARAMS((category, TwainID, lpszBuffer, nMaxLen))
-    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    std::string sValue;
-    switch (category)
-    {
-        case DTWAIN_DGNAME:
-            sValue = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DG, TwainID).second;
-        break;
-        case DTWAIN_DATNAME:
-            sValue = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_DAT, TwainID).second;
-        break;
-        case DTWAIN_MSGNAME:
-            sValue = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_MSG, TwainID).second;
-        break;
-    }
-    const LONG RetVal = StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sValue), lpszBuffer, nMaxLen);
+    const LONG RetVal = DTWAIN_GetTwainNameFromConstant(category, TwainID, lpszBuffer, nMaxLen);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszBuffer))
     LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
     CATCH_BLOCK(-1)
@@ -2337,12 +2347,12 @@ CTL_StringType dynarithmic::GetDTWAINTempFilePath(CTL_TwainDLLHandle* pHandle)
 }
 
 
-std::string CheckSearchOrderString(std::string str)
+CTL_StringType CheckSearchOrderString(CTL_StringType str)
 {
-    static std::set<char> setValidChars = {'C','W','O','U','S'};
-    std::string strOut;
-    StringWrapperA::MakeUpperCase(str);
-    std::copy_if(str.begin(), str.end(), std::back_inserter(strOut), [&](char ch) { return setValidChars.count(ch); });
+    static std::set<TCHAR> setValidChars = {_T('C'),_T('W'),_T('O'),_T('U'), _T('S')};
+    CTL_StringType strOut;
+    StringWrapper::MakeUpperCase(str);
+    std::copy_if(str.begin(), str.end(), std::back_inserter(strOut), [&](TCHAR ch) { return setValidChars.count(ch); });
     return strOut;
 }
 
