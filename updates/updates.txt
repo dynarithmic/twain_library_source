@@ -12,7 +12,7 @@ DTWAIN Version changes
 - Allow DTWAIN_SetDSMSearchOrderEx() to be recognized before calling DTWAIN_SysInitialize().
   This will allow querying for the availability of the TWAIN DSM using DTWAIN_IsTwainAvailable(),
   using a user-defined search logic for the TWAIN DSM DLL files, all before calling 
-  DTWAIN_SysInitialize().  Before version 5.4.6, DTWAIN_SysInitialize() must always be called before 
+  DTWAIN_SysInitialize().  Before version 5.6.4, DTWAIN_SysInitialize() must always be called before 
   calling DTWAIN_SetDSMSearchOrderEx().
 
 
