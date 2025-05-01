@@ -131,13 +131,11 @@
             catch(const std::exception& ex_) \
             {\
                 LogExceptionErrorA(FUNC_MACRO, ex_.what()); \
-                THROW_EXCEPTION \
                 return(type); \
             }\
             catch(const decltype(type) var) { return var; }\
             catch(...) {\
             LogExceptionErrorA(FUNC_MACRO); \
-            THROW_EXCEPTION \
             return(type); \
             }
 
@@ -147,7 +145,6 @@
             {\
                 LogExceptionErrorA(FUNC_MACRO, ex_.what()); \
                 LOG_FUNC_EXIT_NONAME_PARAMS(type) \
-                THROW_EXCEPTION \
                 return(type); \
             }\
             catch(const decltype(type) var) { \
@@ -156,7 +153,6 @@
             catch(...) {\
                 LogExceptionErrorA(FUNC_MACRO); \
                 LOG_FUNC_EXIT_NONAME_PARAMS(type) \
-                THROW_EXCEPTION \
                 return(type); \
             }
 #else
@@ -191,7 +187,6 @@
         CATCH_BLOCK_END \
         catch(decltype(type) var) { return var; }\
         catch(...) {\
-        THROW_EXCEPTION \
         return(type); \
         }
 
@@ -199,13 +194,11 @@
             CATCH_BLOCK_END \
             catch(const std::exception&) \
             {\
-                THROW_EXCEPTION \
                 return(type); \
             }\
             catch(const decltype(type) var) { \
                 return var; }\
             catch(...) {\
-                THROW_EXCEPTION \
                 return(type); \
             }
 #endif
