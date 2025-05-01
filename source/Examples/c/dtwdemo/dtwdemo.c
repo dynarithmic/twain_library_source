@@ -359,12 +359,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
 
                 case IDM_EXIT:
-                   DestroyWindow(hWnd);
-                   break;
+                    if (!DTWAIN_IsAcquiring())
+                        DestroyWindow(hWnd);
+                    else
+                        MessageBox(NULL, _T("Cannot close application.  Images are still being acquired.\r\nPlease close the device user interface."), _T("Device is acquiring"), MB_OK);
+                    return 0;
                 default:
                    return DefWindowProc(hWnd, message, wParam, lParam);
             }
             break;
+        case WM_CLOSE:
+            if (!DTWAIN_IsAcquiring())
+                DestroyWindow(hWnd);
+            else
+                MessageBox(NULL, _T("Cannot close application.  Images are still being acquired.\r\nPlease close the device user interface."), _T("Device is acquiring"), MB_OK);
+            return 0;
+        break;
+
         case WM_DESTROY:
             PostQuitMessage(0);
             break;
