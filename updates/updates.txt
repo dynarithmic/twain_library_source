@@ -15,6 +15,9 @@ DTWAIN Version changes
   DTWAIN_SysInitialize().  Before version 5.6.4, DTWAIN_SysInitialize() must always be called before 
   calling DTWAIN_SetDSMSearchOrderEx().
 
+- Fix issue with DTWDEMO demo program to not allow DTWDEMO  to close while images
+  are being acquired by the device.
+
 
 5.6.3
 
