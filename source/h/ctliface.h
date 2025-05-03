@@ -567,6 +567,8 @@ namespace dynarithmic
         CTL_StringType           s_DLLPath;
         CTL_StringType           s_sINIPath;
         CTL_StringType           s_ShortVersionString;
+        CTL_StringType           s_StartupDSMSearchOrder = _T("CWSOU");
+        CTL_StringType           s_StartupDSMSearchOrderDir;
         CTL_LongToStringMap      s_ErrorCodes;
         CTL_StringType           s_VersionString;
         CTL_ErrorToExtraInfoMap  s_mapExtraErrorInfo;
@@ -617,6 +619,8 @@ namespace dynarithmic
             CTL_StaticDataStruct tempStruct; 
             tempStruct.s_DLLPath = s_StaticData.s_DLLPath;
             tempStruct.s_DLLInstance = s_StaticData.s_DLLInstance;
+            tempStruct.s_StartupDSMSearchOrder = s_StaticData.s_StartupDSMSearchOrder;
+            tempStruct.s_StartupDSMSearchOrderDir = s_StaticData.s_StartupDSMSearchOrderDir;
             s_StaticData = tempStruct;
         }
         static long& GetLogFilterFlags() { return s_StaticData.s_logFilterFlags; }
@@ -652,6 +656,8 @@ namespace dynarithmic
         static CTL_StringType& GetDLLPath() { return s_StaticData.s_DLLPath; }
         static CTL_StringType& GetINIPath() { return s_StaticData.s_sINIPath; }
         static CTL_StringType& GetShortVersionString() { return s_StaticData.s_ShortVersionString; }
+        static CTL_StringType& GetStartupDSMSearchOrder() { return s_StaticData.s_StartupDSMSearchOrder; }
+        static CTL_StringType& GetStartupDSMSearchOrderDir() { return s_StaticData.s_StartupDSMSearchOrderDir; }
         static bool IsUsingMultipleThreads() { return s_StaticData.s_multipleThreads; }
         static void SetUseMultipleThreads(bool bSet) { s_StaticData.s_multipleThreads = bSet; }
         static CTL_LongToStringMap& GetErrorCodes() { return s_StaticData.s_ErrorCodes; }
@@ -812,7 +818,7 @@ namespace dynarithmic
             DTWAIN_DIBUPDATE_PROC           m_pDibUpdateProc = nullptr;
             std::unordered_set<DTWAIN_SOURCE> m_aFeederSources;
             int                             m_TwainDSMSearchOrder = DTWAIN_TWAINDSMSEARCH_WSO;
-            std::string                     m_TwainDSMSearchOrderStr = "CWSOU";
+            CTL_StringType                  m_TwainDSMSearchOrderStr = _T("CWSOU");
             CTL_StringType                  m_TwainDSMUserDirectory;
             CTL_StringType                  m_strSessionDetails;
             CTL_StringType                  m_strSourceDetails;

@@ -25,6 +25,16 @@
 
 namespace dynarithmic
 {
+    void LogWriterUtils::WriteLogInfoExA(long filterFlags, const std::string& s, bool bFlush)
+    {
+        if (CTL_StaticData::GetLogFilterFlags() & filterFlags)
+        {
+            CTL_StaticData::GetLogger().StatusOutFast(s.c_str());
+            if (bFlush)
+                CTL_StaticData::GetLogger().Flush();
+        }
+    }
+
     void LogWriterUtils::WriteLogInfoA(const std::string& s, bool bFlush)
     {
         if (!CTL_StaticData::GetLogFilterFlags())

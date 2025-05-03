@@ -35,6 +35,37 @@
 
 using namespace dynarithmic;
 
+template <typename T, typename SW>
+static bool CheckForAnyBlankNames(const T& vect)
+{
+    for (auto& oneName : vect)
+    {
+        if (SW::IsAllSpace(oneName))
+            return true;
+    }
+    return false;
+}
+
+template <typename StringType, typename StringArrayType, typename StringWrapperType, typename CopyFn>
+static int CheckValidNames(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aFileNames, LPDTWAIN_ARRAY tempNames, CopyFn fn)
+{
+    int bRetval = DTWAIN_NO_ERROR;
+    auto& vect = pHandle->m_ArrayFactory->underlying_container_t<StringType>(aFileNames);
+    if (!vect.empty())
+    {
+        if (!CheckForAnyBlankNames<StringArrayType, StringWrapperType>(vect))
+        {
+            *tempNames = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, 0);
+            fn(pHandle, aFileNames, *tempNames);
+        }
+        else
+            bRetval = DTWAIN_ERR_BLANKNAMEDETECTED;
+    }
+    else
+        bRetval = DTWAIN_ERR_EMPTY_ARRAY;
+    return bRetval;
+}
+
 DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
                                                     DTWAIN_ARRAY aFileNames,
                                                     LONG     lFileType,
@@ -46,10 +77,16 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
                                                     LPLONG pStatus)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, aFileNames, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI,bCloseSource, pStatus))
-    auto bRetval = true;
+    int bRetval = DTWAIN_NO_ERROR;
     auto [pHandle, pSource] = VerifyHandles(Source);
-
+    
     AcquireAttemptRAII aRaii(pSource);
+
+    // Check for null aFileNames
+    if (!aFileNames)
+    {
+        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
+    }
 
     // Check if the file format is valid
     auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
@@ -70,34 +107,38 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
     DTWAIN_ARRAY tempNames = nullptr;
     DTWAINArrayPtr_RAII tempRAII(pHandle, &tempNames);
     DTWAIN_ARRAY arrayToUse = aFileNames;
-    if (aFileNames)
-    {
-        std::vector<LONG> validTypes = {DTWAIN_ARRAYSTRING, DTWAIN_ARRAYANSISTRING, DTWAIN_ARRAYWIDESTRING};
-        auto& factory = pHandle->m_ArrayFactory;
-        const LONG Type = factory->tagtype_to_arraytype(factory->tag_type(aFileNames));
-        const auto itArrType = std::find(validTypes.begin(), validTypes.end(), Type);
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return itArrType == validTypes.end(); }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
-        const auto idx = std::distance(validTypes.begin(), itArrType);
-        if ( idx > 0 )
-        {
-            tempNames = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, 0);
-            if ( idx == 1 )
-                ArrayCopyAnsiToNative(pHandle, aFileNames, tempNames);
-            else
-                ArrayCopyWideToNative(pHandle, aFileNames, tempNames);
-            arrayToUse = tempNames;
-        }
-    }
-    else
-        bRetval = false;
+    std::vector<LONG> validTypes = {DTWAIN_ARRAYSTRING, DTWAIN_ARRAYANSISTRING, DTWAIN_ARRAYWIDESTRING};
+    auto& factory = pHandle->m_ArrayFactory;
 
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !bRetval; }, DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
+    const LONG Type = factory->tagtype_to_arraytype(factory->tag_type(aFileNames));
+    const auto itArrType = std::find(validTypes.begin(), validTypes.end(), Type);
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return itArrType == validTypes.end(); }, DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
+    const auto idx = std::distance(validTypes.begin(), itArrType);
+
+    if ( idx > 0 )
+    {
+        if (idx == 1)
+        {
+            // Check for empty array and for blank entries (both are not allowed)
+            bRetval = CheckValidNames<std::string, StringArray, StringWrapperA>(pHandle, aFileNames, &tempNames, &ArrayCopyAnsiToNative);
+        }
+        else
+        {
+            // Check for empty array and for blank entries (both are not allowed)
+            bRetval = CheckValidNames<std::wstring, StringArrayW, StringWrapperW>(pHandle, aFileNames, &tempNames, &ArrayCopyWideToNative);
+        }
+        if (tempNames)
+            arrayToUse = tempNames;
+    }
+
+    // Return error if array is empty or if there are blank entries
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return bRetval != DTWAIN_NO_ERROR; }, bRetval, false, FUNC_MACRO);
 
     SourceAcquireOptions opts = SourceAcquireOptions().setHandle(pHandle).setSource(Source).setFileType(lFileType).setFileFlags(lFileFlags | DTWAIN_USELIST).
                 setFileList(arrayToUse).setPixelType(PixelType).setMaxPages(lMaxPages).setShowUI(bShowUI ? true : false).
                 setRemainOpen(!(bCloseSource ? true : false));
 
-    bRetval = AcquireFileHelper(opts, ACQUIREFILE);
+    bool bRetval2 = AcquireFileHelper(opts, ACQUIREFILE);
     if (pStatus)
         *pStatus = opts.getStatus();
     if (opts.getStatus() == DTWAIN_TN_ACQUIRECANCELED)
@@ -106,7 +147,7 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFileEx(DTWAIN_SOURCE Source,
     if (pSource->GetLastAcquireError() != 0)
         CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRetval2)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
@@ -122,6 +163,17 @@ DTWAIN_BOOL       DLLENTRY_DEF DTWAIN_AcquireFile(DTWAIN_SOURCE Source,
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lpszFile, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus))
     auto [pHandle, pSource] = VerifyHandles(Source);
+
+    // Check for null filename
+    if (!lpszFile)
+    {
+        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    }
+
+    if (StringWrapper::IsAllSpace(lpszFile))
+    {
+        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_BLANKNAMEDETECTED, false, FUNC_MACRO);
+    }
 
     // Check if the file format is valid
     auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
