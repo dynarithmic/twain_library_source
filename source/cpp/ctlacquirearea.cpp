@@ -85,10 +85,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea(DTWAIN_SOURCE Source, LONG lSetTy
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea2String(DTWAIN_SOURCE Source, LPCTSTR left, LPCTSTR top, LPCTSTR right, LPCTSTR bottom, LONG Unit, LONG flags)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, left, top, right, bottom, Unit, flags))
-    const DTWAIN_FLOAT val1 = StringWrapper::ToDouble(left);
-    const DTWAIN_FLOAT val2 = StringWrapper::ToDouble(top);
-    const DTWAIN_FLOAT val3 = StringWrapper::ToDouble(right);
-    const DTWAIN_FLOAT val4 = StringWrapper::ToDouble(bottom);
+    const DTWAIN_FLOAT val1 = left?StringWrapper::ToDouble(left):0;
+    const DTWAIN_FLOAT val2 = top?StringWrapper::ToDouble(top):0;
+    const DTWAIN_FLOAT val3 = right?StringWrapper::ToDouble(right):0;
+    const DTWAIN_FLOAT val4 = bottom?StringWrapper::ToDouble(bottom):0;
     const DTWAIN_BOOL bRet = DTWAIN_SetAcquireArea2(Source, val1, val2, val3, val4, Unit, flags);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
