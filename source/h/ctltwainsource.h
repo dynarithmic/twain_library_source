@@ -29,6 +29,7 @@
 #include <map>
 
 #include "ctlobstr.h"
+#include "ctliface.h"
 #include "ctlarray.h"
 #include "ctldib.h"
 #include "ctlenum.h"
@@ -311,7 +312,7 @@ namespace dynarithmic
             m_aSupportedCapCache.clear();
             while (iter1 != iter2)
             {
-                m_aSupportedCapCache.push_back(*iter1);
+                m_aSupportedCapCache.insert(*iter1);
                 ++iter1;
             }
         }

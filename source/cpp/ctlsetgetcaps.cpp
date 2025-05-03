@@ -155,7 +155,7 @@ static DTWAIN_ARRAY PerformGetCap(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source,
         if (!bOk)
             return nullptr;
 
-        ConvertTo convValue = typename ConverterFn::Convert(dValue);
+        ConvertTo convValue = ConverterFn::Convert(dValue);
         pHandle->m_ArrayFactory->add_to_back(pDTWAINArray, &convValue, 1);
     }
     else

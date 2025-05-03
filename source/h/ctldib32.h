@@ -552,7 +552,7 @@ namespace dynarithmic
             void RemoveAllDibs();
 
             // Provide conversion for retrieval
-            const CTL_TwainDibPtr& CTL_TwainDibArray::GetAt(size_t nPos) const
+            const CTL_TwainDibPtr& GetAt(size_t nPos) const
             { return m_TwainDibArray.at(nPos); }
             CTL_TwainDibPtr&       GetAt(size_t nPos);
             CTL_TwainDibPtr&       operator[](size_t nPos);

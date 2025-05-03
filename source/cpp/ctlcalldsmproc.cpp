@@ -73,14 +73,12 @@ LONG DLLENTRY_DEF DTWAIN_CallDSMProc(TWAIN_IDENTITY AppID, TWAIN_IDENTITY Source
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto pH = pHandle;
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !pH->m_bSessionAllocated; }, DTWAIN_ERR_NO_SESSION, -1L, FUNC_MACRO);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !AppID && !SourceId; }, DTWAIN_ERR_INVALID_PARAM, -1L, FUNC_MACRO);
     const LONG Ret = CTL_TwainAppMgr::CallDSMEntryProc(static_cast<TW_IDENTITY*>(AppID),
                                                        static_cast<TW_IDENTITY*>(SourceId),
                                                        static_cast<TW_UINT32>(lDG),
                                                        static_cast<TW_UINT16>(lDAT),
                                                        static_cast<TW_UINT16>(lMSG),
                                                        pData);
-
     LOG_FUNC_EXIT_NONAME_PARAMS(Ret)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }

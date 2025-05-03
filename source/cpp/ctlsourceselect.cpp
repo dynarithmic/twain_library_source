@@ -95,6 +95,8 @@ static DTWAIN_SOURCE SelectAndOpenSource(CTL_TwainDLLHandle* pHandle, SourceSele
         iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, CTL_TwainAppMgr::IsSourceOpen(pSource));
         iter->second.SetThreadID(dynarithmic::getThreadIdAsString());
         iter->second.SetSourceHandle(pSource);
+        CTL_StringToSourcePtrMap& m_mapTemp = pHandle->m_mapStringToSource;
+        m_mapTemp[pSource->GetProductName()] = pSource;
     }
 
     if ( !Source && opts.nWhich == SELECTSOURCEBYNAME )

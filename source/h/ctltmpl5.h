@@ -26,8 +26,10 @@
 #include <algorithm>
 #include <memory>
 #include "arrayfactory.h"
+#include "ctltr012.h"
 #include "ctltr013.h"
 #include "ctltr014.h"
+#include "ctltr015.h"
 #include "ctltr016.h"
 #include "ctltr017.h"
 #include "ctltr018.h"
@@ -68,9 +70,6 @@ namespace dynarithmic
         const auto pSession = pTempSource->GetTwainSession();
         rArray.erase(rArray.begin(), rArray.end());
         std::unique_ptr<CTL_CapabilityGetTriplet> pGetTriplet;
-
-        if ( !CTL_TwainAppMgr::IsSourceOpen( pSource ) )
-            return false;
 
         // Try the array version
         if ( nContainerTypes & TwainContainer_ARRAY )
@@ -503,95 +502,7 @@ namespace dynarithmic
     };
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    template <class OriginalType, class ArrayType, class ConvertedTwainType, class NativeToTwainConverter>
-    bool SetMultiCapValuesImpl( DTWAIN_HANDLE DLLHandle,
-                           DTWAIN_SOURCE Source,
-                           DTWAIN_ARRAY pArray,
-                           CTL_ArrayType EnumType,
-                           UINT nCap,
-                           CTL_EnumSetType SetType,
-                           OriginalType TValue,
-                           UINT nContainerVal,
-                           bool bUseContainer,
-                           TW_UINT16 OriginalTwainType,
-                           ArrayType eType,
-                           ConvertedTwainType cType
-                         )
-    {
-        CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
-        CTL_TwainDLLHandle* pHandle = static_cast<CTL_TwainDLLHandle*>(DLLHandle);
-
-        if ( !p )
-            return false;
-
-        // Check if array is of the correct type
-        if ( !EnumeratorFunctionImpl::EnumeratorIsValidEx(pArray, EnumType ) )
-            return false;
-
-        // Create array of the twain type
-        const DTWAIN_ARRAY pDTWAINArray = pArray;
-        std::vector<ConvertedTwainType> Array;
-        OriginalType dValue = {};
-        const size_t nValues = EnumeratorFunctionImpl::EnumeratorGetCount(pDTWAINArray);
-        int i;
-
-        for ( i = 0; i < static_cast<int>(nValues); i++ )
-        {
-            EnumeratorFunctionImpl::EnumeratorGetAt(pDTWAINArray, i, &dValue);
-            ConvertedTwainType conv = NativeToTwainConverter::convert(dValue);
-            Array.push_back( conv );
-        }
-
-        bool bOk = false;
-
-        const CTL_CapInfo* Info = GetCapInfo(pHandle, p, static_cast<TW_UINT16>(nCap));
-        if ( !Info )
-            return false;
-        UINT nAll[3] = {};
-        UINT nContainer = std::get<1>(*Info);
-
-        int nMaxNum;
-        if ( !bUseContainer )
-        {
-            nAll[0] = nContainer & TwainContainer_ENUMERATION;
-            nAll[1] = nContainer & TwainContainer_ARRAY;
-            nAll[2] = nContainer & TwainContainer_RANGE;
-            nMaxNum = 3;
-        }
-        else
-        {
-            nAll[0] = nContainerVal;
-            nMaxNum = 1;
-        }
-
-        for ( i = 0; i < nMaxNum; i++ )
-        {
-            bOk = SetCapabilityValues(  p,
-                                        static_cast<CTL_EnumCapability>(nCap),
-                                        SetType,
-                                        nAll[i],
-                                        OriginalTwainType,
-                                       Array);
-            if ( bOk )
-               break;
-        }
-
-        return bOk;
-    }
-
     /////////////////////////////////////////////////////////////////////////////////////////
-    template <class TwainType, class NativeType, class TwainConverter>
-    bool SetMultiCapValues( DTWAIN_HANDLE DLLHandle,
-                          DTWAIN_SOURCE Source,
-                          DTWAIN_ARRAY pArray,
-                          CTL_ArrayType EnumType,
-                          UINT nCap,
-                          CTL_EnumSetType SetType,
-                          UINT nContainerVal,
-                          bool bUseContainer,
-                          TW_UINT16 OriginalTwainType
-                          );
-
     template <class TwainType, class NativeType, class TwainConverter>
     bool SetMultiCapValues( DTWAIN_HANDLE DLLHandle,
                           DTWAIN_SOURCE Source,

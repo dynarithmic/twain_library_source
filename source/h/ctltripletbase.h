@@ -28,6 +28,8 @@
 
 namespace dynarithmic
 {
+    class CTL_ITwainSession;
+    class CTL_ITwainSource;
     class CTL_TwainTriplet
     {
         public:

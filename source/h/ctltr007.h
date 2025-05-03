@@ -41,12 +41,12 @@ namespace dynarithmic
                 SetValues(pSession, pSourceID);
             }
 
-            TW_UINT16 CTL_ConditionCodeTriplet::GetConditionCode() const
+            TW_UINT16 GetConditionCode() const
             {
                 return m_Status.ConditionCode;
             }
 
-            TW_UINT16 CTL_ConditionCodeTriplet::GetData() const
+            TW_UINT16 GetData() const
             {
                 return m_Status.Data;
             }

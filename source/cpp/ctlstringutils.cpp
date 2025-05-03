@@ -28,13 +28,16 @@ using namespace dynarithmic;
 template <typename WrapperToUse, typename PointerType>
 static HANDLE ConvertToAPIString_Internal(PointerType lpOrigString)
 {
+    if (!lpOrigString)
+        return NULL;
     return WrapperToUse::ConvertToAPIStringEx(lpOrigString);
-
 }
 
 template <typename WrapperToUse, typename PointerTypeIn, typename PointerTypeOut>
 static LONG ConvertToAPIString_InternalEx(PointerTypeIn lpOrigString, PointerTypeOut outString, LONG nLength)
 {
+    if (!lpOrigString)
+        return 0;
     auto retval = WrapperToUse::ConvertToAPIStringEx(lpOrigString);
     if (retval)
     {

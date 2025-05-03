@@ -71,7 +71,7 @@ static LONG PerformCapContainerTest(CTL_TwainDLLHandle* pHandle, CTL_ITwainSourc
     LONG lResults = (LONG)std::get<CapInfoIdx>(*CapInfo);
 
     // Test if the container info specifies a single container type
-    size_t numBitsOn = dynarithmic::countOnes(lResults);
+    size_t numBitsOn = dynarithmic::countOnes(static_cast<uint32_t>(lResults));
     if (numBitsOn == 1)
         return lResults;  // This is a single container type
 

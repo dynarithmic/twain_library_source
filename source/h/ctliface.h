@@ -43,6 +43,8 @@
 #include "notimpl.h"
 #include "sourceacquireopts.h"
 #include "ctlconstexprutils.h"
+#include "ctllogfunctioncall.h"
+#include "capinfomap.h"
 #ifdef _WIN32
     #include "winlibraryloader_impl.inl"
 #else
@@ -71,6 +73,7 @@ namespace dynarithmic
     class CTL_TwainDLLHandle;
     class CTL_ITwainSource;
     class CTL_TwainAppMgr;
+    class CTL_ITwainSession;
     class CTL_TwainDibArray;
     struct SourceSelectionOptions;
     struct SourceAcquireOptions;
@@ -193,29 +196,18 @@ namespace dynarithmic
     };
 
     #include "capstruc.h"
+    #include "capinfomap.h"
 
-    typedef CTL_ClassValues10<CTL_EnumCapability,/* Capability*/
-                             UINT             , /* Container for Get */
-                             UINT             , /* Container for Set*/
-                             UINT             ,  /* Data Type */
-                             UINT             ,  /* Available cap support */
-                             UINT             ,  /* Container for Get Current */
-                             UINT             ,   /* Container for Get Default  */
-                             UINT             ,  /* Container for Set Constraint */
-                             UINT             ,  /* Container for Reset */
-                             UINT                 /* Container for Query Support*/
-                            > CTL_CapInfo;
-
-    #define CAPINFO_IDX_CAPABILITY 0    
-    #define CAPINFO_IDX_GETCONTAINER 1    
-    #define CAPINFO_IDX_SETCONTAINER 2    
-    #define CAPINFO_IDX_DATATYPE     3    
-    #define CAPINFO_IDX_SUPPORTEDOPS 4    
-    #define CAPINFO_IDX_GETCURRENTCONTAINER 5    
-    #define CAPINFO_IDX_GETDEFAULTCONTAINER 6    
-    #define CAPINFO_IDX_SETCONSTRAINTCONTAINER 7    
-    #define CAPINFO_IDX_RESETCONTAINER 8    
-    #define CAPINFO_IDX_QUERYSUPPORT 9    
+    #define CAPINFO_IDX_CAPABILITY 0U    
+    #define CAPINFO_IDX_GETCONTAINER 1U    
+    #define CAPINFO_IDX_SETCONTAINER 2U    
+    #define CAPINFO_IDX_DATATYPE     3U    
+    #define CAPINFO_IDX_SUPPORTEDOPS 4U    
+    #define CAPINFO_IDX_GETCURRENTCONTAINER 5U    
+    #define CAPINFO_IDX_GETDEFAULTCONTAINER 6U    
+    #define CAPINFO_IDX_SETCONSTRAINTCONTAINER 7U    
+    #define CAPINFO_IDX_RESETCONTAINER 8U    
+    #define CAPINFO_IDX_QUERYSUPPORT 9U    
 
     typedef boost::container::flat_map<unsigned long, std::shared_ptr<CTL_TwainDLLHandle>> CTL_MapThreadToDLLHandle;
     typedef boost::container::flat_map<LONG, int> CTL_LongToIntMap;
@@ -231,11 +223,6 @@ namespace dynarithmic
     typedef boost::container::flat_map<std::string, CTL_LongToStringMap> CTL_StringToMapLongToStringMap;
     typedef boost::container::flat_map<LONG, std::vector<LONG>> CTL_LongToVectorLongMap;
     typedef std::vector<CTL_MapThreadToDLLHandle> CTL_HookInfoArray;
-
-    // Create these dynamically whenever a new source is opened
-    // and source cap info does not exist.  Add cap info statically.
-    typedef boost::container::flat_map<CTL_EnumCapability, CTL_CapInfo>  CTL_CapInfoMap;
-    typedef std::shared_ptr<CTL_CapInfoMap> CTL_CapInfoMapPtr;
 
     // Create this statically when initializing.  Initialize the second
     // value with the dynamically created CTL_CapInfoMap above
@@ -579,6 +566,9 @@ namespace dynarithmic
         CTL_StringType           s_strResourcePath;  // path to the DTWAIN resource strings
         CTL_StringType           s_DLLPath;
         CTL_StringType           s_sINIPath;
+        CTL_StringType           s_ShortVersionString;
+        CTL_StringType           s_StartupDSMSearchOrder = _T("CWSOU");
+        CTL_StringType           s_StartupDSMSearchOrderDir;
         CTL_LongToStringMap      s_ErrorCodes;
         CTL_StringType           s_VersionString;
         CTL_ErrorToExtraInfoMap  s_mapExtraErrorInfo;
@@ -629,6 +619,8 @@ namespace dynarithmic
             CTL_StaticDataStruct tempStruct; 
             tempStruct.s_DLLPath = s_StaticData.s_DLLPath;
             tempStruct.s_DLLInstance = s_StaticData.s_DLLInstance;
+            tempStruct.s_StartupDSMSearchOrder = s_StaticData.s_StartupDSMSearchOrder;
+            tempStruct.s_StartupDSMSearchOrderDir = s_StaticData.s_StartupDSMSearchOrderDir;
             s_StaticData = tempStruct;
         }
         static long& GetLogFilterFlags() { return s_StaticData.s_logFilterFlags; }
@@ -663,6 +655,9 @@ namespace dynarithmic
         static CTL_StringType& GetResourcePath() { return s_StaticData.s_strResourcePath; }
         static CTL_StringType& GetDLLPath() { return s_StaticData.s_DLLPath; }
         static CTL_StringType& GetINIPath() { return s_StaticData.s_sINIPath; }
+        static CTL_StringType& GetShortVersionString() { return s_StaticData.s_ShortVersionString; }
+        static CTL_StringType& GetStartupDSMSearchOrder() { return s_StaticData.s_StartupDSMSearchOrder; }
+        static CTL_StringType& GetStartupDSMSearchOrderDir() { return s_StaticData.s_StartupDSMSearchOrderDir; }
         static bool IsUsingMultipleThreads() { return s_StaticData.s_multipleThreads; }
         static void SetUseMultipleThreads(bool bSet) { s_StaticData.s_multipleThreads = bSet; }
         static CTL_LongToStringMap& GetErrorCodes() { return s_StaticData.s_ErrorCodes; }
@@ -823,7 +818,7 @@ namespace dynarithmic
             DTWAIN_DIBUPDATE_PROC           m_pDibUpdateProc = nullptr;
             std::unordered_set<DTWAIN_SOURCE> m_aFeederSources;
             int                             m_TwainDSMSearchOrder = DTWAIN_TWAINDSMSEARCH_WSO;
-            std::string                     m_TwainDSMSearchOrderStr = "CWSOU";
+            CTL_StringType                  m_TwainDSMSearchOrderStr = _T("CWSOU");
             CTL_StringType                  m_TwainDSMUserDirectory;
             CTL_StringType                  m_strSessionDetails;
             CTL_StringType                  m_strSourceDetails;
@@ -942,7 +937,6 @@ namespace dynarithmic
 
     DTWAIN_BOOL DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *p, CTL_TwainDLLHandle *pHandle, TW_UINT16 nCapToCache);
     DTWAIN_BOOL DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, CTL_TwainDLLHandle *pHandle, CTL_EnumeratorNode<LONG>::container_pointer_type vCaps);
-    CTL_CapInfoMapPtr GetCapInfoArray(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource *p);
     DTWAIN_SOURCE SourceSelect(CTL_TwainDLLHandle* pHandle, SourceSelectionOptions& options);
     DTWAIN_ARRAY  SourceAcquire(SourceAcquireOptions& opts);
     bool AcquireExHelper(SourceAcquireOptions& opts);
@@ -966,49 +960,21 @@ namespace dynarithmic
     typedef CTL_StringType(CTL_ITwainSource::* SOURCEINFOFUNC)() const;
     LONG GetSourceInfo(CTL_ITwainSource* p, SOURCEINFOFUNC pFunc, LPTSTR szInfo, LONG nMaxLen);
 
-    //#ifdef DTWAIN_DEBUG_CALL_STACK
-    std::string CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich, LPCSTR pOptionalString=nullptr);
-    std::string CTL_LogFunctionCallA(LPCSTR pFuncName, int nWhich, LPCSTR pOptionalString=nullptr);
-
-    //#endif
-
-
     struct DTWAINGlobalHandle_CloseTraits
     {
-        static void Destroy(HANDLE h)
-        {
-            #ifdef _WIN32
-            if ( h )
-                ImageMemoryHandler::GlobalUnlock(h);
-            #endif
-        }
+        static void Destroy(HANDLE h);
         void operator()(HANDLE h) { Destroy(h); }
     };
 
     struct DTWAINGlobalHandle_ClosePtrTraits
     {
-        static void Destroy(HANDLE* h)
-        {
-            #ifdef _WIN32
-            if (h && *h)
-                ImageMemoryHandler::GlobalUnlock(*h);
-            #endif
-        }
+        static void Destroy(HANDLE* h);
         void operator()(HANDLE* h) { Destroy(h); }
     };
 
     struct DTWAINGlobalHandle_CloseFreeTraits
     {
-        static void Destroy(HANDLE h)
-        {
-            #ifdef _WIN32
-            if (h)
-            {
-                ImageMemoryHandler::GlobalUnlock(h);
-                ImageMemoryHandler::GlobalFree(h);
-            }
-            #endif
-        }
+        static void Destroy(HANDLE h);
         void operator()(HANDLE h) { Destroy(h); }
     };
 
