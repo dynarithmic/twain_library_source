@@ -49,42 +49,42 @@ namespace dynarithmic
                 }
             }
 
-            double CTL_ImageLayoutTripletImpl::GetLeft() const
+            double GetLeft() const
             {
                 return Fix32ToFloat(m_ImageLayout.Frame.Left);
             }
 
-            double CTL_ImageLayoutTripletImpl::GetRight() const
+            double GetRight() const
             {
                 return Fix32ToFloat(m_ImageLayout.Frame.Right);
             }
 
-            double CTL_ImageLayoutTripletImpl::GetTop() const
+            double GetTop() const
             {
                 return Fix32ToFloat(m_ImageLayout.Frame.Top);
             }
 
-            double CTL_ImageLayoutTripletImpl::GetBottom() const
+            double GetBottom() const
             {
                 return Fix32ToFloat(m_ImageLayout.Frame.Bottom);
             }
 
-            TW_UINT32 CTL_ImageLayoutTripletImpl::GetDocumentNumber() const
+            TW_UINT32 GetDocumentNumber() const
             {
                 return m_ImageLayout.DocumentNumber;
             }
 
-            TW_UINT32 CTL_ImageLayoutTripletImpl::GetPageNumber() const
+            TW_UINT32 GetPageNumber() const
             {
                 return m_ImageLayout.PageNumber;
             }
 
-            TW_UINT32 CTL_ImageLayoutTripletImpl::GetFrameNumber() const
+            TW_UINT32 GetFrameNumber() const
             {
                 return m_ImageLayout.FrameNumber;
             }
 
-            TW_FRAME CTL_ImageLayoutTripletImpl::GetFrame() const
+            TW_FRAME GetFrame() const
             {
                 return m_ImageLayout.Frame;
             }

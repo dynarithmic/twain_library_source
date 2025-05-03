@@ -589,13 +589,6 @@ LRESULT CallOneCallback(CallbackType Fn, WPARAM wParam, LPARAM lParam, UserType 
     return (*Fn)(wParam, lParam, UserData);
 }
 
-/*LRESULT CallOneCallback(DTWAIN_CALLBACK_PROC Fn, WPARAM wParam, LPARAM lParam, LONG UserData)
-{
-    return (*Fn)(wParam, lParam, UserData);
-}
-*/
-
-
 template <typename CallbackType, typename UserType>
 struct CallBatchProcessor
 {

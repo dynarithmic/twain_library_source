@@ -24,6 +24,7 @@
 #include "dtwain_config.h"
 #include <funcmac.h>
 #include "logwriterutils.h"
+#include <boost/version.hpp>
 
  /* This indicates that the build requires Visual C++ runtime if set to 1*/
  /* Since there is no way to set the runtime to use at compile time, this */
@@ -35,6 +36,20 @@
 #else
     #ifdef _MSC_VER
         #pragma message ("Build requires external Visual C++ runtime")
+    #endif
+#endif
+
+#ifdef _MSC_VER
+    #pragma message ("Building using Boost Library version " BOOST_LIB_VERSION)
+#endif
+
+#if (BOOST_VERSION / 100000) == 1
+    #if (BOOST_VERSION / 100) % 1000 < 80
+        #error "Error:  Boost library version must be version 1.80 or greater"
+    #endif
+#else
+    #if (BOOST_VERSION / 100000) < 1
+        #error "Error:  Boost library version must be version 1.80 or greater"
     #endif
 #endif
 
@@ -70,21 +85,16 @@
 
     #define LOG_FUNC_ENTRY_PARAMS_ISTWAINMSG(argVals) \
         TRY_BLOCK \
-        if ((CTL_StaticData::GetLogFilterFlags() & (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG)) == \
-                (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG)) \
-        LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_IN) + ParamOutputter((#argVals)).outputParam argVals.getString());
+        LogWriterUtils::WriteLogInfoExA(DTWAIN_LOG_ISTWAINMSG, CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_IN) + ParamOutputter((#argVals)).outputParam argVals.getString());
 
     #define LOG_FUNC_EXIT_PARAMS_ISTWAINMSG(x) { \
-        if ((CTL_StaticData::GetLogFilterFlags() & (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG)) == \
-                (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG)) \
-        LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO, LOG_INDENT_OUT) + ParamOutputter((""), true).outputParam(x).getString()); \
+        LogWriterUtils::WriteLogInfoExA(DTWAIN_LOG_ISTWAINMSG, CTL_LogFunctionCallA(FUNC_MACRO, LOG_INDENT_OUT) + ParamOutputter((""), true).outputParam(x).getString()); \
         return(x); \
             }
 
     #define LOG_FUNC_ENTRY_PARAMS(argVals) \
         TRY_BLOCK \
-        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) \
-        LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_IN) + ParamOutputter((#argVals)).outputParam argVals.getString());
+        LogWriterUtils::WriteLogInfoExA(DTWAIN_LOG_CALLSTACK, CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_IN) + ParamOutputter((#argVals)).outputParam argVals.getString());
 
     #define LOG_FUNC_ENTRY_NONAME_PARAMS(...) \
         TRY_BLOCK LogValue(FUNC_MACRO, true, int(0), __VA_ARGS__);
@@ -94,11 +104,8 @@
         #pragma message ("Building DTWAIN with logging pointer dereferencing on return")
     #endif
         #define LOG_FUNC_EXIT_DEREFERENCE_POINTERS(argVals) \
-            if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) \
-            { \
-                LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_USELAST) + \
-                            ParamOutputter((#argVals)).setOutputAsString(true).outputParam argVals.getString());\
-            }
+                LogWriterUtils::WriteLogInfoExA(DTWAIN_LOG_CALLSTACK, CTL_LogFunctionCallA(FUNC_MACRO,LOG_INDENT_USELAST) + \
+                            ParamOutputter((#argVals)).setOutputAsString(true).outputParam argVals.getString());
     #else
         #ifdef _MSC_VER
             #pragma message ("Building DTWAIN with no logging pointer dereferencing on return")
@@ -109,14 +116,12 @@
     #define LOG_FUNC_EXIT_NONAME_PARAMS(x) { LogValue(FUNC_MACRO, false, x); return(x); }
 
     #define LOG_FUNC_EXIT_PARAMS(x) { \
-        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) \
-        LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(FUNC_MACRO, LOG_INDENT_OUT) + ParamOutputter((""), true).outputParam(x).getString()); \
+        LogWriterUtils::WriteLogInfoExA(DTWAIN_LOG_CALLSTACK, CTL_LogFunctionCallA(FUNC_MACRO, LOG_INDENT_OUT) + ParamOutputter((""), true).outputParam(x).getString()); \
         return(x); \
             }
 
     #define LOG_FUNC_VALUES_EX(argvals) { \
-        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) \
-        LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA((""),LOG_INDENT_IN) + ParamOutputter((#argvals)).outputParam argvals.getString()); \
+        LogWriterUtils::WriteLogInfoExA(DTWAIN_LOG_CALLSTACK, CTL_LogFunctionCallA((""),LOG_INDENT_IN) + ParamOutputter((#argvals)).outputParam argvals.getString()); \
     }
 
     #define CATCH_BLOCK_END }
@@ -126,13 +131,11 @@
             catch(const std::exception& ex_) \
             {\
                 LogExceptionErrorA(FUNC_MACRO, ex_.what()); \
-                THROW_EXCEPTION \
                 return(type); \
             }\
             catch(const decltype(type) var) { return var; }\
             catch(...) {\
             LogExceptionErrorA(FUNC_MACRO); \
-            THROW_EXCEPTION \
             return(type); \
             }
 
@@ -142,7 +145,6 @@
             {\
                 LogExceptionErrorA(FUNC_MACRO, ex_.what()); \
                 LOG_FUNC_EXIT_NONAME_PARAMS(type) \
-                THROW_EXCEPTION \
                 return(type); \
             }\
             catch(const decltype(type) var) { \
@@ -151,7 +153,6 @@
             catch(...) {\
                 LogExceptionErrorA(FUNC_MACRO); \
                 LOG_FUNC_EXIT_NONAME_PARAMS(type) \
-                THROW_EXCEPTION \
                 return(type); \
             }
 #else
@@ -186,7 +187,6 @@
         CATCH_BLOCK_END \
         catch(decltype(type) var) { return var; }\
         catch(...) {\
-        THROW_EXCEPTION \
         return(type); \
         }
 
@@ -194,13 +194,11 @@
             CATCH_BLOCK_END \
             catch(const std::exception&) \
             {\
-                THROW_EXCEPTION \
                 return(type); \
             }\
             catch(const decltype(type) var) { \
                 return var; }\
             catch(...) {\
-                THROW_EXCEPTION \
                 return(type); \
             }
 #endif
