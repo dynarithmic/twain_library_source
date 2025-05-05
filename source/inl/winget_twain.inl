@@ -31,7 +31,7 @@ CTL_StringType GetTwainDirFullName(LPCTSTR strTwainDLLName,
     boost::dll::shared_library* pModule = nullptr)
 {
     auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    static constexpr std::array<std::pair<LONG, TCHAR*>, 15> searchOrderMap = { {
+    static constexpr std::array<std::pair<LONG, const TCHAR*>, 15> searchOrderMap = { {
         {DTWAIN_TWAINDSMSEARCH_WSO, _T("WSO")},
         { DTWAIN_TWAINDSMSEARCH_WOS,_T("WOS") },
         { DTWAIN_TWAINDSMSEARCH_SWO,_T("SWO") },

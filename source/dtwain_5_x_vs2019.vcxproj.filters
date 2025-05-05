@@ -220,15 +220,6 @@
     <ClCompile Include=".\cpp\ctltr011.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include=".\cpp\ctltr012.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include=".\cpp\ctltr013.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include=".\cpp\ctltr014.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include=".\cpp\ctltr015.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
