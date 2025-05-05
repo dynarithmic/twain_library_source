@@ -1140,9 +1140,6 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include=".\cpp\ctltr008.cpp" />
     <ClCompile Include=".\cpp\ctltr010.cpp" />
     <ClCompile Include=".\cpp\ctltr011.cpp" />
-    <ClCompile Include=".\cpp\ctltr012.cpp" />
-    <ClCompile Include=".\cpp\ctltr013.cpp" />
-    <ClCompile Include=".\cpp\ctltr014.cpp" />
     <ClCompile Include=".\cpp\ctltr015.cpp" />
     <ClCompile Include=".\cpp\ctltr016.cpp" />
     <ClCompile Include=".\cpp\ctltr017.cpp" />
