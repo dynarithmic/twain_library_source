@@ -117,7 +117,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2String(DTWAIN_SOURCE Source, LPTS
         auto numDigits = strm.precision();
         for (size_t i = 0; i < val.size(); ++i)
         {
-            strm << std::setprecision(numDigits) << boost::format("%1%") % val[i];
+            strm << std::setprecision(numDigits) << val[i];
             if (pStr[i])
             {
                 std::string sResult = strm.str();

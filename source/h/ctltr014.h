@@ -31,16 +31,23 @@ namespace dynarithmic
                                          CTL_ITwainSource *pSource,
                                          CTL_EnumGetType   gType,
                                          TW_UINT16      gCap,
-                                         TW_UINT16 TwainDataType);
+                                         TW_UINT16 TwainDataType)
+                : CTL_CapabilityGetTriplet(pSession,
+                    pSource,
+                    gType,
+                    gCap,
+                    TwainDataType) {}
 
-            size_t GetNumItems() override;
-            bool GetValue( void *pData, size_t nWhere ) override;
+            bool GetValue(void* pData, size_t nWhere) override
+            {
+                return GenericGetValue(pData, nWhere);
+            }
 
         protected:
-            bool EnumCapValues( void *pCapData ) override;
-
-        private:
-            size_t m_nNumItems;
+            bool EnumCapValues(void* pCapData) override
+            {
+                return GenericEnumCapValues<TW_ARRAY>(pCapData);
+            }
     };
 }
 #endif
