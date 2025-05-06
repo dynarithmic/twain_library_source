@@ -356,7 +356,7 @@ static LONG GetResourceStringInternal(LONG resourceID, LPTSTR lpszBuffer, LONG n
         szTemp.insert(szTemp.end(), iter->second.begin(), iter->second.end());
         szTemp.push_back(0);
     }
-    sCopy += StringConversion::Convert_Ansi_To_Native(szTemp.data());
+    sCopy += StringConversion::Convert_Ansi_To_Native(szTemp.data(), szTemp.size());
     return StringWrapper::CopyInfoToCString(sCopy, lpszBuffer, nMaxLen);
 }
 
@@ -1042,7 +1042,7 @@ void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL, 
     if (!szStr.empty())
     {
         logFilterFlags |= DTWAIN_LOG_USEFILE;
-        OpenLogging(StringConversion::Convert_Ansi_To_Native(szStr).c_str(), logFilterFlags);
+        OpenLogging(StringConversion::Convert_Ansi_To_Native(szStr, szStr.size()).c_str(), logFilterFlags);
         CTL_StaticData::GetLogger().StatusOutFast("In DTWAIN_SysInitialize()");
     }
 
@@ -1518,7 +1518,7 @@ static LONG GetFileTypeInfo(Fn infoFn, int nType, LPTSTR lpszName, LONG nMaxLen)
     std::string str = infoFn(nType);
     if (!str.empty())
     {
-        const CTL_StringType str2 = StringConversion::Convert_Ansi_To_Native(str);
+        const CTL_StringType str2 = StringConversion::Convert_Ansi_To_Native(str, str.size());
         realLen = StringWrapper::CopyInfoToCString(str2, lpszName, nMaxLen);
     }
     return realLen;
@@ -2178,8 +2178,13 @@ CTL_StringType dynarithmic::GetDTWAINDLLPath()
     if ( !dllPath.empty())
         return dllPath;
     dllPath.resize(1024);
-    boost::winapi::GetModuleFileName(CTL_StaticData::GetDLLInstanceHandle(), dllPath.data(), 1024);
-    return dllPath;
+    auto nChars = boost::winapi::GetModuleFileName(CTL_StaticData::GetDLLInstanceHandle(), dllPath.data(), 1024);
+    if (nChars >= 0)
+    {
+        dllPath.resize(nChars);
+        return dllPath;
+    }
+    return {};
 }
 
 CTL_StringType dynarithmic::GetVersionString()
@@ -2218,7 +2223,6 @@ CTL_StringType dynarithmic::GetVersionString()
         strm << sStatic << "Dynarithmic TWAIN Library, Version " << lMajor << "." << lMinor << " - " << s << " Version (Patch Level "
             << lPatch << ") Internal Build Number: " << StringConversion::Convert_Native_To_Ansi(GetDTWAINInternalBuildNumber()) << "\n" << 
             "Shared Library path : " <<  StringConversion::Convert_Native_To_Ansi(GetDTWAINDLLPath());
-
         strm << "\nUsing Resource file (twaininfo.txt) version: " << StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetResourceVersion());
         strm << "\nResource file path: " << StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetResourcePath());
         strm << "\nText Resource Language: " << StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetGeneralResourceInfo().sResourceName);
@@ -2531,7 +2535,7 @@ bool LoadGeneralResources(bool blockExecution)
             {
                 CTL_StringStreamType strm;
                 strm << _T("\r\n\r\nBad data found:\r\n") << _T("Line number: ") << ret.m_dupInfo.lineNumber;
-                strm << _T("\r\nLine starts with: ") << StringConversion::Convert_Ansi_To_Native(ret.m_dupInfo.line);
+                strm << _T("\r\nLine starts with: ") << StringConversion::Convert_Ansi_To_Native(ret.m_dupInfo.line, ret.m_dupInfo.line.length());
                 versionErrorMessage = strm.str();
                 CTL_StaticData::SetResourceLoadError(DTWAIN_ERR_RESOURCES_DATA_EXCEPTION);
             }
@@ -2550,7 +2554,7 @@ bool LoadGeneralResources(bool blockExecution)
             {
                 CTL_StringStreamType strm;
                 strm << _T("\r\n\r\nDuplicate ID Information:\r\n") << _T("Line number: ") << ret.m_dupInfo.lineNumber;
-                strm << _T("\r\nLine: ") << StringConversion::Convert_Ansi_To_Native(ret.m_dupInfo.line);
+                strm << _T("\r\nLine: ") << StringConversion::Convert_Ansi_To_Native(ret.m_dupInfo.line, ret.m_dupInfo.line.length());
                 strm << _T("\r\nID: ") << ret.m_dupInfo.duplicateID;
                 versionErrorMessage = strm.str();
                 CTL_StaticData::SetResourceLoadError(DTWAIN_ERR_RESOURCES_DUPLICATEID_FOUND);
