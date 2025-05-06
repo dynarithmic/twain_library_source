@@ -262,7 +262,7 @@ static std::string GetDirectoryCreationError(const CTL_StringType& fileName)
 {
     return  GetResourceStringFromMap(IDS_LOGMSG_ERRORTEXT) + ": DTWAIN_AcquireFile: " +
             GetResourceStringFromMap(-DTWAIN_ERR_CREATE_DIRECTORY) + ": " +
-            StringConversion::Convert_Native_To_Ansi(fileName);
+            StringConversion::Convert_Native_To_Ansi(fileName, fileName.size());
 }
 
 bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType)
