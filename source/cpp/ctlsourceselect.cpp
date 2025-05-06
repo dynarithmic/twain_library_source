@@ -69,7 +69,7 @@ static LONG OpenSourceInternal(DTWAIN_SOURCE Source, const SourceSelectionOption
             const LONG err = DTWAIN_ERR_SOURCE_COULD_NOT_OPEN;
             CTL_StringType sProdName = StringWrapper::QuoteString(p->GetProductName());
             DTWAIN_Check_Error_Condition_3_Ex(pHandle, [&]{return !retval; }, err, 
-                                              StringConversion::Convert_Native_To_Ansi(sProdName), err, FUNC_MACRO);
+                                              StringConversion::Convert_Native_To_Ansi(sProdName, sProdName.length()), err, FUNC_MACRO);
         }
     }
     return DTWAIN_NO_ERROR;

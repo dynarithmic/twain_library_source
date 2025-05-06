@@ -2372,7 +2372,7 @@ bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
         if ( loadReturnCode != boost::system::errc::success)
         {
             const CTL_StringType dllName = _T(" : ") + m_strTwainDSMPath;
-            DTWAIN_ERROR_CONDITION_EX(IDS_ErrTwainDLLNotFound, StringConversion::Convert_Native_To_Ansi(dllName), false, true)
+            DTWAIN_ERROR_CONDITION_EX(IDS_ErrTwainDLLNotFound, StringConversion::Convert_Native_To_Ansi(dllName, dllName.length()), false, true)
         }
 
         // Attempt to load the DSM_Entry point
@@ -2398,7 +2398,7 @@ bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
             if ( m_strTwainDSMPath.empty())
             {
                 const CTL_StringType dllName = _T(" : ") + tempStr;
-                DTWAIN_ERROR_CONDITION_EX(IDS_ErrTwainDLLNotFound, StringConversion::Convert_Native_To_Ansi(dllName), false, true)
+                DTWAIN_ERROR_CONDITION_EX(IDS_ErrTwainDLLNotFound, StringConversion::Convert_Native_To_Ansi(dllName, dllName.length()), false, true)
             }
         }
         m_strTwainDSMVersionInfo = dynarithmic::GetVersionInfo(m_hLibModule.native(), 0);

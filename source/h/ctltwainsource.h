@@ -160,32 +160,24 @@ namespace dynarithmic
         TW_UINT16    GetProtocolMajor() const { return m_SourceId.get_protocol_major(); }
         TW_UINT16    GetProtocolMinor() const { return m_SourceId.get_protocol_minor(); }
         TW_UINT32    GetSupportedGroups() const { return m_SourceId.get_supported_groups(); }
+        #ifdef UNICODE
         CTL_StringType GetManufacturer() const { return StringConversion::Convert_Ansi_To_Native(m_SourceId.get_manufacturer()); }
         CTL_StringType GetProductFamily() const { return StringConversion::Convert_Ansi_To_Native(m_SourceId.get_product_family()); }
         CTL_StringType GetProductName() const { return StringConversion::Convert_Ansi_To_Native(m_SourceId.get_product_name()); }
+        #else
+		CTL_StringType GetManufacturer() const { return m_SourceId.get_manufacturer(); }
+		CTL_StringType GetProductFamily() const { return m_SourceId.get_product_family(); }
+		CTL_StringType GetProductName() const { return m_SourceId.get_product_name(); }
+        #endif
         std::string GetManufacturerA() const { return m_SourceId.get_manufacturer(); }
         std::string GetProductFamilyA() const { return m_SourceId.get_product_family(); }
         std::string GetProductNameA() const { return m_SourceId.get_product_name(); }
+		std::wstring GetManufacturerW() const { return StringConversion::Convert_Ansi_To_Wide(m_SourceId.get_manufacturer()); } 
+		std::wstring GetProductFamilyW() const { return StringConversion::Convert_Ansi_To_Wide(m_SourceId.get_product_family()); }
+		std::wstring GetProductNameW() const { return StringConversion::Convert_Ansi_To_Wide(m_SourceId.get_product_name()); }
+
         std::string GetSourceInfo() const { return m_SourceId.to_json(); }
-        SourceCompressionMap& GetCompressionMap() { return m_CompressionMap; }
-
-        std::wstring GetManufacturerW() const 
-        {
-            auto str = GetManufacturerA();
-            return std::wstring(str.begin(), str.end());
-        }
-
-        std::wstring GetProductFamilyW() const 
-        { 
-            auto str = GetProductFamilyA();
-            return std::wstring(str.begin(), str.end());
-        }
-
-        std::wstring GetProductNameW() const 
-        {
-            auto str = GetProductNameA();
-            return std::wstring(str.begin(), str.end());
-        }
+        SourceCompressionMap& GetCompressionMap() noexcept { return m_CompressionMap; }
 
         bool         IsOpened() const { return m_bIsOpened; }
         bool         IsSelected() const { return m_bIsSelected; }
