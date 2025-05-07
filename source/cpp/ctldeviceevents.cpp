@@ -160,8 +160,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventInfo(DTWAIN_SOURCE Source, LONG nW
         case DTWAIN_GETDE_DEVNAME:
         {
             char *s = static_cast<char*>(pValue);
-            auto& devName = DeviceEvent.GetDeviceName();
-            strcpy(s, StringConversion::Convert_Native_To_Ansi(devName, devName.length()).c_str());
+            auto devName = DeviceEvent.GetDeviceNameA();
+            strcpy(s, devName.c_str());
         }
         break;
 
