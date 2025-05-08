@@ -21,14 +21,16 @@
 #ifndef WINGET_TWAIN_INL
 #define WINGET_TWAIN_INL
 #ifdef _WIN32
-static CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwainDLLName,
-    bool bLeaveLoaded = false,
-    boost::dll::shared_library* pModule = nullptr);
+static CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, 
+                                            LPCTSTR strTwainDLLName,
+                                            LPLONG pWhichSearch,
+                                            bool bLeaveLoaded = false,
+                                            boost::dll::shared_library* pModule = nullptr);
 
 CTL_StringType GetTwainDirFullName(LPCTSTR strTwainDLLName,
-    LPLONG pWhichSearch,
-    bool bLeaveLoaded = false,
-    boost::dll::shared_library* pModule = nullptr)
+                                   LPLONG pWhichSearch,
+                                   bool bLeaveLoaded = false,
+                                   boost::dll::shared_library* pModule = nullptr)
 {
     auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
     static constexpr std::array<std::pair<LONG, const TCHAR*>, 15> searchOrderMap = { {
@@ -52,10 +54,10 @@ CTL_StringType GetTwainDirFullName(LPCTSTR strTwainDLLName,
     if (iter.first)
     {
         pHandle->m_TwainDSMSearchOrderStr = searchOrderMap[iter.second].second + CTL_StringType(_T("C"));
-        return GetTwainDirFullNameEx(pHandle, strTwainDLLName, bLeaveLoaded, pModule);
+        return GetTwainDirFullNameEx(pHandle, strTwainDLLName, pWhichSearch, bLeaveLoaded, pModule);
     }
     // This will completely use the Ex version of finding the directory
-    return GetTwainDirFullNameEx(pHandle, strTwainDLLName, bLeaveLoaded, pModule);
+    return GetTwainDirFullNameEx(pHandle, strTwainDLLName, pWhichSearch, bLeaveLoaded, pModule);
 }
 
 enum { dll_already_loaded, dll_loaded, dll_notfound };
@@ -77,7 +79,8 @@ static std::pair<int, int> LoadTwainDLL(boost::dll::shared_library& libloader, c
     return { dll_loaded, val };
 }
 
-CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwainDLLName, bool bLeaveLoaded, boost::dll::shared_library* pModule)
+CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwainDLLName, 
+                                     LPLONG pWhichSearch, bool bLeaveLoaded, boost::dll::shared_library* pModule)
 {
     struct libLoadRAII
     {
@@ -105,6 +108,9 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
     static constexpr int CurDirPos = 3;
     static constexpr int UserDefPos = 4;
 
+    if (pWhichSearch)
+        *pWhichSearch = -1;
+
     // make sure we get only the file name.  If a directory path
     // is given in the strTwainDLLName argument, it is ignored.
     StringWrapper::StringArrayType fComponents;
@@ -115,12 +121,12 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
     // if TWAIN isn't found there, check system directory.
     // if not there, then use the Windows path search logic
     std::set<CTL_StringType> strSet;
-    static constexpr std::array<std::pair<StringWrapper::traits_type::char_type, int>, 5> searchMap = { {
-        {_T('C'),CurDirPos},
-        {_T('W'),WinDirPos},
-        {_T('S'),SysDirPos},
-        {_T('O'),SysPathPos},
-        {_T('U'),UserDefPos },
+    static constexpr std::array<std::tuple<StringWrapper::traits_type::char_type, int, int>, 5> searchMap = { {
+        {_T('C'),CurDirPos, DTWAIN_TWAINDSMSEARCH_C},
+        {_T('W'),WinDirPos, DTWAIN_TWAINDSMSEARCH_W},
+        {_T('S'),SysDirPos, DTWAIN_TWAINDSMSEARCH_S},
+        {_T('O'),SysPathPos, DTWAIN_TWAINDSMSEARCH_O},
+        {_T('U'),UserDefPos, DTWAIN_TWAINDSMSEARCH_U },
      } };
 
     std::vector<CTL_StringType> dirNames(searchMap.size());
@@ -167,10 +173,13 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
     for (int i = 0; i < minSize; ++i)
     {
         // skip this search if -1 is given
-        auto curOrder = dynarithmic::generic_array_finder_if(searchMap, [&](const auto& pr) { return pr.first == curSearchOrder[i]; });
-        const int nCurDir = searchMap[curOrder.second].second;
+        auto curOrder = dynarithmic::generic_array_finder_if(searchMap, [&](const auto& pr) 
+            { return std::get<0>(pr) == curSearchOrder[i]; });
+        const int nCurDir = std::get<1>(searchMap[curOrder.second]); // .second;
         if (nCurDir == -1)
             continue;
+
+        const LONG nReturnPosition = std::get<2>(searchMap[curOrder.second]);
 
         // only do this if we haven't checked the directory
         auto dirNameToUse = dirNames[nCurDir];
@@ -256,6 +265,8 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
                 if (bLeaveLoaded)
                     *pModule = libloader;
             }
+            if (pWhichSearch)
+                *pWhichSearch = nReturnPosition;
             return fNameTotal;
         }
         else
