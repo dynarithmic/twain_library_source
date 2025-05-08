@@ -66,7 +66,10 @@ static std::pair<int, int> LoadTwainDLL(boost::dll::shared_library& libloader, c
     ErrorCodeType ec;
     HMODULE hMod = ::GetModuleHandle(fNameTotal.c_str());
     if (hMod)
+    {
+        libloader = boost::dll::shared_library(hMod);
         return { dll_already_loaded, boost::system::errc::success };
+    }
     libloader.load(fNameTotal, ec, boost::dll::load_mode::search_system_folders);
     int val = ec.value();
     if (val != boost::system::errc::success)
