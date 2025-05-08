@@ -2246,11 +2246,12 @@ CTL_StringType CTL_TwainAppMgr::GetTwainDirFullName(LPCTSTR szTwainDLLName,
 }
 
 CTL_StringType CTL_TwainAppMgr::GetTwainDirFullNameEx(LPCTSTR szTwainDLLName,
-                                                    bool bLeaveLoaded/*=false*/,
-                                                    boost::dll::shared_library *pModule)
+                                                      LPLONG pWhichSearch,
+                                                      bool bLeaveLoaded/*=false*/,
+                                                      boost::dll::shared_library *pModule)
 {
     const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    return ::GetTwainDirFullNameEx(pHandle, szTwainDLLName, bLeaveLoaded, pModule);
+    return ::GetTwainDirFullNameEx(pHandle, szTwainDLLName, pWhichSearch, bLeaveLoaded, pModule);
 }
 
 std::pair<bool, CTL_StringType> CTL_TwainAppMgr::CheckTwainExistence(CTL_StringType strTwainDLLName, LPLONG pWhichSearch)
@@ -2390,11 +2391,11 @@ bool CTL_TwainAppMgr::LoadSourceManager( LPCTSTR pszDLLName )
         // load the default TWAIN_32.DLL or TWAINDSM.DLL using the
         // normal process of finding these DLL's
         const auto& tempStr = m_strTwainDSMPath;
-        m_strTwainDSMPath = GetTwainDirFullName(m_strTwainDSMPath.c_str(), nullptr, true, &m_hLibModule);
+        m_strTwainDSMPath = GetTwainDirFullName(m_strTwainDSMPath.c_str(), &m_nTwainDSMFoundPath, true, &m_hLibModule);
         if ( m_strTwainDSMPath.empty() )
         {
             m_strTwainDSMPath = tempStr;
-            m_strTwainDSMPath = GetTwainDirFullNameEx(m_strTwainDSMPath.c_str(), true, &m_hLibModule);
+            m_strTwainDSMPath = GetTwainDirFullNameEx(m_strTwainDSMPath.c_str(), &m_nTwainDSMFoundPath, true, &m_hLibModule);
             if ( m_strTwainDSMPath.empty())
             {
                 const CTL_StringType dllName = _T(" : ") + tempStr;
@@ -2721,6 +2722,14 @@ CTL_StringType CTL_TwainAppMgr::GetDSMVersionInfo()
     if (mgr)
         return mgr->m_strTwainDSMVersionInfo;
     return {};
+}
+
+LONG CTL_TwainAppMgr::GetDSMPathLocation()
+{
+    const auto mgr = GetInstance();
+    if (mgr)
+        return mgr->m_nTwainDSMFoundPath;
+    return -1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

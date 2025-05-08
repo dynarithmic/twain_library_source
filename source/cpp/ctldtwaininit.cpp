@@ -719,13 +719,24 @@ LONG DLLENTRY_DEF DTWAIN_GetDSMFullName(LONG DSMType, LPTSTR szDLLName, LONG nMa
     CTL_StringType sPath;
     CTL_StringType* strToSet = &sPath;
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
-
     if (pHandle)
     {
-        if (DSMType == DTWAIN_TWAINDSM_LEGACY)
+        if (DSMType == DTWAIN_TWAINDSM_LEGACY &&
+            pHandle->m_bSessionAllocated &&
+            pHandle->m_SessionStruct.nSessionType == DSMType)
+        {
             strToSet = &pHandle->m_strTWAINPath;
+        }
         else
+        if (IsTwainDSM2(DSMType) && 
+            IsTwainDSM2(pHandle->m_SessionStruct.nSessionType) &&
+            pHandle->m_bSessionAllocated)
+        {
             strToSet = &pHandle->m_strTWAINPath2;
+        }
+        
+        if ( pWhichSearch )
+            *pWhichSearch = pHandle->m_nTwainPathLocation;
     }
     if ( strToSet->empty() )
         *strToSet = CTL_TwainAppMgr::GetTwainDirFullName(sName.c_str(), pWhichSearch);
@@ -1456,6 +1467,17 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lp
     pHandle->m_pTwainSession = Session;
     pHandle->m_hInstance   = hInstance;
 
+    if (pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_LATESTVERSION ||
+        pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_VERSION2)
+    {
+        pHandle->m_strTWAINPath2 = CTL_TwainAppMgr::GetDSMPath();
+    }
+    else
+    {
+        pHandle->m_strTWAINPath = CTL_TwainAppMgr::GetDSMPath();
+    }
+
+    pHandle->m_nTwainPathLocation = CTL_TwainAppMgr::GetDSMPathLocation();
     // We may need to route the messages to the user.  The user window
     // must be aware that if it is subclassed again, the message will
     // appear twice.
