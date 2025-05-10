@@ -357,7 +357,10 @@ namespace dynarithmic
 
                 // Get all the names associated with this constant
                 std::vector<std::string> saNames;
-                StringWrapperA::Tokenize(name, ", ", saNames);
+                if (twainValue == IDS_DTWAIN_APPTITLE)
+                    saNames.push_back(name);
+                else
+                    StringWrapperA::Tokenize(name, ", ", saNames);
                 iter->second.insert({twainValue, saNames});
                 if (stringToConstantMap.find(name) != stringToConstantMap.end())
                 {
