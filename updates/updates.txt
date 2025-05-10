@@ -4,6 +4,9 @@ DTWAIN Version changes
 
 - Fix issue with missing TWAIN log header information.
 
+- Fix issue with truncated DTWAIN version information being saved in 
+  generated image files.
+
 - Internal code refactoring and cleanup.
 
 
