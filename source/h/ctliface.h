@@ -751,6 +751,7 @@ namespace dynarithmic
             CTL_StringType   m_VersionString;
             CTL_StringType   m_strTWAINPath;     // path to the TWAIN Data Source Manager that is being used
             CTL_StringType   m_strTWAINPath2;   // path to the TWAIN Data Source Manager 2.x that is being used
+            LONG             m_nTwainPathLocation = -1; // constant denoting where active Twain DataSource manager was found
             CTL_StringType   m_strLibraryPath;   // path to the DTWAIN Library being used
             CTL_StringType   m_sWindowsVersionInfo; // Windows version information, cached.
             CTL_StringType   m_strDefaultSource; // Current default TWAIN source

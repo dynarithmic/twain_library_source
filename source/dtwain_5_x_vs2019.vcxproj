@@ -294,7 +294,7 @@ implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
 copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt + $(TargetDir)$(TargetName)_sha512hash.txt $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
 del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
-copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt + $(TargetDir)debug_libraries_zip_sha512hash.txt$ (TargetDir)debug_ziphashes$(PlatformArchitecture).txt
+copy $(TargetDir)debug_libraries_zip_md5hash.txt + $(TargetDir)debug_libraries_zip_sha1hash.txt + $(TargetDir)debug_libraries_zip_sha256hash.txt + $(TargetDir)debug_libraries_zip_sha512hash.txt $(TargetDir)debug_ziphashes$(PlatformArchitecture).txt
 del $(TargetDir)debug_libraries_zip_md5hash.txt
 del $(TargetDir)debug_libraries_zip_sha1hash.txt
 del $(TargetDir)debug_libraries_zip_sha256hash.txt
@@ -545,7 +545,7 @@ implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
 copy $(TargetDir)$(TargetName)_md5hash.txt + $(TargetDir)$(TargetName)_sha1hash.txt + $(TargetDir)$(TargetName)_sha256hash.txt + $(TargetDir)$(TargetName)_sha512hash.txt $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 type $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt &gt;&gt; $(TargetDir)dllhashes$(PlatformArchitecture).txt
 del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
-copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt + $(TargetDir)release_libraries_zip_sha512hash.txt$ (TargetDir)release_ziphashes$(PlatformArchitecture).txt
+copy $(TargetDir)release_libraries_zip_md5hash.txt + $(TargetDir)release_libraries_zip_sha1hash.txt + $(TargetDir)release_libraries_zip_sha256hash.txt + $(TargetDir)release_libraries_zip_sha512hash.txt $(TargetDir)release_ziphashes$(PlatformArchitecture).txt
 del $(TargetDir)release_libraries_zip_md5hash.txt
 del $(TargetDir)release_libraries_zip_sha1hash.txt
 del $(TargetDir)release_libraries_zip_sha256hash.txt
@@ -1140,9 +1140,6 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile Include=".\cpp\ctltr008.cpp" />
     <ClCompile Include=".\cpp\ctltr010.cpp" />
     <ClCompile Include=".\cpp\ctltr011.cpp" />
-    <ClCompile Include=".\cpp\ctltr012.cpp" />
-    <ClCompile Include=".\cpp\ctltr013.cpp" />
-    <ClCompile Include=".\cpp\ctltr014.cpp" />
     <ClCompile Include=".\cpp\ctltr015.cpp" />
     <ClCompile Include=".\cpp\ctltr016.cpp" />
     <ClCompile Include=".\cpp\ctltr017.cpp" />

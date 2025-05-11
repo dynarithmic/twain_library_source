@@ -31,7 +31,8 @@ namespace dynarithmic
             operator pTW_DEVICEEVENT() { return &m_DeviceEvent; }
 
             TW_UINT32  GetEvent() const;                  /* One of the TWDE_xxxx values. */
-            CTL_StringType GetDeviceName() const;             /* The name of the device that generated the event */
+            CTL_StringType GetDeviceName() const;         /* The name of the device that generated the event */
+            std::string GetDeviceNameA() const;           /* ANSI name of the device */
             TW_UINT32  GetBatteryMinutes() const;         /* Battery Minutes Remaining    */
             TW_INT16   GetBatteryPercentage() const;      /* Battery Percentage Remaining */
             TW_INT32   GetPowerSupply() const;            /* Power Supply                 */

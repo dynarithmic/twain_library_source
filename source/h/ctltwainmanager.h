@@ -277,13 +277,15 @@ namespace dynarithmic
                                                       bool leaveLoaded = false,
                                                       boost::dll::shared_library* pModule = nullptr);
             static CTL_StringType GetTwainDirFullNameEx(LPCTSTR szTwainDLLName,
-                                                      bool leaveLoaded = false,
-                                                      boost::dll::shared_library* pModule = nullptr);
+                                                        LPLONG pWhichSearch, 
+                                                        bool leaveLoaded = false,
+                                                        boost::dll::shared_library* pModule = nullptr);
 
             static CTL_CapStruct GetGeneralCapInfo(LONG Cap);
             static bool GetCurrentOneCapValue(const CTL_ITwainSource *pSource, void *pValue, TW_UINT16 Cap, TW_UINT16 nDataType );
             static CTL_StringType GetDSMPath();
             static CTL_StringType GetDSMVersionInfo();
+            static LONG GetDSMPathLocation();
             auto GetDSMModuleHandle() const { return m_hLibModule.native(); }
             static SourceToXferReadyMap& GetSourceToXferReadyMap() { return s_SourceToXferReadyMap; }
             static SourceToXferReadyList& GetSourceToXferReadyList() { return s_SourceToXferReadyList; }
@@ -481,6 +483,7 @@ namespace dynarithmic
                                                                 // session
             CTL_StringType  m_strTwainDSMPath;   // Twain DLL path
             CTL_StringType  m_strTwainDSMVersionInfo; // TWAIN DLL version information
+            LONG            m_nTwainDSMFoundPath = -1; // Constant denoting where the Twain DSM was found
             boost::dll::shared_library m_hLibModule;         // Twain DLL module handle
             DSMENTRYPROC    m_lpDSMEntry;        // Proc entry point for DSM_ENTRY
             TW_UINT16       m_nErrorTWRC;

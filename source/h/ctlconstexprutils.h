@@ -403,5 +403,11 @@ namespace dynarithmic
     {
         return msgType == MSG_RESET || msgType == MSG_RESETALL || msgType == MSG_SET || msgType == MSG_SETCONSTRAINT;
     }
+
+    static constexpr bool IsTwainDSM2(long DSMType) noexcept
+    {
+        return DSMType == DTWAIN_TWAINDSM_VERSION2 ||
+               DSMType == DTWAIN_TWAINDSM_LATESTVERSION;
+    }
 };
 #endif

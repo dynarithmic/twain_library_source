@@ -373,7 +373,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
         auto retVal = GetStringCapability(Source, Cap, &valueTemp[0], NumChars, \
                                           GetCurrentCapValues, __FUNCTION__, GENERATE_PARAM_LOG((Source, value))); \
         valueTemp.resize(NumChars); \
-        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp), value, NumChars); \
+        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp, valueTemp.size()), value, NumChars); \
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((value)) \
         return retVal;\
     }
@@ -385,7 +385,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
         auto retVal = GetStringCapability(Source, Cap, &valueTemp[0], MaxLen, GetCurrentCapValues,\
                                          __FUNCTION__, GENERATE_PARAM_LOG((Source, value))); \
         valueTemp.resize(MaxLen); \
-        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp), value, MaxLen); \
+        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp, valueTemp.size()), value, MaxLen); \
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((value)) \
         return retVal;\
     }
@@ -405,7 +405,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
         auto retval = GetStringCapability(Source, Cap, &valueTemp[0], NumChars, fn, __FUNCTION__, \
                             GENERATE_PARAM_LOG((Source, value, GetType))); \
         valueTemp.resize(NumChars); \
-        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp), value, NumChars); \
+        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp, valueTemp.size()), value, NumChars); \
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((value)) \
         return retval; \
     }
