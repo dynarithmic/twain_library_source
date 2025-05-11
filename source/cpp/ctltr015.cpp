@@ -36,7 +36,7 @@ CTL_CapabilityGetRangeTriplet::CTL_CapabilityGetRangeTriplet(
                                                    gType,
                                                    gCap,
                                                    TwainDataType),
-                                                m_FirstVal{}, m_LastVal{}, m_StepVal{}, m_DefaultVal{}, m_CurrentVal{}, m_nNumRangeItems{}
+                                                m_FirstVal{}, m_LastVal{}, m_StepVal{}, m_DefaultVal{}, m_CurrentVal{}
 {
 }
 
@@ -94,7 +94,7 @@ bool CTL_CapabilityGetRangeTriplet::EnumCapValues( void *pCapData )
         m_DefaultVal.ival = pRange->DefaultValue;
     }
 
-    m_nNumRangeItems = GetNumItems();
+    m_nNumItems = m_nNumRangeItems;
     return true;
 }
 
@@ -115,12 +115,6 @@ TW_UINT16 CTL_CapabilityGetRangeTriplet::GetDataType()
     if ( !pRange )
         return static_cast<TW_UINT16>(-1);
     return pRange->ItemType;
-}
-
-
-size_t CTL_CapabilityGetRangeTriplet::GetNumItems()
-{
-    return 5;
 }
 
 bool CTL_CapabilityGetRangeTriplet::GetValue(void *pData, size_t nWhichVal)

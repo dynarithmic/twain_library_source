@@ -80,14 +80,14 @@ struct NullSetCapConverter
 struct StringGetCapConverter
 {
     static CTL_StringType Convert(std::string& value)
-    { return StringConversion::Convert_Ansi_To_Native(value); }
+    { return StringConversion::Convert_Ansi_To_Native(value, value.length()); }
 };
 
 struct StringSetCapConverter
 {
     static std::string convert(CTL_StringType& value, DTWAIN_ARRAY)
     {
-        return StringConversion::Convert_Native_To_Ansi(value);
+        return StringConversion::Convert_Native_To_Ansi(value, value.length());
     }
 };
 

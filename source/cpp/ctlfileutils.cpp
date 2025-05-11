@@ -115,7 +115,7 @@ namespace dynarithmic
     {
         auto parentDir = get_parent_directory(filename);
         auto guidName = parentDir + StringWrapper::GetGUID();
-        std::ofstream testStream(StringConversion::Convert_Native_To_Ansi(guidName));
+        std::ofstream testStream(StringConversion::Convert_Native_To_Ansi(guidName, guidName.length()));
         if ( testStream.is_open())
         { 
             testStream.close();

@@ -153,7 +153,7 @@ namespace dynarithmic
         int structtype, retcode, successcode;
         auto sPath = createResourceFileName(DTWAINRESOURCEINFOFILE);
         retValue.resourcePath = sPath;
-        auto sPathA = StringConversion::Convert_Native_To_Ansi(sPath);
+        auto sPathA = StringConversion::Convert_Native_To_Ansi(sPath, sPath.length());
         StringWrapperA::traits_type::inputfile_type ifs(sPathA);
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] = ifs ? true : false;
         
@@ -357,7 +357,10 @@ namespace dynarithmic
 
                 // Get all the names associated with this constant
                 std::vector<std::string> saNames;
-                StringWrapperA::Tokenize(name, ", ", saNames);
+                if (twainValue == IDS_DTWAIN_APPTITLE)
+                    saNames.push_back(name);
+                else
+                    StringWrapperA::Tokenize(name, ", ", saNames);
                 iter->second.insert({twainValue, saNames});
                 if (stringToConstantMap.find(name) != stringToConstantMap.end())
                 {
@@ -559,7 +562,7 @@ namespace dynarithmic
     {
         std::vector<std::string> ret;
         const auto sPath = createResourceFileName(DTWAINLANGRESOURCENAMESFILE);
-        const std::string sPathA = StringConversion::Convert_Native_To_Ansi(sPath);
+        const std::string sPathA = StringConversion::Convert_Native_To_Ansi(sPath, sPath.length());
         std::ifstream ifs(sPathA);
         if (!ifs)
             return ret;
