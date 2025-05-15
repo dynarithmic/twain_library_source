@@ -64,7 +64,7 @@ std::pair<bool, int> TWAINCompliancyTester::TestPixelTypeCompliancy()
     DTWAIN_ARRAY PixelTypes = {};
     auto pHandle = m_pSource->GetDTWAINHandle();
     DTWAINArrayLowLevelPtr_RAII arrP(pHandle, &PixelTypes);
-    DTWAIN_BOOL bOK = DTWAIN_GetCapValuesEx2(m_pSource, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &PixelTypes);
+    DTWAIN_BOOL bOK = DTWAIN_GetCapValuesEx2(m_pSource, ICAP_PIXELTYPE, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &PixelTypes);
     if (!bOK || !PixelTypes)
     {
         returnPair = { false, DTWAIN_ERR_ICAPPIXELTYPE_COMPLIANCY1 };
@@ -80,7 +80,7 @@ std::pair<bool, int> TWAINCompliancyTester::TestPixelTypeCompliancy()
         // Get the current pixel type
         DTWAIN_ARRAY CurrentPixelType = {};
         DTWAINArrayLowLevelPtr_RAII arr2(pHandle, &CurrentPixelType);
-        bOK = DTWAIN_GetCapValuesEx2(m_pSource, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &CurrentPixelType);
+        bOK = DTWAIN_GetCapValuesEx2(m_pSource, ICAP_PIXELTYPE, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &CurrentPixelType);
         if (!bOK)
             returnPair = { false, DTWAIN_ERR_ICAPPIXELTYPE_COMPLIANCY1 };
 
@@ -114,11 +114,11 @@ std::pair<bool, int> TWAINCompliancyTester::TestPixelTypeCompliancy()
         {
             vCurPixTypePtr2[0] = val;
             // Set the pixel type
-            bOK = DTWAIN_SetCapValuesEx2(m_pSource, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, CurrentPixelType);
+            bOK = DTWAIN_SetCapValuesEx2(m_pSource, ICAP_PIXELTYPE, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, CurrentPixelType);
             if (bOK)
             {
                 // Get the current bit depths
-                DTWAIN_GetCapValuesEx2(m_pSource, DTWAIN_CV_ICAPBITDEPTH, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aBitDepths);
+                DTWAIN_GetCapValuesEx2(m_pSource, ICAP_BITDEPTH, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aBitDepths);
                 auto& vCurBitDepths = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aBitDepths);
                 if (vCurBitDepths.empty())
                     returnPair = { false, DTWAIN_ERR_ICAPBITDEPTH_COMPLIANCY1 };
@@ -138,11 +138,11 @@ std::pair<bool, int> TWAINCompliancyTester::TestPixelTypeCompliancy()
         {
             vCurPixTypePtr2[0] = val;
             // Set the pixel type
-            bOK = DTWAIN_SetCapValuesEx2(m_pSource, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, CurrentPixelType);
+            bOK = DTWAIN_SetCapValuesEx2(m_pSource, ICAP_PIXELTYPE, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, CurrentPixelType);
             if (bOK)
             {
                 // Get the current bit depths
-                DTWAIN_GetCapValuesEx2(m_pSource, DTWAIN_CV_ICAPBITDEPTH, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aBitDepths);
+                DTWAIN_GetCapValuesEx2(m_pSource, ICAP_BITDEPTH, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aBitDepths);
                 auto& vCurBitDepths = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aBitDepths);
                 for (auto curBitDepth : vCurBitDepths)
                     m_pSource->AddPixelTypeAndBitDepth(val, curBitDepth);
@@ -170,7 +170,7 @@ std::pair<bool, std::vector<int>> TWAINCompliancyTester::TestXfermechCompliancy(
     DTWAIN_ARRAY XFerMechs = {};
     auto pHandle = m_pSource->GetDTWAINHandle();
     DTWAINArrayLowLevelPtr_RAII arrP(pHandle, &XFerMechs);
-    DTWAIN_BOOL bOK = DTWAIN_GetCapValuesEx2(m_pSource, DTWAIN_CV_ICAPXFERMECH, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &XFerMechs);
+    DTWAIN_BOOL bOK = DTWAIN_GetCapValuesEx2(m_pSource, ICAP_XFERMECH, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &XFerMechs);
     if (!bOK || !XFerMechs)
     {
         returnPair.first = false;
@@ -211,7 +211,7 @@ std::pair<bool, std::vector<int>> TWAINCompliancyTester::TestStandardCapabilitie
     // Get the current pixel type
     DTWAIN_ARRAY CurrentPixelType = {};
     DTWAINArrayLowLevelPtr_RAII arr2(pHandle, &CurrentPixelType);
-    bool bOK = DTWAIN_GetCapValuesEx2(m_pSource, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &CurrentPixelType);
+    bool bOK = DTWAIN_GetCapValuesEx2(m_pSource, ICAP_PIXELTYPE, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &CurrentPixelType);
     if (!bOK)
     {
         returnPair.first = false;
@@ -232,13 +232,13 @@ std::pair<bool, std::vector<int>> TWAINCompliancyTester::TestStandardCapabilitie
     for (auto& pr : pixelTypeMap)
     {
         vCurPixTypePtr2[0] = pr.first;
-        bOK = DTWAIN_SetCapValuesEx2(m_pSource, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, CurrentPixelType);
+        bOK = DTWAIN_SetCapValuesEx2(m_pSource, ICAP_PIXELTYPE, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, CurrentPixelType);
         if (!bOK)
         {
             returnPair.first = false;
             returnPair.second.push_back(DTWAIN_ERR_STANDARDCAPS_COMPLIANCY);
         }
-        bOK = DTWAIN_SetCapValuesEx2(m_pSource, DTWAIN_CV_ICAPPIXELTYPE, DTWAIN_CAPRESETALL, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, CurrentPixelType);
+        bOK = DTWAIN_SetCapValuesEx2(m_pSource, ICAP_PIXELTYPE, DTWAIN_CAPRESETALL, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, CurrentPixelType);
         if (!bOK)
         {
             auto conditionCode = CTL_TwainAppMgr::GetLastConditionCodeError();

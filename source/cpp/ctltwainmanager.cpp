@@ -84,7 +84,7 @@ static constexpr std::array<std::pair<int, int>, 32> mapCondCode = { {
 template <class T>
 bool SetOneTwainCapValue( const CTL_ITwainSource *pSource,
                           T Value,
-                          CTL_EnumSetType nSetType,
+                          TW_UINT16 nSetType,
                           TW_UINT16 Cap,
                           TW_UINT16 TwainType = 0xFFFF)
 {
@@ -445,7 +445,7 @@ bool CTL_TwainAppMgr::OpenSource( CTL_ITwainSession* pSession, const CTL_ITwainS
 LONG CTL_TwainAppMgr::DoCapContainerTest(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, TW_UINT16 nCap, LONG lGetType)
 {
     const auto pSession = pSource->GetTwainSession();
-    CTL_CapabilityGetTriplet CapTester(pSession, pSource, static_cast<CTL_EnumGetType>(lGetType), static_cast<TW_UINT16>(nCap), 0);
+    CTL_CapabilityGetTriplet CapTester(pSession, pSource, static_cast<TW_UINT16>(lGetType), static_cast<TW_UINT16>(nCap), 0);
     CapTester.SetTestMode(true);
     const TW_UINT16 rc = CapTester.Execute();
     if (rc == TWRC_SUCCESS)
@@ -496,7 +496,7 @@ bool CTL_TwainAppMgr::GetImageLayoutSize(const CTL_ITwainSource* pSource, CTL_Re
 bool CTL_TwainAppMgr::SetImageLayoutSize(const CTL_ITwainSource* pSource,
                                          const CTL_RealArray& rArray,
                                          CTL_RealArray& rActual,
-                                         CTL_EnumSetType SetType)
+                                         TW_UINT16 SetType)
 {
     if ( !s_pGlobalAppMgr )
         return false;
@@ -901,7 +901,7 @@ bool CTL_TwainAppMgr::StoreImageLayout(CTL_ITwainSource *pSource)
 
     // First, see if ICAP_UNDEFINED image size is used
     TW_UINT16 nValue;
-    if ( GetOneCapValue( pSource, &nValue, TwainCap_UNDEFINEDIMAGESIZE, TWTY_BOOL) )
+    if ( GetOneCapValue( pSource, &nValue, ICAP_UNDEFINEDIMAGESIZE, TWTY_BOOL) )
     {
         if ( nValue == 1 )
         {
@@ -1239,7 +1239,7 @@ bool CTL_TwainAppMgr::SetupMemXferDIB(CTL_ITwainSession* pSession, CTL_ITwainSou
 
             // Get Units and calculate PelsPerMeter
             nPixelFlavor = TWPF_CHOCOLATE;
-            if ( !GetCurrentOneCapValue( pSource, &nPixelFlavor, TwainCap_PIXELFLAVOR, TWTY_UINT16))
+            if ( !GetCurrentOneCapValue( pSource, &nPixelFlavor, ICAP_PIXELFLAVOR, TWTY_UINT16))
                 nPixelFlavor = TWPF_CHOCOLATE;
             switch ( nPixelFlavor )
             {
@@ -1604,11 +1604,11 @@ bool CTL_TwainAppMgr::IsCapabilitySupported(const CTL_ITwainSource *pSource, TW_
     std::unique_ptr<CTL_CapabilityGetTriplet> pTrip;
     switch (nType)
     {
-        case CTL_GetTypeGET:
-        case CTL_GetTypeGETCURRENT:
-        case CTL_GetTypeGETDEFAULT:
+        case MSG_GET:
+        case MSG_GETCURRENT:
+        case MSG_GETDEFAULT:
             pTrip = std::make_unique<CTL_CapabilityGetTriplet>(pSession, pTempSource, 
-                                    static_cast<CTL_EnumGetType>(nType), nCap, TW_UINT16{ 0 });
+                                    static_cast<TW_UINT16>(nType), nCap, TW_UINT16{ 0 });
             break;
 
         default:
@@ -1620,7 +1620,7 @@ bool CTL_TwainAppMgr::IsCapabilitySupported(const CTL_ITwainSource *pSource, TW_
     return bRet;
 }
 
-bool CTL_TwainAppMgr::IsCapabilitySupported(const CTL_ITwainSource *pSource, TW_UINT16 nCap, int nType /*=CTL_GetTypeGET*/)
+bool CTL_TwainAppMgr::IsCapabilitySupported(const CTL_ITwainSource *pSource, TW_UINT16 nCap, int nType /*=MSG_GET*/)
 {
     return IsCapabilitySupported(pSource, nCap, false, nType);
 }
@@ -1673,7 +1673,7 @@ bool CTL_TwainAppMgr::GetCurrentOneCapValue(const CTL_ITwainSource *pSource,
                                             TW_UINT16 Cap,
                                             TW_UINT16 nDataType )
 {
-    return GetOneTwainCapValue( pSource, pValue, Cap, CTL_GetTypeGETCURRENT, nDataType);
+    return GetOneTwainCapValue( pSource, pValue, Cap, MSG_GETCURRENT, nDataType);
 }
 
 bool CTL_TwainAppMgr::GetOneCapValue(const CTL_ITwainSource *pSource,
@@ -1681,13 +1681,13 @@ bool CTL_TwainAppMgr::GetOneCapValue(const CTL_ITwainSource *pSource,
                                      TW_UINT16 Cap,
                                      TW_UINT16 nDataType )
 {
-    return GetOneTwainCapValue( pSource, pValue, Cap, CTL_GetTypeGET, nDataType);
+    return GetOneTwainCapValue( pSource, pValue, Cap, MSG_GET, nDataType);
 }
 
 bool CTL_TwainAppMgr::GetOneTwainCapValue( const CTL_ITwainSource *pSource,
                                            void *pValue,
                                            TW_UINT16 Cap,
-                                           CTL_EnumGetType GetType,
+                                           TW_UINT16 GetType,
                                            TW_UINT16 nDataType )
 {
     auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
@@ -1724,7 +1724,7 @@ bool CTL_TwainAppMgr::GetOneTwainCapValue( const CTL_ITwainSource *pSource,
 int CTL_TwainAppMgr::GetTransferCount( const CTL_ITwainSource *pSource )
 {
     TW_UINT16 nValue;
-    GetOneCapValue( pSource, &nValue, TwainCap_XFERCOUNT, TWTY_UINT16 );
+    GetOneCapValue( pSource, &nValue, CAP_XFERCOUNT, TWTY_UINT16 );
     return nValue;
 }
 
@@ -1742,23 +1742,23 @@ int CTL_TwainAppMgr::SetTransferCount( const CTL_ITwainSource *pSource,
     // pages to acquire
     if (IsCapabilitySupported(pSource, CAP_SHEETCOUNT))
     {
-        SetOneTwainCapValue(pSource, -1, CTL_SetTypeSET, TwainCap_XFERCOUNT, TWTY_INT16);
+        SetOneTwainCapValue(pSource, -1, MSG_SET, CAP_XFERCOUNT, TWTY_INT16);
         if ( nCount == -1 )
-            SetOneTwainCapValue(pSource, 0, CTL_SetTypeSET, CAP_SHEETCOUNT, TWTY_UINT32);
+            SetOneTwainCapValue(pSource, 0, MSG_SET, CAP_SHEETCOUNT, TWTY_UINT32);
         else
-            SetOneTwainCapValue(pSource, nCount, CTL_SetTypeSET, CAP_SHEETCOUNT, TWTY_UINT32);
+            SetOneTwainCapValue(pSource, nCount, MSG_SET, CAP_SHEETCOUNT, TWTY_UINT32);
     }
     else
     {
         // If we are in duplex mode, we need to set the transfer count to 2 * the number
         // of pages, since each page will use two transfers
         LONG isDuplex = 0;
-        GetCurrentOneCapValue(pSource, &isDuplex, DTWAIN_CV_CAPDUPLEXENABLED, CTL_GetTypeGETCURRENT);
+        GetCurrentOneCapValue(pSource, &isDuplex, CAP_DUPLEXENABLED, MSG_GETCURRENT);
         if (isDuplex == 1 && nCount != -1)
         {
             if (pSource->IsDoublePageCountOnDuplex())
                 nCount *= 2; // double the number of images that may be received
-            SetOneTwainCapValue( pSource, nCount, CTL_SetTypeSET, TwainCap_XFERCOUNT, TWTY_INT16);
+            SetOneTwainCapValue( pSource, nCount, MSG_SET, CAP_XFERCOUNT, TWTY_INT16);
         }
     }
     return nCount;
@@ -1800,16 +1800,16 @@ int CTL_TwainAppMgr::SetTransferMechanism( const CTL_ITwainSource *pSource,CTL_T
         uTwainType = TWSX_MEMFILE;
 
     if ( AcquireType != TWAINAcquireType_AudioNative)
-        SetOneTwainCapValue( pSource, uTwainType, CTL_SetTypeSET, TwainCap_XFERMECH, TWTY_UINT16);
+        SetOneTwainCapValue( pSource, uTwainType, MSG_SET, ICAP_XFERMECH, TWTY_UINT16);
     else
-        SetOneTwainCapValue(pSource, uTwainType, CTL_SetTypeSET, ACAP_XFERMECH, TWTY_UINT16);
+        SetOneTwainCapValue(pSource, uTwainType, MSG_SET, ACAP_XFERMECH, TWTY_UINT16);
     return 1;
 }
 
 CTL_IntArray CTL_TwainAppMgr::EnumTransferMechanisms( const CTL_ITwainSource *pSource)
 {
     CTL_IntArray rArray;
-    GetMultiValuesImpl<CTL_IntArray, TW_UINT16>::GetMultipleTwainCapValues(pSource, rArray, TwainCap_XFERMECH, TWTY_UINT16);
+    GetMultiValuesImpl<CTL_IntArray, TW_UINT16>::GetMultipleTwainCapValues(pSource, rArray, ICAP_XFERMECH, TWTY_UINT16);
     return rArray;
 }
 
@@ -1853,17 +1853,11 @@ void CTL_TwainAppMgr::EnumNoTimeoutTriplets()
     std::copy_n(Trips, nItems, std::back_inserter(s_NoTimeoutTriplets));
 }
 
-////////////////////////////////////////////////////////////////////////
-/////////////////////// Pixel Types ///////////////////////////////////
-void CTL_TwainAppMgr::GetPixelTypes( const CTL_ITwainSource *pSource, CTL_IntArray & rArray )
-{
-    GetMultiValuesImpl<CTL_IntArray, TW_UINT16>::GetMultipleTwainCapValues(pSource, rArray, TwainCap_PIXELTYPE,TWTY_UINT16);
-}
 ///////////////////////////////////////////////////////////////////////
 CTL_TwainUnitEnum CTL_TwainAppMgr::GetCurrentUnitMeasure(const CTL_ITwainSource *pSource)
 {
     TW_INT16 nValue;
-    if ( !GetCurrentOneCapValue(pSource, &nValue, TwainCap_UNITS, TWTY_UINT16) )
+    if ( !GetCurrentOneCapValue(pSource, &nValue, ICAP_UNITS, TWTY_UINT16) )
     {
         return TwainUnit_INCHES;
     }
@@ -1874,12 +1868,12 @@ CTL_TwainUnitEnum CTL_TwainAppMgr::GetCurrentUnitMeasure(const CTL_ITwainSource 
 ////////////////////////////////////////////////////////////////////////////
 void CTL_TwainAppMgr::GetCompressionTypes( const CTL_ITwainSource *pSource, CTL_IntArray & rArray )
 {
-    GetMultiValuesImpl<CTL_IntArray, TW_UINT16>::GetMultipleTwainCapValues(pSource, rArray, TwainCap_COMPRESSION,TWTY_UINT16);
+    GetMultiValuesImpl<CTL_IntArray, TW_UINT16>::GetMultipleTwainCapValues(pSource, rArray, ICAP_COMPRESSION,TWTY_UINT16);
 }
 
 void CTL_TwainAppMgr::GetUnitTypes( const CTL_ITwainSource *pSource, CTL_IntArray & rArray )
 {
-    GetMultiValuesImpl<CTL_IntArray, TW_UINT16>::GetMultipleTwainCapValues(pSource, rArray, TwainCap_UNITS,TWTY_UINT16);
+    GetMultiValuesImpl<CTL_IntArray, TW_UINT16>::GetMultipleTwainCapValues(pSource, rArray, ICAP_UNITS,TWTY_UINT16);
 }
 
 /////////////////////// End mandatory capabilities /////////////////////////
@@ -1912,14 +1906,14 @@ void CTL_TwainAppMgr::GetCapabilities(const CTL_ITwainSource *pSource, CTL_Twain
 {
     // Get all the capabilities of the source
     rArray.clear();
-    GetMultiValuesImpl<CTL_TwainCapArray, TW_UINT16>::GetMultipleTwainCapValues(pSource, rArray, TwainCap_SUPPORTEDCAPS, TWTY_UINT16, TwainContainer_ARRAY);
+    GetMultiValuesImpl<CTL_TwainCapArray, TW_UINT16>::GetMultipleTwainCapValues(pSource, rArray, CAP_SUPPORTEDCAPS, TWTY_UINT16, TwainContainer_ARRAY);
 }
 
 void CTL_TwainAppMgr::GetExtendedCapabilities(const CTL_ITwainSource *pSource, CTL_IntArray & rArray)
 {
     // Get the extended capabilities of the source
     rArray.clear();
-    GetMultiValuesImpl<CTL_IntArray, TW_UINT16>::GetMultipleTwainCapValues(pSource, rArray, TwainCap_EXTENDEDCAPS, TWTY_UINT16, TwainContainer_ARRAY);
+    GetMultiValuesImpl<CTL_IntArray, TW_UINT16>::GetMultipleTwainCapValues(pSource, rArray, CAP_EXTENDEDCAPS, TWTY_UINT16, TwainContainer_ARRAY);
 }
 
 UINT CTL_TwainAppMgr::GetCapOps(const CTL_ITwainSource *pSource, int nCap, bool bCanQuery)
@@ -1930,7 +1924,7 @@ UINT CTL_TwainAppMgr::GetCapOps(const CTL_ITwainSource *pSource, int nCap, bool 
 
     if ( nOps == 0 )
     {
-        const UINT nContainer = GetContainerTypesFromCap( static_cast<CTL_EnumCapability>(nCap), 1 );
+        const UINT nContainer = GetContainerTypesFromCap( static_cast<TW_UINT16>(nCap), 1 );
         nOps = 0xFFFF;
         if ( !nContainer )
             nOps = 0xFFFF & ~(TWQC_SET | TWQC_RESET);
@@ -1952,7 +1946,7 @@ CTL_CapabilityQueryTriplet CTL_TwainAppMgr::GetCapabilityOperations(const CTL_IT
     if (!s_pGlobalAppMgr->IsSourceOpen(pSource))
         return { nullptr, nullptr, 0 };
 
-    CTL_CapabilityQueryTriplet QT(pSession, pTempSource, static_cast<CTL_EnumCapability>(nCap));
+    CTL_CapabilityQueryTriplet QT(pSession, pTempSource, static_cast<TW_UINT16>(nCap));
     const TW_UINT16 rc = QT.Execute();
     if (rc != TWRC_SUCCESS)
         return { nullptr, nullptr, 0 };
@@ -1965,23 +1959,21 @@ CTL_CapabilityQueryTriplet CTL_TwainAppMgr::GetCapabilityOperations(const CTL_IT
 bool CTL_TwainAppMgr::IsFeederLoaded( const CTL_ITwainSource *pSource )
 {
     TW_UINT16 nValue;
-    GetOneCapValue( pSource, &nValue, TwainCap_FEEDERLOADED, TWTY_BOOL);
+    GetOneCapValue( pSource, &nValue, CAP_FEEDERLOADED, TWTY_BOOL);
     return nValue?true:false;
 }
 
 
 bool CTL_TwainAppMgr::IsFeederEnabled( const CTL_ITwainSource *pSource, TW_UINT16& nValue )
 {
-    if (!GetOneCapValue( pSource, &nValue,
-                         TwainCap_FEEDERENABLED, TWTY_BOOL))
+    if (!GetOneCapValue( pSource, &nValue, CAP_FEEDERENABLED, TWTY_BOOL))
         return false;
     return true;
 }
 
 bool CTL_TwainAppMgr::IsJobControlSupported( const CTL_ITwainSource *pSource, TW_UINT16& nValue )
 {
-    if (!GetOneCapValue( pSource, &nValue,
-                         TwainCap_JOBCONTROL, TWTY_UINT16 ))
+    if (!GetOneCapValue( pSource, &nValue, CAP_JOBCONTROL, TWTY_UINT16 ))
         return false;
     return true;
 }
@@ -2007,7 +1999,7 @@ bool CTL_TwainAppMgr::SetupFeeder( const CTL_ITwainSource *pSource, int /*maxpag
         // Enable the CAP_AUTOFEED capability
         // Get a set capability triplet compatible for one value
         bValue = false;
-        SetOneTwainCapValue( pSource, bValue, CTL_SetTypeSET, TwainCap_AUTOFEED, TWTY_BOOL );
+        SetOneTwainCapValue( pSource, bValue, MSG_SET, CAP_AUTOFEED, TWTY_BOOL );
 
         // Return, since the autofeed has been turned off and the feeder has been
         // disabled
@@ -2017,7 +2009,7 @@ bool CTL_TwainAppMgr::SetupFeeder( const CTL_ITwainSource *pSource, int /*maxpag
 
     // Set the automatic document feeder mode if present
     nValue = 1;
-    SetOneTwainCapValue( pSource, nValue, CTL_SetTypeSET, TwainCap_FEEDERENABLED, TWTY_BOOL);
+    SetOneTwainCapValue( pSource, nValue, MSG_SET, CAP_FEEDERENABLED, TWTY_BOOL);
 
     // Enable the CAP_AUTOFEED capability if the user wants to automatically feed
     // the page
@@ -2025,7 +2017,7 @@ bool CTL_TwainAppMgr::SetupFeeder( const CTL_ITwainSource *pSource, int /*maxpag
     if ( !bTurnOffAutoFeed)
     {
         bValue = true;
-        SetOneTwainCapValue( pSource, bValue, CTL_SetTypeSET, TwainCap_AUTOFEED, TWTY_BOOL);
+        SetOneTwainCapValue( pSource, bValue, MSG_SET, CAP_AUTOFEED, TWTY_BOOL);
     }
 
     return true;
@@ -2034,13 +2026,13 @@ bool CTL_TwainAppMgr::SetupFeeder( const CTL_ITwainSource *pSource, int /*maxpag
 bool CTL_TwainAppMgr::ShowProgressIndicator(const CTL_ITwainSource* pSource, bool bShow)
 {
     bool bTemp = bShow;
-    return SetOneTwainCapValue( pSource, &bTemp, CTL_SetTypeSET, TwainCap_INDICATORS, TWTY_BOOL );
+    return SetOneTwainCapValue( pSource, &bTemp, MSG_SET, CAP_INDICATORS, TWTY_BOOL );
 }
 
 bool CTL_TwainAppMgr::IsProgressIndicatorOn(const CTL_ITwainSource* pSource)
 {
     bool bTemp;
-    if ( GetOneCapValue( pSource, &bTemp, TwainCap_INDICATORS, TWTY_BOOL ) )
+    if ( GetOneCapValue( pSource, &bTemp, CAP_INDICATORS, TWTY_BOOL ) )
         return bTemp;
     return false;
 }
@@ -2076,7 +2068,7 @@ std::string CTL_TwainAppMgr::GetCapNameFromCap( LONG Cap )
     return "Unknown capability.  Hex value: " + strm.str();
 }
 
-int CTL_TwainAppMgr::GetDataTypeFromCap( CTL_EnumCapability Cap, CTL_ITwainSource *pSource/*=NULL*/ )
+int CTL_TwainAppMgr::GetDataTypeFromCap( TW_UINT16 Cap, CTL_ITwainSource *pSource/*=NULL*/ )
 {
     const auto nThisCap = static_cast<TW_UINT16>(Cap);
     if (nThisCap >= CAP_CUSTOMBASE)
@@ -2166,7 +2158,7 @@ LONG CTL_TwainAppMgr::GetCapFromCapName(const char* szCapName)
     return TwainCap_INVALID;
 }
 
-UINT CTL_TwainAppMgr::GetContainerTypesFromCap( CTL_EnumCapability Cap, bool nType )
+UINT CTL_TwainAppMgr::GetContainerTypesFromCap( TW_UINT16 Cap, bool nType )
 {
     const CTL_CapStruct cStruct = GetGeneralCapInfo(Cap);
 
@@ -2201,7 +2193,7 @@ void CTL_TwainAppMgr::GetContainerNamesFromType( int nType, StringArray &rArray 
         rArray.push_back( "TW_RANGE");
 }
 
-bool CTL_TwainAppMgr::IsCapMaskOn( CTL_EnumCapability Cap, CTL_EnumGetType GetType)
+bool CTL_TwainAppMgr::IsCapMaskOnGet( TW_UINT16 Cap, TW_UINT16 GetType)
 {
     int CapMask = GetCapMaskFromCap( Cap );
     if ( CapMask & GetType )
@@ -2210,7 +2202,7 @@ bool CTL_TwainAppMgr::IsCapMaskOn( CTL_EnumCapability Cap, CTL_EnumGetType GetTy
 }
 
 
-bool CTL_TwainAppMgr::IsCapMaskOn( CTL_EnumCapability Cap, CTL_EnumSetType SetType)
+bool CTL_TwainAppMgr::IsCapMaskOnSet( TW_UINT16 Cap, TW_UINT16 SetType)
 {
     int CapMask = GetCapMaskFromCap( Cap );
     if ( CapMask & SetType )
@@ -2479,7 +2471,7 @@ void CTL_TwainAppMgr::GatherCapabilityInfo(CTL_ITwainSource* pSource)
         customCapSet.clear();
         for (auto& capInfo : pArray)
         {
-            if (capInfo >= DTWAIN_CV_CAPCUSTOMBASE)
+            if (capInfo >= CAP_CUSTOMBASE)
                 customCapSet.insert(capInfo);
         }
 
@@ -2679,7 +2671,7 @@ bool CTL_TwainAppMgr::SetDefaultSource( CTL_ITwainSession *pSession, const CTL_I
     return true;
 }
 
-bool CTL_TwainAppMgr::SetDependentCaps( const CTL_ITwainSource *pSource, CTL_EnumCapability Cap )
+bool CTL_TwainAppMgr::SetDependentCaps( const CTL_ITwainSource *pSource, TW_UINT16 Cap )
 {
     switch (Cap)
     {
@@ -2689,7 +2681,7 @@ bool CTL_TwainAppMgr::SetDependentCaps( const CTL_ITwainSource *pSource, CTL_Enu
             const LONG Val = TWBR_THRESHOLD;
             if (IsCapabilitySupported(pSource, ICAP_BITDEPTHREDUCTION))
             {
-                return SetOneTwainCapValue( pSource, Val, CTL_SetTypeSET, TwainCap_BITDEPTHREDUCTION, TWTY_UINT16 );
+                return SetOneTwainCapValue( pSource, Val, MSG_SET, ICAP_BITDEPTHREDUCTION, TWTY_UINT16 );
             }
         }
         break;

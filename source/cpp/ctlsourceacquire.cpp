@@ -739,7 +739,7 @@ bool dynarithmic::TileModeOn(DTWAIN_SOURCE Source)
 {
     BOOL bMode;
     auto p = static_cast<CTL_ITwainSource*>(Source);
-    if (CTL_TwainAppMgr::GetCurrentOneCapValue(p, &bMode, DTWAIN_CV_ICAPTILES, CTL_GetTypeGETCURRENT))
+    if (CTL_TwainAppMgr::GetCurrentOneCapValue(p, &bMode, ICAP_TILES, MSG_GETCURRENT))
         return static_cast<TW_BOOL>(bMode)?true:false;
     return false;
 }
