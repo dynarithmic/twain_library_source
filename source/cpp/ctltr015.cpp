@@ -27,7 +27,7 @@ using namespace dynarithmic;
 CTL_CapabilityGetRangeTriplet::CTL_CapabilityGetRangeTriplet(
                                     CTL_ITwainSession *pSession,
                                     CTL_ITwainSource* pSource,
-                                    CTL_EnumGetType gType,
+                                    TW_UINT16 gType,
                                     TW_UINT16   gCap,
                                     TW_UINT16 TwainDataType=0xFFFF)
 

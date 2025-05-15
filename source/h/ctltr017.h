@@ -31,7 +31,7 @@ namespace dynarithmic
         public:
             CTL_CapabilitySetOneValTriplet(CTL_ITwainSession *pSession,
                                            CTL_ITwainSource* pSource,
-                                           CTL_EnumSetType sType,
+                                           TW_UINT16 sType,
                                            TW_UINT16    sCap,
                                            TW_UINT16    TwainType,
                                            const std::vector<T> & rArray);

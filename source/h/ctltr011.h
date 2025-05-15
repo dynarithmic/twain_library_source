@@ -28,7 +28,7 @@ namespace dynarithmic
         public:
             CTL_CapabilityGetTriplet(CTL_ITwainSession      *pSession,
                                      CTL_ITwainSource       *pSource,
-                                     CTL_EnumGetType  gType,
+                                     TW_UINT16  gType,
                                      TW_UINT16 gCap,
                                      TW_UINT16 TwainDataType=0xFFFF);
 
@@ -41,8 +41,8 @@ namespace dynarithmic
 
 
         protected:
-            CTL_EnumGetType         CapRetrievalType() const;
-            CTL_EnumCapability      CapToRetrieve()    const;
+            TW_UINT16         CapRetrievalType() const;
+            TW_UINT16       CapToRetrieve()    const;
 
             virtual bool            EnumCapValues( void * /*pCapData*/) { return false; }
 
@@ -131,7 +131,7 @@ namespace dynarithmic
 
         private:
             TW_UINT16               m_gCap;
-            CTL_EnumGetType         m_gType;
+            TW_UINT16         m_gType;
             CTL_EnumContainer       m_nContainerToUse;
     };
 }

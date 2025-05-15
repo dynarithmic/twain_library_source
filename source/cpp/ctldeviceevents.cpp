@@ -37,7 +37,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
     auto pTheSource = pSource;
 
     // See if Source supports the DEVICEEVENTS capability
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !CTL_TwainAppMgr::IsCapabilitySupported(pTheSource, DTWAIN_CV_CAPDEVICEEVENT); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !CTL_TwainAppMgr::IsCapabilitySupported(pTheSource, CAP_DEVICEEVENT); },
                                       DTWAIN_ERR_DEVICEEVENT_NOT_SUPPORTED, false, FUNC_MACRO);
 
     // Set the notifications
@@ -76,7 +76,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
             }
         }
     }
-    const bool bRet = DTWAIN_SetCapValuesEx2(Source, DTWAIN_CV_CAPDEVICEEVENT, SetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array)?true:false;
+    const bool bRet = DTWAIN_SetCapValuesEx2(Source, CAP_DEVICEEVENT, SetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array)?true:false;
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -91,10 +91,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceNotifications(DTWAIN_SOURCE Source, LPL
 
     // See if Source supports the DEVICEEVENTS capability
     // See if Source supports the DEVICEEVENTS capability
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !CTL_TwainAppMgr::IsCapabilitySupported(pTheSource, DTWAIN_CV_CAPDEVICEEVENT); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !CTL_TwainAppMgr::IsCapabilitySupported(pTheSource, CAP_DEVICEEVENT); },
         DTWAIN_ERR_DEVICEEVENT_NOT_SUPPORTED, false, FUNC_MACRO);
 
-    const bool bRet = DTWAIN_GetCapValuesEx2(Source, DTWAIN_CV_CAPDEVICEEVENT, DTWAIN_CAPGETCURRENT, 
+    const bool bRet = DTWAIN_GetCapValuesEx2(Source, CAP_DEVICEEVENT, DTWAIN_CAPGETCURRENT, 
                                 DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
     if (!bRet)
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
