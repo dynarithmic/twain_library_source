@@ -28,13 +28,13 @@ namespace dynarithmic
     class CTL_CapabilitySetTripletBase : public CTL_CapabilityTriplet
     {
         public:
-            CTL_EnumSetType           CapSetType() const;
-            CTL_EnumCapability        CapToSet() const;
+            TW_UINT16           CapSetType() const;
+            TW_UINT16         CapToSet() const;
             TW_UINT16                 GetTwainType() const;
 
             CTL_CapabilitySetTripletBase(CTL_ITwainSession *pSession,
                                          CTL_ITwainSource* pSource,
-                                         CTL_EnumSetType sType,
+                                         TW_UINT16 sType,
                                          TW_UINT16      sCap,
                                          TW_UINT16 TwainType);
 
@@ -63,8 +63,8 @@ namespace dynarithmic
                                          void *pData);
 
         private:
-            CTL_EnumSetType         m_gType;
-            CTL_EnumCapability      m_gCap;
+            TW_UINT16         m_gType;
+            TW_UINT16       m_gCap;
             TW_UINT16               m_nTwainType;
     };
 
@@ -75,7 +75,7 @@ namespace dynarithmic
         public:
             CTL_CapabilitySetTriplet(CTL_ITwainSession *pSession,
                                      CTL_ITwainSource* pSource,
-                                     CTL_EnumSetType sType,
+                                     TW_UINT16 sType,
                                      TW_UINT16  sCap,
                                      TW_UINT16 TwainType,
                                      const std::vector<T> & rArray);
@@ -99,8 +99,8 @@ namespace dynarithmic
 
             CTL_CapabilityResetTriplet(CTL_ITwainSession *pSession,
                                        CTL_ITwainSource* pSource,
-                                       CTL_EnumCapability sCap,
-                                       TW_UINT16 SetType = CTL_SetTypeRESET
+                                       TW_UINT16  sCap,
+                                       TW_UINT16 SetType = MSG_RESET
                                        );
     };
 

@@ -24,8 +24,8 @@
 template <class T>
 CTL_CapabilitySetEnumTriplet<T>::CTL_CapabilitySetEnumTriplet(CTL_ITwainSession *pSession,
                                                              CTL_ITwainSource* pSource,
-                                                             CTL_EnumSetType sType,
-                                                             CTL_EnumCapability sCap,
+                                                             TW_UINT16 sType,
+                                                             TW_UINT16  sCap,
                                                              TW_UINT16 TwainType,
                                                              const std::vector<T>& rArray)
                                                              : CTL_CapabilitySetTriplet<T>(pSession, pSource, sType, sCap, TwainType, rArray), m_nAggSize(rArray.size())

@@ -49,11 +49,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
     bool bOk = false;
 
     // Check if capability UICONTROLLABLE is supported
-    if (DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPUICONTROLLABLE))
+    if (DTWAIN_IsCapSupported(Source, CAP_UICONTROLLABLE))
     {
         // Get the capability value
         DTWAIN_ARRAY CapArray = nullptr;
-        BOOL bGetUI = DTWAIN_GetCapValuesEx2(Source, DTWAIN_CV_CAPUICONTROLLABLE, DTWAIN_CAPGET, 
+        BOOL bGetUI = DTWAIN_GetCapValuesEx2(Source, CAP_UICONTROLLABLE, DTWAIN_CAPGET, 
                                 DTWAIN_CONTONEVALUE, DTWAIN_DEFAULT, &CapArray);
         if (bGetUI && CapArray && !pHandle->m_ArrayFactory->empty(CapArray))
         {

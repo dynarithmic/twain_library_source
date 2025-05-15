@@ -215,7 +215,7 @@ namespace dynarithmic
     typedef boost::container::flat_map<CTL_StringType, CTL_ITwainSource*> CTL_StringToSourcePtrMap;
     typedef boost::container::flat_map<CTL_StringType, int> CTL_StringToIntMap;
     typedef boost::container::flat_map<LONG, HMODULE> CTL_LongToHMODULEMap;
-    typedef boost::container::flat_map<CTL_EnumCapability, CTL_CapInfo> CTL_EnumCapToInfoMap;
+    typedef boost::container::flat_map<TW_UINT16 , CTL_CapInfo> CTL_EnumCapToInfoMap;
     typedef std::vector<CallbackInfo<DTWAIN_CALLBACK_PROC, LONG>> CTL_CallbackProcArray;
     typedef std::vector<CallbackInfo<DTWAIN_CALLBACK_PROC, LONGLONG>> CTL_CallbackProcArray64;
     typedef boost::container::flat_map<LONG, CTL_StringType> CTL_StringToLongMap;

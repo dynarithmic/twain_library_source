@@ -31,8 +31,8 @@ namespace dynarithmic
         public:
             CTL_CapabilitySetRangeTriplet(CTL_ITwainSession *pSession,
                                            CTL_ITwainSource* pSource,
-                                           CTL_EnumSetType sType,
-                                           CTL_EnumCapability sCap,
+                                           TW_UINT16 sType,
+                                           TW_UINT16  sCap,
                                            TW_UINT16 TwainType,
                                            const std::vector<T>& rArray);
 

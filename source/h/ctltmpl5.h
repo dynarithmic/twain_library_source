@@ -50,7 +50,7 @@ namespace dynarithmic
     template <class T>
     bool    GetCapabilityValues( const CTL_ITwainSource *pSource,
                                 TW_UINT16 nCap,
-                                CTL_EnumGetType GetType,
+                                TW_UINT16 GetType,
                                 UINT      nContainerTypes,
                                 LONG    bUseStrings,
                                 TW_UINT16 TwainDataType,
@@ -59,7 +59,7 @@ namespace dynarithmic
     template <class T>
     bool GetCapabilityValues( const CTL_ITwainSource *pSource,
                              TW_UINT16 nCap,
-                             CTL_EnumGetType GetType,
+                             TW_UINT16 GetType,
                              UINT      nContainerTypes,
                              LONG      bUseStrings,
                              TW_UINT16 TwainDataType,
@@ -172,16 +172,16 @@ namespace dynarithmic
 
     template <class T>
     bool SetCapabilityValues( const CTL_ITwainSource *pSource,
-                             CTL_EnumCapability nCap,
-                             CTL_EnumSetType SetType,
+                             TW_UINT16  nCap,
+                             TW_UINT16 SetType,
                              UINT      nContainerTypes,
                              TW_UINT16  nDataType,
                              std::vector<T> &rArray
                             );
     template <class T>
     bool SetCapabilityValues( const CTL_ITwainSource *pSource,
-                             CTL_EnumCapability nCap,
-                             CTL_EnumSetType SetType,
+                             TW_UINT16  nCap,
+                             TW_UINT16 SetType,
                              UINT      nContainerTypes,
                              TW_UINT16  nDataType,
                              std::vector<T> &rArray
@@ -254,7 +254,7 @@ namespace dynarithmic
     bool GetOneCapValue( DTWAIN_HANDLE DLLHandle,
                         DTWAIN_SOURCE Source,
                         TW_UINT16 nCap,
-                        CTL_EnumGetType GetType,
+                        TW_UINT16 GetType,
                         BOOL bUseStrings,
                         AssignType *pAssign,
                         TW_UINT16 TwainDataType
@@ -264,7 +264,7 @@ namespace dynarithmic
     bool GetOneCapValue( DTWAIN_HANDLE DLLHandle,
                         DTWAIN_SOURCE Source,
                         TW_UINT16 nCap,
-                        CTL_EnumGetType GetType,
+                        TW_UINT16 GetType,
                         BOOL bUseStrings,
                         AssignType *pAssign,
                         TW_UINT16 TwainDataType
@@ -278,7 +278,7 @@ namespace dynarithmic
         std::vector<TwainType> Array;
         const int bOk = GetCapabilityValues( p,
                                              nCap,
-                                             static_cast<CTL_EnumGetType>(GetType),
+                                             GetType,
                                              static_cast<UINT>(TwainContainer_ONEVALUE),
                                              bUseStrings,
                                              TwainDataType,
@@ -292,21 +292,21 @@ namespace dynarithmic
 
 
     template <class T>
-    bool SetOneCapValue(CTL_ITwainSource* pSource, TW_UINT16 nCap, CTL_EnumSetType SetType, T dValue, TW_UINT16 nDataType);
+    bool SetOneCapValue(CTL_ITwainSource* pSource, TW_UINT16 nCap, TW_UINT16 SetType, T dValue, TW_UINT16 nDataType);
 
     template <class T>
-    bool SetOneCapValue(CTL_ITwainSource* pSource, TW_UINT16 nCap, CTL_EnumSetType SetType, T dValue, TW_UINT16 nDataType)
+    bool SetOneCapValue(CTL_ITwainSource* pSource, TW_UINT16 nCap, TW_UINT16 SetType, T dValue, TW_UINT16 nDataType)
     {
         std::vector<T> Array;
         Array.push_back(dValue);
-        return SetCapabilityValues(pSource, static_cast<CTL_EnumCapability>(nCap), static_cast<CTL_EnumSetType>(SetType), static_cast<UINT>(TwainContainer_ONEVALUE), nDataType, Array)?true:false;
+        return SetCapabilityValues(pSource, static_cast<TW_UINT16 >(nCap), static_cast<TW_UINT16>(SetType), static_cast<UINT>(TwainContainer_ONEVALUE), nDataType, Array)?true:false;
     }
 
     template <class T>
-    bool SetOneCapValue(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, TW_UINT16 nCap, CTL_EnumSetType SetType, T dValue, TW_UINT16 nDataType);
+    bool SetOneCapValue(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, TW_UINT16 nCap, TW_UINT16 SetType, T dValue, TW_UINT16 nDataType);
 
     template <class T>
-    bool SetOneCapValue( DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, TW_UINT16 nCap, CTL_EnumSetType SetType, T dValue,TW_UINT16 nDataType)
+    bool SetOneCapValue( DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, TW_UINT16 nCap, TW_UINT16 SetType, T dValue,TW_UINT16 nDataType)
     {
         CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
         if ( !p )
@@ -348,7 +348,7 @@ namespace dynarithmic
                                       DTWAIN_ARRAY pArray,
                                       CTL_ArrayType EnumType,
                                       TW_UINT16 nCap,
-                                      CTL_EnumGetType GetType,
+                                      TW_UINT16 GetType,
                                       AssignType,
                                       TW_UINT16 TwainDataType,
                                       UINT nContainerVal,
@@ -421,7 +421,7 @@ namespace dynarithmic
             {
                 bOk = GetCapabilityValues( p,
                     nCap,
-                    static_cast<CTL_EnumGetType>(GetType),
+                    GetType,
                     nAll[i],
                     StringType,
                     TwainDataType,
@@ -448,7 +448,7 @@ namespace dynarithmic
                            EnumeratorType *pArray,
                            CTL_ArrayType EnumType,
                            TW_UINT16 nCap,
-                           CTL_EnumGetType GetType,
+                           TW_UINT16 GetType,
                            AssignType CValue,
                            TW_UINT16 TwainDataType,
                            UINT nContainerVal,
@@ -468,7 +468,7 @@ namespace dynarithmic
                           DTWAIN_ARRAY pArray,
                           CTL_ArrayType EnumType,
                           TW_UINT16 nCap,
-                          CTL_EnumGetType GetType,
+                          TW_UINT16 GetType,
                           CTL_StringType cStr,
                           TW_UINT16 TwainDataType,
                           UINT nContainerVal,
@@ -509,7 +509,7 @@ namespace dynarithmic
                           DTWAIN_ARRAY  pArray,
                           CTL_ArrayType EnumType,
                           UINT nCap,
-                          CTL_EnumSetType SetType,
+                          TW_UINT16 SetType,
                           UINT nContainerVal,
                           bool bUseContainer,
                           TW_UINT16 OriginalTwainType
@@ -563,7 +563,7 @@ namespace dynarithmic
         for ( i = 0; i < nMaxNum; i++ )
         {
             bOk = SetCapabilityValues(  p,
-                static_cast<CTL_EnumCapability>(nCap),
+                static_cast<TW_UINT16 >(nCap),
                 SetType,
                 nAll[i],
                 OriginalTwainType,

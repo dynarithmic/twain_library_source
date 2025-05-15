@@ -321,7 +321,7 @@ namespace dynarithmic
         return DTWAIN_ARRAYLONG;
     }
 
-    static constexpr int GetCapMaskFromCap(CTL_EnumCapability Cap)
+    static constexpr int GetCapMaskFromCap(TW_UINT16  Cap)
     {
         // Jump table
         constexpr int CapAll = CTL_CapMaskGET | CTL_CapMaskGETCURRENT | CTL_CapMaskGETDEFAULT |
@@ -333,32 +333,32 @@ namespace dynarithmic
 
         switch (Cap)
         {
-            case TwainCap_XFERCOUNT:
-            case TwainCap_AUTOFEED:
-            case TwainCap_CLEARPAGE:
-            case TwainCap_REWINDPAGE:
+            case CAP_XFERCOUNT:
+            case CAP_AUTOFEED:
+            case CAP_CLEARPAGE:
+            case CAP_REWINDPAGE:
                 return CapAll;
 
-            case TwainCap_COMPRESSION:
-            case TwainCap_PIXELTYPE:
-            case TwainCap_UNITS:
-            case TwainCap_XFERMECH:
-            case TwainCap_BITDEPTH:
-            case TwainCap_BITORDER:
-            case TwainCap_XRESOLUTION:
-            case TwainCap_YRESOLUTION:
+            case ICAP_COMPRESSION:
+            case ICAP_PIXELTYPE:
+            case ICAP_UNITS:
+            case ICAP_XFERMECH:
+            case ICAP_BITDEPTH:
+            case ICAP_BITORDER:
+            case ICAP_XRESOLUTION:
+            case ICAP_YRESOLUTION:
                 return CapSupport;
 
-            case TwainCap_UICONTROLLABLE:
-            case TwainCap_SUPPORTEDCAPS:
+            case CAP_UICONTROLLABLE:
+            case CAP_SUPPORTEDCAPS:
                 return CTL_CapMaskGET;
 
-            case TwainCap_PLANARCHUNKY:
-            case TwainCap_PHYSICALHEIGHT:
-            case TwainCap_PHYSICALWIDTH:
-            case TwainCap_PIXELFLAVOR:
-            case TwainCap_FEEDERENABLED:
-            case TwainCap_FEEDERLOADED:
+            case ICAP_PLANARCHUNKY:
+            case ICAP_PHYSICALHEIGHT:
+            case ICAP_PHYSICALWIDTH:
+            case ICAP_PIXELFLAVOR:
+            case CAP_FEEDERENABLED:
+            case CAP_FEEDERLOADED:
                 return CapAllGets;
         }
         return 0;

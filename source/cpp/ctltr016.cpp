@@ -29,7 +29,7 @@ using namespace dynarithmic;
 /////////////////////////////////////////////////////////////////////////////////////
 CTL_CapabilitySetTripletBase::CTL_CapabilitySetTripletBase(CTL_ITwainSession *pSession,
                                                            CTL_ITwainSource* pSource,
-                                                           CTL_EnumSetType sType,
+                                                           TW_UINT16 sType,
                                                            TW_UINT16    sCap,
                                                            TW_UINT16 TwainType) :
                     CTL_CapabilityTriplet(pSession, pSource, static_cast<TW_UINT16>(sType), TwainType, false),
@@ -42,12 +42,12 @@ CTL_CapabilitySetTripletBase::CTL_CapabilitySetTripletBase(CTL_ITwainSession *pS
     pCap->hContainer = nullptr;
 }
 
-CTL_EnumSetType CTL_CapabilitySetTripletBase::CapSetType() const
+TW_UINT16 CTL_CapabilitySetTripletBase::CapSetType() const
 {
     return m_gType;
 }
 
-CTL_EnumCapability CTL_CapabilitySetTripletBase::CapToSet() const
+TW_UINT16  CTL_CapabilitySetTripletBase::CapToSet() const
 {
     return m_gCap;
 }
@@ -211,8 +211,8 @@ void CTL_CapabilitySetTripletBase::EncodeArrayValue(pTW_ARRAY pArray,
 ///////////////////////////////////////////////////////////////////////////////////
 CTL_CapabilityResetTriplet::CTL_CapabilityResetTriplet(CTL_ITwainSession *pSession,
                                    CTL_ITwainSource* pSource,
-                                   CTL_EnumCapability sCap,
-                                   TW_UINT16 SetType /* = CTL_SetTypeRESET */) :
+                                   TW_UINT16  sCap,
+                                   TW_UINT16 SetType /* = MSG_RESET */) :
             CTL_CapabilityTriplet(pSession, pSource, SetType, 0, true)
 {
     TW_CAPABILITY *pCap = GetCapabilityBuffer();
@@ -225,7 +225,7 @@ CTL_CapabilityResetTriplet::CTL_CapabilityResetTriplet(CTL_ITwainSession *pSessi
 
 
 CTL_CapabilityResetAllTriplet::CTL_CapabilityResetAllTriplet(CTL_ITwainSession* pSession, CTL_ITwainSource* pSource) : 
-    CTL_CapabilityResetTriplet(pSession, pSource, CAP_SUPPORTEDCAPS, CTL_SetTypeRESETALL)
+    CTL_CapabilityResetTriplet(pSession, pSource, CAP_SUPPORTEDCAPS, MSG_RESETALL)
 {}
 
 

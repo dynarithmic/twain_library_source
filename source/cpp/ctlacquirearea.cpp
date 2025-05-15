@@ -43,7 +43,7 @@ static bool GetImageSize2(CTL_ITwainSource *p,
 static bool SetImageSize(DTWAIN_SOURCE Source,
     DTWAIN_ARRAY FloatArray,
     DTWAIN_ARRAY ActualArray,
-    CTL_EnumSetType SetType);
+    TW_UINT16 SetType);
 
 static bool SetImageSize2(CTL_ITwainSource *p,
     DTWAIN_FLOAT left,
@@ -77,7 +77,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireArea(DTWAIN_SOURCE Source, LONG lSetTy
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lSetType, FloatArray, ActualArray))
     VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    const DTWAIN_BOOL bRet = SetImageSize(Source, FloatArray, ActualArray,static_cast<CTL_EnumSetType>(lSetType));
+    const DTWAIN_BOOL bRet = SetImageSize(Source, FloatArray, ActualArray,static_cast<TW_UINT16>(lSetType));
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -183,15 +183,15 @@ static bool FillActualArray(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ActualArra
     return false;
 }
 
-static bool SetImageSize(DTWAIN_SOURCE Source, DTWAIN_ARRAY FloatArray, DTWAIN_ARRAY ActualArray, CTL_EnumSetType SetType)
+static bool SetImageSize(DTWAIN_SOURCE Source, DTWAIN_ARRAY FloatArray, DTWAIN_ARRAY ActualArray, TW_UINT16 SetType)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, FloatArray, ActualArray, SetType))
     CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
     const auto pHandle = p->GetDTWAINHandle();
-    if (SetType == CTL_SetTypeRESET)
+    if (SetType == MSG_RESET)
     {
         CTL_RealArray dummy;
-        const bool bOk = CTL_TwainAppMgr::SetImageLayoutSize(p, {}, dummy, CTL_SetTypeRESET);
+        const bool bOk = CTL_TwainAppMgr::SetImageLayoutSize(p, {}, dummy, MSG_RESET);
         if ( bOk )
             FillActualArray(pHandle, ActualArray, dummy);
         LOG_FUNC_EXIT_NONAME_PARAMS(bOk)
