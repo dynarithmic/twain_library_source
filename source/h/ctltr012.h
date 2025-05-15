@@ -30,7 +30,7 @@ namespace dynarithmic
         public:
             CTL_CapabilityGetEnumTriplet(CTL_ITwainSession *pSession,
                                          CTL_ITwainSource *pSource,
-                                         CTL_EnumGetType   gType,
+                                         TW_UINT16   gType,
                                          TW_UINT16         gCap,
                                          TW_UINT16 TwainDataType=0xFFFF)
                 : CTL_CapabilityGetTriplet(pSession,

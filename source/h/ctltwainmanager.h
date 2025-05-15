@@ -165,7 +165,7 @@ namespace dynarithmic
             // Get capabilities for selected source
             static void GetCapabilities(const CTL_ITwainSource *pSource,CTL_TwainCapArray& rArray);
 
-            static constexpr bool IsCustomCapability(LONG nCap) { return nCap >= DTWAIN_CV_CAPCUSTOMBASE; }
+            static constexpr bool IsCustomCapability(LONG nCap) { return nCap >= CAP_CUSTOMBASE; }
 
             static void GetExtendedCapabilities(const CTL_ITwainSource *pSource, CTL_IntArray& rArray);
 
@@ -183,13 +183,12 @@ namespace dynarithmic
 
             static void SetPixelAndBitDepth(const CTL_ITwainSource *pSource);
             static bool IsSourceOpen( const CTL_ITwainSource *pSource );
-            static void GetPixelTypes( const CTL_ITwainSource *pSource, CTL_IntArray & rArray );
             static CTL_TwainUnitEnum GetCurrentUnitMeasure(const CTL_ITwainSource *pSource);
             static void GetCompressionTypes( const CTL_ITwainSource *pSource, CTL_IntArray & rArray );
             static void GetUnitTypes( const CTL_ITwainSource *pSource, CTL_IntArray & rArray );
             static bool GetImageLayoutSize(const CTL_ITwainSource* pSource, CTL_RealArray& rArray, TW_UINT16 GetType);
             static bool SetImageLayoutSize(const CTL_ITwainSource* pSource, const CTL_RealArray& rArray, CTL_RealArray& rActual,
-                                             CTL_EnumSetType SetType);
+                                             TW_UINT16 SetType);
 
             static bool StoreImageLayout(CTL_ITwainSource* pSource);
             static bool IsFeederLoaded( const CTL_ITwainSource *pSource );
@@ -229,7 +228,7 @@ namespace dynarithmic
             static int  FindConditionCode(TW_UINT16 nCode);
             static bool IsCapabilitySupported(const CTL_ITwainSource *pSource,
                                               TW_UINT16 nCap,
-                                              int nType=CTL_GetTypeGET);
+                                              int nType=MSG_GET);
 
             static bool IsCapabilitySupported(const CTL_ITwainSource *pSource,
                                               TW_UINT16 nCap,
@@ -239,7 +238,7 @@ namespace dynarithmic
             static bool GetOneTwainCapValue( const CTL_ITwainSource *pSource,
                                              void *pValue,
                                              TW_UINT16 Cap,
-                                             CTL_EnumGetType GetType,
+                                             TW_UINT16 GetType,
                                              TW_UINT16 nDataType );
 
             static bool GetOneCapValue(const CTL_ITwainSource *pSource,
@@ -251,14 +250,14 @@ namespace dynarithmic
                                                          TW_UINT16 rc);
 
             static TW_UINT16 GetMemXferValues(CTL_ITwainSource *pSource, TW_SETUPMEMXFER *pXfer);
-            static bool IsCapMaskOn( CTL_EnumCapability Cap, CTL_EnumGetType GetType);
-            static bool IsCapMaskOn( CTL_EnumCapability Cap, CTL_EnumSetType SetType);
+            static bool IsCapMaskOnGet( TW_UINT16  Cap, TW_UINT16 GetType);
+            static bool IsCapMaskOnSet( TW_UINT16  Cap, TW_UINT16 SetType);
             static bool IsSourceCompliant( const CTL_ITwainSource *pSource,
                                            CTL_EnumTwainVersion TVersion,
                                            CTL_TwainCapArray & rArray);
             static std::string  GetCapNameFromCap( LONG Cap );
-            static int          GetDataTypeFromCap( CTL_EnumCapability Cap, CTL_ITwainSource *pSource=nullptr);
-            static UINT         GetContainerTypesFromCap( CTL_EnumCapability Cap, bool nType );
+            static int          GetDataTypeFromCap( TW_UINT16  Cap, CTL_ITwainSource *pSource=nullptr);
+            static UINT         GetContainerTypesFromCap( TW_UINT16  Cap, bool nType );
             static LONG DoCapContainerTest(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, TW_UINT16 nCap, LONG lGetType);
 
             static void         GetContainerNamesFromType( int nType, StringArray &rArray );
@@ -433,7 +432,7 @@ namespace dynarithmic
                        {
                            pGetTriplet = std::make_unique<CTL_CapabilityGetArrayTriplet>(pSession,
                                pTempSource,
-                               CTL_GetTypeGET,
+                               static_cast<TW_UINT16>(MSG_GET),
                                Cap, nDataType);
                        }
                        break;
@@ -442,7 +441,7 @@ namespace dynarithmic
                        {
                            pGetTriplet = std::make_unique<CTL_CapabilityGetEnumTriplet>( pSession,
                                                pTempSource,
-                                               CTL_GetTypeGET,
+                                               static_cast<TW_UINT16>(MSG_GET),
                                                Cap,
                                                nDataType);
                        }
@@ -452,7 +451,7 @@ namespace dynarithmic
                        {
                            pGetTriplet = std::make_unique<CTL_CapabilityGetRangeTriplet>( pSession,
                                                pTempSource,
-                                               CTL_GetTypeGET,
+                                               static_cast<TW_UINT16>(MSG_GET),
                                                Cap,nDataType);
                        }
                        break;
@@ -474,7 +473,7 @@ namespace dynarithmic
             void OpenLogFile(LPCSTR lpszFile);
             void CloseLogFile();
             CTL_TwainDLLHandle* GetDLLHandle() const { return m_pDLLHandle; }
-            static bool SetDependentCaps( const CTL_ITwainSource *pSource, CTL_EnumCapability Cap );
+            static bool SetDependentCaps( const CTL_ITwainSource *pSource, TW_UINT16  Cap );
             static void EnumNoTimeoutTriplets();
             static CTL_TwainSessionArray::iterator FindSession(const CTL_ITwainSession* pSession);
 

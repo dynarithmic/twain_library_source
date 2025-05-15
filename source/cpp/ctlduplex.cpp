@@ -27,12 +27,12 @@ using namespace dynarithmic;
 
 static std::pair<bool, int> GetDuplexType(DTWAIN_SOURCE Source)
 {
-    if (!DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPDUPLEX))
+    if (!DTWAIN_IsCapSupported(Source, CAP_DUPLEX))
         return { false, TWDX_NONE };
 
     DTWAIN_ARRAY Array = nullptr;
-    const DTWAIN_BOOL bRet2 = DTWAIN_GetCapValuesEx2(Source, DTWAIN_CV_CAPDUPLEX, DTWAIN_CAPGET,
-        DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
+    const DTWAIN_BOOL bRet2 = DTWAIN_GetCapValuesEx2(Source, CAP_DUPLEX, DTWAIN_CAPGET,
+                                                     DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
     const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     DTWAINArrayLowLevel_RAII arr(pHandle, Array);
     if (bRet2 && Array)

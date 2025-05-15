@@ -31,7 +31,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJobControl(DTWAIN_SOURCE Source, LONG JobCont
 {
     LOG_FUNC_ENTRY_PARAMS((Source, JobControl, bSetCurrent))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    CHECK_IF_CAP_SUPPORTED(pSource, pHandle, DTWAIN_CV_CAPJOBCONTROL, false);
+    CHECK_IF_CAP_SUPPORTED(pSource, pHandle, CAP_JOBCONTROL, false);
 
     LONG SetType = DTWAIN_CAPSET;
     if ( !bSetCurrent )
@@ -39,7 +39,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJobControl(DTWAIN_SOURCE Source, LONG JobCont
         SetType = DTWAIN_CAPRESET;
         JobControl = TWJC_NONE;
     }
-    DTWAIN_ARRAY Array = CreateArrayFromCap(pHandle, nullptr, DTWAIN_CV_CAPJOBCONTROL, 1);
+    DTWAIN_ARRAY Array = CreateArrayFromCap(pHandle, nullptr, CAP_JOBCONTROL, 1);
     if ( !Array )
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
     DTWAINArrayLowLevel_RAII a(pSource->GetDTWAINHandle(), Array);
@@ -47,7 +47,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJobControl(DTWAIN_SOURCE Source, LONG JobCont
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
     vValues[0] = JobControl;
 
-    const DTWAIN_BOOL bRet = DTWAIN_SetCapValuesEx2(Source, DTWAIN_CV_CAPJOBCONTROL, SetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array );
+    const DTWAIN_BOOL bRet = DTWAIN_SetCapValuesEx2(Source, CAP_JOBCONTROL, SetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array );
     if ( bRet )
     {
         // Set the source value in the cache

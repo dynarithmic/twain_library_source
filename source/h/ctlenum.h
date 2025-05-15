@@ -367,22 +367,7 @@ namespace dynarithmic
                                 TwainUnit_PIXELS        =  TWUN_PIXELS
                             };
 
-    enum CTL_EnumGetType { CTL_GetTypeGET         = MSG_GET,
-                           CTL_GetTypeGETCURRENT  = MSG_GETCURRENT,
-                           CTL_GetTypeGETDEFAULT  = MSG_GETDEFAULT,
-                           CTL_GetTypeGETHELP   = MSG_GETHELP,
-                           CTL_GetTypeGETLABEL = MSG_GETLABEL,
-                           CTL_GetTypeGETLABELENUM = MSG_GETLABELENUM,
-                           CTL_GetTypeQUERYSUPPORT = MSG_QUERYSUPPORT
-                         };
-
-    enum CTL_EnumSetType { CTL_SetTypeSET         = MSG_SET,
-                           CTL_SetTypeRESET       = MSG_RESET,
-                           CTL_SetTypeRESETALL    = MSG_RESETALL,
-                           CTL_SetTypeSETCONSTRAINT = MSG_SETCONSTRAINT,
-                         };
-
-    enum CTL_EnumCapMask {  CTL_CapMaskGET          = 1,
+        enum CTL_EnumCapMask {  CTL_CapMaskGET          = 1,
                             CTL_CapMaskGETCURRENT   = 2,
                             CTL_CapMaskGETDEFAULT   = 4,
                             CTL_CapMaskSET          = 8,
@@ -406,83 +391,8 @@ namespace dynarithmic
                                 CTL_TwainVersion22 = 7,
                                 CTL_TwainVersion23 = 8,
     };
-    typedef TW_UINT16 CTL_EnumCapability;
-
+    
     #define  TwainCap_INVALID              -1
-    #define  TwainCap_XFERCOUNT            CAP_XFERCOUNT
-    #define  TwainCap_COMPRESSION          ICAP_COMPRESSION
-    #define  TwainCap_PIXELTYPE            ICAP_PIXELTYPE
-    #define  TwainCap_UNITS                ICAP_UNITS
-    #define  TwainCap_XFERMECH             ICAP_XFERMECH
-    #define  TwainCap_AUTHOR               CAP_AUTHOR
-    #define  TwainCap_CAPTION              CAP_CAPTION
-    #define  TwainCap_FEEDERENABLED        CAP_FEEDERENABLED
-    #define  TwainCap_FEEDERLOADED         CAP_FEEDERLOADED
-    #define  TwainCap_TIMEDATE             CAP_TIMEDATE
-    #define  TwainCap_SUPPORTEDCAPS        CAP_SUPPORTEDCAPS
-    #define  TwainCap_EXTENDEDCAPS         CAP_EXTENDEDCAPS
-    #define  TwainCap_AUTOFEED             CAP_AUTOFEED
-    #define  TwainCap_CLEARPAGE            CAP_CLEARPAGE
-    #define  TwainCap_FEEDPAGE             CAP_FEEDPAGE
-    #define  TwainCap_REWINDPAGE           CAP_REWINDPAGE
-    #define  TwainCap_INDICATORS           CAP_INDICATORS
-    #define  TwainCap_SUPPORTEDCAPSEXT     CAP_SUPPORTEDCAPSEXT
-    #define  TwainCap_PAPERDETECTABLE      CAP_PAPERDETECTABLE
-    #define  TwainCap_UICONTROLLABLE       CAP_UICONTROLLABLE
-    #define  TwainCap_DEVICEONLINE         CAP_DEVICEONLINE
-    #define  TwainCap_AUTOSCAN             CAP_AUTOSCAN
-    #define  TwainCap_AUTOBRIGHT           ICAP_AUTOBRIGHT
-    #define  TwainCap_BRIGHTNESS           ICAP_BRIGHTNESS
-    #define  TwainCap_CONTRAST             ICAP_CONTRAST
-    #define  TwainCap_CUSTHALFTONE         ICAP_CUSTHALFTONE
-    #define  TwainCap_EXPOSURETIME         ICAP_EXPOSURETIME
-    #define  TwainCap_FILTER               ICAP_FILTER
-    #define  TwainCap_FLASHUSED            ICAP_FLASHUSED
-    #define  TwainCap_GAMMA                ICAP_GAMMA
-    #define  TwainCap_HALFTONES            ICAP_HALFTONES
-    #define  TwainCap_HIGHLIGHT            ICAP_HIGHLIGHT
-    #define  TwainCap_IMAGEFILEFORMAT      ICAP_IMAGEFILEFORMAT
-    #define  TwainCap_LAMPSTATE            ICAP_LAMPSTATE
-    #define  TwainCap_LIGHTSOURCE          ICAP_LIGHTSOURCE
-    #define  TwainCap_ORIENTATION          ICAP_ORIENTATION
-    #define  TwainCap_PHYSICALWIDTH        ICAP_PHYSICALWIDTH
-    #define  TwainCap_PHYSICALHEIGHT       ICAP_PHYSICALHEIGHT
-    #define  TwainCap_SHADOW               ICAP_SHADOW
-    #define  TwainCap_FRAMES               ICAP_FRAMES
-    #define  TwainCap_XNATIVERESOLUTION    ICAP_XNATIVERESOLUTION
-    #define  TwainCap_YNATIVERESOLUTION    ICAP_YNATIVERESOLUTION
-    #define  TwainCap_XRESOLUTION          ICAP_XRESOLUTION
-    #define  TwainCap_YRESOLUTION          ICAP_YRESOLUTION
-    #define  TwainCap_MAXFRAMES            ICAP_MAXFRAMES
-    #define  TwainCap_TILES                ICAP_TILES
-    #define  TwainCap_BITORDER             ICAP_BITORDER
-    #define  TwainCap_CCITTKFACTOR         ICAP_CCITTKFACTOR
-    #define  TwainCap_LIGHTPATH            ICAP_LIGHTPATH
-    #define  TwainCap_PIXELFLAVOR          ICAP_PIXELFLAVOR
-    #define  TwainCap_PLANARCHUNKY         ICAP_PLANARCHUNKY
-    #define  TwainCap_ROTATION             ICAP_ROTATION
-    #define  TwainCap_SUPPORTEDSIZES       ICAP_SUPPORTEDSIZES
-    #define  TwainCap_THRESHOLD            ICAP_THRESHOLD
-    #define  TwainCap_XSCALING             ICAP_XSCALING
-    #define  TwainCap_YSCALING             ICAP_YSCALING
-    #define  TwainCap_BITORDERCODES        ICAP_BITORDERCODES
-    #define  TwainCap_PIXELFLAVORCODES     ICAP_PIXELFLAVORCODES
-    #define  TwainCap_JPEGPIXELTYPE        ICAP_JPEGPIXELTYPE
-    #define  TwainCap_TIMEFILL             ICAP_TIMEFILL
-    #define  TwainCap_BITDEPTH             ICAP_BITDEPTH
-    #define  TwainCap_BITDEPTHREDUCTION    ICAP_BITDEPTHREDUCTION
-    #define  TwainCap_UNDEFINEDIMAGESIZE   ICAP_UNDEFINEDIMAGESIZE
-    #define  TwainCap_IMAGEDATASET         ICAP_IMAGEDATASET
-    #define  TwainCap_EXTIMAGEINFO         ICAP_EXTIMAGEINFO
-    #define  TwainCap_MINIMUMHEIGHT        ICAP_MINIMUMHEIGHT
-    #define  TwainCap_MINIMUMWIDTH         ICAP_MINIMUMWIDTH
-    #define  TwainCap_THUMBNAILSENABLED    CAP_THUMBNAILSENABLED
-    #define  TwainCap_DUPLEX               CAP_DUPLEX
-    #define  TwainCap_DUPLEXENABLED        CAP_DUPLEXENABLED
-    #define  TwainCap_ENABLEDSUIONLY       CAP_ENABLEDSUIONLY
-    #define  TwainCap_CUSTOMDSDATA         CAP_CUSTOMDSDATA
-    #define  TwainCap_ENDORSER             CAP_ENDORSER
-    #define  TwainCap_JOBCONTROL           CAP_JOBCONTROL
 
     enum CTL_EnumContainer {
              TwainContainer_ONEVALUE    = DTWAIN_CONTONEVALUE,

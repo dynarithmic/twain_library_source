@@ -44,7 +44,7 @@ static int GetMultiCapValues(DTWAIN_HANDLE DLLHandle,
                         DTWAIN_ARRAY pArray,
                         CTL_ArrayType,
                         TW_UINT16 nCap,
-                        CTL_EnumGetType GetType,
+                        TW_UINT16 GetType,
                         CTL_StringType AValue,
                         TW_UINT16 TwainDataType,
                         UINT nContainerVal/* = 0*/,
@@ -58,7 +58,7 @@ static int GetMultiCapValues(DTWAIN_HANDLE DLLHandle,
                         DTWAIN_ARRAY pArray,
                         CTL_ArrayType EnumType,
                         TW_UINT16 nCap,
-                        CTL_EnumGetType GetType,
+                        TW_UINT16 GetType,
                         DTWAIN_FRAME frm,
                         TW_UINT16 TwainDataType,
                         UINT nContainerVal,
@@ -148,7 +148,7 @@ static DTWAIN_ARRAY PerformGetCap(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source,
         bOk = GetOneCapValue<DataType>(DLLHandle,
                                         Source,
                                         static_cast<UINT>(lCap),
-                                        static_cast<CTL_EnumGetType>(lGetType),
+                                        static_cast<TW_UINT16>(lGetType),
                                         oneCapFlag,
                                         &dValue,
                                         static_cast<TW_UINT16>(overrideDataType));
@@ -165,7 +165,7 @@ static DTWAIN_ARRAY PerformGetCap(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source,
                                 pDTWAINArray,
                                 eType,
                                 static_cast<UINT>(lCap),
-                                static_cast<CTL_EnumGetType>(lGetType),
+                                static_cast<TW_UINT16>(lGetType),
                                 ConvertTo(),
                                 static_cast<TW_UINT16>(overrideDataType),
                                 static_cast<UINT>(lContainerType),
@@ -212,13 +212,13 @@ static bool performSetCap(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, TW_UINT
             lValue = ConverterFn::convert(lVal, nullptr);
         }
 
-        bOk = SetOneCapValue(DLLHandle, Source, static_cast<TW_UINT16>(lCap), static_cast<CTL_EnumSetType>(lSetType), lValue, static_cast<TW_UINT16>(TwainTypeValue))?true:false;
+        bOk = SetOneCapValue(DLLHandle, Source, static_cast<TW_UINT16>(lCap), static_cast<TW_UINT16>(lSetType), lValue, static_cast<TW_UINT16>(TwainTypeValue))?true:false;
         return bOk;
     }
     else
     {
         bOk = SetMultiCapValues<DataType, ConvertFrom, ConverterFn>
-            (DLLHandle, Source, pArray, eType, static_cast<UINT>(lCap), static_cast<CTL_EnumSetType>(lSetType), static_cast<UINT>(lContainerType), true, static_cast<TW_UINT16>(TwainTypeValue))?true:false;
+            (DLLHandle, Source, pArray, eType, static_cast<UINT>(lCap), static_cast<TW_UINT16>(lSetType), static_cast<UINT>(lContainerType), true, static_cast<TW_UINT16>(TwainTypeValue))?true:false;
 
     }
     return bOk;
@@ -254,7 +254,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap
     bool overrideDataType = true;
     if (nDataType == DTWAIN_DEFAULT)
     {
-        nDataType = CTL_TwainAppMgr::GetDataTypeFromCap(static_cast<CTL_EnumCapability>(lCap), pSource);
+        nDataType = CTL_TwainAppMgr::GetDataTypeFromCap(static_cast<TW_UINT16 >(lCap), pSource);
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return nDataType < 0 || nDataType == (std::numeric_limits<int>::min)(); }, nDataType, false, FUNC_MACRO);
         overrideDataType = false;
     }
@@ -430,7 +430,7 @@ static DTWAIN_BOOL SetCapValuesEx2_Internal( DTWAIN_SOURCE Source, LONG lCap, LO
 
     if (nDataType == DTWAIN_DEFAULT)
     {
-        nDataType = DTWAIN_GetCapDataType(Source, static_cast<CTL_EnumCapability>(lCap));
+        nDataType = DTWAIN_GetCapDataType(Source, static_cast<TW_UINT16 >(lCap));
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return nDataType < 0; }, nDataType, false, FUNC_MACRO);
     }
 
@@ -549,7 +549,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCapValuesEx( DTWAIN_SOURCE Source, LONG lCap,
     LOG_FUNC_ENTRY_PARAMS((Source, lCap, lSetType, lContainerType, pArray))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     DTWAIN_BOOL bRet = FALSE;
-    auto nDataType = CTL_TwainAppMgr::GetDataTypeFromCap(static_cast<CTL_EnumCapability>(lCap), pSource);
+    auto nDataType = CTL_TwainAppMgr::GetDataTypeFromCap(static_cast<TW_UINT16 >(lCap), pSource);
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return nDataType < 0;} , DTWAIN_ERR_BAD_CAP, false, FUNC_MACRO);
     bRet = SetCapValuesEx2_Internal(Source, lCap, lSetType, lContainerType, nDataType, pArray);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
@@ -837,7 +837,7 @@ static void genericDumper(DTWAIN_ARRAY Array)
 
 static void DumpArrayLONG(DTWAIN_ARRAY Array, LONG lCap)
 {
-    if ( lCap != DTWAIN_CV_CAPSUPPORTEDCAPS )
+    if ( lCap != CAP_SUPPORTEDCAPS )
         genericDumper<CTL_ArrayFactory::tagged_array_long>(Array);
 
     else
@@ -976,7 +976,7 @@ int GetMultiCapValues(DTWAIN_HANDLE DLLHandle,
                        DTWAIN_ARRAY pArray,
                        CTL_ArrayType EnumType,
                        TW_UINT16 nCap,
-                       CTL_EnumGetType GetType,
+                       TW_UINT16 GetType,
                        std::string cStr,
                        TW_UINT16 TwainDataType,
                        UINT nContainerVal,

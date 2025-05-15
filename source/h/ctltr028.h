@@ -52,10 +52,10 @@ namespace dynarithmic
                 const bool bIsSet = IsMSGSetType();
                 if (bIsSet)
                 {
-                    m_capMap[DTWAIN_CV_ICAPJPEGPIXELTYPE] = TWPT_BW;
-                    m_capMap[DTWAIN_CV_ICAPJPEGQUALITY] = TWJQ_MEDIUM;
-                    m_capMap[DTWAIN_CV_ICAPCOMPRESSION] = TWCP_NONE;
-                    m_capMap[DTWAIN_CV_ICAPJPEGSUBSAMPLING] = TWCP_NONE;
+                    m_capMap[ICAP_JPEGPIXELTYPE] = TWPT_BW;
+                    m_capMap[ICAP_JPEGQUALITY] = TWJQ_MEDIUM;
+                    m_capMap[ICAP_COMPRESSION] = TWCP_NONE;
+                    m_capMap[ICAP_JPEGSUBSAMPLING] = TWCP_NONE;
                 }
             }
             typedef std::unordered_map<TW_UINT16, LONG> FileXferCapMap;
@@ -76,7 +76,7 @@ namespace dynarithmic
                 CapSetter(CTL_ITwainSource* pSource) : m_pSource(pSource) {}
                 void operator()(const CTL_SetupFileXferTripletImpl::FileXferCapMap::value_type& v) const
                 {
-                    SetOneCapValue(m_pSource, v.first, CTL_SetTypeSET, v.second, static_cast<TW_UINT16>(CTL_TwainAppMgr::GetGeneralCapInfo(v.first).m_nDataType));
+                    SetOneCapValue(m_pSource, v.first, MSG_SET, v.second, static_cast<TW_UINT16>(CTL_TwainAppMgr::GetGeneralCapInfo(v.first).m_nDataType));
                 }
             };
 

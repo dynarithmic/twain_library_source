@@ -54,7 +54,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !bIsSourceOpen; }, DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
     // Check if capability is supported
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !DTWAIN_IsCapSupported(Source, DTWAIN_CV_CAPENABLEDSUIONLY); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !DTWAIN_IsCapSupported(Source, CAP_ENABLEDSUIONLY); },
         DTWAIN_ERR_UIONLY_NOT_SUPPORTED, false, FUNC_MACRO);
 
     // Start a thread depending on Twain Mode.
