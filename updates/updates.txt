@@ -7,6 +7,8 @@ DTWAIN Version changes
 - Fix issue with truncated DTWAIN version information being saved in 
   generated image files.
 
+- Small speed optimization for DTWAIN_IsCapSupported().
+
 - Internal code refactoring and cleanup.
 
 
