@@ -464,12 +464,6 @@ static void GetLayoutComponents(LayoutTriplet* LayoutTrip, CTL_RealArray& rArray
     
 bool CTL_TwainAppMgr::GetImageLayoutSize(const CTL_ITwainSource* pSource, CTL_RealArray& rArray, TW_UINT16 GetType)
 {
-    if ( !s_pGlobalAppMgr )
-        return false;
-
-    if ( !s_pGlobalAppMgr->IsSourceOpen( pSource ))
-        return false;
-
     const auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
     const auto pSession = pTempSource->GetTwainSession();
 
@@ -498,12 +492,6 @@ bool CTL_TwainAppMgr::SetImageLayoutSize(const CTL_ITwainSource* pSource,
                                          CTL_RealArray& rActual,
                                          TW_UINT16 SetType)
 {
-    if ( !s_pGlobalAppMgr )
-        return false;
-
-    if ( !s_pGlobalAppMgr->IsSourceOpen( pSource ))
-        return false;
-
     rActual.clear();
 
     const auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
