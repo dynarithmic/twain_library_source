@@ -176,8 +176,9 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
 {
     bool bPassMsg = false;
     auto pHandle = FindHandle( hWnd, FALSE );
-    if ( pHandle )
+    if ( !pHandle )
     {
+        return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
     }
 
     if ( uMsg == static_cast<UINT>(CTL_StaticData::GetRegisteredMessage()) )
@@ -191,7 +192,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 pSource->SetAcquireStarted(true);
                 pSource->ResetFileAutoIncrementData();
-                if ((pHandle && (pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle))) || !callbacks.empty())
+                if (pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) || !callbacks.empty())
                 {
                     // Send this message on
                     bPassMsg = true;
@@ -285,14 +286,12 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                     LOG_FUNC_STRING(DTWAIN_ACQUIREDONE -- Finished Copying DIBS to Source...)
                 }
                 else
-                // Program cancelled after XFERREADY was retrieved
+                // Program canceled after XFERREADY was retrieved
                 {
                     // Nothing to do
                 }
                 // Check if acquire count has reached the max
-                if ( pSource->GetAcquireCount() == pSource->GetMaxAcquisitions() ||
-                     /*pSource->IsModal() ||*/  !pSource->IsUIOpenOnAcquire() /* ||
-                     wParam == DTWAIN_TN_ACQUIREDONE_EX*/)
+                if ( pSource->GetAcquireCount() == pSource->GetMaxAcquisitions() || !pSource->IsUIOpenOnAcquire())
                 {
                     // End the TWAIN UI session
                     CTL_TwainAppMgr::EndTwainUI( pHandle->m_pTwainSession, pSource );
@@ -572,7 +571,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
         case WM_DESTROY:
         {
             /* If this window was subclassed, the program must not close this window!!! */
-            if ( pHandle && pHandle->m_hWndTwain && pHandle->m_bUseProxy )
+            if ( pHandle->m_hWndTwain && pHandle->m_bUseProxy )
                 DTWAIN_InvokeCallback( DTWAIN_CallbackMESSAGE, pHandle, nullptr, DTWAIN_AcquireSourceClosed, 0 );
 
         }
