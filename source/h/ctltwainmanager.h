@@ -250,8 +250,6 @@ namespace dynarithmic
                                                          TW_UINT16 rc);
 
             static TW_UINT16 GetMemXferValues(CTL_ITwainSource *pSource, TW_SETUPMEMXFER *pXfer);
-            static bool IsCapMaskOnGet( TW_UINT16  Cap, TW_UINT16 GetType);
-            static bool IsCapMaskOnSet( TW_UINT16  Cap, TW_UINT16 SetType);
             static bool IsSourceCompliant( const CTL_ITwainSource *pSource,
                                            CTL_EnumTwainVersion TVersion,
                                            CTL_TwainCapArray & rArray);
@@ -260,7 +258,6 @@ namespace dynarithmic
             static UINT         GetContainerTypesFromCap( TW_UINT16  Cap, bool nType );
             static LONG DoCapContainerTest(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, TW_UINT16 nCap, LONG lGetType);
 
-            static void         GetContainerNamesFromType( int nType, StringArray &rArray );
             static void         EndTwainUI(const CTL_ITwainSession* pSession, CTL_ITwainSource* pSource);
 
             static int          CopyFile(CTL_StringType strIn, CTL_StringType strOut);

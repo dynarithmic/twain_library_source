@@ -263,22 +263,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-static LONG GetTwainGetType(LONG gettype)
-{
-    switch (gettype)
-    {
-        case DTWAIN_CAPGETHELP:
-            return MSG_GETHELP;
-
-        case DTWAIN_CAPGETLABEL:
-            return MSG_GETLABEL;
-
-        case DTWAIN_CAPGETLABELENUM:
-            return MSG_GETLABELENUM;
-    }
-    return gettype;
-}
-
 DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap, LONG lGetType, LONG lContainerType,
                                             LONG nDataType, LPDTWAIN_ARRAY pArray, bool bOverrideDataType )
 {

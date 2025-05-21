@@ -173,7 +173,7 @@ static std::string get_source_file_types(DTWAIN_SOURCE Source)
 
 using pixelMap = std::map<LONG, std::vector<LONG>>;
 
-static pixelMap getPixelAndBitDepthInfo(CTL_ITwainSource* pSource)
+static pixelMap get_pixel_bitdepth_info(CTL_ITwainSource* pSource)
 {
     const auto pHandle = pSource->GetDTWAINHandle();
     // Get the pixel information
@@ -558,7 +558,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
 
                     // Get the pixel information
                     {
-                        auto pixInfo = getPixelAndBitDepthInfo(pCurrentSourcePtr);
+                        auto pixInfo = get_pixel_bitdepth_info(pCurrentSourcePtr);
                         std::vector<LONG> allPixInfo;
                         std::vector<std::string> vPixNames;
                         std::vector<std::string> vPixNamesEx;

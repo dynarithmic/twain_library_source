@@ -109,7 +109,6 @@ static void LogDTWAINErrorToMsgBox(int nError, LPCSTR pFunc, const std::string& 
 static DTWAIN_BOOL SetLangResourcePath(LPCTSTR szPath);
 static std::string GetStaticLibVer();
 static void LoadStaticData(CTL_TwainDLLHandle*);
-static bool GetDTWAINDLLVersionInfo(HMODULE hMod, LONG* lMajor, LONG* lMinor, LONG *pPatch);
 static CTL_StringType GetDTWAINDLLVersionInfoStr();
 static CTL_StringType GetDTWAINInternalBuildNumber();
 static DTWAIN_BOOL DTWAIN_GetVersionInternal(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatch);
@@ -145,108 +144,16 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetVersionEx(LPLONG lMajor, LPLONG lMinor, LPLON
 DTWAIN_BOOL DTWAIN_GetVersionInternal(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType, LPLONG lPatch)
 {
     LOG_FUNC_ENTRY_PARAMS((lMajor, lMinor, lVersionType))
-    LONG nDistr = 0;
-
-#ifdef DTWAIN_OPENSOURCE_DISTRIBUTION
-#pragma message ("Building Open Source Distribution version")
-    nDistr |= DTWAIN_OPENSOURCE_VERSION;
-#endif
-
-#ifdef DTWAIN_LIB
-    CTL_StringType strVer = _T(DTWAIN_VERINFO_BASEVERSION)
-        _T(DTWAIN_PATCHLEVEL_VERSION);
-    CTL_StringArrayType aInfo;
-    StringWrapper::Tokenize(strVer, _T("."), aInfo);
-    *lMajor = _ttol(aInfo[0].c_str());
-    *lMinor = _ttol(aInfo[1].c_str());
+    constexpr LONG nDistr = DTWAIN_OPENSOURCE_VERSION;
+    static constexpr auto modRet = GetDTWAINDLLVersionInfo();
+    if (lMajor)
+        *lMajor = modRet[0];
+    if (lMinor)
+        *lMinor = modRet[1];
     if (lPatch)
-        *lPatch = _ttol(aInfo[3].c_str());
-#endif
-#ifdef DTWAIN_LIB
-    GetVersionFromResource(lMajor, lMinor, lPatch);
-#else
-    const bool modRet = GetDTWAINDLLVersionInfo(CTL_StaticData::GetDLLInstanceHandle(), lMajor, lMinor, lPatch);
-    if (!modRet)
-    {
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    }
-#endif
-    *lVersionType = nDistr;
-#ifdef UNICODE
-    *lVersionType |= DTWAIN_UNICODE_VERSION;
-#endif
-
-#ifdef DTWAIN_DEBUG
-    *lVersionType |= DTWAIN_DEVELOP_VERSION;
-#endif
-
-#if defined (WIN64) || defined(_WIN64)
-    *lVersionType |= DTWAIN_64BIT_VERSION;
-#else
-#if defined (WIN32) || defined(_WIN32)
-    *lVersionType |= DTWAIN_32BIT_VERSION;
-#endif
-#endif
-
-#ifdef DTWAIN_LIB
-    #ifndef DTWAIN_STDCALL
-        *lVersionType |= DTWAIN_STATICLIB_VERSION;
-    #else
-        *lVersionType |= DTWAIN_STATICLIB_STDCALL_VERSION;
-    #endif
-    #ifdef DTWAIN_ACTIVEX
-        *lVersionType |= DTWAIN_ACTIVEX_VERSION;
-    #endif
-#endif
-
-#ifndef DTWAIN_LIMITED_VERSION
-    #ifdef PDFLIB_INTERNAL
-        #ifdef DTWAIN_LIB
-            #ifndef DTWAIN_STDCALL
-                *lVersionType |= DTWAIN_PDF_VERSION;
-            #else
-                *lVersionType |= DTWAIN_PDF_VERSION;
-            #endif
-        #else
-            #ifndef DTWAIN_DEMO_VERSION
-                *lVersionType |= DTWAIN_PDF_VERSION;
-            #else
-                *lVersionType |= DTWAIN_PDF_VERSION;
-            #endif
-        #endif
-    #endif
-#endif
-
-#ifndef DTWAIN_LIMITED_VERSION
-    #ifdef TWAINSAVE_INTERNAL
-        #ifdef DTWAIN_LIB
-            #ifndef DTWAIN_STDCALL
-                *lVersionType |= DTWAIN_TWAINSAVE_VERSION;
-            #else
-                *lVersionType |= DTWAIN_TWAINSAVE_VERSION;
-            #endif
-            #else
-            #ifndef DTWAIN_DEMO_VERSION
-                *lVersionType |= DTWAIN_TWAINSAVE_VERSION;
-            #else
-                *lVersionType |= DTWAIN_TWAINSAVE_VERSION;
-            #endif
-        #endif
-    #endif
-#endif
-
-#ifdef DTWAIN_DEVELOP_DLL
-    *lVersionType |= DTWAIN_DEVELOP_VERSION;
-#endif
-
-#if DTWAIN_BUILD_LOGCALLSTACK == 1
-    *lVersionType |= DTWAIN_CALLSTACK_LOGGING;
-#endif
-
-#if DTWAIN_BUILD_LOGCALLSTACK == 1 && DTWAIN_BUILD_LOGPOINTERS == 1
-    *lVersionType |= DTWAIN_CALLSTACK_LOGGING_PLUS;
-#endif
-
+        *lPatch = modRet[2];
+    if ( lVersionType )
+        *lVersionType = nDistr | GetDTWAINVersionType();
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -2308,18 +2215,6 @@ void WriteVersionToLog(CTL_TwainDLLHandle *pHandle)
 void dynarithmic::DTWAIN_InternalThrowException() THIS_FUNCTION_THROWS
 {
     throw;
-}
-
-
-bool GetDTWAINDLLVersionInfo(HMODULE hMod, LONG* lMajor, LONG* lMinor, LONG *pPatch)
-{
-    if ( lMajor )
-        *lMajor = DTWAIN_MAJOR_VERSION;
-    if (lMinor)
-        *lMinor = DTWAIN_MINOR_VERSION;
-    if (pPatch)
-        *pPatch = DTWAIN_PATCHLEVEL_VERSION;
-    return true;
 }
 
 CTL_StringType GetDTWAINDLLVersionInfoStr()
