@@ -1349,16 +1349,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lp
     }
 
     // Create a session
-    auto Session =
-        CTL_TwainAppMgr::CreateTwainSession( pHandle, szName.c_str(), &hWndMsg,
-                                             pHandle->m_SessionStruct.nMajorNum,
-                                             pHandle->m_SessionStruct.nMinorNum,
-                                             static_cast<CTL_TwainLanguageEnum>(pHandle->m_SessionStruct.nLanguage),
-                                             static_cast<CTL_TwainCountryEnum>(pHandle->m_SessionStruct.nCountry),
-                                             pHandle->m_SessionStruct.szVersion.c_str(),
-                                             pHandle->m_SessionStruct.szManufact.c_str(),
-                                             pHandle->m_SessionStruct.szFamily.c_str(),
-                                             pHandle->m_SessionStruct.szProduct.c_str());
+    auto Session = CTL_TwainAppMgr::CreateTwainSession( pHandle, szName.c_str(), &hWndMsg);
 
     if ( Session == nullptr)
     {

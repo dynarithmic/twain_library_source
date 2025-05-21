@@ -31,36 +31,15 @@ using namespace dynarithmic;
 //////////////////// CTL_ITwainSession functions /////////////////////////////
 CTL_ITwainSession*  CTL_ITwainSession::Create(CTL_TwainDLLHandle *pHandle,
                                             LPCTSTR pAppName,
-                                            HWND* hAppWnd,
-                                            TW_UINT16 nMajorNum,
-                                            TW_UINT16 nMinorNum,
-                                            CTL_TwainLanguageEnum nLanguage,
-                                            CTL_TwainCountryEnum nCountry,
-                                            LPCTSTR lpszVersion,
-                                            LPCTSTR lpszMfg,
-                                            LPCTSTR lpszFamily,
-                                            LPCTSTR lpszProduct
-                                            )
+                                            HWND* hAppWnd)
 {
-    return new CTL_ITwainSession( pHandle, pAppName, hAppWnd,
-                                  nMajorNum,
-                                  nMinorNum, nLanguage, nCountry,
-                                  lpszVersion, lpszMfg,
-                                  lpszFamily, lpszProduct);
+    return new CTL_ITwainSession(pHandle, pAppName, hAppWnd);
 }
 
 
 CTL_ITwainSession::CTL_ITwainSession(CTL_TwainDLLHandle *pHandle,
-                                    LPCTSTR pAppName,
-                                   HWND* hAppWnd,
-                                   TW_UINT16 nMajorNum,
-                                   TW_UINT16 nMinorNum,
-                                   CTL_TwainLanguageEnum nLanguage,
-                                   CTL_TwainCountryEnum nCountry,
-                                   LPCTSTR lpszVersion,
-                                   LPCTSTR lpszMfg,
-                                   LPCTSTR lpszFamily,
-                                   LPCTSTR lpszProduct) : 
+                                     LPCTSTR pAppName,
+                                     HWND* hAppWnd) : 
                                     m_AppId{}, m_AppWnd{}, m_pTwainDLLHandle{}, m_pSelectedSource{}
 {
     if ( pAppName )
@@ -78,23 +57,22 @@ CTL_ITwainSession::CTL_ITwainSession(CTL_TwainDLLHandle *pHandle,
 
     TW_IDENTITY m_AppIdTemp = {};
     m_AppIdTemp.Id = 0;
-    m_AppIdTemp.Version.MajorNum = nMajorNum;
-    m_AppIdTemp.Version.MinorNum = nMinorNum;
-    m_AppIdTemp.Version.Language = static_cast<TW_UINT16>(nLanguage);
-    m_AppIdTemp.Version.Country  = static_cast<TW_UINT16>(nCountry);
-
+    m_AppIdTemp.Version.MajorNum = pHandle->m_SessionStruct.nMajorNum;
+    m_AppIdTemp.Version.MinorNum = pHandle->m_SessionStruct.nMinorNum;
+    m_AppIdTemp.Version.Language = static_cast<TW_UINT16>(pHandle->m_SessionStruct.nLanguage);
+    m_AppIdTemp.Version.Country  = static_cast<TW_UINT16>(pHandle->m_SessionStruct.nCountry);
 
     StringWrapperA::SafeStrcpy( m_AppIdTemp.Version.Info,
-                                StringConversion::Convert_Native_To_Ansi(lpszVersion).c_str(),
+                                StringConversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szVersion).c_str(),
                                 sizeof m_AppIdTemp.Version.Info - 1 );
 
     m_AppIdTemp.ProtocolMajor =    TWON_PROTOCOLMAJOR;
     m_AppIdTemp.ProtocolMinor =    TWON_PROTOCOLMINOR;
     m_AppIdTemp.SupportedGroups =  DG_IMAGE | DG_CONTROL | DG_AUDIO | DF_APP2 | DF_DSM2 ;
 
-    StringWrapperA::SafeStrcpy( m_AppIdTemp.Manufacturer,  StringConversion::Convert_Native_To_Ansi(lpszMfg).c_str(), sizeof m_AppIdTemp.Manufacturer - 1 );
-    StringWrapperA::SafeStrcpy( m_AppIdTemp.ProductFamily, StringConversion::Convert_Native_To_Ansi(lpszFamily).c_str(), sizeof m_AppIdTemp.ProductFamily - 1 );
-    StringWrapperA::SafeStrcpy( m_AppIdTemp.ProductName,   StringConversion::Convert_Native_To_Ansi(lpszProduct).c_str(),sizeof m_AppIdTemp.ProductName - 1 );
+    StringWrapperA::SafeStrcpy( m_AppIdTemp.Manufacturer,  StringConversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szManufact).c_str(), sizeof m_AppIdTemp.Manufacturer - 1 );
+    StringWrapperA::SafeStrcpy( m_AppIdTemp.ProductFamily, StringConversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szFamily).c_str(), sizeof m_AppIdTemp.ProductFamily - 1 );
+    StringWrapperA::SafeStrcpy( m_AppIdTemp.ProductName,   StringConversion::Convert_Native_To_Ansi(pHandle->m_SessionStruct.szProduct).c_str(),sizeof m_AppIdTemp.ProductName - 1 );
     m_AppId = m_AppIdTemp;
     m_pSelectedSource = nullptr;
     m_bTwainMessageFlag = false;

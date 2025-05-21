@@ -39,31 +39,11 @@ namespace dynarithmic
   class CTL_ITwainSession
   {
     public:
-        static CTL_ITwainSession*  Create(CTL_TwainDLLHandle *pHandle,
-                                        LPCTSTR pAppName,
-                                        HWND* hAppWnd,
-                                        TW_UINT16 nMajorNum,
-                                        TW_UINT16 nMinorNum,
-                                        CTL_TwainLanguageEnum nLanguage,
-                                        CTL_TwainCountryEnum nCountry,
-                                        LPCTSTR lpszVersion,
-                                        LPCTSTR lpszMfg,
-                                        LPCTSTR lpszFamily,
-                                        LPCTSTR lpszProduct
-                                        );
+        static CTL_ITwainSession*  Create(CTL_TwainDLLHandle *pHandle, LPCTSTR pAppName, HWND* hAppWnd);
+
         static void Destroy( CTL_ITwainSessionPtr& pSession );
-        CTL_ITwainSession(CTL_TwainDLLHandle* pHandle,
-                          LPCTSTR pszAppName,
-                          HWND* hAppWnd,
-                          TW_UINT16 nMajorNum,
-                          TW_UINT16 nMinorNum,
-                          CTL_TwainLanguageEnum nLanguage,
-                          CTL_TwainCountryEnum nCountry,
-                          LPCTSTR lpszVersion,
-                          LPCTSTR lpszMfg,
-                          LPCTSTR lpszFamily,
-                          LPCTSTR lpszProduct
-                        );
+
+        CTL_ITwainSession(CTL_TwainDLLHandle* pHandle, LPCTSTR pszAppName, HWND* hAppWnd );
 
         HWND*               GetWindowHandlePtr() const { return const_cast<HWND*>(&m_AppWnd); }
         TW_IDENTITY*        GetAppIDPtr()              { return &m_AppId.get_identity(); }
