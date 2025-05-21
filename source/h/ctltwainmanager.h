@@ -98,18 +98,7 @@ namespace dynarithmic
             // this DLL will get its own session.
             static CTL_ITwainSession* CreateTwainSession(CTL_TwainDLLHandle* pHandle,
                                              LPCTSTR pAppName = nullptr,
-                                             HWND* hAppWnd = nullptr,
-                                             TW_UINT16 nMajorNum    = 1,
-                                             TW_UINT16 nMinorNum    = 0,
-                                             CTL_TwainLanguageEnum nLanguage  =
-                                             TwainLanguage_USAENGLISH,
-                                             CTL_TwainCountryEnum nCountry   =
-                                             TwainCountry_USA,
-                                             LPCTSTR lpszVersion  = _T("<?>"),
-                                             LPCTSTR lpszMfg      = _T("<?>"),
-                                             LPCTSTR lpszFamily   = _T("<?>"),
-                                             LPCTSTR lpszProduct  = _T("<?>")
-                                  );
+                                             HWND* hAppWnd = nullptr);
 
             static void DestroyTwainSession(const CTL_ITwainSession* pSession);
             static bool IsValidTwainSession(const CTL_ITwainSession* pSession);

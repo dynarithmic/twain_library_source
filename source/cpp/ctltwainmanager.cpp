@@ -149,22 +149,26 @@ void CTL_TwainAppMgr::Destroy()
     s_pGlobalAppMgr.reset();
 }
 
-CTL_ITwainSession* CTL_TwainAppMgr::CreateTwainSession(
-                                     CTL_TwainDLLHandle *pHandle,
-                                     LPCTSTR pAppName/* = nullptr*/,
-                                     HWND* hAppWnd,/* = nullptr*/
-                                     TW_UINT16 nMajorNum/*    = 1*/,
-                                     TW_UINT16 nMinorNum/*    = 0*/,
-                                     CTL_TwainLanguageEnum nLanguage/*  =
-                                     TwainLanguage_USAENGLISH*/,
-                                     CTL_TwainCountryEnum nCountry/*   =
-                                     TwainCountry_USA*/,
-                                     LPCTSTR lpszVersion /* = "<?>"*/,
-                                     LPCTSTR lpszMfg  /*    = "<?>"*/,
-                                     LPCTSTR lpszFamily /*  = "<?>"*/,
-                                     LPCTSTR lpszProduct /* = "<?>"*/
-                                     )
+CTL_ITwainSession* CTL_TwainAppMgr::CreateTwainSession(CTL_TwainDLLHandle *pHandle, LPCTSTR pAppName, HWND* hAppWnd)
 {
+    // Make sure we destroy the TWAIN session if something goes wrong in CreateTwainSession
+    struct TwainSessionRAII
+    {
+        CTL_ITwainSession* m_pSession;
+        bool m_bDestroy = true;
+        TwainSessionRAII(CTL_ITwainSession* pSession) : m_pSession(pSession) {}
+        void DestroySession(bool bDestroy) 
+        {
+            // Turn on/off the auto-destruction of the session
+            m_bDestroy = bDestroy;
+        }
+        ~TwainSessionRAII()
+        {
+            if (m_bDestroy)
+                DestroyTwainSession(m_pSession);
+        }
+    };
+
     // Try to load the source manager ( set in state 2 if not already
     //    in state 2 or 3)
     if ( !s_pGlobalAppMgr )
@@ -177,63 +181,60 @@ CTL_ITwainSession* CTL_TwainAppMgr::CreateTwainSession(
             return nullptr;
     }
 
-    const auto pSession = CTL_ITwainSession::Create(pHandle,
-                                                    pAppName,
-                                                    hAppWnd,
-                                                    nMajorNum,
-                                                    nMinorNum,
-                                                    nLanguage,
-                                                    nCountry,
-                                                    lpszVersion,
-                                                    lpszMfg,
-                                                    lpszFamily,
-                                                    lpszProduct);
-    if ( pSession )
+    const auto pSession = CTL_ITwainSession::Create(pHandle, pAppName, hAppWnd);
+
+    // Store this session as an RAII object, so that destruction is possible if
+    // something goes wrong...
+
+    TwainSessionRAII raii(pSession);
+
+    // We need to now set the ProtocolMajor, ProtocolMinor, and Supported Groups
+    // to the proper levels here.  We support 1.9 for TWAIN_32.DLL (LEGACY) and 2.x for
+    // TWAINDSM.DLL.
+    // DTWAIN assumes 2.x, but must change for legacy TWAIN_32.DLL source manager
+    if ( pHandle->m_SessionStruct.DSMName == TWAINDLLVERSION_1 )
     {
-        // We need to now set the ProtocolMajor, ProtocolMinor, and Supported Groups
-        // to the proper levels here.  We support 1.9 for TWAIN_32.DLL (LEGACY) and 2.x for
-        // TWAINDSM.DLL.
-        // DTWAIN assumes 2.x, but must change for legacy TWAIN_32.DLL source manager
-        if ( pHandle->m_SessionStruct.DSMName == TWAINDLLVERSION_1 )
-        {
-            TW_IDENTITY *pIdentity = pSession->GetAppIDPtr();
-            pIdentity->ProtocolMajor = 1;
-            pIdentity->ProtocolMinor = 9;
-            pIdentity->SupportedGroups = DG_IMAGE | DG_CONTROL | DG_AUDIO;
-        }
-        s_pGlobalAppMgr->m_arrTwainSession.push_back({});
-        s_pGlobalAppMgr->m_arrTwainSession.back().reset(pSession);
-
-        if ( !OpenSourceManager( pSession ) )
-        {
-            DestroyTwainSession( pSession );
-            return nullptr;
-        }
-
-        // Now set up the pointers to the memory functions if necessary
-        if (pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_LATESTVERSION ||
-            pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_VERSION2)
-        {
-            CTL_GetEntryPointTriplet entryPoints(pSession);
-            TW_UINT16 rc = entryPoints.Execute();
-            switch (rc)
-            {
-                case TWRC_SUCCESS:
-                    pHandle->m_Twain2Func.m_EntryPoint = entryPoints.getEntryPoint();
-                    pHandle->m_TwainMemoryFunc = &pHandle->m_Twain2Func;
-                    break;
-                default:
-                    LogWriterUtils::WriteLogInfoIndentedA("The entry points for the TWAINDSM.DLL were not found");
-                    DestroyTwainSession(pSession);
-                    return nullptr;
-            }
-        }
-        else
-            pHandle->m_TwainMemoryFunc = &pHandle->m_TwainLegacyFunc;
-        s_pSelectedSession = s_pGlobalAppMgr->m_arrTwainSession.back().get();
-        return s_pSelectedSession;
+        TW_IDENTITY *pIdentity = pSession->GetAppIDPtr();
+        pIdentity->ProtocolMajor = 1;
+        pIdentity->ProtocolMinor = 9;
+        pIdentity->SupportedGroups = DG_IMAGE | DG_CONTROL | DG_AUDIO;
     }
-    return nullptr;
+
+    // Add the session to the global TWAIN application manager
+    s_pGlobalAppMgr->m_arrTwainSession.push_back({});
+    s_pGlobalAppMgr->m_arrTwainSession.back().reset(pSession);
+
+    if ( !OpenSourceManager( pSession ) )
+    {
+        // Something went wrong...
+        return nullptr;
+    }
+
+    // Now set up the pointers to the memory functions if necessary
+    if (pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_LATESTVERSION ||
+        pHandle->m_SessionStruct.nSessionType == DTWAIN_TWAINDSM_VERSION2)
+    {
+        CTL_GetEntryPointTriplet entryPoints(pSession);
+        TW_UINT16 rc = entryPoints.Execute();
+        switch (rc)
+        {
+            case TWRC_SUCCESS:
+                pHandle->m_Twain2Func.m_EntryPoint = entryPoints.getEntryPoint();
+                pHandle->m_TwainMemoryFunc = &pHandle->m_Twain2Func;
+                break;
+            default:
+                // Function entry points for the TWAIN 2.x DSM are missing, so this is no good...
+                LogWriterUtils::WriteLogInfoIndentedA("The entry points for the TWAINDSM.DLL were not found");
+                return nullptr;
+        }
+    }
+    else
+        pHandle->m_TwainMemoryFunc = &pHandle->m_TwainLegacyFunc;
+
+    // Turn off the auto-destruction of the created session
+    raii.DestroySession(false);
+    s_pSelectedSession = s_pGlobalAppMgr->m_arrTwainSession.back().get();
+    return s_pSelectedSession;
 }
 
 bool CTL_TwainAppMgr::OpenSourceManager( CTL_ITwainSession* pSession )
