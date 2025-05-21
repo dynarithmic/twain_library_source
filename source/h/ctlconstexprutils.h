@@ -24,6 +24,7 @@
 #include "ctlconstexprfind.h"
 #include "twain.h"
 #include "ctlenum.h"
+#include "dtwain_version.h"
 
 namespace dynarithmic
 {
@@ -289,12 +290,12 @@ namespace dynarithmic
         return ca;
     }
 
-    static constexpr bool IsSupportedFileFormat(int nFileFormat)
+    static constexpr bool IsSupportedFileFormat(int nFileFormat) 
     {
         return generic_array_finder(EnumTwainFileFormats(), nFileFormat).first;
     }
 
-    static constexpr LONG GetArrayTypeFromCapType(TW_UINT16 CapType)
+    static constexpr LONG GetArrayTypeFromCapType(TW_UINT16 CapType) noexcept
     {
         if (IsTwainShortStringType(CapType) || IsTwainLongStringType(CapType))
             return DTWAIN_ARRAYANSISTRING;
@@ -305,7 +306,7 @@ namespace dynarithmic
         return DTWAIN_ARRAYLONG;
     }
 
-    static constexpr LONG ExtImageInfoArrayType(LONG ExtType)
+    static constexpr LONG ExtImageInfoArrayType(LONG ExtType) noexcept
     {
         TW_UINT16 actualType = static_cast<TW_UINT16>(ExtType);
         if (IsTwainIntegralType(actualType))
@@ -321,7 +322,7 @@ namespace dynarithmic
         return DTWAIN_ARRAYLONG;
     }
 
-    static constexpr int GetCapMaskFromCap(TW_UINT16  Cap)
+    static constexpr int GetCapMaskFromCap(TW_UINT16  Cap) noexcept
     {
         // Jump table
         constexpr int CapAll = CTL_CapMaskGET | CTL_CapMaskGETCURRENT | CTL_CapMaskGETDEFAULT |
@@ -379,6 +380,22 @@ namespace dynarithmic
         return fix32_value;
     }
 
+    static constexpr LONG GetTwainGetType(LONG gettype) noexcept
+    {
+        switch (gettype)
+        {
+            case DTWAIN_CAPGETHELP:
+                return MSG_GETHELP;
+
+            case DTWAIN_CAPGETLABEL:
+                return MSG_GETLABEL;
+
+            case DTWAIN_CAPGETLABELENUM:
+                return MSG_GETLABELENUM;
+        }
+        return gettype;
+    }
+
     static constexpr bool IsMSGGetType(TW_UINT16 msgType) noexcept
     {
         return  msgType == MSG_GET ||
@@ -409,5 +426,89 @@ namespace dynarithmic
         return DSMType == DTWAIN_TWAINDSM_VERSION2 ||
                DSMType == DTWAIN_TWAINDSM_LATESTVERSION;
     }
+
+    static constexpr std::pair<std::array<const char*, 4>, int> GetContainerNamesFromType(int nType) noexcept
+    {
+        using arrayret_type = std::array<const char*, 4>;
+        using arrayintret_type = std::pair<arrayret_type, int>;
+        using arrayall_type = std::array<arrayintret_type, 16>;
+        
+        constexpr arrayall_type retValues = {{
+            {{""},0},
+            {{"TW_ARRAY"},1},
+            {{"TW_ENUMERATION"},1},
+            {{"TW_ARRAY", "TW_ENUMERATION"},2},
+            {{"TW_ONEVALUE"},1},
+            {{"TW_ONEVALUE", "TW_ARRAY"}, 2},
+            {{"TW_ONEVALUE", "TW_ENUMERATION"}, 2},
+            {{"TW_ONEVALUE", "TW_ENUMERATION", "TW_ARRAY"}, 3},
+            {{"TW_RANGE"}, 1},
+            {{"TW_ARRAY", "TW_RANGE"}, 2},
+            {{"TW_ENUMERATION", "TW_RANGE"}, 2},
+            {{"TW_ARRAY", "TW_ENUMERATION", "TW_RANGE"}, 3},
+            {{"TW_ONEVALUE", "TW_RANGE"}, 2},
+            {{"TW_ARRAY", "TW_ONEVALUE", "TW_RANGE"}, 3},
+            {{"TW_ONEVALUE", "TW_ENUMERATION", "TW_RANGE"}, 3},
+            {{"TW_ARRAY", "TW_ENUMERATION", "TW_ONEVALUE", "TW_RANGE"}, 4}
+            }};
+
+        auto nShifted = nType >> 3;
+        if (nShifted > 15)
+            nShifted = 0;
+        return retValues[nShifted];
+    }
+
+    static constexpr bool IsCapMaskOnGet(TW_UINT16 Cap, TW_UINT16 GetType) noexcept
+    {
+        int CapMask = GetCapMaskFromCap(Cap);
+        return (CapMask & GetType);
+    }
+
+
+    static constexpr bool IsCapMaskOnSet(TW_UINT16 Cap, TW_UINT16 SetType) noexcept
+    {
+        int CapMask = GetCapMaskFromCap(Cap);
+        return (CapMask & SetType);
+    }
+
+    static constexpr std::array<int, 3> GetDTWAINDLLVersionInfo() noexcept
+    {
+        constexpr std::array<int, 3> aDLLVersion = { DTWAIN_MAJOR_VERSION,DTWAIN_MINOR_VERSION, DTWAIN_PATCHLEVEL_VERSION };
+        return aDLLVersion;
+    }
+
+    static constexpr LONG GetDTWAINVersionType() noexcept
+    {
+        LONG lVersionType = 0;
+        #ifdef UNICODE
+            lVersionType |= DTWAIN_UNICODE_VERSION;
+        #endif
+
+        #ifdef DTWAIN_DEBUG
+            lVersionType |= DTWAIN_DEVELOP_VERSION;
+        #endif
+
+        #if defined (WIN64) || defined(_WIN64)
+            lVersionType |= DTWAIN_64BIT_VERSION;
+            #else
+            #if defined (WIN32) || defined(_WIN32)
+                lVersionType |= DTWAIN_32BIT_VERSION;
+            #endif
+        #endif
+
+        #ifdef DTWAIN_DEVELOP_DLL
+            lVersionType |= DTWAIN_DEVELOP_VERSION;
+        #endif
+
+        #if DTWAIN_BUILD_LOGCALLSTACK == 1
+            lVersionType |= DTWAIN_CALLSTACK_LOGGING;
+        #endif
+
+        #if DTWAIN_BUILD_LOGCALLSTACK == 1 && DTWAIN_BUILD_LOGPOINTERS == 1
+            lVersionType |= DTWAIN_CALLSTACK_LOGGING_PLUS;
+        #endif
+            return lVersionType;
+    }
 };
+
 #endif

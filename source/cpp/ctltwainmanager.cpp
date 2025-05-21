@@ -2168,36 +2168,6 @@ CTL_ErrorStruct CTL_TwainAppMgr::GetGeneralErrorInfo(TW_UINT32 nDG, TW_UINT16 nD
     return eStruct;
 }
 
-void CTL_TwainAppMgr::GetContainerNamesFromType( int nType, StringArray &rArray )
-{
-    rArray.clear();
-    if ( nType & TwainContainer_ONEVALUE )
-        rArray.push_back( "TW_ONEVALUE");
-    if ( nType & TwainContainer_ENUMERATION )
-        rArray.push_back( "TW_ENUMERATION");
-    if ( nType & TwainContainer_ARRAY )
-        rArray.push_back( "TW_ARRAY");
-    if ( nType & TwainContainer_RANGE )
-        rArray.push_back( "TW_RANGE");
-}
-
-bool CTL_TwainAppMgr::IsCapMaskOnGet( TW_UINT16 Cap, TW_UINT16 GetType)
-{
-    int CapMask = GetCapMaskFromCap( Cap );
-    if ( CapMask & GetType )
-        return true;
-    return false;
-}
-
-
-bool CTL_TwainAppMgr::IsCapMaskOnSet( TW_UINT16 Cap, TW_UINT16 SetType)
-{
-    int CapMask = GetCapMaskFromCap( Cap );
-    if ( CapMask & SetType )
-        return true;
-    return false;
-}
-
 bool CTL_TwainAppMgr::IsSourceCompliant( const CTL_ITwainSource *pSource,
                                          CTL_EnumTwainVersion TVersion,
                                          CTL_TwainCapArray& rArray )

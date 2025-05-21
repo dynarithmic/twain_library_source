@@ -100,33 +100,33 @@ bool CTL_ITwainSource::IsSourceCompliant(CTL_EnumTwainVersion TVersion, CTL_Twai
         int nValue = 0;
         const int nMask = GetCapMaskFromCap(Cap);
 
-        if (CTL_TwainAppMgr::IsCapMaskOnGet(Cap, static_cast<TW_UINT16>(CTL_CapMaskGET)))
+        if (IsCapMaskOnGet(Cap, static_cast<TW_UINT16>(CTL_CapMaskGET)))
         {
             bIsCompliant = CTL_TwainAppMgr::IsCapabilitySupported(this, Cap, MSG_GET);
             if (bIsCompliant)
                 nValue |= CTL_CapMaskGET;
         }
 
-        if (CTL_TwainAppMgr::IsCapMaskOnGet(Cap, static_cast<TW_UINT16>(CTL_CapMaskGETCURRENT)))
+        if (IsCapMaskOnGet(Cap, static_cast<TW_UINT16>(CTL_CapMaskGETCURRENT)))
         {
             bIsCompliant = CTL_TwainAppMgr::IsCapabilitySupported(this, Cap, MSG_GETCURRENT);
             if (bIsCompliant)
                 nValue |= CTL_CapMaskGETCURRENT;
         }
 
-        if (CTL_TwainAppMgr::IsCapMaskOnGet(Cap, static_cast<TW_UINT16>(CTL_CapMaskGETDEFAULT)))
+        if (IsCapMaskOnGet(Cap, static_cast<TW_UINT16>(CTL_CapMaskGETDEFAULT)))
         {
             bIsCompliant = CTL_TwainAppMgr::IsCapabilitySupported(this, Cap, MSG_GETDEFAULT);
             if (bIsCompliant)
                 nValue |= CTL_CapMaskGETDEFAULT;
         }
 
-        if (CTL_TwainAppMgr::IsCapMaskOnSet(Cap, static_cast<TW_UINT16>(CTL_CapMaskSET)))
+        if (IsCapMaskOnSet(Cap, static_cast<TW_UINT16>(CTL_CapMaskSET)))
         {
             nValue |= CTL_CapMaskSET;
         }
 
-        if (CTL_TwainAppMgr::IsCapMaskOnSet(Cap, static_cast<TW_UINT16>(CTL_CapMaskRESET)))
+        if (IsCapMaskOnSet(Cap, static_cast<TW_UINT16>(CTL_CapMaskRESET)))
         {
             nValue |= CTL_CapMaskRESET;
         }
