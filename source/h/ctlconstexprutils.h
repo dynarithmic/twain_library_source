@@ -418,7 +418,7 @@ namespace dynarithmic
 
     static constexpr bool IsMSGSetOrResetType(TW_UINT16 msgType) noexcept
     {
-        return msgType == MSG_RESET || msgType == MSG_RESETALL || msgType == MSG_SET || msgType == MSG_SETCONSTRAINT;
+        return IsMSGSetType(msgType) || IsMSGResetType(msgType);
     }
 
     static constexpr bool IsTwainDSM2(long DSMType) noexcept
@@ -460,15 +460,13 @@ namespace dynarithmic
 
     static constexpr bool IsCapMaskOnGet(TW_UINT16 Cap, TW_UINT16 GetType) noexcept
     {
-        int CapMask = GetCapMaskFromCap(Cap);
-        return (CapMask & GetType);
+        return (GetCapMaskFromCap(Cap) & GetType);
     }
 
 
     static constexpr bool IsCapMaskOnSet(TW_UINT16 Cap, TW_UINT16 SetType) noexcept
     {
-        int CapMask = GetCapMaskFromCap(Cap);
-        return (CapMask & SetType);
+        return (GetCapMaskFromCap(Cap) & SetType);
     }
 
     static constexpr std::array<int, 3> GetDTWAINDLLVersionInfo() noexcept
