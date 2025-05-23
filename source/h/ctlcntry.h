@@ -28,7 +28,7 @@ namespace dynarithmic
     struct TW_CountryInfo
     {
         CTL_StringType        m_strCountry;
-        CTL_TwainCountryEnum  m_Country;
+        TW_UINT16 m_Country;
     };
 }
 #endif

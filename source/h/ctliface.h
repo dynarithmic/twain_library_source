@@ -729,8 +729,8 @@ namespace dynarithmic
                 int nSessionType;
                 tagSessionStruct() : nMajorNum(1),
                                      nMinorNum(0),
-                                     nLanguage(TwainLanguage_USAENGLISH),
-                                     nCountry(TwainCountry_USA),
+                                     nLanguage(TWLG_USA),
+                                     nCountry(TWCY_USA),
                                      szVersion(_T("<?>")),
                                      szManufact(_T("<?>")),
                                      szFamily(_T("<?>")),
