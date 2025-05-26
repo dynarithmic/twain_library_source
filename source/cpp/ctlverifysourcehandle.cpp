@@ -34,47 +34,29 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CheckHandles(DTWAIN_BOOL bCheck)
     CATCH_BLOCK(false)
 }
 
-std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> dynarithmic::VerifyHandles(DTWAIN_SOURCE Source, int Testing/* = DTWAIN_TEST_DLLHANDLE | DTWAIN_TEST_SOURCE*/)
+namespace dynarithmic
 {
-    CTL_ITwainSource *pSource = nullptr;
-    CTL_TwainDLLHandle* pHandle = nullptr;
-    bool doThrow = !(Testing & DTWAIN_TEST_NOTHROW);
-    bool setLastError = Testing & DTWAIN_TEST_SETLASTERROR;
+    std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> VerifyHandles(DTWAIN_SOURCE Source, int Testing/* = DTWAIN_TEST_DLLHANDLE | DTWAIN_TEST_SOURCE*/)
+    {
+        CTL_ITwainSource* pSource = nullptr;
+        CTL_TwainDLLHandle* pHandle = nullptr;
+        bool doThrow = !(Testing & DTWAIN_TEST_NOTHROW);
+        bool setLastError = Testing & DTWAIN_TEST_SETLASTERROR;
 
-    if (!CTL_StaticData::IsCheckHandles())
-    {
-        pSource = static_cast<CTL_ITwainSource*>(Source);
-        return { static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal()), pSource };
-    }
-    else
-    {
-        bool bHandleGood = true;
-        if (Testing & DTWAIN_VERIFY_DLLHANDLE)
+        if (!CTL_StaticData::IsCheckHandles())
         {
-            pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-            bHandleGood = DTWAIN_Check_Bad_Handle_Ex<std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*>>(pHandle, { nullptr, nullptr }, FUNC_MACRO, false);
+            pSource = static_cast<CTL_ITwainSource*>(Source);
+            return { static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal()), pSource };
         }
-        if ( !bHandleGood )
+        else
         {
-            if (doThrow)
+            bool bHandleGood = true;
+            if (Testing & DTWAIN_VERIFY_DLLHANDLE)
             {
-                std::error_code ec(DTWAIN_ERR_BAD_HANDLE, std::system_category());
-                std::system_error err(ec, "Invalid DTWAIN Handle");
-                // Since the handle is bad, the only way to report the
-                // error visually to the app is to write to whatever debug
-                // logger may be attached to the program.
-                OutputDebugStringA(err.what());
-                throw err;
-            }
-            return { nullptr, nullptr };
-        }
-
-        if ( (Testing & DTWAIN_VERIFY_SOURCEHANDLE) || (Testing & DTWAIN_TEST_SOURCEOPEN))
-        {
-            if ( !pHandle )
                 pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-
-            if (!pHandle)
+                bHandleGood = DTWAIN_Check_Bad_Handle_Ex<std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*>>(pHandle, { nullptr, nullptr }, FUNC_MACRO, false);
+            }
+            if (!bHandleGood)
             {
                 if (doThrow)
                 {
@@ -89,32 +71,52 @@ std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> dynarithmic::VerifyHandles(DTW
                 return { nullptr, nullptr };
             }
 
-            pSource = static_cast<CTL_ITwainSource*>(Source);
-            if (!pSource || !CTL_TwainAppMgr::IsValidTwainSource(pHandle->m_pTwainSession, pSource))
+            if ((Testing & DTWAIN_VERIFY_SOURCEHANDLE) || (Testing & DTWAIN_TEST_SOURCEOPEN))
             {
-                if (setLastError)
-                    pHandle->m_lLastError = DTWAIN_ERR_BAD_SOURCE;
-                if ( doThrow )
-                    throw DTWAIN_ERR_BAD_SOURCE;
-                return { nullptr, nullptr };
-            }
-            if (Testing & DTWAIN_TEST_SOURCEOPEN)
-            {
-                auto sourceOpen = CTL_TwainAppMgr::IsSourceOpen(pSource);
-                if (!sourceOpen)
+                if (!pHandle)
+                    pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+
+                if (!pHandle)
+                {
+                    if (doThrow)
+                    {
+                        std::error_code ec(DTWAIN_ERR_BAD_HANDLE, std::system_category());
+                        std::system_error err(ec, "Invalid DTWAIN Handle");
+                        // Since the handle is bad, the only way to report the
+                        // error visually to the app is to write to whatever debug
+                        // logger may be attached to the program.
+                        OutputDebugStringA(err.what());
+                        throw err;
+                    }
+                    return { nullptr, nullptr };
+                }
+
+                pSource = static_cast<CTL_ITwainSource*>(Source);
+                if (!pSource || !CTL_TwainAppMgr::IsValidTwainSource(pHandle->m_pTwainSession, pSource))
                 {
                     if (setLastError)
-                        pHandle->m_lLastError = DTWAIN_ERR_SOURCE_NOT_OPEN;
+                        pHandle->m_lLastError = DTWAIN_ERR_BAD_SOURCE;
                     if (doThrow)
-                        throw DTWAIN_ERR_SOURCE_NOT_OPEN;
+                        throw DTWAIN_ERR_BAD_SOURCE;
                     return { nullptr, nullptr };
+                }
+                if (Testing & DTWAIN_TEST_SOURCEOPEN)
+                {
+                    auto sourceOpen = CTL_TwainAppMgr::IsSourceOpen(pSource);
+                    if (!sourceOpen)
+                    {
+                        if (setLastError)
+                            pHandle->m_lLastError = DTWAIN_ERR_SOURCE_NOT_OPEN;
+                        if (doThrow)
+                            throw DTWAIN_ERR_SOURCE_NOT_OPEN;
+                        return { nullptr, nullptr };
+                    }
                 }
             }
         }
+        // no error
+        if (Testing & DTWAIN_TEST_SETLASTERROR)
+            pHandle->m_lLastError = DTWAIN_NO_ERROR;
+        return { pHandle, pSource };
     }
-    // no error
-    if (Testing & DTWAIN_TEST_SETLASTERROR)
-        pHandle->m_lLastError = DTWAIN_NO_ERROR;
-    return { pHandle, pSource };
 }
-
