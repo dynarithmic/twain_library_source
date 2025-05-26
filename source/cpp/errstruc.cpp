@@ -34,7 +34,7 @@ static std::string DecodeTW_MEMORY(pTW_MEMORY pMemory, LPCSTR pMem);
 static std::string DecodeTW_ELEMENT8(pTW_ELEMENT8 pEl, LPCSTR pMem);
 static std::string DecodeTW_INFO(pTW_INFO pInfo, LPCSTR pMem);
 static std::string DecodeSupportedGroups(TW_UINT32 SupportedGroups);
-static std::string IndentDefinition() { return std::string(4, ' '); }
+constexpr const char * IndentDefinition() { return "    "; }
 
 #define ADD_ERRORCODE_TO_MAP2(x, y) {x + y, #y}
 
@@ -235,17 +235,13 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
 {
     StringStreamA sBuffer;
     std::string sTemp;
-    std::string indenter = IndentDefinition();
-    if ( !pData )
+    auto indenter = IndentDefinition();
+    if ( !pData || sType == ERRSTRUCT_NONE)
         sBuffer << "\nNo TW_MEMREF Data";
     else
     {
         switch (sType)
         {
-            case ERRSTRUCT_NONE:
-                sBuffer << "\nNo TW_MEMREF Data";
-            break;
-
             case ERRSTRUCT_TW_CUSTOMDSDATA:
             {
                 auto pCUSTOMDSDATA = static_cast<pTW_CUSTOMDSDATA>(pData);
