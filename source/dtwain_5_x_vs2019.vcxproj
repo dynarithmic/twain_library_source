@@ -851,10 +851,10 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
 copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
-implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
+rem implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).dll
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).lib
-"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName)_embarcadero.lib
+rem "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName)_embarcadero.lib
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries_pdb.zip  $(TargetDir)$(TargetName).pdb
 
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
@@ -931,7 +931,8 @@ cd $(SolutionDir)
 cd ..
 md demos\libs\$(PlatformArchitecture)bit
 cd demos\libs\$(PlatformArchitecture)bit
-copy $(TargetDir)$(TargetName).lib .</Command>
+copy $(TargetDir)$(TargetName).lib .
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">
@@ -971,10 +972,10 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
 copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
-implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
+rem implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).dll
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).lib
-"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName)_embarcadero.lib
+rem "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName)_embarcadero.lib
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries_pdb.zip  $(TargetDir)$(TargetName).pdb
 
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
@@ -1051,7 +1052,8 @@ cd $(SolutionDir)
 cd ..
 md demos\libs\$(PlatformArchitecture)bit
 cd demos\libs\$(PlatformArchitecture)bit
-copy $(TargetDir)$(TargetName).lib .</Command>
+copy $(TargetDir)$(TargetName).lib .
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">
@@ -1095,10 +1097,10 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
 copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
-implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
+rem implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).dll
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName).lib
-"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName)_embarcadero.lib
+rem "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries.zip  $(TargetDir)$(TargetName)_embarcadero.lib
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)release_libraries_pdb.zip  $(TargetDir)$(TargetName).pdb
 
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
@@ -1175,7 +1177,8 @@ cd $(SolutionDir)
 cd ..
 md demos\libs\$(PlatformArchitecture)bit
 cd demos\libs\$(PlatformArchitecture)bit
-copy $(TargetDir)$(TargetName).lib .</Command>
+copy $(TargetDir)$(TargetName).lib .
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">
@@ -1215,10 +1218,10 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <Command>del $(TargetDir)dllhashes_temp$(PlatformArchitecture).txt
 copy $(SolutionDir)\txt\dtwain$(PlatformArchitecture).ini $(TargetDir)*.ini
 copy $(SolutionDir)txt\*.txt $(TargetDir)*.txt
-implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
+rem implib $(TargetDir)$(TargetName)_embarcadero.lib  $(TargetDir)$(TargetName).dll
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).dll
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName).lib
-"$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName)_embarcadero.lib
+rem "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries.zip  $(TargetDir)$(TargetName)_embarcadero.lib
 "$(ZIP7_UTIL_CMD)" a -tzip $(TargetDir)debug_libraries_pdb.zip  $(TargetDir)$(TargetName).pdb
 
 "$(DIRHASH_UTIL_CMD)" $(TargetDir)$(TargetName).dll MD5 -t $(TargetDir)$(TargetName)_md5hash.txt -lowercase -overwrite
@@ -1295,7 +1298,8 @@ cd $(SolutionDir)
 cd ..
 md demos\libs\$(PlatformArchitecture)bit
 cd demos\libs\$(PlatformArchitecture)bit
-copy $(TargetDir)$(TargetName).lib .</Command>
+copy $(TargetDir)$(TargetName).lib .
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
