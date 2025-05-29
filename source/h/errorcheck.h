@@ -50,7 +50,7 @@ namespace dynarithmic
             }
             #endif
             if (doThrow)
-            throw retErr;
+                throw DTWAINException(retErr);
         }
     }
 
@@ -98,11 +98,12 @@ namespace dynarithmic
         {
             OutputDTWAINErrorA(nullptr, fnName);
             if ( willThrow )
-                throw retErr;
+                throw DTWAINException(retErr);
             return false;
         }
         return true;
     }
+
 
 #define CHECK_IF_CAP_SUPPORTED(pSource, pHandle, nCap, retValue) \
     if (!pSource->IsCapInSupportedList(nCap)) \
