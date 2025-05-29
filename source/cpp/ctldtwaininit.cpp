@@ -1008,6 +1008,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLog(LONG LogFlags, LPCTSTR lpszLogFile)
     LONG allFlags = DTWAIN_LOG_ALL;
     if ( (LogFlags != 0) && (LogFlags & allFlags) == 0)  
         LogFlags |= (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_DECODE_SOURCE | DTWAIN_LOG_DECODE_DEST | DTWAIN_LOG_MISCELLANEOUS);
+    bool logFailed = false; 
 
     bool bLoggerExists = AnyLoggerExists(pHandle);
     auto& logFilterFlags = CTL_StaticData::GetLogFilterFlags();
@@ -1034,13 +1035,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLog(LONG LogFlags, LPCTSTR lpszLogFile)
         // Write to all the loggers that were created
         if ( LogFlags > 0)
             WriteVersionToLog(pHandle);
-        if (LogFlags > 0 && !isLogOpen.first)
+        logFailed = (LogFlags > 0 && !isLogOpen.first);
+        if (logFailed)
         {
             // Indicate that there is at least one logger that failed
-            DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_LOG_CREATE_ERROR, false, FUNC_MACRO);
+            DTWAIN_Check_Error_Condition_2_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_LOG_CREATE_ERROR, false, FUNC_MACRO);
         }
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(!logFailed)
     CATCH_BLOCK(false)
 }
 

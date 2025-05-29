@@ -48,9 +48,9 @@ namespace dynarithmic
             CBaseLogger(const CBaseLogger&) = default;
             CBaseLogger() = default;
             CBaseLogger& operator=(const CBaseLogger&) = default;
-            virtual void trace(const std::string& msg) = 0;
-            static std::string applyDecoration(const std::string& msg);
-            static void generic_outstream(std::ostream& os, const std::string& msg);
+            virtual void trace(std::string_view msg) = 0;
+            static std::string applyDecoration(std::string_view msg);
+            static void generic_outstream(std::ostream& os, std::string_view msg);
             static std::string getTime();
             static std::string getThreadID();
     };
@@ -58,7 +58,7 @@ namespace dynarithmic
     class StdCout_Logger final : public CBaseLogger
     {
         public:
-            void trace(const std::string& msg) override;
+            void trace(std::string_view msg) override;
             static BOOL WINAPI ConsoleCtrlHandler(DWORD dwCtrlType);
             StdCout_Logger(const LoggingTraits& lTraits);
             ~StdCout_Logger();
@@ -67,7 +67,7 @@ namespace dynarithmic
     class DebugMonitor_Logger final : public CBaseLogger
     {
         public:
-            void trace(const std::string& msg) override;
+            void trace(std::string_view msg) override;
     };
 
     class File_Logger final : public CBaseLogger
@@ -79,7 +79,7 @@ namespace dynarithmic
             File_Logger(const LPCSTR filename, const LoggingTraits& fTraits);
             ~File_Logger();
             bool IsFileCreated() const { return m_bFileCreated; }
-            void trace(const std::string& msg) override;
+            void trace(std::string_view msg) override;
     };
 
     class Callback_Logger final : public CBaseLogger
@@ -87,7 +87,7 @@ namespace dynarithmic
         CTL_TwainDLLHandle* m_pHandle = {};
         public:
             Callback_Logger(CTL_TwainDLLHandle* pHandle) : m_pHandle(pHandle) {}
-            void trace(const std::string& msg) override;
+            void trace(std::string_view msg) override;
     };
 
     class CLogSystem
@@ -136,8 +136,8 @@ namespace dynarithmic
        void DisableAllLoggers();
 
        std::string GetAppName() const {return m_csAppName;}
-       void OutputDebugStringFull(const std::string& s);
-       std::string GetDebugStringFull(const std::string& s);
+       void OutputDebugStringFull(std::string_view s);
+       std::string GetDebugStringFull(std::string_view s);
        void SetDLLHandle(CTL_TwainDLLHandle* pHandle);
        int GetCurrentIndentLevel() const { return m_nCurrentIndentLevel; }
        void SetCurrentIndentLevel(int nLevel) { m_nCurrentIndentLevel = nLevel; }
@@ -163,10 +163,10 @@ namespace dynarithmic
 
        /////////////////////////////////////////////////////////////////////////////
        // string utils
-       std::string GetBaseDir(const std::string& path) const;
-       std::string GetBaseName(const std::string& path) const;
+       std::string GetBaseDir(std::string_view path) const;
+       std::string GetBaseName(std::string_view path) const;
        void GetModuleName(HINSTANCE hInst);
-       bool WriteOnDemand(const std::string& fmt);
+       bool WriteOnDemand(std::string_view fmt);
 
        private:
            bool InitLogger(int loggerType, LPCTSTR pOutputFilename, HINSTANCE hInst, const LoggingTraits& fTraits = {});

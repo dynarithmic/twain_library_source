@@ -69,7 +69,7 @@ static LONG OpenSourceInternal(DTWAIN_SOURCE Source, const SourceSelectionOption
             const LONG err = DTWAIN_ERR_SOURCE_COULD_NOT_OPEN;
             CTL_StringType sProdName = StringWrapper::QuoteString(p->GetProductName());
             DTWAIN_Check_Error_Condition_3_Ex(pHandle, [&]{return !retval; }, err, 
-                                              StringConversion::Convert_Native_To_Ansi(sProdName, sProdName.length()), err, FUNC_MACRO);
+                                              StringConversion::Convert_Native_To_Ansi(sProdName, sProdName.length()).c_str(), err, FUNC_MACRO);
         }
     }
     return DTWAIN_NO_ERROR;
@@ -89,7 +89,7 @@ static DTWAIN_SOURCE SelectAndOpenSource(CTL_TwainDLLHandle* pHandle, SourceSele
         if (retVal != DTWAIN_NO_ERROR)
         {
             if ( opts.nWhich == SELECTSOURCEBYNAME )
-                CTL_TwainAppMgr::SetError(retVal, StringConversion::Convert_NativePtr_To_Ansi(opts.szProduct), false);
+                CTL_TwainAppMgr::SetError(retVal, StringConversion::Convert_NativePtr_To_Ansi(opts.szProduct).c_str(), false);
             return nullptr;
         }
         iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, CTL_TwainAppMgr::IsSourceOpen(pSource));
@@ -100,7 +100,7 @@ static DTWAIN_SOURCE SelectAndOpenSource(CTL_TwainDLLHandle* pHandle, SourceSele
     }
 
     if ( !Source && opts.nWhich == SELECTSOURCEBYNAME )
-        CTL_TwainAppMgr::SetError(pHandle->m_lLastError, StringConversion::Convert_NativePtr_To_Ansi(opts.szProduct), false);
+        CTL_TwainAppMgr::SetError(pHandle->m_lLastError, StringConversion::Convert_NativePtr_To_Ansi(opts.szProduct).c_str(), false);
     return Source;
 }
 

@@ -30,6 +30,7 @@
 #include <mutex>
 #include <memory>
 #include <functional>
+#include <string_view>
 #include "ctltripletbase.h"
 #include "dtwain_raii.h"
 #include "ocrinterface.h"
@@ -637,7 +638,7 @@ namespace dynarithmic
         static bool PerformResampling() { return s_StaticData.s_bDoResampling; }
         static CTL_PairToStringMap& GetResourceCache() { return s_StaticData.s_ResourceCache; }
         static CTL_StringToMapLongToStringMap& GetAllLanguagesResourceMap() { return s_StaticData.s_AllLoadedResourcesMap; }
-        static CTL_LongToStringMap* GetLanguageResource(const std::string& sLang);
+        static CTL_LongToStringMap* GetLanguageResource(std::string_view sLang);
         static std::string&         GetCurrentLanguageResourceKey() { return s_StaticData.s_CurrentResourceKey; }
         static void SetCurrentLanguageResourceKey(const std::string& sLang) { s_StaticData.s_CurrentResourceKey = sLang; }
         static CTL_LongToStringMap* GetCurrentLanguageResource();
@@ -648,7 +649,7 @@ namespace dynarithmic
         static CTL_TwainConstantToStringMapNode& GetTwainConstantsStrings(LONG nWhich) { return s_StaticData.s_TwainConstantsMap[nWhich]; }
         static bool IsCheckHandles() { return s_StaticData.s_bCheckHandles; }
         static void SetCheckHandles(bool bSet) { s_StaticData.s_bCheckHandles = bSet; }
-        static std::pair<bool, TwainConstantType> GetIDFromTwainName(const std::string& sName);
+        static std::pair<bool, TwainConstantType> GetIDFromTwainName(std::string_view sName);
         static constexpr int GetDGResourceID() { return 8890; }
         static constexpr int GetDATResourceID() { return 8891; }
         static constexpr int GetMSGResourceID() { return 8892; }

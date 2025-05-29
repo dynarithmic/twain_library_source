@@ -30,22 +30,22 @@ namespace dynarithmic
     struct LogWriterUtils
     {
         static constexpr int maxOutput = 256;
-        static void  WriteLogInfo(const CTL_StringType& s, bool bFlush = false);
-        static void  WriteLogInfoA(const std::string& s, bool bFlush = false);
-        static void  WriteLogInfoExA(long filterFlags, const std::string& s, bool bFlush = false);
-        static void  WriteLogInfoW(const std::wstring& s, bool bFlush = false);
-        static void  WriteLogInfoIndentedA(const std::string& s);
-        static void  WriteLogInfoIndentedW(const std::wstring& s);
-        static void  WriteLogInfoIndented(const CTL_StringType& s);
-        static void  WriteMultiLineInfo(const CTL_StringType& s, const CTL_StringType::traits_type::char_type* pszDelim);
-        static void  WriteMultiLineInfoA(const std::string& s, const char *pszDelim);
-        static void  WriteMultiLineInfoW(const std::wstring& s, const wchar_t* pszDelim);
-        static void  WriteMultiLineInfoIndented(const CTL_StringType& s, const CTL_StringType::traits_type::char_type* pszDelim);
-        static void  WriteMultiLineInfoIndentedA(const std::string& s, const char* pszDelim);
-        static void  WriteMultiLineInfoIndentedW(const std::wstring& s, const wchar_t* pszDelim);
+        static void  WriteLogInfo(CTL_StringViewType s, bool bFlush = false);
+        static void  WriteLogInfoA(std::string_view s, bool bFlush = false);
+        static void  WriteLogInfoExA(long filterFlags, std::string_view s, bool bFlush = false);
+        static void  WriteLogInfoW(std::wstring_view s, bool bFlush = false);
+        static void  WriteLogInfoIndentedA(std::string_view s);
+        static void  WriteLogInfoIndentedW(std::wstring_view s);
+        static void  WriteLogInfoIndented(CTL_StringViewType s);
+        static void  WriteMultiLineInfo(CTL_StringViewType s, const CTL_StringType::traits_type::char_type* pszDelim);
+        static void  WriteMultiLineInfoA(std::string_view s, const char *pszDelim);
+        static void  WriteMultiLineInfoW(std::wstring_view s, const wchar_t* pszDelim);
+        static void  WriteMultiLineInfoIndented(CTL_StringViewType s, const CTL_StringType::traits_type::char_type* pszDelim);
+        static void  WriteMultiLineInfoIndentedA(std::string_view s, const char* pszDelim);
+        static void  WriteMultiLineInfoIndentedW(std::wstring_view s, const wchar_t* pszDelim);
 
         private:
-            static void MultiLineWriter(const std::string& s, const char* pszDelim, int nWhich);
+            static void MultiLineWriter(std::string_view s, const char* pszDelim, int nWhich);
     };
 }
 #endif
