@@ -25,16 +25,27 @@
 
 #include <exception>
 
+
 namespace dynarithmic
 {
     class DTWAINException : public std::exception
     {
         int m_Exception = {};
         public:
+            static constexpr const char* whatString = "{d5d26bc5-d30f-4c34-a80d-032ab23989ae}";
             DTWAINException(int r) noexcept : m_Exception(r) {}
             DTWAINException(void* ) noexcept : m_Exception{} {}
             int GetReturnException() const noexcept { return m_Exception; }
             void SetReturnException(int r) noexcept { m_Exception = r; }
+            const char* what() const override { return whatString; }
     };
+
+    template <typename T>
+    T ProcessCatch(T val, const std::exception& ex_, const char* fn = nullptr)
+    {
+        if (ex_.what() != DTWAINException::whatString)
+            LogExceptionErrorA(fn, true); 
+        return val;
+    }
 }
 #endif

@@ -20,6 +20,7 @@
  */
 #include <sstream>
 #include <boost/format.hpp>
+#include <string_view>
 #include "ctliface.h"
 #include "ctlloadresources.h"
 
@@ -657,7 +658,7 @@ namespace dynarithmic
         return;
     }
 
-    static bool LoadLanguageResourceFromFileA(const char* szLangName, const std::string& sPath, bool clearEntry, bool bIsCustom)
+    static bool LoadLanguageResourceFromFileA(const char* szLangName, std::string_view sPath, bool clearEntry, bool bIsCustom)
     {
         auto& allLanguages = CTL_StaticData::GetAllLanguagesResourceMap();
 
@@ -757,7 +758,7 @@ namespace dynarithmic
         return sPathA + lpszName + (std::string)".txt";
     }
 
-    bool LoadLanguageResourceA(LPCSTR lpszName, const CTL_ResourceRegistryMap& registryMap, bool bClear)
+    bool LoadLanguageResourceA(const char* lpszName, const CTL_ResourceRegistryMap& registryMap, bool bClear)
     {
         LOG_FUNC_ENTRY_PARAMS((lpszName))
         const auto iter = registryMap.find(lpszName);
@@ -782,7 +783,7 @@ namespace dynarithmic
         CATCH_BLOCK(false)
     }
 
-    bool LoadLanguageResourceA(LPCSTR lpszName, bool bClear)
+    bool LoadLanguageResourceA(const char* lpszName, bool bClear)
     {
         LOG_FUNC_ENTRY_PARAMS((lpszName))
         bool bReturn = LoadLanguageResourceFromFileA(lpszName, GetResourceFileNameA(lpszName, DTWAINLANGRESOURCEFILE), bClear, false);
@@ -791,14 +792,14 @@ namespace dynarithmic
         CATCH_BLOCK(false)
     }
 
-    bool LoadLanguageResourceA(const std::string& lpszName, const CTL_ResourceRegistryMap& registryMap, bool bClear)
+    bool LoadLanguageResourceA(std::string_view lpszName, const CTL_ResourceRegistryMap& registryMap, bool bClear)
     {
-        return LoadLanguageResourceA(lpszName.c_str(), registryMap, bClear);
+        return LoadLanguageResourceA(lpszName.data(), registryMap, bClear);
     }
 
-    bool LoadLanguageResourceA(const std::string& lpszName, bool bClear)
+    bool LoadLanguageResourceA(std::string_view lpszName, bool bClear)
     {
-        return LoadLanguageResourceA(lpszName.c_str(), bClear);
+        return LoadLanguageResourceA(lpszName.data(), bClear);
     }
 
     bool LoadLanguageResourceXML(LPCTSTR sLangDLL)

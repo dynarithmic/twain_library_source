@@ -166,9 +166,9 @@ std::pair<bool, std::wstring> CTL_StaticData::GetTwainNameFromConstantW(int lCon
     return { pr.first, StringConversion::Convert_Ansi_To_Wide(pr.second) };
 }
 
-CTL_LongToStringMap* CTL_StaticData::GetLanguageResource(const std::string& sLang)
+CTL_LongToStringMap* CTL_StaticData::GetLanguageResource(std::string_view sLang)
 {
-    auto iter = s_StaticData.s_AllLoadedResourcesMap.find(sLang);
+    auto iter = s_StaticData.s_AllLoadedResourcesMap.find(sLang.data());
     if (iter != s_StaticData.s_AllLoadedResourcesMap.end())
         return &iter->second;
     return nullptr;
@@ -185,10 +185,10 @@ void CTL_TwainDLLHandle::NotifyWindows(UINT /*nMsg*/, WPARAM /*wParam*/, LPARAM 
 {
 }
 
-std::pair<bool, TwainConstantType> CTL_StaticData::GetIDFromTwainName(const std::string& sName)
+std::pair<bool, TwainConstantType> CTL_StaticData::GetIDFromTwainName(std::string_view sName)
 {
     auto& constantsMap = CTL_StaticData::GetStringToConstantMap();
-    auto iter = constantsMap.find(sName);
+    auto iter = constantsMap.find(sName.data());
     if (iter != constantsMap.end())
         return { true, iter->second };
     return { false, (std::numeric_limits<TwainConstantType>::min)() };

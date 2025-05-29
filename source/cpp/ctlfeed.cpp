@@ -256,7 +256,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFeederSensitive(DTWAIN_SOURCE Source)
         BOOL bSupported = DTWAIN_IsFeederSupported(Source);
         if ( bSupported )
         {
-            CTL_TwainAppMgr::SetError(DTWAIN_ERR_FEEDER_COMPLIANCY, pSource->GetProductNameA(), false);
+            CTL_TwainAppMgr::SetError(DTWAIN_ERR_FEEDER_COMPLIANCY, pSource->GetProductNameA().c_str(), false);
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
         }
     }

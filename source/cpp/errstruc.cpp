@@ -222,13 +222,13 @@ std::string CTL_ErrorStructDecoder::DecodeTWAINReturnCodeCC(TW_UINT16 retCode)
                            dynarithmic::GetErrorString_Internal(DTWAIN_ERR_UNKNOWN_TWAIN_CC));
 }
 
-std::string CTL_ErrorStructDecoder::DecodeTWAINCode(TW_UINT16 retCode, TW_UINT16 errStart, const std::string& defMessage)
+std::string CTL_ErrorStructDecoder::DecodeTWAINCode(TW_UINT16 retCode, TW_UINT16 errStart, std::string_view defMessage)
 {
     const TW_UINT16 actualCode = retCode + errStart;
     const auto it = dynarithmic::generic_array_finder_if(mapTwainDSMReturnCodes, [&](const auto& pr) { return pr.first == actualCode; });
     if (it.first)
         return mapTwainDSMReturnCodes[it.second].second;
-    return defMessage;
+    return defMessage.data();
 }
 
 std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorStructTypes sType)

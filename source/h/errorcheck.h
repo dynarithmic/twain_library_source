@@ -30,7 +30,7 @@ namespace dynarithmic
     void DTWAIN_Check_Error_Condition_0_Impl(CTL_TwainDLLHandle* Handle,
                                             Func f,
                                             int32_t Err,
-                                            const std::string& extraInfo,
+                                            const char *extraInfo,
                                             RetType retErr,
                                             const std::string::value_type* fnName,
                                             bool logError=true)
@@ -84,7 +84,7 @@ namespace dynarithmic
     void DTWAIN_Check_Error_Condition_3_Ex(CTL_TwainDLLHandle* Handle,
                                            Func f,
                                            int32_t Err,
-                                           const std::string& errInfo, 
+                                           const char *errInfo, 
                                            RetType retErr,
                                            const std::string::value_type* fnName)
     {

@@ -23,6 +23,7 @@
 #include <boost/format.hpp>
 #include <fstream>
 #include <array>
+#include <string_view>
 #include "ctltr010.h"
 #include "ctltr026.h"
 #include "ctltr027.h"
@@ -40,7 +41,7 @@
 using namespace dynarithmic;
 
 static void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pSession,
-                                 LONG Error, LONG ErrorMsg, const std::string& extraInfo = "");
+                                LONG Error, LONG ErrorMsg, const std::string_view extraInfo = {});
 static bool IsState7InfoNeeded(CTL_ITwainSource *pSource);
 
 CTL_ImageXferTriplet::CTL_ImageXferTriplet(CTL_ITwainSession *pSession,
@@ -1372,9 +1373,9 @@ CTL_TwainFileFormatEnum CTL_ImageXferTriplet::GetFileTypeFromCompression(int nCo
 }
 
 void SendFileAcquireError(CTL_ITwainSource* pSource, const CTL_ITwainSession* pSession,
-                          LONG Error, LONG ErrorMsg, const std::string& extraInfo)
+                          LONG Error, LONG ErrorMsg, std::string_view extraInfo)
 {
-    CTL_TwainAppMgr::SetError(Error, extraInfo, true);
+    CTL_TwainAppMgr::SetError(Error, extraInfo.data(), true);
     if ( CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_DTWAINERRORS)
     {
         char szBuf[DTWAIN_USERRES_MAXSIZE + 1];

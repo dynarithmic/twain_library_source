@@ -129,14 +129,9 @@
 
     #define CATCH_BLOCK(type) \
             CATCH_BLOCK_END \
-            catch(const DTWAINException& ) \
-            {\
-                return(type); \
-            }\
             catch(const std::exception& ex_) \
             {\
-                LogExceptionErrorA(FUNC_MACRO, false, ex_.what()); \
-                return(type); \
+                return ProcessCatch(type, ex_, FUNC_MACRO); \
             }\
             catch(...) {\
                 LogExceptionErrorA(FUNC_MACRO, true); \
@@ -145,12 +140,9 @@
 
     #define CATCH_BLOCK_LOG_PARAMS(type) \
             CATCH_BLOCK_END \
-            catch(const DTWAINException& ) {\
-                LOG_FUNC_EXIT_NONAME_PARAMS(type) \
-            }\
             catch(const std::exception& ex_) \
             {\
-                LogExceptionErrorA(FUNC_MACRO, false, ex_.what()); \
+                ProcessCatch(type, ex_, FUNC_MACRO); \
                 LOG_FUNC_EXIT_NONAME_PARAMS(type) \
             }\
             catch(...) {\
@@ -186,23 +178,21 @@
     #define LOG_FUNC_EXIT_DEREFERENCE_POINTERS(argVals) 
 
     #define CATCH_BLOCK(type) \
-        CATCH_BLOCK_END \
-        catch(decltype(type) var) { return var; }\
-        catch(...) {\
-        return(type); \
-        }
-
-    #define CATCH_BLOCK_LOG_PARAMS(type) \
             CATCH_BLOCK_END \
-            catch(const std::exception&) \
+            catch(const DTWAINException& ) {\
+                return(type); \
+            }\
+            catch(const std::exception& ) \
             {\
                 return(type); \
             }\
-            catch(const decltype(type) var) { \
-                return var; }\
-            catch(...) {\
+            catch(...) \
+            { \
                 return(type); \
             }
+
+    #define CATCH_BLOCK_LOG_PARAMS(type) CATCH_BLOCK(type)
+
 #endif
 #include "dtwain_paramlogger.h"
 #endif
