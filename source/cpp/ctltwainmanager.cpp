@@ -2655,7 +2655,7 @@ VOID CALLBACK CTL_TwainAppMgr::TwainTimeOutProc(HWND, UINT, ULONG, DWORD)
 
     LogWriterUtils::WriteLogInfoIndentedA("The last TWAIN triplet was not completed due to time out");
     SetError(DTWAIN_ERR_TIMEOUT, "", false);
-    throw DTWAIN_ERR_TIMEOUT;
+    throw DTWAINException(DTWAIN_ERR_TIMEOUT);
 #endif
 }
 

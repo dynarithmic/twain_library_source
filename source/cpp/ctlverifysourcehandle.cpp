@@ -36,6 +36,17 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CheckHandles(DTWAIN_BOOL bCheck)
 
 namespace dynarithmic
 {
+
+    static bool DTWAIN_Check_Bad_Handle_Ex2(CTL_TwainDLLHandle* pHandle, const std::string::value_type* fnName)
+    {
+        if (CTL_StaticData::IsCheckHandles() && !IsDLLHandleValid(pHandle, false))
+        {
+            OutputDTWAINErrorA(nullptr, fnName);
+            return false;
+        }
+        return true;
+    }
+
     std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> VerifyHandles(DTWAIN_SOURCE Source, int Testing/* = DTWAIN_TEST_DLLHANDLE | DTWAIN_TEST_SOURCE*/)
     {
         CTL_ITwainSource* pSource = nullptr;
@@ -54,7 +65,7 @@ namespace dynarithmic
             if (Testing & DTWAIN_VERIFY_DLLHANDLE)
             {
                 pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-                bHandleGood = DTWAIN_Check_Bad_Handle_Ex<std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*>>(pHandle, { nullptr, nullptr }, FUNC_MACRO, false);
+                bHandleGood = DTWAIN_Check_Bad_Handle_Ex2(pHandle, FUNC_MACRO);
             }
             if (!bHandleGood)
             {
@@ -66,7 +77,7 @@ namespace dynarithmic
                     // error visually to the app is to write to whatever debug
                     // logger may be attached to the program.
                     OutputDebugStringA(err.what());
-                    throw err;
+                    throw DTWAINException(DTWAIN_ERR_BAD_HANDLE);
                 }
                 return { nullptr, nullptr };
             }
@@ -86,7 +97,7 @@ namespace dynarithmic
                         // error visually to the app is to write to whatever debug
                         // logger may be attached to the program.
                         OutputDebugStringA(err.what());
-                        throw err;
+                        throw DTWAINException(DTWAIN_ERR_BAD_HANDLE);
                     }
                     return { nullptr, nullptr };
                 }
@@ -97,7 +108,7 @@ namespace dynarithmic
                     if (setLastError)
                         pHandle->m_lLastError = DTWAIN_ERR_BAD_SOURCE;
                     if (doThrow)
-                        throw DTWAIN_ERR_BAD_SOURCE;
+                        throw DTWAINException(DTWAIN_ERR_BAD_SOURCE);
                     return { nullptr, nullptr };
                 }
                 if (Testing & DTWAIN_TEST_SOURCEOPEN)
@@ -108,7 +119,7 @@ namespace dynarithmic
                         if (setLastError)
                             pHandle->m_lLastError = DTWAIN_ERR_SOURCE_NOT_OPEN;
                         if (doThrow)
-                            throw DTWAIN_ERR_SOURCE_NOT_OPEN;
+                            throw DTWAINException(DTWAIN_ERR_SOURCE_NOT_OPEN);
                         return { nullptr, nullptr };
                     }
                 }

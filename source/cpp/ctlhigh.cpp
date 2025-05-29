@@ -140,7 +140,7 @@ static T FunctionCaller(FnToCall fn, const std::string& func, const std::string&
     catch (T var) { return var; }
     catch (...)
     {
-        LogExceptionErrorA(func.c_str());
+        LogExceptionErrorA(func.c_str(), true);
         if (CTL_StaticData::IsThrowExceptions())
             DTWAIN_InternalThrowException();
         return {};
