@@ -45,7 +45,7 @@ namespace dynarithmic
     T ProcessCatch(T val, const std::exception& ex_, const char* fn = nullptr)
     {
         if (ex_.what() != DTWAINException::whatString)
-            LogExceptionErrorA(fn, true); 
+            LogExceptionErrorA(fn, false, ex_.what()); 
         return val;
     }
 }
