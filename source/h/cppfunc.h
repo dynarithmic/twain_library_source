@@ -179,12 +179,9 @@
 
     #define CATCH_BLOCK(type) \
             CATCH_BLOCK_END \
-            catch(const DTWAINException& ) {\
-                return(type); \
-            }\
-            catch(const std::exception& ) \
+            catch(const std::exception& ex_) \
             {\
-                return(type); \
+                return ProcessCatch(type, ex_, FUNC_MACRO); \
             }\
             catch(...) \
             { \
