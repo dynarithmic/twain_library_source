@@ -24,6 +24,7 @@
 #include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "dtwain_resource_constants.h"
+#include "dtwain_exception.h"
 
 using namespace dynarithmic;
 
@@ -87,7 +88,6 @@ std::string dynarithmic::CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich,
             strm << sTemp << pFuncName;
             s = strm.str();
         }
-
     }
     else
     {
@@ -112,7 +112,7 @@ std::string dynarithmic::CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich,
     return s;
 }
 
-void dynarithmic::LogExceptionErrorA(LPCSTR fname, bool bIsCatchAll, const char* sAdditionalText)
+void dynarithmic::LogExceptionErrorA(const char * fname, bool bIsCatchAll, const char* sAdditionalText)
 {
     if ( !(CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_SHOWEXCEPTIONS) )
          return;

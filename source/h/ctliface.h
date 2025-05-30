@@ -899,7 +899,6 @@ namespace dynarithmic
     void OutputDTWAINErrorA(const CTL_TwainDLLHandle *pHandle, LPCSTR pFunc=nullptr);
     void OutputDTWAINErrorW(const CTL_TwainDLLHandle *pHandle, LPCWSTR pFunc=nullptr);
 
-    void LogExceptionErrorA(LPCSTR fname, bool bIsCatchAll, const char *sAdditionalText=nullptr);
     void LogDTWAINMessage(HWND, UINT, WPARAM, LPARAM, bool bCallback=false);
     bool UserDefinedLoggerExists(CTL_TwainDLLHandle* pHandle);
     bool AnyLoggerExists(CTL_TwainDLLHandle* pHandle);

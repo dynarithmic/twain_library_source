@@ -25,9 +25,10 @@
 
 #include <exception>
 
-
 namespace dynarithmic
 {
+    void LogExceptionErrorA(const char* fname, bool bIsCatchAll, const char* sAdditionalText = nullptr);
+
     class DTWAINException : public std::exception
     {
         int m_Exception = {};
