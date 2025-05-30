@@ -484,7 +484,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
         LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ACQUIRE)nNum)
 
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return DTWAIN_IsSourceAcquiring(Source); },
-    DTWAIN_ERR_SOURCE_ACQUIRING, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
+                                      DTWAIN_ERR_SOURCE_ACQUIRING, -1, FUNC_MACRO);
     // Negotiate transfer
 
     // We may have to reset the max number of pages double the amount if 
@@ -507,7 +507,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
         {
             // Source must support file transfers
             DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !DTWAIN_IsFileXferSupported(Source, lFileType); },
-                DTWAIN_ERR_NO_FILE_XFER, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
+                                              DTWAIN_ERR_NO_FILE_XFER, -1, FUNC_MACRO);
 
             // Turn off NATIVE and BUFFERED modes if set
             lFileFlags = lFileFlags & ~(DTWAIN_USENATIVE | DTWAIN_USEBUFFERED);
@@ -519,7 +519,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
         {
             // Source must support file transfers
             DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !DTWAIN_IsMemFileXferSupported(Source); },
-                                              DTWAIN_ERR_NO_MEMFILE_XFER, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
+                                              DTWAIN_ERR_NO_MEMFILE_XFER, -1, FUNC_MACRO);
             // Turn off USESOURCEMODE if buffered file mode is selected
             lFileFlags = lFileFlags & ~(DTWAIN_USESOURCEMODE);
         }
@@ -620,7 +620,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
                 if (!pArray)
                 {
                     // Check if array exists
-                    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !pArray; }, DTWAIN_ERR_BAD_ARRAY, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
+                    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !pArray; }, DTWAIN_ERR_BAD_ARRAY, -1, FUNC_MACRO);
                 }
 
                 // Parse the filename string into the array
@@ -638,10 +638,10 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
                     factory->destroy(pArray);
                     if ( nFileCount == 0 )
                         // Array of names is empty
-                        DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{ return true; }, DTWAIN_ERR_EMPTY_ARRAY, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
+                        DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{ return true; }, DTWAIN_ERR_EMPTY_ARRAY, -1, FUNC_MACRO);
                     else
                         // File name is empty
-                        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [] { return true; }, DTWAIN_ERR_BAD_FILENAME, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
+                        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [] { return true; }, DTWAIN_ERR_BAD_FILENAME, -1, FUNC_MACRO);
                 }
 
                 pSource->SetFileEnumerator(pArray);
@@ -658,7 +658,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
 
         }
         else
-            DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{return true; }, DTWAIN_ERR_FILE_FORMAT, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
+            DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{return true; }, DTWAIN_ERR_FILE_FORMAT, -1, FUNC_MACRO);
     }
     else
     if (opts.getActualAcquireType() == TWAINAcquireType_Clipboard)
@@ -711,7 +711,7 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
         pSource->SetAcquireAttempt(false);
 
     // Terminate if there is an error showing the UI (or acquiring with no UI)
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bUIOk; }, DTWAIN_ERR_UI_ERROR, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bUIOk; }, DTWAIN_ERR_UI_ERROR, -1, FUNC_MACRO);
     pSource->SetOpenAfterAcquire(opts.getRemainOpen());
     if (!opts.getShowUI())
         pSource->SetMaxAcquisitions(1);

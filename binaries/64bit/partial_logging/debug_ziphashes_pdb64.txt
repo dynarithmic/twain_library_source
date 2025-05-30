@@ -1,0 +1,5 @@
+﻿MD5 hash of "debug_libraries_pdb.zip" (16 bytes) = 1217ef790ef427f8b7eef719f1a04d0c
+﻿SHA1 hash of "debug_libraries_pdb.zip" (20 bytes) = dd7babf2a45f2753c6f027058eae4575d1a48a22
+﻿SHA256 hash of "debug_libraries_pdb.zip" (32 bytes) = ce0d509d353d0f7129af5e4db1ecb870b85d35948fc52709c039cdc798f5bad7
+﻿SHA512 hash of "debug_libraries_pdb.zip" (64 bytes) = 29550d08b94220e82291c4c1bf6e71b90c9ba90e404983d364295f5c5db0fb20589544177524aa2b710e64e3c7d1dca6bb7486624d905a0c094182078497570f
+

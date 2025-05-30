@@ -180,13 +180,13 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireBuffered(SourceAcquireOptions& opts)
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
         vValues[0] = 1;
         bool bTilesSet = DTWAIN_SetCapValuesEx2(Source, ICAP_TILES, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !bTilesSet; }, DTWAIN_ERR_TILEMODE_NOTSET, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !bTilesSet; }, DTWAIN_ERR_TILEMODE_NOTSET, -1, FUNC_MACRO);
     }
 
     LONG compressionType;
 
     if (!DTWAIN_GetCompressionType(Source, &compressionType, TRUE))
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return false; }, DTWAIN_ERR_COMPRESSION, static_cast<DTWAIN_ACQUIRE>(-1), FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return false; }, DTWAIN_ERR_COMPRESSION, -1, FUNC_MACRO);
 
     pSource->SetCompressionType(compressionType);
     opts.setActualAcquireType(TWAINAcquireType_Buffer);

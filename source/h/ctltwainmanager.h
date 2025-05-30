@@ -24,6 +24,7 @@
 #include <memory>
 #include <map>
 #include <string>
+#include <string_view>
 #include "ctlobstr.h"
 #include "ctlarray.h"
 #include "ctltwainsession.h"
@@ -195,14 +196,14 @@ namespace dynarithmic
             static bool IsProgressIndicatorOn(const CTL_ITwainSource* pSource);
             static bool IsJobControlSupported( const CTL_ITwainSource *pSource, TW_UINT16& nValue );
 
-            static void     SetError(int nError, const std::string& extraInfo, bool bMustReportGeneralError);
+            static void     SetError(int nError, std::string_view extraInfo, bool bMustReportGeneralError);
             static int      GetLastError();
             static int      GetLastTwainError();
             static int      GetLastConditionCodeError();
 
             static LPSTR    GetLastErrorString(LPSTR lpszBuffer, int nSize);
             static LPSTR    GetErrorString(int nError, LPSTR lpszBuffer, int nSize);
-            static void     SetAndLogError(int nError, const std::string& extraInfo, bool bMustReportGeneralError);
+            static void     SetAndLogError(int nError, std::string_view extraInfo, bool bMustReportGeneralError);
 
             static void     SetDLLInstance(HINSTANCE hDLLInstance);
             // Generic capability setting functions

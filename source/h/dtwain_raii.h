@@ -34,7 +34,6 @@ namespace dynarithmic
             }
             catch (...)
             {
-//                LogExceptionErrorA("RAII failure");
             }
         }
     };

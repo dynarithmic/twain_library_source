@@ -242,13 +242,13 @@ std::string dynarithmic::LogWin32Error(DWORD lastError)
     return strm.str();
 }
 
-void LogDTWAINErrorToMsgBox(int nError, LPCSTR func, const std::string& s)
+void LogDTWAINErrorToMsgBox(int nError, LPCSTR func, std::string_view s)
 {
     StringStreamA strm;
     if (!func)
         func = "(Uninitialized DTWAIN DLL)";
     strm << "DTWAIN Function " << func << " returned error code " << nError << std::endl << std::endl;
-    strm << s.c_str();
+    strm << s.data();
     const std::string st = strm.str();
     MessageBoxA(nullptr, st.c_str(), "DTWAIN Error", MB_ICONSTOP);
 }

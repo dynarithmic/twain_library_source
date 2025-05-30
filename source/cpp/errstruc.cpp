@@ -34,7 +34,7 @@ static std::string DecodeTW_MEMORY(pTW_MEMORY pMemory, LPCSTR pMem);
 static std::string DecodeTW_ELEMENT8(pTW_ELEMENT8 pEl, LPCSTR pMem);
 static std::string DecodeTW_INFO(pTW_INFO pInfo, LPCSTR pMem);
 static std::string DecodeSupportedGroups(TW_UINT32 SupportedGroups);
-static std::string IndentDefinition() { return std::string(4, ' '); }
+constexpr const char * IndentDefinition() { return "    "; }
 
 #define ADD_ERRORCODE_TO_MAP2(x, y) {x + y, #y}
 
@@ -222,30 +222,26 @@ std::string CTL_ErrorStructDecoder::DecodeTWAINReturnCodeCC(TW_UINT16 retCode)
                            dynarithmic::GetErrorString_Internal(DTWAIN_ERR_UNKNOWN_TWAIN_CC));
 }
 
-std::string CTL_ErrorStructDecoder::DecodeTWAINCode(TW_UINT16 retCode, TW_UINT16 errStart, const std::string& defMessage)
+std::string CTL_ErrorStructDecoder::DecodeTWAINCode(TW_UINT16 retCode, TW_UINT16 errStart, std::string_view defMessage)
 {
     const TW_UINT16 actualCode = retCode + errStart;
     const auto it = dynarithmic::generic_array_finder_if(mapTwainDSMReturnCodes, [&](const auto& pr) { return pr.first == actualCode; });
     if (it.first)
         return mapTwainDSMReturnCodes[it.second].second;
-    return defMessage;
+    return defMessage.data();
 }
 
 std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorStructTypes sType)
 {
     StringStreamA sBuffer;
     std::string sTemp;
-    std::string indenter = IndentDefinition();
-    if ( !pData )
+    auto indenter = IndentDefinition();
+    if ( !pData || sType == ERRSTRUCT_NONE)
         sBuffer << "\nNo TW_MEMREF Data";
     else
     {
         switch (sType)
         {
-            case ERRSTRUCT_NONE:
-                sBuffer << "\nNo TW_MEMREF Data";
-            break;
-
             case ERRSTRUCT_TW_CUSTOMDSDATA:
             {
                 auto pCUSTOMDSDATA = static_cast<pTW_CUSTOMDSDATA>(pData);

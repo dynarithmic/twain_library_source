@@ -20,6 +20,7 @@
  */
 #include <boost/format.hpp>
 #include <type_traits>
+#include <string_view>
 
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
@@ -46,8 +47,8 @@ static LONG EnumCapInternal(DTWAIN_SOURCE Source,
                             LPDTWAIN_ARRAY arr,
                             DTWAIN_BOOL expandRange,
                             GetCapValuesFn fn,
-                            const std::string& func,
-                            const std::string& paramLog);
+                            std::string_view func,
+                            std::string_view paramLog);
 
 #if DTWAIN_BUILD_LOGCALLSTACK == 1
     #define GENERATE_PARAM_LOG(argVals) \
@@ -58,7 +59,7 @@ static LONG EnumCapInternal(DTWAIN_SOURCE Source,
 
 template <typename CapArrayType>
 static bool GetCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, typename CapArrayType::value_type* value,
-                                 GetCapValuesFn /*capFn*/, const std::string& func, const std::string& paramLog)
+                                 GetCapValuesFn /*capFn*/, std::string_view func, std::string_view paramLog)
 {
     DTWAIN_ARRAY ArrayValues = nullptr;
     const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
@@ -109,7 +110,7 @@ struct SetSupportFn2 : public SetSupportFn1<T>
 };
 
 template <typename T, typename FnToCall>
-static T FunctionCaller(FnToCall fn, const std::string& func, const std::string& paramLog)
+static T FunctionCaller(FnToCall fn, std::string_view func, std::string_view paramLog)
 {
     try
     {
@@ -118,7 +119,9 @@ static T FunctionCaller(FnToCall fn, const std::string& func, const std::string&
         const bool doLog = CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK ? true : false;
         if (doLog)
         {
-            try { LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_IN) + paramLog); }
+            std::string allString = CTL_LogFunctionCallA(func.data(), LOG_INDENT_IN);
+            allString += paramLog;
+            try { LogWriterUtils::WriteLogInfoA(allString); }
             catch (...) {}
         }
         #endif
@@ -129,7 +132,7 @@ static T FunctionCaller(FnToCall fn, const std::string& func, const std::string&
         {
             try
             {
-                LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_OUT) + ParamOutputter("", true).outputParam(bRet).getString());
+                LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(func.data(), LOG_INDENT_OUT) + ParamOutputter("", true).outputParam(bRet).getString());
             }
             catch (...)
             { return bRet; }
@@ -140,7 +143,7 @@ static T FunctionCaller(FnToCall fn, const std::string& func, const std::string&
     catch (T var) { return var; }
     catch (...)
     {
-        LogExceptionErrorA(func.c_str());
+        LogExceptionErrorA(func.data(), true);
         if (CTL_StaticData::IsThrowExceptions())
             DTWAIN_InternalThrowException();
         return {};
@@ -217,20 +220,20 @@ struct EnumCapInternalFn
 };
 
 template <typename CapDataType, typename SetterFn>
-static DTWAIN_BOOL SetCapability(SetterFn fn, const std::string& func, const std::string& paramLog)
+static DTWAIN_BOOL SetCapability(SetterFn fn, std::string_view func, std::string_view paramLog)
 { return FunctionCaller<DTWAIN_BOOL>(fn, func, paramLog); }
 
 static DTWAIN_BOOL GetCapabilityByString(GetDeviceCapsByStringFn fn,
-                                        const std::string& func,
-                                        const std::string& paramLog)
+                                         std::string_view func,
+                                         std::string_view paramLog)
 { return FunctionCaller<DTWAIN_BOOL>(fn, func, paramLog); }
 
-static bool IsEnabledImpl(DTWAIN_SOURCE Source, TW_UINT16 Cap, const std::string& func, const std::string& paramLog)
+static bool IsEnabledImpl(DTWAIN_SOURCE Source, TW_UINT16 Cap, std::string_view func, std::string_view paramLog)
 { return FunctionCaller<bool>(IsEnabledImplFn(Source, Cap), func, paramLog); }
 
 template <typename T>
 static bool IsSupportedImpl(DTWAIN_SOURCE Source, TW_UINT16 Cap, bool anySupport, T SupportVal,
-                            const std::string& func, const std::string& paramLog)
+                            std::string_view func, std::string_view paramLog)
 { return FunctionCaller<bool>(IsSupportedImplFn<T>(Source, Cap, anySupport, SupportVal), func, paramLog); }
 
 static LONG EnumCapInternal(DTWAIN_SOURCE Source,
@@ -238,17 +241,17 @@ static LONG EnumCapInternal(DTWAIN_SOURCE Source,
                             LPDTWAIN_ARRAY arr,
                             DTWAIN_BOOL expandRange,
                             GetCapValuesFn fn,
-                            const std::string& func,
-                            const std::string& paramLog)
+                            std::string_view func,
+                            std::string_view paramLog)
 { return FunctionCaller<LONG>(EnumCapInternalFn(Source, Cap, arr, expandRange?true:false, fn), func, paramLog); }
 
 template <typename SetFn>
 static DTWAIN_BOOL SetCapabilityByString(SetFn fn,
-                                         const std::string& func,
-                                         const std::string& paramLog)
+                                         std::string_view func,
+                                         std::string_view paramLog)
 { return FunctionCaller<DTWAIN_BOOL>(fn, func, paramLog); }
 
-static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value, LONG nLen, GetCapValuesFn fn, const std::string& func, const std::string& paramLog)
+static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value, LONG nLen, GetCapValuesFn fn, std::string_view func, std::string_view paramLog)
 {
 
     DTWAIN_ARRAY ArrayValues = nullptr;

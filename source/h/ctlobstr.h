@@ -41,6 +41,7 @@
 #include <locale>
 #include <iostream>
 #include <cctype>
+#include <string_view>
 #include <boost/lexical_cast.hpp>
 #include <dtwain_filesystem.h>
 #include "dtwain_standard_defs.h"
@@ -69,6 +70,7 @@ namespace dynarithmic
 
     #ifdef UNICODE
         typedef std::wstring        CTL_StringType;
+        typedef std::wstring_view   CTL_StringViewType;
         typedef StringArrayW        CTL_StringArrayType;
         typedef std::wostringstream CTL_StringStreamType;
         typedef std::wistringstream CTL_StringStreamInType;
@@ -83,6 +85,7 @@ namespace dynarithmic
         };
     #else
         typedef std::string         CTL_StringType;
+        typedef std::string_view    CTL_StringViewType;
         typedef StringArray         CTL_StringArrayType;
         typedef std::ostringstream  CTL_StringStreamType;
         typedef std::istringstream  CTL_StringStreamInType;
