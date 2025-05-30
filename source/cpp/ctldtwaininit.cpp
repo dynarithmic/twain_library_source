@@ -23,6 +23,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <string>
+#include <string_view>
 #include <sstream>
 #include <boost/format.hpp>
 #include <boost/dll/runtime_symbol_info.hpp>
@@ -103,7 +104,7 @@ static WNDPROC SubclassTwainMsgWindow(HWND hWnd, WNDPROC wProcIn = nullptr);
             (reinterpret_cast<WNDPROC>(SetWindowLongPtr((hwnd), GWLP_WNDPROC, (LONG_PTR)(WNDPROC)(lpfn))))
 #endif
 
-static void LogDTWAINErrorToMsgBox(int nError, LPCSTR pFunc, const std::string& s);
+static void LogDTWAINErrorToMsgBox(int nError, LPCSTR pFunc, std::string_view s);
 
 /* Set the paths for image DLL's and language resource */
 static DTWAIN_BOOL SetLangResourcePath(LPCTSTR szPath);
@@ -1960,7 +1961,7 @@ void dynarithmic::OutputDTWAINError(const CTL_TwainDLLHandle* pHandle, LPCSTR pF
         DTWAIN_GetErrorStringA( DTWAIN_ERR_BAD_HANDLE, szBuf,MaxMessage);
     else
         DTWAIN_GetErrorStringA( pHandle->m_lLastError, szBuf, MaxMessage);
-    std::string s(szBuf);
+    std::string_view s(szBuf);
     if ( !pHandle )
         LogWriterUtils::WriteLogInfoIndentedA(s);
 

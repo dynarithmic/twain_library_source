@@ -4,6 +4,7 @@
 #if DTWAIN_BUILD_LOGCALLSTACK == 1
 #include <string>
 #include <sstream>
+#include <string_view>
 #include "dtwaindefs.h"
 #include "dtwain_resource_constants2.h"
 #include "ctlobstr.h"
@@ -24,7 +25,7 @@ namespace dynarithmic
         bool m_bOutputAsString;
 
     private:
-        void LogType(const std::string& outStr, const char* ptr)
+        void LogType(std::string_view outStr, const char* ptr)
         {
             // ptr must be a pointer to a valid null terminated string, or nullptr.
             if (ptr)
@@ -34,7 +35,7 @@ namespace dynarithmic
                 strm << outStr << "=(null)";
         }
 
-        void LogType(const std::string& outStr, const wchar_t* ptr)
+        void LogType(std::string_view outStr, const wchar_t* ptr)
         {
             // ptr must be a pointer to a valid null terminated string, or nullptr.
             if (ptr)
@@ -46,7 +47,7 @@ namespace dynarithmic
         }
 
         template <typename T>
-        void LogType(const std::string& outStr, const T* ptr)
+        void LogType(std::string_view outStr, const T* ptr)
         {
             // ptr is a valid pointer to double supplied by the user
             if (ptr)
@@ -61,7 +62,7 @@ namespace dynarithmic
         }
 
         template <typename T>
-        void LogType(const std::string& outStr, T t, std::enable_if_t<std::is_pointer_v<T> >* = nullptr)
+        void LogType(std::string_view outStr, T t, std::enable_if_t<std::is_pointer_v<T> >* = nullptr)
         {
             struct asStringRAII
             {
@@ -126,16 +127,16 @@ namespace dynarithmic
         }
 
         template <typename T>
-        void LogType(const std::string& outStr, T t, std::enable_if_t<!std::is_pointer_v<T> >* = nullptr)
+        void LogType(std::string_view outStr, T t, std::enable_if_t<!std::is_pointer_v<T> >* = nullptr)
         {
             strm << outStr << "=" << t;
         }
 
     public:
-        ParamOutputter(const std::string& s, bool isReturnValue = false) :
+        ParamOutputter(std::string_view s, bool isReturnValue = false) :
             nWhich(0), m_bIsReturnValue(isReturnValue), m_bOutputAsString(false)
         {
-            StringWrapperA::Tokenize(s, "(, )", aParamNames);
+            StringWrapperA::Tokenize(s.data(), "(, )", aParamNames);
             if (!m_bIsReturnValue)
                 strm << "(";
             else
@@ -202,7 +203,7 @@ namespace dynarithmic
         int nArgs = 0;
 
     private:
-        void LogInputType(const std::string& outStr, const char* ptr)
+        void LogInputType(std::string_view outStr, const char* ptr)
         {
             // ptr is a valid string supplied by the user, so just write it out
             if (ptr)
@@ -211,7 +212,7 @@ namespace dynarithmic
                 strm << outStr << "=" << "(null)";
         }
 
-        void LogInputType(const std::string& outStr, char* ptr)
+        void LogInputType(std::string_view outStr, char* ptr)
         {
             // ptr is a valid string supplied by the user, but we can't ensure it is null terminated
             // (It doesn't have to be null-terminated, as the DTWAIN function will eventually put the NULL
@@ -220,7 +221,7 @@ namespace dynarithmic
             strm << outStr << "=" << static_cast<void*>(ptr);
         }
 
-        void LogInputType(const std::string& outStr, wchar_t* ptr)
+        void LogInputType(std::string_view outStr, wchar_t* ptr)
         {
             // ptr is a valid string supplied by the user, but we can't ensure it is null terminated
             // (It doesn't have to be null-terminated, as the DTWAIN function will eventually put the NULL
@@ -230,7 +231,7 @@ namespace dynarithmic
         }
 
         template <typename T>
-        void LogInputType(const std::string& outStr, T t, std::enable_if_t<std::is_pointer_v<T> >* = nullptr)
+        void LogInputType(std::string_view outStr, T t, std::enable_if_t<std::is_pointer_v<T> >* = nullptr)
         {
             if (t)
             {
@@ -244,7 +245,7 @@ namespace dynarithmic
         }
 
         template <typename T>
-        void LogInputType(const std::string& outStr, T t, std::enable_if_t<!std::is_pointer_v<T> >* = nullptr)
+        void LogInputType(std::string_view outStr, T t, std::enable_if_t<!std::is_pointer_v<T> >* = nullptr)
         {
             strm << outStr << "=" << t;
         }
@@ -303,15 +304,15 @@ namespace dynarithmic
     };
 
     template <typename T, typename ...P>
-    std::string LogValue(const std::string& func, bool isIn, T retValue, P ...p)
+    std::string LogValue(std::string_view func, bool isIn, T retValue, P ...p)
     {
         std::string s;
         if (GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK)
         {
             if (isIn)
-                s = CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_IN) + ParamOutputter2(false, std::forward<P>(p)...).getString();
+                s = CTL_LogFunctionCallA(func.data(), LOG_INDENT_IN) + ParamOutputter2(false, std::forward<P>(p)...).getString();
             else
-                s = CTL_LogFunctionCallA(func.c_str(), LOG_INDENT_OUT) + ParamOutputter2(true, retValue).getString();
+                s = CTL_LogFunctionCallA(func.data(), LOG_INDENT_OUT) + ParamOutputter2(true, retValue).getString();
             LogWriterUtils::WriteLogInfoA(s);
         }
         return s;
