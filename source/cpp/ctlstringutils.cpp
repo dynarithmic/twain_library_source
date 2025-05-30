@@ -90,9 +90,10 @@ std::string dynarithmic::TruncateStringWithMore(std::string_view origString, siz
     {
         // Get the "More" text
         std::string MoreText = "...(" + GetResourceStringFromMap(IDS_LOGMSG_MORETEXT) + ")...";
+        std::string origStringS = origString.data();
 
 		// Get original string and resize it
-		std::string tempS = origString.substr(0, maxLen).data();
+		std::string tempS = origStringS.substr(0, maxLen);
 
         // Add the "More" text
         tempS += MoreText;
