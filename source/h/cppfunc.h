@@ -25,6 +25,7 @@
 #include <funcmac.h>
 #include "logwriterutils.h"
 #include <boost/version.hpp>
+#include "dtwain_exception.h"
 
  /* This indicates that the build requires Visual C++ runtime if set to 1*/
  /* Since there is no way to set the runtime to use at compile time, this */
@@ -130,30 +131,23 @@
             CATCH_BLOCK_END \
             catch(const std::exception& ex_) \
             {\
-                LogExceptionErrorA(FUNC_MACRO, ex_.what()); \
-                return(type); \
+                return ProcessCatch(type, ex_, FUNC_MACRO); \
             }\
-            catch(const decltype(type) var) { return var; }\
             catch(...) {\
-            LogExceptionErrorA(FUNC_MACRO); \
-            return(type); \
+                LogExceptionErrorA(FUNC_MACRO, true); \
+                return(type); \
             }
 
     #define CATCH_BLOCK_LOG_PARAMS(type) \
             CATCH_BLOCK_END \
             catch(const std::exception& ex_) \
             {\
-                LogExceptionErrorA(FUNC_MACRO, ex_.what()); \
+                ProcessCatch(type, ex_, FUNC_MACRO); \
                 LOG_FUNC_EXIT_NONAME_PARAMS(type) \
-                return(type); \
             }\
-            catch(const decltype(type) var) { \
-                LOG_FUNC_EXIT_NONAME_PARAMS(type) \
-                return var; }\
             catch(...) {\
-                LogExceptionErrorA(FUNC_MACRO); \
+                LogExceptionErrorA(FUNC_MACRO, true); \
                 LOG_FUNC_EXIT_NONAME_PARAMS(type) \
-                return(type); \
             }
 #else
     #ifdef _MSC_VER
@@ -184,23 +178,18 @@
     #define LOG_FUNC_EXIT_DEREFERENCE_POINTERS(argVals) 
 
     #define CATCH_BLOCK(type) \
-        CATCH_BLOCK_END \
-        catch(decltype(type) var) { return var; }\
-        catch(...) {\
-        return(type); \
-        }
-
-    #define CATCH_BLOCK_LOG_PARAMS(type) \
             CATCH_BLOCK_END \
-            catch(const std::exception&) \
+            catch(const std::exception& ex_) \
             {\
-                return(type); \
+                return ProcessCatch(type, ex_, FUNC_MACRO); \
             }\
-            catch(const decltype(type) var) { \
-                return var; }\
-            catch(...) {\
+            catch(...) \
+            { \
                 return(type); \
             }
+
+    #define CATCH_BLOCK_LOG_PARAMS(type) CATCH_BLOCK(type)
+
 #endif
 #include "dtwain_paramlogger.h"
 #endif

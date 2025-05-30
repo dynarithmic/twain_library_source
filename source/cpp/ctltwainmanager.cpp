@@ -1470,7 +1470,7 @@ bool CTL_TwainAppMgr::CloseSourceManager(CTL_ITwainSession* pSession)
 
 
 ////////// These are static error functions that get errors from the RC file
-void CTL_TwainAppMgr::SetError(int nError, const std::string& extraInfo, bool bMustReportGeneralError)
+void CTL_TwainAppMgr::SetError(int nError, std::string_view extraInfo, bool bMustReportGeneralError)
 {
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
@@ -1485,7 +1485,8 @@ void CTL_TwainAppMgr::SetError(int nError, const std::string& extraInfo, bool bM
         nError = -nError;  // Can't have negative error codes
     GetResourceStringA(nError, szBuffer, 1024);
     s_strLastError  = szBuffer;
-    s_strLastError += " " + extraInfo;
+    s_strLastError += " ";
+    s_strLastError += extraInfo;
     s_nLastError    = nError;
 
     CTL_StaticData::GetExtraErrorInfoMap()[abs(s_nLastError)] = extraInfo;
@@ -1546,10 +1547,10 @@ LPSTR CTL_TwainAppMgr::GetErrorString(int nError, LPSTR lpszBuffer, int nSize)
     return lpszBuffer;
 }
 
-void CTL_TwainAppMgr::SetAndLogError(int nError, const std::string& extraInfo, bool bMustReportGeneralError)
+void CTL_TwainAppMgr::SetAndLogError(int nError, std::string_view extraInfo, bool bMustReportGeneralError)
 {
     int nActualError = std::abs(nError);
-    CTL_TwainAppMgr::SetError(nActualError, extraInfo, bMustReportGeneralError);
+    CTL_TwainAppMgr::SetError(nActualError, extraInfo.data(), bMustReportGeneralError);
     if (CTL_StaticData::GetLogFilterFlags() != 0)
     {
         char szBuf[DTWAIN_USERRES_MAXSIZE + 1] = {};
@@ -2655,7 +2656,7 @@ VOID CALLBACK CTL_TwainAppMgr::TwainTimeOutProc(HWND, UINT, ULONG, DWORD)
 
     LogWriterUtils::WriteLogInfoIndentedA("The last TWAIN triplet was not completed due to time out");
     SetError(DTWAIN_ERR_TIMEOUT, "", false);
-    throw DTWAIN_ERR_TIMEOUT;
+    throw DTWAINException(DTWAIN_ERR_TIMEOUT);
 #endif
 }
 

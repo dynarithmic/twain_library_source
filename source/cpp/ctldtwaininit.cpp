@@ -23,6 +23,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <string>
+#include <string_view>
 #include <sstream>
 #include <boost/format.hpp>
 #include <boost/dll/runtime_symbol_info.hpp>
@@ -103,7 +104,7 @@ static WNDPROC SubclassTwainMsgWindow(HWND hWnd, WNDPROC wProcIn = nullptr);
             (reinterpret_cast<WNDPROC>(SetWindowLongPtr((hwnd), GWLP_WNDPROC, (LONG_PTR)(WNDPROC)(lpfn))))
 #endif
 
-static void LogDTWAINErrorToMsgBox(int nError, LPCSTR pFunc, const std::string& s);
+static void LogDTWAINErrorToMsgBox(int nError, LPCSTR pFunc, std::string_view s);
 
 /* Set the paths for image DLL's and language resource */
 static DTWAIN_BOOL SetLangResourcePath(LPCTSTR szPath);
@@ -1008,6 +1009,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLog(LONG LogFlags, LPCTSTR lpszLogFile)
     LONG allFlags = DTWAIN_LOG_ALL;
     if ( (LogFlags != 0) && (LogFlags & allFlags) == 0)  
         LogFlags |= (DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_DECODE_SOURCE | DTWAIN_LOG_DECODE_DEST | DTWAIN_LOG_MISCELLANEOUS);
+    bool logFailed = false; 
 
     bool bLoggerExists = AnyLoggerExists(pHandle);
     auto& logFilterFlags = CTL_StaticData::GetLogFilterFlags();
@@ -1034,13 +1036,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLog(LONG LogFlags, LPCTSTR lpszLogFile)
         // Write to all the loggers that were created
         if ( LogFlags > 0)
             WriteVersionToLog(pHandle);
-        if (LogFlags > 0 && !isLogOpen.first)
+        logFailed = (LogFlags > 0 && !isLogOpen.first);
+        if (logFailed)
         {
             // Indicate that there is at least one logger that failed
-            DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_LOG_CREATE_ERROR, false, FUNC_MACRO);
+            DTWAIN_Check_Error_Condition_2_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_LOG_CREATE_ERROR, false, FUNC_MACRO);
         }
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    LOG_FUNC_EXIT_NONAME_PARAMS(!logFailed)
     CATCH_BLOCK(false)
 }
 
@@ -1958,7 +1961,7 @@ void dynarithmic::OutputDTWAINError(const CTL_TwainDLLHandle* pHandle, LPCSTR pF
         DTWAIN_GetErrorStringA( DTWAIN_ERR_BAD_HANDLE, szBuf,MaxMessage);
     else
         DTWAIN_GetErrorStringA( pHandle->m_lLastError, szBuf, MaxMessage);
-    std::string s(szBuf);
+    std::string_view s(szBuf);
     if ( !pHandle )
         LogWriterUtils::WriteLogInfoIndentedA(s);
 
@@ -2053,7 +2056,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainIDFromName(LPCTSTR lpszBuffer)
     LOG_FUNC_ENTRY_PARAMS((lpszBuffer))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     auto retVal = CTL_StaticData::GetIDFromTwainName(StringConversion::Convert_NativePtr_To_Ansi(lpszBuffer));
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !retVal.first; }, DTWAIN_ERR_STRINGID_NOTFOUND, retVal.second, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !retVal.first; }, DTWAIN_ERR_STRINGID_NOTFOUND, static_cast<int>(retVal.second), FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS((LONG)retVal.second)
     CATCH_BLOCK(std::numeric_limits<LONG>::min())
 }
