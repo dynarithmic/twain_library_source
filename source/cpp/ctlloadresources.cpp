@@ -676,7 +676,7 @@ namespace dynarithmic
         }
 
         // Create an empty map
-        std::ifstream ifs(sPath);
+        std::ifstream ifs(sPath.data());
         bool open = false;
         if (ifs)
         {
