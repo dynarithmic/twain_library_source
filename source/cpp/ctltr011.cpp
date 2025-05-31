@@ -27,7 +27,7 @@
 using namespace dynarithmic;
 CTL_CapabilityGetTriplet::CTL_CapabilityGetTriplet(CTL_ITwainSession* pSession,
                                                     CTL_ITwainSource* pSource,
-                                                    CTL_EnumGetType gType,
+                                                    TW_UINT16 gType,
                                                     TW_UINT16 gCap,
                                                     TW_UINT16 TwainDataType)
                        :  CTL_CapabilityTriplet(pSession, pSource, static_cast<TW_UINT16>(gType), TwainDataType, true)
@@ -41,12 +41,12 @@ CTL_CapabilityGetTriplet::CTL_CapabilityGetTriplet(CTL_ITwainSession* pSession,
     SetItemType(TwainDataType);
 }
 
-CTL_EnumGetType CTL_CapabilityGetTriplet::CapRetrievalType()const
+TW_UINT16 CTL_CapabilityGetTriplet::CapRetrievalType()const
 {
     return m_gType;
 }
 
-CTL_EnumCapability CTL_CapabilityGetTriplet::CapToRetrieve()const
+TW_UINT16  CTL_CapabilityGetTriplet::CapToRetrieve()const
 {
     return m_gCap;
 }
@@ -108,10 +108,10 @@ void CTL_CapabilityGetTriplet::Decode(void * p)
     switch (m_gType)
     {
         // Get all capabilities
-        case CTL_GetTypeGET:
-        case CTL_GetTypeGETCURRENT:
-        case CTL_GetTypeGETDEFAULT:
-        case CTL_GetTypeQUERYSUPPORT:
+        case MSG_GET:
+        case MSG_GETCURRENT:
+        case MSG_GETDEFAULT:
+        case MSG_QUERYSUPPORT:
             EnumCapValues(p);
             return ;
         default:

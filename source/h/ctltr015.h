@@ -37,11 +37,10 @@ namespace dynarithmic
             CTL_CapabilityGetRangeTriplet(
                                         CTL_ITwainSession *pSession,
                                         CTL_ITwainSource* pSource,
-                                        CTL_EnumGetType gType,
+                                        TW_UINT16 gType,
                                         TW_UINT16   gCap,
                                         TW_UINT16 TwainDataType);
 
-            size_t          GetNumItems() override;
             bool            GetValue(void *pData, size_t nWhichVal) override;
             TW_UINT16       GetDataType();
 
@@ -56,7 +55,7 @@ namespace dynarithmic
             CTL_RangeType   m_StepVal;
             CTL_RangeType   m_DefaultVal;
             CTL_RangeType   m_CurrentVal;
-            size_t          m_nNumRangeItems;
+            static constexpr size_t  m_nNumRangeItems = 5;
     };
 }
 #endif

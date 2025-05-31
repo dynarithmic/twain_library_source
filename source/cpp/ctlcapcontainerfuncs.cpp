@@ -48,7 +48,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainerEx(LONG nCap, DTWAIN_BOOL bSetContainer,
     if (nCap < CAP_CUSTOMBASE)
     {
         auto& factory = pHandle->m_ArrayFactory;
-        LONG lValue = static_cast<LONG>(CTL_TwainAppMgr::GetContainerTypesFromCap(static_cast<CTL_EnumCapability>(nCap),
+        LONG lValue = static_cast<LONG>(CTL_TwainAppMgr::GetContainerTypesFromCap(static_cast<TW_UINT16 >(nCap),
                                                                                   bSetContainer ? true : false));
         if (pDTWAINArray)
         {
@@ -76,7 +76,7 @@ static LONG PerformCapContainerTest(CTL_TwainDLLHandle* pHandle, CTL_ITwainSourc
         return lResults;  // This is a single container type
 
     // Multiple container options exist for this cap or we have no idea (a custom cap).  Use TWAIN to get the best container type now
-    lResults = CTL_TwainAppMgr::DoCapContainerTest(pHandle, pSource, static_cast<CTL_EnumCapability>(nCap), lCapType);
+    lResults = CTL_TwainAppMgr::DoCapContainerTest(pHandle, pSource, static_cast<TW_UINT16 >(nCap), lCapType);
 
     // Replace container information with the updated information
     std::get<CapInfoIdx>(*CapInfo) = lResults;
@@ -95,7 +95,7 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainer(DTWAIN_SOURCE Source, LONG nCap, LONG l
 
 LONG dynarithmic::GetCapDataType(CTL_ITwainSource* pSource, LONG nCap)
 {
-    auto nDataType = CTL_TwainAppMgr::GetDataTypeFromCap(static_cast<CTL_EnumCapability>(nCap), pSource);
+    auto nDataType = CTL_TwainAppMgr::GetDataTypeFromCap(static_cast<TW_UINT16 >(nCap), pSource);
     if (nDataType == (std::numeric_limits<int>::min)())
         return DTWAIN_FAILURE1;
     return nDataType;

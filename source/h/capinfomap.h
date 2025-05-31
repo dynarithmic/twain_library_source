@@ -35,7 +35,7 @@ namespace dynarithmic
 
     // Create these dynamically whenever a new source is opened
    // and source cap info does not exist.  Add cap info statically.
-    typedef boost::container::flat_map<CTL_EnumCapability, CTL_CapInfo>  CTL_CapInfoMap;
+    typedef boost::container::flat_map<TW_UINT16 , CTL_CapInfo>  CTL_CapInfoMap;
     typedef std::shared_ptr<CTL_CapInfoMap> CTL_CapInfoMapPtr;
 
     CTL_CapInfoMapPtr GetCapInfoArray(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource* p);

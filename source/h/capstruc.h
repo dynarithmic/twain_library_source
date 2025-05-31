@@ -48,7 +48,7 @@ namespace dynarithmic
 
     typedef boost::container::flat_map<TW_UINT16, CTL_CapStruct> CTL_GeneralCapInfo;
 
-    typedef CTL_ClassValues10<CTL_EnumCapability,/* Capability*/
+    typedef CTL_ClassValues10<TW_UINT16 ,/* Capability*/
         UINT, /* Container for Get */
         UINT, /* Container for Set*/
         UINT,  /* Data Type */

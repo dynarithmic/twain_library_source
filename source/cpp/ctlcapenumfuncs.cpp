@@ -239,7 +239,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAllCapsToDefault(DTWAIN_SOURCE Source)
         const CTL_CapInfo Info = InfoVal.second;
         if (pTheSource->IsCapNegotiableInState(static_cast<TW_UINT16>(std::get<0>(Info)), pTheSource->GetState()))
         {
-            if (!SetCapabilityValues(pTheSource, std::get<0>(Info), CTL_SetTypeRESET, static_cast<UINT>(TwainContainer_ONEVALUE), 0,Array)) {}
+            if (!SetCapabilityValues(pTheSource, std::get<0>(Info), MSG_RESET, static_cast<UINT>(TwainContainer_ONEVALUE), 0,Array)) {}
         }
     });
 

@@ -30,6 +30,7 @@
 #include <mutex>
 #include <memory>
 #include <functional>
+#include <string_view>
 #include "ctltripletbase.h"
 #include "dtwain_raii.h"
 #include "ocrinterface.h"
@@ -215,7 +216,7 @@ namespace dynarithmic
     typedef boost::container::flat_map<CTL_StringType, CTL_ITwainSource*> CTL_StringToSourcePtrMap;
     typedef boost::container::flat_map<CTL_StringType, int> CTL_StringToIntMap;
     typedef boost::container::flat_map<LONG, HMODULE> CTL_LongToHMODULEMap;
-    typedef boost::container::flat_map<CTL_EnumCapability, CTL_CapInfo> CTL_EnumCapToInfoMap;
+    typedef boost::container::flat_map<TW_UINT16 , CTL_CapInfo> CTL_EnumCapToInfoMap;
     typedef std::vector<CallbackInfo<DTWAIN_CALLBACK_PROC, LONG>> CTL_CallbackProcArray;
     typedef std::vector<CallbackInfo<DTWAIN_CALLBACK_PROC, LONGLONG>> CTL_CallbackProcArray64;
     typedef boost::container::flat_map<LONG, CTL_StringType> CTL_StringToLongMap;
@@ -498,11 +499,11 @@ namespace dynarithmic
 
     typedef std::map<std::string, SourceStatus> SourceStatusMap;
     typedef boost::container::flat_map<int, ImageResamplerData> ImageResamplerMap;
-    typedef boost::container::flat_map<LONG, std::pair<std::string, std::string>> CTL_PDFMediaMap;
+    typedef boost::container::flat_map<int, std::pair<std::string, std::string>> CTL_PDFMediaMap;
     typedef tsl::ordered_map<LONG, FileFormatNode> CTL_AvailableFileFormatsMap;
     using TwainConstantType = int64_t;
     typedef tsl::ordered_map<TwainConstantType, std::vector<std::string>> CTL_TwainConstantToStringMapNode;
-    typedef boost::container::flat_map<LONG, CTL_TwainConstantToStringMapNode> CTL_TwainConstantsMap;
+    typedef boost::container::flat_map<int, CTL_TwainConstantToStringMapNode> CTL_TwainConstantsMap;
     typedef boost::container::flat_map<TwainConstantType, std::string> CTL_TwainIDToStringMap;
     typedef boost::container::flat_map<int32_t, std::string> CTL_ErrorToExtraInfoMap;
     typedef boost::container::flat_map<std::string, unsigned long> CTL_ThreadMap;
@@ -511,7 +512,7 @@ namespace dynarithmic
     typedef boost::container::flat_map<int, FileSaveNode> CTL_FileSaveMap;
     typedef boost::container::flat_map<int, std::vector<int>> CTL_CompressionMap;
 
-    typedef std::unordered_map<std::pair<LONG, std::string>, std::string, CacheKeyHash> CTL_PairToStringMap;
+    typedef std::unordered_map<std::pair<int, std::string>, std::string, CacheKeyHash> CTL_PairToStringMap;
 
     struct CTL_GeneralResourceInfo
     {
@@ -637,7 +638,7 @@ namespace dynarithmic
         static bool PerformResampling() { return s_StaticData.s_bDoResampling; }
         static CTL_PairToStringMap& GetResourceCache() { return s_StaticData.s_ResourceCache; }
         static CTL_StringToMapLongToStringMap& GetAllLanguagesResourceMap() { return s_StaticData.s_AllLoadedResourcesMap; }
-        static CTL_LongToStringMap* GetLanguageResource(const std::string& sLang);
+        static CTL_LongToStringMap* GetLanguageResource(std::string_view sLang);
         static std::string&         GetCurrentLanguageResourceKey() { return s_StaticData.s_CurrentResourceKey; }
         static void SetCurrentLanguageResourceKey(const std::string& sLang) { s_StaticData.s_CurrentResourceKey = sLang; }
         static CTL_LongToStringMap* GetCurrentLanguageResource();
@@ -648,7 +649,7 @@ namespace dynarithmic
         static CTL_TwainConstantToStringMapNode& GetTwainConstantsStrings(LONG nWhich) { return s_StaticData.s_TwainConstantsMap[nWhich]; }
         static bool IsCheckHandles() { return s_StaticData.s_bCheckHandles; }
         static void SetCheckHandles(bool bSet) { s_StaticData.s_bCheckHandles = bSet; }
-        static std::pair<bool, TwainConstantType> GetIDFromTwainName(const std::string& sName);
+        static std::pair<bool, TwainConstantType> GetIDFromTwainName(std::string_view sName);
         static constexpr int GetDGResourceID() { return 8890; }
         static constexpr int GetDATResourceID() { return 8891; }
         static constexpr int GetMSGResourceID() { return 8892; }
@@ -729,8 +730,8 @@ namespace dynarithmic
                 int nSessionType;
                 tagSessionStruct() : nMajorNum(1),
                                      nMinorNum(0),
-                                     nLanguage(TwainLanguage_USAENGLISH),
-                                     nCountry(TwainCountry_USA),
+                                     nLanguage(TWLG_USA),
+                                     nCountry(TWCY_USA),
                                      szVersion(_T("<?>")),
                                      szManufact(_T("<?>")),
                                      szFamily(_T("<?>")),
@@ -751,6 +752,7 @@ namespace dynarithmic
             CTL_StringType   m_VersionString;
             CTL_StringType   m_strTWAINPath;     // path to the TWAIN Data Source Manager that is being used
             CTL_StringType   m_strTWAINPath2;   // path to the TWAIN Data Source Manager 2.x that is being used
+            LONG             m_nTwainPathLocation = -1; // constant denoting where active Twain DataSource manager was found
             CTL_StringType   m_strLibraryPath;   // path to the DTWAIN Library being used
             CTL_StringType   m_sWindowsVersionInfo; // Windows version information, cached.
             CTL_StringType   m_strDefaultSource; // Current default TWAIN source
@@ -897,7 +899,6 @@ namespace dynarithmic
     void OutputDTWAINErrorA(const CTL_TwainDLLHandle *pHandle, LPCSTR pFunc=nullptr);
     void OutputDTWAINErrorW(const CTL_TwainDLLHandle *pHandle, LPCWSTR pFunc=nullptr);
 
-    void LogExceptionErrorA(LPCSTR fname, const char *sAdditionalText=nullptr);
     void LogDTWAINMessage(HWND, UINT, WPARAM, LPARAM, bool bCallback=false);
     bool UserDefinedLoggerExists(CTL_TwainDLLHandle* pHandle);
     bool AnyLoggerExists(CTL_TwainDLLHandle* pHandle);

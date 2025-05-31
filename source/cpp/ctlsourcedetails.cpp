@@ -173,7 +173,7 @@ static std::string get_source_file_types(DTWAIN_SOURCE Source)
 
 using pixelMap = std::map<LONG, std::vector<LONG>>;
 
-static pixelMap getPixelAndBitDepthInfo(CTL_ITwainSource* pSource)
+static pixelMap get_pixel_bitdepth_info(CTL_ITwainSource* pSource)
 {
     const auto pHandle = pSource->GetDTWAINHandle();
     // Get the pixel information
@@ -558,7 +558,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
 
                     // Get the pixel information
                     {
-                        auto pixInfo = getPixelAndBitDepthInfo(pCurrentSourcePtr);
+                        auto pixInfo = get_pixel_bitdepth_info(pCurrentSourcePtr);
                         std::vector<LONG> allPixInfo;
                         std::vector<std::string> vPixNames;
                         std::vector<std::string> vPixNamesEx;
@@ -937,21 +937,21 @@ LONG DLLENTRY_DEF DTWAIN_GetSourceDetails(LPCTSTR szSources, LPTSTR szBuf, LONG 
 {
     LOG_FUNC_ENTRY_PARAMS((szSources, szBuf, nSize, indentFactor))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    CTL_StringType details;
     if (bRefresh)
     {
         CTL_StringArrayType vAllSourcesT;
         std::vector<std::string> vAllSources;
         StringWrapper::TokenizeEx(szSources, _T("|"), vAllSourcesT, false);
         for (auto& name : vAllSourcesT)
-            vAllSources.push_back(StringConversion::Convert_Native_To_Ansi(name));
-    
-        details = StringConversion::Convert_Ansi_To_Native(generate_details(*pHandle->m_pTwainSession, vAllSources, indentFactor));
-        pHandle->m_strSourceDetails = details;
+            vAllSources.push_back(StringConversion::Convert_Native_To_Ansi(name, name.length()));
+        auto genDetails = generate_details(*pHandle->m_pTwainSession, vAllSources, indentFactor);
+        #ifdef UNICODE
+        pHandle->m_strSourceDetails = StringConversion::Convert_Ansi_To_Native(genDetails, genDetails.length());
+        #else
+        pHandle->m_strSourceDetails = genDetails;
+        #endif
     }
-    else
-        details = pHandle->m_strSourceDetails;
-    LONG retVal = StringWrapper::CopyInfoToCString(details, szBuf, nSize);
+    LONG retVal = StringWrapper::CopyInfoToCString(pHandle->m_strSourceDetails, szBuf, nSize);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szBuf))
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
     CATCH_BLOCK(0)

@@ -24,6 +24,7 @@
 #include "ctlconstexprfind.h"
 #include "twain.h"
 #include "ctlenum.h"
+#include "dtwain_version.h"
 
 namespace dynarithmic
 {
@@ -289,12 +290,12 @@ namespace dynarithmic
         return ca;
     }
 
-    static constexpr bool IsSupportedFileFormat(int nFileFormat)
+    static constexpr bool IsSupportedFileFormat(int nFileFormat) 
     {
         return generic_array_finder(EnumTwainFileFormats(), nFileFormat).first;
     }
 
-    static constexpr LONG GetArrayTypeFromCapType(TW_UINT16 CapType)
+    static constexpr LONG GetArrayTypeFromCapType(TW_UINT16 CapType) noexcept
     {
         if (IsTwainShortStringType(CapType) || IsTwainLongStringType(CapType))
             return DTWAIN_ARRAYANSISTRING;
@@ -305,7 +306,7 @@ namespace dynarithmic
         return DTWAIN_ARRAYLONG;
     }
 
-    static constexpr LONG ExtImageInfoArrayType(LONG ExtType)
+    static constexpr LONG ExtImageInfoArrayType(LONG ExtType) noexcept
     {
         TW_UINT16 actualType = static_cast<TW_UINT16>(ExtType);
         if (IsTwainIntegralType(actualType))
@@ -321,7 +322,7 @@ namespace dynarithmic
         return DTWAIN_ARRAYLONG;
     }
 
-    static constexpr int GetCapMaskFromCap(CTL_EnumCapability Cap)
+    static constexpr int GetCapMaskFromCap(TW_UINT16  Cap) noexcept
     {
         // Jump table
         constexpr int CapAll = CTL_CapMaskGET | CTL_CapMaskGETCURRENT | CTL_CapMaskGETDEFAULT |
@@ -333,32 +334,32 @@ namespace dynarithmic
 
         switch (Cap)
         {
-            case TwainCap_XFERCOUNT:
-            case TwainCap_AUTOFEED:
-            case TwainCap_CLEARPAGE:
-            case TwainCap_REWINDPAGE:
+            case CAP_XFERCOUNT:
+            case CAP_AUTOFEED:
+            case CAP_CLEARPAGE:
+            case CAP_REWINDPAGE:
                 return CapAll;
 
-            case TwainCap_COMPRESSION:
-            case TwainCap_PIXELTYPE:
-            case TwainCap_UNITS:
-            case TwainCap_XFERMECH:
-            case TwainCap_BITDEPTH:
-            case TwainCap_BITORDER:
-            case TwainCap_XRESOLUTION:
-            case TwainCap_YRESOLUTION:
+            case ICAP_COMPRESSION:
+            case ICAP_PIXELTYPE:
+            case ICAP_UNITS:
+            case ICAP_XFERMECH:
+            case ICAP_BITDEPTH:
+            case ICAP_BITORDER:
+            case ICAP_XRESOLUTION:
+            case ICAP_YRESOLUTION:
                 return CapSupport;
 
-            case TwainCap_UICONTROLLABLE:
-            case TwainCap_SUPPORTEDCAPS:
+            case CAP_UICONTROLLABLE:
+            case CAP_SUPPORTEDCAPS:
                 return CTL_CapMaskGET;
 
-            case TwainCap_PLANARCHUNKY:
-            case TwainCap_PHYSICALHEIGHT:
-            case TwainCap_PHYSICALWIDTH:
-            case TwainCap_PIXELFLAVOR:
-            case TwainCap_FEEDERENABLED:
-            case TwainCap_FEEDERLOADED:
+            case ICAP_PLANARCHUNKY:
+            case ICAP_PHYSICALHEIGHT:
+            case ICAP_PHYSICALWIDTH:
+            case ICAP_PIXELFLAVOR:
+            case CAP_FEEDERENABLED:
+            case CAP_FEEDERLOADED:
                 return CapAllGets;
         }
         return 0;
@@ -377,6 +378,22 @@ namespace dynarithmic
         fix32_value.Whole = static_cast<TW_INT16>(value >> 16);
         fix32_value.Frac = static_cast<TW_UINT16>(value & 0x0000ffffL);
         return fix32_value;
+    }
+
+    static constexpr LONG GetTwainGetType(LONG gettype) noexcept
+    {
+        switch (gettype)
+        {
+            case DTWAIN_CAPGETHELP:
+                return MSG_GETHELP;
+
+            case DTWAIN_CAPGETLABEL:
+                return MSG_GETLABEL;
+
+            case DTWAIN_CAPGETLABELENUM:
+                return MSG_GETLABELENUM;
+        }
+        return gettype;
     }
 
     static constexpr bool IsMSGGetType(TW_UINT16 msgType) noexcept
@@ -401,7 +418,95 @@ namespace dynarithmic
 
     static constexpr bool IsMSGSetOrResetType(TW_UINT16 msgType) noexcept
     {
-        return msgType == MSG_RESET || msgType == MSG_RESETALL || msgType == MSG_SET || msgType == MSG_SETCONSTRAINT;
+        return IsMSGSetType(msgType) || IsMSGResetType(msgType);
+    }
+
+    static constexpr bool IsTwainDSM2(long DSMType) noexcept
+    {
+        return DSMType == DTWAIN_TWAINDSM_VERSION2 ||
+               DSMType == DTWAIN_TWAINDSM_LATESTVERSION;
+    }
+
+    static constexpr std::pair<std::array<const char*, 4>, int> GetContainerNamesFromType(int nType) noexcept
+    {
+        using arrayret_type = std::array<const char*, 4>;
+        using arrayintret_type = std::pair<arrayret_type, int>;
+        using arrayall_type = std::array<arrayintret_type, 16>;
+        
+        constexpr arrayall_type retValues = {{
+            {{""},0},
+            {{"TW_ARRAY"},1},
+            {{"TW_ENUMERATION"},1},
+            {{"TW_ARRAY", "TW_ENUMERATION"},2},
+            {{"TW_ONEVALUE"},1},
+            {{"TW_ONEVALUE", "TW_ARRAY"}, 2},
+            {{"TW_ONEVALUE", "TW_ENUMERATION"}, 2},
+            {{"TW_ONEVALUE", "TW_ENUMERATION", "TW_ARRAY"}, 3},
+            {{"TW_RANGE"}, 1},
+            {{"TW_ARRAY", "TW_RANGE"}, 2},
+            {{"TW_ENUMERATION", "TW_RANGE"}, 2},
+            {{"TW_ARRAY", "TW_ENUMERATION", "TW_RANGE"}, 3},
+            {{"TW_ONEVALUE", "TW_RANGE"}, 2},
+            {{"TW_ARRAY", "TW_ONEVALUE", "TW_RANGE"}, 3},
+            {{"TW_ONEVALUE", "TW_ENUMERATION", "TW_RANGE"}, 3},
+            {{"TW_ARRAY", "TW_ENUMERATION", "TW_ONEVALUE", "TW_RANGE"}, 4}
+            }};
+
+        auto nShifted = nType >> 3;
+        if (nShifted > 15)
+            nShifted = 0;
+        return retValues[nShifted];
+    }
+
+    static constexpr bool IsCapMaskOnGet(TW_UINT16 Cap, TW_UINT16 GetType) noexcept
+    {
+        return (GetCapMaskFromCap(Cap) & GetType);
+    }
+
+
+    static constexpr bool IsCapMaskOnSet(TW_UINT16 Cap, TW_UINT16 SetType) noexcept
+    {
+        return (GetCapMaskFromCap(Cap) & SetType);
+    }
+
+    static constexpr std::array<int, 3> GetDTWAINDLLVersionInfo() noexcept
+    {
+        constexpr std::array<int, 3> aDLLVersion = { DTWAIN_MAJOR_VERSION,DTWAIN_MINOR_VERSION, DTWAIN_PATCHLEVEL_VERSION };
+        return aDLLVersion;
+    }
+
+    static constexpr LONG GetDTWAINVersionType() noexcept
+    {
+        LONG lVersionType = 0;
+        #ifdef UNICODE
+            lVersionType |= DTWAIN_UNICODE_VERSION;
+        #endif
+
+        #ifdef DTWAIN_DEBUG
+            lVersionType |= DTWAIN_DEVELOP_VERSION;
+        #endif
+
+        #if defined (WIN64) || defined(_WIN64)
+            lVersionType |= DTWAIN_64BIT_VERSION;
+            #else
+            #if defined (WIN32) || defined(_WIN32)
+                lVersionType |= DTWAIN_32BIT_VERSION;
+            #endif
+        #endif
+
+        #ifdef DTWAIN_DEVELOP_DLL
+            lVersionType |= DTWAIN_DEVELOP_VERSION;
+        #endif
+
+        #if DTWAIN_BUILD_LOGCALLSTACK == 1
+            lVersionType |= DTWAIN_CALLSTACK_LOGGING;
+        #endif
+
+        #if DTWAIN_BUILD_LOGCALLSTACK == 1 && DTWAIN_BUILD_LOGPOINTERS == 1
+            lVersionType |= DTWAIN_CALLSTACK_LOGGING_PLUS;
+        #endif
+            return lVersionType;
     }
 };
+
 #endif
