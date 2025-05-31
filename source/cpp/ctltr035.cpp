@@ -29,7 +29,7 @@ CTL_CapabilityQueryTriplet::CTL_CapabilityQueryTriplet(CTL_ITwainSession *pSessi
                        :
                        CTL_CapabilityGetOneValTriplet(pSession,
                                              pSource,
-                                             CTL_GetTypeQUERYSUPPORT,
+                                             MSG_QUERYSUPPORT,
                                              gCap,
                                              TwainType)
 {

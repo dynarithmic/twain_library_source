@@ -83,16 +83,17 @@ LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringEx(LPCTSTR lpOrigString, LPTSTR lpOut
     CATCH_BLOCK(0)
 }
 
-std::string dynarithmic::TruncateStringWithMore(const std::string& origString, size_t maxLen)
+std::string dynarithmic::TruncateStringWithMore(std::string_view origString, size_t maxLen)
 {
     // Truncate if text is too long
     if (origString.size() > maxLen)
     {
         // Get the "More" text
         std::string MoreText = "...(" + GetResourceStringFromMap(IDS_LOGMSG_MORETEXT) + ")...";
+        std::string origStringS = origString.data();
 
 		// Get original string and resize it
-		auto tempS = origString.substr(0, maxLen);
+		std::string tempS = origStringS.substr(0, maxLen);
 
         // Add the "More" text
         tempS += MoreText;
@@ -101,5 +102,5 @@ std::string dynarithmic::TruncateStringWithMore(const std::string& origString, s
     }
 
     // Just return the original string
-    return origString;
+    return origString.data();
 }

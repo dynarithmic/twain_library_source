@@ -66,31 +66,31 @@ namespace dynarithmic
         return result;
     }
 
-    std::string CBaseLogger::applyDecoration(const std::string& msg)
+    std::string CBaseLogger::applyDecoration(std::string_view msg)
     {
-        std::string total = getTime() + getThreadID() + msg;
+        std::string total = getTime() + getThreadID() + msg.data();
         if (total.back() != '\n')
             total += '\n';
         return total;
     }
 
-    void CBaseLogger::generic_outstream(std::ostream& os, const std::string& msg)
+    void CBaseLogger::generic_outstream(std::ostream& os, std::string_view msg)
     {
         os << msg << '\n';
     }
 
-    void StdCout_Logger::trace(const std::string& msg)
+    void StdCout_Logger::trace(std::string_view msg)
     {
-        std::cout << applyDecoration(msg).c_str();
+        std::cout << applyDecoration(msg);
     }
 
     #ifdef _WIN32
-    void DebugMonitor_Logger::trace(const std::string& msg) 
+    void DebugMonitor_Logger::trace(std::string_view msg)
     { 
         OutputDebugStringA(applyDecoration(msg).c_str());
     }
     #else
-    void DebugMonitor_Logger::trace(const std::string& msg) { generic_outstream(std::cout, applyDecoration()); }
+    void DebugMonitor_Logger::trace(std::string_view ) { generic_outstream(std::cout, applyDecoration()); }
     #endif
 
     File_Logger::File_Logger(const LPCSTR filename, const LoggingTraits& fTraits)
@@ -124,10 +124,10 @@ namespace dynarithmic
         }
     }
 
-    void File_Logger::trace(const std::string& msg)
+    void File_Logger::trace(std::string_view msg)
     {
         if (m_ostr)
-            generic_outstream(m_ostr, getTime() + getThreadID() + msg);
+            generic_outstream(m_ostr, getTime() + getThreadID() + msg.data());
     }
 
     BOOL StdCout_Logger::ConsoleCtrlHandler(DWORD dwCtrlType)
@@ -158,13 +158,13 @@ namespace dynarithmic
     }
 }
 
-void Callback_Logger::trace(const std::string& msg)
+void Callback_Logger::trace(std::string_view msg)
 {
     // We have to convert the string to native format, since the user-defined logger handles both wide and non-wide
     // character strings
     if (UserDefinedLoggerExists(m_pHandle))
     {
-        auto fullMessage = getTime() + getThreadID() + msg;
+        auto fullMessage = getTime() + getThreadID() + msg.data();
         WriteUserDefinedLogMsgA(m_pHandle, fullMessage.c_str());
     }
 }
@@ -310,7 +310,7 @@ bool CLogSystem::StatusOutFast(LPCSTR fmt)
     return true;
 }
 
-bool CLogSystem::WriteOnDemand(const std::string& fmt)
+bool CLogSystem::WriteOnDemand(std::string_view fmt)
 {
     std::lock_guard<std::mutex> g(s_logMutex);
     for (const auto& m : app_logger_map)
@@ -324,29 +324,29 @@ bool CLogSystem::Flush()
 }
 /////////////////////////////////////////////////////////////////////////////
 
-std::string CLogSystem::GetBaseName(const std::string& path) const
+std::string CLogSystem::GetBaseName(std::string_view path) const
 {
     StringArray rArray;
-    StringWrapperA::SplitPath(path, rArray);
+    StringWrapperA::SplitPath(path.data(), rArray);
     return rArray[StringWrapper::NAME_POS];
 }
 
 /////////////////////////////////////////////////////////////////////////////
 
-std::string CLogSystem::GetBaseDir(const std::string& path) const
+std::string CLogSystem::GetBaseDir(std::string_view path) const
 {
     StringArray rArray;
-    StringWrapperA::SplitPath(path, rArray);
+    StringWrapperA::SplitPath(path.data(), rArray);
     return rArray[StringWrapper::DIRECTORY_POS];
 }
 
-void CLogSystem::OutputDebugStringFull(const std::string& s)
+void CLogSystem::OutputDebugStringFull(std::string_view s)
 {
     for (const auto& m : app_logger_map)
         m.second->trace(s);
 }
 
-std::string CLogSystem::GetDebugStringFull(const std::string& s)
+std::string CLogSystem::GetDebugStringFull(std::string_view s)
 {
     std::ostringstream strm;
     if ( m_csAppName.empty() )

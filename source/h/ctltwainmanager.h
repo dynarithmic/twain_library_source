@@ -24,6 +24,7 @@
 #include <memory>
 #include <map>
 #include <string>
+#include <string_view>
 #include "ctlobstr.h"
 #include "ctlarray.h"
 #include "ctltwainsession.h"
@@ -98,18 +99,7 @@ namespace dynarithmic
             // this DLL will get its own session.
             static CTL_ITwainSession* CreateTwainSession(CTL_TwainDLLHandle* pHandle,
                                              LPCTSTR pAppName = nullptr,
-                                             HWND* hAppWnd = nullptr,
-                                             TW_UINT16 nMajorNum    = 1,
-                                             TW_UINT16 nMinorNum    = 0,
-                                             CTL_TwainLanguageEnum nLanguage  =
-                                             TwainLanguage_USAENGLISH,
-                                             CTL_TwainCountryEnum nCountry   =
-                                             TwainCountry_USA,
-                                             LPCTSTR lpszVersion  = _T("<?>"),
-                                             LPCTSTR lpszMfg      = _T("<?>"),
-                                             LPCTSTR lpszFamily   = _T("<?>"),
-                                             LPCTSTR lpszProduct  = _T("<?>")
-                                  );
+                                             HWND* hAppWnd = nullptr);
 
             static void DestroyTwainSession(const CTL_ITwainSession* pSession);
             static bool IsValidTwainSession(const CTL_ITwainSession* pSession);
@@ -165,7 +155,7 @@ namespace dynarithmic
             // Get capabilities for selected source
             static void GetCapabilities(const CTL_ITwainSource *pSource,CTL_TwainCapArray& rArray);
 
-            static constexpr bool IsCustomCapability(LONG nCap) { return nCap >= DTWAIN_CV_CAPCUSTOMBASE; }
+            static constexpr bool IsCustomCapability(LONG nCap) { return nCap >= CAP_CUSTOMBASE; }
 
             static void GetExtendedCapabilities(const CTL_ITwainSource *pSource, CTL_IntArray& rArray);
 
@@ -183,13 +173,12 @@ namespace dynarithmic
 
             static void SetPixelAndBitDepth(const CTL_ITwainSource *pSource);
             static bool IsSourceOpen( const CTL_ITwainSource *pSource );
-            static void GetPixelTypes( const CTL_ITwainSource *pSource, CTL_IntArray & rArray );
             static CTL_TwainUnitEnum GetCurrentUnitMeasure(const CTL_ITwainSource *pSource);
             static void GetCompressionTypes( const CTL_ITwainSource *pSource, CTL_IntArray & rArray );
             static void GetUnitTypes( const CTL_ITwainSource *pSource, CTL_IntArray & rArray );
             static bool GetImageLayoutSize(const CTL_ITwainSource* pSource, CTL_RealArray& rArray, TW_UINT16 GetType);
             static bool SetImageLayoutSize(const CTL_ITwainSource* pSource, const CTL_RealArray& rArray, CTL_RealArray& rActual,
-                                             CTL_EnumSetType SetType);
+                                             TW_UINT16 SetType);
 
             static bool StoreImageLayout(CTL_ITwainSource* pSource);
             static bool IsFeederLoaded( const CTL_ITwainSource *pSource );
@@ -207,14 +196,14 @@ namespace dynarithmic
             static bool IsProgressIndicatorOn(const CTL_ITwainSource* pSource);
             static bool IsJobControlSupported( const CTL_ITwainSource *pSource, TW_UINT16& nValue );
 
-            static void     SetError(int nError, const std::string& extraInfo, bool bMustReportGeneralError);
+            static void     SetError(int nError, std::string_view extraInfo, bool bMustReportGeneralError);
             static int      GetLastError();
             static int      GetLastTwainError();
             static int      GetLastConditionCodeError();
 
             static LPSTR    GetLastErrorString(LPSTR lpszBuffer, int nSize);
             static LPSTR    GetErrorString(int nError, LPSTR lpszBuffer, int nSize);
-            static void     SetAndLogError(int nError, const std::string& extraInfo, bool bMustReportGeneralError);
+            static void     SetAndLogError(int nError, std::string_view extraInfo, bool bMustReportGeneralError);
 
             static void     SetDLLInstance(HINSTANCE hDLLInstance);
             // Generic capability setting functions
@@ -229,7 +218,7 @@ namespace dynarithmic
             static int  FindConditionCode(TW_UINT16 nCode);
             static bool IsCapabilitySupported(const CTL_ITwainSource *pSource,
                                               TW_UINT16 nCap,
-                                              int nType=CTL_GetTypeGET);
+                                              int nType=MSG_GET);
 
             static bool IsCapabilitySupported(const CTL_ITwainSource *pSource,
                                               TW_UINT16 nCap,
@@ -239,7 +228,7 @@ namespace dynarithmic
             static bool GetOneTwainCapValue( const CTL_ITwainSource *pSource,
                                              void *pValue,
                                              TW_UINT16 Cap,
-                                             CTL_EnumGetType GetType,
+                                             TW_UINT16 GetType,
                                              TW_UINT16 nDataType );
 
             static bool GetOneCapValue(const CTL_ITwainSource *pSource,
@@ -251,17 +240,14 @@ namespace dynarithmic
                                                          TW_UINT16 rc);
 
             static TW_UINT16 GetMemXferValues(CTL_ITwainSource *pSource, TW_SETUPMEMXFER *pXfer);
-            static bool IsCapMaskOn( CTL_EnumCapability Cap, CTL_EnumGetType GetType);
-            static bool IsCapMaskOn( CTL_EnumCapability Cap, CTL_EnumSetType SetType);
             static bool IsSourceCompliant( const CTL_ITwainSource *pSource,
                                            CTL_EnumTwainVersion TVersion,
                                            CTL_TwainCapArray & rArray);
             static std::string  GetCapNameFromCap( LONG Cap );
-            static int          GetDataTypeFromCap( CTL_EnumCapability Cap, CTL_ITwainSource *pSource=nullptr);
-            static UINT         GetContainerTypesFromCap( CTL_EnumCapability Cap, bool nType );
+            static int          GetDataTypeFromCap( TW_UINT16  Cap, CTL_ITwainSource *pSource=nullptr);
+            static UINT         GetContainerTypesFromCap( TW_UINT16  Cap, bool nType );
             static LONG DoCapContainerTest(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, TW_UINT16 nCap, LONG lGetType);
 
-            static void         GetContainerNamesFromType( int nType, StringArray &rArray );
             static void         EndTwainUI(const CTL_ITwainSession* pSession, CTL_ITwainSource* pSource);
 
             static int          CopyFile(CTL_StringType strIn, CTL_StringType strOut);
@@ -277,13 +263,15 @@ namespace dynarithmic
                                                       bool leaveLoaded = false,
                                                       boost::dll::shared_library* pModule = nullptr);
             static CTL_StringType GetTwainDirFullNameEx(LPCTSTR szTwainDLLName,
-                                                      bool leaveLoaded = false,
-                                                      boost::dll::shared_library* pModule = nullptr);
+                                                        LPLONG pWhichSearch, 
+                                                        bool leaveLoaded = false,
+                                                        boost::dll::shared_library* pModule = nullptr);
 
             static CTL_CapStruct GetGeneralCapInfo(LONG Cap);
             static bool GetCurrentOneCapValue(const CTL_ITwainSource *pSource, void *pValue, TW_UINT16 Cap, TW_UINT16 nDataType );
             static CTL_StringType GetDSMPath();
             static CTL_StringType GetDSMVersionInfo();
+            static LONG GetDSMPathLocation();
             auto GetDSMModuleHandle() const { return m_hLibModule.native(); }
             static SourceToXferReadyMap& GetSourceToXferReadyMap() { return s_SourceToXferReadyMap; }
             static SourceToXferReadyList& GetSourceToXferReadyList() { return s_SourceToXferReadyList; }
@@ -431,7 +419,7 @@ namespace dynarithmic
                        {
                            pGetTriplet = std::make_unique<CTL_CapabilityGetArrayTriplet>(pSession,
                                pTempSource,
-                               CTL_GetTypeGET,
+                               static_cast<TW_UINT16>(MSG_GET),
                                Cap, nDataType);
                        }
                        break;
@@ -440,7 +428,7 @@ namespace dynarithmic
                        {
                            pGetTriplet = std::make_unique<CTL_CapabilityGetEnumTriplet>( pSession,
                                                pTempSource,
-                                               CTL_GetTypeGET,
+                                               static_cast<TW_UINT16>(MSG_GET),
                                                Cap,
                                                nDataType);
                        }
@@ -450,7 +438,7 @@ namespace dynarithmic
                        {
                            pGetTriplet = std::make_unique<CTL_CapabilityGetRangeTriplet>( pSession,
                                                pTempSource,
-                                               CTL_GetTypeGET,
+                                               static_cast<TW_UINT16>(MSG_GET),
                                                Cap,nDataType);
                        }
                        break;
@@ -472,7 +460,7 @@ namespace dynarithmic
             void OpenLogFile(LPCSTR lpszFile);
             void CloseLogFile();
             CTL_TwainDLLHandle* GetDLLHandle() const { return m_pDLLHandle; }
-            static bool SetDependentCaps( const CTL_ITwainSource *pSource, CTL_EnumCapability Cap );
+            static bool SetDependentCaps( const CTL_ITwainSource *pSource, TW_UINT16  Cap );
             static void EnumNoTimeoutTriplets();
             static CTL_TwainSessionArray::iterator FindSession(const CTL_ITwainSession* pSession);
 
@@ -481,6 +469,7 @@ namespace dynarithmic
                                                                 // session
             CTL_StringType  m_strTwainDSMPath;   // Twain DLL path
             CTL_StringType  m_strTwainDSMVersionInfo; // TWAIN DLL version information
+            LONG            m_nTwainDSMFoundPath = -1; // Constant denoting where the Twain DSM was found
             boost::dll::shared_library m_hLibModule;         // Twain DLL module handle
             DSMENTRYPROC    m_lpDSMEntry;        // Proc entry point for DSM_ENTRY
             TW_UINT16       m_nErrorTWRC;

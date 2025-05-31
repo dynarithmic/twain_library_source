@@ -51,7 +51,7 @@ std::pair<CTL_TwainDLLHandle*, OCREngine*> dynarithmic::VerifyOCRHandles(DTWAIN_
     if (OCREngineExists(pHandle, pEngine))
         return { pHandle, pEngine };
     pHandle->m_lLastError = DTWAIN_ERR_OCR_INVALIDENGINE;
-    throw DTWAIN_ERR_OCR_INVALIDENGINE;
+    throw DTWAINException(DTWAIN_ERR_OCR_INVALIDENGINE);
 }
 
 std::pair<CTL_TwainDLLHandle*, OCREngine*> dynarithmic::VerifyOCRHandlesEx(DTWAIN_OCRENGINE Engine)
@@ -60,7 +60,7 @@ std::pair<CTL_TwainDLLHandle*, OCREngine*> dynarithmic::VerifyOCRHandlesEx(DTWAI
     if (Engine)
         return { pHandle, pEngine };
     pHandle->m_lLastError = DTWAIN_ERR_OCR_INVALIDENGINE;
-    throw DTWAIN_ERR_OCR_INVALIDENGINE;
+    throw DTWAINException(DTWAIN_ERR_OCR_INVALIDENGINE);
 }
 
 HANDLE DLLENTRY_DEF DTWAIN_GetOCRText(DTWAIN_OCRENGINE Engine,

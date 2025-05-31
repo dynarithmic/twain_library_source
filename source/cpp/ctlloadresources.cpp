@@ -20,6 +20,7 @@
  */
 #include <sstream>
 #include <boost/format.hpp>
+#include <string_view>
 #include "ctliface.h"
 #include "ctlloadresources.h"
 
@@ -153,7 +154,7 @@ namespace dynarithmic
         int structtype, retcode, successcode;
         auto sPath = createResourceFileName(DTWAINRESOURCEINFOFILE);
         retValue.resourcePath = sPath;
-        auto sPathA = StringConversion::Convert_Native_To_Ansi(sPath);
+        auto sPathA = StringConversion::Convert_Native_To_Ansi(sPath, sPath.length());
         StringWrapperA::traits_type::inputfile_type ifs(sPathA);
         retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_LOADED] = ifs ? true : false;
         
@@ -357,7 +358,10 @@ namespace dynarithmic
 
                 // Get all the names associated with this constant
                 std::vector<std::string> saNames;
-                StringWrapperA::Tokenize(name, ", ", saNames);
+                if (twainValue == IDS_DTWAIN_APPTITLE)
+                    saNames.push_back(name);
+                else
+                    StringWrapperA::Tokenize(name, ", ", saNames);
                 iter->second.insert({twainValue, saNames});
                 if (stringToConstantMap.find(name) != stringToConstantMap.end())
                 {
@@ -559,7 +563,7 @@ namespace dynarithmic
     {
         std::vector<std::string> ret;
         const auto sPath = createResourceFileName(DTWAINLANGRESOURCENAMESFILE);
-        const std::string sPathA = StringConversion::Convert_Native_To_Ansi(sPath);
+        const std::string sPathA = StringConversion::Convert_Native_To_Ansi(sPath, sPath.length());
         std::ifstream ifs(sPathA);
         if (!ifs)
             return ret;
@@ -654,7 +658,7 @@ namespace dynarithmic
         return;
     }
 
-    static bool LoadLanguageResourceFromFileA(const char* szLangName, const std::string& sPath, bool clearEntry, bool bIsCustom)
+    static bool LoadLanguageResourceFromFileA(const char* szLangName, std::string_view sPath, bool clearEntry, bool bIsCustom)
     {
         auto& allLanguages = CTL_StaticData::GetAllLanguagesResourceMap();
 
@@ -672,7 +676,7 @@ namespace dynarithmic
         }
 
         // Create an empty map
-        std::ifstream ifs(sPath);
+        std::ifstream ifs(sPath.data());
         bool open = false;
         if (ifs)
         {
@@ -754,7 +758,7 @@ namespace dynarithmic
         return sPathA + lpszName + (std::string)".txt";
     }
 
-    bool LoadLanguageResourceA(LPCSTR lpszName, const CTL_ResourceRegistryMap& registryMap, bool bClear)
+    bool LoadLanguageResourceA(const char* lpszName, const CTL_ResourceRegistryMap& registryMap, bool bClear)
     {
         LOG_FUNC_ENTRY_PARAMS((lpszName))
         const auto iter = registryMap.find(lpszName);
@@ -779,7 +783,7 @@ namespace dynarithmic
         CATCH_BLOCK(false)
     }
 
-    bool LoadLanguageResourceA(LPCSTR lpszName, bool bClear)
+    bool LoadLanguageResourceA(const char* lpszName, bool bClear)
     {
         LOG_FUNC_ENTRY_PARAMS((lpszName))
         bool bReturn = LoadLanguageResourceFromFileA(lpszName, GetResourceFileNameA(lpszName, DTWAINLANGRESOURCEFILE), bClear, false);
@@ -788,14 +792,14 @@ namespace dynarithmic
         CATCH_BLOCK(false)
     }
 
-    bool LoadLanguageResourceA(const std::string& lpszName, const CTL_ResourceRegistryMap& registryMap, bool bClear)
+    bool LoadLanguageResourceA(std::string_view lpszName, const CTL_ResourceRegistryMap& registryMap, bool bClear)
     {
-        return LoadLanguageResourceA(lpszName.c_str(), registryMap, bClear);
+        return LoadLanguageResourceA(lpszName.data(), registryMap, bClear);
     }
 
-    bool LoadLanguageResourceA(const std::string& lpszName, bool bClear)
+    bool LoadLanguageResourceA(std::string_view lpszName, bool bClear)
     {
-        return LoadLanguageResourceA(lpszName.c_str(), bClear);
+        return LoadLanguageResourceA(lpszName.data(), bClear);
     }
 
     bool LoadLanguageResourceXML(LPCTSTR sLangDLL)

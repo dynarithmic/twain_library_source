@@ -116,7 +116,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
         if (thisCapInfo != allCapInfo.end())
         {
             auto& capData = thisCapInfo->second;
-            CTL_CapInfo Info(static_cast<CTL_EnumCapability>(nCap),
+            CTL_CapInfo Info(static_cast<TW_UINT16 >(nCap),
                 capData.m_nGetContainer, capData.m_nSetContainer, capData.m_nDataType, 0, capData.m_nGetCurrentContainer,
                 capData.m_nGetDefaultContainer, capData.m_nSetConstraintContainer, capData.m_nResetContainer, capData.m_nQuerySupportContainer);
             pArray->insert(make_pair(nCap, Info));
@@ -124,7 +124,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_CacheCapabilityInfo(CTL_ITwainSource *pSource, C
         else
         {
             // This is probably a custom capability
-            CTL_CapInfo Info(static_cast<CTL_EnumCapability>(nCap), 0, 0, 0, 0, 0, 0, 0, 0, 0);
+            CTL_CapInfo Info(static_cast<TW_UINT16 >(nCap), 0, 0, 0, 0, 0, 0, 0, 0, 0);
             pArray->insert(make_pair(nCap, Info));
         }
 

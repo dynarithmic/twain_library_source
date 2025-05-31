@@ -64,31 +64,31 @@ bool CTL_ITwainSource::IsSourceCompliant(CTL_EnumTwainVersion TVersion, CTL_Twai
     switch (TVersion)
     {
         case CTL_TwainVersion15:
-            Array.push_back( DTWAIN_CV_CAPXFERCOUNT );
-            Array.push_back( DTWAIN_CV_ICAPCOMPRESSION );
-            Array.push_back( DTWAIN_CV_ICAPPIXELTYPE );
-            Array.push_back( DTWAIN_CV_ICAPUNITS );
-            Array.push_back( DTWAIN_CV_ICAPXFERMECH );
+            Array.push_back( CAP_XFERCOUNT );
+            Array.push_back( ICAP_COMPRESSION );
+            Array.push_back( ICAP_PIXELTYPE );
+            Array.push_back( ICAP_UNITS );
+            Array.push_back( ICAP_XFERMECH );
         break;
 
         case CTL_TwainVersion16:
         case CTL_TwainVersion17:
         case CTL_TwainVersion18:
-            Array.push_back( DTWAIN_CV_CAPXFERCOUNT );
-            Array.push_back( DTWAIN_CV_ICAPCOMPRESSION );
-            Array.push_back( DTWAIN_CV_ICAPPIXELTYPE );
-            Array.push_back( DTWAIN_CV_ICAPUNITS );
-            Array.push_back( DTWAIN_CV_ICAPXFERMECH );
-            Array.push_back( DTWAIN_CV_CAPSUPPORTEDCAPS );
-            Array.push_back( DTWAIN_CV_CAPUICONTROLLABLE );
-            Array.push_back( DTWAIN_CV_ICAPPLANARCHUNKY );
-            Array.push_back( DTWAIN_CV_ICAPPHYSICALHEIGHT );
-            Array.push_back( DTWAIN_CV_ICAPPHYSICALWIDTH );
-            Array.push_back( DTWAIN_CV_ICAPBITDEPTH );
-            Array.push_back( DTWAIN_CV_ICAPBITORDER );
-            Array.push_back( DTWAIN_CV_ICAPXRESOLUTION );
-            Array.push_back( DTWAIN_CV_ICAPYRESOLUTION );
-            Array.push_back(DTWAIN_CV_ICAPPIXELFLAVOR);
+            Array.push_back( CAP_XFERCOUNT );
+            Array.push_back( ICAP_COMPRESSION );
+            Array.push_back( ICAP_PIXELTYPE );
+            Array.push_back( ICAP_UNITS );
+            Array.push_back( ICAP_XFERMECH );
+            Array.push_back( CAP_SUPPORTEDCAPS );
+            Array.push_back( CAP_UICONTROLLABLE );
+            Array.push_back( ICAP_PLANARCHUNKY );
+            Array.push_back( ICAP_PHYSICALHEIGHT );
+            Array.push_back( ICAP_PHYSICALWIDTH );
+            Array.push_back( ICAP_BITDEPTH );
+            Array.push_back( ICAP_BITORDER );
+            Array.push_back( ICAP_XRESOLUTION );
+            Array.push_back( ICAP_YRESOLUTION );
+            Array.push_back(ICAP_PIXELFLAVOR);
         break;
         default:
             break;
@@ -100,33 +100,33 @@ bool CTL_ITwainSource::IsSourceCompliant(CTL_EnumTwainVersion TVersion, CTL_Twai
         int nValue = 0;
         const int nMask = GetCapMaskFromCap(Cap);
 
-        if (CTL_TwainAppMgr::IsCapMaskOn(Cap, static_cast<CTL_EnumGetType>(CTL_CapMaskGET)))
+        if (IsCapMaskOnGet(Cap, static_cast<TW_UINT16>(CTL_CapMaskGET)))
         {
-            bIsCompliant = CTL_TwainAppMgr::IsCapabilitySupported(this, Cap, CTL_GetTypeGET);
+            bIsCompliant = CTL_TwainAppMgr::IsCapabilitySupported(this, Cap, MSG_GET);
             if (bIsCompliant)
                 nValue |= CTL_CapMaskGET;
         }
 
-        if (CTL_TwainAppMgr::IsCapMaskOn(Cap, static_cast<CTL_EnumGetType>(CTL_CapMaskGETCURRENT)))
+        if (IsCapMaskOnGet(Cap, static_cast<TW_UINT16>(CTL_CapMaskGETCURRENT)))
         {
-            bIsCompliant = CTL_TwainAppMgr::IsCapabilitySupported(this, Cap, CTL_GetTypeGETCURRENT);
+            bIsCompliant = CTL_TwainAppMgr::IsCapabilitySupported(this, Cap, MSG_GETCURRENT);
             if (bIsCompliant)
                 nValue |= CTL_CapMaskGETCURRENT;
         }
 
-        if (CTL_TwainAppMgr::IsCapMaskOn(Cap, static_cast<CTL_EnumGetType>(CTL_CapMaskGETDEFAULT)))
+        if (IsCapMaskOnGet(Cap, static_cast<TW_UINT16>(CTL_CapMaskGETDEFAULT)))
         {
-            bIsCompliant = CTL_TwainAppMgr::IsCapabilitySupported(this, Cap, CTL_GetTypeGETDEFAULT);
+            bIsCompliant = CTL_TwainAppMgr::IsCapabilitySupported(this, Cap, MSG_GETDEFAULT);
             if (bIsCompliant)
                 nValue |= CTL_CapMaskGETDEFAULT;
         }
 
-        if (CTL_TwainAppMgr::IsCapMaskOn(Cap, static_cast<CTL_EnumSetType>(CTL_CapMaskSET)))
+        if (IsCapMaskOnSet(Cap, static_cast<TW_UINT16>(CTL_CapMaskSET)))
         {
             nValue |= CTL_CapMaskSET;
         }
 
-        if (CTL_TwainAppMgr::IsCapMaskOn(Cap, static_cast<CTL_EnumSetType>(CTL_CapMaskRESET)))
+        if (IsCapMaskOnSet(Cap, static_cast<TW_UINT16>(CTL_CapMaskRESET)))
         {
             nValue |= CTL_CapMaskRESET;
         }
@@ -725,42 +725,42 @@ void CTL_ITwainSource::SetCapCacheValue(LONG lCap, double dValue, bool bTurnOn)
 {
     switch (lCap)
     {
-        case DTWAIN_CV_ICAPBRIGHTNESS:
+        case ICAP_BRIGHTNESS:
             CapCacheInfo.Brightness     = dValue;
             CapCacheInfo.UseBrightness  = bTurnOn;
             return;
 
-        case DTWAIN_CV_ICAPCONTRAST:
+        case ICAP_CONTRAST:
             CapCacheInfo.Contrast     = dValue;
             CapCacheInfo.UseContrast  = bTurnOn;
             return;
 
-        case DTWAIN_CV_ICAPXRESOLUTION:
+        case ICAP_XRESOLUTION:
             CapCacheInfo.XResolution   = dValue;
             CapCacheInfo.UseXResolution= bTurnOn;
             return;
 
-        case DTWAIN_CV_ICAPYRESOLUTION:
+        case ICAP_YRESOLUTION:
             CapCacheInfo.YResolution   = dValue;
             CapCacheInfo.UseYResolution= bTurnOn;
             return;
 
-        case DTWAIN_CV_ICAPPIXELFLAVOR:
+        case ICAP_PIXELFLAVOR:
             CapCacheInfo.PixelFlavor   = static_cast<int>(dValue);
             CapCacheInfo.UsePixelFlavor= bTurnOn;
             return;
 
-        case DTWAIN_CV_ICAPXNATIVERESOLUTION:
+        case ICAP_XNATIVERESOLUTION:
             CapCacheInfo.XNativeResolution   = dValue;
             CapCacheInfo.UseXNativeResolution= bTurnOn;
             return;
 
-        case DTWAIN_CV_ICAPPIXELTYPE:
+        case ICAP_PIXELTYPE:
             CapCacheInfo.PixelType = static_cast<int>(dValue);
             CapCacheInfo.UsePixelType = bTurnOn;
             return;
 
-        case DTWAIN_CV_ICAPBITDEPTH:
+        case ICAP_BITDEPTH:
             CapCacheInfo.BitDepth = static_cast<int>(dValue);
             CapCacheInfo.UseBitDepth = bTurnOn;
             return;
@@ -772,42 +772,42 @@ double CTL_ITwainSource::GetCapCacheValue(LONG lCap, LONG* pTurnOn) const
     double dValue = 0;
     switch (lCap)
     {
-        case DTWAIN_CV_ICAPBRIGHTNESS:
+        case ICAP_BRIGHTNESS:
             dValue = CapCacheInfo.Brightness;
             *pTurnOn = CapCacheInfo.UseBrightness;
             return dValue;
 
-        case DTWAIN_CV_ICAPCONTRAST:
+        case ICAP_CONTRAST:
             dValue = CapCacheInfo.Contrast;
             *pTurnOn = CapCacheInfo.UseContrast;
             return dValue;
 
-        case DTWAIN_CV_ICAPXRESOLUTION:
+        case ICAP_XRESOLUTION:
             dValue = CapCacheInfo.XResolution;
             *pTurnOn = CapCacheInfo.UseXResolution;
             return dValue;
 
-        case DTWAIN_CV_ICAPYRESOLUTION:
+        case ICAP_YRESOLUTION:
             dValue = CapCacheInfo.YResolution;
             *pTurnOn = CapCacheInfo.UseYResolution;
             return dValue;
 
-       case DTWAIN_CV_ICAPPIXELFLAVOR:
+       case ICAP_PIXELFLAVOR:
             dValue = static_cast<double>(CapCacheInfo.PixelFlavor);
             *pTurnOn = CapCacheInfo.UsePixelFlavor;
             return dValue;
 
-        case DTWAIN_CV_ICAPXNATIVERESOLUTION:
+        case ICAP_XNATIVERESOLUTION:
             dValue = CapCacheInfo.XNativeResolution;
             *pTurnOn = CapCacheInfo.UseXNativeResolution;
             return dValue;
 
-        case DTWAIN_CV_ICAPPIXELTYPE:
+        case ICAP_PIXELTYPE:
             dValue = static_cast<double>(CapCacheInfo.PixelType);
             *pTurnOn = CapCacheInfo.UsePixelType;
             return dValue;
 
-        case DTWAIN_CV_ICAPBITDEPTH:
+        case ICAP_BITDEPTH:
             dValue = static_cast<double>(CapCacheInfo.BitDepth);
             *pTurnOn = CapCacheInfo.UseBitDepth;
             return dValue;
@@ -966,12 +966,12 @@ void CTL_ITwainSource::SetPhotometric(LONG Setting)
 
 bool CTL_ITwainSource::InitExtImageInfo(int nNum)
 {
-    if ( !CTL_TwainAppMgr::IsCapabilitySupported(this, DTWAIN_CV_ICAPEXTIMAGEINFO) )
+    if ( !CTL_TwainAppMgr::IsCapabilitySupported(this, ICAP_EXTIMAGEINFO) )
         return false;
 
     TW_UINT16 nValue;
 
-    if ( !CTL_TwainAppMgr::GetOneCapValue( this, &nValue, TwainCap_EXTIMAGEINFO, TWTY_BOOL ) )
+    if ( !CTL_TwainAppMgr::GetOneCapValue( this, &nValue, ICAP_EXTIMAGEINFO, TWTY_BOOL ) )
         return false;
 
     if ( !nValue )
