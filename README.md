@@ -1,7 +1,9 @@
 # twain_library_source
 Dynarithmic TWAIN library source and development repository.
 
-This repository contains the source code and development versions of the Dynarithmic TWAIN Library DLL and PDB files.  
+This repository contains the source code and development versions of the Dynarithmic TWAIN Library DLL.  
+
+The Microsoft PDB files for the debug versions of the DTWAIN library can be found [here](https://github.com/dynarithmic/dtwain-pdb).
 
 ----
 
