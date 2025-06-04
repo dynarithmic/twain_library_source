@@ -59,6 +59,7 @@ void CTL_ITwainSource::SetActive(bool bSet)
 
 bool CTL_ITwainSource::IsSourceCompliant(CTL_EnumTwainVersion TVersion, CTL_TwainCapArray& rArray) const
 {
+#if 0
     CTL_TwainCapArray Array;
     rArray.clear();
     switch (TVersion)
@@ -138,6 +139,9 @@ bool CTL_ITwainSource::IsSourceCompliant(CTL_EnumTwainVersion TVersion, CTL_Twai
     if (!rArray.empty())
         return false;
     return true;
+#else
+    return true;
+#endif
 }
 
 
