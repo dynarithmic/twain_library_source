@@ -111,6 +111,7 @@ namespace dynarithmic
     {
         using char_type = char;
         using string_type = std::string;
+        using stringview_type = std::string_view;
         using stringarray_type = std::vector<string_type>;
         using outputstream_type = std::ostringstream;
         using inputstream_type = std::istringstream;
@@ -252,6 +253,7 @@ namespace dynarithmic
     {
         using char_type = wchar_t;
         using string_type = std::wstring;
+        using stringview_type = std::wstring_view;
         using stringarray_type = std::vector<string_type>;
         using outputstream_type = std::wostringstream;
         using inputstream_type = std::wistringstream;
@@ -780,21 +782,21 @@ namespace dynarithmic
             return StringTraits::Copy( pDest, pSrc );
         }
 
-        static void SplitPath(const StringType& str, StringArrayType & rArray)
+        static void SplitPath(typename StringTraits::stringview_type str, StringArrayType & rArray)
         {
             static constexpr int numComponents = 5;
-            typename StringTraits::FILESYSTEM_PATHTYPE p(str.c_str());
+            typename StringTraits::FILESYSTEM_PATHTYPE p(str);
             rArray.clear();
             if (str.empty())
             {
                 rArray.resize(numComponents);
                 return;
             }
-            rArray.push_back(StringTraits::PathGenericString(p.root_name()));
-            rArray.push_back(StringTraits::PathGenericString(p.root_directory()));
-            rArray.push_back(StringTraits::PathGenericString(p.parent_path()));
-            rArray.push_back(StringTraits::PathGenericString(p.stem()));
-            rArray.push_back(StringTraits::PathGenericString(p.extension()));
+            rArray.emplace_back(StringTraits::PathGenericString(p.root_name()));
+            rArray.emplace_back(StringTraits::PathGenericString(p.root_directory()));
+            rArray.emplace_back(StringTraits::PathGenericString(p.parent_path()));
+            rArray.emplace_back(StringTraits::PathGenericString(p.stem()));
+            rArray.emplace_back(StringTraits::PathGenericString(p.extension()));
             for (auto& name : rArray)
             {
                 if (!name.empty())
@@ -807,14 +809,14 @@ namespace dynarithmic
             }
         }
 
-        static StringArrayType SplitPath(const StringType& str)
+        static StringArrayType SplitPath(typename StringTraits::stringview_type str)
         {
             StringArrayType sArrType;
             SplitPath(str, sArrType);
             return sArrType;
         }
 
-        static StringType GetFileNameFromPath(const StringType& str)
+        static StringType GetFileNameFromPath(typename StringTraits::stringview_type str)
         {
             StringArrayType rArray;
             SplitPath(str, rArray);
@@ -827,17 +829,10 @@ namespace dynarithmic
                 return StringTraits::GetEmptyString();
             StringType s = rArray[NAME_POS] + rArray[EXTENSION_POS];
             const filesys::path dir(rArray[DIRECTORY_POS]);
-            const filesys::path file = s; //rArray[NAME_POS] + StringType(".") + rArray[EXTENSION_POS];
+            const filesys::path file = s; 
             filesys::path full_path = dir / file;
             s = StringTraits::PathGenericString(full_path);
             return s;
-            // std::vector<CharType> retStr(MAX_PATH, 0);
-            /*_tmakepath( &retStr[0], rArray[DRIVE_POS].c_str(),
-                                    rArray[DIRECTORY_POS].c_str(),
-                                    rArray[NAME_POS].c_str(),
-                                    rArray[EXTENSION_POS].c_str());*/
-
-            // return &retStr[0];
         }
 
         static StringType GetWindowsDirectory()
@@ -858,11 +853,11 @@ namespace dynarithmic
             return StringTraits::GetEmptyString();
         }
 
-        static StringType AddBackslashToDirectory(const StringType& pathName)
+        static StringType AddBackslashToDirectory(typename StringTraits::stringview_type pathName)
         {
             std::filesystem::path fsPath(pathName);
             fsPath /= StringTraits::GetEmptyString();
-            if constexpr (std::is_same_v<std::string, StringType>)
+            if constexpr (std::is_same_v<std::string_view, StringTraits::stringview_type>)
                 return fsPath.string();
             else
                 return fsPath.native();
@@ -992,7 +987,7 @@ namespace dynarithmic
 
         // If szInfo is nullptr, only the computed length is returned.
         // The length includes trailing null character.
-        static int32_t CopyInfoToCString(const StringType& strInfo, CharType* szInfo, int32_t nMaxLen)
+        static int32_t CopyInfoToCString(typename StringTraits::stringview_type strInfo, CharType* szInfo, int32_t nMaxLen)
         {
             if (strInfo.empty())
             {
