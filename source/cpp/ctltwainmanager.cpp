@@ -2174,6 +2174,7 @@ bool CTL_TwainAppMgr::IsSourceCompliant( const CTL_ITwainSource *pSource,
                                          CTL_EnumTwainVersion TVersion,
                                          CTL_TwainCapArray& rArray )
 {
+#if 0
     if ( !s_pGlobalAppMgr )
         return false;
 
@@ -2181,6 +2182,9 @@ bool CTL_TwainAppMgr::IsSourceCompliant( const CTL_ITwainSource *pSource,
         return false;
 
     return pSource->IsSourceCompliant( TVersion, rArray );
+#else
+    return true;
+#endif
 }
 
 #ifdef _WIN32
