@@ -40,9 +40,6 @@ namespace dynarithmic
         if (!CTL_StaticData::GetLogFilterFlags())
             return;
 
-        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_USECRLF)
-            std::string crlf = "\n";
-
         CTL_StaticData::GetLogger().StatusOutFast(s.data());
         if (bFlush)
             CTL_StaticData::GetLogger().Flush();
