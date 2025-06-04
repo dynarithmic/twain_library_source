@@ -899,7 +899,7 @@ am_cv_filesystem_timestamp_resolution=2
 # Don't try 1 sec, because if 0.01 sec and 0.1 sec don't work,
 # - 1 sec is not much of a win compared to 2 sec, and
 # - it takes 2 seconds to perform the test whether 1 sec works.
-#
+# 
 # Instead, just use the default 2s on platforms that have 1s resolution,
 # accept the extra 1s delay when using $sleep in the Automake tests, in
 # exchange for not incurring the 2s delay for running the test for all
@@ -972,7 +972,7 @@ for am_try_res in $am_try_resolutions; do
       # everything else supports the subsecond mtimes, but make doesn't;
       # notably on macOS, which ships make 3.81 from 2006 (the last one
       # released under GPLv2). https://bugs.gnu.org/68808
-      #
+      # 
       # We test $MAKE if it is defined in the environment, else "make".
       # It might get overridden later, but our hope is that in practice
       # it does not matter: it is the system "make" which is (by far)
@@ -1045,29 +1045,29 @@ esac
 # (eg FreeBSD returns the mod time of the symlink's containing
 # directory).
 am_build_env_is_sane=no
-   am_has_slept=no
+am_has_slept=no
 rm -f conftest.file
-   for am_try in 1 2; do
-     echo "timestamp, slept: $am_has_slept" > conftest.file
+for am_try in 1 2; do
+  echo "timestamp, slept: $am_has_slept" > conftest.file
   if (
-     set X `ls -Lt "$srcdir/configure" conftest.file 2> /dev/null`
+    set X `ls -Lt "$srcdir/configure" conftest.file 2> /dev/null`
     if test "$[]*" = "X"; then
-	# -L didn't work.
-	set X `ls -t "$srcdir/configure" conftest.file`
-     fi
+      # -L didn't work.
+      set X `ls -t "$srcdir/configure" conftest.file`
+    fi
     test "$[]2" = conftest.file
   ); then
     am_build_env_is_sane=yes
-       break
-     fi
-     # Just in case.
+    break
+  fi
+  # Just in case.
   sleep "$am_cv_filesystem_timestamp_resolution"
-     am_has_slept=yes
-   done
+  am_has_slept=yes
+done
 
 AC_MSG_RESULT([$am_build_env_is_sane])
 if test "$am_build_env_is_sane" = no; then
-   AC_MSG_ERROR([newly created file is older than distributed files!
+  AC_MSG_ERROR([newly created file is older than distributed files!
 Check your system clock])
 fi
 
@@ -1255,16 +1255,16 @@ m4_if([$1], [v7],
       if test x$am_uid = xunknown; then
         AC_MSG_WARN([ancient id detected; assuming current UID is ok, but dist-ustar might not work])
       elif test $am_uid -le $am_max_uid; then
-         AC_MSG_RESULT([yes])
+        AC_MSG_RESULT([yes])
       else
-         AC_MSG_RESULT([no])
-         _am_tools=none
+        AC_MSG_RESULT([no])
+        _am_tools=none
       fi
       AC_MSG_CHECKING([whether GID '$am_gid' is supported by ustar format])
       if test x$gm_gid = xunknown; then
         AC_MSG_WARN([ancient id detected; assuming current GID is ok, but dist-ustar might not work])
       elif test $am_gid -le $am_max_gid; then
-         AC_MSG_RESULT([yes])
+        AC_MSG_RESULT([yes])
       else
         AC_MSG_RESULT([no])
         _am_tools=none
