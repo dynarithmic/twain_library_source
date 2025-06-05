@@ -71,37 +71,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAvailablePrinters(DTWAIN_SOURCE Source, LONG 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPrinter(DTWAIN_SOURCE Source, LONG nPrinter, DTWAIN_BOOL bSetCurrent)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nPrinter, bSetCurrent))
-    if ( !DTWAIN_IsCapSupported(Source, CAP_PRINTER) )
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    auto pSource = static_cast<CTL_ITwainSource*>(Source);
-    auto pHandle = pSource->GetDTWAINHandle();
-    DTWAIN_ARRAY Array = CreateArrayFromCap(pHandle, nullptr, CAP_PRINTER, 1);
-    if ( !Array )
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    DTWAINArrayLowLevel_RAII a(pHandle, Array);
-
-    LONG SetType = DTWAIN_CAPSET;
-    if ( !bSetCurrent )
-        SetType = DTWAIN_CAPRESET;
-    bool bFound = false;
-    for ( LONG i = 0; i < 8; i++ )
-    {
-        if ( nPrinter >> i == 1L )
-        {
-            nPrinter = i;
-            bFound = true;
-            break;
-        }
-    }
-    bool bRet = false;
-    if ( bFound )
-    {
-        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
-        if ( !vValues.empty() )
-            vValues[0] = nPrinter;
-        bRet = DTWAIN_SetCapValuesEx2(Source, CAP_PRINTER, SetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array)?true:false;
-    }
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    auto retValue = DTWAIN_SetPrinterEx(Source, nPrinter, bSetCurrent);
+    LOG_FUNC_EXIT_NONAME_PARAMS(retValue)
     CATCH_BLOCK(false)
 }
 

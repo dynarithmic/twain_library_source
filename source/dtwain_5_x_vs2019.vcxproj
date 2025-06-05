@@ -1449,6 +1449,9 @@ copy $(TargetDir)$(TargetName).lib .
     </ClCompile>
     <ClCompile Include="cpp\arrayfactory.cpp" />
     <ClCompile Include="cpp\ctlacquireaudio.cpp" />
+    <ClCompile Include="cpp\ctlarraydumper.cpp" />
+    <ClCompile Include="cpp\ctlbufferstrip.cpp" />
+    <ClCompile Include="cpp\ctlcustomdsdata.cpp" />
     <ClCompile Include="cpp\ctlerrorbuffer.cpp" />
     <ClCompile Include="cpp\ctlerrorcallback.cpp" />
     <ClCompile Include="cpp\ctlextimageinfo.cpp" />
