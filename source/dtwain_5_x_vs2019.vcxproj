@@ -1392,7 +1392,6 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile Include=".\cpp\logmsg.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">false</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include=".\cpp\ctlxmlparse.cpp" />
     <ClCompile Include=".\cpp\a85decoder.cpp" />
     <ClCompile Include=".\cpp\ctltempdir.cpp" />
     <ClCompile Include=".\cpp\ocrengine\ocrinterface.cpp" />
