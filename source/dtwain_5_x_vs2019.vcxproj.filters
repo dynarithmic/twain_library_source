@@ -298,9 +298,6 @@
     <ClCompile Include=".\cpp\ctlverifysourcehandle.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include=".\cpp\ctlxmlparse.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include=".\cpp\imagefun\dtwpdf\dtwainpdf.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>

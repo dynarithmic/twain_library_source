@@ -802,16 +802,6 @@ namespace dynarithmic
         return LoadLanguageResourceA(lpszName.data(), bClear);
     }
 
-    bool LoadLanguageResourceXML(LPCTSTR sLangDLL)
-    {
-        // Load the XML version of the language resources
-        if ( !filesys::exists( sLangDLL))
-        {
-            return false;
-        }
-        return true;
-    }
-
     void UnloadStringResources()
     {
         CTL_StaticData::GetGeneralCapInfo().clear();
