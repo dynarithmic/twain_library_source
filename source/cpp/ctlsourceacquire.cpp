@@ -296,7 +296,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
         iter->second.m_CurrentCount = 0;
     }
     DTWAIN_ARRAY aAcquisitionArray = SourceAcquireWorkerThread(opts);
-    if (DTWAIN_GetTwainMode() == DTWAIN_MODELESS)
+    if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
     {
         LOG_FUNC_EXIT_NONAME_PARAMS(aAcquisitionArray)
     }
@@ -340,7 +340,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
     pDLLHandle->m_bSourceClosed = false;
     pDLLHandle->m_lLastError = 0;
 
-    if (DTWAIN_GetTwainMode() == DTWAIN_MODELESS)
+    if (pDLLHandle->m_lAcquireMode == DTWAIN_MODELESS)
     {
         Array = CreateArrayFromFactory(pDLLHandle, DTWAIN_ARRAYHANDLE, 0);
         a1.SetArray(Array);
