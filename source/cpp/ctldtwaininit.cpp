@@ -930,7 +930,7 @@ void LoadCustomResourcesFromIni(CTL_TwainDLLHandle* pHandle, LPCTSTR szLangDLL, 
         LPCSTR name;
         long orValue;
     };
-    static ProfileSettingsInt allIntProfiles[] = {
+    constexpr ProfileSettingsInt allIntProfiles[] = {
         { "DSMErrorLogging", "Decode_Identity1", DTWAIN_LOG_DECODE_SOURCE },
         { "DSMErrorLogging", "Decode_Identity2", DTWAIN_LOG_DECODE_DEST },
         { "DSMErrorLogging", "Decode_Data", DTWAIN_LOG_DECODE_TWMEMREF },

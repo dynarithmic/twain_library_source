@@ -45,6 +45,7 @@
 #include "cppfunc.h"
 #include "logwriterutils.h"
 #include "ctltripletbase.h"
+#include "ctlconstexprutils.h"
 using namespace dynarithmic;
 
 static constexpr std::array<std::pair<int, int>, 32> mapCondCode = { {
@@ -89,8 +90,6 @@ bool SetOneTwainCapValue( const CTL_ITwainSource *pSource,
                           TW_UINT16 TwainType = 0xFFFF)
 {
     auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
-
-    // Set the #transfer count
     auto pSession = pTempSource->GetTwainSession();
 
     if ( TwainType == 0xFFFF )
@@ -103,9 +102,6 @@ bool SetOneTwainCapValue( const CTL_ITwainSource *pSource,
                                            Cap,
                                            TwainType,
                                            { Value });
-
-    if ( !CTL_TwainAppMgr::IsSourceOpen( pTempSource ) )
-        return false;
 
     const TW_UINT16 rc = SetOne.Execute();
     return CTL_TwainAppMgr::ProcessReturnCodeOneValue(pTempSource, rc)?true:false;
@@ -1816,33 +1812,6 @@ std::vector<TW_UINT32> CTL_TwainAppMgr::EnumSupportedDATS(const CTL_ITwainSource
 void CTL_TwainAppMgr::SetPixelAndBitDepth(const CTL_ITwainSource * /*pSource*/)
 {}
 
-struct FindTriplet
-{
-    FindTriplet(RawTwainTriplet theTriplet) : m_Trip(theTriplet) { }
-    bool operator() (RawTwainTriplet trip) const
-    {
-        return std::tie(m_Trip.nDG, m_Trip.nDAT, m_Trip.nMSG) == std::tie(trip.nDG, trip.nDAT, trip.nMSG);
-    }
-    private:
-        RawTwainTriplet m_Trip;
-};
-
-void CTL_TwainAppMgr::EnumNoTimeoutTriplets()
-{
-    RawTwainTriplet  Trips[] = {
-        {DG_AUDIO, DAT_AUDIOFILEXFER, MSG_GET},
-        {DG_AUDIO, DAT_AUDIONATIVEXFER, MSG_GET},
-        {DG_CONTROL, DAT_USERINTERFACE, MSG_ENABLEDS},
-        {DG_CONTROL, DAT_USERINTERFACE, MSG_ENABLEDSUIONLY},
-        {DG_IMAGE, DAT_IMAGEFILEXFER, MSG_GET},
-        {DG_IMAGE, DAT_IMAGENATIVEXFER, MSG_GET},
-        {DG_IMAGE, DAT_IMAGEMEMXFER, MSG_GET}
-    };
-
-    constexpr int nItems = static_cast<int>(std::size(Trips));
-    std::copy_n(Trips, nItems, std::back_inserter(s_NoTimeoutTriplets));
-}
-
 ///////////////////////////////////////////////////////////////////////
 CTL_TwainUnitEnum CTL_TwainAppMgr::GetCurrentUnitMeasure(const CTL_ITwainSource *pSource)
 {
@@ -2237,7 +2206,6 @@ CTL_TwainAppMgr::CTL_TwainAppMgr(CTL_TwainDLLHandle *pHandle,
 
     // Record the instance
     m_Instance = hInstance;
-    EnumNoTimeoutTriplets();
     m_lpDSMEntry = nullptr;
 }
 
@@ -2519,13 +2487,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
     if ( CTL_StaticData::GetTimeoutValue() > 0 )
     {
         // Check if time out is to be applied to this triplet
-        RawTwainTriplet rtrip{};
-        rtrip.nDAT = nDAT;
-        rtrip.nDG = nDG;
-        rtrip.nMSG = nMSG;
-        if ( std::find_if(s_NoTimeoutTriplets.begin(),
-                                        s_NoTimeoutTriplets.end(),
-                                        FindTriplet(rtrip)) == s_NoTimeoutTriplets.end())
+        if (!IsTimeOutTripletIgnored({ nDG, nDAT, nMSG }))
         {
             CTL_StaticData::SetTimeoutID(SetTimer(nullptr, 0,
                                         CTL_StaticData::GetTimeoutValue(), reinterpret_cast<TIMERPROC>(
@@ -2699,7 +2661,6 @@ CTL_ITwainSession* CTL_TwainAppMgr::s_pSelectedSession = nullptr;
 int          CTL_TwainAppMgr::s_nLastError = 0;
 std::string  CTL_TwainAppMgr::s_strLastError;
 HINSTANCE    CTL_TwainAppMgr::s_ThisInstance = static_cast<HINSTANCE>(nullptr);
-std::vector<RawTwainTriplet> CTL_TwainAppMgr::s_NoTimeoutTriplets;
 SourceToXferReadyMap CTL_TwainAppMgr::s_SourceToXferReadyMap;
 SourceToXferReadyList CTL_TwainAppMgr::s_SourceToXferReadyList;
 SourceFlatbedOnlyList CTL_TwainAppMgr::s_SourceFlatbedOnlyList;
