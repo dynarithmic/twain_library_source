@@ -2482,20 +2482,6 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         SendTwainMsgToWindow(pTriplet.GetSessionPtr(), nullptr, DTWAIN_TN_TWAINTRIPLETBEGIN, 0);
     }
 
-    bool bTimeOutInEffect = false;
-    #ifdef _WIN32
-    if ( CTL_StaticData::GetTimeoutValue() > 0 )
-    {
-        // Check if time out is to be applied to this triplet
-        if (!IsTimeOutTripletIgnored({ nDG, nDAT, nMSG }))
-        {
-            CTL_StaticData::SetTimeoutID(SetTimer(nullptr, 0,
-                                        CTL_StaticData::GetTimeoutValue(), reinterpret_cast<TIMERPROC>(
-                                        TwainTimeOutProc)));
-            bTimeOutInEffect = true;
-        }
-    }
-    #endif
     try
     {
         // This is the actual low-level call to the TWAIN Data Source Manager 
@@ -2509,13 +2495,9 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
             // Send out that we have ended processing the TWAIN triplet
             SendTwainMsgToWindow(pTriplet.GetSessionPtr(), nullptr, DTWAIN_TN_TWAINTRIPLETEND, 0);
         }
-        // A memory exception occurred.  This is bad!
+        // An exception occurred.  This is bad!
         // Check what to do when this happens (possibly close DSM and start over?)
         // To do later...
-        #ifdef _WIN32
-        if ( bTimeOutInEffect )
-            KillTimer(nullptr, CTL_StaticData::GetTimeoutID());
-        #endif
         retcode = -DTWAIN_ERR_EXCEPTION_ERROR;
         if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_LOWLEVELTWAIN)
         {
@@ -2528,10 +2510,6 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         }
         return retcode;
     }
-    #ifdef _WIN32
-    if ( bTimeOutInEffect )
-        KillTimer(nullptr, CTL_StaticData::GetTimeoutID());
-    #endif
     if (m_pDLLHandle->m_bNotifyTripletsUsed)
     {
         // Send out that we have ended processing the TWAIN triplet
