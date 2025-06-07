@@ -185,8 +185,6 @@ namespace dynarithmic
             static int  TransferImage(const CTL_ITwainSource *pSource, int nImageNum=0);
             static bool SetFeederEnableMode( CTL_ITwainSource *pSource, bool bMode=true);
             static void NotifyFeederStatus();
-            static bool ShowProgressIndicator(const CTL_ITwainSource* pSource, bool bShow = true);
-            static bool IsProgressIndicatorOn(const CTL_ITwainSource* pSource);
             static bool IsJobControlSupported( const CTL_ITwainSource *pSource, TW_UINT16& nValue );
 
             static void     SetError(int nError, std::string_view extraInfo, bool bMustReportGeneralError);
@@ -453,7 +451,6 @@ namespace dynarithmic
             void OpenLogFile(LPCSTR lpszFile);
             void CloseLogFile();
             CTL_TwainDLLHandle* GetDLLHandle() const { return m_pDLLHandle; }
-            static bool SetDependentCaps( const CTL_ITwainSource *pSource, TW_UINT16  Cap );
             static CTL_TwainSessionArray::iterator FindSession(const CTL_ITwainSession* pSession);
 
             static TW_IDENTITY s_AppId;          // Twain Identity structure

@@ -82,32 +82,6 @@ static constexpr std::array<std::pair<int, int>, 32> mapCondCode = { {
     {-TWAIN_ERR_NULL_CONTAINER, TWAIN_ERR_NULL_CONTAINER},
     {-DTWAIN_ERR_EXCEPTION_ERROR, DTWAIN_ERR_EXCEPTION_ERROR}} };
 
-template <class T>
-bool SetOneTwainCapValue( const CTL_ITwainSource *pSource,
-                          T Value,
-                          TW_UINT16 nSetType,
-                          TW_UINT16 Cap,
-                          TW_UINT16 TwainType = 0xFFFF)
-{
-    auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
-    auto pSession = pTempSource->GetTwainSession();
-
-    if ( TwainType == 0xFFFF )
-        TwainType = static_cast<TW_UINT16>(DTWAIN_GetCapDataType((DTWAIN_SOURCE)pSource, Cap));
-
-    // Get a set capability triplet compatible for one value
-    CTL_CapabilitySetOneValTriplet<T> SetOne( pSession,
-                                           pTempSource,
-                                           nSetType,
-                                           Cap,
-                                           TwainType,
-                                           { Value });
-
-    const TW_UINT16 rc = SetOne.Execute();
-    return CTL_TwainAppMgr::ProcessReturnCodeOneValue(pTempSource, rc)?true:false;
-}
-
-
 constexpr int TWRC_Error = 1;
 constexpr int TWCC_Error = 2;
 
@@ -1728,11 +1702,12 @@ int CTL_TwainAppMgr::SetTransferCount( const CTL_ITwainSource *pSource,
     // pages to acquire
     if (IsCapabilitySupported(pSource, CAP_SHEETCOUNT))
     {
-        SetOneTwainCapValue(pSource, -1, MSG_SET, CAP_XFERCOUNT, TWTY_INT16);
+        SetOneCapValue(pSource, CAP_XFERCOUNT, MSG_SET, -1, TWTY_INT16);
+
         if ( nCount == -1 )
-            SetOneTwainCapValue(pSource, 0, MSG_SET, CAP_SHEETCOUNT, TWTY_UINT32);
+            SetOneCapValue(pSource, CAP_SHEETCOUNT, MSG_SET, 0, TWTY_UINT32);
         else
-            SetOneTwainCapValue(pSource, nCount, MSG_SET, CAP_SHEETCOUNT, TWTY_UINT32);
+            SetOneCapValue(pSource, CAP_SHEETCOUNT, MSG_SET,  nCount, TWTY_UINT32);
     }
     else
     {
@@ -1744,7 +1719,7 @@ int CTL_TwainAppMgr::SetTransferCount( const CTL_ITwainSource *pSource,
         {
             if (pSource->IsDoublePageCountOnDuplex())
                 nCount *= 2; // double the number of images that may be received
-            SetOneTwainCapValue( pSource, nCount, MSG_SET, CAP_XFERCOUNT, TWTY_INT16);
+            SetOneCapValue( pSource, CAP_XFERCOUNT, MSG_SET, nCount, TWTY_INT16);
         }
     }
     return nCount;
@@ -1785,10 +1760,10 @@ int CTL_TwainAppMgr::SetTransferMechanism( const CTL_ITwainSource *pSource,CTL_T
     if ( AcquireType == TWAINAcquireType_MemFile)
         uTwainType = TWSX_MEMFILE;
 
-    if ( AcquireType != TWAINAcquireType_AudioNative)
-        SetOneTwainCapValue( pSource, uTwainType, MSG_SET, ICAP_XFERMECH, TWTY_UINT16);
+    if (AcquireType != TWAINAcquireType_AudioNative)
+        SetOneCapValue(pSource, ICAP_XFERMECH, MSG_SET, uTwainType, TWTY_UINT16);
     else
-        SetOneTwainCapValue(pSource, uTwainType, MSG_SET, ACAP_XFERMECH, TWTY_UINT16);
+        SetOneCapValue(pSource, ACAP_XFERMECH, MSG_SET, uTwainType, TWTY_UINT16);
     return 1;
 }
 
@@ -1958,7 +1933,7 @@ bool CTL_TwainAppMgr::SetupFeeder( const CTL_ITwainSource *pSource, int /*maxpag
         // Enable the CAP_AUTOFEED capability
         // Get a set capability triplet compatible for one value
         bValue = false;
-        SetOneTwainCapValue( pSource, bValue, MSG_SET, CAP_AUTOFEED, TWTY_BOOL );
+        SetOneCapValue( pSource, CAP_AUTOFEED, MSG_SET, bValue,  TWTY_BOOL );
 
         // Return, since the autofeed has been turned off and the feeder has been
         // disabled
@@ -1968,7 +1943,7 @@ bool CTL_TwainAppMgr::SetupFeeder( const CTL_ITwainSource *pSource, int /*maxpag
 
     // Set the automatic document feeder mode if present
     nValue = 1;
-    SetOneTwainCapValue( pSource, nValue, MSG_SET, CAP_FEEDERENABLED, TWTY_BOOL);
+    SetOneCapValue( pSource, CAP_FEEDERENABLED, MSG_SET, nValue, TWTY_BOOL);
 
     // Enable the CAP_AUTOFEED capability if the user wants to automatically feed
     // the page
@@ -1976,24 +1951,10 @@ bool CTL_TwainAppMgr::SetupFeeder( const CTL_ITwainSource *pSource, int /*maxpag
     if ( !bTurnOffAutoFeed)
     {
         bValue = true;
-        SetOneTwainCapValue( pSource, bValue, MSG_SET, CAP_AUTOFEED, TWTY_BOOL);
+        SetOneCapValue( pSource, CAP_AUTOFEED, MSG_SET, bValue, TWTY_BOOL);
     }
 
     return true;
-}
-
-bool CTL_TwainAppMgr::ShowProgressIndicator(const CTL_ITwainSource* pSource, bool bShow)
-{
-    bool bTemp = bShow;
-    return SetOneTwainCapValue( pSource, &bTemp, MSG_SET, CAP_INDICATORS, TWTY_BOOL );
-}
-
-bool CTL_TwainAppMgr::IsProgressIndicatorOn(const CTL_ITwainSource* pSource)
-{
-    bool bTemp;
-    if ( GetOneCapValue( pSource, &bTemp, CAP_INDICATORS, TWTY_BOOL ) )
-        return bTemp;
-    return false;
 }
 
 int CTL_TwainAppMgr::FindConditionCode(TW_UINT16 nCode)
@@ -2575,32 +2536,16 @@ bool CTL_TwainAppMgr::SetDefaultSource( CTL_ITwainSession *pSession, const CTL_I
     return true;
 }
 
-bool CTL_TwainAppMgr::SetDependentCaps( const CTL_ITwainSource *pSource, TW_UINT16 Cap )
-{
-    switch (Cap)
-    {
-        case ICAP_THRESHOLD:
-        {
-            // Must set ICAP_BITDEPTHREDUCTION
-            const LONG Val = TWBR_THRESHOLD;
-            if (IsCapabilitySupported(pSource, ICAP_BITDEPTHREDUCTION))
-            {
-                return SetOneTwainCapValue( pSource, Val, MSG_SET, ICAP_BITDEPTHREDUCTION, TWTY_UINT16 );
-            }
-        }
-        break;
-    }
-    return true;
-}
-
 VOID CALLBACK CTL_TwainAppMgr::TwainTimeOutProc(HWND, UINT, ULONG, DWORD)
 {
+#if 0
 #ifdef _WIN32
     KillTimer(nullptr, CTL_StaticData::GetTimeoutID());
 
     LogWriterUtils::WriteLogInfoIndentedA("The last TWAIN triplet was not completed due to time out");
     SetError(DTWAIN_ERR_TIMEOUT, "", false);
     throw DTWAINException(DTWAIN_ERR_TIMEOUT);
+#endif
 #endif
 }
 
