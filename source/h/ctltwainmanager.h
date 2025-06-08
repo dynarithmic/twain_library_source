@@ -222,11 +222,6 @@ namespace dynarithmic
                                              TW_UINT16 GetType,
                                              TW_UINT16 nDataType );
 
-            static bool GetOneCapValue(const CTL_ITwainSource *pSource,
-                                       void *pValue,
-                                       TW_UINT16 Cap,
-                                       TW_UINT16 nDataType );
-
             static TW_UINT16 ProcessReturnCodeOneValue(CTL_ITwainSource *pSource,
                                                          TW_UINT16 rc);
 
@@ -259,7 +254,6 @@ namespace dynarithmic
                                                         boost::dll::shared_library* pModule = nullptr);
 
             static CTL_CapStruct GetGeneralCapInfo(LONG Cap);
-            static bool GetCurrentOneCapValue(const CTL_ITwainSource *pSource, void *pValue, TW_UINT16 Cap, TW_UINT16 nDataType );
             static CTL_StringType GetDSMPath();
             static CTL_StringType GetDSMVersionInfo();
             static LONG GetDSMPathLocation();
