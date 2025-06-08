@@ -860,7 +860,7 @@ bool CTL_TwainAppMgr::StoreImageLayout(CTL_ITwainSource *pSource)
 
     // First, see if ICAP_UNDEFINED image size is used
     TW_UINT16 nValue;
-    if ( GetOneCapValue( pSource, &nValue, ICAP_UNDEFINEDIMAGESIZE, TWTY_BOOL) )
+    if ( GetOneTwainCapValue( pSource, &nValue, ICAP_UNDEFINEDIMAGESIZE, MSG_GET, TWTY_BOOL) )
     {
         if ( nValue == 1 )
         {
@@ -1198,7 +1198,7 @@ bool CTL_TwainAppMgr::SetupMemXferDIB(CTL_ITwainSession* pSession, CTL_ITwainSou
 
             // Get Units and calculate PelsPerMeter
             nPixelFlavor = TWPF_CHOCOLATE;
-            if ( !GetCurrentOneCapValue( pSource, &nPixelFlavor, ICAP_PIXELFLAVOR, TWTY_UINT16))
+            if ( !GetOneTwainCapValue( pSource, &nPixelFlavor, ICAP_PIXELFLAVOR, MSG_GETCURRENT, TWTY_UINT16))
                 nPixelFlavor = TWPF_CHOCOLATE;
             switch ( nPixelFlavor )
             {
@@ -1628,22 +1628,6 @@ bool CTL_TwainAppMgr::GetOneIntValue(const CTL_ITwainSource *pSource,
 }
 
 //////////////////////////////////////////////////////////////////////////////
-bool CTL_TwainAppMgr::GetCurrentOneCapValue(const CTL_ITwainSource *pSource,
-                                            void *pValue,
-                                            TW_UINT16 Cap,
-                                            TW_UINT16 nDataType )
-{
-    return GetOneTwainCapValue( pSource, pValue, Cap, MSG_GETCURRENT, nDataType);
-}
-
-bool CTL_TwainAppMgr::GetOneCapValue(const CTL_ITwainSource *pSource,
-                                     void *pValue,
-                                     TW_UINT16 Cap,
-                                     TW_UINT16 nDataType )
-{
-    return GetOneTwainCapValue( pSource, pValue, Cap, MSG_GET, nDataType);
-}
-
 bool CTL_TwainAppMgr::GetOneTwainCapValue( const CTL_ITwainSource *pSource,
                                            void *pValue,
                                            TW_UINT16 Cap,
@@ -1684,7 +1668,7 @@ bool CTL_TwainAppMgr::GetOneTwainCapValue( const CTL_ITwainSource *pSource,
 int CTL_TwainAppMgr::GetTransferCount( const CTL_ITwainSource *pSource )
 {
     TW_UINT16 nValue;
-    GetOneCapValue( pSource, &nValue, CAP_XFERCOUNT, TWTY_UINT16 );
+    GetOneTwainCapValue( pSource, &nValue, CAP_XFERCOUNT, MSG_GET, TWTY_UINT16 );
     return nValue;
 }
 
@@ -1714,7 +1698,7 @@ int CTL_TwainAppMgr::SetTransferCount( const CTL_ITwainSource *pSource,
         // If we are in duplex mode, we need to set the transfer count to 2 * the number
         // of pages, since each page will use two transfers
         LONG isDuplex = 0;
-        GetCurrentOneCapValue(pSource, &isDuplex, CAP_DUPLEXENABLED, MSG_GETCURRENT);
+        GetOneTwainCapValue(pSource, &isDuplex, CAP_DUPLEXENABLED, MSG_GETCURRENT, TWTY_BOOL);
         if (isDuplex == 1 && nCount != -1)
         {
             if (pSource->IsDoublePageCountOnDuplex())
@@ -1791,7 +1775,7 @@ void CTL_TwainAppMgr::SetPixelAndBitDepth(const CTL_ITwainSource * /*pSource*/)
 CTL_TwainUnitEnum CTL_TwainAppMgr::GetCurrentUnitMeasure(const CTL_ITwainSource *pSource)
 {
     TW_INT16 nValue;
-    if ( !GetCurrentOneCapValue(pSource, &nValue, ICAP_UNITS, TWTY_UINT16) )
+    if ( !GetOneTwainCapValue(pSource, &nValue, ICAP_UNITS, MSG_GETCURRENT, TWTY_UINT16) )
     {
         return TwainUnit_INCHES;
     }
@@ -1893,21 +1877,21 @@ CTL_CapabilityQueryTriplet CTL_TwainAppMgr::GetCapabilityOperations(const CTL_IT
 bool CTL_TwainAppMgr::IsFeederLoaded( const CTL_ITwainSource *pSource )
 {
     TW_UINT16 nValue;
-    GetOneCapValue( pSource, &nValue, CAP_FEEDERLOADED, TWTY_BOOL);
+    GetOneTwainCapValue( pSource, &nValue, CAP_FEEDERLOADED, MSG_GET, TWTY_BOOL);
     return nValue?true:false;
 }
 
 
 bool CTL_TwainAppMgr::IsFeederEnabled( const CTL_ITwainSource *pSource, TW_UINT16& nValue )
 {
-    if (!GetOneCapValue( pSource, &nValue, CAP_FEEDERENABLED, TWTY_BOOL))
+    if (!GetOneTwainCapValue( pSource, &nValue, CAP_FEEDERENABLED, MSG_GET, TWTY_BOOL))
         return false;
     return true;
 }
 
 bool CTL_TwainAppMgr::IsJobControlSupported( const CTL_ITwainSource *pSource, TW_UINT16& nValue )
 {
-    if (!GetOneCapValue( pSource, &nValue, CAP_JOBCONTROL, TWTY_UINT16 ))
+    if (!GetOneTwainCapValue( pSource, &nValue, CAP_JOBCONTROL, MSG_GET, TWTY_UINT16 ))
         return false;
     return true;
 }

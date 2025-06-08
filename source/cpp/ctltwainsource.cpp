@@ -975,7 +975,7 @@ bool CTL_ITwainSource::InitExtImageInfo(int nNum)
 
     TW_UINT16 nValue;
 
-    if ( !CTL_TwainAppMgr::GetOneCapValue( this, &nValue, ICAP_EXTIMAGEINFO, TWTY_BOOL ) )
+    if ( !CTL_TwainAppMgr::GetOneTwainCapValue( this, &nValue, ICAP_EXTIMAGEINFO, MSG_GET, TWTY_BOOL ) )
         return false;
 
     if ( !nValue )
