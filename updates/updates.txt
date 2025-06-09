@@ -1,5 +1,11 @@
 DTWAIN Version changes
 
+5.6.6
+
+- Upgraded following internal image libraries:
+
+
+
 5.6.5
 
 - Fix issue with missing TWAIN log header information.
