@@ -46,6 +46,7 @@
 #include "dtwain_library_selector.h"
 #include "ctltwainmsgloop.h"
 #include "ctldefsource.h"
+#include "ctlstringutils.h"
 
 #ifdef _MSC_VER
     #pragma warning (disable:4702)
