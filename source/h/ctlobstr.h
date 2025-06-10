@@ -569,14 +569,14 @@ namespace dynarithmic
             str.replace(nPos, 1, 1, c);
         }
 
-        static bool IsEmpty(const StringType& str)
+        static bool IsEmpty(typename StringTraits::stringview_type str)
         {
             return str.empty();
         }
 
-        static bool IsAllSpace(const StringType& str)
+        static bool IsAllSpace(typename StringTraits::stringview_type str)
         {
-            return StringTraits::IsAllSpace(str.c_str());
+            return StringTraits::IsAllSpace(str.data());
         }
 
         static void Empty(StringType &str )
@@ -584,7 +584,9 @@ namespace dynarithmic
             str = StringTraits::GetEmptyString();
         }
 
-        static StringType ReplaceAll(const StringType& str, const StringType& findStr, const StringType& replaceStr)
+        static StringType ReplaceAll(const StringType& str, 
+                                     typename StringTraits::stringview_type findStr, 
+                                     typename StringTraits::stringview_type replaceStr)
         {
             return boost::algorithm::replace_all_copy(str, findStr, replaceStr);
         }
