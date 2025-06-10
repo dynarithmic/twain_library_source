@@ -314,6 +314,7 @@ void CTL_ITwainSession::EnumSources()
         else
         {
             CTL_ITwainSource::Destroy( pSource );
+            m_bAllSourcesRetrieved = true;
             break;
         }
     }
