@@ -2455,7 +2455,7 @@ bool LoadGeneralResources(bool blockExecution)
                 CTL_StaticData::SetResourceLoadError(DTWAIN_ERR_RESOURCES_BAD_VERSION);
                 versionErrorMessage = _T("\r\nBad or outdated TWAIN version of resources used: (");
                 versionErrorMessage += ret.errorMessage;
-                versionErrorMessage += _T(").  Expected minimum version: ");
+                versionErrorMessage += _T(").  Expected version: ");
                 versionErrorMessage += _T(DTWAIN_TEXTRESOURCE_FILEVERSION);
                 versionErrorMessage += _T("\r\nPlease use the latest text resources found at \"https://github.com/dynarithmic/twain_library/tree/master/text_resources\"");
             }
@@ -2470,18 +2470,37 @@ bool LoadGeneralResources(bool blockExecution)
                 versionErrorMessage = strm.str();
                 CTL_StaticData::SetResourceLoadError(DTWAIN_ERR_RESOURCES_DUPLICATEID_FOUND);
             }
-            // Only display the error message box if DTWAIN_SysInitialize() was called
-            // instead of DTWAIN_SysInitialNoBlocking()
+
+            if (!versionErrorMessage.empty())
+                versionErrorMessage += _T("\r\nCurrent running DTWAIN Version: ") + GetDTWAINDLLVersionInfoStr();
+
+            TCHAR szBuf[DTWAIN_USERRES_MAXSIZE + 1] = {};
+            DTWAIN_GetErrorString(CTL_StaticData::GetResourceLoadError(), szBuf, DTWAIN_USERRES_MAXSIZE);
+            CTL_StringType errorMsg = _T("Error.  DTWAIN Resource file(s) not found or corrupted:\r\n");
+            CTL_StringType sAllErrors = _T("Error in reading resource file:\r\n") + ret.resourcePath + _T("\r\n") +
+                errorMsg + szBuf + versionErrorMessage;
+
             if (blockExecution)
             {
+                // Only display the error message box if DTWAIN_SysInitialize() was called
+                // instead of DTWAIN_SysInitialNoBlocking()
                 #ifdef _WIN32
-                TCHAR szBuf[DTWAIN_USERRES_MAXSIZE + 1] = {};
-                DTWAIN_GetErrorString(CTL_StaticData::GetResourceLoadError(), szBuf, DTWAIN_USERRES_MAXSIZE);
-				CTL_StringType errorMsg = _T("Error.  DTWAIN Resource file(s) not found or corrupted:\r\n");
-                CTL_StringType sAllErrors = _T("Error in reading resource file:\r\n") + ret.resourcePath + _T("\r\n") +
-                    errorMsg + szBuf + versionErrorMessage;
                 MessageBox(nullptr, sAllErrors.c_str(), _T("DTWAIN Resource Error"), MB_ICONERROR);
                 #endif
+            }
+            else
+            // Write the information to errorlog_*.txt located in the resource directory
+            {
+                // Get the base file name with time stamp
+                auto baseFileName = StringConversion::Convert_Ansi_To_Native(CreateFileNameWithDateTime("errorlog_", "txt"));
+
+                // Create the file name with the path of the resources
+                auto errorName = StringConversion::Convert_Native_To_Ansi(CreateResourceFileName(baseFileName.c_str()));
+
+                // Write the information to the errorlog file
+                std::ofstream ofs(errorName);
+                if (ofs)
+                    ofs << StringConversion::Convert_Native_To_Ansi(StringWrapper::ReplaceAll(sAllErrors, _T("\r"), _T(" ")));
             }
         }
         else
