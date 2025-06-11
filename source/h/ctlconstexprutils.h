@@ -28,6 +28,14 @@
 
 namespace dynarithmic
 {
+    struct RawTwainTriplet
+    {
+        TW_UINT32    nDG;
+        TW_UINT16    nDAT;
+        TW_UINT16    nMSG;
+        constexpr RawTwainTriplet(TW_UINT32 dg, TW_UINT16 dat, TW_UINT16 msg) : nDG(dg), nDAT(dat), nMSG(msg) {}
+    };
+
     static constexpr bool IsTwainStringType(TW_UINT16 nItemType)
     {
         switch (nItemType)
@@ -473,6 +481,22 @@ namespace dynarithmic
     {
         constexpr std::array<int, 3> aDLLVersion = { DTWAIN_MAJOR_VERSION,DTWAIN_MINOR_VERSION, DTWAIN_PATCHLEVEL_VERSION };
         return aDLLVersion;
+    }
+
+    static constexpr bool IsTimeOutTripletIgnored(const RawTwainTriplet& trip)
+    {
+        constexpr std::array<RawTwainTriplet, 7> Trips = {
+            {{DG_AUDIO, DAT_AUDIOFILEXFER, MSG_GET},
+            {DG_AUDIO, DAT_AUDIONATIVEXFER, MSG_GET},
+            {DG_CONTROL, DAT_USERINTERFACE, MSG_ENABLEDS},
+            {DG_CONTROL, DAT_USERINTERFACE, MSG_ENABLEDSUIONLY},
+            {DG_IMAGE, DAT_IMAGEFILEXFER, MSG_GET},
+            {DG_IMAGE, DAT_IMAGENATIVEXFER, MSG_GET},
+            {DG_IMAGE, DAT_IMAGEMEMXFER, MSG_GET}} };
+        
+        auto isFoundPr = generic_array_finder_if(Trips, [&](auto& trip2)
+            { return std::tie(trip.nDG, trip.nDAT, trip.nMSG) == std::tie(trip2.nDG, trip2.nDAT, trip2.nMSG); });
+        return isFoundPr.first;
     }
 
     static constexpr LONG GetDTWAINVersionType() noexcept
