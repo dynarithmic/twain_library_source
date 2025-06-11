@@ -47,6 +47,26 @@ namespace dynarithmic
         return true;
     }
 
+    static void ThrowBadHandle()
+    {
+        std::error_code ec(DTWAIN_ERR_BAD_HANDLE, std::system_category());
+        std::system_error err(ec, "Invalid DTWAIN Handle");
+        // Since the handle is bad, the only way to report the
+        // error visually to the app is to write to whatever debug
+        // logger may be attached to the program.
+        OutputDebugStringA(err.what());
+        throw DTWAINException(DTWAIN_ERR_BAD_HANDLE);
+    }
+
+    static std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> ThrowSourceError(CTL_TwainDLLHandle* pHandle, bool setLastError, bool doThrow)
+    {
+        if (setLastError)
+            pHandle->m_lLastError = DTWAIN_ERR_BAD_SOURCE;
+        if (doThrow)
+            throw DTWAINException(DTWAIN_ERR_BAD_SOURCE);
+        return { nullptr, nullptr };
+    }
+
     std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> VerifyHandles(DTWAIN_SOURCE Source, int Testing/* = DTWAIN_TEST_DLLHANDLE | DTWAIN_TEST_SOURCE*/)
     {
         CTL_ITwainSource* pSource = nullptr;
@@ -70,15 +90,7 @@ namespace dynarithmic
             if (!bHandleGood)
             {
                 if (doThrow)
-                {
-                    std::error_code ec(DTWAIN_ERR_BAD_HANDLE, std::system_category());
-                    std::system_error err(ec, "Invalid DTWAIN Handle");
-                    // Since the handle is bad, the only way to report the
-                    // error visually to the app is to write to whatever debug
-                    // logger may be attached to the program.
-                    OutputDebugStringA(err.what());
-                    throw DTWAINException(DTWAIN_ERR_BAD_HANDLE);
-                }
+                    ThrowBadHandle();
                 return { nullptr, nullptr };
             }
 
@@ -90,38 +102,18 @@ namespace dynarithmic
                 if (!pHandle)
                 {
                     if (doThrow)
-                    {
-                        std::error_code ec(DTWAIN_ERR_BAD_HANDLE, std::system_category());
-                        std::system_error err(ec, "Invalid DTWAIN Handle");
-                        // Since the handle is bad, the only way to report the
-                        // error visually to the app is to write to whatever debug
-                        // logger may be attached to the program.
-                        OutputDebugStringA(err.what());
-                        throw DTWAINException(DTWAIN_ERR_BAD_HANDLE);
-                    }
+                        ThrowBadHandle();
                     return { nullptr, nullptr };
                 }
 
                 pSource = static_cast<CTL_ITwainSource*>(Source);
                 if (!pSource || !CTL_TwainAppMgr::IsValidTwainSource(pHandle->m_pTwainSession, pSource))
-                {
-                    if (setLastError)
-                        pHandle->m_lLastError = DTWAIN_ERR_BAD_SOURCE;
-                    if (doThrow)
-                        throw DTWAINException(DTWAIN_ERR_BAD_SOURCE);
-                    return { nullptr, nullptr };
-                }
+                    return ThrowSourceError(pHandle, setLastError, doThrow);
+
                 if (Testing & DTWAIN_TEST_SOURCEOPEN)
                 {
-                    auto sourceOpen = CTL_TwainAppMgr::IsSourceOpen(pSource);
-                    if (!sourceOpen)
-                    {
-                        if (setLastError)
-                            pHandle->m_lLastError = DTWAIN_ERR_SOURCE_NOT_OPEN;
-                        if (doThrow)
-                            throw DTWAINException(DTWAIN_ERR_SOURCE_NOT_OPEN);
-                        return { nullptr, nullptr };
-                    }
+                    if (!CTL_TwainAppMgr::IsSourceOpen(pSource))
+                        return ThrowSourceError(pHandle, setLastError, doThrow);
                 }
             }
         }

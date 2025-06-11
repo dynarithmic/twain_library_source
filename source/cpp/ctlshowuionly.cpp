@@ -44,7 +44,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
     bool bCloseSource = false;
     const bool bIsSourceOpen = DTWAIN_IsSourceOpen(Source) ? true : false;
 
-    if (!bIsSourceOpen && DTWAIN_GetTwainMode() == DTWAIN_MODAL)
+    if (!bIsSourceOpen && pHandle->m_lAcquireMode == DTWAIN_MODAL)
     {
         bCloseSource = true;
         if (!DTWAIN_OpenSource(Source))
@@ -58,7 +58,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
         DTWAIN_ERR_UIONLY_NOT_SUPPORTED, false, FUNC_MACRO);
 
     // Start a thread depending on Twain Mode.
-    if (DTWAIN_GetTwainMode() == DTWAIN_MODELESS) // No thread
+    if (pHandle->m_lAcquireMode == DTWAIN_MODELESS) // No thread
     {
         const DTWAIN_BOOL bRet2 = CTL_TwainAppMgr::ShowUserInterface(pSource, false, true);
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet2)

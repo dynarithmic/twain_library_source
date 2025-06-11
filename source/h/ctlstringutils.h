@@ -28,6 +28,7 @@ namespace dynarithmic
     // Truncate a string if it goes over maxLen, and replace truncated contents with
     // the text "More".
     std::string TruncateStringWithMore(std::string_view origString, size_t maxLen);
+    std::string CreateFileNameWithDateTime(std::string_view prefix, std::string_view ext, bool useUTC=false);
 }
 #endif
 

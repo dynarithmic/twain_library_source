@@ -45,13 +45,6 @@ namespace dynarithmic
     class CTL_ImageXferTriplet;
     class CTL_ImageInfoTriplet;
 
-    struct RawTwainTriplet
-    {
-        TW_UINT32    nDG;
-        TW_UINT16    nDAT;
-        TW_UINT16    nMSG;
-    };
-
     struct SourceXferReadyOverride
     {
         uint32_t m_MaxThreshold = 0;
@@ -192,8 +185,6 @@ namespace dynarithmic
             static int  TransferImage(const CTL_ITwainSource *pSource, int nImageNum=0);
             static bool SetFeederEnableMode( CTL_ITwainSource *pSource, bool bMode=true);
             static void NotifyFeederStatus();
-            static bool ShowProgressIndicator(const CTL_ITwainSource* pSource, bool bShow = true);
-            static bool IsProgressIndicatorOn(const CTL_ITwainSource* pSource);
             static bool IsJobControlSupported( const CTL_ITwainSource *pSource, TW_UINT16& nValue );
 
             static void     SetError(int nError, std::string_view extraInfo, bool bMustReportGeneralError);
@@ -231,11 +222,6 @@ namespace dynarithmic
                                              TW_UINT16 GetType,
                                              TW_UINT16 nDataType );
 
-            static bool GetOneCapValue(const CTL_ITwainSource *pSource,
-                                       void *pValue,
-                                       TW_UINT16 Cap,
-                                       TW_UINT16 nDataType );
-
             static TW_UINT16 ProcessReturnCodeOneValue(CTL_ITwainSource *pSource,
                                                          TW_UINT16 rc);
 
@@ -268,7 +254,6 @@ namespace dynarithmic
                                                         boost::dll::shared_library* pModule = nullptr);
 
             static CTL_CapStruct GetGeneralCapInfo(LONG Cap);
-            static bool GetCurrentOneCapValue(const CTL_ITwainSource *pSource, void *pValue, TW_UINT16 Cap, TW_UINT16 nDataType );
             static CTL_StringType GetDSMPath();
             static CTL_StringType GetDSMVersionInfo();
             static LONG GetDSMPathLocation();
@@ -460,8 +445,6 @@ namespace dynarithmic
             void OpenLogFile(LPCSTR lpszFile);
             void CloseLogFile();
             CTL_TwainDLLHandle* GetDLLHandle() const { return m_pDLLHandle; }
-            static bool SetDependentCaps( const CTL_ITwainSource *pSource, TW_UINT16  Cap );
-            static void EnumNoTimeoutTriplets();
             static CTL_TwainSessionArray::iterator FindSession(const CTL_ITwainSession* pSession);
 
             static TW_IDENTITY s_AppId;          // Twain Identity structure
@@ -481,7 +464,6 @@ namespace dynarithmic
             static int               s_nLastError;
             static std::string        s_strLastError;
             static HINSTANCE         s_ThisInstance;
-            static std::vector<RawTwainTriplet> s_NoTimeoutTriplets;
             static VOID CALLBACK TwainTimeOutProc(HWND, UINT, ULONG, DWORD);
             static SourceToXferReadyMap s_SourceToXferReadyMap;
             static SourceToXferReadyList s_SourceToXferReadyList;

@@ -152,11 +152,9 @@ bool CTL_ITwainSession::AddTwainSource( CTL_ITwainSource *pSource )
 
 bool CTL_ITwainSession::IsValidSource(const CTL_ITwainSource* pSource) const
 {
-    if ( find(m_arrTwainSource.begin(),
-              m_arrTwainSource.end(),
-              pSource) == m_arrTwainSource.end())
-        return false;
-    return true;
+    return std::find(m_arrTwainSource.begin(), 
+                     m_arrTwainSource.end(), 
+                     pSource) != m_arrTwainSource.end();
 }
 
 bool CTL_ITwainSession::SelectSource( const CTL_ITwainSource* pSource )
@@ -316,6 +314,7 @@ void CTL_ITwainSession::EnumSources()
         else
         {
             CTL_ITwainSource::Destroy( pSource );
+            m_bAllSourcesRetrieved = true;
             break;
         }
     }
@@ -384,7 +383,6 @@ CTL_ITwainSource* CTL_ITwainSession::GetDefaultSource()
     if ( ST.Execute() == TWRC_SUCCESS )
     {
         AddTwainSource(ST.GetSourceIDPtr());
-//        m_arrTwainSource.insert(ST.GetSourceIDPtr());
         return  ST.GetSourceIDPtr();
     }
     return nullptr;

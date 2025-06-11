@@ -93,7 +93,7 @@ namespace dynarithmic
         return retVal;
     }
 
-    static CTL_StringType createResourceFileName(LPCTSTR resName)
+    CTL_StringType CreateResourceFileName(LPCTSTR resName)
     {
         CTL_StringType sPath;
         if ( CTL_StaticData::GetResourcePath().empty())
@@ -152,7 +152,7 @@ namespace dynarithmic
         TW_UINT32 dg;
         TW_UINT16 dat, msg;
         int structtype, retcode, successcode;
-        auto sPath = createResourceFileName(DTWAINRESOURCEINFOFILE);
+        auto sPath = CreateResourceFileName(DTWAINRESOURCEINFOFILE);
         retValue.resourcePath = sPath;
         auto sPathA = StringConversion::Convert_Native_To_Ansi(sPath, sPath.length());
         StringWrapperA::traits_type::inputfile_type ifs(sPathA);
@@ -172,6 +172,22 @@ namespace dynarithmic
         std::string sWarning;
         int curLine = 0;
         std::getline(ifs, sWarning);
+        ++curLine;
+
+        std::string totalLine;
+
+        // Read in the minimum version number for this resource
+        // Check if resource version if >= running version
+        std::getline(ifs, totalLine);
+        bool goodVersion = (DTWAIN_TEXTRESOURCE_FILEVERSION == totalLine);
+        if (!goodVersion)
+        {
+            retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_VERSION_READ] = false;
+            retValue.errorMessage = StringConversion::Convert_Ansi_To_Native(totalLine);
+            return false;
+        }
+        else
+            retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_VERSION_READ] = true;
         ++curLine;
 
         static constexpr TW_UINT32 stopper = 9999;
@@ -385,7 +401,6 @@ namespace dynarithmic
         // Read in the image resampling data
         auto& imageMap = CTL_StaticData::GetImageResamplerMap();
         imageMap.clear();
-        std::string totalLine;
         while (std::getline(ifs, totalLine))
         {
             ++curLine;
@@ -529,18 +544,6 @@ namespace dynarithmic
                 compressionMap[static_cast<int>(compressionValue)].push_back(static_cast<int>(oneVal.second));
             }
         }
-        // Read in the minimum version number for this resource
-        // Check if resource version if >= running version
-        std::getline(ifs, totalLine);
-        bool goodVersion = (DTWAIN_TEXTRESOURCE_FILEVERSION == totalLine);
-        if (!goodVersion)
-        {
-            retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_VERSION_READ] = false;
-            retValue.errorMessage = StringConversion::Convert_Ansi_To_Native(totalLine);
-            return false;
-        }
-        else
-            retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_INFOFILE_VERSION_READ] = true;
 
         // Check the CRC value
         CTL_StaticData::GetResourceVersion() = StringConversion::Convert_Ansi_To_Native(DTWAIN_TEXTRESOURCE_FILEVERSION);
@@ -562,7 +565,7 @@ namespace dynarithmic
     std::vector<std::string> GetLangResourceNames()
     {
         std::vector<std::string> ret;
-        const auto sPath = createResourceFileName(DTWAINLANGRESOURCENAMESFILE);
+        const auto sPath = CreateResourceFileName(DTWAINLANGRESOURCENAMESFILE);
         const std::string sPathA = StringConversion::Convert_Native_To_Ansi(sPath, sPath.length());
         std::ifstream ifs(sPathA);
         if (!ifs)
@@ -753,7 +756,7 @@ namespace dynarithmic
 
     std::string GetResourceFileNameA(LPCSTR lpszName, LPCTSTR szPrefix)
     {
-        const auto resPath = createResourceFileName(szPrefix);
+        const auto resPath = CreateResourceFileName(szPrefix);
         const std::string sPathA = StringConversion::Convert_Native_To_Ansi(resPath);
         return sPathA + lpszName + (std::string)".txt";
     }
@@ -800,16 +803,6 @@ namespace dynarithmic
     bool LoadLanguageResourceA(std::string_view lpszName, bool bClear)
     {
         return LoadLanguageResourceA(lpszName.data(), bClear);
-    }
-
-    bool LoadLanguageResourceXML(LPCTSTR sLangDLL)
-    {
-        // Load the XML version of the language resources
-        if ( !filesys::exists( sLangDLL))
-        {
-            return false;
-        }
-        return true;
     }
 
     void UnloadStringResources()

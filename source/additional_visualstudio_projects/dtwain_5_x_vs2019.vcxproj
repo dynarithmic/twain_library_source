@@ -1392,7 +1392,6 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile Include=".\cpp\logmsg.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">false</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include=".\cpp\ctlxmlparse.cpp" />
     <ClCompile Include=".\cpp\a85decoder.cpp" />
     <ClCompile Include=".\cpp\ctltempdir.cpp" />
     <ClCompile Include=".\cpp\ocrengine\ocrinterface.cpp" />
@@ -1450,6 +1449,9 @@ copy $(TargetDir)$(TargetName).lib .
     </ClCompile>
     <ClCompile Include="cpp\arrayfactory.cpp" />
     <ClCompile Include="cpp\ctlacquireaudio.cpp" />
+    <ClCompile Include="cpp\ctlarraydumper.cpp" />
+    <ClCompile Include="cpp\ctlbufferstrip.cpp" />
+    <ClCompile Include="cpp\ctlcustomdsdata.cpp" />
     <ClCompile Include="cpp\ctlerrorbuffer.cpp" />
     <ClCompile Include="cpp\ctlerrorcallback.cpp" />
     <ClCompile Include="cpp\ctlextimageinfo.cpp" />

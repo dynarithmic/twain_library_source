@@ -24,24 +24,32 @@
 #include "ctltwainmanager.h"
 using namespace dynarithmic;
 
+
+// Unused
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainTimeout( LONG milliseconds )
 {
     LOG_FUNC_ENTRY_PARAMS((milliseconds))
+    #if 0
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     if ( !IsDLLHandleValid( pHandle, FALSE ) )
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
     CTL_StaticData::SetTimeoutValue(milliseconds);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    #endif
+    LOG_FUNC_EXIT_NONAME_PARAMS(false)
     CATCH_BLOCK(false)
 }
 
+// Unused
 LONG DLLENTRY_DEF DTWAIN_GetTwainTimeout()
 {
     LOG_FUNC_ENTRY_PARAMS(())
+    #if 0
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
     if ( !IsDLLHandleValid( pHandle, FALSE ) )
         LOG_FUNC_EXIT_NONAME_PARAMS(-1)
     LOG_FUNC_EXIT_NONAME_PARAMS((LONG)CTL_StaticData::GetTimeoutValue())
+    #endif
+    LOG_FUNC_EXIT_NONAME_PARAMS(0)
     CATCH_BLOCK(-1)
 }
 

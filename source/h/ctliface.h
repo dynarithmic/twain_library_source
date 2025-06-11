@@ -915,8 +915,6 @@ namespace dynarithmic
     size_t GetResourceStringW(UINT nResNumber, LPWSTR buffer, LONG bufSize);
     size_t GetResourceString(UINT nResNumber, LPTSTR buffer, LONG bufSize);
     std::string GetErrorString_Internal(int nError);
-    bool LoadLanguageResourceXML(LPCTSTR sLangDLL);
-    bool LoadLanguageResourceXMLImpl(LPCTSTR szFile);
     void DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap);
     std::string LogWin32Error(DWORD lastError);
     void LoadOCRInterfaces(CTL_TwainDLLHandle *pHandle);
