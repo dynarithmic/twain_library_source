@@ -279,15 +279,13 @@ unsigned int CTL_TwainAppMgr::GetRegisteredMsg()
     return 0;
 }
 
-void CTL_TwainAppMgr::EnumSources( CTL_ITwainSession* pSession, CTL_TwainSourceSet & rArray )
+void CTL_TwainAppMgr::EnumSources( CTL_ITwainSession* pSession )
 {
-    rArray.clear();
     if ( !IsValidTwainSession( pSession ) )
         return;
-    pSession->CopyAllSources( rArray );
+    pSession->GetNumSources();
 }
 
-/* static static static static static static static static static static */
 void CTL_TwainAppMgr::DestroyTwainSession(const CTL_ITwainSession* pSession)
 {
     if ( s_pGlobalAppMgr )

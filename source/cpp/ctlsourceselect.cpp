@@ -252,40 +252,35 @@ DTWAIN_SOURCE dynarithmic::SourceSelect(CTL_TwainDLLHandle* pHandle, SourceSelec
     auto pRealSource = static_cast<CTL_ITwainSource*>(pSource);
     DTWAIN_SOURCE pDead = nullptr;
 
-    DTWAIN_ARRAY pDTWAINArray = nullptr;
     bool bFound = false;
 
-    if (!DTWAIN_EnumSources(&pDTWAINArray))
+    const auto& vSources = pHandle->m_pTwainSession->GetTwainSources();
+
+    if (vSources.empty())
     {
         DTWAIN_EndTwainSession();
         LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
     }
 
-    DTWAINArrayLowLevel_RAII arr(pHandle, pDTWAINArray);
-    const auto& vSources = pHandle->m_ArrayFactory->underlying_container_t<CTL_ITwainSource*>(pDTWAINArray);
+    const auto sName = pRealSource->GetProductName();
+    auto pDeadIt = std::find_if(vSources.begin(), vSources.end(),
+        [&](const CTL_ITwainSource* pS){ return pS->GetProductName() == sName; });
 
-    if (!vSources.empty())
+    if (pDeadIt != vSources.end())
     {
-        const auto sName = pRealSource->GetProductName();
-        auto pDeadIt = std::find_if(vSources.begin(), vSources.end(),
-            [&](const CTL_ITwainSource* pS){ return pS->GetProductName() == sName; });
-
-        if (pDeadIt != vSources.end())
+        pDead = *pDeadIt;
+        bFound = true;
+    }
+    if (bFound)
+    {
+        if (pRealSource != pDead)
         {
-            pDead = *pDeadIt;
-            bFound = true;
+            const auto pSession = CTL_TwainAppMgr::GetCurrentSession();
+            if ( pSession )
+                pSession->DestroyOneSource(pRealSource);
         }
-        if (bFound)
-        {
-            if (pRealSource != pDead)
-            {
-                const auto pSession = CTL_TwainAppMgr::GetCurrentSession();
-                if ( pSession )
-                    pSession->DestroyOneSource(pRealSource);
-            }
-            CTL_TwainAppMgr::SetDefaultSource(static_cast<CTL_ITwainSource*>(pDead));
-            LOG_FUNC_EXIT_NONAME_PARAMS(pDead)
-        }
+        CTL_TwainAppMgr::SetDefaultSource(static_cast<CTL_ITwainSource*>(pDead));
+        LOG_FUNC_EXIT_NONAME_PARAMS(pDead)
     }
     DTWAIN_EndTwainSession();
     LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_SOURCE)NULL)
@@ -426,11 +421,8 @@ static std::vector<CTL_StringType> GetNameList(SelectStruct& pS)
 {
     std::vector<CTL_StringType> vSourceNames;
     // Fill the list box with the sources
-    DTWAIN_ARRAY Array = nullptr;
     const auto pHandle = pS.pHandle;
-    DTWAIN_EnumSources(&Array);
-    DTWAINArrayLowLevel_RAII arr(pHandle, Array);
-    auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<CTL_ITwainSource*>(Array);
+    const auto& vValues = pHandle->m_pTwainSession->GetTwainSources();
     if (!vValues.empty())
     {
         TCHAR ProdName[256];

@@ -916,13 +916,11 @@ LONG DLLENTRY_DEF DTWAIN_GetSessionDetails(LPTSTR szBuf, LONG nSize, LONG indent
         details = pHandle->m_strSessionDetails;
     else
     {
-        DTWAIN_ARRAY aAllSources = DTWAIN_EnumSourcesEx();
-        DTWAINArrayPtr_RAII raii(pHandle, &aAllSources);
-        if ( !aAllSources )
+        const auto& vBuf = pHandle->m_pTwainSession->GetTwainSources();
+        if ( vBuf.empty() )
             LOG_FUNC_EXIT_NONAME_PARAMS(0)
         std::vector<std::string> vAllSources;
-        auto& vBuf = pHandle->m_ArrayFactory->underlying_container_t<CTL_ITwainSource*>(aAllSources);
-        for (auto theSource : vBuf)
+        for (auto& theSource : vBuf)
             vAllSources.push_back(theSource->GetProductNameA());
         details = StringConversion::Convert_Ansi_To_Native(generate_details(*pHandle->m_pTwainSession, vAllSources, indentFactor));
         pHandle->m_strSessionDetails = details;
