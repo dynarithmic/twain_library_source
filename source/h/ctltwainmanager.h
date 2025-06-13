@@ -110,7 +110,7 @@ namespace dynarithmic
 
             // Source management functions
             // Get all the sources in an array
-            static void EnumSources( CTL_ITwainSession* pSession, CTL_TwainSourceSet & rArray );
+            static void EnumSources( CTL_ITwainSession* pSession );
 
             // Select a source from the TWAIN source dialog
             static const CTL_ITwainSource* SelectSourceDlg(  CTL_ITwainSession *pSession, LPCTSTR pProduct=nullptr);

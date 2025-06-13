@@ -42,16 +42,20 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
     LOG_FUNC_ENTRY_PARAMS((Array))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+
+    bool bEnumeratorExists = pHandle->m_ArrayFactory->is_valid(*Array);
+    if (!bEnumeratorExists)
+        *Array = nullptr;
+
+    // Create a DTWAIN_ARRAY consisting of pointers to the source objects.
     DTWAIN_ARRAY aSource = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSOURCE, 0);
     if (!aSource)
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
+
     DTWAIN_ARRAY pDTWAINArray = aSource;
 
     const auto& factory = pHandle->m_ArrayFactory;
     auto& vEnum = factory->underlying_container_t<CTL_ITwainSource*>(pDTWAINArray);
-    vEnum.clear();
-
-    CTL_TwainSourceSet SourceArray;
 
     // Start a session if not already started
     if (!pHandle->m_bSessionAllocated)
@@ -60,19 +64,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
     }
 
-    CTL_TwainAppMgr::EnumSources(pHandle->m_pTwainSession, SourceArray);
-    std::copy(SourceArray.begin(), SourceArray.end(), std::back_inserter(vEnum));
-    auto& status_map = CTL_StaticData::GetSourceStatusMap();
-    std::for_each(SourceArray.begin(), SourceArray.end(), [&](const CTL_ITwainSource* pSourceInner)
-        {
-            std::string sname = pSourceInner->GetProductNameA();
-            auto iter = status_map.find(sname);
-            if (iter == status_map.end())
-            {
-                auto mapIter = status_map.insert({ sname, {} }).first;
-                mapIter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, true);
-            }
-        });
+    CTL_TwainAppMgr::EnumSources(pHandle->m_pTwainSession);
+    const auto& twainSources = pHandle->m_pTwainSession->GetTwainSources();
+
+    // Copy results to user array
+    std::copy(twainSources.begin(), twainSources.end(), std::back_inserter(vEnum));
+
+    // Destroy old contents of user array if contents already existed and assign new info
+    if (bEnumeratorExists)
+        pHandle->m_ArrayFactory->destroy(*Array);
     *Array = aSource;
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)

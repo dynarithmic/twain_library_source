@@ -286,6 +286,14 @@ void CTL_ITwainSession::DestroyAllSources()
     m_pSelectedSource = nullptr;
 }
 
+const CTL_TwainSourceSet& CTL_ITwainSession::GetTwainSources() 
+{ 
+    if (m_arrTwainSource.empty())
+        EnumSources();
+    return m_arrTwainSource; 
+}
+
+
 void CTL_ITwainSession::EnumSources()
 {
     // Get first source
@@ -318,6 +326,24 @@ void CTL_ITwainSession::EnumSources()
             break;
         }
     }
+    UpdateStatusMap();
+}
+
+void CTL_ITwainSession::UpdateStatusMap()
+{
+    // Modify source status map
+    auto& status_map = CTL_StaticData::GetSourceStatusMap();
+
+    std::for_each(m_arrTwainSource.begin(), m_arrTwainSource.end(), [&](const CTL_ITwainSource* pSourceInner)
+        {
+            std::string sname = pSourceInner->GetProductNameA();
+            auto iter = status_map.find(sname);
+            if (iter == status_map.end())
+            {
+                auto mapIter = status_map.insert({ sname, {} }).first;
+                mapIter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, true);
+            }
+        });
 }
 
 void CTL_ITwainSession::CopyAllSources( CTL_TwainSourceSet & rArray )
