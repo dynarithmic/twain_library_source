@@ -31,12 +31,13 @@
 #include "ctltmpl5.h"
 #include "errorcheck.h"
 #include "ctlutils.h"
+#include "ctlsetgetcaps.h"
 using namespace dynarithmic;
 
-static DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap,
-                                                   LONG lGetType, LONG lContainerType,
-                                                   LONG nDataType, LPDTWAIN_ARRAY pArray,
-                                                   bool bOverrideDataType );
+static bool DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap,
+                                            LONG lGetType, LONG lContainerType,
+                                            LONG nDataType, LPDTWAIN_ARRAY pArray,
+                                            bool bOverrideDataType );
 
 template <typename T, typename ConvertTo=T>
 struct NullGetCapConverter
@@ -223,6 +224,17 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, lContainerType, nDataType,pArray))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+    BOOL bRet = DTWAIN_GetCapValuesEx2_Internal(pHandle, pSource, lCap, lGetType, lContainerType, nDataType, pArray);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK_LOG_PARAMS(false)
+}
+
+// Gets capability values.  This function does not test if the capability exists, or if the container type is valid.  Use
+// with caution!!
+bool dynarithmic::DTWAIN_GetCapValuesEx2_Internal( CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource,
+                                                   LONG lCap, LONG lGetType, LONG lContainerType,
+                                                   LONG nDataType, LPDTWAIN_ARRAY pArray )
+{
     DTWAIN_BOOL bRet = FALSE;
     bool overrideDataType = true;
     if (nDataType == DTWAIN_DEFAULT)
@@ -231,13 +243,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap
         DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return nDataType < 0 || nDataType == (std::numeric_limits<int>::min)(); }, nDataType, false, FUNC_MACRO);
         overrideDataType = false;
     }
-    bRet = DTWAIN_GetCapValuesEx_Internal(Source, static_cast<TW_UINT16>(lCap), lGetType, lContainerType, nDataType, pArray, overrideDataType);
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK_LOG_PARAMS(false)
+    return bRet = DTWAIN_GetCapValuesEx_Internal(pSource, static_cast<TW_UINT16>(lCap), lGetType, lContainerType, nDataType, pArray, overrideDataType);
 }
 
-DTWAIN_BOOL DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap, LONG lGetType, LONG lContainerType,
-                                            LONG nDataType, LPDTWAIN_ARRAY pArray, bool bOverrideDataType )
+bool DTWAIN_GetCapValuesEx_Internal( DTWAIN_SOURCE Source, TW_UINT16 lCap, LONG lGetType, LONG lContainerType,
+                                     LONG nDataType, LPDTWAIN_ARRAY pArray, bool bOverrideDataType )
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, lContainerType, nDataType, pArray, bOverrideDataType))
 

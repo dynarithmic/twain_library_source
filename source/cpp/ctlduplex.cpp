@@ -23,6 +23,7 @@
 #include "ctliface.h"
 #include "ctltwainmanager.h"
 #include "arrayfactory.h"
+#include "ctlsetgetcaps.h"
 using namespace dynarithmic;
 
 static std::pair<bool, int> GetDuplexType(DTWAIN_SOURCE Source)
@@ -31,9 +32,10 @@ static std::pair<bool, int> GetDuplexType(DTWAIN_SOURCE Source)
         return { false, TWDX_NONE };
 
     DTWAIN_ARRAY Array = nullptr;
-    const DTWAIN_BOOL bRet2 = DTWAIN_GetCapValuesEx2(Source, CAP_DUPLEX, DTWAIN_CAPGET,
-                                                     DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
-    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+    auto pSource = static_cast<CTL_ITwainSource*>(Source);
+    const auto pHandle = pSource->GetDTWAINHandle();
+    const DTWAIN_BOOL bRet2 = DTWAIN_GetCapValuesEx2_Internal(pHandle, pSource, CAP_DUPLEX, DTWAIN_CAPGET,
+                                                              DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
     DTWAINArrayLowLevel_RAII arr(pHandle, Array);
     if (bRet2 && Array)
     {

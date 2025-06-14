@@ -1047,6 +1047,9 @@
     <ClInclude Include="h\dtwain_exception.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="h\ctlsetgetcaps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".\h\versioninfo.ipp">

@@ -24,6 +24,7 @@
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
 #include "arrayfactory.h"
+#include "ctlsetgetcaps.h"
 
 using namespace dynarithmic;
 
@@ -186,8 +187,10 @@ DTWAIN_ARRAY GetPrinterMode(DTWAIN_SOURCE Source, LONG GetType)
 {
     if ( !DTWAIN_IsCapSupported(Source, CAP_PRINTERMODE) )
         return nullptr;
+    auto pSource = static_cast<CTL_ITwainSource*>(Source);
+    const auto pHandle = pSource->GetDTWAINHandle();
     DTWAIN_ARRAY Array = nullptr;
-    const DTWAIN_BOOL bRet = DTWAIN_GetCapValuesEx2(Source, CAP_PRINTERMODE, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array);
+    const DTWAIN_BOOL bRet = DTWAIN_GetCapValuesEx2_Internal(pHandle, pSource, CAP_PRINTERMODE, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array);
     if ( bRet )
         return Array;
     DTWAIN_ArrayDestroy(Array);

@@ -27,6 +27,7 @@
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctlsupport.h"
+#include "ctlsetgetcaps.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -777,10 +778,11 @@ static bool GetDoubleCap( DTWAIN_SOURCE Source, LONG lCap, double *pValue )
     if (DTWAIN_GetCapDataType(Source, lCap) != TWTY_FIX32)
         return false;
     DTWAIN_ARRAY Array = nullptr;
-    bool bRet = DTWAIN_GetCapValuesEx2(Source, lCap, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
+    auto pSource = static_cast<CTL_ITwainSource*>(Source);
+    const auto pHandle = pSource->GetDTWAINHandle();
+    bool bRet = DTWAIN_GetCapValuesEx2_Internal(pHandle, pSource, lCap, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
     if (!bRet)
         return false;
-    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     DTWAINArrayLowLevel_RAII arr(pHandle, Array);
     const auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<double>(Array);
     if ( bRet && Array )
@@ -811,7 +813,7 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
     DTWAINArrayPtr_RAII a(pHandle, &OrigVals);
 
     // get the capability values
-    if (DTWAIN_GetCapValuesEx2(Source, lCap, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arrayToUse))
+    if (DTWAIN_GetCapValuesEx2_Internal(pHandle, pSource, lCap, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arrayToUse))
     {
         // Gotten the value.  Check what container type holds the data
         const LONG lContainer = DTWAIN_GetCapContainer(Source, lCap, GetType);

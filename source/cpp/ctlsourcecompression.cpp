@@ -23,6 +23,7 @@
 #include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
+#include "ctlsetgetcaps.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -199,7 +200,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, L
         DTWAIN_ARRAY aCurrentFileFormat = {};
         DTWAINArrayLowLevelPtr_RAII raii2(pHandle, &aCurrentFileFormat);
         std::vector<LONG>* ptrVectCurrentFormat = nullptr;
-        bool bGotCurrentFileFormat = DTWAIN_GetCapValuesEx2(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aCurrentFileFormat);
+        bool bGotCurrentFileFormat = DTWAIN_GetCapValuesEx2_Internal(pHandle, pSource, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aCurrentFileFormat);
         if (bGotCurrentFileFormat && isFileTransfer)
         {
             auto& vCurrentFormat = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aCurrentFileFormat);
@@ -214,7 +215,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, L
 
         // Get the current xfermech format
         DTWAIN_ARRAY aCurrentXferMech = {};
-        DTWAIN_GetCapValuesEx2(Source, ICAP_XFERMECH, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aCurrentXferMech);
+        DTWAIN_GetCapValuesEx2_Internal(pHandle, pSource, ICAP_XFERMECH, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aCurrentXferMech);
         DTWAINArrayLowLevelPtr_RAII raii3(pHandle, &aCurrentXferMech);
         auto& vCurrentXferMech = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aCurrentXferMech);
 

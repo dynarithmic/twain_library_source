@@ -23,6 +23,7 @@
 #include <algorithm>
 #include "dtwain.h"
 #include "ctliface.h"
+#include "ctlsetgetcaps.h"
 
 ///////////////////////////////////////////////////////////////////////////
 namespace dynarithmic
@@ -35,10 +36,10 @@ namespace dynarithmic
         if (getAnySupport)
             return true;
         DTWAIN_ARRAY Array = 0;
-        if (DTWAIN_GetCapValuesEx2(Source, Cap, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array))
+        auto pSource = static_cast<CTL_ITwainSource*>(Source);
+        auto pHandle = pSource->GetDTWAINHandle();
+        if (DTWAIN_GetCapValuesEx2_Internal(pHandle, pSource, Cap, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array))
         {
-            auto pSource = static_cast<CTL_ITwainSource*>(Source);
-            auto pHandle = pSource->GetDTWAINHandle();
             DTWAINArrayLowLevel_RAII raii(pHandle, Array);
             DTWAIN_ARRAY tempArray = 0;
             DTWAIN_ARRAY arrayToUse = Array;
@@ -88,7 +89,7 @@ namespace dynarithmic
                 if (nContainer == DTWAIN_CONTRANGE)
                 {
                     DTWAIN_ARRAY Array2 = 0;
-                    DTWAIN_BOOL bRet = DTWAIN_GetCapValuesEx2(Source, Cap, DTWAIN_CAPGET, 
+                    DTWAIN_BOOL bRet = DTWAIN_GetCapValuesEx2_Internal(pHandle, pSource, Cap, DTWAIN_CAPGET, 
                                                  DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array2);
                     DTWAINArrayLowLevel_RAII a2(pHandle, Array2);
                     if (bRet)
@@ -109,14 +110,15 @@ namespace dynarithmic
     template <typename T>
     int GetSupport(DTWAIN_SOURCE Source, typename T::value_type* lpSupport, LONG Cap, LONG CapOp=DTWAIN_CAPGET)
     {
-        const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+        auto pSource = static_cast<CTL_ITwainSource*>(Source);
+        const auto pHandle = pSource->GetDTWAINHandle();
         if (lpSupport == NULL)
         {
             pHandle->m_lLastError = DTWAIN_ERR_INVALID_PARAM;
             return -1;
         }
         DTWAIN_ARRAY Array = 0;
-        BOOL isSupported = DTWAIN_GetCapValuesEx2(Source, Cap, CapOp, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array);
+        BOOL isSupported = DTWAIN_GetCapValuesEx2_Internal(pHandle, pSource, Cap, CapOp, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array);
         DTWAINArrayLowLevel_RAII raii(pHandle, Array);
         if ( isSupported )
         {
