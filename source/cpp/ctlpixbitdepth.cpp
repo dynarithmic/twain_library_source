@@ -24,6 +24,8 @@
 #include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
+#include "ctlsetgetcaps.h"
+
 using namespace dynarithmic;
 
 static DTWAIN_BOOL GetPixelType(DTWAIN_SOURCE Source, LPLONG PixelType, LPLONG BitDepth, LONG GetType);
@@ -179,7 +181,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetBitDepth(DTWAIN_SOURCE Source, LPLONG BitDept
         GetType = DTWAIN_CAPGETDEFAULT;
     DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !BitDepth;} ,
                                  DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-    const DTWAIN_BOOL bRet = DTWAIN_GetCapValuesEx2(Source, ICAP_BITDEPTH, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array);
+    const DTWAIN_BOOL bRet = DTWAIN_GetCapValuesEx2_Internal(pHandle, pSource, ICAP_BITDEPTH, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array);
     if ( bRet && Array )
     {
         const auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);

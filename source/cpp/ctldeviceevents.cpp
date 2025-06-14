@@ -22,6 +22,8 @@
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
 #include "arrayfactory.h"
+#include "ctlsetgetcaps.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -94,7 +96,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceNotifications(DTWAIN_SOURCE Source, LPL
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !CTL_TwainAppMgr::IsCapabilitySupported(pTheSource, CAP_DEVICEEVENT); },
         DTWAIN_ERR_DEVICEEVENT_NOT_SUPPORTED, false, FUNC_MACRO);
 
-    const bool bRet = DTWAIN_GetCapValuesEx2(Source, CAP_DEVICEEVENT, DTWAIN_CAPGETCURRENT, 
+    const bool bRet = DTWAIN_GetCapValuesEx2_Internal(pHandle, pSource, CAP_DEVICEEVENT, DTWAIN_CAPGETCURRENT, 
                                 DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
     if (!bRet)
         LOG_FUNC_EXIT_NONAME_PARAMS(false)

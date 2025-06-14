@@ -37,6 +37,7 @@
 #include "resamplefactory.h"
 #include "ctlfilesave.h"
 #include "cppfunc.h"
+#include "ctlsetgetcaps.h"
 
 using namespace dynarithmic;
 
@@ -1585,9 +1586,9 @@ bool IsState7InfoNeeded(CTL_ITwainSource *pSource)
     bool bRetval = false;
     DTWAIN_ARRAY A = nullptr;
     DTWAINScopedLogControllerExclude scopedLog(DTWAIN_LOG_ERRORMSGBOX);
-    if ( DTWAIN_GetCapValuesEx2(pSource, ICAP_UNDEFINEDIMAGESIZE, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &A))
+    const auto pHandle = pSource->GetDTWAINHandle();
+    if ( DTWAIN_GetCapValuesEx2_Internal(pHandle, pSource, ICAP_UNDEFINEDIMAGESIZE, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &A))
     {
-        const auto pHandle = pSource->GetDTWAINHandle();
         DTWAINArrayLowLevel_RAII raii(pHandle, A);
         const auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(A);
         if ( !vValues.empty())

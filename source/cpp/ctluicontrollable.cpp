@@ -21,6 +21,8 @@
 #include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
+#include "ctlsetgetcaps.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -53,7 +55,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
     {
         // Get the capability value
         DTWAIN_ARRAY CapArray = nullptr;
-        BOOL bGetUI = DTWAIN_GetCapValuesEx2(Source, CAP_UICONTROLLABLE, DTWAIN_CAPGET, 
+        BOOL bGetUI = DTWAIN_GetCapValuesEx2_Internal(pHandle, pSource, CAP_UICONTROLLABLE, DTWAIN_CAPGET, 
                                 DTWAIN_CONTONEVALUE, DTWAIN_DEFAULT, &CapArray);
         if (bGetUI && CapArray && !pHandle->m_ArrayFactory->empty(CapArray))
         {

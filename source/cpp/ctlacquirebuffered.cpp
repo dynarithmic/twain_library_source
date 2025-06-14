@@ -25,6 +25,7 @@
 #include "sourceacquireopts.h"
 #include "ctltwainmsgloop.h"
 #include "sourceselectopts.h"
+#include "ctlsetgetcaps.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -98,8 +99,8 @@ static int CheckTiledBufferedSupport(CTL_ITwainSource* pSource)
     DTWAINArrayPtr_RAII tempRAII(pHandle, &arr);
 
     // Get the original capability
-    auto bRet = DTWAIN_GetCapValuesEx2(pSource, ICAP_TILES, DTWAIN_CAPGET, 
-                                    DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
+    auto bRet = DTWAIN_GetCapValuesEx2_Internal(pHandle, pSource, ICAP_TILES, DTWAIN_CAPGET, 
+                                                DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
     if (!bRet)
     {
         pSource->SetBufferedTileModeSupported(false);

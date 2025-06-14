@@ -21,6 +21,8 @@
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
 #include "ctltmpl5.h"
+#include "ctlsetgetcaps.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -75,7 +77,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapabili
         {
             DTWAIN_ARRAY testArray = {};
             DTWAINArrayPtr_RAII raii(pHandle, &testArray);
-            bool ok = DTWAIN_GetCapValuesEx2(Source, lCapability, DTWAIN_CAPGET, ContainerTypeArray[j], DataTypeArray[i], &testArray);
+            bool ok = DTWAIN_GetCapValuesEx2_Internal(pHandle, pSource, lCapability, DTWAIN_CAPGET, ContainerTypeArray[j], DataTypeArray[i], &testArray);
             if (ok)
             {
                 LONG statusValue = (LONG)DataTypeArray[i] << 16 | ContainerTypeArray[j];
