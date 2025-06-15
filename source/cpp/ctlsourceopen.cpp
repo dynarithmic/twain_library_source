@@ -124,7 +124,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     {
         DTWAIN_ARRAY extArray = {};
         DTWAINArrayPtr_RAII temp_(pHandle, &extArray);
-        bool bOk = DTWAIN_GetCapValuesEx2_Internal(pHandle, pSource, ICAP_SUPPORTEDEXTIMAGEINFO, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &extArray);
+        bool bOk = GetCapValuesEx2_Internal(pSource, ICAP_SUPPORTEDEXTIMAGEINFO, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &extArray);
         if (bOk && extArray)
         {
             auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(extArray);

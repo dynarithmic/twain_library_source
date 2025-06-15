@@ -27,7 +27,10 @@
 ///////////////////////////////////////////////////////////////////////////
 namespace dynarithmic
 {
-    bool DTWAIN_GetCapValuesEx2_Internal(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource,
-        LONG lCap, LONG lGetType, LONG lContainerType, LONG nDataType, LPDTWAIN_ARRAY pArray);
+    bool GetCapValuesEx2_Internal(CTL_ITwainSource* pSource,
+                                  LONG lCap, LONG lGetType, LONG lContainerType, LONG nDataType, LPDTWAIN_ARRAY pArray);
+
+    bool SetCapValuesEx2_Internal(CTL_ITwainSource* pSource, LONG lCap, LONG lSetType, LONG lContainerType,
+                                  LONG nDataType, DTWAIN_ARRAY pArray);
 }
 #endif

@@ -38,7 +38,7 @@ namespace dynarithmic
         DTWAIN_ARRAY Array = 0;
         auto pSource = static_cast<CTL_ITwainSource*>(Source);
         auto pHandle = pSource->GetDTWAINHandle();
-        if (DTWAIN_GetCapValuesEx2_Internal(pHandle, pSource, Cap, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array))
+        if (GetCapValuesEx2_Internal(pSource, Cap, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array))
         {
             DTWAINArrayLowLevel_RAII raii(pHandle, Array);
             DTWAIN_ARRAY tempArray = 0;
@@ -89,7 +89,7 @@ namespace dynarithmic
                 if (nContainer == DTWAIN_CONTRANGE)
                 {
                     DTWAIN_ARRAY Array2 = 0;
-                    DTWAIN_BOOL bRet = DTWAIN_GetCapValuesEx2_Internal(pHandle, pSource, Cap, DTWAIN_CAPGET, 
+                    DTWAIN_BOOL bRet = GetCapValuesEx2_Internal(pSource, Cap, DTWAIN_CAPGET, 
                                                  DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array2);
                     DTWAINArrayLowLevel_RAII a2(pHandle, Array2);
                     if (bRet)
@@ -118,7 +118,7 @@ namespace dynarithmic
             return -1;
         }
         DTWAIN_ARRAY Array = 0;
-        BOOL isSupported = DTWAIN_GetCapValuesEx2_Internal(pHandle, pSource, Cap, CapOp, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array);
+        BOOL isSupported = GetCapValuesEx2_Internal(pSource, Cap, CapOp, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array);
         DTWAINArrayLowLevel_RAII raii(pHandle, Array);
         if ( isSupported )
         {

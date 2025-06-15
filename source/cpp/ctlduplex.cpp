@@ -34,8 +34,8 @@ static std::pair<bool, int> GetDuplexType(DTWAIN_SOURCE Source)
     DTWAIN_ARRAY Array = nullptr;
     auto pSource = static_cast<CTL_ITwainSource*>(Source);
     const auto pHandle = pSource->GetDTWAINHandle();
-    const DTWAIN_BOOL bRet2 = DTWAIN_GetCapValuesEx2_Internal(pHandle, pSource, CAP_DUPLEX, DTWAIN_CAPGET,
-                                                              DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
+    const DTWAIN_BOOL bRet2 = GetCapValuesEx2_Internal(pSource, CAP_DUPLEX, DTWAIN_CAPGET,
+                                                       DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
     DTWAINArrayLowLevel_RAII arr(pHandle, Array);
     if (bRet2 && Array)
     {

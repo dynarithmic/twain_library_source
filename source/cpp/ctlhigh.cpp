@@ -780,7 +780,7 @@ static bool GetDoubleCap( DTWAIN_SOURCE Source, LONG lCap, double *pValue )
     DTWAIN_ARRAY Array = nullptr;
     auto pSource = static_cast<CTL_ITwainSource*>(Source);
     const auto pHandle = pSource->GetDTWAINHandle();
-    bool bRet = DTWAIN_GetCapValuesEx2_Internal(pHandle, pSource, lCap, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
+    bool bRet = GetCapValuesEx2_Internal(pSource, lCap, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
     if (!bRet)
         return false;
     DTWAINArrayLowLevel_RAII arr(pHandle, Array);
@@ -813,7 +813,7 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
     DTWAINArrayPtr_RAII a(pHandle, &OrigVals);
 
     // get the capability values
-    if (DTWAIN_GetCapValuesEx2_Internal(pHandle, pSource, lCap, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arrayToUse))
+    if (GetCapValuesEx2_Internal(pSource, lCap, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arrayToUse))
     {
         // Gotten the value.  Check what container type holds the data
         const LONG lContainer = DTWAIN_GetCapContainer(Source, lCap, GetType);
