@@ -24,6 +24,7 @@
 #include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
+#include "ctlsetgetcaps.h"
 
 using namespace dynarithmic;
 
@@ -47,7 +48,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJobControl(DTWAIN_SOURCE Source, LONG JobCont
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
     vValues[0] = JobControl;
 
-    const DTWAIN_BOOL bRet = DTWAIN_SetCapValuesEx2(Source, CAP_JOBCONTROL, SetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array );
+    const DTWAIN_BOOL bRet = dynarithmic::SetCapValuesEx2_Internal(pSource, CAP_JOBCONTROL, SetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array );
     if ( bRet )
     {
         // Set the source value in the cache
