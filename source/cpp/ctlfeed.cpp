@@ -252,7 +252,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFeederSensitive(DTWAIN_SOURCE Source)
     pSource->SetFeederSensitive(bRet);
 
     // We will see if the source is compliant
-    if (!bRet && !DTWAIN_IsCapSupported(Source, CAP_PAPERDETECTABLE))
+    if (!bRet && !pSource->IsCapInSupportedList(CAP_PAPERDETECTABLE))
     {
         BOOL bSupported = DTWAIN_IsFeederSupported(Source);
         if ( bSupported )
@@ -316,10 +316,10 @@ LONG DLLENTRY_DEF DTWAIN_GetFeederFuncs(DTWAIN_SOURCE Source)
 
 bool ExecuteFeederState5Func(DTWAIN_SOURCE Source, LONG lCap)
 {
-    if ( !DTWAIN_IsCapSupported(Source, lCap) )
+    CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
+    if (!pSource->IsCapInSupportedList(lCap))
         return false;
 
-    CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
     const auto pHandle = pSource->GetDTWAINHandle();
     DTWAIN_ARRAY aValues = CreateArrayFromCap(pHandle, nullptr, lCap, 0);
     if ( !aValues )

@@ -51,7 +51,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
     bool bOk = false;
 
     // Check if capability UICONTROLLABLE is supported
-    if (DTWAIN_IsCapSupported(Source, CAP_UICONTROLLABLE))
+    if (pSource->IsCapInSupportedList(CAP_UICONTROLLABLE))
     {
         // Get the capability value
         DTWAIN_ARRAY CapArray = nullptr;
