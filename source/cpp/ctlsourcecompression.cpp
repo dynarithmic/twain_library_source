@@ -23,6 +23,7 @@
 #include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
+#include "ctlsetgetcaps.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -31,7 +32,7 @@
 using namespace dynarithmic;
 
 // Sets the ICAP_XFERMECH and ICAP_COMPRESSION caps with the Mode and lFileType values
-static bool ImageFileFormatCapHandler(DTWAIN_SOURCE Source, CTL_TwainDLLHandle* pHandle, LONG lFileType, LONG Mode)
+static bool ImageFileFormatCapHandler(CTL_ITwainSource* pSource, CTL_TwainDLLHandle* pHandle, LONG lFileType, LONG Mode)
 {
     static constexpr std::array<LONG, 2> aOnePassXferMech = { TWSX_NATIVE, TWSX_MEMORY };
     std::array<std::pair<LONG, LONG>, 2> capsToSet = { { {ICAP_XFERMECH, Mode}, {ICAP_IMAGEFILEFORMAT, lFileType} } };
@@ -43,7 +44,7 @@ static bool ImageFileFormatCapHandler(DTWAIN_SOURCE Source, CTL_TwainDLLHandle* 
         tempBuffer1[0] = val.second;
 
         // Set the capability
-        bool bOk = DTWAIN_SetCapValuesEx2(Source, val.first, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, tempArray1);
+        bool bOk = SetCapValuesEx2_Internal(pSource, val.first, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, tempArray1);
         if (!bOk)
             return false;
 
@@ -103,17 +104,17 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, L
 {
     struct ResetImageFormatRAII
     {
-        DTWAIN_SOURCE Source;
+        CTL_ITwainSource* pSource;
         CTL_TwainDLLHandle* pHandle;
         std::array<LONG, 2> origSetting = {};
         bool bDoReset;
-        ResetImageFormatRAII(DTWAIN_SOURCE theSource, CTL_TwainDLLHandle* theHandle, 
+        ResetImageFormatRAII(CTL_ITwainSource* theSource, CTL_TwainDLLHandle* theHandle, 
                              const std::array<LONG, 2>& origXferMech) :
-            Source(theSource), pHandle(theHandle), origSetting(origXferMech), bDoReset(true) {}
+            pSource(theSource), pHandle(theHandle), origSetting(origXferMech), bDoReset(true) {}
         ~ResetImageFormatRAII()
         {
             if (bDoReset)
-                ImageFileFormatCapHandler(Source, pHandle, origSetting[0], origSetting[1]);
+                ImageFileFormatCapHandler(pSource, pHandle, origSetting[0], origSetting[1]);
         }
     };
 
@@ -199,7 +200,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, L
         DTWAIN_ARRAY aCurrentFileFormat = {};
         DTWAINArrayLowLevelPtr_RAII raii2(pHandle, &aCurrentFileFormat);
         std::vector<LONG>* ptrVectCurrentFormat = nullptr;
-        bool bGotCurrentFileFormat = DTWAIN_GetCapValuesEx2(Source, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aCurrentFileFormat);
+        bool bGotCurrentFileFormat = GetCapValuesEx2_Internal(pSource, ICAP_IMAGEFILEFORMAT, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aCurrentFileFormat);
         if (bGotCurrentFileFormat && isFileTransfer)
         {
             auto& vCurrentFormat = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aCurrentFileFormat);
@@ -214,11 +215,11 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, L
 
         // Get the current xfermech format
         DTWAIN_ARRAY aCurrentXferMech = {};
-        DTWAIN_GetCapValuesEx2(Source, ICAP_XFERMECH, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aCurrentXferMech);
+        GetCapValuesEx2_Internal(pSource, ICAP_XFERMECH, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aCurrentXferMech);
         DTWAINArrayLowLevelPtr_RAII raii3(pHandle, &aCurrentXferMech);
         auto& vCurrentXferMech = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aCurrentXferMech);
 
-        auto bChangedOk = ImageFileFormatCapHandler(Source, pHandle, lFileType, currentMode);
+        auto bChangedOk = ImageFileFormatCapHandler(pSource, pHandle, lFileType, currentMode);
         if (!bChangedOk)
         {
             // return error
@@ -227,7 +228,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, L
         }
 
         // This resets the ICAP_IMAGEFILEFORMAT and ICAP_XFERMECH caps back to the original value on each iteration
-        ResetImageFormatRAII resetter(Source, pHandle, { ptrVectCurrentFormat ? ptrVectCurrentFormat->front() : -1, vCurrentXferMech.front() });
+        ResetImageFormatRAII resetter(pSource, pHandle, { ptrVectCurrentFormat ? ptrVectCurrentFormat->front() : -1, vCurrentXferMech.front() });
 
         // Get the compressions for this type
         auto tempCompression = DTWAIN_EnumCompressionTypesEx(Source);

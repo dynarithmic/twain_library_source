@@ -677,22 +677,14 @@ namespace dynarithmic
             return TokenizeEx(str, lpszTokStr, rArray, bGetNullTokens);
         }
 
-        static bool StartsWith(const StringType& str, const StringType& sub)
+        static bool StartsWith(typename StringTraits::stringview_type str, 
+                               typename StringTraits::stringview_type sub)
         {
             return boost::algorithm::starts_with(str, sub);
         }
 
-        static bool StartsWith(const StringType& str, const CharType* sub)
-        {
-            return boost::algorithm::starts_with(str, sub);
-        }
-
-        static bool EndsWith(const StringType& str, const StringType& sub)
-        {
-            return boost::algorithm::ends_with(str, sub);
-        }
-
-        static bool EndsWith(const StringType& str, const CharType* sub)
+        static bool EndsWith(typename StringTraits::stringview_type str, 
+                             typename StringTraits::stringview_type sub)
         {
             return boost::algorithm::ends_with(str, sub);
         }
@@ -709,12 +701,12 @@ namespace dynarithmic
             return TokenizeQuotedEx(str, lpszTokStr, rArray, bGetNullTokens);
         }
 
-        static int Compare(const StringType& str, const CharType* lpsz)
+        static int Compare(typename StringTraits::stringview_type str, const CharType* lpsz)
         {
             return str.compare(lpsz);
         }
 
-        static bool CompareNoCase(const StringType& str, const CharType* lpsz)
+        static bool CompareNoCase(typename StringTraits::stringview_type str, const CharType* lpsz)
         {
             return boost::iequals(str, lpsz);
         }
@@ -747,12 +739,12 @@ namespace dynarithmic
             return StringTraits::ToString(value);
         }
 
-        static double ToDouble(const StringType& s1)
+        static double ToDouble(typename StringTraits::stringview_type s1)
         {
-            return StringTraits::ToDouble(s1.c_str());
+            return StringTraits::ToDouble(s1.data());
         }
 
-        static int ReverseFind(const StringType& str, CharType ch)
+        static int ReverseFind(typename StringTraits::stringview_type str, CharType ch)
         {
             return static_cast<int>(str.rfind(ch));
         }
@@ -903,9 +895,9 @@ namespace dynarithmic
             return boost::algorithm::replace_all_copy(origString, StringTraits::GetNewLineString(), StringTraits::GetWindowsNewLineString());
         }
 
-        static HANDLE ConvertToAPIStringEx(const StringType& origString)
+        static HANDLE ConvertToAPIStringEx(typename StringTraits::stringview_type origString)
         {
-            StringType newString = ConvertToAPIString(origString);
+            StringType newString = ConvertToAPIString(origString.data());
             HANDLE newHandle = GlobalAlloc(GHND, newString.size() * sizeof(StringTraits::char_type) + sizeof(StringTraits::char_type));
             if (newHandle)
             {
