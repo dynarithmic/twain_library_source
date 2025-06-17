@@ -355,7 +355,7 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
                 index = SendMessage(lstSources, LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(sName.c_str()));
                 if (!DefName.empty())
                 {
-                    if (StringWrapper::traits_type::Compare(sName.c_str(), static_cast<LPCTSTR>(DefName.data())) == 0)
+                    if (StringWrapper::Compare(sName, static_cast<LPCTSTR>(DefName.data())) == 0)
                         DefIndex = index;
                 }
             }

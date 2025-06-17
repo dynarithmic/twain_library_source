@@ -25,6 +25,7 @@
 #include "sourceacquireopts.h"
 #include "ctltwainmsgloop.h"
 #include "sourceselectopts.h"
+#include "ctlsetgetcaps.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -98,8 +99,8 @@ static int CheckTiledBufferedSupport(CTL_ITwainSource* pSource)
     DTWAINArrayPtr_RAII tempRAII(pHandle, &arr);
 
     // Get the original capability
-    auto bRet = DTWAIN_GetCapValuesEx2(pSource, ICAP_TILES, DTWAIN_CAPGET, 
-                                    DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
+    auto bRet = GetCapValuesEx2_Internal(pSource, ICAP_TILES, DTWAIN_CAPGET, 
+                                         DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
     if (!bRet)
     {
         pSource->SetBufferedTileModeSupported(false);
@@ -121,15 +122,14 @@ static int CheckTiledBufferedSupport(CTL_ITwainSource* pSource)
     vTiles[0] = 1;
 
     // Set the capability to see if it accepts TRUE for the ICAP_TILES cap
-    bRet = DTWAIN_SetCapValuesEx2(pSource, ICAP_TILES, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, 
-                         DTWAIN_DEFAULT, arr);
+    bRet = SetCapValuesEx2_Internal(pSource, ICAP_TILES, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
     const int finalReturnValue = bRet ? DTWAIN_NO_ERROR : DTWAIN_ERR_TILES_NOT_SUPPORTED;
 
     // Reset to original value
     if (origValue != vTiles[0])
     {
         vTiles[0] = origValue;
-        bRet = DTWAIN_SetCapValuesEx2(pSource, ICAP_TILES, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
+        bRet = SetCapValuesEx2_Internal(pSource, ICAP_TILES, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
     }
 
     // Set the support and return the final results
@@ -179,7 +179,7 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireBuffered(SourceAcquireOptions& opts)
         DTWAIN_ARRAY arr = dynarithmic::CreateArrayFromCap(pHandle, pSource, ICAP_TILES, 1);
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
         vValues[0] = 1;
-        bool bTilesSet = DTWAIN_SetCapValuesEx2(Source, ICAP_TILES, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
+        bool bTilesSet = SetCapValuesEx2_Internal(pSource, ICAP_TILES, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !bTilesSet; }, DTWAIN_ERR_TILEMODE_NOTSET, -1, FUNC_MACRO);
     }
 

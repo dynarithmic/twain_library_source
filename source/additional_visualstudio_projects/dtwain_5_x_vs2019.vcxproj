@@ -1711,6 +1711,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\ctlfileutils.h" />
     <ClInclude Include="h\ctlloadresources.h" />
     <ClInclude Include="h\ctllogfunctioncall.h" />
+    <ClInclude Include="h\ctlsetgetcaps.h" />
     <ClInclude Include="h\ctlstringutils.h" />
     <ClInclude Include="h\ctlsupport.h" />
     <ClInclude Include="h\ctlthreadutils.h" />

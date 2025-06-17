@@ -38,8 +38,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPatchCapsSupported(DTWAIN_SOURCE Source)
         ICAP_PATCHCODETIMEOUT
     };
 
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+    auto* pS = pSource;
     const auto iter = std::find_if(std::begin(nCapToTest), std::end(nCapToTest), [&](LONG val)
-                                   { return DTWAIN_IsCapSupported(Source, val)?true:false;});
+                                   { return pS->IsCapInSupportedList(val)?true:false;});
 
     const bool bRet = iter != std::end(nCapToTest);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)

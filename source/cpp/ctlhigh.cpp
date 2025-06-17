@@ -27,13 +27,14 @@
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctlsupport.h"
+#include "ctlsetgetcaps.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 using namespace dynarithmic;
 
-static bool GetDoubleCap( DTWAIN_SOURCE Source, LONG lCap, double *pValue );
+static bool GetDoubleCap( CTL_ITwainSource* pSource, LONG lCap, double *pValue );
 static LONG GetAllCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, DTWAIN_BOOL bExpandRange);
 static LONG GetCurrentCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, DTWAIN_BOOL bExpandRange);
 static LONG GetDefaultCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, DTWAIN_BOOL bExpandRange);
@@ -758,29 +759,30 @@ DTWAIN_BOOL dynarithmic::DTWAIN_GetDeviceCapByString(DTWAIN_SOURCE Source, LPTST
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetResolution(DTWAIN_SOURCE Source, LPDTWAIN_FLOAT Resolution)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Resolution))
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     LONG lCap = 0;
-    if ( DTWAIN_IsCapSupported( Source, ICAP_XRESOLUTION))
+    if ( pSource->IsCapInSupportedList(ICAP_XRESOLUTION))
         lCap = ICAP_XRESOLUTION;
     else
-    if ( DTWAIN_IsCapSupported( Source, ICAP_XNATIVERESOLUTION))
+    if (pSource->IsCapInSupportedList(ICAP_XNATIVERESOLUTION))
          lCap = ICAP_XNATIVERESOLUTION;
     else
         LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
-    const DTWAIN_BOOL bRet = GetDoubleCap( Source, lCap, Resolution);
+    const DTWAIN_BOOL bRet = GetDoubleCap( pSource, lCap, Resolution);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(FALSE)
 }
 
-static bool GetDoubleCap( DTWAIN_SOURCE Source, LONG lCap, double *pValue )
+static bool GetDoubleCap( CTL_ITwainSource* pSource, LONG lCap, double *pValue )
 {
     double *pRealValue = pValue;
-    if (DTWAIN_GetCapDataType(Source, lCap) != TWTY_FIX32)
+    if (DTWAIN_GetCapDataType(pSource, lCap) != TWTY_FIX32)
         return false;
     DTWAIN_ARRAY Array = nullptr;
-    bool bRet = DTWAIN_GetCapValuesEx2(Source, lCap, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
+    const auto pHandle = pSource->GetDTWAINHandle();
+    bool bRet = GetCapValuesEx2_Internal(pSource, lCap, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
     if (!bRet)
         return false;
-    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     DTWAINArrayLowLevel_RAII arr(pHandle, Array);
     const auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<double>(Array);
     if ( bRet && Array )
@@ -811,7 +813,7 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
     DTWAINArrayPtr_RAII a(pHandle, &OrigVals);
 
     // get the capability values
-    if (DTWAIN_GetCapValuesEx2(Source, lCap, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arrayToUse))
+    if (GetCapValuesEx2_Internal(pSource, lCap, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arrayToUse))
     {
         // Gotten the value.  Check what container type holds the data
         const LONG lContainer = DTWAIN_GetCapContainer(Source, lCap, GetType);
