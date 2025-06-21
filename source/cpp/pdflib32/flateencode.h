@@ -22,6 +22,7 @@ OF THIRD PARTY RIGHTS.
 #define FLATEENCODE_H
 
 #include <string>
-int FlateEncode(const std::string& inData, std::string& outData);
+#include <string_view>
+int FlateEncode(std::string_view inData, std::string& outData);
 
 #endif

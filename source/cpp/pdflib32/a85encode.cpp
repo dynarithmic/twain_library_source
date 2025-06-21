@@ -20,12 +20,13 @@ OF THIRD PARTY RIGHTS.
 */
 #include "a85encode.h"
 #include <string>
+#include <string_view>
 
 class A85Encoder
 {
     public:
         A85Encoder() : count(0), width(72), pos(0), tuple(0) { }
-        std::string EncodeA85(const std::string& strIn);
+        std::string EncodeA85(std::string_view strIn);
 
     private:
         int count;
@@ -36,7 +37,7 @@ class A85Encoder
         std::string strOut;
 };
 
-std::string A85Encoder::EncodeA85(const std::string& strIn)
+std::string A85Encoder::EncodeA85(std::string_view strIn)
 {
     strOut.clear();
     strOut.reserve(strIn.length());
@@ -104,7 +105,7 @@ void A85Encoder::cleanup85(void)
     strOut += "~>";
 }
 
-int ASCII85Encode( const std::string&inData, std::string& outData)
+int ASCII85Encode(std::string_view inData, std::string& outData)
 {
     A85Encoder encoder;
     outData = encoder.EncodeA85(inData);

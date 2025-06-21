@@ -728,17 +728,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSourceValues(DTWAIN_SOURCE Source, LPCTSTR c
 ///////////////// These functions are high-level capability functions ///////////////
 DTWAIN_BOOL dynarithmic::DTWAIN_SetDeviceCapByString(DTWAIN_SOURCE Source, LPCTSTR strVal, SetByStringFn fn)
 {
-    DTWAIN_FLOAT value = 0.0;
-    if ( strVal )
-        value = StringWrapper::ToDouble(strVal);
+    DTWAIN_FLOAT value = StringWrapper::ToDouble(strVal, 0.0);
     return fn(Source, value);
 }
 
 DTWAIN_BOOL dynarithmic::DTWAIN_SetDeviceCapByString2(DTWAIN_SOURCE Source, LPCTSTR strVal, bool bExtra, SetByStringFn2 fn)
 {
-    DTWAIN_FLOAT value = 0.0;
-    if ( strVal )
-        value = StringWrapper::ToDouble(strVal);
+    DTWAIN_FLOAT value = StringWrapper::ToDouble(strVal, 0.0);
     return fn(Source, value, bExtra);
 }
 
