@@ -34,6 +34,7 @@
 #include <vector>
 #include <array>
 #include <unordered_map>
+#include <string_view>
 #include <time.h>
 #include <boost/functional/hash.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -327,7 +328,7 @@ std::string MakeCompatiblePDFString(const std::string& sString)
     return sNew2;
 }
 
-static int NoCompress(const std::string& inData, std::string& outData)
+static int NoCompress(std::string_view inData, std::string& outData)
 {
     outData = inData;
     return 1;
@@ -337,7 +338,7 @@ static int EncodeVectorStream(const std::vector<char>& InputStream,
                               size_t InputLength,std::vector<char>& OutStream,PdfDocument::CompressTypes compresstype)
 {
     static std::array<
-        std::pair<PdfDocument::CompressTypes, std::function<int(const std::string&, std::string&)>>,4>
+        std::pair<PdfDocument::CompressTypes, std::function<int(std::string_view, std::string&)>>,4>
         compress_fn = { {{ PdfDocument::NO_COMPRESS, NoCompress},
                         { PdfDocument::A85_COMPRESS, ASCII85Encode},
                         { PdfDocument::AHEX_COMPRESS, ASCIIHexEncode},

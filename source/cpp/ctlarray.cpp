@@ -1756,7 +1756,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeSetAllFloatString(DTWAIN_RANGE pArray, LPCT
     double d[5];
     LPCTSTR* vals[] = {&dLow, &dUp, &dStep, &dDefault, &dCurrent};
     for (int i = 0; i < 5; ++i )
-      d[i] = vals[i]?StringWrapper::ToDouble(*vals[i]):0;
+      d[i] = StringWrapper::ToDouble(*vals[i]);
     const DTWAIN_BOOL bRet = DTWAIN_RangeSetAllFloat(pArray, d[0], d[1], d[2], d[3], d[4]);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -2290,10 +2290,10 @@ DTWAIN_FRAME DLLENTRY_DEF DTWAIN_FrameCreateString(LPCTSTR Left, LPCTSTR Top, LP
 {
     LOG_FUNC_ENTRY_PARAMS((Left, Top, Right, Bottom))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const double leftD    = Left?StringWrapper::ToDouble(Left):0;
-    const double topD     = Top?StringWrapper::ToDouble(Top):0;
-    const double rightD   = Right?StringWrapper::ToDouble(Right):0;
-    const double bottomD  = Bottom?StringWrapper::ToDouble(Bottom):0;
+    const double leftD    = StringWrapper::ToDouble(Left);
+    const double topD     = StringWrapper::ToDouble(Top);
+    const double rightD   = StringWrapper::ToDouble(Right);
+    const double bottomD  = StringWrapper::ToDouble(Bottom);
     const DTWAIN_FRAME newFrame = CreateFrameArray(pHandle, leftD, topD, rightD, bottomD);
     LOG_FUNC_EXIT_NONAME_PARAMS(newFrame)
     CATCH_BLOCK(DTWAIN_ARRAY(NULL))
@@ -2306,10 +2306,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetAllString(DTWAIN_FRAME Frame, LPCTSTR Le
     auto pr = CheckValidFrame(pHandle, Frame);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pr.first; }, DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
     std::array<double, 4> aComponents;
-    aComponents[0] = Left?StringWrapper::ToDouble(Left):0;
-    aComponents[1] = Top?StringWrapper::ToDouble(Top):0;
-    aComponents[2] = Right?StringWrapper::ToDouble(Right):0;
-    aComponents[3] = Bottom?StringWrapper::ToDouble(Bottom):0;
+    aComponents[0] = StringWrapper::ToDouble(Left);
+    aComponents[1] = StringWrapper::ToDouble(Top);
+    aComponents[2] = StringWrapper::ToDouble(Right);
+    aComponents[3] = StringWrapper::ToDouble(Bottom);
 
     constexpr std::array<LONG, 4> aDimensions = { DTWAIN_FRAMELEFT, DTWAIN_FRAMETOP, DTWAIN_FRAMERIGHT, DTWAIN_FRAMEBOTTOM };
     std::array<LPCTSTR, 4> aValues = { Left, Top, Right, Bottom };
