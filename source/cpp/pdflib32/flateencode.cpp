@@ -23,7 +23,7 @@ OF THIRD PARTY RIGHTS.
 #include "zlib.h"
 #include "flateencode.h"
 
-int FlateEncode(const std::string&inData, std::string& outData)
+int FlateEncode(std::string_view inData, std::string& outData)
 {
     unsigned long compressedLen = static_cast<long>(static_cast<double>(inData.size()) * 1.2 + 12);
     outData.resize(compressedLen);
