@@ -22,7 +22,7 @@ OF THIRD PARTY RIGHTS.
 #define A85ENCODE_H
 
 #include <string>
-int ASCII85Encode(const std::string& inData,
-                  std::string& outData);
+#include <string_view>
+int ASCII85Encode(std::string_view inData, std::string& outData);
 
 #endif
