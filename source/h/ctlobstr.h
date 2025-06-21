@@ -744,6 +744,11 @@ namespace dynarithmic
             return StringTraits::ToDouble(s1.data());
         }
 
+        static double ToDouble(const CharType* s1, double defVal = 0.0)
+        {
+            return s1?StringTraits::ToDouble(s1):defVal;
+        }
+
         static int ReverseFind(typename StringTraits::stringview_type str, CharType ch)
         {
             return static_cast<int>(str.rfind(ch));
@@ -898,11 +903,10 @@ namespace dynarithmic
         static HANDLE ConvertToAPIStringEx(typename StringTraits::stringview_type origString)
         {
             StringType newString = ConvertToAPIString(origString.data());
-            HANDLE newHandle = GlobalAlloc(GHND, newString.size() * sizeof(StringTraits::char_type) + sizeof(StringTraits::char_type));
+            HANDLE newHandle = GlobalAlloc(GHND | GMEM_ZEROINIT, newString.size() * sizeof(StringTraits::char_type) + sizeof(StringTraits::char_type));
             if (newHandle)
             {
                 typename StringTraits::char_type* pData = (typename StringTraits::char_type*)GlobalLock(newHandle);
-                memset(pData, 0, GlobalSize(newHandle));
                 memcpy(pData, newString.data(), newString.size() * sizeof(StringTraits::char_type));
                 GlobalUnlock(newHandle);
                 return newHandle;
