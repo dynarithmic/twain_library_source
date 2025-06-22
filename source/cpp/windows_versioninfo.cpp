@@ -8,14 +8,14 @@ namespace dynarithmic
 {
     CTL_StringType GetVersionInfo()
     {
-        return GetVersionInfo(CTL_StaticData::GetDLLInstanceHandle(), 0);
+        return GetVersionInfo(CTL_StaticData::GetDLLInstanceHandle(), 0, StringWrapper::traits_type::GetNewLineString());
     }
 
-    CTL_StringType GetVersionInfo(HMODULE dllModule, int indent, CTL_StringType crlf)
+    CTL_StringType GetVersionInfo(HMODULE dllModule, int indent, StringWrapper::traits_type::stringview_type crlf)
     {
         const VersionInfo vInfo(dllModule);
         CTL_StringStreamType strm;
-        vInfo.printit(strm, indent, crlf.c_str());
+        vInfo.printit(strm, indent, crlf.data());
         return strm.str();
     }
 }
