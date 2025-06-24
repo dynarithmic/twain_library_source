@@ -5,6 +5,7 @@
 #include <string>
 #include <sstream>
 #include <string_view>
+#include <tuple>
 #include "dtwaindefs.h"
 #include "dtwain_resource_constants2.h"
 #include "ctlobstr.h"
@@ -17,6 +18,7 @@ namespace dynarithmic
     // outputs parameter and return values
     class ParamOutputter
     {
+    public:   
         StringArray aParamNames;
         size_t nWhich;
         std::string argNames;
@@ -30,7 +32,7 @@ namespace dynarithmic
             // ptr must be a pointer to a valid null terminated string, or nullptr.
             if (ptr)
                 strm << outStr << "=\"" << TruncateStringWithMore(ptr, 256)
-                     << "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")";
+                     << "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")" << std::dec;
             else
                 strm << outStr << "=(null)";
         }
@@ -41,7 +43,7 @@ namespace dynarithmic
             if (ptr)
                 strm << outStr << "=\"" << 
                 TruncateStringWithMore(StringConversion::Convert_WidePtr_To_Ansi(ptr), 256) <<
-                "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")";
+                "\" (" << "0x" << std::hex << static_cast<const void*>(ptr) << ")" << std::dec;
             else
                 strm << outStr << "=(null)";
         }
@@ -53,7 +55,7 @@ namespace dynarithmic
             if (ptr)
             {
                 if (!m_bOutputAsString)
-                    strm << outStr << "=0x" << std::hex << static_cast<const void*>(ptr);
+                    strm << outStr << "=0x" << std::hex << static_cast<const void*>(ptr) << std::dec;
                 else
                     strm << outStr << *ptr;
             }
@@ -80,7 +82,7 @@ namespace dynarithmic
                     LogType(outStr, static_cast<const wchar_t*>(t));
                 else
                 if (t)
-                    strm << outStr << "0x" << std::hex << StringConversion::Convert_WidePtr_To_Ansi(t).c_str();
+                    strm << outStr << "0x" << std::hex << StringConversion::Convert_WidePtr_To_Ansi(t).c_str() << std::dec;
                 else
                     strm << outStr << "=(null)";
             }
@@ -91,7 +93,7 @@ namespace dynarithmic
                     LogType(outStr, static_cast<const char*>(t));
                 else
                 if (t)
-                    strm << outStr << "0x" << std::hex << t;
+                    strm << outStr << "0x" << std::hex << t << std::dec;
                 else
                     strm << outStr << "=(null)";
             }
@@ -109,7 +111,7 @@ namespace dynarithmic
                 else
                 {
                     if (t)
-                        strm << outStr << "=" << t;
+                        strm << outStr << "=0x" << std::hex << t << std::dec;
                     else
                         strm << outStr << "=" << "(null)";
                 }
@@ -118,7 +120,7 @@ namespace dynarithmic
             if constexpr (std::is_pointer_v<T>)
             {
                 if (t)
-                    strm << outStr << "=0x" << std::hex << static_cast<const void*>(t);
+                    strm << outStr << "=0x" << std::hex << static_cast<const void*>(t) << std::dec;
                 else
                     strm << outStr << "=" << "(null)";
             }
@@ -137,16 +139,55 @@ namespace dynarithmic
             nWhich(0), m_bIsReturnValue(isReturnValue), m_bOutputAsString(false)
         {
             StringWrapperA::Tokenize(s.data(), "(, )", aParamNames);
-            if (!m_bIsReturnValue)
-                strm << "(";
-            else
-                strm << s << " " << dynarithmic::GetResourceStringFromMap(IDS_LOGMSG_RETURNTEXT) << " ";
+            if (!aParamNames.empty())
+            {
+                if (!m_bIsReturnValue)
+                    strm << "(";
+                else
+                    strm << s << " " << dynarithmic::GetResourceStringFromMap(IDS_LOGMSG_RETURNTEXT) << " ";
+            }
         }
 
         ParamOutputter& setOutputAsString(bool bSet) noexcept
         {
             m_bOutputAsString = bSet;
             return *this;
+        }
+
+        template <typename T>
+        void appendToStream(size_t idx, T val)
+        {
+            if (aParamNames.empty() && !m_bIsReturnValue)
+                return;
+            const bool bIsNull = std::is_pointer_v<T> && !val;
+            if (!m_bIsReturnValue)
+            {
+                // Make sure we log types correctly, especially character pointers.
+                // User may supply to us a writable char buffer that is not null-terminated!
+                LogType(aParamNames[idx], val);
+            }
+            else
+            {
+                if (bIsNull)
+                    strm << "(null)";
+                else
+                {
+                    if constexpr (std::is_same_v<wchar_t*, T> || std::is_same_v<const wchar_t*, T>)
+                        strm << StringConversion::Convert_WidePtr_To_Ansi(val).c_str();
+                    else
+                        strm << val;
+                }
+            }
+            if (!m_bIsReturnValue)
+            {
+                if (aParamNames.empty())
+                    strm << ")";
+                else
+                if (idx < aParamNames.size() - 1)
+                    strm << ", ";
+                else
+                    strm << ")";
+            }
         }
 
         template <typename T, typename ...P>
@@ -192,6 +233,32 @@ namespace dynarithmic
         }
 
         std::string getString() const { return strm.str(); }
+
+        template <typename TupleT>
+        std::string processTupleArguments(const TupleT& tp, std::string_view paramList, bool IsIn, bool IsDeref)
+        {
+            if (!IsIn)
+            {
+                setOutputAsString(true);
+                aParamNames.clear();
+            }
+            if (IsDeref)
+            {
+                setOutputAsString(true);
+            }
+            std::apply([&](const auto&... tupleArgs)
+                {
+                    size_t index = 0;
+                    auto printElem = [&](const auto& x)
+                    {
+                        appendToStream(index, x);
+                        ++index;
+                    };
+
+                    (printElem(tupleArgs), ...);
+                }, tp);
+            return getString();
+        }
     };
 
     class ParamOutputter2
@@ -307,12 +374,12 @@ namespace dynarithmic
     std::string LogValue(std::string_view func, bool isIn, T retValue, P ...p)
     {
         std::string s;
-        if (GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK)
+        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK)
         {
             if (isIn)
-                s = CTL_LogFunctionCallA(func.data(), LOG_INDENT_IN) + ParamOutputter2(false, std::forward<P>(p)...).getString();
+                s = CTL_LogFunctionCallA(DTWAIN_LOG_CALLSTACK, func.data(), LOG_INDENT_IN) + ParamOutputter2(false, std::forward<P>(p)...).getString();
             else
-                s = CTL_LogFunctionCallA(func.data(), LOG_INDENT_OUT) + ParamOutputter2(true, retValue).getString();
+                s = CTL_LogFunctionCallA(DTWAIN_LOG_CALLSTACK, func.data(), LOG_INDENT_OUT) + ParamOutputter2(true, retValue).getString();
             LogWriterUtils::WriteLogInfoA(s);
         }
         return s;

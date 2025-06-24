@@ -1041,7 +1041,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLog(LONG LogFlags, LPCTSTR lpszLogFile)
         if (logFailed)
         {
             // Indicate that there is at least one logger that failed
-            DTWAIN_Check_Error_Condition_2_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_LOG_CREATE_ERROR, false, FUNC_MACRO);
+            DTWAIN_Check_Error_Condition_2_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_LOG_CREATE_ERROR, false, FUNC_MACRO, false);
         }
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(!logFailed)
@@ -1673,7 +1673,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SysDestroy()
     }
     #if DTWAIN_BUILD_LOGCALLSTACK == 1
     if (CTL_StaticData::GetLogFilterFlags())
-        CTL_LogFunctionCallA(FUNC_MACRO, 1);
+        CTL_LogFunctionCallA(CTL_StaticData::GetLogFilterFlags(), FUNC_MACRO, 1);
     #endif
     return bRet;
     CATCH_BLOCK(false)
