@@ -163,6 +163,8 @@
 
     #define LOG_FUNC_EXIT_PARAMS(x) { return(x); }
 
+    #define LOG_FUNC_EXIT_NONAME_PARAMS(x) { return(x); }
+
     #define LOG_FUNC_EXIT_PARAMS_ISTWAINMSG(x) { return(x); }
 
     #define LOG_FUNC_VALUES_EX(argvals)
