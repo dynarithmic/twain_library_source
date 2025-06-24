@@ -99,10 +99,8 @@ std::pair<bool, DTWAIN_ACQUIRE> dynarithmic::StartModalMessageLoop(DTWAIN_SOURCE
     return { true, pImpl->GetAcquireNum() };
 }
 
-bool TwainMessageLoopImpl::IsSourceOpen(CTL_ITwainSource* pSource, bool bUIOnly)
+bool TwainMessageLoopImpl::IsSourceOpen(CTL_ITwainSource* pSource)
 {
-    if (bUIOnly)
-        return pSource->IsUIOpen() ? true : false;
     return !m_pDLLHandle->m_bTransferDone == true && !m_pDLLHandle->m_bSourceClosed == true;
 }
 
@@ -112,29 +110,85 @@ bool TwainMessageLoopImpl::IsAcquireTerminated(CTL_ITwainSource* pSource, bool b
         return true;
     if (bUIOnly)
         return !pSource->IsUIOpen();
-    return !IsSourceOpen(pSource, bUIOnly);
+    return !IsSourceOpen(pSource);
 }
 
 // Depending on the setting in pSource, we want to either loop
 // on PeekMessage(), or rely on the return value of GetMessage().
 // The settings are found in dtwain32.ini or dtwain64.ini under the
 // "TwainLoopPeek" section.
-static bool ContinueTwainLoop(CTL_ITwainSource* pSource, MSG *msg)
+struct ContinueLoopTraitsPeek
 {
-    if (pSource->IsUsePeekMessage())
+    static bool ContinueLoop(MSG* msg)
     {
         PeekMessage(msg, nullptr, 0, 0, PM_REMOVE);
         return true;
     }
-    BOOL bRet = GetMessage(msg, nullptr, 0, 0);
-    if (bRet == -1)
-        return false;
-    return bRet;
-}
+};
+
+struct ContinueLoopTraitsGet
+{
+    static bool ContinueLoop(MSG* msg)
+    {
+        auto bRet = GetMessage(msg, nullptr, 0, 0);
+        return bRet != 0 && bRet != -1;
+    }
+};
+
+template <typename LoopTraits = ContinueLoopTraitsGet>
+struct ContinueLoopTraits
+{
+    static void InvokeLoop(TwainMessageLoopImpl* pImpl, CTL_ITwainSource* pSource, bool isUIOnly)
+    {
+        MSG msg;
+        auto& acquireRef = pImpl->GetAcquireNumRef();
+        auto& sOpts = pImpl->GetAcquireOptions();
+        bool bInitializeAcquisitionProcess = false;
+
+        // Start the message loop.
+        while (LoopTraits::ContinueLoop(&msg))
+        {
+            // If in UIOnly mode, set it up here
+            if (isUIOnly && !bInitializeAcquisitionProcess)
+            {
+                LLSetupUIOnly(pSource);
+                bInitializeAcquisitionProcess = true;
+            }
+
+            // If acquire has been terminated, break out of this loop
+            if (pImpl->IsAcquireTerminated(pSource, isUIOnly))
+            {
+                if (isUIOnly)
+                    pSource->SetUIOnly(false);
+                break;
+            }
+
+            // If we haven't set up the TWAIN device for the acquisition,
+            // do it now.  The LLAcquireImage() will also eventually show
+            // the user-interface of the device, or acquire immediately if
+            // no user-interface is being used.
+            if (!bInitializeAcquisitionProcess)
+            {
+                acquireRef = LLAcquireImage(sOpts);
+                bInitializeAcquisitionProcess = true;
+
+                // Didn't get an acquisition number, so something failed
+                if (acquireRef == -1L)
+                    break;
+            }
+
+            // This will test for TWAIN messages, Data Source messages or application messages.
+            if (pImpl->CanEnterDispatch(&msg))
+            {
+                TranslateMessage(&msg);
+                ::DispatchMessage(&msg);
+            }
+        }
+    }
+};
 
 void TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource* pSource, bool isUIOnly)
 {
-    MSG msg;
     struct UIScopedRAII
     {
         CTL_ITwainSource* m_pSource;
@@ -147,55 +201,26 @@ void TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource* pSource, 
     UIScopedRAII raii(pSource);
     pSource->SetUIOnly(isUIOnly);
 #ifdef _WIN32
-    bool bInitializeAcquisitionProcess = false;
-
     // Make sure message loop is not empty.  Post a WM_NULL message to the
     // message queue to ensure we're not stuck forever on waiting for a 
     // message in the GetMessage() call.
     HWND theWnd = *pSource->GetTwainSession()->GetWindowHandlePtr();
     ::PostMessage(theWnd, WM_NULL, static_cast<WPARAM>(0), static_cast<LPARAM>(0));
 
-    // Start the message loop.
-    while (ContinueTwainLoop(pSource, &msg))
+    if (pSource->IsUsePeekMessage())
     {
-         // If in UIOnly mode, set it up here
-        if (isUIOnly && !bInitializeAcquisitionProcess)
-        {
-            LLSetupUIOnly(pSource);
-            bInitializeAcquisitionProcess = true;
-        }
-
-        // If acquire has been terminated, break out of this loop
-        if (IsAcquireTerminated(pSource, isUIOnly))
-        {
-            if (isUIOnly)
-                pSource->SetUIOnly(false);
-            break;
-        }
-
-        // If we haven't set up the TWAIN device for the acquisition,
-        // do it now.  The LLAcquireImage() will also eventually show
-        // the user-interface of the device, or acquire immediately if
-        // no user-interface is being used.
-        if (!bInitializeAcquisitionProcess)
-        {
-            m_AcquireNum = LLAcquireImage(sOpts);
-            bInitializeAcquisitionProcess = true;
-
-            // Didn't get an acquisition number, so something failed
-            if (m_AcquireNum == -1L)
-                break;
-        }
-
-        // This will test for TWAIN messages, Data Source messages or application messages.
-        if (CanEnterDispatch(&msg))
-        {
-            TranslateMessage(&msg);
-            ::DispatchMessage(&msg);
-        }
+        // Use the PeekMessage() version of the message loop
+        ContinueLoopTraits<ContinueLoopTraitsPeek> msgLoop;
+        msgLoop.InvokeLoop(this, pSource, isUIOnly);
+    }
+    else
+    {
+        // Use the GetMessage() version of the message loop
+        ContinueLoopTraits<ContinueLoopTraitsGet> msgLoop;
+        msgLoop.InvokeLoop(this, pSource, isUIOnly);
     }
 #else
-    while (IsSourceOpen(pSource, isUIOnly))
+    while (IsSourceOpen(pSource))
     {
         CanEnterDispatch(&msg);
     }
@@ -204,15 +229,15 @@ void TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource* pSource, 
 
 TW_UINT16 TW_CALLINGSTYLE TwainMessageLoopV2::TwainVersion2MsgProc(pTW_IDENTITY , pTW_IDENTITY, TW_UINT32, TW_UINT16, TW_UINT16 MSG_, TW_MEMREF)
 {
-    MSG msg = MSG();
+    MSG msg{};
     msg.message = MSG_;
     s_MessageQueue.push(msg);
     return TWRC_SUCCESS;
 }
 
-bool TwainMessageLoopV2::IsSourceOpen(CTL_ITwainSource* pSource, bool bUIOnly)
+bool TwainMessageLoopV2::IsSourceOpen(CTL_ITwainSource* pSource)
 {
-    return !s_MessageQueue.empty() || TwainMessageLoopImpl::IsSourceOpen(pSource, bUIOnly);
+    return !s_MessageQueue.empty() || TwainMessageLoopImpl::IsSourceOpen(pSource);
 }
 
 void dynarithmic::DTWAIN_AcquireProc(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE, WPARAM Data1, LPARAM)
