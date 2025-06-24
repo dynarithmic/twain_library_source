@@ -23,11 +23,63 @@
 
 #include <string.h>
 #include <winconst.h>
+#include <string>
+#include "logwriterutils.h"
 
 namespace dynarithmic
 {
     std::string CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich, LPCSTR pOptionalString = nullptr);
-    std::string CTL_LogFunctionCallA(LPCSTR pFuncName, int nWhich, LPCSTR pOptionalString = nullptr);
+    std::string CTL_LogFunctionCallA(LONG logFlags, LPCSTR pFuncName, int nWhich, LPCSTR pOptionalString = nullptr);
     long& GetLogFilterFlags();
+
+    template <typename TupleType>
+    std::string CTL_LogFunctionCallAndParamsIn_String(LONG filterFlags, LPCSTR pFuncName, std::string_view paramList, TupleType theArgs)
+    {
+        if (CTL_StaticData::GetLogFilterFlags() & filterFlags)
+        {
+            ParamOutputter pm(paramList);
+            return CTL_LogFunctionCallA(DTWAIN_LOG_CALLSTACK, pFuncName, LOG_INDENT_IN) +
+                            pm.processTupleArguments(theArgs, paramList, true, false); // .outputParam(std::forward<Args>(theArgs)...).getString();
+        }
+        return {};
+    }
+
+    template <typename TupleType>
+    void CTL_LogFunctionCallAndParamsIn(LONG filterFlags, LPCSTR pFuncName, std::string_view paramList, TupleType theArgs)
+    {
+        if (CTL_StaticData::GetLogFilterFlags() & filterFlags)
+            LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallAndParamsIn_String(filterFlags, pFuncName, paramList, theArgs));
+    }
+
+    template <typename TupleType>
+    std::string CTL_LogFunctionCallAndParamsOut_String(LONG filterFlags, LPCSTR pFuncName, TupleType theArgs)
+    {
+        if (CTL_StaticData::GetLogFilterFlags() & filterFlags)
+        {
+            ParamOutputter pm("", true);
+            return CTL_LogFunctionCallA(DTWAIN_LOG_CALLSTACK, pFuncName, LOG_INDENT_OUT) +
+                                        pm.processTupleArguments(theArgs, "", false, false);
+        }
+        return {};
+    }
+
+    template <typename TupleType>
+    void CTL_LogFunctionCallAndParamsOut(LONG filterFlags, LPCSTR pFuncName, TupleType theArgs)
+    {
+        if (CTL_StaticData::GetLogFilterFlags() & filterFlags)
+            LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallAndParamsOut_String(filterFlags, pFuncName, theArgs));
+    }
+
+    template <typename TupleType>
+    void CTL_LogFunctionDerefParams(LPCSTR pFuncName, std::string_view paramList, TupleType theArgs)
+    {
+        if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK)
+        {
+            ParamOutputter pm(paramList);
+            std::string s = CTL_LogFunctionCallA(DTWAIN_LOG_CALLSTACK, pFuncName, LOG_INDENT_USELAST) +
+                            pm.processTupleArguments(theArgs, paramList, true, true); 
+            LogWriterUtils::WriteLogInfoA(s);
+        }
+    }
 }
 #endif

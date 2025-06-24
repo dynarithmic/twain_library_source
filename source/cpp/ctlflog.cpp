@@ -30,8 +30,10 @@ using namespace dynarithmic;
 
 static void LogExceptionToConsole(LPCSTR fname, const char* sAdditionalText=nullptr);
 
-std::string dynarithmic::CTL_LogFunctionCallA(LPCSTR pFuncName, int nWhich, LPCSTR pOptionalString/* = NULL*/)
+std::string dynarithmic::CTL_LogFunctionCallA(LONG logFlags, LPCSTR pFuncName, int nWhich, LPCSTR pOptionalString/* = NULL*/)
 {
+    if (!(CTL_StaticData::GetLogFilterFlags() & logFlags))
+        return {};
     std::string ret;
     if (pOptionalString)
         ret = CTL_LogFunctionCallHelper(pFuncName, nWhich, pOptionalString);

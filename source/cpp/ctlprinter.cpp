@@ -191,7 +191,6 @@ DTWAIN_ARRAY GetPrinterMode(DTWAIN_SOURCE Source, LONG GetType)
     if ( !DTWAIN_IsCapSupported(Source, CAP_PRINTERMODE) )
         return nullptr;
     auto pSource = static_cast<CTL_ITwainSource*>(Source);
-    const auto pHandle = pSource->GetDTWAINHandle();
     DTWAIN_ARRAY Array = nullptr;
     const DTWAIN_BOOL bRet = GetCapValuesEx2_Internal(pSource, CAP_PRINTERMODE, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array);
     if ( bRet )
