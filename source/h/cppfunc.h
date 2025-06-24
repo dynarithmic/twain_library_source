@@ -185,6 +185,6 @@
     #define CATCH_BLOCK_LOG_PARAMS(type) CATCH_BLOCK(type)
 
 #endif
-#include "dtwain_paramlogger.h"
+#include "ctllogfunctioncall.h"
 #endif
 
