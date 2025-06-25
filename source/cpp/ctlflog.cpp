@@ -25,11 +25,13 @@
 #include "ctltwainmanager.h"
 #include "dtwain_resource_constants.h"
 #include "dtwain_exception.h"
+#include "ctllogcalls.h"
 
 using namespace dynarithmic;
 
 static void LogExceptionToConsole(LPCSTR fname, const char* sAdditionalText=nullptr);
 
+#if DTWAIN_BUILD_LOGCALLSTACK == 1
 std::string dynarithmic::CTL_LogFunctionCallA(int32_t logFlags, const char *pFuncName, int nWhich, const char *pOptionalString/* = NULL*/)
 {
     if (!(CTL_StaticData::GetLogFilterFlags() & logFlags))
@@ -113,6 +115,7 @@ std::string dynarithmic::CTL_LogFunctionCallHelper(const char *pFuncName, int nW
     }
     return s;
 }
+#endif
 
 void dynarithmic::LogExceptionErrorA(const char * fname, bool bIsCatchAll, const char* sAdditionalText)
 {
