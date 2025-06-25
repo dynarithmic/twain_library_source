@@ -21,6 +21,9 @@
 #ifndef CTLLOGFUNCTIONCALL_H
 #define CTLLOGFUNCTIONCALL_H
 
+#include "dtwain_config.h"
+#if DTWAIN_BUILD_LOGCALLSTACK == 1
+
 #include <string.h>
 #include <winconst.h>
 #include <string>
@@ -29,7 +32,6 @@
 #include "dtwaindefs.h"
 #include "dtwain_resource_constants2.h"
 #include "ctlloadresources.h"
-#include "dtwain_config.h"
 #include "ctllogcalls.h"
 
 namespace dynarithmic
@@ -454,4 +456,5 @@ namespace dynarithmic
         }
     }
 }
+#endif
 #endif
