@@ -25,6 +25,13 @@
 
 #include "ctlobstr.h"
 
+#define LOG_INDENT_CONSOLE 0
+#define LOG_NO_INDENT   1
+#define LOG_INDENT_IN   2
+#define LOG_INDENT_OUT  3
+#define LOG_INDENT_USELAST 4
+#define LOG_INDENT_USELAST_NOFUNCTION 5
+
 namespace dynarithmic
 {
     struct LogWriterUtils

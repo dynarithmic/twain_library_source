@@ -19,11 +19,12 @@
     OF THIRD PARTY RIGHTS.
  */
 
+#include "../nlohmann/json.hpp"
+#include <boost/range/adaptor/transformed.hpp>
 #include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
-#include "../nlohmann/json.hpp"
-#include <boost/range/adaptor/transformed.hpp>
+#include "ctlsetgetcaps.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -300,7 +301,7 @@ ResInfoMap getResolutionInfo(CTL_ITwainSource* pSource)
         auto& pSetUnitsVal = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aSetUnit);
         DTWAINArrayPtr_RAII raii2(pHandle, &aSetUnit);
         DTWAIN_ARRAY curUnit = nullptr;
-        DTWAIN_GetCapValuesEx2(pSource, ICAP_UNITS, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &curUnit);
+        GetCapValuesEx2_Internal(pSource, ICAP_UNITS, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &curUnit);
         if ( curUnit )
         {
             auto& pCurUnit = pHandle->m_ArrayFactory->underlying_container_t<LONG>(curUnit);
@@ -312,12 +313,12 @@ ResInfoMap getResolutionInfo(CTL_ITwainSource* pSource)
                     resMap.insert({pUnitsVals[i],{}});
                     // Set the current unit of measure
                     pSetUnitsVal[0] = pUnitsVals[i];
-                    if (DTWAIN_SetCapValuesEx2(pSource, ICAP_UNITS, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, aSetUnit))
+                    if (SetCapValuesEx2_Internal(pSource, ICAP_UNITS, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, aSetUnit))
                     {
                         // Get the resolution values for this unit of measure
                         DTWAIN_ARRAY aResolutions = {};
                         DTWAINArrayPtr_RAII raii3(pHandle, &aResolutions);
-                        DTWAIN_GetCapValuesEx2(pSource, ICAP_XRESOLUTION, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aResolutions);
+                        GetCapValuesEx2_Internal(pSource, ICAP_XRESOLUTION, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aResolutions);
                         if ( aResolutions )
                         {
                             auto& pResolutions = pHandle->m_ArrayFactory->underlying_container_t<double>(aResolutions);
@@ -332,7 +333,7 @@ ResInfoMap getResolutionInfo(CTL_ITwainSource* pSource)
                 }
 
                 // Set the unit back to the original
-                DTWAIN_SetCapValuesEx2(pSource, ICAP_UNITS, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, curUnit);
+                SetCapValuesEx2_Internal(pSource, ICAP_UNITS, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, curUnit);
             }
         }
     }
@@ -916,13 +917,11 @@ LONG DLLENTRY_DEF DTWAIN_GetSessionDetails(LPTSTR szBuf, LONG nSize, LONG indent
         details = pHandle->m_strSessionDetails;
     else
     {
-        DTWAIN_ARRAY aAllSources = DTWAIN_EnumSourcesEx();
-        DTWAINArrayPtr_RAII raii(pHandle, &aAllSources);
-        if ( !aAllSources )
+        const auto& vBuf = pHandle->m_pTwainSession->GetTwainSources();
+        if ( vBuf.empty() )
             LOG_FUNC_EXIT_NONAME_PARAMS(0)
         std::vector<std::string> vAllSources;
-        auto& vBuf = pHandle->m_ArrayFactory->underlying_container_t<CTL_ITwainSource*>(aAllSources);
-        for (auto theSource : vBuf)
+        for (auto& theSource : vBuf)
             vAllSources.push_back(theSource->GetProductNameA());
         details = StringConversion::Convert_Ansi_To_Native(generate_details(*pHandle->m_pTwainSession, vAllSources, indentFactor));
         pHandle->m_strSessionDetails = details;

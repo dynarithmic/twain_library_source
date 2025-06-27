@@ -23,6 +23,7 @@
 #include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "ctlsupport.h"
+#include "ctlsetgetcaps.h"
 
 using namespace dynarithmic;
 
@@ -46,7 +47,7 @@ bool dynarithmic::GetSupportString(DTWAIN_SOURCE Source, LPTSTR sz, LONG nLen, L
 
 bool dynarithmic::EnumSupported(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG Cap)
 {
-    const bool bRet = DTWAIN_GetCapValuesEx2(Source, Cap, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, pArray)?true:false;
+    const bool bRet = GetCapValuesEx2_Internal(static_cast<CTL_ITwainSource*>(Source), Cap, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, pArray)?true:false;
     return bRet;
 }
 

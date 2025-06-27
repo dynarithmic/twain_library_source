@@ -232,7 +232,7 @@
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <ExceptionHandling>Async</ExceptionHandling>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>dtwain$(PlatformArchitecture)ud.pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
@@ -686,7 +686,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <ExceptionHandling>Async</ExceptionHandling>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>dtwain$(PlatformArchitecture)d.pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
@@ -819,7 +819,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;USE_DTWAIN_DEBUG_LIB;_DEBUG;FREEIMAGE_CPP_LIB;_UNICODE;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
       <ProgramDataBaseFileName>.\obj\$(Configuration)\</ProgramDataBaseFileName>
@@ -1187,7 +1187,7 @@ copy $(TargetDir)$(TargetName).lib .
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;USE_DTWAIN_DEBUG_LIB;_DEBUG;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
       <ProgramDataBaseFileName>.\obj\$(Configuration)\</ProgramDataBaseFileName>
@@ -1392,7 +1392,6 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile Include=".\cpp\logmsg.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">false</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include=".\cpp\ctlxmlparse.cpp" />
     <ClCompile Include=".\cpp\a85decoder.cpp" />
     <ClCompile Include=".\cpp\ctltempdir.cpp" />
     <ClCompile Include=".\cpp\ocrengine\ocrinterface.cpp" />
@@ -1450,6 +1449,9 @@ copy $(TargetDir)$(TargetName).lib .
     </ClCompile>
     <ClCompile Include="cpp\arrayfactory.cpp" />
     <ClCompile Include="cpp\ctlacquireaudio.cpp" />
+    <ClCompile Include="cpp\ctlarraydumper.cpp" />
+    <ClCompile Include="cpp\ctlbufferstrip.cpp" />
+    <ClCompile Include="cpp\ctlcustomdsdata.cpp" />
     <ClCompile Include="cpp\ctlerrorbuffer.cpp" />
     <ClCompile Include="cpp\ctlerrorcallback.cpp" />
     <ClCompile Include="cpp\ctlextimageinfo.cpp" />
@@ -1708,7 +1710,9 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\ctlfilesave.h" />
     <ClInclude Include="h\ctlfileutils.h" />
     <ClInclude Include="h\ctlloadresources.h" />
+    <ClInclude Include="h\ctllogcalls.h" />
     <ClInclude Include="h\ctllogfunctioncall.h" />
+    <ClInclude Include="h\ctlsetgetcaps.h" />
     <ClInclude Include="h\ctlstringutils.h" />
     <ClInclude Include="h\ctlsupport.h" />
     <ClInclude Include="h\ctlthreadutils.h" />
@@ -1734,7 +1738,6 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\dtwain_filetypes.h" />
     <ClInclude Include="h\dtwain_float_utils.h" />
     <ClInclude Include="h\dtwain_library_selector.h" />
-    <ClInclude Include="h\dtwain_paramlogger.h" />
     <ClInclude Include="h\dtwain_raii.h" />
     <ClInclude Include="h\dtwain_standard_defs.h" />
     <ClInclude Include="h\dtwain_version.h" />

@@ -66,7 +66,8 @@ namespace dynarithmic
                 CapGetter(CTL_ITwainSource* pSource) : m_pSource(pSource) {}
                 void operator()(CTL_SetupFileXferTripletImpl::FileXferCapMap::value_type& v) const
                 {
-                    CTL_TwainAppMgr::GetCurrentOneCapValue(m_pSource, &v.second, v.first, static_cast<TW_UINT16>(CTL_TwainAppMgr::GetGeneralCapInfo(v.first).m_nDataType));
+                    CTL_TwainAppMgr::GetOneTwainCapValue(m_pSource, &v.second, v.first, MSG_GETCURRENT,
+                                                         static_cast<TW_UINT16>(CTL_TwainAppMgr::GetGeneralCapInfo(v.first).m_nDataType));
                 }
             };
 

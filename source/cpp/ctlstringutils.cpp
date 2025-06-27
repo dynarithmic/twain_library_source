@@ -18,6 +18,9 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#include <chrono>
+#include <iomanip>
+#include <sstream>
 #include "ctltwainmanager.h"
 #include "ctliface.h"
 #include "cppfunc.h"
@@ -83,24 +86,43 @@ LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringEx(LPCTSTR lpOrigString, LPTSTR lpOut
     CATCH_BLOCK(0)
 }
 
-std::string dynarithmic::TruncateStringWithMore(std::string_view origString, size_t maxLen)
+namespace dynarithmic
 {
-    // Truncate if text is too long
-    if (origString.size() > maxLen)
+    std::string TruncateStringWithMore(std::string_view origString, size_t maxLen)
     {
-        // Get the "More" text
-        std::string MoreText = "...(" + GetResourceStringFromMap(IDS_LOGMSG_MORETEXT) + ")...";
-        std::string origStringS = origString.data();
+        // Truncate if text is too long
+        if (origString.size() > maxLen)
+        {
+            // Get the "More" text
+            std::string MoreText = "...(" + GetResourceStringFromMap(IDS_LOGMSG_MORETEXT) + ")...";
+            std::string origStringS = origString.data();
 
-		// Get original string and resize it
-		std::string tempS = origStringS.substr(0, maxLen);
+            // Get original string and resize it
+            std::string tempS = origStringS.substr(0, maxLen);
 
-        // Add the "More" text
-        tempS += MoreText;
-        if ( tempS.size() < origString.size() )
-            return tempS;
+            // Add the "More" text
+            tempS += MoreText;
+            if (tempS.size() < origString.size())
+                return tempS;
+        }
+
+        // Just return the original string
+        return origString.data();
     }
 
-    // Just return the original string
-    return origString.data();
+    std::string CreateFileNameWithDateTime(std::string_view prefix, std::string_view ext, bool useUTC)
+    {
+        auto now = std::chrono::system_clock::now();
+        if (useUTC)
+        {
+            auto UTC = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
+            return prefix.data() + std::to_string(UTC) + "." + ext.data();
+        }
+        auto in_time_t = std::chrono::system_clock::to_time_t(now);
+        std::stringstream datetime;
+        datetime << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %X");
+        std::string outVal = datetime.str();
+        outVal = StringWrapperA::ReplaceAll(outVal, ":", "_");
+        return prefix.data() + outVal + "." + ext.data();
+    }
 }

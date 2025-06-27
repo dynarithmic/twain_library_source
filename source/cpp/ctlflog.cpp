@@ -25,13 +25,17 @@
 #include "ctltwainmanager.h"
 #include "dtwain_resource_constants.h"
 #include "dtwain_exception.h"
+#include "ctllogcalls.h"
 
 using namespace dynarithmic;
 
 static void LogExceptionToConsole(LPCSTR fname, const char* sAdditionalText=nullptr);
 
-std::string dynarithmic::CTL_LogFunctionCallA(LPCSTR pFuncName, int nWhich, LPCSTR pOptionalString/* = NULL*/)
+#if DTWAIN_BUILD_LOGCALLSTACK == 1
+std::string dynarithmic::CTL_LogFunctionCallA(int32_t logFlags, const char *pFuncName, int nWhich, const char *pOptionalString/* = NULL*/)
 {
+    if (!(CTL_StaticData::GetLogFilterFlags() & logFlags))
+        return {};
     std::string ret;
     if (pOptionalString)
         ret = CTL_LogFunctionCallHelper(pFuncName, nWhich, pOptionalString);
@@ -40,7 +44,7 @@ std::string dynarithmic::CTL_LogFunctionCallA(LPCSTR pFuncName, int nWhich, LPCS
     return ret;
 }
 
-std::string dynarithmic::CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich, LPCSTR pString/*=NULL*/)
+std::string dynarithmic::CTL_LogFunctionCallHelper(const char *pFuncName, int nWhich, const char *pString)
 {
     if (CTL_StaticData::GetLogFilterFlags() == 0 )
          return {};
@@ -111,6 +115,7 @@ std::string dynarithmic::CTL_LogFunctionCallHelper(LPCSTR pFuncName, int nWhich,
     }
     return s;
 }
+#endif
 
 void dynarithmic::LogExceptionErrorA(const char * fname, bool bIsCatchAll, const char* sAdditionalText)
 {

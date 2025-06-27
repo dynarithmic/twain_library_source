@@ -27,13 +27,14 @@
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctlsupport.h"
+#include "ctlsetgetcaps.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
 using namespace dynarithmic;
 
-static bool GetDoubleCap( DTWAIN_SOURCE Source, LONG lCap, double *pValue );
+static bool GetDoubleCap( CTL_ITwainSource* pSource, LONG lCap, double *pValue );
 static LONG GetAllCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, DTWAIN_BOOL bExpandRange);
 static LONG GetCurrentCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, DTWAIN_BOOL bExpandRange);
 static LONG GetDefaultCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap, DTWAIN_BOOL bExpandRange);
@@ -46,24 +47,22 @@ static LONG EnumCapInternal(DTWAIN_SOURCE Source,
                             TW_UINT16 Cap,
                             LPDTWAIN_ARRAY arr,
                             DTWAIN_BOOL expandRange,
-                            GetCapValuesFn fn,
-                            std::string_view func,
-                            std::string_view paramLog);
+                            GetCapValuesFn fn);
 
 #if DTWAIN_BUILD_LOGCALLSTACK == 1
-    #define GENERATE_PARAM_LOG(argVals) \
-            (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK) ? (ParamOutputter((#argVals)).outputParam argVals.getString()) : ("")
+    #define GENERATE_PARAM_LOG(func, argVals) \
+            CTL_LogFunctionCallAndParamsIn_String(DTWAIN_LOG_CALLSTACK, func, #argVals, std::make_tuple argVals)
 #else
-    #define GENERATE_PARAM_LOG(argVals) {}
+    #define GENERATE_PARAM_LOG(func, argVals) {}
 #endif
 
 template <typename CapArrayType>
 static bool GetCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, typename CapArrayType::value_type* value,
-                                 GetCapValuesFn /*capFn*/, std::string_view func, std::string_view paramLog)
+                                 GetCapValuesFn /*capFn*/)
 {
     DTWAIN_ARRAY ArrayValues = nullptr;
     const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
-    const LONG retVal = EnumCapInternal(Source, Cap, &ArrayValues, false, GetCurrentCapValues, func, paramLog);
+    const LONG retVal = EnumCapInternal(Source, Cap, &ArrayValues, false, GetCurrentCapValues);
     DTWAINArrayLowLevel_RAII arr(pHandle, ArrayValues);
     if (retVal > 0)
     {
@@ -110,40 +109,18 @@ struct SetSupportFn2 : public SetSupportFn1<T>
 };
 
 template <typename T, typename FnToCall>
-static T FunctionCaller(FnToCall fn, std::string_view func, std::string_view paramLog)
+static T FunctionCaller(FnToCall fn)
 {
     try
     {
         T bRet {};
-        #if DTWAIN_BUILD_LOGCALLSTACK == 1
-        const bool doLog = CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK ? true : false;
-        if (doLog)
-        {
-            std::string allString = CTL_LogFunctionCallA(func.data(), LOG_INDENT_IN);
-            allString += paramLog;
-            try { LogWriterUtils::WriteLogInfoA(allString); }
-            catch (...) {}
-        }
-        #endif
         bRet = fn();
-
-        #if DTWAIN_BUILD_LOGCALLSTACK == 1
-        if (doLog)
-        {
-            try
-            {
-                LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(func.data(), LOG_INDENT_OUT) + ParamOutputter("", true).outputParam(bRet).getString());
-            }
-            catch (...)
-            { return bRet; }
-        }
-        #endif
         return bRet;
     }
     catch (T var) { return var; }
     catch (...)
     {
-        LogExceptionErrorA(func.data(), true);
+        LogExceptionErrorA("Exception occurred", true);
         if (CTL_StaticData::IsThrowExceptions())
             DTWAIN_InternalThrowException();
         return {};
@@ -220,42 +197,34 @@ struct EnumCapInternalFn
 };
 
 template <typename CapDataType, typename SetterFn>
-static DTWAIN_BOOL SetCapability(SetterFn fn, std::string_view func, std::string_view paramLog)
-{ return FunctionCaller<DTWAIN_BOOL>(fn, func, paramLog); }
+static DTWAIN_BOOL SetCapability(SetterFn fn)
+{ return FunctionCaller<DTWAIN_BOOL>(fn); }
 
-static DTWAIN_BOOL GetCapabilityByString(GetDeviceCapsByStringFn fn,
-                                         std::string_view func,
-                                         std::string_view paramLog)
-{ return FunctionCaller<DTWAIN_BOOL>(fn, func, paramLog); }
+static DTWAIN_BOOL GetCapabilityByString(GetDeviceCapsByStringFn fn)
+{ return FunctionCaller<DTWAIN_BOOL>(fn); }
 
-static bool IsEnabledImpl(DTWAIN_SOURCE Source, TW_UINT16 Cap, std::string_view func, std::string_view paramLog)
-{ return FunctionCaller<bool>(IsEnabledImplFn(Source, Cap), func, paramLog); }
+static bool IsEnabledImpl(DTWAIN_SOURCE Source, TW_UINT16 Cap)
+{ return FunctionCaller<bool>(IsEnabledImplFn(Source, Cap)); }
 
 template <typename T>
-static bool IsSupportedImpl(DTWAIN_SOURCE Source, TW_UINT16 Cap, bool anySupport, T SupportVal,
-                            std::string_view func, std::string_view paramLog)
-{ return FunctionCaller<bool>(IsSupportedImplFn<T>(Source, Cap, anySupport, SupportVal), func, paramLog); }
+static bool IsSupportedImpl(DTWAIN_SOURCE Source, TW_UINT16 Cap, bool anySupport, T SupportVal)
+{ return FunctionCaller<bool>(IsSupportedImplFn<T>(Source, Cap, anySupport, SupportVal)); }
 
 static LONG EnumCapInternal(DTWAIN_SOURCE Source,
                             TW_UINT16 Cap,
                             LPDTWAIN_ARRAY arr,
                             DTWAIN_BOOL expandRange,
-                            GetCapValuesFn fn,
-                            std::string_view func,
-                            std::string_view paramLog)
-{ return FunctionCaller<LONG>(EnumCapInternalFn(Source, Cap, arr, expandRange?true:false, fn), func, paramLog); }
+                            GetCapValuesFn fn)
+{ return FunctionCaller<LONG>(EnumCapInternalFn(Source, Cap, arr, expandRange?true:false, fn)); }
 
 template <typename SetFn>
-static DTWAIN_BOOL SetCapabilityByString(SetFn fn,
-                                         std::string_view func,
-                                         std::string_view paramLog)
-{ return FunctionCaller<DTWAIN_BOOL>(fn, func, paramLog); }
+static DTWAIN_BOOL SetCapabilityByString(SetFn fn)
+{ return FunctionCaller<DTWAIN_BOOL>(fn); }
 
-static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value, LONG nLen, GetCapValuesFn fn, std::string_view func, std::string_view paramLog)
+static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value, LONG nLen, GetCapValuesFn fn)
 {
-
     DTWAIN_ARRAY ArrayValues = nullptr;
-    const LONG retVal = EnumCapInternal(Source, Cap, &ArrayValues, false, fn, func, paramLog);
+    const LONG retVal = EnumCapInternal(Source, Cap, &ArrayValues, false, fn);
     if (nLen > 0)
         value[0] = '\0';
     const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
@@ -272,50 +241,77 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
 
 
 #define EXPORT_ENUM_CAP_VALUES(FuncName, Cap) \
-    LONG DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, DTWAIN_BOOL bExpandIfRange) {\
-        return EnumCapInternal(Source, Cap, pArray, bExpandIfRange, GetAllCapValues, __FUNCTION__, GENERATE_PARAM_LOG((Source, pArray, bExpandIfRange))); }
+    LONG DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, DTWAIN_BOOL bExpandIfRange) \
+    {\
+       LOG_FUNC_ENTRY_PARAMS((Source, pArray, bExpandIfRange)) \
+       auto bRet = EnumCapInternal(Source, Cap, pArray, bExpandIfRange, GetAllCapValues); \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet); \
+       CATCH_BLOCK(false) \
+    }
 
 #define EXPORT_ENUM_CAP_VALUES_NOEXPAND(FuncName, Cap) \
-    LONG DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray) {\
-            return EnumCapInternal(Source, Cap, pArray, false, GetAllCapValues, __FUNCTION__, GENERATE_PARAM_LOG((Source, pArray))); }
+    LONG DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray) \
+    { \
+        LOG_FUNC_ENTRY_PARAMS((Source, pArray)) \
+        auto bRet = EnumCapInternal(Source, Cap, pArray, false, GetAllCapValues); \
+        LOG_FUNC_EXIT_NONAME_PARAMS(bRet); \
+        CATCH_BLOCK(false) \
+    }
 
 #define EXPORT_ENUM_CAP_VALUES_EX(FuncName, Cap) \
-    DTWAIN_ARRAY DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, DTWAIN_BOOL bExpandIfRange) {\
+    DTWAIN_ARRAY DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, DTWAIN_BOOL bExpandIfRange) \
+    {\
+        LOG_FUNC_ENTRY_PARAMS((Source, bExpandIfRange)) \
         DTWAIN_ARRAY pArray = 0; \
-        EnumCapInternal(Source, Cap, &pArray, bExpandIfRange, GetAllCapValues, __FUNCTION__, GENERATE_PARAM_LOG((Source, bExpandIfRange))); \
-        return pArray; }
+        EnumCapInternal(Source, Cap, &pArray, bExpandIfRange, GetAllCapValues); \
+        LOG_FUNC_EXIT_NONAME_PARAMS(pArray); \
+        CATCH_BLOCK(DTWAIN_ARRAY(NULL)) \
+    }
 
 #define EXPORT_ENUM_CAP_VALUES_NOEXPAND_EX(FuncName, Cap) \
-    DTWAIN_ARRAY DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source) {\
-            DTWAIN_ARRAY pArray = 0; \
-            EnumCapInternal(Source, Cap, &pArray, false, GetAllCapValues, __FUNCTION__, GENERATE_PARAM_LOG((Source))); \
-            return pArray; }
+    DTWAIN_ARRAY DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source) \
+    { \
+        LOG_FUNC_ENTRY_PARAMS((Source)) \
+        DTWAIN_ARRAY pArray = 0; \
+        EnumCapInternal(Source, Cap, &pArray, false, GetAllCapValues); \
+        LOG_FUNC_EXIT_NONAME_PARAMS(pArray); \
+        CATCH_BLOCK(DTWAIN_ARRAY(NULL)) \
+     }
 
 #define EXPORT_SET_CAP_VALUE(FuncName, Cap, CapDataType, CapFn) \
     DTWAIN_BOOL  DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, CapDataType value) \
     {\
-       return SetCapability <CapDataType>(CapFn(Source, value, Cap, true), __FUNCTION__, GENERATE_PARAM_LOG((Source, value))); \
+       LOG_FUNC_ENTRY_PARAMS((Source, value)) \
+       auto bRet = SetCapability<CapDataType>(CapFn(Source, value, Cap, true)); \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet); \
+       CATCH_BLOCK(false) \
     }
 
 
 #define EXPORT_SET_CAP_VALUE_PARM3_2(FuncName, Cap1, Cap2, CapDataType1, CapDataType2, value2, CapFn) \
     DTWAIN_BOOL  DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, CapDataType1 value, DTWAIN_BOOL condType ) \
-{\
-    if ( condType )\
-        SetCapability <CapDataType2>(CapFn(Source, value2, Cap2, true), __FUNCTION__, GENERATE_PARAM_LOG((Source, value))); \
-    return SetCapability <CapDataType1>(CapFn(Source, value, Cap1, true), __FUNCTION__, GENERATE_PARAM_LOG((Source, value))); \
-}
+    {\
+       LOG_FUNC_ENTRY_PARAMS((Source, value, condType)) \
+       if ( condType ) \
+           SetCapability <CapDataType2>(CapFn(Source, value2, Cap2, true)); \
+       auto bRet = SetCapability <CapDataType1>(CapFn(Source, value, Cap1, true)); \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet); \
+       CATCH_BLOCK(false) \
+    }
 
 #define EXPORT_SET_CAP_VALUE_2(FuncName, Cap1, Cap2, CapDataType1, CapDataType2, CapFn) \
     DTWAIN_BOOL  DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, CapDataType1 value) \
-{\
-    CapFn theFn, theFn2;\
-    theFn.SetAll(Source, value, Cap1, true);\
-    theFn2.SetAll(Source, value, Cap2, true);\
-    if (SetCapability <CapDataType1>(theFn, __FUNCTION__, GENERATE_PARAM_LOG((Source, value)))) \
-        return SetCapability<CapDataType2>(theFn2, __FUNCTION__, GENERATE_PARAM_LOG((Source, value))); \
-    return FALSE;\
-}
+    {\
+        LOG_FUNC_ENTRY_PARAMS((Source, value)) \
+        CapFn theFn, theFn2;\
+        DTWAIN_BOOL bRet = FALSE; \
+        theFn.SetAll(Source, value, Cap1, true);\
+        theFn2.SetAll(Source, value, Cap2, true);\
+        if (SetCapability <CapDataType1>(theFn)) \
+            bRet = SetCapability<CapDataType2>(theFn2); \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet); \
+       CATCH_BLOCK(false) \
+    }
 
 #define EXPORT_SET_CAP_VALUE_D_D(FuncName, Cap1, Cap2) \
     EXPORT_SET_CAP_VALUE_2(FuncName, Cap1, Cap2, DTWAIN_FLOAT, DTWAIN_FLOAT, SetSupportFn1<DTWAIN_FLOAT>)
@@ -323,48 +319,63 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
 #define EXPORT_GET_CAP_VALUE(FuncName, Cap, CapDataType, CapFn) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, CapDataType::value_type* value)\
     {\
-        return GetCapability<CapDataType>(Source, Cap, value, CapFn, __FUNCTION__, GENERATE_PARAM_LOG((Source, value))); \
+       LOG_FUNC_ENTRY_PARAMS((Source, value)) \
+       auto bRet = GetCapability<CapDataType>(Source, Cap, value, CapFn); \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet); \
+       CATCH_BLOCK(false) \
     }
 
 #define EXPORT_GET_CAP_VALUE_OPT_CURRENT(FuncName, Cap, CapDataType) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, CapDataType::value_type* value, DTWAIN_BOOL bCurrent)\
     {\
-        std::string sLog = GENERATE_PARAM_LOG((Source, value, bCurrent));\
-        std::string func = __FUNCTION__;\
+        LOG_FUNC_ENTRY_PARAMS((Source, value, bCurrent)) \
+        DTWAIN_BOOL bRet = FALSE; \
         if ( bCurrent ) \
-            return GetCapability<CapDataType>(Source, Cap, value, GetCurrentCapValues, func, sLog); \
-        return GetCapability<CapDataType>(Source, Cap, value, GetDefaultCapValues, func, sLog); \
+            bRet = GetCapability<CapDataType>(Source, Cap, value, GetCurrentCapValues); \
+        else \
+            bRet = GetCapability<CapDataType>(Source, Cap, value, GetDefaultCapValues); \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet); \
+       CATCH_BLOCK(false) \
     }
 
 #define EXPORT_SET_CAP_VALUE_OPT_CURRENT(FuncName, Cap, CapDataType, CapFn) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, CapDataType value, DTWAIN_BOOL bCurrent)\
     {\
-        std::string sLog = GENERATE_PARAM_LOG((Source, value, bCurrent));\
-        std::string func = __FUNCTION__;\
-        return SetCapability<CapDataType>(CapFn(Source, value, Cap, bCurrent?true:false), func, sLog); \
+       LOG_FUNC_ENTRY_PARAMS((Source, value, bCurrent)) \
+       auto bRet = SetCapability<CapDataType>(CapFn(Source, value, Cap, bCurrent?true:false)); \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet); \
+       CATCH_BLOCK(false) \
     }
 
 #define EXPORT_GET_CAP_VALUE_STRING(FuncName) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName##String(DTWAIN_SOURCE Source, LPTSTR value)\
     {\
-        auto retVal = GetCapabilityByString(GetDeviceCapsByStringFn(Source, value, FuncName), __FUNCTION__, GENERATE_PARAM_LOG((Source, value)));\
-        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((value)) \
-        return retVal; \
+       LOG_FUNC_ENTRY_PARAMS((Source, value)) \
+       auto bRet = GetCapabilityByString(GetDeviceCapsByStringFn(Source, value, FuncName));\
+       LOG_FUNC_EXIT_DEREFERENCE_POINTERS((value)) \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet); \
+       CATCH_BLOCK(false) \
     }
 
 #define EXPORT_SET_CAP_VALUE_STRING(FuncName) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName##String(DTWAIN_SOURCE Source, LPCTSTR value)\
    {\
+       LOG_FUNC_ENTRY_PARAMS((Source, value)) \
        CapSetterFn fn(Source, value, &FuncName);\
-       return  SetCapabilityByString(fn, __FUNCTION__, GENERATE_PARAM_LOG((Source, value)));\
+       auto bRet = SetCapabilityByString(fn);\
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet); \
+       CATCH_BLOCK(false) \
    }
 
 #define EXPORT_SET_CAP_VALUE_STRING_2(FuncName) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName##String(DTWAIN_SOURCE Source, LPCTSTR value, DTWAIN_BOOL condition)\
-{\
-    CapSetterFn2 fn(Source, value, condition?true:false, &FuncName);\
-    return  SetCapabilityByString(fn, __FUNCTION__, GENERATE_PARAM_LOG((Source, value, condition)));\
-}
+    {\
+       LOG_FUNC_ENTRY_PARAMS((Source, value, condition)) \
+       CapSetterFn2 fn(Source, value, condition?true:false, &FuncName);\
+       auto bRet = SetCapabilityByString(fn);\
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet); \
+       CATCH_BLOCK(false) \
+    }
 
 #define EXPORT_GET_CAP_VALUE_D(FuncName, Cap) EXPORT_GET_CAP_VALUE(FuncName, Cap, CTL_ArrayFactory::tagged_array_double, GetCurrentCapValues)
 #define EXPORT_GET_CAP_VALUE_I(FuncName, Cap) EXPORT_GET_CAP_VALUE(FuncName, Cap, CTL_ArrayFactory::tagged_array_long, GetCurrentCapValues)
@@ -372,25 +383,27 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
 #define EXPORT_GET_CAP_VALUE_S(FuncName, Cap, NumChars) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, LPTSTR value)\
     {\
+        LOG_FUNC_ENTRY_PARAMS((Source, value)) \
         std::string valueTemp((NumChars) + 1, '\0');\
-        auto retVal = GetStringCapability(Source, Cap, &valueTemp[0], NumChars, \
-                                          GetCurrentCapValues, __FUNCTION__, GENERATE_PARAM_LOG((Source, value))); \
+        auto retVal = GetStringCapability(Source, Cap, &valueTemp[0], NumChars, GetCurrentCapValues); \
         valueTemp.resize(NumChars); \
         StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp, valueTemp.size()), value, NumChars); \
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((value)) \
-        return retVal;\
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal); \
+        CATCH_BLOCK(false) \
     }
 
 #define EXPORT_GET_VALUE_OPT_MAXLENGTH_S(FuncName, Cap) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, LPTSTR value, LONG MaxLen)\
     {\
+        LOG_FUNC_ENTRY_PARAMS((Source, value, MaxLen)) \
         std::string valueTemp(MaxLen + 1, '\0');\
-        auto retVal = GetStringCapability(Source, Cap, &valueTemp[0], MaxLen, GetCurrentCapValues,\
-                                         __FUNCTION__, GENERATE_PARAM_LOG((Source, value))); \
+        auto retVal = GetStringCapability(Source, Cap, &valueTemp[0], MaxLen, GetCurrentCapValues); \
         valueTemp.resize(MaxLen); \
         StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp, valueTemp.size()), value, MaxLen); \
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((value)) \
-        return retVal;\
+        LOG_FUNC_EXIT_NONAME_PARAMS(retVal); \
+        CATCH_BLOCK(false) \
     }
 
 #define EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(FuncName, Cap) EXPORT_GET_CAP_VALUE_OPT_CURRENT(FuncName, Cap, CTL_ArrayFactory::tagged_array_long)
@@ -398,6 +411,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
 #define EXPORT_GET_CAP_VALUE_OPT_CURRENT_S(FuncName, Cap, NumChars) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, LPTSTR value, DTWAIN_LONG GetType)\
     {\
+        LOG_FUNC_ENTRY_PARAMS((Source, value, GetType)) \
         GetCapValuesFn fn = GetAllCapValues;\
         if ( GetType == DTWAIN_CAPGETCURRENT ) \
            fn = GetCurrentCapValues;\
@@ -405,12 +419,12 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
         if ( GetType == DTWAIN_CAPGETDEFAULT) \
            fn = GetDefaultCapValues;\
         std::string valueTemp((NumChars) + 1, '\0');\
-        auto retval = GetStringCapability(Source, Cap, &valueTemp[0], NumChars, fn, __FUNCTION__, \
-                            GENERATE_PARAM_LOG((Source, value, GetType))); \
+        auto retval = GetStringCapability(Source, Cap, &valueTemp[0], NumChars, fn); \
         valueTemp.resize(NumChars); \
         StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(valueTemp, valueTemp.size()), value, NumChars); \
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((value)) \
-        return retval; \
+        LOG_FUNC_EXIT_NONAME_PARAMS(retval) \
+        CATCH_BLOCK(false) \
     }
 
 #define EXPORT_SET_CAP_VALUE_D(FuncName, Cap) EXPORT_SET_CAP_VALUE(FuncName, Cap, DTWAIN_FLOAT, SetSupportFn1<DTWAIN_FLOAT>)
@@ -424,19 +438,39 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
 
 #define EXPORT_IS_CAP_SUPPORTED_I(FuncName, Cap) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, LONG CapValue)\
-    { return IsSupportedImpl(Source, Cap, (CapValue==DTWAIN_ANYSUPPORT), CapValue, __FUNCTION__, GENERATE_PARAM_LOG((Source, CapValue)))?TRUE:FALSE; }
+    { \
+       LOG_FUNC_ENTRY_PARAMS((Source, CapValue)) \
+       auto bRet = IsSupportedImpl(Source, Cap, (CapValue==DTWAIN_ANYSUPPORT), CapValue); \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet); \
+       CATCH_BLOCK(false) \
+    }
 
 #define EXPORT_IS_CAP_SUPPORTED_D(FuncName, Cap) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, DTWAIN_FLOAT CapValue)\
-    { return IsSupportedImpl(Source, Cap, false, CapValue, __FUNCTION__, GENERATE_PARAM_LOG((Source, CapValue)))?TRUE:FALSE; }
+    {\
+       LOG_FUNC_ENTRY_PARAMS((Source, CapValue)) \
+       auto bRet = IsSupportedImpl(Source, Cap, false, CapValue); \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet); \
+       CATCH_BLOCK(false) \
+    }
 
 #define EXPORT_IS_CAP_SUPPORTED_I_1(FuncName, Cap) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source)\
-    { return IsSupportedImpl(Source, Cap, true, 0L, __FUNCTION__, GENERATE_PARAM_LOG((Source)))?TRUE:FALSE; }
+    { \
+       LOG_FUNC_ENTRY_PARAMS((Source)) \
+       auto bRet = IsSupportedImpl(Source, Cap, true, 0L); \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet); \
+       CATCH_BLOCK(false) \
+    }
 
 #define EXPORT_IS_CAP_ENABLED(FuncName, Cap) \
     DTWAIN_BOOL DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source)\
-    { return IsEnabledImpl(Source, Cap, __FUNCTION__, GENERATE_PARAM_LOG((Source)))?TRUE:FALSE; }
+    { \
+       LOG_FUNC_ENTRY_PARAMS((Source)) \
+       auto bRet = IsEnabledImpl(Source, Cap); \
+       LOG_FUNC_EXIT_NONAME_PARAMS(bRet); \
+       CATCH_BLOCK(false) \
+    }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -727,17 +761,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSourceValues(DTWAIN_SOURCE Source, LPCTSTR c
 ///////////////// These functions are high-level capability functions ///////////////
 DTWAIN_BOOL dynarithmic::DTWAIN_SetDeviceCapByString(DTWAIN_SOURCE Source, LPCTSTR strVal, SetByStringFn fn)
 {
-    DTWAIN_FLOAT value = 0.0;
-    if ( strVal )
-        value = StringWrapper::ToDouble(strVal);
+    DTWAIN_FLOAT value = StringWrapper::ToDouble(strVal, 0.0);
     return fn(Source, value);
 }
 
 DTWAIN_BOOL dynarithmic::DTWAIN_SetDeviceCapByString2(DTWAIN_SOURCE Source, LPCTSTR strVal, bool bExtra, SetByStringFn2 fn)
 {
-    DTWAIN_FLOAT value = 0.0;
-    if ( strVal )
-        value = StringWrapper::ToDouble(strVal);
+    DTWAIN_FLOAT value = StringWrapper::ToDouble(strVal, 0.0);
     return fn(Source, value, bExtra);
 }
 
@@ -758,29 +788,30 @@ DTWAIN_BOOL dynarithmic::DTWAIN_GetDeviceCapByString(DTWAIN_SOURCE Source, LPTST
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetResolution(DTWAIN_SOURCE Source, LPDTWAIN_FLOAT Resolution)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Resolution))
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     LONG lCap = 0;
-    if ( DTWAIN_IsCapSupported( Source, ICAP_XRESOLUTION))
+    if ( pSource->IsCapInSupportedList(ICAP_XRESOLUTION))
         lCap = ICAP_XRESOLUTION;
     else
-    if ( DTWAIN_IsCapSupported( Source, ICAP_XNATIVERESOLUTION))
+    if (pSource->IsCapInSupportedList(ICAP_XNATIVERESOLUTION))
          lCap = ICAP_XNATIVERESOLUTION;
     else
         LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
-    const DTWAIN_BOOL bRet = GetDoubleCap( Source, lCap, Resolution);
+    const DTWAIN_BOOL bRet = GetDoubleCap( pSource, lCap, Resolution);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(FALSE)
 }
 
-static bool GetDoubleCap( DTWAIN_SOURCE Source, LONG lCap, double *pValue )
+static bool GetDoubleCap( CTL_ITwainSource* pSource, LONG lCap, double *pValue )
 {
     double *pRealValue = pValue;
-    if (DTWAIN_GetCapDataType(Source, lCap) != TWTY_FIX32)
+    if (DTWAIN_GetCapDataType(pSource, lCap) != TWTY_FIX32)
         return false;
     DTWAIN_ARRAY Array = nullptr;
-    bool bRet = DTWAIN_GetCapValuesEx2(Source, lCap, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
+    const auto pHandle = pSource->GetDTWAINHandle();
+    bool bRet = GetCapValuesEx2_Internal(pSource, lCap, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
     if (!bRet)
         return false;
-    const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     DTWAINArrayLowLevel_RAII arr(pHandle, Array);
     const auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<double>(Array);
     if ( bRet && Array )
@@ -811,7 +842,7 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
     DTWAINArrayPtr_RAII a(pHandle, &OrigVals);
 
     // get the capability values
-    if (DTWAIN_GetCapValuesEx2(Source, lCap, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arrayToUse))
+    if (GetCapValuesEx2_Internal(pSource, lCap, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arrayToUse))
     {
         // Gotten the value.  Check what container type holds the data
         const LONG lContainer = DTWAIN_GetCapContainer(Source, lCap, GetType);

@@ -45,6 +45,7 @@
 #include "cppfunc.h"
 #include "logwriterutils.h"
 #include "ctltripletbase.h"
+#include "ctlconstexprutils.h"
 using namespace dynarithmic;
 
 static constexpr std::array<std::pair<int, int>, 32> mapCondCode = { {
@@ -80,37 +81,6 @@ static constexpr std::array<std::pair<int, int>, 32> mapCondCode = { {
     {DTWAIN_ERR_EXCEPTION_ERROR, DTWAIN_ERR_EXCEPTION_ERROR},
     {-TWAIN_ERR_NULL_CONTAINER, TWAIN_ERR_NULL_CONTAINER},
     {-DTWAIN_ERR_EXCEPTION_ERROR, DTWAIN_ERR_EXCEPTION_ERROR}} };
-
-template <class T>
-bool SetOneTwainCapValue( const CTL_ITwainSource *pSource,
-                          T Value,
-                          TW_UINT16 nSetType,
-                          TW_UINT16 Cap,
-                          TW_UINT16 TwainType = 0xFFFF)
-{
-    auto pTempSource = const_cast<CTL_ITwainSource*>(pSource);
-
-    // Set the #transfer count
-    auto pSession = pTempSource->GetTwainSession();
-
-    if ( TwainType == 0xFFFF )
-        TwainType = static_cast<TW_UINT16>(DTWAIN_GetCapDataType((DTWAIN_SOURCE)pSource, Cap));
-
-    // Get a set capability triplet compatible for one value
-    CTL_CapabilitySetOneValTriplet<T> SetOne( pSession,
-                                           pTempSource,
-                                           nSetType,
-                                           Cap,
-                                           TwainType,
-                                           { Value });
-
-    if ( !CTL_TwainAppMgr::IsSourceOpen( pTempSource ) )
-        return false;
-
-    const TW_UINT16 rc = SetOne.Execute();
-    return CTL_TwainAppMgr::ProcessReturnCodeOneValue(pTempSource, rc)?true:false;
-}
-
 
 constexpr int TWRC_Error = 1;
 constexpr int TWCC_Error = 2;
@@ -309,15 +279,13 @@ unsigned int CTL_TwainAppMgr::GetRegisteredMsg()
     return 0;
 }
 
-void CTL_TwainAppMgr::EnumSources( CTL_ITwainSession* pSession, CTL_TwainSourceSet & rArray )
+void CTL_TwainAppMgr::EnumSources( CTL_ITwainSession* pSession )
 {
-    rArray.clear();
     if ( !IsValidTwainSession( pSession ) )
         return;
-    pSession->CopyAllSources( rArray );
+    pSession->GetNumSources();
 }
 
-/* static static static static static static static static static static */
 void CTL_TwainAppMgr::DestroyTwainSession(const CTL_ITwainSession* pSession)
 {
     if ( s_pGlobalAppMgr )
@@ -890,7 +858,7 @@ bool CTL_TwainAppMgr::StoreImageLayout(CTL_ITwainSource *pSource)
 
     // First, see if ICAP_UNDEFINED image size is used
     TW_UINT16 nValue;
-    if ( GetOneCapValue( pSource, &nValue, ICAP_UNDEFINEDIMAGESIZE, TWTY_BOOL) )
+    if ( GetOneTwainCapValue( pSource, &nValue, ICAP_UNDEFINEDIMAGESIZE, MSG_GET, TWTY_BOOL) )
     {
         if ( nValue == 1 )
         {
@@ -1228,7 +1196,7 @@ bool CTL_TwainAppMgr::SetupMemXferDIB(CTL_ITwainSession* pSession, CTL_ITwainSou
 
             // Get Units and calculate PelsPerMeter
             nPixelFlavor = TWPF_CHOCOLATE;
-            if ( !GetCurrentOneCapValue( pSource, &nPixelFlavor, ICAP_PIXELFLAVOR, TWTY_UINT16))
+            if ( !GetOneTwainCapValue( pSource, &nPixelFlavor, ICAP_PIXELFLAVOR, MSG_GETCURRENT, TWTY_UINT16))
                 nPixelFlavor = TWPF_CHOCOLATE;
             switch ( nPixelFlavor )
             {
@@ -1658,22 +1626,6 @@ bool CTL_TwainAppMgr::GetOneIntValue(const CTL_ITwainSource *pSource,
 }
 
 //////////////////////////////////////////////////////////////////////////////
-bool CTL_TwainAppMgr::GetCurrentOneCapValue(const CTL_ITwainSource *pSource,
-                                            void *pValue,
-                                            TW_UINT16 Cap,
-                                            TW_UINT16 nDataType )
-{
-    return GetOneTwainCapValue( pSource, pValue, Cap, MSG_GETCURRENT, nDataType);
-}
-
-bool CTL_TwainAppMgr::GetOneCapValue(const CTL_ITwainSource *pSource,
-                                     void *pValue,
-                                     TW_UINT16 Cap,
-                                     TW_UINT16 nDataType )
-{
-    return GetOneTwainCapValue( pSource, pValue, Cap, MSG_GET, nDataType);
-}
-
 bool CTL_TwainAppMgr::GetOneTwainCapValue( const CTL_ITwainSource *pSource,
                                            void *pValue,
                                            TW_UINT16 Cap,
@@ -1714,7 +1666,7 @@ bool CTL_TwainAppMgr::GetOneTwainCapValue( const CTL_ITwainSource *pSource,
 int CTL_TwainAppMgr::GetTransferCount( const CTL_ITwainSource *pSource )
 {
     TW_UINT16 nValue;
-    GetOneCapValue( pSource, &nValue, CAP_XFERCOUNT, TWTY_UINT16 );
+    GetOneTwainCapValue( pSource, &nValue, CAP_XFERCOUNT, MSG_GET, TWTY_UINT16 );
     return nValue;
 }
 
@@ -1732,23 +1684,24 @@ int CTL_TwainAppMgr::SetTransferCount( const CTL_ITwainSource *pSource,
     // pages to acquire
     if (IsCapabilitySupported(pSource, CAP_SHEETCOUNT))
     {
-        SetOneTwainCapValue(pSource, -1, MSG_SET, CAP_XFERCOUNT, TWTY_INT16);
+        SetOneCapValue(pSource, CAP_XFERCOUNT, MSG_SET, -1, TWTY_INT16);
+
         if ( nCount == -1 )
-            SetOneTwainCapValue(pSource, 0, MSG_SET, CAP_SHEETCOUNT, TWTY_UINT32);
+            SetOneCapValue(pSource, CAP_SHEETCOUNT, MSG_SET, 0, TWTY_UINT32);
         else
-            SetOneTwainCapValue(pSource, nCount, MSG_SET, CAP_SHEETCOUNT, TWTY_UINT32);
+            SetOneCapValue(pSource, CAP_SHEETCOUNT, MSG_SET,  nCount, TWTY_UINT32);
     }
     else
     {
         // If we are in duplex mode, we need to set the transfer count to 2 * the number
         // of pages, since each page will use two transfers
         LONG isDuplex = 0;
-        GetCurrentOneCapValue(pSource, &isDuplex, CAP_DUPLEXENABLED, MSG_GETCURRENT);
+        GetOneTwainCapValue(pSource, &isDuplex, CAP_DUPLEXENABLED, MSG_GETCURRENT, TWTY_BOOL);
         if (isDuplex == 1 && nCount != -1)
         {
             if (pSource->IsDoublePageCountOnDuplex())
                 nCount *= 2; // double the number of images that may be received
-            SetOneTwainCapValue( pSource, nCount, MSG_SET, CAP_XFERCOUNT, TWTY_INT16);
+            SetOneCapValue( pSource, CAP_XFERCOUNT, MSG_SET, nCount, TWTY_INT16);
         }
     }
     return nCount;
@@ -1789,10 +1742,10 @@ int CTL_TwainAppMgr::SetTransferMechanism( const CTL_ITwainSource *pSource,CTL_T
     if ( AcquireType == TWAINAcquireType_MemFile)
         uTwainType = TWSX_MEMFILE;
 
-    if ( AcquireType != TWAINAcquireType_AudioNative)
-        SetOneTwainCapValue( pSource, uTwainType, MSG_SET, ICAP_XFERMECH, TWTY_UINT16);
+    if (AcquireType != TWAINAcquireType_AudioNative)
+        SetOneCapValue(pSource, ICAP_XFERMECH, MSG_SET, uTwainType, TWTY_UINT16);
     else
-        SetOneTwainCapValue(pSource, uTwainType, MSG_SET, ACAP_XFERMECH, TWTY_UINT16);
+        SetOneCapValue(pSource, ACAP_XFERMECH, MSG_SET, uTwainType, TWTY_UINT16);
     return 1;
 }
 
@@ -1816,38 +1769,11 @@ std::vector<TW_UINT32> CTL_TwainAppMgr::EnumSupportedDATS(const CTL_ITwainSource
 void CTL_TwainAppMgr::SetPixelAndBitDepth(const CTL_ITwainSource * /*pSource*/)
 {}
 
-struct FindTriplet
-{
-    FindTriplet(RawTwainTriplet theTriplet) : m_Trip(theTriplet) { }
-    bool operator() (RawTwainTriplet trip) const
-    {
-        return std::tie(m_Trip.nDG, m_Trip.nDAT, m_Trip.nMSG) == std::tie(trip.nDG, trip.nDAT, trip.nMSG);
-    }
-    private:
-        RawTwainTriplet m_Trip;
-};
-
-void CTL_TwainAppMgr::EnumNoTimeoutTriplets()
-{
-    RawTwainTriplet  Trips[] = {
-        {DG_AUDIO, DAT_AUDIOFILEXFER, MSG_GET},
-        {DG_AUDIO, DAT_AUDIONATIVEXFER, MSG_GET},
-        {DG_CONTROL, DAT_USERINTERFACE, MSG_ENABLEDS},
-        {DG_CONTROL, DAT_USERINTERFACE, MSG_ENABLEDSUIONLY},
-        {DG_IMAGE, DAT_IMAGEFILEXFER, MSG_GET},
-        {DG_IMAGE, DAT_IMAGENATIVEXFER, MSG_GET},
-        {DG_IMAGE, DAT_IMAGEMEMXFER, MSG_GET}
-    };
-
-    constexpr int nItems = static_cast<int>(std::size(Trips));
-    std::copy_n(Trips, nItems, std::back_inserter(s_NoTimeoutTriplets));
-}
-
 ///////////////////////////////////////////////////////////////////////
 CTL_TwainUnitEnum CTL_TwainAppMgr::GetCurrentUnitMeasure(const CTL_ITwainSource *pSource)
 {
     TW_INT16 nValue;
-    if ( !GetCurrentOneCapValue(pSource, &nValue, ICAP_UNITS, TWTY_UINT16) )
+    if ( !GetOneTwainCapValue(pSource, &nValue, ICAP_UNITS, MSG_GETCURRENT, TWTY_UINT16) )
     {
         return TwainUnit_INCHES;
     }
@@ -1949,21 +1875,21 @@ CTL_CapabilityQueryTriplet CTL_TwainAppMgr::GetCapabilityOperations(const CTL_IT
 bool CTL_TwainAppMgr::IsFeederLoaded( const CTL_ITwainSource *pSource )
 {
     TW_UINT16 nValue;
-    GetOneCapValue( pSource, &nValue, CAP_FEEDERLOADED, TWTY_BOOL);
+    GetOneTwainCapValue( pSource, &nValue, CAP_FEEDERLOADED, MSG_GET, TWTY_BOOL);
     return nValue?true:false;
 }
 
 
 bool CTL_TwainAppMgr::IsFeederEnabled( const CTL_ITwainSource *pSource, TW_UINT16& nValue )
 {
-    if (!GetOneCapValue( pSource, &nValue, CAP_FEEDERENABLED, TWTY_BOOL))
+    if (!GetOneTwainCapValue( pSource, &nValue, CAP_FEEDERENABLED, MSG_GET, TWTY_BOOL))
         return false;
     return true;
 }
 
 bool CTL_TwainAppMgr::IsJobControlSupported( const CTL_ITwainSource *pSource, TW_UINT16& nValue )
 {
-    if (!GetOneCapValue( pSource, &nValue, CAP_JOBCONTROL, TWTY_UINT16 ))
+    if (!GetOneTwainCapValue( pSource, &nValue, CAP_JOBCONTROL, MSG_GET, TWTY_UINT16 ))
         return false;
     return true;
 }
@@ -1989,7 +1915,7 @@ bool CTL_TwainAppMgr::SetupFeeder( const CTL_ITwainSource *pSource, int /*maxpag
         // Enable the CAP_AUTOFEED capability
         // Get a set capability triplet compatible for one value
         bValue = false;
-        SetOneTwainCapValue( pSource, bValue, MSG_SET, CAP_AUTOFEED, TWTY_BOOL );
+        SetOneCapValue( pSource, CAP_AUTOFEED, MSG_SET, bValue,  TWTY_BOOL );
 
         // Return, since the autofeed has been turned off and the feeder has been
         // disabled
@@ -1999,7 +1925,7 @@ bool CTL_TwainAppMgr::SetupFeeder( const CTL_ITwainSource *pSource, int /*maxpag
 
     // Set the automatic document feeder mode if present
     nValue = 1;
-    SetOneTwainCapValue( pSource, nValue, MSG_SET, CAP_FEEDERENABLED, TWTY_BOOL);
+    SetOneCapValue( pSource, CAP_FEEDERENABLED, MSG_SET, nValue, TWTY_BOOL);
 
     // Enable the CAP_AUTOFEED capability if the user wants to automatically feed
     // the page
@@ -2007,24 +1933,10 @@ bool CTL_TwainAppMgr::SetupFeeder( const CTL_ITwainSource *pSource, int /*maxpag
     if ( !bTurnOffAutoFeed)
     {
         bValue = true;
-        SetOneTwainCapValue( pSource, bValue, MSG_SET, CAP_AUTOFEED, TWTY_BOOL);
+        SetOneCapValue( pSource, CAP_AUTOFEED, MSG_SET, bValue, TWTY_BOOL);
     }
 
     return true;
-}
-
-bool CTL_TwainAppMgr::ShowProgressIndicator(const CTL_ITwainSource* pSource, bool bShow)
-{
-    bool bTemp = bShow;
-    return SetOneTwainCapValue( pSource, &bTemp, MSG_SET, CAP_INDICATORS, TWTY_BOOL );
-}
-
-bool CTL_TwainAppMgr::IsProgressIndicatorOn(const CTL_ITwainSource* pSource)
-{
-    bool bTemp;
-    if ( GetOneCapValue( pSource, &bTemp, CAP_INDICATORS, TWTY_BOOL ) )
-        return bTemp;
-    return false;
 }
 
 int CTL_TwainAppMgr::FindConditionCode(TW_UINT16 nCode)
@@ -2174,6 +2086,7 @@ bool CTL_TwainAppMgr::IsSourceCompliant( const CTL_ITwainSource *pSource,
                                          CTL_EnumTwainVersion TVersion,
                                          CTL_TwainCapArray& rArray )
 {
+#if 0
     if ( !s_pGlobalAppMgr )
         return false;
 
@@ -2181,6 +2094,9 @@ bool CTL_TwainAppMgr::IsSourceCompliant( const CTL_ITwainSource *pSource,
         return false;
 
     return pSource->IsSourceCompliant( TVersion, rArray );
+#else
+    return true;
+#endif
 }
 
 #ifdef _WIN32
@@ -2233,7 +2149,6 @@ CTL_TwainAppMgr::CTL_TwainAppMgr(CTL_TwainDLLHandle *pHandle,
 
     // Record the instance
     m_Instance = hInstance;
-    EnumNoTimeoutTriplets();
     m_lpDSMEntry = nullptr;
 }
 
@@ -2510,26 +2425,6 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         SendTwainMsgToWindow(pTriplet.GetSessionPtr(), nullptr, DTWAIN_TN_TWAINTRIPLETBEGIN, 0);
     }
 
-    bool bTimeOutInEffect = false;
-    #ifdef _WIN32
-    if ( CTL_StaticData::GetTimeoutValue() > 0 )
-    {
-        // Check if time out is to be applied to this triplet
-        RawTwainTriplet rtrip{};
-        rtrip.nDAT = nDAT;
-        rtrip.nDG = nDG;
-        rtrip.nMSG = nMSG;
-        if ( std::find_if(s_NoTimeoutTriplets.begin(),
-                                        s_NoTimeoutTriplets.end(),
-                                        FindTriplet(rtrip)) == s_NoTimeoutTriplets.end())
-        {
-            CTL_StaticData::SetTimeoutID(SetTimer(nullptr, 0,
-                                        CTL_StaticData::GetTimeoutValue(), reinterpret_cast<TIMERPROC>(
-                                        TwainTimeOutProc)));
-            bTimeOutInEffect = true;
-        }
-    }
-    #endif
     try
     {
         // This is the actual low-level call to the TWAIN Data Source Manager 
@@ -2543,13 +2438,9 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
             // Send out that we have ended processing the TWAIN triplet
             SendTwainMsgToWindow(pTriplet.GetSessionPtr(), nullptr, DTWAIN_TN_TWAINTRIPLETEND, 0);
         }
-        // A memory exception occurred.  This is bad!
+        // An exception occurred.  This is bad!
         // Check what to do when this happens (possibly close DSM and start over?)
         // To do later...
-        #ifdef _WIN32
-        if ( bTimeOutInEffect )
-            KillTimer(nullptr, CTL_StaticData::GetTimeoutID());
-        #endif
         retcode = -DTWAIN_ERR_EXCEPTION_ERROR;
         if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_LOWLEVELTWAIN)
         {
@@ -2562,10 +2453,6 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         }
         return retcode;
     }
-    #ifdef _WIN32
-    if ( bTimeOutInEffect )
-        KillTimer(nullptr, CTL_StaticData::GetTimeoutID());
-    #endif
     if (m_pDLLHandle->m_bNotifyTripletsUsed)
     {
         // Send out that we have ended processing the TWAIN triplet
@@ -2582,15 +2469,14 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         strm << fmt % s1.c_str() % retcode % sz % s;
         LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
     }
-    if (retcode != TWRC_SUCCESS)
-        SetLastTwainError( retcode, TWRC_Error );
-    else
+    if (retcode == TWRC_FAILURE)
     {
-        // Make sure we don't try to get condition codes on a successful
-        // closure of the DSM
-        if (nDG == DG_CONTROL && nDAT == DAT_PARENT && nMSG == MSG_CLOSEDSM)
+        SetLastTwainError(retcode, TWRC_Error);
+        if (nDG == DG_CONTROL && nDAT == DAT_EVENT && nMSG == MSG_PROCESSEVENT)
             raii.m_bRunConditionCode = false;
     }
+    else
+        raii.m_bRunConditionCode = false;
     return retcode;
 }
 
@@ -2631,32 +2517,16 @@ bool CTL_TwainAppMgr::SetDefaultSource( CTL_ITwainSession *pSession, const CTL_I
     return true;
 }
 
-bool CTL_TwainAppMgr::SetDependentCaps( const CTL_ITwainSource *pSource, TW_UINT16 Cap )
-{
-    switch (Cap)
-    {
-        case ICAP_THRESHOLD:
-        {
-            // Must set ICAP_BITDEPTHREDUCTION
-            const LONG Val = TWBR_THRESHOLD;
-            if (IsCapabilitySupported(pSource, ICAP_BITDEPTHREDUCTION))
-            {
-                return SetOneTwainCapValue( pSource, Val, MSG_SET, ICAP_BITDEPTHREDUCTION, TWTY_UINT16 );
-            }
-        }
-        break;
-    }
-    return true;
-}
-
 VOID CALLBACK CTL_TwainAppMgr::TwainTimeOutProc(HWND, UINT, ULONG, DWORD)
 {
+#if 0
 #ifdef _WIN32
     KillTimer(nullptr, CTL_StaticData::GetTimeoutID());
 
     LogWriterUtils::WriteLogInfoIndentedA("The last TWAIN triplet was not completed due to time out");
     SetError(DTWAIN_ERR_TIMEOUT, "", false);
     throw DTWAINException(DTWAIN_ERR_TIMEOUT);
+#endif
 #endif
 }
 
@@ -2695,7 +2565,6 @@ CTL_ITwainSession* CTL_TwainAppMgr::s_pSelectedSession = nullptr;
 int          CTL_TwainAppMgr::s_nLastError = 0;
 std::string  CTL_TwainAppMgr::s_strLastError;
 HINSTANCE    CTL_TwainAppMgr::s_ThisInstance = static_cast<HINSTANCE>(nullptr);
-std::vector<RawTwainTriplet> CTL_TwainAppMgr::s_NoTimeoutTriplets;
 SourceToXferReadyMap CTL_TwainAppMgr::s_SourceToXferReadyMap;
 SourceToXferReadyList CTL_TwainAppMgr::s_SourceToXferReadyList;
 SourceFlatbedOnlyList CTL_TwainAppMgr::s_SourceFlatbedOnlyList;

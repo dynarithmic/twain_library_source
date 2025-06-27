@@ -22,7 +22,7 @@ OF THIRD PARTY RIGHTS.
 #define AHEXENCODE_H
 
 #include <string>
-int ASCIIHexEncode(const std::string& inData,
-                  std::string& outData);
+#include <string_view>
+int ASCIIHexEncode(std::string_view inData, std::string& outData);
 
 #endif
