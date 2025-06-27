@@ -2469,15 +2469,14 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         strm << fmt % s1.c_str() % retcode % sz % s;
         LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
     }
-    if (retcode != TWRC_SUCCESS)
-        SetLastTwainError( retcode, TWRC_Error );
-    else
+    if (retcode == TWRC_FAILURE)
     {
-        // Make sure we don't try to get condition codes on a successful
-        // closure of the DSM
-        if (nDG == DG_CONTROL && nDAT == DAT_PARENT && nMSG == MSG_CLOSEDSM)
+        SetLastTwainError(retcode, TWRC_Error);
+        if (nDG == DG_CONTROL && nDAT == DAT_EVENT && nMSG == MSG_PROCESSEVENT)
             raii.m_bRunConditionCode = false;
     }
+    else
+        raii.m_bRunConditionCode = false;
     return retcode;
 }
 
