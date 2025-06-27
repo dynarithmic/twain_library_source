@@ -18,18 +18,13 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLSTRINGUTILS_H
-#define CTLSTRINGUTILS_H
-
-#include <string>
+#ifndef CTLLOGCALLS_H
+#define CTLLOGCALLS_H
 
 namespace dynarithmic
 {
-    // Truncate a string if it goes over maxLen, and replace truncated contents with
-    // the text "More".
-    std::string TruncateStringWithMore(std::string_view origString, size_t maxLen);
-    std::string CreateFileNameWithDateTime(std::string_view prefix, std::string_view ext, bool useUTC=false);
+    long& GetLogFilterFlags();
+    std::string CTL_LogFunctionCallHelper(const char* pFuncName, int nWhich, const char* pOptionalString = nullptr);
+    std::string CTL_LogFunctionCallA(int32_t logFlags, const char *pFuncName, int nWhich, const char* pOptionalString = nullptr);
 }
 #endif
-
-

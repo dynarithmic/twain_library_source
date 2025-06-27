@@ -33,9 +33,7 @@ namespace dynarithmic
     protected:
         DTWAIN_ACQUIRE m_AcquireNum;
         SourceAcquireOptions sOpts;
-        virtual bool IsSourceOpen(CTL_ITwainSource* pSource, bool bUIOnly);
-        bool IsAcquireTerminated(CTL_ITwainSource* pSource, bool bUIOnly);
-        virtual bool CanEnterDispatch(MSG* /*pMsg*/) { return true; }
+        virtual bool IsSourceOpen(CTL_ITwainSource* pSource);
 
     public:
         TwainMessageLoopImpl(CTL_TwainDLLHandle* pHandle) : m_pDLLHandle(pHandle), m_AcquireNum{} {}
@@ -50,8 +48,12 @@ namespace dynarithmic
         virtual ~TwainMessageLoopImpl() = default;
         virtual void PrepareLoop() {}
         void SetAcquireOptions(const SourceAcquireOptions& opts) { sOpts = opts; }
+        SourceAcquireOptions& GetAcquireOptions() noexcept { return sOpts; }
         virtual void PerformMessageLoop(CTL_ITwainSource* /*pSource*/, bool /*bUIOnly*/) {}
         DTWAIN_ACQUIRE GetAcquireNum() const { return m_AcquireNum; }
+        DTWAIN_ACQUIRE& GetAcquireNumRef() { return m_AcquireNum; }
+        bool IsAcquireTerminated(CTL_ITwainSource* pSource, bool bUIOnly);
+        virtual bool CanEnterDispatch(MSG* /*pMsg*/) { return true; }
     };
 
     class TwainMessageLoopWindowsImpl : public TwainMessageLoopImpl
@@ -99,7 +101,7 @@ namespace dynarithmic
             std::swap(s_MessageQueue, empty);
         }
 
-        bool IsSourceOpen(CTL_ITwainSource* pSource, bool bUIOnly) override;
+        bool IsSourceOpen(CTL_ITwainSource* pSource) override;
         bool CanEnterDispatch(MSG* pMsg) override { return !DTWAIN_IsTwainMsg(pMsg); }
     };
 

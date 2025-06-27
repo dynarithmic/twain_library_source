@@ -18,18 +18,19 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#ifndef CTLSTRINGUTILS_H
-#define CTLSTRINGUTILS_H
+#ifndef CTLSETGETCAPS_H
+#define CTLSETGETCAPS_H
+#include <algorithm>
+#include "dtwain.h"
+#include "ctliface.h"
 
-#include <string>
-
+///////////////////////////////////////////////////////////////////////////
 namespace dynarithmic
 {
-    // Truncate a string if it goes over maxLen, and replace truncated contents with
-    // the text "More".
-    std::string TruncateStringWithMore(std::string_view origString, size_t maxLen);
-    std::string CreateFileNameWithDateTime(std::string_view prefix, std::string_view ext, bool useUTC=false);
+    bool GetCapValuesEx2_Internal(CTL_ITwainSource* pSource,
+                                  LONG lCap, LONG lGetType, LONG lContainerType, LONG nDataType, LPDTWAIN_ARRAY pArray);
+
+    bool SetCapValuesEx2_Internal(CTL_ITwainSource* pSource, LONG lCap, LONG lSetType, LONG lContainerType,
+                                  LONG nDataType, DTWAIN_ARRAY pArray);
 }
 #endif
-
-

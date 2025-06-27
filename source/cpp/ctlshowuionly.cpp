@@ -32,19 +32,19 @@ using namespace dynarithmic;
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+    auto [pHandle, pSource] = VerifyHandles(Source);
     auto pTheSource = pSource;
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return DTWAIN_IsSourceAcquiring(Source); },
-    DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
+                                      DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
 
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return pTheSource->IsUIOpen(); },
-    DTWAIN_ERR_UI_ALREADY_OPENED, false, FUNC_MACRO);
+                                      DTWAIN_ERR_UI_ALREADY_OPENED, false, FUNC_MACRO);
 
     // Open the source (if source is closed)
     bool bCloseSource = false;
-    const bool bIsSourceOpen = DTWAIN_IsSourceOpen(Source) ? true : false;
+    const bool bIsSourceOpen = CTL_TwainAppMgr::IsSourceOpen(pSource) ? true : false;
 
-    if (!bIsSourceOpen && DTWAIN_GetTwainMode() == DTWAIN_MODAL)
+    if (!bIsSourceOpen && pHandle->m_lAcquireMode == DTWAIN_MODAL)
     {
         bCloseSource = true;
         if (!DTWAIN_OpenSource(Source))
@@ -54,11 +54,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !bIsSourceOpen; }, DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
 
     // Check if capability is supported
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !DTWAIN_IsCapSupported(Source, CAP_ENABLEDSUIONLY); },
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !pTheSource->IsCapInSupportedList(CAP_ENABLEDSUIONLY); },
         DTWAIN_ERR_UIONLY_NOT_SUPPORTED, false, FUNC_MACRO);
 
     // Start a thread depending on Twain Mode.
-    if (DTWAIN_GetTwainMode() == DTWAIN_MODELESS) // No thread
+    if (pHandle->m_lAcquireMode == DTWAIN_MODELESS) // No thread
     {
         const DTWAIN_BOOL bRet2 = CTL_TwainAppMgr::ShowUserInterface(pSource, false, true);
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet2)

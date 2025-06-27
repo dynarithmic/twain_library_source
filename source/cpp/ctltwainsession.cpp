@@ -152,11 +152,9 @@ bool CTL_ITwainSession::AddTwainSource( CTL_ITwainSource *pSource )
 
 bool CTL_ITwainSession::IsValidSource(const CTL_ITwainSource* pSource) const
 {
-    if ( find(m_arrTwainSource.begin(),
-              m_arrTwainSource.end(),
-              pSource) == m_arrTwainSource.end())
-        return false;
-    return true;
+    return std::find(m_arrTwainSource.begin(), 
+                     m_arrTwainSource.end(), 
+                     pSource) != m_arrTwainSource.end();
 }
 
 bool CTL_ITwainSession::SelectSource( const CTL_ITwainSource* pSource )
@@ -288,6 +286,14 @@ void CTL_ITwainSession::DestroyAllSources()
     m_pSelectedSource = nullptr;
 }
 
+const CTL_TwainSourceSet& CTL_ITwainSession::GetTwainSources() 
+{ 
+    if (m_arrTwainSource.empty())
+        EnumSources();
+    return m_arrTwainSource; 
+}
+
+
 void CTL_ITwainSession::EnumSources()
 {
     // Get first source
@@ -316,9 +322,28 @@ void CTL_ITwainSession::EnumSources()
         else
         {
             CTL_ITwainSource::Destroy( pSource );
+            m_bAllSourcesRetrieved = true;
             break;
         }
     }
+    UpdateStatusMap();
+}
+
+void CTL_ITwainSession::UpdateStatusMap()
+{
+    // Modify source status map
+    auto& status_map = CTL_StaticData::GetSourceStatusMap();
+
+    std::for_each(m_arrTwainSource.begin(), m_arrTwainSource.end(), [&](const CTL_ITwainSource* pSourceInner)
+        {
+            std::string sname = pSourceInner->GetProductNameA();
+            auto iter = status_map.find(sname);
+            if (iter == status_map.end())
+            {
+                auto mapIter = status_map.insert({ sname, {} }).first;
+                mapIter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, true);
+            }
+        });
 }
 
 void CTL_ITwainSession::CopyAllSources( CTL_TwainSourceSet & rArray )
@@ -384,7 +409,6 @@ CTL_ITwainSource* CTL_ITwainSession::GetDefaultSource()
     if ( ST.Execute() == TWRC_SUCCESS )
     {
         AddTwainSource(ST.GetSourceIDPtr());
-//        m_arrTwainSource.insert(ST.GetSourceIDPtr());
         return  ST.GetSourceIDPtr();
     }
     return nullptr;

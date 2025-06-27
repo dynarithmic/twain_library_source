@@ -22,7 +22,7 @@
 #include "ctltwainmanager.h"
 #include "ctltwainmsgloop.h"
 #include "sourceacquireopts.h"
-#include "dtwain_paramlogger.h"
+#include "ctllogfunctioncall.h"
 #include "sourceselectopts.h"
 
 #ifdef _MSC_VER

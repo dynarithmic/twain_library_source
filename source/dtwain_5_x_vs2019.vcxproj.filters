@@ -298,9 +298,6 @@
     <ClCompile Include=".\cpp\ctlverifysourcehandle.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include=".\cpp\ctlxmlparse.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include=".\cpp\imagefun\dtwpdf\dtwainpdf.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
@@ -605,6 +602,15 @@
       <Filter>C++ Files</Filter>
     </ClCompile>
     <ClCompile Include="cpp\ctlextimageinfo.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlcustomdsdata.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlbufferstrip.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlarraydumper.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -978,9 +984,6 @@
     <ClInclude Include="h\sourceselectopts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="h\dtwain_paramlogger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="h\ctlutils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1039,6 +1042,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="h\dtwain_exception.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctlsetgetcaps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctllogcalls.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

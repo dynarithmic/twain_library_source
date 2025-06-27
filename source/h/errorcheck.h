@@ -45,7 +45,7 @@ namespace dynarithmic
             #if DTWAIN_BUILD_LOGCALLSTACK == 1
             if (logError && (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_CALLSTACK))
             {
-                LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(fnName, LOG_INDENT_OUT) +
+                LogWriterUtils::WriteLogInfoA(CTL_LogFunctionCallA(DTWAIN_LOG_CALLSTACK, fnName, LOG_INDENT_OUT) +
                     ParamOutputter("", true).outputParam(retErr).getString());
             }
             #endif

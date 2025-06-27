@@ -220,7 +220,7 @@
     </Lib>
     <ClCompile>
       <ExceptionHandling>Async</ExceptionHandling>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;CRYPTOPP_DISABLE_SHA_ASM;CRYPTOPP_DISABLE_ASM;CRYPTOPP_X64_MASM_AVAILABLE;USE_PRECOMPILED_HEADERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -247,7 +247,7 @@
     </Lib>
     <ClCompile>
       <ExceptionHandling>Async</ExceptionHandling>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;CRYPTOPP_DISABLE_SHA_ASM;CRYPTOPP_DISABLE_ASM;USE_PRECOMPILED_HEADERS;CRYPTOPP_X64_MASM_AVAILABLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -275,7 +275,7 @@
     </ClCompile>
     <ClCompile>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <ExceptionHandling>Async</ExceptionHandling>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;CRYPTOPP_DISABLE_ASM;UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -289,7 +289,7 @@
     </Lib>
     <ClCompile>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <ExceptionHandling>Async</ExceptionHandling>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;CRYPTOPP_DISABLE_ASM;%(PreprocessorDefinitions)</PreprocessorDefinitions>

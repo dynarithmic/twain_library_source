@@ -1,5 +1,27 @@
 DTWAIN Version changes
 
+5.6.6
+
+- Upgraded following internal image libraries:
+
+    libpng   --> 1.6.48
+
+- If DTWAIN_SysInitializeNoBlocking() is called and returns 0, an errorlog*.txt file is
+  created in the directory where the text resources would be found.  The file will 
+  describes the error if DTWAIN could not be initialized.
+
+- Ensure that TWAIN sources are not re-enumerated if already enumerated by previous DTWAIN
+  functions.
+
+- Removed unnecessary calls to the TWAIN logger if logging is not enabled.
+
+- Removed some extraneous carriage returns when logging information.
+
+- TWAIN condition codes are now only queried when TWRC_FAILURE is returned from the
+  TWAIN Data Source Manager.  This is a change that alters the behavior that is detailed 
+  in the version 5.6.1 update.
+
+
 5.6.5
 
 - Fix issue with missing TWAIN log header information.

@@ -292,14 +292,13 @@ namespace dynarithmic
 
 
     template <class T>
-    bool SetOneCapValue(CTL_ITwainSource* pSource, TW_UINT16 nCap, TW_UINT16 SetType, T dValue, TW_UINT16 nDataType);
+    bool SetOneCapValue(const CTL_ITwainSource* pSource, TW_UINT16 nCap, TW_UINT16 SetType, T dValue, TW_UINT16 nDataType);
 
     template <class T>
-    bool SetOneCapValue(CTL_ITwainSource* pSource, TW_UINT16 nCap, TW_UINT16 SetType, T dValue, TW_UINT16 nDataType)
+    bool SetOneCapValue(const CTL_ITwainSource* pSource, TW_UINT16 nCap, TW_UINT16 SetType, T dValue, TW_UINT16 nDataType)
     {
-        std::vector<T> Array;
-        Array.push_back(dValue);
-        return SetCapabilityValues(pSource, static_cast<TW_UINT16 >(nCap), static_cast<TW_UINT16>(SetType), static_cast<UINT>(TwainContainer_ONEVALUE), nDataType, Array)?true:false;
+        std::vector<T> Array{dValue};
+        return SetCapabilityValues(pSource, static_cast<TW_UINT16>(nCap), static_cast<TW_UINT16>(SetType), static_cast<UINT>(TwainContainer_ONEVALUE), nDataType, Array) ? true : false;
     }
 
     template <class T>

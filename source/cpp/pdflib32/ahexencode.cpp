@@ -20,7 +20,7 @@ OF THIRD PARTY RIGHTS.
 */
 #include <ahexencode.h>
 
-int ASCIIHexEncode( const std::string&inData, std::string& outData)
+int ASCIIHexEncode( std::string_view inData, std::string& outData)
 {
     outData.reserve(inData.size() * 2);
     for ( size_t i = 0; i < inData.size(); ++i)
