@@ -23,7 +23,7 @@
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "../wildcards/wildcards.hpp"
-#include "dtwain_paramlogger.h"
+#include "ctllogfunctioncall.h"
 #include "ctlsetgetcaps.h"
 
 #ifdef _MSC_VER

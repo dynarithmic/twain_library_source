@@ -98,7 +98,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsCapSupported(DTWAIN_SOURCE Source, LONG lCapab
 
     // Test if the capability is supported
     bool bInList = pSource->IsCapInSupportedList(static_cast<TW_UINT16>(lCapability));
-    DTWAIN_Check_Error_Condition_2_Ex(pHandle, [&] {return !bInList; }, DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_2_Ex(pHandle, [&] {return !bInList; }, DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO, false);
     LOG_FUNC_EXIT_NONAME_PARAMS(bInList)
     CATCH_BLOCK_LOG_PARAMS(false)
 }

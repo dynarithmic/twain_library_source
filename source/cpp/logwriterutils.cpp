@@ -57,7 +57,9 @@ namespace dynarithmic
 
     void LogWriterUtils::WriteLogInfoIndentedA(std::string_view s)
     {
-        CTL_LogFunctionCallA(TruncateStringWithMore(s, maxOutput).c_str(), LOG_INDENT_USELAST_NOFUNCTION);
+        #if DTWAIN_BUILD_LOGCALLSTACK == 1
+        CTL_LogFunctionCallA(CTL_StaticData::GetLogFilterFlags(), TruncateStringWithMore(s, maxOutput).c_str(), LOG_INDENT_USELAST_NOFUNCTION);
+        #endif
     }
 
     void LogWriterUtils::WriteLogInfoIndentedW(std::wstring_view s)
@@ -72,10 +74,12 @@ namespace dynarithmic
 
     void LogWriterUtils::MultiLineWriter(std::string_view s, const char* pszDelim, int nWhich)
     {
+        #if DTWAIN_BUILD_LOGCALLSTACK == 1
         StringWrapperA::StringArrayType sArray;
         StringWrapperA::Tokenize(s.data(), pszDelim, sArray, true);
         for (auto& oneString : sArray)
-            CTL_LogFunctionCallA(oneString.c_str(), nWhich);
+            CTL_LogFunctionCallA(CTL_StaticData::GetLogFilterFlags(), oneString.c_str(), nWhich);
+        #endif
     }
 
     void LogWriterUtils::WriteMultiLineInfo(CTL_StringViewType s, const CTL_StringType::traits_type::char_type* pszDelim)
