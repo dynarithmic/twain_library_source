@@ -2146,6 +2146,30 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFrame(DTWAIN_ARRAY FrameArray, LONG nW
     CATCH_BLOCK(FALSE)
 }
 
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFrameString(DTWAIN_ARRAY FrameArray, LONG nWhere,
+                                                      LPTSTR pleft, LPTSTR ptop,
+                                                      LPTSTR pright, LPTSTR pbottom )
+{
+    LOG_FUNC_ENTRY_PARAMS((FrameArray, nWhere, pleft, ptop, pright, pbottom))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    const auto pr = GetRawFrameBufferFromArray(pHandle, FrameArray, nWhere);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; },
+                                      pr.first, false, FUNC_MACRO);
+
+    std::array<LPTSTR, 4> vals = { pleft ? pleft : nullptr, ptop? ptop: nullptr, pright ? pright : nullptr, pbottom ? pbottom : nullptr };
+    StringStreamA strm;
+    for (size_t i = 0; i < vals.size(); ++i)
+    {
+        strm << boost::format("%1%") % pr.second->m_FrameComponent[i];
+        auto sVal = strm.str();
+        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sVal), vals[i], static_cast<int32_t>(sVal.size()) + 1);
+        strm.str("");
+    }
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pleft, ptop, pright, pbottom))
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK(false)
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFrame(DTWAIN_ARRAY FrameArray, LONG nWhere, 
                                                 DTWAIN_FLOAT left, DTWAIN_FLOAT top,
                                                 DTWAIN_FLOAT right, DTWAIN_FLOAT bottom)
@@ -2163,6 +2187,64 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFrame(DTWAIN_ARRAY FrameArray, LONG nW
         *Frame = TwainFrameInternal(left, top, right, bottom);
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFrameString(DTWAIN_ARRAY FrameArray, LONG nWhere, 
+                                                      LPCTSTR left, LPCTSTR top,
+                                                      LPCTSTR right, LPCTSTR bottom)
+{
+    LOG_FUNC_ENTRY_PARAMS((FrameArray, nWhere, left, top, right, bottom))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    const auto pr = GetRawFrameBufferFromArray(pHandle, FrameArray, nWhere);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; }, DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
+
+    std::array<double, 4> aComponents;
+    constexpr std::array<LONG, 4> aDimensions = { DTWAIN_FRAMELEFT, DTWAIN_FRAMETOP, DTWAIN_FRAMERIGHT, DTWAIN_FRAMEBOTTOM };
+    std::array<LPCTSTR, 4> aValues = { left, top, right, bottom };
+    auto vOne = pr.second;
+    for (int i = 0; i < 4; ++i)
+    {
+        aComponents[i] = StringWrapper::ToDouble(aValues[i]);
+        if ( aValues[i] )
+            vOne->m_FrameComponent[aDimensions[i]] = aComponents[i];
+    }
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK(false)
+}
+
+
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFrameEx(DTWAIN_ARRAY FrameArray, LONG nWhere, DTWAIN_FRAME Frame)
+{
+    LOG_FUNC_ENTRY_PARAMS((FrameArray, nWhere, Frame))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    const auto pr2 = GetRawFrameBufferFromArray(pHandle, FrameArray, nWhere);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pr2.first != DTWAIN_NO_ERROR; },
+                                      pr2.first, false, FUNC_MACRO);
+    const auto bRet = DTWAIN_FrameSetAll(Frame, pr2.second->Left(), pr2.second->Top(), pr2.second->Right(), pr2.second->Bottom());
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFrameEx(DTWAIN_ARRAY FrameArray, LONG nWhere, DTWAIN_FRAME Frame)
+{
+    LOG_FUNC_ENTRY_PARAMS((FrameArray, nWhere, Frame))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+
+    // Check if the passed-in frame is valid
+    auto pr = CheckValidFrame(pHandle, Frame);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pr.first; }, DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
+
+    // Get the buffer from the FrameArray
+    const auto pr2 = GetRawFrameBufferFromArray(pHandle, FrameArray, nWhere);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pr2.first != DTWAIN_NO_ERROR; }, pr2.first, false, FUNC_MACRO);
+
+    // Set the passed-in frame with the values from the FrameArray frame
+    auto& vOne = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(Frame);
+    auto& pPtr = vOne.front();
+    pPtr.SetFrame(pr2.second->Left(), pr2.second->Top(), pr2.second->Right(), pr2.second->Bottom());
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -2281,17 +2363,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetAllString(DTWAIN_FRAME Frame, LPCTSTR Le
     auto pr = CheckValidFrame(pHandle, Frame);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pr.first; }, DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
     std::array<double, 4> aComponents;
-    aComponents[0] = StringWrapper::ToDouble(Left);
-    aComponents[1] = StringWrapper::ToDouble(Top);
-    aComponents[2] = StringWrapper::ToDouble(Right);
-    aComponents[3] = StringWrapper::ToDouble(Bottom);
-
     constexpr std::array<LONG, 4> aDimensions = { DTWAIN_FRAMELEFT, DTWAIN_FRAMETOP, DTWAIN_FRAMERIGHT, DTWAIN_FRAMEBOTTOM };
     std::array<LPCTSTR, 4> aValues = { Left, Top, Right, Bottom };
     auto& vOne = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(Frame);
     auto& pPtr = vOne.front();
     for (int i = 0; i < 4; ++i)
     {
+        aComponents[i] = StringWrapper::ToDouble(aValues[i]);
         if ( aValues[i] )
             pPtr.m_FrameComponent[aDimensions[i]] = aComponents[i];
     }
