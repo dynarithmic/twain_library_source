@@ -560,9 +560,6 @@ DTWAIN_ArrayInsertAtLong64                        @9705
 DTWAIN_ArrayInsertAtLong64N                       @9706
 DTWAIN_ArraySetAtLong64                           @9707
 DTWAIN_GetVersionInfo                             @9800
-DTWAIN_ArrayFrameGetAt                            @9801
-DTWAIN_ArrayFrameSetAt                            @9802
-DTWAIN_ArrayFrameGetFrameAt                       @9803
 DTWAIN_AllocateMemory                             @9900
 DTWAIN_FreeMemory                                 @9901
 DTWAIN_LockMemory                                 @9902
@@ -965,7 +962,6 @@ DTWAIN_SetBlankPageDetectionEx                    @30270
 DTWAIN_SetBlankPageDetectionExString              @30271   
 DTWAIN_SetBlankPageDetectionExStringA             @30272   
 DTWAIN_SetBlankPageDetectionExStringW             @30273 
-DTWAIN_ArrayFrameSetFrameAt                       @30280
 DTWAIN_SetAcquireStripSize                        @30291
 DTWAIN_IsMemFileXferSupported                     @30292
 DTWAIN_IsImageAddressingSupported                 @30300

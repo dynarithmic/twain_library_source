@@ -2087,6 +2087,18 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeNearestValueFloatString( DTWAIN_RANGE pArra
 }
 
 ///////////////////////////////////////////////// Frame functions //////////////////////////////////////////
+static std::pair<LONG, TwainFrameInternal*> GetRawFrameBufferFromArray(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY FrameArray, LONG nWhere)
+{
+    const auto checkStatus = ArrayChecker().SetArray1(FrameArray).SetArrayPos(nWhere).
+        SetExplicitTypeCheck(CTL_ArrayFactory::arrayTag::FrameSingleType).
+        SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS | ArrayChecker::CHECK_ARRAY_BOUNDS | ArrayChecker::CHECK_ARRAY_EXPLICIT_TYPE);
+    auto retVal = checkStatus.Check(pHandle);
+    if (retVal != DTWAIN_NO_ERROR)
+        return { retVal, nullptr };
+    const auto& factory = pHandle->m_ArrayFactory;
+    return { DTWAIN_NO_ERROR, static_cast<TwainFrameInternal*>(factory->get_buffer(FrameArray, nWhere)) };
+}
+
 static std::pair<bool, int> CheckValidFrame(CTL_TwainDLLHandle *pHandle, DTWAIN_FRAME frame)
 {
     const auto checkStatus = ArrayChecker().SetArray1(frame).
@@ -2107,86 +2119,49 @@ DTWAIN_FRAME DLLENTRY_DEF DTWAIN_FrameCreate(DTWAIN_FLOAT Left, DTWAIN_FLOAT Top
     CATCH_BLOCK(nullptr)
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayFrameGetAt(DTWAIN_ARRAY FrameArray, LONG nWhere,
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFrame(DTWAIN_ARRAY FrameArray, LONG nWhere,
                                                 LPDTWAIN_FLOAT pleft, LPDTWAIN_FLOAT ptop,
                                                 LPDTWAIN_FLOAT pright, LPDTWAIN_FLOAT pbottom )
 {
     LOG_FUNC_ENTRY_PARAMS((FrameArray, nWhere, pleft, ptop, pright, pbottom))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     DTWAIN_BOOL bRet = FALSE;
-    DTWAIN_FRAME Frame = DTWAIN_ArrayFrameGetFrameAt(FrameArray, nWhere);
+    const auto pr = GetRawFrameBufferFromArray(pHandle, FrameArray, nWhere);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; }, 
+                                      pr.first, false, FUNC_MACRO);
+    auto Frame = pr.second;
     if ( Frame )
     {
         bRet = TRUE;
-        const TwainFrameInternal& theFrame = *static_cast<TwainFrameInternal*>(Frame);
         if ( pleft )
-            *pleft = theFrame.Left();
+            *pleft = Frame->Left();
         if ( ptop )
-            *ptop = theFrame.Top();
+            *ptop = Frame->Top();
         if ( pright )
-            *pright = theFrame.Right();
+            *pright = Frame->Right();
         if ( pbottom )
-            *pbottom = theFrame.Bottom();
+            *pbottom = Frame->Bottom();
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(FALSE)
 }
 
-DTWAIN_FRAME DLLENTRY_DEF DTWAIN_ArrayFrameGetFrameAt(DTWAIN_ARRAY FrameArray, LONG nWhere )
-{
-    LOG_FUNC_ENTRY_PARAMS((FrameArray, nWhere))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    const auto checkStatus = ArrayChecker().SetArray1(FrameArray).SetArrayPos(nWhere).
-                    SetExplicitTypeCheck(CTL_ArrayFactory::arrayTag::FrameSingleType).
-                    SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS | ArrayChecker::CHECK_ARRAY_BOUNDS | ArrayChecker::CHECK_ARRAY_EXPLICIT_TYPE);
-    if ( checkStatus.Check(pHandle) != DTWAIN_NO_ERROR )
-        LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_ARRAY(NULL))
-
-    const auto& factory = pHandle->m_ArrayFactory;
-    auto buffer = static_cast<TwainFrameInternal*>(factory->get_buffer(FrameArray, nWhere));
-    LOG_FUNC_EXIT_NONAME_PARAMS(buffer)
-    CATCH_BLOCK(DTWAIN_ARRAY(NULL))
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayFrameSetAt(DTWAIN_ARRAY FrameArray, LONG nWhere, DTWAIN_FLOAT left, DTWAIN_FLOAT top, DTWAIN_FLOAT right, DTWAIN_FLOAT bottom )
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFrame(DTWAIN_ARRAY FrameArray, LONG nWhere, 
+                                                DTWAIN_FLOAT left, DTWAIN_FLOAT top,
+                                                DTWAIN_FLOAT right, DTWAIN_FLOAT bottom)
 {
     LOG_FUNC_ENTRY_PARAMS((FrameArray, nWhere, left, top, right, bottom))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     DTWAIN_BOOL bRet = FALSE;
-    DTWAIN_FRAME Frame = DTWAIN_ArrayFrameGetFrameAt(FrameArray, nWhere);
+    const auto pr = GetRawFrameBufferFromArray(pHandle, FrameArray, nWhere);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; },
+                                      pr.first, false, FUNC_MACRO);
+    auto Frame = pr.second;
     if (Frame)
     {
         bRet = TRUE;
-        TwainFrameInternal& theFrame = *static_cast<TwainFrameInternal*>(Frame);
-        theFrame = TwainFrameInternal(left, top, right, bottom);
+        *Frame = TwainFrameInternal(left, top, right, bottom);
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_FRAME DLLENTRY_DEF DTWAIN_ArrayGetAtFrame(DTWAIN_ARRAY FrameArray, LONG nWhere)
-{
-    LOG_FUNC_ENTRY_PARAMS((FrameArray, nWhere))
-    auto val = DTWAIN_ArrayFrameGetFrameAt(FrameArray, nWhere);
-    LOG_FUNC_EXIT_NONAME_PARAMS(val)
-    CATCH_BLOCK(DTWAIN_ARRAY(NULL))
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFrame(DTWAIN_ARRAY FrameArray, LONG nWhere, DTWAIN_FRAME theFrame)
-{
-    LOG_FUNC_ENTRY_PARAMS((FrameArray, nWhere, theFrame))
-    auto val = DTWAIN_ArrayFrameSetFrameAt(FrameArray, nWhere, theFrame);
-    LOG_FUNC_EXIT_NONAME_PARAMS(val)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayFrameSetFrameAt(DTWAIN_ARRAY FrameArray, LONG nWhere, DTWAIN_FRAME theFrame)
-{
-    LOG_FUNC_ENTRY_PARAMS((FrameArray, nWhere, theFrame))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto pr = CheckValidFrame(pHandle, theFrame);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pr.first; }, DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
-    double left, top, right, bottom;
-    DTWAIN_FrameGetAll(theFrame, &left, &top, &right, &bottom);
-    DTWAIN_BOOL bRet = DTWAIN_ArrayFrameSetAt(FrameArray, nWhere, left, top, right, bottom);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
