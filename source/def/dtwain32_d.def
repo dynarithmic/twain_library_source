@@ -1080,3 +1080,12 @@ DTWAIN_ArrayGetAtFrame                            @31083
 DTWAIN_ArraySetAtFrame                            @31084
 DTWAIN_ArrayCreateFromStringsA                    @31085
 DTWAIN_ArrayCreateFromStringsW                    @31086
+DTWAIN_ArrayGetAtFrameEx                          @31087
+DTWAIN_ArraySetAtFrameEx                          @31088
+DTWAIN_ArrayGetAtFrameStringA                     @31089
+DTWAIN_ArrayGetAtFrameStringW                     @31090
+DTWAIN_ArrayGetAtFrameString                      @31091
+DTWAIN_ArraySetAtFrameStringA                     @31092    
+DTWAIN_ArraySetAtFrameStringW                     @31093    
+DTWAIN_ArraySetAtFrameString                      @31094    
+

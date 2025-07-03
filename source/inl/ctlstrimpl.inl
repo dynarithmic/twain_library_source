@@ -3034,10 +3034,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryExA(LPCSTR sLangDLL, DTWAIN_
 #endif
 }
 
-
-//LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringExA(LPCSTR lpOrigString, LPSTR lpOutString, LONG nSize);
-//LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringExW(LPCWSTR lpOrigString, LPWSTR lpOutString, LONG nSize);
-
 LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringExA(LPCSTR lpOrigString, LPSTR lpOutString, LONG nSize)
 {
 #ifdef _UNICODE
@@ -3059,6 +3055,65 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ConvertToAPIStringExW(LPCWSTR lpOrigString, LPWS
     DTWAIN_BOOL retVal = DTWAIN_ConvertToAPIStringEx(StringConversion::Convert_WidePtr_To_Native(lpOrigString).c_str(),
                                                     lpOutString?&arg[0]:nullptr, nSize);
     return null_terminator_copier(get_view(arg), lpOutString, retVal);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFrameStringA(DTWAIN_ARRAY FrameArray, LONG nWhere, 
+                                                       LPSTR left, LPSTR top, LPSTR right, LPSTR bottom)
+{
+#ifdef _UNICODE
+    const std::array<LPSTR, 4> outarg = {left, top, right, bottom};
+    std::array<std::wstring, 4> args = {{std::wstring(1024, 0), std::wstring(1024, 0), std::wstring(1024, 0), std::wstring(1024, 0)}};
+    const DTWAIN_BOOL retVal = DTWAIN_ArrayGetAtFrameString(FrameArray, nWhere, &args[0][0], &args[1][0], &args[2][0], &args[3][0]);
+    for ( size_t i = 0; i < 4; ++i )
+        null_terminator_copier(get_view(args[i]), outarg[i], retVal);
+    return retVal;
+#else
+    return DTWAIN_ArrayGetAtFrameString(FrameArray, nWhere, left, top, right, bottom);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFrameStringW(DTWAIN_ARRAY FrameArray, LONG nWhere, 
+                                                       LPWSTR left, LPWSTR top, LPWSTR right, LPWSTR bottom)
+{
+#ifdef _UNICODE
+    return DTWAIN_ArrayGetAtFrameString(FrameArray, nWhere, left, top, right, bottom);
+#else
+    std::array<LPWSTR, 4> outarg = {left, top, right, bottom};
+    std::array<std::string, 4> args = {{std::string(1024, 0), std::string(1024, 0), std::string(1024, 0), std::string(1024, 0)}};
+    DTWAIN_BOOL retVal = DTWAIN_ArrayGetAtFrameString(FrameArray, nWhere, &args[0][0], &args[1][0], &args[2][0], &args[3][0]);
+    for ( size_t i = 0; i < args.size(); ++i )
+        null_terminator_copier(get_view(args[i]), outarg[i], retVal);
+    return retVal;
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFrameStringA(DTWAIN_ARRAY FrameArray, LONG nWhere, 
+                                                       LPCSTR left, LPCSTR top, LPCSTR right, LPCSTR bottom)
+{
+#ifdef _UNICODE
+    return DTWAIN_ArraySetAtFrameString(FrameArray, nWhere, 
+                                        left?StringConversion::Convert_AnsiPtr_To_Native(left).c_str():nullptr,
+                                        top ? StringConversion::Convert_AnsiPtr_To_Native(top).c_str() : nullptr,
+                                        right? StringConversion::Convert_AnsiPtr_To_Native(right).c_str() : nullptr,
+                                        bottom?StringConversion::Convert_AnsiPtr_To_Native(bottom).c_str():nullptr);
+
+#else
+    return DTWAIN_ArraySetAtFrameString(FrameArray, nWhere, left, top, right, bottom);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFrameStringW(DTWAIN_ARRAY FrameArray, LONG nWhere, 
+                                                       LPCWSTR left, LPCWSTR top, LPCWSTR right, LPCWSTR bottom)
+{
+#ifdef _UNICODE
+    return DTWAIN_ArraySetAtFrameString(FrameArray, nWhere, left, top, right, bottom);
+#else
+    return DTWAIN_ArraySetAtFrameString(FrameArray, nWhere, 
+                                        left?StringConversion::Convert_WidePtr_To_Native(left).c_str():nullptr,
+                                        top ? StringConversion::Convert_WidePtr_To_Native(top).c_str() : nullptr,
+                                        right? StringConversion::Convert_WidePtr_To_Native(right).c_str() : nullptr,
+                                        bottom?StringConversion::Convert_WidePtr_To_Native(bottom).c_str():nullptr);
 #endif
 }
 
