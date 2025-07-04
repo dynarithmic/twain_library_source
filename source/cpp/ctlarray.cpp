@@ -2213,8 +2213,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFrameString(DTWAIN_ARRAY FrameArray, L
     CATCH_BLOCK(false)
 }
 
-
-
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFrameEx(DTWAIN_ARRAY FrameArray, LONG nWhere, DTWAIN_FRAME Frame)
 {
     LOG_FUNC_ENTRY_PARAMS((FrameArray, nWhere, Frame))
