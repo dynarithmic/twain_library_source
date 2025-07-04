@@ -539,6 +539,7 @@ namespace dynarithmic
                INI_DEFAULT_ITEM,
                INI_SOURCES_KEY, 
                INI_DSMERRORLOGGING_KEY, 
+               INI_ALLOWDUP_RESOURCE,
                LASTINIENTRY };
         std::array<std::pair<int, std::string_view>, LASTINIENTRY> s_aINIKeys;
         int32_t                      s_nExtImageInfoOffset = 0;

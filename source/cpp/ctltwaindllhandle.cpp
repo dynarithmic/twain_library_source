@@ -134,8 +134,9 @@ CTL_StaticDataStruct::CTL_StaticDataStruct() :
                 {INI_LANGUAGE_KEY,               "language",             },
                 {INI_DEFAULT_ITEM,               "default",              },
                 {INI_SOURCES_KEY,                "Sources",              },
-                {INI_DSMERRORLOGGING_KEY,        "DSMErrorLogging"}}
-             } {}
+                {INI_DSMERRORLOGGING_KEY,        "DSMErrorLogging"       },
+                {INI_ALLOWDUP_RESOURCE,          "allowduplicateresource"},
+             } } {}
 
 std::pair<bool, std::string> CTL_StaticData::GetTwainNameFromConstantA(int lConstantType, TwainConstantType lTwainConstant)
 {
