@@ -1717,8 +1717,8 @@ namespace Dynarithmic
         public const int DTWAIN_CONSTANT_TWFP    = 22;
         public const int DTWAIN_CONSTANT_TWFR    = 23;
         public const int DTWAIN_CONSTANT_TWFT    = 24;
-        public const int DTWAIN_CONSTANT_TWFY    = 22;
-        public const int DTWAIN_CONSTANT_TWIA    = 23;
+        public const int DTWAIN_CONSTANT_TWFY    = 25;
+        public const int DTWAIN_CONSTANT_TWIA    = 26;
         public const int DTWAIN_CONSTANT_TWIC    = 27;
         public const int DTWAIN_CONSTANT_TWIF    = 28;
         public const int DTWAIN_CONSTANT_TWIM    = 29;
@@ -1771,6 +1771,7 @@ namespace Dynarithmic
         public const int DTWAIN_CONSTANT_TWSX     = 76;
         public const int DTWAIN_CONSTANT_CAP      = 77;
         public const int DTWAIN_CONSTANT_ICAP     = 78;
+        public const int DTWAIN_CONSTANT_DTWAIN_CONT = 79;
 
         public const int DTWAIN_USERRES_START    = 20000;
         public const int DTWAIN_USERRES_MAXSIZE  = 8192;
@@ -1930,15 +1931,11 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
         ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern  int DTWAIN_ArrayFrameGetAt(DTWAIN_ARRAY FrameArray, int nWhere, ref double pleft, ref double ptop, ref double pright, ref double pbottom);
+        public static extern  int DTWAIN_ArrayGetAtFrame(DTWAIN_ARRAY FrameArray, int nWhere, ref double pleft, ref double ptop, ref double pright, ref double pbottom);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
         ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern  DTWAIN_FRAME DTWAIN_ArrayFrameGetFrameAt(DTWAIN_ARRAY FrameArray, int nWhere);
-
-        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
-        ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern  int DTWAIN_ArrayFrameSetAt(DTWAIN_ARRAY FrameArray, int nWhere, double left, double top, double right, double bottom);
+        public static extern  int DTWAIN_ArraySetAtFrame(DTWAIN_ARRAY FrameArray, int nWhere, double left, double top, double right, double bottom);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
         ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
@@ -6152,10 +6149,10 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
         ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern DTWAIN_FRAME DTWAIN_ArrayGetAtFrame(DTWAIN_ARRAY pArray, LONG nWhere);
+        public static extern int DTWAIN_ArrayGetAtFrameEx(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_FRAME theFrame);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto,
         ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_ArraySetAtFrame(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_FRAME theFrame);
+        public static extern int DTWAIN_ArraySetAtFrameEx(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_FRAME theFrame);
     }
 }
