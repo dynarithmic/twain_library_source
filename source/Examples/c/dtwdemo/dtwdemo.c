@@ -1509,7 +1509,7 @@ void TestCap(HWND hWnd, LONG capValue)
         {
             if (i >= 1000)
             {
-                SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)"Number of values exceeded 1000...");
+                SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)"~ Number of values exceeded 1000 ... ~");
                 break;
             }
             switch (nArrayType)
@@ -1520,6 +1520,9 @@ void TestCap(HWND hWnd, LONG capValue)
                     DTWAIN_ArrayGetAtLong(values, i, &lVal);
                     if (bIsCapNameSupported)
                         DTWAIN_GetNameFromCapA(lVal, szValues, 256);
+                    else
+                    if (nDataType == TWTY_BOOL)
+                        sprintf(szValues, "%s", lVal == 1 ? "TRUE" : "FALSE");
                     else
                     if (bGotID)
                         DTWAIN_GetTwainNameFromConstantA(nTranslationID, lVal, szValues, 256);
@@ -1549,7 +1552,7 @@ void TestCap(HWND hWnd, LONG capValue)
                 {
                     double left, top, right, bottom;
                     DTWAIN_ArrayGetAtFrame(values, i, &left, &top, &right, &bottom);
-                    sprintf(szValues, "Left: %lf  Top: %lf, Right: %lf, Bottom: %lf", left, top, right, bottom);
+                    sprintf(szValues, "Left: %lf  Top: %lf  Right: %lf  Bottom: %lf", left, top, right, bottom);
                     SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
                 }
                 break;
