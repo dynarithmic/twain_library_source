@@ -1313,7 +1313,7 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
                 case IDC_btnTestCap:
                 {
                     char szCap[100];
-                    int nCurSel = SendMessage(GetDlgItem(hDlg, IDC_lstCapabilities), LB_GETCURSEL, 0, 0);
+                    LRESULT nCurSel = SendMessage(GetDlgItem(hDlg, IDC_lstCapabilities), LB_GETCURSEL, 0, 0);
                     SendMessageA(GetDlgItem(hDlg, IDC_lstCapabilities), LB_GETTEXT, nCurSel, (LPARAM)szCap);
                     DisplayTestCapDlg(hDlg, szCap);
                 }
@@ -1359,7 +1359,7 @@ LRESULT CALLBACK DisplayTestCapProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
                     if (nNotification == CBN_SELCHANGE)
                     {
                         TCHAR szGetType[100];
-                        int nCurSel = SendMessage(GetDlgItem(hDlg, IDC_cmbGetTypes), CB_GETCURSEL, 0, 0);
+                        LRESULT nCurSel = SendMessage(GetDlgItem(hDlg, IDC_cmbGetTypes), CB_GETCURSEL, 0, 0);
                         SendMessage(GetDlgItem(hDlg, IDC_cmbGetTypes), CB_GETLBTEXT, nCurSel, (LPARAM)szGetType);
                         SetTestSelection(hDlg, szGetType, curCapValue);
                     }
@@ -1374,7 +1374,7 @@ LRESULT CALLBACK DisplayTestCapProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
                 {
                     /* Get the Get type*/
                     TCHAR szGetType[100];
-                    int nCurSel = SendMessage(GetDlgItem(hDlg, IDC_cmbGetTypes), CB_GETCURSEL, 0, 0);
+                    LRESULT nCurSel = SendMessage(GetDlgItem(hDlg, IDC_cmbGetTypes), CB_GETCURSEL, 0, 0);
                     SendMessage(GetDlgItem(hDlg, IDC_cmbGetTypes), CB_GETLBTEXT, nCurSel, (LPARAM)szGetType);
                     SetTestSelection(hDlg, szGetType, curCapValue);
                 }
@@ -1468,7 +1468,7 @@ void TestCap(HWND hWnd, LONG capValue)
 
     /* Get the get type, container, and data type */
     TCHAR szGetType[100];
-    int nCurSel = SendMessage(hWndGetTypes, CB_GETCURSEL, 0, 0);
+    LRESULT nCurSel = SendMessage(hWndGetTypes, CB_GETCURSEL, 0, 0);
     SendMessage(hWndGetTypes, CB_GETLBTEXT, nCurSel, (LPARAM)szGetType);
     LONG nGetType = DTWAIN_GetTwainIDFromName(szGetType);
 
