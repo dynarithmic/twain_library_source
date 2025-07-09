@@ -21,10 +21,12 @@
 
 #include "../nlohmann/json.hpp"
 #include <boost/range/adaptor/transformed.hpp>
+#include <string_view>
 #include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctlsetgetcaps.h"
+
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -691,9 +693,9 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     }
 
                     static constexpr int SPECIAL_FILESYSTEM = -999;
-                    std::array<int, 11> imageInfoCaps = { ICAP_BRIGHTNESS, ICAP_CONTRAST, ICAP_GAMMA, ICAP_HIGHLIGHT, ICAP_SHADOW,
+                    constexpr std::array<int, 11> imageInfoCaps = { ICAP_BRIGHTNESS, ICAP_CONTRAST, ICAP_GAMMA, ICAP_HIGHLIGHT, ICAP_SHADOW,
                                                           ICAP_THRESHOLD, ICAP_ROTATION, ICAP_ORIENTATION, ICAP_OVERSCAN, ICAP_HALFTONES, SPECIAL_FILESYSTEM };
-                    std::array<std::string, 11> imageInfoCapsStr = { "\"brightness-values\":", "\"contrast-values\":", "\"gamma-values\":",
+                    constexpr std::array<std::string_view, 11> imageInfoCapsStr = { "\"brightness-values\":", "\"contrast-values\":", "\"gamma-values\":",
                         "\"highlight-values\":", "\"shadow-values\":", "\"threshold-values\":",
                         "\"rotation-values\":", "\"orientation-values\":", "\"overscan-values\":", "\"halftone-values\":", "\"filesystem-camera-values\":" };
                     for (size_t curImageCap = 0; curImageCap < imageInfoCaps.size(); ++curImageCap)
@@ -779,10 +781,10 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
 
                     strm.str("");
 
-                    std::array<int, numOneValueDeviceInfo> deviceInfoCaps = { CAP_FEEDERENABLED, CAP_FEEDERLOADED, CAP_UICONTROLLABLE,
-                                                          ICAP_AUTOBRIGHT, ICAP_AUTOMATICDESKEW,
-                                                          CAP_PRINTER, CAP_DUPLEX, CAP_JOBCONTROL, ICAP_LIGHTPATH, ICAP_EXTIMAGEINFO, 
-                                                          0, CAP_INDICATORS};
+                    constexpr std::array<int, numOneValueDeviceInfo> deviceInfoCaps = { CAP_FEEDERENABLED, CAP_FEEDERLOADED, CAP_UICONTROLLABLE,
+                                                                                        ICAP_AUTOBRIGHT, ICAP_AUTOMATICDESKEW,
+                                                                                        CAP_PRINTER, CAP_DUPLEX, CAP_JOBCONTROL, ICAP_LIGHTPATH, ICAP_EXTIMAGEINFO, 
+                                                                                        0, CAP_INDICATORS};
 
                     std::array<std::string, numOneValueDeviceInfo> deviceInfoCapsStr;
                     std::copy(deviceInfoString.begin(), deviceInfoString.end(), deviceInfoCapsStr.begin());

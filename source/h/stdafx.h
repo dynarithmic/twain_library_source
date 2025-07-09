@@ -49,5 +49,4 @@
 #include <cstdlib>
 #include <boost/functional/hash.hpp>
 #include <boost/variant2/variant.hpp>
-#include "../tsl/ordered_map.h"
 #include "dtwain_filesystem.h"
