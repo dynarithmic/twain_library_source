@@ -497,12 +497,12 @@ namespace dynarithmic
         CTL_StringType& GetExtension() { return m_sExtension; }
     };
 
-    typedef std::map<std::string, SourceStatus> SourceStatusMap;
+    typedef boost::container::flat_map<std::string, SourceStatus> SourceStatusMap;
     typedef boost::container::flat_map<int, ImageResamplerData> ImageResamplerMap;
     typedef boost::container::flat_map<int, std::pair<std::string, std::string>> CTL_PDFMediaMap;
-    typedef tsl::ordered_map<LONG, FileFormatNode> CTL_AvailableFileFormatsMap;
+    typedef boost::container::flat_map<LONG, FileFormatNode> CTL_AvailableFileFormatsMap;
     using TwainConstantType = int64_t;
-    typedef tsl::ordered_map<TwainConstantType, std::vector<std::string>> CTL_TwainConstantToStringMapNode;
+    typedef boost::container::flat_map<TwainConstantType, std::vector<std::string>> CTL_TwainConstantToStringMapNode;
     typedef boost::container::flat_map<int, CTL_TwainConstantToStringMapNode> CTL_TwainConstantsMap;
     typedef boost::container::flat_map<TwainConstantType, std::string> CTL_TwainIDToStringMap;
     typedef boost::container::flat_map<int32_t, std::string> CTL_ErrorToExtraInfoMap;
