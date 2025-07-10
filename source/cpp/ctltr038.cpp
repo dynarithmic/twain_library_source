@@ -340,41 +340,12 @@ bool CTL_ExtImageInfoTriplet::AddInfo(TW_INFO Info)
 }
 
 // Function assumes that DAT_EXTIMAGEINFO exists for the Source
-bool CTL_ExtImageInfoTriplet::EnumSupported(CTL_ITwainSource *pSource,
-                                            CTL_ITwainSession *pSession,
-                                            CTL_IntArray &rArray)
+bool CTL_ExtImageInfoTriplet::EnumSupported(CTL_ITwainSource* pSource,
+                                            CTL_IntArray& rArray)
 {
     size_t NumAttr = CTL_StaticData::GetExtendedImageInfoMap().size();
     rArray.clear();
-
-    TW_UINT16 rc = TWRC_SUCCESS;
-    auto triplet = pSource->GetExtImageInfoTriplet();
-
-    if (!triplet->HasRetrievedInfo())
-    // not retrieved the info yet, so do this.
-        rc = triplet->Execute();
-    
-    switch (rc)
-    {
-        case TWRC_SUCCESS:
-        {
-            for ( size_t i = 0; i < NumAttr; i++)
-            {
-                TW_INFO Info = triplet->GetInfo(i, DTWAIN_BYPOSITION);
-                if ( Info.ReturnCode != TWRC_INFONOTSUPPORTED && Info.ReturnCode != TWRC_DATANOTAVAILABLE)
-                    rArray.push_back(Info.InfoID);
-            }
-            return true;
-        }
-        break;
-
-        case TWRC_FAILURE:
-        {
-            return false;
-        }
-
-        default:
-            return false;
-    }
-    return false;
+    auto& vVect = pSource->GetSupportedExtImageInfos();
+    std::copy(vVect.begin(), vVect.end(), std::back_inserter(rArray));
+    return true;
 }

@@ -1035,7 +1035,7 @@ std::pair<bool, int32_t>CTL_ITwainSource::GetExtImageInfoData(int nWhichItem, in
 bool CTL_ITwainSource::EnumExtImageInfo(CTL_IntArray& r)
 {
     // Function assumes that DAT_EXTIMAGEINFO exists for the Source
-    if ( CTL_ExtImageInfoTriplet::EnumSupported(this, m_pSession, r) )
+    if ( CTL_ExtImageInfoTriplet::EnumSupported(this, r) )
         return true;
     return false;
 }

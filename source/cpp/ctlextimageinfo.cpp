@@ -489,8 +489,7 @@ static std::pair<bool, int> GetCachedExtImageInfoData(CTL_TwainDLLHandle* pHandl
     return { false, DTWAIN_ERR_MEM };
 }
 
-/* This returns the data that the Source returned when the item is queried.  Application
-   must make sure that the LPVOID passed in fits the data that is returned from the Source.
+/* This returns the data that the Source returned when the item is queried.
    Use DTWAIN_GetExtImageInfoItem to determine the type of data.   */
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG nWhich, LPDTWAIN_ARRAY Data)
 {
@@ -638,7 +637,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
     CATCH_BLOCK(false)
 }
 
-/* Uninitializes the Extended Image information interface.  This also must be called.  */
+// Uninitializes the Extended Image information interface.  This also must be called. 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FreeExtImageInfo(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
