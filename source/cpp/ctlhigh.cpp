@@ -18,6 +18,14 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+
+ /*****************************************************************************************
+     The ctlhigh.cpp module serves as a code generator for most of the exported capability
+     functions.
+
+     The macros basically create the boilerplate DLL export header for each function, along
+     with the arguments to the function.
+  *****************************************************************************************/
 #include <boost/format.hpp>
 #include <type_traits>
 #include <string_view>
