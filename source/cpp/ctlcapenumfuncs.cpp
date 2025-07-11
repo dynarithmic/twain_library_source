@@ -22,6 +22,8 @@
 #include "ctltwainmanager.h"
 #include "errorcheck.h"
 #include "ctltmpl5.h"
+#include "ctllogcalls.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
