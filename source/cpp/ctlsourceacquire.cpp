@@ -149,7 +149,6 @@ static std::pair<bool, LONG>
     bool bWriteMisc = (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS) ? true : false;
     if (PixelType != DTWAIN_PT_DEFAULT)
     {
-        CTL_StringType sBuf;
         if (bWriteMisc)
             LogWriterUtils::WriteLogInfoIndentedA("Verifying Current Pixel Type ...");
 
