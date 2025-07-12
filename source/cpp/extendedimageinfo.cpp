@@ -147,7 +147,7 @@ bool ExtendedImageInformation::FillPageSourceInfo()
 
     DTWAIN_ARRAY aValues = {};
     DTWAINArrayPtr_RAII raii(m_theSource->GetDTWAINHandle(), &aValues);
-    constexpr std::array<int32_t, 2> stringItems = { TWEI_CAMERA, TWEI_BOOKNAME };
+    static constexpr std::array<int32_t, 2> stringItems = { TWEI_CAMERA, TWEI_BOOKNAME };
     std::array<std::string*, 2> refStrings = { &m_InfoBlock.m_pageSource.camera, &m_InfoBlock.m_pageSource.bookname };
     auto pHandle = m_theSource->GetDTWAINHandle();
 
@@ -162,7 +162,7 @@ bool ExtendedImageInformation::FillPageSourceInfo()
     }
 
     {
-        constexpr std::array<int32_t, 4> intItems = { TWEI_CHAPTERNUMBER, TWEI_DOCUMENTNUMBER, TWEI_PAGENUMBER, TWEI_FRAMENUMBER };
+        static constexpr std::array<int32_t, 4> intItems = { TWEI_CHAPTERNUMBER, TWEI_DOCUMENTNUMBER, TWEI_PAGENUMBER, TWEI_FRAMENUMBER };
         std::array<TW_UINT32*, 4> refInts = { &m_InfoBlock.m_pageSource.chapterNumber, &m_InfoBlock.m_pageSource.documentNumber, &m_InfoBlock.m_pageSource.pageNumber, &m_InfoBlock.m_pageSource.frameNumber };
 
         for (size_t i = 0; i < intItems.size(); ++i)
@@ -177,7 +177,7 @@ bool ExtendedImageInformation::FillPageSourceInfo()
     }
 
     {
-        constexpr std::array<int32_t, 1> intItems = { TWEI_PIXELFLAVOR };
+        static constexpr std::array<int32_t, 1> intItems = { TWEI_PIXELFLAVOR };
         std::array<TW_UINT16*, 1> refInts = { &m_InfoBlock.m_pageSource.pixelFlavor };
 
         for (size_t i = 0; i < intItems.size(); ++i)
@@ -228,7 +228,7 @@ bool ExtendedImageInformation::FillSkewInfo()
 
     DTWAIN_ARRAY aValues = {};
     DTWAINArrayPtr_RAII raii(m_theSource->GetDTWAINHandle(), &aValues);
-    constexpr std::array<int32_t, 12> intItems = { TWEI_DESKEWSTATUS, TWEI_SKEWORIGINALANGLE,
+    static constexpr std::array<int32_t, 12> intItems = { TWEI_DESKEWSTATUS, TWEI_SKEWORIGINALANGLE,
                                                    TWEI_SKEWFINALANGLE, TWEI_SKEWCONFIDENCE,
                                                    TWEI_SKEWWINDOWX1, TWEI_SKEWWINDOWY1,
                                                    TWEI_SKEWWINDOWX2, TWEI_SKEWWINDOWY2,
@@ -278,7 +278,7 @@ bool ExtendedImageInformation::FillShadedAreaInfo()
 
     m_InfoBlock.m_shadedInfo.count = shadeCount;
 
-    constexpr std::array<int32_t, 14> intItems = { TWEI_DESHADELEFT,
+    static constexpr std::array<int32_t, 14> intItems = { TWEI_DESHADELEFT,
                                                    TWEI_DESHADETOP,
                                                    TWEI_DESHADEWIDTH,
                                                    TWEI_DESHADEHEIGHT,
@@ -327,7 +327,7 @@ bool ExtendedImageInformation::FillSpeckleRemovalInfo()
     DTWAIN_ARRAY aValues = {};
     DTWAINArrayPtr_RAII raii(m_theSource->GetDTWAINHandle(), &aValues);
 
-    constexpr std::array<int32_t, 3> intItems = { TWEI_SPECKLESREMOVED,
+    static constexpr std::array<int32_t, 3> intItems = { TWEI_SPECKLESREMOVED,
                                                   TWEI_BLACKSPECKLESREMOVED,
                                                   TWEI_WHITESPECKLESREMOVED };
     std::array<TW_UINT32*, 3> refInts = { &m_InfoBlock.m_speckleRemoval.specklesRemoved,
@@ -442,7 +442,7 @@ bool ExtendedImageInformation::FillFormsRecognitionInfo()
     DTWAIN_GetExtImageInfoData(m_theSource, TWEI_FORMTEMPLATEMATCH, &aValues);
     m_InfoBlock.m_formsRecognitionInfo.m_vTemplateMatch = CreateContainerFromArray<std::vector<std::string>>(pHandle, aValues);
 
-    constexpr std::array<int32_t, 4> intTypes = { TWEI_FORMCONFIDENCE, TWEI_FORMTEMPLATEPAGEMATCH, TWEI_FORMHORZDOCOFFSET, TWEI_FORMVERTDOCOFFSET };
+    static constexpr std::array<int32_t, 4> intTypes = { TWEI_FORMCONFIDENCE, TWEI_FORMTEMPLATEPAGEMATCH, TWEI_FORMHORZDOCOFFSET, TWEI_FORMVERTDOCOFFSET };
     std::array<std::vector<TW_UINT32>*, 4> ptrVects = { &m_InfoBlock.m_formsRecognitionInfo.m_vConfidence, &m_InfoBlock.m_formsRecognitionInfo.m_vTemplatePageMatch,
                                                         &m_InfoBlock.m_formsRecognitionInfo.m_vHorizontalDocOffset, &m_InfoBlock.m_formsRecognitionInfo.m_vVerticalDocOffset };
     for (size_t i = 0; i < intTypes.size(); ++i)
@@ -663,7 +663,7 @@ bool ExtendedImageInformation::FillExtendedImageInfo25()
         return false;
     auto pHandle = m_theSource->GetDTWAINHandle();
 
-    constexpr std::array<int32_t, 5> intTypes = { TWEI_IAFIELDA_VALUE, TWEI_IAFIELDB_VALUE, TWEI_IAFIELDC_VALUE, TWEI_IAFIELDD_VALUE, TWEI_IAFIELDE_VALUE };
+    static constexpr std::array<int32_t, 5> intTypes = { TWEI_IAFIELDA_VALUE, TWEI_IAFIELDB_VALUE, TWEI_IAFIELDC_VALUE, TWEI_IAFIELDD_VALUE, TWEI_IAFIELDE_VALUE };
     std::array<DTWAIN_ARRAY, 5> aValue;
     std::array<LPDTWAIN_ARRAY, 5> aVects = { &aValue[0], &aValue[1], &aValue[2], &aValue[3], &aValue[4] };
     std::array<DTWAINArrayPtr_RAII, 5> aRAII;
@@ -686,7 +686,7 @@ bool ExtendedImageInformation::FillExtendedImageInfo25()
             m_InfoBlock.m_extendedImageInfo25.m_ImageAddressing.m_AddressInfo[i] = vValues.front();
     }
 
-    constexpr std::array<int32_t, 2> int16Types = { TWEI_IALEVEL, TWEI_PRINTER };
+    static constexpr std::array<int32_t, 2> int16Types = { TWEI_IALEVEL, TWEI_PRINTER };
     std::array<TW_UINT16*, 2> ptrInt = { &m_InfoBlock.m_extendedImageInfo25.m_ImageAddressing.m_iaLevel, &m_InfoBlock.m_extendedImageInfo25.m_printer };
     for (size_t i = 0; i < int16Types.size(); ++i)
     {
