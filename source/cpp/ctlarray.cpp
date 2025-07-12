@@ -2365,7 +2365,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetAllString(DTWAIN_FRAME Frame, LPTSTR Lef
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
 
     std::array<LPTSTR, 4> vals= {Left?Left:nullptr, Top?Top:nullptr, Right?Right:nullptr, Bottom?Bottom:nullptr};
-    StringStreamA strm;
     for (size_t i = 0; i < aFrameComponent.size(); ++i )
     {
         if ( vals[i])

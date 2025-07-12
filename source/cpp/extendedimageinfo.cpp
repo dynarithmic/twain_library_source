@@ -786,7 +786,6 @@ bool ExtendedImageInformation::FillAllInfo()
 
 DTWAIN_ARRAY ExtendedImageInformation::GetBarcodeInfo(long nWhichInfo)
 {
-    std::vector<std::string> tempVS;
     switch (nWhichInfo)
     {
         case TWEI_BARCODECOUNT:
