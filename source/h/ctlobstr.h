@@ -197,7 +197,7 @@ namespace dynarithmic
         static double ToDouble(const char_type* s1)
         { return s1?strtod(s1, nullptr):0.0; }
 
-        static std::string TrimDouble(double value, size_t numDigitsPrecision)
+        static std::string TrimDouble(double value, int numDigitsPrecision)
         {
             char_type buf[256];
             #ifdef _MSC_VER
@@ -353,7 +353,7 @@ namespace dynarithmic
         static double ToDouble(const char_type* s1)
         { return s1 ? wcstod(s1, nullptr) : 0.0; }
 
-        static std::wstring TrimDouble(double value, size_t numDigitsPrecision)
+        static std::wstring TrimDouble(double value, int numDigitsPrecision)
         {
             char_type buf[255];
             #ifdef _MSC_VER
@@ -768,7 +768,7 @@ namespace dynarithmic
             return StringTraits::ToDouble(s1.data());
         }
 
-        static StringType TrimDouble(double val, size_t numDigits = 8)
+        static StringType TrimDouble(double val, int numDigits = 8)
         {
             return StringTraits::TrimDouble(val, numDigits);
         }
