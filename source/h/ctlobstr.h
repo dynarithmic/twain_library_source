@@ -196,6 +196,18 @@ namespace dynarithmic
         static bool IsDigit(int ch) { return isdigit(ch)?true:false; }
         static double ToDouble(const char_type* s1)
         { return s1?strtod(s1, nullptr):0.0; }
+
+        static std::string TrimDouble(double value, size_t numDigitsPrecision)
+        {
+            char_type buf[256];
+            #ifdef _MSC_VER
+            sprintf_s(buf, "%.*g", numDigitsPrecision, value);
+            #else
+            sprintf(buf, "%.*g", numDigitsPrecision, value);
+            #endif
+            return buf;
+        }
+
         #ifdef _WIN32
         static UINT GetWindowsDirectoryImpl(char_type* buffer)
                     { return GetWindowsDirectoryA(buffer, _MAX_PATH); }
@@ -340,6 +352,18 @@ namespace dynarithmic
         static bool IsDigit(wint_t ch) { return iswdigit(ch)?true:false; }
         static double ToDouble(const char_type* s1)
         { return s1 ? wcstod(s1, nullptr) : 0.0; }
+
+        static std::wstring TrimDouble(double value, size_t numDigitsPrecision)
+        {
+            char_type buf[255];
+            #ifdef _MSC_VER
+            swprintf_s(buf, L"%.*g", numDigitsPrecision, value);
+            #else
+            swprintf(buf, L"%.*g", numDigitsPrecision, value);
+            #endif
+            return buf;
+        }
+
         #ifdef _WIN32
         static UINT GetWindowsDirectoryImpl(char_type* buffer)
         { return GetWindowsDirectoryW(buffer, _MAX_PATH); }
@@ -742,6 +766,11 @@ namespace dynarithmic
         static double ToDouble(typename StringTraits::stringview_type s1)
         {
             return StringTraits::ToDouble(s1.data());
+        }
+
+        static StringType TrimDouble(double val, size_t numDigits = 8)
+        {
+            return StringTraits::TrimDouble(val, numDigits);
         }
 
         static double ToDouble(const CharType* s1, double defVal = 0.0)
