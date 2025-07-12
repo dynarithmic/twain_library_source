@@ -442,7 +442,7 @@ HANDLE CDibInterface::CropDIB(HANDLE handle, const FloatRect& ActualRect, const 
 FloatRect CDibInterface::Normalize(fipImage& pImage, const FloatRect& ActualRect, const FloatRect& RequestedRect,
                                    int sourceunit, int destunit, int dpi)
 {
-    constexpr std::array<std::pair<LONG, double>, 5> Measurement = { {{DTWAIN_INCHES, 1.0},
+    static constexpr std::array<std::pair<LONG, double>, 5> Measurement = { {{DTWAIN_INCHES, 1.0},
                                                                       {DTWAIN_TWIPS, 1440.0},
                                                                       {DTWAIN_POINTS, 72.0},
                                                                       {DTWAIN_PICAS, 6.0},
