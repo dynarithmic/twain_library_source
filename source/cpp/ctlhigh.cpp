@@ -784,12 +784,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_GetDeviceCapByString(DTWAIN_SOURCE Source, LPTST
     DTWAIN_FLOAT tempR;
     const DTWAIN_BOOL retVal = fn(Source, &tempR);
     if ( retVal )
-    {
-        StringStreamA strm;
-        strm << boost::format("%1%") % tempR;
-        const auto srcStr = StringConversion::Convert_Ansi_To_Native(strm.str());
-        StringWrapper::SafeStrcpy(strVal, srcStr.c_str());
-    }
+        StringWrapper::SafeStrcpy(strVal, StringWrapper::TrimDouble(tempR).c_str(), 255);
     return retVal;
 }
 

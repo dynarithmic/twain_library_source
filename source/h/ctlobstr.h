@@ -49,6 +49,14 @@
 #define _MAX_PATH 260
 #endif
 
+#ifdef _MSC_VER
+    #define DTWAIN_SPRINTF_FUNC sprintf_s
+    #define DTWAIN_SWPRINTF_FUNC swprintf_s
+#else
+    #define DTWAIN_SPRINTF_FUNC sprintf
+    #define DTWAIN_SWPRINTF_FUNC swprintf
+#endif
+
 namespace dynarithmic
 {
     typedef std::vector<std::string> StringArray;
@@ -200,11 +208,7 @@ namespace dynarithmic
         static std::string TrimDouble(double value, int numDigitsPrecision)
         {
             char_type buf[256];
-            #ifdef _MSC_VER
-            sprintf_s(buf, "%.*g", numDigitsPrecision, value);
-            #else
-            sprintf(buf, "%.*g", numDigitsPrecision, value);
-            #endif
+            DTWAIN_SPRINTF_FUNC(buf, "%.*g", numDigitsPrecision, value);
             return buf;
         }
 
@@ -356,11 +360,7 @@ namespace dynarithmic
         static std::wstring TrimDouble(double value, int numDigitsPrecision)
         {
             char_type buf[255];
-            #ifdef _MSC_VER
-            swprintf_s(buf, L"%.*g", numDigitsPrecision, value);
-            #else
-            swprintf(buf, L"%.*g", numDigitsPrecision, value);
-            #endif
+            DTWAIN_SWPRINTF_FUNC(buf, L"%.*g", numDigitsPrecision, value);
             return buf;
         }
 
