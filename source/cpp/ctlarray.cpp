@@ -21,7 +21,6 @@
 #include <cmath>
 #include <cstdio>
 #include <algorithm>
-#include <boost/format.hpp>
 
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
@@ -1695,14 +1694,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetValueFloat( DTWAIN_RANGE pArray, LONG nW
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetValueFloatString( DTWAIN_RANGE pArray, LONG nWhich, LPTSTR pVal)
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, nWhich, pVal))
-    double d;
-    const DTWAIN_BOOL bRet = DTWAIN_RangeGetValueFloat(pArray, nWhich, &d);
+    double dValue;
+    const DTWAIN_BOOL bRet = DTWAIN_RangeGetValueFloat(pArray, nWhich, &dValue);
     if ( bRet )
-    {
-        StringStreamA strm;
-        strm << boost::format("%1%") % d;
-        StringWrapper::SafeStrcpy(pVal, StringConversion::Convert_Ansi_To_Native(strm.str()).c_str());
-    }
+        StringWrapper::SafeStrcpy(pVal, StringWrapper::TrimDouble(dValue).c_str(), 255);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pVal))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -1816,8 +1811,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetAllFloatString( DTWAIN_RANGE pArray, LPT
                                                          LPTSTR dCurrent )
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, dLow, dUp, dStep, dDefault, dCurrent ))
-    double d[5];
-    const DTWAIN_BOOL bRet = DTWAIN_RangeGetAllFloat(pArray, &d[0], &d[1], &d[2], &d[3], &d[4]);
+    double dValue[5];
+    const DTWAIN_BOOL bRet = DTWAIN_RangeGetAllFloat(pArray, &dValue[0], &dValue[1], &dValue[2], &dValue[3], &dValue[4]);
     if ( bRet )
     {
         LPTSTR vals[] = { dLow?dLow:nullptr, 
@@ -1825,13 +1820,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetAllFloatString( DTWAIN_RANGE pArray, LPT
                            dStep?dStep:nullptr, 
                            dDefault?dDefault:nullptr, 
                            dCurrent?dCurrent:nullptr};
-        StringStreamA strm;
-        for (int i = 0; i < 5; ++i )
+        for (int i = 0; i < 5; ++i)
         {
-            strm << boost::format("%1%") % d[i];
-            auto sVal = strm.str();
-            StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sVal), vals[i], static_cast<int32_t>(sVal.size()) + 1);
-            strm.str("");
+            if (vals[i])
+                StringWrapper::SafeStrcpy(vals[i], StringWrapper::TrimDouble(dValue[i]).c_str(), 255);
         }
     }
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((dLow, dUp, dStep, dDefault, dCurrent))
@@ -1899,14 +1891,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetExpValueFloat( DTWAIN_RANGE pArray, LONG
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetExpValueFloatString( DTWAIN_RANGE pArray, LONG lPos, LPTSTR pVal )
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, lPos, pVal))
-    double d;
-    const DTWAIN_BOOL bRet = DTWAIN_RangeGetExpValueFloat(pArray,lPos,&d);
+    double dValue;
+    const DTWAIN_BOOL bRet = DTWAIN_RangeGetExpValueFloat(pArray,lPos,&dValue);
     if ( bRet )
-    {
-        StringStreamA strm;
-        strm << boost::format("%1%") % d;
-        StringWrapper::SafeStrcpy(pVal, StringConversion::Convert_Ansi_To_Native(strm.str()).c_str());
-    }
+        StringWrapper::SafeStrcpy(pVal, StringWrapper::TrimDouble(dValue).c_str(), 255);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pVal))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -2071,16 +2059,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeNearestValueFloatString( DTWAIN_RANGE pArra
     if ( !dIn || !pOutput )
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
-    const double d = StringWrapper::ToDouble(dIn);
+    const double dValue = StringWrapper::ToDouble(dIn);
     double dOut;
-    const DTWAIN_BOOL bRet = DTWAIN_RangeNearestValueFloat(pArray, d, &dOut,RoundType);
+    const DTWAIN_BOOL bRet = DTWAIN_RangeNearestValueFloat(pArray, dValue, &dOut,RoundType);
     if ( bRet )
-    {
-        StringStreamA strm;
-        strm << boost::format("%1%") % dOut;
-        auto sVal = strm.str();
-        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sVal), pOutput, static_cast<int32_t>(sVal.size()) + 1);
-    }
+        StringWrapper::SafeStrcpy(pOutput, StringWrapper::TrimDouble(dOut).c_str(), 255);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pOutput))
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
@@ -2160,10 +2143,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFrameString(DTWAIN_ARRAY FrameArray, L
     StringStreamA strm;
     for (size_t i = 0; i < vals.size(); ++i)
     {
-        strm << boost::format("%1%") % pr.second->m_FrameComponent[i];
-        auto sVal = strm.str();
-        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sVal), vals[i], static_cast<int32_t>(sVal.size()) + 1);
-        strm.str("");
+        if ( vals[i] )
+            StringWrapper::SafeStrcpy(vals[i], StringWrapper::TrimDouble(pr.second->m_FrameComponent[i]).c_str(), 255);
     }
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pleft, ptop, pright, pbottom))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -2200,7 +2181,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFrameString(DTWAIN_ARRAY FrameArray, L
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; }, DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
 
     std::array<double, 4> aComponents;
-    constexpr std::array<LONG, 4> aDimensions = { DTWAIN_FRAMELEFT, DTWAIN_FRAMETOP, DTWAIN_FRAMERIGHT, DTWAIN_FRAMEBOTTOM };
+    static constexpr std::array<LONG, 4> aDimensions = { DTWAIN_FRAMELEFT, DTWAIN_FRAMETOP, DTWAIN_FRAMERIGHT, DTWAIN_FRAMEBOTTOM };
     std::array<LPCTSTR, 4> aValues = { left, top, right, bottom };
     auto vOne = pr.second;
     for (int i = 0; i < 4; ++i)
@@ -2361,7 +2342,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameSetAllString(DTWAIN_FRAME Frame, LPCTSTR Le
     auto pr = CheckValidFrame(pHandle, Frame);
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pr.first; }, DTWAIN_ERR_INVALID_DTWAIN_FRAME, false, FUNC_MACRO);
     std::array<double, 4> aComponents;
-    constexpr std::array<LONG, 4> aDimensions = { DTWAIN_FRAMELEFT, DTWAIN_FRAMETOP, DTWAIN_FRAMERIGHT, DTWAIN_FRAMEBOTTOM };
+    static constexpr std::array<LONG, 4> aDimensions = { DTWAIN_FRAMELEFT, DTWAIN_FRAMETOP, DTWAIN_FRAMERIGHT, DTWAIN_FRAMEBOTTOM };
     std::array<LPCTSTR, 4> aValues = { Left, Top, Right, Bottom };
     auto& vOne = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(Frame);
     auto& pPtr = vOne.front();
@@ -2387,10 +2368,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetAllString(DTWAIN_FRAME Frame, LPTSTR Lef
     StringStreamA strm;
     for (size_t i = 0; i < aFrameComponent.size(); ++i )
     {
-        strm << boost::format("%1%") % aFrameComponent[i];
-        auto sVal = strm.str();
-        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sVal), vals[i], static_cast<int32_t>(sVal.size()) + 1);
-        strm.str("");
+        if ( vals[i])
+            StringWrapper::SafeStrcpy(vals[i], StringWrapper::TrimDouble(aFrameComponent[i]).c_str(), 255);
     }
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Left, Top, Right, Bottom))
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -2400,16 +2379,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetAllString(DTWAIN_FRAME Frame, LPTSTR Lef
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FrameGetValueString(DTWAIN_FRAME Frame, LONG nWhich, LPTSTR Value)
 {
     LOG_FUNC_ENTRY_PARAMS((Frame, nWhich, Value))
-    double d;
-    const DTWAIN_BOOL bRet = DTWAIN_FrameGetValue(Frame, nWhich, &d);
+    double dValue;
+    const DTWAIN_BOOL bRet = DTWAIN_FrameGetValue(Frame, nWhich, &dValue);
     if (!bRet)
         LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     if (Value)
     {
-        StringStreamA strm;
-        strm << boost::format("%1%") % d;
-        auto sVal = strm.str();
-        StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(sVal), Value, static_cast<int32_t>(sVal.size()) + 1);
+        StringWrapper::SafeStrcpy(Value, StringWrapper::TrimDouble(dValue).c_str(), 255);
         LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Value))
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
