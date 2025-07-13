@@ -46,7 +46,7 @@
 #include <dtwain_filesystem.h>
 #include "dtwain_standard_defs.h"
 #ifndef _MAX_PATH
-#define _MAX_PATH 260
+    #define _MAX_PATH 260
 #endif
 
 #ifdef _MSC_VER
