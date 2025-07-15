@@ -293,7 +293,13 @@ DTWAIN_ARRAY dynarithmic::CreateArrayFromFactory(CTL_TwainDLLHandle* pHandle, LO
         case DTWAIN_ARRAYUINT16:
         case DTWAIN_ARRAYUINT32:
             nEnumType = DTWAIN_ARRAYLONG;
-            break;
+        break;
+
+        case DTWAIN_ARRAYINT64:
+        case DTWAIN_ARRAYUINT64:
+            nEnumType = DTWAIN_ARRAYLONG64;
+        break;
+
         default:;
     }
     int dummy = 0;
