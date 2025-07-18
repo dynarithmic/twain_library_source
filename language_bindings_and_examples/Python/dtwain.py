@@ -1747,6 +1747,7 @@ def setup_windll(theDLL):
      theDLL.DTWAIN_FrameCreateStringA.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_FrameCreateString.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_FrameCreateStringW.restype = ct.POINTER(ct.c_void_p)
+     theDLL.DTWAIN_ArrayGetAtFrame.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_GetDTWAINHandle.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_SysInitializeEx2A.restype = ct.POINTER(ct.c_void_p)
      theDLL.DTWAIN_SysInitializeEx2.restype = ct.POINTER(ct.c_void_p)
