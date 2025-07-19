@@ -3117,4 +3117,80 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFrameStringW(DTWAIN_ARRAY FrameArray, 
 #endif
 }
 
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFloatStringW(DTWAIN_RANGE pArray, LONG nWhich, LPCWSTR dValue)
+{
+#ifdef _UNICODE
+    return DTWAIN_ArraySetAtFloatString(pArray, nWhich, dValue);
+#else
+    return DTWAIN_ArraySetAtFloatString(pArray, nWhich, StringConversion::Convert_WidePtr_To_Native(dValue).c_str());
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFloatStringA(DTWAIN_RANGE pArray, LONG nWhich, LPCSTR dValue)
+{
+#ifdef _UNICODE
+    return DTWAIN_ArraySetAtFloatString(pArray, nWhich, StringConversion::Convert_AnsiPtr_To_Native(dValue).c_str());
+#else
+    return DTWAIN_ArraySetAtFloatString(pArray, nWhich, dValue);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFloatStringA(DTWAIN_ARRAY pArray, LONG nWhere, LPSTR dValue)
+{
+#ifdef _UNICODE
+    std::wstring arg(1024, 0);
+    const DTWAIN_BOOL retVal = DTWAIN_ArrayGetAtFloatString(pArray, nWhere, &arg[0]);
+    return null_terminator_copier(get_view(arg), dValue, retVal);
+#else
+    return DTWAIN_ArrayGetAtFloatString(pArray, nWhere, dValue);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFloatStringW(DTWAIN_SOURCE pArray, LONG nWhere, LPWSTR dValue)
+{
+#ifdef _UNICODE
+    return DTWAIN_ArrayGetAtFloatString(pArray, nWhere, dValue);
+#else
+    std::string arg(1024, 0);
+    DTWAIN_BOOL retVal = DTWAIN_ArrayGetAtFloatString(pArray, nWhere, &arg[0]);
+    return null_terminator_copier(get_view(arg), dValue, retVal);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtFloatStringW(DTWAIN_RANGE pArray, LONG nWhich, LPCWSTR dValue)
+{
+#ifdef _UNICODE
+    return DTWAIN_ArrayInsertAtFloatString(pArray, nWhich, dValue);
+#else
+    return DTWAIN_ArrayInsertAtFloatString(pArray, nWhich, StringConversion::Convert_WidePtr_To_Native(dValue).c_str());
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtFloatStringA(DTWAIN_RANGE pArray, LONG nWhich, LPCSTR dValue)
+{
+#ifdef _UNICODE
+    return DTWAIN_ArrayInsertAtFloatString(pArray, nWhich, StringConversion::Convert_AnsiPtr_To_Native(dValue).c_str());
+#else
+    return DTWAIN_ArrayInsertAtFloatString(pArray, nWhich, dValue);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtFloatStringNW(DTWAIN_ARRAY pArray, LONG nWhere, LPCWSTR Val, LONG num)
+{
+#ifdef _UNICODE
+    return DTWAIN_ArrayInsertAtFloatStringN(pArray, nWhere, Val, num);
+#else
+    return DTWAIN_ArrayInsertAtFloatStringN(pArray, nWhere, StringConversion::Convert_WidePtr_To_Native(Val).c_str(), num);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtFloatStringNA(DTWAIN_ARRAY pArray, LONG nWhere, LPCSTR Val, LONG num)
+{
+#ifdef _UNICODE
+    return DTWAIN_ArrayInsertAtFloatStringN(pArray, nWhere, StringConversion::Convert_AnsiPtr_To_Native(Val).c_str(), num);
+#else
+    return DTWAIN_ArrayInsertAtFloatStringN(pArray, nWhere, Val, num);
+#endif
+}
+
 #endif // CTLSTRIMPL_INL

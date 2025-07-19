@@ -844,6 +844,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtFloat(DTWAIN_ARRAY pArray, LONG nWh
     CATCH_BLOCK(false)
 }
 
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtFloatString(DTWAIN_ARRAY pArray, LONG nWhere, LPCTSTR Val)
+{
+    LOG_FUNC_ENTRY_PARAMS((pArray, nWhere, Val))
+    double dValue = StringWrapper::ToDouble(Val);
+    const DTWAIN_BOOL bRet = DTWAIN_ArrayInsertAt(pArray, nWhere, &dValue);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK(false)
+}
+
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtString(DTWAIN_ARRAY pArray, LONG nWhere, LPCTSTR pVal)
 {
@@ -1062,6 +1071,18 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFloat(DTWAIN_ARRAY pArray, LONG nWhere
     CATCH_BLOCK(false)
 }
 
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFloatString(DTWAIN_ARRAY pArray, LONG nWhere, LPTSTR Val)
+{
+    LOG_FUNC_ENTRY_PARAMS((pArray, nWhere, Val))
+    double dValue;
+    const DTWAIN_BOOL bRet = DTWAIN_ArrayGetAt(pArray, nWhere, &dValue);
+    if (bRet)
+        StringWrapper::SafeStrcpy(Val, StringWrapper::TrimDouble(dValue).c_str(), 255);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Val))
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK(false)
+}
+
 
 DTWAIN_BOOL DLLENTRY_DEF   DTWAIN_ArrayGetAtANSIString(DTWAIN_ARRAY pArray, LONG nWhere, LPSTR pStr)
 {
@@ -1253,6 +1274,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtFloatN(DTWAIN_ARRAY pArray, LONG nW
     CATCH_BLOCK(false)
 }
 
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtFloatStringN(DTWAIN_ARRAY pArray, LONG nWhere, LPCTSTR Val, LONG num)
+{
+    LOG_FUNC_ENTRY_PARAMS((pArray, nWhere, Val, num))
+    double dValue = StringWrapper::ToDouble(Val);
+    const DTWAIN_BOOL bRet = DTWAIN_ArrayInsertAtN(pArray,nWhere,&dValue,num);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK(false)
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtWideStringN(DTWAIN_ARRAY pArray, LONG nWhere, LPCWSTR Val, LONG num)
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, nWhere, Val, num))
@@ -1346,6 +1376,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFloat(DTWAIN_ARRAY pArray, LONG nWhere
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, nWhere, Val))
     const DTWAIN_BOOL bRet = DTWAIN_ArraySetAt(pArray,nWhere,&Val);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArraySetAtFloatString(DTWAIN_ARRAY pArray, LONG nWhere, LPCTSTR Val)
+{
+    LOG_FUNC_ENTRY_PARAMS((pArray, nWhere, Val))
+    double dVal = StringWrapper::ToDouble(Val);
+    const DTWAIN_BOOL bRet = DTWAIN_ArraySetAt(pArray, nWhere, &dVal);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
