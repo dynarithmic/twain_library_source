@@ -1100,4 +1100,9 @@ DTWAIN_ArrayInsertAtFloatString                   @31103
 DTWAIN_ArrayInsertAtFloatStringNA                 @31104 
 DTWAIN_ArrayInsertAtFloatStringNW                 @31105 
 DTWAIN_ArrayInsertAtFloatStringN                  @31106 
+DTWAIN_ArrayFindFloatStringA                      @31107
+DTWAIN_ArrayFindFloatStringW                      @31108
+DTWAIN_ArrayFindFloatString                       @31109
+
+
 
