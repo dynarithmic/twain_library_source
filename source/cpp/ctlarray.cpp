@@ -1233,6 +1233,16 @@ LONG DLLENTRY_DEF DTWAIN_ArrayFindFloat( DTWAIN_ARRAY pArray, DTWAIN_FLOAT Val, 
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 
+LONG DLLENTRY_DEF DTWAIN_ArrayFindFloatString( DTWAIN_ARRAY pArray, LPCTSTR Val, LPCTSTR Tolerance )
+{
+    LOG_FUNC_ENTRY_PARAMS((pArray, Val, Tolerance))
+    double dVal = StringWrapper::ToDouble(Val);
+    double dTol = StringWrapper::ToDouble(Tolerance);
+    LONG FoundPos = DTWAIN_ArrayFindFloat(pArray, dVal, dTol);
+    LOG_FUNC_EXIT_NONAME_PARAMS(FoundPos)
+    CATCH_BLOCK(DTWAIN_FAILURE1)
+}
+
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtN( DTWAIN_ARRAY pArray, LONG nWhere, LPVOID pVariant, LONG num)
 {
