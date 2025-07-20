@@ -3193,4 +3193,25 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayInsertAtFloatStringNA(DTWAIN_ARRAY pArray, 
 #endif
 }
 
+LONG DLLENTRY_DEF DTWAIN_ArrayFindFloatStringW(DTWAIN_ARRAY pArray, LPCWSTR Val, LPCWSTR Tolerance)
+{
+#ifdef _UNICODE
+    return DTWAIN_ArrayFindFloatString(pArray, Val, Tolerance);
+#else
+    return DTWAIN_ArrayFindFloatString(pArray, StringConversion::Convert_WidePtr_To_Native(Val).c_str(), 
+                                       StringConversion::Convert_WidePtr_To_Native(Tolerance).c_str());
+#endif
+}
+
+LONG DLLENTRY_DEF DTWAIN_ArrayFindFloatStringA(DTWAIN_ARRAY pArray, LPCSTR Val, LPCSTR Tolerance)
+{
+#ifdef _UNICODE
+    return DTWAIN_ArrayFindFloatString(pArray, StringConversion::Convert_AnsiPtr_To_Native(Val).c_str(),
+                                        StringConversion::Convert_AnsiPtr_To_Native(Tolerance).c_str());
+#else
+    return DTWAIN_ArrayFindFloatString(pArray, Val, Tolerance);
+#endif
+}
+
+
 #endif // CTLSTRIMPL_INL
