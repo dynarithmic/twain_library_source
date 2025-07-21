@@ -3213,5 +3213,42 @@ LONG DLLENTRY_DEF DTWAIN_ArrayFindFloatStringA(DTWAIN_ARRAY pArray, LPCSTR Val, 
 #endif
 }
 
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFloatStringW(DTWAIN_ARRAY pArray, LPCWSTR Val)
+{
+#ifdef _UNICODE
+    return DTWAIN_ArrayAddFloatString(pArray, Val);
+#else
+    return DTWAIN_ArrayAddFloatString(pArray, StringConversion::Convert_WidePtr_To_Native(Val).c_str());
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFloatStringA(DTWAIN_ARRAY pArray, LPCSTR Val)
+{
+#ifdef _UNICODE
+    return DTWAIN_ArrayAddFloatString(pArray, StringConversion::Convert_AnsiPtr_To_Native(Val).c_str());
+#else
+    return DTWAIN_ArrayAddFloatString(pArray, Val);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFloatStringNW(DTWAIN_ARRAY pArray, LPCWSTR Val, LONG num)
+{
+#ifdef _UNICODE
+    return DTWAIN_ArrayAddFloatStringN(pArray, Val, num);
+#else
+    return DTWAIN_ArrayAddFloatStringN(pArray, StringConversion::Convert_WidePtr_To_Native(Val).c_str(), num);
+#endif
+
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFloatStringNA(DTWAIN_ARRAY pArray, LPCSTR Val, LONG num)
+{
+#ifdef _UNICODE
+    return DTWAIN_ArrayAddFloatStringN(pArray, StringConversion::Convert_AnsiPtr_To_Native(Val).c_str(), num);
+#else
+    return DTWAIN_ArrayAddFloatStringN(pArray, Val, num);
+#endif
+}
+
 
 #endif // CTLSTRIMPL_INL

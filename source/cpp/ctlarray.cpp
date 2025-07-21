@@ -539,6 +539,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFloatN( DTWAIN_ARRAY pArray, DTWAIN_FLOA
     CATCH_BLOCK(false)
 }
 
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFloatStringN( DTWAIN_ARRAY pArray, LPCTSTR Val, LONG num )
+{
+    LOG_FUNC_ENTRY_PARAMS((pArray, Val, num))
+    double dVal = StringWrapper::ToDouble(Val);
+    auto bRet = DTWAIN_ArrayAddFloatN(pArray, dVal, num);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK(false)
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddStringN( DTWAIN_ARRAY pArray, LPCTSTR Val, LONG num )
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, Val, num))
@@ -641,6 +650,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFloat(DTWAIN_ARRAY pArray, DTWAIN_FLOAT 
     LOG_FUNC_ENTRY_PARAMS((pArray, Val))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const DTWAIN_BOOL bRet = ArrayAddN(pHandle, pArray, Val);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
+    CATCH_BLOCK(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFloatString(DTWAIN_ARRAY pArray, LPCTSTR Val )
+{
+    LOG_FUNC_ENTRY_PARAMS((pArray, Val))
+    double dVal = StringWrapper::ToDouble(Val);
+    auto bRet = DTWAIN_ArrayAddFloat(pArray, dVal);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
 }
