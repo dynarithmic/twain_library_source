@@ -9,7 +9,10 @@ DTWAIN Version changes
   capability listing is located.  Selecting a capability and selecting "Test" will display an additional
   dialog with container and data type testing for the selected capability.
 
+- Fixed python language binding for DTWAIN functions that requires parameters to be floating point.
+
 - Breaking changes to the DTWAIN_FRAME related functions:
+
       1) Removed the following DTWAIN_FRAME related functions:
          DTWAIN_ArrayFrameGetAt
          DTWAIN_ArrayFrameSetAt
