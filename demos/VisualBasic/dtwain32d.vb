@@ -283,6 +283,7 @@ Class DTWAINAPI
     Public Const DTWAIN_ARRAYUINT32 As Integer = 120
     Public Const DTWAIN_ARRAYINT32 As Integer = 130
     Public Const DTWAIN_ARRAYINT64 As Integer = 140
+    Public Const DTWAIN_ARRAYUINT64 As Integer = 150
     Public Const DTWAIN_RANGELONG As Integer = DTWAIN_ARRAYLONG
     Public Const DTWAIN_RANGEFLOAT As Integer = DTWAIN_ARRAYFLOAT
     Public Const DTWAIN_RANGEMIN As Integer = 0
@@ -1082,7 +1083,7 @@ Class DTWAINAPI
     Public Const DTWAIN_LOG_USECRLF As Integer = &H400000
     Public Const DTWAIN_LOG_CONSOLE As Integer = &H800000
     Public Const DTWAIN_LOG_DEBUGMONITOR As Integer = &H1000000
-    Public Const DTWAIN_LOG_USEWINDOW As Integer = &H2000000
+    Public Const DTWAIN_LOG_USEWINDOW As Integer = &H2000000F
     Public Const DTWAIN_LOG_CREATEDIRECTORY As Integer = &H4000000
     Public Const DTWAIN_LOG_CONSOLEWITHHANDLER As Integer = (&H8000000 Or DTWAIN_LOG_CONSOLE)
 
@@ -2842,4 +2843,32 @@ Class DTWAINAPI
     Declare Auto Function DTWAIN_ArraySetAtFrame Lib "dtwain32d.dll" (FrameArray As System.IntPtr, nWhere As Integer, left As Double, top As Double, right As Double, bottom As Double) As Integer
     Declare Auto Function DTWAIN_ArrayGetAtFrameEx Lib "dtwain32d.dll" (FrameArray As System.IntPtr, nWhere As Integer, FrameArray As System.IntPtr) As Integer
     Declare Auto Function DTWAIN_ArraySetAtFrameEx Lib "dtwain32d.dll" (FrameArray As System.IntPtr, nWhere As Integer, FrameArray As System.IntPtr) As Integer
+
+    Declare Ansi Function    DTWAIN_ArraySetAtFloatStringA Lib "dtwain32d.dll" (theArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPStr)> Val As String) As Integer
+    Declare Unicode Function DTWAIN_ArraySetAtFloatStringW Lib "dtwain32d.dll" (theArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPWStr)> Val As String) As Integer
+    Declare Auto Function    DTWAIN_ArraySetAtFloatString Lib "dtwain32d.dll" (theArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPTStr)> Val As String) As Integer
+
+    Declare Ansi Function    DTWAIN_ArrayGetAtFloatStringA Lib "dtwain32d.dll" (theArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPTStr)> Val As StringBuilder) As Integer
+    Declare Unicode Function DTWAIN_ArrayGetAtFloatStringW Lib "dtwain32d.dll" (theArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPTStr)> Val As StringBuilder) As Integer
+    Declare Auto Function    DTWAIN_ArrayGetAtFloatString Lib "dtwain32d.dll" (theArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPTStr)> Val As StringBuilder) As Integer
+
+    Declare Ansi Function    DTWAIN_ArrayFindFloatStringA Lib "dtwain32d.dll" (theArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPStr)> Val As String) As Integer
+    Declare Unicode Function DTWAIN_ArrayFindFloatStringW Lib "dtwain32d.dll" (theArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPWStr)> Val As String) As Integer
+    Declare Auto Function    DTWAIN_ArrayFindFloatString Lib "dtwain32d.dll" (theArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPTStr)> Val As String) As Integer
+
+    Declare Ansi Function    DTWAIN_ArrayFindFloatStringNA Lib "dtwain32d.dll" (theArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPStr)> Val As String, num As Integer) As Integer
+    Declare Unicode Function DTWAIN_ArrayFindFloatStringNW Lib "dtwain32d.dll" (theArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPWStr)> Val As String, num As Integer) As Integer
+    Declare Auto Function    DTWAIN_ArrayFindFloatStringN Lib "dtwain32d.dll" (theArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPTStr)> Val As String, num As Integer) As Integer
+
+    Declare Ansi Function    DTWAIN_ArrayFindFloatStringA Lib "dtwain32d.dll" (theArray As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> Val As String, <MarshalAs(UnmanagedType.LPTStr)> Tolerance As String) As Integer
+    Declare Unicode Function DTWAIN_ArrayFindFloatStringW Lib "dtwain32d.dll" (theArray As System.IntPtr, <MarshalAs(UnmanagedType.LPWStr)> Val As String, <MarshalAs(UnmanagedType.LPTStr)> Tolerance As String) As Integer
+    Declare Auto Function    DTWAIN_ArrayFindFloatString Lib "dtwain32d.dll" (theArray As System.IntPtr, <MarshalAs(UnmanagedType.LPTStr)> Val As String, <MarshalAs(UnmanagedType.LPTStr)> Tolerance As String) As Integer
+
+    Declare Ansi Function    DTWAIN_ArrayAddFloatStringA Lib "dtwain32d.dll" (theArray As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> Val As String) As Integer
+    Declare Unicode Function DTWAIN_ArrayAddFloatStringW Lib "dtwain32d.dll" (theArray As System.IntPtr, <MarshalAs(UnmanagedType.LPWStr)> Val As String) As Integer
+    Declare Auto Function    DTWAIN_ArrayAddFloatString Lib "dtwain32d.dll" (theArray As System.IntPtr, <MarshalAs(UnmanagedType.LPTStr)> Val As String) As Integer
+
+    Declare Ansi Function    DTWAIN_ArrayAddFloatStringNA Lib "dtwain32d.dll" (theArray As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> Val As String, num As Integer) As Integer
+    Declare Unicode Function DTWAIN_ArrayAddFloatStringNW Lib "dtwain32d.dll" (theArray As System.IntPtr, <MarshalAs(UnmanagedType.LPWStr)> Val As String, num As Integer) As Integer
+    Declare Auto Function    DTWAIN_ArrayAddFloatStringN Lib "dtwain32d.dll" (theArray As System.IntPtr, <MarshalAs(UnmanagedType.LPTStr)> Val As String, num As Integer) As Integer
 End Class
