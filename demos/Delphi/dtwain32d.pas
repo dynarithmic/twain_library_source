@@ -374,6 +374,7 @@ const
   DTWAIN_ARRAYUINT32 = 120;
   DTWAIN_ARRAYINT32 = 130;
   DTWAIN_ARRAYINT64 = 140;
+  DTWAIN_ARRAYUINT64 = 150;
   DTWAIN_RANGELONG = DTWAIN_ARRAYLONG;
   DTWAIN_RANGEFLOAT = DTWAIN_ARRAYFLOAT;
   DTWAIN_RANGEMIN = 0;
@@ -1799,6 +1800,7 @@ const
   DTWAIN_CONSTANT_TWSX       = 76;
   DTWAIN_CONSTANT_CAP        = 77;
   DTWAIN_CONSTANT_ICAP       = 78;
+  DTWAIN_CONSTANT_DTWAIN_CONT = 79;
 
   DTWAIN_USERRES_START    = 20000;
   DTWAIN_USERRES_MAXSIZE  = 8192;
@@ -2830,6 +2832,34 @@ function DTWAIN_ArrayInsertAtFrameN(pArray:DTWAIN_ARRAY; insertPoint:LONG; theFr
 function DTWAIN_ArrayInsertAtFrame(pArray:DTWAIN_ARRAY; insertPoint:LONG; theFrame:DTWAIN_FRAME):LONG; stdcall; external 'dtwain32d.dll' name 'DTWAIN_ArrayInsertAtFrame'; 
 function DTWAIN_ArrayGetAtFrame(FrameArray:DTWAIN_ARRAY; nWhere:LONG; pleft:LPDTWAIN_FLOAT; ptop:LPDTWAIN_FLOAT; pright:LPDTWAIN_FLOAT; pbottom:LPDTWAIN_FLOAT):BOOL;stdcall; external 'dtwain32d.dll'   name 'DTWAIN_ArrayGetAtFrame';
 function DTWAIN_ArraySetAtFrame(FrameArray:DTWAIN_ARRAY; nWhere:LONG; left:DTWAIN_FLOAT; top:DTWAIN_FLOAT; right:DTWAIN_FLOAT; bottom:DTWAIN_FLOAT):BOOL;stdcall; external 'dtwain32d.dll'   name 'DTWAIN_ArraySetAtFrame';
+
+function DTWAIN_ArraySetAtFloatStringA(pArray:DTWAIN_ARRAY; nWhere:LONG; Val:LPCSTR):LONG; stdcall; external 'dtwain32d.dll' name 'DTWAIN_ArraySetAtFloatStringA';
+function DTWAIN_ArraySetAtFloatStringW(pArray:DTWAIN_ARRAY; nWhere:LONG; Val:LPCWSTR):LONG; stdcall; external 'dtwain32d.dll' name 'DTWAIN_ArraySetAtFloatStringW';
+function DTWAIN_ArraySetAtFloatString(pArray:DTWAIN_ARRAY; nWhere:LONG; Val:LPCTSTR):LONG; stdcall; external 'dtwain32d.dll' name 'DTWAIN_ArraySetAtFloatString';
+
+function DTWAIN_ArrayGetAtFloatStringA(pArray:DTWAIN_ARRAY; nWhere:LONG; Val:LPSTR):LONG; stdcall; external 'dtwain32d.dll' name 'DTWAIN_ArrayGetAtFloatStringA';
+function DTWAIN_ArrayGetAtFloatStringW(pArray:DTWAIN_ARRAY; nWhere:LONG; Val:LPWSTR):LONG; stdcall; external 'dtwain32d.dll' name 'DTWAIN_ArrayGetAtFloatStringW';
+function DTWAIN_ArrayGetAtFloatString(pArray:DTWAIN_ARRAY; nWhere:LONG; Val:LPTSTR):LONG; stdcall; external 'dtwain32d.dll' name 'DTWAIN_ArrayGetAtFloatString';
+
+function DTWAIN_ArrayInsertAtFloatStringA(pArray:DTWAIN_ARRAY; nWhere:LONG; Val:LPCSTR):LONG; stdcall; external 'dtwain32d.dll' name 'DTWAIN_ArrayInsertAtFloatStringA';
+function DTWAIN_ArrayInsertAtFloatStringW(pArray:DTWAIN_ARRAY; nWhere:LONG; Val:LPCWSTR):LONG; stdcall; external 'dtwain32d.dll' name 'DTWAIN_ArrayInsertAtFloatStringW';
+function DTWAIN_ArrayInsertAtFloatString(pArray:DTWAIN_ARRAY; nWhere:LONG; Val:LPCTSTR):LONG; stdcall; external 'dtwain32d.dll' name 'DTWAIN_ArrayInsertAtFloatString';
+
+function DTWAIN_ArrayInsertAtFloatStringNA(pArray:DTWAIN_ARRAY; nWhere:LONG; Val:LPCSTR; num:LONG):LONG; stdcall; external 'dtwain32d.dll' name 'DTWAIN_ArrayInsertAtFloatStringNA';
+function DTWAIN_ArrayInsertAtFloatStringNW(pArray:DTWAIN_ARRAY; nWhere:LONG; Val:LPCWSTR; num:LONG):LONG; stdcall; external 'dtwain32d.dll' name 'DTWAIN_ArrayInsertAtFloatStringNW';
+function DTWAIN_ArrayInsertAtFloatStringN(pArray:DTWAIN_ARRAY; nWhere:LONG; Val:LPCTSTR; num:LONG):LONG; stdcall; external 'dtwain32d.dll' name 'DTWAIN_ArrayInsertAtFloatStringN';
+
+function DTWAIN_ArrayFindFloatStringA(pArray:DTWAIN_ARRAY; Val:LPCSTR; Tolerance:LPCSTR):LONG; stdcall; external 'dtwain32d.dll' name 'DTWAIN_ArrayFindFloatStringA';
+function DTWAIN_ArrayFindFloatStringW(pArray:DTWAIN_ARRAY; Val:LPCWSTR; Tolerance:LPCWSTR):LONG; stdcall; external 'dtwain32d.dll' name 'DTWAIN_ArrayFindFloatStringW';
+function DTWAIN_ArrayFindFloatString(pArray:DTWAIN_ARRAY; Val:LPCTSTR; Tolerance:LPCTSTR):LONG; stdcall; external 'dtwain32d.dll' name 'DTWAIN_ArrayFindFloatString';
+
+function DTWAIN_ArrayAddFloatStringA(pArray:DTWAIN_ARRAY; Val:LPCSTR):LONG; stdcall; external 'dtwain32d.dll' name 'DTWAIN_ArrayAddFloatStringA';
+function DTWAIN_ArrayAddFloatStringW(pArray:DTWAIN_ARRAY; Val:LPCWSTR):LONG; stdcall; external 'dtwain32d.dll' name 'DTWAIN_ArrayAddFloatStringW';
+function DTWAIN_ArrayAddFloatString(pArray:DTWAIN_ARRAY; Val:LPCTSTR):LONG; stdcall; external 'dtwain32d.dll' name 'DTWAIN_ArrayAddFloatString';
+
+function DTWAIN_ArrayAddFloatStringNA(pArray:DTWAIN_ARRAY; Val:LPCSTR; num:LONG):LONG; stdcall; external 'dtwain32d.dll' name 'DTWAIN_ArrayAddFloatStringNA';
+function DTWAIN_ArrayAddFloatStringNW(pArray:DTWAIN_ARRAY; Val:LPCWSTR; num:LONG):LONG; stdcall; external 'dtwain32d.dll' name 'DTWAIN_ArrayAddFloatStringNW';
+function DTWAIN_ArrayAddFloatStringN(pArray:DTWAIN_ARRAY; Val:LPCTSTR; num:LONG):LONG; stdcall; external 'dtwain32d.dll' name 'DTWAIN_ArrayAddFloatStringN';
 
 implementation
 
