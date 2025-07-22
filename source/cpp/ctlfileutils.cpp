@@ -100,7 +100,6 @@ namespace dynarithmic
         {
             std::error_code eCode;
             directory_created = filesys::create_directories(directory, eCode);
-            std::string sTemp = eCode.message();
             if (eCode.value() == 0 || directory_created)
                 return { true, "" };
             return { false, eCode.message() };

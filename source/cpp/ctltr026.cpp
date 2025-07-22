@@ -1398,6 +1398,7 @@ void CTL_ImageXferTriplet::ResolveImageResolution(CTL_ITwainSource *pSource,  DT
     bool bGotResolution = false;
     bool bGetResFromDriver = false;
 
+    char szOutBuf[1024];
     if ( IsState7InfoNeeded(pSource) )
     {
       if ( DTWAIN_GetImageInfo(pSource,
@@ -1416,10 +1417,8 @@ void CTL_ImageXferTriplet::ResolveImageResolution(CTL_ITwainSource *pSource,  DT
             ImageInfo->ResolutionY = static_cast<LONG>(ResolutionY);
             if ( bWriteMisc )
             {
-                StringStreamA strm;
-                strm << boost::format("x-Resolution=%1%, y-Resolution=%2%") % ImageInfo->ResolutionX % ImageInfo->ResolutionY;
-                sError = strm.str();
-                LogWriterUtils::WriteLogInfoIndentedA(sError);
+                DTWAIN_SPRINTF_FUNC(szOutBuf, "x-Resolution=%d, y-Resolution=%d", ImageInfo->ResolutionX, ImageInfo->ResolutionY);
+                LogWriterUtils::WriteLogInfoIndentedA(szOutBuf);
             }
             bGotResolution = true;
         }
@@ -1443,9 +1442,8 @@ void CTL_ImageXferTriplet::ResolveImageResolution(CTL_ITwainSource *pSource,  DT
         ImageInfo->ResolutionY = static_cast<LONG>(Fix32ToFloat(II.YResolution));
         if ( bWriteMisc )
         {
-            StringStreamA strm;
-            strm << boost::format("x-Resolution=%1%, y-Resolution=%2%\n") % ImageInfo->ResolutionX % ImageInfo->ResolutionY;
-            LogWriterUtils::WriteLogInfoIndentedA(strm.str());
+            DTWAIN_SPRINTF_FUNC(szOutBuf, "x-Resolution=%d, y-Resolution=%d\n", ImageInfo->ResolutionX, ImageInfo->ResolutionY);
+            LogWriterUtils::WriteLogInfoIndentedA(szOutBuf);
         }
         bGotResolution = true;
     }
@@ -1465,9 +1463,8 @@ void CTL_ImageXferTriplet::ResolveImageResolution(CTL_ITwainSource *pSource,  DT
             ImageInfo->ResolutionY = static_cast<LONG>(Resolution);
             if ( bWriteMisc )
             {
-                StringStreamA strm;
-                strm << boost::format("x-Resolution=%1%, y-Resolution=%2%") % ImageInfo->ResolutionX % ImageInfo->ResolutionY;
-                LogWriterUtils::WriteLogInfoIndentedA(strm.str());
+                DTWAIN_SPRINTF_FUNC(szOutBuf, "x-Resolution=%d, y-Resolution=%d\n", ImageInfo->ResolutionX, ImageInfo->ResolutionY);
+                LogWriterUtils::WriteLogInfoIndentedA(szOutBuf);
             }
         }
         else

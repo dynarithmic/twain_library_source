@@ -326,7 +326,7 @@ namespace dynarithmic
             template <typename container>
             typename container::iterator find(container& c, double value, double)
             {
-                return std::find_if(c.begin(), c.end(), [&](double val) { return fabs(val - tolerance) <= 1.0e-8; });
+                return std::find_if(c.begin(), c.end(), [&](double val) { return fabs(val - value) <= tolerance; });
             }
         };
 

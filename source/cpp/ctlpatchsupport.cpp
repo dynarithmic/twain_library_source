@@ -41,7 +41,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPatchCapsSupported(DTWAIN_SOURCE Source)
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     auto* pS = pSource;
     const auto iter = std::find_if(std::begin(nCapToTest), std::end(nCapToTest), [&](LONG val)
-                                   { return pS->IsCapInSupportedList(val)?true:false;});
+                                   { return pS->IsCapInSupportedList(static_cast<TW_UINT16>(val))?true:false;});
 
     const bool bRet = iter != std::end(nCapToTest);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)

@@ -103,7 +103,7 @@ namespace dynarithmic
                     LogType(outStr, static_cast<const wchar_t*>(t));
                 else
                 if (t)
-                    strm << outStr << "0x" << std::hex << StringConversion::Convert_WidePtr_To_Ansi(t).c_str() << std::dec;
+                    strm << outStr << "=0x" << std::hex << static_cast<void*>(t) << std::dec;
                 else
                     strm << outStr << "=(null)";
             }
@@ -114,7 +114,7 @@ namespace dynarithmic
                     LogType(outStr, static_cast<const char*>(t));
                 else
                 if (t)
-                    strm << outStr << "0x" << std::hex << t << std::dec;
+                    strm << outStr << "=0x" << std::hex << static_cast<void*>(t) << std::dec;
                 else
                     strm << outStr << "=(null)";
             }
@@ -132,7 +132,7 @@ namespace dynarithmic
                 else
                 {
                     if (t)
-                        strm << outStr << "=0x" << std::hex << t << std::dec;
+                        strm << outStr << "=0x" << std::hex << static_cast<void*>(t) << std::dec;
                     else
                         strm << outStr << "=" << "(null)";
                 }

@@ -82,7 +82,8 @@ namespace dynarithmic
              std::vector<sDuplexFileData>,
              std::vector<sDuplexFileData> > DuplexData;
 
-    using SourceCompressionMap = std::map<int, std::map<int, std::vector<LONG>>>;
+    #define COMPRESSIONMAP_TYPE std::map
+    using SourceCompressionMap = COMPRESSIONMAP_TYPE<int, COMPRESSIONMAP_TYPE<int, std::vector<LONG>>>;
 
     struct AcquireFileStatus
     {

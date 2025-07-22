@@ -21,10 +21,12 @@
 
 #include "../nlohmann/json.hpp"
 #include <boost/range/adaptor/transformed.hpp>
+#include <string_view>
 #include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctlsetgetcaps.h"
+
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -605,7 +607,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         bool usefullName;
                     };
 
-                    std::array<TwainDataItems, 6> otherData = { {
+                    static constexpr std::array<TwainDataItems, 6> otherData = { {
                         { ICAP_SUPPORTEDSIZES, DTWAIN_CONSTANT_TWSS, "\"paper-sizes\":", 5, "TWSS_", true },
                         { ICAP_SUPPORTEDBARCODETYPES, DTWAIN_CONSTANT_TWBT, "\"barcode-supported-types\":", 5, "TWBT_", true },
                         { ICAP_SUPPORTEDPATCHCODETYPES,DTWAIN_CONSTANT_TWPCH, "\"patchcode-supported-types\":", 6, "TWPCH_", true },
@@ -691,9 +693,9 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                     }
 
                     static constexpr int SPECIAL_FILESYSTEM = -999;
-                    std::array<int, 11> imageInfoCaps = { ICAP_BRIGHTNESS, ICAP_CONTRAST, ICAP_GAMMA, ICAP_HIGHLIGHT, ICAP_SHADOW,
+                    static constexpr std::array<int, 11> imageInfoCaps = { ICAP_BRIGHTNESS, ICAP_CONTRAST, ICAP_GAMMA, ICAP_HIGHLIGHT, ICAP_SHADOW,
                                                           ICAP_THRESHOLD, ICAP_ROTATION, ICAP_ORIENTATION, ICAP_OVERSCAN, ICAP_HALFTONES, SPECIAL_FILESYSTEM };
-                    std::array<std::string, 11> imageInfoCapsStr = { "\"brightness-values\":", "\"contrast-values\":", "\"gamma-values\":",
+                    static constexpr std::array<std::string_view, 11> imageInfoCapsStr = { "\"brightness-values\":", "\"contrast-values\":", "\"gamma-values\":",
                         "\"highlight-values\":", "\"shadow-values\":", "\"threshold-values\":",
                         "\"rotation-values\":", "\"orientation-values\":", "\"overscan-values\":", "\"halftone-values\":", "\"filesystem-camera-values\":" };
                     for (size_t curImageCap = 0; curImageCap < imageInfoCaps.size(); ++curImageCap)
@@ -740,8 +742,9 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
 
                     // Get the filetype info
                     tempStrm.str("");
-                    std::vector<std::string> fileTypes = {
+                    static constexpr std::array<std::string_view, 26> fileTypes = {
                                                             "\"bmp\",",
+                                                            "\"bmp (rle compression)\",",
                                                             "\"gif\",",
                                                             "\"pcx\",",
                                                             "\"dcx\",",
@@ -749,28 +752,29 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                                                             "\"ico\",",
                                                             "\"png\",",
                                                             "\"tga\",",
+                                                            "\"tga (rle compression)\",",
                                                             "\"psd\",",
                                                             "\"emf\",",
                                                             "\"wbmp\",",
                                                             "\"wmf\",",
                                                             "\"jpeg\",",
-                                                            "\"jp2\",",
-                                                            "\"tif1\",",
-                                                            "\"tif2\",",
-                                                            "\"tif3\",",
-                                                            "\"tif4\",",
-                                                            "\"tif5\",",
-                                                            "\"tif6\",",
-                                                            "\"tif7\",",
-                                                            "\"ps1\",",
-                                                            "\"ps2\",",
+                                                            "\"jp2 (jpeg-2000)\",",
+                                                            "\"tif (no compression)\",",
+                                                            "\"tif (lzw compression)\",",
+                                                            "\"tif (packbits compression)\",",
+                                                            "\"tif (flate compression)\",",
+                                                            "\"tif (jpeg compression)\",",
+                                                            "\"tif (group 3 fax compression)\",",
+                                                            "\"tif (group 4 fax compression)\",",
+                                                            "\"ps1 (Postscript 1)\",",
+                                                            "\"ps2 (Postscript 2)\",",
                                                             "\"webp\"" };
-
-                    std::string allFileTypes = std::accumulate(fileTypes.begin(), fileTypes.end(), std::string());
-                    std::string customTypes = get_source_file_types(pCurrentSourcePtr); // .str();
+                    std::string allFileTypes;
+                    for (auto s : fileTypes)
+                        allFileTypes += s.data();
+                    std::string customTypes = get_source_file_types(pCurrentSourcePtr); 
                     if (!customTypes.empty())
                     {
-//                        customTypes = "\"device-filetype-info\":" + customTypes;
                         allFileTypes += "," + customTypes;
                     }
 
@@ -779,10 +783,10 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
 
                     strm.str("");
 
-                    std::array<int, numOneValueDeviceInfo> deviceInfoCaps = { CAP_FEEDERENABLED, CAP_FEEDERLOADED, CAP_UICONTROLLABLE,
-                                                          ICAP_AUTOBRIGHT, ICAP_AUTOMATICDESKEW,
-                                                          CAP_PRINTER, CAP_DUPLEX, CAP_JOBCONTROL, ICAP_LIGHTPATH, ICAP_EXTIMAGEINFO, 
-                                                          0, CAP_INDICATORS};
+                    static constexpr std::array<int, numOneValueDeviceInfo> deviceInfoCaps = { CAP_FEEDERENABLED, CAP_FEEDERLOADED, CAP_UICONTROLLABLE,
+                                                                                        ICAP_AUTOBRIGHT, ICAP_AUTOMATICDESKEW,
+                                                                                        CAP_PRINTER, CAP_DUPLEX, CAP_JOBCONTROL, ICAP_LIGHTPATH, ICAP_EXTIMAGEINFO, 
+                                                                                        0, CAP_INDICATORS};
 
                     std::array<std::string, numOneValueDeviceInfo> deviceInfoCapsStr;
                     std::copy(deviceInfoString.begin(), deviceInfoString.end(), deviceInfoCapsStr.begin());

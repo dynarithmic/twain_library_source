@@ -1675,9 +1675,9 @@ int CTL_TwainAppMgr::SetTransferCount( const CTL_ITwainSource *pSource,
 {
     if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS )
     {
-        StringStreamA strm;
-        strm << boost::format("Setting Transfer Count.  Transfer Count = %1%") % nCount;
-        LogWriterUtils::WriteLogInfoIndentedA(strm.str());
+        char szOutBuf[100];
+        DTWAIN_SPRINTF_FUNC(szOutBuf, "Setting Transfer Count.  Transfer Count = %d", nCount);
+        LogWriterUtils::WriteLogInfoIndentedA(szOutBuf);
     }
 
     // If the device supports the CAP_SHEETCOUNT capability, use that to set the number of
