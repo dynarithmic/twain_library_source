@@ -67,7 +67,6 @@ namespace dynarithmic
             ~CTL_ExtImageInfoTriplet() override;
 
             static bool EnumSupported(CTL_ITwainSource *pSource,
-                                      CTL_ITwainSession *pSession,
                                       CTL_IntArray &rArray);
 
             auto& RetrieveInfo() noexcept { return m_ExtInfoMap; } 

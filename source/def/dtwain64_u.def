@@ -560,9 +560,6 @@ DTWAIN_ArrayInsertAtLong64                        @9705
 DTWAIN_ArrayInsertAtLong64N                       @9706
 DTWAIN_ArraySetAtLong64                           @9707
 DTWAIN_GetVersionInfo                             @9800
-DTWAIN_ArrayFrameGetAt                            @9801
-DTWAIN_ArrayFrameSetAt                            @9802
-DTWAIN_ArrayFrameGetFrameAt                       @9803
 DTWAIN_AllocateMemory                             @9900
 DTWAIN_FreeMemory                                 @9901
 DTWAIN_LockMemory                                 @9902
@@ -965,7 +962,6 @@ DTWAIN_SetBlankPageDetectionEx                    @30270
 DTWAIN_SetBlankPageDetectionExString              @30271   
 DTWAIN_SetBlankPageDetectionExStringA             @30272   
 DTWAIN_SetBlankPageDetectionExStringW             @30273 
-DTWAIN_ArrayFrameSetFrameAt                       @30280
 DTWAIN_SetAcquireStripSize                        @30291
 DTWAIN_IsMemFileXferSupported                     @30292
 DTWAIN_IsImageAddressingSupported                 @30300
@@ -1084,3 +1080,35 @@ DTWAIN_ArrayGetAtFrame                            @31083
 DTWAIN_ArraySetAtFrame                            @31084
 DTWAIN_ArrayCreateFromStringsA                    @31085
 DTWAIN_ArrayCreateFromStringsW                    @31086
+DTWAIN_ArrayGetAtFrameEx                          @31087
+DTWAIN_ArraySetAtFrameEx                          @31088
+DTWAIN_ArrayGetAtFrameStringA                     @31089
+DTWAIN_ArrayGetAtFrameStringW                     @31090
+DTWAIN_ArrayGetAtFrameString                      @31091
+DTWAIN_ArraySetAtFrameStringA                     @31092    
+DTWAIN_ArraySetAtFrameStringW                     @31093    
+DTWAIN_ArraySetAtFrameString                      @31094    
+DTWAIN_ArraySetAtFloatStringA                     @31095
+DTWAIN_ArraySetAtFloatStringW                     @31096
+DTWAIN_ArraySetAtFloatString                      @31097
+DTWAIN_ArrayGetAtFloatStringA                     @31098
+DTWAIN_ArrayGetAtFloatStringW                     @31099
+DTWAIN_ArrayGetAtFloatString                      @31100
+DTWAIN_ArrayInsertAtFloatStringA                  @31101     
+DTWAIN_ArrayInsertAtFloatStringW                  @31102     
+DTWAIN_ArrayInsertAtFloatString                   @31103     
+DTWAIN_ArrayInsertAtFloatStringNA                 @31104 
+DTWAIN_ArrayInsertAtFloatStringNW                 @31105 
+DTWAIN_ArrayInsertAtFloatStringN                  @31106 
+DTWAIN_ArrayFindFloatStringA                      @31107
+DTWAIN_ArrayFindFloatStringW                      @31108
+DTWAIN_ArrayFindFloatString                       @31109
+DTWAIN_ArrayAddFloatStringA                       @31110
+DTWAIN_ArrayAddFloatStringW                       @31111
+DTWAIN_ArrayAddFloatString                        @31112
+DTWAIN_ArrayAddFloatStringNA                      @31113
+DTWAIN_ArrayAddFloatStringNW                      @31114
+DTWAIN_ArrayAddFloatStringN                       @31115
+
+
+

@@ -1801,7 +1801,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainMode(LONG lMode)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTIFFSupported(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -1810,21 +1809,18 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTIFFSupported(VOID_PROTOTYPE)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPDFSupported(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPNGSupported(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsJPEGSupported(VOID_PROTOTYPE)
 {
     LOG_FUNC_ENTRY_PARAMS(())
-    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -2122,15 +2118,19 @@ CTL_StringType dynarithmic::GetVersionString()
     if (DTWAIN_GetVersionInternal(&lMajor, &lMinor, &lVersionType, &lPatch) )
     {
         std::string s;
-        const char *sBits = "(32-bit)";
+        const char *sBits = "[32-bit]";
         if ( lVersionType & DTWAIN_64BIT_VERSION )
-            sBits = "(64-bit)";
+            sBits = "[64-bit]";
 
         if (lVersionType & DTWAIN_UNICODE_VERSION)
-            s += " [Unicode Version]";
+            s += " [Unicode]";
+        else
+            s += " [ANSI]";
 
         if (lVersionType & DTWAIN_DEVELOP_VERSION)
             s += " [Debug]";
+        else
+            s += " [Release]";
 
         s += DTWAIN_BUILD_LOGGINGNAME;
         s += DTWAIN_VCRUNTIME_BUILDNAME;
@@ -2144,7 +2144,7 @@ CTL_StringType dynarithmic::GetVersionString()
             sStatic += "\n";
         }
 
-        strm << sStatic << "Dynarithmic TWAIN Library, Version " << lMajor << "." << lMinor << " - " << s << " Version (Patch Level "
+        strm << sStatic << "Dynarithmic TWAIN Library, Version " << lMajor << "." << lMinor << " - " << s << " (Patch Level "
             << lPatch << ") Internal Build Number: " << StringConversion::Convert_Native_To_Ansi(GetDTWAINInternalBuildNumber()) << "\n" << 
             "Shared Library path : " <<  StringConversion::Convert_Native_To_Ansi(GetDTWAINDLLPath());
         strm << "\nUsing Resource file (twaininfo.txt) version: " << StringConversion::Convert_Native_To_Ansi(CTL_StaticData::GetResourceVersion());
