@@ -619,12 +619,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCamerasEx(DTWAIN_SOURCE Source, LONG nWhichC
 
 
 /* Blank page detection functions */
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetection(DTWAIN_SOURCE Source, DTWAIN_FLOAT threshold,
-                                                      LONG discard_option, DTWAIN_BOOL bSet);
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetection(DTWAIN_SOURCE Source, DTWAIN_FLOAT threshold, LONG discard_option, DTWAIN_BOOL bSet);
 LONG DLLENTRY_DEF DTWAIN_GetBlankPageAutoDetection(DTWAIN_SOURCE Source);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsBlankPageDetectionOn(DTWAIN_SOURCE Source);
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionEx(DTWAIN_SOURCE Source, DTWAIN_FLOAT threshold,
-                                                        LONG autodetect, LONG detectOpts, DTWAIN_BOOL bSet);
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBlankPageDetectionEx(DTWAIN_SOURCE Source, DTWAIN_FLOAT threshold,LONG autodetect, LONG detectOpts, DTWAIN_BOOL bSet);
 LONG DLLENTRY_DEF DTWAIN_IsDIBBlank(HANDLE hDib, DTWAIN_FLOAT threshold);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DeleteDIB(HANDLE hDib);
 
