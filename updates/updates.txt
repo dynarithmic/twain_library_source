@@ -9,7 +9,7 @@ DTWAIN Version changes
   capability listing is located.  Selecting a capability and selecting "Test" will display an additional
   dialog with container and data type testing for the selected capability.
 
-- Fixed python language binding for DTWAIN functions that requires parameters to be floating point, 
+- For Python developers: Fixed python language binding for DTWAIN functions that requires parameters to be floating point, 
   in addition to defining the return type and argument types for all DTWAIN functions using 
   ctypes.  
 
