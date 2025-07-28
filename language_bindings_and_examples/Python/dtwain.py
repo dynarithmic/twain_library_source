@@ -1673,7 +1673,6 @@ def load_dtwaindll(dllName):
     isAnsi = False
     if file_name in all64a or file_name in all32a:
         isAnsi = True
-    print(f"The value of isAnsi is {isAnsi}")
     try:
         # load the dll  
         dtwain_dll = ct.windll.LoadLibrary(dllName)
