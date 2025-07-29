@@ -2095,14 +2095,19 @@ CTL_StringType dynarithmic::GetDTWAINExecutionPath()
 CTL_StringType dynarithmic::GetDTWAINDLLPath()
 {
     auto& dllPath = CTL_StaticData::GetDLLPath();
-    if ( !dllPath.empty())
+    if (!dllPath.empty())
         return dllPath;
-    dllPath.resize(1024);
-    auto nChars = boost::winapi::GetModuleFileName(CTL_StaticData::GetDLLInstanceHandle(), dllPath.data(), 1024);
-    if (nChars >= 0)
+    size_t initialSize = 1024;
+    while (true)
     {
-        dllPath.resize(nChars);
-        return dllPath;
+        dllPath.resize(initialSize + 1);
+        auto nChars = boost::winapi::GetModuleFileName(CTL_StaticData::GetDLLInstanceHandle(), dllPath.data(), initialSize);
+        if (::GetLastError() != ERROR_INSUFFICIENT_BUFFER || initialSize >= 8192)
+        {
+            dllPath.resize(nChars);
+            return dllPath;
+        }
+        initialSize += 1000;
     }
     return {};
 }
