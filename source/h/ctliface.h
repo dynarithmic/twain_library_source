@@ -636,7 +636,6 @@ namespace dynarithmic
         static int GetResourceLoadError() { return s_StaticData.s_nLoadingError; }
         static void SetResourceLoadError(int errNum) { s_StaticData.s_nLoadingError = errNum; }
         static CSimpleIniA* GetINIInterface() { return s_iniInterface.get(); }
-        static bool PerformResampling() { return s_StaticData.s_bDoResampling; }
         static CTL_PairToStringMap& GetResourceCache() { return s_StaticData.s_ResourceCache; }
         static CTL_StringToMapLongToStringMap& GetAllLanguagesResourceMap() { return s_StaticData.s_AllLoadedResourcesMap; }
         static CTL_LongToStringMap* GetLanguageResource(std::string_view sLang);
