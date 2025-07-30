@@ -343,7 +343,6 @@ bool CTL_ExtImageInfoTriplet::AddInfo(TW_INFO Info)
 bool CTL_ExtImageInfoTriplet::EnumSupported(CTL_ITwainSource* pSource,
                                             CTL_IntArray& rArray)
 {
-    size_t NumAttr = CTL_StaticData::GetExtendedImageInfoMap().size();
     rArray.clear();
     auto& vVect = pSource->GetSupportedExtImageInfos();
     std::copy(vVect.begin(), vVect.end(), std::back_inserter(rArray));
