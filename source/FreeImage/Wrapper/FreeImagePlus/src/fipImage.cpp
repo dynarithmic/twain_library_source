@@ -208,9 +208,11 @@ unsigned fipImage::getImageSize() const {
     return FreeImage_GetDIBSize(_dib.get());
 }
 
+#if 0
 unsigned fipImage::getImageMemorySize() const {
     return FreeImage_GetMemorySize(_dib.get());
 }
+#endif
 
 unsigned fipImage::getBitsPerPixel() const {
     return FreeImage_GetBPP(_dib.get());
