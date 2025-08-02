@@ -1109,3 +1109,6 @@ DTWAIN_ArrayAddFloatString                        @31112
 DTWAIN_ArrayAddFloatStringNA                      @31113
 DTWAIN_ArrayAddFloatStringNW                      @31114
 DTWAIN_ArrayAddFloatStringN                       @31115
+DTWAIN_ArrayGetCapValues                          @31116
+DTWAIN_ArrayGetCapValuesEx                        @31117
+DTWAIN_ArrayGetCapValuesEx2                       @31118

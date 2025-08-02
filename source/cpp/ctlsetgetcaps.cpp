@@ -198,6 +198,41 @@ static bool performSetCap(DTWAIN_HANDLE DLLHandle, DTWAIN_SOURCE Source, TW_UINT
     return bOk;
 }
 
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayGetCapValues( DTWAIN_SOURCE Source, LONG lCap, LONG lGetType)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType))
+    DTWAIN_ARRAY arr = {};
+    DTWAIN_GetCapValues(Source, lCap, lGetType, &arr);
+    LOG_FUNC_EXIT_NONAME_PARAMS(arr)
+    CATCH_BLOCK((DTWAIN_ARRAY)NULL)
+}
+
+
+// Gets capability values.  This function does not test if the capability exists, or if the container type is valid.  Use
+// with caution!!
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayGetCapValuesEx( DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LONG lContainerType )
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, lContainerType))
+    DTWAIN_ARRAY arr = {};
+    DTWAIN_GetCapValuesEx2(Source, lCap, lGetType, lContainerType, DTWAIN_DEFAULT, &arr);
+    LOG_FUNC_EXIT_NONAME_PARAMS(arr)
+    CATCH_BLOCK((DTWAIN_ARRAY)NULL)
+}
+
+// Gets capability values.  This function does not test if the capability exists, or if the container type is valid.  Use
+// with caution!!
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayGetCapValuesEx2( DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LONG lContainerType,
+                                                       LONG nDataType)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, lContainerType, nDataType))
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+    DTWAIN_ARRAY arr = {};
+    GetCapValuesEx2_Internal(pSource, lCap, lGetType, lContainerType, nDataType, &arr);
+    LOG_FUNC_EXIT_NONAME_PARAMS(arr)
+    CATCH_BLOCK_LOG_PARAMS((DTWAIN_ARRAY)NULL)
+}
+
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapValues( DTWAIN_SOURCE Source, LONG lCap, LONG lGetType, LPDTWAIN_ARRAY pArray )
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCap, lGetType, pArray))
