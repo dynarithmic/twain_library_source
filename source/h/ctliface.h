@@ -497,12 +497,12 @@ namespace dynarithmic
         CTL_StringType& GetExtension() { return m_sExtension; }
     };
 
-    typedef std::map<std::string, SourceStatus> SourceStatusMap;
+    typedef boost::container::flat_map<std::string, SourceStatus> SourceStatusMap;
     typedef boost::container::flat_map<int, ImageResamplerData> ImageResamplerMap;
     typedef boost::container::flat_map<int, std::pair<std::string, std::string>> CTL_PDFMediaMap;
-    typedef tsl::ordered_map<LONG, FileFormatNode> CTL_AvailableFileFormatsMap;
+    typedef boost::container::flat_map<LONG, FileFormatNode> CTL_AvailableFileFormatsMap;
     using TwainConstantType = int64_t;
-    typedef tsl::ordered_map<TwainConstantType, std::vector<std::string>> CTL_TwainConstantToStringMapNode;
+    typedef boost::container::flat_map<TwainConstantType, std::vector<std::string>> CTL_TwainConstantToStringMapNode;
     typedef boost::container::flat_map<int, CTL_TwainConstantToStringMapNode> CTL_TwainConstantsMap;
     typedef boost::container::flat_map<TwainConstantType, std::string> CTL_TwainIDToStringMap;
     typedef boost::container::flat_map<int32_t, std::string> CTL_ErrorToExtraInfoMap;
@@ -539,6 +539,7 @@ namespace dynarithmic
                INI_DEFAULT_ITEM,
                INI_SOURCES_KEY, 
                INI_DSMERRORLOGGING_KEY, 
+               INI_ALLOWDUP_RESOURCE,
                LASTINIENTRY };
         std::array<std::pair<int, std::string_view>, LASTINIENTRY> s_aINIKeys;
         int32_t                      s_nExtImageInfoOffset = 0;
@@ -635,7 +636,6 @@ namespace dynarithmic
         static int GetResourceLoadError() { return s_StaticData.s_nLoadingError; }
         static void SetResourceLoadError(int errNum) { s_StaticData.s_nLoadingError = errNum; }
         static CSimpleIniA* GetINIInterface() { return s_iniInterface.get(); }
-        static bool PerformResampling() { return s_StaticData.s_bDoResampling; }
         static CTL_PairToStringMap& GetResourceCache() { return s_StaticData.s_ResourceCache; }
         static CTL_StringToMapLongToStringMap& GetAllLanguagesResourceMap() { return s_StaticData.s_AllLoadedResourcesMap; }
         static CTL_LongToStringMap* GetLanguageResource(std::string_view sLang);
