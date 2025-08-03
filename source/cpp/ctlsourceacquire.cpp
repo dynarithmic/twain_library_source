@@ -149,7 +149,7 @@ static std::pair<bool, LONG>
     bool bWriteMisc = (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS) ? true : false;
     if (PixelType != DTWAIN_PT_DEFAULT)
     {
-        CTL_StringType sBuf;
+        char szOutBuf[1024];
         if (bWriteMisc)
             LogWriterUtils::WriteLogInfoIndentedA("Verifying Current Pixel Type ...");
 
@@ -157,9 +157,8 @@ static std::pair<bool, LONG>
         {
             if (bWriteMisc)
             {
-                StringStreamA strm;
-                strm << boost::format("Pixel Type of %1% is supported.  Checking if we need to set it...") % PixelType;
-                LogWriterUtils::WriteLogInfoIndentedA(strm.str());
+                DTWAIN_SPRINTF_FUNC(szOutBuf, "Pixel Type of %d is supported.  Checking if we need to set it...", PixelType);
+                LogWriterUtils::WriteLogInfoIndentedA(szOutBuf);
             }
             LONG curPixelType;
             LONG curBitDepth;
@@ -169,9 +168,8 @@ static std::pair<bool, LONG>
             {
                 if (bWriteMisc)
                 {
-                    StringStreamA strm2;
-                    strm2 << boost::format("Current pixel type is %1%, bit depth is %2%") % curPixelType % curBitDepth;
-                    LogWriterUtils::WriteLogInfoIndentedA(strm2.str());
+                    DTWAIN_SPRINTF_FUNC(szOutBuf, "Current pixel type is %d, bit depth is %d", curPixelType, curBitDepth);
+                    LogWriterUtils::WriteLogInfoIndentedA(szOutBuf);
                 }
                 // set the pixel type if not the same
                 if (curPixelType != PixelType)
@@ -185,7 +183,7 @@ static std::pair<bool, LONG>
                     }
                 }
                 else
-                    // pixel type is supported
+                // pixel type is supported
                 {
                     if (bWriteMisc)
                         LogWriterUtils::WriteLogInfoIndentedA("Current and desired pixel type equal.  End processing pixel type and bit depth...");
@@ -204,9 +202,8 @@ static std::pair<bool, LONG>
             if (bWriteMisc)
             {
                 // pixel type not supported
-                StringStreamA strm2;
-                strm2 << boost::format("Pixel Type of %1% is not supported.  Setting to default...") % PixelType;
-                LogWriterUtils::WriteLogInfoIndentedA(strm2.str());
+                DTWAIN_SPRINTF_FUNC(szOutBuf, "Pixel Type of %d is not supported.  Setting to default...", PixelType);
+                LogWriterUtils::WriteLogInfoIndentedA(szOutBuf);
             }
             if (!DTWAIN_SetPixelType(pRealSource, DTWAIN_PT_DEFAULT, DTWAIN_DEFAULT, TRUE))
             {

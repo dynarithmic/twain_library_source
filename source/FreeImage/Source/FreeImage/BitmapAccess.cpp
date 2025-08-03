@@ -36,7 +36,7 @@
 #include "FreeImage.h"
 #include "FreeImageIO.h"
 #include "Utilities.h"
-#include "MapIntrospector.h"
+// #include "MapIntrospector.h" // Do not use this file, as it is unnecessary and cause compilation issues
 
 #include "../Metadata/FreeImageTag.h"
 
@@ -1518,8 +1518,9 @@ FreeImage_GetMetadataCount(FREE_IMAGE_MDMODEL model, FIBITMAP *dib) {
 
 // ----------------------------------------------------------
 
+#if 0
 unsigned DLL_CALLCONV
-FreeImage_GetMemorySize(FIBITMAP *dib) {
+FreeImage_GetMemorySize(FIBITMAP* dib) {
 	if (!dib) {
 		return 0;
 	}
@@ -1585,4 +1586,4 @@ FreeImage_GetMemorySize(FIBITMAP *dib) {
 
 	return (unsigned)size;
 }
-
+#endif

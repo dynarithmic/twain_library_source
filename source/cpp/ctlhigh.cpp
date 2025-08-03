@@ -18,6 +18,14 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+
+ /*****************************************************************************************
+     The ctlhigh.cpp module serves as a code generator for most of the exported capability
+     functions.
+
+     The macros basically create the boilerplate DLL export header for each function, along
+     with the arguments to the function.
+  *****************************************************************************************/
 #include <boost/format.hpp>
 #include <type_traits>
 #include <string_view>
@@ -776,12 +784,7 @@ DTWAIN_BOOL dynarithmic::DTWAIN_GetDeviceCapByString(DTWAIN_SOURCE Source, LPTST
     DTWAIN_FLOAT tempR;
     const DTWAIN_BOOL retVal = fn(Source, &tempR);
     if ( retVal )
-    {
-        StringStreamA strm;
-        strm << boost::format("%1%") % tempR;
-        const auto srcStr = StringConversion::Convert_Ansi_To_Native(strm.str());
-        StringWrapper::SafeStrcpy(strVal, srcStr.c_str());
-    }
+        StringWrapper::SafeStrcpy(strVal, StringWrapper::TrimDouble(tempR).c_str(), 255);
     return retVal;
 }
 

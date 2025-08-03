@@ -27,6 +27,7 @@
 #include "FreeImagePlus.h"
 #include "../cximage/ximage.h"
 #include "logwriterutils.h"
+#include "ctlconstexprfind.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4244)
@@ -441,11 +442,11 @@ HANDLE CDibInterface::CropDIB(HANDLE handle, const FloatRect& ActualRect, const 
 FloatRect CDibInterface::Normalize(fipImage& pImage, const FloatRect& ActualRect, const FloatRect& RequestedRect,
                                    int sourceunit, int destunit, int dpi)
 {
-    const std::map<LONG, double> Measurement = {{DTWAIN_INCHES, 1.0},
-                                                  {DTWAIN_TWIPS, 1440.0},
-                                                  {DTWAIN_POINTS, 72.0},
-                                                  {DTWAIN_PICAS, 6.0},
-                                                  {DTWAIN_CENTIMETERS, 2.54}};
+    static constexpr std::array<std::pair<LONG, double>, 5> Measurement = { {{DTWAIN_INCHES, 1.0},
+                                                                      {DTWAIN_TWIPS, 1440.0},
+                                                                      {DTWAIN_POINTS, 72.0},
+                                                                      {DTWAIN_PICAS, 6.0},
+                                                                      {DTWAIN_CENTIMETERS, 2.54}} };
 
     const UINT32 width = pImage.getWidth();
 
@@ -460,8 +461,15 @@ FloatRect CDibInterface::Normalize(fipImage& pImage, const FloatRect& ActualRect
     if ( pitch == 0 )
         return fRect;
 
-    const auto iterSourceUnit = Measurement.find(sourceunit);
-    const auto iterDestUnit = Measurement.find(destunit);
+    const auto iterSourceUnit = generic_array_finder_if(Measurement, [&](auto& pr) { return pr.first == sourceunit; });
+    const auto iterDestUnit = generic_array_finder_if(Measurement, [&](auto& pr) { return pr.first == destunit; });
+
+    // If not found return the original rect
+    if (!iterSourceUnit.first || !iterDestUnit.first)
+        return fRect;
+
+    auto actualSourceUnit = Measurement[iterSourceUnit.second].second;
+    auto actualDestUnit = Measurement[iterDestUnit.second].second;
 
     // Convert Actual rect to pixels
     double PixelsPerInch = dpi;
@@ -476,7 +484,7 @@ FloatRect CDibInterface::Normalize(fipImage& pImage, const FloatRect& ActualRect
         case DTWAIN_POINTS:
         case DTWAIN_PICAS:
         {
-            const double NumInches = (ActualRect.right - ActualRect.left) / iterSourceUnit->second;
+            const double NumInches = (ActualRect.right - ActualRect.left) / actualSourceUnit;
             PixelsPerInch = static_cast<double>(width) / NumInches;
         }
         break;
@@ -502,10 +510,10 @@ FloatRect CDibInterface::Normalize(fipImage& pImage, const FloatRect& ActualRect
             }
             else
             {
-                fRect.left   = RequestedRect.left / iterDestUnit->second * PixelsPerInch;
-                fRect.right  = RequestedRect.right  / iterSourceUnit->second * PixelsPerInch;
-                fRect.top    = RequestedRect.top   / iterSourceUnit->second  * PixelsPerInch;
-                fRect.bottom = RequestedRect.bottom  / iterSourceUnit->second * PixelsPerInch;
+                fRect.left   = RequestedRect.left / actualDestUnit * PixelsPerInch;
+                fRect.right  = RequestedRect.right  / actualDestUnit * PixelsPerInch;
+                fRect.top    = RequestedRect.top   / actualDestUnit * PixelsPerInch;
+                fRect.bottom = RequestedRect.bottom  / actualDestUnit * PixelsPerInch;
             }
         }
         break;

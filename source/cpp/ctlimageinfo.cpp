@@ -50,12 +50,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfoString(DTWAIN_SOURCE Source,
     const DTWAIN_BOOL retVal = DTWAIN_GetImageInfo(Source, &tempX, &tempY, Width, Length, NumSamples, BitsPerSample, BitsPerPixel, Planar, PixelType, Compression);
     if (retVal)
     {
-        StringStreamA strm;
-        strm << boost::format("%1%") % tempX;
-        StringWrapper::SafeStrcpy(XResolution, StringConversion::Convert_Ansi_To_Native(strm.str()).c_str());
-        strm.str("");
-        strm << boost::format("%1%") % tempY;
-        StringWrapper::SafeStrcpy(YResolution, StringConversion::Convert_Ansi_To_Native(strm.str()).c_str());
+        StringWrapper::SafeStrcpy(XResolution, StringWrapper::TrimDouble(tempX).c_str(), 255);
+        StringWrapper::SafeStrcpy(YResolution, StringWrapper::TrimDouble(tempY).c_str(), 255);
     }
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((XResolution, YResolution))
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)

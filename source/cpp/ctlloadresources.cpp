@@ -339,6 +339,9 @@ namespace dynarithmic
         }
 
         // Read in the TWAIN constants
+        bool bAllowDuplicate = iniInterface->GetBoolValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_MISCELLANEOUS_KEY).data(),
+                                                          CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_ALLOWDUP_RESOURCE).data(), true);
+
         auto& constantsMap = CTL_StaticData::GetTwainConstantsMap();
         auto& stringToConstantMap = CTL_StaticData::GetStringToConstantMap();
         for ( int constantVal = 0; constantVal < CTL_TwainDLLHandle::NumTwainMapValues; ++constantVal)
@@ -379,15 +382,17 @@ namespace dynarithmic
                 else
                     StringWrapperA::Tokenize(name, ", ", saNames);
                 iter->second.insert({twainValue, saNames});
-                if (stringToConstantMap.find(name) != stringToConstantMap.end())
+                if (!bAllowDuplicate)
                 {
-                    retValue.m_dupInfo.line = line;
-                    retValue.m_dupInfo.lineNumber = curLine;
-                    retValue.m_dupInfo.duplicateID = twainValue;
-                    retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_NODUPLICATE_ID] = false;
-                    return false;
+                    if (stringToConstantMap.find(name) != stringToConstantMap.end())
+                    {
+                        retValue.m_dupInfo.line = line;
+                        retValue.m_dupInfo.lineNumber = curLine;
+                        retValue.m_dupInfo.duplicateID = twainValue;
+                        retValue.errorValue[ResourceLoadingInfo::DTWAIN_RESLOAD_NODUPLICATE_ID] = false;
+                        return false;
+                    }
                 }
-
                 // Always insert the special name that has more than one entry
                 if (saNames.size() > 1)
                     stringToConstantMap.insert({ name, twainValue });

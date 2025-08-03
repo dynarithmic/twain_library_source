@@ -46,7 +46,15 @@
 #include <dtwain_filesystem.h>
 #include "dtwain_standard_defs.h"
 #ifndef _MAX_PATH
-#define _MAX_PATH 260
+    #define _MAX_PATH 260
+#endif
+
+#ifdef _MSC_VER
+    #define DTWAIN_SPRINTF_FUNC sprintf_s
+    #define DTWAIN_SWPRINTF_FUNC swprintf_s
+#else
+    #define DTWAIN_SPRINTF_FUNC sprintf
+    #define DTWAIN_SWPRINTF_FUNC swprintf
 #endif
 
 namespace dynarithmic
@@ -196,6 +204,14 @@ namespace dynarithmic
         static bool IsDigit(int ch) { return isdigit(ch)?true:false; }
         static double ToDouble(const char_type* s1)
         { return s1?strtod(s1, nullptr):0.0; }
+
+        static std::string TrimDouble(double value, int numDigitsPrecision)
+        {
+            char_type buf[256];
+            DTWAIN_SPRINTF_FUNC(buf, "%.*g", numDigitsPrecision, value);
+            return buf;
+        }
+
         #ifdef _WIN32
         static UINT GetWindowsDirectoryImpl(char_type* buffer)
                     { return GetWindowsDirectoryA(buffer, _MAX_PATH); }
@@ -340,6 +356,14 @@ namespace dynarithmic
         static bool IsDigit(wint_t ch) { return iswdigit(ch)?true:false; }
         static double ToDouble(const char_type* s1)
         { return s1 ? wcstod(s1, nullptr) : 0.0; }
+
+        static std::wstring TrimDouble(double value, int numDigitsPrecision)
+        {
+            char_type buf[255];
+            DTWAIN_SWPRINTF_FUNC(buf, L"%.*g", numDigitsPrecision, value);
+            return buf;
+        }
+
         #ifdef _WIN32
         static UINT GetWindowsDirectoryImpl(char_type* buffer)
         { return GetWindowsDirectoryW(buffer, _MAX_PATH); }
@@ -742,6 +766,11 @@ namespace dynarithmic
         static double ToDouble(typename StringTraits::stringview_type s1)
         {
             return StringTraits::ToDouble(s1.data());
+        }
+
+        static StringType TrimDouble(double val, int numDigits = 8)
+        {
+            return StringTraits::TrimDouble(val, numDigits);
         }
 
         static double ToDouble(const CharType* s1, double defVal = 0.0)

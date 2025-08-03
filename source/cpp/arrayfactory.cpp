@@ -312,7 +312,11 @@ namespace dynarithmic
         if (iter != theMap.end())
             return iter;
         else
-            throw std::invalid_argument::invalid_argument("operation not supported for array type");
+        {
+            char szBuf[100];
+            sprintf_s(szBuf, "%s operation not supported for array type", op);
+            throw std::invalid_argument::invalid_argument(szBuf);
+        }
     }
 
     void CTL_ArrayFactory::copy(arrayTag *pTagDest, arrayTag* pTagSource)
