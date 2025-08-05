@@ -28,18 +28,10 @@ OF THIRD PARTY RIGHTS.
 #undef min
 #undef max
 #include "pdfencrypt.h"
-
-#include "aes.h"
-#include "modes.h"
-#include "../cryptolib/filters.h"
-#include "../cryptolib/md5.h"
+#include "../hashlib/md5.h"
 
 #define STRINGER_2_(x) #x
 #define STRINGER_(x) STRINGER_2_(x)
-
-#ifdef _MSC_VER
-    #pragma message("Using Crypto++ version " STRINGER_(CRYPTOPP_MAJOR) "." STRINGER_(CRYPTOPP_MINOR) "." STRINGER_(CRYPTOPP_REVISION))
-#endif
 
 std::string GetSystemTimeInMilliseconds();
 #ifdef _MSC_VER
@@ -257,27 +249,30 @@ void PDFEncryption::SetupGlobalEncryptionKey(const std::string& documentID,
     ext[3] = permissionsParam >> 24;
 
     // This version of the MD5 checksum mimics the PDF reference
-    CryptoPP::Weak1::MD5 Cryp;
-    Cryp.Restart();
-    Cryp.Update(userPad.data(), userPad.size());
-    Cryp.Update(ownerKeyParam.data(), ownerKeyParam.size());
-    Cryp.Update(ext.data(), 4);
+    // create a new hashing object
+    MD5 md5;
+    md5.add(userPad.data(), userPad.size());
+    md5.add(ownerKeyParam.data(), ownerKeyParam.size());
+    md5.add(ext.data(), 4);
+
     {
         const UCHARArray test = StringToHexArray(documentID);
-        Cryp.Update(test.data(), test.size());
+        md5.add(test.data(), test.size());
     }
 
-    Cryp.Final(digest.data());
+
+    unsigned char testbuf[MD5::HashBytes];
+    md5.getHash(testbuf);
     if (mkey.size() == 16)
     {
         for (int k = 0; k < 50; ++k)
         {
-            Cryp.Update(digest.data(), digest.size());
-            Cryp.Final(digest.data());
+            md5.reset();
+            md5.add(testbuf, MD5::HashBytes);
+            md5.getHash(testbuf);
         }
     }
-
-    ArrayCopy(digest, 0, mkey, 0, static_cast<int>(mkey.size()));
+    std::copy(testbuf, testbuf + MD5::HashBytes, mkey.begin());
 }
 
 
@@ -287,18 +282,22 @@ PDFEncryption::UCHARArray PDFEncryption::ComputeOwnerKey(const UCHARArray& userP
 {
     UCHARArray ownerKeyValue(32);
     UCHARArray digest(16);
-    CryptoPP::Weak1::MD5 Cryp;
-    Cryp.Restart();
-    Cryp.Update(ownerPad.data(), ownerPad.size());
-    Cryp.Final(digest.data());
+
+    MD5 md5;
+    md5.add(ownerPad.data(), ownerPad.size());
+    md5.getHash(digest.data());
+
     if (strength128Bits)
     {
-        UCHARArray mkeyValue(16);
+
         for (int k = 0; k < 50; ++k)
         {
-            Cryp.Update(digest.data(), digest.size());
-            Cryp.Final(digest.data());
+            md5.reset();
+            md5.add(digest.data(), MD5::HashBytes);
+            md5.getHash(digest.data());
         }
+
+        UCHARArray mkeyValue(16);
         ArrayCopy(userPad, 0, ownerKeyValue, 0, 32);
         for (int i = 0; i < 20; ++i)
         {
@@ -321,16 +320,13 @@ void PDFEncryption::SetupUserKey()
     if (mkey.size() == 16)
     {
         UCHARArray digest(32);
-        CryptoPP::Weak1::MD5 Cryp;
-
-        // Algorithm 3.5, step 2
-        Cryp.Restart();
-        Cryp.Update(&pad[0], sizeof pad);
+        MD5 md5;
+        md5.add(&pad[0], sizeof pad);
 
         // step 3
         const UCHARArray test = StringToHexArray(m_documentID);
-        Cryp.Update(test.data(), test.size());
-        Cryp.Final(digest.data());
+        md5.add(test.data(), test.size());
+        md5.getHash(digest.data());
 
         // step 4
         PrepareRC4Key(mkey, 0, static_cast<int>(mkey.size()));
@@ -396,7 +392,6 @@ PDFEncryption::UCHARArray PDFEncryption::GetExtendedKey(int number, int generati
 
 void PDFEncryption::SetHashKey(int number, int generation)
 {
-
     /** Work area to prepare the object/generation bytes */
     const UCHARArray extra = GetExtendedKey(number, generation);
     std::ostringstream m;
@@ -405,10 +400,14 @@ void PDFEncryption::SetHashKey(int number, int generation)
     const std::string sTemp = m.str();
 
     const UCHARArray tempArr = StringToByteArray(sTemp);
-    CryptoPP::Weak1::MD5 Cryp;
-    Cryp.Update(tempArr.data(), tempArr.size());
+    MD5 md5;
+    md5.add(tempArr.data(), tempArr.size());
+    unsigned char tempbuf[MD5::HashBytes];
+    md5.getHash(tempbuf);
+
     key.resize(32);
-    Cryp.Final(key.data());
+
+    std::copy(tempbuf, tempbuf + MD5::HashBytes, key.begin());
 
     keySize = static_cast<int>(mkey.size()) + 5;
     if (keySize > 16)
