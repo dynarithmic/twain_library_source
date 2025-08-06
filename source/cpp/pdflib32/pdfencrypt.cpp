@@ -206,12 +206,18 @@ void PDFEncryption::SetupAllKeys(const std::string& DocID,
 {
     if (ownerPassword.empty() )
         ownerPassword = userPassword;
+
+    // See PDF reference manual -- user access permissions bits:
+    // 
+    // For 40-bit encryption strength, bits 8 through 11 of the 
+    // permissions value are unused, so just set them to 1.
+    // For 128-bit encryption strength, leave those bits alone
     permissionsParam |= strength128Bits ? 0xfffff0c0 : 0xffffffc0;
-
     permissionsParam &= 0xfffffffc;
-        //PDF reference 3.5.2 Standard Security Handler, Algorithm 3.3-1
-        //If there is no owner password, use the user password instead.
 
+    // PDF reference 3.5.2 Standard Security Handler, Algorithm 3.3-1
+    // 
+    // If there is no owner password, use the user password instead.
     const UCHARArray userPad = PadPassword(userPassword);
     const UCHARArray ownerPad = PadPassword(ownerPassword);
 
@@ -272,7 +278,8 @@ void PDFEncryption::SetupGlobalEncryptionKey(const std::string& documentID,
             md5.getHash(testbuf);
         }
     }
-    std::copy(testbuf, testbuf + MD5::HashBytes, mkey.begin());
+    auto minToCopy = std::min(static_cast<size_t>(MD5::HashBytes), mkey.size());
+    std::copy(testbuf, testbuf + minToCopy, mkey.begin());
 }
 
 
