@@ -317,7 +317,7 @@ LONG DLLENTRY_DEF DTWAIN_GetFeederFuncs(DTWAIN_SOURCE Source)
 bool ExecuteFeederState5Func(DTWAIN_SOURCE Source, LONG lCap)
 {
     CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
-    if (!pSource->IsCapInSupportedList(lCap))
+    if (!pSource->IsCapInSupportedList(static_cast<TW_UINT16>(lCap)))
         return false;
 
     const auto pHandle = pSource->GetDTWAINHandle();

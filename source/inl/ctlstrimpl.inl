@@ -2066,7 +2066,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFCreatorA(DTWAIN_SOURCE Source, LPCSTR lpCr
 #endif
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFEncryptionW(DTWAIN_SOURCE Source, DTWAIN_BOOL bUseEncryption, LPCWSTR lpszUser, LPCWSTR lpszOwner, LONG Permissions, DTWAIN_BOOL UseStrongEncryption)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFEncryptionW(DTWAIN_SOURCE Source, DTWAIN_BOOL bUseEncryption, LPCWSTR lpszUser, LPCWSTR lpszOwner, DWORD Permissions, DTWAIN_BOOL UseStrongEncryption)
 {
 #ifdef _UNICODE
     return DTWAIN_SetPDFEncryption(Source, bUseEncryption, lpszUser, lpszOwner, Permissions, UseStrongEncryption);
@@ -2075,7 +2075,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFEncryptionW(DTWAIN_SOURCE Source, DTWAIN_B
 #endif
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFEncryptionA(DTWAIN_SOURCE Source, DTWAIN_BOOL bUseEncryption, LPCSTR lpszUser, LPCSTR lpszOwner, LONG Permissions, DTWAIN_BOOL UseStrongEncryption)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFEncryptionA(DTWAIN_SOURCE Source, DTWAIN_BOOL bUseEncryption, LPCSTR lpszUser, LPCSTR lpszOwner, DWORD Permissions, DTWAIN_BOOL UseStrongEncryption)
 {
 #ifdef _UNICODE
     return DTWAIN_SetPDFEncryption(Source, bUseEncryption, StringConversion::Convert_AnsiPtr_To_Native(lpszUser).c_str(), StringConversion::Convert_AnsiPtr_To_Native(lpszOwner).c_str(), Permissions, UseStrongEncryption);
