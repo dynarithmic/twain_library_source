@@ -1915,10 +1915,13 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_EnumBitDepthsEx.restype = ct.c_long
      theDLL.DTWAIN_EnumBitDepthsEx2.restype = ct.c_void_p
      theDLL.DTWAIN_EnumBottomCameras.restype = ct.c_long
+     theDLL.DTWAIN_EnumBottomCamerasEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumBrightnessValues.restype = ct.c_long
      theDLL.DTWAIN_EnumBrightnessValuesEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumCameras.restype = ct.c_long
      theDLL.DTWAIN_EnumCamerasEx.restype = ct.c_long
+     theDLL.DTWAIN_EnumCamerasEx2.restype = ct.c_void_p
+     theDLL.DTWAIN_EnumCamerasEx3.restype = ct.c_void_p
      theDLL.DTWAIN_EnumCompressionTypes.restype = ct.c_long
      theDLL.DTWAIN_EnumCompressionTypesEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumCompressionTypesEx2.restype = ct.c_void_p
@@ -1931,6 +1934,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_EnumDoubleFeedDetectValues.restype = ct.c_long
      theDLL.DTWAIN_EnumDoubleFeedDetectValuesEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumExtImageInfoTypes.restype = ct.c_long
+     theDLL.DTWAIN_EnumExtImageInfoTypesEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumExtendedCaps.restype = ct.c_long
      theDLL.DTWAIN_EnumExtendedCapsEx.restype = ct.c_long
      theDLL.DTWAIN_EnumExtendedCapsEx2.restype = ct.c_void_p
@@ -1972,6 +1976,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_EnumPatchTimeOutValues.restype = ct.c_long
      theDLL.DTWAIN_EnumPatchTimeOutValuesEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumPixelTypes.restype = ct.c_long
+     theDLL.DTWAIN_EnumPixelTypesEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumPrinterStringModes.restype = ct.c_long
      theDLL.DTWAIN_EnumPrinterStringModesEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumResolutionValues.restype = ct.c_long
@@ -1989,12 +1994,14 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_EnumSupportedCapsEx.restype = ct.c_long
      theDLL.DTWAIN_EnumSupportedCapsEx2.restype = ct.c_void_p
      theDLL.DTWAIN_EnumSupportedExtImageInfo.restype = ct.c_long
+     theDLL.DTWAIN_EnumSupportedExtImageInfoEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumSupportedFileTypes.restype = ct.c_void_p
      theDLL.DTWAIN_EnumSupportedMultiPageFileTypes.restype = ct.c_void_p
      theDLL.DTWAIN_EnumSupportedSinglePageFileTypes.restype = ct.c_void_p
      theDLL.DTWAIN_EnumThresholdValues.restype = ct.c_long
      theDLL.DTWAIN_EnumThresholdValuesEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumTopCameras.restype = ct.c_long
+     theDLL.DTWAIN_EnumTopCamerasEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumTwainPrinters.restype = ct.c_long
      theDLL.DTWAIN_EnumTwainPrintersArray.restype = ct.c_long
      theDLL.DTWAIN_EnumTwainPrintersArrayEx.restype = ct.c_void_p
@@ -2474,6 +2481,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_RangeCreateFromCap.restype = ct.c_void_p
      theDLL.DTWAIN_RangeDestroy.restype = ct.c_long
      theDLL.DTWAIN_RangeExpand.restype = ct.c_long
+     theDLL.DTWAIN_RangeExpandEx.restype = ct.c_void_p
      theDLL.DTWAIN_RangeGetAll.restype = ct.c_long
      theDLL.DTWAIN_RangeGetAllFloat.restype = ct.c_long
      theDLL.DTWAIN_RangeGetAllFloatString.restype = ct.c_long
@@ -3002,10 +3010,13 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_EnumBitDepthsEx.argtypes = [ct.c_void_p, ct.c_long, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumBitDepthsEx2.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnumBottomCameras.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
+     theDLL.DTWAIN_EnumBottomCamerasEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumBrightnessValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p), ct.c_long]
      theDLL.DTWAIN_EnumBrightnessValuesEx.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnumCameras.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumCamerasEx.argtypes = [ct.c_void_p, ct.c_long, ct.POINTER(ct.c_void_p)]
+     theDLL.DTWAIN_EnumCamerasEx2.argtypes = [ct.c_void_p]
+     theDLL.DTWAIN_EnumCamerasEx3.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnumCompressionTypes.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumCompressionTypesEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumCompressionTypesEx2.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
@@ -3018,6 +3029,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_EnumDoubleFeedDetectValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumDoubleFeedDetectValuesEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumExtImageInfoTypes.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
+     theDLL.DTWAIN_EnumExtImageInfoTypesEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumExtendedCaps.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumExtendedCapsEx.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumExtendedCapsEx2.argtypes = [ct.c_void_p]
@@ -3059,6 +3071,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_EnumPatchTimeOutValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumPatchTimeOutValuesEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumPixelTypes.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
+     theDLL.DTWAIN_EnumPixelTypesEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumPrinterStringModes.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumPrinterStringModesEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumResolutionValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p), ct.c_long]
@@ -3075,9 +3088,11 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_EnumSupportedCapsEx.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumSupportedCapsEx2.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumSupportedExtImageInfo.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
+     theDLL.DTWAIN_EnumSupportedExtImageInfoEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumThresholdValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p), ct.c_long]
      theDLL.DTWAIN_EnumThresholdValuesEx.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnumTopCameras.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
+     theDLL.DTWAIN_EnumTopCamerasEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumTwainPrinters.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumTwainPrintersArray.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumTwainPrintersArrayEx.argtypes = [ct.c_void_p]
@@ -3525,6 +3540,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_RangeCreateFromCap.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_RangeDestroy.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_RangeExpand.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
+     theDLL.DTWAIN_RangeExpandEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_RangeGetAll.argtypes = [ct.c_void_p, ct.c_void_p, ct.c_void_p, ct.c_void_p, ct.c_void_p, ct.c_void_p]
      theDLL.DTWAIN_RangeGetAllFloat.argtypes = [ct.c_void_p, ct.POINTER(ct.c_double), ct.POINTER(ct.c_double), ct.POINTER(ct.c_double), ct.POINTER(ct.c_double), ct.POINTER(ct.c_double)]
      theDLL.DTWAIN_RangeGetAllFloatString.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p]
@@ -4064,10 +4080,13 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_EnumBitDepthsEx.restype = ct.c_long
      theDLL.DTWAIN_EnumBitDepthsEx2.restype = ct.c_void_p
      theDLL.DTWAIN_EnumBottomCameras.restype = ct.c_long
+     theDLL.DTWAIN_EnumBottomCamerasEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumBrightnessValues.restype = ct.c_long
      theDLL.DTWAIN_EnumBrightnessValuesEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumCameras.restype = ct.c_long
      theDLL.DTWAIN_EnumCamerasEx.restype = ct.c_long
+     theDLL.DTWAIN_EnumCamerasEx2.restype = ct.c_void_p
+     theDLL.DTWAIN_EnumCamerasEx3.restype = ct.c_void_p
      theDLL.DTWAIN_EnumCompressionTypes.restype = ct.c_long
      theDLL.DTWAIN_EnumCompressionTypesEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumCompressionTypesEx2.restype = ct.c_void_p
@@ -4080,6 +4099,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_EnumDoubleFeedDetectValues.restype = ct.c_long
      theDLL.DTWAIN_EnumDoubleFeedDetectValuesEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumExtImageInfoTypes.restype = ct.c_long
+     theDLL.DTWAIN_EnumExtImageInfoTypesEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumExtendedCaps.restype = ct.c_long
      theDLL.DTWAIN_EnumExtendedCapsEx.restype = ct.c_long
      theDLL.DTWAIN_EnumExtendedCapsEx2.restype = ct.c_void_p
@@ -4121,6 +4141,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_EnumPatchTimeOutValues.restype = ct.c_long
      theDLL.DTWAIN_EnumPatchTimeOutValuesEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumPixelTypes.restype = ct.c_long
+     theDLL.DTWAIN_EnumPixelTypesEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumPrinterStringModes.restype = ct.c_long
      theDLL.DTWAIN_EnumPrinterStringModesEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumResolutionValues.restype = ct.c_long
@@ -4138,12 +4159,14 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_EnumSupportedCapsEx.restype = ct.c_long
      theDLL.DTWAIN_EnumSupportedCapsEx2.restype = ct.c_void_p
      theDLL.DTWAIN_EnumSupportedExtImageInfo.restype = ct.c_long
+     theDLL.DTWAIN_EnumSupportedExtImageInfoEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumSupportedFileTypes.restype = ct.c_void_p
      theDLL.DTWAIN_EnumSupportedMultiPageFileTypes.restype = ct.c_void_p
      theDLL.DTWAIN_EnumSupportedSinglePageFileTypes.restype = ct.c_void_p
      theDLL.DTWAIN_EnumThresholdValues.restype = ct.c_long
      theDLL.DTWAIN_EnumThresholdValuesEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumTopCameras.restype = ct.c_long
+     theDLL.DTWAIN_EnumTopCamerasEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumTwainPrinters.restype = ct.c_long
      theDLL.DTWAIN_EnumTwainPrintersArray.restype = ct.c_long
      theDLL.DTWAIN_EnumTwainPrintersArrayEx.restype = ct.c_void_p
@@ -4623,6 +4646,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_RangeCreateFromCap.restype = ct.c_void_p
      theDLL.DTWAIN_RangeDestroy.restype = ct.c_long
      theDLL.DTWAIN_RangeExpand.restype = ct.c_long
+     theDLL.DTWAIN_RangeExpandEx.restype = ct.c_void_p
      theDLL.DTWAIN_RangeGetAll.restype = ct.c_long
      theDLL.DTWAIN_RangeGetAllFloat.restype = ct.c_long
      theDLL.DTWAIN_RangeGetAllFloatString.restype = ct.c_long
@@ -5151,10 +5175,13 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_EnumBitDepthsEx.argtypes = [ct.c_void_p, ct.c_long, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumBitDepthsEx2.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnumBottomCameras.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
+     theDLL.DTWAIN_EnumBottomCamerasEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumBrightnessValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p), ct.c_long]
      theDLL.DTWAIN_EnumBrightnessValuesEx.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnumCameras.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumCamerasEx.argtypes = [ct.c_void_p, ct.c_long, ct.POINTER(ct.c_void_p)]
+     theDLL.DTWAIN_EnumCamerasEx2.argtypes = [ct.c_void_p]
+     theDLL.DTWAIN_EnumCamerasEx3.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnumCompressionTypes.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumCompressionTypesEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumCompressionTypesEx2.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
@@ -5167,6 +5194,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_EnumDoubleFeedDetectValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumDoubleFeedDetectValuesEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumExtImageInfoTypes.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
+     theDLL.DTWAIN_EnumExtImageInfoTypesEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumExtendedCaps.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumExtendedCapsEx.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumExtendedCapsEx2.argtypes = [ct.c_void_p]
@@ -5208,6 +5236,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_EnumPatchTimeOutValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumPatchTimeOutValuesEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumPixelTypes.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
+     theDLL.DTWAIN_EnumPixelTypesEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumPrinterStringModes.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumPrinterStringModesEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumResolutionValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p), ct.c_long]
@@ -5224,9 +5253,11 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_EnumSupportedCapsEx.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumSupportedCapsEx2.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumSupportedExtImageInfo.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
+     theDLL.DTWAIN_EnumSupportedExtImageInfoEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumThresholdValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p), ct.c_long]
      theDLL.DTWAIN_EnumThresholdValuesEx.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_EnumTopCameras.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
+     theDLL.DTWAIN_EnumTopCamerasEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumTwainPrinters.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumTwainPrintersArray.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumTwainPrintersArrayEx.argtypes = [ct.c_void_p]
@@ -5674,6 +5705,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_RangeCreateFromCap.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_RangeDestroy.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_RangeExpand.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
+     theDLL.DTWAIN_RangeExpandEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_RangeGetAll.argtypes = [ct.c_void_p, ct.c_void_p, ct.c_void_p, ct.c_void_p, ct.c_void_p, ct.c_void_p]
      theDLL.DTWAIN_RangeGetAllFloat.argtypes = [ct.c_void_p, ct.POINTER(ct.c_double), ct.POINTER(ct.c_double), ct.POINTER(ct.c_double), ct.POINTER(ct.c_double), ct.POINTER(ct.c_double)]
      theDLL.DTWAIN_RangeGetAllFloatString.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_char_p]
