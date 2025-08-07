@@ -251,7 +251,7 @@ LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontName(LONG FontVal, LPTSTR szFont, LONG n
     CATCH_BLOCK(-1)
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextEx(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement, LONG Flags)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextEx(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement, DWORD Flags)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, TextElement))
     VerifyHandles(Source);
@@ -278,7 +278,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFText(DTWAIN_SOURCE Source,
                                                  LPCTSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB,
                                                  LONG renderMode, DTWAIN_FLOAT scaling,
                                                  DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing,
-                                                 LONG strokeWidth, LONG Flags)
+                                                 LONG strokeWidth, DWORD Flags)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, szText, xPos, yPos, fontName, fontSize, colorRGB,
                                                renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags))
@@ -289,7 +289,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFText(DTWAIN_SOURCE Source,
         int DefaultValue;
         LONG pSource;
         int *pDestination;
-        LONG flagValue;
+        DWORD flagValue;
     };
 
     struct DefaultValSetterDOUBLE
@@ -298,7 +298,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFText(DTWAIN_SOURCE Source,
         double DefaultValue;
         double pSource;
         double *pDestination;
-        LONG flagValue;
+        DWORD flagValue;
     };
 
     PDFTextElement element;
@@ -309,7 +309,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFText(DTWAIN_SOURCE Source,
                         {riseValue, 0 , riseValue, &element.riseValue,1},
                         {DTWAIN_DEFAULT, 1 , strokeWidth, &element.strokeWidth,DTWAIN_PDFTEXT_NOSTROKEWIDTH},
                         {DTWAIN_DEFAULT, 0 , colorRGB, &element.colorRGB, DTWAIN_PDFTEXT_NORGBCOLOR},
-                        {Flags, static_cast<int>(Flags), Flags, &element.displayFlags, 1}
+                        {static_cast<LONG>(Flags), static_cast<int>(Flags), static_cast<LONG>(Flags), &element.displayFlags, 1}
                      };
 
    const DefaultValSetterDOUBLE defValsDOUBLE[] = {
