@@ -28,6 +28,11 @@ DTWAIN Version changes
   DTWAIN_EnumTopCamerasEx                   DTWAIN_EnumTopCameras 
   DTWAIN_RangeExpandEx                      DTWAIN_RangeExpand 
 
+- Fixed Delphi demo program when run using 64-bit DTWAIN.
+
+- Updated C#, Visual Basic, and Delphi language bindings.  You should use these new language bindings
+  with version 5.6.8 of the DTWAIN DLL's.
+
 
 5.6.7
 
