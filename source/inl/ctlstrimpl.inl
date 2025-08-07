@@ -2374,7 +2374,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetThresholdStringW(DTWAIN_SOURCE Source, LPCWST
 #endif
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLogA(LONG LogFlags, LPCSTR lpszLogFile)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLogA(DWORD LogFlags, LPCSTR lpszLogFile)
 {
 #ifdef _UNICODE
     return DTWAIN_SetTwainLog(LogFlags, StringConversion::Convert_AnsiPtr_To_Native(lpszLogFile).c_str());
@@ -2383,7 +2383,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLogA(LONG LogFlags, LPCSTR lpszLogFile)
 #endif
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLogW(LONG LogFlags, LPCWSTR lpszLogFile)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLogW(DWORD LogFlags, LPCWSTR lpszLogFile)
 {
 #ifdef _UNICODE
     return DTWAIN_SetTwainLog(LogFlags, lpszLogFile);
