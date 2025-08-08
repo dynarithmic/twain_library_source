@@ -300,6 +300,7 @@ namespace Dynarithmic
         public const int DTWAIN_POINTS = 3;
         public const int DTWAIN_TWIPS = 4;
         public const int DTWAIN_PIXELS = 5;
+        public const int DTWAIN_MILLIMETERS = 6;
         public const int DTWAIN_USENAME = 16;
         public const int DTWAIN_USEPROMPT = 32;
         public const int DTWAIN_USELONGNAME = 64;
@@ -408,6 +409,7 @@ namespace Dynarithmic
         public const int DTWAIN_USENATIVE = 1;
         public const int DTWAIN_USEBUFFERED = 2;
         public const int DTWAIN_USECOMPRESSION = 4;
+        public const int DTWAIN_USEMEMFILE = 8;
         public const int DTWAIN_FAILURE1 = (-1);
         public const int DTWAIN_FAILURE2 = (-2);
         public const int DTWAIN_DELETEALL = (-1);
@@ -1796,7 +1798,7 @@ namespace Dynarithmic
         public static extern  int DTWAIN_AddExtImageInfoQuery(DTWAIN_SOURCE Source, int ExtImageInfo);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
-        public static extern  int DTWAIN_AddPDFTextEx(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement, int Flags);
+        public static extern  int DTWAIN_AddPDFTextEx(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement, uint Flags);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
         public static extern  DTWAIN_HANDLE DTWAIN_AllocateMemory(uint memSize);
@@ -3415,7 +3417,7 @@ namespace Dynarithmic
         public static extern  int DTWAIN_AddFileToAppendA([MarshalAs(UnmanagedType.LPStr)] string szFile);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
-        public static extern  int DTWAIN_AddPDFTextA(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPStr)] string fontName, double fontSize, int colorRGB, int renderMode, double scaling, double charSpacing, double wordSpacing, int strokeWidth, int Flags);
+        public static extern  int DTWAIN_AddPDFTextA(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPStr)] string fontName, double fontSize, int colorRGB, int renderMode, double scaling, double charSpacing, double wordSpacing, int strokeWidth, uint Flags);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
         public static extern  int DTWAIN_ArrayAddStringA(DTWAIN_ARRAY pArray, [MarshalAs(UnmanagedType.LPStr)] string Val);
@@ -3790,7 +3792,7 @@ namespace Dynarithmic
         public static extern  int DTWAIN_AddFileToAppendW([MarshalAs(UnmanagedType.LPWStr)] string szFile);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode, ExactSpelling = true)]
-        public static extern  int DTWAIN_AddPDFTextW(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPWStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPWStr)] string fontName, double fontSize, int colorRGB, int renderMode, double scaling, double charSpacing, double wordSpacing, int strokeWidth, int Flags);
+        public static extern  int DTWAIN_AddPDFTextW(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPWStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPWStr)] string fontName, double fontSize, int colorRGB, int renderMode, double scaling, double charSpacing, double wordSpacing, int strokeWidth, uint Flags);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode, ExactSpelling = true)]
         public static extern  int DTWAIN_ArrayAddStringNW(DTWAIN_ARRAY pArray, [MarshalAs(UnmanagedType.LPWStr)] string Val, int num);
@@ -4165,7 +4167,7 @@ namespace Dynarithmic
         public static extern  int DTWAIN_AddFileToAppend([MarshalAs(UnmanagedType.LPTStr)] string szFile);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
-        public static extern  int DTWAIN_AddPDFText(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPTStr)] string fontName, double fontSize, int colorRGB, int renderMode, double scaling, double charSpacing, double wordSpacing, int strokeWidth, int Flags);
+        public static extern  int DTWAIN_AddPDFText(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPTStr)] string fontName, double fontSize, int colorRGB, int renderMode, double scaling, double charSpacing, double wordSpacing, int strokeWidth, uint Flags);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
         public static extern  int DTWAIN_ArrayAddANSIString(DTWAIN_ARRAY pArray, [MarshalAs(UnmanagedType.LPStr)] string Val);
