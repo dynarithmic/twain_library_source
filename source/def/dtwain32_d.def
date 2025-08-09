@@ -1120,6 +1120,7 @@ DTWAIN_EnumCamerasEx2                             @31123
 DTWAIN_EnumCamerasEx3                             @31124
 DTWAIN_EnumTopCamerasEx                           @31125
 DTWAIN_EnumBottomCamerasEx                        @31126
-
+DTWAIN_AddFileToAppend                            @31127
+DTWAIN_IsDoublePageCountOnDuplex                  @31128
 
 
