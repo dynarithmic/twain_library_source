@@ -358,7 +358,8 @@ cd $(SolutionDir)
 cd ..
 md demos\libs\$(PlatformArchitecture)bit
 cd demos\libs\$(PlatformArchitecture)bit
-copy $(TargetDir)$(TargetName).lib .</Command>
+copy $(TargetDir)$(TargetName).lib .
+copy $(TargetDir)$(TargetName)_embarcadero.lib .</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">
@@ -507,7 +508,8 @@ cd $(SolutionDir)
 cd ..
 md demos\libs\$(PlatformArchitecture)bit
 cd demos\libs\$(PlatformArchitecture)bit
-copy $(TargetDir)$(TargetName).lib .</Command>
+copy $(TargetDir)$(TargetName).lib .
+copy $(TargetDir)$(TargetName)_embarcadero.lib .</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">
@@ -660,7 +662,8 @@ cd $(SolutionDir)
 cd ..
 md demos\libs\$(PlatformArchitecture)bit
 cd demos\libs\$(PlatformArchitecture)bit
-copy $(TargetDir)$(TargetName).lib .</Command>
+copy $(TargetDir)$(TargetName).lib .
+copy $(TargetDir)$(TargetName)_embarcadero.lib .</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">
@@ -810,7 +813,8 @@ cd $(SolutionDir)
 cd ..
 md demos\libs\$(PlatformArchitecture)bit
 cd demos\libs\$(PlatformArchitecture)bit
-copy $(TargetDir)$(TargetName).lib .</Command>
+copy $(TargetDir)$(TargetName).lib .
+copy $(TargetDir)$(TargetName)_embarcadero.lib .</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">
