@@ -227,7 +227,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;USE_DTWAIN_DEBUG_LIB;_DEBUG;_UNICODE;_SCL_SECURE_NO_WARNINGS;DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;%(PreprocessorDefinitions);FREEIMAGE_CPP_LIB;DTWAIN_DEBUG;BUILDING_DTWAINDLL;DTWAIN_DLL</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
@@ -255,7 +255,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/fixed:no %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;vfw32.lib;%(AdditionalDependencies);FreeImageLib.lib;cryptlib.lib</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;vfw32.lib;%(AdditionalDependencies);FreeImageLib.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)ud$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\def\dtwain32_u_d.def</ModuleDefinitionFile>
@@ -269,7 +269,7 @@
       <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
-      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_32);$(BOOST_LIBRARY_DIR_V142_32);$(BOOST_LIBRARY_DIR_V141_32);$(BOOST_LIBRARY_DIR_V140_32);.\FreeImage\Source\FreeImageLib\$(Platform)\DebugU;$(SolutionDir)cryptolib\$(PlatformTarget)\DebugU</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_32);$(BOOST_LIBRARY_DIR_V142_32);$(BOOST_LIBRARY_DIR_V141_32);$(BOOST_LIBRARY_DIR_V140_32);.\FreeImage\Source\FreeImageLib\$(Platform)\DebugU</AdditionalLibraryDirectories>
       <FullProgramDatabaseFile>true</FullProgramDatabaseFile>
       <AssemblyDebug>true</AssemblyDebug>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
@@ -358,7 +358,8 @@ cd $(SolutionDir)
 cd ..
 md demos\libs\$(PlatformArchitecture)bit
 cd demos\libs\$(PlatformArchitecture)bit
-copy $(TargetDir)$(TargetName).lib .</Command>
+copy $(TargetDir)$(TargetName).lib .
+copy $(TargetDir)$(TargetName)_embarcadero.lib .</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">
@@ -379,7 +380,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile>
       <Optimization>MinSpace</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;FREEIMAGE_CPP_LIB;_UNICODE;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL;DTWAIN_NO_LOGGING</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
@@ -406,7 +407,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/fixed:no %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;vfw32.lib;%(AdditionalDependencies);FreeImageLib.lib;cryptlib.lib</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;vfw32.lib;%(AdditionalDependencies);FreeImageLib.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)u$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\def\dtwain32_u.def</ModuleDefinitionFile>
@@ -420,7 +421,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
-      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_32);$(BOOST_LIBRARY_DIR_V142_32);$(BOOST_LIBRARY_DIR_V141_32);$(BOOST_LIBRARY_DIR_V140_32);.\FreeImage\Source\FreeImageLib\Win32\ReleaseU;$(SolutionDir)cryptolib\$(PlatformTarget)\ReleaseU</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_32);$(BOOST_LIBRARY_DIR_V142_32);$(BOOST_LIBRARY_DIR_V141_32);$(BOOST_LIBRARY_DIR_V140_32);.\FreeImage\Source\FreeImageLib\Win32\ReleaseU</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
@@ -507,7 +508,8 @@ cd $(SolutionDir)
 cd ..
 md demos\libs\$(PlatformArchitecture)bit
 cd demos\libs\$(PlatformArchitecture)bit
-copy $(TargetDir)$(TargetName).lib .</Command>
+copy $(TargetDir)$(TargetName).lib .
+copy $(TargetDir)$(TargetName)_embarcadero.lib .</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">
@@ -528,7 +530,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile>
       <Optimization>MinSpace</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
@@ -555,7 +557,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/fixed:no %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;vfw32.lib;%(AdditionalDependencies);FreeImageLib.lib;cryptlib.lib</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;vfw32.lib;%(AdditionalDependencies);FreeImageLib.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\def\dtwain32.def</ModuleDefinitionFile>
@@ -569,7 +571,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
-      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_32);$(BOOST_LIBRARY_DIR_V142_32);$(BOOST_LIBRARY_DIR_V141_32);$(BOOST_LIBRARY_DIR_V140_32);.\FreeImage\Source\FreeImageLib\Win32\Release;$(SolutionDir)cryptolib\$(PlatformTarget)\Release</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_32);$(BOOST_LIBRARY_DIR_V142_32);$(BOOST_LIBRARY_DIR_V141_32);$(BOOST_LIBRARY_DIR_V140_32);.\FreeImage\Source\FreeImageLib\Win32\Release</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
@@ -660,7 +662,8 @@ cd $(SolutionDir)
 cd ..
 md demos\libs\$(PlatformArchitecture)bit
 cd demos\libs\$(PlatformArchitecture)bit
-copy $(TargetDir)$(TargetName).lib .</Command>
+copy $(TargetDir)$(TargetName).lib .
+copy $(TargetDir)$(TargetName)_embarcadero.lib .</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">
@@ -681,7 +684,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;USE_DTWAIN_DEBUG_LIB;_DEBUG;FREEIMAGE_CPP_LIB;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;_SCL_SECURE_NO_WARNINGS;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
@@ -709,7 +712,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/fixed:no %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;vfw32.lib;FreeImageLib.lib;cryptlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;vfw32.lib;FreeImageLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)d$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\def\dtwain32_d.def</ModuleDefinitionFile>
@@ -723,7 +726,7 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
-      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_32);$(BOOST_LIBRARY_DIR_V142_32);$(BOOST_LIBRARY_DIR_V141_32);$(BOOST_LIBRARY_DIR_V140_32);.\FreeImage\Source\FreeImageLib\Win32\Debug;$(SolutionDir)cryptolib\$(PlatformTarget)\Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_32);$(BOOST_LIBRARY_DIR_V142_32);$(BOOST_LIBRARY_DIR_V141_32);$(BOOST_LIBRARY_DIR_V140_32);.\FreeImage\Source\FreeImageLib\Win32\Debug</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
@@ -810,12 +813,13 @@ cd $(SolutionDir)
 cd ..
 md demos\libs\$(PlatformArchitecture)bit
 cd demos\libs\$(PlatformArchitecture)bit
-copy $(TargetDir)$(TargetName).lib .</Command>
+copy $(TargetDir)$(TargetName).lib .
+copy $(TargetDir)$(TargetName)_embarcadero.lib .</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;USE_DTWAIN_DEBUG_LIB;_DEBUG;FREEIMAGE_CPP_LIB;_UNICODE;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
@@ -836,10 +840,10 @@ copy $(TargetDir)$(TargetName).lib .</Command>
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
       <ModuleDefinitionFile>.\def\dtwain64_u_d.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_64);$(BOOST_LIBRARY_DIR_V142_64);$(BOOST_LIBRARY_DIR_V141_64);$(BOOST_LIBRARY_DIR_V140_64);.\FreeImage\Source\FreeImageLib\$(PlatformTarget)\DebugU;$(SolutionDir)cryptolib\$(PlatformTarget)\DebugU</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_64);$(BOOST_LIBRARY_DIR_V142_64);$(BOOST_LIBRARY_DIR_V141_64);$(BOOST_LIBRARY_DIR_V140_64);.\FreeImage\Source\FreeImageLib\$(PlatformTarget)\DebugU</AdditionalLibraryDirectories>
       <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)ud$(TargetExt)</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);FreeImageLib.lib;cryptlib.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);FreeImageLib.lib</AdditionalDependencies>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <ResourceCompile>
@@ -937,10 +941,10 @@ copy $(TargetDir)$(TargetName).lib .
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>MinSpace</Optimization>
-      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;FREEIMAGE_CPP_LIB;_UNICODE;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;FREEIMAGE_CPP_LIB;_UNICODE;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;NDEBUG;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
@@ -957,10 +961,10 @@ copy $(TargetDir)$(TargetName).lib .
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
       <ModuleDefinitionFile>.\def\dtwain64_u.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_64);$(BOOST_LIBRARY_DIR_V142_64);$(BOOST_LIBRARY_DIR_V141_64);$(BOOST_LIBRARY_DIR_V140_64);.\FreeImage\Source\FreeImageLib\$(PlatformTarget)\ReleaseU;$(SolutionDir)cryptolib\$(PlatformTarget)\ReleaseU</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_64);$(BOOST_LIBRARY_DIR_V142_64);$(BOOST_LIBRARY_DIR_V141_64);$(BOOST_LIBRARY_DIR_V140_64);.\FreeImage\Source\FreeImageLib\$(PlatformTarget)\ReleaseU</AdditionalLibraryDirectories>
       <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)u$(TargetExt)</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);FreeImageLib.lib;cryptlib.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);FreeImageLib.lib</AdditionalDependencies>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <ResourceCompile>
@@ -1058,10 +1062,10 @@ copy $(TargetDir)$(TargetName).lib .
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>MinSpace</Optimization>
-      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;FREEIMAGE_CPP_LIB;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;_DEBUGNDEBUG;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL;DTWAIN_NO_LOGGING</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;FREEIMAGE_CPP_LIB;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;_DEBUGNDEBUG;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL;DTWAIN_NO_LOGGING</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
@@ -1078,10 +1082,10 @@ copy $(TargetDir)$(TargetName).lib .
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
       <ModuleDefinitionFile>.\def\dtwain64.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_64);$(BOOST_LIBRARY_DIR_V142_64);$(BOOST_LIBRARY_DIR_V141_64);$(BOOST_LIBRARY_DIR_V140_64);.\FreeImage\Source\FreeImageLib\x64\Release;$(SolutionDir)cryptolib\$(PlatformTarget)\Release</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_64);$(BOOST_LIBRARY_DIR_V142_64);$(BOOST_LIBRARY_DIR_V141_64);$(BOOST_LIBRARY_DIR_V140_64);.\FreeImage\Source\FreeImageLib\x64\Release</AdditionalLibraryDirectories>
       <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)$(TargetExt)</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);FreeImageLib.lib;cryptlib.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);FreeImageLib.lib</AdditionalDependencies>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
@@ -1183,10 +1187,10 @@ copy $(TargetDir)$(TargetName).lib .
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\cryptolib;.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\FreeImage\Source\LibJPEG\;.\FreeImage\Source\ZLib\;.\FreeImage\Source\LibTIFF4\;.\FreeImage\Source;.\FreeImage\Wrapper\FreeImagePlus\;.\date-master\include;.\h;.\matrix;$(BOOST_INCLUDE_DIR);.\dtwinver;.\inl;.\crypt;.\cpp\pdflib32;.\h\imagefun;.\h\ImageFun\dtwpdf;.\h\ocrengine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;USE_DTWAIN_DEBUG_LIB;_DEBUG;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;CRYPTOPP_DISABLE_ASM;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINVER=0x0601;_WIN32_WINNT=0x0601;NOMINMAX;USE_DTWAIN_DEBUG_LIB;_DEBUG;FREEIMAGE_CPP_LIB;_SCL_SECURE_NO_WARNINGS;TARGETNAME=$(TargetName);DTWAIN_OPENSOURCE_DISTRIBUTION;BUILDING_JPEG_DLL;WIN64;WIN32;_WINDOWS;STRICT;FUNCTION_MACRO_DEFINED;PDFLIB_INTERNAL;INCLUDE_DTWIMG32;_CRT_SECURE_NO_WARNINGS;DTWAIN_UNLICENSED_DISTRIBUTION_SPECIAL;DTWAIN_DEBUG;BUILDING_DTWAINDLL;%(PreprocessorDefinitions);DTWAIN_DLL</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AssemblerListingLocation>.\obj\$(Configuration)\</AssemblerListingLocation>
       <ObjectFileName>.\obj\$(Configuration)\</ObjectFileName>
@@ -1203,10 +1207,10 @@ copy $(TargetDir)$(TargetName).lib .
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
       <ModuleDefinitionFile>.\def\dtwain64_d.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_64);$(BOOST_LIBRARY_DIR_V142_64);$(BOOST_LIBRARY_DIR_V141_64);$(BOOST_LIBRARY_DIR_V140_64);.\FreeImage\Source\FreeImageLib\x64\Debug;$(SolutionDir)cryptolib\$(PlatformTarget)\Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_LIBRARY_DIR_V143_64);$(BOOST_LIBRARY_DIR_V142_64);$(BOOST_LIBRARY_DIR_V141_64);$(BOOST_LIBRARY_DIR_V140_64);.\FreeImage\Source\FreeImageLib\x64\Debug</AdditionalLibraryDirectories>
       <OutputFile>$(OutDir)dtwain$(PlatformArchitecture)d$(TargetExt)</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);FreeImageLib.lib;cryptlib.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);FreeImageLib.lib</AdditionalDependencies>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <ResourceCompile>
@@ -1616,6 +1620,13 @@ copy $(TargetDir)$(TargetName).lib .
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="hashlib\crc32.cpp" />
+    <ClCompile Include="hashlib\digest.cpp" />
+    <ClCompile Include="hashlib\keccak.cpp" />
+    <ClCompile Include="hashlib\md5.cpp" />
+    <ClCompile Include="hashlib\sha1.cpp" />
+    <ClCompile Include="hashlib\sha256.cpp" />
+    <ClCompile Include="hashlib\sha3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include=".\h\ctltr040.h" />
@@ -1699,6 +1710,14 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="cximage\ximage.h" />
     <ClInclude Include="FreeImage\Source\FreeImage.h" />
     <ClInclude Include="FreeImage\Wrapper\FreeImagePlus\FreeImagePlus.h" />
+    <ClInclude Include="hashlib\crc32.h" />
+    <ClInclude Include="hashlib\hash.h" />
+    <ClInclude Include="hashlib\hmac.h" />
+    <ClInclude Include="hashlib\keccak.h" />
+    <ClInclude Include="hashlib\md5.h" />
+    <ClInclude Include="hashlib\sha1.h" />
+    <ClInclude Include="hashlib\sha256.h" />
+    <ClInclude Include="hashlib\sha3.h" />
     <ClInclude Include="h\ansiwideconverter_generic.h" />
     <ClInclude Include="h\ansiwideconverter_win32.h" />
     <ClInclude Include="h\arrayfactory.h" />

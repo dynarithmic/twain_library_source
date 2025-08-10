@@ -267,6 +267,24 @@ struct CameraStruct {
     TW_UINT16 CameraType;
 };
 
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCamerasEx2(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    DTWAIN_ARRAY arr = {};
+    DTWAIN_EnumCameras(Source, &arr);
+    LOG_FUNC_EXIT_NONAME_PARAMS(arr)
+    CATCH_BLOCK_LOG_PARAMS((DTWAIN_ARRAY)NULL)
+}
+
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCamerasEx3(DTWAIN_SOURCE Source, LONG nWhichCamera)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, nWhichCamera))
+    DTWAIN_ARRAY arr = {};
+    DTWAIN_EnumCamerasEx(Source, nWhichCamera, &arr);
+    LOG_FUNC_EXIT_NONAME_PARAMS(arr)
+    CATCH_BLOCK_LOG_PARAMS((DTWAIN_ARRAY)NULL)
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCamerasEx(DTWAIN_SOURCE Source, LONG nWhichCamera, LPDTWAIN_ARRAY Cameras)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nWhichCamera, Cameras))
@@ -279,12 +297,30 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCamerasEx(DTWAIN_SOURCE Source, LONG nWhichC
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumTopCamerasEx(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    DTWAIN_ARRAY Cameras = {};
+    DTWAIN_EnumTopCameras(Source, &Cameras);
+    LOG_FUNC_EXIT_NONAME_PARAMS(Cameras)
+    CATCH_BLOCK((DTWAIN_ARRAY)NULL)
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumTopCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Cameras))
     auto retval = DTWAIN_EnumCamerasEx(Source, DTWAIN_FT_CAMERATOP, Cameras);
     LOG_FUNC_EXIT_NONAME_PARAMS(retval)
     CATCH_BLOCK(false)
+}
+
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumBottomCamerasEx(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    DTWAIN_ARRAY Cameras = {};
+    DTWAIN_EnumBottomCameras(Source, &Cameras);
+    LOG_FUNC_EXIT_NONAME_PARAMS(Cameras)
+    CATCH_BLOCK((DTWAIN_ARRAY)NULL)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumBottomCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras)

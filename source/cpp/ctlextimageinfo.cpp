@@ -111,6 +111,15 @@ static constexpr std::array<TW_UINT16, 81> aRequiredTypeMatches = {TWEI_BARCODEC
                                                                    TWEI_BARCODETEXT2,
                                                                    TWEI_PATCHCODE };
 
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSupportedExtImageInfoEx(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    DTWAIN_ARRAY arr = {};
+    DTWAIN_EnumSupportedExtImageInfo(Source, &arr);
+    LOG_FUNC_EXIT_NONAME_PARAMS(arr)
+    CATCH_BLOCK((DTWAIN_ARRAY)NULL)
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedExtImageInfo(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Array))
@@ -163,6 +172,16 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedExtImageInfo(DTWAIN_SOURCE Source, 
  //  If you want to know the ext image types outside of state 7, you must call
  //  DTWAIN_EnumSupportedExtImageInfo() on a source that supports the ICAP_SUPPORTEDEXTIMAGEINFO
  //  capability.
+
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypesEx(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    DTWAIN_ARRAY arr = {};
+    DTWAIN_EnumExtImageInfoTypes(Source, &arr);
+    LOG_FUNC_EXIT_NONAME_PARAMS(arr)
+    CATCH_BLOCK((DTWAIN_ARRAY)NULL)
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Array))

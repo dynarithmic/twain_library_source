@@ -59,13 +59,16 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFProducer(DTWAIN_SOURCE Source, LPCTSTR lpP
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFEncryption(DTWAIN_SOURCE Source, DTWAIN_BOOL bUseEncryption,
                                                  LPCTSTR lpszUser, LPCTSTR lpszOwner,
-                                                 LONG Permissions, DTWAIN_BOOL UseStrongEncryption)
+                                                 DWORD Permissions, DTWAIN_BOOL UseStrongEncryption)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, bUseEncryption, lpszUser, lpszOwner, Permissions, UseStrongEncryption))
     auto [pHandle, pSource] = VerifyHandles(Source);
     const CTL_StringType owner = lpszOwner?lpszOwner:_T("");
     const CTL_StringType user = lpszUser?lpszUser:_T("");
 
+    // Even though the Permissions parameter is an unsigned 32-bit value from the user, 
+    // this will be "converted" to a 32-bit signed integer internally, which is what the PDF 
+    // specification requires.
     pSource->SetPDFEncryption(bUseEncryption?true:false, user, owner, Permissions, UseStrongEncryption?true:false);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
@@ -248,7 +251,7 @@ LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontName(LONG FontVal, LPTSTR szFont, LONG n
     CATCH_BLOCK(-1)
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextEx(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement, LONG Flags)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextEx(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement, DWORD Flags)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, TextElement))
     VerifyHandles(Source);
@@ -275,7 +278,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFText(DTWAIN_SOURCE Source,
                                                  LPCTSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB,
                                                  LONG renderMode, DTWAIN_FLOAT scaling,
                                                  DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing,
-                                                 LONG strokeWidth, LONG Flags)
+                                                 LONG strokeWidth, DWORD Flags)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, szText, xPos, yPos, fontName, fontSize, colorRGB,
                                                renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags))
@@ -286,7 +289,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFText(DTWAIN_SOURCE Source,
         int DefaultValue;
         LONG pSource;
         int *pDestination;
-        LONG flagValue;
+        DWORD flagValue;
     };
 
     struct DefaultValSetterDOUBLE
@@ -295,7 +298,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFText(DTWAIN_SOURCE Source,
         double DefaultValue;
         double pSource;
         double *pDestination;
-        LONG flagValue;
+        DWORD flagValue;
     };
 
     PDFTextElement element;
@@ -306,7 +309,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFText(DTWAIN_SOURCE Source,
                         {riseValue, 0 , riseValue, &element.riseValue,1},
                         {DTWAIN_DEFAULT, 1 , strokeWidth, &element.strokeWidth,DTWAIN_PDFTEXT_NOSTROKEWIDTH},
                         {DTWAIN_DEFAULT, 0 , colorRGB, &element.colorRGB, DTWAIN_PDFTEXT_NORGBCOLOR},
-                        {Flags, static_cast<int>(Flags), Flags, &element.displayFlags, 1}
+                        {static_cast<LONG>(Flags), static_cast<int>(Flags), static_cast<LONG>(Flags), &element.displayFlags, 1}
                      };
 
    const DefaultValSetterDOUBLE defValsDOUBLE[] = {

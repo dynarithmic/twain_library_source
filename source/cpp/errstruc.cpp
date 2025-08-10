@@ -135,7 +135,7 @@ void CTL_ErrorStructDecoder::StartDecoder(pTW_IDENTITY pSource, pTW_IDENTITY pDe
     std::string pMemRefStr;
 
     // Decode the pSource argument
-    long lErrorFilter = CTL_StaticData::GetErrorFilterFlags();
+    auto lErrorFilter = CTL_StaticData::GetErrorFilterFlags();
     if ( nDG == DG_CONTROL && nDAT == DAT_EVENT && nMSG == MSG_PROCESSEVENT )
     {
         if (!(lErrorFilter & DTWAIN_LOG_DECODE_TWEVENT) )
@@ -271,7 +271,7 @@ std::string DecodeData(CTL_ErrorStructDecoder* pDecoder, TW_MEMREF pData, ErrorS
 
             case ERRSTRUCT_TW_EVENT:
             {
-                LONG lErrorFlags = CTL_StaticData::GetErrorFilterFlags();
+                auto lErrorFlags = CTL_StaticData::GetErrorFilterFlags();
                 if ( lErrorFlags & DTWAIN_LOG_DECODE_TWEVENT )
                 {
                     auto p = static_cast<pTW_EVENT>(pData);
