@@ -1112,5 +1112,13 @@ DTWAIN_ArrayAddFloatStringN                       @31115
 DTWAIN_ArrayGetCapValues                          @31116
 DTWAIN_ArrayGetCapValuesEx                        @31117
 DTWAIN_ArrayGetCapValuesEx2                       @31118
-
-
+DTWAIN_EnumPixelTypesEx                           @31119
+DTWAIN_RangeExpandEx                              @31120
+DTWAIN_EnumSupportedExtImageInfoEx                @31121
+DTWAIN_EnumExtImageInfoTypesEx                    @31122
+DTWAIN_EnumCamerasEx2                             @31123
+DTWAIN_EnumCamerasEx3                             @31124
+DTWAIN_EnumTopCamerasEx                           @31125
+DTWAIN_EnumBottomCamerasEx                        @31126
+DTWAIN_AddFileToAppend                            @31127
+DTWAIN_IsDoublePageCountOnDuplex                  @31128

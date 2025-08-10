@@ -135,7 +135,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddFileToAppendA(LPCSTR szFile)
 #endif
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextW(DTWAIN_SOURCE Source, LPCWSTR szText, LONG xPos, LONG yPos, LPCWSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, LONG strokeWidth, LONG Flags)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextW(DTWAIN_SOURCE Source, LPCWSTR szText, LONG xPos, LONG yPos, LPCWSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, LONG strokeWidth, DWORD Flags)
 {
 #ifdef _UNICODE
     return DTWAIN_AddPDFText(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
@@ -144,7 +144,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextW(DTWAIN_SOURCE Source, LPCWSTR szText
 #endif
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, LONG strokeWidth, LONG Flags)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, LONG strokeWidth, DWORD Flags)
 {
 #ifdef _UNICODE
     return DTWAIN_AddPDFText(Source, StringConversion::Convert_AnsiPtr_To_Native(szText).c_str(), xPos, yPos, StringConversion::Convert_AnsiPtr_To_Native(fontName).c_str(), fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
@@ -2066,7 +2066,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFCreatorA(DTWAIN_SOURCE Source, LPCSTR lpCr
 #endif
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFEncryptionW(DTWAIN_SOURCE Source, DTWAIN_BOOL bUseEncryption, LPCWSTR lpszUser, LPCWSTR lpszOwner, LONG Permissions, DTWAIN_BOOL UseStrongEncryption)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFEncryptionW(DTWAIN_SOURCE Source, DTWAIN_BOOL bUseEncryption, LPCWSTR lpszUser, LPCWSTR lpszOwner, DWORD Permissions, DTWAIN_BOOL UseStrongEncryption)
 {
 #ifdef _UNICODE
     return DTWAIN_SetPDFEncryption(Source, bUseEncryption, lpszUser, lpszOwner, Permissions, UseStrongEncryption);
@@ -2075,7 +2075,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFEncryptionW(DTWAIN_SOURCE Source, DTWAIN_B
 #endif
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFEncryptionA(DTWAIN_SOURCE Source, DTWAIN_BOOL bUseEncryption, LPCSTR lpszUser, LPCSTR lpszOwner, LONG Permissions, DTWAIN_BOOL UseStrongEncryption)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFEncryptionA(DTWAIN_SOURCE Source, DTWAIN_BOOL bUseEncryption, LPCSTR lpszUser, LPCSTR lpszOwner, DWORD Permissions, DTWAIN_BOOL UseStrongEncryption)
 {
 #ifdef _UNICODE
     return DTWAIN_SetPDFEncryption(Source, bUseEncryption, StringConversion::Convert_AnsiPtr_To_Native(lpszUser).c_str(), StringConversion::Convert_AnsiPtr_To_Native(lpszOwner).c_str(), Permissions, UseStrongEncryption);
@@ -2374,7 +2374,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetThresholdStringW(DTWAIN_SOURCE Source, LPCWST
 #endif
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLogA(LONG LogFlags, LPCSTR lpszLogFile)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLogA(DWORD LogFlags, LPCSTR lpszLogFile)
 {
 #ifdef _UNICODE
     return DTWAIN_SetTwainLog(LogFlags, StringConversion::Convert_AnsiPtr_To_Native(lpszLogFile).c_str());
@@ -2383,7 +2383,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLogA(LONG LogFlags, LPCSTR lpszLogFile)
 #endif
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLogW(LONG LogFlags, LPCWSTR lpszLogFile)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainLogW(DWORD LogFlags, LPCWSTR lpszLogFile)
 {
 #ifdef _UNICODE
     return DTWAIN_SetTwainLog(LogFlags, lpszLogFile);
