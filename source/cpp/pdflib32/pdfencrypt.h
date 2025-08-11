@@ -24,7 +24,7 @@ OF THIRD PARTY RIGHTS.
 #include <string>
 
 #ifdef DTWAIN_SUPPORT_AES
-    #include "aes.h"
+    #include "..\aeslib\AES_128_CBC.h"
 #endif
 //#include "..\cryptolib\md5.h"
 //#include "..\cryptolib\aes.h"
@@ -129,7 +129,7 @@ class PDFEncryptionAES: public PDFEncryption
     protected:
         UCHARArray GetExtendedKey(int number, int generation);
     private:
-        unsigned char m_ivValue[CryptoPP::AES::BLOCKSIZE];
+        unsigned char m_ivValue[AES_KEY_SIZE];
     public:
         void Encrypt(const std::string& dataIn, std::string& dataOut) override;
         void Encrypt(char *dataIn, int len) override;

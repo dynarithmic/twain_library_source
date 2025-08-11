@@ -80,6 +80,7 @@ namespace dynarithmic
             void SetObjectNum(int nNum) { m_nObjNum = nNum; }
 
             std::string GetContents() const { return Contents; }
+            std::string& GetContentsRef() { return Contents; }
             void SetContents(const std::string& s) {Contents = s; }
             void AppendContents(const std::string& s) {Contents += s; }
             void WriteRaw(const char *pBuffer, size_t nLength)
@@ -427,6 +428,7 @@ namespace dynarithmic
         protected:
             bool WriteHeaderInfo();
             bool WriteObject(PDFObject* pObj);
+            void UpdateLength(std::string& strWithLength, int newLength);
             std::string GetBinaryHeader() const;
             void SortObjects();
     //        bool IsTextElementOnPage(unsigned int tElement) const;
