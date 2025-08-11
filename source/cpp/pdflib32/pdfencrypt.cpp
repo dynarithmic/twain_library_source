@@ -25,6 +25,7 @@ OF THIRD PARTY RIGHTS.
 #include <sstream>
 #include <string>
 #include <vector>
+#include <random>
 #undef min
 #undef max
 #include "pdfencrypt.h"
@@ -112,9 +113,12 @@ class ARCFOUREncryption
         public:
             IVGenerator()
             {
-                const std::string time = "01234567890123";
+                std::string time = "01234567890123";
                 std::string time2 = "01234567890123";
-                std::reverse(time2.begin(), time2.end());
+                std::random_device rd;
+                std::mt19937 g(rd());
+                std::shuffle(time.begin(), time.end(), g);
+                std::shuffle(time2.begin(), time2.end(), g);
                 std::string revTime = time + "+" + time2;
                 arcfour.prepareARCFOURKey(PDFEncryption::UCHARArray(revTime.begin(), revTime.end()));
             }
@@ -521,21 +525,21 @@ void PDFEncryptionAES::Encrypt(const std::string& dataIn, std::string& dataOut)
     AES_CTX ctx;
     AES128::AES_EncryptInit(&ctx, key.data(), m_ivValue);
 
-    size_t num16chunks = numBytes / 16 + 1;
-    if (numBytes > 0 && numBytes % 16 == 0)
-        --num16chunks;
+    size_t numchunks = numBytes / AES_BLOCK_SIZE + 1;
+    if (numBytes > 0 && numBytes % AES_BLOCK_SIZE == 0)
+        --numchunks;
     dataOut.clear();
 
     int start = 0;
     size_t totalBytes = numBytes;
-    for (size_t i = 0; i < num16chunks; ++i)
+    for (size_t i = 0; i < numchunks; ++i)
     {
-        uint8_t oneChunk[16] = {};
-        memcpy(oneChunk, dataIn.data() + start, std::min(totalBytes, static_cast<size_t>(16)));
+        uint8_t oneChunk[AES_BLOCK_SIZE] = {};
+        memcpy(oneChunk, dataIn.data() + start, std::min(totalBytes, static_cast<size_t>(AES_BLOCK_SIZE)));
         AES128::AES_Encrypt(&ctx, oneChunk, oneChunk);
         std::copy_n(oneChunk, AES_BLOCK_SIZE, std::back_inserter(dataOut));
-        start += 16;
-        totalBytes -= 16;
+        start += AES_BLOCK_SIZE;
+        totalBytes -= AES_BLOCK_SIZE;
     }
 
     // Place the iv as the first 16 bytes
