@@ -14,6 +14,11 @@ DTWAIN Version changes
 
   will allow all operations on the encrypted PDF except for copying (copying will be disabled).
 
+- Added AES-128 bit encryption option when creating encrypted PDF files.  To enable this option, the
+  DTWAIN_SetPDFAESEncryption() function must be called with the second argument as TRUE.  
+  Note that you will still need to call DTWAIN_SetPDFEncryption() to set up the initial encryption 
+  options (user/owner password, permissions, etc.)
+
 - Added the following functions that return DTWAIN_ARRAYs, rather than the user having to supply a pointer
   to the DTWAIN_ARRAY as a parameter.  A table of the new functions and the equivalent functions is as follows
 
