@@ -1451,6 +1451,7 @@ copy $(TargetDir)$(TargetName).lib .
     </ClCompile>
     <ClCompile Include=".\cpp\imagefun\dtwpdf\dtwtiff2ps.cpp">
     </ClCompile>
+    <ClCompile Include="aeslib\AES_128_CBC.cpp" />
     <ClCompile Include="cpp\arrayfactory.cpp" />
     <ClCompile Include="cpp\ctlacquireaudio.cpp" />
     <ClCompile Include="cpp\ctlarraydumper.cpp" />

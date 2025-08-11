@@ -634,6 +634,9 @@
     <ClCompile Include="hashlib\sha256.cpp">
       <Filter>Hashing Library</Filter>
     </ClCompile>
+    <ClCompile Include="aeslib\AES_128_CBC.cpp">
+      <Filter>AES Encryption</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp\pdflib32\a85encode.h">
