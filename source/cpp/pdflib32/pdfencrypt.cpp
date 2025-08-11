@@ -509,18 +509,37 @@ void PDFEncryptionAES::PrepareKey()
 {
     PrepareRC4Key(key, 0, keySize);
     IVGenerator iv;
-    PDFEncryption::UCHARArray arr = iv.getIV(CryptoPP::AES::BLOCKSIZE);
-    memcpy(m_ivValue, &arr[0], CryptoPP::AES::BLOCKSIZE);
+    PDFEncryption::UCHARArray arr = iv.getIV(AES_BLOCK_SIZE);
+    memcpy(m_ivValue, &arr[0], AES_BLOCK_SIZE);
 }
 
 // save encrypted data to new string
 void PDFEncryptionAES::Encrypt(const std::string& dataIn, std::string& dataOut)
 {
-    CryptoPP::AES::Encryption aesEncryption(&key[0], CryptoPP::AES::DEFAULT_KEYLENGTH);
-    CryptoPP::CBC_Mode_ExternalCipher::Encryption cbcEncryption(aesEncryption, m_ivValue);
-    CryptoPP::StreamTransformationFilter stfEncryptor(cbcEncryption, new CryptoPP::StringSink(dataOut));
-    stfEncryptor.Put(reinterpret_cast<const unsigned char*>(dataIn.c_str()), dataIn.length() + 1);
-    stfEncryptor.MessageEnd();
+    auto numBytes = dataIn.size();
+
+    AES_CTX ctx;
+    AES128::AES_EncryptInit(&ctx, key.data(), m_ivValue);
+
+    size_t num16chunks = numBytes / 16 + 1;
+    if (numBytes > 0 && numBytes % 16 == 0)
+        --num16chunks;
+    dataOut.clear();
+
+    int start = 0;
+    size_t totalBytes = numBytes;
+    for (size_t i = 0; i < num16chunks; ++i)
+    {
+        uint8_t oneChunk[16] = {};
+        memcpy(oneChunk, dataIn.data() + start, std::min(totalBytes, static_cast<size_t>(16)));
+        AES128::AES_Encrypt(&ctx, oneChunk, oneChunk);
+        std::copy_n(oneChunk, AES_BLOCK_SIZE, std::back_inserter(dataOut));
+        start += 16;
+        totalBytes -= 16;
+    }
+
+    // Place the iv as the first 16 bytes
+    dataOut.insert(0, (const char *)m_ivValue, AES_KEY_SIZE);
 }
 
 PDFEncryption::UCHARArray PDFEncryptionAES::GetExtendedKey(int number, int generation)

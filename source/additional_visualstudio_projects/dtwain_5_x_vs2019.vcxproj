@@ -1700,6 +1700,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include=".\h\ctltr005.h" />
     <ClInclude Include=".\h\ctltr006.h" />
     <ClInclude Include=".\h\ctltr039.h" />
+    <ClInclude Include="aeslib\AES_128_CBC.h" />
     <ClInclude Include="cpp\pdflib32\a85encode.h" />
     <ClInclude Include="cpp\pdflib32\ahexencode.h" />
     <ClInclude Include="cpp\pdflib32\flateencode.h" />
