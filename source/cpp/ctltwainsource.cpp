@@ -906,6 +906,8 @@ void CTL_ITwainSource::SetPDFValue(const CTL_StringType& nWhich, LONG nValue)
     if (nWhich == PDFAESKEY )
     {
         m_ImageInfoEx.bIsAESEncrypted = nValue?true:false;
+        if (m_ImageInfoEx.bIsAESEncrypted)
+            m_ImageInfoEx.bUseStrongEncryption = true;
     }
 }
 
