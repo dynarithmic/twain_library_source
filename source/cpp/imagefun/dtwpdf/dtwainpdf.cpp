@@ -2359,7 +2359,7 @@ void PdfDocument::SetEncryption(const CTL_StringType& ownerPassword,
     m_EncryptionPassword[OWNER_PASSWORD] = StringConversion::Convert_Native_To_Ansi(ownerPassword);
     m_EncryptionPassword[USER_PASSWORD] = StringConversion::Convert_Native_To_Ansi(userPassword);
     m_nPermissions = permissions;
-    m_bIsStrongEncryption = bIsStrongEncryption;
+    m_bIsStrongEncryption = bIsStrongEncryption || isAESEncryoted;
     m_bIsAESEncrypted = isAESEncryoted;
 
     // set the encryption to AES
@@ -2379,6 +2379,6 @@ void PdfDocument::SetEncryption(const CTL_StringType& ownerPassword,
         m_DocumentID[0] = dID;
         m_DocumentID[1] = dID;
 
-        m_Encryption->SetupAllKeys(m_DocumentID[0], m_EncryptionPassword[USER_PASSWORD], m_EncryptionPassword[OWNER_PASSWORD], permissions, bIsStrongEncryption);
+        m_Encryption->SetupAllKeys(m_DocumentID[0], m_EncryptionPassword[USER_PASSWORD], m_EncryptionPassword[OWNER_PASSWORD], permissions, m_bIsStrongEncryption);
     m_bIsEncrypted = true;
 }
