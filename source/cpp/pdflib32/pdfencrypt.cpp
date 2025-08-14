@@ -215,7 +215,7 @@ void PDFEncryption::SetupAllKeys(const std::string& DocID,
     // 
     // For 40-bit encryption strength, bits 8 through 11 of the 
     // permissions value are unused, so just set them to 1.
-    // For 128-bit encryption strength, leave those bits alone
+    // For 128-bit encryption strength or greater, leave those bits alone
     permissionsParam |= strength128Bits ? 0xfffff0c0 : 0xffffffc0;
     permissionsParam &= 0xfffffffc;
 

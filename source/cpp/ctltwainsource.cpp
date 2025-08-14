@@ -940,10 +940,14 @@ void CTL_ITwainSource::SetPDFEncryption(bool bIsEncrypted,
         SetPDFValue(PDFOWNERPASSKEY, strOwnerPassword);
         SetPDFValue(PDFPERMISSIONSKEY, Permissions);
         m_ImageInfoEx.bUseStrongEncryption = bUseStrongEncryption?true:false;
+        m_ImageInfoEx.nPDFKeyLength = bUseStrongEncryption?16:5; // This will be multiplied by 8
         m_ImageInfoEx.bIsPDFEncrypted = true;
     }
     else
+    {
         m_ImageInfoEx.bIsPDFEncrypted = false;
+        m_ImageInfoEx.nPDFKeyLength = 5;
+    }
 }
 
 void CTL_ITwainSource::ClearPDFText()

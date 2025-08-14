@@ -83,6 +83,7 @@ namespace dynarithmic
         bool bIsPDFEncrypted;
         bool bIsAESEncrypted;
         bool bUseStrongEncryption;
+        int  nPDFKeyLength;
         bool PDFUseASCIICompression;
         bool PDFUseNoCompression;
         LONG PDFPermissions;
@@ -136,6 +137,7 @@ namespace dynarithmic
             PDFScaleType(DTWAIN_PDF_FITPAGE),
             bIsPDFEncrypted(false),
             bIsAESEncrypted(false),
+            nPDFKeyLength(5),
             bUseStrongEncryption(false),
             PDFUseASCIICompression(false),
             PDFUseNoCompression(false),

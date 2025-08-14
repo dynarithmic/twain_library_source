@@ -141,12 +141,16 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
         // Test the encryption here
         if ( pPDFInfo->ImageInfoEx.bIsPDFEncrypted)
         {
+            if (imageinfo.bUseStrongEncryption || imageinfo.bIsAESEncrypted)
+                imageinfo.nPDFKeyLength = 16;
+
             pPDFInfo->m_Interface->DTWLIB_PDFSetEncryption(pDocument,
                                                             imageinfo.PDFOwnerPassword.c_str(),
                                                             imageinfo.PDFUserPassword.c_str(),
                                                             imageinfo.PDFPermissions,
                                                             imageinfo.bUseStrongEncryption?TRUE:false,
-                                                            imageinfo.bIsAESEncrypted?TRUE:FALSE);
+                                                            imageinfo.bIsAESEncrypted?TRUE:FALSE,
+                                                            imageinfo.nPDFKeyLength);
         }
 
         pPDFInfo->IsPDFStarted = true;
