@@ -429,7 +429,7 @@ namespace dynarithmic
         protected:
             bool WriteHeaderInfo();
             bool WriteObject(PDFObject* pObj);
-            void UpdateLength(std::string& strWithLength, int newLength);
+            void UpdateLength(std::string& strWithLength, size_t newLength);
             std::string GetBinaryHeader() const;
             void SortObjects();
     //        bool IsTextElementOnPage(unsigned int tElement) const;

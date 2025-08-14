@@ -750,7 +750,7 @@ unsigned int PdfDocument::GetMaxFontRefNumber() const
     return it->second.refNum;
 }
 
-void PdfDocument::UpdateLength(std::string& strWithLength, int newLength)
+void PdfDocument::UpdateLength(std::string& strWithLength, size_t newLength)
 {
     // We really look for 0x1, since that is the place holder for the Length
     auto nPos = strWithLength.find_first_of(1);
