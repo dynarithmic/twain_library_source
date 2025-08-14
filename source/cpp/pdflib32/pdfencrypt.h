@@ -47,22 +47,26 @@ class PDFEncryption
 
         /** The encryption key for a particular object/generation */
         UCHARArray key;
-        /** The encryption key length for a particular object/generation */
-        int keySize;
+
+        /** The total encryption key length (keylength + 5) for a particular object/generation */
+        uint32_t m_nKeySize;
+
+        /** The key length for a particular object/generation */
+        uint32_t m_nActualKeyLength;
 
         /** The global encryption key */
-        UCHARArray mkey;
+        UCHARArray m_EncryptionKey;
 
         /** Alternate message digest */
         //CMD5Checksum MD5Alternate;
 
         /** The encryption key for the owner */
-        UCHARArray ownerKey;
+        UCHARArray m_nOwnerKey;
 
         /** The encryption key for the user */
-        UCHARArray userKey;
+        UCHARArray m_nUserKey;
 
-        int permissions;
+        int m_nPermissions;
 
         std::string m_documentID;
 
@@ -97,7 +101,8 @@ class PDFEncryption
                           const std::string& userPassword,
                           const std::string& ownerPassword, int permissions,
                           bool strength128Bits);
-
+        void SetKeyLength(uint32_t keyLength) { m_nActualKeyLength = keyLength; }
+        uint32_t GetKeyLength() const { return m_nActualKeyLength; }
         void SetupAllKeys(const std::string& DocID,
                           const UCHARArray& userPassword, UCHARArray& ownerPassword,
                           int permissions, bool strength128Bits);
@@ -106,10 +111,10 @@ class PDFEncryption
         virtual void Encrypt(const std::string& /*dataIn*/, std::string& /*dataOut*/) {}
         virtual void Encrypt(char * /*dataIn*/, int/* len*/) {}
 
-        UCHARArray& GetUserKey() { return userKey; }
-        UCHARArray& GetOwnerKey() { return ownerKey; }
-        UCHARArray& GetEncryptionKey() { return mkey; }
-        int GetPermissions() const { return permissions; }
+        UCHARArray& GetUserKey() { return m_nUserKey; }
+        UCHARArray& GetOwnerKey() { return m_nOwnerKey; }
+        UCHARArray& GetEncryptionKey() { return m_EncryptionKey; }
+        int GetPermissions() const { return m_nPermissions; }
 };
 
 class PDFEncryptionRC4 : public PDFEncryption
