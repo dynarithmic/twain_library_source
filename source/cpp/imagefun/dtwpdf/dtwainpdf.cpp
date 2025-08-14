@@ -2379,9 +2379,13 @@ void PdfDocument::SetEncryption(const CTL_StringType& ownerPassword,
 
     const std::string s = GetSystemTimeInMilliseconds().substr(0,13) + "+1359064+" + m_sCurSysTime.substr(0,13);
     const std::string dID = CMD5Checksum().GetMD5(reinterpret_cast<const unsigned char*>(s.c_str()), static_cast<UINT>(s.size()));
-        m_DocumentID[0] = dID;
-        m_DocumentID[1] = dID;
+    m_DocumentID[0] = dID;
+    m_DocumentID[1] = dID;
 
-        m_Encryption->SetupAllKeys(m_DocumentID[0], m_EncryptionPassword[USER_PASSWORD], m_EncryptionPassword[OWNER_PASSWORD], permissions, m_bIsStrongEncryption);
+    m_Encryption->SetKeyLength(m_nKeyLength);
+
+    m_Encryption->SetupAllKeys(m_DocumentID[0], m_EncryptionPassword[USER_PASSWORD], 
+                                m_EncryptionPassword[OWNER_PASSWORD], permissions, 
+                                m_bIsStrongEncryption);
     m_bIsEncrypted = true;
 }
