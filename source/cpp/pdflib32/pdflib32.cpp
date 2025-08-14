@@ -130,15 +130,17 @@ namespace dynarithmic
     }
 
     void PDFInterface::DTWLIB_PDFSetEncryption(PdfDocumentPtr pDoc, LPCTSTR szOwnerPass,
-                                LPCTSTR szUserPass, int32_t Permissions,
-                                          bool bUseStrongEncrypt,
-                                          bool bUseAESEncryption)
+                                               LPCTSTR szUserPass, int32_t Permissions,
+                                               bool bUseStrongEncrypt,
+                                               bool bUseAESEncryption,
+                                               uint32_t nKeyLength)
 {
         pDoc->SetEncryption(szOwnerPass ? szOwnerPass : _T(""),
                                                    szUserPass?szUserPass:_T(""),
                                                    Permissions,
                                                    bUseStrongEncrypt,
-                                                   bUseAESEncryption);
+                                                   bUseAESEncryption,
+                                                   nKeyLength);
 }
 
     void PDFInterface::DTWLIB_PDFSetASCIICompression(PdfDocumentPtr pDoc, bool bSetCompression)

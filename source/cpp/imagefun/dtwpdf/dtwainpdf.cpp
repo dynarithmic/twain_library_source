@@ -465,6 +465,7 @@ PdfDocument::PdfDocument() :
     m_bIsEncrypted(false),
     m_bASCIICompression(false),
     m_bIsNoCompression(false),
+    m_nKeyLength(0),
     CurFontRefNum(START_FONTREF_NUM)
 {
     const auto iter = m_mediaMap.find(DTWAIN_FS_USLETTER);
@@ -991,7 +992,7 @@ bool PdfDocument::EndPDFCreation()
         EObject.SetAESEncryption(m_bIsAESEncrypted);
         EObject.AssignParent(this);
         EObject.SetFilter("Standard");
-        EObject.SetLength(m_bIsStrongEncryption?128:40);
+        EObject.SetLength(m_nKeyLength * 8);
         EObject.SetOwnerPassword(m_EncryptionPassword[OWNER_PASSWORD]);
         EObject.SetUserPassword(m_EncryptionPassword[USER_PASSWORD]);
         if (m_bIsAESEncrypted)
@@ -2354,13 +2355,15 @@ void PdfDocument::SetEncryption(const CTL_StringType& ownerPassword,
                                 const CTL_StringType& userPassword,
                                 unsigned int permissions,
                                 bool bIsStrongEncryption,
-                                bool isAESEncryoted)
+                                bool isAESEncrypted,
+                                uint32_t nKeyLength)
 {
     m_EncryptionPassword[OWNER_PASSWORD] = StringConversion::Convert_Native_To_Ansi(ownerPassword);
     m_EncryptionPassword[USER_PASSWORD] = StringConversion::Convert_Native_To_Ansi(userPassword);
     m_nPermissions = permissions;
-    m_bIsStrongEncryption = bIsStrongEncryption || isAESEncryoted;
-    m_bIsAESEncrypted = isAESEncryoted;
+    m_bIsStrongEncryption = bIsStrongEncryption || isAESEncrypted;
+    m_bIsAESEncrypted = isAESEncrypted;
+    m_nKeyLength = nKeyLength;
 
     // set the encryption to AES
     if (m_bIsAESEncrypted)
