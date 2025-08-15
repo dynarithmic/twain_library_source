@@ -416,9 +416,9 @@ void PDFEncryption::SetHashKey(int number, int generation)
     unsigned char tempbuf[MD5::HashBytes];
     md5.getHash(tempbuf);
 
-    key.resize(32);
+    m_LocalKey.resize(32);
 
-    std::copy(tempbuf, tempbuf + MD5::HashBytes, key.begin());
+    std::copy(tempbuf, tempbuf + MD5::HashBytes, m_LocalKey.begin());
 
     m_nKeySize = static_cast<int>(m_EncryptionKey.size()) + 5;
     auto maxKeySize = std::max(16U, m_nActualKeyLength);
@@ -481,7 +481,7 @@ void PDFEncryption::EncryptRC4(UCHARArray& data)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void PDFEncryptionRC4::PrepareKey()
 {
-    PrepareRC4Key(key, 0, m_nKeySize);
+    PrepareRC4Key(m_LocalKey, 0, m_nKeySize);
 }
 
 PDFEncryption::UCHARArray PDFEncryptionRC4::GetExtendedKey(int number, int generation)
@@ -512,7 +512,7 @@ void PDFEncryptionRC4::Encrypt(char *dataIn, int len)
 #ifdef DTWAIN_SUPPORT_AES
 void PDFEncryptionAES::PrepareKey()
 {
-    PrepareRC4Key(key, 0, m_nKeySize);
+    PrepareRC4Key(m_LocalKey, 0, m_nKeySize);
     IVGenerator iv;
     PDFEncryption::UCHARArray arr = iv.getIV(AES_BLOCK_SIZE);
     memcpy(m_ivValue, &arr[0], AES_BLOCK_SIZE);
@@ -521,30 +521,27 @@ void PDFEncryptionAES::PrepareKey()
 // save encrypted data to new string
 void PDFEncryptionAES::Encrypt(const std::string& dataIn, std::string& dataOut)
 {
-    auto numBytes = dataIn.size();
-
-    AES_CTX ctx;
-    AES128::AES_EncryptInit(&ctx, key.data(), m_ivValue);
-
-    size_t numchunks = numBytes / AES_BLOCK_SIZE + 1;
-    if (numBytes > 0 && numBytes % AES_BLOCK_SIZE == 0)
-        --numchunks;
-    dataOut.clear();
-
-    int start = 0;
-    size_t totalBytes = numBytes;
-    for (size_t i = 0; i < numchunks; ++i)
+    switch (m_nKeySize)
     {
-        uint8_t oneChunk[AES_BLOCK_SIZE] = {};
-        memcpy(oneChunk, dataIn.data() + start, std::min(totalBytes, static_cast<size_t>(AES_BLOCK_SIZE)));
-        AES128::AES_Encrypt(&ctx, oneChunk, oneChunk);
-        std::copy_n(oneChunk, AES_BLOCK_SIZE, std::back_inserter(dataOut));
-        start += AES_BLOCK_SIZE;
-        totalBytes -= AES_BLOCK_SIZE;
+        case 16:
+            EncryptAES128(dataIn, dataOut);
+        break;
+        case 32:
+            EncryptAES256(dataIn, dataOut);
+        break;
     }
+}
 
-    // Place the iv as the first 16 bytes
-    dataOut.insert(0, (const char *)m_ivValue, AES_KEY_SIZE);
+void PDFEncryptionAES::EncryptAES128(const std::string& dataIn, std::string& dataOut)
+{
+    PDFEncryptionAES128 encryptor(m_LocalKey, m_ivValue);
+    encryptor.Encrypt(dataIn, dataOut);
+}
+
+void PDFEncryptionAES::EncryptAES256(const std::string& dataIn, std::string& dataOut)
+{
+    PDFEncryptionAES256 encryptor(m_LocalKey, m_ivValue);
+    encryptor.Encrypt(dataIn, dataOut);
 }
 
 PDFEncryption::UCHARArray PDFEncryptionAES::GetExtendedKey(int number, int generation)

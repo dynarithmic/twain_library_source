@@ -637,6 +637,9 @@
     <ClCompile Include="aeslib\AES_128_CBC.cpp">
       <Filter>AES Encryption</Filter>
     </ClCompile>
+    <ClCompile Include="aeslib\aes.cpp">
+      <Filter>AES Encryption</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp\pdflib32\a85encode.h">
@@ -1099,6 +1102,12 @@
       <Filter>Hashing Library</Filter>
     </ClInclude>
     <ClInclude Include="aeslib\AES_128_CBC.h">
+      <Filter>AES Encryption</Filter>
+    </ClInclude>
+    <ClInclude Include="aeslib\aes.h">
+      <Filter>AES Encryption</Filter>
+    </ClInclude>
+    <ClInclude Include="aeslib\aes.hpp">
       <Filter>AES Encryption</Filter>
     </ClInclude>
   </ItemGroup>
