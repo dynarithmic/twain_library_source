@@ -25,9 +25,8 @@ OF THIRD PARTY RIGHTS.
 
 #ifdef DTWAIN_SUPPORT_AES
     #include "..\aeslib\AES_128_CBC.h"
+    #include "..\aeslib\aes.hpp"
 #endif
-//#include "..\cryptolib\md5.h"
-//#include "..\cryptolib\aes.h"
 
 #define ENCRYPTION_OK           0
 #define ENCRYPTION_NOTSET       1
@@ -46,7 +45,7 @@ class PDFEncryption
         int m_yRC4Component;
 
         /** The encryption key for a particular object/generation */
-        UCHARArray key;
+        UCHARArray m_LocalKey;
 
         /** The total encryption key length (keylength + 5) for a particular object/generation */
         uint32_t m_nKeySize;
@@ -129,11 +128,96 @@ class PDFEncryptionRC4 : public PDFEncryption
 };
 
 #ifdef DTWAIN_SUPPORT_AES
+struct AESEncryptorTraits128
+{
+    typedef std::vector<unsigned char> UCHARArray;
+
+    static void Initialize(AES_CTX* ctx, const UCHARArray& localKey, const unsigned char* iv)
+    {
+        AES128::AES_EncryptInit(ctx, localKey.data(), iv);
+    }
+
+    static void EncryptBlock(AES_CTX* ctx, uint8_t* chunk)
+    {
+        AES128::AES_Encrypt(ctx, chunk, chunk);
+    }
+};
+
+struct AESEncryptorTraits256
+{
+    typedef std::vector<unsigned char> UCHARArray;
+
+    static void Initialize(AES_ctx* ctx, const UCHARArray& localKey, const unsigned char* iv)
+    {
+        ::AES_init_ctx_iv(ctx, localKey.data(), iv);
+    }
+
+    static void EncryptBlock(AES_ctx* ctx, uint8_t* chunk)
+    {
+        ::AES_CBC_encrypt_buffer(ctx, chunk, AES_BLOCK_SIZE);
+    }
+};
+
+template <typename CTXType, typename EncryptorTraits>
+class PDFAESGenericEncryptor
+{
+    typedef std::vector<unsigned char> UCHARArray;
+
+    CTXType ctx;
+    UCHARArray m_LocalKey;
+    unsigned char* m_ivValue;
+    public:
+        PDFAESGenericEncryptor(UCHARArray localKey, unsigned char* ivValue) :
+            m_LocalKey(localKey), m_ivValue(ivValue) {}
+
+        void InitializeEngine()
+        {
+            EncryptorTraits::Initialize(&ctx, m_LocalKey, m_ivValue);
+        }
+
+        void EncryptBlock(uint8_t* chunk)
+        {
+            EncryptorTraits::EncryptBlock(&ctx, chunk);
+        }
+
+        void Encrypt(const std::string& dataIn, std::string& dataOut)
+        {
+            auto numBytes = dataIn.size();
+
+            InitializeEngine();
+
+            size_t numchunks = numBytes / AES_BLOCK_SIZE + 1;
+            if (numBytes > 0 && numBytes % AES_BLOCK_SIZE == 0)
+                --numchunks;
+            dataOut.clear();
+
+            int start = 0;
+            size_t totalBytes = numBytes;
+            for (size_t i = 0; i < numchunks; ++i)
+            {
+                uint8_t oneChunk[AES_BLOCK_SIZE] = {};
+                memcpy(oneChunk, dataIn.data() + start, std::min(totalBytes, static_cast<size_t>(AES_BLOCK_SIZE)));
+                EncryptBlock(oneChunk);
+                std::copy_n(oneChunk, AES_BLOCK_SIZE, std::back_inserter(dataOut));
+                start += AES_BLOCK_SIZE;
+                totalBytes -= AES_BLOCK_SIZE;
+            }
+
+            // Place the iv as the first 16 bytes
+            dataOut.insert(0, (const char*)m_ivValue, AES_KEY_SIZE);
+        }
+};
+
+using PDFEncryptionAES128 = PDFAESGenericEncryptor<AES_CTX, AESEncryptorTraits128>;
+using PDFEncryptionAES256 = PDFAESGenericEncryptor<AES_ctx, AESEncryptorTraits256>;
+
 class PDFEncryptionAES: public PDFEncryption
 {
     protected:
         UCHARArray GetExtendedKey(int number, int generation);
-    private:
+        void EncryptAES128(const std::string& dataIn, std::string& dataOut);
+        void EncryptAES256(const std::string& dataIn, std::string& dataOut);
+private:
         unsigned char m_ivValue[AES_KEY_SIZE];
     public:
         void Encrypt(const std::string& dataIn, std::string& dataOut) override;
