@@ -186,13 +186,24 @@ unsigned char PDFEncryption::pad[] =
 
 PDFEncryption::PDFEncryption() : state(256), m_xRC4Component{}, m_yRC4Component{},
                                 m_nKeySize{}, m_nActualKeyLength(5), 
-                                m_nOwnerKey(32), m_nUserKey(32), m_nPermissions{}
+                                m_nMaxPasswordLength(PasswordLength),
+                                m_nPermissions{}
 {
+    m_nOwnerKey.resize(m_nMaxPasswordLength);
+    m_nUserKey.resize(m_nMaxPasswordLength);
+}
+
+void PDFEncryption::SetMaxPasswordLength(uint32_t maxLen)
+{
+    m_nMaxPasswordLength = maxLen;
+    m_nOwnerKey.resize(m_nMaxPasswordLength);
+    m_nUserKey.resize(m_nMaxPasswordLength);
 }
 
 void PDFEncryption::SetupAllKeys(const std::string& DocID,
                                  const std::string& userPassword,
-                                 const std::string& ownerPassword, int permissionsValue,
+                                 const std::string& ownerPassword, 
+                                 int permissionsValue,
                                  bool strength128Bits)
 {
     UCHARArray uP(userPassword.length());
@@ -292,7 +303,7 @@ PDFEncryption::UCHARArray PDFEncryption::ComputeOwnerKey(const UCHARArray& userP
                                                          const UCHARArray& ownerPad,
                                                          bool strength128Bits)
 {
-    UCHARArray ownerKeyValue(32);
+    UCHARArray ownerKeyValue(m_nMaxPasswordLength);
     UCHARArray digest(16);
 
     MD5 md5;
@@ -309,7 +320,7 @@ PDFEncryption::UCHARArray PDFEncryption::ComputeOwnerKey(const UCHARArray& userP
         }
 
         UCHARArray mkeyValue(m_nActualKeyLength);
-        ArrayCopy(userPad, 0, ownerKeyValue, 0, 32);
+        ArrayCopy(userPad, 0, ownerKeyValue, 0, m_nMaxPasswordLength);
         for (int i = 0; i < 20; ++i)
         {
             for (UCHARArray::size_type j = 0; j < mkeyValue.size(); ++j)
@@ -373,18 +384,18 @@ void PDFEncryption::SetupUserKey()
 
 PDFEncryption::UCHARArray PDFEncryption::PadPassword(const UCHARArray& pass) const
 {
-    UCHARArray userPad(32);
+    UCHARArray userPad(m_nMaxPasswordLength);
     const UCHARArray vectorPad(pad, pad + std::size(pad));
     if ( pass.empty() )
     {
-        ArrayCopy(vectorPad, 0, userPad, 0, 32);
+        ArrayCopy(vectorPad, 0, userPad, 0, m_nMaxPasswordLength);
     }
     else
     {
-         ArrayCopy(pass, 0, userPad, 0, static_cast<int>((std::min)(pass.size(), static_cast<size_t>(32))));
-         if (pass.size() < 32)
+         ArrayCopy(pass, 0, userPad, 0, static_cast<int>((std::min)(pass.size(), static_cast<size_t>(m_nMaxPasswordLength))));
+         if (pass.size() < m_nMaxPasswordLength)
          {
-             ArrayCopy(vectorPad, 0, userPad, static_cast<int>(pass.size()), static_cast<int>(32 - pass.size()));
+             ArrayCopy(vectorPad, 0, userPad, static_cast<int>(pass.size()), static_cast<int>(m_nMaxPasswordLength - pass.size()));
          }
     }
     return userPad;
