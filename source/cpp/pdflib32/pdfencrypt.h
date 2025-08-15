@@ -37,6 +37,8 @@ class PDFEncryption
 {
     public:
         typedef std:: vector<unsigned char> UCHARArray;
+        static constexpr uint32_t PasswordLength = 32U;
+        static constexpr uint32_t PasswordLength256 = 127U;
 
     protected:
     static unsigned char pad[32];
@@ -55,6 +57,9 @@ class PDFEncryption
 
         /** The global encryption key */
         UCHARArray m_EncryptionKey;
+
+        /** The maximum user/owner password length */
+        uint32_t m_nMaxPasswordLength;
 
         /** Alternate message digest */
         //CMD5Checksum MD5Alternate;
@@ -102,6 +107,7 @@ class PDFEncryption
                           bool strength128Bits);
         void SetKeyLength(uint32_t keyLength) { m_nActualKeyLength = keyLength; }
         uint32_t GetKeyLength() const { return m_nActualKeyLength; }
+        void SetMaxPasswordLength(uint32_t maxLen);
         void SetupAllKeys(const std::string& DocID,
                           const UCHARArray& userPassword, UCHARArray& ownerPassword,
                           int permissions, bool strength128Bits);

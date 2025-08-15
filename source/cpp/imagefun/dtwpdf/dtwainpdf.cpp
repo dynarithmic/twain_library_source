@@ -997,8 +997,16 @@ bool PdfDocument::EndPDFCreation()
         EObject.SetUserPassword(m_EncryptionPassword[USER_PASSWORD]);
         if (m_bIsAESEncrypted)
         {
-            EObject.SetRValue(4);
-            EObject.SetVValue(4);
+            if (m_nKeyLength == 16)
+            {
+                EObject.SetRValue(4);
+                EObject.SetVValue(4);
+            }
+            else
+            {
+                EObject.SetRValue(5);
+                EObject.SetVValue(5);
+            }
         }
         else
         if ( m_bIsStrongEncryption )
@@ -1142,11 +1150,23 @@ void InfoObject::ComposeObject()
 void EncryptionObject::ComposeObject()
 {
     char szBuf[200] = {};
+    char szBuf2[200] = {};
+    sprintf(szBuf, "/Length %d\n", m_nLength);
+
+    if (m_nLength == 256)
+        sprintf(szBuf2, "/AESV3\n/Length 32\n");
+    else
+    if (m_nLength == 128)
+        sprintf(szBuf2, "/AESV2\n/Length 16\n");
+
     SetContents("<<\n");
     if ( m_bAESEncrypted )
     {
-        AppendContents("/CF <<\n/StdCF <<\n/AuthEvent /DocOpen\n/CFM /AESV2\n/Length 16\n/Type /CryptFilter\n>>\n>>\n/EncryptMetadata true\n/Filter /Standard\n/Length 128\n");
+        AppendContents("/CF <<\n/StdCF <<\n/AuthEvent /DocOpen\n/CFM ");
+        AppendContents(szBuf2);
+        AppendContents("/Type /CryptFilter\n>>\n>>\n/EncryptMetadata true\n/Filter /Standard\n");
         AppendContents(szBuf);
+
         // Now for the owner and user passwords
         std::string enc1;
         std::string enc2;
@@ -2370,6 +2390,8 @@ void PdfDocument::SetEncryption(const CTL_StringType& ownerPassword,
     {
 #ifdef DTWAIN_SUPPORT_AES
         m_Encryption.reset(new PDFEncryptionAES);
+        if (m_nKeyLength == 32)  // This is AES-256
+            m_Encryption->SetMaxPasswordLength(127);
 #endif
         m_bIsStrongEncryption = true; // always uses strong encryption for AES
 
