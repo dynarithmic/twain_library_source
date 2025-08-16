@@ -185,13 +185,25 @@ unsigned char PDFEncryption::pad[] =
 };
 
 PDFEncryption::PDFEncryption() : state(256), m_xRC4Component{}, m_yRC4Component{},
-                                keySize{}, ownerKey(32), userKey(32), permissions{}
+                                m_nKeySize{}, m_nActualKeyLength(5), 
+                                m_nMaxPasswordLength(PasswordLength),
+                                m_nPermissions{}
 {
+    m_nOwnerKey.resize(m_nMaxPasswordLength);
+    m_nUserKey.resize(m_nMaxPasswordLength);
+}
+
+void PDFEncryption::SetMaxPasswordLength(uint32_t maxLen)
+{
+    m_nMaxPasswordLength = maxLen;
+    m_nOwnerKey.resize(m_nMaxPasswordLength);
+    m_nUserKey.resize(m_nMaxPasswordLength);
 }
 
 void PDFEncryption::SetupAllKeys(const std::string& DocID,
                                  const std::string& userPassword,
-                                 const std::string& ownerPassword, int permissionsValue,
+                                 const std::string& ownerPassword, 
+                                 int permissionsValue,
                                  bool strength128Bits)
 {
     UCHARArray uP(userPassword.length());
@@ -225,8 +237,8 @@ void PDFEncryption::SetupAllKeys(const std::string& DocID,
     const UCHARArray userPad = PadPassword(userPassword);
     const UCHARArray ownerPad = PadPassword(ownerPassword);
 
-    ownerKey = ComputeOwnerKey(userPad, ownerPad, strength128Bits);
-    SetupByUserPad(DocID, userPad, ownerKey, permissionsParam, strength128Bits);
+    m_nOwnerKey = ComputeOwnerKey(userPad, ownerPad, strength128Bits);
+    SetupByUserPad(DocID, userPad, m_nOwnerKey, permissionsParam, strength128Bits);
 }
 
 void PDFEncryption::SetupByUserPad(const std::string& documentID,
@@ -245,10 +257,10 @@ void PDFEncryption::SetupGlobalEncryptionKey(const std::string& documentID,
                                              int permissionsParam,
                                              bool strength128Bits)
 {
-    this->ownerKey = ownerKeyParam;
-    this->permissions = permissionsParam;
+    this->m_nOwnerKey = ownerKeyParam;
+    this->m_nPermissions = permissionsParam;
     m_documentID = documentID;
-    mkey.resize(strength128Bits ? 16 : 5);
+    m_EncryptionKey.resize(m_nActualKeyLength);
 
     UCHARArray digest(16);
     UCHARArray ext(4);
@@ -273,7 +285,7 @@ void PDFEncryption::SetupGlobalEncryptionKey(const std::string& documentID,
 
     unsigned char testbuf[MD5::HashBytes];
     md5.getHash(testbuf);
-    if (mkey.size() == 16)
+    if (m_EncryptionKey.size() >= 16)
     {
         for (int k = 0; k < 50; ++k)
         {
@@ -282,8 +294,8 @@ void PDFEncryption::SetupGlobalEncryptionKey(const std::string& documentID,
             md5.getHash(testbuf);
         }
     }
-    auto minToCopy = std::min(static_cast<size_t>(MD5::HashBytes), mkey.size());
-    std::copy(testbuf, testbuf + minToCopy, mkey.begin());
+    auto minToCopy = std::min(static_cast<size_t>(MD5::HashBytes), m_EncryptionKey.size());
+    std::copy(testbuf, testbuf + minToCopy, m_EncryptionKey.begin());
 }
 
 
@@ -291,16 +303,15 @@ PDFEncryption::UCHARArray PDFEncryption::ComputeOwnerKey(const UCHARArray& userP
                                                          const UCHARArray& ownerPad,
                                                          bool strength128Bits)
 {
-    UCHARArray ownerKeyValue(32);
+    UCHARArray ownerKeyValue(m_nMaxPasswordLength);
     UCHARArray digest(16);
 
     MD5 md5;
     md5.add(ownerPad.data(), ownerPad.size());
     md5.getHash(digest.data());
 
-    if (strength128Bits)
+    if (m_nActualKeyLength >= 16)
     {
-
         for (int k = 0; k < 50; ++k)
         {
             md5.reset();
@@ -308,8 +319,8 @@ PDFEncryption::UCHARArray PDFEncryption::ComputeOwnerKey(const UCHARArray& userP
             md5.getHash(digest.data());
         }
 
-        UCHARArray mkeyValue(16);
-        ArrayCopy(userPad, 0, ownerKeyValue, 0, 32);
+        UCHARArray mkeyValue(m_nActualKeyLength);
+        ArrayCopy(userPad, 0, ownerKeyValue, 0, m_nMaxPasswordLength);
         for (int i = 0; i < 20; ++i)
         {
             for (UCHARArray::size_type j = 0; j < mkeyValue.size(); ++j)
@@ -328,7 +339,7 @@ PDFEncryption::UCHARArray PDFEncryption::ComputeOwnerKey(const UCHARArray& userP
 
 void PDFEncryption::SetupUserKey()
 {
-    if (mkey.size() == 16)
+    if (m_EncryptionKey.size() >= 16)
     {
         UCHARArray digest(32);
         MD5 md5;
@@ -340,11 +351,11 @@ void PDFEncryption::SetupUserKey()
         md5.getHash(digest.data());
 
         // step 4
-        PrepareRC4Key(mkey, 0, static_cast<int>(mkey.size()));
+        PrepareRC4Key(m_EncryptionKey, 0, static_cast<int>(m_EncryptionKey.size()));
         EncryptRC4(digest, 0, 16);
 
         for (int k = 16; k < 32; ++k)
-            userKey[k] = 0;
+            m_nUserKey[k] = 0;
 
         // step 5
         UCHARArray tempkey = digest;
@@ -352,39 +363,39 @@ void PDFEncryption::SetupUserKey()
         {
 
             // Make encryption key
-            for (UCHARArray::size_type j = 0; j < mkey.size(); ++j)
-                tempkey[j] = mkey[j] ^ i;
+            for (UCHARArray::size_type j = 0; j < m_EncryptionKey.size(); ++j)
+                tempkey[j] = m_EncryptionKey[j] ^ i;
 
-            PrepareRC4Key(tempkey, 0, static_cast<int>(mkey.size()));
+            PrepareRC4Key(tempkey, 0, static_cast<int>(m_EncryptionKey.size()));
 
             // Call RC4 using
             EncryptRC4(digest, 0, 16);
             tempkey = digest;
         }
-        userKey = std::move(tempkey);
+        m_nUserKey = std::move(tempkey);
     }
     else
     {
         const UCHARArray vectorPad(pad, pad + std::size(pad));
-        PrepareRC4Key(mkey);
-        EncryptRC4(vectorPad, userKey);
+        PrepareRC4Key(m_EncryptionKey);
+        EncryptRC4(vectorPad, m_nUserKey);
     }
 }
 
 PDFEncryption::UCHARArray PDFEncryption::PadPassword(const UCHARArray& pass) const
 {
-    UCHARArray userPad(32);
+    UCHARArray userPad(m_nMaxPasswordLength);
     const UCHARArray vectorPad(pad, pad + std::size(pad));
     if ( pass.empty() )
     {
-        ArrayCopy(vectorPad, 0, userPad, 0, 32);
+        ArrayCopy(vectorPad, 0, userPad, 0, m_nMaxPasswordLength);
     }
     else
     {
-         ArrayCopy(pass, 0, userPad, 0, static_cast<int>((std::min)(pass.size(), static_cast<size_t>(32))));
-         if (pass.size() < 32)
+         ArrayCopy(pass, 0, userPad, 0, static_cast<int>((std::min)(pass.size(), static_cast<size_t>(m_nMaxPasswordLength))));
+         if (pass.size() < m_nMaxPasswordLength)
          {
-             ArrayCopy(vectorPad, 0, userPad, static_cast<int>(pass.size()), static_cast<int>(32 - pass.size()));
+             ArrayCopy(vectorPad, 0, userPad, static_cast<int>(pass.size()), static_cast<int>(m_nMaxPasswordLength - pass.size()));
          }
     }
     return userPad;
@@ -406,7 +417,7 @@ void PDFEncryption::SetHashKey(int number, int generation)
     /** Work area to prepare the object/generation bytes */
     const UCHARArray extra = GetExtendedKey(number, generation);
     std::ostringstream m;
-    m.write(reinterpret_cast<const char*>(mkey.data()), mkey.size());
+    m.write(reinterpret_cast<const char*>(m_EncryptionKey.data()), m_EncryptionKey.size());
     m.write(reinterpret_cast<const char*>(extra.data()),extra.size());
     const std::string sTemp = m.str();
 
@@ -416,13 +427,14 @@ void PDFEncryption::SetHashKey(int number, int generation)
     unsigned char tempbuf[MD5::HashBytes];
     md5.getHash(tempbuf);
 
-    key.resize(32);
+    m_LocalKey.resize(32);
 
-    std::copy(tempbuf, tempbuf + MD5::HashBytes, key.begin());
+    std::copy(tempbuf, tempbuf + MD5::HashBytes, m_LocalKey.begin());
 
-    keySize = static_cast<int>(mkey.size()) + 5;
-    if (keySize > 16)
-        keySize = 16;
+    m_nKeySize = static_cast<int>(m_EncryptionKey.size()) + 5;
+    auto maxKeySize = std::max(16U, m_nActualKeyLength);
+    if (m_nKeySize > maxKeySize)
+        m_nKeySize = maxKeySize;
 }
 
 void PDFEncryption::PrepareRC4Key(const UCHARArray& keyParam)
@@ -480,7 +492,7 @@ void PDFEncryption::EncryptRC4(UCHARArray& data)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void PDFEncryptionRC4::PrepareKey()
 {
-    PrepareRC4Key(key, 0, keySize);
+    PrepareRC4Key(m_LocalKey, 0, m_nKeySize);
 }
 
 PDFEncryption::UCHARArray PDFEncryptionRC4::GetExtendedKey(int number, int generation)
@@ -511,7 +523,7 @@ void PDFEncryptionRC4::Encrypt(char *dataIn, int len)
 #ifdef DTWAIN_SUPPORT_AES
 void PDFEncryptionAES::PrepareKey()
 {
-    PrepareRC4Key(key, 0, keySize);
+    PrepareRC4Key(m_LocalKey, 0, m_nKeySize);
     IVGenerator iv;
     PDFEncryption::UCHARArray arr = iv.getIV(AES_BLOCK_SIZE);
     memcpy(m_ivValue, &arr[0], AES_BLOCK_SIZE);
@@ -520,30 +532,27 @@ void PDFEncryptionAES::PrepareKey()
 // save encrypted data to new string
 void PDFEncryptionAES::Encrypt(const std::string& dataIn, std::string& dataOut)
 {
-    auto numBytes = dataIn.size();
-
-    AES_CTX ctx;
-    AES128::AES_EncryptInit(&ctx, key.data(), m_ivValue);
-
-    size_t numchunks = numBytes / AES_BLOCK_SIZE + 1;
-    if (numBytes > 0 && numBytes % AES_BLOCK_SIZE == 0)
-        --numchunks;
-    dataOut.clear();
-
-    int start = 0;
-    size_t totalBytes = numBytes;
-    for (size_t i = 0; i < numchunks; ++i)
+    switch (m_nKeySize)
     {
-        uint8_t oneChunk[AES_BLOCK_SIZE] = {};
-        memcpy(oneChunk, dataIn.data() + start, std::min(totalBytes, static_cast<size_t>(AES_BLOCK_SIZE)));
-        AES128::AES_Encrypt(&ctx, oneChunk, oneChunk);
-        std::copy_n(oneChunk, AES_BLOCK_SIZE, std::back_inserter(dataOut));
-        start += AES_BLOCK_SIZE;
-        totalBytes -= AES_BLOCK_SIZE;
+        case 16:
+            EncryptAES128(dataIn, dataOut);
+        break;
+        case 32:
+            EncryptAES256(dataIn, dataOut);
+        break;
     }
+}
 
-    // Place the iv as the first 16 bytes
-    dataOut.insert(0, (const char *)m_ivValue, AES_KEY_SIZE);
+void PDFEncryptionAES::EncryptAES128(const std::string& dataIn, std::string& dataOut)
+{
+    PDFEncryptionAES128 encryptor(m_LocalKey, m_ivValue);
+    encryptor.Encrypt(dataIn, dataOut);
+}
+
+void PDFEncryptionAES::EncryptAES256(const std::string& dataIn, std::string& dataOut)
+{
+    PDFEncryptionAES256 encryptor(m_LocalKey, m_ivValue);
+    encryptor.Encrypt(dataIn, dataOut);
 }
 
 PDFEncryption::UCHARArray PDFEncryptionAES::GetExtendedKey(int number, int generation)

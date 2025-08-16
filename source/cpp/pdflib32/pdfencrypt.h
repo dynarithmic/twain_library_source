@@ -25,9 +25,8 @@ OF THIRD PARTY RIGHTS.
 
 #ifdef DTWAIN_SUPPORT_AES
     #include "..\aeslib\AES_128_CBC.h"
+    #include "..\aeslib\aes.hpp"
 #endif
-//#include "..\cryptolib\md5.h"
-//#include "..\cryptolib\aes.h"
 
 #define ENCRYPTION_OK           0
 #define ENCRYPTION_NOTSET       1
@@ -38,6 +37,8 @@ class PDFEncryption
 {
     public:
         typedef std:: vector<unsigned char> UCHARArray;
+        static constexpr uint32_t PasswordLength = 32U;
+        static constexpr uint32_t PasswordLength256 = 127U;
 
     protected:
     static unsigned char pad[32];
@@ -46,23 +47,30 @@ class PDFEncryption
         int m_yRC4Component;
 
         /** The encryption key for a particular object/generation */
-        UCHARArray key;
-        /** The encryption key length for a particular object/generation */
-        int keySize;
+        UCHARArray m_LocalKey;
+
+        /** The total encryption key length (keylength + 5) for a particular object/generation */
+        uint32_t m_nKeySize;
+
+        /** The key length for a particular object/generation */
+        uint32_t m_nActualKeyLength;
 
         /** The global encryption key */
-        UCHARArray mkey;
+        UCHARArray m_EncryptionKey;
+
+        /** The maximum user/owner password length */
+        uint32_t m_nMaxPasswordLength;
 
         /** Alternate message digest */
         //CMD5Checksum MD5Alternate;
 
         /** The encryption key for the owner */
-        UCHARArray ownerKey;
+        UCHARArray m_nOwnerKey;
 
         /** The encryption key for the user */
-        UCHARArray userKey;
+        UCHARArray m_nUserKey;
 
-        int permissions;
+        int m_nPermissions;
 
         std::string m_documentID;
 
@@ -97,7 +105,9 @@ class PDFEncryption
                           const std::string& userPassword,
                           const std::string& ownerPassword, int permissions,
                           bool strength128Bits);
-
+        void SetKeyLength(uint32_t keyLength) { m_nActualKeyLength = keyLength; }
+        uint32_t GetKeyLength() const { return m_nActualKeyLength; }
+        void SetMaxPasswordLength(uint32_t maxLen);
         void SetupAllKeys(const std::string& DocID,
                           const UCHARArray& userPassword, UCHARArray& ownerPassword,
                           int permissions, bool strength128Bits);
@@ -106,10 +116,10 @@ class PDFEncryption
         virtual void Encrypt(const std::string& /*dataIn*/, std::string& /*dataOut*/) {}
         virtual void Encrypt(char * /*dataIn*/, int/* len*/) {}
 
-        UCHARArray& GetUserKey() { return userKey; }
-        UCHARArray& GetOwnerKey() { return ownerKey; }
-        UCHARArray& GetEncryptionKey() { return mkey; }
-        int GetPermissions() const { return permissions; }
+        UCHARArray& GetUserKey() { return m_nUserKey; }
+        UCHARArray& GetOwnerKey() { return m_nOwnerKey; }
+        UCHARArray& GetEncryptionKey() { return m_EncryptionKey; }
+        int GetPermissions() const { return m_nPermissions; }
 };
 
 class PDFEncryptionRC4 : public PDFEncryption
@@ -124,11 +134,96 @@ class PDFEncryptionRC4 : public PDFEncryption
 };
 
 #ifdef DTWAIN_SUPPORT_AES
+struct AESEncryptorTraits128
+{
+    typedef std::vector<unsigned char> UCHARArray;
+
+    static void Initialize(AES_CTX* ctx, const UCHARArray& localKey, const unsigned char* iv)
+    {
+        AES128::AES_EncryptInit(ctx, localKey.data(), iv);
+    }
+
+    static void EncryptBlock(AES_CTX* ctx, uint8_t* chunk)
+    {
+        AES128::AES_Encrypt(ctx, chunk, chunk);
+    }
+};
+
+struct AESEncryptorTraits256
+{
+    typedef std::vector<unsigned char> UCHARArray;
+
+    static void Initialize(AES_ctx* ctx, const UCHARArray& localKey, const unsigned char* iv)
+    {
+        ::AES_init_ctx_iv(ctx, localKey.data(), iv);
+    }
+
+    static void EncryptBlock(AES_ctx* ctx, uint8_t* chunk)
+    {
+        ::AES_CBC_encrypt_buffer(ctx, chunk, AES_BLOCK_SIZE);
+    }
+};
+
+template <typename CTXType, typename EncryptorTraits>
+class PDFAESGenericEncryptor
+{
+    typedef std::vector<unsigned char> UCHARArray;
+
+    CTXType ctx;
+    UCHARArray m_LocalKey;
+    unsigned char* m_ivValue;
+    public:
+        PDFAESGenericEncryptor(UCHARArray localKey, unsigned char* ivValue) :
+            m_LocalKey(localKey), m_ivValue(ivValue) {}
+
+        void InitializeEngine()
+        {
+            EncryptorTraits::Initialize(&ctx, m_LocalKey, m_ivValue);
+        }
+
+        void EncryptBlock(uint8_t* chunk)
+        {
+            EncryptorTraits::EncryptBlock(&ctx, chunk);
+        }
+
+        void Encrypt(const std::string& dataIn, std::string& dataOut)
+        {
+            auto numBytes = dataIn.size();
+
+            InitializeEngine();
+
+            size_t numchunks = numBytes / AES_BLOCK_SIZE + 1;
+            if (numBytes > 0 && numBytes % AES_BLOCK_SIZE == 0)
+                --numchunks;
+            dataOut.clear();
+
+            int start = 0;
+            size_t totalBytes = numBytes;
+            for (size_t i = 0; i < numchunks; ++i)
+            {
+                uint8_t oneChunk[AES_BLOCK_SIZE] = {};
+                memcpy(oneChunk, dataIn.data() + start, std::min(totalBytes, static_cast<size_t>(AES_BLOCK_SIZE)));
+                EncryptBlock(oneChunk);
+                std::copy_n(oneChunk, AES_BLOCK_SIZE, std::back_inserter(dataOut));
+                start += AES_BLOCK_SIZE;
+                totalBytes -= AES_BLOCK_SIZE;
+            }
+
+            // Place the iv as the first 16 bytes
+            dataOut.insert(0, (const char*)m_ivValue, AES_KEY_SIZE);
+        }
+};
+
+using PDFEncryptionAES128 = PDFAESGenericEncryptor<AES_CTX, AESEncryptorTraits128>;
+using PDFEncryptionAES256 = PDFAESGenericEncryptor<AES_ctx, AESEncryptorTraits256>;
+
 class PDFEncryptionAES: public PDFEncryption
 {
     protected:
         UCHARArray GetExtendedKey(int number, int generation);
-    private:
+        void EncryptAES128(const std::string& dataIn, std::string& dataOut);
+        void EncryptAES256(const std::string& dataIn, std::string& dataOut);
+private:
         unsigned char m_ivValue[AES_KEY_SIZE];
     public:
         void Encrypt(const std::string& dataIn, std::string& dataOut) override;
