@@ -28,12 +28,13 @@ implementation
 procedure TForm1.RetrieveDib(Sender: TObject);
 
 var
-   SelectedSource: DWORD;
+   SelectedSource: DTWAIN_SOURCE;
    ErrStatus: LONG;
    AcquisitionArray: DWORD;
    SourceName, SourceDetails: AnsiString;
    NumChars: LONG;
    RetCode : BOOL;
+   PageCount : LONG;
 begin
    { Check for Twain availability }
    if (DTWAIN_IsTwainAvailable <> 0) then
@@ -66,8 +67,20 @@ begin
                                          'Twain Error', MB_ICONSTOP );
               end
               else
-                { display image }
-                Image1.Picture.LoadFromFile('test.bmp');
+              begin
+                  PageCount := DTWAIN_GetSavedFilesCount(SelectedSource);
+                  if (PageCount = 0) then
+                  begin
+                    { user canceled or no page acquired }
+                    Application.MessageBox('User canceled acquisition',
+                                         'Twain Information', MB_ICONSTOP );
+                  end
+                  else
+                  begin
+                    { display image }
+                    Image1.Picture.LoadFromFile('test.bmp');
+                  end;
+              end;
            end;
            { close all sources, sessions, and DTWAIN itself }
            DTWAIN_SysDestroy

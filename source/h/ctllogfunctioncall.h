@@ -167,6 +167,9 @@ namespace dynarithmic
                 else
                     strm << s << " " << dynarithmic::GetResourceStringFromMap(IDS_LOGMSG_RETURNTEXT) << " ";
             }
+            else
+            if (m_bIsReturnValue)
+                strm << " " << dynarithmic::GetResourceStringFromMap(IDS_LOGMSG_RETURNTEXT) << " ";
         }
 
         ParamOutputter& setOutputAsString(bool bSet) noexcept

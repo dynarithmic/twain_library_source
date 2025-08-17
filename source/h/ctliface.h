@@ -552,7 +552,7 @@ namespace dynarithmic
         LONG                         s_nRegisteredDTWAINMsg = 0;
         bool                         s_bThrowExceptions = false;
         HINSTANCE                    s_DLLInstance = nullptr;
-        long                         s_logFilterFlags = 0;
+        uint32_t                     s_logFilterFlags = 0;
         UINT_PTR                     s_nTimeoutID = 0;
         UINT                         s_nTimeoutMilliseconds = 0;
         bool                         s_ResourcesInitialized = false;
@@ -625,7 +625,7 @@ namespace dynarithmic
             tempStruct.s_StartupDSMSearchOrderDir = s_StaticData.s_StartupDSMSearchOrderDir;
             s_StaticData = tempStruct;
         }
-        static long& GetLogFilterFlags() { return s_StaticData.s_logFilterFlags; }
+        static auto& GetLogFilterFlags() { return s_StaticData.s_logFilterFlags; }
         static bool IsThrowExceptions() { return s_StaticData.s_bThrowExceptions; }
         static void SetThrowExceptions(bool bSet) { s_StaticData.s_bThrowExceptions = bSet; }
         static CTL_UINT16ToInfoMap& GetIntToTwainInfoMap() { return s_StaticData.s_IntToTwainInfoMap; }
@@ -666,7 +666,7 @@ namespace dynarithmic
         static HINSTANCE GetDLLInstanceHandle() { return s_StaticData.s_DLLInstance; }
         static CTL_GeneralErrorInfo& GetGeneralErrorInfoMap() { return s_StaticData.s_mapGeneralErrorInfo; }
         static void SetDLLInstanceHandle(HINSTANCE h) { s_StaticData.s_DLLInstance = h; }
-        static long GetErrorFilterFlags() { return s_StaticData.s_logFilterFlags; }
+        static auto& GetErrorFilterFlags() { return s_StaticData.s_logFilterFlags; }
         static ImageResamplerMap& GetImageResamplerMap() { return s_StaticData.s_ImageResamplerMap; }
         static SourceStatusMap& GetSourceStatusMap() { return s_StaticData.s_SourceStatusMap;  }
         static CTL_StringType& GetResourceVersion() { return s_StaticData.s_ResourceVersion; }

@@ -904,11 +904,7 @@ void CTL_ITwainSource::SetPDFValue(const CTL_StringType& nWhich, LONG nValue)
         m_ImageInfoEx.nPDFPolarity = nValue;
     else
     if (nWhich == PDFAESKEY )
-    {
         m_ImageInfoEx.bIsAESEncrypted = nValue?true:false;
-        m_ImageInfoEx.bUseStrongEncryption = nValue ? true : false;
-        m_ImageInfoEx.bIsPDFEncrypted = nValue ? true : false;
-    }
 }
 
 void CTL_ITwainSource::SetPDFValue(const CTL_StringType& nWhich, DTWAIN_FLOAT f1, DTWAIN_FLOAT f2)
@@ -944,10 +940,14 @@ void CTL_ITwainSource::SetPDFEncryption(bool bIsEncrypted,
         SetPDFValue(PDFOWNERPASSKEY, strOwnerPassword);
         SetPDFValue(PDFPERMISSIONSKEY, Permissions);
         m_ImageInfoEx.bUseStrongEncryption = bUseStrongEncryption?true:false;
+        m_ImageInfoEx.nPDFKeyLength = bUseStrongEncryption?16:5; // This will be multiplied by 8
         m_ImageInfoEx.bIsPDFEncrypted = true;
     }
     else
+    {
         m_ImageInfoEx.bIsPDFEncrypted = false;
+        m_ImageInfoEx.nPDFKeyLength = 5;
+    }
 }
 
 void CTL_ITwainSource::ClearPDFText()
