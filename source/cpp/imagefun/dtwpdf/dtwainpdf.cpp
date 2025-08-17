@@ -465,6 +465,7 @@ PdfDocument::PdfDocument() :
     m_bIsEncrypted(false),
     m_bASCIICompression(false),
     m_bIsNoCompression(false),
+    m_nKeyLength(0),
     CurFontRefNum(START_FONTREF_NUM)
 {
     const auto iter = m_mediaMap.find(DTWAIN_FS_USLETTER);
@@ -674,11 +675,6 @@ bool PdfDocument::WritePage(CTL_StringType sImgFileName)
     cObj.SetImageName( actualFileName );
     cObj.PreComposeObject();
 
-    // Now compose the contents object
-/*    cObj.SetEncrypted(IsEncrypted());
-    cObj.SetImageName( szBuf );
-    cObj.ComposeObject();
-*/
     // Now compose the page contents
     page.SetByteOffset(m_byteOffset);
     page.SetMediaBox(mbox);
@@ -754,6 +750,24 @@ unsigned int PdfDocument::GetMaxFontRefNumber() const
     return it->second.refNum;
 }
 
+void PdfDocument::UpdateLength(std::string& strWithLength, size_t newLength)
+{
+    // We really look for 0x1, since that is the place holder for the Length
+    auto nPos = strWithLength.find_first_of(1);
+    if (nPos != std::string::npos)
+    {
+        // We now replace the fake 0x1 with the real Length
+        const auto nextPos = nPos + 1;
+        std::string newTest = strWithLength.substr(0, nPos);
+        newTest += std::to_string(newLength);
+        newTest += " ";
+
+        // Append the stuff after the 0x1
+        newTest += strWithLength.substr(nextPos);
+        strWithLength = newTest;
+    }
+}
+
 bool PdfDocument::WriteObject(PDFObject* pObj)
 {
     std::ostringstream strm;
@@ -764,7 +778,17 @@ bool PdfDocument::WriteObject(PDFObject* pObj)
     std::string strOut;
     if ( pObj->IsEncrypted() )
     {
+        // This may be a little slow, but we will need to adjust the dictionary
+        // Length key, which has already been set.
         pObj->EncryptBlock(pObj->GetStreamContents(), strOut, nObjectNum, 0);
+        auto currentStream = strm.str();
+
+        // Update the Length key
+        UpdateLength(currentStream, strOut.size());
+
+        // Redo the stream and generate the final string with the new /Length
+        strm.str("");
+        strm << currentStream;
         s = strm.str() + strOut + pObj->GetExtraInfoEnd() + "\n" + "endobj\n";
     }
     else
@@ -968,13 +992,21 @@ bool PdfDocument::EndPDFCreation()
         EObject.SetAESEncryption(m_bIsAESEncrypted);
         EObject.AssignParent(this);
         EObject.SetFilter("Standard");
-        EObject.SetLength(m_bIsStrongEncryption?128:40);
+        EObject.SetLength(m_nKeyLength * 8);
         EObject.SetOwnerPassword(m_EncryptionPassword[OWNER_PASSWORD]);
         EObject.SetUserPassword(m_EncryptionPassword[USER_PASSWORD]);
         if (m_bIsAESEncrypted)
         {
-            EObject.SetRValue(4);
-            EObject.SetVValue(4);
+            if (m_nKeyLength == 16)
+            {
+                EObject.SetRValue(4);
+                EObject.SetVValue(4);
+            }
+            else
+            {
+                EObject.SetRValue(5);
+                EObject.SetVValue(5);
+            }
         }
         else
         if ( m_bIsStrongEncryption )
@@ -1118,11 +1150,23 @@ void InfoObject::ComposeObject()
 void EncryptionObject::ComposeObject()
 {
     char szBuf[200] = {};
+    char szBuf2[200] = {};
+    sprintf(szBuf, "/Length %d\n", m_nLength);
+
+    if (m_nLength == 256)
+        sprintf(szBuf2, "/AESV3\n/Length 32\n");
+    else
+    if (m_nLength == 128)
+        sprintf(szBuf2, "/AESV2\n/Length 16\n");
+
     SetContents("<<\n");
     if ( m_bAESEncrypted )
     {
-        AppendContents("/CF <<\n/StdCF <<\n/AuthEvent /DocOpen\n/CFM /AESV2\n/Length 16\n/Type /CryptFilter\n>>\n>>\n/EncryptMetadata true\n/Filter /Standard\n/Length 128\n");
+        AppendContents("/CF <<\n/StdCF <<\n/AuthEvent /DocOpen\n/CFM ");
+        AppendContents(szBuf2);
+        AppendContents("/Type /CryptFilter\n>>\n>>\n/EncryptMetadata true\n/Filter /Standard\n");
         AppendContents(szBuf);
+
         // Now for the owner and user passwords
         std::string enc1;
         std::string enc2;
@@ -1579,7 +1623,16 @@ void ContentsObject::ComposeObject()
         AppendContents( "/Filter " + filterstr);
 
     // Encrypt this block of data if encryption is set
-    sprintf(szBuf, "%d >>\n", static_cast<int>(nLength));
+    if (IsEncrypted())
+    {
+        // The "encryption" really only places a character 1
+        // in the /Length argument.  This will be replaced
+        // with the real length downstream once we officially
+        // encrypt the data.
+        sprintf(szBuf, "%c\n>>\n", 1);
+    }
+    else
+        sprintf(szBuf, "%d\n>>\n", static_cast<int>(nLength));
     AppendContents(sLength + szBuf + sStream);
 
     if ( IsEncrypted() )
@@ -2136,7 +2189,18 @@ void ImageObject::ComposeObject()
     AppendContents(szBuf);
     sprintf(szBuf, "   /Width %d\n   /Height %d\n", m_Width, m_Height);
     AppendContents(szBuf);
-    sprintf(szBuf, "   /Length %d ", static_cast<int>(m_imgLengthInBytes));
+
+    // Encrypt this block of data if encryption is set
+    if (IsEncrypted())
+    {
+        // The "encryption" really only places a character 1
+        // in the /Length argument.  This will be replaced
+        // with the real length downstream once we officially
+        // encrypt the data.
+        sprintf(szBuf, "   /Length %c ", 1);
+    }
+    else
+        sprintf(szBuf, "   /Length %d ", static_cast<int>(m_imgLengthInBytes));
     AppendContents(szBuf);
 
     if (m_nImgType == 1 ) // Tiff
@@ -2148,7 +2212,7 @@ void ImageObject::ComposeObject()
             sprintf(szBuf,"/ImageMask true /Decode [1 0] ");
         AppendContents(szBuf);
     }
-    AppendContents(">>\nstream\n");
+    AppendContents("\n>>\nstream\n");
     m_sExtraInfo = "";
 
     if (pParent->IsEncrypted())
@@ -2311,19 +2375,23 @@ void PdfDocument::SetEncryption(const CTL_StringType& ownerPassword,
                                 const CTL_StringType& userPassword,
                                 unsigned int permissions,
                                 bool bIsStrongEncryption,
-                                bool isAESEncryoted)
+                                bool isAESEncrypted,
+                                uint32_t nKeyLength)
 {
     m_EncryptionPassword[OWNER_PASSWORD] = StringConversion::Convert_Native_To_Ansi(ownerPassword);
     m_EncryptionPassword[USER_PASSWORD] = StringConversion::Convert_Native_To_Ansi(userPassword);
     m_nPermissions = permissions;
-    m_bIsStrongEncryption = bIsStrongEncryption;
-    m_bIsAESEncrypted = isAESEncryoted;
+    m_bIsStrongEncryption = bIsStrongEncryption || isAESEncrypted;
+    m_bIsAESEncrypted = isAESEncrypted;
+    m_nKeyLength = nKeyLength;
 
     // set the encryption to AES
     if (m_bIsAESEncrypted)
     {
 #ifdef DTWAIN_SUPPORT_AES
         m_Encryption.reset(new PDFEncryptionAES);
+        if (m_nKeyLength == 32)  // This is AES-256
+            m_Encryption->SetMaxPasswordLength(127);
 #endif
         m_bIsStrongEncryption = true; // always uses strong encryption for AES
 
@@ -2333,9 +2401,13 @@ void PdfDocument::SetEncryption(const CTL_StringType& ownerPassword,
 
     const std::string s = GetSystemTimeInMilliseconds().substr(0,13) + "+1359064+" + m_sCurSysTime.substr(0,13);
     const std::string dID = CMD5Checksum().GetMD5(reinterpret_cast<const unsigned char*>(s.c_str()), static_cast<UINT>(s.size()));
-        m_DocumentID[0] = dID;
-        m_DocumentID[1] = dID;
+    m_DocumentID[0] = dID;
+    m_DocumentID[1] = dID;
 
-        m_Encryption->SetupAllKeys(m_DocumentID[0], m_EncryptionPassword[USER_PASSWORD], m_EncryptionPassword[OWNER_PASSWORD], permissions, bIsStrongEncryption);
+    m_Encryption->SetKeyLength(m_nKeyLength);
+
+    m_Encryption->SetupAllKeys(m_DocumentID[0], m_EncryptionPassword[USER_PASSWORD], 
+                                m_EncryptionPassword[OWNER_PASSWORD], permissions, 
+                                m_bIsStrongEncryption);
     m_bIsEncrypted = true;
 }

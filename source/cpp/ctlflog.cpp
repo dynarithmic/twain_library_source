@@ -172,7 +172,7 @@ void LogExceptionToConsole(LPCSTR fname, const char* sAdditionalText)
     catch (...) {}  // can't really do anything
 }
 
-long& dynarithmic::GetLogFilterFlags()
+uint32_t& dynarithmic::GetLogFilterFlags()
 {
     return CTL_StaticData::GetLogFilterFlags();
 }

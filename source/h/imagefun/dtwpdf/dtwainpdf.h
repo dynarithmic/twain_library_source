@@ -80,6 +80,7 @@ namespace dynarithmic
             void SetObjectNum(int nNum) { m_nObjNum = nNum; }
 
             std::string GetContents() const { return Contents; }
+            std::string& GetContentsRef() { return Contents; }
             void SetContents(const std::string& s) {Contents = s; }
             void AppendContents(const std::string& s) {Contents += s; }
             void WriteRaw(const char *pBuffer, size_t nLength)
@@ -395,7 +396,8 @@ namespace dynarithmic
                                const CTL_StringType& userPassword,
                                unsigned int permissions,
                                bool bIsStrongEncryption,
-                               bool isAESEncrypted);
+                               bool isAESEncrypted,
+                               uint32_t nKeyLength);
             bool IsEncrypted() const { return m_bIsEncrypted ;} //& !m_bASCIIHexCompression; }
             bool IsAESEncrypted() const { return m_bIsAESEncrypted; } //& !m_bASCIIHexCompression; }
             StringVector& GetDocumentID() { return m_DocumentID; }
@@ -427,6 +429,7 @@ namespace dynarithmic
         protected:
             bool WriteHeaderInfo();
             bool WriteObject(PDFObject* pObj);
+            void UpdateLength(std::string& strWithLength, size_t newLength);
             std::string GetBinaryHeader() const;
             void SortObjects();
     //        bool IsTextElementOnPage(unsigned int tElement) const;
@@ -479,6 +482,7 @@ namespace dynarithmic
             bool         m_bIsEncrypted;
             bool        m_bASCIICompression;
             bool        m_bIsNoCompression;
+            uint32_t    m_nKeyLength;
             std::string m_SearchText;
             FontRefToFontInfoMap m_mapFontRef;
             FontNameToFontInfoMap m_mapFontNames;

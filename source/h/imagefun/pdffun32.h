@@ -54,9 +54,10 @@ namespace dynarithmic
         void DTWLIB_PDFSetThumbnailFile(PdfDocumentPtr pDoc, LPCTSTR szPath);
         void DTWLIB_PDFSetDPI(PdfDocumentPtr pDoc, int32_t dpi);
         void DTWLIB_PDFSetEncryption(PdfDocumentPtr pDoc, LPCTSTR szOwnerPass,
-            LPCTSTR szUserPass, int32_t Permissions,
-                                              bool bUseStrongEncrypt,
-                                              bool bUseAESEncryption);
+                                     LPCTSTR szUserPass, int32_t Permissions,
+                                     bool bUseStrongEncrypt,
+                                     bool bUseAESEncryption,
+                                     uint32_t nKeyLength);
 
         LONG DTWLIB_PSWriteFile(LPCTSTR szFileIn,
             LPCTSTR szFileOut,
