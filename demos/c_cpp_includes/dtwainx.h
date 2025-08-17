@@ -906,6 +906,16 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayConvertFix32ToFloat(DTWAIN_ARRAY Fix32Arra
 LONG DLLENTRY_DEF DTWAIN_ArrayGetStringLength(DTWAIN_ARRAY a, LONG nWhichString);
 LONG DLLENTRY_DEF DTWAIN_ArrayGetMaxStringLength(DTWAIN_ARRAY a);
 
+/* functions to create array of strings from array of DTWAIN_FLOATs */
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayFloatToANSIString(DTWAIN_ARRAY FloatArray);
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayFloatToWideString(DTWAIN_ARRAY FloatArray);
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayFloatToString(DTWAIN_ARRAY FloatArray);
+
+/* functions to create array of doubles from array of strings */
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayANSIStringToFloat(DTWAIN_ARRAY StringArray);
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayWideStringToFloat(DTWAIN_ARRAY StringArray);
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayStringToFloat(DTWAIN_ARRAY StringArray);
+
 /* function to destroy array of DTWAIN_FRAME objects */
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayDestroyFrames(DTWAIN_ARRAY FrameArray);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetPosFloat( DTWAIN_RANGE pArray, DTWAIN_FLOAT Val, LPLONG pPos );
