@@ -1469,6 +1469,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile Include="cpp\ctlhashutils.cpp" />
     <ClCompile Include="cpp\ctlloadresources.cpp" />
     <ClCompile Include="cpp\ctlpapersize.cpp" />
+    <ClCompile Include="cpp\ctlrandnumutils.cpp" />
     <ClCompile Include="cpp\ctlselectdialog.cpp" />
     <ClCompile Include="cpp\ctlsourcecompression.cpp" />
     <ClCompile Include="cpp\ctlsourcedetails.cpp" />
@@ -1738,6 +1739,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\ctlloadresources.h" />
     <ClInclude Include="h\ctllogcalls.h" />
     <ClInclude Include="h\ctllogfunctioncall.h" />
+    <ClInclude Include="h\ctlrandnumutils.h" />
     <ClInclude Include="h\ctlsetgetcaps.h" />
     <ClInclude Include="h\ctlstringutils.h" />
     <ClInclude Include="h\ctlsupport.h" />
