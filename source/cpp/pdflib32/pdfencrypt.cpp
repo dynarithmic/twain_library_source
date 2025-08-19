@@ -26,10 +26,13 @@ OF THIRD PARTY RIGHTS.
 #include <string>
 #include <vector>
 #include <random>
+#include <boost/multiprecision/cpp_int.hpp> // Include for uint128_t
+
 #undef min
 #undef max
 #include "pdfencrypt.h"
 #include "../hashlib/md5.h"
+#include "ctlhashutils.h"
 
 #define STRINGER_2_(x) #x
 #define STRINGER_(x) STRINGER_2_(x)
@@ -38,6 +41,21 @@ std::string GetSystemTimeInMilliseconds();
 #ifdef _MSC_VER
 #pragma warning (disable:4244)
 #endif
+
+using namespace boost::multiprecision;
+
+// Function to convert 16-byte big-endian char array to int64_t
+static uint128_t bigEndianBytesToInt(const unsigned char* bytes, size_t numBytes)
+{
+    uint128_t value = 0;
+
+    // Iterate through the bytes and shift them into the value
+    // Big-endian means the most significant byte is first (at index 0)
+    for (size_t i = 0; i < numBytes; ++i) { // For an 8-byte (64-bit) integer
+        value = (value << 8) | bytes[i];
+    }
+    return value;
+}
 
 template <typename T>
 void ArrayCopy(const T& input_array, int start, T& output_array, int output_start, int nBytes)
@@ -489,6 +507,66 @@ void PDFEncryption::EncryptRC4(UCHARArray& data)
 {
     EncryptRC4(data, 0, static_cast<int>(data.size()), data);
 }
+
+std::string PDFEncryption::Revision6OneRound(std::string shaHash)
+{
+    std::string dataOut;
+    PDFEncryptionAES aesCrypt;
+    aesCrypt.SetKeyLength(32);
+    auto* shaData = reinterpret_cast<const unsigned char*>(shaHash.c_str());
+    aesCrypt.PrepareKey(shaData, 16, shaData + 16);
+    aesCrypt.Encrypt(shaHash, dataOut); // This is E
+
+    unsigned char bytesToConvert[16];
+    std::transform(dataOut.begin(), dataOut.begin() + 16, bytesToConvert,
+        [](auto ch) { return static_cast<unsigned char>(ch); });
+    auto val = static_cast<int>(bigEndianBytesToInt(bytesToConvert, 16) % 3);
+
+    std::vector<unsigned char> newK;
+    std::string sDataOut = dataOut.substr(0, 16);
+    switch (val)
+    {
+        case 0:
+            newK = dynarithmic::SHA2Hash(sDataOut, dynarithmic::SHA2HashType::SHA256);
+            break;
+        case 1:
+            newK = dynarithmic::SHA2Hash(sDataOut, dynarithmic::SHA2HashType::SHA384);
+            break;
+        case 2:
+            newK = dynarithmic::SHA2Hash(sDataOut, dynarithmic::SHA2HashType::SHA512);
+            break;
+    }
+    shaHash.clear();
+    std::transform(newK.begin(), newK.end(), std::back_inserter(shaHash),
+        [](auto ch) { return static_cast<char>(ch); });
+    return shaHash;
+}
+
+/* Future implementation for PDF 2.0 encryption */
+PDFEncryption::UCHARArray PDFEncryption::ComputeRevision6Hash(std::string shaHash)
+{
+    size_t nRoundCount = 0;
+    for (int i = 0; i < 64; ++i, ++nRoundCount)
+        shaHash = Revision6OneRound(shaHash);
+    while (true)
+    {
+        auto lastChar = static_cast<unsigned int>(shaHash.back());
+        if (lastChar > nRoundCount - 32)
+        {
+            ++nRoundCount;
+            shaHash = Revision6OneRound(shaHash);
+        }
+        else
+            break;
+    }
+    PDFEncryption::UCHARArray finalK;
+    std::transform(shaHash.begin(), shaHash.begin() + 32, std::back_inserter(finalK), [](auto ch)
+        {
+            return static_cast<unsigned char>(ch);
+        });
+    return finalK;
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void PDFEncryptionRC4::PrepareKey()
 {
@@ -527,6 +605,13 @@ void PDFEncryptionAES::PrepareKey()
     IVGenerator iv;
     PDFEncryption::UCHARArray arr = iv.getIV(AES_BLOCK_SIZE);
     memcpy(m_ivValue, &arr[0], AES_BLOCK_SIZE);
+}
+
+void PDFEncryptionAES::PrepareKey(const unsigned char* key, size_t keySize, const unsigned char * iv)
+{
+    m_LocalKey.clear();
+    std::copy_n(key, keySize, std::back_inserter(m_LocalKey));
+    memcpy(m_ivValue, iv, AES_BLOCK_SIZE);
 }
 
 // save encrypted data to new string
