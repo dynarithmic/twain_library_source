@@ -22,6 +22,7 @@ OF THIRD PARTY RIGHTS.
 #define PDFENCRYPT_H
 #include <vector>
 #include <string>
+#include <string_view>
 
 #ifdef DTWAIN_SUPPORT_AES
     #include "..\aeslib\AES_128_CBC.h"
@@ -93,6 +94,8 @@ class PDFEncryption
         void EncryptRC4(const UCHARArray& dataIn, UCHARArray& dataOut);
         void EncryptRC4(UCHARArray& data);
         virtual UCHARArray GetExtendedKey(int number, int generation);
+        UCHARArray ComputeRevision6Hash(std::string shaHash);
+        std::string Revision6OneRound(std::string shaHash);
 
     public:
         PDFEncryption();
@@ -215,6 +218,7 @@ private:
         void Encrypt(const std::string& dataIn, std::string& dataOut) override;
         void Encrypt(char *dataIn, int len) override;
         void PrepareKey() override;
+        void PrepareKey(const unsigned char* key, size_t keySize, const unsigned char* iv);
 };
 #endif
 #endif
