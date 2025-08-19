@@ -550,10 +550,10 @@ PDFEncryption::UCHARArray PDFEncryption::ComputeRevision6Hash(std::string shaHas
         shaHash = Revision6OneRound(shaHash);
     while (true)
     {
+        ++nRoundCount;
         auto lastChar = static_cast<unsigned int>(shaHash.back());
         if (lastChar > nRoundCount - 32)
         {
-            ++nRoundCount;
             shaHash = Revision6OneRound(shaHash);
         }
         else
@@ -620,23 +620,29 @@ void PDFEncryptionAES::Encrypt(const std::string& dataIn, std::string& dataOut)
     switch (m_nKeySize)
     {
         case 16:
-            EncryptAES128(dataIn, dataOut);
+            EncryptAES128CBC(dataIn, dataOut);
         break;
         case 32:
-            EncryptAES256(dataIn, dataOut);
+            EncryptAES256CBC(dataIn, dataOut);
         break;
     }
 }
 
-void PDFEncryptionAES::EncryptAES128(const std::string& dataIn, std::string& dataOut)
+void PDFEncryptionAES::EncryptAES128CBC(const std::string& dataIn, std::string& dataOut)
 {
-    PDFEncryptionAES128 encryptor(m_LocalKey, m_ivValue);
+    PDFEncryptionAES128_CBC encryptor(m_LocalKey, m_ivValue);
     encryptor.Encrypt(dataIn, dataOut);
 }
 
-void PDFEncryptionAES::EncryptAES256(const std::string& dataIn, std::string& dataOut)
+void PDFEncryptionAES::EncryptAES256CBC(const std::string& dataIn, std::string& dataOut)
 {
-    PDFEncryptionAES256 encryptor(m_LocalKey, m_ivValue);
+    PDFEncryptionAES256_CBC encryptor(m_LocalKey, m_ivValue);
+    encryptor.Encrypt(dataIn, dataOut);
+}
+
+void PDFEncryptionAES::EncryptAES256ECB(const std::string& dataIn, std::string& dataOut)
+{
+    PDFEncryptionAES256_ECB encryptor(m_LocalKey, m_ivValue);
     encryptor.Encrypt(dataIn, dataOut);
 }
 

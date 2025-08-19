@@ -1453,6 +1453,7 @@ copy $(TargetDir)$(TargetName).lib .
     </ClCompile>
     <ClCompile Include="aeslib\AES_128_CBC.cpp" />
     <ClCompile Include="aeslib\AES_256_CBC.cpp" />
+    <ClCompile Include="aeslib\AES_256_ECB.cpp" />
     <ClCompile Include="cpp\arrayfactory.cpp" />
     <ClCompile Include="cpp\ctlacquireaudio.cpp" />
     <ClCompile Include="cpp\ctlarraydumper.cpp" />
@@ -1705,6 +1706,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include=".\h\ctltr039.h" />
     <ClInclude Include="aeslib\AES_128_CBC.h" />
     <ClInclude Include="aeslib\AES_256_CBC.h" />
+    <ClInclude Include="aeslib\AES_256_ECB.h" />
     <ClInclude Include="cpp\pdflib32\a85encode.h" />
     <ClInclude Include="cpp\pdflib32\ahexencode.h" />
     <ClInclude Include="cpp\pdflib32\flateencode.h" />

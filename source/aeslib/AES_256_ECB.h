@@ -23,30 +23,29 @@ SOFTWARE.
 
 // File changes for DTWAIN done here.
 // See above license for original author(s)
-#ifndef AES_256_CBC_H__
-#define AES_256_CBC_H__
+#ifndef AES_256_ECB_H__
+#define AES_256_ECB_H__
 
 #define AES_BLOCK_SIZE 16
 #define AES_KEY_SIZE_256 32
 
 typedef struct {
 	unsigned int roundkey[60];
-	unsigned int iv[4];
-} AES_CTX_256_CBC;
+} AES_CTX_256_ECB;
 
 // Wrap the static methods in a struct
-struct AES256_CBC
+struct AES256_ECB
 {
-	static void AES_EncryptInit(AES_CTX_256_CBC* ctx, const unsigned char* key, const unsigned char* iv);
-	static void AES_Encrypt(AES_CTX_256_CBC* ctx, const unsigned char in_data[AES_BLOCK_SIZE], unsigned char out_data[AES_BLOCK_SIZE]);
-	static void AES_CTX_Free(AES_CTX_256_CBC* ctx);
-    static void AES_DecryptInit(AES_CTX_256_CBC* ctx, const unsigned char* key, const unsigned char* iv);
-    static void AES_Decrypt(AES_CTX_256_CBC* ctx, const unsigned char in_data[AES_BLOCK_SIZE], unsigned char out_data[AES_BLOCK_SIZE]);
+	static void AES_EncryptInit(AES_CTX_256_ECB* ctx, const unsigned char* key, const unsigned char* iv = nullptr);
+	static void AES_Encrypt(AES_CTX_256_ECB* ctx, const unsigned char in_data[AES_BLOCK_SIZE], unsigned char out_data[AES_BLOCK_SIZE]);
+	static void AES_CTX_Free(AES_CTX_256_ECB* ctx);
+    static void AES_DecryptInit(AES_CTX_256_ECB* ctx, const unsigned char* key, const unsigned char* iv);
+    static void AES_Decrypt(AES_CTX_256_ECB* ctx, const unsigned char in_data[AES_BLOCK_SIZE], unsigned char out_data[AES_BLOCK_SIZE]);
 };
 
 #if 0
-void AES_DecryptInit(AES_CTX_256 *ctx, const unsigned char *key, const unsigned char *iv) {
-	AES_EncryptInit(ctx, key, iv);
+void AES_DecryptInit(AES_CTX_256_ECB *ctx, const unsigned char *key) {
+	AES_EncryptInit(ctx, key);
 	
 	unsigned int temp;
 	
@@ -95,18 +94,13 @@ void AES_DecryptInit(AES_CTX_256 *ctx, const unsigned char *key, const unsigned 
 }
 
 
-void AES_Decrypt(AES_CTX_256 *ctx, const unsigned char in_data[AES_BLOCK_SIZE], unsigned char out_data[AES_BLOCK_SIZE]) {
-	unsigned int s0, s1, s2, s3, t0, t1, t2, t3, temp[4];
+void AES_Decrypt(AES_CTX_256_ECB *ctx, const unsigned char in_data[AES_BLOCK_SIZE], unsigned char out_data[AES_BLOCK_SIZE]) {
+	unsigned int s0, s1, s2, s3, t0, t1, t2, t3;
 	
 	s0 = GETU32(in_data + 0) ^ ctx->roundkey[0];
 	s1 = GETU32(in_data + 4) ^ ctx->roundkey[1];
 	s2 = GETU32(in_data + 8) ^ ctx->roundkey[2];
 	s3 = GETU32(in_data + 12) ^ ctx->roundkey[3];
-	
-	temp[0] = GETU32(in_data + 0);
-	temp[1] = GETU32(in_data + 4);
-	temp[2] = GETU32(in_data + 8);
-	temp[3] = GETU32(in_data + 12);
 	
 	t0 = Td0[s0 >> 24] ^ Td1[(s3 >> 16) & 0xff] ^ Td2[(s2 >>  8) & 0xff] ^ Td3[s1 & 0xff] ^ ctx->roundkey[ 4];
 	t1 = Td0[s1 >> 24] ^ Td1[(s0 >> 16) & 0xff] ^ Td2[(s3 >>  8) & 0xff] ^ Td3[s2 & 0xff] ^ ctx->roundkey[ 5];
@@ -178,15 +172,10 @@ void AES_Decrypt(AES_CTX_256 *ctx, const unsigned char in_data[AES_BLOCK_SIZE], 
 	s2 = (Td4[(t2 >> 24) & 0xff] & 0xff000000) ^ (Td4[(t1 >> 16) & 0xff] & 0x00ff0000) ^ (Td4[(t0 >>  8) & 0xff] & 0x0000ff00) ^ (Td4[(t3 >>  0) & 0xff] & 0x000000ff) ^ ctx->roundkey[58];
 	s3 = (Td4[(t3 >> 24) & 0xff] & 0xff000000) ^ (Td4[(t2 >> 16) & 0xff] & 0x00ff0000) ^ (Td4[(t1 >>  8) & 0xff] & 0x0000ff00) ^ (Td4[(t0 >>  0) & 0xff] & 0x000000ff) ^ ctx->roundkey[59];
 	
-	PUTU32(out_data +  0, s0 ^ ctx->iv[0]);
-	PUTU32(out_data +  4, s1 ^ ctx->iv[1]);
-	PUTU32(out_data +  8, s2 ^ ctx->iv[2]);
-	PUTU32(out_data + 12, s3 ^ ctx->iv[3]);
-	
-	ctx->iv[0] = temp[0];
-	ctx->iv[1] = temp[1];
-	ctx->iv[2] = temp[2];
-	ctx->iv[3] = temp[3];
+	PUTU32(out_data +  0, s0);
+	PUTU32(out_data +  4, s1);
+	PUTU32(out_data +  8, s2);
+	PUTU32(out_data + 12, s3);
 }
 #endif
 #endif
