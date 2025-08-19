@@ -637,8 +637,11 @@
     <ClCompile Include="aeslib\AES_128_CBC.cpp">
       <Filter>AES Encryption</Filter>
     </ClCompile>
-    <ClCompile Include="aeslib\aes.cpp">
+    <ClCompile Include="aeslib\AES_256_CBC.cpp">
       <Filter>AES Encryption</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\ctlhashutils.cpp">
+      <Filter>C++ Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1104,10 +1107,7 @@
     <ClInclude Include="aeslib\AES_128_CBC.h">
       <Filter>AES Encryption</Filter>
     </ClInclude>
-    <ClInclude Include="aeslib\aes.h">
-      <Filter>AES Encryption</Filter>
-    </ClInclude>
-    <ClInclude Include="aeslib\aes.hpp">
+    <ClInclude Include="aeslib\AES_256_CBC.h">
       <Filter>AES Encryption</Filter>
     </ClInclude>
   </ItemGroup>

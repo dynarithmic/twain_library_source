@@ -1451,8 +1451,8 @@ copy $(TargetDir)$(TargetName).lib .
     </ClCompile>
     <ClCompile Include=".\cpp\imagefun\dtwpdf\dtwtiff2ps.cpp">
     </ClCompile>
-    <ClCompile Include="aeslib\aes.cpp" />
     <ClCompile Include="aeslib\AES_128_CBC.cpp" />
+    <ClCompile Include="aeslib\AES_256_CBC.cpp" />
     <ClCompile Include="cpp\arrayfactory.cpp" />
     <ClCompile Include="cpp\ctlacquireaudio.cpp" />
     <ClCompile Include="cpp\ctlarraydumper.cpp" />
@@ -1465,6 +1465,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile Include="cpp\ctlfilesave.cpp" />
     <ClCompile Include="cpp\ctlfileutils.cpp" />
     <ClCompile Include="cpp\ctlgetmetrics.cpp" />
+    <ClCompile Include="cpp\ctlhashutils.cpp" />
     <ClCompile Include="cpp\ctlloadresources.cpp" />
     <ClCompile Include="cpp\ctlpapersize.cpp" />
     <ClCompile Include="cpp\ctlselectdialog.cpp" />
@@ -1702,9 +1703,8 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include=".\h\ctltr005.h" />
     <ClInclude Include=".\h\ctltr006.h" />
     <ClInclude Include=".\h\ctltr039.h" />
-    <ClInclude Include="aeslib\aes.h" />
-    <ClInclude Include="aeslib\aes.hpp" />
     <ClInclude Include="aeslib\AES_128_CBC.h" />
+    <ClInclude Include="aeslib\AES_256_CBC.h" />
     <ClInclude Include="cpp\pdflib32\a85encode.h" />
     <ClInclude Include="cpp\pdflib32\ahexencode.h" />
     <ClInclude Include="cpp\pdflib32\flateencode.h" />

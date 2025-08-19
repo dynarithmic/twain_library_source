@@ -27,29 +27,19 @@ SOFTWARE.
 #define AES_128_CBC_H__
 
 #define AES_BLOCK_SIZE 16
-#define AES_KEY_SIZE 16
-
-#define GETU32(in_data) (((unsigned int)(in_data)[0] << 24) ^ \
-						((unsigned int)(in_data)[1] << 16) ^ \
-						((unsigned int)(in_data)[2] <<  8) ^ \
-						((unsigned int)(in_data)[3] <<  0))
-
-#define PUTU32(out_data, st) { (out_data)[0] = (unsigned char)((st) >> 24); \
-							  (out_data)[1] = (unsigned char)((st) >> 16); \
-							  (out_data)[2] = (unsigned char)((st) >>  8); \
-							  (out_data)[3] = (unsigned char)((st) >>  0); }
+#define AES_KEY_SIZE_128 16
 
 typedef struct {
 	unsigned int roundkey[44];
 	unsigned int iv[4];
-} AES_CTX;
+} AES_CTX_128;
 
 // Wrap the static methods in a struct
 struct AES128
 {
-	static void AES_EncryptInit(AES_CTX* ctx, const unsigned char* key, const unsigned char* iv);
-	static void AES_Encrypt(AES_CTX* ctx, const unsigned char in_data[AES_BLOCK_SIZE], unsigned char out_data[AES_BLOCK_SIZE]);
-    static void AES_DecryptInit(AES_CTX* ctx, const unsigned char* key, const unsigned char* iv);
-    static void AES_Decrypt(AES_CTX* ctx, const unsigned char in_data[AES_BLOCK_SIZE], unsigned char out_data[AES_BLOCK_SIZE]);
+	static void AES_EncryptInit(AES_CTX_128* ctx, const unsigned char* key, const unsigned char* iv);
+	static void AES_Encrypt(AES_CTX_128* ctx, const unsigned char in_data[AES_BLOCK_SIZE], unsigned char out_data[AES_BLOCK_SIZE]);
+    static void AES_DecryptInit(AES_CTX_128* ctx, const unsigned char* key, const unsigned char* iv);
+    static void AES_Decrypt(AES_CTX_128* ctx, const unsigned char in_data[AES_BLOCK_SIZE], unsigned char out_data[AES_BLOCK_SIZE]);
 };
 #endif

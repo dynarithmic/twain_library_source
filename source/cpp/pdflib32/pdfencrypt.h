@@ -25,7 +25,7 @@ OF THIRD PARTY RIGHTS.
 
 #ifdef DTWAIN_SUPPORT_AES
     #include "..\aeslib\AES_128_CBC.h"
-    #include "..\aeslib\aes.hpp"
+    #include "..\aeslib\AES_256_CBC.h"
 #endif
 
 #define ENCRYPTION_OK           0
@@ -134,37 +134,23 @@ class PDFEncryptionRC4 : public PDFEncryption
 };
 
 #ifdef DTWAIN_SUPPORT_AES
-struct AESEncryptorTraits128
+template <typename ClassName, typename CTXType>
+struct AESEncryptorTraits
 {
     typedef std::vector<unsigned char> UCHARArray;
 
-    static void Initialize(AES_CTX* ctx, const UCHARArray& localKey, const unsigned char* iv)
+    static void Initialize(CTXType* ctx, const UCHARArray& localKey, const unsigned char* iv)
     {
-        AES128::AES_EncryptInit(ctx, localKey.data(), iv);
+        ClassName::AES_EncryptInit(ctx, localKey.data(), iv);
     }
 
-    static void EncryptBlock(AES_CTX* ctx, uint8_t* chunk)
+    static void EncryptBlock(CTXType* ctx, uint8_t* chunk)
     {
-        AES128::AES_Encrypt(ctx, chunk, chunk);
-    }
-};
-
-struct AESEncryptorTraits256
-{
-    typedef std::vector<unsigned char> UCHARArray;
-
-    static void Initialize(AES_ctx* ctx, const UCHARArray& localKey, const unsigned char* iv)
-    {
-        ::AES_init_ctx_iv(ctx, localKey.data(), iv);
-    }
-
-    static void EncryptBlock(AES_ctx* ctx, uint8_t* chunk)
-    {
-        ::AES_CBC_encrypt_buffer(ctx, chunk, AES_BLOCK_SIZE);
+        ClassName::AES_Encrypt(ctx, chunk, chunk);
     }
 };
 
-template <typename CTXType, typename EncryptorTraits>
+template <typename CTXType, typename ClassName, typename EncryptorTraits>
 class PDFAESGenericEncryptor
 {
     typedef std::vector<unsigned char> UCHARArray;
@@ -210,12 +196,12 @@ class PDFAESGenericEncryptor
             }
 
             // Place the iv as the first 16 bytes
-            dataOut.insert(0, (const char*)m_ivValue, AES_KEY_SIZE);
+            dataOut.insert(0, (const char*)m_ivValue, AES_BLOCK_SIZE);
         }
 };
 
-using PDFEncryptionAES128 = PDFAESGenericEncryptor<AES_CTX, AESEncryptorTraits128>;
-using PDFEncryptionAES256 = PDFAESGenericEncryptor<AES_ctx, AESEncryptorTraits256>;
+using PDFEncryptionAES128 = PDFAESGenericEncryptor<AES_CTX_128, AES128, AESEncryptorTraits<AES128, AES_CTX_128>>;
+using PDFEncryptionAES256 = PDFAESGenericEncryptor<AES_CTX_256, AES256, AESEncryptorTraits<AES256, AES_CTX_256>>;;
 
 class PDFEncryptionAES: public PDFEncryption
 {
@@ -224,7 +210,7 @@ class PDFEncryptionAES: public PDFEncryption
         void EncryptAES128(const std::string& dataIn, std::string& dataOut);
         void EncryptAES256(const std::string& dataIn, std::string& dataOut);
 private:
-        unsigned char m_ivValue[AES_KEY_SIZE];
+        unsigned char m_ivValue[AES_BLOCK_SIZE];
     public:
         void Encrypt(const std::string& dataIn, std::string& dataOut) override;
         void Encrypt(char *dataIn, int len) override;
