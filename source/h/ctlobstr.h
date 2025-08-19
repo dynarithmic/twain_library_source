@@ -788,7 +788,7 @@ namespace dynarithmic
             return ret;
         }
 
-        static std::vector<typename StringTraits::uchar_type> UCharsFromString(StringTraits::stringview_type str)
+        static std::vector<typename StringTraits::uchar_type> UCharsFromString(typename StringTraits::stringview_type str)
         {
             std::vector<typename StringTraits::uchar_type> ret;
             for (auto ch : str)
