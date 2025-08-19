@@ -32,14 +32,14 @@ SOFTWARE.
 typedef struct {
 	unsigned int roundkey[44];
 	unsigned int iv[4];
-} AES_CTX_128;
+} AES_CTX_128_CBC;
 
 // Wrap the static methods in a struct
-struct AES128
+struct AES128_CBC
 {
-	static void AES_EncryptInit(AES_CTX_128* ctx, const unsigned char* key, const unsigned char* iv);
-	static void AES_Encrypt(AES_CTX_128* ctx, const unsigned char in_data[AES_BLOCK_SIZE], unsigned char out_data[AES_BLOCK_SIZE]);
-    static void AES_DecryptInit(AES_CTX_128* ctx, const unsigned char* key, const unsigned char* iv);
-    static void AES_Decrypt(AES_CTX_128* ctx, const unsigned char in_data[AES_BLOCK_SIZE], unsigned char out_data[AES_BLOCK_SIZE]);
+	static void AES_EncryptInit(AES_CTX_128_CBC* ctx, const unsigned char* key, const unsigned char* iv);
+	static void AES_Encrypt(AES_CTX_128_CBC* ctx, const unsigned char in_data[AES_BLOCK_SIZE], unsigned char out_data[AES_BLOCK_SIZE]);
+    static void AES_DecryptInit(AES_CTX_128_CBC* ctx, const unsigned char* key, const unsigned char* iv);
+    static void AES_Decrypt(AES_CTX_128_CBC* ctx, const unsigned char in_data[AES_BLOCK_SIZE], unsigned char out_data[AES_BLOCK_SIZE]);
 };
 #endif

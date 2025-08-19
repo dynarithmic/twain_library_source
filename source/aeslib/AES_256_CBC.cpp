@@ -722,7 +722,7 @@ static const unsigned int rcon[10] = {
     0x1B000000, 0x36000000
 };
 
-void AES256::AES_EncryptInit(AES_CTX_256* ctx, const unsigned char* key, const unsigned char* iv)
+void AES256_CBC::AES_EncryptInit(AES_CTX_256_CBC* ctx, const unsigned char* key, const unsigned char* iv)
 {
     ctx->roundkey[0] = GETU32(key + 0);
     ctx->roundkey[1] = GETU32(key + 4);
@@ -763,7 +763,7 @@ void AES256::AES_EncryptInit(AES_CTX_256* ctx, const unsigned char* key, const u
     }
 }
 
-void AES256::AES_Encrypt(AES_CTX_256* ctx, const unsigned char in_data[AES_BLOCK_SIZE], unsigned char out_data[AES_BLOCK_SIZE])
+void AES256_CBC::AES_Encrypt(AES_CTX_256_CBC* ctx, const unsigned char in_data[AES_BLOCK_SIZE], unsigned char out_data[AES_BLOCK_SIZE])
 {
     unsigned int s0, s1, s2, s3, t0, t1, t2, t3;
 
@@ -855,7 +855,7 @@ void AES256::AES_Encrypt(AES_CTX_256* ctx, const unsigned char in_data[AES_BLOCK
     ctx->iv[3] = s3;
 }
 
-void AES256::AES_CTX_Free(AES_CTX_256* ctx)
+void AES256_CBC::AES_CTX_Free(AES_CTX_256_CBC* ctx)
 {
     for (int index = 0; index < 60; index++)
     {

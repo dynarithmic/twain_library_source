@@ -27,6 +27,7 @@ OF THIRD PARTY RIGHTS.
 #ifdef DTWAIN_SUPPORT_AES
     #include "..\aeslib\AES_128_CBC.h"
     #include "..\aeslib\AES_256_CBC.h"
+    #include "..\aeslib\AES_256_ECB.h"
 #endif
 
 #define ENCRYPTION_OK           0
@@ -203,22 +204,26 @@ class PDFAESGenericEncryptor
         }
 };
 
-using PDFEncryptionAES128 = PDFAESGenericEncryptor<AES_CTX_128, AES128, AESEncryptorTraits<AES128, AES_CTX_128>>;
-using PDFEncryptionAES256 = PDFAESGenericEncryptor<AES_CTX_256, AES256, AESEncryptorTraits<AES256, AES_CTX_256>>;;
+using PDFEncryptionAES128_CBC = PDFAESGenericEncryptor<AES_CTX_128_CBC, AES128_CBC, AESEncryptorTraits<AES128_CBC, AES_CTX_128_CBC>>;
+using PDFEncryptionAES256_CBC = PDFAESGenericEncryptor<AES_CTX_256_CBC, AES256_CBC, AESEncryptorTraits<AES256_CBC, AES_CTX_256_CBC>>;;
+using PDFEncryptionAES256_ECB = PDFAESGenericEncryptor<AES_CTX_256_ECB, AES256_ECB, AESEncryptorTraits<AES256_ECB, AES_CTX_256_ECB>>;;
 
 class PDFEncryptionAES: public PDFEncryption
 {
     protected:
         UCHARArray GetExtendedKey(int number, int generation);
-        void EncryptAES128(const std::string& dataIn, std::string& dataOut);
-        void EncryptAES256(const std::string& dataIn, std::string& dataOut);
-private:
+
+    private:
         unsigned char m_ivValue[AES_BLOCK_SIZE];
     public:
         void Encrypt(const std::string& dataIn, std::string& dataOut) override;
         void Encrypt(char *dataIn, int len) override;
         void PrepareKey() override;
         void PrepareKey(const unsigned char* key, size_t keySize, const unsigned char* iv);
+
+        void EncryptAES128CBC(const std::string& dataIn, std::string& dataOut);
+        void EncryptAES256CBC(const std::string& dataIn, std::string& dataOut);
+        void EncryptAES256ECB(const std::string& dataIn, std::string& dataOut);
 };
 #endif
 #endif
