@@ -118,6 +118,7 @@ namespace dynarithmic
     struct ANSIStringTraits
     {
         using char_type = char;
+        using uchar_type = unsigned char;
         using string_type = std::string;
         using stringview_type = std::string_view;
         using stringarray_type = std::vector<string_type>;
@@ -268,6 +269,7 @@ namespace dynarithmic
     struct UnicodeStringTraits
     {
         using char_type = wchar_t;
+        using uchar_type = wchar_t;
         using string_type = std::wstring;
         using stringview_type = std::wstring_view;
         using stringarray_type = std::vector<string_type>;
@@ -776,6 +778,22 @@ namespace dynarithmic
         static double ToDouble(const CharType* s1, double defVal = 0.0)
         {
             return s1?StringTraits::ToDouble(s1):defVal;
+        }
+
+        static StringType StringFromUChars(typename const StringTraits::uchar_type* val, size_t nSize)
+        {
+            StringType ret;
+            for (size_t i = 0; i < nSize; ++i)
+                ret += static_cast<StringTraits::char_type>(val[i]);
+            return ret;
+        }
+
+        static std::vector<typename StringTraits::uchar_type> UCharsFromString(StringTraits::stringview_type str)
+        {
+            std::vector<typename StringTraits::uchar_type> ret;
+            for (auto ch : str)
+                ret.push_back(ch);
+            return ret;
         }
 
         static int ReverseFind(typename StringTraits::stringview_type str, CharType ch)

@@ -646,6 +646,9 @@
     <ClCompile Include="aeslib\AES_256_ECB.cpp">
       <Filter>AES Encryption</Filter>
     </ClCompile>
+    <ClCompile Include="cpp\ctlrandnumutils.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp\pdflib32\a85encode.h">
@@ -1115,6 +1118,9 @@
     </ClInclude>
     <ClInclude Include="aeslib\AES_256_ECB.h">
       <Filter>AES Encryption</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctlrandnumutils.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

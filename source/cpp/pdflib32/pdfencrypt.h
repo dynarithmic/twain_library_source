@@ -72,6 +72,15 @@ class PDFEncryption
         /** The encryption key for the user */
         UCHARArray m_nUserKey;
 
+        /** The UE encryption key (PDF 2.0 only) */
+        UCHARArray m_nUserKeyE;
+
+        /** The OE encryption key (PDF 2.0 only) */
+        UCHARArray m_nOwnerKeyE;
+
+        /** The Perms encryption key (PDF 2.0 only) */
+        UCHARArray m_nPermsKey;
+
         int m_nPermissions;
 
         std::string m_documentID;
@@ -95,8 +104,11 @@ class PDFEncryption
         void EncryptRC4(const UCHARArray& dataIn, UCHARArray& dataOut);
         void EncryptRC4(UCHARArray& data);
         virtual UCHARArray GetExtendedKey(int number, int generation);
-        UCHARArray ComputeRevision6Hash(std::string shaHash);
-        std::string Revision6OneRound(std::string shaHash);
+        UCHARArray ComputeRevision6Hash(std::string shaHash, bool bCreateOwnerPass,
+                                        std::string inputPassword, const std::vector<unsigned char>& userKey);
+        std::string Revision6OneRound(std::string origInput, bool bCreateOwnerPass,
+                                      std::string inputPassword, const std::vector<unsigned char>& userKey);
+        void ComputeOwnerUserKey(std::string userPassword, std::string ownerPassword, int permissions);
 
     public:
         PDFEncryption();
@@ -122,6 +134,8 @@ class PDFEncryption
 
         UCHARArray& GetUserKey() { return m_nUserKey; }
         UCHARArray& GetOwnerKey() { return m_nOwnerKey; }
+        UCHARArray& GetUserKeyE() { return m_nUserKeyE; }
+        UCHARArray& GetOwnerKeyE() { return m_nOwnerKeyE; }
         UCHARArray& GetEncryptionKey() { return m_EncryptionKey; }
         int GetPermissions() const { return m_nPermissions; }
 };
