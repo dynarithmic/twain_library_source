@@ -67,19 +67,19 @@ class PDFEncryption
         //CMD5Checksum MD5Alternate;
 
         /** The encryption key for the owner */
-        UCHARArray m_nOwnerKey;
+        UCHARArray m_OwnerKey;
 
         /** The encryption key for the user */
-        UCHARArray m_nUserKey;
+        UCHARArray m_UserKey;
 
         /** The UE encryption key (PDF 2.0 only) */
-        UCHARArray m_nUserKeyE;
+        UCHARArray m_UserKeyE;
 
         /** The OE encryption key (PDF 2.0 only) */
-        UCHARArray m_nOwnerKeyE;
+        UCHARArray m_OwnerKeyE;
 
         /** The Perms encryption key (PDF 2.0 only) */
-        UCHARArray m_nPermsKey;
+        UCHARArray m_PermsKey;
 
         int m_nPermissions;
 
@@ -108,7 +108,7 @@ class PDFEncryption
                                         std::string inputPassword, const std::vector<unsigned char>& userKey);
         std::string Revision6OneRound(std::string origInput, bool bCreateOwnerPass,
                                       std::string inputPassword, const std::vector<unsigned char>& userKey);
-        void ComputeOwnerUserKey(std::string userPassword, std::string ownerPassword, int permissions);
+        void ComputeOwnerUserKey2(std::string userPassword, std::string ownerPassword, int permissions);
 
     public:
         PDFEncryption();
@@ -132,11 +132,12 @@ class PDFEncryption
         virtual void Encrypt(const std::string& /*dataIn*/, std::string& /*dataOut*/) {}
         virtual void Encrypt(char * /*dataIn*/, int/* len*/) {}
 
-        UCHARArray& GetUserKey() { return m_nUserKey; }
-        UCHARArray& GetOwnerKey() { return m_nOwnerKey; }
-        UCHARArray& GetUserKeyE() { return m_nUserKeyE; }
-        UCHARArray& GetOwnerKeyE() { return m_nOwnerKeyE; }
+        UCHARArray& GetUserKey() { return m_UserKey; }
+        UCHARArray& GetOwnerKey() { return m_OwnerKey; }
+        UCHARArray& GetUserKeyE() { return m_UserKeyE; }
+        UCHARArray& GetOwnerKeyE() { return m_OwnerKeyE; }
         UCHARArray& GetEncryptionKey() { return m_EncryptionKey; }
+        UCHARArray& GetPermsKey() { return m_PermsKey; }
         int GetPermissions() const { return m_nPermissions; }
 };
 

@@ -1171,8 +1171,8 @@ void EncryptionObject::ComposeObject()
         std::string enc1;
         std::string enc2;
         auto& engine = GetParent()->GetEncryptionEngine();
-        const PDFEncryption::UCHARArray enc1Array = engine.GetOwnerKey();
-        const PDFEncryption::UCHARArray enc2Array = engine.GetUserKey();
+        PDFEncryption::UCHARArray enc1Array = engine.GetOwnerKey();
+        PDFEncryption::UCHARArray enc2Array = engine.GetUserKey();
         enc1.append(reinterpret_cast<const char*>(enc1Array.data()), 32);
         enc2.append(reinterpret_cast<const char*>(enc2Array.data()), 32);
         AppendContents("/O (");
@@ -1181,7 +1181,33 @@ void EncryptionObject::ComposeObject()
         AppendContents(")\n/U (");
         enc2 = MakeCompatiblePDFString(enc2);
         WriteRaw(enc2.data(), enc2.length());
-        sprintf(szBuf, ")\n/P %d\n/V %d\n", engine.GetPermissions(), m_nVValue);
+        AppendContents(")\n");
+
+        // If there are OE and UE entries, write them now
+        enc1Array = engine.GetOwnerKeyE();
+        enc2Array = engine.GetUserKeyE();
+        if (!enc1Array.empty() && !enc2Array.empty() )
+        {
+            AppendContents("/OE (");
+            enc1 = MakeCompatiblePDFString(enc1);
+            WriteRaw(enc1.data(), enc1.length());
+            AppendContents(")\n/UE (");
+            enc2 = MakeCompatiblePDFString(enc2);
+            WriteRaw(enc2.data(), enc2.length());
+            AppendContents(")\n");
+        }
+
+        // If there is a Perms entry, write it now
+        enc1Array = engine.GetPermsKey();
+        if (!enc1Array.empty())
+        {
+            AppendContents("/Perms (");
+            enc1 = MakeCompatiblePDFString(enc1);
+            WriteRaw(enc1.data(), enc1.length());
+            AppendContents(")\n");
+        }
+
+        sprintf(szBuf, "/P %d\n/V %d\n", engine.GetPermissions(), m_nVValue);
         AppendContents(szBuf);
         if (m_RValue == 3)
             sprintf(szBuf, "/R %d\n/Length %d\n", m_RValue, m_nLength);

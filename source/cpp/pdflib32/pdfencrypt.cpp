@@ -209,15 +209,15 @@ PDFEncryption::PDFEncryption() : state(256), m_xRC4Component{}, m_yRC4Component{
                                 m_nMaxPasswordLength(PasswordLength),
                                 m_nPermissions{}
 {
-    m_nOwnerKey.resize(m_nMaxPasswordLength);
-    m_nUserKey.resize(m_nMaxPasswordLength);
+    m_OwnerKey.resize(m_nMaxPasswordLength);
+    m_UserKey.resize(m_nMaxPasswordLength);
 }
 
 void PDFEncryption::SetMaxPasswordLength(uint32_t maxLen)
 {
     m_nMaxPasswordLength = maxLen;
-    m_nOwnerKey.resize(m_nMaxPasswordLength);
-    m_nUserKey.resize(m_nMaxPasswordLength);
+    m_OwnerKey.resize(m_nMaxPasswordLength);
+    m_UserKey.resize(m_nMaxPasswordLength);
 }
 
 void PDFEncryption::SetupAllKeys(const std::string& DocID,
@@ -260,8 +260,8 @@ void PDFEncryption::SetupAllKeys(const std::string& DocID,
         const UCHARArray userPad = PadPassword(userPassword);
         const UCHARArray ownerPad = PadPassword(ownerPassword);
 
-        m_nOwnerKey = ComputeOwnerKey(userPad, ownerPad, strength128Bits);
-        SetupByUserPad(DocID, userPad, m_nOwnerKey, permissionsParam, strength128Bits);
+        m_OwnerKey = ComputeOwnerKey(userPad, ownerPad, strength128Bits);
+        SetupByUserPad(DocID, userPad, m_OwnerKey, permissionsParam, strength128Bits);
     }
     else
     {
@@ -271,7 +271,7 @@ void PDFEncryption::SetupAllKeys(const std::string& DocID,
         // PDF 2.0 user/owner key calculation
         std::string uPassword(reinterpret_cast<const char *>(&userPassword[0]), userPassword.size());
         std::string oPassword(reinterpret_cast<const char*>(&ownerPassword[0]), ownerPassword.size());
-        ComputeOwnerUserKey(uPassword, oPassword, permissionsParam);
+        ComputeOwnerUserKey2(uPassword, oPassword, permissionsParam);
     }
 }
 
@@ -291,7 +291,7 @@ void PDFEncryption::SetupGlobalEncryptionKey(const std::string& documentID,
                                              int permissionsParam,
                                              bool strength128Bits)
 {
-    this->m_nOwnerKey = ownerKeyParam;
+    this->m_OwnerKey = ownerKeyParam;
     this->m_nPermissions = permissionsParam;
     m_documentID = documentID;
     m_EncryptionKey.resize(m_nActualKeyLength);
@@ -389,7 +389,7 @@ void PDFEncryption::SetupUserKey()
         EncryptRC4(digest, 0, 16);
 
         for (int k = 16; k < 32; ++k)
-            m_nUserKey[k] = 0;
+            m_UserKey[k] = 0;
 
         // step 5
         UCHARArray tempkey = digest;
@@ -406,13 +406,13 @@ void PDFEncryption::SetupUserKey()
             EncryptRC4(digest, 0, 16);
             tempkey = digest;
         }
-        m_nUserKey = std::move(tempkey);
+        m_UserKey = std::move(tempkey);
     }
     else
     {
         const UCHARArray vectorPad(pad, pad + std::size(pad));
         PrepareRC4Key(m_EncryptionKey);
-        EncryptRC4(vectorPad, m_nUserKey);
+        EncryptRC4(vectorPad, m_UserKey);
     }
 }
 
@@ -586,11 +586,11 @@ std::string PDFEncryption::Revision6OneRound(std::string origInput,
     return dynarithmic::StringWrapperA::StringFromUChars(newK.data(), newK.size());
 }
 
-void PDFEncryption::ComputeOwnerUserKey(std::string userPassword, std::string ownerPassword, int permissions)
+void PDFEncryption::ComputeOwnerUserKey2(std::string userPassword, std::string ownerPassword, int permissions)
 {
     std::array<std::string, 2> aPasswords = { userPassword, ownerPassword };
-    std::array<UCHARArray*, 2> aKeysToUse = { &m_nUserKey, &m_nOwnerKey };
-    std::array<UCHARArray*, 2> aKeysToUseE = { &m_nUserKeyE, &m_nOwnerKeyE };
+    std::array<UCHARArray*, 2> aKeysToUse = { &m_UserKey, &m_OwnerKey };
+    std::array<UCHARArray*, 2> aKeysToUseE = { &m_UserKeyE, &m_OwnerKeyE };
 
     auto keyToUse = dynarithmic::StringWrapperA::StringFromUChars(m_EncryptionKey.data(), m_EncryptionKey.size());
 
@@ -666,7 +666,7 @@ void PDFEncryption::ComputeOwnerUserKey(std::string userPassword, std::string ow
         PermBlock[i] = extendedPermissions & mask;
         mask <<= 8;
     }
-    PermBlock[8] = 'F';
+    PermBlock[8] = 'T';
     PermBlock[9] = 'a';
     PermBlock[10] = 'd';
     PermBlock[11] = 'b';
@@ -685,7 +685,7 @@ void PDFEncryption::ComputeOwnerUserKey(std::string userPassword, std::string ow
     std::string sPermBlock = dynarithmic::StringWrapperA::StringFromUChars(PermBlock, 16);
     aes.EncryptAES256CBC(sPermBlock, sPermsKey);
 
-    m_nPermsKey = dynarithmic::StringWrapperA::UCharsFromString(sPermsKey);
+    m_PermsKey = dynarithmic::StringWrapperA::UCharsFromString(sPermsKey);
 }
 
 /* Future implementation for PDF 2.0 encryption */
@@ -712,11 +712,8 @@ PDFEncryption::UCHARArray PDFEncryption::ComputeRevision6Hash(std::string origIn
         else
             break;
     }
-    PDFEncryption::UCHARArray finalK;
-    std::transform(shaHash.begin(), shaHash.begin() + 32, std::back_inserter(finalK), [](auto ch)
-        {
-            return static_cast<unsigned char>(ch);
-        });
+    PDFEncryption::UCHARArray finalK = dynarithmic::StringWrapperA::UCharsFromString(shaHash);
+    finalK.resize(32);
     return finalK;
 }
 
