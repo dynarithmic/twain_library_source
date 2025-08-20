@@ -782,18 +782,12 @@ namespace dynarithmic
 
         static StringType StringFromUChars(typename const StringTraits::uchar_type* val, size_t nSize)
         {
-            StringType ret;
-            for (size_t i = 0; i < nSize; ++i)
-                ret += static_cast<StringTraits::char_type>(val[i]);
-            return ret;
+            return StringType(val, val + nSize);
         }
 
         static std::vector<typename StringTraits::uchar_type> UCharsFromString(typename StringTraits::stringview_type str)
         {
-            std::vector<typename StringTraits::uchar_type> ret;
-            for (auto ch : str)
-                ret.push_back(ch);
-            return ret;
+            return std::vector<typename StringTraits::uchar_type>(str.begin(), str.end());
         }
 
         static int ReverseFind(typename StringTraits::stringview_type str, CharType ch)
