@@ -462,6 +462,7 @@ PdfDocument::PdfDocument() :
     m_nPermissions(0),
     m_bIsStrongEncryption(false),
     m_bIsAESEncrypted(false),
+    m_bIsAES256Encrypted(false),
     m_bIsEncrypted(false),
     m_bASCIICompression(false),
     m_bIsNoCompression(false),
@@ -989,7 +990,7 @@ bool PdfDocument::EndPDFCreation()
     {
         // Write the encryption object
         EncryptionObject EObject(m_nCurObjNum);
-        EObject.SetAESEncryption(m_bIsAESEncrypted);
+        EObject.SetAESEncryption(m_bIsAESEncrypted || m_bIsAES256Encrypted);
         EObject.AssignParent(this);
         EObject.SetFilter("Standard");
         EObject.SetLength(m_nKeyLength * 8);
@@ -1004,6 +1005,7 @@ bool PdfDocument::EndPDFCreation()
             }
             else
             {
+                // AES-256
                 EObject.SetRValue(5);
                 EObject.SetVValue(5);
             }
@@ -2397,15 +2399,15 @@ void PdfDocument::AddDuplicatePage(unsigned long CRCVal, unsigned long ObjNum)
     m_allPageCRC[CRCVal] = ObjNum;
 }
 
-void PdfDocument::SetEncryption(const CTL_StringType& ownerPassword,
-                                const CTL_StringType& userPassword,
+void PdfDocument::SetEncryption(CTL_StringViewType ownerPassword,
+                                CTL_StringViewType userPassword,
                                 unsigned int permissions,
                                 bool bIsStrongEncryption,
                                 bool isAESEncrypted,
                                 uint32_t nKeyLength)
 {
-    m_EncryptionPassword[OWNER_PASSWORD] = StringConversion::Convert_Native_To_Ansi(ownerPassword);
-    m_EncryptionPassword[USER_PASSWORD] = StringConversion::Convert_Native_To_Ansi(userPassword);
+    m_EncryptionPassword[OWNER_PASSWORD] = StringConversion::Convert_NativePtr_To_Ansi(ownerPassword.data());
+    m_EncryptionPassword[USER_PASSWORD] = StringConversion::Convert_NativePtr_To_Ansi(userPassword.data());
     m_nPermissions = permissions;
     m_bIsStrongEncryption = bIsStrongEncryption || isAESEncrypted;
     m_bIsAESEncrypted = isAESEncrypted;
@@ -2417,12 +2419,17 @@ void PdfDocument::SetEncryption(const CTL_StringType& ownerPassword,
 #ifdef DTWAIN_SUPPORT_AES
         m_Encryption.reset(new PDFEncryptionAES);
         if (m_nKeyLength == 32)  // This is AES-256
+        {
             m_Encryption->SetMaxPasswordLength(127);
+            m_bIsAES256Encrypted = true;
+            // must set to PDF version 2.0
+            SetPDFVersion(2, 0);
+        }
+        else
+            // must set to PDF version 1.6
+            SetPDFVersion(1, 6);
 #endif
         m_bIsStrongEncryption = true; // always uses strong encryption for AES
-
-        // must set to PDF version 1.6
-        SetPDFVersion(1,6);
     }
 
     const std::string s = GetSystemTimeInMilliseconds().substr(0,13) + "+1359064+" + m_sCurSysTime.substr(0,13);

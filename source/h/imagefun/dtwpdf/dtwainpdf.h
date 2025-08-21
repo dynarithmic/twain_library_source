@@ -392,14 +392,14 @@ namespace dynarithmic
             CTL_StringType GetThumbnailFile() const { return m_sThumbnailFileName; }
             PDFEncryption& GetEncryptionEngine() { return *m_Encryption.get(); }
 
-            void SetEncryption(const CTL_StringType& ownerPassword,
-                               const CTL_StringType& userPassword,
+            void SetEncryption(CTL_StringViewType ownerPassword,
+                               CTL_StringViewType userPassword,
                                unsigned int permissions,
                                bool bIsStrongEncryption,
                                bool isAESEncrypted,
                                uint32_t nKeyLength);
-            bool IsEncrypted() const { return m_bIsEncrypted ;} //& !m_bASCIIHexCompression; }
-            bool IsAESEncrypted() const { return m_bIsAESEncrypted; } //& !m_bASCIIHexCompression; }
+            bool IsEncrypted() const { return m_bIsEncrypted ;}
+            bool IsAESEncrypted() const { return m_bIsAESEncrypted; } 
             StringVector& GetDocumentID() { return m_DocumentID; }
             CTL_TEXTELEMENTNAKEDPTRLIST::const_iterator GetFirstTextElement() { return m_vPDFText.begin(); }
             void AddTextElement(PDFTextElement* element)
@@ -479,6 +479,7 @@ namespace dynarithmic
             int          m_nPermissions;
             bool         m_bIsStrongEncryption;
             bool         m_bIsAESEncrypted;
+            bool         m_bIsAES256Encrypted;
             bool         m_bIsEncrypted;
             bool        m_bASCIICompression;
             bool        m_bIsNoCompression;

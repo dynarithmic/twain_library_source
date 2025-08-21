@@ -63,10 +63,10 @@ CTL_StringType GetTwainDirFullName(LPCTSTR strTwainDLLName,
 enum { dll_already_loaded, dll_loaded, dll_notfound };
 
 template <typename ErrorCodeType>
-static std::pair<int, int> LoadTwainDLL(boost::dll::shared_library& libloader, const CTL_StringType& fNameTotal)
+static std::pair<int, int> LoadTwainDLL(boost::dll::shared_library& libloader, CTL_StringViewType fNameTotal)
 {
     ErrorCodeType ec;
-    HMODULE hMod = ::GetModuleHandle(fNameTotal.c_str());
+    HMODULE hMod = ::GetModuleHandle(fNameTotal.data());
     if (hMod)
     {
         libloader = boost::dll::shared_library(hMod);
@@ -167,7 +167,7 @@ CTL_StringType GetTwainDirFullNameEx(CTL_TwainDLLHandle* pHandle, LPCTSTR strTwa
         }
     };
 
-    const CTL_StringType curSearchOrder = searchOrderToUse;
+    CTL_StringViewType curSearchOrder = searchOrderToUse;
     CTL_StringType fNameTotal;
     const int minSize = static_cast<int>((std::min)(dirNames.size(), curSearchOrder.size()));
     for (int i = 0; i < minSize; ++i)
