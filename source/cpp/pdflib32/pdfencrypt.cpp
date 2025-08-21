@@ -683,7 +683,7 @@ void PDFEncryption::ComputeOwnerUserKey2(std::string userPassword, std::string o
     // Use the encryption key for the AES-256 hash.
     std::string sPermsKey;
     std::string sPermBlock = dynarithmic::StringWrapperA::StringFromUChars(PermBlock, 16);
-    aes.EncryptAES256CBC(sPermBlock, sPermsKey);
+    aes.EncryptAES256ECB(sPermBlock, sPermsKey);
 
     m_PermsKey = dynarithmic::StringWrapperA::UCharsFromString(sPermsKey);
 }
