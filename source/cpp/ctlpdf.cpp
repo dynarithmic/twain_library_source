@@ -63,8 +63,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFEncryption(DTWAIN_SOURCE Source, DTWAIN_BO
 {
     LOG_FUNC_ENTRY_PARAMS((Source, bUseEncryption, lpszUser, lpszOwner, Permissions, UseStrongEncryption))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    const CTL_StringType owner = lpszOwner?lpszOwner:_T("");
-    const CTL_StringType user = lpszUser?lpszUser:_T("");
+    CTL_StringViewType owner = lpszOwner?lpszOwner:_T("");
+    CTL_StringViewType user = lpszUser?lpszUser:_T("");
 
     // Even though the Permissions parameter is an unsigned 32-bit value from the user, 
     // this will be "converted" to a 32-bit signed integer internally, which is what the PDF 
