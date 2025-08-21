@@ -1006,7 +1006,7 @@ bool PdfDocument::EndPDFCreation()
             else
             {
                 // AES-256
-                EObject.SetRValue(5);
+                EObject.SetRValue(6);
                 EObject.SetVValue(5);
             }
         }
