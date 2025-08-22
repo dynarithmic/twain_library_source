@@ -531,6 +531,11 @@ namespace dynarithmic
         #endif
             return lVersionType;
     }
+
+    static constexpr uint32_t RoundUpToNearest(uint32_t value, uint32_t upto) noexcept
+    {
+        return  (value + (upto - 1)) / upto * upto;
+    }
 };
 
 #endif
