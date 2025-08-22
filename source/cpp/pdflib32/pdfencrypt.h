@@ -25,10 +25,11 @@ OF THIRD PARTY RIGHTS.
 #include <string_view>
 
 #ifdef DTWAIN_SUPPORT_AES
-    #include "..\aeslib\AES_128_CBC.h"
-    #include "..\aeslib\AES_256_CBC.h"
-    #include "..\aeslib\AES_256_ECB.h"
+    #include "..\aeslib\AES.h"
 #endif
+
+#include <ctlobstr.h>
+#include <ctlconstexprutils.h>
 
 #define ENCRYPTION_OK           0
 #define ENCRYPTION_NOTSET       1
@@ -104,11 +105,7 @@ class PDFEncryption
         void EncryptRC4(const UCHARArray& dataIn, UCHARArray& dataOut);
         void EncryptRC4(UCHARArray& data);
         virtual UCHARArray GetExtendedKey(int number, int generation);
-        UCHARArray ComputeRevision6Hash(std::string shaHash, bool bCreateOwnerPass,
-                                        std::string inputPassword, const std::vector<unsigned char>& userKey);
-        std::string Revision6OneRound(std::string origInput, bool bCreateOwnerPass,
-                                      std::string inputPassword, const std::vector<unsigned char>& userKey);
-        void ComputeOwnerUserKey2(std::string userPassword, std::string ownerPassword, int permissions);
+        void CreateAESV3Info(std::string userPassword, std::string ownerPassword, int permissions);
 
     public:
         PDFEncryption();
@@ -132,6 +129,10 @@ class PDFEncryption
         virtual void Encrypt(const std::string& /*dataIn*/, std::string& /*dataOut*/) {}
         virtual void Encrypt(char * /*dataIn*/, int/* len*/) {}
 
+        UCHARArray ComputeHashAESV3(std::string pswd, std::string salt, std::string uValue);
+        void ComputeUserKeyAESV3(const std::string& userpswd);
+        void ComputeOwnerKeyAESV3(const std::string& ownerpswd);
+
         UCHARArray& GetUserKey() { return m_UserKey; }
         UCHARArray& GetOwnerKey() { return m_OwnerKey; }
         UCHARArray& GetUserKeyE() { return m_UserKeyE; }
@@ -153,10 +154,11 @@ class PDFEncryptionRC4 : public PDFEncryption
 };
 
 #ifdef DTWAIN_SUPPORT_AES
-template <typename ClassName, typename CTXType>
+template <typename ClassName, typename CTXType, bool UseIV>
 struct AESEncryptorTraits
 {
     typedef std::vector<unsigned char> UCHARArray;
+    static const bool s_bUseIV = UseIV;
 
     static void Initialize(CTXType* ctx, const UCHARArray& localKey, const unsigned char* iv)
     {
@@ -169,60 +171,6 @@ struct AESEncryptorTraits
     }
 };
 
-template <typename CTXType, typename ClassName, typename EncryptorTraits>
-class PDFAESGenericEncryptor
-{
-    typedef std::vector<unsigned char> UCHARArray;
-
-    CTXType ctx;
-    UCHARArray m_LocalKey;
-    unsigned char* m_ivValue;
-    public:
-        PDFAESGenericEncryptor(UCHARArray localKey, unsigned char* ivValue) :
-            m_LocalKey(localKey), m_ivValue(ivValue) {}
-
-        void InitializeEngine()
-        {
-            EncryptorTraits::Initialize(&ctx, m_LocalKey, m_ivValue);
-        }
-
-        void EncryptBlock(uint8_t* chunk)
-        {
-            EncryptorTraits::EncryptBlock(&ctx, chunk);
-        }
-
-        void Encrypt(const std::string& dataIn, std::string& dataOut)
-        {
-            auto numBytes = dataIn.size();
-
-            InitializeEngine();
-
-            size_t numchunks = numBytes / AES_BLOCK_SIZE + 1;
-            if (numBytes > 0 && numBytes % AES_BLOCK_SIZE == 0)
-                --numchunks;
-            dataOut.clear();
-
-            int start = 0;
-            size_t totalBytes = numBytes;
-            for (size_t i = 0; i < numchunks; ++i)
-            {
-                uint8_t oneChunk[AES_BLOCK_SIZE] = {};
-                memcpy(oneChunk, dataIn.data() + start, std::min(totalBytes, static_cast<size_t>(AES_BLOCK_SIZE)));
-                EncryptBlock(oneChunk);
-                std::copy_n(oneChunk, AES_BLOCK_SIZE, std::back_inserter(dataOut));
-                start += AES_BLOCK_SIZE;
-                totalBytes -= AES_BLOCK_SIZE;
-            }
-
-            // Place the iv as the first 16 bytes
-            dataOut.insert(0, (const char*)m_ivValue, AES_BLOCK_SIZE);
-        }
-};
-
-using PDFEncryptionAES128_CBC = PDFAESGenericEncryptor<AES_CTX_128_CBC, AES128_CBC, AESEncryptorTraits<AES128_CBC, AES_CTX_128_CBC>>;
-using PDFEncryptionAES256_CBC = PDFAESGenericEncryptor<AES_CTX_256_CBC, AES256_CBC, AESEncryptorTraits<AES256_CBC, AES_CTX_256_CBC>>;;
-using PDFEncryptionAES256_ECB = PDFAESGenericEncryptor<AES_CTX_256_ECB, AES256_ECB, AESEncryptorTraits<AES256_ECB, AES_CTX_256_ECB>>;;
-
 class PDFEncryptionAES: public PDFEncryption
 {
     protected:
@@ -230,13 +178,20 @@ class PDFEncryptionAES: public PDFEncryption
 
     private:
         unsigned char m_ivValue[AES_BLOCK_SIZE];
+        bool m_bIsPaddingUsed = true;
+        void EncryptInternal(std::string dataIn, std::string& dataOut,
+                             AESMode aesMode, AESKeyLength keyLength);
+
     public:
         void Encrypt(const std::string& dataIn, std::string& dataOut) override;
         void Encrypt(char *dataIn, int len) override;
+        void SetPaddingUsed(bool bSet) { m_bIsPaddingUsed = bSet; }
+        bool IsPaddingUsed() const { return m_bIsPaddingUsed; }
         void PrepareKey() override;
         void PrepareKey(const unsigned char* key, size_t keySize, const unsigned char* iv);
 
         void EncryptAES128CBC(const std::string& dataIn, std::string& dataOut);
+        void EncryptAES128ECB(const std::string& dataIn, std::string& dataOut);
         void EncryptAES256CBC(const std::string& dataIn, std::string& dataOut);
         void EncryptAES256ECB(const std::string& dataIn, std::string& dataOut);
 };

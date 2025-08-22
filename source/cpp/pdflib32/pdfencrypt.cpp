@@ -27,13 +27,14 @@ OF THIRD PARTY RIGHTS.
 #include <vector>
 #include <random>
 #include <ctlrandnumutils.h>
-#include <boost/multiprecision/cpp_int.hpp> // Include for uint128_t
+
 
 #undef min
 #undef max
 #include "pdfencrypt.h"
 #include "../hashlib/md5.h"
 #include "ctlhashutils.h"
+#include "ctlstringutils.h"
 #include "ctlobstr.h"
 
 #define STRINGER_2_(x) #x
@@ -43,21 +44,6 @@ std::string GetSystemTimeInMilliseconds();
 #ifdef _MSC_VER
 #pragma warning (disable:4244)
 #endif
-
-using namespace boost::multiprecision;
-
-// Function to convert 16-byte big-endian char array to int64_t
-static uint128_t bigEndianBytesToInt(const unsigned char* bytes, size_t numBytes)
-{
-    uint128_t value = 0;
-
-    // Iterate through the bytes and shift them into the value
-    // Big-endian means the most significant byte is first (at index 0)
-    for (size_t i = 0; i < numBytes; ++i) { // For an 8-byte (64-bit) integer
-        value = (value << 8) | bytes[i];
-    }
-    return value;
-}
 
 template <typename T>
 void ArrayCopy(const T& input_array, int start, T& output_array, int output_start, int nBytes)
@@ -265,14 +251,220 @@ void PDFEncryption::SetupAllKeys(const std::string& DocID,
     }
     else
     {
-        // File encryption key
-        m_EncryptionKey = dynarithmic::CreateRandomDigits(32);
-
-        // PDF 2.0 user/owner key calculation
-        std::string uPassword(reinterpret_cast<const char *>(&userPassword[0]), userPassword.size());
-        std::string oPassword(reinterpret_cast<const char*>(&ownerPassword[0]), ownerPassword.size());
-        ComputeOwnerUserKey2(uPassword, oPassword, permissionsParam);
+        CreateAESV3Info(dynarithmic::StringWrapperA::StringFromUChars(ownerPassword.data(), ownerPassword.size()),
+                        dynarithmic::StringWrapperA::StringFromUChars(userPassword.data(), userPassword.size()),
+                        permissionsParam);
     }
+}
+
+void PDFEncryption::CreateAESV3Info(std::string userPassword, std::string ownerPassword, int permissions)
+{
+    // Generate file encryption key
+    m_EncryptionKey = dynarithmic::CreateRandomDigits(32);
+
+    // Compute U and UE values
+    ComputeUserKeyAESV3(userPassword);
+
+    // Compute O and OE value
+    ComputeOwnerKeyAESV3(ownerPassword);
+
+    // Compute the permissions
+    // Compute the Perms key
+    /*  Fill a 16 - byte block as follows :
+            Extend the permissions(contents of the P integer) to 64 bits by setting the upper 32 bits to all 1’s.
+                NOTE This allows for future extension without changing the format.
+                b) Record the 8 bytes of permission in the bytes 0 - 7 of the block, low order byte first.
+                c) Set byte 8 to the ASCII character "T" or "F" according to the EncryptMetadata boolean.
+                d) Set bytes 9 - 11 to the ASCII characters '"a", "d", "b".
+                e) Set bytes 12 - 15 to 4 bytes of random data, which will be ignored.
+                f) Encrypt the 16 - byte block using AES - 256 in ECB mode with an initialization vector of zero, using the file
+                encryption key as the key.The result(16 bytes) is stored as the Perms string, and checked for validity
+                when the file is opened.*/
+
+    m_nPermissions = permissions;
+    unsigned char PermBlock[16] = {};
+    PermBlock[3] = ((unsigned)permissions >> 24) & 0xFF;
+    PermBlock[2] = ((unsigned)permissions >> 16) & 0xFF;
+    PermBlock[1] = ((unsigned)permissions >> 8) & 0xFF;
+    PermBlock[0] = ((unsigned)permissions >> 0) & 0xFF;
+
+    PermBlock[4] = 0xFF;
+    PermBlock[5] = 0xFF;
+    PermBlock[6] = 0xFF;
+    PermBlock[7] = 0xFF;
+
+    PermBlock[8] = 'T';
+    PermBlock[9] = 'a';
+    PermBlock[10] = 'd';
+    PermBlock[11] = 'b';
+
+    PermBlock[12] = 0;
+    PermBlock[13] = 0;
+    PermBlock[14] = 0;
+    PermBlock[15] = 0;
+    auto randomData = dynarithmic::CreateRandomDigits(4);
+    std::copy_n(randomData.begin(), 4, PermBlock + 12);
+
+    PDFEncryptionAES aes;
+
+    // Prepare the AES-256 key with the file encryption key
+    unsigned char iv[16] = {};
+    aes.PrepareKey(m_EncryptionKey.data(), 32, iv);
+
+    // Use the encryption key for the AES-256 hash.
+    std::string sPermsKey;
+    std::string sPermBlock = dynarithmic::StringWrapperA::StringFromUChars(PermBlock, 16);
+    aes.EncryptAES256ECB(sPermBlock, sPermsKey);
+
+    m_PermsKey = dynarithmic::StringWrapperA::UCharsFromString(sPermsKey);
+}
+
+void PDFEncryption::ComputeUserKeyAESV3(const std::string& userpswd)
+{
+    // Generate User Salts
+    auto vSalt = dynarithmic::CreateRandomDigits(8);
+    auto kSalt = dynarithmic::CreateRandomDigits(8); 
+
+    // Generate hash for U
+    auto hashValueOut = ComputeHashAESV3(userpswd, 
+                                         dynarithmic::StringWrapperA::StringFromUChars(vSalt.data(), 8),
+                                         {});
+    // U = hash + validation salt + key salt
+    unsigned char uValue[48] = {};
+    std::memcpy(uValue, hashValueOut.data(), 32);
+    std::memcpy(uValue + 32, vSalt.data(), 8);
+    std::memcpy(uValue + 32 + 8, kSalt.data(), 8);
+    m_UserKey.assign(uValue, uValue + 48);
+
+    // Generate hash for UE
+    hashValueOut = ComputeHashAESV3(userpswd, 
+                                    dynarithmic::StringWrapperA::StringFromUChars(kSalt.data(), 8), 
+                                    {});
+
+    // UE = AES-256 encoded file encryption key with key=hash
+    // CBC mode, no padding, init vector=0
+    unsigned char iv[16] = {};
+    PDFEncryptionAES aesEncrypt;
+    aesEncrypt.PrepareKey(hashValueOut.data(), 32, iv);
+    std::string ueDataOut;
+    aesEncrypt.SetPaddingUsed(false);
+    aesEncrypt.EncryptAES256CBC(
+        dynarithmic::StringWrapperA::StringFromUChars(m_EncryptionKey.data(), m_EncryptionKey.size()), 
+        ueDataOut);
+    m_UserKeyE.assign(ueDataOut.begin(), ueDataOut.end());
+}
+
+void PDFEncryption::ComputeOwnerKeyAESV3(const std::string& ownerpswd)
+{
+    // Generate User Salts
+    auto vSalt = dynarithmic::CreateRandomDigits(8);
+    auto kSalt = dynarithmic::CreateRandomDigits(8);
+
+    // Generate hash for O
+    //unsigned char hashValue[32];
+
+    auto hashValueOut = ComputeHashAESV3(ownerpswd,
+        dynarithmic::StringWrapperA::StringFromUChars(vSalt.data(), 8), 
+        dynarithmic::StringWrapperA::StringFromUChars(m_UserKey.data(), m_UserKey.size()));
+    // O = hash + validation salt + key salt
+    unsigned char uValue[48] = {};
+    std::memcpy(uValue, hashValueOut.data(), 32);
+    std::memcpy(uValue + 32, vSalt.data(), 8);
+    std::memcpy(uValue + 32 + 8, kSalt.data(), 8);
+    m_OwnerKey.assign(uValue, uValue + 48);
+
+    // Generate hash for OE
+    hashValueOut = ComputeHashAESV3(ownerpswd,
+        dynarithmic::StringWrapperA::StringFromUChars(kSalt.data(), 8),
+        dynarithmic::StringWrapperA::StringFromUChars(m_UserKey.data(), m_UserKey.size()));
+
+    // OE = AES-256 encoded file encryption key with key=hash
+    // CBC mode, no padding, init vector=0
+    unsigned char iv[16] = {};
+    PDFEncryptionAES aesEncrypt;
+    aesEncrypt.PrepareKey(hashValueOut.data(), 32, iv);
+    std::string ueDataOut;
+    aesEncrypt.SetPaddingUsed(false);
+    aesEncrypt.EncryptAES256CBC(
+        dynarithmic::StringWrapperA::StringFromUChars(m_EncryptionKey.data(), m_EncryptionKey.size()),
+        ueDataOut);
+    m_OwnerKeyE.assign(ueDataOut.begin(), ueDataOut.end());
+}
+
+PDFEncryption::UCHARArray PDFEncryption::ComputeHashAESV3(std::string pswd, std::string salt, std::string uValue)
+{
+    PDFEncryption::UCHARArray outValue;
+    std::string hasherKey = pswd + salt + uValue;
+    auto hashedKeyToUse = dynarithmic::SHA2Hash(hasherKey, dynarithmic::SHA2HashType::SHA256);
+
+    if (true) // AES-256 according to PDF 1.7 Adobe Extension Level 8 (PDF 2.0)
+    {
+  //      std::ofstream ofsDebug("c:\\saved_images\\debughex.txt");
+        size_t dataLen = 0;
+        unsigned blockLen = 32; // Start with current SHA256 hash
+        unsigned char data[(127 + 64 + 48) * 64] = {}; // 127 for password, 64 for hash up to SHA512, 48 for uValue
+        unsigned char block[64] = {};
+        std::memcpy(block, hashedKeyToUse.data(), 32);
+
+        for (unsigned i = 0; i < 64 || i < (unsigned)(32 + data[dataLen - 1]); i++)
+        {
+            dataLen = pswd.size() + blockLen;
+            std::memcpy(data, pswd.data(), pswd.size());
+            std::memcpy(data + pswd.size(), block, blockLen);
+            if (!uValue.empty())
+            {
+                std::memcpy(data + dataLen, uValue.data(), 48);
+                dataLen += 48;
+            }
+            for (unsigned j = 1; j < 64; j++)
+                std::memcpy(data + j * dataLen, data, dataLen);
+
+            dataLen *= 64;
+
+            // CHECK-ME: The following was converted to new EVP_Encrypt API
+            // from old internal API which is deprecated in OpenSSL 3.0 but
+            // I'm not 100% sure the conversion is correct, since we don't
+            // finalize the context. It may be unnecessary because of some
+            // preconditions, but these should be clearly stated
+            std::string dataOut;
+            PDFEncryptionAES aesHasher;
+            
+            aesHasher.PrepareKey(block, 16, block + 16);
+//            PDFEncryptionAES128_CBC aesHasher(block, 16, block + 16);
+            aesHasher.SetPaddingUsed(false);
+            std::string sData;
+            sData.assign(data, data + dataLen);
+            aesHasher.EncryptAES128CBC(sData, dataOut);
+/*            for (int j = 0; j < dataLen; ++j)
+            {
+                ofsDebug << std::hex << std::noshowbase << static_cast<int>(data[j]);
+            }*/
+//            ofsDebug.close();
+            std::memcpy(data, dataOut.data(), dataOut.size());
+            unsigned sum = 0;
+            for (unsigned j = 0; j < 16; j++)
+                sum += data[j];
+            blockLen = 32 + (sum % 3) * 16;
+
+            if (blockLen == 32)
+            {
+                auto hash1 = dynarithmic::SHA2Hash(data, dataLen, dynarithmic::SHA2HashType::SHA256);
+                std::memcpy(block, hash1.data(), hash1.size());
+            }
+            else if (blockLen == 48)
+            {
+                auto hash1 = dynarithmic::SHA2Hash(data, dataLen, dynarithmic::SHA2HashType::SHA384);
+                std::memcpy(block, hash1.data(), hash1.size());
+            }
+            else
+            {
+                auto hash1 = dynarithmic::SHA2Hash(data, dataLen, dynarithmic::SHA2HashType::SHA512);
+                std::memcpy(block, hash1.data(), hash1.size());
+            }
+        }
+        outValue.assign(block, block + 32);
+    }
+    return outValue;
 }
 
 void PDFEncryption::SetupByUserPad(const std::string& documentID,
@@ -524,199 +716,6 @@ void PDFEncryption::EncryptRC4(UCHARArray& data)
     EncryptRC4(data, 0, static_cast<int>(data.size()), data);
 }
 
-std::string PDFEncryption::Revision6OneRound(std::string origInput,
-                                             bool bCreateOwnerPass,
-                                             std::string inputPassword,
-                                             const std::vector<unsigned char>& userKey)
-    
-{
-    /*Make a new string K0 as follows:
-    * When checking the owner password or creating the owner key, K0 is the concatenation
-    * of the input password, K, and the 48-byte user key.
-    * Otherwise, K0 is the concatenation of the input password and K.
-    Next, set K1 to 64 repetitions of K0.*/
-
-    std::string K1;
-    std::string origString;
-    if (!bCreateOwnerPass)
-    {
-        origString = inputPassword + origInput;
-    }
-    else
-    {
-        origString = inputPassword + origInput + 
-                     dynarithmic::StringWrapperA::StringFromUChars(userKey.data(), userKey.size());
-    }
-
-    for (int i = 0; i < 64; ++i)
-        K1 += origString;
-
-    /* Encrypt K1 with the AES-128 (CBC, no padding) algorithm, using the first 16 bytes of K as the key and
-       the second 16 bytes of K as the initialization vector.The result of this encryption is E. */
-    std::string E;
-    PDFEncryptionAES aesCrypt;
-    aesCrypt.SetKeyLength(32);
-    auto* shaData = reinterpret_cast<const unsigned char*>(origInput.c_str());
-    aesCrypt.PrepareKey(shaData, 16, shaData + 16);
-    aesCrypt.EncryptAES128CBC(K1, E); // This is E
-
-    /* Taking the first 16 bytes of E as an unsigned big-endian integer, compute the remainder, modulo 3. If the
-       result is 0, the next hash used is SHA-256, if the result is 1, the next hash used is SHA-384, 
-       if the result is 2, the next hash used is SHA-512. */
-    auto bytesToConvert = dynarithmic::StringWrapperA::UCharsFromString(E);
-    auto val = static_cast<int>(bigEndianBytesToInt(bytesToConvert.data(), 16) % 3);
-
-    /* Using the hash algorithm determined in step c, take the hash of E.The result is a new value of K, which
-       will be 32, 48, or 64 bytes in length.*/
-    std::vector<unsigned char> newK;
-    switch (val)
-    {
-        case 0:
-            newK = dynarithmic::SHA2Hash(E, dynarithmic::SHA2HashType::SHA256);
-            break;
-        case 1:
-            newK = dynarithmic::SHA2Hash(E, dynarithmic::SHA2HashType::SHA384);
-            break;
-        case 2:
-            newK = dynarithmic::SHA2Hash(E, dynarithmic::SHA2HashType::SHA512);
-            break;
-    }
-
-    // This is the new K as a string
-    return dynarithmic::StringWrapperA::StringFromUChars(newK.data(), newK.size());
-}
-
-void PDFEncryption::ComputeOwnerUserKey2(std::string userPassword, std::string ownerPassword, int permissions)
-{
-    std::array<std::string, 2> aPasswords = { userPassword, ownerPassword };
-    std::array<UCHARArray*, 2> aKeysToUse = { &m_UserKey, &m_OwnerKey };
-    std::array<UCHARArray*, 2> aKeysToUseE = { &m_UserKeyE, &m_OwnerKeyE };
-
-    auto keyToUse = dynarithmic::StringWrapperA::StringFromUChars(m_EncryptionKey.data(), m_EncryptionKey.size());
-
-    for (size_t curKeyGen = 0; curKeyGen < 2; ++curKeyGen)
-    {
-        // This is only done for AES-256 (PDF 2.0) user / owner passwords
-        // Compute the user key 
-
-        /*  Generate 16 random bytes of data using a strong random number generator.The first 8 bytes are the
-            User Validation Salt.The second 8 bytes are the User Key Salt.Compute the 32-byte hash using algorithm
-            2.B with an input string consisting of the UTF-8 password concatenated with the User Validation Salt.
-            The 48 - byte string consisting of the 32 - byte hash followed by the User Validation Salt followed by the
-            User Key Salt is stored as the U or O key. */
-        auto randomData = dynarithmic::CreateRandomDigits(16);
-        char userValidationSalt[8] = {};
-        char userKeySalt[8] = {};
-        std::copy_n(randomData.begin(), 8, userValidationSalt);
-        std::copy_n(randomData.begin() + 8, 8, userKeySalt);
-
-        std::string strHash = aPasswords[curKeyGen];
-        for (size_t i = 0; i < 8; ++i)
-            strHash += userValidationSalt[i];
-
-        auto vHashOut = ComputeRevision6Hash(strHash,curKeyGen > 0, aPasswords[curKeyGen], *aKeysToUse[0]);
-        std::copy_n(userValidationSalt, 8, std::back_inserter(vHashOut));
-        std::copy_n(userKeySalt, 8, std::back_inserter(vHashOut));
-        *aKeysToUse[curKeyGen] = vHashOut;
-
-        /* Compute the 32-byte hash using algorithm 2.B with an input string consisting of the UTF-8 password
-        concatenated with the User Key Salt.Using this hash as the key, encrypt the file encryption key using
-        AES-256 in CBC mode with no padding and an initialization vector of zero.The resulting 32-byte string is
-            stored as the UE or OE key.*/
-        strHash = aPasswords[curKeyGen];
-        for (size_t i = 0; i < 8; ++i)
-            strHash += userKeySalt[i];
-        vHashOut = ComputeRevision6Hash(strHash, curKeyGen > 0, aPasswords[curKeyGen], *aKeysToUse[0]);
-
-        std::string strvHashOut = dynarithmic::StringWrapperA::StringFromUChars(vHashOut.data(), vHashOut.size());
-
-        PDFEncryptionAES aes;
-
-        // Prepare the AES-256 key with the file encryption key
-        unsigned char iv[16] = {};
-        aes.PrepareKey(m_EncryptionKey.data(), 32, iv);
-
-        std::string sEKey;
-        aKeysToUse[curKeyGen]->clear();
-
-        // Use the encryption key for the AES-256 hash.
-        aes.EncryptAES256CBC(strvHashOut, sEKey);
-        auto* curEKey = aKeysToUseE[curKeyGen];
-        for (auto ch : sEKey)
-            curEKey->push_back(ch);
-    }
-
-    // Compute the Perms key
-    /*  Fill a 16 - byte block as follows :
-            Extend the permissions(contents of the P integer) to 64 bits by setting the upper 32 bits to all 1’s.
-                NOTE This allows for future extension without changing the format.
-                b) Record the 8 bytes of permission in the bytes 0 - 7 of the block, low order byte first.
-                c) Set byte 8 to the ASCII character "T" or "F" according to the EncryptMetadata boolean.
-                d) Set bytes 9 - 11 to the ASCII characters '"a", "d", "b".
-                e) Set bytes 12 - 15 to 4 bytes of random data, which will be ignored.
-                f) Encrypt the 16 - byte block using AES - 256 in ECB mode with an initialization vector of zero, using the file
-                encryption key as the key.The result(16 bytes) is stored as the Perms string, and checked for validity
-                when the file is opened.*/
-    unsigned char PermBlock[16] = {};
-    uint64_t extendedPermissions = permissions;
-    extendedPermissions |= 0xFFFFFFFF00000000;
-    uint64_t mask = 0x00000000000000FF;
-    for (int i = 0; i < 8; ++i)
-    {
-        PermBlock[i] = extendedPermissions & mask;
-        mask <<= 8;
-    }
-    PermBlock[8] = 'T';
-    PermBlock[9] = 'a';
-    PermBlock[10] = 'd';
-    PermBlock[11] = 'b';
-
-    auto randomData = dynarithmic::CreateRandomDigits(4);
-    std::copy_n(randomData.begin(), 4, PermBlock + 12);
-
-    PDFEncryptionAES aes;
-
-    // Prepare the AES-256 key with the file encryption key
-    unsigned char iv[16] = {};
-    aes.PrepareKey(m_EncryptionKey.data(), 32, iv);
-
-    // Use the encryption key for the AES-256 hash.
-    std::string sPermsKey;
-    std::string sPermBlock = dynarithmic::StringWrapperA::StringFromUChars(PermBlock, 16);
-    aes.EncryptAES256ECB(sPermBlock, sPermsKey);
-
-    m_PermsKey = dynarithmic::StringWrapperA::UCharsFromString(sPermsKey);
-}
-
-/* Future implementation for PDF 2.0 encryption */
-PDFEncryption::UCHARArray PDFEncryption::ComputeRevision6Hash(std::string origInput, 
-                                                              bool bCreateOwnerPass, 
-                                                              std::string inputPassword,
-                                                              const std::vector<unsigned char>& userKey)
-{
-    // Take the SHA-256 hash of the original input to the algorithm and name the resulting 32 bytes, K.
-    auto vHash = dynarithmic::SHA2Hash(origInput, dynarithmic::SHA2HashType::SHA256);
-    auto shaHash = dynarithmic::StringWrapperA::StringFromUChars(vHash.data(), vHash.size());
-
-    size_t nRoundCount = 0;
-    for (int i = 0; i < 64; ++i, ++nRoundCount)
-        shaHash = Revision6OneRound(shaHash, bCreateOwnerPass, inputPassword, userKey);
-    while (true)
-    {
-        ++nRoundCount;
-        auto lastChar = static_cast<unsigned int>(shaHash.back());
-        if (lastChar > nRoundCount - 32)
-        {
-            shaHash = Revision6OneRound(shaHash, bCreateOwnerPass, inputPassword, userKey);
-        }
-        else
-            break;
-    }
-    PDFEncryption::UCHARArray finalK = dynarithmic::StringWrapperA::UCharsFromString(shaHash);
-    finalK.resize(32);
-    return finalK;
-}
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void PDFEncryptionRC4::PrepareKey()
 {
@@ -780,20 +779,85 @@ void PDFEncryptionAES::Encrypt(const std::string& dataIn, std::string& dataOut)
 
 void PDFEncryptionAES::EncryptAES128CBC(const std::string& dataIn, std::string& dataOut)
 {
-    PDFEncryptionAES128_CBC encryptor(m_LocalKey, m_ivValue);
-    encryptor.Encrypt(dataIn, dataOut);
+    EncryptInternal(dataIn, dataOut, AESMode::AES_CBC, AESKeyLength::AES_128);
 }
 
 void PDFEncryptionAES::EncryptAES256CBC(const std::string& dataIn, std::string& dataOut)
 {
-    PDFEncryptionAES256_CBC encryptor(m_LocalKey, m_ivValue);
-    encryptor.Encrypt(dataIn, dataOut);
+    EncryptInternal(dataIn, dataOut, AESMode::AES_CBC, AESKeyLength::AES_256);
 }
 
 void PDFEncryptionAES::EncryptAES256ECB(const std::string& dataIn, std::string& dataOut)
 {
-    PDFEncryptionAES256_ECB encryptor(m_LocalKey, m_ivValue);
-    encryptor.Encrypt(dataIn, dataOut);
+    EncryptInternal(dataIn, dataOut, AESMode::AES_ECB, AESKeyLength::AES_256);
+}
+
+void PDFEncryptionAES::EncryptAES128ECB(const std::string& dataIn, std::string& dataOut)
+{
+    EncryptInternal(dataIn, dataOut, AESMode::AES_ECB, AESKeyLength::AES_128);
+}
+
+void PDFEncryptionAES::EncryptInternal(std::string dataIn, std::string& dataOut, 
+                                       AESMode aesMode, AESKeyLength keyLength)
+{
+    // Adjust the input string, depending on the padding.
+    unsigned char chunkByte = 0;
+    int extraChunk = 0;
+    unsigned char chunkToAdd[16] = {};
+    if (m_bIsPaddingUsed)
+    {
+        auto nearest16 = dynarithmic::RoundUpToNearest(dataIn.size(), 16);
+        if (dataIn.size() % 16 == 0)
+        {
+            extraChunk = 1;
+            chunkByte = 0x10;
+        }
+        else
+        {
+            extraChunk = 1;
+            chunkByte = static_cast<unsigned char>(nearest16 - dataIn.size());
+        }
+    }
+
+    if (extraChunk == 1 && chunkByte == 0x10)
+    {
+        memset(chunkToAdd, 0x10, sizeof(chunkToAdd));
+        dataIn.append(chunkToAdd, chunkToAdd + AES_BLOCK_SIZE);
+    }
+    else
+    if (extraChunk == 1)
+    {
+        memset(chunkToAdd, chunkByte, sizeof(chunkToAdd));
+        dataIn.append(chunkToAdd, chunkToAdd + chunkByte);
+    }
+
+    // Convert input string to byte array
+    std::vector<unsigned char> plain = dynarithmic::StringWrapperA::UCharsFromString(dataIn);
+
+    AES aes(keyLength);
+    std::vector<unsigned char> vOut;
+
+    if (aesMode == AESMode::AES_ECB)
+    {
+        vOut = aes.EncryptECB(plain, m_LocalKey);
+    }
+    else
+    if (aesMode == AESMode::AES_CBC)
+    {
+        std::vector<unsigned char> vIv(m_ivValue, m_ivValue + 16);
+        vOut = aes.EncryptCBC(plain, m_LocalKey, vIv);
+        // Add the initialization vector at the beginning of the encrypted stream
+        // but only if there is an iv, or the iv is not all 0
+        if (std::any_of(vIv.begin(), vIv.end(), [](auto ch) { return ch != 0; }))
+        {
+            vOut.insert(vOut.begin(), vIv.begin(), vIv.end());
+        }
+
+    }
+
+    // Add the initialization vector at the beginning of the encrypted stream
+    // but only if there is an iv, or the iv is not all 0
+    dataOut = dynarithmic::StringWrapperA::StringFromUChars(vOut.data(), vOut.size());
 }
 
 PDFEncryption::UCHARArray PDFEncryptionAES::GetExtendedKey(int number, int generation)

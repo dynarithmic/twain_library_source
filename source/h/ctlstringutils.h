@@ -22,13 +22,20 @@
 #define CTLSTRINGUTILS_H
 
 #include <string>
+#include <vector>
+#include <string_view>
 
 namespace dynarithmic
 {
     // Truncate a string if it goes over maxLen, and replace truncated contents with
     // the text "More".
     std::string TruncateStringWithMore(std::string_view origString, size_t maxLen);
+
+    // Create a file using the data and time within the file name
     std::string CreateFileNameWithDateTime(std::string_view prefix, std::string_view ext, bool useUTC=false);
+
+    // Convert a string into a byte array
+    std::vector<unsigned char> HexStringToByteArray(std::string_view hexString);
 }
 #endif
 

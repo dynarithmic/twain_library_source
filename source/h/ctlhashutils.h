@@ -34,6 +34,8 @@ namespace dynarithmic
     };
 
     std::vector<unsigned char> SHA2Hash(std::string_view message, SHA2HashType hashType = SHA2HashType::SHA256);
+    std::vector<unsigned char> SHA2Hash(const unsigned char* message, size_t messageLength, 
+                                        SHA2HashType hashType = SHA2HashType::SHA256);
 }
 #endif
 

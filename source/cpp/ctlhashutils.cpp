@@ -21,6 +21,7 @@
 
 #include <ctlhashutils.h>
 #include <boost/hash2/sha2.hpp>
+#include <ctlobstr.h>
 
 namespace dynarithmic
 {
@@ -58,4 +59,10 @@ namespace dynarithmic
         }
         return {};
     }
+
+    std::vector<unsigned char> SHA2Hash(const unsigned char* message, size_t messageLength, SHA2HashType hashType)
+    {
+        return SHA2Hash(dynarithmic::StringWrapperA::StringFromUChars(message, messageLength), hashType);
+    }
+
 }

@@ -1175,8 +1175,8 @@ void EncryptionObject::ComposeObject()
         auto& engine = GetParent()->GetEncryptionEngine();
         PDFEncryption::UCHARArray enc1Array = engine.GetOwnerKey();
         PDFEncryption::UCHARArray enc2Array = engine.GetUserKey();
-        enc1.append(reinterpret_cast<const char*>(enc1Array.data()), 32);
-        enc2.append(reinterpret_cast<const char*>(enc2Array.data()), 32);
+        enc1.append(reinterpret_cast<const char*>(enc1Array.data()), enc1Array.size());
+        enc2.append(reinterpret_cast<const char*>(enc2Array.data()), enc2Array.size());
         AppendContents("/O (");
         enc1 = MakeCompatiblePDFString(enc1);
         WriteRaw(enc1.data(), enc1.length());
@@ -1191,10 +1191,10 @@ void EncryptionObject::ComposeObject()
         if (!enc1Array.empty() && !enc2Array.empty() )
         {
             AppendContents("/OE (");
-            enc1 = MakeCompatiblePDFString(enc1);
+            enc1 = MakeCompatiblePDFString(enc1Array);
             WriteRaw(enc1.data(), enc1.length());
             AppendContents(")\n/UE (");
-            enc2 = MakeCompatiblePDFString(enc2);
+            enc2 = MakeCompatiblePDFString(enc2Array);
             WriteRaw(enc2.data(), enc2.length());
             AppendContents(")\n");
         }
@@ -1204,7 +1204,7 @@ void EncryptionObject::ComposeObject()
         if (!enc1Array.empty())
         {
             AppendContents("/Perms (");
-            enc1 = MakeCompatiblePDFString(enc1);
+            enc1 = MakeCompatiblePDFString(enc1Array);
             WriteRaw(enc1.data(), enc1.length());
             AppendContents(")\n");
         }
@@ -1238,8 +1238,8 @@ void EncryptionObject::ComposeObject()
         auto& engine = GetParent()->GetEncryptionEngine();
         const PDFEncryption::UCHARArray enc1Array = engine.GetOwnerKey();
         const PDFEncryption::UCHARArray enc2Array = engine.GetUserKey();
-        enc1.append(reinterpret_cast<const char *>(enc1Array.data()), 32);
-        enc2.append(reinterpret_cast<const char *>(enc2Array.data()), 32);
+        enc1.append(reinterpret_cast<const char *>(enc1Array.data()), enc1Array.size());
+        enc2.append(reinterpret_cast<const char *>(enc2Array.data()), enc1Array.size());
         AppendContents("/O (");
         enc1 = MakeCompatiblePDFString(enc1);
         WriteRaw(enc1.data(), enc1.length());
@@ -2409,7 +2409,7 @@ void PdfDocument::SetEncryption(CTL_StringViewType ownerPassword,
     m_EncryptionPassword[OWNER_PASSWORD] = StringConversion::Convert_NativePtr_To_Ansi(ownerPassword.data());
     m_EncryptionPassword[USER_PASSWORD] = StringConversion::Convert_NativePtr_To_Ansi(userPassword.data());
     m_nPermissions = permissions;
-    m_bIsStrongEncryption = bIsStrongEncryption || isAESEncrypted;
+    m_bIsStrongEncryption = bIsStrongEncryption || isAESEncrypted || nKeyLength == 32;
     m_bIsAESEncrypted = isAESEncrypted;
     m_nKeyLength = nKeyLength;
 

@@ -634,20 +634,14 @@
     <ClCompile Include="hashlib\sha256.cpp">
       <Filter>Hashing Library</Filter>
     </ClCompile>
-    <ClCompile Include="aeslib\AES_128_CBC.cpp">
-      <Filter>AES Encryption</Filter>
-    </ClCompile>
-    <ClCompile Include="aeslib\AES_256_CBC.cpp">
-      <Filter>AES Encryption</Filter>
-    </ClCompile>
     <ClCompile Include="cpp\ctlhashutils.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include="aeslib\AES_256_ECB.cpp">
-      <Filter>AES Encryption</Filter>
-    </ClCompile>
     <ClCompile Include="cpp\ctlrandnumutils.cpp">
       <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="aeslib\AES.cpp">
+      <Filter>AES Encryption</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1110,17 +1104,11 @@
     <ClInclude Include="hashlib\sha256.h">
       <Filter>Hashing Library</Filter>
     </ClInclude>
-    <ClInclude Include="aeslib\AES_128_CBC.h">
-      <Filter>AES Encryption</Filter>
-    </ClInclude>
-    <ClInclude Include="aeslib\AES_256_CBC.h">
-      <Filter>AES Encryption</Filter>
-    </ClInclude>
-    <ClInclude Include="aeslib\AES_256_ECB.h">
-      <Filter>AES Encryption</Filter>
-    </ClInclude>
     <ClInclude Include="h\ctlrandnumutils.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="aeslib\AES.h">
+      <Filter>AES Encryption</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

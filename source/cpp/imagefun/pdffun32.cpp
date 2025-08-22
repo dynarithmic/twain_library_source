@@ -143,13 +143,15 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
         {
             if (imageinfo.bUseStrongEncryption || imageinfo.bIsAESEncrypted)
                 imageinfo.nPDFKeyLength = 16;
+            if (imageinfo.bIsAES256Encrypted)
+                imageinfo.nPDFKeyLength = 32;
 
             pPDFInfo->m_Interface->DTWLIB_PDFSetEncryption(pDocument,
                                                             imageinfo.PDFOwnerPassword.c_str(),
                                                             imageinfo.PDFUserPassword.c_str(),
                                                             imageinfo.PDFPermissions,
                                                             imageinfo.bUseStrongEncryption?TRUE:false,
-                                                            imageinfo.bIsAESEncrypted?TRUE:FALSE,
+                                                            (imageinfo.bIsAESEncrypted || imageinfo.bIsAES256Encrypted)?TRUE:FALSE,
                                                             imageinfo.nPDFKeyLength);
         }
 
