@@ -28,6 +28,7 @@ OF THIRD PARTY RIGHTS.
 #include <random>
 #include <ctlrandnumutils.h>
 
+#include <boost/multiprecision/cpp_int.hpp> // Include for uint128_t
 
 #undef min
 #undef max
@@ -44,6 +45,21 @@ std::string GetSystemTimeInMilliseconds();
 #ifdef _MSC_VER
 #pragma warning (disable:4244)
 #endif
+
+using namespace boost::multiprecision;
+
+// Function to convert 16-byte big-endian char array to int64_t
+static uint128_t bigEndianBytesToInt(const unsigned char* bytes, size_t numBytes)
+{
+    uint128_t value = 0;
+
+    // Iterate through the bytes and shift them into the value
+    // Big-endian means the most significant byte is first (at index 0)
+    for (size_t i = 0; i < numBytes; ++i) { // For an 8-byte (64-bit) integer
+        value = (value << 8) | bytes[i];
+    }
+    return value;
+}
 
 template <typename T>
 void ArrayCopy(const T& input_array, int start, T& output_array, int output_start, int nBytes)
@@ -270,6 +286,22 @@ void PDFEncryption::CreateAESV3Info(std::string userPassword, std::string ownerP
 
     // Compute the permissions
     // Compute the Perms key
+    ComputePermsKey(permissions);
+}
+
+void PDFEncryption::ComputeUserKeyAESV3(const std::string& userpswd)
+{
+    ComputeUserOrOwnerKeyAESV3(userpswd, m_UserKey, m_UserKeyE, false);
+}
+
+void PDFEncryption::ComputeOwnerKeyAESV3(const std::string& ownerpswd)
+{
+    ComputeUserOrOwnerKeyAESV3(ownerpswd, m_OwnerKey, m_OwnerKeyE, true);
+}
+
+void PDFEncryption::ComputePermsKey(int permissions)
+{
+    // Compute the Perms key
     /*  Fill a 16 - byte block as follows :
             Extend the permissions(contents of the P integer) to 64 bits by setting the upper 32 bits to all 1’s.
                 NOTE This allows for future extension without changing the format.
@@ -318,127 +350,90 @@ void PDFEncryption::CreateAESV3Info(std::string userPassword, std::string ownerP
     aes.EncryptAES256ECB(sPermBlock, sPermsKey);
 
     m_PermsKey = dynarithmic::StringWrapperA::UCharsFromString(sPermsKey);
-}
 
-void PDFEncryption::ComputeUserKeyAESV3(const std::string& userpswd)
+}
+void PDFEncryption::ComputeUserOrOwnerKeyAESV3(const std::string& pswd, // Password
+                                               UCHARArray& Key, // U or O entry
+                                               UCHARArray& KeyE, // UE or OE entry
+                                               bool useUserKey) // use the user key
 {
-    // Generate User Salts
+    // Generate Salts
     auto vSalt = dynarithmic::CreateRandomDigits(8);
     auto kSalt = dynarithmic::CreateRandomDigits(8); 
     auto vSaltString = dynarithmic::StringWrapperA::StringFromUChars(vSalt.data(), 8);
     auto kSaltString = dynarithmic::StringWrapperA::StringFromUChars(kSalt.data(), 8);
 
-    // Generate hash for U
-    auto hashValueOut = ComputeHashAESV3(userpswd + vSaltString, {});
+    // If we need to use the userkey, set the userString
+    std::string userString;
+    if (useUserKey)
+        userString = dynarithmic::StringWrapperA::StringFromUChars(m_UserKey.data(), m_UserKey.size());
 
-    auto userKeyString = dynarithmic::StringWrapperA::StringFromUChars(hashValueOut.data(), hashValueOut.size()) +
-                         vSaltString + kSaltString;
+    // Generate hash for U or O
+    auto hashValueOut = ComputeHashAESV3(pswd, vSaltString, userString);
 
-    m_UserKey = dynarithmic::StringWrapperA::UCharsFromString(userKeyString);
+    auto KeyString = dynarithmic::StringWrapperA::StringFromUChars(hashValueOut.data(), hashValueOut.size()) +
+                                                                   vSaltString + kSaltString;
 
-    // Generate hash for UE
-    hashValueOut = ComputeHashAESV3(userpswd + kSaltString, {});
+    Key = dynarithmic::StringWrapperA::UCharsFromString(KeyString);
 
-    // UE = AES-256 encoded file encryption key with key=hash
+    // Generate hash for UE or OE
+    hashValueOut = ComputeHashAESV3(pswd, kSaltString, userString);
+
+    // UE or OE = AES-256 encoded file encryption key with key=hash
     // CBC mode, no padding, init vector=0
     unsigned char iv[16] = {};
     PDFEncryptionAES aesEncrypt;
+    IVGenerator ivGen;
     aesEncrypt.PrepareKey(hashValueOut.data(), 32, iv);
-    std::string ueDataOut;
     aesEncrypt.SetPaddingUsed(false);
+    aesEncrypt.SetIVAttached(false);
+    std::string dataOut;
     aesEncrypt.EncryptAES256CBC(
         dynarithmic::StringWrapperA::StringFromUChars(m_EncryptionKey.data(), m_EncryptionKey.size()), 
-        ueDataOut);
-    m_UserKeyE.assign(ueDataOut.begin(), ueDataOut.end());
+        dataOut);
+    KeyE.assign(dataOut.begin(), dataOut.end());
 }
 
-void PDFEncryption::ComputeOwnerKeyAESV3(const std::string& ownerpswd)
-{
-    // Generate User Salts
-    auto vSalt = dynarithmic::CreateRandomDigits(8);
-    auto kSalt = dynarithmic::CreateRandomDigits(8);
-
-    auto vSaltString = dynarithmic::StringWrapperA::StringFromUChars(vSalt.data(), 8);
-    auto kSaltString = dynarithmic::StringWrapperA::StringFromUChars(kSalt.data(), 8);
-    auto userString = dynarithmic::StringWrapperA::StringFromUChars(m_UserKey.data(), m_UserKey.size());
-
-    // Generate hash for O
-    auto hashValueOut = ComputeHashAESV3(ownerpswd + vSaltString + userString, userString);
-
-    auto ownerKeyString = dynarithmic::StringWrapperA::StringFromUChars(hashValueOut.data(), hashValueOut.size()) +
-                            vSaltString + kSaltString;
-
-    m_OwnerKey = dynarithmic::StringWrapperA::UCharsFromString(ownerKeyString);
-
-    // Generate hash for OE
-    hashValueOut = ComputeHashAESV3(ownerpswd + kSaltString + userString, userString);
-
-    // OE = AES-256 encoded file encryption key with key=hash
-    // CBC mode, no padding, init vector=0
-    unsigned char iv[16] = {};
-    PDFEncryptionAES aesEncrypt;
-    aesEncrypt.PrepareKey(hashValueOut.data(), 32, iv);
-    std::string ueDataOut;
-    aesEncrypt.SetPaddingUsed(false);
-    aesEncrypt.EncryptAES256CBC(
-        dynarithmic::StringWrapperA::StringFromUChars(m_EncryptionKey.data(), m_EncryptionKey.size()),
-        ueDataOut);
-    m_OwnerKeyE.assign(ueDataOut.begin(), ueDataOut.end());
-}
-
-PDFEncryption::UCHARArray PDFEncryption::ComputeHashAESV3(std::string pswd, std::string uValue)
+PDFEncryption::UCHARArray PDFEncryption::ComputeHashAESV3(std::string pswd, std::string salt, std::string uValue)
 {
     PDFEncryption::UCHARArray outValue;
-    std::string hasherKey = pswd;
-    auto hashedKeyToUse = dynarithmic::SHA2Hash(hasherKey, dynarithmic::SHA2HashType::SHA256);
+    std::string hasherKey = pswd + salt + uValue;
+    auto K = dynarithmic::SHA2Hash(hasherKey, dynarithmic::SHA2HashType::SHA256);
 
-    std::string K;
-    if (true) // AES-256 according to PDF 1.7 Adobe Extension Level 8 (PDF 2.0)
+    // AES-256 according to PDF 1.7 Adobe Extension Level 8 (PDF 2.0)
+    std::string E;
+    PDFEncryptionAES aesEncryptor;
+    for (unsigned i = 0; i < 64 ||
+        static_cast<unsigned int>(E.back()) > (i - 32); i++)
     {
-        K = dynarithmic::StringWrapperA::StringFromUChars(hashedKeyToUse.data(), hashedKeyToUse.size());
-        std::string E;
-        for (unsigned i = 0; i < 64 || 
-            static_cast<unsigned int>(E.back()) > (i - 32); i++)
+        std::string oneValue = pswd + uValue;
+        std::string K1;
+        for (int j = 1; j <= 64; ++j)
+            K1 += oneValue;
+
+        aesEncryptor.PrepareKey(K.data(), 16, &K[16]);
+        aesEncryptor.SetPaddingUsed(false);
+        aesEncryptor.SetIVAttached(false);
+        aesEncryptor.EncryptAES128CBC(K1, E);
+        auto ETemp = dynarithmic::StringWrapperA::UCharsFromString(E);
+        auto K1Temp = dynarithmic::StringWrapperA::UCharsFromString(K1);
+        auto remainder = static_cast<int>(bigEndianBytesToInt(ETemp.data(), 16) % 3);
+
+        if (remainder == 0)
         {
-            std::string K0 = pswd + K;
-            if (!uValue.empty())
-                K0 += uValue;
-            std::string K1;
-            for (int j = 1; j <= 64; ++j)
-                K1 += K0;
-
-            PDFEncryptionAES aesHasher;
-            
-            aesHasher.PrepareKey(hashedKeyToUse.data(), 16, &hashedKeyToUse[16]);
-            aesHasher.SetPaddingUsed(false);
-            aesHasher.EncryptAES128CBC(K1, E);
-            auto ETemp = dynarithmic::StringWrapperA::UCharsFromString(E);
-            unsigned sum = 0;
-            for (unsigned j = 0; j < 16; j++)
-                sum += ETemp[j];
-
-            auto remainder = sum % 3;
-
-            if (remainder == 0)
-            {
-                auto hash1 = dynarithmic::SHA2Hash(E, dynarithmic::SHA2HashType::SHA256);
-                K = dynarithmic::StringWrapperA::StringFromUChars(hash1.data(), hash1.size());
-            }
-            else if (remainder == 1)
-            {
-                auto hash1 = dynarithmic::SHA2Hash(E, dynarithmic::SHA2HashType::SHA384);
-                K = dynarithmic::StringWrapperA::StringFromUChars(hash1.data(), hash1.size());
-            }
-            else
-            {
-                auto hash1 = dynarithmic::SHA2Hash(E, dynarithmic::SHA2HashType::SHA512);
-                K = dynarithmic::StringWrapperA::StringFromUChars(hash1.data(), hash1.size());
-            }
+            K = dynarithmic::SHA2Hash(E, dynarithmic::SHA2HashType::SHA256);
         }
+        else if (remainder == 1)
+        {
+            K = dynarithmic::SHA2Hash(E, dynarithmic::SHA2HashType::SHA384);
+        }
+        else
+        {
+            K = dynarithmic::SHA2Hash(E, dynarithmic::SHA2HashType::SHA512);
+        }
+        K.resize(32);
     }
-    auto out = dynarithmic::StringWrapperA::UCharsFromString(K);
-    out.resize(32);
-    return out;
+    return K;
 }
 
 void PDFEncryption::SetupByUserPad(const std::string& documentID,
@@ -821,7 +816,7 @@ void PDFEncryptionAES::EncryptInternal(std::string dataIn, std::string& dataOut,
         vOut = aes.EncryptCBC(plain, m_LocalKey, vIv);
         // Add the initialization vector at the beginning of the encrypted stream
         // but only if there is an iv, or the iv is not all 0
-        if (std::any_of(vIv.begin(), vIv.end(), [](auto ch) { return ch != 0; }))
+        if (m_bIsIVAttached && std::any_of(vIv.begin(), vIv.end(), [](auto ch) { return ch != 0; }))
         {
             vOut.insert(vOut.begin(), vIv.begin(), vIv.end());
         }
