@@ -129,9 +129,12 @@ class PDFEncryption
         virtual void Encrypt(const std::string& /*dataIn*/, std::string& /*dataOut*/) {}
         virtual void Encrypt(char * /*dataIn*/, int/* len*/) {}
 
-        UCHARArray ComputeHashAESV3(std::string pswd, std::string uValue);
+        UCHARArray ComputeHashAESV3(std::string pswd, std::string salt, std::string uValue);
+        void ComputeUserOrOwnerKeyAESV3(const std::string& pswd, UCHARArray& Key,
+                                        UCHARArray& KeyE, bool useUserKey);
         void ComputeUserKeyAESV3(const std::string& userpswd);
         void ComputeOwnerKeyAESV3(const std::string& ownerpswd);
+        void ComputePermsKey(int permissions);
 
         UCHARArray& GetUserKey() { return m_UserKey; }
         UCHARArray& GetOwnerKey() { return m_OwnerKey; }
@@ -179,6 +182,7 @@ class PDFEncryptionAES: public PDFEncryption
     private:
         unsigned char m_ivValue[AES_BLOCK_SIZE];
         bool m_bIsPaddingUsed = true;
+        bool m_bIsIVAttached = true;
         void EncryptInternal(std::string dataIn, std::string& dataOut,
                              AESMode aesMode, AESKeyLength keyLength);
 
@@ -186,6 +190,8 @@ class PDFEncryptionAES: public PDFEncryption
         void Encrypt(const std::string& dataIn, std::string& dataOut) override;
         void Encrypt(char *dataIn, int len) override;
         void SetPaddingUsed(bool bSet) { m_bIsPaddingUsed = bSet; }
+        void SetIVAttached(bool bSet) { m_bIsIVAttached = bSet; }
+        bool IsIVAttached() const { return m_bIsIVAttached; }
         bool IsPaddingUsed() const { return m_bIsPaddingUsed; }
         void PrepareKey() override;
         void PrepareKey(const unsigned char* key, size_t keySize, const unsigned char* iv);
