@@ -802,30 +802,29 @@ void PDFEncryptionAES::EncryptInternal(std::string dataIn, std::string& dataOut,
 {
     // Adjust the input string, depending on the padding.
     unsigned char chunkByte = 0;
-    int extraChunk = 0;
+    bool extraChunk = false;
     unsigned char chunkToAdd[16] = {};
     if (m_bIsPaddingUsed)
     {
+        extraChunk = true;
         auto nearest16 = dynarithmic::RoundUpToNearest(dataIn.size(), 16);
         if (dataIn.size() % 16 == 0)
         {
-            extraChunk = 1;
             chunkByte = 0x10;
         }
         else
         {
-            extraChunk = 1;
             chunkByte = static_cast<unsigned char>(nearest16 - dataIn.size());
         }
     }
 
-    if (extraChunk == 1 && chunkByte == 0x10)
+    if (extraChunk && chunkByte == 0x10)
     {
         memset(chunkToAdd, 0x10, sizeof(chunkToAdd));
         dataIn.append(chunkToAdd, chunkToAdd + AES_BLOCK_SIZE);
     }
     else
-    if (extraChunk == 1)
+    if (extraChunk)
     {
         memset(chunkToAdd, chunkByte, sizeof(chunkToAdd));
         dataIn.append(chunkToAdd, chunkToAdd + chunkByte);
@@ -854,9 +853,6 @@ void PDFEncryptionAES::EncryptInternal(std::string dataIn, std::string& dataOut,
         }
 
     }
-
-    // Add the initialization vector at the beginning of the encrypted stream
-    // but only if there is an iv, or the iv is not all 0
     dataOut = dynarithmic::StringWrapperA::StringFromUChars(vOut.data(), vOut.size());
 }
 
