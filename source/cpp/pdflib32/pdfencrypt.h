@@ -129,7 +129,7 @@ class PDFEncryption
         virtual void Encrypt(const std::string& /*dataIn*/, std::string& /*dataOut*/) {}
         virtual void Encrypt(char * /*dataIn*/, int/* len*/) {}
 
-        UCHARArray ComputeHashAESV3(std::string pswd, std::string salt, std::string uValue);
+        UCHARArray ComputeHashAESV3(std::string pswd, std::string uValue);
         void ComputeUserKeyAESV3(const std::string& userpswd);
         void ComputeOwnerKeyAESV3(const std::string& ownerpswd);
 
