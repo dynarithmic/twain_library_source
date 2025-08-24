@@ -183,7 +183,7 @@ class PDFEncryptionAES: public PDFEncryption
         unsigned char m_ivValue[AES_BLOCK_SIZE];
         bool m_bIsPaddingUsed = true;
         bool m_bIsIVAttached = true;
-        void EncryptInternal(std::string dataIn, std::string& dataOut,
+        void EncryptInternal(std::string_view dataIn, std::string& dataOut,
                              AESMode aesMode, AESKeyLength keyLength);
 
     public:
