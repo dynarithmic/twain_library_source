@@ -1,5 +1,41 @@
 DTWAIN Version changes
 
+5.6.9
+
+- Added AES-256 bit encryption option when creating encrypted PDF files.  To enable this option, the
+  DTWAIN_SetPDFAESEncryptionEx() function must be called with the second argument as DTWAIN_PDF_AES256.
+  and the third argument as TRUE.  
+
+  Note that you will still need to call DTWAIN_SetPDFEncryption() to set up the initial encryption 
+  options (user/owner password, permissions, etc.)
+
+- Fixed possible issue with creating valid PDF files that contain PDF streams with embedded left 
+  or right parentheses characters.  
+
+- Added DTWAIN_ARRAY functions:
+
+     DTWAIN_ArrayFloatToANSIString 
+     DTWAIN_ArrayFloatToWideString
+     DTWAIN_ArrayANSIStringToFloat
+     DTWAIN_ArayWideStringToFloat
+     DTWAIN_ArrayFloatToString
+     DTWAIN_ArrayStringToFloat
+
+   The functions above allow conversions from DTWAIN_ARRAY's that consist of floats to string types and
+   vice-versa.  This allows languages that have difficulty with C/C++ double types (for example, XBase++)
+   to call functions that return DTWAIN_ARRAYs of floating point values, and also to call DTWAIN functions
+   that require floating point arrays.
+
+   Example pseudo-code:
+      DTWAIN_ARRAY a = DTWAIN_ArrayGetCapValues(Source, ICAP_XRESOLUTION, DTWAIN_CAPGET);
+      // convert to string, since our language can't handle float variables
+      DTWAIN_ARRAY converted = DTWAIN_ArrayFloatToANSIString(a);
+      // Now converted has the string versions of the floating point values.
+
+   Note that to prevent memory leaks in the above code, both "converted" and "a" need to be eventually destroyed 
+   using DTWAIN_ArrayDestroy, since a copy of the DTWAIN_ARRAY a has the converted values.
+
+
 5.6.8
 
 - Replaced crypto++ with Portable C++ Hashing Library by Stephan Brumme, resulting in 
