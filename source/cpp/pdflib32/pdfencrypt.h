@@ -122,7 +122,7 @@ class PDFEncryption
         uint32_t GetKeyLength() const { return m_nActualKeyLength; }
         void SetMaxPasswordLength(uint32_t maxLen);
         void SetupAllKeys(const std::string& DocID,
-                          const UCHARArray& userPassword, UCHARArray& ownerPassword,
+                          UCHARArray& userPassword, UCHARArray& ownerPassword,
                           int permissions, bool strength128Bits);
         virtual void PrepareKey() = 0;
         void SetHashKey(int number, int generation);
