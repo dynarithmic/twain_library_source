@@ -128,6 +128,11 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
         auto& imageinfo = pPDFInfo->ImageInfoEx;
         if ( imageinfo.bIsPDFEncrypted && imageinfo.bUseStrongEncryption && imageinfo.bIsAESEncrypted)
             minor_version = 6;
+        if (imageinfo.bIsPDFEncrypted && imageinfo.bIsAES256Encrypted)
+        {
+            major_version = 2;
+            minor_version = 0;
+        }
 
         if ( !pPDFInfo->m_Interface->DTWLIB_PDFStartCreation(pDocument, major_version, minor_version) )
         {
