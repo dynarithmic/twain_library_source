@@ -783,7 +783,7 @@ void PDFEncryptionAES::EncryptAES128ECB(const std::string& dataIn, std::string& 
     EncryptInternal(dataIn, dataOut, AESMode::AES_ECB, AESKeyLength::AES_128);
 }
 
-void PDFEncryptionAES::EncryptInternal(std::string dataIn, std::string& dataOut, 
+void PDFEncryptionAES::EncryptInternal(std::string_view dataIn, std::string& dataOut, 
                                        AESMode aesMode, AESKeyLength keyLength)
 {
     // Convert input string to byte array
