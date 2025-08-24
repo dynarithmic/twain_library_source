@@ -105,7 +105,8 @@ class PDFEncryption
         void EncryptRC4(const UCHARArray& dataIn, UCHARArray& dataOut);
         void EncryptRC4(UCHARArray& data);
         virtual UCHARArray GetExtendedKey(int number, int generation);
-        void CreateAESV3Info(std::string userPassword, std::string ownerPassword, int permissions);
+        void CreateAESV3Info(std::string_view userPassword, std::string_view ownerPassword, 
+                             int permissions);
 
     public:
         PDFEncryption();
@@ -129,11 +130,11 @@ class PDFEncryption
         virtual void Encrypt(const std::string& /*dataIn*/, std::string& /*dataOut*/) {}
         virtual void Encrypt(char * /*dataIn*/, int/* len*/) {}
 
-        UCHARArray ComputeHashAESV3(std::string pswd, std::string salt, std::string uValue);
-        void ComputeUserOrOwnerKeyAESV3(const std::string& pswd, UCHARArray& Key,
+        UCHARArray ComputeHashAESV3(std::string_view pswd, std::string salt, std::string uValue);
+        void ComputeUserOrOwnerKeyAESV3(std::string_view pswd, UCHARArray& Key,
                                         UCHARArray& KeyE, bool useUserKey);
-        void ComputeUserKeyAESV3(const std::string& userpswd);
-        void ComputeOwnerKeyAESV3(const std::string& ownerpswd);
+        void ComputeUserKeyAESV3(std::string_view userpswd);
+        void ComputeOwnerKeyAESV3(std::string_view ownerpswd);
         void ComputePermsKey(int permissions);
 
         UCHARArray& GetUserKey() { return m_UserKey; }
