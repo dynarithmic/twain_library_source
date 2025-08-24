@@ -195,6 +195,7 @@ class PDFEncryptionAES: public PDFEncryption
         bool IsPaddingUsed() const { return m_bIsPaddingUsed; }
         void PrepareKey() override;
         void PrepareKey(const unsigned char* key, size_t keySize, const unsigned char* iv);
+        void PrepareKey(const unsigned char* key, size_t keySize);
 
         void EncryptAES128CBC(const std::string& dataIn, std::string& dataOut);
         void EncryptAES128ECB(const std::string& dataIn, std::string& dataOut);

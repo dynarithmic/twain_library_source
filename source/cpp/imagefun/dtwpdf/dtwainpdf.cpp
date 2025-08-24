@@ -423,7 +423,19 @@ int PDFObject::EncryptBlock(const std::string& sIn, std::string& sOut, int objec
     PDFEncryption& enc = pParent->GetEncryptionEngine();
     // now get the hash key from the object and generation numbers;
     enc.SetHashKey(objectnum, gennum);
-    enc.PrepareKey();
+
+    PDFEncryptionAES* pAES = dynamic_cast<PDFEncryptionAES*>(&enc);
+    if (pAES)
+    {
+        // If this is AES, then we need to encrypt using either 
+        // AES-128 CBC or AES-256 CBC, depending on the key size
+        if (pAES->GetKeyLength() == 32)  // AES-256
+            pAES->PrepareKey(pAES->GetEncryptionKey().data(), 32);
+        else
+            pAES->PrepareKey(); // AES-128
+    }
+    else
+        enc.PrepareKey();
     enc.Encrypt(sIn, sOut);
     return ENCRYPTION_OK;
 }

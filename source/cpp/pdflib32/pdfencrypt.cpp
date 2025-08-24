@@ -406,7 +406,9 @@ PDFEncryption::UCHARArray PDFEncryption::ComputeHashAESV3(std::string pswd, std:
     for (unsigned i = 0; i < 64 ||
         static_cast<unsigned int>(E.back()) > (i - 32); i++)
     {
-        std::string oneValue = pswd + uValue;
+        std::string oneValue = pswd +
+            dynarithmic::StringWrapperA::StringFromUChars(K.data(), K.size()) 
+            + uValue;
         std::string K1;
         for (int j = 1; j <= 64; ++j)
             K1 += oneValue;
@@ -431,8 +433,8 @@ PDFEncryption::UCHARArray PDFEncryption::ComputeHashAESV3(std::string pswd, std:
         {
             K = dynarithmic::SHA2Hash(E, dynarithmic::SHA2HashType::SHA512);
         }
-        K.resize(32);
     }
+    K.resize(32);
     return K;
 }
 
@@ -732,6 +734,15 @@ void PDFEncryptionAES::PrepareKey(const unsigned char* key, size_t keySize, cons
     memcpy(m_ivValue, iv, AES_BLOCK_SIZE);
 }
 
+void PDFEncryptionAES::PrepareKey(const unsigned char* key, size_t keySize)
+{
+    m_LocalKey.clear();
+    std::copy_n(key, keySize, std::back_inserter(m_LocalKey));
+    IVGenerator iv;
+    PDFEncryption::UCHARArray arr = iv.getIV(AES_BLOCK_SIZE);
+    memcpy(m_ivValue, &arr[0], AES_BLOCK_SIZE);
+}
+
 // save encrypted data to new string
 void PDFEncryptionAES::Encrypt(const std::string& dataIn, std::string& dataOut)
 {
@@ -820,7 +831,6 @@ void PDFEncryptionAES::EncryptInternal(std::string dataIn, std::string& dataOut,
         {
             vOut.insert(vOut.begin(), vIv.begin(), vIv.end());
         }
-
     }
     dataOut = dynarithmic::StringWrapperA::StringFromUChars(vOut.data(), vOut.size());
 }
