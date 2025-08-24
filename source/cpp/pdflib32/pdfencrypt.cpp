@@ -279,7 +279,8 @@ void PDFEncryption::SetupAllKeys(const std::string& DocID,
     }
 }
 
-void PDFEncryption::CreateAESV3Info(std::string userPassword, std::string ownerPassword, int permissions)
+void PDFEncryption::CreateAESV3Info(std::string_view userPassword, std::string_view ownerPassword, 
+                                    int permissions)
 {
     // Generate file encryption key
     m_EncryptionKey = dynarithmic::CreateRandomDigits(32);
@@ -295,12 +296,12 @@ void PDFEncryption::CreateAESV3Info(std::string userPassword, std::string ownerP
     ComputePermsKey(permissions);
 }
 
-void PDFEncryption::ComputeUserKeyAESV3(const std::string& userpswd)
+void PDFEncryption::ComputeUserKeyAESV3(std::string_view userpswd)
 {
     ComputeUserOrOwnerKeyAESV3(userpswd, m_UserKey, m_UserKeyE, false);
 }
 
-void PDFEncryption::ComputeOwnerKeyAESV3(const std::string& ownerpswd)
+void PDFEncryption::ComputeOwnerKeyAESV3(std::string_view ownerpswd)
 {
     ComputeUserOrOwnerKeyAESV3(ownerpswd, m_OwnerKey, m_OwnerKeyE, true);
 }
@@ -331,7 +332,7 @@ void PDFEncryption::ComputePermsKey(int permissions)
     PermBlock[6] = 0xFF;
     PermBlock[7] = 0xFF;
 
-    PermBlock[8] = 'T';
+    PermBlock[8] = 'T'; // This will always encrypt the meta data
     PermBlock[9] = 'a';
     PermBlock[10] = 'd';
     PermBlock[11] = 'b';
@@ -351,19 +352,24 @@ void PDFEncryption::ComputePermsKey(int permissions)
     aes.SetPaddingUsed(false);
 
     // Use the encryption key for the AES-256 hash.
-    std::string sPermsKey;
-    std::string sPermBlock = dynarithmic::StringWrapperA::StringFromUChars(PermBlock, 16);
-    aes.EncryptAES256ECB(sPermBlock, sPermsKey);
+    std::string strPermsKey;
+    std::string strPermBlock = dynarithmic::StringWrapperA::StringFromUChars(PermBlock, 16);
+    aes.EncryptAES256ECB(strPermBlock, strPermsKey);
 
-    m_PermsKey = dynarithmic::StringWrapperA::UCharsFromString(sPermsKey);
+    m_PermsKey = dynarithmic::StringWrapperA::UCharsFromString(strPermsKey);
 
 }
-void PDFEncryption::ComputeUserOrOwnerKeyAESV3(const std::string& pswd, // Password
-                                               UCHARArray& Key, // U or O entry
-                                               UCHARArray& KeyE, // UE or OE entry
+
+void PDFEncryption::ComputeUserOrOwnerKeyAESV3(std::string_view pswd, // Password
+                                               UCHARArray& Key, // U or O entry on output
+                                               UCHARArray& KeyE, // UE or OE entry on output
                                                bool useUserKey) // use the user key
 {
+    // Implements Algorithms 8 and 9 as described by PDF-ISO 32000-1:2020
+    // 
     // Generate Salts
+
+    // step a)
     auto vSalt = dynarithmic::CreateRandomDigits(8);
     auto kSalt = dynarithmic::CreateRandomDigits(8); 
     auto vSaltString = dynarithmic::StringWrapperA::StringFromUChars(vSalt.data(), 8);
@@ -382,7 +388,7 @@ void PDFEncryption::ComputeUserOrOwnerKeyAESV3(const std::string& pswd, // Passw
 
     Key = dynarithmic::StringWrapperA::UCharsFromString(KeyString);
 
-    // Generate hash for UE or OE
+    // Generate hash for UE or OE (step b)
     hashValueOut = ComputeHashAESV3(pswd, kSaltString, userString);
 
     // UE or OE = AES-256 encoded file encryption key with key=hash
@@ -397,36 +403,64 @@ void PDFEncryption::ComputeUserOrOwnerKeyAESV3(const std::string& pswd, // Passw
     aesEncrypt.EncryptAES256CBC(
         dynarithmic::StringWrapperA::StringFromUChars(m_EncryptionKey.data(), m_EncryptionKey.size()), 
         dataOut);
+
+    // done
     KeyE.assign(dataOut.begin(), dataOut.end());
 }
 
-PDFEncryption::UCHARArray PDFEncryption::ComputeHashAESV3(std::string pswd, std::string salt, std::string uValue)
+PDFEncryption::UCHARArray PDFEncryption::ComputeHashAESV3(std::string_view pswd, std::string salt, std::string uValue)
 {
+    // AES-256 according to PDF 1.7 Adobe Extension Level 8 (PDF 2.0)
+
+    // PDF 2.0 Algorithm 2.B
+    // step a) -- Create the K value with the SHA hash of the data, salt,
+    // and userKey value (which will be empty if creating the user key).
     PDFEncryption::UCHARArray outValue;
-    std::string hasherKey = pswd + salt + uValue;
+    std::string hasherKey = pswd.data() + salt + uValue;
     auto K = dynarithmic::SHA2Hash(hasherKey, dynarithmic::SHA2HashType::SHA256);
 
-    // AES-256 according to PDF 1.7 Adobe Extension Level 8 (PDF 2.0)
     std::string E;
     PDFEncryptionAES aesEncryptor;
-    for (unsigned i = 0; i < 64 ||
-        static_cast<unsigned int>(E.back()) > (i - 32); i++)
+
+    // This loop is tricky in that it will always loop at least 64 times,
+    // and will exit after at least 64 iteration, and only if the condition
+    // that the last byte of the encrypted string is <= the current round
+    // iteration.  This final step accomplishes step e) and step f) of the 
+    // algorithm described in ISO-32000-2:2020 (Algorithm 2.B).
+
+    for (unsigned round = 0; round < 64 || // Loop 64 rounds
+        // Loop termination after 64 rounds...
+        static_cast<unsigned int>(E.back()) > (round - 32); round++) 
     {
-        std::string oneValue = pswd +
+        // step b) -- Create the base string that will be repeated 64 times
+        std::string oneValue = pswd.data() +
             dynarithmic::StringWrapperA::StringFromUChars(K.data(), K.size()) 
             + uValue;
         std::string K1;
+
+        // Create 64 copies of the string above to create K1
         for (int j = 1; j <= 64; ++j)
             K1 += oneValue;
 
+        // Key consists of the first 16 bytes of K.  The IV consists of
+        // the next 16 bytes of K
         aesEncryptor.PrepareKey(K.data(), 16, &K[16]);
+
+        // No padding, and do not attach the IV at the beginning of the 
+        // encrypted stream.
         aesEncryptor.SetPaddingUsed(false);
         aesEncryptor.SetIVAttached(false);
+
+        // Start the encryption (AES-128 CBC)
         aesEncryptor.EncryptAES128CBC(K1, E);
+
         auto ETemp = dynarithmic::StringWrapperA::UCharsFromString(E);
         auto K1Temp = dynarithmic::StringWrapperA::UCharsFromString(K1);
+
+        // step c) -- Take the first 16 bytes as an integer, modulo 3
         auto remainder = static_cast<int>(bigEndianBytesToInt(ETemp.data(), 16) % 3);
 
+        // step d) -- Choose the SHA hash algorithm, based on the remainder
         if (remainder == 0)
         {
             K = dynarithmic::SHA2Hash(E, dynarithmic::SHA2HashType::SHA256);
@@ -440,6 +474,8 @@ PDFEncryption::UCHARArray PDFEncryption::ComputeHashAESV3(std::string pswd, std:
             K = dynarithmic::SHA2Hash(E, dynarithmic::SHA2HashType::SHA512);
         }
     }
+
+    // done
     K.resize(32);
     return K;
 }
