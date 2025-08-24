@@ -262,45 +262,45 @@ std::string MakeCompatiblePDFString(const std::string& sString)
     // Search for forward slash and replace with two forward slashes
     std::string sNew;
     sNew.reserve(100);
-    std::string::difference_type nEscapes[5] = {0};
-    unsigned char nChars[] = { 0x09, 0x0d, 0x0a, 0x0c, 0x08 };
 
-    PDFEncryption::UCHARArray nEscapeChar(5);
-    std::copy_n(nChars, 5, nEscapeChar.begin());
+    unsigned char nChars[] = { 0x09, 0x0d, 0x0a, 0x0c, 0x08, 0x28, 0x29 };
+    const char* nEscapeString[] = { "\\t", "\\r", "\\n", "\\f", "\\b", "(", ")" };
 
-    const char *nEscapeString[] = { "\\t", "\\r", "\\n", "\\f", "\\b" };
+    std::string::difference_type nEscapes[sizeof(nChars)] = {0};
+    std::vector<unsigned char> nEscapeChar(sizeof(nChars));
+    std::copy_n(nChars, sizeof(nChars), nEscapeChar.begin());
 
     const std::string::difference_type nForward = std::count(sString.begin(), sString.end(), '\\');
     std::string::difference_type sum = 0;
 
-    for ( int i = 0; i < 5; ++i )
+    for (int i = 0; i < sizeof(nChars); ++i)
     {
         nEscapes[i] = std::count(sString.begin(), sString.end(), nEscapeChar[i]);
         sum += nEscapes[i];
     }
 
-    if ( nForward + sum > 0 )
+    if (nForward + sum > 0)
     {
         std::string::const_iterator it1 = sString.begin();
         const std::string::const_iterator it2 = sString.end();
 
-        while (it1 != it2 )
+        while (it1 != it2)
         {
             bool addit = true;
-            if ( *it1 == '\\' )
+            if (*it1 == '\\')
                 sNew += '\\';
             else
             {
                 auto found = std::find(nEscapeChar.begin(), nEscapeChar.end(), *it1);
 
-                if ( found != nEscapeChar.end() )
+                if (found != nEscapeChar.end())
                 {
                     const int dist = static_cast<int>(std::distance(nEscapeChar.begin(), found));
                     sNew += nEscapeString[dist];
                     addit = false;
                 }
             }
-            if ( addit )
+            if (addit)
                 sNew += *it1;
             ++it1;
         }
@@ -308,17 +308,11 @@ std::string MakeCompatiblePDFString(const std::string& sString)
     else
         sNew = sString;
 
-    // balances parentheses
-    const int nLeft = static_cast<int>(std::count(sNew.begin(), sNew.end(), '('));
-    const int nRight = static_cast<int>(std::count(sNew.begin(), sNew.end(), ')'));
-    if ( nLeft == nRight )
-        return sNew;
-
     // prepend all parens with / characters
     std::string sNew2;
     std::string::const_iterator it3 = sNew.begin();
     const std::string::const_iterator it4 = sNew.end();
-    while (it3 != it4 )
+    while (it3 != it4)
     {
         if (*it3 == '(' || *it3 == ')')
             sNew2 += "\\";
