@@ -268,8 +268,8 @@ void PDFEncryption::SetupAllKeys(const std::string& DocID,
     else
     {
         // Make sure that the passwords are not greater than 127 characters
-        ownerPassword.resize(std::min(127U, ownerPassword.size()));
-        userPassword.resize(std::min(127U, userPassword.size()));
+        ownerPassword.resize(std::min(static_cast<size_t>(127), ownerPassword.size()));
+        userPassword.resize(std::min(static_cast<size_t>(127), userPassword.size()));
 
         // Create all of the information blocks that will be written to the PDF
         // file in the Encryption dictionary (U, O, UE, OE, Perms, and the file encryption key)
@@ -793,7 +793,7 @@ void PDFEncryptionAES::EncryptInternal(std::string dataIn, std::string& dataOut,
     if (m_bIsPaddingUsed)
     {
         extraChunk = true;
-        auto nearest16 = dynarithmic::RoundUpToNearest(dataIn.size(), 16);
+        auto nearest16 = dynarithmic::RoundUpToNearest(static_cast<uint32_t>(dataIn.size()), 16U);
         if (dataIn.size() % 16 == 0)
         {
             chunkByte = 0x10;
