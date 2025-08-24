@@ -2423,7 +2423,7 @@ void PdfDocument::SetEncryption(CTL_StringViewType ownerPassword,
     if (m_bIsAESEncrypted)
     {
 #ifdef DTWAIN_SUPPORT_AES
-        m_Encryption = std::make_shared<PDFEncryptionAES>(); 
+        m_Encryption = std::make_shared<PDFEncryptionAES>();
         if (m_nKeyLength == 32)  // This is AES-256
         {
             m_Encryption->SetMaxPasswordLength(127);

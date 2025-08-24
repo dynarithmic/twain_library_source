@@ -48,14 +48,14 @@ std::string GetSystemTimeInMilliseconds();
 
 using namespace boost::multiprecision;
 
-// Function to convert 16-byte big-endian char array to int64_t
+// Function to convert 16-byte big-endian char array to 16 byte integer
 static uint128_t bigEndianBytesToInt(const unsigned char* bytes, size_t numBytes)
 {
     uint128_t value = 0;
 
     // Iterate through the bytes and shift them into the value
     // Big-endian means the most significant byte is first (at index 0)
-    for (size_t i = 0; i < numBytes; ++i) { // For an 8-byte (64-bit) integer
+    for (size_t i = 0; i < numBytes; ++i) { // For an 16-byte (128-bit) integer
         value = (value << 8) | bytes[i];
     }
     return value;
