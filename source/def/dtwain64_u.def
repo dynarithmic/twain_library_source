@@ -1128,3 +1128,4 @@ DTWAIN_ArrayANSIStringToFloat                     @31131
 DTWAIN_ArrayWideStringToFloat                     @31132 
 DTWAIN_ArrayFloatToString                         @31133 
 DTWAIN_ArrayStringToFloat                         @31134 
+DTWAIN_SetPDFAESEncryptionEx                      @31135
