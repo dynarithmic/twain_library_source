@@ -786,59 +786,68 @@ void PDFEncryptionAES::EncryptAES128ECB(const std::string& dataIn, std::string& 
 void PDFEncryptionAES::EncryptInternal(std::string dataIn, std::string& dataOut, 
                                        AESMode aesMode, AESKeyLength keyLength)
 {
+    // Convert input string to byte array
+    std::vector<unsigned char> origDataAsUChars = dynarithmic::StringWrapperA::UCharsFromString(dataIn);
+
     // Adjust the input string, depending on the padding.
-    unsigned char chunkByte = 0;
-    bool extraChunk = false;
-    unsigned char chunkToAdd[16] = {};
+    unsigned char paddingByte = 0;
+    bool extraPadding = false;
+    unsigned char paddingToAdd[16] = {};
     if (m_bIsPaddingUsed)
     {
-        extraChunk = true;
+        // we need to add padding bytes (PKCS#7)
+        extraPadding = true;
         auto nearest16 = dynarithmic::RoundUpToNearest(static_cast<uint32_t>(dataIn.size()), 16U);
         if (dataIn.size() % 16 == 0)
         {
-            chunkByte = 0x10;
+            paddingByte = 0x10;
         }
         else
         {
-            chunkByte = static_cast<unsigned char>(nearest16 - dataIn.size());
+            paddingByte = static_cast<unsigned char>(nearest16 - dataIn.size());
         }
     }
 
-    if (extraChunk && chunkByte == 0x10)
+    // Add padding byte to end of the data we will encrypt
+    if (extraPadding && paddingByte == 0x10)
     {
-        memset(chunkToAdd, 0x10, sizeof(chunkToAdd));
-        dataIn.append(chunkToAdd, chunkToAdd + AES_BLOCK_SIZE);
+        memset(paddingToAdd, 0x10, sizeof(paddingToAdd));
+        origDataAsUChars.insert(origDataAsUChars.end(), paddingToAdd, paddingToAdd + AES_BLOCK_SIZE);
     }
     else
-    if (extraChunk)
+    if (extraPadding)
     {
-        memset(chunkToAdd, chunkByte, sizeof(chunkToAdd));
-        dataIn.append(chunkToAdd, chunkToAdd + chunkByte);
+        memset(paddingToAdd, paddingByte, sizeof(paddingToAdd));
+        origDataAsUChars.insert(origDataAsUChars.end(), paddingToAdd, paddingToAdd + paddingByte);
     }
 
-    // Convert input string to byte array
-    std::vector<unsigned char> plain = dynarithmic::StringWrapperA::UCharsFromString(dataIn);
-
-    AES aes(keyLength);
-    std::vector<unsigned char> vOut;
+    AES aes(keyLength); // The lower-level AES encryption instance
+    std::vector<unsigned char> vEncryptedData;
 
     if (aesMode == AESMode::AES_ECB)
     {
-        vOut = aes.EncryptECB(plain, m_LocalKey);
+        // Start the encryption (no iv in ECB mode)
+        vEncryptedData = aes.EncryptECB(origDataAsUChars, m_LocalKey);
     }
     else
     if (aesMode == AESMode::AES_CBC)
     {
+        // Convert initialization vector to a compatible std::vector
         std::vector<unsigned char> vIv(m_ivValue, m_ivValue + 16);
-        vOut = aes.EncryptCBC(plain, m_LocalKey, vIv);
+
+        // Start the encryption
+        vEncryptedData = aes.EncryptCBC(origDataAsUChars, m_LocalKey, vIv);
+
         // Add the initialization vector at the beginning of the encrypted stream
-        // but only if there is an iv, or the iv is not all 0
+        // but only if 1) the user wants to attach the iv, 2) there is an iv, 
+        // and 3) the iv is not all 0
         if (m_bIsIVAttached && std::any_of(vIv.begin(), vIv.end(), [](auto ch) { return ch != 0; }))
         {
-            vOut.insert(vOut.begin(), vIv.begin(), vIv.end());
+            vEncryptedData.insert(vEncryptedData.begin(), vIv.begin(), vIv.end());
         }
     }
-    dataOut = dynarithmic::StringWrapperA::StringFromUChars(vOut.data(), vOut.size());
+    // Convert encrypted data to a std::string and we are done.
+    dataOut = dynarithmic::StringWrapperA::StringFromUChars(vEncryptedData.data(), vEncryptedData.size());
 }
 
 PDFEncryption::UCHARArray PDFEncryptionAES::GetExtendedKey(int number, int generation)
