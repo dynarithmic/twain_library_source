@@ -237,10 +237,10 @@ void PDFEncryption::SetupAllKeys(const std::string& DocID,
 
 
 void PDFEncryption::SetupAllKeys(const std::string& DocID,
-    const UCHARArray& userPassword,
-    UCHARArray& ownerPassword,
-    int permissionsParam,
-    bool strength128Bits)
+                                UCHARArray& userPassword,
+                                UCHARArray& ownerPassword,
+                                int permissionsParam,
+                                bool strength128Bits)
 {
     bool isAES256 = (m_nActualKeyLength == 32 && dynamic_cast<PDFEncryptionAES*>(this));
     if (ownerPassword.empty())
@@ -267,6 +267,12 @@ void PDFEncryption::SetupAllKeys(const std::string& DocID,
     }
     else
     {
+        // Make sure that the passwords are not greater than 127 characters
+        ownerPassword.resize(std::min(127U, ownerPassword.size()));
+        userPassword.resize(std::min(127U, userPassword.size()));
+
+        // Create all of the information blocks that will be written to the PDF
+        // file in the Encryption dictionary (U, O, UE, OE, Perms, and the file encryption key)
         CreateAESV3Info(dynarithmic::StringWrapperA::StringFromUChars(ownerPassword.data(), ownerPassword.size()),
                         dynarithmic::StringWrapperA::StringFromUChars(userPassword.data(), userPassword.size()),
                         permissionsParam);
