@@ -1349,6 +1349,9 @@ DTWAIN DLL are not displayed */
 #define DTWAIN_PDF_PORTRAIT         0
 #define DTWAIN_PDF_LANDSCAPE        1
 
+/* PDF AES Encryption options */
+#define DTWAIN_PDF_AES128           1
+#define DTWAIN_PDF_AES256           2
 
 /* Postscript options */
 #define DTWAIN_PS_REGULAR           0
