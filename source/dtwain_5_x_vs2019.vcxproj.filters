@@ -1227,9 +1227,6 @@
     <Filter Include="CXImage Files">
       <UniqueIdentifier>{65e5fb4a-3fd2-42d8-a860-64e1e4f61e0f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Hashing Library">
-      <UniqueIdentifier>{00752f06-8696-4fd2-b17f-7893c688fde6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="AES Encryption">
       <UniqueIdentifier>{5e54c952-71bb-44a5-b77d-b24c098fd813}</UniqueIdentifier>
     </Filter>
