@@ -422,7 +422,18 @@ namespace dynarithmic
                     encrypt_opts.get_owner_password().c_str(),
                     encrypt_opts.get_permissions_int(),
                     encrypt_opts.is_use_strong_encryption());
-                API_INSTANCE DTWAIN_SetPDFAESEncryption(source, encrypt_opts.is_use_AES_encryption());
+                bool encryptAES128 = encrypt_opts.is_use_AES_encryption();
+                bool encryptAES256 = encrypt_opts.is_use_AES256_encryption();
+                if (encryptAES256)
+                    API_INSTANCE DTWAIN_SetPDFAESEncryptionEx(source, DTWAIN_PDF_AES256, 1);
+                else
+                if (encryptAES128)
+                    API_INSTANCE DTWAIN_SetPDFAESEncryptionEx(source, DTWAIN_PDF_AES128, 1);
+                if (!encryptAES128 && !encryptAES256)
+                {
+                    API_INSTANCE DTWAIN_SetPDFAESEncryptionEx(source, DTWAIN_PDF_AES128, 0);
+                    API_INSTANCE DTWAIN_SetPDFAESEncryptionEx(source, DTWAIN_PDF_AES256, 0);
+                }
             }
             else
             {
