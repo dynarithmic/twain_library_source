@@ -1213,6 +1213,8 @@ const
   DTWAIN_PDF_ALLOWASSEMBLY = 1024;
   DTWAIN_PDF_ALLOWDEGRADEDPRINTING = 4;
   DTWAIN_PDF_ALLOWALL = $FFFFFFFC;
+  DTWAIN_PDF_ALLOWANYMOD = (DTWAIN_PDF_ALLOWMOD Or DTWAIN_PDF_ALLOWFILLIN Or DTWAIN_PDF_ALLOWMODANNOTATIONS Or DTWAIN_PDF_ALLOWASSEMBLY);
+  DTWAIN_PDF_ALLOWANYPRINTING = (DTWAIN_PDF_ALLOWANYPRINTING Or DTWAIN_PDF_ALLOWDEGRADEDPRINTING);
   DTWAIN_PDF_PORTRAIT = 0;
   DTWAIN_PDF_LANDSCAPE = 1;
   DTWAIN_PS_REGULAR = 0;
@@ -1816,6 +1818,8 @@ const
   DTWAIN_USERRES_MAXSIZE = 8192;
   DTWAIN_APIHANDLEOK = 1;
   DTWAIN_TWAINSESSIONOK = 2;
+  DTWAIN_PDF_AES128 = 1;
+  DTWAIN_PDF_AES256 = 2;
 
 { DTWAIN DLL functional interface }
 
@@ -1845,6 +1849,7 @@ function DTWAIN_AllocateMemory(memSize:DWORD) : NativeInt; stdcall;  external 'd
 function DTWAIN_AllocateMemory64(memSize:UInt64) : NativeInt; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_AllocateMemory64';
 function DTWAIN_AllocateMemoryEx(memSize:DWORD) : NativeInt; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_AllocateMemoryEx';
 function DTWAIN_AppHandlesExceptions(bSet:BOOL) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_AppHandlesExceptions';
+function DTWAIN_ArrayANSIStringToFloat(StringArray:DTWAIN_ARRAY) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayANSIStringToFloat';
 function DTWAIN_ArrayAdd(pArray:DTWAIN_ARRAY; pVariant:LPVOID) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayAdd';
 function DTWAIN_ArrayAddANSIString(pArray:DTWAIN_ARRAY; Val:LPCSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayAddANSIString';
 function DTWAIN_ArrayAddANSIStringN(pArray:DTWAIN_ARRAY; Val:LPCSTR; num:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayAddANSIStringN';
@@ -1899,6 +1904,9 @@ function DTWAIN_ArrayFindStringW(pArray:DTWAIN_ARRAY; pString:LPCWSTR) : LONG; s
 function DTWAIN_ArrayFindWideString(pArray:DTWAIN_ARRAY; pString:LPCWSTR) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayFindWideString';
 function DTWAIN_ArrayFix32GetAt(aFix32:DTWAIN_ARRAY; lPos:LONG; Whole:LPLONG; Frac:LPLONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayFix32GetAt';
 function DTWAIN_ArrayFix32SetAt(aFix32:DTWAIN_ARRAY; lPos:LONG; Whole:LONG; Frac:LONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayFix32SetAt';
+function DTWAIN_ArrayFloatToANSIString(FloatArray:DTWAIN_ARRAY) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayFloatToANSIString';
+function DTWAIN_ArrayFloatToString(FloatArray:DTWAIN_ARRAY) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayFloatToString';
+function DTWAIN_ArrayFloatToWideString(FloatArray:DTWAIN_ARRAY) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayFloatToWideString';
 function DTWAIN_ArrayGetAt(pArray:DTWAIN_ARRAY; nWhere:LONG; pVariant:LPVOID) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayGetAt';
 function DTWAIN_ArrayGetAtANSIString(pArray:DTWAIN_ARRAY; nWhere:LONG; pStr:LPSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayGetAtANSIString';
 function DTWAIN_ArrayGetAtANSIStringPtr(pArray:DTWAIN_ARRAY; nWhere:LONG) : LPCSTR; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayGetAtANSIStringPtr';
@@ -1977,6 +1985,8 @@ function DTWAIN_ArraySetAtString(pArray:DTWAIN_ARRAY; nWhere:LONG; pStr:LPCTSTR)
 function DTWAIN_ArraySetAtStringA(pArray:DTWAIN_ARRAY; nWhere:LONG; pStr:LPCSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArraySetAtStringA';
 function DTWAIN_ArraySetAtStringW(pArray:DTWAIN_ARRAY; nWhere:LONG; pStr:LPCWSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArraySetAtStringW';
 function DTWAIN_ArraySetAtWideString(pArray:DTWAIN_ARRAY; nWhere:LONG; pStr:LPCWSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArraySetAtWideString';
+function DTWAIN_ArrayStringToFloat(StringArray:DTWAIN_ARRAY) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayStringToFloat';
+function DTWAIN_ArrayWideStringToFloat(StringArray:DTWAIN_ARRAY) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ArrayWideStringToFloat';
 function DTWAIN_CallCallback(wParam:WPARAM; lParam:LPARAM; UserData:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_CallCallback';
 function DTWAIN_CallCallback64(wParam:WPARAM; lParam:LPARAM; UserData:Int64) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_CallCallback64';
 function DTWAIN_CallDSMProc(AppID:DTWAIN_IDENTITY; SourceId:DTWAIN_IDENTITY; lDG:LONG; lDAT:LONG; lMSG:LONG; pData:LPVOID) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_CallDSMProc';
@@ -2790,6 +2800,7 @@ function DTWAIN_SetOCRCapValues(Engine:DTWAIN_OCRENGINE; OCRCapValue:LONG; SetTy
 function DTWAIN_SetOrientation(Source:DTWAIN_SOURCE; Orient:LONG; bSetCurrent:BOOL) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetOrientation';
 function DTWAIN_SetOverscan(Source:DTWAIN_SOURCE; Value:LONG; bSetCurrent:BOOL) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetOverscan';
 function DTWAIN_SetPDFAESEncryption(Source:DTWAIN_SOURCE; bUseAES:BOOL) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetPDFAESEncryption';
+function DTWAIN_SetPDFAESEncryptionEx(Source:DTWAIN_SOURCE; nWhichEncryption:LONG; bUseAES:BOOL) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetPDFAESEncryptionEx';
 function DTWAIN_SetPDFASCIICompression(Source:DTWAIN_SOURCE; bSet:BOOL) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetPDFASCIICompression';
 function DTWAIN_SetPDFAuthor(Source:DTWAIN_SOURCE; lpAuthor:LPCTSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetPDFAuthor';
 function DTWAIN_SetPDFAuthorA(Source:DTWAIN_SOURCE; lpAuthor:LPCSTR) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SetPDFAuthorA';
