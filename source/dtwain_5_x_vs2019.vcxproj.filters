@@ -613,27 +613,6 @@
     <ClCompile Include="cpp\ctlarraydumper.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include="hashlib\crc32.cpp">
-      <Filter>Hashing Library</Filter>
-    </ClCompile>
-    <ClCompile Include="hashlib\digest.cpp">
-      <Filter>Hashing Library</Filter>
-    </ClCompile>
-    <ClCompile Include="hashlib\keccak.cpp">
-      <Filter>Hashing Library</Filter>
-    </ClCompile>
-    <ClCompile Include="hashlib\md5.cpp">
-      <Filter>Hashing Library</Filter>
-    </ClCompile>
-    <ClCompile Include="hashlib\sha1.cpp">
-      <Filter>Hashing Library</Filter>
-    </ClCompile>
-    <ClCompile Include="hashlib\sha3.cpp">
-      <Filter>Hashing Library</Filter>
-    </ClCompile>
-    <ClCompile Include="hashlib\sha256.cpp">
-      <Filter>Hashing Library</Filter>
-    </ClCompile>
     <ClCompile Include="cpp\ctlhashutils.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
@@ -1079,30 +1058,6 @@
     </ClInclude>
     <ClInclude Include="h\ctllogcalls.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="hashlib\crc32.h">
-      <Filter>Hashing Library</Filter>
-    </ClInclude>
-    <ClInclude Include="hashlib\hash.h">
-      <Filter>Hashing Library</Filter>
-    </ClInclude>
-    <ClInclude Include="hashlib\hmac.h">
-      <Filter>Hashing Library</Filter>
-    </ClInclude>
-    <ClInclude Include="hashlib\keccak.h">
-      <Filter>Hashing Library</Filter>
-    </ClInclude>
-    <ClInclude Include="hashlib\md5.h">
-      <Filter>Hashing Library</Filter>
-    </ClInclude>
-    <ClInclude Include="hashlib\sha1.h">
-      <Filter>Hashing Library</Filter>
-    </ClInclude>
-    <ClInclude Include="hashlib\sha3.h">
-      <Filter>Hashing Library</Filter>
-    </ClInclude>
-    <ClInclude Include="hashlib\sha256.h">
-      <Filter>Hashing Library</Filter>
     </ClInclude>
     <ClInclude Include="h\ctlrandnumutils.h">
       <Filter>Header Files</Filter>

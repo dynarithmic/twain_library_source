@@ -23,6 +23,7 @@
 
 #include <vector>
 #include <string_view>
+#include <boost/hash2/md5.hpp>
 
 namespace dynarithmic
 {
@@ -36,6 +37,17 @@ namespace dynarithmic
     std::vector<unsigned char> SHA2Hash(std::string_view message, SHA2HashType hashType = SHA2HashType::SHA256);
     std::vector<unsigned char> SHA2Hash(const unsigned char* message, size_t messageLength, 
                                         SHA2HashType hashType = SHA2HashType::SHA256);
+
+    class MD5Hasher
+    {
+        boost::hash2::md5_128 md5_hasher;
+        public:
+            static constexpr uint16_t HashBytes = 16;
+            void Add(const unsigned char* pData, size_t len);
+            void Add(const std::vector<unsigned char>& pData);
+            void Reset();
+            std::vector<unsigned char> GetHash();
+    };
 }
 #endif
 

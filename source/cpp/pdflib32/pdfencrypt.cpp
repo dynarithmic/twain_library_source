@@ -33,7 +33,7 @@ OF THIRD PARTY RIGHTS.
 #undef min
 #undef max
 #include "pdfencrypt.h"
-#include "../hashlib/md5.h"
+//#include "../hashlib/md5.h"
 #include "ctlhashutils.h"
 #include "ctlstringutils.h"
 #include "ctlobstr.h"
@@ -511,30 +511,28 @@ void PDFEncryption::SetupGlobalEncryptionKey(std::string_view documentID,
 
     // This version of the MD5 checksum mimics the PDF reference
     // create a new hashing object
-    MD5 md5;
-    md5.add(userPad.data(), userPad.size());
-    md5.add(ownerKeyParam.data(), ownerKeyParam.size());
-    md5.add(ext.data(), 4);
+    dynarithmic::MD5Hasher md5;
+    md5.Add(userPad.data(), userPad.size());
+    md5.Add(ownerKeyParam.data(), ownerKeyParam.size());
+    md5.Add(ext.data(), 4);
 
     {
         const UCHARArray test = StringToHexArray(documentID.data());
-        md5.add(test.data(), test.size());
+        md5.Add(test.data(), test.size());
     }
 
-
-    unsigned char testbuf[MD5::HashBytes];
-    md5.getHash(testbuf);
+    auto testbuf = md5.GetHash();
     if (m_EncryptionKey.size() >= 16)
     {
         for (int k = 0; k < 50; ++k)
         {
-            md5.reset();
-            md5.add(testbuf, MD5::HashBytes);
-            md5.getHash(testbuf);
+            md5.Reset();
+            md5.Add(testbuf.data(), dynarithmic::MD5Hasher::HashBytes);
+            testbuf = md5.GetHash();
         }
     }
-    auto minToCopy = std::min(static_cast<size_t>(MD5::HashBytes), m_EncryptionKey.size());
-    std::copy(testbuf, testbuf + minToCopy, m_EncryptionKey.begin());
+    auto minToCopy = std::min(static_cast<size_t>(dynarithmic::MD5Hasher::HashBytes), m_EncryptionKey.size());
+    std::copy(testbuf.begin(), testbuf.begin() + minToCopy, m_EncryptionKey.begin());
 }
 
 
@@ -545,17 +543,17 @@ PDFEncryption::UCHARArray PDFEncryption::ComputeOwnerKey(const UCHARArray& userP
     UCHARArray ownerKeyValue(m_nMaxPasswordLength);
     UCHARArray digest(16);
 
-    MD5 md5;
-    md5.add(ownerPad.data(), ownerPad.size());
-    md5.getHash(digest.data());
+    dynarithmic::MD5Hasher md5;
+    md5.Add(ownerPad.data(), ownerPad.size());
+    digest = md5.GetHash();
 
     if (m_nActualKeyLength >= 16)
     {
         for (int k = 0; k < 50; ++k)
         {
-            md5.reset();
-            md5.add(digest.data(), MD5::HashBytes);
-            md5.getHash(digest.data());
+            md5.Reset();
+            md5.Add(digest.data(), dynarithmic::MD5Hasher::HashBytes);
+            digest = md5.GetHash();
         }
 
         UCHARArray mkeyValue(m_nActualKeyLength);
@@ -581,13 +579,13 @@ void PDFEncryption::SetupUserKey()
     if (m_EncryptionKey.size() >= 16)
     {
         UCHARArray digest(32);
-        MD5 md5;
-        md5.add(&pad[0], sizeof pad);
+        dynarithmic::MD5Hasher md5;
+        md5.Add(&pad[0], sizeof pad);
 
         // step 3
         const UCHARArray test = StringToHexArray(m_documentID);
-        md5.add(test.data(), test.size());
-        md5.getHash(digest.data());
+        md5.Add(test.data(), test.size());
+        digest = md5.GetHash();
 
         // step 4
         PrepareRC4Key(m_EncryptionKey, 0, static_cast<int>(m_EncryptionKey.size()));
@@ -600,7 +598,6 @@ void PDFEncryption::SetupUserKey()
         UCHARArray tempkey = digest;
         for (int i = 1; i <= 19; ++i)
         {
-
             // Make encryption key
             for (UCHARArray::size_type j = 0; j < m_EncryptionKey.size(); ++j)
                 tempkey[j] = m_EncryptionKey[j] ^ i;
@@ -661,14 +658,13 @@ void PDFEncryption::SetHashKey(int number, int generation)
     const std::string sTemp = m.str();
 
     const UCHARArray tempArr = StringToByteArray(sTemp);
-    MD5 md5;
-    md5.add(tempArr.data(), tempArr.size());
-    unsigned char tempbuf[MD5::HashBytes];
-    md5.getHash(tempbuf);
+    dynarithmic::MD5Hasher md5;
+    md5.Add(tempArr.data(), tempArr.size());
+    auto tempbuf = md5.GetHash();
 
     m_LocalKey.resize(32);
 
-    std::copy(tempbuf, tempbuf + MD5::HashBytes, m_LocalKey.begin());
+    std::copy(tempbuf.begin(), tempbuf.begin() + dynarithmic::MD5Hasher::HashBytes, m_LocalKey.begin());
 
     m_nKeySize = static_cast<int>(m_EncryptionKey.size()) + 5;
     auto maxKeySize = std::max(16U, m_nActualKeyLength);
