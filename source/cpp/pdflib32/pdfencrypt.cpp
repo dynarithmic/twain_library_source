@@ -222,9 +222,9 @@ void PDFEncryption::SetMaxPasswordLength(uint32_t maxLen)
     m_UserKey.resize(m_nMaxPasswordLength);
 }
 
-void PDFEncryption::SetupAllKeys(const std::string& DocID,
-                                 const std::string& userPassword,
-                                 const std::string& ownerPassword, 
+void PDFEncryption::SetupAllKeys(std::string_view DocID,
+                                 std::string_view userPassword,
+                                 std::string_view ownerPassword, 
                                  int permissionsValue,
                                  bool strength128Bits)
 {
@@ -236,7 +236,7 @@ void PDFEncryption::SetupAllKeys(const std::string& DocID,
 }
 
 
-void PDFEncryption::SetupAllKeys(const std::string& DocID,
+void PDFEncryption::SetupAllKeys(std::string_view DocID,
                                 UCHARArray& userPassword,
                                 UCHARArray& ownerPassword,
                                 int permissionsParam,
@@ -480,7 +480,7 @@ PDFEncryption::UCHARArray PDFEncryption::ComputeHashAESV3(std::string_view pswd,
     return K;
 }
 
-void PDFEncryption::SetupByUserPad(const std::string& documentID,
+void PDFEncryption::SetupByUserPad(std::string_view documentID,
                                    const UCHARArray& userPad,
                                    const UCHARArray& ownerKeyParam,
                                    int permissionsParam,
@@ -490,7 +490,7 @@ void PDFEncryption::SetupByUserPad(const std::string& documentID,
     SetupUserKey();
 }
 
-void PDFEncryption::SetupGlobalEncryptionKey(const std::string& documentID,
+void PDFEncryption::SetupGlobalEncryptionKey(std::string_view documentID,
                                              const UCHARArray& userPad,
                                              const UCHARArray& ownerKeyParam,
                                              int permissionsParam,
@@ -517,7 +517,7 @@ void PDFEncryption::SetupGlobalEncryptionKey(const std::string& documentID,
     md5.add(ext.data(), 4);
 
     {
-        const UCHARArray test = StringToHexArray(documentID);
+        const UCHARArray test = StringToHexArray(documentID.data());
         md5.add(test.data(), test.size());
     }
 
@@ -740,7 +740,7 @@ PDFEncryption::UCHARArray PDFEncryptionRC4::GetExtendedKey(int number, int gener
     return PDFEncryption::GetExtendedKey(number, generation);
 }
 
-void PDFEncryptionRC4::Encrypt(const std::string& dataIn, std::string& dataOut)
+void PDFEncryptionRC4::Encrypt(std::string_view dataIn, std::string& dataOut)
 {
     UCHARArray dIn(dataIn.size());
     std::copy (dataIn.begin(), dataIn.end(), dIn.begin());
@@ -786,7 +786,7 @@ void PDFEncryptionAES::PrepareKey(const unsigned char* key, size_t keySize)
 }
 
 // save encrypted data to new string
-void PDFEncryptionAES::Encrypt(const std::string& dataIn, std::string& dataOut)
+void PDFEncryptionAES::Encrypt(std::string_view dataIn, std::string& dataOut)
 {
     switch (m_nKeySize)
     {
@@ -799,22 +799,22 @@ void PDFEncryptionAES::Encrypt(const std::string& dataIn, std::string& dataOut)
     }
 }
 
-void PDFEncryptionAES::EncryptAES128CBC(const std::string& dataIn, std::string& dataOut)
+void PDFEncryptionAES::EncryptAES128CBC(std::string_view dataIn, std::string& dataOut)
 {
     EncryptInternal(dataIn, dataOut, AESMode::AES_CBC, AESKeyLength::AES_128);
 }
 
-void PDFEncryptionAES::EncryptAES256CBC(const std::string& dataIn, std::string& dataOut)
+void PDFEncryptionAES::EncryptAES256CBC(std::string_view dataIn, std::string& dataOut)
 {
     EncryptInternal(dataIn, dataOut, AESMode::AES_CBC, AESKeyLength::AES_256);
 }
 
-void PDFEncryptionAES::EncryptAES256ECB(const std::string& dataIn, std::string& dataOut)
+void PDFEncryptionAES::EncryptAES256ECB(std::string_view dataIn, std::string& dataOut)
 {
     EncryptInternal(dataIn, dataOut, AESMode::AES_ECB, AESKeyLength::AES_256);
 }
 
-void PDFEncryptionAES::EncryptAES128ECB(const std::string& dataIn, std::string& dataOut)
+void PDFEncryptionAES::EncryptAES128ECB(std::string_view dataIn, std::string& dataOut)
 {
     EncryptInternal(dataIn, dataOut, AESMode::AES_ECB, AESKeyLength::AES_128);
 }
@@ -845,12 +845,6 @@ void PDFEncryptionAES::EncryptInternal(std::string_view dataIn, std::string& dat
     }
 
     // Add padding byte to end of the data we will encrypt
-    if (extraPadding && paddingByte == 0x10)
-    {
-        memset(paddingToAdd, 0x10, sizeof(paddingToAdd));
-        origDataAsUChars.insert(origDataAsUChars.end(), paddingToAdd, paddingToAdd + AES_BLOCK_SIZE);
-    }
-    else
     if (extraPadding)
     {
         memset(paddingToAdd, paddingByte, sizeof(paddingToAdd));
