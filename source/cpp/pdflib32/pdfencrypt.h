@@ -87,12 +87,12 @@ class PDFEncryption
         std::string m_documentID;
 
         UCHARArray PadPassword(const UCHARArray& passw) const;
-        void SetupByUserPad(const std::string& documentID,
+        void SetupByUserPad(std::string_view documentID,
                             const UCHARArray& userPad,
                             const UCHARArray& ownerKey,
                             int permissions,
                             bool strength128Bits);
-        void SetupGlobalEncryptionKey(const std::string& documentID,
+        void SetupGlobalEncryptionKey(std::string_view documentID,
                                       const UCHARArray& userPad,
                                       const UCHARArray& ownerKey,
                                       int permissions,
@@ -115,19 +115,19 @@ class PDFEncryption
                                    const UCHARArray& ownerPad,
                                    bool strength128Bits);
 
-        void SetupAllKeys(const std::string& DocID,
-                          const std::string& userPassword,
-                          const std::string& ownerPassword, int permissions,
+        void SetupAllKeys(std::string_view DocID,
+                          std::string_view userPassword,
+                          std::string_view ownerPassword, int permissions,
                           bool strength128Bits);
         void SetKeyLength(uint32_t keyLength) { m_nActualKeyLength = keyLength; }
         uint32_t GetKeyLength() const { return m_nActualKeyLength; }
         void SetMaxPasswordLength(uint32_t maxLen);
-        void SetupAllKeys(const std::string& DocID,
+        void SetupAllKeys(std::string_view DocID,
                           UCHARArray& userPassword, UCHARArray& ownerPassword,
                           int permissions, bool strength128Bits);
         virtual void PrepareKey() = 0;
         void SetHashKey(int number, int generation);
-        virtual void Encrypt(const std::string& /*dataIn*/, std::string& /*dataOut*/) {}
+        virtual void Encrypt(std::string_view /*dataIn*/, std::string& /*dataOut*/) {}
         virtual void Encrypt(char * /*dataIn*/, int/* len*/) {}
 
         UCHARArray ComputeHashAESV3(std::string_view pswd, std::string salt, std::string uValue);
@@ -151,30 +151,13 @@ class PDFEncryptionRC4 : public PDFEncryption
     protected:
         UCHARArray GetExtendedKey(int number, int generation) override;
     public:
-        void Encrypt(const std::string& dataIn, std::string& dataOut) override;
+        void Encrypt(std::string_view dataIn, std::string& dataOut) override;
         void Encrypt(char *dataIn, int len) override;
         void PrepareKey() override;
 
 };
 
 #ifdef DTWAIN_SUPPORT_AES
-template <typename ClassName, typename CTXType, bool UseIV>
-struct AESEncryptorTraits
-{
-    typedef std::vector<unsigned char> UCHARArray;
-    static const bool s_bUseIV = UseIV;
-
-    static void Initialize(CTXType* ctx, const UCHARArray& localKey, const unsigned char* iv)
-    {
-        ClassName::AES_EncryptInit(ctx, localKey.data(), iv);
-    }
-
-    static void EncryptBlock(CTXType* ctx, uint8_t* chunk)
-    {
-        ClassName::AES_Encrypt(ctx, chunk, chunk);
-    }
-};
-
 class PDFEncryptionAES: public PDFEncryption
 {
     protected:
@@ -188,7 +171,7 @@ class PDFEncryptionAES: public PDFEncryption
                              AESMode aesMode, AESKeyLength keyLength);
 
     public:
-        void Encrypt(const std::string& dataIn, std::string& dataOut) override;
+        void Encrypt(std::string_view dataIn, std::string& dataOut) override;
         void Encrypt(char *dataIn, int len) override;
         void SetPaddingUsed(bool bSet) { m_bIsPaddingUsed = bSet; }
         void SetIVAttached(bool bSet) { m_bIsIVAttached = bSet; }
@@ -198,10 +181,10 @@ class PDFEncryptionAES: public PDFEncryption
         void PrepareKey(const unsigned char* key, size_t keySize, const unsigned char* iv);
         void PrepareKey(const unsigned char* key, size_t keySize);
 
-        void EncryptAES128CBC(const std::string& dataIn, std::string& dataOut);
-        void EncryptAES128ECB(const std::string& dataIn, std::string& dataOut);
-        void EncryptAES256CBC(const std::string& dataIn, std::string& dataOut);
-        void EncryptAES256ECB(const std::string& dataIn, std::string& dataOut);
+        void EncryptAES128CBC(std::string_view dataIn, std::string& dataOut);
+        void EncryptAES128ECB(std::string_view dataIn, std::string& dataOut);
+        void EncryptAES256CBC(std::string_view dataIn, std::string& dataOut);
+        void EncryptAES256ECB(std::string_view dataIn, std::string& dataOut);
 };
 #endif
 #endif
