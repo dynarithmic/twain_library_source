@@ -65,4 +65,28 @@ namespace dynarithmic
         return SHA2Hash(dynarithmic::StringWrapperA::StringFromUChars(message, messageLength), hashType);
     }
 
+    void MD5Hasher::Add(const unsigned char* pData, size_t len)
+    {
+        md5_hasher.update(pData, len);
+    }
+
+    void MD5Hasher::Add(const std::vector<unsigned char>& pData)
+    {
+        md5_hasher.update(pData.data(), pData.size());
+    }
+
+    void MD5Hasher::Reset()
+    {
+        md5_hasher = {};
+    }
+
+    std::vector<unsigned char> MD5Hasher::GetHash()
+    {
+        std::vector<unsigned char> retVal;
+        auto digest = md5_hasher.result();
+        for (unsigned char byte : digest)
+            retVal.push_back(byte);
+        return retVal;
+    }
+
 }
