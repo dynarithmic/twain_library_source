@@ -1498,8 +1498,6 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile Include="cpp\pdflib32\a85encode.cpp" />
     <ClCompile Include="cpp\pdflib32\ahexencode.cpp" />
     <ClCompile Include="cpp\pdflib32\flateencode.cpp" />
-    <ClCompile Include="cpp\pdflib32\md5class.cpp" />
-    <ClCompile Include="cpp\pdflib32\md5class2.cpp" />
     <ClCompile Include="cpp\pdflib32\pdfencrypt.cpp" />
     <ClCompile Include="cpp\pdflib32\pdflib32.cpp" />
     <ClCompile Include="cpp\pdflib32\pslib32.cpp" />
@@ -1559,9 +1557,6 @@ copy $(TargetDir)$(TargetName).lib .
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="c\imagefun\dtwpdf\md5c.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="FreeImage\Wrapper\FreeImagePlus\src\fipImage.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">NotUsing</PrecompiledHeader>
@@ -1623,13 +1618,6 @@ copy $(TargetDir)$(TargetName).lib .
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hashlib\crc32.cpp" />
-    <ClCompile Include="hashlib\digest.cpp" />
-    <ClCompile Include="hashlib\keccak.cpp" />
-    <ClCompile Include="hashlib\md5.cpp" />
-    <ClCompile Include="hashlib\sha1.cpp" />
-    <ClCompile Include="hashlib\sha256.cpp" />
-    <ClCompile Include="hashlib\sha3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include=".\h\ctltr040.h" />
@@ -1714,14 +1702,6 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="cximage\ximage.h" />
     <ClInclude Include="FreeImage\Source\FreeImage.h" />
     <ClInclude Include="FreeImage\Wrapper\FreeImagePlus\FreeImagePlus.h" />
-    <ClInclude Include="hashlib\crc32.h" />
-    <ClInclude Include="hashlib\hash.h" />
-    <ClInclude Include="hashlib\hmac.h" />
-    <ClInclude Include="hashlib\keccak.h" />
-    <ClInclude Include="hashlib\md5.h" />
-    <ClInclude Include="hashlib\sha1.h" />
-    <ClInclude Include="hashlib\sha256.h" />
-    <ClInclude Include="hashlib\sha3.h" />
     <ClInclude Include="h\ansiwideconverter_generic.h" />
     <ClInclude Include="h\ansiwideconverter_win32.h" />
     <ClInclude Include="h\arrayfactory.h" />

@@ -47,6 +47,8 @@ namespace dynarithmic
             void Add(const std::vector<unsigned char>& pData);
             void Reset();
             std::vector<unsigned char> GetHash();
+            std::vector<unsigned char> GetHash(const unsigned char *input, size_t len);
+            std::vector<unsigned char> GetHash(const std::vector<unsigned char>& input);
     };
 }
 #endif

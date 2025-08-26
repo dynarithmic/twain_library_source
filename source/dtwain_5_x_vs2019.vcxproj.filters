@@ -400,15 +400,6 @@
     <ClCompile Include=".\cpp\logmsg.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include="c\imagefun\dtwpdf\md5c.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\pdflib32\md5class.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\pdflib32\md5class2.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include=".\cpp\ocrengine\ocrinterface.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
