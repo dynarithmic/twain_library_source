@@ -34,6 +34,7 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/format.hpp>
+#include <boost/algorithm/hex.hpp>
 #include <assert.h>
 #include <algorithm>
 #include <stdlib.h>
@@ -783,6 +784,13 @@ namespace dynarithmic
         static StringType StringFromUChars(typename const StringTraits::uchar_type* val, size_t nSize)
         {
             return StringType(val, val + nSize);
+        }
+
+        static StringType HexStringFromUChars(typename const StringTraits::uchar_type* val, size_t nSize)
+        {
+            StringType hex_output_vector;
+            boost::algorithm::hex_lower(val, val + nSize, std::back_inserter(hex_output_vector));
+            return hex_output_vector;
         }
 
         static std::vector<typename StringTraits::uchar_type> UCharsFromString(typename StringTraits::stringview_type str)

@@ -43,6 +43,7 @@
 #include "dtwainpdf.h"
 #include "crc32_aux.h"
 #include "jpeglib.h"
+#include "ctlhashutils.h"
 #undef Z_PREFIX
 #include "zlib.h"
 #ifdef __MSL__
@@ -69,7 +70,6 @@
 #pragma warning (pop)
 #endif
 #include <cmath>
-#include <MD5Checksum.h>
 #define D_TO_R_SCALEFACTOR (3.14159265358979323846 / 180.0)
 #define DegreesToRadians(x) ((x) * D_TO_R_SCALEFACTOR)
 
@@ -87,7 +87,6 @@ using namespace dynarithmic;
 
 #define EXTRA_OBJECTS   3
 
-std::vector<unsigned char> MD5Hash (unsigned char *input);
 static std::string GetPDFDate();
 static std::string CreateIDString(const std::string& sName, std::string& ID1, std::string& ID2);
 static std::string HexString(unsigned char *input, int length=-1);
@@ -181,20 +180,6 @@ toff_t ImageObject::libtiffSizeProc (thandle_t /*fd*/)
     return 0;
 }
 
-// Helper functions
-// This is the MD5 function
-std::vector<unsigned char> MD5Hash (unsigned char *input)
-{
-  MD5_CTX context;
-  std::vector<unsigned char> digest(16);
-
-  MD5Init (&context);
-  MD5Update (&context, input, static_cast<unsigned>(strlen(reinterpret_cast<const char*>(input))));
-  MD5Final (digest.data(), &context);
-
-  return digest;
-}
-
 std::string HexString(unsigned char *input, int length/*=-1*/)
 {
     std::string sOut;
@@ -214,10 +199,12 @@ std::string CreateIDString(const std::string& sName, std::string& ID1, std::stri
     WRITE_TO_LOG()
     sprintf(szBuf, "%s-%s", sNow.c_str(), sName.c_str());
     WRITE_TO_LOG()
-    std::vector<unsigned char> hash = MD5Hash(reinterpret_cast<unsigned char*>(szBuf));
+    std::vector<unsigned char> hash = 
+        dynarithmic::MD5Hasher().GetHash(reinterpret_cast<unsigned char*>(szBuf), strlen(szBuf));
     hash.resize(32,'\0');
     WRITE_TO_LOG()
-    std::vector<unsigned char> version = MD5Hash(reinterpret_cast<unsigned char*>(szBuf2));
+    std::vector<unsigned char> version = 
+        dynarithmic::MD5Hasher().GetHash(reinterpret_cast<unsigned char*>(szBuf2), strlen(szBuf2));
     version.resize(32,'\0');
     WRITE_TO_LOG()
     std::string hexHash;
@@ -2439,7 +2426,8 @@ void PdfDocument::SetEncryption(CTL_StringViewType ownerPassword,
     }
 
     const std::string s = GetSystemTimeInMilliseconds().substr(0,13) + "+1359064+" + m_sCurSysTime.substr(0,13);
-    const std::string dID = CMD5Checksum().GetMD5(reinterpret_cast<const unsigned char*>(s.c_str()), static_cast<UINT>(s.size()));
+    auto docIDHash = dynarithmic::MD5Hasher().GetHash(reinterpret_cast<const unsigned char*>(s.c_str()), s.size());
+    const std::string dID = dynarithmic::StringWrapperA::HexStringFromUChars(docIDHash.data(), docIDHash.size());
     m_DocumentID[0] = dID;
     m_DocumentID[1] = dID;
 

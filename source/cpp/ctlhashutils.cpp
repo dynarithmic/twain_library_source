@@ -89,4 +89,17 @@ namespace dynarithmic
         return retVal;
     }
 
+    std::vector<unsigned char> MD5Hasher::GetHash(const unsigned char* input, size_t len)
+    {
+        Reset();
+        Add(input, len);
+        return GetHash();
+    }
+
+    std::vector<unsigned char> MD5Hasher::GetHash(const std::vector<unsigned char>& input)
+    {
+        Reset();
+        Add(input);
+        return GetHash();
+    }
 }
