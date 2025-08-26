@@ -891,9 +891,6 @@
     <ClInclude Include="h\logmsg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cpp\pdflib32\md5class.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="h\notimpl.h">
       <Filter>Header Files</Filter>
     </ClInclude>

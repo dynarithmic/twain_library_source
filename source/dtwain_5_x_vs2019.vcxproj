@@ -1695,7 +1695,6 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="cpp\pdflib32\a85encode.h" />
     <ClInclude Include="cpp\pdflib32\ahexencode.h" />
     <ClInclude Include="cpp\pdflib32\flateencode.h" />
-    <ClInclude Include="cpp\pdflib32\md5class.h" />
     <ClInclude Include="cpp\pdflib32\pdfencrypt.h" />
     <ClInclude Include="cpp\pdflib32\pdflib32.h" />
     <ClInclude Include="cximage\ximacfg.h" />
