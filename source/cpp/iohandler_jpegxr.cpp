@@ -53,6 +53,7 @@ int CTL_JpegXRIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*f
     saveParams.flags = flags;
     saveParams.unitOfMeasure = m_ImageInfoEx.UnitOfMeasure;
     saveParams.res = { m_ImageInfoEx.ResolutionX, m_ImageInfoEx.ResolutionY };
-
+    saveParams.metaDataTag = FIMD_EXIF_MAIN;
+    saveParams.commentKey = "Software";
     return SaveToFile(saveParams);
 }
