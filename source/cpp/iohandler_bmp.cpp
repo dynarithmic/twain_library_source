@@ -34,7 +34,16 @@ int CTL_BmpIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
             return DTWAIN_ERR_INVALID_BITDEPTH;
 
     if (m_ImageInfoEx.IsRLE)
-        return SaveToFile(hDib, szFile, FIF_BMP, BMP_SAVE_RLE, DTWAIN_INCHES, { 0, 0 });
+    {
+        IOSaveParams saveParams;
+        saveParams.hDib = hDib;
+        saveParams.szFile = szFile;
+        saveParams.fmt = FIF_BMP;
+        saveParams.flags = BMP_SAVE_RLE;
+        saveParams.unitOfMeasure = DTWAIN_INCHES;
+        saveParams.res = { 0,0 };
+        return SaveToFile(saveParams);
+    }
 
     HANDLE hHandleToWrite = CTL_TwainDib::CreateBMPBitmapFromDIB(hDib);
     if (hHandleToWrite)

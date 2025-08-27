@@ -316,8 +316,14 @@ namespace dynarithmic
         void         SetJpegValues(LONG nQuality, bool bProgressive) { m_ImageInfoEx.nJpegQuality = nQuality;
                                                                        m_ImageInfoEx.bProgressiveJpeg = bProgressive; }
 
+        void         SetJpegXRValues(LONG nQuality, bool bProgressive) { m_ImageInfoEx.nJpegXRQuality = nQuality;
+                                                                       m_ImageInfoEx.bProgressiveJpegXR = bProgressive; }
+
         void         GetJpegValues(LONG &Quality, bool &bProgressive) const { Quality = m_ImageInfoEx.nJpegQuality;
                                                                               bProgressive = m_ImageInfoEx.bProgressiveJpeg; }
+
+        void         GetJpegXRValues(LONG &Quality, bool &bProgressive) const { Quality = m_ImageInfoEx.nJpegXRQuality;
+                                                                              bProgressive = m_ImageInfoEx.bProgressiveJpegXR; }
 
         void         SetPDFValue(CTL_StringViewType nWhich, CTL_StringViewType sz);
         void         SetPDFValue(CTL_StringViewType nWhich, LONG nValue);

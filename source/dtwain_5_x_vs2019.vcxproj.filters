@@ -613,6 +613,9 @@
     <ClCompile Include="aeslib\AES.cpp">
       <Filter>AES Encryption</Filter>
     </ClCompile>
+    <ClCompile Include="cpp\iohandler_jpegxr.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp\pdflib32\a85encode.h">

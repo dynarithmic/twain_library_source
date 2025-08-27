@@ -35,8 +35,15 @@ int CTL_PngIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     if (!IsValidBitDepth(DTWAIN_PNG, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    return SaveToFile(hDib, szFile, FIF_PNG, 0, m_ImageInfoEx.UnitOfMeasure,
-                        {m_ImageInfoEx.ResolutionX, m_ImageInfoEx.ResolutionY},
-                        { 0.01, 0.01, 0, 0 });
+    IOSaveParams saveParams;
+    saveParams.hDib = hDib;
+    saveParams.szFile = szFile;
+    saveParams.fmt = FIF_PNG;
+    saveParams.flags = 0;
+    saveParams.unitOfMeasure = m_ImageInfoEx.UnitOfMeasure;
+    saveParams.res = { m_ImageInfoEx.ResolutionX, m_ImageInfoEx.ResolutionY };
+    saveParams.multiplier_pr = { 0.01, 0.01, 0, 0 };
+
+    return SaveToFile(saveParams);
 }
 

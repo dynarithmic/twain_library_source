@@ -1129,3 +1129,5 @@ DTWAIN_ArrayWideStringToFloat                     @31132
 DTWAIN_ArrayFloatToString                         @31133 
 DTWAIN_ArrayStringToFloat                         @31134 
 DTWAIN_SetPDFAESEncryptionEx                      @31135
+DTWAIN_SetJpegXRValues                            @31136
+DTWAIN_GetJpegXRValues                            @31137
