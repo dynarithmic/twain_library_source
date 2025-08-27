@@ -92,9 +92,6 @@
     <ClCompile Include="image\sys\adapthuff.c">
       <Filter>Source Files\image\sys</Filter>
     </ClCompile>
-    <ClCompile Include="image\sys\image.c">
-      <Filter>Source Files\image\sys</Filter>
-    </ClCompile>
     <ClCompile Include="image\sys\strcodec.c">
       <Filter>Source Files\image\sys</Filter>
     </ClCompile>
@@ -115,6 +112,9 @@
     </ClCompile>
     <ClCompile Include="jxrgluelib\JXRMeta.c">
       <Filter>Source Files\jxrgluelib</Filter>
+    </ClCompile>
+    <ClCompile Include="image\sys\image_jxr.c">
+      <Filter>Source Files\image\sys</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
