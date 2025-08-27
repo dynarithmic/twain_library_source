@@ -41,5 +41,13 @@ int CTL_Jpeg2KIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*f
     if (!IsValidBitDepth(DTWAIN_JPEG2000, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    return SaveToFile(hDib, szFile, FIF_J2K, 0, m_ImageInfoEx.UnitOfMeasure, { m_ImageInfoEx.ResolutionX, m_ImageInfoEx.ResolutionY });
+    IOSaveParams saveParams;
+    saveParams.hDib = hDib;
+    saveParams.szFile = szFile;
+    saveParams.fmt = FIF_J2K;
+    saveParams.flags = 0;
+    saveParams.unitOfMeasure = m_ImageInfoEx.UnitOfMeasure;
+    saveParams.res = { m_ImageInfoEx.ResolutionX, m_ImageInfoEx.ResolutionY };
+
+    return SaveToFile(saveParams); 
 }

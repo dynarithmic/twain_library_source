@@ -49,6 +49,19 @@ namespace dynarithmic
     class CTL_ImageIOHandler
     {
         public:
+            struct IOSaveParams
+            {
+                HANDLE hDib = nullptr;
+                LPCTSTR szFile = nullptr;
+                FREE_IMAGE_FORMAT fmt = FIF_BMP;
+                int flags = 0;
+                UINT unitOfMeasure = 0;
+                std::pair<LONG, LONG> res = { 0, 0};
+                std::tuple<double, double, double, double> multiplier_pr = { 1,1, 0.5, 0.5 };
+                LPCSTR commentKey = "Comment";
+                FREE_IMAGE_MDMODEL metaDataTag = FIMD_COMMENTS;
+            };
+
             CTL_ImageIOHandler();
             CTL_ImageIOHandler( CTL_TwainDib *pDib );
             virtual ~CTL_ImageIOHandler() = default;
@@ -69,8 +82,7 @@ namespace dynarithmic
             const DTWAINImageInfoEx& GetBaseImageInfo() const { return m_ImageInfo; }
             CTL_TwainDib* GetDib() const { return m_pDib; }
             static bool IsValidBitDepth(LONG FileType, LONG bitDepth);
-            int SaveToFile(HANDLE hDib, LPCTSTR szFile, FREE_IMAGE_FORMAT fmt, int flags, UINT unitOfMeasure,
-                           std::pair<LONG, LONG> res, const std::tuple<double, double, double, double>& multipler_pr = { 1,1, 0.5, 0.5 }) const;
+            int SaveToFile(const IOSaveParams& saveParams) const;
             static auto& GetSupportedBPPMap() { return s_supportedBitDepths; }
 
         protected:
@@ -253,6 +265,18 @@ namespace dynarithmic
             CTL_JpegIOHandler* m_pJpegHandler;
     };
 
+    class CTL_JpegXRIOHandler final : public CTL_ImageIOHandler
+    {
+        public:
+            CTL_JpegXRIOHandler(CTL_TwainDib* pDib, const DTWAINImageInfoEx &ImageInfoEx);
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
+            ~CTL_JpegXRIOHandler() override = default;
+
+        private:
+            int m_nFormat;
+            DTWAINImageInfoEx m_ImageInfoEx;
+    };
+
     class CTL_GifIOHandler : public CTL_ImageIOHandler
     {
         public:
@@ -427,6 +451,7 @@ namespace dynarithmic
                    WBMPFormatResized = DTWAIN_WBMP_RESIZED,
                    WEBPFormat = DTWAIN_WEBP,
                    PBMFormat = DTWAIN_PBM,
+                   JpegXRFormat = DTWAIN_JPEGXR,
                    RawFormat=9999};
 
             // Setting/Getting

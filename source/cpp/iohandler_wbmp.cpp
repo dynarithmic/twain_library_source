@@ -52,5 +52,13 @@ int CTL_WBMPIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
     if (!parent_directory_exists(szFile).first)
         return DTWAIN_ERR_FILEOPEN;
 
-    return SaveToFile(hDib, szFile, FIF_WBMP, 0, DTWAIN_INCHES, { 0, 0 });
+    IOSaveParams saveParams;
+    saveParams.hDib = hDib;
+    saveParams.szFile = szFile;
+    saveParams.fmt = FIF_WBMP;
+    saveParams.flags = 0;
+    saveParams.unitOfMeasure = DTWAIN_INCHES;
+    saveParams.res = { 0, 0 };
+       
+    return SaveToFile(saveParams);
 }

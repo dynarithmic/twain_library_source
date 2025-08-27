@@ -1490,6 +1490,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile Include="cpp\imagefun\resamplefactory.cpp" />
     <ClCompile Include="cpp\imagefun\tiffun32.cpp" />
     <ClCompile Include="cpp\imagefun\txtfun32.cpp" />
+    <ClCompile Include="cpp\iohandler_jpegxr.cpp" />
     <ClCompile Include="cpp\iohandler_pbm.cpp" />
     <ClCompile Include="cpp\iohandler_webp.cpp" />
     <ClCompile Include="cpp\linux_versioninfo.cpp" />
