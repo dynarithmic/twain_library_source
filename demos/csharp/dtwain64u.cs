@@ -4698,10 +4698,7 @@ namespace Dynarithmic
         public static extern int DTWAIN_SetOverscan(DTWAIN_SOURCE Source, int Value, int bSetCurrent);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
-        public static extern int DTWAIN_SetPDFAESEncryption(DTWAIN_SOURCE Source, int bUseAES);
-
-        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
-        public static extern int DTWAIN_SetPDFAESEncryptionEx(DTWAIN_SOURCE Source, int nWhichEncryption, int bUseAES);
+        public static extern int DTWAIN_SetPDFAESEncryption(DTWAIN_SOURCE Source, int nWhichEncryption, int bUseAES);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
         public static extern int DTWAIN_SetPDFASCIICompression(DTWAIN_SOURCE Source, int bSet);
