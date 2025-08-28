@@ -25,24 +25,16 @@ using namespace dynarithmic;
 
 int CTL_WebpIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
-    if (!m_pDib)
-        return DTWAIN_ERR_DIB;
-
-    const HANDLE hDib = m_pDib->GetHandle();
-    if (!hDib)
+    HANDLE hDib = {};
+    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
         return DTWAIN_ERR_DIB;
 
     if (!IsValidBitDepth(DTWAIN_PSD, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    IOSaveParams saveParams;
-    saveParams.hDib = hDib;
-    saveParams.szFile = szFile;
-    saveParams.fmt = FIF_WEBP;
-    saveParams.flags = 0;
-    saveParams.unitOfMeasure = DTWAIN_INCHES;
-    saveParams.res = { 0, 0 };
+    m_SaveParams.hDib = hDib;
+    m_SaveParams.szFile = szFile;
 
-    return SaveToFile(saveParams);
+    return SaveToFile();
 }
 

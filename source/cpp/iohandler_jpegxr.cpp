@@ -26,16 +26,17 @@ using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CTL_JpegXRIOHandler::CTL_JpegXRIOHandler(CTL_TwainDib* pDib, const DTWAINImageInfoEx &ImageInfoEx)
 : CTL_ImageIOHandler( pDib ), m_nFormat(0), m_ImageInfoEx(ImageInfoEx)
-{ }
+{ 
+    m_SaveParams.fmt = FIF_JXR;
+    m_SaveParams.metaDataTag = FIMD_EXIF_MAIN;
+    m_SaveParams.commentKey = "Software";
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CTL_JpegXRIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
-    if ( !m_pDib )
-        return DTWAIN_ERR_DIB;
-
-    const HANDLE hDib = m_pDib->GetHandle();
-    if ( !hDib )
+    HANDLE hDib = {};
+    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
         return DTWAIN_ERR_DIB;
 
     if (!IsValidBitDepth(DTWAIN_JPEGXR, m_pDib->GetBitsPerPixel()))
@@ -46,14 +47,10 @@ int CTL_JpegXRIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*f
     if (m_ImageInfoEx.bProgressiveJpegXR)
         flags |= JXR_PROGRESSIVE;
 
-    IOSaveParams saveParams;
-    saveParams.hDib = hDib;
-    saveParams.szFile = szFile;
-    saveParams.fmt = FIF_JXR;
-    saveParams.flags = flags;
-    saveParams.unitOfMeasure = m_ImageInfoEx.UnitOfMeasure;
-    saveParams.res = { m_ImageInfoEx.ResolutionX, m_ImageInfoEx.ResolutionY };
-    saveParams.metaDataTag = FIMD_EXIF_MAIN;
-    saveParams.commentKey = "Software";
-    return SaveToFile(saveParams);
+    m_SaveParams.hDib = hDib;
+    m_SaveParams.szFile = szFile;
+    m_SaveParams.flags = flags;
+    m_SaveParams.unitOfMeasure = m_ImageInfoEx.UnitOfMeasure;
+    m_SaveParams.res = { m_ImageInfoEx.ResolutionX, m_ImageInfoEx.ResolutionY };
+    return SaveToFile();
 }

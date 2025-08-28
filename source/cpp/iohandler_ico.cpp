@@ -53,15 +53,10 @@ int CTL_IcoIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     if (!parent_directory_exists(szFile).first)
         return DTWAIN_ERR_FILEOPEN;
 
-    IOSaveParams saveParams;
-    saveParams.hDib = hDib;
-    saveParams.szFile = szFile;
-    saveParams.fmt = FIF_ICO;
-    saveParams.flags = 0;
-    saveParams.unitOfMeasure = DTWAIN_INCHES;
-    saveParams.res = { 0,0 };
+    m_SaveParams.hDib = hDib;
+    m_SaveParams.szFile = szFile;
 
-    auto retVal = SaveToFile(saveParams); 
+    auto retVal = SaveToFile(); 
     if (retVal != 0)
     {
         // Remove the file if it existed
