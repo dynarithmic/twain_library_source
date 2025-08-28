@@ -343,6 +343,7 @@ const
   DTWAIN_BIGTIFFG4MULTI = 11014;
   DTWAIN_BIGTIFFJPEG = 11015;
   DTWAIN_BIGTIFFJPEGMULTI = 11016;
+  DTWAIN_JPEGXR = 12000;
   DTWAIN_INCHES = 0;
   DTWAIN_CENTIMETERS = 1;
   DTWAIN_PICAS = 2;
@@ -2298,6 +2299,7 @@ function DTWAIN_GetImageInfoStringA(Source:DTWAIN_SOURCE; lpXResolution:LPSTR; l
 function DTWAIN_GetImageInfoStringW(Source:DTWAIN_SOURCE; lpXResolution:LPWSTR; lpYResolution:LPWSTR; lpWidth:LPLONG; lpLength:LPLONG; lpNumSamples:LPLONG; lpBitsPerSample:LPDTWAIN_ARRAY; lpBitsPerPixel:LPLONG; lpPlanar:LPLONG; lpPixelType:LPLONG; lpCompression:LPLONG) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetImageInfoStringW';
 function DTWAIN_GetJobControl(Source:DTWAIN_SOURCE; pJobControl:LPLONG; bCurrent:BOOL) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetJobControl';
 function DTWAIN_GetJpegValues(Source:DTWAIN_SOURCE; pQuality:LPLONG; Progressive:LPLONG) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetJpegValues';
+function DTWAIN_GetJpegXRValues(Source:DTWAIN_SOURCE; pQuality:LPLONG; Progressive:LPLONG) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetJpegXRValues';
 function DTWAIN_GetLanguage : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetLanguage';
 function DTWAIN_GetLastError : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetLastError';
 function DTWAIN_GetLibraryPath(lpszVer:LPTSTR; nLength:LONG) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetLibraryPath';
@@ -2781,6 +2783,7 @@ function DTWAIN_SetHighlightStringA(Source:DTWAIN_SOURCE; Highlight:LPCSTR) : BO
 function DTWAIN_SetHighlightStringW(Source:DTWAIN_SOURCE; Highlight:LPCWSTR) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_SetHighlightStringW';
 function DTWAIN_SetJobControl(Source:DTWAIN_SOURCE; JobControl:LONG; bSetCurrent:BOOL) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_SetJobControl';
 function DTWAIN_SetJpegValues(Source:DTWAIN_SOURCE; Quality:LONG; Progressive:LONG) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_SetJpegValues';
+function DTWAIN_SetJpegXRValues(Source:DTWAIN_SOURCE; Quality:LONG; Progressive:LONG) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_SetJpegXRValues';
 function DTWAIN_SetLanguage(nLanguage:LONG) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_SetLanguage';
 function DTWAIN_SetLastError(nError:LONG) : LONG; external 'dtwain64.dll'  name 'DTWAIN_SetLastError';
 function DTWAIN_SetLightPath(Source:DTWAIN_SOURCE; LightPath:LONG) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_SetLightPath';
