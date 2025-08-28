@@ -492,6 +492,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_GetImageInfoStringW
    attr_reader :DTWAIN_GetJobControl
    attr_reader :DTWAIN_GetJpegValues
+   attr_reader :DTWAIN_GetJpegXRValues
    attr_reader :DTWAIN_GetLanguage
    attr_reader :DTWAIN_GetLastError
    attr_reader :DTWAIN_GetLibraryPath
@@ -973,6 +974,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_SetHighlightStringW
    attr_reader :DTWAIN_SetJobControl
    attr_reader :DTWAIN_SetJpegValues
+   attr_reader :DTWAIN_SetJpegXRValues
    attr_reader :DTWAIN_SetLanguage
    attr_reader :DTWAIN_SetLastError
    attr_reader :DTWAIN_SetLightPath
@@ -1282,6 +1284,7 @@ class DTWAINAPI
    DTWAIN_BIGTIFFG4MULTI = 11014
    DTWAIN_BIGTIFFJPEG = 11015
    DTWAIN_BIGTIFFJPEGMULTI = 11016
+   DTWAIN_JPEGXR = 12000
    DTWAIN_INCHES = 0
    DTWAIN_CENTIMETERS = 1
    DTWAIN_PICAS = 2
@@ -3270,6 +3273,7 @@ class DTWAINAPI
        @DTWAIN_GetImageInfoStringW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetImageInfoStringW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetJobControl = Fiddle::Function::new(dtwain_dll['DTWAIN_GetJobControl'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_GetJpegValues = Fiddle::Function::new(dtwain_dll['DTWAIN_GetJpegValues'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_GetJpegXRValues = Fiddle::Function::new(dtwain_dll['DTWAIN_GetJpegXRValues'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetLanguage = Fiddle::Function::new(dtwain_dll['DTWAIN_GetLanguage'],[],Fiddle::TYPE_LONG)
        @DTWAIN_GetLastError = Fiddle::Function::new(dtwain_dll['DTWAIN_GetLastError'],[],Fiddle::TYPE_LONG)
        @DTWAIN_GetLibraryPath = Fiddle::Function::new(dtwain_dll['DTWAIN_GetLibraryPath'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
@@ -3751,6 +3755,7 @@ class DTWAINAPI
        @DTWAIN_SetHighlightStringW = Fiddle::Function::new(dtwain_dll['DTWAIN_SetHighlightStringW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_SetJobControl = Fiddle::Function::new(dtwain_dll['DTWAIN_SetJobControl'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_SetJpegValues = Fiddle::Function::new(dtwain_dll['DTWAIN_SetJpegValues'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
+       @DTWAIN_SetJpegXRValues = Fiddle::Function::new(dtwain_dll['DTWAIN_SetJpegXRValues'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
        @DTWAIN_SetLanguage = Fiddle::Function::new(dtwain_dll['DTWAIN_SetLanguage'],[Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
        @DTWAIN_SetLastError = Fiddle::Function::new(dtwain_dll['DTWAIN_SetLastError'],[Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_SetLightPath = Fiddle::Function::new(dtwain_dll['DTWAIN_SetLightPath'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
