@@ -25,23 +25,16 @@ using namespace dynarithmic;
 
 int CTL_TgaIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
-    if ( !m_pDib )
-        return DTWAIN_ERR_DIB;
-
-    const HANDLE hDib = m_pDib->GetHandle();
-    if ( !hDib )
+    HANDLE hDib = {};
+    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
         return DTWAIN_ERR_DIB;
 
     if (!IsValidBitDepth(DTWAIN_TGA, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    IOSaveParams saveParams;
-    saveParams.hDib = hDib;
-    saveParams.szFile = szFile;
-    saveParams.fmt = FIF_TARGA;
-    saveParams.flags = m_ImageInfoEx.IsRLE ? TARGA_SAVE_RLE : 0;
-    saveParams.unitOfMeasure = DTWAIN_INCHES;
-    saveParams.res = { 0, 0 };
+    m_SaveParams.hDib = hDib;
+    m_SaveParams.szFile = szFile;
+    m_SaveParams.flags = m_ImageInfoEx.IsRLE ? TARGA_SAVE_RLE : 0;
 
-    return SaveToFile(saveParams);
+    return SaveToFile();
 }

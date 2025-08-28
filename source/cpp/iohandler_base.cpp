@@ -65,11 +65,11 @@ bool CTL_ImageIOHandler::IsValidBitDepth(LONG FileType, LONG bitDepth)
     return true;
 }
 
-int CTL_ImageIOHandler::SaveToFile(const IOSaveParams& saveParams) const
+int CTL_ImageIOHandler::SaveToFile() const
 {
     #ifdef _WIN32
     fipImage fw;
-    if (!fipImageUtility::copyFromHandle(fw, saveParams.hDib))
+    if (!fipImageUtility::copyFromHandle(fw, m_SaveParams.hDib))
         return 1;
     fipWinImage_RAII raii(&fw);
     #else
@@ -78,19 +78,19 @@ int CTL_ImageIOHandler::SaveToFile(const IOSaveParams& saveParams) const
     fw.loadFromMemory(FIF_TIFF, memIO, flags);
     #endif
 
-    double multiplier = 39.37 * std::get<0>(saveParams.multiplier_pr);
-    if (saveParams.unitOfMeasure == DTWAIN_CENTIMETERS)
-        multiplier = 100.0 * std::get<1>(saveParams.multiplier_pr);
+    double multiplier = 39.37 * std::get<0>(m_SaveParams.multiplier_pr);
+    if (m_SaveParams.unitOfMeasure == DTWAIN_CENTIMETERS)
+        multiplier = 100.0 * std::get<1>(m_SaveParams.multiplier_pr);
 
-    fw.setHorizontalResolution(saveParams.res.first * multiplier + std::get<2>(saveParams.multiplier_pr));
-    fw.setVerticalResolution(saveParams.res.second * multiplier + std::get<3>(saveParams.multiplier_pr));
+    fw.setHorizontalResolution(m_SaveParams.res.first * multiplier + std::get<2>(m_SaveParams.multiplier_pr));
+    fw.setVerticalResolution(m_SaveParams.res.second * multiplier + std::get<3>(m_SaveParams.multiplier_pr));
 
     char commentStr[256] = {};
     GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
 
     fipTag fp;
-    fp.setKeyValue(saveParams.commentKey, commentStr);
-    fw.setMetadata(saveParams.metaDataTag, saveParams.commentKey, fp);
-    return fw.save(saveParams.fmt, StringConversion::Convert_NativePtr_To_Ansi(saveParams.szFile).c_str(), 
-                    saveParams.flags) ? 0 : 1;
+    fp.setKeyValue(m_SaveParams.commentKey, commentStr);
+    fw.setMetadata(m_SaveParams.metaDataTag, m_SaveParams.commentKey, fp);
+    return fw.save(m_SaveParams.fmt, StringConversion::Convert_NativePtr_To_Ansi(m_SaveParams.szFile).c_str(),
+                   m_SaveParams.flags) ? 0 : 1;
 }
