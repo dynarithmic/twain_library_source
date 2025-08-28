@@ -994,7 +994,6 @@ class DTWAINAPI
    attr_reader :DTWAIN_SetOrientation
    attr_reader :DTWAIN_SetOverscan
    attr_reader :DTWAIN_SetPDFAESEncryption
-   attr_reader :DTWAIN_SetPDFAESEncryptionEx
    attr_reader :DTWAIN_SetPDFASCIICompression
    attr_reader :DTWAIN_SetPDFAuthor
    attr_reader :DTWAIN_SetPDFAuthorA
@@ -3774,8 +3773,7 @@ class DTWAINAPI
        @DTWAIN_SetOCRCapValues = Fiddle::Function::new(dtwain_dll['DTWAIN_SetOCRCapValues'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_SetOrientation = Fiddle::Function::new(dtwain_dll['DTWAIN_SetOrientation'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_SetOverscan = Fiddle::Function::new(dtwain_dll['DTWAIN_SetOverscan'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
-       @DTWAIN_SetPDFAESEncryption = Fiddle::Function::new(dtwain_dll['DTWAIN_SetPDFAESEncryption'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
-       @DTWAIN_SetPDFAESEncryptionEx = Fiddle::Function::new(dtwain_dll['DTWAIN_SetPDFAESEncryptionEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
+       @DTWAIN_SetPDFAESEncryption = Fiddle::Function::new(dtwain_dll['DTWAIN_SetPDFAESEncryption'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_SetPDFASCIICompression = Fiddle::Function::new(dtwain_dll['DTWAIN_SetPDFASCIICompression'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_SetPDFAuthor = Fiddle::Function::new(dtwain_dll['DTWAIN_SetPDFAuthor'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_SetPDFAuthorA = Fiddle::Function::new(dtwain_dll['DTWAIN_SetPDFAuthorA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)

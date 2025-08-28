@@ -2688,7 +2688,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_SetOrientation.restype = ct.c_long
      theDLL.DTWAIN_SetOverscan.restype = ct.c_long
      theDLL.DTWAIN_SetPDFAESEncryption.restype = ct.c_long
-     theDLL.DTWAIN_SetPDFAESEncryptionEx.restype = ct.c_long
      theDLL.DTWAIN_SetPDFASCIICompression.restype = ct.c_long
      theDLL.DTWAIN_SetPDFAuthor.restype = ct.c_long
      theDLL.DTWAIN_SetPDFAuthorA.restype = ct.c_long
@@ -3751,8 +3750,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_SetOCRCapValues.argtypes = [ct.c_void_p, ct.c_long, ct.c_long, ct.c_void_p]
      theDLL.DTWAIN_SetOrientation.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetOverscan.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
-     theDLL.DTWAIN_SetPDFAESEncryption.argtypes = [ct.c_void_p, ct.c_long]
-     theDLL.DTWAIN_SetPDFAESEncryptionEx.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
+     theDLL.DTWAIN_SetPDFAESEncryption.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetPDFASCIICompression.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_SetPDFAuthor.argtypes = [ct.c_void_p, ct.c_wchar_p]
      theDLL.DTWAIN_SetPDFAuthorA.argtypes = [ct.c_void_p, ct.c_char_p]
@@ -4871,7 +4869,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_SetOrientation.restype = ct.c_long
      theDLL.DTWAIN_SetOverscan.restype = ct.c_long
      theDLL.DTWAIN_SetPDFAESEncryption.restype = ct.c_long
-     theDLL.DTWAIN_SetPDFAESEncryptionEx.restype = ct.c_long
      theDLL.DTWAIN_SetPDFASCIICompression.restype = ct.c_long
      theDLL.DTWAIN_SetPDFAuthor.restype = ct.c_long
      theDLL.DTWAIN_SetPDFAuthorA.restype = ct.c_long
@@ -5934,8 +5931,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_SetOCRCapValues.argtypes = [ct.c_void_p, ct.c_long, ct.c_long, ct.c_void_p]
      theDLL.DTWAIN_SetOrientation.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetOverscan.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
-     theDLL.DTWAIN_SetPDFAESEncryption.argtypes = [ct.c_void_p, ct.c_long]
-     theDLL.DTWAIN_SetPDFAESEncryptionEx.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
+     theDLL.DTWAIN_SetPDFAESEncryption.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetPDFASCIICompression.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_SetPDFAuthor.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_SetPDFAuthorA.argtypes = [ct.c_void_p, ct.c_char_p]

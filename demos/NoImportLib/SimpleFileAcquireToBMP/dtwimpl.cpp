@@ -1027,7 +1027,6 @@
     D_SETORIENTATIONFUNC                          DYNDTWAIN_API::DTWAIN_SetOrientation = nullptr;
     D_SETOVERSCANFUNC                             DYNDTWAIN_API::DTWAIN_SetOverscan = nullptr;
     D_SETPDFAESENCRYPTIONFUNC                     DYNDTWAIN_API::DTWAIN_SetPDFAESEncryption = nullptr;
-    D_SETPDFAESENCRYPTIONEXFUNC                   DYNDTWAIN_API::DTWAIN_SetPDFAESEncryptionEx = nullptr;
     D_SETPDFASCIICOMPRESSIONFUNC                  DYNDTWAIN_API::DTWAIN_SetPDFASCIICompression = nullptr;
     D_SETPDFAUTHORFUNC                            DYNDTWAIN_API::DTWAIN_SetPDFAuthor = nullptr;
     D_SETPDFAUTHORAFUNC                           DYNDTWAIN_API::DTWAIN_SetPDFAuthorA = nullptr;
@@ -2207,7 +2206,6 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_SetOrientation, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetOverscan, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetPDFAESEncryption, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_SetPDFAESEncryptionEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetPDFASCIICompression, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetPDFAuthor, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetPDFAuthorA, hModule);
