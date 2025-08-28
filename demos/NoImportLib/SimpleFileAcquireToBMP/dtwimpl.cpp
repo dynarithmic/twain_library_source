@@ -523,6 +523,7 @@
     D_GETIMAGEINFOSTRINGWFUNC                     DYNDTWAIN_API::DTWAIN_GetImageInfoStringW = nullptr;
     D_GETJOBCONTROLFUNC                           DYNDTWAIN_API::DTWAIN_GetJobControl = nullptr;
     D_GETJPEGVALUESFUNC                           DYNDTWAIN_API::DTWAIN_GetJpegValues = nullptr;
+    D_GETJPEGXRVALUESFUNC                         DYNDTWAIN_API::DTWAIN_GetJpegXRValues = nullptr;
     D_GETLANGUAGEFUNC                             DYNDTWAIN_API::DTWAIN_GetLanguage = nullptr;
     D_GETLASTERRORFUNC                            DYNDTWAIN_API::DTWAIN_GetLastError = nullptr;
     D_GETLIBRARYPATHFUNC                          DYNDTWAIN_API::DTWAIN_GetLibraryPath = nullptr;
@@ -1006,6 +1007,7 @@
     D_SETHIGHLIGHTSTRINGWFUNC                     DYNDTWAIN_API::DTWAIN_SetHighlightStringW = nullptr;
     D_SETJOBCONTROLFUNC                           DYNDTWAIN_API::DTWAIN_SetJobControl = nullptr;
     D_SETJPEGVALUESFUNC                           DYNDTWAIN_API::DTWAIN_SetJpegValues = nullptr;
+    D_SETJPEGXRVALUESFUNC                         DYNDTWAIN_API::DTWAIN_SetJpegXRValues = nullptr;
     D_SETLANGUAGEFUNC                             DYNDTWAIN_API::DTWAIN_SetLanguage = nullptr;
     D_SETLASTERRORFUNC                            DYNDTWAIN_API::DTWAIN_SetLastError = nullptr;
     D_SETLIGHTPATHFUNC                            DYNDTWAIN_API::DTWAIN_SetLightPath = nullptr;
@@ -1701,6 +1703,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetImageInfoStringW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetJobControl, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetJpegValues, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetJpegXRValues, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetLanguage, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetLastError, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetLibraryPath, hModule);
@@ -2184,6 +2187,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_SetHighlightStringW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetJobControl, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetJpegValues, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_SetJpegXRValues, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetLanguage, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetLastError, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetLightPath, hModule);

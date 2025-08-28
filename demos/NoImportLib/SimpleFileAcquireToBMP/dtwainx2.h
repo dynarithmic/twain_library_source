@@ -516,6 +516,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETIMAGEINFOSTRINGAFUNC)                  
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETIMAGEINFOSTRINGWFUNC)                  (DTWAIN_SOURCE, LPWSTR, LPWSTR, LPLONG, LPLONG, LPLONG, LPDTWAIN_ARRAY, LPLONG, LPLONG, LPLONG, LPLONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETJOBCONTROLFUNC)                        (DTWAIN_SOURCE, LPLONG, DTWAIN_BOOL);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETJPEGVALUESFUNC)                        (DTWAIN_SOURCE, LPLONG, LPLONG);
+typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETJPEGXRVALUESFUNC)                      (DTWAIN_SOURCE, LPLONG, LPLONG);
 typedef LONG (DLLENTRY_DEF * D_GETLANGUAGEFUNC)                                 (VOID_PROTOTYPE);
 typedef LONG (DLLENTRY_DEF * D_GETLASTERRORFUNC)                                (VOID_PROTOTYPE);
 typedef LONG (DLLENTRY_DEF * D_GETLIBRARYPATHFUNC)                              (LPTSTR, LONG);
@@ -999,6 +1000,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETHIGHLIGHTSTRINGAFUNC)                  
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETHIGHLIGHTSTRINGWFUNC)                  (DTWAIN_SOURCE, LPCWSTR);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETJOBCONTROLFUNC)                        (DTWAIN_SOURCE, LONG, DTWAIN_BOOL);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETJPEGVALUESFUNC)                        (DTWAIN_SOURCE, LONG, LONG);
+typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETJPEGXRVALUESFUNC)                      (DTWAIN_SOURCE, LONG, LONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETLANGUAGEFUNC)                          (LONG);
 typedef LONG (DLLENTRY_DEF * D_SETLASTERRORFUNC)                                (LONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_SETLIGHTPATHFUNC)                         (DTWAIN_SOURCE, LONG);
@@ -1644,6 +1646,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_USEMULTIPLETHREADSFUNC)                   
     STATIC D_GETIMAGEINFOSTRINGWFUNC                        DTWAIN_GetImageInfoStringW;
     STATIC D_GETJOBCONTROLFUNC                              DTWAIN_GetJobControl;
     STATIC D_GETJPEGVALUESFUNC                              DTWAIN_GetJpegValues;
+    STATIC D_GETJPEGXRVALUESFUNC                            DTWAIN_GetJpegXRValues;
     STATIC D_GETLANGUAGEFUNC                                DTWAIN_GetLanguage;
     STATIC D_GETLASTERRORFUNC                               DTWAIN_GetLastError;
     STATIC D_GETLIBRARYPATHFUNC                             DTWAIN_GetLibraryPath;
@@ -2127,6 +2130,7 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_USEMULTIPLETHREADSFUNC)                   
     STATIC D_SETHIGHLIGHTSTRINGWFUNC                        DTWAIN_SetHighlightStringW;
     STATIC D_SETJOBCONTROLFUNC                              DTWAIN_SetJobControl;
     STATIC D_SETJPEGVALUESFUNC                              DTWAIN_SetJpegValues;
+    STATIC D_SETJPEGXRVALUESFUNC                            DTWAIN_SetJpegXRValues;
     STATIC D_SETLANGUAGEFUNC                                DTWAIN_SetLanguage;
     STATIC D_SETLASTERRORFUNC                               DTWAIN_SetLastError;
     STATIC D_SETLIGHTPATHFUNC                               DTWAIN_SetLightPath;

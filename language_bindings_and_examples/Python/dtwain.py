@@ -179,6 +179,7 @@ DTWAIN_BIGTIFFG4 = 11013
 DTWAIN_BIGTIFFG4MULTI = 11014
 DTWAIN_BIGTIFFJPEG = 11015
 DTWAIN_BIGTIFFJPEGMULTI = 11016
+DTWAIN_JPEGXR = 12000
 DTWAIN_INCHES = 0
 DTWAIN_CENTIMETERS = 1
 DTWAIN_PICAS = 2
@@ -2185,6 +2186,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetImageInfoStringW.restype = ct.c_long
      theDLL.DTWAIN_GetJobControl.restype = ct.c_long
      theDLL.DTWAIN_GetJpegValues.restype = ct.c_long
+     theDLL.DTWAIN_GetJpegXRValues.restype = ct.c_long
      theDLL.DTWAIN_GetLanguage.restype = ct.c_longct.c_void
      theDLL.DTWAIN_GetLastError.restype = ct.c_longct.c_void
      theDLL.DTWAIN_GetLibraryPath.restype = ct.c_long
@@ -2666,6 +2668,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_SetHighlightStringW.restype = ct.c_long
      theDLL.DTWAIN_SetJobControl.restype = ct.c_long
      theDLL.DTWAIN_SetJpegValues.restype = ct.c_long
+     theDLL.DTWAIN_SetJpegXRValues.restype = ct.c_long
      theDLL.DTWAIN_SetLanguage.restype = ct.c_long
      theDLL.DTWAIN_SetLastError.restype = ct.c_long
      theDLL.DTWAIN_SetLightPath.restype = ct.c_long
@@ -3275,6 +3278,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetImageInfoStringW.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_wchar_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_void_p), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetJobControl.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.c_long]
      theDLL.DTWAIN_GetJpegValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
+     theDLL.DTWAIN_GetJpegXRValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetLibraryPath.argtypes = [ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetLibraryPathA.argtypes = [ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetLibraryPathW.argtypes = [ct.c_wchar_p, ct.c_long]
@@ -3728,6 +3732,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_SetHighlightStringW.argtypes = [ct.c_void_p, ct.c_wchar_p]
      theDLL.DTWAIN_SetJobControl.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetJpegValues.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
+     theDLL.DTWAIN_SetJpegXRValues.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetLanguage.argtypes = [ct.c_long]
      theDLL.DTWAIN_SetLastError.argtypes = [ct.c_long]
      theDLL.DTWAIN_SetLightPath.argtypes = [ct.c_void_p, ct.c_long]
@@ -4364,6 +4369,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetImageInfoStringW.restype = ct.c_long
      theDLL.DTWAIN_GetJobControl.restype = ct.c_long
      theDLL.DTWAIN_GetJpegValues.restype = ct.c_long
+     theDLL.DTWAIN_GetJpegXRValues.restype = ct.c_long
      theDLL.DTWAIN_GetLanguage.restype = ct.c_longct.c_void
      theDLL.DTWAIN_GetLastError.restype = ct.c_longct.c_void
      theDLL.DTWAIN_GetLibraryPath.restype = ct.c_long
@@ -4845,6 +4851,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_SetHighlightStringW.restype = ct.c_long
      theDLL.DTWAIN_SetJobControl.restype = ct.c_long
      theDLL.DTWAIN_SetJpegValues.restype = ct.c_long
+     theDLL.DTWAIN_SetJpegXRValues.restype = ct.c_long
      theDLL.DTWAIN_SetLanguage.restype = ct.c_long
      theDLL.DTWAIN_SetLastError.restype = ct.c_long
      theDLL.DTWAIN_SetLightPath.restype = ct.c_long
@@ -5454,6 +5461,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetImageInfoStringW.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_wchar_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_void_p), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetJobControl.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.c_long]
      theDLL.DTWAIN_GetJpegValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
+     theDLL.DTWAIN_GetJpegXRValues.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetLibraryPath.argtypes = [ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetLibraryPathA.argtypes = [ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetLibraryPathW.argtypes = [ct.c_wchar_p, ct.c_long]
@@ -5907,6 +5915,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_SetHighlightStringW.argtypes = [ct.c_void_p, ct.c_wchar_p]
      theDLL.DTWAIN_SetJobControl.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetJpegValues.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
+     theDLL.DTWAIN_SetJpegXRValues.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
      theDLL.DTWAIN_SetLanguage.argtypes = [ct.c_long]
      theDLL.DTWAIN_SetLastError.argtypes = [ct.c_long]
      theDLL.DTWAIN_SetLightPath.argtypes = [ct.c_void_p, ct.c_long]
