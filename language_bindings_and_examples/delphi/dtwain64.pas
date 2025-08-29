@@ -2802,8 +2802,7 @@ function DTWAIN_SetNoiseFilter(Source:DTWAIN_SOURCE; NoiseFilter:LONG) : BOOL; e
 function DTWAIN_SetOCRCapValues(Engine:DTWAIN_OCRENGINE; OCRCapValue:LONG; SetType:LONG; CapValues:DTWAIN_ARRAY) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_SetOCRCapValues';
 function DTWAIN_SetOrientation(Source:DTWAIN_SOURCE; Orient:LONG; bSetCurrent:BOOL) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_SetOrientation';
 function DTWAIN_SetOverscan(Source:DTWAIN_SOURCE; Value:LONG; bSetCurrent:BOOL) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_SetOverscan';
-function DTWAIN_SetPDFAESEncryption(Source:DTWAIN_SOURCE; bUseAES:BOOL) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_SetPDFAESEncryption';
-function DTWAIN_SetPDFAESEncryptionEx(Source:DTWAIN_SOURCE; nWhichEncryption:LONG; bUseAES:BOOL) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_SetPDFAESEncryptionEx';
+function DTWAIN_SetPDFAESEncryption(Source:DTWAIN_SOURCE; nWhichEncryption:LONG; bUseAES:BOOL) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_SetPDFAESEncryption';
 function DTWAIN_SetPDFASCIICompression(Source:DTWAIN_SOURCE; bSet:BOOL) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_SetPDFASCIICompression';
 function DTWAIN_SetPDFAuthor(Source:DTWAIN_SOURCE; lpAuthor:LPCTSTR) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_SetPDFAuthor';
 function DTWAIN_SetPDFAuthorA(Source:DTWAIN_SOURCE; lpAuthor:LPCSTR) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_SetPDFAuthorA';

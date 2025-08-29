@@ -2706,8 +2706,7 @@ Class DTWAINAPI
     Declare Auto Function DTWAIN_SetOCRCapValues Lib "dtwain32d.dll" (Engine As System.IntPtr, OCRCapValue As Integer, SetType As Integer, CapValues As System.IntPtr) As Integer
     Declare Auto Function DTWAIN_SetOrientation Lib "dtwain32d.dll" (Source As System.IntPtr, Orient As Integer, bSetCurrent As Integer) As Integer
     Declare Auto Function DTWAIN_SetOverscan Lib "dtwain32d.dll" (Source As System.IntPtr, Value As Integer, bSetCurrent As Integer) As Integer
-    Declare Auto Function DTWAIN_SetPDFAESEncryption Lib "dtwain32d.dll" (Source As System.IntPtr, bUseAES As Integer) As Integer
-    Declare Auto Function DTWAIN_SetPDFAESEncryptionEx Lib "dtwain32d.dll" (Source As System.IntPtr, nWhichEncryption As Integer, bUseAES As Integer) As Integer
+    Declare Auto Function DTWAIN_SetPDFAESEncryption Lib "dtwain32d.dll" (Source As System.IntPtr, nWhichEncryption As Integer, bUseAES As Integer) As Integer
     Declare Auto Function DTWAIN_SetPDFASCIICompression Lib "dtwain32d.dll" (Source As System.IntPtr, bSet As Integer) As Integer
     Declare Auto Function DTWAIN_SetPDFAuthor Lib "dtwain32d.dll" (Source As System.IntPtr, lpAuthor As String) As Integer
     Declare Ansi Function DTWAIN_SetPDFAuthorA Lib "dtwain32d.dll" (Source As System.IntPtr, lpAuthor As String) As Integer

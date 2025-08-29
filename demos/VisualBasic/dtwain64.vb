@@ -247,6 +247,7 @@ Class DTWAINAPI
     Public Const DTWAIN_BIGTIFFG4MULTI As Integer = 11014
     Public Const DTWAIN_BIGTIFFJPEG As Integer = 11015
     Public Const DTWAIN_BIGTIFFJPEGMULTI As Integer = 11016
+    Public Const DTWAIN_JPEGXR As Integer = 12000
     Public Const DTWAIN_INCHES As Integer = 0
     Public Const DTWAIN_CENTIMETERS As Integer = 1
     Public Const DTWAIN_PICAS As Integer = 2
@@ -2202,6 +2203,7 @@ Class DTWAINAPI
     Declare Unicode Function DTWAIN_GetImageInfoStringW Lib "dtwain64.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPWStr)> lpXResolution As StringBuilder, <MarshalAs(UnmanagedType.LPWStr)> lpYResolution As StringBuilder, ByRef lpWidth As Integer, ByRef lpLength As Integer, ByRef lpNumSamples As Integer, ByRef lpBitsPerSample As System.IntPtr, ByRef lpBitsPerPixel As Integer, ByRef lpPlanar As Integer, ByRef lpPixelType As Integer, ByRef lpCompression As Integer) As Integer
     Declare Auto Function DTWAIN_GetJobControl Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pJobControl As Integer, bCurrent As Integer) As Integer
     Declare Auto Function DTWAIN_GetJpegValues Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pQuality As Integer, ByRef Progressive As Integer) As Integer
+    Declare Auto Function DTWAIN_GetJpegXRValues Lib "dtwain64.dll" (Source As System.IntPtr, ByRef pQuality As Integer, ByRef Progressive As Integer) As Integer
     Declare Auto Function DTWAIN_GetLanguage Lib "dtwain64.dll" () As Integer
     Declare Auto Function DTWAIN_GetLastError Lib "dtwain64.dll" () As Integer
     Declare Auto Function DTWAIN_GetLibraryPath Lib "dtwain64.dll" (<MarshalAs(UnmanagedType.LPTStr)> lpszVer As StringBuilder, nLength As Integer) As Integer
@@ -2685,6 +2687,7 @@ Class DTWAINAPI
     Declare Unicode Function DTWAIN_SetHighlightStringW Lib "dtwain64.dll" (Source As System.IntPtr, Highlight As String) As Integer
     Declare Auto Function DTWAIN_SetJobControl Lib "dtwain64.dll" (Source As System.IntPtr, JobControl As Integer, bSetCurrent As Integer) As Integer
     Declare Auto Function DTWAIN_SetJpegValues Lib "dtwain64.dll" (Source As System.IntPtr, Quality As Integer, Progressive As Integer) As Integer
+    Declare Auto Function DTWAIN_SetJpegXRValues Lib "dtwain64.dll" (Source As System.IntPtr, Quality As Integer, Progressive As Integer) As Integer
     Declare Auto Function DTWAIN_SetLanguage Lib "dtwain64.dll" (nLanguage As Integer) As Integer
     Declare Auto Function DTWAIN_SetLastError Lib "dtwain64.dll" (nError As Integer) As Integer
     Declare Auto Function DTWAIN_SetLightPath Lib "dtwain64.dll" (Source As System.IntPtr, LightPath As Integer) As Integer
@@ -2703,8 +2706,7 @@ Class DTWAINAPI
     Declare Auto Function DTWAIN_SetOCRCapValues Lib "dtwain64.dll" (Engine As System.IntPtr, OCRCapValue As Integer, SetType As Integer, CapValues As System.IntPtr) As Integer
     Declare Auto Function DTWAIN_SetOrientation Lib "dtwain64.dll" (Source As System.IntPtr, Orient As Integer, bSetCurrent As Integer) As Integer
     Declare Auto Function DTWAIN_SetOverscan Lib "dtwain64.dll" (Source As System.IntPtr, Value As Integer, bSetCurrent As Integer) As Integer
-    Declare Auto Function DTWAIN_SetPDFAESEncryption Lib "dtwain64.dll" (Source As System.IntPtr, bUseAES As Integer) As Integer
-    Declare Auto Function DTWAIN_SetPDFAESEncryptionEx Lib "dtwain64.dll" (Source As System.IntPtr, nWhichEncryption As Integer, bUseAES As Integer) As Integer
+    Declare Auto Function DTWAIN_SetPDFAESEncryption Lib "dtwain64.dll" (Source As System.IntPtr, nWhichEncryption As Integer, bUseAES As Integer) As Integer
     Declare Auto Function DTWAIN_SetPDFASCIICompression Lib "dtwain64.dll" (Source As System.IntPtr, bSet As Integer) As Integer
     Declare Auto Function DTWAIN_SetPDFAuthor Lib "dtwain64.dll" (Source As System.IntPtr, lpAuthor As String) As Integer
     Declare Ansi Function DTWAIN_SetPDFAuthorA Lib "dtwain64.dll" (Source As System.IntPtr, lpAuthor As String) As Integer
