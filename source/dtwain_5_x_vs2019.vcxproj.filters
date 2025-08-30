@@ -400,15 +400,6 @@
     <ClCompile Include=".\cpp\logmsg.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include="c\imagefun\dtwpdf\md5c.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\pdflib32\md5class.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp\pdflib32\md5class2.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include=".\cpp\ocrengine\ocrinterface.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
@@ -613,32 +604,17 @@
     <ClCompile Include="cpp\ctlarraydumper.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include="hashlib\crc32.cpp">
-      <Filter>Hashing Library</Filter>
+    <ClCompile Include="cpp\ctlhashutils.cpp">
+      <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include="hashlib\digest.cpp">
-      <Filter>Hashing Library</Filter>
+    <ClCompile Include="cpp\ctlrandnumutils.cpp">
+      <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include="hashlib\keccak.cpp">
-      <Filter>Hashing Library</Filter>
-    </ClCompile>
-    <ClCompile Include="hashlib\md5.cpp">
-      <Filter>Hashing Library</Filter>
-    </ClCompile>
-    <ClCompile Include="hashlib\sha1.cpp">
-      <Filter>Hashing Library</Filter>
-    </ClCompile>
-    <ClCompile Include="hashlib\sha3.cpp">
-      <Filter>Hashing Library</Filter>
-    </ClCompile>
-    <ClCompile Include="hashlib\sha256.cpp">
-      <Filter>Hashing Library</Filter>
-    </ClCompile>
-    <ClCompile Include="aeslib\AES_128_CBC.cpp">
+    <ClCompile Include="aeslib\AES.cpp">
       <Filter>AES Encryption</Filter>
     </ClCompile>
-    <ClCompile Include="aeslib\aes.cpp">
-      <Filter>AES Encryption</Filter>
+    <ClCompile Include="cpp\iohandler_jpegxr.cpp">
+      <Filter>C++ Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -918,9 +894,6 @@
     <ClInclude Include="h\logmsg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cpp\pdflib32\md5class.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="h\notimpl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1077,37 +1050,10 @@
     <ClInclude Include="h\ctllogcalls.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="hashlib\crc32.h">
-      <Filter>Hashing Library</Filter>
+    <ClInclude Include="h\ctlrandnumutils.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="hashlib\hash.h">
-      <Filter>Hashing Library</Filter>
-    </ClInclude>
-    <ClInclude Include="hashlib\hmac.h">
-      <Filter>Hashing Library</Filter>
-    </ClInclude>
-    <ClInclude Include="hashlib\keccak.h">
-      <Filter>Hashing Library</Filter>
-    </ClInclude>
-    <ClInclude Include="hashlib\md5.h">
-      <Filter>Hashing Library</Filter>
-    </ClInclude>
-    <ClInclude Include="hashlib\sha1.h">
-      <Filter>Hashing Library</Filter>
-    </ClInclude>
-    <ClInclude Include="hashlib\sha3.h">
-      <Filter>Hashing Library</Filter>
-    </ClInclude>
-    <ClInclude Include="hashlib\sha256.h">
-      <Filter>Hashing Library</Filter>
-    </ClInclude>
-    <ClInclude Include="aeslib\AES_128_CBC.h">
-      <Filter>AES Encryption</Filter>
-    </ClInclude>
-    <ClInclude Include="aeslib\aes.h">
-      <Filter>AES Encryption</Filter>
-    </ClInclude>
-    <ClInclude Include="aeslib\aes.hpp">
+    <ClInclude Include="aeslib\AES.h">
       <Filter>AES Encryption</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1271,9 +1217,6 @@
     </Filter>
     <Filter Include="CXImage Files">
       <UniqueIdentifier>{65e5fb4a-3fd2-42d8-a860-64e1e4f61e0f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Hashing Library">
-      <UniqueIdentifier>{00752f06-8696-4fd2-b17f-7893c688fde6}</UniqueIdentifier>
     </Filter>
     <Filter Include="AES Encryption">
       <UniqueIdentifier>{5e54c952-71bb-44a5-b77d-b24c098fd813}</UniqueIdentifier>

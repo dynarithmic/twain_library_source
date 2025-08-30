@@ -28,5 +28,7 @@ int CTL_GifIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFi
     if (!IsValidBitDepth(DTWAIN_GIF, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    return SaveToFile(m_pDib->GetHandle(), szFile, FIF_GIF, 0, DTWAIN_INCHES, { 0,0 });
+    m_SaveParams.hDib = m_pDib->GetHandle();
+    m_SaveParams.szFile = szFile;
+    return SaveToFile();
 }

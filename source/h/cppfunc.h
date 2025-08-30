@@ -45,12 +45,12 @@
 #endif
 
 #if (BOOST_VERSION / 100000) == 1
-    #if (BOOST_VERSION / 100) % 1000 < 80
-        #error "Error:  Boost library version must be version 1.80 or greater"
+    #if (BOOST_VERSION / 100) % 1000 < 89
+        #error "Error:  Boost library version must be version 1.89 or greater"
     #endif
 #else
     #if (BOOST_VERSION / 100000) < 1
-        #error "Error:  Boost library version must be version 1.80 or greater"
+        #error "Error:  Boost library version must be version 1.89 or greater"
     #endif
 #endif
 

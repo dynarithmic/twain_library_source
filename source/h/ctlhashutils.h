@@ -1,0 +1,56 @@
+/*
+    This file is part of the Dynarithmic TWAIN Library (DTWAIN).
+    Copyright (c) 2002-2025 Dynarithmic Software.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+    FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
+    DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
+    OF THIRD PARTY RIGHTS.
+ */
+#ifndef CTLHASHUTILS_H
+#define CTLHASHUTILS_H
+
+#include <vector>
+#include <string_view>
+#include <boost/hash2/md5.hpp>
+
+namespace dynarithmic
+{
+    enum class SHA2HashType 
+    {
+        SHA256,
+        SHA384,
+        SHA512
+    };
+
+    std::vector<unsigned char> SHA2Hash(std::string_view message, SHA2HashType hashType = SHA2HashType::SHA256);
+    std::vector<unsigned char> SHA2Hash(const unsigned char* message, size_t messageLength, 
+                                        SHA2HashType hashType = SHA2HashType::SHA256);
+
+    class MD5Hasher
+    {
+        boost::hash2::md5_128 md5_hasher;
+        public:
+            static constexpr uint16_t HashBytes = 16;
+            void Add(const unsigned char* pData, size_t len);
+            void Add(const std::vector<unsigned char>& pData);
+            void Reset();
+            std::vector<unsigned char> GetHash();
+            std::vector<unsigned char> GetHash(const unsigned char *input, size_t len);
+            std::vector<unsigned char> GetHash(const std::vector<unsigned char>& input);
+    };
+}
+#endif
+
+

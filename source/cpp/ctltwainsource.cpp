@@ -843,7 +843,7 @@ DTWAIN_ARRAY CTL_ITwainSource::GetAcquisitionArray() const
 }
 
 
-void CTL_ITwainSource::SetPDFValue(const CTL_StringType& nWhich, const CTL_StringType& sz)
+void CTL_ITwainSource::SetPDFValue(CTL_StringViewType nWhich, CTL_StringViewType sz)
 {
     if ( nWhich == PDFAUTHORKEY)
         m_ImageInfoEx.PDFAuthor = sz;
@@ -874,7 +874,7 @@ void CTL_ITwainSource::SetPDFValue(const CTL_StringType& nWhich, const CTL_Strin
 }
 
 
-void CTL_ITwainSource::SetPDFValue(const CTL_StringType& nWhich, LONG nValue)
+void CTL_ITwainSource::SetPDFValue(CTL_StringViewType nWhich, LONG nValue)
 {
     if ( nWhich == PDFORIENTATIONKEY)
         m_ImageInfoEx.PDFOrientation = nValue;
@@ -905,9 +905,12 @@ void CTL_ITwainSource::SetPDFValue(const CTL_StringType& nWhich, LONG nValue)
     else
     if (nWhich == PDFAESKEY )
         m_ImageInfoEx.bIsAESEncrypted = nValue?true:false;
+    else
+    if (nWhich == PDFAES256KEY)
+        m_ImageInfoEx.bIsAES256Encrypted = nValue ? true : false;
 }
 
-void CTL_ITwainSource::SetPDFValue(const CTL_StringType& nWhich, DTWAIN_FLOAT f1, DTWAIN_FLOAT f2)
+void CTL_ITwainSource::SetPDFValue(CTL_StringViewType nWhich, DTWAIN_FLOAT f1, DTWAIN_FLOAT f2)
 {
     if ( nWhich == PDFSCALINGKEY )
     {
@@ -916,7 +919,7 @@ void CTL_ITwainSource::SetPDFValue(const CTL_StringType& nWhich, DTWAIN_FLOAT f1
     }
 }
 
-void CTL_ITwainSource::SetPDFValue(const CTL_StringType& nWhich, const PDFTextElementPtr& element)
+void CTL_ITwainSource::SetPDFValue(CTL_StringViewType nWhich, const PDFTextElementPtr& element)
 {
     if ( nWhich == PDFTEXTELEMENTKEY )
     {
@@ -931,7 +934,7 @@ void CTL_ITwainSource::SetPDFPageSize(LONG nPageSize, DTWAIN_FLOAT cWidth, DTWAI
 }
 
 void CTL_ITwainSource::SetPDFEncryption(bool bIsEncrypted,
-                                        const CTL_StringType& strUserPassword, const CTL_StringType& strOwnerPassword,
+                                        CTL_StringViewType strUserPassword, CTL_StringViewType strOwnerPassword,
                                         LONG Permissions, bool bUseStrongEncryption)
 {
     if ( bIsEncrypted )

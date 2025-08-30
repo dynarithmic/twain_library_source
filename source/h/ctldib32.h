@@ -49,6 +49,19 @@ namespace dynarithmic
     class CTL_ImageIOHandler
     {
         public:
+            struct IOSaveParams
+            {
+                HANDLE hDib = nullptr;
+                LPCTSTR szFile = nullptr;
+                FREE_IMAGE_FORMAT fmt = FIF_BMP;
+                int flags = 0;
+                UINT unitOfMeasure = DTWAIN_INCHES;
+                std::pair<LONG, LONG> res = { 0, 0};
+                std::tuple<double, double, double, double> multiplier_pr = { 1,1, 0.5, 0.5 };
+                LPCSTR commentKey = "Comment";
+                FREE_IMAGE_MDMODEL metaDataTag = FIMD_COMMENTS;
+            };
+
             CTL_ImageIOHandler();
             CTL_ImageIOHandler( CTL_TwainDib *pDib );
             virtual ~CTL_ImageIOHandler() = default;
@@ -69,8 +82,7 @@ namespace dynarithmic
             const DTWAINImageInfoEx& GetBaseImageInfo() const { return m_ImageInfo; }
             CTL_TwainDib* GetDib() const { return m_pDib; }
             static bool IsValidBitDepth(LONG FileType, LONG bitDepth);
-            int SaveToFile(HANDLE hDib, LPCTSTR szFile, FREE_IMAGE_FORMAT fmt, int flags, UINT unitOfMeasure,
-                           std::pair<LONG, LONG> res, const std::tuple<double, double, double, double>& multipler_pr = { 1,1, 0.5, 0.5 }) const;
+            int SaveToFile() const;
             static auto& GetSupportedBPPMap() { return s_supportedBitDepths; }
 
         protected:
@@ -86,6 +98,7 @@ namespace dynarithmic
             unsigned m_nPage;
             bool m_bAllWritten;
             bool m_bOnePageWritten;
+            IOSaveParams m_SaveParams;
             static boost::container::flat_map<LONG, std::vector<int>> s_supportedBitDepths;
     };
 
@@ -110,13 +123,19 @@ namespace dynarithmic
             CTL_JpegIOHandler(int Quality=75, BOOL bJpegProgressive=FALSE) :
                     CTL_ImageIOHandler(),
                     m_nJpegQuality(Quality),
-                    m_bJpegProgressive(bJpegProgressive) {}
+                    m_bJpegProgressive(bJpegProgressive) { SetSaveArgs(); }
 
             CTL_JpegIOHandler( CTL_TwainDib *pDib, DTWAINImageInfoEx& ImageInfoEx)
                             : CTL_ImageIOHandler(pDib ),
                             m_nJpegQuality(75),
                             m_bJpegProgressive(false),
-                            m_ImageInfoEx(ImageInfoEx) {}
+                            m_ImageInfoEx(ImageInfoEx) { SetSaveArgs(); }
+
+            void SetSaveArgs()
+            {
+                m_SaveParams.fmt = FIF_JPEG;
+                m_SaveParams.multiplier_pr = { 0.01, 0.01, 0, 0 };
+            }
 
             int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
 
@@ -149,11 +168,19 @@ namespace dynarithmic
     class CTL_PngIOHandler : public CTL_ImageIOHandler
     {
         public:
-            CTL_PngIOHandler() : CTL_ImageIOHandler() {};
-            CTL_PngIOHandler( CTL_TwainDib *pDib, DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler( pDib ), m_ImageInfoEx(ImageInfoEx) {}
+            CTL_PngIOHandler() : CTL_ImageIOHandler() { SetSaveArgs(); };
+            CTL_PngIOHandler( CTL_TwainDib *pDib, DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler( pDib ), m_ImageInfoEx(ImageInfoEx) 
+                { SetSaveArgs();}
+
             int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
+
         private:
             DTWAINImageInfoEx m_ImageInfoEx;
+            void SetSaveArgs()
+            {
+                m_SaveParams.fmt = FIF_PNG;
+                m_SaveParams.multiplier_pr = { 0.01, 0.01, 0, 0 };
+            }
     };
 
     class CTL_PcxIOHandler : public CTL_ImageIOHandler
@@ -172,11 +199,23 @@ namespace dynarithmic
     class CTL_TgaIOHandler : public CTL_ImageIOHandler
     {
         public:
-            CTL_TgaIOHandler()  : CTL_ImageIOHandler() {}
-            CTL_TgaIOHandler( CTL_TwainDib *pDib, DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler( pDib ), m_ImageInfoEx(ImageInfoEx) {}
+            CTL_TgaIOHandler()  : CTL_ImageIOHandler() 
+            {
+                SetSaveArgs();
+            }
+
+            CTL_TgaIOHandler( CTL_TwainDib *pDib, DTWAINImageInfoEx& ImageInfoEx) : CTL_ImageIOHandler( pDib ), m_ImageInfoEx(ImageInfoEx) 
+            {
+                SetSaveArgs();
+            }
+
             int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
 
         private:
+            void SetSaveArgs()
+            {
+                m_SaveParams.fmt = FIF_TARGA;
+            }
             DTWAINImageInfoEx m_ImageInfoEx;
     };
 
@@ -195,9 +234,23 @@ namespace dynarithmic
     class CTL_PsdIOHandler : public CTL_ImageIOHandler
     {
         public:
-            CTL_PsdIOHandler()  : CTL_ImageIOHandler() {};
-            CTL_PsdIOHandler( CTL_TwainDib *pDib ) : CTL_ImageIOHandler( pDib ) {}
+            CTL_PsdIOHandler()  : CTL_ImageIOHandler() 
+            {
+                SetSaveArgs();
+            }
+
+            CTL_PsdIOHandler( CTL_TwainDib *pDib ) : CTL_ImageIOHandler( pDib ) 
+            {
+                SetSaveArgs();
+            }
+
             int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
+
+        private:
+            void SetSaveArgs()
+            {
+                m_SaveParams.fmt = FIF_PSD;
+            }
     };
 
     class CTL_PDFIOHandler final : public CTL_ImageIOHandler
@@ -253,11 +306,28 @@ namespace dynarithmic
             CTL_JpegIOHandler* m_pJpegHandler;
     };
 
+    class CTL_JpegXRIOHandler final : public CTL_ImageIOHandler
+    {
+        public:
+            CTL_JpegXRIOHandler(CTL_TwainDib* pDib, const DTWAINImageInfoEx &ImageInfoEx);
+            int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
+            ~CTL_JpegXRIOHandler() override = default;
+
+        private:
+            int m_nFormat;
+            DTWAINImageInfoEx m_ImageInfoEx;
+    };
+
     class CTL_GifIOHandler : public CTL_ImageIOHandler
     {
         public:
-            CTL_GifIOHandler(CTL_TwainDib* pDib)  :
-            CTL_ImageIOHandler(pDib) {}
+            CTL_GifIOHandler(CTL_TwainDib* pDib)  : CTL_ImageIOHandler(pDib) 
+            {
+                m_SaveParams.fmt = FIF_GIF;
+                m_SaveParams.flags = 0;
+                m_SaveParams.unitOfMeasure = DTWAIN_INCHES;
+            }
+
             int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
     };
 
@@ -265,7 +335,8 @@ namespace dynarithmic
     {
         public:
             CTL_IcoIOHandler(CTL_TwainDib* pDib, DTWAINImageInfoEx& ImageInfoEx)  : 
-                            CTL_ImageIOHandler(pDib), m_ImageInfoEx(ImageInfoEx) {}
+                            CTL_ImageIOHandler(pDib), m_ImageInfoEx(ImageInfoEx) 
+            { m_SaveParams.fmt = FIF_ICO; }
             int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
 
         private:
@@ -275,10 +346,23 @@ namespace dynarithmic
     class CTL_PBMIOHandler : public CTL_ImageIOHandler
     {
         public:
-            CTL_PBMIOHandler() : CTL_ImageIOHandler() {}
-            CTL_PBMIOHandler(CTL_TwainDib *pDib) : CTL_ImageIOHandler(pDib){}
+            CTL_PBMIOHandler() : CTL_ImageIOHandler() 
+            {
+                SetSaveArgs();
+            }
+
+            CTL_PBMIOHandler(CTL_TwainDib *pDib) : CTL_ImageIOHandler(pDib)
+            {
+                SetSaveArgs();
+            }
             int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
+
         private:
+            void SetSaveArgs()
+            {
+                m_SaveParams.fmt = FIF_PBM;
+            }
+
             DTWAINImageInfoEx m_ImageInfoEx;
     };
 
@@ -286,7 +370,10 @@ namespace dynarithmic
     {
     public:
         CTL_WBMPIOHandler(CTL_TwainDib* pDib, DTWAINImageInfoEx& ImageInfoEx)  : CTL_ImageIOHandler(pDib),
-            m_ImageInfoEx(ImageInfoEx) {}
+            m_ImageInfoEx(ImageInfoEx) 
+        {
+            m_SaveParams.fmt = FIF_WBMP;
+        }
         int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
 
     private:
@@ -317,9 +404,23 @@ namespace dynarithmic
     class CTL_WebpIOHandler : public CTL_ImageIOHandler
     {
         public:
-            CTL_WebpIOHandler() : CTL_ImageIOHandler() {}
-            CTL_WebpIOHandler(CTL_TwainDib *pDib) : CTL_ImageIOHandler(pDib){}
+            CTL_WebpIOHandler() : CTL_ImageIOHandler() 
+            {
+                SetSaveArgs();
+            }
+
+            CTL_WebpIOHandler(CTL_TwainDib *pDib) : CTL_ImageIOHandler(pDib)
+            {
+                SetSaveArgs();
+            }
+
             int WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fh, DibMultiPageStruct* pDibStruct = nullptr) override;
+
+        private:
+            void SetSaveArgs()
+            {
+                m_SaveParams.fmt = FIF_WEBP;
+            }
     };
 
     #endif  // NOIMAGE_SUPPORT
@@ -427,6 +528,7 @@ namespace dynarithmic
                    WBMPFormatResized = DTWAIN_WBMP_RESIZED,
                    WEBPFormat = DTWAIN_WEBP,
                    PBMFormat = DTWAIN_PBM,
+                   JpegXRFormat = DTWAIN_JPEGXR,
                    RawFormat=9999};
 
             // Setting/Getting

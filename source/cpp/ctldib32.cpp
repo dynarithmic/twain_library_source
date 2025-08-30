@@ -202,6 +202,9 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
         case JpegFormat:
             pHandler = std::make_unique<CTL_JpegIOHandler>( this, ImageInfo);
         break;
+        case JpegXRFormat:
+            pHandler = std::make_unique<CTL_JpegXRIOHandler>(this, ImageInfo);
+        break;
         case Jpeg2000Format:
             ImageInfo.nJpegQuality = 100;
             ImageInfo.bProgressiveJpeg = 0;

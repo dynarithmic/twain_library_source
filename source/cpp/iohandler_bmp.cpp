@@ -24,17 +24,20 @@
 using namespace dynarithmic;
 int CTL_BmpIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct*)
 {
-    if ( !m_pDib )
+    HANDLE hDib = {};
+    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
         return DTWAIN_ERR_DIB;
 
-    const HANDLE hDib = m_pDib->GetHandle();
-    if ( !hDib )
-        return DTWAIN_ERR_DIB;
     if ( !IsValidBitDepth(DTWAIN_BMP, m_pDib->GetBitsPerPixel()))
             return DTWAIN_ERR_INVALID_BITDEPTH;
 
     if (m_ImageInfoEx.IsRLE)
-        return SaveToFile(hDib, szFile, FIF_BMP, BMP_SAVE_RLE, DTWAIN_INCHES, { 0, 0 });
+    {
+        m_SaveParams.hDib = hDib;
+        m_SaveParams.szFile = szFile;
+        m_SaveParams.flags = BMP_SAVE_RLE;
+        return SaveToFile();
+    }
 
     HANDLE hHandleToWrite = CTL_TwainDib::CreateBMPBitmapFromDIB(hDib);
     if (hHandleToWrite)
