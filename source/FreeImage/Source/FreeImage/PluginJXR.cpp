@@ -946,7 +946,7 @@ SupportsNoPixels() {
 // ==========================================================
 
 static void * DLL_CALLCONV
-Open(FreeImageIO *io, fi_handle handle, BOOL read) {
+Open(FreeImageIO *io, fi_handle handle, BOOL read, FIBITMAP* dib, int flags) {
 	WMPStream *pStream = NULL;	// stream interface
 	if(io && handle) {
 		// allocate the FreeImageIO stream wrapper

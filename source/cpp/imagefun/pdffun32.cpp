@@ -128,6 +128,11 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
         auto& imageinfo = pPDFInfo->ImageInfoEx;
         if ( imageinfo.bIsPDFEncrypted && imageinfo.bUseStrongEncryption && imageinfo.bIsAESEncrypted)
             minor_version = 6;
+        if (imageinfo.bIsPDFEncrypted && imageinfo.bIsAES256Encrypted)
+        {
+            major_version = 2;
+            minor_version = 0;
+        }
 
         if ( !pPDFInfo->m_Interface->DTWLIB_PDFStartCreation(pDocument, major_version, minor_version) )
         {
@@ -143,13 +148,15 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
         {
             if (imageinfo.bUseStrongEncryption || imageinfo.bIsAESEncrypted)
                 imageinfo.nPDFKeyLength = 16;
+            if (imageinfo.bIsAES256Encrypted)
+                imageinfo.nPDFKeyLength = 32;
 
             pPDFInfo->m_Interface->DTWLIB_PDFSetEncryption(pDocument,
                                                             imageinfo.PDFOwnerPassword.c_str(),
                                                             imageinfo.PDFUserPassword.c_str(),
                                                             imageinfo.PDFPermissions,
                                                             imageinfo.bUseStrongEncryption?TRUE:false,
-                                                            imageinfo.bIsAESEncrypted?TRUE:FALSE,
+                                                            (imageinfo.bIsAESEncrypted || imageinfo.bIsAES256Encrypted)?TRUE:FALSE,
                                                             imageinfo.nPDFKeyLength);
         }
 

@@ -25,18 +25,18 @@ using namespace dynarithmic;
 
 int CTL_PngIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
-    if ( !m_pDib )
-        return DTWAIN_ERR_DIB;
-
-    const HANDLE hDib = m_pDib->GetHandle();
-    if ( !hDib )
+    HANDLE hDib = {};
+    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
         return DTWAIN_ERR_DIB;
 
     if (!IsValidBitDepth(DTWAIN_PNG, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    return SaveToFile(hDib, szFile, FIF_PNG, 0, m_ImageInfoEx.UnitOfMeasure,
-                        {m_ImageInfoEx.ResolutionX, m_ImageInfoEx.ResolutionY},
-                        { 0.01, 0.01, 0, 0 });
+    m_SaveParams.hDib = hDib;
+    m_SaveParams.szFile = szFile;
+    m_SaveParams.unitOfMeasure = m_ImageInfoEx.UnitOfMeasure;
+    m_SaveParams.res = { m_ImageInfoEx.ResolutionX, m_ImageInfoEx.ResolutionY };
+
+    return SaveToFile();
 }
 

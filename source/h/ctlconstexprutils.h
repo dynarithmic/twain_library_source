@@ -282,7 +282,7 @@ namespace dynarithmic
     /////////////// Supported formats for File transfers ////////////////
     static constexpr auto EnumTwainFileFormats()
     {
-        constexpr std::array<int, 58> ca = {
+        constexpr std::array<int, 59> ca = {
             TWAINFileFormat_BMP, TWAINFileFormat_BMPRLE, TWAINFileFormat_PCX, TWAINFileFormat_DCX, TWAINFileFormat_TIFFLZW,
             TWAINFileFormat_PDF, TWAINFileFormat_PDFMULTI, TWAINFileFormat_TIFFNONE, TWAINFileFormat_TIFFGROUP3,TWAINFileFormat_TIFFGROUP4,
             TWAINFileFormat_TIFFPACKBITS, TWAINFileFormat_TIFFDEFLATE, TWAINFileFormat_TIFFJPEG, TWAINFileFormat_TIFFNONEMULTI,
@@ -294,7 +294,8 @@ namespace dynarithmic
             TWAINFileFormat_WBMP, TWAINFileFormat_WEBP, TWAINFileFormat_PBM, TWAINFileFormat_TGARLE, TWAINFileFormat_BIGTIFFLZW, TWAINFileFormat_BIGTIFFLZWMULTI,
             TWAINFileFormat_BIGTIFFNONE, TWAINFileFormat_BIGTIFFNONEMULTI, TWAINFileFormat_BIGTIFFPACKBITS, TWAINFileFormat_BIGTIFFPACKBITSMULTI,
             TWAINFileFormat_BIGTIFFDEFLATE, TWAINFileFormat_BIGTIFFDEFLATEMULTI, TWAINFileFormat_BIGTIFFGROUP3, TWAINFileFormat_BIGTIFFGROUP3MULTI,
-            TWAINFileFormat_BIGTIFFGROUP4, TWAINFileFormat_BIGTIFFGROUP4MULTI, TWAINFileFormat_BIGTIFFJPEG, TWAINFileFormat_BIGTIFFJPEGMULTI };
+            TWAINFileFormat_BIGTIFFGROUP4, TWAINFileFormat_BIGTIFFGROUP4MULTI, TWAINFileFormat_BIGTIFFJPEG, TWAINFileFormat_BIGTIFFJPEGMULTI,
+            TWAINFileFormat_JPEGXR};
         return ca;
     }
 
@@ -530,6 +531,11 @@ namespace dynarithmic
             lVersionType |= DTWAIN_CALLSTACK_LOGGING_PLUS;
         #endif
             return lVersionType;
+    }
+
+    static constexpr uint32_t RoundUpToNearest(uint32_t value, uint32_t upto) noexcept
+    {
+        return  (value + (upto - 1)) / upto * upto;
     }
 };
 

@@ -26,20 +26,24 @@ using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CTL_Jpeg2KIOHandler::CTL_Jpeg2KIOHandler(CTL_TwainDib* pDib, const DTWAINImageInfoEx &ImageInfoEx)
 : CTL_ImageIOHandler( pDib ), m_nFormat(0), m_ImageInfoEx(ImageInfoEx), m_pJpegHandler(nullptr)
-{ }
+{
+    m_SaveParams.fmt = FIF_J2K;
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CTL_Jpeg2KIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
-    if ( !m_pDib )
-        return DTWAIN_ERR_DIB;
-
-    const HANDLE hDib = m_pDib->GetHandle();
-    if ( !hDib )
+    HANDLE hDib = {};
+    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
         return DTWAIN_ERR_DIB;
 
     if (!IsValidBitDepth(DTWAIN_JPEG2000, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    return SaveToFile(hDib, szFile, FIF_J2K, 0, m_ImageInfoEx.UnitOfMeasure, { m_ImageInfoEx.ResolutionX, m_ImageInfoEx.ResolutionY });
+    m_SaveParams.hDib = hDib;
+    m_SaveParams.szFile = szFile;
+    m_SaveParams.unitOfMeasure = m_ImageInfoEx.UnitOfMeasure;
+    m_SaveParams.res = { m_ImageInfoEx.ResolutionX, m_ImageInfoEx.ResolutionY };
+
+    return SaveToFile(); 
 }

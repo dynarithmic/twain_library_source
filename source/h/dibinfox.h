@@ -56,6 +56,7 @@ namespace dynarithmic
     #define PDFTEXTELEMENTKEY _T("TextElement")
     #define PDFPOLARITYKEY _T("Polarity")
     #define PDFAESKEY   _T("AESEncryption")
+    #define PDFAES256KEY   _T("AES256Encryption")
 
     struct DTWAINImageOCRPDFInfo
     {
@@ -82,6 +83,7 @@ namespace dynarithmic
         LONG PDFScaleType;
         bool bIsPDFEncrypted;
         bool bIsAESEncrypted;
+        bool bIsAES256Encrypted;
         bool bUseStrongEncryption;
         int  nPDFKeyLength;
         bool PDFUseASCIICompression;
@@ -108,6 +110,8 @@ namespace dynarithmic
 
         LONG nJpegQuality;
         bool bProgressiveJpeg;
+        LONG nJpegXRQuality;
+        bool bProgressiveJpegXR;
         LONG PDFPageSize;
         bool PDFUseCompression;
         bool PDFUseThumbnail;
@@ -137,6 +141,7 @@ namespace dynarithmic
             PDFScaleType(DTWAIN_PDF_FITPAGE),
             bIsPDFEncrypted(false),
             bIsAESEncrypted(false),
+            bIsAES256Encrypted(false),
             nPDFKeyLength(5),
             bUseStrongEncryption(false),
             PDFUseASCIICompression(false),
@@ -158,6 +163,8 @@ namespace dynarithmic
             IsSearchableTextOnPage(false),
             nJpegQuality(100),
             bProgressiveJpeg(false),
+            nJpegXRQuality(100),
+            bProgressiveJpegXR(false),
             PDFPageSize(DTWAIN_PDF_NOSCALING),
             PDFUseCompression(true),
             PDFUseThumbnail(false),

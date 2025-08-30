@@ -34,6 +34,7 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/format.hpp>
+#include <boost/algorithm/hex.hpp>
 #include <assert.h>
 #include <algorithm>
 #include <stdlib.h>
@@ -118,6 +119,7 @@ namespace dynarithmic
     struct ANSIStringTraits
     {
         using char_type = char;
+        using uchar_type = unsigned char;
         using string_type = std::string;
         using stringview_type = std::string_view;
         using stringarray_type = std::vector<string_type>;
@@ -268,6 +270,7 @@ namespace dynarithmic
     struct UnicodeStringTraits
     {
         using char_type = wchar_t;
+        using uchar_type = wchar_t;
         using string_type = std::wstring;
         using stringview_type = std::wstring_view;
         using stringarray_type = std::vector<string_type>;
@@ -776,6 +779,23 @@ namespace dynarithmic
         static double ToDouble(const CharType* s1, double defVal = 0.0)
         {
             return s1?StringTraits::ToDouble(s1):defVal;
+        }
+
+        static StringType StringFromUChars(typename const StringTraits::uchar_type* val, size_t nSize)
+        {
+            return StringType(val, val + nSize);
+        }
+
+        static StringType HexStringFromUChars(typename const StringTraits::uchar_type* val, size_t nSize)
+        {
+            StringType hex_output_vector;
+            boost::algorithm::hex_lower(val, val + nSize, std::back_inserter(hex_output_vector));
+            return hex_output_vector;
+        }
+
+        static std::vector<typename StringTraits::uchar_type> UCharsFromString(typename StringTraits::stringview_type str)
+        {
+            return std::vector<typename StringTraits::uchar_type>(str.begin(), str.end());
         }
 
         static int ReverseFind(typename StringTraits::stringview_type str, CharType ch)

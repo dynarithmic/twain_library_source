@@ -25,11 +25,8 @@ using namespace dynarithmic;
 
 int CTL_WmfIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
-    if ( !m_pDib )
-        return DTWAIN_ERR_DIB;
-
-    const HANDLE hDib = m_pDib->GetHandle();
-    if ( !hDib )
+    HANDLE hDib = {};
+    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
         return DTWAIN_ERR_DIB;
 
     if (!IsValidBitDepth(DTWAIN_WMF, m_pDib->GetBitsPerPixel()))

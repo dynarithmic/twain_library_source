@@ -415,6 +415,11 @@ namespace dynarithmic
             API_INSTANCE DTWAIN_SetPDFPageScale(source, static_cast<LONG>(po.get_page_scale_options().get_page_scale()), xscale, yscale);
 
             // Set encryption options
+
+            // First, turn off all AES encryption
+            API_INSTANCE DTWAIN_SetPDFAESEncryption(source, DTWAIN_PDF_AES128, 0);
+            API_INSTANCE DTWAIN_SetPDFAESEncryption(source, DTWAIN_PDF_AES256, 0);
+
             auto& encrypt_opts = po.get_encryption_options();
             if (encrypt_opts.is_use_encryption())
             {
@@ -422,12 +427,14 @@ namespace dynarithmic
                     encrypt_opts.get_owner_password().c_str(),
                     encrypt_opts.get_permissions_int(),
                     encrypt_opts.is_use_strong_encryption());
-                API_INSTANCE DTWAIN_SetPDFAESEncryption(source, encrypt_opts.is_use_AES_encryption());
-            }
-            else
-            {
-                API_INSTANCE DTWAIN_SetPDFEncryptionA(source, 0, "", "", 0, 0);
-                API_INSTANCE DTWAIN_SetPDFAESEncryption(source, false);
+
+                bool encryptAES128 = encrypt_opts.is_use_AES128_encryption();
+                bool encryptAES256 = encrypt_opts.is_use_AES256_encryption();
+                if (encryptAES256)
+                    API_INSTANCE DTWAIN_SetPDFAESEncryption(source, DTWAIN_PDF_AES256, 1);
+                else
+                if (encryptAES128)
+                    API_INSTANCE DTWAIN_SetPDFAESEncryption(source, DTWAIN_PDF_AES128, 1);
             }
         }
 

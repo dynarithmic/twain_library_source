@@ -63,8 +63,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFEncryption(DTWAIN_SOURCE Source, DTWAIN_BO
 {
     LOG_FUNC_ENTRY_PARAMS((Source, bUseEncryption, lpszUser, lpszOwner, Permissions, UseStrongEncryption))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    const CTL_StringType owner = lpszOwner?lpszOwner:_T("");
-    const CTL_StringType user = lpszUser?lpszUser:_T("");
+    CTL_StringViewType owner = lpszOwner?lpszOwner:_T("");
+    CTL_StringViewType user = lpszUser?lpszUser:_T("");
 
     // Even though the Permissions parameter is an unsigned 32-bit value from the user, 
     // this will be "converted" to a 32-bit signed integer internally, which is what the PDF 
@@ -189,17 +189,33 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFCompression(DTWAIN_SOURCE Source, DTWAIN_B
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFAESEncryption(DTWAIN_SOURCE Source, DTWAIN_BOOL bUseAES)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFAESEncryption(DTWAIN_SOURCE Source, LONG nWhichEncryption, DTWAIN_BOOL bUseAES)
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, bUseAES))
+    LOG_FUNC_ENTRY_PARAMS((Source, nWhichEncryption, bUseAES))
     #ifndef DTWAIN_SUPPORT_AES
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
-        CATCH_BLOCK_LOG_PARAMS(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    CATCH_BLOCK_LOG_PARAMS(false)
     #else
-        auto [pHandle, pSource] = VerifyHandles(Source);
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    bool goodParam = (nWhichEncryption == DTWAIN_PDF_AES128 ||
+                      nWhichEncryption == DTWAIN_PDF_AES256);
+
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !goodParam; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+
+    if (nWhichEncryption == DTWAIN_PDF_AES128)
+    {
         pSource->SetPDFValue(PDFAESKEY, static_cast<LONG>(bUseAES));
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
-        CATCH_BLOCK_LOG_PARAMS(false)
+        pSource->SetPDFValue(PDFAES256KEY, 0);
+    }
+    else
+    if (nWhichEncryption == DTWAIN_PDF_AES256)
+    {
+        pSource->SetPDFValue(PDFAES256KEY, static_cast<LONG>(bUseAES));
+        pSource->SetPDFValue(PDFAESKEY, 0);
+    }
+
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
     #endif
 }
 
