@@ -2469,7 +2469,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
         strm << fmt % s1.c_str() % retcode % sz % s;
         LogWriterUtils::WriteMultiLineInfoIndentedA(strm.str(), "\n");
     }
-    if (retcode == TWRC_FAILURE)
+    if (retcode == TWRC_FAILURE || retcode == TWRC_CHECKSTATUS)
     {
         SetLastTwainError(retcode, TWRC_Error);
         if (nDG == DG_CONTROL && nDAT == DAT_EVENT && nMSG == MSG_PROCESSEVENT)
