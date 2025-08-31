@@ -34,7 +34,7 @@ namespace dynarithmic
     {
     private:
         template <int N>
-        static void copy_util(const std::string& s, char(&dest)[N], size_t num)
+        static void copy_util(std::string_view s, char(&dest)[N], size_t num)
         {
             const auto minval = (std::min)(num, s.size());
             std::copy_n(s.begin(), minval, dest);
@@ -63,10 +63,10 @@ namespace dynarithmic
         CTL_TwainIdentity& set_protocol_major(uint16_t val) { m_identity.ProtocolMajor = val; return *this; }
         CTL_TwainIdentity& set_protocol_minor(uint16_t val) { m_identity.ProtocolMinor = val; return *this; }
         CTL_TwainIdentity& set_supported_groups(uint32_t val) { m_identity.SupportedGroups = val; return *this; }
-        CTL_TwainIdentity& set_manufacturer(const std::string& s) { copy_util(s, m_identity.Manufacturer, maxCharSize); return *this; }
-        CTL_TwainIdentity& set_product_family(const std::string& s) { copy_util(s, m_identity.ProductFamily, maxCharSize); return *this; }
-        CTL_TwainIdentity& set_product_name(const std::string& s) { copy_util(s, m_identity.ProductName, maxCharSize); return *this; }
-        CTL_TwainIdentity& set_version_info(const std::string& s) { copy_util(s, m_identity.Version.Info, maxCharSize); return *this; }
+        CTL_TwainIdentity& set_manufacturer(std::string_view s) { copy_util(s, m_identity.Manufacturer, maxCharSize); return *this; }
+        CTL_TwainIdentity& set_product_family(std::string_view s) { copy_util(s, m_identity.ProductFamily, maxCharSize); return *this; }
+        CTL_TwainIdentity& set_product_name(std::string_view s) { copy_util(s, m_identity.ProductName, maxCharSize); return *this; }
+        CTL_TwainIdentity& set_version_info(std::string_view s) { copy_util(s, m_identity.Version.Info, maxCharSize); return *this; }
 
         CTL_TwainIdentity& set_major_num(uint16_t val) { m_identity.Version.MajorNum = val; return *this; }
         CTL_TwainIdentity& set_minor_num(uint16_t val) { m_identity.Version.MinorNum = val; return *this; }
