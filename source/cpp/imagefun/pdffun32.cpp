@@ -122,11 +122,11 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
         pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pDocument, PDF_SUBJECT, m_sSubject.c_str());
         pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pDocument, PDF_CREATOR, m_sCreator.c_str());
 
-        // Set the PDF standard to 1.3 or 1.6, depending on encryption setting
+        // Set the PDF standard to 1.3, 1.6, or 2.0 depending on encryption setting
         int major_version = 1;
         int minor_version = 3;
         auto& imageinfo = pPDFInfo->ImageInfoEx;
-        if ( imageinfo.bIsPDFEncrypted && imageinfo.bUseStrongEncryption && imageinfo.bIsAESEncrypted)
+        if ( imageinfo.bIsPDFEncrypted && imageinfo.bIsAESEncrypted)
             minor_version = 6;
         if (imageinfo.bIsPDFEncrypted && imageinfo.bIsAES256Encrypted)
         {
@@ -399,7 +399,7 @@ int CPDFImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImage
     return 0;
 }
 
-void CPDFImageHandler::SetSearchableText(const std::string& sText)
+void CPDFImageHandler::SetSearchableText(std::string_view sText)
 {
     m_sSearchableText = sText;
 }
