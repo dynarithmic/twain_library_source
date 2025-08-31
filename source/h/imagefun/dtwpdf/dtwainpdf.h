@@ -69,8 +69,7 @@ namespace dynarithmic
             PdfDocument* GetParent() const { return m_pParentDoc; }
             void SetEncrypted(bool bEncrypted=true) { m_bIsEncrypted = bEncrypted; }
             bool IsEncrypted() const { return m_bIsEncrypted; }
-            int EncryptBlock(const std::string &sIn, std::string& sOut, int objectnum, int gennum) const;
-            int EncryptBlock(char *pIn, int nLength, int objectnum, int gennum) const;
+            int EncryptBlock(std::string_view sIn, std::string& sOut, int objectnum, int gennum) const;
             virtual std::string GetExtraInfo() { return ""; }
             virtual std::string GetExtraInfoEnd() { return ""; }
             virtual std::string GetStreamContents() { return GetContents(); }
@@ -81,8 +80,8 @@ namespace dynarithmic
 
             std::string GetContents() const { return Contents; }
             std::string& GetContentsRef() { return Contents; }
-            void SetContents(const std::string& s) {Contents = s; }
-            void AppendContents(const std::string& s) {Contents += s; }
+            void SetContents(std::string_view s) {Contents = s; }
+            void AppendContents(std::string_view s) {Contents += s; }
             void WriteRaw(const char *pBuffer, size_t nLength)
             {
                 Contents.append(pBuffer, nLength);
@@ -118,7 +117,7 @@ namespace dynarithmic
     {
         public:
             ContentsObject(int objnum) : PDFObject(objnum), m_xscale(0), m_yscale(0) { }
-            void SetImageName(const std::string& sImgName) { m_sImgName = sImgName; }
+            void SetImageName(std::string_view sImgName) { m_sImgName = sImgName; }
             void SetScaling(double x, double y) { m_xscale = x; m_yscale = y; }
             void ComposeObject() override;
             void PreComposeObject();
@@ -206,12 +205,12 @@ namespace dynarithmic
             { }
 
             void ComposeObject() override;
-            void SetProducer(const std::string& s) { m_sProducer = s; }
-            void SetAuthor(const std::string& s) { m_sAuthor = s; }
-            void SetTitle(const std::string& s) { m_sTitle = s; }
-            void SetSubject(const std::string& s) { m_sSubject = s; }
-            void SetKeywords(const std::string& s) { m_sKeywords = s; }
-            void SetCreator(const std::string& s) { m_sCreator = s; }
+            void SetProducer(std::string_view s) { m_sProducer = s; }
+            void SetAuthor(std::string_view s) { m_sAuthor = s; }
+            void SetTitle(std::string_view s) { m_sTitle = s; }
+            void SetSubject(std::string_view s) { m_sSubject = s; }
+            void SetKeywords(std::string_view s) { m_sKeywords = s; }
+            void SetCreator(std::string_view s) { m_sCreator = s; }
 
         private:
             std::string m_sProducer, m_sAuthor, m_sTitle, m_sSubject, m_sKeywords,
@@ -226,9 +225,9 @@ namespace dynarithmic
             void ComposeObject() override;
             void SetRValue(int RValue) { m_RValue = RValue; }
             void SetLength(int nLength) { m_nLength = nLength; }
-            void SetFilter(const std::string& sFilter) { m_sFilter = sFilter; }
-            void SetOwnerPassword(const std::string& oValue) {m_sOwnerValue = oValue; }
-            void SetUserPassword(const std::string& pValue) {m_sUserValue = pValue; }
+            void SetFilter(std::string_view sFilter) { m_sFilter = sFilter; }
+            void SetOwnerPassword(std::string_view oValue) {m_sOwnerValue = oValue; }
+            void SetUserPassword(std::string_view pValue) {m_sUserValue = pValue; }
             void SetVValue(int VValue) { m_nVValue = VValue; }
             void SetPermissions(int nPermissions) { m_nPermissions = nPermissions; }
             void SetAESEncryption(bool bSet) { m_bAESEncrypted = bSet; }
@@ -256,7 +255,7 @@ namespace dynarithmic
         public:
             FontObject(int objnum) : PDFObject(objnum) { }
             void ComposeObject() override;
-            void SetFontName(const std::string& name) { fontname = name; }
+            void SetFontName(std::string_view name) { fontname = name; }
             std::string GetFontName() const { return fontname; }
 
         private:
@@ -272,7 +271,7 @@ namespace dynarithmic
                                      m_orientation(DTWAIN_PDF_PORTRAIT),
                                      m_bThumbnailImage(false)
             { }
-            void SetMediaBox(const std::string& mediabox) { m_smediabox = mediabox;}
+            void SetMediaBox(std::string_view mediabox) { m_smediabox = mediabox;}
             void SetResourceObjectNum(int nNum) { m_resObjNum = nNum; }
             int  GetResourceObjectNum() const { return m_resObjNum; }
             void SetCurrentImageNum(unsigned num) { m_nImageNum = num; }
@@ -330,7 +329,7 @@ namespace dynarithmic
             ~PdfDocument() = default;
 
             // Set the PDF version
-            void SetPDFVersion(const std::string& pdfVer) { m_sPDFVer = pdfVer; }
+            void SetPDFVersion(std::string_view pdfVer) { m_sPDFVer = pdfVer; }
             void SetPDFVersion(int major, int minor);
             std::string GetPDFVersion() const { return m_sPDFVer; }
 
@@ -339,16 +338,16 @@ namespace dynarithmic
     //        void SetMediaBox(const std::string& sMediaBox) { m_curmediabox = sMediaBox; }
 
             // Set the PDF header (binary) data
-            void SetPDFHeader(const std::string& sHeader) { m_sPDFHeader = sHeader; }
+            void SetPDFHeader(std::string_view sHeader) { m_sPDFHeader = sHeader; }
             std::string GetPDFHeader() const { return m_sPDFHeader; }
 
             bool OpenNewPDFFile(CTL_StringType sFile);
             void SetPolarity(int PolarityType) { m_nPolarity = PolarityType; }
             int GetPolarity() const { return m_nPolarity; }
-            bool SetImageFileName(const std::string& sImgName);
+            bool SetImageFileName(std::string_view sImgName);
             bool WritePage(CTL_StringType sFileName);
             void SetMediaBox(int mediatype);
-            void SetMediaBox(const std::string& sMedia) { m_smediabox = sMedia; }
+            void SetMediaBox(std::string_view sMedia) { m_smediabox = sMedia; }
             void SetOrientation( int oType ) { m_Orientation = oType; }
             void SetScaling(double xscale, double yscale) {m_xscale = xscale; m_yscale = yscale;}
             void SetScaleType(int scaletype) { m_scaletype = scaletype; }
@@ -360,15 +359,15 @@ namespace dynarithmic
             void AddDuplicatePage(unsigned long CRCVal, unsigned long nObjNum);
             void SetCompression(bool bSet=true) {m_bCompression = bSet; }
             bool GetCompression() const { return m_bCompression; }
-            void SetProducer(const std::string& s) { m_sProducer = s; }
-            void SetAuthor(const std::string& s) { m_sAuthor = s; }
-            void SetTitle(const std::string& s) { m_sTitle = s; }
-            void SetSubject(const std::string& s) { m_sSubject = s; }
-            void SetKeywords(const std::string& s) { m_sKeywords = s; }
-            void SetCreator(const std::string& s) { m_sCreator = s; }
+            void SetProducer(std::string_view s) { m_sProducer = s; }
+            void SetAuthor(std::string_view s) { m_sAuthor = s; }
+            void SetTitle(std::string_view s) { m_sTitle = s; }
+            void SetSubject(std::string_view s) { m_sSubject = s; }
+            void SetKeywords(std::string_view s) { m_sKeywords = s; }
+            void SetCreator(std::string_view s) { m_sCreator = s; }
 
             // Searchable text added to PDF file
-            void SetSearchableText(const std::string& s);
+            void SetSearchableText(std::string_view s);
             std::string GetSearchableText() const { return m_SearchText; }
             unsigned long GetProcSetObjNum() const { return m_nProcSetObj; }
             void SetProcSetObjNum(unsigned long num) { m_nProcSetObj = num; }
