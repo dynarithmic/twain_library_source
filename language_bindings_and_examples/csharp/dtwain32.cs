@@ -83,13 +83,13 @@ namespace Dynarithmic
             public TW_UINT32 SupportedGroups;                   // Bit field OR combination of DG_ constants
 
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = (int)TWSTR.STR32)]
-            public string Manufacturer = "";                         // Manufacturer name, e.g. "Hewlett-Packard"
+            public string Manufacturer = string.Empty;                         // Manufacturer name, e.g. "Hewlett-Packard"
 
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = (int)TWSTR.STR32)]
-            public string ProductFamily = "";                        // Product family name, e.g. "ScanJet"
+            public string ProductFamily = string.Empty;                        // Product family name, e.g. "ScanJet"
 
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = (int)TWSTR.STR32)]
-            public string ProductName = "";                          // Product name, e.g. "ScanJet Plus"
+            public string ProductName = string.Empty;                          // Product name, e.g. "ScanJet Plus"
         }
 
         public struct POINT
@@ -115,23 +115,23 @@ namespace Dynarithmic
             public int      structSize = 0;
             public System.IntPtr   dlgOwner = System.IntPtr.Zero;
             public System.IntPtr   instance = System.IntPtr.Zero;
-            public string   filter = "";
-            public string   customFilter = "";
+            public string   filter = string.Empty;
+            public string   customFilter = string.Empty;
             public int      maxCustFilter = 0;
             public int      filterIndex = 0;
-            public string   file = "";
+            public string   file = string.Empty;
             public int      maxFile = 0;
-            public string   fileTitle = "";
+            public string   fileTitle = string.Empty;
             public int      maxFileTitle = 0;
-            public string   initialDir = "";
-            public string   title = "";
+            public string   initialDir = string.Empty;
+            public string   title = string.Empty;
             public int      flags = 0;
             public short    fileOffset = 0;
             public short    fileExtension = 0;
-            public string   defExt = "";
+            public string   defExt = string.Empty;
             public System.IntPtr   custData = System.IntPtr.Zero;
             public System.IntPtr   hook = System.IntPtr.Zero;
-            public string templateName = "";
+            public string templateName = string.Empty;
             public System.IntPtr   reservedPtr = System.IntPtr.Zero;
             public int      reservedInt = 0;
             public int      flagsEx = 0;
