@@ -83,13 +83,13 @@ namespace Dynarithmic
             public TW_UINT32 SupportedGroups;                   // Bit field OR combination of DG_ constants
 
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = (int)TWSTR.STR32)]
-            public string Manufacturer;                         // Manufacturer name, e.g. "Hewlett-Packard"
+            public string Manufacturer = "";                         // Manufacturer name, e.g. "Hewlett-Packard"
 
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = (int)TWSTR.STR32)]
-            public string ProductFamily;                        // Product family name, e.g. "ScanJet"
+            public string ProductFamily = "";                        // Product family name, e.g. "ScanJet"
 
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = (int)TWSTR.STR32)]
-            public string ProductName;                          // Product name, e.g. "ScanJet Plus"
+            public string ProductName = "";                          // Product name, e.g. "ScanJet Plus"
         }
 
         public struct POINT
@@ -115,23 +115,23 @@ namespace Dynarithmic
             public int      structSize = 0;
             public System.IntPtr   dlgOwner = System.IntPtr.Zero;
             public System.IntPtr   instance = System.IntPtr.Zero;
-            public string   filter = null;
-            public string   customFilter = null;
+            public string   filter = "";
+            public string   customFilter = "";
             public int      maxCustFilter = 0;
             public int      filterIndex = 0;
-            public string   file = null;
+            public string   file = "";
             public int      maxFile = 0;
-            public string   fileTitle = null;
+            public string   fileTitle = "";
             public int      maxFileTitle = 0;
-            public string   initialDir = null;
-            public string   title = null;
+            public string   initialDir = "";
+            public string   title = "";
             public int      flags = 0;
             public short    fileOffset = 0;
             public short    fileExtension = 0;
-            public string   defExt = null;
+            public string   defExt = "";
             public System.IntPtr   custData = System.IntPtr.Zero;
             public System.IntPtr   hook = System.IntPtr.Zero;
-            public string   templateName = null;
+            public string templateName = "";
             public System.IntPtr   reservedPtr = System.IntPtr.Zero;
             public int      reservedInt = 0;
             public int      flagsEx = 0;
