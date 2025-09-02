@@ -27,6 +27,7 @@
 #include <string>
 #include <sstream>
 #include <numeric>
+#include <string_view>
 
 namespace dynarithmic
 {
