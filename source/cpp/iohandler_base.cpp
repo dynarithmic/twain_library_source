@@ -85,11 +85,8 @@ int CTL_ImageIOHandler::SaveToFile() const
     fw.setHorizontalResolution(m_SaveParams.res.first * multiplier + std::get<2>(m_SaveParams.multiplier_pr));
     fw.setVerticalResolution(m_SaveParams.res.second * multiplier + std::get<3>(m_SaveParams.multiplier_pr));
 
-    char commentStr[256] = {};
-    GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
-
     fipTag fp;
-    fp.setKeyValue(m_SaveParams.commentKey, commentStr);
+    fp.setKeyValue(m_SaveParams.commentKey, CTL_StaticData::GetAppTitle().c_str());
     fw.setMetadata(m_SaveParams.metaDataTag, m_SaveParams.commentKey, fp);
     return fw.save(m_SaveParams.fmt, StringConversion::Convert_NativePtr_To_Ansi(m_SaveParams.szFile).c_str(),
                    m_SaveParams.flags) ? 0 : 1;
