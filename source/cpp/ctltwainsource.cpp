@@ -288,9 +288,7 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_ImageInfoEx.IsCreateDirectory = false;
     m_pExtImageTriplet = std::make_unique<CTL_ExtImageInfoTriplet>(m_pSession, this, 0);
     m_pExtendedImageInformation = std::make_unique<ExtendedImageInformation>(this);
-    char commentStr[256] = {};
-    GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
-    SetPDFValue(PDFPRODUCERKEY, StringConversion::Convert_Ansi_To_Native(commentStr));
+    SetPDFValue(PDFPRODUCERKEY,  StringConversion::Convert_Ansi_To_Native(CTL_StaticData::GetAppTitle()));
 }
 
 void CTL_ITwainSource::Reset() const
