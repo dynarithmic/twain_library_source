@@ -1,5 +1,5 @@
-﻿MD5 hash of "release_libraries_pdb.zip" (16 bytes) = 93527e833a0460f1060e5d74e68584e3
-﻿SHA1 hash of "release_libraries_pdb.zip" (20 bytes) = ae6bf86fa4669e42654567793617843e24fd40aa
-﻿SHA256 hash of "release_libraries_pdb.zip" (32 bytes) = f7aba7cdcdb09c11d69a686e84f0caf5e07720d492c77f3729c5a99bfc7d86a4
-﻿SHA512 hash of "release_libraries_pdb.zip" (64 bytes) = 78c21c7984e7ff6b6fc32906c94fce16b89c8e5b2983f2403625b5bf7cde26c1f974371b06f9b6214d5824ac59ef5c215bc919b55f73aa05bd4e6b5199815d1d
+﻿MD5 hash of "release_libraries_pdb.zip" (16 bytes) = c77a6906f72bab5f638076846d874ffc
+﻿SHA1 hash of "release_libraries_pdb.zip" (20 bytes) = 6dcfb882a75f1fe5e17ee93d98c1010420f7dd72
+﻿SHA256 hash of "release_libraries_pdb.zip" (32 bytes) = 4e83704e4ac202ad04b03592e0a2c67f403207d55cf3d6382994e3178560c81d
+﻿SHA512 hash of "release_libraries_pdb.zip" (64 bytes) = 8f752097e4578e34549383c4b4f16acb73b164e0957e44823cae70d865e4254df9bbb4867f956ddf1df004fe32ef1f143456c7459a8147dcde6c044328e08ca5
 
