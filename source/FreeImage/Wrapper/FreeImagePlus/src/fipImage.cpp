@@ -855,6 +855,7 @@ BOOL fipImage::convertToRGBA16() {
     return FALSE;
 }
 
+#ifdef DTWAIN_RESIZE_ENABLED
 BOOL fipImage::toneMapping(FREE_IMAGE_TMO tmo, double first_param, double second_param, double third_param, double fourth_param) {
     if(_dib) {
         FIBITMAP *dst = nullptr;
@@ -872,7 +873,7 @@ BOOL fipImage::toneMapping(FREE_IMAGE_TMO tmo, double first_param, double second
     }
     return FALSE;
 }
-
+#endif
 ///////////////////////////////////////////////////////////////////
 // Transparency support: background colour and alpha channel
 
@@ -1085,6 +1086,7 @@ BOOL fipImage::getHistogram(DWORD *histo, FREE_IMAGE_COLOR_CHANNEL channel) cons
     return FALSE;
 }
 
+#ifdef DTWAIN_RESIZE_ENABLED
 ///////////////////////////////////////////////////////////////////
 // Upsampling / downsampling routine
 
@@ -1133,6 +1135,7 @@ BOOL fipImage::makeThumbnail(unsigned max_size, BOOL convert) {
     }
     return FALSE;
 }
+#endif
 
 ///////////////////////////////////////////////////////////////////
 // Metadata
