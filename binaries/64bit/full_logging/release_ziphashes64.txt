@@ -1,5 +1,5 @@
-﻿MD5 hash of "release_libraries.zip" (16 bytes) = 372e88f300bcbdea28728e28fc4f7332
-﻿SHA1 hash of "release_libraries.zip" (20 bytes) = eea3814d989055b22c82897aae1fe2a682e730c4
-﻿SHA256 hash of "release_libraries.zip" (32 bytes) = d35d33b660ff846419c0b74013c4f2dc46d5bc552deffb5236d973512930eac7
-﻿SHA512 hash of "release_libraries.zip" (64 bytes) = bf45b963a84dd80a21ab1dc3d6427ee722f08f2b822b7c543180e222f8e6891d50d54bb8f6bd7910c745de05a08170c06c84eeb4b5de9d07b173f3cb54453cdf
+﻿MD5 hash of "release_libraries.zip" (16 bytes) = 1d641b6a8f821529dc3ce365f03fbf54
+﻿SHA1 hash of "release_libraries.zip" (20 bytes) = bb5acb10d04e1f0ddaed81ce3e3558fdfe004e63
+﻿SHA256 hash of "release_libraries.zip" (32 bytes) = 025954da120a7aaa603913e16f48bbf1d8f6db883765bbc13738c5d0abee4d84
+﻿SHA512 hash of "release_libraries.zip" (64 bytes) = b98ab56c74f8bbc31ff72c5ce2d228a029218302bd2534c8bd43e7064b1ac1a82083e8eab93f116cdb1fef5c67b6845e9b082a072513b2498a1feb7c55d3094a
 
