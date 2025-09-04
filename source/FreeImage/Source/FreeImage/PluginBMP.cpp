@@ -130,6 +130,7 @@ SwapFileHeader(BITMAPFILEHEADER *header) {
 
 // --------------------------------------------------------------------------
 
+#ifdef DTWAIN_LOAD_ENABLED
 /**
 Load uncompressed image pixels for 1-, 4-, 8-, 16-, 24- and 32-bit dib
 @param io FreeImage IO
@@ -1135,6 +1136,7 @@ Load(FreeImageIO *io, fi_handle handle, int page, int flags, void *data) {
 
 	return NULL;
 }
+#endif
 
 // ----------------------------------------------------------
 
@@ -1493,21 +1495,22 @@ Save(FreeImageIO *io, FIBITMAP *dib, fi_handle handle, int page, int flags, void
 void DLL_CALLCONV
 InitBMP(Plugin *plugin, int format_id) {
 	s_format_id = format_id;
-
+#ifdef DTWAIN_LOAD_ENABLED
 	plugin->format_proc = Format;
 	plugin->description_proc = Description;
 	plugin->extension_proc = Extension;
 	plugin->regexpr_proc = RegExpr;
+    plugin->load_proc = Load;
+    plugin->validate_proc = Validate;
+    plugin->supports_export_bpp_proc = SupportsExportDepth;
+    plugin->supports_export_type_proc = SupportsExportType;
+    plugin->mime_proc = MimeType;
+    plugin->supports_no_pixels_proc = SupportsNoPixels;
+#endif
 	plugin->open_proc = NULL;
 	plugin->close_proc = NULL;
 	plugin->pagecount_proc = NULL;
 	plugin->pagecapability_proc = NULL;
-	plugin->load_proc = Load;
 	plugin->save_proc = Save;
-	plugin->validate_proc = Validate;
-	plugin->mime_proc = MimeType;
-	plugin->supports_export_bpp_proc = SupportsExportDepth;
-	plugin->supports_export_type_proc = SupportsExportType;
 	plugin->supports_icc_profiles_proc = NULL;	// not implemented yet;
-	plugin->supports_no_pixels_proc = SupportsNoPixels;
 }
