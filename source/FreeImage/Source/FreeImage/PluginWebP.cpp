@@ -170,7 +170,6 @@ SupportsNoPixels() {
 }
 
 // ----------------------------------------------------------
-#ifdef DTWAIN_LOAD_ENABLED
 static void * DLL_CALLCONV
 Open(FreeImageIO *io, fi_handle handle, BOOL read, FIBITMAP* dib, int flags) {
 	WebPMux *mux = NULL;
@@ -202,7 +201,7 @@ Open(FreeImageIO *io, fi_handle handle, BOOL read, FIBITMAP* dib, int flags) {
 	
 	return mux;
 }
-#endif
+
 static void DLL_CALLCONV
 Close(FreeImageIO *io, fi_handle handle, void *data) {
 	WebPMux *mux = (WebPMux*)data;
@@ -686,8 +685,8 @@ InitWEBP(Plugin *plugin, int format_id) {
 	s_format_id = format_id;
 #ifdef DTWAIN_LOAD_ENABLED
     plugin->load_proc = Load;
-    plugin->open_proc = Open;
 #endif
+    plugin->open_proc = Open;
 	plugin->format_proc = Format;
 	plugin->description_proc = Description;
 	plugin->extension_proc = Extension;
