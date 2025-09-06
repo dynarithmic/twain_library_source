@@ -19,8 +19,10 @@
 // Use at your own risk!
 // ==========================================================
 
+#ifdef DTWAIN_RESIZE_ENABLED
 #include "FreeImage.h"
 #include "Utilities.h"
+
 
 /**
 Performs a tone mapping on a 48-bit RGB or a 96-bit RGBF image and returns a 24-bit image. 
@@ -71,5 +73,5 @@ FreeImage_ToneMapping(FIBITMAP *dib, FREE_IMAGE_TMO tmo, double first_param, dou
 
 	return NULL;
 }
-
+#endif
 

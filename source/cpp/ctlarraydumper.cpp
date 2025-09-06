@@ -136,20 +136,28 @@ static void DumpArrayNativeString(DTWAIN_ARRAY Array)
 #endif
 }
 
+template <typename StringWrapperType, typename WriterFn>
+static void GenericDumpArrayString(DTWAIN_ARRAY Array, WriterFn fn)
+{
+    using string_type = StringWrapperType::traits_type::string_type;
+    static constexpr auto newLine = StringWrapperType::traits_type::GetNewLineString();
+    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+    const auto& vData = 
+        pHandle->m_ArrayFactory->underlying_container_t<string_type>(Array);
+    string_type allValues = StringWrapperType::Join(vData.begin(), vData.end(), newLine);
+    fn(allValues, newLine);
+}
+
 static void DumpArrayWideString(DTWAIN_ARRAY Array)
 {
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    const auto& vData = pHandle->m_ArrayFactory->underlying_container_t<std::wstring>(Array);
-    std::wstring allValues = StringWrapperW::Join(vData.begin(), vData.end(), L"\n");
-    LogWriterUtils::WriteMultiLineInfoIndentedW(allValues, L"\n");
+    GenericDumpArrayString<StringWrapperW, decltype(LogWriterUtils::WriteMultiLineInfoIndentedW)>
+        (Array, &LogWriterUtils::WriteMultiLineInfoIndentedW);
 }
 
 static void DumpArrayAnsiString(DTWAIN_ARRAY Array)
 {
-    const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-    const auto& vData = pHandle->m_ArrayFactory->underlying_container_t<std::string>(Array);
-    std::string allValues = StringWrapperA::Join(vData.begin(), vData.end(), "\n");
-    LogWriterUtils::WriteMultiLineInfoIndentedA(allValues, "\n");
+    GenericDumpArrayString<StringWrapperA, decltype(LogWriterUtils::WriteMultiLineInfoIndentedA)>
+        (Array, &LogWriterUtils::WriteMultiLineInfoIndentedA);
 }
 
 static void DumpArrayFrame(DTWAIN_ARRAY Array)

@@ -19,6 +19,7 @@
 // Use at your own risk!
 // ==========================================================
 
+#ifdef DTWAIN_RESIZE_ENABLED
 #include "FreeImage.h"
 #include "Utilities.h"
 #include "ToneMapping.h"
@@ -687,3 +688,4 @@ FreeImage_TmoFattal02(FIBITMAP *dib, double color_saturation, double attenuation
 		return NULL;
 	}
 }
+#endif

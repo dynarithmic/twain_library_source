@@ -868,6 +868,12 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
                     pHandle->m_TwainDSMSearchOrder = -1;
                 }
                 pHandle->SetVersionString(GetVersionString());
+
+                // Get the application title, now that all the resources have been loaded
+                auto& appTitle = CTL_StaticData::GetAppTitle();
+                appTitle.resize(256, '\0');
+                auto nSize = GetResourceStringA(IDS_DTWAIN_APPTITLE, &appTitle[0], 255);
+                appTitle.resize(nSize);
             }
             LOG_FUNC_ENTRY_PARAMS(())
             LOG_FUNC_EXIT_NONAME_PARAMS(static_cast<DTWAIN_HANDLE>(pHandle))

@@ -24,6 +24,8 @@ DTWAIN Version changes
 - Fixed possible issue with creating valid PDF files that contain PDF streams with embedded left 
   or right parentheses characters.  
 
+- Ensure C# language binding compile without warnings for C# version 8.0 and above.
+
 - Added DTWAIN_ARRAY functions:
 
      DTWAIN_ArrayFloatToANSIString 

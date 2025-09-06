@@ -87,9 +87,9 @@ using namespace dynarithmic;
 #define EXTRA_OBJECTS   3
 
 static std::string GetPDFDate();
-static std::string CreateIDString(const std::string& sName, std::string& ID1, std::string& ID2);
+static std::string CreateIDString(std::string_view sName, std::string& ID1, std::string& ID2);
 static std::string HexString(unsigned char *input, int length=-1);
-static std::string MakeCompatiblePDFString(const std::string& sString);
+static std::string MakeCompatiblePDFString(std::string_view sString);
 std::string GetSystemTimeInMilliseconds();
 static bool IsRenderModeStroked(int rendermode);
 
@@ -190,13 +190,13 @@ std::string HexString(unsigned char *input, int length/*=-1*/)
     return sOut;
 }
 
-std::string CreateIDString(const std::string& sName, std::string& ID1, std::string& ID2)
+std::string CreateIDString(std::string_view sName, std::string& ID1, std::string& ID2)
 {
     char szBuf[1024];
     char szBuf2[] = "001";
     const std::string sNow = GetPDFDate();
     WRITE_TO_LOG()
-    sprintf(szBuf, "%s-%s", sNow.c_str(), sName.c_str());
+    sprintf(szBuf, "%s-%s", sNow.c_str(), sName.data());
     WRITE_TO_LOG()
     std::vector<unsigned char> hash = 
         dynarithmic::MD5Hasher().GetHash(reinterpret_cast<unsigned char*>(szBuf), strlen(szBuf));
@@ -243,7 +243,7 @@ std::string MakeCompatiblePDFString(const PDFEncryption::UCHARArray& u)
     return MakeCompatiblePDFString(sTemp);
 }
 
-std::string MakeCompatiblePDFString(const std::string& sString)
+std::string MakeCompatiblePDFString(std::string_view sString)
 {
     // Search for forward slash and replace with two forward slashes
     std::string sNew;
@@ -267,8 +267,8 @@ std::string MakeCompatiblePDFString(const std::string& sString)
 
     if (nForward + sum > 0)
     {
-        std::string::const_iterator it1 = sString.begin();
-        const std::string::const_iterator it2 = sString.end();
+        auto it1 = sString.begin();
+        auto it2 = sString.end();
 
         while (it1 != it2)
         {
@@ -389,7 +389,7 @@ static std::string GetPDFDate()
 };
 
 
-int PDFObject::EncryptBlock(const std::string& sIn, std::string& sOut, int objectnum, int gennum) const
+int PDFObject::EncryptBlock(std::string_view sIn, std::string& sOut, int objectnum, int gennum) const
 {
     PdfDocument *pParent = GetParent();
     if ( !pParent )
@@ -528,7 +528,7 @@ bool PdfDocument::OpenNewPDFFile(CTL_StringType sFile)
     return true;
 }
 
-void PdfDocument::SetSearchableText(const std::string& /*s*/)
+void PdfDocument::SetSearchableText(std::string_view /*s*/)
 {
 /*    m_SearchText = s;
     // Add a text element
