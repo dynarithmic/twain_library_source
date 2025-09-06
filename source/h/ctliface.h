@@ -589,6 +589,7 @@ namespace dynarithmic
         CTL_PairToStringMap      s_ResourceCache;
         CTL_FileSaveMap          s_FileSaveMap;
         CTL_CompressionMap       s_CompressionMap;
+        std::string              s_AppTitle;
         CTL_StaticDataStruct();
     };
 
@@ -676,6 +677,7 @@ namespace dynarithmic
         static CTL_CallbackProcArray& GetCallbacks() { return s_StaticData.s_aAllCallbacks; }
         static auto& GetAppWindowsToDisable() { return s_StaticData.s_appWindowsToDisable; }
         static constexpr std::string_view GetINIKey(int nWhich) { return s_StaticData.s_aINIKeys[nWhich].second; }
+        static std::string& GetAppTitle() { return s_StaticData.s_AppTitle; }
     };
 
     struct CTL_LoggerCallbackInfo

@@ -146,7 +146,7 @@
 #define IDS_TWCC_BADDEST           9512 /* Unknown destination Application/Source in DSM_Entry */
 #define IDS_TWCC_CAPUNSUPPORTED    9513 /* Capability not supported by source            */
 #define IDS_TWCC_CAPBADOPERATION   9514 /* Operation not supported by capability         */
-#define IDS_TWCC_CAPSEQERROR       9515 /* Capability has dependancy on other capability */
+#define IDS_TWCC_CAPSEQERROR       9515 /* Capability has dependency on other capability */
 #define IDS_TWCC_DENIED            9516 /* File System operation is denied (file is protected) */
 #define IDS_TWCC_FILEEXISTS        9517 /* Operation failed because file already exists. */
 #define IDS_TWCC_FILENOTFOUND      9518 /* File not found */
@@ -155,6 +155,12 @@
 #define IDS_TWCC_PAPERDOUBLEFEED   9521  /* The feeder detected multiple pages */
 #define IDS_TWCC_FILEWRITEERROR    9522  /* Error writing the file (meant for things like disk full conditions) */
 #define IDS_TWCC_CHECKDEVICEONLINE 9523  /* The device went offline prior to or during this operation */
+#define IDS_TWCC_INTERLOCK         9524  /* The cover or door is opened */
+#define IDS_TWCC_DAMAGEDCORNER     9525  /* Operation failed because the document has a damaged */
+#define IDS_TWCC_FOCUSERROR        9526  /* Operation failed because of a focusing error during document capture */
+#define IDS_TWCC_DOCTOOLIGHT       9527  /* Operation failed because the document is too light.*/ 
+#define IDS_TWCC_DOCTOODARK        9528  /* Operation failed because the document is too dark.*/
+#define IDS_TWCC_NOMEDIA           9529  /* Source has nothing to capture for a transfer */ 
 
 #define IDS_TWRC_ERRORSTART       9600
 #define IDS_TWRC_SUCCESS          9600

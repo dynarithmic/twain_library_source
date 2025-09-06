@@ -557,7 +557,7 @@ _assignPixel<32>(BYTE* bits, BYTE* val, BOOL as24bit) {
 #endif
 	}
 }
-
+#ifdef DTWAIN_LOAD_ENABLED
 /**
 Generic RLE loader
 */
@@ -1073,7 +1073,7 @@ Load(FreeImageIO *io, fi_handle handle, int page, int flags, void *data) {
 		return NULL;
 	}
 }
-
+#endif
 // --------------------------------------------------------------------------
 
 static BOOL 
@@ -1591,7 +1591,9 @@ Save(FreeImageIO *io, FIBITMAP *dib, fi_handle handle, int page, int flags, void
 void DLL_CALLCONV
 InitTARGA(Plugin *plugin, int format_id) {
 	s_format_id = format_id;
-
+#ifdef DTWAIN_LOAD_ENABLED
+    plugin->load_proc = Load;
+#endif
 	plugin->format_proc = Format;
 	plugin->description_proc = Description;
 	plugin->extension_proc = Extension;
@@ -1600,7 +1602,6 @@ InitTARGA(Plugin *plugin, int format_id) {
 	plugin->close_proc = NULL;
 	plugin->pagecount_proc = NULL;
 	plugin->pagecapability_proc = NULL;
-	plugin->load_proc = Load;
 	plugin->save_proc = Save;
 	plugin->validate_proc = Validate;
 	plugin->mime_proc = MimeType;

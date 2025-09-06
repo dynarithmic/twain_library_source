@@ -130,6 +130,7 @@ SwapFileHeader(BITMAPFILEHEADER *header) {
 
 // --------------------------------------------------------------------------
 
+#ifdef DTWAIN_LOAD_ENABLED
 /**
 Load uncompressed image pixels for 1-, 4-, 8-, 16-, 24- and 32-bit dib
 @param io FreeImage IO
@@ -1011,11 +1012,6 @@ LoadOS21XBMP(FreeImageIO *io, fi_handle handle, int flags, unsigned bitmap_bits_
 // ==========================================================
 
 static const char * DLL_CALLCONV
-Format() {
-	return "BMP";
-}
-
-static const char * DLL_CALLCONV
 Description() {
 	return "Windows or OS/2 Bitmap";
 }
@@ -1135,8 +1131,13 @@ Load(FreeImageIO *io, fi_handle handle, int page, int flags, void *data) {
 
 	return NULL;
 }
+#endif
 
 // ----------------------------------------------------------
+static const char* DLL_CALLCONV
+Format() {
+    return "BMP";
+}
 
 /**
 Encode a 8-bit source buffer into a 8-bit target buffer using a RLE compression algorithm. 
@@ -1493,21 +1494,22 @@ Save(FreeImageIO *io, FIBITMAP *dib, fi_handle handle, int page, int flags, void
 void DLL_CALLCONV
 InitBMP(Plugin *plugin, int format_id) {
 	s_format_id = format_id;
-
-	plugin->format_proc = Format;
+#ifdef DTWAIN_LOAD_ENABLED
 	plugin->description_proc = Description;
 	plugin->extension_proc = Extension;
 	plugin->regexpr_proc = RegExpr;
+    plugin->load_proc = Load;
+    plugin->validate_proc = Validate;
+    plugin->supports_export_bpp_proc = SupportsExportDepth;
+    plugin->supports_export_type_proc = SupportsExportType;
+    plugin->mime_proc = MimeType;
+    plugin->supports_no_pixels_proc = SupportsNoPixels;
+#endif
+    plugin->format_proc = Format;
 	plugin->open_proc = NULL;
 	plugin->close_proc = NULL;
 	plugin->pagecount_proc = NULL;
 	plugin->pagecapability_proc = NULL;
-	plugin->load_proc = Load;
 	plugin->save_proc = Save;
-	plugin->validate_proc = Validate;
-	plugin->mime_proc = MimeType;
-	plugin->supports_export_bpp_proc = SupportsExportDepth;
-	plugin->supports_export_type_proc = SupportsExportType;
 	plugin->supports_icc_profiles_proc = NULL;	// not implemented yet;
-	plugin->supports_no_pixels_proc = SupportsNoPixels;
 }
