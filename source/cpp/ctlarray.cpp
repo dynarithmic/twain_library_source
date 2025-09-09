@@ -2635,6 +2635,171 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayConvertFix32ToFloat(DTWAIN_ARRAY Fix32Arra
     CATCH_BLOCK(DTWAIN_ARRAY(0))
 }
 
+template <typename WrapperType>
+DTWAIN_ARRAY GenericArrayFloatToString(const CTL_TwainDLLHandle* pHandle,  
+                                       DTWAIN_ARRAY FloatArray, 
+                                       CTL_ArrayType arrayType, 
+                                       LONG& retVal)
+{
+    const auto& factory = pHandle->m_ArrayFactory;
+    const auto FloatArrayV = FloatArray;
+
+    // Check if array exists
+    const bool bIsValid = factory->is_valid(FloatArrayV);
+    if (!bIsValid)
+    {
+        retVal = DTWAIN_ERR_WRONG_ARRAY_TYPE;
+        return nullptr;
+    }
+
+    const auto bIsFloat = factory->tag_type(FloatArrayV) == CTL_ArrayFactory::arrayTag::DoubleType;
+    if (!bIsFloat)
+    {
+        retVal = DTWAIN_ERR_WRONG_ARRAY_TYPE;
+        return nullptr;
+    }
+
+    int nStatus;
+    // get count
+    const size_t Count = factory->size(FloatArrayV);
+
+    // create a new array
+    auto aString = factory->create_array(arrayType, &nStatus, Count);
+
+    // get the underlying vectors
+    auto vIn = static_cast<double*>(factory->get_buffer(FloatArrayV, 0));
+    auto vOut = static_cast<typename WrapperType::traits_type::string_type*>(factory->get_buffer(aString, 0));
+
+    // call ToString to convert float to double
+    std::transform(vIn, vIn + Count, vOut, [&](double d)
+        {
+            typename WrapperType::traits_type::char_type Value[256] = {};
+            typename WrapperType::traits_type::string_type sValue;
+            WrapperType::SafeStrcpy(Value, WrapperType::TrimDouble(d).c_str(), 255);
+            sValue = Value;
+            return sValue;
+        });
+    retVal = DTWAIN_NO_ERROR;
+    return aString;
+}
+
+template <typename WrapperType>
+DTWAIN_ARRAY GenericArrayStringToFloat(const CTL_TwainDLLHandle* pHandle,  
+                                       DTWAIN_ARRAY StringArray,        
+                                       int arrayTagType, 
+                                       LONG& retVal)
+{
+    const auto& factory = pHandle->m_ArrayFactory;
+
+    // Check if array exists
+    const bool bIsValid = factory->is_valid(StringArray);
+    if (!bIsValid)
+    {
+        retVal = DTWAIN_ERR_WRONG_ARRAY_TYPE;
+        return nullptr;
+    }
+
+    const auto bIsStringArray = factory->tag_type(StringArray) == arrayTagType;
+    if (!bIsStringArray)
+    {
+        retVal = DTWAIN_ERR_WRONG_ARRAY_TYPE;
+        return nullptr;
+    }
+
+    int nStatus;
+    // get count
+    const size_t Count = factory->size(StringArray);
+
+    // create a new array
+    auto aDouble = factory->create_array(CTL_ArrayDoubleType, &nStatus, Count);
+
+    // get the underlying vectors
+    auto vIn = static_cast<typename WrapperType::traits_type::string_type*>(factory->get_buffer(StringArray, 0));
+    auto vOut = static_cast<double*>(factory->get_buffer(aDouble, 0));
+
+    // convert string to double
+    std::transform(vIn, vIn + Count, vOut, [&](const auto& str)
+        {
+            return WrapperType::ToDouble(str);
+        });
+    retVal = DTWAIN_NO_ERROR;
+    return aDouble;
+}
+
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayFloatToANSIString(DTWAIN_ARRAY FloatArray)
+{
+    LOG_FUNC_ENTRY_PARAMS((FloatArray))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    LONG retVal = 0;
+    auto newArray = GenericArrayFloatToString<StringWrapperA>(pHandle, FloatArray, CTL_ArrayANSIStringType, retVal);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return retVal != DTWAIN_NO_ERROR; }, DTWAIN_ERR_WRONG_ARRAY_TYPE, nullptr, FUNC_MACRO);
+    LOG_FUNC_EXIT_NONAME_PARAMS(newArray)
+    CATCH_BLOCK(DTWAIN_ARRAY(0))
+}
+
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayFloatToWideString(DTWAIN_ARRAY FloatArray)
+{
+    LOG_FUNC_ENTRY_PARAMS((FloatArray))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    LONG retVal = 0;
+    auto newArray = GenericArrayFloatToString<StringWrapperW>(pHandle, FloatArray, CTL_ArrayWideStringType, retVal);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return retVal != DTWAIN_NO_ERROR; }, DTWAIN_ERR_WRONG_ARRAY_TYPE, nullptr, FUNC_MACRO);
+    LOG_FUNC_EXIT_NONAME_PARAMS(newArray)
+    CATCH_BLOCK(DTWAIN_ARRAY(0))
+}
+
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayFloatToString(DTWAIN_ARRAY FloatArray)
+{
+    LOG_FUNC_ENTRY_PARAMS((FloatArray))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    LONG retVal = 0;
+    #ifdef _UNICODE
+    auto newArray = GenericArrayFloatToString<StringWrapperW>(pHandle, FloatArray, CTL_ArrayWideStringType, retVal);
+    #else
+    auto newArray = GenericArrayFloatToString<StringWrapperA>(pHandle, FloatArray, CTL_ArrayANSIStringType, retVal);
+    #endif
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return retVal != DTWAIN_NO_ERROR; }, DTWAIN_ERR_WRONG_ARRAY_TYPE, nullptr, FUNC_MACRO);
+    LOG_FUNC_EXIT_NONAME_PARAMS(newArray)
+    CATCH_BLOCK(DTWAIN_ARRAY(0))
+}
+
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayANSIStringToFloat(DTWAIN_ARRAY StringArray)
+{
+    LOG_FUNC_ENTRY_PARAMS((StringArray))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    LONG retVal = 0;
+    auto newArray = GenericArrayStringToFloat<StringWrapperA>(pHandle, StringArray, CTL_ArrayFactory::arrayTag::StringType, retVal);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return retVal != DTWAIN_NO_ERROR; }, DTWAIN_ERR_WRONG_ARRAY_TYPE, nullptr, FUNC_MACRO);
+    LOG_FUNC_EXIT_NONAME_PARAMS(newArray)
+    CATCH_BLOCK(DTWAIN_ARRAY(0))
+}
+
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayWideStringToFloat(DTWAIN_ARRAY StringArray)
+{
+    LOG_FUNC_ENTRY_PARAMS((StringArray))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    LONG retVal = 0;
+    auto newArray = GenericArrayStringToFloat<StringWrapperW>(pHandle, StringArray, CTL_ArrayFactory::arrayTag::WStringType, retVal);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return retVal != DTWAIN_NO_ERROR; }, DTWAIN_ERR_WRONG_ARRAY_TYPE, nullptr, FUNC_MACRO);
+    LOG_FUNC_EXIT_NONAME_PARAMS(newArray)
+    CATCH_BLOCK(DTWAIN_ARRAY(0))
+}
+
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_ArrayStringToFloat(DTWAIN_ARRAY StringArray)
+{
+    LOG_FUNC_ENTRY_PARAMS((StringArray))
+    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    LONG retVal = 0;
+    #ifdef _UNICODE
+    auto newArray = GenericArrayStringToFloat<StringWrapperW>(pHandle, StringArray, CTL_ArrayFactory::arrayTag::WStringType, retVal);
+    #else
+    auto newArray = GenericArrayStringToFloat<StringWrapperA>(pHandle, StringArray, CTL_ArrayFactory::arrayTag::StringType, retVal);
+    #endif
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return retVal != DTWAIN_NO_ERROR; }, DTWAIN_ERR_WRONG_ARRAY_TYPE, nullptr, FUNC_MACRO);
+    LOG_FUNC_EXIT_NONAME_PARAMS(newArray)
+    CATCH_BLOCK(DTWAIN_ARRAY(0))
+}
+
 bool dynarithmic::DTWAINFRAMEToTWFRAME(DTWAIN_FRAME pDdtwil, pTW_FRAME pTwain)
 {
     double Val[4];

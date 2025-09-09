@@ -43,6 +43,7 @@
 #include "dtwainpdf.h"
 #include "crc32_aux.h"
 #include "jpeglib.h"
+#include "ctlhashutils.h"
 #undef Z_PREFIX
 #include "zlib.h"
 #ifdef __MSL__
@@ -55,7 +56,6 @@
 #pragma  warning (disable : 4702)
 #pragma  warning (disable : 4996)
 #endif
-#include <md5c.h>
 #include "a85encode.h"
 #include "ahexencode.h"
 #include "flateencode.h"
@@ -69,7 +69,6 @@
 #pragma warning (pop)
 #endif
 #include <cmath>
-#include <MD5Checksum.h>
 #define D_TO_R_SCALEFACTOR (3.14159265358979323846 / 180.0)
 #define DegreesToRadians(x) ((x) * D_TO_R_SCALEFACTOR)
 
@@ -87,11 +86,10 @@ using namespace dynarithmic;
 
 #define EXTRA_OBJECTS   3
 
-std::vector<unsigned char> MD5Hash (unsigned char *input);
 static std::string GetPDFDate();
-static std::string CreateIDString(const std::string& sName, std::string& ID1, std::string& ID2);
+static std::string CreateIDString(std::string_view sName, std::string& ID1, std::string& ID2);
 static std::string HexString(unsigned char *input, int length=-1);
-static std::string MakeCompatiblePDFString(const std::string& sString);
+static std::string MakeCompatiblePDFString(std::string_view sString);
 std::string GetSystemTimeInMilliseconds();
 static bool IsRenderModeStroked(int rendermode);
 
@@ -181,20 +179,6 @@ toff_t ImageObject::libtiffSizeProc (thandle_t /*fd*/)
     return 0;
 }
 
-// Helper functions
-// This is the MD5 function
-std::vector<unsigned char> MD5Hash (unsigned char *input)
-{
-  MD5_CTX context;
-  std::vector<unsigned char> digest(16);
-
-  MD5Init (&context);
-  MD5Update (&context, input, static_cast<unsigned>(strlen(reinterpret_cast<const char*>(input))));
-  MD5Final (digest.data(), &context);
-
-  return digest;
-}
-
 std::string HexString(unsigned char *input, int length/*=-1*/)
 {
     std::string sOut;
@@ -206,18 +190,20 @@ std::string HexString(unsigned char *input, int length/*=-1*/)
     return sOut;
 }
 
-std::string CreateIDString(const std::string& sName, std::string& ID1, std::string& ID2)
+std::string CreateIDString(std::string_view sName, std::string& ID1, std::string& ID2)
 {
     char szBuf[1024];
     char szBuf2[] = "001";
     const std::string sNow = GetPDFDate();
     WRITE_TO_LOG()
-    sprintf(szBuf, "%s-%s", sNow.c_str(), sName.c_str());
+    sprintf(szBuf, "%s-%s", sNow.c_str(), sName.data());
     WRITE_TO_LOG()
-    std::vector<unsigned char> hash = MD5Hash(reinterpret_cast<unsigned char*>(szBuf));
+    std::vector<unsigned char> hash = 
+        dynarithmic::MD5Hasher().GetHash(reinterpret_cast<unsigned char*>(szBuf), strlen(szBuf));
     hash.resize(32,'\0');
     WRITE_TO_LOG()
-    std::vector<unsigned char> version = MD5Hash(reinterpret_cast<unsigned char*>(szBuf2));
+    std::vector<unsigned char> version = 
+        dynarithmic::MD5Hasher().GetHash(reinterpret_cast<unsigned char*>(szBuf2), strlen(szBuf2));
     version.resize(32,'\0');
     WRITE_TO_LOG()
     std::string hexHash;
@@ -257,50 +243,50 @@ std::string MakeCompatiblePDFString(const PDFEncryption::UCHARArray& u)
     return MakeCompatiblePDFString(sTemp);
 }
 
-std::string MakeCompatiblePDFString(const std::string& sString)
+std::string MakeCompatiblePDFString(std::string_view sString)
 {
     // Search for forward slash and replace with two forward slashes
     std::string sNew;
     sNew.reserve(100);
-    std::string::difference_type nEscapes[5] = {0};
-    unsigned char nChars[] = { 0x09, 0x0d, 0x0a, 0x0c, 0x08 };
 
-    PDFEncryption::UCHARArray nEscapeChar(5);
-    std::copy_n(nChars, 5, nEscapeChar.begin());
+    unsigned char nChars[] = { 0x09, 0x0d, 0x0a, 0x0c, 0x08, 0x28, 0x29 };
+    const char* nEscapeString[] = { "\\t", "\\r", "\\n", "\\f", "\\b", "(", ")" };
 
-    const char *nEscapeString[] = { "\\t", "\\r", "\\n", "\\f", "\\b" };
+    std::string::difference_type nEscapes[sizeof(nChars)] = {0};
+    std::vector<unsigned char> nEscapeChar(sizeof(nChars));
+    std::copy_n(nChars, sizeof(nChars), nEscapeChar.begin());
 
     const std::string::difference_type nForward = std::count(sString.begin(), sString.end(), '\\');
     std::string::difference_type sum = 0;
 
-    for ( int i = 0; i < 5; ++i )
+    for (int i = 0; i < sizeof(nChars); ++i)
     {
         nEscapes[i] = std::count(sString.begin(), sString.end(), nEscapeChar[i]);
         sum += nEscapes[i];
     }
 
-    if ( nForward + sum > 0 )
+    if (nForward + sum > 0)
     {
-        std::string::const_iterator it1 = sString.begin();
-        const std::string::const_iterator it2 = sString.end();
+        auto it1 = sString.begin();
+        auto it2 = sString.end();
 
-        while (it1 != it2 )
+        while (it1 != it2)
         {
             bool addit = true;
-            if ( *it1 == '\\' )
+            if (*it1 == '\\')
                 sNew += '\\';
             else
             {
                 auto found = std::find(nEscapeChar.begin(), nEscapeChar.end(), *it1);
 
-                if ( found != nEscapeChar.end() )
+                if (found != nEscapeChar.end())
                 {
                     const int dist = static_cast<int>(std::distance(nEscapeChar.begin(), found));
                     sNew += nEscapeString[dist];
                     addit = false;
                 }
             }
-            if ( addit )
+            if (addit)
                 sNew += *it1;
             ++it1;
         }
@@ -308,17 +294,11 @@ std::string MakeCompatiblePDFString(const std::string& sString)
     else
         sNew = sString;
 
-    // balances parentheses
-    const int nLeft = static_cast<int>(std::count(sNew.begin(), sNew.end(), '('));
-    const int nRight = static_cast<int>(std::count(sNew.begin(), sNew.end(), ')'));
-    if ( nLeft == nRight )
-        return sNew;
-
     // prepend all parens with / characters
     std::string sNew2;
     std::string::const_iterator it3 = sNew.begin();
     const std::string::const_iterator it4 = sNew.end();
-    while (it3 != it4 )
+    while (it3 != it4)
     {
         if (*it3 == '(' || *it3 == ')')
             sNew2 += "\\";
@@ -409,7 +389,7 @@ static std::string GetPDFDate()
 };
 
 
-int PDFObject::EncryptBlock(const std::string& sIn, std::string& sOut, int objectnum, int gennum) const
+int PDFObject::EncryptBlock(std::string_view sIn, std::string& sOut, int objectnum, int gennum) const
 {
     PdfDocument *pParent = GetParent();
     if ( !pParent )
@@ -423,7 +403,19 @@ int PDFObject::EncryptBlock(const std::string& sIn, std::string& sOut, int objec
     PDFEncryption& enc = pParent->GetEncryptionEngine();
     // now get the hash key from the object and generation numbers;
     enc.SetHashKey(objectnum, gennum);
-    enc.PrepareKey();
+
+    PDFEncryptionAES* pAES = dynamic_cast<PDFEncryptionAES*>(&enc);
+    if (pAES)
+    {
+        // If this is AES, then we need to encrypt using either 
+        // AES-128 CBC or AES-256 CBC, depending on the key size
+        if (pAES->GetKeyLength() == 32)  // AES-256
+            pAES->PrepareKey(pAES->GetEncryptionKey().data(), 32);
+        else
+            pAES->PrepareKey(); // AES-128
+    }
+    else
+        enc.PrepareKey();
     enc.Encrypt(sIn, sOut);
     return ENCRYPTION_OK;
 }
@@ -462,6 +454,7 @@ PdfDocument::PdfDocument() :
     m_nPermissions(0),
     m_bIsStrongEncryption(false),
     m_bIsAESEncrypted(false),
+    m_bIsAES256Encrypted(false),
     m_bIsEncrypted(false),
     m_bASCIICompression(false),
     m_bIsNoCompression(false),
@@ -535,7 +528,7 @@ bool PdfDocument::OpenNewPDFFile(CTL_StringType sFile)
     return true;
 }
 
-void PdfDocument::SetSearchableText(const std::string& /*s*/)
+void PdfDocument::SetSearchableText(std::string_view /*s*/)
 {
 /*    m_SearchText = s;
     // Add a text element
@@ -989,7 +982,7 @@ bool PdfDocument::EndPDFCreation()
     {
         // Write the encryption object
         EncryptionObject EObject(m_nCurObjNum);
-        EObject.SetAESEncryption(m_bIsAESEncrypted);
+        EObject.SetAESEncryption(m_bIsAESEncrypted || m_bIsAES256Encrypted);
         EObject.AssignParent(this);
         EObject.SetFilter("Standard");
         EObject.SetLength(m_nKeyLength * 8);
@@ -1004,7 +997,8 @@ bool PdfDocument::EndPDFCreation()
             }
             else
             {
-                EObject.SetRValue(5);
+                // AES-256
+                EObject.SetRValue(6);
                 EObject.SetVValue(5);
             }
         }
@@ -1171,17 +1165,43 @@ void EncryptionObject::ComposeObject()
         std::string enc1;
         std::string enc2;
         auto& engine = GetParent()->GetEncryptionEngine();
-        const PDFEncryption::UCHARArray enc1Array = engine.GetOwnerKey();
-        const PDFEncryption::UCHARArray enc2Array = engine.GetUserKey();
-        enc1.append(reinterpret_cast<const char*>(enc1Array.data()), 32);
-        enc2.append(reinterpret_cast<const char*>(enc2Array.data()), 32);
+        PDFEncryption::UCHARArray enc1Array = engine.GetOwnerKey();
+        PDFEncryption::UCHARArray enc2Array = engine.GetUserKey();
+        enc1.append(reinterpret_cast<const char*>(enc1Array.data()), enc1Array.size());
+        enc2.append(reinterpret_cast<const char*>(enc2Array.data()), enc2Array.size());
         AppendContents("/O (");
         enc1 = MakeCompatiblePDFString(enc1);
         WriteRaw(enc1.data(), enc1.length());
         AppendContents(")\n/U (");
         enc2 = MakeCompatiblePDFString(enc2);
         WriteRaw(enc2.data(), enc2.length());
-        sprintf(szBuf, ")\n/P %d\n/V %d\n", engine.GetPermissions(), m_nVValue);
+        AppendContents(")\n");
+
+        // If there are OE and UE entries, write them now
+        enc1Array = engine.GetOwnerKeyE();
+        enc2Array = engine.GetUserKeyE();
+        if (!enc1Array.empty() && !enc2Array.empty() )
+        {
+            AppendContents("/OE (");
+            enc1 = MakeCompatiblePDFString(enc1Array);
+            WriteRaw(enc1.data(), enc1.length());
+            AppendContents(")\n/UE (");
+            enc2 = MakeCompatiblePDFString(enc2Array);
+            WriteRaw(enc2.data(), enc2.length());
+            AppendContents(")\n");
+        }
+
+        // If there is a Perms entry, write it now
+        enc1Array = engine.GetPermsKey();
+        if (!enc1Array.empty())
+        {
+            AppendContents("/Perms (");
+            enc1 = MakeCompatiblePDFString(enc1Array);
+            WriteRaw(enc1.data(), enc1.length());
+            AppendContents(")\n");
+        }
+
+        sprintf(szBuf, "/P %d\n/V %d\n", engine.GetPermissions(), m_nVValue);
         AppendContents(szBuf);
         if (m_RValue == 3)
             sprintf(szBuf, "/R %d\n/Length %d\n", m_RValue, m_nLength);
@@ -1210,8 +1230,8 @@ void EncryptionObject::ComposeObject()
         auto& engine = GetParent()->GetEncryptionEngine();
         const PDFEncryption::UCHARArray enc1Array = engine.GetOwnerKey();
         const PDFEncryption::UCHARArray enc2Array = engine.GetUserKey();
-        enc1.append(reinterpret_cast<const char *>(enc1Array.data()), 32);
-        enc2.append(reinterpret_cast<const char *>(enc2Array.data()), 32);
+        enc1.append(reinterpret_cast<const char *>(enc1Array.data()), enc1Array.size());
+        enc2.append(reinterpret_cast<const char *>(enc2Array.data()), enc1Array.size());
         AppendContents("/O (");
         enc1 = MakeCompatiblePDFString(enc1);
         WriteRaw(enc1.data(), enc1.length());
@@ -2371,17 +2391,17 @@ void PdfDocument::AddDuplicatePage(unsigned long CRCVal, unsigned long ObjNum)
     m_allPageCRC[CRCVal] = ObjNum;
 }
 
-void PdfDocument::SetEncryption(const CTL_StringType& ownerPassword,
-                                const CTL_StringType& userPassword,
+void PdfDocument::SetEncryption(CTL_StringViewType ownerPassword,
+                                CTL_StringViewType userPassword,
                                 unsigned int permissions,
                                 bool bIsStrongEncryption,
                                 bool isAESEncrypted,
                                 uint32_t nKeyLength)
 {
-    m_EncryptionPassword[OWNER_PASSWORD] = StringConversion::Convert_Native_To_Ansi(ownerPassword);
-    m_EncryptionPassword[USER_PASSWORD] = StringConversion::Convert_Native_To_Ansi(userPassword);
+    m_EncryptionPassword[OWNER_PASSWORD] = StringConversion::Convert_NativePtr_To_Ansi(ownerPassword.data());
+    m_EncryptionPassword[USER_PASSWORD] = StringConversion::Convert_NativePtr_To_Ansi(userPassword.data());
     m_nPermissions = permissions;
-    m_bIsStrongEncryption = bIsStrongEncryption || isAESEncrypted;
+    m_bIsStrongEncryption = bIsStrongEncryption || isAESEncrypted || nKeyLength == 32;
     m_bIsAESEncrypted = isAESEncrypted;
     m_nKeyLength = nKeyLength;
 
@@ -2389,18 +2409,24 @@ void PdfDocument::SetEncryption(const CTL_StringType& ownerPassword,
     if (m_bIsAESEncrypted)
     {
 #ifdef DTWAIN_SUPPORT_AES
-        m_Encryption.reset(new PDFEncryptionAES);
+        m_Encryption = std::make_shared<PDFEncryptionAES>();
         if (m_nKeyLength == 32)  // This is AES-256
+        {
             m_Encryption->SetMaxPasswordLength(127);
+            m_bIsAES256Encrypted = true;
+            // must set to PDF version 2.0
+            SetPDFVersion(2, 0);
+        }
+        else
+            // must set to PDF version 1.6
+            SetPDFVersion(1, 6);
 #endif
         m_bIsStrongEncryption = true; // always uses strong encryption for AES
-
-        // must set to PDF version 1.6
-        SetPDFVersion(1,6);
     }
 
     const std::string s = GetSystemTimeInMilliseconds().substr(0,13) + "+1359064+" + m_sCurSysTime.substr(0,13);
-    const std::string dID = CMD5Checksum().GetMD5(reinterpret_cast<const unsigned char*>(s.c_str()), static_cast<UINT>(s.size()));
+    auto docIDHash = dynarithmic::MD5Hasher().GetHash(reinterpret_cast<const unsigned char*>(s.c_str()), s.size());
+    const std::string dID = dynarithmic::StringWrapperA::HexStringFromUChars(docIDHash.data(), docIDHash.size());
     m_DocumentID[0] = dID;
     m_DocumentID[1] = dID;
 

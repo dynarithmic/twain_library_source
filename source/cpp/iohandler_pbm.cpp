@@ -25,15 +25,15 @@ using namespace dynarithmic;
 
 int CTL_PBMIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct* )
 {
-    if ( !m_pDib )
-        return DTWAIN_ERR_DIB;
-
-    const HANDLE hDib = m_pDib->GetHandle();
-    if ( !hDib )
+    HANDLE hDib = {};
+    if (!m_pDib || !(hDib = m_pDib->GetHandle()))
         return DTWAIN_ERR_DIB;
 
     if (!IsValidBitDepth(DTWAIN_PBM, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
-    return SaveToFile(hDib, szFile, FIF_PBM, 0, DTWAIN_INCHES, { 0, 0 });
+    m_SaveParams.hDib = hDib;
+    m_SaveParams.szFile = szFile;
+
+    return SaveToFile();
 }

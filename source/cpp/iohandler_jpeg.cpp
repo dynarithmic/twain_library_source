@@ -26,14 +26,11 @@ using namespace dynarithmic;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CTL_JpegIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhFile*/, DibMultiPageStruct*)
 {
-    if ( !m_pDib )
+    HANDLE hDib = {};
+    if ( !m_pDib || !(hDib = m_pDib->GetHandle()))
         return DTWAIN_ERR_DIB;
 
-    const HANDLE hDib = m_pDib->GetHandle();
-    if ( !hDib )
-        return DTWAIN_ERR_DIB;
-
-    if (!IsValidBitDepth(DTWAIN_JPEG, m_pDib->GetBitsPerPixel()))
+    if ( !IsValidBitDepth(DTWAIN_JPEG, m_pDib->GetBitsPerPixel()))
         return DTWAIN_ERR_INVALID_BITDEPTH;
 
     int flags = 0;
@@ -41,7 +38,11 @@ int CTL_JpegIOHandler::WriteBitmap(LPCTSTR szFile, bool /*bOpenFile*/, int /*fhF
         flags |= JPEG_PROGRESSIVE;
     flags += m_ImageInfoEx.IsPDF ? m_ImageInfoEx.nPDFJpegQuality : m_ImageInfoEx.nJpegQuality;
 
-    return SaveToFile(hDib, szFile, FIF_JPEG, flags, m_ImageInfoEx.UnitOfMeasure,
-                      { m_ImageInfoEx.ResolutionX, m_ImageInfoEx.ResolutionY },
-                      { 0.01, 0.01, 0, 0 });
+    m_SaveParams.hDib = hDib;
+    m_SaveParams.szFile = szFile;
+    m_SaveParams.flags = flags;
+    m_SaveParams.unitOfMeasure = m_ImageInfoEx.UnitOfMeasure;
+    m_SaveParams.res = { m_ImageInfoEx.ResolutionX, m_ImageInfoEx.ResolutionY };
+
+    return SaveToFile();
 }

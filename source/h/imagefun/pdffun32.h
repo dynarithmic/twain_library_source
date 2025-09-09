@@ -117,18 +117,18 @@ namespace dynarithmic
             void SetMultiPageStatus(DibMultiPageStruct *pStruct) override;
             void GetMultiPageStatus(DibMultiPageStruct *pStruct) override;
 
-            void SetAuthor(const std::string& s) { m_sAuthor = s; }
-            void SetProducer(const std::string& s) { m_sProducer = s; }
-            void SetTitle(const std::string& s) { m_sTitle = s; }
-            void SetSubject(const std::string& s) { m_sSubject = s; }
-            void SetKeywords(const std::string& s) { m_sKeywords = s; }
-            void SetCreator(const std::string& s) {m_sCreator = s; }
+            void SetAuthor(std::string_view s) { m_sAuthor = s; }
+            void SetProducer(std::string_view s) { m_sProducer = s; }
+            void SetTitle(std::string_view s) { m_sTitle = s; }
+            void SetSubject(std::string_view s) { m_sSubject = s; }
+            void SetKeywords(std::string_view s) { m_sKeywords = s; }
+            void SetCreator(std::string_view s) {m_sCreator = s; }
             void SetImageType(int nWhich) { m_nImageType = nWhich; }
             int  GetImageType() const { return m_nImageType; }
             void SetThumbnailFile(CTL_StringType s) { m_sThumbnailFile = std::move(s); }
             void SetDPI(LONG dpi) { m_dpi = dpi; }
             LONG GetDPI() const { return m_dpi; }
-            void SetSearchableText(const std::string& s);
+            void SetSearchableText(std::string_view s);
             void AddPDFTextElement(PDFTextElementPtr element) const;
 
         protected:

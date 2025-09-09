@@ -405,7 +405,7 @@ BOOL fipWinImage::captureWindow(HWND hWndApplicationWindow, HWND hWndSelectedWin
 
 ///////////////////////////////////////////////////////////////////
 // Painting operations
-
+#ifdef DTWAIN_RESIZE_ENABLED
 void fipWinImage::drawEx(HDC hDC, RECT& rcDest, BOOL useFileBkg, RGBQUAD *appBkColor, FIBITMAP *bg) const {
     // Convert to a standard bitmap if needed
     if(_bHasChanged) {
@@ -516,6 +516,6 @@ void fipWinImage::getToneMappingOperator(FREE_IMAGE_TMO *tmo, double *first_para
     *third_param = _tmo_param_3;
     *fourth_param = _tmo_param_4;
 }
-
+#endif
 
 #endif // _WIN32

@@ -65,13 +65,11 @@ bool CTL_ImageIOHandler::IsValidBitDepth(LONG FileType, LONG bitDepth)
     return true;
 }
 
-int CTL_ImageIOHandler::SaveToFile(HANDLE hDib, LPCTSTR szFile, FREE_IMAGE_FORMAT fmt, int flags,
-                                   UINT unitOfMeasure, std::pair<LONG, LONG> res,
-                                    const std::tuple<double, double, double, double>& multiplier_pr) const
+int CTL_ImageIOHandler::SaveToFile() const
 {
     #ifdef _WIN32
     fipImage fw;
-    if (!fipImageUtility::copyFromHandle(fw, hDib))
+    if (!fipImageUtility::copyFromHandle(fw, m_SaveParams.hDib))
         return 1;
     fipWinImage_RAII raii(&fw);
     #else
@@ -80,18 +78,16 @@ int CTL_ImageIOHandler::SaveToFile(HANDLE hDib, LPCTSTR szFile, FREE_IMAGE_FORMA
     fw.loadFromMemory(FIF_TIFF, memIO, flags);
     #endif
 
-    double multiplier = 39.37 * std::get<0>(multiplier_pr);
-    if (unitOfMeasure == DTWAIN_CENTIMETERS)
-        multiplier = 100.0 * std::get<1>(multiplier_pr);
+    double multiplier = 39.37 * std::get<0>(m_SaveParams.multiplier_pr);
+    if (m_SaveParams.unitOfMeasure == DTWAIN_CENTIMETERS)
+        multiplier = 100.0 * std::get<1>(m_SaveParams.multiplier_pr);
 
-    fw.setHorizontalResolution(res.first * multiplier + std::get<2>(multiplier_pr));
-    fw.setVerticalResolution(res.second * multiplier + std::get<3>(multiplier_pr));
-
-    char commentStr[256] = {};
-    GetResourceStringA(IDS_DTWAIN_APPTITLE, commentStr, 255);
+    fw.setHorizontalResolution(m_SaveParams.res.first * multiplier + std::get<2>(m_SaveParams.multiplier_pr));
+    fw.setVerticalResolution(m_SaveParams.res.second * multiplier + std::get<3>(m_SaveParams.multiplier_pr));
 
     fipTag fp;
-    fp.setKeyValue("Comment", commentStr);
-    fw.setMetadata(FIMD_COMMENTS, "Comment", fp);
-    return fw.save(fmt, StringConversion::Convert_NativePtr_To_Ansi(szFile).c_str(), flags) ? 0 : 1;
+    fp.setKeyValue(m_SaveParams.commentKey, CTL_StaticData::GetAppTitle().c_str());
+    fw.setMetadata(m_SaveParams.metaDataTag, m_SaveParams.commentKey, fp);
+    return fw.save(m_SaveParams.fmt, StringConversion::Convert_NativePtr_To_Ansi(m_SaveParams.szFile).c_str(),
+                   m_SaveParams.flags) ? 0 : 1;
 }

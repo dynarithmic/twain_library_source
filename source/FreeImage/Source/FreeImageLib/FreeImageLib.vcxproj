@@ -75,7 +75,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <PlatformToolset>v142</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -190,8 +190,8 @@
     <Lib>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>LibTIFF4.lib;LibJPEG.lib;LibPNG.lib;ZLib.lib;LibWebP.lib;LibOpenJPEG.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\LibJPEG\$(Platform)\$(Configuration);$(ProjectDir)..\LibPNG\$(Platform)\$(Configuration);$(ProjectDir)..\ZLib\$(Platform)\$(Configuration);$(ProjectDir)..\LibTIFF4\$(Platform)\$(Configuration);$(ProjectDir)..\LibWebP\$(Platform)\$(Configuration);$(ProjectDir)..\LibOpenJPEG\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>LibTIFF4.lib;LibJPEG.lib;LibPNG.lib;ZLib.lib;LibWebP.lib;LibOpenJPEG.lib;LibJXR.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\LibJPEG\$(Platform)\$(Configuration);$(ProjectDir)..\LibPNG\$(Platform)\$(Configuration);$(ProjectDir)..\ZLib\$(Platform)\$(Configuration);$(ProjectDir)..\LibTIFF4\$(Platform)\$(Configuration);$(ProjectDir)..\LibWebP\$(Platform)\$(Configuration);$(ProjectDir)..\LibJXR\$(Platform)\$(Configuration);$(ProjectDir)..\LibOpenJPEG\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
       <Command>
@@ -229,8 +229,8 @@
     <Lib>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>LibTIFF4.lib;LibJPEG.lib;LibPNG.lib;ZLib.lib;LibWebP.lib;LibOpenJPEG.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\LibJPEG\$(Platform)\$(Configuration);$(ProjectDir)..\LibPNG\$(Platform)\$(Configuration);$(ProjectDir)..\ZLib\$(Platform)\$(Configuration);$(ProjectDir)..\LibTIFF4\$(Platform)\$(Configuration);$(ProjectDir)..\LibWebP\$(Platform)\$(Configuration);$(ProjectDir)..\LibOpenJPEG\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>LibTIFF4.lib;LibJPEG.lib;LibPNG.lib;ZLib.lib;LibWebP.lib;LibOpenJPEG.lib;LibJXR.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\LibJPEG\$(Platform)\$(Configuration);$(ProjectDir)..\LibPNG\$(Platform)\$(Configuration);$(ProjectDir)..\ZLib\$(Platform)\$(Configuration);$(ProjectDir)..\LibTIFF4\$(Platform)\$(Configuration);$(ProjectDir)..\LibWebP\$(Platform)\$(Configuration);$(ProjectDir)..\LibJXR\$(Platform)\$(Configuration);$(ProjectDir)..\LibOpenJPEG\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
       <Command>
@@ -269,8 +269,8 @@
     <Lib>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>LibTIFF4.lib;LibJPEG.lib;LibPNG.lib;ZLib.lib;LibWebP.lib;LibOpenJPEG.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\LibJPEG\$(Platform)\$(Configuration);$(ProjectDir)..\LibPNG\$(Platform)\$(Configuration);$(ProjectDir)..\ZLib\$(Platform)\$(Configuration);$(ProjectDir)..\LibTIFF4\$(Platform)\$(Configuration);$(ProjectDir)..\LibWebP\$(Platform)\$(Configuration);$(ProjectDir)..\LibOpenJPEG\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>LibTIFF4.lib;LibJPEG.lib;LibPNG.lib;ZLib.lib;LibWebP.lib;LibOpenJPEG.lib;LibJXR.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\LibJPEG\$(Platform)\$(Configuration);$(ProjectDir)..\LibPNG\$(Platform)\$(Configuration);$(ProjectDir)..\ZLib\$(Platform)\$(Configuration);$(ProjectDir)..\LibTIFF4\$(Platform)\$(Configuration);$(ProjectDir)..\LibWebP\$(Platform)\$(Configuration);$(ProjectDir)..\LibJXR\$(Platform)\$(Configuration);$(ProjectDir)..\LibOpenJPEG\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
       <Command>mkdir ..\..\Dist\x64
@@ -311,8 +311,8 @@ copy ..\FreeImage.h ..\..\Dist\x64
     <Lib>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>LibTIFF4.lib;LibJPEG.lib;LibPNG.lib;ZLib.lib;LibWebP.lib;LibOpenJPEG.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\LibJPEG\$(Platform)\$(Configuration);$(ProjectDir)..\LibPNG\$(Platform)\$(Configuration);$(ProjectDir)..\ZLib\$(Platform)\$(Configuration);$(ProjectDir)..\LibTIFF4\$(Platform)\$(Configuration);$(ProjectDir)..\LibWebP\$(Platform)\$(Configuration);$(ProjectDir)..\LibOpenJPEG\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>LibTIFF4.lib;LibJPEG.lib;LibPNG.lib;ZLib.lib;LibWebP.lib;LibOpenJPEG.lib;LibJXR.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\LibJPEG\$(Platform)\$(Configuration);$(ProjectDir)..\LibPNG\$(Platform)\$(Configuration);$(ProjectDir)..\ZLib\$(Platform)\$(Configuration);$(ProjectDir)..\LibTIFF4\$(Platform)\$(Configuration);$(ProjectDir)..\LibWebP\$(Platform)\$(Configuration);$(ProjectDir)..\LibJXR\$(Platform)\$(Configuration);$(ProjectDir)..\LibOpenJPEG\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
       <Command>mkdir ..\..\Dist\x64
@@ -356,8 +356,8 @@ copy ..\FreeImage.h ..\..\Dist\x64
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>LibTIFF4.lib;LibJPEG.lib;LibPNG.lib;ZLib.lib;LibWebP.lib;LibOpenJPEG.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\LibJPEG\$(Platform)\$(Configuration);$(ProjectDir)..\LibPNG\$(Platform)\$(Configuration);$(ProjectDir)..\ZLib\$(Platform)\$(Configuration);$(ProjectDir)..\LibTIFF4\$(Platform)\$(Configuration);$(ProjectDir)..\LibWebP\$(Platform)\$(Configuration);$(ProjectDir)..\LibOpenJPEG\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>LibTIFF4.lib;LibJPEG.lib;LibPNG.lib;ZLib.lib;LibWebP.lib;LibOpenJPEG.lib;LibJXR.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\LibJPEG\$(Platform)\$(Configuration);$(ProjectDir)..\LibPNG\$(Platform)\$(Configuration);$(ProjectDir)..\ZLib\$(Platform)\$(Configuration);$(ProjectDir)..\LibTIFF4\$(Platform)\$(Configuration);$(ProjectDir)..\LibWebP\$(Platform)\$(Configuration);$(ProjectDir)..\LibJXR\$(Platform)\$(Configuration);$(ProjectDir)..\LibOpenJPEG\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
       <Command>mkdir ..\..\Dist\x32
@@ -401,8 +401,8 @@ copy ..\FreeImage.h ..\..\Dist\x32
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>LibTIFF4.lib;LibJPEG.lib;LibPNG.lib;ZLib.lib;LibWebP.lib;LibOpenJPEG.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\LibJPEG\$(Platform)\$(Configuration);$(ProjectDir)..\LibPNG\$(Platform)\$(Configuration);$(ProjectDir)..\ZLib\$(Platform)\$(Configuration);$(ProjectDir)..\LibTIFF4\$(Platform)\$(Configuration);$(ProjectDir)..\LibWebP\$(Platform)\$(Configuration);$(ProjectDir)..\LibOpenJPEG\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>LibTIFF4.lib;LibJPEG.lib;LibPNG.lib;ZLib.lib;LibWebP.lib;LibOpenJPEG.lib;LibJXR.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\LibJPEG\$(Platform)\$(Configuration);$(ProjectDir)..\LibPNG\$(Platform)\$(Configuration);$(ProjectDir)..\ZLib\$(Platform)\$(Configuration);$(ProjectDir)..\LibTIFF4\$(Platform)\$(Configuration);$(ProjectDir)..\LibWebP\$(Platform)\$(Configuration);$(ProjectDir)..\LibJXR\$(Platform)\$(Configuration);$(ProjectDir)..\LibOpenJPEG\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
       <Command>mkdir ..\..\Dist\x32
@@ -449,8 +449,8 @@ copy ..\FreeImage.h ..\..\Dist\x32
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>LibTIFF4.lib;LibJPEG.lib;LibPNG.lib;ZLib.lib;LibWebP.lib;LibOpenJPEG.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\LibJPEG\$(Platform)\$(Configuration);$(ProjectDir)..\LibPNG\$(Platform)\$(Configuration);$(ProjectDir)..\ZLib\$(Platform)\$(Configuration);$(ProjectDir)..\LibTIFF4\$(Platform)\$(Configuration);$(ProjectDir)..\LibWebP\$(Platform)\$(Configuration);$(ProjectDir)..\LibOpenJPEG\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>LibTIFF4.lib;LibJPEG.lib;LibPNG.lib;ZLib.lib;LibWebP.lib;LibOpenJPEG.lib;LibJXR.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\LibJPEG\$(Platform)\$(Configuration);$(ProjectDir)..\LibPNG\$(Platform)\$(Configuration);$(ProjectDir)..\ZLib\$(Platform)\$(Configuration);$(ProjectDir)..\LibTIFF4\$(Platform)\$(Configuration);$(ProjectDir)..\LibWebP\$(Platform)\$(Configuration);$(ProjectDir)..\LibJXR\$(Platform)\$(Configuration);$(ProjectDir)..\LibOpenJPEG\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
       <Command>mkdir ..\..\Dist\x64
@@ -497,8 +497,8 @@ copy ..\FreeImage.h ..\..\Dist\x64
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>LibTIFF4.lib;LibJPEG.lib;LibPNG.lib;ZLib.lib;LibWebP.lib;LibOpenJPEG.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\LibJPEG\$(Platform)\$(Configuration);$(ProjectDir)..\LibPNG\$(Platform)\$(Configuration);$(ProjectDir)..\ZLib\$(Platform)\$(Configuration);$(ProjectDir)..\LibTIFF4\$(Platform)\$(Configuration);$(ProjectDir)..\LibWebP\$(Platform)\$(Configuration);$(ProjectDir)..\LibOpenJPEG\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>LibTIFF4.lib;LibJPEG.lib;LibPNG.lib;ZLib.lib;LibWebP.lib;LibOpenJPEG.lib;LibJXR.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\LibJPEG\$(Platform)\$(Configuration);$(ProjectDir)..\LibPNG\$(Platform)\$(Configuration);$(ProjectDir)..\ZLib\$(Platform)\$(Configuration);$(ProjectDir)..\LibTIFF4\$(Platform)\$(Configuration);$(ProjectDir)..\LibWebP\$(Platform)\$(Configuration);$(ProjectDir)..\LibJXR\$(Platform)\$(Configuration);$(ProjectDir)..\LibOpenJPEG\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
       <Command>mkdir ..\..\Dist\x64
@@ -598,14 +598,14 @@ copy ..\FreeImage.h ..\..\Dist\x64
     <ClCompile Include="..\FreeImage\PluginJP2.cpp" />
     <ClCompile Include="..\FreeImage\PluginJPEG.cpp" />
     <ClCompile Include="..\FreeImage\PluginJXR.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseU|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseU|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugU|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugU|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseU|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseU|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugU|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugU|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\FreeImage\PluginKOALA.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

@@ -151,7 +151,7 @@ int ImageXferFileWriter::CopyDibToFile(CTL_TwainDibPtr pCurDib,
 int ImageXferFileWriter::CopyDibToFileEx(CTL_TwainDibPtr pCurDib,
                                          int MultipageOption,
                                          CTL_ImageIOHandlerPtr& pHandler,
-                                         const CTL_StringType& strTempFile) const
+                                         CTL_StringViewType strTempFile) const
 {
     DTWAINImageInfoEx ImageInfo;
 
@@ -187,7 +187,7 @@ int ImageXferFileWriter::CopyDibToFileEx(CTL_TwainDibPtr pCurDib,
         && !dynarithmic::IsFileTypeMultiPage( FileType ))
     )
     {
-        const int retval = pCurDib->WriteDibBitmap(ImageInfo, strTempFile.c_str(), acquireFileStatus.GetAcquireFileFormat());
+        const int retval = pCurDib->WriteDibBitmap(ImageInfo, strTempFile.data(), acquireFileStatus.GetAcquireFileFormat());
         if ( retval != 0 )
            SendFileAcquireError(m_pSource, m_pSession, retval, DTWAIN_TN_FILEPAGESAVEERROR, 
                 StringConversion::Convert_Native_To_Ansi(acquireFileStatus.GetActualFileName()));
@@ -195,7 +195,7 @@ int ImageXferFileWriter::CopyDibToFileEx(CTL_TwainDibPtr pCurDib,
         else
         {
             if ( !MultipageOption || MultipageOption == DIB_MULTI_FIRST )
-                acquireFileStatus.SetLastAcquiredFileName( strTempFile );
+                acquireFileStatus.SetLastAcquiredFileName( strTempFile.data() );
             CTL_TwainAppMgr::SendTwainMsgToWindow(m_pSession,
                                                   nullptr, DTWAIN_TN_FILEPAGESAVEOK,
                                                   reinterpret_cast<LPARAM>(m_pSource));
@@ -206,7 +206,7 @@ int ImageXferFileWriter::CopyDibToFileEx(CTL_TwainDibPtr pCurDib,
     // Write a multi page file
     int nStatus = 0;
     if ( MultipageOption == DIB_MULTI_FIRST)
-        pHandler = pCurDib->WriteFirstPageDibMulti(ImageInfo, strTempFile.c_str(), acquireFileStatus.GetAcquireFileFormat(),
+        pHandler = pCurDib->WriteFirstPageDibMulti(ImageInfo, strTempFile.data(), acquireFileStatus.GetAcquireFileFormat(),
                                                     false, 0, nStatus);
     else
     if ( MultipageOption == DIB_MULTI_NEXT)
@@ -220,7 +220,7 @@ int ImageXferFileWriter::CopyDibToFileEx(CTL_TwainDibPtr pCurDib,
     else
     {
         if ( MultipageOption == DIB_MULTI_FIRST )
-           acquireFileStatus.SetLastAcquiredFileName( strTempFile );
+           acquireFileStatus.SetLastAcquiredFileName( strTempFile.data() );
        CTL_TwainAppMgr::SendTwainMsgToWindow(m_pSession, nullptr, DTWAIN_TN_FILEPAGESAVEOK,reinterpret_cast<LPARAM>(m_pSource));
     }
     return nStatus;
@@ -498,7 +498,7 @@ int ImageXferFileWriter::ProcessManualDuplexState(LONG Msg) const
 
 int ImageXferFileWriter::MergeDuplexFilesEx(const sDuplexFileData& DupData,
                                             CTL_ImageIOHandlerPtr& pHandler,
-                                            const CTL_StringType& strTempFile,
+                                            CTL_StringViewType strTempFile,
                                             int MultiPageOption) const
 {
     std::ifstream nHandle;
@@ -548,7 +548,7 @@ int ImageXferFileWriter::MergeDuplexFilesEx(const sDuplexFileData& DupData,
     return DTWAIN_MANDUP_SCANOK;
 }
 
-void ImageXferFileWriter::ManualDuplexCleanUp(const CTL_StringType& strFile/* = ""*/, bool bDestroyFile/*=false*/) const
+void ImageXferFileWriter::ManualDuplexCleanUp(CTL_StringViewType strFile/* = ""*/, bool bDestroyFile/*=false*/) const
 {
     CTL_TwainDib Dib;
     int nStatus;
