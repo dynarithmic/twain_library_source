@@ -246,6 +246,7 @@ FreeImage_Initialise(BOOL load_local_plugins_only) {
         s_plugins->AddNode(InitWEBP, FIF_WEBP);
         s_plugins->AddNode(InitTARGA, FIF_TARGA);
         s_plugins->AddNode(InitBMP, FIF_BMP);
+        s_plugins->AddNode(InitJXR, FIF_JXR);
         //        s_plugins->AddNode(InitPCX, FIF_PCX);
 //          s_plugins->AddNode(InitBMP, FIF_BMP);
 //          s_plugins->AddNode(InitJNG);

@@ -116,13 +116,6 @@ SupportsExportType(FREE_IMAGE_TYPE type) {
 
 // ----------------------------------------------------------
 
-static void * DLL_CALLCONV
-Open(FreeImageIO *io, fi_handle handle, BOOL read, FIBITMAP* dib, int flags) {
-	// create the stream wrapper
-	J2KFIO_t *fio = opj_freeimage_stream_create(io, handle, read);
-	return fio;
-}
-
 static void DLL_CALLCONV
 Close(FreeImageIO *io, fi_handle handle, void *data) {
 	// destroy the stream wrapper
@@ -131,7 +124,14 @@ Close(FreeImageIO *io, fi_handle handle, void *data) {
 }
 
 // ----------------------------------------------------------
+static void* DLL_CALLCONV
+Open(FreeImageIO* io, fi_handle handle, BOOL read, FIBITMAP* dib, int flags) {
+    // create the stream wrapper
+    J2KFIO_t* fio = opj_freeimage_stream_create(io, handle, read);
+    return fio;
+}
 
+#ifdef DTWAIN_LOAD_ENABLED
 static FIBITMAP * DLL_CALLCONV
 Load(FreeImageIO *io, fi_handle handle, int page, int flags, void *data) {
 	J2KFIO_t *fio = (J2KFIO_t*)data;
@@ -227,7 +227,7 @@ Load(FreeImageIO *io, fi_handle handle, int page, int flags, void *data) {
 
 	return NULL;
 }
-
+#endif
 static BOOL DLL_CALLCONV
 Save(FreeImageIO *io, FIBITMAP *dib, fi_handle handle, int page, int flags, void *data) {
 	J2KFIO_t *fio = (J2KFIO_t*)data;
@@ -316,16 +316,17 @@ Save(FreeImageIO *io, FIBITMAP *dib, fi_handle handle, int page, int flags, void
 void DLL_CALLCONV
 InitJP2(Plugin *plugin, int format_id) {
 	s_format_id = format_id;
-
+#ifdef DTWAIN_LOAD_ENABLED
+    plugin->load_proc = Load;
+#endif
 	plugin->format_proc = Format;
 	plugin->description_proc = Description;
 	plugin->extension_proc = Extension;
 	plugin->regexpr_proc = RegExpr;
-	plugin->open_proc = Open;
+    plugin->open_proc = Open;
 	plugin->close_proc = Close;
 	plugin->pagecount_proc = NULL;
 	plugin->pagecapability_proc = NULL;
-	plugin->load_proc = Load;
 	plugin->save_proc = Save;
 	plugin->validate_proc = Validate;
 	plugin->mime_proc = MimeType;

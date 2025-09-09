@@ -258,11 +258,11 @@ static std::vector<T> FileListToVector(SourceAcquireOptions& opts)
     return allNames;
 }
 
-static std::string GetDirectoryCreationError(const CTL_StringType& fileName)
+static std::string GetDirectoryCreationError(CTL_StringViewType fileName)
 {
     return  GetResourceStringFromMap(IDS_LOGMSG_ERRORTEXT) + ": DTWAIN_AcquireFile: " +
             GetResourceStringFromMap(-DTWAIN_ERR_CREATE_DIRECTORY) + ": " +
-            StringConversion::Convert_Native_To_Ansi(fileName, fileName.size());
+            StringConversion::Convert_NativePtr_To_Ansi(fileName.data());
 }
 
 bool dynarithmic::AcquireFileHelper(SourceAcquireOptions& opts, LONG AcquireType)

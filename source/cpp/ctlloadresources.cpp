@@ -680,6 +680,7 @@ namespace dynarithmic
             if (clearEntry)
                 ClearMapEntries(iterLang->second, DTWAIN_USERRES_START, !bIsCustom);
             else
+            if (!bIsCustom)
                 return true;
         }
 
@@ -709,7 +710,7 @@ namespace dynarithmic
                     resourceMap.insert({ resourceID, descr });
                 }
             }
-            allLanguages.insert({ szLangName, resourceMap });
+            allLanguages[szLangName].insert(resourceMap.begin(), resourceMap.end());
             CTL_StaticData::SetCurrentLanguageResourceKey(szLangName);
             auto& info = CTL_StaticData::GetGeneralResourceInfo();
             info.sResourceName = StringConversion::Convert_AnsiPtr_To_Native(szLangName);

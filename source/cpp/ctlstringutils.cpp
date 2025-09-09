@@ -21,10 +21,14 @@
 #include <chrono>
 #include <iomanip>
 #include <sstream>
+#include <array>
+#include <string_view>
+
 #include "ctltwainmanager.h"
 #include "ctliface.h"
 #include "cppfunc.h"
 #include "ctlstringutils.h"
+#include "ctlconstexprfind.h"
 
 using namespace dynarithmic;
 
@@ -124,5 +128,40 @@ namespace dynarithmic
         std::string outVal = datetime.str();
         outVal = StringWrapperA::ReplaceAll(outVal, ":", "_");
         return prefix.data() + outVal + "." + ext.data();
+    }
+
+    // Function to convert a two-character hex string to a byte
+    static constexpr unsigned char HexCharToByte(char c) noexcept 
+    {
+        // create lookup table
+        constexpr std::array<std::pair<char, unsigned int>, 22> hexMap =
+        { {
+            {'0',0},{'1',1},{'2',2},{'3',3},{'4',4},{'5',5},{'6',6},{'7', 7},{'8',8},{'9',9},
+            {'A',10},{'B',11},{'C',12},{'D',13},{'E',14},{'F',15},
+            {'a',10},{'b',11},{'c',12},{'d',13},{'e',14},{'f',15}
+        } };
+
+        const auto foundVal = dynarithmic::generic_array_finder_if(hexMap, [&](const auto& pr) 
+                                                            { return pr.first == c; });
+        if (foundVal.first)
+            return static_cast<unsigned char>(foundVal.second);
+        return 0;
+    }
+
+    // convert a hex string to a byte array
+    std::vector<unsigned char> HexStringToByteArray(std::string_view hexString)
+    {
+        std::vector<unsigned char> byteArray;
+        if (hexString.size() % 2 != 0)
+        {
+            return byteArray;
+        }
+        for (size_t i = 0; i < hexString.length(); i += 2)
+        {
+            unsigned char highNibble = HexCharToByte(hexString[i]);
+            unsigned char lowNibble = HexCharToByte(hexString[i + 1]);
+            byteArray.push_back((highNibble << 4) | lowNibble);
+        }
+        return byteArray;
     }
 }

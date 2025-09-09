@@ -19,7 +19,7 @@
 //
 // Use at your own risk!
 // ==========================================================
-
+#ifdef DTWAIN_RESIZE_ENABLED
 #include "Resize.h"
 
 FIBITMAP * DLL_CALLCONV
@@ -190,3 +190,4 @@ FreeImage_MakeThumbnail(FIBITMAP *dib, int max_pixel_size, BOOL convert) {
 
 	return thumbnail;
 }
+#endif

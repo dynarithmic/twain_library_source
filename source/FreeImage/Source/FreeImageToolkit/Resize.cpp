@@ -21,6 +21,7 @@
 // Use at your own risk!
 // ==========================================================
 
+#ifdef DTWAIN_RESIZE_ENABLED
 #include "Resize.h"
 
 /**
@@ -2114,3 +2115,4 @@ void CResizeEngine::verticalFilter(FIBITMAP *const src, unsigned width, unsigned
 		break;
 	}
 }
+#endif

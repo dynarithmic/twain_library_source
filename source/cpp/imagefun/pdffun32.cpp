@@ -122,12 +122,17 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
         pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pDocument, PDF_SUBJECT, m_sSubject.c_str());
         pPDFInfo->m_Interface->DTWLIB_PDFSetNameField(pDocument, PDF_CREATOR, m_sCreator.c_str());
 
-        // Set the PDF standard to 1.3 or 1.6, depending on encryption setting
+        // Set the PDF standard to 1.3, 1.6, or 2.0 depending on encryption setting
         int major_version = 1;
         int minor_version = 3;
         auto& imageinfo = pPDFInfo->ImageInfoEx;
-        if ( imageinfo.bIsPDFEncrypted && imageinfo.bUseStrongEncryption && imageinfo.bIsAESEncrypted)
+        if ( imageinfo.bIsPDFEncrypted && imageinfo.bIsAESEncrypted)
             minor_version = 6;
+        if (imageinfo.bIsPDFEncrypted && imageinfo.bIsAES256Encrypted)
+        {
+            major_version = 2;
+            minor_version = 0;
+        }
 
         if ( !pPDFInfo->m_Interface->DTWLIB_PDFStartCreation(pDocument, major_version, minor_version) )
         {
@@ -143,13 +148,15 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
         {
             if (imageinfo.bUseStrongEncryption || imageinfo.bIsAESEncrypted)
                 imageinfo.nPDFKeyLength = 16;
+            if (imageinfo.bIsAES256Encrypted)
+                imageinfo.nPDFKeyLength = 32;
 
             pPDFInfo->m_Interface->DTWLIB_PDFSetEncryption(pDocument,
                                                             imageinfo.PDFOwnerPassword.c_str(),
                                                             imageinfo.PDFUserPassword.c_str(),
                                                             imageinfo.PDFPermissions,
                                                             imageinfo.bUseStrongEncryption?TRUE:false,
-                                                            imageinfo.bIsAESEncrypted?TRUE:FALSE,
+                                                            (imageinfo.bIsAESEncrypted || imageinfo.bIsAES256Encrypted)?TRUE:FALSE,
                                                             imageinfo.nPDFKeyLength);
         }
 
@@ -392,7 +399,7 @@ int CPDFImageHandler::WriteImage(CTL_ImageIOHandler* ptrHandler, BYTE * /*pImage
     return 0;
 }
 
-void CPDFImageHandler::SetSearchableText(const std::string& sText)
+void CPDFImageHandler::SetSearchableText(std::string_view sText)
 {
     m_sSearchableText = sText;
 }
