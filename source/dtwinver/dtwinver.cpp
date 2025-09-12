@@ -4863,12 +4863,19 @@ _Success_(return != FALSE) BOOL COSVersion::IsWindows11Version24H2(_In_ LPCOS_VE
     return IsWindows11(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->dwEmulatedBuildNumber > 22631) && (lpVersionInformation->dwEmulatedBuildNumber <= 26100);
 }
 
+_Success_(return != FALSE) BOOL COSVersion::IsWindows11Version25H2(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
+{
+  if (bCheckUnderlying)
+    return IsWindows11(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->dwUnderlyingBuildNumber > 26100) && (lpVersionInformation->dwUnderlyingBuildNumber <= 26200);
+  else
+    return IsWindows11(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->dwEmulatedBuildNumber > 26100) && (lpVersionInformation->dwEmulatedBuildNumber <= 26200);
+}
 _Success_(return != FALSE) BOOL COSVersion::IsWindows11ActiveDevelopmentBranch(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
 {
   if (bCheckUnderlying)
-    return IsWindows11(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->dwUnderlyingBuildNumber > 26100);
+    return IsWindows11(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->dwUnderlyingBuildNumber > 26200);
   else
-    return IsWindows11(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->dwEmulatedBuildNumber > 26100);
+    return IsWindows11(lpVersionInformation, bCheckUnderlying) && (lpVersionInformation->dwEmulatedBuildNumber > 26200);
 }
 
 _Success_(return != FALSE) BOOL COSVersion::IsWindows8Point1(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying)
@@ -5847,7 +5854,7 @@ _Success_(return != FALSE) BOOL COSVersion::IsDatacenterServerCoreAzureEdition(_
   return ((lpVersionInformation->dwSuiteMask4 & COSVERSION_SUITE4_DATACENTER_SERVER_CORE_AZURE_EDITION) != 0);
 }
 
-_Success_(return != FALSE) BOOL COSVersion::IsAzureServerCloudhost(_In_ LPCOS_VERSION_INFO lpVersionInformation)
+_Success_(return != FALSE) BOOL COSVersion::IsAzureServerCloudHost(_In_ LPCOS_VERSION_INFO lpVersionInformation)
 {
   return ((lpVersionInformation->dwSuiteMask4 & COSVERSION_SUITE4_AZURE_SERVER_CLOUDHOST) != 0);
 }
