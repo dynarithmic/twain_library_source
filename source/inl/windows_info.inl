@@ -346,7 +346,7 @@ CTL_StringType dynarithmic::GetWinVersion()
                 else if (os.IsWindows98SE(&osvi, FALSE))
                     sBuf << _T("Windows 98 Second Edition");
                 else if (os.IsWindowsME(&osvi, FALSE))
-                    sBuf << _T("Windows Millenium Edition");
+                    sBuf << _T("Windows Millennium Edition");
                 else
                     sBuf << _T("Windows \?\?");
                 sText << sBuf.str();
@@ -672,13 +672,18 @@ CTL_StringType dynarithmic::GetWinVersion()
                         sText <<  _T("Windows 11 S"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
                     else
                         sText <<  _T("Windows 11"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
-
                     if (os.IsWindows11Version21H2(&osvi, FALSE))
                         sText <<  _T(", (version 21H2)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
                     else if (os.IsWindows11Version22H2(&osvi, FALSE))
                         sText <<  _T(", (version 22H2)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+                    else if (os.IsWindows11Version23H2(&osvi, FALSE))
+			            sText << _T(", (version 23H2)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+			        else if (os.IsWindows11Version24H2(&osvi, FALSE))
+                        sText << _T(", (version 24H2)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+			        else if (os.IsWindows11Version25H2(&osvi, FALSE))
+                        sText << _T(", (version 25H2)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
                     else if (os.IsWindows11ActiveDevelopmentBranch(&osvi, FALSE))
-                        sText <<  _T(", (Active Development Branch)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+                        sText << _T(", (Active Development Branch)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
                 }
                 else if (os.IsWindowsServer2019(&osvi, FALSE))
                 {
@@ -721,6 +726,8 @@ CTL_StringType dynarithmic::GetWinVersion()
                         sText <<  _T("Windows Server 2022 (Domain Controller)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
                     else
                         sText <<  _T("Windows Server 2022"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+                    if (os.IsWindowsServerVersion23H2(&osvi, FALSE))
+                        sText <<  _T(", (version 23H2)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
                     if (os.IsWindowsServer2022ActiveDevelopmentBranch(&osvi, FALSE))
                         sText <<  _T(", (vNext aka Active Development Branch)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
                     if (os.IsDatacenterWindowsServer2022(&osvi, FALSE))
@@ -732,13 +739,36 @@ CTL_StringType dynarithmic::GetWinVersion()
                     else if (os.IsStandardWindowsServer2022(&osvi, FALSE))
                         sText <<  _T(", (Standard Edition)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
                 }
-                break;
-            }
-            default:
-            {
-                sText <<  _T("Unknown OS"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
-                break;
-            }
+        else if (os.IsWindowsServer2025(&osvi, FALSE))
+        {
+          if (os.IsNanoServer(&osvi))
+            sText << _T("Windows Server 2025 Nano Server"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+          else if (os.IsARM64Server(&osvi))
+              sText << _T("Windows Server 2025 ARM64 Server"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+          else if (os.IsDomainControllerWindowsServer2025(&osvi, FALSE))
+              sText << _T("Windows Server 2025 (Domain Controller)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+          else
+              sText << _T("Windows Server 2025"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+          if (os.IsWindowsServerVersion24H2(&osvi, FALSE))
+              sText << _T(", (version 24H2)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+          else if (os.IsWindowsServer2025ActiveDevelopmentBranch(&osvi, FALSE))
+              sText << _T(", (vNext aka Active Development Branch)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+          if (os.IsDatacenterWindowsServer2025(&osvi, FALSE))
+              sText << _T(", (Datacenter Edition)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+          else if (os.IsEnterpriseWindowsServer2025(&osvi, FALSE))
+              sText << _T(", (Enterprise Edition)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+          else if (os.IsWebWindowsServer2025(&osvi, FALSE))
+              sText << _T(", (Web Edition)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+          else if (os.IsStandardWindowsServer2025(&osvi, FALSE))
+              sText << _T(", (Standard Edition)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+        }
+        break;
+        }
+        default:
+        {
+            sText <<  _T("Unknown OS"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+            break;
+        }
         }
 
 #ifndef UNDER_CE
@@ -1251,7 +1281,13 @@ CTL_StringType dynarithmic::GetWinVersion()
                 if (os.IsWindows11Version21H2(&osvi, TRUE))
                     sText <<  _T(", (version 21H2)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
                 else if (os.IsWindows11Version22H2(&osvi, TRUE))
-                    sText <<  _T(", (version 22H2)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+                    sText <<  _T(", (version 22H2)"); //NOLINT(clang-analyzer-security.iecureAPI.strcpy)
+                else if (os.IsWindows11Version23H2(&osvi, TRUE))
+                    sText << _T(", (version 23H2)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+                else if (os.IsWindows11Version24H2(&osvi, TRUE))
+                    sText << _T(", (version 24H2)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+                else if (os.IsWindows11Version25H2(&osvi, TRUE))
+                    sText << _T(", (version 25H2)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
                 else if (os.IsWindows11ActiveDevelopmentBranch(&osvi, TRUE))
                     sText <<  _T(", (Active Development Branch)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
             }
@@ -1296,10 +1332,12 @@ CTL_StringType dynarithmic::GetWinVersion()
                     sText <<  _T("Windows Server 2022 (Domain Controller)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
                 else
                     sText <<  _T("Windows Server 2022"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
-                if (os.IsWindowsServer2022ActiveDevelopmentBranch(&osvi, TRUE))
-                    sText <<  _T(", (vNext aka Active Development Branch)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+                if (os.IsWindowsServerVersion23H2(&osvi, TRUE))
+                    sText << _T(", (version 23H2)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+			    else if (os.IsWindowsServer2022ActiveDevelopmentBranch(&osvi, TRUE))
+                    sText << _T(", (vNext aka Active Development Branch)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
                 if (os.IsDatacenterWindowsServer2022(&osvi, TRUE))
-                    sText <<  _T(", (Datacenter Edition)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+                    sText << _T(", (Datacenter Edition)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
                 else if (os.IsEnterpriseWindowsServer2022(&osvi, TRUE))
                     sText <<  _T(", (Enterprise Edition)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
                 else if (os.IsWebWindowsServer2022(&osvi, TRUE))
@@ -1307,7 +1345,30 @@ CTL_StringType dynarithmic::GetWinVersion()
                 else if (os.IsStandardWindowsServer2022(&osvi, TRUE))
                     sText <<  _T(", (Standard Edition)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
             }
-            break;
+        else if (os.IsWindowsServer2025(&osvi, TRUE))
+        {
+          if (os.IsNanoServer(&osvi))
+            sText << _T("Windows Server 2025 Nano Server"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+          else if (os.IsARM64Server(&osvi))
+              sText << _T("Windows Server 2025 ARM64 Server"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+          else if (os.IsDomainControllerWindowsServer2025(&osvi, TRUE))
+              sText << _T("Windows Server 2025 (Domain Controller)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+          else
+              sText << _T("Windows Server 2025"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+          if (os.IsWindowsServerVersion24H2(&osvi, TRUE))
+              sText << _T(", (version 24H2)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+          else if (os.IsWindowsServer2025ActiveDevelopmentBranch(&osvi, TRUE))
+              sText << _T(", (vNext aka Active Development Branch)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+          if (os.IsDatacenterWindowsServer2025(&osvi, TRUE))
+              sText << _T(", (Datacenter Edition)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+          else if (os.IsEnterpriseWindowsServer2025(&osvi, TRUE))
+              sText << _T(", (Enterprise Edition)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+          else if (os.IsWebWindowsServer2025(&osvi, TRUE))
+              sText << _T(", (Web Edition)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+          else if (os.IsStandardWindowsServer2025(&osvi, TRUE))
+              sText << _T(", (Standard Edition)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+        }
+        break;
 }
         default:
         {
@@ -1876,6 +1937,10 @@ CTL_StringType dynarithmic::GetWinVersion()
             sText <<  _T(", (Restricted)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
         if (os.IsSmallBusinessServerPremium(&osvi))
             sText <<  _T(", (Small Business Server Premium)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+        if (os.IsServerForSBSolutions(&osvi))
+            sText << _T(", (Server for SB Solutions)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+        if (os.IsServerSolutions(&osvi))
+            sText << _T(", (Server Solutions)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
         if (os.IsPreRelease(&osvi))
             sText <<  _T(", (Prerelease)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
         if (os.IsEvaluation(&osvi))
@@ -1938,10 +2003,16 @@ CTL_StringType dynarithmic::GetWinVersion()
             sText <<  _T(", (IoT OS)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
         if (os.IsIoTEdgeOS(&osvi))
             sText <<  _T(", (IoT EdgeOS)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
-        if (os.IsIoTEnterprise(&osvi))
-            sText <<  _T(", (IoT Enterprise)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
         if (os.IsIoTEnterpriseSK(&osvi))
-            sText <<  _T(", (IoT EnterpriseSK)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+            sText << _T(", (IoT Enterprise LTSC Subscription)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+        else if (os.IsIoTEnterpriseK(&osvi))
+            sText << _T(", (IoT Enterprise Subscription)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+        else if (os.IsIoTEnterpriseEvaluation(&osvi))
+            sText << _T(", (IoT Enterprise Evaluation)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+        else if (os.IsIoTEnterprise(&osvi))
+            sText << _T(", (IoT Enterprise)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+        if (os.IsValidation(&osvi))
+            sText << _T(", (Validation)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
         if (os.IsXBoxSystemOS(&osvi))
             sText <<  _T(", (XBox SystemOS)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
         if (os.IsXBoxNativeOS(&osvi))
@@ -1958,17 +2029,24 @@ CTL_StringType dynarithmic::GetWinVersion()
             sText <<  _T(", (XBox Keystone)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
         if (os.IsAzureStackHCIServerCore(&osvi))
             sText <<  _T(", (Azure Stack HCI Server Core)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+        if (os.IsAzureServerAgentBridge(&osvi))
+            sText << _T(", (Azure Server Agent Bridge)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+        if (os.IsAzureServerNanoHost(&osvi))
+            sText << _T(", (Azure Server Nano Host)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
         if (os.IsDatacenterServerAzureEdition(&osvi))
             sText <<  _T(", (Datacenter Server Azure Edition)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
         if (os.IsDatacenterServerCoreAzureEdition(&osvi))
             sText <<  _T(", (Datacenter Server Core Azure Edition)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
-        if (os.IsAzureServerCloudhost(&osvi))
+        if (os.IsAzureServerCloudHost(&osvi))
             sText <<  _T(", (Azure Server Cloud Host)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
         if (os.IsAzureServerCloudMOS(&osvi))
             sText <<  _T(", (Azure Server Cloud MOS)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
         if (os.IsWindows365(&osvi))
             sText <<  _T(", (Windows 365)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
-
+        if (os.IsWNC(&osvi))
+            sText << _T(", (WNC)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
+        if (os.IsUnlicensed(&osvi))
+            sText << _T(", (Unlicensed)"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
         sText <<  _T("\n"); //NOLINT(clang-analyzer-security.insecureAPI.strcpy)
 
         //Some extra info for CE
