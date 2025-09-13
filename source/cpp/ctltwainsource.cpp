@@ -38,6 +38,7 @@
 #include "arrayfactory.h"
 #include "ctlfileutils.h"
 #include "tiff.h"
+#include "ctlclosesource.h"
 
 using namespace dynarithmic;
 
@@ -1253,4 +1254,16 @@ CTL_ExtImageInfoTriplet* CTL_ITwainSource::GetExtImageInfoTriplet()
         m_pExtImageTriplet = std::make_unique<CTL_ExtImageInfoTriplet>(m_pSession, this, 0);
     return m_pExtImageTriplet.get();
 }
+
+SourceCloserRAII::SourceCloserRAII(CTL_ITwainSource* pSource, bool bClose) : p(pSource), bMustClose(bClose) {}
+SourceCloserRAII::~SourceCloserRAII()
+{
+    try
+    {
+        if (bMustClose)
+            CloseSourceInternal(p->GetDTWAINHandle(), p);
+    }
+    catch (...) {}
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////

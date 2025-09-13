@@ -1117,6 +1117,23 @@ namespace dynarithmic
         DTWAINScopedLogController& operator=(DTWAINScopedLogController&) = delete;
     };
 
+    // RAII class to close a TWAIN source locally
+    struct SourceCloserRAII
+    {
+        CTL_ITwainSource* p;
+        bool bMustClose;
+        SourceCloserRAII(CTL_ITwainSource* pSource, bool bClose);
+        ~SourceCloserRAII();
+    };
+
+    // RAII class to close a TWAIN session locally
+    struct SessionCloserRAII
+    {
+        bool bMustClose;
+        SessionCloserRAII(bool bClose) : bMustClose(bClose) {}
+        ~SessionCloserRAII();
+    };
+
     struct HandleRAII
     {
         LPBYTE m_pByte;

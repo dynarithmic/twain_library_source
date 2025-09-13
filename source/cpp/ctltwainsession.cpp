@@ -413,3 +413,13 @@ CTL_ITwainSource* CTL_ITwainSession::GetDefaultSource()
     }
     return nullptr;
 }
+
+SessionCloserRAII::~SessionCloserRAII()
+{
+    try
+    {
+        if (bMustClose)
+            DTWAIN_EndTwainSession();
+    }
+    catch (...) {}
+}
