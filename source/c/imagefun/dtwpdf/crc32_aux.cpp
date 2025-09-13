@@ -22,7 +22,7 @@
 #include "crc32_aux.h"
 using namespace boost;
 /* ========================================================================= */
-unsigned int dynarithmic::crc32_aux(unsigned long crc, const unsigned char* buf, unsigned int len)
+unsigned int dynarithmic::crc32_aux(const unsigned char* buf, unsigned int len)
 {
     if (!buf)
         return 0;
