@@ -47,6 +47,7 @@
 #include "ctltwainmsgloop.h"
 #include "ctldefsource.h"
 #include "ctlstringutils.h"
+#include "ctlclosesource.h"
 
 #ifdef _MSC_VER
     #pragma warning (disable:4702)
@@ -1772,7 +1773,7 @@ LONG DTWAIN_CloseAllSources()
         CTL_ITwainSource *pTheSource = vt.second;
         if (pTheSource->IsAcquireAttempt())
             CTL_TwainAppMgr::DisableUserInterface(pTheSource);
-        DTWAIN_CloseSource(pTheSource);
+        dynarithmic::CloseSourceInternal(pHandle, pTheSource);
     });
 
     LOG_FUNC_EXIT_NONAME_PARAMS(0)

@@ -27,6 +27,8 @@
 #include "sourceselectopts.h"
 #include "arrayfactory.h"
 #include "dtwstrfn.h"
+#include "ctlclosesource.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -234,6 +236,10 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     }
     else
         bSessionPreStarted = true;
+
+    // Make sure that we end the TWAIN session if we started the session
+    SessionCloserRAII sesCloser(!bSessionPreStarted);
+
     auto p = static_cast<CTL_ITwainSource *>(opts.getSource());
     DTWAIN_SOURCE pRealSource;
     bool bSourcePreOpened = true;
@@ -244,19 +250,18 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
         pRealSource = SourceSelect(pHandle, selOpts);
         if (!pRealSource)
         {
-            if (!bSessionPreStarted)
-                DTWAIN_EndTwainSession();
             LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
         }
         if (!DTWAIN_OpenSource(pRealSource))
         {
-            if (!bSessionPreStarted)
-                DTWAIN_EndTwainSession();
             LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
         }
     }
     else
         pRealSource = p;
+
+    // Make sure TWAIN Source is closed if we opned it.
+    SourceCloserRAII sourceCloser(p, !bSourcePreOpened);
 
     const auto acqType = opts.getAcquireType();
     switch (acqType)
@@ -295,6 +300,8 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     DTWAIN_ARRAY aAcquisitionArray = SourceAcquireWorkerThread(opts);
     if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
     {
+        sesCloser.bMustClose = false;
+        sourceCloser.bMustClose = false;
         LOG_FUNC_EXIT_NONAME_PARAMS(aAcquisitionArray)
     }
 
@@ -309,10 +316,6 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     #ifdef _WIN32
     DTWAIN_SetCallbackProc(oldCall, DTWAIN_CallbackMESSAGE);
     #endif
-    if (!bSessionPreStarted)
-        DTWAIN_EndTwainSession();
-    if (!bSourcePreOpened)
-        DTWAIN_CloseSource(pRealSource);
     LOG_FUNC_EXIT_NONAME_PARAMS(aAcquisitionArray)
     CATCH_BLOCK(DTWAIN_ARRAY(0))
 }

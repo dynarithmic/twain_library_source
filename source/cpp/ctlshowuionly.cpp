@@ -46,12 +46,16 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
 
     if (!bIsSourceOpen && pHandle->m_lAcquireMode == DTWAIN_MODAL)
     {
+        // Open the source up ourselves, and make sure we close it on exit
         bCloseSource = true;
         if (!DTWAIN_OpenSource(Source))
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
     }
     else
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !bIsSourceOpen; }, DTWAIN_ERR_SOURCE_NOT_OPEN, false, FUNC_MACRO);
+
+    // Make sure the source is closed if it was opened by us.
+    SourceCloserRAII sourcecloser(pSource, bCloseSource);
 
     // Check if capability is supported
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !pTheSource->IsCapInSupportedList(CAP_ENABLEDSUIONLY); },
@@ -71,9 +75,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ShowUIOnly(DTWAIN_SOURCE Source)
         dynarithmic::StartModalMessageLoop(pSource, opts);
     }
 
-    // Close the source if opened artificially
-    if (bCloseSource)
-        DTWAIN_CloseSource(Source);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
 }

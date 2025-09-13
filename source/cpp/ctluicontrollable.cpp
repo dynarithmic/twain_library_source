@@ -22,6 +22,7 @@
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctlsetgetcaps.h"
+#include "ctlclosesource.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -33,7 +34,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     auto [pHandle, pSource] = VerifyHandles(Source);
-
     auto getSupport = pSource->IsUIControllable();
 
     // If status of UI support already determined, return result.
@@ -46,7 +46,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
         bSourceOpen = true;
     else
     if (!CTL_TwainAppMgr::OpenSource(pHandle->m_pTwainSession, pSource))
-       LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+
+    // Make sure we close this source if the source had to be opened
+    // to test for UI controlability by utilizing RAII class
+    SourceCloserRAII so(pSource, !bSourceOpen);
 
     bool bOk = false;
 
@@ -68,9 +72,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIControllable(DTWAIN_SOURCE Source)
         // Source UI must be tested
         bOk = CTL_TwainAppMgr::ShowUserInterface(pSource, true);
     }
-    // Close source if opened in this function
-    if (!bSourceOpen)
-        DTWAIN_CloseSource(Source);
     pSource->SetUIControllable(bOk);
     LOG_FUNC_EXIT_NONAME_PARAMS(bOk ? TRUE : FALSE)
     CATCH_BLOCK_LOG_PARAMS(false)

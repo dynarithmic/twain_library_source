@@ -26,7 +26,7 @@
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctlsetgetcaps.h"
-
+#include "ctlclosesource.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -459,22 +459,6 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
     std::array<std::string, numImageInfoString> imageInfoString;
     std::array<std::string, numOneValueDeviceInfo> deviceInfoString;
 
-    struct CloserRAII
-    {
-        CTL_ITwainSource* p;
-        bool bMustClose;
-        CloserRAII(CTL_ITwainSource* pSource, bool bClose) : p(pSource), bMustClose(bClose) {}
-        ~CloserRAII()
-        {
-            try
-            {
-                if (bMustClose)
-                    DTWAIN_CloseSource(p);
-            }
-            catch (...) {}
-        }
-    };
-
     struct SourceSelectStatusRAII
     {
         bool m_bSelectStatus;
@@ -542,7 +526,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
             }
         }
 
-        CloserRAII closer(pCurrentSourcePtr, bMustClose);
+        SourceCloserRAII closer(pCurrentSourcePtr, bMustClose);
 
         auto curIter = sourceStatusMap.find(curSource);
         if (bNullSource || curIter != sourceStatusMap.end())
