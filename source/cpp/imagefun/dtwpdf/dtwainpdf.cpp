@@ -1778,7 +1778,7 @@ bool ImageObject::ProcessJPEGImage(int& width, int& height, int& bpp, int& rgb)
     }
     fclose (infile);
 
-    unsigned long crcVal = crc32_aux(0, reinterpret_cast<unsigned char*>(m_vImgStream.data()), static_cast<unsigned>(m_imgLengthInBytes));
+    unsigned long crcVal = crc32_aux(reinterpret_cast<unsigned char*>(m_vImgStream.data()), static_cast<unsigned>(m_imgLengthInBytes));
 
     m_nCurCRCVal = crcVal;
     return true;
@@ -1967,7 +1967,7 @@ bool ImageObject::ProcessTIFFImage(int& width, int& height, int& bpp, int& /*rgb
       m_imgLengthInBytes = imageOffset;
     }
 
-  const unsigned long crcVal = crc32_aux(0, reinterpret_cast<unsigned char*>(m_vImgStream.data()), static_cast<unsigned>(m_imgLengthInBytes));
+  const unsigned long crcVal = crc32_aux(reinterpret_cast<unsigned char*>(m_vImgStream.data()), static_cast<unsigned>(m_imgLengthInBytes));
 
     m_nCurCRCVal = crcVal;
     TIFFClose (image);
@@ -2159,7 +2159,7 @@ bool ImageObject::ProcessBMPImage(int& width, int& height, int& bpp, int& /*rgb*
                        PdfDocument::FLATE_COMPRESS);
 
     m_imgLengthInBytes = m_vImgStream.size();
-    const unsigned long crcVal = crc32_aux(0, reinterpret_cast<unsigned char*>(m_vImgStream.data()), static_cast<unsigned>(m_imgLengthInBytes));
+    const unsigned long crcVal = crc32_aux(reinterpret_cast<unsigned char*>(m_vImgStream.data()), static_cast<unsigned>(m_imgLengthInBytes));
 
     m_nCurCRCVal = crcVal;
     TIFFClose (image);
@@ -2353,8 +2353,8 @@ void PageObject::ComposeObject()
     sConstantText += szBuf;
 
     // Get the CRC for the page contents
-    std::vector<char> v(sConstantText.begin(), sConstantText.end());
-    m_CRCValue = crc32_aux(0, (unsigned char*)v.data(), static_cast<unsigned>(v.size()));
+    std::vector<unsigned char> v(sConstantText.begin(), sConstantText.end());
+    m_CRCValue = crc32_aux(v.data(), static_cast<unsigned>(v.size()));
 }
 
 
