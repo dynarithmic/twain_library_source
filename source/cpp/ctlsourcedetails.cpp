@@ -726,7 +726,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
 
                     // Get the filetype info
                     tempStrm.str("");
-                    static constexpr std::array<std::string_view, 26> fileTypes = {
+                    static constexpr std::array<std::string_view, 27> fileTypes = {
                                                             "\"bmp\",",
                                                             "\"bmp (rle compression)\",",
                                                             "\"gif\",",
@@ -743,13 +743,14 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                                                             "\"wmf\",",
                                                             "\"jpeg\",",
                                                             "\"jp2 (jpeg-2000)\",",
-                                                            "\"tif (no compression)\",",
-                                                            "\"tif (lzw compression)\",",
-                                                            "\"tif (packbits compression)\",",
-                                                            "\"tif (flate compression)\",",
-                                                            "\"tif (jpeg compression)\",",
-                                                            "\"tif (group 3 fax compression)\",",
-                                                            "\"tif (group 4 fax compression)\",",
+                                                            "\"jpeg-xr\",",
+                                                            "\"tiff (no compression)\",",
+                                                            "\"tiff (lzw compression)\",",
+                                                            "\"tiff (packbits compression)\",",
+                                                            "\"tiff (flate compression)\",",
+                                                            "\"tiff (jpeg compression)\",",
+                                                            "\"tiff (group 3 fax compression)\",",
+                                                            "\"tiff (group 4 fax compression)\",",
                                                             "\"ps1 (Postscript 1)\",",
                                                             "\"ps2 (Postscript 2)\",",
                                                             "\"webp\"" };
