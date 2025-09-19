@@ -716,10 +716,10 @@ namespace dynarithmic
             return boost::algorithm::ends_with(str, sub);
         }
 
-        static StringType QuoteString(const StringType& str, 
+        static StringType QuoteString(typename StringTraits::stringview_type str,
                                       const StringType& quoteString = typename traits_type::DoubleQuoteString())
         {
-            return quoteString + str + quoteString;
+            return quoteString + str.data() + quoteString;
         }
 
         static int TokenizeQuoted(const StringType& str, const CharType *lpszTokStr,
@@ -738,26 +738,50 @@ namespace dynarithmic
             return boost::iequals(str, lpsz);
         }
 
+        static void to_lower_upper(CharType* input, size_t len,
+                                   bool isLower,
+                                   const std::locale& loc = std::locale())
+        {
+            auto const& facet = std::use_facet<std::ctype<CharType>>(loc);
+            std::transform(input, input + len, input,
+                [&facet, isLower](CharType c) { return isLower ? facet.tolower(c) : facet.toupper(c); });
+        }
+
+
+        static StringType to_lower_upper_copy(typename StringTraits::stringview_type input, 
+                                              bool isLower,
+                                              const std::locale& loc = std::locale())
+        {
+            auto const& facet = std::use_facet<std::ctype<CharType>>(loc);
+            StringType out;
+            out.reserve(input.size());
+
+            std::transform(input.begin(), input.end(), std::back_inserter(out),
+                [&facet, isLower](CharType c) { return isLower?facet.tolower(c):facet.toupper(c); });
+
+            return out;
+        }
+
         static StringType&  MakeUpperCase(StringType& str)
         {
-            boost::algorithm::to_upper(str);
+            to_lower_upper(str.data(), str.size(), false);
             return str;
         }
 
         static StringType&  MakeLowerCase(StringType& str)
         {
-            boost::algorithm::to_lower(str);
+            to_lower_upper(str.data(), str.size(), true);
             return str;
         }
 
-        static StringType UpperCase(const StringType& str)
+        static StringType UpperCase(typename StringTraits::stringview_type str)
         {
-            return boost::algorithm::to_upper_copy(str);
+            return to_lower_upper_copy(str, false);
         }
 
-        static StringType LowerCase(const StringType& str)
+        static StringType LowerCase(typename StringTraits::stringview_type str)
         {
-            return boost::algorithm::to_lower_copy(str);
+            return to_lower_upper_copy(str, true);
         }
 
         template <typename T>

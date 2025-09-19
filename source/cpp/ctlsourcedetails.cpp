@@ -73,15 +73,14 @@ static void create_stream(std::ostringstream& strm, DTWAIN_SOURCE Source, LONG c
             std::string joined_names;
             if constexpr (std::is_integral_v<T>)
             {
-                char szConstantName[100] = {};
                 if (!isRange && useTwainName)
                 {
                     std::vector<std::string> vTwainNames;
                     for (auto& val : vValues)
                     {
-                        DTWAIN_GetTwainNameFromConstantA(twainConstantID, val, szConstantName, 99);
+                        auto sConstantName = CTL_StaticData::GetTwainNameFromConstantA(twainConstantID, val).second;
                         std::vector<std::string> saParsedNames;
-                        StringWrapperA::Tokenize(szConstantName, ", ", saParsedNames);
+                        StringWrapperA::Tokenize(sConstantName, ", ", saParsedNames);
                         for (auto& sName : saParsedNames)
                         {
                             std::string sTotalName = "\"" + std::string(sName) + "\"";
@@ -165,11 +164,10 @@ static std::string get_source_file_types(DTWAIN_SOURCE Source)
     return {};
 
     std::vector<std::string> vRetVal;
-    char szFileFormat[100];
     for (auto curFormat : vFileFormats)
     {
-        DTWAIN_GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWFF, curFormat, szFileFormat, 99);
-        vRetVal.push_back(StringWrapperA::QuoteString(szFileFormat)); 
+        auto sFileFormat = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWFF, curFormat).second;
+        vRetVal.push_back(StringWrapperA::QuoteString(sFileFormat)); 
     }
     return join_string(vRetVal.begin(), vRetVal.end());
 }
@@ -552,9 +550,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         for (auto& pr : pixInfo)
                         {
                             allPixInfo.push_back(pr.first);
-                            char szName[20];
-                            DTWAIN_GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWPT, pr.first, szName, 20);
-                            std::string sName = szName;
+                            auto sName = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWPT, pr.first).second;
                             vPixNames.push_back(sName);
                             vPixNamesEx.push_back("\"" + vPixNames.back() + "\"");
                         }
@@ -642,9 +638,8 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         strm << "\"resolution-info\": {";
                         for (auto &pr : resMap)
                         {
-                            char buf[100];
-                            DTWAIN_GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWUN, pr.first, buf, 100);
-                            vSizeNames.push_back(StringWrapperA::LowerCase(std::string(buf)).substr(5));
+                            auto buf = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWUN, pr.first).second;
+                            vSizeNames.push_back(StringWrapperA::LowerCase(buf).substr(5));
                         }
                         strm << "\"resolution-count\":" << resMap.size() << ",";
                         strm << "\"resolution-units\":";
