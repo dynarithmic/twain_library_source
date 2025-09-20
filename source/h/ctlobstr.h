@@ -557,35 +557,31 @@ namespace dynarithmic
         enum { DRIVE_POS, DRIVE_PATH, DIRECTORY_POS, NAME_POS, EXTENSION_POS };
         typedef std::vector<StringType> StringArrayType;
 
-        // define string helper functions here
-        static StringType Right(const StringType& str, size_t nNum)
+        static StringType Mid(typename StringTraits::stringview_type str, size_t nFirst)
         {
-            const size_t nLen = str.length();
-            if (nNum == 0)
-                return StringTraits::GetEmptyString();
-            if (nNum > nLen)
-                nNum = nLen;
-            return str.substr(nLen - nNum, nNum);
+            return str.substr(nFirst).data();
         }
 
-        static StringType Mid(const StringType& str, size_t nFirst)
+        static StringType Mid(typename StringTraits::stringview_type str, size_t nFirst, size_t nNum)
         {
-            if (nFirst == 0)
-                return str;
-            return str.substr(nFirst);
+            return { str.substr(nFirst, nNum).data(), nNum };
         }
 
-        static StringType Mid(const StringType& str, size_t  nFirst, size_t nNum)
-        {
-            return str.substr(nFirst, nNum);
-        }
-
-        static StringType Left(const StringType& str, size_t nNum)
+        static StringType Left(typename StringTraits::stringview_type str, size_t nNum)
         {
             return Mid(str, 0, nNum);
         }
 
-        static CharType GetAt(const StringType &str, size_t nPos)
+        // define string helper functions here
+        static StringType Right(typename StringTraits::stringview_type str, size_t nNum)
+        {
+            const size_t nLen = str.length();
+            if (nNum > nLen)
+                nNum = nLen;
+            return Mid(nLen - nNum, nNum);
+        }
+
+        static CharType GetAt(typename StringTraits::stringview_type str, size_t nPos)
         {
             assert(nPos < str.length());
             return str[nPos];
@@ -611,11 +607,20 @@ namespace dynarithmic
             str = StringTraits::GetEmptyString();
         }
 
-        static StringType ReplaceAll(const StringType& str, 
+        static StringType ReplaceAll(typename StringTraits::stringview_type strOrig, 
                                      typename StringTraits::stringview_type findStr, 
                                      typename StringTraits::stringview_type replaceStr)
         {
-            return boost::algorithm::replace_all_copy(str, findStr, replaceStr);
+            if (strOrig.empty()) 
+                return {};
+            StringType str = strOrig.data();
+            size_t start_pos = 0;
+            while ((start_pos = str.find(findStr, start_pos)) != std::string::npos) 
+            {
+                str.replace(start_pos, findStr.length(), replaceStr.data(), replaceStr.length());
+                start_pos += replaceStr.length(); 
+            }
+            return str;
         }
 
         static StringType&  TrimRight(StringType& str, const CharType *lpszTrimStr)
