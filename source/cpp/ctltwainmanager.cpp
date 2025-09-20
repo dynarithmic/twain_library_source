@@ -2024,7 +2024,7 @@ LONG CTL_TwainAppMgr::GetCapFromCapName(const char* szCapName)
         const size_t nSize = sArray.size();
         if (nSize > 0)
         {
-            std::string sNum = sArray[nSize - 1];
+            std::string sNum = sArray.back();
             int nNum = 0;
             try
             {
