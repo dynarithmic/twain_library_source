@@ -102,6 +102,7 @@
 1085 DTWAIN_RANGE-Wert liegt außerhalb der Grenzen  
 1086 DTWAIN_RANGE hat eine Schrittgröße von 0
 1087 Leer oder leerer Name wurde erkannt
+1088 Der Dokumenteneinzug hat keinen Papiersensor oder der Papiersensor wird nicht erkannt.
 1100 TWAIN Zustandscode: Zu wenig Speicher
 1101 TWAIN Zustandscode: Kein Fehler
 1102 TWAIN Zustandscode: Unbekannte Fehlerursache
