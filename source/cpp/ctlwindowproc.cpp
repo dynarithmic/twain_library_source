@@ -362,6 +362,8 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
           case DTWAIN_TN_PROCESSEDDIBFINAL:
           case DTWAIN_TN_TWAINTRIPLETBEGIN:
           case DTWAIN_TN_TWAINTRIPLETEND:
+          case DTWAIN_TN_FEEDERTIMEOUT:
+          case DTWAIN_TN_FEEDERTOFLATBED:
           {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 if (  pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) || !callbacks.empty())

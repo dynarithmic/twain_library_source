@@ -1059,6 +1059,9 @@
     <ClInclude Include="h\ctlclosesource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="h\ctltimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".\h\versioninfo.ipp">

@@ -1721,6 +1721,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\ctlstringutils.h" />
     <ClInclude Include="h\ctlsupport.h" />
     <ClInclude Include="h\ctlthreadutils.h" />
+    <ClInclude Include="h\ctltimer.h" />
     <ClInclude Include="h\ctltr037.h" />
     <ClInclude Include="h\ctltr041.h" />
     <ClInclude Include="h\ctltr042.h" />

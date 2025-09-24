@@ -272,7 +272,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
             break;
         default:
         {
-            auto retVal = ConfigurePixelTypesAndBitDepth(opts, pHandle, pRealSource);
+            const auto retVal = ConfigurePixelTypesAndBitDepth(opts, pHandle, pRealSource);
             if ( !retVal.first )
                 DTWAIN_Check_Error_Condition_0_Ex(pHandle, [] {return true; }, retVal.second, NULL, FUNC_MACRO);
         }
@@ -297,6 +297,49 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
         iter->second.m_bSeenUIClose = false;
         iter->second.m_CurrentCount = 0;
     }
+
+    // Wait for the feeder if no UI is selected
+    // and user has a wait-time for paper being placed in the feeder
+    if (!opts.getShowUI())
+    {
+        auto bRet = FeederWait(pAcquireSource);
+        switch (bRet)
+        {
+            case DTWAIN_TN_FEEDERNOTSUPPORTED:
+            case DTWAIN_TN_FEEDERNOTENABLED:
+            case DTWAIN_NO_ERROR:
+                break;
+
+            case DTWAIN_TN_FEEDERTIMEOUT:
+            {
+                // Feeder timed out without paper.
+                auto waitOption = pAcquireSource->GetFeederWaitTimeOption();
+                if (waitOption & DTWAIN_FEEDER_TERMINATE)
+                {
+                    // Stop the acquisition due to the feeder having no paper
+                    opts.setStatus(DTWAIN_TN_FEEDERTIMEOUT);
+
+                    // Send notification to application
+                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(),
+                        nullptr, DTWAIN_TN_FEEDERTIMEOUT, reinterpret_cast<LPARAM>(pSource));
+
+                    // return with no acquisitions being processed
+                    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [] {return true; }, NULL, NULL, FUNC_MACRO);
+                }
+                else
+                if (waitOption & DTWAIN_FEEDER_USEFLATBED)
+                {
+                    // Send notification to application
+                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(),
+                        nullptr, DTWAIN_TN_FEEDERTOFLATBED, reinterpret_cast<LPARAM>(pSource));
+
+                    // Continue and try the flatbed instead
+                    DTWAIN_EnableFeeder(pAcquireSource, FALSE);
+                }
+            }
+        }
+    }
+
     DTWAIN_ARRAY aAcquisitionArray = SourceAcquireWorkerThread(opts);
     if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
     {
