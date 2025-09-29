@@ -307,8 +307,13 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
         {
             case DTWAIN_TN_FEEDERNOTSUPPORTED:
             case DTWAIN_TN_FEEDERNOTENABLED:
+                // Send notification to application
+                CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(),
+                    nullptr, bRet, reinterpret_cast<LPARAM>(pSource));
+            break;
+
             case DTWAIN_NO_ERROR:
-                break;
+            break;
 
             case DTWAIN_TN_FEEDERTIMEOUT:
             {

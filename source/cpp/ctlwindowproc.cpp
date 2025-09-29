@@ -347,6 +347,8 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
             }
             break;
 
+          // These are simple pass-thru messages that get sent back to 
+          // the user
           case DTWAIN_TN_TRANSFERREADY:
           case DTWAIN_TN_PAGECONTINUE:
           case DTWAIN_TN_MANDUPSIDE1DONE:
@@ -364,6 +366,8 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
           case DTWAIN_TN_TWAINTRIPLETEND:
           case DTWAIN_TN_FEEDERTIMEOUT:
           case DTWAIN_TN_FEEDERTOFLATBED:
+          case DTWAIN_TN_FEEDERNOTENABLED:
+          case DTWAIN_TN_FEEDERNOTSUPPORTED:
           {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 if (  pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) || !callbacks.empty())
