@@ -370,13 +370,6 @@ struct openSourceSaver
     ~openSourceSaver() { DTWAIN_OpenSourcesOnSelect(m_bSaved); }
 };
 
-struct closeSourceRAII
-{
-    DTWAIN_SOURCE m_Source;
-    closeSourceRAII(DTWAIN_SOURCE source) : m_Source(source) {}
-    ~closeSourceRAII() { DTWAIN_CloseSource(m_Source); }
-};
-
 static std::vector<TCHAR> GetDefaultName(SelectStruct& selectTraits)
 {
     bool bLogMessages = (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS) ? true : false;
@@ -403,7 +396,7 @@ static std::vector<TCHAR> GetDefaultName(SelectStruct& selectTraits)
         }
         if (DefSource)
         {
-            closeSourceRAII cs(DefSource);
+            SourceCloserRAII sourcecloser(static_cast<CTL_ITwainSource*>(DefSource), true); 
             LONG nCharacters = GetSourceInfo(static_cast<CTL_ITwainSource*>(DefSource), &CTL_ITwainSource::GetProductName, nullptr, 0);
             if (nCharacters > 0)
             {

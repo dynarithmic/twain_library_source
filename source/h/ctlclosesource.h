@@ -18,15 +18,14 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <boost/crc.hpp>
-#include "crc32_aux.h"
-using namespace boost;
-/* ========================================================================= */
-unsigned int dynarithmic::crc32_aux(const unsigned char* buf, unsigned int len)
+#ifndef CTLCLOSESOURCE_H
+#define CTLCLOSESOURCE_H
+
+#include "ctliface.h"
+
+///////////////////////////////////////////////////////////////////////////
+namespace dynarithmic
 {
-    if (!buf)
-        return 0;
-    boost::crc_32_type  result;
-    result.process_bytes(buf, len);
-    return result.checksum();
+    bool CloseSourceInternal(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource);
 }
+#endif

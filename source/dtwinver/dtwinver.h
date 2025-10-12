@@ -381,6 +381,7 @@ public:
   _Success_(return != FALSE) BOOL IsWindows11Version22H2(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying);
   _Success_(return != FALSE) BOOL IsWindows11Version23H2(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying);
   _Success_(return != FALSE) BOOL IsWindows11Version24H2(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying);
+  _Success_(return != FALSE) BOOL IsWindows11Version25H2(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying);
   _Success_(return != FALSE) BOOL IsWindows11ActiveDevelopmentBranch(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying);
 
   _Success_(return != FALSE) BOOL IsWebWindowsServer2003(_In_ LPCOS_VERSION_INFO lpVersionInformation, _In_ BOOL bCheckUnderlying);
@@ -570,7 +571,7 @@ public:
   _Success_(return != FALSE) BOOL IsAzureStackHCIServerCore(_In_ LPCOS_VERSION_INFO lpVersionInformation);
   _Success_(return != FALSE) BOOL IsDatacenterServerAzureEdition(_In_ LPCOS_VERSION_INFO lpVersionInformation);
   _Success_(return != FALSE) BOOL IsDatacenterServerCoreAzureEdition(_In_ LPCOS_VERSION_INFO lpVersionInformation);
-  _Success_(return != FALSE) BOOL IsAzureServerCloudhost(_In_ LPCOS_VERSION_INFO lpVersionInformation);
+  _Success_(return != FALSE) BOOL IsAzureServerCloudHost(_In_ LPCOS_VERSION_INFO lpVersionInformation);
   _Success_(return != FALSE) BOOL IsAzureServerCloudMOS(_In_ LPCOS_VERSION_INFO lpVersionInformation);
   _Success_(return != FALSE) BOOL IsWindows365(_In_ LPCOS_VERSION_INFO lpVersionInformation);
   _Success_(return != FALSE) BOOL IsUnlicensed(_In_ LPCOS_VERSION_INFO lpVersionInformation);

@@ -27,6 +27,8 @@
 #include "sourceselectopts.h"
 #include "arrayfactory.h"
 #include "dtwstrfn.h"
+#include "ctlclosesource.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -234,6 +236,10 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     }
     else
         bSessionPreStarted = true;
+
+    // Make sure that we end the TWAIN session if we started the session
+    SessionCloserRAII sesCloser(!bSessionPreStarted);
+
     auto p = static_cast<CTL_ITwainSource *>(opts.getSource());
     DTWAIN_SOURCE pRealSource;
     bool bSourcePreOpened = true;
@@ -244,19 +250,18 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
         pRealSource = SourceSelect(pHandle, selOpts);
         if (!pRealSource)
         {
-            if (!bSessionPreStarted)
-                DTWAIN_EndTwainSession();
             LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
         }
         if (!DTWAIN_OpenSource(pRealSource))
         {
-            if (!bSessionPreStarted)
-                DTWAIN_EndTwainSession();
             LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
         }
     }
     else
         pRealSource = p;
+
+    // Make sure TWAIN Source is closed if we opned it.
+    SourceCloserRAII sourceCloser(p, !bSourcePreOpened);
 
     const auto acqType = opts.getAcquireType();
     switch (acqType)
@@ -267,7 +272,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
             break;
         default:
         {
-            auto retVal = ConfigurePixelTypesAndBitDepth(opts, pHandle, pRealSource);
+            const auto retVal = ConfigurePixelTypesAndBitDepth(opts, pHandle, pRealSource);
             if ( !retVal.first )
                 DTWAIN_Check_Error_Condition_0_Ex(pHandle, [] {return true; }, retVal.second, NULL, FUNC_MACRO);
         }
@@ -292,9 +297,59 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
         iter->second.m_bSeenUIClose = false;
         iter->second.m_CurrentCount = 0;
     }
+
+    // Wait for the feeder if no UI is selected
+    // and user has a wait-time for paper being placed in the feeder
+    if (!opts.getShowUI())
+    {
+        auto bRet = FeederWait(pAcquireSource);
+        switch (bRet)
+        {
+            case DTWAIN_TN_FEEDERNOTSUPPORTED:
+            case DTWAIN_TN_FEEDERNOTENABLED:
+                // Send notification to application
+                CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(),
+                    nullptr, bRet, reinterpret_cast<LPARAM>(pSource));
+            break;
+
+            case DTWAIN_NO_ERROR:
+            break;
+
+            case DTWAIN_TN_FEEDERTIMEOUT:
+            {
+                // Feeder timed out without paper.
+                auto waitOption = pAcquireSource->GetFeederWaitTimeOption();
+                if (waitOption & DTWAIN_FEEDER_TERMINATE)
+                {
+                    // Stop the acquisition due to the feeder having no paper
+                    opts.setStatus(DTWAIN_TN_FEEDERTIMEOUT);
+
+                    // Send notification to application
+                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(),
+                        nullptr, DTWAIN_TN_FEEDERTIMEOUT, reinterpret_cast<LPARAM>(pSource));
+
+                    // return with no acquisitions being processed
+                    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [] {return true; }, NULL, NULL, FUNC_MACRO);
+                }
+                else
+                if (waitOption & DTWAIN_FEEDER_USEFLATBED)
+                {
+                    // Send notification to application
+                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(),
+                        nullptr, DTWAIN_TN_FEEDERTOFLATBED, reinterpret_cast<LPARAM>(pSource));
+
+                    // Continue and try the flatbed instead
+                    DTWAIN_EnableFeeder(pAcquireSource, FALSE);
+                }
+            }
+        }
+    }
+
     DTWAIN_ARRAY aAcquisitionArray = SourceAcquireWorkerThread(opts);
     if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
     {
+        sesCloser.bMustClose = false;
+        sourceCloser.bMustClose = false;
         LOG_FUNC_EXIT_NONAME_PARAMS(aAcquisitionArray)
     }
 
@@ -309,10 +364,6 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     #ifdef _WIN32
     DTWAIN_SetCallbackProc(oldCall, DTWAIN_CallbackMESSAGE);
     #endif
-    if (!bSessionPreStarted)
-        DTWAIN_EndTwainSession();
-    if (!bSourcePreOpened)
-        DTWAIN_CloseSource(pRealSource);
     LOG_FUNC_EXIT_NONAME_PARAMS(aAcquisitionArray)
     CATCH_BLOCK(DTWAIN_ARRAY(0))
 }

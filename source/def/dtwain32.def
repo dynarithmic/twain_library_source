@@ -1130,3 +1130,5 @@ DTWAIN_ArrayFloatToString                         @31133
 DTWAIN_ArrayStringToFloat                         @31134 
 DTWAIN_SetJpegXRValues                            @31136
 DTWAIN_GetJpegXRValues                            @31137
+DTWAIN_SetFeederWaitTime                          @31138
+DTWAIN_GetFeederWaitTime                          @31139

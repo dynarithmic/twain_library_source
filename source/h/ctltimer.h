@@ -18,15 +18,27 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <boost/crc.hpp>
-#include "crc32_aux.h"
-using namespace boost;
-/* ========================================================================= */
-unsigned int dynarithmic::crc32_aux(const unsigned char* buf, unsigned int len)
+#ifndef CTLTIMER_H
+#define CTLTIMER_H
+
+#include <chrono>
+
+namespace dynarithmic
 {
-    if (!buf)
-        return 0;
-    boost::crc_32_type  result;
-    result.process_bytes(buf, len);
-    return result.checksum();
+    class TwainTimer
+    {
+        public:
+            TwainTimer() : beg_(clock_::now()) {}
+            void reset() { beg_ = clock_::now(); }
+            double elapsed() const {
+                return std::chrono::duration_cast<second_>
+                    (clock_::now() - beg_).count();
+            }
+
+        private:
+            typedef std::chrono::high_resolution_clock clock_;
+            typedef std::chrono::duration<double, std::ratio<1>> second_;
+            std::chrono::time_point<clock_> beg_;
+    };
 }
+#endif
