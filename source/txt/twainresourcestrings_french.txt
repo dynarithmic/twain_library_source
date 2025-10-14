@@ -209,7 +209,7 @@
 2075 TWAIN_32.DLL non trouvé
 2076 TWAINDSM.DLL non trouvé  
 2077 Répertoire de fichiers invalide
-2078 Could not create directory
+2078 Impossible de créer le répertoire
 2079 Transym OCR DLL non trouvé 
 2081 No filename specified.  Use -f option
 2082 TWAIN not available
