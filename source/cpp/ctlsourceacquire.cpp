@@ -250,17 +250,17 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
         pRealSource = SourceSelect(pHandle, selOpts);
         if (!pRealSource)
         {
-            LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
+            LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
         }
         if (!DTWAIN_OpenSource(pRealSource))
         {
-            LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
+            LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
         }
     }
     else
         pRealSource = p;
 
-    // Make sure TWAIN Source is closed if we opned it.
+    // Make sure TWAIN Source is closed if we opened it.
     SourceCloserRAII sourceCloser(p, !bSourcePreOpened);
 
     const auto acqType = opts.getAcquireType();
@@ -408,7 +408,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
             if (DTWAIN_LLAcquireNative(opts) == -1L)
             {
                 opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
+                LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
             }
             if (opts.getAcquireType() == ACQUIRENATIVEEX)
                 pSource->SetUserAcquisitionArray(opts.getUserArray());
@@ -419,7 +419,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
             if (DTWAIN_LLAcquireBuffered(opts) == -1L)
             {
                 opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
+                LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
             }
             if (opts.getAcquireType() == ACQUIREBUFFEREX)
                 pSource->SetUserAcquisitionArray(opts.getUserArray());
@@ -429,7 +429,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
             if (DTWAIN_LLAcquireToClipboard(opts) == -1L)
             {
                 opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
+                LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
             }
             break;
 
@@ -437,7 +437,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
             if (DTWAIN_LLAcquireFile(opts) == -1L)
             {
                 opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
+                LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
             }
             break;
 
@@ -446,7 +446,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
             if (DTWAIN_LLAcquireAudioNative(opts) == -1L)
             {
                 opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
+                LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
             }
             if (opts.getAcquireType() == ACQUIREAUDIONATIVEEX)
                 pSource->SetUserAcquisitionArray(opts.getUserArray());
@@ -456,7 +456,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
             if (DTWAIN_LLAcquireAudioFile(opts) == -1L)
             {
                 opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
+                LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
             }
             break;
 
