@@ -367,6 +367,7 @@ static bool IsFeederLoaded(CTL_ITwainSource* pSource, LPDTWAIN_ARRAY aFeederLoad
     }
     return false;
 }
+
 int dynarithmic::FeederWait(CTL_ITwainSource *pSource)
 {
     if (!pSource->IsFeederEnabledMode())
@@ -378,6 +379,8 @@ int dynarithmic::FeederWait(CTL_ITwainSource *pSource)
         return DTWAIN_NO_ERROR;
     const dynarithmic::TwainTimer theTimer;
     DTWAIN_ARRAY aFeederLoaded = {};
+	DTWAINArrayLowLevelPtr_RAII raii2(pSource->GetDTWAINHandle(), &aFeederLoaded);
+
     while (!IsFeederLoaded(pSource, &aFeederLoaded))
     {
         if (timeoutval != DTWAIN_WAIT_INFINITE)
