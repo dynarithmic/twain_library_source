@@ -78,7 +78,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTempFileDirectoryEx(LPCTSTR szFilePath, LONG 
         {
             if (bLogMessages)
             {
-                std::string sMessage = "Could not create temp directory " + StringWrapperA::QuoteString(dirCreated.second);
+                std::string sMessage = GetResourceStringFromMap(-DTWAIN_ERR_CREATE_DIRECTORY) + ": " + StringWrapperA::QuoteString(dirCreated.second);
                 LogWriterUtils::WriteLogInfoIndentedA(sMessage);
             }
             DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return false; }, DTWAIN_ERR_CREATE_DIRECTORY, false, FUNC_MACRO);

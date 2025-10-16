@@ -212,6 +212,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFeederWaitTime(DTWAIN_SOURCE Source, LONG wai
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
+
 LONG DLLENTRY_DEF DTWAIN_GetFeederWaitTime(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
@@ -366,6 +367,7 @@ static bool IsFeederLoaded(CTL_ITwainSource* pSource, LPDTWAIN_ARRAY aFeederLoad
     }
     return false;
 }
+
 int dynarithmic::FeederWait(CTL_ITwainSource *pSource)
 {
     if (!pSource->IsFeederEnabledMode())
@@ -377,6 +379,8 @@ int dynarithmic::FeederWait(CTL_ITwainSource *pSource)
         return DTWAIN_NO_ERROR;
     const dynarithmic::TwainTimer theTimer;
     DTWAIN_ARRAY aFeederLoaded = {};
+	DTWAINArrayLowLevelPtr_RAII raii2(pSource->GetDTWAINHandle(), &aFeederLoaded);
+
     while (!IsFeederLoaded(pSource, &aFeederLoaded))
     {
         if (timeoutval != DTWAIN_WAIT_INFINITE)

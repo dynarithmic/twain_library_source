@@ -38,7 +38,7 @@ namespace dynarithmic
             DTWAINException(void* ) noexcept : m_Exception{} {}
             int GetReturnException() const noexcept { return m_Exception; }
             void SetReturnException(int r) noexcept { m_Exception = r; }
-            const char* what() const override { return whatString; }
+            const char* what() const noexcept override { return whatString; }
     };
 
     template <typename T>
