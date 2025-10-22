@@ -345,6 +345,19 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
         }
     }
 
+	// Send notification to application
+	bool bStartAcquire = CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(), nullptr, DTWAIN_TN_PREACQUIRESTART,
+        reinterpret_cast<LPARAM>(pSource));
+
+    // If callback returned 0, stop the acquisition.
+    if (!bStartAcquire)
+    {
+		// Stop the acquisition due to user app requesting the stop
+		opts.setStatus(DTWAIN_TN_ACQUIREDONE);
+		// return with no acquisitions being processed
+		DTWAIN_Check_Error_Condition_0_Ex(pHandle, [] {return true; }, NULL, NULL, FUNC_MACRO);
+    }
+
     DTWAIN_ARRAY aAcquisitionArray = SourceAcquireWorkerThread(opts);
     if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
     {
