@@ -42,6 +42,7 @@ namespace dynarithmic
         int selectionResourceID;
         std::function<std::vector<TCHAR>(SelectStruct&)> getDefaultFunc;
         std::function<std::vector<CTL_StringType>(SelectStruct&)> getNameListFunc;
+        bool setINIToDefault = true;
 
         SourceSelectionOptions(int n, int resourceID,  LPCTSTR sProd=nullptr, HWND parent=nullptr, LPCTSTR title=nullptr, LONG xP = 0, LONG yP = 0,
                                LPCTSTR sIncludeNames=nullptr, LPCTSTR sExcludeNames=nullptr, LPCTSTR sNameMapping=nullptr, LONG opt = 0) :

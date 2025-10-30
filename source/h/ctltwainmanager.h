@@ -238,8 +238,7 @@ namespace dynarithmic
 
             static int          CopyFile(CTL_StringType strIn, CTL_StringType strOut);
             static LONG         GetCapFromCapName( const char *szCapName );
-            static bool         SetDefaultSource( CTL_ITwainSession *pSession,
-                                                  const CTL_ITwainSource *pSource );
+            static bool         SetDefaultSource( CTL_ITwainSession *pSession, CTL_ITwainSource *pSource );
 
             static TW_UINT16 CallDSMEntryProc( TW_IDENTITY *pOrigin, TW_IDENTITY* pDest,
                                                TW_UINT32 dg, TW_UINT16 dat, TW_UINT16 msg, TW_MEMREF pMemref);

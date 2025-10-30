@@ -539,6 +539,7 @@ namespace dynarithmic
                INI_SOURCES_KEY, 
                INI_DSMERRORLOGGING_KEY, 
                INI_ALLOWDUP_RESOURCE,
+               INI_SOURCE_SAVEDEFAULT,
                LASTINIENTRY };
         std::array<std::pair<int, std::string_view>, LASTINIENTRY> s_aINIKeys;
         int32_t                      s_nExtImageInfoOffset = 0;
@@ -694,6 +695,7 @@ namespace dynarithmic
         bool m_bCheckFeederStatusOnOpen;
         bool m_bQueryBestCapContainer;
         bool m_bQueryCapOperations;
+        bool m_bSaveDefaultToINI;
     };
 
     class CTL_TwainDLLHandle
