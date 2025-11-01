@@ -287,10 +287,12 @@ void CLogSystem::SetDLLHandle(CTL_TwainDLLHandle* pHandle)
 
 void CLogSystem::PrintBanner(bool bStarted)
 {
-    if ( bStarted )
-    StatusOutFast("****** Log started ******\n");
+    std::string LogMsg;
+    if (bStarted)
+		LogMsg = "****** " + GetResourceStringFromMap(IDS_LOGMSG_LOGSTARTED) + " ******\n";
     else
-        StatusOutFast("****** Log ended ******\n");
+		LogMsg = "****** " + GetResourceStringFromMap(IDS_LOGMSG_LOGENDED) + " ******\n";
+    StatusOutFast(LogMsg.c_str());
 }
 
 /////////////////////////////////////////////////////////////////////////////
