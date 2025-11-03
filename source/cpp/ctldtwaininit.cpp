@@ -2378,18 +2378,22 @@ void LoadPaperDetectionOverrides()
 }
 
 // This loads DTWAIN32.INI or DTWAIN64.INI, and checks the [SourceOpenProps]
-// section.  This section determines the activities to perform after sucessfully
+// section.  This section determines the activities to perform after successfully
 // opening a TWAIN Source
 void LoadOnSourceOpenProperties(CTL_TwainDLLHandle* pHandle)
 {
     // Get the section name
-    auto* feederProfile = CTL_StaticData::GetINIInterface();
-    if (!feederProfile)
+    auto* iniInterface = CTL_StaticData::GetINIInterface();
+    if (!iniInterface)
         return;
     auto iniKey = CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCEOPENPROPS_KEY).data();
-    pHandle->m_OnSourceOpenProperties.m_bCheckFeederStatusOnOpen = feederProfile->GetBoolValue(iniKey, CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_CHECKFEEDERSTATUS_ITEM).data(), true);
-    pHandle->m_OnSourceOpenProperties.m_bQueryBestCapContainer = feederProfile->GetBoolValue(iniKey, CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_QUERYBESTCAPCONTAINER_ITEM).data(), true);
-    pHandle->m_OnSourceOpenProperties.m_bQueryCapOperations = feederProfile->GetBoolValue(iniKey, CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_QUERYBESTCAPCONTAINER_ITEM).data(), true);
+    pHandle->m_OnSourceOpenProperties.m_bCheckFeederStatusOnOpen = iniInterface->GetBoolValue(iniKey, CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_CHECKFEEDERSTATUS_ITEM).data(), true);
+    pHandle->m_OnSourceOpenProperties.m_bQueryBestCapContainer = iniInterface->GetBoolValue(iniKey, CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_QUERYBESTCAPCONTAINER_ITEM).data(), true);
+    pHandle->m_OnSourceOpenProperties.m_bQueryCapOperations = iniInterface->GetBoolValue(iniKey, CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_QUERYBESTCAPCONTAINER_ITEM).data(), true);
+
+    // Check if the default opened source name is saved to the INI file when a source is opened
+	iniKey = CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCES_KEY).data();
+	pHandle->m_OnSourceOpenProperties.m_bSaveDefaultToINI = iniInterface->GetBoolValue(iniKey, CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCE_SAVEDEFAULT).data(), false);
 }
 
 void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle)

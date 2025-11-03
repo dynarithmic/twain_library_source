@@ -69,6 +69,8 @@
 #define IDS_LOGMSG_MORETEXT                 (IDS_LOGMSG_START + 18)
 #define IDS_LOGMSG_CAPABILITYLISTING        (IDS_LOGMSG_START + 19)
 #define IDS_LOGMSG_DEFAULTSOURCE            (IDS_LOGMSG_START + 20)
+#define IDS_LOGMSG_LOGSTARTED               (IDS_LOGMSG_START + 21)
+#define IDS_LOGMSG_LOGENDED                 (IDS_LOGMSG_START + 22)
 #define IDS_LOGMSG_END                      (4999)
 
 // PDF Font text
