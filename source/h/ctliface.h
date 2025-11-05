@@ -540,6 +540,8 @@ namespace dynarithmic
                INI_DSMERRORLOGGING_KEY, 
                INI_ALLOWDUP_RESOURCE,
                INI_SOURCE_SAVEDEFAULT,
+               INI_SELECTSOURCEPOS_KEY,
+ 			   INI_SAVESELECTSOURCEPOS_KEY,
                LASTINIENTRY };
         std::array<std::pair<int, std::string_view>, LASTINIENTRY> s_aINIKeys;
         int32_t                      s_nExtImageInfoOffset = 0;
@@ -590,6 +592,7 @@ namespace dynarithmic
         CTL_FileSaveMap          s_FileSaveMap;
         CTL_CompressionMap       s_CompressionMap;
         std::string              s_AppTitle;
+        std::pair<int32_t, int32_t> s_SavedSelectSourcePos;
         CTL_StaticDataStruct();
     };
 
@@ -624,6 +627,7 @@ namespace dynarithmic
             tempStruct.s_DLLInstance = s_StaticData.s_DLLInstance;
             tempStruct.s_StartupDSMSearchOrder = s_StaticData.s_StartupDSMSearchOrder;
             tempStruct.s_StartupDSMSearchOrderDir = s_StaticData.s_StartupDSMSearchOrderDir;
+            tempStruct.s_SavedSelectSourcePos = s_StaticData.s_SavedSelectSourcePos;
             s_StaticData = tempStruct;
         }
         static auto& GetLogFilterFlags() { return s_StaticData.s_logFilterFlags; }
@@ -678,6 +682,7 @@ namespace dynarithmic
         static auto& GetAppWindowsToDisable() { return s_StaticData.s_appWindowsToDisable; }
         static constexpr std::string_view GetINIKey(int nWhich) { return s_StaticData.s_aINIKeys[nWhich].second; }
         static std::string& GetAppTitle() { return s_StaticData.s_AppTitle; }
+        static std::pair<int32_t, int32_t>& GetSelectSourcePos() { return s_StaticData.s_SavedSelectSourcePos; }
     };
 
     struct CTL_LoggerCallbackInfo

@@ -1404,6 +1404,7 @@ DTWAIN DLL are not displayed */
 #define DTWAIN_DLG_OPENONSELECT         2048
 #define DTWAIN_DLG_NOOPENONSELECT       4096
 #define DTWAIN_DLG_HIGHLIGHTFIRST       8192
+#define DTWAIN_DLG_SAVELASTSCREENPOS    16384
 
 /* DTWAIN Language resource constants */
 #define DTWAIN_RES_ENGLISH              0
