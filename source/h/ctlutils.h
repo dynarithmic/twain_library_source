@@ -29,12 +29,12 @@
 namespace dynarithmic
 {
     template <typename T>
-    int countOnes(const T val)
+    int countOneBits(const T val)
     {
 #if __cplusplus >= 202002L
         return std::popcount(val);
 #else
-        return static_cast<int>(std::bitset<64>(val).count());
+        return static_cast<int>(std::bitset<sizeof(T) * CHAR_BIT>(val).count());
 #endif
     }
 
