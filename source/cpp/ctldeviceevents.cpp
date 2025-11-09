@@ -52,7 +52,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
         SetType = DTWAIN_CAPRESET;
     else
     {
-        LONG nBits = dynarithmic::countOneBits(DeviceEvents);
+        LONG nBits = dynarithmic::countOneBits(static_cast<uint32_t>(DeviceEvents));
         if (nBits == 0)
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
