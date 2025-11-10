@@ -137,7 +137,9 @@ CTL_StaticDataStruct::CTL_StaticDataStruct() :
                 {INI_DSMERRORLOGGING_KEY,        "DSMErrorLogging"       },
                 {INI_ALLOWDUP_RESOURCE,          "allowduplicateresource"},
 				{INI_SOURCE_SAVEDEFAULT,         "savedefault"},
-             } } {}
+                {INI_SELECTSOURCEPOS_KEY,        "selectsourcepos"},
+                {INI_SAVESELECTSOURCEPOS_KEY,    "saveselectsourcepos"},
+             } }, s_SavedSelectSourcePos{ std::numeric_limits<int32_t>::max(), std::numeric_limits<int32_t>::max() } {}
 
 std::pair<bool, std::string> CTL_StaticData::GetTwainNameFromConstantA(int lConstantType, TwainConstantType lTwainConstant)
 {

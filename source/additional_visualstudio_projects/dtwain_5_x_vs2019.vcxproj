@@ -1467,7 +1467,6 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile Include="cpp\ctlhashutils.cpp" />
     <ClCompile Include="cpp\ctlloadresources.cpp" />
     <ClCompile Include="cpp\ctlpapersize.cpp" />
-    <ClCompile Include="cpp\ctlrandnumutils.cpp" />
     <ClCompile Include="cpp\ctlselectdialog.cpp" />
     <ClCompile Include="cpp\ctlsourcecompression.cpp" />
     <ClCompile Include="cpp\ctlsourcedetails.cpp" />

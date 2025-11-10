@@ -229,6 +229,20 @@ static CTL_StringType GetPossibleMappedName(CustomPlacement CS, TCHAR* szSelecte
     return {};
 }
 
+static void SetLastSavePos(HWND hWndDlg, SelectStruct* pS)
+{
+    if (pS->CS.nOptions & DTWAIN_DLG_SAVELASTSCREENPOS)
+    {
+        auto& lastPos = CTL_StaticData::GetSelectSourcePos();
+        RECT windowRect;
+        if (GetWindowRect(hWndDlg, &windowRect))
+        {
+            lastPos.first = windowRect.left;
+            lastPos.second = windowRect.top;
+        }
+    }
+}
+
 LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static SelectStruct* pS;
@@ -246,14 +260,25 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
 
             HWND lstSources;
             pS = reinterpret_cast<SelectStruct*>(lParam);
-
-            if (pS->CS.nOptions & DTWAIN_DLG_CENTER_SCREEN)
-                CenterWindow(hWnd, nullptr);
-            else
-            if (pS->CS.nOptions & DTWAIN_DLG_CENTER)
-                CenterWindow(hWnd, GetParent(hWnd));
-            else
-                SetWindowPos(hWnd, nullptr, pS->CS.xpos, pS->CS.ypos, 0, 0, SWP_NOSIZE);
+            bool bUseLastScreenPos = false;
+            if (pS->CS.nOptions & DTWAIN_DLG_SAVELASTSCREENPOS)
+            {
+                auto& lastPos = CTL_StaticData::GetSelectSourcePos();
+                if (lastPos.first != std::numeric_limits<int32_t>::max() ||
+                    lastPos.second != lastPos.first)
+                    bUseLastScreenPos = true;
+				SetWindowPos(hWnd, nullptr, lastPos.first, lastPos.second, 0, 0, SWP_NOSIZE);
+            }
+            if ( !bUseLastScreenPos )
+            {
+                if (pS->CS.nOptions & DTWAIN_DLG_CENTER_SCREEN)
+                    CenterWindow(hWnd, nullptr);
+                else
+                if (pS->CS.nOptions & DTWAIN_DLG_CENTER)
+                    CenterWindow(hWnd, GetParent(hWnd));
+                else
+                    SetWindowPos(hWnd, nullptr, pS->CS.xpos, pS->CS.ypos, 0, 0, SWP_NOSIZE);
+            }
             lstSources = GetDlgItem(hWnd, IDC_LSTSOURCES);
 
             // Set the title
@@ -410,12 +435,14 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
                 strm << _T("Selected Source name in dialog = \"") << sz << _T("\", Actual Source name = \"") << pS->SourceName << _T("\"");
                 LogWriterUtils::WriteLogInfoIndented(strm.str());
             }
+            SetLastSavePos(hWnd, pS);
             EndDialog(hWnd, LOWORD(wParam));
             return TRUE;
         }
         else
         if (LOWORD(wParam) == IDCANCEL)
         {
+			SetLastSavePos(hWnd, pS);
             pS->SourceName.clear();
             EndDialog(hWnd, LOWORD(wParam));
             return TRUE;

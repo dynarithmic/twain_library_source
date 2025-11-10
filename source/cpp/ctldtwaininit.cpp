@@ -97,6 +97,7 @@ static void LoadPaperDetectionOverrides();
 static void LoadOnSourceOpenProperties(CTL_TwainDLLHandle* pHandle);
 static bool LoadGeneralResources(bool blockExecution);
 static void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle);
+static void LoadSelectSourcePosition();
 
 
 #ifdef _WIN32
@@ -854,6 +855,9 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
                 // Load image file related options
                 LoadImageFileOptions(pHandle);
 
+                // Load the last "Select Source" file dialog position
+                LoadSelectSourcePosition();
+                
                 // Initialize imaging code
                 FreeImage_Initialise(true);
 
@@ -1699,6 +1703,25 @@ static bool SysDestroyHelper(const char* pParentFunc, CTL_TwainDLLHandle* pHandl
     auto* customProfile = CTL_StaticData::GetINIInterface();
     if (customProfile)
     {
+        // Write the last select source save position
+        auto& lastPos = CTL_StaticData::GetSelectSourcePos();
+
+        // Check if the "saveselectsourcepos" key value is in INI file, and if so, ifthe value is true
+		bool bSaveLastPos = customProfile->GetBoolValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCES_KEY).data(),
+			                                            CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SAVESELECTSOURCEPOS_KEY).data(), false);
+
+        if (bSaveLastPos && lastPos != std::make_pair(std::numeric_limits<int32_t>::max(), std::numeric_limits<int32_t>::max()))
+        {
+            // Save the last value
+            std::ostringstream strm;
+            strm << lastPos.first << " " << lastPos.second;
+            customProfile->SetValue(
+                CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCES_KEY).data(),
+                CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SELECTSOURCEPOS_KEY).data(),
+                strm.str().c_str());
+        }
+
+        // Close out the other INI changes
         customProfile->SaveFile(CTL_StaticData::GetINIPath().c_str());
         CTL_StaticData::s_iniInterface.reset();
         CTL_StaticData::SetINIFileLoaded(false);
@@ -2524,6 +2547,35 @@ bool LoadGeneralResources(bool blockExecution)
             bResourcesLoaded = true;
     }
     return bResourcesLoaded;
+}
+
+// This loads the last select source save position
+void LoadSelectSourcePosition()
+{
+    // Get the section name
+    auto* customProfile = CTL_StaticData::GetINIInterface();
+    if (!customProfile)
+        return;
+
+    const char* pLastPos = customProfile->GetValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCES_KEY).data(),
+        CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SELECTSOURCEPOS_KEY).data(), "");
+    if (pLastPos && pLastPos[0] != 0)
+    {
+        StringWrapperA::StringArrayType arr;
+        auto numTokens = StringWrapperA::Tokenize(pLastPos, " ", arr);
+        if (numTokens >= 2)
+        {
+            auto& lastPos = CTL_StaticData::GetSelectSourcePos();
+            try
+            {
+                lastPos.first = stoi(arr[0]);
+                lastPos.second = stoi(arr[1]);
+            }
+            catch (...)
+            {
+            }
+        }
+    }
 }
 
 #include <sstream>

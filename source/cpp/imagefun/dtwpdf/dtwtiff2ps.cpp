@@ -165,7 +165,7 @@ static void PSHead(FILE*, TIFF*, uint32_t, uint32_t, float, float, float, float,
 static void PSTail(FILE*, int);
 
 void init_getopt();
-int getopt(int nargc, const char** nargv, const char* ostr);
+int getopt(int argc, const char** argv, const char* optstring);
 
 #if defined( EXP_ASCII85ENCODER)
 int Ascii85EncodeBlock( uint8_t * ascii85_p, unsigned f_eod, const uint8_t * raw_p, int raw_l );
@@ -711,8 +711,7 @@ PSHead(FILE *fd, TIFF *tif, uint32_t w, uint32_t h, float pw, float ph,
     (void) tif; (void) w; (void) h;
     t = time(nullptr);
     fprintf(fd, "%%!PS-Adobe-3.0%s\n", generateEPSF ? " EPSF-3.0" : "");
-    CTL_StringType Buffer = GetVersionString();
-    std::string sConverted = StringConversion::Convert_Native_To_Ansi(Buffer);
+    std::string sConverted = CTL_StaticData::GetAppTitle();
     std::replace_if(sConverted.begin(), sConverted.end(), [](unsigned char ch) { return ::iscntrl(ch); }, ' ');
     fprintf(fd, "%%%%Creator: %s\n", sConverted.c_str());
     fprintf(fd, "%%%%Title: %s\n", szTitle);
