@@ -508,6 +508,18 @@ static std::pair<bool, int> GetCachedExtImageInfoData(CTL_TwainDLLHandle* pHandl
     return { false, DTWAIN_ERR_MEM };
 }
 
+
+/* This returns the data that the Source returned when the item is queried.
+   Use DTWAIN_GetExtImageInfoItem to determine the type of data.   */
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetExtImageInfoDataEx(DTWAIN_SOURCE Source, LONG nWhich)
+{
+	LOG_FUNC_ENTRY_PARAMS((Source, nWhich))
+    DTWAIN_ARRAY Data = {};
+    DTWAIN_GetExtImageInfoData(Source, nWhich, &Data);
+	LOG_FUNC_EXIT_NONAME_PARAMS(Data)
+	CATCH_BLOCK(nullptr)
+}
+
 /* This returns the data that the Source returned when the item is queried.
    Use DTWAIN_GetExtImageInfoItem to determine the type of data.   */
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG nWhich, LPDTWAIN_ARRAY Data)
