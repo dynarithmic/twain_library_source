@@ -1132,3 +1132,4 @@ DTWAIN_SetJpegXRValues                            @31136
 DTWAIN_GetJpegXRValues                            @31137
 DTWAIN_SetFeederWaitTime                          @31138
 DTWAIN_GetFeederWaitTime                          @31139
+DTWAIN_GetExtImageInfoDataEx                      @31140
