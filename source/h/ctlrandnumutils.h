@@ -33,10 +33,10 @@ namespace dynarithmic
 	{
 		static std::random_device rd;
 		static std::mt19937 generator(rd());
-		static std::uniform_int_distribution<int> distrib(lowchar, highchar);
+		static std::uniform_int_distribution<int> distrib(static_cast<int>(lowchar), static_cast<int>(highchar));
 
 		T randomString;
-		randomString.reserve(length);
+		randomString.reserve(length); 
 		std::generate_n(std::back_inserter(randomString), length, [&]() {
 			return static_cast<unsigned char>(distrib(generator));
 			});

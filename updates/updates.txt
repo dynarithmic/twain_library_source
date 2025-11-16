@@ -9,6 +9,7 @@ DTWAIN Version changes
       libtiff  --> 4.7.1
       libpng   --> 1.6.50
       libopenjpeg --> 2.5.4
+      libwebp  --> 1.6.0
 
 - Added the DTWAIN_SetFeederWaitTime() API function.  This function allows devices with document feeders that
   can detect whether paper is placed within the feeder to wait for a specified number of seconds before
