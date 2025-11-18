@@ -4730,7 +4730,7 @@ function load_dtwaindll(DLLToLoad)
   -- exit if DLL does not match environment or is an invalid name
   if not good_file then
      print(DLLToLoad .. " is not a valid DTWAIN DLL name, or DLL does not match lua environment (32-bit / 64-bit)")
-     os.exit(-1)
+     return nil
   end
 
   -- determine if DLL is actually ANSI or Unicode
@@ -4750,6 +4750,9 @@ function load_dtwaindll(DLLToLoad)
     else
        mylib = load64bitUnicode(DLLToLoad)
     end
+  end
+  if mylib == nil then
+    print(DLLToLoad .. " failed to load")
   end
   return mylib
 end
