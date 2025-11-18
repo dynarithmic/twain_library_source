@@ -9,9 +9,9 @@ local dtwain_lib = {}
 local ffi = require("ffi")
 local ptr_size = ffi.sizeof("void*")
 if ptr_size == 8  then
-  dtwain_lib = load_dtwaindll("c:/dtwain_bin/dtwain64.dll") 
+  dtwain_lib = load_dtwaindll("dtwain64.dll") 
 else
-  dtwain_lib = load_dtwaindll("c:/dtwain_bin/dtwain32.dll") 
+  dtwain_lib = load_dtwaindll("dtwain32.dll") 
 end
 
 if dtwain_lib == nil then
@@ -25,9 +25,6 @@ if dtwain_libinit == nil then
     print("DTWAIN failed to be initialized")
     os.exit(-2)
 end
-
-local myString = "c:\\saved_images\\lualog.txt"
-dtwain_lib.DTWAIN_SetTwainLogA(dconstants.DTWAIN_LOG_ALL or dconstants.DTWAIN_LOG_USEFILE, myString )
 
 -- Select a TWAIN source
 local twain_source = dtwain_lib.DTWAIN_SelectSource()
