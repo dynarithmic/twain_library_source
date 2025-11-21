@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2025 Dynarithmic Software.
+    Copyright (c) 2002-2026 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -2024,7 +2024,7 @@ LONG CTL_TwainAppMgr::GetCapFromCapName(const char* szCapName)
         const size_t nSize = sArray.size();
         if (nSize > 0)
         {
-            std::string sNum = sArray[nSize - 1];
+            std::string sNum = sArray.back();
             int nNum = 0;
             try
             {
@@ -2480,8 +2480,7 @@ TW_UINT16 CTL_TwainAppMgr::CallDSMEntryProc( const CTL_TwainTriplet & pTriplet )
     return retcode;
 }
 
-void CTL_TwainAppMgr::SetLastTwainError( TW_UINT16 nError,
-                                         int nErrorType )
+void CTL_TwainAppMgr::SetLastTwainError( TW_UINT16 nError, int nErrorType )
 {
     if ( nErrorType == TWRC_Error )
         m_nErrorTWRC = nError;
@@ -2503,14 +2502,13 @@ int CTL_TwainAppMgr::GetLastConditionCodeError()
     return TWCC_SUCCESS;
 }
 
-bool CTL_TwainAppMgr::SetDefaultSource( CTL_ITwainSession *pSession, const CTL_ITwainSource *pSource )
+bool CTL_TwainAppMgr::SetDefaultSource( CTL_ITwainSession *pSession, CTL_ITwainSource *pSource )
 {
-    const auto pTemp = const_cast<CTL_ITwainSource*>(pSource);
-    CTL_SetDefaultSourceTriplet Trip(pSession, pTemp);
+    CTL_SetDefaultSourceTriplet Trip(pSession, pSource);
     const TW_UINT16 rc = Trip.Execute();
     if ( rc != TWRC_SUCCESS )
     {
-        auto ccode = GetLastConditionCodeError();
+        const auto ccode = GetLastConditionCodeError();
         if (ccode != TWCC_SUCCESS)
             return false;
     }

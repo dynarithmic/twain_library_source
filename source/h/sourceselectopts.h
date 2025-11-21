@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2025 Dynarithmic Software.
+    Copyright (c) 2002-2026 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ namespace dynarithmic
         int selectionResourceID;
         std::function<std::vector<TCHAR>(SelectStruct&)> getDefaultFunc;
         std::function<std::vector<CTL_StringType>(SelectStruct&)> getNameListFunc;
+        bool setINIToDefault = true;
 
         SourceSelectionOptions(int n, int resourceID,  LPCTSTR sProd=nullptr, HWND parent=nullptr, LPCTSTR title=nullptr, LONG xP = 0, LONG yP = 0,
                                LPCTSTR sIncludeNames=nullptr, LPCTSTR sExcludeNames=nullptr, LPCTSTR sNameMapping=nullptr, LONG opt = 0) :

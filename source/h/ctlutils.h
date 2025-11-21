@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2025 Dynarithmic Software.
+    Copyright (c) 2002-2026 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -29,12 +29,12 @@
 namespace dynarithmic
 {
     template <typename T>
-    int countOnes(const T val)
+    int countOneBits(const T val)
     {
 #if __cplusplus >= 202002L
         return std::popcount(val);
 #else
-        return static_cast<int>(std::bitset<64>(val).count());
+        return static_cast<int>(std::bitset<sizeof(T) * CHAR_BIT>(val).count());
 #endif
     }
 

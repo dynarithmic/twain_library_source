@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2025 Dynarithmic Software.
+    Copyright (c) 2002-2026 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
  */
 #include "cppfunc.h"
 #include "ctltwainmanager.h"
+#include "ctlclosesource.h"
 #include "errorcheck.h"
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -33,25 +34,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CloseSource(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    bool bRetval = false;
-    const auto sProductName = pSource->GetProductName();
-    bRetval = DTWAIN_CloseSourceUnconditional(pHandle, pSource)?true:false;
-    if (bRetval)
-    {
-        pHandle->m_mapStringToSource.erase(sProductName);
-        pHandle->m_aFeederSources.erase(Source);
-    }
-    std::string sProductNameA = StringConversion::Convert_Native_To_Ansi(sProductName);
-    auto& sourceMap = CTL_StaticData::GetSourceStatusMap();
-    auto iter = sourceMap.find(sProductNameA);
-    if (iter != sourceMap.end())
-    {
-        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, false);
-        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_SELECECTED, false);
-        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, false);
-        iter->second.SetSourceHandle({});
-        iter->second.SetThreadID({});
-    }
+    auto bRetval = CloseSourceInternal(pHandle, pSource);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -83,4 +66,28 @@ DTWAIN_BOOL DTWAIN_CloseSourceUnconditional(CTL_TwainDLLHandle *pHandle, CTL_ITw
     bRetval = CTL_TwainAppMgr::CloseSource(pHandle->m_pTwainSession, p)?true:false;
     LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
     CATCH_BLOCK(false)
+}
+
+bool dynarithmic::CloseSourceInternal(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource)
+{
+    bool bRetval = false;
+    const auto sProductName = pSource->GetProductName();
+    bRetval = DTWAIN_CloseSourceUnconditional(pHandle, pSource) ? true : false;
+    if (bRetval)
+    {
+        pHandle->m_mapStringToSource.erase(sProductName);
+        pHandle->m_aFeederSources.erase(pSource);
+    }
+    std::string sProductNameA = StringConversion::Convert_Native_To_Ansi(sProductName);
+    auto& sourceMap = CTL_StaticData::GetSourceStatusMap();
+    auto iter = sourceMap.find(sProductNameA);
+    if (iter != sourceMap.end())
+    {
+        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_OPEN, false);
+        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_SELECECTED, false);
+        iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, false);
+        iter->second.SetSourceHandle({});
+        iter->second.SetThreadID({});
+    }
+    return bRetval;
 }

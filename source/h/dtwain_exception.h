@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2025 Dynarithmic Software.
+    Copyright (c) 2002-2026 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ namespace dynarithmic
             DTWAINException(void* ) noexcept : m_Exception{} {}
             int GetReturnException() const noexcept { return m_Exception; }
             void SetReturnException(int r) noexcept { m_Exception = r; }
-            const char* what() const override { return whatString; }
+            const char* what() const noexcept override { return whatString; }
     };
 
     template <typename T>

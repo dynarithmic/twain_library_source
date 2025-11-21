@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2025 Dynarithmic Software.
+    Copyright (c) 2002-2026 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -347,6 +347,8 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
             }
             break;
 
+          // These are simple pass-thru messages that get sent back to 
+          // the user
           case DTWAIN_TN_TRANSFERREADY:
           case DTWAIN_TN_PAGECONTINUE:
           case DTWAIN_TN_MANDUPSIDE1DONE:
@@ -362,6 +364,11 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
           case DTWAIN_TN_PROCESSEDDIBFINAL:
           case DTWAIN_TN_TWAINTRIPLETBEGIN:
           case DTWAIN_TN_TWAINTRIPLETEND:
+          case DTWAIN_TN_FEEDERTIMEOUT:
+          case DTWAIN_TN_FEEDERTOFLATBED:
+          case DTWAIN_TN_FEEDERNOTENABLED:
+          case DTWAIN_TN_FEEDERNOTSUPPORTED:
+          case DTWAIN_TN_PREACQUIRESTART:
           {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 if (  pHandle->m_hNotifyWnd || CALLBACK_EXISTS(pHandle) || !callbacks.empty())

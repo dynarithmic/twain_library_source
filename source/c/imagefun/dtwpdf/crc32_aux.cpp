@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2025 Dynarithmic Software.
+    Copyright (c) 2002-2026 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include "crc32_aux.h"
 using namespace boost;
 /* ========================================================================= */
-unsigned int dynarithmic::crc32_aux(unsigned long crc, const unsigned char* buf, unsigned int len)
+unsigned int dynarithmic::crc32_aux(const unsigned char* buf, unsigned int len)
 {
     if (!buf)
         return 0;

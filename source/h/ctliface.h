@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2025 Dynarithmic Software.
+    Copyright (c) 2002-2026 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -79,28 +79,27 @@ namespace dynarithmic
     struct SourceSelectionOptions;
     struct SourceAcquireOptions;
 
-    #define  TWMSG_CancelSourceSelected         1100
-    #define  TWMSG_TwainFailureConditionCode    1101
-    #define  TWMSG_TwainAcquireImage            1102
-        /* DTWAIN Source UI Close Modes */
+    #define DTWAIN_INTERNAL_NOTIFICATION   10000
+    /* DTWAIN Source UI Close Modes */
     #define DTWAIN_SourceCloseModeFORCE           0
     #define DTWAIN_SourceCloseModeBYPASS          1
 
     #define DSM_STATE_NONE      1
     #define DSM_STATE_LOADED    2
     #define DSM_STATE_OPENED    3
-        // Select source wParam's 
-    #define  DTWAIN_SelectSourceFailed                1016
-    #define  DTWAIN_AcquireSourceClosed               1017
-    #define  DTWAIN_TN_ACQUIRECANCELLED_EX            1200
-    #define  DTWAIN_TN_ACQUIREDONE_EX                 1205
-    #define  DTWAIN_RETRY_EX                          9997
 
-        // modal processing messages
-    #define DTWAIN_TN_MESSAGELOOPERROR                1500
+    // Select source wParam's 
+    #define  DTWAIN_SelectSourceFailed             (DTWAIN_INTERNAL_NOTIFICATION + 1)
+    #define  DTWAIN_AcquireSourceClosed            (DTWAIN_INTERNAL_NOTIFICATION + 2)
+    #define  DTWAIN_TN_ACQUIRECANCELLED_EX         (DTWAIN_INTERNAL_NOTIFICATION + 3)
+    #define  DTWAIN_TN_ACQUIREDONE_EX              (DTWAIN_INTERNAL_NOTIFICATION + 4)
+    #define  DTWAIN_RETRY_EX                       (DTWAIN_INTERNAL_NOTIFICATION + 5)
+
+    // modal processing messages
+    #define DTWAIN_TN_MESSAGELOOPERROR             (DTWAIN_INTERNAL_NOTIFICATION + 6)
     #define REGISTERED_DTWAIN_MSG _T("DTWAIN_NOTIFY-{37AE5C3E-34B6-472f-A0BC-74F3CB199F2B}")
 
-        // Availability flags
+    // Availability flags
     #define DTWAIN_BASE_AVAILABLE       0
     #define DTWAIN_PDF_AVAILABLE        1
     #define DTWAIN_TWAINSAVE_AVAILABLE  2
@@ -111,10 +110,10 @@ namespace dynarithmic
         /* Scanner already has physically scanned a page.
          This is sent only once (when TWAIN actually does the transformation of the
          scanned image to the DIB) */
-    #define  DTWAIN_TWAINAcquireStarted               1019
+    #define  DTWAIN_TWAINAcquireStarted          (DTWAIN_INTERNAL_NOTIFICATION + 7)
 
-        /* Sent when DTWAIN_Acquire...() functions are about to return */
-    #define  DTWAIN_AcquireTerminated                 1020
+    /* Sent when DTWAIN_Acquire...() functions are about to return */
+    #define  DTWAIN_AcquireTerminated            (DTWAIN_INTERNAL_NOTIFICATION + 8)
     #ifdef _WIN32
     #define  TWAINDLLVERSION_1    _T("TWAIN_32.DLL")
     #define  TWAINDLLVERSION_2    _T("TWAINDSM.DLL")
@@ -540,6 +539,9 @@ namespace dynarithmic
                INI_SOURCES_KEY, 
                INI_DSMERRORLOGGING_KEY, 
                INI_ALLOWDUP_RESOURCE,
+               INI_SOURCE_SAVEDEFAULT,
+               INI_SELECTSOURCEPOS_KEY,
+ 			   INI_SAVESELECTSOURCEPOS_KEY,
                LASTINIENTRY };
         std::array<std::pair<int, std::string_view>, LASTINIENTRY> s_aINIKeys;
         int32_t                      s_nExtImageInfoOffset = 0;
@@ -590,6 +592,7 @@ namespace dynarithmic
         CTL_FileSaveMap          s_FileSaveMap;
         CTL_CompressionMap       s_CompressionMap;
         std::string              s_AppTitle;
+        std::pair<int32_t, int32_t> s_SavedSelectSourcePos;
         CTL_StaticDataStruct();
     };
 
@@ -624,6 +627,7 @@ namespace dynarithmic
             tempStruct.s_DLLInstance = s_StaticData.s_DLLInstance;
             tempStruct.s_StartupDSMSearchOrder = s_StaticData.s_StartupDSMSearchOrder;
             tempStruct.s_StartupDSMSearchOrderDir = s_StaticData.s_StartupDSMSearchOrderDir;
+            tempStruct.s_SavedSelectSourcePos = s_StaticData.s_SavedSelectSourcePos;
             s_StaticData = tempStruct;
         }
         static auto& GetLogFilterFlags() { return s_StaticData.s_logFilterFlags; }
@@ -678,6 +682,7 @@ namespace dynarithmic
         static auto& GetAppWindowsToDisable() { return s_StaticData.s_appWindowsToDisable; }
         static constexpr std::string_view GetINIKey(int nWhich) { return s_StaticData.s_aINIKeys[nWhich].second; }
         static std::string& GetAppTitle() { return s_StaticData.s_AppTitle; }
+        static std::pair<int32_t, int32_t>& GetSelectSourcePos() { return s_StaticData.s_SavedSelectSourcePos; }
     };
 
     struct CTL_LoggerCallbackInfo
@@ -695,6 +700,7 @@ namespace dynarithmic
         bool m_bCheckFeederStatusOnOpen;
         bool m_bQueryBestCapContainer;
         bool m_bQueryCapOperations;
+        bool m_bSaveDefaultToINI;
     };
 
     class CTL_TwainDLLHandle
@@ -957,6 +963,7 @@ namespace dynarithmic
     DTWAIN_ARRAY CreateArrayFromCap(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapType, LONG lSize);
     bool AssignArray(CTL_TwainDLLHandle* pHandle, LPDTWAIN_ARRAY aDestination, LPDTWAIN_ARRAY aSource);
     LONG GetCapDataType(CTL_ITwainSource* pSource, LONG nCap);
+    int FeederWait(CTL_ITwainSource* pSource);
 
     typedef CTL_StringType(CTL_ITwainSource::* SOURCEINFOFUNC)() const;
     LONG GetSourceInfo(CTL_ITwainSource* p, SOURCEINFOFUNC pFunc, LPTSTR szInfo, LONG nMaxLen);
@@ -1115,6 +1122,23 @@ namespace dynarithmic
         ~DTWAINScopedLogController() { CTL_StaticData::GetLogFilterFlags() = m_ErrorFilterFlags; }
         DTWAINScopedLogController(DTWAINScopedLogController&) = delete;
         DTWAINScopedLogController& operator=(DTWAINScopedLogController&) = delete;
+    };
+
+    // RAII class to close a TWAIN source locally
+    struct SourceCloserRAII
+    {
+        CTL_ITwainSource* p;
+        bool bMustClose;
+        SourceCloserRAII(CTL_ITwainSource* pSource, bool bClose);
+        ~SourceCloserRAII();
+    };
+
+    // RAII class to close a TWAIN session locally
+    struct SessionCloserRAII
+    {
+        bool bMustClose;
+        SessionCloserRAII(bool bClose) : bMustClose(bClose) {}
+        ~SessionCloserRAII();
     };
 
     struct HandleRAII

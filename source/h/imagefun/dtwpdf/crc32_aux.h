@@ -22,6 +22,6 @@ OF THIRD PARTY RIGHTS.
 #define CRC32AUX_H
 namespace dynarithmic
 {
-    unsigned int crc32_aux(unsigned long crc, const unsigned char* buf, unsigned int len);
+    unsigned int crc32_aux(const unsigned char* buf, unsigned int len);
 }
 #endif

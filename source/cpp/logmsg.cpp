@@ -1,6 +1,6 @@
 /*
 This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-Copyright (c) 2002-2025 Dynarithmic Software.
+Copyright (c) 2002-2026 Dynarithmic Software.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -287,10 +287,12 @@ void CLogSystem::SetDLLHandle(CTL_TwainDLLHandle* pHandle)
 
 void CLogSystem::PrintBanner(bool bStarted)
 {
-    if ( bStarted )
-    StatusOutFast("****** Log started ******\n");
+    std::string LogMsg;
+    if (bStarted)
+		LogMsg = "****** " + GetResourceStringFromMap(IDS_LOGMSG_LOGSTARTED) + " ******\n";
     else
-        StatusOutFast("****** Log ended ******\n");
+		LogMsg = "****** " + GetResourceStringFromMap(IDS_LOGMSG_LOGENDED) + " ******\n";
+    StatusOutFast(LogMsg.c_str());
 }
 
 /////////////////////////////////////////////////////////////////////////////

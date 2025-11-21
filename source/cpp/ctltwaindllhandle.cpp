@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2025 Dynarithmic Software.
+    Copyright (c) 2002-2026 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -136,7 +136,10 @@ CTL_StaticDataStruct::CTL_StaticDataStruct() :
                 {INI_SOURCES_KEY,                "Sources",              },
                 {INI_DSMERRORLOGGING_KEY,        "DSMErrorLogging"       },
                 {INI_ALLOWDUP_RESOURCE,          "allowduplicateresource"},
-             } } {}
+				{INI_SOURCE_SAVEDEFAULT,         "savedefault"},
+                {INI_SELECTSOURCEPOS_KEY,        "selectsourcepos"},
+                {INI_SAVESELECTSOURCEPOS_KEY,    "saveselectsourcepos"},
+             } }, s_SavedSelectSourcePos{ std::numeric_limits<int32_t>::max(), std::numeric_limits<int32_t>::max() } {}
 
 std::pair<bool, std::string> CTL_StaticData::GetTwainNameFromConstantA(int lConstantType, TwainConstantType lTwainConstant)
 {

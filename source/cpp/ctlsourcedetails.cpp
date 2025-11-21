@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2025 Dynarithmic Software.
+    Copyright (c) 2002-2026 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctlsetgetcaps.h"
-
+#include "ctlclosesource.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -73,15 +73,14 @@ static void create_stream(std::ostringstream& strm, DTWAIN_SOURCE Source, LONG c
             std::string joined_names;
             if constexpr (std::is_integral_v<T>)
             {
-                char szConstantName[100] = {};
                 if (!isRange && useTwainName)
                 {
                     std::vector<std::string> vTwainNames;
                     for (auto& val : vValues)
                     {
-                        DTWAIN_GetTwainNameFromConstantA(twainConstantID, val, szConstantName, 99);
+                        auto sConstantName = CTL_StaticData::GetTwainNameFromConstantA(twainConstantID, val).second;
                         std::vector<std::string> saParsedNames;
-                        StringWrapperA::Tokenize(szConstantName, ", ", saParsedNames);
+                        StringWrapperA::Tokenize(sConstantName, ", ", saParsedNames);
                         for (auto& sName : saParsedNames)
                         {
                             std::string sTotalName = "\"" + std::string(sName) + "\"";
@@ -165,11 +164,10 @@ static std::string get_source_file_types(DTWAIN_SOURCE Source)
     return {};
 
     std::vector<std::string> vRetVal;
-    char szFileFormat[100];
     for (auto curFormat : vFileFormats)
     {
-        DTWAIN_GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWFF, curFormat, szFileFormat, 99);
-        vRetVal.push_back(StringWrapperA::QuoteString(szFileFormat)); 
+        auto sFileFormat = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWFF, curFormat).second;
+        vRetVal.push_back(StringWrapperA::QuoteString(sFileFormat)); 
     }
     return join_string(vRetVal.begin(), vRetVal.end());
 }
@@ -459,22 +457,6 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
     std::array<std::string, numImageInfoString> imageInfoString;
     std::array<std::string, numOneValueDeviceInfo> deviceInfoString;
 
-    struct CloserRAII
-    {
-        CTL_ITwainSource* p;
-        bool bMustClose;
-        CloserRAII(CTL_ITwainSource* pSource, bool bClose) : p(pSource), bMustClose(bClose) {}
-        ~CloserRAII()
-        {
-            try
-            {
-                if (bMustClose)
-                    DTWAIN_CloseSource(p);
-            }
-            catch (...) {}
-        }
-    };
-
     struct SourceSelectStatusRAII
     {
         bool m_bSelectStatus;
@@ -542,7 +524,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
             }
         }
 
-        CloserRAII closer(pCurrentSourcePtr, bMustClose);
+        SourceCloserRAII closer(pCurrentSourcePtr, bMustClose);
 
         auto curIter = sourceStatusMap.find(curSource);
         if (bNullSource || curIter != sourceStatusMap.end())
@@ -568,9 +550,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         for (auto& pr : pixInfo)
                         {
                             allPixInfo.push_back(pr.first);
-                            char szName[20];
-                            DTWAIN_GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWPT, pr.first, szName, 20);
-                            std::string sName = szName;
+                            auto sName = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWPT, pr.first).second;
                             vPixNames.push_back(sName);
                             vPixNamesEx.push_back("\"" + vPixNames.back() + "\"");
                         }
@@ -658,9 +638,8 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                         strm << "\"resolution-info\": {";
                         for (auto &pr : resMap)
                         {
-                            char buf[100];
-                            DTWAIN_GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWUN, pr.first, buf, 100);
-                            vSizeNames.push_back(StringWrapperA::LowerCase(std::string(buf)).substr(5));
+                            auto buf = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWUN, pr.first).second;
+                            vSizeNames.push_back(StringWrapperA::LowerCase(buf).substr(5));
                         }
                         strm << "\"resolution-count\":" << resMap.size() << ",";
                         strm << "\"resolution-units\":";
@@ -742,7 +721,7 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
 
                     // Get the filetype info
                     tempStrm.str("");
-                    static constexpr std::array<std::string_view, 26> fileTypes = {
+                    static constexpr std::array<std::string_view, 27> fileTypes = {
                                                             "\"bmp\",",
                                                             "\"bmp (rle compression)\",",
                                                             "\"gif\",",
@@ -759,13 +738,14 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
                                                             "\"wmf\",",
                                                             "\"jpeg\",",
                                                             "\"jp2 (jpeg-2000)\",",
-                                                            "\"tif (no compression)\",",
-                                                            "\"tif (lzw compression)\",",
-                                                            "\"tif (packbits compression)\",",
-                                                            "\"tif (flate compression)\",",
-                                                            "\"tif (jpeg compression)\",",
-                                                            "\"tif (group 3 fax compression)\",",
-                                                            "\"tif (group 4 fax compression)\",",
+                                                            "\"jpeg-xr\",",
+                                                            "\"tiff (no compression)\",",
+                                                            "\"tiff (lzw compression)\",",
+                                                            "\"tiff (packbits compression)\",",
+                                                            "\"tiff (flate compression)\",",
+                                                            "\"tiff (jpeg compression)\",",
+                                                            "\"tiff (group 3 fax compression)\",",
+                                                            "\"tiff (group 4 fax compression)\",",
                                                             "\"ps1 (Postscript 1)\",",
                                                             "\"ps2 (Postscript 2)\",",
                                                             "\"webp\"" };

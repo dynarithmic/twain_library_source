@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2025 Dynarithmic Software.
+    Copyright (c) 2002-2026 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include "errorcheck.h"
 #include "arrayfactory.h"
 #include "ctlsetgetcaps.h"
+#include "ctlutils.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
@@ -51,13 +52,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
         SetType = DTWAIN_CAPRESET;
     else
     {
-        LONG nBits = 0;
-        LONG i;
-        for (i = 0; i < 32; i++)
-        {
-            if (DeviceEvents & 1L << i)
-                nBits++;
-        }
+        LONG nBits = dynarithmic::countOneBits(static_cast<uint32_t>(DeviceEvents));
         if (nBits == 0)
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
@@ -69,7 +64,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
         auto& vValues = factory->underlying_container_t<LONG>(Array);
         LONG nIndex = 0;
 
-        for (i = 0; i < 32; i++)
+        for (int i = 0; i < 32; i++)
         {
             if (DeviceEvents & 1L << i)
             {

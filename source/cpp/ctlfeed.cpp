@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2025 Dynarithmic Software.
+    Copyright (c) 2002-2026 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -23,12 +23,15 @@
 #include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include <algorithm>
-
+#include <chrono>
+#include <thread>
 #include "cppfunc.h"
 #include "errorcheck.h"
 #include "ctlsetgetcaps.h"
+#include "ctltimer.h"
 
 using namespace dynarithmic;
+using namespace std::chrono_literals;
 
 typedef void (CTL_ITwainSource::*SetFunc)(bool);
 typedef bool (CTL_ITwainSource::*IsEnabledFunc)() const;
@@ -197,6 +200,27 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnableAutoFeed(DTWAIN_SOURCE Source, DTWAIN_BOOL
     CATCH_BLOCK(false)
 }
 
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFeederWaitTime(DTWAIN_SOURCE Source, LONG waitTime, LONG flags)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, waitTime, flags))
+    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+    auto isSensitive = DTWAIN_IsFeederSensitive(Source);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !isSensitive; }, DTWAIN_ERR_FEEDER_NOPAPERSENSOR, false, FUNC_MACRO);
+    CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
+    p->SetFeederWaitTime(std::max(DTWAIN_WAIT_INFINITE, static_cast<int>(waitTime)));
+    p->SetFeederWaitTimeOption(std::max(flags, static_cast<LONG>(DTWAIN_FEEDER_TERMINATE)));
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK(false)
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetFeederWaitTime(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    auto waitTime = pSource->GetFeederWaitTime();
+    LOG_FUNC_EXIT_NONAME_PARAMS(waitTime)
+    CATCH_BLOCK(-1)
+}
 bool EnableFeederFunc(DTWAIN_SOURCE Source, LONG lCap, CTL_ITwainSource* pSource, SetFunc Func, bool bSet)
 {
     // Set the capability value
@@ -331,6 +355,45 @@ bool ExecuteFeederState5Func(DTWAIN_SOURCE Source, LONG lCap)
     return false;
 }
 
+static bool IsFeederLoaded(CTL_ITwainSource* pSource, LPDTWAIN_ARRAY aFeederLoaded)
+{
+    BOOL retval = GetCapValuesEx2_Internal(pSource, CAP_FEEDERLOADED, DTWAIN_CAPGETCURRENT, 
+                                            DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, aFeederLoaded);
+    if (retval)
+    {
+        auto& vValues = pSource->GetDTWAINHandle()->m_ArrayFactory->underlying_container_t<LONG>(*aFeederLoaded);
+        if (!vValues.empty())
+            return vValues.front();
+    }
+    return false;
+}
+
+int dynarithmic::FeederWait(CTL_ITwainSource *pSource)
+{
+    if (!pSource->IsFeederEnabledMode())
+        return DTWAIN_TN_FEEDERNOTENABLED;
+    if (!pSource->IsCapInSupportedList(CAP_FEEDERLOADED))
+        return DTWAIN_TN_FEEDERNOTSUPPORTED;
+    auto timeoutval = pSource->GetFeederWaitTime();
+    if (timeoutval == 0)
+        return DTWAIN_NO_ERROR;
+    const dynarithmic::TwainTimer theTimer;
+    DTWAIN_ARRAY aFeederLoaded = {};
+	DTWAINArrayLowLevelPtr_RAII raii2(pSource->GetDTWAINHandle(), &aFeederLoaded);
+
+    while (!IsFeederLoaded(pSource, &aFeederLoaded))
+    {
+        if (timeoutval != DTWAIN_WAIT_INFINITE)
+        {
+            if (theTimer.elapsed() > timeoutval)
+            {
+                return DTWAIN_TN_FEEDERTIMEOUT;
+            }
+        }
+        std::this_thread::sleep_for(1ms);
+    }
+    return DTWAIN_NO_ERROR;
+}
 ///////////////////////////////////////////////////////////
 VOID CALLBACK ThisTimerProc(HWND, UINT, ULONG idEvent, DWORD)
 {

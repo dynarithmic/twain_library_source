@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2025 Dynarithmic Software.
+    Copyright (c) 2002-2026 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,24 +18,27 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
+#ifndef CTLTIMER_H
+#define CTLTIMER_H
 
-#include <ctlrandnumutils.h>
-#include <random>
-#include <vector>
-#include <algorithm>
+#include <chrono>
 
 namespace dynarithmic
 {
-    std::vector<unsigned char> CreateRandomDigits(size_t num_bytes)
+    class TwainTimer
     {
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_int_distribution<> distrib(0, 255);
-        std::vector<unsigned char> random_bytes(num_bytes);
-        std::generate(random_bytes.begin(), random_bytes.end(), [&]() 
-        {
-             return static_cast<unsigned char>(distrib(gen));
-        });
-        return random_bytes;
-    }
+        public:
+            TwainTimer() : beg_(clock_::now()) {}
+            void reset() { beg_ = clock_::now(); }
+            double elapsed() const {
+                return std::chrono::duration_cast<second_>
+                    (clock_::now() - beg_).count();
+            }
+
+        private:
+            typedef std::chrono::high_resolution_clock clock_;
+            typedef std::chrono::duration<double, std::ratio<1>> second_;
+            std::chrono::time_point<clock_> beg_;
+    };
 }
+#endif

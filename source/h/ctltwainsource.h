@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2025 Dynarithmic Software.
+    Copyright (c) 2002-2026 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -511,6 +511,10 @@ namespace dynarithmic
         AcquireFileStatus& GetAcquireFileStatusRef() { return m_AcquireFileStatus; }
         AcquireFileStatus GetAcquireFileStatus() const { return m_AcquireFileStatus; }
         ExtendedImageInformation* GetExtendedImageInfo() { return m_pExtendedImageInformation.get(); }
+        void        SetFeederWaitTime(int waitTime) { m_nFeederWaitTime = waitTime; }
+        int         GetFeederWaitTime() const noexcept { return m_nFeederWaitTime; }
+        int         GetFeederWaitTimeOption() const noexcept { return m_nFeederWaitTimeOption; }
+        void        SetFeederWaitTimeOption(int option) noexcept { m_nFeederWaitTimeOption = option; }
         // Only public member
         void *      m_pUserPtr;
 
@@ -697,6 +701,8 @@ namespace dynarithmic
         bool    m_bExtendedImageInfoSupported;
         bool    m_bSupportedExtImageInfo;
         bool    m_bSupportedCustomCapsRetrieved;
+        int     m_nFeederWaitTime;
+        int     m_nFeederWaitTimeOption;
     };
 }
 #endif

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2025 Dynarithmic Software.
+    Copyright (c) 2002-2026 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,10 +22,36 @@
 #define CTLRANDOMNUMUTILS_H
 
 #include <vector>
+#include <random>
+#include <algorithm>
+#include <iterator>
 
 namespace dynarithmic
 {
-    std::vector<unsigned char> CreateRandomDigits(size_t numDigits);
+    template <typename T>
+	T GenerateRandomString(size_t length, size_t lowchar = 0, size_t highchar = 255)
+	{
+		static std::random_device rd;
+		static std::mt19937 generator(rd());
+		static std::uniform_int_distribution<int> distrib(static_cast<int>(lowchar), static_cast<int>(highchar));
+
+		T randomString;
+		randomString.reserve(length); 
+		std::generate_n(std::back_inserter(randomString), length, [&]() {
+			return static_cast<unsigned char>(distrib(generator));
+			});
+		return randomString;
+	}
+
+    inline std::vector<unsigned char> CreateRandomDigits(size_t numDigits)
+    {
+        return GenerateRandomString<std::vector<unsigned char>>(numDigits);
+    }
+
+	inline std::string CreateRandomLatin1String(size_t length)
+	{
+		return GenerateRandomString<std::string>(length, 32, 255);
+	}
 }
 #endif
 

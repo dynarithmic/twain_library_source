@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2025 Dynarithmic Software.
+    Copyright (c) 2002-2026 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 #include "../cximage/ximage.h"
 #include "logwriterutils.h"
 #include "ctlconstexprfind.h"
+#include <ctlutils.h>
 
 #ifdef _MSC_VER
 #pragma warning (disable:4244)
@@ -36,9 +37,6 @@
 #pragma warning (disable:4309)
 #pragma warning (disable:4244)
 #endif
-
-static int getNumOnBits(BYTE value);
-
 
 //#define ISOURCE_INIT_STRING "{98F28E51-C24B-B1B4-9232-0080C8DA7A5E}"
 #define GetAValue(rgb)      ((BYTE)((rgb)>>24))
@@ -522,19 +520,6 @@ FloatRect CDibInterface::Normalize(fipImage& pImage, const FloatRect& ActualRect
     return fRect;
 }
 
-int getNumOnBits(BYTE value)
-{
-    return (value & 0x01) +
-           ((value & 0x02) >> 1) +
-           ((value & 0x04) >> 2) +
-           ((value & 0x08) >> 3) +
-           ((value & 0x10) >> 4) +
-           ((value & 0x20) >> 5) +
-           ((value & 0x40) >> 6) +
-           ((value & 0x80) >> 7);
-}
-
-
 // Test for blank page here
 bool CDibInterface::IsBlankDIB(HANDLE hDib, double threshold)
 {
@@ -560,7 +545,7 @@ bool CDibInterface::IsBlankDIB(HANDLE hDib, double threshold)
             uint64_t numWhite = 0;
             while (bitsOffset < totalSize)
             {
-                const auto countWhite = std::bitset<8>(*(pDib + bitsOffset)).count();
+                const auto countWhite = countOneBits(*(pDib + bitsOffset));
                 numWhite += countWhite;
                 numBlack += 8 - countWhite;
                 ++bitsOffset;
@@ -627,7 +612,7 @@ bool CDibInterface::IsBlankDIBHelper(HANDLE hDib, double threshold)
             for (UINT32 col = 0; col < width; ++col)
             {
                 fw.getPixelColor(col, row, &rgb);
-                numwhite += getNumOnBits(rgb.rgbRed) + getNumOnBits(rgb.rgbGreen) + getNumOnBits(rgb.rgbBlue);
+				numwhite += countOneBits(rgb.rgbRed) + countOneBits(rgb.rgbGreen) + countOneBits(rgb.rgbBlue);
                 totalcomponents += 24;
             }
         }

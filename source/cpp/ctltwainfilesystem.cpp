@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2025 Dynarithmic Software.
+    Copyright (c) 2002-2026 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -273,7 +273,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCamerasEx2(DTWAIN_SOURCE Source)
     DTWAIN_ARRAY arr = {};
     DTWAIN_EnumCameras(Source, &arr);
     LOG_FUNC_EXIT_NONAME_PARAMS(arr)
-    CATCH_BLOCK_LOG_PARAMS((DTWAIN_ARRAY)NULL)
+    CATCH_BLOCK_LOG_PARAMS(nullptr)
 }
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCamerasEx3(DTWAIN_SOURCE Source, LONG nWhichCamera)
@@ -282,7 +282,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCamerasEx3(DTWAIN_SOURCE Source, LONG nWhic
     DTWAIN_ARRAY arr = {};
     DTWAIN_EnumCamerasEx(Source, nWhichCamera, &arr);
     LOG_FUNC_EXIT_NONAME_PARAMS(arr)
-    CATCH_BLOCK_LOG_PARAMS((DTWAIN_ARRAY)NULL)
+    CATCH_BLOCK_LOG_PARAMS(nullptr)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCamerasEx(DTWAIN_SOURCE Source, LONG nWhichCamera, LPDTWAIN_ARRAY Cameras)
@@ -303,7 +303,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumTopCamerasEx(DTWAIN_SOURCE Source)
     DTWAIN_ARRAY Cameras = {};
     DTWAIN_EnumTopCameras(Source, &Cameras);
     LOG_FUNC_EXIT_NONAME_PARAMS(Cameras)
-    CATCH_BLOCK((DTWAIN_ARRAY)NULL)
+    CATCH_BLOCK(nullptr)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumTopCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras)
@@ -320,7 +320,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumBottomCamerasEx(DTWAIN_SOURCE Source)
     DTWAIN_ARRAY Cameras = {};
     DTWAIN_EnumBottomCameras(Source, &Cameras);
     LOG_FUNC_EXIT_NONAME_PARAMS(Cameras)
-    CATCH_BLOCK((DTWAIN_ARRAY)NULL)
+    CATCH_BLOCK(nullptr)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumBottomCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras)

@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2025 Dynarithmic Software.
+    Copyright (c) 2002-2026 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@
 #include "arrayfactory.h"
 #include "ctlfileutils.h"
 #include "tiff.h"
+#include "ctlclosesource.h"
 
 using namespace dynarithmic;
 
@@ -259,7 +260,9 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_bImageInfoRetrieved(false),
     m_bExtendedImageInfoSupported(false),
     m_bSupportedCustomCapsRetrieved(false),
-    m_bSupportedExtImageInfo(false)
+    m_bSupportedExtImageInfo(false),
+    m_nFeederWaitTime(0),
+    m_nFeederWaitTimeOption(DTWAIN_FEEDER_TERMINATE)
 {
     if (lpszProduct)
         m_SourceId.set_product_name(StringConversion::Convert_NativePtr_To_Ansi(lpszProduct));
@@ -1253,4 +1256,16 @@ CTL_ExtImageInfoTriplet* CTL_ITwainSource::GetExtImageInfoTriplet()
         m_pExtImageTriplet = std::make_unique<CTL_ExtImageInfoTriplet>(m_pSession, this, 0);
     return m_pExtImageTriplet.get();
 }
+
+SourceCloserRAII::SourceCloserRAII(CTL_ITwainSource* pSource, bool bClose) : p(pSource), bMustClose(bClose) {}
+SourceCloserRAII::~SourceCloserRAII()
+{
+    try
+    {
+        if (bMustClose)
+            CloseSourceInternal(p->GetDTWAINHandle(), p);
+    }
+    catch (...) {}
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////

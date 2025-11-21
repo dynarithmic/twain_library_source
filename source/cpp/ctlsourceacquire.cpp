@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2025 Dynarithmic Software.
+    Copyright (c) 2002-2026 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@
 #include "sourceselectopts.h"
 #include "arrayfactory.h"
 #include "dtwstrfn.h"
+#include "ctlclosesource.h"
+
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
@@ -234,6 +236,10 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     }
     else
         bSessionPreStarted = true;
+
+    // Make sure that we end the TWAIN session if we started the session
+    SessionCloserRAII sesCloser(!bSessionPreStarted);
+
     auto p = static_cast<CTL_ITwainSource *>(opts.getSource());
     DTWAIN_SOURCE pRealSource;
     bool bSourcePreOpened = true;
@@ -244,19 +250,18 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
         pRealSource = SourceSelect(pHandle, selOpts);
         if (!pRealSource)
         {
-            if (!bSessionPreStarted)
-                DTWAIN_EndTwainSession();
-            LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
+            LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
         }
         if (!DTWAIN_OpenSource(pRealSource))
         {
-            if (!bSessionPreStarted)
-                DTWAIN_EndTwainSession();
-            LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
+            LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
         }
     }
     else
         pRealSource = p;
+
+    // Make sure TWAIN Source is closed if we opened it.
+    SourceCloserRAII sourceCloser(p, !bSourcePreOpened);
 
     const auto acqType = opts.getAcquireType();
     switch (acqType)
@@ -267,7 +272,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
             break;
         default:
         {
-            auto retVal = ConfigurePixelTypesAndBitDepth(opts, pHandle, pRealSource);
+            const auto retVal = ConfigurePixelTypesAndBitDepth(opts, pHandle, pRealSource);
             if ( !retVal.first )
                 DTWAIN_Check_Error_Condition_0_Ex(pHandle, [] {return true; }, retVal.second, NULL, FUNC_MACRO);
         }
@@ -292,9 +297,72 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
         iter->second.m_bSeenUIClose = false;
         iter->second.m_CurrentCount = 0;
     }
+
+    // Wait for the feeder if no UI is selected
+    // and user has a wait-time for paper being placed in the feeder
+    if (!opts.getShowUI())
+    {
+        auto bRet = FeederWait(pAcquireSource);
+        switch (bRet)
+        {
+            case DTWAIN_TN_FEEDERNOTSUPPORTED:
+            case DTWAIN_TN_FEEDERNOTENABLED:
+                // Send notification to application
+                CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(),
+                    nullptr, bRet, reinterpret_cast<LPARAM>(pSource));
+            break;
+
+            case DTWAIN_NO_ERROR:
+            break;
+
+            case DTWAIN_TN_FEEDERTIMEOUT:
+            {
+                // Feeder timed out without paper.
+                auto waitOption = pAcquireSource->GetFeederWaitTimeOption();
+                if (waitOption & DTWAIN_FEEDER_TERMINATE)
+                {
+                    // Stop the acquisition due to the feeder having no paper
+                    opts.setStatus(DTWAIN_TN_FEEDERTIMEOUT);
+
+                    // Send notification to application
+                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(),
+                        nullptr, DTWAIN_TN_FEEDERTIMEOUT, reinterpret_cast<LPARAM>(pSource));
+
+                    // return with no acquisitions being processed
+                    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [] {return true; }, NULL, NULL, FUNC_MACRO);
+                }
+                else
+                if (waitOption & DTWAIN_FEEDER_USEFLATBED)
+                {
+                    // Send notification to application
+                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(),
+                        nullptr, DTWAIN_TN_FEEDERTOFLATBED, reinterpret_cast<LPARAM>(pSource));
+
+                    // Continue and try the flatbed instead
+                    DTWAIN_EnableFeeder(pAcquireSource, FALSE);
+                }
+            }
+        }
+    }
+
+	// Send notification to application
+	bool bStartAcquire = CTL_TwainAppMgr::SendTwainMsgToWindow(pSource->GetTwainSession(), nullptr, DTWAIN_TN_PREACQUIRESTART,
+        reinterpret_cast<LPARAM>(pSource));
+
+    // If callback returned 0, stop the acquisition.
+    if (!bStartAcquire)
+    {
+		// Stop the acquisition due to user app requesting the stop
+		opts.setStatus(DTWAIN_TN_ACQUIREDONE);
+		// return with no acquisitions being processed
+		DTWAIN_Check_Error_Condition_0_Ex(pHandle, [] {return true; }, NULL, NULL, FUNC_MACRO);
+    }
+
     DTWAIN_ARRAY aAcquisitionArray = SourceAcquireWorkerThread(opts);
     if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
     {
+        sesCloser.bMustClose = false;
+        sourceCloser.bMustClose = false;
         LOG_FUNC_EXIT_NONAME_PARAMS(aAcquisitionArray)
     }
 
@@ -309,10 +377,6 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     #ifdef _WIN32
     DTWAIN_SetCallbackProc(oldCall, DTWAIN_CallbackMESSAGE);
     #endif
-    if (!bSessionPreStarted)
-        DTWAIN_EndTwainSession();
-    if (!bSourcePreOpened)
-        DTWAIN_CloseSource(pRealSource);
     LOG_FUNC_EXIT_NONAME_PARAMS(aAcquisitionArray)
     CATCH_BLOCK(DTWAIN_ARRAY(0))
 }
@@ -357,7 +421,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
             if (DTWAIN_LLAcquireNative(opts) == -1L)
             {
                 opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
+                LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
             }
             if (opts.getAcquireType() == ACQUIRENATIVEEX)
                 pSource->SetUserAcquisitionArray(opts.getUserArray());
@@ -368,7 +432,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
             if (DTWAIN_LLAcquireBuffered(opts) == -1L)
             {
                 opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
+                LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
             }
             if (opts.getAcquireType() == ACQUIREBUFFEREX)
                 pSource->SetUserAcquisitionArray(opts.getUserArray());
@@ -378,7 +442,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
             if (DTWAIN_LLAcquireToClipboard(opts) == -1L)
             {
                 opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
+                LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
             }
             break;
 
@@ -386,7 +450,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
             if (DTWAIN_LLAcquireFile(opts) == -1L)
             {
                 opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
+                LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
             }
             break;
 
@@ -395,7 +459,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
             if (DTWAIN_LLAcquireAudioNative(opts) == -1L)
             {
                 opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
+                LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
             }
             if (opts.getAcquireType() == ACQUIREAUDIONATIVEEX)
                 pSource->SetUserAcquisitionArray(opts.getUserArray());
@@ -405,7 +469,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
             if (DTWAIN_LLAcquireAudioFile(opts) == -1L)
             {
                 opts.setStatus(DTWAIN_TN_ACQUIREFAILED);
-                LOG_FUNC_EXIT_NONAME_PARAMS((DTWAIN_ARRAY)NULL)
+                LOG_FUNC_EXIT_NONAME_PARAMS(nullptr)
             }
             break;
 

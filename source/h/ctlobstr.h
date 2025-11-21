@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2025 Dynarithmic Software.
+    Copyright (c) 2002-2026 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -438,25 +438,25 @@ namespace dynarithmic
     struct StringConversion
     {
         #ifdef UNICODE
-        static std::wstring          Convert_Ansi_To_Native(const std::string& x) { return ANSIToWide(x); }
+        static std::wstring          Convert_Ansi_To_Native(std::string_view x) { return ANSIToWide(x); }
         static std::wstring          Convert_AnsiPtr_To_Native(const char *x) { return ANSIToWide(x?x:""); }
 
         static const std::wstring&   Convert_Wide_To_Native(const std::wstring& x) { return x; }
         static std::wstring          Convert_WidePtr_To_Native(const wchar_t* x) { return x?x:L""; }
 
-        static std::string           Convert_Native_To_Ansi(const std::wstring& x) { return WideToANSI(x); }
+        static std::string           Convert_Native_To_Ansi(std::wstring_view x) { return WideToANSI(x); }
         static std::string           Convert_NativePtr_To_Ansi(const wchar_t *x) { return WideToANSI(x?x:L""); }
 
         static const std::wstring&   Convert_Native_To_Wide(const std::wstring& x) { return x; }
         static std::wstring          Convert_NativePtr_To_Wide(const wchar_t *x) { return x?x:L""; }
 
-        static std::wstring          Convert_Ansi_To_Native(const std::string& x, size_t len) { return ANSIToWide(x, len); }
+        static std::wstring          Convert_Ansi_To_Native(std::string_view x, size_t len) { return ANSIToWide(x, len); }
         static std::wstring          Convert_AnsiPtr_To_Native(const char* x, size_t len) { return ANSIToWide(x ? x : "", len); }
 
         static const std::wstring&   Convert_Wide_To_Native(const std::wstring& x, size_t len) { return x; }
         static std::wstring          Convert_WidePtr_To_Native(const wchar_t* x, size_t len) { if (x) return { x, len }; return {}; }
 
-        static std::string           Convert_Native_To_Ansi(const std::wstring& x, size_t len) { return WideToANSI(x, len); }
+        static std::string           Convert_Native_To_Ansi(std::wstring_view x, size_t len) { return WideToANSI(x, len); }
         static std::string           Convert_NativePtr_To_Ansi(const wchar_t* x, size_t len) { return WideToANSI(x ? x : L"", len); }
 
         static const std::wstring&   Convert_Native_To_Wide(const std::wstring& x, size_t) { return x; }
@@ -466,55 +466,55 @@ namespace dynarithmic
         static const std::string&   Convert_Ansi_To_Native(const std::string& x) { return x; }
         static std::string    Convert_AnsiPtr_To_Native(const char *x) { return x?x:""; }
 
-        static std::string    Convert_Wide_To_Native(const std::wstring& x) {return WideToANSI(x);}
+        static std::string    Convert_Wide_To_Native(std::wstring_view x) {return WideToANSI(x);}
         static std::string    Convert_WidePtr_To_Native(const wchar_t *x) { return WideToANSI(x?x:L""); }
 
         static const std::string&   Convert_Native_To_Ansi(const std::string& x) { return x; }
         static std::string    Convert_NativePtr_To_Ansi(const char *x)  { return x?x:""; }
 
-        static std::wstring   Convert_Native_To_Wide(const std::string& x) { return ANSIToWide(x); }
+        static std::wstring   Convert_Native_To_Wide(std::string_view x) { return ANSIToWide(x); }
         static std::wstring   Convert_NativePtr_To_Wide(const char *x) { return ANSIToWide(x?x:""); }
 
         static const std::string& Convert_Ansi_To_Native(const std::string& x, size_t len) { return x; }
         static std::string    Convert_AnsiPtr_To_Native(const char* x, size_t len) { if (x) return {x, len}; return {}; }
 
-        static std::string    Convert_Wide_To_Native(const std::wstring& x, size_t len) { return WideToANSI(x, len); }
+        static std::string    Convert_Wide_To_Native(std::wstring_view x, size_t len) { return WideToANSI(x, len); }
         static std::string    Convert_WidePtr_To_Native(const wchar_t* x, size_t len) { return WideToANSI(x ? x : L"", len); }
 
         static const std::string& Convert_Native_To_Ansi(const std::string& x, size_t) { return x; }
         static std::string    Convert_NativePtr_To_Ansi(const char* x, size_t) { return x?x:""; }
 
-        static std::wstring   Convert_Native_To_Wide(const std::string& x, size_t len) { return ANSIToWide(x, len); }
+        static std::wstring   Convert_Native_To_Wide(std::string_view x, size_t len) { return ANSIToWide(x, len); }
         static std::wstring   Convert_NativePtr_To_Wide(const char* x, size_t len) { return ANSIToWide(x ? x : "", len); }
         #endif
-        static std::string     Convert_Wide_To_Ansi(const std::wstring& x) { return WideToANSI(x); }
-        static std::wstring    Convert_Ansi_To_Wide(const std::string& x) { return ANSIToWide(x); }
+        static std::string     Convert_Wide_To_Ansi(std::wstring_view x) { return WideToANSI(x); }
+        static std::wstring    Convert_Ansi_To_Wide(std::string_view x) { return ANSIToWide(x); }
         static std::string     Convert_WidePtr_To_Ansi(const wchar_t *x) { return x ? WideToANSI(x) : ""; }
         static std::wstring     Convert_AnsiPtr_To_Wide(const char *x) { return x ? ANSIToWide(x) : L""; }
 
-        static std::string     Convert_Wide_To_Ansi(const std::wstring& x, size_t len) { return WideToANSI(x, len); }
-        static std::wstring    Convert_Ansi_To_Wide(const std::string& x, size_t len) { return ANSIToWide(x, len); }
+        static std::string     Convert_Wide_To_Ansi(std::wstring_view x, size_t len) { return WideToANSI(x, len); }
+        static std::wstring    Convert_Ansi_To_Wide(std::string_view x, size_t len) { return ANSIToWide(x, len); }
         static std::string     Convert_WidePtr_To_Ansi(const wchar_t* x, size_t len) { return x ? WideToANSI(x, len) : ""; }
         static std::wstring    Convert_AnsiPtr_To_Wide(const char* x, size_t len) { return x ? ANSIToWide(x, len) : L""; }
 
-        static std::string WideToANSI(const std::wstring& wstr)
+        static std::string WideToANSI(std::wstring_view wstr)
         {
-            return static_cast<LPCSTR>(ConvertW2A(wstr.c_str()));
+            return static_cast<LPCSTR>(ConvertW2A(wstr.data()));
         }
 
-        static std::wstring ANSIToWide(const std::string& str)
+        static std::wstring ANSIToWide(std::string_view str)
         {
-            return static_cast<LPCWSTR>(ConvertA2W(str.c_str()));
+            return static_cast<LPCWSTR>(ConvertA2W(str.data()));
         }
 
-        static std::string WideToANSI(const std::wstring& wstr, size_t len)
+        static std::string WideToANSI(std::wstring_view wstr, size_t len)
         {
-            return static_cast<LPCSTR>(ConvertW2A(wstr.c_str(), len));
+            return static_cast<LPCSTR>(ConvertW2A(wstr.data(), len));
         }
 
-        static std::wstring ANSIToWide(const std::string& str, size_t len)
+        static std::wstring ANSIToWide(std::string_view str, size_t len)
         {
-            return static_cast<LPCWSTR>(ConvertA2W(str.c_str(), len));
+            return static_cast<LPCWSTR>(ConvertA2W(str.data(), len));
         }
 
         template <typename T>
@@ -535,16 +535,16 @@ namespace dynarithmic
             }
         };
 
-        static CTL_StringVector<std::string> WideToANSIWriteable(const std::wstring& wstr)
+        static CTL_StringVector<std::string> WideToANSIWriteable(std::wstring_view wstr)
         {
-            const ConvertW2A conv(wstr.c_str());
+            const ConvertW2A conv(wstr.data());
             CTL_StringVector<std::string> ret(static_cast<LPCSTR>(conv));
             return ret;
         }
 
-        static CTL_StringVector<std::wstring> ANSIToWideWriteable(const std::string& str)
+        static CTL_StringVector<std::wstring> ANSIToWideWriteable(std::string_view str)
         {
-            const ConvertA2W conv(str.c_str());
+            const ConvertA2W conv(str.data());
             CTL_StringVector<std::wstring> ret(static_cast<LPCWSTR>(conv));
             return ret;
         }
@@ -557,35 +557,31 @@ namespace dynarithmic
         enum { DRIVE_POS, DRIVE_PATH, DIRECTORY_POS, NAME_POS, EXTENSION_POS };
         typedef std::vector<StringType> StringArrayType;
 
-        // define string helper functions here
-        static StringType Right(const StringType& str, size_t nNum)
+        static StringType Mid(typename StringTraits::stringview_type str, size_t nFirst)
         {
-            const size_t nLen = str.length();
-            if (nNum == 0)
-                return StringTraits::GetEmptyString();
-            if (nNum > nLen)
-                nNum = nLen;
-            return str.substr(nLen - nNum, nNum);
+            return str.substr(nFirst).data();
         }
 
-        static StringType Mid(const StringType& str, size_t nFirst)
+        static StringType Mid(typename StringTraits::stringview_type str, size_t nFirst, size_t nNum)
         {
-            if (nFirst == 0)
-                return str;
-            return str.substr(nFirst);
+            return { str.substr(nFirst, nNum).data(), nNum };
         }
 
-        static StringType Mid(const StringType& str, size_t  nFirst, size_t nNum)
-        {
-            return str.substr(nFirst, nNum);
-        }
-
-        static StringType Left(const StringType& str, size_t nNum)
+        static StringType Left(typename StringTraits::stringview_type str, size_t nNum)
         {
             return Mid(str, 0, nNum);
         }
 
-        static CharType GetAt(const StringType &str, size_t nPos)
+        // define string helper functions here
+        static StringType Right(typename StringTraits::stringview_type str, size_t nNum)
+        {
+            const size_t nLen = str.length();
+            if (nNum > nLen)
+                nNum = nLen;
+            return Mid(nLen - nNum, nNum);
+        }
+
+        static CharType GetAt(typename StringTraits::stringview_type str, size_t nPos)
         {
             assert(nPos < str.length());
             return str[nPos];
@@ -611,11 +607,20 @@ namespace dynarithmic
             str = StringTraits::GetEmptyString();
         }
 
-        static StringType ReplaceAll(const StringType& str, 
+        static StringType ReplaceAll(typename StringTraits::stringview_type strOrig, 
                                      typename StringTraits::stringview_type findStr, 
                                      typename StringTraits::stringview_type replaceStr)
         {
-            return boost::algorithm::replace_all_copy(str, findStr, replaceStr);
+            if (strOrig.empty()) 
+                return {};
+            StringType str = strOrig.data();
+            size_t start_pos = 0;
+            while ((start_pos = str.find(findStr, start_pos)) != std::string::npos) 
+            {
+                str.replace(start_pos, findStr.length(), replaceStr.data(), replaceStr.length());
+                start_pos += replaceStr.length(); 
+            }
+            return str;
         }
 
         static StringType&  TrimRight(StringType& str, const CharType *lpszTrimStr)
@@ -716,10 +721,10 @@ namespace dynarithmic
             return boost::algorithm::ends_with(str, sub);
         }
 
-        static StringType QuoteString(const StringType& str, 
+        static StringType QuoteString(typename StringTraits::stringview_type str,
                                       const StringType& quoteString = typename traits_type::DoubleQuoteString())
         {
-            return quoteString + str + quoteString;
+            return quoteString + str.data() + quoteString;
         }
 
         static int TokenizeQuoted(const StringType& str, const CharType *lpszTokStr,
@@ -738,26 +743,50 @@ namespace dynarithmic
             return boost::iequals(str, lpsz);
         }
 
+        static void to_lower_upper(CharType* input, size_t len,
+                                   bool isLower,
+                                   const std::locale& loc = std::locale())
+        {
+            auto const& facet = std::use_facet<std::ctype<CharType>>(loc);
+            std::transform(input, input + len, input,
+                [&facet, isLower](CharType c) { return isLower ? facet.tolower(c) : facet.toupper(c); });
+        }
+
+
+        static StringType to_lower_upper_copy(typename StringTraits::stringview_type input, 
+                                              bool isLower,
+                                              const std::locale& loc = std::locale())
+        {
+            auto const& facet = std::use_facet<std::ctype<CharType>>(loc);
+            StringType out;
+            out.reserve(input.size());
+
+            std::transform(input.begin(), input.end(), std::back_inserter(out),
+                [&facet, isLower](CharType c) { return isLower?facet.tolower(c):facet.toupper(c); });
+
+            return out;
+        }
+
         static StringType&  MakeUpperCase(StringType& str)
         {
-            boost::algorithm::to_upper(str);
+            to_lower_upper(str.data(), str.size(), false);
             return str;
         }
 
         static StringType&  MakeLowerCase(StringType& str)
         {
-            boost::algorithm::to_lower(str);
+            to_lower_upper(str.data(), str.size(), true);
             return str;
         }
 
-        static StringType UpperCase(const StringType& str)
+        static StringType UpperCase(typename StringTraits::stringview_type str)
         {
-            return boost::algorithm::to_upper_copy(str);
+            return to_lower_upper_copy(str, false);
         }
 
-        static StringType LowerCase(const StringType& str)
+        static StringType LowerCase(typename StringTraits::stringview_type str)
         {
-            return boost::algorithm::to_lower_copy(str);
+            return to_lower_upper_copy(str, true);
         }
 
         template <typename T>

@@ -607,9 +607,6 @@
     <ClCompile Include="cpp\ctlhashutils.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
-    <ClCompile Include="cpp\ctlrandnumutils.cpp">
-      <Filter>C++ Files</Filter>
-    </ClCompile>
     <ClCompile Include="aeslib\AES.cpp">
       <Filter>AES Encryption</Filter>
     </ClCompile>
@@ -1055,6 +1052,12 @@
     </ClInclude>
     <ClInclude Include="aeslib\AES.h">
       <Filter>AES Encryption</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctlclosesource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="h\ctltimer.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

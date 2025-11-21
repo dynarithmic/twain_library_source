@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2025 Dynarithmic Software.
+    Copyright (c) 2002-2026 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -47,6 +47,7 @@
 #include "ctltwainmsgloop.h"
 #include "ctldefsource.h"
 #include "ctlstringutils.h"
+#include "ctlclosesource.h"
 
 #ifdef _MSC_VER
     #pragma warning (disable:4702)
@@ -96,6 +97,7 @@ static void LoadPaperDetectionOverrides();
 static void LoadOnSourceOpenProperties(CTL_TwainDLLHandle* pHandle);
 static bool LoadGeneralResources(bool blockExecution);
 static void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle);
+static void LoadSelectSourcePosition();
 
 
 #ifdef _WIN32
@@ -853,6 +855,9 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
                 // Load image file related options
                 LoadImageFileOptions(pHandle);
 
+                // Load the last "Select Source" file dialog position
+                LoadSelectSourcePosition();
+                
                 // Initialize imaging code
                 FreeImage_Initialise(true);
 
@@ -1698,6 +1703,25 @@ static bool SysDestroyHelper(const char* pParentFunc, CTL_TwainDLLHandle* pHandl
     auto* customProfile = CTL_StaticData::GetINIInterface();
     if (customProfile)
     {
+        // Write the last select source save position
+        auto& lastPos = CTL_StaticData::GetSelectSourcePos();
+
+        // Check if the "saveselectsourcepos" key value is in INI file, and if so, ifthe value is true
+		bool bSaveLastPos = customProfile->GetBoolValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCES_KEY).data(),
+			                                            CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SAVESELECTSOURCEPOS_KEY).data(), false);
+
+        if (bSaveLastPos && lastPos != std::make_pair(std::numeric_limits<int32_t>::max(), std::numeric_limits<int32_t>::max()))
+        {
+            // Save the last value
+            std::ostringstream strm;
+            strm << lastPos.first << " " << lastPos.second;
+            customProfile->SetValue(
+                CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCES_KEY).data(),
+                CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SELECTSOURCEPOS_KEY).data(),
+                strm.str().c_str());
+        }
+
+        // Close out the other INI changes
         customProfile->SaveFile(CTL_StaticData::GetINIPath().c_str());
         CTL_StaticData::s_iniInterface.reset();
         CTL_StaticData::SetINIFileLoaded(false);
@@ -1772,7 +1796,7 @@ LONG DTWAIN_CloseAllSources()
         CTL_ITwainSource *pTheSource = vt.second;
         if (pTheSource->IsAcquireAttempt())
             CTL_TwainAppMgr::DisableUserInterface(pTheSource);
-        DTWAIN_CloseSource(pTheSource);
+        dynarithmic::CloseSourceInternal(pHandle, pTheSource);
     });
 
     LOG_FUNC_EXIT_NONAME_PARAMS(0)
@@ -2377,18 +2401,22 @@ void LoadPaperDetectionOverrides()
 }
 
 // This loads DTWAIN32.INI or DTWAIN64.INI, and checks the [SourceOpenProps]
-// section.  This section determines the activities to perform after sucessfully
+// section.  This section determines the activities to perform after successfully
 // opening a TWAIN Source
 void LoadOnSourceOpenProperties(CTL_TwainDLLHandle* pHandle)
 {
     // Get the section name
-    auto* feederProfile = CTL_StaticData::GetINIInterface();
-    if (!feederProfile)
+    auto* iniInterface = CTL_StaticData::GetINIInterface();
+    if (!iniInterface)
         return;
     auto iniKey = CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCEOPENPROPS_KEY).data();
-    pHandle->m_OnSourceOpenProperties.m_bCheckFeederStatusOnOpen = feederProfile->GetBoolValue(iniKey, CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_CHECKFEEDERSTATUS_ITEM).data(), true);
-    pHandle->m_OnSourceOpenProperties.m_bQueryBestCapContainer = feederProfile->GetBoolValue(iniKey, CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_QUERYBESTCAPCONTAINER_ITEM).data(), true);
-    pHandle->m_OnSourceOpenProperties.m_bQueryCapOperations = feederProfile->GetBoolValue(iniKey, CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_QUERYBESTCAPCONTAINER_ITEM).data(), true);
+    pHandle->m_OnSourceOpenProperties.m_bCheckFeederStatusOnOpen = iniInterface->GetBoolValue(iniKey, CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_CHECKFEEDERSTATUS_ITEM).data(), true);
+    pHandle->m_OnSourceOpenProperties.m_bQueryBestCapContainer = iniInterface->GetBoolValue(iniKey, CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_QUERYBESTCAPCONTAINER_ITEM).data(), true);
+    pHandle->m_OnSourceOpenProperties.m_bQueryCapOperations = iniInterface->GetBoolValue(iniKey, CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_QUERYBESTCAPCONTAINER_ITEM).data(), true);
+
+    // Check if the default opened source name is saved to the INI file when a source is opened
+	iniKey = CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCES_KEY).data();
+	pHandle->m_OnSourceOpenProperties.m_bSaveDefaultToINI = iniInterface->GetBoolValue(iniKey, CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCE_SAVEDEFAULT).data(), false);
 }
 
 void LoadImageFileOptions(CTL_TwainDLLHandle* pHandle)
@@ -2519,6 +2547,35 @@ bool LoadGeneralResources(bool blockExecution)
             bResourcesLoaded = true;
     }
     return bResourcesLoaded;
+}
+
+// This loads the last select source save position
+void LoadSelectSourcePosition()
+{
+    // Get the section name
+    auto* customProfile = CTL_StaticData::GetINIInterface();
+    if (!customProfile)
+        return;
+
+    const char* pLastPos = customProfile->GetValue(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SOURCES_KEY).data(),
+        CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_SELECTSOURCEPOS_KEY).data(), "");
+    if (pLastPos && pLastPos[0] != 0)
+    {
+        StringWrapperA::StringArrayType arr;
+        auto numTokens = StringWrapperA::Tokenize(pLastPos, " ", arr);
+        if (numTokens >= 2)
+        {
+            auto& lastPos = CTL_StaticData::GetSelectSourcePos();
+            try
+            {
+                lastPos.first = stoi(arr[0]);
+                lastPos.second = stoi(arr[1]);
+            }
+            catch (...)
+            {
+            }
+        }
+    }
 }
 
 #include <sstream>

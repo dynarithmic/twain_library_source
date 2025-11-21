@@ -1,6 +1,6 @@
 /*
     This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2025 Dynarithmic Software.
+    Copyright (c) 2002-2026 Dynarithmic Software.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -117,7 +117,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSupportedExtImageInfoEx(DTWAIN_SOURCE Sourc
     DTWAIN_ARRAY arr = {};
     DTWAIN_EnumSupportedExtImageInfo(Source, &arr);
     LOG_FUNC_EXIT_NONAME_PARAMS(arr)
-    CATCH_BLOCK((DTWAIN_ARRAY)NULL)
+    CATCH_BLOCK(nullptr) 
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedExtImageInfo(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array)
@@ -179,7 +179,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypesEx(DTWAIN_SOURCE Source)
     DTWAIN_ARRAY arr = {};
     DTWAIN_EnumExtImageInfoTypes(Source, &arr);
     LOG_FUNC_EXIT_NONAME_PARAMS(arr)
-    CATCH_BLOCK((DTWAIN_ARRAY)NULL)
+    CATCH_BLOCK(nullptr)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array)
@@ -506,6 +506,18 @@ static std::pair<bool, int> GetCachedExtImageInfoData(CTL_TwainDLLHandle* pHandl
         return { true, DTWAIN_NO_ERROR };
     }
     return { false, DTWAIN_ERR_MEM };
+}
+
+
+/* This returns the data that the Source returned when the item is queried.
+   Use DTWAIN_GetExtImageInfoItem to determine the type of data.   */
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetExtImageInfoDataEx(DTWAIN_SOURCE Source, LONG nWhich)
+{
+	LOG_FUNC_ENTRY_PARAMS((Source, nWhich))
+    DTWAIN_ARRAY Data = {};
+    DTWAIN_GetExtImageInfoData(Source, nWhich, &Data);
+	LOG_FUNC_EXIT_NONAME_PARAMS(Data)
+	CATCH_BLOCK(nullptr)
 }
 
 /* This returns the data that the Source returned when the item is queried.
