@@ -4,6 +4,8 @@ DTWAIN Version changes
 
 - Change name of Ruby binding to dtwain.rb from dynarithmic.rb
 
+- Added Lua language binding (binding uses LuaJit)
+
 - Upgraded following internal image libraries:
 
       libtiff  --> 4.7.1
