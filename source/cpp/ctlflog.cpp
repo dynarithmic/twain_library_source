@@ -18,12 +18,7 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include <boost/format.hpp>
-
-#include "cppfunc.h"
 #include "ctliface.h"
-#include "ctltwainmanager.h"
-#include "dtwain_resource_constants.h"
 #include "dtwain_exception.h"
 #include "ctllogcalls.h"
 
@@ -112,6 +107,16 @@ std::string dynarithmic::CTL_LogFunctionCallHelper(const char *pFuncName, int nW
         {
            CTL_StaticData::GetLogger().OutputDebugStringFull(s);
         }
+    }
+    else 
+    if ( nWhich == LOG_INDENT_OUT )
+    {
+		s += " -- " + dynarithmic::GetResourceStringFromMap(IDS_LOGMSG_LASTERROR);
+		const auto* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+		s += " (" + std::to_string(pHandle->m_lLastError) + "), ";
+        char buffer[1024] = {};
+        GetResourceStringA(std::abs(pHandle->m_lLastError), buffer, 1023);
+        s += std::string("(") + buffer + ")";
     }
     return s;
 }

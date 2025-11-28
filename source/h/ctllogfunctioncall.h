@@ -404,7 +404,7 @@ namespace dynarithmic
                 s = CTL_LogFunctionCallA(DTWAIN_LOG_CALLSTACK, func.data(), LOG_INDENT_IN) + ParamOutputter2(false, std::forward<P>(p)...).getString();
             else
                 s = CTL_LogFunctionCallA(DTWAIN_LOG_CALLSTACK, func.data(), LOG_INDENT_OUT) + ParamOutputter2(true, retValue).getString();
-            LogWriterUtils::WriteLogInfoA(s);
+                LogWriterUtils::WriteLogInfoA(s);
         }
         return s;
     }
