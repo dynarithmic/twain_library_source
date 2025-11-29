@@ -22,6 +22,7 @@
 #include "dtwain_exception.h"
 #include "ctllogcalls.h"
 #include "logwriterutils.h"
+#include <sstream>
 
 using namespace dynarithmic;
 
@@ -112,12 +113,15 @@ std::string dynarithmic::CTL_LogFunctionCallHelper(const char *pFuncName, int nW
     else 
     if ( nWhich == LOG_INDENT_OUT )
     {
-		s += " -- " + dynarithmic::GetResourceStringFromMap(IDS_LOGMSG_LASTERROR);
 		const auto* pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
-		s += " (" + std::to_string(pHandle->m_lLastError) + "), ";
-        char buffer[1024] = {};
-        GetResourceStringA(std::abs(pHandle->m_lLastError), buffer, 1023);
-        s += std::string("(") + buffer + ")";
+		char buffer[1024] = {};
+		GetResourceStringA(std::abs(pHandle->m_lLastError), buffer, 1023);
+        std::ostringstream strm;
+        strm << " -- " 
+             << dynarithmic::GetResourceStringFromMap(IDS_LOGMSG_LASTERROR) 
+             << " (" << std::to_string(pHandle->m_lLastError) << ") " 
+             << "(" << buffer << ")";
+        s += strm.str();
     }
     return s;
 }
