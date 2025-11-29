@@ -41,7 +41,7 @@ DTWAIN_ERROR_PROC DLLENTRY_DEF DTWAIN_GetErrorCallback(VOID_PROTOTYPE)
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const DTWAIN_ERROR_PROC theProc = pHandle->m_pErrorProcFn;
     LOG_FUNC_EXIT_NONAME_PARAMS(theProc)
-    CATCH_BLOCK(DTWAIN_ERROR_PROC(0))
+    CATCH_BLOCK(nullptr)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetErrorCallback64(DTWAIN_ERROR_PROC64 logProc, LONG64 UserData)
@@ -60,6 +60,6 @@ DTWAIN_ERROR_PROC64 DLLENTRY_DEF DTWAIN_GetErrorCallback64(VOID_PROTOTYPE)
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const DTWAIN_ERROR_PROC64 theProc = pHandle->m_pErrorProcFn64;
     LOG_FUNC_EXIT_NONAME_PARAMS(theProc)
-    CATCH_BLOCK(DTWAIN_ERROR_PROC64(0))
+    CATCH_BLOCK(nullptr)
 }
 

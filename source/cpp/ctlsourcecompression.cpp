@@ -257,6 +257,6 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, L
     std::transform(setAllTypes.begin(), setAllTypes.end(), vAll.begin(), [&](LONG n) { return n; });
 
     LOG_FUNC_EXIT_NONAME_PARAMS(aRetValue)
-    CATCH_BLOCK(DTWAIN_ARRAY{})
+    CATCH_BLOCK(nullptr)
 }
 

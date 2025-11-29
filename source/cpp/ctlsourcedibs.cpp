@@ -36,7 +36,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetSourceAcquisitions(DTWAIN_SOURCE Source)
     if (!AcqArray)
         LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
     LOG_FUNC_EXIT_NONAME_PARAMS(AcqArray)
-    CATCH_BLOCK_LOG_PARAMS(DTWAIN_ARRAY(0))
+    CATCH_BLOCK_LOG_PARAMS(nullptr)
 }
 
 DTWAIN_BOOL dynarithmic::DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source, DTWAIN_ARRAY pArray)
@@ -88,7 +88,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetCurrentAcquiredImage(DTWAIN_SOURCE Source)
     if (nCount == 0)
         LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
     LOG_FUNC_EXIT_NONAME_PARAMS((HANDLE)pSource->GetDibHandle(nCount - 1))
-    CATCH_BLOCK_LOG_PARAMS(HANDLE(0))
+    CATCH_BLOCK_LOG_PARAMS(nullptr)
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetCurrentPageNum(DTWAIN_SOURCE Source)
@@ -106,7 +106,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_CreateAcquisitionArray()
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     const DTWAIN_ARRAY AcqArray = static_cast<DTWAIN_ARRAY>(CreateArrayFromFactory(pHandle, DTWAIN_ARRAYOFHANDLEARRAYS, 0));
     LOG_FUNC_EXIT_NONAME_PARAMS(AcqArray)
-    CATCH_BLOCK(DTWAIN_ARRAY(0))
+    CATCH_BLOCK(nullptr)
 }
 
 // class whose purpose is to destroy the image data array

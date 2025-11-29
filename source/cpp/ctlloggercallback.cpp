@@ -31,7 +31,7 @@ DTWAIN_LOGGER_PROC DLLENTRY_DEF DTWAIN_GetLoggerCallback(VOID_PROTOTYPE)
     LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_LoggerCallbackInfo.m_pLoggerCallback)
-    CATCH_BLOCK(DTWAIN_LOGGER_PROC(0))
+    CATCH_BLOCK(nullptr)
 }
 
 DTWAIN_LOGGER_PROCA DLLENTRY_DEF DTWAIN_GetLoggerCallbackA(VOID_PROTOTYPE) 
@@ -40,7 +40,7 @@ DTWAIN_LOGGER_PROCA DLLENTRY_DEF DTWAIN_GetLoggerCallbackA(VOID_PROTOTYPE)
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     DTWAIN_LOGGER_PROCA theProc = pHandle->m_LoggerCallbackInfo.m_pLoggerCallbackA; 
     LOG_FUNC_EXIT_NONAME_PARAMS(theProc) 
-    CATCH_BLOCK(DTWAIN_LOGGER_PROCA(0)) 
+    CATCH_BLOCK(nullptr) 
 }
 
 DTWAIN_LOGGER_PROCW DLLENTRY_DEF DTWAIN_GetLoggerCallbackW(VOID_PROTOTYPE) 
@@ -49,7 +49,7 @@ DTWAIN_LOGGER_PROCW DLLENTRY_DEF DTWAIN_GetLoggerCallbackW(VOID_PROTOTYPE)
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     DTWAIN_LOGGER_PROCW theProc = pHandle->m_LoggerCallbackInfo.m_pLoggerCallbackW; 
     LOG_FUNC_EXIT_NONAME_PARAMS(theProc) 
-    CATCH_BLOCK(DTWAIN_LOGGER_PROCW(0)) 
+    CATCH_BLOCK(nullptr) 
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetLoggerCallback(DTWAIN_LOGGER_PROC logProc, DTWAIN_LONG64 UserData)

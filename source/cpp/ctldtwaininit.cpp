@@ -471,7 +471,7 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_GetDTWAINHandle()
 {
     LOG_FUNC_ENTRY_PARAMS(())
     LOG_FUNC_EXIT_NONAME_PARAMS(::GetDTWAINHandle_Internal())
-    CATCH_BLOCK(DTWAIN_HANDLE(0))
+    CATCH_BLOCK(nullptr)
 }
 
 
@@ -699,7 +699,7 @@ DTWAIN_HANDLE DLLENTRY_DEF  DTWAIN_SysInitializeLib(HINSTANCE hInstance)
 #endif
     const DTWAIN_HANDLE Handle = DTWAIN_SysInitialize();
     LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
-    CATCH_BLOCK(DTWAIN_HANDLE(0))
+    CATCH_BLOCK(nullptr)
 }
 
 DTWAIN_HANDLE DLLENTRY_DEF  DTWAIN_SysInitializeLibEx2(HINSTANCE hInstance,
@@ -713,7 +713,7 @@ DTWAIN_HANDLE DLLENTRY_DEF  DTWAIN_SysInitializeLibEx2(HINSTANCE hInstance,
 
     const DTWAIN_HANDLE Handle = DTWAIN_SysInitializeLibEx(hInstance, szINIPath);
     LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
-    CATCH_BLOCK(DTWAIN_HANDLE(0))
+    CATCH_BLOCK(nullptr)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -725,7 +725,7 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeLibEx(HINSTANCE hInstance, LPCTST
 
     const DTWAIN_HANDLE Handle = DTWAIN_SysInitializeLib(hInstance);
     LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
-    CATCH_BLOCK(DTWAIN_HANDLE(0))
+	CATCH_BLOCK(nullptr)
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -739,7 +739,7 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx2(LPCTSTR szINIPath,
     SetLangResourcePath(szLangResourcePath);
     const DTWAIN_HANDLE Handle = DTWAIN_SysInitializeEx(szINIPath);
     LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
-    CATCH_BLOCK(DTWAIN_HANDLE(0))
+	CATCH_BLOCK(nullptr)
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////
 DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx(LPCTSTR szINIPath)
@@ -748,7 +748,7 @@ DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeEx(LPCTSTR szINIPath)
     CTL_StaticData::GetINIPath() = StringWrapper::AddBackslashToDirectory(szINIPath);
     const DTWAIN_HANDLE Handle = DTWAIN_SysInitialize();
     LOG_FUNC_EXIT_NONAME_PARAMS(Handle)
-    CATCH_BLOCK(DTWAIN_HANDLE(0))
+	CATCH_BLOCK(nullptr)
 }
 
 DTWAIN_HANDLE DLLENTRY_DEF DTWAIN_SysInitializeNoBlocking()
@@ -882,15 +882,15 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
             }
             LOG_FUNC_ENTRY_PARAMS(())
             LOG_FUNC_EXIT_NONAME_PARAMS(static_cast<DTWAIN_HANDLE>(pHandle))
-            CATCH_BLOCK(DTWAIN_HANDLE(0))
+			CATCH_BLOCK(nullptr)
         }
         else
         {
             LOG_FUNC_ENTRY_PARAMS(())
             LOG_FUNC_EXIT_NONAME_PARAMS(static_cast<DTWAIN_HANDLE>(pHandle))
-            CATCH_BLOCK(DTWAIN_HANDLE(0))
+			CATCH_BLOCK(nullptr)
         }
-        CATCH_BLOCK(DTWAIN_HANDLE(0))
+		CATCH_BLOCK(nullptr)
         LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
     }
     catch (std::exception& ex)
@@ -1779,7 +1779,7 @@ HWND  DLLENTRY_DEF  DTWAIN_GetTwainHwnd()
     LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_hWndTwain)
-    CATCH_BLOCK(HWND(0))
+    CATCH_BLOCK(nullptr)
 }
 
 LONG DTWAIN_CloseAllSources()

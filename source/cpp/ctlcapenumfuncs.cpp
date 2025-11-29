@@ -37,7 +37,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCustomCapsEx2(DTWAIN_SOURCE Source)
     DTWAIN_ARRAY pArray = nullptr;
     DTWAIN_EnumCustomCaps(Source, &pArray);
     LOG_FUNC_EXIT_NONAME_PARAMS(pArray)
-    CATCH_BLOCK(DTWAIN_ARRAY(nullptr))
+    CATCH_BLOCK(nullptr)
 }
 
 

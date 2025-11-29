@@ -63,7 +63,7 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectDefaultOCREngine()
         pEngine->StartupOCREngine();
 
     LOG_FUNC_EXIT_NONAME_PARAMS(SelectedEngine)
-    CATCH_BLOCK(DTWAIN_OCRENGINE())
+    CATCH_BLOCK(nullptr)
 }
 
 DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngineByName(LPCTSTR lpszName)
@@ -90,7 +90,7 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngineByName(LPCTSTR lpszName)
         }
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(ocrEngine_)
-    CATCH_BLOCK(DTWAIN_OCRENGINE())
+    CATCH_BLOCK(nullptr)
 }
 
 DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine()
@@ -104,7 +104,7 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine()
                                 0, 0, nullptr, nullptr, nullptr, DTWAIN_DLG_CENTER_SCREEN);
     auto retVal = SelectOCREngine(pHandle, opts);
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
-    CATCH_BLOCK(DTWAIN_OCRENGINE())
+    CATCH_BLOCK(nullptr)
 }
 
 DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine2(HWND hWndParent, 
@@ -122,7 +122,7 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine2(HWND hWndParent,
                                 xPos, yPos, nullptr, nullptr, nullptr, nOptions);
     auto retVal = SelectOCREngine(pHandle, opts);
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
-    CATCH_BLOCK(DTWAIN_OCRENGINE())
+    CATCH_BLOCK(nullptr)
 }
 
 DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine2Ex(HWND hWndParent,
@@ -144,7 +144,7 @@ DTWAIN_OCRENGINE DLLENTRY_DEF DTWAIN_SelectOCREngine2Ex(HWND hWndParent,
 
     auto retVal = SelectOCREngine(pHandle, opts);
     LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
-    CATCH_BLOCK(DTWAIN_OCRENGINE())
+    CATCH_BLOCK(nullptr)
 }
 
 static std::vector<TCHAR> GetDefaultOCRName(SelectStruct& selectTraits)

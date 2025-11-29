@@ -62,7 +62,7 @@ HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIString(LPCTSTR lpOrigString)
     LOG_FUNC_ENTRY_PARAMS((lpOrigString))
     auto retval = ConvertToAPIString_Internal<StringWrapper,LPCTSTR>(lpOrigString);
     LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-    CATCH_BLOCK((HANDLE)NULL)
+    CATCH_BLOCK(nullptr)
 }
 
 HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringA(LPCSTR lpOrigString)
@@ -70,7 +70,7 @@ HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringA(LPCSTR lpOrigString)
     LOG_FUNC_ENTRY_PARAMS((lpOrigString))
     auto retval = ConvertToAPIString_Internal<StringWrapperA,LPCSTR>(lpOrigString);
     LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-    CATCH_BLOCK((HANDLE)NULL)
+    CATCH_BLOCK(nullptr)
 }
 
 HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringW(LPCWSTR lpOrigString)
@@ -78,7 +78,7 @@ HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringW(LPCWSTR lpOrigString)
     LOG_FUNC_ENTRY_PARAMS((lpOrigString))
     auto retval = ConvertToAPIString_Internal<StringWrapperW,LPCWSTR>(lpOrigString);
     LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-    CATCH_BLOCK((HANDLE)NULL)
+    CATCH_BLOCK(nullptr)
 }
 
 LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringEx(LPCTSTR lpOrigString, LPTSTR lpOutString, LONG nSize)
