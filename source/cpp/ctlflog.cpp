@@ -21,6 +21,7 @@
 #include "ctliface.h"
 #include "dtwain_exception.h"
 #include "ctllogcalls.h"
+#include "logwriterutils.h"
 
 using namespace dynarithmic;
 
