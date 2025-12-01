@@ -1,5 +1,10 @@
 DTWAIN Version changes
 
+5.7.2
+
+- Fixed potential issue with setting the CAP_CAPTION capability.
+
+
 5.7.1
 
 - Change name of Ruby binding to dtwain.rb from dynarithmic.rb
