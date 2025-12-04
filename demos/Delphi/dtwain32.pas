@@ -39,8 +39,8 @@ type
   LPCSTR = PAnsiChar;
   LPWSTR = PWideChar;
   LPCWSTR = PWideChar;
-  LPCTSTR = PChar;
-  LPTSTR = PChar;
+  LPCTSTR = PAnsiChar;
+  LPTSTR = PAnsiChar;
   LPVOID = Pointer;
   DTWAIN_CALLBACK_PROC = Pointer;
   DTWAIN_CALLBACK_PROC64 = Pointer;

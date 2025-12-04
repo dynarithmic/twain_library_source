@@ -1741,7 +1741,7 @@ Class DTWAINAPI
     Public Delegate Function DTwainErrorProc64(param1 As Integer, param2 As Long) As Integer
     Public Delegate Function DTwainLoggerProcA(<MarshalAs(UnmanagedType.LPStr)> lpszName As String, UserData As Long) As Integer
     Public Delegate Function DTwainLoggerProcW(<MarshalAs(UnmanagedType.LPWStr)> lpszName As String, UserData As Long) As Integer
-    Public Delegate Function DTwainLoggerProc(<MarshalAs(UnmanagedType.LPTStr)> lpszName As String, UserData As Long) As Integer
+    Public Delegate Function DTwainLoggerProc(<MarshalAs(UnmanagedType.LPStr)> lpszName As String, UserData As Long) As Integer
     Public Delegate Function DTwainDIBUpdateProc(TheSource As System.IntPtr, currentImage As Integer, DibData As System.IntPtr) As System.IntPtr
 
     Declare Ansi Function DTWAIN_AcquireAudioFile Lib "dtwain64.dll" (Source As System.IntPtr, lpszFile As String, lFileFlags As Integer, lMaxClips As Integer, bShowUI As Integer, bCloseSource As Integer, ByRef pStatus As Integer) As Integer
