@@ -19,6 +19,7 @@
 --  DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT 
 --  OF THIRD PARTY RIGHTS.                                                                
 
+
 local dtwain_constants = {}
    dtwain_constants.DTWAIN_FF_TIFF = 0
    dtwain_constants.DTWAIN_FF_PICT = 1
