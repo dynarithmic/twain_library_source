@@ -21,7 +21,6 @@
 #ifndef DTWAIN_VERINFO_H
 #define DTWAIN_VERINFO_H
 
-#include "dtwain_config.h"
 #include "dtwain_version.h"
 
 #if DTWAIN_BUILD_LOGCALLSTACK == 1

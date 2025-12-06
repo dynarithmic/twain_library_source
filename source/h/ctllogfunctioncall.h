@@ -21,7 +21,6 @@
 #ifndef CTLLOGFUNCTIONCALL_H
 #define CTLLOGFUNCTIONCALL_H
 
-#include "dtwain_config.h"
 #if DTWAIN_BUILD_LOGCALLSTACK == 1
 
 #include <string.h>
