@@ -39,7 +39,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetSourceAcquisitions(DTWAIN_SOURCE Source)
     CATCH_BLOCK_LOG_PARAMS(nullptr)
 }
 
-DTWAIN_BOOL dynarithmic::DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source, DTWAIN_ARRAY pArray)
+DTWAIN_BOOL dynarithmic::DTWAIN_GetAllSourceDibsInternal(DTWAIN_SOURCE Source, DTWAIN_ARRAY pArray)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pArray))
     CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
@@ -72,12 +72,21 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAllSourceDibsEx(DTWAIN_SOURCE Source, LPDTWAI
     const DTWAIN_ARRAY DibArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYHANDLE, 0);
     if (DibArray)
     {
-        DTWAIN_GetAllSourceDibs(Source, DibArray);
+        DTWAIN_GetAllSourceDibsInternal(Source, DibArray);
         *pArray = DibArray;
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(false)
     CATCH_BLOCK(false)
+}
+
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source)
+{
+	LOG_FUNC_ENTRY_PARAMS((Source))
+    DTWAIN_ARRAY dibs = {};
+	DTWAIN_GetAllSourceDibsEx(Source, &dibs);
+	LOG_FUNC_EXIT_NONAME_PARAMS(dibs)
+    CATCH_BLOCK(nullptr)
 }
 
 HANDLE DLLENTRY_DEF DTWAIN_GetCurrentAcquiredImage(DTWAIN_SOURCE Source)

@@ -281,7 +281,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                 {
                     LOG_FUNC_STRING(DTWAIN_ACQUIREDONE -- Copying DIBS to Source...)
                     DTWAIN_ARRAY aDibs = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYHANDLE, 0);
-                    DTWAIN_GetAllSourceDibs( static_cast<DTWAIN_SOURCE>(pSource), aDibs );
+                    DTWAIN_GetAllSourceDibsInternal( static_cast<DTWAIN_SOURCE>(pSource), aDibs );
                     pSource->AddDibsToAcquisition(aDibs);
                     LOG_FUNC_STRING(DTWAIN_ACQUIREDONE -- Finished Copying DIBS to Source...)
                 }
@@ -507,7 +507,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                                 char buf[25] = {};
                                 LOG_FUNC_STRING(No UI Mode Done -- Copying DIBS to Source...)
                                 DTWAIN_ARRAY aDibs = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYHANDLE, 0);
-                                DTWAIN_GetAllSourceDibs(pSource, aDibs);
+                                DTWAIN_GetAllSourceDibsInternal(pSource, aDibs);
                                 int nDibs = static_cast<int>(pHandle->m_ArrayFactory->size(aDibs));
                                 StringStreamA strm;
                                 strm << buf;
