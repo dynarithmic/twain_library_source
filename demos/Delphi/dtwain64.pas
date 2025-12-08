@@ -2192,6 +2192,7 @@ function DTWAIN_GetAcquireArea2(Source:DTWAIN_SOURCE; left:LPDTWAIN_FLOAT; top:L
 function DTWAIN_GetAcquireArea2String(Source:DTWAIN_SOURCE; left:LPTSTR; top:LPTSTR; right:LPTSTR; bottom:LPTSTR; Unit_:LPLONG) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetAcquireArea2String';
 function DTWAIN_GetAcquireArea2StringA(Source:DTWAIN_SOURCE; left:LPSTR; top:LPSTR; right:LPSTR; bottom:LPSTR; Unit_:LPLONG) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetAcquireArea2StringA';
 function DTWAIN_GetAcquireArea2StringW(Source:DTWAIN_SOURCE; left:LPWSTR; top:LPWSTR; right:LPWSTR; bottom:LPWSTR; Unit_:LPLONG) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetAcquireArea2StringW';
+function DTWAIN_GetAcquireAreaEx(Source:DTWAIN_SOURCE; lGetType:LONG) : DTWAIN_ARRAY; external 'dtwain64.dll'  name 'DTWAIN_GetAcquireAreaEx';
 function DTWAIN_GetAcquireMetrics(source:DTWAIN_SOURCE; ImageCount:LPLONG; SheetCount:LPLONG) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetAcquireMetrics';
 function DTWAIN_GetAcquireStripBuffer(Source:DTWAIN_SOURCE) : NativeInt; external 'dtwain64.dll'  name 'DTWAIN_GetAcquireStripBuffer';
 function DTWAIN_GetAcquireStripData(Source:DTWAIN_SOURCE; lpCompression:LPLONG; lpBytesPerRow:LPDWORD; lpColumns:LPDWORD; lpRows:LPDWORD; XOffset:LPDWORD; YOffset:LPDWORD; lpBytesWritten:LPDWORD) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetAcquireStripData';
@@ -2205,6 +2206,7 @@ function DTWAIN_GetActiveDSMVersionInfo(szDLLInfo:LPTSTR; nMaxLen:LONG) : LONG; 
 function DTWAIN_GetActiveDSMVersionInfoA(lpszBuffer:LPSTR; nMaxLen:LONG) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetActiveDSMVersionInfoA';
 function DTWAIN_GetActiveDSMVersionInfoW(lpszBuffer:LPWSTR; nMaxLen:LONG) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetActiveDSMVersionInfoW';
 function DTWAIN_GetAlarmVolume(Source:DTWAIN_SOURCE; lpVolume:LPLONG) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetAlarmVolume';
+function DTWAIN_GetAllSourceDibs(Source:DTWAIN_SOURCE) : DTWAIN_ARRAY; external 'dtwain64.dll'  name 'DTWAIN_GetAllSourceDibs';
 function DTWAIN_GetAppInfo(szVerStr:LPTSTR; szManu:LPTSTR; szProdFam:LPTSTR; szProdName:LPTSTR) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetAppInfo';
 function DTWAIN_GetAppInfoA(szVerStr:LPSTR; szManu:LPSTR; szProdFam:LPSTR; szProdName:LPSTR) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetAppInfoA';
 function DTWAIN_GetAppInfoW(szVerStr:LPWSTR; szManu:LPWSTR; szProdFam:LPWSTR; szProdName:LPWSTR) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetAppInfoW';
@@ -2225,6 +2227,7 @@ function DTWAIN_GetCallback64 : DTwainCallback64; external 'dtwain64.dll'  name 
 function DTWAIN_GetCapArrayType(Source:DTWAIN_SOURCE; nCap:LONG) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetCapArrayType';
 function DTWAIN_GetCapContainer(Source:DTWAIN_SOURCE; nCap:LONG; lCapType:LONG) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetCapContainer';
 function DTWAIN_GetCapContainerEx(nCap:LONG; bSetContainer:BOOL; ConTypes:LPDTWAIN_ARRAY) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetCapContainerEx';
+function DTWAIN_GetCapContainerEx2(nCap:LONG; bSetContainer:BOOL) : DTWAIN_ARRAY; external 'dtwain64.dll'  name 'DTWAIN_GetCapContainerEx2';
 function DTWAIN_GetCapDataType(Source:DTWAIN_SOURCE; nCap:LONG) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetCapDataType';
 function DTWAIN_GetCapFromName(szName:LPCTSTR) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetCapFromName';
 function DTWAIN_GetCapFromNameA(szName:LPCSTR) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetCapFromNameA';
