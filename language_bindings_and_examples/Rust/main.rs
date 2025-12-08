@@ -93,7 +93,7 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>>{
             api_func.DTWAIN_ArrayDestroy(cap_array);
 
             // Now acquire to a bmp file
-            c_string = CString::new("c:\\saved_images\\rust.bmp").unwrap();
+            c_string = CString::new("rust.bmp").unwrap();
             api_func.DTWAIN_AcquireFileA(twain_source, c_string.as_ptr(), DTwainAPI::DTWAIN_BMP, DTwainAPI::DTWAIN_USELONGNAME,
                                          DTwainAPI::DTWAIN_PT_DEFAULT, 1, 1, 1, ptr::null_mut());
         }
