@@ -144,7 +144,6 @@ namespace Dynarithmic
         public delegate long  DTwainErrorProc64( int param1, long param2);
         public delegate long  DTwainLoggerProcA([MarshalAs(UnmanagedType.LPStr)] string lpszName, long UserData);
         public delegate long  DTwainLoggerProcW([MarshalAs(UnmanagedType.LPWStr)] string lpszName, long UserData);
-        public delegate long  DTwainLoggerProc([MarshalAs(UnmanagedType.LPTStr)] string lpszName, long UserData);
         public delegate DTWAIN_HANDLE DTwainDIBUpdateProc(DTWAIN_SOURCE source, int currentImage, DTWAIN_HANDLE DibData);
         public delegate long  DTwainLoggerProc([MarshalAs(UnmanagedType.LPTStr)] string lpszName, long UserData);
 

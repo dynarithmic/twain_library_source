@@ -70,7 +70,11 @@ namespace TWAINDemo
         private Boolean initialized;
         private TwainAPI.DTwainCallback theCallback;
 
+        #if _X64
+        public long CallbackProc(long wParam, long lParam, long UserData)
+        #else
         public int CallbackProc(int wParam, int lParam, int UserData)
+        #endif
         {
             switch (wParam)
             {
