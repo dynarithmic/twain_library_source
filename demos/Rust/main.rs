@@ -42,7 +42,7 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>>{
         unsafe
         {
             // Display the product name.
-            // Note we use the helper function alloc_c_char_buffer to allocate a char buffer
+            // Note we use the helper function alloc_ansi_buffer to allocate a char buffer
             // that the DLL function can work with.
             let char_buffer = dtwainapi::DTwainAPI::allocate_ansi_buffer(256);
             api_func.DTWAIN_GetSourceProductNameA(twain_source, char_buffer, 256);
