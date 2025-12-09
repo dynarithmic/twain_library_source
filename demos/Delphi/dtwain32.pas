@@ -176,16 +176,16 @@ type
   HFONT = NativeInt;
   TOpenFilenamePtr = ^TOpenFilename;
 
+
   { Function types }
-   DTwainCallback = function(wParam:Integer;lParam:Integer;userData:Integer) : Integer; stdcall;
-   DTwainDibUpdateCallback = function(Source:DTWAIN_SOURCE;pageNum:Integer;dibHandle:DTWAIN_HANDLE): Integer; stdcall;
-   DTwainCallback64 = function(wParam:Integer;lParam:Integer;userData:Int64):Integer; stdcall;
-   DTwainErrorProc = function( param1:Integer;param2:Integer):Integer;stdcall;
-   DTwainErrorProc64 = function( param1:Integer;param2:Int64):Integer;stdcall;
-   DTwainLoggerProcA = function(lpszName:LPSTR;userData:LongInt):Integer;stdcall;
-   DTwainLoggerProcW = function(lpszName:LPWSTR;userData:LongInt):Integer;stdcall;
-   DTwainLoggerProc = function(lpszName:LPTSTR;userData:LongInt):Integer;stdcall;
-   DTwainDIBUpdateProc = function(lpSource:DTWAIN_SOURCE;currentImage:Integer;DibData:DTWAIN_HANDLE):DTWAIN_HANDLE;stdcall;
+   DTwainCallback = function(wParam:NativeInt; lParam:NativeInt; userData:NativeInt) : NativeInt; stdcall;
+   DTwainCallback64 = function(wParam:NativeInt; lParam:NativeInt; userData:Int64): NativeInt; stdcall;
+   DTwainDIBUpdateProc = function(lpSource:DTWAIN_SOURCE; currentImage:Integer; DibData:DTWAIN_HANDLE):DTWAIN_HANDLE;stdcall;
+   DTwainErrorProc = function( param1:Integer; param2:Integer):NativeInt; stdcall;
+   DTwainErrorProc64 = function( param1:Integer; param2:Int64):NativeInt; stdcall;
+   DTwainLoggerProcA = function(lpszName:LPSTR; userData:Int64):NativeInt; stdcall;
+   DTwainLoggerProcW = function(lpszName:LPWSTR; userData:Int64):NativeInt; stdcall;
+   DTwainLoggerProc = function(lpszName:LPTSTR; userData:Int64):NativeInt; stdcall;
 
 const
 

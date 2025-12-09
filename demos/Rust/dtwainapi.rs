@@ -21,11 +21,2261 @@
 #![allow(dead_code)]
 #![allow(non_upper_case_globals)]
 #![allow(non_snake_case)]
+#![allow(non_camel_case_types)]
 
 use std::ffi::{c_void, c_char};
 use libloading::{Library, Symbol};
 
+#[cfg(target_pointer_width = "64")]
+type Dtwaincallbacktype = i64;
 
+#[cfg(target_pointer_width = "64")]
+type Dtwaincallbackreturntype = i64;
+
+#[cfg(target_pointer_width = "32")]
+type Dtwaincallbacktype = i32;
+
+#[cfg(target_pointer_width = "32")]
+type Dtwaincallbackreturntype = i32;
+
+type DTWAIN_CALLBACK_PROC = extern "C" fn(Dtwaincallbacktype, Dtwaincallbacktype, Dtwaincallbacktype) -> Dtwaincallbackreturntype;
+type DTWAIN_CALLBACK_PROC64 = extern "C" fn(Dtwaincallbacktype, Dtwaincallbacktype, i64) -> Dtwaincallbackreturntype;
+type DTWAIN_DIBUPDATE_PROC = extern "C" fn(*const c_void, i32, *const c_void) -> *mut c_void;
+type DTWAIN_LOGGER_PROC = extern "C" fn(*const u16, i64) -> Dtwaincallbackreturntype;
+type DTWAIN_LOGGER_PROCA = extern "C" fn(*const c_char, i64) -> Dtwaincallbackreturntype;
+type DTWAIN_LOGGER_PROCW = extern "C" fn(*const u16, i64) -> Dtwaincallbackreturntype;
+type DTWAIN_ERROR_PROC = extern "C" fn(i32, i32) -> Dtwaincallbackreturntype;
+type DTWAIN_ERROR_PROC64 = extern "C" fn(i32, i64) -> Dtwaincallbackreturntype;
+
+type DtwainacquireaudiofileFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32,i32,i32,*mut i32) -> i32;
+type DtwainacquireaudiofileaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32,i32,i32,i32,*mut i32) -> i32;
+type DtwainacquireaudiofilewFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32,i32,i32,*mut i32) -> i32;
+type DtwainacquireaudionativeFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32,*mut i32) -> *mut c_void;
+type DtwainacquireaudionativeexFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32,*mut c_void,*mut i32) -> i32;
+type DtwainacquirebufferedFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32,i32,*mut i32) -> *mut c_void;
+type DtwainacquirebufferedexFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32,i32,*mut c_void,*mut i32) -> i32;
+type DtwainacquirefileFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32,i32,i32,i32,i32,*mut i32) -> i32;
+type DtwainacquirefileaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32,i32,i32,i32,i32,i32,*mut i32) -> i32;
+type DtwainacquirefileexFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,i32,i32,i32,i32,i32,i32,*mut i32) -> i32;
+type DtwainacquirefilewFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32,i32,i32,i32,i32,*mut i32) -> i32;
+type DtwainacquirenativeFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32,i32,*mut i32) -> *mut c_void;
+type DtwainacquirenativeexFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32,i32,*mut c_void,*mut i32) -> i32;
+type DtwainacquiretoclipboardFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32,i32,i32,i32,*mut i32) -> *mut c_void;
+type DtwainaddextimageinfoqueryFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainaddpdftextFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32,*const u16,f64,i32,i32,f64,f64,f64,i32,u32) -> i32;
+type DtwainaddpdftextaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32,i32,*const c_char,f64,i32,i32,f64,f64,f64,i32,u32) -> i32;
+type DtwainaddpdftextexFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,u32) -> i32;
+type DtwainaddpdftextwFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32,*const u16,f64,i32,i32,f64,f64,f64,i32,u32) -> i32;
+type DtwainallocatememoryFunc = unsafe extern "C" fn(u32) -> *mut c_void;
+type Dtwainallocatememory64Func = unsafe extern "C" fn(u64) -> *mut c_void;
+type DtwainallocatememoryexFunc = unsafe extern "C" fn(u32) -> *mut c_void;
+type DtwainapphandlesexceptionsFunc = unsafe extern "C" fn(i32) -> i32;
+type DtwainarrayansistringtofloatFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainarrayaddFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
+type DtwainarrayaddansistringFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainarrayaddansistringnFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32) -> i32;
+type DtwainarrayaddfloatFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
+type DtwainarrayaddfloatnFunc = unsafe extern "C" fn(*mut c_void,f64,i32) -> i32;
+type DtwainarrayaddfloatstringFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainarrayaddfloatstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainarrayaddfloatstringnFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32) -> i32;
+type DtwainarrayaddfloatstringnaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32) -> i32;
+type DtwainarrayaddfloatstringnwFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32) -> i32;
+type DtwainarrayaddfloatstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainarrayaddframeFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
+type DtwainarrayaddframenFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,i32) -> i32;
+type DtwainarrayaddlongFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type Dtwainarrayaddlong64Func = unsafe extern "C" fn(*mut c_void,i64) -> i32;
+type Dtwainarrayaddlong64nFunc = unsafe extern "C" fn(*mut c_void,i64,i32) -> i32;
+type DtwainarrayaddlongnFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
+type DtwainarrayaddnFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,i32) -> i32;
+type DtwainarrayaddstringFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainarrayaddstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainarrayaddstringnFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32) -> i32;
+type DtwainarrayaddstringnaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32) -> i32;
+type DtwainarrayaddstringnwFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32) -> i32;
+type DtwainarrayaddstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainarrayaddwidestringFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainarrayaddwidestringnFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32) -> i32;
+type Dtwainarrayconvertfix32tofloatFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type Dtwainarrayconvertfloattofix32Func = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainarraycopyFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
+type DtwainarraycreateFunc = unsafe extern "C" fn(i32,i32) -> *mut c_void;
+type DtwainarraycreatecopyFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainarraycreatefromcapFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> *mut c_void;
+type Dtwainarraycreatefromlong64sFunc = unsafe extern "C" fn(*mut i64,i32) -> *mut c_void;
+type DtwainarraycreatefromlongsFunc = unsafe extern "C" fn(*mut i32,i32) -> *mut c_void;
+type DtwainarraycreatefromrealsFunc = unsafe extern "C" fn(i32) -> *mut c_void;
+type DtwainarraydestroyFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainarraydestroyframesFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainarrayfindFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
+type DtwainarrayfindansistringFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainarrayfindfloatFunc = unsafe extern "C" fn(*mut c_void,f64,f64) -> i32;
+type DtwainarrayfindfloatstringFunc = unsafe extern "C" fn(*mut c_void,*const u16,*const u16) -> i32;
+type DtwainarrayfindfloatstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*const c_char) -> i32;
+type DtwainarrayfindfloatstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,*const u16) -> i32;
+type DtwainarrayfindlongFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type Dtwainarrayfindlong64Func = unsafe extern "C" fn(*mut c_void,i64) -> i32;
+type DtwainarrayfindstringFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainarrayfindstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainarrayfindstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainarrayfindwidestringFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type Dtwainarrayfix32getatFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32,*mut i32) -> i32;
+type Dtwainarrayfix32setatFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32) -> i32;
+type DtwainarrayfloattoansistringFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainarrayfloattostringFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainarrayfloattowidestringFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainarraygetatFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void) -> i32;
+type DtwainarraygetatansistringFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char) -> i32;
+type DtwainarraygetatansistringptrFunc = unsafe extern "C" fn(*mut c_void,i32) -> *const c_char;
+type DtwainarraygetatfloatFunc = unsafe extern "C" fn(*mut c_void,i32,*mut f64) -> i32;
+type DtwainarraygetatfloatstringFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16) -> i32;
+type DtwainarraygetatfloatstringaFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char) -> i32;
+type DtwainarraygetatfloatstringwFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16) -> i32;
+type DtwainarraygetatframeFunc = unsafe extern "C" fn(*mut c_void,i32,*mut f64,*mut f64,*mut f64,*mut f64) -> i32;
+type DtwainarraygetatframeexFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void) -> i32;
+type DtwainarraygetatframestringFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16,*mut u16,*mut u16,*mut u16) -> i32;
+type DtwainarraygetatframestringaFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char,*mut c_char,*mut c_char,*mut c_char) -> i32;
+type DtwainarraygetatframestringwFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16,*mut u16,*mut u16,*mut u16) -> i32;
+type DtwainarraygetatlongFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32) -> i32;
+type Dtwainarraygetatlong64Func = unsafe extern "C" fn(*mut c_void,i32,*mut i64) -> i32;
+type DtwainarraygetatsourceFunc = unsafe extern "C" fn(*mut c_void,i32,*mut *const ()) -> i32;
+type DtwainarraygetatstringFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16) -> i32;
+type DtwainarraygetatstringaFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char) -> i32;
+type DtwainarraygetatstringptrFunc = unsafe extern "C" fn(*mut c_void,i32) -> *const u16;
+type DtwainarraygetatstringwFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16) -> i32;
+type DtwainarraygetatwidestringFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16) -> i32;
+type DtwainarraygetatwidestringptrFunc = unsafe extern "C" fn(*mut c_void,i32) -> *const u16;
+type DtwainarraygetbufferFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwainarraygetcapvaluesFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> *mut c_void;
+type DtwainarraygetcapvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32) -> *mut c_void;
+type Dtwainarraygetcapvaluesex2Func = unsafe extern "C" fn(*mut c_void,i32,i32,i32,i32) -> *mut c_void;
+type DtwainarraygetcountFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainarraygetmaxstringlengthFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainarraygetsourceatFunc = unsafe extern "C" fn(*mut c_void,i32,*mut *const ()) -> i32;
+type DtwainarraygetstringlengthFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainarraygettypeFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainarrayinitFunc = unsafe extern "C" fn() -> *mut c_void;
+type DtwainarrayinsertatFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void) -> i32;
+type DtwainarrayinsertatansistringFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char) -> i32;
+type DtwainarrayinsertatansistringnFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char,i32) -> i32;
+type DtwainarrayinsertatfloatFunc = unsafe extern "C" fn(*mut c_void,i32,f64) -> i32;
+type DtwainarrayinsertatfloatnFunc = unsafe extern "C" fn(*mut c_void,i32,f64,i32) -> i32;
+type DtwainarrayinsertatfloatstringFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
+type DtwainarrayinsertatfloatstringaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char) -> i32;
+type DtwainarrayinsertatfloatstringnFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16,i32) -> i32;
+type DtwainarrayinsertatfloatstringnaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char,i32) -> i32;
+type DtwainarrayinsertatfloatstringnwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16,i32) -> i32;
+type DtwainarrayinsertatfloatstringwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
+type DtwainarrayinsertatframeFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void) -> i32;
+type DtwainarrayinsertatframenFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void,i32) -> i32;
+type DtwainarrayinsertatlongFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
+type Dtwainarrayinsertatlong64Func = unsafe extern "C" fn(*mut c_void,i32,i64) -> i32;
+type Dtwainarrayinsertatlong64nFunc = unsafe extern "C" fn(*mut c_void,i32,i64,i32) -> i32;
+type DtwainarrayinsertatlongnFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32) -> i32;
+type DtwainarrayinsertatnFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void,i32) -> i32;
+type DtwainarrayinsertatstringFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
+type DtwainarrayinsertatstringaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char) -> i32;
+type DtwainarrayinsertatstringnFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16,i32) -> i32;
+type DtwainarrayinsertatstringnaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char,i32) -> i32;
+type DtwainarrayinsertatstringnwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16,i32) -> i32;
+type DtwainarrayinsertatstringwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
+type DtwainarrayinsertatwidestringFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
+type DtwainarrayinsertatwidestringnFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16,i32) -> i32;
+type DtwainarrayremoveallFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainarrayremoveatFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainarrayremoveatnFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
+type DtwainarrayresizeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainarraysetatFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void) -> i32;
+type DtwainarraysetatansistringFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char) -> i32;
+type DtwainarraysetatfloatFunc = unsafe extern "C" fn(*mut c_void,i32,f64) -> i32;
+type DtwainarraysetatfloatstringFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
+type DtwainarraysetatfloatstringaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char) -> i32;
+type DtwainarraysetatfloatstringwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
+type DtwainarraysetatframeFunc = unsafe extern "C" fn(*mut c_void,i32,f64,f64,f64,f64) -> i32;
+type DtwainarraysetatframeexFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void) -> i32;
+type DtwainarraysetatframestringFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16,*const u16,*const u16,*const u16) -> i32;
+type DtwainarraysetatframestringaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char,*const c_char,*const c_char,*const c_char) -> i32;
+type DtwainarraysetatframestringwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16,*const u16,*const u16,*const u16) -> i32;
+type DtwainarraysetatlongFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
+type Dtwainarraysetatlong64Func = unsafe extern "C" fn(*mut c_void,i32,i64) -> i32;
+type DtwainarraysetatstringFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
+type DtwainarraysetatstringaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char) -> i32;
+type DtwainarraysetatstringwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
+type DtwainarraysetatwidestringFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
+type DtwainarraystringtofloatFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainarraywidestringtofloatFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwaincallcallbackFunc = unsafe extern "C" fn(i32,i32,i32) -> i32;
+type Dtwaincallcallback64Func = unsafe extern "C" fn(i32,i32,i64) -> i32;
+type DtwaincalldsmprocFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,i32,i32,i32,*mut c_void) -> i32;
+type DtwaincheckhandlesFunc = unsafe extern "C" fn(i32) -> i32;
+type DtwainclearbuffersFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainclearerrorbufferFunc = unsafe extern "C" fn() -> i32;
+type DtwainclearpdftextFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainclearpageFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainclosesourceFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainclosesourceuiFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainconvertdibtobitmapFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> *mut c_void;
+type DtwainconvertdibtofullbitmapFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwainconverttoapistringFunc = unsafe extern "C" fn(*const u16) -> *mut c_void;
+type DtwainconverttoapistringaFunc = unsafe extern "C" fn(*const c_char) -> *mut c_void;
+type DtwainconverttoapistringexFunc = unsafe extern "C" fn(*const u16,*mut u16,i32) -> i32;
+type DtwainconverttoapistringexaFunc = unsafe extern "C" fn(*const c_char,*mut c_char,i32) -> i32;
+type DtwainconverttoapistringexwFunc = unsafe extern "C" fn(*const u16,*mut u16,i32) -> i32;
+type DtwainconverttoapistringwFunc = unsafe extern "C" fn(*const u16) -> *mut c_void;
+type DtwaincreateacquisitionarrayFunc = unsafe extern "C" fn() -> *mut c_void;
+type DtwaincreatepdftextelementFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwaindeletedibFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwaindestroyacquisitionarrayFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwaindestroypdftextelementFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwaindisableappwindowFunc = unsafe extern "C" fn(*const c_void,i32) -> i32;
+type DtwainenableautoborderdetectFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainenableautobrightFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainenableautodeskewFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainenableautofeedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainenableautorotateFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainenableautoscanFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainenableautomaticsensemediumFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainenableduplexFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainenablefeederFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainenableindicatorFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainenablejobfilehandlingFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainenablelampFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainenablemsgnotifyFunc = unsafe extern "C" fn(i32) -> i32;
+type DtwainenablepatchdetectFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainenablepeekmessageloopFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainenableprinterFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainenablethumbnailFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainenabletripletsnotifyFunc = unsafe extern "C" fn(i32) -> i32;
+type DtwainendthreadFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainendtwainsessionFunc = unsafe extern "C" fn() -> i32;
+type DtwainenumalarmvolumesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
+type DtwainenumalarmvolumesexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwainenumalarmsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumalarmsexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumaudioxfermechsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumaudioxfermechsexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumautofeedvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumautofeedvaluesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumautomaticcapturesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
+type DtwainenumautomaticcapturesexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwainenumautomaticsensemediumFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumautomaticsensemediumexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumbitdepthsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumbitdepthsexFunc = unsafe extern "C" fn(*mut c_void,i32,*mut *mut c_void) -> i32;
+type Dtwainenumbitdepthsex2Func = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwainenumbottomcamerasFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumbottomcamerasexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumbrightnessvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
+type DtwainenumbrightnessvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwainenumcamerasFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumcamerasexFunc = unsafe extern "C" fn(*mut c_void,i32,*mut *mut c_void) -> i32;
+type Dtwainenumcamerasex2Func = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type Dtwainenumcamerasex3Func = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwainenumcompressiontypesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumcompressiontypesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type Dtwainenumcompressiontypesex2Func = unsafe extern "C" fn(*mut c_void,i32,i32) -> *mut c_void;
+type DtwainenumcontrastvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
+type DtwainenumcontrastvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwainenumcustomcapsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type Dtwainenumcustomcapsex2Func = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumdoublefeeddetectlengthsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
+type DtwainenumdoublefeeddetectlengthsexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwainenumdoublefeeddetectvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumdoublefeeddetectvaluesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumextimageinfotypesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumextimageinfotypesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumextendedcapsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumextendedcapsexFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type Dtwainenumextendedcapsex2Func = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumfiletypebitsperpixelFunc = unsafe extern "C" fn(i32,*mut *mut c_void) -> i32;
+type DtwainenumfilexferformatsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumfilexferformatsexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumhalftonesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumhalftonesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumhighlightvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
+type DtwainenumhighlightvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwainenumjobcontrolsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumjobcontrolsexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumlightpathsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumlightpathsexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumlightsourcesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumlightsourcesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenummaxbuffersFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
+type DtwainenummaxbuffersexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwainenumnoisefiltersFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumnoisefiltersexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumocrinterfacesFunc = unsafe extern "C" fn(*mut *mut c_void) -> i32;
+type DtwainenumocrsupportedcapsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumorientationsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumorientationsexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumoverscanvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumoverscanvaluesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumpapersizesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumpapersizesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumpatchcodesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumpatchcodesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumpatchmaxprioritiesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumpatchmaxprioritiesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumpatchmaxretriesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumpatchmaxretriesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumpatchprioritiesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumpatchprioritiesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumpatchsearchmodesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumpatchsearchmodesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumpatchtimeoutvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumpatchtimeoutvaluesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumpixeltypesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumpixeltypesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumprinterstringmodesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumprinterstringmodesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumresolutionvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
+type DtwainenumresolutionvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwainenumshadowvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
+type DtwainenumshadowvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwainenumsourceunitsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumsourceunitsexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumsourcevaluesFunc = unsafe extern "C" fn(*mut c_void,*const u16,*mut *mut c_void,i32) -> i32;
+type DtwainenumsourcevaluesaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*mut *mut c_void,i32) -> i32;
+type DtwainenumsourcevalueswFunc = unsafe extern "C" fn(*mut c_void,*const u16,*mut *mut c_void,i32) -> i32;
+type DtwainenumsourcesFunc = unsafe extern "C" fn(*mut *mut c_void) -> i32;
+type DtwainenumsourcesexFunc = unsafe extern "C" fn() -> *mut c_void;
+type DtwainenumsupportedcapsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumsupportedcapsexFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type Dtwainenumsupportedcapsex2Func = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumsupportedextimageinfoFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumsupportedextimageinfoexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumsupportedfiletypesFunc = unsafe extern "C" fn() -> *mut c_void;
+type DtwainenumsupportedmultipagefiletypesFunc = unsafe extern "C" fn() -> *mut c_void;
+type DtwainenumsupportedsinglepagefiletypesFunc = unsafe extern "C" fn() -> *mut c_void;
+type DtwainenumthresholdvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
+type DtwainenumthresholdvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwainenumtopcamerasFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumtopcamerasexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumtwainprintersFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumtwainprintersarrayFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumtwainprintersarrayexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumtwainprintersexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumxresolutionvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
+type DtwainenumxresolutionvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwainenumyresolutionvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
+type DtwainenumyresolutionvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwainexecuteocrFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32) -> i32;
+type DtwainexecuteocraFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32,i32) -> i32;
+type DtwainexecuteocrwFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32) -> i32;
+type DtwainfeedpageFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainflipbitmapFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainflushacquiredpagesFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainforceacquirebitdepthFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainforcescanonnouiFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainframecreateFunc = unsafe extern "C" fn(f64,f64,f64,f64) -> *mut c_void;
+type DtwainframecreatestringFunc = unsafe extern "C" fn(*const u16,*const u16,*const u16,*const u16) -> *mut c_void;
+type DtwainframecreatestringaFunc = unsafe extern "C" fn(*const c_char,*const c_char,*const c_char,*const c_char) -> *mut c_void;
+type DtwainframecreatestringwFunc = unsafe extern "C" fn(*const u16,*const u16,*const u16,*const u16) -> *mut c_void;
+type DtwainframedestroyFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainframegetallFunc = unsafe extern "C" fn(*mut c_void,*mut f64,*mut f64,*mut f64,*mut f64) -> i32;
+type DtwainframegetallstringFunc = unsafe extern "C" fn(*mut c_void,*mut u16,*mut u16,*mut u16,*mut u16) -> i32;
+type DtwainframegetallstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,*mut c_char,*mut c_char,*mut c_char) -> i32;
+type DtwainframegetallstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16,*mut u16,*mut u16,*mut u16) -> i32;
+type DtwainframegetvalueFunc = unsafe extern "C" fn(*mut c_void,i32,*mut f64) -> i32;
+type DtwainframegetvaluestringFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16) -> i32;
+type DtwainframegetvaluestringaFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char) -> i32;
+type DtwainframegetvaluestringwFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16) -> i32;
+type DtwainframeisvalidFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainframesetallFunc = unsafe extern "C" fn(*mut c_void,f64,f64,f64,f64) -> i32;
+type DtwainframesetallstringFunc = unsafe extern "C" fn(*mut c_void,*const u16,*const u16,*const u16,*const u16) -> i32;
+type DtwainframesetallstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*const c_char,*const c_char,*const c_char) -> i32;
+type DtwainframesetallstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,*const u16,*const u16,*const u16) -> i32;
+type DtwainframesetvalueFunc = unsafe extern "C" fn(*mut c_void,i32,f64) -> i32;
+type DtwainframesetvaluestringFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
+type DtwainframesetvaluestringaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char) -> i32;
+type DtwainframesetvaluestringwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
+type DtwainfreeextimageinfoFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainfreememoryFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainfreememoryexFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwaingetapihandlestatusFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwaingetacquireareaFunc = unsafe extern "C" fn(*mut c_void,i32,*mut *mut c_void) -> i32;
+type Dtwaingetacquirearea2Func = unsafe extern "C" fn(*mut c_void,*mut f64,*mut f64,*mut f64,*mut f64,*mut i32) -> i32;
+type Dtwaingetacquirearea2stringFunc = unsafe extern "C" fn(*mut c_void,*mut u16,*mut u16,*mut u16,*mut u16,*mut i32) -> i32;
+type Dtwaingetacquirearea2stringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,*mut c_char,*mut c_char,*mut c_char,*mut i32) -> i32;
+type Dtwaingetacquirearea2stringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16,*mut u16,*mut u16,*mut u16,*mut i32) -> i32;
+type DtwaingetacquireareaexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwaingetacquiremetricsFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32) -> i32;
+type DtwaingetacquirestripbufferFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwaingetacquirestripdataFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut u32,*mut u32,*mut u32,*mut u32,*mut u32,*mut u32) -> i32;
+type DtwaingetacquirestripsizesFunc = unsafe extern "C" fn(*mut c_void,*mut u32,*mut u32,*mut u32) -> i32;
+type DtwaingetacquiredimageFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> *mut c_void;
+type DtwaingetacquiredimagearrayFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwaingetactivedsmpathFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
+type DtwaingetactivedsmpathaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
+type DtwaingetactivedsmpathwFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
+type DtwaingetactivedsmversioninfoFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
+type DtwaingetactivedsmversioninfoaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
+type DtwaingetactivedsmversioninfowFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
+type DtwaingetalarmvolumeFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
+type DtwaingetallsourcedibsFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwaingetappinfoFunc = unsafe extern "C" fn(*mut u16,*mut u16,*mut u16,*mut u16) -> i32;
+type DtwaingetappinfoaFunc = unsafe extern "C" fn(*mut c_char,*mut c_char,*mut c_char,*mut c_char) -> i32;
+type DtwaingetappinfowFunc = unsafe extern "C" fn(*mut u16,*mut u16,*mut u16,*mut u16) -> i32;
+type DtwaingetauthorFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingetauthoraFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
+type DtwaingetauthorwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingetbatteryminutesFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
+type DtwaingetbatterypercentFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
+type DtwaingetbitdepthFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
+type DtwaingetblankpageautodetectionFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwaingetbrightnessFunc = unsafe extern "C" fn(*mut c_void,*mut f64) -> i32;
+type DtwaingetbrightnessstringFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingetbrightnessstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
+type DtwaingetbrightnessstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingetbufferedtransferinfoFunc = unsafe extern "C" fn(*mut c_void,*mut u32,*mut u32,*mut u32,*mut u32,*mut u32,*mut u32,*mut u32,*mut u32,*mut u32) -> *mut c_void;
+type DtwaingetcallbackFunc = unsafe extern "C" fn() -> DTWAIN_CALLBACK_PROC;
+type Dtwaingetcallback64Func = unsafe extern "C" fn() -> DTWAIN_CALLBACK_PROC64;
+type DtwaingetcaparraytypeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwaingetcapcontainerFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
+type DtwaingetcapcontainerexFunc = unsafe extern "C" fn(i32,i32,*mut *mut c_void) -> i32;
+type Dtwaingetcapcontainerex2Func = unsafe extern "C" fn(i32,i32) -> *mut c_void;
+type DtwaingetcapdatatypeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwaingetcapfromnameFunc = unsafe extern "C" fn(*const u16) -> i32;
+type DtwaingetcapfromnameaFunc = unsafe extern "C" fn(*const c_char) -> i32;
+type DtwaingetcapfromnamewFunc = unsafe extern "C" fn(*const u16) -> i32;
+type DtwaingetcapoperationsFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32) -> i32;
+type DtwaingetcapvaluesFunc = unsafe extern "C" fn(*mut c_void,i32,i32,*mut *mut c_void) -> i32;
+type DtwaingetcapvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32,*mut *mut c_void) -> i32;
+type Dtwaingetcapvaluesex2Func = unsafe extern "C" fn(*mut c_void,i32,i32,i32,i32,*mut *mut c_void) -> i32;
+type DtwaingetcaptionFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingetcaptionaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
+type DtwaingetcaptionwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingetcompressionsizeFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
+type DtwaingetcompressiontypeFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
+type DtwaingetconditioncodestringFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
+type DtwaingetconditioncodestringaFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
+type DtwaingetconditioncodestringwFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
+type DtwaingetcontrastFunc = unsafe extern "C" fn(*mut c_void,*mut f64) -> i32;
+type DtwaingetcontraststringFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingetcontraststringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
+type DtwaingetcontraststringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingetcountryFunc = unsafe extern "C" fn() -> i32;
+type DtwaingetcurrentacquiredimageFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwaingetcurrentfilenameFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetcurrentfilenameaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
+type DtwaingetcurrentfilenamewFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetcurrentpagenumFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwaingetcurrentretrycountFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwaingetcurrenttwaintripletFunc = unsafe extern "C" fn(*mut *mut c_void,*mut *mut c_void,*mut i32,*mut i32,*mut i32,*mut i64) -> i32;
+type DtwaingetcustomdsdataFunc = unsafe extern "C" fn(*mut c_void,*mut u8,u32,*mut u32,i32) -> *mut c_void;
+type DtwaingetdsmfullnameFunc = unsafe extern "C" fn(i32,*mut u16,i32,*mut i32) -> i32;
+type DtwaingetdsmfullnameaFunc = unsafe extern "C" fn(i32,*mut c_char,i32,*mut i32) -> i32;
+type DtwaingetdsmfullnamewFunc = unsafe extern "C" fn(i32,*mut u16,i32,*mut i32) -> i32;
+type DtwaingetdsmsearchorderFunc = unsafe extern "C" fn() -> i32;
+type DtwaingetdtwainhandleFunc = unsafe extern "C" fn() -> *mut c_void;
+type DtwaingetdeviceeventFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
+type DtwaingetdeviceeventexFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut *mut c_void) -> i32;
+type DtwaingetdeviceeventinfoFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void) -> i32;
+type DtwaingetdevicenotificationsFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
+type DtwaingetdevicetimedateFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingetdevicetimedateaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
+type DtwaingetdevicetimedatewFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingetdoublefeeddetectlengthFunc = unsafe extern "C" fn(*mut c_void,*mut f64,i32) -> i32;
+type DtwaingetdoublefeeddetectvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwaingetduplextypeFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
+type DtwaingeterrorbufferFunc = unsafe extern "C" fn(*mut *mut c_void) -> i32;
+type DtwaingeterrorbufferthresholdFunc = unsafe extern "C" fn() -> i32;
+type DtwaingeterrorcallbackFunc = unsafe extern "C" fn() -> DTWAIN_ERROR_PROC;
+type Dtwaingeterrorcallback64Func = unsafe extern "C" fn() -> DTWAIN_ERROR_PROC64;
+type DtwaingeterrorstringFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
+type DtwaingeterrorstringaFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
+type DtwaingeterrorstringwFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
+type DtwaingetextcapfromnameFunc = unsafe extern "C" fn(*const u16) -> i32;
+type DtwaingetextcapfromnameaFunc = unsafe extern "C" fn(*const c_char) -> i32;
+type DtwaingetextcapfromnamewFunc = unsafe extern "C" fn(*const u16) -> i32;
+type DtwaingetextimageinfoFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwaingetextimageinfodataFunc = unsafe extern "C" fn(*mut c_void,i32,*mut *mut c_void) -> i32;
+type DtwaingetextimageinfodataexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwaingetextimageinfoitemFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32,*mut i32,*mut i32) -> i32;
+type DtwaingetextimageinfoitemexFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32,*mut i32,*mut i32,*mut i32) -> i32;
+type DtwaingetextnamefromcapFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
+type DtwaingetextnamefromcapaFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
+type DtwaingetextnamefromcapwFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
+type DtwaingetfeederalignmentFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
+type DtwaingetfeederfuncsFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwaingetfeederorderFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
+type DtwaingetfeederwaittimeFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwaingetfilecompressiontypeFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwaingetfiletypeextensionsFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
+type DtwaingetfiletypeextensionsaFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
+type DtwaingetfiletypeextensionswFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
+type DtwaingetfiletypenameFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
+type DtwaingetfiletypenameaFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
+type DtwaingetfiletypenamewFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
+type DtwaingethalftoneFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingethalftoneaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
+type DtwaingethalftonewFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingethighlightFunc = unsafe extern "C" fn(*mut c_void,*mut f64) -> i32;
+type DtwaingethighlightstringFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingethighlightstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
+type DtwaingethighlightstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingetimageinfoFunc = unsafe extern "C" fn(*mut c_void,*mut f64,*mut f64,*mut i32,*mut i32,*mut i32,*mut *mut c_void,*mut i32,*mut i32,*mut i32,*mut i32) -> i32;
+type DtwaingetimageinfostringFunc = unsafe extern "C" fn(*mut c_void,*mut u16,*mut u16,*mut i32,*mut i32,*mut i32,*mut *mut c_void,*mut i32,*mut i32,*mut i32,*mut i32) -> i32;
+type DtwaingetimageinfostringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,*mut c_char,*mut i32,*mut i32,*mut i32,*mut *mut c_void,*mut i32,*mut i32,*mut i32,*mut i32) -> i32;
+type DtwaingetimageinfostringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16,*mut u16,*mut i32,*mut i32,*mut i32,*mut *mut c_void,*mut i32,*mut i32,*mut i32,*mut i32) -> i32;
+type DtwaingetjobcontrolFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
+type DtwaingetjpegvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32) -> i32;
+type DtwaingetjpegxrvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32) -> i32;
+type DtwaingetlanguageFunc = unsafe extern "C" fn() -> i32;
+type DtwaingetlasterrorFunc = unsafe extern "C" fn() -> i32;
+type DtwaingetlibrarypathFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
+type DtwaingetlibrarypathaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
+type DtwaingetlibrarypathwFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
+type DtwaingetlightpathFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
+type DtwaingetlightsourceFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
+type DtwaingetlightsourcesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwaingetloggercallbackFunc = unsafe extern "C" fn() -> DTWAIN_LOGGER_PROC;
+type DtwaingetloggercallbackaFunc = unsafe extern "C" fn() -> DTWAIN_LOGGER_PROCA;
+type DtwaingetloggercallbackwFunc = unsafe extern "C" fn() -> DTWAIN_LOGGER_PROCW;
+type DtwaingetmanualduplexcountFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32) -> i32;
+type DtwaingetmaxacquisitionsFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwaingetmaxbuffersFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
+type DtwaingetmaxpagestoacquireFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwaingetmaxretryattemptsFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwaingetnamefromcapFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
+type DtwaingetnamefromcapaFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
+type DtwaingetnamefromcapwFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
+type DtwaingetnoisefilterFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
+type DtwaingetnumacquiredimagesFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwaingetnumacquisitionsFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwaingetocrcapvaluesFunc = unsafe extern "C" fn(*mut c_void,i32,i32,*mut *mut c_void) -> i32;
+type DtwaingetocrerrorstringFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16,i32) -> i32;
+type DtwaingetocrerrorstringaFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char,i32) -> i32;
+type DtwaingetocrerrorstringwFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16,i32) -> i32;
+type DtwaingetocrlasterrorFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwaingetocrmajorminorversionFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32) -> i32;
+type DtwaingetocrmanufacturerFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetocrmanufactureraFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
+type DtwaingetocrmanufacturerwFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetocrproductfamilyFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetocrproductfamilyaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
+type DtwaingetocrproductfamilywFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetocrproductnameFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetocrproductnameaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
+type DtwaingetocrproductnamewFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetocrtextFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16,i32,*mut i32,i32) -> *mut c_void;
+type DtwaingetocrtextaFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char,i32,*mut i32,i32) -> *mut c_void;
+type DtwaingetocrtextinfofloatFunc = unsafe extern "C" fn(*mut c_void,i32,i32,*mut f64) -> i32;
+type DtwaingetocrtextinfofloatexFunc = unsafe extern "C" fn(*mut c_void,i32,*mut f64,i32) -> i32;
+type DtwaingetocrtextinfohandleFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwaingetocrtextinfolongFunc = unsafe extern "C" fn(*mut c_void,i32,i32,*mut i32) -> i32;
+type DtwaingetocrtextinfolongexFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32,i32) -> i32;
+type DtwaingetocrtextwFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16,i32,*mut i32,i32) -> *mut c_void;
+type DtwaingetocrversioninfoFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetocrversioninfoaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
+type DtwaingetocrversioninfowFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetorientationFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
+type DtwaingetoverscanFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
+type DtwaingetpdftextelementfloatFunc = unsafe extern "C" fn(*mut c_void,*mut f64,*mut f64,i32) -> i32;
+type DtwaingetpdftextelementlongFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32,i32) -> i32;
+type DtwaingetpdftextelementstringFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32,i32) -> i32;
+type DtwaingetpdftextelementstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32,i32) -> i32;
+type DtwaingetpdftextelementstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32,i32) -> i32;
+type Dtwaingetpdftype1fontnameFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
+type Dtwaingetpdftype1fontnameaFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
+type Dtwaingetpdftype1fontnamewFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
+type DtwaingetpapersizeFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
+type DtwaingetpapersizenameFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
+type DtwaingetpapersizenameaFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
+type DtwaingetpapersizenamewFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
+type DtwaingetpatchmaxprioritiesFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
+type DtwaingetpatchmaxretriesFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
+type DtwaingetpatchprioritiesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwaingetpatchsearchmodeFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
+type DtwaingetpatchtimeoutFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
+type DtwaingetpixelflavorFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
+type DtwaingetpixeltypeFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32,i32) -> i32;
+type DtwaingetprinterFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
+type DtwaingetprinterstartnumberFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
+type DtwaingetprinterstringmodeFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
+type DtwaingetprinterstringsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwaingetprintersuffixstringFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetprintersuffixstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
+type DtwaingetprintersuffixstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetregisteredmsgFunc = unsafe extern "C" fn() -> i32;
+type DtwaingetresolutionFunc = unsafe extern "C" fn(*mut c_void,*mut f64) -> i32;
+type DtwaingetresolutionstringFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingetresolutionstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
+type DtwaingetresolutionstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingetresourcestringFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
+type DtwaingetresourcestringaFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
+type DtwaingetresourcestringwFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
+type DtwaingetrotationFunc = unsafe extern "C" fn(*mut c_void,*mut f64) -> i32;
+type DtwaingetrotationstringFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingetrotationstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
+type DtwaingetrotationstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingetsavefilenameFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetsavefilenameaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
+type DtwaingetsavefilenamewFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetsavedfilescountFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwaingetsessiondetailsFunc = unsafe extern "C" fn(*mut u16,i32,i32,i32) -> i32;
+type DtwaingetsessiondetailsaFunc = unsafe extern "C" fn(*mut c_char,i32,i32,i32) -> i32;
+type DtwaingetsessiondetailswFunc = unsafe extern "C" fn(*mut u16,i32,i32,i32) -> i32;
+type DtwaingetshadowFunc = unsafe extern "C" fn(*mut c_void,*mut f64) -> i32;
+type DtwaingetshadowstringFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingetshadowstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
+type DtwaingetshadowstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingetshortversionstringFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
+type DtwaingetshortversionstringaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
+type DtwaingetshortversionstringwFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
+type DtwaingetsourceacquisitionsFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwaingetsourcedetailsFunc = unsafe extern "C" fn(*const u16,*mut u16,i32,i32,i32) -> i32;
+type DtwaingetsourcedetailsaFunc = unsafe extern "C" fn(*const c_char,*mut c_char,i32,i32,i32) -> i32;
+type DtwaingetsourcedetailswFunc = unsafe extern "C" fn(*const u16,*mut u16,i32,i32,i32) -> i32;
+type DtwaingetsourceidFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwaingetsourceidexFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> *mut c_void;
+type DtwaingetsourcemanufacturerFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetsourcemanufactureraFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
+type DtwaingetsourcemanufacturerwFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetsourceproductfamilyFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetsourceproductfamilyaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
+type DtwaingetsourceproductfamilywFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetsourceproductnameFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetsourceproductnameaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
+type DtwaingetsourceproductnamewFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetsourceunitFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
+type DtwaingetsourceversioninfoFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetsourceversioninfoaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
+type DtwaingetsourceversioninfowFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
+type DtwaingetsourceversionnumberFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32) -> i32;
+type DtwaingetstaticlibversionFunc = unsafe extern "C" fn() -> i32;
+type DtwaingettempfiledirectoryFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
+type DtwaingettempfiledirectoryaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
+type DtwaingettempfiledirectorywFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
+type DtwaingetthresholdFunc = unsafe extern "C" fn(*mut c_void,*mut f64) -> i32;
+type DtwaingetthresholdstringFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingetthresholdstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
+type DtwaingetthresholdstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingettimedateFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingettimedateaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
+type DtwaingettimedatewFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingettwainappidFunc = unsafe extern "C" fn() -> *mut c_void;
+type DtwaingettwainappidexFunc = unsafe extern "C" fn(*mut *mut c_void) -> *mut c_void;
+type DtwaingettwainavailabilityFunc = unsafe extern "C" fn() -> i32;
+type DtwaingettwainavailabilityexFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
+type DtwaingettwainavailabilityexaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
+type DtwaingettwainavailabilityexwFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
+type DtwaingettwaincountrynameFunc = unsafe extern "C" fn(i32,*mut u16) -> i32;
+type DtwaingettwaincountrynameaFunc = unsafe extern "C" fn(i32,*mut c_char) -> i32;
+type DtwaingettwaincountrynamewFunc = unsafe extern "C" fn(i32,*mut u16) -> i32;
+type DtwaingettwaincountryvalueFunc = unsafe extern "C" fn(*const u16) -> i32;
+type DtwaingettwaincountryvalueaFunc = unsafe extern "C" fn(*const c_char) -> i32;
+type DtwaingettwaincountryvaluewFunc = unsafe extern "C" fn(*const u16) -> i32;
+type DtwaingettwainhwndFunc = unsafe extern "C" fn() -> *const c_void;
+type DtwaingettwainidfromnameFunc = unsafe extern "C" fn(*const u16) -> i32;
+type DtwaingettwainidfromnameaFunc = unsafe extern "C" fn(*const c_char) -> i32;
+type DtwaingettwainidfromnamewFunc = unsafe extern "C" fn(*const u16) -> i32;
+type DtwaingettwainlanguagenameFunc = unsafe extern "C" fn(i32,*mut u16) -> i32;
+type DtwaingettwainlanguagenameaFunc = unsafe extern "C" fn(i32,*mut c_char) -> i32;
+type DtwaingettwainlanguagenamewFunc = unsafe extern "C" fn(i32,*mut u16) -> i32;
+type DtwaingettwainlanguagevalueFunc = unsafe extern "C" fn(*const u16) -> i32;
+type DtwaingettwainlanguagevalueaFunc = unsafe extern "C" fn(*const c_char) -> i32;
+type DtwaingettwainlanguagevaluewFunc = unsafe extern "C" fn(*const u16) -> i32;
+type DtwaingettwainmodeFunc = unsafe extern "C" fn() -> i32;
+type DtwaingettwainnamefromconstantFunc = unsafe extern "C" fn(i32,i32,*mut u16,i32) -> i32;
+type DtwaingettwainnamefromconstantaFunc = unsafe extern "C" fn(i32,i32,*mut c_char,i32) -> i32;
+type DtwaingettwainnamefromconstantwFunc = unsafe extern "C" fn(i32,i32,*mut u16,i32) -> i32;
+type DtwaingettwainstringnameFunc = unsafe extern "C" fn(i32,i32,*mut u16,i32) -> i32;
+type DtwaingettwainstringnameaFunc = unsafe extern "C" fn(i32,i32,*mut c_char,i32) -> i32;
+type DtwaingettwainstringnamewFunc = unsafe extern "C" fn(i32,i32,*mut u16,i32) -> i32;
+type DtwaingettwaintimeoutFunc = unsafe extern "C" fn() -> i32;
+type DtwaingetversionFunc = unsafe extern "C" fn(*mut i32,*mut i32,*mut i32) -> i32;
+type DtwaingetversioncopyrightFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
+type DtwaingetversioncopyrightaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
+type DtwaingetversioncopyrightwFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
+type DtwaingetversionexFunc = unsafe extern "C" fn(*mut i32,*mut i32,*mut i32,*mut i32) -> i32;
+type DtwaingetversioninfoFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
+type DtwaingetversioninfoaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
+type DtwaingetversioninfowFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
+type DtwaingetversionstringFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
+type DtwaingetversionstringaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
+type DtwaingetversionstringwFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
+type DtwaingetwindowsversioninfoFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
+type DtwaingetwindowsversioninfoaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
+type DtwaingetwindowsversioninfowFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
+type DtwaingetxresolutionFunc = unsafe extern "C" fn(*mut c_void,*mut f64) -> i32;
+type DtwaingetxresolutionstringFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingetxresolutionstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
+type DtwaingetxresolutionstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingetyresolutionFunc = unsafe extern "C" fn(*mut c_void,*mut f64) -> i32;
+type DtwaingetyresolutionstringFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaingetyresolutionstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
+type DtwaingetyresolutionstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
+type DtwaininitextimageinfoFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwaininitimagefileappendFunc = unsafe extern "C" fn(*const u16,i32) -> i32;
+type DtwaininitimagefileappendaFunc = unsafe extern "C" fn(*const c_char,i32) -> i32;
+type DtwaininitimagefileappendwFunc = unsafe extern "C" fn(*const u16,i32) -> i32;
+type DtwaininitocrinterfaceFunc = unsafe extern "C" fn() -> i32;
+type DtwainisacquiringFunc = unsafe extern "C" fn() -> i32;
+type DtwainisaudioxfersupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainisautoborderdetectenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisautoborderdetectsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisautobrightenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisautobrightsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisautodeskewenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisautodeskewsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisautofeedenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisautofeedsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisautorotateenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisautorotatesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisautoscanenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisautomaticsensemediumenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisautomaticsensemediumsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisblankpagedetectiononFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisbufferedtilemodeonFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisbufferedtilemodesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainiscapsupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainiscompressionsupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainiscustomdsdatasupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisdibblankFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
+type DtwainisdibblankstringFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainisdibblankstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainisdibblankstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainisdeviceeventsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisdeviceonlineFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisdoublefeeddetectlengthsupportedFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
+type DtwainisdoublefeeddetectsupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainisduplexenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisduplexsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisextimageinfosupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisfeederenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisfeederloadedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisfeedersensitiveFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisfeedersupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisfilesystemsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisfilexfersupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainisiafieldalastpagesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisiafieldalevelsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisiafieldaprintformatsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisiafieldavaluesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisiafieldblastpagesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisiafieldblevelsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisiafieldbprintformatsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisiafieldbvaluesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisiafieldclastpagesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisiafieldclevelsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisiafieldcprintformatsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisiafieldcvaluesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisiafielddlastpagesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisiafielddlevelsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisiafielddprintformatsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisiafielddvaluesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisiafieldelastpagesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisiafieldelevelsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisiafieldeprintformatsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisiafieldevaluesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisimageaddressingsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisindicatorenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisindicatorsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisinitializedFunc = unsafe extern "C" fn() -> i32;
+type DtwainisjpegsupportedFunc = unsafe extern "C" fn() -> i32;
+type DtwainisjobcontrolsupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainislampenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainislampsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainislightpathsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainislightsourcesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainismaxbufferssupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainismemfilexfersupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainismsgnotifyenabledFunc = unsafe extern "C" fn() -> i32;
+type DtwainisnotifytripletsenabledFunc = unsafe extern "C" fn() -> i32;
+type DtwainisocrengineactivatedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisopensourcesonselectFunc = unsafe extern "C" fn() -> i32;
+type DtwainisorientationsupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainisoverscansupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainispdfsupportedFunc = unsafe extern "C" fn() -> i32;
+type DtwainispngsupportedFunc = unsafe extern "C" fn() -> i32;
+type DtwainispaperdetectableFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainispapersizesupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainispatchcapssupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainispatchdetectenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainispatchsupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainispeekmessageloopenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainispixeltypesupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainisprinterenabledFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainisprintersupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisrotationsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainissessionenabledFunc = unsafe extern "C" fn() -> i32;
+type DtwainisskipimageinfoerrorFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainissourceacquiringFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainissourceacquiringexFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainissourceinuionlymodeFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainissourceopenFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainissourceselectedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainissourcevalidFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainistiffsupportedFunc = unsafe extern "C" fn() -> i32;
+type DtwainisthumbnailenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisthumbnailsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainistwainavailableFunc = unsafe extern "C" fn() -> i32;
+type DtwainistwainavailableexFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
+type DtwainistwainavailableexaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
+type DtwainistwainavailableexwFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
+type DtwainisuicontrollableFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisuienabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainisuionlysupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainloadcustomstringresourcesFunc = unsafe extern "C" fn(*const u16) -> i32;
+type DtwainloadcustomstringresourcesaFunc = unsafe extern "C" fn(*const c_char) -> i32;
+type DtwainloadcustomstringresourcesexFunc = unsafe extern "C" fn(*const u16,i32) -> i32;
+type DtwainloadcustomstringresourcesexaFunc = unsafe extern "C" fn(*const c_char,i32) -> i32;
+type DtwainloadcustomstringresourcesexwFunc = unsafe extern "C" fn(*const u16,i32) -> i32;
+type DtwainloadcustomstringresourceswFunc = unsafe extern "C" fn(*const u16) -> i32;
+type DtwainloadlanguageresourceFunc = unsafe extern "C" fn(i32) -> i32;
+type DtwainlockmemoryFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainlockmemoryexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainlogmessageFunc = unsafe extern "C" fn(*const u16) -> i32;
+type DtwainlogmessageaFunc = unsafe extern "C" fn(*const c_char) -> i32;
+type DtwainlogmessagewFunc = unsafe extern "C" fn(*const u16) -> i32;
+type DtwainmakergbFunc = unsafe extern "C" fn(i32,i32,i32) -> i32;
+type DtwainopensourceFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainopensourcesonselectFunc = unsafe extern "C" fn(i32) -> i32;
+type DtwainrangecreateFunc = unsafe extern "C" fn(i32) -> *mut c_void;
+type DtwainrangecreatefromcapFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwainrangedestroyFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainrangeexpandFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainrangeexpandexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainrangegetallFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,*mut c_void,*mut c_void,*mut c_void,*mut c_void) -> i32;
+type DtwainrangegetallfloatFunc = unsafe extern "C" fn(*mut c_void,*mut f64,*mut f64,*mut f64,*mut f64,*mut f64) -> i32;
+type DtwainrangegetallfloatstringFunc = unsafe extern "C" fn(*mut c_void,*mut u16,*mut u16,*mut u16,*mut u16,*mut u16) -> i32;
+type DtwainrangegetallfloatstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,*mut c_char,*mut c_char,*mut c_char,*mut c_char) -> i32;
+type DtwainrangegetallfloatstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16,*mut u16,*mut u16,*mut u16,*mut u16) -> i32;
+type DtwainrangegetalllongFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32,*mut i32,*mut i32,*mut i32) -> i32;
+type DtwainrangegetcountFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainrangegetexpvalueFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void) -> i32;
+type DtwainrangegetexpvaluefloatFunc = unsafe extern "C" fn(*mut c_void,i32,*mut f64) -> i32;
+type DtwainrangegetexpvaluefloatstringFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16) -> i32;
+type DtwainrangegetexpvaluefloatstringaFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char) -> i32;
+type DtwainrangegetexpvaluefloatstringwFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16) -> i32;
+type DtwainrangegetexpvaluelongFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32) -> i32;
+type DtwainrangegetnearestvalueFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,*mut c_void,i32) -> i32;
+type DtwainrangegetposFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,*mut i32) -> i32;
+type DtwainrangegetposfloatFunc = unsafe extern "C" fn(*mut c_void,f64,*mut i32) -> i32;
+type DtwainrangegetposfloatstringFunc = unsafe extern "C" fn(*mut c_void,*const u16,*mut i32) -> i32;
+type DtwainrangegetposfloatstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*mut i32) -> i32;
+type DtwainrangegetposfloatstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,*mut i32) -> i32;
+type DtwainrangegetposlongFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32) -> i32;
+type DtwainrangegetvalueFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void) -> i32;
+type DtwainrangegetvaluefloatFunc = unsafe extern "C" fn(*mut c_void,i32,*mut f64) -> i32;
+type DtwainrangegetvaluefloatstringFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16) -> i32;
+type DtwainrangegetvaluefloatstringaFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char) -> i32;
+type DtwainrangegetvaluefloatstringwFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16) -> i32;
+type DtwainrangegetvaluelongFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32) -> i32;
+type DtwainrangeisvalidFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
+type DtwainrangenearestvaluefloatFunc = unsafe extern "C" fn(*mut c_void,f64,*mut f64,i32) -> i32;
+type DtwainrangenearestvaluefloatstringFunc = unsafe extern "C" fn(*mut c_void,*const u16,*mut u16,i32) -> i32;
+type DtwainrangenearestvaluefloatstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*mut c_char,i32) -> i32;
+type DtwainrangenearestvaluefloatstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,*mut u16,i32) -> i32;
+type DtwainrangenearestvaluelongFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32,i32) -> i32;
+type DtwainrangesetallFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,*mut c_void,*mut c_void,*mut c_void,*mut c_void) -> i32;
+type DtwainrangesetallfloatFunc = unsafe extern "C" fn(*mut c_void,f64,f64,f64,f64,f64) -> i32;
+type DtwainrangesetallfloatstringFunc = unsafe extern "C" fn(*mut c_void,*const u16,*const u16,*const u16,*const u16,*const u16) -> i32;
+type DtwainrangesetallfloatstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*const c_char,*const c_char,*const c_char,*const c_char) -> i32;
+type DtwainrangesetallfloatstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,*const u16,*const u16,*const u16,*const u16) -> i32;
+type DtwainrangesetalllongFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32,i32,i32) -> i32;
+type DtwainrangesetvalueFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void) -> i32;
+type DtwainrangesetvaluefloatFunc = unsafe extern "C" fn(*mut c_void,i32,f64) -> i32;
+type DtwainrangesetvaluefloatstringFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
+type DtwainrangesetvaluefloatstringaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char) -> i32;
+type DtwainrangesetvaluefloatstringwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
+type DtwainrangesetvaluelongFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
+type DtwainresetpdftextelementFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainrewindpageFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainselectdefaultocrengineFunc = unsafe extern "C" fn() -> *mut c_void;
+type DtwainselectdefaultsourceFunc = unsafe extern "C" fn() -> *mut c_void;
+type DtwainselectdefaultsourcewithopenFunc = unsafe extern "C" fn(i32) -> *mut c_void;
+type DtwainselectocrengineFunc = unsafe extern "C" fn() -> *mut c_void;
+type Dtwainselectocrengine2Func = unsafe extern "C" fn(*const c_void,*const u16,i32,i32,i32) -> *mut c_void;
+type Dtwainselectocrengine2aFunc = unsafe extern "C" fn(*const c_void,*const c_char,i32,i32,i32) -> *mut c_void;
+type Dtwainselectocrengine2exFunc = unsafe extern "C" fn(*const c_void,*const u16,i32,i32,*const u16,*const u16,*const u16,i32) -> *mut c_void;
+type Dtwainselectocrengine2exaFunc = unsafe extern "C" fn(*const c_void,*const c_char,i32,i32,*const c_char,*const c_char,*const c_char,i32) -> *mut c_void;
+type Dtwainselectocrengine2exwFunc = unsafe extern "C" fn(*const c_void,*const u16,i32,i32,*const u16,*const u16,*const u16,i32) -> *mut c_void;
+type Dtwainselectocrengine2wFunc = unsafe extern "C" fn(*const c_void,*const u16,i32,i32,i32) -> *mut c_void;
+type DtwainselectocrenginebynameFunc = unsafe extern "C" fn(*const u16) -> *mut c_void;
+type DtwainselectocrenginebynameaFunc = unsafe extern "C" fn(*const c_char) -> *mut c_void;
+type DtwainselectocrenginebynamewFunc = unsafe extern "C" fn(*const u16) -> *mut c_void;
+type DtwainselectsourceFunc = unsafe extern "C" fn() -> *mut c_void;
+type Dtwainselectsource2Func = unsafe extern "C" fn(*const c_void,*const u16,i32,i32,i32) -> *mut c_void;
+type Dtwainselectsource2aFunc = unsafe extern "C" fn(*const c_void,*const c_char,i32,i32,i32) -> *mut c_void;
+type Dtwainselectsource2exFunc = unsafe extern "C" fn(*const c_void,*const u16,i32,i32,*const u16,*const u16,*const u16,i32) -> *mut c_void;
+type Dtwainselectsource2exaFunc = unsafe extern "C" fn(*const c_void,*const c_char,i32,i32,*const c_char,*const c_char,*const c_char,i32) -> *mut c_void;
+type Dtwainselectsource2exwFunc = unsafe extern "C" fn(*const c_void,*const u16,i32,i32,*const u16,*const u16,*const u16,i32) -> *mut c_void;
+type Dtwainselectsource2wFunc = unsafe extern "C" fn(*const c_void,*const u16,i32,i32,i32) -> *mut c_void;
+type DtwainselectsourcebynameFunc = unsafe extern "C" fn(*const u16) -> *mut c_void;
+type DtwainselectsourcebynameaFunc = unsafe extern "C" fn(*const c_char) -> *mut c_void;
+type DtwainselectsourcebynamewFunc = unsafe extern "C" fn(*const u16) -> *mut c_void;
+type DtwainselectsourcebynamewithopenFunc = unsafe extern "C" fn(*const u16,i32) -> *mut c_void;
+type DtwainselectsourcebynamewithopenaFunc = unsafe extern "C" fn(*const c_char,i32) -> *mut c_void;
+type DtwainselectsourcebynamewithopenwFunc = unsafe extern "C" fn(*const u16,i32) -> *mut c_void;
+type DtwainselectsourcewithopenFunc = unsafe extern "C" fn(i32) -> *mut c_void;
+type DtwainsetacquireareaFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void,*mut c_void) -> i32;
+type Dtwainsetacquirearea2Func = unsafe extern "C" fn(*mut c_void,f64,f64,f64,f64,i32,i32) -> i32;
+type Dtwainsetacquirearea2stringFunc = unsafe extern "C" fn(*mut c_void,*const u16,*const u16,*const u16,*const u16,i32,i32) -> i32;
+type Dtwainsetacquirearea2stringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*const c_char,*const c_char,*const c_char,i32,i32) -> i32;
+type Dtwainsetacquirearea2stringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,*const u16,*const u16,*const u16,i32,i32) -> i32;
+type DtwainsetacquireimagenegativeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetacquireimagescaleFunc = unsafe extern "C" fn(*mut c_void,f64,f64) -> i32;
+type DtwainsetacquireimagescalestringFunc = unsafe extern "C" fn(*mut c_void,*const u16,*const u16) -> i32;
+type DtwainsetacquireimagescalestringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*const c_char) -> i32;
+type DtwainsetacquireimagescalestringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,*const u16) -> i32;
+type DtwainsetacquirestripbufferFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
+type DtwainsetacquirestripsizeFunc = unsafe extern "C" fn(*mut c_void,u32) -> i32;
+type DtwainsetalarmvolumeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetalarmsFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
+type DtwainsetallcapstodefaultFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainsetappinfoFunc = unsafe extern "C" fn(*const u16,*const u16,*const u16,*const u16) -> i32;
+type DtwainsetappinfoaFunc = unsafe extern "C" fn(*const c_char,*const c_char,*const c_char,*const c_char) -> i32;
+type DtwainsetappinfowFunc = unsafe extern "C" fn(*const u16,*const u16,*const u16,*const u16) -> i32;
+type DtwainsetauthorFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetauthoraFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainsetauthorwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetavailableprintersFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetavailableprintersarrayFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
+type DtwainsetbitdepthFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
+type DtwainsetblankpagedetectionFunc = unsafe extern "C" fn(*mut c_void,f64,i32,i32) -> i32;
+type DtwainsetblankpagedetectionexFunc = unsafe extern "C" fn(*mut c_void,f64,i32,i32,i32) -> i32;
+type DtwainsetblankpagedetectionexstringFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32,i32) -> i32;
+type DtwainsetblankpagedetectionexstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32,i32,i32) -> i32;
+type DtwainsetblankpagedetectionexstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32,i32) -> i32;
+type DtwainsetblankpagedetectionstringFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32) -> i32;
+type DtwainsetblankpagedetectionstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32,i32) -> i32;
+type DtwainsetblankpagedetectionstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32) -> i32;
+type DtwainsetbrightnessFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
+type DtwainsetbrightnessstringFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetbrightnessstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainsetbrightnessstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetbufferedtilemodeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetcallbackFunc = unsafe extern "C" fn(DTWAIN_CALLBACK_PROC,i32) -> DTWAIN_CALLBACK_PROC;
+type Dtwainsetcallback64Func = unsafe extern "C" fn(DTWAIN_CALLBACK_PROC64,i64) -> DTWAIN_CALLBACK_PROC64;
+type DtwainsetcameraFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetcameraaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainsetcamerawFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetcapvaluesFunc = unsafe extern "C" fn(*mut c_void,i32,i32,*mut c_void) -> i32;
+type DtwainsetcapvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32,*mut c_void) -> i32;
+type Dtwainsetcapvaluesex2Func = unsafe extern "C" fn(*mut c_void,i32,i32,i32,i32,*mut c_void) -> i32;
+type DtwainsetcaptionFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetcaptionaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainsetcaptionwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetcompressiontypeFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
+type DtwainsetcontrastFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
+type DtwainsetcontraststringFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetcontraststringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainsetcontraststringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetcountryFunc = unsafe extern "C" fn(i32) -> i32;
+type DtwainsetcurrentretrycountFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetcustomdsdataFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,*const u8,u32,i32) -> i32;
+type DtwainsetdsmsearchorderFunc = unsafe extern "C" fn(i32) -> i32;
+type DtwainsetdsmsearchorderexFunc = unsafe extern "C" fn(*const u16,*const u16) -> i32;
+type DtwainsetdsmsearchorderexaFunc = unsafe extern "C" fn(*const c_char,*const c_char) -> i32;
+type DtwainsetdsmsearchorderexwFunc = unsafe extern "C" fn(*const u16,*const u16) -> i32;
+type DtwainsetdefaultsourceFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainsetdevicenotificationsFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetdevicetimedateFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetdevicetimedateaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainsetdevicetimedatewFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetdoublefeeddetectlengthFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
+type DtwainsetdoublefeeddetectlengthstringFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetdoublefeeddetectlengthstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainsetdoublefeeddetectlengthstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetdoublefeeddetectvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
+type DtwainsetdoublepagecountonduplexFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainseteojdetectvalueFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainseterrorbufferthresholdFunc = unsafe extern "C" fn(i32) -> i32;
+type DtwainseterrorcallbackFunc = unsafe extern "C" fn(DTWAIN_ERROR_PROC,i32) -> i32;
+type Dtwainseterrorcallback64Func = unsafe extern "C" fn(DTWAIN_ERROR_PROC64,i64) -> i32;
+type DtwainsetfeederalignmentFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetfeederorderFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetfeederwaittimeFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
+type DtwainsetfileautoincrementFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32) -> i32;
+type DtwainsetfilecompressiontypeFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
+type DtwainsetfilesaveposFunc = unsafe extern "C" fn(*const c_void,*const u16,i32,i32,i32) -> i32;
+type DtwainsetfilesaveposaFunc = unsafe extern "C" fn(*const c_void,*const c_char,i32,i32,i32) -> i32;
+type DtwainsetfilesaveposwFunc = unsafe extern "C" fn(*const c_void,*const u16,i32,i32,i32) -> i32;
+type DtwainsetfilexferformatFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
+type DtwainsethalftoneFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsethalftoneaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainsethalftonewFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsethighlightFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
+type DtwainsethighlightstringFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsethighlightstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainsethighlightstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetjobcontrolFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
+type DtwainsetjpegvaluesFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
+type DtwainsetjpegxrvaluesFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
+type DtwainsetlanguageFunc = unsafe extern "C" fn(i32) -> i32;
+type DtwainsetlasterrorFunc = unsafe extern "C" fn(i32) -> i32;
+type DtwainsetlightpathFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetlightpathexFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
+type DtwainsetlightsourceFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetlightsourcesFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
+type DtwainsetloggercallbackFunc = unsafe extern "C" fn(DTWAIN_LOGGER_PROC,i64) -> i32;
+type DtwainsetloggercallbackaFunc = unsafe extern "C" fn(DTWAIN_LOGGER_PROCA,i64) -> i32;
+type DtwainsetloggercallbackwFunc = unsafe extern "C" fn(DTWAIN_LOGGER_PROCW,i64) -> i32;
+type DtwainsetmanualduplexmodeFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
+type DtwainsetmaxacquisitionsFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetmaxbuffersFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetmaxretryattemptsFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetmultipagescanmodeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetnoisefilterFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetocrcapvaluesFunc = unsafe extern "C" fn(*mut c_void,i32,i32,*mut c_void) -> i32;
+type DtwainsetorientationFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
+type DtwainsetoverscanFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
+type DtwainsetpdfaesencryptionFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
+type DtwainsetpdfasciicompressionFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetpdfauthorFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetpdfauthoraFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainsetpdfauthorwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetpdfcompressionFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetpdfcreatorFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetpdfcreatoraFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainsetpdfcreatorwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetpdfencryptionFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16,*const u16,u32,i32) -> i32;
+type DtwainsetpdfencryptionaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char,*const c_char,u32,i32) -> i32;
+type DtwainsetpdfencryptionwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16,*const u16,u32,i32) -> i32;
+type DtwainsetpdfjpegqualityFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetpdfkeywordsFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetpdfkeywordsaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainsetpdfkeywordswFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetpdfocrconversionFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32,i32,i32) -> i32;
+type DtwainsetpdfocrmodeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetpdforientationFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetpdfpagescaleFunc = unsafe extern "C" fn(*mut c_void,i32,f64,f64) -> i32;
+type DtwainsetpdfpagescalestringFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16,*const u16) -> i32;
+type DtwainsetpdfpagescalestringaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char,*const c_char) -> i32;
+type DtwainsetpdfpagescalestringwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16,*const u16) -> i32;
+type DtwainsetpdfpagesizeFunc = unsafe extern "C" fn(*mut c_void,i32,f64,f64) -> i32;
+type DtwainsetpdfpagesizestringFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16,*const u16) -> i32;
+type DtwainsetpdfpagesizestringaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char,*const c_char) -> i32;
+type DtwainsetpdfpagesizestringwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16,*const u16) -> i32;
+type DtwainsetpdfpolarityFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetpdfproducerFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetpdfproduceraFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainsetpdfproducerwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetpdfsubjectFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetpdfsubjectaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainsetpdfsubjectwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetpdftextelementfloatFunc = unsafe extern "C" fn(*mut c_void,f64,f64,i32) -> i32;
+type DtwainsetpdftextelementlongFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32) -> i32;
+type DtwainsetpdftextelementstringFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32) -> i32;
+type DtwainsetpdftextelementstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32) -> i32;
+type DtwainsetpdftextelementstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32) -> i32;
+type DtwainsetpdftitleFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetpdftitleaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainsetpdftitlewFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetpapersizeFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
+type DtwainsetpatchmaxprioritiesFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetpatchmaxretriesFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetpatchprioritiesFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
+type DtwainsetpatchsearchmodeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetpatchtimeoutFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetpixelflavorFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetpixeltypeFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32) -> i32;
+type DtwainsetpostscripttitleFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetpostscripttitleaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainsetpostscripttitlewFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetpostscripttypeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetprinterFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
+type DtwainsetprinterexFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
+type DtwainsetprinterstartnumberFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsetprinterstringmodeFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
+type DtwainsetprinterstringsFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,*mut i32) -> i32;
+type DtwainsetprintersuffixstringFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetprintersuffixstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainsetprintersuffixstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetquerycapsupportFunc = unsafe extern "C" fn(i32) -> i32;
+type DtwainsetresolutionFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
+type DtwainsetresolutionstringFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetresolutionstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainsetresolutionstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetresourcepathFunc = unsafe extern "C" fn(*const u16) -> i32;
+type DtwainsetresourcepathaFunc = unsafe extern "C" fn(*const c_char) -> i32;
+type DtwainsetresourcepathwFunc = unsafe extern "C" fn(*const u16) -> i32;
+type DtwainsetrotationFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
+type DtwainsetrotationstringFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetrotationstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainsetrotationstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetsavefilenameFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetsavefilenameaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainsetsavefilenamewFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetshadowFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
+type DtwainsetshadowstringFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetshadowstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainsetshadowstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetsourceunitFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsettiffcompresstypeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsettiffinvertFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainsettempfiledirectoryFunc = unsafe extern "C" fn(*const u16) -> i32;
+type DtwainsettempfiledirectoryaFunc = unsafe extern "C" fn(*const c_char) -> i32;
+type DtwainsettempfiledirectoryexFunc = unsafe extern "C" fn(*const u16,i32) -> i32;
+type DtwainsettempfiledirectoryexaFunc = unsafe extern "C" fn(*const c_char,i32) -> i32;
+type DtwainsettempfiledirectoryexwFunc = unsafe extern "C" fn(*const u16,i32) -> i32;
+type DtwainsettempfiledirectorywFunc = unsafe extern "C" fn(*const u16) -> i32;
+type DtwainsetthresholdFunc = unsafe extern "C" fn(*mut c_void,f64,i32) -> i32;
+type DtwainsetthresholdstringFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32) -> i32;
+type DtwainsetthresholdstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32) -> i32;
+type DtwainsetthresholdstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32) -> i32;
+type DtwainsettwaindsmFunc = unsafe extern "C" fn(i32) -> i32;
+type DtwainsettwainlogFunc = unsafe extern "C" fn(u32,*const u16) -> i32;
+type DtwainsettwainlogaFunc = unsafe extern "C" fn(u32,*const c_char) -> i32;
+type DtwainsettwainlogwFunc = unsafe extern "C" fn(u32,*const u16) -> i32;
+type DtwainsettwainmodeFunc = unsafe extern "C" fn(i32) -> i32;
+type DtwainsettwaintimeoutFunc = unsafe extern "C" fn(i32) -> i32;
+type DtwainsetupdatedibprocFunc = unsafe extern "C" fn(DTWAIN_DIBUPDATE_PROC) -> DTWAIN_DIBUPDATE_PROC;
+type DtwainsetxresolutionFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
+type DtwainsetxresolutionstringFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetxresolutionstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainsetxresolutionstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetyresolutionFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
+type DtwainsetyresolutionstringFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainsetyresolutionstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
+type DtwainsetyresolutionstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
+type DtwainshowuionlyFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainshutdownocrengineFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainskipimageinfoerrorFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
+type DtwainstartthreadFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainstarttwainsessionFunc = unsafe extern "C" fn(*const c_void,*const u16) -> i32;
+type DtwainstarttwainsessionaFunc = unsafe extern "C" fn(*const c_void,*const c_char) -> i32;
+type DtwainstarttwainsessionwFunc = unsafe extern "C" fn(*const c_void,*const u16) -> i32;
+type DtwainsysdestroyFunc = unsafe extern "C" fn() -> i32;
+type DtwainsysinitializeFunc = unsafe extern "C" fn() -> *mut c_void;
+type DtwainsysinitializeexFunc = unsafe extern "C" fn(*const u16) -> *mut c_void;
+type Dtwainsysinitializeex2Func = unsafe extern "C" fn(*const u16,*const u16,*const u16) -> *mut c_void;
+type Dtwainsysinitializeex2aFunc = unsafe extern "C" fn(*const c_char,*const c_char,*const c_char) -> *mut c_void;
+type Dtwainsysinitializeex2wFunc = unsafe extern "C" fn(*const u16,*const u16,*const u16) -> *mut c_void;
+type DtwainsysinitializeexaFunc = unsafe extern "C" fn(*const c_char) -> *mut c_void;
+type DtwainsysinitializeexwFunc = unsafe extern "C" fn(*const u16) -> *mut c_void;
+type DtwainsysinitializelibFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainsysinitializelibexFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> *mut c_void;
+type Dtwainsysinitializelibex2Func = unsafe extern "C" fn(*mut c_void,*const u16,*const u16,*const u16) -> *mut c_void;
+type Dtwainsysinitializelibex2aFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*const c_char,*const c_char) -> *mut c_void;
+type Dtwainsysinitializelibex2wFunc = unsafe extern "C" fn(*mut c_void,*const u16,*const u16,*const u16) -> *mut c_void;
+type DtwainsysinitializelibexaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> *mut c_void;
+type DtwainsysinitializelibexwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> *mut c_void;
+type DtwainsysinitializenoblockingFunc = unsafe extern "C" fn() -> *mut c_void;
+type DtwaintestgetcapFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwainunlockmemoryFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainunlockmemoryexFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainusemultiplethreadsFunc = unsafe extern "C" fn(i32) -> i32;
+pub struct DTwainAPI<'a>
+{
+    DTWAIN_AcquireAudioFileFunc: Symbol<'a, DtwainacquireaudiofileFunc>,
+    DTWAIN_AcquireAudioFileAFunc: Symbol<'a, DtwainacquireaudiofileaFunc>,
+    DTWAIN_AcquireAudioFileWFunc: Symbol<'a, DtwainacquireaudiofilewFunc>,
+    DTWAIN_AcquireAudioNativeFunc: Symbol<'a, DtwainacquireaudionativeFunc>,
+    DTWAIN_AcquireAudioNativeExFunc: Symbol<'a, DtwainacquireaudionativeexFunc>,
+    DTWAIN_AcquireBufferedFunc: Symbol<'a, DtwainacquirebufferedFunc>,
+    DTWAIN_AcquireBufferedExFunc: Symbol<'a, DtwainacquirebufferedexFunc>,
+    DTWAIN_AcquireFileFunc: Symbol<'a, DtwainacquirefileFunc>,
+    DTWAIN_AcquireFileAFunc: Symbol<'a, DtwainacquirefileaFunc>,
+    DTWAIN_AcquireFileExFunc: Symbol<'a, DtwainacquirefileexFunc>,
+    DTWAIN_AcquireFileWFunc: Symbol<'a, DtwainacquirefilewFunc>,
+    DTWAIN_AcquireNativeFunc: Symbol<'a, DtwainacquirenativeFunc>,
+    DTWAIN_AcquireNativeExFunc: Symbol<'a, DtwainacquirenativeexFunc>,
+    DTWAIN_AcquireToClipboardFunc: Symbol<'a, DtwainacquiretoclipboardFunc>,
+    DTWAIN_AddExtImageInfoQueryFunc: Symbol<'a, DtwainaddextimageinfoqueryFunc>,
+    DTWAIN_AddPDFTextFunc: Symbol<'a, DtwainaddpdftextFunc>,
+    DTWAIN_AddPDFTextAFunc: Symbol<'a, DtwainaddpdftextaFunc>,
+    DTWAIN_AddPDFTextExFunc: Symbol<'a, DtwainaddpdftextexFunc>,
+    DTWAIN_AddPDFTextWFunc: Symbol<'a, DtwainaddpdftextwFunc>,
+    DTWAIN_AllocateMemoryFunc: Symbol<'a, DtwainallocatememoryFunc>,
+    DTWAIN_AllocateMemory64Func: Symbol<'a, Dtwainallocatememory64Func>,
+    DTWAIN_AllocateMemoryExFunc: Symbol<'a, DtwainallocatememoryexFunc>,
+    DTWAIN_AppHandlesExceptionsFunc: Symbol<'a, DtwainapphandlesexceptionsFunc>,
+    DTWAIN_ArrayANSIStringToFloatFunc: Symbol<'a, DtwainarrayansistringtofloatFunc>,
+    DTWAIN_ArrayAddFunc: Symbol<'a, DtwainarrayaddFunc>,
+    DTWAIN_ArrayAddANSIStringFunc: Symbol<'a, DtwainarrayaddansistringFunc>,
+    DTWAIN_ArrayAddANSIStringNFunc: Symbol<'a, DtwainarrayaddansistringnFunc>,
+    DTWAIN_ArrayAddFloatFunc: Symbol<'a, DtwainarrayaddfloatFunc>,
+    DTWAIN_ArrayAddFloatNFunc: Symbol<'a, DtwainarrayaddfloatnFunc>,
+    DTWAIN_ArrayAddFloatStringFunc: Symbol<'a, DtwainarrayaddfloatstringFunc>,
+    DTWAIN_ArrayAddFloatStringAFunc: Symbol<'a, DtwainarrayaddfloatstringaFunc>,
+    DTWAIN_ArrayAddFloatStringNFunc: Symbol<'a, DtwainarrayaddfloatstringnFunc>,
+    DTWAIN_ArrayAddFloatStringNAFunc: Symbol<'a, DtwainarrayaddfloatstringnaFunc>,
+    DTWAIN_ArrayAddFloatStringNWFunc: Symbol<'a, DtwainarrayaddfloatstringnwFunc>,
+    DTWAIN_ArrayAddFloatStringWFunc: Symbol<'a, DtwainarrayaddfloatstringwFunc>,
+    DTWAIN_ArrayAddFrameFunc: Symbol<'a, DtwainarrayaddframeFunc>,
+    DTWAIN_ArrayAddFrameNFunc: Symbol<'a, DtwainarrayaddframenFunc>,
+    DTWAIN_ArrayAddLongFunc: Symbol<'a, DtwainarrayaddlongFunc>,
+    DTWAIN_ArrayAddLong64Func: Symbol<'a, Dtwainarrayaddlong64Func>,
+    DTWAIN_ArrayAddLong64NFunc: Symbol<'a, Dtwainarrayaddlong64nFunc>,
+    DTWAIN_ArrayAddLongNFunc: Symbol<'a, DtwainarrayaddlongnFunc>,
+    DTWAIN_ArrayAddNFunc: Symbol<'a, DtwainarrayaddnFunc>,
+    DTWAIN_ArrayAddStringFunc: Symbol<'a, DtwainarrayaddstringFunc>,
+    DTWAIN_ArrayAddStringAFunc: Symbol<'a, DtwainarrayaddstringaFunc>,
+    DTWAIN_ArrayAddStringNFunc: Symbol<'a, DtwainarrayaddstringnFunc>,
+    DTWAIN_ArrayAddStringNAFunc: Symbol<'a, DtwainarrayaddstringnaFunc>,
+    DTWAIN_ArrayAddStringNWFunc: Symbol<'a, DtwainarrayaddstringnwFunc>,
+    DTWAIN_ArrayAddStringWFunc: Symbol<'a, DtwainarrayaddstringwFunc>,
+    DTWAIN_ArrayAddWideStringFunc: Symbol<'a, DtwainarrayaddwidestringFunc>,
+    DTWAIN_ArrayAddWideStringNFunc: Symbol<'a, DtwainarrayaddwidestringnFunc>,
+    DTWAIN_ArrayConvertFix32ToFloatFunc: Symbol<'a, Dtwainarrayconvertfix32tofloatFunc>,
+    DTWAIN_ArrayConvertFloatToFix32Func: Symbol<'a, Dtwainarrayconvertfloattofix32Func>,
+    DTWAIN_ArrayCopyFunc: Symbol<'a, DtwainarraycopyFunc>,
+    DTWAIN_ArrayCreateFunc: Symbol<'a, DtwainarraycreateFunc>,
+    DTWAIN_ArrayCreateCopyFunc: Symbol<'a, DtwainarraycreatecopyFunc>,
+    DTWAIN_ArrayCreateFromCapFunc: Symbol<'a, DtwainarraycreatefromcapFunc>,
+    DTWAIN_ArrayCreateFromLong64sFunc: Symbol<'a, Dtwainarraycreatefromlong64sFunc>,
+    DTWAIN_ArrayCreateFromLongsFunc: Symbol<'a, DtwainarraycreatefromlongsFunc>,
+    DTWAIN_ArrayCreateFromRealsFunc: Symbol<'a, DtwainarraycreatefromrealsFunc>,
+    DTWAIN_ArrayDestroyFunc: Symbol<'a, DtwainarraydestroyFunc>,
+    DTWAIN_ArrayDestroyFramesFunc: Symbol<'a, DtwainarraydestroyframesFunc>,
+    DTWAIN_ArrayFindFunc: Symbol<'a, DtwainarrayfindFunc>,
+    DTWAIN_ArrayFindANSIStringFunc: Symbol<'a, DtwainarrayfindansistringFunc>,
+    DTWAIN_ArrayFindFloatFunc: Symbol<'a, DtwainarrayfindfloatFunc>,
+    DTWAIN_ArrayFindFloatStringFunc: Symbol<'a, DtwainarrayfindfloatstringFunc>,
+    DTWAIN_ArrayFindFloatStringAFunc: Symbol<'a, DtwainarrayfindfloatstringaFunc>,
+    DTWAIN_ArrayFindFloatStringWFunc: Symbol<'a, DtwainarrayfindfloatstringwFunc>,
+    DTWAIN_ArrayFindLongFunc: Symbol<'a, DtwainarrayfindlongFunc>,
+    DTWAIN_ArrayFindLong64Func: Symbol<'a, Dtwainarrayfindlong64Func>,
+    DTWAIN_ArrayFindStringFunc: Symbol<'a, DtwainarrayfindstringFunc>,
+    DTWAIN_ArrayFindStringAFunc: Symbol<'a, DtwainarrayfindstringaFunc>,
+    DTWAIN_ArrayFindStringWFunc: Symbol<'a, DtwainarrayfindstringwFunc>,
+    DTWAIN_ArrayFindWideStringFunc: Symbol<'a, DtwainarrayfindwidestringFunc>,
+    DTWAIN_ArrayFix32GetAtFunc: Symbol<'a, Dtwainarrayfix32getatFunc>,
+    DTWAIN_ArrayFix32SetAtFunc: Symbol<'a, Dtwainarrayfix32setatFunc>,
+    DTWAIN_ArrayFloatToANSIStringFunc: Symbol<'a, DtwainarrayfloattoansistringFunc>,
+    DTWAIN_ArrayFloatToStringFunc: Symbol<'a, DtwainarrayfloattostringFunc>,
+    DTWAIN_ArrayFloatToWideStringFunc: Symbol<'a, DtwainarrayfloattowidestringFunc>,
+    DTWAIN_ArrayGetAtFunc: Symbol<'a, DtwainarraygetatFunc>,
+    DTWAIN_ArrayGetAtANSIStringFunc: Symbol<'a, DtwainarraygetatansistringFunc>,
+    DTWAIN_ArrayGetAtANSIStringPtrFunc: Symbol<'a, DtwainarraygetatansistringptrFunc>,
+    DTWAIN_ArrayGetAtFloatFunc: Symbol<'a, DtwainarraygetatfloatFunc>,
+    DTWAIN_ArrayGetAtFloatStringFunc: Symbol<'a, DtwainarraygetatfloatstringFunc>,
+    DTWAIN_ArrayGetAtFloatStringAFunc: Symbol<'a, DtwainarraygetatfloatstringaFunc>,
+    DTWAIN_ArrayGetAtFloatStringWFunc: Symbol<'a, DtwainarraygetatfloatstringwFunc>,
+    DTWAIN_ArrayGetAtFrameFunc: Symbol<'a, DtwainarraygetatframeFunc>,
+    DTWAIN_ArrayGetAtFrameExFunc: Symbol<'a, DtwainarraygetatframeexFunc>,
+    DTWAIN_ArrayGetAtFrameStringFunc: Symbol<'a, DtwainarraygetatframestringFunc>,
+    DTWAIN_ArrayGetAtFrameStringAFunc: Symbol<'a, DtwainarraygetatframestringaFunc>,
+    DTWAIN_ArrayGetAtFrameStringWFunc: Symbol<'a, DtwainarraygetatframestringwFunc>,
+    DTWAIN_ArrayGetAtLongFunc: Symbol<'a, DtwainarraygetatlongFunc>,
+    DTWAIN_ArrayGetAtLong64Func: Symbol<'a, Dtwainarraygetatlong64Func>,
+    DTWAIN_ArrayGetAtSourceFunc: Symbol<'a, DtwainarraygetatsourceFunc>,
+    DTWAIN_ArrayGetAtStringFunc: Symbol<'a, DtwainarraygetatstringFunc>,
+    DTWAIN_ArrayGetAtStringAFunc: Symbol<'a, DtwainarraygetatstringaFunc>,
+    DTWAIN_ArrayGetAtStringPtrFunc: Symbol<'a, DtwainarraygetatstringptrFunc>,
+    DTWAIN_ArrayGetAtStringWFunc: Symbol<'a, DtwainarraygetatstringwFunc>,
+    DTWAIN_ArrayGetAtWideStringFunc: Symbol<'a, DtwainarraygetatwidestringFunc>,
+    DTWAIN_ArrayGetAtWideStringPtrFunc: Symbol<'a, DtwainarraygetatwidestringptrFunc>,
+    DTWAIN_ArrayGetBufferFunc: Symbol<'a, DtwainarraygetbufferFunc>,
+    DTWAIN_ArrayGetCapValuesFunc: Symbol<'a, DtwainarraygetcapvaluesFunc>,
+    DTWAIN_ArrayGetCapValuesExFunc: Symbol<'a, DtwainarraygetcapvaluesexFunc>,
+    DTWAIN_ArrayGetCapValuesEx2Func: Symbol<'a, Dtwainarraygetcapvaluesex2Func>,
+    DTWAIN_ArrayGetCountFunc: Symbol<'a, DtwainarraygetcountFunc>,
+    DTWAIN_ArrayGetMaxStringLengthFunc: Symbol<'a, DtwainarraygetmaxstringlengthFunc>,
+    DTWAIN_ArrayGetSourceAtFunc: Symbol<'a, DtwainarraygetsourceatFunc>,
+    DTWAIN_ArrayGetStringLengthFunc: Symbol<'a, DtwainarraygetstringlengthFunc>,
+    DTWAIN_ArrayGetTypeFunc: Symbol<'a, DtwainarraygettypeFunc>,
+    DTWAIN_ArrayInitFunc: Symbol<'a, DtwainarrayinitFunc>,
+    DTWAIN_ArrayInsertAtFunc: Symbol<'a, DtwainarrayinsertatFunc>,
+    DTWAIN_ArrayInsertAtANSIStringFunc: Symbol<'a, DtwainarrayinsertatansistringFunc>,
+    DTWAIN_ArrayInsertAtANSIStringNFunc: Symbol<'a, DtwainarrayinsertatansistringnFunc>,
+    DTWAIN_ArrayInsertAtFloatFunc: Symbol<'a, DtwainarrayinsertatfloatFunc>,
+    DTWAIN_ArrayInsertAtFloatNFunc: Symbol<'a, DtwainarrayinsertatfloatnFunc>,
+    DTWAIN_ArrayInsertAtFloatStringFunc: Symbol<'a, DtwainarrayinsertatfloatstringFunc>,
+    DTWAIN_ArrayInsertAtFloatStringAFunc: Symbol<'a, DtwainarrayinsertatfloatstringaFunc>,
+    DTWAIN_ArrayInsertAtFloatStringNFunc: Symbol<'a, DtwainarrayinsertatfloatstringnFunc>,
+    DTWAIN_ArrayInsertAtFloatStringNAFunc: Symbol<'a, DtwainarrayinsertatfloatstringnaFunc>,
+    DTWAIN_ArrayInsertAtFloatStringNWFunc: Symbol<'a, DtwainarrayinsertatfloatstringnwFunc>,
+    DTWAIN_ArrayInsertAtFloatStringWFunc: Symbol<'a, DtwainarrayinsertatfloatstringwFunc>,
+    DTWAIN_ArrayInsertAtFrameFunc: Symbol<'a, DtwainarrayinsertatframeFunc>,
+    DTWAIN_ArrayInsertAtFrameNFunc: Symbol<'a, DtwainarrayinsertatframenFunc>,
+    DTWAIN_ArrayInsertAtLongFunc: Symbol<'a, DtwainarrayinsertatlongFunc>,
+    DTWAIN_ArrayInsertAtLong64Func: Symbol<'a, Dtwainarrayinsertatlong64Func>,
+    DTWAIN_ArrayInsertAtLong64NFunc: Symbol<'a, Dtwainarrayinsertatlong64nFunc>,
+    DTWAIN_ArrayInsertAtLongNFunc: Symbol<'a, DtwainarrayinsertatlongnFunc>,
+    DTWAIN_ArrayInsertAtNFunc: Symbol<'a, DtwainarrayinsertatnFunc>,
+    DTWAIN_ArrayInsertAtStringFunc: Symbol<'a, DtwainarrayinsertatstringFunc>,
+    DTWAIN_ArrayInsertAtStringAFunc: Symbol<'a, DtwainarrayinsertatstringaFunc>,
+    DTWAIN_ArrayInsertAtStringNFunc: Symbol<'a, DtwainarrayinsertatstringnFunc>,
+    DTWAIN_ArrayInsertAtStringNAFunc: Symbol<'a, DtwainarrayinsertatstringnaFunc>,
+    DTWAIN_ArrayInsertAtStringNWFunc: Symbol<'a, DtwainarrayinsertatstringnwFunc>,
+    DTWAIN_ArrayInsertAtStringWFunc: Symbol<'a, DtwainarrayinsertatstringwFunc>,
+    DTWAIN_ArrayInsertAtWideStringFunc: Symbol<'a, DtwainarrayinsertatwidestringFunc>,
+    DTWAIN_ArrayInsertAtWideStringNFunc: Symbol<'a, DtwainarrayinsertatwidestringnFunc>,
+    DTWAIN_ArrayRemoveAllFunc: Symbol<'a, DtwainarrayremoveallFunc>,
+    DTWAIN_ArrayRemoveAtFunc: Symbol<'a, DtwainarrayremoveatFunc>,
+    DTWAIN_ArrayRemoveAtNFunc: Symbol<'a, DtwainarrayremoveatnFunc>,
+    DTWAIN_ArrayResizeFunc: Symbol<'a, DtwainarrayresizeFunc>,
+    DTWAIN_ArraySetAtFunc: Symbol<'a, DtwainarraysetatFunc>,
+    DTWAIN_ArraySetAtANSIStringFunc: Symbol<'a, DtwainarraysetatansistringFunc>,
+    DTWAIN_ArraySetAtFloatFunc: Symbol<'a, DtwainarraysetatfloatFunc>,
+    DTWAIN_ArraySetAtFloatStringFunc: Symbol<'a, DtwainarraysetatfloatstringFunc>,
+    DTWAIN_ArraySetAtFloatStringAFunc: Symbol<'a, DtwainarraysetatfloatstringaFunc>,
+    DTWAIN_ArraySetAtFloatStringWFunc: Symbol<'a, DtwainarraysetatfloatstringwFunc>,
+    DTWAIN_ArraySetAtFrameFunc: Symbol<'a, DtwainarraysetatframeFunc>,
+    DTWAIN_ArraySetAtFrameExFunc: Symbol<'a, DtwainarraysetatframeexFunc>,
+    DTWAIN_ArraySetAtFrameStringFunc: Symbol<'a, DtwainarraysetatframestringFunc>,
+    DTWAIN_ArraySetAtFrameStringAFunc: Symbol<'a, DtwainarraysetatframestringaFunc>,
+    DTWAIN_ArraySetAtFrameStringWFunc: Symbol<'a, DtwainarraysetatframestringwFunc>,
+    DTWAIN_ArraySetAtLongFunc: Symbol<'a, DtwainarraysetatlongFunc>,
+    DTWAIN_ArraySetAtLong64Func: Symbol<'a, Dtwainarraysetatlong64Func>,
+    DTWAIN_ArraySetAtStringFunc: Symbol<'a, DtwainarraysetatstringFunc>,
+    DTWAIN_ArraySetAtStringAFunc: Symbol<'a, DtwainarraysetatstringaFunc>,
+    DTWAIN_ArraySetAtStringWFunc: Symbol<'a, DtwainarraysetatstringwFunc>,
+    DTWAIN_ArraySetAtWideStringFunc: Symbol<'a, DtwainarraysetatwidestringFunc>,
+    DTWAIN_ArrayStringToFloatFunc: Symbol<'a, DtwainarraystringtofloatFunc>,
+    DTWAIN_ArrayWideStringToFloatFunc: Symbol<'a, DtwainarraywidestringtofloatFunc>,
+    DTWAIN_CallCallbackFunc: Symbol<'a, DtwaincallcallbackFunc>,
+    DTWAIN_CallCallback64Func: Symbol<'a, Dtwaincallcallback64Func>,
+    DTWAIN_CallDSMProcFunc: Symbol<'a, DtwaincalldsmprocFunc>,
+    DTWAIN_CheckHandlesFunc: Symbol<'a, DtwaincheckhandlesFunc>,
+    DTWAIN_ClearBuffersFunc: Symbol<'a, DtwainclearbuffersFunc>,
+    DTWAIN_ClearErrorBufferFunc: Symbol<'a, DtwainclearerrorbufferFunc>,
+    DTWAIN_ClearPDFTextFunc: Symbol<'a, DtwainclearpdftextFunc>,
+    DTWAIN_ClearPageFunc: Symbol<'a, DtwainclearpageFunc>,
+    DTWAIN_CloseSourceFunc: Symbol<'a, DtwainclosesourceFunc>,
+    DTWAIN_CloseSourceUIFunc: Symbol<'a, DtwainclosesourceuiFunc>,
+    DTWAIN_ConvertDIBToBitmapFunc: Symbol<'a, DtwainconvertdibtobitmapFunc>,
+    DTWAIN_ConvertDIBToFullBitmapFunc: Symbol<'a, DtwainconvertdibtofullbitmapFunc>,
+    DTWAIN_ConvertToAPIStringFunc: Symbol<'a, DtwainconverttoapistringFunc>,
+    DTWAIN_ConvertToAPIStringAFunc: Symbol<'a, DtwainconverttoapistringaFunc>,
+    DTWAIN_ConvertToAPIStringExFunc: Symbol<'a, DtwainconverttoapistringexFunc>,
+    DTWAIN_ConvertToAPIStringExAFunc: Symbol<'a, DtwainconverttoapistringexaFunc>,
+    DTWAIN_ConvertToAPIStringExWFunc: Symbol<'a, DtwainconverttoapistringexwFunc>,
+    DTWAIN_ConvertToAPIStringWFunc: Symbol<'a, DtwainconverttoapistringwFunc>,
+    DTWAIN_CreateAcquisitionArrayFunc: Symbol<'a, DtwaincreateacquisitionarrayFunc>,
+    DTWAIN_CreatePDFTextElementFunc: Symbol<'a, DtwaincreatepdftextelementFunc>,
+    DTWAIN_DeleteDIBFunc: Symbol<'a, DtwaindeletedibFunc>,
+    DTWAIN_DestroyAcquisitionArrayFunc: Symbol<'a, DtwaindestroyacquisitionarrayFunc>,
+    DTWAIN_DestroyPDFTextElementFunc: Symbol<'a, DtwaindestroypdftextelementFunc>,
+    DTWAIN_DisableAppWindowFunc: Symbol<'a, DtwaindisableappwindowFunc>,
+    DTWAIN_EnableAutoBorderDetectFunc: Symbol<'a, DtwainenableautoborderdetectFunc>,
+    DTWAIN_EnableAutoBrightFunc: Symbol<'a, DtwainenableautobrightFunc>,
+    DTWAIN_EnableAutoDeskewFunc: Symbol<'a, DtwainenableautodeskewFunc>,
+    DTWAIN_EnableAutoFeedFunc: Symbol<'a, DtwainenableautofeedFunc>,
+    DTWAIN_EnableAutoRotateFunc: Symbol<'a, DtwainenableautorotateFunc>,
+    DTWAIN_EnableAutoScanFunc: Symbol<'a, DtwainenableautoscanFunc>,
+    DTWAIN_EnableAutomaticSenseMediumFunc: Symbol<'a, DtwainenableautomaticsensemediumFunc>,
+    DTWAIN_EnableDuplexFunc: Symbol<'a, DtwainenableduplexFunc>,
+    DTWAIN_EnableFeederFunc: Symbol<'a, DtwainenablefeederFunc>,
+    DTWAIN_EnableIndicatorFunc: Symbol<'a, DtwainenableindicatorFunc>,
+    DTWAIN_EnableJobFileHandlingFunc: Symbol<'a, DtwainenablejobfilehandlingFunc>,
+    DTWAIN_EnableLampFunc: Symbol<'a, DtwainenablelampFunc>,
+    DTWAIN_EnableMsgNotifyFunc: Symbol<'a, DtwainenablemsgnotifyFunc>,
+    DTWAIN_EnablePatchDetectFunc: Symbol<'a, DtwainenablepatchdetectFunc>,
+    DTWAIN_EnablePeekMessageLoopFunc: Symbol<'a, DtwainenablepeekmessageloopFunc>,
+    DTWAIN_EnablePrinterFunc: Symbol<'a, DtwainenableprinterFunc>,
+    DTWAIN_EnableThumbnailFunc: Symbol<'a, DtwainenablethumbnailFunc>,
+    DTWAIN_EnableTripletsNotifyFunc: Symbol<'a, DtwainenabletripletsnotifyFunc>,
+    DTWAIN_EndThreadFunc: Symbol<'a, DtwainendthreadFunc>,
+    DTWAIN_EndTwainSessionFunc: Symbol<'a, DtwainendtwainsessionFunc>,
+    DTWAIN_EnumAlarmVolumesFunc: Symbol<'a, DtwainenumalarmvolumesFunc>,
+    DTWAIN_EnumAlarmVolumesExFunc: Symbol<'a, DtwainenumalarmvolumesexFunc>,
+    DTWAIN_EnumAlarmsFunc: Symbol<'a, DtwainenumalarmsFunc>,
+    DTWAIN_EnumAlarmsExFunc: Symbol<'a, DtwainenumalarmsexFunc>,
+    DTWAIN_EnumAudioXferMechsFunc: Symbol<'a, DtwainenumaudioxfermechsFunc>,
+    DTWAIN_EnumAudioXferMechsExFunc: Symbol<'a, DtwainenumaudioxfermechsexFunc>,
+    DTWAIN_EnumAutoFeedValuesFunc: Symbol<'a, DtwainenumautofeedvaluesFunc>,
+    DTWAIN_EnumAutoFeedValuesExFunc: Symbol<'a, DtwainenumautofeedvaluesexFunc>,
+    DTWAIN_EnumAutomaticCapturesFunc: Symbol<'a, DtwainenumautomaticcapturesFunc>,
+    DTWAIN_EnumAutomaticCapturesExFunc: Symbol<'a, DtwainenumautomaticcapturesexFunc>,
+    DTWAIN_EnumAutomaticSenseMediumFunc: Symbol<'a, DtwainenumautomaticsensemediumFunc>,
+    DTWAIN_EnumAutomaticSenseMediumExFunc: Symbol<'a, DtwainenumautomaticsensemediumexFunc>,
+    DTWAIN_EnumBitDepthsFunc: Symbol<'a, DtwainenumbitdepthsFunc>,
+    DTWAIN_EnumBitDepthsExFunc: Symbol<'a, DtwainenumbitdepthsexFunc>,
+    DTWAIN_EnumBitDepthsEx2Func: Symbol<'a, Dtwainenumbitdepthsex2Func>,
+    DTWAIN_EnumBottomCamerasFunc: Symbol<'a, DtwainenumbottomcamerasFunc>,
+    DTWAIN_EnumBottomCamerasExFunc: Symbol<'a, DtwainenumbottomcamerasexFunc>,
+    DTWAIN_EnumBrightnessValuesFunc: Symbol<'a, DtwainenumbrightnessvaluesFunc>,
+    DTWAIN_EnumBrightnessValuesExFunc: Symbol<'a, DtwainenumbrightnessvaluesexFunc>,
+    DTWAIN_EnumCamerasFunc: Symbol<'a, DtwainenumcamerasFunc>,
+    DTWAIN_EnumCamerasExFunc: Symbol<'a, DtwainenumcamerasexFunc>,
+    DTWAIN_EnumCamerasEx2Func: Symbol<'a, Dtwainenumcamerasex2Func>,
+    DTWAIN_EnumCamerasEx3Func: Symbol<'a, Dtwainenumcamerasex3Func>,
+    DTWAIN_EnumCompressionTypesFunc: Symbol<'a, DtwainenumcompressiontypesFunc>,
+    DTWAIN_EnumCompressionTypesExFunc: Symbol<'a, DtwainenumcompressiontypesexFunc>,
+    DTWAIN_EnumCompressionTypesEx2Func: Symbol<'a, Dtwainenumcompressiontypesex2Func>,
+    DTWAIN_EnumContrastValuesFunc: Symbol<'a, DtwainenumcontrastvaluesFunc>,
+    DTWAIN_EnumContrastValuesExFunc: Symbol<'a, DtwainenumcontrastvaluesexFunc>,
+    DTWAIN_EnumCustomCapsFunc: Symbol<'a, DtwainenumcustomcapsFunc>,
+    DTWAIN_EnumCustomCapsEx2Func: Symbol<'a, Dtwainenumcustomcapsex2Func>,
+    DTWAIN_EnumDoubleFeedDetectLengthsFunc: Symbol<'a, DtwainenumdoublefeeddetectlengthsFunc>,
+    DTWAIN_EnumDoubleFeedDetectLengthsExFunc: Symbol<'a, DtwainenumdoublefeeddetectlengthsexFunc>,
+    DTWAIN_EnumDoubleFeedDetectValuesFunc: Symbol<'a, DtwainenumdoublefeeddetectvaluesFunc>,
+    DTWAIN_EnumDoubleFeedDetectValuesExFunc: Symbol<'a, DtwainenumdoublefeeddetectvaluesexFunc>,
+    DTWAIN_EnumExtImageInfoTypesFunc: Symbol<'a, DtwainenumextimageinfotypesFunc>,
+    DTWAIN_EnumExtImageInfoTypesExFunc: Symbol<'a, DtwainenumextimageinfotypesexFunc>,
+    DTWAIN_EnumExtendedCapsFunc: Symbol<'a, DtwainenumextendedcapsFunc>,
+    DTWAIN_EnumExtendedCapsExFunc: Symbol<'a, DtwainenumextendedcapsexFunc>,
+    DTWAIN_EnumExtendedCapsEx2Func: Symbol<'a, Dtwainenumextendedcapsex2Func>,
+    DTWAIN_EnumFileTypeBitsPerPixelFunc: Symbol<'a, DtwainenumfiletypebitsperpixelFunc>,
+    DTWAIN_EnumFileXferFormatsFunc: Symbol<'a, DtwainenumfilexferformatsFunc>,
+    DTWAIN_EnumFileXferFormatsExFunc: Symbol<'a, DtwainenumfilexferformatsexFunc>,
+    DTWAIN_EnumHalftonesFunc: Symbol<'a, DtwainenumhalftonesFunc>,
+    DTWAIN_EnumHalftonesExFunc: Symbol<'a, DtwainenumhalftonesexFunc>,
+    DTWAIN_EnumHighlightValuesFunc: Symbol<'a, DtwainenumhighlightvaluesFunc>,
+    DTWAIN_EnumHighlightValuesExFunc: Symbol<'a, DtwainenumhighlightvaluesexFunc>,
+    DTWAIN_EnumJobControlsFunc: Symbol<'a, DtwainenumjobcontrolsFunc>,
+    DTWAIN_EnumJobControlsExFunc: Symbol<'a, DtwainenumjobcontrolsexFunc>,
+    DTWAIN_EnumLightPathsFunc: Symbol<'a, DtwainenumlightpathsFunc>,
+    DTWAIN_EnumLightPathsExFunc: Symbol<'a, DtwainenumlightpathsexFunc>,
+    DTWAIN_EnumLightSourcesFunc: Symbol<'a, DtwainenumlightsourcesFunc>,
+    DTWAIN_EnumLightSourcesExFunc: Symbol<'a, DtwainenumlightsourcesexFunc>,
+    DTWAIN_EnumMaxBuffersFunc: Symbol<'a, DtwainenummaxbuffersFunc>,
+    DTWAIN_EnumMaxBuffersExFunc: Symbol<'a, DtwainenummaxbuffersexFunc>,
+    DTWAIN_EnumNoiseFiltersFunc: Symbol<'a, DtwainenumnoisefiltersFunc>,
+    DTWAIN_EnumNoiseFiltersExFunc: Symbol<'a, DtwainenumnoisefiltersexFunc>,
+    DTWAIN_EnumOCRInterfacesFunc: Symbol<'a, DtwainenumocrinterfacesFunc>,
+    DTWAIN_EnumOCRSupportedCapsFunc: Symbol<'a, DtwainenumocrsupportedcapsFunc>,
+    DTWAIN_EnumOrientationsFunc: Symbol<'a, DtwainenumorientationsFunc>,
+    DTWAIN_EnumOrientationsExFunc: Symbol<'a, DtwainenumorientationsexFunc>,
+    DTWAIN_EnumOverscanValuesFunc: Symbol<'a, DtwainenumoverscanvaluesFunc>,
+    DTWAIN_EnumOverscanValuesExFunc: Symbol<'a, DtwainenumoverscanvaluesexFunc>,
+    DTWAIN_EnumPaperSizesFunc: Symbol<'a, DtwainenumpapersizesFunc>,
+    DTWAIN_EnumPaperSizesExFunc: Symbol<'a, DtwainenumpapersizesexFunc>,
+    DTWAIN_EnumPatchCodesFunc: Symbol<'a, DtwainenumpatchcodesFunc>,
+    DTWAIN_EnumPatchCodesExFunc: Symbol<'a, DtwainenumpatchcodesexFunc>,
+    DTWAIN_EnumPatchMaxPrioritiesFunc: Symbol<'a, DtwainenumpatchmaxprioritiesFunc>,
+    DTWAIN_EnumPatchMaxPrioritiesExFunc: Symbol<'a, DtwainenumpatchmaxprioritiesexFunc>,
+    DTWAIN_EnumPatchMaxRetriesFunc: Symbol<'a, DtwainenumpatchmaxretriesFunc>,
+    DTWAIN_EnumPatchMaxRetriesExFunc: Symbol<'a, DtwainenumpatchmaxretriesexFunc>,
+    DTWAIN_EnumPatchPrioritiesFunc: Symbol<'a, DtwainenumpatchprioritiesFunc>,
+    DTWAIN_EnumPatchPrioritiesExFunc: Symbol<'a, DtwainenumpatchprioritiesexFunc>,
+    DTWAIN_EnumPatchSearchModesFunc: Symbol<'a, DtwainenumpatchsearchmodesFunc>,
+    DTWAIN_EnumPatchSearchModesExFunc: Symbol<'a, DtwainenumpatchsearchmodesexFunc>,
+    DTWAIN_EnumPatchTimeOutValuesFunc: Symbol<'a, DtwainenumpatchtimeoutvaluesFunc>,
+    DTWAIN_EnumPatchTimeOutValuesExFunc: Symbol<'a, DtwainenumpatchtimeoutvaluesexFunc>,
+    DTWAIN_EnumPixelTypesFunc: Symbol<'a, DtwainenumpixeltypesFunc>,
+    DTWAIN_EnumPixelTypesExFunc: Symbol<'a, DtwainenumpixeltypesexFunc>,
+    DTWAIN_EnumPrinterStringModesFunc: Symbol<'a, DtwainenumprinterstringmodesFunc>,
+    DTWAIN_EnumPrinterStringModesExFunc: Symbol<'a, DtwainenumprinterstringmodesexFunc>,
+    DTWAIN_EnumResolutionValuesFunc: Symbol<'a, DtwainenumresolutionvaluesFunc>,
+    DTWAIN_EnumResolutionValuesExFunc: Symbol<'a, DtwainenumresolutionvaluesexFunc>,
+    DTWAIN_EnumShadowValuesFunc: Symbol<'a, DtwainenumshadowvaluesFunc>,
+    DTWAIN_EnumShadowValuesExFunc: Symbol<'a, DtwainenumshadowvaluesexFunc>,
+    DTWAIN_EnumSourceUnitsFunc: Symbol<'a, DtwainenumsourceunitsFunc>,
+    DTWAIN_EnumSourceUnitsExFunc: Symbol<'a, DtwainenumsourceunitsexFunc>,
+    DTWAIN_EnumSourceValuesFunc: Symbol<'a, DtwainenumsourcevaluesFunc>,
+    DTWAIN_EnumSourceValuesAFunc: Symbol<'a, DtwainenumsourcevaluesaFunc>,
+    DTWAIN_EnumSourceValuesWFunc: Symbol<'a, DtwainenumsourcevalueswFunc>,
+    DTWAIN_EnumSourcesFunc: Symbol<'a, DtwainenumsourcesFunc>,
+    DTWAIN_EnumSourcesExFunc: Symbol<'a, DtwainenumsourcesexFunc>,
+    DTWAIN_EnumSupportedCapsFunc: Symbol<'a, DtwainenumsupportedcapsFunc>,
+    DTWAIN_EnumSupportedCapsExFunc: Symbol<'a, DtwainenumsupportedcapsexFunc>,
+    DTWAIN_EnumSupportedCapsEx2Func: Symbol<'a, Dtwainenumsupportedcapsex2Func>,
+    DTWAIN_EnumSupportedExtImageInfoFunc: Symbol<'a, DtwainenumsupportedextimageinfoFunc>,
+    DTWAIN_EnumSupportedExtImageInfoExFunc: Symbol<'a, DtwainenumsupportedextimageinfoexFunc>,
+    DTWAIN_EnumSupportedFileTypesFunc: Symbol<'a, DtwainenumsupportedfiletypesFunc>,
+    DTWAIN_EnumSupportedMultiPageFileTypesFunc: Symbol<'a, DtwainenumsupportedmultipagefiletypesFunc>,
+    DTWAIN_EnumSupportedSinglePageFileTypesFunc: Symbol<'a, DtwainenumsupportedsinglepagefiletypesFunc>,
+    DTWAIN_EnumThresholdValuesFunc: Symbol<'a, DtwainenumthresholdvaluesFunc>,
+    DTWAIN_EnumThresholdValuesExFunc: Symbol<'a, DtwainenumthresholdvaluesexFunc>,
+    DTWAIN_EnumTopCamerasFunc: Symbol<'a, DtwainenumtopcamerasFunc>,
+    DTWAIN_EnumTopCamerasExFunc: Symbol<'a, DtwainenumtopcamerasexFunc>,
+    DTWAIN_EnumTwainPrintersFunc: Symbol<'a, DtwainenumtwainprintersFunc>,
+    DTWAIN_EnumTwainPrintersArrayFunc: Symbol<'a, DtwainenumtwainprintersarrayFunc>,
+    DTWAIN_EnumTwainPrintersArrayExFunc: Symbol<'a, DtwainenumtwainprintersarrayexFunc>,
+    DTWAIN_EnumTwainPrintersExFunc: Symbol<'a, DtwainenumtwainprintersexFunc>,
+    DTWAIN_EnumXResolutionValuesFunc: Symbol<'a, DtwainenumxresolutionvaluesFunc>,
+    DTWAIN_EnumXResolutionValuesExFunc: Symbol<'a, DtwainenumxresolutionvaluesexFunc>,
+    DTWAIN_EnumYResolutionValuesFunc: Symbol<'a, DtwainenumyresolutionvaluesFunc>,
+    DTWAIN_EnumYResolutionValuesExFunc: Symbol<'a, DtwainenumyresolutionvaluesexFunc>,
+    DTWAIN_ExecuteOCRFunc: Symbol<'a, DtwainexecuteocrFunc>,
+    DTWAIN_ExecuteOCRAFunc: Symbol<'a, DtwainexecuteocraFunc>,
+    DTWAIN_ExecuteOCRWFunc: Symbol<'a, DtwainexecuteocrwFunc>,
+    DTWAIN_FeedPageFunc: Symbol<'a, DtwainfeedpageFunc>,
+    DTWAIN_FlipBitmapFunc: Symbol<'a, DtwainflipbitmapFunc>,
+    DTWAIN_FlushAcquiredPagesFunc: Symbol<'a, DtwainflushacquiredpagesFunc>,
+    DTWAIN_ForceAcquireBitDepthFunc: Symbol<'a, DtwainforceacquirebitdepthFunc>,
+    DTWAIN_ForceScanOnNoUIFunc: Symbol<'a, DtwainforcescanonnouiFunc>,
+    DTWAIN_FrameCreateFunc: Symbol<'a, DtwainframecreateFunc>,
+    DTWAIN_FrameCreateStringFunc: Symbol<'a, DtwainframecreatestringFunc>,
+    DTWAIN_FrameCreateStringAFunc: Symbol<'a, DtwainframecreatestringaFunc>,
+    DTWAIN_FrameCreateStringWFunc: Symbol<'a, DtwainframecreatestringwFunc>,
+    DTWAIN_FrameDestroyFunc: Symbol<'a, DtwainframedestroyFunc>,
+    DTWAIN_FrameGetAllFunc: Symbol<'a, DtwainframegetallFunc>,
+    DTWAIN_FrameGetAllStringFunc: Symbol<'a, DtwainframegetallstringFunc>,
+    DTWAIN_FrameGetAllStringAFunc: Symbol<'a, DtwainframegetallstringaFunc>,
+    DTWAIN_FrameGetAllStringWFunc: Symbol<'a, DtwainframegetallstringwFunc>,
+    DTWAIN_FrameGetValueFunc: Symbol<'a, DtwainframegetvalueFunc>,
+    DTWAIN_FrameGetValueStringFunc: Symbol<'a, DtwainframegetvaluestringFunc>,
+    DTWAIN_FrameGetValueStringAFunc: Symbol<'a, DtwainframegetvaluestringaFunc>,
+    DTWAIN_FrameGetValueStringWFunc: Symbol<'a, DtwainframegetvaluestringwFunc>,
+    DTWAIN_FrameIsValidFunc: Symbol<'a, DtwainframeisvalidFunc>,
+    DTWAIN_FrameSetAllFunc: Symbol<'a, DtwainframesetallFunc>,
+    DTWAIN_FrameSetAllStringFunc: Symbol<'a, DtwainframesetallstringFunc>,
+    DTWAIN_FrameSetAllStringAFunc: Symbol<'a, DtwainframesetallstringaFunc>,
+    DTWAIN_FrameSetAllStringWFunc: Symbol<'a, DtwainframesetallstringwFunc>,
+    DTWAIN_FrameSetValueFunc: Symbol<'a, DtwainframesetvalueFunc>,
+    DTWAIN_FrameSetValueStringFunc: Symbol<'a, DtwainframesetvaluestringFunc>,
+    DTWAIN_FrameSetValueStringAFunc: Symbol<'a, DtwainframesetvaluestringaFunc>,
+    DTWAIN_FrameSetValueStringWFunc: Symbol<'a, DtwainframesetvaluestringwFunc>,
+    DTWAIN_FreeExtImageInfoFunc: Symbol<'a, DtwainfreeextimageinfoFunc>,
+    DTWAIN_FreeMemoryFunc: Symbol<'a, DtwainfreememoryFunc>,
+    DTWAIN_FreeMemoryExFunc: Symbol<'a, DtwainfreememoryexFunc>,
+    DTWAIN_GetAPIHandleStatusFunc: Symbol<'a, DtwaingetapihandlestatusFunc>,
+    DTWAIN_GetAcquireAreaFunc: Symbol<'a, DtwaingetacquireareaFunc>,
+    DTWAIN_GetAcquireArea2Func: Symbol<'a, Dtwaingetacquirearea2Func>,
+    DTWAIN_GetAcquireArea2StringFunc: Symbol<'a, Dtwaingetacquirearea2stringFunc>,
+    DTWAIN_GetAcquireArea2StringAFunc: Symbol<'a, Dtwaingetacquirearea2stringaFunc>,
+    DTWAIN_GetAcquireArea2StringWFunc: Symbol<'a, Dtwaingetacquirearea2stringwFunc>,
+    DTWAIN_GetAcquireAreaExFunc: Symbol<'a, DtwaingetacquireareaexFunc>,
+    DTWAIN_GetAcquireMetricsFunc: Symbol<'a, DtwaingetacquiremetricsFunc>,
+    DTWAIN_GetAcquireStripBufferFunc: Symbol<'a, DtwaingetacquirestripbufferFunc>,
+    DTWAIN_GetAcquireStripDataFunc: Symbol<'a, DtwaingetacquirestripdataFunc>,
+    DTWAIN_GetAcquireStripSizesFunc: Symbol<'a, DtwaingetacquirestripsizesFunc>,
+    DTWAIN_GetAcquiredImageFunc: Symbol<'a, DtwaingetacquiredimageFunc>,
+    DTWAIN_GetAcquiredImageArrayFunc: Symbol<'a, DtwaingetacquiredimagearrayFunc>,
+    DTWAIN_GetActiveDSMPathFunc: Symbol<'a, DtwaingetactivedsmpathFunc>,
+    DTWAIN_GetActiveDSMPathAFunc: Symbol<'a, DtwaingetactivedsmpathaFunc>,
+    DTWAIN_GetActiveDSMPathWFunc: Symbol<'a, DtwaingetactivedsmpathwFunc>,
+    DTWAIN_GetActiveDSMVersionInfoFunc: Symbol<'a, DtwaingetactivedsmversioninfoFunc>,
+    DTWAIN_GetActiveDSMVersionInfoAFunc: Symbol<'a, DtwaingetactivedsmversioninfoaFunc>,
+    DTWAIN_GetActiveDSMVersionInfoWFunc: Symbol<'a, DtwaingetactivedsmversioninfowFunc>,
+    DTWAIN_GetAlarmVolumeFunc: Symbol<'a, DtwaingetalarmvolumeFunc>,
+    DTWAIN_GetAllSourceDibsFunc: Symbol<'a, DtwaingetallsourcedibsFunc>,
+    DTWAIN_GetAppInfoFunc: Symbol<'a, DtwaingetappinfoFunc>,
+    DTWAIN_GetAppInfoAFunc: Symbol<'a, DtwaingetappinfoaFunc>,
+    DTWAIN_GetAppInfoWFunc: Symbol<'a, DtwaingetappinfowFunc>,
+    DTWAIN_GetAuthorFunc: Symbol<'a, DtwaingetauthorFunc>,
+    DTWAIN_GetAuthorAFunc: Symbol<'a, DtwaingetauthoraFunc>,
+    DTWAIN_GetAuthorWFunc: Symbol<'a, DtwaingetauthorwFunc>,
+    DTWAIN_GetBatteryMinutesFunc: Symbol<'a, DtwaingetbatteryminutesFunc>,
+    DTWAIN_GetBatteryPercentFunc: Symbol<'a, DtwaingetbatterypercentFunc>,
+    DTWAIN_GetBitDepthFunc: Symbol<'a, DtwaingetbitdepthFunc>,
+    DTWAIN_GetBlankPageAutoDetectionFunc: Symbol<'a, DtwaingetblankpageautodetectionFunc>,
+    DTWAIN_GetBrightnessFunc: Symbol<'a, DtwaingetbrightnessFunc>,
+    DTWAIN_GetBrightnessStringFunc: Symbol<'a, DtwaingetbrightnessstringFunc>,
+    DTWAIN_GetBrightnessStringAFunc: Symbol<'a, DtwaingetbrightnessstringaFunc>,
+    DTWAIN_GetBrightnessStringWFunc: Symbol<'a, DtwaingetbrightnessstringwFunc>,
+    DTWAIN_GetBufferedTransferInfoFunc: Symbol<'a, DtwaingetbufferedtransferinfoFunc>,
+    DTWAIN_GetCallbackFunc: Symbol<'a, DtwaingetcallbackFunc>,
+    DTWAIN_GetCallback64Func: Symbol<'a, Dtwaingetcallback64Func>,
+    DTWAIN_GetCapArrayTypeFunc: Symbol<'a, DtwaingetcaparraytypeFunc>,
+    DTWAIN_GetCapContainerFunc: Symbol<'a, DtwaingetcapcontainerFunc>,
+    DTWAIN_GetCapContainerExFunc: Symbol<'a, DtwaingetcapcontainerexFunc>,
+    DTWAIN_GetCapContainerEx2Func: Symbol<'a, Dtwaingetcapcontainerex2Func>,
+    DTWAIN_GetCapDataTypeFunc: Symbol<'a, DtwaingetcapdatatypeFunc>,
+    DTWAIN_GetCapFromNameFunc: Symbol<'a, DtwaingetcapfromnameFunc>,
+    DTWAIN_GetCapFromNameAFunc: Symbol<'a, DtwaingetcapfromnameaFunc>,
+    DTWAIN_GetCapFromNameWFunc: Symbol<'a, DtwaingetcapfromnamewFunc>,
+    DTWAIN_GetCapOperationsFunc: Symbol<'a, DtwaingetcapoperationsFunc>,
+    DTWAIN_GetCapValuesFunc: Symbol<'a, DtwaingetcapvaluesFunc>,
+    DTWAIN_GetCapValuesExFunc: Symbol<'a, DtwaingetcapvaluesexFunc>,
+    DTWAIN_GetCapValuesEx2Func: Symbol<'a, Dtwaingetcapvaluesex2Func>,
+    DTWAIN_GetCaptionFunc: Symbol<'a, DtwaingetcaptionFunc>,
+    DTWAIN_GetCaptionAFunc: Symbol<'a, DtwaingetcaptionaFunc>,
+    DTWAIN_GetCaptionWFunc: Symbol<'a, DtwaingetcaptionwFunc>,
+    DTWAIN_GetCompressionSizeFunc: Symbol<'a, DtwaingetcompressionsizeFunc>,
+    DTWAIN_GetCompressionTypeFunc: Symbol<'a, DtwaingetcompressiontypeFunc>,
+    DTWAIN_GetConditionCodeStringFunc: Symbol<'a, DtwaingetconditioncodestringFunc>,
+    DTWAIN_GetConditionCodeStringAFunc: Symbol<'a, DtwaingetconditioncodestringaFunc>,
+    DTWAIN_GetConditionCodeStringWFunc: Symbol<'a, DtwaingetconditioncodestringwFunc>,
+    DTWAIN_GetContrastFunc: Symbol<'a, DtwaingetcontrastFunc>,
+    DTWAIN_GetContrastStringFunc: Symbol<'a, DtwaingetcontraststringFunc>,
+    DTWAIN_GetContrastStringAFunc: Symbol<'a, DtwaingetcontraststringaFunc>,
+    DTWAIN_GetContrastStringWFunc: Symbol<'a, DtwaingetcontraststringwFunc>,
+    DTWAIN_GetCountryFunc: Symbol<'a, DtwaingetcountryFunc>,
+    DTWAIN_GetCurrentAcquiredImageFunc: Symbol<'a, DtwaingetcurrentacquiredimageFunc>,
+    DTWAIN_GetCurrentFileNameFunc: Symbol<'a, DtwaingetcurrentfilenameFunc>,
+    DTWAIN_GetCurrentFileNameAFunc: Symbol<'a, DtwaingetcurrentfilenameaFunc>,
+    DTWAIN_GetCurrentFileNameWFunc: Symbol<'a, DtwaingetcurrentfilenamewFunc>,
+    DTWAIN_GetCurrentPageNumFunc: Symbol<'a, DtwaingetcurrentpagenumFunc>,
+    DTWAIN_GetCurrentRetryCountFunc: Symbol<'a, DtwaingetcurrentretrycountFunc>,
+    DTWAIN_GetCurrentTwainTripletFunc: Symbol<'a, DtwaingetcurrenttwaintripletFunc>,
+    DTWAIN_GetCustomDSDataFunc: Symbol<'a, DtwaingetcustomdsdataFunc>,
+    DTWAIN_GetDSMFullNameFunc: Symbol<'a, DtwaingetdsmfullnameFunc>,
+    DTWAIN_GetDSMFullNameAFunc: Symbol<'a, DtwaingetdsmfullnameaFunc>,
+    DTWAIN_GetDSMFullNameWFunc: Symbol<'a, DtwaingetdsmfullnamewFunc>,
+    DTWAIN_GetDSMSearchOrderFunc: Symbol<'a, DtwaingetdsmsearchorderFunc>,
+    DTWAIN_GetDTWAINHandleFunc: Symbol<'a, DtwaingetdtwainhandleFunc>,
+    DTWAIN_GetDeviceEventFunc: Symbol<'a, DtwaingetdeviceeventFunc>,
+    DTWAIN_GetDeviceEventExFunc: Symbol<'a, DtwaingetdeviceeventexFunc>,
+    DTWAIN_GetDeviceEventInfoFunc: Symbol<'a, DtwaingetdeviceeventinfoFunc>,
+    DTWAIN_GetDeviceNotificationsFunc: Symbol<'a, DtwaingetdevicenotificationsFunc>,
+    DTWAIN_GetDeviceTimeDateFunc: Symbol<'a, DtwaingetdevicetimedateFunc>,
+    DTWAIN_GetDeviceTimeDateAFunc: Symbol<'a, DtwaingetdevicetimedateaFunc>,
+    DTWAIN_GetDeviceTimeDateWFunc: Symbol<'a, DtwaingetdevicetimedatewFunc>,
+    DTWAIN_GetDoubleFeedDetectLengthFunc: Symbol<'a, DtwaingetdoublefeeddetectlengthFunc>,
+    DTWAIN_GetDoubleFeedDetectValuesFunc: Symbol<'a, DtwaingetdoublefeeddetectvaluesFunc>,
+    DTWAIN_GetDuplexTypeFunc: Symbol<'a, DtwaingetduplextypeFunc>,
+    DTWAIN_GetErrorBufferFunc: Symbol<'a, DtwaingeterrorbufferFunc>,
+    DTWAIN_GetErrorBufferThresholdFunc: Symbol<'a, DtwaingeterrorbufferthresholdFunc>,
+    DTWAIN_GetErrorCallbackFunc: Symbol<'a, DtwaingeterrorcallbackFunc>,
+    DTWAIN_GetErrorCallback64Func: Symbol<'a, Dtwaingeterrorcallback64Func>,
+    DTWAIN_GetErrorStringFunc: Symbol<'a, DtwaingeterrorstringFunc>,
+    DTWAIN_GetErrorStringAFunc: Symbol<'a, DtwaingeterrorstringaFunc>,
+    DTWAIN_GetErrorStringWFunc: Symbol<'a, DtwaingeterrorstringwFunc>,
+    DTWAIN_GetExtCapFromNameFunc: Symbol<'a, DtwaingetextcapfromnameFunc>,
+    DTWAIN_GetExtCapFromNameAFunc: Symbol<'a, DtwaingetextcapfromnameaFunc>,
+    DTWAIN_GetExtCapFromNameWFunc: Symbol<'a, DtwaingetextcapfromnamewFunc>,
+    DTWAIN_GetExtImageInfoFunc: Symbol<'a, DtwaingetextimageinfoFunc>,
+    DTWAIN_GetExtImageInfoDataFunc: Symbol<'a, DtwaingetextimageinfodataFunc>,
+    DTWAIN_GetExtImageInfoDataExFunc: Symbol<'a, DtwaingetextimageinfodataexFunc>,
+    DTWAIN_GetExtImageInfoItemFunc: Symbol<'a, DtwaingetextimageinfoitemFunc>,
+    DTWAIN_GetExtImageInfoItemExFunc: Symbol<'a, DtwaingetextimageinfoitemexFunc>,
+    DTWAIN_GetExtNameFromCapFunc: Symbol<'a, DtwaingetextnamefromcapFunc>,
+    DTWAIN_GetExtNameFromCapAFunc: Symbol<'a, DtwaingetextnamefromcapaFunc>,
+    DTWAIN_GetExtNameFromCapWFunc: Symbol<'a, DtwaingetextnamefromcapwFunc>,
+    DTWAIN_GetFeederAlignmentFunc: Symbol<'a, DtwaingetfeederalignmentFunc>,
+    DTWAIN_GetFeederFuncsFunc: Symbol<'a, DtwaingetfeederfuncsFunc>,
+    DTWAIN_GetFeederOrderFunc: Symbol<'a, DtwaingetfeederorderFunc>,
+    DTWAIN_GetFeederWaitTimeFunc: Symbol<'a, DtwaingetfeederwaittimeFunc>,
+    DTWAIN_GetFileCompressionTypeFunc: Symbol<'a, DtwaingetfilecompressiontypeFunc>,
+    DTWAIN_GetFileTypeExtensionsFunc: Symbol<'a, DtwaingetfiletypeextensionsFunc>,
+    DTWAIN_GetFileTypeExtensionsAFunc: Symbol<'a, DtwaingetfiletypeextensionsaFunc>,
+    DTWAIN_GetFileTypeExtensionsWFunc: Symbol<'a, DtwaingetfiletypeextensionswFunc>,
+    DTWAIN_GetFileTypeNameFunc: Symbol<'a, DtwaingetfiletypenameFunc>,
+    DTWAIN_GetFileTypeNameAFunc: Symbol<'a, DtwaingetfiletypenameaFunc>,
+    DTWAIN_GetFileTypeNameWFunc: Symbol<'a, DtwaingetfiletypenamewFunc>,
+    DTWAIN_GetHalftoneFunc: Symbol<'a, DtwaingethalftoneFunc>,
+    DTWAIN_GetHalftoneAFunc: Symbol<'a, DtwaingethalftoneaFunc>,
+    DTWAIN_GetHalftoneWFunc: Symbol<'a, DtwaingethalftonewFunc>,
+    DTWAIN_GetHighlightFunc: Symbol<'a, DtwaingethighlightFunc>,
+    DTWAIN_GetHighlightStringFunc: Symbol<'a, DtwaingethighlightstringFunc>,
+    DTWAIN_GetHighlightStringAFunc: Symbol<'a, DtwaingethighlightstringaFunc>,
+    DTWAIN_GetHighlightStringWFunc: Symbol<'a, DtwaingethighlightstringwFunc>,
+    DTWAIN_GetImageInfoFunc: Symbol<'a, DtwaingetimageinfoFunc>,
+    DTWAIN_GetImageInfoStringFunc: Symbol<'a, DtwaingetimageinfostringFunc>,
+    DTWAIN_GetImageInfoStringAFunc: Symbol<'a, DtwaingetimageinfostringaFunc>,
+    DTWAIN_GetImageInfoStringWFunc: Symbol<'a, DtwaingetimageinfostringwFunc>,
+    DTWAIN_GetJobControlFunc: Symbol<'a, DtwaingetjobcontrolFunc>,
+    DTWAIN_GetJpegValuesFunc: Symbol<'a, DtwaingetjpegvaluesFunc>,
+    DTWAIN_GetJpegXRValuesFunc: Symbol<'a, DtwaingetjpegxrvaluesFunc>,
+    DTWAIN_GetLanguageFunc: Symbol<'a, DtwaingetlanguageFunc>,
+    DTWAIN_GetLastErrorFunc: Symbol<'a, DtwaingetlasterrorFunc>,
+    DTWAIN_GetLibraryPathFunc: Symbol<'a, DtwaingetlibrarypathFunc>,
+    DTWAIN_GetLibraryPathAFunc: Symbol<'a, DtwaingetlibrarypathaFunc>,
+    DTWAIN_GetLibraryPathWFunc: Symbol<'a, DtwaingetlibrarypathwFunc>,
+    DTWAIN_GetLightPathFunc: Symbol<'a, DtwaingetlightpathFunc>,
+    DTWAIN_GetLightSourceFunc: Symbol<'a, DtwaingetlightsourceFunc>,
+    DTWAIN_GetLightSourcesFunc: Symbol<'a, DtwaingetlightsourcesFunc>,
+    DTWAIN_GetLoggerCallbackFunc: Symbol<'a, DtwaingetloggercallbackFunc>,
+    DTWAIN_GetLoggerCallbackAFunc: Symbol<'a, DtwaingetloggercallbackaFunc>,
+    DTWAIN_GetLoggerCallbackWFunc: Symbol<'a, DtwaingetloggercallbackwFunc>,
+    DTWAIN_GetManualDuplexCountFunc: Symbol<'a, DtwaingetmanualduplexcountFunc>,
+    DTWAIN_GetMaxAcquisitionsFunc: Symbol<'a, DtwaingetmaxacquisitionsFunc>,
+    DTWAIN_GetMaxBuffersFunc: Symbol<'a, DtwaingetmaxbuffersFunc>,
+    DTWAIN_GetMaxPagesToAcquireFunc: Symbol<'a, DtwaingetmaxpagestoacquireFunc>,
+    DTWAIN_GetMaxRetryAttemptsFunc: Symbol<'a, DtwaingetmaxretryattemptsFunc>,
+    DTWAIN_GetNameFromCapFunc: Symbol<'a, DtwaingetnamefromcapFunc>,
+    DTWAIN_GetNameFromCapAFunc: Symbol<'a, DtwaingetnamefromcapaFunc>,
+    DTWAIN_GetNameFromCapWFunc: Symbol<'a, DtwaingetnamefromcapwFunc>,
+    DTWAIN_GetNoiseFilterFunc: Symbol<'a, DtwaingetnoisefilterFunc>,
+    DTWAIN_GetNumAcquiredImagesFunc: Symbol<'a, DtwaingetnumacquiredimagesFunc>,
+    DTWAIN_GetNumAcquisitionsFunc: Symbol<'a, DtwaingetnumacquisitionsFunc>,
+    DTWAIN_GetOCRCapValuesFunc: Symbol<'a, DtwaingetocrcapvaluesFunc>,
+    DTWAIN_GetOCRErrorStringFunc: Symbol<'a, DtwaingetocrerrorstringFunc>,
+    DTWAIN_GetOCRErrorStringAFunc: Symbol<'a, DtwaingetocrerrorstringaFunc>,
+    DTWAIN_GetOCRErrorStringWFunc: Symbol<'a, DtwaingetocrerrorstringwFunc>,
+    DTWAIN_GetOCRLastErrorFunc: Symbol<'a, DtwaingetocrlasterrorFunc>,
+    DTWAIN_GetOCRMajorMinorVersionFunc: Symbol<'a, DtwaingetocrmajorminorversionFunc>,
+    DTWAIN_GetOCRManufacturerFunc: Symbol<'a, DtwaingetocrmanufacturerFunc>,
+    DTWAIN_GetOCRManufacturerAFunc: Symbol<'a, DtwaingetocrmanufactureraFunc>,
+    DTWAIN_GetOCRManufacturerWFunc: Symbol<'a, DtwaingetocrmanufacturerwFunc>,
+    DTWAIN_GetOCRProductFamilyFunc: Symbol<'a, DtwaingetocrproductfamilyFunc>,
+    DTWAIN_GetOCRProductFamilyAFunc: Symbol<'a, DtwaingetocrproductfamilyaFunc>,
+    DTWAIN_GetOCRProductFamilyWFunc: Symbol<'a, DtwaingetocrproductfamilywFunc>,
+    DTWAIN_GetOCRProductNameFunc: Symbol<'a, DtwaingetocrproductnameFunc>,
+    DTWAIN_GetOCRProductNameAFunc: Symbol<'a, DtwaingetocrproductnameaFunc>,
+    DTWAIN_GetOCRProductNameWFunc: Symbol<'a, DtwaingetocrproductnamewFunc>,
+    DTWAIN_GetOCRTextFunc: Symbol<'a, DtwaingetocrtextFunc>,
+    DTWAIN_GetOCRTextAFunc: Symbol<'a, DtwaingetocrtextaFunc>,
+    DTWAIN_GetOCRTextInfoFloatFunc: Symbol<'a, DtwaingetocrtextinfofloatFunc>,
+    DTWAIN_GetOCRTextInfoFloatExFunc: Symbol<'a, DtwaingetocrtextinfofloatexFunc>,
+    DTWAIN_GetOCRTextInfoHandleFunc: Symbol<'a, DtwaingetocrtextinfohandleFunc>,
+    DTWAIN_GetOCRTextInfoLongFunc: Symbol<'a, DtwaingetocrtextinfolongFunc>,
+    DTWAIN_GetOCRTextInfoLongExFunc: Symbol<'a, DtwaingetocrtextinfolongexFunc>,
+    DTWAIN_GetOCRTextWFunc: Symbol<'a, DtwaingetocrtextwFunc>,
+    DTWAIN_GetOCRVersionInfoFunc: Symbol<'a, DtwaingetocrversioninfoFunc>,
+    DTWAIN_GetOCRVersionInfoAFunc: Symbol<'a, DtwaingetocrversioninfoaFunc>,
+    DTWAIN_GetOCRVersionInfoWFunc: Symbol<'a, DtwaingetocrversioninfowFunc>,
+    DTWAIN_GetOrientationFunc: Symbol<'a, DtwaingetorientationFunc>,
+    DTWAIN_GetOverscanFunc: Symbol<'a, DtwaingetoverscanFunc>,
+    DTWAIN_GetPDFTextElementFloatFunc: Symbol<'a, DtwaingetpdftextelementfloatFunc>,
+    DTWAIN_GetPDFTextElementLongFunc: Symbol<'a, DtwaingetpdftextelementlongFunc>,
+    DTWAIN_GetPDFTextElementStringFunc: Symbol<'a, DtwaingetpdftextelementstringFunc>,
+    DTWAIN_GetPDFTextElementStringAFunc: Symbol<'a, DtwaingetpdftextelementstringaFunc>,
+    DTWAIN_GetPDFTextElementStringWFunc: Symbol<'a, DtwaingetpdftextelementstringwFunc>,
+    DTWAIN_GetPDFType1FontNameFunc: Symbol<'a, Dtwaingetpdftype1fontnameFunc>,
+    DTWAIN_GetPDFType1FontNameAFunc: Symbol<'a, Dtwaingetpdftype1fontnameaFunc>,
+    DTWAIN_GetPDFType1FontNameWFunc: Symbol<'a, Dtwaingetpdftype1fontnamewFunc>,
+    DTWAIN_GetPaperSizeFunc: Symbol<'a, DtwaingetpapersizeFunc>,
+    DTWAIN_GetPaperSizeNameFunc: Symbol<'a, DtwaingetpapersizenameFunc>,
+    DTWAIN_GetPaperSizeNameAFunc: Symbol<'a, DtwaingetpapersizenameaFunc>,
+    DTWAIN_GetPaperSizeNameWFunc: Symbol<'a, DtwaingetpapersizenamewFunc>,
+    DTWAIN_GetPatchMaxPrioritiesFunc: Symbol<'a, DtwaingetpatchmaxprioritiesFunc>,
+    DTWAIN_GetPatchMaxRetriesFunc: Symbol<'a, DtwaingetpatchmaxretriesFunc>,
+    DTWAIN_GetPatchPrioritiesFunc: Symbol<'a, DtwaingetpatchprioritiesFunc>,
+    DTWAIN_GetPatchSearchModeFunc: Symbol<'a, DtwaingetpatchsearchmodeFunc>,
+    DTWAIN_GetPatchTimeOutFunc: Symbol<'a, DtwaingetpatchtimeoutFunc>,
+    DTWAIN_GetPixelFlavorFunc: Symbol<'a, DtwaingetpixelflavorFunc>,
+    DTWAIN_GetPixelTypeFunc: Symbol<'a, DtwaingetpixeltypeFunc>,
+    DTWAIN_GetPrinterFunc: Symbol<'a, DtwaingetprinterFunc>,
+    DTWAIN_GetPrinterStartNumberFunc: Symbol<'a, DtwaingetprinterstartnumberFunc>,
+    DTWAIN_GetPrinterStringModeFunc: Symbol<'a, DtwaingetprinterstringmodeFunc>,
+    DTWAIN_GetPrinterStringsFunc: Symbol<'a, DtwaingetprinterstringsFunc>,
+    DTWAIN_GetPrinterSuffixStringFunc: Symbol<'a, DtwaingetprintersuffixstringFunc>,
+    DTWAIN_GetPrinterSuffixStringAFunc: Symbol<'a, DtwaingetprintersuffixstringaFunc>,
+    DTWAIN_GetPrinterSuffixStringWFunc: Symbol<'a, DtwaingetprintersuffixstringwFunc>,
+    DTWAIN_GetRegisteredMsgFunc: Symbol<'a, DtwaingetregisteredmsgFunc>,
+    DTWAIN_GetResolutionFunc: Symbol<'a, DtwaingetresolutionFunc>,
+    DTWAIN_GetResolutionStringFunc: Symbol<'a, DtwaingetresolutionstringFunc>,
+    DTWAIN_GetResolutionStringAFunc: Symbol<'a, DtwaingetresolutionstringaFunc>,
+    DTWAIN_GetResolutionStringWFunc: Symbol<'a, DtwaingetresolutionstringwFunc>,
+    DTWAIN_GetResourceStringFunc: Symbol<'a, DtwaingetresourcestringFunc>,
+    DTWAIN_GetResourceStringAFunc: Symbol<'a, DtwaingetresourcestringaFunc>,
+    DTWAIN_GetResourceStringWFunc: Symbol<'a, DtwaingetresourcestringwFunc>,
+    DTWAIN_GetRotationFunc: Symbol<'a, DtwaingetrotationFunc>,
+    DTWAIN_GetRotationStringFunc: Symbol<'a, DtwaingetrotationstringFunc>,
+    DTWAIN_GetRotationStringAFunc: Symbol<'a, DtwaingetrotationstringaFunc>,
+    DTWAIN_GetRotationStringWFunc: Symbol<'a, DtwaingetrotationstringwFunc>,
+    DTWAIN_GetSaveFileNameFunc: Symbol<'a, DtwaingetsavefilenameFunc>,
+    DTWAIN_GetSaveFileNameAFunc: Symbol<'a, DtwaingetsavefilenameaFunc>,
+    DTWAIN_GetSaveFileNameWFunc: Symbol<'a, DtwaingetsavefilenamewFunc>,
+    DTWAIN_GetSavedFilesCountFunc: Symbol<'a, DtwaingetsavedfilescountFunc>,
+    DTWAIN_GetSessionDetailsFunc: Symbol<'a, DtwaingetsessiondetailsFunc>,
+    DTWAIN_GetSessionDetailsAFunc: Symbol<'a, DtwaingetsessiondetailsaFunc>,
+    DTWAIN_GetSessionDetailsWFunc: Symbol<'a, DtwaingetsessiondetailswFunc>,
+    DTWAIN_GetShadowFunc: Symbol<'a, DtwaingetshadowFunc>,
+    DTWAIN_GetShadowStringFunc: Symbol<'a, DtwaingetshadowstringFunc>,
+    DTWAIN_GetShadowStringAFunc: Symbol<'a, DtwaingetshadowstringaFunc>,
+    DTWAIN_GetShadowStringWFunc: Symbol<'a, DtwaingetshadowstringwFunc>,
+    DTWAIN_GetShortVersionStringFunc: Symbol<'a, DtwaingetshortversionstringFunc>,
+    DTWAIN_GetShortVersionStringAFunc: Symbol<'a, DtwaingetshortversionstringaFunc>,
+    DTWAIN_GetShortVersionStringWFunc: Symbol<'a, DtwaingetshortversionstringwFunc>,
+    DTWAIN_GetSourceAcquisitionsFunc: Symbol<'a, DtwaingetsourceacquisitionsFunc>,
+    DTWAIN_GetSourceDetailsFunc: Symbol<'a, DtwaingetsourcedetailsFunc>,
+    DTWAIN_GetSourceDetailsAFunc: Symbol<'a, DtwaingetsourcedetailsaFunc>,
+    DTWAIN_GetSourceDetailsWFunc: Symbol<'a, DtwaingetsourcedetailswFunc>,
+    DTWAIN_GetSourceIDFunc: Symbol<'a, DtwaingetsourceidFunc>,
+    DTWAIN_GetSourceIDExFunc: Symbol<'a, DtwaingetsourceidexFunc>,
+    DTWAIN_GetSourceManufacturerFunc: Symbol<'a, DtwaingetsourcemanufacturerFunc>,
+    DTWAIN_GetSourceManufacturerAFunc: Symbol<'a, DtwaingetsourcemanufactureraFunc>,
+    DTWAIN_GetSourceManufacturerWFunc: Symbol<'a, DtwaingetsourcemanufacturerwFunc>,
+    DTWAIN_GetSourceProductFamilyFunc: Symbol<'a, DtwaingetsourceproductfamilyFunc>,
+    DTWAIN_GetSourceProductFamilyAFunc: Symbol<'a, DtwaingetsourceproductfamilyaFunc>,
+    DTWAIN_GetSourceProductFamilyWFunc: Symbol<'a, DtwaingetsourceproductfamilywFunc>,
+    DTWAIN_GetSourceProductNameFunc: Symbol<'a, DtwaingetsourceproductnameFunc>,
+    DTWAIN_GetSourceProductNameAFunc: Symbol<'a, DtwaingetsourceproductnameaFunc>,
+    DTWAIN_GetSourceProductNameWFunc: Symbol<'a, DtwaingetsourceproductnamewFunc>,
+    DTWAIN_GetSourceUnitFunc: Symbol<'a, DtwaingetsourceunitFunc>,
+    DTWAIN_GetSourceVersionInfoFunc: Symbol<'a, DtwaingetsourceversioninfoFunc>,
+    DTWAIN_GetSourceVersionInfoAFunc: Symbol<'a, DtwaingetsourceversioninfoaFunc>,
+    DTWAIN_GetSourceVersionInfoWFunc: Symbol<'a, DtwaingetsourceversioninfowFunc>,
+    DTWAIN_GetSourceVersionNumberFunc: Symbol<'a, DtwaingetsourceversionnumberFunc>,
+    DTWAIN_GetStaticLibVersionFunc: Symbol<'a, DtwaingetstaticlibversionFunc>,
+    DTWAIN_GetTempFileDirectoryFunc: Symbol<'a, DtwaingettempfiledirectoryFunc>,
+    DTWAIN_GetTempFileDirectoryAFunc: Symbol<'a, DtwaingettempfiledirectoryaFunc>,
+    DTWAIN_GetTempFileDirectoryWFunc: Symbol<'a, DtwaingettempfiledirectorywFunc>,
+    DTWAIN_GetThresholdFunc: Symbol<'a, DtwaingetthresholdFunc>,
+    DTWAIN_GetThresholdStringFunc: Symbol<'a, DtwaingetthresholdstringFunc>,
+    DTWAIN_GetThresholdStringAFunc: Symbol<'a, DtwaingetthresholdstringaFunc>,
+    DTWAIN_GetThresholdStringWFunc: Symbol<'a, DtwaingetthresholdstringwFunc>,
+    DTWAIN_GetTimeDateFunc: Symbol<'a, DtwaingettimedateFunc>,
+    DTWAIN_GetTimeDateAFunc: Symbol<'a, DtwaingettimedateaFunc>,
+    DTWAIN_GetTimeDateWFunc: Symbol<'a, DtwaingettimedatewFunc>,
+    DTWAIN_GetTwainAppIDFunc: Symbol<'a, DtwaingettwainappidFunc>,
+    DTWAIN_GetTwainAppIDExFunc: Symbol<'a, DtwaingettwainappidexFunc>,
+    DTWAIN_GetTwainAvailabilityFunc: Symbol<'a, DtwaingettwainavailabilityFunc>,
+    DTWAIN_GetTwainAvailabilityExFunc: Symbol<'a, DtwaingettwainavailabilityexFunc>,
+    DTWAIN_GetTwainAvailabilityExAFunc: Symbol<'a, DtwaingettwainavailabilityexaFunc>,
+    DTWAIN_GetTwainAvailabilityExWFunc: Symbol<'a, DtwaingettwainavailabilityexwFunc>,
+    DTWAIN_GetTwainCountryNameFunc: Symbol<'a, DtwaingettwaincountrynameFunc>,
+    DTWAIN_GetTwainCountryNameAFunc: Symbol<'a, DtwaingettwaincountrynameaFunc>,
+    DTWAIN_GetTwainCountryNameWFunc: Symbol<'a, DtwaingettwaincountrynamewFunc>,
+    DTWAIN_GetTwainCountryValueFunc: Symbol<'a, DtwaingettwaincountryvalueFunc>,
+    DTWAIN_GetTwainCountryValueAFunc: Symbol<'a, DtwaingettwaincountryvalueaFunc>,
+    DTWAIN_GetTwainCountryValueWFunc: Symbol<'a, DtwaingettwaincountryvaluewFunc>,
+    DTWAIN_GetTwainHwndFunc: Symbol<'a, DtwaingettwainhwndFunc>,
+    DTWAIN_GetTwainIDFromNameFunc: Symbol<'a, DtwaingettwainidfromnameFunc>,
+    DTWAIN_GetTwainIDFromNameAFunc: Symbol<'a, DtwaingettwainidfromnameaFunc>,
+    DTWAIN_GetTwainIDFromNameWFunc: Symbol<'a, DtwaingettwainidfromnamewFunc>,
+    DTWAIN_GetTwainLanguageNameFunc: Symbol<'a, DtwaingettwainlanguagenameFunc>,
+    DTWAIN_GetTwainLanguageNameAFunc: Symbol<'a, DtwaingettwainlanguagenameaFunc>,
+    DTWAIN_GetTwainLanguageNameWFunc: Symbol<'a, DtwaingettwainlanguagenamewFunc>,
+    DTWAIN_GetTwainLanguageValueFunc: Symbol<'a, DtwaingettwainlanguagevalueFunc>,
+    DTWAIN_GetTwainLanguageValueAFunc: Symbol<'a, DtwaingettwainlanguagevalueaFunc>,
+    DTWAIN_GetTwainLanguageValueWFunc: Symbol<'a, DtwaingettwainlanguagevaluewFunc>,
+    DTWAIN_GetTwainModeFunc: Symbol<'a, DtwaingettwainmodeFunc>,
+    DTWAIN_GetTwainNameFromConstantFunc: Symbol<'a, DtwaingettwainnamefromconstantFunc>,
+    DTWAIN_GetTwainNameFromConstantAFunc: Symbol<'a, DtwaingettwainnamefromconstantaFunc>,
+    DTWAIN_GetTwainNameFromConstantWFunc: Symbol<'a, DtwaingettwainnamefromconstantwFunc>,
+    DTWAIN_GetTwainStringNameFunc: Symbol<'a, DtwaingettwainstringnameFunc>,
+    DTWAIN_GetTwainStringNameAFunc: Symbol<'a, DtwaingettwainstringnameaFunc>,
+    DTWAIN_GetTwainStringNameWFunc: Symbol<'a, DtwaingettwainstringnamewFunc>,
+    DTWAIN_GetTwainTimeoutFunc: Symbol<'a, DtwaingettwaintimeoutFunc>,
+    DTWAIN_GetVersionFunc: Symbol<'a, DtwaingetversionFunc>,
+    DTWAIN_GetVersionCopyrightFunc: Symbol<'a, DtwaingetversioncopyrightFunc>,
+    DTWAIN_GetVersionCopyrightAFunc: Symbol<'a, DtwaingetversioncopyrightaFunc>,
+    DTWAIN_GetVersionCopyrightWFunc: Symbol<'a, DtwaingetversioncopyrightwFunc>,
+    DTWAIN_GetVersionExFunc: Symbol<'a, DtwaingetversionexFunc>,
+    DTWAIN_GetVersionInfoFunc: Symbol<'a, DtwaingetversioninfoFunc>,
+    DTWAIN_GetVersionInfoAFunc: Symbol<'a, DtwaingetversioninfoaFunc>,
+    DTWAIN_GetVersionInfoWFunc: Symbol<'a, DtwaingetversioninfowFunc>,
+    DTWAIN_GetVersionStringFunc: Symbol<'a, DtwaingetversionstringFunc>,
+    DTWAIN_GetVersionStringAFunc: Symbol<'a, DtwaingetversionstringaFunc>,
+    DTWAIN_GetVersionStringWFunc: Symbol<'a, DtwaingetversionstringwFunc>,
+    DTWAIN_GetWindowsVersionInfoFunc: Symbol<'a, DtwaingetwindowsversioninfoFunc>,
+    DTWAIN_GetWindowsVersionInfoAFunc: Symbol<'a, DtwaingetwindowsversioninfoaFunc>,
+    DTWAIN_GetWindowsVersionInfoWFunc: Symbol<'a, DtwaingetwindowsversioninfowFunc>,
+    DTWAIN_GetXResolutionFunc: Symbol<'a, DtwaingetxresolutionFunc>,
+    DTWAIN_GetXResolutionStringFunc: Symbol<'a, DtwaingetxresolutionstringFunc>,
+    DTWAIN_GetXResolutionStringAFunc: Symbol<'a, DtwaingetxresolutionstringaFunc>,
+    DTWAIN_GetXResolutionStringWFunc: Symbol<'a, DtwaingetxresolutionstringwFunc>,
+    DTWAIN_GetYResolutionFunc: Symbol<'a, DtwaingetyresolutionFunc>,
+    DTWAIN_GetYResolutionStringFunc: Symbol<'a, DtwaingetyresolutionstringFunc>,
+    DTWAIN_GetYResolutionStringAFunc: Symbol<'a, DtwaingetyresolutionstringaFunc>,
+    DTWAIN_GetYResolutionStringWFunc: Symbol<'a, DtwaingetyresolutionstringwFunc>,
+    DTWAIN_InitExtImageInfoFunc: Symbol<'a, DtwaininitextimageinfoFunc>,
+    DTWAIN_InitImageFileAppendFunc: Symbol<'a, DtwaininitimagefileappendFunc>,
+    DTWAIN_InitImageFileAppendAFunc: Symbol<'a, DtwaininitimagefileappendaFunc>,
+    DTWAIN_InitImageFileAppendWFunc: Symbol<'a, DtwaininitimagefileappendwFunc>,
+    DTWAIN_InitOCRInterfaceFunc: Symbol<'a, DtwaininitocrinterfaceFunc>,
+    DTWAIN_IsAcquiringFunc: Symbol<'a, DtwainisacquiringFunc>,
+    DTWAIN_IsAudioXferSupportedFunc: Symbol<'a, DtwainisaudioxfersupportedFunc>,
+    DTWAIN_IsAutoBorderDetectEnabledFunc: Symbol<'a, DtwainisautoborderdetectenabledFunc>,
+    DTWAIN_IsAutoBorderDetectSupportedFunc: Symbol<'a, DtwainisautoborderdetectsupportedFunc>,
+    DTWAIN_IsAutoBrightEnabledFunc: Symbol<'a, DtwainisautobrightenabledFunc>,
+    DTWAIN_IsAutoBrightSupportedFunc: Symbol<'a, DtwainisautobrightsupportedFunc>,
+    DTWAIN_IsAutoDeskewEnabledFunc: Symbol<'a, DtwainisautodeskewenabledFunc>,
+    DTWAIN_IsAutoDeskewSupportedFunc: Symbol<'a, DtwainisautodeskewsupportedFunc>,
+    DTWAIN_IsAutoFeedEnabledFunc: Symbol<'a, DtwainisautofeedenabledFunc>,
+    DTWAIN_IsAutoFeedSupportedFunc: Symbol<'a, DtwainisautofeedsupportedFunc>,
+    DTWAIN_IsAutoRotateEnabledFunc: Symbol<'a, DtwainisautorotateenabledFunc>,
+    DTWAIN_IsAutoRotateSupportedFunc: Symbol<'a, DtwainisautorotatesupportedFunc>,
+    DTWAIN_IsAutoScanEnabledFunc: Symbol<'a, DtwainisautoscanenabledFunc>,
+    DTWAIN_IsAutomaticSenseMediumEnabledFunc: Symbol<'a, DtwainisautomaticsensemediumenabledFunc>,
+    DTWAIN_IsAutomaticSenseMediumSupportedFunc: Symbol<'a, DtwainisautomaticsensemediumsupportedFunc>,
+    DTWAIN_IsBlankPageDetectionOnFunc: Symbol<'a, DtwainisblankpagedetectiononFunc>,
+    DTWAIN_IsBufferedTileModeOnFunc: Symbol<'a, DtwainisbufferedtilemodeonFunc>,
+    DTWAIN_IsBufferedTileModeSupportedFunc: Symbol<'a, DtwainisbufferedtilemodesupportedFunc>,
+    DTWAIN_IsCapSupportedFunc: Symbol<'a, DtwainiscapsupportedFunc>,
+    DTWAIN_IsCompressionSupportedFunc: Symbol<'a, DtwainiscompressionsupportedFunc>,
+    DTWAIN_IsCustomDSDataSupportedFunc: Symbol<'a, DtwainiscustomdsdatasupportedFunc>,
+    DTWAIN_IsDIBBlankFunc: Symbol<'a, DtwainisdibblankFunc>,
+    DTWAIN_IsDIBBlankStringFunc: Symbol<'a, DtwainisdibblankstringFunc>,
+    DTWAIN_IsDIBBlankStringAFunc: Symbol<'a, DtwainisdibblankstringaFunc>,
+    DTWAIN_IsDIBBlankStringWFunc: Symbol<'a, DtwainisdibblankstringwFunc>,
+    DTWAIN_IsDeviceEventSupportedFunc: Symbol<'a, DtwainisdeviceeventsupportedFunc>,
+    DTWAIN_IsDeviceOnLineFunc: Symbol<'a, DtwainisdeviceonlineFunc>,
+    DTWAIN_IsDoubleFeedDetectLengthSupportedFunc: Symbol<'a, DtwainisdoublefeeddetectlengthsupportedFunc>,
+    DTWAIN_IsDoubleFeedDetectSupportedFunc: Symbol<'a, DtwainisdoublefeeddetectsupportedFunc>,
+    DTWAIN_IsDuplexEnabledFunc: Symbol<'a, DtwainisduplexenabledFunc>,
+    DTWAIN_IsDuplexSupportedFunc: Symbol<'a, DtwainisduplexsupportedFunc>,
+    DTWAIN_IsExtImageInfoSupportedFunc: Symbol<'a, DtwainisextimageinfosupportedFunc>,
+    DTWAIN_IsFeederEnabledFunc: Symbol<'a, DtwainisfeederenabledFunc>,
+    DTWAIN_IsFeederLoadedFunc: Symbol<'a, DtwainisfeederloadedFunc>,
+    DTWAIN_IsFeederSensitiveFunc: Symbol<'a, DtwainisfeedersensitiveFunc>,
+    DTWAIN_IsFeederSupportedFunc: Symbol<'a, DtwainisfeedersupportedFunc>,
+    DTWAIN_IsFileSystemSupportedFunc: Symbol<'a, DtwainisfilesystemsupportedFunc>,
+    DTWAIN_IsFileXferSupportedFunc: Symbol<'a, DtwainisfilexfersupportedFunc>,
+    DTWAIN_IsIAFieldALastPageSupportedFunc: Symbol<'a, DtwainisiafieldalastpagesupportedFunc>,
+    DTWAIN_IsIAFieldALevelSupportedFunc: Symbol<'a, DtwainisiafieldalevelsupportedFunc>,
+    DTWAIN_IsIAFieldAPrintFormatSupportedFunc: Symbol<'a, DtwainisiafieldaprintformatsupportedFunc>,
+    DTWAIN_IsIAFieldAValueSupportedFunc: Symbol<'a, DtwainisiafieldavaluesupportedFunc>,
+    DTWAIN_IsIAFieldBLastPageSupportedFunc: Symbol<'a, DtwainisiafieldblastpagesupportedFunc>,
+    DTWAIN_IsIAFieldBLevelSupportedFunc: Symbol<'a, DtwainisiafieldblevelsupportedFunc>,
+    DTWAIN_IsIAFieldBPrintFormatSupportedFunc: Symbol<'a, DtwainisiafieldbprintformatsupportedFunc>,
+    DTWAIN_IsIAFieldBValueSupportedFunc: Symbol<'a, DtwainisiafieldbvaluesupportedFunc>,
+    DTWAIN_IsIAFieldCLastPageSupportedFunc: Symbol<'a, DtwainisiafieldclastpagesupportedFunc>,
+    DTWAIN_IsIAFieldCLevelSupportedFunc: Symbol<'a, DtwainisiafieldclevelsupportedFunc>,
+    DTWAIN_IsIAFieldCPrintFormatSupportedFunc: Symbol<'a, DtwainisiafieldcprintformatsupportedFunc>,
+    DTWAIN_IsIAFieldCValueSupportedFunc: Symbol<'a, DtwainisiafieldcvaluesupportedFunc>,
+    DTWAIN_IsIAFieldDLastPageSupportedFunc: Symbol<'a, DtwainisiafielddlastpagesupportedFunc>,
+    DTWAIN_IsIAFieldDLevelSupportedFunc: Symbol<'a, DtwainisiafielddlevelsupportedFunc>,
+    DTWAIN_IsIAFieldDPrintFormatSupportedFunc: Symbol<'a, DtwainisiafielddprintformatsupportedFunc>,
+    DTWAIN_IsIAFieldDValueSupportedFunc: Symbol<'a, DtwainisiafielddvaluesupportedFunc>,
+    DTWAIN_IsIAFieldELastPageSupportedFunc: Symbol<'a, DtwainisiafieldelastpagesupportedFunc>,
+    DTWAIN_IsIAFieldELevelSupportedFunc: Symbol<'a, DtwainisiafieldelevelsupportedFunc>,
+    DTWAIN_IsIAFieldEPrintFormatSupportedFunc: Symbol<'a, DtwainisiafieldeprintformatsupportedFunc>,
+    DTWAIN_IsIAFieldEValueSupportedFunc: Symbol<'a, DtwainisiafieldevaluesupportedFunc>,
+    DTWAIN_IsImageAddressingSupportedFunc: Symbol<'a, DtwainisimageaddressingsupportedFunc>,
+    DTWAIN_IsIndicatorEnabledFunc: Symbol<'a, DtwainisindicatorenabledFunc>,
+    DTWAIN_IsIndicatorSupportedFunc: Symbol<'a, DtwainisindicatorsupportedFunc>,
+    DTWAIN_IsInitializedFunc: Symbol<'a, DtwainisinitializedFunc>,
+    DTWAIN_IsJPEGSupportedFunc: Symbol<'a, DtwainisjpegsupportedFunc>,
+    DTWAIN_IsJobControlSupportedFunc: Symbol<'a, DtwainisjobcontrolsupportedFunc>,
+    DTWAIN_IsLampEnabledFunc: Symbol<'a, DtwainislampenabledFunc>,
+    DTWAIN_IsLampSupportedFunc: Symbol<'a, DtwainislampsupportedFunc>,
+    DTWAIN_IsLightPathSupportedFunc: Symbol<'a, DtwainislightpathsupportedFunc>,
+    DTWAIN_IsLightSourceSupportedFunc: Symbol<'a, DtwainislightsourcesupportedFunc>,
+    DTWAIN_IsMaxBuffersSupportedFunc: Symbol<'a, DtwainismaxbufferssupportedFunc>,
+    DTWAIN_IsMemFileXferSupportedFunc: Symbol<'a, DtwainismemfilexfersupportedFunc>,
+    DTWAIN_IsMsgNotifyEnabledFunc: Symbol<'a, DtwainismsgnotifyenabledFunc>,
+    DTWAIN_IsNotifyTripletsEnabledFunc: Symbol<'a, DtwainisnotifytripletsenabledFunc>,
+    DTWAIN_IsOCREngineActivatedFunc: Symbol<'a, DtwainisocrengineactivatedFunc>,
+    DTWAIN_IsOpenSourcesOnSelectFunc: Symbol<'a, DtwainisopensourcesonselectFunc>,
+    DTWAIN_IsOrientationSupportedFunc: Symbol<'a, DtwainisorientationsupportedFunc>,
+    DTWAIN_IsOverscanSupportedFunc: Symbol<'a, DtwainisoverscansupportedFunc>,
+    DTWAIN_IsPDFSupportedFunc: Symbol<'a, DtwainispdfsupportedFunc>,
+    DTWAIN_IsPNGSupportedFunc: Symbol<'a, DtwainispngsupportedFunc>,
+    DTWAIN_IsPaperDetectableFunc: Symbol<'a, DtwainispaperdetectableFunc>,
+    DTWAIN_IsPaperSizeSupportedFunc: Symbol<'a, DtwainispapersizesupportedFunc>,
+    DTWAIN_IsPatchCapsSupportedFunc: Symbol<'a, DtwainispatchcapssupportedFunc>,
+    DTWAIN_IsPatchDetectEnabledFunc: Symbol<'a, DtwainispatchdetectenabledFunc>,
+    DTWAIN_IsPatchSupportedFunc: Symbol<'a, DtwainispatchsupportedFunc>,
+    DTWAIN_IsPeekMessageLoopEnabledFunc: Symbol<'a, DtwainispeekmessageloopenabledFunc>,
+    DTWAIN_IsPixelTypeSupportedFunc: Symbol<'a, DtwainispixeltypesupportedFunc>,
+    DTWAIN_IsPrinterEnabledFunc: Symbol<'a, DtwainisprinterenabledFunc>,
+    DTWAIN_IsPrinterSupportedFunc: Symbol<'a, DtwainisprintersupportedFunc>,
+    DTWAIN_IsRotationSupportedFunc: Symbol<'a, DtwainisrotationsupportedFunc>,
+    DTWAIN_IsSessionEnabledFunc: Symbol<'a, DtwainissessionenabledFunc>,
+    DTWAIN_IsSkipImageInfoErrorFunc: Symbol<'a, DtwainisskipimageinfoerrorFunc>,
+    DTWAIN_IsSourceAcquiringFunc: Symbol<'a, DtwainissourceacquiringFunc>,
+    DTWAIN_IsSourceAcquiringExFunc: Symbol<'a, DtwainissourceacquiringexFunc>,
+    DTWAIN_IsSourceInUIOnlyModeFunc: Symbol<'a, DtwainissourceinuionlymodeFunc>,
+    DTWAIN_IsSourceOpenFunc: Symbol<'a, DtwainissourceopenFunc>,
+    DTWAIN_IsSourceSelectedFunc: Symbol<'a, DtwainissourceselectedFunc>,
+    DTWAIN_IsSourceValidFunc: Symbol<'a, DtwainissourcevalidFunc>,
+    DTWAIN_IsTIFFSupportedFunc: Symbol<'a, DtwainistiffsupportedFunc>,
+    DTWAIN_IsThumbnailEnabledFunc: Symbol<'a, DtwainisthumbnailenabledFunc>,
+    DTWAIN_IsThumbnailSupportedFunc: Symbol<'a, DtwainisthumbnailsupportedFunc>,
+    DTWAIN_IsTwainAvailableFunc: Symbol<'a, DtwainistwainavailableFunc>,
+    DTWAIN_IsTwainAvailableExFunc: Symbol<'a, DtwainistwainavailableexFunc>,
+    DTWAIN_IsTwainAvailableExAFunc: Symbol<'a, DtwainistwainavailableexaFunc>,
+    DTWAIN_IsTwainAvailableExWFunc: Symbol<'a, DtwainistwainavailableexwFunc>,
+    DTWAIN_IsUIControllableFunc: Symbol<'a, DtwainisuicontrollableFunc>,
+    DTWAIN_IsUIEnabledFunc: Symbol<'a, DtwainisuienabledFunc>,
+    DTWAIN_IsUIOnlySupportedFunc: Symbol<'a, DtwainisuionlysupportedFunc>,
+    DTWAIN_LoadCustomStringResourcesFunc: Symbol<'a, DtwainloadcustomstringresourcesFunc>,
+    DTWAIN_LoadCustomStringResourcesAFunc: Symbol<'a, DtwainloadcustomstringresourcesaFunc>,
+    DTWAIN_LoadCustomStringResourcesExFunc: Symbol<'a, DtwainloadcustomstringresourcesexFunc>,
+    DTWAIN_LoadCustomStringResourcesExAFunc: Symbol<'a, DtwainloadcustomstringresourcesexaFunc>,
+    DTWAIN_LoadCustomStringResourcesExWFunc: Symbol<'a, DtwainloadcustomstringresourcesexwFunc>,
+    DTWAIN_LoadCustomStringResourcesWFunc: Symbol<'a, DtwainloadcustomstringresourceswFunc>,
+    DTWAIN_LoadLanguageResourceFunc: Symbol<'a, DtwainloadlanguageresourceFunc>,
+    DTWAIN_LockMemoryFunc: Symbol<'a, DtwainlockmemoryFunc>,
+    DTWAIN_LockMemoryExFunc: Symbol<'a, DtwainlockmemoryexFunc>,
+    DTWAIN_LogMessageFunc: Symbol<'a, DtwainlogmessageFunc>,
+    DTWAIN_LogMessageAFunc: Symbol<'a, DtwainlogmessageaFunc>,
+    DTWAIN_LogMessageWFunc: Symbol<'a, DtwainlogmessagewFunc>,
+    DTWAIN_MakeRGBFunc: Symbol<'a, DtwainmakergbFunc>,
+    DTWAIN_OpenSourceFunc: Symbol<'a, DtwainopensourceFunc>,
+    DTWAIN_OpenSourcesOnSelectFunc: Symbol<'a, DtwainopensourcesonselectFunc>,
+    DTWAIN_RangeCreateFunc: Symbol<'a, DtwainrangecreateFunc>,
+    DTWAIN_RangeCreateFromCapFunc: Symbol<'a, DtwainrangecreatefromcapFunc>,
+    DTWAIN_RangeDestroyFunc: Symbol<'a, DtwainrangedestroyFunc>,
+    DTWAIN_RangeExpandFunc: Symbol<'a, DtwainrangeexpandFunc>,
+    DTWAIN_RangeExpandExFunc: Symbol<'a, DtwainrangeexpandexFunc>,
+    DTWAIN_RangeGetAllFunc: Symbol<'a, DtwainrangegetallFunc>,
+    DTWAIN_RangeGetAllFloatFunc: Symbol<'a, DtwainrangegetallfloatFunc>,
+    DTWAIN_RangeGetAllFloatStringFunc: Symbol<'a, DtwainrangegetallfloatstringFunc>,
+    DTWAIN_RangeGetAllFloatStringAFunc: Symbol<'a, DtwainrangegetallfloatstringaFunc>,
+    DTWAIN_RangeGetAllFloatStringWFunc: Symbol<'a, DtwainrangegetallfloatstringwFunc>,
+    DTWAIN_RangeGetAllLongFunc: Symbol<'a, DtwainrangegetalllongFunc>,
+    DTWAIN_RangeGetCountFunc: Symbol<'a, DtwainrangegetcountFunc>,
+    DTWAIN_RangeGetExpValueFunc: Symbol<'a, DtwainrangegetexpvalueFunc>,
+    DTWAIN_RangeGetExpValueFloatFunc: Symbol<'a, DtwainrangegetexpvaluefloatFunc>,
+    DTWAIN_RangeGetExpValueFloatStringFunc: Symbol<'a, DtwainrangegetexpvaluefloatstringFunc>,
+    DTWAIN_RangeGetExpValueFloatStringAFunc: Symbol<'a, DtwainrangegetexpvaluefloatstringaFunc>,
+    DTWAIN_RangeGetExpValueFloatStringWFunc: Symbol<'a, DtwainrangegetexpvaluefloatstringwFunc>,
+    DTWAIN_RangeGetExpValueLongFunc: Symbol<'a, DtwainrangegetexpvaluelongFunc>,
+    DTWAIN_RangeGetNearestValueFunc: Symbol<'a, DtwainrangegetnearestvalueFunc>,
+    DTWAIN_RangeGetPosFunc: Symbol<'a, DtwainrangegetposFunc>,
+    DTWAIN_RangeGetPosFloatFunc: Symbol<'a, DtwainrangegetposfloatFunc>,
+    DTWAIN_RangeGetPosFloatStringFunc: Symbol<'a, DtwainrangegetposfloatstringFunc>,
+    DTWAIN_RangeGetPosFloatStringAFunc: Symbol<'a, DtwainrangegetposfloatstringaFunc>,
+    DTWAIN_RangeGetPosFloatStringWFunc: Symbol<'a, DtwainrangegetposfloatstringwFunc>,
+    DTWAIN_RangeGetPosLongFunc: Symbol<'a, DtwainrangegetposlongFunc>,
+    DTWAIN_RangeGetValueFunc: Symbol<'a, DtwainrangegetvalueFunc>,
+    DTWAIN_RangeGetValueFloatFunc: Symbol<'a, DtwainrangegetvaluefloatFunc>,
+    DTWAIN_RangeGetValueFloatStringFunc: Symbol<'a, DtwainrangegetvaluefloatstringFunc>,
+    DTWAIN_RangeGetValueFloatStringAFunc: Symbol<'a, DtwainrangegetvaluefloatstringaFunc>,
+    DTWAIN_RangeGetValueFloatStringWFunc: Symbol<'a, DtwainrangegetvaluefloatstringwFunc>,
+    DTWAIN_RangeGetValueLongFunc: Symbol<'a, DtwainrangegetvaluelongFunc>,
+    DTWAIN_RangeIsValidFunc: Symbol<'a, DtwainrangeisvalidFunc>,
+    DTWAIN_RangeNearestValueFloatFunc: Symbol<'a, DtwainrangenearestvaluefloatFunc>,
+    DTWAIN_RangeNearestValueFloatStringFunc: Symbol<'a, DtwainrangenearestvaluefloatstringFunc>,
+    DTWAIN_RangeNearestValueFloatStringAFunc: Symbol<'a, DtwainrangenearestvaluefloatstringaFunc>,
+    DTWAIN_RangeNearestValueFloatStringWFunc: Symbol<'a, DtwainrangenearestvaluefloatstringwFunc>,
+    DTWAIN_RangeNearestValueLongFunc: Symbol<'a, DtwainrangenearestvaluelongFunc>,
+    DTWAIN_RangeSetAllFunc: Symbol<'a, DtwainrangesetallFunc>,
+    DTWAIN_RangeSetAllFloatFunc: Symbol<'a, DtwainrangesetallfloatFunc>,
+    DTWAIN_RangeSetAllFloatStringFunc: Symbol<'a, DtwainrangesetallfloatstringFunc>,
+    DTWAIN_RangeSetAllFloatStringAFunc: Symbol<'a, DtwainrangesetallfloatstringaFunc>,
+    DTWAIN_RangeSetAllFloatStringWFunc: Symbol<'a, DtwainrangesetallfloatstringwFunc>,
+    DTWAIN_RangeSetAllLongFunc: Symbol<'a, DtwainrangesetalllongFunc>,
+    DTWAIN_RangeSetValueFunc: Symbol<'a, DtwainrangesetvalueFunc>,
+    DTWAIN_RangeSetValueFloatFunc: Symbol<'a, DtwainrangesetvaluefloatFunc>,
+    DTWAIN_RangeSetValueFloatStringFunc: Symbol<'a, DtwainrangesetvaluefloatstringFunc>,
+    DTWAIN_RangeSetValueFloatStringAFunc: Symbol<'a, DtwainrangesetvaluefloatstringaFunc>,
+    DTWAIN_RangeSetValueFloatStringWFunc: Symbol<'a, DtwainrangesetvaluefloatstringwFunc>,
+    DTWAIN_RangeSetValueLongFunc: Symbol<'a, DtwainrangesetvaluelongFunc>,
+    DTWAIN_ResetPDFTextElementFunc: Symbol<'a, DtwainresetpdftextelementFunc>,
+    DTWAIN_RewindPageFunc: Symbol<'a, DtwainrewindpageFunc>,
+    DTWAIN_SelectDefaultOCREngineFunc: Symbol<'a, DtwainselectdefaultocrengineFunc>,
+    DTWAIN_SelectDefaultSourceFunc: Symbol<'a, DtwainselectdefaultsourceFunc>,
+    DTWAIN_SelectDefaultSourceWithOpenFunc: Symbol<'a, DtwainselectdefaultsourcewithopenFunc>,
+    DTWAIN_SelectOCREngineFunc: Symbol<'a, DtwainselectocrengineFunc>,
+    DTWAIN_SelectOCREngine2Func: Symbol<'a, Dtwainselectocrengine2Func>,
+    DTWAIN_SelectOCREngine2AFunc: Symbol<'a, Dtwainselectocrengine2aFunc>,
+    DTWAIN_SelectOCREngine2ExFunc: Symbol<'a, Dtwainselectocrengine2exFunc>,
+    DTWAIN_SelectOCREngine2ExAFunc: Symbol<'a, Dtwainselectocrengine2exaFunc>,
+    DTWAIN_SelectOCREngine2ExWFunc: Symbol<'a, Dtwainselectocrengine2exwFunc>,
+    DTWAIN_SelectOCREngine2WFunc: Symbol<'a, Dtwainselectocrengine2wFunc>,
+    DTWAIN_SelectOCREngineByNameFunc: Symbol<'a, DtwainselectocrenginebynameFunc>,
+    DTWAIN_SelectOCREngineByNameAFunc: Symbol<'a, DtwainselectocrenginebynameaFunc>,
+    DTWAIN_SelectOCREngineByNameWFunc: Symbol<'a, DtwainselectocrenginebynamewFunc>,
+    DTWAIN_SelectSourceFunc: Symbol<'a, DtwainselectsourceFunc>,
+    DTWAIN_SelectSource2Func: Symbol<'a, Dtwainselectsource2Func>,
+    DTWAIN_SelectSource2AFunc: Symbol<'a, Dtwainselectsource2aFunc>,
+    DTWAIN_SelectSource2ExFunc: Symbol<'a, Dtwainselectsource2exFunc>,
+    DTWAIN_SelectSource2ExAFunc: Symbol<'a, Dtwainselectsource2exaFunc>,
+    DTWAIN_SelectSource2ExWFunc: Symbol<'a, Dtwainselectsource2exwFunc>,
+    DTWAIN_SelectSource2WFunc: Symbol<'a, Dtwainselectsource2wFunc>,
+    DTWAIN_SelectSourceByNameFunc: Symbol<'a, DtwainselectsourcebynameFunc>,
+    DTWAIN_SelectSourceByNameAFunc: Symbol<'a, DtwainselectsourcebynameaFunc>,
+    DTWAIN_SelectSourceByNameWFunc: Symbol<'a, DtwainselectsourcebynamewFunc>,
+    DTWAIN_SelectSourceByNameWithOpenFunc: Symbol<'a, DtwainselectsourcebynamewithopenFunc>,
+    DTWAIN_SelectSourceByNameWithOpenAFunc: Symbol<'a, DtwainselectsourcebynamewithopenaFunc>,
+    DTWAIN_SelectSourceByNameWithOpenWFunc: Symbol<'a, DtwainselectsourcebynamewithopenwFunc>,
+    DTWAIN_SelectSourceWithOpenFunc: Symbol<'a, DtwainselectsourcewithopenFunc>,
+    DTWAIN_SetAcquireAreaFunc: Symbol<'a, DtwainsetacquireareaFunc>,
+    DTWAIN_SetAcquireArea2Func: Symbol<'a, Dtwainsetacquirearea2Func>,
+    DTWAIN_SetAcquireArea2StringFunc: Symbol<'a, Dtwainsetacquirearea2stringFunc>,
+    DTWAIN_SetAcquireArea2StringAFunc: Symbol<'a, Dtwainsetacquirearea2stringaFunc>,
+    DTWAIN_SetAcquireArea2StringWFunc: Symbol<'a, Dtwainsetacquirearea2stringwFunc>,
+    DTWAIN_SetAcquireImageNegativeFunc: Symbol<'a, DtwainsetacquireimagenegativeFunc>,
+    DTWAIN_SetAcquireImageScaleFunc: Symbol<'a, DtwainsetacquireimagescaleFunc>,
+    DTWAIN_SetAcquireImageScaleStringFunc: Symbol<'a, DtwainsetacquireimagescalestringFunc>,
+    DTWAIN_SetAcquireImageScaleStringAFunc: Symbol<'a, DtwainsetacquireimagescalestringaFunc>,
+    DTWAIN_SetAcquireImageScaleStringWFunc: Symbol<'a, DtwainsetacquireimagescalestringwFunc>,
+    DTWAIN_SetAcquireStripBufferFunc: Symbol<'a, DtwainsetacquirestripbufferFunc>,
+    DTWAIN_SetAcquireStripSizeFunc: Symbol<'a, DtwainsetacquirestripsizeFunc>,
+    DTWAIN_SetAlarmVolumeFunc: Symbol<'a, DtwainsetalarmvolumeFunc>,
+    DTWAIN_SetAlarmsFunc: Symbol<'a, DtwainsetalarmsFunc>,
+    DTWAIN_SetAllCapsToDefaultFunc: Symbol<'a, DtwainsetallcapstodefaultFunc>,
+    DTWAIN_SetAppInfoFunc: Symbol<'a, DtwainsetappinfoFunc>,
+    DTWAIN_SetAppInfoAFunc: Symbol<'a, DtwainsetappinfoaFunc>,
+    DTWAIN_SetAppInfoWFunc: Symbol<'a, DtwainsetappinfowFunc>,
+    DTWAIN_SetAuthorFunc: Symbol<'a, DtwainsetauthorFunc>,
+    DTWAIN_SetAuthorAFunc: Symbol<'a, DtwainsetauthoraFunc>,
+    DTWAIN_SetAuthorWFunc: Symbol<'a, DtwainsetauthorwFunc>,
+    DTWAIN_SetAvailablePrintersFunc: Symbol<'a, DtwainsetavailableprintersFunc>,
+    DTWAIN_SetAvailablePrintersArrayFunc: Symbol<'a, DtwainsetavailableprintersarrayFunc>,
+    DTWAIN_SetBitDepthFunc: Symbol<'a, DtwainsetbitdepthFunc>,
+    DTWAIN_SetBlankPageDetectionFunc: Symbol<'a, DtwainsetblankpagedetectionFunc>,
+    DTWAIN_SetBlankPageDetectionExFunc: Symbol<'a, DtwainsetblankpagedetectionexFunc>,
+    DTWAIN_SetBlankPageDetectionExStringFunc: Symbol<'a, DtwainsetblankpagedetectionexstringFunc>,
+    DTWAIN_SetBlankPageDetectionExStringAFunc: Symbol<'a, DtwainsetblankpagedetectionexstringaFunc>,
+    DTWAIN_SetBlankPageDetectionExStringWFunc: Symbol<'a, DtwainsetblankpagedetectionexstringwFunc>,
+    DTWAIN_SetBlankPageDetectionStringFunc: Symbol<'a, DtwainsetblankpagedetectionstringFunc>,
+    DTWAIN_SetBlankPageDetectionStringAFunc: Symbol<'a, DtwainsetblankpagedetectionstringaFunc>,
+    DTWAIN_SetBlankPageDetectionStringWFunc: Symbol<'a, DtwainsetblankpagedetectionstringwFunc>,
+    DTWAIN_SetBrightnessFunc: Symbol<'a, DtwainsetbrightnessFunc>,
+    DTWAIN_SetBrightnessStringFunc: Symbol<'a, DtwainsetbrightnessstringFunc>,
+    DTWAIN_SetBrightnessStringAFunc: Symbol<'a, DtwainsetbrightnessstringaFunc>,
+    DTWAIN_SetBrightnessStringWFunc: Symbol<'a, DtwainsetbrightnessstringwFunc>,
+    DTWAIN_SetBufferedTileModeFunc: Symbol<'a, DtwainsetbufferedtilemodeFunc>,
+    DTWAIN_SetCallbackFunc: Symbol<'a, DtwainsetcallbackFunc>,
+    DTWAIN_SetCallback64Func: Symbol<'a, Dtwainsetcallback64Func>,
+    DTWAIN_SetCameraFunc: Symbol<'a, DtwainsetcameraFunc>,
+    DTWAIN_SetCameraAFunc: Symbol<'a, DtwainsetcameraaFunc>,
+    DTWAIN_SetCameraWFunc: Symbol<'a, DtwainsetcamerawFunc>,
+    DTWAIN_SetCapValuesFunc: Symbol<'a, DtwainsetcapvaluesFunc>,
+    DTWAIN_SetCapValuesExFunc: Symbol<'a, DtwainsetcapvaluesexFunc>,
+    DTWAIN_SetCapValuesEx2Func: Symbol<'a, Dtwainsetcapvaluesex2Func>,
+    DTWAIN_SetCaptionFunc: Symbol<'a, DtwainsetcaptionFunc>,
+    DTWAIN_SetCaptionAFunc: Symbol<'a, DtwainsetcaptionaFunc>,
+    DTWAIN_SetCaptionWFunc: Symbol<'a, DtwainsetcaptionwFunc>,
+    DTWAIN_SetCompressionTypeFunc: Symbol<'a, DtwainsetcompressiontypeFunc>,
+    DTWAIN_SetContrastFunc: Symbol<'a, DtwainsetcontrastFunc>,
+    DTWAIN_SetContrastStringFunc: Symbol<'a, DtwainsetcontraststringFunc>,
+    DTWAIN_SetContrastStringAFunc: Symbol<'a, DtwainsetcontraststringaFunc>,
+    DTWAIN_SetContrastStringWFunc: Symbol<'a, DtwainsetcontraststringwFunc>,
+    DTWAIN_SetCountryFunc: Symbol<'a, DtwainsetcountryFunc>,
+    DTWAIN_SetCurrentRetryCountFunc: Symbol<'a, DtwainsetcurrentretrycountFunc>,
+    DTWAIN_SetCustomDSDataFunc: Symbol<'a, DtwainsetcustomdsdataFunc>,
+    DTWAIN_SetDSMSearchOrderFunc: Symbol<'a, DtwainsetdsmsearchorderFunc>,
+    DTWAIN_SetDSMSearchOrderExFunc: Symbol<'a, DtwainsetdsmsearchorderexFunc>,
+    DTWAIN_SetDSMSearchOrderExAFunc: Symbol<'a, DtwainsetdsmsearchorderexaFunc>,
+    DTWAIN_SetDSMSearchOrderExWFunc: Symbol<'a, DtwainsetdsmsearchorderexwFunc>,
+    DTWAIN_SetDefaultSourceFunc: Symbol<'a, DtwainsetdefaultsourceFunc>,
+    DTWAIN_SetDeviceNotificationsFunc: Symbol<'a, DtwainsetdevicenotificationsFunc>,
+    DTWAIN_SetDeviceTimeDateFunc: Symbol<'a, DtwainsetdevicetimedateFunc>,
+    DTWAIN_SetDeviceTimeDateAFunc: Symbol<'a, DtwainsetdevicetimedateaFunc>,
+    DTWAIN_SetDeviceTimeDateWFunc: Symbol<'a, DtwainsetdevicetimedatewFunc>,
+    DTWAIN_SetDoubleFeedDetectLengthFunc: Symbol<'a, DtwainsetdoublefeeddetectlengthFunc>,
+    DTWAIN_SetDoubleFeedDetectLengthStringFunc: Symbol<'a, DtwainsetdoublefeeddetectlengthstringFunc>,
+    DTWAIN_SetDoubleFeedDetectLengthStringAFunc: Symbol<'a, DtwainsetdoublefeeddetectlengthstringaFunc>,
+    DTWAIN_SetDoubleFeedDetectLengthStringWFunc: Symbol<'a, DtwainsetdoublefeeddetectlengthstringwFunc>,
+    DTWAIN_SetDoubleFeedDetectValuesFunc: Symbol<'a, DtwainsetdoublefeeddetectvaluesFunc>,
+    DTWAIN_SetDoublePageCountOnDuplexFunc: Symbol<'a, DtwainsetdoublepagecountonduplexFunc>,
+    DTWAIN_SetEOJDetectValueFunc: Symbol<'a, DtwainseteojdetectvalueFunc>,
+    DTWAIN_SetErrorBufferThresholdFunc: Symbol<'a, DtwainseterrorbufferthresholdFunc>,
+    DTWAIN_SetErrorCallbackFunc: Symbol<'a, DtwainseterrorcallbackFunc>,
+    DTWAIN_SetErrorCallback64Func: Symbol<'a, Dtwainseterrorcallback64Func>,
+    DTWAIN_SetFeederAlignmentFunc: Symbol<'a, DtwainsetfeederalignmentFunc>,
+    DTWAIN_SetFeederOrderFunc: Symbol<'a, DtwainsetfeederorderFunc>,
+    DTWAIN_SetFeederWaitTimeFunc: Symbol<'a, DtwainsetfeederwaittimeFunc>,
+    DTWAIN_SetFileAutoIncrementFunc: Symbol<'a, DtwainsetfileautoincrementFunc>,
+    DTWAIN_SetFileCompressionTypeFunc: Symbol<'a, DtwainsetfilecompressiontypeFunc>,
+    DTWAIN_SetFileSavePosFunc: Symbol<'a, DtwainsetfilesaveposFunc>,
+    DTWAIN_SetFileSavePosAFunc: Symbol<'a, DtwainsetfilesaveposaFunc>,
+    DTWAIN_SetFileSavePosWFunc: Symbol<'a, DtwainsetfilesaveposwFunc>,
+    DTWAIN_SetFileXferFormatFunc: Symbol<'a, DtwainsetfilexferformatFunc>,
+    DTWAIN_SetHalftoneFunc: Symbol<'a, DtwainsethalftoneFunc>,
+    DTWAIN_SetHalftoneAFunc: Symbol<'a, DtwainsethalftoneaFunc>,
+    DTWAIN_SetHalftoneWFunc: Symbol<'a, DtwainsethalftonewFunc>,
+    DTWAIN_SetHighlightFunc: Symbol<'a, DtwainsethighlightFunc>,
+    DTWAIN_SetHighlightStringFunc: Symbol<'a, DtwainsethighlightstringFunc>,
+    DTWAIN_SetHighlightStringAFunc: Symbol<'a, DtwainsethighlightstringaFunc>,
+    DTWAIN_SetHighlightStringWFunc: Symbol<'a, DtwainsethighlightstringwFunc>,
+    DTWAIN_SetJobControlFunc: Symbol<'a, DtwainsetjobcontrolFunc>,
+    DTWAIN_SetJpegValuesFunc: Symbol<'a, DtwainsetjpegvaluesFunc>,
+    DTWAIN_SetJpegXRValuesFunc: Symbol<'a, DtwainsetjpegxrvaluesFunc>,
+    DTWAIN_SetLanguageFunc: Symbol<'a, DtwainsetlanguageFunc>,
+    DTWAIN_SetLastErrorFunc: Symbol<'a, DtwainsetlasterrorFunc>,
+    DTWAIN_SetLightPathFunc: Symbol<'a, DtwainsetlightpathFunc>,
+    DTWAIN_SetLightPathExFunc: Symbol<'a, DtwainsetlightpathexFunc>,
+    DTWAIN_SetLightSourceFunc: Symbol<'a, DtwainsetlightsourceFunc>,
+    DTWAIN_SetLightSourcesFunc: Symbol<'a, DtwainsetlightsourcesFunc>,
+    DTWAIN_SetLoggerCallbackFunc: Symbol<'a, DtwainsetloggercallbackFunc>,
+    DTWAIN_SetLoggerCallbackAFunc: Symbol<'a, DtwainsetloggercallbackaFunc>,
+    DTWAIN_SetLoggerCallbackWFunc: Symbol<'a, DtwainsetloggercallbackwFunc>,
+    DTWAIN_SetManualDuplexModeFunc: Symbol<'a, DtwainsetmanualduplexmodeFunc>,
+    DTWAIN_SetMaxAcquisitionsFunc: Symbol<'a, DtwainsetmaxacquisitionsFunc>,
+    DTWAIN_SetMaxBuffersFunc: Symbol<'a, DtwainsetmaxbuffersFunc>,
+    DTWAIN_SetMaxRetryAttemptsFunc: Symbol<'a, DtwainsetmaxretryattemptsFunc>,
+    DTWAIN_SetMultipageScanModeFunc: Symbol<'a, DtwainsetmultipagescanmodeFunc>,
+    DTWAIN_SetNoiseFilterFunc: Symbol<'a, DtwainsetnoisefilterFunc>,
+    DTWAIN_SetOCRCapValuesFunc: Symbol<'a, DtwainsetocrcapvaluesFunc>,
+    DTWAIN_SetOrientationFunc: Symbol<'a, DtwainsetorientationFunc>,
+    DTWAIN_SetOverscanFunc: Symbol<'a, DtwainsetoverscanFunc>,
+    DTWAIN_SetPDFAESEncryptionFunc: Symbol<'a, DtwainsetpdfaesencryptionFunc>,
+    DTWAIN_SetPDFASCIICompressionFunc: Symbol<'a, DtwainsetpdfasciicompressionFunc>,
+    DTWAIN_SetPDFAuthorFunc: Symbol<'a, DtwainsetpdfauthorFunc>,
+    DTWAIN_SetPDFAuthorAFunc: Symbol<'a, DtwainsetpdfauthoraFunc>,
+    DTWAIN_SetPDFAuthorWFunc: Symbol<'a, DtwainsetpdfauthorwFunc>,
+    DTWAIN_SetPDFCompressionFunc: Symbol<'a, DtwainsetpdfcompressionFunc>,
+    DTWAIN_SetPDFCreatorFunc: Symbol<'a, DtwainsetpdfcreatorFunc>,
+    DTWAIN_SetPDFCreatorAFunc: Symbol<'a, DtwainsetpdfcreatoraFunc>,
+    DTWAIN_SetPDFCreatorWFunc: Symbol<'a, DtwainsetpdfcreatorwFunc>,
+    DTWAIN_SetPDFEncryptionFunc: Symbol<'a, DtwainsetpdfencryptionFunc>,
+    DTWAIN_SetPDFEncryptionAFunc: Symbol<'a, DtwainsetpdfencryptionaFunc>,
+    DTWAIN_SetPDFEncryptionWFunc: Symbol<'a, DtwainsetpdfencryptionwFunc>,
+    DTWAIN_SetPDFJpegQualityFunc: Symbol<'a, DtwainsetpdfjpegqualityFunc>,
+    DTWAIN_SetPDFKeywordsFunc: Symbol<'a, DtwainsetpdfkeywordsFunc>,
+    DTWAIN_SetPDFKeywordsAFunc: Symbol<'a, DtwainsetpdfkeywordsaFunc>,
+    DTWAIN_SetPDFKeywordsWFunc: Symbol<'a, DtwainsetpdfkeywordswFunc>,
+    DTWAIN_SetPDFOCRConversionFunc: Symbol<'a, DtwainsetpdfocrconversionFunc>,
+    DTWAIN_SetPDFOCRModeFunc: Symbol<'a, DtwainsetpdfocrmodeFunc>,
+    DTWAIN_SetPDFOrientationFunc: Symbol<'a, DtwainsetpdforientationFunc>,
+    DTWAIN_SetPDFPageScaleFunc: Symbol<'a, DtwainsetpdfpagescaleFunc>,
+    DTWAIN_SetPDFPageScaleStringFunc: Symbol<'a, DtwainsetpdfpagescalestringFunc>,
+    DTWAIN_SetPDFPageScaleStringAFunc: Symbol<'a, DtwainsetpdfpagescalestringaFunc>,
+    DTWAIN_SetPDFPageScaleStringWFunc: Symbol<'a, DtwainsetpdfpagescalestringwFunc>,
+    DTWAIN_SetPDFPageSizeFunc: Symbol<'a, DtwainsetpdfpagesizeFunc>,
+    DTWAIN_SetPDFPageSizeStringFunc: Symbol<'a, DtwainsetpdfpagesizestringFunc>,
+    DTWAIN_SetPDFPageSizeStringAFunc: Symbol<'a, DtwainsetpdfpagesizestringaFunc>,
+    DTWAIN_SetPDFPageSizeStringWFunc: Symbol<'a, DtwainsetpdfpagesizestringwFunc>,
+    DTWAIN_SetPDFPolarityFunc: Symbol<'a, DtwainsetpdfpolarityFunc>,
+    DTWAIN_SetPDFProducerFunc: Symbol<'a, DtwainsetpdfproducerFunc>,
+    DTWAIN_SetPDFProducerAFunc: Symbol<'a, DtwainsetpdfproduceraFunc>,
+    DTWAIN_SetPDFProducerWFunc: Symbol<'a, DtwainsetpdfproducerwFunc>,
+    DTWAIN_SetPDFSubjectFunc: Symbol<'a, DtwainsetpdfsubjectFunc>,
+    DTWAIN_SetPDFSubjectAFunc: Symbol<'a, DtwainsetpdfsubjectaFunc>,
+    DTWAIN_SetPDFSubjectWFunc: Symbol<'a, DtwainsetpdfsubjectwFunc>,
+    DTWAIN_SetPDFTextElementFloatFunc: Symbol<'a, DtwainsetpdftextelementfloatFunc>,
+    DTWAIN_SetPDFTextElementLongFunc: Symbol<'a, DtwainsetpdftextelementlongFunc>,
+    DTWAIN_SetPDFTextElementStringFunc: Symbol<'a, DtwainsetpdftextelementstringFunc>,
+    DTWAIN_SetPDFTextElementStringAFunc: Symbol<'a, DtwainsetpdftextelementstringaFunc>,
+    DTWAIN_SetPDFTextElementStringWFunc: Symbol<'a, DtwainsetpdftextelementstringwFunc>,
+    DTWAIN_SetPDFTitleFunc: Symbol<'a, DtwainsetpdftitleFunc>,
+    DTWAIN_SetPDFTitleAFunc: Symbol<'a, DtwainsetpdftitleaFunc>,
+    DTWAIN_SetPDFTitleWFunc: Symbol<'a, DtwainsetpdftitlewFunc>,
+    DTWAIN_SetPaperSizeFunc: Symbol<'a, DtwainsetpapersizeFunc>,
+    DTWAIN_SetPatchMaxPrioritiesFunc: Symbol<'a, DtwainsetpatchmaxprioritiesFunc>,
+    DTWAIN_SetPatchMaxRetriesFunc: Symbol<'a, DtwainsetpatchmaxretriesFunc>,
+    DTWAIN_SetPatchPrioritiesFunc: Symbol<'a, DtwainsetpatchprioritiesFunc>,
+    DTWAIN_SetPatchSearchModeFunc: Symbol<'a, DtwainsetpatchsearchmodeFunc>,
+    DTWAIN_SetPatchTimeOutFunc: Symbol<'a, DtwainsetpatchtimeoutFunc>,
+    DTWAIN_SetPixelFlavorFunc: Symbol<'a, DtwainsetpixelflavorFunc>,
+    DTWAIN_SetPixelTypeFunc: Symbol<'a, DtwainsetpixeltypeFunc>,
+    DTWAIN_SetPostScriptTitleFunc: Symbol<'a, DtwainsetpostscripttitleFunc>,
+    DTWAIN_SetPostScriptTitleAFunc: Symbol<'a, DtwainsetpostscripttitleaFunc>,
+    DTWAIN_SetPostScriptTitleWFunc: Symbol<'a, DtwainsetpostscripttitlewFunc>,
+    DTWAIN_SetPostScriptTypeFunc: Symbol<'a, DtwainsetpostscripttypeFunc>,
+    DTWAIN_SetPrinterFunc: Symbol<'a, DtwainsetprinterFunc>,
+    DTWAIN_SetPrinterExFunc: Symbol<'a, DtwainsetprinterexFunc>,
+    DTWAIN_SetPrinterStartNumberFunc: Symbol<'a, DtwainsetprinterstartnumberFunc>,
+    DTWAIN_SetPrinterStringModeFunc: Symbol<'a, DtwainsetprinterstringmodeFunc>,
+    DTWAIN_SetPrinterStringsFunc: Symbol<'a, DtwainsetprinterstringsFunc>,
+    DTWAIN_SetPrinterSuffixStringFunc: Symbol<'a, DtwainsetprintersuffixstringFunc>,
+    DTWAIN_SetPrinterSuffixStringAFunc: Symbol<'a, DtwainsetprintersuffixstringaFunc>,
+    DTWAIN_SetPrinterSuffixStringWFunc: Symbol<'a, DtwainsetprintersuffixstringwFunc>,
+    DTWAIN_SetQueryCapSupportFunc: Symbol<'a, DtwainsetquerycapsupportFunc>,
+    DTWAIN_SetResolutionFunc: Symbol<'a, DtwainsetresolutionFunc>,
+    DTWAIN_SetResolutionStringFunc: Symbol<'a, DtwainsetresolutionstringFunc>,
+    DTWAIN_SetResolutionStringAFunc: Symbol<'a, DtwainsetresolutionstringaFunc>,
+    DTWAIN_SetResolutionStringWFunc: Symbol<'a, DtwainsetresolutionstringwFunc>,
+    DTWAIN_SetResourcePathFunc: Symbol<'a, DtwainsetresourcepathFunc>,
+    DTWAIN_SetResourcePathAFunc: Symbol<'a, DtwainsetresourcepathaFunc>,
+    DTWAIN_SetResourcePathWFunc: Symbol<'a, DtwainsetresourcepathwFunc>,
+    DTWAIN_SetRotationFunc: Symbol<'a, DtwainsetrotationFunc>,
+    DTWAIN_SetRotationStringFunc: Symbol<'a, DtwainsetrotationstringFunc>,
+    DTWAIN_SetRotationStringAFunc: Symbol<'a, DtwainsetrotationstringaFunc>,
+    DTWAIN_SetRotationStringWFunc: Symbol<'a, DtwainsetrotationstringwFunc>,
+    DTWAIN_SetSaveFileNameFunc: Symbol<'a, DtwainsetsavefilenameFunc>,
+    DTWAIN_SetSaveFileNameAFunc: Symbol<'a, DtwainsetsavefilenameaFunc>,
+    DTWAIN_SetSaveFileNameWFunc: Symbol<'a, DtwainsetsavefilenamewFunc>,
+    DTWAIN_SetShadowFunc: Symbol<'a, DtwainsetshadowFunc>,
+    DTWAIN_SetShadowStringFunc: Symbol<'a, DtwainsetshadowstringFunc>,
+    DTWAIN_SetShadowStringAFunc: Symbol<'a, DtwainsetshadowstringaFunc>,
+    DTWAIN_SetShadowStringWFunc: Symbol<'a, DtwainsetshadowstringwFunc>,
+    DTWAIN_SetSourceUnitFunc: Symbol<'a, DtwainsetsourceunitFunc>,
+    DTWAIN_SetTIFFCompressTypeFunc: Symbol<'a, DtwainsettiffcompresstypeFunc>,
+    DTWAIN_SetTIFFInvertFunc: Symbol<'a, DtwainsettiffinvertFunc>,
+    DTWAIN_SetTempFileDirectoryFunc: Symbol<'a, DtwainsettempfiledirectoryFunc>,
+    DTWAIN_SetTempFileDirectoryAFunc: Symbol<'a, DtwainsettempfiledirectoryaFunc>,
+    DTWAIN_SetTempFileDirectoryExFunc: Symbol<'a, DtwainsettempfiledirectoryexFunc>,
+    DTWAIN_SetTempFileDirectoryExAFunc: Symbol<'a, DtwainsettempfiledirectoryexaFunc>,
+    DTWAIN_SetTempFileDirectoryExWFunc: Symbol<'a, DtwainsettempfiledirectoryexwFunc>,
+    DTWAIN_SetTempFileDirectoryWFunc: Symbol<'a, DtwainsettempfiledirectorywFunc>,
+    DTWAIN_SetThresholdFunc: Symbol<'a, DtwainsetthresholdFunc>,
+    DTWAIN_SetThresholdStringFunc: Symbol<'a, DtwainsetthresholdstringFunc>,
+    DTWAIN_SetThresholdStringAFunc: Symbol<'a, DtwainsetthresholdstringaFunc>,
+    DTWAIN_SetThresholdStringWFunc: Symbol<'a, DtwainsetthresholdstringwFunc>,
+    DTWAIN_SetTwainDSMFunc: Symbol<'a, DtwainsettwaindsmFunc>,
+    DTWAIN_SetTwainLogFunc: Symbol<'a, DtwainsettwainlogFunc>,
+    DTWAIN_SetTwainLogAFunc: Symbol<'a, DtwainsettwainlogaFunc>,
+    DTWAIN_SetTwainLogWFunc: Symbol<'a, DtwainsettwainlogwFunc>,
+    DTWAIN_SetTwainModeFunc: Symbol<'a, DtwainsettwainmodeFunc>,
+    DTWAIN_SetTwainTimeoutFunc: Symbol<'a, DtwainsettwaintimeoutFunc>,
+    DTWAIN_SetUpdateDibProcFunc: Symbol<'a, DtwainsetupdatedibprocFunc>,
+    DTWAIN_SetXResolutionFunc: Symbol<'a, DtwainsetxresolutionFunc>,
+    DTWAIN_SetXResolutionStringFunc: Symbol<'a, DtwainsetxresolutionstringFunc>,
+    DTWAIN_SetXResolutionStringAFunc: Symbol<'a, DtwainsetxresolutionstringaFunc>,
+    DTWAIN_SetXResolutionStringWFunc: Symbol<'a, DtwainsetxresolutionstringwFunc>,
+    DTWAIN_SetYResolutionFunc: Symbol<'a, DtwainsetyresolutionFunc>,
+    DTWAIN_SetYResolutionStringFunc: Symbol<'a, DtwainsetyresolutionstringFunc>,
+    DTWAIN_SetYResolutionStringAFunc: Symbol<'a, DtwainsetyresolutionstringaFunc>,
+    DTWAIN_SetYResolutionStringWFunc: Symbol<'a, DtwainsetyresolutionstringwFunc>,
+    DTWAIN_ShowUIOnlyFunc: Symbol<'a, DtwainshowuionlyFunc>,
+    DTWAIN_ShutdownOCREngineFunc: Symbol<'a, DtwainshutdownocrengineFunc>,
+    DTWAIN_SkipImageInfoErrorFunc: Symbol<'a, DtwainskipimageinfoerrorFunc>,
+    DTWAIN_StartThreadFunc: Symbol<'a, DtwainstartthreadFunc>,
+    DTWAIN_StartTwainSessionFunc: Symbol<'a, DtwainstarttwainsessionFunc>,
+    DTWAIN_StartTwainSessionAFunc: Symbol<'a, DtwainstarttwainsessionaFunc>,
+    DTWAIN_StartTwainSessionWFunc: Symbol<'a, DtwainstarttwainsessionwFunc>,
+    DTWAIN_SysDestroyFunc: Symbol<'a, DtwainsysdestroyFunc>,
+    DTWAIN_SysInitializeFunc: Symbol<'a, DtwainsysinitializeFunc>,
+    DTWAIN_SysInitializeExFunc: Symbol<'a, DtwainsysinitializeexFunc>,
+    DTWAIN_SysInitializeEx2Func: Symbol<'a, Dtwainsysinitializeex2Func>,
+    DTWAIN_SysInitializeEx2AFunc: Symbol<'a, Dtwainsysinitializeex2aFunc>,
+    DTWAIN_SysInitializeEx2WFunc: Symbol<'a, Dtwainsysinitializeex2wFunc>,
+    DTWAIN_SysInitializeExAFunc: Symbol<'a, DtwainsysinitializeexaFunc>,
+    DTWAIN_SysInitializeExWFunc: Symbol<'a, DtwainsysinitializeexwFunc>,
+    DTWAIN_SysInitializeLibFunc: Symbol<'a, DtwainsysinitializelibFunc>,
+    DTWAIN_SysInitializeLibExFunc: Symbol<'a, DtwainsysinitializelibexFunc>,
+    DTWAIN_SysInitializeLibEx2Func: Symbol<'a, Dtwainsysinitializelibex2Func>,
+    DTWAIN_SysInitializeLibEx2AFunc: Symbol<'a, Dtwainsysinitializelibex2aFunc>,
+    DTWAIN_SysInitializeLibEx2WFunc: Symbol<'a, Dtwainsysinitializelibex2wFunc>,
+    DTWAIN_SysInitializeLibExAFunc: Symbol<'a, DtwainsysinitializelibexaFunc>,
+    DTWAIN_SysInitializeLibExWFunc: Symbol<'a, DtwainsysinitializelibexwFunc>,
+    DTWAIN_SysInitializeNoBlockingFunc: Symbol<'a, DtwainsysinitializenoblockingFunc>,
+    DTWAIN_TestGetCapFunc: Symbol<'a, DtwaintestgetcapFunc>,
+    DTWAIN_UnlockMemoryFunc: Symbol<'a, DtwainunlockmemoryFunc>,
+    DTWAIN_UnlockMemoryExFunc: Symbol<'a, DtwainunlockmemoryexFunc>,
+    DTWAIN_UseMultipleThreadsFunc: Symbol<'a, DtwainusemultiplethreadsFunc>
+}
+impl<'a> DTwainAPI<'a>
+{
     pub const DTWAIN_FF_TIFF: i32 = 0;
     pub const DTWAIN_FF_PICT: i32 = 1;
     pub const DTWAIN_FF_BMP: i32 = 2;
@@ -79,7 +2329,7 @@ use libloading::{Library, Symbol};
     pub const DTWAIN_FS_A0: i32 = 19;
     pub const DTWAIN_FS_A1: i32 = 20;
     pub const DTWAIN_FS_A2: i32 = 21;
-    pub const DTWAIN_FS_A4: i32 = DTWAIN_FS_A4LETTER;
+    pub const DTWAIN_FS_A4: i32 = DTwainAPI::DTWAIN_FS_A4LETTER;
     pub const DTWAIN_FS_A7: i32 = 22;
     pub const DTWAIN_FS_A8: i32 = 23;
     pub const DTWAIN_FS_A9: i32 = 24;
@@ -87,10 +2337,10 @@ use libloading::{Library, Symbol};
     pub const DTWAIN_FS_ISOB0: i32 = 26;
     pub const DTWAIN_FS_ISOB1: i32 = 27;
     pub const DTWAIN_FS_ISOB2: i32 = 28;
-    pub const DTWAIN_FS_ISOB3: i32 = DTWAIN_FS_B3;
-    pub const DTWAIN_FS_ISOB4: i32 = DTWAIN_FS_B4;
+    pub const DTWAIN_FS_ISOB3: i32 = DTwainAPI::DTWAIN_FS_B3;
+    pub const DTWAIN_FS_ISOB4: i32 = DTwainAPI::DTWAIN_FS_B4;
     pub const DTWAIN_FS_ISOB5: i32 = 29;
-    pub const DTWAIN_FS_ISOB6: i32 = DTWAIN_FS_B6;
+    pub const DTWAIN_FS_ISOB6: i32 = DTwainAPI::DTWAIN_FS_B6;
     pub const DTWAIN_FS_ISOB7: i32 = 30;
     pub const DTWAIN_FS_ISOB8: i32 = 31;
     pub const DTWAIN_FS_ISOB9: i32 = 32;
@@ -100,7 +2350,7 @@ use libloading::{Library, Symbol};
     pub const DTWAIN_FS_JISB2: i32 = 36;
     pub const DTWAIN_FS_JISB3: i32 = 37;
     pub const DTWAIN_FS_JISB4: i32 = 38;
-    pub const DTWAIN_FS_JISB5: i32 = DTWAIN_FS_B5LETTER;
+    pub const DTWAIN_FS_JISB5: i32 = DTwainAPI::DTWAIN_FS_B5LETTER;
     pub const DTWAIN_FS_JISB6: i32 = 39;
     pub const DTWAIN_FS_JISB7: i32 = 40;
     pub const DTWAIN_FS_JISB8: i32 = 41;
@@ -194,7 +2444,7 @@ use libloading::{Library, Symbol};
     pub const DTWAIN_USESOURCEMODE: i32 = 128;
     pub const DTWAIN_USELIST: i32 = 256;
     pub const DTWAIN_CREATE_DIRECTORY: i32 = 512;
-    pub const DTWAIN_CREATEDIRECTORY: i32 = DTWAIN_CREATE_DIRECTORY;
+    pub const DTWAIN_CREATEDIRECTORY: i32 = DTwainAPI::DTWAIN_CREATE_DIRECTORY;
     pub const DTWAIN_ARRAYANY: i32 = 1;
     pub const DTWAIN_ArrayTypePTR: i32 = 1;
     pub const DTWAIN_ARRAYLONG: i32 = 2;
@@ -203,7 +2453,7 @@ use libloading::{Library, Symbol};
     pub const DTWAIN_ARRAYSOURCE: i32 = 5;
     pub const DTWAIN_ARRAYSTRING: i32 = 6;
     pub const DTWAIN_ARRAYFRAME: i32 = 7;
-    pub const DTWAIN_ARRAYBOOL: i32 = DTWAIN_ARRAYLONG;
+    pub const DTWAIN_ARRAYBOOL: i32 = DTwainAPI::DTWAIN_ARRAYLONG;
     pub const DTWAIN_ARRAYLONGSTRING: i32 = 8;
     pub const DTWAIN_ARRAYUNICODESTRING: i32 = 9;
     pub const DTWAIN_ARRAYLONG64: i32 = 10;
@@ -217,8 +2467,8 @@ use libloading::{Library, Symbol};
     pub const DTWAIN_ARRAYINT32: i32 = 130;
     pub const DTWAIN_ARRAYINT64: i32 = 140;
     pub const DTWAIN_ARRAYUINT64: i32 = 150;
-    pub const DTWAIN_RANGELONG: i32 = DTWAIN_ARRAYLONG;
-    pub const DTWAIN_RANGEFLOAT: i32 = DTWAIN_ARRAYFLOAT;
+    pub const DTWAIN_RANGELONG: i32 = DTwainAPI::DTWAIN_ARRAYLONG;
+    pub const DTWAIN_RANGEFLOAT: i32 = DTwainAPI::DTWAIN_ARRAYFLOAT;
     pub const DTWAIN_RANGEMIN: i32 = 0;
     pub const DTWAIN_RANGEMAX: i32 = 1;
     pub const DTWAIN_RANGESTEP: i32 = 2;
@@ -262,10 +2512,10 @@ use libloading::{Library, Symbol};
     pub const DTWAIN_CAPGETHELP: i32 = 9;
     pub const DTWAIN_CAPGETLABEL: i32 = 10;
     pub const DTWAIN_CAPGETLABELENUM: i32 = 11;
-    pub const DTWAIN_AREASET: i32 = DTWAIN_CAPSET;
-    pub const DTWAIN_AREARESET: i32 = DTWAIN_CAPRESET;
-    pub const DTWAIN_AREACURRENT: i32 = DTWAIN_CAPGETCURRENT;
-    pub const DTWAIN_AREADEFAULT: i32 = DTWAIN_CAPGETDEFAULT;
+    pub const DTWAIN_AREASET: i32 = DTwainAPI::DTWAIN_CAPSET;
+    pub const DTWAIN_AREARESET: i32 = DTwainAPI::DTWAIN_CAPRESET;
+    pub const DTWAIN_AREACURRENT: i32 = DTwainAPI::DTWAIN_CAPGETCURRENT;
+    pub const DTWAIN_AREADEFAULT: i32 = DTwainAPI::DTWAIN_CAPGETDEFAULT;
     pub const DTWAIN_VER15: i32 = 0;
     pub const DTWAIN_VER16: i32 = 1;
     pub const DTWAIN_VER17: i32 = 2;
@@ -404,8 +2654,8 @@ use libloading::{Library, Symbol};
     pub const DTWAIN_OR_ROT90: i32 = 1;
     pub const DTWAIN_OR_ROT180: i32 = 2;
     pub const DTWAIN_OR_ROT270: i32 = 3;
-    pub const DTWAIN_OR_PORTRAIT: i32 = DTWAIN_OR_ROT0;
-    pub const DTWAIN_OR_LANDSCAPE: i32 = DTWAIN_OR_ROT270;
+    pub const DTWAIN_OR_PORTRAIT: i32 = DTwainAPI::DTWAIN_OR_ROT0;
+    pub const DTWAIN_OR_LANDSCAPE: i32 = DTwainAPI::DTWAIN_OR_ROT270;
     pub const DTWAIN_OR_ANYROTATION: i32 = -1;
     pub const DTWAIN_CO_GET: i32 = 0x0001;
     pub const DTWAIN_CO_SET: i32 = 0x0002;
@@ -861,7 +3111,7 @@ use libloading::{Library, Symbol};
     pub const DTWAIN_ERR_OCR_INVALIDBITDEPTH: i32 = -2106;
     pub const DTWAIN_ERR_OCR_RECOGNITIONERROR: i32 = -2107;
     pub const DTWAIN_ERR_OCR_LAST: i32 = -2108;
-    pub const DTWAIN_ERR_LAST: i32 = DTWAIN_ERR_OCR_LAST;
+    pub const DTWAIN_ERR_LAST: i32 = DTwainAPI::DTWAIN_ERR_OCR_LAST;
     pub const DTWAIN_ERR_SOURCE_COULD_NOT_OPEN: i32 = -2500;
     pub const DTWAIN_ERR_SOURCE_COULD_NOT_CLOSE: i32 = -2501;
     pub const DTWAIN_ERR_IMAGEINFO_INVALID: i32 = -2502;
@@ -1028,10 +3278,10 @@ use libloading::{Library, Symbol};
     pub const DTWAIN_LOG_DEBUGMONITOR: u32 = 0x1000000 ;
     pub const DTWAIN_LOG_USEWINDOW: u32 = 0x2000000    ;
     pub const DTWAIN_LOG_CREATEDIRECTORY: u32 = 0x04000000;
-    pub const DTWAIN_LOG_CONSOLEWITHHANDLER: u32 = 0x08000000 | DTWAIN_LOG_CONSOLE;
-    pub const DTWAIN_LOG_ALL: u32 = DTWAIN_LOG_DECODE_SOURCE | DTWAIN_LOG_DECODE_DEST | DTWAIN_LOG_DECODE_TWEVENT | DTWAIN_LOG_DECODE_TWMEMREF | DTWAIN_LOG_CALLSTACK | DTWAIN_LOG_ISTWAINMSG | DTWAIN_LOG_INITFAILURE | DTWAIN_LOG_LOWLEVELTWAIN | DTWAIN_LOG_NOTIFICATIONS | DTWAIN_LOG_MISCELLANEOUS | DTWAIN_LOG_DTWAINERRORS | DTWAIN_LOG_DECODE_BITMAP;
+    pub const DTWAIN_LOG_CONSOLEWITHHANDLER: u32 = 0x08000000 | DTwainAPI::DTWAIN_LOG_CONSOLE;
+    pub const DTWAIN_LOG_ALL: u32 = DTwainAPI::DTWAIN_LOG_DECODE_SOURCE | DTwainAPI::DTWAIN_LOG_DECODE_DEST | DTwainAPI::DTWAIN_LOG_DECODE_TWEVENT | DTwainAPI::DTWAIN_LOG_DECODE_TWMEMREF | DTwainAPI::DTWAIN_LOG_CALLSTACK | DTwainAPI::DTWAIN_LOG_ISTWAINMSG | DTwainAPI::DTWAIN_LOG_INITFAILURE | DTwainAPI::DTWAIN_LOG_LOWLEVELTWAIN | DTwainAPI::DTWAIN_LOG_NOTIFICATIONS | DTwainAPI::DTWAIN_LOG_MISCELLANEOUS | DTwainAPI::DTWAIN_LOG_DTWAINERRORS | DTwainAPI::DTWAIN_LOG_DECODE_BITMAP;
     pub const DTWAIN_LOG_ALL_APPEND: u32 = 0xFFFFFFFF;
-    pub const DTWAIN_TEMPDIR_CREATEDIRECTORY: u32 = DTWAIN_LOG_CREATEDIRECTORY;
+    pub const DTWAIN_TEMPDIR_CREATEDIRECTORY: u32 = DTwainAPI::DTWAIN_LOG_CREATEDIRECTORY;
     pub const DTWAINGCD_RETURNHANDLE: i32 = 1;
     pub const DTWAINGCD_COPYDATA: i32 = 2;
     pub const DTWAIN_BYPOSITION: i32 = 0;
@@ -1058,8 +3308,8 @@ use libloading::{Library, Symbol};
     pub const DTWAIN_PDF_ALLOWASSEMBLY: u32 = 1024;
     pub const DTWAIN_PDF_ALLOWDEGRADEDPRINTING: u32 = 4;
     pub const DTWAIN_PDF_ALLOWALL: u32 = 0xFFFFFFFC;
-    pub const DTWAIN_PDF_ALLOWANYMOD: u32 = DTWAIN_PDF_ALLOWMOD | DTWAIN_PDF_ALLOWFILLIN | DTWAIN_PDF_ALLOWMODANNOTATIONS | DTWAIN_PDF_ALLOWASSEMBLY;
-    pub const DTWAIN_PDF_ALLOWANYPRINTING: u32 = DTWAIN_PDF_ALLOWPRINTING | DTWAIN_PDF_ALLOWDEGRADEDPRINTING;
+    pub const DTWAIN_PDF_ALLOWANYMOD: u32 = DTwainAPI::DTWAIN_PDF_ALLOWMOD | DTwainAPI::DTWAIN_PDF_ALLOWFILLIN | DTwainAPI::DTWAIN_PDF_ALLOWMODANNOTATIONS | DTwainAPI::DTWAIN_PDF_ALLOWASSEMBLY;
+    pub const DTWAIN_PDF_ALLOWANYPRINTING: u32 = DTwainAPI::DTWAIN_PDF_ALLOWPRINTING | DTwainAPI::DTWAIN_PDF_ALLOWDEGRADEDPRINTING;
     pub const DTWAIN_PDF_PORTRAIT: i32 = 0;
     pub const DTWAIN_PDF_LANDSCAPE: i32 = 1;
     pub const DTWAIN_PS_REGULAR: i32 = 0;
@@ -1069,7 +3319,7 @@ use libloading::{Library, Symbol};
     pub const DTWAIN_BP_AUTODISCARD_AFTERPROCESS: i32 = 2;
     pub const DTWAIN_BP_DETECTORIGINAL: i32 = 1;
     pub const DTWAIN_BP_DETECTADJUSTED: i32 = 2;
-    pub const DTWAIN_BP_DETECTALL: i32 = DTWAIN_BP_DETECTORIGINAL | DTWAIN_BP_DETECTADJUSTED;
+    pub const DTWAIN_BP_DETECTALL: i32 = DTwainAPI::DTWAIN_BP_DETECTORIGINAL | DTwainAPI::DTWAIN_BP_DETECTADJUSTED;
     pub const DTWAIN_BP_DISABLE: i32 = -2;
     pub const DTWAIN_BP_AUTO: i32 = -1;
     pub const DTWAIN_BP_AUTODISCARD_ANY: u32 = 0xFFFF;
@@ -1419,43 +3669,43 @@ use libloading::{Library, Symbol};
     pub const DTWAIN_CV_ACAPAUDIOFILEFORMAT: i32 = 0x1201;
     pub const DTWAIN_CV_ACAPXFERMECH: i32 = 0x1202;
     pub const DTWAIN_CFMCV_CAPCFMSTART: i32 = 2048;
-    pub const DTWAIN_CFMCV_CAPDUPLEXSCANNER: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+10;
-    pub const DTWAIN_CFMCV_CAPDUPLEXENABLE: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+11;
-    pub const DTWAIN_CFMCV_CAPSCANNERNAME: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+12;
-    pub const DTWAIN_CFMCV_CAPSINGLEPASS: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+13;
-    pub const DTWAIN_CFMCV_CAPERRHANDLING: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+20;
-    pub const DTWAIN_CFMCV_CAPFEEDERSTATUS: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+21;
-    pub const DTWAIN_CFMCV_CAPFEEDMEDIUMWAIT: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+22;
-    pub const DTWAIN_CFMCV_CAPFEEDWAITTIME: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+23;
-    pub const DTWAIN_CFMCV_ICAPWHITEBALANCE: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+24;
-    pub const DTWAIN_CFMCV_ICAPAUTOBINARY: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+25;
-    pub const DTWAIN_CFMCV_ICAPIMAGESEPARATION: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+26;
-    pub const DTWAIN_CFMCV_ICAPHARDWARECOMPRESSION: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+27;
-    pub const DTWAIN_CFMCV_ICAPIMAGEEMPHASIS: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+28;
-    pub const DTWAIN_CFMCV_ICAPOUTLINING: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+29;
-    pub const DTWAIN_CFMCV_ICAPDYNTHRESHOLD: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+30;
-    pub const DTWAIN_CFMCV_ICAPVARIANCE: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+31;
-    pub const DTWAIN_CFMCV_CAPENDORSERAVAILABLE: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+32;
-    pub const DTWAIN_CFMCV_CAPENDORSERENABLE: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+33;
-    pub const DTWAIN_CFMCV_CAPENDORSERCHARSET: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+34;
-    pub const DTWAIN_CFMCV_CAPENDORSERSTRINGLENGTH: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+35;
-    pub const DTWAIN_CFMCV_CAPENDORSERSTRING: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+36;
-    pub const DTWAIN_CFMCV_ICAPDYNTHRESHOLDCURVE: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+48;
-    pub const DTWAIN_CFMCV_ICAPSMOOTHINGMODE: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+49;
-    pub const DTWAIN_CFMCV_ICAPFILTERMODE: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+50;
-    pub const DTWAIN_CFMCV_ICAPGRADATION: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+51;
-    pub const DTWAIN_CFMCV_ICAPMIRROR: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+52;
-    pub const DTWAIN_CFMCV_ICAPEASYSCANMODE: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+53;
-    pub const DTWAIN_CFMCV_ICAPSOFTWAREINTERPOLATION: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+54;
-    pub const DTWAIN_CFMCV_ICAPIMAGESEPARATIONEX: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+55;
-    pub const DTWAIN_CFMCV_CAPDUPLEXPAGE: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+56;
-    pub const DTWAIN_CFMCV_ICAPINVERTIMAGE: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+57;
-    pub const DTWAIN_CFMCV_ICAPSPECKLEREMOVE: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+58;
-    pub const DTWAIN_CFMCV_ICAPUSMFILTER: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+59;
-    pub const DTWAIN_CFMCV_ICAPNOISEFILTERCFM: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+60;
-    pub const DTWAIN_CFMCV_ICAPDESCREENING: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+61;
-    pub const DTWAIN_CFMCV_ICAPQUALITYFILTER: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+62;
-    pub const DTWAIN_CFMCV_ICAPBINARYFILTER: i32 = DTWAIN_CV_CAPCUSTOMBASE+DTWAIN_CFMCV_CAPCFMSTART+63;
+    pub const DTWAIN_CFMCV_CAPDUPLEXSCANNER: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+10;
+    pub const DTWAIN_CFMCV_CAPDUPLEXENABLE: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+11;
+    pub const DTWAIN_CFMCV_CAPSCANNERNAME: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+12;
+    pub const DTWAIN_CFMCV_CAPSINGLEPASS: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+13;
+    pub const DTWAIN_CFMCV_CAPERRHANDLING: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+20;
+    pub const DTWAIN_CFMCV_CAPFEEDERSTATUS: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+21;
+    pub const DTWAIN_CFMCV_CAPFEEDMEDIUMWAIT: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+22;
+    pub const DTWAIN_CFMCV_CAPFEEDWAITTIME: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+23;
+    pub const DTWAIN_CFMCV_ICAPWHITEBALANCE: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+24;
+    pub const DTWAIN_CFMCV_ICAPAUTOBINARY: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+25;
+    pub const DTWAIN_CFMCV_ICAPIMAGESEPARATION: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+26;
+    pub const DTWAIN_CFMCV_ICAPHARDWARECOMPRESSION: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+27;
+    pub const DTWAIN_CFMCV_ICAPIMAGEEMPHASIS: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+28;
+    pub const DTWAIN_CFMCV_ICAPOUTLINING: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+29;
+    pub const DTWAIN_CFMCV_ICAPDYNTHRESHOLD: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+30;
+    pub const DTWAIN_CFMCV_ICAPVARIANCE: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+31;
+    pub const DTWAIN_CFMCV_CAPENDORSERAVAILABLE: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+32;
+    pub const DTWAIN_CFMCV_CAPENDORSERENABLE: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+33;
+    pub const DTWAIN_CFMCV_CAPENDORSERCHARSET: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+34;
+    pub const DTWAIN_CFMCV_CAPENDORSERSTRINGLENGTH: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+35;
+    pub const DTWAIN_CFMCV_CAPENDORSERSTRING: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+36;
+    pub const DTWAIN_CFMCV_ICAPDYNTHRESHOLDCURVE: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+48;
+    pub const DTWAIN_CFMCV_ICAPSMOOTHINGMODE: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+49;
+    pub const DTWAIN_CFMCV_ICAPFILTERMODE: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+50;
+    pub const DTWAIN_CFMCV_ICAPGRADATION: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+51;
+    pub const DTWAIN_CFMCV_ICAPMIRROR: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+52;
+    pub const DTWAIN_CFMCV_ICAPEASYSCANMODE: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+53;
+    pub const DTWAIN_CFMCV_ICAPSOFTWAREINTERPOLATION: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+54;
+    pub const DTWAIN_CFMCV_ICAPIMAGESEPARATIONEX: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+55;
+    pub const DTWAIN_CFMCV_CAPDUPLEXPAGE: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+56;
+    pub const DTWAIN_CFMCV_ICAPINVERTIMAGE: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+57;
+    pub const DTWAIN_CFMCV_ICAPSPECKLEREMOVE: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+58;
+    pub const DTWAIN_CFMCV_ICAPUSMFILTER: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+59;
+    pub const DTWAIN_CFMCV_ICAPNOISEFILTERCFM: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+60;
+    pub const DTWAIN_CFMCV_ICAPDESCREENING: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+61;
+    pub const DTWAIN_CFMCV_ICAPQUALITYFILTER: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+62;
+    pub const DTWAIN_CFMCV_ICAPBINARYFILTER: i32 = DTwainAPI::DTWAIN_CV_CAPCUSTOMBASE+DTwainAPI::DTWAIN_CFMCV_CAPCFMSTART+63;
     pub const DTWAIN_OCRCV_IMAGEFILEFORMAT: i32 = 0x1000;
     pub const DTWAIN_OCRCV_DESKEW: i32 = 0x1001;
     pub const DTWAIN_OCRCV_DESHADE: i32 = 0x1002;
@@ -1570,7 +3820,7 @@ use libloading::{Library, Symbol};
     pub const DTWAIN_PDFTEXTTRANSFORM_KRTS: i32 = 21;
     pub const DTWAIN_PDFTEXTTRANSFORM_KTSR: i32 = 22;
     pub const DTWAIN_PDFTEXTTRANSFORM_KTRS: i32 = 23;
-    pub const DTWAIN_PDFTEXTTRANFORM_LAST: i32 = DTWAIN_PDFTEXTTRANSFORM_KTRS;
+    pub const DTWAIN_PDFTEXTTRANFORM_LAST: i32 = DTwainAPI::DTWAIN_PDFTEXTTRANSFORM_KTRS;
     pub const DTWAIN_TWDF_ULTRASONIC: i32 = 0;
     pub const DTWAIN_TWDF_BYLENGTH: i32 = 1;
     pub const DTWAIN_TWDF_INFRARED: i32 = 2;
@@ -1668,2215 +3918,7 @@ use libloading::{Library, Symbol};
     pub const DTWAIN_PDF_AES256: i32 = 2;
     pub const DTWAIN_FEEDER_TERMINATE: i32 = 1;
     pub const DTWAIN_FEEDER_USEFLATBED: i32 = 2;
-type DtwainacquireaudiofileFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32,i32,i32,i32,*mut i32) -> i32;
-type DtwainacquireaudiofileaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32,i32,i32,i32,*mut i32) -> i32;
-type DtwainacquireaudiofilewFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32,i32,i32,*mut i32) -> i32;
-type DtwainacquireaudionativeFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32,*mut i32) -> *mut c_void;
-type DtwainacquireaudionativeexFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32,*mut c_void,*mut i32) -> i32;
-type DtwainacquirebufferedFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32,i32,*mut i32) -> *mut c_void;
-type DtwainacquirebufferedexFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32,i32,*mut c_void,*mut i32) -> i32;
-type DtwainacquirefileFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32,i32,i32,i32,i32,i32,*mut i32) -> i32;
-type DtwainacquirefileaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32,i32,i32,i32,i32,i32,*mut i32) -> i32;
-type DtwainacquirefileexFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,i32,i32,i32,i32,i32,i32,*mut i32) -> i32;
-type DtwainacquirefilewFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32,i32,i32,i32,i32,*mut i32) -> i32;
-type DtwainacquirenativeFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32,i32,*mut i32) -> *mut c_void;
-type DtwainacquirenativeexFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32,i32,*mut c_void,*mut i32) -> i32;
-type DtwainacquiretoclipboardFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32,i32,i32,i32,*mut i32) -> *mut c_void;
-type DtwainaddextimageinfoqueryFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainaddpdftextFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32,i32,*const c_char,f64,i32,i32,f64,f64,f64,i32,u32) -> i32;
-type DtwainaddpdftextaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32,i32,*const c_char,f64,i32,i32,f64,f64,f64,i32,u32) -> i32;
-type DtwainaddpdftextexFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,u32) -> i32;
-type DtwainaddpdftextwFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32,*const u16,f64,i32,i32,f64,f64,f64,i32,u32) -> i32;
-type DtwainallocatememoryFunc = unsafe extern "C" fn(u32) -> *mut c_void;
-type Dtwainallocatememory64Func = unsafe extern "C" fn(u64) -> *mut c_void;
-type DtwainallocatememoryexFunc = unsafe extern "C" fn(u32) -> *mut c_void;
-type DtwainapphandlesexceptionsFunc = unsafe extern "C" fn(i32) -> i32;
-type DtwainarrayansistringtofloatFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainarrayaddFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
-type DtwainarrayaddansistringFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainarrayaddansistringnFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32) -> i32;
-type DtwainarrayaddfloatFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
-type DtwainarrayaddfloatnFunc = unsafe extern "C" fn(*mut c_void,f64,i32) -> i32;
-type DtwainarrayaddfloatstringFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainarrayaddfloatstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainarrayaddfloatstringnFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32) -> i32;
-type DtwainarrayaddfloatstringnaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32) -> i32;
-type DtwainarrayaddfloatstringnwFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32) -> i32;
-type DtwainarrayaddfloatstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainarrayaddframeFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
-type DtwainarrayaddframenFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,i32) -> i32;
-type DtwainarrayaddlongFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type Dtwainarrayaddlong64Func = unsafe extern "C" fn(*mut c_void,i64) -> i32;
-type Dtwainarrayaddlong64nFunc = unsafe extern "C" fn(*mut c_void,i64,i32) -> i32;
-type DtwainarrayaddlongnFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type DtwainarrayaddnFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,i32) -> i32;
-type DtwainarrayaddstringFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainarrayaddstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainarrayaddstringnFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32) -> i32;
-type DtwainarrayaddstringnaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32) -> i32;
-type DtwainarrayaddstringnwFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32) -> i32;
-type DtwainarrayaddstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainarrayaddwidestringFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainarrayaddwidestringnFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32) -> i32;
-type Dtwainarrayconvertfix32tofloatFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type Dtwainarrayconvertfloattofix32Func = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainarraycopyFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
-type DtwainarraycreateFunc = unsafe extern "C" fn(i32,i32) -> *mut c_void;
-type DtwainarraycreatecopyFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainarraycreatefromcapFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> *mut c_void;
-type Dtwainarraycreatefromlong64sFunc = unsafe extern "C" fn(*mut i64,i32) -> *mut c_void;
-type DtwainarraycreatefromlongsFunc = unsafe extern "C" fn(*mut i32,i32) -> *mut c_void;
-type DtwainarraycreatefromrealsFunc = unsafe extern "C" fn(i32) -> *mut c_void;
-type DtwainarraydestroyFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainarraydestroyframesFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainarrayfindFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
-type DtwainarrayfindansistringFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainarrayfindfloatFunc = unsafe extern "C" fn(*mut c_void,f64,f64) -> i32;
-type DtwainarrayfindfloatstringFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*const c_char) -> i32;
-type DtwainarrayfindfloatstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*const c_char) -> i32;
-type DtwainarrayfindfloatstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,*const u16) -> i32;
-type DtwainarrayfindlongFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type Dtwainarrayfindlong64Func = unsafe extern "C" fn(*mut c_void,i64) -> i32;
-type DtwainarrayfindstringFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainarrayfindstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainarrayfindstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainarrayfindwidestringFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type Dtwainarrayfix32getatFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32,*mut i32) -> i32;
-type Dtwainarrayfix32setatFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32) -> i32;
-type DtwainarrayfloattoansistringFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainarrayfloattostringFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainarrayfloattowidestringFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainarraygetatFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void) -> i32;
-type DtwainarraygetatansistringFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char) -> i32;
-type DtwainarraygetatansistringptrFunc = unsafe extern "C" fn(*mut c_void,i32) -> *const c_char;
-type DtwainarraygetatfloatFunc = unsafe extern "C" fn(*mut c_void,i32,*mut f64) -> i32;
-type DtwainarraygetatfloatstringFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char) -> i32;
-type DtwainarraygetatfloatstringaFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char) -> i32;
-type DtwainarraygetatfloatstringwFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16) -> i32;
-type DtwainarraygetatframeFunc = unsafe extern "C" fn(*mut c_void,i32,*mut f64,*mut f64,*mut f64,*mut f64) -> i32;
-type DtwainarraygetatframeexFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void) -> i32;
-type DtwainarraygetatframestringFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char,*mut c_char,*mut c_char,*mut c_char) -> i32;
-type DtwainarraygetatframestringaFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char,*mut c_char,*mut c_char,*mut c_char) -> i32;
-type DtwainarraygetatframestringwFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16,*mut u16,*mut u16,*mut u16) -> i32;
-type DtwainarraygetatlongFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32) -> i32;
-type Dtwainarraygetatlong64Func = unsafe extern "C" fn(*mut c_void,i32,*mut i64) -> i32;
-type DtwainarraygetatsourceFunc = unsafe extern "C" fn(*mut c_void,i32,*mut *const ()) -> i32;
-type DtwainarraygetatstringFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char) -> i32;
-type DtwainarraygetatstringaFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char) -> i32;
-type DtwainarraygetatstringptrFunc = unsafe extern "C" fn(*mut c_void,i32) -> *const c_char;
-type DtwainarraygetatstringwFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16) -> i32;
-type DtwainarraygetatwidestringFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16) -> i32;
-type DtwainarraygetatwidestringptrFunc = unsafe extern "C" fn(*mut c_void,i32) -> *const u16;
-type DtwainarraygetbufferFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
-type DtwainarraygetcapvaluesFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> *mut c_void;
-type DtwainarraygetcapvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32) -> *mut c_void;
-type Dtwainarraygetcapvaluesex2Func = unsafe extern "C" fn(*mut c_void,i32,i32,i32,i32) -> *mut c_void;
-type DtwainarraygetcountFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainarraygetmaxstringlengthFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainarraygetsourceatFunc = unsafe extern "C" fn(*mut c_void,i32,*mut *const ()) -> i32;
-type DtwainarraygetstringlengthFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainarraygettypeFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainarrayinitFunc = unsafe extern "C" fn() -> *mut c_void;
-type DtwainarrayinsertatFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void) -> i32;
-type DtwainarrayinsertatansistringFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char) -> i32;
-type DtwainarrayinsertatansistringnFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char,i32) -> i32;
-type DtwainarrayinsertatfloatFunc = unsafe extern "C" fn(*mut c_void,i32,f64) -> i32;
-type DtwainarrayinsertatfloatnFunc = unsafe extern "C" fn(*mut c_void,i32,f64,i32) -> i32;
-type DtwainarrayinsertatfloatstringFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char) -> i32;
-type DtwainarrayinsertatfloatstringaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char) -> i32;
-type DtwainarrayinsertatfloatstringnFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char,i32) -> i32;
-type DtwainarrayinsertatfloatstringnaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char,i32) -> i32;
-type DtwainarrayinsertatfloatstringnwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16,i32) -> i32;
-type DtwainarrayinsertatfloatstringwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
-type DtwainarrayinsertatframeFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void) -> i32;
-type DtwainarrayinsertatframenFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void,i32) -> i32;
-type DtwainarrayinsertatlongFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type Dtwainarrayinsertatlong64Func = unsafe extern "C" fn(*mut c_void,i32,i64) -> i32;
-type Dtwainarrayinsertatlong64nFunc = unsafe extern "C" fn(*mut c_void,i32,i64,i32) -> i32;
-type DtwainarrayinsertatlongnFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32) -> i32;
-type DtwainarrayinsertatnFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void,i32) -> i32;
-type DtwainarrayinsertatstringFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char) -> i32;
-type DtwainarrayinsertatstringaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char) -> i32;
-type DtwainarrayinsertatstringnFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char,i32) -> i32;
-type DtwainarrayinsertatstringnaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char,i32) -> i32;
-type DtwainarrayinsertatstringnwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16,i32) -> i32;
-type DtwainarrayinsertatstringwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
-type DtwainarrayinsertatwidestringFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
-type DtwainarrayinsertatwidestringnFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16,i32) -> i32;
-type DtwainarrayremoveallFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainarrayremoveatFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainarrayremoveatnFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type DtwainarrayresizeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainarraysetatFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void) -> i32;
-type DtwainarraysetatansistringFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char) -> i32;
-type DtwainarraysetatfloatFunc = unsafe extern "C" fn(*mut c_void,i32,f64) -> i32;
-type DtwainarraysetatfloatstringFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char) -> i32;
-type DtwainarraysetatfloatstringaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char) -> i32;
-type DtwainarraysetatfloatstringwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
-type DtwainarraysetatframeFunc = unsafe extern "C" fn(*mut c_void,i32,f64,f64,f64,f64) -> i32;
-type DtwainarraysetatframeexFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void) -> i32;
-type DtwainarraysetatframestringFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char,*const c_char,*const c_char,*const c_char) -> i32;
-type DtwainarraysetatframestringaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char,*const c_char,*const c_char,*const c_char) -> i32;
-type DtwainarraysetatframestringwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16,*const u16,*const u16,*const u16) -> i32;
-type DtwainarraysetatlongFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type Dtwainarraysetatlong64Func = unsafe extern "C" fn(*mut c_void,i32,i64) -> i32;
-type DtwainarraysetatstringFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char) -> i32;
-type DtwainarraysetatstringaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char) -> i32;
-type DtwainarraysetatstringwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
-type DtwainarraysetatwidestringFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
-type DtwainarraystringtofloatFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainarraywidestringtofloatFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwaincallcallbackFunc = unsafe extern "C" fn(i32,i32,i32) -> i32;
-type Dtwaincallcallback64Func = unsafe extern "C" fn(i32,i32,i64) -> i32;
-type DtwaincalldsmprocFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,i32,i32,i32,*mut c_void) -> i32;
-type DtwaincheckhandlesFunc = unsafe extern "C" fn(i32) -> i32;
-type DtwainclearbuffersFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainclearerrorbufferFunc = unsafe extern "C" fn() -> i32;
-type DtwainclearpdftextFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainclearpageFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainclosesourceFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainclosesourceuiFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainconvertdibtobitmapFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> *mut c_void;
-type DtwainconvertdibtofullbitmapFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
-type DtwainconverttoapistringFunc = unsafe extern "C" fn(*const c_char) -> *mut c_void;
-type DtwainconverttoapistringaFunc = unsafe extern "C" fn(*const c_char) -> *mut c_void;
-type DtwainconverttoapistringexFunc = unsafe extern "C" fn(*const c_char,*mut c_char,i32) -> i32;
-type DtwainconverttoapistringexaFunc = unsafe extern "C" fn(*const c_char,*mut c_char,i32) -> i32;
-type DtwainconverttoapistringexwFunc = unsafe extern "C" fn(*const u16,*mut u16,i32) -> i32;
-type DtwainconverttoapistringwFunc = unsafe extern "C" fn(*const u16) -> *mut c_void;
-type DtwaincreateacquisitionarrayFunc = unsafe extern "C" fn() -> *mut c_void;
-type DtwaincreatepdftextelementFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwaindeletedibFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwaindestroyacquisitionarrayFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwaindestroypdftextelementFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwaindisableappwindowFunc = unsafe extern "C" fn(*const c_void,i32) -> i32;
-type DtwainenableautoborderdetectFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainenableautobrightFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainenableautodeskewFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainenableautofeedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainenableautorotateFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainenableautoscanFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainenableautomaticsensemediumFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainenableduplexFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainenablefeederFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainenableindicatorFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainenablejobfilehandlingFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainenablelampFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainenablemsgnotifyFunc = unsafe extern "C" fn(i32) -> i32;
-type DtwainenablepatchdetectFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainenablepeekmessageloopFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainenableprinterFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainenablethumbnailFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainenabletripletsnotifyFunc = unsafe extern "C" fn(i32) -> i32;
-type DtwainendthreadFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainendtwainsessionFunc = unsafe extern "C" fn() -> i32;
-type DtwainenumalarmvolumesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
-type DtwainenumalarmvolumesexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
-type DtwainenumalarmsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumalarmsexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumaudioxfermechsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumaudioxfermechsexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumautofeedvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumautofeedvaluesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumautomaticcapturesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
-type DtwainenumautomaticcapturesexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
-type DtwainenumautomaticsensemediumFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumautomaticsensemediumexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumbitdepthsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumbitdepthsexFunc = unsafe extern "C" fn(*mut c_void,i32,*mut *mut c_void) -> i32;
-type Dtwainenumbitdepthsex2Func = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
-type DtwainenumbottomcamerasFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumbottomcamerasexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumbrightnessvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
-type DtwainenumbrightnessvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
-type DtwainenumcamerasFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumcamerasexFunc = unsafe extern "C" fn(*mut c_void,i32,*mut *mut c_void) -> i32;
-type Dtwainenumcamerasex2Func = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type Dtwainenumcamerasex3Func = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
-type DtwainenumcompressiontypesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumcompressiontypesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type Dtwainenumcompressiontypesex2Func = unsafe extern "C" fn(*mut c_void,i32,i32) -> *mut c_void;
-type DtwainenumcontrastvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
-type DtwainenumcontrastvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
-type DtwainenumcustomcapsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type Dtwainenumcustomcapsex2Func = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumdoublefeeddetectlengthsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
-type DtwainenumdoublefeeddetectlengthsexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
-type DtwainenumdoublefeeddetectvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumdoublefeeddetectvaluesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumextimageinfotypesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumextimageinfotypesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumextendedcapsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumextendedcapsexFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type Dtwainenumextendedcapsex2Func = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumfiletypebitsperpixelFunc = unsafe extern "C" fn(i32,*mut *mut c_void) -> i32;
-type DtwainenumfilexferformatsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumfilexferformatsexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumhalftonesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumhalftonesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumhighlightvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
-type DtwainenumhighlightvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
-type DtwainenumjobcontrolsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumjobcontrolsexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumlightpathsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumlightpathsexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumlightsourcesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumlightsourcesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenummaxbuffersFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
-type DtwainenummaxbuffersexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
-type DtwainenumnoisefiltersFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumnoisefiltersexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumocrinterfacesFunc = unsafe extern "C" fn(*mut *mut c_void) -> i32;
-type DtwainenumocrsupportedcapsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumorientationsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumorientationsexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumoverscanvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumoverscanvaluesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumpapersizesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumpapersizesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumpatchcodesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumpatchcodesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumpatchmaxprioritiesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumpatchmaxprioritiesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumpatchmaxretriesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumpatchmaxretriesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumpatchprioritiesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumpatchprioritiesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumpatchsearchmodesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumpatchsearchmodesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumpatchtimeoutvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumpatchtimeoutvaluesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumpixeltypesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumpixeltypesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumprinterstringmodesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumprinterstringmodesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumresolutionvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
-type DtwainenumresolutionvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
-type DtwainenumshadowvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
-type DtwainenumshadowvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
-type DtwainenumsourceunitsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumsourceunitsexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumsourcevaluesFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*mut *mut c_void,i32) -> i32;
-type DtwainenumsourcevaluesaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*mut *mut c_void,i32) -> i32;
-type DtwainenumsourcevalueswFunc = unsafe extern "C" fn(*mut c_void,*const u16,*mut *mut c_void,i32) -> i32;
-type DtwainenumsourcesFunc = unsafe extern "C" fn(*mut *mut c_void) -> i32;
-type DtwainenumsourcesexFunc = unsafe extern "C" fn() -> *mut c_void;
-type DtwainenumsupportedcapsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumsupportedcapsexFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type Dtwainenumsupportedcapsex2Func = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumsupportedextimageinfoFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumsupportedextimageinfoexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumsupportedfiletypesFunc = unsafe extern "C" fn() -> *mut c_void;
-type DtwainenumsupportedmultipagefiletypesFunc = unsafe extern "C" fn() -> *mut c_void;
-type DtwainenumsupportedsinglepagefiletypesFunc = unsafe extern "C" fn() -> *mut c_void;
-type DtwainenumthresholdvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
-type DtwainenumthresholdvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
-type DtwainenumtopcamerasFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumtopcamerasexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumtwainprintersFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumtwainprintersarrayFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumtwainprintersarrayexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumtwainprintersexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainenumxresolutionvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
-type DtwainenumxresolutionvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
-type DtwainenumyresolutionvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
-type DtwainenumyresolutionvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
-type DtwainexecuteocrFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32,i32) -> i32;
-type DtwainexecuteocraFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32,i32) -> i32;
-type DtwainexecuteocrwFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32) -> i32;
-type DtwainfeedpageFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainflipbitmapFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainflushacquiredpagesFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainforceacquirebitdepthFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainforcescanonnouiFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainframecreateFunc = unsafe extern "C" fn(f64,f64,f64,f64) -> *mut c_void;
-type DtwainframecreatestringFunc = unsafe extern "C" fn(*const c_char,*const c_char,*const c_char,*const c_char) -> *mut c_void;
-type DtwainframecreatestringaFunc = unsafe extern "C" fn(*const c_char,*const c_char,*const c_char,*const c_char) -> *mut c_void;
-type DtwainframecreatestringwFunc = unsafe extern "C" fn(*const u16,*const u16,*const u16,*const u16) -> *mut c_void;
-type DtwainframedestroyFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainframegetallFunc = unsafe extern "C" fn(*mut c_void,*mut f64,*mut f64,*mut f64,*mut f64) -> i32;
-type DtwainframegetallstringFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,*mut c_char,*mut c_char,*mut c_char) -> i32;
-type DtwainframegetallstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,*mut c_char,*mut c_char,*mut c_char) -> i32;
-type DtwainframegetallstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16,*mut u16,*mut u16,*mut u16) -> i32;
-type DtwainframegetvalueFunc = unsafe extern "C" fn(*mut c_void,i32,*mut f64) -> i32;
-type DtwainframegetvaluestringFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char) -> i32;
-type DtwainframegetvaluestringaFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char) -> i32;
-type DtwainframegetvaluestringwFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16) -> i32;
-type DtwainframeisvalidFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainframesetallFunc = unsafe extern "C" fn(*mut c_void,f64,f64,f64,f64) -> i32;
-type DtwainframesetallstringFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*const c_char,*const c_char,*const c_char) -> i32;
-type DtwainframesetallstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*const c_char,*const c_char,*const c_char) -> i32;
-type DtwainframesetallstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,*const u16,*const u16,*const u16) -> i32;
-type DtwainframesetvalueFunc = unsafe extern "C" fn(*mut c_void,i32,f64) -> i32;
-type DtwainframesetvaluestringFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char) -> i32;
-type DtwainframesetvaluestringaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char) -> i32;
-type DtwainframesetvaluestringwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
-type DtwainfreeextimageinfoFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainfreememoryFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainfreememoryexFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwaingetapihandlestatusFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwaingetacquireareaFunc = unsafe extern "C" fn(*mut c_void,i32,*mut *mut c_void) -> i32;
-type Dtwaingetacquirearea2Func = unsafe extern "C" fn(*mut c_void,*mut f64,*mut f64,*mut f64,*mut f64,*mut i32) -> i32;
-type Dtwaingetacquirearea2stringFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,*mut c_char,*mut c_char,*mut c_char,*mut i32) -> i32;
-type Dtwaingetacquirearea2stringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,*mut c_char,*mut c_char,*mut c_char,*mut i32) -> i32;
-type Dtwaingetacquirearea2stringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16,*mut u16,*mut u16,*mut u16,*mut i32) -> i32;
-type DtwaingetacquireareaexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
-type DtwaingetacquiremetricsFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32) -> i32;
-type DtwaingetacquirestripbufferFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwaingetacquirestripdataFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut u32,*mut u32,*mut u32,*mut u32,*mut u32,*mut u32) -> i32;
-type DtwaingetacquirestripsizesFunc = unsafe extern "C" fn(*mut c_void,*mut u32,*mut u32,*mut u32) -> i32;
-type DtwaingetacquiredimageFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> *mut c_void;
-type DtwaingetacquiredimagearrayFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
-type DtwaingetactivedsmpathFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
-type DtwaingetactivedsmpathaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
-type DtwaingetactivedsmpathwFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
-type DtwaingetactivedsmversioninfoFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
-type DtwaingetactivedsmversioninfoaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
-type DtwaingetactivedsmversioninfowFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
-type DtwaingetalarmvolumeFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
-type DtwaingetallsourcedibsFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwaingetappinfoFunc = unsafe extern "C" fn(*mut c_char,*mut c_char,*mut c_char,*mut c_char) -> i32;
-type DtwaingetappinfoaFunc = unsafe extern "C" fn(*mut c_char,*mut c_char,*mut c_char,*mut c_char) -> i32;
-type DtwaingetappinfowFunc = unsafe extern "C" fn(*mut u16,*mut u16,*mut u16,*mut u16) -> i32;
-type DtwaingetauthorFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingetauthoraFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingetauthorwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
-type DtwaingetbatteryminutesFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
-type DtwaingetbatterypercentFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
-type DtwaingetbitdepthFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
-type DtwaingetblankpageautodetectionFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwaingetbrightnessFunc = unsafe extern "C" fn(*mut c_void,*mut f64) -> i32;
-type DtwaingetbrightnessstringFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingetbrightnessstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingetbrightnessstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
-type DtwaingetbufferedtransferinfoFunc = unsafe extern "C" fn(*mut c_void,*mut u32,*mut u32,*mut u32,*mut u32,*mut u32,*mut u32,*mut u32,*mut u32,*mut u32) -> *mut c_void;
-type DtwaingetcaparraytypeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwaingetcapcontainerFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type DtwaingetcapcontainerexFunc = unsafe extern "C" fn(i32,i32,*mut *mut c_void) -> i32;
-type Dtwaingetcapcontainerex2Func = unsafe extern "C" fn(i32,i32) -> *mut c_void;
-type DtwaingetcapdatatypeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwaingetcapfromnameFunc = unsafe extern "C" fn(*const c_char) -> i32;
-type DtwaingetcapfromnameaFunc = unsafe extern "C" fn(*const c_char) -> i32;
-type DtwaingetcapfromnamewFunc = unsafe extern "C" fn(*const u16) -> i32;
-type DtwaingetcapoperationsFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32) -> i32;
-type DtwaingetcapvaluesFunc = unsafe extern "C" fn(*mut c_void,i32,i32,*mut *mut c_void) -> i32;
-type DtwaingetcapvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32,*mut *mut c_void) -> i32;
-type Dtwaingetcapvaluesex2Func = unsafe extern "C" fn(*mut c_void,i32,i32,i32,i32,*mut *mut c_void) -> i32;
-type DtwaingetcaptionFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingetcaptionaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingetcaptionwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
-type DtwaingetcompressionsizeFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
-type DtwaingetcompressiontypeFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
-type DtwaingetconditioncodestringFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
-type DtwaingetconditioncodestringaFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
-type DtwaingetconditioncodestringwFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
-type DtwaingetcontrastFunc = unsafe extern "C" fn(*mut c_void,*mut f64) -> i32;
-type DtwaingetcontraststringFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingetcontraststringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingetcontraststringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
-type DtwaingetcountryFunc = unsafe extern "C" fn() -> i32;
-type DtwaingetcurrentacquiredimageFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwaingetcurrentfilenameFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingetcurrentfilenameaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingetcurrentfilenamewFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
-type DtwaingetcurrentpagenumFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwaingetcurrentretrycountFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwaingetcurrenttwaintripletFunc = unsafe extern "C" fn(*mut *mut c_void,*mut *mut c_void,*mut i32,*mut i32,*mut i32,*mut i64) -> i32;
-type DtwaingetcustomdsdataFunc = unsafe extern "C" fn(*mut c_void,*mut u8,u32,*mut u32,i32) -> *mut c_void;
-type DtwaingetdsmfullnameFunc = unsafe extern "C" fn(i32,*mut c_char,i32,*mut i32) -> i32;
-type DtwaingetdsmfullnameaFunc = unsafe extern "C" fn(i32,*mut c_char,i32,*mut i32) -> i32;
-type DtwaingetdsmfullnamewFunc = unsafe extern "C" fn(i32,*mut u16,i32,*mut i32) -> i32;
-type DtwaingetdsmsearchorderFunc = unsafe extern "C" fn() -> i32;
-type DtwaingetdtwainhandleFunc = unsafe extern "C" fn() -> *mut c_void;
-type DtwaingetdeviceeventFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
-type DtwaingetdeviceeventexFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut *mut c_void) -> i32;
-type DtwaingetdeviceeventinfoFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void) -> i32;
-type DtwaingetdevicenotificationsFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
-type DtwaingetdevicetimedateFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingetdevicetimedateaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingetdevicetimedatewFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
-type DtwaingetdoublefeeddetectlengthFunc = unsafe extern "C" fn(*mut c_void,*mut f64,i32) -> i32;
-type DtwaingetdoublefeeddetectvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwaingetduplextypeFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
-type DtwaingeterrorbufferFunc = unsafe extern "C" fn(*mut *mut c_void) -> i32;
-type DtwaingeterrorbufferthresholdFunc = unsafe extern "C" fn() -> i32;
-type DtwaingeterrorstringFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
-type DtwaingeterrorstringaFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
-type DtwaingeterrorstringwFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
-type DtwaingetextcapfromnameFunc = unsafe extern "C" fn(*const c_char) -> i32;
-type DtwaingetextcapfromnameaFunc = unsafe extern "C" fn(*const c_char) -> i32;
-type DtwaingetextcapfromnamewFunc = unsafe extern "C" fn(*const u16) -> i32;
-type DtwaingetextimageinfoFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwaingetextimageinfodataFunc = unsafe extern "C" fn(*mut c_void,i32,*mut *mut c_void) -> i32;
-type DtwaingetextimageinfodataexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
-type DtwaingetextimageinfoitemFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32,*mut i32,*mut i32) -> i32;
-type DtwaingetextimageinfoitemexFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32,*mut i32,*mut i32,*mut i32) -> i32;
-type DtwaingetextnamefromcapFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
-type DtwaingetextnamefromcapaFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
-type DtwaingetextnamefromcapwFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
-type DtwaingetfeederalignmentFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
-type DtwaingetfeederfuncsFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwaingetfeederorderFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
-type DtwaingetfeederwaittimeFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwaingetfilecompressiontypeFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwaingetfiletypeextensionsFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
-type DtwaingetfiletypeextensionsaFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
-type DtwaingetfiletypeextensionswFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
-type DtwaingetfiletypenameFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
-type DtwaingetfiletypenameaFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
-type DtwaingetfiletypenamewFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
-type DtwaingethalftoneFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingethalftoneaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingethalftonewFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
-type DtwaingethighlightFunc = unsafe extern "C" fn(*mut c_void,*mut f64) -> i32;
-type DtwaingethighlightstringFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingethighlightstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingethighlightstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
-type DtwaingetimageinfoFunc = unsafe extern "C" fn(*mut c_void,*mut f64,*mut f64,*mut i32,*mut i32,*mut i32,*mut *mut c_void,*mut i32,*mut i32,*mut i32,*mut i32) -> i32;
-type DtwaingetimageinfostringFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,*mut c_char,*mut i32,*mut i32,*mut i32,*mut *mut c_void,*mut i32,*mut i32,*mut i32,*mut i32) -> i32;
-type DtwaingetimageinfostringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,*mut c_char,*mut i32,*mut i32,*mut i32,*mut *mut c_void,*mut i32,*mut i32,*mut i32,*mut i32) -> i32;
-type DtwaingetimageinfostringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16,*mut u16,*mut i32,*mut i32,*mut i32,*mut *mut c_void,*mut i32,*mut i32,*mut i32,*mut i32) -> i32;
-type DtwaingetjobcontrolFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
-type DtwaingetjpegvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32) -> i32;
-type DtwaingetjpegxrvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32) -> i32;
-type DtwaingetlanguageFunc = unsafe extern "C" fn() -> i32;
-type DtwaingetlasterrorFunc = unsafe extern "C" fn() -> i32;
-type DtwaingetlibrarypathFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
-type DtwaingetlibrarypathaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
-type DtwaingetlibrarypathwFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
-type DtwaingetlightpathFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
-type DtwaingetlightsourceFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
-type DtwaingetlightsourcesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwaingetmanualduplexcountFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32) -> i32;
-type DtwaingetmaxacquisitionsFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwaingetmaxbuffersFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
-type DtwaingetmaxpagestoacquireFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwaingetmaxretryattemptsFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwaingetnamefromcapFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
-type DtwaingetnamefromcapaFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
-type DtwaingetnamefromcapwFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
-type DtwaingetnoisefilterFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
-type DtwaingetnumacquiredimagesFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwaingetnumacquisitionsFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwaingetocrcapvaluesFunc = unsafe extern "C" fn(*mut c_void,i32,i32,*mut *mut c_void) -> i32;
-type DtwaingetocrerrorstringFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char,i32) -> i32;
-type DtwaingetocrerrorstringaFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char,i32) -> i32;
-type DtwaingetocrerrorstringwFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16,i32) -> i32;
-type DtwaingetocrlasterrorFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwaingetocrmajorminorversionFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32) -> i32;
-type DtwaingetocrmanufacturerFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingetocrmanufactureraFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingetocrmanufacturerwFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
-type DtwaingetocrproductfamilyFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingetocrproductfamilyaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingetocrproductfamilywFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
-type DtwaingetocrproductnameFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingetocrproductnameaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingetocrproductnamewFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
-type DtwaingetocrtextFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char,i32,*mut i32,i32) -> *mut c_void;
-type DtwaingetocrtextaFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char,i32,*mut i32,i32) -> *mut c_void;
-type DtwaingetocrtextinfofloatFunc = unsafe extern "C" fn(*mut c_void,i32,i32,*mut f64) -> i32;
-type DtwaingetocrtextinfofloatexFunc = unsafe extern "C" fn(*mut c_void,i32,*mut f64,i32) -> i32;
-type DtwaingetocrtextinfohandleFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
-type DtwaingetocrtextinfolongFunc = unsafe extern "C" fn(*mut c_void,i32,i32,*mut i32) -> i32;
-type DtwaingetocrtextinfolongexFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32,i32) -> i32;
-type DtwaingetocrtextwFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16,i32,*mut i32,i32) -> *mut c_void;
-type DtwaingetocrversioninfoFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingetocrversioninfoaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingetocrversioninfowFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
-type DtwaingetorientationFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
-type DtwaingetoverscanFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
-type DtwaingetpdftextelementfloatFunc = unsafe extern "C" fn(*mut c_void,*mut f64,*mut f64,i32) -> i32;
-type DtwaingetpdftextelementlongFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32,i32) -> i32;
-type DtwaingetpdftextelementstringFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32,i32) -> i32;
-type DtwaingetpdftextelementstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32,i32) -> i32;
-type DtwaingetpdftextelementstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32,i32) -> i32;
-type Dtwaingetpdftype1fontnameFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
-type Dtwaingetpdftype1fontnameaFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
-type Dtwaingetpdftype1fontnamewFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
-type DtwaingetpapersizeFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
-type DtwaingetpapersizenameFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
-type DtwaingetpapersizenameaFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
-type DtwaingetpapersizenamewFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
-type DtwaingetpatchmaxprioritiesFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
-type DtwaingetpatchmaxretriesFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
-type DtwaingetpatchprioritiesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwaingetpatchsearchmodeFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
-type DtwaingetpatchtimeoutFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
-type DtwaingetpixelflavorFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
-type DtwaingetpixeltypeFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32,i32) -> i32;
-type DtwaingetprinterFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
-type DtwaingetprinterstartnumberFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
-type DtwaingetprinterstringmodeFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i32) -> i32;
-type DtwaingetprinterstringsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwaingetprintersuffixstringFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingetprintersuffixstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingetprintersuffixstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
-type DtwaingetregisteredmsgFunc = unsafe extern "C" fn() -> i32;
-type DtwaingetresolutionFunc = unsafe extern "C" fn(*mut c_void,*mut f64) -> i32;
-type DtwaingetresolutionstringFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingetresolutionstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingetresolutionstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
-type DtwaingetresourcestringFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
-type DtwaingetresourcestringaFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
-type DtwaingetresourcestringwFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
-type DtwaingetrotationFunc = unsafe extern "C" fn(*mut c_void,*mut f64) -> i32;
-type DtwaingetrotationstringFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingetrotationstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingetrotationstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
-type DtwaingetsavefilenameFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingetsavefilenameaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingetsavefilenamewFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
-type DtwaingetsavedfilescountFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwaingetsessiondetailsFunc = unsafe extern "C" fn(*mut c_char,i32,i32,i32) -> i32;
-type DtwaingetsessiondetailsaFunc = unsafe extern "C" fn(*mut c_char,i32,i32,i32) -> i32;
-type DtwaingetsessiondetailswFunc = unsafe extern "C" fn(*mut u16,i32,i32,i32) -> i32;
-type DtwaingetshadowFunc = unsafe extern "C" fn(*mut c_void,*mut f64) -> i32;
-type DtwaingetshadowstringFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingetshadowstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingetshadowstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
-type DtwaingetshortversionstringFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
-type DtwaingetshortversionstringaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
-type DtwaingetshortversionstringwFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
-type DtwaingetsourceacquisitionsFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwaingetsourcedetailsFunc = unsafe extern "C" fn(*const c_char,*mut c_char,i32,i32,i32) -> i32;
-type DtwaingetsourcedetailsaFunc = unsafe extern "C" fn(*const c_char,*mut c_char,i32,i32,i32) -> i32;
-type DtwaingetsourcedetailswFunc = unsafe extern "C" fn(*const u16,*mut u16,i32,i32,i32) -> i32;
-type DtwaingetsourceidFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwaingetsourceidexFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> *mut c_void;
-type DtwaingetsourcemanufacturerFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingetsourcemanufactureraFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingetsourcemanufacturerwFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
-type DtwaingetsourceproductfamilyFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingetsourceproductfamilyaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingetsourceproductfamilywFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
-type DtwaingetsourceproductnameFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingetsourceproductnameaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingetsourceproductnamewFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
-type DtwaingetsourceunitFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
-type DtwaingetsourceversioninfoFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingetsourceversioninfoaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,i32) -> i32;
-type DtwaingetsourceversioninfowFunc = unsafe extern "C" fn(*mut c_void,*mut u16,i32) -> i32;
-type DtwaingetsourceversionnumberFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32) -> i32;
-type DtwaingetstaticlibversionFunc = unsafe extern "C" fn() -> i32;
-type DtwaingettempfiledirectoryFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
-type DtwaingettempfiledirectoryaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
-type DtwaingettempfiledirectorywFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
-type DtwaingetthresholdFunc = unsafe extern "C" fn(*mut c_void,*mut f64) -> i32;
-type DtwaingetthresholdstringFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingetthresholdstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingetthresholdstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
-type DtwaingettimedateFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingettimedateaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingettimedatewFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
-type DtwaingettwainappidFunc = unsafe extern "C" fn() -> *mut c_void;
-type DtwaingettwainappidexFunc = unsafe extern "C" fn(*mut *mut c_void) -> *mut c_void;
-type DtwaingettwainavailabilityFunc = unsafe extern "C" fn() -> i32;
-type DtwaingettwainavailabilityexFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
-type DtwaingettwainavailabilityexaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
-type DtwaingettwainavailabilityexwFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
-type DtwaingettwaincountrynameFunc = unsafe extern "C" fn(i32,*mut c_char) -> i32;
-type DtwaingettwaincountrynameaFunc = unsafe extern "C" fn(i32,*mut c_char) -> i32;
-type DtwaingettwaincountrynamewFunc = unsafe extern "C" fn(i32,*mut u16) -> i32;
-type DtwaingettwaincountryvalueFunc = unsafe extern "C" fn(*const c_char) -> i32;
-type DtwaingettwaincountryvalueaFunc = unsafe extern "C" fn(*const c_char) -> i32;
-type DtwaingettwaincountryvaluewFunc = unsafe extern "C" fn(*const u16) -> i32;
-type DtwaingettwainhwndFunc = unsafe extern "C" fn() -> *const c_void;
-type DtwaingettwainidfromnameFunc = unsafe extern "C" fn(*const c_char) -> i32;
-type DtwaingettwainidfromnameaFunc = unsafe extern "C" fn(*const c_char) -> i32;
-type DtwaingettwainidfromnamewFunc = unsafe extern "C" fn(*const u16) -> i32;
-type DtwaingettwainlanguagenameFunc = unsafe extern "C" fn(i32,*mut c_char) -> i32;
-type DtwaingettwainlanguagenameaFunc = unsafe extern "C" fn(i32,*mut c_char) -> i32;
-type DtwaingettwainlanguagenamewFunc = unsafe extern "C" fn(i32,*mut u16) -> i32;
-type DtwaingettwainlanguagevalueFunc = unsafe extern "C" fn(*const c_char) -> i32;
-type DtwaingettwainlanguagevalueaFunc = unsafe extern "C" fn(*const c_char) -> i32;
-type DtwaingettwainlanguagevaluewFunc = unsafe extern "C" fn(*const u16) -> i32;
-type DtwaingettwainmodeFunc = unsafe extern "C" fn() -> i32;
-type DtwaingettwainnamefromconstantFunc = unsafe extern "C" fn(i32,i32,*mut c_char,i32) -> i32;
-type DtwaingettwainnamefromconstantaFunc = unsafe extern "C" fn(i32,i32,*mut c_char,i32) -> i32;
-type DtwaingettwainnamefromconstantwFunc = unsafe extern "C" fn(i32,i32,*mut u16,i32) -> i32;
-type DtwaingettwainstringnameFunc = unsafe extern "C" fn(i32,i32,*mut c_char,i32) -> i32;
-type DtwaingettwainstringnameaFunc = unsafe extern "C" fn(i32,i32,*mut c_char,i32) -> i32;
-type DtwaingettwainstringnamewFunc = unsafe extern "C" fn(i32,i32,*mut u16,i32) -> i32;
-type DtwaingettwaintimeoutFunc = unsafe extern "C" fn() -> i32;
-type DtwaingetversionFunc = unsafe extern "C" fn(*mut i32,*mut i32,*mut i32) -> i32;
-type DtwaingetversioncopyrightFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
-type DtwaingetversioncopyrightaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
-type DtwaingetversioncopyrightwFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
-type DtwaingetversionexFunc = unsafe extern "C" fn(*mut i32,*mut i32,*mut i32,*mut i32) -> i32;
-type DtwaingetversioninfoFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
-type DtwaingetversioninfoaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
-type DtwaingetversioninfowFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
-type DtwaingetversionstringFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
-type DtwaingetversionstringaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
-type DtwaingetversionstringwFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
-type DtwaingetwindowsversioninfoFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
-type DtwaingetwindowsversioninfoaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
-type DtwaingetwindowsversioninfowFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
-type DtwaingetxresolutionFunc = unsafe extern "C" fn(*mut c_void,*mut f64) -> i32;
-type DtwaingetxresolutionstringFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingetxresolutionstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingetxresolutionstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
-type DtwaingetyresolutionFunc = unsafe extern "C" fn(*mut c_void,*mut f64) -> i32;
-type DtwaingetyresolutionstringFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingetyresolutionstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
-type DtwaingetyresolutionstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
-type DtwaininitextimageinfoFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwaininitimagefileappendFunc = unsafe extern "C" fn(*const c_char,i32) -> i32;
-type DtwaininitimagefileappendaFunc = unsafe extern "C" fn(*const c_char,i32) -> i32;
-type DtwaininitimagefileappendwFunc = unsafe extern "C" fn(*const u16,i32) -> i32;
-type DtwaininitocrinterfaceFunc = unsafe extern "C" fn() -> i32;
-type DtwainisacquiringFunc = unsafe extern "C" fn() -> i32;
-type DtwainisaudioxfersupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainisautoborderdetectenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisautoborderdetectsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisautobrightenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisautobrightsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisautodeskewenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisautodeskewsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisautofeedenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisautofeedsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisautorotateenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisautorotatesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisautoscanenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisautomaticsensemediumenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisautomaticsensemediumsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisblankpagedetectiononFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisbufferedtilemodeonFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisbufferedtilemodesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainiscapsupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainiscompressionsupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainiscustomdsdatasupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisdibblankFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
-type DtwainisdibblankstringFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainisdibblankstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainisdibblankstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainisdeviceeventsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisdeviceonlineFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisdoublefeeddetectlengthsupportedFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
-type DtwainisdoublefeeddetectsupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainisduplexenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisduplexsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisextimageinfosupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisfeederenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisfeederloadedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisfeedersensitiveFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisfeedersupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisfilesystemsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisfilexfersupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainisiafieldalastpagesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisiafieldalevelsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisiafieldaprintformatsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisiafieldavaluesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisiafieldblastpagesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisiafieldblevelsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisiafieldbprintformatsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisiafieldbvaluesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisiafieldclastpagesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisiafieldclevelsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisiafieldcprintformatsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisiafieldcvaluesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisiafielddlastpagesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisiafielddlevelsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisiafielddprintformatsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisiafielddvaluesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisiafieldelastpagesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisiafieldelevelsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisiafieldeprintformatsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisiafieldevaluesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisimageaddressingsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisindicatorenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisindicatorsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisinitializedFunc = unsafe extern "C" fn() -> i32;
-type DtwainisjpegsupportedFunc = unsafe extern "C" fn() -> i32;
-type DtwainisjobcontrolsupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainislampenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainislampsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainislightpathsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainislightsourcesupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainismaxbufferssupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainismemfilexfersupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainismsgnotifyenabledFunc = unsafe extern "C" fn() -> i32;
-type DtwainisnotifytripletsenabledFunc = unsafe extern "C" fn() -> i32;
-type DtwainisocrengineactivatedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisopensourcesonselectFunc = unsafe extern "C" fn() -> i32;
-type DtwainisorientationsupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainisoverscansupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainispdfsupportedFunc = unsafe extern "C" fn() -> i32;
-type DtwainispngsupportedFunc = unsafe extern "C" fn() -> i32;
-type DtwainispaperdetectableFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainispapersizesupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainispatchcapssupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainispatchdetectenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainispatchsupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainispeekmessageloopenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainispixeltypesupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainisprinterenabledFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainisprintersupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisrotationsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainissessionenabledFunc = unsafe extern "C" fn() -> i32;
-type DtwainisskipimageinfoerrorFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainissourceacquiringFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainissourceacquiringexFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainissourceinuionlymodeFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainissourceopenFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainissourceselectedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainissourcevalidFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainistiffsupportedFunc = unsafe extern "C" fn() -> i32;
-type DtwainisthumbnailenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisthumbnailsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainistwainavailableFunc = unsafe extern "C" fn() -> i32;
-type DtwainistwainavailableexFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
-type DtwainistwainavailableexaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
-type DtwainistwainavailableexwFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
-type DtwainisuicontrollableFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisuienabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainisuionlysupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainloadcustomstringresourcesFunc = unsafe extern "C" fn(*const c_char) -> i32;
-type DtwainloadcustomstringresourcesaFunc = unsafe extern "C" fn(*const c_char) -> i32;
-type DtwainloadcustomstringresourcesexFunc = unsafe extern "C" fn(*const c_char,i32) -> i32;
-type DtwainloadcustomstringresourcesexaFunc = unsafe extern "C" fn(*const c_char,i32) -> i32;
-type DtwainloadcustomstringresourcesexwFunc = unsafe extern "C" fn(*const u16,i32) -> i32;
-type DtwainloadcustomstringresourceswFunc = unsafe extern "C" fn(*const u16) -> i32;
-type DtwainloadlanguageresourceFunc = unsafe extern "C" fn(i32) -> i32;
-type DtwainlockmemoryFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainlockmemoryexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainlogmessageFunc = unsafe extern "C" fn(*const c_char) -> i32;
-type DtwainlogmessageaFunc = unsafe extern "C" fn(*const c_char) -> i32;
-type DtwainlogmessagewFunc = unsafe extern "C" fn(*const u16) -> i32;
-type DtwainmakergbFunc = unsafe extern "C" fn(i32,i32,i32) -> i32;
-type DtwainopensourceFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainopensourcesonselectFunc = unsafe extern "C" fn(i32) -> i32;
-type DtwainrangecreateFunc = unsafe extern "C" fn(i32) -> *mut c_void;
-type DtwainrangecreatefromcapFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
-type DtwainrangedestroyFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainrangeexpandFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainrangeexpandexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainrangegetallFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,*mut c_void,*mut c_void,*mut c_void,*mut c_void) -> i32;
-type DtwainrangegetallfloatFunc = unsafe extern "C" fn(*mut c_void,*mut f64,*mut f64,*mut f64,*mut f64,*mut f64) -> i32;
-type DtwainrangegetallfloatstringFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,*mut c_char,*mut c_char,*mut c_char,*mut c_char) -> i32;
-type DtwainrangegetallfloatstringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char,*mut c_char,*mut c_char,*mut c_char,*mut c_char) -> i32;
-type DtwainrangegetallfloatstringwFunc = unsafe extern "C" fn(*mut c_void,*mut u16,*mut u16,*mut u16,*mut u16,*mut u16) -> i32;
-type DtwainrangegetalllongFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut i32,*mut i32,*mut i32,*mut i32) -> i32;
-type DtwainrangegetcountFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainrangegetexpvalueFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void) -> i32;
-type DtwainrangegetexpvaluefloatFunc = unsafe extern "C" fn(*mut c_void,i32,*mut f64) -> i32;
-type DtwainrangegetexpvaluefloatstringFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char) -> i32;
-type DtwainrangegetexpvaluefloatstringaFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char) -> i32;
-type DtwainrangegetexpvaluefloatstringwFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16) -> i32;
-type DtwainrangegetexpvaluelongFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32) -> i32;
-type DtwainrangegetnearestvalueFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,*mut c_void,i32) -> i32;
-type DtwainrangegetposFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,*mut i32) -> i32;
-type DtwainrangegetposfloatFunc = unsafe extern "C" fn(*mut c_void,f64,*mut i32) -> i32;
-type DtwainrangegetposfloatstringFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*mut i32) -> i32;
-type DtwainrangegetposfloatstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*mut i32) -> i32;
-type DtwainrangegetposfloatstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,*mut i32) -> i32;
-type DtwainrangegetposlongFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32) -> i32;
-type DtwainrangegetvalueFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void) -> i32;
-type DtwainrangegetvaluefloatFunc = unsafe extern "C" fn(*mut c_void,i32,*mut f64) -> i32;
-type DtwainrangegetvaluefloatstringFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char) -> i32;
-type DtwainrangegetvaluefloatstringaFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char) -> i32;
-type DtwainrangegetvaluefloatstringwFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16) -> i32;
-type DtwainrangegetvaluelongFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32) -> i32;
-type DtwainrangeisvalidFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
-type DtwainrangenearestvaluefloatFunc = unsafe extern "C" fn(*mut c_void,f64,*mut f64,i32) -> i32;
-type DtwainrangenearestvaluefloatstringFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*mut c_char,i32) -> i32;
-type DtwainrangenearestvaluefloatstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*mut c_char,i32) -> i32;
-type DtwainrangenearestvaluefloatstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,*mut u16,i32) -> i32;
-type DtwainrangenearestvaluelongFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32,i32) -> i32;
-type DtwainrangesetallFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,*mut c_void,*mut c_void,*mut c_void,*mut c_void) -> i32;
-type DtwainrangesetallfloatFunc = unsafe extern "C" fn(*mut c_void,f64,f64,f64,f64,f64) -> i32;
-type DtwainrangesetallfloatstringFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*const c_char,*const c_char,*const c_char,*const c_char) -> i32;
-type DtwainrangesetallfloatstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*const c_char,*const c_char,*const c_char,*const c_char) -> i32;
-type DtwainrangesetallfloatstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,*const u16,*const u16,*const u16,*const u16) -> i32;
-type DtwainrangesetalllongFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32,i32,i32) -> i32;
-type DtwainrangesetvalueFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void) -> i32;
-type DtwainrangesetvaluefloatFunc = unsafe extern "C" fn(*mut c_void,i32,f64) -> i32;
-type DtwainrangesetvaluefloatstringFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char) -> i32;
-type DtwainrangesetvaluefloatstringaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char) -> i32;
-type DtwainrangesetvaluefloatstringwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
-type DtwainrangesetvaluelongFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type DtwainresetpdftextelementFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainrewindpageFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainselectdefaultocrengineFunc = unsafe extern "C" fn() -> *mut c_void;
-type DtwainselectdefaultsourceFunc = unsafe extern "C" fn() -> *mut c_void;
-type DtwainselectdefaultsourcewithopenFunc = unsafe extern "C" fn(i32) -> *mut c_void;
-type DtwainselectocrengineFunc = unsafe extern "C" fn() -> *mut c_void;
-type Dtwainselectocrengine2Func = unsafe extern "C" fn(*const c_void,*const c_char,i32,i32,i32) -> *mut c_void;
-type Dtwainselectocrengine2aFunc = unsafe extern "C" fn(*const c_void,*const c_char,i32,i32,i32) -> *mut c_void;
-type Dtwainselectocrengine2exFunc = unsafe extern "C" fn(*const c_void,*const c_char,i32,i32,*const c_char,*const c_char,*const c_char,i32) -> *mut c_void;
-type Dtwainselectocrengine2exaFunc = unsafe extern "C" fn(*const c_void,*const c_char,i32,i32,*const c_char,*const c_char,*const c_char,i32) -> *mut c_void;
-type Dtwainselectocrengine2exwFunc = unsafe extern "C" fn(*const c_void,*const u16,i32,i32,*const u16,*const u16,*const u16,i32) -> *mut c_void;
-type Dtwainselectocrengine2wFunc = unsafe extern "C" fn(*const c_void,*const u16,i32,i32,i32) -> *mut c_void;
-type DtwainselectocrenginebynameFunc = unsafe extern "C" fn(*const c_char) -> *mut c_void;
-type DtwainselectocrenginebynameaFunc = unsafe extern "C" fn(*const c_char) -> *mut c_void;
-type DtwainselectocrenginebynamewFunc = unsafe extern "C" fn(*const u16) -> *mut c_void;
-type DtwainselectsourceFunc = unsafe extern "C" fn() -> *mut c_void;
-type Dtwainselectsource2Func = unsafe extern "C" fn(*const c_void,*const c_char,i32,i32,i32) -> *mut c_void;
-type Dtwainselectsource2aFunc = unsafe extern "C" fn(*const c_void,*const c_char,i32,i32,i32) -> *mut c_void;
-type Dtwainselectsource2exFunc = unsafe extern "C" fn(*const c_void,*const c_char,i32,i32,*const c_char,*const c_char,*const c_char,i32) -> *mut c_void;
-type Dtwainselectsource2exaFunc = unsafe extern "C" fn(*const c_void,*const c_char,i32,i32,*const c_char,*const c_char,*const c_char,i32) -> *mut c_void;
-type Dtwainselectsource2exwFunc = unsafe extern "C" fn(*const c_void,*const u16,i32,i32,*const u16,*const u16,*const u16,i32) -> *mut c_void;
-type Dtwainselectsource2wFunc = unsafe extern "C" fn(*const c_void,*const u16,i32,i32,i32) -> *mut c_void;
-type DtwainselectsourcebynameFunc = unsafe extern "C" fn(*const c_char) -> *mut c_void;
-type DtwainselectsourcebynameaFunc = unsafe extern "C" fn(*const c_char) -> *mut c_void;
-type DtwainselectsourcebynamewFunc = unsafe extern "C" fn(*const u16) -> *mut c_void;
-type DtwainselectsourcebynamewithopenFunc = unsafe extern "C" fn(*const c_char,i32) -> *mut c_void;
-type DtwainselectsourcebynamewithopenaFunc = unsafe extern "C" fn(*const c_char,i32) -> *mut c_void;
-type DtwainselectsourcebynamewithopenwFunc = unsafe extern "C" fn(*const u16,i32) -> *mut c_void;
-type DtwainselectsourcewithopenFunc = unsafe extern "C" fn(i32) -> *mut c_void;
-type DtwainsetacquireareaFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void,*mut c_void) -> i32;
-type Dtwainsetacquirearea2Func = unsafe extern "C" fn(*mut c_void,f64,f64,f64,f64,i32,i32) -> i32;
-type Dtwainsetacquirearea2stringFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*const c_char,*const c_char,*const c_char,i32,i32) -> i32;
-type Dtwainsetacquirearea2stringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*const c_char,*const c_char,*const c_char,i32,i32) -> i32;
-type Dtwainsetacquirearea2stringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,*const u16,*const u16,*const u16,i32,i32) -> i32;
-type DtwainsetacquireimagenegativeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetacquireimagescaleFunc = unsafe extern "C" fn(*mut c_void,f64,f64) -> i32;
-type DtwainsetacquireimagescalestringFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*const c_char) -> i32;
-type DtwainsetacquireimagescalestringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*const c_char) -> i32;
-type DtwainsetacquireimagescalestringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,*const u16) -> i32;
-type DtwainsetacquirestripbufferFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
-type DtwainsetacquirestripsizeFunc = unsafe extern "C" fn(*mut c_void,u32) -> i32;
-type DtwainsetalarmvolumeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetalarmsFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
-type DtwainsetallcapstodefaultFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainsetappinfoFunc = unsafe extern "C" fn(*const c_char,*const c_char,*const c_char,*const c_char) -> i32;
-type DtwainsetappinfoaFunc = unsafe extern "C" fn(*const c_char,*const c_char,*const c_char,*const c_char) -> i32;
-type DtwainsetappinfowFunc = unsafe extern "C" fn(*const u16,*const u16,*const u16,*const u16) -> i32;
-type DtwainsetauthorFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetauthoraFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetauthorwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainsetavailableprintersFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetavailableprintersarrayFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
-type DtwainsetbitdepthFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type DtwainsetblankpagedetectionFunc = unsafe extern "C" fn(*mut c_void,f64,i32,i32) -> i32;
-type DtwainsetblankpagedetectionexFunc = unsafe extern "C" fn(*mut c_void,f64,i32,i32,i32) -> i32;
-type DtwainsetblankpagedetectionexstringFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32,i32,i32) -> i32;
-type DtwainsetblankpagedetectionexstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32,i32,i32) -> i32;
-type DtwainsetblankpagedetectionexstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32,i32) -> i32;
-type DtwainsetblankpagedetectionstringFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32,i32) -> i32;
-type DtwainsetblankpagedetectionstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32,i32) -> i32;
-type DtwainsetblankpagedetectionstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32) -> i32;
-type DtwainsetbrightnessFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
-type DtwainsetbrightnessstringFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetbrightnessstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetbrightnessstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainsetbufferedtilemodeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetcameraFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetcameraaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetcamerawFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainsetcapvaluesFunc = unsafe extern "C" fn(*mut c_void,i32,i32,*mut c_void) -> i32;
-type DtwainsetcapvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32,*mut c_void) -> i32;
-type Dtwainsetcapvaluesex2Func = unsafe extern "C" fn(*mut c_void,i32,i32,i32,i32,*mut c_void) -> i32;
-type DtwainsetcaptionFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetcaptionaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetcaptionwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainsetcompressiontypeFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type DtwainsetcontrastFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
-type DtwainsetcontraststringFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetcontraststringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetcontraststringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainsetcountryFunc = unsafe extern "C" fn(i32) -> i32;
-type DtwainsetcurrentretrycountFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetcustomdsdataFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,*const u8,u32,i32) -> i32;
-type DtwainsetdsmsearchorderFunc = unsafe extern "C" fn(i32) -> i32;
-type DtwainsetdsmsearchorderexFunc = unsafe extern "C" fn(*const c_char,*const c_char) -> i32;
-type DtwainsetdsmsearchorderexaFunc = unsafe extern "C" fn(*const c_char,*const c_char) -> i32;
-type DtwainsetdsmsearchorderexwFunc = unsafe extern "C" fn(*const u16,*const u16) -> i32;
-type DtwainsetdefaultsourceFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainsetdevicenotificationsFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetdevicetimedateFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetdevicetimedateaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetdevicetimedatewFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainsetdoublefeeddetectlengthFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
-type DtwainsetdoublefeeddetectlengthstringFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetdoublefeeddetectlengthstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetdoublefeeddetectlengthstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainsetdoublefeeddetectvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
-type DtwainsetdoublepagecountonduplexFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainseteojdetectvalueFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainseterrorbufferthresholdFunc = unsafe extern "C" fn(i32) -> i32;
-type DtwainseterrorcallbackFunc = unsafe extern "C" fn(i32) -> i32;
-type Dtwainseterrorcallback64Func = unsafe extern "C" fn(i64) -> i32;
-type DtwainsetfeederalignmentFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetfeederorderFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetfeederwaittimeFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type DtwainsetfileautoincrementFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32) -> i32;
-type DtwainsetfilecompressiontypeFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type DtwainsetfilesaveposFunc = unsafe extern "C" fn(*const c_void,*const c_char,i32,i32,i32) -> i32;
-type DtwainsetfilesaveposaFunc = unsafe extern "C" fn(*const c_void,*const c_char,i32,i32,i32) -> i32;
-type DtwainsetfilesaveposwFunc = unsafe extern "C" fn(*const c_void,*const u16,i32,i32,i32) -> i32;
-type DtwainsetfilexferformatFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type DtwainsethalftoneFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsethalftoneaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsethalftonewFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainsethighlightFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
-type DtwainsethighlightstringFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsethighlightstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsethighlightstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainsetjobcontrolFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type DtwainsetjpegvaluesFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type DtwainsetjpegxrvaluesFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type DtwainsetlanguageFunc = unsafe extern "C" fn(i32) -> i32;
-type DtwainsetlasterrorFunc = unsafe extern "C" fn(i32) -> i32;
-type DtwainsetlightpathFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetlightpathexFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
-type DtwainsetlightsourceFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetlightsourcesFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
-type DtwainsetloggercallbackFunc = unsafe extern "C" fn(i64) -> i32;
-type DtwainsetloggercallbackaFunc = unsafe extern "C" fn(i64) -> i32;
-type DtwainsetloggercallbackwFunc = unsafe extern "C" fn(i64) -> i32;
-type DtwainsetmanualduplexmodeFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type DtwainsetmaxacquisitionsFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetmaxbuffersFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetmaxretryattemptsFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetmultipagescanmodeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetnoisefilterFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetocrcapvaluesFunc = unsafe extern "C" fn(*mut c_void,i32,i32,*mut c_void) -> i32;
-type DtwainsetorientationFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type DtwainsetoverscanFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type DtwainsetpdfaesencryptionFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type DtwainsetpdfasciicompressionFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetpdfauthorFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetpdfauthoraFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetpdfauthorwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainsetpdfcompressionFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetpdfcreatorFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetpdfcreatoraFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetpdfcreatorwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainsetpdfencryptionFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char,*const c_char,u32,i32) -> i32;
-type DtwainsetpdfencryptionaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char,*const c_char,u32,i32) -> i32;
-type DtwainsetpdfencryptionwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16,*const u16,u32,i32) -> i32;
-type DtwainsetpdfjpegqualityFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetpdfkeywordsFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetpdfkeywordsaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetpdfkeywordswFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainsetpdfocrconversionFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32,i32,i32) -> i32;
-type DtwainsetpdfocrmodeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetpdforientationFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetpdfpagescaleFunc = unsafe extern "C" fn(*mut c_void,i32,f64,f64) -> i32;
-type DtwainsetpdfpagescalestringFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char,*const c_char) -> i32;
-type DtwainsetpdfpagescalestringaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char,*const c_char) -> i32;
-type DtwainsetpdfpagescalestringwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16,*const u16) -> i32;
-type DtwainsetpdfpagesizeFunc = unsafe extern "C" fn(*mut c_void,i32,f64,f64) -> i32;
-type DtwainsetpdfpagesizestringFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char,*const c_char) -> i32;
-type DtwainsetpdfpagesizestringaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char,*const c_char) -> i32;
-type DtwainsetpdfpagesizestringwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16,*const u16) -> i32;
-type DtwainsetpdfpolarityFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetpdfproducerFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetpdfproduceraFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetpdfproducerwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainsetpdfsubjectFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetpdfsubjectaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetpdfsubjectwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainsetpdftextelementfloatFunc = unsafe extern "C" fn(*mut c_void,f64,f64,i32) -> i32;
-type DtwainsetpdftextelementlongFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32) -> i32;
-type DtwainsetpdftextelementstringFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32) -> i32;
-type DtwainsetpdftextelementstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32) -> i32;
-type DtwainsetpdftextelementstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32) -> i32;
-type DtwainsetpdftitleFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetpdftitleaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetpdftitlewFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainsetpapersizeFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type DtwainsetpatchmaxprioritiesFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetpatchmaxretriesFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetpatchprioritiesFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
-type DtwainsetpatchsearchmodeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetpatchtimeoutFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetpixelflavorFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetpixeltypeFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32) -> i32;
-type DtwainsetpostscripttitleFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetpostscripttitleaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetpostscripttitlewFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainsetpostscripttypeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetprinterFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type DtwainsetprinterexFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type DtwainsetprinterstartnumberFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsetprinterstringmodeFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
-type DtwainsetprinterstringsFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,*mut i32) -> i32;
-type DtwainsetprintersuffixstringFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetprintersuffixstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetprintersuffixstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainsetquerycapsupportFunc = unsafe extern "C" fn(i32) -> i32;
-type DtwainsetresolutionFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
-type DtwainsetresolutionstringFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetresolutionstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetresolutionstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainsetresourcepathFunc = unsafe extern "C" fn(*const c_char) -> i32;
-type DtwainsetresourcepathaFunc = unsafe extern "C" fn(*const c_char) -> i32;
-type DtwainsetresourcepathwFunc = unsafe extern "C" fn(*const u16) -> i32;
-type DtwainsetrotationFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
-type DtwainsetrotationstringFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetrotationstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetrotationstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainsetsavefilenameFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetsavefilenameaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetsavefilenamewFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainsetshadowFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
-type DtwainsetshadowstringFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetshadowstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetshadowstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainsetsourceunitFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsettiffcompresstypeFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsettiffinvertFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainsettempfiledirectoryFunc = unsafe extern "C" fn(*const c_char) -> i32;
-type DtwainsettempfiledirectoryaFunc = unsafe extern "C" fn(*const c_char) -> i32;
-type DtwainsettempfiledirectoryexFunc = unsafe extern "C" fn(*const c_char,i32) -> i32;
-type DtwainsettempfiledirectoryexaFunc = unsafe extern "C" fn(*const c_char,i32) -> i32;
-type DtwainsettempfiledirectoryexwFunc = unsafe extern "C" fn(*const u16,i32) -> i32;
-type DtwainsettempfiledirectorywFunc = unsafe extern "C" fn(*const u16) -> i32;
-type DtwainsetthresholdFunc = unsafe extern "C" fn(*mut c_void,f64,i32) -> i32;
-type DtwainsetthresholdstringFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32) -> i32;
-type DtwainsetthresholdstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32) -> i32;
-type DtwainsetthresholdstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32) -> i32;
-type DtwainsettwaindsmFunc = unsafe extern "C" fn(i32) -> i32;
-type DtwainsettwainlogFunc = unsafe extern "C" fn(u32,*const c_char) -> i32;
-type DtwainsettwainlogaFunc = unsafe extern "C" fn(u32,*const c_char) -> i32;
-type DtwainsettwainlogwFunc = unsafe extern "C" fn(u32,*const u16) -> i32;
-type DtwainsettwainmodeFunc = unsafe extern "C" fn(i32) -> i32;
-type DtwainsettwaintimeoutFunc = unsafe extern "C" fn(i32) -> i32;
-type DtwainsetxresolutionFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
-type DtwainsetxresolutionstringFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetxresolutionstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetxresolutionstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainsetyresolutionFunc = unsafe extern "C" fn(*mut c_void,f64) -> i32;
-type DtwainsetyresolutionstringFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetyresolutionstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> i32;
-type DtwainsetyresolutionstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> i32;
-type DtwainshowuionlyFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainshutdownocrengineFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainskipimageinfoerrorFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainstartthreadFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainstarttwainsessionFunc = unsafe extern "C" fn(*const c_void,*const c_char) -> i32;
-type DtwainstarttwainsessionaFunc = unsafe extern "C" fn(*const c_void,*const c_char) -> i32;
-type DtwainstarttwainsessionwFunc = unsafe extern "C" fn(*const c_void,*const u16) -> i32;
-type DtwainsysdestroyFunc = unsafe extern "C" fn() -> i32;
-type DtwainsysinitializeFunc = unsafe extern "C" fn() -> *mut c_void;
-type DtwainsysinitializeexFunc = unsafe extern "C" fn(*const c_char) -> *mut c_void;
-type Dtwainsysinitializeex2Func = unsafe extern "C" fn(*const c_char,*const c_char,*const c_char) -> *mut c_void;
-type Dtwainsysinitializeex2aFunc = unsafe extern "C" fn(*const c_char,*const c_char,*const c_char) -> *mut c_void;
-type Dtwainsysinitializeex2wFunc = unsafe extern "C" fn(*const u16,*const u16,*const u16) -> *mut c_void;
-type DtwainsysinitializeexaFunc = unsafe extern "C" fn(*const c_char) -> *mut c_void;
-type DtwainsysinitializeexwFunc = unsafe extern "C" fn(*const u16) -> *mut c_void;
-type DtwainsysinitializelibFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type DtwainsysinitializelibexFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> *mut c_void;
-type Dtwainsysinitializelibex2Func = unsafe extern "C" fn(*mut c_void,*const c_char,*const c_char,*const c_char) -> *mut c_void;
-type Dtwainsysinitializelibex2aFunc = unsafe extern "C" fn(*mut c_void,*const c_char,*const c_char,*const c_char) -> *mut c_void;
-type Dtwainsysinitializelibex2wFunc = unsafe extern "C" fn(*mut c_void,*const u16,*const u16,*const u16) -> *mut c_void;
-type DtwainsysinitializelibexaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> *mut c_void;
-type DtwainsysinitializelibexwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> *mut c_void;
-type DtwainsysinitializenoblockingFunc = unsafe extern "C" fn() -> *mut c_void;
-type DtwaintestgetcapFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
-type DtwainunlockmemoryFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainunlockmemoryexFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainusemultiplethreadsFunc = unsafe extern "C" fn(i32) -> i32;
-pub struct DTwainAPI<'a>
-{
-    DTWAIN_AcquireAudioFileFunc: Symbol<'a, DtwainacquireaudiofileFunc>,
-    DTWAIN_AcquireAudioFileAFunc: Symbol<'a, DtwainacquireaudiofileaFunc>,
-    DTWAIN_AcquireAudioFileWFunc: Symbol<'a, DtwainacquireaudiofilewFunc>,
-    DTWAIN_AcquireAudioNativeFunc: Symbol<'a, DtwainacquireaudionativeFunc>,
-    DTWAIN_AcquireAudioNativeExFunc: Symbol<'a, DtwainacquireaudionativeexFunc>,
-    DTWAIN_AcquireBufferedFunc: Symbol<'a, DtwainacquirebufferedFunc>,
-    DTWAIN_AcquireBufferedExFunc: Symbol<'a, DtwainacquirebufferedexFunc>,
-    DTWAIN_AcquireFileFunc: Symbol<'a, DtwainacquirefileFunc>,
-    DTWAIN_AcquireFileAFunc: Symbol<'a, DtwainacquirefileaFunc>,
-    DTWAIN_AcquireFileExFunc: Symbol<'a, DtwainacquirefileexFunc>,
-    DTWAIN_AcquireFileWFunc: Symbol<'a, DtwainacquirefilewFunc>,
-    DTWAIN_AcquireNativeFunc: Symbol<'a, DtwainacquirenativeFunc>,
-    DTWAIN_AcquireNativeExFunc: Symbol<'a, DtwainacquirenativeexFunc>,
-    DTWAIN_AcquireToClipboardFunc: Symbol<'a, DtwainacquiretoclipboardFunc>,
-    DTWAIN_AddExtImageInfoQueryFunc: Symbol<'a, DtwainaddextimageinfoqueryFunc>,
-    DTWAIN_AddPDFTextFunc: Symbol<'a, DtwainaddpdftextFunc>,
-    DTWAIN_AddPDFTextAFunc: Symbol<'a, DtwainaddpdftextaFunc>,
-    DTWAIN_AddPDFTextExFunc: Symbol<'a, DtwainaddpdftextexFunc>,
-    DTWAIN_AddPDFTextWFunc: Symbol<'a, DtwainaddpdftextwFunc>,
-    DTWAIN_AllocateMemoryFunc: Symbol<'a, DtwainallocatememoryFunc>,
-    DTWAIN_AllocateMemory64Func: Symbol<'a, Dtwainallocatememory64Func>,
-    DTWAIN_AllocateMemoryExFunc: Symbol<'a, DtwainallocatememoryexFunc>,
-    DTWAIN_AppHandlesExceptionsFunc: Symbol<'a, DtwainapphandlesexceptionsFunc>,
-    DTWAIN_ArrayANSIStringToFloatFunc: Symbol<'a, DtwainarrayansistringtofloatFunc>,
-    DTWAIN_ArrayAddFunc: Symbol<'a, DtwainarrayaddFunc>,
-    DTWAIN_ArrayAddANSIStringFunc: Symbol<'a, DtwainarrayaddansistringFunc>,
-    DTWAIN_ArrayAddANSIStringNFunc: Symbol<'a, DtwainarrayaddansistringnFunc>,
-    DTWAIN_ArrayAddFloatFunc: Symbol<'a, DtwainarrayaddfloatFunc>,
-    DTWAIN_ArrayAddFloatNFunc: Symbol<'a, DtwainarrayaddfloatnFunc>,
-    DTWAIN_ArrayAddFloatStringFunc: Symbol<'a, DtwainarrayaddfloatstringFunc>,
-    DTWAIN_ArrayAddFloatStringAFunc: Symbol<'a, DtwainarrayaddfloatstringaFunc>,
-    DTWAIN_ArrayAddFloatStringNFunc: Symbol<'a, DtwainarrayaddfloatstringnFunc>,
-    DTWAIN_ArrayAddFloatStringNAFunc: Symbol<'a, DtwainarrayaddfloatstringnaFunc>,
-    DTWAIN_ArrayAddFloatStringNWFunc: Symbol<'a, DtwainarrayaddfloatstringnwFunc>,
-    DTWAIN_ArrayAddFloatStringWFunc: Symbol<'a, DtwainarrayaddfloatstringwFunc>,
-    DTWAIN_ArrayAddFrameFunc: Symbol<'a, DtwainarrayaddframeFunc>,
-    DTWAIN_ArrayAddFrameNFunc: Symbol<'a, DtwainarrayaddframenFunc>,
-    DTWAIN_ArrayAddLongFunc: Symbol<'a, DtwainarrayaddlongFunc>,
-    DTWAIN_ArrayAddLong64Func: Symbol<'a, Dtwainarrayaddlong64Func>,
-    DTWAIN_ArrayAddLong64NFunc: Symbol<'a, Dtwainarrayaddlong64nFunc>,
-    DTWAIN_ArrayAddLongNFunc: Symbol<'a, DtwainarrayaddlongnFunc>,
-    DTWAIN_ArrayAddNFunc: Symbol<'a, DtwainarrayaddnFunc>,
-    DTWAIN_ArrayAddStringFunc: Symbol<'a, DtwainarrayaddstringFunc>,
-    DTWAIN_ArrayAddStringAFunc: Symbol<'a, DtwainarrayaddstringaFunc>,
-    DTWAIN_ArrayAddStringNFunc: Symbol<'a, DtwainarrayaddstringnFunc>,
-    DTWAIN_ArrayAddStringNAFunc: Symbol<'a, DtwainarrayaddstringnaFunc>,
-    DTWAIN_ArrayAddStringNWFunc: Symbol<'a, DtwainarrayaddstringnwFunc>,
-    DTWAIN_ArrayAddStringWFunc: Symbol<'a, DtwainarrayaddstringwFunc>,
-    DTWAIN_ArrayAddWideStringFunc: Symbol<'a, DtwainarrayaddwidestringFunc>,
-    DTWAIN_ArrayAddWideStringNFunc: Symbol<'a, DtwainarrayaddwidestringnFunc>,
-    DTWAIN_ArrayConvertFix32ToFloatFunc: Symbol<'a, Dtwainarrayconvertfix32tofloatFunc>,
-    DTWAIN_ArrayConvertFloatToFix32Func: Symbol<'a, Dtwainarrayconvertfloattofix32Func>,
-    DTWAIN_ArrayCopyFunc: Symbol<'a, DtwainarraycopyFunc>,
-    DTWAIN_ArrayCreateFunc: Symbol<'a, DtwainarraycreateFunc>,
-    DTWAIN_ArrayCreateCopyFunc: Symbol<'a, DtwainarraycreatecopyFunc>,
-    DTWAIN_ArrayCreateFromCapFunc: Symbol<'a, DtwainarraycreatefromcapFunc>,
-    DTWAIN_ArrayCreateFromLong64sFunc: Symbol<'a, Dtwainarraycreatefromlong64sFunc>,
-    DTWAIN_ArrayCreateFromLongsFunc: Symbol<'a, DtwainarraycreatefromlongsFunc>,
-    DTWAIN_ArrayCreateFromRealsFunc: Symbol<'a, DtwainarraycreatefromrealsFunc>,
-    DTWAIN_ArrayDestroyFunc: Symbol<'a, DtwainarraydestroyFunc>,
-    DTWAIN_ArrayDestroyFramesFunc: Symbol<'a, DtwainarraydestroyframesFunc>,
-    DTWAIN_ArrayFindFunc: Symbol<'a, DtwainarrayfindFunc>,
-    DTWAIN_ArrayFindANSIStringFunc: Symbol<'a, DtwainarrayfindansistringFunc>,
-    DTWAIN_ArrayFindFloatFunc: Symbol<'a, DtwainarrayfindfloatFunc>,
-    DTWAIN_ArrayFindFloatStringFunc: Symbol<'a, DtwainarrayfindfloatstringFunc>,
-    DTWAIN_ArrayFindFloatStringAFunc: Symbol<'a, DtwainarrayfindfloatstringaFunc>,
-    DTWAIN_ArrayFindFloatStringWFunc: Symbol<'a, DtwainarrayfindfloatstringwFunc>,
-    DTWAIN_ArrayFindLongFunc: Symbol<'a, DtwainarrayfindlongFunc>,
-    DTWAIN_ArrayFindLong64Func: Symbol<'a, Dtwainarrayfindlong64Func>,
-    DTWAIN_ArrayFindStringFunc: Symbol<'a, DtwainarrayfindstringFunc>,
-    DTWAIN_ArrayFindStringAFunc: Symbol<'a, DtwainarrayfindstringaFunc>,
-    DTWAIN_ArrayFindStringWFunc: Symbol<'a, DtwainarrayfindstringwFunc>,
-    DTWAIN_ArrayFindWideStringFunc: Symbol<'a, DtwainarrayfindwidestringFunc>,
-    DTWAIN_ArrayFix32GetAtFunc: Symbol<'a, Dtwainarrayfix32getatFunc>,
-    DTWAIN_ArrayFix32SetAtFunc: Symbol<'a, Dtwainarrayfix32setatFunc>,
-    DTWAIN_ArrayFloatToANSIStringFunc: Symbol<'a, DtwainarrayfloattoansistringFunc>,
-    DTWAIN_ArrayFloatToStringFunc: Symbol<'a, DtwainarrayfloattostringFunc>,
-    DTWAIN_ArrayFloatToWideStringFunc: Symbol<'a, DtwainarrayfloattowidestringFunc>,
-    DTWAIN_ArrayGetAtFunc: Symbol<'a, DtwainarraygetatFunc>,
-    DTWAIN_ArrayGetAtANSIStringFunc: Symbol<'a, DtwainarraygetatansistringFunc>,
-    DTWAIN_ArrayGetAtANSIStringPtrFunc: Symbol<'a, DtwainarraygetatansistringptrFunc>,
-    DTWAIN_ArrayGetAtFloatFunc: Symbol<'a, DtwainarraygetatfloatFunc>,
-    DTWAIN_ArrayGetAtFloatStringFunc: Symbol<'a, DtwainarraygetatfloatstringFunc>,
-    DTWAIN_ArrayGetAtFloatStringAFunc: Symbol<'a, DtwainarraygetatfloatstringaFunc>,
-    DTWAIN_ArrayGetAtFloatStringWFunc: Symbol<'a, DtwainarraygetatfloatstringwFunc>,
-    DTWAIN_ArrayGetAtFrameFunc: Symbol<'a, DtwainarraygetatframeFunc>,
-    DTWAIN_ArrayGetAtFrameExFunc: Symbol<'a, DtwainarraygetatframeexFunc>,
-    DTWAIN_ArrayGetAtFrameStringFunc: Symbol<'a, DtwainarraygetatframestringFunc>,
-    DTWAIN_ArrayGetAtFrameStringAFunc: Symbol<'a, DtwainarraygetatframestringaFunc>,
-    DTWAIN_ArrayGetAtFrameStringWFunc: Symbol<'a, DtwainarraygetatframestringwFunc>,
-    DTWAIN_ArrayGetAtLongFunc: Symbol<'a, DtwainarraygetatlongFunc>,
-    DTWAIN_ArrayGetAtLong64Func: Symbol<'a, Dtwainarraygetatlong64Func>,
-    DTWAIN_ArrayGetAtSourceFunc: Symbol<'a, DtwainarraygetatsourceFunc>,
-    DTWAIN_ArrayGetAtStringFunc: Symbol<'a, DtwainarraygetatstringFunc>,
-    DTWAIN_ArrayGetAtStringAFunc: Symbol<'a, DtwainarraygetatstringaFunc>,
-    DTWAIN_ArrayGetAtStringPtrFunc: Symbol<'a, DtwainarraygetatstringptrFunc>,
-    DTWAIN_ArrayGetAtStringWFunc: Symbol<'a, DtwainarraygetatstringwFunc>,
-    DTWAIN_ArrayGetAtWideStringFunc: Symbol<'a, DtwainarraygetatwidestringFunc>,
-    DTWAIN_ArrayGetAtWideStringPtrFunc: Symbol<'a, DtwainarraygetatwidestringptrFunc>,
-    DTWAIN_ArrayGetBufferFunc: Symbol<'a, DtwainarraygetbufferFunc>,
-    DTWAIN_ArrayGetCapValuesFunc: Symbol<'a, DtwainarraygetcapvaluesFunc>,
-    DTWAIN_ArrayGetCapValuesExFunc: Symbol<'a, DtwainarraygetcapvaluesexFunc>,
-    DTWAIN_ArrayGetCapValuesEx2Func: Symbol<'a, Dtwainarraygetcapvaluesex2Func>,
-    DTWAIN_ArrayGetCountFunc: Symbol<'a, DtwainarraygetcountFunc>,
-    DTWAIN_ArrayGetMaxStringLengthFunc: Symbol<'a, DtwainarraygetmaxstringlengthFunc>,
-    DTWAIN_ArrayGetSourceAtFunc: Symbol<'a, DtwainarraygetsourceatFunc>,
-    DTWAIN_ArrayGetStringLengthFunc: Symbol<'a, DtwainarraygetstringlengthFunc>,
-    DTWAIN_ArrayGetTypeFunc: Symbol<'a, DtwainarraygettypeFunc>,
-    DTWAIN_ArrayInitFunc: Symbol<'a, DtwainarrayinitFunc>,
-    DTWAIN_ArrayInsertAtFunc: Symbol<'a, DtwainarrayinsertatFunc>,
-    DTWAIN_ArrayInsertAtANSIStringFunc: Symbol<'a, DtwainarrayinsertatansistringFunc>,
-    DTWAIN_ArrayInsertAtANSIStringNFunc: Symbol<'a, DtwainarrayinsertatansistringnFunc>,
-    DTWAIN_ArrayInsertAtFloatFunc: Symbol<'a, DtwainarrayinsertatfloatFunc>,
-    DTWAIN_ArrayInsertAtFloatNFunc: Symbol<'a, DtwainarrayinsertatfloatnFunc>,
-    DTWAIN_ArrayInsertAtFloatStringFunc: Symbol<'a, DtwainarrayinsertatfloatstringFunc>,
-    DTWAIN_ArrayInsertAtFloatStringAFunc: Symbol<'a, DtwainarrayinsertatfloatstringaFunc>,
-    DTWAIN_ArrayInsertAtFloatStringNFunc: Symbol<'a, DtwainarrayinsertatfloatstringnFunc>,
-    DTWAIN_ArrayInsertAtFloatStringNAFunc: Symbol<'a, DtwainarrayinsertatfloatstringnaFunc>,
-    DTWAIN_ArrayInsertAtFloatStringNWFunc: Symbol<'a, DtwainarrayinsertatfloatstringnwFunc>,
-    DTWAIN_ArrayInsertAtFloatStringWFunc: Symbol<'a, DtwainarrayinsertatfloatstringwFunc>,
-    DTWAIN_ArrayInsertAtFrameFunc: Symbol<'a, DtwainarrayinsertatframeFunc>,
-    DTWAIN_ArrayInsertAtFrameNFunc: Symbol<'a, DtwainarrayinsertatframenFunc>,
-    DTWAIN_ArrayInsertAtLongFunc: Symbol<'a, DtwainarrayinsertatlongFunc>,
-    DTWAIN_ArrayInsertAtLong64Func: Symbol<'a, Dtwainarrayinsertatlong64Func>,
-    DTWAIN_ArrayInsertAtLong64NFunc: Symbol<'a, Dtwainarrayinsertatlong64nFunc>,
-    DTWAIN_ArrayInsertAtLongNFunc: Symbol<'a, DtwainarrayinsertatlongnFunc>,
-    DTWAIN_ArrayInsertAtNFunc: Symbol<'a, DtwainarrayinsertatnFunc>,
-    DTWAIN_ArrayInsertAtStringFunc: Symbol<'a, DtwainarrayinsertatstringFunc>,
-    DTWAIN_ArrayInsertAtStringAFunc: Symbol<'a, DtwainarrayinsertatstringaFunc>,
-    DTWAIN_ArrayInsertAtStringNFunc: Symbol<'a, DtwainarrayinsertatstringnFunc>,
-    DTWAIN_ArrayInsertAtStringNAFunc: Symbol<'a, DtwainarrayinsertatstringnaFunc>,
-    DTWAIN_ArrayInsertAtStringNWFunc: Symbol<'a, DtwainarrayinsertatstringnwFunc>,
-    DTWAIN_ArrayInsertAtStringWFunc: Symbol<'a, DtwainarrayinsertatstringwFunc>,
-    DTWAIN_ArrayInsertAtWideStringFunc: Symbol<'a, DtwainarrayinsertatwidestringFunc>,
-    DTWAIN_ArrayInsertAtWideStringNFunc: Symbol<'a, DtwainarrayinsertatwidestringnFunc>,
-    DTWAIN_ArrayRemoveAllFunc: Symbol<'a, DtwainarrayremoveallFunc>,
-    DTWAIN_ArrayRemoveAtFunc: Symbol<'a, DtwainarrayremoveatFunc>,
-    DTWAIN_ArrayRemoveAtNFunc: Symbol<'a, DtwainarrayremoveatnFunc>,
-    DTWAIN_ArrayResizeFunc: Symbol<'a, DtwainarrayresizeFunc>,
-    DTWAIN_ArraySetAtFunc: Symbol<'a, DtwainarraysetatFunc>,
-    DTWAIN_ArraySetAtANSIStringFunc: Symbol<'a, DtwainarraysetatansistringFunc>,
-    DTWAIN_ArraySetAtFloatFunc: Symbol<'a, DtwainarraysetatfloatFunc>,
-    DTWAIN_ArraySetAtFloatStringFunc: Symbol<'a, DtwainarraysetatfloatstringFunc>,
-    DTWAIN_ArraySetAtFloatStringAFunc: Symbol<'a, DtwainarraysetatfloatstringaFunc>,
-    DTWAIN_ArraySetAtFloatStringWFunc: Symbol<'a, DtwainarraysetatfloatstringwFunc>,
-    DTWAIN_ArraySetAtFrameFunc: Symbol<'a, DtwainarraysetatframeFunc>,
-    DTWAIN_ArraySetAtFrameExFunc: Symbol<'a, DtwainarraysetatframeexFunc>,
-    DTWAIN_ArraySetAtFrameStringFunc: Symbol<'a, DtwainarraysetatframestringFunc>,
-    DTWAIN_ArraySetAtFrameStringAFunc: Symbol<'a, DtwainarraysetatframestringaFunc>,
-    DTWAIN_ArraySetAtFrameStringWFunc: Symbol<'a, DtwainarraysetatframestringwFunc>,
-    DTWAIN_ArraySetAtLongFunc: Symbol<'a, DtwainarraysetatlongFunc>,
-    DTWAIN_ArraySetAtLong64Func: Symbol<'a, Dtwainarraysetatlong64Func>,
-    DTWAIN_ArraySetAtStringFunc: Symbol<'a, DtwainarraysetatstringFunc>,
-    DTWAIN_ArraySetAtStringAFunc: Symbol<'a, DtwainarraysetatstringaFunc>,
-    DTWAIN_ArraySetAtStringWFunc: Symbol<'a, DtwainarraysetatstringwFunc>,
-    DTWAIN_ArraySetAtWideStringFunc: Symbol<'a, DtwainarraysetatwidestringFunc>,
-    DTWAIN_ArrayStringToFloatFunc: Symbol<'a, DtwainarraystringtofloatFunc>,
-    DTWAIN_ArrayWideStringToFloatFunc: Symbol<'a, DtwainarraywidestringtofloatFunc>,
-    DTWAIN_CallCallbackFunc: Symbol<'a, DtwaincallcallbackFunc>,
-    DTWAIN_CallCallback64Func: Symbol<'a, Dtwaincallcallback64Func>,
-    DTWAIN_CallDSMProcFunc: Symbol<'a, DtwaincalldsmprocFunc>,
-    DTWAIN_CheckHandlesFunc: Symbol<'a, DtwaincheckhandlesFunc>,
-    DTWAIN_ClearBuffersFunc: Symbol<'a, DtwainclearbuffersFunc>,
-    DTWAIN_ClearErrorBufferFunc: Symbol<'a, DtwainclearerrorbufferFunc>,
-    DTWAIN_ClearPDFTextFunc: Symbol<'a, DtwainclearpdftextFunc>,
-    DTWAIN_ClearPageFunc: Symbol<'a, DtwainclearpageFunc>,
-    DTWAIN_CloseSourceFunc: Symbol<'a, DtwainclosesourceFunc>,
-    DTWAIN_CloseSourceUIFunc: Symbol<'a, DtwainclosesourceuiFunc>,
-    DTWAIN_ConvertDIBToBitmapFunc: Symbol<'a, DtwainconvertdibtobitmapFunc>,
-    DTWAIN_ConvertDIBToFullBitmapFunc: Symbol<'a, DtwainconvertdibtofullbitmapFunc>,
-    DTWAIN_ConvertToAPIStringFunc: Symbol<'a, DtwainconverttoapistringFunc>,
-    DTWAIN_ConvertToAPIStringAFunc: Symbol<'a, DtwainconverttoapistringaFunc>,
-    DTWAIN_ConvertToAPIStringExFunc: Symbol<'a, DtwainconverttoapistringexFunc>,
-    DTWAIN_ConvertToAPIStringExAFunc: Symbol<'a, DtwainconverttoapistringexaFunc>,
-    DTWAIN_ConvertToAPIStringExWFunc: Symbol<'a, DtwainconverttoapistringexwFunc>,
-    DTWAIN_ConvertToAPIStringWFunc: Symbol<'a, DtwainconverttoapistringwFunc>,
-    DTWAIN_CreateAcquisitionArrayFunc: Symbol<'a, DtwaincreateacquisitionarrayFunc>,
-    DTWAIN_CreatePDFTextElementFunc: Symbol<'a, DtwaincreatepdftextelementFunc>,
-    DTWAIN_DeleteDIBFunc: Symbol<'a, DtwaindeletedibFunc>,
-    DTWAIN_DestroyAcquisitionArrayFunc: Symbol<'a, DtwaindestroyacquisitionarrayFunc>,
-    DTWAIN_DestroyPDFTextElementFunc: Symbol<'a, DtwaindestroypdftextelementFunc>,
-    DTWAIN_DisableAppWindowFunc: Symbol<'a, DtwaindisableappwindowFunc>,
-    DTWAIN_EnableAutoBorderDetectFunc: Symbol<'a, DtwainenableautoborderdetectFunc>,
-    DTWAIN_EnableAutoBrightFunc: Symbol<'a, DtwainenableautobrightFunc>,
-    DTWAIN_EnableAutoDeskewFunc: Symbol<'a, DtwainenableautodeskewFunc>,
-    DTWAIN_EnableAutoFeedFunc: Symbol<'a, DtwainenableautofeedFunc>,
-    DTWAIN_EnableAutoRotateFunc: Symbol<'a, DtwainenableautorotateFunc>,
-    DTWAIN_EnableAutoScanFunc: Symbol<'a, DtwainenableautoscanFunc>,
-    DTWAIN_EnableAutomaticSenseMediumFunc: Symbol<'a, DtwainenableautomaticsensemediumFunc>,
-    DTWAIN_EnableDuplexFunc: Symbol<'a, DtwainenableduplexFunc>,
-    DTWAIN_EnableFeederFunc: Symbol<'a, DtwainenablefeederFunc>,
-    DTWAIN_EnableIndicatorFunc: Symbol<'a, DtwainenableindicatorFunc>,
-    DTWAIN_EnableJobFileHandlingFunc: Symbol<'a, DtwainenablejobfilehandlingFunc>,
-    DTWAIN_EnableLampFunc: Symbol<'a, DtwainenablelampFunc>,
-    DTWAIN_EnableMsgNotifyFunc: Symbol<'a, DtwainenablemsgnotifyFunc>,
-    DTWAIN_EnablePatchDetectFunc: Symbol<'a, DtwainenablepatchdetectFunc>,
-    DTWAIN_EnablePeekMessageLoopFunc: Symbol<'a, DtwainenablepeekmessageloopFunc>,
-    DTWAIN_EnablePrinterFunc: Symbol<'a, DtwainenableprinterFunc>,
-    DTWAIN_EnableThumbnailFunc: Symbol<'a, DtwainenablethumbnailFunc>,
-    DTWAIN_EnableTripletsNotifyFunc: Symbol<'a, DtwainenabletripletsnotifyFunc>,
-    DTWAIN_EndThreadFunc: Symbol<'a, DtwainendthreadFunc>,
-    DTWAIN_EndTwainSessionFunc: Symbol<'a, DtwainendtwainsessionFunc>,
-    DTWAIN_EnumAlarmVolumesFunc: Symbol<'a, DtwainenumalarmvolumesFunc>,
-    DTWAIN_EnumAlarmVolumesExFunc: Symbol<'a, DtwainenumalarmvolumesexFunc>,
-    DTWAIN_EnumAlarmsFunc: Symbol<'a, DtwainenumalarmsFunc>,
-    DTWAIN_EnumAlarmsExFunc: Symbol<'a, DtwainenumalarmsexFunc>,
-    DTWAIN_EnumAudioXferMechsFunc: Symbol<'a, DtwainenumaudioxfermechsFunc>,
-    DTWAIN_EnumAudioXferMechsExFunc: Symbol<'a, DtwainenumaudioxfermechsexFunc>,
-    DTWAIN_EnumAutoFeedValuesFunc: Symbol<'a, DtwainenumautofeedvaluesFunc>,
-    DTWAIN_EnumAutoFeedValuesExFunc: Symbol<'a, DtwainenumautofeedvaluesexFunc>,
-    DTWAIN_EnumAutomaticCapturesFunc: Symbol<'a, DtwainenumautomaticcapturesFunc>,
-    DTWAIN_EnumAutomaticCapturesExFunc: Symbol<'a, DtwainenumautomaticcapturesexFunc>,
-    DTWAIN_EnumAutomaticSenseMediumFunc: Symbol<'a, DtwainenumautomaticsensemediumFunc>,
-    DTWAIN_EnumAutomaticSenseMediumExFunc: Symbol<'a, DtwainenumautomaticsensemediumexFunc>,
-    DTWAIN_EnumBitDepthsFunc: Symbol<'a, DtwainenumbitdepthsFunc>,
-    DTWAIN_EnumBitDepthsExFunc: Symbol<'a, DtwainenumbitdepthsexFunc>,
-    DTWAIN_EnumBitDepthsEx2Func: Symbol<'a, Dtwainenumbitdepthsex2Func>,
-    DTWAIN_EnumBottomCamerasFunc: Symbol<'a, DtwainenumbottomcamerasFunc>,
-    DTWAIN_EnumBottomCamerasExFunc: Symbol<'a, DtwainenumbottomcamerasexFunc>,
-    DTWAIN_EnumBrightnessValuesFunc: Symbol<'a, DtwainenumbrightnessvaluesFunc>,
-    DTWAIN_EnumBrightnessValuesExFunc: Symbol<'a, DtwainenumbrightnessvaluesexFunc>,
-    DTWAIN_EnumCamerasFunc: Symbol<'a, DtwainenumcamerasFunc>,
-    DTWAIN_EnumCamerasExFunc: Symbol<'a, DtwainenumcamerasexFunc>,
-    DTWAIN_EnumCamerasEx2Func: Symbol<'a, Dtwainenumcamerasex2Func>,
-    DTWAIN_EnumCamerasEx3Func: Symbol<'a, Dtwainenumcamerasex3Func>,
-    DTWAIN_EnumCompressionTypesFunc: Symbol<'a, DtwainenumcompressiontypesFunc>,
-    DTWAIN_EnumCompressionTypesExFunc: Symbol<'a, DtwainenumcompressiontypesexFunc>,
-    DTWAIN_EnumCompressionTypesEx2Func: Symbol<'a, Dtwainenumcompressiontypesex2Func>,
-    DTWAIN_EnumContrastValuesFunc: Symbol<'a, DtwainenumcontrastvaluesFunc>,
-    DTWAIN_EnumContrastValuesExFunc: Symbol<'a, DtwainenumcontrastvaluesexFunc>,
-    DTWAIN_EnumCustomCapsFunc: Symbol<'a, DtwainenumcustomcapsFunc>,
-    DTWAIN_EnumCustomCapsEx2Func: Symbol<'a, Dtwainenumcustomcapsex2Func>,
-    DTWAIN_EnumDoubleFeedDetectLengthsFunc: Symbol<'a, DtwainenumdoublefeeddetectlengthsFunc>,
-    DTWAIN_EnumDoubleFeedDetectLengthsExFunc: Symbol<'a, DtwainenumdoublefeeddetectlengthsexFunc>,
-    DTWAIN_EnumDoubleFeedDetectValuesFunc: Symbol<'a, DtwainenumdoublefeeddetectvaluesFunc>,
-    DTWAIN_EnumDoubleFeedDetectValuesExFunc: Symbol<'a, DtwainenumdoublefeeddetectvaluesexFunc>,
-    DTWAIN_EnumExtImageInfoTypesFunc: Symbol<'a, DtwainenumextimageinfotypesFunc>,
-    DTWAIN_EnumExtImageInfoTypesExFunc: Symbol<'a, DtwainenumextimageinfotypesexFunc>,
-    DTWAIN_EnumExtendedCapsFunc: Symbol<'a, DtwainenumextendedcapsFunc>,
-    DTWAIN_EnumExtendedCapsExFunc: Symbol<'a, DtwainenumextendedcapsexFunc>,
-    DTWAIN_EnumExtendedCapsEx2Func: Symbol<'a, Dtwainenumextendedcapsex2Func>,
-    DTWAIN_EnumFileTypeBitsPerPixelFunc: Symbol<'a, DtwainenumfiletypebitsperpixelFunc>,
-    DTWAIN_EnumFileXferFormatsFunc: Symbol<'a, DtwainenumfilexferformatsFunc>,
-    DTWAIN_EnumFileXferFormatsExFunc: Symbol<'a, DtwainenumfilexferformatsexFunc>,
-    DTWAIN_EnumHalftonesFunc: Symbol<'a, DtwainenumhalftonesFunc>,
-    DTWAIN_EnumHalftonesExFunc: Symbol<'a, DtwainenumhalftonesexFunc>,
-    DTWAIN_EnumHighlightValuesFunc: Symbol<'a, DtwainenumhighlightvaluesFunc>,
-    DTWAIN_EnumHighlightValuesExFunc: Symbol<'a, DtwainenumhighlightvaluesexFunc>,
-    DTWAIN_EnumJobControlsFunc: Symbol<'a, DtwainenumjobcontrolsFunc>,
-    DTWAIN_EnumJobControlsExFunc: Symbol<'a, DtwainenumjobcontrolsexFunc>,
-    DTWAIN_EnumLightPathsFunc: Symbol<'a, DtwainenumlightpathsFunc>,
-    DTWAIN_EnumLightPathsExFunc: Symbol<'a, DtwainenumlightpathsexFunc>,
-    DTWAIN_EnumLightSourcesFunc: Symbol<'a, DtwainenumlightsourcesFunc>,
-    DTWAIN_EnumLightSourcesExFunc: Symbol<'a, DtwainenumlightsourcesexFunc>,
-    DTWAIN_EnumMaxBuffersFunc: Symbol<'a, DtwainenummaxbuffersFunc>,
-    DTWAIN_EnumMaxBuffersExFunc: Symbol<'a, DtwainenummaxbuffersexFunc>,
-    DTWAIN_EnumNoiseFiltersFunc: Symbol<'a, DtwainenumnoisefiltersFunc>,
-    DTWAIN_EnumNoiseFiltersExFunc: Symbol<'a, DtwainenumnoisefiltersexFunc>,
-    DTWAIN_EnumOCRInterfacesFunc: Symbol<'a, DtwainenumocrinterfacesFunc>,
-    DTWAIN_EnumOCRSupportedCapsFunc: Symbol<'a, DtwainenumocrsupportedcapsFunc>,
-    DTWAIN_EnumOrientationsFunc: Symbol<'a, DtwainenumorientationsFunc>,
-    DTWAIN_EnumOrientationsExFunc: Symbol<'a, DtwainenumorientationsexFunc>,
-    DTWAIN_EnumOverscanValuesFunc: Symbol<'a, DtwainenumoverscanvaluesFunc>,
-    DTWAIN_EnumOverscanValuesExFunc: Symbol<'a, DtwainenumoverscanvaluesexFunc>,
-    DTWAIN_EnumPaperSizesFunc: Symbol<'a, DtwainenumpapersizesFunc>,
-    DTWAIN_EnumPaperSizesExFunc: Symbol<'a, DtwainenumpapersizesexFunc>,
-    DTWAIN_EnumPatchCodesFunc: Symbol<'a, DtwainenumpatchcodesFunc>,
-    DTWAIN_EnumPatchCodesExFunc: Symbol<'a, DtwainenumpatchcodesexFunc>,
-    DTWAIN_EnumPatchMaxPrioritiesFunc: Symbol<'a, DtwainenumpatchmaxprioritiesFunc>,
-    DTWAIN_EnumPatchMaxPrioritiesExFunc: Symbol<'a, DtwainenumpatchmaxprioritiesexFunc>,
-    DTWAIN_EnumPatchMaxRetriesFunc: Symbol<'a, DtwainenumpatchmaxretriesFunc>,
-    DTWAIN_EnumPatchMaxRetriesExFunc: Symbol<'a, DtwainenumpatchmaxretriesexFunc>,
-    DTWAIN_EnumPatchPrioritiesFunc: Symbol<'a, DtwainenumpatchprioritiesFunc>,
-    DTWAIN_EnumPatchPrioritiesExFunc: Symbol<'a, DtwainenumpatchprioritiesexFunc>,
-    DTWAIN_EnumPatchSearchModesFunc: Symbol<'a, DtwainenumpatchsearchmodesFunc>,
-    DTWAIN_EnumPatchSearchModesExFunc: Symbol<'a, DtwainenumpatchsearchmodesexFunc>,
-    DTWAIN_EnumPatchTimeOutValuesFunc: Symbol<'a, DtwainenumpatchtimeoutvaluesFunc>,
-    DTWAIN_EnumPatchTimeOutValuesExFunc: Symbol<'a, DtwainenumpatchtimeoutvaluesexFunc>,
-    DTWAIN_EnumPixelTypesFunc: Symbol<'a, DtwainenumpixeltypesFunc>,
-    DTWAIN_EnumPixelTypesExFunc: Symbol<'a, DtwainenumpixeltypesexFunc>,
-    DTWAIN_EnumPrinterStringModesFunc: Symbol<'a, DtwainenumprinterstringmodesFunc>,
-    DTWAIN_EnumPrinterStringModesExFunc: Symbol<'a, DtwainenumprinterstringmodesexFunc>,
-    DTWAIN_EnumResolutionValuesFunc: Symbol<'a, DtwainenumresolutionvaluesFunc>,
-    DTWAIN_EnumResolutionValuesExFunc: Symbol<'a, DtwainenumresolutionvaluesexFunc>,
-    DTWAIN_EnumShadowValuesFunc: Symbol<'a, DtwainenumshadowvaluesFunc>,
-    DTWAIN_EnumShadowValuesExFunc: Symbol<'a, DtwainenumshadowvaluesexFunc>,
-    DTWAIN_EnumSourceUnitsFunc: Symbol<'a, DtwainenumsourceunitsFunc>,
-    DTWAIN_EnumSourceUnitsExFunc: Symbol<'a, DtwainenumsourceunitsexFunc>,
-    DTWAIN_EnumSourceValuesFunc: Symbol<'a, DtwainenumsourcevaluesFunc>,
-    DTWAIN_EnumSourceValuesAFunc: Symbol<'a, DtwainenumsourcevaluesaFunc>,
-    DTWAIN_EnumSourceValuesWFunc: Symbol<'a, DtwainenumsourcevalueswFunc>,
-    DTWAIN_EnumSourcesFunc: Symbol<'a, DtwainenumsourcesFunc>,
-    DTWAIN_EnumSourcesExFunc: Symbol<'a, DtwainenumsourcesexFunc>,
-    DTWAIN_EnumSupportedCapsFunc: Symbol<'a, DtwainenumsupportedcapsFunc>,
-    DTWAIN_EnumSupportedCapsExFunc: Symbol<'a, DtwainenumsupportedcapsexFunc>,
-    DTWAIN_EnumSupportedCapsEx2Func: Symbol<'a, Dtwainenumsupportedcapsex2Func>,
-    DTWAIN_EnumSupportedExtImageInfoFunc: Symbol<'a, DtwainenumsupportedextimageinfoFunc>,
-    DTWAIN_EnumSupportedExtImageInfoExFunc: Symbol<'a, DtwainenumsupportedextimageinfoexFunc>,
-    DTWAIN_EnumSupportedFileTypesFunc: Symbol<'a, DtwainenumsupportedfiletypesFunc>,
-    DTWAIN_EnumSupportedMultiPageFileTypesFunc: Symbol<'a, DtwainenumsupportedmultipagefiletypesFunc>,
-    DTWAIN_EnumSupportedSinglePageFileTypesFunc: Symbol<'a, DtwainenumsupportedsinglepagefiletypesFunc>,
-    DTWAIN_EnumThresholdValuesFunc: Symbol<'a, DtwainenumthresholdvaluesFunc>,
-    DTWAIN_EnumThresholdValuesExFunc: Symbol<'a, DtwainenumthresholdvaluesexFunc>,
-    DTWAIN_EnumTopCamerasFunc: Symbol<'a, DtwainenumtopcamerasFunc>,
-    DTWAIN_EnumTopCamerasExFunc: Symbol<'a, DtwainenumtopcamerasexFunc>,
-    DTWAIN_EnumTwainPrintersFunc: Symbol<'a, DtwainenumtwainprintersFunc>,
-    DTWAIN_EnumTwainPrintersArrayFunc: Symbol<'a, DtwainenumtwainprintersarrayFunc>,
-    DTWAIN_EnumTwainPrintersArrayExFunc: Symbol<'a, DtwainenumtwainprintersarrayexFunc>,
-    DTWAIN_EnumTwainPrintersExFunc: Symbol<'a, DtwainenumtwainprintersexFunc>,
-    DTWAIN_EnumXResolutionValuesFunc: Symbol<'a, DtwainenumxresolutionvaluesFunc>,
-    DTWAIN_EnumXResolutionValuesExFunc: Symbol<'a, DtwainenumxresolutionvaluesexFunc>,
-    DTWAIN_EnumYResolutionValuesFunc: Symbol<'a, DtwainenumyresolutionvaluesFunc>,
-    DTWAIN_EnumYResolutionValuesExFunc: Symbol<'a, DtwainenumyresolutionvaluesexFunc>,
-    DTWAIN_ExecuteOCRFunc: Symbol<'a, DtwainexecuteocrFunc>,
-    DTWAIN_ExecuteOCRAFunc: Symbol<'a, DtwainexecuteocraFunc>,
-    DTWAIN_ExecuteOCRWFunc: Symbol<'a, DtwainexecuteocrwFunc>,
-    DTWAIN_FeedPageFunc: Symbol<'a, DtwainfeedpageFunc>,
-    DTWAIN_FlipBitmapFunc: Symbol<'a, DtwainflipbitmapFunc>,
-    DTWAIN_FlushAcquiredPagesFunc: Symbol<'a, DtwainflushacquiredpagesFunc>,
-    DTWAIN_ForceAcquireBitDepthFunc: Symbol<'a, DtwainforceacquirebitdepthFunc>,
-    DTWAIN_ForceScanOnNoUIFunc: Symbol<'a, DtwainforcescanonnouiFunc>,
-    DTWAIN_FrameCreateFunc: Symbol<'a, DtwainframecreateFunc>,
-    DTWAIN_FrameCreateStringFunc: Symbol<'a, DtwainframecreatestringFunc>,
-    DTWAIN_FrameCreateStringAFunc: Symbol<'a, DtwainframecreatestringaFunc>,
-    DTWAIN_FrameCreateStringWFunc: Symbol<'a, DtwainframecreatestringwFunc>,
-    DTWAIN_FrameDestroyFunc: Symbol<'a, DtwainframedestroyFunc>,
-    DTWAIN_FrameGetAllFunc: Symbol<'a, DtwainframegetallFunc>,
-    DTWAIN_FrameGetAllStringFunc: Symbol<'a, DtwainframegetallstringFunc>,
-    DTWAIN_FrameGetAllStringAFunc: Symbol<'a, DtwainframegetallstringaFunc>,
-    DTWAIN_FrameGetAllStringWFunc: Symbol<'a, DtwainframegetallstringwFunc>,
-    DTWAIN_FrameGetValueFunc: Symbol<'a, DtwainframegetvalueFunc>,
-    DTWAIN_FrameGetValueStringFunc: Symbol<'a, DtwainframegetvaluestringFunc>,
-    DTWAIN_FrameGetValueStringAFunc: Symbol<'a, DtwainframegetvaluestringaFunc>,
-    DTWAIN_FrameGetValueStringWFunc: Symbol<'a, DtwainframegetvaluestringwFunc>,
-    DTWAIN_FrameIsValidFunc: Symbol<'a, DtwainframeisvalidFunc>,
-    DTWAIN_FrameSetAllFunc: Symbol<'a, DtwainframesetallFunc>,
-    DTWAIN_FrameSetAllStringFunc: Symbol<'a, DtwainframesetallstringFunc>,
-    DTWAIN_FrameSetAllStringAFunc: Symbol<'a, DtwainframesetallstringaFunc>,
-    DTWAIN_FrameSetAllStringWFunc: Symbol<'a, DtwainframesetallstringwFunc>,
-    DTWAIN_FrameSetValueFunc: Symbol<'a, DtwainframesetvalueFunc>,
-    DTWAIN_FrameSetValueStringFunc: Symbol<'a, DtwainframesetvaluestringFunc>,
-    DTWAIN_FrameSetValueStringAFunc: Symbol<'a, DtwainframesetvaluestringaFunc>,
-    DTWAIN_FrameSetValueStringWFunc: Symbol<'a, DtwainframesetvaluestringwFunc>,
-    DTWAIN_FreeExtImageInfoFunc: Symbol<'a, DtwainfreeextimageinfoFunc>,
-    DTWAIN_FreeMemoryFunc: Symbol<'a, DtwainfreememoryFunc>,
-    DTWAIN_FreeMemoryExFunc: Symbol<'a, DtwainfreememoryexFunc>,
-    DTWAIN_GetAPIHandleStatusFunc: Symbol<'a, DtwaingetapihandlestatusFunc>,
-    DTWAIN_GetAcquireAreaFunc: Symbol<'a, DtwaingetacquireareaFunc>,
-    DTWAIN_GetAcquireArea2Func: Symbol<'a, Dtwaingetacquirearea2Func>,
-    DTWAIN_GetAcquireArea2StringFunc: Symbol<'a, Dtwaingetacquirearea2stringFunc>,
-    DTWAIN_GetAcquireArea2StringAFunc: Symbol<'a, Dtwaingetacquirearea2stringaFunc>,
-    DTWAIN_GetAcquireArea2StringWFunc: Symbol<'a, Dtwaingetacquirearea2stringwFunc>,
-    DTWAIN_GetAcquireAreaExFunc: Symbol<'a, DtwaingetacquireareaexFunc>,
-    DTWAIN_GetAcquireMetricsFunc: Symbol<'a, DtwaingetacquiremetricsFunc>,
-    DTWAIN_GetAcquireStripBufferFunc: Symbol<'a, DtwaingetacquirestripbufferFunc>,
-    DTWAIN_GetAcquireStripDataFunc: Symbol<'a, DtwaingetacquirestripdataFunc>,
-    DTWAIN_GetAcquireStripSizesFunc: Symbol<'a, DtwaingetacquirestripsizesFunc>,
-    DTWAIN_GetAcquiredImageFunc: Symbol<'a, DtwaingetacquiredimageFunc>,
-    DTWAIN_GetAcquiredImageArrayFunc: Symbol<'a, DtwaingetacquiredimagearrayFunc>,
-    DTWAIN_GetActiveDSMPathFunc: Symbol<'a, DtwaingetactivedsmpathFunc>,
-    DTWAIN_GetActiveDSMPathAFunc: Symbol<'a, DtwaingetactivedsmpathaFunc>,
-    DTWAIN_GetActiveDSMPathWFunc: Symbol<'a, DtwaingetactivedsmpathwFunc>,
-    DTWAIN_GetActiveDSMVersionInfoFunc: Symbol<'a, DtwaingetactivedsmversioninfoFunc>,
-    DTWAIN_GetActiveDSMVersionInfoAFunc: Symbol<'a, DtwaingetactivedsmversioninfoaFunc>,
-    DTWAIN_GetActiveDSMVersionInfoWFunc: Symbol<'a, DtwaingetactivedsmversioninfowFunc>,
-    DTWAIN_GetAlarmVolumeFunc: Symbol<'a, DtwaingetalarmvolumeFunc>,
-    DTWAIN_GetAllSourceDibsFunc: Symbol<'a, DtwaingetallsourcedibsFunc>,
-    DTWAIN_GetAppInfoFunc: Symbol<'a, DtwaingetappinfoFunc>,
-    DTWAIN_GetAppInfoAFunc: Symbol<'a, DtwaingetappinfoaFunc>,
-    DTWAIN_GetAppInfoWFunc: Symbol<'a, DtwaingetappinfowFunc>,
-    DTWAIN_GetAuthorFunc: Symbol<'a, DtwaingetauthorFunc>,
-    DTWAIN_GetAuthorAFunc: Symbol<'a, DtwaingetauthoraFunc>,
-    DTWAIN_GetAuthorWFunc: Symbol<'a, DtwaingetauthorwFunc>,
-    DTWAIN_GetBatteryMinutesFunc: Symbol<'a, DtwaingetbatteryminutesFunc>,
-    DTWAIN_GetBatteryPercentFunc: Symbol<'a, DtwaingetbatterypercentFunc>,
-    DTWAIN_GetBitDepthFunc: Symbol<'a, DtwaingetbitdepthFunc>,
-    DTWAIN_GetBlankPageAutoDetectionFunc: Symbol<'a, DtwaingetblankpageautodetectionFunc>,
-    DTWAIN_GetBrightnessFunc: Symbol<'a, DtwaingetbrightnessFunc>,
-    DTWAIN_GetBrightnessStringFunc: Symbol<'a, DtwaingetbrightnessstringFunc>,
-    DTWAIN_GetBrightnessStringAFunc: Symbol<'a, DtwaingetbrightnessstringaFunc>,
-    DTWAIN_GetBrightnessStringWFunc: Symbol<'a, DtwaingetbrightnessstringwFunc>,
-    DTWAIN_GetBufferedTransferInfoFunc: Symbol<'a, DtwaingetbufferedtransferinfoFunc>,
-    DTWAIN_GetCapArrayTypeFunc: Symbol<'a, DtwaingetcaparraytypeFunc>,
-    DTWAIN_GetCapContainerFunc: Symbol<'a, DtwaingetcapcontainerFunc>,
-    DTWAIN_GetCapContainerExFunc: Symbol<'a, DtwaingetcapcontainerexFunc>,
-    DTWAIN_GetCapContainerEx2Func: Symbol<'a, Dtwaingetcapcontainerex2Func>,
-    DTWAIN_GetCapDataTypeFunc: Symbol<'a, DtwaingetcapdatatypeFunc>,
-    DTWAIN_GetCapFromNameFunc: Symbol<'a, DtwaingetcapfromnameFunc>,
-    DTWAIN_GetCapFromNameAFunc: Symbol<'a, DtwaingetcapfromnameaFunc>,
-    DTWAIN_GetCapFromNameWFunc: Symbol<'a, DtwaingetcapfromnamewFunc>,
-    DTWAIN_GetCapOperationsFunc: Symbol<'a, DtwaingetcapoperationsFunc>,
-    DTWAIN_GetCapValuesFunc: Symbol<'a, DtwaingetcapvaluesFunc>,
-    DTWAIN_GetCapValuesExFunc: Symbol<'a, DtwaingetcapvaluesexFunc>,
-    DTWAIN_GetCapValuesEx2Func: Symbol<'a, Dtwaingetcapvaluesex2Func>,
-    DTWAIN_GetCaptionFunc: Symbol<'a, DtwaingetcaptionFunc>,
-    DTWAIN_GetCaptionAFunc: Symbol<'a, DtwaingetcaptionaFunc>,
-    DTWAIN_GetCaptionWFunc: Symbol<'a, DtwaingetcaptionwFunc>,
-    DTWAIN_GetCompressionSizeFunc: Symbol<'a, DtwaingetcompressionsizeFunc>,
-    DTWAIN_GetCompressionTypeFunc: Symbol<'a, DtwaingetcompressiontypeFunc>,
-    DTWAIN_GetConditionCodeStringFunc: Symbol<'a, DtwaingetconditioncodestringFunc>,
-    DTWAIN_GetConditionCodeStringAFunc: Symbol<'a, DtwaingetconditioncodestringaFunc>,
-    DTWAIN_GetConditionCodeStringWFunc: Symbol<'a, DtwaingetconditioncodestringwFunc>,
-    DTWAIN_GetContrastFunc: Symbol<'a, DtwaingetcontrastFunc>,
-    DTWAIN_GetContrastStringFunc: Symbol<'a, DtwaingetcontraststringFunc>,
-    DTWAIN_GetContrastStringAFunc: Symbol<'a, DtwaingetcontraststringaFunc>,
-    DTWAIN_GetContrastStringWFunc: Symbol<'a, DtwaingetcontraststringwFunc>,
-    DTWAIN_GetCountryFunc: Symbol<'a, DtwaingetcountryFunc>,
-    DTWAIN_GetCurrentAcquiredImageFunc: Symbol<'a, DtwaingetcurrentacquiredimageFunc>,
-    DTWAIN_GetCurrentFileNameFunc: Symbol<'a, DtwaingetcurrentfilenameFunc>,
-    DTWAIN_GetCurrentFileNameAFunc: Symbol<'a, DtwaingetcurrentfilenameaFunc>,
-    DTWAIN_GetCurrentFileNameWFunc: Symbol<'a, DtwaingetcurrentfilenamewFunc>,
-    DTWAIN_GetCurrentPageNumFunc: Symbol<'a, DtwaingetcurrentpagenumFunc>,
-    DTWAIN_GetCurrentRetryCountFunc: Symbol<'a, DtwaingetcurrentretrycountFunc>,
-    DTWAIN_GetCurrentTwainTripletFunc: Symbol<'a, DtwaingetcurrenttwaintripletFunc>,
-    DTWAIN_GetCustomDSDataFunc: Symbol<'a, DtwaingetcustomdsdataFunc>,
-    DTWAIN_GetDSMFullNameFunc: Symbol<'a, DtwaingetdsmfullnameFunc>,
-    DTWAIN_GetDSMFullNameAFunc: Symbol<'a, DtwaingetdsmfullnameaFunc>,
-    DTWAIN_GetDSMFullNameWFunc: Symbol<'a, DtwaingetdsmfullnamewFunc>,
-    DTWAIN_GetDSMSearchOrderFunc: Symbol<'a, DtwaingetdsmsearchorderFunc>,
-    DTWAIN_GetDTWAINHandleFunc: Symbol<'a, DtwaingetdtwainhandleFunc>,
-    DTWAIN_GetDeviceEventFunc: Symbol<'a, DtwaingetdeviceeventFunc>,
-    DTWAIN_GetDeviceEventExFunc: Symbol<'a, DtwaingetdeviceeventexFunc>,
-    DTWAIN_GetDeviceEventInfoFunc: Symbol<'a, DtwaingetdeviceeventinfoFunc>,
-    DTWAIN_GetDeviceNotificationsFunc: Symbol<'a, DtwaingetdevicenotificationsFunc>,
-    DTWAIN_GetDeviceTimeDateFunc: Symbol<'a, DtwaingetdevicetimedateFunc>,
-    DTWAIN_GetDeviceTimeDateAFunc: Symbol<'a, DtwaingetdevicetimedateaFunc>,
-    DTWAIN_GetDeviceTimeDateWFunc: Symbol<'a, DtwaingetdevicetimedatewFunc>,
-    DTWAIN_GetDoubleFeedDetectLengthFunc: Symbol<'a, DtwaingetdoublefeeddetectlengthFunc>,
-    DTWAIN_GetDoubleFeedDetectValuesFunc: Symbol<'a, DtwaingetdoublefeeddetectvaluesFunc>,
-    DTWAIN_GetDuplexTypeFunc: Symbol<'a, DtwaingetduplextypeFunc>,
-    DTWAIN_GetErrorBufferFunc: Symbol<'a, DtwaingeterrorbufferFunc>,
-    DTWAIN_GetErrorBufferThresholdFunc: Symbol<'a, DtwaingeterrorbufferthresholdFunc>,
-    DTWAIN_GetErrorStringFunc: Symbol<'a, DtwaingeterrorstringFunc>,
-    DTWAIN_GetErrorStringAFunc: Symbol<'a, DtwaingeterrorstringaFunc>,
-    DTWAIN_GetErrorStringWFunc: Symbol<'a, DtwaingeterrorstringwFunc>,
-    DTWAIN_GetExtCapFromNameFunc: Symbol<'a, DtwaingetextcapfromnameFunc>,
-    DTWAIN_GetExtCapFromNameAFunc: Symbol<'a, DtwaingetextcapfromnameaFunc>,
-    DTWAIN_GetExtCapFromNameWFunc: Symbol<'a, DtwaingetextcapfromnamewFunc>,
-    DTWAIN_GetExtImageInfoFunc: Symbol<'a, DtwaingetextimageinfoFunc>,
-    DTWAIN_GetExtImageInfoDataFunc: Symbol<'a, DtwaingetextimageinfodataFunc>,
-    DTWAIN_GetExtImageInfoDataExFunc: Symbol<'a, DtwaingetextimageinfodataexFunc>,
-    DTWAIN_GetExtImageInfoItemFunc: Symbol<'a, DtwaingetextimageinfoitemFunc>,
-    DTWAIN_GetExtImageInfoItemExFunc: Symbol<'a, DtwaingetextimageinfoitemexFunc>,
-    DTWAIN_GetExtNameFromCapFunc: Symbol<'a, DtwaingetextnamefromcapFunc>,
-    DTWAIN_GetExtNameFromCapAFunc: Symbol<'a, DtwaingetextnamefromcapaFunc>,
-    DTWAIN_GetExtNameFromCapWFunc: Symbol<'a, DtwaingetextnamefromcapwFunc>,
-    DTWAIN_GetFeederAlignmentFunc: Symbol<'a, DtwaingetfeederalignmentFunc>,
-    DTWAIN_GetFeederFuncsFunc: Symbol<'a, DtwaingetfeederfuncsFunc>,
-    DTWAIN_GetFeederOrderFunc: Symbol<'a, DtwaingetfeederorderFunc>,
-    DTWAIN_GetFeederWaitTimeFunc: Symbol<'a, DtwaingetfeederwaittimeFunc>,
-    DTWAIN_GetFileCompressionTypeFunc: Symbol<'a, DtwaingetfilecompressiontypeFunc>,
-    DTWAIN_GetFileTypeExtensionsFunc: Symbol<'a, DtwaingetfiletypeextensionsFunc>,
-    DTWAIN_GetFileTypeExtensionsAFunc: Symbol<'a, DtwaingetfiletypeextensionsaFunc>,
-    DTWAIN_GetFileTypeExtensionsWFunc: Symbol<'a, DtwaingetfiletypeextensionswFunc>,
-    DTWAIN_GetFileTypeNameFunc: Symbol<'a, DtwaingetfiletypenameFunc>,
-    DTWAIN_GetFileTypeNameAFunc: Symbol<'a, DtwaingetfiletypenameaFunc>,
-    DTWAIN_GetFileTypeNameWFunc: Symbol<'a, DtwaingetfiletypenamewFunc>,
-    DTWAIN_GetHalftoneFunc: Symbol<'a, DtwaingethalftoneFunc>,
-    DTWAIN_GetHalftoneAFunc: Symbol<'a, DtwaingethalftoneaFunc>,
-    DTWAIN_GetHalftoneWFunc: Symbol<'a, DtwaingethalftonewFunc>,
-    DTWAIN_GetHighlightFunc: Symbol<'a, DtwaingethighlightFunc>,
-    DTWAIN_GetHighlightStringFunc: Symbol<'a, DtwaingethighlightstringFunc>,
-    DTWAIN_GetHighlightStringAFunc: Symbol<'a, DtwaingethighlightstringaFunc>,
-    DTWAIN_GetHighlightStringWFunc: Symbol<'a, DtwaingethighlightstringwFunc>,
-    DTWAIN_GetImageInfoFunc: Symbol<'a, DtwaingetimageinfoFunc>,
-    DTWAIN_GetImageInfoStringFunc: Symbol<'a, DtwaingetimageinfostringFunc>,
-    DTWAIN_GetImageInfoStringAFunc: Symbol<'a, DtwaingetimageinfostringaFunc>,
-    DTWAIN_GetImageInfoStringWFunc: Symbol<'a, DtwaingetimageinfostringwFunc>,
-    DTWAIN_GetJobControlFunc: Symbol<'a, DtwaingetjobcontrolFunc>,
-    DTWAIN_GetJpegValuesFunc: Symbol<'a, DtwaingetjpegvaluesFunc>,
-    DTWAIN_GetJpegXRValuesFunc: Symbol<'a, DtwaingetjpegxrvaluesFunc>,
-    DTWAIN_GetLanguageFunc: Symbol<'a, DtwaingetlanguageFunc>,
-    DTWAIN_GetLastErrorFunc: Symbol<'a, DtwaingetlasterrorFunc>,
-    DTWAIN_GetLibraryPathFunc: Symbol<'a, DtwaingetlibrarypathFunc>,
-    DTWAIN_GetLibraryPathAFunc: Symbol<'a, DtwaingetlibrarypathaFunc>,
-    DTWAIN_GetLibraryPathWFunc: Symbol<'a, DtwaingetlibrarypathwFunc>,
-    DTWAIN_GetLightPathFunc: Symbol<'a, DtwaingetlightpathFunc>,
-    DTWAIN_GetLightSourceFunc: Symbol<'a, DtwaingetlightsourceFunc>,
-    DTWAIN_GetLightSourcesFunc: Symbol<'a, DtwaingetlightsourcesFunc>,
-    DTWAIN_GetManualDuplexCountFunc: Symbol<'a, DtwaingetmanualduplexcountFunc>,
-    DTWAIN_GetMaxAcquisitionsFunc: Symbol<'a, DtwaingetmaxacquisitionsFunc>,
-    DTWAIN_GetMaxBuffersFunc: Symbol<'a, DtwaingetmaxbuffersFunc>,
-    DTWAIN_GetMaxPagesToAcquireFunc: Symbol<'a, DtwaingetmaxpagestoacquireFunc>,
-    DTWAIN_GetMaxRetryAttemptsFunc: Symbol<'a, DtwaingetmaxretryattemptsFunc>,
-    DTWAIN_GetNameFromCapFunc: Symbol<'a, DtwaingetnamefromcapFunc>,
-    DTWAIN_GetNameFromCapAFunc: Symbol<'a, DtwaingetnamefromcapaFunc>,
-    DTWAIN_GetNameFromCapWFunc: Symbol<'a, DtwaingetnamefromcapwFunc>,
-    DTWAIN_GetNoiseFilterFunc: Symbol<'a, DtwaingetnoisefilterFunc>,
-    DTWAIN_GetNumAcquiredImagesFunc: Symbol<'a, DtwaingetnumacquiredimagesFunc>,
-    DTWAIN_GetNumAcquisitionsFunc: Symbol<'a, DtwaingetnumacquisitionsFunc>,
-    DTWAIN_GetOCRCapValuesFunc: Symbol<'a, DtwaingetocrcapvaluesFunc>,
-    DTWAIN_GetOCRErrorStringFunc: Symbol<'a, DtwaingetocrerrorstringFunc>,
-    DTWAIN_GetOCRErrorStringAFunc: Symbol<'a, DtwaingetocrerrorstringaFunc>,
-    DTWAIN_GetOCRErrorStringWFunc: Symbol<'a, DtwaingetocrerrorstringwFunc>,
-    DTWAIN_GetOCRLastErrorFunc: Symbol<'a, DtwaingetocrlasterrorFunc>,
-    DTWAIN_GetOCRMajorMinorVersionFunc: Symbol<'a, DtwaingetocrmajorminorversionFunc>,
-    DTWAIN_GetOCRManufacturerFunc: Symbol<'a, DtwaingetocrmanufacturerFunc>,
-    DTWAIN_GetOCRManufacturerAFunc: Symbol<'a, DtwaingetocrmanufactureraFunc>,
-    DTWAIN_GetOCRManufacturerWFunc: Symbol<'a, DtwaingetocrmanufacturerwFunc>,
-    DTWAIN_GetOCRProductFamilyFunc: Symbol<'a, DtwaingetocrproductfamilyFunc>,
-    DTWAIN_GetOCRProductFamilyAFunc: Symbol<'a, DtwaingetocrproductfamilyaFunc>,
-    DTWAIN_GetOCRProductFamilyWFunc: Symbol<'a, DtwaingetocrproductfamilywFunc>,
-    DTWAIN_GetOCRProductNameFunc: Symbol<'a, DtwaingetocrproductnameFunc>,
-    DTWAIN_GetOCRProductNameAFunc: Symbol<'a, DtwaingetocrproductnameaFunc>,
-    DTWAIN_GetOCRProductNameWFunc: Symbol<'a, DtwaingetocrproductnamewFunc>,
-    DTWAIN_GetOCRTextFunc: Symbol<'a, DtwaingetocrtextFunc>,
-    DTWAIN_GetOCRTextAFunc: Symbol<'a, DtwaingetocrtextaFunc>,
-    DTWAIN_GetOCRTextInfoFloatFunc: Symbol<'a, DtwaingetocrtextinfofloatFunc>,
-    DTWAIN_GetOCRTextInfoFloatExFunc: Symbol<'a, DtwaingetocrtextinfofloatexFunc>,
-    DTWAIN_GetOCRTextInfoHandleFunc: Symbol<'a, DtwaingetocrtextinfohandleFunc>,
-    DTWAIN_GetOCRTextInfoLongFunc: Symbol<'a, DtwaingetocrtextinfolongFunc>,
-    DTWAIN_GetOCRTextInfoLongExFunc: Symbol<'a, DtwaingetocrtextinfolongexFunc>,
-    DTWAIN_GetOCRTextWFunc: Symbol<'a, DtwaingetocrtextwFunc>,
-    DTWAIN_GetOCRVersionInfoFunc: Symbol<'a, DtwaingetocrversioninfoFunc>,
-    DTWAIN_GetOCRVersionInfoAFunc: Symbol<'a, DtwaingetocrversioninfoaFunc>,
-    DTWAIN_GetOCRVersionInfoWFunc: Symbol<'a, DtwaingetocrversioninfowFunc>,
-    DTWAIN_GetOrientationFunc: Symbol<'a, DtwaingetorientationFunc>,
-    DTWAIN_GetOverscanFunc: Symbol<'a, DtwaingetoverscanFunc>,
-    DTWAIN_GetPDFTextElementFloatFunc: Symbol<'a, DtwaingetpdftextelementfloatFunc>,
-    DTWAIN_GetPDFTextElementLongFunc: Symbol<'a, DtwaingetpdftextelementlongFunc>,
-    DTWAIN_GetPDFTextElementStringFunc: Symbol<'a, DtwaingetpdftextelementstringFunc>,
-    DTWAIN_GetPDFTextElementStringAFunc: Symbol<'a, DtwaingetpdftextelementstringaFunc>,
-    DTWAIN_GetPDFTextElementStringWFunc: Symbol<'a, DtwaingetpdftextelementstringwFunc>,
-    DTWAIN_GetPDFType1FontNameFunc: Symbol<'a, Dtwaingetpdftype1fontnameFunc>,
-    DTWAIN_GetPDFType1FontNameAFunc: Symbol<'a, Dtwaingetpdftype1fontnameaFunc>,
-    DTWAIN_GetPDFType1FontNameWFunc: Symbol<'a, Dtwaingetpdftype1fontnamewFunc>,
-    DTWAIN_GetPaperSizeFunc: Symbol<'a, DtwaingetpapersizeFunc>,
-    DTWAIN_GetPaperSizeNameFunc: Symbol<'a, DtwaingetpapersizenameFunc>,
-    DTWAIN_GetPaperSizeNameAFunc: Symbol<'a, DtwaingetpapersizenameaFunc>,
-    DTWAIN_GetPaperSizeNameWFunc: Symbol<'a, DtwaingetpapersizenamewFunc>,
-    DTWAIN_GetPatchMaxPrioritiesFunc: Symbol<'a, DtwaingetpatchmaxprioritiesFunc>,
-    DTWAIN_GetPatchMaxRetriesFunc: Symbol<'a, DtwaingetpatchmaxretriesFunc>,
-    DTWAIN_GetPatchPrioritiesFunc: Symbol<'a, DtwaingetpatchprioritiesFunc>,
-    DTWAIN_GetPatchSearchModeFunc: Symbol<'a, DtwaingetpatchsearchmodeFunc>,
-    DTWAIN_GetPatchTimeOutFunc: Symbol<'a, DtwaingetpatchtimeoutFunc>,
-    DTWAIN_GetPixelFlavorFunc: Symbol<'a, DtwaingetpixelflavorFunc>,
-    DTWAIN_GetPixelTypeFunc: Symbol<'a, DtwaingetpixeltypeFunc>,
-    DTWAIN_GetPrinterFunc: Symbol<'a, DtwaingetprinterFunc>,
-    DTWAIN_GetPrinterStartNumberFunc: Symbol<'a, DtwaingetprinterstartnumberFunc>,
-    DTWAIN_GetPrinterStringModeFunc: Symbol<'a, DtwaingetprinterstringmodeFunc>,
-    DTWAIN_GetPrinterStringsFunc: Symbol<'a, DtwaingetprinterstringsFunc>,
-    DTWAIN_GetPrinterSuffixStringFunc: Symbol<'a, DtwaingetprintersuffixstringFunc>,
-    DTWAIN_GetPrinterSuffixStringAFunc: Symbol<'a, DtwaingetprintersuffixstringaFunc>,
-    DTWAIN_GetPrinterSuffixStringWFunc: Symbol<'a, DtwaingetprintersuffixstringwFunc>,
-    DTWAIN_GetRegisteredMsgFunc: Symbol<'a, DtwaingetregisteredmsgFunc>,
-    DTWAIN_GetResolutionFunc: Symbol<'a, DtwaingetresolutionFunc>,
-    DTWAIN_GetResolutionStringFunc: Symbol<'a, DtwaingetresolutionstringFunc>,
-    DTWAIN_GetResolutionStringAFunc: Symbol<'a, DtwaingetresolutionstringaFunc>,
-    DTWAIN_GetResolutionStringWFunc: Symbol<'a, DtwaingetresolutionstringwFunc>,
-    DTWAIN_GetResourceStringFunc: Symbol<'a, DtwaingetresourcestringFunc>,
-    DTWAIN_GetResourceStringAFunc: Symbol<'a, DtwaingetresourcestringaFunc>,
-    DTWAIN_GetResourceStringWFunc: Symbol<'a, DtwaingetresourcestringwFunc>,
-    DTWAIN_GetRotationFunc: Symbol<'a, DtwaingetrotationFunc>,
-    DTWAIN_GetRotationStringFunc: Symbol<'a, DtwaingetrotationstringFunc>,
-    DTWAIN_GetRotationStringAFunc: Symbol<'a, DtwaingetrotationstringaFunc>,
-    DTWAIN_GetRotationStringWFunc: Symbol<'a, DtwaingetrotationstringwFunc>,
-    DTWAIN_GetSaveFileNameFunc: Symbol<'a, DtwaingetsavefilenameFunc>,
-    DTWAIN_GetSaveFileNameAFunc: Symbol<'a, DtwaingetsavefilenameaFunc>,
-    DTWAIN_GetSaveFileNameWFunc: Symbol<'a, DtwaingetsavefilenamewFunc>,
-    DTWAIN_GetSavedFilesCountFunc: Symbol<'a, DtwaingetsavedfilescountFunc>,
-    DTWAIN_GetSessionDetailsFunc: Symbol<'a, DtwaingetsessiondetailsFunc>,
-    DTWAIN_GetSessionDetailsAFunc: Symbol<'a, DtwaingetsessiondetailsaFunc>,
-    DTWAIN_GetSessionDetailsWFunc: Symbol<'a, DtwaingetsessiondetailswFunc>,
-    DTWAIN_GetShadowFunc: Symbol<'a, DtwaingetshadowFunc>,
-    DTWAIN_GetShadowStringFunc: Symbol<'a, DtwaingetshadowstringFunc>,
-    DTWAIN_GetShadowStringAFunc: Symbol<'a, DtwaingetshadowstringaFunc>,
-    DTWAIN_GetShadowStringWFunc: Symbol<'a, DtwaingetshadowstringwFunc>,
-    DTWAIN_GetShortVersionStringFunc: Symbol<'a, DtwaingetshortversionstringFunc>,
-    DTWAIN_GetShortVersionStringAFunc: Symbol<'a, DtwaingetshortversionstringaFunc>,
-    DTWAIN_GetShortVersionStringWFunc: Symbol<'a, DtwaingetshortversionstringwFunc>,
-    DTWAIN_GetSourceAcquisitionsFunc: Symbol<'a, DtwaingetsourceacquisitionsFunc>,
-    DTWAIN_GetSourceDetailsFunc: Symbol<'a, DtwaingetsourcedetailsFunc>,
-    DTWAIN_GetSourceDetailsAFunc: Symbol<'a, DtwaingetsourcedetailsaFunc>,
-    DTWAIN_GetSourceDetailsWFunc: Symbol<'a, DtwaingetsourcedetailswFunc>,
-    DTWAIN_GetSourceIDFunc: Symbol<'a, DtwaingetsourceidFunc>,
-    DTWAIN_GetSourceIDExFunc: Symbol<'a, DtwaingetsourceidexFunc>,
-    DTWAIN_GetSourceManufacturerFunc: Symbol<'a, DtwaingetsourcemanufacturerFunc>,
-    DTWAIN_GetSourceManufacturerAFunc: Symbol<'a, DtwaingetsourcemanufactureraFunc>,
-    DTWAIN_GetSourceManufacturerWFunc: Symbol<'a, DtwaingetsourcemanufacturerwFunc>,
-    DTWAIN_GetSourceProductFamilyFunc: Symbol<'a, DtwaingetsourceproductfamilyFunc>,
-    DTWAIN_GetSourceProductFamilyAFunc: Symbol<'a, DtwaingetsourceproductfamilyaFunc>,
-    DTWAIN_GetSourceProductFamilyWFunc: Symbol<'a, DtwaingetsourceproductfamilywFunc>,
-    DTWAIN_GetSourceProductNameFunc: Symbol<'a, DtwaingetsourceproductnameFunc>,
-    DTWAIN_GetSourceProductNameAFunc: Symbol<'a, DtwaingetsourceproductnameaFunc>,
-    DTWAIN_GetSourceProductNameWFunc: Symbol<'a, DtwaingetsourceproductnamewFunc>,
-    DTWAIN_GetSourceUnitFunc: Symbol<'a, DtwaingetsourceunitFunc>,
-    DTWAIN_GetSourceVersionInfoFunc: Symbol<'a, DtwaingetsourceversioninfoFunc>,
-    DTWAIN_GetSourceVersionInfoAFunc: Symbol<'a, DtwaingetsourceversioninfoaFunc>,
-    DTWAIN_GetSourceVersionInfoWFunc: Symbol<'a, DtwaingetsourceversioninfowFunc>,
-    DTWAIN_GetSourceVersionNumberFunc: Symbol<'a, DtwaingetsourceversionnumberFunc>,
-    DTWAIN_GetStaticLibVersionFunc: Symbol<'a, DtwaingetstaticlibversionFunc>,
-    DTWAIN_GetTempFileDirectoryFunc: Symbol<'a, DtwaingettempfiledirectoryFunc>,
-    DTWAIN_GetTempFileDirectoryAFunc: Symbol<'a, DtwaingettempfiledirectoryaFunc>,
-    DTWAIN_GetTempFileDirectoryWFunc: Symbol<'a, DtwaingettempfiledirectorywFunc>,
-    DTWAIN_GetThresholdFunc: Symbol<'a, DtwaingetthresholdFunc>,
-    DTWAIN_GetThresholdStringFunc: Symbol<'a, DtwaingetthresholdstringFunc>,
-    DTWAIN_GetThresholdStringAFunc: Symbol<'a, DtwaingetthresholdstringaFunc>,
-    DTWAIN_GetThresholdStringWFunc: Symbol<'a, DtwaingetthresholdstringwFunc>,
-    DTWAIN_GetTimeDateFunc: Symbol<'a, DtwaingettimedateFunc>,
-    DTWAIN_GetTimeDateAFunc: Symbol<'a, DtwaingettimedateaFunc>,
-    DTWAIN_GetTimeDateWFunc: Symbol<'a, DtwaingettimedatewFunc>,
-    DTWAIN_GetTwainAppIDFunc: Symbol<'a, DtwaingettwainappidFunc>,
-    DTWAIN_GetTwainAppIDExFunc: Symbol<'a, DtwaingettwainappidexFunc>,
-    DTWAIN_GetTwainAvailabilityFunc: Symbol<'a, DtwaingettwainavailabilityFunc>,
-    DTWAIN_GetTwainAvailabilityExFunc: Symbol<'a, DtwaingettwainavailabilityexFunc>,
-    DTWAIN_GetTwainAvailabilityExAFunc: Symbol<'a, DtwaingettwainavailabilityexaFunc>,
-    DTWAIN_GetTwainAvailabilityExWFunc: Symbol<'a, DtwaingettwainavailabilityexwFunc>,
-    DTWAIN_GetTwainCountryNameFunc: Symbol<'a, DtwaingettwaincountrynameFunc>,
-    DTWAIN_GetTwainCountryNameAFunc: Symbol<'a, DtwaingettwaincountrynameaFunc>,
-    DTWAIN_GetTwainCountryNameWFunc: Symbol<'a, DtwaingettwaincountrynamewFunc>,
-    DTWAIN_GetTwainCountryValueFunc: Symbol<'a, DtwaingettwaincountryvalueFunc>,
-    DTWAIN_GetTwainCountryValueAFunc: Symbol<'a, DtwaingettwaincountryvalueaFunc>,
-    DTWAIN_GetTwainCountryValueWFunc: Symbol<'a, DtwaingettwaincountryvaluewFunc>,
-    DTWAIN_GetTwainHwndFunc: Symbol<'a, DtwaingettwainhwndFunc>,
-    DTWAIN_GetTwainIDFromNameFunc: Symbol<'a, DtwaingettwainidfromnameFunc>,
-    DTWAIN_GetTwainIDFromNameAFunc: Symbol<'a, DtwaingettwainidfromnameaFunc>,
-    DTWAIN_GetTwainIDFromNameWFunc: Symbol<'a, DtwaingettwainidfromnamewFunc>,
-    DTWAIN_GetTwainLanguageNameFunc: Symbol<'a, DtwaingettwainlanguagenameFunc>,
-    DTWAIN_GetTwainLanguageNameAFunc: Symbol<'a, DtwaingettwainlanguagenameaFunc>,
-    DTWAIN_GetTwainLanguageNameWFunc: Symbol<'a, DtwaingettwainlanguagenamewFunc>,
-    DTWAIN_GetTwainLanguageValueFunc: Symbol<'a, DtwaingettwainlanguagevalueFunc>,
-    DTWAIN_GetTwainLanguageValueAFunc: Symbol<'a, DtwaingettwainlanguagevalueaFunc>,
-    DTWAIN_GetTwainLanguageValueWFunc: Symbol<'a, DtwaingettwainlanguagevaluewFunc>,
-    DTWAIN_GetTwainModeFunc: Symbol<'a, DtwaingettwainmodeFunc>,
-    DTWAIN_GetTwainNameFromConstantFunc: Symbol<'a, DtwaingettwainnamefromconstantFunc>,
-    DTWAIN_GetTwainNameFromConstantAFunc: Symbol<'a, DtwaingettwainnamefromconstantaFunc>,
-    DTWAIN_GetTwainNameFromConstantWFunc: Symbol<'a, DtwaingettwainnamefromconstantwFunc>,
-    DTWAIN_GetTwainStringNameFunc: Symbol<'a, DtwaingettwainstringnameFunc>,
-    DTWAIN_GetTwainStringNameAFunc: Symbol<'a, DtwaingettwainstringnameaFunc>,
-    DTWAIN_GetTwainStringNameWFunc: Symbol<'a, DtwaingettwainstringnamewFunc>,
-    DTWAIN_GetTwainTimeoutFunc: Symbol<'a, DtwaingettwaintimeoutFunc>,
-    DTWAIN_GetVersionFunc: Symbol<'a, DtwaingetversionFunc>,
-    DTWAIN_GetVersionCopyrightFunc: Symbol<'a, DtwaingetversioncopyrightFunc>,
-    DTWAIN_GetVersionCopyrightAFunc: Symbol<'a, DtwaingetversioncopyrightaFunc>,
-    DTWAIN_GetVersionCopyrightWFunc: Symbol<'a, DtwaingetversioncopyrightwFunc>,
-    DTWAIN_GetVersionExFunc: Symbol<'a, DtwaingetversionexFunc>,
-    DTWAIN_GetVersionInfoFunc: Symbol<'a, DtwaingetversioninfoFunc>,
-    DTWAIN_GetVersionInfoAFunc: Symbol<'a, DtwaingetversioninfoaFunc>,
-    DTWAIN_GetVersionInfoWFunc: Symbol<'a, DtwaingetversioninfowFunc>,
-    DTWAIN_GetVersionStringFunc: Symbol<'a, DtwaingetversionstringFunc>,
-    DTWAIN_GetVersionStringAFunc: Symbol<'a, DtwaingetversionstringaFunc>,
-    DTWAIN_GetVersionStringWFunc: Symbol<'a, DtwaingetversionstringwFunc>,
-    DTWAIN_GetWindowsVersionInfoFunc: Symbol<'a, DtwaingetwindowsversioninfoFunc>,
-    DTWAIN_GetWindowsVersionInfoAFunc: Symbol<'a, DtwaingetwindowsversioninfoaFunc>,
-    DTWAIN_GetWindowsVersionInfoWFunc: Symbol<'a, DtwaingetwindowsversioninfowFunc>,
-    DTWAIN_GetXResolutionFunc: Symbol<'a, DtwaingetxresolutionFunc>,
-    DTWAIN_GetXResolutionStringFunc: Symbol<'a, DtwaingetxresolutionstringFunc>,
-    DTWAIN_GetXResolutionStringAFunc: Symbol<'a, DtwaingetxresolutionstringaFunc>,
-    DTWAIN_GetXResolutionStringWFunc: Symbol<'a, DtwaingetxresolutionstringwFunc>,
-    DTWAIN_GetYResolutionFunc: Symbol<'a, DtwaingetyresolutionFunc>,
-    DTWAIN_GetYResolutionStringFunc: Symbol<'a, DtwaingetyresolutionstringFunc>,
-    DTWAIN_GetYResolutionStringAFunc: Symbol<'a, DtwaingetyresolutionstringaFunc>,
-    DTWAIN_GetYResolutionStringWFunc: Symbol<'a, DtwaingetyresolutionstringwFunc>,
-    DTWAIN_InitExtImageInfoFunc: Symbol<'a, DtwaininitextimageinfoFunc>,
-    DTWAIN_InitImageFileAppendFunc: Symbol<'a, DtwaininitimagefileappendFunc>,
-    DTWAIN_InitImageFileAppendAFunc: Symbol<'a, DtwaininitimagefileappendaFunc>,
-    DTWAIN_InitImageFileAppendWFunc: Symbol<'a, DtwaininitimagefileappendwFunc>,
-    DTWAIN_InitOCRInterfaceFunc: Symbol<'a, DtwaininitocrinterfaceFunc>,
-    DTWAIN_IsAcquiringFunc: Symbol<'a, DtwainisacquiringFunc>,
-    DTWAIN_IsAudioXferSupportedFunc: Symbol<'a, DtwainisaudioxfersupportedFunc>,
-    DTWAIN_IsAutoBorderDetectEnabledFunc: Symbol<'a, DtwainisautoborderdetectenabledFunc>,
-    DTWAIN_IsAutoBorderDetectSupportedFunc: Symbol<'a, DtwainisautoborderdetectsupportedFunc>,
-    DTWAIN_IsAutoBrightEnabledFunc: Symbol<'a, DtwainisautobrightenabledFunc>,
-    DTWAIN_IsAutoBrightSupportedFunc: Symbol<'a, DtwainisautobrightsupportedFunc>,
-    DTWAIN_IsAutoDeskewEnabledFunc: Symbol<'a, DtwainisautodeskewenabledFunc>,
-    DTWAIN_IsAutoDeskewSupportedFunc: Symbol<'a, DtwainisautodeskewsupportedFunc>,
-    DTWAIN_IsAutoFeedEnabledFunc: Symbol<'a, DtwainisautofeedenabledFunc>,
-    DTWAIN_IsAutoFeedSupportedFunc: Symbol<'a, DtwainisautofeedsupportedFunc>,
-    DTWAIN_IsAutoRotateEnabledFunc: Symbol<'a, DtwainisautorotateenabledFunc>,
-    DTWAIN_IsAutoRotateSupportedFunc: Symbol<'a, DtwainisautorotatesupportedFunc>,
-    DTWAIN_IsAutoScanEnabledFunc: Symbol<'a, DtwainisautoscanenabledFunc>,
-    DTWAIN_IsAutomaticSenseMediumEnabledFunc: Symbol<'a, DtwainisautomaticsensemediumenabledFunc>,
-    DTWAIN_IsAutomaticSenseMediumSupportedFunc: Symbol<'a, DtwainisautomaticsensemediumsupportedFunc>,
-    DTWAIN_IsBlankPageDetectionOnFunc: Symbol<'a, DtwainisblankpagedetectiononFunc>,
-    DTWAIN_IsBufferedTileModeOnFunc: Symbol<'a, DtwainisbufferedtilemodeonFunc>,
-    DTWAIN_IsBufferedTileModeSupportedFunc: Symbol<'a, DtwainisbufferedtilemodesupportedFunc>,
-    DTWAIN_IsCapSupportedFunc: Symbol<'a, DtwainiscapsupportedFunc>,
-    DTWAIN_IsCompressionSupportedFunc: Symbol<'a, DtwainiscompressionsupportedFunc>,
-    DTWAIN_IsCustomDSDataSupportedFunc: Symbol<'a, DtwainiscustomdsdatasupportedFunc>,
-    DTWAIN_IsDIBBlankFunc: Symbol<'a, DtwainisdibblankFunc>,
-    DTWAIN_IsDIBBlankStringFunc: Symbol<'a, DtwainisdibblankstringFunc>,
-    DTWAIN_IsDIBBlankStringAFunc: Symbol<'a, DtwainisdibblankstringaFunc>,
-    DTWAIN_IsDIBBlankStringWFunc: Symbol<'a, DtwainisdibblankstringwFunc>,
-    DTWAIN_IsDeviceEventSupportedFunc: Symbol<'a, DtwainisdeviceeventsupportedFunc>,
-    DTWAIN_IsDeviceOnLineFunc: Symbol<'a, DtwainisdeviceonlineFunc>,
-    DTWAIN_IsDoubleFeedDetectLengthSupportedFunc: Symbol<'a, DtwainisdoublefeeddetectlengthsupportedFunc>,
-    DTWAIN_IsDoubleFeedDetectSupportedFunc: Symbol<'a, DtwainisdoublefeeddetectsupportedFunc>,
-    DTWAIN_IsDuplexEnabledFunc: Symbol<'a, DtwainisduplexenabledFunc>,
-    DTWAIN_IsDuplexSupportedFunc: Symbol<'a, DtwainisduplexsupportedFunc>,
-    DTWAIN_IsExtImageInfoSupportedFunc: Symbol<'a, DtwainisextimageinfosupportedFunc>,
-    DTWAIN_IsFeederEnabledFunc: Symbol<'a, DtwainisfeederenabledFunc>,
-    DTWAIN_IsFeederLoadedFunc: Symbol<'a, DtwainisfeederloadedFunc>,
-    DTWAIN_IsFeederSensitiveFunc: Symbol<'a, DtwainisfeedersensitiveFunc>,
-    DTWAIN_IsFeederSupportedFunc: Symbol<'a, DtwainisfeedersupportedFunc>,
-    DTWAIN_IsFileSystemSupportedFunc: Symbol<'a, DtwainisfilesystemsupportedFunc>,
-    DTWAIN_IsFileXferSupportedFunc: Symbol<'a, DtwainisfilexfersupportedFunc>,
-    DTWAIN_IsIAFieldALastPageSupportedFunc: Symbol<'a, DtwainisiafieldalastpagesupportedFunc>,
-    DTWAIN_IsIAFieldALevelSupportedFunc: Symbol<'a, DtwainisiafieldalevelsupportedFunc>,
-    DTWAIN_IsIAFieldAPrintFormatSupportedFunc: Symbol<'a, DtwainisiafieldaprintformatsupportedFunc>,
-    DTWAIN_IsIAFieldAValueSupportedFunc: Symbol<'a, DtwainisiafieldavaluesupportedFunc>,
-    DTWAIN_IsIAFieldBLastPageSupportedFunc: Symbol<'a, DtwainisiafieldblastpagesupportedFunc>,
-    DTWAIN_IsIAFieldBLevelSupportedFunc: Symbol<'a, DtwainisiafieldblevelsupportedFunc>,
-    DTWAIN_IsIAFieldBPrintFormatSupportedFunc: Symbol<'a, DtwainisiafieldbprintformatsupportedFunc>,
-    DTWAIN_IsIAFieldBValueSupportedFunc: Symbol<'a, DtwainisiafieldbvaluesupportedFunc>,
-    DTWAIN_IsIAFieldCLastPageSupportedFunc: Symbol<'a, DtwainisiafieldclastpagesupportedFunc>,
-    DTWAIN_IsIAFieldCLevelSupportedFunc: Symbol<'a, DtwainisiafieldclevelsupportedFunc>,
-    DTWAIN_IsIAFieldCPrintFormatSupportedFunc: Symbol<'a, DtwainisiafieldcprintformatsupportedFunc>,
-    DTWAIN_IsIAFieldCValueSupportedFunc: Symbol<'a, DtwainisiafieldcvaluesupportedFunc>,
-    DTWAIN_IsIAFieldDLastPageSupportedFunc: Symbol<'a, DtwainisiafielddlastpagesupportedFunc>,
-    DTWAIN_IsIAFieldDLevelSupportedFunc: Symbol<'a, DtwainisiafielddlevelsupportedFunc>,
-    DTWAIN_IsIAFieldDPrintFormatSupportedFunc: Symbol<'a, DtwainisiafielddprintformatsupportedFunc>,
-    DTWAIN_IsIAFieldDValueSupportedFunc: Symbol<'a, DtwainisiafielddvaluesupportedFunc>,
-    DTWAIN_IsIAFieldELastPageSupportedFunc: Symbol<'a, DtwainisiafieldelastpagesupportedFunc>,
-    DTWAIN_IsIAFieldELevelSupportedFunc: Symbol<'a, DtwainisiafieldelevelsupportedFunc>,
-    DTWAIN_IsIAFieldEPrintFormatSupportedFunc: Symbol<'a, DtwainisiafieldeprintformatsupportedFunc>,
-    DTWAIN_IsIAFieldEValueSupportedFunc: Symbol<'a, DtwainisiafieldevaluesupportedFunc>,
-    DTWAIN_IsImageAddressingSupportedFunc: Symbol<'a, DtwainisimageaddressingsupportedFunc>,
-    DTWAIN_IsIndicatorEnabledFunc: Symbol<'a, DtwainisindicatorenabledFunc>,
-    DTWAIN_IsIndicatorSupportedFunc: Symbol<'a, DtwainisindicatorsupportedFunc>,
-    DTWAIN_IsInitializedFunc: Symbol<'a, DtwainisinitializedFunc>,
-    DTWAIN_IsJPEGSupportedFunc: Symbol<'a, DtwainisjpegsupportedFunc>,
-    DTWAIN_IsJobControlSupportedFunc: Symbol<'a, DtwainisjobcontrolsupportedFunc>,
-    DTWAIN_IsLampEnabledFunc: Symbol<'a, DtwainislampenabledFunc>,
-    DTWAIN_IsLampSupportedFunc: Symbol<'a, DtwainislampsupportedFunc>,
-    DTWAIN_IsLightPathSupportedFunc: Symbol<'a, DtwainislightpathsupportedFunc>,
-    DTWAIN_IsLightSourceSupportedFunc: Symbol<'a, DtwainislightsourcesupportedFunc>,
-    DTWAIN_IsMaxBuffersSupportedFunc: Symbol<'a, DtwainismaxbufferssupportedFunc>,
-    DTWAIN_IsMemFileXferSupportedFunc: Symbol<'a, DtwainismemfilexfersupportedFunc>,
-    DTWAIN_IsMsgNotifyEnabledFunc: Symbol<'a, DtwainismsgnotifyenabledFunc>,
-    DTWAIN_IsNotifyTripletsEnabledFunc: Symbol<'a, DtwainisnotifytripletsenabledFunc>,
-    DTWAIN_IsOCREngineActivatedFunc: Symbol<'a, DtwainisocrengineactivatedFunc>,
-    DTWAIN_IsOpenSourcesOnSelectFunc: Symbol<'a, DtwainisopensourcesonselectFunc>,
-    DTWAIN_IsOrientationSupportedFunc: Symbol<'a, DtwainisorientationsupportedFunc>,
-    DTWAIN_IsOverscanSupportedFunc: Symbol<'a, DtwainisoverscansupportedFunc>,
-    DTWAIN_IsPDFSupportedFunc: Symbol<'a, DtwainispdfsupportedFunc>,
-    DTWAIN_IsPNGSupportedFunc: Symbol<'a, DtwainispngsupportedFunc>,
-    DTWAIN_IsPaperDetectableFunc: Symbol<'a, DtwainispaperdetectableFunc>,
-    DTWAIN_IsPaperSizeSupportedFunc: Symbol<'a, DtwainispapersizesupportedFunc>,
-    DTWAIN_IsPatchCapsSupportedFunc: Symbol<'a, DtwainispatchcapssupportedFunc>,
-    DTWAIN_IsPatchDetectEnabledFunc: Symbol<'a, DtwainispatchdetectenabledFunc>,
-    DTWAIN_IsPatchSupportedFunc: Symbol<'a, DtwainispatchsupportedFunc>,
-    DTWAIN_IsPeekMessageLoopEnabledFunc: Symbol<'a, DtwainispeekmessageloopenabledFunc>,
-    DTWAIN_IsPixelTypeSupportedFunc: Symbol<'a, DtwainispixeltypesupportedFunc>,
-    DTWAIN_IsPrinterEnabledFunc: Symbol<'a, DtwainisprinterenabledFunc>,
-    DTWAIN_IsPrinterSupportedFunc: Symbol<'a, DtwainisprintersupportedFunc>,
-    DTWAIN_IsRotationSupportedFunc: Symbol<'a, DtwainisrotationsupportedFunc>,
-    DTWAIN_IsSessionEnabledFunc: Symbol<'a, DtwainissessionenabledFunc>,
-    DTWAIN_IsSkipImageInfoErrorFunc: Symbol<'a, DtwainisskipimageinfoerrorFunc>,
-    DTWAIN_IsSourceAcquiringFunc: Symbol<'a, DtwainissourceacquiringFunc>,
-    DTWAIN_IsSourceAcquiringExFunc: Symbol<'a, DtwainissourceacquiringexFunc>,
-    DTWAIN_IsSourceInUIOnlyModeFunc: Symbol<'a, DtwainissourceinuionlymodeFunc>,
-    DTWAIN_IsSourceOpenFunc: Symbol<'a, DtwainissourceopenFunc>,
-    DTWAIN_IsSourceSelectedFunc: Symbol<'a, DtwainissourceselectedFunc>,
-    DTWAIN_IsSourceValidFunc: Symbol<'a, DtwainissourcevalidFunc>,
-    DTWAIN_IsTIFFSupportedFunc: Symbol<'a, DtwainistiffsupportedFunc>,
-    DTWAIN_IsThumbnailEnabledFunc: Symbol<'a, DtwainisthumbnailenabledFunc>,
-    DTWAIN_IsThumbnailSupportedFunc: Symbol<'a, DtwainisthumbnailsupportedFunc>,
-    DTWAIN_IsTwainAvailableFunc: Symbol<'a, DtwainistwainavailableFunc>,
-    DTWAIN_IsTwainAvailableExFunc: Symbol<'a, DtwainistwainavailableexFunc>,
-    DTWAIN_IsTwainAvailableExAFunc: Symbol<'a, DtwainistwainavailableexaFunc>,
-    DTWAIN_IsTwainAvailableExWFunc: Symbol<'a, DtwainistwainavailableexwFunc>,
-    DTWAIN_IsUIControllableFunc: Symbol<'a, DtwainisuicontrollableFunc>,
-    DTWAIN_IsUIEnabledFunc: Symbol<'a, DtwainisuienabledFunc>,
-    DTWAIN_IsUIOnlySupportedFunc: Symbol<'a, DtwainisuionlysupportedFunc>,
-    DTWAIN_LoadCustomStringResourcesFunc: Symbol<'a, DtwainloadcustomstringresourcesFunc>,
-    DTWAIN_LoadCustomStringResourcesAFunc: Symbol<'a, DtwainloadcustomstringresourcesaFunc>,
-    DTWAIN_LoadCustomStringResourcesExFunc: Symbol<'a, DtwainloadcustomstringresourcesexFunc>,
-    DTWAIN_LoadCustomStringResourcesExAFunc: Symbol<'a, DtwainloadcustomstringresourcesexaFunc>,
-    DTWAIN_LoadCustomStringResourcesExWFunc: Symbol<'a, DtwainloadcustomstringresourcesexwFunc>,
-    DTWAIN_LoadCustomStringResourcesWFunc: Symbol<'a, DtwainloadcustomstringresourceswFunc>,
-    DTWAIN_LoadLanguageResourceFunc: Symbol<'a, DtwainloadlanguageresourceFunc>,
-    DTWAIN_LockMemoryFunc: Symbol<'a, DtwainlockmemoryFunc>,
-    DTWAIN_LockMemoryExFunc: Symbol<'a, DtwainlockmemoryexFunc>,
-    DTWAIN_LogMessageFunc: Symbol<'a, DtwainlogmessageFunc>,
-    DTWAIN_LogMessageAFunc: Symbol<'a, DtwainlogmessageaFunc>,
-    DTWAIN_LogMessageWFunc: Symbol<'a, DtwainlogmessagewFunc>,
-    DTWAIN_MakeRGBFunc: Symbol<'a, DtwainmakergbFunc>,
-    DTWAIN_OpenSourceFunc: Symbol<'a, DtwainopensourceFunc>,
-    DTWAIN_OpenSourcesOnSelectFunc: Symbol<'a, DtwainopensourcesonselectFunc>,
-    DTWAIN_RangeCreateFunc: Symbol<'a, DtwainrangecreateFunc>,
-    DTWAIN_RangeCreateFromCapFunc: Symbol<'a, DtwainrangecreatefromcapFunc>,
-    DTWAIN_RangeDestroyFunc: Symbol<'a, DtwainrangedestroyFunc>,
-    DTWAIN_RangeExpandFunc: Symbol<'a, DtwainrangeexpandFunc>,
-    DTWAIN_RangeExpandExFunc: Symbol<'a, DtwainrangeexpandexFunc>,
-    DTWAIN_RangeGetAllFunc: Symbol<'a, DtwainrangegetallFunc>,
-    DTWAIN_RangeGetAllFloatFunc: Symbol<'a, DtwainrangegetallfloatFunc>,
-    DTWAIN_RangeGetAllFloatStringFunc: Symbol<'a, DtwainrangegetallfloatstringFunc>,
-    DTWAIN_RangeGetAllFloatStringAFunc: Symbol<'a, DtwainrangegetallfloatstringaFunc>,
-    DTWAIN_RangeGetAllFloatStringWFunc: Symbol<'a, DtwainrangegetallfloatstringwFunc>,
-    DTWAIN_RangeGetAllLongFunc: Symbol<'a, DtwainrangegetalllongFunc>,
-    DTWAIN_RangeGetCountFunc: Symbol<'a, DtwainrangegetcountFunc>,
-    DTWAIN_RangeGetExpValueFunc: Symbol<'a, DtwainrangegetexpvalueFunc>,
-    DTWAIN_RangeGetExpValueFloatFunc: Symbol<'a, DtwainrangegetexpvaluefloatFunc>,
-    DTWAIN_RangeGetExpValueFloatStringFunc: Symbol<'a, DtwainrangegetexpvaluefloatstringFunc>,
-    DTWAIN_RangeGetExpValueFloatStringAFunc: Symbol<'a, DtwainrangegetexpvaluefloatstringaFunc>,
-    DTWAIN_RangeGetExpValueFloatStringWFunc: Symbol<'a, DtwainrangegetexpvaluefloatstringwFunc>,
-    DTWAIN_RangeGetExpValueLongFunc: Symbol<'a, DtwainrangegetexpvaluelongFunc>,
-    DTWAIN_RangeGetNearestValueFunc: Symbol<'a, DtwainrangegetnearestvalueFunc>,
-    DTWAIN_RangeGetPosFunc: Symbol<'a, DtwainrangegetposFunc>,
-    DTWAIN_RangeGetPosFloatFunc: Symbol<'a, DtwainrangegetposfloatFunc>,
-    DTWAIN_RangeGetPosFloatStringFunc: Symbol<'a, DtwainrangegetposfloatstringFunc>,
-    DTWAIN_RangeGetPosFloatStringAFunc: Symbol<'a, DtwainrangegetposfloatstringaFunc>,
-    DTWAIN_RangeGetPosFloatStringWFunc: Symbol<'a, DtwainrangegetposfloatstringwFunc>,
-    DTWAIN_RangeGetPosLongFunc: Symbol<'a, DtwainrangegetposlongFunc>,
-    DTWAIN_RangeGetValueFunc: Symbol<'a, DtwainrangegetvalueFunc>,
-    DTWAIN_RangeGetValueFloatFunc: Symbol<'a, DtwainrangegetvaluefloatFunc>,
-    DTWAIN_RangeGetValueFloatStringFunc: Symbol<'a, DtwainrangegetvaluefloatstringFunc>,
-    DTWAIN_RangeGetValueFloatStringAFunc: Symbol<'a, DtwainrangegetvaluefloatstringaFunc>,
-    DTWAIN_RangeGetValueFloatStringWFunc: Symbol<'a, DtwainrangegetvaluefloatstringwFunc>,
-    DTWAIN_RangeGetValueLongFunc: Symbol<'a, DtwainrangegetvaluelongFunc>,
-    DTWAIN_RangeIsValidFunc: Symbol<'a, DtwainrangeisvalidFunc>,
-    DTWAIN_RangeNearestValueFloatFunc: Symbol<'a, DtwainrangenearestvaluefloatFunc>,
-    DTWAIN_RangeNearestValueFloatStringFunc: Symbol<'a, DtwainrangenearestvaluefloatstringFunc>,
-    DTWAIN_RangeNearestValueFloatStringAFunc: Symbol<'a, DtwainrangenearestvaluefloatstringaFunc>,
-    DTWAIN_RangeNearestValueFloatStringWFunc: Symbol<'a, DtwainrangenearestvaluefloatstringwFunc>,
-    DTWAIN_RangeNearestValueLongFunc: Symbol<'a, DtwainrangenearestvaluelongFunc>,
-    DTWAIN_RangeSetAllFunc: Symbol<'a, DtwainrangesetallFunc>,
-    DTWAIN_RangeSetAllFloatFunc: Symbol<'a, DtwainrangesetallfloatFunc>,
-    DTWAIN_RangeSetAllFloatStringFunc: Symbol<'a, DtwainrangesetallfloatstringFunc>,
-    DTWAIN_RangeSetAllFloatStringAFunc: Symbol<'a, DtwainrangesetallfloatstringaFunc>,
-    DTWAIN_RangeSetAllFloatStringWFunc: Symbol<'a, DtwainrangesetallfloatstringwFunc>,
-    DTWAIN_RangeSetAllLongFunc: Symbol<'a, DtwainrangesetalllongFunc>,
-    DTWAIN_RangeSetValueFunc: Symbol<'a, DtwainrangesetvalueFunc>,
-    DTWAIN_RangeSetValueFloatFunc: Symbol<'a, DtwainrangesetvaluefloatFunc>,
-    DTWAIN_RangeSetValueFloatStringFunc: Symbol<'a, DtwainrangesetvaluefloatstringFunc>,
-    DTWAIN_RangeSetValueFloatStringAFunc: Symbol<'a, DtwainrangesetvaluefloatstringaFunc>,
-    DTWAIN_RangeSetValueFloatStringWFunc: Symbol<'a, DtwainrangesetvaluefloatstringwFunc>,
-    DTWAIN_RangeSetValueLongFunc: Symbol<'a, DtwainrangesetvaluelongFunc>,
-    DTWAIN_ResetPDFTextElementFunc: Symbol<'a, DtwainresetpdftextelementFunc>,
-    DTWAIN_RewindPageFunc: Symbol<'a, DtwainrewindpageFunc>,
-    DTWAIN_SelectDefaultOCREngineFunc: Symbol<'a, DtwainselectdefaultocrengineFunc>,
-    DTWAIN_SelectDefaultSourceFunc: Symbol<'a, DtwainselectdefaultsourceFunc>,
-    DTWAIN_SelectDefaultSourceWithOpenFunc: Symbol<'a, DtwainselectdefaultsourcewithopenFunc>,
-    DTWAIN_SelectOCREngineFunc: Symbol<'a, DtwainselectocrengineFunc>,
-    DTWAIN_SelectOCREngine2Func: Symbol<'a, Dtwainselectocrengine2Func>,
-    DTWAIN_SelectOCREngine2AFunc: Symbol<'a, Dtwainselectocrengine2aFunc>,
-    DTWAIN_SelectOCREngine2ExFunc: Symbol<'a, Dtwainselectocrengine2exFunc>,
-    DTWAIN_SelectOCREngine2ExAFunc: Symbol<'a, Dtwainselectocrengine2exaFunc>,
-    DTWAIN_SelectOCREngine2ExWFunc: Symbol<'a, Dtwainselectocrengine2exwFunc>,
-    DTWAIN_SelectOCREngine2WFunc: Symbol<'a, Dtwainselectocrengine2wFunc>,
-    DTWAIN_SelectOCREngineByNameFunc: Symbol<'a, DtwainselectocrenginebynameFunc>,
-    DTWAIN_SelectOCREngineByNameAFunc: Symbol<'a, DtwainselectocrenginebynameaFunc>,
-    DTWAIN_SelectOCREngineByNameWFunc: Symbol<'a, DtwainselectocrenginebynamewFunc>,
-    DTWAIN_SelectSourceFunc: Symbol<'a, DtwainselectsourceFunc>,
-    DTWAIN_SelectSource2Func: Symbol<'a, Dtwainselectsource2Func>,
-    DTWAIN_SelectSource2AFunc: Symbol<'a, Dtwainselectsource2aFunc>,
-    DTWAIN_SelectSource2ExFunc: Symbol<'a, Dtwainselectsource2exFunc>,
-    DTWAIN_SelectSource2ExAFunc: Symbol<'a, Dtwainselectsource2exaFunc>,
-    DTWAIN_SelectSource2ExWFunc: Symbol<'a, Dtwainselectsource2exwFunc>,
-    DTWAIN_SelectSource2WFunc: Symbol<'a, Dtwainselectsource2wFunc>,
-    DTWAIN_SelectSourceByNameFunc: Symbol<'a, DtwainselectsourcebynameFunc>,
-    DTWAIN_SelectSourceByNameAFunc: Symbol<'a, DtwainselectsourcebynameaFunc>,
-    DTWAIN_SelectSourceByNameWFunc: Symbol<'a, DtwainselectsourcebynamewFunc>,
-    DTWAIN_SelectSourceByNameWithOpenFunc: Symbol<'a, DtwainselectsourcebynamewithopenFunc>,
-    DTWAIN_SelectSourceByNameWithOpenAFunc: Symbol<'a, DtwainselectsourcebynamewithopenaFunc>,
-    DTWAIN_SelectSourceByNameWithOpenWFunc: Symbol<'a, DtwainselectsourcebynamewithopenwFunc>,
-    DTWAIN_SelectSourceWithOpenFunc: Symbol<'a, DtwainselectsourcewithopenFunc>,
-    DTWAIN_SetAcquireAreaFunc: Symbol<'a, DtwainsetacquireareaFunc>,
-    DTWAIN_SetAcquireArea2Func: Symbol<'a, Dtwainsetacquirearea2Func>,
-    DTWAIN_SetAcquireArea2StringFunc: Symbol<'a, Dtwainsetacquirearea2stringFunc>,
-    DTWAIN_SetAcquireArea2StringAFunc: Symbol<'a, Dtwainsetacquirearea2stringaFunc>,
-    DTWAIN_SetAcquireArea2StringWFunc: Symbol<'a, Dtwainsetacquirearea2stringwFunc>,
-    DTWAIN_SetAcquireImageNegativeFunc: Symbol<'a, DtwainsetacquireimagenegativeFunc>,
-    DTWAIN_SetAcquireImageScaleFunc: Symbol<'a, DtwainsetacquireimagescaleFunc>,
-    DTWAIN_SetAcquireImageScaleStringFunc: Symbol<'a, DtwainsetacquireimagescalestringFunc>,
-    DTWAIN_SetAcquireImageScaleStringAFunc: Symbol<'a, DtwainsetacquireimagescalestringaFunc>,
-    DTWAIN_SetAcquireImageScaleStringWFunc: Symbol<'a, DtwainsetacquireimagescalestringwFunc>,
-    DTWAIN_SetAcquireStripBufferFunc: Symbol<'a, DtwainsetacquirestripbufferFunc>,
-    DTWAIN_SetAcquireStripSizeFunc: Symbol<'a, DtwainsetacquirestripsizeFunc>,
-    DTWAIN_SetAlarmVolumeFunc: Symbol<'a, DtwainsetalarmvolumeFunc>,
-    DTWAIN_SetAlarmsFunc: Symbol<'a, DtwainsetalarmsFunc>,
-    DTWAIN_SetAllCapsToDefaultFunc: Symbol<'a, DtwainsetallcapstodefaultFunc>,
-    DTWAIN_SetAppInfoFunc: Symbol<'a, DtwainsetappinfoFunc>,
-    DTWAIN_SetAppInfoAFunc: Symbol<'a, DtwainsetappinfoaFunc>,
-    DTWAIN_SetAppInfoWFunc: Symbol<'a, DtwainsetappinfowFunc>,
-    DTWAIN_SetAuthorFunc: Symbol<'a, DtwainsetauthorFunc>,
-    DTWAIN_SetAuthorAFunc: Symbol<'a, DtwainsetauthoraFunc>,
-    DTWAIN_SetAuthorWFunc: Symbol<'a, DtwainsetauthorwFunc>,
-    DTWAIN_SetAvailablePrintersFunc: Symbol<'a, DtwainsetavailableprintersFunc>,
-    DTWAIN_SetAvailablePrintersArrayFunc: Symbol<'a, DtwainsetavailableprintersarrayFunc>,
-    DTWAIN_SetBitDepthFunc: Symbol<'a, DtwainsetbitdepthFunc>,
-    DTWAIN_SetBlankPageDetectionFunc: Symbol<'a, DtwainsetblankpagedetectionFunc>,
-    DTWAIN_SetBlankPageDetectionExFunc: Symbol<'a, DtwainsetblankpagedetectionexFunc>,
-    DTWAIN_SetBlankPageDetectionExStringFunc: Symbol<'a, DtwainsetblankpagedetectionexstringFunc>,
-    DTWAIN_SetBlankPageDetectionExStringAFunc: Symbol<'a, DtwainsetblankpagedetectionexstringaFunc>,
-    DTWAIN_SetBlankPageDetectionExStringWFunc: Symbol<'a, DtwainsetblankpagedetectionexstringwFunc>,
-    DTWAIN_SetBlankPageDetectionStringFunc: Symbol<'a, DtwainsetblankpagedetectionstringFunc>,
-    DTWAIN_SetBlankPageDetectionStringAFunc: Symbol<'a, DtwainsetblankpagedetectionstringaFunc>,
-    DTWAIN_SetBlankPageDetectionStringWFunc: Symbol<'a, DtwainsetblankpagedetectionstringwFunc>,
-    DTWAIN_SetBrightnessFunc: Symbol<'a, DtwainsetbrightnessFunc>,
-    DTWAIN_SetBrightnessStringFunc: Symbol<'a, DtwainsetbrightnessstringFunc>,
-    DTWAIN_SetBrightnessStringAFunc: Symbol<'a, DtwainsetbrightnessstringaFunc>,
-    DTWAIN_SetBrightnessStringWFunc: Symbol<'a, DtwainsetbrightnessstringwFunc>,
-    DTWAIN_SetBufferedTileModeFunc: Symbol<'a, DtwainsetbufferedtilemodeFunc>,
-    DTWAIN_SetCameraFunc: Symbol<'a, DtwainsetcameraFunc>,
-    DTWAIN_SetCameraAFunc: Symbol<'a, DtwainsetcameraaFunc>,
-    DTWAIN_SetCameraWFunc: Symbol<'a, DtwainsetcamerawFunc>,
-    DTWAIN_SetCapValuesFunc: Symbol<'a, DtwainsetcapvaluesFunc>,
-    DTWAIN_SetCapValuesExFunc: Symbol<'a, DtwainsetcapvaluesexFunc>,
-    DTWAIN_SetCapValuesEx2Func: Symbol<'a, Dtwainsetcapvaluesex2Func>,
-    DTWAIN_SetCaptionFunc: Symbol<'a, DtwainsetcaptionFunc>,
-    DTWAIN_SetCaptionAFunc: Symbol<'a, DtwainsetcaptionaFunc>,
-    DTWAIN_SetCaptionWFunc: Symbol<'a, DtwainsetcaptionwFunc>,
-    DTWAIN_SetCompressionTypeFunc: Symbol<'a, DtwainsetcompressiontypeFunc>,
-    DTWAIN_SetContrastFunc: Symbol<'a, DtwainsetcontrastFunc>,
-    DTWAIN_SetContrastStringFunc: Symbol<'a, DtwainsetcontraststringFunc>,
-    DTWAIN_SetContrastStringAFunc: Symbol<'a, DtwainsetcontraststringaFunc>,
-    DTWAIN_SetContrastStringWFunc: Symbol<'a, DtwainsetcontraststringwFunc>,
-    DTWAIN_SetCountryFunc: Symbol<'a, DtwainsetcountryFunc>,
-    DTWAIN_SetCurrentRetryCountFunc: Symbol<'a, DtwainsetcurrentretrycountFunc>,
-    DTWAIN_SetCustomDSDataFunc: Symbol<'a, DtwainsetcustomdsdataFunc>,
-    DTWAIN_SetDSMSearchOrderFunc: Symbol<'a, DtwainsetdsmsearchorderFunc>,
-    DTWAIN_SetDSMSearchOrderExFunc: Symbol<'a, DtwainsetdsmsearchorderexFunc>,
-    DTWAIN_SetDSMSearchOrderExAFunc: Symbol<'a, DtwainsetdsmsearchorderexaFunc>,
-    DTWAIN_SetDSMSearchOrderExWFunc: Symbol<'a, DtwainsetdsmsearchorderexwFunc>,
-    DTWAIN_SetDefaultSourceFunc: Symbol<'a, DtwainsetdefaultsourceFunc>,
-    DTWAIN_SetDeviceNotificationsFunc: Symbol<'a, DtwainsetdevicenotificationsFunc>,
-    DTWAIN_SetDeviceTimeDateFunc: Symbol<'a, DtwainsetdevicetimedateFunc>,
-    DTWAIN_SetDeviceTimeDateAFunc: Symbol<'a, DtwainsetdevicetimedateaFunc>,
-    DTWAIN_SetDeviceTimeDateWFunc: Symbol<'a, DtwainsetdevicetimedatewFunc>,
-    DTWAIN_SetDoubleFeedDetectLengthFunc: Symbol<'a, DtwainsetdoublefeeddetectlengthFunc>,
-    DTWAIN_SetDoubleFeedDetectLengthStringFunc: Symbol<'a, DtwainsetdoublefeeddetectlengthstringFunc>,
-    DTWAIN_SetDoubleFeedDetectLengthStringAFunc: Symbol<'a, DtwainsetdoublefeeddetectlengthstringaFunc>,
-    DTWAIN_SetDoubleFeedDetectLengthStringWFunc: Symbol<'a, DtwainsetdoublefeeddetectlengthstringwFunc>,
-    DTWAIN_SetDoubleFeedDetectValuesFunc: Symbol<'a, DtwainsetdoublefeeddetectvaluesFunc>,
-    DTWAIN_SetDoublePageCountOnDuplexFunc: Symbol<'a, DtwainsetdoublepagecountonduplexFunc>,
-    DTWAIN_SetEOJDetectValueFunc: Symbol<'a, DtwainseteojdetectvalueFunc>,
-    DTWAIN_SetErrorBufferThresholdFunc: Symbol<'a, DtwainseterrorbufferthresholdFunc>,
-    DTWAIN_SetErrorCallbackFunc: Symbol<'a, DtwainseterrorcallbackFunc>,
-    DTWAIN_SetErrorCallback64Func: Symbol<'a, Dtwainseterrorcallback64Func>,
-    DTWAIN_SetFeederAlignmentFunc: Symbol<'a, DtwainsetfeederalignmentFunc>,
-    DTWAIN_SetFeederOrderFunc: Symbol<'a, DtwainsetfeederorderFunc>,
-    DTWAIN_SetFeederWaitTimeFunc: Symbol<'a, DtwainsetfeederwaittimeFunc>,
-    DTWAIN_SetFileAutoIncrementFunc: Symbol<'a, DtwainsetfileautoincrementFunc>,
-    DTWAIN_SetFileCompressionTypeFunc: Symbol<'a, DtwainsetfilecompressiontypeFunc>,
-    DTWAIN_SetFileSavePosFunc: Symbol<'a, DtwainsetfilesaveposFunc>,
-    DTWAIN_SetFileSavePosAFunc: Symbol<'a, DtwainsetfilesaveposaFunc>,
-    DTWAIN_SetFileSavePosWFunc: Symbol<'a, DtwainsetfilesaveposwFunc>,
-    DTWAIN_SetFileXferFormatFunc: Symbol<'a, DtwainsetfilexferformatFunc>,
-    DTWAIN_SetHalftoneFunc: Symbol<'a, DtwainsethalftoneFunc>,
-    DTWAIN_SetHalftoneAFunc: Symbol<'a, DtwainsethalftoneaFunc>,
-    DTWAIN_SetHalftoneWFunc: Symbol<'a, DtwainsethalftonewFunc>,
-    DTWAIN_SetHighlightFunc: Symbol<'a, DtwainsethighlightFunc>,
-    DTWAIN_SetHighlightStringFunc: Symbol<'a, DtwainsethighlightstringFunc>,
-    DTWAIN_SetHighlightStringAFunc: Symbol<'a, DtwainsethighlightstringaFunc>,
-    DTWAIN_SetHighlightStringWFunc: Symbol<'a, DtwainsethighlightstringwFunc>,
-    DTWAIN_SetJobControlFunc: Symbol<'a, DtwainsetjobcontrolFunc>,
-    DTWAIN_SetJpegValuesFunc: Symbol<'a, DtwainsetjpegvaluesFunc>,
-    DTWAIN_SetJpegXRValuesFunc: Symbol<'a, DtwainsetjpegxrvaluesFunc>,
-    DTWAIN_SetLanguageFunc: Symbol<'a, DtwainsetlanguageFunc>,
-    DTWAIN_SetLastErrorFunc: Symbol<'a, DtwainsetlasterrorFunc>,
-    DTWAIN_SetLightPathFunc: Symbol<'a, DtwainsetlightpathFunc>,
-    DTWAIN_SetLightPathExFunc: Symbol<'a, DtwainsetlightpathexFunc>,
-    DTWAIN_SetLightSourceFunc: Symbol<'a, DtwainsetlightsourceFunc>,
-    DTWAIN_SetLightSourcesFunc: Symbol<'a, DtwainsetlightsourcesFunc>,
-    DTWAIN_SetLoggerCallbackFunc: Symbol<'a, DtwainsetloggercallbackFunc>,
-    DTWAIN_SetLoggerCallbackAFunc: Symbol<'a, DtwainsetloggercallbackaFunc>,
-    DTWAIN_SetLoggerCallbackWFunc: Symbol<'a, DtwainsetloggercallbackwFunc>,
-    DTWAIN_SetManualDuplexModeFunc: Symbol<'a, DtwainsetmanualduplexmodeFunc>,
-    DTWAIN_SetMaxAcquisitionsFunc: Symbol<'a, DtwainsetmaxacquisitionsFunc>,
-    DTWAIN_SetMaxBuffersFunc: Symbol<'a, DtwainsetmaxbuffersFunc>,
-    DTWAIN_SetMaxRetryAttemptsFunc: Symbol<'a, DtwainsetmaxretryattemptsFunc>,
-    DTWAIN_SetMultipageScanModeFunc: Symbol<'a, DtwainsetmultipagescanmodeFunc>,
-    DTWAIN_SetNoiseFilterFunc: Symbol<'a, DtwainsetnoisefilterFunc>,
-    DTWAIN_SetOCRCapValuesFunc: Symbol<'a, DtwainsetocrcapvaluesFunc>,
-    DTWAIN_SetOrientationFunc: Symbol<'a, DtwainsetorientationFunc>,
-    DTWAIN_SetOverscanFunc: Symbol<'a, DtwainsetoverscanFunc>,
-    DTWAIN_SetPDFAESEncryptionFunc: Symbol<'a, DtwainsetpdfaesencryptionFunc>,
-    DTWAIN_SetPDFASCIICompressionFunc: Symbol<'a, DtwainsetpdfasciicompressionFunc>,
-    DTWAIN_SetPDFAuthorFunc: Symbol<'a, DtwainsetpdfauthorFunc>,
-    DTWAIN_SetPDFAuthorAFunc: Symbol<'a, DtwainsetpdfauthoraFunc>,
-    DTWAIN_SetPDFAuthorWFunc: Symbol<'a, DtwainsetpdfauthorwFunc>,
-    DTWAIN_SetPDFCompressionFunc: Symbol<'a, DtwainsetpdfcompressionFunc>,
-    DTWAIN_SetPDFCreatorFunc: Symbol<'a, DtwainsetpdfcreatorFunc>,
-    DTWAIN_SetPDFCreatorAFunc: Symbol<'a, DtwainsetpdfcreatoraFunc>,
-    DTWAIN_SetPDFCreatorWFunc: Symbol<'a, DtwainsetpdfcreatorwFunc>,
-    DTWAIN_SetPDFEncryptionFunc: Symbol<'a, DtwainsetpdfencryptionFunc>,
-    DTWAIN_SetPDFEncryptionAFunc: Symbol<'a, DtwainsetpdfencryptionaFunc>,
-    DTWAIN_SetPDFEncryptionWFunc: Symbol<'a, DtwainsetpdfencryptionwFunc>,
-    DTWAIN_SetPDFJpegQualityFunc: Symbol<'a, DtwainsetpdfjpegqualityFunc>,
-    DTWAIN_SetPDFKeywordsFunc: Symbol<'a, DtwainsetpdfkeywordsFunc>,
-    DTWAIN_SetPDFKeywordsAFunc: Symbol<'a, DtwainsetpdfkeywordsaFunc>,
-    DTWAIN_SetPDFKeywordsWFunc: Symbol<'a, DtwainsetpdfkeywordswFunc>,
-    DTWAIN_SetPDFOCRConversionFunc: Symbol<'a, DtwainsetpdfocrconversionFunc>,
-    DTWAIN_SetPDFOCRModeFunc: Symbol<'a, DtwainsetpdfocrmodeFunc>,
-    DTWAIN_SetPDFOrientationFunc: Symbol<'a, DtwainsetpdforientationFunc>,
-    DTWAIN_SetPDFPageScaleFunc: Symbol<'a, DtwainsetpdfpagescaleFunc>,
-    DTWAIN_SetPDFPageScaleStringFunc: Symbol<'a, DtwainsetpdfpagescalestringFunc>,
-    DTWAIN_SetPDFPageScaleStringAFunc: Symbol<'a, DtwainsetpdfpagescalestringaFunc>,
-    DTWAIN_SetPDFPageScaleStringWFunc: Symbol<'a, DtwainsetpdfpagescalestringwFunc>,
-    DTWAIN_SetPDFPageSizeFunc: Symbol<'a, DtwainsetpdfpagesizeFunc>,
-    DTWAIN_SetPDFPageSizeStringFunc: Symbol<'a, DtwainsetpdfpagesizestringFunc>,
-    DTWAIN_SetPDFPageSizeStringAFunc: Symbol<'a, DtwainsetpdfpagesizestringaFunc>,
-    DTWAIN_SetPDFPageSizeStringWFunc: Symbol<'a, DtwainsetpdfpagesizestringwFunc>,
-    DTWAIN_SetPDFPolarityFunc: Symbol<'a, DtwainsetpdfpolarityFunc>,
-    DTWAIN_SetPDFProducerFunc: Symbol<'a, DtwainsetpdfproducerFunc>,
-    DTWAIN_SetPDFProducerAFunc: Symbol<'a, DtwainsetpdfproduceraFunc>,
-    DTWAIN_SetPDFProducerWFunc: Symbol<'a, DtwainsetpdfproducerwFunc>,
-    DTWAIN_SetPDFSubjectFunc: Symbol<'a, DtwainsetpdfsubjectFunc>,
-    DTWAIN_SetPDFSubjectAFunc: Symbol<'a, DtwainsetpdfsubjectaFunc>,
-    DTWAIN_SetPDFSubjectWFunc: Symbol<'a, DtwainsetpdfsubjectwFunc>,
-    DTWAIN_SetPDFTextElementFloatFunc: Symbol<'a, DtwainsetpdftextelementfloatFunc>,
-    DTWAIN_SetPDFTextElementLongFunc: Symbol<'a, DtwainsetpdftextelementlongFunc>,
-    DTWAIN_SetPDFTextElementStringFunc: Symbol<'a, DtwainsetpdftextelementstringFunc>,
-    DTWAIN_SetPDFTextElementStringAFunc: Symbol<'a, DtwainsetpdftextelementstringaFunc>,
-    DTWAIN_SetPDFTextElementStringWFunc: Symbol<'a, DtwainsetpdftextelementstringwFunc>,
-    DTWAIN_SetPDFTitleFunc: Symbol<'a, DtwainsetpdftitleFunc>,
-    DTWAIN_SetPDFTitleAFunc: Symbol<'a, DtwainsetpdftitleaFunc>,
-    DTWAIN_SetPDFTitleWFunc: Symbol<'a, DtwainsetpdftitlewFunc>,
-    DTWAIN_SetPaperSizeFunc: Symbol<'a, DtwainsetpapersizeFunc>,
-    DTWAIN_SetPatchMaxPrioritiesFunc: Symbol<'a, DtwainsetpatchmaxprioritiesFunc>,
-    DTWAIN_SetPatchMaxRetriesFunc: Symbol<'a, DtwainsetpatchmaxretriesFunc>,
-    DTWAIN_SetPatchPrioritiesFunc: Symbol<'a, DtwainsetpatchprioritiesFunc>,
-    DTWAIN_SetPatchSearchModeFunc: Symbol<'a, DtwainsetpatchsearchmodeFunc>,
-    DTWAIN_SetPatchTimeOutFunc: Symbol<'a, DtwainsetpatchtimeoutFunc>,
-    DTWAIN_SetPixelFlavorFunc: Symbol<'a, DtwainsetpixelflavorFunc>,
-    DTWAIN_SetPixelTypeFunc: Symbol<'a, DtwainsetpixeltypeFunc>,
-    DTWAIN_SetPostScriptTitleFunc: Symbol<'a, DtwainsetpostscripttitleFunc>,
-    DTWAIN_SetPostScriptTitleAFunc: Symbol<'a, DtwainsetpostscripttitleaFunc>,
-    DTWAIN_SetPostScriptTitleWFunc: Symbol<'a, DtwainsetpostscripttitlewFunc>,
-    DTWAIN_SetPostScriptTypeFunc: Symbol<'a, DtwainsetpostscripttypeFunc>,
-    DTWAIN_SetPrinterFunc: Symbol<'a, DtwainsetprinterFunc>,
-    DTWAIN_SetPrinterExFunc: Symbol<'a, DtwainsetprinterexFunc>,
-    DTWAIN_SetPrinterStartNumberFunc: Symbol<'a, DtwainsetprinterstartnumberFunc>,
-    DTWAIN_SetPrinterStringModeFunc: Symbol<'a, DtwainsetprinterstringmodeFunc>,
-    DTWAIN_SetPrinterStringsFunc: Symbol<'a, DtwainsetprinterstringsFunc>,
-    DTWAIN_SetPrinterSuffixStringFunc: Symbol<'a, DtwainsetprintersuffixstringFunc>,
-    DTWAIN_SetPrinterSuffixStringAFunc: Symbol<'a, DtwainsetprintersuffixstringaFunc>,
-    DTWAIN_SetPrinterSuffixStringWFunc: Symbol<'a, DtwainsetprintersuffixstringwFunc>,
-    DTWAIN_SetQueryCapSupportFunc: Symbol<'a, DtwainsetquerycapsupportFunc>,
-    DTWAIN_SetResolutionFunc: Symbol<'a, DtwainsetresolutionFunc>,
-    DTWAIN_SetResolutionStringFunc: Symbol<'a, DtwainsetresolutionstringFunc>,
-    DTWAIN_SetResolutionStringAFunc: Symbol<'a, DtwainsetresolutionstringaFunc>,
-    DTWAIN_SetResolutionStringWFunc: Symbol<'a, DtwainsetresolutionstringwFunc>,
-    DTWAIN_SetResourcePathFunc: Symbol<'a, DtwainsetresourcepathFunc>,
-    DTWAIN_SetResourcePathAFunc: Symbol<'a, DtwainsetresourcepathaFunc>,
-    DTWAIN_SetResourcePathWFunc: Symbol<'a, DtwainsetresourcepathwFunc>,
-    DTWAIN_SetRotationFunc: Symbol<'a, DtwainsetrotationFunc>,
-    DTWAIN_SetRotationStringFunc: Symbol<'a, DtwainsetrotationstringFunc>,
-    DTWAIN_SetRotationStringAFunc: Symbol<'a, DtwainsetrotationstringaFunc>,
-    DTWAIN_SetRotationStringWFunc: Symbol<'a, DtwainsetrotationstringwFunc>,
-    DTWAIN_SetSaveFileNameFunc: Symbol<'a, DtwainsetsavefilenameFunc>,
-    DTWAIN_SetSaveFileNameAFunc: Symbol<'a, DtwainsetsavefilenameaFunc>,
-    DTWAIN_SetSaveFileNameWFunc: Symbol<'a, DtwainsetsavefilenamewFunc>,
-    DTWAIN_SetShadowFunc: Symbol<'a, DtwainsetshadowFunc>,
-    DTWAIN_SetShadowStringFunc: Symbol<'a, DtwainsetshadowstringFunc>,
-    DTWAIN_SetShadowStringAFunc: Symbol<'a, DtwainsetshadowstringaFunc>,
-    DTWAIN_SetShadowStringWFunc: Symbol<'a, DtwainsetshadowstringwFunc>,
-    DTWAIN_SetSourceUnitFunc: Symbol<'a, DtwainsetsourceunitFunc>,
-    DTWAIN_SetTIFFCompressTypeFunc: Symbol<'a, DtwainsettiffcompresstypeFunc>,
-    DTWAIN_SetTIFFInvertFunc: Symbol<'a, DtwainsettiffinvertFunc>,
-    DTWAIN_SetTempFileDirectoryFunc: Symbol<'a, DtwainsettempfiledirectoryFunc>,
-    DTWAIN_SetTempFileDirectoryAFunc: Symbol<'a, DtwainsettempfiledirectoryaFunc>,
-    DTWAIN_SetTempFileDirectoryExFunc: Symbol<'a, DtwainsettempfiledirectoryexFunc>,
-    DTWAIN_SetTempFileDirectoryExAFunc: Symbol<'a, DtwainsettempfiledirectoryexaFunc>,
-    DTWAIN_SetTempFileDirectoryExWFunc: Symbol<'a, DtwainsettempfiledirectoryexwFunc>,
-    DTWAIN_SetTempFileDirectoryWFunc: Symbol<'a, DtwainsettempfiledirectorywFunc>,
-    DTWAIN_SetThresholdFunc: Symbol<'a, DtwainsetthresholdFunc>,
-    DTWAIN_SetThresholdStringFunc: Symbol<'a, DtwainsetthresholdstringFunc>,
-    DTWAIN_SetThresholdStringAFunc: Symbol<'a, DtwainsetthresholdstringaFunc>,
-    DTWAIN_SetThresholdStringWFunc: Symbol<'a, DtwainsetthresholdstringwFunc>,
-    DTWAIN_SetTwainDSMFunc: Symbol<'a, DtwainsettwaindsmFunc>,
-    DTWAIN_SetTwainLogFunc: Symbol<'a, DtwainsettwainlogFunc>,
-    DTWAIN_SetTwainLogAFunc: Symbol<'a, DtwainsettwainlogaFunc>,
-    DTWAIN_SetTwainLogWFunc: Symbol<'a, DtwainsettwainlogwFunc>,
-    DTWAIN_SetTwainModeFunc: Symbol<'a, DtwainsettwainmodeFunc>,
-    DTWAIN_SetTwainTimeoutFunc: Symbol<'a, DtwainsettwaintimeoutFunc>,
-    DTWAIN_SetXResolutionFunc: Symbol<'a, DtwainsetxresolutionFunc>,
-    DTWAIN_SetXResolutionStringFunc: Symbol<'a, DtwainsetxresolutionstringFunc>,
-    DTWAIN_SetXResolutionStringAFunc: Symbol<'a, DtwainsetxresolutionstringaFunc>,
-    DTWAIN_SetXResolutionStringWFunc: Symbol<'a, DtwainsetxresolutionstringwFunc>,
-    DTWAIN_SetYResolutionFunc: Symbol<'a, DtwainsetyresolutionFunc>,
-    DTWAIN_SetYResolutionStringFunc: Symbol<'a, DtwainsetyresolutionstringFunc>,
-    DTWAIN_SetYResolutionStringAFunc: Symbol<'a, DtwainsetyresolutionstringaFunc>,
-    DTWAIN_SetYResolutionStringWFunc: Symbol<'a, DtwainsetyresolutionstringwFunc>,
-    DTWAIN_ShowUIOnlyFunc: Symbol<'a, DtwainshowuionlyFunc>,
-    DTWAIN_ShutdownOCREngineFunc: Symbol<'a, DtwainshutdownocrengineFunc>,
-    DTWAIN_SkipImageInfoErrorFunc: Symbol<'a, DtwainskipimageinfoerrorFunc>,
-    DTWAIN_StartThreadFunc: Symbol<'a, DtwainstartthreadFunc>,
-    DTWAIN_StartTwainSessionFunc: Symbol<'a, DtwainstarttwainsessionFunc>,
-    DTWAIN_StartTwainSessionAFunc: Symbol<'a, DtwainstarttwainsessionaFunc>,
-    DTWAIN_StartTwainSessionWFunc: Symbol<'a, DtwainstarttwainsessionwFunc>,
-    DTWAIN_SysDestroyFunc: Symbol<'a, DtwainsysdestroyFunc>,
-    DTWAIN_SysInitializeFunc: Symbol<'a, DtwainsysinitializeFunc>,
-    DTWAIN_SysInitializeExFunc: Symbol<'a, DtwainsysinitializeexFunc>,
-    DTWAIN_SysInitializeEx2Func: Symbol<'a, Dtwainsysinitializeex2Func>,
-    DTWAIN_SysInitializeEx2AFunc: Symbol<'a, Dtwainsysinitializeex2aFunc>,
-    DTWAIN_SysInitializeEx2WFunc: Symbol<'a, Dtwainsysinitializeex2wFunc>,
-    DTWAIN_SysInitializeExAFunc: Symbol<'a, DtwainsysinitializeexaFunc>,
-    DTWAIN_SysInitializeExWFunc: Symbol<'a, DtwainsysinitializeexwFunc>,
-    DTWAIN_SysInitializeLibFunc: Symbol<'a, DtwainsysinitializelibFunc>,
-    DTWAIN_SysInitializeLibExFunc: Symbol<'a, DtwainsysinitializelibexFunc>,
-    DTWAIN_SysInitializeLibEx2Func: Symbol<'a, Dtwainsysinitializelibex2Func>,
-    DTWAIN_SysInitializeLibEx2AFunc: Symbol<'a, Dtwainsysinitializelibex2aFunc>,
-    DTWAIN_SysInitializeLibEx2WFunc: Symbol<'a, Dtwainsysinitializelibex2wFunc>,
-    DTWAIN_SysInitializeLibExAFunc: Symbol<'a, DtwainsysinitializelibexaFunc>,
-    DTWAIN_SysInitializeLibExWFunc: Symbol<'a, DtwainsysinitializelibexwFunc>,
-    DTWAIN_SysInitializeNoBlockingFunc: Symbol<'a, DtwainsysinitializenoblockingFunc>,
-    DTWAIN_TestGetCapFunc: Symbol<'a, DtwaintestgetcapFunc>,
-    DTWAIN_UnlockMemoryFunc: Symbol<'a, DtwainunlockmemoryFunc>,
-    DTWAIN_UnlockMemoryExFunc: Symbol<'a, DtwainunlockmemoryexFunc>,
-    DTWAIN_UseMultipleThreadsFunc: Symbol<'a, DtwainusemultiplethreadsFunc>
-}
-impl<'a> DTwainAPI<'a>
-{
+
     pub fn new(library: &'a Library) -> Result<Self, Box<dyn std::error::Error>>
     {
         let DTWAIN_AcquireAudioFile: Symbol<DtwainacquireaudiofileFunc> = unsafe { library.get(b"DTWAIN_AcquireAudioFile")? };
@@ -4261,6 +4303,8 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetBrightnessStringA: Symbol<DtwaingetbrightnessstringaFunc> = unsafe { library.get(b"DTWAIN_GetBrightnessStringA")? };
         let DTWAIN_GetBrightnessStringW: Symbol<DtwaingetbrightnessstringwFunc> = unsafe { library.get(b"DTWAIN_GetBrightnessStringW")? };
         let DTWAIN_GetBufferedTransferInfo: Symbol<DtwaingetbufferedtransferinfoFunc> = unsafe { library.get(b"DTWAIN_GetBufferedTransferInfo")? };
+        let DTWAIN_GetCallback: Symbol<DtwaingetcallbackFunc> = unsafe { library.get(b"DTWAIN_GetCallback")? };
+        let DTWAIN_GetCallback64: Symbol<Dtwaingetcallback64Func> = unsafe { library.get(b"DTWAIN_GetCallback64")? };
         let DTWAIN_GetCapArrayType: Symbol<DtwaingetcaparraytypeFunc> = unsafe { library.get(b"DTWAIN_GetCapArrayType")? };
         let DTWAIN_GetCapContainer: Symbol<DtwaingetcapcontainerFunc> = unsafe { library.get(b"DTWAIN_GetCapContainer")? };
         let DTWAIN_GetCapContainerEx: Symbol<DtwaingetcapcontainerexFunc> = unsafe { library.get(b"DTWAIN_GetCapContainerEx")? };
@@ -4311,6 +4355,8 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetDuplexType: Symbol<DtwaingetduplextypeFunc> = unsafe { library.get(b"DTWAIN_GetDuplexType")? };
         let DTWAIN_GetErrorBuffer: Symbol<DtwaingeterrorbufferFunc> = unsafe { library.get(b"DTWAIN_GetErrorBuffer")? };
         let DTWAIN_GetErrorBufferThreshold: Symbol<DtwaingeterrorbufferthresholdFunc> = unsafe { library.get(b"DTWAIN_GetErrorBufferThreshold")? };
+        let DTWAIN_GetErrorCallback: Symbol<DtwaingeterrorcallbackFunc> = unsafe { library.get(b"DTWAIN_GetErrorCallback")? };
+        let DTWAIN_GetErrorCallback64: Symbol<Dtwaingeterrorcallback64Func> = unsafe { library.get(b"DTWAIN_GetErrorCallback64")? };
         let DTWAIN_GetErrorString: Symbol<DtwaingeterrorstringFunc> = unsafe { library.get(b"DTWAIN_GetErrorString")? };
         let DTWAIN_GetErrorStringA: Symbol<DtwaingeterrorstringaFunc> = unsafe { library.get(b"DTWAIN_GetErrorStringA")? };
         let DTWAIN_GetErrorStringW: Symbol<DtwaingeterrorstringwFunc> = unsafe { library.get(b"DTWAIN_GetErrorStringW")? };
@@ -4358,6 +4404,9 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetLightPath: Symbol<DtwaingetlightpathFunc> = unsafe { library.get(b"DTWAIN_GetLightPath")? };
         let DTWAIN_GetLightSource: Symbol<DtwaingetlightsourceFunc> = unsafe { library.get(b"DTWAIN_GetLightSource")? };
         let DTWAIN_GetLightSources: Symbol<DtwaingetlightsourcesFunc> = unsafe { library.get(b"DTWAIN_GetLightSources")? };
+        let DTWAIN_GetLoggerCallback: Symbol<DtwaingetloggercallbackFunc> = unsafe { library.get(b"DTWAIN_GetLoggerCallback")? };
+        let DTWAIN_GetLoggerCallbackA: Symbol<DtwaingetloggercallbackaFunc> = unsafe { library.get(b"DTWAIN_GetLoggerCallbackA")? };
+        let DTWAIN_GetLoggerCallbackW: Symbol<DtwaingetloggercallbackwFunc> = unsafe { library.get(b"DTWAIN_GetLoggerCallbackW")? };
         let DTWAIN_GetManualDuplexCount: Symbol<DtwaingetmanualduplexcountFunc> = unsafe { library.get(b"DTWAIN_GetManualDuplexCount")? };
         let DTWAIN_GetMaxAcquisitions: Symbol<DtwaingetmaxacquisitionsFunc> = unsafe { library.get(b"DTWAIN_GetMaxAcquisitions")? };
         let DTWAIN_GetMaxBuffers: Symbol<DtwaingetmaxbuffersFunc> = unsafe { library.get(b"DTWAIN_GetMaxBuffers")? };
@@ -4773,6 +4822,8 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_SetBrightnessStringA: Symbol<DtwainsetbrightnessstringaFunc> = unsafe { library.get(b"DTWAIN_SetBrightnessStringA")? };
         let DTWAIN_SetBrightnessStringW: Symbol<DtwainsetbrightnessstringwFunc> = unsafe { library.get(b"DTWAIN_SetBrightnessStringW")? };
         let DTWAIN_SetBufferedTileMode: Symbol<DtwainsetbufferedtilemodeFunc> = unsafe { library.get(b"DTWAIN_SetBufferedTileMode")? };
+        let DTWAIN_SetCallback: Symbol<DtwainsetcallbackFunc> = unsafe { library.get(b"DTWAIN_SetCallback")? };
+        let DTWAIN_SetCallback64: Symbol<Dtwainsetcallback64Func> = unsafe { library.get(b"DTWAIN_SetCallback64")? };
         let DTWAIN_SetCamera: Symbol<DtwainsetcameraFunc> = unsafe { library.get(b"DTWAIN_SetCamera")? };
         let DTWAIN_SetCameraA: Symbol<DtwainsetcameraaFunc> = unsafe { library.get(b"DTWAIN_SetCameraA")? };
         let DTWAIN_SetCameraW: Symbol<DtwainsetcamerawFunc> = unsafe { library.get(b"DTWAIN_SetCameraW")? };
@@ -4946,6 +4997,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_SetTwainLogW: Symbol<DtwainsettwainlogwFunc> = unsafe { library.get(b"DTWAIN_SetTwainLogW")? };
         let DTWAIN_SetTwainMode: Symbol<DtwainsettwainmodeFunc> = unsafe { library.get(b"DTWAIN_SetTwainMode")? };
         let DTWAIN_SetTwainTimeout: Symbol<DtwainsettwaintimeoutFunc> = unsafe { library.get(b"DTWAIN_SetTwainTimeout")? };
+        let DTWAIN_SetUpdateDibProc: Symbol<DtwainsetupdatedibprocFunc> = unsafe { library.get(b"DTWAIN_SetUpdateDibProc")? };
         let DTWAIN_SetXResolution: Symbol<DtwainsetxresolutionFunc> = unsafe { library.get(b"DTWAIN_SetXResolution")? };
         let DTWAIN_SetXResolutionString: Symbol<DtwainsetxresolutionstringFunc> = unsafe { library.get(b"DTWAIN_SetXResolutionString")? };
         let DTWAIN_SetXResolutionStringA: Symbol<DtwainsetxresolutionstringaFunc> = unsafe { library.get(b"DTWAIN_SetXResolutionStringA")? };
@@ -5364,6 +5416,8 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetBrightnessStringAFunc: DTWAIN_GetBrightnessStringA,
             DTWAIN_GetBrightnessStringWFunc: DTWAIN_GetBrightnessStringW,
             DTWAIN_GetBufferedTransferInfoFunc: DTWAIN_GetBufferedTransferInfo,
+            DTWAIN_GetCallbackFunc: DTWAIN_GetCallback,
+            DTWAIN_GetCallback64Func: DTWAIN_GetCallback64,
             DTWAIN_GetCapArrayTypeFunc: DTWAIN_GetCapArrayType,
             DTWAIN_GetCapContainerFunc: DTWAIN_GetCapContainer,
             DTWAIN_GetCapContainerExFunc: DTWAIN_GetCapContainerEx,
@@ -5414,6 +5468,8 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetDuplexTypeFunc: DTWAIN_GetDuplexType,
             DTWAIN_GetErrorBufferFunc: DTWAIN_GetErrorBuffer,
             DTWAIN_GetErrorBufferThresholdFunc: DTWAIN_GetErrorBufferThreshold,
+            DTWAIN_GetErrorCallbackFunc: DTWAIN_GetErrorCallback,
+            DTWAIN_GetErrorCallback64Func: DTWAIN_GetErrorCallback64,
             DTWAIN_GetErrorStringFunc: DTWAIN_GetErrorString,
             DTWAIN_GetErrorStringAFunc: DTWAIN_GetErrorStringA,
             DTWAIN_GetErrorStringWFunc: DTWAIN_GetErrorStringW,
@@ -5461,6 +5517,9 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetLightPathFunc: DTWAIN_GetLightPath,
             DTWAIN_GetLightSourceFunc: DTWAIN_GetLightSource,
             DTWAIN_GetLightSourcesFunc: DTWAIN_GetLightSources,
+            DTWAIN_GetLoggerCallbackFunc: DTWAIN_GetLoggerCallback,
+            DTWAIN_GetLoggerCallbackAFunc: DTWAIN_GetLoggerCallbackA,
+            DTWAIN_GetLoggerCallbackWFunc: DTWAIN_GetLoggerCallbackW,
             DTWAIN_GetManualDuplexCountFunc: DTWAIN_GetManualDuplexCount,
             DTWAIN_GetMaxAcquisitionsFunc: DTWAIN_GetMaxAcquisitions,
             DTWAIN_GetMaxBuffersFunc: DTWAIN_GetMaxBuffers,
@@ -5876,6 +5935,8 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_SetBrightnessStringAFunc: DTWAIN_SetBrightnessStringA,
             DTWAIN_SetBrightnessStringWFunc: DTWAIN_SetBrightnessStringW,
             DTWAIN_SetBufferedTileModeFunc: DTWAIN_SetBufferedTileMode,
+            DTWAIN_SetCallbackFunc: DTWAIN_SetCallback,
+            DTWAIN_SetCallback64Func: DTWAIN_SetCallback64,
             DTWAIN_SetCameraFunc: DTWAIN_SetCamera,
             DTWAIN_SetCameraAFunc: DTWAIN_SetCameraA,
             DTWAIN_SetCameraWFunc: DTWAIN_SetCameraW,
@@ -6049,6 +6110,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_SetTwainLogWFunc: DTWAIN_SetTwainLogW,
             DTWAIN_SetTwainModeFunc: DTWAIN_SetTwainMode,
             DTWAIN_SetTwainTimeoutFunc: DTWAIN_SetTwainTimeout,
+            DTWAIN_SetUpdateDibProcFunc: DTWAIN_SetUpdateDibProc,
             DTWAIN_SetXResolutionFunc: DTWAIN_SetXResolution,
             DTWAIN_SetXResolutionStringFunc: DTWAIN_SetXResolutionString,
             DTWAIN_SetXResolutionStringAFunc: DTWAIN_SetXResolutionStringA,
@@ -6088,7 +6150,7 @@ impl<'a> DTwainAPI<'a>
 }
 
 
-    pub fn DTWAIN_AcquireAudioFile(&self, Source: *mut c_void, lpszFile: *const c_char, lFileFlags: i32, lMaxClips: i32, bShowUI: i32, bCloseSource: i32, pStatus: *mut i32) -> i32 {
+    pub fn DTWAIN_AcquireAudioFile(&self, Source: *mut c_void, lpszFile: *const u16, lFileFlags: i32, lMaxClips: i32, bShowUI: i32, bCloseSource: i32, pStatus: *mut i32) -> i32 {
         unsafe { return (self.DTWAIN_AcquireAudioFileFunc)(Source, lpszFile, lFileFlags, lMaxClips, bShowUI, bCloseSource, pStatus);  }
     }
 
@@ -6116,7 +6178,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_AcquireBufferedExFunc)(Source, PixelType, nMaxPages, bShowUI, bCloseSource, Acquisitions, pStatus);  }
     }
 
-    pub fn DTWAIN_AcquireFile(&self, Source: *mut c_void, lpszFile: *const c_char, lFileType: i32, lFileFlags: i32, PixelType: i32, lMaxPages: i32, bShowUI: i32, bCloseSource: i32, pStatus: *mut i32) -> i32 {
+    pub fn DTWAIN_AcquireFile(&self, Source: *mut c_void, lpszFile: *const u16, lFileType: i32, lFileFlags: i32, PixelType: i32, lMaxPages: i32, bShowUI: i32, bCloseSource: i32, pStatus: *mut i32) -> i32 {
         unsafe { return (self.DTWAIN_AcquireFileFunc)(Source, lpszFile, lFileType, lFileFlags, PixelType, lMaxPages, bShowUI, bCloseSource, pStatus);  }
     }
 
@@ -6148,7 +6210,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_AddExtImageInfoQueryFunc)(Source, ExtImageInfo);  }
     }
 
-    pub fn DTWAIN_AddPDFText(&self, Source: *mut c_void, szText: *const c_char, xPos: i32, yPos: i32, fontName: *const c_char, fontSize: f64, colorRGB: i32, renderMode: i32, scaling: f64, charSpacing: f64, wordSpacing: f64, strokeWidth: i32, Flags: u32) -> i32 {
+    pub fn DTWAIN_AddPDFText(&self, Source: *mut c_void, szText: *const u16, xPos: i32, yPos: i32, fontName: *const u16, fontSize: f64, colorRGB: i32, renderMode: i32, scaling: f64, charSpacing: f64, wordSpacing: f64, strokeWidth: i32, Flags: u32) -> i32 {
         unsafe { return (self.DTWAIN_AddPDFTextFunc)(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);  }
     }
 
@@ -6204,7 +6266,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ArrayAddFloatNFunc)(pArray, Val, num);  }
     }
 
-    pub fn DTWAIN_ArrayAddFloatString(&self, pArray: *mut c_void, Val: *const c_char) -> i32 {
+    pub fn DTWAIN_ArrayAddFloatString(&self, pArray: *mut c_void, Val: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_ArrayAddFloatStringFunc)(pArray, Val);  }
     }
 
@@ -6212,7 +6274,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ArrayAddFloatStringAFunc)(pArray, Val);  }
     }
 
-    pub fn DTWAIN_ArrayAddFloatStringN(&self, pArray: *mut c_void, Val: *const c_char, num: i32) -> i32 {
+    pub fn DTWAIN_ArrayAddFloatStringN(&self, pArray: *mut c_void, Val: *const u16, num: i32) -> i32 {
         unsafe { return (self.DTWAIN_ArrayAddFloatStringNFunc)(pArray, Val, num);  }
     }
 
@@ -6256,7 +6318,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ArrayAddNFunc)(pArray, pVariant, num);  }
     }
 
-    pub fn DTWAIN_ArrayAddString(&self, pArray: *mut c_void, Val: *const c_char) -> i32 {
+    pub fn DTWAIN_ArrayAddString(&self, pArray: *mut c_void, Val: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_ArrayAddStringFunc)(pArray, Val);  }
     }
 
@@ -6264,7 +6326,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ArrayAddStringAFunc)(pArray, Val);  }
     }
 
-    pub fn DTWAIN_ArrayAddStringN(&self, pArray: *mut c_void, Val: *const c_char, num: i32) -> i32 {
+    pub fn DTWAIN_ArrayAddStringN(&self, pArray: *mut c_void, Val: *const u16, num: i32) -> i32 {
         unsafe { return (self.DTWAIN_ArrayAddStringNFunc)(pArray, Val, num);  }
     }
 
@@ -6344,7 +6406,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ArrayFindFloatFunc)(pArray, Val, Tolerance);  }
     }
 
-    pub fn DTWAIN_ArrayFindFloatString(&self, pArray: *mut c_void, Val: *const c_char, Tolerance: *const c_char) -> i32 {
+    pub fn DTWAIN_ArrayFindFloatString(&self, pArray: *mut c_void, Val: *const u16, Tolerance: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_ArrayFindFloatStringFunc)(pArray, Val, Tolerance);  }
     }
 
@@ -6364,7 +6426,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ArrayFindLong64Func)(pArray, Val);  }
     }
 
-    pub fn DTWAIN_ArrayFindString(&self, pArray: *mut c_void, pString: *const c_char) -> i32 {
+    pub fn DTWAIN_ArrayFindString(&self, pArray: *mut c_void, pString: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_ArrayFindStringFunc)(pArray, pString);  }
     }
 
@@ -6416,7 +6478,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ArrayGetAtFloatFunc)(pArray, nWhere, pVal);  }
     }
 
-    pub fn DTWAIN_ArrayGetAtFloatString(&self, pArray: *mut c_void, nWhere: i32, Val: *mut c_char) -> i32 {
+    pub fn DTWAIN_ArrayGetAtFloatString(&self, pArray: *mut c_void, nWhere: i32, Val: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_ArrayGetAtFloatStringFunc)(pArray, nWhere, Val);  }
     }
 
@@ -6436,7 +6498,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ArrayGetAtFrameExFunc)(FrameArray, nWhere, Frame);  }
     }
 
-    pub fn DTWAIN_ArrayGetAtFrameString(&self, FrameArray: *mut c_void, nWhere: i32, left: *mut c_char, top: *mut c_char, right: *mut c_char, bottom: *mut c_char) -> i32 {
+    pub fn DTWAIN_ArrayGetAtFrameString(&self, FrameArray: *mut c_void, nWhere: i32, left: *mut u16, top: *mut u16, right: *mut u16, bottom: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_ArrayGetAtFrameStringFunc)(FrameArray, nWhere, left, top, right, bottom);  }
     }
 
@@ -6460,7 +6522,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ArrayGetAtSourceFunc)(pArray, nWhere, ppSource);  }
     }
 
-    pub fn DTWAIN_ArrayGetAtString(&self, pArray: *mut c_void, nWhere: i32, pStr: *mut c_char) -> i32 {
+    pub fn DTWAIN_ArrayGetAtString(&self, pArray: *mut c_void, nWhere: i32, pStr: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_ArrayGetAtStringFunc)(pArray, nWhere, pStr);  }
     }
 
@@ -6468,7 +6530,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ArrayGetAtStringAFunc)(pArray, nWhere, pStr);  }
     }
 
-    pub fn DTWAIN_ArrayGetAtStringPtr(&self, pArray: *mut c_void, nWhere: i32) -> *const c_char {
+    pub fn DTWAIN_ArrayGetAtStringPtr(&self, pArray: *mut c_void, nWhere: i32) -> *const u16 {
         unsafe { return (self.DTWAIN_ArrayGetAtStringPtrFunc)(pArray, nWhere);  }
     }
 
@@ -6544,7 +6606,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ArrayInsertAtFloatNFunc)(pArray, nWhere, Val, num);  }
     }
 
-    pub fn DTWAIN_ArrayInsertAtFloatString(&self, pArray: *mut c_void, nWhere: i32, Val: *const c_char) -> i32 {
+    pub fn DTWAIN_ArrayInsertAtFloatString(&self, pArray: *mut c_void, nWhere: i32, Val: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_ArrayInsertAtFloatStringFunc)(pArray, nWhere, Val);  }
     }
 
@@ -6552,7 +6614,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ArrayInsertAtFloatStringAFunc)(pArray, nWhere, Val);  }
     }
 
-    pub fn DTWAIN_ArrayInsertAtFloatStringN(&self, pArray: *mut c_void, nWhere: i32, Val: *const c_char, num: i32) -> i32 {
+    pub fn DTWAIN_ArrayInsertAtFloatStringN(&self, pArray: *mut c_void, nWhere: i32, Val: *const u16, num: i32) -> i32 {
         unsafe { return (self.DTWAIN_ArrayInsertAtFloatStringNFunc)(pArray, nWhere, Val, num);  }
     }
 
@@ -6596,7 +6658,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ArrayInsertAtNFunc)(pArray, nWhere, pVariant, num);  }
     }
 
-    pub fn DTWAIN_ArrayInsertAtString(&self, pArray: *mut c_void, nWhere: i32, pVal: *const c_char) -> i32 {
+    pub fn DTWAIN_ArrayInsertAtString(&self, pArray: *mut c_void, nWhere: i32, pVal: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_ArrayInsertAtStringFunc)(pArray, nWhere, pVal);  }
     }
 
@@ -6604,7 +6666,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ArrayInsertAtStringAFunc)(pArray, nWhere, pVal);  }
     }
 
-    pub fn DTWAIN_ArrayInsertAtStringN(&self, pArray: *mut c_void, nWhere: i32, Val: *const c_char, num: i32) -> i32 {
+    pub fn DTWAIN_ArrayInsertAtStringN(&self, pArray: *mut c_void, nWhere: i32, Val: *const u16, num: i32) -> i32 {
         unsafe { return (self.DTWAIN_ArrayInsertAtStringNFunc)(pArray, nWhere, Val, num);  }
     }
 
@@ -6656,7 +6718,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ArraySetAtFloatFunc)(pArray, nWhere, pVal);  }
     }
 
-    pub fn DTWAIN_ArraySetAtFloatString(&self, pArray: *mut c_void, nWhere: i32, Val: *const c_char) -> i32 {
+    pub fn DTWAIN_ArraySetAtFloatString(&self, pArray: *mut c_void, nWhere: i32, Val: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_ArraySetAtFloatStringFunc)(pArray, nWhere, Val);  }
     }
 
@@ -6676,7 +6738,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ArraySetAtFrameExFunc)(FrameArray, nWhere, Frame);  }
     }
 
-    pub fn DTWAIN_ArraySetAtFrameString(&self, FrameArray: *mut c_void, nWhere: i32, left: *const c_char, top: *const c_char, right: *const c_char, bottom: *const c_char) -> i32 {
+    pub fn DTWAIN_ArraySetAtFrameString(&self, FrameArray: *mut c_void, nWhere: i32, left: *const u16, top: *const u16, right: *const u16, bottom: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_ArraySetAtFrameStringFunc)(FrameArray, nWhere, left, top, right, bottom);  }
     }
 
@@ -6696,7 +6758,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ArraySetAtLong64Func)(pArray, nWhere, Val);  }
     }
 
-    pub fn DTWAIN_ArraySetAtString(&self, pArray: *mut c_void, nWhere: i32, pStr: *const c_char) -> i32 {
+    pub fn DTWAIN_ArraySetAtString(&self, pArray: *mut c_void, nWhere: i32, pStr: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_ArraySetAtStringFunc)(pArray, nWhere, pStr);  }
     }
 
@@ -6768,7 +6830,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ConvertDIBToFullBitmapFunc)(hDib, isBMP);  }
     }
 
-    pub fn DTWAIN_ConvertToAPIString(&self, lpOrigString: *const c_char) -> *mut c_void {
+    pub fn DTWAIN_ConvertToAPIString(&self, lpOrigString: *const u16) -> *mut c_void {
         unsafe { return (self.DTWAIN_ConvertToAPIStringFunc)(lpOrigString);  }
     }
 
@@ -6776,7 +6838,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ConvertToAPIStringAFunc)(lpOrigString);  }
     }
 
-    pub fn DTWAIN_ConvertToAPIStringEx(&self, lpOrigString: *const c_char, lpOutString: *mut c_char, nSize: i32) -> i32 {
+    pub fn DTWAIN_ConvertToAPIStringEx(&self, lpOrigString: *const u16, lpOutString: *mut u16, nSize: i32) -> i32 {
         unsafe { return (self.DTWAIN_ConvertToAPIStringExFunc)(lpOrigString, lpOutString, nSize);  }
     }
 
@@ -7240,7 +7302,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_EnumSourceUnitsExFunc)(Source);  }
     }
 
-    pub fn DTWAIN_EnumSourceValues(&self, Source: *mut c_void, capName: *const c_char, values: *mut *mut c_void, bExpandIfRange: i32) -> i32 {
+    pub fn DTWAIN_EnumSourceValues(&self, Source: *mut c_void, capName: *const u16, values: *mut *mut c_void, bExpandIfRange: i32) -> i32 {
         unsafe { return (self.DTWAIN_EnumSourceValuesFunc)(Source, capName, values, bExpandIfRange);  }
     }
 
@@ -7340,7 +7402,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_EnumYResolutionValuesExFunc)(Source, bExpandIfRange);  }
     }
 
-    pub fn DTWAIN_ExecuteOCR(&self, Engine: *mut c_void, szFileName: *const c_char, nStartPage: i32, nEndPage: i32) -> i32 {
+    pub fn DTWAIN_ExecuteOCR(&self, Engine: *mut c_void, szFileName: *const u16, nStartPage: i32, nEndPage: i32) -> i32 {
         unsafe { return (self.DTWAIN_ExecuteOCRFunc)(Engine, szFileName, nStartPage, nEndPage);  }
     }
 
@@ -7376,7 +7438,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_FrameCreateFunc)(Left, Top, Right, Bottom);  }
     }
 
-    pub fn DTWAIN_FrameCreateString(&self, Left: *const c_char, Top: *const c_char, Right: *const c_char, Bottom: *const c_char) -> *mut c_void {
+    pub fn DTWAIN_FrameCreateString(&self, Left: *const u16, Top: *const u16, Right: *const u16, Bottom: *const u16) -> *mut c_void {
         unsafe { return (self.DTWAIN_FrameCreateStringFunc)(Left, Top, Right, Bottom);  }
     }
 
@@ -7396,7 +7458,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_FrameGetAllFunc)(Frame, Left, Top, Right, Bottom);  }
     }
 
-    pub fn DTWAIN_FrameGetAllString(&self, Frame: *mut c_void, Left: *mut c_char, Top: *mut c_char, Right: *mut c_char, Bottom: *mut c_char) -> i32 {
+    pub fn DTWAIN_FrameGetAllString(&self, Frame: *mut c_void, Left: *mut u16, Top: *mut u16, Right: *mut u16, Bottom: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_FrameGetAllStringFunc)(Frame, Left, Top, Right, Bottom);  }
     }
 
@@ -7412,7 +7474,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_FrameGetValueFunc)(Frame, nWhich, Value);  }
     }
 
-    pub fn DTWAIN_FrameGetValueString(&self, Frame: *mut c_void, nWhich: i32, Value: *mut c_char) -> i32 {
+    pub fn DTWAIN_FrameGetValueString(&self, Frame: *mut c_void, nWhich: i32, Value: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_FrameGetValueStringFunc)(Frame, nWhich, Value);  }
     }
 
@@ -7432,7 +7494,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_FrameSetAllFunc)(Frame, Left, Top, Right, Bottom);  }
     }
 
-    pub fn DTWAIN_FrameSetAllString(&self, Frame: *mut c_void, Left: *const c_char, Top: *const c_char, Right: *const c_char, Bottom: *const c_char) -> i32 {
+    pub fn DTWAIN_FrameSetAllString(&self, Frame: *mut c_void, Left: *const u16, Top: *const u16, Right: *const u16, Bottom: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_FrameSetAllStringFunc)(Frame, Left, Top, Right, Bottom);  }
     }
 
@@ -7448,7 +7510,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_FrameSetValueFunc)(Frame, nWhich, Value);  }
     }
 
-    pub fn DTWAIN_FrameSetValueString(&self, Frame: *mut c_void, nWhich: i32, Value: *const c_char) -> i32 {
+    pub fn DTWAIN_FrameSetValueString(&self, Frame: *mut c_void, nWhich: i32, Value: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_FrameSetValueStringFunc)(Frame, nWhich, Value);  }
     }
 
@@ -7484,7 +7546,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetAcquireArea2Func)(Source, left, top, right, bottom, lpUnit);  }
     }
 
-    pub fn DTWAIN_GetAcquireArea2String(&self, Source: *mut c_void, left: *mut c_char, top: *mut c_char, right: *mut c_char, bottom: *mut c_char, Unit: *mut i32) -> i32 {
+    pub fn DTWAIN_GetAcquireArea2String(&self, Source: *mut c_void, left: *mut u16, top: *mut u16, right: *mut u16, bottom: *mut u16, Unit: *mut i32) -> i32 {
         unsafe { return (self.DTWAIN_GetAcquireArea2StringFunc)(Source, left, top, right, bottom, Unit);  }
     }
 
@@ -7524,7 +7586,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetAcquiredImageArrayFunc)(aAcq, nWhichAcq);  }
     }
 
-    pub fn DTWAIN_GetActiveDSMPath(&self, lpszBuffer: *mut c_char, nMaxLen: i32) -> i32 {
+    pub fn DTWAIN_GetActiveDSMPath(&self, lpszBuffer: *mut u16, nMaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetActiveDSMPathFunc)(lpszBuffer, nMaxLen);  }
     }
 
@@ -7536,7 +7598,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetActiveDSMPathWFunc)(lpszBuffer, nMaxLen);  }
     }
 
-    pub fn DTWAIN_GetActiveDSMVersionInfo(&self, szDLLInfo: *mut c_char, nMaxLen: i32) -> i32 {
+    pub fn DTWAIN_GetActiveDSMVersionInfo(&self, szDLLInfo: *mut u16, nMaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetActiveDSMVersionInfoFunc)(szDLLInfo, nMaxLen);  }
     }
 
@@ -7556,7 +7618,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetAllSourceDibsFunc)(Source);  }
     }
 
-    pub fn DTWAIN_GetAppInfo(&self, szVerStr: *mut c_char, szManu: *mut c_char, szProdFam: *mut c_char, szProdName: *mut c_char) -> i32 {
+    pub fn DTWAIN_GetAppInfo(&self, szVerStr: *mut u16, szManu: *mut u16, szProdFam: *mut u16, szProdName: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_GetAppInfoFunc)(szVerStr, szManu, szProdFam, szProdName);  }
     }
 
@@ -7568,7 +7630,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetAppInfoWFunc)(szVerStr, szManu, szProdFam, szProdName);  }
     }
 
-    pub fn DTWAIN_GetAuthor(&self, Source: *mut c_void, szAuthor: *mut c_char) -> i32 {
+    pub fn DTWAIN_GetAuthor(&self, Source: *mut c_void, szAuthor: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_GetAuthorFunc)(Source, szAuthor);  }
     }
 
@@ -7600,7 +7662,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetBrightnessFunc)(Source, Brightness);  }
     }
 
-    pub fn DTWAIN_GetBrightnessString(&self, Source: *mut c_void, Brightness: *mut c_char) -> i32 {
+    pub fn DTWAIN_GetBrightnessString(&self, Source: *mut c_void, Brightness: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_GetBrightnessStringFunc)(Source, Brightness);  }
     }
 
@@ -7614,6 +7676,14 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_GetBufferedTransferInfo(&self, Source: *mut c_void, Compression: *mut u32, BytesPerRow: *mut u32, Columns: *mut u32, Rows: *mut u32, XOffset: *mut u32, YOffset: *mut u32, Flags: *mut u32, BytesWritten: *mut u32, MemoryLength: *mut u32) -> *mut c_void {
         unsafe { return (self.DTWAIN_GetBufferedTransferInfoFunc)(Source, Compression, BytesPerRow, Columns, Rows, XOffset, YOffset, Flags, BytesWritten, MemoryLength);  }
+    }
+
+    pub fn DTWAIN_GetCallback(&self) -> DTWAIN_CALLBACK_PROC {
+        unsafe { return (self.DTWAIN_GetCallbackFunc)();  }
+    }
+
+    pub fn DTWAIN_GetCallback64(&self) -> DTWAIN_CALLBACK_PROC64 {
+        unsafe { return (self.DTWAIN_GetCallback64Func)();  }
     }
 
     pub fn DTWAIN_GetCapArrayType(&self, Source: *mut c_void, nCap: i32) -> i32 {
@@ -7636,7 +7706,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetCapDataTypeFunc)(Source, nCap);  }
     }
 
-    pub fn DTWAIN_GetCapFromName(&self, szName: *const c_char) -> i32 {
+    pub fn DTWAIN_GetCapFromName(&self, szName: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_GetCapFromNameFunc)(szName);  }
     }
 
@@ -7664,7 +7734,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetCapValuesEx2Func)(Source, lCap, lGetType, lContainerType, nDataType, pArray);  }
     }
 
-    pub fn DTWAIN_GetCaption(&self, Source: *mut c_void, Caption: *mut c_char) -> i32 {
+    pub fn DTWAIN_GetCaption(&self, Source: *mut c_void, Caption: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_GetCaptionFunc)(Source, Caption);  }
     }
 
@@ -7684,7 +7754,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetCompressionTypeFunc)(Source, lpCompression, bCurrent);  }
     }
 
-    pub fn DTWAIN_GetConditionCodeString(&self, lError: i32, lpszBuffer: *mut c_char, nMaxLen: i32) -> i32 {
+    pub fn DTWAIN_GetConditionCodeString(&self, lError: i32, lpszBuffer: *mut u16, nMaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetConditionCodeStringFunc)(lError, lpszBuffer, nMaxLen);  }
     }
 
@@ -7700,7 +7770,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetContrastFunc)(Source, Contrast);  }
     }
 
-    pub fn DTWAIN_GetContrastString(&self, Source: *mut c_void, Contrast: *mut c_char) -> i32 {
+    pub fn DTWAIN_GetContrastString(&self, Source: *mut c_void, Contrast: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_GetContrastStringFunc)(Source, Contrast);  }
     }
 
@@ -7720,7 +7790,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetCurrentAcquiredImageFunc)(Source);  }
     }
 
-    pub fn DTWAIN_GetCurrentFileName(&self, Source: *mut c_void, szName: *mut c_char, MaxLen: i32) -> i32 {
+    pub fn DTWAIN_GetCurrentFileName(&self, Source: *mut c_void, szName: *mut u16, MaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetCurrentFileNameFunc)(Source, szName, MaxLen);  }
     }
 
@@ -7748,7 +7818,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetCustomDSDataFunc)(Source, Data, dSize, pActualSize, nFlags);  }
     }
 
-    pub fn DTWAIN_GetDSMFullName(&self, DSMType: i32, szDLLName: *mut c_char, nMaxLen: i32, pWhichSearch: *mut i32) -> i32 {
+    pub fn DTWAIN_GetDSMFullName(&self, DSMType: i32, szDLLName: *mut u16, nMaxLen: i32, pWhichSearch: *mut i32) -> i32 {
         unsafe { return (self.DTWAIN_GetDSMFullNameFunc)(DSMType, szDLLName, nMaxLen, pWhichSearch);  }
     }
 
@@ -7784,7 +7854,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetDeviceNotificationsFunc)(Source, DevEvents);  }
     }
 
-    pub fn DTWAIN_GetDeviceTimeDate(&self, Source: *mut c_void, szTimeDate: *mut c_char) -> i32 {
+    pub fn DTWAIN_GetDeviceTimeDate(&self, Source: *mut c_void, szTimeDate: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_GetDeviceTimeDateFunc)(Source, szTimeDate);  }
     }
 
@@ -7816,7 +7886,15 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetErrorBufferThresholdFunc)();  }
     }
 
-    pub fn DTWAIN_GetErrorString(&self, lError: i32, lpszBuffer: *mut c_char, nMaxLen: i32) -> i32 {
+    pub fn DTWAIN_GetErrorCallback(&self) -> DTWAIN_ERROR_PROC {
+        unsafe { return (self.DTWAIN_GetErrorCallbackFunc)();  }
+    }
+
+    pub fn DTWAIN_GetErrorCallback64(&self) -> DTWAIN_ERROR_PROC64 {
+        unsafe { return (self.DTWAIN_GetErrorCallback64Func)();  }
+    }
+
+    pub fn DTWAIN_GetErrorString(&self, lError: i32, lpszBuffer: *mut u16, nMaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetErrorStringFunc)(lError, lpszBuffer, nMaxLen);  }
     }
 
@@ -7828,7 +7906,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetErrorStringWFunc)(lError, lpszBuffer, nLength);  }
     }
 
-    pub fn DTWAIN_GetExtCapFromName(&self, szName: *const c_char) -> i32 {
+    pub fn DTWAIN_GetExtCapFromName(&self, szName: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_GetExtCapFromNameFunc)(szName);  }
     }
 
@@ -7860,7 +7938,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetExtImageInfoItemExFunc)(Source, nWhich, InfoID, NumItems, Type, ReturnCode);  }
     }
 
-    pub fn DTWAIN_GetExtNameFromCap(&self, nValue: i32, szValue: *mut c_char, nMaxLen: i32) -> i32 {
+    pub fn DTWAIN_GetExtNameFromCap(&self, nValue: i32, szValue: *mut u16, nMaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetExtNameFromCapFunc)(nValue, szValue, nMaxLen);  }
     }
 
@@ -7892,7 +7970,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetFileCompressionTypeFunc)(Source);  }
     }
 
-    pub fn DTWAIN_GetFileTypeExtensions(&self, nType: i32, lpszName: *mut c_char, nLength: i32) -> i32 {
+    pub fn DTWAIN_GetFileTypeExtensions(&self, nType: i32, lpszName: *mut u16, nLength: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetFileTypeExtensionsFunc)(nType, lpszName, nLength);  }
     }
 
@@ -7904,7 +7982,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetFileTypeExtensionsWFunc)(nType, lpszName, nLength);  }
     }
 
-    pub fn DTWAIN_GetFileTypeName(&self, nType: i32, lpszName: *mut c_char, nLength: i32) -> i32 {
+    pub fn DTWAIN_GetFileTypeName(&self, nType: i32, lpszName: *mut u16, nLength: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetFileTypeNameFunc)(nType, lpszName, nLength);  }
     }
 
@@ -7916,7 +7994,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetFileTypeNameWFunc)(nType, lpszName, nLength);  }
     }
 
-    pub fn DTWAIN_GetHalftone(&self, Source: *mut c_void, lpHalftone: *mut c_char, GetType: i32) -> i32 {
+    pub fn DTWAIN_GetHalftone(&self, Source: *mut c_void, lpHalftone: *mut u16, GetType: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetHalftoneFunc)(Source, lpHalftone, GetType);  }
     }
 
@@ -7932,7 +8010,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetHighlightFunc)(Source, Highlight);  }
     }
 
-    pub fn DTWAIN_GetHighlightString(&self, Source: *mut c_void, Highlight: *mut c_char) -> i32 {
+    pub fn DTWAIN_GetHighlightString(&self, Source: *mut c_void, Highlight: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_GetHighlightStringFunc)(Source, Highlight);  }
     }
 
@@ -7948,7 +8026,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetImageInfoFunc)(Source, lpXResolution, lpYResolution, lpWidth, lpLength, lpNumSamples, lpBitsPerSample, lpBitsPerPixel, lpPlanar, lpPixelType, lpCompression);  }
     }
 
-    pub fn DTWAIN_GetImageInfoString(&self, Source: *mut c_void, lpXResolution: *mut c_char, lpYResolution: *mut c_char, lpWidth: *mut i32, lpLength: *mut i32, lpNumSamples: *mut i32, lpBitsPerSample: *mut *mut c_void, lpBitsPerPixel: *mut i32, lpPlanar: *mut i32, lpPixelType: *mut i32, lpCompression: *mut i32) -> i32 {
+    pub fn DTWAIN_GetImageInfoString(&self, Source: *mut c_void, lpXResolution: *mut u16, lpYResolution: *mut u16, lpWidth: *mut i32, lpLength: *mut i32, lpNumSamples: *mut i32, lpBitsPerSample: *mut *mut c_void, lpBitsPerPixel: *mut i32, lpPlanar: *mut i32, lpPixelType: *mut i32, lpCompression: *mut i32) -> i32 {
         unsafe { return (self.DTWAIN_GetImageInfoStringFunc)(Source, lpXResolution, lpYResolution, lpWidth, lpLength, lpNumSamples, lpBitsPerSample, lpBitsPerPixel, lpPlanar, lpPixelType, lpCompression);  }
     }
 
@@ -7980,7 +8058,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetLastErrorFunc)();  }
     }
 
-    pub fn DTWAIN_GetLibraryPath(&self, lpszVer: *mut c_char, nLength: i32) -> i32 {
+    pub fn DTWAIN_GetLibraryPath(&self, lpszVer: *mut u16, nLength: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetLibraryPathFunc)(lpszVer, nLength);  }
     }
 
@@ -8004,6 +8082,18 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetLightSourcesFunc)(Source, LightSources);  }
     }
 
+    pub fn DTWAIN_GetLoggerCallback(&self) -> DTWAIN_LOGGER_PROC {
+        unsafe { return (self.DTWAIN_GetLoggerCallbackFunc)();  }
+    }
+
+    pub fn DTWAIN_GetLoggerCallbackA(&self) -> DTWAIN_LOGGER_PROCA {
+        unsafe { return (self.DTWAIN_GetLoggerCallbackAFunc)();  }
+    }
+
+    pub fn DTWAIN_GetLoggerCallbackW(&self) -> DTWAIN_LOGGER_PROCW {
+        unsafe { return (self.DTWAIN_GetLoggerCallbackWFunc)();  }
+    }
+
     pub fn DTWAIN_GetManualDuplexCount(&self, Source: *mut c_void, pSide1: *mut i32, pSide2: *mut i32) -> i32 {
         unsafe { return (self.DTWAIN_GetManualDuplexCountFunc)(Source, pSide1, pSide2);  }
     }
@@ -8024,7 +8114,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetMaxRetryAttemptsFunc)(Source);  }
     }
 
-    pub fn DTWAIN_GetNameFromCap(&self, nCapValue: i32, szValue: *mut c_char, nMaxLen: i32) -> i32 {
+    pub fn DTWAIN_GetNameFromCap(&self, nCapValue: i32, szValue: *mut u16, nMaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetNameFromCapFunc)(nCapValue, szValue, nMaxLen);  }
     }
 
@@ -8052,7 +8142,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetOCRCapValuesFunc)(Engine, OCRCapValue, GetType, CapValues);  }
     }
 
-    pub fn DTWAIN_GetOCRErrorString(&self, Engine: *mut c_void, lError: i32, lpszBuffer: *mut c_char, nMaxLen: i32) -> i32 {
+    pub fn DTWAIN_GetOCRErrorString(&self, Engine: *mut c_void, lError: i32, lpszBuffer: *mut u16, nMaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetOCRErrorStringFunc)(Engine, lError, lpszBuffer, nMaxLen);  }
     }
 
@@ -8072,7 +8162,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetOCRMajorMinorVersionFunc)(Engine, lpMajor, lpMinor);  }
     }
 
-    pub fn DTWAIN_GetOCRManufacturer(&self, Engine: *mut c_void, szManufacturer: *mut c_char, nMaxLen: i32) -> i32 {
+    pub fn DTWAIN_GetOCRManufacturer(&self, Engine: *mut c_void, szManufacturer: *mut u16, nMaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetOCRManufacturerFunc)(Engine, szManufacturer, nMaxLen);  }
     }
 
@@ -8084,7 +8174,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetOCRManufacturerWFunc)(Engine, szManufacturer, nLength);  }
     }
 
-    pub fn DTWAIN_GetOCRProductFamily(&self, Engine: *mut c_void, szProductFamily: *mut c_char, nMaxLen: i32) -> i32 {
+    pub fn DTWAIN_GetOCRProductFamily(&self, Engine: *mut c_void, szProductFamily: *mut u16, nMaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetOCRProductFamilyFunc)(Engine, szProductFamily, nMaxLen);  }
     }
 
@@ -8096,7 +8186,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetOCRProductFamilyWFunc)(Engine, szProductFamily, nLength);  }
     }
 
-    pub fn DTWAIN_GetOCRProductName(&self, Engine: *mut c_void, szProductName: *mut c_char, nMaxLen: i32) -> i32 {
+    pub fn DTWAIN_GetOCRProductName(&self, Engine: *mut c_void, szProductName: *mut u16, nMaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetOCRProductNameFunc)(Engine, szProductName, nMaxLen);  }
     }
 
@@ -8108,7 +8198,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetOCRProductNameWFunc)(Engine, szProductName, nLength);  }
     }
 
-    pub fn DTWAIN_GetOCRText(&self, Engine: *mut c_void, nPageNo: i32, Data: *mut c_char, dSize: i32, pActualSize: *mut i32, nFlags: i32) -> *mut c_void {
+    pub fn DTWAIN_GetOCRText(&self, Engine: *mut c_void, nPageNo: i32, Data: *mut u16, dSize: i32, pActualSize: *mut i32, nFlags: i32) -> *mut c_void {
         unsafe { return (self.DTWAIN_GetOCRTextFunc)(Engine, nPageNo, Data, dSize, pActualSize, nFlags);  }
     }
 
@@ -8140,7 +8230,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetOCRTextWFunc)(Engine, nPageNo, Data, dSize, pActualSize, nFlags);  }
     }
 
-    pub fn DTWAIN_GetOCRVersionInfo(&self, Engine: *mut c_void, buffer: *mut c_char, maxBufSize: i32) -> i32 {
+    pub fn DTWAIN_GetOCRVersionInfo(&self, Engine: *mut c_void, buffer: *mut u16, maxBufSize: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetOCRVersionInfoFunc)(Engine, buffer, maxBufSize);  }
     }
 
@@ -8168,7 +8258,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetPDFTextElementLongFunc)(TextElement, val1, val2, Flags);  }
     }
 
-    pub fn DTWAIN_GetPDFTextElementString(&self, TextElement: *mut c_void, szData: *mut c_char, maxLen: i32, Flags: i32) -> i32 {
+    pub fn DTWAIN_GetPDFTextElementString(&self, TextElement: *mut c_void, szData: *mut u16, maxLen: i32, Flags: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetPDFTextElementStringFunc)(TextElement, szData, maxLen, Flags);  }
     }
 
@@ -8180,7 +8270,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetPDFTextElementStringWFunc)(TextElement, szData, maxLen, Flags);  }
     }
 
-    pub fn DTWAIN_GetPDFType1FontName(&self, FontVal: i32, szFont: *mut c_char, nChars: i32) -> i32 {
+    pub fn DTWAIN_GetPDFType1FontName(&self, FontVal: i32, szFont: *mut u16, nChars: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetPDFType1FontNameFunc)(FontVal, szFont, nChars);  }
     }
 
@@ -8196,7 +8286,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetPaperSizeFunc)(Source, lpPaperSize, bCurrent);  }
     }
 
-    pub fn DTWAIN_GetPaperSizeName(&self, paperNumber: i32, outName: *mut c_char, nSize: i32) -> i32 {
+    pub fn DTWAIN_GetPaperSizeName(&self, paperNumber: i32, outName: *mut u16, nSize: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetPaperSizeNameFunc)(paperNumber, outName, nSize);  }
     }
 
@@ -8252,7 +8342,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetPrinterStringsFunc)(Source, ArrayString);  }
     }
 
-    pub fn DTWAIN_GetPrinterSuffixString(&self, Source: *mut c_void, Suffix: *mut c_char, nMaxLen: i32) -> i32 {
+    pub fn DTWAIN_GetPrinterSuffixString(&self, Source: *mut c_void, Suffix: *mut u16, nMaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetPrinterSuffixStringFunc)(Source, Suffix, nMaxLen);  }
     }
 
@@ -8272,7 +8362,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetResolutionFunc)(Source, Resolution);  }
     }
 
-    pub fn DTWAIN_GetResolutionString(&self, Source: *mut c_void, Resolution: *mut c_char) -> i32 {
+    pub fn DTWAIN_GetResolutionString(&self, Source: *mut c_void, Resolution: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_GetResolutionStringFunc)(Source, Resolution);  }
     }
 
@@ -8284,7 +8374,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetResolutionStringWFunc)(Source, Resolution);  }
     }
 
-    pub fn DTWAIN_GetResourceString(&self, ResourceID: i32, lpszBuffer: *mut c_char, nMaxLen: i32) -> i32 {
+    pub fn DTWAIN_GetResourceString(&self, ResourceID: i32, lpszBuffer: *mut u16, nMaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetResourceStringFunc)(ResourceID, lpszBuffer, nMaxLen);  }
     }
 
@@ -8300,7 +8390,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetRotationFunc)(Source, Rotation);  }
     }
 
-    pub fn DTWAIN_GetRotationString(&self, Source: *mut c_void, Rotation: *mut c_char) -> i32 {
+    pub fn DTWAIN_GetRotationString(&self, Source: *mut c_void, Rotation: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_GetRotationStringFunc)(Source, Rotation);  }
     }
 
@@ -8312,7 +8402,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetRotationStringWFunc)(Source, Rotation);  }
     }
 
-    pub fn DTWAIN_GetSaveFileName(&self, Source: *mut c_void, fName: *mut c_char, nMaxLen: i32) -> i32 {
+    pub fn DTWAIN_GetSaveFileName(&self, Source: *mut c_void, fName: *mut u16, nMaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetSaveFileNameFunc)(Source, fName, nMaxLen);  }
     }
 
@@ -8328,7 +8418,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetSavedFilesCountFunc)(Source);  }
     }
 
-    pub fn DTWAIN_GetSessionDetails(&self, szBuf: *mut c_char, nSize: i32, indentFactor: i32, bRefresh: i32) -> i32 {
+    pub fn DTWAIN_GetSessionDetails(&self, szBuf: *mut u16, nSize: i32, indentFactor: i32, bRefresh: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetSessionDetailsFunc)(szBuf, nSize, indentFactor, bRefresh);  }
     }
 
@@ -8344,7 +8434,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetShadowFunc)(Source, Shadow);  }
     }
 
-    pub fn DTWAIN_GetShadowString(&self, Source: *mut c_void, Shadow: *mut c_char) -> i32 {
+    pub fn DTWAIN_GetShadowString(&self, Source: *mut c_void, Shadow: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_GetShadowStringFunc)(Source, Shadow);  }
     }
 
@@ -8356,7 +8446,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetShadowStringWFunc)(Source, Shadow);  }
     }
 
-    pub fn DTWAIN_GetShortVersionString(&self, lpszVer: *mut c_char, nLength: i32) -> i32 {
+    pub fn DTWAIN_GetShortVersionString(&self, lpszVer: *mut u16, nLength: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetShortVersionStringFunc)(lpszVer, nLength);  }
     }
 
@@ -8372,7 +8462,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetSourceAcquisitionsFunc)(Source);  }
     }
 
-    pub fn DTWAIN_GetSourceDetails(&self, szSources: *const c_char, szBuf: *mut c_char, nSize: i32, indentFactor: i32, bRefresh: i32) -> i32 {
+    pub fn DTWAIN_GetSourceDetails(&self, szSources: *const u16, szBuf: *mut u16, nSize: i32, indentFactor: i32, bRefresh: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetSourceDetailsFunc)(szSources, szBuf, nSize, indentFactor, bRefresh);  }
     }
 
@@ -8392,7 +8482,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetSourceIDExFunc)(Source, pIdentity);  }
     }
 
-    pub fn DTWAIN_GetSourceManufacturer(&self, Source: *mut c_void, szProduct: *mut c_char, nMaxLen: i32) -> i32 {
+    pub fn DTWAIN_GetSourceManufacturer(&self, Source: *mut c_void, szProduct: *mut u16, nMaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetSourceManufacturerFunc)(Source, szProduct, nMaxLen);  }
     }
 
@@ -8404,7 +8494,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetSourceManufacturerWFunc)(Source, szProduct, nLength);  }
     }
 
-    pub fn DTWAIN_GetSourceProductFamily(&self, Source: *mut c_void, szProduct: *mut c_char, nMaxLen: i32) -> i32 {
+    pub fn DTWAIN_GetSourceProductFamily(&self, Source: *mut c_void, szProduct: *mut u16, nMaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetSourceProductFamilyFunc)(Source, szProduct, nMaxLen);  }
     }
 
@@ -8416,7 +8506,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetSourceProductFamilyWFunc)(Source, szProduct, nLength);  }
     }
 
-    pub fn DTWAIN_GetSourceProductName(&self, Source: *mut c_void, szProduct: *mut c_char, nMaxLen: i32) -> i32 {
+    pub fn DTWAIN_GetSourceProductName(&self, Source: *mut c_void, szProduct: *mut u16, nMaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetSourceProductNameFunc)(Source, szProduct, nMaxLen);  }
     }
 
@@ -8432,7 +8522,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetSourceUnitFunc)(Source, lpUnit);  }
     }
 
-    pub fn DTWAIN_GetSourceVersionInfo(&self, Source: *mut c_void, szProduct: *mut c_char, nMaxLen: i32) -> i32 {
+    pub fn DTWAIN_GetSourceVersionInfo(&self, Source: *mut c_void, szProduct: *mut u16, nMaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetSourceVersionInfoFunc)(Source, szProduct, nMaxLen);  }
     }
 
@@ -8452,7 +8542,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetStaticLibVersionFunc)();  }
     }
 
-    pub fn DTWAIN_GetTempFileDirectory(&self, szFilePath: *mut c_char, nMaxLen: i32) -> i32 {
+    pub fn DTWAIN_GetTempFileDirectory(&self, szFilePath: *mut u16, nMaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetTempFileDirectoryFunc)(szFilePath, nMaxLen);  }
     }
 
@@ -8468,7 +8558,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetThresholdFunc)(Source, Threshold);  }
     }
 
-    pub fn DTWAIN_GetThresholdString(&self, Source: *mut c_void, Threshold: *mut c_char) -> i32 {
+    pub fn DTWAIN_GetThresholdString(&self, Source: *mut c_void, Threshold: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_GetThresholdStringFunc)(Source, Threshold);  }
     }
 
@@ -8480,7 +8570,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetThresholdStringWFunc)(Source, Threshold);  }
     }
 
-    pub fn DTWAIN_GetTimeDate(&self, Source: *mut c_void, szTimeDate: *mut c_char) -> i32 {
+    pub fn DTWAIN_GetTimeDate(&self, Source: *mut c_void, szTimeDate: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_GetTimeDateFunc)(Source, szTimeDate);  }
     }
 
@@ -8504,7 +8594,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetTwainAvailabilityFunc)();  }
     }
 
-    pub fn DTWAIN_GetTwainAvailabilityEx(&self, directories: *mut c_char, nMaxLen: i32) -> i32 {
+    pub fn DTWAIN_GetTwainAvailabilityEx(&self, directories: *mut u16, nMaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetTwainAvailabilityExFunc)(directories, nMaxLen);  }
     }
 
@@ -8516,7 +8606,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetTwainAvailabilityExWFunc)(szDirectories, nLength);  }
     }
 
-    pub fn DTWAIN_GetTwainCountryName(&self, countryId: i32, szName: *mut c_char) -> i32 {
+    pub fn DTWAIN_GetTwainCountryName(&self, countryId: i32, szName: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_GetTwainCountryNameFunc)(countryId, szName);  }
     }
 
@@ -8528,7 +8618,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetTwainCountryNameWFunc)(countryId, szName);  }
     }
 
-    pub fn DTWAIN_GetTwainCountryValue(&self, country: *const c_char) -> i32 {
+    pub fn DTWAIN_GetTwainCountryValue(&self, country: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_GetTwainCountryValueFunc)(country);  }
     }
 
@@ -8544,7 +8634,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetTwainHwndFunc)();  }
     }
 
-    pub fn DTWAIN_GetTwainIDFromName(&self, lpszBuffer: *const c_char) -> i32 {
+    pub fn DTWAIN_GetTwainIDFromName(&self, lpszBuffer: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_GetTwainIDFromNameFunc)(lpszBuffer);  }
     }
 
@@ -8556,7 +8646,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetTwainIDFromNameWFunc)(lpszBuffer);  }
     }
 
-    pub fn DTWAIN_GetTwainLanguageName(&self, nameId: i32, szName: *mut c_char) -> i32 {
+    pub fn DTWAIN_GetTwainLanguageName(&self, nameId: i32, szName: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_GetTwainLanguageNameFunc)(nameId, szName);  }
     }
 
@@ -8568,7 +8658,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetTwainLanguageNameWFunc)(lang, szName);  }
     }
 
-    pub fn DTWAIN_GetTwainLanguageValue(&self, szName: *const c_char) -> i32 {
+    pub fn DTWAIN_GetTwainLanguageValue(&self, szName: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_GetTwainLanguageValueFunc)(szName);  }
     }
 
@@ -8584,7 +8674,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetTwainModeFunc)();  }
     }
 
-    pub fn DTWAIN_GetTwainNameFromConstant(&self, lConstantType: i32, lTwainConstant: i32, lpszOut: *mut c_char, nSize: i32) -> i32 {
+    pub fn DTWAIN_GetTwainNameFromConstant(&self, lConstantType: i32, lTwainConstant: i32, lpszOut: *mut u16, nSize: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetTwainNameFromConstantFunc)(lConstantType, lTwainConstant, lpszOut, nSize);  }
     }
 
@@ -8596,7 +8686,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetTwainNameFromConstantWFunc)(lConstantType, lTwainConstant, lpszOut, nSize);  }
     }
 
-    pub fn DTWAIN_GetTwainStringName(&self, category: i32, TwainID: i32, lpszBuffer: *mut c_char, nMaxLen: i32) -> i32 {
+    pub fn DTWAIN_GetTwainStringName(&self, category: i32, TwainID: i32, lpszBuffer: *mut u16, nMaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetTwainStringNameFunc)(category, TwainID, lpszBuffer, nMaxLen);  }
     }
 
@@ -8616,7 +8706,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetVersionFunc)(lpMajor, lpMinor, lpVersionType);  }
     }
 
-    pub fn DTWAIN_GetVersionCopyright(&self, lpszApp: *mut c_char, nLength: i32) -> i32 {
+    pub fn DTWAIN_GetVersionCopyright(&self, lpszApp: *mut u16, nLength: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetVersionCopyrightFunc)(lpszApp, nLength);  }
     }
 
@@ -8632,7 +8722,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetVersionExFunc)(lMajor, lMinor, lVersionType, lPatchLevel);  }
     }
 
-    pub fn DTWAIN_GetVersionInfo(&self, lpszVer: *mut c_char, nLength: i32) -> i32 {
+    pub fn DTWAIN_GetVersionInfo(&self, lpszVer: *mut u16, nLength: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetVersionInfoFunc)(lpszVer, nLength);  }
     }
 
@@ -8644,7 +8734,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetVersionInfoWFunc)(lpszVer, nLength);  }
     }
 
-    pub fn DTWAIN_GetVersionString(&self, lpszVer: *mut c_char, nLength: i32) -> i32 {
+    pub fn DTWAIN_GetVersionString(&self, lpszVer: *mut u16, nLength: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetVersionStringFunc)(lpszVer, nLength);  }
     }
 
@@ -8656,7 +8746,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetVersionStringWFunc)(lpszVer, nLength);  }
     }
 
-    pub fn DTWAIN_GetWindowsVersionInfo(&self, lpszBuffer: *mut c_char, nMaxLen: i32) -> i32 {
+    pub fn DTWAIN_GetWindowsVersionInfo(&self, lpszBuffer: *mut u16, nMaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetWindowsVersionInfoFunc)(lpszBuffer, nMaxLen);  }
     }
 
@@ -8672,7 +8762,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetXResolutionFunc)(Source, Resolution);  }
     }
 
-    pub fn DTWAIN_GetXResolutionString(&self, Source: *mut c_void, Resolution: *mut c_char) -> i32 {
+    pub fn DTWAIN_GetXResolutionString(&self, Source: *mut c_void, Resolution: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_GetXResolutionStringFunc)(Source, Resolution);  }
     }
 
@@ -8688,7 +8778,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetYResolutionFunc)(Source, Resolution);  }
     }
 
-    pub fn DTWAIN_GetYResolutionString(&self, Source: *mut c_void, Resolution: *mut c_char) -> i32 {
+    pub fn DTWAIN_GetYResolutionString(&self, Source: *mut c_void, Resolution: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_GetYResolutionStringFunc)(Source, Resolution);  }
     }
 
@@ -8704,7 +8794,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_InitExtImageInfoFunc)(Source);  }
     }
 
-    pub fn DTWAIN_InitImageFileAppend(&self, szFile: *const c_char, fType: i32) -> i32 {
+    pub fn DTWAIN_InitImageFileAppend(&self, szFile: *const u16, fType: i32) -> i32 {
         unsafe { return (self.DTWAIN_InitImageFileAppendFunc)(szFile, fType);  }
     }
 
@@ -8808,7 +8898,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_IsDIBBlankFunc)(hDib, threshold);  }
     }
 
-    pub fn DTWAIN_IsDIBBlankString(&self, hDib: *mut c_void, threshold: *const c_char) -> i32 {
+    pub fn DTWAIN_IsDIBBlankString(&self, hDib: *mut c_void, threshold: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_IsDIBBlankStringFunc)(hDib, threshold);  }
     }
 
@@ -9120,7 +9210,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_IsTwainAvailableFunc)();  }
     }
 
-    pub fn DTWAIN_IsTwainAvailableEx(&self, directories: *mut c_char, nMaxLen: i32) -> i32 {
+    pub fn DTWAIN_IsTwainAvailableEx(&self, directories: *mut u16, nMaxLen: i32) -> i32 {
         unsafe { return (self.DTWAIN_IsTwainAvailableExFunc)(directories, nMaxLen);  }
     }
 
@@ -9144,7 +9234,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_IsUIOnlySupportedFunc)(Source);  }
     }
 
-    pub fn DTWAIN_LoadCustomStringResources(&self, sLangDLL: *const c_char) -> i32 {
+    pub fn DTWAIN_LoadCustomStringResources(&self, sLangDLL: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_LoadCustomStringResourcesFunc)(sLangDLL);  }
     }
 
@@ -9152,7 +9242,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_LoadCustomStringResourcesAFunc)(sLangDLL);  }
     }
 
-    pub fn DTWAIN_LoadCustomStringResourcesEx(&self, sLangDLL: *const c_char, bClear: i32) -> i32 {
+    pub fn DTWAIN_LoadCustomStringResourcesEx(&self, sLangDLL: *const u16, bClear: i32) -> i32 {
         unsafe { return (self.DTWAIN_LoadCustomStringResourcesExFunc)(sLangDLL, bClear);  }
     }
 
@@ -9180,7 +9270,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_LockMemoryExFunc)(h);  }
     }
 
-    pub fn DTWAIN_LogMessage(&self, message: *const c_char) -> i32 {
+    pub fn DTWAIN_LogMessage(&self, message: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_LogMessageFunc)(message);  }
     }
 
@@ -9232,7 +9322,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_RangeGetAllFloatFunc)(pArray, pVariantLow, pVariantUp, pVariantStep, pVariantDefault, pVariantCurrent);  }
     }
 
-    pub fn DTWAIN_RangeGetAllFloatString(&self, pArray: *mut c_void, dLow: *mut c_char, dUp: *mut c_char, dStep: *mut c_char, dDefault: *mut c_char, dCurrent: *mut c_char) -> i32 {
+    pub fn DTWAIN_RangeGetAllFloatString(&self, pArray: *mut c_void, dLow: *mut u16, dUp: *mut u16, dStep: *mut u16, dDefault: *mut u16, dCurrent: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_RangeGetAllFloatStringFunc)(pArray, dLow, dUp, dStep, dDefault, dCurrent);  }
     }
 
@@ -9260,7 +9350,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_RangeGetExpValueFloatFunc)(pArray, lPos, pVal);  }
     }
 
-    pub fn DTWAIN_RangeGetExpValueFloatString(&self, pArray: *mut c_void, lPos: i32, pVal: *mut c_char) -> i32 {
+    pub fn DTWAIN_RangeGetExpValueFloatString(&self, pArray: *mut c_void, lPos: i32, pVal: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_RangeGetExpValueFloatStringFunc)(pArray, lPos, pVal);  }
     }
 
@@ -9288,7 +9378,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_RangeGetPosFloatFunc)(pArray, Val, pPos);  }
     }
 
-    pub fn DTWAIN_RangeGetPosFloatString(&self, pArray: *mut c_void, Val: *const c_char, pPos: *mut i32) -> i32 {
+    pub fn DTWAIN_RangeGetPosFloatString(&self, pArray: *mut c_void, Val: *const u16, pPos: *mut i32) -> i32 {
         unsafe { return (self.DTWAIN_RangeGetPosFloatStringFunc)(pArray, Val, pPos);  }
     }
 
@@ -9312,7 +9402,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_RangeGetValueFloatFunc)(pArray, nWhich, pVal);  }
     }
 
-    pub fn DTWAIN_RangeGetValueFloatString(&self, pArray: *mut c_void, nWhich: i32, pVal: *mut c_char) -> i32 {
+    pub fn DTWAIN_RangeGetValueFloatString(&self, pArray: *mut c_void, nWhich: i32, pVal: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_RangeGetValueFloatStringFunc)(pArray, nWhich, pVal);  }
     }
 
@@ -9336,7 +9426,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_RangeNearestValueFloatFunc)(pArray, dIn, pOut, RoundType);  }
     }
 
-    pub fn DTWAIN_RangeNearestValueFloatString(&self, pArray: *mut c_void, dIn: *const c_char, pOut: *mut c_char, RoundType: i32) -> i32 {
+    pub fn DTWAIN_RangeNearestValueFloatString(&self, pArray: *mut c_void, dIn: *const u16, pOut: *mut u16, RoundType: i32) -> i32 {
         unsafe { return (self.DTWAIN_RangeNearestValueFloatStringFunc)(pArray, dIn, pOut, RoundType);  }
     }
 
@@ -9360,7 +9450,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_RangeSetAllFloatFunc)(pArray, dLow, dUp, dStep, dDefault, dCurrent);  }
     }
 
-    pub fn DTWAIN_RangeSetAllFloatString(&self, pArray: *mut c_void, dLow: *const c_char, dUp: *const c_char, dStep: *const c_char, dDefault: *const c_char, dCurrent: *const c_char) -> i32 {
+    pub fn DTWAIN_RangeSetAllFloatString(&self, pArray: *mut c_void, dLow: *const u16, dUp: *const u16, dStep: *const u16, dDefault: *const u16, dCurrent: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_RangeSetAllFloatStringFunc)(pArray, dLow, dUp, dStep, dDefault, dCurrent);  }
     }
 
@@ -9384,7 +9474,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_RangeSetValueFloatFunc)(pArray, nWhich, Val);  }
     }
 
-    pub fn DTWAIN_RangeSetValueFloatString(&self, pArray: *mut c_void, nWhich: i32, Val: *const c_char) -> i32 {
+    pub fn DTWAIN_RangeSetValueFloatString(&self, pArray: *mut c_void, nWhich: i32, Val: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_RangeSetValueFloatStringFunc)(pArray, nWhich, Val);  }
     }
 
@@ -9424,7 +9514,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SelectOCREngineFunc)();  }
     }
 
-    pub fn DTWAIN_SelectOCREngine2(&self, hWndParent: *const c_void, szTitle: *const c_char, xPos: i32, yPos: i32, nOptions: i32) -> *mut c_void {
+    pub fn DTWAIN_SelectOCREngine2(&self, hWndParent: *const c_void, szTitle: *const u16, xPos: i32, yPos: i32, nOptions: i32) -> *mut c_void {
         unsafe { return (self.DTWAIN_SelectOCREngine2Func)(hWndParent, szTitle, xPos, yPos, nOptions);  }
     }
 
@@ -9432,7 +9522,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SelectOCREngine2AFunc)(hWndParent, szTitle, xPos, yPos, nOptions);  }
     }
 
-    pub fn DTWAIN_SelectOCREngine2Ex(&self, hWndParent: *const c_void, szTitle: *const c_char, xPos: i32, yPos: i32, szIncludeFilter: *const c_char, szExcludeFilter: *const c_char, szNameMapping: *const c_char, nOptions: i32) -> *mut c_void {
+    pub fn DTWAIN_SelectOCREngine2Ex(&self, hWndParent: *const c_void, szTitle: *const u16, xPos: i32, yPos: i32, szIncludeFilter: *const u16, szExcludeFilter: *const u16, szNameMapping: *const u16, nOptions: i32) -> *mut c_void {
         unsafe { return (self.DTWAIN_SelectOCREngine2ExFunc)(hWndParent, szTitle, xPos, yPos, szIncludeFilter, szExcludeFilter, szNameMapping, nOptions);  }
     }
 
@@ -9448,7 +9538,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SelectOCREngine2WFunc)(hWndParent, szTitle, xPos, yPos, nOptions);  }
     }
 
-    pub fn DTWAIN_SelectOCREngineByName(&self, lpszName: *const c_char) -> *mut c_void {
+    pub fn DTWAIN_SelectOCREngineByName(&self, lpszName: *const u16) -> *mut c_void {
         unsafe { return (self.DTWAIN_SelectOCREngineByNameFunc)(lpszName);  }
     }
 
@@ -9464,7 +9554,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SelectSourceFunc)();  }
     }
 
-    pub fn DTWAIN_SelectSource2(&self, hWndParent: *const c_void, szTitle: *const c_char, xPos: i32, yPos: i32, nOptions: i32) -> *mut c_void {
+    pub fn DTWAIN_SelectSource2(&self, hWndParent: *const c_void, szTitle: *const u16, xPos: i32, yPos: i32, nOptions: i32) -> *mut c_void {
         unsafe { return (self.DTWAIN_SelectSource2Func)(hWndParent, szTitle, xPos, yPos, nOptions);  }
     }
 
@@ -9472,7 +9562,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SelectSource2AFunc)(hWndParent, szTitle, xPos, yPos, nOptions);  }
     }
 
-    pub fn DTWAIN_SelectSource2Ex(&self, hWndParent: *const c_void, szTitle: *const c_char, xPos: i32, yPos: i32, szIncludeFilter: *const c_char, szExcludeFilter: *const c_char, szNameMapping: *const c_char, nOptions: i32) -> *mut c_void {
+    pub fn DTWAIN_SelectSource2Ex(&self, hWndParent: *const c_void, szTitle: *const u16, xPos: i32, yPos: i32, szIncludeFilter: *const u16, szExcludeFilter: *const u16, szNameMapping: *const u16, nOptions: i32) -> *mut c_void {
         unsafe { return (self.DTWAIN_SelectSource2ExFunc)(hWndParent, szTitle, xPos, yPos, szIncludeFilter, szExcludeFilter, szNameMapping, nOptions);  }
     }
 
@@ -9488,7 +9578,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SelectSource2WFunc)(hWndParent, szTitle, xPos, yPos, nOptions);  }
     }
 
-    pub fn DTWAIN_SelectSourceByName(&self, lpszName: *const c_char) -> *mut c_void {
+    pub fn DTWAIN_SelectSourceByName(&self, lpszName: *const u16) -> *mut c_void {
         unsafe { return (self.DTWAIN_SelectSourceByNameFunc)(lpszName);  }
     }
 
@@ -9500,7 +9590,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SelectSourceByNameWFunc)(lpszName);  }
     }
 
-    pub fn DTWAIN_SelectSourceByNameWithOpen(&self, lpszName: *const c_char, bOpen: i32) -> *mut c_void {
+    pub fn DTWAIN_SelectSourceByNameWithOpen(&self, lpszName: *const u16, bOpen: i32) -> *mut c_void {
         unsafe { return (self.DTWAIN_SelectSourceByNameWithOpenFunc)(lpszName, bOpen);  }
     }
 
@@ -9524,7 +9614,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetAcquireArea2Func)(Source, left, top, right, bottom, lUnit, Flags);  }
     }
 
-    pub fn DTWAIN_SetAcquireArea2String(&self, Source: *mut c_void, left: *const c_char, top: *const c_char, right: *const c_char, bottom: *const c_char, lUnit: i32, Flags: i32) -> i32 {
+    pub fn DTWAIN_SetAcquireArea2String(&self, Source: *mut c_void, left: *const u16, top: *const u16, right: *const u16, bottom: *const u16, lUnit: i32, Flags: i32) -> i32 {
         unsafe { return (self.DTWAIN_SetAcquireArea2StringFunc)(Source, left, top, right, bottom, lUnit, Flags);  }
     }
 
@@ -9544,7 +9634,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetAcquireImageScaleFunc)(Source, xscale, yscale);  }
     }
 
-    pub fn DTWAIN_SetAcquireImageScaleString(&self, Source: *mut c_void, xscale: *const c_char, yscale: *const c_char) -> i32 {
+    pub fn DTWAIN_SetAcquireImageScaleString(&self, Source: *mut c_void, xscale: *const u16, yscale: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetAcquireImageScaleStringFunc)(Source, xscale, yscale);  }
     }
 
@@ -9576,7 +9666,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetAllCapsToDefaultFunc)(Source);  }
     }
 
-    pub fn DTWAIN_SetAppInfo(&self, szVerStr: *const c_char, szManu: *const c_char, szProdFam: *const c_char, szProdName: *const c_char) -> i32 {
+    pub fn DTWAIN_SetAppInfo(&self, szVerStr: *const u16, szManu: *const u16, szProdFam: *const u16, szProdName: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetAppInfoFunc)(szVerStr, szManu, szProdFam, szProdName);  }
     }
 
@@ -9588,7 +9678,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetAppInfoWFunc)(szVerStr, szManu, szProdFam, szProdName);  }
     }
 
-    pub fn DTWAIN_SetAuthor(&self, Source: *mut c_void, szAuthor: *const c_char) -> i32 {
+    pub fn DTWAIN_SetAuthor(&self, Source: *mut c_void, szAuthor: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetAuthorFunc)(Source, szAuthor);  }
     }
 
@@ -9620,7 +9710,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetBlankPageDetectionExFunc)(Source, threshold, autodetect, detectOpts, bSet);  }
     }
 
-    pub fn DTWAIN_SetBlankPageDetectionExString(&self, Source: *mut c_void, threshold: *const c_char, autodetect_option: i32, detectOpts: i32, bSet: i32) -> i32 {
+    pub fn DTWAIN_SetBlankPageDetectionExString(&self, Source: *mut c_void, threshold: *const u16, autodetect_option: i32, detectOpts: i32, bSet: i32) -> i32 {
         unsafe { return (self.DTWAIN_SetBlankPageDetectionExStringFunc)(Source, threshold, autodetect_option, detectOpts, bSet);  }
     }
 
@@ -9632,7 +9722,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetBlankPageDetectionExStringWFunc)(Source, threshold, autodetect_option, detectOpts, bSet);  }
     }
 
-    pub fn DTWAIN_SetBlankPageDetectionString(&self, Source: *mut c_void, threshold: *const c_char, autodetect_option: i32, bSet: i32) -> i32 {
+    pub fn DTWAIN_SetBlankPageDetectionString(&self, Source: *mut c_void, threshold: *const u16, autodetect_option: i32, bSet: i32) -> i32 {
         unsafe { return (self.DTWAIN_SetBlankPageDetectionStringFunc)(Source, threshold, autodetect_option, bSet);  }
     }
 
@@ -9648,7 +9738,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetBrightnessFunc)(Source, Brightness);  }
     }
 
-    pub fn DTWAIN_SetBrightnessString(&self, Source: *mut c_void, Brightness: *const c_char) -> i32 {
+    pub fn DTWAIN_SetBrightnessString(&self, Source: *mut c_void, Brightness: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetBrightnessStringFunc)(Source, Brightness);  }
     }
 
@@ -9664,7 +9754,15 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetBufferedTileModeFunc)(Source, bTileMode);  }
     }
 
-    pub fn DTWAIN_SetCamera(&self, Source: *mut c_void, szCamera: *const c_char) -> i32 {
+    pub fn DTWAIN_SetCallback(&self, Fn: DTWAIN_CALLBACK_PROC, UserData: i32) -> DTWAIN_CALLBACK_PROC {
+        unsafe { return (self.DTWAIN_SetCallbackFunc)(Fn, UserData);  }
+    }
+
+    pub fn DTWAIN_SetCallback64(&self, Fn: DTWAIN_CALLBACK_PROC64, UserData: i64) -> DTWAIN_CALLBACK_PROC64 {
+        unsafe { return (self.DTWAIN_SetCallback64Func)(Fn, UserData);  }
+    }
+
+    pub fn DTWAIN_SetCamera(&self, Source: *mut c_void, szCamera: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetCameraFunc)(Source, szCamera);  }
     }
 
@@ -9688,7 +9786,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetCapValuesEx2Func)(Source, lCap, lSetType, lContainerType, nDataType, pArray);  }
     }
 
-    pub fn DTWAIN_SetCaption(&self, Source: *mut c_void, Caption: *const c_char) -> i32 {
+    pub fn DTWAIN_SetCaption(&self, Source: *mut c_void, Caption: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetCaptionFunc)(Source, Caption);  }
     }
 
@@ -9708,7 +9806,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetContrastFunc)(Source, Contrast);  }
     }
 
-    pub fn DTWAIN_SetContrastString(&self, Source: *mut c_void, Contrast: *const c_char) -> i32 {
+    pub fn DTWAIN_SetContrastString(&self, Source: *mut c_void, Contrast: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetContrastStringFunc)(Source, Contrast);  }
     }
 
@@ -9736,7 +9834,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetDSMSearchOrderFunc)(SearchPath);  }
     }
 
-    pub fn DTWAIN_SetDSMSearchOrderEx(&self, SearchOrder: *const c_char, UserPath: *const c_char) -> i32 {
+    pub fn DTWAIN_SetDSMSearchOrderEx(&self, SearchOrder: *const u16, UserPath: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetDSMSearchOrderExFunc)(SearchOrder, UserPath);  }
     }
 
@@ -9756,7 +9854,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetDeviceNotificationsFunc)(Source, DevEvents);  }
     }
 
-    pub fn DTWAIN_SetDeviceTimeDate(&self, Source: *mut c_void, szTimeDate: *const c_char) -> i32 {
+    pub fn DTWAIN_SetDeviceTimeDate(&self, Source: *mut c_void, szTimeDate: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetDeviceTimeDateFunc)(Source, szTimeDate);  }
     }
 
@@ -9772,7 +9870,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetDoubleFeedDetectLengthFunc)(Source, Value);  }
     }
 
-    pub fn DTWAIN_SetDoubleFeedDetectLengthString(&self, Source: *mut c_void, value: *const c_char) -> i32 {
+    pub fn DTWAIN_SetDoubleFeedDetectLengthString(&self, Source: *mut c_void, value: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetDoubleFeedDetectLengthStringFunc)(Source, value);  }
     }
 
@@ -9800,12 +9898,12 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetErrorBufferThresholdFunc)(nErrors);  }
     }
 
-    pub fn DTWAIN_SetErrorCallback(&self, UserData: i32) -> i32 {
-        unsafe { return (self.DTWAIN_SetErrorCallbackFunc)(UserData);  }
+    pub fn DTWAIN_SetErrorCallback(&self, proc: DTWAIN_ERROR_PROC, UserData: i32) -> i32 {
+        unsafe { return (self.DTWAIN_SetErrorCallbackFunc)(proc, UserData);  }
     }
 
-    pub fn DTWAIN_SetErrorCallback64(&self, UserData64: i64) -> i32 {
-        unsafe { return (self.DTWAIN_SetErrorCallback64Func)(UserData64);  }
+    pub fn DTWAIN_SetErrorCallback64(&self, proc: DTWAIN_ERROR_PROC64, UserData64: i64) -> i32 {
+        unsafe { return (self.DTWAIN_SetErrorCallback64Func)(proc, UserData64);  }
     }
 
     pub fn DTWAIN_SetFeederAlignment(&self, Source: *mut c_void, lpAlignment: i32) -> i32 {
@@ -9828,7 +9926,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetFileCompressionTypeFunc)(Source, lCompression, bIsCustom);  }
     }
 
-    pub fn DTWAIN_SetFileSavePos(&self, hWndParent: *const c_void, szTitle: *const c_char, xPos: i32, yPos: i32, nFlags: i32) -> i32 {
+    pub fn DTWAIN_SetFileSavePos(&self, hWndParent: *const c_void, szTitle: *const u16, xPos: i32, yPos: i32, nFlags: i32) -> i32 {
         unsafe { return (self.DTWAIN_SetFileSavePosFunc)(hWndParent, szTitle, xPos, yPos, nFlags);  }
     }
 
@@ -9844,7 +9942,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetFileXferFormatFunc)(Source, lFileType, bSetCurrent);  }
     }
 
-    pub fn DTWAIN_SetHalftone(&self, Source: *mut c_void, lpHalftone: *const c_char) -> i32 {
+    pub fn DTWAIN_SetHalftone(&self, Source: *mut c_void, lpHalftone: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetHalftoneFunc)(Source, lpHalftone);  }
     }
 
@@ -9860,7 +9958,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetHighlightFunc)(Source, Highlight);  }
     }
 
-    pub fn DTWAIN_SetHighlightString(&self, Source: *mut c_void, Highlight: *const c_char) -> i32 {
+    pub fn DTWAIN_SetHighlightString(&self, Source: *mut c_void, Highlight: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetHighlightStringFunc)(Source, Highlight);  }
     }
 
@@ -9908,16 +10006,16 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetLightSourcesFunc)(Source, LightSources);  }
     }
 
-    pub fn DTWAIN_SetLoggerCallback(&self, UserData: i64) -> i32 {
-        unsafe { return (self.DTWAIN_SetLoggerCallbackFunc)(UserData);  }
+    pub fn DTWAIN_SetLoggerCallback(&self, logProc: DTWAIN_LOGGER_PROC, UserData: i64) -> i32 {
+        unsafe { return (self.DTWAIN_SetLoggerCallbackFunc)(logProc, UserData);  }
     }
 
-    pub fn DTWAIN_SetLoggerCallbackA(&self, UserData: i64) -> i32 {
-        unsafe { return (self.DTWAIN_SetLoggerCallbackAFunc)(UserData);  }
+    pub fn DTWAIN_SetLoggerCallbackA(&self, logProc: DTWAIN_LOGGER_PROCA, UserData: i64) -> i32 {
+        unsafe { return (self.DTWAIN_SetLoggerCallbackAFunc)(logProc, UserData);  }
     }
 
-    pub fn DTWAIN_SetLoggerCallbackW(&self, UserData: i64) -> i32 {
-        unsafe { return (self.DTWAIN_SetLoggerCallbackWFunc)(UserData);  }
+    pub fn DTWAIN_SetLoggerCallbackW(&self, logProc: DTWAIN_LOGGER_PROCW, UserData: i64) -> i32 {
+        unsafe { return (self.DTWAIN_SetLoggerCallbackWFunc)(logProc, UserData);  }
     }
 
     pub fn DTWAIN_SetManualDuplexMode(&self, Source: *mut c_void, Flags: i32, bSet: i32) -> i32 {
@@ -9964,7 +10062,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetPDFASCIICompressionFunc)(Source, bSet);  }
     }
 
-    pub fn DTWAIN_SetPDFAuthor(&self, Source: *mut c_void, lpAuthor: *const c_char) -> i32 {
+    pub fn DTWAIN_SetPDFAuthor(&self, Source: *mut c_void, lpAuthor: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetPDFAuthorFunc)(Source, lpAuthor);  }
     }
 
@@ -9980,7 +10078,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetPDFCompressionFunc)(Source, bCompression);  }
     }
 
-    pub fn DTWAIN_SetPDFCreator(&self, Source: *mut c_void, lpCreator: *const c_char) -> i32 {
+    pub fn DTWAIN_SetPDFCreator(&self, Source: *mut c_void, lpCreator: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetPDFCreatorFunc)(Source, lpCreator);  }
     }
 
@@ -9992,7 +10090,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetPDFCreatorWFunc)(Source, lpCreator);  }
     }
 
-    pub fn DTWAIN_SetPDFEncryption(&self, Source: *mut c_void, bUseEncryption: i32, lpszUser: *const c_char, lpszOwner: *const c_char, Permissions: u32, UseStrongEncryption: i32) -> i32 {
+    pub fn DTWAIN_SetPDFEncryption(&self, Source: *mut c_void, bUseEncryption: i32, lpszUser: *const u16, lpszOwner: *const u16, Permissions: u32, UseStrongEncryption: i32) -> i32 {
         unsafe { return (self.DTWAIN_SetPDFEncryptionFunc)(Source, bUseEncryption, lpszUser, lpszOwner, Permissions, UseStrongEncryption);  }
     }
 
@@ -10008,7 +10106,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetPDFJpegQualityFunc)(Source, Quality);  }
     }
 
-    pub fn DTWAIN_SetPDFKeywords(&self, Source: *mut c_void, lpKeyWords: *const c_char) -> i32 {
+    pub fn DTWAIN_SetPDFKeywords(&self, Source: *mut c_void, lpKeyWords: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetPDFKeywordsFunc)(Source, lpKeyWords);  }
     }
 
@@ -10036,7 +10134,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetPDFPageScaleFunc)(Source, nOptions, xScale, yScale);  }
     }
 
-    pub fn DTWAIN_SetPDFPageScaleString(&self, Source: *mut c_void, nOptions: i32, xScale: *const c_char, yScale: *const c_char) -> i32 {
+    pub fn DTWAIN_SetPDFPageScaleString(&self, Source: *mut c_void, nOptions: i32, xScale: *const u16, yScale: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetPDFPageScaleStringFunc)(Source, nOptions, xScale, yScale);  }
     }
 
@@ -10052,7 +10150,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetPDFPageSizeFunc)(Source, PageSize, CustomWidth, CustomHeight);  }
     }
 
-    pub fn DTWAIN_SetPDFPageSizeString(&self, Source: *mut c_void, PageSize: i32, CustomWidth: *const c_char, CustomHeight: *const c_char) -> i32 {
+    pub fn DTWAIN_SetPDFPageSizeString(&self, Source: *mut c_void, PageSize: i32, CustomWidth: *const u16, CustomHeight: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetPDFPageSizeStringFunc)(Source, PageSize, CustomWidth, CustomHeight);  }
     }
 
@@ -10068,7 +10166,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetPDFPolarityFunc)(Source, Polarity);  }
     }
 
-    pub fn DTWAIN_SetPDFProducer(&self, Source: *mut c_void, lpProducer: *const c_char) -> i32 {
+    pub fn DTWAIN_SetPDFProducer(&self, Source: *mut c_void, lpProducer: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetPDFProducerFunc)(Source, lpProducer);  }
     }
 
@@ -10080,7 +10178,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetPDFProducerWFunc)(Source, lpProducer);  }
     }
 
-    pub fn DTWAIN_SetPDFSubject(&self, Source: *mut c_void, lpSubject: *const c_char) -> i32 {
+    pub fn DTWAIN_SetPDFSubject(&self, Source: *mut c_void, lpSubject: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetPDFSubjectFunc)(Source, lpSubject);  }
     }
 
@@ -10100,7 +10198,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetPDFTextElementLongFunc)(TextElement, val1, val2, Flags);  }
     }
 
-    pub fn DTWAIN_SetPDFTextElementString(&self, TextElement: *mut c_void, val1: *const c_char, Flags: i32) -> i32 {
+    pub fn DTWAIN_SetPDFTextElementString(&self, TextElement: *mut c_void, val1: *const u16, Flags: i32) -> i32 {
         unsafe { return (self.DTWAIN_SetPDFTextElementStringFunc)(TextElement, val1, Flags);  }
     }
 
@@ -10112,7 +10210,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetPDFTextElementStringWFunc)(TextElement, szString, Flags);  }
     }
 
-    pub fn DTWAIN_SetPDFTitle(&self, Source: *mut c_void, lpTitle: *const c_char) -> i32 {
+    pub fn DTWAIN_SetPDFTitle(&self, Source: *mut c_void, lpTitle: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetPDFTitleFunc)(Source, lpTitle);  }
     }
 
@@ -10156,7 +10254,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetPixelTypeFunc)(Source, PixelType, BitDepth, bSetCurrent);  }
     }
 
-    pub fn DTWAIN_SetPostScriptTitle(&self, Source: *mut c_void, szTitle: *const c_char) -> i32 {
+    pub fn DTWAIN_SetPostScriptTitle(&self, Source: *mut c_void, szTitle: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetPostScriptTitleFunc)(Source, szTitle);  }
     }
 
@@ -10192,7 +10290,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetPrinterStringsFunc)(Source, ArrayString, pNumStrings);  }
     }
 
-    pub fn DTWAIN_SetPrinterSuffixString(&self, Source: *mut c_void, Suffix: *const c_char) -> i32 {
+    pub fn DTWAIN_SetPrinterSuffixString(&self, Source: *mut c_void, Suffix: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetPrinterSuffixStringFunc)(Source, Suffix);  }
     }
 
@@ -10212,7 +10310,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetResolutionFunc)(Source, Resolution);  }
     }
 
-    pub fn DTWAIN_SetResolutionString(&self, Source: *mut c_void, Resolution: *const c_char) -> i32 {
+    pub fn DTWAIN_SetResolutionString(&self, Source: *mut c_void, Resolution: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetResolutionStringFunc)(Source, Resolution);  }
     }
 
@@ -10224,7 +10322,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetResolutionStringWFunc)(Source, Resolution);  }
     }
 
-    pub fn DTWAIN_SetResourcePath(&self, ResourcePath: *const c_char) -> i32 {
+    pub fn DTWAIN_SetResourcePath(&self, ResourcePath: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetResourcePathFunc)(ResourcePath);  }
     }
 
@@ -10240,7 +10338,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetRotationFunc)(Source, Rotation);  }
     }
 
-    pub fn DTWAIN_SetRotationString(&self, Source: *mut c_void, Rotation: *const c_char) -> i32 {
+    pub fn DTWAIN_SetRotationString(&self, Source: *mut c_void, Rotation: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetRotationStringFunc)(Source, Rotation);  }
     }
 
@@ -10252,7 +10350,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetRotationStringWFunc)(Source, Rotation);  }
     }
 
-    pub fn DTWAIN_SetSaveFileName(&self, Source: *mut c_void, fName: *const c_char) -> i32 {
+    pub fn DTWAIN_SetSaveFileName(&self, Source: *mut c_void, fName: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetSaveFileNameFunc)(Source, fName);  }
     }
 
@@ -10268,7 +10366,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetShadowFunc)(Source, Shadow);  }
     }
 
-    pub fn DTWAIN_SetShadowString(&self, Source: *mut c_void, Shadow: *const c_char) -> i32 {
+    pub fn DTWAIN_SetShadowString(&self, Source: *mut c_void, Shadow: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetShadowStringFunc)(Source, Shadow);  }
     }
 
@@ -10292,7 +10390,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetTIFFInvertFunc)(Source, Setting);  }
     }
 
-    pub fn DTWAIN_SetTempFileDirectory(&self, szFilePath: *const c_char) -> i32 {
+    pub fn DTWAIN_SetTempFileDirectory(&self, szFilePath: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetTempFileDirectoryFunc)(szFilePath);  }
     }
 
@@ -10300,7 +10398,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetTempFileDirectoryAFunc)(szFilePath);  }
     }
 
-    pub fn DTWAIN_SetTempFileDirectoryEx(&self, szFilePath: *const c_char, CreationFlags: i32) -> i32 {
+    pub fn DTWAIN_SetTempFileDirectoryEx(&self, szFilePath: *const u16, CreationFlags: i32) -> i32 {
         unsafe { return (self.DTWAIN_SetTempFileDirectoryExFunc)(szFilePath, CreationFlags);  }
     }
 
@@ -10320,7 +10418,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetThresholdFunc)(Source, Threshold, bSetBithDepthReduction);  }
     }
 
-    pub fn DTWAIN_SetThresholdString(&self, Source: *mut c_void, Threshold: *const c_char, bSetBitDepthReduction: i32) -> i32 {
+    pub fn DTWAIN_SetThresholdString(&self, Source: *mut c_void, Threshold: *const u16, bSetBitDepthReduction: i32) -> i32 {
         unsafe { return (self.DTWAIN_SetThresholdStringFunc)(Source, Threshold, bSetBitDepthReduction);  }
     }
 
@@ -10336,7 +10434,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetTwainDSMFunc)(DSMType);  }
     }
 
-    pub fn DTWAIN_SetTwainLog(&self, LogFlags: u32, lpszLogFile: *const c_char) -> i32 {
+    pub fn DTWAIN_SetTwainLog(&self, LogFlags: u32, lpszLogFile: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetTwainLogFunc)(LogFlags, lpszLogFile);  }
     }
 
@@ -10356,11 +10454,15 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetTwainTimeoutFunc)(milliseconds);  }
     }
 
+    pub fn DTWAIN_SetUpdateDibProc(&self, DibProc: DTWAIN_DIBUPDATE_PROC) -> DTWAIN_DIBUPDATE_PROC {
+        unsafe { return (self.DTWAIN_SetUpdateDibProcFunc)(DibProc);  }
+    }
+
     pub fn DTWAIN_SetXResolution(&self, Source: *mut c_void, xResolution: f64) -> i32 {
         unsafe { return (self.DTWAIN_SetXResolutionFunc)(Source, xResolution);  }
     }
 
-    pub fn DTWAIN_SetXResolutionString(&self, Source: *mut c_void, Resolution: *const c_char) -> i32 {
+    pub fn DTWAIN_SetXResolutionString(&self, Source: *mut c_void, Resolution: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetXResolutionStringFunc)(Source, Resolution);  }
     }
 
@@ -10376,7 +10478,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SetYResolutionFunc)(Source, yResolution);  }
     }
 
-    pub fn DTWAIN_SetYResolutionString(&self, Source: *mut c_void, Resolution: *const c_char) -> i32 {
+    pub fn DTWAIN_SetYResolutionString(&self, Source: *mut c_void, Resolution: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_SetYResolutionStringFunc)(Source, Resolution);  }
     }
 
@@ -10404,7 +10506,7 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_StartThreadFunc)(DLLHandle);  }
     }
 
-    pub fn DTWAIN_StartTwainSession(&self, hWndMsg: *const c_void, lpszDLLName: *const c_char) -> i32 {
+    pub fn DTWAIN_StartTwainSession(&self, hWndMsg: *const c_void, lpszDLLName: *const u16) -> i32 {
         unsafe { return (self.DTWAIN_StartTwainSessionFunc)(hWndMsg, lpszDLLName);  }
     }
 
@@ -10424,11 +10526,11 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SysInitializeFunc)();  }
     }
 
-    pub fn DTWAIN_SysInitializeEx(&self, szINIPath: *const c_char) -> *mut c_void {
+    pub fn DTWAIN_SysInitializeEx(&self, szINIPath: *const u16) -> *mut c_void {
         unsafe { return (self.DTWAIN_SysInitializeExFunc)(szINIPath);  }
     }
 
-    pub fn DTWAIN_SysInitializeEx2(&self, szINIPath: *const c_char, szImageDLLPath: *const c_char, szLangResourcePath: *const c_char) -> *mut c_void {
+    pub fn DTWAIN_SysInitializeEx2(&self, szINIPath: *const u16, szImageDLLPath: *const u16, szLangResourcePath: *const u16) -> *mut c_void {
         unsafe { return (self.DTWAIN_SysInitializeEx2Func)(szINIPath, szImageDLLPath, szLangResourcePath);  }
     }
 
@@ -10452,11 +10554,11 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_SysInitializeLibFunc)(hInstance);  }
     }
 
-    pub fn DTWAIN_SysInitializeLibEx(&self, hInstance: *mut c_void, szINIPath: *const c_char) -> *mut c_void {
+    pub fn DTWAIN_SysInitializeLibEx(&self, hInstance: *mut c_void, szINIPath: *const u16) -> *mut c_void {
         unsafe { return (self.DTWAIN_SysInitializeLibExFunc)(hInstance, szINIPath);  }
     }
 
-    pub fn DTWAIN_SysInitializeLibEx2(&self, hInstance: *mut c_void, szINIPath: *const c_char, szImageDLLPath: *const c_char, szLangResourcePath: *const c_char) -> *mut c_void {
+    pub fn DTWAIN_SysInitializeLibEx2(&self, hInstance: *mut c_void, szINIPath: *const u16, szImageDLLPath: *const u16, szLangResourcePath: *const u16) -> *mut c_void {
         unsafe { return (self.DTWAIN_SysInitializeLibEx2Func)(hInstance, szINIPath, szImageDLLPath, szLangResourcePath);  }
     }
 
