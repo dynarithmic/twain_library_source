@@ -41,7 +41,6 @@
 #include <iomanip>
 #include <locale>
 #include <iostream>
-#include <cctype>
 #include <string_view>
 #include <boost/lexical_cast.hpp>
 #include <dtwain_filesystem.h>
@@ -675,7 +674,7 @@ namespace dynarithmic
                                                                         const typename strtraits::char_type* separator
                                                                         = typename strtraits::GetEmptyString())
         {
-            typename strtraits::outputstream_type strm;
+            typename strtraits::outputstream_type strm{};
             if (!str.empty())
                 strm << str << separator << value;
             else
@@ -810,12 +809,12 @@ namespace dynarithmic
             return s1?StringTraits::ToDouble(s1):defVal;
         }
 
-        static StringType StringFromUChars(typename const StringTraits::uchar_type* val, size_t nSize)
+        static StringType StringFromUChars(const typename StringTraits::uchar_type* val, size_t nSize)
         {
             return StringType(val, val + nSize);
         }
 
-        static StringType HexStringFromUChars(typename const StringTraits::uchar_type* val, size_t nSize)
+        static StringType HexStringFromUChars(const typename StringTraits::uchar_type* val, size_t nSize)
         {
             StringType hex_output_vector;
             boost::algorithm::hex_lower(val, val + nSize, std::back_inserter(hex_output_vector));
@@ -1099,7 +1098,7 @@ namespace dynarithmic
             SplitPath(sFileName, rArray);
 
             // Adjust the file name
-            typename StringTraits::outputstream_type strm;
+            typename StringTraits::outputstream_type strm{};
             strm << std::setfill(StringTraits::GetZeroNumericString()) << std::setw(nDigits) << num;
             typename StringTraits::string_type szBuf = strm.str();
             typename StringTraits::string_type& sTemp = rArray[NAME_POS];
@@ -1146,7 +1145,7 @@ namespace dynarithmic
         static typename StringTraits::string_type GetPageFileName(typename StringTraits::string_type strBase, int nCurImage, bool bUseLongNames)
         {
             typename StringTraits::string_type strFormat;
-            typename StringTraits::outputstream_type strm;
+            typename StringTraits::outputstream_type strm{};
             strm << nCurImage;
             strFormat = strm.str();
             const int nLenFormat = static_cast<int>(strFormat.length());

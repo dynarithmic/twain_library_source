@@ -4,6 +4,11 @@ DTWAIN Version changes
 
 - Fixed potential issue with setting the CAP_CAPTION capability.
 
+- Added Rust language bindings (dtwainpi.rs).
+
+- Updated C# and Visual Basic language bindings to properly handle DTWAIN
+  callback functions.
+
 
 5.7.1
 

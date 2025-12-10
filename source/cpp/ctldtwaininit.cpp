@@ -125,8 +125,6 @@ static CTL_StringType CheckSearchOrderString(CTL_StringType);
 static bool FindTask( DWORD hTask );
 static HMODULE GetDLLInstance();
 
-static const int numLoggingOptions = 4;
-
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetVersion(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType)
 {
     LOG_FUNC_ENTRY_PARAMS((lMajor, lMinor, lVersionType))
@@ -1791,12 +1789,13 @@ LONG DTWAIN_CloseAllSources()
     if ( pHandle->m_mapStringToSource.empty() )
         LOG_FUNC_EXIT_NONAME_PARAMS(0)
     CTL_StringToSourcePtrMap m_mapTemp = pHandle->m_mapStringToSource;
+    auto* pHandle2 = pHandle;
     std::for_each(m_mapTemp.begin(), m_mapTemp.end(), [&](CTL_StringToSourcePtrMap::value_type& vt)
     {
         CTL_ITwainSource *pTheSource = vt.second;
         if (pTheSource->IsAcquireAttempt())
             CTL_TwainAppMgr::DisableUserInterface(pTheSource);
-        dynarithmic::CloseSourceInternal(pHandle, pTheSource);
+        dynarithmic::CloseSourceInternal(pHandle2, pTheSource);
     });
 
     LOG_FUNC_EXIT_NONAME_PARAMS(0)
@@ -2577,8 +2576,6 @@ void LoadSelectSourcePosition()
         }
     }
 }
-
-#include <sstream>
 
 #ifdef DTWAIN_LIB
 void GetVersionFromResource(LPLONG lMajor, LPLONG lMinor, LPLONG patch)
