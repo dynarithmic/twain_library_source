@@ -73,8 +73,13 @@ func main() {
         }
 
         // Acquire to bmp file
-        api_func.DTWAIN_AcquireFile(twain_source,
-            dtwainapi.StringToUTF16("c:\\saved_images\\gotest3.bmp"),
+        // We will use the Unicode version of the function (DTWAIN_AcquireFileW) that takes
+        // a wide character file name.  
+        // We could have also used DTWAIN_AcquireFileA and just passed a regular Go string, 
+        // so this is really only for demo purposes to show how to pass immutable wide strings 
+        // to the DTWAIN API
+        api_func.DTWAIN_AcquireFileW(twain_source,
+            dtwainapi.StringToUTF16("gotest.bmp"), // This is a helper function that creates a wide string
             dtwainapi.DTWAIN_BMP,
             dtwainapi.DTWAIN_USELONGNAME,
             dtwainapi.DTWAIN_PT_DEFAULT,
