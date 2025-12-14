@@ -2,7 +2,7 @@
 // Poisson solver based on a full multigrid algorithm
 //
 // Design and implementation by
-// - Hervé Drolon (drolon@infonie.fr)
+// - Herve Drolon (drolon@infonie.fr)
 // Reference:
 // PRESS, W. H., TEUKOLSKY, S. A., VETTERLING, W. T., AND FLANNERY, B. P.
 // 1992. Numerical Recipes in C: The Art of Scientific Computing, 2nd ed. Cambridge University Press.
