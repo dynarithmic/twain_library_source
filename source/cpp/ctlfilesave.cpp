@@ -69,7 +69,7 @@ CTL_StringType dynarithmic::PromptForFileName(CTL_TwainDLLHandle* pHandle, CTL_T
             pOfn->Flags |= OFN_ENABLEHOOK;
             pOfn->lCustData = (LPARAM)&pHandle->m_CustomPlacement;
             if (!StringWrapperA::IsEmpty(sTitleAnsi))
-                pOfn->lpstrTitle = sTitleAnsi.c_str();
+                pOfn->lpstrTitle = StringConversion::Convert_Ansi_To_Native(sTitleAnsi).c_str();
         }
     }
 

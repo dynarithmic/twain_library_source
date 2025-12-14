@@ -123,8 +123,11 @@ static void DisplayLocalString(HWND hWnd, int nID, int resID)
         if (hWndControl)
         {
             // Convert text to UTF-16
-            auto utf8String = StringConversion::UTF8_To_UTF16(sText);
-            SetDlgItemTextW(hWnd, nID, utf8String.c_str());
+            auto utf16String = StringConversion::UTF8_To_UTF16(sText);
+            if (!utf16String.empty())
+                SetDlgItemTextW(hWnd, nID, utf16String.c_str());
+            else
+                SetDlgItemTextW(hWnd, nID, StringConversion::Convert_Ansi_To_Wide(sText).c_str());
         }
     }
 }
