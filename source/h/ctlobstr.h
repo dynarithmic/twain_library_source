@@ -516,9 +516,9 @@ namespace dynarithmic
             return static_cast<LPCWSTR>(ConvertA2W(str.data(), len));
         }
 
-		static std::wstring UTF8_To_UTF16(std::string_view utf8)
+		static std::pair<std::wstring, bool> UTF8_To_UTF16(std::string_view utf8, bool bCopyIfError = true)
 		{
-			if (utf8.empty()) return {};
+            if (utf8.empty()) return { {}, true };
 
 			int size = MultiByteToWideChar(
 				CP_UTF8,
@@ -533,8 +533,8 @@ namespace dynarithmic
             if (size == 0)
             {
                 if (!bCopyIfError)
-                    return {};
-                return StringConversion::Convert_Ansi_To_Wide(utf8);
+                    return { {}, false };
+                return { StringConversion::Convert_Ansi_To_Wide(utf8), false };
             }
 
 			MultiByteToWideChar(
@@ -545,7 +545,7 @@ namespace dynarithmic
 				result.data(),
 				size
 			);
-			return result;
+            return { result, true };
 		}
 
         template <typename T>

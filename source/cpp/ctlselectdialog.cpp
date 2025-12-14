@@ -57,7 +57,7 @@ CTL_StringType dynarithmic::LLSelectionDialog(CTL_TwainDLLHandle* pHandle, const
     {
         if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
             LogWriterUtils::WriteLogInfoIndentedA("Retrieving Dialog Resources...");
-        selectStruct.CS.sTitle = StringConversion::UTF8_To_UTF16(GetResourceStringFromMap(opts.selectionResourceID));
+        selectStruct.CS.sTitle = StringConversion::UTF8_To_UTF16(GetResourceStringFromMap(opts.selectionResourceID)).first;
         if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
             LogWriterUtils::WriteLogInfoIndentedA("Retrieved Dialog Resources successfully...");
         if (selectStruct.CS.sTitle.empty() )
@@ -122,12 +122,9 @@ static void DisplayLocalString(HWND hWnd, int nID, int resID)
         const HWND hWndControl = GetDlgItem(hWnd, nID);
         if (hWndControl)
         {
-            // Convert text to UTF-16
-            auto utf16String = StringConversion::UTF8_To_UTF16(sText);
-            if (!utf16String.empty())
-                SetDlgItemTextW(hWnd, nID, utf16String.c_str());
-            else
-                SetDlgItemTextW(hWnd, nID, StringConversion::Convert_Ansi_To_Wide(sText).c_str());
+            // Convert UTF-8 text to UTF-16.  If the conversion fails, a "normal"
+            // wide string is returned (i.e. ASCII char / null pairs for each ASCII char).
+            SetDlgItemTextW(hWnd, nID, StringConversion::UTF8_To_UTF16(sText).first.c_str());
         }
     }
 }
