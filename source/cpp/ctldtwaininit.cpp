@@ -265,7 +265,13 @@ static LONG GetResourceStringInternal(LONG resourceID, LPTSTR lpszBuffer, LONG n
         szTemp.insert(szTemp.end(), iter->second.begin(), iter->second.end());
         szTemp.push_back(0);
     }
-    sCopy += StringConversion::Convert_Ansi_To_Native(szTemp.data(), szTemp.size());
+    #if _UNICODE
+        // We need to convert the error string to UTF16 for wide buffer
+        auto utf16String = StringConversion::UTF8_To_UTF16(szTemp.data());
+        sCopy += utf16String;
+    #else
+		sCopy += StringConversion::Convert_Ansi_To_Native(szTemp.data(), szTemp.size());
+    #endif
     return StringWrapper::CopyInfoToCString(sCopy, lpszBuffer, nMaxLen);
 }
 

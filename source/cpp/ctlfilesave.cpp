@@ -54,6 +54,7 @@ CTL_StringType dynarithmic::PromptForFileName(CTL_TwainDLLHandle* pHandle, CTL_T
     szFile[0] = _T('\0');
     pOfn->lStructSize = sizeof(OPENFILENAME);
     const auto sTitle = pHandle->m_CustomPlacement.sTitle;
+    auto sTitleAnsi = StringConversion::Convert_Wide_To_Ansi(sTitle);
     if (pOfn == &ofn)
     {
         pOfn->hwndOwner = nullptr;
@@ -67,8 +68,8 @@ CTL_StringType dynarithmic::PromptForFileName(CTL_TwainDLLHandle* pHandle, CTL_T
             pOfn->lpfnHook = pHandle->m_pSaveAsDlgProc;
             pOfn->Flags |= OFN_ENABLEHOOK;
             pOfn->lCustData = (LPARAM)&pHandle->m_CustomPlacement;
-            if (!StringWrapper::IsEmpty(sTitle))
-                pOfn->lpstrTitle = sTitle.c_str();
+            if (!StringWrapperA::IsEmpty(sTitleAnsi))
+                pOfn->lpstrTitle = sTitleAnsi.c_str();
         }
     }
 

@@ -254,7 +254,7 @@ namespace dynarithmic
         int xpos;
         int ypos;
         HWND hWndParent;
-        CTL_StringType sTitle;
+        std::wstring sTitle;  // This will always be a UTF16 title
         std::vector<CTL_StringType> aIncludeNames;
         std::vector<CTL_StringType> aExcludeNames;
         std::unordered_map<CTL_StringType, CTL_StringType> mapNames;

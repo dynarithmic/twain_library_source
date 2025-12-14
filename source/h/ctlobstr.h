@@ -516,6 +516,32 @@ namespace dynarithmic
             return static_cast<LPCWSTR>(ConvertA2W(str.data(), len));
         }
 
+		static std::wstring UTF8_To_UTF16(std::string_view utf8)
+		{
+			if (utf8.empty()) return {};
+
+			int size = MultiByteToWideChar(
+				CP_UTF8,
+				MB_ERR_INVALID_CHARS,
+				utf8.data(),
+				(int)utf8.size(),
+				nullptr,
+				0
+			);
+
+			std::wstring result(size, 0);
+
+			MultiByteToWideChar(
+				CP_UTF8,
+				MB_ERR_INVALID_CHARS,
+				utf8.data(),
+				(int)utf8.size(),
+				result.data(),
+				size
+			);
+			return result;
+		}
+
         template <typename T>
         struct CTL_StringVector
         {

@@ -52,16 +52,16 @@ CTL_StringType dynarithmic::LLSelectionDialog(CTL_TwainDLLHandle* pHandle, const
     selectStruct.nItems = 0;
     selectStruct.pHandle = pHandle;
     if ( opts.szTitle )
-        selectStruct.CS.sTitle = opts.szTitle;
+        selectStruct.CS.sTitle = StringConversion::Convert_Native_To_Wide(opts.szTitle);
     else
     {
         if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
             LogWriterUtils::WriteLogInfoIndentedA("Retrieving Dialog Resources...");
-        selectStruct.CS.sTitle = GetResourceStringFromMap_Native(opts.selectionResourceID);
+        selectStruct.CS.sTitle = StringConversion::UTF8_To_UTF16(GetResourceStringFromMap(opts.selectionResourceID));
         if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
             LogWriterUtils::WriteLogInfoIndentedA("Retrieved Dialog Resources successfully...");
         if (selectStruct.CS.sTitle.empty() )
-            selectStruct.CS.sTitle = _T("Select Source");
+            selectStruct.CS.sTitle = L"Select Source";
     }
 
     if (opts.szIncludeNames)
@@ -121,7 +121,11 @@ static void DisplayLocalString(HWND hWnd, int nID, int resID)
     {
         const HWND hWndControl = GetDlgItem(hWnd, nID);
         if (hWndControl)
-            SetDlgItemTextA(hWnd, nID, sText.c_str());
+        {
+            // Convert text to UTF-16
+            auto utf8String = StringConversion::UTF8_To_UTF16(sText);
+            SetDlgItemTextW(hWnd, nID, utf8String.c_str());
+        }
     }
 }
 
@@ -282,7 +286,7 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
             lstSources = GetDlgItem(hWnd, IDC_LSTSOURCES);
 
             // Set the title
-            ::SetWindowText(hWnd, pS->CS.sTitle.c_str());
+            ::SetWindowTextW(hWnd, pS->CS.sTitle.c_str());
 
             // Fill the list box with the sources
             auto vValues = pS->getNameListFunc(*pS);
