@@ -687,6 +687,7 @@ namespace dynarithmic
         // Create an empty map
         std::ifstream ifs(sPath.data());
         bool open = false;
+        const char* BOMHeaderUTF = "\xEF\xBB\xBF";
         if (ifs)
         {
             CTL_StringToMapLongToStringMap::mapped_type resourceMap;
@@ -694,8 +695,16 @@ namespace dynarithmic
             int resourceID;
             open = true;
             std::string line;
+            bool bReadFirstLine = false;
             while (getline(ifs, line))
             {
+                // Read the BOM header if it already exists
+                if (!bReadFirstLine)
+                {
+                    if (line.size() >= 3 && StringWrapperA::StartsWith(line, BOMHeaderUTF))
+                        line = line.substr(3);
+                }
+                bReadFirstLine = true;
                 std::istringstream strm(line);
                 while (strm >> resourceID)
                 {

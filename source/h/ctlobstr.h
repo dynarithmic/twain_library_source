@@ -524,18 +524,24 @@ namespace dynarithmic
 				CP_UTF8,
 				MB_ERR_INVALID_CHARS,
 				utf8.data(),
-				(int)utf8.size(),
+				static_cast<int>(utf8.size()),
 				nullptr,
 				0
 			);
 
 			std::wstring result(size, 0);
+            if (size == 0)
+            {
+                if (!bCopyIfError)
+                    return {};
+                return StringConversion::Convert_Ansi_To_Wide(utf8);
+            }
 
 			MultiByteToWideChar(
 				CP_UTF8,
 				MB_ERR_INVALID_CHARS,
 				utf8.data(),
-				(int)utf8.size(),
+				static_cast<int>(utf8.size()),
 				result.data(),
 				size
 			);
