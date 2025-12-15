@@ -267,7 +267,7 @@ static LONG GetResourceStringInternal(LONG resourceID, LPTSTR lpszBuffer, LONG n
     }
     #if _UNICODE
         // We need to convert the error string to UTF16 for wide buffer
-        auto utf16String = StringConversion::UTF8_To_UTF16(szTemp.data()).first;
+        auto utf16String = StringConversion::Convert_UTF8_To_UTF16(szTemp.data()).first;
         if ( !utf16String.empty() )
             sCopy += utf16String;
         else

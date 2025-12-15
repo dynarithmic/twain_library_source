@@ -496,6 +496,30 @@ namespace dynarithmic
         static std::string     Convert_WidePtr_To_Ansi(const wchar_t* x, size_t len) { return x ? WideToANSI(x, len) : ""; }
         static std::wstring    Convert_AnsiPtr_To_Wide(const char* x, size_t len) { return x ? ANSIToWide(x, len) : L""; }
 
+        #ifdef _WIN32
+        using utf16strType = std::wstring;
+		using utf16viewType = std::wstring_view;
+        #else
+		using utf16strType = std::u16string;
+		using utf16viewType = std::u16string_view;
+        #endif
+
+        static std::pair<utf16strType, bool> Convert_UTF8_To_UTF16(std::string_view utf8, bool bMakeWideIfError = true)
+        {
+            auto pr = UTF8_UTF16_Converter::UTF8ToUTF16(utf8);
+            if ( !pr.second && bMakeWideIfError )
+                return { StringConversion::Convert_Ansi_To_Wide(utf8), false }; // Right now, only works for Windows
+            return pr;
+        }
+
+		static std::pair<std::string, bool> Convert_UTF16_To_UTF8(utf16viewType utf16, bool bMakeAnsiIfError = true)
+		{
+			auto pr = UTF8_UTF16_Converter::UTF16ToUTF8(utf16);
+			if (!pr.second && bMakeAnsiIfError)
+				return { StringConversion::Convert_Wide_To_Ansi(utf16), false }; // Right now, only works for Windows
+			return pr;
+		}
+
         static std::string WideToANSI(std::wstring_view wstr)
         {
             return static_cast<LPCSTR>(ConvertW2A(wstr.data()));
@@ -515,38 +539,6 @@ namespace dynarithmic
         {
             return static_cast<LPCWSTR>(ConvertA2W(str.data(), len));
         }
-
-		static std::pair<std::wstring, bool> UTF8_To_UTF16(std::string_view utf8, bool bCopyIfError = true)
-		{
-            if (utf8.empty()) return { {}, true };
-
-			int size = MultiByteToWideChar(
-				CP_UTF8,
-				MB_ERR_INVALID_CHARS,
-				utf8.data(),
-				static_cast<int>(utf8.size()),
-				nullptr,
-				0
-			);
-
-			std::wstring result(size, 0);
-            if (size == 0)
-            {
-                if (!bCopyIfError)
-                    return { {}, false };
-                return { StringConversion::Convert_Ansi_To_Wide(utf8), false };
-            }
-
-			MultiByteToWideChar(
-				CP_UTF8,
-				MB_ERR_INVALID_CHARS,
-				utf8.data(),
-				static_cast<int>(utf8.size()),
-				result.data(),
-				size
-			);
-            return { result, true };
-		}
 
         template <typename T>
         struct CTL_StringVector
