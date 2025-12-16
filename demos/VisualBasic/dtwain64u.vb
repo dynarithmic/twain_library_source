@@ -1736,14 +1736,14 @@ Class DTWAINAPI
     Public Const DTWAIN_FEEDER_TERMINATE As Integer = 1
     Public Const DTWAIN_FEEDER_USEFLATBED As Integer = 2
 
-    Public Delegate Function DTwainCallback(WParam As Long, LParam As Long, UserData As Long) As Long
-    Public Delegate Function DTwainCallback64(WParam As Long, LParam As Long, UserData As Long) As Long
-    Public Delegate Function DTwainErrorProc(param1 As Integer, param2 As Integer) As Long
-    Public Delegate Function DTwainErrorProc64(param1 As Integer, param2 As Long) As Long
-    Public Delegate Function DTwainLoggerProcA(<MarshalAs(UnmanagedType.LPStr)> lpszName As String, UserData As Long) As Long
-    Public Delegate Function DTwainLoggerProcW(<MarshalAs(UnmanagedType.LPWStr)> lpszName As String, UserData As Long) As Long
-    Public Delegate Function DTwainDIBUpdateProc(TheSource As System.IntPtr, currentImage As Integer, DibData As System.IntPtr) As System.IntPtr
-    Public Delegate Function DTwainLoggerProc(<MarshalAs(UnmanagedType.LPTStr)> lpszName As String, UserData As Long) As Long
+    Public Delegate Function DTwainCallback(WParam As IntPtr, LParam As IntPtr, UserData As IntPtr) As IntPtr
+    Public Delegate Function DTwainCallback64(WParam As IntPtr, LParam As IntPtr, UserData As IntPtr) As IntPtr
+    Public Delegate Function DTwainErrorProc(param1 As Integer, param2 As Integer) As IntPtr
+    Public Delegate Function DTwainErrorProc64(param1 As Integer, param2 As Long) As IntPtr
+    Public Delegate Function DTwainLoggerProcA(<MarshalAs(UnmanagedType.LPStr)> lpszName As String, UserData As Long) As IntPtr
+    Public Delegate Function DTwainLoggerProcW(<MarshalAs(UnmanagedType.LPWStr)> lpszName As String, UserData As Long) As IntPtr
+    Public Delegate Function DTwainDIBUpdateProc(TheSource As IntPtr, currentImage As Integer, DibData As IntPtr) As IntPtr
+    Public Delegate Function DTwainLoggerProc(<MarshalAs(UnmanagedType.LPTStr)> lpszName As String, UserData As Long) As IntPtr
 
 
     Declare Auto Function DTWAIN_AcquireAudioFile Lib "dtwain64u.dll" (Source As System.IntPtr, lpszFile As String, lFileFlags As Integer, lMaxClips As Integer, bShowUI As Integer, bCloseSource As Integer, ByRef pStatus As Integer) As Integer
