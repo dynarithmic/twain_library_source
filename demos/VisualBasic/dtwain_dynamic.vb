@@ -26,6 +26,9 @@ Imports System
 Imports System.Reflection
 Imports System.Runtime.InteropServices
 Imports System.Text
+Imports System.IO
+Imports System.ComponentModel
+
 
 Namespace Dynarithmic
     Friend Module NativeMethods
@@ -49,16 +52,56 @@ Namespace Dynarithmic
         Implements IDisposable
 
         Private _module As IntPtr
+        Private _sysErrorMessage As String = ""
 
         Public Sub New(dllPath As String)
-            _module = NativeMethods.LoadLibrary(dllPath)
-            If _module = IntPtr.Zero Then
-                Throw New DllNotFoundException(
-                $"Failed to load {dllPath}, error={Marshal.GetLastWin32Error()}"
-            )
+            Dim dll32() As String = {"dtwain32u.dll", "dtwain32ud.dll"}
+            Dim dll64() As String = {"dtwain64u.dll", "dtwain64ud.dll"}
+            Dim filename As String = Path.GetFileName(dllPath).ToLower()
+
+            Dim index1 As Integer = Array.IndexOf(dll32, filename)
+            Dim index2 As Integer = Array.IndexOf(dll64, filename)
+
+            Dim is32Bit As Boolean = False
+            If IntPtr.Size = 4 Then
+                is32Bit = True
+            End If
+
+            Dim is64Bit As Boolean = False
+            If IntPtr.Size = 8 Then
+                is64Bit = True
+            End If
+
+            Dim joinedNames As String
+            If is32Bit Then
+                joinedNames = String.Join(", ", dll32)
+            Else
+                joinedNames = String.Join(", ", dll64)
+            End If
+
+            If index1 = -1 And index2 = -1 Then
+                _sysErrorMessage = "DTWAIN DLL file name " & filename &
+                  " is not valid (must be one of the following: [" & joinedNames & "])"
+            End If
+            If String.IsNullOrEmpty(_sysErrorMessage) And is64Bit And index1 <> -1 Then
+                _sysErrorMessage = "Cannot load 32-bit DTWAIN DLL in a 64-bit process"
+            End If
+            If String.IsNullOrEmpty(_sysErrorMessage) And is32Bit And index2 <> -1 Then
+                _sysErrorMessage = "Cannot load 64-bit DTWAIN DLL in a 32-bit process"
+            End If
+            If String.IsNullOrEmpty(_sysErrorMessage) Then
+                _module = NativeMethods.LoadLibrary(dllPath)
+                If _module = IntPtr.Zero Then
+                    Dim lastError = Marshal.GetLastWin32Error()
+                    Dim message As String = New Win32Exception(CInt(lastError)).Message
+                    _sysErrorMessage = "Failed to load " & dllPath & ", error=" & Marshal.GetLastWin32Error()
+                End If
             End If
         End Sub
 
+        Public Function GetErrorMessage() As String
+            Return _sysErrorMessage
+        End Function
         Public Sub Bind(target As Object)
             Dim t = target.GetType()
 
@@ -138,7 +181,19 @@ Namespace Dynarithmic
 
         Public Sub New(dllPath As String)
             MyBase.New(dllPath)
-            MyBase.Bind(api)
+            Dim errMsg As String = MyBase.GetErrorMessage()
+            Dim isEmpty As Boolean = String.IsNullOrEmpty(errMsg)
+            If Not isEmpty Then
+                If errMsg.StartsWith("Failed") Then
+                    Throw New DllNotFoundException(errMsg)
+                End If
+                Throw New ArgumentOutOfRangeException(NameOf(dllPath), errMsg)
+            End If
+            Try
+                MyBase.Bind(api)
+            Catch ex As Exception
+                Throw ex
+            End Try
         End Sub
 
         Structure DTWAIN_POINTAPI

@@ -1,104 +1,117 @@
-/*
-    This file is part of the Dynarithmic TWAIN Library (DTWAIN).
-    Copyright (c) 2002-2026 Dynarithmic Software.
+    /*
+        This file is part of the Dynarithmic TWAIN Library (DTWAIN).
+        Copyright (c) 2002-2026 Dynarithmic Software.
 
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
+        Licensed under the Apache License, Version 2.0 (the "License");
+        you may not use this file except in compliance with the License.
+        You may obtain a copy of the License at
 
-        http://www.apache.org/licenses/LICENSE-2.0
+            http://www.apache.org/licenses/LICENSE-2.0
 
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+        Unless required by applicable law or agreed to in writing, software
+        distributed under the License is distributed on an "AS IS" BASIS,
+        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        See the License for the specific language governing permissions and
+        limitations under the License.
 
-    FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
-    DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
-    OF THIRD PARTY RIGHTS.
-*/
-#pragma warning disable 0649
-using System;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.IO;
+        FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
+        DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
+        OF THIRD PARTY RIGHTS.
+    */
+    #pragma warning disable 0649
+    using System;
+    using System.Reflection;
+    using System.Runtime.InteropServices;
+    using System.IO;
 
-namespace Dynarithmic
-{
-    using DTWAIN_SOURCE = System.IntPtr;
-    using DTWAIN_ARRAY = System.IntPtr;
-    using DTWAIN_RANGE = System.IntPtr;
-    using DTWAIN_FRAME = System.IntPtr;
-    using DTWAIN_PDFTEXTELEMENT = System.IntPtr;
-    using DTWAIN_HANDLE = System.IntPtr;
-    using NULL_HANDLE = System.IntPtr;
-    using DTWAIN_IDENTITY = System.IntPtr;
-    using DTWAIN_OCRENGINE = System.IntPtr;
-    using DTWAIN_OCRTEXTINFOHANDLE = System.IntPtr;
-    using TW_UINT16 = System.UInt16;
-    using TW_UINT32 = System.UInt32;
-    using TW_BOOL = System.UInt16;
-    using DTWAIN_MEMORY_PTR = System.IntPtr;
-    using ULONG64 = System.UInt64;
-    using LONG64 = System.Int64;
-    using LONGLONG = System.Int64;
-    using DWORD = System.UInt32;
-    using LONG = System.Int32;
-    using HINSTANCE = System.IntPtr;
-    using HWND = System.IntPtr;
-    using DTWAIN_FLOAT = System.Double;
-    using HANDLE = System.IntPtr;
-    using HFONT = System.IntPtr;
-
-    [AttributeUsage(AttributeTargets.Field)]
-    public sealed class DTWAINNativeFunctionAttribute : Attribute
+    namespace Dynarithmic
     {
-        public string EntryPoint { get; }
+        using DTWAIN_SOURCE = System.IntPtr;
+        using DTWAIN_ARRAY = System.IntPtr;
+        using DTWAIN_RANGE = System.IntPtr;
+        using DTWAIN_FRAME = System.IntPtr;
+        using DTWAIN_PDFTEXTELEMENT = System.IntPtr;
+        using DTWAIN_HANDLE = System.IntPtr;
+        using NULL_HANDLE = System.IntPtr;
+        using DTWAIN_IDENTITY = System.IntPtr;
+        using DTWAIN_OCRENGINE = System.IntPtr;
+        using DTWAIN_OCRTEXTINFOHANDLE = System.IntPtr;
+        using TW_UINT16 = System.UInt16;
+        using TW_UINT32 = System.UInt32;
+        using TW_BOOL = System.UInt16;
+        using DTWAIN_MEMORY_PTR = System.IntPtr;
+        using ULONG64 = System.UInt64;
+        using LONG64 = System.Int64;
+        using LONGLONG = System.Int64;
+        using DWORD = System.UInt32;
+        using LONG = System.Int32;
+        using HINSTANCE = System.IntPtr;
+        using HWND = System.IntPtr;
+        using DTWAIN_FLOAT = System.Double;
+        using HANDLE = System.IntPtr;
+        using HFONT = System.IntPtr;
+
+        [AttributeUsage(AttributeTargets.Field)]
+        public sealed class DTWAINNativeFunctionAttribute : Attribute
+        {
+            public string EntryPoint { get; }
         
-        public DTWAINNativeFunctionAttribute(string entryPoint)
-        {
-            EntryPoint = entryPoint;
+            public DTWAINNativeFunctionAttribute(string entryPoint)
+            {
+                EntryPoint = entryPoint;
+            }
         }
-    }
 
-    public abstract class DTWAINNativeLibraryBase : IDisposable
-    {
-        private IntPtr _module;
-
-        protected DTWAINNativeLibraryBase(string dllPath)
+        public abstract class DTWAINNativeLibraryBase : IDisposable
         {
-            string[] dll32 = { "dtwain32u.dll", "dtwain32ud.dll" };
-            string[] dll64 = { "dtwain64u.dll", "dtwain64ud.dll" };
-            string filename = Path.GetFileName(dllPath).ToLower();
+            private IntPtr _module;
+            private string _sysErrorMessage;
 
-            int index1 = Array.IndexOf(dll32, filename);
-            int index2 = Array.IndexOf(dll64, filename);
+            public string GetErrorMessage() { return _sysErrorMessage; }
+            protected DTWAINNativeLibraryBase(string dllPath)
+            {
+                _sysErrorMessage = "";
+                string[] dll32 = { "dtwain32u.dll", "dtwain32ud.dll" };
+                string[] dll64 = { "dtwain64u.dll", "dtwain64ud.dll" };
+                string filename = Path.GetFileName(dllPath).ToLower();
 
-            bool is32bit = (IntPtr.Size == 4);
-            bool is64bit = (IntPtr.Size == 8);
+                int index1 = Array.IndexOf(dll32, filename);
+                int index2 = Array.IndexOf(dll64, filename);
 
-            string joinedNames = default;
-            if (is32bit)
-                joinedNames = string.Join(", ", dll32);
-            else
-                joinedNames = string.Join(", ", dll64);
+                bool is32bit = (IntPtr.Size == 4);
+                bool is64bit = (IntPtr.Size == 8);
 
-            if (index1 == -1 && index2 == -1)
-                throw new ArgumentOutOfRangeException(nameof(dllPath), "DTWAIN DLL file name " + filename +
-                    " is not valid (must be one of the following: [" + joinedNames + "])");
+                string joinedNames = default;
+                if (is32bit)
+                    joinedNames = string.Join(", ", dll32);
+                else
+                    joinedNames = string.Join(", ", dll64);
 
-            if (is64bit && index1 != -1)
-                throw new ArgumentOutOfRangeException(nameof(dllPath), "Cannot load 32-bit DTWAIN DLL in a 64-bit process");
+                if (index1 == -1 && index2 == -1)
+                    _sysErrorMessage = "DTWAIN DLL file name " + filename +
+                        " is not valid (must be one of the following: [" + joinedNames + "])";
+                if (!String.IsNullOrEmpty(_sysErrorMessage) && is64bit && index1 != -1)
+                _sysErrorMessage = "Cannot load 32-bit DTWAIN DLL in a 64-bit process";
 
-            if (is32bit && index2 != -1)
-                throw new ArgumentOutOfRangeException(nameof(dllPath), "Cannot load 64-bit DTWAIN DLL in a 32-bit process");
-
-            _module = LoadLibrary(dllPath);
-            if (_module == IntPtr.Zero)
-                throw new DllNotFoundException(dllPath);
-
-            BindFunctions();
+            if (!String.IsNullOrEmpty(_sysErrorMessage) && is32bit && index2 != -1)
+                _sysErrorMessage = "Cannot load 64-bit DTWAIN DLL in a 32-bit process";
+            if (String.IsNullOrEmpty(_sysErrorMessage))
+            {
+                _module = LoadLibrary(dllPath);
+                if (_module == IntPtr.Zero)
+                    _sysErrorMessage = "Failed to load " + dllPath + ", error=" + Marshal.GetLastWin32Error();
+                else
+                {
+                    try
+                    {
+                        BindFunctions();
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
+                }
+            }
         }
 
         private void BindFunctions()
@@ -3006,7 +3019,17 @@ namespace Dynarithmic
         public delegate int DTWAIN_UseMultipleThreadsDelegate(int bSet);
 
         public TwainAPI(string dllPath)
-            : base(dllPath) { }
+            : base(dllPath) 
+        {
+            string errMsg= GetErrorMessage();
+            bool isEmpty = String.IsNullOrEmpty(errMsg);
+            if (!isEmpty)
+            {
+                if (errMsg.StartsWith("Failed"))
+                    throw new DllNotFoundException(errMsg);
+                throw new ArgumentOutOfRangeException(errMsg);
+            }
+        }
 
         [DTWAINNativeFunction("DTWAIN_AcquireAudioFile")]
         private readonly DTWAIN_AcquireAudioFileDelegate  _DTWAIN_AcquireAudioFile;
