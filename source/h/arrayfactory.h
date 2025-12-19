@@ -173,7 +173,7 @@ namespace dynarithmic
             // Get the tagged_array<T> that represents the DTWAIN Array
 	        if (auto* p = static_cast<tagged_array<T>*>(pTag))
                 return p->get_container(); // Return the std::vector
-            throw (std::invalid_argument::invalid_argument("underlying_container_t argument cannot be nullptr"));
+            throw (std::invalid_argument("underlying_container_t argument cannot be nullptr"));
         }
 
         template <typename T>

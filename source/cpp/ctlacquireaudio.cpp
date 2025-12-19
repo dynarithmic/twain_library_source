@@ -55,7 +55,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireAudioNative(DTWAIN_SOURCE Source, LONG n
         CTL_TwainAppMgr::SetError(pSource->GetLastAcquireError(), "", false);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pStatus))
     LOG_FUNC_EXIT_NONAME_PARAMS(aDibs)
-    CATCH_BLOCK_LOG_PARAMS(DTWAIN_ARRAY(0))
+    CATCH_BLOCK_LOG_PARAMS(nullptr)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AcquireAudioNativeEx(DTWAIN_SOURCE Source, LONG nMaxAudioClips, DTWAIN_BOOL bShowUI,

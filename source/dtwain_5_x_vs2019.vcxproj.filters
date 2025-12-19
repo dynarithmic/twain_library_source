@@ -1008,9 +1008,6 @@
     <ClInclude Include="h\ctltripletbase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="h\dtwain_config.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="h\dtwain_standard_defs.h">
       <Filter>Header Files</Filter>
     </ClInclude>

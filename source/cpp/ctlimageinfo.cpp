@@ -143,5 +143,5 @@ HANDLE DLLENTRY_DEF DTWAIN_GetBufferedTransferInfo(DTWAIN_SOURCE Source,
     }
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((Compression, BytesPerRow, Columns, Rows, XOffset, YOffset, Flags, BytesWritten, MemoryLength))
     LOG_FUNC_EXIT_NONAME_PARAMS(memxferInfo.Memory.TheMem)
-    CATCH_BLOCK_LOG_PARAMS((HANDLE)0)
+    CATCH_BLOCK_LOG_PARAMS(nullptr)
 }

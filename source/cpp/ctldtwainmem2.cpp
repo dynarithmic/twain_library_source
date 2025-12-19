@@ -68,7 +68,7 @@ HANDLE  DLLENTRY_DEF DTWAIN_AllocateMemory(DWORD memSize)
     LOG_FUNC_ENTRY_PARAMS((memSize))
     auto h = GeneralAllocator<SystemAllocation<SIZE_T>, SIZE_T>(memSize, SystemAllocation<SIZE_T>{});
     LOG_FUNC_EXIT_NONAME_PARAMS(h)
-    CATCH_BLOCK(HANDLE())
+    CATCH_BLOCK(nullptr)
 }
 
 // DTWAIN 2.0 memory related functions for 64-bit allocations
@@ -86,7 +86,7 @@ HANDLE  DLLENTRY_DEF DTWAIN_AllocateMemory64(ULONG64 memSize)
         auto h = GeneralAllocator<SystemAllocation<SIZE_T>, SIZE_T>(memSize, SystemAllocation<SIZE_T>{});
     #endif
     LOG_FUNC_EXIT_NONAME_PARAMS(h)
-    CATCH_BLOCK(HANDLE())
+    CATCH_BLOCK(nullptr)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FreeMemory(HANDLE h)
@@ -102,7 +102,7 @@ DTWAIN_MEMORY_PTR DLLENTRY_DEF DTWAIN_LockMemory(HANDLE h)
     LOG_FUNC_ENTRY_PARAMS((h))
     const DTWAIN_MEMORY_PTR ptr = ImageMemoryHandler::GlobalLock(h);
     LOG_FUNC_EXIT_NONAME_PARAMS(ptr)
-    CATCH_BLOCK(DTWAIN_MEMORY_PTR())
+    CATCH_BLOCK(nullptr)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_UnlockMemory(HANDLE h)
@@ -120,7 +120,7 @@ HANDLE  DLLENTRY_DEF DTWAIN_AllocateMemoryEx(DWORD memSize)
     TwainAllocation<DWORD> allocation(pHandle);
     auto h = GeneralAllocator<TwainAllocation<DWORD>, DWORD>(memSize, allocation);
     LOG_FUNC_EXIT_NONAME_PARAMS(h)
-    CATCH_BLOCK(HANDLE())
+    CATCH_BLOCK(nullptr)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_FreeMemoryEx(HANDLE h)
@@ -145,7 +145,7 @@ DTWAIN_MEMORY_PTR DLLENTRY_DEF DTWAIN_LockMemoryEx(HANDLE h)
     if (pHandle->m_TwainMemoryFunc)
         ptr = pHandle->m_TwainMemoryFunc->LockMemory(h);
     LOG_FUNC_EXIT_NONAME_PARAMS(ptr)
-    CATCH_BLOCK(DTWAIN_MEMORY_PTR())
+    CATCH_BLOCK(nullptr)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_UnlockMemoryEx(HANDLE h)

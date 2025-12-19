@@ -254,7 +254,7 @@ namespace dynarithmic
         int xpos;
         int ypos;
         HWND hWndParent;
-        CTL_StringType sTitle;
+        std::wstring sTitle;  // This will always be a UTF16 title
         std::vector<CTL_StringType> aIncludeNames;
         std::vector<CTL_StringType> aExcludeNames;
         std::unordered_map<CTL_StringType, CTL_StringType> mapNames;
@@ -901,7 +901,7 @@ namespace dynarithmic
     #endif
 
     void DTWAIN_InvokeCallback( int nWhich, DTWAIN_HANDLE pHandle, DTWAIN_SOURCE pSource, WPARAM lData1, LPARAM lData2 );
-    DTWAIN_BOOL DTWAIN_GetAllSourceDibs(DTWAIN_SOURCE Source, DTWAIN_ARRAY pArray);
+    DTWAIN_BOOL DTWAIN_GetAllSourceDibsInternal(DTWAIN_SOURCE Source, DTWAIN_ARRAY pArray);
 
     void OutputDTWAINError(const CTL_TwainDLLHandle *pHandle, LPCSTR pFunc=nullptr);
     void OutputDTWAINErrorA(const CTL_TwainDLLHandle *pHandle, LPCSTR pFunc=nullptr);
@@ -958,10 +958,10 @@ namespace dynarithmic
     void DestroyFrameFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_FRAME Frame);
     DTWAIN_ARRAY CreateArrayFromFactory(CTL_TwainDLLHandle* pHandle, LONG nEnumType, LONG nInitialSize);
     DTWAIN_ARRAY CreateArrayCopyFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Source);
-    DTWAIN_FRAME CreateFrameArray(CTL_TwainDLLHandle* pHandle, double Left, double Top, double Right, double Bottom);
-    void SetArrayValueFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray, size_t lPos, LPVOID pVariant);
+    DTWAIN_FRAME CreateFrameArray(const CTL_TwainDLLHandle* pHandle, double Left, double Top, double Right, double Bottom);
+    void SetArrayValueFromFactory(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray, size_t lPos, LPVOID pVariant);
     DTWAIN_ARRAY CreateArrayFromCap(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapType, LONG lSize);
-    bool AssignArray(CTL_TwainDLLHandle* pHandle, LPDTWAIN_ARRAY aDestination, LPDTWAIN_ARRAY aSource);
+    bool AssignArray(const CTL_TwainDLLHandle* pHandle, LPDTWAIN_ARRAY aDestination, LPDTWAIN_ARRAY aSource);
     LONG GetCapDataType(CTL_ITwainSource* pSource, LONG nCap);
     int FeederWait(CTL_ITwainSource* pSource);
 

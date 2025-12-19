@@ -172,6 +172,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
         LogWriterUtils::WriteMultiLineInfoIndented(sName, _T("\n"));
     }
 
+    if (bRetval)
+        pHandle->m_lLastError = 0; // Reset the error flag to 0
     LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
     CATCH_BLOCK_LOG_PARAMS(false)
 }

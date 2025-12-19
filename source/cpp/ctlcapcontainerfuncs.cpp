@@ -30,6 +30,15 @@
 
 using namespace dynarithmic;
 
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetCapContainerEx2(LONG nCap, DTWAIN_BOOL bSetContainer)
+{
+    LOG_FUNC_ENTRY_PARAMS((nCap, bSetContainer))
+    DTWAIN_ARRAY theArray = {};
+    DTWAIN_GetCapContainerEx(nCap, bSetContainer, &theArray);
+	LOG_FUNC_EXIT_NONAME_PARAMS(theArray)
+    CATCH_BLOCK_LOG_PARAMS(nullptr)
+}
+
 LONG DLLENTRY_DEF DTWAIN_GetCapContainerEx(LONG nCap, DTWAIN_BOOL bSetContainer, LPDTWAIN_ARRAY pArray)
 {
     LOG_FUNC_ENTRY_PARAMS((nCap, bSetContainer, pArray))
