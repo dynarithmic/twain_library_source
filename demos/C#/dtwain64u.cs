@@ -47,6 +47,97 @@ namespace Dynarithmic
     using HANDLE = System.IntPtr;
     using HFONT = System.IntPtr;
 
+    public class TwainAPI
+    {
+        // string type constants
+        // these include room for the strings and a null char
+        public enum TWSTR : int
+        {
+            STR32 = 34,
+            STR64 = 66,
+            STR128 = 130,
+            STR255 = 256,
+            STR1024 = 1026,
+            UNI512 = 512
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 2)]
+        public struct TW_VERSION
+        {
+            public TW_UINT16 MajorNum;                          // Major revision number of the software
+            public TW_UINT16 MinorNum;                          // Incremental revision number of the software
+            public TW_UINT16 Language;                          // e.g. TWLG_SWISSFRENCH
+            public TW_UINT16 Country;                           // e.g. TWCY_SWITZERLAND
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = (int)TWSTR.STR32)]
+            public string Info;                                 // e.g. "1.0b3 Beta release"
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 2)]
+        public class TW_IDENTITY
+        {
+            public TW_UINT32 Id;                                // Unique number.  In Windows, application hWnd
+            public TW_VERSION Version;                          // Identifies the piece of code
+            public TW_UINT16 ProtocolMajor;                     // Application and DS must set to TWON_PROTOCOLMAJOR
+            public TW_UINT16 ProtocolMinor;                     // Application and DS must set to TWON_PROTOCOLMINOR
+            public TW_UINT32 SupportedGroups;                   // Bit field OR combination of DG_ constants
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = (int)TWSTR.STR32)]
+            public string Manufacturer = string.Empty;                         // Manufacturer name, e.g. "Hewlett-Packard"
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = (int)TWSTR.STR32)]
+            public string ProductFamily = string.Empty;                        // Product family name, e.g. "ScanJet"
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = (int)TWSTR.STR32)]
+            public string ProductName = string.Empty;                          // Product name, e.g. "ScanJet Plus"
+        }
+
+        public struct POINT
+        {
+            public System.Int32 x;
+            public System.Int32 Y;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 8)]
+        public struct MSG
+        {
+            public System.IntPtr hwnd;
+            public System.UInt32 message;
+            public System.UIntPtr wParam;
+            public System.UIntPtr lParam;
+            public System.UInt32 time;
+            public POINT pt;
+        }
+
+        [ StructLayout( LayoutKind.Sequential, CharSet=CharSet.Auto )]
+        public class OpenFileName
+        {
+            public int      structSize = 0;
+            public System.IntPtr   dlgOwner = System.IntPtr.Zero;
+            public System.IntPtr   instance = System.IntPtr.Zero;
+            public string   filter = string.Empty;
+            public string   customFilter = string.Empty;
+            public int      maxCustFilter = 0;
+            public int      filterIndex = 0;
+            public string   file = string.Empty;
+            public int      maxFile = 0;
+            public string   fileTitle = string.Empty;
+            public int      maxFileTitle = 0;
+            public string   initialDir = string.Empty;
+            public string   title = string.Empty;
+            public int      flags = 0;
+            public short    fileOffset = 0;
+            public short    fileExtension = 0;
+            public string   defExt = string.Empty;
+            public System.IntPtr   custData = System.IntPtr.Zero;
+            public System.IntPtr   hook = System.IntPtr.Zero;
+            public string templateName = string.Empty;
+            public System.IntPtr   reservedPtr = System.IntPtr.Zero;
+            public int      reservedInt = 0;
+            public int      flagsEx = 0;
+        }
+
+
         public delegate long  DTwainCallback( long wParam, long lParam, long UserData );
         public delegate long  DTwainCallback64( long wParam, long lParam, long UserData );
         public delegate long  DTwainErrorProc( int param1, int param2 );
