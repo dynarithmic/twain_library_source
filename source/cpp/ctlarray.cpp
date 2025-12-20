@@ -604,13 +604,14 @@ static int CheckArrayFrameValues(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArra
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFrameN(DTWAIN_ARRAY pArray, DTWAIN_FRAME frame, LONG num )
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, frame, num))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_DLLHANDLE_SETLASTERROR);
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_DLLHANDLE_SETLASTERROR);
     auto nTestValue = CheckArrayFrameValues(pHandle, pArray, frame);
     if (nTestValue != DTWAIN_NO_ERROR)
     {
-        pHandle->m_lLastError = nTestValue;
-        LOG_FUNC_EXIT_NONAME_PARAMS(false);
+        DTWAIN_Check_Error_Condition_0_Ex_WithParams(pHandle, [&] { return true; },
+            nTestValue, false, FUNC_MACRO, true, {});
     }
+    LOG_FUNC_EXIT_NONAME_PARAMS(false);
 
     auto& vect = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(pArray);
     auto& vectOne = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(frame);
@@ -921,7 +922,8 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_ArrayInsertAtFrameN(DTWAIN_ARRAY pArray, LONG n
     auto nTestValue = CheckArrayFrameValues(pHandle, pArray, frame);
     if (nTestValue != DTWAIN_NO_ERROR)
     {
-        pHandle->m_lLastError = nTestValue;
+		DTWAIN_Check_Error_Condition_0_Ex_WithParams(pHandle, [&] { return true; },
+			nTestValue, false, FUNC_MACRO, true, {});
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
     }
     
@@ -930,12 +932,13 @@ DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_ArrayInsertAtFrameN(DTWAIN_ARRAY pArray, LONG n
 
     auto checkStatus = ArrayChecker().SetArray1(pArray).SetArrayPos(nWhere).
                         SetCheckType(ArrayChecker::CHECK_ARRAY_BOUNDS);
-    auto val = checkStatus.Check(pHandle).first;
-    if ( val != DTWAIN_NO_ERROR)
+    auto val = checkStatus.Check(pHandle);
+    if ( val.first != DTWAIN_NO_ERROR)
     {
-        pHandle->m_lLastError = val;
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    }
+		DTWAIN_Check_Error_Condition_0_Ex_WithParams(pHandle, [&] { return true; },
+                            val.first, false, FUNC_MACRO, true, { val.second });
+	}
+    LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
     auto& vect = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(pArray);
     auto tempVect = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(frame);
