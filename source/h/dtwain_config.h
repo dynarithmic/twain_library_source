@@ -22,22 +22,17 @@ OF THIRD PARTY RIGHTS.
 #define DTWAIN_CONFIG_H
 
 /* Build with DTWAIN logging of call stack */
-#define DTWAIN_BUILD_LOGCALLSTACK 0 
+#define DTWAIN_BUILD_LOGCALLSTACK 1 
 
 /* Build without DTWAIN logging pointer values on return of functions. 
    Note that DTWAIN_BUILD_LOGCALLSTACK must be 1 for this to take effect */
-#define DTWAIN_BUILD_LOGPOINTERS 0
-
-/* This indicates that the build requires Visual C++ runtime if set to 1*/
-/* Since there is no way to set the runtime to use at compile time, this */
-/* setting must match the link-time options */
-#define DTWAIN_BUILD_NEEDVCRUNTIME 0
+#define DTWAIN_BUILD_LOGPOINTERS 1
 
 /* Define whether the DLL or static version of the CRT runtime will be used */
 #if defined(_DLL)
-    #define DTWAIN_BUILD_NEEDVCRUNTIME 1
+	#define DTWAIN_BUILD_NEEDVCRUNTIME 1
 #else
-    #define DTWAIN_BUILD_NEEDVCRUNTIME 0
+	#define DTWAIN_BUILD_NEEDVCRUNTIME 0
 #endif
 
 #endif
