@@ -31,6 +31,11 @@
 
 using namespace dynarithmic;
 
+static std::string CreateIndexErrorMsg(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY arr, LONG invalidIndex)
+{
+    return "Index " + std::to_string(invalidIndex) + " >= size (" + std::to_string(pHandle->m_ArrayFactory->size(arr)) + ")";
+}
+
 struct ArrayChecker
 {
     static constexpr int CHECK_ARRAY_BOUNDS = 1;
@@ -818,9 +823,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayRemoveAtN(  DTWAIN_ARRAY pArray, LONG nWher
                                       [&] { return !factory->is_valid(pArray); },
                                       DTWAIN_ERR_WRONG_ARRAY_TYPE, false, FUNC_MACRO);
     const size_t Count = factory->size(pArray);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return Count == 0 || nWhere < 0 
+    DTWAIN_Check_Error_Condition_0_Ex_WithParams(pHandle, [&] { return Count == 0 || nWhere < 0 
 														|| static_cast<size_t>(nWhere) >= Count; },
-                                      DTWAIN_ERR_INDEX_BOUNDS, false, FUNC_MACRO);
+                                                DTWAIN_ERR_INDEX_BOUNDS, false, FUNC_MACRO, true, 
+                                                { CreateIndexErrorMsg(pHandle, pArray, nWhere)});
     factory->remove(pArray, nWhere, num);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
@@ -1372,7 +1378,13 @@ DTWAIN_BOOL  DLLENTRY_DEF DTWAIN_ArraySetAt( DTWAIN_ARRAY pArray, LONG lPos, LPV
         SetArray1(pArray).
         SetArrayPos(lPos).
         SetCheckType(ArrayChecker::CHECK_ARRAY_EXISTS | ArrayChecker::CHECK_ARRAY_BOUNDS);
-    if (checkStatus.Check(pHandle) != DTWAIN_NO_ERROR)
+
+    auto chk = checkStatus.Check(pHandle);
+	DTWAIN_Check_Error_Condition_0_Ex_WithParams(pHandle, [&] {return chk == DTWAIN_ERR_INDEX_BOUNDS; },
+		                                    DTWAIN_ERR_INDEX_BOUNDS, false, FUNC_MACRO, true,
+		                                    { CreateIndexErrorMsg(pHandle, pArray, lPos) });
+
+    if (chk != DTWAIN_NO_ERROR)
         LOG_FUNC_EXIT_NONAME_PARAMS(false )
 
     SetArrayValueFromFactory(pHandle, pArray, lPos, pVariant);
@@ -2511,10 +2523,11 @@ static bool CheckFix32(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aFix32, DTWAIN_
 
     // check for out of bounds size
     const size_t Count = factory->size(aFix32);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return Count == 0 || 
+    DTWAIN_Check_Error_Condition_0_Ex_WithParams(pHandle, [&] { return Count == 0 || 
 														 lPos < 0 || 
 														 static_cast<size_t>(lPos) >= Count; }, 
-														 DTWAIN_ERR_INDEX_BOUNDS, false, FUNC_MACRO);
+														 DTWAIN_ERR_INDEX_BOUNDS, false, FUNC_MACRO, true,
+                                                { CreateIndexErrorMsg(pHandle, aFix32, lPos)});
     return true;
 }
 
@@ -2943,24 +2956,26 @@ static bool IsValidStringArray(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pVarian
 LONG DLLENTRY_DEF DTWAIN_ArrayGetStringLength(DTWAIN_ARRAY theArray, LONG nWhichString)
 {
     LOG_FUNC_ENTRY_PARAMS((theArray, nWhichString))
-    auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_DLLHANDLE_SETLASTERROR);
+        auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_TEST_DLLHANDLE_SETLASTERROR);
     auto pH = pHandle;
 
     int nWhich = 0;
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !IsValidStringArray(pH, theArray, nWhich); },
-                                      DTWAIN_ERR_WRONG_ARRAY_TYPE, DTWAIN_ERR_WRONG_ARRAY_TYPE, FUNC_MACRO);
+        DTWAIN_ERR_WRONG_ARRAY_TYPE, DTWAIN_ERR_WRONG_ARRAY_TYPE, FUNC_MACRO);
     auto checkStatus = ArrayChecker().SetArray1(theArray).SetCheckType(ArrayChecker::CHECK_ARRAY_BOUNDS).SetArrayPos(nWhichString);
     auto val = checkStatus.Check(pHandle);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return val == DTWAIN_ERR_INDEX_BOUNDS; },
-        DTWAIN_ERR_INDEX_BOUNDS, DTWAIN_ERR_INDEX_BOUNDS, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex_WithParams(pHandle, [&] { return val == DTWAIN_ERR_INDEX_BOUNDS; },
+        DTWAIN_ERR_INDEX_BOUNDS, DTWAIN_ERR_INDEX_BOUNDS, FUNC_MACRO, true,
+                                                    {CreateIndexErrorMsg(pHandle, theArray, nWhichString) });
     LONG retValue;
     if ( nWhich == 2 )
         retValue = ArrayStringLength_Internal<CTL_ArrayFactory::tagged_array_wstring>(pHandle, theArray, nWhichString);
     else
         retValue = ArrayStringLength_Internal<CTL_ArrayFactory::tagged_array_string>(pHandle, theArray, nWhichString);
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return retValue == DTWAIN_ERR_INDEX_BOUNDS; },
-    DTWAIN_ERR_INDEX_BOUNDS, DTWAIN_ERR_INDEX_BOUNDS, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex_WithParams(pHandle, [&] { return retValue == DTWAIN_ERR_INDEX_BOUNDS; },
+                                                 DTWAIN_ERR_INDEX_BOUNDS, DTWAIN_ERR_INDEX_BOUNDS, FUNC_MACRO, true, 
+                                                 {CreateIndexErrorMsg(pHandle, theArray, nWhichString)});
     LOG_FUNC_EXIT_NONAME_PARAMS(retValue)
     CATCH_BLOCK(0)
 }

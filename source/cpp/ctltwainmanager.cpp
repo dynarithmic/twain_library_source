@@ -46,6 +46,8 @@
 #include "logwriterutils.h"
 #include "ctltripletbase.h"
 #include "ctlconstexprutils.h"
+#include "ctlstringutils.h"
+
 using namespace dynarithmic;
 
 static constexpr std::array<std::pair<int, int>, 32> mapCondCode = { {
@@ -1438,7 +1440,8 @@ bool CTL_TwainAppMgr::CloseSourceManager(CTL_ITwainSession* pSession)
 
 
 ////////// These are static error functions that get errors from the RC file
-void CTL_TwainAppMgr::SetError(int nError, std::string_view extraInfo, bool bMustReportGeneralError)
+void CTL_TwainAppMgr::SetError(int nError, std::string_view extraInfo, bool bMustReportGeneralError,
+                               const std::vector<std::string>& replacementArgs)
 {
     const auto pHandle = static_cast<CTL_TwainDLLHandle *>(GetDTWAINHandle_Internal());
 
@@ -1456,6 +1459,9 @@ void CTL_TwainAppMgr::SetError(int nError, std::string_view extraInfo, bool bMus
     s_strLastError += " ";
     s_strLastError += extraInfo;
     s_nLastError    = nError;
+
+    // Replace any placeholders with information from replacementArgs
+    ReplacePlaceHolders(s_strLastError, replacementArgs);
 
     CTL_StaticData::GetExtraErrorInfoMap()[abs(s_nLastError)] = extraInfo;
     if ( CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_USEBUFFER )
@@ -1950,14 +1956,11 @@ int CTL_TwainAppMgr::FindConditionCode(TW_UINT16 nCode)
 std::string CTL_TwainAppMgr::GetCapNameFromCap( LONG Cap )
 {
     if ( static_cast<UINT>(Cap) >= CAP_CUSTOMBASE )
-    {
-        StringStreamOutA strm;
-        strm << boost::format("CAP_CUSTOMBASE + %1%") % (static_cast<long>(Cap) - static_cast<long>(CAP_CUSTOMBASE));
-        return strm.str();
-    }
+        return "CAP_CUSTOMBASE + " + std::to_string(static_cast<long>(Cap) - static_cast<long>(CAP_CUSTOMBASE));
     else
     {
-        static constexpr std::array<int, 3> aConstantTypes = { {DTWAIN_CONSTANT_ICAP, DTWAIN_CONSTANT_CAP, DTWAIN_CONSTANT_TWEI} };
+        static constexpr std::array<int, 4> aConstantTypes = { {DTWAIN_CONSTANT_ICAP, DTWAIN_CONSTANT_CAP, 
+                                                                DTWAIN_CONSTANT_ACAP, DTWAIN_CONSTANT_TWEI} };
         for (auto constantType : aConstantTypes)
         {
             auto pr = CTL_StaticData::GetTwainNameFromConstantA(constantType, Cap);
@@ -1965,9 +1968,7 @@ std::string CTL_TwainAppMgr::GetCapNameFromCap( LONG Cap )
                 return pr.second;
         }
     }
-    StringStreamOutA strm;
-    strm << std::hex << Cap;
-    return "Unknown capability.  Hex value: " + strm.str();
+    return "Unknown capability.  " + std::to_string(Cap);
 }
 
 int CTL_TwainAppMgr::GetDataTypeFromCap( TW_UINT16 Cap, CTL_ITwainSource *pSource/*=NULL*/ )
