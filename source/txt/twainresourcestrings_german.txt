@@ -19,7 +19,7 @@
 1002 Ungültige DTWAIN_SOURCE
 1003 Ungültiges DTWAIN_ARRAY
 1004 Unrichtiger DTWAIN_ARRAY Type
-1005 Index außerhalb der erlaubten Grenzen für DTWAIN_ARRAY
+1005 Index außerhalb der erlaubten Grenzen für DTWAIN_ARRAY: %1
 1006 Kein Speicher mehr!
 1007 DTWAIN konnte TWAIN Fenster nicht erstellen
 1008 Ungültiger Pixel Typ
@@ -27,7 +27,7 @@
 1010 Es wurde noch keine DTWAIN Session begonnen. Verwenden Sie DTWAIN_StartTwainSession().
 1011 Ungültige DTWAIN_ACQUIRE Nummer
 1012 Ungültige TWAIN Fähigkeit
-1013 Quelle unterstützt die Fähigkeit nicht
+1013 Quelle unterstützt die Fähigkeit nicht: %1
 1014 Allgemeiner TWAIN Fehler. Verwenden Sie DTWAIN_GetTwainError für detailiertere Fehlermeldung.
 1015 Fenster Nachrichtenschleife konnte nicht abgefangen werden
 1016 Ungültiges Dateinamenargument wurde angegeben

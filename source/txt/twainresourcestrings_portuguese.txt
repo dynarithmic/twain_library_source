@@ -19,7 +19,7 @@
 1002 Fonte DTWAIN Inválida  
 1003 ARRAY DTWAIN Inválido  
 1004 Tipo de ARRAY DTWAIN Incorreto  
-1005 Índice fora dos limites para ARRAY DTWAIN  
+1005 Índice fora dos limites para ARRAY DTWAIN: %1 
 1006 Fora da memória heap  
 1007 DTWAIN Não conseguiu criar a janela TWAIN  
 1008 Tipo de Pixel Inválido  
@@ -27,7 +27,7 @@
 1010 Nenhuma sessão DTWAIN foi iniciada. Você deve chamar DTWAIN_StartTwainSession()  
 1011 Número DTWAIN_ACQUIRE inválido  
 1012 Capacidade TWAIN inválida  
-1013 Fonte não suporta a capacidade  
+1013 Fonte não suporta a capacidade: %1  
 1014 Erro geral TWAIN. Verifique DTWAIN_GetTwainError() para mais informações  
 1015 Falha ao conectar a fila de mensagens da aplicação  
 1016 Argumento de nome de arquivo inválido foi passado  

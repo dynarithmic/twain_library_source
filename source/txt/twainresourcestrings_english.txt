@@ -19,7 +19,7 @@
 1002 Invalid DTWAIN_SOURCE
 1003 Invalid DTWAIN_ARRAY
 1004 Incorrect DTWAIN_ARRAY type
-1005 Index out of bounds for DTWAIN_ARRAY
+1005 Index out of bounds for DTWAIN_ARRAY: %1
 1006 Out of heap memory
 1007 DTWAIN Could not create TWAIN window
 1008 Invalid Pixel Type
@@ -27,7 +27,7 @@
 1010 No DTWAIN Session was started.  You must call DTWAIN_StartTwainSession()
 1011 Invalid DTWAIN_ACQUIRE number
 1012 Invalid TWAIN Capability
-1013 Source does not support capability
+1013 Source does not support capability: %1
 1014 General TWAIN Error.  Check DTWAIN_GetTwainError() for more information
 1015 Failed to Hook application message queue
 1016 Bad File name argument was passed
