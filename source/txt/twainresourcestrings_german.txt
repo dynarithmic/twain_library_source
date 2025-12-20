@@ -299,3 +299,15 @@
 9527 TWAIN-Bedingungscode: Vorgang fehlgeschlagen (Dokument zu hell)
 9528 TWAIN-Bedingungscode: Vorgang fehlgeschlagen (Dokument zu dunkel)
 9529 TWAIN-Bedingungscode: Vorgang fehlgeschlagen (Quelle hat nichts zum Erfassen für die Übertragung)
+9600 TWAIN Rückgabecode: TWRC_SUCCESS  
+9601 TWAIN Rückgabecode: TWRC_FAILURE  
+9602 TWAIN Rückgabecode: TWRC_CHECKSTATUS  
+9603 TWAIN Rückgabecode: TWRC_CANCEL  
+9604 TWAIN Rückgabecode: TWRC_DSEVENT  
+9605 TWAIN Rückgabecode: TWRC_NOTDSEVENT  
+9606 TWAIN Rückgabecode: TWRC_XFERDONE  
+9607 TWAIN Rückgabecode: TWRC_ENDOFLIST  
+9608 TWAIN Rückgabecode: TWRC_INFONOTSUPPORTED  
+9609 TWAIN Rückgabecode: TWRC_DATANOTAVAILABLE  
+9610 TWAIN Rückgabecode: TWRC_BUSY  
+9611 TWAIN Rückgabecode: TWRC_SCANNERLOCKED

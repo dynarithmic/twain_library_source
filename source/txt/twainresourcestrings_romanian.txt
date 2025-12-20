@@ -300,3 +300,15 @@
 9527 Cod de condiție TWAIN: Operațiune eșuată (document prea deschis)  
 9528 Cod de condiție TWAIN: Operațiune eșuată (document prea întunecat)  
 9529 Cod de condiție TWAIN: Operațiune eșuată (sursa nu are nimic de capturat pentru transfer)  
+9600 Cod de returnare TWAIN: TWRC_SUCCESS
+9601 Cod de returnare TWAIN: TWRC_FAILURE
+9602 Cod de returnare TWAIN: TWRC_CHECKSTATUS
+9603 Cod de returnare TWAIN: TWRC_CANCEL
+9604 Cod de returnare TWAIN: TWRC_DSEVENT
+9605 Cod de returnare TWAIN: TWRC_NOTDSEVENT
+9606 Cod de returnare TWAIN: TWRC_XFERDONE
+9607 Cod de returnare TWAIN: TWRC_ENDOFLIST
+9608 Cod de returnare TWAIN: TWRC_INFONOTSUPPORTED
+9609 Cod de returnare TWAIN: TWRC_DATANOTAVAILABLE
+9610 Cod de returnare TWAIN: TWRC_BUSY
+9611 Cod de returnare TWAIN: TWRC_SCANNERLOCKED

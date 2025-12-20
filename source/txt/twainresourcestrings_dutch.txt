@@ -299,3 +299,15 @@
 9527 TWAIN Statuscode: Bewerking mislukt (document is te licht)
 9528 TWAIN Statuscode: Bewerking mislukt (document is te donker)
 9529 TWAIN Statuscode: Bewerking mislukt (bron heeft niets om te capturen voor overdracht)
+9600 TWAIN Retourcode: TWRC_SUCCESS  
+9601 TWAIN Retourcode: TWRC_FAILURE  
+9602 TWAIN Retourcode: TWRC_CHECKSTATUS  
+9603 TWAIN Retourcode: TWRC_CANCEL  
+9604 TWAIN Retourcode: TWRC_DSEVENT  
+9605 TWAIN Retourcode: TWRC_NOTDSEVENT  
+9606 TWAIN Retourcode: TWRC_XFERDONE  
+9607 TWAIN Retourcode: TWRC_ENDOFLIST  
+9608 TWAIN Retourcode: TWRC_INFONOTSUPPORTED  
+9609 TWAIN Retourcode: TWRC_DATANOTAVAILABLE  
+9610 TWAIN Retourcode: TWRC_BUSY  
+9611 TWAIN Retourcode: TWRC_SCANNERLOCKED

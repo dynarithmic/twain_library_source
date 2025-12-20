@@ -30,9 +30,9 @@ OF THIRD PARTY RIGHTS.
 
 /* Define whether the DLL or static version of the CRT runtime will be used */
 #if defined(_DLL)
-	#define DTWAIN_BUILD_NEEDVCRUNTIME 1
+    #define DTWAIN_BUILD_NEEDVCRUNTIME 1
 #else
-	#define DTWAIN_BUILD_NEEDVCRUNTIME 0
+    #define DTWAIN_BUILD_NEEDVCRUNTIME 0
 #endif
 
 #endif

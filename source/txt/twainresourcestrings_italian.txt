@@ -300,3 +300,15 @@
 9527 Codice di Condizione TWAIN: Operazione fallita (documento troppo chiaro)
 9528 Codice di Condizione TWAIN: Operazione fallita (documento troppo scuro)
 9529 Codice di Condizione TWAIN: Operazione fallita (la sorgente non ha nulla da catturare per il trasferimento)
+9600 Codice di ritorno TWAIN: TWRC_SUCCESS
+9601 Codice di ritorno TWAIN: TWRC_FAILURE
+9602 Codice di ritorno TWAIN: TWRC_CHECKSTATUS
+9603 Codice di ritorno TWAIN: TWRC_CANCEL
+9604 Codice di ritorno TWAIN: TWRC_DSEVENT
+9605 Codice di ritorno TWAIN: TWRC_NOTDSEVENT
+9606 Codice di ritorno TWAIN: TWRC_XFERDONE
+9607 Codice di ritorno TWAIN: TWRC_ENDOFLIST
+9608 Codice di ritorno TWAIN: TWRC_INFONOTSUPPORTED
+9609 Codice di ritorno TWAIN: TWRC_DATANOTAVAILABLE
+9610 Codice di ritorno TWAIN: TWRC_BUSY
+9611 Codice di ritorno TWAIN: TWRC_SCANNERLOCKED

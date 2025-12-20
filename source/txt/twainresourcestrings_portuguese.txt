@@ -301,3 +301,15 @@
 9527 Código de Condição TWAIN: Operação falhou (documento muito claro)  
 9528 Código de Condição TWAIN: Operação falhou (documento muito escuro)  
 9529 Código de Condição TWAIN: Operação falhou (fonte não tem nada para capturar para transferência)  
+9600 Código de Retorno TWAIN: TWRC_SUCESSO  
+9601 Código de Retorno TWAIN: TWRC_FALHA  
+9602 Código de Retorno TWAIN: TWRC_VERIFICARSTATUS  
+9603 Código de Retorno TWAIN: TWRC_CANCELAR  
+9604 Código de Retorno TWAIN: TWRC_EVENTODSE  
+9605 Código de Retorno TWAIN: TWRC_NAOEVENTODSE  
+9606 Código de Retorno TWAIN: TWRC_TRANSFERENCIACONCLUIDA  
+9607 Código de Retorno TWAIN: TWRC_FIMDALISTA  
+9608 Código de Retorno TWAIN: TWRC_INFORMACAONAOAPOIADA  
+9609 Código de Retorno TWAIN: TWRC_DADOSNAOINDISPONIVEIS  
+9610 Código de Retorno TWAIN: TWRC_OCUPADO  
+9611 Código de Retorno TWAIN: TWRC_SCANNERBLOQUEADO
