@@ -8,6 +8,8 @@ DTWAIN Version changes
 
 - Added Go language bindings (dtwainapi.go).
 
+- Added F# language bindings (dtwainapi.fs).
+
 - Updated C# and Visual Basic language bindings to properly handle DTWAIN
   callback functions.
 
