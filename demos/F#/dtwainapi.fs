@@ -52,6 +52,46 @@ type LONGLONG = Int64
 type LONG64 = Int64
 type DTWAIN_IDENTITY = IntPtr
 
+[<UnmanagedFunctionPointer(CallingConvention.StdCall)>]
+type DTWAIN_CALLBACK_PROC64 = delegate of nativeint * nativeint * int64 -> nativeint
+[<UnmanagedFunctionPointer(CallingConvention.StdCall)>]
+type DTWAIN_SetCallback64Delegate = delegate of DTWAIN_CALLBACK_PROC64 * int64 -> nativeint
+
+[<UnmanagedFunctionPointer(CallingConvention.StdCall)>]
+type DTWAIN_CALLBACK_PROC = delegate of nativeint * nativeint * nativeint -> nativeint
+[<UnmanagedFunctionPointer(CallingConvention.StdCall)>]
+type DTWAIN_SetCallbackDelegate = delegate of DTWAIN_CALLBACK_PROC * int32 -> nativeint
+
+[<UnmanagedFunctionPointer(CallingConvention.StdCall)>]
+type DTWAIN_DIBUPDATE_PROC = delegate of DTWAIN_SOURCE * int32 * IntPtr -> IntPtr
+[<UnmanagedFunctionPointer(CallingConvention.StdCall)>]
+type DTWAIN_SetUpdateDibProcDelegate = delegate of DTWAIN_DIBUPDATE_PROC -> nativeint
+
+[<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
+type DTWAIN_LOGGER_PROC = delegate of string * int64 -> nativeint
+[<UnmanagedFunctionPointer(CallingConvention.StdCall)>]
+type DTWAIN_SetLoggerCallbackDelegate = delegate of DTWAIN_LOGGER_PROC * int64 -> nativeint
+
+[<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Ansi)>]
+type DTWAIN_LOGGER_PROCA = delegate of string * int64 -> nativeint
+[<UnmanagedFunctionPointer(CallingConvention.StdCall)>]
+type DTWAIN_SetLoggerCallbackADelegate = delegate of DTWAIN_LOGGER_PROCA * int64 -> nativeint
+
+[<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
+type DTWAIN_LOGGER_PROCW = delegate of string * int64 -> nativeint
+[<UnmanagedFunctionPointer(CallingConvention.StdCall)>]
+type DTWAIN_SetLoggerCallbackWDelegate = delegate of DTWAIN_LOGGER_PROCW * int64 -> nativeint
+
+[<UnmanagedFunctionPointer(CallingConvention.StdCall)>]
+type DTWAIN_ERROR_PROC = delegate of int * int -> nativeint
+[<UnmanagedFunctionPointer(CallingConvention.StdCall)>]
+type DTWAIN_SetErrorCallbackDelegate = delegate of DTWAIN_ERROR_PROC * int32 -> nativeint
+
+[<UnmanagedFunctionPointer(CallingConvention.StdCall)>]
+type DTWAIN_ERROR_PROC64 = delegate of int * int64 -> nativeint
+[<UnmanagedFunctionPointer(CallingConvention.StdCall)>]
+type DTWAIN_SetErrorCallback64Delegate = delegate of DTWAIN_ERROR_PROC64 * int64 -> nativeint
+
 [<Struct>]
 [<StructLayout(LayoutKind.Sequential)>]
 type MSG =
@@ -63,7 +103,7 @@ type MSG =
         mutable time    : uint32
         mutable pt      : POINT
     }
-
+    
 and [<Struct; StructLayout(LayoutKind.Sequential)>] POINT =
     {
         mutable x : int32
@@ -82,7 +122,6 @@ module NativeMethods =
                                 uint32 dwLanguageId,StringBuilder lpBuffer,uint32 nSize,IntPtr Arguments)
 
 module TwainAPI =
-
     [<Struct; StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)>]
     type TW_VERSION =
         {
@@ -2963,6 +3002,12 @@ module TwainAPI =
     type DTWAIN_GetBufferedTransferInfoDelegate = delegate of DTWAIN_SOURCE * DWORD byref * DWORD byref * DWORD byref * DWORD byref * DWORD byref * DWORD byref * DWORD byref * DWORD byref * DWORD byref -> HANDLE
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
+    type DTWAIN_GetCallbackDelegate = delegate of unit -> DTWAIN_CALLBACK_PROC
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
+    type DTWAIN_GetCallback64Delegate = delegate of unit -> DTWAIN_CALLBACK_PROC64
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
     type DTWAIN_GetCapArrayTypeDelegate = delegate of DTWAIN_SOURCE * LONG -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
@@ -3113,6 +3158,12 @@ module TwainAPI =
     type DTWAIN_GetErrorBufferThresholdDelegate = delegate of unit -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
+    type DTWAIN_GetErrorCallbackDelegate = delegate of unit -> DTWAIN_ERROR_PROC
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
+    type DTWAIN_GetErrorCallback64Delegate = delegate of unit -> DTWAIN_ERROR_PROC64
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
     type DTWAIN_GetErrorStringDelegate = delegate of LONG * System.Text.StringBuilder * LONG -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Ansi)>]
@@ -3252,6 +3303,15 @@ module TwainAPI =
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
     type DTWAIN_GetLightSourcesDelegate = delegate of DTWAIN_SOURCE * DTWAIN_ARRAY byref -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
+    type DTWAIN_GetLoggerCallbackDelegate = delegate of unit -> DTWAIN_LOGGER_PROC
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
+    type DTWAIN_GetLoggerCallbackADelegate = delegate of unit -> DTWAIN_LOGGER_PROCA
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
+    type DTWAIN_GetLoggerCallbackWDelegate = delegate of unit -> DTWAIN_LOGGER_PROCW
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
     type DTWAIN_GetManualDuplexCountDelegate = delegate of DTWAIN_SOURCE * int byref * int byref -> DTWAIN_BOOL
@@ -5494,6 +5554,8 @@ module TwainAPI =
     let private GetBrightnessStringA = lazy (DynamicDll.Bind "DTWAIN_GetBrightnessStringA" : DTWAIN_GetBrightnessStringADelegate)
     let private GetBrightnessStringW = lazy (DynamicDll.Bind "DTWAIN_GetBrightnessStringW" : DTWAIN_GetBrightnessStringWDelegate)
     let private GetBufferedTransferInfo = lazy (DynamicDll.Bind "DTWAIN_GetBufferedTransferInfo" : DTWAIN_GetBufferedTransferInfoDelegate)
+    let private GetCallback = lazy (DynamicDll.Bind "DTWAIN_GetCallback" : DTWAIN_GetCallbackDelegate)
+    let private GetCallback64 = lazy (DynamicDll.Bind "DTWAIN_GetCallback64" : DTWAIN_GetCallback64Delegate)
     let private GetCapArrayType = lazy (DynamicDll.Bind "DTWAIN_GetCapArrayType" : DTWAIN_GetCapArrayTypeDelegate)
     let private GetCapContainer = lazy (DynamicDll.Bind "DTWAIN_GetCapContainer" : DTWAIN_GetCapContainerDelegate)
     let private GetCapContainerEx = lazy (DynamicDll.Bind "DTWAIN_GetCapContainerEx" : DTWAIN_GetCapContainerExDelegate)
@@ -5544,6 +5606,8 @@ module TwainAPI =
     let private GetDuplexType = lazy (DynamicDll.Bind "DTWAIN_GetDuplexType" : DTWAIN_GetDuplexTypeDelegate)
     let private GetErrorBuffer = lazy (DynamicDll.Bind "DTWAIN_GetErrorBuffer" : DTWAIN_GetErrorBufferDelegate)
     let private GetErrorBufferThreshold = lazy (DynamicDll.Bind "DTWAIN_GetErrorBufferThreshold" : DTWAIN_GetErrorBufferThresholdDelegate)
+    let private GetErrorCallback = lazy (DynamicDll.Bind "DTWAIN_GetErrorCallback" : DTWAIN_GetErrorCallbackDelegate)
+    let private GetErrorCallback64 = lazy (DynamicDll.Bind "DTWAIN_GetErrorCallback64" : DTWAIN_GetErrorCallback64Delegate)
     let private GetErrorString = lazy (DynamicDll.Bind "DTWAIN_GetErrorString" : DTWAIN_GetErrorStringDelegate)
     let private GetErrorStringA = lazy (DynamicDll.Bind "DTWAIN_GetErrorStringA" : DTWAIN_GetErrorStringADelegate)
     let private GetErrorStringW = lazy (DynamicDll.Bind "DTWAIN_GetErrorStringW" : DTWAIN_GetErrorStringWDelegate)
@@ -5591,6 +5655,9 @@ module TwainAPI =
     let private GetLightPath = lazy (DynamicDll.Bind "DTWAIN_GetLightPath" : DTWAIN_GetLightPathDelegate)
     let private GetLightSource = lazy (DynamicDll.Bind "DTWAIN_GetLightSource" : DTWAIN_GetLightSourceDelegate)
     let private GetLightSources = lazy (DynamicDll.Bind "DTWAIN_GetLightSources" : DTWAIN_GetLightSourcesDelegate)
+    let private GetLoggerCallback = lazy (DynamicDll.Bind "DTWAIN_GetLoggerCallback" : DTWAIN_GetLoggerCallbackDelegate)
+    let private GetLoggerCallbackA = lazy (DynamicDll.Bind "DTWAIN_GetLoggerCallbackA" : DTWAIN_GetLoggerCallbackADelegate)
+    let private GetLoggerCallbackW = lazy (DynamicDll.Bind "DTWAIN_GetLoggerCallbackW" : DTWAIN_GetLoggerCallbackWDelegate)
     let private GetManualDuplexCount = lazy (DynamicDll.Bind "DTWAIN_GetManualDuplexCount" : DTWAIN_GetManualDuplexCountDelegate)
     let private GetMaxAcquisitions = lazy (DynamicDll.Bind "DTWAIN_GetMaxAcquisitions" : DTWAIN_GetMaxAcquisitionsDelegate)
     let private GetMaxBuffers = lazy (DynamicDll.Bind "DTWAIN_GetMaxBuffers" : DTWAIN_GetMaxBuffersDelegate)
@@ -7759,6 +7826,14 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetBufferedTransferInfo.Value.Invoke(source, &compression, &bytesperrow, &columns, &rows, &xoffset, &yoffset, &flags, &byteswritten, &memorylength)
 
+    let DTWAIN_GetCallback() : DTWAIN_CALLBACK_PROC =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetCallback.Value.Invoke()
+
+    let DTWAIN_GetCallback64() : DTWAIN_CALLBACK_PROC64 =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetCallback64.Value.Invoke()
+
     let DTWAIN_GetCapArrayType (source: DTWAIN_SOURCE) (ncap: LONG) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetCapArrayType.Value.Invoke(source, ncap)
@@ -7959,6 +8034,14 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetErrorBufferThreshold.Value.Invoke()
 
+    let DTWAIN_GetErrorCallback() : DTWAIN_ERROR_PROC =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetErrorCallback.Value.Invoke()
+
+    let DTWAIN_GetErrorCallback64() : DTWAIN_ERROR_PROC64 =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetErrorCallback64.Value.Invoke()
+
     let DTWAIN_GetErrorString (lerror: LONG) (lpszbuffer: System.Text.StringBuilder) (nmaxlen: LONG) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetErrorString.Value.Invoke(lerror, lpszbuffer, nmaxlen)
@@ -8146,6 +8229,18 @@ module TwainAPI =
     let DTWAIN_GetLightSources (source: DTWAIN_SOURCE) (lightsources: DTWAIN_ARRAY byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetLightSources.Value.Invoke(source, &lightsources)
+
+    let DTWAIN_GetLoggerCallback() : DTWAIN_LOGGER_PROC =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetLoggerCallback.Value.Invoke()
+
+    let DTWAIN_GetLoggerCallbackA() : DTWAIN_LOGGER_PROCA =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetLoggerCallbackA.Value.Invoke()
+
+    let DTWAIN_GetLoggerCallbackW() : DTWAIN_LOGGER_PROCW =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetLoggerCallbackW.Value.Invoke()
 
     let DTWAIN_GetManualDuplexCount (source: DTWAIN_SOURCE) (pside1: int byref) (pside2: int byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
@@ -10626,3 +10721,82 @@ module TwainAPI =
     let DTWAIN_UseMultipleThreads (bset: DTWAIN_BOOL) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         UseMultipleThreads.Value.Invoke(bset)
+    let mutable private pinnedCallback_SetCallback : DTWAIN_CALLBACK_PROC option = None
+
+    let private SetCallback : Lazy<DTWAIN_SetCallbackDelegate> = 
+        lazy (DynamicDll. Bind "DTWAIN_SetCallback")
+
+    let DTWAIN_SetCallback(fn: DTWAIN_CALLBACK_PROC) (userdata: LONG) : nativeint = 
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        pinnedCallback_SetCallback <- Some fn
+        SetCallback.Value.Invoke(fn, userdata)
+
+    let mutable private pinnedCallback_SetCallback64 : DTWAIN_CALLBACK_PROC64 option = None
+
+    let private SetCallback64 : Lazy<DTWAIN_SetCallback64Delegate> = 
+        lazy (DynamicDll. Bind "DTWAIN_SetCallback64")
+
+    let DTWAIN_SetCallback64(fn: DTWAIN_CALLBACK_PROC64) (userdata: DTWAIN_LONG64) : nativeint = 
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        pinnedCallback_SetCallback64 <- Some fn
+        SetCallback64.Value.Invoke(fn, userdata)
+
+    let mutable private pinnedCallback_SetErrorCallback : DTWAIN_ERROR_PROC option = None
+
+    let private SetErrorCallback : Lazy<DTWAIN_SetErrorCallbackDelegate> = 
+        lazy (DynamicDll. Bind "DTWAIN_SetErrorCallback")
+
+    let DTWAIN_SetErrorCallback(proc: DTWAIN_ERROR_PROC) (userdata: LONG) : nativeint = 
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        pinnedCallback_SetErrorCallback <- Some proc
+        SetErrorCallback.Value.Invoke(proc, userdata)
+
+    let mutable private pinnedCallback_SetErrorCallback64 : DTWAIN_ERROR_PROC64 option = None
+
+    let private SetErrorCallback64 : Lazy<DTWAIN_SetErrorCallback64Delegate> = 
+        lazy (DynamicDll. Bind "DTWAIN_SetErrorCallback64")
+
+    let DTWAIN_SetErrorCallback64(proc: DTWAIN_ERROR_PROC64) (userdata64: DTWAIN_LONG64) : nativeint = 
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        pinnedCallback_SetErrorCallback64 <- Some proc
+        SetErrorCallback64.Value.Invoke(proc, userdata64)
+
+    let mutable private pinnedCallback_SetLoggerCallback : DTWAIN_LOGGER_PROC option = None
+
+    let private SetLoggerCallback : Lazy<DTWAIN_SetLoggerCallbackDelegate> = 
+        lazy (DynamicDll. Bind "DTWAIN_SetLoggerCallback")
+
+    let DTWAIN_SetLoggerCallback(logproc: DTWAIN_LOGGER_PROC) (userdata: DTWAIN_LONG64) : nativeint = 
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        pinnedCallback_SetLoggerCallback <- Some logproc
+        SetLoggerCallback.Value.Invoke(logproc, userdata)
+
+    let mutable private pinnedCallback_SetLoggerCallbackA : DTWAIN_LOGGER_PROCA option = None
+
+    let private SetLoggerCallbackA : Lazy<DTWAIN_SetLoggerCallbackADelegate> = 
+        lazy (DynamicDll. Bind "DTWAIN_SetLoggerCallbackA")
+
+    let DTWAIN_SetLoggerCallbackA(logproc: DTWAIN_LOGGER_PROCA) (userdata: DTWAIN_LONG64) : nativeint = 
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        pinnedCallback_SetLoggerCallbackA <- Some logproc
+        SetLoggerCallbackA.Value.Invoke(logproc, userdata)
+
+    let mutable private pinnedCallback_SetLoggerCallbackW : DTWAIN_LOGGER_PROCW option = None
+
+    let private SetLoggerCallbackW : Lazy<DTWAIN_SetLoggerCallbackWDelegate> = 
+        lazy (DynamicDll. Bind "DTWAIN_SetLoggerCallbackW")
+
+    let DTWAIN_SetLoggerCallbackW(logproc: DTWAIN_LOGGER_PROCW) (userdata: DTWAIN_LONG64) : nativeint = 
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        pinnedCallback_SetLoggerCallbackW <- Some logproc
+        SetLoggerCallbackW.Value.Invoke(logproc, userdata)
+
+    let mutable private pinnedCallback_SetUpdateDibProc : DTWAIN_DIBUPDATE_PROC option = None
+
+    let private SetUpdateDibProc : Lazy<DTWAIN_SetUpdateDibProcDelegate> = 
+        lazy (DynamicDll. Bind "DTWAIN_SetUpdateDibProc")
+
+    let DTWAIN_SetUpdateDibProc(dibproc: DTWAIN_DIBUPDATE_PROC) : nativeint = 
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        pinnedCallback_SetUpdateDibProc <- Some dibproc
+        SetUpdateDibProc.Value.Invoke(dibproc)
