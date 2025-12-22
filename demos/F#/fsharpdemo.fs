@@ -5,7 +5,6 @@ open System.Text
 
 [<EntryPoint>]
 let main argv =
-
     let dllname =
         if Environment.Is64BitProcess then
             "dtwain64u.dll"
@@ -29,6 +28,10 @@ let main argv =
                     TwainAPI.DTWAIN_SysDestroy() |> ignore
                     1
                 else
+                    // This will allow callbacks to be invoked by DTWAIN
+                    TwainAPI.DTWAIN_EnableMsgNotify 1 |> ignore   
+
+                    // Now get the product name of the TWAIN source that was selected
                     let prodname = new StringBuilder(256)
                     let ret = TwainAPI.DTWAIN_GetSourceProductNameW sourceResult prodname 256
                     printfn "The name of the selected TWAIN Source is: %s" (prodname.ToString())
@@ -54,13 +57,31 @@ let main argv =
 
                     // Destroy the array when done
                     TwainAPI.DTWAIN_ArrayDestroy cap_array |> ignore
-                    let mutable status_ = 0
+
+                    // Example of a callback that will "watch" when the TWAIN
+                    // device acquires an image.  See the DTWAIN documentation
+                    // on the notifications that will be sent to your application
+                    let myCallback wParam lParam (userData: int64) : nativeint =
+                        printfn "DTWAIN Callback called!"
+                        printfn "  wParam = %d" (uint64 wParam)
+                        printfn "  lParam = 0x%016X" (uint64 lParam)
+                        printfn "  UserData = %016X" userData
+                        nativeint 1 // Should always return 1 as a default
+
+                    // Create the unmanaged delegate instance
+                    let callbackInst = DTWAIN_CALLBACK_PROC64(myCallback)
+
+                    // Register it by calling DTWAIN_SetCallback64
+                    let previous = TwainAPI.DTWAIN_SetCallback64 callbackInst 0
+
                     // Now Acquire to a BMP file
-                    TwainAPI.DTWAIN_AcquireFile sourceResult "C:/Saved_images/TEST.BMP" TwainAPI.DTWAIN_BMP 
+                    let mutable status_ = 0
+                    TwainAPI.DTWAIN_AcquireFile sourceResult "TEST.BMP" TwainAPI.DTWAIN_BMP 
                                                TwainAPI.DTWAIN_USELONGNAME
                                                TwainAPI.DTWAIN_PT_DEFAULT 1 1 1 &status_ |> ignore
 
                     TwainAPI.DTWAIN_SysDestroy() |> ignore
+
                     0  // success
         with
         | ex ->
