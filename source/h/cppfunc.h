@@ -21,6 +21,7 @@
 #ifndef CPPFUNC_H
 #define CPPFUNC_H
 
+#include "dtwain_config.h"
 #include <funcmac.h>
 #include "logwriterutils.h"
 #include <boost/version.hpp>

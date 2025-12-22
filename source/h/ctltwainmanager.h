@@ -187,7 +187,8 @@ namespace dynarithmic
             static void NotifyFeederStatus();
             static bool IsJobControlSupported( const CTL_ITwainSource *pSource, TW_UINT16& nValue );
 
-            static void     SetError(int nError, std::string_view extraInfo, bool bMustReportGeneralError);
+            static void     SetError(int nError, std::string_view extraInfo, bool bMustReportGeneralError,
+                                     const std::vector<std::string>& replacementArgs = {});
             static int      GetLastError();
             static int      GetLastTwainError();
             static int      GetLastConditionCodeError();

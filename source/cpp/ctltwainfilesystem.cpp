@@ -134,7 +134,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFileSystemSupported(DTWAIN_SOURCE Source )
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     int fsSupported = CheckFileSystemSupport(pSource);
     DTWAIN_Check_Error_Condition_2_Ex(pSource->GetDTWAINHandle(), [&] { return fsSupported != DTWAIN_NO_ERROR; },
-                                      fsSupported, false, FUNC_MACRO);
+                                      fsSupported, false, FUNC_MACRO, true);
 
     LOG_FUNC_EXIT_NONAME_PARAMS(fsSupported == DTWAIN_NO_ERROR)
     CATCH_BLOCK_LOG_PARAMS(false)

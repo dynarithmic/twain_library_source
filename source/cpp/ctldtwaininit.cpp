@@ -1992,12 +1992,12 @@ void dynarithmic::OutputDTWAINError(const CTL_TwainDLLHandle* pHandle, LPCSTR pF
         return;
     static constexpr int MaxMessage = DTWAIN_USERRES_MAXSIZE;
     char szBuf[MaxMessage+1];
-    if ( !pHandle )
-        DTWAIN_GetErrorStringA( DTWAIN_ERR_BAD_HANDLE, szBuf,MaxMessage);
+    if (!pHandle)
+        DTWAIN_GetErrorStringA(DTWAIN_ERR_BAD_HANDLE, szBuf, MaxMessage);
     else
-        DTWAIN_GetErrorStringA( pHandle->m_lLastError, szBuf, MaxMessage);
+        CTL_TwainAppMgr::GetLastErrorString(szBuf, MaxMessage);
     std::string_view s(szBuf);
-    if ( !pHandle )
+    if ( pHandle )
         LogWriterUtils::WriteLogInfoIndentedA(s);
 
     if (logFilterFlags & DTWAIN_LOG_ERRORMSGBOX && pHandle)
