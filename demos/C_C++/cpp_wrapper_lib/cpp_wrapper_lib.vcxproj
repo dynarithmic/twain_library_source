@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="acquire_characteristics.cpp" />
+    <ClCompile Include="buffered_transfer_info.cpp" />
+    <ClCompile Include="extendedimage_info.cpp" />
+    <ClCompile Include="imprinter_info.cpp" />
+    <ClCompile Include="logger_callback.cpp" />
+    <ClCompile Include="options_base.cpp" />
+    <ClCompile Include="paperhandling_info.cpp" />
+    <ClCompile Include="pdf_text_element.cpp" />
+    <ClCompile Include="string_utilities.cpp" />
+    <ClCompile Include="twain_callback.cpp" />
+    <ClCompile Include="twain_characteristics.cpp" />
+    <ClCompile Include="twain_session.cpp" />
+    <ClCompile Include="twain_source.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="dynarithmic\twain\capability_interface\capability_interface.hpp" />
+    <ClInclude Include="dynarithmic\twain\capability_interface\generated_capfuncs.hpp" />
+    <ClInclude Include="dynarithmic\twain\characteristics\twain_select_dialog.hpp" />
+    <ClInclude Include="dynarithmic\twain\extimageinfo\extendedimage_info.hpp" />
+    <ClInclude Include="dynarithmic\twain\identity\twain_identity.hpp" />
+    <ClInclude Include="dynarithmic\twain\imagehandler\image_handler.hpp" />
+    <ClInclude Include="dynarithmic\twain\info\asyncdeviceevents_info.hpp" />
+    <ClInclude Include="dynarithmic\twain\info\buffered_transfer_info.hpp" />
+    <ClInclude Include="dynarithmic\twain\info\capinfo_base2.hpp" />
+    <ClInclude Include="dynarithmic\twain\info\file_transfer_info.hpp" />
+    <ClInclude Include="dynarithmic\twain\info\imageinformation_info.hpp" />
+    <ClInclude Include="dynarithmic\twain\info\imprinter_info.hpp" />
+    <ClInclude Include="dynarithmic\twain\info\info_base.hpp" />
+    <ClInclude Include="dynarithmic\twain\info\paperhandling_info.hpp" />
+    <ClInclude Include="dynarithmic\twain\logging\error_logger.hpp" />
+    <ClInclude Include="dynarithmic\twain\logging\error_logger_details.hpp" />
+    <ClInclude Include="dynarithmic\twain\logging\logger_callback.hpp" />
+    <ClInclude Include="dynarithmic\twain\logging\twain_logger.hpp" />
+    <ClInclude Include="dynarithmic\twain\messaging\twain_loop.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\audiblealarms_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\autoadjust_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\autocapture_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\autoscanning_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\barcodedetection_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\blankpage_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\buffered_transfer_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\capnegotiation_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\color_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\compression_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\deviceevents_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\deviceparams_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\doublefeed_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\file_transfer_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\general_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\imageinformation_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\imageparameter_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\imagetype_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\imprinter_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\jobcontrol_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\language_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\micr_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\options_base.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\pages_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\paperhandling_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\patchcode_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\pdf_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\powermonitor_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\resolution_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\options\ui_options.hpp" />
+    <ClInclude Include="dynarithmic\twain\pdf\pdf_text_element.hpp" />
+    <ClInclude Include="dynarithmic\twain\session\twain_characteristics.hpp" />
+    <ClInclude Include="dynarithmic\twain\session\twain_session.hpp" />
+    <ClInclude Include="dynarithmic\twain\session\twain_session_base.hpp" />
+    <ClInclude Include="dynarithmic\twain\source\twain_source.hpp" />
+    <ClInclude Include="dynarithmic\twain\source\twain_source_pimpl.hpp" />
+    <ClInclude Include="dynarithmic\twain\tostring\tostring.hpp" />
+    <ClInclude Include="dynarithmic\twain\types\constexpr_utils.hpp" />
+    <ClInclude Include="dynarithmic\twain\types\eternal_map\include\mapbox\eternal.hpp" />
+    <ClInclude Include="dynarithmic\twain\types\twain_array.hpp" />
+    <ClInclude Include="dynarithmic\twain\types\twain_callback.hpp" />
+    <ClInclude Include="dynarithmic\twain\types\twain_capbasics.hpp" />
+    <ClInclude Include="dynarithmic\twain\types\twain_frame.hpp" />
+    <ClInclude Include="dynarithmic\twain\types\twain_range.hpp" />
+    <ClInclude Include="dynarithmic\twain\types\twain_timer.hpp" />
+    <ClInclude Include="dynarithmic\twain\types\twain_types.hpp" />
+    <ClInclude Include="dynarithmic\twain\types\underlying_type.hpp" />
+    <ClInclude Include="dynarithmic\twain\utilities\misc_utilities.hpp" />
+    <ClInclude Include="dynarithmic\twain\utilities\string_utilities.hpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{829672ce-d35e-4225-89fa-911780f7880f}</ProjectGuid>
+    <RootNamespace>cppwrapperlib</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)cpp_wrapper_lib\</OutDir>
+    <TargetName>$(ProjectName)_$(PlatformArchitecture)_$(Configuration)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)cpp_wrapper_lib\</OutDir>
+    <TargetName>$(ProjectName)_$(PlatformArchitecture)_$(Configuration)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)cpp_wrapper_lib\</OutDir>
+    <TargetName>$(ProjectName)_$(PlatformArchitecture)_$(Configuration)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)cpp_wrapper_lib\</OutDir>
+    <TargetName>$(ProjectName)_$(PlatformArchitecture)_$(Configuration)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)c_cpp_includes;$(SolutionDir)cpp_wrapper_lib</AdditionalIncludeDirectories>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <OutputFile>$(SolutionDir)cpp_wrapper_lib\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)c_cpp_includes;$(SolutionDir)cpp_wrapper_lib</AdditionalIncludeDirectories>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <OutputFile>$(SolutionDir)cpp_wrapper_lib\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)c_cpp_includes;$(SolutionDir)cpp_wrapper_lib</AdditionalIncludeDirectories>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <OutputFile>$(SolutionDir)cpp_wrapper_lib\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)c_cpp_includes;$(SolutionDir)cpp_wrapper_lib</AdditionalIncludeDirectories>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <OutputFile>$(SolutionDir)cpp_wrapper_lib\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
