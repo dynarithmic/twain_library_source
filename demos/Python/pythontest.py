@@ -1,5 +1,5 @@
 from ctypes import *
-import dtwain
+import dtwainapi
 import struct
 import ctypes as ct
 
