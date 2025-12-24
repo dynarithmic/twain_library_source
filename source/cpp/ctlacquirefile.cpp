@@ -221,7 +221,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileAutoIncrement(DTWAIN_SOURCE Source, LONG 
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-LONG DLLENTRY_DEF DTWAIN_GetSavedFilesCount(DTWAIN_SOURCE Source)
+LONG DLLENTRY_DEF DTWAIN_GetFileSavePageCount(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     auto [pHandle, pSource] = VerifyHandles(Source);
