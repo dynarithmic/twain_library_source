@@ -310,7 +310,7 @@ void PDFEncryption::ComputePermsKey(int permissions)
 {
     // Compute the Perms key
     /*  Fill a 16 - byte block as follows :
-            Extend the permissions(contents of the P integer) to 64 bits by setting the upper 32 bits to all 1’s.
+            Extend the permissions(contents of the P integer) to 64 bits by setting the upper 32 bits to all 1's.
                 NOTE This allows for future extension without changing the format.
                 b) Record the 8 bytes of permission in the bytes 0 - 7 of the block, low order byte first.
                 c) Set byte 8 to the ASCII character "T" or "F" according to the EncryptMetadata boolean.

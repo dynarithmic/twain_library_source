@@ -1057,7 +1057,7 @@ DTWAIN_SetTempFileDirectoryExA                    @31060
 DTWAIN_SetTempFileDirectoryExW                    @31061
 DTWAIN_ArrayGetAtSource                           @31062
 DTWAIN_GetOCRMajorMinorVersion                    @31063
-DTWAIN_GetSavedFilesCount                         @31064
+DTWAIN_GetFileSavePageCount                       @31064
 DTWAIN_GetActiveDSMVersionInfo                    @31065
 DTWAIN_GetActiveDSMVersionInfoA                   @31066
 DTWAIN_GetActiveDSMVersionInfoW                   @31067
@@ -1133,3 +1133,6 @@ DTWAIN_GetJpegXRValues                            @31137
 DTWAIN_SetFeederWaitTime                          @31138
 DTWAIN_GetFeederWaitTime                          @31139
 DTWAIN_GetExtImageInfoDataEx                      @31140
+DTWAIN_GetAcquireAreaEx                           @31141
+DTWAIN_GetCapContainerEx2                         @31142
+DTWAIN_GetAllSourceDibs                           @31143

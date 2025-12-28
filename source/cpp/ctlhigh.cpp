@@ -273,7 +273,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
         DTWAIN_ARRAY pArray = 0; \
         EnumCapInternal(Source, Cap, &pArray, bExpandIfRange, GetAllCapValues); \
         LOG_FUNC_EXIT_NONAME_PARAMS(pArray); \
-        CATCH_BLOCK(DTWAIN_ARRAY(NULL)) \
+        CATCH_BLOCK(nullptr) \
     }
 
 #define EXPORT_ENUM_CAP_VALUES_NOEXPAND_EX(FuncName, Cap) \
@@ -283,7 +283,7 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
         DTWAIN_ARRAY pArray = 0; \
         EnumCapInternal(Source, Cap, &pArray, false, GetAllCapValues); \
         LOG_FUNC_EXIT_NONAME_PARAMS(pArray); \
-        CATCH_BLOCK(DTWAIN_ARRAY(NULL)) \
+        CATCH_BLOCK(nullptr) \
      }
 
 #define EXPORT_SET_CAP_VALUE(FuncName, Cap, CapDataType, CapFn) \

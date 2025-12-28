@@ -20,7 +20,6 @@
  */
 #include "cppfunc.h"
 #include "ctliface.h"
-#include "ctltwainmanager.h"
 #include "arrayfactory.h"
 #include "errorcheck.h"
 #include "ctlsetgetcaps.h"
@@ -161,7 +160,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, L
             if (vValues)
             {
                 // Already resolved, so just create an array, copy, and return
-                DTWAIN_ARRAY aValues = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, static_cast<LONG>(vValues->size()));
+				DTWAIN_ARRAY aValues = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(vValues->size()));
                 if (aValues)
                 {
                     auto& vCurrentValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
@@ -246,7 +245,8 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, L
         compressionMap[currentMode][lFileType] = vAllTypes;
     }
 
-    DTWAIN_ARRAY aRetValue = DTWAIN_ArrayCreate(DTWAIN_ARRAYLONG, static_cast<LONG>(setAllTypes.size()));
+	DTWAIN_ARRAY aRetValue = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(setAllTypes.size()));
+
     if ( !aRetValue)
     {
         // No memory, so return error
@@ -257,6 +257,6 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, L
     std::transform(setAllTypes.begin(), setAllTypes.end(), vAll.begin(), [&](LONG n) { return n; });
 
     LOG_FUNC_EXIT_NONAME_PARAMS(aRetValue)
-    CATCH_BLOCK(DTWAIN_ARRAY{})
+    CATCH_BLOCK(nullptr)
 }
 

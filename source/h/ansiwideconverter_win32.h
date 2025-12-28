@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 #include <limits>
+
 class ConvertW2A
 {
     std::string m_sz;
@@ -114,4 +115,76 @@ private:
         }
     }
 };
+
+class UTF8_UTF16_Converter
+{
+    public:
+	    static std::pair<std::wstring, bool> UTF8ToUTF16(std::string_view utf8)
+	    {
+		    if (utf8.empty())
+			    return { {}, true };
+
+		    int size = MultiByteToWideChar(
+			    CP_UTF8,
+			    MB_ERR_INVALID_CHARS,
+			    utf8.data(),
+			    static_cast<int>(utf8.size()),
+			    nullptr,
+			    0
+		    );
+
+		    if (size == 0)
+			    return { {}, false };
+
+		    std::wstring result(size, 0);
+
+		    MultiByteToWideChar(
+			    CP_UTF8,
+			    MB_ERR_INVALID_CHARS,
+			    utf8.data(),
+			    static_cast<int>(utf8.size()),
+			    result.data(),
+			    size
+		    );
+
+		    return { result, true };
+	    }
+
+	    static std::pair<std::string, bool> UTF16ToUTF8(std::wstring_view utf16string)
+	    {
+		    if (utf16string.empty())
+		    {
+			    return { {}, true };
+		    }
+
+		    int size = WideCharToMultiByte(
+			    CP_UTF8,
+			    0,
+			    utf16string.data(),
+			    static_cast<int>(utf16string.size()),
+			    nullptr,
+			    0,
+			    nullptr,
+			    nullptr
+		    );
+
+		    if (size == 0)
+			    return { {}, false };
+
+		    std::string result(size, 0);
+		    int chars_converted = WideCharToMultiByte(
+			    CP_UTF8,
+			    0,
+			    utf16string.data(),
+			    static_cast<int>(utf16string.size()),
+			    &result[0],
+			    size,
+			    nullptr,
+			    nullptr);
+
+		    result.resize(chars_converted);
+		    return { result, true };
+	    }
+};
+
 #endif // ANSIWIDECONVERTER_WIN32_H

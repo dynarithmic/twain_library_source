@@ -97,7 +97,7 @@ DTWAIN_CALLBACK_PROC DLLENTRY_DEF DTWAIN_SetCallback(DTWAIN_CALLBACK_PROC Fn, LO
     if (Fn)
         Fn(DTWAIN_TN_SETCALLBACKINIT, 0, UserData);
     LOG_FUNC_EXIT_NONAME_PARAMS(oldProc)
-    CATCH_BLOCK(DTWAIN_CALLBACK_PROC())
+    CATCH_BLOCK(nullptr)
 }
 
 DTWAIN_CALLBACK_PROC64 DLLENTRY_DEF DTWAIN_SetCallback64(DTWAIN_CALLBACK_PROC64 Fn, DTWAIN_LONG64 UserData)
@@ -110,7 +110,7 @@ DTWAIN_CALLBACK_PROC64 DLLENTRY_DEF DTWAIN_SetCallback64(DTWAIN_CALLBACK_PROC64 
     if (Fn)
         Fn(DTWAIN_TN_SETCALLBACK64INIT, 0, UserData);
     LOG_FUNC_EXIT_NONAME_PARAMS(oldProc)
-    CATCH_BLOCK(DTWAIN_CALLBACK_PROC64())
+    CATCH_BLOCK(nullptr)
 }
 
 DTWAIN_CALLBACK_PROC DLLENTRY_DEF DTWAIN_GetCallback()
@@ -118,7 +118,7 @@ DTWAIN_CALLBACK_PROC DLLENTRY_DEF DTWAIN_GetCallback()
     LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_pCallbackFn)
-    CATCH_BLOCK(DTWAIN_CALLBACK_PROC())
+    CATCH_BLOCK(nullptr)
 }
 
 DTWAIN_CALLBACK_PROC64 DLLENTRY_DEF DTWAIN_GetCallback64()
@@ -126,7 +126,7 @@ DTWAIN_CALLBACK_PROC64 DLLENTRY_DEF DTWAIN_GetCallback64()
     LOG_FUNC_ENTRY_PARAMS(())
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     LOG_FUNC_EXIT_NONAME_PARAMS(pHandle->m_pCallbackFn64)
-    CATCH_BLOCK(DTWAIN_CALLBACK_PROC64())
+    CATCH_BLOCK(nullptr)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF  DTWAIN_AddCallback(DTWAIN_CALLBACK_PROC Fn, LONG UserData)
@@ -281,7 +281,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                 {
                     LOG_FUNC_STRING(DTWAIN_ACQUIREDONE -- Copying DIBS to Source...)
                     DTWAIN_ARRAY aDibs = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYHANDLE, 0);
-                    DTWAIN_GetAllSourceDibs( static_cast<DTWAIN_SOURCE>(pSource), aDibs );
+                    DTWAIN_GetAllSourceDibsInternal( static_cast<DTWAIN_SOURCE>(pSource), aDibs );
                     pSource->AddDibsToAcquisition(aDibs);
                     LOG_FUNC_STRING(DTWAIN_ACQUIREDONE -- Finished Copying DIBS to Source...)
                 }
@@ -507,7 +507,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
                                 char buf[25] = {};
                                 LOG_FUNC_STRING(No UI Mode Done -- Copying DIBS to Source...)
                                 DTWAIN_ARRAY aDibs = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYHANDLE, 0);
-                                DTWAIN_GetAllSourceDibs(pSource, aDibs);
+                                DTWAIN_GetAllSourceDibsInternal(pSource, aDibs);
                                 int nDibs = static_cast<int>(pHandle->m_ArrayFactory->size(aDibs));
                                 StringStreamA strm;
                                 strm << buf;

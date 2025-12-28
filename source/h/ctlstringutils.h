@@ -36,6 +36,9 @@ namespace dynarithmic
 
     // Convert a string into a byte array
     std::vector<unsigned char> HexStringToByteArray(std::string_view hexString);
+
+    // Search and replace %1, %2, etc. placeholders with data
+    std::string& ReplacePlaceHolders(std::string& sOrigString, const std::vector<std::string>& vReplacements);
 }
 #endif
 

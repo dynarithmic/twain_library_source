@@ -378,7 +378,7 @@ DTWAIN_ARRAY  dynarithmic::SourceAcquire(SourceAcquireOptions& opts)
     DTWAIN_SetCallbackProc(oldCall, DTWAIN_CallbackMESSAGE);
     #endif
     LOG_FUNC_EXIT_NONAME_PARAMS(aAcquisitionArray)
-    CATCH_BLOCK(DTWAIN_ARRAY(0))
+    CATCH_BLOCK(nullptr)
 }
 
 DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
@@ -501,7 +501,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
     }
     aAcq.SetDestroy(false);
     LOG_FUNC_EXIT_NONAME_PARAMS(aAcquisitionArray)
-    CATCH_BLOCK(DTWAIN_ARRAY())
+    CATCH_BLOCK(nullptr)
 }
 
 bool dynarithmic::AcquireExHelper(SourceAcquireOptions& opts)

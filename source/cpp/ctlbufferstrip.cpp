@@ -98,7 +98,7 @@ HANDLE DLLENTRY_DEF DTWAIN_GetAcquireStripBuffer(DTWAIN_SOURCE Source)
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
     const HANDLE h = pSource->GetUserStripBuffer();
     LOG_FUNC_EXIT_NONAME_PARAMS(h)
-    CATCH_BLOCK_LOG_PARAMS(HANDLE())
+    CATCH_BLOCK_LOG_PARAMS(nullptr)
 }
 
 

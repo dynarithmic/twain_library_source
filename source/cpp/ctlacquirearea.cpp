@@ -64,6 +64,15 @@ static constexpr bool IsValidUnit(LONG Unit)
 }
 
 ///////////////////////////////////////////////////////////////////////
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_GetAcquireAreaEx(DTWAIN_SOURCE Source, LONG lGetType)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, lGetType))
+    DTWAIN_ARRAY FloatArray = {};
+    DTWAIN_GetAcquireArea(Source, lGetType, &FloatArray);
+    LOG_FUNC_EXIT_NONAME_PARAMS(FloatArray)
+    CATCH_BLOCK_LOG_PARAMS(nullptr)
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea(DTWAIN_SOURCE Source, LONG lGetType, LPDTWAIN_ARRAY FloatArray)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lGetType, FloatArray))

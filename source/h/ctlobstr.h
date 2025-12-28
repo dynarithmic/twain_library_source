@@ -41,7 +41,6 @@
 #include <iomanip>
 #include <locale>
 #include <iostream>
-#include <cctype>
 #include <string_view>
 #include <boost/lexical_cast.hpp>
 #include <dtwain_filesystem.h>
@@ -497,6 +496,30 @@ namespace dynarithmic
         static std::string     Convert_WidePtr_To_Ansi(const wchar_t* x, size_t len) { return x ? WideToANSI(x, len) : ""; }
         static std::wstring    Convert_AnsiPtr_To_Wide(const char* x, size_t len) { return x ? ANSIToWide(x, len) : L""; }
 
+        #ifdef _WIN32
+        using utf16strType = std::wstring;
+		using utf16viewType = std::wstring_view;
+        #else
+		using utf16strType = std::u16string;
+		using utf16viewType = std::u16string_view;
+        #endif
+
+        static std::pair<utf16strType, bool> Convert_UTF8_To_UTF16(std::string_view utf8, bool bMakeWideIfError = true)
+        {
+            auto pr = UTF8_UTF16_Converter::UTF8ToUTF16(utf8);
+            if ( !pr.second && bMakeWideIfError )
+                return { StringConversion::Convert_Ansi_To_Wide(utf8), false }; // Right now, only works for Windows
+            return pr;
+        }
+
+		static std::pair<std::string, bool> Convert_UTF16_To_UTF8(utf16viewType utf16, bool bMakeAnsiIfError = true)
+		{
+			auto pr = UTF8_UTF16_Converter::UTF16ToUTF8(utf16);
+			if (!pr.second && bMakeAnsiIfError)
+				return { StringConversion::Convert_Wide_To_Ansi(utf16), false }; // Right now, only works for Windows
+			return pr;
+		}
+
         static std::string WideToANSI(std::wstring_view wstr)
         {
             return static_cast<LPCSTR>(ConvertW2A(wstr.data()));
@@ -675,7 +698,7 @@ namespace dynarithmic
                                                                         const typename strtraits::char_type* separator
                                                                         = typename strtraits::GetEmptyString())
         {
-            typename strtraits::outputstream_type strm;
+            typename strtraits::outputstream_type strm{};
             if (!str.empty())
                 strm << str << separator << value;
             else
@@ -810,12 +833,12 @@ namespace dynarithmic
             return s1?StringTraits::ToDouble(s1):defVal;
         }
 
-        static StringType StringFromUChars(typename const StringTraits::uchar_type* val, size_t nSize)
+        static StringType StringFromUChars(const typename StringTraits::uchar_type* val, size_t nSize)
         {
             return StringType(val, val + nSize);
         }
 
-        static StringType HexStringFromUChars(typename const StringTraits::uchar_type* val, size_t nSize)
+        static StringType HexStringFromUChars(const typename StringTraits::uchar_type* val, size_t nSize)
         {
             StringType hex_output_vector;
             boost::algorithm::hex_lower(val, val + nSize, std::back_inserter(hex_output_vector));
@@ -1099,7 +1122,7 @@ namespace dynarithmic
             SplitPath(sFileName, rArray);
 
             // Adjust the file name
-            typename StringTraits::outputstream_type strm;
+            typename StringTraits::outputstream_type strm{};
             strm << std::setfill(StringTraits::GetZeroNumericString()) << std::setw(nDigits) << num;
             typename StringTraits::string_type szBuf = strm.str();
             typename StringTraits::string_type& sTemp = rArray[NAME_POS];
@@ -1146,7 +1169,7 @@ namespace dynarithmic
         static typename StringTraits::string_type GetPageFileName(typename StringTraits::string_type strBase, int nCurImage, bool bUseLongNames)
         {
             typename StringTraits::string_type strFormat;
-            typename StringTraits::outputstream_type strm;
+            typename StringTraits::outputstream_type strm{};
             strm << nCurImage;
             strFormat = strm.str();
             const int nLenFormat = static_cast<int>(strFormat.length());

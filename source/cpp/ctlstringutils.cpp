@@ -23,6 +23,8 @@
 #include <sstream>
 #include <array>
 #include <string_view>
+#include <boost/algorithm/string/replace.hpp>
+#include <vector>
 
 #include "ctltwainmanager.h"
 #include "ctliface.h"
@@ -62,7 +64,7 @@ HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIString(LPCTSTR lpOrigString)
     LOG_FUNC_ENTRY_PARAMS((lpOrigString))
     auto retval = ConvertToAPIString_Internal<StringWrapper,LPCTSTR>(lpOrigString);
     LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-    CATCH_BLOCK((HANDLE)NULL)
+    CATCH_BLOCK(nullptr)
 }
 
 HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringA(LPCSTR lpOrigString)
@@ -70,7 +72,7 @@ HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringA(LPCSTR lpOrigString)
     LOG_FUNC_ENTRY_PARAMS((lpOrigString))
     auto retval = ConvertToAPIString_Internal<StringWrapperA,LPCSTR>(lpOrigString);
     LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-    CATCH_BLOCK((HANDLE)NULL)
+    CATCH_BLOCK(nullptr)
 }
 
 HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringW(LPCWSTR lpOrigString)
@@ -78,7 +80,7 @@ HANDLE DLLENTRY_DEF DTWAIN_ConvertToAPIStringW(LPCWSTR lpOrigString)
     LOG_FUNC_ENTRY_PARAMS((lpOrigString))
     auto retval = ConvertToAPIString_Internal<StringWrapperW,LPCWSTR>(lpOrigString);
     LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-    CATCH_BLOCK((HANDLE)NULL)
+    CATCH_BLOCK(nullptr)
 }
 
 LONG DLLENTRY_DEF DTWAIN_ConvertToAPIStringEx(LPCTSTR lpOrigString, LPTSTR lpOutString, LONG nSize)
@@ -164,4 +166,18 @@ namespace dynarithmic
         }
         return byteArray;
     }
+
+    // Replace string that contains %1, %2, etc. with string replacements
+	std::string& ReplacePlaceHolders(std::string& sOrigString, const std::vector<std::string>& vReplacements)
+	{
+		int i = 1;
+		std::string placeHolder;
+		for (auto& s : vReplacements)
+		{
+			placeHolder = "%" + std::to_string(i);
+			boost::algorithm::replace_all(sOrigString, placeHolder, s);
+			++i;
+		}
+		return sOrigString;
+	}
 }

@@ -307,7 +307,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetFileSavePos(HWND hWndParent, LPCTSTR szTitle,
         pHandle->m_CustomPlacement.nOptions = nFlags;
         pHandle->m_CustomPlacement.hWndParent = hWndParent;
         if (szTitle)
-            pHandle->m_CustomPlacement.sTitle = szTitle;
+            pHandle->m_CustomPlacement.sTitle = StringConversion::Convert_NativePtr_To_Wide(szTitle);
         else
             pHandle->m_CustomPlacement.sTitle.clear();
     }

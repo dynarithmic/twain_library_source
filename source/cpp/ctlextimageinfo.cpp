@@ -18,7 +18,6 @@
     DYNARITHMIC SOFTWARE. DYNARITHMIC SOFTWARE DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
     OF THIRD PARTY RIGHTS.
  */
-#include "ctltmpl5.h"
 #include "errorcheck.h"
 #include "ctltr038.h"
 #include "twain.h"
@@ -208,7 +207,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDT
         // Dump contents of the enumerated values to the log
         if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
         {
-            DTWAIN_ARRAY aStrings = DTWAIN_ArrayCreate(DTWAIN_ARRAYANSISTRING, 0);
+			DTWAIN_ARRAY aStrings = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYANSISTRING, 0);
             DTWAINArrayLowLevel_RAII raii(pHandle, aStrings);
             auto& aValues = pHandle->m_ArrayFactory->underlying_container_t<std::string>(aStrings);
             for (auto val : vValues)

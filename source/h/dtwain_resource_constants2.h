@@ -71,6 +71,7 @@
 #define IDS_LOGMSG_DEFAULTSOURCE            (IDS_LOGMSG_START + 20)
 #define IDS_LOGMSG_LOGSTARTED               (IDS_LOGMSG_START + 21)
 #define IDS_LOGMSG_LOGENDED                 (IDS_LOGMSG_START + 22)
+#define IDS_LOGMSG_LASTERROR                (IDS_LOGMSG_START + 23)
 #define IDS_LOGMSG_END                      (4999)
 
 // PDF Font text
