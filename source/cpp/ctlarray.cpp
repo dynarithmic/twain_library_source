@@ -2126,8 +2126,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetNearestValue( DTWAIN_RANGE pArray, LPVOI
     CATCH_BLOCK(false)
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeNearestValueLong( DTWAIN_RANGE pArray, LONG lIn,
-                                                       LPLONG pOutput, LONG RoundType)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetNearestValueLong( DTWAIN_RANGE pArray, LONG lIn,
+                                                          LPLONG pOutput, LONG RoundType)
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, lIn, pOutput, RoundType))
     const DTWAIN_BOOL bRet = DTWAIN_RangeGetNearestValue(pArray,&lIn,pOutput,RoundType);
@@ -2136,7 +2136,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeNearestValueLong( DTWAIN_RANGE pArray, LONG
     CATCH_BLOCK(false)
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeNearestValueFloat( DTWAIN_RANGE pArray, DTWAIN_FLOAT dIn,
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetNearestValueFloat( DTWAIN_RANGE pArray, DTWAIN_FLOAT dIn,
                                                         LPDTWAIN_FLOAT pOutput, LONG RoundType)
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, dIn, pOutput, RoundType))
@@ -2146,7 +2146,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeNearestValueFloat( DTWAIN_RANGE pArray, DTW
     CATCH_BLOCK(false)
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeNearestValueFloatString( DTWAIN_RANGE pArray, LPCTSTR dIn,
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetNearestValueFloatString( DTWAIN_RANGE pArray, LPCTSTR dIn,
                                                               LPTSTR pOutput, LONG RoundType)
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, dIn, pOutput, RoundType))
@@ -2156,7 +2156,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeNearestValueFloatString( DTWAIN_RANGE pArra
 
     const double dValue = StringWrapper::ToDouble(dIn);
     double dOut;
-    const DTWAIN_BOOL bRet = DTWAIN_RangeNearestValueFloat(pArray, dValue, &dOut,RoundType);
+    const DTWAIN_BOOL bRet = DTWAIN_RangeGetNearestValueFloat(pArray, dValue, &dOut,RoundType);
     if ( bRet )
         StringWrapper::SafeStrcpy(pOutput, StringWrapper::TrimDouble(dOut).c_str(), 255);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((pOutput))
