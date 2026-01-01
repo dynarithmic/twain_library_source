@@ -1146,4 +1146,3 @@ DTWAIN_AddPDFTextString                           @31150
 DTWAIN_AddPDFTextStringA                          @31151
 DTWAIN_AddPDFTextStringW                          @31152
 DTWAIN_CreatePDFTextElementCopy                   @31153
-DTWAIN_GetLightSourcesEx                          @31154
