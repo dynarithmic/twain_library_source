@@ -241,7 +241,7 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
             const auto it2 = iter->second.end();
             while (it != it2 )
             {
-                pPDFInfo->m_Interface->DTWLIB_PDFAddPageText(pPDFInfo->pPDFdoc, it->get());
+                pPDFInfo->m_Interface->DTWLIB_PDFAddPageText(pPDFInfo->pPDFdoc, *it);
                 ++it;
             }
         }

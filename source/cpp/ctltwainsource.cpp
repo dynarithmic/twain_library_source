@@ -924,7 +924,7 @@ void CTL_ITwainSource::SetPDFValue(CTL_StringViewType nWhich, const PDFTextEleme
 {
     if ( nWhich == PDFTEXTELEMENTKEY )
     {
-        m_pDLLHandle->m_mapPDFTextElement[this].push_back(element);
+        m_pDLLHandle->m_mapPDFTextElement[this].push_back(element.get());
     }
 }
 void CTL_ITwainSource::SetPDFPageSize(LONG nPageSize, DTWAIN_FLOAT cWidth, DTWAIN_FLOAT cHeight)

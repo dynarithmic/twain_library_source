@@ -172,7 +172,7 @@ DTWAIN_RangeGetExpValueFloatString                @270
 DTWAIN_RangeGetPosFloat                           @271
 DTWAIN_RangeGetPosLong                            @272
 DTWAIN_RangeGetPosFloatString                     @273
-DTWAIN_RangeNearestValueFloatString               @274
+DTWAIN_RangeGetNearestValueFloatString               @274
 DTWAIN_SetXResolutionString                       @275
 DTWAIN_SetYResolutionString                       @276
 DTWAIN_GetXResolution                             @277
@@ -446,8 +446,8 @@ DTWAIN_RangeSetValueLong                          @3548
 DTWAIN_RangeSetValueFloat                         @3549
 DTWAIN_RangeGetExpValueLong                       @3552
 DTWAIN_RangeGetExpValueFloat                      @3553
-DTWAIN_RangeNearestValueLong                      @3555
-DTWAIN_RangeNearestValueFloat                     @3556
+DTWAIN_RangeGetNearestValueLong                   @3555
+DTWAIN_RangeGetNearestValueFloat                  @3556
 DTWAIN_SetMultipageScanMode                       @3600
 DTWAIN_FlushAcquiredPages                         @3601
 DTWAIN_LoadCustomStringResources                  @4000
@@ -919,8 +919,8 @@ DTWAIN_RangeSetAllFloatStringA                    @30203
 DTWAIN_RangeSetAllFloatStringW                    @30204
 DTWAIN_RangeSetValueFloatStringA                  @30205
 DTWAIN_RangeSetValueFloatStringW                  @30206
-DTWAIN_RangeNearestValueFloatStringA              @30207
-DTWAIN_RangeNearestValueFloatStringW              @30208
+DTWAIN_RangeGetNearestValueFloatStringA           @30207
+DTWAIN_RangeGetNearestValueFloatStringW           @30208
 DTWAIN_RangeGetValueFloatStringA                  @30209
 DTWAIN_RangeGetValueFloatStringW                  @30210
 DTWAIN_RangeGetPosFloatStringA                    @30211
@@ -1136,3 +1136,12 @@ DTWAIN_GetExtImageInfoDataEx                      @31140
 DTWAIN_GetAcquireAreaEx                           @31141
 DTWAIN_GetCapContainerEx2                         @31142
 DTWAIN_GetAllSourceDibs                           @31143
+DTWAIN_CreatePDFTextElementString                 @31144
+DTWAIN_CreatePDFTextElementStringA                @31145
+DTWAIN_CreatePDFTextElementStringW                @31146
+DTWAIN_SetPDFTextElementFloatString               @31147
+DTWAIN_SetPDFTextElementFloatStringA              @31148
+DTWAIN_SetPDFTextElementFloatStringW              @31149
+DTWAIN_AddPDFTextString                           @31150
+DTWAIN_AddPDFTextStringA                          @31151
+DTWAIN_AddPDFTextStringW                          @31152

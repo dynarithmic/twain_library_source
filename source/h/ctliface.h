@@ -593,6 +593,7 @@ namespace dynarithmic
         CTL_CompressionMap       s_CompressionMap;
         std::string              s_AppTitle;
         std::pair<int32_t, int32_t> s_SavedSelectSourcePos;
+        CTL_TEXTELEMENTPTRLIST   s_PDFTextElementList;
         CTL_StaticDataStruct();
     };
 
@@ -683,6 +684,7 @@ namespace dynarithmic
         static constexpr std::string_view GetINIKey(int nWhich) { return s_StaticData.s_aINIKeys[nWhich].second; }
         static std::string& GetAppTitle() { return s_StaticData.s_AppTitle; }
         static std::pair<int32_t, int32_t>& GetSelectSourcePos() { return s_StaticData.s_SavedSelectSourcePos; }
+        static auto& GetPDFTextElementList() { return s_StaticData.s_PDFTextElementList; }
     };
 
     struct CTL_LoggerCallbackInfo

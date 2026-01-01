@@ -171,15 +171,10 @@ struct OCRTextInfo
 static bool GetOCRCharacterInformation( OCREngine* pEngine, OCRTextInfo& tInfo, HANDLE hBitmap, const DTWAINImageInfoEx& imageInfoEx );
 static PDFStringToTextElement CreatePDFTextElementMap(OCRTextInfo& tInfo);
 
-static void InitializeDisplayStatus(PDFTextElementPtr& pElement)
-{
-    pElement->hasBeenDisplayed = false;
-}
-
 struct PDFTextElementEraser
 {
     PDFTextElementEraser(LONG Flags) : m_Flags(Flags) {}
-    bool operator()(const PDFTextElementPtr& pElement) const
+    bool operator()(const PDFTextElement* pElement) const
     {
         return pElement->displayFlags & m_Flags?true:false;
     }
@@ -201,7 +196,8 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
         if (it != pHandle->m_mapPDFTextElement.end())
         {
         // any PDF text is initialized to not written
-            std::for_each(it->second.begin(), it->second.end(),InitializeDisplayStatus);
+            std::for_each(it->second.begin(), it->second.end(), 
+                          [](auto* pElement) { pElement->hasBeenDisplayed = false; });
         }
     }
 
@@ -330,7 +326,9 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
 
             while ( itStart != itEnd )
             {
-                DTWAIN_PDFTEXTELEMENT TextElement = DTWAIN_CreatePDFTextElement(m_ImageInfoEx.theSource); // add to Source array of elements
+                DTWAIN_PDFTEXTELEMENT SourceElement = static_cast<void*>(&(*itStart));
+                DTWAIN_PDFTEXTELEMENT TextElement = DTWAIN_CreatePDFTextElementCopy(SourceElement); // add to Source array of elements
+                DTWAIN_AddPDFTextEx(TextElement, m_ImageInfoEx.theSource, 0);
                 auto pElement = static_cast<PDFTextElement *>(TextElement);
                 *pElement = *itStart;
                 if ( itStart == pElMap.begin())
