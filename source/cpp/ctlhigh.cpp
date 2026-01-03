@@ -286,6 +286,26 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
         CATCH_BLOCK(nullptr) \
      }
 
+#define EXPORT_ENUM_CURRENTCAP_VALUES_EX(FuncName, Cap) \
+    DTWAIN_ARRAY DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, DTWAIN_BOOL bExpandIfRange) \
+    {\
+        LOG_FUNC_ENTRY_PARAMS((Source, bExpandIfRange)) \
+        DTWAIN_ARRAY pArray = 0; \
+        EnumCapInternal(Source, Cap, &pArray, bExpandIfRange, GetCurrentCapValues); \
+        LOG_FUNC_EXIT_NONAME_PARAMS(pArray); \
+        CATCH_BLOCK(nullptr) \
+    }
+
+#define EXPORT_ENUM_CURRENTCAP_VALUES_NOEXPAND_EX(FuncName, Cap) \
+    DTWAIN_ARRAY DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source) \
+    { \
+        LOG_FUNC_ENTRY_PARAMS((Source)) \
+        DTWAIN_ARRAY pArray = 0; \
+        EnumCapInternal(Source, Cap, &pArray, false, GetCurrentCapValues); \
+        LOG_FUNC_EXIT_NONAME_PARAMS(pArray); \
+        CATCH_BLOCK(nullptr) \
+     }
+
 #define EXPORT_SET_CAP_VALUE(FuncName, Cap, CapDataType, CapFn) \
     DTWAIN_BOOL  DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, CapDataType value) \
     {\
@@ -564,6 +584,7 @@ EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetJobControl, CAP_JOBCONTROL)
 EXPORT_GET_CAP_VALUE_I(DTWAIN_GetLightPath, ICAP_LIGHTPATH)
 EXPORT_GET_CAP_VALUE_I(DTWAIN_GetLightSource, ICAP_LIGHTSOURCE)
 EXPORT_GET_CAP_VALUE_A(DTWAIN_GetLightSources, ICAP_LIGHTSOURCE)
+EXPORT_ENUM_CURRENTCAP_VALUES_NOEXPAND_EX(DTWAIN_GetLightSourcesEx, ICAP_LIGHTSOURCE)
 EXPORT_GET_CAP_VALUE_I(DTWAIN_GetNoiseFilter,  ICAP_NOISEFILTER)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetOrientation, ICAP_ORIENTATION)
 EXPORT_GET_CAP_VALUE_I(DTWAIN_GetMaxBuffers, CAP_MAXBATCHBUFFERS)

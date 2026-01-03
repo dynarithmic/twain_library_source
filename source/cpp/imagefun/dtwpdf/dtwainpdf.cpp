@@ -322,7 +322,7 @@ static int EncodeVectorStream(const std::vector<char>& InputStream,
         compress_fn = { {{ PdfDocument::NO_COMPRESS, NoCompress},
                         { PdfDocument::A85_COMPRESS, ASCII85Encode},
                         { PdfDocument::AHEX_COMPRESS, ASCIIHexEncode},
-                        { PdfDocument::FLATE_COMPRESS, FlateEncode}, } };
+                        { PdfDocument::FLATE_COMPRESS, FlateEncode },}};
 
     auto iter = dynarithmic::generic_array_finder_if(compress_fn, [&](const auto& pr) { return pr.first == compresstype; });
     if ( iter.first)
@@ -1301,7 +1301,7 @@ std::string PDFTextElement::GetPDFTextString() const
     // Get the stroke width
     if ( IsRenderModeStroked(renderMode))
     {
-        sprintf(szBuf, "\n%d w ", strokeWidth);
+        sprintf(szBuf, "\n%4.2lf w ", strokeWidth);
         sText += szBuf;
     }
 
@@ -1397,40 +1397,19 @@ void ContentsObject::CreateFontDictAndText(int startObjNum, int& nextObjNum)
         Matrix3_3 MatrixScale;
         Matrix3_3 MatrixRotate;
         Matrix3_3 MatrixSkew;
-        const Matrix3_3* allTransformations[24][4] =
-        { {&MatrixTranslate, &MatrixScale, &MatrixRotate, &MatrixSkew}, // TSRK
-          {&MatrixTranslate, &MatrixScale, &MatrixSkew, &MatrixRotate}, // TSKR
-          {&MatrixTranslate, &MatrixSkew, &MatrixScale, &MatrixRotate}, // TKSR
-          {&MatrixTranslate, &MatrixSkew, &MatrixRotate, &MatrixScale}, // TKRS
-          {&MatrixTranslate, &MatrixRotate, &MatrixScale, &MatrixSkew}, // TRSK
-          {&MatrixTranslate, &MatrixRotate, &MatrixSkew, &MatrixScale}, // TRKS
-
-          {&MatrixScale, &MatrixTranslate, &MatrixRotate, &MatrixSkew}, // STRK
-          {&MatrixScale, &MatrixTranslate, &MatrixSkew, &MatrixRotate}, // STKR
-          {&MatrixScale, &MatrixSkew, &MatrixTranslate, &MatrixRotate}, // SKTR
-          {&MatrixScale, &MatrixSkew, &MatrixRotate, &MatrixTranslate}, // SKRT
-          {&MatrixScale, &MatrixRotate, &MatrixTranslate, &MatrixSkew}, // SRTK
-          {&MatrixScale, &MatrixRotate, &MatrixSkew, &MatrixTranslate}, // SRKT
-
-          {&MatrixRotate, &MatrixScale, &MatrixTranslate, &MatrixSkew}, // RSTK
-          {&MatrixRotate, &MatrixScale, &MatrixSkew, &MatrixTranslate}, // RSKT
-          {&MatrixRotate, &MatrixTranslate, &MatrixScale, &MatrixSkew}, // RTSK
-          {&MatrixRotate, &MatrixTranslate, &MatrixSkew, &MatrixScale}, // RTKT
-          {&MatrixRotate, &MatrixSkew, &MatrixScale, &MatrixTranslate}, // RKST
-          {&MatrixRotate, &MatrixSkew, &MatrixTranslate, &MatrixScale}, // RKTS
-
-          {&MatrixSkew, &MatrixScale, &MatrixTranslate, &MatrixRotate}, // KSTR
-          {&MatrixSkew, &MatrixScale, &MatrixRotate, &MatrixTranslate}, // KSRT
-          {&MatrixSkew, &MatrixRotate, &MatrixScale, &MatrixTranslate}, // KRST
-          {&MatrixSkew, &MatrixRotate, &MatrixTranslate, &MatrixScale}, // KRTS
-          {&MatrixSkew, &MatrixTranslate, &MatrixScale, &MatrixRotate}, // KTSR
-          {&MatrixSkew, &MatrixTranslate, &MatrixRotate, &MatrixScale}  // KTRS
+        const Matrix3_3* allTransformations[6][4] =
+        { {&MatrixTranslate, &MatrixScale, &MatrixRotate, &MatrixSkew}, // SRK
+          {&MatrixTranslate, &MatrixScale, &MatrixSkew, &MatrixRotate}, // SKR
+          {&MatrixTranslate, &MatrixSkew, &MatrixScale, &MatrixRotate}, // KSR
+          {&MatrixTranslate, &MatrixSkew, &MatrixRotate, &MatrixScale}, // KRS
+          {&MatrixTranslate, &MatrixRotate, &MatrixScale, &MatrixSkew}, // RSK
+          {&MatrixTranslate, &MatrixRotate, &MatrixSkew, &MatrixScale}, // RKS
         };
 
         std::vector<const Matrix3_3*> MatrixAll(4);
         while (it1 != it2 )
         {
-            char szBuf[100];
+            char szBuf[1024];
             // Get the font
             sprintf(szBuf, "\n/F%d %4.2lf Tf", it1->first.first, it1->first.second);
             m_sText += szBuf;
@@ -1450,12 +1429,6 @@ void ContentsObject::CreateFontDictAndText(int startObjNum, int& nextObjNum)
             MatrixSkew[1][2] = 0;
             MatrixSkew[2][2] = 1;
 
-            /*std::map<char, Matrix3_3*> TransformationMap;
-            TransformationMap['T'] = &MatrixTranslate;
-            TransformationMap['S'] = &MatrixScale;
-            TransformationMap['R'] = &MatrixRotate;
-            TransformationMap['K'] = &MatrixSkew;*/
-
             while (pIt1 != pIt2)
             {
                 // Get the color
@@ -1465,8 +1438,7 @@ void ContentsObject::CreateFontDictAndText(int startObjNum, int& nextObjNum)
                 sprintf(szBuf, "\n%4.2lf %4.2lf %4.2lf rg", red, green, blue);
                 m_sText += szBuf;
 
-                // Test matrix multiplication of all components
-                // Try translate x rotate x scale/skew
+                // matrix multiplication of all components
                 MatrixTranslate[0][0] = 1;
                 MatrixTranslate[0][1] = 0;
                 MatrixTranslate[1][0] = 0;
@@ -1495,38 +1467,25 @@ void ContentsObject::CreateFontDictAndText(int startObjNum, int& nextObjNum)
                 MatrixSkew[2][0] = 0;
                 MatrixSkew[2][1] = 0;
 
+                // Use transformation order to determine order of rotation, scaling, and skewing
                 for (int i = 0; i < 4; ++i )
                     MatrixAll[i] = allTransformations[(*pIt1)->textTransform][i];
 
                pdfTransformation = MultiplyMatrix33(*MatrixAll[1], *MatrixAll[0]);
 
-                // Do rotation transformation
+                // Do second transformation
                 pdfTransformation2 = MultiplyMatrix33(*MatrixAll[2], pdfTransformation);
 
-                // Do skew
+                // Do third transformation
                 pdfTransformation3 = MultiplyMatrix33(*MatrixAll[3], pdfTransformation2);
 
+                // Write info to transformation matrix
                 sprintf(szBuf, "\n%4.2lf %4.2lf %4.2lf %4.2lf %4.2lf %4.2lf Tm",
                     pdfTransformation3[0][0], pdfTransformation3[0][1], pdfTransformation3[1][0], pdfTransformation3[1][1],
-                    pdfTransformation3[2][0], pdfTransformation3[2][1]); //pIt1->scalingX, pIt1->scalingY, pIt1->xpos, pIt1->ypos);
+    				(*pIt1)->xpos, (*pIt1)->ypos);
 
                 m_sText += szBuf;
 
-                // get the rotation
-/*                if ( !FLOAT_CLOSE(pIt1->rotationAngle,0.0))
-                {
-                    sprintf(szBuf, "\n%4.2lf %4.2lf -%4.2lf %4.2lf 0 0 Tm", pIt1->rotationAngle,
-                                    pIt1->rotationAngle, pIt1->rotationAngle, pIt1->rotationAngle);
-                    m_sText += szBuf;
-                }
-*/
-                // get the skew if specified
-/*                if ( !FLOAT_CLOSE(pIt1->skewAngleX,0.0) || !FLOAT_CLOSE(pIt1->skewAngleY, 0.0))
-                {
-                    sprintf(szBuf, "\n1 %4.2lf %4.2lf 1 0 0 Tm", pIt1->skewAngleX, pIt1->skewAngleY);
-                    m_sText += szBuf;
-                }
-*/
                 // Get the character spacing
                 sprintf(szBuf, "\n%4.2lf Tc ", (*pIt1)->charSpacing);
                 m_sText += szBuf;
@@ -1542,14 +1501,6 @@ void ContentsObject::CreateFontDictAndText(int startObjNum, int& nextObjNum)
                 // Set the render mode
                 sprintf(szBuf, "\n%d Tr ", (*pIt1)->renderMode);
                 m_sText += szBuf;
-
-                // Get the position
-                sprintf(szBuf, "\n1 0 0 1 %lf %lf Tm\n", (*pIt1)->xpos, (*pIt1)->ypos);
-                m_sText += szBuf;
-
-                // Get the leading
-            /*  sprintf(szBuf, "\n8.8 TL");
-                m_sText += szBuf;*/
 
                 // Get the stroke width
                 if ( IsRenderModeStroked((*pIt1)->renderMode))

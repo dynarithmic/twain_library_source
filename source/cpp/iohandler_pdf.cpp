@@ -328,7 +328,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
             {
                 DTWAIN_PDFTEXTELEMENT SourceElement = static_cast<void*>(&(*itStart));
                 DTWAIN_PDFTEXTELEMENT TextElement = DTWAIN_CreatePDFTextElementCopy(SourceElement); // add to Source array of elements
-                DTWAIN_AddPDFTextEx(TextElement, m_ImageInfoEx.theSource, 0);
+                DTWAIN_AddPDFTextElement(TextElement, m_ImageInfoEx.theSource, 0);
                 auto pElement = static_cast<PDFTextElement *>(TextElement);
                 *pElement = *itStart;
                 if ( itStart == pElMap.begin())

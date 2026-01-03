@@ -59,7 +59,7 @@ namespace dynarithmic
         int riseValue;
         int colorRGB;
         int displayFlags;
-        int strokeWidth;
+        double strokeWidth;
         unsigned stockPosition;
         double scalingX;
         double scalingY;
@@ -76,7 +76,7 @@ namespace dynarithmic
             renderMode(0), riseValue(0), colorRGB(0), displayFlags(0), strokeWidth(2),
             stockPosition(0), scalingX(1), scalingY(1), rotationAngle(0),
             skewAngleX(0), skewAngleY(0), hasBeenDisplayed(false),
-            textTransform(DTWAIN_PDFTEXTTRANSFORM_TSRK), isEnabled(true) { }
+            textTransform(DTWAIN_PDFTEXTTRANSFORM_SRK), isEnabled(true) { }
             std::string GetPDFTextString() const;
             void SetInvisible() { renderMode = 3; m_font.refNum = 1; }
     };
