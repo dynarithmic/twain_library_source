@@ -191,6 +191,8 @@ TCHAR* g_AllDataTypes[] = { _T("TWTY_INT8"), _T("TWTY_INT16"), _T("TWTY_INT32"),
                             _T("TWTY_STR64"), _T("TWTY_STR128"), _T("TWTY_STR255"), _T("TWTY_STR1024"), _T("TWTY_UNI512"),
                             _T("TWTY_HANDLE") };
 
+DTWAIN_PDFTEXTELEMENT g_PDFTextElement;
+
 int APIENTRY WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
                      LPSTR     lpCmdLine,
@@ -231,6 +233,11 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 
     /* Call function to determine the DTWAIN version */
     DTWAIN_GetVersion(&nMajorVer, &nMinorVer, &nDTwainType);
+
+    /* Create a PDF text element for usage when acquiring to a PDF file */
+    g_PDFTextElement = DTWAIN_CreatePDFTextElement();
+    DTWAIN_SetPDFTextElementLong(g_PDFTextElement, 100, 100, DTWAIN_PDFTEXTELEMENT_POSITION);
+	DTWAIN_SetPDFTextElementLong(g_PDFTextElement, DTWAIN_MakeRGB(127, 127, 127), 0, DTWAIN_PDFTEXTELEMENT_COLOR);
 
     /* Main message loop: */
     while (GetMessage(&msg, NULL, 0, 0))
@@ -1800,9 +1807,8 @@ LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserDa
 			TCHAR text[100];
 			wsprintf(text, _T("Page %d"), pdf_page_count); 
 			++pdf_page_count;
-			DTWAIN_AddPDFText(g_CurrentSource, text, 100, 100, _T("Helvetica"), 12, 
-							  DTWAIN_MakeRGB(127, 127, 127), 0, 100.0, 0, 0.0, 0, 
-				              DTWAIN_PDFTEXT_CURRENTPAGE);
+            DTWAIN_SetPDFTextElementString(g_PDFTextElement, text, DTWAIN_PDFTEXTELEMENT_TEXT);
+            DTWAIN_AddPDFTextElement(g_CurrentSource, g_PDFTextElement, DTWAIN_PDFTEXT_CURRENTPAGE);
 			return 1;
 		}
 
