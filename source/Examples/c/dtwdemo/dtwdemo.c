@@ -237,7 +237,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     /* Create a PDF text element for usage when acquiring to a PDF file */
     g_PDFTextElement = DTWAIN_CreatePDFTextElement();
 
-    /* Position, font color, and display pages for the PDF text element */
+    /* Position, font height, font color, and display pages for the PDF text element */
+	DTWAIN_SetPDFTextElementFloat(g_PDFTextElement, 25, 0, DTWAIN_PDFTEXTELEMENT_FONTHEIGHT);
     DTWAIN_SetPDFTextElementLong(g_PDFTextElement, 100, 100, DTWAIN_PDFTEXTELEMENT_POSITION);
     DTWAIN_SetPDFTextElementLong(g_PDFTextElement, DTWAIN_MakeRGB(127, 127, 127), 0, DTWAIN_PDFTEXTELEMENT_COLOR);
     DTWAIN_SetPDFTextElementLong(g_PDFTextElement, DTWAIN_PDFTEXT_ALLPAGES, 0, DTWAIN_PDFTEXTELEMENT_DISPLAYFLAGS);

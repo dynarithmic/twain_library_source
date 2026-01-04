@@ -100,19 +100,29 @@ static int EncodeVectorStream(const std::vector<char>& InputStream,
 
 typedef std::array<std::array<double, 3>, 3> Matrix3_3;
 
-static Matrix3_3 MultiplyMatrix33(const Matrix3_3& m1, const Matrix3_3& m2)
+static Matrix3_3 MultiplyMatrix33(const Matrix3_3 & A, const Matrix3_3 & B)
 {
-    Matrix3_3 product = {0,0,0,0,0,0,0,0,0};
-    for (int row = 0; row < 3; row++)
-    {
-        for (int col = 0; col < 3; col++)
-        {
-            // Multiply the row of A by the column of B to get the row, column of product.
-            for (int inner = 0; inner < 2; ++inner)
-                product[row][col] += m1[row][inner] * m2[inner][col];
-        }
-    }
-    return product;
+    Matrix3_3 C;
+	const double a00 = A[0][0], a01 = A[0][1], a02 = A[0][2];
+	const double a10 = A[1][0], a11 = A[1][1], a12 = A[1][2];
+	const double a20 = A[2][0], a21 = A[2][1], a22 = A[2][2];
+
+	const double b00 = B[0][0], b01 = B[0][1], b02 = B[0][2];
+	const double b10 = B[1][0], b11 = B[1][1], b12 = B[1][2];
+	const double b20 = B[2][0], b21 = B[2][1], b22 = B[2][2];
+
+	C[0][0] = a00 * b00 + a01 * b10 + a02 * b20;
+	C[0][1] = a00 * b01 + a01 * b11 + a02 * b21;
+	C[0][2] = a00 * b02 + a01 * b12 + a02 * b22;
+
+	C[1][0] = a10 * b00 + a11 * b10 + a12 * b20;
+	C[1][1] = a10 * b01 + a11 * b11 + a12 * b21;
+	C[1][2] = a10 * b02 + a11 * b12 + a12 * b22;
+
+	C[2][0] = a20 * b00 + a21 * b10 + a22 * b20;
+	C[2][1] = a20 * b01 + a21 * b11 + a22 * b21;
+	C[2][2] = a20 * b02 + a21 * b12 + a22 * b22;
+    return C;
 }
 
 
