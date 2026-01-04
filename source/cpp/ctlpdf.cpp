@@ -390,7 +390,7 @@ static void GenericAddPDFText(CTL_ITwainSource *pSource,
     }
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement, DWORD Flags)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, TextElement))
     auto [pHandle, pSource] = VerifyHandles(Source);
@@ -409,7 +409,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_P
                         pElement->charSpacing,
                         pElement->wordSpacing,
                         pElement->strokeWidth,
-                        Flags,
+                        pElement->displayFlags,
                         *validElement.second);
     pElement->vptrTwainSource.insert(pSource);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
@@ -452,11 +452,24 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextString(DTWAIN_SOURCE Source,
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ClearPDFText(DTWAIN_SOURCE Source)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ClearPDFTextElements(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    pSource->ClearPDFText();
+    pSource->ClearPDFTextElements();
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
+    CATCH_BLOCK_LOG_PARAMS(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RemovePDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    auto [pHandle, pSource] = VerifyHandles(Source);
+	PDFTextElement* pElement = static_cast<PDFTextElement*>(TextElement);
+	auto validElement = CheckGlobalPDFTextElement(TextElement);
+	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !validElement.first; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+
+    pSource->ClearOnePDFTextElement(pElement);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -477,7 +490,7 @@ DTWAIN_PDFTEXTELEMENT DLLENTRY_DEF DTWAIN_CreatePDFTextElement()
                       0, 
                       1.0, 
                       0, 
-                      0, 
+                      DTWAIN_PDFTEXT_ALLPAGES, 
                       nullptr);
 
 	auto& globalTextElementList = CTL_StaticData::GetPDFTextElementList();
@@ -511,10 +524,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyPDFTextElement(DTWAIN_PDFTEXTELEMENT Text
         {
             if (pr.first)
             {
-                auto& theList = pr.second;
+                auto& theNode = pr.second;
+                auto& theSet = theNode.first;
+                auto& theList = theNode.second;
                 theList.erase(std::find_if(theList.begin(), theList.end(),
                     [&](auto& ptr) { return ptr == TextElement; }), theList.end());
-
+                theSet.erase(static_cast<PDFTextElement*>(TextElement));
             }
         }
 

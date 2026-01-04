@@ -464,7 +464,8 @@ namespace dynarithmic
         void         SetXferReadySent(bool bSet) { m_bXferReadySent = bSet;  }
         bool         IsCurrentlyProcessingPixelInfo() const { return m_bProcessingPixelInfo; }
         void         SetCurrentlyProcessingPixelInfo(bool bSet=true) { m_bProcessingPixelInfo = bSet; }
-        void         ClearPDFText();
+        void         ClearPDFTextElements();
+        void         ClearOnePDFTextElement(PDFTextElement* pElement);
         bool         IsTwainVersion2() const { return m_bDSMVersion2; }
         void         SetTwainVersion2(bool bSet = true) { m_bDSMVersion2 = bSet;  }
         void         SetOpenFlag(bool bOpened) { m_bIsOpened = bOpened; }

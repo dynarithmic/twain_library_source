@@ -237,8 +237,8 @@ int CPDFImageHandler::WriteGraphicFile(CTL_ImageIOHandler* ptrHandler, LPCTSTR p
         const auto iter = pHandle->m_mapPDFTextElement.find(pSource);
         if (iter != pHandle->m_mapPDFTextElement.end())
         {
-            auto it = iter->second.begin();
-            const auto it2 = iter->second.end();
+            auto it = iter->second.second.begin();
+            const auto it2 = iter->second.second.end();
             while (it != it2 )
             {
                 pPDFInfo->m_Interface->DTWLIB_PDFAddPageText(pPDFInfo->pPDFdoc, *it);

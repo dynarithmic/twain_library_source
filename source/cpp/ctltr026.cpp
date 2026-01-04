@@ -801,7 +801,7 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
                                     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                                           nullptr, DTWAIN_TN_FILESAVEERROR,
                                                                           reinterpret_cast<LPARAM>(pSource));
-                                    pSource->ClearPDFText(); // clear the text elements
+                                    pSource->ClearPDFTextElements(); // clear the text elements
                                   }
                               }
                             }

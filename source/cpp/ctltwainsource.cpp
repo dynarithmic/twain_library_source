@@ -924,9 +924,18 @@ void CTL_ITwainSource::SetPDFValue(CTL_StringViewType nWhich, const PDFTextEleme
 {
     if ( nWhich == PDFTEXTELEMENTKEY )
     {
-        m_pDLLHandle->m_mapPDFTextElement[this].push_back(element.get());
+        auto& node = m_pDLLHandle->m_mapPDFTextElement[this];
+        auto& theSet = node.first;
+        auto& theList = node.second;
+        auto* textElement = element.get();
+        if (!theSet.count(textElement))
+        {
+            theList.push_back(textElement);
+            theSet.insert(textElement);
+        }
     }
 }
+
 void CTL_ITwainSource::SetPDFPageSize(LONG nPageSize, DTWAIN_FLOAT cWidth, DTWAIN_FLOAT cHeight)
 {
     m_ImageInfoEx.PDFPageSize = nPageSize;
@@ -954,11 +963,35 @@ void CTL_ITwainSource::SetPDFEncryption(bool bIsEncrypted,
     }
 }
 
-void CTL_ITwainSource::ClearPDFText()
+static void ClearPDFTextInternal(CTL_TEXTELEMENTMAP::iterator it, PDFTextElement* pElement)
+{
+	// See if text element is in set
+	auto& theSet = it->second.first;
+	if (theSet.count(pElement))
+	{
+		auto& theList = it->second.second;
+		theList.erase(std::remove(theList.begin(), theList.end(), pElement), theList.end());
+	}
+	theSet.erase(pElement);
+	pElement->vptrTwainSource.erase(it->first);
+}
+
+void CTL_ITwainSource::ClearPDFTextElements()
 {
     const auto it = m_pDLLHandle->m_mapPDFTextElement.find(this);
     if (it != m_pDLLHandle->m_mapPDFTextElement.end())
-        it->second.clear();
+    {
+		auto& theSet = it->second.first;
+        while (!theSet.empty())
+            ClearPDFTextInternal(it, *theSet.begin());
+    }
+}
+
+void CTL_ITwainSource::ClearOnePDFTextElement(PDFTextElement* pElement)
+{
+	const auto it = m_pDLLHandle->m_mapPDFTextElement.find(this);
+	if (it != m_pDLLHandle->m_mapPDFTextElement.end())
+        ClearPDFTextInternal(it, pElement);
 }
 
 void CTL_ITwainSource::SetPhotometric(LONG Setting)
@@ -1182,7 +1215,7 @@ void CTL_ITwainSource::ProcessMultipageFile()
         const ImageXferFileWriter FileWriter(nullptr, m_pSession ,this);
         FileWriter.CloseMultiPageDibFile(GetMutiPageScanMode() != DTWAIN_FILESAVE_MANUALSAVE);
     }
-    ClearPDFText(); // clear the text elements
+    ClearPDFTextElements(); // clear the text elements
 }
 
 bool isIntCap(DTWAIN_SOURCE Source, LONG nCap)
