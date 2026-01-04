@@ -1505,7 +1505,7 @@ void ContentsObject::CreateFontDictAndText(int startObjNum, int& nextObjNum)
                 // Get the stroke width
                 if ( IsRenderModeStroked((*pIt1)->renderMode))
                 {
-                    sprintf(szBuf, "\n%d w ", (*pIt1)->strokeWidth);
+                    sprintf(szBuf, "\n%4.2lf w ", (*pIt1)->strokeWidth);
                     m_sText += szBuf;
                 }
 
