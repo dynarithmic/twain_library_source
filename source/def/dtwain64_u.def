@@ -529,7 +529,7 @@ DTWAIN_GetOCRTextInfoFloatEx                      @9020
 DTWAIN_SetPDFOCRMode                              @9021
 DTWAIN_SetPDFOCRConversion                        @9022
 DTWAIN_AddPDFText                                 @9023
-DTWAIN_ClearPDFText                               @9024
+DTWAIN_ClearPDFTextElements                       @9024
 DTWAIN_GetPDFType1FontName                        @9025
 DTWAIN_IsPaperDetectable                          @9040
 DTWAIN_SetCallback64                              @9100
@@ -1144,3 +1144,4 @@ DTWAIN_AddPDFTextStringA                          @31148
 DTWAIN_AddPDFTextStringW                          @31149
 DTWAIN_CreatePDFTextElementCopy                   @31150
 DTWAIN_GetLightSourcesEx                          @31151
+DTWAIN_RemovePDFTextElement                       @31152
