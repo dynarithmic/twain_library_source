@@ -221,7 +221,7 @@
     D_CHECKHANDLESFUNC                            DYNDTWAIN_API::DTWAIN_CheckHandles = nullptr;
     D_CLEARBUFFERSFUNC                            DYNDTWAIN_API::DTWAIN_ClearBuffers = nullptr;
     D_CLEARERRORBUFFERFUNC                        DYNDTWAIN_API::DTWAIN_ClearErrorBuffer = nullptr;
-    D_CLEARPDFTEXTFUNC                            DYNDTWAIN_API::DTWAIN_ClearPDFText = nullptr;
+    D_CLEARPDFTEXTELEMENTSFUNC                    DYNDTWAIN_API::DTWAIN_ClearPDFTextElements = nullptr;
     D_CLEARPAGEFUNC                               DYNDTWAIN_API::DTWAIN_ClearPage = nullptr;
     D_CLOSESOURCEFUNC                             DYNDTWAIN_API::DTWAIN_CloseSource = nullptr;
     D_CLOSESOURCEUIFUNC                           DYNDTWAIN_API::DTWAIN_CloseSourceUI = nullptr;
@@ -896,6 +896,7 @@
     D_RANGESETVALUEFLOATSTRINGAFUNC               DYNDTWAIN_API::DTWAIN_RangeSetValueFloatStringA = nullptr;
     D_RANGESETVALUEFLOATSTRINGWFUNC               DYNDTWAIN_API::DTWAIN_RangeSetValueFloatStringW = nullptr;
     D_RANGESETVALUELONGFUNC                       DYNDTWAIN_API::DTWAIN_RangeSetValueLong = nullptr;
+    D_REMOVEPDFTEXTELEMENTFUNC                    DYNDTWAIN_API::DTWAIN_RemovePDFTextElement = nullptr;
     D_RESETPDFTEXTELEMENTFUNC                     DYNDTWAIN_API::DTWAIN_ResetPDFTextElement = nullptr;
     D_REWINDPAGEFUNC                              DYNDTWAIN_API::DTWAIN_RewindPage = nullptr;
     D_SELECTDEFAULTOCRENGINEFUNC                  DYNDTWAIN_API::DTWAIN_SelectDefaultOCREngine = nullptr;
@@ -1414,7 +1415,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_CheckHandles, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ClearBuffers, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ClearErrorBuffer, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_ClearPDFText, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_ClearPDFTextElements, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ClearPage, hModule);
           LOADFUNCTIONIMPL(DTWAIN_CloseSource, hModule);
           LOADFUNCTIONIMPL(DTWAIN_CloseSourceUI, hModule);
@@ -2089,6 +2090,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_RangeSetValueFloatStringA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_RangeSetValueFloatStringW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_RangeSetValueLong, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_RemovePDFTextElement, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ResetPDFTextElement, hModule);
           LOADFUNCTIONIMPL(DTWAIN_RewindPage, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SelectDefaultOCREngine, hModule);

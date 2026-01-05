@@ -1964,7 +1964,7 @@ Namespace Dynarithmic
         Public Delegate Function DTWAIN_AddPDFTextADelegate(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As System.Double, colorRGB As Integer, renderMode As Integer, scaling As System.Double, charSpacing As System.Double, wordSpacing As System.Double, strokeWidth As System.Double, Flags As UInteger) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
-        Public Delegate Function DTWAIN_AddPDFTextElementDelegate(Source As System.IntPtr, TextElement As System.IntPtr, Flags As UInteger) As Integer
+        Public Delegate Function DTWAIN_AddPDFTextElementDelegate(Source As System.IntPtr, TextElement As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
         Public Delegate Function DTWAIN_AddPDFTextStringDelegate(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As String, colorRGB As Integer, renderMode As Integer, scaling As String, charSpacing As String, wordSpacing As String, strokeWidth As String, Flags As UInteger) As Integer
@@ -2405,7 +2405,7 @@ Namespace Dynarithmic
         Public Delegate Function DTWAIN_ClearErrorBufferDelegate() As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
-        Public Delegate Function DTWAIN_ClearPDFTextDelegate(Source As System.IntPtr) As Integer
+        Public Delegate Function DTWAIN_ClearPDFTextElementsDelegate(Source As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
         Public Delegate Function DTWAIN_ClearPageDelegate(Source As System.IntPtr) As Integer
@@ -4424,6 +4424,9 @@ Namespace Dynarithmic
         Public Delegate Function DTWAIN_RangeSetValueLongDelegate(pArray As System.IntPtr, nWhich As Integer, Val As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
+        Public Delegate Function DTWAIN_RemovePDFTextElementDelegate(Source As System.IntPtr, TextElement As System.IntPtr) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
         Public Delegate Function DTWAIN_ResetPDFTextElementDelegate(TextElement As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
@@ -5342,8 +5345,8 @@ Namespace Dynarithmic
         Return api.DTWAIN_AddPDFTextA(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags)
         End Function
         
-        Public Function DTWAIN_AddPDFTextElement(Source As System.IntPtr, TextElement As System.IntPtr, Flags As UInteger) As Integer
-        Return api.DTWAIN_AddPDFTextElement(Source, TextElement, Flags)
+        Public Function DTWAIN_AddPDFTextElement(Source As System.IntPtr, TextElement As System.IntPtr) As Integer
+        Return api.DTWAIN_AddPDFTextElement(Source, TextElement)
         End Function
         
         Public Function DTWAIN_AddPDFTextString(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As String, colorRGB As Integer, renderMode As Integer, scaling As String, charSpacing As String, wordSpacing As String, strokeWidth As String, Flags As UInteger) As Integer
@@ -5930,8 +5933,8 @@ Namespace Dynarithmic
         Return api.DTWAIN_ClearErrorBuffer()
         End Function
         
-        Public Function DTWAIN_ClearPDFText(Source As System.IntPtr) As Integer
-        Return api.DTWAIN_ClearPDFText(Source)
+        Public Function DTWAIN_ClearPDFTextElements(Source As System.IntPtr) As Integer
+        Return api.DTWAIN_ClearPDFTextElements(Source)
         End Function
         
         Public Function DTWAIN_ClearPage(Source As System.IntPtr) As Integer
@@ -8622,6 +8625,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_RangeSetValueLong(pArray, nWhich, Val)
         End Function
         
+        Public Function DTWAIN_RemovePDFTextElement(Source As System.IntPtr, TextElement As System.IntPtr) As Integer
+        Return api.DTWAIN_RemovePDFTextElement(Source, TextElement)
+        End Function
+        
         Public Function DTWAIN_ResetPDFTextElement(TextElement As System.IntPtr) As Integer
         Return api.DTWAIN_ResetPDFTextElement(TextElement)
         End Function
@@ -9909,7 +9916,7 @@ Namespace Dynarithmic
             Public DTWAIN_CheckHandles As DTWAIN_CheckHandlesDelegate
             Public DTWAIN_ClearBuffers As DTWAIN_ClearBuffersDelegate
             Public DTWAIN_ClearErrorBuffer As DTWAIN_ClearErrorBufferDelegate
-            Public DTWAIN_ClearPDFText As DTWAIN_ClearPDFTextDelegate
+            Public DTWAIN_ClearPDFTextElements As DTWAIN_ClearPDFTextElementsDelegate
             Public DTWAIN_ClearPage As DTWAIN_ClearPageDelegate
             Public DTWAIN_CloseSource As DTWAIN_CloseSourceDelegate
             Public DTWAIN_CloseSourceUI As DTWAIN_CloseSourceUIDelegate
@@ -10582,6 +10589,7 @@ Namespace Dynarithmic
             Public DTWAIN_RangeSetValueFloatStringA As DTWAIN_RangeSetValueFloatStringADelegate
             Public DTWAIN_RangeSetValueFloatStringW As DTWAIN_RangeSetValueFloatStringWDelegate
             Public DTWAIN_RangeSetValueLong As DTWAIN_RangeSetValueLongDelegate
+            Public DTWAIN_RemovePDFTextElement As DTWAIN_RemovePDFTextElementDelegate
             Public DTWAIN_ResetPDFTextElement As DTWAIN_ResetPDFTextElementDelegate
             Public DTWAIN_RewindPage As DTWAIN_RewindPageDelegate
             Public DTWAIN_SelectDefaultOCREngine As DTWAIN_SelectDefaultOCREngineDelegate

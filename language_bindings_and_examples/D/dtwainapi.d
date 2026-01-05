@@ -1916,7 +1916,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(LPCWSTR) DTWAIN_AddFileToAppendW;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_CCHARPTRTYPE, LONG, LONG, DTWAIN_CCHARPTRTYPE, DTWAIN_FLOAT, LONG, LONG, DTWAIN_FLOAT, DTWAIN_FLOAT, DTWAIN_FLOAT, DTWAIN_FLOAT, DWORD) DTWAIN_AddPDFText;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPCSTR, LONG, LONG, LPCSTR, DTWAIN_FLOAT, LONG, LONG, DTWAIN_FLOAT, DTWAIN_FLOAT, DTWAIN_FLOAT, DTWAIN_FLOAT, DWORD) DTWAIN_AddPDFTextA;
-    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_PDFTEXTELEMENT, DWORD) DTWAIN_AddPDFTextElement;
+    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_PDFTEXTELEMENT) DTWAIN_AddPDFTextElement;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_CCHARPTRTYPE, LONG, LONG, DTWAIN_CCHARPTRTYPE, DTWAIN_CCHARPTRTYPE, LONG, LONG, DTWAIN_CCHARPTRTYPE, DTWAIN_CCHARPTRTYPE, DTWAIN_CCHARPTRTYPE, DTWAIN_CCHARPTRTYPE, DWORD) DTWAIN_AddPDFTextString;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPCSTR, LONG, LONG, LPCSTR, LPCSTR, LONG, LONG, LPCSTR, LPCSTR, LPCSTR, LPCSTR, DWORD) DTWAIN_AddPDFTextStringA;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPCWSTR, LONG, LONG, LPCWSTR, LPCWSTR, LONG, LONG, LPCWSTR, LPCWSTR, LPCWSTR, LPCWSTR, DWORD) DTWAIN_AddPDFTextStringW;
@@ -2069,7 +2069,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_BOOL) DTWAIN_CheckHandles;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_ClearBuffers;
     extern(Windows) DTWAIN_BOOL function() DTWAIN_ClearErrorBuffer;
-    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_ClearPDFText;
+    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_ClearPDFTextElements;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_ClearPage;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_CloseSource;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_CloseSourceUI;
@@ -2737,6 +2737,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_RANGE, LONG, LPCSTR) DTWAIN_RangeSetValueFloatStringA;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_RANGE, LONG, LPCWSTR) DTWAIN_RangeSetValueFloatStringW;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_RANGE, LONG, LONG) DTWAIN_RangeSetValueLong;
+    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_PDFTEXTELEMENT) DTWAIN_RemovePDFTextElement;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_PDFTEXTELEMENT) DTWAIN_ResetPDFTextElement;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_RewindPage;
     extern(Windows) DTWAIN_OCRENGINE function() DTWAIN_SelectDefaultOCREngine;
@@ -3190,7 +3191,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_CheckHandles, "DTWAIN_CheckHandles");
         bindFunction(cast(void**)&DTWAIN_ClearBuffers, "DTWAIN_ClearBuffers");
         bindFunction(cast(void**)&DTWAIN_ClearErrorBuffer, "DTWAIN_ClearErrorBuffer");
-        bindFunction(cast(void**)&DTWAIN_ClearPDFText, "DTWAIN_ClearPDFText");
+        bindFunction(cast(void**)&DTWAIN_ClearPDFTextElements, "DTWAIN_ClearPDFTextElements");
         bindFunction(cast(void**)&DTWAIN_ClearPage, "DTWAIN_ClearPage");
         bindFunction(cast(void**)&DTWAIN_CloseSource, "DTWAIN_CloseSource");
         bindFunction(cast(void**)&DTWAIN_CloseSourceUI, "DTWAIN_CloseSourceUI");
@@ -3858,6 +3859,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_RangeSetValueFloatStringA, "DTWAIN_RangeSetValueFloatStringA");
         bindFunction(cast(void**)&DTWAIN_RangeSetValueFloatStringW, "DTWAIN_RangeSetValueFloatStringW");
         bindFunction(cast(void**)&DTWAIN_RangeSetValueLong, "DTWAIN_RangeSetValueLong");
+        bindFunction(cast(void**)&DTWAIN_RemovePDFTextElement, "DTWAIN_RemovePDFTextElement");
         bindFunction(cast(void**)&DTWAIN_ResetPDFTextElement, "DTWAIN_ResetPDFTextElement");
         bindFunction(cast(void**)&DTWAIN_RewindPage, "DTWAIN_RewindPage");
         bindFunction(cast(void**)&DTWAIN_SelectDefaultOCREngine, "DTWAIN_SelectDefaultOCREngine");

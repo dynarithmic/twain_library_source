@@ -94,7 +94,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_AddExtImageInfoQuery(DTWAIN_SOURCE Source, LONG ExtImageInfo);
         DTWAIN_BOOL DTWAIN_AddPDFText(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE szText, LONG xPos, LONG yPos, DTWAIN_CCHARPTRTYPE fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DWORD Flags);
-        DTWAIN_BOOL DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement, DWORD Flags);
+        DTWAIN_BOOL DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement);
         DTWAIN_BOOL DTWAIN_AddPDFTextString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE szText, LONG xPos, LONG yPos, DTWAIN_CCHARPTRTYPE fontName, DTWAIN_CCHARPTRTYPE fontSize, LONG colorRGB, LONG renderMode, DTWAIN_CCHARPTRTYPE scaling, DTWAIN_CCHARPTRTYPE charSpacing, DTWAIN_CCHARPTRTYPE wordSpacing, DTWAIN_CCHARPTRTYPE strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextStringA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, LPCSTR fontSize, LONG colorRGB, LONG renderMode, LPCSTR scaling, LPCSTR charSpacing, LPCSTR wordSpacing, LPCSTR strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextStringW(DTWAIN_SOURCE Source, LPCWSTR szText, LONG xPos, LONG yPos, LPCWSTR fontName, LPCWSTR fontSize, LONG colorRGB, LONG renderMode, LPCWSTR scaling, LPCWSTR charSpacing, LPCWSTR wordSpacing, LPCWSTR strokeWidth, DWORD Flags);
@@ -244,7 +244,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_CheckHandles(DTWAIN_BOOL bCheck);
         DTWAIN_BOOL DTWAIN_ClearBuffers(DTWAIN_SOURCE Source, LONG ClearBuffer);
         DTWAIN_BOOL DTWAIN_ClearErrorBuffer();
-        DTWAIN_BOOL DTWAIN_ClearPDFText(DTWAIN_SOURCE Source);
+        DTWAIN_BOOL DTWAIN_ClearPDFTextElements(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_ClearPage(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_CloseSource(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_CloseSourceUI(DTWAIN_SOURCE Source);
@@ -914,6 +914,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_RangeSetValueFloatStringA(DTWAIN_RANGE pArray, LONG nWhich, LPCSTR dValue);
         DTWAIN_BOOL DTWAIN_RangeSetValueFloatStringW(DTWAIN_RANGE pArray, LONG nWhich, LPCWSTR dValue);
         DTWAIN_BOOL DTWAIN_RangeSetValueLong(DTWAIN_RANGE pArray, LONG nWhich, LONG Val);
+        DTWAIN_BOOL DTWAIN_RemovePDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement);
         DTWAIN_BOOL DTWAIN_ResetPDFTextElement(DTWAIN_PDFTEXTELEMENT TextElement);
         DTWAIN_BOOL DTWAIN_RewindPage(DTWAIN_SOURCE Source);
         DTWAIN_OCRENGINE DTWAIN_SelectDefaultOCREngine();
@@ -1271,7 +1272,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_AddExtImageInfoQuery(DTWAIN_SOURCE Source, LONG ExtImageInfo);
         DTWAIN_BOOL DTWAIN_AddPDFText(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE szText, LONG xPos, LONG yPos, DTWAIN_CCHARPTRTYPE fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DWORD Flags);
-        DTWAIN_BOOL DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement, DWORD Flags);
+        DTWAIN_BOOL DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement);
         DTWAIN_BOOL DTWAIN_AddPDFTextString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE szText, LONG xPos, LONG yPos, DTWAIN_CCHARPTRTYPE fontName, DTWAIN_CCHARPTRTYPE fontSize, LONG colorRGB, LONG renderMode, DTWAIN_CCHARPTRTYPE scaling, DTWAIN_CCHARPTRTYPE charSpacing, DTWAIN_CCHARPTRTYPE wordSpacing, DTWAIN_CCHARPTRTYPE strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextStringA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, LPCSTR fontSize, LONG colorRGB, LONG renderMode, LPCSTR scaling, LPCSTR charSpacing, LPCSTR wordSpacing, LPCSTR strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextStringW(DTWAIN_SOURCE Source, LPCWSTR szText, LONG xPos, LONG yPos, LPCWSTR fontName, LPCWSTR fontSize, LONG colorRGB, LONG renderMode, LPCWSTR scaling, LPCWSTR charSpacing, LPCWSTR wordSpacing, LPCWSTR strokeWidth, DWORD Flags);
@@ -1421,7 +1422,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_CheckHandles(DTWAIN_BOOL bCheck);
         DTWAIN_BOOL DTWAIN_ClearBuffers(DTWAIN_SOURCE Source, LONG ClearBuffer);
         DTWAIN_BOOL DTWAIN_ClearErrorBuffer();
-        DTWAIN_BOOL DTWAIN_ClearPDFText(DTWAIN_SOURCE Source);
+        DTWAIN_BOOL DTWAIN_ClearPDFTextElements(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_ClearPage(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_CloseSource(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_CloseSourceUI(DTWAIN_SOURCE Source);
@@ -2091,6 +2092,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_RangeSetValueFloatStringA(DTWAIN_RANGE pArray, LONG nWhich, LPCSTR dValue);
         DTWAIN_BOOL DTWAIN_RangeSetValueFloatStringW(DTWAIN_RANGE pArray, LONG nWhich, LPCWSTR dValue);
         DTWAIN_BOOL DTWAIN_RangeSetValueLong(DTWAIN_RANGE pArray, LONG nWhich, LONG Val);
+        DTWAIN_BOOL DTWAIN_RemovePDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement);
         DTWAIN_BOOL DTWAIN_ResetPDFTextElement(DTWAIN_PDFTEXTELEMENT TextElement);
         DTWAIN_BOOL DTWAIN_RewindPage(DTWAIN_SOURCE Source);
         DTWAIN_OCRENGINE DTWAIN_SelectDefaultOCREngine();
@@ -2448,7 +2450,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_AddExtImageInfoQuery(DTWAIN_SOURCE Source, LONG ExtImageInfo);
         DTWAIN_BOOL DTWAIN_AddPDFText(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE szText, LONG xPos, LONG yPos, DTWAIN_CCHARPTRTYPE fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DWORD Flags);
-        DTWAIN_BOOL DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement, DWORD Flags);
+        DTWAIN_BOOL DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement);
         DTWAIN_BOOL DTWAIN_AddPDFTextString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE szText, LONG xPos, LONG yPos, DTWAIN_CCHARPTRTYPE fontName, DTWAIN_CCHARPTRTYPE fontSize, LONG colorRGB, LONG renderMode, DTWAIN_CCHARPTRTYPE scaling, DTWAIN_CCHARPTRTYPE charSpacing, DTWAIN_CCHARPTRTYPE wordSpacing, DTWAIN_CCHARPTRTYPE strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextStringA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, LPCSTR fontSize, LONG colorRGB, LONG renderMode, LPCSTR scaling, LPCSTR charSpacing, LPCSTR wordSpacing, LPCSTR strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextStringW(DTWAIN_SOURCE Source, LPCWSTR szText, LONG xPos, LONG yPos, LPCWSTR fontName, LPCWSTR fontSize, LONG colorRGB, LONG renderMode, LPCWSTR scaling, LPCWSTR charSpacing, LPCWSTR wordSpacing, LPCWSTR strokeWidth, DWORD Flags);
@@ -2598,7 +2600,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_CheckHandles(DTWAIN_BOOL bCheck);
         DTWAIN_BOOL DTWAIN_ClearBuffers(DTWAIN_SOURCE Source, LONG ClearBuffer);
         DTWAIN_BOOL DTWAIN_ClearErrorBuffer();
-        DTWAIN_BOOL DTWAIN_ClearPDFText(DTWAIN_SOURCE Source);
+        DTWAIN_BOOL DTWAIN_ClearPDFTextElements(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_ClearPage(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_CloseSource(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_CloseSourceUI(DTWAIN_SOURCE Source);
@@ -3268,6 +3270,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_RangeSetValueFloatStringA(DTWAIN_RANGE pArray, LONG nWhich, LPCSTR dValue);
         DTWAIN_BOOL DTWAIN_RangeSetValueFloatStringW(DTWAIN_RANGE pArray, LONG nWhich, LPCWSTR dValue);
         DTWAIN_BOOL DTWAIN_RangeSetValueLong(DTWAIN_RANGE pArray, LONG nWhich, LONG Val);
+        DTWAIN_BOOL DTWAIN_RemovePDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement);
         DTWAIN_BOOL DTWAIN_ResetPDFTextElement(DTWAIN_PDFTEXTELEMENT TextElement);
         DTWAIN_BOOL DTWAIN_RewindPage(DTWAIN_SOURCE Source);
         DTWAIN_OCRENGINE DTWAIN_SelectDefaultOCREngine();
@@ -3625,7 +3628,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_AddExtImageInfoQuery(DTWAIN_SOURCE Source, LONG ExtImageInfo);
         DTWAIN_BOOL DTWAIN_AddPDFText(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE szText, LONG xPos, LONG yPos, DTWAIN_CCHARPTRTYPE fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DWORD Flags);
-        DTWAIN_BOOL DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement, DWORD Flags);
+        DTWAIN_BOOL DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement);
         DTWAIN_BOOL DTWAIN_AddPDFTextString(DTWAIN_SOURCE Source, DTWAIN_CCHARPTRTYPE szText, LONG xPos, LONG yPos, DTWAIN_CCHARPTRTYPE fontName, DTWAIN_CCHARPTRTYPE fontSize, LONG colorRGB, LONG renderMode, DTWAIN_CCHARPTRTYPE scaling, DTWAIN_CCHARPTRTYPE charSpacing, DTWAIN_CCHARPTRTYPE wordSpacing, DTWAIN_CCHARPTRTYPE strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextStringA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, LPCSTR fontSize, LONG colorRGB, LONG renderMode, LPCSTR scaling, LPCSTR charSpacing, LPCSTR wordSpacing, LPCSTR strokeWidth, DWORD Flags);
         DTWAIN_BOOL DTWAIN_AddPDFTextStringW(DTWAIN_SOURCE Source, LPCWSTR szText, LONG xPos, LONG yPos, LPCWSTR fontName, LPCWSTR fontSize, LONG colorRGB, LONG renderMode, LPCWSTR scaling, LPCWSTR charSpacing, LPCWSTR wordSpacing, LPCWSTR strokeWidth, DWORD Flags);
@@ -3775,7 +3778,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_CheckHandles(DTWAIN_BOOL bCheck);
         DTWAIN_BOOL DTWAIN_ClearBuffers(DTWAIN_SOURCE Source, LONG ClearBuffer);
         DTWAIN_BOOL DTWAIN_ClearErrorBuffer();
-        DTWAIN_BOOL DTWAIN_ClearPDFText(DTWAIN_SOURCE Source);
+        DTWAIN_BOOL DTWAIN_ClearPDFTextElements(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_ClearPage(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_CloseSource(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_CloseSourceUI(DTWAIN_SOURCE Source);
@@ -4445,6 +4448,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_RangeSetValueFloatStringA(DTWAIN_RANGE pArray, LONG nWhich, LPCSTR dValue);
         DTWAIN_BOOL DTWAIN_RangeSetValueFloatStringW(DTWAIN_RANGE pArray, LONG nWhich, LPCWSTR dValue);
         DTWAIN_BOOL DTWAIN_RangeSetValueLong(DTWAIN_RANGE pArray, LONG nWhich, LONG Val);
+        DTWAIN_BOOL DTWAIN_RemovePDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement);
         DTWAIN_BOOL DTWAIN_ResetPDFTextElement(DTWAIN_PDFTEXTELEMENT TextElement);
         DTWAIN_BOOL DTWAIN_RewindPage(DTWAIN_SOURCE Source);
         DTWAIN_OCRENGINE DTWAIN_SelectDefaultOCREngine();

@@ -1901,7 +1901,7 @@ module TwainAPI =
     type DTWAIN_AddPDFTextADelegate = delegate of DTWAIN_SOURCE * string * LONG * LONG * string * DTWAIN_FLOAT * LONG * LONG * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * DWORD -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
-    type DTWAIN_AddPDFTextElementDelegate = delegate of DTWAIN_SOURCE * DTWAIN_PDFTEXTELEMENT * DWORD -> DTWAIN_BOOL
+    type DTWAIN_AddPDFTextElementDelegate = delegate of DTWAIN_SOURCE * DTWAIN_PDFTEXTELEMENT -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
     type DTWAIN_AddPDFTextStringDelegate = delegate of DTWAIN_SOURCE * string * LONG * LONG * string * string * LONG * LONG * string * string * string * string * DWORD -> DTWAIN_BOOL
@@ -2342,7 +2342,7 @@ module TwainAPI =
     type DTWAIN_ClearErrorBufferDelegate = delegate of unit -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
-    type DTWAIN_ClearPDFTextDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_BOOL
+    type DTWAIN_ClearPDFTextElementsDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
     type DTWAIN_ClearPageDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_BOOL
@@ -4367,6 +4367,9 @@ module TwainAPI =
     type DTWAIN_RangeSetValueLongDelegate = delegate of DTWAIN_RANGE * LONG * LONG -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
+    type DTWAIN_RemovePDFTextElementDelegate = delegate of DTWAIN_SOURCE * DTWAIN_PDFTEXTELEMENT -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
     type DTWAIN_ResetPDFTextElementDelegate = delegate of DTWAIN_PDFTEXTELEMENT -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
@@ -5348,7 +5351,7 @@ module TwainAPI =
     let private CheckHandles = lazy (DynamicDll.Bind "DTWAIN_CheckHandles" : DTWAIN_CheckHandlesDelegate)
     let private ClearBuffers = lazy (DynamicDll.Bind "DTWAIN_ClearBuffers" : DTWAIN_ClearBuffersDelegate)
     let private ClearErrorBuffer = lazy (DynamicDll.Bind "DTWAIN_ClearErrorBuffer" : DTWAIN_ClearErrorBufferDelegate)
-    let private ClearPDFText = lazy (DynamicDll.Bind "DTWAIN_ClearPDFText" : DTWAIN_ClearPDFTextDelegate)
+    let private ClearPDFTextElements = lazy (DynamicDll.Bind "DTWAIN_ClearPDFTextElements" : DTWAIN_ClearPDFTextElementsDelegate)
     let private ClearPage = lazy (DynamicDll.Bind "DTWAIN_ClearPage" : DTWAIN_ClearPageDelegate)
     let private CloseSource = lazy (DynamicDll.Bind "DTWAIN_CloseSource" : DTWAIN_CloseSourceDelegate)
     let private CloseSourceUI = lazy (DynamicDll.Bind "DTWAIN_CloseSourceUI" : DTWAIN_CloseSourceUIDelegate)
@@ -6023,6 +6026,7 @@ module TwainAPI =
     let private RangeSetValueFloatStringA = lazy (DynamicDll.Bind "DTWAIN_RangeSetValueFloatStringA" : DTWAIN_RangeSetValueFloatStringADelegate)
     let private RangeSetValueFloatStringW = lazy (DynamicDll.Bind "DTWAIN_RangeSetValueFloatStringW" : DTWAIN_RangeSetValueFloatStringWDelegate)
     let private RangeSetValueLong = lazy (DynamicDll.Bind "DTWAIN_RangeSetValueLong" : DTWAIN_RangeSetValueLongDelegate)
+    let private RemovePDFTextElement = lazy (DynamicDll.Bind "DTWAIN_RemovePDFTextElement" : DTWAIN_RemovePDFTextElementDelegate)
     let private ResetPDFTextElement = lazy (DynamicDll.Bind "DTWAIN_ResetPDFTextElement" : DTWAIN_ResetPDFTextElementDelegate)
     let private RewindPage = lazy (DynamicDll.Bind "DTWAIN_RewindPage" : DTWAIN_RewindPageDelegate)
     let private SelectDefaultOCREngine = lazy (DynamicDll.Bind "DTWAIN_SelectDefaultOCREngine" : DTWAIN_SelectDefaultOCREngineDelegate)
@@ -6395,9 +6399,9 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         AddPDFTextA.Value.Invoke(source, sztext, xpos, ypos, fontname, fontsize, colorrgb, rendermode, scaling, charspacing, wordspacing, strokewidth, flags)
 
-    let DTWAIN_AddPDFTextElement (source: DTWAIN_SOURCE) (textelement: DTWAIN_PDFTEXTELEMENT) (flags: DWORD) : DTWAIN_BOOL =
+    let DTWAIN_AddPDFTextElement (source: DTWAIN_SOURCE) (textelement: DTWAIN_PDFTEXTELEMENT) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
-        AddPDFTextElement.Value.Invoke(source, textelement, flags)
+        AddPDFTextElement.Value.Invoke(source, textelement)
 
     let DTWAIN_AddPDFTextString (source: DTWAIN_SOURCE) (sztext: string) (xpos: LONG) (ypos: LONG) (fontname: string) (fontsize: string) (colorrgb: LONG) (rendermode: LONG) (scaling: string) (charspacing: string) (wordspacing: string) (strokewidth: string) (flags: DWORD) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
@@ -6983,9 +6987,9 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         ClearErrorBuffer.Value.Invoke()
 
-    let DTWAIN_ClearPDFText (source: DTWAIN_SOURCE) : DTWAIN_BOOL =
+    let DTWAIN_ClearPDFTextElements (source: DTWAIN_SOURCE) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
-        ClearPDFText.Value.Invoke(source)
+        ClearPDFTextElements.Value.Invoke(source)
 
     let DTWAIN_ClearPage (source: DTWAIN_SOURCE) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
@@ -9682,6 +9686,10 @@ module TwainAPI =
     let DTWAIN_RangeSetValueLong (parray: DTWAIN_RANGE) (nwhich: LONG) (val1: LONG) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         RangeSetValueLong.Value.Invoke(parray, nwhich, val1)
+
+    let DTWAIN_RemovePDFTextElement (source: DTWAIN_SOURCE) (textelement: DTWAIN_PDFTEXTELEMENT) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        RemovePDFTextElement.Value.Invoke(source, textelement)
 
     let DTWAIN_ResetPDFTextElement (textelement: DTWAIN_PDFTEXTELEMENT) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

@@ -64,7 +64,7 @@ type DtwainacquiretoclipboardFunc = unsafe extern "C" fn(*mut c_void,i32,i32,i32
 type DtwainaddextimageinfoqueryFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainaddpdftextFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32,*const u16,f64,i32,i32,f64,f64,f64,f64,u32) -> i32;
 type DtwainaddpdftextaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32,i32,*const c_char,f64,i32,i32,f64,f64,f64,f64,u32) -> i32;
-type DtwainaddpdftextelementFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,u32) -> i32;
+type DtwainaddpdftextelementFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
 type DtwainaddpdftextstringFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32,*const u16,*const u16,i32,i32,*const u16,*const u16,*const u16,*const u16,u32) -> i32;
 type DtwainaddpdftextstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32,i32,*const c_char,*const c_char,i32,i32,*const c_char,*const c_char,*const c_char,*const c_char,u32) -> i32;
 type DtwainaddpdftextstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32,*const u16,*const u16,i32,i32,*const u16,*const u16,*const u16,*const u16,u32) -> i32;
@@ -214,7 +214,7 @@ type DtwaincalldsmprocFunc = unsafe extern "C" fn(*mut c_void,*mut c_void,i32,i3
 type DtwaincheckhandlesFunc = unsafe extern "C" fn(i32) -> i32;
 type DtwainclearbuffersFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainclearerrorbufferFunc = unsafe extern "C" fn() -> i32;
-type DtwainclearpdftextFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainclearpdftextelementsFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainclearpageFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainclosesourceFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainclosesourceuiFunc = unsafe extern "C" fn(*mut c_void) -> i32;
@@ -887,6 +887,7 @@ type DtwainrangesetvaluefloatstringFunc = unsafe extern "C" fn(*mut c_void,i32,*
 type DtwainrangesetvaluefloatstringaFunc = unsafe extern "C" fn(*mut c_void,i32,*const c_char) -> i32;
 type DtwainrangesetvaluefloatstringwFunc = unsafe extern "C" fn(*mut c_void,i32,*const u16) -> i32;
 type DtwainrangesetvaluelongFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> i32;
+type DtwainremovepdftextelementFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
 type DtwainresetpdftextelementFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainrewindpageFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainselectdefaultocrengineFunc = unsafe extern "C" fn() -> *mut c_void;
@@ -1336,7 +1337,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_CheckHandlesFunc: Symbol<'a, DtwaincheckhandlesFunc>,
     DTWAIN_ClearBuffersFunc: Symbol<'a, DtwainclearbuffersFunc>,
     DTWAIN_ClearErrorBufferFunc: Symbol<'a, DtwainclearerrorbufferFunc>,
-    DTWAIN_ClearPDFTextFunc: Symbol<'a, DtwainclearpdftextFunc>,
+    DTWAIN_ClearPDFTextElementsFunc: Symbol<'a, DtwainclearpdftextelementsFunc>,
     DTWAIN_ClearPageFunc: Symbol<'a, DtwainclearpageFunc>,
     DTWAIN_CloseSourceFunc: Symbol<'a, DtwainclosesourceFunc>,
     DTWAIN_CloseSourceUIFunc: Symbol<'a, DtwainclosesourceuiFunc>,
@@ -2009,6 +2010,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_RangeSetValueFloatStringAFunc: Symbol<'a, DtwainrangesetvaluefloatstringaFunc>,
     DTWAIN_RangeSetValueFloatStringWFunc: Symbol<'a, DtwainrangesetvaluefloatstringwFunc>,
     DTWAIN_RangeSetValueLongFunc: Symbol<'a, DtwainrangesetvaluelongFunc>,
+    DTWAIN_RemovePDFTextElementFunc: Symbol<'a, DtwainremovepdftextelementFunc>,
     DTWAIN_ResetPDFTextElementFunc: Symbol<'a, DtwainresetpdftextelementFunc>,
     DTWAIN_RewindPageFunc: Symbol<'a, DtwainrewindpageFunc>,
     DTWAIN_SelectDefaultOCREngineFunc: Symbol<'a, DtwainselectdefaultocrengineFunc>,
@@ -4090,7 +4092,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_CheckHandles: Symbol<DtwaincheckhandlesFunc> = unsafe { library.get(b"DTWAIN_CheckHandles")? };
         let DTWAIN_ClearBuffers: Symbol<DtwainclearbuffersFunc> = unsafe { library.get(b"DTWAIN_ClearBuffers")? };
         let DTWAIN_ClearErrorBuffer: Symbol<DtwainclearerrorbufferFunc> = unsafe { library.get(b"DTWAIN_ClearErrorBuffer")? };
-        let DTWAIN_ClearPDFText: Symbol<DtwainclearpdftextFunc> = unsafe { library.get(b"DTWAIN_ClearPDFText")? };
+        let DTWAIN_ClearPDFTextElements: Symbol<DtwainclearpdftextelementsFunc> = unsafe { library.get(b"DTWAIN_ClearPDFTextElements")? };
         let DTWAIN_ClearPage: Symbol<DtwainclearpageFunc> = unsafe { library.get(b"DTWAIN_ClearPage")? };
         let DTWAIN_CloseSource: Symbol<DtwainclosesourceFunc> = unsafe { library.get(b"DTWAIN_CloseSource")? };
         let DTWAIN_CloseSourceUI: Symbol<DtwainclosesourceuiFunc> = unsafe { library.get(b"DTWAIN_CloseSourceUI")? };
@@ -4763,6 +4765,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_RangeSetValueFloatStringA: Symbol<DtwainrangesetvaluefloatstringaFunc> = unsafe { library.get(b"DTWAIN_RangeSetValueFloatStringA")? };
         let DTWAIN_RangeSetValueFloatStringW: Symbol<DtwainrangesetvaluefloatstringwFunc> = unsafe { library.get(b"DTWAIN_RangeSetValueFloatStringW")? };
         let DTWAIN_RangeSetValueLong: Symbol<DtwainrangesetvaluelongFunc> = unsafe { library.get(b"DTWAIN_RangeSetValueLong")? };
+        let DTWAIN_RemovePDFTextElement: Symbol<DtwainremovepdftextelementFunc> = unsafe { library.get(b"DTWAIN_RemovePDFTextElement")? };
         let DTWAIN_ResetPDFTextElement: Symbol<DtwainresetpdftextelementFunc> = unsafe { library.get(b"DTWAIN_ResetPDFTextElement")? };
         let DTWAIN_RewindPage: Symbol<DtwainrewindpageFunc> = unsafe { library.get(b"DTWAIN_RewindPage")? };
         let DTWAIN_SelectDefaultOCREngine: Symbol<DtwainselectdefaultocrengineFunc> = unsafe { library.get(b"DTWAIN_SelectDefaultOCREngine")? };
@@ -5211,7 +5214,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_CheckHandlesFunc: DTWAIN_CheckHandles,
             DTWAIN_ClearBuffersFunc: DTWAIN_ClearBuffers,
             DTWAIN_ClearErrorBufferFunc: DTWAIN_ClearErrorBuffer,
-            DTWAIN_ClearPDFTextFunc: DTWAIN_ClearPDFText,
+            DTWAIN_ClearPDFTextElementsFunc: DTWAIN_ClearPDFTextElements,
             DTWAIN_ClearPageFunc: DTWAIN_ClearPage,
             DTWAIN_CloseSourceFunc: DTWAIN_CloseSource,
             DTWAIN_CloseSourceUIFunc: DTWAIN_CloseSourceUI,
@@ -5884,6 +5887,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_RangeSetValueFloatStringAFunc: DTWAIN_RangeSetValueFloatStringA,
             DTWAIN_RangeSetValueFloatStringWFunc: DTWAIN_RangeSetValueFloatStringW,
             DTWAIN_RangeSetValueLongFunc: DTWAIN_RangeSetValueLong,
+            DTWAIN_RemovePDFTextElementFunc: DTWAIN_RemovePDFTextElement,
             DTWAIN_ResetPDFTextElementFunc: DTWAIN_ResetPDFTextElement,
             DTWAIN_RewindPageFunc: DTWAIN_RewindPage,
             DTWAIN_SelectDefaultOCREngineFunc: DTWAIN_SelectDefaultOCREngine,
@@ -6236,8 +6240,8 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_AddPDFTextAFunc)(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);  }
     }
 
-    pub fn DTWAIN_AddPDFTextElement(&self, Source: *mut c_void, TextElement: *mut c_void, Flags: u32) -> i32 {
-        unsafe { return (self.DTWAIN_AddPDFTextElementFunc)(Source, TextElement, Flags);  }
+    pub fn DTWAIN_AddPDFTextElement(&self, Source: *mut c_void, TextElement: *mut c_void) -> i32 {
+        unsafe { return (self.DTWAIN_AddPDFTextElementFunc)(Source, TextElement);  }
     }
 
     pub fn DTWAIN_AddPDFTextString(&self, Source: *mut c_void, szText: *const u16, xPos: i32, yPos: i32, fontName: *const u16, fontSize: *const u16, colorRGB: i32, renderMode: i32, scaling: *const u16, charSpacing: *const u16, wordSpacing: *const u16, strokeWidth: *const u16, Flags: u32) -> i32 {
@@ -6836,8 +6840,8 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ClearErrorBufferFunc)();  }
     }
 
-    pub fn DTWAIN_ClearPDFText(&self, Source: *mut c_void) -> i32 {
-        unsafe { return (self.DTWAIN_ClearPDFTextFunc)(Source);  }
+    pub fn DTWAIN_ClearPDFTextElements(&self, Source: *mut c_void) -> i32 {
+        unsafe { return (self.DTWAIN_ClearPDFTextElementsFunc)(Source);  }
     }
 
     pub fn DTWAIN_ClearPage(&self, Source: *mut c_void) -> i32 {
@@ -9526,6 +9530,10 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_RangeSetValueLong(&self, pArray: *mut c_void, nWhich: i32, Val: i32) -> i32 {
         unsafe { return (self.DTWAIN_RangeSetValueLongFunc)(pArray, nWhich, Val);  }
+    }
+
+    pub fn DTWAIN_RemovePDFTextElement(&self, Source: *mut c_void, TextElement: *mut c_void) -> i32 {
+        unsafe { return (self.DTWAIN_RemovePDFTextElementFunc)(Source, TextElement);  }
     }
 
     pub fn DTWAIN_ResetPDFTextElement(&self, TextElement: *mut c_void) -> i32 {

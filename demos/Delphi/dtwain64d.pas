@@ -1840,7 +1840,7 @@ function DTWAIN_AddFileToAppendA(szFile:LPCSTR) : BOOL; external 'dtwain64d.dll'
 function DTWAIN_AddFileToAppendW(szFile:LPCWSTR) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_AddFileToAppendW';
 function DTWAIN_AddPDFText(Source:DTWAIN_SOURCE; szText:LPCTSTR; xPos:LONG; yPos:LONG; fontName:LPCTSTR; fontSize:DTWAIN_FLOAT; colorRGB:LONG; renderMode:LONG; scaling:DTWAIN_FLOAT; charSpacing:DTWAIN_FLOAT; wordSpacing:DTWAIN_FLOAT; strokeWidth:DTWAIN_FLOAT; Flags:DWORD) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_AddPDFText';
 function DTWAIN_AddPDFTextA(Source:DTWAIN_SOURCE; szText:LPCSTR; xPos:LONG; yPos:LONG; fontName:LPCSTR; fontSize:DTWAIN_FLOAT; colorRGB:LONG; renderMode:LONG; scaling:DTWAIN_FLOAT; charSpacing:DTWAIN_FLOAT; wordSpacing:DTWAIN_FLOAT; strokeWidth:DTWAIN_FLOAT; Flags:DWORD) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_AddPDFTextA';
-function DTWAIN_AddPDFTextElement(Source:DTWAIN_SOURCE; TextElement:DTWAIN_PDFTEXTELEMENT; Flags:DWORD) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_AddPDFTextElement';
+function DTWAIN_AddPDFTextElement(Source:DTWAIN_SOURCE; TextElement:DTWAIN_PDFTEXTELEMENT) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_AddPDFTextElement';
 function DTWAIN_AddPDFTextString(Source:DTWAIN_SOURCE; szText:LPCTSTR; xPos:LONG; yPos:LONG; fontName:LPCTSTR; fontSize:LPCTSTR; colorRGB:LONG; renderMode:LONG; scaling:LPCTSTR; charSpacing:LPCTSTR; wordSpacing:LPCTSTR; strokeWidth:LPCTSTR; Flags:DWORD) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_AddPDFTextString';
 function DTWAIN_AddPDFTextStringA(Source:DTWAIN_SOURCE; szText:LPCSTR; xPos:LONG; yPos:LONG; fontName:LPCSTR; fontSize:LPCSTR; colorRGB:LONG; renderMode:LONG; scaling:LPCSTR; charSpacing:LPCSTR; wordSpacing:LPCSTR; strokeWidth:LPCSTR; Flags:DWORD) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_AddPDFTextStringA';
 function DTWAIN_AddPDFTextStringW(Source:DTWAIN_SOURCE; szText:LPCWSTR; xPos:LONG; yPos:LONG; fontName:LPCWSTR; fontSize:LPCWSTR; colorRGB:LONG; renderMode:LONG; scaling:LPCWSTR; charSpacing:LPCWSTR; wordSpacing:LPCWSTR; strokeWidth:LPCWSTR; Flags:DWORD) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_AddPDFTextStringW';
@@ -1993,7 +1993,7 @@ function DTWAIN_CallDSMProc(AppID:DTWAIN_IDENTITY; SourceId:DTWAIN_IDENTITY; lDG
 function DTWAIN_CheckHandles(bCheck:BOOL) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_CheckHandles';
 function DTWAIN_ClearBuffers(Source:DTWAIN_SOURCE; ClearBuffer:LONG) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_ClearBuffers';
 function DTWAIN_ClearErrorBuffer : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_ClearErrorBuffer';
-function DTWAIN_ClearPDFText(Source:DTWAIN_SOURCE) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_ClearPDFText';
+function DTWAIN_ClearPDFTextElements(Source:DTWAIN_SOURCE) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_ClearPDFTextElements';
 function DTWAIN_ClearPage(Source:DTWAIN_SOURCE) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_ClearPage';
 function DTWAIN_CloseSource(Source:DTWAIN_SOURCE) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_CloseSource';
 function DTWAIN_CloseSourceUI(Source:DTWAIN_SOURCE) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_CloseSourceUI';
@@ -2668,6 +2668,7 @@ function DTWAIN_RangeSetValueFloatString(pArray:DTWAIN_RANGE; nWhich:LONG; Val:L
 function DTWAIN_RangeSetValueFloatStringA(pArray:DTWAIN_RANGE; nWhich:LONG; dValue:LPCSTR) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_RangeSetValueFloatStringA';
 function DTWAIN_RangeSetValueFloatStringW(pArray:DTWAIN_RANGE; nWhich:LONG; dValue:LPCWSTR) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_RangeSetValueFloatStringW';
 function DTWAIN_RangeSetValueLong(pArray:DTWAIN_RANGE; nWhich:LONG; Val:LONG) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_RangeSetValueLong';
+function DTWAIN_RemovePDFTextElement(Source:DTWAIN_SOURCE; TextElement:DTWAIN_PDFTEXTELEMENT) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_RemovePDFTextElement';
 function DTWAIN_ResetPDFTextElement(TextElement:DTWAIN_PDFTEXTELEMENT) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_ResetPDFTextElement';
 function DTWAIN_RewindPage(Source:DTWAIN_SOURCE) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_RewindPage';
 function DTWAIN_SelectDefaultOCREngine : DTWAIN_OCRENGINE; external 'dtwain64d.dll'  name 'DTWAIN_SelectDefaultOCREngine';

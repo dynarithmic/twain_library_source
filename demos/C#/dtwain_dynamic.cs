@@ -1909,7 +1909,7 @@
         public delegate int DTWAIN_AddFileToAppendWDelegate([MarshalAs(UnmanagedType.LPWStr)] string szFile);
         public delegate int DTWAIN_AddPDFTextDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPTStr)] string fontName, DTWAIN_FLOAT fontSize, int colorRGB, int renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, uint Flags);
         public delegate int DTWAIN_AddPDFTextADelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPStr)] string fontName, DTWAIN_FLOAT fontSize, int colorRGB, int renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, uint Flags);
-        public delegate int DTWAIN_AddPDFTextElementDelegate(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement, uint Flags);
+        public delegate int DTWAIN_AddPDFTextElementDelegate(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement);
         public delegate int DTWAIN_AddPDFTextStringDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPTStr)] string fontName, [MarshalAs(UnmanagedType.LPTStr)] string fontSize, int colorRGB, int renderMode, [MarshalAs(UnmanagedType.LPTStr)] string scaling, [MarshalAs(UnmanagedType.LPTStr)] string charSpacing, [MarshalAs(UnmanagedType.LPTStr)] string wordSpacing, [MarshalAs(UnmanagedType.LPTStr)] string strokeWidth, uint Flags);
         public delegate int DTWAIN_AddPDFTextStringADelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPStr)] string fontName, [MarshalAs(UnmanagedType.LPStr)] string fontSize, int colorRGB, int renderMode, [MarshalAs(UnmanagedType.LPStr)] string scaling, [MarshalAs(UnmanagedType.LPStr)] string charSpacing, [MarshalAs(UnmanagedType.LPStr)] string wordSpacing, [MarshalAs(UnmanagedType.LPStr)] string strokeWidth, uint Flags);
         public delegate int DTWAIN_AddPDFTextStringWDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPWStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPWStr)] string fontName, [MarshalAs(UnmanagedType.LPWStr)] string fontSize, int colorRGB, int renderMode, [MarshalAs(UnmanagedType.LPWStr)] string scaling, [MarshalAs(UnmanagedType.LPWStr)] string charSpacing, [MarshalAs(UnmanagedType.LPWStr)] string wordSpacing, [MarshalAs(UnmanagedType.LPWStr)] string strokeWidth, uint Flags);
@@ -2056,7 +2056,7 @@
         public delegate int DTWAIN_CheckHandlesDelegate(int bCheck);
         public delegate int DTWAIN_ClearBuffersDelegate(DTWAIN_SOURCE Source, int ClearBuffer);
         public delegate int DTWAIN_ClearErrorBufferDelegate();
-        public delegate int DTWAIN_ClearPDFTextDelegate(DTWAIN_SOURCE Source);
+        public delegate int DTWAIN_ClearPDFTextElementsDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_ClearPageDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_CloseSourceDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_CloseSourceUIDelegate(DTWAIN_SOURCE Source);
@@ -2731,6 +2731,7 @@
         public delegate int DTWAIN_RangeSetValueFloatStringADelegate(DTWAIN_RANGE pArray, int nWhich, [MarshalAs(UnmanagedType.LPStr)] string dValue);
         public delegate int DTWAIN_RangeSetValueFloatStringWDelegate(DTWAIN_RANGE pArray, int nWhich, [MarshalAs(UnmanagedType.LPWStr)] string dValue);
         public delegate int DTWAIN_RangeSetValueLongDelegate(DTWAIN_RANGE pArray, int nWhich, int Val);
+        public delegate int DTWAIN_RemovePDFTextElementDelegate(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement);
         public delegate int DTWAIN_ResetPDFTextElementDelegate(DTWAIN_PDFTEXTELEMENT TextElement);
         public delegate int DTWAIN_RewindPageDelegate(DTWAIN_SOURCE Source);
         public delegate DTWAIN_OCRENGINE DTWAIN_SelectDefaultOCREngineDelegate();
@@ -3526,8 +3527,8 @@
         [DTWAINNativeFunction("DTWAIN_ClearErrorBuffer")]
         private readonly DTWAIN_ClearErrorBufferDelegate  _DTWAIN_ClearErrorBuffer;
 
-        [DTWAINNativeFunction("DTWAIN_ClearPDFText")]
-        private readonly DTWAIN_ClearPDFTextDelegate  _DTWAIN_ClearPDFText;
+        [DTWAINNativeFunction("DTWAIN_ClearPDFTextElements")]
+        private readonly DTWAIN_ClearPDFTextElementsDelegate  _DTWAIN_ClearPDFTextElements;
 
         [DTWAINNativeFunction("DTWAIN_ClearPage")]
         private readonly DTWAIN_ClearPageDelegate  _DTWAIN_ClearPage;
@@ -5551,6 +5552,9 @@
         [DTWAINNativeFunction("DTWAIN_RangeSetValueLong")]
         private readonly DTWAIN_RangeSetValueLongDelegate  _DTWAIN_RangeSetValueLong;
 
+        [DTWAINNativeFunction("DTWAIN_RemovePDFTextElement")]
+        private readonly DTWAIN_RemovePDFTextElementDelegate  _DTWAIN_RemovePDFTextElement;
+
         [DTWAINNativeFunction("DTWAIN_ResetPDFTextElement")]
         private readonly DTWAIN_ResetPDFTextElementDelegate  _DTWAIN_ResetPDFTextElement;
 
@@ -6450,8 +6454,8 @@
         public  int DTWAIN_AddPDFTextA(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPStr)] string fontName, DTWAIN_FLOAT fontSize, int colorRGB, int renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, uint Flags)
         => _DTWAIN_AddPDFTextA(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
 
-        public  int DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement, uint Flags)
-        => _DTWAIN_AddPDFTextElement(Source, TextElement, Flags);
+        public  int DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement)
+        => _DTWAIN_AddPDFTextElement(Source, TextElement);
 
         public  int DTWAIN_AddPDFTextString(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPTStr)] string fontName, [MarshalAs(UnmanagedType.LPTStr)] string fontSize, int colorRGB, int renderMode, [MarshalAs(UnmanagedType.LPTStr)] string scaling, [MarshalAs(UnmanagedType.LPTStr)] string charSpacing, [MarshalAs(UnmanagedType.LPTStr)] string wordSpacing, [MarshalAs(UnmanagedType.LPTStr)] string strokeWidth, uint Flags)
         => _DTWAIN_AddPDFTextString(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
@@ -6891,8 +6895,8 @@
         public  int DTWAIN_ClearErrorBuffer()
         => _DTWAIN_ClearErrorBuffer();
 
-        public  int DTWAIN_ClearPDFText(DTWAIN_SOURCE Source)
-        => _DTWAIN_ClearPDFText(Source);
+        public  int DTWAIN_ClearPDFTextElements(DTWAIN_SOURCE Source)
+        => _DTWAIN_ClearPDFTextElements(Source);
 
         public  int DTWAIN_ClearPage(DTWAIN_SOURCE Source)
         => _DTWAIN_ClearPage(Source);
@@ -8915,6 +8919,9 @@
 
         public  int DTWAIN_RangeSetValueLong(DTWAIN_RANGE pArray, int nWhich, int Val)
         => _DTWAIN_RangeSetValueLong(pArray, nWhich, Val);
+
+        public  int DTWAIN_RemovePDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement)
+        => _DTWAIN_RemovePDFTextElement(Source, TextElement);
 
         public  int DTWAIN_ResetPDFTextElement(DTWAIN_PDFTEXTELEMENT TextElement)
         => _DTWAIN_ResetPDFTextElement(TextElement);

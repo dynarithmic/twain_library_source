@@ -302,7 +302,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_CheckHandles
    attr_reader :DTWAIN_ClearBuffers
    attr_reader :DTWAIN_ClearErrorBuffer
-   attr_reader :DTWAIN_ClearPDFText
+   attr_reader :DTWAIN_ClearPDFTextElements
    attr_reader :DTWAIN_ClearPage
    attr_reader :DTWAIN_CloseSource
    attr_reader :DTWAIN_CloseSourceUI
@@ -975,6 +975,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_RangeSetValueFloatStringA
    attr_reader :DTWAIN_RangeSetValueFloatStringW
    attr_reader :DTWAIN_RangeSetValueLong
+   attr_reader :DTWAIN_RemovePDFTextElement
    attr_reader :DTWAIN_ResetPDFTextElement
    attr_reader :DTWAIN_RewindPage
    attr_reader :DTWAIN_SelectDefaultOCREngine
@@ -2942,7 +2943,7 @@ class DTWAINAPI
        @DTWAIN_AddExtImageInfoQuery = Fiddle::Function::new(dtwain_dll['DTWAIN_AddExtImageInfoQuery'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
        @DTWAIN_AddPDFText = Fiddle::Function::new(dtwain_dll['DTWAIN_AddPDFText'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_DOUBLE, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_DOUBLE, Fiddle::TYPE_DOUBLE, Fiddle::TYPE_DOUBLE, Fiddle::TYPE_DOUBLE, Fiddle::TYPE_UINT],Fiddle::TYPE_INT)
        @DTWAIN_AddPDFTextA = Fiddle::Function::new(dtwain_dll['DTWAIN_AddPDFTextA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_DOUBLE, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_DOUBLE, Fiddle::TYPE_DOUBLE, Fiddle::TYPE_DOUBLE, Fiddle::TYPE_DOUBLE, Fiddle::TYPE_UINT],Fiddle::TYPE_INT)
-       @DTWAIN_AddPDFTextElement = Fiddle::Function::new(dtwain_dll['DTWAIN_AddPDFTextElement'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_UINT],Fiddle::TYPE_INT)
+       @DTWAIN_AddPDFTextElement = Fiddle::Function::new(dtwain_dll['DTWAIN_AddPDFTextElement'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_AddPDFTextString = Fiddle::Function::new(dtwain_dll['DTWAIN_AddPDFTextString'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_UINT],Fiddle::TYPE_INT)
        @DTWAIN_AddPDFTextStringA = Fiddle::Function::new(dtwain_dll['DTWAIN_AddPDFTextStringA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_UINT],Fiddle::TYPE_INT)
        @DTWAIN_AddPDFTextStringW = Fiddle::Function::new(dtwain_dll['DTWAIN_AddPDFTextStringW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_UINT],Fiddle::TYPE_INT)
@@ -3092,7 +3093,7 @@ class DTWAINAPI
        @DTWAIN_CheckHandles = Fiddle::Function::new(dtwain_dll['DTWAIN_CheckHandles'],[Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_ClearBuffers = Fiddle::Function::new(dtwain_dll['DTWAIN_ClearBuffers'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
        @DTWAIN_ClearErrorBuffer = Fiddle::Function::new(dtwain_dll['DTWAIN_ClearErrorBuffer'],[],Fiddle::TYPE_INT)
-       @DTWAIN_ClearPDFText = Fiddle::Function::new(dtwain_dll['DTWAIN_ClearPDFText'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_ClearPDFTextElements = Fiddle::Function::new(dtwain_dll['DTWAIN_ClearPDFTextElements'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ClearPage = Fiddle::Function::new(dtwain_dll['DTWAIN_ClearPage'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_CloseSource = Fiddle::Function::new(dtwain_dll['DTWAIN_CloseSource'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_CloseSourceUI = Fiddle::Function::new(dtwain_dll['DTWAIN_CloseSourceUI'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
@@ -3765,6 +3766,7 @@ class DTWAINAPI
        @DTWAIN_RangeSetValueFloatStringA = Fiddle::Function::new(dtwain_dll['DTWAIN_RangeSetValueFloatStringA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_RangeSetValueFloatStringW = Fiddle::Function::new(dtwain_dll['DTWAIN_RangeSetValueFloatStringW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_RangeSetValueLong = Fiddle::Function::new(dtwain_dll['DTWAIN_RangeSetValueLong'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
+       @DTWAIN_RemovePDFTextElement = Fiddle::Function::new(dtwain_dll['DTWAIN_RemovePDFTextElement'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ResetPDFTextElement = Fiddle::Function::new(dtwain_dll['DTWAIN_ResetPDFTextElement'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_RewindPage = Fiddle::Function::new(dtwain_dll['DTWAIN_RewindPage'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_SelectDefaultOCREngine = Fiddle::Function::new(dtwain_dll['DTWAIN_SelectDefaultOCREngine'],[],Fiddle::TYPE_VOIDP)

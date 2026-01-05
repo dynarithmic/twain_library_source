@@ -1751,7 +1751,7 @@ Class DTWAINAPI
     Public Declare Unicode Function DTWAIN_AddFileToAppendW Lib "dtwain64.dll" (szFile As String) As Integer
     Public Declare Ansi Function DTWAIN_AddPDFText Lib "dtwain64.dll" (Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As System.Double, colorRGB As Integer, renderMode As Integer, scaling As System.Double, charSpacing As System.Double, wordSpacing As System.Double, strokeWidth As System.Double, Flags As UInteger) As Integer
     Public Declare Ansi Function DTWAIN_AddPDFTextA Lib "dtwain64.dll" (Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As System.Double, colorRGB As Integer, renderMode As Integer, scaling As System.Double, charSpacing As System.Double, wordSpacing As System.Double, strokeWidth As System.Double, Flags As UInteger) As Integer
-    Public Declare Auto Function DTWAIN_AddPDFTextElement Lib "dtwain64.dll" (Source As System.IntPtr, TextElement As System.IntPtr, Flags As UInteger) As Integer
+    Public Declare Auto Function DTWAIN_AddPDFTextElement Lib "dtwain64.dll" (Source As System.IntPtr, TextElement As System.IntPtr) As Integer
     Public Declare Ansi Function DTWAIN_AddPDFTextString Lib "dtwain64.dll" (Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As String, colorRGB As Integer, renderMode As Integer, scaling As String, charSpacing As String, wordSpacing As String, strokeWidth As String, Flags As UInteger) As Integer
     Public Declare Ansi Function DTWAIN_AddPDFTextStringA Lib "dtwain64.dll" (Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As String, colorRGB As Integer, renderMode As Integer, scaling As String, charSpacing As String, wordSpacing As String, strokeWidth As String, Flags As UInteger) As Integer
     Public Declare Unicode Function DTWAIN_AddPDFTextStringW Lib "dtwain64.dll" (Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As String, colorRGB As Integer, renderMode As Integer, scaling As String, charSpacing As String, wordSpacing As String, strokeWidth As String, Flags As UInteger) As Integer
@@ -1898,7 +1898,7 @@ Class DTWAINAPI
     Public Declare Auto Function DTWAIN_CheckHandles Lib "dtwain64.dll" (bCheck As Integer) As Integer
     Public Declare Auto Function DTWAIN_ClearBuffers Lib "dtwain64.dll" (Source As System.IntPtr, ClearBuffer As Integer) As Integer
     Public Declare Auto Function DTWAIN_ClearErrorBuffer Lib "dtwain64.dll" () As Integer
-    Public Declare Auto Function DTWAIN_ClearPDFText Lib "dtwain64.dll" (Source As System.IntPtr) As Integer
+    Public Declare Auto Function DTWAIN_ClearPDFTextElements Lib "dtwain64.dll" (Source As System.IntPtr) As Integer
     Public Declare Auto Function DTWAIN_ClearPage Lib "dtwain64.dll" (Source As System.IntPtr) As Integer
     Public Declare Auto Function DTWAIN_CloseSource Lib "dtwain64.dll" (Source As System.IntPtr) As Integer
     Public Declare Auto Function DTWAIN_CloseSourceUI Lib "dtwain64.dll" (Source As System.IntPtr) As Integer
@@ -2571,6 +2571,7 @@ Class DTWAINAPI
     Public Declare Ansi Function DTWAIN_RangeSetValueFloatStringA Lib "dtwain64.dll" (pArray As System.IntPtr, nWhich As Integer, dValue As String) As Integer
     Public Declare Unicode Function DTWAIN_RangeSetValueFloatStringW Lib "dtwain64.dll" (pArray As System.IntPtr, nWhich As Integer, dValue As String) As Integer
     Public Declare Auto Function DTWAIN_RangeSetValueLong Lib "dtwain64.dll" (pArray As System.IntPtr, nWhich As Integer, Val As Integer) As Integer
+    Public Declare Auto Function DTWAIN_RemovePDFTextElement Lib "dtwain64.dll" (Source As System.IntPtr, TextElement As System.IntPtr) As Integer
     Public Declare Auto Function DTWAIN_ResetPDFTextElement Lib "dtwain64.dll" (TextElement As System.IntPtr) As Integer
     Public Declare Auto Function DTWAIN_RewindPage Lib "dtwain64.dll" (Source As System.IntPtr) As Integer
     Public Declare Auto Function DTWAIN_SelectDefaultOCREngine Lib "dtwain64.dll" () As System.IntPtr

@@ -1914,7 +1914,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_CheckHandles.restype = ct.c_long
      theDLL.DTWAIN_ClearBuffers.restype = ct.c_long
      theDLL.DTWAIN_ClearErrorBuffer.restype = ct.c_long
-     theDLL.DTWAIN_ClearPDFText.restype = ct.c_long
+     theDLL.DTWAIN_ClearPDFTextElements.restype = ct.c_long
      theDLL.DTWAIN_ClearPage.restype = ct.c_long
      theDLL.DTWAIN_CloseSource.restype = ct.c_long
      theDLL.DTWAIN_CloseSourceUI.restype = ct.c_long
@@ -2587,6 +2587,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_RangeSetValueFloatStringA.restype = ct.c_long
      theDLL.DTWAIN_RangeSetValueFloatStringW.restype = ct.c_long
      theDLL.DTWAIN_RangeSetValueLong.restype = ct.c_long
+     theDLL.DTWAIN_RemovePDFTextElement.restype = ct.c_long
      theDLL.DTWAIN_ResetPDFTextElement.restype = ct.c_long
      theDLL.DTWAIN_RewindPage.restype = ct.c_long
      theDLL.DTWAIN_SelectDefaultOCREngine.restype = ct.c_void_p
@@ -2886,7 +2887,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_AddExtImageInfoQuery.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_AddPDFText.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_ulong]
      theDLL.DTWAIN_AddPDFTextA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_ulong]
-     theDLL.DTWAIN_AddPDFTextElement.argtypes = [ct.c_void_p, ct.c_void_p, ct.c_ulong]
+     theDLL.DTWAIN_AddPDFTextElement.argtypes = [ct.c_void_p, ct.c_void_p]
      theDLL.DTWAIN_AddPDFTextString.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_ulong]
      theDLL.DTWAIN_AddPDFTextStringA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_ulong]
      theDLL.DTWAIN_AddPDFTextStringW.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_ulong]
@@ -3034,7 +3035,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_CallDSMProc.argtypes = [ct.c_void_p, ct.c_void_p, ct.c_long, ct.c_long, ct.c_long, ct.c_void_p]
      theDLL.DTWAIN_CheckHandles.argtypes = [ct.c_long]
      theDLL.DTWAIN_ClearBuffers.argtypes = [ct.c_void_p, ct.c_long]
-     theDLL.DTWAIN_ClearPDFText.argtypes = [ct.c_void_p]
+     theDLL.DTWAIN_ClearPDFTextElements.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_ClearPage.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_CloseSource.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_CloseSourceUI.argtypes = [ct.c_void_p]
@@ -3668,6 +3669,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_RangeSetValueFloatStringA.argtypes = [ct.c_void_p, ct.c_long, ct.c_char_p]
      theDLL.DTWAIN_RangeSetValueFloatStringW.argtypes = [ct.c_void_p, ct.c_long, ct.c_wchar_p]
      theDLL.DTWAIN_RangeSetValueLong.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
+     theDLL.DTWAIN_RemovePDFTextElement.argtypes = [ct.c_void_p, ct.c_void_p]
      theDLL.DTWAIN_ResetPDFTextElement.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_RewindPage.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_SelectDefaultSourceWithOpen.argtypes = [ct.c_long]
@@ -4124,7 +4126,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_CheckHandles.restype = ct.c_long
      theDLL.DTWAIN_ClearBuffers.restype = ct.c_long
      theDLL.DTWAIN_ClearErrorBuffer.restype = ct.c_long
-     theDLL.DTWAIN_ClearPDFText.restype = ct.c_long
+     theDLL.DTWAIN_ClearPDFTextElements.restype = ct.c_long
      theDLL.DTWAIN_ClearPage.restype = ct.c_long
      theDLL.DTWAIN_CloseSource.restype = ct.c_long
      theDLL.DTWAIN_CloseSourceUI.restype = ct.c_long
@@ -4797,6 +4799,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_RangeSetValueFloatStringA.restype = ct.c_long
      theDLL.DTWAIN_RangeSetValueFloatStringW.restype = ct.c_long
      theDLL.DTWAIN_RangeSetValueLong.restype = ct.c_long
+     theDLL.DTWAIN_RemovePDFTextElement.restype = ct.c_long
      theDLL.DTWAIN_ResetPDFTextElement.restype = ct.c_long
      theDLL.DTWAIN_RewindPage.restype = ct.c_long
      theDLL.DTWAIN_SelectDefaultOCREngine.restype = ct.c_void_p
@@ -5096,7 +5099,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_AddExtImageInfoQuery.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_AddPDFText.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_ulong]
      theDLL.DTWAIN_AddPDFTextA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_ulong]
-     theDLL.DTWAIN_AddPDFTextElement.argtypes = [ct.c_void_p, ct.c_void_p, ct.c_ulong]
+     theDLL.DTWAIN_AddPDFTextElement.argtypes = [ct.c_void_p, ct.c_void_p]
      theDLL.DTWAIN_AddPDFTextString.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_ulong]
      theDLL.DTWAIN_AddPDFTextStringA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_ulong]
      theDLL.DTWAIN_AddPDFTextStringW.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_ulong]
@@ -5244,7 +5247,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_CallDSMProc.argtypes = [ct.c_void_p, ct.c_void_p, ct.c_long, ct.c_long, ct.c_long, ct.c_void_p]
      theDLL.DTWAIN_CheckHandles.argtypes = [ct.c_long]
      theDLL.DTWAIN_ClearBuffers.argtypes = [ct.c_void_p, ct.c_long]
-     theDLL.DTWAIN_ClearPDFText.argtypes = [ct.c_void_p]
+     theDLL.DTWAIN_ClearPDFTextElements.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_ClearPage.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_CloseSource.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_CloseSourceUI.argtypes = [ct.c_void_p]
@@ -5878,6 +5881,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_RangeSetValueFloatStringA.argtypes = [ct.c_void_p, ct.c_long, ct.c_char_p]
      theDLL.DTWAIN_RangeSetValueFloatStringW.argtypes = [ct.c_void_p, ct.c_long, ct.c_wchar_p]
      theDLL.DTWAIN_RangeSetValueLong.argtypes = [ct.c_void_p, ct.c_long, ct.c_long]
+     theDLL.DTWAIN_RemovePDFTextElement.argtypes = [ct.c_void_p, ct.c_void_p]
      theDLL.DTWAIN_ResetPDFTextElement.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_RewindPage.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_SelectDefaultSourceWithOpen.argtypes = [ct.c_long]
