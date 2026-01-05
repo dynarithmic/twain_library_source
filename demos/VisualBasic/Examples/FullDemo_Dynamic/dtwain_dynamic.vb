@@ -1748,6 +1748,9 @@ Namespace Dynarithmic
         Public Const DTWAIN_PDFTEXT_NORGBCOLOR As UInteger = &H02000000UI
         Public Const DTWAIN_PDFTEXT_NOFONTSIZE As UInteger = &H04000000UI
         Public Const DTWAIN_PDFTEXT_NOABSPOSITION As UInteger = &H08000000UI
+        Public Const DTWAIN_PDFTEXT_NOROTATION As UInteger = &H10000000UI
+        Public Const DTWAIN_PDFTEXT_NOSKEWING As UInteger = &H20000000UI
+        Public Const DTWAIN_PDFTEXT_NOSCALINGXY As UInteger = &H40000000UI
         Public Const DTWAIN_PDFTEXT_IGNOREALL As UInteger = &HFFF00000UI
         Public Const DTWAIN_FONT_COURIER As Integer = 0
         Public Const DTWAIN_FONT_COURIERBOLD As Integer = 1
@@ -1784,31 +1787,13 @@ Namespace Dynarithmic
         Public Const DTWAIN_PDFTEXTELEMENT_TEXTLENGTH As Integer = 14
         Public Const DTWAIN_PDFTEXTELEMENT_SKEWANGLES As Integer = 15
         Public Const DTWAIN_PDFTEXTELEMENT_TRANSFORMORDER As Integer = 16
-        Public Const DTWAIN_PDFTEXTTRANSFORM_TSRK As Integer = 0
-        Public Const DTWAIN_PDFTEXTTRANSFORM_TSKR As Integer = 1
-        Public Const DTWAIN_PDFTEXTTRANSFORM_TKSR As Integer = 2
-        Public Const DTWAIN_PDFTEXTTRANSFORM_TKRS As Integer = 3
-        Public Const DTWAIN_PDFTEXTTRANSFORM_TRSK As Integer = 4
-        Public Const DTWAIN_PDFTEXTTRANSFORM_TRKS As Integer = 5
-        Public Const DTWAIN_PDFTEXTTRANSFORM_STRK As Integer = 6
-        Public Const DTWAIN_PDFTEXTTRANSFORM_STKR As Integer = 7
-        Public Const DTWAIN_PDFTEXTTRANSFORM_SKTR As Integer = 8
-        Public Const DTWAIN_PDFTEXTTRANSFORM_SKRT As Integer = 9
-        Public Const DTWAIN_PDFTEXTTRANSFORM_SRTK As Integer = 10
-        Public Const DTWAIN_PDFTEXTTRANSFORM_SRKT As Integer = 11
-        Public Const DTWAIN_PDFTEXTTRANSFORM_RSTK As Integer = 12
-        Public Const DTWAIN_PDFTEXTTRANSFORM_RSKT As Integer = 13
-        Public Const DTWAIN_PDFTEXTTRANSFORM_RTSK As Integer = 14
-        Public Const DTWAIN_PDFTEXTTRANSFORM_RTKT As Integer = 15
-        Public Const DTWAIN_PDFTEXTTRANSFORM_RKST As Integer = 16
-        Public Const DTWAIN_PDFTEXTTRANSFORM_RKTS As Integer = 17
-        Public Const DTWAIN_PDFTEXTTRANSFORM_KSTR As Integer = 18
-        Public Const DTWAIN_PDFTEXTTRANSFORM_KSRT As Integer = 19
-        Public Const DTWAIN_PDFTEXTTRANSFORM_KRST As Integer = 20
-        Public Const DTWAIN_PDFTEXTTRANSFORM_KRTS As Integer = 21
-        Public Const DTWAIN_PDFTEXTTRANSFORM_KTSR As Integer = 22
-        Public Const DTWAIN_PDFTEXTTRANSFORM_KTRS As Integer = 23
-        Public Const DTWAIN_PDFTEXTTRANFORM_LAST As Integer = DTWAIN_PDFTEXTTRANSFORM_KTRS
+        Public Const DTWAIN_PDFTEXTTRANSFORM_SRK As Integer = 0
+        Public Const DTWAIN_PDFTEXTTRANSFORM_SKR As Integer = 1
+        Public Const DTWAIN_PDFTEXTTRANSFORM_KSR As Integer = 2
+        Public Const DTWAIN_PDFTEXTTRANSFORM_KRS As Integer = 3
+        Public Const DTWAIN_PDFTEXTTRANSFORM_RSK As Integer = 4
+        Public Const DTWAIN_PDFTEXTTRANSFORM_RKS As Integer = 5
+        Public Const DTWAIN_PDFTEXTTRANFORM_LAST As Integer = DTWAIN_PDFTEXTTRANSFORM_RKS
         Public Const DTWAIN_TWDF_ULTRASONIC As Integer = 0
         Public Const DTWAIN_TWDF_BYLENGTH As Integer = 1
         Public Const DTWAIN_TWDF_INFRARED As Integer = 2
@@ -1973,16 +1958,25 @@ Namespace Dynarithmic
         Public Delegate Function DTWAIN_AddFileToAppendWDelegate(szFile As String) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
-        Public Delegate Function DTWAIN_AddPDFTextDelegate(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As System.Double, colorRGB As Integer, renderMode As Integer, scaling As System.Double, charSpacing As System.Double, wordSpacing As System.Double, strokeWidth As Integer, Flags As UInteger) As Integer
+        Public Delegate Function DTWAIN_AddPDFTextDelegate(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As System.Double, colorRGB As Integer, renderMode As Integer, scaling As System.Double, charSpacing As System.Double, wordSpacing As System.Double, strokeWidth As System.Double, Flags As UInteger) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Ansi)>
-        Public Delegate Function DTWAIN_AddPDFTextADelegate(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As System.Double, colorRGB As Integer, renderMode As Integer, scaling As System.Double, charSpacing As System.Double, wordSpacing As System.Double, strokeWidth As Integer, Flags As UInteger) As Integer
+        Public Delegate Function DTWAIN_AddPDFTextADelegate(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As System.Double, colorRGB As Integer, renderMode As Integer, scaling As System.Double, charSpacing As System.Double, wordSpacing As System.Double, strokeWidth As System.Double, Flags As UInteger) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
-        Public Delegate Function DTWAIN_AddPDFTextExDelegate(Source As System.IntPtr, TextElement As System.IntPtr, Flags As UInteger) As Integer
+        Public Delegate Function DTWAIN_AddPDFTextElementDelegate(Source As System.IntPtr, TextElement As System.IntPtr, Flags As UInteger) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
+        Public Delegate Function DTWAIN_AddPDFTextStringDelegate(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As String, colorRGB As Integer, renderMode As Integer, scaling As String, charSpacing As String, wordSpacing As String, strokeWidth As String, Flags As UInteger) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Ansi)>
+        Public Delegate Function DTWAIN_AddPDFTextStringADelegate(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As String, colorRGB As Integer, renderMode As Integer, scaling As String, charSpacing As String, wordSpacing As String, strokeWidth As String, Flags As UInteger) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
-        Public Delegate Function DTWAIN_AddPDFTextWDelegate(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As System.Double, colorRGB As Integer, renderMode As Integer, scaling As System.Double, charSpacing As System.Double, wordSpacing As System.Double, strokeWidth As Integer, Flags As UInteger) As Integer
+        Public Delegate Function DTWAIN_AddPDFTextStringWDelegate(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As String, colorRGB As Integer, renderMode As Integer, scaling As String, charSpacing As String, wordSpacing As String, strokeWidth As String, Flags As UInteger) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
+        Public Delegate Function DTWAIN_AddPDFTextWDelegate(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As System.Double, colorRGB As Integer, renderMode As Integer, scaling As System.Double, charSpacing As System.Double, wordSpacing As System.Double, strokeWidth As System.Double, Flags As UInteger) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
         Public Delegate Function DTWAIN_AllocateMemoryDelegate(memSize As UInteger) As System.IntPtr
@@ -2450,7 +2444,10 @@ Namespace Dynarithmic
         Public Delegate Function DTWAIN_CreateAcquisitionArrayDelegate() As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
-        Public Delegate Function DTWAIN_CreatePDFTextElementDelegate(Source As System.IntPtr) As System.IntPtr
+        Public Delegate Function DTWAIN_CreatePDFTextElementDelegate() As System.IntPtr
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
+        Public Delegate Function DTWAIN_CreatePDFTextElementCopyDelegate(TextElement As System.IntPtr) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
         Public Delegate Function DTWAIN_DeleteDIBDelegate(hDib As System.IntPtr) As Integer
@@ -3369,6 +3366,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
         Public Delegate Function DTWAIN_GetLightSourcesDelegate(Source As System.IntPtr, ByRef LightSources As System.IntPtr) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
+        Public Delegate Function DTWAIN_GetLightSourcesExDelegate(Source As System.IntPtr) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
         Public Delegate Function DTWAIN_GetLoggerCallbackDelegate() As DTwainLoggerProc
@@ -4334,6 +4334,21 @@ Namespace Dynarithmic
         Public Delegate Function DTWAIN_RangeGetNearestValueDelegate(pArray As System.IntPtr, pVariantIn As System.IntPtr, pVariantOut As System.IntPtr, RoundType As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
+        Public Delegate Function DTWAIN_RangeGetNearestValueFloatDelegate(pArray As System.IntPtr, dIn As System.Double, ByRef pOut As System.Double, RoundType As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
+        Public Delegate Function DTWAIN_RangeGetNearestValueFloatStringDelegate(pArray As System.IntPtr, dIn As String, <MarshalAs(UnmanagedType.LPTStr)> pOut As StringBuilder, RoundType As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Ansi)>
+        Public Delegate Function DTWAIN_RangeGetNearestValueFloatStringADelegate(pArray As System.IntPtr, dIn As String, <MarshalAs(UnmanagedType.LPStr)> dOut As StringBuilder, RoundType As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
+        Public Delegate Function DTWAIN_RangeGetNearestValueFloatStringWDelegate(pArray As System.IntPtr, dIn As String, <MarshalAs(UnmanagedType.LPWStr)> dOut As StringBuilder, RoundType As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
+        Public Delegate Function DTWAIN_RangeGetNearestValueLongDelegate(pArray As System.IntPtr, lIn As Integer, ByRef pOut As Integer, RoundType As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
         Public Delegate Function DTWAIN_RangeGetPosDelegate(pArray As System.IntPtr, pVariant As System.IntPtr, ByRef pPos As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
@@ -4371,21 +4386,6 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
         Public Delegate Function DTWAIN_RangeIsValidDelegate(Range As System.IntPtr, ByRef pStatus As Integer) As Integer
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
-        Public Delegate Function DTWAIN_RangeNearestValueFloatDelegate(pArray As System.IntPtr, dIn As System.Double, ByRef pOut As System.Double, RoundType As Integer) As Integer
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
-        Public Delegate Function DTWAIN_RangeNearestValueFloatStringDelegate(pArray As System.IntPtr, dIn As String, <MarshalAs(UnmanagedType.LPTStr)> pOut As StringBuilder, RoundType As Integer) As Integer
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Ansi)>
-        Public Delegate Function DTWAIN_RangeNearestValueFloatStringADelegate(pArray As System.IntPtr, dIn As String, <MarshalAs(UnmanagedType.LPStr)> dOut As StringBuilder, RoundType As Integer) As Integer
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
-        Public Delegate Function DTWAIN_RangeNearestValueFloatStringWDelegate(pArray As System.IntPtr, dIn As String, <MarshalAs(UnmanagedType.LPWStr)> dOut As StringBuilder, RoundType As Integer) As Integer
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
-        Public Delegate Function DTWAIN_RangeNearestValueLongDelegate(pArray As System.IntPtr, lIn As Integer, ByRef pOut As Integer, RoundType As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
         Public Delegate Function DTWAIN_RangeSetAllDelegate(pArray As System.IntPtr, pVariantLow As System.IntPtr, pVariantUp As System.IntPtr, pVariantStep As System.IntPtr, pVariantDefault As System.IntPtr, pVariantCurrent As System.IntPtr) As Integer
@@ -4952,6 +4952,15 @@ Namespace Dynarithmic
         Public Delegate Function DTWAIN_SetPDFTextElementFloatDelegate(TextElement As System.IntPtr, val1 As System.Double, val2 As System.Double, Flags As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
+        Public Delegate Function DTWAIN_SetPDFTextElementFloatStringDelegate(TextElement As System.IntPtr, val1 As String, val2 As String, Flags As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Ansi)>
+        Public Delegate Function DTWAIN_SetPDFTextElementFloatStringADelegate(TextElement As System.IntPtr, val1 As String, val2 As String, Flags As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
+        Public Delegate Function DTWAIN_SetPDFTextElementFloatStringWDelegate(TextElement As System.IntPtr, val1 As String, val2 As String, Flags As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
         Public Delegate Function DTWAIN_SetPDFTextElementLongDelegate(TextElement As System.IntPtr, val1 As Integer, val2 As Integer, Flags As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
@@ -5325,19 +5334,31 @@ Namespace Dynarithmic
         Return api.DTWAIN_AddFileToAppendW(szFile)
         End Function
         
-        Public Function DTWAIN_AddPDFText(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As System.Double, colorRGB As Integer, renderMode As Integer, scaling As System.Double, charSpacing As System.Double, wordSpacing As System.Double, strokeWidth As Integer, Flags As UInteger) As Integer
+        Public Function DTWAIN_AddPDFText(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As System.Double, colorRGB As Integer, renderMode As Integer, scaling As System.Double, charSpacing As System.Double, wordSpacing As System.Double, strokeWidth As System.Double, Flags As UInteger) As Integer
         Return api.DTWAIN_AddPDFText(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags)
         End Function
         
-        Public Function DTWAIN_AddPDFTextA(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As System.Double, colorRGB As Integer, renderMode As Integer, scaling As System.Double, charSpacing As System.Double, wordSpacing As System.Double, strokeWidth As Integer, Flags As UInteger) As Integer
+        Public Function DTWAIN_AddPDFTextA(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As System.Double, colorRGB As Integer, renderMode As Integer, scaling As System.Double, charSpacing As System.Double, wordSpacing As System.Double, strokeWidth As System.Double, Flags As UInteger) As Integer
         Return api.DTWAIN_AddPDFTextA(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags)
         End Function
         
-        Public Function DTWAIN_AddPDFTextEx(Source As System.IntPtr, TextElement As System.IntPtr, Flags As UInteger) As Integer
-        Return api.DTWAIN_AddPDFTextEx(Source, TextElement, Flags)
+        Public Function DTWAIN_AddPDFTextElement(Source As System.IntPtr, TextElement As System.IntPtr, Flags As UInteger) As Integer
+        Return api.DTWAIN_AddPDFTextElement(Source, TextElement, Flags)
         End Function
         
-        Public Function DTWAIN_AddPDFTextW(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As System.Double, colorRGB As Integer, renderMode As Integer, scaling As System.Double, charSpacing As System.Double, wordSpacing As System.Double, strokeWidth As Integer, Flags As UInteger) As Integer
+        Public Function DTWAIN_AddPDFTextString(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As String, colorRGB As Integer, renderMode As Integer, scaling As String, charSpacing As String, wordSpacing As String, strokeWidth As String, Flags As UInteger) As Integer
+        Return api.DTWAIN_AddPDFTextString(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags)
+        End Function
+        
+        Public Function DTWAIN_AddPDFTextStringA(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As String, colorRGB As Integer, renderMode As Integer, scaling As String, charSpacing As String, wordSpacing As String, strokeWidth As String, Flags As UInteger) As Integer
+        Return api.DTWAIN_AddPDFTextStringA(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags)
+        End Function
+        
+        Public Function DTWAIN_AddPDFTextStringW(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As String, colorRGB As Integer, renderMode As Integer, scaling As String, charSpacing As String, wordSpacing As String, strokeWidth As String, Flags As UInteger) As Integer
+        Return api.DTWAIN_AddPDFTextStringW(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags)
+        End Function
+        
+        Public Function DTWAIN_AddPDFTextW(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As System.Double, colorRGB As Integer, renderMode As Integer, scaling As System.Double, charSpacing As System.Double, wordSpacing As System.Double, strokeWidth As System.Double, Flags As UInteger) As Integer
         Return api.DTWAIN_AddPDFTextW(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags)
         End Function
         
@@ -5961,8 +5982,12 @@ Namespace Dynarithmic
         Return api.DTWAIN_CreateAcquisitionArray()
         End Function
         
-        Public Function DTWAIN_CreatePDFTextElement(Source As System.IntPtr) As System.IntPtr
-        Return api.DTWAIN_CreatePDFTextElement(Source)
+        Public Function DTWAIN_CreatePDFTextElement() As System.IntPtr
+        Return api.DTWAIN_CreatePDFTextElement()
+        End Function
+        
+        Public Function DTWAIN_CreatePDFTextElementCopy(TextElement As System.IntPtr) As System.IntPtr
+        Return api.DTWAIN_CreatePDFTextElementCopy(TextElement)
         End Function
         
         Public Function DTWAIN_DeleteDIB(hDib As System.IntPtr) As Integer
@@ -7187,6 +7212,10 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_GetLightSources(Source As System.IntPtr, ByRef LightSources As System.IntPtr) As Integer
         Return api.DTWAIN_GetLightSources(Source, LightSources)
+        End Function
+        
+        Public Function DTWAIN_GetLightSourcesEx(Source As System.IntPtr) As System.IntPtr
+        Return api.DTWAIN_GetLightSourcesEx(Source)
         End Function
         
         Public Function DTWAIN_GetLoggerCallback() As DTwainLoggerProc
@@ -8473,6 +8502,26 @@ Namespace Dynarithmic
         Return api.DTWAIN_RangeGetNearestValue(pArray, pVariantIn, pVariantOut, RoundType)
         End Function
         
+        Public Function DTWAIN_RangeGetNearestValueFloat(pArray As System.IntPtr, dIn As System.Double, ByRef pOut As System.Double, RoundType As Integer) As Integer
+        Return api.DTWAIN_RangeGetNearestValueFloat(pArray, dIn, pOut, RoundType)
+        End Function
+        
+        Public Function DTWAIN_RangeGetNearestValueFloatString(pArray As System.IntPtr, dIn As String, <MarshalAs(UnmanagedType.LPTStr)> pOut As StringBuilder, RoundType As Integer) As Integer
+        Return api.DTWAIN_RangeGetNearestValueFloatString(pArray, dIn, pOut, RoundType)
+        End Function
+        
+        Public Function DTWAIN_RangeGetNearestValueFloatStringA(pArray As System.IntPtr, dIn As String, <MarshalAs(UnmanagedType.LPStr)> dOut As StringBuilder, RoundType As Integer) As Integer
+        Return api.DTWAIN_RangeGetNearestValueFloatStringA(pArray, dIn, dOut, RoundType)
+        End Function
+        
+        Public Function DTWAIN_RangeGetNearestValueFloatStringW(pArray As System.IntPtr, dIn As String, <MarshalAs(UnmanagedType.LPWStr)> dOut As StringBuilder, RoundType As Integer) As Integer
+        Return api.DTWAIN_RangeGetNearestValueFloatStringW(pArray, dIn, dOut, RoundType)
+        End Function
+        
+        Public Function DTWAIN_RangeGetNearestValueLong(pArray As System.IntPtr, lIn As Integer, ByRef pOut As Integer, RoundType As Integer) As Integer
+        Return api.DTWAIN_RangeGetNearestValueLong(pArray, lIn, pOut, RoundType)
+        End Function
+        
         Public Function DTWAIN_RangeGetPos(pArray As System.IntPtr, pVariant As System.IntPtr, ByRef pPos As Integer) As Integer
         Return api.DTWAIN_RangeGetPos(pArray, pVariant, pPos)
         End Function
@@ -8523,26 +8572,6 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_RangeIsValid(Range As System.IntPtr, ByRef pStatus As Integer) As Integer
         Return api.DTWAIN_RangeIsValid(Range, pStatus)
-        End Function
-        
-        Public Function DTWAIN_RangeNearestValueFloat(pArray As System.IntPtr, dIn As System.Double, ByRef pOut As System.Double, RoundType As Integer) As Integer
-        Return api.DTWAIN_RangeNearestValueFloat(pArray, dIn, pOut, RoundType)
-        End Function
-        
-        Public Function DTWAIN_RangeNearestValueFloatString(pArray As System.IntPtr, dIn As String, <MarshalAs(UnmanagedType.LPTStr)> pOut As StringBuilder, RoundType As Integer) As Integer
-        Return api.DTWAIN_RangeNearestValueFloatString(pArray, dIn, pOut, RoundType)
-        End Function
-        
-        Public Function DTWAIN_RangeNearestValueFloatStringA(pArray As System.IntPtr, dIn As String, <MarshalAs(UnmanagedType.LPStr)> dOut As StringBuilder, RoundType As Integer) As Integer
-        Return api.DTWAIN_RangeNearestValueFloatStringA(pArray, dIn, dOut, RoundType)
-        End Function
-        
-        Public Function DTWAIN_RangeNearestValueFloatStringW(pArray As System.IntPtr, dIn As String, <MarshalAs(UnmanagedType.LPWStr)> dOut As StringBuilder, RoundType As Integer) As Integer
-        Return api.DTWAIN_RangeNearestValueFloatStringW(pArray, dIn, dOut, RoundType)
-        End Function
-        
-        Public Function DTWAIN_RangeNearestValueLong(pArray As System.IntPtr, lIn As Integer, ByRef pOut As Integer, RoundType As Integer) As Integer
-        Return api.DTWAIN_RangeNearestValueLong(pArray, lIn, pOut, RoundType)
         End Function
         
         Public Function DTWAIN_RangeSetAll(pArray As System.IntPtr, pVariantLow As System.IntPtr, pVariantUp As System.IntPtr, pVariantStep As System.IntPtr, pVariantDefault As System.IntPtr, pVariantCurrent As System.IntPtr) As Integer
@@ -9297,6 +9326,18 @@ Namespace Dynarithmic
         Return api.DTWAIN_SetPDFTextElementFloat(TextElement, val1, val2, Flags)
         End Function
         
+        Public Function DTWAIN_SetPDFTextElementFloatString(TextElement As System.IntPtr, val1 As String, val2 As String, Flags As Integer) As Integer
+        Return api.DTWAIN_SetPDFTextElementFloatString(TextElement, val1, val2, Flags)
+        End Function
+        
+        Public Function DTWAIN_SetPDFTextElementFloatStringA(TextElement As System.IntPtr, val1 As String, val2 As String, Flags As Integer) As Integer
+        Return api.DTWAIN_SetPDFTextElementFloatStringA(TextElement, val1, val2, Flags)
+        End Function
+        
+        Public Function DTWAIN_SetPDFTextElementFloatStringW(TextElement As System.IntPtr, val1 As String, val2 As String, Flags As Integer) As Integer
+        Return api.DTWAIN_SetPDFTextElementFloatStringW(TextElement, val1, val2, Flags)
+        End Function
+        
         Public Function DTWAIN_SetPDFTextElementLong(TextElement As System.IntPtr, val1 As Integer, val2 As Integer, Flags As Integer) As Integer
         Return api.DTWAIN_SetPDFTextElementLong(TextElement, val1, val2, Flags)
         End Function
@@ -9721,7 +9762,10 @@ Namespace Dynarithmic
             Public DTWAIN_AddFileToAppendW As DTWAIN_AddFileToAppendWDelegate
             Public DTWAIN_AddPDFText As DTWAIN_AddPDFTextDelegate
             Public DTWAIN_AddPDFTextA As DTWAIN_AddPDFTextADelegate
-            Public DTWAIN_AddPDFTextEx As DTWAIN_AddPDFTextExDelegate
+            Public DTWAIN_AddPDFTextElement As DTWAIN_AddPDFTextElementDelegate
+            Public DTWAIN_AddPDFTextString As DTWAIN_AddPDFTextStringDelegate
+            Public DTWAIN_AddPDFTextStringA As DTWAIN_AddPDFTextStringADelegate
+            Public DTWAIN_AddPDFTextStringW As DTWAIN_AddPDFTextStringWDelegate
             Public DTWAIN_AddPDFTextW As DTWAIN_AddPDFTextWDelegate
             Public DTWAIN_AllocateMemory As DTWAIN_AllocateMemoryDelegate
             Public DTWAIN_AllocateMemory64 As DTWAIN_AllocateMemory64Delegate
@@ -9879,6 +9923,7 @@ Namespace Dynarithmic
             Public DTWAIN_ConvertToAPIStringW As DTWAIN_ConvertToAPIStringWDelegate
             Public DTWAIN_CreateAcquisitionArray As DTWAIN_CreateAcquisitionArrayDelegate
             Public DTWAIN_CreatePDFTextElement As DTWAIN_CreatePDFTextElementDelegate
+            Public DTWAIN_CreatePDFTextElementCopy As DTWAIN_CreatePDFTextElementCopyDelegate
             Public DTWAIN_DeleteDIB As DTWAIN_DeleteDIBDelegate
             Public DTWAIN_DestroyAcquisitionArray As DTWAIN_DestroyAcquisitionArrayDelegate
             Public DTWAIN_DestroyPDFTextElement As DTWAIN_DestroyPDFTextElementDelegate
@@ -10185,6 +10230,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetLightPath As DTWAIN_GetLightPathDelegate
             Public DTWAIN_GetLightSource As DTWAIN_GetLightSourceDelegate
             Public DTWAIN_GetLightSources As DTWAIN_GetLightSourcesDelegate
+            Public DTWAIN_GetLightSourcesEx As DTWAIN_GetLightSourcesExDelegate
             Public DTWAIN_GetLoggerCallback As DTWAIN_GetLoggerCallbackDelegate
             Public DTWAIN_GetLoggerCallbackA As DTWAIN_GetLoggerCallbackADelegate
             Public DTWAIN_GetLoggerCallbackW As DTWAIN_GetLoggerCallbackWDelegate
@@ -10506,6 +10552,11 @@ Namespace Dynarithmic
             Public DTWAIN_RangeGetExpValueFloatStringW As DTWAIN_RangeGetExpValueFloatStringWDelegate
             Public DTWAIN_RangeGetExpValueLong As DTWAIN_RangeGetExpValueLongDelegate
             Public DTWAIN_RangeGetNearestValue As DTWAIN_RangeGetNearestValueDelegate
+            Public DTWAIN_RangeGetNearestValueFloat As DTWAIN_RangeGetNearestValueFloatDelegate
+            Public DTWAIN_RangeGetNearestValueFloatString As DTWAIN_RangeGetNearestValueFloatStringDelegate
+            Public DTWAIN_RangeGetNearestValueFloatStringA As DTWAIN_RangeGetNearestValueFloatStringADelegate
+            Public DTWAIN_RangeGetNearestValueFloatStringW As DTWAIN_RangeGetNearestValueFloatStringWDelegate
+            Public DTWAIN_RangeGetNearestValueLong As DTWAIN_RangeGetNearestValueLongDelegate
             Public DTWAIN_RangeGetPos As DTWAIN_RangeGetPosDelegate
             Public DTWAIN_RangeGetPosFloat As DTWAIN_RangeGetPosFloatDelegate
             Public DTWAIN_RangeGetPosFloatString As DTWAIN_RangeGetPosFloatStringDelegate
@@ -10519,11 +10570,6 @@ Namespace Dynarithmic
             Public DTWAIN_RangeGetValueFloatStringW As DTWAIN_RangeGetValueFloatStringWDelegate
             Public DTWAIN_RangeGetValueLong As DTWAIN_RangeGetValueLongDelegate
             Public DTWAIN_RangeIsValid As DTWAIN_RangeIsValidDelegate
-            Public DTWAIN_RangeNearestValueFloat As DTWAIN_RangeNearestValueFloatDelegate
-            Public DTWAIN_RangeNearestValueFloatString As DTWAIN_RangeNearestValueFloatStringDelegate
-            Public DTWAIN_RangeNearestValueFloatStringA As DTWAIN_RangeNearestValueFloatStringADelegate
-            Public DTWAIN_RangeNearestValueFloatStringW As DTWAIN_RangeNearestValueFloatStringWDelegate
-            Public DTWAIN_RangeNearestValueLong As DTWAIN_RangeNearestValueLongDelegate
             Public DTWAIN_RangeSetAll As DTWAIN_RangeSetAllDelegate
             Public DTWAIN_RangeSetAllFloat As DTWAIN_RangeSetAllFloatDelegate
             Public DTWAIN_RangeSetAllFloatString As DTWAIN_RangeSetAllFloatStringDelegate
@@ -10712,6 +10758,9 @@ Namespace Dynarithmic
             Public DTWAIN_SetPDFSubjectA As DTWAIN_SetPDFSubjectADelegate
             Public DTWAIN_SetPDFSubjectW As DTWAIN_SetPDFSubjectWDelegate
             Public DTWAIN_SetPDFTextElementFloat As DTWAIN_SetPDFTextElementFloatDelegate
+            Public DTWAIN_SetPDFTextElementFloatString As DTWAIN_SetPDFTextElementFloatStringDelegate
+            Public DTWAIN_SetPDFTextElementFloatStringA As DTWAIN_SetPDFTextElementFloatStringADelegate
+            Public DTWAIN_SetPDFTextElementFloatStringW As DTWAIN_SetPDFTextElementFloatStringWDelegate
             Public DTWAIN_SetPDFTextElementLong As DTWAIN_SetPDFTextElementLongDelegate
             Public DTWAIN_SetPDFTextElementString As DTWAIN_SetPDFTextElementStringDelegate
             Public DTWAIN_SetPDFTextElementStringA As DTWAIN_SetPDFTextElementStringADelegate

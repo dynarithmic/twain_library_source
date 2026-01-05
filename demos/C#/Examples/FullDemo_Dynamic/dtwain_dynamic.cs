@@ -1648,6 +1648,9 @@
         public const uint DTWAIN_PDFTEXT_NORGBCOLOR = 0x02000000U;
         public const uint DTWAIN_PDFTEXT_NOFONTSIZE = 0x04000000U;
         public const uint DTWAIN_PDFTEXT_NOABSPOSITION = 0x08000000U;
+        public const uint DTWAIN_PDFTEXT_NOROTATION = 0x10000000U;
+        public const uint DTWAIN_PDFTEXT_NOSKEWING = 0x20000000U;
+        public const uint DTWAIN_PDFTEXT_NOSCALINGXY = 0x40000000U;
         public const uint DTWAIN_PDFTEXT_IGNOREALL = 0xFFF00000U;
         public const int DTWAIN_FONT_COURIER = 0;
         public const int DTWAIN_FONT_COURIERBOLD = 1;
@@ -1684,31 +1687,13 @@
         public const int DTWAIN_PDFTEXTELEMENT_TEXTLENGTH = 14;
         public const int DTWAIN_PDFTEXTELEMENT_SKEWANGLES = 15;
         public const int DTWAIN_PDFTEXTELEMENT_TRANSFORMORDER = 16;
-        public const int DTWAIN_PDFTEXTTRANSFORM_TSRK = 0;
-        public const int DTWAIN_PDFTEXTTRANSFORM_TSKR = 1;
-        public const int DTWAIN_PDFTEXTTRANSFORM_TKSR = 2;
-        public const int DTWAIN_PDFTEXTTRANSFORM_TKRS = 3;
-        public const int DTWAIN_PDFTEXTTRANSFORM_TRSK = 4;
-        public const int DTWAIN_PDFTEXTTRANSFORM_TRKS = 5;
-        public const int DTWAIN_PDFTEXTTRANSFORM_STRK = 6;
-        public const int DTWAIN_PDFTEXTTRANSFORM_STKR = 7;
-        public const int DTWAIN_PDFTEXTTRANSFORM_SKTR = 8;
-        public const int DTWAIN_PDFTEXTTRANSFORM_SKRT = 9;
-        public const int DTWAIN_PDFTEXTTRANSFORM_SRTK = 10;
-        public const int DTWAIN_PDFTEXTTRANSFORM_SRKT = 11;
-        public const int DTWAIN_PDFTEXTTRANSFORM_RSTK = 12;
-        public const int DTWAIN_PDFTEXTTRANSFORM_RSKT = 13;
-        public const int DTWAIN_PDFTEXTTRANSFORM_RTSK = 14;
-        public const int DTWAIN_PDFTEXTTRANSFORM_RTKT = 15;
-        public const int DTWAIN_PDFTEXTTRANSFORM_RKST = 16;
-        public const int DTWAIN_PDFTEXTTRANSFORM_RKTS = 17;
-        public const int DTWAIN_PDFTEXTTRANSFORM_KSTR = 18;
-        public const int DTWAIN_PDFTEXTTRANSFORM_KSRT = 19;
-        public const int DTWAIN_PDFTEXTTRANSFORM_KRST = 20;
-        public const int DTWAIN_PDFTEXTTRANSFORM_KRTS = 21;
-        public const int DTWAIN_PDFTEXTTRANSFORM_KTSR = 22;
-        public const int DTWAIN_PDFTEXTTRANSFORM_KTRS = 23;
-        public const int DTWAIN_PDFTEXTTRANFORM_LAST = DTWAIN_PDFTEXTTRANSFORM_KTRS;
+        public const int DTWAIN_PDFTEXTTRANSFORM_SRK = 0;
+        public const int DTWAIN_PDFTEXTTRANSFORM_SKR = 1;
+        public const int DTWAIN_PDFTEXTTRANSFORM_KSR = 2;
+        public const int DTWAIN_PDFTEXTTRANSFORM_KRS = 3;
+        public const int DTWAIN_PDFTEXTTRANSFORM_RSK = 4;
+        public const int DTWAIN_PDFTEXTTRANSFORM_RKS = 5;
+        public const int DTWAIN_PDFTEXTTRANFORM_LAST = DTWAIN_PDFTEXTTRANSFORM_RKS;
         public const int DTWAIN_TWDF_ULTRASONIC = 0;
         public const int DTWAIN_TWDF_BYLENGTH = 1;
         public const int DTWAIN_TWDF_INFRARED = 2;
@@ -1922,10 +1907,13 @@
         public delegate int DTWAIN_AddFileToAppendDelegate([MarshalAs(UnmanagedType.LPTStr)] string szFile);
         public delegate int DTWAIN_AddFileToAppendADelegate([MarshalAs(UnmanagedType.LPStr)] string szFile);
         public delegate int DTWAIN_AddFileToAppendWDelegate([MarshalAs(UnmanagedType.LPWStr)] string szFile);
-        public delegate int DTWAIN_AddPDFTextDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPTStr)] string fontName, DTWAIN_FLOAT fontSize, int colorRGB, int renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, int strokeWidth, uint Flags);
-        public delegate int DTWAIN_AddPDFTextADelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPStr)] string fontName, DTWAIN_FLOAT fontSize, int colorRGB, int renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, int strokeWidth, uint Flags);
-        public delegate int DTWAIN_AddPDFTextExDelegate(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement, uint Flags);
-        public delegate int DTWAIN_AddPDFTextWDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPWStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPWStr)] string fontName, DTWAIN_FLOAT fontSize, int colorRGB, int renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, int strokeWidth, uint Flags);
+        public delegate int DTWAIN_AddPDFTextDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPTStr)] string fontName, DTWAIN_FLOAT fontSize, int colorRGB, int renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, uint Flags);
+        public delegate int DTWAIN_AddPDFTextADelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPStr)] string fontName, DTWAIN_FLOAT fontSize, int colorRGB, int renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, uint Flags);
+        public delegate int DTWAIN_AddPDFTextElementDelegate(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement, uint Flags);
+        public delegate int DTWAIN_AddPDFTextStringDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPTStr)] string fontName, [MarshalAs(UnmanagedType.LPTStr)] string fontSize, int colorRGB, int renderMode, [MarshalAs(UnmanagedType.LPTStr)] string scaling, [MarshalAs(UnmanagedType.LPTStr)] string charSpacing, [MarshalAs(UnmanagedType.LPTStr)] string wordSpacing, [MarshalAs(UnmanagedType.LPTStr)] string strokeWidth, uint Flags);
+        public delegate int DTWAIN_AddPDFTextStringADelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPStr)] string fontName, [MarshalAs(UnmanagedType.LPStr)] string fontSize, int colorRGB, int renderMode, [MarshalAs(UnmanagedType.LPStr)] string scaling, [MarshalAs(UnmanagedType.LPStr)] string charSpacing, [MarshalAs(UnmanagedType.LPStr)] string wordSpacing, [MarshalAs(UnmanagedType.LPStr)] string strokeWidth, uint Flags);
+        public delegate int DTWAIN_AddPDFTextStringWDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPWStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPWStr)] string fontName, [MarshalAs(UnmanagedType.LPWStr)] string fontSize, int colorRGB, int renderMode, [MarshalAs(UnmanagedType.LPWStr)] string scaling, [MarshalAs(UnmanagedType.LPWStr)] string charSpacing, [MarshalAs(UnmanagedType.LPWStr)] string wordSpacing, [MarshalAs(UnmanagedType.LPWStr)] string strokeWidth, uint Flags);
+        public delegate int DTWAIN_AddPDFTextWDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPWStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPWStr)] string fontName, DTWAIN_FLOAT fontSize, int colorRGB, int renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, uint Flags);
         public delegate HANDLE DTWAIN_AllocateMemoryDelegate(uint memSize);
         public delegate HANDLE DTWAIN_AllocateMemory64Delegate(ULONG64 memSize);
         public delegate HANDLE DTWAIN_AllocateMemoryExDelegate(uint memSize);
@@ -2081,7 +2069,8 @@
         public delegate int DTWAIN_ConvertToAPIStringExWDelegate([MarshalAs(UnmanagedType.LPWStr)] string lpOrigString, [MarshalAs(UnmanagedType.LPWStr)] System.Text.StringBuilder lpOutString, int nSize);
         public delegate HANDLE DTWAIN_ConvertToAPIStringWDelegate([MarshalAs(UnmanagedType.LPWStr)] string lpOrigString);
         public delegate DTWAIN_ARRAY DTWAIN_CreateAcquisitionArrayDelegate();
-        public delegate DTWAIN_PDFTEXTELEMENT DTWAIN_CreatePDFTextElementDelegate(DTWAIN_SOURCE Source);
+        public delegate DTWAIN_PDFTEXTELEMENT DTWAIN_CreatePDFTextElementDelegate();
+        public delegate DTWAIN_PDFTEXTELEMENT DTWAIN_CreatePDFTextElementCopyDelegate(DTWAIN_PDFTEXTELEMENT TextElement);
         public delegate int DTWAIN_DeleteDIBDelegate(HANDLE hDib);
         public delegate int DTWAIN_DestroyAcquisitionArrayDelegate(DTWAIN_ARRAY aAcq, int bDestroyData);
         public delegate int DTWAIN_DestroyPDFTextElementDelegate(DTWAIN_PDFTEXTELEMENT TextElement);
@@ -2388,6 +2377,7 @@
         public delegate int DTWAIN_GetLightPathDelegate(DTWAIN_SOURCE Source, ref int lpLightPath);
         public delegate int DTWAIN_GetLightSourceDelegate(DTWAIN_SOURCE Source, ref int LightSource);
         public delegate int DTWAIN_GetLightSourcesDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY LightSources);
+        public delegate DTWAIN_ARRAY DTWAIN_GetLightSourcesExDelegate(DTWAIN_SOURCE Source);
         public delegate DTwainLoggerProc DTWAIN_GetLoggerCallbackDelegate();
         public delegate DTwainLoggerProcA DTWAIN_GetLoggerCallbackADelegate();
         public delegate DTwainLoggerProcW DTWAIN_GetLoggerCallbackWDelegate();
@@ -2711,6 +2701,11 @@
         public delegate int DTWAIN_RangeGetExpValueFloatStringWDelegate(DTWAIN_RANGE pArray, int lPos, [MarshalAs(UnmanagedType.LPWStr)] System.Text.StringBuilder pVal);
         public delegate int DTWAIN_RangeGetExpValueLongDelegate(DTWAIN_RANGE pArray, int lPos, ref int pVal);
         public delegate int DTWAIN_RangeGetNearestValueDelegate(DTWAIN_RANGE pArray, System.IntPtr pVariantIn, System.IntPtr pVariantOut, int RoundType);
+        public delegate int DTWAIN_RangeGetNearestValueFloatDelegate(DTWAIN_RANGE pArray, DTWAIN_FLOAT dIn, ref DTWAIN_FLOAT pOut, int RoundType);
+        public delegate int DTWAIN_RangeGetNearestValueFloatStringDelegate(DTWAIN_RANGE pArray, [MarshalAs(UnmanagedType.LPTStr)] string dIn, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder pOut, int RoundType);
+        public delegate int DTWAIN_RangeGetNearestValueFloatStringADelegate(DTWAIN_RANGE pArray, [MarshalAs(UnmanagedType.LPStr)] string dIn, [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder dOut, int RoundType);
+        public delegate int DTWAIN_RangeGetNearestValueFloatStringWDelegate(DTWAIN_RANGE pArray, [MarshalAs(UnmanagedType.LPWStr)] string dIn, [MarshalAs(UnmanagedType.LPWStr)] System.Text.StringBuilder dOut, int RoundType);
+        public delegate int DTWAIN_RangeGetNearestValueLongDelegate(DTWAIN_RANGE pArray, int lIn, ref int pOut, int RoundType);
         public delegate int DTWAIN_RangeGetPosDelegate(DTWAIN_RANGE pArray, System.IntPtr pVariant, ref int pPos);
         public delegate int DTWAIN_RangeGetPosFloatDelegate(DTWAIN_RANGE pArray, DTWAIN_FLOAT Val, ref int pPos);
         public delegate int DTWAIN_RangeGetPosFloatStringDelegate(DTWAIN_RANGE pArray, [MarshalAs(UnmanagedType.LPTStr)] string Val, ref int pPos);
@@ -2724,11 +2719,6 @@
         public delegate int DTWAIN_RangeGetValueFloatStringWDelegate(DTWAIN_RANGE pArray, int nWhich, [MarshalAs(UnmanagedType.LPWStr)] System.Text.StringBuilder dValue);
         public delegate int DTWAIN_RangeGetValueLongDelegate(DTWAIN_RANGE pArray, int nWhich, ref int pVal);
         public delegate int DTWAIN_RangeIsValidDelegate(DTWAIN_RANGE Range, ref int pStatus);
-        public delegate int DTWAIN_RangeNearestValueFloatDelegate(DTWAIN_RANGE pArray, DTWAIN_FLOAT dIn, ref DTWAIN_FLOAT pOut, int RoundType);
-        public delegate int DTWAIN_RangeNearestValueFloatStringDelegate(DTWAIN_RANGE pArray, [MarshalAs(UnmanagedType.LPTStr)] string dIn, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder pOut, int RoundType);
-        public delegate int DTWAIN_RangeNearestValueFloatStringADelegate(DTWAIN_RANGE pArray, [MarshalAs(UnmanagedType.LPStr)] string dIn, [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder dOut, int RoundType);
-        public delegate int DTWAIN_RangeNearestValueFloatStringWDelegate(DTWAIN_RANGE pArray, [MarshalAs(UnmanagedType.LPWStr)] string dIn, [MarshalAs(UnmanagedType.LPWStr)] System.Text.StringBuilder dOut, int RoundType);
-        public delegate int DTWAIN_RangeNearestValueLongDelegate(DTWAIN_RANGE pArray, int lIn, ref int pOut, int RoundType);
         public delegate int DTWAIN_RangeSetAllDelegate(DTWAIN_RANGE pArray, System.IntPtr pVariantLow, System.IntPtr pVariantUp, System.IntPtr pVariantStep, System.IntPtr pVariantDefault, System.IntPtr pVariantCurrent);
         public delegate int DTWAIN_RangeSetAllFloatDelegate(DTWAIN_RANGE pArray, DTWAIN_FLOAT dLow, DTWAIN_FLOAT dUp, DTWAIN_FLOAT dStep, DTWAIN_FLOAT dDefault, DTWAIN_FLOAT dCurrent);
         public delegate int DTWAIN_RangeSetAllFloatStringDelegate(DTWAIN_RANGE pArray, [MarshalAs(UnmanagedType.LPTStr)] string dLow, [MarshalAs(UnmanagedType.LPTStr)] string dUp, [MarshalAs(UnmanagedType.LPTStr)] string dStep, [MarshalAs(UnmanagedType.LPTStr)] string dDefault, [MarshalAs(UnmanagedType.LPTStr)] string dCurrent);
@@ -2917,6 +2907,9 @@
         public delegate int DTWAIN_SetPDFSubjectADelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPStr)] string lpSubject);
         public delegate int DTWAIN_SetPDFSubjectWDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPWStr)] string lpSubject);
         public delegate int DTWAIN_SetPDFTextElementFloatDelegate(DTWAIN_PDFTEXTELEMENT TextElement, DTWAIN_FLOAT val1, DTWAIN_FLOAT val2, int Flags);
+        public delegate int DTWAIN_SetPDFTextElementFloatStringDelegate(DTWAIN_PDFTEXTELEMENT TextElement, [MarshalAs(UnmanagedType.LPTStr)] string val1, [MarshalAs(UnmanagedType.LPTStr)] string val2, int Flags);
+        public delegate int DTWAIN_SetPDFTextElementFloatStringADelegate(DTWAIN_PDFTEXTELEMENT TextElement, [MarshalAs(UnmanagedType.LPStr)] string val1, [MarshalAs(UnmanagedType.LPStr)] string val2, int Flags);
+        public delegate int DTWAIN_SetPDFTextElementFloatStringWDelegate(DTWAIN_PDFTEXTELEMENT TextElement, [MarshalAs(UnmanagedType.LPWStr)] string val1, [MarshalAs(UnmanagedType.LPWStr)] string val2, int Flags);
         public delegate int DTWAIN_SetPDFTextElementLongDelegate(DTWAIN_PDFTEXTELEMENT TextElement, int val1, int val2, int Flags);
         public delegate int DTWAIN_SetPDFTextElementStringDelegate(DTWAIN_PDFTEXTELEMENT TextElement, [MarshalAs(UnmanagedType.LPTStr)] string val1, int Flags);
         public delegate int DTWAIN_SetPDFTextElementStringADelegate(DTWAIN_PDFTEXTELEMENT TextElement, [MarshalAs(UnmanagedType.LPStr)] string szString, int Flags);
@@ -3092,8 +3085,17 @@
         [DTWAINNativeFunction("DTWAIN_AddPDFTextA")]
         private readonly DTWAIN_AddPDFTextADelegate  _DTWAIN_AddPDFTextA;
 
-        [DTWAINNativeFunction("DTWAIN_AddPDFTextEx")]
-        private readonly DTWAIN_AddPDFTextExDelegate  _DTWAIN_AddPDFTextEx;
+        [DTWAINNativeFunction("DTWAIN_AddPDFTextElement")]
+        private readonly DTWAIN_AddPDFTextElementDelegate  _DTWAIN_AddPDFTextElement;
+
+        [DTWAINNativeFunction("DTWAIN_AddPDFTextString")]
+        private readonly DTWAIN_AddPDFTextStringDelegate  _DTWAIN_AddPDFTextString;
+
+        [DTWAINNativeFunction("DTWAIN_AddPDFTextStringA")]
+        private readonly DTWAIN_AddPDFTextStringADelegate  _DTWAIN_AddPDFTextStringA;
+
+        [DTWAINNativeFunction("DTWAIN_AddPDFTextStringW")]
+        private readonly DTWAIN_AddPDFTextStringWDelegate  _DTWAIN_AddPDFTextStringW;
 
         [DTWAINNativeFunction("DTWAIN_AddPDFTextW")]
         private readonly DTWAIN_AddPDFTextWDelegate  _DTWAIN_AddPDFTextW;
@@ -3565,6 +3567,9 @@
 
         [DTWAINNativeFunction("DTWAIN_CreatePDFTextElement")]
         private readonly DTWAIN_CreatePDFTextElementDelegate  _DTWAIN_CreatePDFTextElement;
+
+        [DTWAINNativeFunction("DTWAIN_CreatePDFTextElementCopy")]
+        private readonly DTWAIN_CreatePDFTextElementCopyDelegate  _DTWAIN_CreatePDFTextElementCopy;
 
         [DTWAINNativeFunction("DTWAIN_DeleteDIB")]
         private readonly DTWAIN_DeleteDIBDelegate  _DTWAIN_DeleteDIB;
@@ -4483,6 +4488,9 @@
 
         [DTWAINNativeFunction("DTWAIN_GetLightSources")]
         private readonly DTWAIN_GetLightSourcesDelegate  _DTWAIN_GetLightSources;
+
+        [DTWAINNativeFunction("DTWAIN_GetLightSourcesEx")]
+        private readonly DTWAIN_GetLightSourcesExDelegate  _DTWAIN_GetLightSourcesEx;
 
         [DTWAINNativeFunction("DTWAIN_GetLoggerCallback")]
         private readonly DTWAIN_GetLoggerCallbackDelegate  _DTWAIN_GetLoggerCallback;
@@ -5453,6 +5461,21 @@
         [DTWAINNativeFunction("DTWAIN_RangeGetNearestValue")]
         private readonly DTWAIN_RangeGetNearestValueDelegate  _DTWAIN_RangeGetNearestValue;
 
+        [DTWAINNativeFunction("DTWAIN_RangeGetNearestValueFloat")]
+        private readonly DTWAIN_RangeGetNearestValueFloatDelegate  _DTWAIN_RangeGetNearestValueFloat;
+
+        [DTWAINNativeFunction("DTWAIN_RangeGetNearestValueFloatString")]
+        private readonly DTWAIN_RangeGetNearestValueFloatStringDelegate  _DTWAIN_RangeGetNearestValueFloatString;
+
+        [DTWAINNativeFunction("DTWAIN_RangeGetNearestValueFloatStringA")]
+        private readonly DTWAIN_RangeGetNearestValueFloatStringADelegate  _DTWAIN_RangeGetNearestValueFloatStringA;
+
+        [DTWAINNativeFunction("DTWAIN_RangeGetNearestValueFloatStringW")]
+        private readonly DTWAIN_RangeGetNearestValueFloatStringWDelegate  _DTWAIN_RangeGetNearestValueFloatStringW;
+
+        [DTWAINNativeFunction("DTWAIN_RangeGetNearestValueLong")]
+        private readonly DTWAIN_RangeGetNearestValueLongDelegate  _DTWAIN_RangeGetNearestValueLong;
+
         [DTWAINNativeFunction("DTWAIN_RangeGetPos")]
         private readonly DTWAIN_RangeGetPosDelegate  _DTWAIN_RangeGetPos;
 
@@ -5491,21 +5514,6 @@
 
         [DTWAINNativeFunction("DTWAIN_RangeIsValid")]
         private readonly DTWAIN_RangeIsValidDelegate  _DTWAIN_RangeIsValid;
-
-        [DTWAINNativeFunction("DTWAIN_RangeNearestValueFloat")]
-        private readonly DTWAIN_RangeNearestValueFloatDelegate  _DTWAIN_RangeNearestValueFloat;
-
-        [DTWAINNativeFunction("DTWAIN_RangeNearestValueFloatString")]
-        private readonly DTWAIN_RangeNearestValueFloatStringDelegate  _DTWAIN_RangeNearestValueFloatString;
-
-        [DTWAINNativeFunction("DTWAIN_RangeNearestValueFloatStringA")]
-        private readonly DTWAIN_RangeNearestValueFloatStringADelegate  _DTWAIN_RangeNearestValueFloatStringA;
-
-        [DTWAINNativeFunction("DTWAIN_RangeNearestValueFloatStringW")]
-        private readonly DTWAIN_RangeNearestValueFloatStringWDelegate  _DTWAIN_RangeNearestValueFloatStringW;
-
-        [DTWAINNativeFunction("DTWAIN_RangeNearestValueLong")]
-        private readonly DTWAIN_RangeNearestValueLongDelegate  _DTWAIN_RangeNearestValueLong;
 
         [DTWAINNativeFunction("DTWAIN_RangeSetAll")]
         private readonly DTWAIN_RangeSetAllDelegate  _DTWAIN_RangeSetAll;
@@ -6071,6 +6079,15 @@
         [DTWAINNativeFunction("DTWAIN_SetPDFTextElementFloat")]
         private readonly DTWAIN_SetPDFTextElementFloatDelegate  _DTWAIN_SetPDFTextElementFloat;
 
+        [DTWAINNativeFunction("DTWAIN_SetPDFTextElementFloatString")]
+        private readonly DTWAIN_SetPDFTextElementFloatStringDelegate  _DTWAIN_SetPDFTextElementFloatString;
+
+        [DTWAINNativeFunction("DTWAIN_SetPDFTextElementFloatStringA")]
+        private readonly DTWAIN_SetPDFTextElementFloatStringADelegate  _DTWAIN_SetPDFTextElementFloatStringA;
+
+        [DTWAINNativeFunction("DTWAIN_SetPDFTextElementFloatStringW")]
+        private readonly DTWAIN_SetPDFTextElementFloatStringWDelegate  _DTWAIN_SetPDFTextElementFloatStringW;
+
         [DTWAINNativeFunction("DTWAIN_SetPDFTextElementLong")]
         private readonly DTWAIN_SetPDFTextElementLongDelegate  _DTWAIN_SetPDFTextElementLong;
 
@@ -6427,16 +6444,25 @@
         public  int DTWAIN_AddFileToAppendW([MarshalAs(UnmanagedType.LPWStr)] string szFile)
         => _DTWAIN_AddFileToAppendW(szFile);
 
-        public  int DTWAIN_AddPDFText(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPTStr)] string fontName, DTWAIN_FLOAT fontSize, int colorRGB, int renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, int strokeWidth, uint Flags)
+        public  int DTWAIN_AddPDFText(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPTStr)] string fontName, DTWAIN_FLOAT fontSize, int colorRGB, int renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, uint Flags)
         => _DTWAIN_AddPDFText(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
 
-        public  int DTWAIN_AddPDFTextA(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPStr)] string fontName, DTWAIN_FLOAT fontSize, int colorRGB, int renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, int strokeWidth, uint Flags)
+        public  int DTWAIN_AddPDFTextA(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPStr)] string fontName, DTWAIN_FLOAT fontSize, int colorRGB, int renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, uint Flags)
         => _DTWAIN_AddPDFTextA(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
 
-        public  int DTWAIN_AddPDFTextEx(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement, uint Flags)
-        => _DTWAIN_AddPDFTextEx(Source, TextElement, Flags);
+        public  int DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement, uint Flags)
+        => _DTWAIN_AddPDFTextElement(Source, TextElement, Flags);
 
-        public  int DTWAIN_AddPDFTextW(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPWStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPWStr)] string fontName, DTWAIN_FLOAT fontSize, int colorRGB, int renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, int strokeWidth, uint Flags)
+        public  int DTWAIN_AddPDFTextString(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPTStr)] string fontName, [MarshalAs(UnmanagedType.LPTStr)] string fontSize, int colorRGB, int renderMode, [MarshalAs(UnmanagedType.LPTStr)] string scaling, [MarshalAs(UnmanagedType.LPTStr)] string charSpacing, [MarshalAs(UnmanagedType.LPTStr)] string wordSpacing, [MarshalAs(UnmanagedType.LPTStr)] string strokeWidth, uint Flags)
+        => _DTWAIN_AddPDFTextString(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
+
+        public  int DTWAIN_AddPDFTextStringA(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPStr)] string fontName, [MarshalAs(UnmanagedType.LPStr)] string fontSize, int colorRGB, int renderMode, [MarshalAs(UnmanagedType.LPStr)] string scaling, [MarshalAs(UnmanagedType.LPStr)] string charSpacing, [MarshalAs(UnmanagedType.LPStr)] string wordSpacing, [MarshalAs(UnmanagedType.LPStr)] string strokeWidth, uint Flags)
+        => _DTWAIN_AddPDFTextStringA(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
+
+        public  int DTWAIN_AddPDFTextStringW(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPWStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPWStr)] string fontName, [MarshalAs(UnmanagedType.LPWStr)] string fontSize, int colorRGB, int renderMode, [MarshalAs(UnmanagedType.LPWStr)] string scaling, [MarshalAs(UnmanagedType.LPWStr)] string charSpacing, [MarshalAs(UnmanagedType.LPWStr)] string wordSpacing, [MarshalAs(UnmanagedType.LPWStr)] string strokeWidth, uint Flags)
+        => _DTWAIN_AddPDFTextStringW(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
+
+        public  int DTWAIN_AddPDFTextW(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPWStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPWStr)] string fontName, DTWAIN_FLOAT fontSize, int colorRGB, int renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, uint Flags)
         => _DTWAIN_AddPDFTextW(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
 
         public  HANDLE DTWAIN_AllocateMemory(uint memSize)
@@ -6904,8 +6930,11 @@
         public  DTWAIN_ARRAY DTWAIN_CreateAcquisitionArray()
         => _DTWAIN_CreateAcquisitionArray();
 
-        public  DTWAIN_PDFTEXTELEMENT DTWAIN_CreatePDFTextElement(DTWAIN_SOURCE Source)
-        => _DTWAIN_CreatePDFTextElement(Source);
+        public  DTWAIN_PDFTEXTELEMENT DTWAIN_CreatePDFTextElement()
+        => _DTWAIN_CreatePDFTextElement();
+
+        public  DTWAIN_PDFTEXTELEMENT DTWAIN_CreatePDFTextElementCopy(DTWAIN_PDFTEXTELEMENT TextElement)
+        => _DTWAIN_CreatePDFTextElementCopy(TextElement);
 
         public  int DTWAIN_DeleteDIB(HANDLE hDib)
         => _DTWAIN_DeleteDIB(hDib);
@@ -7824,6 +7853,9 @@
 
         public  int DTWAIN_GetLightSources(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY LightSources)
         => _DTWAIN_GetLightSources(Source, ref LightSources);
+
+        public  DTWAIN_ARRAY DTWAIN_GetLightSourcesEx(DTWAIN_SOURCE Source)
+        => _DTWAIN_GetLightSourcesEx(Source);
 
         public  DTwainLoggerProc DTWAIN_GetLoggerCallback()
         => _DTWAIN_GetLoggerCallback();
@@ -8794,6 +8826,21 @@
         public  int DTWAIN_RangeGetNearestValue(DTWAIN_RANGE pArray, System.IntPtr pVariantIn, System.IntPtr pVariantOut, int RoundType)
         => _DTWAIN_RangeGetNearestValue(pArray, pVariantIn, pVariantOut, RoundType);
 
+        public  int DTWAIN_RangeGetNearestValueFloat(DTWAIN_RANGE pArray, DTWAIN_FLOAT dIn, ref DTWAIN_FLOAT pOut, int RoundType)
+        => _DTWAIN_RangeGetNearestValueFloat(pArray, dIn, ref pOut, RoundType);
+
+        public  int DTWAIN_RangeGetNearestValueFloatString(DTWAIN_RANGE pArray, [MarshalAs(UnmanagedType.LPTStr)] string dIn, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder pOut, int RoundType)
+        => _DTWAIN_RangeGetNearestValueFloatString(pArray, dIn, pOut, RoundType);
+
+        public  int DTWAIN_RangeGetNearestValueFloatStringA(DTWAIN_RANGE pArray, [MarshalAs(UnmanagedType.LPStr)] string dIn, [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder dOut, int RoundType)
+        => _DTWAIN_RangeGetNearestValueFloatStringA(pArray, dIn, dOut, RoundType);
+
+        public  int DTWAIN_RangeGetNearestValueFloatStringW(DTWAIN_RANGE pArray, [MarshalAs(UnmanagedType.LPWStr)] string dIn, [MarshalAs(UnmanagedType.LPWStr)] System.Text.StringBuilder dOut, int RoundType)
+        => _DTWAIN_RangeGetNearestValueFloatStringW(pArray, dIn, dOut, RoundType);
+
+        public  int DTWAIN_RangeGetNearestValueLong(DTWAIN_RANGE pArray, int lIn, ref int pOut, int RoundType)
+        => _DTWAIN_RangeGetNearestValueLong(pArray, lIn, ref pOut, RoundType);
+
         public  int DTWAIN_RangeGetPos(DTWAIN_RANGE pArray, System.IntPtr pVariant, ref int pPos)
         => _DTWAIN_RangeGetPos(pArray, pVariant, ref pPos);
 
@@ -8832,21 +8879,6 @@
 
         public  int DTWAIN_RangeIsValid(DTWAIN_RANGE Range, ref int pStatus)
         => _DTWAIN_RangeIsValid(Range, ref pStatus);
-
-        public  int DTWAIN_RangeNearestValueFloat(DTWAIN_RANGE pArray, DTWAIN_FLOAT dIn, ref DTWAIN_FLOAT pOut, int RoundType)
-        => _DTWAIN_RangeNearestValueFloat(pArray, dIn, ref pOut, RoundType);
-
-        public  int DTWAIN_RangeNearestValueFloatString(DTWAIN_RANGE pArray, [MarshalAs(UnmanagedType.LPTStr)] string dIn, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder pOut, int RoundType)
-        => _DTWAIN_RangeNearestValueFloatString(pArray, dIn, pOut, RoundType);
-
-        public  int DTWAIN_RangeNearestValueFloatStringA(DTWAIN_RANGE pArray, [MarshalAs(UnmanagedType.LPStr)] string dIn, [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder dOut, int RoundType)
-        => _DTWAIN_RangeNearestValueFloatStringA(pArray, dIn, dOut, RoundType);
-
-        public  int DTWAIN_RangeNearestValueFloatStringW(DTWAIN_RANGE pArray, [MarshalAs(UnmanagedType.LPWStr)] string dIn, [MarshalAs(UnmanagedType.LPWStr)] System.Text.StringBuilder dOut, int RoundType)
-        => _DTWAIN_RangeNearestValueFloatStringW(pArray, dIn, dOut, RoundType);
-
-        public  int DTWAIN_RangeNearestValueLong(DTWAIN_RANGE pArray, int lIn, ref int pOut, int RoundType)
-        => _DTWAIN_RangeNearestValueLong(pArray, lIn, ref pOut, RoundType);
 
         public  int DTWAIN_RangeSetAll(DTWAIN_RANGE pArray, System.IntPtr pVariantLow, System.IntPtr pVariantUp, System.IntPtr pVariantStep, System.IntPtr pVariantDefault, System.IntPtr pVariantCurrent)
         => _DTWAIN_RangeSetAll(pArray, pVariantLow, pVariantUp, pVariantStep, pVariantDefault, pVariantCurrent);
@@ -9411,6 +9443,15 @@
 
         public  int DTWAIN_SetPDFTextElementFloat(DTWAIN_PDFTEXTELEMENT TextElement, DTWAIN_FLOAT val1, DTWAIN_FLOAT val2, int Flags)
         => _DTWAIN_SetPDFTextElementFloat(TextElement, val1, val2, Flags);
+
+        public  int DTWAIN_SetPDFTextElementFloatString(DTWAIN_PDFTEXTELEMENT TextElement, [MarshalAs(UnmanagedType.LPTStr)] string val1, [MarshalAs(UnmanagedType.LPTStr)] string val2, int Flags)
+        => _DTWAIN_SetPDFTextElementFloatString(TextElement, val1, val2, Flags);
+
+        public  int DTWAIN_SetPDFTextElementFloatStringA(DTWAIN_PDFTEXTELEMENT TextElement, [MarshalAs(UnmanagedType.LPStr)] string val1, [MarshalAs(UnmanagedType.LPStr)] string val2, int Flags)
+        => _DTWAIN_SetPDFTextElementFloatStringA(TextElement, val1, val2, Flags);
+
+        public  int DTWAIN_SetPDFTextElementFloatStringW(DTWAIN_PDFTEXTELEMENT TextElement, [MarshalAs(UnmanagedType.LPWStr)] string val1, [MarshalAs(UnmanagedType.LPWStr)] string val2, int Flags)
+        => _DTWAIN_SetPDFTextElementFloatStringW(TextElement, val1, val2, Flags);
 
         public  int DTWAIN_SetPDFTextElementLong(DTWAIN_PDFTEXTELEMENT TextElement, int val1, int val2, int Flags)
         => _DTWAIN_SetPDFTextElementLong(TextElement, val1, val2, Flags);

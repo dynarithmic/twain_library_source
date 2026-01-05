@@ -68,7 +68,10 @@
     D_ADDFILETOAPPENDWFUNC                        DYNDTWAIN_API::DTWAIN_AddFileToAppendW = nullptr;
     D_ADDPDFTEXTFUNC                              DYNDTWAIN_API::DTWAIN_AddPDFText = nullptr;
     D_ADDPDFTEXTAFUNC                             DYNDTWAIN_API::DTWAIN_AddPDFTextA = nullptr;
-    D_ADDPDFTEXTEXFUNC                            DYNDTWAIN_API::DTWAIN_AddPDFTextEx = nullptr;
+    D_ADDPDFTEXTELEMENTFUNC                       DYNDTWAIN_API::DTWAIN_AddPDFTextElement = nullptr;
+    D_ADDPDFTEXTSTRINGFUNC                        DYNDTWAIN_API::DTWAIN_AddPDFTextString = nullptr;
+    D_ADDPDFTEXTSTRINGAFUNC                       DYNDTWAIN_API::DTWAIN_AddPDFTextStringA = nullptr;
+    D_ADDPDFTEXTSTRINGWFUNC                       DYNDTWAIN_API::DTWAIN_AddPDFTextStringW = nullptr;
     D_ADDPDFTEXTWFUNC                             DYNDTWAIN_API::DTWAIN_AddPDFTextW = nullptr;
     D_ALLOCATEMEMORYFUNC                          DYNDTWAIN_API::DTWAIN_AllocateMemory = nullptr;
     D_ALLOCATEMEMORY64FUNC                        DYNDTWAIN_API::DTWAIN_AllocateMemory64 = nullptr;
@@ -232,6 +235,7 @@
     D_CONVERTTOAPISTRINGWFUNC                     DYNDTWAIN_API::DTWAIN_ConvertToAPIStringW = nullptr;
     D_CREATEACQUISITIONARRAYFUNC                  DYNDTWAIN_API::DTWAIN_CreateAcquisitionArray = nullptr;
     D_CREATEPDFTEXTELEMENTFUNC                    DYNDTWAIN_API::DTWAIN_CreatePDFTextElement = nullptr;
+    D_CREATEPDFTEXTELEMENTCOPYFUNC                DYNDTWAIN_API::DTWAIN_CreatePDFTextElementCopy = nullptr;
     D_DELETEDIBFUNC                               DYNDTWAIN_API::DTWAIN_DeleteDIB = nullptr;
     D_DESTROYACQUISITIONARRAYFUNC                 DYNDTWAIN_API::DTWAIN_DestroyAcquisitionArray = nullptr;
     D_DESTROYPDFTEXTELEMENTFUNC                   DYNDTWAIN_API::DTWAIN_DestroyPDFTextElement = nullptr;
@@ -538,6 +542,7 @@
     D_GETLIGHTPATHFUNC                            DYNDTWAIN_API::DTWAIN_GetLightPath = nullptr;
     D_GETLIGHTSOURCEFUNC                          DYNDTWAIN_API::DTWAIN_GetLightSource = nullptr;
     D_GETLIGHTSOURCESFUNC                         DYNDTWAIN_API::DTWAIN_GetLightSources = nullptr;
+    D_GETLIGHTSOURCESEXFUNC                       DYNDTWAIN_API::DTWAIN_GetLightSourcesEx = nullptr;
     D_GETLOGGERCALLBACKFUNC                       DYNDTWAIN_API::DTWAIN_GetLoggerCallback = nullptr;
     D_GETLOGGERCALLBACKAFUNC                      DYNDTWAIN_API::DTWAIN_GetLoggerCallbackA = nullptr;
     D_GETLOGGERCALLBACKWFUNC                      DYNDTWAIN_API::DTWAIN_GetLoggerCallbackW = nullptr;
@@ -861,6 +866,11 @@
     D_RANGEGETEXPVALUEFLOATSTRINGWFUNC            DYNDTWAIN_API::DTWAIN_RangeGetExpValueFloatStringW = nullptr;
     D_RANGEGETEXPVALUELONGFUNC                    DYNDTWAIN_API::DTWAIN_RangeGetExpValueLong = nullptr;
     D_RANGEGETNEARESTVALUEFUNC                    DYNDTWAIN_API::DTWAIN_RangeGetNearestValue = nullptr;
+    D_RANGEGETNEARESTVALUEFLOATFUNC               DYNDTWAIN_API::DTWAIN_RangeGetNearestValueFloat = nullptr;
+    D_RANGEGETNEARESTVALUEFLOATSTRINGFUNC         DYNDTWAIN_API::DTWAIN_RangeGetNearestValueFloatString = nullptr;
+    D_RANGEGETNEARESTVALUEFLOATSTRINGAFUNC        DYNDTWAIN_API::DTWAIN_RangeGetNearestValueFloatStringA = nullptr;
+    D_RANGEGETNEARESTVALUEFLOATSTRINGWFUNC        DYNDTWAIN_API::DTWAIN_RangeGetNearestValueFloatStringW = nullptr;
+    D_RANGEGETNEARESTVALUELONGFUNC                DYNDTWAIN_API::DTWAIN_RangeGetNearestValueLong = nullptr;
     D_RANGEGETPOSFUNC                             DYNDTWAIN_API::DTWAIN_RangeGetPos = nullptr;
     D_RANGEGETPOSFLOATFUNC                        DYNDTWAIN_API::DTWAIN_RangeGetPosFloat = nullptr;
     D_RANGEGETPOSFLOATSTRINGFUNC                  DYNDTWAIN_API::DTWAIN_RangeGetPosFloatString = nullptr;
@@ -874,11 +884,6 @@
     D_RANGEGETVALUEFLOATSTRINGWFUNC               DYNDTWAIN_API::DTWAIN_RangeGetValueFloatStringW = nullptr;
     D_RANGEGETVALUELONGFUNC                       DYNDTWAIN_API::DTWAIN_RangeGetValueLong = nullptr;
     D_RANGEISVALIDFUNC                            DYNDTWAIN_API::DTWAIN_RangeIsValid = nullptr;
-    D_RANGENEARESTVALUEFLOATFUNC                  DYNDTWAIN_API::DTWAIN_RangeNearestValueFloat = nullptr;
-    D_RANGENEARESTVALUEFLOATSTRINGFUNC            DYNDTWAIN_API::DTWAIN_RangeNearestValueFloatString = nullptr;
-    D_RANGENEARESTVALUEFLOATSTRINGAFUNC           DYNDTWAIN_API::DTWAIN_RangeNearestValueFloatStringA = nullptr;
-    D_RANGENEARESTVALUEFLOATSTRINGWFUNC           DYNDTWAIN_API::DTWAIN_RangeNearestValueFloatStringW = nullptr;
-    D_RANGENEARESTVALUELONGFUNC                   DYNDTWAIN_API::DTWAIN_RangeNearestValueLong = nullptr;
     D_RANGESETALLFUNC                             DYNDTWAIN_API::DTWAIN_RangeSetAll = nullptr;
     D_RANGESETALLFLOATFUNC                        DYNDTWAIN_API::DTWAIN_RangeSetAllFloat = nullptr;
     D_RANGESETALLFLOATSTRINGFUNC                  DYNDTWAIN_API::DTWAIN_RangeSetAllFloatString = nullptr;
@@ -1067,6 +1072,9 @@
     D_SETPDFSUBJECTAFUNC                          DYNDTWAIN_API::DTWAIN_SetPDFSubjectA = nullptr;
     D_SETPDFSUBJECTWFUNC                          DYNDTWAIN_API::DTWAIN_SetPDFSubjectW = nullptr;
     D_SETPDFTEXTELEMENTFLOATFUNC                  DYNDTWAIN_API::DTWAIN_SetPDFTextElementFloat = nullptr;
+    D_SETPDFTEXTELEMENTFLOATSTRINGFUNC            DYNDTWAIN_API::DTWAIN_SetPDFTextElementFloatString = nullptr;
+    D_SETPDFTEXTELEMENTFLOATSTRINGAFUNC           DYNDTWAIN_API::DTWAIN_SetPDFTextElementFloatStringA = nullptr;
+    D_SETPDFTEXTELEMENTFLOATSTRINGWFUNC           DYNDTWAIN_API::DTWAIN_SetPDFTextElementFloatStringW = nullptr;
     D_SETPDFTEXTELEMENTLONGFUNC                   DYNDTWAIN_API::DTWAIN_SetPDFTextElementLong = nullptr;
     D_SETPDFTEXTELEMENTSTRINGFUNC                 DYNDTWAIN_API::DTWAIN_SetPDFTextElementString = nullptr;
     D_SETPDFTEXTELEMENTSTRINGAFUNC                DYNDTWAIN_API::DTWAIN_SetPDFTextElementStringA = nullptr;
@@ -1253,7 +1261,10 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_AddFileToAppendW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_AddPDFText, hModule);
           LOADFUNCTIONIMPL(DTWAIN_AddPDFTextA, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_AddPDFTextEx, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_AddPDFTextElement, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_AddPDFTextString, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_AddPDFTextStringA, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_AddPDFTextStringW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_AddPDFTextW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_AllocateMemory, hModule);
           LOADFUNCTIONIMPL(DTWAIN_AllocateMemory64, hModule);
@@ -1417,6 +1428,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_ConvertToAPIStringW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_CreateAcquisitionArray, hModule);
           LOADFUNCTIONIMPL(DTWAIN_CreatePDFTextElement, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_CreatePDFTextElementCopy, hModule);
           LOADFUNCTIONIMPL(DTWAIN_DeleteDIB, hModule);
           LOADFUNCTIONIMPL(DTWAIN_DestroyAcquisitionArray, hModule);
           LOADFUNCTIONIMPL(DTWAIN_DestroyPDFTextElement, hModule);
@@ -1723,6 +1735,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetLightPath, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetLightSource, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetLightSources, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetLightSourcesEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetLoggerCallback, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetLoggerCallbackA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetLoggerCallbackW, hModule);
@@ -2046,6 +2059,11 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_RangeGetExpValueFloatStringW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_RangeGetExpValueLong, hModule);
           LOADFUNCTIONIMPL(DTWAIN_RangeGetNearestValue, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_RangeGetNearestValueFloat, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_RangeGetNearestValueFloatString, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_RangeGetNearestValueFloatStringA, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_RangeGetNearestValueFloatStringW, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_RangeGetNearestValueLong, hModule);
           LOADFUNCTIONIMPL(DTWAIN_RangeGetPos, hModule);
           LOADFUNCTIONIMPL(DTWAIN_RangeGetPosFloat, hModule);
           LOADFUNCTIONIMPL(DTWAIN_RangeGetPosFloatString, hModule);
@@ -2059,11 +2077,6 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_RangeGetValueFloatStringW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_RangeGetValueLong, hModule);
           LOADFUNCTIONIMPL(DTWAIN_RangeIsValid, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_RangeNearestValueFloat, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_RangeNearestValueFloatString, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_RangeNearestValueFloatStringA, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_RangeNearestValueFloatStringW, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_RangeNearestValueLong, hModule);
           LOADFUNCTIONIMPL(DTWAIN_RangeSetAll, hModule);
           LOADFUNCTIONIMPL(DTWAIN_RangeSetAllFloat, hModule);
           LOADFUNCTIONIMPL(DTWAIN_RangeSetAllFloatString, hModule);
@@ -2252,6 +2265,9 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_SetPDFSubjectA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetPDFSubjectW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetPDFTextElementFloat, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_SetPDFTextElementFloatString, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_SetPDFTextElementFloatStringA, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_SetPDFTextElementFloatStringW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetPDFTextElementLong, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetPDFTextElementString, hModule);
           LOADFUNCTIONIMPL(DTWAIN_SetPDFTextElementStringA, hModule);

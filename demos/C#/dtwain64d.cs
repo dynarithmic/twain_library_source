@@ -1630,6 +1630,9 @@ namespace Dynarithmic
         public const uint DTWAIN_PDFTEXT_NORGBCOLOR = 0x02000000U;
         public const uint DTWAIN_PDFTEXT_NOFONTSIZE = 0x04000000U;
         public const uint DTWAIN_PDFTEXT_NOABSPOSITION = 0x08000000U;
+        public const uint DTWAIN_PDFTEXT_NOROTATION = 0x10000000U;
+        public const uint DTWAIN_PDFTEXT_NOSKEWING = 0x20000000U;
+        public const uint DTWAIN_PDFTEXT_NOSCALINGXY = 0x40000000U;
         public const uint DTWAIN_PDFTEXT_IGNOREALL = 0xFFF00000U;
         public const int DTWAIN_FONT_COURIER = 0;
         public const int DTWAIN_FONT_COURIERBOLD = 1;
@@ -1666,31 +1669,13 @@ namespace Dynarithmic
         public const int DTWAIN_PDFTEXTELEMENT_TEXTLENGTH = 14;
         public const int DTWAIN_PDFTEXTELEMENT_SKEWANGLES = 15;
         public const int DTWAIN_PDFTEXTELEMENT_TRANSFORMORDER = 16;
-        public const int DTWAIN_PDFTEXTTRANSFORM_TSRK = 0;
-        public const int DTWAIN_PDFTEXTTRANSFORM_TSKR = 1;
-        public const int DTWAIN_PDFTEXTTRANSFORM_TKSR = 2;
-        public const int DTWAIN_PDFTEXTTRANSFORM_TKRS = 3;
-        public const int DTWAIN_PDFTEXTTRANSFORM_TRSK = 4;
-        public const int DTWAIN_PDFTEXTTRANSFORM_TRKS = 5;
-        public const int DTWAIN_PDFTEXTTRANSFORM_STRK = 6;
-        public const int DTWAIN_PDFTEXTTRANSFORM_STKR = 7;
-        public const int DTWAIN_PDFTEXTTRANSFORM_SKTR = 8;
-        public const int DTWAIN_PDFTEXTTRANSFORM_SKRT = 9;
-        public const int DTWAIN_PDFTEXTTRANSFORM_SRTK = 10;
-        public const int DTWAIN_PDFTEXTTRANSFORM_SRKT = 11;
-        public const int DTWAIN_PDFTEXTTRANSFORM_RSTK = 12;
-        public const int DTWAIN_PDFTEXTTRANSFORM_RSKT = 13;
-        public const int DTWAIN_PDFTEXTTRANSFORM_RTSK = 14;
-        public const int DTWAIN_PDFTEXTTRANSFORM_RTKT = 15;
-        public const int DTWAIN_PDFTEXTTRANSFORM_RKST = 16;
-        public const int DTWAIN_PDFTEXTTRANSFORM_RKTS = 17;
-        public const int DTWAIN_PDFTEXTTRANSFORM_KSTR = 18;
-        public const int DTWAIN_PDFTEXTTRANSFORM_KSRT = 19;
-        public const int DTWAIN_PDFTEXTTRANSFORM_KRST = 20;
-        public const int DTWAIN_PDFTEXTTRANSFORM_KRTS = 21;
-        public const int DTWAIN_PDFTEXTTRANSFORM_KTSR = 22;
-        public const int DTWAIN_PDFTEXTTRANSFORM_KTRS = 23;
-        public const int DTWAIN_PDFTEXTTRANFORM_LAST = DTWAIN_PDFTEXTTRANSFORM_KTRS;
+        public const int DTWAIN_PDFTEXTTRANSFORM_SRK = 0;
+        public const int DTWAIN_PDFTEXTTRANSFORM_SKR = 1;
+        public const int DTWAIN_PDFTEXTTRANSFORM_KSR = 2;
+        public const int DTWAIN_PDFTEXTTRANSFORM_KRS = 3;
+        public const int DTWAIN_PDFTEXTTRANSFORM_RSK = 4;
+        public const int DTWAIN_PDFTEXTTRANSFORM_RKS = 5;
+        public const int DTWAIN_PDFTEXTTRANFORM_LAST = DTWAIN_PDFTEXTTRANSFORM_RKS;
         public const int DTWAIN_TWDF_ULTRASONIC = 0;
         public const int DTWAIN_TWDF_BYLENGTH = 1;
         public const int DTWAIN_TWDF_INFRARED = 2;
@@ -1847,16 +1832,25 @@ namespace Dynarithmic
         public static extern int DTWAIN_AddFileToAppendW([MarshalAs(UnmanagedType.LPWStr)] string szFile);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
-        public static extern int DTWAIN_AddPDFText(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPStr)] string fontName, DTWAIN_FLOAT fontSize, int colorRGB, int renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, int strokeWidth, uint Flags);
+        public static extern int DTWAIN_AddPDFText(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPStr)] string fontName, DTWAIN_FLOAT fontSize, int colorRGB, int renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, uint Flags);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
-        public static extern int DTWAIN_AddPDFTextA(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPStr)] string fontName, DTWAIN_FLOAT fontSize, int colorRGB, int renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, int strokeWidth, uint Flags);
+        public static extern int DTWAIN_AddPDFTextA(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPStr)] string fontName, DTWAIN_FLOAT fontSize, int colorRGB, int renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, uint Flags);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
-        public static extern int DTWAIN_AddPDFTextEx(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement, uint Flags);
+        public static extern int DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement, uint Flags);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        public static extern int DTWAIN_AddPDFTextString(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPStr)] string fontName, [MarshalAs(UnmanagedType.LPStr)] string fontSize, int colorRGB, int renderMode, [MarshalAs(UnmanagedType.LPStr)] string scaling, [MarshalAs(UnmanagedType.LPStr)] string charSpacing, [MarshalAs(UnmanagedType.LPStr)] string wordSpacing, [MarshalAs(UnmanagedType.LPStr)] string strokeWidth, uint Flags);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        public static extern int DTWAIN_AddPDFTextStringA(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPStr)] string fontName, [MarshalAs(UnmanagedType.LPStr)] string fontSize, int colorRGB, int renderMode, [MarshalAs(UnmanagedType.LPStr)] string scaling, [MarshalAs(UnmanagedType.LPStr)] string charSpacing, [MarshalAs(UnmanagedType.LPStr)] string wordSpacing, [MarshalAs(UnmanagedType.LPStr)] string strokeWidth, uint Flags);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode, ExactSpelling = true)]
-        public static extern int DTWAIN_AddPDFTextW(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPWStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPWStr)] string fontName, DTWAIN_FLOAT fontSize, int colorRGB, int renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, int strokeWidth, uint Flags);
+        public static extern int DTWAIN_AddPDFTextStringW(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPWStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPWStr)] string fontName, [MarshalAs(UnmanagedType.LPWStr)] string fontSize, int colorRGB, int renderMode, [MarshalAs(UnmanagedType.LPWStr)] string scaling, [MarshalAs(UnmanagedType.LPWStr)] string charSpacing, [MarshalAs(UnmanagedType.LPWStr)] string wordSpacing, [MarshalAs(UnmanagedType.LPWStr)] string strokeWidth, uint Flags);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode, ExactSpelling = true)]
+        public static extern int DTWAIN_AddPDFTextW(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPWStr)] string szText, int xPos, int yPos, [MarshalAs(UnmanagedType.LPWStr)] string fontName, DTWAIN_FLOAT fontSize, int colorRGB, int renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, uint Flags);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
         public static extern HANDLE DTWAIN_AllocateMemory(uint memSize);
@@ -2324,7 +2318,10 @@ namespace Dynarithmic
         public static extern DTWAIN_ARRAY DTWAIN_CreateAcquisitionArray();
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
-        public static extern DTWAIN_PDFTEXTELEMENT DTWAIN_CreatePDFTextElement(DTWAIN_SOURCE Source);
+        public static extern DTWAIN_PDFTEXTELEMENT DTWAIN_CreatePDFTextElement();
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
+        public static extern DTWAIN_PDFTEXTELEMENT DTWAIN_CreatePDFTextElementCopy(DTWAIN_PDFTEXTELEMENT TextElement);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
         public static extern int DTWAIN_DeleteDIB(HANDLE hDib);
@@ -3243,6 +3240,9 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
         public static extern int DTWAIN_GetLightSources(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY LightSources);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
+        public static extern DTWAIN_ARRAY DTWAIN_GetLightSourcesEx(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
         public static extern DTwainLoggerProc DTWAIN_GetLoggerCallback();
@@ -4214,6 +4214,21 @@ namespace Dynarithmic
         public static extern int DTWAIN_RangeGetNearestValue(DTWAIN_RANGE pArray, System.IntPtr pVariantIn, System.IntPtr pVariantOut, int RoundType);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
+        public static extern int DTWAIN_RangeGetNearestValueFloat(DTWAIN_RANGE pArray, DTWAIN_FLOAT dIn, ref DTWAIN_FLOAT pOut, int RoundType);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        public static extern int DTWAIN_RangeGetNearestValueFloatString(DTWAIN_RANGE pArray, [MarshalAs(UnmanagedType.LPStr)] string dIn, [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder pOut, int RoundType);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        public static extern int DTWAIN_RangeGetNearestValueFloatStringA(DTWAIN_RANGE pArray, [MarshalAs(UnmanagedType.LPStr)] string dIn, [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder dOut, int RoundType);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode, ExactSpelling = true)]
+        public static extern int DTWAIN_RangeGetNearestValueFloatStringW(DTWAIN_RANGE pArray, [MarshalAs(UnmanagedType.LPWStr)] string dIn, [MarshalAs(UnmanagedType.LPWStr)] System.Text.StringBuilder dOut, int RoundType);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
+        public static extern int DTWAIN_RangeGetNearestValueLong(DTWAIN_RANGE pArray, int lIn, ref int pOut, int RoundType);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
         public static extern int DTWAIN_RangeGetPos(DTWAIN_RANGE pArray, System.IntPtr pVariant, ref int pPos);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
@@ -4251,21 +4266,6 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
         public static extern int DTWAIN_RangeIsValid(DTWAIN_RANGE Range, ref int pStatus);
-
-        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
-        public static extern int DTWAIN_RangeNearestValueFloat(DTWAIN_RANGE pArray, DTWAIN_FLOAT dIn, ref DTWAIN_FLOAT pOut, int RoundType);
-
-        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
-        public static extern int DTWAIN_RangeNearestValueFloatString(DTWAIN_RANGE pArray, [MarshalAs(UnmanagedType.LPStr)] string dIn, [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder pOut, int RoundType);
-
-        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
-        public static extern int DTWAIN_RangeNearestValueFloatStringA(DTWAIN_RANGE pArray, [MarshalAs(UnmanagedType.LPStr)] string dIn, [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder dOut, int RoundType);
-
-        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode, ExactSpelling = true)]
-        public static extern int DTWAIN_RangeNearestValueFloatStringW(DTWAIN_RANGE pArray, [MarshalAs(UnmanagedType.LPWStr)] string dIn, [MarshalAs(UnmanagedType.LPWStr)] System.Text.StringBuilder dOut, int RoundType);
-
-        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
-        public static extern int DTWAIN_RangeNearestValueLong(DTWAIN_RANGE pArray, int lIn, ref int pOut, int RoundType);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
         public static extern int DTWAIN_RangeSetAll(DTWAIN_RANGE pArray, System.IntPtr pVariantLow, System.IntPtr pVariantUp, System.IntPtr pVariantStep, System.IntPtr pVariantDefault, System.IntPtr pVariantCurrent);
@@ -4830,6 +4830,15 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
         public static extern int DTWAIN_SetPDFTextElementFloat(DTWAIN_PDFTEXTELEMENT TextElement, DTWAIN_FLOAT val1, DTWAIN_FLOAT val2, int Flags);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        public static extern int DTWAIN_SetPDFTextElementFloatString(DTWAIN_PDFTEXTELEMENT TextElement, [MarshalAs(UnmanagedType.LPStr)] string val1, [MarshalAs(UnmanagedType.LPStr)] string val2, int Flags);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]
+        public static extern int DTWAIN_SetPDFTextElementFloatStringA(DTWAIN_PDFTEXTELEMENT TextElement, [MarshalAs(UnmanagedType.LPStr)] string val1, [MarshalAs(UnmanagedType.LPStr)] string val2, int Flags);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode, ExactSpelling = true)]
+        public static extern int DTWAIN_SetPDFTextElementFloatStringW(DTWAIN_PDFTEXTELEMENT TextElement, [MarshalAs(UnmanagedType.LPWStr)] string val1, [MarshalAs(UnmanagedType.LPWStr)] string val2, int Flags);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
         public static extern int DTWAIN_SetPDFTextElementLong(DTWAIN_PDFTEXTELEMENT TextElement, int val1, int val2, int Flags);
