@@ -1,5 +1,10 @@
 DTWAIN Version changes
 
+5.7.3
+- Add ability to rotate and skew text that is added to a PDF page.  
+  See the new DTWAIN_PDFTEXTELEMENT type and the supporting API functions.
+
+
 5.7.2
 
 - Fixed potential issue with setting the CAP_CAPTION capability.
