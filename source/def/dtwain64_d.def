@@ -341,10 +341,6 @@ DTWAIN_EnumLightSources                           @1309
 DTWAIN_EnumLightPaths                             @1310
 DTWAIN_SetLightPathEx                             @1311
 DTWAIN_EnumSupportedCapsEx                        @1312
-DTWAIN_IsTIFFSupported                            @1400
-DTWAIN_IsPDFSupported                             @1401
-DTWAIN_IsJPEGSupported                            @1402
-DTWAIN_IsPNGSupported                             @1403
 DTWAIN_LoadLanguageResource                       @1500
 DTWAIN_SetAuthor                                  @1602
 DTWAIN_GetAuthor                                  @1603
