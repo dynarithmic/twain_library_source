@@ -695,37 +695,47 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPDFTextElementFloat(DTWAIN_PDFTEXTELEMENT Tex
     switch (Flags)
     {
         case DTWAIN_PDFTEXTELEMENT_SCALINGXY:
-            *val1 = pPtr->scalingX;
-            *val2 = pPtr->scalingY;
+            if (val1)
+                *val1 = pPtr->scalingX;
+            if ( val2 )
+                *val2 = pPtr->scalingY;
         break;
 
         case DTWAIN_PDFTEXTELEMENT_FONTHEIGHT:
-            *val1 = pPtr->fontSize;
+            if ( val1 )
+                *val1 = pPtr->fontSize;
         break;
 
         case DTWAIN_PDFTEXTELEMENT_ROTATIONANGLE:
-            *val1 = pPtr->rotationAngle;
+            if ( val1 )
+                *val1 = pPtr->rotationAngle;
         break;
 
         case DTWAIN_PDFTEXTELEMENT_SCALING:
-            *val1 = pPtr->scaling;
+            if ( val1 )
+                *val1 = pPtr->scaling;
         break;
 
         case DTWAIN_PDFTEXTELEMENT_CHARSPACING:
-            *val1 = pPtr->charSpacing;
+            if ( val1 )
+                *val1 = pPtr->charSpacing;
         break;
 
         case DTWAIN_PDFTEXTELEMENT_WORDSPACING:
-            *val1 = pPtr->wordSpacing;
+            if ( val1 )
+                *val1 = pPtr->wordSpacing;
         break;
 
         case DTWAIN_PDFTEXTELEMENT_SKEWANGLES:
-            *val1 = pPtr->skewAngleX;
-            *val2 = pPtr->skewAngleY;
+            if ( val1 )
+                *val1 = pPtr->skewAngleX;
+            if ( val2 )
+                *val2 = pPtr->skewAngleY;
         break;
 
 		case DTWAIN_PDFTEXTELEMENT_STROKEWIDTH:
-			*val1 = pPtr->strokeWidth;
+            if ( val1 )
+			    *val1 = pPtr->strokeWidth;
     	break;
 
         default:
@@ -751,24 +761,30 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPDFTextElementLong(DTWAIN_PDFTEXTELEMENT Text
     switch (Flags)
     {
         case DTWAIN_PDFTEXTELEMENT_POSITION:
-            *val1 = static_cast<LONG>(pPtr->xpos);
-            *val2 = static_cast<LONG>(pPtr->ypos);
+            if ( val1 )
+                *val1 = static_cast<LONG>(pPtr->xpos);
+            if ( val2 )
+                *val2 = static_cast<LONG>(pPtr->ypos);
         break;
 
         case DTWAIN_PDFTEXTELEMENT_COLOR:
-            *val1 = pPtr->colorRGB;
+			if (val1)
+				*val1 = pPtr->colorRGB;
         break;
 
         case DTWAIN_PDFTEXTELEMENT_DISPLAYFLAGS:
-            *val1 = pPtr->displayFlags;
+			if (val1)
+				*val1 = pPtr->displayFlags;
         break;
 
         case DTWAIN_PDFTEXTELEMENT_RENDERMODE:
-            *val1 = pPtr->renderMode;
+			if (val1)
+				*val1 = pPtr->renderMode;
         break;
 
         case DTWAIN_PDFTEXTELEMENT_TEXTLENGTH:
-            *val1 = static_cast<long>(pPtr->m_text.size());
+			if (val1)
+				*val1 = static_cast<long>(pPtr->m_text.size());
         break;
 
         default:
