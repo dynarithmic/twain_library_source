@@ -2463,7 +2463,6 @@ Class DTWAINAPI
     Public Declare Auto Function DTWAIN_IsIndicatorEnabled Lib "dtwain32u.dll" (Source As System.IntPtr) As Integer
     Public Declare Auto Function DTWAIN_IsIndicatorSupported Lib "dtwain32u.dll" (Source As System.IntPtr) As Integer
     Public Declare Auto Function DTWAIN_IsInitialized Lib "dtwain32u.dll" () As Integer
-    Public Declare Auto Function DTWAIN_IsJPEGSupported Lib "dtwain32u.dll" () As Integer
     Public Declare Auto Function DTWAIN_IsJobControlSupported Lib "dtwain32u.dll" (Source As System.IntPtr, JobControl As Integer) As Integer
     Public Declare Auto Function DTWAIN_IsLampEnabled Lib "dtwain32u.dll" (Source As System.IntPtr) As Integer
     Public Declare Auto Function DTWAIN_IsLampSupported Lib "dtwain32u.dll" (Source As System.IntPtr) As Integer
@@ -2477,8 +2476,6 @@ Class DTWAINAPI
     Public Declare Auto Function DTWAIN_IsOpenSourcesOnSelect Lib "dtwain32u.dll" () As Integer
     Public Declare Auto Function DTWAIN_IsOrientationSupported Lib "dtwain32u.dll" (Source As System.IntPtr, Orientation As Integer) As Integer
     Public Declare Auto Function DTWAIN_IsOverscanSupported Lib "dtwain32u.dll" (Source As System.IntPtr, SupportValue As Integer) As Integer
-    Public Declare Auto Function DTWAIN_IsPDFSupported Lib "dtwain32u.dll" () As Integer
-    Public Declare Auto Function DTWAIN_IsPNGSupported Lib "dtwain32u.dll" () As Integer
     Public Declare Auto Function DTWAIN_IsPaperDetectable Lib "dtwain32u.dll" (Source As System.IntPtr) As Integer
     Public Declare Auto Function DTWAIN_IsPaperSizeSupported Lib "dtwain32u.dll" (Source As System.IntPtr, PaperSize As Integer) As Integer
     Public Declare Auto Function DTWAIN_IsPatchCapsSupported Lib "dtwain32u.dll" (Source As System.IntPtr) As Integer
@@ -2497,7 +2494,6 @@ Class DTWAINAPI
     Public Declare Auto Function DTWAIN_IsSourceOpen Lib "dtwain32u.dll" (Source As System.IntPtr) As Integer
     Public Declare Auto Function DTWAIN_IsSourceSelected Lib "dtwain32u.dll" (Source As System.IntPtr) As Integer
     Public Declare Auto Function DTWAIN_IsSourceValid Lib "dtwain32u.dll" (Source As System.IntPtr) As Integer
-    Public Declare Auto Function DTWAIN_IsTIFFSupported Lib "dtwain32u.dll" () As Integer
     Public Declare Auto Function DTWAIN_IsThumbnailEnabled Lib "dtwain32u.dll" (Source As System.IntPtr) As Integer
     Public Declare Auto Function DTWAIN_IsThumbnailSupported Lib "dtwain32u.dll" (Source As System.IntPtr) As Integer
     Public Declare Auto Function DTWAIN_IsTwainAvailable Lib "dtwain32u.dll" () As Integer

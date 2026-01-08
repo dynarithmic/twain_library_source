@@ -867,7 +867,6 @@ class DTWAINAPI
    attr_reader :DTWAIN_IsIndicatorEnabled
    attr_reader :DTWAIN_IsIndicatorSupported
    attr_reader :DTWAIN_IsInitialized
-   attr_reader :DTWAIN_IsJPEGSupported
    attr_reader :DTWAIN_IsJobControlSupported
    attr_reader :DTWAIN_IsLampEnabled
    attr_reader :DTWAIN_IsLampSupported
@@ -881,8 +880,6 @@ class DTWAINAPI
    attr_reader :DTWAIN_IsOpenSourcesOnSelect
    attr_reader :DTWAIN_IsOrientationSupported
    attr_reader :DTWAIN_IsOverscanSupported
-   attr_reader :DTWAIN_IsPDFSupported
-   attr_reader :DTWAIN_IsPNGSupported
    attr_reader :DTWAIN_IsPaperDetectable
    attr_reader :DTWAIN_IsPaperSizeSupported
    attr_reader :DTWAIN_IsPatchCapsSupported
@@ -901,7 +898,6 @@ class DTWAINAPI
    attr_reader :DTWAIN_IsSourceOpen
    attr_reader :DTWAIN_IsSourceSelected
    attr_reader :DTWAIN_IsSourceValid
-   attr_reader :DTWAIN_IsTIFFSupported
    attr_reader :DTWAIN_IsThumbnailEnabled
    attr_reader :DTWAIN_IsThumbnailSupported
    attr_reader :DTWAIN_IsTwainAvailable
@@ -3459,9 +3455,9 @@ class DTWAINAPI
        @DTWAIN_GetOverscan = Fiddle::Function::new(dtwain_dll['DTWAIN_GetOverscan'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_GetPDFTextElementFloat = Fiddle::Function::new(dtwain_dll['DTWAIN_GetPDFTextElementFloat'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
        @DTWAIN_GetPDFTextElementLong = Fiddle::Function::new(dtwain_dll['DTWAIN_GetPDFTextElementLong'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
-       @DTWAIN_GetPDFTextElementString = Fiddle::Function::new(dtwain_dll['DTWAIN_GetPDFTextElementString'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
-       @DTWAIN_GetPDFTextElementStringA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetPDFTextElementStringA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
-       @DTWAIN_GetPDFTextElementStringW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetPDFTextElementStringW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
+       @DTWAIN_GetPDFTextElementString = Fiddle::Function::new(dtwain_dll['DTWAIN_GetPDFTextElementString'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
+       @DTWAIN_GetPDFTextElementStringA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetPDFTextElementStringA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
+       @DTWAIN_GetPDFTextElementStringW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetPDFTextElementStringW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetPDFType1FontName = Fiddle::Function::new(dtwain_dll['DTWAIN_GetPDFType1FontName'],[Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetPDFType1FontNameA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetPDFType1FontNameA'],[Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetPDFType1FontNameW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetPDFType1FontNameW'],[Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
@@ -3658,7 +3654,6 @@ class DTWAINAPI
        @DTWAIN_IsIndicatorEnabled = Fiddle::Function::new(dtwain_dll['DTWAIN_IsIndicatorEnabled'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_IsIndicatorSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsIndicatorSupported'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_IsInitialized = Fiddle::Function::new(dtwain_dll['DTWAIN_IsInitialized'],[],Fiddle::TYPE_INT)
-       @DTWAIN_IsJPEGSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsJPEGSupported'],[],Fiddle::TYPE_INT)
        @DTWAIN_IsJobControlSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsJobControlSupported'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
        @DTWAIN_IsLampEnabled = Fiddle::Function::new(dtwain_dll['DTWAIN_IsLampEnabled'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_IsLampSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsLampSupported'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
@@ -3672,8 +3667,6 @@ class DTWAINAPI
        @DTWAIN_IsOpenSourcesOnSelect = Fiddle::Function::new(dtwain_dll['DTWAIN_IsOpenSourcesOnSelect'],[],Fiddle::TYPE_INT)
        @DTWAIN_IsOrientationSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsOrientationSupported'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
        @DTWAIN_IsOverscanSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsOverscanSupported'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
-       @DTWAIN_IsPDFSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsPDFSupported'],[],Fiddle::TYPE_INT)
-       @DTWAIN_IsPNGSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsPNGSupported'],[],Fiddle::TYPE_INT)
        @DTWAIN_IsPaperDetectable = Fiddle::Function::new(dtwain_dll['DTWAIN_IsPaperDetectable'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_IsPaperSizeSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsPaperSizeSupported'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
        @DTWAIN_IsPatchCapsSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsPatchCapsSupported'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
@@ -3692,7 +3685,6 @@ class DTWAINAPI
        @DTWAIN_IsSourceOpen = Fiddle::Function::new(dtwain_dll['DTWAIN_IsSourceOpen'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_IsSourceSelected = Fiddle::Function::new(dtwain_dll['DTWAIN_IsSourceSelected'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_IsSourceValid = Fiddle::Function::new(dtwain_dll['DTWAIN_IsSourceValid'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
-       @DTWAIN_IsTIFFSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsTIFFSupported'],[],Fiddle::TYPE_INT)
        @DTWAIN_IsThumbnailEnabled = Fiddle::Function::new(dtwain_dll['DTWAIN_IsThumbnailEnabled'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_IsThumbnailSupported = Fiddle::Function::new(dtwain_dll['DTWAIN_IsThumbnailSupported'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_IsTwainAvailable = Fiddle::Function::new(dtwain_dll['DTWAIN_IsTwainAvailable'],[],Fiddle::TYPE_INT)

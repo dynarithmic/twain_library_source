@@ -2622,7 +2622,6 @@
         public delegate int DTWAIN_IsIndicatorEnabledDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_IsIndicatorSupportedDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_IsInitializedDelegate();
-        public delegate int DTWAIN_IsJPEGSupportedDelegate();
         public delegate int DTWAIN_IsJobControlSupportedDelegate(DTWAIN_SOURCE Source, int JobControl);
         public delegate int DTWAIN_IsLampEnabledDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_IsLampSupportedDelegate(DTWAIN_SOURCE Source);
@@ -2636,8 +2635,6 @@
         public delegate int DTWAIN_IsOpenSourcesOnSelectDelegate();
         public delegate int DTWAIN_IsOrientationSupportedDelegate(DTWAIN_SOURCE Source, int Orientation);
         public delegate int DTWAIN_IsOverscanSupportedDelegate(DTWAIN_SOURCE Source, int SupportValue);
-        public delegate int DTWAIN_IsPDFSupportedDelegate();
-        public delegate int DTWAIN_IsPNGSupportedDelegate();
         public delegate int DTWAIN_IsPaperDetectableDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_IsPaperSizeSupportedDelegate(DTWAIN_SOURCE Source, int PaperSize);
         public delegate int DTWAIN_IsPatchCapsSupportedDelegate(DTWAIN_SOURCE Source);
@@ -2656,7 +2653,6 @@
         public delegate int DTWAIN_IsSourceOpenDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_IsSourceSelectedDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_IsSourceValidDelegate(DTWAIN_SOURCE Source);
-        public delegate int DTWAIN_IsTIFFSupportedDelegate();
         public delegate int DTWAIN_IsThumbnailEnabledDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_IsThumbnailSupportedDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_IsTwainAvailableDelegate();
@@ -5225,9 +5221,6 @@
         [DTWAINNativeFunction("DTWAIN_IsInitialized")]
         private readonly DTWAIN_IsInitializedDelegate  _DTWAIN_IsInitialized;
 
-        [DTWAINNativeFunction("DTWAIN_IsJPEGSupported")]
-        private readonly DTWAIN_IsJPEGSupportedDelegate  _DTWAIN_IsJPEGSupported;
-
         [DTWAINNativeFunction("DTWAIN_IsJobControlSupported")]
         private readonly DTWAIN_IsJobControlSupportedDelegate  _DTWAIN_IsJobControlSupported;
 
@@ -5266,12 +5259,6 @@
 
         [DTWAINNativeFunction("DTWAIN_IsOverscanSupported")]
         private readonly DTWAIN_IsOverscanSupportedDelegate  _DTWAIN_IsOverscanSupported;
-
-        [DTWAINNativeFunction("DTWAIN_IsPDFSupported")]
-        private readonly DTWAIN_IsPDFSupportedDelegate  _DTWAIN_IsPDFSupported;
-
-        [DTWAINNativeFunction("DTWAIN_IsPNGSupported")]
-        private readonly DTWAIN_IsPNGSupportedDelegate  _DTWAIN_IsPNGSupported;
 
         [DTWAINNativeFunction("DTWAIN_IsPaperDetectable")]
         private readonly DTWAIN_IsPaperDetectableDelegate  _DTWAIN_IsPaperDetectable;
@@ -5326,9 +5313,6 @@
 
         [DTWAINNativeFunction("DTWAIN_IsSourceValid")]
         private readonly DTWAIN_IsSourceValidDelegate  _DTWAIN_IsSourceValid;
-
-        [DTWAINNativeFunction("DTWAIN_IsTIFFSupported")]
-        private readonly DTWAIN_IsTIFFSupportedDelegate  _DTWAIN_IsTIFFSupported;
 
         [DTWAINNativeFunction("DTWAIN_IsThumbnailEnabled")]
         private readonly DTWAIN_IsThumbnailEnabledDelegate  _DTWAIN_IsThumbnailEnabled;
@@ -8593,9 +8577,6 @@
         public  int DTWAIN_IsInitialized()
         => _DTWAIN_IsInitialized();
 
-        public  int DTWAIN_IsJPEGSupported()
-        => _DTWAIN_IsJPEGSupported();
-
         public  int DTWAIN_IsJobControlSupported(DTWAIN_SOURCE Source, int JobControl)
         => _DTWAIN_IsJobControlSupported(Source, JobControl);
 
@@ -8634,12 +8615,6 @@
 
         public  int DTWAIN_IsOverscanSupported(DTWAIN_SOURCE Source, int SupportValue)
         => _DTWAIN_IsOverscanSupported(Source, SupportValue);
-
-        public  int DTWAIN_IsPDFSupported()
-        => _DTWAIN_IsPDFSupported();
-
-        public  int DTWAIN_IsPNGSupported()
-        => _DTWAIN_IsPNGSupported();
 
         public  int DTWAIN_IsPaperDetectable(DTWAIN_SOURCE Source)
         => _DTWAIN_IsPaperDetectable(Source);
@@ -8694,9 +8669,6 @@
 
         public  int DTWAIN_IsSourceValid(DTWAIN_SOURCE Source)
         => _DTWAIN_IsSourceValid(Source);
-
-        public  int DTWAIN_IsTIFFSupported()
-        => _DTWAIN_IsTIFFSupported();
 
         public  int DTWAIN_IsThumbnailEnabled(DTWAIN_SOURCE Source)
         => _DTWAIN_IsThumbnailEnabled(Source);

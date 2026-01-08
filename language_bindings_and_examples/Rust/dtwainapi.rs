@@ -779,7 +779,6 @@ type DtwainisimageaddressingsupportedFunc = unsafe extern "C" fn(*mut c_void) ->
 type DtwainisindicatorenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainisindicatorsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainisinitializedFunc = unsafe extern "C" fn() -> i32;
-type DtwainisjpegsupportedFunc = unsafe extern "C" fn() -> i32;
 type DtwainisjobcontrolsupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainislampenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainislampsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
@@ -793,8 +792,6 @@ type DtwainisocrengineactivatedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainisopensourcesonselectFunc = unsafe extern "C" fn() -> i32;
 type DtwainisorientationsupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainisoverscansupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainispdfsupportedFunc = unsafe extern "C" fn() -> i32;
-type DtwainispngsupportedFunc = unsafe extern "C" fn() -> i32;
 type DtwainispaperdetectableFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainispapersizesupportedFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainispatchcapssupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
@@ -813,7 +810,6 @@ type DtwainissourceinuionlymodeFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainissourceopenFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainissourceselectedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainissourcevalidFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainistiffsupportedFunc = unsafe extern "C" fn() -> i32;
 type DtwainisthumbnailenabledFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainisthumbnailsupportedFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainistwainavailableFunc = unsafe extern "C" fn() -> i32;
@@ -1902,7 +1898,6 @@ pub struct DTwainAPI<'a>
     DTWAIN_IsIndicatorEnabledFunc: Symbol<'a, DtwainisindicatorenabledFunc>,
     DTWAIN_IsIndicatorSupportedFunc: Symbol<'a, DtwainisindicatorsupportedFunc>,
     DTWAIN_IsInitializedFunc: Symbol<'a, DtwainisinitializedFunc>,
-    DTWAIN_IsJPEGSupportedFunc: Symbol<'a, DtwainisjpegsupportedFunc>,
     DTWAIN_IsJobControlSupportedFunc: Symbol<'a, DtwainisjobcontrolsupportedFunc>,
     DTWAIN_IsLampEnabledFunc: Symbol<'a, DtwainislampenabledFunc>,
     DTWAIN_IsLampSupportedFunc: Symbol<'a, DtwainislampsupportedFunc>,
@@ -1916,8 +1911,6 @@ pub struct DTwainAPI<'a>
     DTWAIN_IsOpenSourcesOnSelectFunc: Symbol<'a, DtwainisopensourcesonselectFunc>,
     DTWAIN_IsOrientationSupportedFunc: Symbol<'a, DtwainisorientationsupportedFunc>,
     DTWAIN_IsOverscanSupportedFunc: Symbol<'a, DtwainisoverscansupportedFunc>,
-    DTWAIN_IsPDFSupportedFunc: Symbol<'a, DtwainispdfsupportedFunc>,
-    DTWAIN_IsPNGSupportedFunc: Symbol<'a, DtwainispngsupportedFunc>,
     DTWAIN_IsPaperDetectableFunc: Symbol<'a, DtwainispaperdetectableFunc>,
     DTWAIN_IsPaperSizeSupportedFunc: Symbol<'a, DtwainispapersizesupportedFunc>,
     DTWAIN_IsPatchCapsSupportedFunc: Symbol<'a, DtwainispatchcapssupportedFunc>,
@@ -1936,7 +1929,6 @@ pub struct DTwainAPI<'a>
     DTWAIN_IsSourceOpenFunc: Symbol<'a, DtwainissourceopenFunc>,
     DTWAIN_IsSourceSelectedFunc: Symbol<'a, DtwainissourceselectedFunc>,
     DTWAIN_IsSourceValidFunc: Symbol<'a, DtwainissourcevalidFunc>,
-    DTWAIN_IsTIFFSupportedFunc: Symbol<'a, DtwainistiffsupportedFunc>,
     DTWAIN_IsThumbnailEnabledFunc: Symbol<'a, DtwainisthumbnailenabledFunc>,
     DTWAIN_IsThumbnailSupportedFunc: Symbol<'a, DtwainisthumbnailsupportedFunc>,
     DTWAIN_IsTwainAvailableFunc: Symbol<'a, DtwainistwainavailableFunc>,
@@ -4657,7 +4649,6 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_IsIndicatorEnabled: Symbol<DtwainisindicatorenabledFunc> = unsafe { library.get(b"DTWAIN_IsIndicatorEnabled")? };
         let DTWAIN_IsIndicatorSupported: Symbol<DtwainisindicatorsupportedFunc> = unsafe { library.get(b"DTWAIN_IsIndicatorSupported")? };
         let DTWAIN_IsInitialized: Symbol<DtwainisinitializedFunc> = unsafe { library.get(b"DTWAIN_IsInitialized")? };
-        let DTWAIN_IsJPEGSupported: Symbol<DtwainisjpegsupportedFunc> = unsafe { library.get(b"DTWAIN_IsJPEGSupported")? };
         let DTWAIN_IsJobControlSupported: Symbol<DtwainisjobcontrolsupportedFunc> = unsafe { library.get(b"DTWAIN_IsJobControlSupported")? };
         let DTWAIN_IsLampEnabled: Symbol<DtwainislampenabledFunc> = unsafe { library.get(b"DTWAIN_IsLampEnabled")? };
         let DTWAIN_IsLampSupported: Symbol<DtwainislampsupportedFunc> = unsafe { library.get(b"DTWAIN_IsLampSupported")? };
@@ -4671,8 +4662,6 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_IsOpenSourcesOnSelect: Symbol<DtwainisopensourcesonselectFunc> = unsafe { library.get(b"DTWAIN_IsOpenSourcesOnSelect")? };
         let DTWAIN_IsOrientationSupported: Symbol<DtwainisorientationsupportedFunc> = unsafe { library.get(b"DTWAIN_IsOrientationSupported")? };
         let DTWAIN_IsOverscanSupported: Symbol<DtwainisoverscansupportedFunc> = unsafe { library.get(b"DTWAIN_IsOverscanSupported")? };
-        let DTWAIN_IsPDFSupported: Symbol<DtwainispdfsupportedFunc> = unsafe { library.get(b"DTWAIN_IsPDFSupported")? };
-        let DTWAIN_IsPNGSupported: Symbol<DtwainispngsupportedFunc> = unsafe { library.get(b"DTWAIN_IsPNGSupported")? };
         let DTWAIN_IsPaperDetectable: Symbol<DtwainispaperdetectableFunc> = unsafe { library.get(b"DTWAIN_IsPaperDetectable")? };
         let DTWAIN_IsPaperSizeSupported: Symbol<DtwainispapersizesupportedFunc> = unsafe { library.get(b"DTWAIN_IsPaperSizeSupported")? };
         let DTWAIN_IsPatchCapsSupported: Symbol<DtwainispatchcapssupportedFunc> = unsafe { library.get(b"DTWAIN_IsPatchCapsSupported")? };
@@ -4691,7 +4680,6 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_IsSourceOpen: Symbol<DtwainissourceopenFunc> = unsafe { library.get(b"DTWAIN_IsSourceOpen")? };
         let DTWAIN_IsSourceSelected: Symbol<DtwainissourceselectedFunc> = unsafe { library.get(b"DTWAIN_IsSourceSelected")? };
         let DTWAIN_IsSourceValid: Symbol<DtwainissourcevalidFunc> = unsafe { library.get(b"DTWAIN_IsSourceValid")? };
-        let DTWAIN_IsTIFFSupported: Symbol<DtwainistiffsupportedFunc> = unsafe { library.get(b"DTWAIN_IsTIFFSupported")? };
         let DTWAIN_IsThumbnailEnabled: Symbol<DtwainisthumbnailenabledFunc> = unsafe { library.get(b"DTWAIN_IsThumbnailEnabled")? };
         let DTWAIN_IsThumbnailSupported: Symbol<DtwainisthumbnailsupportedFunc> = unsafe { library.get(b"DTWAIN_IsThumbnailSupported")? };
         let DTWAIN_IsTwainAvailable: Symbol<DtwainistwainavailableFunc> = unsafe { library.get(b"DTWAIN_IsTwainAvailable")? };
@@ -5779,7 +5767,6 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_IsIndicatorEnabledFunc: DTWAIN_IsIndicatorEnabled,
             DTWAIN_IsIndicatorSupportedFunc: DTWAIN_IsIndicatorSupported,
             DTWAIN_IsInitializedFunc: DTWAIN_IsInitialized,
-            DTWAIN_IsJPEGSupportedFunc: DTWAIN_IsJPEGSupported,
             DTWAIN_IsJobControlSupportedFunc: DTWAIN_IsJobControlSupported,
             DTWAIN_IsLampEnabledFunc: DTWAIN_IsLampEnabled,
             DTWAIN_IsLampSupportedFunc: DTWAIN_IsLampSupported,
@@ -5793,8 +5780,6 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_IsOpenSourcesOnSelectFunc: DTWAIN_IsOpenSourcesOnSelect,
             DTWAIN_IsOrientationSupportedFunc: DTWAIN_IsOrientationSupported,
             DTWAIN_IsOverscanSupportedFunc: DTWAIN_IsOverscanSupported,
-            DTWAIN_IsPDFSupportedFunc: DTWAIN_IsPDFSupported,
-            DTWAIN_IsPNGSupportedFunc: DTWAIN_IsPNGSupported,
             DTWAIN_IsPaperDetectableFunc: DTWAIN_IsPaperDetectable,
             DTWAIN_IsPaperSizeSupportedFunc: DTWAIN_IsPaperSizeSupported,
             DTWAIN_IsPatchCapsSupportedFunc: DTWAIN_IsPatchCapsSupported,
@@ -5813,7 +5798,6 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_IsSourceOpenFunc: DTWAIN_IsSourceOpen,
             DTWAIN_IsSourceSelectedFunc: DTWAIN_IsSourceSelected,
             DTWAIN_IsSourceValidFunc: DTWAIN_IsSourceValid,
-            DTWAIN_IsTIFFSupportedFunc: DTWAIN_IsTIFFSupported,
             DTWAIN_IsThumbnailEnabledFunc: DTWAIN_IsThumbnailEnabled,
             DTWAIN_IsThumbnailSupportedFunc: DTWAIN_IsThumbnailSupported,
             DTWAIN_IsTwainAvailableFunc: DTWAIN_IsTwainAvailable,
@@ -9100,10 +9084,6 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_IsInitializedFunc)();  }
     }
 
-    pub fn DTWAIN_IsJPEGSupported(&self) -> i32 {
-        unsafe { return (self.DTWAIN_IsJPEGSupportedFunc)();  }
-    }
-
     pub fn DTWAIN_IsJobControlSupported(&self, Source: *mut c_void, JobControl: i32) -> i32 {
         unsafe { return (self.DTWAIN_IsJobControlSupportedFunc)(Source, JobControl);  }
     }
@@ -9154,14 +9134,6 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_IsOverscanSupported(&self, Source: *mut c_void, SupportValue: i32) -> i32 {
         unsafe { return (self.DTWAIN_IsOverscanSupportedFunc)(Source, SupportValue);  }
-    }
-
-    pub fn DTWAIN_IsPDFSupported(&self) -> i32 {
-        unsafe { return (self.DTWAIN_IsPDFSupportedFunc)();  }
-    }
-
-    pub fn DTWAIN_IsPNGSupported(&self) -> i32 {
-        unsafe { return (self.DTWAIN_IsPNGSupportedFunc)();  }
     }
 
     pub fn DTWAIN_IsPaperDetectable(&self, Source: *mut c_void) -> i32 {
@@ -9234,10 +9206,6 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_IsSourceValid(&self, Source: *mut c_void) -> i32 {
         unsafe { return (self.DTWAIN_IsSourceValidFunc)(Source);  }
-    }
-
-    pub fn DTWAIN_IsTIFFSupported(&self) -> i32 {
-        unsafe { return (self.DTWAIN_IsTIFFSupportedFunc)();  }
     }
 
     pub fn DTWAIN_IsThumbnailEnabled(&self, Source: *mut c_void) -> i32 {

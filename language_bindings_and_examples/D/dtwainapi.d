@@ -2428,9 +2428,9 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG, DTWAIN_BOOL) DTWAIN_GetOverscan;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_PDFTEXTELEMENT, LPDTWAIN_FLOAT, LPDTWAIN_FLOAT, LONG) DTWAIN_GetPDFTextElementFloat;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_PDFTEXTELEMENT, LPLONG, LPLONG, LONG) DTWAIN_GetPDFTextElementLong;
-    extern(Windows) DTWAIN_BOOL function(DTWAIN_PDFTEXTELEMENT, DTWAIN_CHARPTRTYPE, LONG, LONG) DTWAIN_GetPDFTextElementString;
-    extern(Windows) DTWAIN_BOOL function(DTWAIN_PDFTEXTELEMENT, LPSTR, LONG, LONG) DTWAIN_GetPDFTextElementStringA;
-    extern(Windows) DTWAIN_BOOL function(DTWAIN_PDFTEXTELEMENT, LPWSTR, LONG, LONG) DTWAIN_GetPDFTextElementStringW;
+    extern(Windows) LONG function(DTWAIN_PDFTEXTELEMENT, DTWAIN_CHARPTRTYPE, LONG, LONG) DTWAIN_GetPDFTextElementString;
+    extern(Windows) LONG function(DTWAIN_PDFTEXTELEMENT, LPSTR, LONG, LONG) DTWAIN_GetPDFTextElementStringA;
+    extern(Windows) LONG function(DTWAIN_PDFTEXTELEMENT, LPWSTR, LONG, LONG) DTWAIN_GetPDFTextElementStringW;
     extern(Windows) LONG function(LONG, DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetPDFType1FontName;
     extern(Windows) LONG function(LONG, LPSTR, LONG) DTWAIN_GetPDFType1FontNameA;
     extern(Windows) LONG function(LONG, LPWSTR, LONG) DTWAIN_GetPDFType1FontNameW;
@@ -2628,7 +2628,6 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsIndicatorEnabled;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsIndicatorSupported;
     extern(Windows) DTWAIN_BOOL function() DTWAIN_IsInitialized;
-    extern(Windows) DTWAIN_BOOL function() DTWAIN_IsJPEGSupported;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_IsJobControlSupported;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsLampEnabled;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsLampSupported;
@@ -2642,8 +2641,6 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function() DTWAIN_IsOpenSourcesOnSelect;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_IsOrientationSupported;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_IsOverscanSupported;
-    extern(Windows) DTWAIN_BOOL function() DTWAIN_IsPDFSupported;
-    extern(Windows) DTWAIN_BOOL function() DTWAIN_IsPNGSupported;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsPaperDetectable;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_IsPaperSizeSupported;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsPatchCapsSupported;
@@ -2662,7 +2659,6 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsSourceOpen;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsSourceSelected;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsSourceValid;
-    extern(Windows) DTWAIN_BOOL function() DTWAIN_IsTIFFSupported;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsThumbnailEnabled;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_IsThumbnailSupported;
     extern(Windows) DTWAIN_BOOL function() DTWAIN_IsTwainAvailable;
@@ -3750,7 +3746,6 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_IsIndicatorEnabled, "DTWAIN_IsIndicatorEnabled");
         bindFunction(cast(void**)&DTWAIN_IsIndicatorSupported, "DTWAIN_IsIndicatorSupported");
         bindFunction(cast(void**)&DTWAIN_IsInitialized, "DTWAIN_IsInitialized");
-        bindFunction(cast(void**)&DTWAIN_IsJPEGSupported, "DTWAIN_IsJPEGSupported");
         bindFunction(cast(void**)&DTWAIN_IsJobControlSupported, "DTWAIN_IsJobControlSupported");
         bindFunction(cast(void**)&DTWAIN_IsLampEnabled, "DTWAIN_IsLampEnabled");
         bindFunction(cast(void**)&DTWAIN_IsLampSupported, "DTWAIN_IsLampSupported");
@@ -3764,8 +3759,6 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_IsOpenSourcesOnSelect, "DTWAIN_IsOpenSourcesOnSelect");
         bindFunction(cast(void**)&DTWAIN_IsOrientationSupported, "DTWAIN_IsOrientationSupported");
         bindFunction(cast(void**)&DTWAIN_IsOverscanSupported, "DTWAIN_IsOverscanSupported");
-        bindFunction(cast(void**)&DTWAIN_IsPDFSupported, "DTWAIN_IsPDFSupported");
-        bindFunction(cast(void**)&DTWAIN_IsPNGSupported, "DTWAIN_IsPNGSupported");
         bindFunction(cast(void**)&DTWAIN_IsPaperDetectable, "DTWAIN_IsPaperDetectable");
         bindFunction(cast(void**)&DTWAIN_IsPaperSizeSupported, "DTWAIN_IsPaperSizeSupported");
         bindFunction(cast(void**)&DTWAIN_IsPatchCapsSupported, "DTWAIN_IsPatchCapsSupported");
@@ -3784,7 +3777,6 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_IsSourceOpen, "DTWAIN_IsSourceOpen");
         bindFunction(cast(void**)&DTWAIN_IsSourceSelected, "DTWAIN_IsSourceSelected");
         bindFunction(cast(void**)&DTWAIN_IsSourceValid, "DTWAIN_IsSourceValid");
-        bindFunction(cast(void**)&DTWAIN_IsTIFFSupported, "DTWAIN_IsTIFFSupported");
         bindFunction(cast(void**)&DTWAIN_IsThumbnailEnabled, "DTWAIN_IsThumbnailEnabled");
         bindFunction(cast(void**)&DTWAIN_IsThumbnailSupported, "DTWAIN_IsThumbnailSupported");
         bindFunction(cast(void**)&DTWAIN_IsTwainAvailable, "DTWAIN_IsTwainAvailable");

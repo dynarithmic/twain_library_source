@@ -4097,9 +4097,6 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_IsInitializedDelegate() As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
-        Private Delegate Function DTWAIN_IsJPEGSupportedDelegate() As Integer
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
         Private Delegate Function DTWAIN_IsJobControlSupportedDelegate(Source As System.IntPtr, JobControl As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
@@ -4137,12 +4134,6 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
         Private Delegate Function DTWAIN_IsOverscanSupportedDelegate(Source As System.IntPtr, SupportValue As Integer) As Integer
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
-        Private Delegate Function DTWAIN_IsPDFSupportedDelegate() As Integer
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
-        Private Delegate Function DTWAIN_IsPNGSupportedDelegate() As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
         Private Delegate Function DTWAIN_IsPaperDetectableDelegate(Source As System.IntPtr) As Integer
@@ -4197,9 +4188,6 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
         Private Delegate Function DTWAIN_IsSourceValidDelegate(Source As System.IntPtr) As Integer
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
-        Private Delegate Function DTWAIN_IsTIFFSupportedDelegate() As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
         Private Delegate Function DTWAIN_IsThumbnailEnabledDelegate(Source As System.IntPtr) As Integer
@@ -8189,10 +8177,6 @@ Namespace Dynarithmic
         Return api.DTWAIN_IsInitialized()
         End Function
         
-        Public Function DTWAIN_IsJPEGSupported() As Integer
-        Return api.DTWAIN_IsJPEGSupported()
-        End Function
-        
         Public Function DTWAIN_IsJobControlSupported(Source As System.IntPtr, JobControl As Integer) As Integer
         Return api.DTWAIN_IsJobControlSupported(Source, JobControl)
         End Function
@@ -8243,14 +8227,6 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_IsOverscanSupported(Source As System.IntPtr, SupportValue As Integer) As Integer
         Return api.DTWAIN_IsOverscanSupported(Source, SupportValue)
-        End Function
-        
-        Public Function DTWAIN_IsPDFSupported() As Integer
-        Return api.DTWAIN_IsPDFSupported()
-        End Function
-        
-        Public Function DTWAIN_IsPNGSupported() As Integer
-        Return api.DTWAIN_IsPNGSupported()
         End Function
         
         Public Function DTWAIN_IsPaperDetectable(Source As System.IntPtr) As Integer
@@ -8323,10 +8299,6 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_IsSourceValid(Source As System.IntPtr) As Integer
         Return api.DTWAIN_IsSourceValid(Source)
-        End Function
-        
-        Public Function DTWAIN_IsTIFFSupported() As Integer
-        Return api.DTWAIN_IsTIFFSupported()
         End Function
         
         Public Function DTWAIN_IsThumbnailEnabled(Source As System.IntPtr) As Integer
@@ -10480,7 +10452,6 @@ Namespace Dynarithmic
             Public DTWAIN_IsIndicatorEnabled As DTWAIN_IsIndicatorEnabledDelegate
             Public DTWAIN_IsIndicatorSupported As DTWAIN_IsIndicatorSupportedDelegate
             Public DTWAIN_IsInitialized As DTWAIN_IsInitializedDelegate
-            Public DTWAIN_IsJPEGSupported As DTWAIN_IsJPEGSupportedDelegate
             Public DTWAIN_IsJobControlSupported As DTWAIN_IsJobControlSupportedDelegate
             Public DTWAIN_IsLampEnabled As DTWAIN_IsLampEnabledDelegate
             Public DTWAIN_IsLampSupported As DTWAIN_IsLampSupportedDelegate
@@ -10494,8 +10465,6 @@ Namespace Dynarithmic
             Public DTWAIN_IsOpenSourcesOnSelect As DTWAIN_IsOpenSourcesOnSelectDelegate
             Public DTWAIN_IsOrientationSupported As DTWAIN_IsOrientationSupportedDelegate
             Public DTWAIN_IsOverscanSupported As DTWAIN_IsOverscanSupportedDelegate
-            Public DTWAIN_IsPDFSupported As DTWAIN_IsPDFSupportedDelegate
-            Public DTWAIN_IsPNGSupported As DTWAIN_IsPNGSupportedDelegate
             Public DTWAIN_IsPaperDetectable As DTWAIN_IsPaperDetectableDelegate
             Public DTWAIN_IsPaperSizeSupported As DTWAIN_IsPaperSizeSupportedDelegate
             Public DTWAIN_IsPatchCapsSupported As DTWAIN_IsPatchCapsSupportedDelegate
@@ -10514,7 +10483,6 @@ Namespace Dynarithmic
             Public DTWAIN_IsSourceOpen As DTWAIN_IsSourceOpenDelegate
             Public DTWAIN_IsSourceSelected As DTWAIN_IsSourceSelectedDelegate
             Public DTWAIN_IsSourceValid As DTWAIN_IsSourceValidDelegate
-            Public DTWAIN_IsTIFFSupported As DTWAIN_IsTIFFSupportedDelegate
             Public DTWAIN_IsThumbnailEnabled As DTWAIN_IsThumbnailEnabledDelegate
             Public DTWAIN_IsThumbnailSupported As DTWAIN_IsThumbnailSupportedDelegate
             Public DTWAIN_IsTwainAvailable As DTWAIN_IsTwainAvailableDelegate

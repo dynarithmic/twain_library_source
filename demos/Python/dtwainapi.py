@@ -2479,7 +2479,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_IsIndicatorEnabled.restype = ct.c_long
      theDLL.DTWAIN_IsIndicatorSupported.restype = ct.c_long
      theDLL.DTWAIN_IsInitialized.restype = ct.c_long
-     theDLL.DTWAIN_IsJPEGSupported.restype = ct.c_long
      theDLL.DTWAIN_IsJobControlSupported.restype = ct.c_long
      theDLL.DTWAIN_IsLampEnabled.restype = ct.c_long
      theDLL.DTWAIN_IsLampSupported.restype = ct.c_long
@@ -2493,8 +2492,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_IsOpenSourcesOnSelect.restype = ct.c_long
      theDLL.DTWAIN_IsOrientationSupported.restype = ct.c_long
      theDLL.DTWAIN_IsOverscanSupported.restype = ct.c_long
-     theDLL.DTWAIN_IsPDFSupported.restype = ct.c_long
-     theDLL.DTWAIN_IsPNGSupported.restype = ct.c_long
      theDLL.DTWAIN_IsPaperDetectable.restype = ct.c_long
      theDLL.DTWAIN_IsPaperSizeSupported.restype = ct.c_long
      theDLL.DTWAIN_IsPatchCapsSupported.restype = ct.c_long
@@ -2513,7 +2510,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_IsSourceOpen.restype = ct.c_long
      theDLL.DTWAIN_IsSourceSelected.restype = ct.c_long
      theDLL.DTWAIN_IsSourceValid.restype = ct.c_long
-     theDLL.DTWAIN_IsTIFFSupported.restype = ct.c_long
      theDLL.DTWAIN_IsThumbnailEnabled.restype = ct.c_long
      theDLL.DTWAIN_IsThumbnailSupported.restype = ct.c_long
      theDLL.DTWAIN_IsTwainAvailable.restype = ct.c_long
@@ -4691,7 +4687,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_IsIndicatorEnabled.restype = ct.c_long
      theDLL.DTWAIN_IsIndicatorSupported.restype = ct.c_long
      theDLL.DTWAIN_IsInitialized.restype = ct.c_long
-     theDLL.DTWAIN_IsJPEGSupported.restype = ct.c_long
      theDLL.DTWAIN_IsJobControlSupported.restype = ct.c_long
      theDLL.DTWAIN_IsLampEnabled.restype = ct.c_long
      theDLL.DTWAIN_IsLampSupported.restype = ct.c_long
@@ -4705,8 +4700,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_IsOpenSourcesOnSelect.restype = ct.c_long
      theDLL.DTWAIN_IsOrientationSupported.restype = ct.c_long
      theDLL.DTWAIN_IsOverscanSupported.restype = ct.c_long
-     theDLL.DTWAIN_IsPDFSupported.restype = ct.c_long
-     theDLL.DTWAIN_IsPNGSupported.restype = ct.c_long
      theDLL.DTWAIN_IsPaperDetectable.restype = ct.c_long
      theDLL.DTWAIN_IsPaperSizeSupported.restype = ct.c_long
      theDLL.DTWAIN_IsPatchCapsSupported.restype = ct.c_long
@@ -4725,7 +4718,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_IsSourceOpen.restype = ct.c_long
      theDLL.DTWAIN_IsSourceSelected.restype = ct.c_long
      theDLL.DTWAIN_IsSourceValid.restype = ct.c_long
-     theDLL.DTWAIN_IsTIFFSupported.restype = ct.c_long
      theDLL.DTWAIN_IsThumbnailEnabled.restype = ct.c_long
      theDLL.DTWAIN_IsThumbnailSupported.restype = ct.c_long
      theDLL.DTWAIN_IsTwainAvailable.restype = ct.c_long

@@ -609,9 +609,9 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetOverscan(DTWAIN_SOURCE Source, LPLONG lpOverscan, DTWAIN_BOOL bCurrent);
         DTWAIN_BOOL DTWAIN_GetPDFTextElementFloat(DTWAIN_PDFTEXTELEMENT TextElement, LPDTWAIN_FLOAT val1, LPDTWAIN_FLOAT val2, LONG Flags);
         DTWAIN_BOOL DTWAIN_GetPDFTextElementLong(DTWAIN_PDFTEXTELEMENT TextElement, LPLONG val1, LPLONG val2, LONG Flags);
-        DTWAIN_BOOL DTWAIN_GetPDFTextElementString(DTWAIN_PDFTEXTELEMENT TextElement, DTWAIN_CHARPTRTYPE szData, LONG maxLen, LONG Flags);
-        DTWAIN_BOOL DTWAIN_GetPDFTextElementStringA(DTWAIN_PDFTEXTELEMENT TextElement, LPSTR szData, LONG maxLen, LONG Flags);
-        DTWAIN_BOOL DTWAIN_GetPDFTextElementStringW(DTWAIN_PDFTEXTELEMENT TextElement, LPWSTR szData, LONG maxLen, LONG Flags);
+        LONG DTWAIN_GetPDFTextElementString(DTWAIN_PDFTEXTELEMENT TextElement, DTWAIN_CHARPTRTYPE szData, LONG maxLen, LONG Flags);
+        LONG DTWAIN_GetPDFTextElementStringA(DTWAIN_PDFTEXTELEMENT TextElement, LPSTR szData, LONG maxLen, LONG Flags);
+        LONG DTWAIN_GetPDFTextElementStringW(DTWAIN_PDFTEXTELEMENT TextElement, LPWSTR szData, LONG maxLen, LONG Flags);
         LONG DTWAIN_GetPDFType1FontName(LONG FontVal, DTWAIN_CHARPTRTYPE szFont, LONG nChars);
         LONG DTWAIN_GetPDFType1FontNameA(LONG FontVal, LPSTR szFont, LONG nChars);
         LONG DTWAIN_GetPDFType1FontNameW(LONG FontVal, LPWSTR szFont, LONG nChars);
@@ -806,7 +806,6 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsIndicatorEnabled(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIndicatorSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsInitialized();
-        DTWAIN_BOOL DTWAIN_IsJPEGSupported();
         DTWAIN_BOOL DTWAIN_IsJobControlSupported(DTWAIN_SOURCE Source, LONG JobControl);
         DTWAIN_BOOL DTWAIN_IsLampEnabled(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsLampSupported(DTWAIN_SOURCE Source);
@@ -820,8 +819,6 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsOpenSourcesOnSelect();
         DTWAIN_BOOL DTWAIN_IsOrientationSupported(DTWAIN_SOURCE Source, LONG Orientation);
         DTWAIN_BOOL DTWAIN_IsOverscanSupported(DTWAIN_SOURCE Source, LONG SupportValue);
-        DTWAIN_BOOL DTWAIN_IsPDFSupported();
-        DTWAIN_BOOL DTWAIN_IsPNGSupported();
         DTWAIN_BOOL DTWAIN_IsPaperDetectable(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsPaperSizeSupported(DTWAIN_SOURCE Source, LONG PaperSize);
         DTWAIN_BOOL DTWAIN_IsPatchCapsSupported(DTWAIN_SOURCE Source);
@@ -840,7 +837,6 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsSourceOpen(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsSourceSelected(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsSourceValid(DTWAIN_SOURCE Source);
-        DTWAIN_BOOL DTWAIN_IsTIFFSupported();
         DTWAIN_BOOL DTWAIN_IsThumbnailEnabled(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsThumbnailSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsTwainAvailable();
@@ -1787,9 +1783,9 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetOverscan(DTWAIN_SOURCE Source, LPLONG lpOverscan, DTWAIN_BOOL bCurrent);
         DTWAIN_BOOL DTWAIN_GetPDFTextElementFloat(DTWAIN_PDFTEXTELEMENT TextElement, LPDTWAIN_FLOAT val1, LPDTWAIN_FLOAT val2, LONG Flags);
         DTWAIN_BOOL DTWAIN_GetPDFTextElementLong(DTWAIN_PDFTEXTELEMENT TextElement, LPLONG val1, LPLONG val2, LONG Flags);
-        DTWAIN_BOOL DTWAIN_GetPDFTextElementString(DTWAIN_PDFTEXTELEMENT TextElement, DTWAIN_CHARPTRTYPE szData, LONG maxLen, LONG Flags);
-        DTWAIN_BOOL DTWAIN_GetPDFTextElementStringA(DTWAIN_PDFTEXTELEMENT TextElement, LPSTR szData, LONG maxLen, LONG Flags);
-        DTWAIN_BOOL DTWAIN_GetPDFTextElementStringW(DTWAIN_PDFTEXTELEMENT TextElement, LPWSTR szData, LONG maxLen, LONG Flags);
+        LONG DTWAIN_GetPDFTextElementString(DTWAIN_PDFTEXTELEMENT TextElement, DTWAIN_CHARPTRTYPE szData, LONG maxLen, LONG Flags);
+        LONG DTWAIN_GetPDFTextElementStringA(DTWAIN_PDFTEXTELEMENT TextElement, LPSTR szData, LONG maxLen, LONG Flags);
+        LONG DTWAIN_GetPDFTextElementStringW(DTWAIN_PDFTEXTELEMENT TextElement, LPWSTR szData, LONG maxLen, LONG Flags);
         LONG DTWAIN_GetPDFType1FontName(LONG FontVal, DTWAIN_CHARPTRTYPE szFont, LONG nChars);
         LONG DTWAIN_GetPDFType1FontNameA(LONG FontVal, LPSTR szFont, LONG nChars);
         LONG DTWAIN_GetPDFType1FontNameW(LONG FontVal, LPWSTR szFont, LONG nChars);
@@ -1984,7 +1980,6 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsIndicatorEnabled(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIndicatorSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsInitialized();
-        DTWAIN_BOOL DTWAIN_IsJPEGSupported();
         DTWAIN_BOOL DTWAIN_IsJobControlSupported(DTWAIN_SOURCE Source, LONG JobControl);
         DTWAIN_BOOL DTWAIN_IsLampEnabled(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsLampSupported(DTWAIN_SOURCE Source);
@@ -1998,8 +1993,6 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsOpenSourcesOnSelect();
         DTWAIN_BOOL DTWAIN_IsOrientationSupported(DTWAIN_SOURCE Source, LONG Orientation);
         DTWAIN_BOOL DTWAIN_IsOverscanSupported(DTWAIN_SOURCE Source, LONG SupportValue);
-        DTWAIN_BOOL DTWAIN_IsPDFSupported();
-        DTWAIN_BOOL DTWAIN_IsPNGSupported();
         DTWAIN_BOOL DTWAIN_IsPaperDetectable(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsPaperSizeSupported(DTWAIN_SOURCE Source, LONG PaperSize);
         DTWAIN_BOOL DTWAIN_IsPatchCapsSupported(DTWAIN_SOURCE Source);
@@ -2018,7 +2011,6 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsSourceOpen(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsSourceSelected(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsSourceValid(DTWAIN_SOURCE Source);
-        DTWAIN_BOOL DTWAIN_IsTIFFSupported();
         DTWAIN_BOOL DTWAIN_IsThumbnailEnabled(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsThumbnailSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsTwainAvailable();
@@ -2965,9 +2957,9 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetOverscan(DTWAIN_SOURCE Source, LPLONG lpOverscan, DTWAIN_BOOL bCurrent);
         DTWAIN_BOOL DTWAIN_GetPDFTextElementFloat(DTWAIN_PDFTEXTELEMENT TextElement, LPDTWAIN_FLOAT val1, LPDTWAIN_FLOAT val2, LONG Flags);
         DTWAIN_BOOL DTWAIN_GetPDFTextElementLong(DTWAIN_PDFTEXTELEMENT TextElement, LPLONG val1, LPLONG val2, LONG Flags);
-        DTWAIN_BOOL DTWAIN_GetPDFTextElementString(DTWAIN_PDFTEXTELEMENT TextElement, DTWAIN_CHARPTRTYPE szData, LONG maxLen, LONG Flags);
-        DTWAIN_BOOL DTWAIN_GetPDFTextElementStringA(DTWAIN_PDFTEXTELEMENT TextElement, LPSTR szData, LONG maxLen, LONG Flags);
-        DTWAIN_BOOL DTWAIN_GetPDFTextElementStringW(DTWAIN_PDFTEXTELEMENT TextElement, LPWSTR szData, LONG maxLen, LONG Flags);
+        LONG DTWAIN_GetPDFTextElementString(DTWAIN_PDFTEXTELEMENT TextElement, DTWAIN_CHARPTRTYPE szData, LONG maxLen, LONG Flags);
+        LONG DTWAIN_GetPDFTextElementStringA(DTWAIN_PDFTEXTELEMENT TextElement, LPSTR szData, LONG maxLen, LONG Flags);
+        LONG DTWAIN_GetPDFTextElementStringW(DTWAIN_PDFTEXTELEMENT TextElement, LPWSTR szData, LONG maxLen, LONG Flags);
         LONG DTWAIN_GetPDFType1FontName(LONG FontVal, DTWAIN_CHARPTRTYPE szFont, LONG nChars);
         LONG DTWAIN_GetPDFType1FontNameA(LONG FontVal, LPSTR szFont, LONG nChars);
         LONG DTWAIN_GetPDFType1FontNameW(LONG FontVal, LPWSTR szFont, LONG nChars);
@@ -3162,7 +3154,6 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsIndicatorEnabled(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIndicatorSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsInitialized();
-        DTWAIN_BOOL DTWAIN_IsJPEGSupported();
         DTWAIN_BOOL DTWAIN_IsJobControlSupported(DTWAIN_SOURCE Source, LONG JobControl);
         DTWAIN_BOOL DTWAIN_IsLampEnabled(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsLampSupported(DTWAIN_SOURCE Source);
@@ -3176,8 +3167,6 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsOpenSourcesOnSelect();
         DTWAIN_BOOL DTWAIN_IsOrientationSupported(DTWAIN_SOURCE Source, LONG Orientation);
         DTWAIN_BOOL DTWAIN_IsOverscanSupported(DTWAIN_SOURCE Source, LONG SupportValue);
-        DTWAIN_BOOL DTWAIN_IsPDFSupported();
-        DTWAIN_BOOL DTWAIN_IsPNGSupported();
         DTWAIN_BOOL DTWAIN_IsPaperDetectable(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsPaperSizeSupported(DTWAIN_SOURCE Source, LONG PaperSize);
         DTWAIN_BOOL DTWAIN_IsPatchCapsSupported(DTWAIN_SOURCE Source);
@@ -3196,7 +3185,6 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsSourceOpen(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsSourceSelected(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsSourceValid(DTWAIN_SOURCE Source);
-        DTWAIN_BOOL DTWAIN_IsTIFFSupported();
         DTWAIN_BOOL DTWAIN_IsThumbnailEnabled(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsThumbnailSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsTwainAvailable();
@@ -4143,9 +4131,9 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_GetOverscan(DTWAIN_SOURCE Source, LPLONG lpOverscan, DTWAIN_BOOL bCurrent);
         DTWAIN_BOOL DTWAIN_GetPDFTextElementFloat(DTWAIN_PDFTEXTELEMENT TextElement, LPDTWAIN_FLOAT val1, LPDTWAIN_FLOAT val2, LONG Flags);
         DTWAIN_BOOL DTWAIN_GetPDFTextElementLong(DTWAIN_PDFTEXTELEMENT TextElement, LPLONG val1, LPLONG val2, LONG Flags);
-        DTWAIN_BOOL DTWAIN_GetPDFTextElementString(DTWAIN_PDFTEXTELEMENT TextElement, DTWAIN_CHARPTRTYPE szData, LONG maxLen, LONG Flags);
-        DTWAIN_BOOL DTWAIN_GetPDFTextElementStringA(DTWAIN_PDFTEXTELEMENT TextElement, LPSTR szData, LONG maxLen, LONG Flags);
-        DTWAIN_BOOL DTWAIN_GetPDFTextElementStringW(DTWAIN_PDFTEXTELEMENT TextElement, LPWSTR szData, LONG maxLen, LONG Flags);
+        LONG DTWAIN_GetPDFTextElementString(DTWAIN_PDFTEXTELEMENT TextElement, DTWAIN_CHARPTRTYPE szData, LONG maxLen, LONG Flags);
+        LONG DTWAIN_GetPDFTextElementStringA(DTWAIN_PDFTEXTELEMENT TextElement, LPSTR szData, LONG maxLen, LONG Flags);
+        LONG DTWAIN_GetPDFTextElementStringW(DTWAIN_PDFTEXTELEMENT TextElement, LPWSTR szData, LONG maxLen, LONG Flags);
         LONG DTWAIN_GetPDFType1FontName(LONG FontVal, DTWAIN_CHARPTRTYPE szFont, LONG nChars);
         LONG DTWAIN_GetPDFType1FontNameA(LONG FontVal, LPSTR szFont, LONG nChars);
         LONG DTWAIN_GetPDFType1FontNameW(LONG FontVal, LPWSTR szFont, LONG nChars);
@@ -4340,7 +4328,6 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsIndicatorEnabled(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsIndicatorSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsInitialized();
-        DTWAIN_BOOL DTWAIN_IsJPEGSupported();
         DTWAIN_BOOL DTWAIN_IsJobControlSupported(DTWAIN_SOURCE Source, LONG JobControl);
         DTWAIN_BOOL DTWAIN_IsLampEnabled(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsLampSupported(DTWAIN_SOURCE Source);
@@ -4354,8 +4341,6 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsOpenSourcesOnSelect();
         DTWAIN_BOOL DTWAIN_IsOrientationSupported(DTWAIN_SOURCE Source, LONG Orientation);
         DTWAIN_BOOL DTWAIN_IsOverscanSupported(DTWAIN_SOURCE Source, LONG SupportValue);
-        DTWAIN_BOOL DTWAIN_IsPDFSupported();
-        DTWAIN_BOOL DTWAIN_IsPNGSupported();
         DTWAIN_BOOL DTWAIN_IsPaperDetectable(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsPaperSizeSupported(DTWAIN_SOURCE Source, LONG PaperSize);
         DTWAIN_BOOL DTWAIN_IsPatchCapsSupported(DTWAIN_SOURCE Source);
@@ -4374,7 +4359,6 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_IsSourceOpen(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsSourceSelected(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsSourceValid(DTWAIN_SOURCE Source);
-        DTWAIN_BOOL DTWAIN_IsTIFFSupported();
         DTWAIN_BOOL DTWAIN_IsThumbnailEnabled(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsThumbnailSupported(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_IsTwainAvailable();

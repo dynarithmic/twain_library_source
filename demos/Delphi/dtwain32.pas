@@ -2359,9 +2359,9 @@ function DTWAIN_GetOrientation(Source:DTWAIN_SOURCE; lpOrient:LPLONG; bCurrent:B
 function DTWAIN_GetOverscan(Source:DTWAIN_SOURCE; lpOverscan:LPLONG; bCurrent:BOOL) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetOverscan';
 function DTWAIN_GetPDFTextElementFloat(TextElement:DTWAIN_PDFTEXTELEMENT; val1:LPDTWAIN_FLOAT; val2:LPDTWAIN_FLOAT; Flags:LONG) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetPDFTextElementFloat';
 function DTWAIN_GetPDFTextElementLong(TextElement:DTWAIN_PDFTEXTELEMENT; val1:LPLONG; val2:LPLONG; Flags:LONG) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetPDFTextElementLong';
-function DTWAIN_GetPDFTextElementString(TextElement:DTWAIN_PDFTEXTELEMENT; szData:LPTSTR; maxLen:LONG; Flags:LONG) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetPDFTextElementString';
-function DTWAIN_GetPDFTextElementStringA(TextElement:DTWAIN_PDFTEXTELEMENT; szData:LPSTR; maxLen:LONG; Flags:LONG) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetPDFTextElementStringA';
-function DTWAIN_GetPDFTextElementStringW(TextElement:DTWAIN_PDFTEXTELEMENT; szData:LPWSTR; maxLen:LONG; Flags:LONG) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetPDFTextElementStringW';
+function DTWAIN_GetPDFTextElementString(TextElement:DTWAIN_PDFTEXTELEMENT; szData:LPTSTR; maxLen:LONG; Flags:LONG) : LONG; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetPDFTextElementString';
+function DTWAIN_GetPDFTextElementStringA(TextElement:DTWAIN_PDFTEXTELEMENT; szData:LPSTR; maxLen:LONG; Flags:LONG) : LONG; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetPDFTextElementStringA';
+function DTWAIN_GetPDFTextElementStringW(TextElement:DTWAIN_PDFTEXTELEMENT; szData:LPWSTR; maxLen:LONG; Flags:LONG) : LONG; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetPDFTextElementStringW';
 function DTWAIN_GetPDFType1FontName(FontVal:LONG; szFont:LPTSTR; nChars:LONG) : LONG; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetPDFType1FontName';
 function DTWAIN_GetPDFType1FontNameA(FontVal:LONG; szFont:LPSTR; nChars:LONG) : LONG; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetPDFType1FontNameA';
 function DTWAIN_GetPDFType1FontNameW(FontVal:LONG; szFont:LPWSTR; nChars:LONG) : LONG; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_GetPDFType1FontNameW';
@@ -2559,7 +2559,6 @@ function DTWAIN_IsImageAddressingSupported(Source:DTWAIN_SOURCE) : BOOL; stdcall
 function DTWAIN_IsIndicatorEnabled(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsIndicatorEnabled';
 function DTWAIN_IsIndicatorSupported(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsIndicatorSupported';
 function DTWAIN_IsInitialized : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsInitialized';
-function DTWAIN_IsJPEGSupported : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsJPEGSupported';
 function DTWAIN_IsJobControlSupported(Source:DTWAIN_SOURCE; JobControl:LONG) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsJobControlSupported';
 function DTWAIN_IsLampEnabled(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsLampEnabled';
 function DTWAIN_IsLampSupported(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsLampSupported';
@@ -2573,8 +2572,6 @@ function DTWAIN_IsOCREngineActivated(OCREngine:DTWAIN_OCRENGINE) : BOOL; stdcall
 function DTWAIN_IsOpenSourcesOnSelect : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsOpenSourcesOnSelect';
 function DTWAIN_IsOrientationSupported(Source:DTWAIN_SOURCE; Orientation:LONG) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsOrientationSupported';
 function DTWAIN_IsOverscanSupported(Source:DTWAIN_SOURCE; SupportValue:LONG) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsOverscanSupported';
-function DTWAIN_IsPDFSupported : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsPDFSupported';
-function DTWAIN_IsPNGSupported : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsPNGSupported';
 function DTWAIN_IsPaperDetectable(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsPaperDetectable';
 function DTWAIN_IsPaperSizeSupported(Source:DTWAIN_SOURCE; PaperSize:LONG) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsPaperSizeSupported';
 function DTWAIN_IsPatchCapsSupported(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsPatchCapsSupported';
@@ -2593,7 +2590,6 @@ function DTWAIN_IsSourceInUIOnlyMode(Source:DTWAIN_SOURCE) : BOOL; stdcall;  ext
 function DTWAIN_IsSourceOpen(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsSourceOpen';
 function DTWAIN_IsSourceSelected(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsSourceSelected';
 function DTWAIN_IsSourceValid(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsSourceValid';
-function DTWAIN_IsTIFFSupported : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsTIFFSupported';
 function DTWAIN_IsThumbnailEnabled(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsThumbnailEnabled';
 function DTWAIN_IsThumbnailSupported(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsThumbnailSupported';
 function DTWAIN_IsTwainAvailable : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_IsTwainAvailable';

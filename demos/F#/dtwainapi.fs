@@ -3440,13 +3440,13 @@ module TwainAPI =
     type DTWAIN_GetPDFTextElementLongDelegate = delegate of DTWAIN_PDFTEXTELEMENT * int byref * int byref * LONG -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
-    type DTWAIN_GetPDFTextElementStringDelegate = delegate of DTWAIN_PDFTEXTELEMENT * System.Text.StringBuilder * LONG * LONG -> DTWAIN_BOOL
+    type DTWAIN_GetPDFTextElementStringDelegate = delegate of DTWAIN_PDFTEXTELEMENT * System.Text.StringBuilder * LONG * LONG -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Ansi)>]
-    type DTWAIN_GetPDFTextElementStringADelegate = delegate of DTWAIN_PDFTEXTELEMENT * System.Text.StringBuilder * LONG * LONG -> DTWAIN_BOOL
+    type DTWAIN_GetPDFTextElementStringADelegate = delegate of DTWAIN_PDFTEXTELEMENT * System.Text.StringBuilder * LONG * LONG -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
-    type DTWAIN_GetPDFTextElementStringWDelegate = delegate of DTWAIN_PDFTEXTELEMENT * System.Text.StringBuilder * LONG * LONG -> DTWAIN_BOOL
+    type DTWAIN_GetPDFTextElementStringWDelegate = delegate of DTWAIN_PDFTEXTELEMENT * System.Text.StringBuilder * LONG * LONG -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
     type DTWAIN_GetPDFType1FontNameDelegate = delegate of LONG * System.Text.StringBuilder * LONG -> LONG
@@ -4040,9 +4040,6 @@ module TwainAPI =
     type DTWAIN_IsInitializedDelegate = delegate of unit -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
-    type DTWAIN_IsJPEGSupportedDelegate = delegate of unit -> DTWAIN_BOOL
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
     type DTWAIN_IsJobControlSupportedDelegate = delegate of DTWAIN_SOURCE * LONG -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
@@ -4080,12 +4077,6 @@ module TwainAPI =
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
     type DTWAIN_IsOverscanSupportedDelegate = delegate of DTWAIN_SOURCE * LONG -> DTWAIN_BOOL
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
-    type DTWAIN_IsPDFSupportedDelegate = delegate of unit -> DTWAIN_BOOL
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
-    type DTWAIN_IsPNGSupportedDelegate = delegate of unit -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
     type DTWAIN_IsPaperDetectableDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_BOOL
@@ -4140,9 +4131,6 @@ module TwainAPI =
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
     type DTWAIN_IsSourceValidDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_BOOL
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
-    type DTWAIN_IsTIFFSupportedDelegate = delegate of unit -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
     type DTWAIN_IsThumbnailEnabledDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_BOOL
@@ -5917,7 +5905,6 @@ module TwainAPI =
     let private IsIndicatorEnabled = lazy (DynamicDll.Bind "DTWAIN_IsIndicatorEnabled" : DTWAIN_IsIndicatorEnabledDelegate)
     let private IsIndicatorSupported = lazy (DynamicDll.Bind "DTWAIN_IsIndicatorSupported" : DTWAIN_IsIndicatorSupportedDelegate)
     let private IsInitialized = lazy (DynamicDll.Bind "DTWAIN_IsInitialized" : DTWAIN_IsInitializedDelegate)
-    let private IsJPEGSupported = lazy (DynamicDll.Bind "DTWAIN_IsJPEGSupported" : DTWAIN_IsJPEGSupportedDelegate)
     let private IsJobControlSupported = lazy (DynamicDll.Bind "DTWAIN_IsJobControlSupported" : DTWAIN_IsJobControlSupportedDelegate)
     let private IsLampEnabled = lazy (DynamicDll.Bind "DTWAIN_IsLampEnabled" : DTWAIN_IsLampEnabledDelegate)
     let private IsLampSupported = lazy (DynamicDll.Bind "DTWAIN_IsLampSupported" : DTWAIN_IsLampSupportedDelegate)
@@ -5931,8 +5918,6 @@ module TwainAPI =
     let private IsOpenSourcesOnSelect = lazy (DynamicDll.Bind "DTWAIN_IsOpenSourcesOnSelect" : DTWAIN_IsOpenSourcesOnSelectDelegate)
     let private IsOrientationSupported = lazy (DynamicDll.Bind "DTWAIN_IsOrientationSupported" : DTWAIN_IsOrientationSupportedDelegate)
     let private IsOverscanSupported = lazy (DynamicDll.Bind "DTWAIN_IsOverscanSupported" : DTWAIN_IsOverscanSupportedDelegate)
-    let private IsPDFSupported = lazy (DynamicDll.Bind "DTWAIN_IsPDFSupported" : DTWAIN_IsPDFSupportedDelegate)
-    let private IsPNGSupported = lazy (DynamicDll.Bind "DTWAIN_IsPNGSupported" : DTWAIN_IsPNGSupportedDelegate)
     let private IsPaperDetectable = lazy (DynamicDll.Bind "DTWAIN_IsPaperDetectable" : DTWAIN_IsPaperDetectableDelegate)
     let private IsPaperSizeSupported = lazy (DynamicDll.Bind "DTWAIN_IsPaperSizeSupported" : DTWAIN_IsPaperSizeSupportedDelegate)
     let private IsPatchCapsSupported = lazy (DynamicDll.Bind "DTWAIN_IsPatchCapsSupported" : DTWAIN_IsPatchCapsSupportedDelegate)
@@ -5951,7 +5936,6 @@ module TwainAPI =
     let private IsSourceOpen = lazy (DynamicDll.Bind "DTWAIN_IsSourceOpen" : DTWAIN_IsSourceOpenDelegate)
     let private IsSourceSelected = lazy (DynamicDll.Bind "DTWAIN_IsSourceSelected" : DTWAIN_IsSourceSelectedDelegate)
     let private IsSourceValid = lazy (DynamicDll.Bind "DTWAIN_IsSourceValid" : DTWAIN_IsSourceValidDelegate)
-    let private IsTIFFSupported = lazy (DynamicDll.Bind "DTWAIN_IsTIFFSupported" : DTWAIN_IsTIFFSupportedDelegate)
     let private IsThumbnailEnabled = lazy (DynamicDll.Bind "DTWAIN_IsThumbnailEnabled" : DTWAIN_IsThumbnailEnabledDelegate)
     let private IsThumbnailSupported = lazy (DynamicDll.Bind "DTWAIN_IsThumbnailSupported" : DTWAIN_IsThumbnailSupportedDelegate)
     let private IsTwainAvailable = lazy (DynamicDll.Bind "DTWAIN_IsTwainAvailable" : DTWAIN_IsTwainAvailableDelegate)
@@ -8451,15 +8435,15 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetPDFTextElementLong.Value.Invoke(textelement, &val1, &val2, flags)
 
-    let DTWAIN_GetPDFTextElementString (textelement: DTWAIN_PDFTEXTELEMENT) (szdata: System.Text.StringBuilder) (maxlen: LONG) (flags: LONG) : DTWAIN_BOOL =
+    let DTWAIN_GetPDFTextElementString (textelement: DTWAIN_PDFTEXTELEMENT) (szdata: System.Text.StringBuilder) (maxlen: LONG) (flags: LONG) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetPDFTextElementString.Value.Invoke(textelement, szdata, maxlen, flags)
 
-    let DTWAIN_GetPDFTextElementStringA (textelement: DTWAIN_PDFTEXTELEMENT) (szdata: System.Text.StringBuilder) (maxlen: LONG) (flags: LONG) : DTWAIN_BOOL =
+    let DTWAIN_GetPDFTextElementStringA (textelement: DTWAIN_PDFTEXTELEMENT) (szdata: System.Text.StringBuilder) (maxlen: LONG) (flags: LONG) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetPDFTextElementStringA.Value.Invoke(textelement, szdata, maxlen, flags)
 
-    let DTWAIN_GetPDFTextElementStringW (textelement: DTWAIN_PDFTEXTELEMENT) (szdata: System.Text.StringBuilder) (maxlen: LONG) (flags: LONG) : DTWAIN_BOOL =
+    let DTWAIN_GetPDFTextElementStringW (textelement: DTWAIN_PDFTEXTELEMENT) (szdata: System.Text.StringBuilder) (maxlen: LONG) (flags: LONG) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetPDFTextElementStringW.Value.Invoke(textelement, szdata, maxlen, flags)
 
@@ -9251,10 +9235,6 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         IsInitialized.Value.Invoke()
 
-    let DTWAIN_IsJPEGSupported() : DTWAIN_BOOL =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        IsJPEGSupported.Value.Invoke()
-
     let DTWAIN_IsJobControlSupported (source: DTWAIN_SOURCE) (jobcontrol: LONG) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         IsJobControlSupported.Value.Invoke(source, jobcontrol)
@@ -9306,14 +9286,6 @@ module TwainAPI =
     let DTWAIN_IsOverscanSupported (source: DTWAIN_SOURCE) (supportvalue: LONG) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         IsOverscanSupported.Value.Invoke(source, supportvalue)
-
-    let DTWAIN_IsPDFSupported() : DTWAIN_BOOL =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        IsPDFSupported.Value.Invoke()
-
-    let DTWAIN_IsPNGSupported() : DTWAIN_BOOL =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        IsPNGSupported.Value.Invoke()
 
     let DTWAIN_IsPaperDetectable (source: DTWAIN_SOURCE) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
@@ -9386,10 +9358,6 @@ module TwainAPI =
     let DTWAIN_IsSourceValid (source: DTWAIN_SOURCE) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         IsSourceValid.Value.Invoke(source)
-
-    let DTWAIN_IsTIFFSupported() : DTWAIN_BOOL =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        IsTIFFSupported.Value.Invoke()
 
     let DTWAIN_IsThumbnailEnabled (source: DTWAIN_SOURCE) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

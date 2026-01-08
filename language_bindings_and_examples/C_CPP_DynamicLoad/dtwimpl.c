@@ -787,7 +787,6 @@
     D_ISINDICATORENABLEDFUNC                      DYNDTWAIN_API::DTWAIN_IsIndicatorEnabled = nullptr;
     D_ISINDICATORSUPPORTEDFUNC                    DYNDTWAIN_API::DTWAIN_IsIndicatorSupported = nullptr;
     D_ISINITIALIZEDFUNC                           DYNDTWAIN_API::DTWAIN_IsInitialized = nullptr;
-    D_ISJPEGSUPPORTEDFUNC                         DYNDTWAIN_API::DTWAIN_IsJPEGSupported = nullptr;
     D_ISJOBCONTROLSUPPORTEDFUNC                   DYNDTWAIN_API::DTWAIN_IsJobControlSupported = nullptr;
     D_ISLAMPENABLEDFUNC                           DYNDTWAIN_API::DTWAIN_IsLampEnabled = nullptr;
     D_ISLAMPSUPPORTEDFUNC                         DYNDTWAIN_API::DTWAIN_IsLampSupported = nullptr;
@@ -801,8 +800,6 @@
     D_ISOPENSOURCESONSELECTFUNC                   DYNDTWAIN_API::DTWAIN_IsOpenSourcesOnSelect = nullptr;
     D_ISORIENTATIONSUPPORTEDFUNC                  DYNDTWAIN_API::DTWAIN_IsOrientationSupported = nullptr;
     D_ISOVERSCANSUPPORTEDFUNC                     DYNDTWAIN_API::DTWAIN_IsOverscanSupported = nullptr;
-    D_ISPDFSUPPORTEDFUNC                          DYNDTWAIN_API::DTWAIN_IsPDFSupported = nullptr;
-    D_ISPNGSUPPORTEDFUNC                          DYNDTWAIN_API::DTWAIN_IsPNGSupported = nullptr;
     D_ISPAPERDETECTABLEFUNC                       DYNDTWAIN_API::DTWAIN_IsPaperDetectable = nullptr;
     D_ISPAPERSIZESUPPORTEDFUNC                    DYNDTWAIN_API::DTWAIN_IsPaperSizeSupported = nullptr;
     D_ISPATCHCAPSSUPPORTEDFUNC                    DYNDTWAIN_API::DTWAIN_IsPatchCapsSupported = nullptr;
@@ -821,7 +818,6 @@
     D_ISSOURCEOPENFUNC                            DYNDTWAIN_API::DTWAIN_IsSourceOpen = nullptr;
     D_ISSOURCESELECTEDFUNC                        DYNDTWAIN_API::DTWAIN_IsSourceSelected = nullptr;
     D_ISSOURCEVALIDFUNC                           DYNDTWAIN_API::DTWAIN_IsSourceValid = nullptr;
-    D_ISTIFFSUPPORTEDFUNC                         DYNDTWAIN_API::DTWAIN_IsTIFFSupported = nullptr;
     D_ISTHUMBNAILENABLEDFUNC                      DYNDTWAIN_API::DTWAIN_IsThumbnailEnabled = nullptr;
     D_ISTHUMBNAILSUPPORTEDFUNC                    DYNDTWAIN_API::DTWAIN_IsThumbnailSupported = nullptr;
     D_ISTWAINAVAILABLEFUNC                        DYNDTWAIN_API::DTWAIN_IsTwainAvailable = nullptr;
@@ -1981,7 +1977,6 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_IsIndicatorEnabled, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsIndicatorSupported, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsInitialized, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_IsJPEGSupported, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsJobControlSupported, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsLampEnabled, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsLampSupported, hModule);
@@ -1995,8 +1990,6 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_IsOpenSourcesOnSelect, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsOrientationSupported, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsOverscanSupported, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_IsPDFSupported, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_IsPNGSupported, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsPaperDetectable, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsPaperSizeSupported, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsPatchCapsSupported, hModule);
@@ -2015,7 +2008,6 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_IsSourceOpen, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsSourceSelected, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsSourceValid, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_IsTIFFSupported, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsThumbnailEnabled, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsThumbnailSupported, hModule);
           LOADFUNCTIONIMPL(DTWAIN_IsTwainAvailable, hModule);

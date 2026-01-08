@@ -3977,9 +3977,6 @@ namespace Dynarithmic
         public static extern int DTWAIN_IsInitialized();
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_IsJPEGSupported();
-
-        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_IsJobControlSupported(DTWAIN_SOURCE Source, int JobControl);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
@@ -4017,12 +4014,6 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_IsOverscanSupported(DTWAIN_SOURCE Source, int SupportValue);
-
-        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_IsPDFSupported();
-
-        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_IsPNGSupported();
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_IsPaperDetectable(DTWAIN_SOURCE Source);
@@ -4077,9 +4068,6 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_IsSourceValid(DTWAIN_SOURCE Source);
-
-        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_IsTIFFSupported();
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_IsThumbnailEnabled(DTWAIN_SOURCE Source);
