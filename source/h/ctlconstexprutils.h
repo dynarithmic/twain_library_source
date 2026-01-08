@@ -25,6 +25,7 @@
 #include "twain.h"
 #include "ctlenum.h"
 #include "dtwain_version.h"
+#include "dtwpdft.h"
 
 namespace dynarithmic
 {
@@ -434,6 +435,33 @@ namespace dynarithmic
     {
         return DSMType == DTWAIN_TWAINDSM_VERSION2 ||
                DSMType == DTWAIN_TWAINDSM_LATESTVERSION;
+    }
+
+    static constexpr std::tuple<int, std::string_view, std::wstring_view> GetType1FontNameFromType(int nType)
+    {
+        using tupletype = std::tuple<int, std::string_view, std::wstring_view>;
+        constexpr std::array<tupletype, 14> retValues =
+        { {
+            {DTWAIN_FONT_HELVETICA,             "Helvetica", L"Helvetica"},
+            {DTWAIN_FONT_HELVETICABOLD,         "Helvetica-Bold", L"Helvetica-Bold"},
+            {DTWAIN_FONT_HELVETICABOLDOBLIQUE,  "Helvetica-BoldOblique", L"Helvetica-BoldOblique"},
+            {DTWAIN_FONT_HELVETICAOBLIQUE,      "Helvetica-Oblique", L"Helvetica-Oblique"},
+            {DTWAIN_FONT_COURIER,               "Courier", L"Courier"},
+            {DTWAIN_FONT_COURIERBOLD,           "Courier-Bold", L"Courier-Bold"},
+            {DTWAIN_FONT_COURIERBOLDOBLIQUE,    "Courier-BoldOblique", L"Courier-BoldOblique"},
+            {DTWAIN_FONT_COURIEROBLIQUE,        "Courier-Oblique", L"Courier-Oblique"},
+            {DTWAIN_FONT_TIMESBOLD,             "Times-Bold", L"Times-Bold"},
+            {DTWAIN_FONT_TIMESBOLDITALIC,       "Times-BoldItalic", L"Times-BoldItalic"},
+            {DTWAIN_FONT_TIMESROMAN,            "Times-Roman", L"Times-Roman"},
+            {DTWAIN_FONT_TIMESITALIC,           "Times-Italic", L"Times-Italic"},
+            {DTWAIN_FONT_SYMBOL,                "Symbol", L"Symbol"},
+            {DTWAIN_FONT_ZAPFDINGBATS,          "ZapfDingbats", L"ZapfDingbats"}
+        } };
+
+        auto isFoundPr = generic_array_finder_if(retValues, [&](const auto& retValue) { return std::get<0>(retValue) == nType; });
+        if (isFoundPr.first)
+            return retValues[isFoundPr.second];
+        return {};
     }
 
     static constexpr std::pair<std::array<const char*, 4>, int> GetContainerNamesFromType(int nType) noexcept

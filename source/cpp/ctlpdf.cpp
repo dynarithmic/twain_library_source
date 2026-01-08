@@ -281,12 +281,43 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFOCRMode(DTWAIN_SOURCE Source, DTWAIN_BOOL 
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
+template <typename wrapperType, typename strType, int tupleVal>
+static LONG GetType1FontInternal(int FontVal, strType szFont, LONG nChars)
+{
+	auto st = GetType1FontNameFromType(FontVal);
+    return wrapperType::CopyInfoToCString(std::get<tupleVal>(st), szFont, nChars);
+}
+
 LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontName(LONG FontVal, LPTSTR szFont, LONG nChars)
 {
     LOG_FUNC_ENTRY_PARAMS((FontVal, szFont, nChars))
     VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto st = CTL_StaticData::GetTwainNameFromConstant(DTWAIN_CONSTANT_FONTNAME, FontVal + DTWAIN_FONT_START_).second;
-    auto numChars = StringWrapper::CopyInfoToCString(st, szFont, nChars);
+    int numChars = 0;
+    #ifdef _UNICODE
+    numChars = GetType1FontInternal<StringWrapperW, LPWSTR, 2>(FontVal, szFont, nChars); 
+    #else
+   	numChars = GetType1FontInternal<StringWrapperA, LPSTR, 1>(FontVal, szFont, nChars); 
+    #endif
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szFont))
+    LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
+    CATCH_BLOCK(-1)
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontNameA(LONG FontVal, LPSTR szFont, LONG nChars)
+{
+    LOG_FUNC_ENTRY_PARAMS((FontVal, szFont, nChars))
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+	int numChars = GetType1FontInternal<StringWrapperA, LPSTR, 1>(FontVal, szFont, nChars);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szFont))
+    LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
+    CATCH_BLOCK(-1)
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontNameW(LONG FontVal, LPWSTR szFont, LONG nChars)
+{
+    LOG_FUNC_ENTRY_PARAMS((FontVal, szFont, nChars))
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+	int numChars = GetType1FontInternal<StringWrapperW, LPWSTR, 2>(FontVal, szFont, nChars);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((szFont))
     LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
     CATCH_BLOCK(-1)
@@ -795,7 +826,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPDFTextElementLong(DTWAIN_PDFTEXTELEMENT Text
     CATCH_BLOCK(false)
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPDFTextElementString(DTWAIN_PDFTEXTELEMENT TextElement, LPTSTR lpszStr, LONG maxLen, LONG Flags)
+LONG DLLENTRY_DEF DTWAIN_GetPDFTextElementString(DTWAIN_PDFTEXTELEMENT TextElement, LPTSTR lpszStr, LONG maxLen, LONG Flags)
 {
     LOG_FUNC_ENTRY_PARAMS((TextElement, lpszStr, maxLen, Flags))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
@@ -807,22 +838,24 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPDFTextElementString(DTWAIN_PDFTEXTELEMENT Te
 
     const PDFTextElement* pPtr = static_cast<PDFTextElement*>(TextElement);
 
+    int32_t retLength = 0;
+
     switch (Flags)
     {
         case DTWAIN_PDFTEXTELEMENT_FONTNAME:
-            StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(pPtr->m_font.m_fontName), lpszStr, maxLen);
+            retLength = StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(pPtr->m_font.m_fontName), lpszStr, maxLen);
         break;
 
         case DTWAIN_PDFTEXTELEMENT_TEXT:
-            StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(pPtr->m_text), lpszStr, maxLen);
+            retLength = StringWrapper::CopyInfoToCString(StringConversion::Convert_Ansi_To_Native(pPtr->m_text), lpszStr, maxLen);
         break;
 
         default:
-            LOG_FUNC_EXIT_NONAME_PARAMS(false)
+            LOG_FUNC_EXIT_NONAME_PARAMS(0)
     }
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszStr))
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
+    LOG_FUNC_EXIT_NONAME_PARAMS(retLength)
+    CATCH_BLOCK(0)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ResetPDFTextElement(DTWAIN_PDFTEXTELEMENT TextElement)

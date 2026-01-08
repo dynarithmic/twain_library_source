@@ -910,47 +910,25 @@ LONG DLLENTRY_DEF DTWAIN_GetOCRVersionInfoW(DTWAIN_OCRENGINE Engine, LPWSTR buff
 #endif
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPDFTextElementStringA(DTWAIN_PDFTEXTELEMENT TextElement, LPSTR szData, LONG nMaxLen, LONG Flags)
+LONG DLLENTRY_DEF DTWAIN_GetPDFTextElementStringA(DTWAIN_PDFTEXTELEMENT TextElement, LPSTR szData, LONG nMaxLen, LONG Flags)
 {
 #ifdef _UNICODE
     std::wstring arg((std::max)(nMaxLen, 0L),0);
-    const DTWAIN_BOOL retVal = DTWAIN_GetPDFTextElementString(TextElement, (nMaxLen > 0 && szData) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()), Flags);
+    const auto retVal = DTWAIN_GetPDFTextElementString(TextElement, (nMaxLen > 0 && szData) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()), Flags);
     return null_terminator_copier(get_view(arg), szData, retVal);
 #else
     return DTWAIN_GetPDFTextElementString(TextElement, szData, nMaxLen, Flags);
 #endif
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPDFTextElementStringW(DTWAIN_PDFTEXTELEMENT TextElement, LPWSTR szData, LONG maxLen, LONG Flags)
+LONG DLLENTRY_DEF DTWAIN_GetPDFTextElementStringW(DTWAIN_PDFTEXTELEMENT TextElement, LPWSTR szData, LONG maxLen, LONG Flags)
 {
 #ifdef _UNICODE
     return DTWAIN_GetPDFTextElementString(TextElement, szData, maxLen, Flags);
 #else
     std::string arg((std::max)(maxLen,0L), 0);
-    DTWAIN_BOOL retVal = DTWAIN_GetPDFTextElementString(TextElement, (maxLen>0 && szData)? &arg[0] : nullptr, static_cast<LONG>(arg.size()), Flags);
+    const auto retVal = DTWAIN_GetPDFTextElementString(TextElement, (maxLen>0 && szData)? &arg[0] : nullptr, static_cast<LONG>(arg.size()), Flags);
     return null_terminator_copier(get_view(arg), szData, retVal);
-#endif
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontNameA(LONG FontVal, LPSTR szFont, LONG nChars)
-{
-#ifdef _UNICODE
-    std::wstring arg((std::max)(nChars, 0L), 0);
-    const LONG retVal = DTWAIN_GetPDFType1FontName(FontVal, (nChars > 0 && szFont) ? &arg[0] : nullptr, nChars);
-    return null_terminator_copier(get_view(arg), szFont, retVal);
-#else
-    return DTWAIN_GetPDFType1FontName(FontVal, szFont, nChars);
-#endif
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontNameW(LONG FontVal, LPWSTR szFont, LONG nChars)
-{
-#ifdef _UNICODE
-    return DTWAIN_GetPDFType1FontName(FontVal, szFont, nChars);
-#else
-    std::string arg((std::max)(nChars, 0L), 0);
-    LONG retVal = DTWAIN_GetPDFType1FontName(FontVal, (nChars>0 && szFont)? &arg[0] : nullptr, nChars);
-    return null_terminator_copier(get_view(arg), szFont, retVal);
 #endif
 }
 
