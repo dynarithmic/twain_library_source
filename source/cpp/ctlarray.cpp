@@ -1022,6 +1022,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtSource(DTWAIN_ARRAY pArray, LONG nWher
     CATCH_BLOCK(false)
 }
 
+DTWAIN_SOURCE DLLENTRY_DEF DTWAIN_ArrayGetAtSourceEx(DTWAIN_ARRAY pArray, LONG nWhere)
+{
+    LOG_FUNC_ENTRY_PARAMS((pArray, nWhere))
+    DTWAIN_SOURCE Source = {};
+    DTWAIN_ArrayGetSourceAt(pArray, nWhere, &Source);
+    LOG_FUNC_EXIT_NONAME_PARAMS(Source)
+    CATCH_BLOCK(nullptr)
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAt( DTWAIN_ARRAY pArray, LONG nWhere, LPVOID pVariant)
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, nWhere, pVariant))
