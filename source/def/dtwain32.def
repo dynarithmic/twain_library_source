@@ -487,10 +487,7 @@ DTWAIN_AppHandlesExceptions                       @8010
 DTWAIN_GetStaticLibVersion                        @8050
 DTWAIN_GetVersionString                           @8051
 DTWAIN_EnableJobFileHandling                      @8054
-DTWAIN_AddCallback                                @8100
-DTWAIN_RemoveCallback                             @8101
 DTWAIN_LogMessage                                 @8200
-DTWAIN_X                                          @3508
 DTWAIN_SetBlankPageDetection                      @8400
 DTWAIN_IsBlankPageDetectionOn                     @8401
 DTWAIN_IsDIBBlank                                 @8402

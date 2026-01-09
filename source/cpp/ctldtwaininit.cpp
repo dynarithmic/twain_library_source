@@ -186,9 +186,6 @@ LONG DLLENTRY_DEF DTWAIN_GetStaticLibVersion()
     CATCH_BLOCK(-1)
 }
 
-void DLLENTRY_DEF DTWAIN_X(LPCTSTR)
-{}
-
 //////////////////////////////// Initialize DLL /////////////////////////////
 LONG DLLENTRY_DEF DTWAIN_GetAPIHandleStatus(DTWAIN_HANDLE pHandle)
 {

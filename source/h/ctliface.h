@@ -580,7 +580,6 @@ namespace dynarithmic
         CTL_MapThreadToDLLHandle s_mapThreadToDLLHandle;
         CTL_ThreadMap            s_ThreadMap;
         std::unordered_set<HWND> s_appWindowsToDisable;
-        CTL_CallbackProcArray    s_aAllCallbacks;
         CTL_StringType           s_strLangResourcePath;
         CTL_GeneralErrorInfo     s_mapGeneralErrorInfo;
         CLogSystem               s_appLog;
@@ -679,7 +678,6 @@ namespace dynarithmic
         static std::pair<bool, CTL_StringType> GetTwainNameFromConstant(int lConstantType, TwainConstantType lTwainConstant);
         static std::pair<bool, std::string> GetTwainNameFromConstantA(int lConstantType, TwainConstantType lTwainConstant);
         static std::pair<bool, std::wstring> GetTwainNameFromConstantW(int lConstantType, TwainConstantType lTwainConstant);
-        static CTL_CallbackProcArray& GetCallbacks() { return s_StaticData.s_aAllCallbacks; }
         static auto& GetAppWindowsToDisable() { return s_StaticData.s_appWindowsToDisable; }
         static constexpr std::string_view GetINIKey(int nWhich) { return s_StaticData.s_aINIKeys[nWhich].second; }
         static std::string& GetAppTitle() { return s_StaticData.s_AppTitle; }
