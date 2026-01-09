@@ -32,7 +32,7 @@ static std::string DecodeSourceInfo(pTW_IDENTITY pIdentity, LPCSTR sPrefix);
 static std::string DecodeData(CTL_ErrorStructDecoder *pDecoder, TW_MEMREF pData, ErrorStructTypes sType);
 static std::string DecodeTW_MEMORY(pTW_MEMORY pMemory, LPCSTR pMem);
 static std::string DecodeTW_ELEMENT8(pTW_ELEMENT8 pEl, LPCSTR pMem);
-static std::string DecodeTW_INFO(pTW_INFO pInfo, LPCSTR pMem);
+//static std::string DecodeTW_INFO(pTW_INFO pInfo, LPCSTR pMem);
 static std::string DecodeSupportedGroups(TW_UINT32 SupportedGroups);
 constexpr const char * IndentDefinition() { return "    "; }
 
@@ -822,6 +822,7 @@ std::string DecodeTW_ELEMENT8(pTW_ELEMENT8 pEl, LPCSTR pMem)
     return sTemp;
 }
 
+#if 0
 std::string DecodeTW_INFO(pTW_INFO pInfo, LPCSTR pMem)
 {
     StringStreamA sBuffer;
@@ -839,3 +840,4 @@ std::string DecodeTW_INFO(pTW_INFO pInfo, LPCSTR pMem)
     }
     return sTemp;
 }
+#endif

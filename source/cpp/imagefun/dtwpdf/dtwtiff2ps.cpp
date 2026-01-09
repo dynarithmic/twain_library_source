@@ -1752,12 +1752,11 @@ Ascii85Init(void)
     ascii85count = 0;
 }
 
-static char*
-Ascii85Encode(unsigned char* raw)
+static char* Ascii85Encode(unsigned char* raw)
 {
     static char encoded[6];
 
-    uint32_t word = ((raw[0] << 8) + raw[1] << 16) + (raw[2] << 8) + raw[3];
+    uint32_t word = ((raw[0] << 8) + (raw[1] << 16)) + (raw[2] << 8) + raw[3];
     if (word != 0L) {
         uint32_t q = word / (85L * 85 * 85 * 85);  /* actually only a byte */
         encoded[0] = q + '!';

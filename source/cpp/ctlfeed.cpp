@@ -39,7 +39,6 @@ typedef bool (CTL_ITwainSource::*IsEnabledFunc)() const;
 static bool EnableFeederFunc(DTWAIN_SOURCE Source, LONG lCap, CTL_ITwainSource* p, SetFunc Func, bool bSet);
 static bool IsFeederEnabledFunc(DTWAIN_SOURCE Source, IsEnabledFunc Func);
 static bool ExecuteFeederState5Func(DTWAIN_SOURCE Source, LONG lCap);
-static VOID CALLBACK ThisTimerProc(HWND hwnd, UINT uMsg, ULONG idEvent,DWORD dwTime);
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFeederSupported(DTWAIN_SOURCE Source)
 {
@@ -395,6 +394,7 @@ int dynarithmic::FeederWait(CTL_ITwainSource *pSource)
     return DTWAIN_NO_ERROR;
 }
 ///////////////////////////////////////////////////////////
+#if 0
 VOID CALLBACK ThisTimerProc(HWND, UINT, ULONG idEvent, DWORD)
 {
     return;
@@ -432,3 +432,4 @@ VOID CALLBACK ThisTimerProc(HWND, UINT, ULONG idEvent, DWORD)
     #endif
     #endif
 }
+#endif
