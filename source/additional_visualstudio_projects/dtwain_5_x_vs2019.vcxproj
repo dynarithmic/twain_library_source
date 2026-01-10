@@ -1713,6 +1713,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\ctldib32.h" />
     <ClInclude Include="h\ctlfilesave.h" />
     <ClInclude Include="h\ctlfileutils.h" />
+    <ClInclude Include="h\ctlguiddef.h" />
     <ClInclude Include="h\ctlloadresources.h" />
     <ClInclude Include="h\ctllogcalls.h" />
     <ClInclude Include="h\ctllogfunctioncall.h" />

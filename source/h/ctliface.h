@@ -46,6 +46,7 @@
 #include "ctlconstexprutils.h"
 #include "ctllogfunctioncall.h"
 #include "capinfomap.h"
+#include "ctlbimap.h"
 #ifdef _WIN32
     #include "winlibraryloader_impl.inl"
 #else
@@ -68,6 +69,7 @@ struct dtwain_library_loader : library_loader_impl
 #include "logmsg.h"
 #include "winconst.h"
 #include <map>
+#include "ctlguiddef.h"
 
 namespace dynarithmic
 {
@@ -642,6 +644,7 @@ namespace dynarithmic
 
     class CTL_TwainDLLHandle
     {
+
         public:
             static constexpr int NumTwainMapValues = DTWAIN_CONSTANT_LAST;
 
@@ -656,6 +659,7 @@ namespace dynarithmic
             CTL_ResourceRegistryMap& GetResourceRegistry() { return m_ResourceRegistry; }
             CTL_StringType GetVersionString() const { return  m_VersionString; }
             void        SetVersionString(CTL_StringType s) { m_VersionString = std::move(s); }
+            DTWAIN_GUID& GetGUID() { return m_uuid; }
 
             DTWAIN_ACQUIRE          GetNewAcquireNum();
             void                    EraseAcquireNum(DTWAIN_ACQUIRE nNum);
@@ -692,6 +696,7 @@ namespace dynarithmic
             };
 
             tagSessionStruct m_SessionStruct;
+            DTWAIN_GUID m_uuid = {};
             CTL_ResourceRegistryMap m_ResourceRegistry;
             CTL_ITwainSession* m_pTwainSession;
             CTL_StringType   m_VersionString;

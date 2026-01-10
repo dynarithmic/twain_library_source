@@ -28,6 +28,7 @@
 #include "ctltwainsource.h"
 #include "ctltwainidentity.h"
 #include "ctlbimap.h"
+#include "ctlguiddef.h"
 
 namespace dynarithmic
 {
@@ -39,7 +40,7 @@ namespace dynarithmic
 
   class CTL_ITwainSession
   {
-      using SourceBimap = dynarithmic::BidirectionMap<std::array<char, 37>, CTL_ITwainSource*>;
+      using SourceBimap = dynarithmic::BidirectionMap<DTWAIN_GUID, CTL_ITwainSource*>;
 
     public:
         static CTL_ITwainSession*  Create(CTL_TwainDLLHandle *pHandle, LPCTSTR pAppName, HWND* hAppWnd);

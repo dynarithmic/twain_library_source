@@ -40,6 +40,7 @@
 #include "ctltwaincompliancy.h"
 #include "dtwain_anyutils.h"
 #include "extendedimageinfo.h"
+#include "ctlguiddef.h"
 
 namespace dynarithmic
 {
@@ -125,7 +126,7 @@ namespace dynarithmic
         CapToValuesMap m_capToValuesMap_G;
         CapToValuesMap m_capToValuesMap_GD;
         SourceCompressionMap m_CompressionMap;
-        std::array<char, 37> m_uuid = {};
+        DTWAIN_GUID m_uuid = {};
 
     public:
         CTL_ITwainSource(const CTL_ITwainSource&) = delete;
@@ -140,8 +141,8 @@ namespace dynarithmic
         CTL_TwainIdentity& GetTwainIdentity() { return m_SourceId;  }
 
         CTL_ITwainSession* GetTwainSession() const;
-        std::array<char, 37> GetGUID() const { return m_uuid; }
-		std::array<char, 37>& GetGUIDRef() { return m_uuid; }
+        DTWAIN_GUID GetGUID() const { return m_uuid; }
+        DTWAIN_GUID& GetGUIDRef() { return m_uuid; }
 
         bool isCapValuesCached(TW_UINT16 lCap, LONG getType) const
         {

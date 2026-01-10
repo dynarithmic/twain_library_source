@@ -48,6 +48,7 @@
 #include "ctldefsource.h"
 #include "ctlstringutils.h"
 #include "ctlclosesource.h"
+#include "ctlguiddef.h"
 
 #ifdef _MSC_VER
     #pragma warning (disable:4702)
@@ -123,6 +124,7 @@ static CTL_StringType CheckSearchOrderString(CTL_StringType);
 #endif
 
 static bool FindTask( DWORD hTask );
+static bool FindTask(const DTWAIN_GUID& guid);
 static HMODULE GetDLLInstance();
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetVersion(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType)
@@ -802,6 +804,11 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
         auto threadId = getThreadId();
         AssociateThreadToTwainDLL(pHandlePtr, threadId);
         CTL_TwainDLLHandle* pHandle = pHandlePtr.get();
+
+        // Associate a GUID with the handle
+        auto uid = StringWrapperA::GetGUIDNoCurlyBrace();
+        memcpy(pHandle->GetGUID().data(), uid.c_str(), uid.size());
+
         if (!bMinimalSetup)
         {
             // Open dtwain32.ini or dtwain64.ini
@@ -1555,6 +1562,13 @@ static bool FindTask( DWORD hTask )
 {
     auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
     return threadMap.find(hTask) != threadMap.end();
+}
+
+static bool FindTask(const DTWAIN_GUID& guid)
+{
+	auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
+    auto it = std::find_if(threadMap.begin(), threadMap.end(), [&](const auto& pr) { return pr.second->GetGUID() == guid; });
+    return it != threadMap.end();
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
