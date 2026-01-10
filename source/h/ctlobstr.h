@@ -973,11 +973,16 @@ namespace dynarithmic
             return pathName;
         }
 
+		static StringType GetGUIDNoCurlyBrace()
+		{
+			const boost::uuids::uuid u = boost::uuids::random_generator()();
+            return StringTraits::ConvertToBoostUUIDString(u);
+		}
+
         static StringType GetGUID()
         {
-            const boost::uuids::uuid u = boost::uuids::random_generator()();
             return StringTraits::GetLeftCurlyBrace() +
-                   StringTraits::ConvertToBoostUUIDString(u) +
+                   GetGUIDNoCurlyBrace() +
                    StringTraits::GetRightCurlyBrace();
         }
 
