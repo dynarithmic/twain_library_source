@@ -144,6 +144,7 @@ bool CTL_ITwainSession::AddTwainSource( CTL_ITwainSource *pSource )
     {
         auto uid = StringWrapperA::GetGUIDNoCurlyBrace();
         memcpy(&pSource->GetGUIDRef(), uid.c_str(), uid.length());
+        m_mapUUIDToSource.Insert(pSource->GetGUID(), pSource );
         m_arrTwainSource.insert( pSource );
         auto iter = sourceStatusMap.insert({ pSource->GetProductNameA(), {} }).first;
         iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, true);

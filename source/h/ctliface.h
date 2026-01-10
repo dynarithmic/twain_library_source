@@ -133,68 +133,6 @@ namespace dynarithmic
         {}
     };
 
-    // Note -- must have distinct key / value pairs.
-    template <typename Key_, typename Value_>
-    struct BiDirectionalMap
-    {
-        typedef std::map<Key_, Value_> left_map;
-        typedef std::map<Value_, Key_> right_map;
-
-        private:
-            left_map left;
-            right_map right;
-
-        public:
-            std::tuple<typename left_map::iterator,
-                       typename right_map::iterator, bool>
-            insert(const std::pair<Key_, Value_>& val)
-            {
-                auto it1 = left.insert({val.first, val.second});
-                if ( it1.second )
-                {
-                    auto it2 = right.insert({val.second, val.first});
-                    return {it1.first, it2.first, true};
-                }
-                return {it1.first, right.find(val.second), false};
-            }
-
-            std::tuple<typename left_map::iterator, typename right_map::iterator, bool>
-            erase(const Key_& key)
-            {
-                auto it1 = left.find(key);
-                if ( it1 != left.end())
-                {
-                    auto it2 = right.find(it1->second);
-                    if ( it2 != right.end())
-                    {
-                        auto er1 = left.erase(it1);
-                        auto er2 = right.erase(it2);
-                        return {er1, er2, true};
-                    }
-                }
-                return {left.end(), right.end(), false};
-            }
-
-            void clear()
-            {
-                left.clear();
-                right.clear();
-            }
-
-            size_t size() const
-            {
-               return left.size();
-            }
-
-            bool empty() const
-            {
-                return left.empty();
-            }
-
-            const left_map& Left() { return left; }
-            const right_map& Right() { return right; }
-    };
-
     #include "capstruc.h"
     #include "capinfomap.h"
 
@@ -211,7 +149,6 @@ namespace dynarithmic
 
     typedef boost::container::flat_map<unsigned long, std::shared_ptr<CTL_TwainDLLHandle>> CTL_MapThreadToDLLHandle;
     typedef boost::container::flat_map<LONG, int> CTL_LongToIntMap;
-    typedef BiDirectionalMap<std::pair<int, int>, std::string> CTL_TwainNameMap;
     typedef boost::container::flat_map<CTL_StringType, CTL_ITwainSource*> CTL_StringToSourcePtrMap;
     typedef boost::container::flat_map<CTL_StringType, int> CTL_StringToIntMap;
     typedef boost::container::flat_map<LONG, HMODULE> CTL_LongToHMODULEMap;
