@@ -116,7 +116,7 @@ bool TwainMessageLoopImpl::IsAcquireTerminated(CTL_ITwainSource* pSource, bool b
 // Depending on the setting in pSource, we want to either loop
 // on PeekMessage(), or rely on the return value of GetMessage().
 // The settings are found in dtwain32.ini or dtwain64.ini under the
-// "TwainLoopPeek" section.
+// "TwainLoopGetMsg" section.
 struct ContinueLoopTraitsPeek
 {
     static bool ContinueLoop(MSG* msg)
@@ -183,6 +183,9 @@ struct ContinueLoopTraits
                 TranslateMessage(&msg);
                 ::DispatchMessage(&msg);
             }
+
+			// Optional throttle to avoid CPU spin 
+			Sleep(1);
         }
     }
 };
