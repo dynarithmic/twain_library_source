@@ -2567,5 +2567,5 @@ HINSTANCE    CTL_TwainAppMgr::s_ThisInstance = static_cast<HINSTANCE>(nullptr);
 SourceToXferReadyMap CTL_TwainAppMgr::s_SourceToXferReadyMap;
 SourceToXferReadyList CTL_TwainAppMgr::s_SourceToXferReadyList;
 SourceFlatbedOnlyList CTL_TwainAppMgr::s_SourceFlatbedOnlyList;
-SourcePeekMessageList CTL_TwainAppMgr::s_SourcePeekMessageList;
+SourceGetMessageList CTL_TwainAppMgr::s_SourceGetMessageList;
 SourcePaperDetectableMap CTL_TwainAppMgr::s_SourcePaperDetectableMap;

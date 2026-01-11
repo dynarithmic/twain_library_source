@@ -240,7 +240,7 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_bTileMode(false),
     m_bExtendedCapsRetrieved(false),
     m_bShutdownAcquire(false),
-    m_bUsePeekMessage(false),
+    m_bUsePeekMessage(true),
     m_nLastAcquireError(false),
     m_bTwainMsgLoopStarted(false),
     m_tbIsFileSystemSupported(boost::logic::indeterminate),

@@ -481,7 +481,8 @@ namespace dynarithmic
                INI_ALLOWDUP_RESOURCE,
                INI_SOURCE_SAVEDEFAULT,
                INI_SELECTSOURCEPOS_KEY,
- 			   INI_SAVESELECTSOURCEPOS_KEY,
+               INI_SAVESELECTSOURCEPOS_KEY,
+               INI_TWAINLOOPGETMSG_KEY,
                LASTINIENTRY };
         std::array<std::pair<int, std::string_view>, LASTINIENTRY> s_aINIKeys;
         int32_t                      s_nExtImageInfoOffset = 0;
@@ -906,7 +907,7 @@ namespace dynarithmic
     DTWAIN_FRAME CreateFrameArray(const CTL_TwainDLLHandle* pHandle, double Left, double Top, double Right, double Bottom);
     void SetArrayValueFromFactory(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray, size_t lPos, LPVOID pVariant);
     DTWAIN_ARRAY CreateArrayFromCap(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapType, LONG lSize);
-    bool AssignArray(const CTL_TwainDLLHandle* pHandle, LPDTWAIN_ARRAY aDestination, LPDTWAIN_ARRAY aSource);
+    bool MoveArray(const CTL_TwainDLLHandle* pHandle, LPDTWAIN_ARRAY aDestination, LPDTWAIN_ARRAY aSource);
     LONG GetCapDataType(CTL_ITwainSource* pSource, LONG nCap);
     int FeederWait(CTL_ITwainSource* pSource);
 

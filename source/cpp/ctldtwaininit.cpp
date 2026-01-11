@@ -2349,22 +2349,22 @@ void LoadTransferReadyOverrides()
 }
 
 // This loads the sources that rely on the TWAIN loop when processing the acquisitions
-// to use PeekMessage() instead of GetMessage().
+// to use GetMessage() instead of PeekMessage().
 void LoadTwainLoopOverrides()
 {
-    auto& peekloop_list = CTL_TwainAppMgr::GetSourcePeekMessageList();
-    peekloop_list.clear();
+    auto& getmsgloop_list = CTL_TwainAppMgr::GetSourceGetMessageList();
+    getmsgloop_list.clear();
 
     // Get the section name
     auto* customProfile = CTL_StaticData::GetINIInterface();
     if (!customProfile)
         return;
     CSimpleIniA::TNamesDepend keys;
-    customProfile->GetAllKeys(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_TWAINLOOPPEEK_KEY).data(), keys);
+    customProfile->GetAllKeys(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_TWAINLOOPGETMSG_KEY).data(), keys);
     auto iter = keys.begin();
     while (iter != keys.end())
     {
-        peekloop_list.insert(iter->pItem);
+        getmsgloop_list.insert(iter->pItem);
         ++iter;
     }
 }
