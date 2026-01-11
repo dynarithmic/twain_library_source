@@ -390,21 +390,26 @@ DTWAIN_ARRAY dynarithmic::CreateArrayFromCap(CTL_TwainDLLHandle* pHandle, CTL_IT
     return CreateArrayFromFactory(pHandle, lType, lSize);
 }
 
-bool dynarithmic::AssignArray(const CTL_TwainDLLHandle* pHandle, LPDTWAIN_ARRAY aDestination, LPDTWAIN_ARRAY aSource)
+// Safely "move" an existing array to a new array.
+bool dynarithmic::MoveArray(const CTL_TwainDLLHandle* pHandle, LPDTWAIN_ARRAY aDestination, LPDTWAIN_ARRAY aSource)
 {
-    // We clear the user array here, since we do not want to 
-    // report information back to user if capability is not supported
+    // The source must be an existing DTWAIN_ARRAY
     bool bSourceArrayExists = pHandle->m_ArrayFactory->is_valid(*aSource);
     if (!bSourceArrayExists)
         return false;
 
+    // If source and destination are the same, nothing to do.
     bool bDestinationArrayExists = pHandle->m_ArrayFactory->is_valid(*aDestination);
     if (bDestinationArrayExists && (*aDestination == *aSource))
         return true;
 
+    // Destroy the destination if it exists.
     if (bDestinationArrayExists)
         pHandle->m_ArrayFactory->destroy(*aDestination);
 
+    // Set destination equal to source, and null out the source.
+    // Setting the source to null ensures that any subsequent calls
+    // to destroy the source will essentially be a no-op.
     *aDestination = *aSource;
     *aSource = nullptr;
     return true;

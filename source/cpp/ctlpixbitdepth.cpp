@@ -208,7 +208,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumPixelTypes(DTWAIN_SOURCE Source, LPDTWAIN_AR
     const CTL_ITwainSource::CachedPixelTypeMap& theMap = pSource->GetPixelTypeMap();
     std::transform(theMap.begin(), theMap.end(), std::back_inserter(vIn), []
             (const CTL_ITwainSource::CachedPixelTypeMap::value_type& v) { return v.first; });
-    AssignArray(pHandle, pArray, &arr);
+    MoveArray(pHandle, pArray, &arr);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -225,7 +225,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumBitDepthsEx(DTWAIN_SOURCE Source, LONG Pixel
         const CTL_ITwainSource::CachedPixelTypeMap& theMap = pSource->GetPixelTypeMap();
         auto& pBitDepths = theMap.find(PixelType)->second;
         std::copy(pBitDepths.begin(), pBitDepths.end(), std::back_inserter(vIn));
-		AssignArray(pHandle, Array, &arr);
+		MoveArray(pHandle, Array, &arr);
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(false)

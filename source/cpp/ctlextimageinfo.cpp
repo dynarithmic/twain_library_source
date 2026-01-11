@@ -157,7 +157,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedExtImageInfo(DTWAIN_SOURCE Source, 
         // cached list of supported TWEI_x values.
         auto& vVect = pS->GetSupportedExtImageInfos();
         DTWAIN_ARRAY ThisArray = CreateArrayFromContainer<std::vector<LONG>>(pHandle, vVect);
-        dynarithmic::AssignArray(pHandle, Array, &ThisArray);
+        dynarithmic::MoveArray(pHandle, Array, &ThisArray);
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
@@ -215,7 +215,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDT
             LogWriterUtils::WriteLogInfoIndentedA("Supported Extended Image Info types:");
             DumpArrayContents(aStrings, 0);
         }
-        dynarithmic::AssignArray(pHandle, Array, &ThisArray);
+        dynarithmic::MoveArray(pHandle, Array, &ThisArray);
         return TRUE;
     }
     else
@@ -648,7 +648,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
                 finalRet = pTheSource->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, factory->get_buffer(ExtInfoArray, i), nullptr);
             }
         }
-        dynarithmic::AssignArray(pHandle, Data, &ExtInfoArray);
+        dynarithmic::MoveArray(pHandle, Data, &ExtInfoArray);
         if (!finalRet.first)
         {
             // Error occurred

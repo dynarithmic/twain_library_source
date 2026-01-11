@@ -75,7 +75,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
                 CTL_CapInfoMap *pCapInfoArray = std::get<1>(Info).get();
                 std::for_each(pCapInfoArray->begin(), pCapInfoArray->end(), [&vCaps](const CTL_CapInfoMap::value_type& CapInfo)
                                 { vCaps.push_back(static_cast<int>(std::get<0>(CapInfo))); });
-                AssignArray(pHandle, Array, &ThisArray); 
+                MoveArray(pHandle, Array, &ThisArray); 
                 LOG_FUNC_EXIT_NONAME_PARAMS(true)
             }
         }
