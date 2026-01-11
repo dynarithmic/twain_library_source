@@ -21,8 +21,9 @@ DTWAIN Version changes
 
   For applications that require a blocking loop, the previous GetMessage 
   behavior is still supported and can be explicitly enabled using the
-  DTWAIN_EnableGetMessageLoop() API function, or creating an entry in the 
-  DTWAIN32.INI or DTWAIN64.INI file under the [TwainLoopGetMsg] section.
+  DTWAIN_EnablePeekMessageLoop() API function and specifying FALSE (or 0) as the
+  parameter, or creating an entry in the DTWAIN32.INI or DTWAIN64.INI file 
+  under the [TwainLoopGetMsg] section.
 
 - Add ability to rotate and skew text that is added to a PDF page.  
   See the new DTWAIN_PDFTEXTELEMENT type and the supporting API functions.
