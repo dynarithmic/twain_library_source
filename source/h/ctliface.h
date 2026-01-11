@@ -30,6 +30,7 @@
 #include <mutex>
 #include <memory>
 #include <functional>
+#include <array>
 #include <string_view>
 #include "ctltripletbase.h"
 #include "dtwain_raii.h"
@@ -644,7 +645,6 @@ namespace dynarithmic
 
     class CTL_TwainDLLHandle
     {
-
         public:
             static constexpr int NumTwainMapValues = DTWAIN_CONSTANT_LAST;
 
@@ -660,6 +660,8 @@ namespace dynarithmic
             CTL_StringType GetVersionString() const { return  m_VersionString; }
             void        SetVersionString(CTL_StringType s) { m_VersionString = std::move(s); }
             DTWAIN_GUID& GetGUID() { return m_uuid; }
+            auto& GetGUIDMap(int nWhich) { return m_arrayMapGUID[nWhich]; }
+            auto& GetGUIDMap() { return m_arrayMapGUID; }
 
             DTWAIN_ACQUIRE          GetNewAcquireNum();
             void                    EraseAcquireNum(DTWAIN_ACQUIRE nNum);
@@ -697,6 +699,7 @@ namespace dynarithmic
 
             tagSessionStruct m_SessionStruct;
             DTWAIN_GUID m_uuid = {};
+            std::array<DTWAIN_GUID_MAP, GUID_DEF_TOTAL> m_arrayMapGUID = {};
             CTL_ResourceRegistryMap m_ResourceRegistry;
             CTL_ITwainSession* m_pTwainSession;
             CTL_StringType   m_VersionString;
@@ -1024,9 +1027,14 @@ namespace dynarithmic
             if (m_pHandle && m_bDestroy && m_Array)
             {
                 if constexpr (std::is_same_v<ArrayType, DTWAIN_ARRAY*>)
-                    m_pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(*m_Array));
+                {
+                    if (*m_Array)
+                        m_pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(*m_Array));
+                }
                 else
+                {
                     m_pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(m_Array));
+                }
                 m_Array = {};
             }
         }

@@ -143,9 +143,7 @@ bool CTL_ITwainSession::AddTwainSource( CTL_ITwainSource *pSource )
     if ( std::find_if(m_arrTwainSource.begin(), m_arrTwainSource.end(), SourceFinder(strProduct)) == m_arrTwainSource.end())
     {
         auto uid = StringWrapperA::GetGUIDNoCurlyBrace();
-        auto& guidRef = pSource->GetGUIDRef();
-        memcpy(guidRef.data(), uid.c_str(), uid.length());
-        m_mapUUIDToSource.Insert(guidRef, pSource );
+        pSource->GetDTWAINHandle()->GetGUIDMap(GUID_SOURCES).Insert( uid, pSource );
         m_arrTwainSource.insert( pSource );
         auto iter = sourceStatusMap.insert({ pSource->GetProductNameA(), {} }).first;
         iter->second.SetStatus(SourceStatus::SOURCE_STATUS_UNKNOWN, true);

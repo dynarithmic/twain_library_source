@@ -184,6 +184,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetBitDepth(DTWAIN_SOURCE Source, LPLONG BitDept
     const DTWAIN_BOOL bRet = GetCapValuesEx2_Internal(pSource, ICAP_BITDEPTH, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array);
     if ( bRet && Array )
     {
+        DTWAINArrayLowLevelPtr_RAII(pHandle, &Array);
         const auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
         if ( !vIn.empty() )
             *BitDepth = vIn[0];
@@ -202,12 +203,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumPixelTypes(DTWAIN_SOURCE Source, LPDTWAIN_AR
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pArray))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    const DTWAIN_ARRAY arr = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
+    DTWAIN_ARRAY arr = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
     auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
     const CTL_ITwainSource::CachedPixelTypeMap& theMap = pSource->GetPixelTypeMap();
     std::transform(theMap.begin(), theMap.end(), std::back_inserter(vIn), []
             (const CTL_ITwainSource::CachedPixelTypeMap::value_type& v) { return v.first; });
-    *pArray = arr;
+    AssignArray(pHandle, pArray, &arr);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -219,12 +220,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumBitDepthsEx(DTWAIN_SOURCE Source, LONG Pixel
     auto [pHandle, pSource] = VerifyHandles(Source);
     if (pSource->IsPixelTypeSupported(PixelType) )
     {
-        const DTWAIN_ARRAY arr = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
+        DTWAIN_ARRAY arr = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
         auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
         const CTL_ITwainSource::CachedPixelTypeMap& theMap = pSource->GetPixelTypeMap();
         auto& pBitDepths = theMap.find(PixelType)->second;
         std::copy(pBitDepths.begin(), pBitDepths.end(), std::back_inserter(vIn));
-        *Array = arr;
+		AssignArray(pHandle, Array, &arr);
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(false)

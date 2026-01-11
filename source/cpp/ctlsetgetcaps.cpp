@@ -408,10 +408,7 @@ bool GetCapValuesEx_Internal( CTL_ITwainSource* pSource, TW_UINT16 lCap, LONG lG
         SetCapabilityInfo<CAPINFO_IDX_DATATYPE>(pHandle, pSource, nDataType, lCap);
     }
 
-    arr.SetDestroy(false);
-    if ( bEnumeratorExists )
-        pHandle->m_ArrayFactory->destroy(*pArray);
-    *pArray = ThisArray;
+    AssignArray(pHandle, pArray, &ThisArray); 
     DumpArrayContents(*pArray, lCap);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)

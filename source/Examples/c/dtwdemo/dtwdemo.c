@@ -617,6 +617,7 @@ void GenericAcquire(LONG nWhichOne)
             DTWAIN_GetErrorStringA(lastError, szError, 1023);
             MessageBoxA(NULL, szError, "TWAIN Error", MB_ICONSTOP);
         }
+		DTWAIN_DestroyAcquisitionArray(g_AcquireArray, FALSE);
         return;
     }
 
@@ -1263,6 +1264,7 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
             DTWAIN_EnumCustomCaps(g_CurrentSource, &testArray);
             wsprintf(szBuf, _T("%d"), (int)DTWAIN_ArrayGetCount(testArray));
             SetWindowText(hWndNumCustomCaps, szBuf);
+            DTWAIN_ArrayDestroy(testArray);
 
             DTWAIN_EnumExtendedCaps(g_CurrentSource, &CapArray);
             wsprintf(szBuf, _T("%d"), (int)DTWAIN_ArrayGetCount(CapArray));

@@ -56,7 +56,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
         factory->clear(*Array);
 
     DTWAIN_ARRAY ThisArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
-    DTWAINArrayLowLevel_RAII arr(pHandle, ThisArray);
+    DTWAINArrayLowLevelPtr_RAII arr(pHandle, &ThisArray);
     auto& vCaps = factory->underlying_container_t<LONG>(ThisArray);
 
     if (ThisArray)
@@ -75,7 +75,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
                 CTL_CapInfoMap *pCapInfoArray = std::get<1>(Info).get();
                 std::for_each(pCapInfoArray->begin(), pCapInfoArray->end(), [&vCaps](const CTL_CapInfoMap::value_type& CapInfo)
                                 { vCaps.push_back(static_cast<int>(std::get<0>(CapInfo))); });
-                *Array = CreateArrayCopyFromFactory(pHandle, ThisArray);
+                AssignArray(pHandle, Array, &ThisArray); 
                 LOG_FUNC_EXIT_NONAME_PARAMS(true)
             }
         }
@@ -121,6 +121,11 @@ static void CopyCapsToUserArray(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* p
     vCaps.insert(vCaps.begin(), capCache.begin(), capCache.end());
 
     // Copy the temp array to the user's copy
+	// We destroy the old data if it exists.
+	bool bEnumeratorExists = pHandle->m_ArrayFactory->is_valid(*Array);
+	if (bEnumeratorExists)
+		pHandle->m_ArrayFactory->destroy(*Array);
+
     *Array = CreateArrayCopyFromFactory(pHandle, ThisArray);
 }
 

@@ -126,7 +126,6 @@ namespace dynarithmic
         CapToValuesMap m_capToValuesMap_G;
         CapToValuesMap m_capToValuesMap_GD;
         SourceCompressionMap m_CompressionMap;
-        DTWAIN_GUID m_uuid = {};
 
     public:
         CTL_ITwainSource(const CTL_ITwainSource&) = delete;
@@ -141,8 +140,6 @@ namespace dynarithmic
         CTL_TwainIdentity& GetTwainIdentity() { return m_SourceId;  }
 
         CTL_ITwainSession* GetTwainSession() const;
-        DTWAIN_GUID GetGUID() const { return m_uuid; }
-        DTWAIN_GUID& GetGUIDRef() { return m_uuid; }
 
         bool isCapValuesCached(TW_UINT16 lCap, LONG getType) const
         {

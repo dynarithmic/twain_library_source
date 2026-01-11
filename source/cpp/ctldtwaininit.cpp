@@ -806,8 +806,7 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
         CTL_TwainDLLHandle* pHandle = pHandlePtr.get();
 
         // Associate a GUID with the handle
-        auto uid = StringWrapperA::GetGUIDNoCurlyBrace();
-        memcpy(pHandle->GetGUID().data(), uid.c_str(), uid.size());
+        pHandle->GetGUID() = StringWrapperA::GetGUIDNoCurlyBrace();
 
         if (!bMinimalSetup)
         {

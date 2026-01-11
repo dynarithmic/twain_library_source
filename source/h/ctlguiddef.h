@@ -22,8 +22,13 @@
 #define CTLGUIDDEF_H
 
 #include <array>
+#include "ctlbimap.h"
+
 namespace dynarithmic
 {
-    using DTWAIN_GUID = std::array<char, 37>;
+    using DTWAIN_GUID = std::string;
+    using DTWAIN_GUID_MAP = dynarithmic::BidirectionMap<DTWAIN_GUID, void*>;
+    enum { GUID_SOURCES, GUID_ARRAYS, GUID_PDFTEXTELEMENTS, 
+           GUID_TWAIN_IDENTITY_APP, GUID_TWAIN_IDENTITY_SOURCE, GUID_DEF_TOTAL };
 }
 #endif

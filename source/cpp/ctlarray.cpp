@@ -306,17 +306,19 @@ DTWAIN_ARRAY dynarithmic::CreateArrayFromFactory(CTL_TwainDLLHandle* pHandle, LO
         default:;
     }
     int dummy = 0;
+    DTWAIN_ARRAY retArray = {};
     if (nEnumType == DTWAIN_ARRAYFRAME)
     {
-        DTWAIN_ARRAY frameArray = pHandle->m_ArrayFactory->create_frame(0, 0, 0, 0);
-        if (frameArray)
+        retArray = pHandle->m_ArrayFactory->create_frame(0, 0, 0, 0);
+        if (retArray)
         {
-            auto& vect = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(frameArray);
+            auto& vect = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(retArray);
             vect.resize(nInitialSize);
         }
-        return frameArray;
     }
-    return pHandle->m_ArrayFactory->create_array(static_cast<CTL_ArrayType>(nEnumType), &dummy, nInitialSize);
+    else
+        retArray = pHandle->m_ArrayFactory->create_array(static_cast<CTL_ArrayType>(nEnumType), &dummy, nInitialSize);
+    return retArray;
 }
 
 DTWAIN_ARRAY dynarithmic::CreateArrayCopyFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Source)
