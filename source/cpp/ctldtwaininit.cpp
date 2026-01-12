@@ -1762,6 +1762,7 @@ static bool SysDestroyHelper(const char* pParentFunc, CTL_TwainDLLHandle* pHandl
         pHandle->RemoveAllEnumerators();
         pHandle->RemoveAllSourceCapInfo();
         pHandle->RemoveAllSourceMaps();
+        pHandle->RemoveAllPDFTextElements();
         pHandle->m_CallbackMsg = nullptr;
         pHandle->m_CallbackError = nullptr;
         RemoveThreadIdFromAssociation(threadId);

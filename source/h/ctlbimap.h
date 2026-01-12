@@ -96,6 +96,8 @@ namespace dynarithmic
 			return left_to_right.size();
 		}
 
+		const auto& GetRightToLeftMap() const { return right_to_left; }
+		const auto& GetLeftToRightMap() const { return left_to_right; }
 	private:
 		std::map<Left, Right> left_to_right;
 		std::map<Right, Left> right_to_left;

@@ -399,6 +399,10 @@ static void GenericAddPDFText(CTL_ITwainSource *pSource,
     if (!pTextElement)
     {
         PDFTextElementPtr pPtr = std::make_shared<PDFTextElement>();
+
+		auto& guidMap = static_cast<CTL_TwainDLLHandle*>(dynarithmic::GetDTWAINHandle_Internal())->GetGUIDMap(GUID_PDFTEXTELEMENTS);
+        guidMap.Insert(StringWrapperA::GetGUIDNoCurlyBrace(), pPtr.get());
+
         *pPtr = element;
         // Add to the global list
 		auto& globalTextElementList = CTL_StaticData::GetPDFTextElementList();
@@ -565,6 +569,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_DestroyPDFTextElement(DTWAIN_PDFTEXTELEMENT Text
         }
 
         // Now erase the global instance
+
+        // Erase the GUID associated with the text element
+		auto& guidMap = pHandle->GetGUIDMap(GUID_PDFTEXTELEMENTS);
+		guidMap.EraseRight(TextElement);
         auto& globalList = CTL_StaticData::GetPDFTextElementList();
         globalList.erase(itGeneric.second);
     }
@@ -879,6 +887,9 @@ DTWAIN_PDFTEXTELEMENT DLLENTRY_DEF DTWAIN_CreatePDFTextElementCopy(DTWAIN_PDFTEX
     if ( !TextElement )
 		DTWAIN_Check_Error_Condition_1_Ex(pHandle, [] { return 1; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 	PDFTextElementPtr pPtr = std::make_shared<PDFTextElement>();
+	auto& guidMap = pHandle->GetGUIDMap(GUID_PDFTEXTELEMENTS);
+	guidMap.Insert(StringWrapperA::GetGUIDNoCurlyBrace(), pPtr.get());
+
     auto it = CheckGlobalPDFTextElement(TextElement);
 	DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !it.first; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 	auto* pText = pPtr.get();

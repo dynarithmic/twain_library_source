@@ -79,6 +79,22 @@ void CTL_TwainDLLHandle::RemoveAllSourceMaps()
     m_mapStringToSource.clear();
 }
 
+void CTL_TwainDLLHandle::RemoveAllPDFTextElements()
+{
+    auto& textElementList = CTL_StaticData::GetPDFTextElementList();
+	auto& guidMap = GetGUIDMap(GUID_PDFTEXTELEMENTS);
+    auto& righttoleftmap = guidMap.GetRightToLeftMap();
+    for (const auto& mapEl : righttoleftmap)
+    {
+        // Remove text elements from global list
+        auto it = textElementList.erase(std::remove_if(textElementList.begin(), textElementList.end(), 
+                                        [&](auto& pr) { return pr.get() == static_cast<PDFTextElement*>(mapEl.first); }), textElementList.end());
+    }
+
+    // Remove all locally created PDF text elements
+    guidMap.Clear();
+}
+
 void CTL_TwainDLLHandle::InitializeResourceRegistry()
 {
     auto default_values = GetLangResourceNames();

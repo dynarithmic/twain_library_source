@@ -655,6 +655,7 @@ namespace dynarithmic
             void    RemoveAllEnumerators();
             void    RemoveAllSourceCapInfo();
             void    RemoveAllSourceMaps();
+            void    RemoveAllPDFTextElements();
             void    InitializeResourceRegistry();
             std::pair<CTL_ResourceRegistryMap::iterator, bool> AddResourceToRegistry(LPCSTR pLangDLL, bool bClear);
             CTL_ResourceRegistryMap& GetResourceRegistry() { return m_ResourceRegistry; }
