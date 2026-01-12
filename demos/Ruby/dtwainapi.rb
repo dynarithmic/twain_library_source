@@ -231,6 +231,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_ArrayGetAtLong
    attr_reader :DTWAIN_ArrayGetAtLong64
    attr_reader :DTWAIN_ArrayGetAtSource
+   attr_reader :DTWAIN_ArrayGetAtSourceEx
    attr_reader :DTWAIN_ArrayGetAtString
    attr_reader :DTWAIN_ArrayGetAtStringA
    attr_reader :DTWAIN_ArrayGetAtStringPtr
@@ -3018,6 +3019,7 @@ class DTWAINAPI
        @DTWAIN_ArrayGetAtLong = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtLong'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayGetAtLong64 = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtLong64'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayGetAtSource = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtSource'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_ArrayGetAtSourceEx = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtSourceEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
        @DTWAIN_ArrayGetAtString = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtString'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayGetAtStringA = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtStringA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayGetAtStringPtr = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtStringPtr'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)

@@ -2073,6 +2073,9 @@ namespace Dynarithmic
         public static extern int DTWAIN_ArrayGetAtSource(DTWAIN_ARRAY pArray, int nWhere, ref DTWAIN_SOURCE ppSource);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
+        public static extern DTWAIN_SOURCE DTWAIN_ArrayGetAtSourceEx(DTWAIN_ARRAY pArray, int nWhere);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true)]
         public static extern int DTWAIN_ArrayGetAtString(DTWAIN_ARRAY pArray, int nWhere, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder pStr);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true)]

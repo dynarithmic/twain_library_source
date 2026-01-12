@@ -143,6 +143,7 @@ type DtwainarraygetatframestringwFunc = unsafe extern "C" fn(*mut c_void,i32,*mu
 type DtwainarraygetatlongFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32) -> i32;
 type Dtwainarraygetatlong64Func = unsafe extern "C" fn(*mut c_void,i32,*mut i64) -> i32;
 type DtwainarraygetatsourceFunc = unsafe extern "C" fn(*mut c_void,i32,*mut *const ()) -> i32;
+type DtwainarraygetatsourceexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
 type DtwainarraygetatstringFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16) -> i32;
 type DtwainarraygetatstringaFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char) -> i32;
 type DtwainarraygetatstringptrFunc = unsafe extern "C" fn(*mut c_void,i32) -> *const u16;
@@ -1262,6 +1263,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_ArrayGetAtLongFunc: Symbol<'a, DtwainarraygetatlongFunc>,
     DTWAIN_ArrayGetAtLong64Func: Symbol<'a, Dtwainarraygetatlong64Func>,
     DTWAIN_ArrayGetAtSourceFunc: Symbol<'a, DtwainarraygetatsourceFunc>,
+    DTWAIN_ArrayGetAtSourceExFunc: Symbol<'a, DtwainarraygetatsourceexFunc>,
     DTWAIN_ArrayGetAtStringFunc: Symbol<'a, DtwainarraygetatstringFunc>,
     DTWAIN_ArrayGetAtStringAFunc: Symbol<'a, DtwainarraygetatstringaFunc>,
     DTWAIN_ArrayGetAtStringPtrFunc: Symbol<'a, DtwainarraygetatstringptrFunc>,
@@ -4013,6 +4015,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_ArrayGetAtLong: Symbol<DtwainarraygetatlongFunc> = unsafe { library.get(b"DTWAIN_ArrayGetAtLong")? };
         let DTWAIN_ArrayGetAtLong64: Symbol<Dtwainarraygetatlong64Func> = unsafe { library.get(b"DTWAIN_ArrayGetAtLong64")? };
         let DTWAIN_ArrayGetAtSource: Symbol<DtwainarraygetatsourceFunc> = unsafe { library.get(b"DTWAIN_ArrayGetAtSource")? };
+        let DTWAIN_ArrayGetAtSourceEx: Symbol<DtwainarraygetatsourceexFunc> = unsafe { library.get(b"DTWAIN_ArrayGetAtSourceEx")? };
         let DTWAIN_ArrayGetAtString: Symbol<DtwainarraygetatstringFunc> = unsafe { library.get(b"DTWAIN_ArrayGetAtString")? };
         let DTWAIN_ArrayGetAtStringA: Symbol<DtwainarraygetatstringaFunc> = unsafe { library.get(b"DTWAIN_ArrayGetAtStringA")? };
         let DTWAIN_ArrayGetAtStringPtr: Symbol<DtwainarraygetatstringptrFunc> = unsafe { library.get(b"DTWAIN_ArrayGetAtStringPtr")? };
@@ -5131,6 +5134,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_ArrayGetAtLongFunc: DTWAIN_ArrayGetAtLong,
             DTWAIN_ArrayGetAtLong64Func: DTWAIN_ArrayGetAtLong64,
             DTWAIN_ArrayGetAtSourceFunc: DTWAIN_ArrayGetAtSource,
+            DTWAIN_ArrayGetAtSourceExFunc: DTWAIN_ArrayGetAtSourceEx,
             DTWAIN_ArrayGetAtStringFunc: DTWAIN_ArrayGetAtString,
             DTWAIN_ArrayGetAtStringAFunc: DTWAIN_ArrayGetAtStringA,
             DTWAIN_ArrayGetAtStringPtrFunc: DTWAIN_ArrayGetAtStringPtr,
@@ -6538,6 +6542,10 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_ArrayGetAtSource(&self, pArray: *mut c_void, nWhere: i32, ppSource: *mut *const ()) -> i32 {
         unsafe { return (self.DTWAIN_ArrayGetAtSourceFunc)(pArray, nWhere, ppSource);  }
+    }
+
+    pub fn DTWAIN_ArrayGetAtSourceEx(&self, pArray: *mut c_void, nWhere: i32) -> *mut c_void {
+        unsafe { return (self.DTWAIN_ArrayGetAtSourceExFunc)(pArray, nWhere);  }
     }
 
     pub fn DTWAIN_ArrayGetAtString(&self, pArray: *mut c_void, nWhere: i32, pStr: *mut u16) -> i32 {

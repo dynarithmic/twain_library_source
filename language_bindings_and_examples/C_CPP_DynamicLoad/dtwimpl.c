@@ -150,6 +150,7 @@
     D_ARRAYGETATLONGFUNC                          DYNDTWAIN_API::DTWAIN_ArrayGetAtLong = nullptr;
     D_ARRAYGETATLONG64FUNC                        DYNDTWAIN_API::DTWAIN_ArrayGetAtLong64 = nullptr;
     D_ARRAYGETATSOURCEFUNC                        DYNDTWAIN_API::DTWAIN_ArrayGetAtSource = nullptr;
+    D_ARRAYGETATSOURCEEXFUNC                      DYNDTWAIN_API::DTWAIN_ArrayGetAtSourceEx = nullptr;
     D_ARRAYGETATSTRINGFUNC                        DYNDTWAIN_API::DTWAIN_ArrayGetAtString = nullptr;
     D_ARRAYGETATSTRINGAFUNC                       DYNDTWAIN_API::DTWAIN_ArrayGetAtStringA = nullptr;
     D_ARRAYGETATSTRINGPTRFUNC                     DYNDTWAIN_API::DTWAIN_ArrayGetAtStringPtr = nullptr;
@@ -1340,6 +1341,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_ArrayGetAtLong, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayGetAtLong64, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayGetAtSource, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_ArrayGetAtSourceEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayGetAtString, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayGetAtStringA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayGetAtStringPtr, hModule);

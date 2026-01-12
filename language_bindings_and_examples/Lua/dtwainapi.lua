@@ -173,6 +173,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_ArrayGetAtLong(DTWAIN_ARRAY pArray, LONG nWhere, LPLONG pVal);
         DTWAIN_BOOL DTWAIN_ArrayGetAtLong64(DTWAIN_ARRAY pArray, LONG nWhere, LPLONG64 pVal);
         DTWAIN_BOOL DTWAIN_ArrayGetAtSource(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_SOURCE* ppSource);
+        DTWAIN_SOURCE DTWAIN_ArrayGetAtSourceEx(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayGetAtString(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_CHARPTRTYPE pStr);
         DTWAIN_BOOL DTWAIN_ArrayGetAtStringA(DTWAIN_ARRAY pArray, LONG nWhere, LPSTR pStr);
         LPCTSTR DTWAIN_ArrayGetAtStringPtr(DTWAIN_ARRAY pArray, LONG nWhere);
@@ -1347,6 +1348,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_ArrayGetAtLong(DTWAIN_ARRAY pArray, LONG nWhere, LPLONG pVal);
         DTWAIN_BOOL DTWAIN_ArrayGetAtLong64(DTWAIN_ARRAY pArray, LONG nWhere, LPLONG64 pVal);
         DTWAIN_BOOL DTWAIN_ArrayGetAtSource(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_SOURCE* ppSource);
+        DTWAIN_SOURCE DTWAIN_ArrayGetAtSourceEx(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayGetAtString(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_CHARPTRTYPE pStr);
         DTWAIN_BOOL DTWAIN_ArrayGetAtStringA(DTWAIN_ARRAY pArray, LONG nWhere, LPSTR pStr);
         LPCTSTR DTWAIN_ArrayGetAtStringPtr(DTWAIN_ARRAY pArray, LONG nWhere);
@@ -2521,6 +2523,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_ArrayGetAtLong(DTWAIN_ARRAY pArray, LONG nWhere, LPLONG pVal);
         DTWAIN_BOOL DTWAIN_ArrayGetAtLong64(DTWAIN_ARRAY pArray, LONG nWhere, LPLONG64 pVal);
         DTWAIN_BOOL DTWAIN_ArrayGetAtSource(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_SOURCE* ppSource);
+        DTWAIN_SOURCE DTWAIN_ArrayGetAtSourceEx(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayGetAtString(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_CHARPTRTYPE pStr);
         DTWAIN_BOOL DTWAIN_ArrayGetAtStringA(DTWAIN_ARRAY pArray, LONG nWhere, LPSTR pStr);
         LPCTSTR DTWAIN_ArrayGetAtStringPtr(DTWAIN_ARRAY pArray, LONG nWhere);
@@ -3695,6 +3698,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_ArrayGetAtLong(DTWAIN_ARRAY pArray, LONG nWhere, LPLONG pVal);
         DTWAIN_BOOL DTWAIN_ArrayGetAtLong64(DTWAIN_ARRAY pArray, LONG nWhere, LPLONG64 pVal);
         DTWAIN_BOOL DTWAIN_ArrayGetAtSource(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_SOURCE* ppSource);
+        DTWAIN_SOURCE DTWAIN_ArrayGetAtSourceEx(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayGetAtString(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_CHARPTRTYPE pStr);
         DTWAIN_BOOL DTWAIN_ArrayGetAtStringA(DTWAIN_ARRAY pArray, LONG nWhere, LPSTR pStr);
         LPCTSTR DTWAIN_ArrayGetAtStringPtr(DTWAIN_ARRAY pArray, LONG nWhere);

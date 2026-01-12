@@ -1998,6 +1998,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY, LONG, LPLONG) DTWAIN_ArrayGetAtLong;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY, LONG, LPLONG64) DTWAIN_ArrayGetAtLong64;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY, LONG, DTWAIN_SOURCE*) DTWAIN_ArrayGetAtSource;
+    extern(Windows) DTWAIN_SOURCE function(DTWAIN_ARRAY, LONG) DTWAIN_ArrayGetAtSourceEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY, LONG, DTWAIN_CHARPTRTYPE) DTWAIN_ArrayGetAtString;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY, LONG, LPSTR) DTWAIN_ArrayGetAtStringA;
     extern(Windows) LPCTSTR function(DTWAIN_ARRAY, LONG) DTWAIN_ArrayGetAtStringPtr;
@@ -3116,6 +3117,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_ArrayGetAtLong, "DTWAIN_ArrayGetAtLong");
         bindFunction(cast(void**)&DTWAIN_ArrayGetAtLong64, "DTWAIN_ArrayGetAtLong64");
         bindFunction(cast(void**)&DTWAIN_ArrayGetAtSource, "DTWAIN_ArrayGetAtSource");
+        bindFunction(cast(void**)&DTWAIN_ArrayGetAtSourceEx, "DTWAIN_ArrayGetAtSourceEx");
         bindFunction(cast(void**)&DTWAIN_ArrayGetAtString, "DTWAIN_ArrayGetAtString");
         bindFunction(cast(void**)&DTWAIN_ArrayGetAtStringA, "DTWAIN_ArrayGetAtStringA");
         bindFunction(cast(void**)&DTWAIN_ArrayGetAtStringPtr, "DTWAIN_ArrayGetAtStringPtr");

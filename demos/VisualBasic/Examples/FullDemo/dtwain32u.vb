@@ -1830,6 +1830,7 @@ Class DTWAINAPI
     Public Declare Auto Function DTWAIN_ArrayGetAtLong Lib "dtwain32u.dll" (pArray As System.IntPtr, nWhere As Integer, ByRef pVal As Integer) As Integer
     Public Declare Auto Function DTWAIN_ArrayGetAtLong64 Lib "dtwain32u.dll" (pArray As System.IntPtr, nWhere As Integer, ByRef pVal As System.Int64) As Integer
     Public Declare Auto Function DTWAIN_ArrayGetAtSource Lib "dtwain32u.dll" (pArray As System.IntPtr, nWhere As Integer, ByRef ppSource As System.IntPtr) As Integer
+    Public Declare Auto Function DTWAIN_ArrayGetAtSourceEx Lib "dtwain32u.dll" (pArray As System.IntPtr, nWhere As Integer) As System.IntPtr
     Public Declare Auto Function DTWAIN_ArrayGetAtString Lib "dtwain32u.dll" (pArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPTStr)> pStr As StringBuilder) As Integer
     Public Declare Ansi Function DTWAIN_ArrayGetAtStringA Lib "dtwain32u.dll" (pArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPStr)> pStr As StringBuilder) As Integer
     Public Declare Unicode Function DTWAIN_ArrayGetAtStringW Lib "dtwain32u.dll" (pArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPWStr)> pStr As StringBuilder) As Integer

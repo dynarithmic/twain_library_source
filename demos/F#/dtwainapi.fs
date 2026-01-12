@@ -2135,6 +2135,9 @@ module TwainAPI =
     type DTWAIN_ArrayGetAtSourceDelegate = delegate of DTWAIN_ARRAY * LONG * DTWAIN_SOURCE byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
+    type DTWAIN_ArrayGetAtSourceExDelegate = delegate of DTWAIN_ARRAY * LONG -> DTWAIN_SOURCE
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
     type DTWAIN_ArrayGetAtStringDelegate = delegate of DTWAIN_ARRAY * LONG * System.Text.StringBuilder -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Ansi)>]
@@ -5270,6 +5273,7 @@ module TwainAPI =
     let private ArrayGetAtLong = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtLong" : DTWAIN_ArrayGetAtLongDelegate)
     let private ArrayGetAtLong64 = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtLong64" : DTWAIN_ArrayGetAtLong64Delegate)
     let private ArrayGetAtSource = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtSource" : DTWAIN_ArrayGetAtSourceDelegate)
+    let private ArrayGetAtSourceEx = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtSourceEx" : DTWAIN_ArrayGetAtSourceExDelegate)
     let private ArrayGetAtString = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtString" : DTWAIN_ArrayGetAtStringDelegate)
     let private ArrayGetAtStringA = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtStringA" : DTWAIN_ArrayGetAtStringADelegate)
     let private ArrayGetAtStringW = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtStringW" : DTWAIN_ArrayGetAtStringWDelegate)
@@ -6694,6 +6698,10 @@ module TwainAPI =
     let DTWAIN_ArrayGetAtSource (parray: DTWAIN_ARRAY) (nwhere: LONG) (ppsource: DTWAIN_SOURCE byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         ArrayGetAtSource.Value.Invoke(parray, nwhere, &ppsource)
+
+    let DTWAIN_ArrayGetAtSourceEx (parray: DTWAIN_ARRAY) (nwhere: LONG) : DTWAIN_SOURCE =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        ArrayGetAtSourceEx.Value.Invoke(parray, nwhere)
 
     let DTWAIN_ArrayGetAtString (parray: DTWAIN_ARRAY) (nwhere: LONG) (pstr: System.Text.StringBuilder) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

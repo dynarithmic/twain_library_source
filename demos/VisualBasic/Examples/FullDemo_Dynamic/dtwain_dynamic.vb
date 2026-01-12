@@ -2198,6 +2198,9 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_ArrayGetAtSourceDelegate(pArray As System.IntPtr, nWhere As Integer, ByRef ppSource As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
+        Private Delegate Function DTWAIN_ArrayGetAtSourceExDelegate(pArray As System.IntPtr, nWhere As Integer) As System.IntPtr
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
         Private Delegate Function DTWAIN_ArrayGetAtStringDelegate(pArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPTStr)> pStr As StringBuilder) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Ansi)>
@@ -5643,6 +5646,10 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_ArrayGetAtSource(pArray As System.IntPtr, nWhere As Integer, ByRef ppSource As System.IntPtr) As Integer
         Return api.DTWAIN_ArrayGetAtSource(pArray, nWhere, ppSource)
+        End Function
+        
+        Public Function DTWAIN_ArrayGetAtSourceEx(pArray As System.IntPtr, nWhere As Integer) As System.IntPtr
+        Return api.DTWAIN_ArrayGetAtSourceEx(pArray, nWhere)
         End Function
         
         Public Function DTWAIN_ArrayGetAtString(pArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPTStr)> pStr As StringBuilder) As Integer
@@ -9819,6 +9826,7 @@ Namespace Dynarithmic
             Public DTWAIN_ArrayGetAtLong As DTWAIN_ArrayGetAtLongDelegate
             Public DTWAIN_ArrayGetAtLong64 As DTWAIN_ArrayGetAtLong64Delegate
             Public DTWAIN_ArrayGetAtSource As DTWAIN_ArrayGetAtSourceDelegate
+            Public DTWAIN_ArrayGetAtSourceEx As DTWAIN_ArrayGetAtSourceExDelegate
             Public DTWAIN_ArrayGetAtString As DTWAIN_ArrayGetAtStringDelegate
             Public DTWAIN_ArrayGetAtStringA As DTWAIN_ArrayGetAtStringADelegate
             Public DTWAIN_ArrayGetAtStringW As DTWAIN_ArrayGetAtStringWDelegate

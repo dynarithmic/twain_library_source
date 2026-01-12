@@ -1843,6 +1843,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_ArrayGetAtLong.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetAtLong64.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetAtSource.restype = ct.c_long
+     theDLL.DTWAIN_ArrayGetAtSourceEx.restype = ct.c_void_p
      theDLL.DTWAIN_ArrayGetAtString.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetAtStringA.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetAtStringPtr.restype = ct.c_wchar_p
@@ -2962,6 +2963,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_ArrayGetAtLong.argtypes = [ct.c_void_p, ct.c_long, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_ArrayGetAtLong64.argtypes = [ct.c_void_p, ct.c_long, ct.POINTER(ct.c_int64)]
      theDLL.DTWAIN_ArrayGetAtSource.argtypes = [ct.c_void_p, ct.c_long, ct.POINTER(ct.c_void_p)]
+     theDLL.DTWAIN_ArrayGetAtSourceEx.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_ArrayGetAtString.argtypes = [ct.c_void_p, ct.c_long, ct.c_wchar_p]
      theDLL.DTWAIN_ArrayGetAtStringA.argtypes = [ct.c_void_p, ct.c_long, ct.c_char_p]
      theDLL.DTWAIN_ArrayGetAtStringPtr.argtypes = [ct.c_void_p, ct.c_long]
@@ -4051,6 +4053,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_ArrayGetAtLong.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetAtLong64.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetAtSource.restype = ct.c_long
+     theDLL.DTWAIN_ArrayGetAtSourceEx.restype = ct.c_void_p
      theDLL.DTWAIN_ArrayGetAtString.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetAtStringA.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetAtStringPtr.restype = ct.c_char_p
@@ -5170,6 +5173,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_ArrayGetAtLong.argtypes = [ct.c_void_p, ct.c_long, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_ArrayGetAtLong64.argtypes = [ct.c_void_p, ct.c_long, ct.POINTER(ct.c_int64)]
      theDLL.DTWAIN_ArrayGetAtSource.argtypes = [ct.c_void_p, ct.c_long, ct.POINTER(ct.c_void_p)]
+     theDLL.DTWAIN_ArrayGetAtSourceEx.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_ArrayGetAtString.argtypes = [ct.c_void_p, ct.c_long, ct.c_char_p]
      theDLL.DTWAIN_ArrayGetAtStringA.argtypes = [ct.c_void_p, ct.c_long, ct.c_char_p]
      theDLL.DTWAIN_ArrayGetAtStringPtr.argtypes = [ct.c_void_p, ct.c_long]

@@ -1987,6 +1987,7 @@
         public delegate int DTWAIN_ArrayGetAtLongDelegate(DTWAIN_ARRAY pArray, int nWhere, ref int pVal);
         public delegate int DTWAIN_ArrayGetAtLong64Delegate(DTWAIN_ARRAY pArray, int nWhere, ref long pVal);
         public delegate int DTWAIN_ArrayGetAtSourceDelegate(DTWAIN_ARRAY pArray, int nWhere, ref DTWAIN_SOURCE ppSource);
+        public delegate DTWAIN_SOURCE DTWAIN_ArrayGetAtSourceExDelegate(DTWAIN_ARRAY pArray, int nWhere);
         public delegate int DTWAIN_ArrayGetAtStringDelegate(DTWAIN_ARRAY pArray, int nWhere, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder pStr);
         public delegate int DTWAIN_ArrayGetAtStringADelegate(DTWAIN_ARRAY pArray, int nWhere, [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder pStr);
         public delegate int DTWAIN_ArrayGetAtStringWDelegate(DTWAIN_ARRAY pArray, int nWhere, [MarshalAs(UnmanagedType.LPWStr)] System.Text.StringBuilder pStr);
@@ -3315,6 +3316,9 @@
 
         [DTWAINNativeFunction("DTWAIN_ArrayGetAtSource")]
         private readonly DTWAIN_ArrayGetAtSourceDelegate  _DTWAIN_ArrayGetAtSource;
+
+        [DTWAINNativeFunction("DTWAIN_ArrayGetAtSourceEx")]
+        private readonly DTWAIN_ArrayGetAtSourceExDelegate  _DTWAIN_ArrayGetAtSourceEx;
 
         [DTWAINNativeFunction("DTWAIN_ArrayGetAtString")]
         private readonly DTWAIN_ArrayGetAtStringDelegate  _DTWAIN_ArrayGetAtString;
@@ -6671,6 +6675,9 @@
 
         public  int DTWAIN_ArrayGetAtSource(DTWAIN_ARRAY pArray, int nWhere, ref DTWAIN_SOURCE ppSource)
         => _DTWAIN_ArrayGetAtSource(pArray, nWhere, ref ppSource);
+
+        public  DTWAIN_SOURCE DTWAIN_ArrayGetAtSourceEx(DTWAIN_ARRAY pArray, int nWhere)
+        => _DTWAIN_ArrayGetAtSourceEx(pArray, nWhere);
 
         public  int DTWAIN_ArrayGetAtString(DTWAIN_ARRAY pArray, int nWhere, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder pStr)
         => _DTWAIN_ArrayGetAtString(pArray, nWhere, pStr);

@@ -1748,6 +1748,7 @@ my $DTWAIN_ArrayGetAtFrameStringW = new Win32::API($dtwain_dllName, 'DTWAIN_Arra
 my $DTWAIN_ArrayGetAtLong = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayGetAtLong', 'NiP', 'I');
 my $DTWAIN_ArrayGetAtLong64 = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayGetAtLong64', 'NiP', 'I');
 my $DTWAIN_ArrayGetAtSource = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayGetAtSource', 'NiP', 'I');
+my $DTWAIN_ArrayGetAtSourceEx = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayGetAtSourceEx', 'Ni', 'N');
 my $DTWAIN_ArrayGetAtString = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayGetAtString', 'NiP', 'I');
 my $DTWAIN_ArrayGetAtStringA = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayGetAtStringA', 'NiP', 'I');
 my $DTWAIN_ArrayGetAtStringPtr = new Win32::API($dtwain_dllName, 'DTWAIN_ArrayGetAtStringPtr', 'Ni', 'P');
