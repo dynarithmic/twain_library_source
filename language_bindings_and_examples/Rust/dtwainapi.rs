@@ -65,6 +65,9 @@ type DtwainaddextimageinfoqueryFunc = unsafe extern "C" fn(*mut c_void,i32) -> i
 type DtwainaddpdftextFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32,*const u16,f64,i32,i32,f64,f64,f64,f64,u32) -> i32;
 type DtwainaddpdftextaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32,i32,*const c_char,f64,i32,i32,f64,f64,f64,f64,u32) -> i32;
 type DtwainaddpdftextelementFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
+type DtwainaddpdftextexFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32,*const u16,f64,i32,i32,f64,f64,f64,f64,f64,f64,f64,f64,f64,i32) -> i32;
+type DtwainaddpdftextexaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32,i32,*const c_char,f64,i32,i32,f64,f64,f64,f64,f64,f64,f64,f64,f64,i32) -> i32;
+type DtwainaddpdftextexwFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32,*const u16,f64,i32,i32,f64,f64,f64,f64,f64,f64,f64,f64,f64,i32) -> i32;
 type DtwainaddpdftextstringFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32,*const u16,*const u16,i32,i32,*const u16,*const u16,*const u16,*const u16,u32) -> i32;
 type DtwainaddpdftextstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char,i32,i32,*const c_char,*const c_char,i32,i32,*const c_char,*const c_char,*const c_char,*const c_char,u32) -> i32;
 type DtwainaddpdftextstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32,*const u16,*const u16,i32,i32,*const u16,*const u16,*const u16,*const u16,u32) -> i32;
@@ -1185,6 +1188,9 @@ pub struct DTwainAPI<'a>
     DTWAIN_AddPDFTextFunc: Symbol<'a, DtwainaddpdftextFunc>,
     DTWAIN_AddPDFTextAFunc: Symbol<'a, DtwainaddpdftextaFunc>,
     DTWAIN_AddPDFTextElementFunc: Symbol<'a, DtwainaddpdftextelementFunc>,
+    DTWAIN_AddPDFTextExFunc: Symbol<'a, DtwainaddpdftextexFunc>,
+    DTWAIN_AddPDFTextExAFunc: Symbol<'a, DtwainaddpdftextexaFunc>,
+    DTWAIN_AddPDFTextExWFunc: Symbol<'a, DtwainaddpdftextexwFunc>,
     DTWAIN_AddPDFTextStringFunc: Symbol<'a, DtwainaddpdftextstringFunc>,
     DTWAIN_AddPDFTextStringAFunc: Symbol<'a, DtwainaddpdftextstringaFunc>,
     DTWAIN_AddPDFTextStringWFunc: Symbol<'a, DtwainaddpdftextstringwFunc>,
@@ -3937,6 +3943,9 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_AddPDFText: Symbol<DtwainaddpdftextFunc> = unsafe { library.get(b"DTWAIN_AddPDFText")? };
         let DTWAIN_AddPDFTextA: Symbol<DtwainaddpdftextaFunc> = unsafe { library.get(b"DTWAIN_AddPDFTextA")? };
         let DTWAIN_AddPDFTextElement: Symbol<DtwainaddpdftextelementFunc> = unsafe { library.get(b"DTWAIN_AddPDFTextElement")? };
+        let DTWAIN_AddPDFTextEx: Symbol<DtwainaddpdftextexFunc> = unsafe { library.get(b"DTWAIN_AddPDFTextEx")? };
+        let DTWAIN_AddPDFTextExA: Symbol<DtwainaddpdftextexaFunc> = unsafe { library.get(b"DTWAIN_AddPDFTextExA")? };
+        let DTWAIN_AddPDFTextExW: Symbol<DtwainaddpdftextexwFunc> = unsafe { library.get(b"DTWAIN_AddPDFTextExW")? };
         let DTWAIN_AddPDFTextString: Symbol<DtwainaddpdftextstringFunc> = unsafe { library.get(b"DTWAIN_AddPDFTextString")? };
         let DTWAIN_AddPDFTextStringA: Symbol<DtwainaddpdftextstringaFunc> = unsafe { library.get(b"DTWAIN_AddPDFTextStringA")? };
         let DTWAIN_AddPDFTextStringW: Symbol<DtwainaddpdftextstringwFunc> = unsafe { library.get(b"DTWAIN_AddPDFTextStringW")? };
@@ -5056,6 +5065,9 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_AddPDFTextFunc: DTWAIN_AddPDFText,
             DTWAIN_AddPDFTextAFunc: DTWAIN_AddPDFTextA,
             DTWAIN_AddPDFTextElementFunc: DTWAIN_AddPDFTextElement,
+            DTWAIN_AddPDFTextExFunc: DTWAIN_AddPDFTextEx,
+            DTWAIN_AddPDFTextExAFunc: DTWAIN_AddPDFTextExA,
+            DTWAIN_AddPDFTextExWFunc: DTWAIN_AddPDFTextExW,
             DTWAIN_AddPDFTextStringFunc: DTWAIN_AddPDFTextString,
             DTWAIN_AddPDFTextStringAFunc: DTWAIN_AddPDFTextStringA,
             DTWAIN_AddPDFTextStringWFunc: DTWAIN_AddPDFTextStringW,
@@ -6230,6 +6242,18 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_AddPDFTextElement(&self, Source: *mut c_void, TextElement: *mut c_void) -> i32 {
         unsafe { return (self.DTWAIN_AddPDFTextElementFunc)(Source, TextElement);  }
+    }
+
+    pub fn DTWAIN_AddPDFTextEx(&self, Source: *mut c_void, szText: *const u16, xPos: i32, yPos: i32, fontName: *const u16, fontSize: f64, colorRGB: i32, renderMode: i32, scaling: f64, charSpacing: f64, wordSpacing: f64, strokeWidth: f64, rotationAngle: f64, skewAngleX: f64, skewAngleY: f64, scalingX: f64, scalingY: f64, transformType: i32) -> i32 {
+        unsafe { return (self.DTWAIN_AddPDFTextExFunc)(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType);  }
+    }
+
+    pub fn DTWAIN_AddPDFTextExA(&self, Source: *mut c_void, szText: *const c_char, xPos: i32, yPos: i32, fontName: *const c_char, fontSize: f64, colorRGB: i32, renderMode: i32, scaling: f64, charSpacing: f64, wordSpacing: f64, strokeWidth: f64, rotationAngle: f64, skewAngleX: f64, skewAngleY: f64, scalingX: f64, scalingY: f64, transformType: i32) -> i32 {
+        unsafe { return (self.DTWAIN_AddPDFTextExAFunc)(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType);  }
+    }
+
+    pub fn DTWAIN_AddPDFTextExW(&self, Source: *mut c_void, szText: *const u16, xPos: i32, yPos: i32, fontName: *const u16, fontSize: f64, colorRGB: i32, renderMode: i32, scaling: f64, charSpacing: f64, wordSpacing: f64, strokeWidth: f64, rotationAngle: f64, skewAngleX: f64, skewAngleY: f64, scalingX: f64, scalingY: f64, transformType: i32) -> i32 {
+        unsafe { return (self.DTWAIN_AddPDFTextExWFunc)(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType);  }
     }
 
     pub fn DTWAIN_AddPDFTextString(&self, Source: *mut c_void, szText: *const u16, xPos: i32, yPos: i32, fontName: *const u16, fontSize: *const u16, colorRGB: i32, renderMode: i32, scaling: *const u16, charSpacing: *const u16, wordSpacing: *const u16, strokeWidth: *const u16, Flags: u32) -> i32 {

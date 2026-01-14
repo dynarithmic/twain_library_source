@@ -1904,6 +1904,15 @@ module TwainAPI =
     type DTWAIN_AddPDFTextElementDelegate = delegate of DTWAIN_SOURCE * DTWAIN_PDFTEXTELEMENT -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
+    type DTWAIN_AddPDFTextExDelegate = delegate of DTWAIN_SOURCE * string * LONG * LONG * string * DTWAIN_FLOAT * LONG * LONG * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * LONG -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Ansi)>]
+    type DTWAIN_AddPDFTextExADelegate = delegate of DTWAIN_SOURCE * string * LONG * LONG * string * DTWAIN_FLOAT * LONG * LONG * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * LONG -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
+    type DTWAIN_AddPDFTextExWDelegate = delegate of DTWAIN_SOURCE * string * LONG * LONG * string * DTWAIN_FLOAT * LONG * LONG * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * LONG -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
     type DTWAIN_AddPDFTextStringDelegate = delegate of DTWAIN_SOURCE * string * LONG * LONG * string * string * LONG * LONG * string * string * string * string * DWORD -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Ansi)>]
@@ -5196,6 +5205,9 @@ module TwainAPI =
     let private AddPDFText = lazy (DynamicDll.Bind "DTWAIN_AddPDFText" : DTWAIN_AddPDFTextDelegate)
     let private AddPDFTextA = lazy (DynamicDll.Bind "DTWAIN_AddPDFTextA" : DTWAIN_AddPDFTextADelegate)
     let private AddPDFTextElement = lazy (DynamicDll.Bind "DTWAIN_AddPDFTextElement" : DTWAIN_AddPDFTextElementDelegate)
+    let private AddPDFTextEx = lazy (DynamicDll.Bind "DTWAIN_AddPDFTextEx" : DTWAIN_AddPDFTextExDelegate)
+    let private AddPDFTextExA = lazy (DynamicDll.Bind "DTWAIN_AddPDFTextExA" : DTWAIN_AddPDFTextExADelegate)
+    let private AddPDFTextExW = lazy (DynamicDll.Bind "DTWAIN_AddPDFTextExW" : DTWAIN_AddPDFTextExWDelegate)
     let private AddPDFTextString = lazy (DynamicDll.Bind "DTWAIN_AddPDFTextString" : DTWAIN_AddPDFTextStringDelegate)
     let private AddPDFTextStringA = lazy (DynamicDll.Bind "DTWAIN_AddPDFTextStringA" : DTWAIN_AddPDFTextStringADelegate)
     let private AddPDFTextStringW = lazy (DynamicDll.Bind "DTWAIN_AddPDFTextStringW" : DTWAIN_AddPDFTextStringWDelegate)
@@ -6390,6 +6402,18 @@ module TwainAPI =
     let DTWAIN_AddPDFTextElement (source: DTWAIN_SOURCE) (textelement: DTWAIN_PDFTEXTELEMENT) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         AddPDFTextElement.Value.Invoke(source, textelement)
+
+    let DTWAIN_AddPDFTextEx (source: DTWAIN_SOURCE) (sztext: string) (xpos: LONG) (ypos: LONG) (fontname: string) (fontsize: DTWAIN_FLOAT) (colorrgb: LONG) (rendermode: LONG) (scaling: DTWAIN_FLOAT) (charspacing: DTWAIN_FLOAT) (wordspacing: DTWAIN_FLOAT) (strokewidth: DTWAIN_FLOAT) (rotationangle: DTWAIN_FLOAT) (skewanglex: DTWAIN_FLOAT) (skewangley: DTWAIN_FLOAT) (scalingx: DTWAIN_FLOAT) (scalingy: DTWAIN_FLOAT) (transformtype: LONG) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        AddPDFTextEx.Value.Invoke(source, sztext, xpos, ypos, fontname, fontsize, colorrgb, rendermode, scaling, charspacing, wordspacing, strokewidth, rotationangle, skewanglex, skewangley, scalingx, scalingy, transformtype)
+
+    let DTWAIN_AddPDFTextExA (source: DTWAIN_SOURCE) (sztext: string) (xpos: LONG) (ypos: LONG) (fontname: string) (fontsize: DTWAIN_FLOAT) (colorrgb: LONG) (rendermode: LONG) (scaling: DTWAIN_FLOAT) (charspacing: DTWAIN_FLOAT) (wordspacing: DTWAIN_FLOAT) (strokewidth: DTWAIN_FLOAT) (rotationangle: DTWAIN_FLOAT) (skewanglex: DTWAIN_FLOAT) (skewangley: DTWAIN_FLOAT) (scalingx: DTWAIN_FLOAT) (scalingy: DTWAIN_FLOAT) (transformtype: LONG) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        AddPDFTextExA.Value.Invoke(source, sztext, xpos, ypos, fontname, fontsize, colorrgb, rendermode, scaling, charspacing, wordspacing, strokewidth, rotationangle, skewanglex, skewangley, scalingx, scalingy, transformtype)
+
+    let DTWAIN_AddPDFTextExW (source: DTWAIN_SOURCE) (sztext: string) (xpos: LONG) (ypos: LONG) (fontname: string) (fontsize: DTWAIN_FLOAT) (colorrgb: LONG) (rendermode: LONG) (scaling: DTWAIN_FLOAT) (charspacing: DTWAIN_FLOAT) (wordspacing: DTWAIN_FLOAT) (strokewidth: DTWAIN_FLOAT) (rotationangle: DTWAIN_FLOAT) (skewanglex: DTWAIN_FLOAT) (skewangley: DTWAIN_FLOAT) (scalingx: DTWAIN_FLOAT) (scalingy: DTWAIN_FLOAT) (transformtype: LONG) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        AddPDFTextExW.Value.Invoke(source, sztext, xpos, ypos, fontname, fontsize, colorrgb, rendermode, scaling, charspacing, wordspacing, strokewidth, rotationangle, skewanglex, skewangley, scalingx, scalingy, transformtype)
 
     let DTWAIN_AddPDFTextString (source: DTWAIN_SOURCE) (sztext: string) (xpos: LONG) (ypos: LONG) (fontname: string) (fontsize: string) (colorrgb: LONG) (rendermode: LONG) (scaling: string) (charspacing: string) (wordspacing: string) (strokewidth: string) (flags: DWORD) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
