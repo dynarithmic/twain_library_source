@@ -191,6 +191,8 @@ TCHAR* g_AllDataTypes[] = { _T("TWTY_INT8"), _T("TWTY_INT16"), _T("TWTY_INT32"),
                             _T("TWTY_STR64"), _T("TWTY_STR128"), _T("TWTY_STR255"), _T("TWTY_STR1024"), _T("TWTY_UNI512"),
                             _T("TWTY_HANDLE") };
 
+DTWAIN_PDFTEXTELEMENT g_PDFTextElement;
+
 int APIENTRY WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
                      LPSTR     lpCmdLine,
@@ -231,6 +233,15 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 
     /* Call function to determine the DTWAIN version */
     DTWAIN_GetVersion(&nMajorVer, &nMinorVer, &nDTwainType);
+
+    /* Create a PDF text element for usage when acquiring to a PDF file */
+    g_PDFTextElement = DTWAIN_CreatePDFTextElement();
+
+    /* Position, font height, font color, and display pages for the PDF text element */
+	DTWAIN_SetPDFTextElementFloat(g_PDFTextElement, 25, 0, DTWAIN_PDFTEXTELEMENT_FONTHEIGHT);
+    DTWAIN_SetPDFTextElementLong(g_PDFTextElement, 100, 100, DTWAIN_PDFTEXTELEMENT_POSITION);
+    DTWAIN_SetPDFTextElementLong(g_PDFTextElement, DTWAIN_MakeRGB(127, 127, 127), 0, DTWAIN_PDFTEXTELEMENT_COLOR);
+    DTWAIN_SetPDFTextElementLong(g_PDFTextElement, DTWAIN_PDFTEXT_ALLPAGES, 0, DTWAIN_PDFTEXTELEMENT_DISPLAYFLAGS);
 
     /* Main message loop: */
     while (GetMessage(&msg, NULL, 0, 0))
@@ -302,7 +313,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             g_Menu = GetMenu(hWnd);
             EnableSourceItems(FALSE);
             CheckMenuItem(g_Menu, IDM_USE_SOURCE_UI, MF_BYCOMMAND | MF_CHECKED);
-			CheckMenuItem(g_Menu, IDM_SHOW_PREVIEW, MF_BYCOMMAND | MF_CHECKED);
+            CheckMenuItem(g_Menu, IDM_SHOW_PREVIEW, MF_BYCOMMAND | MF_CHECKED);
             CheckMenuItem(g_Menu, IDM_SHOW_BARCODEINFO, MF_BYCOMMAND | MF_CHECKED);
             break;
 
@@ -366,9 +377,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     ToggleCheckedItem(IDM_DISCARD_BLANKS);
                 break;
 
-				case IDM_SHOW_PREVIEW:
-					ToggleCheckedItem(IDM_SHOW_PREVIEW);
-  			    break;
+                case IDM_SHOW_PREVIEW:
+                    ToggleCheckedItem(IDM_SHOW_PREVIEW);
+                break;
 
                 case IDM_SHOW_BARCODEINFO:
                     ToggleCheckedItem(IDM_SHOW_BARCODEINFO);
@@ -509,8 +520,14 @@ void SelectTheSource(int nWhich)
     {
         if ( DTWAIN_OpenSource(tempSource) )
         {
+            // We want to make sure that when we acquire to a PDF file, we will "stamp"
+            // each PDF page with the text that g_PDFTextElement will have (see TwainCallbackProc)
+			DTWAIN_AddPDFTextElement(tempSource, g_PDFTextElement);
+
+            // Enable all of the items in the menu, depending on what the source supports
             EnableBarcodeAndFileXferItems(tempSource);
             EnableSourceItems(TRUE);
+
             g_CurrentSource = tempSource;
             SetCaptionToSourceName();
             DTWAIN_EnableFeeder(tempSource, TRUE);
@@ -600,6 +617,7 @@ void GenericAcquire(LONG nWhichOne)
             DTWAIN_GetErrorStringA(lastError, szError, 1023);
             MessageBoxA(NULL, szError, "TWAIN Error", MB_ICONSTOP);
         }
+		DTWAIN_DestroyAcquisitionArray(g_AcquireArray, FALSE);
         return;
     }
 
@@ -742,13 +760,13 @@ void AcquireFile(BOOL bUseSource)
             MessageBox(g_hWnd, _T("No Images Acquired"), _T(""), MB_OK);
         return;
     }
-	else
-	{
-		if (_taccess(g_FileName, 0) == 0)
-		{
-			MessageBox(g_hWnd, _T("Images Acquired"), _T(""), MB_OK);
-			return;
-		}
+    else
+    {
+        if (_taccess(g_FileName, 0) == 0)
+        {
+            MessageBox(g_hWnd, _T("Images Acquired"), _T(""), MB_OK);
+            return;
+        }
     }
 }
 
@@ -1246,6 +1264,7 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
             DTWAIN_EnumCustomCaps(g_CurrentSource, &testArray);
             wsprintf(szBuf, _T("%d"), (int)DTWAIN_ArrayGetCount(testArray));
             SetWindowText(hWndNumCustomCaps, szBuf);
+            DTWAIN_ArrayDestroy(testArray);
 
             DTWAIN_EnumExtendedCaps(g_CurrentSource, &CapArray);
             wsprintf(szBuf, _T("%d"), (int)DTWAIN_ArrayGetCount(CapArray));
@@ -1764,12 +1783,12 @@ void WaitLoop()
 
 LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserData)
 {
-	static pdf_page_count = 1;
-	switch (wParam)
+    static pdf_page_count = 1;
+    switch (wParam)
     {
         case DTWAIN_TN_ACQUIRESTARTED:
             bPageOK = TRUE;
-			pdf_page_count = 1;
+            pdf_page_count = 1;
         break;
 
         case DTWAIN_TN_TRANSFERDONE:
@@ -1779,32 +1798,39 @@ LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserDa
                 DisplayBarCodeInfo();
         }
         break;
-		/* See if we want to keep the DIB */
-		case DTWAIN_TN_QUERYPAGEDISCARD:
-		{
-			LRESULT retVal;
-			/* First let's see if menu option is checked */
-			BOOL showPreview = GetToggleMenuState(IDM_SHOW_PREVIEW);
-			if (!showPreview)
-				return 1;
+        /* See if we want to keep the DIB */
+        case DTWAIN_TN_QUERYPAGEDISCARD:
+        {
+            LRESULT retVal;
+            /* First let's see if menu option is checked */
+            BOOL showPreview = GetToggleMenuState(IDM_SHOW_PREVIEW);
+            if (!showPreview)
+                return 1;
 
-			/* Display the acquire DIB to the user and see if the image is to be kept */
-			retVal = (DisplayOneDibPage(g_hInstance, DTWAIN_GetCurrentAcquiredImage(g_CurrentSource), IDD_dlgDib, g_hWnd) == IDCANCEL)?0:1;
-			return retVal;   // return this back to DTWAIN
-		}
-		break;
+            /* Display the acquire DIB to the user and see if the image is to be kept */
+            retVal = (DisplayOneDibPage(g_hInstance, DTWAIN_GetCurrentAcquiredImage(g_CurrentSource), IDD_dlgDib, g_hWnd) == IDCANCEL)?0:1;
+            return retVal;   // return this back to DTWAIN
+        }
+        break;
 
-		/* If this is a PDF file this code will put a page stamp on this page */
-		case DTWAIN_TN_FILEPAGESAVING:
-		{
-			TCHAR text[100];
-			wsprintf(text, _T("Page %d"), pdf_page_count); 
-			++pdf_page_count;
-			DTWAIN_AddPDFText(g_CurrentSource, text, 100, 100, _T("Helvetica"), 12, 
-							  DTWAIN_MakeRGB(127, 127, 127), 0, 100.0, 0, 0.0, 0, 
-				              DTWAIN_PDFTEXT_CURRENTPAGE);
-			return 1;
-		}
+        /* If this is a PDF file, this code will put a page stamp on this page */
+        case DTWAIN_TN_FILEPAGESAVING:
+        {
+            if (g_FileType == DTWAIN_PDFMULTI)
+            {
+                /* Set the text to "Page x*, where x is the current page count */
+                TCHAR text[100];
+                wsprintf(text, _T("Page %d"), pdf_page_count);
+
+                /* Change the text in the PDF Text Element that was added to the source */
+                /* This will "automatically" set the PDF text to "Page x" for each page */
+                DTWAIN_SetPDFTextElementString(g_PDFTextElement, text, DTWAIN_PDFTEXTELEMENT_TEXT);
+
+                /* Increment the page count*/
+				++pdf_page_count;
+            }
+            return 1;
+        }
 
         case DTWAIN_TN_FILEPAGESAVEERROR:
             MessageBox(NULL, _T("Could not save image page.\nPlease try acquiring image using a different color")
