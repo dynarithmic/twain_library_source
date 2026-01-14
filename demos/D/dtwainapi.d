@@ -1107,6 +1107,7 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_ERR_IMAGEINFO_INVALID = (-2502);
     public static const int DTWAIN_ERR_WRITEDATA_TOFILE = (-2503);
     public static const int DTWAIN_ERR_OPERATION_NOTSUPPORTED = (-2504);
+    public static const int DTWAIN_ERR_INVALID_PDFTEXTELEMENT = (-2505);
     public static const int DTWAIN_DE_CHKAUTOCAPTURE = 1;
     public static const int DTWAIN_DE_CHKBATTERY = 2;
     public static const int DTWAIN_DE_CHKDEVICEONLINE = 4;
