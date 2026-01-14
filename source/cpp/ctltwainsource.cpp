@@ -706,6 +706,7 @@ CTL_ITwainSource::~CTL_ITwainSource()
     try
     {
         DestroyExtImageInfo();
+        ClearPDFTextElements();
         ResetManualDuplexMode();
         CloseSource(true);
         m_pDLLHandle->m_mapPDFTextElement.erase(this);
@@ -1215,7 +1216,6 @@ void CTL_ITwainSource::ProcessMultipageFile()
         const ImageXferFileWriter FileWriter(nullptr, m_pSession ,this);
         FileWriter.CloseMultiPageDibFile(GetMutiPageScanMode() != DTWAIN_FILESAVE_MANUALSAVE);
     }
-    ClearPDFTextElements(); // clear the text elements
 }
 
 bool isIntCap(DTWAIN_SOURCE Source, LONG nCap)
