@@ -3293,4 +3293,29 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextStringW(DTWAIN_SOURCE Source, LPCWSTR 
 #endif
 }
 
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextExW(DTWAIN_SOURCE Source, LPCWSTR szText, LONG xPos, LONG yPos, LPCWSTR fontName, 
+                                              DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth,                                               DTWAIN_FLOAT rotationAngle, DTWAIN_FLOAT skewAngleX, DTWAIN_FLOAT skewAngleY, DTWAIN_FLOAT scalingX, DTWAIN_FLOAT scalingY, LONG transformType)
+{
+#ifdef _UNICODE
+	return DTWAIN_AddPDFTextEx(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType);
+#else
+	return DTWAIN_AddPDFTextEx(Source, 
+                               StringConversion::Convert_WidePtr_To_Native(szText).c_str(), xPos, yPos, 
+                               StringConversion::Convert_WidePtr_To_Native(fontName).c_str(), fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextExA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName,
+	DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, 
+	DTWAIN_FLOAT rotationAngle, DTWAIN_FLOAT skewAngleX, DTWAIN_FLOAT skewAngleY, DTWAIN_FLOAT scalingX, DTWAIN_FLOAT scalingY, LONG transformType
+)
+{
+#ifdef _UNICODE
+	return DTWAIN_AddPDFTextEx(Source, StringConversion::Convert_AnsiPtr_To_Native(szText).c_str(), xPos, yPos, StringConversion::Convert_AnsiPtr_To_Native(fontName).c_str(), fontSize, colorRGB, renderMode, 
+        scaling, charSpacing, wordSpacing, strokeWidth, rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType);
+#else
+	return DTWAIN_AddPDFTextEx(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType);
+#endif
+}
+
 #endif // CTLSTRIMPL_INL

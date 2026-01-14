@@ -1765,6 +1765,9 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_AddPDFText.restype = ct.c_long
      theDLL.DTWAIN_AddPDFTextA.restype = ct.c_long
      theDLL.DTWAIN_AddPDFTextElement.restype = ct.c_long
+     theDLL.DTWAIN_AddPDFTextEx.restype = ct.c_long
+     theDLL.DTWAIN_AddPDFTextExA.restype = ct.c_long
+     theDLL.DTWAIN_AddPDFTextExW.restype = ct.c_long
      theDLL.DTWAIN_AddPDFTextString.restype = ct.c_long
      theDLL.DTWAIN_AddPDFTextStringA.restype = ct.c_long
      theDLL.DTWAIN_AddPDFTextStringW.restype = ct.c_long
@@ -2885,6 +2888,9 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_AddPDFText.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_ulong]
      theDLL.DTWAIN_AddPDFTextA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_ulong]
      theDLL.DTWAIN_AddPDFTextElement.argtypes = [ct.c_void_p, ct.c_void_p]
+     theDLL.DTWAIN_AddPDFTextEx.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_long]
+     theDLL.DTWAIN_AddPDFTextExA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_long]
+     theDLL.DTWAIN_AddPDFTextExW.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_long]
      theDLL.DTWAIN_AddPDFTextString.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_ulong]
      theDLL.DTWAIN_AddPDFTextStringA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_ulong]
      theDLL.DTWAIN_AddPDFTextStringW.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_ulong]
@@ -3975,6 +3981,9 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_AddPDFText.restype = ct.c_long
      theDLL.DTWAIN_AddPDFTextA.restype = ct.c_long
      theDLL.DTWAIN_AddPDFTextElement.restype = ct.c_long
+     theDLL.DTWAIN_AddPDFTextEx.restype = ct.c_long
+     theDLL.DTWAIN_AddPDFTextExA.restype = ct.c_long
+     theDLL.DTWAIN_AddPDFTextExW.restype = ct.c_long
      theDLL.DTWAIN_AddPDFTextString.restype = ct.c_long
      theDLL.DTWAIN_AddPDFTextStringA.restype = ct.c_long
      theDLL.DTWAIN_AddPDFTextStringW.restype = ct.c_long
@@ -5095,6 +5104,9 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_AddPDFText.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_ulong]
      theDLL.DTWAIN_AddPDFTextA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_ulong]
      theDLL.DTWAIN_AddPDFTextElement.argtypes = [ct.c_void_p, ct.c_void_p]
+     theDLL.DTWAIN_AddPDFTextEx.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_long]
+     theDLL.DTWAIN_AddPDFTextExA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_long]
+     theDLL.DTWAIN_AddPDFTextExW.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_double, ct.c_long, ct.c_long, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_double, ct.c_long]
      theDLL.DTWAIN_AddPDFTextString.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_ulong]
      theDLL.DTWAIN_AddPDFTextStringA.argtypes = [ct.c_void_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_char_p, ct.c_long, ct.c_long, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_ulong]
      theDLL.DTWAIN_AddPDFTextStringW.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_wchar_p, ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_ulong]

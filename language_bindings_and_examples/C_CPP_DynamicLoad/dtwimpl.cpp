@@ -69,6 +69,9 @@
     D_ADDPDFTEXTFUNC                              DYNDTWAIN_API::DTWAIN_AddPDFText = nullptr;
     D_ADDPDFTEXTAFUNC                             DYNDTWAIN_API::DTWAIN_AddPDFTextA = nullptr;
     D_ADDPDFTEXTELEMENTFUNC                       DYNDTWAIN_API::DTWAIN_AddPDFTextElement = nullptr;
+    D_ADDPDFTEXTEXFUNC                            DYNDTWAIN_API::DTWAIN_AddPDFTextEx = nullptr;
+    D_ADDPDFTEXTEXAFUNC                           DYNDTWAIN_API::DTWAIN_AddPDFTextExA = nullptr;
+    D_ADDPDFTEXTEXWFUNC                           DYNDTWAIN_API::DTWAIN_AddPDFTextExW = nullptr;
     D_ADDPDFTEXTSTRINGFUNC                        DYNDTWAIN_API::DTWAIN_AddPDFTextString = nullptr;
     D_ADDPDFTEXTSTRINGAFUNC                       DYNDTWAIN_API::DTWAIN_AddPDFTextStringA = nullptr;
     D_ADDPDFTEXTSTRINGWFUNC                       DYNDTWAIN_API::DTWAIN_AddPDFTextStringW = nullptr;
@@ -1260,6 +1263,9 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_AddPDFText, hModule);
           LOADFUNCTIONIMPL(DTWAIN_AddPDFTextA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_AddPDFTextElement, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_AddPDFTextEx, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_AddPDFTextExA, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_AddPDFTextExW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_AddPDFTextString, hModule);
           LOADFUNCTIONIMPL(DTWAIN_AddPDFTextStringA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_AddPDFTextStringW, hModule);

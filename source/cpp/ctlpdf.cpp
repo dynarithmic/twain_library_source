@@ -323,7 +323,7 @@ LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontNameW(LONG FontVal, LPWSTR szFont, LONG 
     CATCH_BLOCK(-1)
 }
 
-static void GenericAddPDFText(CTL_ITwainSource *pSource,
+static std::shared_ptr<PDFTextElement> GenericAddPDFText(CTL_ITwainSource *pSource,
                               LPCTSTR szText, LONG xPos, LONG yPos,
 	                          LPCTSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB,
 	                          LONG renderMode, DTWAIN_FLOAT scaling,
@@ -415,6 +415,7 @@ static void GenericAddPDFText(CTL_ITwainSource *pSource,
 		// Set the "has already been displayed" to false
         pPtr->hasBeenDisplayed = false;
         pPtr->displayFlags = Flags;
+        return pPtr;
     }
     else
     {
@@ -423,6 +424,7 @@ static void GenericAddPDFText(CTL_ITwainSource *pSource,
             pSource->SetPDFValue(PDFTEXTELEMENTKEY, pTextElement);
         pTextElement->displayFlags = Flags;
     }
+    return pTextElement;
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextElement(DTWAIN_SOURCE Source, DTWAIN_PDFTEXTELEMENT TextElement)
@@ -484,6 +486,40 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextString(DTWAIN_SOURCE Source,
     auto retVal = DTWAIN_AddPDFText(Source, szText, xPos, yPos, fontName, val1,
                                     colorRGB, renderMode, val2, val3, val4, val5, Flags);
 	LOG_FUNC_EXIT_NONAME_PARAMS(retVal)
+    CATCH_BLOCK_LOG_PARAMS(false)
+}
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextEx(DTWAIN_SOURCE Source,
+                                             LPCTSTR szText, 
+                                             LONG xPos, 
+                                             LONG yPos,
+                                             LPCTSTR fontName, 
+                                             DTWAIN_FLOAT fontSize, 
+                                             LONG colorRGB,
+                                             LONG renderMode, 
+                                             DTWAIN_FLOAT scaling,
+                                             DTWAIN_FLOAT charSpacing, 
+                                             DTWAIN_FLOAT wordSpacing,
+                                             DTWAIN_FLOAT strokeWidth, 
+                                             DTWAIN_FLOAT rotationAngle,
+                                             DTWAIN_FLOAT skewAngleX,
+                                             DTWAIN_FLOAT skewAngleY,
+                                             DTWAIN_FLOAT scalingX,
+                                         	 DTWAIN_FLOAT scalingY,
+                                             LONG transformType)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, szText, xPos, yPos, fontName, fontSize, colorRGB,
+                           renderMode, scaling, charSpacing, wordSpacing, strokeWidth, 
+                           rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType))
+    auto [pHandle, pSource] = VerifyHandles(Source);
+    auto ptrText = GenericAddPDFText(pSource, szText, xPos, yPos, fontName, fontSize, colorRGB,
+                                 renderMode, scaling, charSpacing, wordSpacing, strokeWidth, DTWAIN_PDFTEXT_CURRENTPAGE);
+    ptrText->rotationAngle = rotationAngle;
+    ptrText->skewAngleX = skewAngleX;
+    ptrText->skewAngleY = skewAngleY;
+    ptrText->scalingX = scalingX;
+    ptrText->scalingY = scalingY;
+    ptrText->textTransform = transformType;
+	LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 

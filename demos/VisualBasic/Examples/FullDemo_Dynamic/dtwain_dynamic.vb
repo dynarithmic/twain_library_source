@@ -1967,6 +1967,15 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_AddPDFTextElementDelegate(Source As System.IntPtr, TextElement As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
+        Private Delegate Function DTWAIN_AddPDFTextExDelegate(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As System.Double, colorRGB As Integer, renderMode As Integer, scaling As System.Double, charSpacing As System.Double, wordSpacing As System.Double, strokeWidth As System.Double, rotationAngle As System.Double, skewAngleX As System.Double, skewAngleY As System.Double, scalingX As System.Double, scalingY As System.Double, transformType As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Ansi)>
+        Private Delegate Function DTWAIN_AddPDFTextExADelegate(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As System.Double, colorRGB As Integer, renderMode As Integer, scaling As System.Double, charSpacing As System.Double, wordSpacing As System.Double, strokeWidth As System.Double, rotationAngle As System.Double, skewAngleX As System.Double, skewAngleY As System.Double, scalingX As System.Double, scalingY As System.Double, transformType As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
+        Private Delegate Function DTWAIN_AddPDFTextExWDelegate(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As System.Double, colorRGB As Integer, renderMode As Integer, scaling As System.Double, charSpacing As System.Double, wordSpacing As System.Double, strokeWidth As System.Double, rotationAngle As System.Double, skewAngleX As System.Double, skewAngleY As System.Double, scalingX As System.Double, scalingY As System.Double, transformType As Integer) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
         Private Delegate Function DTWAIN_AddPDFTextStringDelegate(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As String, colorRGB As Integer, renderMode As Integer, scaling As String, charSpacing As String, wordSpacing As String, strokeWidth As String, Flags As UInteger) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Ansi)>
@@ -5338,6 +5347,18 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_AddPDFTextElement(Source As System.IntPtr, TextElement As System.IntPtr) As Integer
         Return api.DTWAIN_AddPDFTextElement(Source, TextElement)
+        End Function
+        
+        Public Function DTWAIN_AddPDFTextEx(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As System.Double, colorRGB As Integer, renderMode As Integer, scaling As System.Double, charSpacing As System.Double, wordSpacing As System.Double, strokeWidth As System.Double, rotationAngle As System.Double, skewAngleX As System.Double, skewAngleY As System.Double, scalingX As System.Double, scalingY As System.Double, transformType As Integer) As Integer
+        Return api.DTWAIN_AddPDFTextEx(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType)
+        End Function
+        
+        Public Function DTWAIN_AddPDFTextExA(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As System.Double, colorRGB As Integer, renderMode As Integer, scaling As System.Double, charSpacing As System.Double, wordSpacing As System.Double, strokeWidth As System.Double, rotationAngle As System.Double, skewAngleX As System.Double, skewAngleY As System.Double, scalingX As System.Double, scalingY As System.Double, transformType As Integer) As Integer
+        Return api.DTWAIN_AddPDFTextExA(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType)
+        End Function
+        
+        Public Function DTWAIN_AddPDFTextExW(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As System.Double, colorRGB As Integer, renderMode As Integer, scaling As System.Double, charSpacing As System.Double, wordSpacing As System.Double, strokeWidth As System.Double, rotationAngle As System.Double, skewAngleX As System.Double, skewAngleY As System.Double, scalingX As System.Double, scalingY As System.Double, transformType As Integer) As Integer
+        Return api.DTWAIN_AddPDFTextExW(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType)
         End Function
         
         Public Function DTWAIN_AddPDFTextString(Source As System.IntPtr, szText As String, xPos As Integer, yPos As Integer, fontName As String, fontSize As String, colorRGB As Integer, renderMode As Integer, scaling As String, charSpacing As String, wordSpacing As String, strokeWidth As String, Flags As UInteger) As Integer
@@ -9749,6 +9770,9 @@ Namespace Dynarithmic
             Public DTWAIN_AddPDFText As DTWAIN_AddPDFTextDelegate
             Public DTWAIN_AddPDFTextA As DTWAIN_AddPDFTextADelegate
             Public DTWAIN_AddPDFTextElement As DTWAIN_AddPDFTextElementDelegate
+            Public DTWAIN_AddPDFTextEx As DTWAIN_AddPDFTextExDelegate
+            Public DTWAIN_AddPDFTextExA As DTWAIN_AddPDFTextExADelegate
+            Public DTWAIN_AddPDFTextExW As DTWAIN_AddPDFTextExWDelegate
             Public DTWAIN_AddPDFTextString As DTWAIN_AddPDFTextStringDelegate
             Public DTWAIN_AddPDFTextStringA As DTWAIN_AddPDFTextStringADelegate
             Public DTWAIN_AddPDFTextStringW As DTWAIN_AddPDFTextStringWDelegate
