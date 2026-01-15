@@ -930,7 +930,7 @@ DTWAIN_FrameGetAllStringA                         @30221
 DTWAIN_FrameGetAllStringW                         @30222
 DTWAIN_FrameCreateStringA                         @30223
 DTWAIN_FrameCreateStringW                         @30224
-DTWAIN_AddPDFTextElement                               @30230
+DTWAIN_AddPDFTextElement                          @30230
 DTWAIN_GetTwainStringName                         @30240
 DTWAIN_GetTwainStringNameA                        @30241
 DTWAIN_GetTwainStringNameW                        @30242
@@ -938,9 +938,9 @@ DTWAIN_GetActiveDSMPath                           @30243
 DTWAIN_GetActiveDSMPathA                          @30244
 DTWAIN_GetActiveDSMPathW                          @30245
 DTWAIN_GetCurrentTwainTriplet                     @30250
-DTWAIN_GetTwainIDFromName                         @30251
-DTWAIN_GetTwainIDFromNameA                        @30252
-DTWAIN_GetTwainIDFromNameW                        @30253
+DTWAIN_GetConstantFromTwainName                   @30251
+DTWAIN_GetConstantFromTwainNameA                  @30252
+DTWAIN_GetConstantFromTwainNameW                  @30253
 DTWAIN_EnumSupportedFileTypes                     @30260
 DTWAIN_EnumSupportedMultiPageFileTypes            @30261
 DTWAIN_EnumSupportedSinglePageFileTypes           @30262

@@ -2070,7 +2070,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainStringName(LONG category, LONG TwainID, LPTSTR 
     CATCH_BLOCK(-1)
 }
 
-LONG DLLENTRY_DEF DTWAIN_GetTwainIDFromName(LPCTSTR lpszBuffer)
+LONG DLLENTRY_DEF DTWAIN_GetConstantFromTwainName(LPCTSTR lpszBuffer)
 {
     LOG_FUNC_ENTRY_PARAMS((lpszBuffer))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
