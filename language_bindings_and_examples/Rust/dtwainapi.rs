@@ -459,6 +459,9 @@ type DtwaingetcompressiontypeFunc = unsafe extern "C" fn(*mut c_void,*mut i32,i3
 type DtwaingetconditioncodestringFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
 type DtwaingetconditioncodestringaFunc = unsafe extern "C" fn(i32,*mut c_char,i32) -> i32;
 type DtwaingetconditioncodestringwFunc = unsafe extern "C" fn(i32,*mut u16,i32) -> i32;
+type DtwaingetconstantfromtwainnameFunc = unsafe extern "C" fn(*const u16) -> i32;
+type DtwaingetconstantfromtwainnameaFunc = unsafe extern "C" fn(*const c_char) -> i32;
+type DtwaingetconstantfromtwainnamewFunc = unsafe extern "C" fn(*const u16) -> i32;
 type DtwaingetcontrastFunc = unsafe extern "C" fn(*mut c_void,*mut f64) -> i32;
 type DtwaingetcontraststringFunc = unsafe extern "C" fn(*mut c_void,*mut u16) -> i32;
 type DtwaingetcontraststringaFunc = unsafe extern "C" fn(*mut c_void,*mut c_char) -> i32;
@@ -677,9 +680,6 @@ type DtwaingettwaincountryvalueFunc = unsafe extern "C" fn(*const u16) -> i32;
 type DtwaingettwaincountryvalueaFunc = unsafe extern "C" fn(*const c_char) -> i32;
 type DtwaingettwaincountryvaluewFunc = unsafe extern "C" fn(*const u16) -> i32;
 type DtwaingettwainhwndFunc = unsafe extern "C" fn() -> *const c_void;
-type DtwaingettwainidfromnameFunc = unsafe extern "C" fn(*const u16) -> i32;
-type DtwaingettwainidfromnameaFunc = unsafe extern "C" fn(*const c_char) -> i32;
-type DtwaingettwainidfromnamewFunc = unsafe extern "C" fn(*const u16) -> i32;
 type DtwaingettwainlanguagenameFunc = unsafe extern "C" fn(i32,*mut u16) -> i32;
 type DtwaingettwainlanguagenameaFunc = unsafe extern "C" fn(i32,*mut c_char) -> i32;
 type DtwaingettwainlanguagenamewFunc = unsafe extern "C" fn(i32,*mut u16) -> i32;
@@ -1582,6 +1582,9 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetConditionCodeStringFunc: Symbol<'a, DtwaingetconditioncodestringFunc>,
     DTWAIN_GetConditionCodeStringAFunc: Symbol<'a, DtwaingetconditioncodestringaFunc>,
     DTWAIN_GetConditionCodeStringWFunc: Symbol<'a, DtwaingetconditioncodestringwFunc>,
+    DTWAIN_GetConstantFromTwainNameFunc: Symbol<'a, DtwaingetconstantfromtwainnameFunc>,
+    DTWAIN_GetConstantFromTwainNameAFunc: Symbol<'a, DtwaingetconstantfromtwainnameaFunc>,
+    DTWAIN_GetConstantFromTwainNameWFunc: Symbol<'a, DtwaingetconstantfromtwainnamewFunc>,
     DTWAIN_GetContrastFunc: Symbol<'a, DtwaingetcontrastFunc>,
     DTWAIN_GetContrastStringFunc: Symbol<'a, DtwaingetcontraststringFunc>,
     DTWAIN_GetContrastStringAFunc: Symbol<'a, DtwaingetcontraststringaFunc>,
@@ -1800,9 +1803,6 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetTwainCountryValueAFunc: Symbol<'a, DtwaingettwaincountryvalueaFunc>,
     DTWAIN_GetTwainCountryValueWFunc: Symbol<'a, DtwaingettwaincountryvaluewFunc>,
     DTWAIN_GetTwainHwndFunc: Symbol<'a, DtwaingettwainhwndFunc>,
-    DTWAIN_GetTwainIDFromNameFunc: Symbol<'a, DtwaingettwainidfromnameFunc>,
-    DTWAIN_GetTwainIDFromNameAFunc: Symbol<'a, DtwaingettwainidfromnameaFunc>,
-    DTWAIN_GetTwainIDFromNameWFunc: Symbol<'a, DtwaingettwainidfromnamewFunc>,
     DTWAIN_GetTwainLanguageNameFunc: Symbol<'a, DtwaingettwainlanguagenameFunc>,
     DTWAIN_GetTwainLanguageNameAFunc: Symbol<'a, DtwaingettwainlanguagenameaFunc>,
     DTWAIN_GetTwainLanguageNameWFunc: Symbol<'a, DtwaingettwainlanguagenamewFunc>,
@@ -4338,6 +4338,9 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetConditionCodeString: Symbol<DtwaingetconditioncodestringFunc> = unsafe { library.get(b"DTWAIN_GetConditionCodeString")? };
         let DTWAIN_GetConditionCodeStringA: Symbol<DtwaingetconditioncodestringaFunc> = unsafe { library.get(b"DTWAIN_GetConditionCodeStringA")? };
         let DTWAIN_GetConditionCodeStringW: Symbol<DtwaingetconditioncodestringwFunc> = unsafe { library.get(b"DTWAIN_GetConditionCodeStringW")? };
+        let DTWAIN_GetConstantFromTwainName: Symbol<DtwaingetconstantfromtwainnameFunc> = unsafe { library.get(b"DTWAIN_GetConstantFromTwainName")? };
+        let DTWAIN_GetConstantFromTwainNameA: Symbol<DtwaingetconstantfromtwainnameaFunc> = unsafe { library.get(b"DTWAIN_GetConstantFromTwainNameA")? };
+        let DTWAIN_GetConstantFromTwainNameW: Symbol<DtwaingetconstantfromtwainnamewFunc> = unsafe { library.get(b"DTWAIN_GetConstantFromTwainNameW")? };
         let DTWAIN_GetContrast: Symbol<DtwaingetcontrastFunc> = unsafe { library.get(b"DTWAIN_GetContrast")? };
         let DTWAIN_GetContrastString: Symbol<DtwaingetcontraststringFunc> = unsafe { library.get(b"DTWAIN_GetContrastString")? };
         let DTWAIN_GetContrastStringA: Symbol<DtwaingetcontraststringaFunc> = unsafe { library.get(b"DTWAIN_GetContrastStringA")? };
@@ -4556,9 +4559,6 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetTwainCountryValueA: Symbol<DtwaingettwaincountryvalueaFunc> = unsafe { library.get(b"DTWAIN_GetTwainCountryValueA")? };
         let DTWAIN_GetTwainCountryValueW: Symbol<DtwaingettwaincountryvaluewFunc> = unsafe { library.get(b"DTWAIN_GetTwainCountryValueW")? };
         let DTWAIN_GetTwainHwnd: Symbol<DtwaingettwainhwndFunc> = unsafe { library.get(b"DTWAIN_GetTwainHwnd")? };
-        let DTWAIN_GetTwainIDFromName: Symbol<DtwaingettwainidfromnameFunc> = unsafe { library.get(b"DTWAIN_GetTwainIDFromName")? };
-        let DTWAIN_GetTwainIDFromNameA: Symbol<DtwaingettwainidfromnameaFunc> = unsafe { library.get(b"DTWAIN_GetTwainIDFromNameA")? };
-        let DTWAIN_GetTwainIDFromNameW: Symbol<DtwaingettwainidfromnamewFunc> = unsafe { library.get(b"DTWAIN_GetTwainIDFromNameW")? };
         let DTWAIN_GetTwainLanguageName: Symbol<DtwaingettwainlanguagenameFunc> = unsafe { library.get(b"DTWAIN_GetTwainLanguageName")? };
         let DTWAIN_GetTwainLanguageNameA: Symbol<DtwaingettwainlanguagenameaFunc> = unsafe { library.get(b"DTWAIN_GetTwainLanguageNameA")? };
         let DTWAIN_GetTwainLanguageNameW: Symbol<DtwaingettwainlanguagenamewFunc> = unsafe { library.get(b"DTWAIN_GetTwainLanguageNameW")? };
@@ -5460,6 +5460,9 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetConditionCodeStringFunc: DTWAIN_GetConditionCodeString,
             DTWAIN_GetConditionCodeStringAFunc: DTWAIN_GetConditionCodeStringA,
             DTWAIN_GetConditionCodeStringWFunc: DTWAIN_GetConditionCodeStringW,
+            DTWAIN_GetConstantFromTwainNameFunc: DTWAIN_GetConstantFromTwainName,
+            DTWAIN_GetConstantFromTwainNameAFunc: DTWAIN_GetConstantFromTwainNameA,
+            DTWAIN_GetConstantFromTwainNameWFunc: DTWAIN_GetConstantFromTwainNameW,
             DTWAIN_GetContrastFunc: DTWAIN_GetContrast,
             DTWAIN_GetContrastStringFunc: DTWAIN_GetContrastString,
             DTWAIN_GetContrastStringAFunc: DTWAIN_GetContrastStringA,
@@ -5678,9 +5681,6 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetTwainCountryValueAFunc: DTWAIN_GetTwainCountryValueA,
             DTWAIN_GetTwainCountryValueWFunc: DTWAIN_GetTwainCountryValueW,
             DTWAIN_GetTwainHwndFunc: DTWAIN_GetTwainHwnd,
-            DTWAIN_GetTwainIDFromNameFunc: DTWAIN_GetTwainIDFromName,
-            DTWAIN_GetTwainIDFromNameAFunc: DTWAIN_GetTwainIDFromNameA,
-            DTWAIN_GetTwainIDFromNameWFunc: DTWAIN_GetTwainIDFromNameW,
             DTWAIN_GetTwainLanguageNameFunc: DTWAIN_GetTwainLanguageName,
             DTWAIN_GetTwainLanguageNameAFunc: DTWAIN_GetTwainLanguageNameA,
             DTWAIN_GetTwainLanguageNameWFunc: DTWAIN_GetTwainLanguageNameW,
@@ -7821,6 +7821,18 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetConditionCodeStringWFunc)(lError, lpszBuffer, nMaxLen);  }
     }
 
+    pub fn DTWAIN_GetConstantFromTwainName(&self, lpszBuffer: *const u16) -> i32 {
+        unsafe { return (self.DTWAIN_GetConstantFromTwainNameFunc)(lpszBuffer);  }
+    }
+
+    pub fn DTWAIN_GetConstantFromTwainNameA(&self, lpszBuffer: *const c_char) -> i32 {
+        unsafe { return (self.DTWAIN_GetConstantFromTwainNameAFunc)(lpszBuffer);  }
+    }
+
+    pub fn DTWAIN_GetConstantFromTwainNameW(&self, lpszBuffer: *const u16) -> i32 {
+        unsafe { return (self.DTWAIN_GetConstantFromTwainNameWFunc)(lpszBuffer);  }
+    }
+
     pub fn DTWAIN_GetContrast(&self, Source: *mut c_void, Contrast: *mut f64) -> i32 {
         unsafe { return (self.DTWAIN_GetContrastFunc)(Source, Contrast);  }
     }
@@ -8691,18 +8703,6 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_GetTwainHwnd(&self) -> *const c_void {
         unsafe { return (self.DTWAIN_GetTwainHwndFunc)();  }
-    }
-
-    pub fn DTWAIN_GetTwainIDFromName(&self, lpszBuffer: *const u16) -> i32 {
-        unsafe { return (self.DTWAIN_GetTwainIDFromNameFunc)(lpszBuffer);  }
-    }
-
-    pub fn DTWAIN_GetTwainIDFromNameA(&self, lpszBuffer: *const c_char) -> i32 {
-        unsafe { return (self.DTWAIN_GetTwainIDFromNameAFunc)(lpszBuffer);  }
-    }
-
-    pub fn DTWAIN_GetTwainIDFromNameW(&self, lpszBuffer: *const u16) -> i32 {
-        unsafe { return (self.DTWAIN_GetTwainIDFromNameWFunc)(lpszBuffer);  }
     }
 
     pub fn DTWAIN_GetTwainLanguageName(&self, nameId: i32, szName: *mut u16) -> i32 {

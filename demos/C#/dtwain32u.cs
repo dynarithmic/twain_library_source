@@ -3016,6 +3016,15 @@ namespace Dynarithmic
         public static extern int DTWAIN_GetConditionCodeStringW(int lError, [MarshalAs(UnmanagedType.LPWStr)] System.Text.StringBuilder lpszBuffer, int nMaxLen);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_GetConstantFromTwainName([MarshalAs(UnmanagedType.LPTStr)] string lpszBuffer);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_GetConstantFromTwainNameA([MarshalAs(UnmanagedType.LPStr)] string lpszBuffer);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_GetConstantFromTwainNameW([MarshalAs(UnmanagedType.LPWStr)] string lpszBuffer);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_GetContrast(DTWAIN_SOURCE Source, ref DTWAIN_FLOAT Contrast);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
@@ -3668,15 +3677,6 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern HWND DTWAIN_GetTwainHwnd();
-
-        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_GetTwainIDFromName([MarshalAs(UnmanagedType.LPTStr)] string lpszBuffer);
-
-        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_GetTwainIDFromNameA([MarshalAs(UnmanagedType.LPStr)] string lpszBuffer);
-
-        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_GetTwainIDFromNameW([MarshalAs(UnmanagedType.LPWStr)] string lpszBuffer);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Auto, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_GetTwainLanguageName(int nameId, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szName);

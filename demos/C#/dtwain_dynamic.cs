@@ -2302,6 +2302,9 @@
         public delegate int DTWAIN_GetConditionCodeStringDelegate(int lError, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszBuffer, int nMaxLen);
         public delegate int DTWAIN_GetConditionCodeStringADelegate(int lError, [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder lpszBuffer, int nMaxLen);
         public delegate int DTWAIN_GetConditionCodeStringWDelegate(int lError, [MarshalAs(UnmanagedType.LPWStr)] System.Text.StringBuilder lpszBuffer, int nMaxLen);
+        public delegate int DTWAIN_GetConstantFromTwainNameDelegate([MarshalAs(UnmanagedType.LPTStr)] string lpszBuffer);
+        public delegate int DTWAIN_GetConstantFromTwainNameADelegate([MarshalAs(UnmanagedType.LPStr)] string lpszBuffer);
+        public delegate int DTWAIN_GetConstantFromTwainNameWDelegate([MarshalAs(UnmanagedType.LPWStr)] string lpszBuffer);
         public delegate int DTWAIN_GetContrastDelegate(DTWAIN_SOURCE Source, ref DTWAIN_FLOAT Contrast);
         public delegate int DTWAIN_GetContrastStringDelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder Contrast);
         public delegate int DTWAIN_GetContrastStringADelegate(DTWAIN_SOURCE Source, [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder Contrast);
@@ -2520,9 +2523,6 @@
         public delegate int DTWAIN_GetTwainCountryValueADelegate([MarshalAs(UnmanagedType.LPStr)] string country);
         public delegate int DTWAIN_GetTwainCountryValueWDelegate([MarshalAs(UnmanagedType.LPWStr)] string country);
         public delegate HWND DTWAIN_GetTwainHwndDelegate();
-        public delegate int DTWAIN_GetTwainIDFromNameDelegate([MarshalAs(UnmanagedType.LPTStr)] string lpszBuffer);
-        public delegate int DTWAIN_GetTwainIDFromNameADelegate([MarshalAs(UnmanagedType.LPStr)] string lpszBuffer);
-        public delegate int DTWAIN_GetTwainIDFromNameWDelegate([MarshalAs(UnmanagedType.LPWStr)] string lpszBuffer);
         public delegate int DTWAIN_GetTwainLanguageNameDelegate(int nameId, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szName);
         public delegate int DTWAIN_GetTwainLanguageNameADelegate(int lang, [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder szName);
         public delegate int DTWAIN_GetTwainLanguageNameWDelegate(int lang, [MarshalAs(UnmanagedType.LPWStr)] System.Text.StringBuilder szName);
@@ -4263,6 +4263,15 @@
         [DTWAINNativeFunction("DTWAIN_GetConditionCodeStringW")]
         private readonly DTWAIN_GetConditionCodeStringWDelegate  _DTWAIN_GetConditionCodeStringW;
 
+        [DTWAINNativeFunction("DTWAIN_GetConstantFromTwainName")]
+        private readonly DTWAIN_GetConstantFromTwainNameDelegate  _DTWAIN_GetConstantFromTwainName;
+
+        [DTWAINNativeFunction("DTWAIN_GetConstantFromTwainNameA")]
+        private readonly DTWAIN_GetConstantFromTwainNameADelegate  _DTWAIN_GetConstantFromTwainNameA;
+
+        [DTWAINNativeFunction("DTWAIN_GetConstantFromTwainNameW")]
+        private readonly DTWAIN_GetConstantFromTwainNameWDelegate  _DTWAIN_GetConstantFromTwainNameW;
+
         [DTWAINNativeFunction("DTWAIN_GetContrast")]
         private readonly DTWAIN_GetContrastDelegate  _DTWAIN_GetContrast;
 
@@ -4916,15 +4925,6 @@
 
         [DTWAINNativeFunction("DTWAIN_GetTwainHwnd")]
         private readonly DTWAIN_GetTwainHwndDelegate  _DTWAIN_GetTwainHwnd;
-
-        [DTWAINNativeFunction("DTWAIN_GetTwainIDFromName")]
-        private readonly DTWAIN_GetTwainIDFromNameDelegate  _DTWAIN_GetTwainIDFromName;
-
-        [DTWAINNativeFunction("DTWAIN_GetTwainIDFromNameA")]
-        private readonly DTWAIN_GetTwainIDFromNameADelegate  _DTWAIN_GetTwainIDFromNameA;
-
-        [DTWAINNativeFunction("DTWAIN_GetTwainIDFromNameW")]
-        private readonly DTWAIN_GetTwainIDFromNameWDelegate  _DTWAIN_GetTwainIDFromNameW;
 
         [DTWAINNativeFunction("DTWAIN_GetTwainLanguageName")]
         private readonly DTWAIN_GetTwainLanguageNameDelegate  _DTWAIN_GetTwainLanguageName;
@@ -7631,6 +7631,15 @@
         public  int DTWAIN_GetConditionCodeStringW(int lError, [MarshalAs(UnmanagedType.LPWStr)] System.Text.StringBuilder lpszBuffer, int nMaxLen)
         => _DTWAIN_GetConditionCodeStringW(lError, lpszBuffer, nMaxLen);
 
+        public  int DTWAIN_GetConstantFromTwainName([MarshalAs(UnmanagedType.LPTStr)] string lpszBuffer)
+        => _DTWAIN_GetConstantFromTwainName(lpszBuffer);
+
+        public  int DTWAIN_GetConstantFromTwainNameA([MarshalAs(UnmanagedType.LPStr)] string lpszBuffer)
+        => _DTWAIN_GetConstantFromTwainNameA(lpszBuffer);
+
+        public  int DTWAIN_GetConstantFromTwainNameW([MarshalAs(UnmanagedType.LPWStr)] string lpszBuffer)
+        => _DTWAIN_GetConstantFromTwainNameW(lpszBuffer);
+
         public  int DTWAIN_GetContrast(DTWAIN_SOURCE Source, ref DTWAIN_FLOAT Contrast)
         => _DTWAIN_GetContrast(Source, ref Contrast);
 
@@ -8284,15 +8293,6 @@
 
         public  HWND DTWAIN_GetTwainHwnd()
         => _DTWAIN_GetTwainHwnd();
-
-        public  int DTWAIN_GetTwainIDFromName([MarshalAs(UnmanagedType.LPTStr)] string lpszBuffer)
-        => _DTWAIN_GetTwainIDFromName(lpszBuffer);
-
-        public  int DTWAIN_GetTwainIDFromNameA([MarshalAs(UnmanagedType.LPStr)] string lpszBuffer)
-        => _DTWAIN_GetTwainIDFromNameA(lpszBuffer);
-
-        public  int DTWAIN_GetTwainIDFromNameW([MarshalAs(UnmanagedType.LPWStr)] string lpszBuffer)
-        => _DTWAIN_GetTwainIDFromNameW(lpszBuffer);
 
         public  int DTWAIN_GetTwainLanguageName(int nameId, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szName)
         => _DTWAIN_GetTwainLanguageName(nameId, szName);

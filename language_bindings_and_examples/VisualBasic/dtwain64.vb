@@ -2144,6 +2144,9 @@ Class DTWAINAPI
     Public Declare Ansi Function DTWAIN_GetConditionCodeString Lib "dtwain64.dll" (lError As Integer, <MarshalAs(UnmanagedType.LPStr)> lpszBuffer As StringBuilder, nMaxLen As Integer) As Integer
     Public Declare Ansi Function DTWAIN_GetConditionCodeStringA Lib "dtwain64.dll" (lError As Integer, <MarshalAs(UnmanagedType.LPStr)> lpszBuffer As StringBuilder, nMaxLen As Integer) As Integer
     Public Declare Unicode Function DTWAIN_GetConditionCodeStringW Lib "dtwain64.dll" (lError As Integer, <MarshalAs(UnmanagedType.LPWStr)> lpszBuffer As StringBuilder, nMaxLen As Integer) As Integer
+    Public Declare Ansi Function DTWAIN_GetConstantFromTwainName Lib "dtwain64.dll" (lpszBuffer As String) As Integer
+    Public Declare Ansi Function DTWAIN_GetConstantFromTwainNameA Lib "dtwain64.dll" (lpszBuffer As String) As Integer
+    Public Declare Unicode Function DTWAIN_GetConstantFromTwainNameW Lib "dtwain64.dll" (lpszBuffer As String) As Integer
     Public Declare Auto Function DTWAIN_GetContrast Lib "dtwain64.dll" (Source As System.IntPtr, ByRef Contrast As System.Double) As Integer
     Public Declare Ansi Function DTWAIN_GetContrastString Lib "dtwain64.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> Contrast As StringBuilder) As Integer
     Public Declare Ansi Function DTWAIN_GetContrastStringA Lib "dtwain64.dll" (Source As System.IntPtr, <MarshalAs(UnmanagedType.LPStr)> Contrast As StringBuilder) As Integer
@@ -2360,9 +2363,6 @@ Class DTWAINAPI
     Public Declare Ansi Function DTWAIN_GetTwainCountryValueA Lib "dtwain64.dll" (country As String) As Integer
     Public Declare Unicode Function DTWAIN_GetTwainCountryValueW Lib "dtwain64.dll" (country As String) As Integer
     Public Declare Auto Function DTWAIN_GetTwainHwnd Lib "dtwain64.dll" () As System.IntPtr
-    Public Declare Ansi Function DTWAIN_GetTwainIDFromName Lib "dtwain64.dll" (lpszBuffer As String) As Integer
-    Public Declare Ansi Function DTWAIN_GetTwainIDFromNameA Lib "dtwain64.dll" (lpszBuffer As String) As Integer
-    Public Declare Unicode Function DTWAIN_GetTwainIDFromNameW Lib "dtwain64.dll" (lpszBuffer As String) As Integer
     Public Declare Ansi Function DTWAIN_GetTwainLanguageName Lib "dtwain64.dll" (nameId As Integer, <MarshalAs(UnmanagedType.LPStr)> szName As StringBuilder) As Integer
     Public Declare Ansi Function DTWAIN_GetTwainLanguageNameA Lib "dtwain64.dll" (lang As Integer, <MarshalAs(UnmanagedType.LPStr)> szName As StringBuilder) As Integer
     Public Declare Unicode Function DTWAIN_GetTwainLanguageNameW Lib "dtwain64.dll" (lang As Integer, <MarshalAs(UnmanagedType.LPWStr)> szName As StringBuilder) As Integer

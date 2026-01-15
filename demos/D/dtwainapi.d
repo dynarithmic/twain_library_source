@@ -2313,6 +2313,9 @@ class DTWAIN_DynamicDLL
     extern(Windows) LONG function(LONG, DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetConditionCodeString;
     extern(Windows) LONG function(LONG, LPSTR, LONG) DTWAIN_GetConditionCodeStringA;
     extern(Windows) LONG function(LONG, LPWSTR, LONG) DTWAIN_GetConditionCodeStringW;
+    extern(Windows) LONG function(DTWAIN_CCHARPTRTYPE) DTWAIN_GetConstantFromTwainName;
+    extern(Windows) LONG function(LPCSTR) DTWAIN_GetConstantFromTwainNameA;
+    extern(Windows) LONG function(LPCWSTR) DTWAIN_GetConstantFromTwainNameW;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_FLOAT) DTWAIN_GetContrast;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, DTWAIN_CHARPTRTYPE) DTWAIN_GetContrastString;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPSTR) DTWAIN_GetContrastStringA;
@@ -2526,9 +2529,6 @@ class DTWAIN_DynamicDLL
     extern(Windows) LONG function(LPCSTR) DTWAIN_GetTwainCountryValueA;
     extern(Windows) LONG function(LPCWSTR) DTWAIN_GetTwainCountryValueW;
     extern(Windows) HWND function() DTWAIN_GetTwainHwnd;
-    extern(Windows) LONG function(DTWAIN_CCHARPTRTYPE) DTWAIN_GetTwainIDFromName;
-    extern(Windows) LONG function(LPCSTR) DTWAIN_GetTwainIDFromNameA;
-    extern(Windows) LONG function(LPCWSTR) DTWAIN_GetTwainIDFromNameW;
     extern(Windows) BOOL function(LONG, DTWAIN_CHARPTRTYPE) DTWAIN_GetTwainLanguageName;
     extern(Windows) DTWAIN_BOOL function(LONG, LPSTR) DTWAIN_GetTwainLanguageNameA;
     extern(Windows) DTWAIN_BOOL function(LONG, LPWSTR) DTWAIN_GetTwainLanguageNameW;
@@ -3435,6 +3435,9 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetConditionCodeString, "DTWAIN_GetConditionCodeString");
         bindFunction(cast(void**)&DTWAIN_GetConditionCodeStringA, "DTWAIN_GetConditionCodeStringA");
         bindFunction(cast(void**)&DTWAIN_GetConditionCodeStringW, "DTWAIN_GetConditionCodeStringW");
+        bindFunction(cast(void**)&DTWAIN_GetConstantFromTwainName, "DTWAIN_GetConstantFromTwainName");
+        bindFunction(cast(void**)&DTWAIN_GetConstantFromTwainNameA, "DTWAIN_GetConstantFromTwainNameA");
+        bindFunction(cast(void**)&DTWAIN_GetConstantFromTwainNameW, "DTWAIN_GetConstantFromTwainNameW");
         bindFunction(cast(void**)&DTWAIN_GetContrast, "DTWAIN_GetContrast");
         bindFunction(cast(void**)&DTWAIN_GetContrastString, "DTWAIN_GetContrastString");
         bindFunction(cast(void**)&DTWAIN_GetContrastStringA, "DTWAIN_GetContrastStringA");
@@ -3648,9 +3651,6 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetTwainCountryValueA, "DTWAIN_GetTwainCountryValueA");
         bindFunction(cast(void**)&DTWAIN_GetTwainCountryValueW, "DTWAIN_GetTwainCountryValueW");
         bindFunction(cast(void**)&DTWAIN_GetTwainHwnd, "DTWAIN_GetTwainHwnd");
-        bindFunction(cast(void**)&DTWAIN_GetTwainIDFromName, "DTWAIN_GetTwainIDFromName");
-        bindFunction(cast(void**)&DTWAIN_GetTwainIDFromNameA, "DTWAIN_GetTwainIDFromNameA");
-        bindFunction(cast(void**)&DTWAIN_GetTwainIDFromNameW, "DTWAIN_GetTwainIDFromNameW");
         bindFunction(cast(void**)&DTWAIN_GetTwainLanguageName, "DTWAIN_GetTwainLanguageName");
         bindFunction(cast(void**)&DTWAIN_GetTwainLanguageNameA, "DTWAIN_GetTwainLanguageNameA");
         bindFunction(cast(void**)&DTWAIN_GetTwainLanguageNameW, "DTWAIN_GetTwainLanguageNameW");

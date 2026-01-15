@@ -3078,6 +3078,15 @@ module TwainAPI =
     type DTWAIN_GetConditionCodeStringWDelegate = delegate of LONG * System.Text.StringBuilder * LONG -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
+    type DTWAIN_GetConstantFromTwainNameDelegate = delegate of string -> LONG
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Ansi)>]
+    type DTWAIN_GetConstantFromTwainNameADelegate = delegate of string -> LONG
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
+    type DTWAIN_GetConstantFromTwainNameWDelegate = delegate of string -> LONG
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
     type DTWAIN_GetContrastDelegate = delegate of DTWAIN_SOURCE * DTWAIN_FLOAT byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
@@ -3730,15 +3739,6 @@ module TwainAPI =
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
     type DTWAIN_GetTwainHwndDelegate = delegate of unit -> HWND
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
-    type DTWAIN_GetTwainIDFromNameDelegate = delegate of string -> LONG
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Ansi)>]
-    type DTWAIN_GetTwainIDFromNameADelegate = delegate of string -> LONG
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
-    type DTWAIN_GetTwainIDFromNameWDelegate = delegate of string -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Auto)>]
     type DTWAIN_GetTwainLanguageNameDelegate = delegate of LONG * System.Text.StringBuilder -> BOOL
@@ -5597,6 +5597,9 @@ module TwainAPI =
     let private GetConditionCodeString = lazy (DynamicDll.Bind "DTWAIN_GetConditionCodeString" : DTWAIN_GetConditionCodeStringDelegate)
     let private GetConditionCodeStringA = lazy (DynamicDll.Bind "DTWAIN_GetConditionCodeStringA" : DTWAIN_GetConditionCodeStringADelegate)
     let private GetConditionCodeStringW = lazy (DynamicDll.Bind "DTWAIN_GetConditionCodeStringW" : DTWAIN_GetConditionCodeStringWDelegate)
+    let private GetConstantFromTwainName = lazy (DynamicDll.Bind "DTWAIN_GetConstantFromTwainName" : DTWAIN_GetConstantFromTwainNameDelegate)
+    let private GetConstantFromTwainNameA = lazy (DynamicDll.Bind "DTWAIN_GetConstantFromTwainNameA" : DTWAIN_GetConstantFromTwainNameADelegate)
+    let private GetConstantFromTwainNameW = lazy (DynamicDll.Bind "DTWAIN_GetConstantFromTwainNameW" : DTWAIN_GetConstantFromTwainNameWDelegate)
     let private GetContrast = lazy (DynamicDll.Bind "DTWAIN_GetContrast" : DTWAIN_GetContrastDelegate)
     let private GetContrastString = lazy (DynamicDll.Bind "DTWAIN_GetContrastString" : DTWAIN_GetContrastStringDelegate)
     let private GetContrastStringA = lazy (DynamicDll.Bind "DTWAIN_GetContrastStringA" : DTWAIN_GetContrastStringADelegate)
@@ -5815,9 +5818,6 @@ module TwainAPI =
     let private GetTwainCountryValueA = lazy (DynamicDll.Bind "DTWAIN_GetTwainCountryValueA" : DTWAIN_GetTwainCountryValueADelegate)
     let private GetTwainCountryValueW = lazy (DynamicDll.Bind "DTWAIN_GetTwainCountryValueW" : DTWAIN_GetTwainCountryValueWDelegate)
     let private GetTwainHwnd = lazy (DynamicDll.Bind "DTWAIN_GetTwainHwnd" : DTWAIN_GetTwainHwndDelegate)
-    let private GetTwainIDFromName = lazy (DynamicDll.Bind "DTWAIN_GetTwainIDFromName" : DTWAIN_GetTwainIDFromNameDelegate)
-    let private GetTwainIDFromNameA = lazy (DynamicDll.Bind "DTWAIN_GetTwainIDFromNameA" : DTWAIN_GetTwainIDFromNameADelegate)
-    let private GetTwainIDFromNameW = lazy (DynamicDll.Bind "DTWAIN_GetTwainIDFromNameW" : DTWAIN_GetTwainIDFromNameWDelegate)
     let private GetTwainLanguageName = lazy (DynamicDll.Bind "DTWAIN_GetTwainLanguageName" : DTWAIN_GetTwainLanguageNameDelegate)
     let private GetTwainLanguageNameA = lazy (DynamicDll.Bind "DTWAIN_GetTwainLanguageNameA" : DTWAIN_GetTwainLanguageNameADelegate)
     let private GetTwainLanguageNameW = lazy (DynamicDll.Bind "DTWAIN_GetTwainLanguageNameW" : DTWAIN_GetTwainLanguageNameWDelegate)
@@ -7968,6 +7968,18 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetConditionCodeStringW.Value.Invoke(lerror, lpszbuffer, nmaxlen)
 
+    let DTWAIN_GetConstantFromTwainName (lpszbuffer: string) : LONG =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetConstantFromTwainName.Value.Invoke(lpszbuffer)
+
+    let DTWAIN_GetConstantFromTwainNameA (lpszbuffer: string) : LONG =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetConstantFromTwainNameA.Value.Invoke(lpszbuffer)
+
+    let DTWAIN_GetConstantFromTwainNameW (lpszbuffer: string) : LONG =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetConstantFromTwainNameW.Value.Invoke(lpszbuffer)
+
     let DTWAIN_GetContrast (source: DTWAIN_SOURCE) (contrast: DTWAIN_FLOAT byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetContrast.Value.Invoke(source, &contrast)
@@ -8839,18 +8851,6 @@ module TwainAPI =
     let DTWAIN_GetTwainHwnd() : HWND =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetTwainHwnd.Value.Invoke()
-
-    let DTWAIN_GetTwainIDFromName (lpszbuffer: string) : LONG =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        GetTwainIDFromName.Value.Invoke(lpszbuffer)
-
-    let DTWAIN_GetTwainIDFromNameA (lpszbuffer: string) : LONG =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        GetTwainIDFromNameA.Value.Invoke(lpszbuffer)
-
-    let DTWAIN_GetTwainIDFromNameW (lpszbuffer: string) : LONG =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        GetTwainIDFromNameW.Value.Invoke(lpszbuffer)
 
     let DTWAIN_GetTwainLanguageName (nameid: LONG) (szname: System.Text.StringBuilder) : BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

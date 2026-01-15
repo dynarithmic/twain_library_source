@@ -489,6 +489,9 @@ function load32bitAnsi(DLLToLoad)
         LONG DTWAIN_GetConditionCodeString(LONG lError, DTWAIN_CHARPTRTYPE lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetConditionCodeStringA(LONG lError, LPSTR lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetConditionCodeStringW(LONG lError, LPWSTR lpszBuffer, LONG nMaxLen);
+        LONG DTWAIN_GetConstantFromTwainName(DTWAIN_CCHARPTRTYPE lpszBuffer);
+        LONG DTWAIN_GetConstantFromTwainNameA(LPCSTR lpszBuffer);
+        LONG DTWAIN_GetConstantFromTwainNameW(LPCWSTR lpszBuffer);
         DTWAIN_BOOL DTWAIN_GetContrast(DTWAIN_SOURCE Source, LPDTWAIN_FLOAT Contrast);
         DTWAIN_BOOL DTWAIN_GetContrastString(DTWAIN_SOURCE Source, DTWAIN_CHARPTRTYPE Contrast);
         DTWAIN_BOOL DTWAIN_GetContrastStringA(DTWAIN_SOURCE Source, LPSTR Contrast);
@@ -704,9 +707,6 @@ function load32bitAnsi(DLLToLoad)
         LONG DTWAIN_GetTwainCountryValueA(LPCSTR country);
         LONG DTWAIN_GetTwainCountryValueW(LPCWSTR country);
         HWND DTWAIN_GetTwainHwnd();
-        LONG DTWAIN_GetTwainIDFromName(DTWAIN_CCHARPTRTYPE lpszBuffer);
-        LONG DTWAIN_GetTwainIDFromNameA(LPCSTR lpszBuffer);
-        LONG DTWAIN_GetTwainIDFromNameW(LPCWSTR lpszBuffer);
         BOOL DTWAIN_GetTwainLanguageName(LONG nameId, DTWAIN_CHARPTRTYPE szName);
         DTWAIN_BOOL DTWAIN_GetTwainLanguageNameA(LONG lang, LPSTR szName);
         DTWAIN_BOOL DTWAIN_GetTwainLanguageNameW(LONG lang, LPWSTR szName);
@@ -1667,6 +1667,9 @@ function load32bitUnicode(DLLToLoad)
         LONG DTWAIN_GetConditionCodeString(LONG lError, DTWAIN_CHARPTRTYPE lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetConditionCodeStringA(LONG lError, LPSTR lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetConditionCodeStringW(LONG lError, LPWSTR lpszBuffer, LONG nMaxLen);
+        LONG DTWAIN_GetConstantFromTwainName(DTWAIN_CCHARPTRTYPE lpszBuffer);
+        LONG DTWAIN_GetConstantFromTwainNameA(LPCSTR lpszBuffer);
+        LONG DTWAIN_GetConstantFromTwainNameW(LPCWSTR lpszBuffer);
         DTWAIN_BOOL DTWAIN_GetContrast(DTWAIN_SOURCE Source, LPDTWAIN_FLOAT Contrast);
         DTWAIN_BOOL DTWAIN_GetContrastString(DTWAIN_SOURCE Source, DTWAIN_CHARPTRTYPE Contrast);
         DTWAIN_BOOL DTWAIN_GetContrastStringA(DTWAIN_SOURCE Source, LPSTR Contrast);
@@ -1882,9 +1885,6 @@ function load32bitUnicode(DLLToLoad)
         LONG DTWAIN_GetTwainCountryValueA(LPCSTR country);
         LONG DTWAIN_GetTwainCountryValueW(LPCWSTR country);
         HWND DTWAIN_GetTwainHwnd();
-        LONG DTWAIN_GetTwainIDFromName(DTWAIN_CCHARPTRTYPE lpszBuffer);
-        LONG DTWAIN_GetTwainIDFromNameA(LPCSTR lpszBuffer);
-        LONG DTWAIN_GetTwainIDFromNameW(LPCWSTR lpszBuffer);
         BOOL DTWAIN_GetTwainLanguageName(LONG nameId, DTWAIN_CHARPTRTYPE szName);
         DTWAIN_BOOL DTWAIN_GetTwainLanguageNameA(LONG lang, LPSTR szName);
         DTWAIN_BOOL DTWAIN_GetTwainLanguageNameW(LONG lang, LPWSTR szName);
@@ -2845,6 +2845,9 @@ function load64bitAnsi(DLLToLoad)
         LONG DTWAIN_GetConditionCodeString(LONG lError, DTWAIN_CHARPTRTYPE lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetConditionCodeStringA(LONG lError, LPSTR lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetConditionCodeStringW(LONG lError, LPWSTR lpszBuffer, LONG nMaxLen);
+        LONG DTWAIN_GetConstantFromTwainName(DTWAIN_CCHARPTRTYPE lpszBuffer);
+        LONG DTWAIN_GetConstantFromTwainNameA(LPCSTR lpszBuffer);
+        LONG DTWAIN_GetConstantFromTwainNameW(LPCWSTR lpszBuffer);
         DTWAIN_BOOL DTWAIN_GetContrast(DTWAIN_SOURCE Source, LPDTWAIN_FLOAT Contrast);
         DTWAIN_BOOL DTWAIN_GetContrastString(DTWAIN_SOURCE Source, DTWAIN_CHARPTRTYPE Contrast);
         DTWAIN_BOOL DTWAIN_GetContrastStringA(DTWAIN_SOURCE Source, LPSTR Contrast);
@@ -3060,9 +3063,6 @@ function load64bitAnsi(DLLToLoad)
         LONG DTWAIN_GetTwainCountryValueA(LPCSTR country);
         LONG DTWAIN_GetTwainCountryValueW(LPCWSTR country);
         HWND DTWAIN_GetTwainHwnd();
-        LONG DTWAIN_GetTwainIDFromName(DTWAIN_CCHARPTRTYPE lpszBuffer);
-        LONG DTWAIN_GetTwainIDFromNameA(LPCSTR lpszBuffer);
-        LONG DTWAIN_GetTwainIDFromNameW(LPCWSTR lpszBuffer);
         BOOL DTWAIN_GetTwainLanguageName(LONG nameId, DTWAIN_CHARPTRTYPE szName);
         DTWAIN_BOOL DTWAIN_GetTwainLanguageNameA(LONG lang, LPSTR szName);
         DTWAIN_BOOL DTWAIN_GetTwainLanguageNameW(LONG lang, LPWSTR szName);
@@ -4023,6 +4023,9 @@ function load64bitUnicode(DLLToLoad)
         LONG DTWAIN_GetConditionCodeString(LONG lError, DTWAIN_CHARPTRTYPE lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetConditionCodeStringA(LONG lError, LPSTR lpszBuffer, LONG nMaxLen);
         LONG DTWAIN_GetConditionCodeStringW(LONG lError, LPWSTR lpszBuffer, LONG nMaxLen);
+        LONG DTWAIN_GetConstantFromTwainName(DTWAIN_CCHARPTRTYPE lpszBuffer);
+        LONG DTWAIN_GetConstantFromTwainNameA(LPCSTR lpszBuffer);
+        LONG DTWAIN_GetConstantFromTwainNameW(LPCWSTR lpszBuffer);
         DTWAIN_BOOL DTWAIN_GetContrast(DTWAIN_SOURCE Source, LPDTWAIN_FLOAT Contrast);
         DTWAIN_BOOL DTWAIN_GetContrastString(DTWAIN_SOURCE Source, DTWAIN_CHARPTRTYPE Contrast);
         DTWAIN_BOOL DTWAIN_GetContrastStringA(DTWAIN_SOURCE Source, LPSTR Contrast);
@@ -4238,9 +4241,6 @@ function load64bitUnicode(DLLToLoad)
         LONG DTWAIN_GetTwainCountryValueA(LPCSTR country);
         LONG DTWAIN_GetTwainCountryValueW(LPCWSTR country);
         HWND DTWAIN_GetTwainHwnd();
-        LONG DTWAIN_GetTwainIDFromName(DTWAIN_CCHARPTRTYPE lpszBuffer);
-        LONG DTWAIN_GetTwainIDFromNameA(LPCSTR lpszBuffer);
-        LONG DTWAIN_GetTwainIDFromNameW(LPCWSTR lpszBuffer);
         BOOL DTWAIN_GetTwainLanguageName(LONG nameId, DTWAIN_CHARPTRTYPE szName);
         DTWAIN_BOOL DTWAIN_GetTwainLanguageNameA(LONG lang, LPSTR szName);
         DTWAIN_BOOL DTWAIN_GetTwainLanguageNameW(LONG lang, LPWSTR szName);

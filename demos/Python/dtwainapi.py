@@ -2160,6 +2160,9 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetConditionCodeString.restype = ct.c_long
      theDLL.DTWAIN_GetConditionCodeStringA.restype = ct.c_long
      theDLL.DTWAIN_GetConditionCodeStringW.restype = ct.c_long
+     theDLL.DTWAIN_GetConstantFromTwainName.restype = ct.c_long
+     theDLL.DTWAIN_GetConstantFromTwainNameA.restype = ct.c_long
+     theDLL.DTWAIN_GetConstantFromTwainNameW.restype = ct.c_long
      theDLL.DTWAIN_GetContrast.restype = ct.c_long
      theDLL.DTWAIN_GetContrastString.restype = ct.c_long
      theDLL.DTWAIN_GetContrastStringA.restype = ct.c_long
@@ -2378,9 +2381,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetTwainCountryValueA.restype = ct.c_long
      theDLL.DTWAIN_GetTwainCountryValueW.restype = ct.c_long
      theDLL.DTWAIN_GetTwainHwnd.restype = ct.c_void_p
-     theDLL.DTWAIN_GetTwainIDFromName.restype = ct.c_long
-     theDLL.DTWAIN_GetTwainIDFromNameA.restype = ct.c_long
-     theDLL.DTWAIN_GetTwainIDFromNameW.restype = ct.c_long
      theDLL.DTWAIN_GetTwainLanguageName.restype = ct.c_long
      theDLL.DTWAIN_GetTwainLanguageNameA.restype = ct.c_long
      theDLL.DTWAIN_GetTwainLanguageNameW.restype = ct.c_long
@@ -3272,6 +3272,9 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetConditionCodeString.argtypes = [ct.c_long, ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetConditionCodeStringA.argtypes = [ct.c_long, ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetConditionCodeStringW.argtypes = [ct.c_long, ct.c_wchar_p, ct.c_long]
+     theDLL.DTWAIN_GetConstantFromTwainName.argtypes = [ct.c_wchar_p]
+     theDLL.DTWAIN_GetConstantFromTwainNameA.argtypes = [ct.c_char_p]
+     theDLL.DTWAIN_GetConstantFromTwainNameW.argtypes = [ct.c_wchar_p]
      theDLL.DTWAIN_GetContrast.argtypes = [ct.c_void_p, ct.POINTER(ct.c_double)]
      theDLL.DTWAIN_GetContrastString.argtypes = [ct.c_void_p, ct.c_wchar_p]
      theDLL.DTWAIN_GetContrastStringA.argtypes = [ct.c_void_p, ct.c_char_p]
@@ -3474,9 +3477,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetTwainCountryValue.argtypes = [ct.c_wchar_p]
      theDLL.DTWAIN_GetTwainCountryValueA.argtypes = [ct.c_char_p]
      theDLL.DTWAIN_GetTwainCountryValueW.argtypes = [ct.c_wchar_p]
-     theDLL.DTWAIN_GetTwainIDFromName.argtypes = [ct.c_wchar_p]
-     theDLL.DTWAIN_GetTwainIDFromNameA.argtypes = [ct.c_char_p]
-     theDLL.DTWAIN_GetTwainIDFromNameW.argtypes = [ct.c_wchar_p]
      theDLL.DTWAIN_GetTwainLanguageName.argtypes = [ct.c_long, ct.c_wchar_p]
      theDLL.DTWAIN_GetTwainLanguageNameA.argtypes = [ct.c_long, ct.c_char_p]
      theDLL.DTWAIN_GetTwainLanguageNameW.argtypes = [ct.c_long, ct.c_wchar_p]
@@ -4376,6 +4376,9 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetConditionCodeString.restype = ct.c_long
      theDLL.DTWAIN_GetConditionCodeStringA.restype = ct.c_long
      theDLL.DTWAIN_GetConditionCodeStringW.restype = ct.c_long
+     theDLL.DTWAIN_GetConstantFromTwainName.restype = ct.c_long
+     theDLL.DTWAIN_GetConstantFromTwainNameA.restype = ct.c_long
+     theDLL.DTWAIN_GetConstantFromTwainNameW.restype = ct.c_long
      theDLL.DTWAIN_GetContrast.restype = ct.c_long
      theDLL.DTWAIN_GetContrastString.restype = ct.c_long
      theDLL.DTWAIN_GetContrastStringA.restype = ct.c_long
@@ -4594,9 +4597,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetTwainCountryValueA.restype = ct.c_long
      theDLL.DTWAIN_GetTwainCountryValueW.restype = ct.c_long
      theDLL.DTWAIN_GetTwainHwnd.restype = ct.c_void_p
-     theDLL.DTWAIN_GetTwainIDFromName.restype = ct.c_long
-     theDLL.DTWAIN_GetTwainIDFromNameA.restype = ct.c_long
-     theDLL.DTWAIN_GetTwainIDFromNameW.restype = ct.c_long
      theDLL.DTWAIN_GetTwainLanguageName.restype = ct.c_long
      theDLL.DTWAIN_GetTwainLanguageNameA.restype = ct.c_long
      theDLL.DTWAIN_GetTwainLanguageNameW.restype = ct.c_long
@@ -5488,6 +5488,9 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetConditionCodeString.argtypes = [ct.c_long, ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetConditionCodeStringA.argtypes = [ct.c_long, ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetConditionCodeStringW.argtypes = [ct.c_long, ct.c_wchar_p, ct.c_long]
+     theDLL.DTWAIN_GetConstantFromTwainName.argtypes = [ct.c_char_p]
+     theDLL.DTWAIN_GetConstantFromTwainNameA.argtypes = [ct.c_char_p]
+     theDLL.DTWAIN_GetConstantFromTwainNameW.argtypes = [ct.c_wchar_p]
      theDLL.DTWAIN_GetContrast.argtypes = [ct.c_void_p, ct.POINTER(ct.c_double)]
      theDLL.DTWAIN_GetContrastString.argtypes = [ct.c_void_p, ct.c_char_p]
      theDLL.DTWAIN_GetContrastStringA.argtypes = [ct.c_void_p, ct.c_char_p]
@@ -5690,9 +5693,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetTwainCountryValue.argtypes = [ct.c_char_p]
      theDLL.DTWAIN_GetTwainCountryValueA.argtypes = [ct.c_char_p]
      theDLL.DTWAIN_GetTwainCountryValueW.argtypes = [ct.c_wchar_p]
-     theDLL.DTWAIN_GetTwainIDFromName.argtypes = [ct.c_char_p]
-     theDLL.DTWAIN_GetTwainIDFromNameA.argtypes = [ct.c_char_p]
-     theDLL.DTWAIN_GetTwainIDFromNameW.argtypes = [ct.c_wchar_p]
      theDLL.DTWAIN_GetTwainLanguageName.argtypes = [ct.c_long, ct.c_char_p]
      theDLL.DTWAIN_GetTwainLanguageNameA.argtypes = [ct.c_long, ct.c_char_p]
      theDLL.DTWAIN_GetTwainLanguageNameW.argtypes = [ct.c_long, ct.c_wchar_p]

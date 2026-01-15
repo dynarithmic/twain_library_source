@@ -2239,6 +2239,9 @@ function DTWAIN_GetCompressionType(Source:DTWAIN_SOURCE; lpCompression:LPLONG; b
 function DTWAIN_GetConditionCodeString(lError:LONG; lpszBuffer:LPTSTR; nMaxLen:LONG) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetConditionCodeString';
 function DTWAIN_GetConditionCodeStringA(lError:LONG; lpszBuffer:LPSTR; nMaxLen:LONG) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetConditionCodeStringA';
 function DTWAIN_GetConditionCodeStringW(lError:LONG; lpszBuffer:LPWSTR; nMaxLen:LONG) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetConditionCodeStringW';
+function DTWAIN_GetConstantFromTwainName(lpszBuffer:LPCTSTR) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetConstantFromTwainName';
+function DTWAIN_GetConstantFromTwainNameA(lpszBuffer:LPCSTR) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetConstantFromTwainNameA';
+function DTWAIN_GetConstantFromTwainNameW(lpszBuffer:LPCWSTR) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetConstantFromTwainNameW';
 function DTWAIN_GetContrast(Source:DTWAIN_SOURCE; Contrast:LPDTWAIN_FLOAT) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetContrast';
 function DTWAIN_GetContrastString(Source:DTWAIN_SOURCE; Contrast:LPTSTR) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetContrastString';
 function DTWAIN_GetContrastStringA(Source:DTWAIN_SOURCE; Contrast:LPSTR) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetContrastStringA';
@@ -2457,9 +2460,6 @@ function DTWAIN_GetTwainCountryValue(country:LPCTSTR) : LONG; external 'dtwain64
 function DTWAIN_GetTwainCountryValueA(country:LPCSTR) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetTwainCountryValueA';
 function DTWAIN_GetTwainCountryValueW(country:LPCWSTR) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetTwainCountryValueW';
 function DTWAIN_GetTwainHwnd : NativeInt; external 'dtwain64.dll'  name 'DTWAIN_GetTwainHwnd';
-function DTWAIN_GetTwainIDFromName(lpszBuffer:LPCTSTR) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetTwainIDFromName';
-function DTWAIN_GetTwainIDFromNameA(lpszBuffer:LPCSTR) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetTwainIDFromNameA';
-function DTWAIN_GetTwainIDFromNameW(lpszBuffer:LPCWSTR) : LONG; external 'dtwain64.dll'  name 'DTWAIN_GetTwainIDFromNameW';
 function DTWAIN_GetTwainLanguageName(nameId:LONG; szName:LPTSTR) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetTwainLanguageName';
 function DTWAIN_GetTwainLanguageNameA(lang:LONG; szName:LPSTR) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetTwainLanguageNameA';
 function DTWAIN_GetTwainLanguageNameW(lang:LONG; szName:LPWSTR) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_GetTwainLanguageNameW';

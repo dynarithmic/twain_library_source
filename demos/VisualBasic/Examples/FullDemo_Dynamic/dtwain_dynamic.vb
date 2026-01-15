@@ -3141,6 +3141,15 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_GetConditionCodeStringWDelegate(lError As Integer, <MarshalAs(UnmanagedType.LPWStr)> lpszBuffer As StringBuilder, nMaxLen As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
+        Private Delegate Function DTWAIN_GetConstantFromTwainNameDelegate(lpszBuffer As String) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Ansi)>
+        Private Delegate Function DTWAIN_GetConstantFromTwainNameADelegate(lpszBuffer As String) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
+        Private Delegate Function DTWAIN_GetConstantFromTwainNameWDelegate(lpszBuffer As String) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
         Private Delegate Function DTWAIN_GetContrastDelegate(Source As System.IntPtr, ByRef Contrast As System.Double) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
@@ -3787,15 +3796,6 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
         Private Delegate Function DTWAIN_GetTwainHwndDelegate() As System.IntPtr
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
-        Private Delegate Function DTWAIN_GetTwainIDFromNameDelegate(lpszBuffer As String) As Integer
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Ansi)>
-        Private Delegate Function DTWAIN_GetTwainIDFromNameADelegate(lpszBuffer As String) As Integer
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
-        Private Delegate Function DTWAIN_GetTwainIDFromNameWDelegate(lpszBuffer As String) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Auto)>
         Private Delegate Function DTWAIN_GetTwainLanguageNameDelegate(nameId As Integer, <MarshalAs(UnmanagedType.LPTStr)> szName As StringBuilder) As Integer
@@ -6914,6 +6914,18 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetConditionCodeStringW(lError, lpszBuffer, nMaxLen)
         End Function
         
+        Public Function DTWAIN_GetConstantFromTwainName(lpszBuffer As String) As Integer
+        Return api.DTWAIN_GetConstantFromTwainName(lpszBuffer)
+        End Function
+        
+        Public Function DTWAIN_GetConstantFromTwainNameA(lpszBuffer As String) As Integer
+        Return api.DTWAIN_GetConstantFromTwainNameA(lpszBuffer)
+        End Function
+        
+        Public Function DTWAIN_GetConstantFromTwainNameW(lpszBuffer As String) As Integer
+        Return api.DTWAIN_GetConstantFromTwainNameW(lpszBuffer)
+        End Function
+        
         Public Function DTWAIN_GetContrast(Source As System.IntPtr, ByRef Contrast As System.Double) As Integer
         Return api.DTWAIN_GetContrast(Source, Contrast)
         End Function
@@ -7776,18 +7788,6 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_GetTwainHwnd() As System.IntPtr
         Return api.DTWAIN_GetTwainHwnd()
-        End Function
-        
-        Public Function DTWAIN_GetTwainIDFromName(lpszBuffer As String) As Integer
-        Return api.DTWAIN_GetTwainIDFromName(lpszBuffer)
-        End Function
-        
-        Public Function DTWAIN_GetTwainIDFromNameA(lpszBuffer As String) As Integer
-        Return api.DTWAIN_GetTwainIDFromNameA(lpszBuffer)
-        End Function
-        
-        Public Function DTWAIN_GetTwainIDFromNameW(lpszBuffer As String) As Integer
-        Return api.DTWAIN_GetTwainIDFromNameW(lpszBuffer)
         End Function
         
         Public Function DTWAIN_GetTwainLanguageName(nameId As Integer, <MarshalAs(UnmanagedType.LPTStr)> szName As StringBuilder) As Integer
@@ -10162,6 +10162,9 @@ Namespace Dynarithmic
             Public DTWAIN_GetConditionCodeString As DTWAIN_GetConditionCodeStringDelegate
             Public DTWAIN_GetConditionCodeStringA As DTWAIN_GetConditionCodeStringADelegate
             Public DTWAIN_GetConditionCodeStringW As DTWAIN_GetConditionCodeStringWDelegate
+            Public DTWAIN_GetConstantFromTwainName As DTWAIN_GetConstantFromTwainNameDelegate
+            Public DTWAIN_GetConstantFromTwainNameA As DTWAIN_GetConstantFromTwainNameADelegate
+            Public DTWAIN_GetConstantFromTwainNameW As DTWAIN_GetConstantFromTwainNameWDelegate
             Public DTWAIN_GetContrast As DTWAIN_GetContrastDelegate
             Public DTWAIN_GetContrastString As DTWAIN_GetContrastStringDelegate
             Public DTWAIN_GetContrastStringA As DTWAIN_GetContrastStringADelegate
@@ -10378,9 +10381,6 @@ Namespace Dynarithmic
             Public DTWAIN_GetTwainCountryValueA As DTWAIN_GetTwainCountryValueADelegate
             Public DTWAIN_GetTwainCountryValueW As DTWAIN_GetTwainCountryValueWDelegate
             Public DTWAIN_GetTwainHwnd As DTWAIN_GetTwainHwndDelegate
-            Public DTWAIN_GetTwainIDFromName As DTWAIN_GetTwainIDFromNameDelegate
-            Public DTWAIN_GetTwainIDFromNameA As DTWAIN_GetTwainIDFromNameADelegate
-            Public DTWAIN_GetTwainIDFromNameW As DTWAIN_GetTwainIDFromNameWDelegate
             Public DTWAIN_GetTwainLanguageName As DTWAIN_GetTwainLanguageNameDelegate
             Public DTWAIN_GetTwainLanguageNameA As DTWAIN_GetTwainLanguageNameADelegate
             Public DTWAIN_GetTwainLanguageNameW As DTWAIN_GetTwainLanguageNameWDelegate
