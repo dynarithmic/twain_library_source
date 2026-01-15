@@ -1456,7 +1456,7 @@ void SetTestSelection(HWND hWnd, TCHAR* getType, int capValue)
     SendMessage(hWndGetTypes, CB_SETCURSEL, nPos, 0);
 
     /* Get the equivalent MSG_GET type matching the one passed in */
-    LONG nID = DTWAIN_GetTwainIDFromName(getType);
+    LONG nID = DTWAIN_GetConstantFromTwainName(getType);
 
     /* Choose the best container type for the capability */
     LONG bestContainer = DTWAIN_GetCapContainer(g_CurrentSource, capValue, nID);
@@ -1492,7 +1492,7 @@ void TestCap(HWND hWnd, LONG capValue)
     TCHAR szGetType[100];
     LRESULT nCurSel = SendMessage(hWndGetTypes, CB_GETCURSEL, 0, 0);
     SendMessage(hWndGetTypes, CB_GETLBTEXT, nCurSel, (LPARAM)szGetType);
-    LONG nGetType = DTWAIN_GetTwainIDFromName(szGetType);
+    LONG nGetType = DTWAIN_GetConstantFromTwainName(szGetType);
 
     /* Get the container type */
     nCurSel = SendMessage(hWndContainerTypes, CB_GETCURSEL, 0, 0);
@@ -1502,7 +1502,7 @@ void TestCap(HWND hWnd, LONG capValue)
     TCHAR szDataType[100];
     nCurSel = SendMessage(hWndDataTypes, CB_GETCURSEL, 0, 0);
     SendMessage(hWndDataTypes, CB_GETLBTEXT, nCurSel, (LPARAM)szDataType);
-    LONG nDataType = DTWAIN_GetTwainIDFromName(szDataType);
+    LONG nDataType = DTWAIN_GetConstantFromTwainName(szDataType);
 
     /* Get the translation (if it exists) for the cap return values */
     LONG nTranslationID = -1;
