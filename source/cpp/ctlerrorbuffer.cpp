@@ -26,6 +26,7 @@
 #include "ctliface.h"
 #include "arrayfactory.h"
 #include "ctltwainmanager.h"
+#include <errorcheck.h>
 using namespace dynarithmic;
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetErrorBuffer(LPDTWAIN_ARRAY ArrayBuffer)
@@ -33,16 +34,19 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetErrorBuffer(LPDTWAIN_ARRAY ArrayBuffer)
     LOG_FUNC_ENTRY_PARAMS((ArrayBuffer))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
 
+	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !ArrayBuffer; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+
     const size_t nEntries = (std::min)(static_cast<size_t>(pHandle->m_nErrorBufferThreshold), pHandle->m_vErrorBuffer.size());
-    const DTWAIN_ARRAY A = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(nEntries));
-    if ( A )
-    {
-        auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(A);
-        std::copy_n(pHandle->m_vErrorBuffer.begin(), nEntries, vIn.begin());
-        *ArrayBuffer = A;
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    }
-    LOG_FUNC_EXIT_NONAME_PARAMS(false)
+	auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(nEntries));
+	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+
+	auto theArray =  retVal.second;
+	DTWAINArrayLowLevelPtr_RAII raii(pHandle, &theArray);
+
+    auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(theArray);
+    std::copy_n(pHandle->m_vErrorBuffer.begin(), nEntries, vIn.begin());
+    MoveArray(pHandle, ArrayBuffer, &theArray);
+    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 

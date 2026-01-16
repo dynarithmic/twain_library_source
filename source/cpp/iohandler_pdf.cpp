@@ -497,7 +497,7 @@ int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, std::string& sT
         sFileToUse = std::move(szTempPath);
     }
     // Just OCR the text here
-    DTWAIN_ARRAY aValues = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 1);
+    DTWAIN_ARRAY aValues = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 1).second;
     if ( aValues )
     {
         DTWAINArrayLowLevel_RAII a(pHandle, aValues);

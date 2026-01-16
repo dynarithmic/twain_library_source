@@ -96,12 +96,18 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetImageInfo(DTWAIN_SOURCE Source,
 
     if (BitsPerSample)
     {
-        const DTWAIN_ARRAY Array = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 8);
-        auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
-        TW_INT16* pStart = &pInfo->BitsPerSample[0];
-        TW_INT16* pEnd = &pInfo->BitsPerSample[8];
-        std::copy(pStart, pEnd, vValues.begin());
-        *BitsPerSample = Array;
+        auto retValue = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 8);
+        if (retValue.second)
+        {
+            auto Array = retValue.second;
+            auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
+            TW_INT16* pStart = &pInfo->BitsPerSample[0];
+            TW_INT16* pEnd = &pInfo->BitsPerSample[8];
+            std::copy(pStart, pEnd, vValues.begin());
+            MoveArray(pHandle, BitsPerSample, &Array);
+        }
+        else
+            *BitsPerSample = nullptr;
     }
 
     if (Planar)

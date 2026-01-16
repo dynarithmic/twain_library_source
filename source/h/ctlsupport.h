@@ -35,23 +35,22 @@ namespace dynarithmic
             return false;
         if (getAnySupport)
             return true;
-        DTWAIN_ARRAY Array = 0;
+        DTWAIN_ARRAY Array = {};
         auto pSource = static_cast<CTL_ITwainSource*>(Source);
         auto pHandle = pSource->GetDTWAINHandle();
         if (GetCapValuesEx2_Internal(pSource, Cap, DTWAIN_CAPGET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array))
         {
             DTWAINArrayLowLevel_RAII raii(pHandle, Array);
-            DTWAIN_ARRAY tempArray = 0;
-            DTWAIN_ARRAY arrayToUse = Array;
-            DTWAINArrayLowLevel_RAII raii2(pHandle, nullptr); 
             if (GetCapContainer(pSource, Cap, DTWAIN_CAPGET) == DTWAIN_CONTRANGE)
             {
+				DTWAIN_ARRAY tempArray = {};
+                DTWAINArrayLowLevelPtr_RAII raii2(pHandle, &tempArray);
                 // expand range if we find that the underlying values are in a range
                 try
                 {
+                    // Expand and move the values into Array
                     DTWAIN_RangeExpand(Array, &tempArray);
-                    raii2.SetArray(tempArray);
-                    arrayToUse = tempArray;
+                    MoveArray(pHandle, &Array, &tempArray);
                 }
                 catch(...)
                 {
@@ -59,7 +58,7 @@ namespace dynarithmic
                 }
             }
             // get underlying vector and search it for the value
-            auto& vData = pHandle->m_ArrayFactory->underlying_container_t<T>(arrayToUse);
+            auto& vData = pHandle->m_ArrayFactory->underlying_container_t<T>(Array);
             return std::find(vData.begin(), vData.end(), SupportVal) != vData.end();
         }
         return false;
@@ -73,7 +72,7 @@ namespace dynarithmic
         {
             auto pSource = static_cast<CTL_ITwainSource*>(Source);
             const auto pHandle = pSource->GetDTWAINHandle();
-            DTWAIN_ARRAY Array = CreateArrayFromCap(pHandle, pSource, Cap, 1);
+            DTWAIN_ARRAY Array = CreateArrayFromCap(pHandle, pSource, Cap, 1).second;
             if (!Array)
                 return false;
             DTWAINArrayLowLevel_RAII a(pHandle, Array);
@@ -88,10 +87,10 @@ namespace dynarithmic
                 LONG nContainer = GetCapContainer(pSource, Cap, DTWAIN_CAPGET);
                 if (nContainer == DTWAIN_CONTRANGE)
                 {
-                    DTWAIN_ARRAY Array2 = 0;
+                    DTWAIN_ARRAY Array2 = {};
                     DTWAIN_BOOL bRet = GetCapValuesEx2_Internal(pSource, Cap, DTWAIN_CAPGET, 
                                                  DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array2);
-                    DTWAINArrayLowLevel_RAII a2(pHandle, Array2);
+                    DTWAINArrayLowLevelPtr_RAII a2(pHandle, &Array2);
                     if (bRet)
                     {
                         LONG nSize = static_cast<LONG>(pHandle->m_ArrayFactory->size(Array2));
@@ -117,9 +116,9 @@ namespace dynarithmic
             pHandle->m_lLastError = DTWAIN_ERR_INVALID_PARAM;
             return -1;
         }
-        DTWAIN_ARRAY Array = 0;
+        DTWAIN_ARRAY Array = {};
         BOOL isSupported = GetCapValuesEx2_Internal(pSource, Cap, CapOp, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array);
-        DTWAINArrayLowLevel_RAII raii(pHandle, Array);
+        DTWAINArrayLowLevelPtr_RAII raii(pHandle, &Array);
         if ( isSupported )
         {
             // get underlying vector and search it for the value

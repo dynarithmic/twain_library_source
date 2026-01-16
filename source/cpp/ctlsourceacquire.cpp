@@ -393,7 +393,14 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
     pSource->SetShutdownAcquire(false);
     pSource->SetLastAcquireError(0);
     pSource->ResetAcquisitionAttempts(nullptr);
-    DTWAIN_ARRAY aAcquisitionArray = CreateArrayFromFactory(pDLLHandle, DTWAIN_ARRAYOFHANDLEARRAYS, 0);
+
+	auto retVal = CreateArrayFromFactory(pDLLHandle, DTWAIN_ARRAYOFHANDLEARRAYS, 0);
+    if (!retVal.second)
+    {
+        opts.setStatus(retVal.first);
+        return nullptr;
+    }
+    auto aAcquisitionArray = retVal.second;
     DTWAINArrayLowLevel_RAII aAcq(pDLLHandle, aAcquisitionArray);
 
     pSource->m_pUserPtr = nullptr;
@@ -403,7 +410,7 @@ DTWAIN_ARRAY dynarithmic::SourceAcquireWorkerThread(SourceAcquireOptions& opts)
 
     if (pDLLHandle->m_lAcquireMode == DTWAIN_MODELESS)
     {
-        Array = CreateArrayFromFactory(pDLLHandle, DTWAIN_ARRAYHANDLE, 0);
+        Array = CreateArrayFromFactory(pDLLHandle, DTWAIN_ARRAYHANDLE, 0).second;
         a1.SetArray(Array);
         if (!Array)
         {
@@ -677,12 +684,9 @@ DTWAIN_ACQUIRE  dynarithmic::LLAcquireImage(SourceAcquireOptions& opts)
                 // Allocate for array
                 auto pArray = static_cast<DTWAIN_ARRAY>(pSource->GetFileEnumerator());
                 if (!pArray)
-                    pArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, 0);
-                if (!pArray)
-                {
-                    // Check if array exists
-                    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !pArray; }, DTWAIN_ERR_BAD_ARRAY, -1, FUNC_MACRO);
-                }
+                    pArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, 0).second;
+                // Check if array exists
+                DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !pArray; }, DTWAIN_ERR_BAD_ARRAY, -1, FUNC_MACRO);
 
                 // Parse the filename string into the array
                 ParseFileNames(pHandle, opts.getFileList(), opts.getFileName(), pArray);

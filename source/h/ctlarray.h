@@ -56,26 +56,30 @@ namespace dynarithmic
         LONG nSize = static_cast<LONG>(theContainer.size());
         if constexpr (std::is_integral_v<typename Container::value_type>)
         {
-            theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, nSize);
-            CopyContainer<Container, LONG>(pHandle, theContainer, theArray);
+            theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, nSize).second;
+            if ( theArray )
+                CopyContainer<Container, LONG>(pHandle, theContainer, theArray);
         }
         else
         if constexpr (std::is_floating_point_v<typename Container::value_type>)
         {
-            theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYFLOAT, nSize);
-            CopyContainer<Container, double>(pHandle, theContainer, theArray);
+            theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYFLOAT, nSize).second;
+            if ( theArray )
+                CopyContainer<Container, double>(pHandle, theContainer, theArray);
         }
         else
         if constexpr (std::is_same_v<typename Container::value_type, std::string>)
         {
-            theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYANSISTRING, nSize);
-            CopyContainer<Container, std::string>(pHandle, theContainer, theArray);
+            theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYANSISTRING, nSize).second;
+            if ( theArray )
+                CopyContainer<Container, std::string>(pHandle, theContainer, theArray);
         }
         else 
         if constexpr (std::is_same_v<typename Container::value_type, TwainFrameInternal>)
         {
-            theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYFRAME, nSize);
-            CopyContainer<Container, TwainFrameInternal>(pHandle, theContainer, theArray);
+            theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYFRAME, nSize).second;
+            if ( theArray )
+                CopyContainer<Container, TwainFrameInternal>(pHandle, theContainer, theArray);
         }
         return theArray;
     }

@@ -176,7 +176,10 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireBuffered(SourceAcquireOptions& opts)
     if (pSource->IsTileModeOn())
     {
         // Set the ICAP_TILES capability on here
-        DTWAIN_ARRAY arr = dynarithmic::CreateArrayFromCap(pHandle, pSource, ICAP_TILES, 1);
+        auto retValue = dynarithmic::CreateArrayFromCap(pHandle, pSource, ICAP_TILES, 1);
+		DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !retValue.second; }, retValue.first, -1, FUNC_MACRO);
+        auto arr = retValue.second;
+        DTWAINArrayLowLevelPtr_RAII raii(pHandle, &arr);
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
         vValues[0] = 1;
         bool bTilesSet = SetCapValuesEx2_Internal(pSource, ICAP_TILES, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);

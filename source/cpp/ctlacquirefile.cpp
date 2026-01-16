@@ -55,8 +55,14 @@ static int CheckValidNames(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY aFileNames,
     {
         if (!CheckForAnyBlankNames<StringArrayType, StringWrapperType>(vect))
         {
-            *tempNames = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, 0);
-            fn(pHandle, aFileNames, *tempNames);
+			auto retVal = dynarithmic::CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, 0);
+            if (!retVal.second)
+                bRetval = retVal.first;
+            else
+            {
+                *tempNames = retVal.second;
+                fn(pHandle, aFileNames, *tempNames);
+            }
         }
         else
             bRetval = DTWAIN_ERR_BLANKNAMEDETECTED;

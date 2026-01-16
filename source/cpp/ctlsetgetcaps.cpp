@@ -103,11 +103,11 @@ static DTWAIN_ARRAY PerformGetCap(CTL_ITwainSource* pSource,
     if (overrideDataType == 0xFFFF)
     {
         const LONG nArrayType = GetArrayTypeFromCapType(static_cast<TW_UINT16>(nDataType));
-        ThisArray = CreateArrayFromFactory(pHandle, nArrayType, 0);
+        ThisArray = CreateArrayFromFactory(pHandle, nArrayType, 0).second;
         overrideDataType = nDataType;
     }
     else
-        ThisArray = CreateArrayFromCap(pHandle, pSource, lCap, 0);
+        ThisArray = CreateArrayFromCap(pHandle, pSource, lCap, 0).second;
 
     if (!ThisArray)
         return nullptr;
@@ -290,8 +290,7 @@ bool GetCapValuesEx_Internal( CTL_ITwainSource* pSource, TW_UINT16 lCap, LONG lG
 
     const auto pHandle = pSource->GetDTWAINHandle();
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return pArray == nullptr; },
-                                      DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return pArray == nullptr; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     // We clear the user array here, since we do not want to 
     // report information back to user if capability is not supported

@@ -289,6 +289,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCamerasEx(DTWAIN_SOURCE Source, LONG nWhichC
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nWhichCamera, Cameras))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !Cameras; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     int fsSupported = CheckFileSystemSupport(pSource);
     DTWAIN_Check_Error_Condition_1_Ex(pSource->GetDTWAINHandle(), [&] {return fsSupported != DTWAIN_NO_ERROR; },
                                       fsSupported, false, FUNC_MACRO);
@@ -358,12 +359,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCamera(DTWAIN_SOURCE Source, LPCTSTR szCamera
 bool FSGetCameras(CTL_ITwainSource *pSource, LPDTWAIN_ARRAY Cameras, TW_UINT16 CameraType )
 {
     LOG_FUNC_ENTRY_PARAMS((pSource, Cameras, CameraType))
-    const DTWAIN_ARRAY aCameras = CreateArrayFromFactory(pSource->GetDTWAINHandle(), DTWAIN_ARRAYANSISTRING, 0);
+    DTWAIN_ARRAY aCameras = CreateArrayFromFactory(pSource->GetDTWAINHandle(), DTWAIN_ARRAYANSISTRING, 0).second;
+    if (!aCameras)
+        return false;
+    DTWAINArrayLowLevelPtr_RAII raii(pSource->GetDTWAINHandle(), &aCameras);
     CameraStruct CS{};
     CS.aCameras = aCameras;
     CS.CameraType = CameraType;
     WalkFileSystem(EnumCameraProc, pSource, _T("/"), reinterpret_cast<LPARAM>(&CS));
-    *Cameras = CS.aCameras;
+    MoveArray(pSource->GetDTWAINHandle(), Cameras, &aCameras);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }

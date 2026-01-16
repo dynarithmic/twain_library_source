@@ -77,6 +77,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea(DTWAIN_SOURCE Source, LONG lGetTy
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lGetType, FloatArray))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !FloatArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     const DTWAIN_BOOL bRet = GetImageSize(pHandle, Source, FloatArray, static_cast<TW_UINT16>(lGetType));
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK_LOG_PARAMS(false)
@@ -152,30 +153,25 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireArea2(DTWAIN_SOURCE Source, LPDTWAIN_F
 static bool GetImageSize(CTL_TwainDLLHandle* pHandle, DTWAIN_SOURCE Source, LPDTWAIN_ARRAY FloatArray, TW_UINT16 GetType)
 {
     CTL_ITwainSource* p = static_cast<CTL_ITwainSource*>(Source);
-    DTWAIN_ARRAY FloatArrayOut = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYFLOAT, 4);
+    DTWAIN_ARRAY FloatArrayOut = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYFLOAT, 4).second;
     if (!FloatArrayOut)
         return false;
-    DTWAINArrayLowLevel_RAII aFloat(pHandle, FloatArrayOut);
+    DTWAINArrayLowLevelPtr_RAII aFloat(pHandle, &FloatArrayOut);
     CTL_RealArray Array;
     if (GetType == MSG_GETCURRENT)
         GetType = MSG_GET;
 
     const bool bOk = CTL_TwainAppMgr::GetImageLayoutSize(p, Array, GetType);
     if (!bOk)
+    {
+        MoveArray(pHandle, FloatArray, &FloatArrayOut);
         return false;
+    }
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<double>(FloatArrayOut);
     std::copy(Array.begin(), Array.end(), vValues.begin());
-    const DTWAIN_ARRAY temp = CreateArrayCopyFromFactory(pHandle, FloatArrayOut);
-    if  (pHandle->m_ArrayFactory->is_valid(static_cast<void*>(FloatArray)))
-        pHandle->m_ArrayFactory->destroy(static_cast<void*>(FloatArray));
-    if (temp)
-    {
-        *FloatArray = temp;
-        return true;
-    }
-    return false;
+    MoveArray(pHandle, FloatArray, &FloatArrayOut);
+    return true;
 }
-
 
 static bool FillActualArray(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY ActualArray, const std::vector<double>& vValues)
 {

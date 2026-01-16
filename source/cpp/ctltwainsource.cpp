@@ -1227,10 +1227,13 @@ template <typename T>
 static DTWAIN_ARRAY PopulateArray(const std::vector<anytype_>& dataArray, CTL_ITwainSource* pSource, TW_UINT16 nCap)
 {
     const auto pHandle = pSource->GetDTWAINHandle();
-    const DTWAIN_ARRAY theArray = CreateArrayFromCap(pHandle, pSource, static_cast<LONG>(nCap), static_cast<LONG>(dataArray.size()));
-    auto& vVector = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
-    std::transform(dataArray.begin(), dataArray.end(), vVector.begin(), [](anytype_ theAny) 
-                    { return ANYTYPE_NAMESPACE any_cast<typename T::value_type>(theAny);});
+    const DTWAIN_ARRAY theArray = CreateArrayFromCap(pHandle, pSource, static_cast<LONG>(nCap), static_cast<LONG>(dataArray.size())).second;
+    if (theArray)
+    {
+        auto& vVector = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
+        std::transform(dataArray.begin(), dataArray.end(), vVector.begin(), [](anytype_ theAny)
+                       { return ANYTYPE_NAMESPACE any_cast<typename T::value_type>(theAny); });
+    }
     return theArray;
 }
 
