@@ -666,6 +666,7 @@ namespace TWAINDemo
             AcquireNative.Enabled = bEnable;
             AcquireBuffered.Enabled = bEnable;
             AcquireFile.Enabled = bEnable;
+            AcquireFileUsingDevice.Enabled = bEnable;
         }
         private void EnableBarcodeItems(bool bEnable)
         {
