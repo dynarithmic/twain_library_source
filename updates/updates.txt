@@ -35,6 +35,11 @@ DTWAIN Version changes
   will not close the source.  Instead, a return value of FALSE will be
   given, and the last error code is set to DTWAIN_ERR_SOURCE_ACQUIRING.
 
+- The C# full demo project has been updated to include features that
+  exist in the DTWDEMO32/64 program.  This includes the testing of
+  any TWAIN capability using MSG_GET, MSG_GETCURRENT, and MSG_GETDEFAULT
+  options.
+
 
 5.7.2
 
