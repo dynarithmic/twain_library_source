@@ -88,22 +88,32 @@ namespace TWAINDemo
             {
                 case TwainAPI.DTWAIN_TN_ACQUIRESTARTED:
                     pdf_page_count = 1;
-                break;
+                    break;
 
                 // If this is a PDF file this code will put a page stamp on this page 
                 case TwainAPI.DTWAIN_TN_FILEPAGESAVING:
                     string text = "Page " + pdf_page_count;
                     ++pdf_page_count;
                     TwainAPI.DTWAIN_SetPDFTextElementString(textElement, text, TwainAPI.DTWAIN_PDFTEXTELEMENT_TEXT);
-                break;
+                    break;
 
                 case TwainAPI.DTWAIN_TN_QUERYPAGEDISCARD:
                     if (ShowPreview.Checked)
                     {
                         DIBDisplayerDlg2 sDIBDlg = new DIBDisplayerDlg2(TwainAPI.DTWAIN_GetCurrentAcquiredImage(SelectedSource));
-                        if (sDIBDlg.ShowDialog() == DialogResult.Cancel)
+                        if (sDIBDlg.ShowDialog(this) == DialogResult.Cancel)
                             return 0;
                     }
+                    break;
+
+                case TwainAPI.DTWAIN_TN_TRANSFERDONE:
+                {
+                    if (ShowBarcodeInfo.Checked)
+                    {
+                        BarCodesDlg sBarcodeDlg = new BarCodesDlg(SelectedSource);
+                        sBarcodeDlg.ShowDialog(this);
+                    }
+                }
                 break;
             }
             return 1;
@@ -591,7 +601,7 @@ namespace TWAINDemo
 
                 case 1:
                     SelectSourceByNameBox objSelectSourceByName = new SelectSourceByNameBox();
-                    DialogResult nResult = objSelectSourceByName.ShowDialog();
+                    DialogResult nResult = objSelectSourceByName.ShowDialog(this);
                     if (nResult == DialogResult.OK)
                     {
                         SelectedSource = TwainAPI.DTWAIN_SelectSourceByName(objSelectSourceByName.GetText());
@@ -604,7 +614,7 @@ namespace TWAINDemo
 
                 case 3:
                     CustomSelectSource customSourceDlg = new CustomSelectSource();
-                    DialogResult dResult = customSourceDlg.ShowDialog();
+                    DialogResult dResult = customSourceDlg.ShowDialog(this);
                     if (dResult == DialogResult.OK)
                         SelectedSource = TwainAPI.DTWAIN_SelectSourceByName(customSourceDlg.GetSourceName());
                 break;
@@ -656,10 +666,15 @@ namespace TWAINDemo
 
         private void EnableBarcodeItems(bool bEnable)
         {
-            if (bEnable && TwainAPI.DTWAIN_IsExtImageInfoSupported(SelectedSource) == 1)
+            int supported = TwainAPI.DTWAIN_IsExtImageInfoSupported(SelectedSource);
+            if (bEnable && supported == 1)
                 ShowBarcodeInfo.Enabled = true;
             else
+            {
                 ShowBarcodeInfo.Enabled = false;
+                if (supported == 0)
+                    ShowBarcodeInfo.Checked = false;
+            }
         }
 
         private void SetCaptionToSourceName()
@@ -682,7 +697,7 @@ namespace TWAINDemo
             if (SelectedSource != IntPtr.Zero)
             {
                 SourcePropsDlg sPropDlg = new SourcePropsDlg(SelectedSource);
-                sPropDlg.ShowDialog();
+                sPropDlg.ShowDialog(this);
             }
         }
 
@@ -745,7 +760,7 @@ namespace TWAINDemo
                 // Display the DIBS
                 //...
                 DIBDisplayerDlg sDIBDlg = new DIBDisplayerDlg(acquireArray);
-                sDIBDlg.ShowDialog();
+                sDIBDlg.ShowDialog(this);
                 this.Enabled = true;
             }
         }
@@ -786,7 +801,7 @@ namespace TWAINDemo
                                                               (int)TwainAPI.DTWAIN_BP_AUTODISCARD_ANY,
                                                               DiscardBlankPages.Checked ? 1 : 0);
                         FileTypeDlg fDlg = new FileTypeDlg();
-                        fDlg.ShowDialog();
+                        fDlg.ShowDialog(this);
                         tFileName = fDlg.GetFileName();
                         StringBuilder szSourceName = new StringBuilder(tFileName);
                         fileType = fDlg.GetFileType();
@@ -865,7 +880,7 @@ namespace TWAINDemo
         {
             uint LogFlags = TwainAPI.DTWAIN_LOG_ALL & ~(TwainAPI.DTWAIN_LOG_ISTWAINMSG | TwainAPI.DTWAIN_LOG_USEFILE | TwainAPI.DTWAIN_LOG_DEBUGMONITOR | TwainAPI.DTWAIN_LOG_CONSOLE);
             LogFileSelectionDlg logDlg = new LogFileSelectionDlg();
-            DialogResult nResult = logDlg.ShowDialog();
+            DialogResult nResult = logDlg.ShowDialog(this);
             if (nResult == DialogResult.OK)
             {
                 int debugOption = logDlg.GetDebugOption();
@@ -896,7 +911,7 @@ namespace TWAINDemo
         private void About_Click(object sender, EventArgs e)
         {
             AboutDlg aDlg = new AboutDlg();
-            aDlg.ShowDialog();
+            aDlg.ShowDialog(this);
         }
 
         private void idlang_dutch_Click(object sender, EventArgs e)
@@ -952,7 +967,7 @@ namespace TWAINDemo
         private void idlang_custom_Click(object sender, EventArgs e)
         {
             CustomLanguageDlg objCustomLanguage = new CustomLanguageDlg();
-            DialogResult nResult = objCustomLanguage.ShowDialog();
+            DialogResult nResult = objCustomLanguage.ShowDialog(this);
             if (nResult == DialogResult.OK)
             {
                 load_language(objCustomLanguage.GetText());

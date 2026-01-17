@@ -59,6 +59,7 @@ namespace TWAINDemo
             this.textBox5 = new System.Windows.Forms.TextBox();
             this.textBox6 = new System.Windows.Forms.TextBox();
             this.textBox7 = new System.Windows.Forms.TextBox();
+            this.btnTestCap = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.GroupBox3.SuspendLayout();
@@ -181,6 +182,7 @@ namespace TWAINDemo
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.btnTestCap);
             this.groupBox2.Controls.Add(this.label8);
             this.groupBox2.Controls.Add(this.label7);
             this.groupBox2.Controls.Add(this.label6);
@@ -277,12 +279,12 @@ namespace TWAINDemo
             // 
             // txtDSData
             // 
-            this.txtDSData.Location = new System.Drawing.Point(7, 11);
+            this.txtDSData.Location = new System.Drawing.Point(7, 19);
             this.txtDSData.Multiline = true;
             this.txtDSData.Name = "txtDSData";
             this.txtDSData.ReadOnly = true;
             this.txtDSData.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtDSData.Size = new System.Drawing.Size(304, 387);
+            this.txtDSData.Size = new System.Drawing.Size(304, 382);
             this.txtDSData.TabIndex = 2;
             // 
             // TextBox1
@@ -340,12 +342,12 @@ namespace TWAINDemo
             // 
             // txtJSON
             // 
-            this.txtJSON.Location = new System.Drawing.Point(7, 11);
+            this.txtJSON.Location = new System.Drawing.Point(7, 19);
             this.txtJSON.Multiline = true;
             this.txtJSON.Name = "txtJSON";
             this.txtJSON.ReadOnly = true;
             this.txtJSON.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtJSON.Size = new System.Drawing.Size(304, 387);
+            this.txtJSON.Size = new System.Drawing.Size(304, 379);
             this.txtJSON.TabIndex = 2;
             // 
             // textBox5
@@ -377,6 +379,16 @@ namespace TWAINDemo
             this.textBox7.Size = new System.Drawing.Size(42, 13);
             this.textBox7.TabIndex = 1;
             this.textBox7.TabStop = false;
+            // 
+            // btnTestCap
+            // 
+            this.btnTestCap.Location = new System.Drawing.Point(246, 152);
+            this.btnTestCap.Name = "btnTestCap";
+            this.btnTestCap.Size = new System.Drawing.Size(128, 23);
+            this.btnTestCap.TabIndex = 2;
+            this.btnTestCap.Text = "Test Capability (Get)...";
+            this.btnTestCap.UseVisualStyleBackColor = true;
+            this.btnTestCap.Click += new System.EventHandler(this.btnTestCap_Click);
             // 
             // SourcePropsDlg
             // 
@@ -435,5 +447,6 @@ namespace TWAINDemo
         private System.Windows.Forms.TextBox textBox5;
         private System.Windows.Forms.TextBox textBox6;
         private System.Windows.Forms.TextBox textBox7;
+        private System.Windows.Forms.Button btnTestCap;
     }
 }

@@ -55,6 +55,7 @@ namespace TWAINDemo
                 this.listCaps.Items.Add(szInfo.ToString());
             }
 
+            this.listCaps.SetSelected(0, true);
             this.edTotalCaps.Text = nSize.ToString();
             DTwainDemo.TwainAPI.DTWAIN_EnumCustomCaps(m_Source, ref AllCaps);
             this.edCustomCaps.Text = DTwainDemo.TwainAPI.DTWAIN_ArrayGetCount(AllCaps).ToString();
@@ -76,6 +77,12 @@ namespace TWAINDemo
 
             // Need to convert the JSON new lines to \r\n for edit controls
             this.txtJSON.Text = szInfo.ToString().Replace("\n", "\r\n");
+            DTwainDemo.TwainAPI.DTWAIN_ArrayDestroy(AllCaps);
+        }
+        private void btnTestCap_Click(object sender, EventArgs e)
+        {
+            TestCapDlg sTestCapDlg = new TestCapDlg(m_Source, this.listCaps.SelectedItem.ToString());
+            sTestCapDlg.ShowDialog(this);
         }
     }
 }
