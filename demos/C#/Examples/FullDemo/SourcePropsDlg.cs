@@ -76,6 +76,8 @@ namespace TWAINDemo
 
             // Need to convert the JSON new lines to \r\n for edit controls
             this.txtJSON.Text = szInfo.ToString().Replace("\n", "\r\n");
+
+            TwainAPI.DTWAIN_ArrayDestroy(AllCaps);
         }
     }
 }

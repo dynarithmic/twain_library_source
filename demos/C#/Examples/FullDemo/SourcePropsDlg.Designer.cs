@@ -277,12 +277,12 @@ namespace TWAINDemo
             // 
             // txtDSData
             // 
-            this.txtDSData.Location = new System.Drawing.Point(7, 11);
+            this.txtDSData.Location = new System.Drawing.Point(7, 19);
             this.txtDSData.Multiline = true;
             this.txtDSData.Name = "txtDSData";
             this.txtDSData.ReadOnly = true;
             this.txtDSData.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtDSData.Size = new System.Drawing.Size(304, 387);
+            this.txtDSData.Size = new System.Drawing.Size(304, 382);
             this.txtDSData.TabIndex = 2;
             // 
             // TextBox1
@@ -340,12 +340,12 @@ namespace TWAINDemo
             // 
             // txtJSON
             // 
-            this.txtJSON.Location = new System.Drawing.Point(7, 11);
+            this.txtJSON.Location = new System.Drawing.Point(7, 19);
             this.txtJSON.Multiline = true;
             this.txtJSON.Name = "txtJSON";
             this.txtJSON.ReadOnly = true;
             this.txtJSON.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtJSON.Size = new System.Drawing.Size(304, 387);
+            this.txtJSON.Size = new System.Drawing.Size(304, 379);
             this.txtJSON.TabIndex = 2;
             // 
             // textBox5
