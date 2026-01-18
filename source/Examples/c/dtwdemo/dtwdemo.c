@@ -9,9 +9,9 @@
 #include "dtwain.h"
 #include <ctype.h>
 #include "dibdisplay.h"
-#include <io.h>
 #include <tchar.h>
 #include <stdio.h>
+#include "SourceProperties.h"
 #define MAX_LOADSTRING 100
 
 // Global Variables:
@@ -59,10 +59,6 @@ void DisplayLoggingOptions();
 void LoadLanguage(int message);
 void LoadLanguageStrings(LPCTSTR szLang);
 void DisplayCustomLangDlg();
-void DisplayTestCapDlg(HWND parent, const char *szName);
-LONG InitTestControls(HWND hWnd, const char* szName);
-void SetTestSelection(HWND hWnd, TCHAR* getType, int capValue);
-void TestCap(HWND hWnd, LONG capValue);
 
 LRESULT CALLBACK EnterCustomLangNameProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -79,8 +75,6 @@ LRESULT CALLBACK TwainCallbackProc(WPARAM wParam, LPARAM lParam, LONG_PTR UserDa
 LRESULT CALLBACK EnterSourceNameProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK DisplayCustomSelectProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK DisplayBarCodeInfoProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
-LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
-//LRESULT CALLBACK DisplayDIBProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK DisplayAcquireSettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK DisplayFileTypesProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK DisplayLoggingProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
@@ -183,13 +177,6 @@ UINT g_AllMenuItems[] = { IDM_SELECT_SOURCE,
 
 TCHAR g_CustomLanguage[256];
 
-TCHAR* g_AllContainerTypes[] = { _T("TW_ARRAY"), _T("TW_ENUMERATION"), _T("TW_ONEVALUE"), _T("TW_RANGE") };
-LONG g_AllContainerTypesID[] = { DTWAIN_CONTARRAY, DTWAIN_CONTENUMERATION, DTWAIN_CONTONEVALUE, DTWAIN_CONTRANGE };
-TCHAR* g_AllGetTypes[] = { _T("MSG_GET"), _T("MSG_GETCURRENT"), _T("MSG_GETDEFAULT") };
-TCHAR* g_AllDataTypes[] = { _T("TWTY_INT8"), _T("TWTY_INT16"), _T("TWTY_INT32"), _T("TWTY_UINT8"),_T("TWTY_UINT16"),
-                            _T("TWTY_UINT32"), _T("TWTY_BOOL"), _T("TWTY_FIX32"), _T("TWTY_FRAME"), _T("TWTY_STR32"),
-                            _T("TWTY_STR64"), _T("TWTY_STR128"), _T("TWTY_STR255"), _T("TWTY_STR1024"), _T("TWTY_UNI512"),
-                            _T("TWTY_HANDLE") };
 
 DTWAIN_PDFTEXTELEMENT g_PDFTextElement;
 
@@ -1197,393 +1184,52 @@ LRESULT CALLBACK DisplayCustomSelectProc(HWND hDlg, UINT message, WPARAM wParam,
     return FALSE;
 }
 
-LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    switch (message)
-    {
-        case WM_INITDIALOG:
-        {
-            TCHAR szBuf[256];
-            char szBufName[256];
-            LONG nMajor, nMinor;
-            DTWAIN_ARRAY CapArray = 0;
-            LONG nCapCount;
-            LONG nIndex;
-            LONG nCapValue;
-            HWND hWndName =     GetDlgItem(hDlg,  IDC_edProductName);
-            HWND hWndFamily =   GetDlgItem(hDlg,  IDC_edFamilyName);
-            HWND hWndManu =     GetDlgItem(hDlg,  IDC_edManufacturer);
-            HWND hWndVerInfo =  GetDlgItem(hDlg,  IDC_edVersionInfo);
-            HWND hWndVersion =  GetDlgItem(hDlg,  IDC_edVersion);
-            HWND hWndCaps    =  GetDlgItem(hDlg,  IDC_lstCapabilities);
-            HWND hWndNumCaps =  GetDlgItem(hDlg,  IDC_edTotalCaps);
-            HWND hWndNumCustomCaps =  GetDlgItem(hDlg,  IDC_edCustomCaps);
-            HWND hWndNumExtendedCaps =  GetDlgItem(hDlg,  IDC_edExtendedCaps);
-            HWND hWndDSData = GetDlgItem(hDlg, IDC_edDSData);
-            HWND hWndJSONDetails = GetDlgItem(hDlg, IDC_edJSONDetails);
-            int maxTextLength = 0;
-            int curStringLength;
-            HDC hdcList = GetDC(hWndCaps);
-            SIZE textSize;
-            DTWAIN_GetSourceProductNameA(g_CurrentSource, szBufName, 255);
-            SetWindowTextA(hWndName, szBufName);
 
-            DTWAIN_GetSourceProductFamily(g_CurrentSource, szBuf, 255);
-            SetWindowText(hWndFamily, szBuf);
 
-            DTWAIN_GetSourceManufacturer(g_CurrentSource, szBuf, 255);
-            SetWindowText(hWndManu, szBuf);
 
-            DTWAIN_GetSourceVersionInfo(g_CurrentSource, szBuf, 255);
-            SetWindowText(hWndVerInfo, szBuf);
 
-            DTWAIN_GetSourceVersionNumber(g_CurrentSource, &nMajor, &nMinor);
-            wsprintf(szBuf, _T("%d.%d"), nMajor, nMinor);
-            SetWindowText(hWndVersion, szBuf);
             
-            DTWAIN_EnumSupportedCaps(g_CurrentSource, &CapArray);
-            nCapCount = DTWAIN_ArrayGetCount( CapArray );
-            for ( nIndex = 0; nIndex < nCapCount; nIndex++ )
-            {
-                DTWAIN_ArrayGetAt( CapArray, nIndex, &nCapValue );
-                DTWAIN_GetNameFromCap( nCapValue, szBuf, 255);
-                SendMessage( hWndCaps, LB_ADDSTRING, 0, (LPARAM)szBuf);
-                curStringLength = lstrlen(szBuf);
-                GetTextExtentPoint32(hdcList, szBuf, curStringLength, &textSize);
-                if (textSize.cx > maxTextLength)
-                    maxTextLength = textSize.cx;
-            }
-            ReleaseDC(hWndCaps, hdcList);
-            SendMessage(hWndCaps, LB_SETHORIZONTALEXTENT, maxTextLength, 0);
-            SendMessage(hWndCaps, LB_SETCURSEL, 0, 0);
-
-            wsprintf(szBuf, _T("%d"), nCapCount);
-            SetWindowText(hWndNumCaps, szBuf);
-
-            DTWAIN_ARRAY testArray;
-            DTWAIN_EnumCustomCaps(g_CurrentSource, &testArray);
-            wsprintf(szBuf, _T("%d"), (int)DTWAIN_ArrayGetCount(testArray));
-            SetWindowText(hWndNumCustomCaps, szBuf);
-            DTWAIN_ArrayDestroy(testArray);
-
-            DTWAIN_EnumExtendedCaps(g_CurrentSource, &CapArray);
-            wsprintf(szBuf, _T("%d"), (int)DTWAIN_ArrayGetCount(CapArray));
-            SetWindowText(hWndNumExtendedCaps, szBuf);
-
-            BYTE* szData = NULL;
-            LONG actualSize;
-            /* First, get the size of the Source's custom DS data */
-            HANDLE h = DTWAIN_GetCustomDSData(g_CurrentSource, NULL, 0, &actualSize, DTWAINGCD_COPYDATA);
-            if ( h )
-            {
-                /* Allocate memory for the data.  We add an extra byte, 
-                   since the data is not guaranteed to be null-terminated */
-                szData = malloc((actualSize + 1) * sizeof(BYTE));
-                if (szData)
-                {
-                    /* Fill the memory with 0 */
-                    memset(szData, 0, actualSize + 1);
-
-                    /* Second call actually gets the data */
-                    DTWAIN_GetCustomDSData(g_CurrentSource, szData, actualSize, &actualSize, DTWAINGCD_COPYDATA);
-                    SetWindowTextA(hWndDSData, szData);
-                    free(szData);
-                }
-            }
-
-            /* Get JSON details of the Source */
-            {
-                LONG numChars = DTWAIN_GetSourceDetailsA(szBufName, NULL, 0, 2, TRUE);
-                if (numChars > 0)
-                {
-                    szData = malloc(numChars + 1);
-                    if (szData)
-                    {
-                        /* Fill the memory with 0 */
-                        memset(szData, 0, numChars + 1);
-                        DTWAIN_GetSourceDetailsA(szBufName, szData, numChars, 2, FALSE);
-
-                        /* Edit controls need \r\n and not \n new lines. */
-                        HANDLE h = DTWAIN_ConvertToAPIStringA(szData);
-                        if (h)
-                        {
-                            LPCSTR pData = GlobalLock(h);
-                            SetWindowTextA(hWndJSONDetails, pData);
-                            GlobalUnlock(h);
-                            GlobalFree(h);
-                        }
-                        free(szData);
-                    }
-                }
-            }
-            DTWAIN_ArrayDestroy( CapArray );
-            return TRUE;
-        }
-
-        case WM_COMMAND:
-        {
-            int nControl = LOWORD(wParam);
-            int nNotification = HIWORD(wParam);
-
-            switch( nControl )
-            {
-                /* Quit the dialog */
-                case IDOK:
-                case IDCANCEL:
-                     EndDialog(hDlg, 1);
-                break;
-                case IDC_btnTestCap:
-                {
-                    char szCap[100];
-                    LRESULT nCurSel = SendMessage(GetDlgItem(hDlg, IDC_lstCapabilities), LB_GETCURSEL, 0, 0);
-                    SendMessageA(GetDlgItem(hDlg, IDC_lstCapabilities), LB_GETTEXT, nCurSel, (LPARAM)szCap);
-                    DisplayTestCapDlg(hDlg, szCap);
-                }
-            }
-        }
-        break;
-    }
-    return FALSE;
-}
 
 
-void DisplayTestCapDlg(HWND parent, const char *szCapName)
-{
-    DialogBoxParam(g_hInstance, (LPCTSTR)IDD_dlgTestCap, parent, (DLGPROC)DisplayTestCapProc, (LPARAM)(szCapName));
-}
 
-LRESULT CALLBACK DisplayTestCapProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    static LONG curCapValue;
-    switch (message)
-    {
-        case WM_INITDIALOG:
-        {
-            const char* szName = (const char*)lParam;
-            char szTitle[256];
-            strcpy(szTitle, "Test Capability (");
-            strcat(szTitle, szName);
-            strcat(szTitle, ")");
-            SetWindowTextA(hDlg, szTitle);
-            curCapValue = InitTestControls(hDlg, szName);
-            return TRUE;
-        }
-        break;
-        case WM_COMMAND:
-        {
-            int nControl = LOWORD(wParam);
-            int nNotification = HIWORD(wParam);
 
-            switch (nControl)
-            {
-                case IDC_cmbGetTypes:
-                {
-                    if (nNotification == CBN_SELCHANGE)
-                    {
-                        TCHAR szGetType[100];
-                        LRESULT nCurSel = SendMessage(GetDlgItem(hDlg, IDC_cmbGetTypes), CB_GETCURSEL, 0, 0);
-                        SendMessage(GetDlgItem(hDlg, IDC_cmbGetTypes), CB_GETLBTEXT, nCurSel, (LPARAM)szGetType);
-                        SetTestSelection(hDlg, szGetType, curCapValue);
-                    }
-                }
-                break;
 
-                case IDC_btnTest:
-                    TestCap(hDlg, curCapValue);
-                break;
 
-                case IDC_btnReset:
-                {
-                    /* Get the Get type*/
-                    TCHAR szGetType[100];
-                    LRESULT nCurSel = SendMessage(GetDlgItem(hDlg, IDC_cmbGetTypes), CB_GETCURSEL, 0, 0);
-                    SendMessage(GetDlgItem(hDlg, IDC_cmbGetTypes), CB_GETLBTEXT, nCurSel, (LPARAM)szGetType);
-                    SetTestSelection(hDlg, szGetType, curCapValue);
-                }
-                break;
 
-                /* Quit the dialog */
-                case IDOK:
-                {
-                    EndDialog(hDlg, 1);
-                }
-                break;
-                case IDCANCEL:
-                    EndDialog(hDlg, LOWORD(wParam));
-                    return TRUE;
-                break;
-            }
-        }
-        break;
-    }
-    return FALSE;
-}
 
-LONG InitTestControls(HWND hWnd, const char* szName)
-{
-    HWND hWndGetTypes = GetDlgItem(hWnd, IDC_cmbGetTypes);
-    HWND hWndContainerTypes = GetDlgItem(hWnd, IDC_cmbContainer);
-    HWND hWndDataTypes = GetDlgItem(hWnd, IDC_cmbDataType);
 
-    LONG capValue = DTWAIN_GetCapFromNameA(szName);
-    if (capValue == -1)
-        return -1;
 
-    int i = 0;
-    int numGetTypes = sizeof(g_AllGetTypes) / sizeof(g_AllGetTypes[0]);
-    for (i = 0; i < numGetTypes; ++i)
-        SendMessage(hWndGetTypes, CB_ADDSTRING, 0, (LPARAM)g_AllGetTypes[i]);
 
-    int numContainerTypes = sizeof(g_AllContainerTypes) / sizeof(g_AllContainerTypes[0]);
-    for (i = 0; i < numContainerTypes; ++i)
-        SendMessage(hWndContainerTypes, CB_ADDSTRING, 0, (LPARAM)g_AllContainerTypes[i]);
 
-    int numDataTypes = sizeof(g_AllDataTypes) / sizeof(g_AllDataTypes[0]);
-    for (i = 0; i < numDataTypes; ++i)
-        SendMessage(hWndDataTypes, CB_ADDSTRING, 0, (LPARAM)g_AllDataTypes[i]);
 
-    SetTestSelection(hWnd, _T("MSG_GET"), capValue);
-    return capValue;
-}
 
-void SetTestSelection(HWND hWnd, TCHAR* getType, int capValue)
-{
-    HWND hWndGetTypes = GetDlgItem(hWnd, IDC_cmbGetTypes);
-    HWND hWndContainerTypes = GetDlgItem(hWnd, IDC_cmbContainer);
-    HWND hWndDataTypes = GetDlgItem(hWnd, IDC_cmbDataType);
 
-    int nPos = ComboBox_FindString(hWndGetTypes, -1, getType);
-    SendMessage(hWndGetTypes, CB_SETCURSEL, nPos, 0);
 
-    /* Get the equivalent MSG_GET type matching the one passed in */
-    LONG nID = DTWAIN_GetConstantFromTwainName(getType);
 
-    /* Choose the best container type for the capability */
-    LONG bestContainer = DTWAIN_GetCapContainer(g_CurrentSource, capValue, nID);
 
-    TCHAR szBestContainer[100];
-    DTWAIN_GetTwainNameFromConstant(DTWAIN_CONSTANT_DTWAIN_CONT, bestContainer, szBestContainer, 100);
 
-    nPos = ComboBox_FindString(hWndContainerTypes, -1, szBestContainer);
-    if (nPos != CB_ERR)
-        SendMessage(hWndContainerTypes, CB_SETCURSEL, nPos, 0);
 
-    /* Choose the data type */
-    LONG bestDataType = DTWAIN_GetCapDataType(g_CurrentSource, capValue);
 
-    TCHAR szBestDataType[100];
-    DTWAIN_GetTwainNameFromConstant(DTWAIN_CONSTANT_TWTY, bestDataType, szBestDataType, 100);
 
-    nPos = ComboBox_FindString(hWndDataTypes, -1, szBestDataType);
-    if (nPos != CB_ERR)
-        SendMessage(hWndDataTypes, CB_SETCURSEL, nPos, 0);
-}
 
-void TestCap(HWND hWnd, LONG capValue)
-{
-    HWND hWndGetTypes = GetDlgItem(hWnd, IDC_cmbGetTypes);
-    HWND hWndContainerTypes = GetDlgItem(hWnd, IDC_cmbContainer);
-    HWND hWndDataTypes = GetDlgItem(hWnd, IDC_cmbDataType);
-    HWND hWndResults = GetDlgItem(hWnd, IDC_lstResults);
 
-    SendMessage(hWndResults, LB_RESETCONTENT, 0, 0);
 
-    /* Get the get type, container, and data type */
-    TCHAR szGetType[100];
-    LRESULT nCurSel = SendMessage(hWndGetTypes, CB_GETCURSEL, 0, 0);
-    SendMessage(hWndGetTypes, CB_GETLBTEXT, nCurSel, (LPARAM)szGetType);
-    LONG nGetType = DTWAIN_GetConstantFromTwainName(szGetType);
 
-    /* Get the container type */
-    nCurSel = SendMessage(hWndContainerTypes, CB_GETCURSEL, 0, 0);
-    LONG nContainerType = g_AllContainerTypesID[nCurSel];
 
-    /* Get the data type */
-    TCHAR szDataType[100];
-    nCurSel = SendMessage(hWndDataTypes, CB_GETCURSEL, 0, 0);
-    SendMessage(hWndDataTypes, CB_GETLBTEXT, nCurSel, (LPARAM)szDataType);
-    LONG nDataType = DTWAIN_GetConstantFromTwainName(szDataType);
 
-    /* Get the translation (if it exists) for the cap return values */
-    LONG nTranslationID = -1;
-    BOOL bGotID = FALSE;
-    BOOL bIsCapNameSupported = (capValue == CAP_SUPPORTEDCAPS || capValue == CAP_EXTENDEDCAPS || capValue == CAP_SUPPORTEDCAPSSEGMENTUNIQUE);
-    if (!bIsCapNameSupported)
-    {
-        /* Get the TWAIN constant name mapping, given the capability value */
-        char szTranslationID[100];
-        nTranslationID = -1;
-        bGotID = DTWAIN_GetTwainNameFromConstantA(DTWAIN_CONSTANT_CAPCODE_MAP, capValue, szTranslationID, 100);
-        if (bGotID)
-            nTranslationID = atoi(szTranslationID);
-    }
-    /* Call the capability function */
-    DTWAIN_ARRAY values;
-    LONG ret = DTWAIN_GetCapValuesEx2(g_CurrentSource, capValue, nGetType, nContainerType, nDataType, &values);
-    if (ret)
-    {
-        char szValues[1024];
-        /* Display the results in the list box */
-        LONG numItems = DTWAIN_ArrayGetCount(values);
-        LONG nArrayType = DTWAIN_ArrayGetType(values);
-        LONG i = 0;
-        for (i = 0; i < numItems; ++i)
-        {
-            if (i >= 1000)
-            {
-                SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)"~ Number of values exceeded 1000 ... ~");
-                break;
-            }
-            switch (nArrayType)
-            {
-                case DTWAIN_ARRAYLONG:
-                {
-                    LONG lVal;
-                    DTWAIN_ArrayGetAtLong(values, i, &lVal);
-                    if (bIsCapNameSupported)
-                        DTWAIN_GetNameFromCapA(lVal, szValues, 256);
-                    else
-                    if (nDataType == TWTY_BOOL)
-                        sprintf(szValues, "%s", lVal == 1 ? "TRUE" : "FALSE");
-                    else
-                    if (bGotID)
-                        DTWAIN_GetTwainNameFromConstantA(nTranslationID, lVal, szValues, 256);
-                    else
-                        sprintf(szValues, "%d", lVal);
-                    SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
-                }
-                break;
 
-                case DTWAIN_ARRAYFLOAT:
-                {
-                    double dVal;
-                    DTWAIN_ArrayGetAtFloat(values, i, &dVal);
-                    sprintf(szValues, "%lf", dVal);
-                    SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
-                }
-                break;
 
-                case DTWAIN_ARRAYANSISTRING:
-                {
-                    DTWAIN_ArrayGetAtANSIString(values, i, szValues);
-                    SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
-                }
-                break;
 
-                case DTWAIN_ARRAYFRAME:
-                {
-                    double left, top, right, bottom;
-                    DTWAIN_ArrayGetAtFrame(values, i, &left, &top, &right, &bottom);
-                    sprintf(szValues, "Left: %lf  Top: %lf  Right: %lf  Bottom: %lf", left, top, right, bottom);
-                    SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
-                }
-                break;
 
-            }
-        }
-        DTWAIN_ArrayDestroy(values);
-    }
-}
+
+
+
+
+
+
+
+
+
 
 LRESULT CALLBACK DisplayAcquireSettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
