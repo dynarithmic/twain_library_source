@@ -390,8 +390,13 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstant(LONG lConstantType, LONG lTwai
 {
     LOG_FUNC_ENTRY_PARAMS((lConstantType, lTwainConstant, lpszOut, nSize))
     VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto ret = CTL_StaticData::GetTwainNameFromConstant(lConstantType, lTwainConstant).second;
-    auto numChars = StringWrapper::CopyInfoToCString(ret, lpszOut, nSize);
+    auto ret = CTL_StaticData::GetTwainNameFromConstant(lConstantType, lTwainConstant);
+    if (!ret.first)
+    {
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
+        LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
+    }
+	auto numChars = StringWrapper::CopyInfoToCString(ret.second, lpszOut, nSize);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
     LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
     CATCH_BLOCK(-1)
