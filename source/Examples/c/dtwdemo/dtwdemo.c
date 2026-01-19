@@ -11,6 +11,7 @@
 #include "dibdisplay.h"
 #include <tchar.h>
 #include <stdio.h>
+#include <io.h>
 #include "SourceProperties.h"
 #define MAX_LOADSTRING 100
 
