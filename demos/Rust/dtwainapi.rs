@@ -3915,6 +3915,7 @@ impl<'a> DTwainAPI<'a>
     pub const DTWAIN_CONSTANT_DTWAIN_CONT: i32 = 79;
     pub const DTWAIN_CONSTANT_CAPCODE_MAP: i32 = 80;
     pub const DTWAIN_CONSTANT_ACAP: i32 = 81;
+    pub const DTWAIN_CONSTANT_CAPCODE_NOMNEMONIC: i32 = 82;
     pub const DTWAIN_USERRES_START: i32 = 20000;
     pub const DTWAIN_USERRES_MAXSIZE: i32 = 8192;
     pub const DTWAIN_APIHANDLEOK: i32 = 1;

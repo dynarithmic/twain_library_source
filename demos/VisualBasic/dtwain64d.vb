@@ -1714,6 +1714,7 @@ Class DTWAINAPI
     Public Const DTWAIN_CONSTANT_DTWAIN_CONT As Integer = 79
     Public Const DTWAIN_CONSTANT_CAPCODE_MAP As Integer = 80
     Public Const DTWAIN_CONSTANT_ACAP As Integer = 81
+    Public Const DTWAIN_CONSTANT_CAPCODE_NOMNEMONIC As Integer = 82
     Public Const DTWAIN_USERRES_START As Integer = 20000
     Public Const DTWAIN_USERRES_MAXSIZE As Integer = 8192
     Public Const DTWAIN_APIHANDLEOK As Integer = 1
