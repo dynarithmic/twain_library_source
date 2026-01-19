@@ -18,9 +18,9 @@ static TCHAR* g_AllContainerTypes[] = { _T("TW_ARRAY"), _T("TW_ENUMERATION"), _T
 static LONG g_AllContainerTypesID[] = { DTWAIN_CONTARRAY, DTWAIN_CONTENUMERATION, DTWAIN_CONTONEVALUE, DTWAIN_CONTRANGE };
 static TCHAR* g_AllGetTypes[] = { _T("MSG_GET"), _T("MSG_GETCURRENT"), _T("MSG_GETDEFAULT") };
 static TCHAR* g_AllDataTypes[] = { _T("TWTY_INT8"), _T("TWTY_INT16"), _T("TWTY_INT32"), _T("TWTY_UINT8"),_T("TWTY_UINT16"),
-						        _T("TWTY_UINT32"), _T("TWTY_BOOL"), _T("TWTY_FIX32"), _T("TWTY_FRAME"), _T("TWTY_STR32"),
-						        _T("TWTY_STR64"), _T("TWTY_STR128"), _T("TWTY_STR255"), _T("TWTY_STR1024"), _T("TWTY_UNI512"),
-						        _T("TWTY_HANDLE") };
+                                _T("TWTY_UINT32"), _T("TWTY_BOOL"), _T("TWTY_FIX32"), _T("TWTY_FRAME"), _T("TWTY_STR32"),
+                                _T("TWTY_STR64"), _T("TWTY_STR128"), _T("TWTY_STR255"), _T("TWTY_STR1024"), _T("TWTY_UNI512"),
+                                _T("TWTY_HANDLE") };
 static TCHAR* g_AllSetTypes[] = { _T("MSG_SET"), _T("MSG_RESET"), _T("MSG_SETCONSTRAINT") };
 static char g_szInput[32767];
 
@@ -167,7 +167,7 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
                 case IDCANCEL:
                     /* User may have done a lot of capability testing, 
                     so make sure we reset all the caps to default when we return */
-					DTWAIN_SetAllCapsToDefault(g_CurrentSource);
+                    DTWAIN_SetAllCapsToDefault(g_CurrentSource);
                     EndDialog(hDlg, 1);
                     break;
                 case IDC_btnTestCap:
@@ -179,7 +179,7 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
                 }
                 break;
                 case IDC_btnResetCapabilities:
-					DTWAIN_SetAllCapsToDefault(g_CurrentSource);
+                    DTWAIN_SetAllCapsToDefault(g_CurrentSource);
                 break;
             }
         }
@@ -257,15 +257,15 @@ LRESULT CALLBACK DisplayTestCapProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
                 }
                 break;
 
-			    case IDC_btnResetSet:
-			    {
-				    /* Get the Get type*/
-				    TCHAR szSetType[100];
-				    LRESULT nCurSel = SendMessage(GetDlgItem(hDlg, IDC_cmbSetTypes), CB_GETCURSEL, 0, 0);
-				    SendMessage(GetDlgItem(hDlg, IDC_cmbSetTypes), CB_GETLBTEXT, nCurSel, (LPARAM)szSetType);
-				    SetTestSelection2(hDlg, szSetType, curCapValue);
-			    }
-			    break;
+                case IDC_btnResetSet:
+                {
+                    /* Get the Get type*/
+                    TCHAR szSetType[100];
+                    LRESULT nCurSel = SendMessage(GetDlgItem(hDlg, IDC_cmbSetTypes), CB_GETCURSEL, 0, 0);
+                    SendMessage(GetDlgItem(hDlg, IDC_cmbSetTypes), CB_GETLBTEXT, nCurSel, (LPARAM)szSetType);
+                    SetTestSelection2(hDlg, szSetType, curCapValue);
+                }
+                break;
 
                 case IDC_btnTestSet:
                     TestSetCap(hDlg, curCapValue);
@@ -524,49 +524,59 @@ void TestGetCap(HWND hWnd, LONG capValue)
             }
             switch (nArrayType)
             {
-            case DTWAIN_ARRAYLONG:
-            {
-                LONG lVal;
-                DTWAIN_ArrayGetAtLong(values, i, &lVal);
-                if (bIsCapNameSupported)
-                    DTWAIN_GetNameFromCapA(lVal, szValues, 256);
-                else
-                if (nDataType == TWTY_BOOL)
-                    sprintf(szValues, "%s", lVal == 1 ? "TRUE" : "FALSE");
-                else
-                if (bGotID)
-                    DTWAIN_GetTwainNameFromConstantA(nTranslationID, lVal, szValues, 256);
-                else
-                    sprintf(szValues, "%d", lVal);
-                SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
-            }
-            break;
+                case DTWAIN_ARRAYLONG:
+                {
+                    LONG lVal;
+                    DTWAIN_ArrayGetAtLong(values, i, &lVal);
+                    if (capValue == CAP_SUPPORTEDDATS)
+                    {
+                        char szHi[100];
+                        char szLo[100];
+                        int hiWord = lVal >> 16;
+                        int loWord = lVal & 0x0000FFFF;
+                        DTWAIN_GetTwainNameFromConstantA(DTWAIN_CONSTANT_DG, hiWord, szHi, 100);
+                        DTWAIN_GetTwainNameFromConstantA(DTWAIN_CONSTANT_DAT, loWord, szLo, 100);
+                        sprintf(szValues, "%s / %s", szHi, szLo);
+                    }
+                    else
+                    if (bIsCapNameSupported)
+                        DTWAIN_GetNameFromCapA(lVal, szValues, 256);
+                    else
+                    if (nDataType == TWTY_BOOL)
+                        sprintf(szValues, "%s", lVal == 1 ? "TRUE" : "FALSE");
+                    else
+                    if (bGotID)
+                        DTWAIN_GetTwainNameFromConstantA(nTranslationID, lVal, szValues, 256);
+                    else
+                        sprintf(szValues, "%d", lVal);
+                    SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
+                }
+                break;
 
-            case DTWAIN_ARRAYFLOAT:
-            {
-                double dVal;
-                DTWAIN_ArrayGetAtFloat(values, i, &dVal);
-                sprintf(szValues, "%lf", dVal);
-                SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
-            }
-            break;
+                case DTWAIN_ARRAYFLOAT:
+                {
+                    double dVal;
+                    DTWAIN_ArrayGetAtFloat(values, i, &dVal);
+                    sprintf(szValues, "%lf", dVal);
+                    SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
+                }
+                break;
 
-            case DTWAIN_ARRAYANSISTRING:
-            {
-                DTWAIN_ArrayGetAtANSIString(values, i, szValues);
-                SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
-            }
-            break;
+                case DTWAIN_ARRAYANSISTRING:
+                {
+                    DTWAIN_ArrayGetAtANSIString(values, i, szValues);
+                    SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
+                }
+                break;
 
-            case DTWAIN_ARRAYFRAME:
-            {
-                double left, top, right, bottom;
-                DTWAIN_ArrayGetAtFrame(values, i, &left, &top, &right, &bottom);
-                sprintf(szValues, "Left: %lf  Top: %lf  Right: %lf  Bottom: %lf", left, top, right, bottom);
-                SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
-            }
-            break;
-
+                case DTWAIN_ARRAYFRAME:
+                {
+                    double left, top, right, bottom;
+                    DTWAIN_ArrayGetAtFrame(values, i, &left, &top, &right, &bottom);
+                    sprintf(szValues, "Left: %lf  Top: %lf  Right: %lf  Bottom: %lf", left, top, right, bottom);
+                    SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
+                }
+                break;
             }
         }
         DTWAIN_ArrayDestroy(values);
@@ -733,7 +743,7 @@ void TestSetCap(HWND hWnd, LONG capValue)
     DTWAIN_ArrayDestroy(aValues);
 
     if (ret)
-		SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)"Ok");
+        SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)"Ok");
     else
-		SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)"Error");
+        SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)"Error");
 }

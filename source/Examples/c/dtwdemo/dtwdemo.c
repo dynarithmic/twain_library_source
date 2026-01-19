@@ -7,7 +7,6 @@
 #include <windowsx.h>
 #include "dtwdemo.h"
 #include "dtwain.h"
-#include <ctype.h>
 #include "dibdisplay.h"
 #include <tchar.h>
 #include <stdio.h>
