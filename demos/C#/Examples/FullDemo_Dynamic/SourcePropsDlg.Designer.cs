@@ -41,6 +41,7 @@ namespace TWAINDemo
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.btnTestCap = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
@@ -59,7 +60,7 @@ namespace TWAINDemo
             this.textBox5 = new System.Windows.Forms.TextBox();
             this.textBox6 = new System.Windows.Forms.TextBox();
             this.textBox7 = new System.Windows.Forms.TextBox();
-            this.btnTestCap = new System.Windows.Forms.Button();
+            this.btnResetAllCaps = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.GroupBox3.SuspendLayout();
@@ -182,6 +183,7 @@ namespace TWAINDemo
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.btnResetAllCaps);
             this.groupBox2.Controls.Add(this.btnTestCap);
             this.groupBox2.Controls.Add(this.label8);
             this.groupBox2.Controls.Add(this.label7);
@@ -196,6 +198,16 @@ namespace TWAINDemo
             this.groupBox2.TabIndex = 6;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Capability Info";
+            // 
+            // btnTestCap
+            // 
+            this.btnTestCap.Location = new System.Drawing.Point(246, 152);
+            this.btnTestCap.Name = "btnTestCap";
+            this.btnTestCap.Size = new System.Drawing.Size(128, 23);
+            this.btnTestCap.TabIndex = 2;
+            this.btnTestCap.Text = "Test Capability ...";
+            this.btnTestCap.UseVisualStyleBackColor = true;
+            this.btnTestCap.Click += new System.EventHandler(this.btnTestCap_Click);
             // 
             // label8
             // 
@@ -380,15 +392,15 @@ namespace TWAINDemo
             this.textBox7.TabIndex = 1;
             this.textBox7.TabStop = false;
             // 
-            // btnTestCap
+            // btnResetAllCaps
             // 
-            this.btnTestCap.Location = new System.Drawing.Point(246, 152);
-            this.btnTestCap.Name = "btnTestCap";
-            this.btnTestCap.Size = new System.Drawing.Size(128, 23);
-            this.btnTestCap.TabIndex = 2;
-            this.btnTestCap.Text = "Test Capability (Get)...";
-            this.btnTestCap.UseVisualStyleBackColor = true;
-            this.btnTestCap.Click += new System.EventHandler(this.btnTestCap_Click);
+            this.btnResetAllCaps.Location = new System.Drawing.Point(246, 182);
+            this.btnResetAllCaps.Name = "btnResetAllCaps";
+            this.btnResetAllCaps.Size = new System.Drawing.Size(127, 23);
+            this.btnResetAllCaps.TabIndex = 3;
+            this.btnResetAllCaps.Text = "Reset All Capabilities";
+            this.btnResetAllCaps.UseVisualStyleBackColor = true;
+            this.btnResetAllCaps.Click += new System.EventHandler(this.btnResetAllCaps_Click);
             // 
             // SourcePropsDlg
             // 
@@ -402,6 +414,7 @@ namespace TWAINDemo
             this.Controls.Add(this.groupBox1);
             this.Name = "SourcePropsDlg";
             this.Text = "Source Properties";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.SourcePropsDlg_FormClosed);
             this.Load += new System.EventHandler(this.SourcePropsDlg_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
@@ -448,5 +461,6 @@ namespace TWAINDemo
         private System.Windows.Forms.TextBox textBox6;
         private System.Windows.Forms.TextBox textBox7;
         private System.Windows.Forms.Button btnTestCap;
+        private System.Windows.Forms.Button btnResetAllCaps;
     }
 }
