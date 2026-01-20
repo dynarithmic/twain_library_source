@@ -43,16 +43,16 @@ DTWAIN Version changes
   and the lower left "Capability Info" box will contain "Test Capability".  
   This will have full testing for setting and getting a capability's values.
 
-- The C\# full demo project has been updated to include features that
+- The C# full demo project has been updated to include features that
   exist in the DTWDEMO32/64 program.  This includes the testing of
   any TWAIN capability using MSG_GET, MSG_GETCURRENT, MSG_GETDEFAULT, etc.
   options.
 
-- C\#, Visual Basic, and F\# language bindings have been rewritten to use
+- C#, Visual Basic, and F# language bindings have been rewritten to use
   the .NET string marshalling logic instead of providing separate "A" and
   "W" functions for ANSI and wide-string functions.  
 
-  Basically this means that existing C\#, VB or F\# code that calls a 
+  Basically this means that existing C#, VB or F# code that calls a 
   DTWAIN function that uses the language bindings provided will not build
   if an "A" or "W" function is called.  Instead, the program should
   call the general function, and the .NET string marshalling logic will 
