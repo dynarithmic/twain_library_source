@@ -827,6 +827,7 @@ namespace dynarithmic
     CTL_TwainDLLHandle* FindHandle(HINSTANCE hInst);
     std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> VerifyHandles(DTWAIN_SOURCE Source, int Testing = DTWAIN_VERIFY_DLLHANDLE | DTWAIN_VERIFY_SOURCEHANDLE | DTWAIN_TEST_SETLASTERROR);
     bool CenterWindow(HWND hwnd, HWND hwndParent);
+    void CenterWindowOnCurrentMonitor(HWND hwnd);
 
     LONG GetCustomCapDataType(DTWAIN_SOURCE Source, TW_UINT16 nCap);
     LONG GetCapContainer(CTL_ITwainSource* pSource, LONG nCap, LONG lCapType);
