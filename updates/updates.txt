@@ -28,6 +28,14 @@ DTWAIN Version changes
 - Add ability to rotate and skew text that is added to a PDF page.  
   See the new DTWAIN_PDFTEXTELEMENT type and the supporting API functions.
 
+- Add DTWAIN_DLG_CENTER_CURRENT_MONITOR flag to DTWAIN_SelectSource2() function.
+  This flag allows the "Select Source" dialog to be centered with respect to the 
+  current monitor.
+
+- Fixed the DTWAIN_DLG_CENTER logic in DTWAIN_SelectSource2() to properly center 
+  the "Select Source" dialog box with respect to the parent window if the parent 
+  window is moved to another monitor.
+
 - Fix potential memory leak when using functions that takes a pointer
   to a DTWAIN_ARRAY.
 
