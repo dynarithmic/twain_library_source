@@ -86,5 +86,13 @@ namespace TWAINDemo
             TestCapDlg sTestCapDlg = new TestCapDlg(m_Source, listCaps.SelectedItem.ToString());
             sTestCapDlg.ShowDialog(this);
         }
+        private void btnResetAllCaps_Click(object sender, EventArgs e)
+        {
+            TwainAPI.DTWAIN_SetAllCapsToDefault(m_Source);
+        }
+        private void SourcePropsDlg_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            TwainAPI.DTWAIN_SetAllCapsToDefault(m_Source);
+        }
     }
 }

@@ -977,7 +977,7 @@ namespace TWAINDemo
 
         private void load_language(string language)
         {
-            int retVal = TwainAPI.DTWAIN_LoadCustomStringResourcesA(language);
+            int retVal = TwainAPI.DTWAIN_LoadCustomStringResources(language);
             if (retVal == 0)
                 MessageBox.Show("Could not load language resource " + language, "Error", MessageBoxButtons.OK);
             else
