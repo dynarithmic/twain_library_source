@@ -35,10 +35,31 @@ DTWAIN Version changes
   will not close the source.  Instead, a return value of FALSE will be
   given, and the last error code is set to DTWAIN_ERR_SOURCE_ACQUIRING.
 
+- The DTWDEMO32 and DTWDEMO64 demo programs now contains full capability testing.  This
+  is available through the main menu once a TWAIN Source has been selected:
+
+  Source Selection Test -> Source Properties.. 
+
+  and the lower left "Capability Info" box will contain "Test Capability".  
+  This will have full testing for setting and getting a capability's values.
+
 - The C# full demo project has been updated to include features that
   exist in the DTWDEMO32/64 program.  This includes the testing of
-  any TWAIN capability using MSG_GET, MSG_GETCURRENT, and MSG_GETDEFAULT
+  any TWAIN capability using MSG_GET, MSG_GETCURRENT, MSG_GETDEFAULT, etc.
   options.
+
+- C#, Visual Basic, and F# language bindings have been rewritten to use
+  the .NET string marshalling logic instead of providing separate "A" and
+  "W" functions for ANSI and wide-string functions.  
+
+  Basically this means that existing C#, VB or F# code that calls a 
+  DTWAIN function that uses the language bindings provided will not build
+  if an "A" or "W" function is called.  Instead, the program should
+  call the general function, and the .NET string marshalling logic will 
+  direct the call to the proper function.  For example, if your program
+  currently calls DTWAIN_GetSourceProductNameA or DTWAIN_GetSourceProductNameW,
+  you must instead call DTWAIN_GetSourceProductName.
+  
 
 
 5.7.2
