@@ -1091,6 +1091,7 @@ local dtwain_constants = {}
    dtwain_constants.DTWAIN_DLG_NOOPENONSELECT = 4096
    dtwain_constants.DTWAIN_DLG_HIGHLIGHTFIRST = 8192
    dtwain_constants.DTWAIN_DLG_SAVELASTSCREENPOS = 16384
+   dtwain_constants.DTWAIN_DLG_CENTER_CURRENT_MONITOR = 32768
    dtwain_constants.DTWAIN_RES_ENGLISH = 0
    dtwain_constants.DTWAIN_RES_FRENCH = 1
    dtwain_constants.DTWAIN_RES_SPANISH = 2

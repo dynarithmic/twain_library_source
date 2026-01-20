@@ -1164,6 +1164,7 @@ Class DTWAINAPI
     Public Const DTWAIN_DLG_NOOPENONSELECT As Integer = 4096
     Public Const DTWAIN_DLG_HIGHLIGHTFIRST As Integer = 8192
     Public Const DTWAIN_DLG_SAVELASTSCREENPOS As Integer = 16384
+    Public Const DTWAIN_DLG_CENTER_CURRENT_MONITOR As Integer = 32768
     Public Const DTWAIN_RES_ENGLISH As Integer = 0
     Public Const DTWAIN_RES_FRENCH As Integer = 1
     Public Const DTWAIN_RES_SPANISH As Integer = 2

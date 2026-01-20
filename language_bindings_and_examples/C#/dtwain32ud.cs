@@ -1218,6 +1218,7 @@ namespace Dynarithmic
         public const int DTWAIN_DLG_NOOPENONSELECT = 4096;
         public const int DTWAIN_DLG_HIGHLIGHTFIRST = 8192;
         public const int DTWAIN_DLG_SAVELASTSCREENPOS = 16384;
+        public const int DTWAIN_DLG_CENTER_CURRENT_MONITOR = 32768;
         public const int DTWAIN_RES_ENGLISH = 0;
         public const int DTWAIN_RES_FRENCH = 1;
         public const int DTWAIN_RES_SPANISH = 2;

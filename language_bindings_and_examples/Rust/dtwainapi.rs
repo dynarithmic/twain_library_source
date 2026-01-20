@@ -3365,6 +3365,7 @@ impl<'a> DTwainAPI<'a>
     pub const DTWAIN_DLG_NOOPENONSELECT: i32 = 4096;
     pub const DTWAIN_DLG_HIGHLIGHTFIRST: i32 = 8192;
     pub const DTWAIN_DLG_SAVELASTSCREENPOS: i32 = 16384;
+    pub const DTWAIN_DLG_CENTER_CURRENT_MONITOR: i32 = 32768;
     pub const DTWAIN_RES_ENGLISH: i32 = 0;
     pub const DTWAIN_RES_FRENCH: i32 = 1;
     pub const DTWAIN_RES_SPANISH: i32 = 2;
