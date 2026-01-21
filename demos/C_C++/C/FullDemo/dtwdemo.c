@@ -486,7 +486,7 @@ void SelectTheSource(int nWhich)
     switch (nWhich)
     {
         case IDM_SELECT_SOURCE:
-            tempSource = DTWAIN_SelectSource2(NULL, NULL,0,0, DTWAIN_DLG_CENTER_SCREEN | DTWAIN_DLG_SORTNAMES);
+            tempSource = DTWAIN_SelectSource2(NULL, NULL,0,0, DTWAIN_DLG_CENTER_CURRENT_MONITOR| DTWAIN_DLG_SORTNAMES);
         break;
 
         case IDM_SELECT_DEFAULT_SOURCE:

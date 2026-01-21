@@ -237,7 +237,7 @@ BEGIN
     COMBOBOX        IDC_cmbGetTypes,26,36,77,60,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_cmbContainer,113,36,106,68,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_cmbDataType,231,36,68,67,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Test ",IDC_btnTest,167,52,50,14
+    PUSHBUTTON      "Test ",IDC_btnTest,163,52,50,14
     PUSHBUTTON      "Revert",IDC_btnReset,307,35,50,14
     LISTBOX         IDC_lstResults,25,77,341,53,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_cmbSetTypes,26,163,77,60,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -260,6 +260,7 @@ BEGIN
     LTEXT           "Container:",IDC_staticContainer,113,150,35,8
     LTEXT           "Results:",IDC_staticResults,248,186,27,8
     LTEXT           "Input: (One data item per line):",IDC_staticInput,24,186,102,8
+    LTEXT           "",IDC_staticTestGetResults,215,55,49,8
 END
 
 /////////////////////////////////////////////////////////////////////////////

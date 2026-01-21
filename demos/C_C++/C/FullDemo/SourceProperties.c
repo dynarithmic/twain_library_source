@@ -458,6 +458,7 @@ void TestGetCap(HWND hWnd, LONG capValue)
     HWND hWndContainerTypes = GetDlgItem(hWnd, IDC_cmbContainer);
     HWND hWndDataTypes = GetDlgItem(hWnd, IDC_cmbDataType);
     HWND hWndResults = GetDlgItem(hWnd, IDC_lstResults);
+    HWND hWndStaticResults = GetDlgItem(hWnd, IDC_staticTestGetResults);
 
     SendMessage(hWndResults, LB_RESETCONTENT, 0, 0);
 
@@ -510,6 +511,7 @@ void TestGetCap(HWND hWnd, LONG capValue)
     LONG ret = DTWAIN_GetCapValuesEx2(g_CurrentSource, capValue, nGetType, nContainerType, nDataType, &values);
     if (ret)
     {
+        SendMessageA(hWndStaticResults, WM_SETTEXT, 0, (LPARAM)"Success");
         char szValues[1024];
         /* Display the results in the list box */
         LONG numItems = DTWAIN_ArrayGetCount(values);
@@ -580,6 +582,10 @@ void TestGetCap(HWND hWnd, LONG capValue)
             }
         }
         DTWAIN_ArrayDestroy(values);
+    }
+    else
+    {
+		SendMessageA(hWndStaticResults, WM_SETTEXT, 0, (LPARAM)"Error");
     }
 }
 

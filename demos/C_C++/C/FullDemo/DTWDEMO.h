@@ -100,6 +100,7 @@
 #define IDC_staticResults                   8017
 #define IDC_staticInput                     8018
 #define IDC_btnResetCapabilities            8019
+#define IDC_staticTestGetResults            8020
 
 #define ID_LANGUAGE_ENGLISH             32771
 #define ID_LANGUAGE_FRENCH              32772
