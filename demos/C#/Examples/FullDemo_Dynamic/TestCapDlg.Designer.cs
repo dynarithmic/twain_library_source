@@ -54,6 +54,7 @@ namespace TWAINDemo
             this.lblSetOperation = new System.Windows.Forms.Label();
             this.lblInput = new System.Windows.Forms.Label();
             this.editInputData = new System.Windows.Forms.TextBox();
+            this.lblTestGetResults = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -99,7 +100,7 @@ namespace TWAINDemo
             this.cmbGetTypes.FormattingEnabled = true;
             this.cmbGetTypes.Location = new System.Drawing.Point(17, 55);
             this.cmbGetTypes.Name = "cmbGetTypes";
-            this.cmbGetTypes.Size = new System.Drawing.Size(121, 21);
+            this.cmbGetTypes.Size = new System.Drawing.Size(134, 21);
             this.cmbGetTypes.TabIndex = 4;
             this.cmbGetTypes.SelectedIndexChanged += new System.EventHandler(this.cmbGetTypes_SelectedIndexChanged);
             // 
@@ -283,11 +284,20 @@ namespace TWAINDemo
             this.editInputData.Size = new System.Drawing.Size(208, 84);
             this.editInputData.TabIndex = 24;
             // 
+            // lblTestGetResults
+            // 
+            this.lblTestGetResults.AutoSize = true;
+            this.lblTestGetResults.Location = new System.Drawing.Point(318, 94);
+            this.lblTestGetResults.Name = "lblTestGetResults";
+            this.lblTestGetResults.Size = new System.Drawing.Size(0, 13);
+            this.lblTestGetResults.TabIndex = 25;
+            // 
             // TestCapDlg
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(555, 482);
+            this.Controls.Add(this.lblTestGetResults);
             this.Controls.Add(this.editInputData);
             this.Controls.Add(this.lblInput);
             this.Controls.Add(this.lstResultsSet);
@@ -348,5 +358,6 @@ namespace TWAINDemo
         private System.Windows.Forms.Label lblSetOperation;
         private System.Windows.Forms.Label lblInput;
         private System.Windows.Forms.TextBox editInputData;
+        private System.Windows.Forms.Label lblTestGetResults;
     }
 }

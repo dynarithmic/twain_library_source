@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using Dynarithmic;
 using DTWAIN_SOURCE = System.IntPtr;
 using DTWAIN_ARRAY = System.IntPtr;
+using System.Globalization;
 
 namespace TWAINDemo
 {
@@ -13,9 +14,9 @@ namespace TWAINDemo
         private string capToTest;
         private int capToTestAsInt;
         private static string[] allGetTypes = { "MSG_GET", "MSG_GETCURRENT", "MSG_GETDEFAULT" };
-        private static string[] allContainerTypes = { "TW_ARRAY", "TW_ENUMERATION", "TW_ONEVALUE", "TW_RANGE" };
-        private static int[] allContainerTypesID = { TwainAPI.DTWAIN_CONTARRAY, TwainAPI.DTWAIN_CONTENUMERATION, 
-                                                      TwainAPI.DTWAIN_CONTONEVALUE, TwainAPI.DTWAIN_CONTRANGE };
+        private static string[] allContainerTypes = { "TW_ONEVALUE", "TW_ARRAY", "TW_ENUMERATION", "TW_RANGE" };
+        private static int[] allContainerTypesID = { TwainAPI.DTWAIN_CONTONEVALUE, TwainAPI.DTWAIN_CONTARRAY, TwainAPI.DTWAIN_CONTENUMERATION,
+                                                      TwainAPI.DTWAIN_CONTRANGE };
         private static string [] allDataTypes = { "TWTY_INT8", "TWTY_INT16", "TWTY_INT32", "TWTY_UINT8","TWTY_UINT16",
                             "TWTY_UINT32", "TWTY_BOOL", "TWTY_FIX32", "TWTY_FRAME", "TWTY_STR32",
                             "TWTY_STR64", "TWTY_STR128", "TWTY_STR255", "TWTY_STR1024", "TWTY_UNI512",
@@ -88,33 +89,35 @@ namespace TWAINDemo
             int nPos = FindItemByStringName(cmbGetTypes, getType);
             cmbGetTypes.SelectedIndex = nPos;
 
-            // Get the equivalent MSG_GET type matching the one passed in */
+            // Get the equivalent "MSG_GETxxxxx" type matching the one passed in */
             int nID = DTwainDemo.TwainAPI.DTWAIN_GetConstantFromTwainName(getType);
 
-            // Choose the best container type for the capability 
+            // Choose the container type for the capability 
             int bestContainer = DTwainDemo.TwainAPI.DTWAIN_GetCapContainer(m_Source, capToTestAsInt, nID);
 
-            StringBuilder szBestContainer = new StringBuilder(100);
-            DTwainDemo.TwainAPI.DTWAIN_GetTwainNameFromConstant(TwainAPI.DTWAIN_CONSTANT_DTWAIN_CONT, 
-                                                     bestContainer, szBestContainer, 100);
+            // Could be more than one container defined for this cap, so get the "best" one
+            string sBestContainer = GetBestMatchingContainer(bestContainer);
 
-            // Position the cmbContainer control to the name equal to szBestContainer
-            nPos = FindItemByStringName(cmbContainer, szBestContainer.ToString());
+            // Position the cmbContainer control to the name equal to sBestContainer
+            nPos = FindItemByStringName(cmbContainer, sBestContainer);
             if (nPos != -1)
                 cmbContainer.SelectedIndex = nPos;
+            else
+                cmbContainer.SelectedIndex = 0;
 
-            // Choose the data type 
+            // Get the data type 
             int bestDataType = DTwainDemo.TwainAPI.DTWAIN_GetCapDataType(m_Source, capToTestAsInt);
 
-            // Get the name of the best container type
+            // Get the name of the data type
             StringBuilder szBestDataType= new StringBuilder(100);
-            DTwainDemo.TwainAPI.DTWAIN_GetTwainNameFromConstant(TwainAPI.DTWAIN_CONSTANT_TWTY, bestDataType, 
-                                                     szBestDataType, 100);
+            DTwainDemo.TwainAPI.DTWAIN_GetTwainNameFromConstant(TwainAPI.DTWAIN_CONSTANT_TWTY, bestDataType, szBestDataType, 100);
 
-            // Now position the cmbDataType combo to the best name
+            // Now position the cmbDataType combo to the name
             nPos = FindItemByStringName(cmbDataType, szBestDataType.ToString());
             if (nPos != -1)
                 cmbDataType.SelectedIndex = nPos;
+            else
+                cmbDataType.SelectedIndex = 0;
         }
 
         private void SetTestSelection2(string setType)
@@ -134,34 +137,7 @@ namespace TWAINDemo
                 editInputData,
                 lstResultsSet
             };
-            // Position the cmbGetTypes combo to "setType"
-            int nPos = FindItemByStringName(cmbSetTypes, setType);
-            cmbSetTypes.SelectedIndex = nPos;
-            // Get the equivalent MSG_SET type matching the one passed in 
-            int nID = DTwainDemo.TwainAPI.DTWAIN_GetConstantFromTwainName(setType);
-            // Choose the best container type for the capability 
-            int bestContainer = DTwainDemo.TwainAPI.DTWAIN_GetCapContainer(m_Source, capToTestAsInt, nID);
-            if (bestContainer == 0)
-            {
-                cmbContainerSet.SelectedIndex = 0;
-            }
-            else
-            {
-                StringBuilder szBestContainer = new StringBuilder(100);
-                DTwainDemo.TwainAPI.DTWAIN_GetTwainNameFromConstant(TwainAPI.DTWAIN_CONSTANT_DTWAIN_CONT,
-                                                        bestContainer, szBestContainer, 100);
-                nPos = FindItemByStringName(cmbContainerSet, szBestContainer.ToString());
-                cmbContainerSet.SelectedIndex = nPos;
-            }
-            // Choose the data type 
-            int bestDataType = DTwainDemo.TwainAPI.DTWAIN_GetCapDataType(m_Source, capToTestAsInt);
-            StringBuilder szBestDataType = new StringBuilder(100);
-            DTwainDemo.TwainAPI.DTWAIN_GetTwainNameFromConstant(TwainAPI.DTWAIN_CONSTANT_TWTY, bestDataType, szBestDataType, 100);
-            nPos = FindItemByStringName(cmbDataTypeSet, szBestDataType.ToString());
-            if ( nPos == -1 )
-                cmbDataTypeSet.SelectedIndex = 0;
-            else
-                cmbDataTypeSet.SelectedIndex = nPos;
+
             int capOpts = 0;
             // Determine if setting the capability values for this cap is supported 
             if (DTwainDemo.TwainAPI.DTWAIN_GetCapOperations(m_Source, capToTestAsInt, ref capOpts) == 1)
@@ -171,11 +147,60 @@ namespace TWAINDemo
                 {
                     foreach (var ctrl in controlsToToggle)
                     {
-                        ctrl.Enabled = false; 
+                        ctrl.Enabled = false;
                     }
+                    return; // Nothing else to do, since this capability does not support having it set
                 }
             }
+
+            // Position the cmbGetTypes combo to "setType"
+            int nPos = FindItemByStringName(cmbSetTypes, setType);
+            cmbSetTypes.SelectedIndex = nPos;
+
+            // Get the equivalent MSG_SETxxxx type matching the one passed in 
+            int nID = DTwainDemo.TwainAPI.DTWAIN_GetConstantFromTwainName(setType);
+
+            // Choose the container type for the capability 
+            int bestContainer = DTwainDemo.TwainAPI.DTWAIN_GetCapContainer(m_Source, capToTestAsInt, nID);
+            if (bestContainer == 0)
+            {
+                cmbContainerSet.SelectedIndex = 0;
+            }
+            else
+            {
+                // Could have multiple "Set" TWAIN container types, so choose one
+                string sBestContainer = GetBestMatchingContainer(bestContainer);
+
+                nPos = FindItemByStringName(cmbContainerSet, sBestContainer);
+                if ( nPos == -1 )
+                    cmbContainerSet.SelectedIndex = 0;
+                else
+                    cmbContainerSet.SelectedIndex = nPos;
+            }
+
+            // Get the data type 
+            int bestDataType = DTwainDemo.TwainAPI.DTWAIN_GetCapDataType(m_Source, capToTestAsInt);
+            StringBuilder szBestDataType = new StringBuilder(100);
+
+            // Position cmbDataTypeSet to the data type
+            DTwainDemo.TwainAPI.DTWAIN_GetTwainNameFromConstant(TwainAPI.DTWAIN_CONSTANT_TWTY, bestDataType, szBestDataType, 100);
+            nPos = FindItemByStringName(cmbDataTypeSet, szBestDataType.ToString());
+            if ( nPos == -1 )
+                cmbDataTypeSet.SelectedIndex = 0;
+            else
+                cmbDataTypeSet.SelectedIndex = nPos;
         }
+
+        private string GetBestMatchingContainer(int container)
+        {
+            for (int i = 0; i < allContainerTypesID.Length; ++i)
+            {
+                if ((container & allContainerTypesID[i]) != 0)
+                    return allContainerTypes[i];
+            }
+            return "TW_ONEVALUE";
+        }
+
         private void btnStartTest_Click(object sender, EventArgs e)
         {
             TestGetCap();
@@ -214,8 +239,8 @@ namespace TWAINDemo
                 if ( bTranslate == 1 )
                 {
                     StringBuilder szID = new StringBuilder(100);
-                // Get the TWAIN constant name mapping, given the capability value 
-                nTranslationID = -1;
+                    // Get the TWAIN constant name mapping, given the capability value 
+                    nTranslationID = -1;
                     bGotID = DTwainDemo.TwainAPI.DTWAIN_GetTwainNameFromConstant(
                             TwainAPI.DTWAIN_CONSTANT_CAPCODE_MAP, capToTestAsInt, szID, 100);
                     if (bGotID > 0)
@@ -231,6 +256,7 @@ namespace TWAINDemo
                                                       ref values);
             if (ret == 1)
             {
+                lblTestGetResults.Text = "Success";
                 StringBuilder szValues = new StringBuilder(1024);
 
                 // Display the results in the list box 
@@ -325,6 +351,8 @@ namespace TWAINDemo
                 }
                 DTwainDemo.TwainAPI.DTWAIN_ArrayDestroy(values);
             }
+            else
+                lblTestGetResults.Text = "Error";
         }
         private void TestSetCap()
         {
@@ -366,13 +394,15 @@ namespace TWAINDemo
                 }
                 break;
             }
+            if (string.IsNullOrEmpty(szInput))
+                szInput = " ";
+            string[] items = szInput.Split(' ');
             if (arrayType == TwainAPI.DTWAIN_ARRAYFRAME)
             {
                 double[] frameValues = { 0, 0, 0, 0 };
-                string[] items = szInput.Split(' ');
                 for (int i = 0; i < items.Length; ++i)
                 {
-                    frameValues[i] = Convert.ToDouble(items[i]);
+                    frameValues[i] = SafeToDouble(items[i]);
                 }
                 aValues = DTwainDemo.TwainAPI.DTWAIN_FrameCreate(frameValues[0], frameValues[1], frameValues[2], frameValues[3]);
             }
@@ -389,7 +419,7 @@ namespace TWAINDemo
                     {
                         case TwainAPI.DTWAIN_TWTY_BOOL:
                         {
-                            int value = BoolStringToInt(szInput);
+                            int value = BoolStringToInt(items[0]);
                             DTwainDemo.TwainAPI.DTWAIN_ArrayAddLong(aValues, value);
                         }
                         break;
@@ -401,17 +431,20 @@ namespace TWAINDemo
                         case TwainAPI.DTWAIN_TWTY_UINT32:
                         {
                             // First see if the string is a TWAIN known value
-                            int value = DTwainDemo.TwainAPI.DTWAIN_GetConstantFromTwainName(szInput);
+                            int value = DTwainDemo.TwainAPI.DTWAIN_GetConstantFromTwainName(items[0]);
                             if (value != int.MinValue)
                                 DTwainDemo.TwainAPI.DTWAIN_ArrayAddLong(aValues, value);
                             else
                             {
-                                DTwainDemo.TwainAPI.DTWAIN_ArrayAddLong(aValues, Convert.ToInt32(szInput));
+                                if (string.IsNullOrWhiteSpace(items[0]))
+                                    DTwainDemo.TwainAPI.DTWAIN_ArrayAddLong(aValues, 0);
+                                else
+                                    DTwainDemo.TwainAPI.DTWAIN_ArrayAddLong(aValues, SafeToInt32(items[0]));
                             }
                         }
                         break;
                         case TwainAPI.DTWAIN_TWTY_FIX32:
-                            DTwainDemo.TwainAPI.DTWAIN_ArrayAddFloat(aValues, Convert.ToDouble(szInput));
+                            DTwainDemo.TwainAPI.DTWAIN_ArrayAddFloat(aValues, SafeToDouble(items[0]));
                         break;
                     }
                 }
@@ -468,6 +501,22 @@ namespace TWAINDemo
             {
                 ctrl.Enabled = bEnable;
             }
+        }
+
+        public static int SafeToInt32(string s)
+        {
+            return int.TryParse(s, out var v) ? v : 0;
+        }
+
+        public static double SafeToDouble(string s)
+        {
+            return double.TryParse(
+                s,
+                NumberStyles.Float | NumberStyles.AllowThousands,
+                CultureInfo.InvariantCulture,
+                out var v)
+                ? v
+                : 0.0;
         }
     }
 }
