@@ -44,8 +44,6 @@ static UINT_PTR APIENTRY FileSaveAsHookProc(HWND hWnd, UINT msg, WPARAM /*w*/, L
 
 bool dynarithmic::CenterWindow(HWND hWnd, HWND hParent)
 {
-	if (!IsWindow(hWnd) || !IsWindow(hParent))
-		return true;
 
 	if (!hParent)
 		hParent = GetDesktopWindow();
