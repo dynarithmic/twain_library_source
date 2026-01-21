@@ -24,6 +24,7 @@
 #include "dtwtype.h"
 #include "ctlobstr.h"
 #include "ctliface.h"
+#include "ctlguiddef.h"
 
 namespace dynarithmic
 {
@@ -271,6 +272,11 @@ namespace dynarithmic
                     *pStatus = DTWAIN_ERR_WRONG_ARRAY_TYPE;
                 break;
         }
+        if (pNewArray)
+        {
+            auto& guidMap = static_cast<CTL_TwainDLLHandle*>(dynarithmic::GetDTWAINHandle_Internal())->GetGUIDMap(GUID_ARRAYS);
+            guidMap.Insert(StringWrapperA::GetGUIDNoCurlyBrace(), pNewArray);
+        }
         return pNewArray;
     }
 
@@ -335,6 +341,8 @@ namespace dynarithmic
         const auto iter = m_tagMap.find(pTag);
         if (iter != m_tagMap.end())
             m_tagMap.erase(iter);
+		auto& guidMap = static_cast<CTL_TwainDLLHandle*>(dynarithmic::GetDTWAINHandle_Internal())->GetGUIDMap(GUID_ARRAYS);
+		guidMap.EraseRight(pTag);
     }
 
     void CTL_ArrayFactory::add_to_back(arrayTag *pTag, void *value, size_t num)

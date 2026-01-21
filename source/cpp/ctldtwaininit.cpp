@@ -48,6 +48,7 @@
 #include "ctldefsource.h"
 #include "ctlstringutils.h"
 #include "ctlclosesource.h"
+#include "ctlguiddef.h"
 
 #ifdef _MSC_VER
     #pragma warning (disable:4702)
@@ -123,6 +124,7 @@ static CTL_StringType CheckSearchOrderString(CTL_StringType);
 #endif
 
 static bool FindTask( DWORD hTask );
+static bool FindTask(const DTWAIN_GUID& guid);
 static HMODULE GetDLLInstance();
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetVersion(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType)
@@ -185,9 +187,6 @@ LONG DLLENTRY_DEF DTWAIN_GetStaticLibVersion()
 
     CATCH_BLOCK(-1)
 }
-
-void DLLENTRY_DEF DTWAIN_X(LPCTSTR)
-{}
 
 //////////////////////////////// Initialize DLL /////////////////////////////
 LONG DLLENTRY_DEF DTWAIN_GetAPIHandleStatus(DTWAIN_HANDLE pHandle)
@@ -391,8 +390,13 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstant(LONG lConstantType, LONG lTwai
 {
     LOG_FUNC_ENTRY_PARAMS((lConstantType, lTwainConstant, lpszOut, nSize))
     VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto ret = CTL_StaticData::GetTwainNameFromConstant(lConstantType, lTwainConstant).second;
-    auto numChars = StringWrapper::CopyInfoToCString(ret, lpszOut, nSize);
+    auto ret = CTL_StaticData::GetTwainNameFromConstant(lConstantType, lTwainConstant);
+    if (!ret.first)
+    {
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
+        LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
+    }
+	auto numChars = StringWrapper::CopyInfoToCString(ret.second, lpszOut, nSize);
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
     LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
     CATCH_BLOCK(-1)
@@ -805,6 +809,10 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
         auto threadId = getThreadId();
         AssociateThreadToTwainDLL(pHandlePtr, threadId);
         CTL_TwainDLLHandle* pHandle = pHandlePtr.get();
+
+        // Associate a GUID with the handle
+        pHandle->GetGUID() = StringWrapperA::GetGUIDNoCurlyBrace();
+
         if (!bMinimalSetup)
         {
             // Open dtwain32.ini or dtwain64.ini
@@ -1420,7 +1428,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lp
 static DTWAIN_ARRAY GetFileTypes(CTL_TwainDLLHandle* pHandle, int nType)
 {
     constexpr const char *sNames[] = { "","-Single","-Multi" };
-    DTWAIN_ARRAY aFileTypes = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
+    DTWAIN_ARRAY aFileTypes = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0).second;
     if (aFileTypes)
     {
         auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
@@ -1558,6 +1566,13 @@ static bool FindTask( DWORD hTask )
 {
     auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
     return threadMap.find(hTask) != threadMap.end();
+}
+
+static bool FindTask(const DTWAIN_GUID& guid)
+{
+	auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
+    auto it = std::find_if(threadMap.begin(), threadMap.end(), [&](const auto& pr) { return pr.second->GetGUID() == guid; });
+    return it != threadMap.end();
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
@@ -1752,6 +1767,7 @@ static bool SysDestroyHelper(const char* pParentFunc, CTL_TwainDLLHandle* pHandl
         pHandle->RemoveAllEnumerators();
         pHandle->RemoveAllSourceCapInfo();
         pHandle->RemoveAllSourceMaps();
+        pHandle->RemoveAllPDFTextElements();
         pHandle->m_CallbackMsg = nullptr;
         pHandle->m_CallbackError = nullptr;
         RemoveThreadIdFromAssociation(threadId);
@@ -1833,33 +1849,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainMode(LONG lMode)
     }
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, []{return 0;}, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    CATCH_BLOCK(false)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTIFFSupported(VOID_PROTOTYPE)
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPDFSupported(VOID_PROTOTYPE)
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPNGSupported(VOID_PROTOTYPE)
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsJPEGSupported(VOID_PROTOTYPE)
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
 
@@ -2086,7 +2075,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainStringName(LONG category, LONG TwainID, LPTSTR 
     CATCH_BLOCK(-1)
 }
 
-LONG DLLENTRY_DEF DTWAIN_GetTwainIDFromName(LPCTSTR lpszBuffer)
+LONG DLLENTRY_DEF DTWAIN_GetConstantFromTwainName(LPCTSTR lpszBuffer)
 {
     LOG_FUNC_ENTRY_PARAMS((lpszBuffer))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
@@ -2366,22 +2355,22 @@ void LoadTransferReadyOverrides()
 }
 
 // This loads the sources that rely on the TWAIN loop when processing the acquisitions
-// to use PeekMessage() instead of GetMessage().
+// to use GetMessage() instead of PeekMessage().
 void LoadTwainLoopOverrides()
 {
-    auto& peekloop_list = CTL_TwainAppMgr::GetSourcePeekMessageList();
-    peekloop_list.clear();
+    auto& getmsgloop_list = CTL_TwainAppMgr::GetSourceGetMessageList();
+    getmsgloop_list.clear();
 
     // Get the section name
     auto* customProfile = CTL_StaticData::GetINIInterface();
     if (!customProfile)
         return;
     CSimpleIniA::TNamesDepend keys;
-    customProfile->GetAllKeys(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_TWAINLOOPPEEK_KEY).data(), keys);
+    customProfile->GetAllKeys(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_TWAINLOOPGETMSG_KEY).data(), keys);
     auto iter = keys.begin();
     while (iter != keys.end())
     {
-        peekloop_list.insert(iter->pItem);
+        getmsgloop_list.insert(iter->pItem);
         ++iter;
     }
 }

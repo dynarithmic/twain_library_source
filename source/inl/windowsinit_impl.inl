@@ -41,35 +41,65 @@ static UINT_PTR APIENTRY FileSaveAsHookProc(HWND hWnd, UINT msg, WPARAM /*w*/, L
     return TRUE;
 }
 
-bool dynarithmic::CenterWindow(HWND hwnd, HWND hwndParent)
+
+bool dynarithmic::CenterWindow(HWND hWnd, HWND hParent)
 {
-    RECT rect, rectP;
 
-    if (!hwndParent)
-        hwndParent = GetDesktopWindow();
-    GetWindowRect(hwnd, &rect);
-    GetWindowRect(hwndParent, &rectP);
+	if (!hParent)
+		hParent = GetDesktopWindow();
 
-    int width = rect.right - rect.left;
-    int height = rect.bottom - rect.top;
+	RECT rcChild;
+	RECT rcParent;
 
-    int x = (rectP.right - rectP.left - width) / 2 + rectP.left;
-    int y = (rectP.bottom - rectP.top - height) / 2 + rectP.top;
+	GetWindowRect(hWnd, &rcChild);     // SCREEN coords
+	GetWindowRect(hParent, &rcParent); // SCREEN coords
 
-    int screenwidth = GetSystemMetrics(SM_CXSCREEN);
-    int screenheight = GetSystemMetrics(SM_CYSCREEN);
+	int childW = rcChild.right - rcChild.left;
+	int childH = rcChild.bottom - rcChild.top;
 
-    //make sure that the dialog box never moves outside of
-    //the screen
-    if (x < 0) x = 0;
-    if (y < 0) y = 0;
-    if (x + width  > screenwidth)  x = screenwidth - width;
-    if (y + height > screenheight) y = screenheight - height;
+	int parentW = rcParent.right - rcParent.left;
+	int parentH = rcParent.bottom - rcParent.top;
 
-    // Convert x,y to screen and then to parent coordinates
+	int x = rcParent.left + (parentW - childW) / 2;
+	int y = rcParent.top + (parentH - childH) / 2;
 
-    MoveWindow(hwnd, x, y, width, height, FALSE);
+	SetWindowPos(hWnd,NULL,x,y,0,0,SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
     return true;
+}
+
+void dynarithmic::CenterWindowOnCurrentMonitor(HWND hWnd)
+{
+	// Get window rect
+	RECT rcWindow;
+	GetWindowRect(hWnd, &rcWindow);
+
+	int windowWidth = rcWindow.right - rcWindow.left;
+	int windowHeight = rcWindow.bottom - rcWindow.top;
+
+	// Get the monitor containing the window
+	HMONITOR hMonitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+
+	MONITORINFO mi;
+	mi.cbSize = sizeof(mi);
+	GetMonitorInfo(hMonitor, &mi);
+
+	// Use work area (excludes taskbar)
+	RECT rcWork = mi.rcWork;
+
+	int x = rcWork.left +
+		((rcWork.right - rcWork.left) - windowWidth) / 2;
+
+	int y = rcWork.top +
+		((rcWork.bottom - rcWork.top) - windowHeight) / 2;
+
+	SetWindowPos(
+		hWnd,
+		NULL,
+		x,
+		y,
+		0,
+		0,
+		SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
 }
 
 ////////// Function to subclass the window ////////////////////////

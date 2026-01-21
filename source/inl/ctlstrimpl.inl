@@ -135,7 +135,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddFileToAppendA(LPCSTR szFile)
 #endif
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextW(DTWAIN_SOURCE Source, LPCWSTR szText, LONG xPos, LONG yPos, LPCWSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, LONG strokeWidth, DWORD Flags)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextW(DTWAIN_SOURCE Source, LPCWSTR szText, LONG xPos, LONG yPos, LPCWSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DWORD Flags)
 {
 #ifdef _UNICODE
     return DTWAIN_AddPDFText(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
@@ -144,7 +144,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextW(DTWAIN_SOURCE Source, LPCWSTR szText
 #endif
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, LONG strokeWidth, DWORD Flags)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, DWORD Flags)
 {
 #ifdef _UNICODE
     return DTWAIN_AddPDFText(Source, StringConversion::Convert_AnsiPtr_To_Native(szText).c_str(), xPos, yPos, StringConversion::Convert_AnsiPtr_To_Native(fontName).c_str(), fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
@@ -910,47 +910,25 @@ LONG DLLENTRY_DEF DTWAIN_GetOCRVersionInfoW(DTWAIN_OCRENGINE Engine, LPWSTR buff
 #endif
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPDFTextElementStringA(DTWAIN_PDFTEXTELEMENT TextElement, LPSTR szData, LONG nMaxLen, LONG Flags)
+LONG DLLENTRY_DEF DTWAIN_GetPDFTextElementStringA(DTWAIN_PDFTEXTELEMENT TextElement, LPSTR szData, LONG nMaxLen, LONG Flags)
 {
 #ifdef _UNICODE
     std::wstring arg((std::max)(nMaxLen, 0L),0);
-    const DTWAIN_BOOL retVal = DTWAIN_GetPDFTextElementString(TextElement, (nMaxLen > 0 && szData) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()), Flags);
+    const auto retVal = DTWAIN_GetPDFTextElementString(TextElement, (nMaxLen > 0 && szData) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()), Flags);
     return null_terminator_copier(get_view(arg), szData, retVal);
 #else
     return DTWAIN_GetPDFTextElementString(TextElement, szData, nMaxLen, Flags);
 #endif
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetPDFTextElementStringW(DTWAIN_PDFTEXTELEMENT TextElement, LPWSTR szData, LONG maxLen, LONG Flags)
+LONG DLLENTRY_DEF DTWAIN_GetPDFTextElementStringW(DTWAIN_PDFTEXTELEMENT TextElement, LPWSTR szData, LONG maxLen, LONG Flags)
 {
 #ifdef _UNICODE
     return DTWAIN_GetPDFTextElementString(TextElement, szData, maxLen, Flags);
 #else
     std::string arg((std::max)(maxLen,0L), 0);
-    DTWAIN_BOOL retVal = DTWAIN_GetPDFTextElementString(TextElement, (maxLen>0 && szData)? &arg[0] : nullptr, static_cast<LONG>(arg.size()), Flags);
+    const auto retVal = DTWAIN_GetPDFTextElementString(TextElement, (maxLen>0 && szData)? &arg[0] : nullptr, static_cast<LONG>(arg.size()), Flags);
     return null_terminator_copier(get_view(arg), szData, retVal);
-#endif
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontNameA(LONG FontVal, LPSTR szFont, LONG nChars)
-{
-#ifdef _UNICODE
-    std::wstring arg((std::max)(nChars, 0L), 0);
-    const LONG retVal = DTWAIN_GetPDFType1FontName(FontVal, (nChars > 0 && szFont) ? &arg[0] : nullptr, nChars);
-    return null_terminator_copier(get_view(arg), szFont, retVal);
-#else
-    return DTWAIN_GetPDFType1FontName(FontVal, szFont, nChars);
-#endif
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetPDFType1FontNameW(LONG FontVal, LPWSTR szFont, LONG nChars)
-{
-#ifdef _UNICODE
-    return DTWAIN_GetPDFType1FontName(FontVal, szFont, nChars);
-#else
-    std::string arg((std::max)(nChars, 0L), 0);
-    LONG retVal = DTWAIN_GetPDFType1FontName(FontVal, (nChars>0 && szFont)? &arg[0] : nullptr, nChars);
-    return null_terminator_copier(get_view(arg), szFont, retVal);
 #endif
 }
 
@@ -1454,21 +1432,21 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainStringNameA(LONG category, LONG TwainID, LPSTR 
 #endif
 }
 
-LONG DLLENTRY_DEF DTWAIN_GetTwainIDFromNameA(LPCSTR lpszBuffer)
+LONG DLLENTRY_DEF DTWAIN_GetConstantFromTwainNameA(LPCSTR lpszBuffer)
 {
 #ifdef _UNICODE
-    return DTWAIN_GetTwainIDFromName(StringConversion::Convert_AnsiPtr_To_Native(lpszBuffer).c_str());
+    return DTWAIN_GetConstantFromTwainName(StringConversion::Convert_AnsiPtr_To_Native(lpszBuffer).c_str());
 #else
-    return DTWAIN_GetTwainIDFromName(lpszBuffer);
+    return DTWAIN_GetConstantFromTwainName(lpszBuffer);
 #endif
 }
 
-LONG DLLENTRY_DEF DTWAIN_GetTwainIDFromNameW(LPCWSTR lpszBuffer)
+LONG DLLENTRY_DEF DTWAIN_GetConstantFromTwainNameW(LPCWSTR lpszBuffer)
 {
 #ifdef _UNICODE
-    return DTWAIN_GetTwainIDFromName(lpszBuffer);
+    return DTWAIN_GetConstantFromTwainName(lpszBuffer);
 #else
-    return DTWAIN_GetTwainIDFromName(StringConversion::Convert_WidePtr_To_Native(lpszBuffer).c_str());
+    return DTWAIN_GetConstantFromTwainName(StringConversion::Convert_WidePtr_To_Native(lpszBuffer).c_str());
 #endif
 }
 
@@ -2643,29 +2621,29 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeSetValueFloatStringA(DTWAIN_RANGE pArray, L
 #endif
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeNearestValueFloatStringW(DTWAIN_RANGE pArray, LPCWSTR dIn, LPWSTR dOut, LONG RoundType)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetNearestValueFloatStringW(DTWAIN_RANGE pArray, LPCWSTR dIn, LPWSTR dOut, LONG RoundType)
 {
 #ifdef _UNICODE
-    return DTWAIN_RangeNearestValueFloatString(pArray, dIn, dOut, RoundType);
+    return DTWAIN_RangeGetNearestValueFloatString(pArray, dIn, dOut, RoundType);
 #else
     std::string arg(128, 0);
-    DTWAIN_BOOL retVal = DTWAIN_RangeNearestValueFloatString(pArray,
+    DTWAIN_BOOL retVal = DTWAIN_RangeGetNearestValueFloatString(pArray,
                                                StringConversion::Convert_WidePtr_To_Native(dIn).c_str(),
                                                &arg[0], RoundType);
     return null_terminator_copier(get_view(arg), dOut, retVal);
 #endif
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeNearestValueFloatStringA(DTWAIN_RANGE pArray, LPCSTR dIn, LPSTR dOut, LONG RoundType)
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_RangeGetNearestValueFloatStringA(DTWAIN_RANGE pArray, LPCSTR dIn, LPSTR dOut, LONG RoundType)
 {
 #ifdef _UNICODE
     std::wstring arg(128, 0);
-    const DTWAIN_BOOL retVal = DTWAIN_RangeNearestValueFloatString(pArray,
+    const DTWAIN_BOOL retVal = DTWAIN_RangeGetNearestValueFloatString(pArray,
                                                                    StringConversion::Convert_AnsiPtr_To_Native(dIn).c_str(),
                                                                    &arg[0], RoundType);
     return null_terminator_copier(get_view(arg), dOut, retVal);
 #else
-    return DTWAIN_RangeNearestValueFloatString(pArray, dIn, dOut, RoundType);
+    return DTWAIN_RangeGetNearestValueFloatString(pArray, dIn, dOut, RoundType);
 #endif
 }
 
@@ -3250,5 +3228,94 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayAddFloatStringNA(DTWAIN_ARRAY pArray, LPCST
 #endif
 }
 
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementFloatStringA(DTWAIN_PDFTEXTELEMENT TextElement, LPCSTR val1, LPCSTR val2, LONG Flags)
+{
+#ifdef _UNICODE
+    return DTWAIN_SetPDFTextElementFloatString(TextElement,
+                                               StringConversion::Convert_AnsiPtr_To_Native(val1).c_str(),
+                                               StringConversion::Convert_AnsiPtr_To_Native(val2).c_str(),
+                                               Flags);
+#else
+    return DTWAIN_SetPDFTextElementFloatString(TextElement, val1, val2, Flags);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFTextElementFloatStringW(DTWAIN_PDFTEXTELEMENT TextElement, LPCWSTR val1, LPCWSTR val2, LONG Flags)
+{
+#ifdef _UNICODE
+	return DTWAIN_SetPDFTextElementFloatString(TextElement, val1, val2, Flags);
+#else
+	return DTWAIN_SetPDFTextElementFloatString(TextElement,
+  	                                           StringConversion::Convert_WidePtr_To_Native(val1).c_str(),
+	                                           StringConversion::Convert_WidePtr_To_Native(val2).c_str(),
+	                                           Flags);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextStringA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName, LPCSTR fontSize, 
+                                                  LONG colorRGB, LONG renderMode, LPCSTR scaling, LPCSTR charSpacing, LPCSTR wordSpacing, 
+                                                  LPCSTR strokeWidth, DWORD Flags)
+{
+#ifdef _UNICODE
+    return DTWAIN_AddPDFTextString(Source,
+        StringConversion::Convert_AnsiPtr_To_Native(szText).c_str(), xPos, yPos,
+        StringConversion::Convert_AnsiPtr_To_Native(fontName).c_str(),
+        StringConversion::Convert_AnsiPtr_To_Native(fontSize).c_str(), colorRGB, renderMode,
+        StringConversion::Convert_AnsiPtr_To_Native(scaling).c_str(),
+        StringConversion::Convert_AnsiPtr_To_Native(charSpacing).c_str(),
+        StringConversion::Convert_AnsiPtr_To_Native(wordSpacing).c_str(), 
+        StringConversion::Convert_AnsiPtr_To_Native(strokeWidth).c_str(), Flags);
+#else
+    return DTWAIN_AddPDFTextString(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, 
+                                   renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
+#endif
+}
+
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextStringW(DTWAIN_SOURCE Source, LPCWSTR szText, LONG xPos, LONG yPos, LPCWSTR fontName, LPCWSTR fontSize,
+	                                              LONG colorRGB, LONG renderMode, LPCWSTR scaling, LPCWSTR charSpacing, LPCWSTR wordSpacing,
+	                                              LPCWSTR strokeWidth, DWORD Flags)
+{
+#ifdef _UNICODE
+	return DTWAIN_AddPDFTextString(Source, szText, xPos, yPos, fontName, fontSize, colorRGB,
+		                           renderMode, scaling, charSpacing, wordSpacing, strokeWidth, Flags);
+#else
+	return DTWAIN_AddPDFTextString(Source,
+		StringConversion::Convert_WidePtr_To_Native(szText).c_str(), xPos, yPos,
+		StringConversion::Convert_WidePtr_To_Native(fontName).c_str(),
+		StringConversion::Convert_WidePtr_To_Native(fontSize).c_str(), colorRGB, renderMode,
+		StringConversion::Convert_WidePtr_To_Native(scaling).c_str(),
+		StringConversion::Convert_WidePtr_To_Native(charSpacing).c_str(),
+		StringConversion::Convert_WidePtr_To_Native(wordSpacing).c_str(), 
+        StringConversion::Convert_WidePtr_To_Native(strokeWidth).c_str(),
+        Flags);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextExW(DTWAIN_SOURCE Source, LPCWSTR szText, LONG xPos, LONG yPos, LPCWSTR fontName, 
+                                              DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth,                                               DTWAIN_FLOAT rotationAngle, DTWAIN_FLOAT skewAngleX, DTWAIN_FLOAT skewAngleY, DTWAIN_FLOAT scalingX, DTWAIN_FLOAT scalingY, LONG transformType)
+{
+#ifdef _UNICODE
+	return DTWAIN_AddPDFTextEx(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType);
+#else
+	return DTWAIN_AddPDFTextEx(Source, 
+                               StringConversion::Convert_WidePtr_To_Native(szText).c_str(), xPos, yPos, 
+                               StringConversion::Convert_WidePtr_To_Native(fontName).c_str(), fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextExA(DTWAIN_SOURCE Source, LPCSTR szText, LONG xPos, LONG yPos, LPCSTR fontName,
+	DTWAIN_FLOAT fontSize, LONG colorRGB, LONG renderMode, DTWAIN_FLOAT scaling, DTWAIN_FLOAT charSpacing, DTWAIN_FLOAT wordSpacing, DTWAIN_FLOAT strokeWidth, 
+	DTWAIN_FLOAT rotationAngle, DTWAIN_FLOAT skewAngleX, DTWAIN_FLOAT skewAngleY, DTWAIN_FLOAT scalingX, DTWAIN_FLOAT scalingY, LONG transformType
+)
+{
+#ifdef _UNICODE
+	return DTWAIN_AddPDFTextEx(Source, StringConversion::Convert_AnsiPtr_To_Native(szText).c_str(), xPos, yPos, StringConversion::Convert_AnsiPtr_To_Native(fontName).c_str(), fontSize, colorRGB, renderMode, 
+        scaling, charSpacing, wordSpacing, strokeWidth, rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType);
+#else
+	return DTWAIN_AddPDFTextEx(Source, szText, xPos, yPos, fontName, fontSize, colorRGB, renderMode, scaling, charSpacing, wordSpacing, strokeWidth, rotationAngle, skewAngleX, skewAngleY, scalingX, scalingY, transformType);
+#endif
+}
 
 #endif // CTLSTRIMPL_INL

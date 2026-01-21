@@ -171,15 +171,10 @@ struct OCRTextInfo
 static bool GetOCRCharacterInformation( OCREngine* pEngine, OCRTextInfo& tInfo, HANDLE hBitmap, const DTWAINImageInfoEx& imageInfoEx );
 static PDFStringToTextElement CreatePDFTextElementMap(OCRTextInfo& tInfo);
 
-static void InitializeDisplayStatus(PDFTextElementPtr& pElement)
-{
-    pElement->hasBeenDisplayed = false;
-}
-
 struct PDFTextElementEraser
 {
     PDFTextElementEraser(LONG Flags) : m_Flags(Flags) {}
-    bool operator()(const PDFTextElementPtr& pElement) const
+    bool operator()(const PDFTextElement* pElement) const
     {
         return pElement->displayFlags & m_Flags?true:false;
     }
@@ -201,7 +196,8 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
         if (it != pHandle->m_mapPDFTextElement.end())
         {
         // any PDF text is initialized to not written
-            std::for_each(it->second.begin(), it->second.end(),InitializeDisplayStatus);
+            std::for_each(it->second.second.begin(), it->second.second.end(), 
+                          [](auto* pElement) { pElement->hasBeenDisplayed = false; });
         }
     }
 
@@ -330,14 +326,17 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
 
             while ( itStart != itEnd )
             {
-                DTWAIN_PDFTEXTELEMENT TextElement = DTWAIN_CreatePDFTextElement(m_ImageInfoEx.theSource); // add to Source array of elements
+                DTWAIN_PDFTEXTELEMENT SourceElement = static_cast<void*>(&(*itStart));
+                DTWAIN_PDFTEXTELEMENT TextElement = DTWAIN_CreatePDFTextElementCopy(SourceElement); // add to Source array of elements
+                DTWAIN_SetPDFTextElementLong(TextElement, DTWAIN_PDFTEXT_CURRENTPAGE, 0, DTWAIN_PDFTEXTELEMENT_DISPLAYFLAGS);
+                DTWAIN_AddPDFTextElement(TextElement, m_ImageInfoEx.theSource);
                 auto pElement = static_cast<PDFTextElement *>(TextElement);
                 *pElement = *itStart;
                 if ( itStart == pElMap.begin())
                 {
                     // Iterator to last item added to the Text element list
                     m_ImageInfoEx.PDFSearchableTextRange.first =
-                        std::prev(pHandle->m_mapPDFTextElement[m_ImageInfoEx.theSource].end());
+                        std::prev(pHandle->m_mapPDFTextElement[m_ImageInfoEx.theSource].second.end());
                 }
                 ++itStart;
                 ++nCount;
@@ -345,7 +344,7 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
             if ( nCount > 0 )
             {
                 m_ImageInfoEx.PDFSearchableTextRange.second =
-                    std::prev(pHandle->m_mapPDFTextElement[m_ImageInfoEx.theSource].end());
+                    std::prev(pHandle->m_mapPDFTextElement[m_ImageInfoEx.theSource].second.end());
                 m_ImageInfoEx.IsSearchableTextOnPage = true;
             }
         }
@@ -358,14 +357,22 @@ int CTL_PDFIOHandler::WriteBitmap(LPCTSTR szFile, bool bOpenFile, int fhFile, Di
     // Destroy the local text elements
     if (nCount > 0 )
     {
-        pHandle->m_mapPDFTextElement[m_ImageInfoEx.theSource].erase(m_ImageInfoEx.PDFSearchableTextRange.first,
-                                                                    m_ImageInfoEx.PDFSearchableTextRange.second);
+        pHandle->m_mapPDFTextElement[m_ImageInfoEx.theSource].second.erase(m_ImageInfoEx.PDFSearchableTextRange.first,
+                                                                           m_ImageInfoEx.PDFSearchableTextRange.second);
     }
 
     // erase temporary (current page) text elements
     PDFTextElementEraser eraser(DTWAIN_PDFTEXT_CURRENTPAGE);
     auto& mapElement = pHandle->m_mapPDFTextElement[m_ImageInfoEx.theSource];
-    mapElement.erase(std::remove_if(mapElement.begin(), mapElement.end(), eraser), mapElement.end());
+    auto& mapList = mapElement.second;
+    mapList.erase(std::remove_if(mapList.begin(), mapList.end(), eraser), mapList.end());
+
+    // rebuild the set of text items
+    mapElement.first.clear();
+    for (auto* txtElement : mapList)
+    {
+        mapElement.first.insert(txtElement);
+    }
 
     if ( bRet != 0 )
     {
@@ -490,7 +497,7 @@ int CTL_PDFIOHandler::GetOCRText(LPCTSTR filename, int pageType, std::string& sT
         sFileToUse = std::move(szTempPath);
     }
     // Just OCR the text here
-    DTWAIN_ARRAY aValues = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 1);
+    DTWAIN_ARRAY aValues = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 1).second;
     if ( aValues )
     {
         DTWAINArrayLowLevel_RAII a(pHandle, aValues);

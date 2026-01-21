@@ -71,8 +71,8 @@ static bool GetCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, typename CapArray
     DTWAIN_ARRAY ArrayValues = nullptr;
     const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     const LONG retVal = EnumCapInternal(Source, Cap, &ArrayValues, false, GetCurrentCapValues);
-    DTWAINArrayLowLevel_RAII arr(pHandle, ArrayValues);
-    if (retVal > 0)
+    DTWAINArrayLowLevelPtr_RAII arr(pHandle, &ArrayValues);
+    if (retVal > 0 && ArrayValues)
     {
         auto& vOut = pHandle->m_ArrayFactory->underlying_container_t<typename CapArrayType::value_type>(ArrayValues);
         *value = vOut[0];
@@ -236,8 +236,8 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
     if (nLen > 0)
         value[0] = '\0';
     const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
-    DTWAINArrayLowLevel_RAII arr(pHandle, ArrayValues);
-    if (retVal > 0)
+    DTWAINArrayLowLevelPtr_RAII arr(pHandle, &ArrayValues);
+    if (retVal > 0 && ArrayValues)
     {
         std::string sVal;
         pHandle->m_ArrayFactory->get_value(ArrayValues, 0, &sVal);
@@ -282,6 +282,26 @@ static bool GetStringCapability(DTWAIN_SOURCE Source, TW_UINT16 Cap, LPSTR value
         LOG_FUNC_ENTRY_PARAMS((Source)) \
         DTWAIN_ARRAY pArray = 0; \
         EnumCapInternal(Source, Cap, &pArray, false, GetAllCapValues); \
+        LOG_FUNC_EXIT_NONAME_PARAMS(pArray); \
+        CATCH_BLOCK(nullptr) \
+     }
+
+#define EXPORT_ENUM_CURRENTCAP_VALUES_EX(FuncName, Cap) \
+    DTWAIN_ARRAY DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source, DTWAIN_BOOL bExpandIfRange) \
+    {\
+        LOG_FUNC_ENTRY_PARAMS((Source, bExpandIfRange)) \
+        DTWAIN_ARRAY pArray = 0; \
+        EnumCapInternal(Source, Cap, &pArray, bExpandIfRange, GetCurrentCapValues); \
+        LOG_FUNC_EXIT_NONAME_PARAMS(pArray); \
+        CATCH_BLOCK(nullptr) \
+    }
+
+#define EXPORT_ENUM_CURRENTCAP_VALUES_NOEXPAND_EX(FuncName, Cap) \
+    DTWAIN_ARRAY DLLENTRY_DEF FuncName(DTWAIN_SOURCE Source) \
+    { \
+        LOG_FUNC_ENTRY_PARAMS((Source)) \
+        DTWAIN_ARRAY pArray = 0; \
+        EnumCapInternal(Source, Cap, &pArray, false, GetCurrentCapValues); \
         LOG_FUNC_EXIT_NONAME_PARAMS(pArray); \
         CATCH_BLOCK(nullptr) \
      }
@@ -564,6 +584,7 @@ EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetJobControl, CAP_JOBCONTROL)
 EXPORT_GET_CAP_VALUE_I(DTWAIN_GetLightPath, ICAP_LIGHTPATH)
 EXPORT_GET_CAP_VALUE_I(DTWAIN_GetLightSource, ICAP_LIGHTSOURCE)
 EXPORT_GET_CAP_VALUE_A(DTWAIN_GetLightSources, ICAP_LIGHTSOURCE)
+EXPORT_ENUM_CURRENTCAP_VALUES_NOEXPAND_EX(DTWAIN_GetLightSourcesEx, ICAP_LIGHTSOURCE)
 EXPORT_GET_CAP_VALUE_I(DTWAIN_GetNoiseFilter,  ICAP_NOISEFILTER)
 EXPORT_GET_CAP_VALUE_OPT_CURRENT_I(DTWAIN_GetOrientation, ICAP_ORIENTATION)
 EXPORT_GET_CAP_VALUE_I(DTWAIN_GetMaxBuffers, CAP_MAXBATCHBUFFERS)
@@ -816,7 +837,7 @@ static bool GetDoubleCap( CTL_ITwainSource* pSource, LONG lCap, double *pValue )
     bool bRet = GetCapValuesEx2_Internal(pSource, lCap, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array) ? true : false;
     if (!bRet)
         return false;
-    DTWAINArrayLowLevel_RAII arr(pHandle, Array);
+    DTWAINArrayLowLevelPtr_RAII arr(pHandle, &Array);
     const auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<double>(Array);
     if ( bRet && Array )
     {
@@ -832,21 +853,17 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pArray, lCap, bExpandRange))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO); 
     LONG nValues = 0;
 
-    DTWAIN_ARRAY OrigVals = nullptr;
+    if (pHandle->m_ArrayFactory->is_valid(*pArray))
+        pHandle->m_ArrayFactory->clear(*pArray);
 
-    // we may use a brand new array
-    LPDTWAIN_ARRAY arrayToUse = &OrigVals;
-
-    // use what was passed in if it isn't null
-    if ( pArray )
-        arrayToUse = pArray;
-
-    DTWAINArrayPtr_RAII a(pHandle, &OrigVals);
+    DTWAIN_ARRAY arrayToUse = {};
+    DTWAINArrayLowLevelPtr_RAII raii(pHandle, &arrayToUse);
 
     // get the capability values
-    if (GetCapValuesEx2_Internal(pSource, lCap, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arrayToUse))
+    if (GetCapValuesEx2_Internal(pSource, lCap, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arrayToUse))
     {
         // Gotten the value.  Check what container type holds the data
         const LONG lContainer = DTWAIN_GetCapContainer(Source, lCap, GetType);
@@ -863,18 +880,17 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
                     DTWAINArrayPtr_RAII aTemp(pHandle, &tempArray);
 
                     // expand the range into a temp array
-                    DTWAIN_RangeExpand(*arrayToUse, &tempArray);
+                    DTWAIN_RangeExpand(arrayToUse, &tempArray);
 
-                    // destroy original and copy new values
-                    pHandle->m_ArrayFactory->destroy(*arrayToUse);
-                    *arrayToUse = CreateArrayCopyFromFactory(pHandle, tempArray);
+                    // Copy expanded range to output array
+                    MoveArray(pHandle, &arrayToUse, &tempArray);
 
                     // get the count
-                    nValues = static_cast<LONG>(pHandle->m_ArrayFactory->size(*arrayToUse)); 
+                    nValues = static_cast<LONG>(pHandle->m_ArrayFactory->size(arrayToUse)); 
                 }
                 else
                 {
-                    nValues = static_cast<LONG>(pHandle->m_ArrayFactory->size(*arrayToUse)); 
+                    nValues = static_cast<LONG>(pHandle->m_ArrayFactory->size(arrayToUse)); 
                 }
             }
             break;
@@ -882,9 +898,10 @@ static LONG GetCapValues(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray, LONG lCap,
             case DTWAIN_CONTONEVALUE:
             case DTWAIN_CONTARRAY:
             {
-                nValues = static_cast<LONG>(pHandle->m_ArrayFactory->size(*arrayToUse)); 
+                nValues = static_cast<LONG>(pHandle->m_ArrayFactory->size(arrayToUse)); 
             }
         }
+        MoveArray(pHandle, pArray, &arrayToUse);
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(nValues)
     CATCH_BLOCK_LOG_PARAMS(0) //DTWAIN_FAILURE1)

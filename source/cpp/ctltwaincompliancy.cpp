@@ -36,12 +36,15 @@ struct ResetPixelType
     {
         try
         {
-            DTWAIN_ARRAY arr = CreateArrayFromFactory(m_pSourceRAII->GetDTWAINHandle(), DTWAIN_ARRAYLONG, 1);
-            DTWAINArrayLowLevelPtr_RAII raii(m_pSourceRAII->GetDTWAINHandle(), &arr);
-            // get pointer to internals of the array
-            auto& vCurPtr = m_pSourceRAII->GetDTWAINHandle()->m_ArrayFactory->underlying_container_t<LONG>(arr);
-            vCurPtr[0] = origValue;
-            SetCapValuesEx2_Internal(m_pSourceRAII, ICAP_PIXELTYPE, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
+            auto arr = CreateArrayFromFactory(m_pSourceRAII->GetDTWAINHandle(), DTWAIN_ARRAYLONG, 1).second;
+            if (arr)
+            {
+                DTWAINArrayLowLevelPtr_RAII raii(m_pSourceRAII->GetDTWAINHandle(), &arr);
+                // get pointer to internals of the array
+                auto& vCurPtr = m_pSourceRAII->GetDTWAINHandle()->m_ArrayFactory->underlying_container_t<LONG>(arr);
+                vCurPtr[0] = origValue;
+                SetCapValuesEx2_Internal(m_pSourceRAII, ICAP_PIXELTYPE, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arr);
+            }
         }
         catch (...)
         {
@@ -369,18 +372,20 @@ std::pair<bool, std::vector<int>> TWAINCompliancyTester::TestStandardCapabilitie
                     {
                         DTWAIN_ARRAY arrTest = {};
                         DTWAINArrayLowLevelPtr_RAII arrTestRAII(pHandle, &arrTest);
-                        arrTest = CreateArrayFromCap(m_pSource->GetDTWAINHandle(), m_pSource, oneCap, 5);
-                        bOK = SetCapValuesEx2_Internal(m_pSource, oneCap, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arrTest);
-                        if (!bOK)
+                        arrTest = CreateArrayFromCap(m_pSource->GetDTWAINHandle(), m_pSource, oneCap, 5).second;
+                        if (arrTest)
                         {
-                            auto lastTwainError = CTL_TwainAppMgr::GetLastTwainError();
-                            if (lastTwainError == TWRC_CHECKSTATUS)
-                                continue;
-                            returnPair.first = false;
-                            returnPair.second.push_back(DTWAIN_ERR_STANDARDCAPS_COMPLIANCY);
+                            bOK = SetCapValuesEx2_Internal(m_pSource, oneCap, DTWAIN_CAPSET, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, arrTest);
+                            if (!bOK)
+                            {
+                                auto lastTwainError = CTL_TwainAppMgr::GetLastTwainError();
+                                if (lastTwainError == TWRC_CHECKSTATUS)
+                                    continue;
+                                returnPair.first = false;
+                                returnPair.second.push_back(DTWAIN_ERR_STANDARDCAPS_COMPLIANCY);
+                            }
                         }
                     }
-                
 /*                    7.3.7.5.2.1.Action: MSG_SET the value using a
                         TW_ARRAY container
                         7.3.7.5.2.1.1.Test : If result is not

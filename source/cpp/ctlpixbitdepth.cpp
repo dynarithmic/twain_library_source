@@ -60,11 +60,11 @@ DTWAIN_BOOL DTWAIN_SetPixelTypeHelper(DTWAIN_SOURCE Source, LONG PixelType, LONG
     LONG SetType = DTWAIN_CAPSET;
     if ( !bSetCurrent )
         SetType = DTWAIN_CAPRESET;
-    DTWAIN_ARRAY Array = CreateArrayFromCap(pHandle, nullptr, ICAP_PIXELTYPE, 1);
+    DTWAIN_ARRAY Array = CreateArrayFromCap(pHandle, nullptr, ICAP_PIXELTYPE, 1).second;
     if (!Array)
         return false;
 
-    DTWAINArrayLowLevel_RAII a(pHandle, Array);
+    DTWAINArrayLowLevelPtr_RAII a(pHandle, &Array);
 
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
     LONG defaultBitDepth = -1;
@@ -120,7 +120,7 @@ DTWAIN_BOOL GetPixelType(DTWAIN_SOURCE Source, LPLONG PixelType, LPLONG BitDepth
 {
     DTWAIN_ARRAY Array = nullptr;
     const DTWAIN_BOOL bRet = DTWAIN_GetCapValuesEx2(Source, ICAP_PIXELTYPE,  GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array );
-    if ( bRet )
+    if ( bRet && Array )
     {
         const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
         DTWAINArrayLowLevel_RAII arr(pHandle, Array);
@@ -146,9 +146,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBitDepth(DTWAIN_SOURCE Source, LONG BitDepth,
     if ( !bSetCurrent )
         SetType = DTWAIN_CAPRESET;
     DTWAIN_BOOL bRet = FALSE;
-    DTWAIN_ARRAY Array = CreateArrayFromCap(pHandle, nullptr, ICAP_BITDEPTH, 1);
-    if ( !Array )
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    auto retValue = CreateArrayFromCap(pHandle, nullptr, ICAP_BITDEPTH, 1);
+    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !retValue.second; }, retValue.first, false, FUNC_MACRO);
+    auto Array = retValue.second;
     DTWAINArrayLowLevel_RAII a(pHandle, Array);
     auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
     if ( !vIn.empty())
@@ -157,8 +157,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetBitDepth(DTWAIN_SOURCE Source, LONG BitDepth,
         bRet = SetCapValuesEx2_Internal(pSource, ICAP_BITDEPTH, SetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, Array);
         if ( !bRet )
         {
-            DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return true;},
-                                DTWAIN_ERR_INVALID_BITDEPTH, false, FUNC_MACRO);
+            DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return true;}, DTWAIN_ERR_INVALID_BITDEPTH, false, FUNC_MACRO);
         }
         else
         {
@@ -184,6 +183,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetBitDepth(DTWAIN_SOURCE Source, LPLONG BitDept
     const DTWAIN_BOOL bRet = GetCapValuesEx2_Internal(pSource, ICAP_BITDEPTH, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array);
     if ( bRet && Array )
     {
+        DTWAINArrayLowLevelPtr_RAII(pHandle, &Array);
         const auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);
         if ( !vIn.empty() )
             *BitDepth = vIn[0];
@@ -202,12 +202,16 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumPixelTypes(DTWAIN_SOURCE Source, LPDTWAIN_AR
 {
     LOG_FUNC_ENTRY_PARAMS((Source, pArray))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    const DTWAIN_ARRAY arr = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
+	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO); 
+
+    auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
+	DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+    auto arr = retVal.second;
     auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
     const CTL_ITwainSource::CachedPixelTypeMap& theMap = pSource->GetPixelTypeMap();
     std::transform(theMap.begin(), theMap.end(), std::back_inserter(vIn), []
-            (const CTL_ITwainSource::CachedPixelTypeMap::value_type& v) { return v.first; });
-    *pArray = arr;
+                        (const CTL_ITwainSource::CachedPixelTypeMap::value_type& v) { return v.first; });
+    MoveArray(pHandle, pArray, &arr);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
@@ -219,12 +223,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumBitDepthsEx(DTWAIN_SOURCE Source, LONG Pixel
     auto [pHandle, pSource] = VerifyHandles(Source);
     if (pSource->IsPixelTypeSupported(PixelType) )
     {
-        const DTWAIN_ARRAY arr = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
+		auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
+		DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+        auto arr = retVal.second;
         auto& vIn = pHandle->m_ArrayFactory->underlying_container_t<LONG>(arr);
         const CTL_ITwainSource::CachedPixelTypeMap& theMap = pSource->GetPixelTypeMap();
         auto& pBitDepths = theMap.find(PixelType)->second;
         std::copy(pBitDepths.begin(), pBitDepths.end(), std::back_inserter(vIn));
-        *Array = arr;
+		MoveArray(pHandle, Array, &arr);
         LOG_FUNC_EXIT_NONAME_PARAMS(true)
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(false)
@@ -244,6 +250,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumFileTypeBitsPerPixel(LONG FileType, LPDTWAIN
 {
     LOG_FUNC_ENTRY_PARAMS((FileType, Array))
     auto [pH, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    DTWAIN_Check_Error_Condition_0_Ex(pH, [&] { return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     auto pHandle = pH;
 
     if (Array)
@@ -253,7 +260,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumFileTypeBitsPerPixel(LONG FileType, LPDTWAIN
             factory->clear(*Array);
     }
 
-    DTWAIN_ARRAY ThisArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
+	auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
+	DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+    auto ThisArray = retVal.second;
     DTWAINArrayLowLevel_RAII arr(pHandle, ThisArray);
     auto& bppMap = CTL_ImageIOHandler::GetSupportedBPPMap();
     const auto iter = bppMap.find(FileType);
@@ -264,8 +273,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumFileTypeBitsPerPixel(LONG FileType, LPDTWAIN
                      LONG lVal = val;
                      pHandle->m_ArrayFactory->add_to_back(ThisArray, &lVal, 1);
                  });
-    *Array = ThisArray;
-    arr.SetDestroy(false);
+    MoveArray(pH, Array, &ThisArray);
     LOG_FUNC_EXIT_NONAME_PARAMS(iter != bppMap.end())
     CATCH_BLOCK(FALSE)
 }

@@ -43,32 +43,25 @@ LONG DLLENTRY_DEF DTWAIN_GetCapContainerEx(LONG nCap, DTWAIN_BOOL bSetContainer,
 {
     LOG_FUNC_ENTRY_PARAMS((nCap, bSetContainer, pArray))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    // Check if array is of the correct type
-    if (pArray)
-    {
-        *pArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
-        if (!*pArray)
-            LOG_FUNC_EXIT_NONAME_PARAMS(0L)
-    }
-    DTWAIN_ARRAY pDTWAINArray = nullptr;
-    if (pArray)
-        pDTWAINArray = *pArray;
+	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
+	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, 0L, FUNC_MACRO);
+    DTWAIN_ARRAY pDTWAINArray = retVal.second;
+    DTWAINArrayLowLevelPtr_RAII raii(pHandle, &pDTWAINArray);
 
     if (nCap < CAP_CUSTOMBASE)
     {
         auto& factory = pHandle->m_ArrayFactory;
         LONG lValue = static_cast<LONG>(CTL_TwainAppMgr::GetContainerTypesFromCap(static_cast<TW_UINT16 >(nCap),
                                                                                   bSetContainer ? true : false));
-        if (pDTWAINArray)
+        auto& vLong = factory->underlying_container_t<LONG>(pDTWAINArray);
+        for (int i = 1; i <= 16; i++)
         {
-            auto& vLong = factory->underlying_container_t<LONG>(pDTWAINArray);
-            for (int i = 1; i <= 16; i++)
-            {
-                if (lValue & (1 << (i - 1)))
-                    vLong.push_back(i);
-            }
+            if (lValue & (1 << (i - 1)))
+                vLong.push_back(i);
         }
     }
+    MoveArray(pHandle, pArray, &pDTWAINArray);
     LOG_FUNC_EXIT_NONAME_PARAMS(0xFFFFFFFF)
     CATCH_BLOCK_LOG_PARAMS(0)
 }

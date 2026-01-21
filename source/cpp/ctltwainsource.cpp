@@ -240,7 +240,7 @@ CTL_ITwainSource::CTL_ITwainSource(CTL_ITwainSession* pSession, LPCTSTR lpszProd
     m_bTileMode(false),
     m_bExtendedCapsRetrieved(false),
     m_bShutdownAcquire(false),
-    m_bUsePeekMessage(false),
+    m_bUsePeekMessage(true),
     m_nLastAcquireError(false),
     m_bTwainMsgLoopStarted(false),
     m_tbIsFileSystemSupported(boost::logic::indeterminate),
@@ -706,6 +706,7 @@ CTL_ITwainSource::~CTL_ITwainSource()
     try
     {
         DestroyExtImageInfo();
+        ClearPDFTextElements();
         ResetManualDuplexMode();
         CloseSource(true);
         m_pDLLHandle->m_mapPDFTextElement.erase(this);
@@ -924,9 +925,18 @@ void CTL_ITwainSource::SetPDFValue(CTL_StringViewType nWhich, const PDFTextEleme
 {
     if ( nWhich == PDFTEXTELEMENTKEY )
     {
-        m_pDLLHandle->m_mapPDFTextElement[this].push_back(element);
+        auto& node = m_pDLLHandle->m_mapPDFTextElement[this];
+        auto& theSet = node.first;
+        auto& theList = node.second;
+        auto* textElement = element.get();
+        if (!theSet.count(textElement))
+        {
+            theList.push_back(textElement);
+            theSet.insert(textElement);
+        }
     }
 }
+
 void CTL_ITwainSource::SetPDFPageSize(LONG nPageSize, DTWAIN_FLOAT cWidth, DTWAIN_FLOAT cHeight)
 {
     m_ImageInfoEx.PDFPageSize = nPageSize;
@@ -954,11 +964,35 @@ void CTL_ITwainSource::SetPDFEncryption(bool bIsEncrypted,
     }
 }
 
-void CTL_ITwainSource::ClearPDFText()
+static void ClearPDFTextInternal(CTL_TEXTELEMENTMAP::iterator it, PDFTextElement* pElement)
+{
+	// See if text element is in set
+	auto& theSet = it->second.first;
+	if (theSet.count(pElement))
+	{
+		auto& theList = it->second.second;
+		theList.erase(std::remove(theList.begin(), theList.end(), pElement), theList.end());
+	}
+	theSet.erase(pElement);
+	pElement->vptrTwainSource.erase(it->first);
+}
+
+void CTL_ITwainSource::ClearPDFTextElements()
 {
     const auto it = m_pDLLHandle->m_mapPDFTextElement.find(this);
     if (it != m_pDLLHandle->m_mapPDFTextElement.end())
-        it->second.clear();
+    {
+		auto& theSet = it->second.first;
+        while (!theSet.empty())
+            ClearPDFTextInternal(it, *theSet.begin());
+    }
+}
+
+void CTL_ITwainSource::ClearOnePDFTextElement(PDFTextElement* pElement)
+{
+	const auto it = m_pDLLHandle->m_mapPDFTextElement.find(this);
+	if (it != m_pDLLHandle->m_mapPDFTextElement.end())
+        ClearPDFTextInternal(it, pElement);
 }
 
 void CTL_ITwainSource::SetPhotometric(LONG Setting)
@@ -1182,7 +1216,6 @@ void CTL_ITwainSource::ProcessMultipageFile()
         const ImageXferFileWriter FileWriter(nullptr, m_pSession ,this);
         FileWriter.CloseMultiPageDibFile(GetMutiPageScanMode() != DTWAIN_FILESAVE_MANUALSAVE);
     }
-    ClearPDFText(); // clear the text elements
 }
 
 bool isIntCap(DTWAIN_SOURCE Source, LONG nCap)
@@ -1194,10 +1227,13 @@ template <typename T>
 static DTWAIN_ARRAY PopulateArray(const std::vector<anytype_>& dataArray, CTL_ITwainSource* pSource, TW_UINT16 nCap)
 {
     const auto pHandle = pSource->GetDTWAINHandle();
-    const DTWAIN_ARRAY theArray = CreateArrayFromCap(pHandle, pSource, static_cast<LONG>(nCap), static_cast<LONG>(dataArray.size()));
-    auto& vVector = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
-    std::transform(dataArray.begin(), dataArray.end(), vVector.begin(), [](anytype_ theAny) 
-                    { return ANYTYPE_NAMESPACE any_cast<typename T::value_type>(theAny);});
+    const DTWAIN_ARRAY theArray = CreateArrayFromCap(pHandle, pSource, static_cast<LONG>(nCap), static_cast<LONG>(dataArray.size())).second;
+    if (theArray)
+    {
+        auto& vVector = pHandle->m_ArrayFactory->underlying_container_t<typename T::value_type>(theArray);
+        std::transform(dataArray.begin(), dataArray.end(), vVector.begin(), [](anytype_ theAny)
+                       { return ANYTYPE_NAMESPACE any_cast<typename T::value_type>(theAny); });
+    }
     return theArray;
 }
 

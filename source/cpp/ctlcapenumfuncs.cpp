@@ -47,16 +47,18 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
 
     // Check if Array is nullptr
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return Array == nullptr; },
-                                      DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     auto& factory = pHandle->m_ArrayFactory;
 
     if (factory->is_valid(*Array))
         factory->clear(*Array);
 
-    DTWAIN_ARRAY ThisArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
-    DTWAINArrayLowLevel_RAII arr(pHandle, ThisArray);
+    auto retvalue = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !retvalue.second; }, retvalue.first, false, FUNC_MACRO);
+    auto ThisArray = retvalue.second;
+
+    DTWAINArrayLowLevelPtr_RAII arr(pHandle, &ThisArray);
     auto& vCaps = factory->underlying_container_t<LONG>(ThisArray);
 
     if (ThisArray)
@@ -75,14 +77,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
                 CTL_CapInfoMap *pCapInfoArray = std::get<1>(Info).get();
                 std::for_each(pCapInfoArray->begin(), pCapInfoArray->end(), [&vCaps](const CTL_CapInfoMap::value_type& CapInfo)
                                 { vCaps.push_back(static_cast<int>(std::get<0>(CapInfo))); });
-                *Array = CreateArrayCopyFromFactory(pHandle, ThisArray);
+                MoveArray(pHandle, Array, &ThisArray); 
                 LOG_FUNC_EXIT_NONAME_PARAMS(true)
             }
         }
 
         // First time, so let's go
-        const DTWAIN_ARRAY pDTWAINArray = ThisArray;
-        factory->clear(pDTWAINArray);
+        factory->clear(ThisArray);
         CTL_TwainCapArray rArray;
 
         // loop through all capabilities
@@ -96,7 +97,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN
         DTWAIN_CacheCapabilityInfo(pSource, pHandle, &vCaps);
         pSource->SetRetrievedAllCaps(true);
         const bool bFound = !vCaps.empty();
-        *Array = CreateArrayCopyFromFactory(pHandle, ThisArray);
+        MoveArray(pHandle, Array, &ThisArray);
         if (bFound)
             LOG_FUNC_EXIT_NONAME_PARAMS(true)
     }
@@ -108,10 +109,13 @@ template <typename CacheFn>
 static void CopyCapsToUserArray(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LPDTWAIN_ARRAY Array, CacheFn fn)
 {
     // Create the container to copy the caps to
-    DTWAIN_ARRAY ThisArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
+    auto retValue = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
+    if (!retValue.second)
+        return;
+    DTWAIN_ARRAY ThisArray = retValue.second;
 
     // If anything goes wrong, make sure the array is deleted from memory
-    DTWAINArrayLowLevel_RAII arr(pHandle, ThisArray);
+    DTWAINArrayLowLevelPtr_RAII arr(pHandle, &ThisArray);
 
     auto& factory = pHandle->m_ArrayFactory;
 
@@ -120,8 +124,7 @@ static void CopyCapsToUserArray(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* p
     auto& capCache = (pSource->*fn)();
     vCaps.insert(vCaps.begin(), capCache.begin(), capCache.end());
 
-    // Copy the temp array to the user's copy
-    *Array = CreateArrayCopyFromFactory(pHandle, ThisArray);
+    MoveArray(pHandle, Array, &ThisArray);
 }
 
 struct EnumCustomTraits
@@ -165,6 +168,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtendedCaps(DTWAIN_SOURCE Source, LPDTWAIN_
     LOG_FUNC_ENTRY_PARAMS((Source, Array))
     auto [pHandle, pSource] = VerifyHandles(Source);
 
+	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+
     // Enumerate the extended caps
     auto retVal = EnumCaps<EnumExtendedTraits>(Source, Array, &CTL_ITwainSource::GetExtendedCapCache);
 
@@ -181,6 +186,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCustomCaps(DTWAIN_SOURCE Source, LPDTWAIN_AR
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Array))
     auto [pHandle, pSource] = VerifyHandles(Source);
+
+	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     // Enumerate the custom caps
     auto retVal = EnumCaps<EnumCustomTraits>(Source, Array, &CTL_ITwainSource::GetCustomCapCache);

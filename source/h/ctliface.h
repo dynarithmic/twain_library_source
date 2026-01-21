@@ -30,6 +30,7 @@
 #include <mutex>
 #include <memory>
 #include <functional>
+#include <array>
 #include <string_view>
 #include "ctltripletbase.h"
 #include "dtwain_raii.h"
@@ -46,6 +47,7 @@
 #include "ctlconstexprutils.h"
 #include "ctllogfunctioncall.h"
 #include "capinfomap.h"
+#include "ctlbimap.h"
 #ifdef _WIN32
     #include "winlibraryloader_impl.inl"
 #else
@@ -68,6 +70,7 @@ struct dtwain_library_loader : library_loader_impl
 #include "logmsg.h"
 #include "winconst.h"
 #include <map>
+#include "ctlguiddef.h"
 
 namespace dynarithmic
 {
@@ -133,68 +136,6 @@ namespace dynarithmic
         {}
     };
 
-    // Note -- must have distinct key / value pairs.
-    template <typename Key_, typename Value_>
-    struct BiDirectionalMap
-    {
-        typedef std::map<Key_, Value_> left_map;
-        typedef std::map<Value_, Key_> right_map;
-
-        private:
-            left_map left;
-            right_map right;
-
-        public:
-            std::tuple<typename left_map::iterator,
-                       typename right_map::iterator, bool>
-            insert(const std::pair<Key_, Value_>& val)
-            {
-                auto it1 = left.insert({val.first, val.second});
-                if ( it1.second )
-                {
-                    auto it2 = right.insert({val.second, val.first});
-                    return {it1.first, it2.first, true};
-                }
-                return {it1.first, right.find(val.second), false};
-            }
-
-            std::tuple<typename left_map::iterator, typename right_map::iterator, bool>
-            erase(const Key_& key)
-            {
-                auto it1 = left.find(key);
-                if ( it1 != left.end())
-                {
-                    auto it2 = right.find(it1->second);
-                    if ( it2 != right.end())
-                    {
-                        auto er1 = left.erase(it1);
-                        auto er2 = right.erase(it2);
-                        return {er1, er2, true};
-                    }
-                }
-                return {left.end(), right.end(), false};
-            }
-
-            void clear()
-            {
-                left.clear();
-                right.clear();
-            }
-
-            size_t size() const
-            {
-               return left.size();
-            }
-
-            bool empty() const
-            {
-                return left.empty();
-            }
-
-            const left_map& Left() { return left; }
-            const right_map& Right() { return right; }
-    };
-
     #include "capstruc.h"
     #include "capinfomap.h"
 
@@ -211,7 +152,6 @@ namespace dynarithmic
 
     typedef boost::container::flat_map<unsigned long, std::shared_ptr<CTL_TwainDLLHandle>> CTL_MapThreadToDLLHandle;
     typedef boost::container::flat_map<LONG, int> CTL_LongToIntMap;
-    typedef BiDirectionalMap<std::pair<int, int>, std::string> CTL_TwainNameMap;
     typedef boost::container::flat_map<CTL_StringType, CTL_ITwainSource*> CTL_StringToSourcePtrMap;
     typedef boost::container::flat_map<CTL_StringType, int> CTL_StringToIntMap;
     typedef boost::container::flat_map<LONG, HMODULE> CTL_LongToHMODULEMap;
@@ -541,7 +481,8 @@ namespace dynarithmic
                INI_ALLOWDUP_RESOURCE,
                INI_SOURCE_SAVEDEFAULT,
                INI_SELECTSOURCEPOS_KEY,
- 			   INI_SAVESELECTSOURCEPOS_KEY,
+               INI_SAVESELECTSOURCEPOS_KEY,
+               INI_TWAINLOOPGETMSG_KEY,
                LASTINIENTRY };
         std::array<std::pair<int, std::string_view>, LASTINIENTRY> s_aINIKeys;
         int32_t                      s_nExtImageInfoOffset = 0;
@@ -580,7 +521,6 @@ namespace dynarithmic
         CTL_MapThreadToDLLHandle s_mapThreadToDLLHandle;
         CTL_ThreadMap            s_ThreadMap;
         std::unordered_set<HWND> s_appWindowsToDisable;
-        CTL_CallbackProcArray    s_aAllCallbacks;
         CTL_StringType           s_strLangResourcePath;
         CTL_GeneralErrorInfo     s_mapGeneralErrorInfo;
         CLogSystem               s_appLog;
@@ -593,6 +533,7 @@ namespace dynarithmic
         CTL_CompressionMap       s_CompressionMap;
         std::string              s_AppTitle;
         std::pair<int32_t, int32_t> s_SavedSelectSourcePos;
+        CTL_TEXTELEMENTPTRLIST   s_PDFTextElementList;
         CTL_StaticDataStruct();
     };
 
@@ -678,11 +619,11 @@ namespace dynarithmic
         static std::pair<bool, CTL_StringType> GetTwainNameFromConstant(int lConstantType, TwainConstantType lTwainConstant);
         static std::pair<bool, std::string> GetTwainNameFromConstantA(int lConstantType, TwainConstantType lTwainConstant);
         static std::pair<bool, std::wstring> GetTwainNameFromConstantW(int lConstantType, TwainConstantType lTwainConstant);
-        static CTL_CallbackProcArray& GetCallbacks() { return s_StaticData.s_aAllCallbacks; }
         static auto& GetAppWindowsToDisable() { return s_StaticData.s_appWindowsToDisable; }
         static constexpr std::string_view GetINIKey(int nWhich) { return s_StaticData.s_aINIKeys[nWhich].second; }
         static std::string& GetAppTitle() { return s_StaticData.s_AppTitle; }
         static std::pair<int32_t, int32_t>& GetSelectSourcePos() { return s_StaticData.s_SavedSelectSourcePos; }
+        static auto& GetPDFTextElementList() { return s_StaticData.s_PDFTextElementList; }
     };
 
     struct CTL_LoggerCallbackInfo
@@ -714,11 +655,15 @@ namespace dynarithmic
             void    RemoveAllEnumerators();
             void    RemoveAllSourceCapInfo();
             void    RemoveAllSourceMaps();
+            void    RemoveAllPDFTextElements();
             void    InitializeResourceRegistry();
             std::pair<CTL_ResourceRegistryMap::iterator, bool> AddResourceToRegistry(LPCSTR pLangDLL, bool bClear);
             CTL_ResourceRegistryMap& GetResourceRegistry() { return m_ResourceRegistry; }
             CTL_StringType GetVersionString() const { return  m_VersionString; }
             void        SetVersionString(CTL_StringType s) { m_VersionString = std::move(s); }
+            DTWAIN_GUID& GetGUID() { return m_uuid; }
+            auto& GetGUIDMap(int nWhich) { return m_arrayMapGUID[nWhich]; }
+            auto& GetGUIDMap() { return m_arrayMapGUID; }
 
             DTWAIN_ACQUIRE          GetNewAcquireNum();
             void                    EraseAcquireNum(DTWAIN_ACQUIRE nNum);
@@ -755,6 +700,8 @@ namespace dynarithmic
             };
 
             tagSessionStruct m_SessionStruct;
+            DTWAIN_GUID m_uuid = {};
+            std::array<DTWAIN_GUID_MAP, GUID_DEF_TOTAL> m_arrayMapGUID = {};
             CTL_ResourceRegistryMap m_ResourceRegistry;
             CTL_ITwainSession* m_pTwainSession;
             CTL_StringType   m_VersionString;
@@ -880,6 +827,7 @@ namespace dynarithmic
     CTL_TwainDLLHandle* FindHandle(HINSTANCE hInst);
     std::pair<CTL_TwainDLLHandle*, CTL_ITwainSource*> VerifyHandles(DTWAIN_SOURCE Source, int Testing = DTWAIN_VERIFY_DLLHANDLE | DTWAIN_VERIFY_SOURCEHANDLE | DTWAIN_TEST_SETLASTERROR);
     bool CenterWindow(HWND hwnd, HWND hwndParent);
+    void CenterWindowOnCurrentMonitor(HWND hwnd);
 
     LONG GetCustomCapDataType(DTWAIN_SOURCE Source, TW_UINT16 nCap);
     LONG GetCapContainer(CTL_ITwainSource* pSource, LONG nCap, LONG lCapType);
@@ -956,12 +904,12 @@ namespace dynarithmic
     void SysDestroyNoCheck();
     void DestroyArrayFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray);
     void DestroyFrameFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_FRAME Frame);
-    DTWAIN_ARRAY CreateArrayFromFactory(CTL_TwainDLLHandle* pHandle, LONG nEnumType, LONG nInitialSize);
+    std::pair<int, DTWAIN_ARRAY> CreateArrayFromFactory(CTL_TwainDLLHandle* pHandle, LONG nEnumType, LONG nInitialSize);
+	std::pair<int, DTWAIN_ARRAY> CreateArrayFromCap(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapType, LONG lSize);
     DTWAIN_ARRAY CreateArrayCopyFromFactory(CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY Source);
     DTWAIN_FRAME CreateFrameArray(const CTL_TwainDLLHandle* pHandle, double Left, double Top, double Right, double Bottom);
     void SetArrayValueFromFactory(const CTL_TwainDLLHandle* pHandle, DTWAIN_ARRAY pArray, size_t lPos, LPVOID pVariant);
-    DTWAIN_ARRAY CreateArrayFromCap(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapType, LONG lSize);
-    bool AssignArray(const CTL_TwainDLLHandle* pHandle, LPDTWAIN_ARRAY aDestination, LPDTWAIN_ARRAY aSource);
+    bool MoveArray(const CTL_TwainDLLHandle* pHandle, LPDTWAIN_ARRAY aDestination, LPDTWAIN_ARRAY aSource);
     LONG GetCapDataType(CTL_ITwainSource* pSource, LONG nCap);
     int FeederWait(CTL_ITwainSource* pSource);
 
@@ -1082,9 +1030,14 @@ namespace dynarithmic
             if (m_pHandle && m_bDestroy && m_Array)
             {
                 if constexpr (std::is_same_v<ArrayType, DTWAIN_ARRAY*>)
-                    m_pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(*m_Array));
+                {
+                    if (*m_Array)
+                        m_pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(*m_Array));
+                }
                 else
+                {
                     m_pHandle->m_ArrayFactory->destroy(CTL_ArrayFactory::from_void(m_Array));
+                }
                 m_Array = {};
             }
         }

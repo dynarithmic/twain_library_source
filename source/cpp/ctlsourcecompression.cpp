@@ -37,7 +37,9 @@ static bool ImageFileFormatCapHandler(CTL_ITwainSource* pSource, CTL_TwainDLLHan
     std::array<std::pair<LONG, LONG>, 2> capsToSet = { { {ICAP_XFERMECH, Mode}, {ICAP_IMAGEFILEFORMAT, lFileType} } };
     for (auto& val : capsToSet)
     {
-        DTWAIN_ARRAY tempArray1 = CreateArrayFromCap(pHandle, nullptr, val.first, 1);
+        DTWAIN_ARRAY tempArray1 = CreateArrayFromCap(pHandle, nullptr, val.first, 1).second;
+        if (!tempArray1)
+            return false;
         DTWAINArrayLowLevel_RAII raii1(pHandle, tempArray1);
         auto& tempBuffer1 = pHandle->m_ArrayFactory->underlying_container_t<LONG>(tempArray1);
         tempBuffer1[0] = val.second;
@@ -160,19 +162,12 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, L
             if (vValues)
             {
                 // Already resolved, so just create an array, copy, and return
-				DTWAIN_ARRAY aValues = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(vValues->size()));
-                if (aValues)
-                {
-                    auto& vCurrentValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
-                    std::copy(vValues->begin(), vValues->end(), vCurrentValues.begin());
-                    return aValues;
-                }
-                else
-                {
-                    // No memory, so return error
-                    DTWAIN_SetLastError(DTWAIN_ERR_MEM);
-                    LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
-                }
+				auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(vValues->size()));
+				DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, nullptr, FUNC_MACRO);
+                auto aValues = retVal.second;
+                auto& vCurrentValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
+                std::copy(vValues->begin(), vValues->end(), vCurrentValues.begin());
+                return aValues;
             }
         }
 
@@ -245,17 +240,13 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCompressionTypesEx2(DTWAIN_SOURCE Source, L
         compressionMap[currentMode][lFileType] = vAllTypes;
     }
 
-	DTWAIN_ARRAY aRetValue = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(setAllTypes.size()));
 
-    if ( !aRetValue)
-    {
-        // No memory, so return error
-        DTWAIN_SetLastError(DTWAIN_ERR_MEM);
-        LOG_FUNC_EXIT_NONAME_PARAMS(NULL)
-    }
+	auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(setAllTypes.size()));
+
+	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, nullptr, FUNC_MACRO);
+    auto aRetValue = retVal.second;
     auto& vAll = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aRetValue);
     std::transform(setAllTypes.begin(), setAllTypes.end(), vAll.begin(), [&](LONG n) { return n; });
-
     LOG_FUNC_EXIT_NONAME_PARAMS(aRetValue)
     CATCH_BLOCK(nullptr)
 }

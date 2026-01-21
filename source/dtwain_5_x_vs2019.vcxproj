@@ -1705,6 +1705,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\ansiwideconverter_win32.h" />
     <ClInclude Include="h\arrayfactory.h" />
     <ClInclude Include="h\capinfomap.h" />
+    <ClInclude Include="h\ctlbimap.h" />
     <ClInclude Include="h\ctlclosesource.h" />
     <ClInclude Include="h\ctlconstexprfind.h" />
     <ClInclude Include="h\ctlconstexprutils.h" />
@@ -1712,6 +1713,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\ctldib32.h" />
     <ClInclude Include="h\ctlfilesave.h" />
     <ClInclude Include="h\ctlfileutils.h" />
+    <ClInclude Include="h\ctlguiddef.h" />
     <ClInclude Include="h\ctlloadresources.h" />
     <ClInclude Include="h\ctllogcalls.h" />
     <ClInclude Include="h\ctllogfunctioncall.h" />

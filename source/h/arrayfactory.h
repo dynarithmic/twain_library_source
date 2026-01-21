@@ -390,7 +390,9 @@ namespace dynarithmic
         {
             auto p = static_cast<T*>(tag);
             auto& v = p->get_container();
-            v.erase(v.begin() + nWhere, v.begin() + nWhere + nCount);
+			auto first = v.begin() + nWhere;
+			auto last = v.begin() + std::min(nWhere + nCount, v.size());
+			v.erase(first, last);
         }
 
         template <typename T>

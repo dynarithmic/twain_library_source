@@ -39,7 +39,6 @@ typedef bool (CTL_ITwainSource::*IsEnabledFunc)() const;
 static bool EnableFeederFunc(DTWAIN_SOURCE Source, LONG lCap, CTL_ITwainSource* p, SetFunc Func, bool bSet);
 static bool IsFeederEnabledFunc(DTWAIN_SOURCE Source, IsEnabledFunc Func);
 static bool ExecuteFeederState5Func(DTWAIN_SOURCE Source, LONG lCap);
-static VOID CALLBACK ThisTimerProc(HWND hwnd, UINT uMsg, ULONG idEvent,DWORD dwTime);
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFeederSupported(DTWAIN_SOURCE Source)
 {
@@ -58,7 +57,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFeederSupported(DTWAIN_SOURCE Source)
     DTWAIN_ARRAY arr = nullptr;
     const BOOL bOk = GetCapValuesEx2_Internal(pSource, CAP_FEEDERENABLED, 
                                               DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &arr);
-    if (!bOk)
+    if (!bOk || !arr)
     {
         pSource->SetFeederSupported(false);
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
@@ -102,8 +101,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsFeederLoaded(DTWAIN_SOURCE Source)
         DTWAIN_ARRAY a = nullptr;
         const DTWAIN_BOOL bReturn = GetCapValuesEx2_Internal(pSource, CAP_FEEDERLOADED, 
                                                              DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &a);
-        DTWAINArrayLowLevel_RAII arr(pHandle, a);
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bReturn;}, DTWAIN_ERR_NO_FEEDER_QUERY, false, FUNC_MACRO);
+        DTWAINArrayLowLevelPtr_RAII arr(pHandle, &a);
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return !bReturn || !a;}, DTWAIN_ERR_NO_FEEDER_QUERY, false, FUNC_MACRO);
         auto& vFeeder = pHandle->m_ArrayFactory->underlying_container_t<LONG>(a);
         LONG Val = 0;
         if ( !vFeeder.empty() )
@@ -229,9 +228,9 @@ bool EnableFeederFunc(DTWAIN_SOURCE Source, LONG lCap, CTL_ITwainSource* pSource
     // Check the current value
     const auto pHandle = pSource->GetDTWAINHandle();
     DTWAIN_BOOL bReturn = GetCapValuesEx2_Internal(pSource, lCap, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &aValues);
-    if (!bReturn)
+    if (!bReturn || !aValues)
         return false;
-    DTWAINArrayLowLevel_RAII arr(pHandle, aValues);
+    DTWAINArrayLowLevelPtr_RAII arr(pHandle, &aValues);
     auto& vFeeder = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
 
     if ( vFeeder.empty() )
@@ -345,7 +344,7 @@ bool ExecuteFeederState5Func(DTWAIN_SOURCE Source, LONG lCap)
         return false;
 
     const auto pHandle = pSource->GetDTWAINHandle();
-    DTWAIN_ARRAY aValues = CreateArrayFromCap(pHandle, nullptr, lCap, 0);
+    DTWAIN_ARRAY aValues = CreateArrayFromCap(pHandle, nullptr, lCap, 0).second;
     if ( !aValues )
         return false;
     DTWAINArrayLowLevel_RAII aRAII(pHandle, aValues);
@@ -395,6 +394,7 @@ int dynarithmic::FeederWait(CTL_ITwainSource *pSource)
     return DTWAIN_NO_ERROR;
 }
 ///////////////////////////////////////////////////////////
+#if 0
 VOID CALLBACK ThisTimerProc(HWND, UINT, ULONG idEvent, DWORD)
 {
     return;
@@ -432,3 +432,4 @@ VOID CALLBACK ThisTimerProc(HWND, UINT, ULONG idEvent, DWORD)
     #endif
     #endif
 }
+#endif
