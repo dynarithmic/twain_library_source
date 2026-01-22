@@ -11,6 +11,9 @@
     #pragma warning (disable : 4996)
 #endif
 
+// This is the Resource ID for the "Error" string (see twainresourcestring_english.txt)
+#define RESOURCE_ERROR_TEXT 3016
+
 extern DTWAIN_SOURCE g_CurrentSource;
 extern HINSTANCE g_hInstance;
 
@@ -758,9 +761,21 @@ void TestSetCap(HWND hWnd, LONG capValue)
         SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)"Ok");
     else
     {
+        /* Error occurred while setting the capability
+         These messages assume that the error text and strings
+         are UTF-8 converted to UTF-16 internally by DTWAIN when using 
+         the Unicode version of DTWAIN.  */
         wchar_t szErrMessage[8192];
-        DTWAIN_GetErrorStringW(last_error, szErrMessage, 8192);
-        SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)"Error");
-        SendMessageW(hWndResults, LB_ADDSTRING, 0, (LPARAM)szErrMessage);
+        wchar_t szErrorText[100];
+
+        /* Get the error from the DTWAIN_SetCapValues function.This is in UTF16 - format */
+        DTWAIN_GetErrorString(last_error, szErrMessage, 8192);
+
+        /* Get the resource string for the string "Error".This is in UTF16 - format */
+        DTWAIN_GetResourceString(RESOURCE_ERROR_TEXT, szErrorText, 100);
+
+        /* Display results */
+        SendMessage(hWndResults, LB_ADDSTRING, 0, (LPARAM)szErrorText);
+		SendMessage(hWndResults, LB_ADDSTRING, 0, (LPARAM)szErrMessage);
     }
 }
