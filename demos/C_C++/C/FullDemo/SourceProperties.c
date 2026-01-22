@@ -194,7 +194,7 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
 void DisplayTestCapDlg(HWND parent, const char* szCapName)
 {
     int capValue = DTWAIN_GetCapFromNameA(szCapName);
-    DialogBoxParamW(g_hInstance, (LPCTSTR)IDD_dlgTestCap, parent, (DLGPROC)DisplayTestCapProc, (LPARAM)(capValue));
+    DialogBoxParam(g_hInstance, (LPCTSTR)IDD_dlgTestCap, parent, (DLGPROC)DisplayTestCapProc, (LPARAM)(capValue));
 }
 
 LRESULT CALLBACK DisplayTestCapProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
@@ -762,20 +762,20 @@ void TestSetCap(HWND hWnd, LONG capValue)
     else
     {
         /* Error occurred while setting the capability
-         These messages assume that the error text and strings
-         are UTF-8 converted to UTF-16 internally by DTWAIN when using 
-         the Unicode version of DTWAIN.  */
+           These messages assume that the error text and strings
+           are UTF-8 converted to UTF-16 internally by DTWAIN when using
+           the Unicode version of DTWAIN.  */
         wchar_t szErrMessage[8192];
         wchar_t szErrorText[100];
 
         /* Get the error from the DTWAIN_SetCapValues function.This is in UTF16 - format */
-        DTWAIN_GetErrorString(last_error, szErrMessage, 8192);
+        DTWAIN_GetErrorStringW(last_error, szErrMessage, 8192);
 
         /* Get the resource string for the string "Error".This is in UTF16 - format */
-        DTWAIN_GetResourceString(RESOURCE_ERROR_TEXT, szErrorText, 100);
+        DTWAIN_GetResourceStringW(RESOURCE_ERROR_TEXT, szErrorText, 100);
 
         /* Display results */
-        SendMessage(hWndResults, LB_ADDSTRING, 0, (LPARAM)szErrorText);
-		SendMessage(hWndResults, LB_ADDSTRING, 0, (LPARAM)szErrMessage);
-    }
+        SendMessageW(hWndResults, LB_ADDSTRING, 0, (LPARAM)szErrorText);
+        SendMessageW(hWndResults, LB_ADDSTRING, 0, (LPARAM)szErrMessage);
+     }
 }
