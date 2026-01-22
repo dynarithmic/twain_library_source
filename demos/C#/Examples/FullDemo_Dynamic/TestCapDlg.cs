@@ -452,11 +452,17 @@ namespace TWAINDemo
             // Call the capability function 
             int ret = DTwainDemo.TwainAPI.DTWAIN_SetCapValuesEx2(m_Source, capToTestAsInt, nSetType, nContainerType, 
                                                       nDataType, aValues);
+            int lastError = DTwainDemo.TwainAPI.DTWAIN_GetLastError();
             DTwainDemo.TwainAPI.DTWAIN_ArrayDestroy(aValues);
             if (ret == 1)
                 lstResultsSet.Items.Add("Ok");
             else
+            {
+                StringBuilder szErr = new StringBuilder(8192);
+                DTwainDemo.TwainAPI.DTWAIN_GetErrorString(lastError, szErr, 8192);
                 lstResultsSet.Items.Add("Error");
+                lstResultsSet.Items.Add(szErr.ToString());
+            }
         }
 
         private void cmbGetTypes_SelectedIndexChanged(object sender, EventArgs e)
