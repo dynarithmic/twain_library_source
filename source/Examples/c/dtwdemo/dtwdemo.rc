@@ -246,7 +246,7 @@ BEGIN
     COMBOBOX        IDC_cmbDataTypeSet,231,163,68,67,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Revert",IDC_btnResetSet,307,162,50,14
     EDITTEXT        IDC_edSetInput,22,197,129,45,ES_MULTILINE | ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL
-    LISTBOX         IDC_lstResultsSet,250,197,122,29,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LISTBOX         IDC_lstResultsSet,230,197,137,45,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,145,244,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,205,244,50,14
     LTEXT           "Get Operation:",IDC_STATIC,26,24,69,8
@@ -258,7 +258,7 @@ BEGIN
     LTEXT           "Set Operation:",IDC_staticSetOperation,26,150,69,8
     LTEXT           "Data Type:",IDC_staticDataType,231,150,37,8
     LTEXT           "Container:",IDC_staticContainer,113,150,35,8
-    LTEXT           "Results:",IDC_staticResults,248,186,27,8
+    LTEXT           "Results:",IDC_staticResults,228,186,27,8
     LTEXT           "Input: (One data item per line):",IDC_staticInput,24,186,102,8
     LTEXT           "",IDC_staticTestGetResults,215,55,49,8
 END
