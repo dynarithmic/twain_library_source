@@ -31,6 +31,7 @@ static void SetTestSelection2(HWND hWnd, TCHAR* setType, int capValue);
 static void TestGetCap(HWND hWnd, LONG capValue);
 static void TestSetCap(HWND hWnd, LONG capValue);
 static LONG InitTestControls(HWND hWnd, const char* szName);
+static int Utf8ToUtf16(const char* utf8, wchar_t* utf16, int utf16Capacity);
 
 LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 { 
@@ -190,7 +191,8 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
 
 void DisplayTestCapDlg(HWND parent, const char* szCapName)
 {
-    DialogBoxParam(g_hInstance, (LPCTSTR)IDD_dlgTestCap, parent, (DLGPROC)DisplayTestCapProc, (LPARAM)(szCapName));
+    int capValue = DTWAIN_GetCapFromNameA(szCapName);
+    DialogBoxParamW(g_hInstance, (LPCTSTR)IDD_dlgTestCap, parent, (DLGPROC)DisplayTestCapProc, (LPARAM)(capValue));
 }
 
 LRESULT CALLBACK DisplayTestCapProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
@@ -200,7 +202,9 @@ LRESULT CALLBACK DisplayTestCapProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
     {
         case WM_INITDIALOG:
         {
-            const char* szName = (const char*)lParam;
+            int capValue = (int)lParam;
+            char szName[100];
+            DTWAIN_GetNameFromCapA(capValue, szName, 100);
             char szTitle[256];
             strcpy(szTitle, "Test Capability (");
             strcat(szTitle, szName);
@@ -402,6 +406,8 @@ void SetTestSelection2(HWND hWnd, TCHAR* setType, int capValue)
     HWND hWndStatic3 = GetDlgItem(hWnd, IDC_staticContainer);
     HWND hWndStatic4 = GetDlgItem(hWnd, IDC_staticResults);
     HWND hWndStatic5 = GetDlgItem(hWnd, IDC_staticInput);
+
+    SendMessage(hWndSetResults, LB_SETHORIZONTALEXTENT, 1000, 0);
 
     HWND allWindows[] = {
             hWndSetTypes, hWndContainerTypesSet, hWndDataTypesSet, hWndInput,hWndTestSet,
@@ -746,10 +752,29 @@ void TestSetCap(HWND hWnd, LONG capValue)
 
     /* Call the capability function */
     LONG ret = DTWAIN_SetCapValuesEx2(g_CurrentSource, capValue, nSetType, nContainerType, nDataType, aValues);
+    LONG last_error = DTWAIN_GetLastError();
     DTWAIN_ArrayDestroy(aValues);
 
     if (ret)
         SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)"Ok");
     else
+    {
+        char szErrMessage[8192];
+        DTWAIN_GetErrorStringA(last_error, szErrMessage, 8192);
+        wchar_t utf16str[8192];
+		Utf8ToUtf16(szErrMessage, utf16str, 8192);
         SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)"Error");
+		SendMessage(hWndResults, LB_ADDSTRING, 0, (LPARAM)utf16str);
+    }
+}
+
+int Utf8ToUtf16(const char* utf8,wchar_t* utf16,int utf16Capacity)
+{
+	return MultiByteToWideChar(
+		CP_UTF8,                // UTF-8 input
+		MB_ERR_INVALID_CHARS,   // Fail on invalid UTF-8
+		utf8,
+		-1,                     // Null-terminated input
+		utf16,
+		utf16Capacity);
 }

@@ -233,6 +233,7 @@
 2503 Fehler beim Schreiben der Daten in die Datei
 2504 Operation nicht unterstützt  
 2505 Ungültiges PDF-Text-Element
+2506 Fähigkeit wurde nicht gesetzt. Ungültige Werte wurden verwendet.
 3000 Wählen TWAIN Quelle
 3001 &Wählen
 3002 &Abbrechen
