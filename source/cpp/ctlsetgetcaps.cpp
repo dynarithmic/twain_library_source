@@ -434,6 +434,10 @@ bool dynarithmic::SetCapValuesEx2_Internal( CTL_ITwainSource* pSource, LONG lCap
 
     if ( !CTL_CapabilityTriplet::IsCapOperationReset(lSetType) )
     {
+		// Test to see if array is valid and non-empty (must have at least one value for MSG_SET operations)
+		DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !pHandle->m_ArrayFactory->is_valid(pArray); }, DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
+		DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return pHandle->m_ArrayFactory->size(pArray) == 0; }, DTWAIN_ERR_EMPTY_ARRAY, false, FUNC_MACRO);
+
         bool bFoundType = false;
 
         // Get the array type, given the tag type of the DTWAIN Array
@@ -517,6 +521,7 @@ bool dynarithmic::SetCapValuesEx2_Internal( CTL_ITwainSource* pSource, LONG lCap
             break; // get out now
         }
     }
+	DTWAIN_Check_Error_Condition_2_Ex(pHandle, [&] {return !bOk; }, DTWAIN_ERR_SETCAP_FAILED, false, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(bOk)
     CATCH_BLOCK(false)
 }
