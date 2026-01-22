@@ -190,7 +190,8 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
 
 void DisplayTestCapDlg(HWND parent, const char* szCapName)
 {
-    DialogBoxParam(g_hInstance, (LPCTSTR)IDD_dlgTestCap, parent, (DLGPROC)DisplayTestCapProc, (LPARAM)(szCapName));
+    int capValue = DTWAIN_GetCapFromNameA(szCapName);
+    DialogBoxParamW(g_hInstance, (LPCTSTR)IDD_dlgTestCap, parent, (DLGPROC)DisplayTestCapProc, (LPARAM)(capValue));
 }
 
 LRESULT CALLBACK DisplayTestCapProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
@@ -200,7 +201,9 @@ LRESULT CALLBACK DisplayTestCapProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
     {
         case WM_INITDIALOG:
         {
-            const char* szName = (const char*)lParam;
+            int capValue = (int)lParam;
+            char szName[100];
+            DTWAIN_GetNameFromCapA(capValue, szName, 100);
             char szTitle[256];
             strcpy(szTitle, "Test Capability (");
             strcat(szTitle, szName);
@@ -402,6 +405,8 @@ void SetTestSelection2(HWND hWnd, TCHAR* setType, int capValue)
     HWND hWndStatic3 = GetDlgItem(hWnd, IDC_staticContainer);
     HWND hWndStatic4 = GetDlgItem(hWnd, IDC_staticResults);
     HWND hWndStatic5 = GetDlgItem(hWnd, IDC_staticInput);
+
+    SendMessage(hWndSetResults, LB_SETHORIZONTALEXTENT, 1000, 0);
 
     HWND allWindows[] = {
             hWndSetTypes, hWndContainerTypesSet, hWndDataTypesSet, hWndInput,hWndTestSet,
@@ -746,10 +751,16 @@ void TestSetCap(HWND hWnd, LONG capValue)
 
     /* Call the capability function */
     LONG ret = DTWAIN_SetCapValuesEx2(g_CurrentSource, capValue, nSetType, nContainerType, nDataType, aValues);
+    LONG last_error = DTWAIN_GetLastError();
     DTWAIN_ArrayDestroy(aValues);
 
     if (ret)
         SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)"Ok");
     else
+    {
+        wchar_t szErrMessage[8192];
+        DTWAIN_GetErrorStringW(last_error, szErrMessage, 8192);
         SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)"Error");
+        SendMessageW(hWndResults, LB_ADDSTRING, 0, (LPARAM)szErrMessage);
+    }
 }
