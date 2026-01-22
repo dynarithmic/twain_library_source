@@ -435,8 +435,11 @@ bool dynarithmic::SetCapValuesEx2_Internal( CTL_ITwainSource* pSource, LONG lCap
     if ( !CTL_CapabilityTriplet::IsCapOperationReset(lSetType) )
     {
 		// Test to see if array is valid and non-empty (must have at least one value for MSG_SET operations)
-		DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !pHandle->m_ArrayFactory->is_valid(pArray); }, DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
-		DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return pHandle->m_ArrayFactory->size(pArray) == 0; }, DTWAIN_ERR_EMPTY_ARRAY, false, FUNC_MACRO);
+        bool isValid = pHandle->m_ArrayFactory->is_valid(pArray);
+        bool isEmpty = false;
+        if (isValid)
+            isEmpty = (pHandle->m_ArrayFactory->size(pArray) == 0);
+		DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !isValid || isEmpty; }, isEmpty?DTWAIN_ERR_EMPTY_ARRAY:DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
 
         bool bFoundType = false;
 
