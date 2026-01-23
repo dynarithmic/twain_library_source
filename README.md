@@ -26,19 +26,16 @@ If you want to rebuild the libraries, you will need the following tools and comp
 * One of the following development environments:
 
       Visual Studio 2019 (Community or Professional) with Platform Toolset v142 installed.
-      Visual Studio 2022 (Community or Professional) with Platform Toolset v142 or v143 installed.
+      Visual Studio 2022 or 2026 (Community or Professional) with Platform Toolset v142 or greater installed.
       
-By default Visual Studio 2019 has Platform Toolset v142 installed.  
-By default Visual Studio 2022 has Platform Toolset v143 installed. 
-
 In addition, you will need 
 
 1) At least 20 GB of free disk space.
 2) An installation of the [Boost](http://www.boost.org/) library (version 1.89 or above).  I recommend getting the pre-built Boost libraries found at [SourceForge](https://sourceforge.net/projects/boost/files/boost-binaries/).  When installed, you will get the boost **include** files, plus the library files.  Please download the version of boost that fits your compiler.  
 
 ```plaintext
-For Visual Studio 2019 or 2022 (using platform toolset v142) -- Download files with "14.2" in the file name.
-For Visual Studio 2022 (using platform toolset v143) -- Download files with "14.3" in the file name.
+For Visual Studio 2019, 2022, or 2026 (using platform toolset v142) -- Download files with "14.2" in the file name.
+For Visual Studio 2022 or greater (using platform toolset v143 or greater) -- Download files with "14.3" in the file name.
 ```
 
 3) An installation of the [7-Zip](https://www.7-zip.org/) archiving utility.
@@ -51,10 +48,10 @@ For Visual Studio 2022 (using platform toolset v143) -- Download files with "14.
 
 The following environment variables should be set, depending on the platform toolset being used when building DTWAIN using Visual Studio:
 
-*    BOOST_LIBRARY_DIR_V142_32 -- (required: Visual Studio 2019 and Visual Studio 2022 using Platform Toolset v142)
-*    BOOST_LIBRARY_DIR_V142_64 -- (required: Visual Studio 2019 and Visual Studio 2022 using Platform Toolset v142)   
-*    BOOST_LIBRARY_DIR_V143_32 -- (required: Visual Studio 2022, Platform Toolset v143)
-*    BOOST_LIBRARY_DIR_V143_64 -- (required: Visual Studio 2022, Platform Toolset v143)   
+*    BOOST_LIBRARY_DIR_V142_32 -- (required: Visual Studio 2019 and Visual Studio 2022, 2026 using Platform Toolset v142)
+*    BOOST_LIBRARY_DIR_V142_64 -- (required: Visual Studio 2019 and Visual Studio 2022, 2026 using Platform Toolset v142)   
+*    BOOST_LIBRARY_DIR_V143_32 -- (required: Visual Studio 2022, 2026, Platform Toolset v143)
+*    BOOST_LIBRARY_DIR_V143_64 -- (required: Visual Studio 2022, 2026, Platform Toolset v143)   
 
 #### Definition of environment variables:
 
@@ -103,7 +100,7 @@ The final hashes of the files are stored as text in the **binaries\32bit** and *
 
 * Start the Microsoft Visual Studio, and open the DTWAIN solution file found in the [source](https://github.com/dynarithmic/twain_library_source/tree/master/source) directory named **dtwain_5_x_vs2019.sln**.
 
-When you load the solution and project files in the Visual Studio IDE, you may be prompted to upgrade the platform toolset from v142 to the latest version that is supported by the particular Visual Studio compiler you are using.  You can choose to leave the platform toolset as-is, or decide to upgrade to the latest one.  However the platform toolset must be v142 or v143, and your current installation must have this toolset installed for your compiler.
+When you load the solution and project files in the Visual Studio IDE, you may be prompted to upgrade the platform toolset from v142 to the latest version that is supported by the particular Visual Studio compiler you are using.  You can choose to leave the platform toolset as-is, or decide to upgrade to the latest one.  However the platform toolset must be at least v142, and your current installation must have this toolset installed for your compiler.
 
 Please note that the version of the Boost library that will be used at link time must match the platform toolset that DTWAIN was built with.  
 
