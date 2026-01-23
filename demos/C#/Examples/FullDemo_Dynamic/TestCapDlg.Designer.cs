@@ -179,15 +179,17 @@ namespace TWAINDemo
             // lstResultsSet
             // 
             this.lstResultsSet.FormattingEnabled = true;
-            this.lstResultsSet.Location = new System.Drawing.Point(330, 353);
+            this.lstResultsSet.HorizontalExtent = 500;
+            this.lstResultsSet.HorizontalScrollbar = true;
+            this.lstResultsSet.Location = new System.Drawing.Point(313, 353);
             this.lstResultsSet.Name = "lstResultsSet";
-            this.lstResultsSet.Size = new System.Drawing.Size(196, 69);
+            this.lstResultsSet.Size = new System.Drawing.Size(213, 82);
             this.lstResultsSet.TabIndex = 22;
             // 
             // lblResultsSet
             // 
             this.lblResultsSet.AutoSize = true;
-            this.lblResultsSet.Location = new System.Drawing.Point(329, 337);
+            this.lblResultsSet.Location = new System.Drawing.Point(312, 337);
             this.lblResultsSet.Name = "lblResultsSet";
             this.lblResultsSet.Size = new System.Drawing.Size(45, 13);
             this.lblResultsSet.TabIndex = 21;

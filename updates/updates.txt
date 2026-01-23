@@ -36,8 +36,11 @@ DTWAIN Version changes
   the "Select Source" dialog box with respect to the parent window if the parent 
   window is moved to another monitor.
 
-- Fix potential memory leak when using functions that takes a pointer
+- Fixed potential memory leak when using functions that takes a pointer
   to a DTWAIN_ARRAY.
+
+- Fixed potential illegal memory access if DTWAIN_SetCapValues() is given an 
+  invalid DTWAIN_ARRAY of values.
 
 - Ensure that calling DTWAIN_CloseSource() while the Source is acquiring images
   will not close the source.  Instead, a return value of FALSE will be

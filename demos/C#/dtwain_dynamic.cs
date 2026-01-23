@@ -1006,6 +1006,7 @@
         public const int DTWAIN_ERR_WRITEDATA_TOFILE = (-2503);
         public const int DTWAIN_ERR_OPERATION_NOTSUPPORTED = (-2504);
         public const int DTWAIN_ERR_INVALID_PDFTEXTELEMENT = (-2505);
+        public const int DTWAIN_ERR_SETCAP_FAILED = (-2506);
         public const int DTWAIN_DE_CHKAUTOCAPTURE = 1;
         public const int DTWAIN_DE_CHKBATTERY = 2;
         public const int DTWAIN_DE_CHKDEVICEONLINE = 4;

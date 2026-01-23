@@ -11,6 +11,9 @@
     #pragma warning (disable : 4996)
 #endif
 
+// This is the Resource ID for the "Error" string (see twainresourcestring_english.txt)
+#define RESOURCE_ERROR_TEXT 3016
+
 extern DTWAIN_SOURCE g_CurrentSource;
 extern HINSTANCE g_hInstance;
 
@@ -190,7 +193,8 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
 
 void DisplayTestCapDlg(HWND parent, const char* szCapName)
 {
-    DialogBoxParam(g_hInstance, (LPCTSTR)IDD_dlgTestCap, parent, (DLGPROC)DisplayTestCapProc, (LPARAM)(szCapName));
+    int capValue = DTWAIN_GetCapFromNameA(szCapName);
+    DialogBoxParam(g_hInstance, (LPCTSTR)IDD_dlgTestCap, parent, (DLGPROC)DisplayTestCapProc, (LPARAM)(capValue));
 }
 
 LRESULT CALLBACK DisplayTestCapProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
@@ -200,7 +204,9 @@ LRESULT CALLBACK DisplayTestCapProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
     {
         case WM_INITDIALOG:
         {
-            const char* szName = (const char*)lParam;
+            int capValue = (int)lParam;
+            char szName[100];
+            DTWAIN_GetNameFromCapA(capValue, szName, 100);
             char szTitle[256];
             strcpy(szTitle, "Test Capability (");
             strcat(szTitle, szName);
@@ -403,6 +409,8 @@ void SetTestSelection2(HWND hWnd, TCHAR* setType, int capValue)
     HWND hWndStatic4 = GetDlgItem(hWnd, IDC_staticResults);
     HWND hWndStatic5 = GetDlgItem(hWnd, IDC_staticInput);
 
+    SendMessage(hWndSetResults, LB_SETHORIZONTALEXTENT, 1000, 0);
+
     HWND allWindows[] = {
             hWndSetTypes, hWndContainerTypesSet, hWndDataTypesSet, hWndInput,hWndTestSet,
             hWndResetSet, hWndSetResults, hWndStatic1 , hWndStatic2 , hWndStatic3 , hWndStatic4, hWndStatic5 };
@@ -516,6 +524,7 @@ void TestGetCap(HWND hWnd, LONG capValue)
         /* Display the results in the list box */
         LONG numItems = DTWAIN_ArrayGetCount(values);
         LONG nArrayType = DTWAIN_ArrayGetType(values);
+        const char* rangeName[] = {"Minimum", "Maximum", "Step", "Default", "Current"};
         LONG i = 0;
         for (i = 0; i < numItems; ++i)
         {
@@ -550,6 +559,9 @@ void TestGetCap(HWND hWnd, LONG capValue)
                     if (bGotID)
                         DTWAIN_GetTwainNameFromConstantA(nTranslationID, lVal, szValues, 256);
                     else
+                    if (nContainerType == DTWAIN_CONTRANGE)
+                        sprintf(szValues, "%s: %d", rangeName[i], lVal);
+                    else
                         sprintf(szValues, "%d", lVal);
                     SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
                 }
@@ -559,7 +571,10 @@ void TestGetCap(HWND hWnd, LONG capValue)
                 {
                     double dVal;
                     DTWAIN_ArrayGetAtFloat(values, i, &dVal);
-                    sprintf(szValues, "%lf", dVal);
+                    if (nContainerType == DTWAIN_CONTRANGE)
+                        sprintf(szValues, "%s: %lf", rangeName[i], dVal);
+                    else
+                        sprintf(szValues, "%lf", dVal);
                     SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)szValues);
                 }
                 break;
@@ -585,7 +600,7 @@ void TestGetCap(HWND hWnd, LONG capValue)
     }
     else
     {
-		SendMessageA(hWndStaticResults, WM_SETTEXT, 0, (LPARAM)"Error");
+        SendMessageA(hWndStaticResults, WM_SETTEXT, 0, (LPARAM)"Error");
     }
 }
 
@@ -601,78 +616,78 @@ int ParseTokenCallback(const char* line, void* userData)
     PARSERINFO* theInfo = (PARSERINFO*)userData;
     switch (theInfo->dataType)
     {
-    case TWTY_BOOL:
-    {
-        int value = StringToBoolInt(line);
-        DTWAIN_ArrayAddLong(theInfo->theArray, value);
-    }
-    break;
-    case TWTY_INT8:
-    case TWTY_INT16:
-    case TWTY_INT32:
-    {
-        // First see if the string is a TWAIN known value
-        int value = DTWAIN_GetConstantFromTwainNameA(line);
-        if (value != INT_MIN)
-            DTWAIN_ArrayAddLong(theInfo->theArray, value);
-        else
+        case TWTY_BOOL:
         {
-            int value = 0;
-            char* end;
-            value = strtol(line, &end, 10);
+            int value = StringToBoolInt(line);
             DTWAIN_ArrayAddLong(theInfo->theArray, value);
         }
-    }
-    break;
-
-    case TWTY_UINT8:
-    case TWTY_UINT16:
-    case TWTY_UINT32:
-    {
-        // First see if the string is a TWAIN known value
-        int value = DTWAIN_GetConstantFromTwainNameA(line);
-        if (value != INT_MIN)
-            DTWAIN_ArrayAddLong(theInfo->theArray, value);
-        else
+        break;
+        case TWTY_INT8:
+        case TWTY_INT16:
+        case TWTY_INT32:
         {
-            int value = 0;
-            char* end;
-            value = strtoul(line, &end, 10);
-            DTWAIN_ArrayAddLong(theInfo->theArray, value);
+            // First see if the string is a TWAIN known value
+            int value = DTWAIN_GetConstantFromTwainNameA(line);
+            if (value != INT_MIN)
+                DTWAIN_ArrayAddLong(theInfo->theArray, value);
+            else
+            {
+                int value = 0;
+                char* end;
+                value = strtol(line, &end, 10);
+                DTWAIN_ArrayAddLong(theInfo->theArray, value);
+            }
         }
-    }
-    break;
+        break;
 
-    case TWTY_STR32:
-    case TWTY_STR64:
-    case TWTY_STR128:
-    case TWTY_STR255:
-    case TWTY_STR1024:
-    {
-        DTWAIN_ArrayAddANSIString(theInfo->theArray, line);
-    }
-    break;
+        case TWTY_UINT8:
+        case TWTY_UINT16:
+        case TWTY_UINT32:
+        {
+            // First see if the string is a TWAIN known value
+            int value = DTWAIN_GetConstantFromTwainNameA(line);
+            if (value != INT_MIN)
+                DTWAIN_ArrayAddLong(theInfo->theArray, value);
+            else
+            {
+                int value = 0;
+                char* end;
+                value = strtoul(line, &end, 10);
+                DTWAIN_ArrayAddLong(theInfo->theArray, value);
+            }
+        }
+        break;
 
-    case TWTY_FIX32:
-    {
-        double value = 0;
-        char* end;
-        value = strtod(line, &end);
-        DTWAIN_ArrayAddFloat(theInfo->theArray, value);
-    }
-    break;
+        case TWTY_STR32:
+        case TWTY_STR64:
+        case TWTY_STR128:
+        case TWTY_STR255:
+        case TWTY_STR1024:
+        {
+            DTWAIN_ArrayAddANSIString(theInfo->theArray, line);
+        }
+        break;
 
-    case TWTY_FRAME:
-    {
-        double value = 0;
-        char* end;
-        value = strtod(line, &end);
-        DTWAIN_FrameSetValue(theInfo->theArray, theInfo->counter, value);
-        ++theInfo->counter;
-        if (theInfo->counter == 4)
-            return 0;
-    }
-    break;
+        case TWTY_FIX32:
+        {
+            double value = 0;
+            char* end;
+            value = strtod(line, &end);
+            DTWAIN_ArrayAddFloat(theInfo->theArray, value);
+        }
+        break;
+
+        case TWTY_FRAME:
+        {
+            double value = 0;
+            char* end;
+            value = strtod(line, &end);
+            DTWAIN_FrameSetValue(theInfo->theArray, theInfo->counter, value);
+            ++theInfo->counter;
+            if (theInfo->counter == 4)
+                return 0;
+        }
+        break;
     }
     return 1;
 }
@@ -746,10 +761,28 @@ void TestSetCap(HWND hWnd, LONG capValue)
 
     /* Call the capability function */
     LONG ret = DTWAIN_SetCapValuesEx2(g_CurrentSource, capValue, nSetType, nContainerType, nDataType, aValues);
+    LONG last_error = DTWAIN_GetLastError();
     DTWAIN_ArrayDestroy(aValues);
 
     if (ret)
         SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)"Ok");
     else
-        SendMessageA(hWndResults, LB_ADDSTRING, 0, (LPARAM)"Error");
+    {
+        /* Error occurred while setting the capability
+         These messages assume that the error text and strings
+         are UTF-8 converted to UTF-16 internally by DTWAIN when using
+         the Unicode version of DTWAIN.  */
+         wchar_t szErrMessage[8192];
+         wchar_t szErrorText[100];
+
+         /* Get the error from the DTWAIN_SetCapValues function.This is in UTF16 - format */
+         DTWAIN_GetErrorStringW(last_error, szErrMessage, 8192);
+
+         /* Get the resource string for the string "Error".This is in UTF16 - format */
+         DTWAIN_GetResourceStringW(RESOURCE_ERROR_TEXT, szErrorText, 100);
+
+         /* Display results */
+         SendMessageW(hWndResults, LB_ADDSTRING, 0, (LPARAM)szErrorText);
+         SendMessageW(hWndResults, LB_ADDSTRING, 0, (LPARAM)szErrMessage);
+    }
 }

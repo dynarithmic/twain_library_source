@@ -935,6 +935,7 @@ Class DTWAINAPI
     Public Const DTWAIN_ERR_WRITEDATA_TOFILE As Integer = (-2503)
     Public Const DTWAIN_ERR_OPERATION_NOTSUPPORTED As Integer = (-2504)
     Public Const DTWAIN_ERR_INVALID_PDFTEXTELEMENT As Integer = (-2505)
+    Public Const DTWAIN_ERR_SETCAP_FAILED As Integer = (-2506)
     Public Const DTWAIN_DE_CHKAUTOCAPTURE As Integer = 1
     Public Const DTWAIN_DE_CHKBATTERY As Integer = 2
     Public Const DTWAIN_DE_CHKDEVICEONLINE As Integer = 4
