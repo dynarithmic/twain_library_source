@@ -935,7 +935,6 @@ Class DTWAINAPI
     Public Const DTWAIN_ERR_WRITEDATA_TOFILE As Integer = (-2503)
     Public Const DTWAIN_ERR_OPERATION_NOTSUPPORTED As Integer = (-2504)
     Public Const DTWAIN_ERR_INVALID_PDFTEXTELEMENT As Integer = (-2505)
-    Public Const DTWAIN_ERR_SETCAP_FAILED As Integer = (-2506)
     Public Const DTWAIN_DE_CHKAUTOCAPTURE As Integer = 1
     Public Const DTWAIN_DE_CHKBATTERY As Integer = 2
     Public Const DTWAIN_DE_CHKDEVICEONLINE As Integer = 4
@@ -2202,7 +2201,6 @@ Class DTWAINAPI
     Public Declare Ansi Function DTWAIN_GetTwainLanguageValue Lib "dtwain32.dll" (szName As String) As Integer
     Public Declare Function DTWAIN_GetTwainMode Lib "dtwain32.dll" () As Integer
     Public Declare Ansi Function DTWAIN_GetTwainNameFromConstant Lib "dtwain32.dll" (lConstantType As Integer, lTwainConstant As Integer, <MarshalAs(UnmanagedType.LPStr)> lpszOut As StringBuilder, nSize As Integer) As Integer
-    Public Declare Ansi Function DTWAIN_GetTwainNameFromConstantEx Lib "dtwain32.dll" (lConstantType As Integer, lTwainConstant As Integer, <MarshalAs(UnmanagedType.LPStr)> lpszOut As StringBuilder, nSize As Integer) As Integer
     Public Declare Ansi Function DTWAIN_GetTwainStringName Lib "dtwain32.dll" (category As Integer, TwainID As Integer, <MarshalAs(UnmanagedType.LPStr)> lpszBuffer As StringBuilder, nMaxLen As Integer) As Integer
     Public Declare Function DTWAIN_GetTwainTimeout Lib "dtwain32.dll" () As Integer
     Public Declare Function DTWAIN_GetVersion Lib "dtwain32.dll" (ByRef lpMajor As Integer, ByRef lpMinor As Integer, ByRef lpVersionType As Integer) As Integer

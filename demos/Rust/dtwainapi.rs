@@ -689,6 +689,9 @@ type DtwaingettwainlanguagevaluewFunc = unsafe extern "C" fn(*const u16) -> i32;
 type DtwaingettwainmodeFunc = unsafe extern "C" fn() -> i32;
 type DtwaingettwainnamefromconstantFunc = unsafe extern "C" fn(i32,i32,*mut u16,i32) -> i32;
 type DtwaingettwainnamefromconstantaFunc = unsafe extern "C" fn(i32,i32,*mut c_char,i32) -> i32;
+type DtwaingettwainnamefromconstantexFunc = unsafe extern "C" fn(i32,i32,*mut u16,i32) -> i32;
+type DtwaingettwainnamefromconstantexaFunc = unsafe extern "C" fn(i32,i32,*mut c_char,i32) -> i32;
+type DtwaingettwainnamefromconstantexwFunc = unsafe extern "C" fn(i32,i32,*mut u16,i32) -> i32;
 type DtwaingettwainnamefromconstantwFunc = unsafe extern "C" fn(i32,i32,*mut u16,i32) -> i32;
 type DtwaingettwainstringnameFunc = unsafe extern "C" fn(i32,i32,*mut u16,i32) -> i32;
 type DtwaingettwainstringnameaFunc = unsafe extern "C" fn(i32,i32,*mut c_char,i32) -> i32;
@@ -1812,6 +1815,9 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetTwainModeFunc: Symbol<'a, DtwaingettwainmodeFunc>,
     DTWAIN_GetTwainNameFromConstantFunc: Symbol<'a, DtwaingettwainnamefromconstantFunc>,
     DTWAIN_GetTwainNameFromConstantAFunc: Symbol<'a, DtwaingettwainnamefromconstantaFunc>,
+    DTWAIN_GetTwainNameFromConstantExFunc: Symbol<'a, DtwaingettwainnamefromconstantexFunc>,
+    DTWAIN_GetTwainNameFromConstantExAFunc: Symbol<'a, DtwaingettwainnamefromconstantexaFunc>,
+    DTWAIN_GetTwainNameFromConstantExWFunc: Symbol<'a, DtwaingettwainnamefromconstantexwFunc>,
     DTWAIN_GetTwainNameFromConstantWFunc: Symbol<'a, DtwaingettwainnamefromconstantwFunc>,
     DTWAIN_GetTwainStringNameFunc: Symbol<'a, DtwaingettwainstringnameFunc>,
     DTWAIN_GetTwainStringNameAFunc: Symbol<'a, DtwaingettwainstringnameaFunc>,
@@ -4571,6 +4577,9 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetTwainMode: Symbol<DtwaingettwainmodeFunc> = unsafe { library.get(b"DTWAIN_GetTwainMode")? };
         let DTWAIN_GetTwainNameFromConstant: Symbol<DtwaingettwainnamefromconstantFunc> = unsafe { library.get(b"DTWAIN_GetTwainNameFromConstant")? };
         let DTWAIN_GetTwainNameFromConstantA: Symbol<DtwaingettwainnamefromconstantaFunc> = unsafe { library.get(b"DTWAIN_GetTwainNameFromConstantA")? };
+        let DTWAIN_GetTwainNameFromConstantEx: Symbol<DtwaingettwainnamefromconstantexFunc> = unsafe { library.get(b"DTWAIN_GetTwainNameFromConstantEx")? };
+        let DTWAIN_GetTwainNameFromConstantExA: Symbol<DtwaingettwainnamefromconstantexaFunc> = unsafe { library.get(b"DTWAIN_GetTwainNameFromConstantExA")? };
+        let DTWAIN_GetTwainNameFromConstantExW: Symbol<DtwaingettwainnamefromconstantexwFunc> = unsafe { library.get(b"DTWAIN_GetTwainNameFromConstantExW")? };
         let DTWAIN_GetTwainNameFromConstantW: Symbol<DtwaingettwainnamefromconstantwFunc> = unsafe { library.get(b"DTWAIN_GetTwainNameFromConstantW")? };
         let DTWAIN_GetTwainStringName: Symbol<DtwaingettwainstringnameFunc> = unsafe { library.get(b"DTWAIN_GetTwainStringName")? };
         let DTWAIN_GetTwainStringNameA: Symbol<DtwaingettwainstringnameaFunc> = unsafe { library.get(b"DTWAIN_GetTwainStringNameA")? };
@@ -5693,6 +5702,9 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetTwainModeFunc: DTWAIN_GetTwainMode,
             DTWAIN_GetTwainNameFromConstantFunc: DTWAIN_GetTwainNameFromConstant,
             DTWAIN_GetTwainNameFromConstantAFunc: DTWAIN_GetTwainNameFromConstantA,
+            DTWAIN_GetTwainNameFromConstantExFunc: DTWAIN_GetTwainNameFromConstantEx,
+            DTWAIN_GetTwainNameFromConstantExAFunc: DTWAIN_GetTwainNameFromConstantExA,
+            DTWAIN_GetTwainNameFromConstantExWFunc: DTWAIN_GetTwainNameFromConstantExW,
             DTWAIN_GetTwainNameFromConstantWFunc: DTWAIN_GetTwainNameFromConstantW,
             DTWAIN_GetTwainStringNameFunc: DTWAIN_GetTwainStringName,
             DTWAIN_GetTwainStringNameAFunc: DTWAIN_GetTwainStringNameA,
@@ -8742,6 +8754,18 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_GetTwainNameFromConstantA(&self, lConstantType: i32, lTwainConstant: i32, lpszOut: *mut c_char, nSize: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetTwainNameFromConstantAFunc)(lConstantType, lTwainConstant, lpszOut, nSize);  }
+    }
+
+    pub fn DTWAIN_GetTwainNameFromConstantEx(&self, lConstantType: i32, lTwainConstant: i32, lpszOut: *mut u16, nSize: i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetTwainNameFromConstantExFunc)(lConstantType, lTwainConstant, lpszOut, nSize);  }
+    }
+
+    pub fn DTWAIN_GetTwainNameFromConstantExA(&self, lConstantType: i32, lTwainConstant: i32, lpszOut: *mut c_char, nSize: i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetTwainNameFromConstantExAFunc)(lConstantType, lTwainConstant, lpszOut, nSize);  }
+    }
+
+    pub fn DTWAIN_GetTwainNameFromConstantExW(&self, lConstantType: i32, lTwainConstant: i32, lpszOut: *mut u16, nSize: i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetTwainNameFromConstantExWFunc)(lConstantType, lTwainConstant, lpszOut, nSize);  }
     }
 
     pub fn DTWAIN_GetTwainNameFromConstantW(&self, lConstantType: i32, lTwainConstant: i32, lpszOut: *mut u16, nSize: i32) -> i32 {

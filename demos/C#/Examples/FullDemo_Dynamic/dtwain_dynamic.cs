@@ -2418,6 +2418,8 @@
         public delegate int DTWAIN_GetTwainModeDelegate();
         public delegate int DTWAIN_GetTwainNameFromConstantDelegate(int lConstantType, int lTwainConstant, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszOut, int nSize);
         public delegate int DTWAIN_GetTwainNameFromConstantDelegate_overload(int lConstantType, int lTwainConstant, System.IntPtr lpszOut, int nSize);
+        public delegate int DTWAIN_GetTwainNameFromConstantExDelegate(int lConstantType, int lTwainConstant, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszOut, int nSize);
+        public delegate int DTWAIN_GetTwainNameFromConstantExDelegate_overload(int lConstantType, int lTwainConstant, System.IntPtr lpszOut, int nSize);
         public delegate int DTWAIN_GetTwainStringNameDelegate(int category, int TwainID, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszBuffer, int nMaxLen);
         public delegate int DTWAIN_GetTwainStringNameDelegate_overload(int category, int TwainID, System.IntPtr lpszBuffer, int nMaxLen);
         public delegate int DTWAIN_GetTwainTimeoutDelegate();
@@ -4352,6 +4354,12 @@
 
         [DTWAINNativeFunction("DTWAIN_GetTwainNameFromConstant")]
         private readonly DTWAIN_GetTwainNameFromConstantDelegate_overload _DTWAIN_GetTwainNameFromConstant_overload; 
+
+        [DTWAINNativeFunction("DTWAIN_GetTwainNameFromConstantEx")]
+        private readonly DTWAIN_GetTwainNameFromConstantExDelegate  _DTWAIN_GetTwainNameFromConstantEx;
+
+        [DTWAINNativeFunction("DTWAIN_GetTwainNameFromConstantEx")]
+        private readonly DTWAIN_GetTwainNameFromConstantExDelegate_overload _DTWAIN_GetTwainNameFromConstantEx_overload; 
 
         [DTWAINNativeFunction("DTWAIN_GetTwainStringName")]
         private readonly DTWAIN_GetTwainStringNameDelegate  _DTWAIN_GetTwainStringName;
@@ -6964,6 +6972,12 @@
 
         public  int DTWAIN_GetTwainNameFromConstant (int lConstantType, int lTwainConstant, System.IntPtr lpszOut, int nSize)
         => _DTWAIN_GetTwainNameFromConstant_overload(lConstantType, lTwainConstant, lpszOut, nSize);
+
+        public  int DTWAIN_GetTwainNameFromConstantEx(int lConstantType, int lTwainConstant, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszOut, int nSize)
+        => _DTWAIN_GetTwainNameFromConstantEx(lConstantType, lTwainConstant, lpszOut, nSize);
+
+        public  int DTWAIN_GetTwainNameFromConstantEx (int lConstantType, int lTwainConstant, System.IntPtr lpszOut, int nSize)
+        => _DTWAIN_GetTwainNameFromConstantEx_overload(lConstantType, lTwainConstant, lpszOut, nSize);
 
         public  int DTWAIN_GetTwainStringName(int category, int TwainID, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszBuffer, int nMaxLen)
         => _DTWAIN_GetTwainStringName(category, TwainID, lpszBuffer, nMaxLen);
