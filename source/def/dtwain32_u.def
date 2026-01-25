@@ -1142,3 +1142,6 @@ DTWAIN_ArrayGetAtSourceEx                         @31153
 DTWAIN_AddPDFTextEx                               @31154
 DTWAIN_AddPDFTextExA                              @31155
 DTWAIN_AddPDFTextExW                              @31156
+DTWAIN_GetTwainNameFromConstantEx                 @31157
+DTWAIN_GetTwainNameFromConstantExA                @31158
+DTWAIN_GetTwainNameFromConstantExW                @31159

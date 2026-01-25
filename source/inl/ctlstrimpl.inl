@@ -3318,4 +3318,28 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextExA(DTWAIN_SOURCE Source, LPCSTR szTex
 #endif
 }
 
+LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstantExW(LONG lConstantType, LONG lTwainConstant, LPWSTR lpszOut, LONG nSize)
+{
+#ifdef _UNICODE
+    return DTWAIN_GetTwainNameFromConstantEx(lConstantType, lTwainConstant, lpszOut, nSize);
+#else
+    std::string arg((std::max)(nSize, 0L), 0);
+    LONG retVal = DTWAIN_GetTwainNameFromConstantEx(lConstantType, lTwainConstant, (nSize > 0 && lpszOut) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    return null_terminator_copier(get_view(arg), lpszOut, retVal);
+#endif
+}
+
+
+LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstantExA(LONG lConstantType, LONG lTwainConstant, LPSTR lpszOut, LONG nSize)
+{
+#ifdef _UNICODE
+    std::wstring arg((std::max)(nSize, 0L), 0);
+    LONG retVal = DTWAIN_GetTwainNameFromConstantEx(lConstantType, lTwainConstant, (nSize > 0 && lpszOut) ? &arg[0] : nullptr,
+                                                    static_cast<LONG>(arg.size()));
+    return null_terminator_copier(get_view(arg), lpszOut, retVal);
+#else
+    return DTWAIN_GetTwainNameFromConstantEx(lConstantType, lTwainConstant, lpszOut, nSize);
+#endif
+}
+
 #endif // CTLSTRIMPL_INL

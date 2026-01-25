@@ -386,22 +386,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesEx(LPCTSTR sLangDLL, DT
     CATCH_BLOCK(false)
 }
 
-LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstant(LONG lConstantType, LONG lTwainConstant, LPTSTR lpszOut, LONG nSize)
-{
-    LOG_FUNC_ENTRY_PARAMS((lConstantType, lTwainConstant, lpszOut, nSize))
-    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto ret = CTL_StaticData::GetTwainNameFromConstant(lConstantType, lTwainConstant);
-    if (!ret.first)
-    {
-        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
-        LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
-    }
-	auto numChars = StringWrapper::CopyInfoToCString(ret.second, lpszOut, nSize);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
-    LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
-    CATCH_BLOCK(-1)
-}
-
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsInitialized()
 {
     // Get the Current task
@@ -2083,6 +2067,33 @@ LONG DLLENTRY_DEF DTWAIN_GetConstantFromTwainName(LPCTSTR lpszBuffer)
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !retVal.first; }, DTWAIN_ERR_STRINGID_NOTFOUND, static_cast<int>(retVal.second), FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS((LONG)retVal.second)
     CATCH_BLOCK(std::numeric_limits<LONG>::min())
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstant(LONG lConstantType, LONG lTwainConstant, LPTSTR lpszOut, LONG nSize)
+{
+    LOG_FUNC_ENTRY_PARAMS((lConstantType, lTwainConstant, lpszOut, nSize))
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    auto ret = CTL_StaticData::GetTwainNameFromConstant(lConstantType, lTwainConstant);
+    if (!ret.first)
+    {
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
+        LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
+    }
+	auto numChars = StringWrapper::CopyInfoToCString(ret.second, lpszOut, nSize);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
+    LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
+    CATCH_BLOCK(-1)
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstantEx(LONG lConstantType, LONG lTwainConstant, LPTSTR lpszOut, LONG nSize)
+{
+    LOG_FUNC_ENTRY_PARAMS((lConstantType, lTwainConstant, lpszOut, nSize))
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    auto ret = CTL_StaticData::GetTwainNameFromConstant(lConstantType, lTwainConstant);
+	auto numChars = StringWrapper::CopyInfoToCString(ret.second, lpszOut, nSize);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
+    LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
+    CATCH_BLOCK(0)
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetWindowsVersionInfo(LPTSTR lpszBuffer, LONG nMaxLen)
