@@ -2541,6 +2541,9 @@ class DTWAIN_DynamicDLL
     extern(Windows) LONG function() DTWAIN_GetTwainMode;
     extern(Windows) LONG function(LONG, LONG, DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetTwainNameFromConstant;
     extern(Windows) LONG function(LONG, LONG, LPSTR, LONG) DTWAIN_GetTwainNameFromConstantA;
+    extern(Windows) LONG function(LONG, LONG, DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetTwainNameFromConstantEx;
+    extern(Windows) LONG function(LONG, LONG, LPSTR, LONG) DTWAIN_GetTwainNameFromConstantExA;
+    extern(Windows) LONG function(LONG, LONG, LPWSTR, LONG) DTWAIN_GetTwainNameFromConstantExW;
     extern(Windows) LONG function(LONG, LONG, LPWSTR, LONG) DTWAIN_GetTwainNameFromConstantW;
     extern(Windows) LONG function(LONG, LONG, DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetTwainStringName;
     extern(Windows) LONG function(LONG, LONG, LPSTR, LONG) DTWAIN_GetTwainStringNameA;
@@ -3663,6 +3666,9 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetTwainMode, "DTWAIN_GetTwainMode");
         bindFunction(cast(void**)&DTWAIN_GetTwainNameFromConstant, "DTWAIN_GetTwainNameFromConstant");
         bindFunction(cast(void**)&DTWAIN_GetTwainNameFromConstantA, "DTWAIN_GetTwainNameFromConstantA");
+        bindFunction(cast(void**)&DTWAIN_GetTwainNameFromConstantEx, "DTWAIN_GetTwainNameFromConstantEx");
+        bindFunction(cast(void**)&DTWAIN_GetTwainNameFromConstantExA, "DTWAIN_GetTwainNameFromConstantExA");
+        bindFunction(cast(void**)&DTWAIN_GetTwainNameFromConstantExW, "DTWAIN_GetTwainNameFromConstantExW");
         bindFunction(cast(void**)&DTWAIN_GetTwainNameFromConstantW, "DTWAIN_GetTwainNameFromConstantW");
         bindFunction(cast(void**)&DTWAIN_GetTwainStringName, "DTWAIN_GetTwainStringName");
         bindFunction(cast(void**)&DTWAIN_GetTwainStringNameA, "DTWAIN_GetTwainStringNameA");

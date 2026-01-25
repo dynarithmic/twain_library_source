@@ -2472,6 +2472,9 @@ function DTWAIN_GetTwainLanguageValueW(lang:LPCWSTR) : LONG; external 'dtwain64d
 function DTWAIN_GetTwainMode : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainMode';
 function DTWAIN_GetTwainNameFromConstant(lConstantType:LONG; lTwainConstant:LONG; lpszOut:LPTSTR; nSize:LONG) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainNameFromConstant';
 function DTWAIN_GetTwainNameFromConstantA(lConstantType:LONG; lTwainConstant:LONG; lpszOut:LPSTR; nSize:LONG) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainNameFromConstantA';
+function DTWAIN_GetTwainNameFromConstantEx(lConstantType:LONG; lTwainConstant:LONG; lpszOut:LPTSTR; nSize:LONG) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainNameFromConstantEx';
+function DTWAIN_GetTwainNameFromConstantExA(lConstantType:LONG; lTwainConstant:LONG; lpszOut:LPSTR; nSize:LONG) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainNameFromConstantExA';
+function DTWAIN_GetTwainNameFromConstantExW(lConstantType:LONG; lTwainConstant:LONG; lpszOut:LPWSTR; nSize:LONG) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainNameFromConstantExW';
 function DTWAIN_GetTwainNameFromConstantW(lConstantType:LONG; lTwainConstant:LONG; lpszOut:LPWSTR; nSize:LONG) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainNameFromConstantW';
 function DTWAIN_GetTwainStringName(category:LONG; TwainID:LONG; lpszBuffer:LPTSTR; nMaxLen:LONG) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainStringName';
 function DTWAIN_GetTwainStringNameA(category:LONG; TwainID:LONG; lpszBuffer:LPSTR; nMaxLen:LONG) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainStringNameA';

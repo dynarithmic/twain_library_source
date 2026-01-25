@@ -696,6 +696,9 @@
     D_GETTWAINMODEFUNC                            DYNDTWAIN_API::DTWAIN_GetTwainMode = nullptr;
     D_GETTWAINNAMEFROMCONSTANTFUNC                DYNDTWAIN_API::DTWAIN_GetTwainNameFromConstant = nullptr;
     D_GETTWAINNAMEFROMCONSTANTAFUNC               DYNDTWAIN_API::DTWAIN_GetTwainNameFromConstantA = nullptr;
+    D_GETTWAINNAMEFROMCONSTANTEXFUNC              DYNDTWAIN_API::DTWAIN_GetTwainNameFromConstantEx = nullptr;
+    D_GETTWAINNAMEFROMCONSTANTEXAFUNC             DYNDTWAIN_API::DTWAIN_GetTwainNameFromConstantExA = nullptr;
+    D_GETTWAINNAMEFROMCONSTANTEXWFUNC             DYNDTWAIN_API::DTWAIN_GetTwainNameFromConstantExW = nullptr;
     D_GETTWAINNAMEFROMCONSTANTWFUNC               DYNDTWAIN_API::DTWAIN_GetTwainNameFromConstantW = nullptr;
     D_GETTWAINSTRINGNAMEFUNC                      DYNDTWAIN_API::DTWAIN_GetTwainStringName = nullptr;
     D_GETTWAINSTRINGNAMEAFUNC                     DYNDTWAIN_API::DTWAIN_GetTwainStringNameA = nullptr;
@@ -1890,6 +1893,9 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetTwainMode, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetTwainNameFromConstant, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetTwainNameFromConstantA, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetTwainNameFromConstantEx, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetTwainNameFromConstantExA, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetTwainNameFromConstantExW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetTwainNameFromConstantW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetTwainStringName, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetTwainStringNameA, hModule);

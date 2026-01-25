@@ -3252,6 +3252,9 @@ module TwainAPI =
     type DTWAIN_GetTwainNameFromConstantDelegate = delegate of LONG * LONG * System.Text.StringBuilder * LONG -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
+    type DTWAIN_GetTwainNameFromConstantExDelegate = delegate of LONG * LONG * System.Text.StringBuilder * LONG -> LONG
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
     type DTWAIN_GetTwainStringNameDelegate = delegate of LONG * LONG * System.Text.StringBuilder * LONG -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
@@ -4703,6 +4706,7 @@ module TwainAPI =
     let private GetTwainLanguageValue = lazy (DynamicDll.Bind "DTWAIN_GetTwainLanguageValue" : DTWAIN_GetTwainLanguageValueDelegate)
     let private GetTwainMode = lazy (DynamicDll.Bind "DTWAIN_GetTwainMode" : DTWAIN_GetTwainModeDelegate)
     let private GetTwainNameFromConstant = lazy (DynamicDll.Bind "DTWAIN_GetTwainNameFromConstant" : DTWAIN_GetTwainNameFromConstantDelegate)
+    let private GetTwainNameFromConstantEx = lazy (DynamicDll.Bind "DTWAIN_GetTwainNameFromConstantEx" : DTWAIN_GetTwainNameFromConstantExDelegate)
     let private GetTwainStringName = lazy (DynamicDll.Bind "DTWAIN_GetTwainStringName" : DTWAIN_GetTwainStringNameDelegate)
     let private GetTwainTimeout = lazy (DynamicDll.Bind "DTWAIN_GetTwainTimeout" : DTWAIN_GetTwainTimeoutDelegate)
     let private GetVersion = lazy (DynamicDll.Bind "DTWAIN_GetVersion" : DTWAIN_GetVersionDelegate)
@@ -6926,6 +6930,10 @@ module TwainAPI =
     let DTWAIN_GetTwainNameFromConstant (lconstanttype: LONG) (ltwainconstant: LONG) (lpszout: System.Text.StringBuilder) (nsize: LONG) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetTwainNameFromConstant.Value.Invoke(lconstanttype, ltwainconstant, lpszout, nsize)
+
+    let DTWAIN_GetTwainNameFromConstantEx (lconstanttype: LONG) (ltwainconstant: LONG) (lpszout: System.Text.StringBuilder) (nsize: LONG) : LONG =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetTwainNameFromConstantEx.Value.Invoke(lconstanttype, ltwainconstant, lpszout, nsize)
 
     let DTWAIN_GetTwainStringName (category: LONG) (twainid: LONG) (lpszbuffer: System.Text.StringBuilder) (nmaxlen: LONG) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

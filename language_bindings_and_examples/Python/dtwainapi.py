@@ -2393,6 +2393,9 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetTwainMode.restype = ct.c_long
      theDLL.DTWAIN_GetTwainNameFromConstant.restype = ct.c_long
      theDLL.DTWAIN_GetTwainNameFromConstantA.restype = ct.c_long
+     theDLL.DTWAIN_GetTwainNameFromConstantEx.restype = ct.c_long
+     theDLL.DTWAIN_GetTwainNameFromConstantExA.restype = ct.c_long
+     theDLL.DTWAIN_GetTwainNameFromConstantExW.restype = ct.c_long
      theDLL.DTWAIN_GetTwainNameFromConstantW.restype = ct.c_long
      theDLL.DTWAIN_GetTwainStringName.restype = ct.c_long
      theDLL.DTWAIN_GetTwainStringNameA.restype = ct.c_long
@@ -3488,6 +3491,9 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetTwainLanguageValueW.argtypes = [ct.c_wchar_p]
      theDLL.DTWAIN_GetTwainNameFromConstant.argtypes = [ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetTwainNameFromConstantA.argtypes = [ct.c_long, ct.c_long, ct.c_char_p, ct.c_long]
+     theDLL.DTWAIN_GetTwainNameFromConstantEx.argtypes = [ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_long]
+     theDLL.DTWAIN_GetTwainNameFromConstantExA.argtypes = [ct.c_long, ct.c_long, ct.c_char_p, ct.c_long]
+     theDLL.DTWAIN_GetTwainNameFromConstantExW.argtypes = [ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetTwainNameFromConstantW.argtypes = [ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetTwainStringName.argtypes = [ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetTwainStringNameA.argtypes = [ct.c_long, ct.c_long, ct.c_char_p, ct.c_long]
@@ -4609,6 +4615,9 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetTwainMode.restype = ct.c_long
      theDLL.DTWAIN_GetTwainNameFromConstant.restype = ct.c_long
      theDLL.DTWAIN_GetTwainNameFromConstantA.restype = ct.c_long
+     theDLL.DTWAIN_GetTwainNameFromConstantEx.restype = ct.c_long
+     theDLL.DTWAIN_GetTwainNameFromConstantExA.restype = ct.c_long
+     theDLL.DTWAIN_GetTwainNameFromConstantExW.restype = ct.c_long
      theDLL.DTWAIN_GetTwainNameFromConstantW.restype = ct.c_long
      theDLL.DTWAIN_GetTwainStringName.restype = ct.c_long
      theDLL.DTWAIN_GetTwainStringNameA.restype = ct.c_long
@@ -5704,6 +5713,9 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetTwainLanguageValueW.argtypes = [ct.c_wchar_p]
      theDLL.DTWAIN_GetTwainNameFromConstant.argtypes = [ct.c_long, ct.c_long, ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetTwainNameFromConstantA.argtypes = [ct.c_long, ct.c_long, ct.c_char_p, ct.c_long]
+     theDLL.DTWAIN_GetTwainNameFromConstantEx.argtypes = [ct.c_long, ct.c_long, ct.c_char_p, ct.c_long]
+     theDLL.DTWAIN_GetTwainNameFromConstantExA.argtypes = [ct.c_long, ct.c_long, ct.c_char_p, ct.c_long]
+     theDLL.DTWAIN_GetTwainNameFromConstantExW.argtypes = [ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetTwainNameFromConstantW.argtypes = [ct.c_long, ct.c_long, ct.c_wchar_p, ct.c_long]
      theDLL.DTWAIN_GetTwainStringName.argtypes = [ct.c_long, ct.c_long, ct.c_char_p, ct.c_long]
      theDLL.DTWAIN_GetTwainStringNameA.argtypes = [ct.c_long, ct.c_long, ct.c_char_p, ct.c_long]

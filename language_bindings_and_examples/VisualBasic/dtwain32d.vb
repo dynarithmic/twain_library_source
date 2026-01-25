@@ -2202,6 +2202,7 @@ Class DTWAINAPI
     Public Declare Ansi Function DTWAIN_GetTwainLanguageValue Lib "dtwain32d.dll" (szName As String) As Integer
     Public Declare Function DTWAIN_GetTwainMode Lib "dtwain32d.dll" () As Integer
     Public Declare Ansi Function DTWAIN_GetTwainNameFromConstant Lib "dtwain32d.dll" (lConstantType As Integer, lTwainConstant As Integer, <MarshalAs(UnmanagedType.LPStr)> lpszOut As StringBuilder, nSize As Integer) As Integer
+    Public Declare Ansi Function DTWAIN_GetTwainNameFromConstantEx Lib "dtwain32d.dll" (lConstantType As Integer, lTwainConstant As Integer, <MarshalAs(UnmanagedType.LPStr)> lpszOut As StringBuilder, nSize As Integer) As Integer
     Public Declare Ansi Function DTWAIN_GetTwainStringName Lib "dtwain32d.dll" (category As Integer, TwainID As Integer, <MarshalAs(UnmanagedType.LPStr)> lpszBuffer As StringBuilder, nMaxLen As Integer) As Integer
     Public Declare Function DTWAIN_GetTwainTimeout Lib "dtwain32d.dll" () As Integer
     Public Declare Function DTWAIN_GetVersion Lib "dtwain32d.dll" (ByRef lpMajor As Integer, ByRef lpMinor As Integer, ByRef lpVersionType As Integer) As Integer

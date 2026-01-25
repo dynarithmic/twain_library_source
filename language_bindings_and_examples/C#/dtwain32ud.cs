@@ -3358,6 +3358,12 @@ namespace Dynarithmic
         public static extern int DTWAIN_GetTwainNameFromConstant(int lConstantType, int lTwainConstant, System.IntPtr lpszOut, int nSize);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_GetTwainNameFromConstantEx(int lConstantType, int lTwainConstant, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszOut, int nSize);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_GetTwainNameFromConstantEx(int lConstantType, int lTwainConstant, System.IntPtr lpszOut, int nSize);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_GetTwainStringName(int category, int TwainID, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszBuffer, int nMaxLen);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
