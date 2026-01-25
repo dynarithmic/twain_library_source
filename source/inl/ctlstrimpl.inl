@@ -3342,4 +3342,33 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstantExA(LONG lConstantType, LONG lT
 #endif
 }
 
+LONG DLLENTRY_DEF DTWAIN_GetDSMSearchOrderExA(LPSTR SearchDirectory, LPSTR UserDirectory)
+{
+#ifdef _UNICODE
+	std::array<LPSTR, 2> outarg = { SearchDirectory, UserDirectory };
+	std::array<std::wstring, 2> args = { {std::wstring(10, 0), std::wstring(32767, 0)} };
+	const LONG retVal = DTWAIN_GetDSMSearchOrderEx(&args[0][0], &args[1][0]);
+	for (size_t i = 0; i < args.size(); ++i)
+		null_terminator_copier(get_view(args[i]), outarg[i], retVal);
+	return retVal;
+#else
+    return DTWAIN_GetDSMSearchOrderEx(SearchDirectory, UserDirectory);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDSMSearchOrderExW(LPWSTR SearchDirectory, LPWSTR UserDirectory)
+{
+#ifdef _UNICODE
+    return DTWAIN_GetDSMSearchOrderEx(SearchDirectory, UserDirectory);
+#else
+	std::array<LPWSTR, 2> outarg = { SearchDirectory, UserDirectory };
+	std::array<std::string, 2> args = { {std::string(10, 0), std::string(32767, 0)} };
+	const LONG retVal = DTWAIN_GetDSMSearchOrderEx(&args[0][0], &args[1][0]);
+	for (size_t i = 0; i < args.size(); ++i)
+		null_terminator_copier(get_view(args[i]), outarg[i], retVal);
+	return retVal;
+#endif
+}
+
+
 #endif // CTLSTRIMPL_INL

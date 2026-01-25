@@ -1883,28 +1883,43 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDSMSearchOrderEx(LPCTSTR SearchOrder, LPCTSTR
     LOG_FUNC_ENTRY_PARAMS((SearchOrder, UserDirectory))
     if (!SearchOrder)
         LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
+	auto strValidString = CheckSearchOrderString(SearchOrder);
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
     if (!pHandle)
     {
-        CTL_StaticData::GetStartupDSMSearchOrder() = SearchOrder;
+		if (!strValidString.empty())
+			CTL_StaticData::GetStartupDSMSearchOrder() = strValidString;
         CTL_StaticData::GetStartupDSMSearchOrderDir() = UserDirectory ? UserDirectory : _T("");
         LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
     }
     else
     {
-        auto strValidString = CheckSearchOrderString(SearchOrder);
         if (!strValidString.empty())
         {
             pHandle->m_TwainDSMSearchOrderStr = strValidString;
             pHandle->m_TwainDSMUserDirectory = UserDirectory ? UserDirectory : StringWrapper::traits_type::GetEmptyString();
             pHandle->m_TwainDSMSearchOrder = -1;
-            CTL_StaticData::GetStartupDSMSearchOrder() =  SearchOrder;
+            CTL_StaticData::GetStartupDSMSearchOrder() =  strValidString;
             CTL_StaticData::GetStartupDSMSearchOrderDir() = UserDirectory ? UserDirectory : _T("");
             LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
         }
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
     CATCH_BLOCK(false)
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetDSMSearchOrderEx(LPTSTR SearchOrder, LPTSTR UserDirectory)
+{
+	LOG_FUNC_ENTRY_PARAMS((SearchOrder, UserDirectory))
+	auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    if (SearchOrder)
+        StringWrapper::CopyInfoToCString(CTL_StaticData::GetStartupDSMSearchOrder(), SearchOrder, 6);
+
+    LONG nSize = static_cast<LONG>(CTL_StaticData::GetStartupDSMSearchOrderDir().size() + 1);
+    LONG retSize = StringWrapper::CopyInfoToCString(CTL_StaticData::GetStartupDSMSearchOrderDir(), UserDirectory, nSize);
+	LOG_FUNC_EXIT_DEREFERENCE_POINTERS((SearchOrder, UserDirectory))
+    LOG_FUNC_EXIT_NONAME_PARAMS(retSize)
+    CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetResourcePath(LPCTSTR ResourcePath)
@@ -2309,9 +2324,17 @@ CTL_StringType dynarithmic::GetDTWAINTempFilePath(CTL_TwainDLLHandle* pHandle)
 CTL_StringType CheckSearchOrderString(CTL_StringType str)
 {
     static std::set<TCHAR> setValidChars = {_T('C'),_T('W'),_T('O'),_T('U'), _T('S')};
+    std::set<TCHAR> setDuplicates;
     CTL_StringType strOut;
     StringWrapper::MakeUpperCase(str);
-    std::copy_if(str.begin(), str.end(), std::back_inserter(strOut), [&](TCHAR ch) { return setValidChars.count(ch); });
+    std::copy_if(str.begin(), str.end(), std::back_inserter(strOut), [&](TCHAR ch)
+        {
+            bool isValidChar = false;
+            if (!setDuplicates.count(ch))
+                isValidChar = setValidChars.count(ch);
+			setDuplicates.insert(ch);
+            return isValidChar;
+        });
     return strOut;
 }
 

@@ -206,10 +206,14 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     hAccelTable = LoadAccelerators(hInstance, (LPCTSTR)IDC_DTWDEMO);
 
     /* Initialize DTWAIN.  Quit if error! */
-    if ( !DTWAIN_SysInitialize( )) 
+	DTWAIN_SetDSMSearchOrderExA("CWOCZ", "This is a test");
+    if ( !DTWAIN_SysInitialize( ))
         return 0;
     DTWAIN_SetAppInfoA("1.0","Demo Program Menu", "Demo Program Family", "Demo Program Name");
 
+    /* Test */
+    char szDir1[100], szDir2[100];
+    DTWAIN_GetDSMSearchOrderExA(szDir1, szDir2);
     /* Allow DTWAIN messages to be sent directly to our Window proc */
     DTWAIN_StartTwainSession(g_hWnd, NULL);
     // DTWAIN_SetTwainMode(DTWAIN_MODELESS);

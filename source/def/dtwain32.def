@@ -1145,3 +1145,6 @@ DTWAIN_AddPDFTextExW                              @31156
 DTWAIN_GetTwainNameFromConstantEx                 @31157
 DTWAIN_GetTwainNameFromConstantExA                @31158
 DTWAIN_GetTwainNameFromConstantExW                @31159
+DTWAIN_GetDSMSearchOrderEx                        @31160
+DTWAIN_GetDSMSearchOrderExA                       @31161
+DTWAIN_GetDSMSearchOrderExW                       @31162
