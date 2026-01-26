@@ -35,7 +35,7 @@ let main argv =
 
                     // Now get the product name of the TWAIN source that was selected
                     let buffer = new StringBuilder(256)
-                    let ret = TwainAPI.DTWAIN_GetSourceProductNameW sourceResult buffer 256
+                    let ret = TwainAPI.DTWAIN_GetSourceProductName sourceResult buffer 256
                     printfn "The name of the selected TWAIN Source is: %s" (buffer.ToString())
 
                     // Example usage of DTWAIN_ARRAY:
