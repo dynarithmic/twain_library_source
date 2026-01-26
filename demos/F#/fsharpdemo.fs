@@ -23,7 +23,7 @@ let main argv =
             else
                 // Select a Source using the enhanced "Select Source" dialog.  We will center it
                 // on the screen
-                let sourceResult = TwainAPI.DTWAIN_SelectSource2 IntPtr.Zero "Select Source" 0 0 TwainAPI.DTWAIN_DLG_CENTER_SCREEN 
+                let sourceResult = TwainAPI.DTWAIN_SelectSource2 IntPtr.Zero "Select Source" 0 0 TwainAPI.DTWAIN_DLG_CENTER_CURRENT_MONITOR
                 
                 if sourceResult = 0 then 
                     printfn "No TWAIN Source was selected"
