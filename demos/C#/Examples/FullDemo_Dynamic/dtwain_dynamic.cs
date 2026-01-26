@@ -2254,6 +2254,8 @@
         public delegate int DTWAIN_GetDSMFullNameDelegate(int DSMType, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szDLLName, int nMaxLen, ref int pWhichSearch);
         public delegate int DTWAIN_GetDSMFullNameDelegate_overload(int DSMType, System.IntPtr szDLLName, int nMaxLen, ref int pWhichSearch);
         public delegate int DTWAIN_GetDSMSearchOrderDelegate();
+        public delegate int DTWAIN_GetDSMSearchOrderExDelegate([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder SearchOrder, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder UserDirectory);
+        public delegate int DTWAIN_GetDSMSearchOrderExDelegate_overload(System.IntPtr SearchOrder, System.IntPtr UserDirectory);
         public delegate DTWAIN_HANDLE DTWAIN_GetDTWAINHandleDelegate();
         public delegate int DTWAIN_GetDeviceEventDelegate(DTWAIN_SOURCE Source, ref int lpEvent);
         public delegate int DTWAIN_GetDeviceEventExDelegate(DTWAIN_SOURCE Source, ref int lpEvent, ref DTWAIN_ARRAY pArray);
@@ -3862,6 +3864,12 @@
 
         [DTWAINNativeFunction("DTWAIN_GetDSMSearchOrder")]
         private readonly DTWAIN_GetDSMSearchOrderDelegate  _DTWAIN_GetDSMSearchOrder;
+
+        [DTWAINNativeFunction("DTWAIN_GetDSMSearchOrderEx")]
+        private readonly DTWAIN_GetDSMSearchOrderExDelegate  _DTWAIN_GetDSMSearchOrderEx;
+
+        [DTWAINNativeFunction("DTWAIN_GetDSMSearchOrderEx")]
+        private readonly DTWAIN_GetDSMSearchOrderExDelegate_overload _DTWAIN_GetDSMSearchOrderEx_overload; 
 
         [DTWAINNativeFunction("DTWAIN_GetDTWAINHandle")]
         private readonly DTWAIN_GetDTWAINHandleDelegate  _DTWAIN_GetDTWAINHandle;
@@ -6480,6 +6488,12 @@
 
         public  int DTWAIN_GetDSMSearchOrder()
         => _DTWAIN_GetDSMSearchOrder();
+
+        public  int DTWAIN_GetDSMSearchOrderEx([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder SearchOrder, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder UserDirectory)
+        => _DTWAIN_GetDSMSearchOrderEx(SearchOrder, UserDirectory);
+
+        public  int DTWAIN_GetDSMSearchOrderEx (System.IntPtr SearchOrder, System.IntPtr UserDirectory)
+        => _DTWAIN_GetDSMSearchOrderEx_overload(SearchOrder, UserDirectory);
 
         public  DTWAIN_HANDLE DTWAIN_GetDTWAINHandle()
         => _DTWAIN_GetDTWAINHandle();

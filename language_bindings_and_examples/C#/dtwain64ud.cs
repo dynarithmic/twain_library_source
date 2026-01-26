@@ -2865,6 +2865,12 @@ namespace Dynarithmic
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern int DTWAIN_GetDSMSearchOrder();
 
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode, ExactSpelling = true)]
+        public static extern int DTWAIN_GetDSMSearchOrderEx([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder SearchOrder, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder UserDirectory);
+
+        [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode, ExactSpelling = true)]
+        public static extern int DTWAIN_GetDSMSearchOrderEx(System.IntPtr SearchOrder, System.IntPtr UserDirectory);
+
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern DTWAIN_HANDLE DTWAIN_GetDTWAINHandle();
 

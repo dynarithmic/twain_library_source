@@ -2939,6 +2939,9 @@ Namespace Dynarithmic
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetDSMSearchOrderDelegate() As Integer
         
+        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
+        Private Delegate Function DTWAIN_GetDSMSearchOrderExDelegate(<MarshalAs(UnmanagedType.LPTStr)> SearchOrder As StringBuilder, <MarshalAs(UnmanagedType.LPTStr)> UserDirectory As StringBuilder) As Integer
+        
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetDTWAINHandleDelegate() As System.IntPtr
         
@@ -5688,6 +5691,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetDSMSearchOrder()
         End Function
         
+        Public Function DTWAIN_GetDSMSearchOrderEx(<MarshalAs(UnmanagedType.LPTStr)> SearchOrder As StringBuilder, <MarshalAs(UnmanagedType.LPTStr)> UserDirectory As StringBuilder) As Integer
+        Return api.DTWAIN_GetDSMSearchOrderEx(SearchOrder, UserDirectory)
+        End Function
+        
         Public Function DTWAIN_GetDTWAINHandle() As System.IntPtr
         Return api.DTWAIN_GetDTWAINHandle()
         End Function
@@ -7864,6 +7871,7 @@ Namespace Dynarithmic
             Public DTWAIN_GetCustomDSData As DTWAIN_GetCustomDSDataDelegate
             Public DTWAIN_GetDSMFullName As DTWAIN_GetDSMFullNameDelegate
             Public DTWAIN_GetDSMSearchOrder As DTWAIN_GetDSMSearchOrderDelegate
+            Public DTWAIN_GetDSMSearchOrderEx As DTWAIN_GetDSMSearchOrderExDelegate
             Public DTWAIN_GetDTWAINHandle As DTWAIN_GetDTWAINHandleDelegate
             Public DTWAIN_GetDeviceEvent As DTWAIN_GetDeviceEventDelegate
             Public DTWAIN_GetDeviceEventEx As DTWAIN_GetDeviceEventExDelegate

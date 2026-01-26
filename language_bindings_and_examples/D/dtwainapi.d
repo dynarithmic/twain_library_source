@@ -2336,6 +2336,9 @@ class DTWAIN_DynamicDLL
     extern(Windows) LONG function(LONG, LPSTR, LONG, LPLONG) DTWAIN_GetDSMFullNameA;
     extern(Windows) LONG function(LONG, LPWSTR, LONG, LPLONG) DTWAIN_GetDSMFullNameW;
     extern(Windows) LONG function() DTWAIN_GetDSMSearchOrder;
+    extern(Windows) LONG function(DTWAIN_CHARPTRTYPE, DTWAIN_CHARPTRTYPE) DTWAIN_GetDSMSearchOrderEx;
+    extern(Windows) LONG function(LPSTR, LPSTR) DTWAIN_GetDSMSearchOrderExA;
+    extern(Windows) LONG function(LPWSTR, LPWSTR) DTWAIN_GetDSMSearchOrderExW;
     extern(Windows) DTWAIN_HANDLE function() DTWAIN_GetDTWAINHandle;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG) DTWAIN_GetDeviceEvent;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPLONG, LPDTWAIN_ARRAY) DTWAIN_GetDeviceEventEx;
@@ -3461,6 +3464,9 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetDSMFullNameA, "DTWAIN_GetDSMFullNameA");
         bindFunction(cast(void**)&DTWAIN_GetDSMFullNameW, "DTWAIN_GetDSMFullNameW");
         bindFunction(cast(void**)&DTWAIN_GetDSMSearchOrder, "DTWAIN_GetDSMSearchOrder");
+        bindFunction(cast(void**)&DTWAIN_GetDSMSearchOrderEx, "DTWAIN_GetDSMSearchOrderEx");
+        bindFunction(cast(void**)&DTWAIN_GetDSMSearchOrderExA, "DTWAIN_GetDSMSearchOrderExA");
+        bindFunction(cast(void**)&DTWAIN_GetDSMSearchOrderExW, "DTWAIN_GetDSMSearchOrderExW");
         bindFunction(cast(void**)&DTWAIN_GetDTWAINHandle, "DTWAIN_GetDTWAINHandle");
         bindFunction(cast(void**)&DTWAIN_GetDeviceEvent, "DTWAIN_GetDeviceEvent");
         bindFunction(cast(void**)&DTWAIN_GetDeviceEventEx, "DTWAIN_GetDeviceEventEx");

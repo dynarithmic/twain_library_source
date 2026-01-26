@@ -2876,6 +2876,9 @@ module TwainAPI =
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetDSMSearchOrderDelegate = delegate of unit -> LONG
 
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
+    type DTWAIN_GetDSMSearchOrderExDelegate = delegate of System.Text.StringBuilder * System.Text.StringBuilder -> LONG
+
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetDTWAINHandleDelegate = delegate of unit -> DTWAIN_HANDLE
 
@@ -4581,6 +4584,7 @@ module TwainAPI =
     let private GetCustomDSData = lazy (DynamicDll.Bind "DTWAIN_GetCustomDSData" : DTWAIN_GetCustomDSDataDelegate)
     let private GetDSMFullName = lazy (DynamicDll.Bind "DTWAIN_GetDSMFullName" : DTWAIN_GetDSMFullNameDelegate)
     let private GetDSMSearchOrder = lazy (DynamicDll.Bind "DTWAIN_GetDSMSearchOrder" : DTWAIN_GetDSMSearchOrderDelegate)
+    let private GetDSMSearchOrderEx = lazy (DynamicDll.Bind "DTWAIN_GetDSMSearchOrderEx" : DTWAIN_GetDSMSearchOrderExDelegate)
     let private GetDTWAINHandle = lazy (DynamicDll.Bind "DTWAIN_GetDTWAINHandle" : DTWAIN_GetDTWAINHandleDelegate)
     let private GetDeviceEvent = lazy (DynamicDll.Bind "DTWAIN_GetDeviceEvent" : DTWAIN_GetDeviceEventDelegate)
     let private GetDeviceEventEx = lazy (DynamicDll.Bind "DTWAIN_GetDeviceEventEx" : DTWAIN_GetDeviceEventExDelegate)
@@ -6430,6 +6434,10 @@ module TwainAPI =
     let DTWAIN_GetDSMSearchOrder() : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetDSMSearchOrder.Value.Invoke()
+
+    let DTWAIN_GetDSMSearchOrderEx (searchorder: System.Text.StringBuilder) (userdirectory: System.Text.StringBuilder) : LONG =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetDSMSearchOrderEx.Value.Invoke(searchorder, userdirectory)
 
     let DTWAIN_GetDTWAINHandle() : DTWAIN_HANDLE =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

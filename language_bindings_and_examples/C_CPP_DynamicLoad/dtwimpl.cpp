@@ -486,6 +486,9 @@
     D_GETDSMFULLNAMEAFUNC                         DYNDTWAIN_API::DTWAIN_GetDSMFullNameA = nullptr;
     D_GETDSMFULLNAMEWFUNC                         DYNDTWAIN_API::DTWAIN_GetDSMFullNameW = nullptr;
     D_GETDSMSEARCHORDERFUNC                       DYNDTWAIN_API::DTWAIN_GetDSMSearchOrder = nullptr;
+    D_GETDSMSEARCHORDEREXFUNC                     DYNDTWAIN_API::DTWAIN_GetDSMSearchOrderEx = nullptr;
+    D_GETDSMSEARCHORDEREXAFUNC                    DYNDTWAIN_API::DTWAIN_GetDSMSearchOrderExA = nullptr;
+    D_GETDSMSEARCHORDEREXWFUNC                    DYNDTWAIN_API::DTWAIN_GetDSMSearchOrderExW = nullptr;
     D_GETDTWAINHANDLEFUNC                         DYNDTWAIN_API::DTWAIN_GetDTWAINHandle = nullptr;
     D_GETDEVICEEVENTFUNC                          DYNDTWAIN_API::DTWAIN_GetDeviceEvent = nullptr;
     D_GETDEVICEEVENTEXFUNC                        DYNDTWAIN_API::DTWAIN_GetDeviceEventEx = nullptr;
@@ -1683,6 +1686,9 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_GetDSMFullNameA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetDSMFullNameW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetDSMSearchOrder, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetDSMSearchOrderEx, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetDSMSearchOrderExA, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_GetDSMSearchOrderExW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetDTWAINHandle, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetDeviceEvent, hModule);
           LOADFUNCTIONIMPL(DTWAIN_GetDeviceEventEx, hModule);

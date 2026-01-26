@@ -2262,6 +2262,9 @@ function DTWAIN_GetDSMFullName(DSMType:LONG; szDLLName:LPTSTR; nMaxLen:LONG; pWh
 function DTWAIN_GetDSMFullNameA(DSMType:LONG; szDLLName:LPSTR; nMaxLen:LONG; pWhichSearch:LPLONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDSMFullNameA';
 function DTWAIN_GetDSMFullNameW(DSMType:LONG; szDLLName:LPWSTR; nMaxLen:LONG; pWhichSearch:LPLONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDSMFullNameW';
 function DTWAIN_GetDSMSearchOrder : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDSMSearchOrder';
+function DTWAIN_GetDSMSearchOrderEx(SearchOrder:LPTSTR; UserDirectory:LPTSTR) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDSMSearchOrderEx';
+function DTWAIN_GetDSMSearchOrderExA(SearchOrder:LPSTR; UserDirectory:LPSTR) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDSMSearchOrderExA';
+function DTWAIN_GetDSMSearchOrderExW(SearchOrder:LPWSTR; UserDirectory:LPWSTR) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDSMSearchOrderExW';
 function DTWAIN_GetDTWAINHandle : DTWAIN_HANDLE; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDTWAINHandle';
 function DTWAIN_GetDeviceEvent(Source:DTWAIN_SOURCE; lpEvent:LPLONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDeviceEvent';
 function DTWAIN_GetDeviceEventEx(Source:DTWAIN_SOURCE; lpEvent:LPLONG; pArray:LPDTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDeviceEventEx';

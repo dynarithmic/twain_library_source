@@ -2079,6 +2079,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetCustomDSData Lib "dtwain32d.dll" (Source As System.IntPtr, Data As Byte(), dSize As UInteger, ByRef pActualSize As UInteger, nFlags As Integer) As System.IntPtr
     Public Declare Ansi Function DTWAIN_GetDSMFullName Lib "dtwain32d.dll" (DSMType As Integer, <MarshalAs(UnmanagedType.LPStr)> szDLLName As StringBuilder, nMaxLen As Integer, ByRef pWhichSearch As Integer) As Integer
     Public Declare Function DTWAIN_GetDSMSearchOrder Lib "dtwain32d.dll" () As Integer
+    Public Declare Ansi Function DTWAIN_GetDSMSearchOrderEx Lib "dtwain32d.dll" (<MarshalAs(UnmanagedType.LPStr)> SearchOrder As StringBuilder, <MarshalAs(UnmanagedType.LPStr)> UserDirectory As StringBuilder) As Integer
     Public Declare Function DTWAIN_GetDTWAINHandle Lib "dtwain32d.dll" () As System.IntPtr
     Public Declare Function DTWAIN_GetDeviceEvent Lib "dtwain32d.dll" (Source As System.IntPtr, ByRef lpEvent As Integer) As Integer
     Public Declare Function DTWAIN_GetDeviceEventEx Lib "dtwain32d.dll" (Source As System.IntPtr, ByRef lpEvent As Integer, ByRef pArray As System.IntPtr) As Integer

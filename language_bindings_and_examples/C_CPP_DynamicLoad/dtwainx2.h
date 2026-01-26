@@ -479,6 +479,9 @@ typedef LONG (DLLENTRY_DEF * D_GETDSMFULLNAMEFUNC)                              
 typedef LONG (DLLENTRY_DEF * D_GETDSMFULLNAMEAFUNC)                             (LONG, LPSTR, LONG, LPLONG);
 typedef LONG (DLLENTRY_DEF * D_GETDSMFULLNAMEWFUNC)                             (LONG, LPWSTR, LONG, LPLONG);
 typedef LONG (DLLENTRY_DEF * D_GETDSMSEARCHORDERFUNC)                           (VOID_PROTOTYPE);
+typedef LONG (DLLENTRY_DEF * D_GETDSMSEARCHORDEREXFUNC)                         (LPTSTR, LPTSTR);
+typedef LONG (DLLENTRY_DEF * D_GETDSMSEARCHORDEREXAFUNC)                        (LPSTR, LPSTR);
+typedef LONG (DLLENTRY_DEF * D_GETDSMSEARCHORDEREXWFUNC)                        (LPWSTR, LPWSTR);
 typedef DTWAIN_HANDLE (DLLENTRY_DEF * D_GETDTWAINHANDLEFUNC)                    (VOID_PROTOTYPE);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETDEVICEEVENTFUNC)                       (DTWAIN_SOURCE, LPLONG);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_GETDEVICEEVENTEXFUNC)                     (DTWAIN_SOURCE, LPLONG, LPDTWAIN_ARRAY);
@@ -1626,6 +1629,9 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_USEMULTIPLETHREADSFUNC)                   
     STATIC D_GETDSMFULLNAMEAFUNC                            DTWAIN_GetDSMFullNameA;
     STATIC D_GETDSMFULLNAMEWFUNC                            DTWAIN_GetDSMFullNameW;
     STATIC D_GETDSMSEARCHORDERFUNC                          DTWAIN_GetDSMSearchOrder;
+    STATIC D_GETDSMSEARCHORDEREXFUNC                        DTWAIN_GetDSMSearchOrderEx;
+    STATIC D_GETDSMSEARCHORDEREXAFUNC                       DTWAIN_GetDSMSearchOrderExA;
+    STATIC D_GETDSMSEARCHORDEREXWFUNC                       DTWAIN_GetDSMSearchOrderExW;
     STATIC D_GETDTWAINHANDLEFUNC                            DTWAIN_GetDTWAINHandle;
     STATIC D_GETDEVICEEVENTFUNC                             DTWAIN_GetDeviceEvent;
     STATIC D_GETDEVICEEVENTEXFUNC                           DTWAIN_GetDeviceEventEx;

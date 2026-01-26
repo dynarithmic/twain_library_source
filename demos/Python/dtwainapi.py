@@ -2183,6 +2183,9 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetDSMFullNameA.restype = ct.c_long
      theDLL.DTWAIN_GetDSMFullNameW.restype = ct.c_long
      theDLL.DTWAIN_GetDSMSearchOrder.restype = ct.c_long
+     theDLL.DTWAIN_GetDSMSearchOrderEx.restype = ct.c_long
+     theDLL.DTWAIN_GetDSMSearchOrderExA.restype = ct.c_long
+     theDLL.DTWAIN_GetDSMSearchOrderExW.restype = ct.c_long
      theDLL.DTWAIN_GetDTWAINHandle.restype = ct.c_void_p
      theDLL.DTWAIN_GetDeviceEvent.restype = ct.c_long
      theDLL.DTWAIN_GetDeviceEventEx.restype = ct.c_long
@@ -3296,6 +3299,9 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_GetDSMFullName.argtypes = [ct.c_long, ct.c_wchar_p, ct.c_long, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetDSMFullNameA.argtypes = [ct.c_long, ct.c_char_p, ct.c_long, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetDSMFullNameW.argtypes = [ct.c_long, ct.c_wchar_p, ct.c_long, ct.POINTER(ct.c_long)]
+     theDLL.DTWAIN_GetDSMSearchOrderEx.argtypes = [ct.c_wchar_p, ct.c_wchar_p]
+     theDLL.DTWAIN_GetDSMSearchOrderExA.argtypes = [ct.c_char_p, ct.c_char_p]
+     theDLL.DTWAIN_GetDSMSearchOrderExW.argtypes = [ct.c_wchar_p, ct.c_wchar_p]
      theDLL.DTWAIN_GetDeviceEvent.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetDeviceEventEx.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_GetDeviceEventInfo.argtypes = [ct.c_void_p, ct.c_long, ct.c_void_p]
@@ -4405,6 +4411,9 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetDSMFullNameA.restype = ct.c_long
      theDLL.DTWAIN_GetDSMFullNameW.restype = ct.c_long
      theDLL.DTWAIN_GetDSMSearchOrder.restype = ct.c_long
+     theDLL.DTWAIN_GetDSMSearchOrderEx.restype = ct.c_long
+     theDLL.DTWAIN_GetDSMSearchOrderExA.restype = ct.c_long
+     theDLL.DTWAIN_GetDSMSearchOrderExW.restype = ct.c_long
      theDLL.DTWAIN_GetDTWAINHandle.restype = ct.c_void_p
      theDLL.DTWAIN_GetDeviceEvent.restype = ct.c_long
      theDLL.DTWAIN_GetDeviceEventEx.restype = ct.c_long
@@ -5518,6 +5527,9 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_GetDSMFullName.argtypes = [ct.c_long, ct.c_char_p, ct.c_long, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetDSMFullNameA.argtypes = [ct.c_long, ct.c_char_p, ct.c_long, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetDSMFullNameW.argtypes = [ct.c_long, ct.c_wchar_p, ct.c_long, ct.POINTER(ct.c_long)]
+     theDLL.DTWAIN_GetDSMSearchOrderEx.argtypes = [ct.c_char_p, ct.c_char_p]
+     theDLL.DTWAIN_GetDSMSearchOrderExA.argtypes = [ct.c_char_p, ct.c_char_p]
+     theDLL.DTWAIN_GetDSMSearchOrderExW.argtypes = [ct.c_wchar_p, ct.c_wchar_p]
      theDLL.DTWAIN_GetDeviceEvent.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_GetDeviceEventEx.argtypes = [ct.c_void_p, ct.POINTER(ct.c_long), ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_GetDeviceEventInfo.argtypes = [ct.c_void_p, ct.c_long, ct.c_void_p]

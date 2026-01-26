@@ -65,7 +65,7 @@ let main argv =
                     // on the notifications that will be sent to your application
                     
                     let get_notification_code (wParam : nativeint) =
-                        TwainAPI.DTWAIN_GetTwainNameFromConstant (TwainAPI.DTWAIN_CONSTANT_DTWAIN_TN) (wParam.ToInt32()) (buffer) (256)  |> ignore
+                        TwainAPI.DTWAIN_GetTwainNameFromConstantW (TwainAPI.DTWAIN_CONSTANT_DTWAIN_TN) (wParam.ToInt32()) (buffer) (256)  |> ignore
                         ()
                         
                     let myCallback (wParam) (lParam) (userData: int64) : nativeint =

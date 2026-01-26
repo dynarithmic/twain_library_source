@@ -479,6 +479,9 @@ type DtwaingetdsmfullnameFunc = unsafe extern "C" fn(i32,*mut u16,i32,*mut i32) 
 type DtwaingetdsmfullnameaFunc = unsafe extern "C" fn(i32,*mut c_char,i32,*mut i32) -> i32;
 type DtwaingetdsmfullnamewFunc = unsafe extern "C" fn(i32,*mut u16,i32,*mut i32) -> i32;
 type DtwaingetdsmsearchorderFunc = unsafe extern "C" fn() -> i32;
+type DtwaingetdsmsearchorderexFunc = unsafe extern "C" fn(*mut u16,*mut u16) -> i32;
+type DtwaingetdsmsearchorderexaFunc = unsafe extern "C" fn(*mut c_char,*mut c_char) -> i32;
+type DtwaingetdsmsearchorderexwFunc = unsafe extern "C" fn(*mut u16,*mut u16) -> i32;
 type DtwaingetdtwainhandleFunc = unsafe extern "C" fn() -> *mut c_void;
 type DtwaingetdeviceeventFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
 type DtwaingetdeviceeventexFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut *mut c_void) -> i32;
@@ -1605,6 +1608,9 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetDSMFullNameAFunc: Symbol<'a, DtwaingetdsmfullnameaFunc>,
     DTWAIN_GetDSMFullNameWFunc: Symbol<'a, DtwaingetdsmfullnamewFunc>,
     DTWAIN_GetDSMSearchOrderFunc: Symbol<'a, DtwaingetdsmsearchorderFunc>,
+    DTWAIN_GetDSMSearchOrderExFunc: Symbol<'a, DtwaingetdsmsearchorderexFunc>,
+    DTWAIN_GetDSMSearchOrderExAFunc: Symbol<'a, DtwaingetdsmsearchorderexaFunc>,
+    DTWAIN_GetDSMSearchOrderExWFunc: Symbol<'a, DtwaingetdsmsearchorderexwFunc>,
     DTWAIN_GetDTWAINHandleFunc: Symbol<'a, DtwaingetdtwainhandleFunc>,
     DTWAIN_GetDeviceEventFunc: Symbol<'a, DtwaingetdeviceeventFunc>,
     DTWAIN_GetDeviceEventExFunc: Symbol<'a, DtwaingetdeviceeventexFunc>,
@@ -4367,6 +4373,9 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetDSMFullNameA: Symbol<DtwaingetdsmfullnameaFunc> = unsafe { library.get(b"DTWAIN_GetDSMFullNameA")? };
         let DTWAIN_GetDSMFullNameW: Symbol<DtwaingetdsmfullnamewFunc> = unsafe { library.get(b"DTWAIN_GetDSMFullNameW")? };
         let DTWAIN_GetDSMSearchOrder: Symbol<DtwaingetdsmsearchorderFunc> = unsafe { library.get(b"DTWAIN_GetDSMSearchOrder")? };
+        let DTWAIN_GetDSMSearchOrderEx: Symbol<DtwaingetdsmsearchorderexFunc> = unsafe { library.get(b"DTWAIN_GetDSMSearchOrderEx")? };
+        let DTWAIN_GetDSMSearchOrderExA: Symbol<DtwaingetdsmsearchorderexaFunc> = unsafe { library.get(b"DTWAIN_GetDSMSearchOrderExA")? };
+        let DTWAIN_GetDSMSearchOrderExW: Symbol<DtwaingetdsmsearchorderexwFunc> = unsafe { library.get(b"DTWAIN_GetDSMSearchOrderExW")? };
         let DTWAIN_GetDTWAINHandle: Symbol<DtwaingetdtwainhandleFunc> = unsafe { library.get(b"DTWAIN_GetDTWAINHandle")? };
         let DTWAIN_GetDeviceEvent: Symbol<DtwaingetdeviceeventFunc> = unsafe { library.get(b"DTWAIN_GetDeviceEvent")? };
         let DTWAIN_GetDeviceEventEx: Symbol<DtwaingetdeviceeventexFunc> = unsafe { library.get(b"DTWAIN_GetDeviceEventEx")? };
@@ -5492,6 +5501,9 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetDSMFullNameAFunc: DTWAIN_GetDSMFullNameA,
             DTWAIN_GetDSMFullNameWFunc: DTWAIN_GetDSMFullNameW,
             DTWAIN_GetDSMSearchOrderFunc: DTWAIN_GetDSMSearchOrder,
+            DTWAIN_GetDSMSearchOrderExFunc: DTWAIN_GetDSMSearchOrderEx,
+            DTWAIN_GetDSMSearchOrderExAFunc: DTWAIN_GetDSMSearchOrderExA,
+            DTWAIN_GetDSMSearchOrderExWFunc: DTWAIN_GetDSMSearchOrderExW,
             DTWAIN_GetDTWAINHandleFunc: DTWAIN_GetDTWAINHandle,
             DTWAIN_GetDeviceEventFunc: DTWAIN_GetDeviceEvent,
             DTWAIN_GetDeviceEventExFunc: DTWAIN_GetDeviceEventEx,
@@ -7914,6 +7926,18 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_GetDSMSearchOrder(&self) -> i32 {
         unsafe { return (self.DTWAIN_GetDSMSearchOrderFunc)();  }
+    }
+
+    pub fn DTWAIN_GetDSMSearchOrderEx(&self, SearchOrder: *mut u16, UserDirectory: *mut u16) -> i32 {
+        unsafe { return (self.DTWAIN_GetDSMSearchOrderExFunc)(SearchOrder, UserDirectory);  }
+    }
+
+    pub fn DTWAIN_GetDSMSearchOrderExA(&self, SearchOrder: *mut c_char, UserDirectory: *mut c_char) -> i32 {
+        unsafe { return (self.DTWAIN_GetDSMSearchOrderExAFunc)(SearchOrder, UserDirectory);  }
+    }
+
+    pub fn DTWAIN_GetDSMSearchOrderExW(&self, SearchOrder: *mut u16, UserDirectory: *mut u16) -> i32 {
+        unsafe { return (self.DTWAIN_GetDSMSearchOrderExWFunc)(SearchOrder, UserDirectory);  }
     }
 
     pub fn DTWAIN_GetDTWAINHandle(&self) -> *mut c_void {
