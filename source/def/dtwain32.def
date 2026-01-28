@@ -1148,3 +1148,7 @@ DTWAIN_GetTwainNameFromConstantExW                @31159
 DTWAIN_GetDSMSearchOrderEx                        @31160
 DTWAIN_GetDSMSearchOrderExA                       @31161
 DTWAIN_GetDSMSearchOrderExW                       @31162
+DTWAIN_RotateDIB                                  @31163
+DTWAIN_RotateDIBString                            @31164
+DTWAIN_RotateDIBStringA                           @31165
+DTWAIN_RotateDIBStringW                           @31166

@@ -3370,5 +3370,22 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDSMSearchOrderExW(LPWSTR SearchDirectory, LPW
 #endif
 }
 
+HANDLE DLLENTRY_DEF DTWAIN_RotateDIBStringA(HANDLE hDib, LPCSTR angle)
+{
+#ifdef _UNICODE
+    return DTWAIN_RotateDIBString(hDib, StringConversion::Convert_AnsiPtr_To_Native(angle).c_str());
+#else
+    return DTWAIN_RotateDIBString(hDib, angle);
+#endif
+}
+
+HANDLE DLLENTRY_DEF DTWAIN_RotateDIBStringW(HANDLE hDib, LPCWSTR angle)
+{
+#ifdef _UNICODE
+    return DTWAIN_RotateDIBString(hDib, angle);
+#else
+    return DTWAIN_RotateDIBString(hDib, StringConversion::Convert_WidePtr_To_Native(angle).c_str());
+#endif
+}
 
 #endif // CTLSTRIMPL_INL
