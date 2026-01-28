@@ -2681,6 +2681,10 @@ function DTWAIN_RangeSetValueLong(pArray:DTWAIN_RANGE; nWhich:LONG; Val:LONG) : 
 function DTWAIN_RemovePDFTextElement(Source:DTWAIN_SOURCE; TextElement:DTWAIN_PDFTEXTELEMENT) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_RemovePDFTextElement';
 function DTWAIN_ResetPDFTextElement(TextElement:DTWAIN_PDFTEXTELEMENT) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_ResetPDFTextElement';
 function DTWAIN_RewindPage(Source:DTWAIN_SOURCE) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_RewindPage';
+function DTWAIN_RotateDIB(hDib:NativeInt; rotationAngle:DTWAIN_FLOAT) : NativeInt; external 'dtwain64.dll'  name 'DTWAIN_RotateDIB';
+function DTWAIN_RotateDIBString(hDib:NativeInt; rotationAngle:LPCTSTR) : NativeInt; external 'dtwain64.dll'  name 'DTWAIN_RotateDIBString';
+function DTWAIN_RotateDIBStringA(hDib:NativeInt; rotationAngle:LPCSTR) : NativeInt; external 'dtwain64.dll'  name 'DTWAIN_RotateDIBStringA';
+function DTWAIN_RotateDIBStringW(hDib:NativeInt; rotationAngle:LPCWSTR) : NativeInt; external 'dtwain64.dll'  name 'DTWAIN_RotateDIBStringW';
 function DTWAIN_SelectDefaultOCREngine : DTWAIN_OCRENGINE; external 'dtwain64.dll'  name 'DTWAIN_SelectDefaultOCREngine';
 function DTWAIN_SelectDefaultSource : DTWAIN_SOURCE; external 'dtwain64.dll'  name 'DTWAIN_SelectDefaultSource';
 function DTWAIN_SelectDefaultSourceWithOpen(bOpen:BOOL) : DTWAIN_SOURCE; external 'dtwain64.dll'  name 'DTWAIN_SelectDefaultSourceWithOpen';
