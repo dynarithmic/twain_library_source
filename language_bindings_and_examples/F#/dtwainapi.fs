@@ -2876,6 +2876,9 @@ module TwainAPI =
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetDSMSearchOrderDelegate = delegate of unit -> LONG
 
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
+    type DTWAIN_GetDSMSearchOrderExDelegate = delegate of System.Text.StringBuilder * System.Text.StringBuilder -> LONG
+
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetDTWAINHandleDelegate = delegate of unit -> DTWAIN_HANDLE
 
@@ -3250,6 +3253,9 @@ module TwainAPI =
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
     type DTWAIN_GetTwainNameFromConstantDelegate = delegate of LONG * LONG * System.Text.StringBuilder * LONG -> LONG
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
+    type DTWAIN_GetTwainNameFromConstantExDelegate = delegate of LONG * LONG * System.Text.StringBuilder * LONG -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
     type DTWAIN_GetTwainStringNameDelegate = delegate of LONG * LONG * System.Text.StringBuilder * LONG -> LONG
@@ -3736,6 +3742,12 @@ module TwainAPI =
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_RewindPageDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_RotateDIBDelegate = delegate of HANDLE * DTWAIN_FLOAT -> HANDLE
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
+    type DTWAIN_RotateDIBStringDelegate = delegate of HANDLE * string -> HANDLE
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_SelectDefaultOCREngineDelegate = delegate of unit -> DTWAIN_OCRENGINE
@@ -4578,6 +4590,7 @@ module TwainAPI =
     let private GetCustomDSData = lazy (DynamicDll.Bind "DTWAIN_GetCustomDSData" : DTWAIN_GetCustomDSDataDelegate)
     let private GetDSMFullName = lazy (DynamicDll.Bind "DTWAIN_GetDSMFullName" : DTWAIN_GetDSMFullNameDelegate)
     let private GetDSMSearchOrder = lazy (DynamicDll.Bind "DTWAIN_GetDSMSearchOrder" : DTWAIN_GetDSMSearchOrderDelegate)
+    let private GetDSMSearchOrderEx = lazy (DynamicDll.Bind "DTWAIN_GetDSMSearchOrderEx" : DTWAIN_GetDSMSearchOrderExDelegate)
     let private GetDTWAINHandle = lazy (DynamicDll.Bind "DTWAIN_GetDTWAINHandle" : DTWAIN_GetDTWAINHandleDelegate)
     let private GetDeviceEvent = lazy (DynamicDll.Bind "DTWAIN_GetDeviceEvent" : DTWAIN_GetDeviceEventDelegate)
     let private GetDeviceEventEx = lazy (DynamicDll.Bind "DTWAIN_GetDeviceEventEx" : DTWAIN_GetDeviceEventExDelegate)
@@ -4703,6 +4716,7 @@ module TwainAPI =
     let private GetTwainLanguageValue = lazy (DynamicDll.Bind "DTWAIN_GetTwainLanguageValue" : DTWAIN_GetTwainLanguageValueDelegate)
     let private GetTwainMode = lazy (DynamicDll.Bind "DTWAIN_GetTwainMode" : DTWAIN_GetTwainModeDelegate)
     let private GetTwainNameFromConstant = lazy (DynamicDll.Bind "DTWAIN_GetTwainNameFromConstant" : DTWAIN_GetTwainNameFromConstantDelegate)
+    let private GetTwainNameFromConstantEx = lazy (DynamicDll.Bind "DTWAIN_GetTwainNameFromConstantEx" : DTWAIN_GetTwainNameFromConstantExDelegate)
     let private GetTwainStringName = lazy (DynamicDll.Bind "DTWAIN_GetTwainStringName" : DTWAIN_GetTwainStringNameDelegate)
     let private GetTwainTimeout = lazy (DynamicDll.Bind "DTWAIN_GetTwainTimeout" : DTWAIN_GetTwainTimeoutDelegate)
     let private GetVersion = lazy (DynamicDll.Bind "DTWAIN_GetVersion" : DTWAIN_GetVersionDelegate)
@@ -4865,6 +4879,8 @@ module TwainAPI =
     let private RemovePDFTextElement = lazy (DynamicDll.Bind "DTWAIN_RemovePDFTextElement" : DTWAIN_RemovePDFTextElementDelegate)
     let private ResetPDFTextElement = lazy (DynamicDll.Bind "DTWAIN_ResetPDFTextElement" : DTWAIN_ResetPDFTextElementDelegate)
     let private RewindPage = lazy (DynamicDll.Bind "DTWAIN_RewindPage" : DTWAIN_RewindPageDelegate)
+    let private RotateDIB = lazy (DynamicDll.Bind "DTWAIN_RotateDIB" : DTWAIN_RotateDIBDelegate)
+    let private RotateDIBString = lazy (DynamicDll.Bind "DTWAIN_RotateDIBString" : DTWAIN_RotateDIBStringDelegate)
     let private SelectDefaultOCREngine = lazy (DynamicDll.Bind "DTWAIN_SelectDefaultOCREngine" : DTWAIN_SelectDefaultOCREngineDelegate)
     let private SelectDefaultSource = lazy (DynamicDll.Bind "DTWAIN_SelectDefaultSource" : DTWAIN_SelectDefaultSourceDelegate)
     let private SelectDefaultSourceWithOpen = lazy (DynamicDll.Bind "DTWAIN_SelectDefaultSourceWithOpen" : DTWAIN_SelectDefaultSourceWithOpenDelegate)
@@ -6427,6 +6443,10 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetDSMSearchOrder.Value.Invoke()
 
+    let DTWAIN_GetDSMSearchOrderEx (searchorder: System.Text.StringBuilder) (userdirectory: System.Text.StringBuilder) : LONG =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetDSMSearchOrderEx.Value.Invoke(searchorder, userdirectory)
+
     let DTWAIN_GetDTWAINHandle() : DTWAIN_HANDLE =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetDTWAINHandle.Value.Invoke()
@@ -6926,6 +6946,10 @@ module TwainAPI =
     let DTWAIN_GetTwainNameFromConstant (lconstanttype: LONG) (ltwainconstant: LONG) (lpszout: System.Text.StringBuilder) (nsize: LONG) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetTwainNameFromConstant.Value.Invoke(lconstanttype, ltwainconstant, lpszout, nsize)
+
+    let DTWAIN_GetTwainNameFromConstantEx (lconstanttype: LONG) (ltwainconstant: LONG) (lpszout: System.Text.StringBuilder) (nsize: LONG) : LONG =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        GetTwainNameFromConstantEx.Value.Invoke(lconstanttype, ltwainconstant, lpszout, nsize)
 
     let DTWAIN_GetTwainStringName (category: LONG) (twainid: LONG) (lpszbuffer: System.Text.StringBuilder) (nmaxlen: LONG) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
@@ -7574,6 +7598,14 @@ module TwainAPI =
     let DTWAIN_RewindPage (source: DTWAIN_SOURCE) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         RewindPage.Value.Invoke(source)
+
+    let DTWAIN_RotateDIB (hdib: HANDLE) (rotationangle: DTWAIN_FLOAT) : HANDLE =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        RotateDIB.Value.Invoke(hdib, rotationangle)
+
+    let DTWAIN_RotateDIBString (hdib: HANDLE) (rotationangle: string) : HANDLE =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        RotateDIBString.Value.Invoke(hdib, rotationangle)
 
     let DTWAIN_SelectDefaultOCREngine() : DTWAIN_OCRENGINE =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

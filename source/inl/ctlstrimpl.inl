@@ -3318,4 +3318,74 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_AddPDFTextExA(DTWAIN_SOURCE Source, LPCSTR szTex
 #endif
 }
 
+LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstantExW(LONG lConstantType, LONG lTwainConstant, LPWSTR lpszOut, LONG nSize)
+{
+#ifdef _UNICODE
+    return DTWAIN_GetTwainNameFromConstantEx(lConstantType, lTwainConstant, lpszOut, nSize);
+#else
+    std::string arg((std::max)(nSize, 0L), 0);
+    LONG retVal = DTWAIN_GetTwainNameFromConstantEx(lConstantType, lTwainConstant, (nSize > 0 && lpszOut) ? &arg[0] : nullptr, static_cast<LONG>(arg.size()));
+    return null_terminator_copier(get_view(arg), lpszOut, retVal);
+#endif
+}
+
+
+LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstantExA(LONG lConstantType, LONG lTwainConstant, LPSTR lpszOut, LONG nSize)
+{
+#ifdef _UNICODE
+    std::wstring arg((std::max)(nSize, 0L), 0);
+    LONG retVal = DTWAIN_GetTwainNameFromConstantEx(lConstantType, lTwainConstant, (nSize > 0 && lpszOut) ? &arg[0] : nullptr,
+                                                    static_cast<LONG>(arg.size()));
+    return null_terminator_copier(get_view(arg), lpszOut, retVal);
+#else
+    return DTWAIN_GetTwainNameFromConstantEx(lConstantType, lTwainConstant, lpszOut, nSize);
+#endif
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetDSMSearchOrderExA(LPSTR SearchDirectory, LPSTR UserDirectory)
+{
+#ifdef _UNICODE
+	std::array<LPSTR, 2> outarg = { SearchDirectory, UserDirectory };
+	std::array<std::wstring, 2> args = { {std::wstring(10, 0), std::wstring(32767, 0)} };
+	const LONG retVal = DTWAIN_GetDSMSearchOrderEx(&args[0][0], &args[1][0]);
+	for (size_t i = 0; i < args.size(); ++i)
+		null_terminator_copier(get_view(args[i]), outarg[i], retVal);
+	return retVal;
+#else
+    return DTWAIN_GetDSMSearchOrderEx(SearchDirectory, UserDirectory);
+#endif
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDSMSearchOrderExW(LPWSTR SearchDirectory, LPWSTR UserDirectory)
+{
+#ifdef _UNICODE
+    return DTWAIN_GetDSMSearchOrderEx(SearchDirectory, UserDirectory);
+#else
+	std::array<LPWSTR, 2> outarg = { SearchDirectory, UserDirectory };
+	std::array<std::string, 2> args = { {std::string(10, 0), std::string(32767, 0)} };
+	const LONG retVal = DTWAIN_GetDSMSearchOrderEx(&args[0][0], &args[1][0]);
+	for (size_t i = 0; i < args.size(); ++i)
+		null_terminator_copier(get_view(args[i]), outarg[i], retVal);
+	return retVal;
+#endif
+}
+
+HANDLE DLLENTRY_DEF DTWAIN_RotateDIBStringA(HANDLE hDib, LPCSTR angle)
+{
+#ifdef _UNICODE
+    return DTWAIN_RotateDIBString(hDib, StringConversion::Convert_AnsiPtr_To_Native(angle).c_str());
+#else
+    return DTWAIN_RotateDIBString(hDib, angle);
+#endif
+}
+
+HANDLE DLLENTRY_DEF DTWAIN_RotateDIBStringW(HANDLE hDib, LPCWSTR angle)
+{
+#ifdef _UNICODE
+    return DTWAIN_RotateDIBString(hDib, angle);
+#else
+    return DTWAIN_RotateDIBString(hDib, StringConversion::Convert_WidePtr_To_Native(angle).c_str());
+#endif
+}
+
 #endif // CTLSTRIMPL_INL

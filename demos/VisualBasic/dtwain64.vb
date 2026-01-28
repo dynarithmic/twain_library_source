@@ -2079,6 +2079,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetCustomDSData Lib "dtwain64.dll" (Source As System.IntPtr, Data As Byte(), dSize As UInteger, ByRef pActualSize As UInteger, nFlags As Integer) As System.IntPtr
     Public Declare Ansi Function DTWAIN_GetDSMFullName Lib "dtwain64.dll" (DSMType As Integer, <MarshalAs(UnmanagedType.LPStr)> szDLLName As StringBuilder, nMaxLen As Integer, ByRef pWhichSearch As Integer) As Integer
     Public Declare Function DTWAIN_GetDSMSearchOrder Lib "dtwain64.dll" () As Integer
+    Public Declare Ansi Function DTWAIN_GetDSMSearchOrderEx Lib "dtwain64.dll" (<MarshalAs(UnmanagedType.LPStr)> SearchOrder As StringBuilder, <MarshalAs(UnmanagedType.LPStr)> UserDirectory As StringBuilder) As Integer
     Public Declare Function DTWAIN_GetDTWAINHandle Lib "dtwain64.dll" () As System.IntPtr
     Public Declare Function DTWAIN_GetDeviceEvent Lib "dtwain64.dll" (Source As System.IntPtr, ByRef lpEvent As Integer) As Integer
     Public Declare Function DTWAIN_GetDeviceEventEx Lib "dtwain64.dll" (Source As System.IntPtr, ByRef lpEvent As Integer, ByRef pArray As System.IntPtr) As Integer
@@ -2202,6 +2203,7 @@ Class DTWAINAPI
     Public Declare Ansi Function DTWAIN_GetTwainLanguageValue Lib "dtwain64.dll" (szName As String) As Integer
     Public Declare Function DTWAIN_GetTwainMode Lib "dtwain64.dll" () As Integer
     Public Declare Ansi Function DTWAIN_GetTwainNameFromConstant Lib "dtwain64.dll" (lConstantType As Integer, lTwainConstant As Integer, <MarshalAs(UnmanagedType.LPStr)> lpszOut As StringBuilder, nSize As Integer) As Integer
+    Public Declare Ansi Function DTWAIN_GetTwainNameFromConstantEx Lib "dtwain64.dll" (lConstantType As Integer, lTwainConstant As Integer, <MarshalAs(UnmanagedType.LPStr)> lpszOut As StringBuilder, nSize As Integer) As Integer
     Public Declare Ansi Function DTWAIN_GetTwainStringName Lib "dtwain64.dll" (category As Integer, TwainID As Integer, <MarshalAs(UnmanagedType.LPStr)> lpszBuffer As StringBuilder, nMaxLen As Integer) As Integer
     Public Declare Function DTWAIN_GetTwainTimeout Lib "dtwain64.dll" () As Integer
     Public Declare Function DTWAIN_GetVersion Lib "dtwain64.dll" (ByRef lpMajor As Integer, ByRef lpMinor As Integer, ByRef lpVersionType As Integer) As Integer
@@ -2364,6 +2366,8 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_RemovePDFTextElement Lib "dtwain64.dll" (Source As System.IntPtr, TextElement As System.IntPtr) As Integer
     Public Declare Function DTWAIN_ResetPDFTextElement Lib "dtwain64.dll" (TextElement As System.IntPtr) As Integer
     Public Declare Function DTWAIN_RewindPage Lib "dtwain64.dll" (Source As System.IntPtr) As Integer
+    Public Declare Function DTWAIN_RotateDIB Lib "dtwain64.dll" (hDib As System.IntPtr, rotationAngle As System.Double) As System.IntPtr
+    Public Declare Ansi Function DTWAIN_RotateDIBString Lib "dtwain64.dll" (hDib As System.IntPtr, rotationAngle As String) As System.IntPtr
     Public Declare Function DTWAIN_SelectDefaultOCREngine Lib "dtwain64.dll" () As System.IntPtr
     Public Declare Function DTWAIN_SelectDefaultSource Lib "dtwain64.dll" () As System.IntPtr
     Public Declare Function DTWAIN_SelectDefaultSourceWithOpen Lib "dtwain64.dll" (bOpen As Integer) As System.IntPtr

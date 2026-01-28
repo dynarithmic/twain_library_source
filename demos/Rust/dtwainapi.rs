@@ -479,6 +479,9 @@ type DtwaingetdsmfullnameFunc = unsafe extern "C" fn(i32,*mut u16,i32,*mut i32) 
 type DtwaingetdsmfullnameaFunc = unsafe extern "C" fn(i32,*mut c_char,i32,*mut i32) -> i32;
 type DtwaingetdsmfullnamewFunc = unsafe extern "C" fn(i32,*mut u16,i32,*mut i32) -> i32;
 type DtwaingetdsmsearchorderFunc = unsafe extern "C" fn() -> i32;
+type DtwaingetdsmsearchorderexFunc = unsafe extern "C" fn(*mut u16,*mut u16) -> i32;
+type DtwaingetdsmsearchorderexaFunc = unsafe extern "C" fn(*mut c_char,*mut c_char) -> i32;
+type DtwaingetdsmsearchorderexwFunc = unsafe extern "C" fn(*mut u16,*mut u16) -> i32;
 type DtwaingetdtwainhandleFunc = unsafe extern "C" fn() -> *mut c_void;
 type DtwaingetdeviceeventFunc = unsafe extern "C" fn(*mut c_void,*mut i32) -> i32;
 type DtwaingetdeviceeventexFunc = unsafe extern "C" fn(*mut c_void,*mut i32,*mut *mut c_void) -> i32;
@@ -689,6 +692,9 @@ type DtwaingettwainlanguagevaluewFunc = unsafe extern "C" fn(*const u16) -> i32;
 type DtwaingettwainmodeFunc = unsafe extern "C" fn() -> i32;
 type DtwaingettwainnamefromconstantFunc = unsafe extern "C" fn(i32,i32,*mut u16,i32) -> i32;
 type DtwaingettwainnamefromconstantaFunc = unsafe extern "C" fn(i32,i32,*mut c_char,i32) -> i32;
+type DtwaingettwainnamefromconstantexFunc = unsafe extern "C" fn(i32,i32,*mut u16,i32) -> i32;
+type DtwaingettwainnamefromconstantexaFunc = unsafe extern "C" fn(i32,i32,*mut c_char,i32) -> i32;
+type DtwaingettwainnamefromconstantexwFunc = unsafe extern "C" fn(i32,i32,*mut u16,i32) -> i32;
 type DtwaingettwainnamefromconstantwFunc = unsafe extern "C" fn(i32,i32,*mut u16,i32) -> i32;
 type DtwaingettwainstringnameFunc = unsafe extern "C" fn(i32,i32,*mut u16,i32) -> i32;
 type DtwaingettwainstringnameaFunc = unsafe extern "C" fn(i32,i32,*mut c_char,i32) -> i32;
@@ -890,6 +896,10 @@ type DtwainrangesetvaluelongFunc = unsafe extern "C" fn(*mut c_void,i32,i32) -> 
 type DtwainremovepdftextelementFunc = unsafe extern "C" fn(*mut c_void,*mut c_void) -> i32;
 type DtwainresetpdftextelementFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainrewindpageFunc = unsafe extern "C" fn(*mut c_void) -> i32;
+type DtwainrotatedibFunc = unsafe extern "C" fn(*mut c_void,f64) -> *mut c_void;
+type DtwainrotatedibstringFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> *mut c_void;
+type DtwainrotatedibstringaFunc = unsafe extern "C" fn(*mut c_void,*const c_char) -> *mut c_void;
+type DtwainrotatedibstringwFunc = unsafe extern "C" fn(*mut c_void,*const u16) -> *mut c_void;
 type DtwainselectdefaultocrengineFunc = unsafe extern "C" fn() -> *mut c_void;
 type DtwainselectdefaultsourceFunc = unsafe extern "C" fn() -> *mut c_void;
 type DtwainselectdefaultsourcewithopenFunc = unsafe extern "C" fn(i32) -> *mut c_void;
@@ -1602,6 +1612,9 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetDSMFullNameAFunc: Symbol<'a, DtwaingetdsmfullnameaFunc>,
     DTWAIN_GetDSMFullNameWFunc: Symbol<'a, DtwaingetdsmfullnamewFunc>,
     DTWAIN_GetDSMSearchOrderFunc: Symbol<'a, DtwaingetdsmsearchorderFunc>,
+    DTWAIN_GetDSMSearchOrderExFunc: Symbol<'a, DtwaingetdsmsearchorderexFunc>,
+    DTWAIN_GetDSMSearchOrderExAFunc: Symbol<'a, DtwaingetdsmsearchorderexaFunc>,
+    DTWAIN_GetDSMSearchOrderExWFunc: Symbol<'a, DtwaingetdsmsearchorderexwFunc>,
     DTWAIN_GetDTWAINHandleFunc: Symbol<'a, DtwaingetdtwainhandleFunc>,
     DTWAIN_GetDeviceEventFunc: Symbol<'a, DtwaingetdeviceeventFunc>,
     DTWAIN_GetDeviceEventExFunc: Symbol<'a, DtwaingetdeviceeventexFunc>,
@@ -1812,6 +1825,9 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetTwainModeFunc: Symbol<'a, DtwaingettwainmodeFunc>,
     DTWAIN_GetTwainNameFromConstantFunc: Symbol<'a, DtwaingettwainnamefromconstantFunc>,
     DTWAIN_GetTwainNameFromConstantAFunc: Symbol<'a, DtwaingettwainnamefromconstantaFunc>,
+    DTWAIN_GetTwainNameFromConstantExFunc: Symbol<'a, DtwaingettwainnamefromconstantexFunc>,
+    DTWAIN_GetTwainNameFromConstantExAFunc: Symbol<'a, DtwaingettwainnamefromconstantexaFunc>,
+    DTWAIN_GetTwainNameFromConstantExWFunc: Symbol<'a, DtwaingettwainnamefromconstantexwFunc>,
     DTWAIN_GetTwainNameFromConstantWFunc: Symbol<'a, DtwaingettwainnamefromconstantwFunc>,
     DTWAIN_GetTwainStringNameFunc: Symbol<'a, DtwaingettwainstringnameFunc>,
     DTWAIN_GetTwainStringNameAFunc: Symbol<'a, DtwaingettwainstringnameaFunc>,
@@ -2013,6 +2029,10 @@ pub struct DTwainAPI<'a>
     DTWAIN_RemovePDFTextElementFunc: Symbol<'a, DtwainremovepdftextelementFunc>,
     DTWAIN_ResetPDFTextElementFunc: Symbol<'a, DtwainresetpdftextelementFunc>,
     DTWAIN_RewindPageFunc: Symbol<'a, DtwainrewindpageFunc>,
+    DTWAIN_RotateDIBFunc: Symbol<'a, DtwainrotatedibFunc>,
+    DTWAIN_RotateDIBStringFunc: Symbol<'a, DtwainrotatedibstringFunc>,
+    DTWAIN_RotateDIBStringAFunc: Symbol<'a, DtwainrotatedibstringaFunc>,
+    DTWAIN_RotateDIBStringWFunc: Symbol<'a, DtwainrotatedibstringwFunc>,
     DTWAIN_SelectDefaultOCREngineFunc: Symbol<'a, DtwainselectdefaultocrengineFunc>,
     DTWAIN_SelectDefaultSourceFunc: Symbol<'a, DtwainselectdefaultsourceFunc>,
     DTWAIN_SelectDefaultSourceWithOpenFunc: Symbol<'a, DtwainselectdefaultsourcewithopenFunc>,
@@ -4361,6 +4381,9 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetDSMFullNameA: Symbol<DtwaingetdsmfullnameaFunc> = unsafe { library.get(b"DTWAIN_GetDSMFullNameA")? };
         let DTWAIN_GetDSMFullNameW: Symbol<DtwaingetdsmfullnamewFunc> = unsafe { library.get(b"DTWAIN_GetDSMFullNameW")? };
         let DTWAIN_GetDSMSearchOrder: Symbol<DtwaingetdsmsearchorderFunc> = unsafe { library.get(b"DTWAIN_GetDSMSearchOrder")? };
+        let DTWAIN_GetDSMSearchOrderEx: Symbol<DtwaingetdsmsearchorderexFunc> = unsafe { library.get(b"DTWAIN_GetDSMSearchOrderEx")? };
+        let DTWAIN_GetDSMSearchOrderExA: Symbol<DtwaingetdsmsearchorderexaFunc> = unsafe { library.get(b"DTWAIN_GetDSMSearchOrderExA")? };
+        let DTWAIN_GetDSMSearchOrderExW: Symbol<DtwaingetdsmsearchorderexwFunc> = unsafe { library.get(b"DTWAIN_GetDSMSearchOrderExW")? };
         let DTWAIN_GetDTWAINHandle: Symbol<DtwaingetdtwainhandleFunc> = unsafe { library.get(b"DTWAIN_GetDTWAINHandle")? };
         let DTWAIN_GetDeviceEvent: Symbol<DtwaingetdeviceeventFunc> = unsafe { library.get(b"DTWAIN_GetDeviceEvent")? };
         let DTWAIN_GetDeviceEventEx: Symbol<DtwaingetdeviceeventexFunc> = unsafe { library.get(b"DTWAIN_GetDeviceEventEx")? };
@@ -4571,6 +4594,9 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetTwainMode: Symbol<DtwaingettwainmodeFunc> = unsafe { library.get(b"DTWAIN_GetTwainMode")? };
         let DTWAIN_GetTwainNameFromConstant: Symbol<DtwaingettwainnamefromconstantFunc> = unsafe { library.get(b"DTWAIN_GetTwainNameFromConstant")? };
         let DTWAIN_GetTwainNameFromConstantA: Symbol<DtwaingettwainnamefromconstantaFunc> = unsafe { library.get(b"DTWAIN_GetTwainNameFromConstantA")? };
+        let DTWAIN_GetTwainNameFromConstantEx: Symbol<DtwaingettwainnamefromconstantexFunc> = unsafe { library.get(b"DTWAIN_GetTwainNameFromConstantEx")? };
+        let DTWAIN_GetTwainNameFromConstantExA: Symbol<DtwaingettwainnamefromconstantexaFunc> = unsafe { library.get(b"DTWAIN_GetTwainNameFromConstantExA")? };
+        let DTWAIN_GetTwainNameFromConstantExW: Symbol<DtwaingettwainnamefromconstantexwFunc> = unsafe { library.get(b"DTWAIN_GetTwainNameFromConstantExW")? };
         let DTWAIN_GetTwainNameFromConstantW: Symbol<DtwaingettwainnamefromconstantwFunc> = unsafe { library.get(b"DTWAIN_GetTwainNameFromConstantW")? };
         let DTWAIN_GetTwainStringName: Symbol<DtwaingettwainstringnameFunc> = unsafe { library.get(b"DTWAIN_GetTwainStringName")? };
         let DTWAIN_GetTwainStringNameA: Symbol<DtwaingettwainstringnameaFunc> = unsafe { library.get(b"DTWAIN_GetTwainStringNameA")? };
@@ -4772,6 +4798,10 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_RemovePDFTextElement: Symbol<DtwainremovepdftextelementFunc> = unsafe { library.get(b"DTWAIN_RemovePDFTextElement")? };
         let DTWAIN_ResetPDFTextElement: Symbol<DtwainresetpdftextelementFunc> = unsafe { library.get(b"DTWAIN_ResetPDFTextElement")? };
         let DTWAIN_RewindPage: Symbol<DtwainrewindpageFunc> = unsafe { library.get(b"DTWAIN_RewindPage")? };
+        let DTWAIN_RotateDIB: Symbol<DtwainrotatedibFunc> = unsafe { library.get(b"DTWAIN_RotateDIB")? };
+        let DTWAIN_RotateDIBString: Symbol<DtwainrotatedibstringFunc> = unsafe { library.get(b"DTWAIN_RotateDIBString")? };
+        let DTWAIN_RotateDIBStringA: Symbol<DtwainrotatedibstringaFunc> = unsafe { library.get(b"DTWAIN_RotateDIBStringA")? };
+        let DTWAIN_RotateDIBStringW: Symbol<DtwainrotatedibstringwFunc> = unsafe { library.get(b"DTWAIN_RotateDIBStringW")? };
         let DTWAIN_SelectDefaultOCREngine: Symbol<DtwainselectdefaultocrengineFunc> = unsafe { library.get(b"DTWAIN_SelectDefaultOCREngine")? };
         let DTWAIN_SelectDefaultSource: Symbol<DtwainselectdefaultsourceFunc> = unsafe { library.get(b"DTWAIN_SelectDefaultSource")? };
         let DTWAIN_SelectDefaultSourceWithOpen: Symbol<DtwainselectdefaultsourcewithopenFunc> = unsafe { library.get(b"DTWAIN_SelectDefaultSourceWithOpen")? };
@@ -5483,6 +5513,9 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetDSMFullNameAFunc: DTWAIN_GetDSMFullNameA,
             DTWAIN_GetDSMFullNameWFunc: DTWAIN_GetDSMFullNameW,
             DTWAIN_GetDSMSearchOrderFunc: DTWAIN_GetDSMSearchOrder,
+            DTWAIN_GetDSMSearchOrderExFunc: DTWAIN_GetDSMSearchOrderEx,
+            DTWAIN_GetDSMSearchOrderExAFunc: DTWAIN_GetDSMSearchOrderExA,
+            DTWAIN_GetDSMSearchOrderExWFunc: DTWAIN_GetDSMSearchOrderExW,
             DTWAIN_GetDTWAINHandleFunc: DTWAIN_GetDTWAINHandle,
             DTWAIN_GetDeviceEventFunc: DTWAIN_GetDeviceEvent,
             DTWAIN_GetDeviceEventExFunc: DTWAIN_GetDeviceEventEx,
@@ -5693,6 +5726,9 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetTwainModeFunc: DTWAIN_GetTwainMode,
             DTWAIN_GetTwainNameFromConstantFunc: DTWAIN_GetTwainNameFromConstant,
             DTWAIN_GetTwainNameFromConstantAFunc: DTWAIN_GetTwainNameFromConstantA,
+            DTWAIN_GetTwainNameFromConstantExFunc: DTWAIN_GetTwainNameFromConstantEx,
+            DTWAIN_GetTwainNameFromConstantExAFunc: DTWAIN_GetTwainNameFromConstantExA,
+            DTWAIN_GetTwainNameFromConstantExWFunc: DTWAIN_GetTwainNameFromConstantExW,
             DTWAIN_GetTwainNameFromConstantWFunc: DTWAIN_GetTwainNameFromConstantW,
             DTWAIN_GetTwainStringNameFunc: DTWAIN_GetTwainStringName,
             DTWAIN_GetTwainStringNameAFunc: DTWAIN_GetTwainStringNameA,
@@ -5894,6 +5930,10 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_RemovePDFTextElementFunc: DTWAIN_RemovePDFTextElement,
             DTWAIN_ResetPDFTextElementFunc: DTWAIN_ResetPDFTextElement,
             DTWAIN_RewindPageFunc: DTWAIN_RewindPage,
+            DTWAIN_RotateDIBFunc: DTWAIN_RotateDIB,
+            DTWAIN_RotateDIBStringFunc: DTWAIN_RotateDIBString,
+            DTWAIN_RotateDIBStringAFunc: DTWAIN_RotateDIBStringA,
+            DTWAIN_RotateDIBStringWFunc: DTWAIN_RotateDIBStringW,
             DTWAIN_SelectDefaultOCREngineFunc: DTWAIN_SelectDefaultOCREngine,
             DTWAIN_SelectDefaultSourceFunc: DTWAIN_SelectDefaultSource,
             DTWAIN_SelectDefaultSourceWithOpenFunc: DTWAIN_SelectDefaultSourceWithOpen,
@@ -7904,6 +7944,18 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetDSMSearchOrderFunc)();  }
     }
 
+    pub fn DTWAIN_GetDSMSearchOrderEx(&self, SearchOrder: *mut u16, UserDirectory: *mut u16) -> i32 {
+        unsafe { return (self.DTWAIN_GetDSMSearchOrderExFunc)(SearchOrder, UserDirectory);  }
+    }
+
+    pub fn DTWAIN_GetDSMSearchOrderExA(&self, SearchOrder: *mut c_char, UserDirectory: *mut c_char) -> i32 {
+        unsafe { return (self.DTWAIN_GetDSMSearchOrderExAFunc)(SearchOrder, UserDirectory);  }
+    }
+
+    pub fn DTWAIN_GetDSMSearchOrderExW(&self, SearchOrder: *mut u16, UserDirectory: *mut u16) -> i32 {
+        unsafe { return (self.DTWAIN_GetDSMSearchOrderExWFunc)(SearchOrder, UserDirectory);  }
+    }
+
     pub fn DTWAIN_GetDTWAINHandle(&self) -> *mut c_void {
         unsafe { return (self.DTWAIN_GetDTWAINHandleFunc)();  }
     }
@@ -8744,6 +8796,18 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetTwainNameFromConstantAFunc)(lConstantType, lTwainConstant, lpszOut, nSize);  }
     }
 
+    pub fn DTWAIN_GetTwainNameFromConstantEx(&self, lConstantType: i32, lTwainConstant: i32, lpszOut: *mut u16, nSize: i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetTwainNameFromConstantExFunc)(lConstantType, lTwainConstant, lpszOut, nSize);  }
+    }
+
+    pub fn DTWAIN_GetTwainNameFromConstantExA(&self, lConstantType: i32, lTwainConstant: i32, lpszOut: *mut c_char, nSize: i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetTwainNameFromConstantExAFunc)(lConstantType, lTwainConstant, lpszOut, nSize);  }
+    }
+
+    pub fn DTWAIN_GetTwainNameFromConstantExW(&self, lConstantType: i32, lTwainConstant: i32, lpszOut: *mut u16, nSize: i32) -> i32 {
+        unsafe { return (self.DTWAIN_GetTwainNameFromConstantExWFunc)(lConstantType, lTwainConstant, lpszOut, nSize);  }
+    }
+
     pub fn DTWAIN_GetTwainNameFromConstantW(&self, lConstantType: i32, lTwainConstant: i32, lpszOut: *mut u16, nSize: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetTwainNameFromConstantWFunc)(lConstantType, lTwainConstant, lpszOut, nSize);  }
     }
@@ -9546,6 +9610,22 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_RewindPage(&self, Source: *mut c_void) -> i32 {
         unsafe { return (self.DTWAIN_RewindPageFunc)(Source);  }
+    }
+
+    pub fn DTWAIN_RotateDIB(&self, hDib: *mut c_void, rotationAngle: f64) -> *mut c_void {
+        unsafe { return (self.DTWAIN_RotateDIBFunc)(hDib, rotationAngle);  }
+    }
+
+    pub fn DTWAIN_RotateDIBString(&self, hDib: *mut c_void, rotationAngle: *const u16) -> *mut c_void {
+        unsafe { return (self.DTWAIN_RotateDIBStringFunc)(hDib, rotationAngle);  }
+    }
+
+    pub fn DTWAIN_RotateDIBStringA(&self, hDib: *mut c_void, rotationAngle: *const c_char) -> *mut c_void {
+        unsafe { return (self.DTWAIN_RotateDIBStringAFunc)(hDib, rotationAngle);  }
+    }
+
+    pub fn DTWAIN_RotateDIBStringW(&self, hDib: *mut c_void, rotationAngle: *const u16) -> *mut c_void {
+        unsafe { return (self.DTWAIN_RotateDIBStringWFunc)(hDib, rotationAngle);  }
     }
 
     pub fn DTWAIN_SelectDefaultOCREngine(&self) -> *mut c_void {

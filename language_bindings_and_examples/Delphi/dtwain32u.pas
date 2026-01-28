@@ -2262,6 +2262,9 @@ function DTWAIN_GetDSMFullName(DSMType:LONG; szDLLName:LPTSTR; nMaxLen:LONG; pWh
 function DTWAIN_GetDSMFullNameA(DSMType:LONG; szDLLName:LPSTR; nMaxLen:LONG; pWhichSearch:LPLONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDSMFullNameA';
 function DTWAIN_GetDSMFullNameW(DSMType:LONG; szDLLName:LPWSTR; nMaxLen:LONG; pWhichSearch:LPLONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDSMFullNameW';
 function DTWAIN_GetDSMSearchOrder : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDSMSearchOrder';
+function DTWAIN_GetDSMSearchOrderEx(SearchOrder:LPTSTR; UserDirectory:LPTSTR) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDSMSearchOrderEx';
+function DTWAIN_GetDSMSearchOrderExA(SearchOrder:LPSTR; UserDirectory:LPSTR) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDSMSearchOrderExA';
+function DTWAIN_GetDSMSearchOrderExW(SearchOrder:LPWSTR; UserDirectory:LPWSTR) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDSMSearchOrderExW';
 function DTWAIN_GetDTWAINHandle : DTWAIN_HANDLE; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDTWAINHandle';
 function DTWAIN_GetDeviceEvent(Source:DTWAIN_SOURCE; lpEvent:LPLONG) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDeviceEvent';
 function DTWAIN_GetDeviceEventEx(Source:DTWAIN_SOURCE; lpEvent:LPLONG; pArray:LPDTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetDeviceEventEx';
@@ -2472,6 +2475,9 @@ function DTWAIN_GetTwainLanguageValueW(lang:LPCWSTR) : LONG; stdcall;  external 
 function DTWAIN_GetTwainMode : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetTwainMode';
 function DTWAIN_GetTwainNameFromConstant(lConstantType:LONG; lTwainConstant:LONG; lpszOut:LPTSTR; nSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetTwainNameFromConstant';
 function DTWAIN_GetTwainNameFromConstantA(lConstantType:LONG; lTwainConstant:LONG; lpszOut:LPSTR; nSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetTwainNameFromConstantA';
+function DTWAIN_GetTwainNameFromConstantEx(lConstantType:LONG; lTwainConstant:LONG; lpszOut:LPTSTR; nSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetTwainNameFromConstantEx';
+function DTWAIN_GetTwainNameFromConstantExA(lConstantType:LONG; lTwainConstant:LONG; lpszOut:LPSTR; nSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetTwainNameFromConstantExA';
+function DTWAIN_GetTwainNameFromConstantExW(lConstantType:LONG; lTwainConstant:LONG; lpszOut:LPWSTR; nSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetTwainNameFromConstantExW';
 function DTWAIN_GetTwainNameFromConstantW(lConstantType:LONG; lTwainConstant:LONG; lpszOut:LPWSTR; nSize:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetTwainNameFromConstantW';
 function DTWAIN_GetTwainStringName(category:LONG; TwainID:LONG; lpszBuffer:LPTSTR; nMaxLen:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetTwainStringName';
 function DTWAIN_GetTwainStringNameA(category:LONG; TwainID:LONG; lpszBuffer:LPSTR; nMaxLen:LONG) : LONG; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_GetTwainStringNameA';
@@ -2675,6 +2681,10 @@ function DTWAIN_RangeSetValueLong(pArray:DTWAIN_RANGE; nWhich:LONG; Val:LONG) : 
 function DTWAIN_RemovePDFTextElement(Source:DTWAIN_SOURCE; TextElement:DTWAIN_PDFTEXTELEMENT) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_RemovePDFTextElement';
 function DTWAIN_ResetPDFTextElement(TextElement:DTWAIN_PDFTEXTELEMENT) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_ResetPDFTextElement';
 function DTWAIN_RewindPage(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_RewindPage';
+function DTWAIN_RotateDIB(hDib:NativeInt; rotationAngle:DTWAIN_FLOAT) : NativeInt; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_RotateDIB';
+function DTWAIN_RotateDIBString(hDib:NativeInt; rotationAngle:LPCTSTR) : NativeInt; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_RotateDIBString';
+function DTWAIN_RotateDIBStringA(hDib:NativeInt; rotationAngle:LPCSTR) : NativeInt; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_RotateDIBStringA';
+function DTWAIN_RotateDIBStringW(hDib:NativeInt; rotationAngle:LPCWSTR) : NativeInt; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_RotateDIBStringW';
 function DTWAIN_SelectDefaultOCREngine : DTWAIN_OCRENGINE; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SelectDefaultOCREngine';
 function DTWAIN_SelectDefaultSource : DTWAIN_SOURCE; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SelectDefaultSource';
 function DTWAIN_SelectDefaultSourceWithOpen(bOpen:BOOL) : DTWAIN_SOURCE; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_SelectDefaultSourceWithOpen';

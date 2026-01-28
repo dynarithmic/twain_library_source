@@ -365,6 +365,18 @@ HANDLE CDibInterface::IncreaseDecreaseBpp(HANDLE hDib, long newbpp, bool bIncrea
     return ImageHandler.CopyToHandle();
 }
 
+HANDLE CDibInterface::RotateDIB(HANDLE hDib, float angle)
+{
+    if (!hDib)
+        return nullptr;
+    BYTE* pImage = (BYTE*)ImageMemoryHandler::GlobalLock(hDib);
+    DTWAINGlobalHandle_RAII raii(hDib);
+    // Use CxImage rotate
+    CxImage ImageHandler(pImage, GlobalSize(hDib), CXIMAGE_FORMAT_BMP);
+    ImageHandler.Rotate(static_cast<double>(angle));
+    return ImageHandler.CopyToHandle();
+}
+
 HANDLE CDibInterface::IncreaseBpp(HANDLE hDib, long newbpp)
 {
     return IncreaseDecreaseBpp(hDib, newbpp, true);
