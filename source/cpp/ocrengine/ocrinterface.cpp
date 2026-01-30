@@ -119,7 +119,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRCapValues(DTWAIN_OCRENGINE Engine,LONG OCR
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, OCRCapValue, GetType, CapValues))
     auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
-
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !CapValues; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     if (pEngine->IsCapSupported(OCRCapValue))
     {
         const LONG nDataType = pEngine->GetCapDataType(OCRCapValue);
@@ -131,11 +131,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRCapValues(DTWAIN_OCRENGINE Engine,LONG OCR
             {
                 OCREngine::OCRLongArrayValues vals;
                 pEngine->GetCapValues(OCRCapValue, GetType, vals);
-                const DTWAIN_ARRAY theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(vals.size()));
-
+                auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(vals.size()));
+				DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+                auto theArray = retVal.second;
+                DTWAINArrayLowLevelPtr_RAII raii(pHandle, &theArray);
                 for (LONG i = 0; i < static_cast<LONG>(vals.size()); ++i)
                     DTWAIN_ArraySetAtLong(theArray, i, vals[i]);
-                *CapValues = theArray;
+                MoveArray(pHandle, CapValues, &theArray);
                 LOG_FUNC_EXIT_NONAME_PARAMS(true)
             }
             break;
@@ -143,10 +145,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetOCRCapValues(DTWAIN_OCRENGINE Engine,LONG OCR
             {
                 OCREngine::OCRStringArrayValues vals;
                 pEngine->GetCapValues(OCRCapValue, GetType, vals);
-                const DTWAIN_ARRAY theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, static_cast<LONG>(vals.size()));
+                auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSTRING, static_cast<LONG>(vals.size()));
+				DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+				auto theArray = retVal.second;
+				DTWAINArrayLowLevelPtr_RAII raii(pHandle, &theArray);
+
                 for (LONG i = 0; i < static_cast<LONG>(vals.size()); ++i)
                     DTWAIN_ArraySetAtStringA(theArray, i, vals[i].c_str());
-                *CapValues = theArray;
+                MoveArray(pHandle, CapValues, &theArray);
                 LOG_FUNC_EXIT_NONAME_PARAMS(true)
             }
             break;
@@ -575,14 +581,19 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumOCRSupportedCaps(DTWAIN_OCRENGINE Engine, LP
 {
     LOG_FUNC_ENTRY_PARAMS((Engine, SupportedCaps))
     auto [pHandle, pEngine] = VerifyOCRHandlesEx(Engine);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !SupportedCaps; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     OCREngine::OCRLongArrayValues vals;
     pEngine->GetSupportedCaps(vals);
-    const DTWAIN_ARRAY theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(vals.size()));
+	auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, static_cast<LONG>(vals.size()));
+	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+	auto theArray = retVal.second;
+	DTWAINArrayLowLevelPtr_RAII raii(pHandle, &theArray);
+
     if (!theArray)
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(theArray);
     std::copy(vals.begin(), vals.end(), vValues.begin());
-    *SupportedCaps = theArray;
+    MoveArray(pHandle, SupportedCaps, &theArray);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
@@ -644,13 +655,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumOCRInterfaces(LPDTWAIN_ARRAY OCRArray)
 {
     LOG_FUNC_ENTRY_PARAMS((OCRArray))
     auto [pHandle, pEngine] = VerifyOCRHandles();
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !OCRArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
     if (pHandle->m_OCRInterfaceArray.empty())
         *OCRArray = nullptr;
     else
     {
-        const DTWAIN_ARRAY theArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYOCRENGINE, 0);
-        DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] { return !theArray; }, DTWAIN_ERR_OUT_OF_MEMORY, false, FUNC_MACRO);
-
+        auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYOCRENGINE, 0);
+		DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+		auto theArray = retVal.second;
+		DTWAINArrayLowLevelPtr_RAII raii(pHandle, &theArray);
         const auto& factory = pHandle->m_ArrayFactory;
         auto& vEnum = factory->underlying_container_t<OCREngine*>(theArray);
         vEnum.clear();
@@ -658,7 +671,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumOCRInterfaces(LPDTWAIN_ARRAY OCRArray)
         for (auto &ocr : pHandle->m_OCRInterfaceArray)
             vEnum.push_back(ocr.get());
 
-        *OCRArray = theArray;
+        MoveArray(pHandle, OCRArray, &theArray);
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)

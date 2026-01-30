@@ -344,9 +344,11 @@ namespace dynarithmic
 
         auto& constantsMap = CTL_StaticData::GetTwainConstantsMap();
         auto& stringToConstantMap = CTL_StaticData::GetStringToConstantMap();
+        std::set<int> sDoNotPlaceInMap = { DTWAIN_CONSTANT_CAPCODE_MAP };
         for ( int constantVal = 0; constantVal < CTL_TwainDLLHandle::NumTwainMapValues; ++constantVal)
         { 
             auto iter = constantsMap.insert({constantVal, {}}).first;
+            bool bPlaceInMap = sDoNotPlaceInMap.count(constantVal)?false:true;
             while (std::getline(ifs, line))
             {
                 ++curLine;
@@ -394,12 +396,15 @@ namespace dynarithmic
                     }
                 }
                 // Always insert the special name that has more than one entry
+                if (bPlaceInMap)
+                {
                 if (saNames.size() > 1)
                     stringToConstantMap.insert({ name, twainValue });
 
                 // Insert the actual entries
                 for (auto& oneName : saNames)
                     stringToConstantMap.insert({ oneName, twainValue });
+                }
             }
         }
 

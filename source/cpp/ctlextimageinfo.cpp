@@ -123,6 +123,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedExtImageInfo(DTWAIN_SOURCE Source, 
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Array))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+
     CTL_ITwainSource* pS = pSource;
     CTL_TwainDLLHandle* pH = pHandle;
     // We clear the user array here, since we do not want to 
@@ -157,7 +159,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedExtImageInfo(DTWAIN_SOURCE Source, 
         // cached list of supported TWEI_x values.
         auto& vVect = pS->GetSupportedExtImageInfos();
         DTWAIN_ARRAY ThisArray = CreateArrayFromContainer<std::vector<LONG>>(pHandle, vVect);
-        dynarithmic::AssignArray(pHandle, Array, &ThisArray);
+        dynarithmic::MoveArray(pHandle, Array, &ThisArray);
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
@@ -185,6 +187,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDT
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Array))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !Array; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+
     CTL_ITwainSource* pS = pSource;
 
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pS->IsExtendedImageInfoSupported(); },
@@ -202,21 +206,27 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumExtImageInfoTypes(DTWAIN_SOURCE Source, LPDT
     if (pSource->EnumExtImageInfo(vExtImageInfo))
     {
         DTWAIN_ARRAY ThisArray = CreateArrayFromContainer<std::vector<int>>(pHandle, vExtImageInfo);
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !ThisArray; }, DTWAIN_ERR_OUT_OF_MEMORY, false, FUNC_MACRO);
+
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(ThisArray);
 
         // Dump contents of the enumerated values to the log
         if (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS)
         {
-			DTWAIN_ARRAY aStrings = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYANSISTRING, 0);
-            DTWAINArrayLowLevel_RAII raii(pHandle, aStrings);
-            auto& aValues = pHandle->m_ArrayFactory->underlying_container_t<std::string>(aStrings);
-            for (auto val : vValues)
-                aValues.push_back(CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, val).second);
-            LogWriterUtils::WriteLogInfoIndentedA("Supported Extended Image Info types:");
-            DumpArrayContents(aStrings, 0);
+            auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYANSISTRING, 0);
+            if (retVal.second)
+            {
+                auto aStrings = retVal.second;
+                DTWAINArrayLowLevel_RAII raii(pHandle, aStrings);
+                auto& aValues = pHandle->m_ArrayFactory->underlying_container_t<std::string>(aStrings);
+                for (auto val : vValues)
+                    aValues.push_back(CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, val).second);
+                LogWriterUtils::WriteLogInfoIndentedA("Supported Extended Image Info types:");
+                DumpArrayContents(aStrings, 0);
+            }
         }
-        dynarithmic::AssignArray(pHandle, Array, &ThisArray);
-        return TRUE;
+        MoveArray(pHandle, Array, &ThisArray);
+		LOG_FUNC_EXIT_NONAME_PARAMS(true)
     }
     else
         DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_EXTIMAGEINFO_RETRIEVAL, false, FUNC_MACRO);
@@ -525,6 +535,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
 {
     LOG_FUNC_ENTRY_PARAMS((Source, nWhich, Data))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+
     CTL_ITwainSource* pTheSource = pSource;
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pTheSource->IsExtendedImageInfoSupported(); },
                                         DTWAIN_ERR_CAP_NO_SUPPORT, false, FUNC_MACRO);
@@ -533,8 +544,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return pTheSource->GetState() != SOURCE_STATE_TRANSFERRING; },
                                         DTWAIN_ERR_INVALID_STATE, false, FUNC_MACRO);
 
-    // Check if array exists
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{ return !Data;}, DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
+	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !Data; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     // We clear the user array here, since we do not want to 
     // report information back to user if capability is not supported
@@ -593,13 +603,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
                 Info.ItemType = TWTY_FRAME;
         }
 
-        DTWAIN_ARRAY ExtInfoArray = CreateArrayFromFactory(pHandle, ExtImageInfoArrayType(Info.ItemType), 0);
+        auto retVal = CreateArrayFromFactory(pHandle, ExtImageInfoArrayType(Info.ItemType), 0);
 
-        if (!ExtInfoArray)
-        {
-            // Check if array exists
-            DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !ExtInfoArray; }, DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
-        }
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+        auto ExtInfoArray = retVal.second;
 
         auto Count = Info.NumItems;
 
@@ -648,7 +655,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
                 finalRet = pTheSource->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, factory->get_buffer(ExtInfoArray, i), nullptr);
             }
         }
-        dynarithmic::AssignArray(pHandle, Data, &ExtInfoArray);
+        MoveArray(pHandle, Data, &ExtInfoArray);
         if (!finalRet.first)
         {
             // Error occurred

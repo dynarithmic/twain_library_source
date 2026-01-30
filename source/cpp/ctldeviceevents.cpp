@@ -56,10 +56,12 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LON
         if (nBits == 0)
             LOG_FUNC_EXIT_NONAME_PARAMS(false)
 
-        Array = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, nBits);
+        auto retValue = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, nBits);
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !retValue.second; },
+			                              retValue.first, false, FUNC_MACRO);
 
-        if (!Array)
-            LOG_FUNC_EXIT_NONAME_PARAMS(false)
+        Array = retValue.second;
+        DTWAINArrayLowLevelPtr_RAII raii(pHandle, &Array);
         auto& factory = pHandle->m_ArrayFactory;
         auto& vValues = factory->underlying_container_t<LONG>(Array);
         LONG nIndex = 0;
@@ -86,7 +88,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceNotifications(DTWAIN_SOURCE Source, LPL
     DTWAIN_ARRAY Array = nullptr;
     DTWAINArrayPtr_RAII raii(pHandle, &Array);
 
-    // See if Source supports the DEVICEEVENTS capability
     // See if Source supports the DEVICEEVENTS capability
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !CTL_TwainAppMgr::IsCapabilitySupported(pTheSource, CAP_DEVICEEVENT); },
         DTWAIN_ERR_DEVICEEVENT_NOT_SUPPORTED, false, FUNC_MACRO);
@@ -127,10 +128,10 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventEx(DTWAIN_SOURCE Source, LPLONG lp
     LOG_FUNC_ENTRY_PARAMS((Source, lpEvent, pArray))
     if (!DTWAIN_GetDeviceEvent(Source, lpEvent))
         LOG_FUNC_EXIT_NONAME_PARAMS(false)
-    if (!pArray)
-        LOG_FUNC_EXIT_NONAME_PARAMS(true)
 
     CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
+	DTWAIN_Check_Error_Condition_0_Ex(pSource->GetDTWAINHandle(), [&] { return !pArray; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+
     const CTL_DeviceEvent DeviceEvent = pSource->GetDeviceEvent();
     const auto pHandle = pSource->GetDTWAINHandle();
     const DTWAIN_BOOL bRet = DeviceEvent.GetEventInfoEx(pHandle, pArray);

@@ -40,9 +40,9 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetJobControl(DTWAIN_SOURCE Source, LONG JobCont
         SetType = DTWAIN_CAPRESET;
         JobControl = TWJC_NONE;
     }
-    DTWAIN_ARRAY Array = CreateArrayFromCap(pHandle, nullptr, CAP_JOBCONTROL, 1);
-    if ( !Array )
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    auto retVal = CreateArrayFromCap(pHandle, nullptr, CAP_JOBCONTROL, 1);
+	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+    auto Array = retVal.second;
     DTWAINArrayLowLevel_RAII a(pSource->GetDTWAINHandle(), Array);
 
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(Array);

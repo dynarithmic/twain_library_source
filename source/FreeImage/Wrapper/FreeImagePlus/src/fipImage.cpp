@@ -62,9 +62,9 @@ BOOL fipImage::setSize(FREE_IMAGE_TYPE image_type, unsigned width, unsigned heig
             case 8:
                 RGBQUAD *pal = FreeImage_GetPalette(_dib.get());
                 for(unsigned i = 0; i < FreeImage_GetColorsUsed(_dib.get()); i++) {
-                    pal[i].rgbRed = i;
-                    pal[i].rgbGreen = i;
-                    pal[i].rgbBlue = i;
+                    pal[i].rgbRed = static_cast<BYTE>(i);
+                    pal[i].rgbGreen = static_cast<BYTE>(i);
+                    pal[i].rgbBlue = static_cast<BYTE>(i);
                 }
                 break;
         }
@@ -472,7 +472,7 @@ BOOL fipImage::save(const char* lpszPathName, int flag) {
         const FREE_IMAGE_TYPE image_type = FreeImage_GetImageType(_dib.get());
         if(image_type == FIT_BITMAP) {
             // standard bitmap type
-            const WORD bpp = FreeImage_GetBPP(_dib.get());
+            const auto bpp = FreeImage_GetBPP(_dib.get());
             bCanSave = FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp);
         } else {
             // special bitmap type
@@ -506,7 +506,7 @@ BOOL fipImage::saveU(const wchar_t* lpszPathName, int flag) {
         const FREE_IMAGE_TYPE image_type = FreeImage_GetImageType(_dib.get());
         if(image_type == FIT_BITMAP) {
             // standard bitmap type
-            const WORD bpp = FreeImage_GetBPP(_dib.get());
+            const auto bpp = FreeImage_GetBPP(_dib.get());
             bCanSave = FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp);
         } else {
             // special bitmap type
@@ -532,7 +532,7 @@ BOOL fipImage::saveToHandle(FREE_IMAGE_FORMAT fif, FreeImageIO *io, fi_handle ha
         const FREE_IMAGE_TYPE image_type = FreeImage_GetImageType(_dib.get());
         if(image_type == FIT_BITMAP) {
             // standard bitmap type
-            const WORD bpp = FreeImage_GetBPP(_dib.get());
+            const auto bpp = FreeImage_GetBPP(_dib.get());
             bCanSave = FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp);
         } else {
             // special bitmap type
@@ -558,7 +558,7 @@ BOOL fipImage::saveToMemory(FREE_IMAGE_FORMAT fif, fipMemoryIO& memIO, int flag)
         const FREE_IMAGE_TYPE image_type = FreeImage_GetImageType(_dib.get());
         if(image_type == FIT_BITMAP) {
             // standard bitmap type
-            const WORD bpp = FreeImage_GetBPP(_dib.get());
+            const auto bpp = FreeImage_GetBPP(_dib.get());
             bCanSave = FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp);
         } else {
             // special bitmap type
@@ -597,7 +597,7 @@ BOOL fipImage::saveEx(const char* lpszPathName, int page, int flag)
         if (image_type == FIT_BITMAP)
         {
             // standard bitmap type
-            const WORD bpp = FreeImage_GetBPP(_dib.get());
+            const auto bpp = FreeImage_GetBPP(_dib.get());
             bCanSave = FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp);
         }
         else
@@ -638,7 +638,7 @@ BOOL fipImage::saveUEx(const wchar_t* lpszPathName, int page, int flag)
         if (image_type == FIT_BITMAP)
         {
             // standard bitmap type
-            const WORD bpp = FreeImage_GetBPP(_dib.get());
+            const auto bpp = FreeImage_GetBPP(_dib.get());
             bCanSave = FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp);
         }
         else
@@ -670,7 +670,7 @@ BOOL fipImage::saveToHandleEx(FREE_IMAGE_FORMAT fif, FreeImageIO *io, fi_handle 
         if (image_type == FIT_BITMAP)
         {
             // standard bitmap type
-            const WORD bpp = FreeImage_GetBPP(_dib.get());
+            const auto bpp = FreeImage_GetBPP(_dib.get());
             bCanSave = FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp);
         }
         else
@@ -702,7 +702,7 @@ BOOL fipImage::saveToMemoryEx(FREE_IMAGE_FORMAT fif, fipMemoryIO& memIO, int pag
         if (image_type == FIT_BITMAP)
         {
             // standard bitmap type
-            const WORD bpp = FreeImage_GetBPP(_dib.get());
+            const auto bpp = FreeImage_GetBPP(_dib.get());
             bCanSave = FreeImage_FIFSupportsWriting(fif) && FreeImage_FIFSupportsExportBPP(fif, bpp);
         }
         else

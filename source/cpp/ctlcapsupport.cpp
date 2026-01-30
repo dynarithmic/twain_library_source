@@ -65,7 +65,7 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_TestGetCap(DTWAIN_SOURCE Source, LONG lCapabili
     static constexpr size_t ContainerArraySize = std::size(ContainerTypeArray);
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
 
-    DTWAIN_ARRAY outputArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
+    DTWAIN_ARRAY outputArray = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0).second;
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return outputArray == nullptr; }, DTWAIN_ERR_OUT_OF_MEMORY, nullptr, FUNC_MACRO);
 
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(outputArray);

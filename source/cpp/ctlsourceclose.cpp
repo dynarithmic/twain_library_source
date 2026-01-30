@@ -34,6 +34,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_CloseSource(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     auto [pHandle, pSource] = VerifyHandles(Source);
+    auto pS = pSource;
+	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return pS->IsAcquireAttempt(); }, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
     auto bRetval = CloseSourceInternal(pHandle, pSource);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)
     CATCH_BLOCK_LOG_PARAMS(false)
@@ -53,15 +55,13 @@ DTWAIN_BOOL DTWAIN_CloseSourceUnconditional(CTL_TwainDLLHandle *pHandle, CTL_ITw
     LOG_FUNC_ENTRY_PARAMS(())
     bool bRetval = false;
 
-    if (pHandle->m_nSourceCloseMode == DTWAIN_SourceCloseModeFORCE &&
-        p->IsAcquireAttempt())
+    if (pHandle->m_nSourceCloseMode == DTWAIN_SourceCloseModeFORCE && p->IsAcquireAttempt())
     {
         CTL_TwainAppMgr::DisableUserInterface(p);
         p->SetAcquireAttempt(false);
     }
     else
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return p->IsAcquireAttempt(); },
-        DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
+        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&]{return p->IsAcquireAttempt(); }, DTWAIN_ERR_SOURCE_ACQUIRING, false, FUNC_MACRO);
 
     bRetval = CTL_TwainAppMgr::CloseSource(pHandle->m_pTwainSession, p)?true:false;
     LOG_FUNC_EXIT_NONAME_PARAMS(bRetval)

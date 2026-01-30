@@ -801,7 +801,6 @@ std::pair<bool, bool> CTL_ImageXferTriplet::AbortTransfer(bool bForceClose, int 
                                     CTL_TwainAppMgr::SendTwainMsgToWindow(pSession,
                                                                           nullptr, DTWAIN_TN_FILESAVEERROR,
                                                                           reinterpret_cast<LPARAM>(pSource));
-                                    pSource->ClearPDFText(); // clear the text elements
                                   }
                               }
                             }
@@ -1586,10 +1585,13 @@ bool IsState7InfoNeeded(CTL_ITwainSource *pSource)
     const auto pHandle = pSource->GetDTWAINHandle();
     if ( GetCapValuesEx2_Internal(pSource, ICAP_UNDEFINEDIMAGESIZE, DTWAIN_CAPGETCURRENT, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &A))
     {
-        DTWAINArrayLowLevel_RAII raii(pHandle, A);
-        const auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(A);
-        if ( !vValues.empty())
-            bRetval = vValues[0] > 0;
+        if (A)
+        {
+            DTWAINArrayLowLevel_RAII raii(pHandle, A);
+            const auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(A);
+            if (!vValues.empty())
+                bRetval = vValues[0] > 0;
+        }
     }
     return bRetval;
 }

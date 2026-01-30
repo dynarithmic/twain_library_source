@@ -34,7 +34,7 @@ using namespace dynarithmic;
 
 static void TestAndCachePixelTypes(CTL_ITwainSource *p);
 static void DetermineIfSpecialXfer(CTL_ITwainSource* p);
-static void DetermineIfPeekMessage(CTL_ITwainSource* p);
+static void DetermineIfGetMessage(CTL_ITwainSource* p);
 static void DetermineIfPaperDetectable(CTL_ITwainSource* p);
 static std::pair<bool, int> PerformPixelTypeCompliancyTest(CTL_ITwainSource * p);
 
@@ -107,8 +107,8 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_OpenSource(DTWAIN_SOURCE Source)
     // TWAIN message queue
     DetermineIfSpecialXfer(pSource);
 
-    // See if the source uses PeekMessage processing for the TWAIN message loop
-    DetermineIfPeekMessage(pSource);
+    // See if the source uses GetMessage processing for the TWAIN message loop
+    DetermineIfGetMessage(pSource);
 
     // Cache the pixel types and bit depths
     TestAndCachePixelTypes(pSource);
@@ -291,20 +291,20 @@ void DetermineIfPaperDetectable(CTL_ITwainSource* p)
     }
 }
 
-void DetermineIfPeekMessage(CTL_ITwainSource* pSource)
+void DetermineIfGetMessage(CTL_ITwainSource* pSource)
 {
     using wildcards::match;
-    auto& peekmsg_list = CTL_TwainAppMgr::GetSourcePeekMessageList();
+    auto& getmsg_list = CTL_TwainAppMgr::GetSourceGetMessageList();
     std::string sourceName = pSource->GetProductNameA();
     
     // Search vector for a matching name
-    auto iterSearch = peekmsg_list.begin();
-    while (iterSearch != peekmsg_list.end())
+    auto iterSearch = getmsg_list.begin();
+    while (iterSearch != getmsg_list.end())
     {
         bool matches = match(sourceName, *iterSearch);
         if (matches)
         {
-            pSource->SetUsePeekMessage(true);
+            pSource->SetUsePeekMessage(false);
             return;
         }
         ++iterSearch;

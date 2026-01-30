@@ -59,14 +59,14 @@ namespace dynarithmic
         int riseValue;
         int colorRGB;
         int displayFlags;
-        int strokeWidth;
+        double strokeWidth;
         unsigned stockPosition;
         double scalingX;
         double scalingY;
         double rotationAngle;
         double skewAngleX;
         double skewAngleY;
-        CTL_ITwainSource *pTwainSource; // the source that owns this text element
+        std::set<CTL_ITwainSource *> vptrTwainSource; // the sources that owns this text element
         bool hasBeenDisplayed;
         unsigned int textTransform;
         bool isEnabled;
@@ -75,19 +75,19 @@ namespace dynarithmic
             wordSpacing(0), scaling(100), fontSize(10),
             renderMode(0), riseValue(0), colorRGB(0), displayFlags(0), strokeWidth(2),
             stockPosition(0), scalingX(1), scalingY(1), rotationAngle(0),
-            skewAngleX(0), skewAngleY(0), pTwainSource(nullptr), hasBeenDisplayed(false),
-            textTransform(DTWAIN_PDFTEXTTRANSFORM_TSRK), isEnabled(true) { }
+            skewAngleX(0), skewAngleY(0), hasBeenDisplayed(false),
+            textTransform(DTWAIN_PDFTEXTTRANSFORM_SRK), isEnabled(true) { }
             std::string GetPDFTextString() const;
             void SetInvisible() { renderMode = 3; m_font.refNum = 1; }
     };
 
     typedef std::shared_ptr<PDFTextElement> PDFTextElementPtr;
     typedef std::list<PDFTextElementPtr> CTL_TEXTELEMENTPTRLIST;
-    typedef std::unordered_map<CTL_ITwainSource*, CTL_TEXTELEMENTPTRLIST> CTL_TEXTELEMENTMAP;
-    typedef std::list<PDFTextElement*> CTL_TEXTELEMENTNAKEDPTRLIST;
-    typedef std::unordered_set<PDFTextElement*> CTL_TEXTELEMENTNAKEDPTRSET;
-    typedef std::pair<CTL_TEXTELEMENTPTRLIST::iterator, CTL_TEXTELEMENTPTRLIST::iterator> CTL_SEARCHABLETEXTRANGE;
+	typedef std::list<PDFTextElement*> CTL_TEXTELEMENTNAKEDPTRLIST;
+	typedef std::pair<std::unordered_set<PDFTextElement*>, std::list<PDFTextElement*>> CTL_TEXTELEMENTNAKEDPTRSETLIST;
+    typedef std::unordered_map<CTL_ITwainSource*, CTL_TEXTELEMENTNAKEDPTRSETLIST> CTL_TEXTELEMENTMAP;
     typedef std::pair<CTL_TEXTELEMENTNAKEDPTRLIST::iterator,
                                     CTL_TEXTELEMENTNAKEDPTRLIST::iterator> CTL_SEARCHABLENAKEDTEXTRANGE;
+	using CTL_SEARCHABLETEXTRANGE = CTL_SEARCHABLENAKEDTEXTRANGE;
 }
 #endif

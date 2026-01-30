@@ -34,7 +34,7 @@ bool dynarithmic::GetSupportString(DTWAIN_SOURCE Source, LPTSTR sz, LONG nLen, L
         sz[0] = _T('\0');
     DTWAIN_ARRAY Array = nullptr;
     const bool bRet = DTWAIN_GetCapValuesEx2(Source, Cap, GetType, DTWAIN_CONTDEFAULT, DTWAIN_DEFAULT, &Array)?true:false;
-    if (!bRet)
+    if (!bRet || !Array )
         return false;
     const auto pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
     DTWAINArrayLowLevel_RAII raii(pHandle, Array);

@@ -27,6 +27,7 @@
 #include "ctlenum.h"
 #include "ctltwainsource.h"
 #include "ctltwainidentity.h"
+#include "ctlguiddef.h"
 
 namespace dynarithmic
 {

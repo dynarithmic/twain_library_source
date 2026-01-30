@@ -103,11 +103,11 @@ static DTWAIN_ARRAY PerformGetCap(CTL_ITwainSource* pSource,
     if (overrideDataType == 0xFFFF)
     {
         const LONG nArrayType = GetArrayTypeFromCapType(static_cast<TW_UINT16>(nDataType));
-        ThisArray = CreateArrayFromFactory(pHandle, nArrayType, 0);
+        ThisArray = CreateArrayFromFactory(pHandle, nArrayType, 0).second;
         overrideDataType = nDataType;
     }
     else
-        ThisArray = CreateArrayFromCap(pHandle, pSource, lCap, 0);
+        ThisArray = CreateArrayFromCap(pHandle, pSource, lCap, 0).second;
 
     if (!ThisArray)
         return nullptr;
@@ -290,8 +290,7 @@ bool GetCapValuesEx_Internal( CTL_ITwainSource* pSource, TW_UINT16 lCap, LONG lG
 
     const auto pHandle = pSource->GetDTWAINHandle();
 
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return pArray == nullptr; },
-                                      DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
+    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return pArray == nullptr; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
     // We clear the user array here, since we do not want to 
     // report information back to user if capability is not supported
@@ -408,10 +407,7 @@ bool GetCapValuesEx_Internal( CTL_ITwainSource* pSource, TW_UINT16 lCap, LONG lG
         SetCapabilityInfo<CAPINFO_IDX_DATATYPE>(pHandle, pSource, nDataType, lCap);
     }
 
-    arr.SetDestroy(false);
-    if ( bEnumeratorExists )
-        pHandle->m_ArrayFactory->destroy(*pArray);
-    *pArray = ThisArray;
+    MoveArray(pHandle, pArray, &ThisArray); 
     DumpArrayContents(*pArray, lCap);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
@@ -438,6 +434,13 @@ bool dynarithmic::SetCapValuesEx2_Internal( CTL_ITwainSource* pSource, LONG lCap
 
     if ( !CTL_CapabilityTriplet::IsCapOperationReset(lSetType) )
     {
+		// Test to see if array is valid and non-empty (must have at least one value for MSG_SET operations)
+        bool isValid = pHandle->m_ArrayFactory->is_valid(pArray);
+        bool isEmpty = false;
+        if (isValid)
+            isEmpty = (pHandle->m_ArrayFactory->size(pArray) == 0);
+		DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !isValid || isEmpty; }, isEmpty?DTWAIN_ERR_EMPTY_ARRAY:DTWAIN_ERR_BAD_ARRAY, false, FUNC_MACRO);
+
         bool bFoundType = false;
 
         // Get the array type, given the tag type of the DTWAIN Array
@@ -521,6 +524,7 @@ bool dynarithmic::SetCapValuesEx2_Internal( CTL_ITwainSource* pSource, LONG lCap
             break; // get out now
         }
     }
+	DTWAIN_Check_Error_Condition_2_Ex(pHandle, [&] {return !bOk; }, DTWAIN_ERR_SETCAP_FAILED, false, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(bOk)
     CATCH_BLOCK(false)
 }

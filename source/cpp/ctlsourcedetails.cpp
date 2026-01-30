@@ -185,14 +185,17 @@ static pixelMap get_pixel_bitdepth_info(CTL_ITwainSource* pSource)
     pixelMap pMap;
     for (auto curPixInfo : pixInfo)
     {
-        auto iter = pMap.insert({curPixInfo, {}}).first;
+        auto iter = pMap.insert({ curPixInfo, {} }).first;
         DTWAIN_ARRAY aBitDepthInfo = nullptr;
         DTWAINArrayPtr_RAII raii2(pHandle, &aBitDepthInfo);
         DTWAIN_SetPixelType(pSource, curPixInfo, DTWAIN_DEFAULT, TRUE);
         DTWAIN_EnumBitDepths(pSource, &aBitDepthInfo);
-        auto& aBitDepthInfoPtr = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aBitDepthInfo);
-        for (auto curBitDepth : aBitDepthInfoPtr)
-            iter->second.push_back(curBitDepth);
+        if (aBitDepthInfo)
+        {
+            auto& aBitDepthInfoPtr = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aBitDepthInfo);
+            for (auto curBitDepth : aBitDepthInfoPtr)
+                iter->second.push_back(curBitDepth);
+        }
     }
     return pMap;
 }
@@ -297,7 +300,10 @@ ResInfoMap getResolutionInfo(CTL_ITwainSource* pSource)
     {
         auto& pUnitsVals = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aUnits);
         size_t sizeLen = pUnitsVals.size();
-        DTWAIN_ARRAY aSetUnit = CreateArrayFromCap(pHandle, nullptr, ICAP_UNITS, 1);
+        auto retvalue = CreateArrayFromCap(pHandle, nullptr, ICAP_UNITS, 1);
+        if (!retvalue.second)
+            return resMap;
+        auto aSetUnit = retvalue.second;
         auto& pSetUnitsVal = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aSetUnit);
         DTWAINArrayPtr_RAII raii2(pHandle, &aSetUnit);
         DTWAIN_ARRAY curUnit = nullptr;

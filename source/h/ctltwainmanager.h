@@ -56,7 +56,7 @@ namespace dynarithmic
     using SourceToXferReadyMap = std::map<std::string, SourceXferReadyOverride>;
     using SourceToXferReadyList = std::vector<std::pair<std::string, uint32_t>>;
     using SourceFlatbedOnlyList = std::unordered_set<std::string>;
-    using SourcePeekMessageList = std::unordered_set<std::string>;
+    using SourceGetMessageList = std::unordered_set<std::string>;
     using SourcePaperDetectableMap = std::map<std::string, bool>;
 
     class CTL_TwainAppMgr;
@@ -261,7 +261,7 @@ namespace dynarithmic
             static SourceToXferReadyMap& GetSourceToXferReadyMap() { return s_SourceToXferReadyMap; }
             static SourceToXferReadyList& GetSourceToXferReadyList() { return s_SourceToXferReadyList; }
             static SourceFlatbedOnlyList& GetSourceFlatbedOnlyList() { return s_SourceFlatbedOnlyList; }
-            static SourcePeekMessageList& GetSourcePeekMessageList() { return s_SourcePeekMessageList; }
+            static SourceGetMessageList& GetSourceGetMessageList() { return s_SourceGetMessageList; }
             static SourcePaperDetectableMap& GetSourcePaperDetectionMap() { return s_SourcePaperDetectableMap; }
             const CTL_TwainTriplet* GetCurrentTriplet() const { return m_pCurrentTriplet;}
 
@@ -468,7 +468,7 @@ namespace dynarithmic
             static SourceToXferReadyMap s_SourceToXferReadyMap;
             static SourceToXferReadyList s_SourceToXferReadyList;
             static SourceFlatbedOnlyList s_SourceFlatbedOnlyList;
-            static SourcePeekMessageList s_SourcePeekMessageList;
+            static SourceGetMessageList s_SourceGetMessageList;
             static SourcePaperDetectableMap s_SourcePaperDetectableMap;
     };
 

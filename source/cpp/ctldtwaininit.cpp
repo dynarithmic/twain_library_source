@@ -48,6 +48,7 @@
 #include "ctldefsource.h"
 #include "ctlstringutils.h"
 #include "ctlclosesource.h"
+#include "ctlguiddef.h"
 
 #ifdef _MSC_VER
     #pragma warning (disable:4702)
@@ -123,6 +124,7 @@ static CTL_StringType CheckSearchOrderString(CTL_StringType);
 #endif
 
 static bool FindTask( DWORD hTask );
+static bool FindTask(const DTWAIN_GUID& guid);
 static HMODULE GetDLLInstance();
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetVersion(LPLONG lMajor, LPLONG lMinor, LPLONG lVersionType)
@@ -185,9 +187,6 @@ LONG DLLENTRY_DEF DTWAIN_GetStaticLibVersion()
 
     CATCH_BLOCK(-1)
 }
-
-void DLLENTRY_DEF DTWAIN_X(LPCTSTR)
-{}
 
 //////////////////////////////// Initialize DLL /////////////////////////////
 LONG DLLENTRY_DEF DTWAIN_GetAPIHandleStatus(DTWAIN_HANDLE pHandle)
@@ -385,17 +384,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_LoadCustomStringResourcesEx(LPCTSTR sLangDLL, DT
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !bRet; }, DTWAIN_ERR_FILEOPEN, false, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(bRet)
     CATCH_BLOCK(false)
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstant(LONG lConstantType, LONG lTwainConstant, LPTSTR lpszOut, LONG nSize)
-{
-    LOG_FUNC_ENTRY_PARAMS((lConstantType, lTwainConstant, lpszOut, nSize))
-    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
-    auto ret = CTL_StaticData::GetTwainNameFromConstant(lConstantType, lTwainConstant).second;
-    auto numChars = StringWrapper::CopyInfoToCString(ret, lpszOut, nSize);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
-    LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
-    CATCH_BLOCK(-1)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsInitialized()
@@ -805,6 +793,10 @@ DTWAIN_HANDLE SysInitializeHelper(bool block, bool bMinimalSetup)
         auto threadId = getThreadId();
         AssociateThreadToTwainDLL(pHandlePtr, threadId);
         CTL_TwainDLLHandle* pHandle = pHandlePtr.get();
+
+        // Associate a GUID with the handle
+        pHandle->GetGUID() = StringWrapperA::GetGUIDNoCurlyBrace();
+
         if (!bMinimalSetup)
         {
             // Open dtwain32.ini or dtwain64.ini
@@ -1420,7 +1412,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_StartTwainSession(HWND hWndMsgNotify, LPCTSTR lp
 static DTWAIN_ARRAY GetFileTypes(CTL_TwainDLLHandle* pHandle, int nType)
 {
     constexpr const char *sNames[] = { "","-Single","-Multi" };
-    DTWAIN_ARRAY aFileTypes = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
+    DTWAIN_ARRAY aFileTypes = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0).second;
     if (aFileTypes)
     {
         auto& availableFileTypes = CTL_StaticData::GetAvailableFileFormatsMap();
@@ -1558,6 +1550,13 @@ static bool FindTask( DWORD hTask )
 {
     auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
     return threadMap.find(hTask) != threadMap.end();
+}
+
+static bool FindTask(const DTWAIN_GUID& guid)
+{
+	auto& threadMap = CTL_StaticData::GetThreadToDLLHandleMap();
+    auto it = std::find_if(threadMap.begin(), threadMap.end(), [&](const auto& pr) { return pr.second->GetGUID() == guid; });
+    return it != threadMap.end();
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EndTwainSession()
@@ -1752,6 +1751,7 @@ static bool SysDestroyHelper(const char* pParentFunc, CTL_TwainDLLHandle* pHandl
         pHandle->RemoveAllEnumerators();
         pHandle->RemoveAllSourceCapInfo();
         pHandle->RemoveAllSourceMaps();
+        pHandle->RemoveAllPDFTextElements();
         pHandle->m_CallbackMsg = nullptr;
         pHandle->m_CallbackError = nullptr;
         RemoveThreadIdFromAssociation(threadId);
@@ -1836,33 +1836,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainMode(LONG lMode)
     CATCH_BLOCK(false)
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTIFFSupported(VOID_PROTOTYPE)
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPDFSupported(VOID_PROTOTYPE)
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPNGSupported(VOID_PROTOTYPE)
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsJPEGSupported(VOID_PROTOTYPE)
-{
-    LOG_FUNC_ENTRY_PARAMS(())
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
-}
-
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetTwainDSM(LONG DSMType)
 {
     LOG_FUNC_ENTRY_PARAMS((DSMType))
@@ -1910,28 +1883,43 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDSMSearchOrderEx(LPCTSTR SearchOrder, LPCTSTR
     LOG_FUNC_ENTRY_PARAMS((SearchOrder, UserDirectory))
     if (!SearchOrder)
         LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
+	auto strValidString = CheckSearchOrderString(SearchOrder);
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE | DTWAIN_TEST_NOTHROW);
     if (!pHandle)
     {
-        CTL_StaticData::GetStartupDSMSearchOrder() = SearchOrder;
+		if (!strValidString.empty())
+			CTL_StaticData::GetStartupDSMSearchOrder() = strValidString;
         CTL_StaticData::GetStartupDSMSearchOrderDir() = UserDirectory ? UserDirectory : _T("");
         LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
     }
     else
     {
-        auto strValidString = CheckSearchOrderString(SearchOrder);
         if (!strValidString.empty())
         {
             pHandle->m_TwainDSMSearchOrderStr = strValidString;
             pHandle->m_TwainDSMUserDirectory = UserDirectory ? UserDirectory : StringWrapper::traits_type::GetEmptyString();
             pHandle->m_TwainDSMSearchOrder = -1;
-            CTL_StaticData::GetStartupDSMSearchOrder() =  SearchOrder;
+            CTL_StaticData::GetStartupDSMSearchOrder() =  strValidString;
             CTL_StaticData::GetStartupDSMSearchOrderDir() = UserDirectory ? UserDirectory : _T("");
             LOG_FUNC_EXIT_NONAME_PARAMS(TRUE)
         }
     }
     LOG_FUNC_EXIT_NONAME_PARAMS(FALSE)
     CATCH_BLOCK(false)
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetDSMSearchOrderEx(LPTSTR SearchOrder, LPTSTR UserDirectory)
+{
+	LOG_FUNC_ENTRY_PARAMS((SearchOrder, UserDirectory))
+	auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    if (SearchOrder)
+        StringWrapper::CopyInfoToCString(CTL_StaticData::GetStartupDSMSearchOrder(), SearchOrder, 6);
+
+    LONG nSize = static_cast<LONG>(CTL_StaticData::GetStartupDSMSearchOrderDir().size() + 1);
+    LONG retSize = StringWrapper::CopyInfoToCString(CTL_StaticData::GetStartupDSMSearchOrderDir(), UserDirectory, nSize);
+	LOG_FUNC_EXIT_DEREFERENCE_POINTERS((SearchOrder, UserDirectory))
+    LOG_FUNC_EXIT_NONAME_PARAMS(retSize)
+    CATCH_BLOCK(DTWAIN_FAILURE1)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetResourcePath(LPCTSTR ResourcePath)
@@ -2086,7 +2074,7 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainStringName(LONG category, LONG TwainID, LPTSTR 
     CATCH_BLOCK(-1)
 }
 
-LONG DLLENTRY_DEF DTWAIN_GetTwainIDFromName(LPCTSTR lpszBuffer)
+LONG DLLENTRY_DEF DTWAIN_GetConstantFromTwainName(LPCTSTR lpszBuffer)
 {
     LOG_FUNC_ENTRY_PARAMS((lpszBuffer))
     auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
@@ -2094,6 +2082,33 @@ LONG DLLENTRY_DEF DTWAIN_GetTwainIDFromName(LPCTSTR lpszBuffer)
     DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !retVal.first; }, DTWAIN_ERR_STRINGID_NOTFOUND, static_cast<int>(retVal.second), FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS((LONG)retVal.second)
     CATCH_BLOCK(std::numeric_limits<LONG>::min())
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstant(LONG lConstantType, LONG lTwainConstant, LPTSTR lpszOut, LONG nSize)
+{
+    LOG_FUNC_ENTRY_PARAMS((lConstantType, lTwainConstant, lpszOut, nSize))
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    auto ret = CTL_StaticData::GetTwainNameFromConstant(lConstantType, lTwainConstant);
+    if (!ret.first)
+    {
+        LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
+        LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
+    }
+	auto numChars = StringWrapper::CopyInfoToCString(ret.second, lpszOut, nSize);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
+    LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
+    CATCH_BLOCK(-1)
+}
+
+LONG DLLENTRY_DEF DTWAIN_GetTwainNameFromConstantEx(LONG lConstantType, LONG lTwainConstant, LPTSTR lpszOut, LONG nSize)
+{
+    LOG_FUNC_ENTRY_PARAMS((lConstantType, lTwainConstant, lpszOut, nSize))
+    VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
+    auto ret = CTL_StaticData::GetTwainNameFromConstant(lConstantType, lTwainConstant);
+	auto numChars = StringWrapper::CopyInfoToCString(ret.second, lpszOut, nSize);
+    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszOut))
+    LOG_FUNC_EXIT_NONAME_PARAMS(numChars)
+    CATCH_BLOCK(0)
 }
 
 LONG DLLENTRY_DEF DTWAIN_GetWindowsVersionInfo(LPTSTR lpszBuffer, LONG nMaxLen)
@@ -2309,9 +2324,17 @@ CTL_StringType dynarithmic::GetDTWAINTempFilePath(CTL_TwainDLLHandle* pHandle)
 CTL_StringType CheckSearchOrderString(CTL_StringType str)
 {
     static std::set<TCHAR> setValidChars = {_T('C'),_T('W'),_T('O'),_T('U'), _T('S')};
+    std::set<TCHAR> setDuplicates;
     CTL_StringType strOut;
     StringWrapper::MakeUpperCase(str);
-    std::copy_if(str.begin(), str.end(), std::back_inserter(strOut), [&](TCHAR ch) { return setValidChars.count(ch); });
+    std::copy_if(str.begin(), str.end(), std::back_inserter(strOut), [&](TCHAR ch)
+        {
+            bool isValidChar = false;
+            if (!setDuplicates.count(ch))
+                isValidChar = setValidChars.count(ch);
+			setDuplicates.insert(ch);
+            return isValidChar;
+        });
     return strOut;
 }
 
@@ -2366,22 +2389,22 @@ void LoadTransferReadyOverrides()
 }
 
 // This loads the sources that rely on the TWAIN loop when processing the acquisitions
-// to use PeekMessage() instead of GetMessage().
+// to use GetMessage() instead of PeekMessage().
 void LoadTwainLoopOverrides()
 {
-    auto& peekloop_list = CTL_TwainAppMgr::GetSourcePeekMessageList();
-    peekloop_list.clear();
+    auto& getmsgloop_list = CTL_TwainAppMgr::GetSourceGetMessageList();
+    getmsgloop_list.clear();
 
     // Get the section name
     auto* customProfile = CTL_StaticData::GetINIInterface();
     if (!customProfile)
         return;
     CSimpleIniA::TNamesDepend keys;
-    customProfile->GetAllKeys(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_TWAINLOOPPEEK_KEY).data(), keys);
+    customProfile->GetAllKeys(CTL_StaticData::GetINIKey(CTL_StaticDataStruct::INI_TWAINLOOPGETMSG_KEY).data(), keys);
     auto iter = keys.begin();
     while (iter != keys.end())
     {
-        peekloop_list.insert(iter->pItem);
+        getmsgloop_list.insert(iter->pItem);
         ++iter;
     }
 }

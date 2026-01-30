@@ -166,6 +166,8 @@ static std::vector<CTL_StringType> GetNameList(SelectStruct& selectTraits)
     DTWAIN_ARRAY Array = nullptr;
     const auto pHandle = selectTraits.pHandle;
     DTWAIN_EnumOCRInterfaces(&Array);
+    if (!Array)
+        return vSourceNames;
     DTWAINArrayLowLevel_RAII arr(pHandle, Array);
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<OCREngine*>(Array);
     if (!vValues.empty())

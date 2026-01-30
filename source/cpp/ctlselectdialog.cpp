@@ -275,6 +275,9 @@ LRESULT CALLBACK dynarithmic::DisplayTwainDlgProc(HWND hWnd, UINT message, WPARA
             }
             if ( !bUseLastScreenPos )
             {
+				if (pS->CS.nOptions & DTWAIN_DLG_CENTER_CURRENT_MONITOR)
+					CenterWindowOnCurrentMonitor(hWnd);
+                else
                 if (pS->CS.nOptions & DTWAIN_DLG_CENTER_SCREEN)
                     CenterWindow(hWnd, nullptr);
                 else

@@ -48,11 +48,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
         *Array = nullptr;
 
     // Create a DTWAIN_ARRAY consisting of pointers to the source objects.
-    DTWAIN_ARRAY aSource = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSOURCE, 0);
-    if (!aSource)
-        LOG_FUNC_EXIT_NONAME_PARAMS(false)
+    auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYSOURCE, 0);
+	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] {return !retVal.second; }, retVal.first, false, FUNC_MACRO);
 
-    DTWAIN_ARRAY pDTWAINArray = aSource;
+    DTWAIN_ARRAY pDTWAINArray = retVal.second;
+    DTWAINArrayLowLevelPtr_RAII raii(pHandle, &pDTWAINArray);
 
     const auto& factory = pHandle->m_ArrayFactory;
     auto& vEnum = factory->underlying_container_t<CTL_ITwainSource*>(pDTWAINArray);
@@ -70,10 +70,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSources(LPDTWAIN_ARRAY Array)
     // Copy results to user array
     std::copy(twainSources.begin(), twainSources.end(), std::back_inserter(vEnum));
 
-    // Destroy old contents of user array if contents already existed and assign new info
-    if (bEnumeratorExists)
-        pHandle->m_ArrayFactory->destroy(*Array);
-    *Array = aSource;
+    MoveArray(pHandle, Array, &pDTWAINArray);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }
