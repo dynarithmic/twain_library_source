@@ -478,8 +478,11 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
     pHandle->m_bOpenSourceOnSelect = false;
 
     auto& sourceStatusMap = CTL_StaticData::GetSourceStatusMap();
+    char szSourceBuf[100];
     for (auto& curSource : allSources)
     {
+        StringWrapperA::SafeStrcpy(szSourceBuf, curSource.c_str(), 100);
+        CTL_TwainAppMgr::SendTwainMsgToWindow(&ts, nullptr, DTWAIN_TN_SOURCEDETAILS, reinterpret_cast<LPARAM>(szSourceBuf));
         std::string jColorInfo;
         std::string resUnitInfo;
         std::string capabilityString;
