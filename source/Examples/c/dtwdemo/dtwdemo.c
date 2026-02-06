@@ -110,6 +110,8 @@ AllTypes g_allTypes[] = {   {_T("BMP File"), DTWAIN_BMP, _T("test.bmp")},
                             {_T("Postscript Level 2 File"), DTWAIN_POSTSCRIPT2MULTI, _T("test.ps")},
                             {_T("PNG File"), DTWAIN_PNG, _T("test.png")},
                             {_T("Adobe Paintshop (PSD) File"), DTWAIN_PSD, _T("test.psd")},
+							{_T("SVG File"), DTWAIN_SVG, _T("test.svg")},
+							{_T("SVGZ File"), DTWAIN_SVGZ, _T("test.svgz")},
                             {_T("Text File"), DTWAIN_TEXTMULTI, _T("test.txt")},
                             {_T("TIFF (No compression)"), DTWAIN_TIFFNONEMULTI, _T("test.tif")},
                             {_T("TIFF (CCITT Group 3)"), DTWAIN_TIFFG3MULTI, _T("test.tif")},
@@ -734,10 +736,7 @@ void AcquireFile(BOOL bUseSource)
     EnableWindow(g_hWnd, TRUE);
     EnableSourceItems(TRUE);
 
-    /* Reopen source since we closed it after the acquisition
-       (to be safe) */
     DTWAIN_ArrayDestroy( AFileNames );
-    DTWAIN_OpenSource( g_CurrentSource );
     LONG pageCount = DTWAIN_GetFileSavePageCount(g_CurrentSource);
     if ( !bAcquireOK || pageCount == 0 || !bPageOK )
     {
