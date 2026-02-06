@@ -300,24 +300,3 @@ std::pair<bool, int> SaveSVGZ(const std::string& svgText, const std::string& fil
 		return { true, DTWAIN_NO_ERROR }; 
 	return { false, DTWAIN_ERR_FILEWRITE };
 }
-
-#if 0
-// ---------------- Example usage ----------------
-#ifdef SVGZ_MINIZ_TEST
-#include <iostream>
-
-int main()
-{
-	std::string svg = R"(
-<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
-  <rect x="10" y="10" width="80" height="80" fill="black"/>
-</svg>
-)";
-
-	if (SaveSVGZ(svg, L"test.svgz"))
-		std::cout << "SVGZ written successfully\n";
-	else
-		std::cout << "Failed to write SVGZ\n";
-}
-#endif
-#endif
