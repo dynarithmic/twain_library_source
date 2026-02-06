@@ -317,6 +317,10 @@ int CTL_TwainDib::WriteDibBitmap (DTWAINImageInfoEx& ImageInfo,
         }
         break;
 
+        case SVGFormat:
+        case SVGZFormat:
+            pHandler = std::make_unique<CTL_SVGIOHandler>(this, nFormat == SVGZFormat);
+        break;
         default:
             return DTWAIN_ERR_BADPARAM;
     }

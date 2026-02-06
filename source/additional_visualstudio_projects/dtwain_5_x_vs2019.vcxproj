@@ -1491,12 +1491,14 @@ copy $(TargetDir)$(TargetName).lib .
     <ClCompile Include="cpp\imagefun\txtfun32.cpp" />
     <ClCompile Include="cpp\iohandler_jpegxr.cpp" />
     <ClCompile Include="cpp\iohandler_pbm.cpp" />
+    <ClCompile Include="cpp\iohandler_svg.cpp" />
     <ClCompile Include="cpp\iohandler_webp.cpp" />
     <ClCompile Include="cpp\linux_versioninfo.cpp" />
     <ClCompile Include="cpp\logwriterutils.cpp" />
     <ClCompile Include="cpp\ocrengine\ocrselect.cpp" />
     <ClCompile Include="cpp\pdflib32\a85encode.cpp" />
     <ClCompile Include="cpp\pdflib32\ahexencode.cpp" />
+    <ClCompile Include="cpp\pdflib32\base64encode.cpp" />
     <ClCompile Include="cpp\pdflib32\flateencode.cpp" />
     <ClCompile Include="cpp\pdflib32\pdfencrypt.cpp" />
     <ClCompile Include="cpp\pdflib32\pdflib32.cpp" />
@@ -1618,6 +1620,110 @@ copy $(TargetDir)$(TargetName).lib .
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="miniz\miniz.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="miniz\miniz_tdef.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="miniz\miniz_tinfl.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="miniz\miniz_zip.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U_D|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_D|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win64_DTWAINDLL_U_D|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_U|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Win32_DTWAINDLL_D|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include=".\h\ctltr040.h" />
@@ -1694,6 +1800,7 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="aeslib\AES.h" />
     <ClInclude Include="cpp\pdflib32\a85encode.h" />
     <ClInclude Include="cpp\pdflib32\ahexencode.h" />
+    <ClInclude Include="cpp\pdflib32\base64encode.h" />
     <ClInclude Include="cpp\pdflib32\flateencode.h" />
     <ClInclude Include="cpp\pdflib32\pdfencrypt.h" />
     <ClInclude Include="cpp\pdflib32\pdflib32.h" />
@@ -1768,6 +1875,12 @@ copy $(TargetDir)$(TargetName).lib .
     <ClInclude Include="h\sourceselectopts.h" />
     <ClInclude Include="h\twainfix32.h" />
     <ClInclude Include="h\twainframe.h" />
+    <ClInclude Include="miniz\miniz.h" />
+    <ClInclude Include="miniz\miniz_common.h" />
+    <ClInclude Include="miniz\miniz_export.h" />
+    <ClInclude Include="miniz\miniz_tdef.h" />
+    <ClInclude Include="miniz\miniz_tinfl.h" />
+    <ClInclude Include="miniz\miniz_zip.h" />
     <ClInclude Include="simpleini\SimpleIni.h" />
     <CustomBuildStep Include=".\cdtwain\cdtwain_internal\buftrans.h" />
     <CustomBuildStep Include=".\cdtwain\cdtwain_internal\cdtenum.h" />
