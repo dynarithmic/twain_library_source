@@ -1804,12 +1804,15 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_ArrayGetAt Lib "dtwain64d.dll" (pArray As System.IntPtr, nWhere As Integer, pVariant As System.IntPtr) As Integer
     Public Declare Ansi Function DTWAIN_ArrayGetAtANSIString Lib "dtwain64d.dll" (pArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPStr)> pStr As StringBuilder) As Integer
     Public Declare Function DTWAIN_ArrayGetAtFloat Lib "dtwain64d.dll" (pArray As System.IntPtr, nWhere As Integer, ByRef pVal As System.Double) As Integer
+    Public Declare Function DTWAIN_ArrayGetAtFloatEx Lib "dtwain64d.dll" (pArray As System.IntPtr, nWhere As Integer) As System.Double
     Public Declare Ansi Function DTWAIN_ArrayGetAtFloatString Lib "dtwain64d.dll" (pArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPStr)> Val As StringBuilder) As Integer
     Public Declare Function DTWAIN_ArrayGetAtFrame Lib "dtwain64d.dll" (FrameArray As System.IntPtr, nWhere As Integer, ByRef pleft As System.Double, ByRef ptop As System.Double, ByRef pright As System.Double, ByRef pbottom As System.Double) As Integer
     Public Declare Function DTWAIN_ArrayGetAtFrameEx Lib "dtwain64d.dll" (FrameArray As System.IntPtr, nWhere As Integer, Frame As System.IntPtr) As Integer
     Public Declare Ansi Function DTWAIN_ArrayGetAtFrameString Lib "dtwain64d.dll" (FrameArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPStr)> left As StringBuilder, <MarshalAs(UnmanagedType.LPStr)> top As StringBuilder, <MarshalAs(UnmanagedType.LPStr)> right As StringBuilder, <MarshalAs(UnmanagedType.LPStr)> bottom As StringBuilder) As Integer
     Public Declare Function DTWAIN_ArrayGetAtLong Lib "dtwain64d.dll" (pArray As System.IntPtr, nWhere As Integer, ByRef pVal As Integer) As Integer
     Public Declare Function DTWAIN_ArrayGetAtLong64 Lib "dtwain64d.dll" (pArray As System.IntPtr, nWhere As Integer, ByRef pVal As System.Int64) As Integer
+    Public Declare Function DTWAIN_ArrayGetAtLong64Ex Lib "dtwain64d.dll" (pArray As System.IntPtr, nWhere As Integer) As System.Int64
+    Public Declare Function DTWAIN_ArrayGetAtLongEx Lib "dtwain64d.dll" (pArray As System.IntPtr, nWhere As Integer) As Integer
     Public Declare Function DTWAIN_ArrayGetAtSource Lib "dtwain64d.dll" (pArray As System.IntPtr, nWhere As Integer, ByRef ppSource As System.IntPtr) As Integer
     Public Declare Function DTWAIN_ArrayGetAtSourceEx Lib "dtwain64d.dll" (pArray As System.IntPtr, nWhere As Integer) As System.IntPtr
     Public Declare Ansi Function DTWAIN_ArrayGetAtString Lib "dtwain64d.dll" (pArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPStr)> pStr As StringBuilder) As Integer

@@ -142,6 +142,7 @@
     D_ARRAYGETATANSISTRINGFUNC                    DYNDTWAIN_API::DTWAIN_ArrayGetAtANSIString = nullptr;
     D_ARRAYGETATANSISTRINGPTRFUNC                 DYNDTWAIN_API::DTWAIN_ArrayGetAtANSIStringPtr = nullptr;
     D_ARRAYGETATFLOATFUNC                         DYNDTWAIN_API::DTWAIN_ArrayGetAtFloat = nullptr;
+    D_ARRAYGETATFLOATEXFUNC                       DYNDTWAIN_API::DTWAIN_ArrayGetAtFloatEx = nullptr;
     D_ARRAYGETATFLOATSTRINGFUNC                   DYNDTWAIN_API::DTWAIN_ArrayGetAtFloatString = nullptr;
     D_ARRAYGETATFLOATSTRINGAFUNC                  DYNDTWAIN_API::DTWAIN_ArrayGetAtFloatStringA = nullptr;
     D_ARRAYGETATFLOATSTRINGWFUNC                  DYNDTWAIN_API::DTWAIN_ArrayGetAtFloatStringW = nullptr;
@@ -152,6 +153,8 @@
     D_ARRAYGETATFRAMESTRINGWFUNC                  DYNDTWAIN_API::DTWAIN_ArrayGetAtFrameStringW = nullptr;
     D_ARRAYGETATLONGFUNC                          DYNDTWAIN_API::DTWAIN_ArrayGetAtLong = nullptr;
     D_ARRAYGETATLONG64FUNC                        DYNDTWAIN_API::DTWAIN_ArrayGetAtLong64 = nullptr;
+    D_ARRAYGETATLONG64EXFUNC                      DYNDTWAIN_API::DTWAIN_ArrayGetAtLong64Ex = nullptr;
+    D_ARRAYGETATLONGEXFUNC                        DYNDTWAIN_API::DTWAIN_ArrayGetAtLongEx = nullptr;
     D_ARRAYGETATSOURCEFUNC                        DYNDTWAIN_API::DTWAIN_ArrayGetAtSource = nullptr;
     D_ARRAYGETATSOURCEEXFUNC                      DYNDTWAIN_API::DTWAIN_ArrayGetAtSourceEx = nullptr;
     D_ARRAYGETATSTRINGFUNC                        DYNDTWAIN_API::DTWAIN_ArrayGetAtString = nullptr;
@@ -1346,6 +1349,7 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_ArrayGetAtANSIString, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayGetAtANSIStringPtr, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayGetAtFloat, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_ArrayGetAtFloatEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayGetAtFloatString, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayGetAtFloatStringA, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayGetAtFloatStringW, hModule);
@@ -1356,6 +1360,8 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_ArrayGetAtFrameStringW, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayGetAtLong, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayGetAtLong64, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_ArrayGetAtLong64Ex, hModule);
+          LOADFUNCTIONIMPL(DTWAIN_ArrayGetAtLongEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayGetAtSource, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayGetAtSourceEx, hModule);
           LOADFUNCTIONIMPL(DTWAIN_ArrayGetAtString, hModule);

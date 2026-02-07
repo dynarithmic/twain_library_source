@@ -165,6 +165,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_ArrayGetAtANSIString(DTWAIN_ARRAY pArray, LONG nWhere, LPSTR pStr);
         LPCSTR DTWAIN_ArrayGetAtANSIStringPtr(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayGetAtFloat(DTWAIN_ARRAY pArray, LONG nWhere, LPDTWAIN_FLOAT pVal);
+        DTWAIN_FLOAT DTWAIN_ArrayGetAtFloatEx(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayGetAtFloatString(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_CHARPTRTYPE Val);
         DTWAIN_BOOL DTWAIN_ArrayGetAtFloatStringA(DTWAIN_ARRAY pArray, LONG nWhere, LPSTR Val);
         DTWAIN_BOOL DTWAIN_ArrayGetAtFloatStringW(DTWAIN_ARRAY pArray, LONG nWhere, LPWSTR Val);
@@ -175,6 +176,8 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_ArrayGetAtFrameStringW(DTWAIN_ARRAY FrameArray, LONG nWhere, LPWSTR left, LPWSTR top, LPWSTR right, LPWSTR bottom);
         DTWAIN_BOOL DTWAIN_ArrayGetAtLong(DTWAIN_ARRAY pArray, LONG nWhere, LPLONG pVal);
         DTWAIN_BOOL DTWAIN_ArrayGetAtLong64(DTWAIN_ARRAY pArray, LONG nWhere, LPLONG64 pVal);
+        LONG64 DTWAIN_ArrayGetAtLong64Ex(DTWAIN_ARRAY pArray, LONG nWhere);
+        LONG DTWAIN_ArrayGetAtLongEx(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayGetAtSource(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_SOURCE* ppSource);
         DTWAIN_SOURCE DTWAIN_ArrayGetAtSourceEx(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayGetAtString(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_CHARPTRTYPE pStr);
@@ -1353,6 +1356,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_ArrayGetAtANSIString(DTWAIN_ARRAY pArray, LONG nWhere, LPSTR pStr);
         LPCSTR DTWAIN_ArrayGetAtANSIStringPtr(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayGetAtFloat(DTWAIN_ARRAY pArray, LONG nWhere, LPDTWAIN_FLOAT pVal);
+        DTWAIN_FLOAT DTWAIN_ArrayGetAtFloatEx(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayGetAtFloatString(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_CHARPTRTYPE Val);
         DTWAIN_BOOL DTWAIN_ArrayGetAtFloatStringA(DTWAIN_ARRAY pArray, LONG nWhere, LPSTR Val);
         DTWAIN_BOOL DTWAIN_ArrayGetAtFloatStringW(DTWAIN_ARRAY pArray, LONG nWhere, LPWSTR Val);
@@ -1363,6 +1367,8 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_ArrayGetAtFrameStringW(DTWAIN_ARRAY FrameArray, LONG nWhere, LPWSTR left, LPWSTR top, LPWSTR right, LPWSTR bottom);
         DTWAIN_BOOL DTWAIN_ArrayGetAtLong(DTWAIN_ARRAY pArray, LONG nWhere, LPLONG pVal);
         DTWAIN_BOOL DTWAIN_ArrayGetAtLong64(DTWAIN_ARRAY pArray, LONG nWhere, LPLONG64 pVal);
+        LONG64 DTWAIN_ArrayGetAtLong64Ex(DTWAIN_ARRAY pArray, LONG nWhere);
+        LONG DTWAIN_ArrayGetAtLongEx(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayGetAtSource(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_SOURCE* ppSource);
         DTWAIN_SOURCE DTWAIN_ArrayGetAtSourceEx(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayGetAtString(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_CHARPTRTYPE pStr);
@@ -2541,6 +2547,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_ArrayGetAtANSIString(DTWAIN_ARRAY pArray, LONG nWhere, LPSTR pStr);
         LPCSTR DTWAIN_ArrayGetAtANSIStringPtr(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayGetAtFloat(DTWAIN_ARRAY pArray, LONG nWhere, LPDTWAIN_FLOAT pVal);
+        DTWAIN_FLOAT DTWAIN_ArrayGetAtFloatEx(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayGetAtFloatString(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_CHARPTRTYPE Val);
         DTWAIN_BOOL DTWAIN_ArrayGetAtFloatStringA(DTWAIN_ARRAY pArray, LONG nWhere, LPSTR Val);
         DTWAIN_BOOL DTWAIN_ArrayGetAtFloatStringW(DTWAIN_ARRAY pArray, LONG nWhere, LPWSTR Val);
@@ -2551,6 +2558,8 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_ArrayGetAtFrameStringW(DTWAIN_ARRAY FrameArray, LONG nWhere, LPWSTR left, LPWSTR top, LPWSTR right, LPWSTR bottom);
         DTWAIN_BOOL DTWAIN_ArrayGetAtLong(DTWAIN_ARRAY pArray, LONG nWhere, LPLONG pVal);
         DTWAIN_BOOL DTWAIN_ArrayGetAtLong64(DTWAIN_ARRAY pArray, LONG nWhere, LPLONG64 pVal);
+        LONG64 DTWAIN_ArrayGetAtLong64Ex(DTWAIN_ARRAY pArray, LONG nWhere);
+        LONG DTWAIN_ArrayGetAtLongEx(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayGetAtSource(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_SOURCE* ppSource);
         DTWAIN_SOURCE DTWAIN_ArrayGetAtSourceEx(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayGetAtString(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_CHARPTRTYPE pStr);
@@ -3729,6 +3738,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_ArrayGetAtANSIString(DTWAIN_ARRAY pArray, LONG nWhere, LPSTR pStr);
         LPCSTR DTWAIN_ArrayGetAtANSIStringPtr(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayGetAtFloat(DTWAIN_ARRAY pArray, LONG nWhere, LPDTWAIN_FLOAT pVal);
+        DTWAIN_FLOAT DTWAIN_ArrayGetAtFloatEx(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayGetAtFloatString(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_CHARPTRTYPE Val);
         DTWAIN_BOOL DTWAIN_ArrayGetAtFloatStringA(DTWAIN_ARRAY pArray, LONG nWhere, LPSTR Val);
         DTWAIN_BOOL DTWAIN_ArrayGetAtFloatStringW(DTWAIN_ARRAY pArray, LONG nWhere, LPWSTR Val);
@@ -3739,6 +3749,8 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_ArrayGetAtFrameStringW(DTWAIN_ARRAY FrameArray, LONG nWhere, LPWSTR left, LPWSTR top, LPWSTR right, LPWSTR bottom);
         DTWAIN_BOOL DTWAIN_ArrayGetAtLong(DTWAIN_ARRAY pArray, LONG nWhere, LPLONG pVal);
         DTWAIN_BOOL DTWAIN_ArrayGetAtLong64(DTWAIN_ARRAY pArray, LONG nWhere, LPLONG64 pVal);
+        LONG64 DTWAIN_ArrayGetAtLong64Ex(DTWAIN_ARRAY pArray, LONG nWhere);
+        LONG DTWAIN_ArrayGetAtLongEx(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayGetAtSource(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_SOURCE* ppSource);
         DTWAIN_SOURCE DTWAIN_ArrayGetAtSourceEx(DTWAIN_ARRAY pArray, LONG nWhere);
         DTWAIN_BOOL DTWAIN_ArrayGetAtString(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_CHARPTRTYPE pStr);

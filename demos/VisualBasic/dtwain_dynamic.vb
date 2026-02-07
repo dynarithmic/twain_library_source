@@ -2108,6 +2108,9 @@ Namespace Dynarithmic
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_ArrayGetAtFloatDelegate(pArray As System.IntPtr, nWhere As Integer, ByRef pVal As System.Double) As Integer
         
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_ArrayGetAtFloatExDelegate(pArray As System.IntPtr, nWhere As Integer) As System.Double
+        
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
         Private Delegate Function DTWAIN_ArrayGetAtFloatStringDelegate(pArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPTStr)> Val As StringBuilder) As Integer
         
@@ -2125,6 +2128,12 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_ArrayGetAtLong64Delegate(pArray As System.IntPtr, nWhere As Integer, ByRef pVal As System.Int64) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_ArrayGetAtLong64ExDelegate(pArray As System.IntPtr, nWhere As Integer) As System.Int64
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_ArrayGetAtLongExDelegate(pArray As System.IntPtr, nWhere As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_ArrayGetAtSourceDelegate(pArray As System.IntPtr, nWhere As Integer, ByRef ppSource As System.IntPtr) As Integer
@@ -4588,6 +4597,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_ArrayGetAtFloat(pArray, nWhere, pVal)
         End Function
         
+        Public Function DTWAIN_ArrayGetAtFloatEx(pArray As System.IntPtr, nWhere As Integer) As System.Double
+        Return api.DTWAIN_ArrayGetAtFloatEx(pArray, nWhere)
+        End Function
+        
         Public Function DTWAIN_ArrayGetAtFloatString(pArray As System.IntPtr, nWhere As Integer, <MarshalAs(UnmanagedType.LPTStr)> Val As StringBuilder) As Integer
         Return api.DTWAIN_ArrayGetAtFloatString(pArray, nWhere, Val)
         End Function
@@ -4610,6 +4623,14 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_ArrayGetAtLong64(pArray As System.IntPtr, nWhere As Integer, ByRef pVal As System.Int64) As Integer
         Return api.DTWAIN_ArrayGetAtLong64(pArray, nWhere, pVal)
+        End Function
+        
+        Public Function DTWAIN_ArrayGetAtLong64Ex(pArray As System.IntPtr, nWhere As Integer) As System.Int64
+        Return api.DTWAIN_ArrayGetAtLong64Ex(pArray, nWhere)
+        End Function
+        
+        Public Function DTWAIN_ArrayGetAtLongEx(pArray As System.IntPtr, nWhere As Integer) As Integer
+        Return api.DTWAIN_ArrayGetAtLongEx(pArray, nWhere)
         End Function
         
         Public Function DTWAIN_ArrayGetAtSource(pArray As System.IntPtr, nWhere As Integer, ByRef ppSource As System.IntPtr) As Integer
@@ -7610,12 +7631,15 @@ Namespace Dynarithmic
             Public DTWAIN_ArrayGetAt As DTWAIN_ArrayGetAtDelegate
             Public DTWAIN_ArrayGetAtANSIString As DTWAIN_ArrayGetAtANSIStringDelegate
             Public DTWAIN_ArrayGetAtFloat As DTWAIN_ArrayGetAtFloatDelegate
+            Public DTWAIN_ArrayGetAtFloatEx As DTWAIN_ArrayGetAtFloatExDelegate
             Public DTWAIN_ArrayGetAtFloatString As DTWAIN_ArrayGetAtFloatStringDelegate
             Public DTWAIN_ArrayGetAtFrame As DTWAIN_ArrayGetAtFrameDelegate
             Public DTWAIN_ArrayGetAtFrameEx As DTWAIN_ArrayGetAtFrameExDelegate
             Public DTWAIN_ArrayGetAtFrameString As DTWAIN_ArrayGetAtFrameStringDelegate
             Public DTWAIN_ArrayGetAtLong As DTWAIN_ArrayGetAtLongDelegate
             Public DTWAIN_ArrayGetAtLong64 As DTWAIN_ArrayGetAtLong64Delegate
+            Public DTWAIN_ArrayGetAtLong64Ex As DTWAIN_ArrayGetAtLong64ExDelegate
+            Public DTWAIN_ArrayGetAtLongEx As DTWAIN_ArrayGetAtLongExDelegate
             Public DTWAIN_ArrayGetAtSource As DTWAIN_ArrayGetAtSourceDelegate
             Public DTWAIN_ArrayGetAtSourceEx As DTWAIN_ArrayGetAtSourceExDelegate
             Public DTWAIN_ArrayGetAtString As DTWAIN_ArrayGetAtStringDelegate

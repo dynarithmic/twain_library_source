@@ -223,6 +223,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_ArrayGetAtANSIString
    attr_reader :DTWAIN_ArrayGetAtANSIStringPtr
    attr_reader :DTWAIN_ArrayGetAtFloat
+   attr_reader :DTWAIN_ArrayGetAtFloatEx
    attr_reader :DTWAIN_ArrayGetAtFloatString
    attr_reader :DTWAIN_ArrayGetAtFloatStringA
    attr_reader :DTWAIN_ArrayGetAtFloatStringW
@@ -233,6 +234,8 @@ class DTWAINAPI
    attr_reader :DTWAIN_ArrayGetAtFrameStringW
    attr_reader :DTWAIN_ArrayGetAtLong
    attr_reader :DTWAIN_ArrayGetAtLong64
+   attr_reader :DTWAIN_ArrayGetAtLong64Ex
+   attr_reader :DTWAIN_ArrayGetAtLongEx
    attr_reader :DTWAIN_ArrayGetAtSource
    attr_reader :DTWAIN_ArrayGetAtSourceEx
    attr_reader :DTWAIN_ArrayGetAtString
@@ -3031,6 +3034,7 @@ class DTWAINAPI
        @DTWAIN_ArrayGetAtANSIString = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtANSIString'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayGetAtANSIStringPtr = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtANSIStringPtr'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
        @DTWAIN_ArrayGetAtFloat = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtFloat'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_ArrayGetAtFloatEx = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtFloatEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_DOUBLE)
        @DTWAIN_ArrayGetAtFloatString = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtFloatString'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayGetAtFloatStringA = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtFloatStringA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayGetAtFloatStringW = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtFloatStringW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
@@ -3041,6 +3045,8 @@ class DTWAINAPI
        @DTWAIN_ArrayGetAtFrameStringW = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtFrameStringW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayGetAtLong = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtLong'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayGetAtLong64 = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtLong64'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_ArrayGetAtLong64Ex = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtLong64Ex'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG_LONG)
+       @DTWAIN_ArrayGetAtLongEx = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtLongEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_ArrayGetAtSource = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtSource'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayGetAtSourceEx = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtSourceEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
        @DTWAIN_ArrayGetAtString = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtString'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)

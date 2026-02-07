@@ -2045,6 +2045,9 @@ module TwainAPI =
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_ArrayGetAtFloatDelegate = delegate of DTWAIN_ARRAY * LONG * DTWAIN_FLOAT byref -> DTWAIN_BOOL
 
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_ArrayGetAtFloatExDelegate = delegate of DTWAIN_ARRAY * LONG -> DTWAIN_FLOAT
+
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
     type DTWAIN_ArrayGetAtFloatStringDelegate = delegate of DTWAIN_ARRAY * LONG * System.Text.StringBuilder -> DTWAIN_BOOL
 
@@ -2062,6 +2065,12 @@ module TwainAPI =
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_ArrayGetAtLong64Delegate = delegate of DTWAIN_ARRAY * LONG * Int64 byref -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_ArrayGetAtLong64ExDelegate = delegate of DTWAIN_ARRAY * LONG -> LONG64
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_ArrayGetAtLongExDelegate = delegate of DTWAIN_ARRAY * LONG -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_ArrayGetAtSourceDelegate = delegate of DTWAIN_ARRAY * LONG * DTWAIN_SOURCE byref -> DTWAIN_BOOL
@@ -4315,12 +4324,15 @@ module TwainAPI =
     let private ArrayGetAt = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAt" : DTWAIN_ArrayGetAtDelegate)
     let private ArrayGetAtANSIString = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtANSIString" : DTWAIN_ArrayGetAtANSIStringDelegate)
     let private ArrayGetAtFloat = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtFloat" : DTWAIN_ArrayGetAtFloatDelegate)
+    let private ArrayGetAtFloatEx = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtFloatEx" : DTWAIN_ArrayGetAtFloatExDelegate)
     let private ArrayGetAtFloatString = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtFloatString" : DTWAIN_ArrayGetAtFloatStringDelegate)
     let private ArrayGetAtFrame = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtFrame" : DTWAIN_ArrayGetAtFrameDelegate)
     let private ArrayGetAtFrameEx = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtFrameEx" : DTWAIN_ArrayGetAtFrameExDelegate)
     let private ArrayGetAtFrameString = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtFrameString" : DTWAIN_ArrayGetAtFrameStringDelegate)
     let private ArrayGetAtLong = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtLong" : DTWAIN_ArrayGetAtLongDelegate)
     let private ArrayGetAtLong64 = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtLong64" : DTWAIN_ArrayGetAtLong64Delegate)
+    let private ArrayGetAtLong64Ex = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtLong64Ex" : DTWAIN_ArrayGetAtLong64ExDelegate)
+    let private ArrayGetAtLongEx = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtLongEx" : DTWAIN_ArrayGetAtLongExDelegate)
     let private ArrayGetAtSource = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtSource" : DTWAIN_ArrayGetAtSourceDelegate)
     let private ArrayGetAtSourceEx = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtSourceEx" : DTWAIN_ArrayGetAtSourceExDelegate)
     let private ArrayGetAtString = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtString" : DTWAIN_ArrayGetAtStringDelegate)
@@ -5334,6 +5346,10 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         ArrayGetAtFloat.Value.Invoke(parray, nwhere, &pval)
 
+    let DTWAIN_ArrayGetAtFloatEx (parray: DTWAIN_ARRAY) (nwhere: LONG) : DTWAIN_FLOAT =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        ArrayGetAtFloatEx.Value.Invoke(parray, nwhere)
+
     let DTWAIN_ArrayGetAtFloatString (parray: DTWAIN_ARRAY) (nwhere: LONG) (val1: System.Text.StringBuilder) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         ArrayGetAtFloatString.Value.Invoke(parray, nwhere, val1)
@@ -5357,6 +5373,14 @@ module TwainAPI =
     let DTWAIN_ArrayGetAtLong64 (parray: DTWAIN_ARRAY) (nwhere: LONG) (pval: Int64 byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         ArrayGetAtLong64.Value.Invoke(parray, nwhere, &pval)
+
+    let DTWAIN_ArrayGetAtLong64Ex (parray: DTWAIN_ARRAY) (nwhere: LONG) : LONG64 =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        ArrayGetAtLong64Ex.Value.Invoke(parray, nwhere)
+
+    let DTWAIN_ArrayGetAtLongEx (parray: DTWAIN_ARRAY) (nwhere: LONG) : LONG =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        ArrayGetAtLongEx.Value.Invoke(parray, nwhere)
 
     let DTWAIN_ArrayGetAtSource (parray: DTWAIN_ARRAY) (nwhere: LONG) (ppsource: DTWAIN_SOURCE byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

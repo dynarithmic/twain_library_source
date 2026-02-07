@@ -1962,6 +1962,7 @@
         public delegate int DTWAIN_ArrayGetAtDelegate(DTWAIN_ARRAY pArray, int nWhere, System.IntPtr pVariant);
         public delegate int DTWAIN_ArrayGetAtANSIStringDelegate(DTWAIN_ARRAY pArray, int nWhere, [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder pStr);
         public delegate int DTWAIN_ArrayGetAtFloatDelegate(DTWAIN_ARRAY pArray, int nWhere, ref DTWAIN_FLOAT pVal);
+        public delegate DTWAIN_FLOAT DTWAIN_ArrayGetAtFloatExDelegate(DTWAIN_ARRAY pArray, int nWhere);
         public delegate int DTWAIN_ArrayGetAtFloatStringDelegate(DTWAIN_ARRAY pArray, int nWhere, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder Val);
         public delegate int DTWAIN_ArrayGetAtFloatStringDelegate_overload(DTWAIN_ARRAY pArray, int nWhere, System.IntPtr Val);
         public delegate int DTWAIN_ArrayGetAtFrameDelegate(DTWAIN_ARRAY FrameArray, int nWhere, ref DTWAIN_FLOAT pleft, ref DTWAIN_FLOAT ptop, ref DTWAIN_FLOAT pright, ref DTWAIN_FLOAT pbottom);
@@ -1970,6 +1971,8 @@
         public delegate int DTWAIN_ArrayGetAtFrameStringDelegate_overload(DTWAIN_ARRAY FrameArray, int nWhere, System.IntPtr left, System.IntPtr top, System.IntPtr right, System.IntPtr bottom);
         public delegate int DTWAIN_ArrayGetAtLongDelegate(DTWAIN_ARRAY pArray, int nWhere, ref int pVal);
         public delegate int DTWAIN_ArrayGetAtLong64Delegate(DTWAIN_ARRAY pArray, int nWhere, ref long pVal);
+        public delegate LONG64 DTWAIN_ArrayGetAtLong64ExDelegate(DTWAIN_ARRAY pArray, int nWhere);
+        public delegate int DTWAIN_ArrayGetAtLongExDelegate(DTWAIN_ARRAY pArray, int nWhere);
         public delegate int DTWAIN_ArrayGetAtSourceDelegate(DTWAIN_ARRAY pArray, int nWhere, ref DTWAIN_SOURCE ppSource);
         public delegate DTWAIN_SOURCE DTWAIN_ArrayGetAtSourceExDelegate(DTWAIN_ARRAY pArray, int nWhere);
         public delegate int DTWAIN_ArrayGetAtStringDelegate(DTWAIN_ARRAY pArray, int nWhere, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder pStr);
@@ -2985,6 +2988,9 @@
         [DTWAINNativeFunction("DTWAIN_ArrayGetAtFloat")]
         private readonly DTWAIN_ArrayGetAtFloatDelegate  _DTWAIN_ArrayGetAtFloat;
 
+        [DTWAINNativeFunction("DTWAIN_ArrayGetAtFloatEx")]
+        private readonly DTWAIN_ArrayGetAtFloatExDelegate  _DTWAIN_ArrayGetAtFloatEx;
+
         [DTWAINNativeFunction("DTWAIN_ArrayGetAtFloatString")]
         private readonly DTWAIN_ArrayGetAtFloatStringDelegate  _DTWAIN_ArrayGetAtFloatString;
 
@@ -3008,6 +3014,12 @@
 
         [DTWAINNativeFunction("DTWAIN_ArrayGetAtLong64")]
         private readonly DTWAIN_ArrayGetAtLong64Delegate  _DTWAIN_ArrayGetAtLong64;
+
+        [DTWAINNativeFunction("DTWAIN_ArrayGetAtLong64Ex")]
+        private readonly DTWAIN_ArrayGetAtLong64ExDelegate  _DTWAIN_ArrayGetAtLong64Ex;
+
+        [DTWAINNativeFunction("DTWAIN_ArrayGetAtLongEx")]
+        private readonly DTWAIN_ArrayGetAtLongExDelegate  _DTWAIN_ArrayGetAtLongEx;
 
         [DTWAINNativeFunction("DTWAIN_ArrayGetAtSource")]
         private readonly DTWAIN_ArrayGetAtSourceDelegate  _DTWAIN_ArrayGetAtSource;
@@ -5615,6 +5627,9 @@
         public  int DTWAIN_ArrayGetAtFloat(DTWAIN_ARRAY pArray, int nWhere, ref DTWAIN_FLOAT pVal)
         => _DTWAIN_ArrayGetAtFloat(pArray, nWhere, ref pVal);
 
+        public  DTWAIN_FLOAT DTWAIN_ArrayGetAtFloatEx(DTWAIN_ARRAY pArray, int nWhere)
+        => _DTWAIN_ArrayGetAtFloatEx(pArray, nWhere);
+
         public  int DTWAIN_ArrayGetAtFloatString(DTWAIN_ARRAY pArray, int nWhere, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder Val)
         => _DTWAIN_ArrayGetAtFloatString(pArray, nWhere, Val);
 
@@ -5638,6 +5653,12 @@
 
         public  int DTWAIN_ArrayGetAtLong64(DTWAIN_ARRAY pArray, int nWhere, ref long pVal)
         => _DTWAIN_ArrayGetAtLong64(pArray, nWhere, ref pVal);
+
+        public  LONG64 DTWAIN_ArrayGetAtLong64Ex(DTWAIN_ARRAY pArray, int nWhere)
+        => _DTWAIN_ArrayGetAtLong64Ex(pArray, nWhere);
+
+        public  int DTWAIN_ArrayGetAtLongEx(DTWAIN_ARRAY pArray, int nWhere)
+        => _DTWAIN_ArrayGetAtLongEx(pArray, nWhere);
 
         public  int DTWAIN_ArrayGetAtSource(DTWAIN_ARRAY pArray, int nWhere, ref DTWAIN_SOURCE ppSource)
         => _DTWAIN_ArrayGetAtSource(pArray, nWhere, ref ppSource);

@@ -1921,6 +1921,7 @@ function DTWAIN_ArrayGetAt(pArray:DTWAIN_ARRAY; nWhere:LONG; pVariant:LPVOID) : 
 function DTWAIN_ArrayGetAtANSIString(pArray:DTWAIN_ARRAY; nWhere:LONG; pStr:LPSTR) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_ArrayGetAtANSIString';
 function DTWAIN_ArrayGetAtANSIStringPtr(pArray:DTWAIN_ARRAY; nWhere:LONG) : LPCSTR; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_ArrayGetAtANSIStringPtr';
 function DTWAIN_ArrayGetAtFloat(pArray:DTWAIN_ARRAY; nWhere:LONG; pVal:LPDTWAIN_FLOAT) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_ArrayGetAtFloat';
+function DTWAIN_ArrayGetAtFloatEx(pArray:DTWAIN_ARRAY; nWhere:LONG) : DTWAIN_FLOAT; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_ArrayGetAtFloatEx';
 function DTWAIN_ArrayGetAtFloatString(pArray:DTWAIN_ARRAY; nWhere:LONG; Val:LPTSTR) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_ArrayGetAtFloatString';
 function DTWAIN_ArrayGetAtFloatStringA(pArray:DTWAIN_ARRAY; nWhere:LONG; Val:LPSTR) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_ArrayGetAtFloatStringA';
 function DTWAIN_ArrayGetAtFloatStringW(pArray:DTWAIN_ARRAY; nWhere:LONG; Val:LPWSTR) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_ArrayGetAtFloatStringW';
@@ -1931,6 +1932,8 @@ function DTWAIN_ArrayGetAtFrameStringA(FrameArray:DTWAIN_ARRAY; nWhere:LONG; lef
 function DTWAIN_ArrayGetAtFrameStringW(FrameArray:DTWAIN_ARRAY; nWhere:LONG; left:LPWSTR; top:LPWSTR; right:LPWSTR; bottom:LPWSTR) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_ArrayGetAtFrameStringW';
 function DTWAIN_ArrayGetAtLong(pArray:DTWAIN_ARRAY; nWhere:LONG; pVal:LPLONG) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_ArrayGetAtLong';
 function DTWAIN_ArrayGetAtLong64(pArray:DTWAIN_ARRAY; nWhere:LONG; pVal:LPLONG64) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_ArrayGetAtLong64';
+function DTWAIN_ArrayGetAtLong64Ex(pArray:DTWAIN_ARRAY; nWhere:LONG) : Int64; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_ArrayGetAtLong64Ex';
+function DTWAIN_ArrayGetAtLongEx(pArray:DTWAIN_ARRAY; nWhere:LONG) : LONG; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_ArrayGetAtLongEx';
 function DTWAIN_ArrayGetAtSource(pArray:DTWAIN_ARRAY; nWhere:LONG; ppSource:LPDTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_ArrayGetAtSource';
 function DTWAIN_ArrayGetAtSourceEx(pArray:DTWAIN_ARRAY; nWhere:LONG) : DTWAIN_SOURCE; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_ArrayGetAtSourceEx';
 function DTWAIN_ArrayGetAtString(pArray:DTWAIN_ARRAY; nWhere:LONG; pStr:LPTSTR) : BOOL; stdcall;  external 'dtwain32.dll'  name 'DTWAIN_ArrayGetAtString';

@@ -135,6 +135,7 @@ type DtwainarraygetatFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_void) ->
 type DtwainarraygetatansistringFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char) -> i32;
 type DtwainarraygetatansistringptrFunc = unsafe extern "C" fn(*mut c_void,i32) -> *const c_char;
 type DtwainarraygetatfloatFunc = unsafe extern "C" fn(*mut c_void,i32,*mut f64) -> i32;
+type DtwainarraygetatfloatexFunc = unsafe extern "C" fn(*mut c_void,i32) -> f64;
 type DtwainarraygetatfloatstringFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16) -> i32;
 type DtwainarraygetatfloatstringaFunc = unsafe extern "C" fn(*mut c_void,i32,*mut c_char) -> i32;
 type DtwainarraygetatfloatstringwFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16) -> i32;
@@ -145,6 +146,8 @@ type DtwainarraygetatframestringaFunc = unsafe extern "C" fn(*mut c_void,i32,*mu
 type DtwainarraygetatframestringwFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16,*mut u16,*mut u16,*mut u16) -> i32;
 type DtwainarraygetatlongFunc = unsafe extern "C" fn(*mut c_void,i32,*mut i32) -> i32;
 type Dtwainarraygetatlong64Func = unsafe extern "C" fn(*mut c_void,i32,*mut i64) -> i32;
+type Dtwainarraygetatlong64exFunc = unsafe extern "C" fn(*mut c_void,i32) -> i64;
+type DtwainarraygetatlongexFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainarraygetatsourceFunc = unsafe extern "C" fn(*mut c_void,i32,*mut *const ()) -> i32;
 type DtwainarraygetatsourceexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
 type DtwainarraygetatstringFunc = unsafe extern "C" fn(*mut c_void,i32,*mut u16) -> i32;
@@ -1268,6 +1271,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_ArrayGetAtANSIStringFunc: Symbol<'a, DtwainarraygetatansistringFunc>,
     DTWAIN_ArrayGetAtANSIStringPtrFunc: Symbol<'a, DtwainarraygetatansistringptrFunc>,
     DTWAIN_ArrayGetAtFloatFunc: Symbol<'a, DtwainarraygetatfloatFunc>,
+    DTWAIN_ArrayGetAtFloatExFunc: Symbol<'a, DtwainarraygetatfloatexFunc>,
     DTWAIN_ArrayGetAtFloatStringFunc: Symbol<'a, DtwainarraygetatfloatstringFunc>,
     DTWAIN_ArrayGetAtFloatStringAFunc: Symbol<'a, DtwainarraygetatfloatstringaFunc>,
     DTWAIN_ArrayGetAtFloatStringWFunc: Symbol<'a, DtwainarraygetatfloatstringwFunc>,
@@ -1278,6 +1282,8 @@ pub struct DTwainAPI<'a>
     DTWAIN_ArrayGetAtFrameStringWFunc: Symbol<'a, DtwainarraygetatframestringwFunc>,
     DTWAIN_ArrayGetAtLongFunc: Symbol<'a, DtwainarraygetatlongFunc>,
     DTWAIN_ArrayGetAtLong64Func: Symbol<'a, Dtwainarraygetatlong64Func>,
+    DTWAIN_ArrayGetAtLong64ExFunc: Symbol<'a, Dtwainarraygetatlong64exFunc>,
+    DTWAIN_ArrayGetAtLongExFunc: Symbol<'a, DtwainarraygetatlongexFunc>,
     DTWAIN_ArrayGetAtSourceFunc: Symbol<'a, DtwainarraygetatsourceFunc>,
     DTWAIN_ArrayGetAtSourceExFunc: Symbol<'a, DtwainarraygetatsourceexFunc>,
     DTWAIN_ArrayGetAtStringFunc: Symbol<'a, DtwainarraygetatstringFunc>,
@@ -4040,6 +4046,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_ArrayGetAtANSIString: Symbol<DtwainarraygetatansistringFunc> = unsafe { library.get(b"DTWAIN_ArrayGetAtANSIString")? };
         let DTWAIN_ArrayGetAtANSIStringPtr: Symbol<DtwainarraygetatansistringptrFunc> = unsafe { library.get(b"DTWAIN_ArrayGetAtANSIStringPtr")? };
         let DTWAIN_ArrayGetAtFloat: Symbol<DtwainarraygetatfloatFunc> = unsafe { library.get(b"DTWAIN_ArrayGetAtFloat")? };
+        let DTWAIN_ArrayGetAtFloatEx: Symbol<DtwainarraygetatfloatexFunc> = unsafe { library.get(b"DTWAIN_ArrayGetAtFloatEx")? };
         let DTWAIN_ArrayGetAtFloatString: Symbol<DtwainarraygetatfloatstringFunc> = unsafe { library.get(b"DTWAIN_ArrayGetAtFloatString")? };
         let DTWAIN_ArrayGetAtFloatStringA: Symbol<DtwainarraygetatfloatstringaFunc> = unsafe { library.get(b"DTWAIN_ArrayGetAtFloatStringA")? };
         let DTWAIN_ArrayGetAtFloatStringW: Symbol<DtwainarraygetatfloatstringwFunc> = unsafe { library.get(b"DTWAIN_ArrayGetAtFloatStringW")? };
@@ -4050,6 +4057,8 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_ArrayGetAtFrameStringW: Symbol<DtwainarraygetatframestringwFunc> = unsafe { library.get(b"DTWAIN_ArrayGetAtFrameStringW")? };
         let DTWAIN_ArrayGetAtLong: Symbol<DtwainarraygetatlongFunc> = unsafe { library.get(b"DTWAIN_ArrayGetAtLong")? };
         let DTWAIN_ArrayGetAtLong64: Symbol<Dtwainarraygetatlong64Func> = unsafe { library.get(b"DTWAIN_ArrayGetAtLong64")? };
+        let DTWAIN_ArrayGetAtLong64Ex: Symbol<Dtwainarraygetatlong64exFunc> = unsafe { library.get(b"DTWAIN_ArrayGetAtLong64Ex")? };
+        let DTWAIN_ArrayGetAtLongEx: Symbol<DtwainarraygetatlongexFunc> = unsafe { library.get(b"DTWAIN_ArrayGetAtLongEx")? };
         let DTWAIN_ArrayGetAtSource: Symbol<DtwainarraygetatsourceFunc> = unsafe { library.get(b"DTWAIN_ArrayGetAtSource")? };
         let DTWAIN_ArrayGetAtSourceEx: Symbol<DtwainarraygetatsourceexFunc> = unsafe { library.get(b"DTWAIN_ArrayGetAtSourceEx")? };
         let DTWAIN_ArrayGetAtString: Symbol<DtwainarraygetatstringFunc> = unsafe { library.get(b"DTWAIN_ArrayGetAtString")? };
@@ -5172,6 +5181,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_ArrayGetAtANSIStringFunc: DTWAIN_ArrayGetAtANSIString,
             DTWAIN_ArrayGetAtANSIStringPtrFunc: DTWAIN_ArrayGetAtANSIStringPtr,
             DTWAIN_ArrayGetAtFloatFunc: DTWAIN_ArrayGetAtFloat,
+            DTWAIN_ArrayGetAtFloatExFunc: DTWAIN_ArrayGetAtFloatEx,
             DTWAIN_ArrayGetAtFloatStringFunc: DTWAIN_ArrayGetAtFloatString,
             DTWAIN_ArrayGetAtFloatStringAFunc: DTWAIN_ArrayGetAtFloatStringA,
             DTWAIN_ArrayGetAtFloatStringWFunc: DTWAIN_ArrayGetAtFloatStringW,
@@ -5182,6 +5192,8 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_ArrayGetAtFrameStringWFunc: DTWAIN_ArrayGetAtFrameStringW,
             DTWAIN_ArrayGetAtLongFunc: DTWAIN_ArrayGetAtLong,
             DTWAIN_ArrayGetAtLong64Func: DTWAIN_ArrayGetAtLong64,
+            DTWAIN_ArrayGetAtLong64ExFunc: DTWAIN_ArrayGetAtLong64Ex,
+            DTWAIN_ArrayGetAtLongExFunc: DTWAIN_ArrayGetAtLongEx,
             DTWAIN_ArrayGetAtSourceFunc: DTWAIN_ArrayGetAtSource,
             DTWAIN_ArrayGetAtSourceExFunc: DTWAIN_ArrayGetAtSourceEx,
             DTWAIN_ArrayGetAtStringFunc: DTWAIN_ArrayGetAtString,
@@ -6571,6 +6583,10 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_ArrayGetAtFloatFunc)(pArray, nWhere, pVal);  }
     }
 
+    pub fn DTWAIN_ArrayGetAtFloatEx(&self, pArray: *mut c_void, nWhere: i32) -> f64 {
+        unsafe { return (self.DTWAIN_ArrayGetAtFloatExFunc)(pArray, nWhere);  }
+    }
+
     pub fn DTWAIN_ArrayGetAtFloatString(&self, pArray: *mut c_void, nWhere: i32, Val: *mut u16) -> i32 {
         unsafe { return (self.DTWAIN_ArrayGetAtFloatStringFunc)(pArray, nWhere, Val);  }
     }
@@ -6609,6 +6625,14 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_ArrayGetAtLong64(&self, pArray: *mut c_void, nWhere: i32, pVal: *mut i64) -> i32 {
         unsafe { return (self.DTWAIN_ArrayGetAtLong64Func)(pArray, nWhere, pVal);  }
+    }
+
+    pub fn DTWAIN_ArrayGetAtLong64Ex(&self, pArray: *mut c_void, nWhere: i32) -> i64 {
+        unsafe { return (self.DTWAIN_ArrayGetAtLong64ExFunc)(pArray, nWhere);  }
+    }
+
+    pub fn DTWAIN_ArrayGetAtLongEx(&self, pArray: *mut c_void, nWhere: i32) -> i32 {
+        unsafe { return (self.DTWAIN_ArrayGetAtLongExFunc)(pArray, nWhere);  }
     }
 
     pub fn DTWAIN_ArrayGetAtSource(&self, pArray: *mut c_void, nWhere: i32, ppSource: *mut *const ()) -> i32 {

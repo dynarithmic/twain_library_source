@@ -1842,6 +1842,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_ArrayGetAtANSIString.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetAtANSIStringPtr.restype = ct.c_char_p
      theDLL.DTWAIN_ArrayGetAtFloat.restype = ct.c_long
+     theDLL.DTWAIN_ArrayGetAtFloatEx.restype = ct.c_double
      theDLL.DTWAIN_ArrayGetAtFloatString.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetAtFloatStringA.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetAtFloatStringW.restype = ct.c_long
@@ -1852,6 +1853,8 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_ArrayGetAtFrameStringW.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetAtLong.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetAtLong64.restype = ct.c_long
+     theDLL.DTWAIN_ArrayGetAtLong64Ex.restype = ct.c_int64
+     theDLL.DTWAIN_ArrayGetAtLongEx.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetAtSource.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetAtSourceEx.restype = ct.c_void_p
      theDLL.DTWAIN_ArrayGetAtString.restype = ct.c_long
@@ -2975,6 +2978,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_ArrayGetAtANSIString.argtypes = [ct.c_void_p, ct.c_long, ct.c_char_p]
      theDLL.DTWAIN_ArrayGetAtANSIStringPtr.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_ArrayGetAtFloat.argtypes = [ct.c_void_p, ct.c_long, ct.POINTER(ct.c_double)]
+     theDLL.DTWAIN_ArrayGetAtFloatEx.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_ArrayGetAtFloatString.argtypes = [ct.c_void_p, ct.c_long, ct.c_wchar_p]
      theDLL.DTWAIN_ArrayGetAtFloatStringA.argtypes = [ct.c_void_p, ct.c_long, ct.c_char_p]
      theDLL.DTWAIN_ArrayGetAtFloatStringW.argtypes = [ct.c_void_p, ct.c_long, ct.c_wchar_p]
@@ -2985,6 +2989,8 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_ArrayGetAtFrameStringW.argtypes = [ct.c_void_p, ct.c_long, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p]
      theDLL.DTWAIN_ArrayGetAtLong.argtypes = [ct.c_void_p, ct.c_long, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_ArrayGetAtLong64.argtypes = [ct.c_void_p, ct.c_long, ct.POINTER(ct.c_int64)]
+     theDLL.DTWAIN_ArrayGetAtLong64Ex.argtypes = [ct.c_void_p, ct.c_long]
+     theDLL.DTWAIN_ArrayGetAtLongEx.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_ArrayGetAtSource.argtypes = [ct.c_void_p, ct.c_long, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_ArrayGetAtSourceEx.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_ArrayGetAtString.argtypes = [ct.c_void_p, ct.c_long, ct.c_wchar_p]
@@ -4078,6 +4084,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_ArrayGetAtANSIString.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetAtANSIStringPtr.restype = ct.c_char_p
      theDLL.DTWAIN_ArrayGetAtFloat.restype = ct.c_long
+     theDLL.DTWAIN_ArrayGetAtFloatEx.restype = ct.c_double
      theDLL.DTWAIN_ArrayGetAtFloatString.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetAtFloatStringA.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetAtFloatStringW.restype = ct.c_long
@@ -4088,6 +4095,8 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_ArrayGetAtFrameStringW.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetAtLong.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetAtLong64.restype = ct.c_long
+     theDLL.DTWAIN_ArrayGetAtLong64Ex.restype = ct.c_int64
+     theDLL.DTWAIN_ArrayGetAtLongEx.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetAtSource.restype = ct.c_long
      theDLL.DTWAIN_ArrayGetAtSourceEx.restype = ct.c_void_p
      theDLL.DTWAIN_ArrayGetAtString.restype = ct.c_long
@@ -5211,6 +5220,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_ArrayGetAtANSIString.argtypes = [ct.c_void_p, ct.c_long, ct.c_char_p]
      theDLL.DTWAIN_ArrayGetAtANSIStringPtr.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_ArrayGetAtFloat.argtypes = [ct.c_void_p, ct.c_long, ct.POINTER(ct.c_double)]
+     theDLL.DTWAIN_ArrayGetAtFloatEx.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_ArrayGetAtFloatString.argtypes = [ct.c_void_p, ct.c_long, ct.c_char_p]
      theDLL.DTWAIN_ArrayGetAtFloatStringA.argtypes = [ct.c_void_p, ct.c_long, ct.c_char_p]
      theDLL.DTWAIN_ArrayGetAtFloatStringW.argtypes = [ct.c_void_p, ct.c_long, ct.c_wchar_p]
@@ -5221,6 +5231,8 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_ArrayGetAtFrameStringW.argtypes = [ct.c_void_p, ct.c_long, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p]
      theDLL.DTWAIN_ArrayGetAtLong.argtypes = [ct.c_void_p, ct.c_long, ct.POINTER(ct.c_long)]
      theDLL.DTWAIN_ArrayGetAtLong64.argtypes = [ct.c_void_p, ct.c_long, ct.POINTER(ct.c_int64)]
+     theDLL.DTWAIN_ArrayGetAtLong64Ex.argtypes = [ct.c_void_p, ct.c_long]
+     theDLL.DTWAIN_ArrayGetAtLongEx.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_ArrayGetAtSource.argtypes = [ct.c_void_p, ct.c_long, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_ArrayGetAtSourceEx.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_ArrayGetAtString.argtypes = [ct.c_void_p, ct.c_long, ct.c_char_p]
