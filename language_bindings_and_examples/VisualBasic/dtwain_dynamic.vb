@@ -419,6 +419,8 @@ Namespace Dynarithmic
         Public Const DTWAIN_BIGTIFFJPEG As Integer = 11015
         Public Const DTWAIN_BIGTIFFJPEGMULTI As Integer = 11016
         Public Const DTWAIN_JPEGXR As Integer = 12000
+        Public Const DTWAIN_SVG As Integer = 13000
+        Public Const DTWAIN_SVGZ As Integer = 13001
         Public Const DTWAIN_INCHES As Integer = 0
         Public Const DTWAIN_CENTIMETERS As Integer = 1
         Public Const DTWAIN_PICAS As Integer = 2
@@ -627,6 +629,7 @@ Namespace Dynarithmic
         Public Const DTWAIN_TN_TRANSFERTILEREADY As Integer = 1300
         Public Const DTWAIN_TN_TRANSFERTILEDONE As Integer = 1301
         Public Const DTWAIN_TN_FILECOMPRESSTYPEMISMATCH As Integer = 1302
+        Public Const DTWAIN_TN_SOURCEDETAILS As Integer = 1304
         Public Const DTWAIN_PDFOCR_CLEANTEXT1 As Integer = 1
         Public Const DTWAIN_PDFOCR_CLEANTEXT2 As Integer = 2
         Public Const DTWAIN_MODAL As Integer = 0

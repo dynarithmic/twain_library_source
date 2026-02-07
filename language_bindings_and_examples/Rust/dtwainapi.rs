@@ -2469,6 +2469,8 @@ impl<'a> DTwainAPI<'a>
     pub const DTWAIN_BIGTIFFJPEG: i32 = 11015;
     pub const DTWAIN_BIGTIFFJPEGMULTI: i32 = 11016;
     pub const DTWAIN_JPEGXR: i32 = 12000;
+    pub const DTWAIN_SVG: i32 = 13000;
+    pub const DTWAIN_SVGZ: i32 = 13001;
     pub const DTWAIN_INCHES: i32 = 0;
     pub const DTWAIN_CENTIMETERS: i32 = 1;
     pub const DTWAIN_PICAS: i32 = 2;
@@ -2677,6 +2679,7 @@ impl<'a> DTwainAPI<'a>
     pub const DTWAIN_TN_TRANSFERTILEREADY: i32 = 1300;
     pub const DTWAIN_TN_TRANSFERTILEDONE: i32 = 1301;
     pub const DTWAIN_TN_FILECOMPRESSTYPEMISMATCH: i32 = 1302;
+    pub const DTWAIN_TN_SOURCEDETAILS: i32 = 1304;
     pub const DTWAIN_PDFOCR_CLEANTEXT1: i32 = 1;
     pub const DTWAIN_PDFOCR_CLEANTEXT2: i32 = 2;
     pub const DTWAIN_MODAL: i32 = 0;

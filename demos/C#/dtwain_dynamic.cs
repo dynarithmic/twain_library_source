@@ -319,6 +319,8 @@
         public const int DTWAIN_BIGTIFFJPEG = 11015;
         public const int DTWAIN_BIGTIFFJPEGMULTI = 11016;
         public const int DTWAIN_JPEGXR = 12000;
+        public const int DTWAIN_SVG = 13000;
+        public const int DTWAIN_SVGZ = 13001;
         public const int DTWAIN_INCHES = 0;
         public const int DTWAIN_CENTIMETERS = 1;
         public const int DTWAIN_PICAS = 2;
@@ -527,6 +529,7 @@
         public const int DTWAIN_TN_TRANSFERTILEREADY = 1300;
         public const int DTWAIN_TN_TRANSFERTILEDONE = 1301;
         public const int DTWAIN_TN_FILECOMPRESSTYPEMISMATCH = 1302;
+        public const int DTWAIN_TN_SOURCEDETAILS = 1304;
         public const int DTWAIN_PDFOCR_CLEANTEXT1 = 1;
         public const int DTWAIN_PDFOCR_CLEANTEXT2 = 2;
         public const int DTWAIN_MODAL = 0;
