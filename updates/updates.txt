@@ -9,6 +9,15 @@ DTWAIN Version changes
   images, and for bit depths greater than 1, the SVG will consist of embedded base-64 
   encoded PNG data.
 
+- Do not produce extraneous TWAIN messages from log files if DTWAIN_LOG_ISTWAINMSG option 
+  is turned off.  This change reduces the size of log files by a very large margin.
+
+- Determine at runtime if the client application requires GetMessage() processing instead
+  of PeekMessage() processing when acquiring images.  Some script and automation 
+  applications (for example, Macro Scheduler and others) may require GetMessage() 
+  processing, since the internal architecture of these applications require a blocking 
+  message queue, which GetMessage() provides. 
+
 - Send DTWAIN_TN_SOURCEDETAILS notifications to the application when DTWAIN_GetSessionDetails()
   or DTWAIN_GetSourceDetails() is called.  The LPARAM of the notification will be a pointer to
   a null terminated ASCII string that represents the Product Name of the Source that is being processed.
