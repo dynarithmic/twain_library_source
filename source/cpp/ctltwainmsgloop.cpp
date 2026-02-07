@@ -32,6 +32,40 @@ using namespace dynarithmic;
 
 std::queue<MSG> TwainMessageLoopV2::s_MessageQueue;
 
+static bool DTWAIN_ShouldUseGetMessage()
+{
+	MSG msg;
+
+	// 1) If no window belongs to this thread, likely script host
+	DWORD thisThread = GetCurrentThreadId();
+	bool hasWindow = false;
+
+	EnumThreadWindows(thisThread,
+		[](HWND, LPARAM lParam) -> BOOL
+		{
+			*reinterpret_cast<bool*>(lParam) = true;
+			return FALSE;
+		},
+		reinterpret_cast<LPARAM>(&hasWindow));
+
+	if (!hasWindow)
+		return true; // safer to block
+
+	// 2) Probe PeekMessage responsiveness
+	DWORD start = GetTickCount();
+
+	while (GetTickCount() - start < 50) // 50 ms probe
+	{
+		if (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
+			return false; // messages flow normally to Peek is safe
+
+		WaitMessage(); // yield cooperatively
+	}
+
+	// No messages appeared, likely host needs GetMessage
+	return true;
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnablePeekMessageLoop(DTWAIN_SOURCE Source, BOOL bSet)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, bSet))
@@ -60,7 +94,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsPeekMessageLoopEnabled(DTWAIN_SOURCE Source)
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-std::pair<bool, DTWAIN_ACQUIRE> dynarithmic::StartModalMessageLoop(DTWAIN_SOURCE Source, SourceAcquireOptions& opts)
+std::pair<int, DTWAIN_ACQUIRE> dynarithmic::StartModalMessageLoop(DTWAIN_SOURCE Source, SourceAcquireOptions& opts)
 {
     CTL_ITwainSource* pSource = static_cast<CTL_ITwainSource*>(Source);
     if (!pSource)
@@ -93,10 +127,10 @@ std::pair<bool, DTWAIN_ACQUIRE> dynarithmic::StartModalMessageLoop(DTWAIN_SOURCE
     // do any prep work before we loop
     pImpl->PrepareLoop();
     pImpl->SetAcquireOptions(opts);
-    pImpl->PerformMessageLoop(pSource, opts.getIsUIOnly());
+    int retCode = pImpl->PerformMessageLoop(pSource, opts.getIsUIOnly());
     if (pSource->IsShutdownAcquire())
-        return { false, -1 };
-    return { true, pImpl->GetAcquireNum() };
+        return { retCode, -1 };
+    return { retCode, pImpl->GetAcquireNum() };
 }
 
 bool TwainMessageLoopImpl::IsSourceOpen(CTL_ITwainSource* pSource)
@@ -119,6 +153,7 @@ bool TwainMessageLoopImpl::IsAcquireTerminated(CTL_ITwainSource* pSource, bool b
 // "TwainLoopGetMsg" section.
 struct ContinueLoopTraitsPeek
 {
+    static constexpr bool isPeekMsg = true;
     static bool ContinueLoop(MSG* msg)
     {
         PeekMessage(msg, nullptr, 0, 0, PM_REMOVE);
@@ -128,6 +163,7 @@ struct ContinueLoopTraitsPeek
 
 struct ContinueLoopTraitsGet
 {
+    static constexpr bool isPeekMsg = false;
     static bool ContinueLoop(MSG* msg)
     {
         auto bRet = GetMessage(msg, nullptr, 0, 0);
@@ -138,12 +174,24 @@ struct ContinueLoopTraitsGet
 template <typename LoopTraits = ContinueLoopTraitsGet>
 struct ContinueLoopTraits
 {
-    static void InvokeLoop(TwainMessageLoopImpl* pImpl, CTL_ITwainSource* pSource, bool isUIOnly)
+    static bool InvokeLoop(TwainMessageLoopImpl* pImpl, CTL_ITwainSource* pSource, bool isUIOnly)
     {
         MSG msg;
         auto& acquireRef = pImpl->GetAcquireNumRef();
         auto& sOpts = pImpl->GetAcquireOptions();
         bool bInitializeAcquisitionProcess = false;
+
+		struct TwainWatchdog
+		{
+			DWORD lastProgressTick;
+			DWORD timeoutMs;
+			bool  triggered;
+		};
+
+        TwainWatchdog wd{ GetTickCount(), 3000, false };
+
+        DWORD lastTwainProgressTick = GetTickCount();
+		const DWORD timeoutMs = 3000;
 
         // Start the message loop.
         while (LoopTraits::ContinueLoop(&msg))
@@ -153,6 +201,7 @@ struct ContinueLoopTraits
             {
                 LLSetupUIOnly(pSource);
                 bInitializeAcquisitionProcess = true;
+                lastTwainProgressTick = GetTickCount();
             }
 
             // If acquire has been terminated, break out of this loop
@@ -160,6 +209,7 @@ struct ContinueLoopTraits
             {
                 if (isUIOnly)
                     pSource->SetUIOnly(false);
+				lastTwainProgressTick = GetTickCount();
                 break;
             }
 
@@ -171,27 +221,42 @@ struct ContinueLoopTraits
             {
                 acquireRef = LLAcquireImage(sOpts);
                 bInitializeAcquisitionProcess = true;
+				lastTwainProgressTick = GetTickCount();
 
                 // Didn't get an acquisition number, so something failed
                 if (acquireRef == -1L)
                     break;
             }
 
-            // This will test for TWAIN messages, Data Source messages or application messages.
-            if (pImpl->CanEnterDispatch(&msg))
-            {
-                TranslateMessage(&msg);
-                ::DispatchMessage(&msg);
-            }
+			// This will test for TWAIN messages, Data Source messages or application messages.
+			if (pImpl->CanEnterDispatch(&msg))
+			{
+				TranslateMessage(&msg);
+				::DispatchMessage(&msg);
+			}
 
+#if 0 // Note that this has not been implemented
+			// PeekMessage watchdog
+			if (LoopTraits::isPeekMsg)
+			{
+				if (GetTickCount() - lastTwainProgressTick > timeoutMs)
+				{
+					// no progress for timeout, exit loop
+                    wd.triggered = true;
+                    break;
+				}
+			}
+#endif
 			// Optional throttle to avoid CPU spin 
 			Sleep(1);
         }
+        return wd.triggered;
     }
 };
 
-void TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource* pSource, bool isUIOnly)
+int TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource* pSource, bool isUIOnly)
 {
+    int returnCode = DTWAIN_NO_ERROR;
     struct UIScopedRAII
     {
         CTL_ITwainSource* m_pSource;
@@ -203,6 +268,30 @@ void TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource* pSource, 
 
     UIScopedRAII raii(pSource);
     pSource->SetUIOnly(isUIOnly);
+
+    // Determine if the message pump should be PeekMessage().  The only
+    // way for GetMessage() to be universally used is if the host application is a
+    // scripting engine or similar.  "Normal" Windows apps and TWAIN
+    // Sources will always work using PeekMessage().
+
+    // If we detect that GetMessage() should be used, we use it.  If the client
+    // has explicitly stated to use GetMessage() by either calling 
+    // DTWAIN_EnablePeekMessageLoop() to FALSE, or the DTWAIN32/64.INI
+    // has the Source listed as one that must use GetMessage(), then we use GetMessage().
+    auto isGetMessageRequired = DTWAIN_ShouldUseGetMessage() || !pSource->IsUsePeekMessage();
+    if (isGetMessageRequired)
+        pSource->SetUsePeekMessage(false);
+
+	bool bLogMessages = (CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS) ? true : false;
+
+	if (bLogMessages)
+	{
+        std::string msg = "Using PeekMessage() for TWAIN acquisitions ...";
+        if (!pSource->IsUsePeekMessage())
+            msg = "Using PeekMessage() for TWAIN acquisitions ...";
+    	LogWriterUtils::WriteLogInfoIndentedA(msg);
+	}
+
 #ifdef _WIN32
     // Make sure message loop is not empty.  Post a WM_NULL message to the
     // message queue to ensure we're not stuck forever on waiting for a 
@@ -210,24 +299,32 @@ void TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource* pSource, 
     HWND theWnd = *pSource->GetTwainSession()->GetWindowHandlePtr();
     ::PostMessage(theWnd, WM_NULL, static_cast<WPARAM>(0), static_cast<LPARAM>(0));
 
+    bool watchdog_triggered = false;
     if (pSource->IsUsePeekMessage())
     {
         // Use the PeekMessage() version of the message loop
         ContinueLoopTraits<ContinueLoopTraitsPeek> msgLoop;
-        msgLoop.InvokeLoop(this, pSource, isUIOnly);
+        watchdog_triggered = msgLoop.InvokeLoop(this, pSource, isUIOnly);
     }
     else
     {
         // Use the GetMessage() version of the message loop
         ContinueLoopTraits<ContinueLoopTraitsGet> msgLoop;
-        msgLoop.InvokeLoop(this, pSource, isUIOnly);
+        watchdog_triggered = msgLoop.InvokeLoop(this, pSource, isUIOnly);
+    }
+
+    if (watchdog_triggered)
+    {
+        returnCode = DTWAIN_ERR_TIMEOUT;
     }
 #else
     while (IsSourceOpen(pSource))
     {
         CanEnterDispatch(&msg);
     }
+    break;
 #endif
+    return returnCode;
 }
 
 TW_UINT16 TW_CALLINGSTYLE TwainMessageLoopV2::TwainVersion2MsgProc(pTW_IDENTITY , pTW_IDENTITY, TW_UINT32, TW_UINT16, TW_UINT16 MSG_, TW_MEMREF)

@@ -49,7 +49,7 @@ namespace dynarithmic
         virtual void PrepareLoop() {}
         void SetAcquireOptions(const SourceAcquireOptions& opts) { sOpts = opts; }
         SourceAcquireOptions& GetAcquireOptions() noexcept { return sOpts; }
-        virtual void PerformMessageLoop(CTL_ITwainSource* /*pSource*/, bool /*bUIOnly*/) {}
+        virtual int PerformMessageLoop(CTL_ITwainSource* /*pSource*/, bool /*bUIOnly*/) { return DTWAIN_NO_ERROR; }
         DTWAIN_ACQUIRE GetAcquireNum() const { return m_AcquireNum; }
         DTWAIN_ACQUIRE& GetAcquireNumRef() { return m_AcquireNum; }
         bool IsAcquireTerminated(CTL_ITwainSource* pSource, bool bUIOnly);
@@ -69,7 +69,7 @@ namespace dynarithmic
 #endif
         }
 
-        void PerformMessageLoop(CTL_ITwainSource* pSource, bool bUIOnly) override;
+        int PerformMessageLoop(CTL_ITwainSource* pSource, bool bUIOnly) override;
     };
 
     class TwainMessageLoopV1 : public TwainMessageLoopWindowsImpl
@@ -106,7 +106,7 @@ namespace dynarithmic
     };
 
 
-    std::pair<bool, DTWAIN_ACQUIRE> StartModalMessageLoop(DTWAIN_SOURCE Source, SourceAcquireOptions& opts);
+    std::pair<int, DTWAIN_ACQUIRE> StartModalMessageLoop(DTWAIN_SOURCE Source, SourceAcquireOptions& opts);
 }
 
 #endif
