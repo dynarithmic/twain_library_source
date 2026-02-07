@@ -203,6 +203,30 @@ LONG DLLENTRY_DEF DTWAIN_GetAPIHandleStatus(DTWAIN_HANDLE pHandle)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTwainMsg(MSG *pMsg)
 {
     LOG_FUNC_ENTRY_PARAMS_ISTWAINMSG((pMsg))
+
+    // Ensure we don't log low-level TWAIN calls when 
+    // for DTWAIN_IsTwainMsg unless user specifies this.
+
+    // This remembers the old flags when restoring at the
+    // return of this function.
+    struct FlagRAII
+    {
+        LONG oldFlags = 0;
+        FlagRAII(LONG oFlags) : oldFlags(oFlags) {}
+        ~FlagRAII()
+        {
+            CTL_StaticData::GetLogFilterFlags() = oldFlags;
+        }
+    };
+
+    auto& logFlags = CTL_StaticData::GetLogFilterFlags();
+    FlagRAII raii(logFlags);
+
+    // Turn off low-level TWAIN logging if no logging for
+    // IsTwainMsg
+    if (!(logFlags & DTWAIN_LOG_ISTWAINMSG))
+        logFlags = logFlags & ~DTWAIN_LOG_LOWLEVELTWAIN;
+
     if (!TwainMessageLoopV2::s_MessageQueue.empty())
     {
         MSG msg = TwainMessageLoopV2::s_MessageQueue.front();

@@ -57,7 +57,7 @@ static bool DTWAIN_ShouldUseGetMessage()
 	while (GetTickCount() - start < 50) // 50 ms probe
 	{
 		if (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
-			return false; // messages flow normally to Peek is safe
+			return false; // messages flow normally so Peek is safe
 
 		WaitMessage(); // yield cooperatively
 	}
