@@ -1,5 +1,21 @@
 DTWAIN Version changes
 
+5.8.1
+
+- Add SVG and SVGZ file formats to DTWAIN_AcquireFile() and DTWAIN_AcquireFileEx().
+  The constants are DTWAIN_SVG and DTWAIN_SVGZ for SVG and SVGZ types, respectively.
+  
+  The SVG that is produced will be vectorized for black=and-white, 1 bit-per-pixel
+  images, and for bit depths greater than 1, the SVG will consist of embedded base-64 
+  encoded PNG data.
+
+- Send DTWAIN_TN_SOURCEDETAILS notifications to the application when DTWAIN_GetSessionDetails()
+  or DTWAIN_GetSourceDetails() is called.  The LPARAM of the notification will be a pointer to
+  a null terminated ASCII string that represents the Product Name of the Source that is being processed.
+  The notification is sent for each Source that is being processed during the calls to 
+  DTWAIN_GetSourceDetails() or DTWAIN_GetSessionDetails().  
+
+
 5.8.0
 
 - Improved TWAIN Driver Compatibility
