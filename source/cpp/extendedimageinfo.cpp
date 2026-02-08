@@ -1227,3 +1227,327 @@ DTWAIN_ARRAY ExtendedImageInformation::GetPatchCodeInfo(long nWhichInfo)
     }
     return nullptr;
 }
+
+std::pair<bool, int> dynarithmic::GetExtImageInfoDataInternal(DTWAIN_SOURCE Source, LONG nWhich, LPDTWAIN_ARRAY Data)
+{
+    CTL_ITwainSource* pTheSource = static_cast<CTL_ITwainSource*>(Source);
+    CTL_TwainDLLHandle* pHandle = pTheSource->GetDTWAINHandle();
+    // We clear the user array here, since we do not want to 
+    // report information back to user if capability is not supported
+    bool bArrayExists = pHandle->m_ArrayFactory->is_valid(*Data);
+    if (bArrayExists)
+        pHandle->m_ArrayFactory->clear(*Data);
+
+    auto* pExtendedImageInfo = pTheSource->GetExtendedImageInfo();
+
+    // The if() is only true on the initial filling of the extended image inforamtion
+    if ( pExtendedImageInfo->IsInfoBeingFilled() )
+    {
+        // Get the info 
+        TW_INFO Info = pTheSource->GetExtImageInfoItem(nWhich, DTWAIN_BYID);
+		// Log the current information
+		if (CTL_StaticData::GetLogFilterFlags())
+		{
+			std::string sTWInfo = CTL_ErrorStructDecoder::DecodeTW_INFO(&Info, nullptr);
+			sTWInfo = "TW_Info: " + sTWInfo;
+			LogWriterUtils::WriteLogInfoIndentedA(sTWInfo);
+		}
+
+        // Check if the info type is supported
+        bool bNotSupported = false;
+        int nErrorCode = 0;
+        if (Info.ReturnCode == TWRC_DATANOTAVAILABLE)
+        {
+            nErrorCode = DTWAIN_ERR_UNAVAILABLE_EXTINFO;
+            bNotSupported = true;
+        }
+        else
+        if (Info.ReturnCode == TWRC_INFONOTSUPPORTED)
+        {
+            nErrorCode = DTWAIN_ERR_UNSUPPORTED_EXTINFO;
+            bNotSupported = true;
+        }
+
+        if (bNotSupported)
+        {
+            if (CTL_StaticData::GetLogFilterFlags())
+            {
+                std::string msg = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, Info.InfoID).second;
+                LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(-nErrorCode) + " " + msg);
+            }
+            return { false, nErrorCode };
+        }
+
+        // Check if type returned by device is what the TWAIN specification indicates
+        auto lTypeReportedByDevice = Info.ItemType;
+        auto lTypeRequiredByTWAIN = CTL_TwainAppMgr::GetGeneralCapInfo(nWhich + CTL_StaticData::GetExtImageInfoOffset()).m_nDataType;
+        bool bTypesMatch = true;
+        if (lTypeReportedByDevice != static_cast<LONG>(lTypeRequiredByTWAIN))
+        {
+            bTypesMatch = false;
+            // Log this condition.  We *may* still get the data, even though TWAIN spec was violated.
+            if (CTL_StaticData::GetLogFilterFlags())
+            {
+                StringTraitsA::string_type sBadType = GetResourceStringFromMap(IDS_DTWAIN_ERROR_REPORTED_TYPE_MISMATCH);
+                sBadType += "  Extended Image Info Value: " + CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, nWhich).second;
+                sBadType += " - {Device Type=" + CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWTY, lTypeReportedByDevice).second;
+                sBadType += ", Twain Required Type=" + CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWTY, lTypeRequiredByTWAIN).second + "}";
+                LogWriterUtils::WriteLogInfoIndentedA(sBadType);
+            }
+
+            // We return an error if the TWAIN spec has been violated for any required types that have to match
+            auto iter = std::find(aRequiredTypeMatches.begin(), aRequiredTypeMatches.end(), nWhich);
+            if (iter != aRequiredTypeMatches.end())
+            {
+				std::string msg = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, Info.InfoID).second;
+				LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(-DTWAIN_ERR_EXTIMAGEINFO_DATATYPE_MISMATCH) + " " + msg);
+                return { false, DTWAIN_ERR_EXTIMAGEINFO_DATATYPE_MISMATCH };
+            }
+
+            // If the mismatch type is TW_FRAME, we should fake it out and pretend that the types match
+            if (Info.InfoID == TWEI_FRAME)
+                Info.ItemType = TWTY_FRAME;
+        }
+
+        auto retVal = CreateArrayFromFactory(pHandle, ExtImageInfoArrayType(Info.ItemType), 0);
+
+        if (!retVal.second)
+        {
+            if (CTL_StaticData::GetLogFilterFlags())
+            {
+                std::string msg = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, Info.InfoID).second;
+                LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(-DTWAIN_ERR_ARRAYTYPE_MISMATCH) + " " + msg);
+            }
+            return { retVal.first, DTWAIN_ERR_ARRAYTYPE_MISMATCH };
+        }
+        auto ExtInfoArray = retVal.second;
+
+        auto Count = Info.NumItems;
+
+        const auto& factory = pHandle->m_ArrayFactory;
+        auto eType = factory->tag_type(ExtInfoArray);
+
+        factory->resize(ExtInfoArray, Count);
+
+        std::pair<bool, int32_t> finalRet = { true, DTWAIN_NO_ERROR };
+        for ( int i = 0; i < Count; ++i )
+        {
+            if (eType == CTL_ArrayFactory::arrayTag::StringType)
+            {
+                std::vector<char> Temp;
+                size_t ItemSize;
+                finalRet = pTheSource->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, nullptr, nullptr, &ItemSize);
+                if ( finalRet.first )
+                {
+                    Temp.resize(ItemSize);
+                    finalRet = pTheSource->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, Temp.data(), nullptr, nullptr);
+                    if ( finalRet.first)
+                        SetArrayValueFromFactory(pHandle, ExtInfoArray, i, Temp.data());
+                }
+            }
+            else
+            if (eType == CTL_ArrayFactory::arrayTag::VoidPtrType) // This is a handle
+            {
+                TW_HANDLE pDataHandle = nullptr;
+                finalRet = pTheSource->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, nullptr, &pDataHandle, nullptr);
+                if (finalRet.first)
+                {
+                    auto& vValues = factory->underlying_container_t<void*>(ExtInfoArray);
+                    vValues[i] = pDataHandle;
+                }
+            }
+            else
+            if (eType == CTL_ArrayFactory::arrayTag::FrameSingleType) // This is a frame
+            {
+                TW_FRAME oneFrame = {};
+                if (bTypesMatch) // Only do this if the types match up.
+                    finalRet = pTheSource->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, &oneFrame, nullptr);
+                dynarithmic::TWFRAMEToDTWAINFRAME(oneFrame, ExtInfoArray);
+            }
+            else
+            {
+                finalRet = pTheSource->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, factory->get_buffer(ExtInfoArray, i), nullptr);
+            }
+        }
+        dynarithmic::MoveArray(pHandle, Data, &ExtInfoArray);
+        if (!finalRet.first)
+        {
+            // Error occurred
+            return { finalRet.second, false };
+        }
+    }
+    else
+    {
+        // Info already filled, so get the cached information
+        auto pr = GetCachedExtImageInfoData(pHandle, pTheSource, nWhich, Data);
+        if (!pr.first)
+        {
+			LogWriterUtils::WriteLogInfoIndentedA("Could not get cached ExtImageInfo");
+            return { pr.second, false };
+        }
+    }
+    return { true, DTWAIN_NO_ERROR };
+}
+
+/* Returns the data for a specified Extended Image Info type.  Note that this can only be used in State 7 of the source,
+   and after DTWAIN_InitExtImageInfo() has been called*/
+std::pair<bool, int> dynarithmic::GetCachedExtImageInfoData(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG nWhich, LPDTWAIN_ARRAY Data)
+{
+    LONG ItemType = 0;
+    LONG ReturnCode = 0;
+
+    // If the ext image info item does not exist for the source, return an error.
+    DTWAIN_GetExtImageInfoItemEx(pSource, nWhich, nullptr, nullptr, &ItemType, &ReturnCode);
+    if (ReturnCode == TWRC_DATANOTAVAILABLE)
+        return { false, DTWAIN_ERR_UNAVAILABLE_EXTINFO };
+    else
+    if (ReturnCode == TWRC_INFONOTSUPPORTED)
+        return { false, DTWAIN_ERR_UNSUPPORTED_EXTINFO };
+
+    // Get the extended image info block containing the cached data.
+    auto* pExtendedImageInfo = pSource->GetExtendedImageInfo();
+    DTWAIN_ARRAY theArray = nullptr;
+
+    // Get the Extended Image Info item.
+    switch (nWhich)
+    {
+        case TWEI_BARCODECONFIDENCE:
+        case TWEI_BARCODECOUNT:
+        case TWEI_BARCODEX:
+        case TWEI_BARCODEY:
+        case TWEI_BARCODEROTATION:
+        case TWEI_BARCODETEXT:
+        case TWEI_BARCODETEXTLENGTH:                
+        case TWEI_BARCODETYPE:
+            theArray = pExtendedImageInfo->GetBarcodeInfo(nWhich);
+        break;
+
+        case TWEI_CAMERA:
+        case TWEI_BOOKNAME:
+        case TWEI_CHAPTERNUMBER:
+        case TWEI_DOCUMENTNUMBER:
+        case TWEI_PAGENUMBER:
+        case TWEI_FRAMENUMBER:
+        case TWEI_PIXELFLAVOR:
+        case TWEI_FRAME:
+            theArray = pExtendedImageInfo->GetPageSourceInfo(nWhich);
+        break;
+
+        case TWEI_DESKEWSTATUS:
+        case TWEI_SKEWORIGINALANGLE:
+        case TWEI_SKEWFINALANGLE:
+        case TWEI_SKEWCONFIDENCE:
+        case TWEI_SKEWWINDOWX1:
+        case TWEI_SKEWWINDOWX2:
+        case TWEI_SKEWWINDOWX3:
+        case TWEI_SKEWWINDOWX4:
+        case TWEI_SKEWWINDOWY1:
+        case TWEI_SKEWWINDOWY2:
+        case TWEI_SKEWWINDOWY3:
+        case TWEI_SKEWWINDOWY4:
+            theArray = pExtendedImageInfo->GetSkewInfo(nWhich);
+        break;
+
+        case TWEI_DESHADECOUNT:
+        case TWEI_DESHADELEFT:
+        case TWEI_DESHADETOP:
+        case TWEI_DESHADEWIDTH:
+        case TWEI_DESHADEHEIGHT:
+        case TWEI_DESHADESIZE:
+        case TWEI_DESHADEBLACKCOUNTOLD:
+        case TWEI_DESHADEBLACKCOUNTNEW:
+        case TWEI_DESHADEBLACKRLMIN:
+        case TWEI_DESHADEBLACKRLMAX:
+        case TWEI_DESHADEWHITECOUNTOLD:
+        case TWEI_DESHADEWHITECOUNTNEW:
+        case TWEI_DESHADEWHITERLMIN:
+        case TWEI_DESHADEWHITERLMAX:
+        case TWEI_DESHADEWHITERLAVE:
+            theArray = pExtendedImageInfo->GetShaderAreaInfo(nWhich);
+        break;
+
+        case TWEI_SPECKLESREMOVED:
+        case TWEI_BLACKSPECKLESREMOVED:
+        case TWEI_WHITESPECKLESREMOVED:
+            theArray = pExtendedImageInfo->GetSpeckleRemovalInfo(nWhich);
+        break;
+
+        case TWEI_HORZLINECOUNT:
+        case TWEI_VERTLINECOUNT:
+        case TWEI_HORZLINEXCOORD:
+        case TWEI_HORZLINEYCOORD:
+        case TWEI_HORZLINELENGTH:
+        case TWEI_HORZLINETHICKNESS:
+        case TWEI_VERTLINEXCOORD:
+        case TWEI_VERTLINEYCOORD:
+        case TWEI_VERTLINELENGTH:
+        case TWEI_VERTLINETHICKNESS:
+            theArray = pExtendedImageInfo->GetHorizontalVerticalLineInfo(nWhich);
+        break;
+
+        case TWEI_FORMTEMPLATEMATCH:
+        case TWEI_FORMTEMPLATEPAGEMATCH:
+        case TWEI_FORMHORZDOCOFFSET:
+        case TWEI_FORMVERTDOCOFFSET:
+        case TWEI_FORMCONFIDENCE:
+            theArray = pExtendedImageInfo->GetFillFormsRecognitionInfo(nWhich);
+        break;
+
+        case TWEI_ICCPROFILE:
+        case TWEI_LASTSEGMENT:
+        case TWEI_SEGMENTNUMBER:
+            theArray = pExtendedImageInfo->GetImageSegmentationInfo(nWhich);
+        break;
+
+        case TWEI_ENDORSEDTEXT:
+            theArray = pExtendedImageInfo->GetEndorsedTextInfo(nWhich);
+        break;
+
+        case TWEI_MAGTYPE:
+            theArray = pExtendedImageInfo->GetExtendedImageInfo20(nWhich);
+        break;
+
+        case TWEI_MAGDATALENGTH:
+        case TWEI_MAGDATA:
+        case TWEI_FILESYSTEMSOURCE:
+        case TWEI_PAGESIDE:
+        case TWEI_IMAGEMERGED:
+            theArray = pExtendedImageInfo->GetExtendedImageInfo21(nWhich);
+        break;
+
+        case TWEI_PAPERCOUNT:
+            theArray = pExtendedImageInfo->GetExtendedImageInfo22(nWhich);
+        break;
+
+        case TWEI_PRINTERTEXT:
+            theArray = pExtendedImageInfo->GetExtendedImageInfo23(nWhich);
+        break;
+
+        case TWEI_TWAINDIRECTMETADATA:
+            theArray = pExtendedImageInfo->GetExtendedImageInfo24(nWhich);
+        break;
+
+        case TWEI_IAFIELDA_VALUE:
+        case TWEI_IAFIELDB_VALUE:
+        case TWEI_IAFIELDC_VALUE:
+        case TWEI_IAFIELDD_VALUE:
+        case TWEI_IAFIELDE_VALUE:
+        case TWEI_IALEVEL:
+        case TWEI_PRINTER:
+        case TWEI_BARCODETEXT2:
+            theArray = pExtendedImageInfo->GetExtendedImageInfo25(nWhich);
+        break;
+
+        case TWEI_PATCHCODE:
+            theArray = pExtendedImageInfo->GetPatchCodeInfo(nWhich);
+        break;
+    }
+
+    if (theArray)
+    {
+        *Data = theArray;
+        return { true, DTWAIN_NO_ERROR };
+    }
+    return { false, DTWAIN_ERR_MEM };
+}
+

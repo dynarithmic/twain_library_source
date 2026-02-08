@@ -840,4 +840,3 @@ std::string CTL_ErrorStructDecoder::DecodeTW_INFO(pTW_INFO pInfo, LPCSTR pMem)
     }
     return sTemp;
 }
-#endif
