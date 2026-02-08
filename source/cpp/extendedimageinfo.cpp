@@ -99,26 +99,26 @@ bool ExtendedImageInformation::FillBarcodeInfo()
     }
 
     // Get the barcode count information
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_BARCODECOUNT, &aCount);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_BARCODECOUNT, &aCount);
     auto vect = CreateContainerFromArray<std::vector<TW_UINT32>>(pHandle, aCount, 1);
     if (vect.empty() || vect.front() == 0)
         return true;
     m_InfoBlock.m_barcodeInfo.count = vect.front();
 
     // Get the barcode details
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_BARCODEX, &aCountX);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_BARCODEX, &aCountX);
     m_InfoBlock.m_barcodeInfo.vXCoordinate = CreateContainerFromArray<std::vector<TW_UINT32>>(pHandle, aCountX);
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_BARCODEY, &aCountY);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_BARCODEY, &aCountY);
     m_InfoBlock.m_barcodeInfo.vYCoordinate = CreateContainerFromArray<std::vector<TW_UINT32>>(pHandle, aCountY);
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_BARCODETYPE, &aType);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_BARCODETYPE, &aType);
     m_InfoBlock.m_barcodeInfo.vType = CreateContainerFromArray<std::vector<TW_UINT32>>(pHandle, aType);
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_BARCODEROTATION, &aRotation);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_BARCODEROTATION, &aRotation);
     m_InfoBlock.m_barcodeInfo.vRotation = CreateContainerFromArray<std::vector<TW_UINT32>>(pHandle, aRotation);
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_BARCODECONFIDENCE, &aConfidence);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_BARCODECONFIDENCE, &aConfidence);
     m_InfoBlock.m_barcodeInfo.vConfidence = CreateContainerFromArray<std::vector<TW_UINT32>>(pHandle, aConfidence);
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_BARCODETEXTLENGTH, &aTextLength);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_BARCODETEXTLENGTH, &aTextLength);
     m_InfoBlock.m_barcodeInfo.vLength = CreateContainerFromArray<std::vector<TW_UINT32>>(pHandle, aTextLength);
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_BARCODETEXT, &aText);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_BARCODETEXT, &aText);
 
     int lastLen = 0;
 
@@ -153,7 +153,7 @@ bool ExtendedImageInformation::FillPageSourceInfo()
 
     for (size_t i = 0; i < stringItems.size(); ++i)
     {
-        DTWAIN_GetExtImageInfoData(m_theSource, stringItems[i], &aValues);
+        GetExtImageInfoDataInternal(m_theSource, stringItems[i], &aValues);
         if (!aValues)
             continue;
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<std::string>(aValues);
@@ -167,7 +167,7 @@ bool ExtendedImageInformation::FillPageSourceInfo()
 
         for (size_t i = 0; i < intItems.size(); ++i)
         {
-            DTWAIN_GetExtImageInfoData(m_theSource, intItems[i], &aValues);
+            GetExtImageInfoDataInternal(m_theSource, intItems[i], &aValues);
             if (!aValues)
                 continue;
             auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
@@ -182,7 +182,7 @@ bool ExtendedImageInformation::FillPageSourceInfo()
 
         for (size_t i = 0; i < intItems.size(); ++i)
         {
-            DTWAIN_GetExtImageInfoData(m_theSource, intItems[i], &aValues);
+            GetExtImageInfoDataInternal(m_theSource, intItems[i], &aValues);
             if (!aValues)
                 continue;
             auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
@@ -195,7 +195,7 @@ bool ExtendedImageInformation::FillPageSourceInfo()
     }
 
     // Get the frame
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_FRAME, &aValues);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_FRAME, &aValues);
     if (aValues)
     {
         auto& vFrames = pHandle->m_ArrayFactory->underlying_container_t<TwainFrameInternal>(aValues);
@@ -244,7 +244,7 @@ bool ExtendedImageInformation::FillSkewInfo()
 
     for (size_t i = 0; i < intItems.size(); ++i)
     {
-        DTWAIN_GetExtImageInfoData(m_theSource, intItems[i], &aValues);
+        GetExtImageInfoDataInternal(m_theSource, intItems[i], &aValues);
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<DWORD>(aValues);
         if (!vValues.empty())
             *(refInts[i]) = vValues.front();
@@ -264,7 +264,7 @@ bool ExtendedImageInformation::FillShadedAreaInfo()
 
     // Get the count information
     LONG shadeCount = 0;
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_DESHADECOUNT, &aValues);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_DESHADECOUNT, &aValues);
     if (!aValues)
         return true;
 
@@ -310,7 +310,7 @@ bool ExtendedImageInformation::FillShadedAreaInfo()
     for (size_t i = 0; i < intItems.size(); ++i)
     {
         auto* curVect = ptrVect[i];
-        DTWAIN_GetExtImageInfoData(m_theSource, intItems[i], &aValues);
+        GetExtImageInfoDataInternal(m_theSource, intItems[i], &aValues);
         *curVect = CreateContainerFromArray<std::vector<TW_UINT32>>(pHandle, aValues);
     }
     std::for_each(ptrVect.begin(), ptrVect.end(), [&](auto* pVect) { pVect->resize(m_InfoBlock.m_shadedInfo.count);  });
@@ -335,7 +335,7 @@ bool ExtendedImageInformation::FillSpeckleRemovalInfo()
                                           &m_InfoBlock.m_speckleRemoval.whiteSpecklesRemoved };
     for (size_t i = 0; i < intItems.size(); ++i)
     {
-        DTWAIN_GetExtImageInfoData(m_theSource, intItems[i], &aValues);
+        GetExtImageInfoDataInternal(m_theSource, intItems[i], &aValues);
         if (!aValues)
             continue;
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<DWORD>(aValues);
@@ -356,7 +356,7 @@ bool ExtendedImageInformation::GenericFillLineInfo(ExtendedImageInfo_LineDetecti
 
     // Get the count information
     LONG lineCount = 0;
-    DTWAIN_GetExtImageInfoData(m_theSource, itemCountType, &aValues);
+    GetExtImageInfoDataInternal(m_theSource, itemCountType, &aValues);
     if (!aValues)
         return true;
     auto pHandle = m_theSource->GetDTWAINHandle();
@@ -385,7 +385,7 @@ bool ExtendedImageInformation::GenericFillLineInfo(ExtendedImageInfo_LineDetecti
 
     for (size_t i = 0; i < intItems.size(); ++i)
     {
-        DTWAIN_GetExtImageInfoData(m_theSource, intItems[i], &aAllValues[i]);
+        GetExtImageInfoDataInternal(m_theSource, intItems[i], &aAllValues[i]);
         if (aAllValues[i])
         {
             auto& vValues2 = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aAllValues[i]);
@@ -439,7 +439,7 @@ bool ExtendedImageInformation::FillFormsRecognitionInfo()
     DTWAINArrayPtr_RAII raii(m_theSource->GetDTWAINHandle(), &aValues);
 
     // Get the template match information
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_FORMTEMPLATEMATCH, &aValues);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_FORMTEMPLATEMATCH, &aValues);
     m_InfoBlock.m_formsRecognitionInfo.m_vTemplateMatch = CreateContainerFromArray<std::vector<std::string>>(pHandle, aValues);
 
     static constexpr std::array<int32_t, 4> intTypes = { TWEI_FORMCONFIDENCE, TWEI_FORMTEMPLATEPAGEMATCH, TWEI_FORMHORZDOCOFFSET, TWEI_FORMVERTDOCOFFSET };
@@ -447,7 +447,7 @@ bool ExtendedImageInformation::FillFormsRecognitionInfo()
                                                         &m_InfoBlock.m_formsRecognitionInfo.m_vHorizontalDocOffset, &m_InfoBlock.m_formsRecognitionInfo.m_vVerticalDocOffset };
     for (size_t i = 0; i < intTypes.size(); ++i)
     {
-        DTWAIN_GetExtImageInfoData(m_theSource, intTypes[i], &aValues);
+        GetExtImageInfoDataInternal(m_theSource, intTypes[i], &aValues);
         *(ptrVects[i]) = CreateContainerFromArray<std::vector<TW_UINT32>>(pHandle, aValues);
     }
     return true;
@@ -463,7 +463,7 @@ bool ExtendedImageInformation::FillImageSegmentationInfo()
     DTWAIN_ARRAY aValues = {};
     DTWAINArrayPtr_RAII raii(m_theSource->GetDTWAINHandle(), &aValues);
 
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_ICCPROFILE, &aValues);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_ICCPROFILE, &aValues);
     if (aValues)
     {
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<std::string>(aValues);
@@ -471,7 +471,7 @@ bool ExtendedImageInformation::FillImageSegmentationInfo()
             m_InfoBlock.m_imageSementationInfo.m_sICCProfile = vValues.front();
     }
 
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_LASTSEGMENT, &aValues);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_LASTSEGMENT, &aValues);
     if (aValues)
     {
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
@@ -479,7 +479,7 @@ bool ExtendedImageInformation::FillImageSegmentationInfo()
             m_InfoBlock.m_imageSementationInfo.m_bLastSegment = static_cast<TW_BOOL>(vValues.front());
     }
 
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_SEGMENTNUMBER, &aValues);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_SEGMENTNUMBER, &aValues);
     if (aValues)
     {
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<DWORD>(aValues);
@@ -498,7 +498,7 @@ bool ExtendedImageInformation::FillEndorsedTextInfo()
 
     DTWAIN_ARRAY aValues = {};
     DTWAINArrayPtr_RAII raii(m_theSource->GetDTWAINHandle(), &aValues);
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_ENDORSEDTEXT, &aValues);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_ENDORSEDTEXT, &aValues);
     if (!aValues)
         return true;
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<std::string>(aValues);
@@ -515,7 +515,7 @@ bool ExtendedImageInformation::FillExtendedImageInfo20()
     DTWAIN_ARRAY aValues = {};
     DTWAINArrayPtr_RAII raii(m_theSource->GetDTWAINHandle(), &aValues);
 
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_MAGTYPE, &aValues);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_MAGTYPE, &aValues);
     if (!aValues)
         return true;
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
@@ -532,7 +532,7 @@ bool ExtendedImageInformation::FillExtendedImageInfo21()
     DTWAIN_ARRAY aValues = {};
     DTWAINArrayPtr_RAII raii(m_theSource->GetDTWAINHandle(), &aValues);
 
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_MAGDATALENGTH, &aValues);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_MAGDATALENGTH, &aValues);
     if (!aValues)
         return true;
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
@@ -542,7 +542,7 @@ bool ExtendedImageInformation::FillExtendedImageInfo21()
         magDataLength = vValues[0];
 
         // Get the mag data
-        DTWAIN_GetExtImageInfoData(m_theSource, TWEI_MAGDATA, &aValues);
+        GetExtImageInfoDataInternal(m_theSource, TWEI_MAGDATA, &aValues);
         LONG nCount = DTWAIN_ArrayGetCount(aValues);
         DTWAIN_HANDLE sHandle = NULL;
         if (nCount > 0)
@@ -570,7 +570,7 @@ bool ExtendedImageInformation::FillExtendedImageInfo21()
                 GlobalFree(sHandle);
         }
     }
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_FILESYSTEMSOURCE, &aValues);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_FILESYSTEMSOURCE, &aValues);
     if (aValues)
     {
         auto& vValues2 = pHandle->m_ArrayFactory->underlying_container_t<std::string>(aValues);
@@ -578,7 +578,7 @@ bool ExtendedImageInformation::FillExtendedImageInfo21()
             m_InfoBlock.m_extendedImageInfo21.m_fileSystemSource = vValues2.front();
     }
 
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_PAGESIDE, &aValues);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_PAGESIDE, &aValues);
     if (aValues)
     {
         auto& vValues2 = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
@@ -586,7 +586,7 @@ bool ExtendedImageInformation::FillExtendedImageInfo21()
             m_InfoBlock.m_extendedImageInfo21.m_pageSide = static_cast<TW_UINT16>(vValues2.front());
     }
 
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_IMAGEMERGED, &aValues);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_IMAGEMERGED, &aValues);
     if (aValues)
     {
         auto& vValues2 = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
@@ -604,7 +604,7 @@ bool ExtendedImageInformation::FillExtendedImageInfo22()
     DTWAIN_ARRAY aValues = {};
     DTWAINArrayPtr_RAII raii(m_theSource->GetDTWAINHandle(), &aValues);
 
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_PAPERCOUNT, &aValues);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_PAPERCOUNT, &aValues);
     if (!aValues)
         return true;
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);
@@ -621,7 +621,7 @@ bool ExtendedImageInformation::FillExtendedImageInfo23()
     DTWAIN_ARRAY aValues = {};
     DTWAINArrayPtr_RAII raii(m_theSource->GetDTWAINHandle(), &aValues);
 
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_PRINTERTEXT, &aValues);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_PRINTERTEXT, &aValues);
     if (!aValues)
         return true;
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<std::string>(aValues);
@@ -638,7 +638,7 @@ bool ExtendedImageInformation::FillExtendedImageInfo24()
     DTWAIN_ARRAY aValues = {};
     DTWAINArrayPtr_RAII raii(m_theSource->GetDTWAINHandle(), &aValues);
 
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_TWAINDIRECTMETADATA, &aValues);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_TWAINDIRECTMETADATA, &aValues);
     if (!aValues)
         return true;
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<DTWAIN_HANDLE>(aValues);
@@ -678,7 +678,7 @@ bool ExtendedImageInformation::FillExtendedImageInfo25()
 
     for (size_t i = 0; i < aValue.size(); ++i)
     {
-        bool bOk = DTWAIN_GetExtImageInfoData(m_theSource, intTypes[i], &aValue[i]);
+        bool bOk = GetExtImageInfoDataInternal(m_theSource, intTypes[i], &aValue[i]).first;
         if (!bOk)
             continue;
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<std::string>(aValue[i]);
@@ -690,7 +690,7 @@ bool ExtendedImageInformation::FillExtendedImageInfo25()
     std::array<TW_UINT16*, 2> ptrInt = { &m_InfoBlock.m_extendedImageInfo25.m_ImageAddressing.m_iaLevel, &m_InfoBlock.m_extendedImageInfo25.m_printer };
     for (size_t i = 0; i < int16Types.size(); ++i)
     {
-        bool bOk = DTWAIN_GetExtImageInfoData(m_theSource, int16Types[i], &aValue[i]);
+        bool bOk = GetExtImageInfoDataInternal(m_theSource, int16Types[i], &aValue[i]).first;
         if (!bOk)
             continue;
         auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValue[i]);
@@ -698,7 +698,7 @@ bool ExtendedImageInformation::FillExtendedImageInfo25()
             *(ptrInt[i]) = static_cast<TW_UINT16>(vValues.front());
     }
 
-    bool bOk = DTWAIN_GetExtImageInfoData(m_theSource, TWEI_BARCODETEXT2, &aValue[0]);
+    bool bOk = GetExtImageInfoDataInternal(m_theSource, TWEI_BARCODETEXT2, &aValue[0]).first;
     if (!bOk)
         return true;
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<DTWAIN_HANDLE>(aValue[0]);
@@ -745,7 +745,7 @@ bool ExtendedImageInformation::FillPatchCodeInfo()
     auto pHandle = m_theSource->GetDTWAINHandle();
     DTWAIN_ARRAY aValues = {};
     DTWAINArrayPtr_RAII raii(m_theSource->GetDTWAINHandle(), &aValues);
-    DTWAIN_GetExtImageInfoData(m_theSource, TWEI_PATCHCODE, &aValues);
+    GetExtImageInfoDataInternal(m_theSource, TWEI_PATCHCODE, &aValues);
     if (!aValues)
         return true;
     auto& vValues = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aValues);

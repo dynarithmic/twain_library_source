@@ -31,6 +31,8 @@
     Chapter 9, "Extended Image Information Definitions*/
 namespace dynarithmic
 {
+    std::pair<bool, int> GetExtImageInfoDataInternal(DTWAIN_SOURCE Source, LONG nWhich, LPDTWAIN_ARRAY Data);
+
     struct ExtendedImageInfo_Barcode
     {
         TW_UINT32 count = 0;

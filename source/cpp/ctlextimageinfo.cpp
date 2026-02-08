@@ -21,6 +21,7 @@
 #include "errorcheck.h"
 #include "ctltr038.h"
 #include "twain.h"
+#include "extendedimageinfo.h"
 using namespace dynarithmic;
 /* These functions can only be used in State 7   (when DTWAIN_TN_TRANSFERDONE notification is sent).
    This means that only languages that can utilize DTWAIN_SetCallback or can intercept Window's
@@ -546,6 +547,14 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
 
 	DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !Data; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
 
+    auto retValue = GetExtImageInfoDataInternal(Source, nWhich, Data);
+    LOG_FUNC_EXIT_NONAME_PARAMS(retValue.first)
+    CATCH_BLOCK(false)
+}
+std::pair<bool, int> dynarithmic::GetExtImageInfoDataInternal(DTWAIN_SOURCE Source, LONG nWhich, LPDTWAIN_ARRAY Data)
+{
+    CTL_ITwainSource* pTheSource = static_cast<CTL_ITwainSource*>(Source);
+    CTL_TwainDLLHandle* pHandle = pTheSource->GetDTWAINHandle();
     // We clear the user array here, since we do not want to 
     // report information back to user if capability is not supported
     bool bArrayExists = pHandle->m_ArrayFactory->is_valid(*Data);
@@ -559,6 +568,13 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
     {
         // Get the info 
         TW_INFO Info = pTheSource->GetExtImageInfoItem(nWhich, DTWAIN_BYID);
+		// Log the current information
+		if (CTL_StaticData::GetLogFilterFlags())
+		{
+			std::string sTWInfo = CTL_ErrorStructDecoder::DecodeTW_INFO(&Info, nullptr);
+			sTWInfo = "TW_Info: " + sTWInfo;
+			LogWriterUtils::WriteLogInfoIndentedA(sTWInfo);
+		}
 
         // Check if the info type is supported
         bool bNotSupported = false;
@@ -574,7 +590,16 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
             nErrorCode = DTWAIN_ERR_UNSUPPORTED_EXTINFO;
             bNotSupported = true;
         }
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return bNotSupported; }, nErrorCode, false, FUNC_MACRO);
+
+        if (bNotSupported)
+        {
+            if (CTL_StaticData::GetLogFilterFlags())
+            {
+                std::string msg = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, Info.InfoID).second;
+                LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(-nErrorCode) + " " + msg);
+            }
+            return { false, nErrorCode };
+        }
 
         // Check if type returned by device is what the TWAIN specification indicates
         auto lTypeReportedByDevice = Info.ItemType;
@@ -596,7 +621,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
             // We return an error if the TWAIN spec has been violated for any required types that have to match
             auto iter = std::find(aRequiredTypeMatches.begin(), aRequiredTypeMatches.end(), nWhich);
             if (iter != aRequiredTypeMatches.end())
-                DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return true; }, DTWAIN_ERR_EXTIMAGEINFO_DATATYPE_MISMATCH, false, FUNC_MACRO);
+            {
+				std::string msg = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, Info.InfoID).second;
+				LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(-DTWAIN_ERR_EXTIMAGEINFO_DATATYPE_MISMATCH) + " " + msg);
+                return { false, DTWAIN_ERR_EXTIMAGEINFO_DATATYPE_MISMATCH };
+            }
 
             // If the mismatch type is TW_FRAME, we should fake it out and pretend that the types match
             if (Info.InfoID == TWEI_FRAME)
@@ -605,7 +634,15 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
 
         auto retVal = CreateArrayFromFactory(pHandle, ExtImageInfoArrayType(Info.ItemType), 0);
 
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !retVal.second; }, retVal.first, false, FUNC_MACRO);
+        if (!retVal.second)
+        {
+            if (CTL_StaticData::GetLogFilterFlags())
+            {
+                std::string msg = CTL_StaticData::GetTwainNameFromConstantA(DTWAIN_CONSTANT_TWEI, Info.InfoID).second;
+                LogWriterUtils::WriteLogInfoIndentedA(GetResourceStringFromMap(-DTWAIN_ERR_ARRAYTYPE_MISMATCH) + " " + msg);
+            }
+            return { retVal.first, DTWAIN_ERR_ARRAYTYPE_MISMATCH };
+        }
         auto ExtInfoArray = retVal.second;
 
         auto Count = Info.NumItems;
@@ -655,23 +692,24 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetExtImageInfoData(DTWAIN_SOURCE Source, LONG n
                 finalRet = pTheSource->GetExtImageInfoData(nWhich, DTWAIN_BYID, i, factory->get_buffer(ExtInfoArray, i), nullptr);
             }
         }
-        MoveArray(pHandle, Data, &ExtInfoArray);
+        dynarithmic::MoveArray(pHandle, Data, &ExtInfoArray);
         if (!finalRet.first)
         {
             // Error occurred
-            CTL_TwainAppMgr::SetError(finalRet.second, "", false);
-            LOG_FUNC_EXIT_NONAME_PARAMS(false)
+            return { finalRet.second, false };
         }
     }
     else
     {
         // Info already filled, so get the cached information
-        auto pr = GetCachedExtImageInfoData(pHandle, pSource, nWhich, Data);
-        // Check if succeeded
-        DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !pr.first; }, pr.second, false, FUNC_MACRO);
+        auto pr = GetCachedExtImageInfoData(pHandle, pTheSource, nWhich, Data);
+        if (!pr.first)
+        {
+			LogWriterUtils::WriteLogInfoIndentedA("Could not get cached ExtImageInfo");
+            return { pr.second, false };
+        }
     }
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK(false)
+    return { true, DTWAIN_NO_ERROR };
 }
 
 // Uninitializes the Extended Image information interface.  This also must be called. 
