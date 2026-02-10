@@ -2089,15 +2089,6 @@ LONG DLLENTRY_DEF DTWAIN_GetVersionCopyright(LPTSTR lpszVer, LONG nLength)
     CATCH_BLOCK(-1)
 }
 
-LONG DLLENTRY_DEF DTWAIN_GetTwainStringName(LONG category, LONG TwainID, LPTSTR lpszBuffer, LONG nMaxLen)
-{
-    LOG_FUNC_ENTRY_PARAMS((category, TwainID, lpszBuffer, nMaxLen))
-    const LONG RetVal = DTWAIN_GetTwainNameFromConstant(category, TwainID, lpszBuffer, nMaxLen);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszBuffer))
-    LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
-    CATCH_BLOCK(-1)
-}
-
 LONG DLLENTRY_DEF DTWAIN_GetConstantFromTwainName(LPCTSTR lpszBuffer)
 {
     LOG_FUNC_ENTRY_PARAMS((lpszBuffer))
