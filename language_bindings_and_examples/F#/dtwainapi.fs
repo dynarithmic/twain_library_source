@@ -3245,20 +3245,8 @@ module TwainAPI =
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
     type DTWAIN_GetTwainAvailabilityExDelegate = delegate of System.Text.StringBuilder * LONG -> LONG
 
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
-    type DTWAIN_GetTwainCountryNameDelegate = delegate of LONG * System.Text.StringBuilder -> BOOL
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
-    type DTWAIN_GetTwainCountryValueDelegate = delegate of string -> LONG
-
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetTwainHwndDelegate = delegate of unit -> HWND
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
-    type DTWAIN_GetTwainLanguageNameDelegate = delegate of LONG * System.Text.StringBuilder -> BOOL
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
-    type DTWAIN_GetTwainLanguageValueDelegate = delegate of string -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetTwainModeDelegate = delegate of unit -> LONG
@@ -3268,9 +3256,6 @@ module TwainAPI =
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
     type DTWAIN_GetTwainNameFromConstantExDelegate = delegate of LONG * LONG * System.Text.StringBuilder * LONG -> LONG
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
-    type DTWAIN_GetTwainStringNameDelegate = delegate of LONG * LONG * System.Text.StringBuilder * LONG -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetTwainTimeoutDelegate = delegate of unit -> LONG
@@ -4724,15 +4709,10 @@ module TwainAPI =
     let private GetTwainAppIDEx = lazy (DynamicDll.Bind "DTWAIN_GetTwainAppIDEx" : DTWAIN_GetTwainAppIDExDelegate)
     let private GetTwainAvailability = lazy (DynamicDll.Bind "DTWAIN_GetTwainAvailability" : DTWAIN_GetTwainAvailabilityDelegate)
     let private GetTwainAvailabilityEx = lazy (DynamicDll.Bind "DTWAIN_GetTwainAvailabilityEx" : DTWAIN_GetTwainAvailabilityExDelegate)
-    let private GetTwainCountryName = lazy (DynamicDll.Bind "DTWAIN_GetTwainCountryName" : DTWAIN_GetTwainCountryNameDelegate)
-    let private GetTwainCountryValue = lazy (DynamicDll.Bind "DTWAIN_GetTwainCountryValue" : DTWAIN_GetTwainCountryValueDelegate)
     let private GetTwainHwnd = lazy (DynamicDll.Bind "DTWAIN_GetTwainHwnd" : DTWAIN_GetTwainHwndDelegate)
-    let private GetTwainLanguageName = lazy (DynamicDll.Bind "DTWAIN_GetTwainLanguageName" : DTWAIN_GetTwainLanguageNameDelegate)
-    let private GetTwainLanguageValue = lazy (DynamicDll.Bind "DTWAIN_GetTwainLanguageValue" : DTWAIN_GetTwainLanguageValueDelegate)
     let private GetTwainMode = lazy (DynamicDll.Bind "DTWAIN_GetTwainMode" : DTWAIN_GetTwainModeDelegate)
     let private GetTwainNameFromConstant = lazy (DynamicDll.Bind "DTWAIN_GetTwainNameFromConstant" : DTWAIN_GetTwainNameFromConstantDelegate)
     let private GetTwainNameFromConstantEx = lazy (DynamicDll.Bind "DTWAIN_GetTwainNameFromConstantEx" : DTWAIN_GetTwainNameFromConstantExDelegate)
-    let private GetTwainStringName = lazy (DynamicDll.Bind "DTWAIN_GetTwainStringName" : DTWAIN_GetTwainStringNameDelegate)
     let private GetTwainTimeout = lazy (DynamicDll.Bind "DTWAIN_GetTwainTimeout" : DTWAIN_GetTwainTimeoutDelegate)
     let private GetVersion = lazy (DynamicDll.Bind "DTWAIN_GetVersion" : DTWAIN_GetVersionDelegate)
     let private GetVersionCopyright = lazy (DynamicDll.Bind "DTWAIN_GetVersionCopyright" : DTWAIN_GetVersionCopyrightDelegate)
@@ -6946,25 +6926,9 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetTwainAvailabilityEx.Value.Invoke(directories, nmaxlen)
 
-    let DTWAIN_GetTwainCountryName (countryid: LONG) (szname: System.Text.StringBuilder) : BOOL =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        GetTwainCountryName.Value.Invoke(countryid, szname)
-
-    let DTWAIN_GetTwainCountryValue (country: string) : LONG =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        GetTwainCountryValue.Value.Invoke(country)
-
     let DTWAIN_GetTwainHwnd() : HWND =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetTwainHwnd.Value.Invoke()
-
-    let DTWAIN_GetTwainLanguageName (nameid: LONG) (szname: System.Text.StringBuilder) : BOOL =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        GetTwainLanguageName.Value.Invoke(nameid, szname)
-
-    let DTWAIN_GetTwainLanguageValue (szname: string) : LONG =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        GetTwainLanguageValue.Value.Invoke(szname)
 
     let DTWAIN_GetTwainMode() : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
@@ -6977,10 +6941,6 @@ module TwainAPI =
     let DTWAIN_GetTwainNameFromConstantEx (lconstanttype: LONG) (ltwainconstant: LONG) (lpszout: System.Text.StringBuilder) (nsize: LONG) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetTwainNameFromConstantEx.Value.Invoke(lconstanttype, ltwainconstant, lpszout, nsize)
-
-    let DTWAIN_GetTwainStringName (category: LONG) (twainid: LONG) (lpszbuffer: System.Text.StringBuilder) (nmaxlen: LONG) : LONG =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        GetTwainStringName.Value.Invoke(category, twainid, lpszbuffer, nmaxlen)
 
     let DTWAIN_GetTwainTimeout() : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

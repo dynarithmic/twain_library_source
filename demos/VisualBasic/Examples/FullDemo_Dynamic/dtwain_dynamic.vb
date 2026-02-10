@@ -3302,20 +3302,8 @@ Namespace Dynarithmic
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
         Private Delegate Function DTWAIN_GetTwainAvailabilityExDelegate(<MarshalAs(UnmanagedType.LPTStr)> directories As StringBuilder, nMaxLen As Integer) As Integer
         
-        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
-        Private Delegate Function DTWAIN_GetTwainCountryNameDelegate(countryId As Integer, <MarshalAs(UnmanagedType.LPTStr)> szName As StringBuilder) As Integer
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
-        Private Delegate Function DTWAIN_GetTwainCountryValueDelegate(country As String) As Integer
-        
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetTwainHwndDelegate() As System.IntPtr
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
-        Private Delegate Function DTWAIN_GetTwainLanguageNameDelegate(nameId As Integer, <MarshalAs(UnmanagedType.LPTStr)> szName As StringBuilder) As Integer
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
-        Private Delegate Function DTWAIN_GetTwainLanguageValueDelegate(szName As String) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetTwainModeDelegate() As Integer
@@ -3325,9 +3313,6 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
         Private Delegate Function DTWAIN_GetTwainNameFromConstantExDelegate(lConstantType As Integer, lTwainConstant As Integer, <MarshalAs(UnmanagedType.LPTStr)> lpszOut As StringBuilder, nSize As Integer) As Integer
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
-        Private Delegate Function DTWAIN_GetTwainStringNameDelegate(category As Integer, TwainID As Integer, <MarshalAs(UnmanagedType.LPTStr)> lpszBuffer As StringBuilder, nMaxLen As Integer) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_GetTwainTimeoutDelegate() As Integer
@@ -6189,24 +6174,8 @@ Namespace Dynarithmic
         Return api.DTWAIN_GetTwainAvailabilityEx(directories, nMaxLen)
         End Function
         
-        Public Function DTWAIN_GetTwainCountryName(countryId As Integer, <MarshalAs(UnmanagedType.LPTStr)> szName As StringBuilder) As Integer
-        Return api.DTWAIN_GetTwainCountryName(countryId, szName)
-        End Function
-        
-        Public Function DTWAIN_GetTwainCountryValue(country As String) As Integer
-        Return api.DTWAIN_GetTwainCountryValue(country)
-        End Function
-        
         Public Function DTWAIN_GetTwainHwnd() As System.IntPtr
         Return api.DTWAIN_GetTwainHwnd()
-        End Function
-        
-        Public Function DTWAIN_GetTwainLanguageName(nameId As Integer, <MarshalAs(UnmanagedType.LPTStr)> szName As StringBuilder) As Integer
-        Return api.DTWAIN_GetTwainLanguageName(nameId, szName)
-        End Function
-        
-        Public Function DTWAIN_GetTwainLanguageValue(szName As String) As Integer
-        Return api.DTWAIN_GetTwainLanguageValue(szName)
         End Function
         
         Public Function DTWAIN_GetTwainMode() As Integer
@@ -6219,10 +6188,6 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_GetTwainNameFromConstantEx(lConstantType As Integer, lTwainConstant As Integer, <MarshalAs(UnmanagedType.LPTStr)> lpszOut As StringBuilder, nSize As Integer) As Integer
         Return api.DTWAIN_GetTwainNameFromConstantEx(lConstantType, lTwainConstant, lpszOut, nSize)
-        End Function
-        
-        Public Function DTWAIN_GetTwainStringName(category As Integer, TwainID As Integer, <MarshalAs(UnmanagedType.LPTStr)> lpszBuffer As StringBuilder, nMaxLen As Integer) As Integer
-        Return api.DTWAIN_GetTwainStringName(category, TwainID, lpszBuffer, nMaxLen)
         End Function
         
         Public Function DTWAIN_GetTwainTimeout() As Integer
@@ -8029,15 +7994,10 @@ Namespace Dynarithmic
             Public DTWAIN_GetTwainAppID As DTWAIN_GetTwainAppIDDelegate
             Public DTWAIN_GetTwainAvailability As DTWAIN_GetTwainAvailabilityDelegate
             Public DTWAIN_GetTwainAvailabilityEx As DTWAIN_GetTwainAvailabilityExDelegate
-            Public DTWAIN_GetTwainCountryName As DTWAIN_GetTwainCountryNameDelegate
-            Public DTWAIN_GetTwainCountryValue As DTWAIN_GetTwainCountryValueDelegate
             Public DTWAIN_GetTwainHwnd As DTWAIN_GetTwainHwndDelegate
-            Public DTWAIN_GetTwainLanguageName As DTWAIN_GetTwainLanguageNameDelegate
-            Public DTWAIN_GetTwainLanguageValue As DTWAIN_GetTwainLanguageValueDelegate
             Public DTWAIN_GetTwainMode As DTWAIN_GetTwainModeDelegate
             Public DTWAIN_GetTwainNameFromConstant As DTWAIN_GetTwainNameFromConstantDelegate
             Public DTWAIN_GetTwainNameFromConstantEx As DTWAIN_GetTwainNameFromConstantExDelegate
-            Public DTWAIN_GetTwainStringName As DTWAIN_GetTwainStringNameDelegate
             Public DTWAIN_GetTwainTimeout As DTWAIN_GetTwainTimeoutDelegate
             Public DTWAIN_GetVersion As DTWAIN_GetVersionDelegate
             Public DTWAIN_GetVersionCopyright As DTWAIN_GetVersionCopyrightDelegate

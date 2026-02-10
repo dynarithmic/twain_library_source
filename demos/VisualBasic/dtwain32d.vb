@@ -2202,15 +2202,10 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetTwainAppID Lib "dtwain32d.dll" () As System.IntPtr
     Public Declare Function DTWAIN_GetTwainAvailability Lib "dtwain32d.dll" () As Integer
     Public Declare Ansi Function DTWAIN_GetTwainAvailabilityEx Lib "dtwain32d.dll" (<MarshalAs(UnmanagedType.LPStr)> directories As StringBuilder, nMaxLen As Integer) As Integer
-    Public Declare Ansi Function DTWAIN_GetTwainCountryName Lib "dtwain32d.dll" (countryId As Integer, <MarshalAs(UnmanagedType.LPStr)> szName As StringBuilder) As Integer
-    Public Declare Ansi Function DTWAIN_GetTwainCountryValue Lib "dtwain32d.dll" (country As String) As Integer
     Public Declare Function DTWAIN_GetTwainHwnd Lib "dtwain32d.dll" () As System.IntPtr
-    Public Declare Ansi Function DTWAIN_GetTwainLanguageName Lib "dtwain32d.dll" (nameId As Integer, <MarshalAs(UnmanagedType.LPStr)> szName As StringBuilder) As Integer
-    Public Declare Ansi Function DTWAIN_GetTwainLanguageValue Lib "dtwain32d.dll" (szName As String) As Integer
     Public Declare Function DTWAIN_GetTwainMode Lib "dtwain32d.dll" () As Integer
     Public Declare Ansi Function DTWAIN_GetTwainNameFromConstant Lib "dtwain32d.dll" (lConstantType As Integer, lTwainConstant As Integer, <MarshalAs(UnmanagedType.LPStr)> lpszOut As StringBuilder, nSize As Integer) As Integer
     Public Declare Ansi Function DTWAIN_GetTwainNameFromConstantEx Lib "dtwain32d.dll" (lConstantType As Integer, lTwainConstant As Integer, <MarshalAs(UnmanagedType.LPStr)> lpszOut As StringBuilder, nSize As Integer) As Integer
-    Public Declare Ansi Function DTWAIN_GetTwainStringName Lib "dtwain32d.dll" (category As Integer, TwainID As Integer, <MarshalAs(UnmanagedType.LPStr)> lpszBuffer As StringBuilder, nMaxLen As Integer) As Integer
     Public Declare Function DTWAIN_GetTwainTimeout Lib "dtwain32d.dll" () As Integer
     Public Declare Function DTWAIN_GetVersion Lib "dtwain32d.dll" (ByRef lpMajor As Integer, ByRef lpMinor As Integer, ByRef lpVersionType As Integer) As Integer
     Public Declare Ansi Function DTWAIN_GetVersionCopyright Lib "dtwain32d.dll" (<MarshalAs(UnmanagedType.LPStr)> lpszApp As StringBuilder, nLength As Integer) As Integer

@@ -679,19 +679,7 @@ type DtwaingettwainavailabilityFunc = unsafe extern "C" fn() -> i32;
 type DtwaingettwainavailabilityexFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
 type DtwaingettwainavailabilityexaFunc = unsafe extern "C" fn(*mut c_char,i32) -> i32;
 type DtwaingettwainavailabilityexwFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
-type DtwaingettwaincountrynameFunc = unsafe extern "C" fn(i32,*mut u16) -> i32;
-type DtwaingettwaincountrynameaFunc = unsafe extern "C" fn(i32,*mut c_char) -> i32;
-type DtwaingettwaincountrynamewFunc = unsafe extern "C" fn(i32,*mut u16) -> i32;
-type DtwaingettwaincountryvalueFunc = unsafe extern "C" fn(*const u16) -> i32;
-type DtwaingettwaincountryvalueaFunc = unsafe extern "C" fn(*const c_char) -> i32;
-type DtwaingettwaincountryvaluewFunc = unsafe extern "C" fn(*const u16) -> i32;
 type DtwaingettwainhwndFunc = unsafe extern "C" fn() -> *const c_void;
-type DtwaingettwainlanguagenameFunc = unsafe extern "C" fn(i32,*mut u16) -> i32;
-type DtwaingettwainlanguagenameaFunc = unsafe extern "C" fn(i32,*mut c_char) -> i32;
-type DtwaingettwainlanguagenamewFunc = unsafe extern "C" fn(i32,*mut u16) -> i32;
-type DtwaingettwainlanguagevalueFunc = unsafe extern "C" fn(*const u16) -> i32;
-type DtwaingettwainlanguagevalueaFunc = unsafe extern "C" fn(*const c_char) -> i32;
-type DtwaingettwainlanguagevaluewFunc = unsafe extern "C" fn(*const u16) -> i32;
 type DtwaingettwainmodeFunc = unsafe extern "C" fn() -> i32;
 type DtwaingettwainnamefromconstantFunc = unsafe extern "C" fn(i32,i32,*mut u16,i32) -> i32;
 type DtwaingettwainnamefromconstantaFunc = unsafe extern "C" fn(i32,i32,*mut c_char,i32) -> i32;
@@ -699,9 +687,6 @@ type DtwaingettwainnamefromconstantexFunc = unsafe extern "C" fn(i32,i32,*mut u1
 type DtwaingettwainnamefromconstantexaFunc = unsafe extern "C" fn(i32,i32,*mut c_char,i32) -> i32;
 type DtwaingettwainnamefromconstantexwFunc = unsafe extern "C" fn(i32,i32,*mut u16,i32) -> i32;
 type DtwaingettwainnamefromconstantwFunc = unsafe extern "C" fn(i32,i32,*mut u16,i32) -> i32;
-type DtwaingettwainstringnameFunc = unsafe extern "C" fn(i32,i32,*mut u16,i32) -> i32;
-type DtwaingettwainstringnameaFunc = unsafe extern "C" fn(i32,i32,*mut c_char,i32) -> i32;
-type DtwaingettwainstringnamewFunc = unsafe extern "C" fn(i32,i32,*mut u16,i32) -> i32;
 type DtwaingettwaintimeoutFunc = unsafe extern "C" fn() -> i32;
 type DtwaingetversionFunc = unsafe extern "C" fn(*mut i32,*mut i32,*mut i32) -> i32;
 type DtwaingetversioncopyrightFunc = unsafe extern "C" fn(*mut u16,i32) -> i32;
@@ -1815,19 +1800,7 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetTwainAvailabilityExFunc: Symbol<'a, DtwaingettwainavailabilityexFunc>,
     DTWAIN_GetTwainAvailabilityExAFunc: Symbol<'a, DtwaingettwainavailabilityexaFunc>,
     DTWAIN_GetTwainAvailabilityExWFunc: Symbol<'a, DtwaingettwainavailabilityexwFunc>,
-    DTWAIN_GetTwainCountryNameFunc: Symbol<'a, DtwaingettwaincountrynameFunc>,
-    DTWAIN_GetTwainCountryNameAFunc: Symbol<'a, DtwaingettwaincountrynameaFunc>,
-    DTWAIN_GetTwainCountryNameWFunc: Symbol<'a, DtwaingettwaincountrynamewFunc>,
-    DTWAIN_GetTwainCountryValueFunc: Symbol<'a, DtwaingettwaincountryvalueFunc>,
-    DTWAIN_GetTwainCountryValueAFunc: Symbol<'a, DtwaingettwaincountryvalueaFunc>,
-    DTWAIN_GetTwainCountryValueWFunc: Symbol<'a, DtwaingettwaincountryvaluewFunc>,
     DTWAIN_GetTwainHwndFunc: Symbol<'a, DtwaingettwainhwndFunc>,
-    DTWAIN_GetTwainLanguageNameFunc: Symbol<'a, DtwaingettwainlanguagenameFunc>,
-    DTWAIN_GetTwainLanguageNameAFunc: Symbol<'a, DtwaingettwainlanguagenameaFunc>,
-    DTWAIN_GetTwainLanguageNameWFunc: Symbol<'a, DtwaingettwainlanguagenamewFunc>,
-    DTWAIN_GetTwainLanguageValueFunc: Symbol<'a, DtwaingettwainlanguagevalueFunc>,
-    DTWAIN_GetTwainLanguageValueAFunc: Symbol<'a, DtwaingettwainlanguagevalueaFunc>,
-    DTWAIN_GetTwainLanguageValueWFunc: Symbol<'a, DtwaingettwainlanguagevaluewFunc>,
     DTWAIN_GetTwainModeFunc: Symbol<'a, DtwaingettwainmodeFunc>,
     DTWAIN_GetTwainNameFromConstantFunc: Symbol<'a, DtwaingettwainnamefromconstantFunc>,
     DTWAIN_GetTwainNameFromConstantAFunc: Symbol<'a, DtwaingettwainnamefromconstantaFunc>,
@@ -1835,9 +1808,6 @@ pub struct DTwainAPI<'a>
     DTWAIN_GetTwainNameFromConstantExAFunc: Symbol<'a, DtwaingettwainnamefromconstantexaFunc>,
     DTWAIN_GetTwainNameFromConstantExWFunc: Symbol<'a, DtwaingettwainnamefromconstantexwFunc>,
     DTWAIN_GetTwainNameFromConstantWFunc: Symbol<'a, DtwaingettwainnamefromconstantwFunc>,
-    DTWAIN_GetTwainStringNameFunc: Symbol<'a, DtwaingettwainstringnameFunc>,
-    DTWAIN_GetTwainStringNameAFunc: Symbol<'a, DtwaingettwainstringnameaFunc>,
-    DTWAIN_GetTwainStringNameWFunc: Symbol<'a, DtwaingettwainstringnamewFunc>,
     DTWAIN_GetTwainTimeoutFunc: Symbol<'a, DtwaingettwaintimeoutFunc>,
     DTWAIN_GetVersionFunc: Symbol<'a, DtwaingetversionFunc>,
     DTWAIN_GetVersionCopyrightFunc: Symbol<'a, DtwaingetversioncopyrightFunc>,
@@ -4590,19 +4560,7 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetTwainAvailabilityEx: Symbol<DtwaingettwainavailabilityexFunc> = unsafe { library.get(b"DTWAIN_GetTwainAvailabilityEx")? };
         let DTWAIN_GetTwainAvailabilityExA: Symbol<DtwaingettwainavailabilityexaFunc> = unsafe { library.get(b"DTWAIN_GetTwainAvailabilityExA")? };
         let DTWAIN_GetTwainAvailabilityExW: Symbol<DtwaingettwainavailabilityexwFunc> = unsafe { library.get(b"DTWAIN_GetTwainAvailabilityExW")? };
-        let DTWAIN_GetTwainCountryName: Symbol<DtwaingettwaincountrynameFunc> = unsafe { library.get(b"DTWAIN_GetTwainCountryName")? };
-        let DTWAIN_GetTwainCountryNameA: Symbol<DtwaingettwaincountrynameaFunc> = unsafe { library.get(b"DTWAIN_GetTwainCountryNameA")? };
-        let DTWAIN_GetTwainCountryNameW: Symbol<DtwaingettwaincountrynamewFunc> = unsafe { library.get(b"DTWAIN_GetTwainCountryNameW")? };
-        let DTWAIN_GetTwainCountryValue: Symbol<DtwaingettwaincountryvalueFunc> = unsafe { library.get(b"DTWAIN_GetTwainCountryValue")? };
-        let DTWAIN_GetTwainCountryValueA: Symbol<DtwaingettwaincountryvalueaFunc> = unsafe { library.get(b"DTWAIN_GetTwainCountryValueA")? };
-        let DTWAIN_GetTwainCountryValueW: Symbol<DtwaingettwaincountryvaluewFunc> = unsafe { library.get(b"DTWAIN_GetTwainCountryValueW")? };
         let DTWAIN_GetTwainHwnd: Symbol<DtwaingettwainhwndFunc> = unsafe { library.get(b"DTWAIN_GetTwainHwnd")? };
-        let DTWAIN_GetTwainLanguageName: Symbol<DtwaingettwainlanguagenameFunc> = unsafe { library.get(b"DTWAIN_GetTwainLanguageName")? };
-        let DTWAIN_GetTwainLanguageNameA: Symbol<DtwaingettwainlanguagenameaFunc> = unsafe { library.get(b"DTWAIN_GetTwainLanguageNameA")? };
-        let DTWAIN_GetTwainLanguageNameW: Symbol<DtwaingettwainlanguagenamewFunc> = unsafe { library.get(b"DTWAIN_GetTwainLanguageNameW")? };
-        let DTWAIN_GetTwainLanguageValue: Symbol<DtwaingettwainlanguagevalueFunc> = unsafe { library.get(b"DTWAIN_GetTwainLanguageValue")? };
-        let DTWAIN_GetTwainLanguageValueA: Symbol<DtwaingettwainlanguagevalueaFunc> = unsafe { library.get(b"DTWAIN_GetTwainLanguageValueA")? };
-        let DTWAIN_GetTwainLanguageValueW: Symbol<DtwaingettwainlanguagevaluewFunc> = unsafe { library.get(b"DTWAIN_GetTwainLanguageValueW")? };
         let DTWAIN_GetTwainMode: Symbol<DtwaingettwainmodeFunc> = unsafe { library.get(b"DTWAIN_GetTwainMode")? };
         let DTWAIN_GetTwainNameFromConstant: Symbol<DtwaingettwainnamefromconstantFunc> = unsafe { library.get(b"DTWAIN_GetTwainNameFromConstant")? };
         let DTWAIN_GetTwainNameFromConstantA: Symbol<DtwaingettwainnamefromconstantaFunc> = unsafe { library.get(b"DTWAIN_GetTwainNameFromConstantA")? };
@@ -4610,9 +4568,6 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_GetTwainNameFromConstantExA: Symbol<DtwaingettwainnamefromconstantexaFunc> = unsafe { library.get(b"DTWAIN_GetTwainNameFromConstantExA")? };
         let DTWAIN_GetTwainNameFromConstantExW: Symbol<DtwaingettwainnamefromconstantexwFunc> = unsafe { library.get(b"DTWAIN_GetTwainNameFromConstantExW")? };
         let DTWAIN_GetTwainNameFromConstantW: Symbol<DtwaingettwainnamefromconstantwFunc> = unsafe { library.get(b"DTWAIN_GetTwainNameFromConstantW")? };
-        let DTWAIN_GetTwainStringName: Symbol<DtwaingettwainstringnameFunc> = unsafe { library.get(b"DTWAIN_GetTwainStringName")? };
-        let DTWAIN_GetTwainStringNameA: Symbol<DtwaingettwainstringnameaFunc> = unsafe { library.get(b"DTWAIN_GetTwainStringNameA")? };
-        let DTWAIN_GetTwainStringNameW: Symbol<DtwaingettwainstringnamewFunc> = unsafe { library.get(b"DTWAIN_GetTwainStringNameW")? };
         let DTWAIN_GetTwainTimeout: Symbol<DtwaingettwaintimeoutFunc> = unsafe { library.get(b"DTWAIN_GetTwainTimeout")? };
         let DTWAIN_GetVersion: Symbol<DtwaingetversionFunc> = unsafe { library.get(b"DTWAIN_GetVersion")? };
         let DTWAIN_GetVersionCopyright: Symbol<DtwaingetversioncopyrightFunc> = unsafe { library.get(b"DTWAIN_GetVersionCopyright")? };
@@ -5725,19 +5680,7 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetTwainAvailabilityExFunc: DTWAIN_GetTwainAvailabilityEx,
             DTWAIN_GetTwainAvailabilityExAFunc: DTWAIN_GetTwainAvailabilityExA,
             DTWAIN_GetTwainAvailabilityExWFunc: DTWAIN_GetTwainAvailabilityExW,
-            DTWAIN_GetTwainCountryNameFunc: DTWAIN_GetTwainCountryName,
-            DTWAIN_GetTwainCountryNameAFunc: DTWAIN_GetTwainCountryNameA,
-            DTWAIN_GetTwainCountryNameWFunc: DTWAIN_GetTwainCountryNameW,
-            DTWAIN_GetTwainCountryValueFunc: DTWAIN_GetTwainCountryValue,
-            DTWAIN_GetTwainCountryValueAFunc: DTWAIN_GetTwainCountryValueA,
-            DTWAIN_GetTwainCountryValueWFunc: DTWAIN_GetTwainCountryValueW,
             DTWAIN_GetTwainHwndFunc: DTWAIN_GetTwainHwnd,
-            DTWAIN_GetTwainLanguageNameFunc: DTWAIN_GetTwainLanguageName,
-            DTWAIN_GetTwainLanguageNameAFunc: DTWAIN_GetTwainLanguageNameA,
-            DTWAIN_GetTwainLanguageNameWFunc: DTWAIN_GetTwainLanguageNameW,
-            DTWAIN_GetTwainLanguageValueFunc: DTWAIN_GetTwainLanguageValue,
-            DTWAIN_GetTwainLanguageValueAFunc: DTWAIN_GetTwainLanguageValueA,
-            DTWAIN_GetTwainLanguageValueWFunc: DTWAIN_GetTwainLanguageValueW,
             DTWAIN_GetTwainModeFunc: DTWAIN_GetTwainMode,
             DTWAIN_GetTwainNameFromConstantFunc: DTWAIN_GetTwainNameFromConstant,
             DTWAIN_GetTwainNameFromConstantAFunc: DTWAIN_GetTwainNameFromConstantA,
@@ -5745,9 +5688,6 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_GetTwainNameFromConstantExAFunc: DTWAIN_GetTwainNameFromConstantExA,
             DTWAIN_GetTwainNameFromConstantExWFunc: DTWAIN_GetTwainNameFromConstantExW,
             DTWAIN_GetTwainNameFromConstantWFunc: DTWAIN_GetTwainNameFromConstantW,
-            DTWAIN_GetTwainStringNameFunc: DTWAIN_GetTwainStringName,
-            DTWAIN_GetTwainStringNameAFunc: DTWAIN_GetTwainStringNameA,
-            DTWAIN_GetTwainStringNameWFunc: DTWAIN_GetTwainStringNameW,
             DTWAIN_GetTwainTimeoutFunc: DTWAIN_GetTwainTimeout,
             DTWAIN_GetVersionFunc: DTWAIN_GetVersion,
             DTWAIN_GetVersionCopyrightFunc: DTWAIN_GetVersionCopyright,
@@ -8759,56 +8699,8 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_GetTwainAvailabilityExWFunc)(szDirectories, nLength);  }
     }
 
-    pub fn DTWAIN_GetTwainCountryName(&self, countryId: i32, szName: *mut u16) -> i32 {
-        unsafe { return (self.DTWAIN_GetTwainCountryNameFunc)(countryId, szName);  }
-    }
-
-    pub fn DTWAIN_GetTwainCountryNameA(&self, countryId: i32, szName: *mut c_char) -> i32 {
-        unsafe { return (self.DTWAIN_GetTwainCountryNameAFunc)(countryId, szName);  }
-    }
-
-    pub fn DTWAIN_GetTwainCountryNameW(&self, countryId: i32, szName: *mut u16) -> i32 {
-        unsafe { return (self.DTWAIN_GetTwainCountryNameWFunc)(countryId, szName);  }
-    }
-
-    pub fn DTWAIN_GetTwainCountryValue(&self, country: *const u16) -> i32 {
-        unsafe { return (self.DTWAIN_GetTwainCountryValueFunc)(country);  }
-    }
-
-    pub fn DTWAIN_GetTwainCountryValueA(&self, country: *const c_char) -> i32 {
-        unsafe { return (self.DTWAIN_GetTwainCountryValueAFunc)(country);  }
-    }
-
-    pub fn DTWAIN_GetTwainCountryValueW(&self, country: *const u16) -> i32 {
-        unsafe { return (self.DTWAIN_GetTwainCountryValueWFunc)(country);  }
-    }
-
     pub fn DTWAIN_GetTwainHwnd(&self) -> *const c_void {
         unsafe { return (self.DTWAIN_GetTwainHwndFunc)();  }
-    }
-
-    pub fn DTWAIN_GetTwainLanguageName(&self, nameId: i32, szName: *mut u16) -> i32 {
-        unsafe { return (self.DTWAIN_GetTwainLanguageNameFunc)(nameId, szName);  }
-    }
-
-    pub fn DTWAIN_GetTwainLanguageNameA(&self, lang: i32, szName: *mut c_char) -> i32 {
-        unsafe { return (self.DTWAIN_GetTwainLanguageNameAFunc)(lang, szName);  }
-    }
-
-    pub fn DTWAIN_GetTwainLanguageNameW(&self, lang: i32, szName: *mut u16) -> i32 {
-        unsafe { return (self.DTWAIN_GetTwainLanguageNameWFunc)(lang, szName);  }
-    }
-
-    pub fn DTWAIN_GetTwainLanguageValue(&self, szName: *const u16) -> i32 {
-        unsafe { return (self.DTWAIN_GetTwainLanguageValueFunc)(szName);  }
-    }
-
-    pub fn DTWAIN_GetTwainLanguageValueA(&self, lang: *const c_char) -> i32 {
-        unsafe { return (self.DTWAIN_GetTwainLanguageValueAFunc)(lang);  }
-    }
-
-    pub fn DTWAIN_GetTwainLanguageValueW(&self, lang: *const u16) -> i32 {
-        unsafe { return (self.DTWAIN_GetTwainLanguageValueWFunc)(lang);  }
     }
 
     pub fn DTWAIN_GetTwainMode(&self) -> i32 {
@@ -8837,18 +8729,6 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_GetTwainNameFromConstantW(&self, lConstantType: i32, lTwainConstant: i32, lpszOut: *mut u16, nSize: i32) -> i32 {
         unsafe { return (self.DTWAIN_GetTwainNameFromConstantWFunc)(lConstantType, lTwainConstant, lpszOut, nSize);  }
-    }
-
-    pub fn DTWAIN_GetTwainStringName(&self, category: i32, TwainID: i32, lpszBuffer: *mut u16, nMaxLen: i32) -> i32 {
-        unsafe { return (self.DTWAIN_GetTwainStringNameFunc)(category, TwainID, lpszBuffer, nMaxLen);  }
-    }
-
-    pub fn DTWAIN_GetTwainStringNameA(&self, category: i32, TwainID: i32, lpszBuffer: *mut c_char, nMaxLen: i32) -> i32 {
-        unsafe { return (self.DTWAIN_GetTwainStringNameAFunc)(category, TwainID, lpszBuffer, nMaxLen);  }
-    }
-
-    pub fn DTWAIN_GetTwainStringNameW(&self, category: i32, TwainID: i32, lpszBuffer: *mut u16, nMaxLen: i32) -> i32 {
-        unsafe { return (self.DTWAIN_GetTwainStringNameWFunc)(category, TwainID, lpszBuffer, nMaxLen);  }
     }
 
     pub fn DTWAIN_GetTwainTimeout(&self) -> i32 {

@@ -2203,15 +2203,10 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_GetTwainAppID Lib "dtwain32ud.dll" () As System.IntPtr
     Public Declare Function DTWAIN_GetTwainAvailability Lib "dtwain32ud.dll" () As Integer
     Public Declare Unicode Function DTWAIN_GetTwainAvailabilityEx Lib "dtwain32ud.dll" (<MarshalAs(UnmanagedType.LPTStr)> directories As StringBuilder, nMaxLen As Integer) As Integer
-    Public Declare Unicode Function DTWAIN_GetTwainCountryName Lib "dtwain32ud.dll" (countryId As Integer, <MarshalAs(UnmanagedType.LPTStr)> szName As StringBuilder) As Integer
-    Public Declare Unicode Function DTWAIN_GetTwainCountryValue Lib "dtwain32ud.dll" (country As String) As Integer
     Public Declare Function DTWAIN_GetTwainHwnd Lib "dtwain32ud.dll" () As System.IntPtr
-    Public Declare Unicode Function DTWAIN_GetTwainLanguageName Lib "dtwain32ud.dll" (nameId As Integer, <MarshalAs(UnmanagedType.LPTStr)> szName As StringBuilder) As Integer
-    Public Declare Unicode Function DTWAIN_GetTwainLanguageValue Lib "dtwain32ud.dll" (szName As String) As Integer
     Public Declare Function DTWAIN_GetTwainMode Lib "dtwain32ud.dll" () As Integer
     Public Declare Unicode Function DTWAIN_GetTwainNameFromConstant Lib "dtwain32ud.dll" (lConstantType As Integer, lTwainConstant As Integer, <MarshalAs(UnmanagedType.LPTStr)> lpszOut As StringBuilder, nSize As Integer) As Integer
     Public Declare Unicode Function DTWAIN_GetTwainNameFromConstantEx Lib "dtwain32ud.dll" (lConstantType As Integer, lTwainConstant As Integer, <MarshalAs(UnmanagedType.LPTStr)> lpszOut As StringBuilder, nSize As Integer) As Integer
-    Public Declare Unicode Function DTWAIN_GetTwainStringName Lib "dtwain32ud.dll" (category As Integer, TwainID As Integer, <MarshalAs(UnmanagedType.LPTStr)> lpszBuffer As StringBuilder, nMaxLen As Integer) As Integer
     Public Declare Function DTWAIN_GetTwainTimeout Lib "dtwain32ud.dll" () As Integer
     Public Declare Function DTWAIN_GetVersion Lib "dtwain32ud.dll" (ByRef lpMajor As Integer, ByRef lpMinor As Integer, ByRef lpVersionType As Integer) As Integer
     Public Declare Unicode Function DTWAIN_GetVersionCopyright Lib "dtwain32ud.dll" (<MarshalAs(UnmanagedType.LPTStr)> lpszApp As StringBuilder, nLength As Integer) As Integer

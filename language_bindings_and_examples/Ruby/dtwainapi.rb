@@ -767,19 +767,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_GetTwainAvailabilityEx
    attr_reader :DTWAIN_GetTwainAvailabilityExA
    attr_reader :DTWAIN_GetTwainAvailabilityExW
-   attr_reader :DTWAIN_GetTwainCountryName
-   attr_reader :DTWAIN_GetTwainCountryNameA
-   attr_reader :DTWAIN_GetTwainCountryNameW
-   attr_reader :DTWAIN_GetTwainCountryValue
-   attr_reader :DTWAIN_GetTwainCountryValueA
-   attr_reader :DTWAIN_GetTwainCountryValueW
    attr_reader :DTWAIN_GetTwainHwnd
-   attr_reader :DTWAIN_GetTwainLanguageName
-   attr_reader :DTWAIN_GetTwainLanguageNameA
-   attr_reader :DTWAIN_GetTwainLanguageNameW
-   attr_reader :DTWAIN_GetTwainLanguageValue
-   attr_reader :DTWAIN_GetTwainLanguageValueA
-   attr_reader :DTWAIN_GetTwainLanguageValueW
    attr_reader :DTWAIN_GetTwainMode
    attr_reader :DTWAIN_GetTwainNameFromConstant
    attr_reader :DTWAIN_GetTwainNameFromConstantA
@@ -787,9 +775,6 @@ class DTWAINAPI
    attr_reader :DTWAIN_GetTwainNameFromConstantExA
    attr_reader :DTWAIN_GetTwainNameFromConstantExW
    attr_reader :DTWAIN_GetTwainNameFromConstantW
-   attr_reader :DTWAIN_GetTwainStringName
-   attr_reader :DTWAIN_GetTwainStringNameA
-   attr_reader :DTWAIN_GetTwainStringNameW
    attr_reader :DTWAIN_GetTwainTimeout
    attr_reader :DTWAIN_GetVersion
    attr_reader :DTWAIN_GetVersionCopyright
@@ -3578,19 +3563,7 @@ class DTWAINAPI
        @DTWAIN_GetTwainAvailabilityEx = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainAvailabilityEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetTwainAvailabilityExA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainAvailabilityExA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetTwainAvailabilityExW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainAvailabilityExW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
-       @DTWAIN_GetTwainCountryName = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainCountryName'],[Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
-       @DTWAIN_GetTwainCountryNameA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainCountryNameA'],[Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
-       @DTWAIN_GetTwainCountryNameW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainCountryNameW'],[Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
-       @DTWAIN_GetTwainCountryValue = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainCountryValue'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
-       @DTWAIN_GetTwainCountryValueA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainCountryValueA'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
-       @DTWAIN_GetTwainCountryValueW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainCountryValueW'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
        @DTWAIN_GetTwainHwnd = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainHwnd'],[],Fiddle::TYPE_VOIDP)
-       @DTWAIN_GetTwainLanguageName = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainLanguageName'],[Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
-       @DTWAIN_GetTwainLanguageNameA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainLanguageNameA'],[Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
-       @DTWAIN_GetTwainLanguageNameW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainLanguageNameW'],[Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
-       @DTWAIN_GetTwainLanguageValue = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainLanguageValue'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
-       @DTWAIN_GetTwainLanguageValueA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainLanguageValueA'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
-       @DTWAIN_GetTwainLanguageValueW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainLanguageValueW'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
        @DTWAIN_GetTwainMode = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainMode'],[],Fiddle::TYPE_LONG)
        @DTWAIN_GetTwainNameFromConstant = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainNameFromConstant'],[Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetTwainNameFromConstantA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainNameFromConstantA'],[Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
@@ -3598,9 +3571,6 @@ class DTWAINAPI
        @DTWAIN_GetTwainNameFromConstantExA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainNameFromConstantExA'],[Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetTwainNameFromConstantExW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainNameFromConstantExW'],[Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetTwainNameFromConstantW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainNameFromConstantW'],[Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
-       @DTWAIN_GetTwainStringName = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainStringName'],[Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
-       @DTWAIN_GetTwainStringNameA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainStringNameA'],[Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
-       @DTWAIN_GetTwainStringNameW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainStringNameW'],[Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetTwainTimeout = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainTimeout'],[],Fiddle::TYPE_LONG)
        @DTWAIN_GetVersion = Fiddle::Function::new(dtwain_dll['DTWAIN_GetVersion'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetVersionCopyright = Fiddle::Function::new(dtwain_dll['DTWAIN_GetVersionCopyright'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
