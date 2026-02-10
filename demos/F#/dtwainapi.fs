@@ -2682,12 +2682,6 @@ module TwainAPI =
     type DTWAIN_FlushAcquiredPagesDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_ForceAcquireBitDepthDelegate = delegate of DTWAIN_SOURCE * LONG -> DTWAIN_BOOL
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_ForceScanOnNoUIDelegate = delegate of DTWAIN_SOURCE * BOOL -> DTWAIN_BOOL
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_FrameCreateDelegate = delegate of DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT -> DTWAIN_FRAME
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
@@ -4521,8 +4515,6 @@ module TwainAPI =
     let private FeedPage = lazy (DynamicDll.Bind "DTWAIN_FeedPage" : DTWAIN_FeedPageDelegate)
     let private FlipBitmap = lazy (DynamicDll.Bind "DTWAIN_FlipBitmap" : DTWAIN_FlipBitmapDelegate)
     let private FlushAcquiredPages = lazy (DynamicDll.Bind "DTWAIN_FlushAcquiredPages" : DTWAIN_FlushAcquiredPagesDelegate)
-    let private ForceAcquireBitDepth = lazy (DynamicDll.Bind "DTWAIN_ForceAcquireBitDepth" : DTWAIN_ForceAcquireBitDepthDelegate)
-    let private ForceScanOnNoUI = lazy (DynamicDll.Bind "DTWAIN_ForceScanOnNoUI" : DTWAIN_ForceScanOnNoUIDelegate)
     let private FrameCreate = lazy (DynamicDll.Bind "DTWAIN_FrameCreate" : DTWAIN_FrameCreateDelegate)
     let private FrameCreateString = lazy (DynamicDll.Bind "DTWAIN_FrameCreateString" : DTWAIN_FrameCreateStringDelegate)
     let private FrameDestroy = lazy (DynamicDll.Bind "DTWAIN_FrameDestroy" : DTWAIN_FrameDestroyDelegate)
@@ -6173,14 +6165,6 @@ module TwainAPI =
     let DTWAIN_FlushAcquiredPages (source: DTWAIN_SOURCE) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         FlushAcquiredPages.Value.Invoke(source)
-
-    let DTWAIN_ForceAcquireBitDepth (source: DTWAIN_SOURCE) (bitdepth: LONG) : DTWAIN_BOOL =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        ForceAcquireBitDepth.Value.Invoke(source, bitdepth)
-
-    let DTWAIN_ForceScanOnNoUI (source: DTWAIN_SOURCE) (bset: BOOL) : DTWAIN_BOOL =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        ForceScanOnNoUI.Value.Invoke(source, bset)
 
     let DTWAIN_FrameCreate (left: DTWAIN_FLOAT) (top: DTWAIN_FLOAT) (right: DTWAIN_FLOAT) (bottom: DTWAIN_FLOAT) : DTWAIN_FRAME =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

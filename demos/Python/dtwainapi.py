@@ -2084,8 +2084,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_FeedPage.restype = ct.c_long
      theDLL.DTWAIN_FlipBitmap.restype = ct.c_long
      theDLL.DTWAIN_FlushAcquiredPages.restype = ct.c_long
-     theDLL.DTWAIN_ForceAcquireBitDepth.restype = ct.c_long
-     theDLL.DTWAIN_ForceScanOnNoUI.restype = ct.c_long
      theDLL.DTWAIN_FrameCreate.restype = ct.c_void_p
      theDLL.DTWAIN_FrameCreateString.restype = ct.c_void_p
      theDLL.DTWAIN_FrameCreateStringA.restype = ct.c_void_p
@@ -3196,8 +3194,6 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_FeedPage.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_FlipBitmap.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_FlushAcquiredPages.argtypes = [ct.c_void_p]
-     theDLL.DTWAIN_ForceAcquireBitDepth.argtypes = [ct.c_void_p, ct.c_long]
-     theDLL.DTWAIN_ForceScanOnNoUI.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_FrameCreate.argtypes = [ct.c_double, ct.c_double, ct.c_double, ct.c_double]
      theDLL.DTWAIN_FrameCreateString.argtypes = [ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p, ct.c_wchar_p]
      theDLL.DTWAIN_FrameCreateStringA.argtypes = [ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_char_p]
@@ -4296,8 +4292,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_FeedPage.restype = ct.c_long
      theDLL.DTWAIN_FlipBitmap.restype = ct.c_long
      theDLL.DTWAIN_FlushAcquiredPages.restype = ct.c_long
-     theDLL.DTWAIN_ForceAcquireBitDepth.restype = ct.c_long
-     theDLL.DTWAIN_ForceScanOnNoUI.restype = ct.c_long
      theDLL.DTWAIN_FrameCreate.restype = ct.c_void_p
      theDLL.DTWAIN_FrameCreateString.restype = ct.c_void_p
      theDLL.DTWAIN_FrameCreateStringA.restype = ct.c_void_p
@@ -5408,8 +5402,6 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_FeedPage.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_FlipBitmap.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_FlushAcquiredPages.argtypes = [ct.c_void_p]
-     theDLL.DTWAIN_ForceAcquireBitDepth.argtypes = [ct.c_void_p, ct.c_long]
-     theDLL.DTWAIN_ForceScanOnNoUI.argtypes = [ct.c_void_p, ct.c_long]
      theDLL.DTWAIN_FrameCreate.argtypes = [ct.c_double, ct.c_double, ct.c_double, ct.c_double]
      theDLL.DTWAIN_FrameCreateString.argtypes = [ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_char_p]
      theDLL.DTWAIN_FrameCreateStringA.argtypes = [ct.c_char_p, ct.c_char_p, ct.c_char_p, ct.c_char_p]

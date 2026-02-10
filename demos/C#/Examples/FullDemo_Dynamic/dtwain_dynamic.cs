@@ -2178,8 +2178,6 @@
         public delegate int DTWAIN_FeedPageDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_FlipBitmapDelegate(HANDLE hDib);
         public delegate int DTWAIN_FlushAcquiredPagesDelegate(DTWAIN_SOURCE Source);
-        public delegate int DTWAIN_ForceAcquireBitDepthDelegate(DTWAIN_SOURCE Source, int BitDepth);
-        public delegate int DTWAIN_ForceScanOnNoUIDelegate(DTWAIN_SOURCE Source, int bSet);
         public delegate DTWAIN_FRAME DTWAIN_FrameCreateDelegate(DTWAIN_FLOAT Left, DTWAIN_FLOAT Top, DTWAIN_FLOAT Right, DTWAIN_FLOAT Bottom);
         public delegate DTWAIN_FRAME DTWAIN_FrameCreateStringDelegate([MarshalAs(UnmanagedType.LPTStr)] string Left, [MarshalAs(UnmanagedType.LPTStr)] string Top, [MarshalAs(UnmanagedType.LPTStr)] string Right, [MarshalAs(UnmanagedType.LPTStr)] string Bottom);
         public delegate int DTWAIN_FrameDestroyDelegate(DTWAIN_FRAME Frame);
@@ -3627,12 +3625,6 @@
 
         [DTWAINNativeFunction("DTWAIN_FlushAcquiredPages")]
         private readonly DTWAIN_FlushAcquiredPagesDelegate  _DTWAIN_FlushAcquiredPages;
-
-        [DTWAINNativeFunction("DTWAIN_ForceAcquireBitDepth")]
-        private readonly DTWAIN_ForceAcquireBitDepthDelegate  _DTWAIN_ForceAcquireBitDepth;
-
-        [DTWAINNativeFunction("DTWAIN_ForceScanOnNoUI")]
-        private readonly DTWAIN_ForceScanOnNoUIDelegate  _DTWAIN_ForceScanOnNoUI;
 
         [DTWAINNativeFunction("DTWAIN_FrameCreate")]
         private readonly DTWAIN_FrameCreateDelegate  _DTWAIN_FrameCreate;
@@ -6242,12 +6234,6 @@
 
         public  int DTWAIN_FlushAcquiredPages(DTWAIN_SOURCE Source)
         => _DTWAIN_FlushAcquiredPages(Source);
-
-        public  int DTWAIN_ForceAcquireBitDepth(DTWAIN_SOURCE Source, int BitDepth)
-        => _DTWAIN_ForceAcquireBitDepth(Source, BitDepth);
-
-        public  int DTWAIN_ForceScanOnNoUI(DTWAIN_SOURCE Source, int bSet)
-        => _DTWAIN_ForceScanOnNoUI(Source, bSet);
 
         public  DTWAIN_FRAME DTWAIN_FrameCreate(DTWAIN_FLOAT Left, DTWAIN_FLOAT Top, DTWAIN_FLOAT Right, DTWAIN_FLOAT Bottom)
         => _DTWAIN_FrameCreate(Left, Top, Right, Bottom);

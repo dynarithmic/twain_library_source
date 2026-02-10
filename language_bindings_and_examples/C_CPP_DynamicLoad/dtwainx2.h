@@ -377,8 +377,6 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_EXECUTEOCRWFUNC)                          
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_FEEDPAGEFUNC)                             (DTWAIN_SOURCE);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_FLIPBITMAPFUNC)                           (HANDLE);
 typedef DTWAIN_BOOL (DLLENTRY_DEF * D_FLUSHACQUIREDPAGESFUNC)                   (DTWAIN_SOURCE);
-typedef DTWAIN_BOOL (DLLENTRY_DEF * D_FORCEACQUIREBITDEPTHFUNC)                 (DTWAIN_SOURCE, LONG);
-typedef DTWAIN_BOOL (DLLENTRY_DEF * D_FORCESCANONNOUIFUNC)                      (DTWAIN_SOURCE, BOOL);
 typedef DTWAIN_FRAME (DLLENTRY_DEF * D_FRAMECREATEFUNC)                         (DTWAIN_FLOAT, DTWAIN_FLOAT, DTWAIN_FLOAT, DTWAIN_FLOAT);
 typedef DTWAIN_FRAME (DLLENTRY_DEF * D_FRAMECREATESTRINGFUNC)                   (LPCTSTR, LPCTSTR, LPCTSTR, LPCTSTR);
 typedef DTWAIN_FRAME (DLLENTRY_DEF * D_FRAMECREATESTRINGAFUNC)                  (LPCSTR, LPCSTR, LPCSTR, LPCSTR);
@@ -1519,8 +1517,6 @@ typedef DTWAIN_BOOL (DLLENTRY_DEF * D_USEMULTIPLETHREADSFUNC)                   
     STATIC D_FEEDPAGEFUNC                                   DTWAIN_FeedPage;
     STATIC D_FLIPBITMAPFUNC                                 DTWAIN_FlipBitmap;
     STATIC D_FLUSHACQUIREDPAGESFUNC                         DTWAIN_FlushAcquiredPages;
-    STATIC D_FORCEACQUIREBITDEPTHFUNC                       DTWAIN_ForceAcquireBitDepth;
-    STATIC D_FORCESCANONNOUIFUNC                            DTWAIN_ForceScanOnNoUI;
     STATIC D_FRAMECREATEFUNC                                DTWAIN_FrameCreate;
     STATIC D_FRAMECREATESTRINGFUNC                          DTWAIN_FrameCreateString;
     STATIC D_FRAMECREATESTRINGAFUNC                         DTWAIN_FrameCreateStringA;

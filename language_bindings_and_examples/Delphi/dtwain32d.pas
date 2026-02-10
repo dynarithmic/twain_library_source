@@ -2163,8 +2163,6 @@ function DTWAIN_ExecuteOCRW(Engine:DTWAIN_OCRENGINE; szFileName:LPCWSTR; nStartP
 function DTWAIN_FeedPage(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_FeedPage';
 function DTWAIN_FlipBitmap(hDib:NativeInt) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_FlipBitmap';
 function DTWAIN_FlushAcquiredPages(Source:DTWAIN_SOURCE) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_FlushAcquiredPages';
-function DTWAIN_ForceAcquireBitDepth(Source:DTWAIN_SOURCE; BitDepth:LONG) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_ForceAcquireBitDepth';
-function DTWAIN_ForceScanOnNoUI(Source:DTWAIN_SOURCE; bSet:BOOL) : BOOL; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_ForceScanOnNoUI';
 function DTWAIN_FrameCreate(Left:DTWAIN_FLOAT; Top:DTWAIN_FLOAT; Right:DTWAIN_FLOAT; Bottom:DTWAIN_FLOAT) : DTWAIN_FRAME; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_FrameCreate';
 function DTWAIN_FrameCreateString(Left:LPCTSTR; Top:LPCTSTR; Right:LPCTSTR; Bottom:LPCTSTR) : DTWAIN_FRAME; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_FrameCreateString';
 function DTWAIN_FrameCreateStringA(Left:LPCSTR; Top:LPCSTR; Right:LPCSTR; Bottom:LPCSTR) : DTWAIN_FRAME; stdcall;  external 'dtwain32d.dll'  name 'DTWAIN_FrameCreateStringA';

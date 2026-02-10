@@ -2239,8 +2239,6 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_FeedPage;
     extern(Windows) DTWAIN_BOOL function(HANDLE) DTWAIN_FlipBitmap;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_FlushAcquiredPages;
-    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_ForceAcquireBitDepth;
-    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, BOOL) DTWAIN_ForceScanOnNoUI;
     extern(Windows) DTWAIN_FRAME function(DTWAIN_FLOAT, DTWAIN_FLOAT, DTWAIN_FLOAT, DTWAIN_FLOAT) DTWAIN_FrameCreate;
     extern(Windows) DTWAIN_FRAME function(DTWAIN_CCHARPTRTYPE, DTWAIN_CCHARPTRTYPE, DTWAIN_CCHARPTRTYPE, DTWAIN_CCHARPTRTYPE) DTWAIN_FrameCreateString;
     extern(Windows) DTWAIN_FRAME function(LPCSTR, LPCSTR, LPCSTR, LPCSTR) DTWAIN_FrameCreateStringA;
@@ -3359,8 +3357,6 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_FeedPage, "DTWAIN_FeedPage");
         bindFunction(cast(void**)&DTWAIN_FlipBitmap, "DTWAIN_FlipBitmap");
         bindFunction(cast(void**)&DTWAIN_FlushAcquiredPages, "DTWAIN_FlushAcquiredPages");
-        bindFunction(cast(void**)&DTWAIN_ForceAcquireBitDepth, "DTWAIN_ForceAcquireBitDepth");
-        bindFunction(cast(void**)&DTWAIN_ForceScanOnNoUI, "DTWAIN_ForceScanOnNoUI");
         bindFunction(cast(void**)&DTWAIN_FrameCreate, "DTWAIN_FrameCreate");
         bindFunction(cast(void**)&DTWAIN_FrameCreateString, "DTWAIN_FrameCreateString");
         bindFunction(cast(void**)&DTWAIN_FrameCreateStringA, "DTWAIN_FrameCreateStringA");

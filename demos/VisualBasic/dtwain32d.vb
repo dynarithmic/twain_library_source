@@ -2016,8 +2016,6 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_FeedPage Lib "dtwain32d.dll" (Source As System.IntPtr) As Integer
     Public Declare Function DTWAIN_FlipBitmap Lib "dtwain32d.dll" (hDib As System.IntPtr) As Integer
     Public Declare Function DTWAIN_FlushAcquiredPages Lib "dtwain32d.dll" (Source As System.IntPtr) As Integer
-    Public Declare Function DTWAIN_ForceAcquireBitDepth Lib "dtwain32d.dll" (Source As System.IntPtr, BitDepth As Integer) As Integer
-    Public Declare Function DTWAIN_ForceScanOnNoUI Lib "dtwain32d.dll" (Source As System.IntPtr, bSet As Integer) As Integer
     Public Declare Function DTWAIN_FrameCreate Lib "dtwain32d.dll" (Left As System.Double, Top As System.Double, Right As System.Double, Bottom As System.Double) As System.IntPtr
     Public Declare Ansi Function DTWAIN_FrameCreateString Lib "dtwain32d.dll" (Left As String, Top As String, Right As String, Bottom As String) As System.IntPtr
     Public Declare Function DTWAIN_FrameDestroy Lib "dtwain32d.dll" (Frame As System.IntPtr) As Integer

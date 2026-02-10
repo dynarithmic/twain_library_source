@@ -2632,12 +2632,6 @@ namespace Dynarithmic
         public static extern int DTWAIN_FlushAcquiredPages(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
-        public static extern int DTWAIN_ForceAcquireBitDepth(DTWAIN_SOURCE Source, int BitDepth);
-
-        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
-        public static extern int DTWAIN_ForceScanOnNoUI(DTWAIN_SOURCE Source, int bSet);
-
-        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true)]
         public static extern DTWAIN_FRAME DTWAIN_FrameCreate(DTWAIN_FLOAT Left, DTWAIN_FLOAT Top, DTWAIN_FLOAT Right, DTWAIN_FLOAT Bottom);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Unicode, ExactSpelling = true)]

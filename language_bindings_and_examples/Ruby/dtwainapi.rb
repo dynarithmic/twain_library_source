@@ -465,8 +465,6 @@ class DTWAINAPI
    attr_reader :DTWAIN_FeedPage
    attr_reader :DTWAIN_FlipBitmap
    attr_reader :DTWAIN_FlushAcquiredPages
-   attr_reader :DTWAIN_ForceAcquireBitDepth
-   attr_reader :DTWAIN_ForceScanOnNoUI
    attr_reader :DTWAIN_FrameCreate
    attr_reader :DTWAIN_FrameCreateString
    attr_reader :DTWAIN_FrameCreateStringA
@@ -3261,8 +3259,6 @@ class DTWAINAPI
        @DTWAIN_FeedPage = Fiddle::Function::new(dtwain_dll['DTWAIN_FeedPage'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_FlipBitmap = Fiddle::Function::new(dtwain_dll['DTWAIN_FlipBitmap'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_FlushAcquiredPages = Fiddle::Function::new(dtwain_dll['DTWAIN_FlushAcquiredPages'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
-       @DTWAIN_ForceAcquireBitDepth = Fiddle::Function::new(dtwain_dll['DTWAIN_ForceAcquireBitDepth'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
-       @DTWAIN_ForceScanOnNoUI = Fiddle::Function::new(dtwain_dll['DTWAIN_ForceScanOnNoUI'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_FrameCreate = Fiddle::Function::new(dtwain_dll['DTWAIN_FrameCreate'],[Fiddle::TYPE_DOUBLE, Fiddle::TYPE_DOUBLE, Fiddle::TYPE_DOUBLE, Fiddle::TYPE_DOUBLE],Fiddle::TYPE_VOIDP)
        @DTWAIN_FrameCreateString = Fiddle::Function::new(dtwain_dll['DTWAIN_FrameCreateString'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_FrameCreateStringA = Fiddle::Function::new(dtwain_dll['DTWAIN_FrameCreateStringA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)

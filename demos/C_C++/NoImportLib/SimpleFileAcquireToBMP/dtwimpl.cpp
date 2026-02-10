@@ -384,8 +384,6 @@
     D_FEEDPAGEFUNC                                DYNDTWAIN_API::DTWAIN_FeedPage = nullptr;
     D_FLIPBITMAPFUNC                              DYNDTWAIN_API::DTWAIN_FlipBitmap = nullptr;
     D_FLUSHACQUIREDPAGESFUNC                      DYNDTWAIN_API::DTWAIN_FlushAcquiredPages = nullptr;
-    D_FORCEACQUIREBITDEPTHFUNC                    DYNDTWAIN_API::DTWAIN_ForceAcquireBitDepth = nullptr;
-    D_FORCESCANONNOUIFUNC                         DYNDTWAIN_API::DTWAIN_ForceScanOnNoUI = nullptr;
     D_FRAMECREATEFUNC                             DYNDTWAIN_API::DTWAIN_FrameCreate = nullptr;
     D_FRAMECREATESTRINGFUNC                       DYNDTWAIN_API::DTWAIN_FrameCreateString = nullptr;
     D_FRAMECREATESTRINGAFUNC                      DYNDTWAIN_API::DTWAIN_FrameCreateStringA = nullptr;
@@ -1576,8 +1574,6 @@ int LoadFunction(Fn& apifn, HMODULE hModule, const char *fnName)
           LOADFUNCTIONIMPL(DTWAIN_FeedPage, hModule);
           LOADFUNCTIONIMPL(DTWAIN_FlipBitmap, hModule);
           LOADFUNCTIONIMPL(DTWAIN_FlushAcquiredPages, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_ForceAcquireBitDepth, hModule);
-          LOADFUNCTIONIMPL(DTWAIN_ForceScanOnNoUI, hModule);
           LOADFUNCTIONIMPL(DTWAIN_FrameCreate, hModule);
           LOADFUNCTIONIMPL(DTWAIN_FrameCreateString, hModule);
           LOADFUNCTIONIMPL(DTWAIN_FrameCreateStringA, hModule);

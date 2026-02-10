@@ -377,8 +377,6 @@ type DtwainexecuteocrwFunc = unsafe extern "C" fn(*mut c_void,*const u16,i32,i32
 type DtwainfeedpageFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainflipbitmapFunc = unsafe extern "C" fn(*mut c_void) -> i32;
 type DtwainflushacquiredpagesFunc = unsafe extern "C" fn(*mut c_void) -> i32;
-type DtwainforceacquirebitdepthFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
-type DtwainforcescanonnouiFunc = unsafe extern "C" fn(*mut c_void,i32) -> i32;
 type DtwainframecreateFunc = unsafe extern "C" fn(f64,f64,f64,f64) -> *mut c_void;
 type DtwainframecreatestringFunc = unsafe extern "C" fn(*const u16,*const u16,*const u16,*const u16) -> *mut c_void;
 type DtwainframecreatestringaFunc = unsafe extern "C" fn(*const c_char,*const c_char,*const c_char,*const c_char) -> *mut c_void;
@@ -1498,8 +1496,6 @@ pub struct DTwainAPI<'a>
     DTWAIN_FeedPageFunc: Symbol<'a, DtwainfeedpageFunc>,
     DTWAIN_FlipBitmapFunc: Symbol<'a, DtwainflipbitmapFunc>,
     DTWAIN_FlushAcquiredPagesFunc: Symbol<'a, DtwainflushacquiredpagesFunc>,
-    DTWAIN_ForceAcquireBitDepthFunc: Symbol<'a, DtwainforceacquirebitdepthFunc>,
-    DTWAIN_ForceScanOnNoUIFunc: Symbol<'a, DtwainforcescanonnouiFunc>,
     DTWAIN_FrameCreateFunc: Symbol<'a, DtwainframecreateFunc>,
     DTWAIN_FrameCreateStringFunc: Symbol<'a, DtwainframecreatestringFunc>,
     DTWAIN_FrameCreateStringAFunc: Symbol<'a, DtwainframecreatestringaFunc>,
@@ -4258,8 +4254,6 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_FeedPage: Symbol<DtwainfeedpageFunc> = unsafe { library.get(b"DTWAIN_FeedPage")? };
         let DTWAIN_FlipBitmap: Symbol<DtwainflipbitmapFunc> = unsafe { library.get(b"DTWAIN_FlipBitmap")? };
         let DTWAIN_FlushAcquiredPages: Symbol<DtwainflushacquiredpagesFunc> = unsafe { library.get(b"DTWAIN_FlushAcquiredPages")? };
-        let DTWAIN_ForceAcquireBitDepth: Symbol<DtwainforceacquirebitdepthFunc> = unsafe { library.get(b"DTWAIN_ForceAcquireBitDepth")? };
-        let DTWAIN_ForceScanOnNoUI: Symbol<DtwainforcescanonnouiFunc> = unsafe { library.get(b"DTWAIN_ForceScanOnNoUI")? };
         let DTWAIN_FrameCreate: Symbol<DtwainframecreateFunc> = unsafe { library.get(b"DTWAIN_FrameCreate")? };
         let DTWAIN_FrameCreateString: Symbol<DtwainframecreatestringFunc> = unsafe { library.get(b"DTWAIN_FrameCreateString")? };
         let DTWAIN_FrameCreateStringA: Symbol<DtwainframecreatestringaFunc> = unsafe { library.get(b"DTWAIN_FrameCreateStringA")? };
@@ -5378,8 +5372,6 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_FeedPageFunc: DTWAIN_FeedPage,
             DTWAIN_FlipBitmapFunc: DTWAIN_FlipBitmap,
             DTWAIN_FlushAcquiredPagesFunc: DTWAIN_FlushAcquiredPages,
-            DTWAIN_ForceAcquireBitDepthFunc: DTWAIN_ForceAcquireBitDepth,
-            DTWAIN_ForceScanOnNoUIFunc: DTWAIN_ForceScanOnNoUI,
             DTWAIN_FrameCreateFunc: DTWAIN_FrameCreate,
             DTWAIN_FrameCreateStringFunc: DTWAIN_FrameCreateString,
             DTWAIN_FrameCreateStringAFunc: DTWAIN_FrameCreateStringA,
@@ -7489,14 +7481,6 @@ impl<'a> DTwainAPI<'a>
 
     pub fn DTWAIN_FlushAcquiredPages(&self, Source: *mut c_void) -> i32 {
         unsafe { return (self.DTWAIN_FlushAcquiredPagesFunc)(Source);  }
-    }
-
-    pub fn DTWAIN_ForceAcquireBitDepth(&self, Source: *mut c_void, BitDepth: i32) -> i32 {
-        unsafe { return (self.DTWAIN_ForceAcquireBitDepthFunc)(Source, BitDepth);  }
-    }
-
-    pub fn DTWAIN_ForceScanOnNoUI(&self, Source: *mut c_void, bSet: i32) -> i32 {
-        unsafe { return (self.DTWAIN_ForceScanOnNoUIFunc)(Source, bSet);  }
     }
 
     pub fn DTWAIN_FrameCreate(&self, Left: f64, Top: f64, Right: f64, Bottom: f64) -> *mut c_void {

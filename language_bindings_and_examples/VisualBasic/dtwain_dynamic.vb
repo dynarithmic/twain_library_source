@@ -2745,12 +2745,6 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_FlushAcquiredPagesDelegate(Source As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_ForceAcquireBitDepthDelegate(Source As System.IntPtr, BitDepth As Integer) As Integer
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_ForceScanOnNoUIDelegate(Source As System.IntPtr, bSet As Integer) As Integer
-        
-        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_FrameCreateDelegate(Left As System.Double, Top As System.Double, Right As System.Double, Bottom As System.Double) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Unicode)>
@@ -5430,14 +5424,6 @@ Namespace Dynarithmic
         Return api.DTWAIN_FlushAcquiredPages(Source)
         End Function
         
-        Public Function DTWAIN_ForceAcquireBitDepth(Source As System.IntPtr, BitDepth As Integer) As Integer
-        Return api.DTWAIN_ForceAcquireBitDepth(Source, BitDepth)
-        End Function
-        
-        Public Function DTWAIN_ForceScanOnNoUI(Source As System.IntPtr, bSet As Integer) As Integer
-        Return api.DTWAIN_ForceScanOnNoUI(Source, bSet)
-        End Function
-        
         Public Function DTWAIN_FrameCreate(Left As System.Double, Top As System.Double, Right As System.Double, Bottom As System.Double) As System.IntPtr
         Return api.DTWAIN_FrameCreate(Left, Top, Right, Bottom)
         End Function
@@ -7808,8 +7794,6 @@ Namespace Dynarithmic
             Public DTWAIN_FeedPage As DTWAIN_FeedPageDelegate
             Public DTWAIN_FlipBitmap As DTWAIN_FlipBitmapDelegate
             Public DTWAIN_FlushAcquiredPages As DTWAIN_FlushAcquiredPagesDelegate
-            Public DTWAIN_ForceAcquireBitDepth As DTWAIN_ForceAcquireBitDepthDelegate
-            Public DTWAIN_ForceScanOnNoUI As DTWAIN_ForceScanOnNoUIDelegate
             Public DTWAIN_FrameCreate As DTWAIN_FrameCreateDelegate
             Public DTWAIN_FrameCreateString As DTWAIN_FrameCreateStringDelegate
             Public DTWAIN_FrameDestroy As DTWAIN_FrameDestroyDelegate
