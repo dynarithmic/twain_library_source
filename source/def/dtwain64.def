@@ -449,7 +449,6 @@ DTWAIN_FlushAcquiredPages                         @3601
 DTWAIN_LoadCustomStringResources                  @4000
 DTWAIN_SetLightSources                            @4005
 DTWAIN_GetLightSources                            @4006
-DTWAIN_ForceAcquireBitDepth                       @4010
 DTWAIN_IsPatchCapsSupported                       @4500
 DTWAIN_IsPatchSupported                           @4501
 DTWAIN_IsPatchDetectEnabled                       @4502
@@ -971,7 +970,6 @@ DTWAIN_GetPaperSizeName                           @30340
 DTWAIN_GetPaperSizeNameA                          @30341
 DTWAIN_GetPaperSizeNameW                          @30342
 DTWAIN_CallCallback64                             @30343
-DTWAIN_ForceScanOnNoUI                            @30344
 DTWAIN_GetDoubleFeedDetectValues                  @30345
 DTWAIN_InitImageFileAppend                        @30346
 DTWAIN_SetPDFPolarity                             @30347
