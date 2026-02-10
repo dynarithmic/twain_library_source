@@ -288,7 +288,7 @@ int TwainMessageLoopWindowsImpl::PerformMessageLoop(CTL_ITwainSource* pSource, b
 	{
         std::string msg = "Using PeekMessage() for TWAIN acquisitions ...";
         if (!pSource->IsUsePeekMessage())
-            msg = "Using PeekMessage() for TWAIN acquisitions ...";
+            msg = "Using GetMessage() for TWAIN acquisitions ...";
     	LogWriterUtils::WriteLogInfoIndentedA(msg);
 	}
 
