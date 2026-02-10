@@ -1935,7 +1935,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDSMSearchOrderEx(LPCTSTR SearchOrder, LPCTSTR
 LONG DLLENTRY_DEF DTWAIN_GetDSMSearchOrderEx(LPTSTR SearchOrder, LPTSTR UserDirectory)
 {
 	LOG_FUNC_ENTRY_PARAMS((SearchOrder, UserDirectory))
-	auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     if (SearchOrder)
         StringWrapper::CopyInfoToCString(CTL_StaticData::GetStartupDSMSearchOrder(), SearchOrder, 6);
 
