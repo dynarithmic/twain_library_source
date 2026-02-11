@@ -478,8 +478,11 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
     pHandle->m_bOpenSourceOnSelect = false;
 
     auto& sourceStatusMap = CTL_StaticData::GetSourceStatusMap();
+    char szSourceBuf[100];
     for (auto& curSource : allSources)
     {
+        StringWrapperA::SafeStrcpy(szSourceBuf, curSource.c_str(), 100);
+        CTL_TwainAppMgr::SendTwainMsgToWindow(&ts, nullptr, DTWAIN_TN_SOURCEDETAILS, reinterpret_cast<LPARAM>(szSourceBuf));
         std::string jColorInfo;
         std::string resUnitInfo;
         std::string capabilityString;
@@ -727,34 +730,36 @@ static std::string generate_details(CTL_ITwainSession& ts, const std::vector<std
 
                     // Get the filetype info
                     tempStrm.str("");
-                    static constexpr std::array<std::string_view, 27> fileTypes = {
+                    static constexpr std::array<std::string_view, 29> fileTypes = {
+															"\"bmp (rle compression)\",",
                                                             "\"bmp\",",
-                                                            "\"bmp (rle compression)\",",
+															"\"dcx\",",
+															"\"emf\",",
                                                             "\"gif\",",
+															"\"ico\",",
+															"\"jp2 (jpeg-2000)\",",
+															"\"jpeg-xr\",",
+															"\"jpeg\",",
                                                             "\"pcx\",",
-                                                            "\"dcx\",",
                                                             "\"pdf\",",
-                                                            "\"ico\",",
                                                             "\"png\",",
-                                                            "\"tga\",",
-                                                            "\"tga (rle compression)\",",
+															"\"ps1 (Postscript 1)\",",
+															"\"ps2 (Postscript 2)\",",
                                                             "\"psd\",",
-                                                            "\"emf\",",
-                                                            "\"wbmp\",",
-                                                            "\"wmf\",",
-                                                            "\"jpeg\",",
-                                                            "\"jp2 (jpeg-2000)\",",
-                                                            "\"jpeg-xr\",",
-                                                            "\"tiff (no compression)\",",
-                                                            "\"tiff (lzw compression)\",",
-                                                            "\"tiff (packbits compression)\",",
+															"\"svg\",",
+															"\"svgz\",",
+															"\"tga (rle compression)\",",
+															"\"tga\",",
                                                             "\"tiff (flate compression)\",",
-                                                            "\"tiff (jpeg compression)\",",
                                                             "\"tiff (group 3 fax compression)\",",
                                                             "\"tiff (group 4 fax compression)\",",
-                                                            "\"ps1 (Postscript 1)\",",
-                                                            "\"ps2 (Postscript 2)\",",
-                                                            "\"webp\"" };
+															"\"tiff (jpeg compression)\",",
+															"\"tiff (lzw compression)\",",
+															"\"tiff (no compression)\",",
+															"\"tiff (packbits compression)\",",
+															"\"wbmp\",",
+															"\"webp\",",
+															"\"wmf\"" };
                     std::string allFileTypes;
                     for (auto s : fileTypes)
                         allFileTypes += s.data();

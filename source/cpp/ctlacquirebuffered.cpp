@@ -196,6 +196,13 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireBuffered(SourceAcquireOptions& opts)
     if (pHandle->m_lAcquireMode == DTWAIN_MODELESS)
         return LLAcquireImage(opts);
     auto pr = dynarithmic::StartModalMessageLoop(opts.getSource(), opts);
+	DTWAIN_Check_Error_Condition_2_Ex(pHandle, [&] 
+        { return pr.first != DTWAIN_NO_ERROR; }, pr.first, DTWAIN_FAILURE1, FUNC_MACRO);
+    if (pr.first != DTWAIN_NO_ERROR)
+    {
+        CTL_TwainAppMgr::DisableUserInterface(pSource);
+        LOG_FUNC_EXIT_NONAME_PARAMS(DTWAIN_FAILURE1)
+    }
     LOG_FUNC_EXIT_NONAME_PARAMS(pr.second)
     CATCH_BLOCK(DTWAIN_FAILURE1)
 }

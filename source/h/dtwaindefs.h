@@ -537,6 +537,9 @@
  * not recognized for the file type */
 #define DTWAIN_TN_FILECOMPRESSTYPEMISMATCH  1302
 
+/* Sent when getting Source details using DTWAIN_GetSourceDetails() */
+#define DTWAIN_TN_SOURCEDETAILS             1304
+
 /* PDF OCR clean text flags */
 #define DTWAIN_PDFOCR_CLEANTEXT1            1
 #define DTWAIN_PDFOCR_CLEANTEXT2            2

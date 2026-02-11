@@ -613,6 +613,24 @@
     <ClCompile Include="cpp\iohandler_jpegxr.cpp">
       <Filter>C++ Files</Filter>
     </ClCompile>
+    <ClCompile Include="cpp\iohandler_svg.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\pdflib32\base64encode.cpp">
+      <Filter>C++ Files</Filter>
+    </ClCompile>
+    <ClCompile Include="miniz\miniz.c">
+      <Filter>miniz</Filter>
+    </ClCompile>
+    <ClCompile Include="miniz\miniz_tdef.c">
+      <Filter>miniz</Filter>
+    </ClCompile>
+    <ClCompile Include="miniz\miniz_tinfl.c">
+      <Filter>miniz</Filter>
+    </ClCompile>
+    <ClCompile Include="miniz\miniz_zip.c">
+      <Filter>miniz</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp\pdflib32\a85encode.h">
@@ -1065,6 +1083,27 @@
     <ClInclude Include="h\ctlguiddef.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="cpp\pdflib32\base64encode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="miniz\miniz.h">
+      <Filter>miniz</Filter>
+    </ClInclude>
+    <ClInclude Include="miniz\miniz_export.h">
+      <Filter>miniz</Filter>
+    </ClInclude>
+    <ClInclude Include="miniz\miniz_common.h">
+      <Filter>miniz</Filter>
+    </ClInclude>
+    <ClInclude Include="miniz\miniz_tdef.h">
+      <Filter>miniz</Filter>
+    </ClInclude>
+    <ClInclude Include="miniz\miniz_tinfl.h">
+      <Filter>miniz</Filter>
+    </ClInclude>
+    <ClInclude Include="miniz\miniz_zip.h">
+      <Filter>miniz</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".\h\versioninfo.ipp">
@@ -1229,6 +1268,9 @@
     </Filter>
     <Filter Include="AES Encryption">
       <UniqueIdentifier>{5e54c952-71bb-44a5-b77d-b24c098fd813}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="miniz">
+      <UniqueIdentifier>{4fce70b8-1277-454a-a982-e3f1de3ea842}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -421,6 +421,8 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_BIGTIFFJPEG = 11015;
     public static const int DTWAIN_BIGTIFFJPEGMULTI = 11016;
     public static const int DTWAIN_JPEGXR = 12000;
+    public static const int DTWAIN_SVG = 13000;
+    public static const int DTWAIN_SVGZ = 13001;
     public static const int DTWAIN_INCHES = 0;
     public static const int DTWAIN_CENTIMETERS = 1;
     public static const int DTWAIN_PICAS = 2;
@@ -629,6 +631,7 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_TN_TRANSFERTILEREADY = 1300;
     public static const int DTWAIN_TN_TRANSFERTILEDONE = 1301;
     public static const int DTWAIN_TN_FILECOMPRESSTYPEMISMATCH = 1302;
+    public static const int DTWAIN_TN_SOURCEDETAILS = 1304;
     public static const int DTWAIN_PDFOCR_CLEANTEXT1 = 1;
     public static const int DTWAIN_PDFOCR_CLEANTEXT2 = 2;
     public static const int DTWAIN_MODAL = 0;
@@ -1994,6 +1997,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY, LONG, LPSTR) DTWAIN_ArrayGetAtANSIString;
     extern(Windows) LPCSTR function(DTWAIN_ARRAY, LONG) DTWAIN_ArrayGetAtANSIStringPtr;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY, LONG, LPDTWAIN_FLOAT) DTWAIN_ArrayGetAtFloat;
+    extern(Windows) DTWAIN_FLOAT function(DTWAIN_ARRAY, LONG) DTWAIN_ArrayGetAtFloatEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY, LONG, DTWAIN_CHARPTRTYPE) DTWAIN_ArrayGetAtFloatString;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY, LONG, LPSTR) DTWAIN_ArrayGetAtFloatStringA;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY, LONG, LPWSTR) DTWAIN_ArrayGetAtFloatStringW;
@@ -2004,6 +2008,8 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY, LONG, LPWSTR, LPWSTR, LPWSTR, LPWSTR) DTWAIN_ArrayGetAtFrameStringW;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY, LONG, LPLONG) DTWAIN_ArrayGetAtLong;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY, LONG, LPLONG64) DTWAIN_ArrayGetAtLong64;
+    extern(Windows) LONG64 function(DTWAIN_ARRAY, LONG) DTWAIN_ArrayGetAtLong64Ex;
+    extern(Windows) LONG function(DTWAIN_ARRAY, LONG) DTWAIN_ArrayGetAtLongEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY, LONG, DTWAIN_SOURCE*) DTWAIN_ArrayGetAtSource;
     extern(Windows) DTWAIN_SOURCE function(DTWAIN_ARRAY, LONG) DTWAIN_ArrayGetAtSourceEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_ARRAY, LONG, DTWAIN_CHARPTRTYPE) DTWAIN_ArrayGetAtString;
@@ -2233,8 +2239,6 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_FeedPage;
     extern(Windows) DTWAIN_BOOL function(HANDLE) DTWAIN_FlipBitmap;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE) DTWAIN_FlushAcquiredPages;
-    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LONG) DTWAIN_ForceAcquireBitDepth;
-    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, BOOL) DTWAIN_ForceScanOnNoUI;
     extern(Windows) DTWAIN_FRAME function(DTWAIN_FLOAT, DTWAIN_FLOAT, DTWAIN_FLOAT, DTWAIN_FLOAT) DTWAIN_FrameCreate;
     extern(Windows) DTWAIN_FRAME function(DTWAIN_CCHARPTRTYPE, DTWAIN_CCHARPTRTYPE, DTWAIN_CCHARPTRTYPE, DTWAIN_CCHARPTRTYPE) DTWAIN_FrameCreateString;
     extern(Windows) DTWAIN_FRAME function(LPCSTR, LPCSTR, LPCSTR, LPCSTR) DTWAIN_FrameCreateStringA;
@@ -2528,19 +2532,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) LONG function(DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetTwainAvailabilityEx;
     extern(Windows) LONG function(LPSTR, LONG) DTWAIN_GetTwainAvailabilityExA;
     extern(Windows) LONG function(LPWSTR, LONG) DTWAIN_GetTwainAvailabilityExW;
-    extern(Windows) BOOL function(LONG, DTWAIN_CHARPTRTYPE) DTWAIN_GetTwainCountryName;
-    extern(Windows) DTWAIN_BOOL function(LONG, LPSTR) DTWAIN_GetTwainCountryNameA;
-    extern(Windows) DTWAIN_BOOL function(LONG, LPWSTR) DTWAIN_GetTwainCountryNameW;
-    extern(Windows) LONG function(DTWAIN_CCHARPTRTYPE) DTWAIN_GetTwainCountryValue;
-    extern(Windows) LONG function(LPCSTR) DTWAIN_GetTwainCountryValueA;
-    extern(Windows) LONG function(LPCWSTR) DTWAIN_GetTwainCountryValueW;
     extern(Windows) HWND function() DTWAIN_GetTwainHwnd;
-    extern(Windows) BOOL function(LONG, DTWAIN_CHARPTRTYPE) DTWAIN_GetTwainLanguageName;
-    extern(Windows) DTWAIN_BOOL function(LONG, LPSTR) DTWAIN_GetTwainLanguageNameA;
-    extern(Windows) DTWAIN_BOOL function(LONG, LPWSTR) DTWAIN_GetTwainLanguageNameW;
-    extern(Windows) LONG function(DTWAIN_CCHARPTRTYPE) DTWAIN_GetTwainLanguageValue;
-    extern(Windows) LONG function(LPCSTR) DTWAIN_GetTwainLanguageValueA;
-    extern(Windows) LONG function(LPCWSTR) DTWAIN_GetTwainLanguageValueW;
     extern(Windows) LONG function() DTWAIN_GetTwainMode;
     extern(Windows) LONG function(LONG, LONG, DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetTwainNameFromConstant;
     extern(Windows) LONG function(LONG, LONG, LPSTR, LONG) DTWAIN_GetTwainNameFromConstantA;
@@ -2548,9 +2540,6 @@ class DTWAIN_DynamicDLL
     extern(Windows) LONG function(LONG, LONG, LPSTR, LONG) DTWAIN_GetTwainNameFromConstantExA;
     extern(Windows) LONG function(LONG, LONG, LPWSTR, LONG) DTWAIN_GetTwainNameFromConstantExW;
     extern(Windows) LONG function(LONG, LONG, LPWSTR, LONG) DTWAIN_GetTwainNameFromConstantW;
-    extern(Windows) LONG function(LONG, LONG, DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetTwainStringName;
-    extern(Windows) LONG function(LONG, LONG, LPSTR, LONG) DTWAIN_GetTwainStringNameA;
-    extern(Windows) LONG function(LONG, LONG, LPWSTR, LONG) DTWAIN_GetTwainStringNameW;
     extern(Windows) LONG function() DTWAIN_GetTwainTimeout;
     extern(Windows) DTWAIN_BOOL function(LPLONG, LPLONG, LPLONG) DTWAIN_GetVersion;
     extern(Windows) LONG function(DTWAIN_CHARPTRTYPE, LONG) DTWAIN_GetVersionCopyright;
@@ -3126,6 +3115,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_ArrayGetAtANSIString, "DTWAIN_ArrayGetAtANSIString");
         bindFunction(cast(void**)&DTWAIN_ArrayGetAtANSIStringPtr, "DTWAIN_ArrayGetAtANSIStringPtr");
         bindFunction(cast(void**)&DTWAIN_ArrayGetAtFloat, "DTWAIN_ArrayGetAtFloat");
+        bindFunction(cast(void**)&DTWAIN_ArrayGetAtFloatEx, "DTWAIN_ArrayGetAtFloatEx");
         bindFunction(cast(void**)&DTWAIN_ArrayGetAtFloatString, "DTWAIN_ArrayGetAtFloatString");
         bindFunction(cast(void**)&DTWAIN_ArrayGetAtFloatStringA, "DTWAIN_ArrayGetAtFloatStringA");
         bindFunction(cast(void**)&DTWAIN_ArrayGetAtFloatStringW, "DTWAIN_ArrayGetAtFloatStringW");
@@ -3136,6 +3126,8 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_ArrayGetAtFrameStringW, "DTWAIN_ArrayGetAtFrameStringW");
         bindFunction(cast(void**)&DTWAIN_ArrayGetAtLong, "DTWAIN_ArrayGetAtLong");
         bindFunction(cast(void**)&DTWAIN_ArrayGetAtLong64, "DTWAIN_ArrayGetAtLong64");
+        bindFunction(cast(void**)&DTWAIN_ArrayGetAtLong64Ex, "DTWAIN_ArrayGetAtLong64Ex");
+        bindFunction(cast(void**)&DTWAIN_ArrayGetAtLongEx, "DTWAIN_ArrayGetAtLongEx");
         bindFunction(cast(void**)&DTWAIN_ArrayGetAtSource, "DTWAIN_ArrayGetAtSource");
         bindFunction(cast(void**)&DTWAIN_ArrayGetAtSourceEx, "DTWAIN_ArrayGetAtSourceEx");
         bindFunction(cast(void**)&DTWAIN_ArrayGetAtString, "DTWAIN_ArrayGetAtString");
@@ -3365,8 +3357,6 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_FeedPage, "DTWAIN_FeedPage");
         bindFunction(cast(void**)&DTWAIN_FlipBitmap, "DTWAIN_FlipBitmap");
         bindFunction(cast(void**)&DTWAIN_FlushAcquiredPages, "DTWAIN_FlushAcquiredPages");
-        bindFunction(cast(void**)&DTWAIN_ForceAcquireBitDepth, "DTWAIN_ForceAcquireBitDepth");
-        bindFunction(cast(void**)&DTWAIN_ForceScanOnNoUI, "DTWAIN_ForceScanOnNoUI");
         bindFunction(cast(void**)&DTWAIN_FrameCreate, "DTWAIN_FrameCreate");
         bindFunction(cast(void**)&DTWAIN_FrameCreateString, "DTWAIN_FrameCreateString");
         bindFunction(cast(void**)&DTWAIN_FrameCreateStringA, "DTWAIN_FrameCreateStringA");
@@ -3660,19 +3650,7 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetTwainAvailabilityEx, "DTWAIN_GetTwainAvailabilityEx");
         bindFunction(cast(void**)&DTWAIN_GetTwainAvailabilityExA, "DTWAIN_GetTwainAvailabilityExA");
         bindFunction(cast(void**)&DTWAIN_GetTwainAvailabilityExW, "DTWAIN_GetTwainAvailabilityExW");
-        bindFunction(cast(void**)&DTWAIN_GetTwainCountryName, "DTWAIN_GetTwainCountryName");
-        bindFunction(cast(void**)&DTWAIN_GetTwainCountryNameA, "DTWAIN_GetTwainCountryNameA");
-        bindFunction(cast(void**)&DTWAIN_GetTwainCountryNameW, "DTWAIN_GetTwainCountryNameW");
-        bindFunction(cast(void**)&DTWAIN_GetTwainCountryValue, "DTWAIN_GetTwainCountryValue");
-        bindFunction(cast(void**)&DTWAIN_GetTwainCountryValueA, "DTWAIN_GetTwainCountryValueA");
-        bindFunction(cast(void**)&DTWAIN_GetTwainCountryValueW, "DTWAIN_GetTwainCountryValueW");
         bindFunction(cast(void**)&DTWAIN_GetTwainHwnd, "DTWAIN_GetTwainHwnd");
-        bindFunction(cast(void**)&DTWAIN_GetTwainLanguageName, "DTWAIN_GetTwainLanguageName");
-        bindFunction(cast(void**)&DTWAIN_GetTwainLanguageNameA, "DTWAIN_GetTwainLanguageNameA");
-        bindFunction(cast(void**)&DTWAIN_GetTwainLanguageNameW, "DTWAIN_GetTwainLanguageNameW");
-        bindFunction(cast(void**)&DTWAIN_GetTwainLanguageValue, "DTWAIN_GetTwainLanguageValue");
-        bindFunction(cast(void**)&DTWAIN_GetTwainLanguageValueA, "DTWAIN_GetTwainLanguageValueA");
-        bindFunction(cast(void**)&DTWAIN_GetTwainLanguageValueW, "DTWAIN_GetTwainLanguageValueW");
         bindFunction(cast(void**)&DTWAIN_GetTwainMode, "DTWAIN_GetTwainMode");
         bindFunction(cast(void**)&DTWAIN_GetTwainNameFromConstant, "DTWAIN_GetTwainNameFromConstant");
         bindFunction(cast(void**)&DTWAIN_GetTwainNameFromConstantA, "DTWAIN_GetTwainNameFromConstantA");
@@ -3680,9 +3658,6 @@ class DTWAIN_DynamicDLL
         bindFunction(cast(void**)&DTWAIN_GetTwainNameFromConstantExA, "DTWAIN_GetTwainNameFromConstantExA");
         bindFunction(cast(void**)&DTWAIN_GetTwainNameFromConstantExW, "DTWAIN_GetTwainNameFromConstantExW");
         bindFunction(cast(void**)&DTWAIN_GetTwainNameFromConstantW, "DTWAIN_GetTwainNameFromConstantW");
-        bindFunction(cast(void**)&DTWAIN_GetTwainStringName, "DTWAIN_GetTwainStringName");
-        bindFunction(cast(void**)&DTWAIN_GetTwainStringNameA, "DTWAIN_GetTwainStringNameA");
-        bindFunction(cast(void**)&DTWAIN_GetTwainStringNameW, "DTWAIN_GetTwainStringNameW");
         bindFunction(cast(void**)&DTWAIN_GetTwainTimeout, "DTWAIN_GetTwainTimeout");
         bindFunction(cast(void**)&DTWAIN_GetVersion, "DTWAIN_GetVersion");
         bindFunction(cast(void**)&DTWAIN_GetVersionCopyright, "DTWAIN_GetVersionCopyright");

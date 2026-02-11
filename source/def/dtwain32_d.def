@@ -449,7 +449,6 @@ DTWAIN_FlushAcquiredPages                         @3601
 DTWAIN_LoadCustomStringResources                  @4000
 DTWAIN_SetLightSources                            @4005
 DTWAIN_GetLightSources                            @4006
-DTWAIN_ForceAcquireBitDepth                       @4010
 DTWAIN_IsPatchCapsSupported                       @4500
 DTWAIN_IsPatchSupported                           @4501
 DTWAIN_IsPatchDetectEnabled                       @4502
@@ -812,18 +811,6 @@ DTWAIN_SetDoubleFeedDetectLengthStringW           @15028
 DTWAIN_SetDoubleFeedDetectLengthStringA           @15029
 DTWAIN_SetDoubleFeedDetectLengthString            @15030
 DTWAIN_CheckHandles                               @16000
-DTWAIN_GetTwainCountryName                        @17000
-DTWAIN_GetTwainCountryValue                       @17001
-DTWAIN_GetTwainCountryNameA                       @17002
-DTWAIN_GetTwainCountryNameW                       @17003
-DTWAIN_GetTwainCountryValueA                      @17004
-DTWAIN_GetTwainCountryValueW                      @17005
-DTWAIN_GetTwainLanguageName                       @17010
-DTWAIN_GetTwainLanguageValue                      @17011
-DTWAIN_GetTwainLanguageNameA                      @17012
-DTWAIN_GetTwainLanguageNameW                      @17013
-DTWAIN_GetTwainLanguageValueA                     @17014
-DTWAIN_GetTwainLanguageValueW                     @17015
 DTWAIN_GetConditionCodeString                     @18000
 DTWAIN_GetConditionCodeStringA                    @18001
 DTWAIN_GetConditionCodeStringW                    @18002
@@ -931,9 +918,6 @@ DTWAIN_FrameGetAllStringW                         @30222
 DTWAIN_FrameCreateStringA                         @30223
 DTWAIN_FrameCreateStringW                         @30224
 DTWAIN_AddPDFTextElement                          @30230
-DTWAIN_GetTwainStringName                         @30240
-DTWAIN_GetTwainStringNameA                        @30241
-DTWAIN_GetTwainStringNameW                        @30242
 DTWAIN_GetActiveDSMPath                           @30243
 DTWAIN_GetActiveDSMPathA                          @30244
 DTWAIN_GetActiveDSMPathW                          @30245
@@ -986,7 +970,6 @@ DTWAIN_GetPaperSizeName                           @30340
 DTWAIN_GetPaperSizeNameA                          @30341
 DTWAIN_GetPaperSizeNameW                          @30342
 DTWAIN_CallCallback64                             @30343
-DTWAIN_ForceScanOnNoUI                            @30344
 DTWAIN_GetDoubleFeedDetectValues                  @30345
 DTWAIN_InitImageFileAppend                        @30346
 DTWAIN_SetPDFPolarity                             @30347
@@ -1152,3 +1135,7 @@ DTWAIN_RotateDIB                                  @31163
 DTWAIN_RotateDIBString                            @31164
 DTWAIN_RotateDIBStringA                           @31165
 DTWAIN_RotateDIBStringW                           @31166
+DTWAIN_ArrayGetAtLongEx                           @31167
+DTWAIN_ArrayGetAtLong64Ex                         @31168
+DTWAIN_ArrayGetAtFloatEx                          @31169
+

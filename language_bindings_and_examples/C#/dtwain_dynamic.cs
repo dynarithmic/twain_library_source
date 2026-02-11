@@ -319,6 +319,8 @@
         public const int DTWAIN_BIGTIFFJPEG = 11015;
         public const int DTWAIN_BIGTIFFJPEGMULTI = 11016;
         public const int DTWAIN_JPEGXR = 12000;
+        public const int DTWAIN_SVG = 13000;
+        public const int DTWAIN_SVGZ = 13001;
         public const int DTWAIN_INCHES = 0;
         public const int DTWAIN_CENTIMETERS = 1;
         public const int DTWAIN_PICAS = 2;
@@ -527,6 +529,7 @@
         public const int DTWAIN_TN_TRANSFERTILEREADY = 1300;
         public const int DTWAIN_TN_TRANSFERTILEDONE = 1301;
         public const int DTWAIN_TN_FILECOMPRESSTYPEMISMATCH = 1302;
+        public const int DTWAIN_TN_SOURCEDETAILS = 1304;
         public const int DTWAIN_PDFOCR_CLEANTEXT1 = 1;
         public const int DTWAIN_PDFOCR_CLEANTEXT2 = 2;
         public const int DTWAIN_MODAL = 0;
@@ -1959,6 +1962,7 @@
         public delegate int DTWAIN_ArrayGetAtDelegate(DTWAIN_ARRAY pArray, int nWhere, System.IntPtr pVariant);
         public delegate int DTWAIN_ArrayGetAtANSIStringDelegate(DTWAIN_ARRAY pArray, int nWhere, [MarshalAs(UnmanagedType.LPStr)] System.Text.StringBuilder pStr);
         public delegate int DTWAIN_ArrayGetAtFloatDelegate(DTWAIN_ARRAY pArray, int nWhere, ref DTWAIN_FLOAT pVal);
+        public delegate DTWAIN_FLOAT DTWAIN_ArrayGetAtFloatExDelegate(DTWAIN_ARRAY pArray, int nWhere);
         public delegate int DTWAIN_ArrayGetAtFloatStringDelegate(DTWAIN_ARRAY pArray, int nWhere, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder Val);
         public delegate int DTWAIN_ArrayGetAtFloatStringDelegate_overload(DTWAIN_ARRAY pArray, int nWhere, System.IntPtr Val);
         public delegate int DTWAIN_ArrayGetAtFrameDelegate(DTWAIN_ARRAY FrameArray, int nWhere, ref DTWAIN_FLOAT pleft, ref DTWAIN_FLOAT ptop, ref DTWAIN_FLOAT pright, ref DTWAIN_FLOAT pbottom);
@@ -1967,6 +1971,8 @@
         public delegate int DTWAIN_ArrayGetAtFrameStringDelegate_overload(DTWAIN_ARRAY FrameArray, int nWhere, System.IntPtr left, System.IntPtr top, System.IntPtr right, System.IntPtr bottom);
         public delegate int DTWAIN_ArrayGetAtLongDelegate(DTWAIN_ARRAY pArray, int nWhere, ref int pVal);
         public delegate int DTWAIN_ArrayGetAtLong64Delegate(DTWAIN_ARRAY pArray, int nWhere, ref long pVal);
+        public delegate LONG64 DTWAIN_ArrayGetAtLong64ExDelegate(DTWAIN_ARRAY pArray, int nWhere);
+        public delegate int DTWAIN_ArrayGetAtLongExDelegate(DTWAIN_ARRAY pArray, int nWhere);
         public delegate int DTWAIN_ArrayGetAtSourceDelegate(DTWAIN_ARRAY pArray, int nWhere, ref DTWAIN_SOURCE ppSource);
         public delegate DTWAIN_SOURCE DTWAIN_ArrayGetAtSourceExDelegate(DTWAIN_ARRAY pArray, int nWhere);
         public delegate int DTWAIN_ArrayGetAtStringDelegate(DTWAIN_ARRAY pArray, int nWhere, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder pStr);
@@ -2172,8 +2178,6 @@
         public delegate int DTWAIN_FeedPageDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_FlipBitmapDelegate(HANDLE hDib);
         public delegate int DTWAIN_FlushAcquiredPagesDelegate(DTWAIN_SOURCE Source);
-        public delegate int DTWAIN_ForceAcquireBitDepthDelegate(DTWAIN_SOURCE Source, int BitDepth);
-        public delegate int DTWAIN_ForceScanOnNoUIDelegate(DTWAIN_SOURCE Source, int bSet);
         public delegate DTWAIN_FRAME DTWAIN_FrameCreateDelegate(DTWAIN_FLOAT Left, DTWAIN_FLOAT Top, DTWAIN_FLOAT Right, DTWAIN_FLOAT Bottom);
         public delegate DTWAIN_FRAME DTWAIN_FrameCreateStringDelegate([MarshalAs(UnmanagedType.LPTStr)] string Left, [MarshalAs(UnmanagedType.LPTStr)] string Top, [MarshalAs(UnmanagedType.LPTStr)] string Right, [MarshalAs(UnmanagedType.LPTStr)] string Bottom);
         public delegate int DTWAIN_FrameDestroyDelegate(DTWAIN_FRAME Frame);
@@ -2410,20 +2414,12 @@
         public delegate int DTWAIN_GetTwainAvailabilityDelegate();
         public delegate int DTWAIN_GetTwainAvailabilityExDelegate([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder directories, int nMaxLen);
         public delegate int DTWAIN_GetTwainAvailabilityExDelegate_overload(System.IntPtr directories, int nMaxLen);
-        public delegate int DTWAIN_GetTwainCountryNameDelegate(int countryId, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szName);
-        public delegate int DTWAIN_GetTwainCountryNameDelegate_overload(int countryId, System.IntPtr szName);
-        public delegate int DTWAIN_GetTwainCountryValueDelegate([MarshalAs(UnmanagedType.LPTStr)] string country);
         public delegate HWND DTWAIN_GetTwainHwndDelegate();
-        public delegate int DTWAIN_GetTwainLanguageNameDelegate(int nameId, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szName);
-        public delegate int DTWAIN_GetTwainLanguageNameDelegate_overload(int nameId, System.IntPtr szName);
-        public delegate int DTWAIN_GetTwainLanguageValueDelegate([MarshalAs(UnmanagedType.LPTStr)] string szName);
         public delegate int DTWAIN_GetTwainModeDelegate();
         public delegate int DTWAIN_GetTwainNameFromConstantDelegate(int lConstantType, int lTwainConstant, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszOut, int nSize);
         public delegate int DTWAIN_GetTwainNameFromConstantDelegate_overload(int lConstantType, int lTwainConstant, System.IntPtr lpszOut, int nSize);
         public delegate int DTWAIN_GetTwainNameFromConstantExDelegate(int lConstantType, int lTwainConstant, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszOut, int nSize);
         public delegate int DTWAIN_GetTwainNameFromConstantExDelegate_overload(int lConstantType, int lTwainConstant, System.IntPtr lpszOut, int nSize);
-        public delegate int DTWAIN_GetTwainStringNameDelegate(int category, int TwainID, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszBuffer, int nMaxLen);
-        public delegate int DTWAIN_GetTwainStringNameDelegate_overload(int category, int TwainID, System.IntPtr lpszBuffer, int nMaxLen);
         public delegate int DTWAIN_GetTwainTimeoutDelegate();
         public delegate int DTWAIN_GetVersionDelegate(ref int lpMajor, ref int lpMinor, ref int lpVersionType);
         public delegate int DTWAIN_GetVersionCopyrightDelegate([MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszApp, int nLength);
@@ -2982,6 +2978,9 @@
         [DTWAINNativeFunction("DTWAIN_ArrayGetAtFloat")]
         private readonly DTWAIN_ArrayGetAtFloatDelegate  _DTWAIN_ArrayGetAtFloat;
 
+        [DTWAINNativeFunction("DTWAIN_ArrayGetAtFloatEx")]
+        private readonly DTWAIN_ArrayGetAtFloatExDelegate  _DTWAIN_ArrayGetAtFloatEx;
+
         [DTWAINNativeFunction("DTWAIN_ArrayGetAtFloatString")]
         private readonly DTWAIN_ArrayGetAtFloatStringDelegate  _DTWAIN_ArrayGetAtFloatString;
 
@@ -3005,6 +3004,12 @@
 
         [DTWAINNativeFunction("DTWAIN_ArrayGetAtLong64")]
         private readonly DTWAIN_ArrayGetAtLong64Delegate  _DTWAIN_ArrayGetAtLong64;
+
+        [DTWAINNativeFunction("DTWAIN_ArrayGetAtLong64Ex")]
+        private readonly DTWAIN_ArrayGetAtLong64ExDelegate  _DTWAIN_ArrayGetAtLong64Ex;
+
+        [DTWAINNativeFunction("DTWAIN_ArrayGetAtLongEx")]
+        private readonly DTWAIN_ArrayGetAtLongExDelegate  _DTWAIN_ArrayGetAtLongEx;
 
         [DTWAINNativeFunction("DTWAIN_ArrayGetAtSource")]
         private readonly DTWAIN_ArrayGetAtSourceDelegate  _DTWAIN_ArrayGetAtSource;
@@ -3620,12 +3625,6 @@
 
         [DTWAINNativeFunction("DTWAIN_FlushAcquiredPages")]
         private readonly DTWAIN_FlushAcquiredPagesDelegate  _DTWAIN_FlushAcquiredPages;
-
-        [DTWAINNativeFunction("DTWAIN_ForceAcquireBitDepth")]
-        private readonly DTWAIN_ForceAcquireBitDepthDelegate  _DTWAIN_ForceAcquireBitDepth;
-
-        [DTWAINNativeFunction("DTWAIN_ForceScanOnNoUI")]
-        private readonly DTWAIN_ForceScanOnNoUIDelegate  _DTWAIN_ForceScanOnNoUI;
 
         [DTWAINNativeFunction("DTWAIN_FrameCreate")]
         private readonly DTWAIN_FrameCreateDelegate  _DTWAIN_FrameCreate;
@@ -4335,26 +4334,8 @@
         [DTWAINNativeFunction("DTWAIN_GetTwainAvailabilityEx")]
         private readonly DTWAIN_GetTwainAvailabilityExDelegate_overload _DTWAIN_GetTwainAvailabilityEx_overload; 
 
-        [DTWAINNativeFunction("DTWAIN_GetTwainCountryName")]
-        private readonly DTWAIN_GetTwainCountryNameDelegate  _DTWAIN_GetTwainCountryName;
-
-        [DTWAINNativeFunction("DTWAIN_GetTwainCountryName")]
-        private readonly DTWAIN_GetTwainCountryNameDelegate_overload _DTWAIN_GetTwainCountryName_overload; 
-
-        [DTWAINNativeFunction("DTWAIN_GetTwainCountryValue")]
-        private readonly DTWAIN_GetTwainCountryValueDelegate  _DTWAIN_GetTwainCountryValue;
-
         [DTWAINNativeFunction("DTWAIN_GetTwainHwnd")]
         private readonly DTWAIN_GetTwainHwndDelegate  _DTWAIN_GetTwainHwnd;
-
-        [DTWAINNativeFunction("DTWAIN_GetTwainLanguageName")]
-        private readonly DTWAIN_GetTwainLanguageNameDelegate  _DTWAIN_GetTwainLanguageName;
-
-        [DTWAINNativeFunction("DTWAIN_GetTwainLanguageName")]
-        private readonly DTWAIN_GetTwainLanguageNameDelegate_overload _DTWAIN_GetTwainLanguageName_overload; 
-
-        [DTWAINNativeFunction("DTWAIN_GetTwainLanguageValue")]
-        private readonly DTWAIN_GetTwainLanguageValueDelegate  _DTWAIN_GetTwainLanguageValue;
 
         [DTWAINNativeFunction("DTWAIN_GetTwainMode")]
         private readonly DTWAIN_GetTwainModeDelegate  _DTWAIN_GetTwainMode;
@@ -4370,12 +4351,6 @@
 
         [DTWAINNativeFunction("DTWAIN_GetTwainNameFromConstantEx")]
         private readonly DTWAIN_GetTwainNameFromConstantExDelegate_overload _DTWAIN_GetTwainNameFromConstantEx_overload; 
-
-        [DTWAINNativeFunction("DTWAIN_GetTwainStringName")]
-        private readonly DTWAIN_GetTwainStringNameDelegate  _DTWAIN_GetTwainStringName;
-
-        [DTWAINNativeFunction("DTWAIN_GetTwainStringName")]
-        private readonly DTWAIN_GetTwainStringNameDelegate_overload _DTWAIN_GetTwainStringName_overload; 
 
         [DTWAINNativeFunction("DTWAIN_GetTwainTimeout")]
         private readonly DTWAIN_GetTwainTimeoutDelegate  _DTWAIN_GetTwainTimeout;
@@ -5612,6 +5587,9 @@
         public  int DTWAIN_ArrayGetAtFloat(DTWAIN_ARRAY pArray, int nWhere, ref DTWAIN_FLOAT pVal)
         => _DTWAIN_ArrayGetAtFloat(pArray, nWhere, ref pVal);
 
+        public  DTWAIN_FLOAT DTWAIN_ArrayGetAtFloatEx(DTWAIN_ARRAY pArray, int nWhere)
+        => _DTWAIN_ArrayGetAtFloatEx(pArray, nWhere);
+
         public  int DTWAIN_ArrayGetAtFloatString(DTWAIN_ARRAY pArray, int nWhere, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder Val)
         => _DTWAIN_ArrayGetAtFloatString(pArray, nWhere, Val);
 
@@ -5635,6 +5613,12 @@
 
         public  int DTWAIN_ArrayGetAtLong64(DTWAIN_ARRAY pArray, int nWhere, ref long pVal)
         => _DTWAIN_ArrayGetAtLong64(pArray, nWhere, ref pVal);
+
+        public  LONG64 DTWAIN_ArrayGetAtLong64Ex(DTWAIN_ARRAY pArray, int nWhere)
+        => _DTWAIN_ArrayGetAtLong64Ex(pArray, nWhere);
+
+        public  int DTWAIN_ArrayGetAtLongEx(DTWAIN_ARRAY pArray, int nWhere)
+        => _DTWAIN_ArrayGetAtLongEx(pArray, nWhere);
 
         public  int DTWAIN_ArrayGetAtSource(DTWAIN_ARRAY pArray, int nWhere, ref DTWAIN_SOURCE ppSource)
         => _DTWAIN_ArrayGetAtSource(pArray, nWhere, ref ppSource);
@@ -6250,12 +6234,6 @@
 
         public  int DTWAIN_FlushAcquiredPages(DTWAIN_SOURCE Source)
         => _DTWAIN_FlushAcquiredPages(Source);
-
-        public  int DTWAIN_ForceAcquireBitDepth(DTWAIN_SOURCE Source, int BitDepth)
-        => _DTWAIN_ForceAcquireBitDepth(Source, BitDepth);
-
-        public  int DTWAIN_ForceScanOnNoUI(DTWAIN_SOURCE Source, int bSet)
-        => _DTWAIN_ForceScanOnNoUI(Source, bSet);
 
         public  DTWAIN_FRAME DTWAIN_FrameCreate(DTWAIN_FLOAT Left, DTWAIN_FLOAT Top, DTWAIN_FLOAT Right, DTWAIN_FLOAT Bottom)
         => _DTWAIN_FrameCreate(Left, Top, Right, Bottom);
@@ -6965,26 +6943,8 @@
         public  int DTWAIN_GetTwainAvailabilityEx (System.IntPtr directories, int nMaxLen)
         => _DTWAIN_GetTwainAvailabilityEx_overload(directories, nMaxLen);
 
-        public  int DTWAIN_GetTwainCountryName(int countryId, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szName)
-        => _DTWAIN_GetTwainCountryName(countryId, szName);
-
-        public  int DTWAIN_GetTwainCountryName (int countryId, System.IntPtr szName)
-        => _DTWAIN_GetTwainCountryName_overload(countryId, szName);
-
-        public  int DTWAIN_GetTwainCountryValue([MarshalAs(UnmanagedType.LPTStr)] string country)
-        => _DTWAIN_GetTwainCountryValue(country);
-
         public  HWND DTWAIN_GetTwainHwnd()
         => _DTWAIN_GetTwainHwnd();
-
-        public  int DTWAIN_GetTwainLanguageName(int nameId, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder szName)
-        => _DTWAIN_GetTwainLanguageName(nameId, szName);
-
-        public  int DTWAIN_GetTwainLanguageName (int nameId, System.IntPtr szName)
-        => _DTWAIN_GetTwainLanguageName_overload(nameId, szName);
-
-        public  int DTWAIN_GetTwainLanguageValue([MarshalAs(UnmanagedType.LPTStr)] string szName)
-        => _DTWAIN_GetTwainLanguageValue(szName);
 
         public  int DTWAIN_GetTwainMode()
         => _DTWAIN_GetTwainMode();
@@ -7000,12 +6960,6 @@
 
         public  int DTWAIN_GetTwainNameFromConstantEx (int lConstantType, int lTwainConstant, System.IntPtr lpszOut, int nSize)
         => _DTWAIN_GetTwainNameFromConstantEx_overload(lConstantType, lTwainConstant, lpszOut, nSize);
-
-        public  int DTWAIN_GetTwainStringName(int category, int TwainID, [MarshalAs(UnmanagedType.LPTStr)] System.Text.StringBuilder lpszBuffer, int nMaxLen)
-        => _DTWAIN_GetTwainStringName(category, TwainID, lpszBuffer, nMaxLen);
-
-        public  int DTWAIN_GetTwainStringName (int category, int TwainID, System.IntPtr lpszBuffer, int nMaxLen)
-        => _DTWAIN_GetTwainStringName_overload(category, TwainID, lpszBuffer, nMaxLen);
 
         public  int DTWAIN_GetTwainTimeout()
         => _DTWAIN_GetTwainTimeout();

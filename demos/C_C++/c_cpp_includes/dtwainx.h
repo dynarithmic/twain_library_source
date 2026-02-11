@@ -167,6 +167,9 @@ DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_ArrayGetAtFloat(DTWAIN_ARRAY pArray, LON
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_ArrayGetSourceAt(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_SOURCE* ppSource);
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_ArrayGetAtSource(DTWAIN_ARRAY pArray, LONG nWhere, DTWAIN_SOURCE* ppSource);
 DTWAIN_SOURCE  DLLENTRY_DEF      DTWAIN_ArrayGetAtSourceEx(DTWAIN_ARRAY pArray, LONG nWhere);
+LONG           DLLENTRY_DEF      DTWAIN_ArrayGetAtLongEx(DTWAIN_ARRAY pArray, LONG nWhere);
+LONG64         DLLENTRY_DEF      DTWAIN_ArrayGetAtLong64Ex(DTWAIN_ARRAY pArray, LONG nWhere);
+DTWAIN_FLOAT   DLLENTRY_DEF      DTWAIN_ArrayGetAtFloatEx(DTWAIN_ARRAY pArray, LONG nWhere);
 
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_ArrayInsertAt(DTWAIN_ARRAY pArray, LONG nWhere, LPVOID pVariant);
 DTWAIN_BOOL    DLLENTRY_DEF      DTWAIN_ArrayInsertAtLong(DTWAIN_ARRAY pArray, LONG nWhere, LONG pVal);
@@ -329,9 +332,6 @@ DTWAIN_BOOL          DLLENTRY_DEF    DTWAIN_EnableThumbnail(DTWAIN_SOURCE Source
 /* Scale acquired images (Can be used for thumbnailing acquired images) */
 DTWAIN_BOOL          DLLENTRY_DEF    DTWAIN_SetAcquireImageScale(DTWAIN_SOURCE Source, DTWAIN_FLOAT xscale,DTWAIN_FLOAT yscale);
 
-/* Force bits-per-pixel for acquired images */
-DTWAIN_BOOL          DLLENTRY_DEF    DTWAIN_ForceAcquireBitDepth(DTWAIN_SOURCE Source, LONG BitDepth );
-
 /* Setting special events from Source */
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDeviceNotifications(DTWAIN_SOURCE Source, LONG DevEvents);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceNotifications(DTWAIN_SOURCE Source, LPLONG DevEvents);
@@ -339,7 +339,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEvent(DTWAIN_SOURCE Source, LPLONG lpEv
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventEx(DTWAIN_SOURCE Source, LPLONG lpEvent, LPDTWAIN_ARRAY pArray);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetDeviceEventInfo(DTWAIN_SOURCE Source, LONG nWhichInfo, LPVOID pValue);
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsDeviceEventSupported(DTWAIN_SOURCE Source);
-
 
 /* Showing the UI only (some Sources support this) */
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsUIOnlySupported(DTWAIN_SOURCE Source);
@@ -966,7 +965,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetAcquireMetrics(DTWAIN_SOURCE source, LPLONG I
 /* Optionally create a negative of the acquired image */
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetAcquireImageNegative(DTWAIN_SOURCE Source, DTWAIN_BOOL IsNegative );
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetPDFPolarity(DTWAIN_SOURCE Source, LONG Polarity);
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ForceScanOnNoUI(DTWAIN_SOURCE Source, BOOL bSet);
 
 /* String array functions that return pointers */
 LPCTSTR DLLENTRY_DEF DTWAIN_ArrayGetAtStringPtr(DTWAIN_ARRAY pArray, LONG nWhere);

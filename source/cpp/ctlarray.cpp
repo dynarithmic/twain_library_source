@@ -1138,6 +1138,36 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFloat(DTWAIN_ARRAY pArray, LONG nWhere
     CATCH_BLOCK(false)
 }
 
+LONG DLLENTRY_DEF DTWAIN_ArrayGetAtLongEx(DTWAIN_ARRAY pArray, LONG nWhere)
+{
+    LOG_FUNC_ENTRY_PARAMS((pArray, nWhere))
+    LONG value = {};
+    auto badValue = std::numeric_limits<LONG>::min();
+    auto bRet = DTWAIN_ArrayGetAt(pArray, nWhere, &value);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet ? value : badValue);
+    CATCH_BLOCK(std::numeric_limits<LONG>::min())
+}
+
+LONG64 DLLENTRY_DEF DTWAIN_ArrayGetAtLong64Ex(DTWAIN_ARRAY pArray, LONG nWhere)
+{
+    LOG_FUNC_ENTRY_PARAMS((pArray, nWhere))
+	LONG64 value = {};
+	auto badValue = std::numeric_limits<LONG64>::min();
+    auto bRet = DTWAIN_ArrayGetAt(pArray, nWhere, &value);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet ? value : badValue);
+    CATCH_BLOCK(std::numeric_limits<LONG64>::min())
+}
+
+DTWAIN_FLOAT DLLENTRY_DEF DTWAIN_ArrayGetAtFloatEx(DTWAIN_ARRAY pArray, LONG nWhere)
+{
+    LOG_FUNC_ENTRY_PARAMS((pArray, nWhere))
+    DTWAIN_FLOAT value = {};
+	auto badValue = std::numeric_limits<DTWAIN_FLOAT>::min();
+    auto bRet = DTWAIN_ArrayGetAt(pArray, nWhere, &value);
+    LOG_FUNC_EXIT_NONAME_PARAMS(bRet ? value : badValue)
+    CATCH_BLOCK(std::numeric_limits<DTWAIN_FLOAT>::min())
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_ArrayGetAtFloatString(DTWAIN_ARRAY pArray, LONG nWhere, LPTSTR Val)
 {
     LOG_FUNC_ENTRY_PARAMS((pArray, nWhere, Val))

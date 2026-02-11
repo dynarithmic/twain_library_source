@@ -28,6 +28,7 @@
 #ifdef _MSC_VER
 #pragma warning (disable:4702)
 #endif
+#include <errorcheck.h>
 using namespace dynarithmic;
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_AcquireNative(DTWAIN_SOURCE Source, LONG PixelType, LONG nMaxPages, DTWAIN_BOOL bShowUI, DTWAIN_BOOL bCloseSource, LPLONG pStatus)
@@ -81,5 +82,11 @@ DTWAIN_ACQUIRE dynarithmic::DTWAIN_LLAcquireNative(SourceAcquireOptions& opts)
     if ( pHandle->m_lAcquireMode == DTWAIN_MODELESS )
          return LLAcquireImage(opts);
     auto pr = dynarithmic::StartModalMessageLoop(opts.getSource(), opts);
+	DTWAIN_Check_Error_Condition_2_Ex(pHandle, [&] { return pr.first != DTWAIN_NO_ERROR; }, pr.first, DTWAIN_FAILURE1, FUNC_MACRO);
+	if (pr.first != DTWAIN_NO_ERROR)
+	{
+		CTL_TwainAppMgr::DisableUserInterface(static_cast<CTL_ITwainSource*>(opts.getSource()));
+        return DTWAIN_FAILURE1;
+	}
     return pr.second;
 }

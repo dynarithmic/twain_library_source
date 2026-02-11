@@ -304,6 +304,8 @@ module TwainAPI =
     let public DTWAIN_BIGTIFFJPEG = 11015
     let public DTWAIN_BIGTIFFJPEGMULTI = 11016
     let public DTWAIN_JPEGXR = 12000
+    let public DTWAIN_SVG = 13000
+    let public DTWAIN_SVGZ = 13001
     let public DTWAIN_INCHES = 0
     let public DTWAIN_CENTIMETERS = 1
     let public DTWAIN_PICAS = 2
@@ -512,6 +514,7 @@ module TwainAPI =
     let public DTWAIN_TN_TRANSFERTILEREADY = 1300
     let public DTWAIN_TN_TRANSFERTILEDONE = 1301
     let public DTWAIN_TN_FILECOMPRESSTYPEMISMATCH = 1302
+    let public DTWAIN_TN_SOURCEDETAILS = 1304
     let public DTWAIN_PDFOCR_CLEANTEXT1 = 1
     let public DTWAIN_PDFOCR_CLEANTEXT2 = 2
     let public DTWAIN_MODAL = 0
@@ -2042,6 +2045,9 @@ module TwainAPI =
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_ArrayGetAtFloatDelegate = delegate of DTWAIN_ARRAY * LONG * DTWAIN_FLOAT byref -> DTWAIN_BOOL
 
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_ArrayGetAtFloatExDelegate = delegate of DTWAIN_ARRAY * LONG -> DTWAIN_FLOAT
+
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
     type DTWAIN_ArrayGetAtFloatStringDelegate = delegate of DTWAIN_ARRAY * LONG * System.Text.StringBuilder -> DTWAIN_BOOL
 
@@ -2059,6 +2065,12 @@ module TwainAPI =
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_ArrayGetAtLong64Delegate = delegate of DTWAIN_ARRAY * LONG * Int64 byref -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_ArrayGetAtLong64ExDelegate = delegate of DTWAIN_ARRAY * LONG -> LONG64
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_ArrayGetAtLongExDelegate = delegate of DTWAIN_ARRAY * LONG -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_ArrayGetAtSourceDelegate = delegate of DTWAIN_ARRAY * LONG * DTWAIN_SOURCE byref -> DTWAIN_BOOL
@@ -2670,12 +2682,6 @@ module TwainAPI =
     type DTWAIN_FlushAcquiredPagesDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_ForceAcquireBitDepthDelegate = delegate of DTWAIN_SOURCE * LONG -> DTWAIN_BOOL
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_ForceScanOnNoUIDelegate = delegate of DTWAIN_SOURCE * BOOL -> DTWAIN_BOOL
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_FrameCreateDelegate = delegate of DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT * DTWAIN_FLOAT -> DTWAIN_FRAME
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
@@ -3233,20 +3239,8 @@ module TwainAPI =
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
     type DTWAIN_GetTwainAvailabilityExDelegate = delegate of System.Text.StringBuilder * LONG -> LONG
 
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
-    type DTWAIN_GetTwainCountryNameDelegate = delegate of LONG * System.Text.StringBuilder -> BOOL
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
-    type DTWAIN_GetTwainCountryValueDelegate = delegate of string -> LONG
-
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetTwainHwndDelegate = delegate of unit -> HWND
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
-    type DTWAIN_GetTwainLanguageNameDelegate = delegate of LONG * System.Text.StringBuilder -> BOOL
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
-    type DTWAIN_GetTwainLanguageValueDelegate = delegate of string -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetTwainModeDelegate = delegate of unit -> LONG
@@ -3256,9 +3250,6 @@ module TwainAPI =
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
     type DTWAIN_GetTwainNameFromConstantExDelegate = delegate of LONG * LONG * System.Text.StringBuilder * LONG -> LONG
-
-    [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode)>]
-    type DTWAIN_GetTwainStringNameDelegate = delegate of LONG * LONG * System.Text.StringBuilder * LONG -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_GetTwainTimeoutDelegate = delegate of unit -> LONG
@@ -4312,12 +4303,15 @@ module TwainAPI =
     let private ArrayGetAt = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAt" : DTWAIN_ArrayGetAtDelegate)
     let private ArrayGetAtANSIString = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtANSIString" : DTWAIN_ArrayGetAtANSIStringDelegate)
     let private ArrayGetAtFloat = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtFloat" : DTWAIN_ArrayGetAtFloatDelegate)
+    let private ArrayGetAtFloatEx = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtFloatEx" : DTWAIN_ArrayGetAtFloatExDelegate)
     let private ArrayGetAtFloatString = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtFloatString" : DTWAIN_ArrayGetAtFloatStringDelegate)
     let private ArrayGetAtFrame = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtFrame" : DTWAIN_ArrayGetAtFrameDelegate)
     let private ArrayGetAtFrameEx = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtFrameEx" : DTWAIN_ArrayGetAtFrameExDelegate)
     let private ArrayGetAtFrameString = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtFrameString" : DTWAIN_ArrayGetAtFrameStringDelegate)
     let private ArrayGetAtLong = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtLong" : DTWAIN_ArrayGetAtLongDelegate)
     let private ArrayGetAtLong64 = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtLong64" : DTWAIN_ArrayGetAtLong64Delegate)
+    let private ArrayGetAtLong64Ex = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtLong64Ex" : DTWAIN_ArrayGetAtLong64ExDelegate)
+    let private ArrayGetAtLongEx = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtLongEx" : DTWAIN_ArrayGetAtLongExDelegate)
     let private ArrayGetAtSource = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtSource" : DTWAIN_ArrayGetAtSourceDelegate)
     let private ArrayGetAtSourceEx = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtSourceEx" : DTWAIN_ArrayGetAtSourceExDelegate)
     let private ArrayGetAtString = lazy (DynamicDll.Bind "DTWAIN_ArrayGetAtString" : DTWAIN_ArrayGetAtStringDelegate)
@@ -4521,8 +4515,6 @@ module TwainAPI =
     let private FeedPage = lazy (DynamicDll.Bind "DTWAIN_FeedPage" : DTWAIN_FeedPageDelegate)
     let private FlipBitmap = lazy (DynamicDll.Bind "DTWAIN_FlipBitmap" : DTWAIN_FlipBitmapDelegate)
     let private FlushAcquiredPages = lazy (DynamicDll.Bind "DTWAIN_FlushAcquiredPages" : DTWAIN_FlushAcquiredPagesDelegate)
-    let private ForceAcquireBitDepth = lazy (DynamicDll.Bind "DTWAIN_ForceAcquireBitDepth" : DTWAIN_ForceAcquireBitDepthDelegate)
-    let private ForceScanOnNoUI = lazy (DynamicDll.Bind "DTWAIN_ForceScanOnNoUI" : DTWAIN_ForceScanOnNoUIDelegate)
     let private FrameCreate = lazy (DynamicDll.Bind "DTWAIN_FrameCreate" : DTWAIN_FrameCreateDelegate)
     let private FrameCreateString = lazy (DynamicDll.Bind "DTWAIN_FrameCreateString" : DTWAIN_FrameCreateStringDelegate)
     let private FrameDestroy = lazy (DynamicDll.Bind "DTWAIN_FrameDestroy" : DTWAIN_FrameDestroyDelegate)
@@ -4709,15 +4701,10 @@ module TwainAPI =
     let private GetTwainAppIDEx = lazy (DynamicDll.Bind "DTWAIN_GetTwainAppIDEx" : DTWAIN_GetTwainAppIDExDelegate)
     let private GetTwainAvailability = lazy (DynamicDll.Bind "DTWAIN_GetTwainAvailability" : DTWAIN_GetTwainAvailabilityDelegate)
     let private GetTwainAvailabilityEx = lazy (DynamicDll.Bind "DTWAIN_GetTwainAvailabilityEx" : DTWAIN_GetTwainAvailabilityExDelegate)
-    let private GetTwainCountryName = lazy (DynamicDll.Bind "DTWAIN_GetTwainCountryName" : DTWAIN_GetTwainCountryNameDelegate)
-    let private GetTwainCountryValue = lazy (DynamicDll.Bind "DTWAIN_GetTwainCountryValue" : DTWAIN_GetTwainCountryValueDelegate)
     let private GetTwainHwnd = lazy (DynamicDll.Bind "DTWAIN_GetTwainHwnd" : DTWAIN_GetTwainHwndDelegate)
-    let private GetTwainLanguageName = lazy (DynamicDll.Bind "DTWAIN_GetTwainLanguageName" : DTWAIN_GetTwainLanguageNameDelegate)
-    let private GetTwainLanguageValue = lazy (DynamicDll.Bind "DTWAIN_GetTwainLanguageValue" : DTWAIN_GetTwainLanguageValueDelegate)
     let private GetTwainMode = lazy (DynamicDll.Bind "DTWAIN_GetTwainMode" : DTWAIN_GetTwainModeDelegate)
     let private GetTwainNameFromConstant = lazy (DynamicDll.Bind "DTWAIN_GetTwainNameFromConstant" : DTWAIN_GetTwainNameFromConstantDelegate)
     let private GetTwainNameFromConstantEx = lazy (DynamicDll.Bind "DTWAIN_GetTwainNameFromConstantEx" : DTWAIN_GetTwainNameFromConstantExDelegate)
-    let private GetTwainStringName = lazy (DynamicDll.Bind "DTWAIN_GetTwainStringName" : DTWAIN_GetTwainStringNameDelegate)
     let private GetTwainTimeout = lazy (DynamicDll.Bind "DTWAIN_GetTwainTimeout" : DTWAIN_GetTwainTimeoutDelegate)
     let private GetVersion = lazy (DynamicDll.Bind "DTWAIN_GetVersion" : DTWAIN_GetVersionDelegate)
     let private GetVersionCopyright = lazy (DynamicDll.Bind "DTWAIN_GetVersionCopyright" : DTWAIN_GetVersionCopyrightDelegate)
@@ -5331,6 +5318,10 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         ArrayGetAtFloat.Value.Invoke(parray, nwhere, &pval)
 
+    let DTWAIN_ArrayGetAtFloatEx (parray: DTWAIN_ARRAY) (nwhere: LONG) : DTWAIN_FLOAT =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        ArrayGetAtFloatEx.Value.Invoke(parray, nwhere)
+
     let DTWAIN_ArrayGetAtFloatString (parray: DTWAIN_ARRAY) (nwhere: LONG) (val1: System.Text.StringBuilder) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         ArrayGetAtFloatString.Value.Invoke(parray, nwhere, val1)
@@ -5354,6 +5345,14 @@ module TwainAPI =
     let DTWAIN_ArrayGetAtLong64 (parray: DTWAIN_ARRAY) (nwhere: LONG) (pval: Int64 byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         ArrayGetAtLong64.Value.Invoke(parray, nwhere, &pval)
+
+    let DTWAIN_ArrayGetAtLong64Ex (parray: DTWAIN_ARRAY) (nwhere: LONG) : LONG64 =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        ArrayGetAtLong64Ex.Value.Invoke(parray, nwhere)
+
+    let DTWAIN_ArrayGetAtLongEx (parray: DTWAIN_ARRAY) (nwhere: LONG) : LONG =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        ArrayGetAtLongEx.Value.Invoke(parray, nwhere)
 
     let DTWAIN_ArrayGetAtSource (parray: DTWAIN_ARRAY) (nwhere: LONG) (ppsource: DTWAIN_SOURCE byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
@@ -6167,14 +6166,6 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         FlushAcquiredPages.Value.Invoke(source)
 
-    let DTWAIN_ForceAcquireBitDepth (source: DTWAIN_SOURCE) (bitdepth: LONG) : DTWAIN_BOOL =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        ForceAcquireBitDepth.Value.Invoke(source, bitdepth)
-
-    let DTWAIN_ForceScanOnNoUI (source: DTWAIN_SOURCE) (bset: BOOL) : DTWAIN_BOOL =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        ForceScanOnNoUI.Value.Invoke(source, bset)
-
     let DTWAIN_FrameCreate (left: DTWAIN_FLOAT) (top: DTWAIN_FLOAT) (right: DTWAIN_FLOAT) (bottom: DTWAIN_FLOAT) : DTWAIN_FRAME =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         FrameCreate.Value.Invoke(left, top, right, bottom)
@@ -6919,25 +6910,9 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetTwainAvailabilityEx.Value.Invoke(directories, nmaxlen)
 
-    let DTWAIN_GetTwainCountryName (countryid: LONG) (szname: System.Text.StringBuilder) : BOOL =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        GetTwainCountryName.Value.Invoke(countryid, szname)
-
-    let DTWAIN_GetTwainCountryValue (country: string) : LONG =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        GetTwainCountryValue.Value.Invoke(country)
-
     let DTWAIN_GetTwainHwnd() : HWND =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetTwainHwnd.Value.Invoke()
-
-    let DTWAIN_GetTwainLanguageName (nameid: LONG) (szname: System.Text.StringBuilder) : BOOL =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        GetTwainLanguageName.Value.Invoke(nameid, szname)
-
-    let DTWAIN_GetTwainLanguageValue (szname: string) : LONG =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        GetTwainLanguageValue.Value.Invoke(szname)
 
     let DTWAIN_GetTwainMode() : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
@@ -6950,10 +6925,6 @@ module TwainAPI =
     let DTWAIN_GetTwainNameFromConstantEx (lconstanttype: LONG) (ltwainconstant: LONG) (lpszout: System.Text.StringBuilder) (nsize: LONG) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         GetTwainNameFromConstantEx.Value.Invoke(lconstanttype, ltwainconstant, lpszout, nsize)
-
-    let DTWAIN_GetTwainStringName (category: LONG) (twainid: LONG) (lpszbuffer: System.Text.StringBuilder) (nmaxlen: LONG) : LONG =
-        if not IsLoaded then failwith "Call TwainAPI.Load first"
-        GetTwainStringName.Value.Invoke(category, twainid, lpszbuffer, nmaxlen)
 
     let DTWAIN_GetTwainTimeout() : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

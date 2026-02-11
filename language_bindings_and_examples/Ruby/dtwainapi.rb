@@ -223,6 +223,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_ArrayGetAtANSIString
    attr_reader :DTWAIN_ArrayGetAtANSIStringPtr
    attr_reader :DTWAIN_ArrayGetAtFloat
+   attr_reader :DTWAIN_ArrayGetAtFloatEx
    attr_reader :DTWAIN_ArrayGetAtFloatString
    attr_reader :DTWAIN_ArrayGetAtFloatStringA
    attr_reader :DTWAIN_ArrayGetAtFloatStringW
@@ -233,6 +234,8 @@ class DTWAINAPI
    attr_reader :DTWAIN_ArrayGetAtFrameStringW
    attr_reader :DTWAIN_ArrayGetAtLong
    attr_reader :DTWAIN_ArrayGetAtLong64
+   attr_reader :DTWAIN_ArrayGetAtLong64Ex
+   attr_reader :DTWAIN_ArrayGetAtLongEx
    attr_reader :DTWAIN_ArrayGetAtSource
    attr_reader :DTWAIN_ArrayGetAtSourceEx
    attr_reader :DTWAIN_ArrayGetAtString
@@ -462,8 +465,6 @@ class DTWAINAPI
    attr_reader :DTWAIN_FeedPage
    attr_reader :DTWAIN_FlipBitmap
    attr_reader :DTWAIN_FlushAcquiredPages
-   attr_reader :DTWAIN_ForceAcquireBitDepth
-   attr_reader :DTWAIN_ForceScanOnNoUI
    attr_reader :DTWAIN_FrameCreate
    attr_reader :DTWAIN_FrameCreateString
    attr_reader :DTWAIN_FrameCreateStringA
@@ -764,19 +765,7 @@ class DTWAINAPI
    attr_reader :DTWAIN_GetTwainAvailabilityEx
    attr_reader :DTWAIN_GetTwainAvailabilityExA
    attr_reader :DTWAIN_GetTwainAvailabilityExW
-   attr_reader :DTWAIN_GetTwainCountryName
-   attr_reader :DTWAIN_GetTwainCountryNameA
-   attr_reader :DTWAIN_GetTwainCountryNameW
-   attr_reader :DTWAIN_GetTwainCountryValue
-   attr_reader :DTWAIN_GetTwainCountryValueA
-   attr_reader :DTWAIN_GetTwainCountryValueW
    attr_reader :DTWAIN_GetTwainHwnd
-   attr_reader :DTWAIN_GetTwainLanguageName
-   attr_reader :DTWAIN_GetTwainLanguageNameA
-   attr_reader :DTWAIN_GetTwainLanguageNameW
-   attr_reader :DTWAIN_GetTwainLanguageValue
-   attr_reader :DTWAIN_GetTwainLanguageValueA
-   attr_reader :DTWAIN_GetTwainLanguageValueW
    attr_reader :DTWAIN_GetTwainMode
    attr_reader :DTWAIN_GetTwainNameFromConstant
    attr_reader :DTWAIN_GetTwainNameFromConstantA
@@ -784,9 +773,6 @@ class DTWAINAPI
    attr_reader :DTWAIN_GetTwainNameFromConstantExA
    attr_reader :DTWAIN_GetTwainNameFromConstantExW
    attr_reader :DTWAIN_GetTwainNameFromConstantW
-   attr_reader :DTWAIN_GetTwainStringName
-   attr_reader :DTWAIN_GetTwainStringNameA
-   attr_reader :DTWAIN_GetTwainStringNameW
    attr_reader :DTWAIN_GetTwainTimeout
    attr_reader :DTWAIN_GetVersion
    attr_reader :DTWAIN_GetVersionCopyright
@@ -1421,6 +1407,8 @@ class DTWAINAPI
    DTWAIN_BIGTIFFJPEG = 11015
    DTWAIN_BIGTIFFJPEGMULTI = 11016
    DTWAIN_JPEGXR = 12000
+   DTWAIN_SVG = 13000
+   DTWAIN_SVGZ = 13001
    DTWAIN_INCHES = 0
    DTWAIN_CENTIMETERS = 1
    DTWAIN_PICAS = 2
@@ -1629,6 +1617,7 @@ class DTWAINAPI
    DTWAIN_TN_TRANSFERTILEREADY = 1300
    DTWAIN_TN_TRANSFERTILEDONE = 1301
    DTWAIN_TN_FILECOMPRESSTYPEMISMATCH = 1302
+   DTWAIN_TN_SOURCEDETAILS = 1304
    DTWAIN_PDFOCR_CLEANTEXT1 = 1
    DTWAIN_PDFOCR_CLEANTEXT2 = 2
    DTWAIN_MODAL = 0
@@ -3028,6 +3017,7 @@ class DTWAINAPI
        @DTWAIN_ArrayGetAtANSIString = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtANSIString'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayGetAtANSIStringPtr = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtANSIStringPtr'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
        @DTWAIN_ArrayGetAtFloat = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtFloat'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_ArrayGetAtFloatEx = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtFloatEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_DOUBLE)
        @DTWAIN_ArrayGetAtFloatString = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtFloatString'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayGetAtFloatStringA = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtFloatStringA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayGetAtFloatStringW = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtFloatStringW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
@@ -3038,6 +3028,8 @@ class DTWAINAPI
        @DTWAIN_ArrayGetAtFrameStringW = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtFrameStringW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayGetAtLong = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtLong'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayGetAtLong64 = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtLong64'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_ArrayGetAtLong64Ex = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtLong64Ex'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG_LONG)
+       @DTWAIN_ArrayGetAtLongEx = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtLongEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_ArrayGetAtSource = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtSource'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_ArrayGetAtSourceEx = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtSourceEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
        @DTWAIN_ArrayGetAtString = Fiddle::Function::new(dtwain_dll['DTWAIN_ArrayGetAtString'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
@@ -3267,8 +3259,6 @@ class DTWAINAPI
        @DTWAIN_FeedPage = Fiddle::Function::new(dtwain_dll['DTWAIN_FeedPage'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_FlipBitmap = Fiddle::Function::new(dtwain_dll['DTWAIN_FlipBitmap'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_FlushAcquiredPages = Fiddle::Function::new(dtwain_dll['DTWAIN_FlushAcquiredPages'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
-       @DTWAIN_ForceAcquireBitDepth = Fiddle::Function::new(dtwain_dll['DTWAIN_ForceAcquireBitDepth'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_INT)
-       @DTWAIN_ForceScanOnNoUI = Fiddle::Function::new(dtwain_dll['DTWAIN_ForceScanOnNoUI'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_INT)
        @DTWAIN_FrameCreate = Fiddle::Function::new(dtwain_dll['DTWAIN_FrameCreate'],[Fiddle::TYPE_DOUBLE, Fiddle::TYPE_DOUBLE, Fiddle::TYPE_DOUBLE, Fiddle::TYPE_DOUBLE],Fiddle::TYPE_VOIDP)
        @DTWAIN_FrameCreateString = Fiddle::Function::new(dtwain_dll['DTWAIN_FrameCreateString'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_FrameCreateStringA = Fiddle::Function::new(dtwain_dll['DTWAIN_FrameCreateStringA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
@@ -3569,19 +3559,7 @@ class DTWAINAPI
        @DTWAIN_GetTwainAvailabilityEx = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainAvailabilityEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetTwainAvailabilityExA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainAvailabilityExA'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetTwainAvailabilityExW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainAvailabilityExW'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
-       @DTWAIN_GetTwainCountryName = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainCountryName'],[Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
-       @DTWAIN_GetTwainCountryNameA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainCountryNameA'],[Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
-       @DTWAIN_GetTwainCountryNameW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainCountryNameW'],[Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
-       @DTWAIN_GetTwainCountryValue = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainCountryValue'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
-       @DTWAIN_GetTwainCountryValueA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainCountryValueA'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
-       @DTWAIN_GetTwainCountryValueW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainCountryValueW'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
        @DTWAIN_GetTwainHwnd = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainHwnd'],[],Fiddle::TYPE_VOIDP)
-       @DTWAIN_GetTwainLanguageName = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainLanguageName'],[Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
-       @DTWAIN_GetTwainLanguageNameA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainLanguageNameA'],[Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
-       @DTWAIN_GetTwainLanguageNameW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainLanguageNameW'],[Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
-       @DTWAIN_GetTwainLanguageValue = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainLanguageValue'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
-       @DTWAIN_GetTwainLanguageValueA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainLanguageValueA'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
-       @DTWAIN_GetTwainLanguageValueW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainLanguageValueW'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
        @DTWAIN_GetTwainMode = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainMode'],[],Fiddle::TYPE_LONG)
        @DTWAIN_GetTwainNameFromConstant = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainNameFromConstant'],[Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetTwainNameFromConstantA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainNameFromConstantA'],[Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
@@ -3589,9 +3567,6 @@ class DTWAINAPI
        @DTWAIN_GetTwainNameFromConstantExA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainNameFromConstantExA'],[Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetTwainNameFromConstantExW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainNameFromConstantExW'],[Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetTwainNameFromConstantW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainNameFromConstantW'],[Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
-       @DTWAIN_GetTwainStringName = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainStringName'],[Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
-       @DTWAIN_GetTwainStringNameA = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainStringNameA'],[Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
-       @DTWAIN_GetTwainStringNameW = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainStringNameW'],[Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)
        @DTWAIN_GetTwainTimeout = Fiddle::Function::new(dtwain_dll['DTWAIN_GetTwainTimeout'],[],Fiddle::TYPE_LONG)
        @DTWAIN_GetVersion = Fiddle::Function::new(dtwain_dll['DTWAIN_GetVersion'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_GetVersionCopyright = Fiddle::Function::new(dtwain_dll['DTWAIN_GetVersionCopyright'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_LONG)

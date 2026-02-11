@@ -203,6 +203,30 @@ LONG DLLENTRY_DEF DTWAIN_GetAPIHandleStatus(DTWAIN_HANDLE pHandle)
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_IsTwainMsg(MSG *pMsg)
 {
     LOG_FUNC_ENTRY_PARAMS_ISTWAINMSG((pMsg))
+
+    // Ensure we don't log low-level TWAIN calls when 
+    // for DTWAIN_IsTwainMsg unless user specifies this.
+
+    // This remembers the old flags when restoring at the
+    // return of this function.
+    struct FlagRAII
+    {
+        LONG oldFlags = 0;
+        FlagRAII(LONG oFlags) : oldFlags(oFlags) {}
+        ~FlagRAII()
+        {
+            CTL_StaticData::GetLogFilterFlags() = oldFlags;
+        }
+    };
+
+    auto& logFlags = CTL_StaticData::GetLogFilterFlags();
+    FlagRAII raii(logFlags);
+
+    // Turn off low-level TWAIN logging if no logging for
+    // IsTwainMsg
+    if (!(logFlags & DTWAIN_LOG_ISTWAINMSG))
+        logFlags = logFlags & ~DTWAIN_LOG_LOWLEVELTWAIN;
+
     if (!TwainMessageLoopV2::s_MessageQueue.empty())
     {
         MSG msg = TwainMessageLoopV2::s_MessageQueue.front();
@@ -1911,7 +1935,6 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetDSMSearchOrderEx(LPCTSTR SearchOrder, LPCTSTR
 LONG DLLENTRY_DEF DTWAIN_GetDSMSearchOrderEx(LPTSTR SearchOrder, LPTSTR UserDirectory)
 {
 	LOG_FUNC_ENTRY_PARAMS((SearchOrder, UserDirectory))
-	auto [pHandle, pSource] = VerifyHandles(nullptr, DTWAIN_VERIFY_DLLHANDLE);
     if (SearchOrder)
         StringWrapper::CopyInfoToCString(CTL_StaticData::GetStartupDSMSearchOrder(), SearchOrder, 6);
 
@@ -2061,15 +2084,6 @@ LONG DLLENTRY_DEF DTWAIN_GetVersionCopyright(LPTSTR lpszVer, LONG nLength)
     LOG_FUNC_ENTRY_PARAMS((lpszVer, nLength))
     const LONG RetVal = static_cast<LONG>(GetResourceString(IDS_DTWAIN_APPTITLE, lpszVer, nLength));
     LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszVer))
-    LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
-    CATCH_BLOCK(-1)
-}
-
-LONG DLLENTRY_DEF DTWAIN_GetTwainStringName(LONG category, LONG TwainID, LPTSTR lpszBuffer, LONG nMaxLen)
-{
-    LOG_FUNC_ENTRY_PARAMS((category, TwainID, lpszBuffer, nMaxLen))
-    const LONG RetVal = DTWAIN_GetTwainNameFromConstant(category, TwainID, lpszBuffer, nMaxLen);
-    LOG_FUNC_EXIT_DEREFERENCE_POINTERS((lpszBuffer))
     LOG_FUNC_EXIT_NONAME_PARAMS(RetVal)
     CATCH_BLOCK(-1)
 }

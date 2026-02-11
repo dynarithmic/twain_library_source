@@ -344,6 +344,8 @@ const
   DTWAIN_BIGTIFFJPEG = 11015;
   DTWAIN_BIGTIFFJPEGMULTI = 11016;
   DTWAIN_JPEGXR = 12000;
+  DTWAIN_SVG = 13000;
+  DTWAIN_SVGZ = 13001;
   DTWAIN_INCHES = 0;
   DTWAIN_CENTIMETERS = 1;
   DTWAIN_PICAS = 2;
@@ -552,6 +554,7 @@ const
   DTWAIN_TN_TRANSFERTILEREADY = 1300;
   DTWAIN_TN_TRANSFERTILEDONE = 1301;
   DTWAIN_TN_FILECOMPRESSTYPEMISMATCH = 1302;
+  DTWAIN_TN_SOURCEDETAILS = 1304;
   DTWAIN_PDFOCR_CLEANTEXT1 = 1;
   DTWAIN_PDFOCR_CLEANTEXT2 = 2;
   DTWAIN_MODAL = 0;
@@ -1918,6 +1921,7 @@ function DTWAIN_ArrayGetAt(pArray:DTWAIN_ARRAY; nWhere:LONG; pVariant:LPVOID) : 
 function DTWAIN_ArrayGetAtANSIString(pArray:DTWAIN_ARRAY; nWhere:LONG; pStr:LPSTR) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_ArrayGetAtANSIString';
 function DTWAIN_ArrayGetAtANSIStringPtr(pArray:DTWAIN_ARRAY; nWhere:LONG) : LPCSTR; external 'dtwain64d.dll'  name 'DTWAIN_ArrayGetAtANSIStringPtr';
 function DTWAIN_ArrayGetAtFloat(pArray:DTWAIN_ARRAY; nWhere:LONG; pVal:LPDTWAIN_FLOAT) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_ArrayGetAtFloat';
+function DTWAIN_ArrayGetAtFloatEx(pArray:DTWAIN_ARRAY; nWhere:LONG) : DTWAIN_FLOAT; external 'dtwain64d.dll'  name 'DTWAIN_ArrayGetAtFloatEx';
 function DTWAIN_ArrayGetAtFloatString(pArray:DTWAIN_ARRAY; nWhere:LONG; Val:LPTSTR) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_ArrayGetAtFloatString';
 function DTWAIN_ArrayGetAtFloatStringA(pArray:DTWAIN_ARRAY; nWhere:LONG; Val:LPSTR) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_ArrayGetAtFloatStringA';
 function DTWAIN_ArrayGetAtFloatStringW(pArray:DTWAIN_ARRAY; nWhere:LONG; Val:LPWSTR) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_ArrayGetAtFloatStringW';
@@ -1928,6 +1932,8 @@ function DTWAIN_ArrayGetAtFrameStringA(FrameArray:DTWAIN_ARRAY; nWhere:LONG; lef
 function DTWAIN_ArrayGetAtFrameStringW(FrameArray:DTWAIN_ARRAY; nWhere:LONG; left:LPWSTR; top:LPWSTR; right:LPWSTR; bottom:LPWSTR) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_ArrayGetAtFrameStringW';
 function DTWAIN_ArrayGetAtLong(pArray:DTWAIN_ARRAY; nWhere:LONG; pVal:LPLONG) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_ArrayGetAtLong';
 function DTWAIN_ArrayGetAtLong64(pArray:DTWAIN_ARRAY; nWhere:LONG; pVal:LPLONG64) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_ArrayGetAtLong64';
+function DTWAIN_ArrayGetAtLong64Ex(pArray:DTWAIN_ARRAY; nWhere:LONG) : Int64; external 'dtwain64d.dll'  name 'DTWAIN_ArrayGetAtLong64Ex';
+function DTWAIN_ArrayGetAtLongEx(pArray:DTWAIN_ARRAY; nWhere:LONG) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_ArrayGetAtLongEx';
 function DTWAIN_ArrayGetAtSource(pArray:DTWAIN_ARRAY; nWhere:LONG; ppSource:LPDTWAIN_SOURCE) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_ArrayGetAtSource';
 function DTWAIN_ArrayGetAtSourceEx(pArray:DTWAIN_ARRAY; nWhere:LONG) : DTWAIN_SOURCE; external 'dtwain64d.dll'  name 'DTWAIN_ArrayGetAtSourceEx';
 function DTWAIN_ArrayGetAtString(pArray:DTWAIN_ARRAY; nWhere:LONG; pStr:LPTSTR) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_ArrayGetAtString';
@@ -2157,8 +2163,6 @@ function DTWAIN_ExecuteOCRW(Engine:DTWAIN_OCRENGINE; szFileName:LPCWSTR; nStartP
 function DTWAIN_FeedPage(Source:DTWAIN_SOURCE) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_FeedPage';
 function DTWAIN_FlipBitmap(hDib:NativeInt) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_FlipBitmap';
 function DTWAIN_FlushAcquiredPages(Source:DTWAIN_SOURCE) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_FlushAcquiredPages';
-function DTWAIN_ForceAcquireBitDepth(Source:DTWAIN_SOURCE; BitDepth:LONG) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_ForceAcquireBitDepth';
-function DTWAIN_ForceScanOnNoUI(Source:DTWAIN_SOURCE; bSet:BOOL) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_ForceScanOnNoUI';
 function DTWAIN_FrameCreate(Left:DTWAIN_FLOAT; Top:DTWAIN_FLOAT; Right:DTWAIN_FLOAT; Bottom:DTWAIN_FLOAT) : DTWAIN_FRAME; external 'dtwain64d.dll'  name 'DTWAIN_FrameCreate';
 function DTWAIN_FrameCreateString(Left:LPCTSTR; Top:LPCTSTR; Right:LPCTSTR; Bottom:LPCTSTR) : DTWAIN_FRAME; external 'dtwain64d.dll'  name 'DTWAIN_FrameCreateString';
 function DTWAIN_FrameCreateStringA(Left:LPCSTR; Top:LPCSTR; Right:LPCSTR; Bottom:LPCSTR) : DTWAIN_FRAME; external 'dtwain64d.dll'  name 'DTWAIN_FrameCreateStringA';
@@ -2459,19 +2463,7 @@ function DTWAIN_GetTwainAvailability : LONG; external 'dtwain64d.dll'  name 'DTW
 function DTWAIN_GetTwainAvailabilityEx(directories:LPTSTR; nMaxLen:LONG) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainAvailabilityEx';
 function DTWAIN_GetTwainAvailabilityExA(szDirectories:LPSTR; nLength:LONG) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainAvailabilityExA';
 function DTWAIN_GetTwainAvailabilityExW(szDirectories:LPWSTR; nLength:LONG) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainAvailabilityExW';
-function DTWAIN_GetTwainCountryName(countryId:LONG; szName:LPTSTR) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainCountryName';
-function DTWAIN_GetTwainCountryNameA(countryId:LONG; szName:LPSTR) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainCountryNameA';
-function DTWAIN_GetTwainCountryNameW(countryId:LONG; szName:LPWSTR) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainCountryNameW';
-function DTWAIN_GetTwainCountryValue(country:LPCTSTR) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainCountryValue';
-function DTWAIN_GetTwainCountryValueA(country:LPCSTR) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainCountryValueA';
-function DTWAIN_GetTwainCountryValueW(country:LPCWSTR) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainCountryValueW';
 function DTWAIN_GetTwainHwnd : NativeInt; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainHwnd';
-function DTWAIN_GetTwainLanguageName(nameId:LONG; szName:LPTSTR) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainLanguageName';
-function DTWAIN_GetTwainLanguageNameA(lang:LONG; szName:LPSTR) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainLanguageNameA';
-function DTWAIN_GetTwainLanguageNameW(lang:LONG; szName:LPWSTR) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainLanguageNameW';
-function DTWAIN_GetTwainLanguageValue(szName:LPCTSTR) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainLanguageValue';
-function DTWAIN_GetTwainLanguageValueA(lang:LPCSTR) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainLanguageValueA';
-function DTWAIN_GetTwainLanguageValueW(lang:LPCWSTR) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainLanguageValueW';
 function DTWAIN_GetTwainMode : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainMode';
 function DTWAIN_GetTwainNameFromConstant(lConstantType:LONG; lTwainConstant:LONG; lpszOut:LPTSTR; nSize:LONG) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainNameFromConstant';
 function DTWAIN_GetTwainNameFromConstantA(lConstantType:LONG; lTwainConstant:LONG; lpszOut:LPSTR; nSize:LONG) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainNameFromConstantA';
@@ -2479,9 +2471,6 @@ function DTWAIN_GetTwainNameFromConstantEx(lConstantType:LONG; lTwainConstant:LO
 function DTWAIN_GetTwainNameFromConstantExA(lConstantType:LONG; lTwainConstant:LONG; lpszOut:LPSTR; nSize:LONG) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainNameFromConstantExA';
 function DTWAIN_GetTwainNameFromConstantExW(lConstantType:LONG; lTwainConstant:LONG; lpszOut:LPWSTR; nSize:LONG) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainNameFromConstantExW';
 function DTWAIN_GetTwainNameFromConstantW(lConstantType:LONG; lTwainConstant:LONG; lpszOut:LPWSTR; nSize:LONG) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainNameFromConstantW';
-function DTWAIN_GetTwainStringName(category:LONG; TwainID:LONG; lpszBuffer:LPTSTR; nMaxLen:LONG) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainStringName';
-function DTWAIN_GetTwainStringNameA(category:LONG; TwainID:LONG; lpszBuffer:LPSTR; nMaxLen:LONG) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainStringNameA';
-function DTWAIN_GetTwainStringNameW(category:LONG; TwainID:LONG; lpszBuffer:LPWSTR; nMaxLen:LONG) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainStringNameW';
 function DTWAIN_GetTwainTimeout : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetTwainTimeout';
 function DTWAIN_GetVersion(lpMajor:LPLONG; lpMinor:LPLONG; lpVersionType:LPLONG) : BOOL; external 'dtwain64d.dll'  name 'DTWAIN_GetVersion';
 function DTWAIN_GetVersionCopyright(lpszApp:LPTSTR; nLength:LONG) : LONG; external 'dtwain64d.dll'  name 'DTWAIN_GetVersionCopyright';

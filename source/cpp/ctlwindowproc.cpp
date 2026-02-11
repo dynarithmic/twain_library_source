@@ -220,6 +220,7 @@ LRESULT DLLENTRY_DEF dynarithmic::DTWAIN_WindowProc(HWND hWnd,
             case DTWAIN_TN_INVALID_TWAINDSM2_BITMAP:
             case DTWAIN_TN_IMAGE_RESAMPLE_FAILURE:
             case DTWAIN_TN_FILECOMPRESSTYPEMISMATCH:
+            case DTWAIN_TN_SOURCEDETAILS:
             {
                 auto pSource = reinterpret_cast<CTL_ITwainSource*>(lParam);
                 auto& acquireFileStatus = pSource->GetAcquireFileStatusRef();
