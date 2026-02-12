@@ -34,6 +34,7 @@ static void SetTestSelection2(HWND hWnd, TCHAR* setType, int capValue);
 static void TestGetCap(HWND hWnd, LONG capValue);
 static void TestSetCap(HWND hWnd, LONG capValue);
 static LONG InitTestControls(HWND hWnd, const char* szName);
+static void RefreshCustomDSData(HWND hWndDSData);
 
 LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 { 
@@ -109,32 +110,14 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
             wsprintf(szBuf, _T("%d"), (int)DTWAIN_ArrayGetCount(CapArray));
             SetWindowText(hWndNumExtendedCaps, szBuf);
 
-            BYTE* szData = NULL;
-            LONG actualSize;
-            /* First, get the size of the Source's custom DS data */
-            HANDLE h = DTWAIN_GetCustomDSData(g_CurrentSource, NULL, 0, &actualSize, DTWAINGCD_COPYDATA);
-            if (h)
-            {
-                /* Allocate memory for the data.  We add an extra byte,
-                   since the data is not guaranteed to be null-terminated */
-                szData = malloc((actualSize + 1) * sizeof(BYTE));
-                if (szData)
-                {
-                    /* Fill the memory with 0 */
-                    memset(szData, 0, actualSize + 1);
-
-                    /* Second call actually gets the data */
-                    DTWAIN_GetCustomDSData(g_CurrentSource, szData, actualSize, &actualSize, DTWAINGCD_COPYDATA);
-                    SetWindowTextA(hWndDSData, szData);
-                    free(szData);
-                }
-            }
+            RefreshCustomDSData(hWndDSData);
 
             /* Get JSON details of the Source */
             {
                 LONG numChars = DTWAIN_GetSourceDetailsA(szBufName, NULL, 0, 2, TRUE);
                 if (numChars > 0)
                 {
+					BYTE* szData = NULL;
                     szData = malloc(numChars + 1);
                     if (szData)
                     {
@@ -195,11 +178,19 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
                 case IDC_btnShowUIIOnly:
                 {
                     HWND hWndShowUIOnly = GetDlgItem(hDlg, IDC_btnShowUIIOnly);
+					HWND hWndDSData = GetDlgItem(hDlg, IDC_edDSData);
                     EnableWindow(hWndShowUIOnly, FALSE);
                     DTWAIN_ShowUIOnly(g_CurrentSource);
                     EnableWindow(hWndShowUIOnly, TRUE);
-                    break;
+                    RefreshCustomDSData(hWndDSData);
                 }
+				break;
+                case IDC_btnRefreshShowUIOnly:
+                {
+					HWND hWndDSData = GetDlgItem(hDlg, IDC_edDSData);
+					RefreshCustomDSData(hWndDSData);
+                }
+                break;
             }
         }
         break;
@@ -800,5 +791,30 @@ void TestSetCap(HWND hWnd, LONG capValue)
          /* Display results */
          SendMessageW(hWndResults, LB_ADDSTRING, 0, (LPARAM)szErrorText);
          SendMessageW(hWndResults, LB_ADDSTRING, 0, (LPARAM)szErrMessage);
+    }
+}
+
+void RefreshCustomDSData(HWND hWndDSData)
+{
+    SetWindowTextA(hWndDSData, "");
+    BYTE* szData = NULL;
+    LONG actualSize;
+    /* First, get the size of the Source's custom DS data */
+    HANDLE h = DTWAIN_GetCustomDSData(g_CurrentSource, NULL, 0, &actualSize, DTWAINGCD_COPYDATA);
+    if (h)
+    {
+        /* Allocate memory for the data.  We add an extra byte,
+           since the data is not guaranteed to be null-terminated */
+        szData = malloc((actualSize + 1) * sizeof(BYTE));
+        if (szData)
+        {
+            /* Fill the memory with 0 */
+            memset(szData, 0, actualSize + 1);
+
+            /* Second call actually gets the data */
+            DTWAIN_GetCustomDSData(g_CurrentSource, szData, actualSize, &actualSize, DTWAINGCD_COPYDATA);
+            SetWindowTextA(hWndDSData, szData);
+            free(szData);
+        }
     }
 }

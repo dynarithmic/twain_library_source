@@ -102,6 +102,7 @@
 #define IDC_btnResetCapabilities            8019
 #define IDC_staticTestGetResults            8020
 #define IDC_btnShowUIIOnly                  8021
+#define IDC_btnRefreshShowUIOnly            8022
 
 #define ID_LANGUAGE_ENGLISH             32771
 #define ID_LANGUAGE_FRENCH              32772

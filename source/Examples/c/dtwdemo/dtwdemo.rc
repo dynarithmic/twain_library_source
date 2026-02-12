@@ -175,7 +175,8 @@ BEGIN
     EDITTEXT        IDC_edJSONDetails,438,15,189,200,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
     PUSHBUTTON      "Test Capability ...",IDC_btnTestCap,135,181,81,14
     PUSHBUTTON      "Reset All Capabilities",IDC_btnResetCapabilities,136,198,81,14
-    PUSHBUTTON      "Show UI Only",IDC_btnShowUIIOnly,306,195,54,14
+    PUSHBUTTON      "Show UI Only",IDC_btnShowUIIOnly,272,195,54,14
+    PUSHBUTTON      "Refresh",IDC_btnRefreshShowUIOnly,345,195,50,14
 END
 
 #include "dibdisplay.rc"
