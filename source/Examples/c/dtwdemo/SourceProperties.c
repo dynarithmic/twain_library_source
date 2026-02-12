@@ -59,6 +59,7 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
             HWND hWndNumExtendedCaps = GetDlgItem(hDlg, IDC_edExtendedCaps);
             HWND hWndDSData = GetDlgItem(hDlg, IDC_edDSData);
             HWND hWndJSONDetails = GetDlgItem(hDlg, IDC_edJSONDetails);
+            HWND hWndShowUIOnly = GetDlgItem(hDlg, IDC_btnShowUIIOnly);
             int maxTextLength = 0;
             int curStringLength;
             HDC hdcList = GetDC(hWndCaps);
@@ -155,6 +156,8 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
                 }
             }
             DTWAIN_ArrayDestroy(CapArray);
+            // Get whether Source supports "Show UI Only"
+            EnableWindow(hWndShowUIOnly, DTWAIN_IsUIOnlySupported(g_CurrentSource));
             return TRUE;
         }
 
@@ -168,6 +171,11 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
                 /* Quit the dialog */
                 case IDOK:
                 case IDCANCEL:
+                    if (DTWAIN_IsSourceAcquiringEx(g_CurrentSource, TRUE))
+                    {
+                        MessageBoxA(NULL, "You must close the Source user interface before leaving this dialog", "Information", MB_ICONSTOP);
+                        return FALSE;
+                    }
                     /* User may have done a lot of capability testing, 
                     so make sure we reset all the caps to default when we return */
                     DTWAIN_SetAllCapsToDefault(g_CurrentSource);
@@ -184,6 +192,14 @@ LRESULT CALLBACK DisplaySourcePropsProc(HWND hDlg, UINT message, WPARAM wParam, 
                 case IDC_btnResetCapabilities:
                     DTWAIN_SetAllCapsToDefault(g_CurrentSource);
                 break;
+                case IDC_btnShowUIIOnly:
+                {
+                    HWND hWndShowUIOnly = GetDlgItem(hDlg, IDC_btnShowUIIOnly);
+                    EnableWindow(hWndShowUIOnly, FALSE);
+                    DTWAIN_ShowUIOnly(g_CurrentSource);
+                    EnableWindow(hWndShowUIOnly, TRUE);
+                    break;
+                }
             }
         }
         break;
