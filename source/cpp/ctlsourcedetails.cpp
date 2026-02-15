@@ -374,13 +374,13 @@ static AllCapInfo getAllCapInfo(CTL_ITwainSource* pSource)
     DTWAINArrayPtr_RAII aAllCapsraii(pHandle, &aAllCaps);
     auto& vCapBuf = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aAllCaps);
 
-    DTWAIN_ARRAY aExtendedCaps = DTWAIN_EnumExtendedCapsEx2(pSource);
+    DTWAIN_ARRAY aExtendedCaps = DTWAIN_EnumExtendedCapsEx(pSource);
     DTWAINArrayPtr_RAII aExtendedraii(pHandle, &aExtendedCaps);
     std::vector<LONG> vExtBuf;
     if ( aExtendedCaps )
         vExtBuf = pHandle->m_ArrayFactory->underlying_container_t<LONG>(aExtendedCaps);
 
-    DTWAIN_ARRAY aCustomCaps = DTWAIN_EnumCustomCapsEx2(pSource);
+    DTWAIN_ARRAY aCustomCaps = DTWAIN_EnumCustomCapsEx(pSource);
     DTWAINArrayPtr_RAII aCustomraii(pHandle, &aCustomCaps);
     std::vector<LONG> vCustomBuf;
     if ( aCustomCaps)

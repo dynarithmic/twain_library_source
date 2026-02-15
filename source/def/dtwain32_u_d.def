@@ -823,7 +823,7 @@ DTWAIN_UseMultipleThreads                         @20000
 DTWAIN_EnumSourcesEx                              @30001
 DTWAIN_EnumSupportedCapsEx2                       @30002
 DTWAIN_EnumExtendedCapsEx2                        @30003
-DTWAIN_EnumCustomCapsEx2                          @30004
+DTWAIN_EnumCustomCapsEx                          @30004
 DTWAIN_EnumSourceUnitsEx                          @30005
 DTWAIN_EnumPaperSizesEx                           @30006
 DTWAIN_EnumDoubleFeedDetectLengthsEx              @30007
@@ -1093,7 +1093,6 @@ DTWAIN_RangeExpandEx                              @31120
 DTWAIN_EnumSupportedExtImageInfoEx                @31121
 DTWAIN_EnumExtImageInfoTypesEx                    @31122
 DTWAIN_EnumCamerasEx2                             @31123
-DTWAIN_EnumCamerasEx3                             @31124
 DTWAIN_EnumTopCamerasEx                           @31125
 DTWAIN_EnumBottomCamerasEx                        @31126
 DTWAIN_AddFileToAppend                            @31127

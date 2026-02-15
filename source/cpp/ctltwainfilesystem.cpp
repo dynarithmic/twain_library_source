@@ -41,6 +41,8 @@ using namespace dynarithmic;
 #define DELETE_DIRECTORY    8
 #define FORMAT_MEDIA        9
 
+#define DTWAIN_FT_ALLCAMERAS     0xFFFF
+
 using FileSysRetType = std::pair<LONG, TW_MEMREF>;
 static FileSysRetType FSDirectory(CTL_ITwainSource* pSource, LPCTSTR sDir, LONG nWhich);
 static FileSysRetType FSGetFile(CTL_ITwainSource* pSource, LPTSTR sDir, TW_MEMREF FSHandle, LONG nWhich);
@@ -267,35 +269,49 @@ struct CameraStruct {
     TW_UINT16 CameraType;
 };
 
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCamerasEx2(DTWAIN_SOURCE Source)
+static DTWAIN_ARRAY GenericEnumCameras(DTWAIN_SOURCE Source, LONG nWhichCamera, LPDTWAIN_ARRAY Cameras)
+{
+	auto retVal = DTWAIN_EnumCamerasEx2(Source, nWhichCamera);
+	if (retVal)
+	{
+		CTL_TwainDLLHandle* pHandle = static_cast<CTL_ITwainSource*>(Source)->GetDTWAINHandle();
+		MoveArray(pHandle, Cameras, &retVal);
+        return Cameras;
+	}
+    return nullptr;
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, Cameras))
+	auto retVal = GenericEnumCameras(Source, DTWAIN_FT_ALLCAMERAS, Cameras);
+	LOG_FUNC_EXIT_NONAME_PARAMS(retVal?true:false)
+    CATCH_BLOCK_LOG_PARAMS(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumTopCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, Cameras))
+	auto retVal = GenericEnumCameras(Source, DTWAIN_FT_CAMERATOP, Cameras);
+	LOG_FUNC_EXIT_NONAME_PARAMS(retVal?true:false)
+    CATCH_BLOCK_LOG_PARAMS(false)
+}
+
+DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumBottomCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, Cameras))
+	auto retVal = GenericEnumCameras(Source, DTWAIN_FT_CAMERABOTTOM, Cameras);
+	LOG_FUNC_EXIT_NONAME_PARAMS(retVal?true:false)
+    CATCH_BLOCK_LOG_PARAMS(false)
+}
+
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCamerasEx(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
     DTWAIN_ARRAY arr = {};
     DTWAIN_EnumCameras(Source, &arr);
     LOG_FUNC_EXIT_NONAME_PARAMS(arr)
     CATCH_BLOCK_LOG_PARAMS(nullptr)
-}
-
-DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCamerasEx3(DTWAIN_SOURCE Source, LONG nWhichCamera)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, nWhichCamera))
-    DTWAIN_ARRAY arr = {};
-    DTWAIN_EnumCamerasEx(Source, nWhichCamera, &arr);
-    LOG_FUNC_EXIT_NONAME_PARAMS(arr)
-    CATCH_BLOCK_LOG_PARAMS(nullptr)
-}
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCamerasEx(DTWAIN_SOURCE Source, LONG nWhichCamera, LPDTWAIN_ARRAY Cameras)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, nWhichCamera, Cameras))
-    auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
-    DTWAIN_Check_Error_Condition_0_Ex(pHandle, [&] { return !Cameras; }, DTWAIN_ERR_INVALID_PARAM, false, FUNC_MACRO);
-    int fsSupported = CheckFileSystemSupport(pSource);
-    DTWAIN_Check_Error_Condition_1_Ex(pSource->GetDTWAINHandle(), [&] {return fsSupported != DTWAIN_NO_ERROR; },
-                                      fsSupported, false, FUNC_MACRO);
-    FSGetCameras(pSource, Cameras, static_cast<TW_UINT16>(nWhichCamera));
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK_LOG_PARAMS(false)
 }
 
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumTopCamerasEx(DTWAIN_SOURCE Source)
@@ -307,14 +323,6 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumTopCamerasEx(DTWAIN_SOURCE Source)
     CATCH_BLOCK(nullptr)
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumTopCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, Cameras))
-    auto retval = DTWAIN_EnumCamerasEx(Source, DTWAIN_FT_CAMERATOP, Cameras);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-    CATCH_BLOCK(false)
-}
-
 DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumBottomCamerasEx(DTWAIN_SOURCE Source)
 {
     LOG_FUNC_ENTRY_PARAMS((Source))
@@ -324,26 +332,18 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumBottomCamerasEx(DTWAIN_SOURCE Source)
     CATCH_BLOCK(nullptr)
 }
 
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumBottomCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras)
-{
-    LOG_FUNC_ENTRY_PARAMS((Source, Cameras))
-    auto retval = DTWAIN_EnumCamerasEx(Source, DTWAIN_FT_CAMERABOTTOM, Cameras);
-    LOG_FUNC_EXIT_NONAME_PARAMS(retval)
-    CATCH_BLOCK(false)
-}
 
-#define DTWAIN_FT_ALLCAMERAS     0xFFFF
-
-DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCameras(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Cameras)
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumCamerasEx2(DTWAIN_SOURCE Source, LONG nWhichCamera)
 {
-    LOG_FUNC_ENTRY_PARAMS((Source, Cameras))
+    LOG_FUNC_ENTRY_PARAMS((Source, nWhichCamera))
     auto [pHandle, pSource] = VerifyHandles(Source, DTWAIN_TEST_SOURCEOPEN_SETLASTERROR);
+    DTWAIN_ARRAY Cameras = {};
     int fsSupported = CheckFileSystemSupport(pSource);
-    DTWAIN_Check_Error_Condition_1_Ex(pHandle, [&] {return fsSupported != DTWAIN_NO_ERROR; },
-        fsSupported, false, FUNC_MACRO);
-    FSGetCameras(pSource, Cameras, DTWAIN_FT_ALLCAMERAS);
-    LOG_FUNC_EXIT_NONAME_PARAMS(true)
-    CATCH_BLOCK_LOG_PARAMS(false)
+    DTWAIN_Check_Error_Condition_1_Ex(pSource->GetDTWAINHandle(), [&] {return fsSupported != DTWAIN_NO_ERROR; },
+                                      fsSupported, false, FUNC_MACRO);
+    FSGetCameras(pSource, &Cameras, static_cast<TW_UINT16>(nWhichCamera));
+    LOG_FUNC_EXIT_NONAME_PARAMS(Cameras)
+    CATCH_BLOCK_LOG_PARAMS(nullptr)
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_SetCamera(DTWAIN_SOURCE Source, LPCTSTR szCamera)
