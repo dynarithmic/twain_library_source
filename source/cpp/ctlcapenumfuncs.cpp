@@ -49,6 +49,15 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumExtendedCapsEx(DTWAIN_SOURCE Source)
     CATCH_BLOCK(nullptr)
 }
 
+DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumSupportedCapsEx(DTWAIN_SOURCE Source)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source))
+    DTWAIN_ARRAY pArray = nullptr;
+    DTWAIN_EnumSupportedCaps(Source, &pArray);
+    LOG_FUNC_EXIT_NONAME_PARAMS(pArray)
+    CATCH_BLOCK(nullptr)
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY Array)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, Array))
