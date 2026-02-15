@@ -2332,7 +2332,7 @@ namespace Dynarithmic
         public static extern int DTWAIN_EnumBitDepths(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_EnumBitDepthsEx(DTWAIN_SOURCE Source, int PixelType, ref DTWAIN_ARRAY pArray);
+        public static extern DTWAIN_ARRAY DTWAIN_EnumBitDepthsEx(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern DTWAIN_ARRAY DTWAIN_EnumBitDepthsEx2(DTWAIN_SOURCE Source, int PixelType);
@@ -2353,13 +2353,10 @@ namespace Dynarithmic
         public static extern int DTWAIN_EnumCameras(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY Cameras);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_EnumCamerasEx(DTWAIN_SOURCE Source, int nWhichCamera, ref DTWAIN_ARRAY Cameras);
+        public static extern DTWAIN_ARRAY DTWAIN_EnumCamerasEx(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern DTWAIN_ARRAY DTWAIN_EnumCamerasEx2(DTWAIN_SOURCE Source);
-
-        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern DTWAIN_ARRAY DTWAIN_EnumCamerasEx3(DTWAIN_SOURCE Source, int nWhichCamera);
+        public static extern DTWAIN_ARRAY DTWAIN_EnumCamerasEx2(DTWAIN_SOURCE Source, int nWhichCamera);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_EnumCompressionTypes(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
@@ -2380,7 +2377,7 @@ namespace Dynarithmic
         public static extern int DTWAIN_EnumCustomCaps(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern DTWAIN_ARRAY DTWAIN_EnumCustomCapsEx2(DTWAIN_SOURCE Source);
+        public static extern DTWAIN_ARRAY DTWAIN_EnumCustomCapsEx(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_EnumDoubleFeedDetectLengths(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray, int bExpandIfRange);
@@ -2404,7 +2401,7 @@ namespace Dynarithmic
         public static extern int DTWAIN_EnumExtendedCaps(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int DTWAIN_EnumExtendedCapsEx(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
+        public static extern DTWAIN_ARRAY DTWAIN_EnumExtendedCapsEx(DTWAIN_SOURCE Source);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern DTWAIN_ARRAY DTWAIN_EnumExtendedCapsEx2(DTWAIN_SOURCE Source);

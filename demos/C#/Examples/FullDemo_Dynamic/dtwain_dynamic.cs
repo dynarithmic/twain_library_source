@@ -2078,23 +2078,22 @@
         public delegate int DTWAIN_EnumAutomaticSenseMediumDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
         public delegate DTWAIN_ARRAY DTWAIN_EnumAutomaticSenseMediumExDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_EnumBitDepthsDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
-        public delegate int DTWAIN_EnumBitDepthsExDelegate(DTWAIN_SOURCE Source, int PixelType, ref DTWAIN_ARRAY pArray);
+        public delegate DTWAIN_ARRAY DTWAIN_EnumBitDepthsExDelegate(DTWAIN_SOURCE Source);
         public delegate DTWAIN_ARRAY DTWAIN_EnumBitDepthsEx2Delegate(DTWAIN_SOURCE Source, int PixelType);
         public delegate int DTWAIN_EnumBottomCamerasDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY Cameras);
         public delegate DTWAIN_ARRAY DTWAIN_EnumBottomCamerasExDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_EnumBrightnessValuesDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray, int bExpandIfRange);
         public delegate DTWAIN_ARRAY DTWAIN_EnumBrightnessValuesExDelegate(DTWAIN_SOURCE Source, int bExpandIfRange);
         public delegate int DTWAIN_EnumCamerasDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY Cameras);
-        public delegate int DTWAIN_EnumCamerasExDelegate(DTWAIN_SOURCE Source, int nWhichCamera, ref DTWAIN_ARRAY Cameras);
-        public delegate DTWAIN_ARRAY DTWAIN_EnumCamerasEx2Delegate(DTWAIN_SOURCE Source);
-        public delegate DTWAIN_ARRAY DTWAIN_EnumCamerasEx3Delegate(DTWAIN_SOURCE Source, int nWhichCamera);
+        public delegate DTWAIN_ARRAY DTWAIN_EnumCamerasExDelegate(DTWAIN_SOURCE Source);
+        public delegate DTWAIN_ARRAY DTWAIN_EnumCamerasEx2Delegate(DTWAIN_SOURCE Source, int nWhichCamera);
         public delegate int DTWAIN_EnumCompressionTypesDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
         public delegate DTWAIN_ARRAY DTWAIN_EnumCompressionTypesExDelegate(DTWAIN_SOURCE Source);
         public delegate DTWAIN_ARRAY DTWAIN_EnumCompressionTypesEx2Delegate(DTWAIN_SOURCE Source, int lFileType, int bUseBufferedMode);
         public delegate int DTWAIN_EnumContrastValuesDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray, int bExpandIfRange);
         public delegate DTWAIN_ARRAY DTWAIN_EnumContrastValuesExDelegate(DTWAIN_SOURCE Source, int bExpandIfRange);
         public delegate int DTWAIN_EnumCustomCapsDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
-        public delegate DTWAIN_ARRAY DTWAIN_EnumCustomCapsEx2Delegate(DTWAIN_SOURCE Source);
+        public delegate DTWAIN_ARRAY DTWAIN_EnumCustomCapsExDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_EnumDoubleFeedDetectLengthsDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray, int bExpandIfRange);
         public delegate DTWAIN_ARRAY DTWAIN_EnumDoubleFeedDetectLengthsExDelegate(DTWAIN_SOURCE Source, int bExpandIfRange);
         public delegate int DTWAIN_EnumDoubleFeedDetectValuesDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
@@ -2102,7 +2101,7 @@
         public delegate int DTWAIN_EnumExtImageInfoTypesDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
         public delegate DTWAIN_ARRAY DTWAIN_EnumExtImageInfoTypesExDelegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_EnumExtendedCapsDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
-        public delegate int DTWAIN_EnumExtendedCapsExDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
+        public delegate DTWAIN_ARRAY DTWAIN_EnumExtendedCapsExDelegate(DTWAIN_SOURCE Source);
         public delegate DTWAIN_ARRAY DTWAIN_EnumExtendedCapsEx2Delegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_EnumFileTypeBitsPerPixelDelegate(int FileType, ref DTWAIN_ARRAY Array);
         public delegate int DTWAIN_EnumFileXferFormatsDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
@@ -3353,9 +3352,6 @@
         [DTWAINNativeFunction("DTWAIN_EnumCamerasEx2")]
         private readonly DTWAIN_EnumCamerasEx2Delegate  _DTWAIN_EnumCamerasEx2;
 
-        [DTWAINNativeFunction("DTWAIN_EnumCamerasEx3")]
-        private readonly DTWAIN_EnumCamerasEx3Delegate  _DTWAIN_EnumCamerasEx3;
-
         [DTWAINNativeFunction("DTWAIN_EnumCompressionTypes")]
         private readonly DTWAIN_EnumCompressionTypesDelegate  _DTWAIN_EnumCompressionTypes;
 
@@ -3374,8 +3370,8 @@
         [DTWAINNativeFunction("DTWAIN_EnumCustomCaps")]
         private readonly DTWAIN_EnumCustomCapsDelegate  _DTWAIN_EnumCustomCaps;
 
-        [DTWAINNativeFunction("DTWAIN_EnumCustomCapsEx2")]
-        private readonly DTWAIN_EnumCustomCapsEx2Delegate  _DTWAIN_EnumCustomCapsEx2;
+        [DTWAINNativeFunction("DTWAIN_EnumCustomCapsEx")]
+        private readonly DTWAIN_EnumCustomCapsExDelegate  _DTWAIN_EnumCustomCapsEx;
 
         [DTWAINNativeFunction("DTWAIN_EnumDoubleFeedDetectLengths")]
         private readonly DTWAIN_EnumDoubleFeedDetectLengthsDelegate  _DTWAIN_EnumDoubleFeedDetectLengths;
@@ -5935,8 +5931,8 @@
         public  int DTWAIN_EnumBitDepths(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray)
         => _DTWAIN_EnumBitDepths(Source, ref pArray);
 
-        public  int DTWAIN_EnumBitDepthsEx(DTWAIN_SOURCE Source, int PixelType, ref DTWAIN_ARRAY pArray)
-        => _DTWAIN_EnumBitDepthsEx(Source, PixelType, ref pArray);
+        public  DTWAIN_ARRAY DTWAIN_EnumBitDepthsEx(DTWAIN_SOURCE Source)
+        => _DTWAIN_EnumBitDepthsEx(Source);
 
         public  DTWAIN_ARRAY DTWAIN_EnumBitDepthsEx2(DTWAIN_SOURCE Source, int PixelType)
         => _DTWAIN_EnumBitDepthsEx2(Source, PixelType);
@@ -5956,14 +5952,11 @@
         public  int DTWAIN_EnumCameras(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY Cameras)
         => _DTWAIN_EnumCameras(Source, ref Cameras);
 
-        public  int DTWAIN_EnumCamerasEx(DTWAIN_SOURCE Source, int nWhichCamera, ref DTWAIN_ARRAY Cameras)
-        => _DTWAIN_EnumCamerasEx(Source, nWhichCamera, ref Cameras);
+        public  DTWAIN_ARRAY DTWAIN_EnumCamerasEx(DTWAIN_SOURCE Source)
+        => _DTWAIN_EnumCamerasEx(Source);
 
-        public  DTWAIN_ARRAY DTWAIN_EnumCamerasEx2(DTWAIN_SOURCE Source)
-        => _DTWAIN_EnumCamerasEx2(Source);
-
-        public  DTWAIN_ARRAY DTWAIN_EnumCamerasEx3(DTWAIN_SOURCE Source, int nWhichCamera)
-        => _DTWAIN_EnumCamerasEx3(Source, nWhichCamera);
+        public  DTWAIN_ARRAY DTWAIN_EnumCamerasEx2(DTWAIN_SOURCE Source, int nWhichCamera)
+        => _DTWAIN_EnumCamerasEx2(Source, nWhichCamera);
 
         public  int DTWAIN_EnumCompressionTypes(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray)
         => _DTWAIN_EnumCompressionTypes(Source, ref pArray);
@@ -5983,8 +5976,8 @@
         public  int DTWAIN_EnumCustomCaps(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray)
         => _DTWAIN_EnumCustomCaps(Source, ref pArray);
 
-        public  DTWAIN_ARRAY DTWAIN_EnumCustomCapsEx2(DTWAIN_SOURCE Source)
-        => _DTWAIN_EnumCustomCapsEx2(Source);
+        public  DTWAIN_ARRAY DTWAIN_EnumCustomCapsEx(DTWAIN_SOURCE Source)
+        => _DTWAIN_EnumCustomCapsEx(Source);
 
         public  int DTWAIN_EnumDoubleFeedDetectLengths(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray, int bExpandIfRange)
         => _DTWAIN_EnumDoubleFeedDetectLengths(Source, ref pArray, bExpandIfRange);
@@ -6007,8 +6000,8 @@
         public  int DTWAIN_EnumExtendedCaps(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray)
         => _DTWAIN_EnumExtendedCaps(Source, ref pArray);
 
-        public  int DTWAIN_EnumExtendedCapsEx(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray)
-        => _DTWAIN_EnumExtendedCapsEx(Source, ref pArray);
+        public  DTWAIN_ARRAY DTWAIN_EnumExtendedCapsEx(DTWAIN_SOURCE Source)
+        => _DTWAIN_EnumExtendedCapsEx(Source);
 
         public  DTWAIN_ARRAY DTWAIN_EnumExtendedCapsEx2(DTWAIN_SOURCE Source)
         => _DTWAIN_EnumExtendedCapsEx2(Source);

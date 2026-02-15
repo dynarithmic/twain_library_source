@@ -370,14 +370,13 @@ class DTWAINAPI
    attr_reader :DTWAIN_EnumCameras
    attr_reader :DTWAIN_EnumCamerasEx
    attr_reader :DTWAIN_EnumCamerasEx2
-   attr_reader :DTWAIN_EnumCamerasEx3
    attr_reader :DTWAIN_EnumCompressionTypes
    attr_reader :DTWAIN_EnumCompressionTypesEx
    attr_reader :DTWAIN_EnumCompressionTypesEx2
    attr_reader :DTWAIN_EnumContrastValues
    attr_reader :DTWAIN_EnumContrastValuesEx
    attr_reader :DTWAIN_EnumCustomCaps
-   attr_reader :DTWAIN_EnumCustomCapsEx2
+   attr_reader :DTWAIN_EnumCustomCapsEx
    attr_reader :DTWAIN_EnumDoubleFeedDetectLengths
    attr_reader :DTWAIN_EnumDoubleFeedDetectLengthsEx
    attr_reader :DTWAIN_EnumDoubleFeedDetectValues
@@ -3155,23 +3154,22 @@ class DTWAINAPI
        @DTWAIN_EnumAutomaticSenseMedium = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumAutomaticSenseMedium'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_EnumAutomaticSenseMediumEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumAutomaticSenseMediumEx'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumBitDepths = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumBitDepths'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
-       @DTWAIN_EnumBitDepthsEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumBitDepthsEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_EnumBitDepthsEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumBitDepthsEx'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumBitDepthsEx2 = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumBitDepthsEx2'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumBottomCameras = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumBottomCameras'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_EnumBottomCamerasEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumBottomCamerasEx'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumBrightnessValues = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumBrightnessValues'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_LONG)
        @DTWAIN_EnumBrightnessValuesEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumBrightnessValuesEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumCameras = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumCameras'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
-       @DTWAIN_EnumCamerasEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumCamerasEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
-       @DTWAIN_EnumCamerasEx2 = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumCamerasEx2'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
-       @DTWAIN_EnumCamerasEx3 = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumCamerasEx3'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
+       @DTWAIN_EnumCamerasEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumCamerasEx'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
+       @DTWAIN_EnumCamerasEx2 = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumCamerasEx2'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumCompressionTypes = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumCompressionTypes'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_EnumCompressionTypesEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumCompressionTypesEx'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumCompressionTypesEx2 = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumCompressionTypesEx2'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_LONG, Fiddle::TYPE_INT],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumContrastValues = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumContrastValues'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_LONG)
        @DTWAIN_EnumContrastValuesEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumContrastValuesEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumCustomCaps = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumCustomCaps'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
-       @DTWAIN_EnumCustomCapsEx2 = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumCustomCapsEx2'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
+       @DTWAIN_EnumCustomCapsEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumCustomCapsEx'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumDoubleFeedDetectLengths = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumDoubleFeedDetectLengths'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_LONG)
        @DTWAIN_EnumDoubleFeedDetectLengthsEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumDoubleFeedDetectLengthsEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_INT],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumDoubleFeedDetectValues = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumDoubleFeedDetectValues'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_LONG)
@@ -3179,7 +3177,7 @@ class DTWAINAPI
        @DTWAIN_EnumExtImageInfoTypes = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumExtImageInfoTypes'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_EnumExtImageInfoTypesEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumExtImageInfoTypesEx'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumExtendedCaps = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumExtendedCaps'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
-       @DTWAIN_EnumExtendedCapsEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumExtendedCapsEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_EnumExtendedCapsEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumExtendedCapsEx'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumExtendedCapsEx2 = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumExtendedCapsEx2'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumFileTypeBitsPerPixel = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumFileTypeBitsPerPixel'],[Fiddle::TYPE_LONG, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_EnumFileXferFormats = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumFileXferFormats'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)

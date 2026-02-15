@@ -273,23 +273,22 @@ type DtwainenumautomaticcapturesexFunc = unsafe extern "C" fn(*mut c_void,i32) -
 type DtwainenumautomaticsensemediumFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
 type DtwainenumautomaticsensemediumexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
 type DtwainenumbitdepthsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumbitdepthsexFunc = unsafe extern "C" fn(*mut c_void,i32,*mut *mut c_void) -> i32;
+type DtwainenumbitdepthsexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
 type Dtwainenumbitdepthsex2Func = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
 type DtwainenumbottomcamerasFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
 type DtwainenumbottomcamerasexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
 type DtwainenumbrightnessvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
 type DtwainenumbrightnessvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
 type DtwainenumcamerasFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumcamerasexFunc = unsafe extern "C" fn(*mut c_void,i32,*mut *mut c_void) -> i32;
-type Dtwainenumcamerasex2Func = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
-type Dtwainenumcamerasex3Func = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
+type DtwainenumcamerasexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type Dtwainenumcamerasex2Func = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
 type DtwainenumcompressiontypesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
 type DtwainenumcompressiontypesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
 type Dtwainenumcompressiontypesex2Func = unsafe extern "C" fn(*mut c_void,i32,i32) -> *mut c_void;
 type DtwainenumcontrastvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
 type DtwainenumcontrastvaluesexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
 type DtwainenumcustomcapsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type Dtwainenumcustomcapsex2Func = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type DtwainenumcustomcapsexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
 type DtwainenumdoublefeeddetectlengthsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void,i32) -> i32;
 type DtwainenumdoublefeeddetectlengthsexFunc = unsafe extern "C" fn(*mut c_void,i32) -> *mut c_void;
 type DtwainenumdoublefeeddetectvaluesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
@@ -297,7 +296,7 @@ type DtwainenumdoublefeeddetectvaluesexFunc = unsafe extern "C" fn(*mut c_void) 
 type DtwainenumextimageinfotypesFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
 type DtwainenumextimageinfotypesexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
 type DtwainenumextendedcapsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumextendedcapsexFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumextendedcapsexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
 type Dtwainenumextendedcapsex2Func = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
 type DtwainenumfiletypebitsperpixelFunc = unsafe extern "C" fn(i32,*mut *mut c_void) -> i32;
 type DtwainenumfilexferformatsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
@@ -1401,14 +1400,13 @@ pub struct DTwainAPI<'a>
     DTWAIN_EnumCamerasFunc: Symbol<'a, DtwainenumcamerasFunc>,
     DTWAIN_EnumCamerasExFunc: Symbol<'a, DtwainenumcamerasexFunc>,
     DTWAIN_EnumCamerasEx2Func: Symbol<'a, Dtwainenumcamerasex2Func>,
-    DTWAIN_EnumCamerasEx3Func: Symbol<'a, Dtwainenumcamerasex3Func>,
     DTWAIN_EnumCompressionTypesFunc: Symbol<'a, DtwainenumcompressiontypesFunc>,
     DTWAIN_EnumCompressionTypesExFunc: Symbol<'a, DtwainenumcompressiontypesexFunc>,
     DTWAIN_EnumCompressionTypesEx2Func: Symbol<'a, Dtwainenumcompressiontypesex2Func>,
     DTWAIN_EnumContrastValuesFunc: Symbol<'a, DtwainenumcontrastvaluesFunc>,
     DTWAIN_EnumContrastValuesExFunc: Symbol<'a, DtwainenumcontrastvaluesexFunc>,
     DTWAIN_EnumCustomCapsFunc: Symbol<'a, DtwainenumcustomcapsFunc>,
-    DTWAIN_EnumCustomCapsEx2Func: Symbol<'a, Dtwainenumcustomcapsex2Func>,
+    DTWAIN_EnumCustomCapsExFunc: Symbol<'a, DtwainenumcustomcapsexFunc>,
     DTWAIN_EnumDoubleFeedDetectLengthsFunc: Symbol<'a, DtwainenumdoublefeeddetectlengthsFunc>,
     DTWAIN_EnumDoubleFeedDetectLengthsExFunc: Symbol<'a, DtwainenumdoublefeeddetectlengthsexFunc>,
     DTWAIN_EnumDoubleFeedDetectValuesFunc: Symbol<'a, DtwainenumdoublefeeddetectvaluesFunc>,
@@ -4159,14 +4157,13 @@ impl<'a> DTwainAPI<'a>
         let DTWAIN_EnumCameras: Symbol<DtwainenumcamerasFunc> = unsafe { library.get(b"DTWAIN_EnumCameras")? };
         let DTWAIN_EnumCamerasEx: Symbol<DtwainenumcamerasexFunc> = unsafe { library.get(b"DTWAIN_EnumCamerasEx")? };
         let DTWAIN_EnumCamerasEx2: Symbol<Dtwainenumcamerasex2Func> = unsafe { library.get(b"DTWAIN_EnumCamerasEx2")? };
-        let DTWAIN_EnumCamerasEx3: Symbol<Dtwainenumcamerasex3Func> = unsafe { library.get(b"DTWAIN_EnumCamerasEx3")? };
         let DTWAIN_EnumCompressionTypes: Symbol<DtwainenumcompressiontypesFunc> = unsafe { library.get(b"DTWAIN_EnumCompressionTypes")? };
         let DTWAIN_EnumCompressionTypesEx: Symbol<DtwainenumcompressiontypesexFunc> = unsafe { library.get(b"DTWAIN_EnumCompressionTypesEx")? };
         let DTWAIN_EnumCompressionTypesEx2: Symbol<Dtwainenumcompressiontypesex2Func> = unsafe { library.get(b"DTWAIN_EnumCompressionTypesEx2")? };
         let DTWAIN_EnumContrastValues: Symbol<DtwainenumcontrastvaluesFunc> = unsafe { library.get(b"DTWAIN_EnumContrastValues")? };
         let DTWAIN_EnumContrastValuesEx: Symbol<DtwainenumcontrastvaluesexFunc> = unsafe { library.get(b"DTWAIN_EnumContrastValuesEx")? };
         let DTWAIN_EnumCustomCaps: Symbol<DtwainenumcustomcapsFunc> = unsafe { library.get(b"DTWAIN_EnumCustomCaps")? };
-        let DTWAIN_EnumCustomCapsEx2: Symbol<Dtwainenumcustomcapsex2Func> = unsafe { library.get(b"DTWAIN_EnumCustomCapsEx2")? };
+        let DTWAIN_EnumCustomCapsEx: Symbol<DtwainenumcustomcapsexFunc> = unsafe { library.get(b"DTWAIN_EnumCustomCapsEx")? };
         let DTWAIN_EnumDoubleFeedDetectLengths: Symbol<DtwainenumdoublefeeddetectlengthsFunc> = unsafe { library.get(b"DTWAIN_EnumDoubleFeedDetectLengths")? };
         let DTWAIN_EnumDoubleFeedDetectLengthsEx: Symbol<DtwainenumdoublefeeddetectlengthsexFunc> = unsafe { library.get(b"DTWAIN_EnumDoubleFeedDetectLengthsEx")? };
         let DTWAIN_EnumDoubleFeedDetectValues: Symbol<DtwainenumdoublefeeddetectvaluesFunc> = unsafe { library.get(b"DTWAIN_EnumDoubleFeedDetectValues")? };
@@ -5277,14 +5274,13 @@ impl<'a> DTwainAPI<'a>
             DTWAIN_EnumCamerasFunc: DTWAIN_EnumCameras,
             DTWAIN_EnumCamerasExFunc: DTWAIN_EnumCamerasEx,
             DTWAIN_EnumCamerasEx2Func: DTWAIN_EnumCamerasEx2,
-            DTWAIN_EnumCamerasEx3Func: DTWAIN_EnumCamerasEx3,
             DTWAIN_EnumCompressionTypesFunc: DTWAIN_EnumCompressionTypes,
             DTWAIN_EnumCompressionTypesExFunc: DTWAIN_EnumCompressionTypesEx,
             DTWAIN_EnumCompressionTypesEx2Func: DTWAIN_EnumCompressionTypesEx2,
             DTWAIN_EnumContrastValuesFunc: DTWAIN_EnumContrastValues,
             DTWAIN_EnumContrastValuesExFunc: DTWAIN_EnumContrastValuesEx,
             DTWAIN_EnumCustomCapsFunc: DTWAIN_EnumCustomCaps,
-            DTWAIN_EnumCustomCapsEx2Func: DTWAIN_EnumCustomCapsEx2,
+            DTWAIN_EnumCustomCapsExFunc: DTWAIN_EnumCustomCapsEx,
             DTWAIN_EnumDoubleFeedDetectLengthsFunc: DTWAIN_EnumDoubleFeedDetectLengths,
             DTWAIN_EnumDoubleFeedDetectLengthsExFunc: DTWAIN_EnumDoubleFeedDetectLengthsEx,
             DTWAIN_EnumDoubleFeedDetectValuesFunc: DTWAIN_EnumDoubleFeedDetectValues,
@@ -7067,8 +7063,8 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_EnumBitDepthsFunc)(Source, pArray);  }
     }
 
-    pub fn DTWAIN_EnumBitDepthsEx(&self, Source: *mut c_void, PixelType: i32, pArray: *mut *mut c_void) -> i32 {
-        unsafe { return (self.DTWAIN_EnumBitDepthsExFunc)(Source, PixelType, pArray);  }
+    pub fn DTWAIN_EnumBitDepthsEx(&self, Source: *mut c_void) -> *mut c_void {
+        unsafe { return (self.DTWAIN_EnumBitDepthsExFunc)(Source);  }
     }
 
     pub fn DTWAIN_EnumBitDepthsEx2(&self, Source: *mut c_void, PixelType: i32) -> *mut c_void {
@@ -7095,16 +7091,12 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_EnumCamerasFunc)(Source, Cameras);  }
     }
 
-    pub fn DTWAIN_EnumCamerasEx(&self, Source: *mut c_void, nWhichCamera: i32, Cameras: *mut *mut c_void) -> i32 {
-        unsafe { return (self.DTWAIN_EnumCamerasExFunc)(Source, nWhichCamera, Cameras);  }
+    pub fn DTWAIN_EnumCamerasEx(&self, Source: *mut c_void) -> *mut c_void {
+        unsafe { return (self.DTWAIN_EnumCamerasExFunc)(Source);  }
     }
 
-    pub fn DTWAIN_EnumCamerasEx2(&self, Source: *mut c_void) -> *mut c_void {
-        unsafe { return (self.DTWAIN_EnumCamerasEx2Func)(Source);  }
-    }
-
-    pub fn DTWAIN_EnumCamerasEx3(&self, Source: *mut c_void, nWhichCamera: i32) -> *mut c_void {
-        unsafe { return (self.DTWAIN_EnumCamerasEx3Func)(Source, nWhichCamera);  }
+    pub fn DTWAIN_EnumCamerasEx2(&self, Source: *mut c_void, nWhichCamera: i32) -> *mut c_void {
+        unsafe { return (self.DTWAIN_EnumCamerasEx2Func)(Source, nWhichCamera);  }
     }
 
     pub fn DTWAIN_EnumCompressionTypes(&self, Source: *mut c_void, pArray: *mut *mut c_void) -> i32 {
@@ -7131,8 +7123,8 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_EnumCustomCapsFunc)(Source, pArray);  }
     }
 
-    pub fn DTWAIN_EnumCustomCapsEx2(&self, Source: *mut c_void) -> *mut c_void {
-        unsafe { return (self.DTWAIN_EnumCustomCapsEx2Func)(Source);  }
+    pub fn DTWAIN_EnumCustomCapsEx(&self, Source: *mut c_void) -> *mut c_void {
+        unsafe { return (self.DTWAIN_EnumCustomCapsExFunc)(Source);  }
     }
 
     pub fn DTWAIN_EnumDoubleFeedDetectLengths(&self, Source: *mut c_void, pArray: *mut *mut c_void, bExpandIfRange: i32) -> i32 {
@@ -7163,8 +7155,8 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_EnumExtendedCapsFunc)(Source, pArray);  }
     }
 
-    pub fn DTWAIN_EnumExtendedCapsEx(&self, Source: *mut c_void, pArray: *mut *mut c_void) -> i32 {
-        unsafe { return (self.DTWAIN_EnumExtendedCapsExFunc)(Source, pArray);  }
+    pub fn DTWAIN_EnumExtendedCapsEx(&self, Source: *mut c_void) -> *mut c_void {
+        unsafe { return (self.DTWAIN_EnumExtendedCapsExFunc)(Source);  }
     }
 
     pub fn DTWAIN_EnumExtendedCapsEx2(&self, Source: *mut c_void) -> *mut c_void {
