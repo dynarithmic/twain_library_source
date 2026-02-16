@@ -1265,6 +1265,7 @@ const
   DTWAIN_DLG_HIGHLIGHTFIRST = 8192;
   DTWAIN_DLG_SAVELASTSCREENPOS = 16384;
   DTWAIN_DLG_CENTER_CURRENT_MONITOR = 32768;
+  DTWAIN_DLG_CONSOLEASPARENT = 65536;
   DTWAIN_RES_ENGLISH = 0;
   DTWAIN_RES_FRENCH = 1;
   DTWAIN_RES_SPANISH = 2;
@@ -2137,7 +2138,7 @@ function DTWAIN_EnumSourceValuesW(Source:DTWAIN_SOURCE; capName:LPCWSTR; values:
 function DTWAIN_EnumSources(lpArray:LPDTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnumSources';
 function DTWAIN_EnumSourcesEx : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnumSourcesEx';
 function DTWAIN_EnumSupportedCaps(Source:DTWAIN_SOURCE; pArray:LPDTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnumSupportedCaps';
-function DTWAIN_EnumSupportedCapsEx(Source:DTWAIN_SOURCE; pArray:LPDTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnumSupportedCapsEx';
+function DTWAIN_EnumSupportedCapsEx(Source:DTWAIN_SOURCE) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnumSupportedCapsEx';
 function DTWAIN_EnumSupportedCapsEx2(Source:DTWAIN_SOURCE) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnumSupportedCapsEx2';
 function DTWAIN_EnumSupportedExtImageInfo(Source:DTWAIN_SOURCE; pArray:LPDTWAIN_ARRAY) : BOOL; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnumSupportedExtImageInfo';
 function DTWAIN_EnumSupportedExtImageInfoEx(Source:DTWAIN_SOURCE) : DTWAIN_ARRAY; stdcall;  external 'dtwain32u.dll'  name 'DTWAIN_EnumSupportedExtImageInfoEx';

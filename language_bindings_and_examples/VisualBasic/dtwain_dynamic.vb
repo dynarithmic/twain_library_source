@@ -1340,6 +1340,7 @@ Namespace Dynarithmic
         Public Const DTWAIN_DLG_HIGHLIGHTFIRST As Integer = 8192
         Public Const DTWAIN_DLG_SAVELASTSCREENPOS As Integer = 16384
         Public Const DTWAIN_DLG_CENTER_CURRENT_MONITOR As Integer = 32768
+        Public Const DTWAIN_DLG_CONSOLEASPARENT As Integer = 65536
         Public Const DTWAIN_RES_ENGLISH As Integer = 0
         Public Const DTWAIN_RES_FRENCH As Integer = 1
         Public Const DTWAIN_RES_SPANISH As Integer = 2
@@ -2673,7 +2674,7 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_EnumSupportedCapsDelegate(Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
-        Private Delegate Function DTWAIN_EnumSupportedCapsExDelegate(Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
+        Private Delegate Function DTWAIN_EnumSupportedCapsExDelegate(Source As System.IntPtr) As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_EnumSupportedCapsEx2Delegate(Source As System.IntPtr) As System.IntPtr
@@ -5325,8 +5326,8 @@ Namespace Dynarithmic
         Return api.DTWAIN_EnumSupportedCaps(Source, pArray)
         End Function
         
-        Public Function DTWAIN_EnumSupportedCapsEx(Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
-        Return api.DTWAIN_EnumSupportedCapsEx(Source, pArray)
+        Public Function DTWAIN_EnumSupportedCapsEx(Source As System.IntPtr) As System.IntPtr
+        Return api.DTWAIN_EnumSupportedCapsEx(Source)
         End Function
         
         Public Function DTWAIN_EnumSupportedCapsEx2(Source As System.IntPtr) As System.IntPtr

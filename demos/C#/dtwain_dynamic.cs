@@ -1240,6 +1240,7 @@
         public const int DTWAIN_DLG_HIGHLIGHTFIRST = 8192;
         public const int DTWAIN_DLG_SAVELASTSCREENPOS = 16384;
         public const int DTWAIN_DLG_CENTER_CURRENT_MONITOR = 32768;
+        public const int DTWAIN_DLG_CONSOLEASPARENT = 65536;
         public const int DTWAIN_RES_ENGLISH = 0;
         public const int DTWAIN_RES_FRENCH = 1;
         public const int DTWAIN_RES_SPANISH = 2;
@@ -2154,7 +2155,7 @@
         public delegate int DTWAIN_EnumSourcesDelegate(ref DTWAIN_ARRAY lpArray);
         public delegate DTWAIN_ARRAY DTWAIN_EnumSourcesExDelegate();
         public delegate int DTWAIN_EnumSupportedCapsDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
-        public delegate int DTWAIN_EnumSupportedCapsExDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
+        public delegate DTWAIN_ARRAY DTWAIN_EnumSupportedCapsExDelegate(DTWAIN_SOURCE Source);
         public delegate DTWAIN_ARRAY DTWAIN_EnumSupportedCapsEx2Delegate(DTWAIN_SOURCE Source);
         public delegate int DTWAIN_EnumSupportedExtImageInfoDelegate(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray);
         public delegate DTWAIN_ARRAY DTWAIN_EnumSupportedExtImageInfoExDelegate(DTWAIN_SOURCE Source);
@@ -6159,8 +6160,8 @@
         public  int DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray)
         => _DTWAIN_EnumSupportedCaps(Source, ref pArray);
 
-        public  int DTWAIN_EnumSupportedCapsEx(DTWAIN_SOURCE Source, ref DTWAIN_ARRAY pArray)
-        => _DTWAIN_EnumSupportedCapsEx(Source, ref pArray);
+        public  DTWAIN_ARRAY DTWAIN_EnumSupportedCapsEx(DTWAIN_SOURCE Source)
+        => _DTWAIN_EnumSupportedCapsEx(Source);
 
         public  DTWAIN_ARRAY DTWAIN_EnumSupportedCapsEx2(DTWAIN_SOURCE Source)
         => _DTWAIN_EnumSupportedCapsEx2(Source);

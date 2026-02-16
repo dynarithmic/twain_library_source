@@ -1177,6 +1177,7 @@ const (
     DTWAIN_DLG_HIGHLIGHTFIRST = 8192
     DTWAIN_DLG_SAVELASTSCREENPOS = 16384
     DTWAIN_DLG_CENTER_CURRENT_MONITOR = 32768
+    DTWAIN_DLG_CONSOLEASPARENT = 65536
     DTWAIN_RES_ENGLISH = 0
     DTWAIN_RES_FRENCH = 1
     DTWAIN_RES_SPANISH = 2
@@ -4758,10 +4759,10 @@ func (d *DTWAIN_DLL) DTWAIN_EnumSupportedCaps(Source DTWAIN_SOURCE, pArray LPDTW
     return int32(v1)
 }
 
-func (d *DTWAIN_DLL) DTWAIN_EnumSupportedCapsEx(Source DTWAIN_SOURCE, pArray LPDTWAIN_ARRAY) int32 {
+func (d *DTWAIN_DLL) DTWAIN_EnumSupportedCapsEx(Source DTWAIN_SOURCE) DTWAIN_ARRAY {
     theProc := d.procs["DTWAIN_EnumSupportedCapsEx"]
-    v1, _, _ := syscall.SyscallN(theProc, uintptr(Source), uintptr(unsafe.Pointer(pArray)))
-    return int32(v1)
+    v1, _, _ := syscall.SyscallN(theProc, uintptr(Source))
+    return DTWAIN_ARRAY(v1)
 }
 
 func (d *DTWAIN_DLL) DTWAIN_EnumSupportedCapsEx2(Source DTWAIN_SOURCE) DTWAIN_ARRAY {

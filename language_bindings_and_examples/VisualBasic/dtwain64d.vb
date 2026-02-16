@@ -1169,6 +1169,7 @@ Class DTWAINAPI
     Public Const DTWAIN_DLG_HIGHLIGHTFIRST As Integer = 8192
     Public Const DTWAIN_DLG_SAVELASTSCREENPOS As Integer = 16384
     Public Const DTWAIN_DLG_CENTER_CURRENT_MONITOR As Integer = 32768
+    Public Const DTWAIN_DLG_CONSOLEASPARENT As Integer = 65536
     Public Const DTWAIN_RES_ENGLISH As Integer = 0
     Public Const DTWAIN_RES_FRENCH As Integer = 1
     Public Const DTWAIN_RES_SPANISH As Integer = 2
@@ -1992,7 +1993,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_EnumSources Lib "dtwain64d.dll" (ByRef lpArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_EnumSourcesEx Lib "dtwain64d.dll" () As System.IntPtr
     Public Declare Function DTWAIN_EnumSupportedCaps Lib "dtwain64d.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
-    Public Declare Function DTWAIN_EnumSupportedCapsEx Lib "dtwain64d.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
+    Public Declare Function DTWAIN_EnumSupportedCapsEx Lib "dtwain64d.dll" (Source As System.IntPtr) As System.IntPtr
     Public Declare Function DTWAIN_EnumSupportedCapsEx2 Lib "dtwain64d.dll" (Source As System.IntPtr) As System.IntPtr
     Public Declare Function DTWAIN_EnumSupportedExtImageInfo Lib "dtwain64d.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_EnumSupportedExtImageInfoEx Lib "dtwain64d.dll" (Source As System.IntPtr) As System.IntPtr

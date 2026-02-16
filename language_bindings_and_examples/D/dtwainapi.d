@@ -1342,6 +1342,7 @@ class DTWAIN_DynamicDLL
     public static const int DTWAIN_DLG_HIGHLIGHTFIRST = 8192;
     public static const int DTWAIN_DLG_SAVELASTSCREENPOS = 16384;
     public static const int DTWAIN_DLG_CENTER_CURRENT_MONITOR = 32768;
+    public static const int DTWAIN_DLG_CONSOLEASPARENT = 65536;
     public static const int DTWAIN_RES_ENGLISH = 0;
     public static const int DTWAIN_RES_FRENCH = 1;
     public static const int DTWAIN_RES_SPANISH = 2;
@@ -2213,7 +2214,7 @@ class DTWAIN_DynamicDLL
     extern(Windows) DTWAIN_BOOL function(LPDTWAIN_ARRAY) DTWAIN_EnumSources;
     extern(Windows) DTWAIN_ARRAY function() DTWAIN_EnumSourcesEx;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_EnumSupportedCaps;
-    extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_EnumSupportedCapsEx;
+    extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_EnumSupportedCapsEx;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_EnumSupportedCapsEx2;
     extern(Windows) DTWAIN_BOOL function(DTWAIN_SOURCE, LPDTWAIN_ARRAY) DTWAIN_EnumSupportedExtImageInfo;
     extern(Windows) DTWAIN_ARRAY function(DTWAIN_SOURCE) DTWAIN_EnumSupportedExtImageInfoEx;

@@ -351,7 +351,7 @@ type DtwainenumsourcevalueswFunc = unsafe extern "C" fn(*mut c_void,*const u16,*
 type DtwainenumsourcesFunc = unsafe extern "C" fn(*mut *mut c_void) -> i32;
 type DtwainenumsourcesexFunc = unsafe extern "C" fn() -> *mut c_void;
 type DtwainenumsupportedcapsFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
-type DtwainenumsupportedcapsexFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
+type DtwainenumsupportedcapsexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
 type Dtwainenumsupportedcapsex2Func = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
 type DtwainenumsupportedextimageinfoFunc = unsafe extern "C" fn(*mut c_void,*mut *mut c_void) -> i32;
 type DtwainenumsupportedextimageinfoexFunc = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
@@ -3360,6 +3360,7 @@ impl<'a> DTwainAPI<'a>
     pub const DTWAIN_DLG_HIGHLIGHTFIRST: i32 = 8192;
     pub const DTWAIN_DLG_SAVELASTSCREENPOS: i32 = 16384;
     pub const DTWAIN_DLG_CENTER_CURRENT_MONITOR: i32 = 32768;
+    pub const DTWAIN_DLG_CONSOLEASPARENT: i32 = 65536;
     pub const DTWAIN_RES_ENGLISH: i32 = 0;
     pub const DTWAIN_RES_FRENCH: i32 = 1;
     pub const DTWAIN_RES_SPANISH: i32 = 2;
@@ -7375,8 +7376,8 @@ impl<'a> DTwainAPI<'a>
         unsafe { return (self.DTWAIN_EnumSupportedCapsFunc)(Source, pArray);  }
     }
 
-    pub fn DTWAIN_EnumSupportedCapsEx(&self, Source: *mut c_void, pArray: *mut *mut c_void) -> i32 {
-        unsafe { return (self.DTWAIN_EnumSupportedCapsExFunc)(Source, pArray);  }
+    pub fn DTWAIN_EnumSupportedCapsEx(&self, Source: *mut c_void) -> *mut c_void {
+        unsafe { return (self.DTWAIN_EnumSupportedCapsExFunc)(Source);  }
     }
 
     pub fn DTWAIN_EnumSupportedCapsEx2(&self, Source: *mut c_void) -> *mut c_void {

@@ -381,7 +381,7 @@ function load32bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_EnumSources(LPDTWAIN_ARRAY lpArray);
         DTWAIN_ARRAY DTWAIN_EnumSourcesEx();
         DTWAIN_BOOL DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
-        DTWAIN_BOOL DTWAIN_EnumSupportedCapsEx(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
+        DTWAIN_ARRAY DTWAIN_EnumSupportedCapsEx(DTWAIN_SOURCE Source);
         DTWAIN_ARRAY DTWAIN_EnumSupportedCapsEx2(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_EnumSupportedExtImageInfo(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
         DTWAIN_ARRAY DTWAIN_EnumSupportedExtImageInfoEx(DTWAIN_SOURCE Source);
@@ -1554,7 +1554,7 @@ function load32bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_EnumSources(LPDTWAIN_ARRAY lpArray);
         DTWAIN_ARRAY DTWAIN_EnumSourcesEx();
         DTWAIN_BOOL DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
-        DTWAIN_BOOL DTWAIN_EnumSupportedCapsEx(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
+        DTWAIN_ARRAY DTWAIN_EnumSupportedCapsEx(DTWAIN_SOURCE Source);
         DTWAIN_ARRAY DTWAIN_EnumSupportedCapsEx2(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_EnumSupportedExtImageInfo(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
         DTWAIN_ARRAY DTWAIN_EnumSupportedExtImageInfoEx(DTWAIN_SOURCE Source);
@@ -2727,7 +2727,7 @@ function load64bitAnsi(DLLToLoad)
         DTWAIN_BOOL DTWAIN_EnumSources(LPDTWAIN_ARRAY lpArray);
         DTWAIN_ARRAY DTWAIN_EnumSourcesEx();
         DTWAIN_BOOL DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
-        DTWAIN_BOOL DTWAIN_EnumSupportedCapsEx(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
+        DTWAIN_ARRAY DTWAIN_EnumSupportedCapsEx(DTWAIN_SOURCE Source);
         DTWAIN_ARRAY DTWAIN_EnumSupportedCapsEx2(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_EnumSupportedExtImageInfo(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
         DTWAIN_ARRAY DTWAIN_EnumSupportedExtImageInfoEx(DTWAIN_SOURCE Source);
@@ -3900,7 +3900,7 @@ function load64bitUnicode(DLLToLoad)
         DTWAIN_BOOL DTWAIN_EnumSources(LPDTWAIN_ARRAY lpArray);
         DTWAIN_ARRAY DTWAIN_EnumSourcesEx();
         DTWAIN_BOOL DTWAIN_EnumSupportedCaps(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
-        DTWAIN_BOOL DTWAIN_EnumSupportedCapsEx(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
+        DTWAIN_ARRAY DTWAIN_EnumSupportedCapsEx(DTWAIN_SOURCE Source);
         DTWAIN_ARRAY DTWAIN_EnumSupportedCapsEx2(DTWAIN_SOURCE Source);
         DTWAIN_BOOL DTWAIN_EnumSupportedExtImageInfo(DTWAIN_SOURCE Source, LPDTWAIN_ARRAY pArray);
         DTWAIN_ARRAY DTWAIN_EnumSupportedExtImageInfoEx(DTWAIN_SOURCE Source);

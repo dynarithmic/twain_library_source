@@ -1135,6 +1135,7 @@ DTWAIN_DLG_NOOPENONSELECT = 4096
 DTWAIN_DLG_HIGHLIGHTFIRST = 8192
 DTWAIN_DLG_SAVELASTSCREENPOS = 16384
 DTWAIN_DLG_CENTER_CURRENT_MONITOR = 32768
+DTWAIN_DLG_CONSOLEASPARENT = 65536
 DTWAIN_RES_ENGLISH = 0
 DTWAIN_RES_FRENCH = 1
 DTWAIN_RES_SPANISH = 2
@@ -2058,7 +2059,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_EnumSources.restype = ct.c_long
      theDLL.DTWAIN_EnumSourcesEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumSupportedCaps.restype = ct.c_long
-     theDLL.DTWAIN_EnumSupportedCapsEx.restype = ct.c_long
+     theDLL.DTWAIN_EnumSupportedCapsEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumSupportedCapsEx2.restype = ct.c_void_p
      theDLL.DTWAIN_EnumSupportedExtImageInfo.restype = ct.c_long
      theDLL.DTWAIN_EnumSupportedExtImageInfoEx.restype = ct.c_void_p
@@ -3170,7 +3171,7 @@ def setup_unicode(theDLL):
      theDLL.DTWAIN_EnumSourceValuesW.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.POINTER(ct.c_void_p), ct.c_long]
      theDLL.DTWAIN_EnumSources.argtypes = [ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumSupportedCaps.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
-     theDLL.DTWAIN_EnumSupportedCapsEx.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
+     theDLL.DTWAIN_EnumSupportedCapsEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumSupportedCapsEx2.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumSupportedExtImageInfo.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumSupportedExtImageInfoEx.argtypes = [ct.c_void_p]
@@ -4264,7 +4265,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_EnumSources.restype = ct.c_long
      theDLL.DTWAIN_EnumSourcesEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumSupportedCaps.restype = ct.c_long
-     theDLL.DTWAIN_EnumSupportedCapsEx.restype = ct.c_long
+     theDLL.DTWAIN_EnumSupportedCapsEx.restype = ct.c_void_p
      theDLL.DTWAIN_EnumSupportedCapsEx2.restype = ct.c_void_p
      theDLL.DTWAIN_EnumSupportedExtImageInfo.restype = ct.c_long
      theDLL.DTWAIN_EnumSupportedExtImageInfoEx.restype = ct.c_void_p
@@ -5376,7 +5377,7 @@ def setup_ansi(theDLL):
      theDLL.DTWAIN_EnumSourceValuesW.argtypes = [ct.c_void_p, ct.c_wchar_p, ct.POINTER(ct.c_void_p), ct.c_long]
      theDLL.DTWAIN_EnumSources.argtypes = [ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumSupportedCaps.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
-     theDLL.DTWAIN_EnumSupportedCapsEx.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
+     theDLL.DTWAIN_EnumSupportedCapsEx.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumSupportedCapsEx2.argtypes = [ct.c_void_p]
      theDLL.DTWAIN_EnumSupportedExtImageInfo.argtypes = [ct.c_void_p, ct.POINTER(ct.c_void_p)]
      theDLL.DTWAIN_EnumSupportedExtImageInfoEx.argtypes = [ct.c_void_p]

@@ -2327,6 +2327,7 @@ class DTWAINAPI
    DTWAIN_DLG_HIGHLIGHTFIRST = 8192
    DTWAIN_DLG_SAVELASTSCREENPOS = 16384
    DTWAIN_DLG_CENTER_CURRENT_MONITOR = 32768
+   DTWAIN_DLG_CONSOLEASPARENT = 65536
    DTWAIN_RES_ENGLISH = 0
    DTWAIN_RES_FRENCH = 1
    DTWAIN_RES_SPANISH = 2
@@ -3232,7 +3233,7 @@ class DTWAINAPI
        @DTWAIN_EnumSources = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumSources'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_EnumSourcesEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumSourcesEx'],[],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumSupportedCaps = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumSupportedCaps'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
-       @DTWAIN_EnumSupportedCapsEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumSupportedCapsEx'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
+       @DTWAIN_EnumSupportedCapsEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumSupportedCapsEx'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumSupportedCapsEx2 = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumSupportedCapsEx2'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)
        @DTWAIN_EnumSupportedExtImageInfo = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumSupportedExtImageInfo'],[Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP],Fiddle::TYPE_INT)
        @DTWAIN_EnumSupportedExtImageInfoEx = Fiddle::Function::new(dtwain_dll['DTWAIN_EnumSupportedExtImageInfoEx'],[Fiddle::TYPE_VOIDP],Fiddle::TYPE_VOIDP)

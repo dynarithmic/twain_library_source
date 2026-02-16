@@ -1225,6 +1225,7 @@ module TwainAPI =
     let public DTWAIN_DLG_HIGHLIGHTFIRST = 8192
     let public DTWAIN_DLG_SAVELASTSCREENPOS = 16384
     let public DTWAIN_DLG_CENTER_CURRENT_MONITOR = 32768
+    let public DTWAIN_DLG_CONSOLEASPARENT = 65536
     let public DTWAIN_RES_ENGLISH = 0
     let public DTWAIN_RES_FRENCH = 1
     let public DTWAIN_RES_SPANISH = 2
@@ -2610,7 +2611,7 @@ module TwainAPI =
     type DTWAIN_EnumSupportedCapsDelegate = delegate of DTWAIN_SOURCE * DTWAIN_ARRAY byref -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
-    type DTWAIN_EnumSupportedCapsExDelegate = delegate of DTWAIN_SOURCE * DTWAIN_ARRAY byref -> DTWAIN_BOOL
+    type DTWAIN_EnumSupportedCapsExDelegate = delegate of DTWAIN_SOURCE -> DTWAIN_ARRAY
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_EnumSupportedCapsEx2Delegate = delegate of DTWAIN_SOURCE -> DTWAIN_ARRAY
@@ -6066,9 +6067,9 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         EnumSupportedCaps.Value.Invoke(source, &parray)
 
-    let DTWAIN_EnumSupportedCapsEx (source: DTWAIN_SOURCE) (parray: DTWAIN_ARRAY byref) : DTWAIN_BOOL =
+    let DTWAIN_EnumSupportedCapsEx (source: DTWAIN_SOURCE) : DTWAIN_ARRAY =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
-        EnumSupportedCapsEx.Value.Invoke(source, &parray)
+        EnumSupportedCapsEx.Value.Invoke(source)
 
     let DTWAIN_EnumSupportedCapsEx2 (source: DTWAIN_SOURCE) : DTWAIN_ARRAY =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
