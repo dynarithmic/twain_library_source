@@ -1412,6 +1412,7 @@ DTWAIN DLL are not displayed */
 #define DTWAIN_DLG_HIGHLIGHTFIRST       8192
 #define DTWAIN_DLG_SAVELASTSCREENPOS    16384
 #define DTWAIN_DLG_CENTER_CURRENT_MONITOR 32768
+#define DTWAIN_DLG_CONSOLEASPARENT     65536
 
 /* DTWAIN Language resource constants */
 #define DTWAIN_RES_ENGLISH              0
