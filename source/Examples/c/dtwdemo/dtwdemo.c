@@ -617,6 +617,10 @@ void GenericAcquire(LONG nWhichOne)
         DTWAIN_DestroyAcquisitionArray(g_AcquireArray, FALSE);
         return;
     }
+
+	DTWAIN_ArrayDumpToLog(g_AcquireArray);
+    DTWAIN_ARRAY arr = DTWAIN_GetAcquiredImageArray(g_AcquireArray, 0);
+	DTWAIN_ArrayDumpToLog(arr);
     RetrieveAndDisplayDibs(g_hInstance, g_AcquireArray, IDD_dlgDib, g_hWnd);
     DTWAIN_DestroyAcquisitionArray( g_AcquireArray, FALSE );
 }

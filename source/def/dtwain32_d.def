@@ -1138,4 +1138,4 @@ DTWAIN_ArrayGetAtLongEx                           @31167
 DTWAIN_ArrayGetAtLong64Ex                         @31168
 DTWAIN_ArrayGetAtFloatEx                          @31169
 DTWAIN_EnumOCRInterfacesEx                        @31170
-
+DTWAIN_ArrayDumpToLog                             @31171

@@ -63,6 +63,21 @@ struct StreamerImplNativeString
     }
 };
 
+struct StreamerImplTwainSource
+{
+	CTL_OutputBaseStreamType* m_pStrm;
+	size_t* m_pCurItem;
+	StreamerImplTwainSource(CTL_OutputBaseStreamType* strm, size_t* curItem) : m_pStrm(strm), m_pCurItem(curItem) { *curItem = 0; }
+
+	void operator()(CTL_ITwainSource* pPtr) const
+	{
+        if (pPtr)
+            *m_pStrm << _T("Source ") << *m_pCurItem + 1 << _T(": ") << 
+            StringConversion::Convert_Ansi_To_Native(pPtr->GetTwainIdentity().get_product_name()) << "\n";
+		++*m_pCurItem;
+	}
+};
+
 template <typename T, typename StreamFn = StreamerImpl<T> >
 struct oStreamer
 {
@@ -124,6 +139,22 @@ static void DumpArrayFLOAT(DTWAIN_ARRAY Array)
 {
     genericDumper<CTL_ArrayFactory::tagged_array_double>(Array);
 }
+
+static void DumpArrayAcquisitions(DTWAIN_ARRAY Array)
+{
+	genericDumper<CTL_ArrayFactory::tagged_array_tagged_array_voidptr>(Array);
+}
+
+static void DumpArrayHandles(DTWAIN_ARRAY Array)
+{
+	genericDumper<CTL_ArrayFactory::tagged_array_voidptr>(Array);
+}
+
+static void DumpArrayLONG64(DTWAIN_ARRAY Array)
+{
+	genericDumper<CTL_ArrayFactory::tagged_array_long64>(Array);
+}
+
 static void DumpArrayWideString(DTWAIN_ARRAY Array);
 static void DumpArrayAnsiString(DTWAIN_ARRAY Array);
 
@@ -168,6 +199,16 @@ static void DumpArrayFrame(DTWAIN_ARRAY Array)
     CTL_StringStreamType strm;
     std::for_each(vData.begin(), vData.end(), StreamerImplFrame(&strm, &n));
     LogWriterUtils::WriteMultiLineInfoIndented(strm.str(), _T("\n"));
+}
+
+static void DumpSourceNames(DTWAIN_ARRAY Array)
+{
+	const auto pHandle = static_cast<CTL_TwainDLLHandle*>(GetDTWAINHandle_Internal());
+	const auto& vData = pHandle->m_ArrayFactory->underlying_container_t<CTL_ITwainSource*>(Array);
+	size_t n;
+	CTL_StringStreamType strm;
+	std::for_each(vData.begin(), vData.end(), StreamerImplTwainSource(&strm, &n));
+	LogWriterUtils::WriteMultiLineInfoIndented(strm.str(), _T("\n"));
 }
 
 void dynarithmic::DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap)
@@ -231,5 +272,21 @@ void dynarithmic::DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap)
         case DTWAIN_ARRAYFRAME:
             DumpArrayFrame(Array);
             break;
+
+        case DTWAIN_ARRAYLONG64:
+            DumpArrayLONG64(Array);
+            break;
+
+        case DTWAIN_ARRAYSOURCE:
+            DumpSourceNames(Array);
+            break;
+
+        case DTWAIN_ARRAYOFHANDLEARRAYS:
+            DumpArrayAcquisitions(Array);
+            break;
+
+		case DTWAIN_ARRAYHANDLE:
+			DumpArrayHandles(Array);
+			break;
     }
 }
