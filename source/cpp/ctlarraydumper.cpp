@@ -211,9 +211,16 @@ static void DumpSourceNames(DTWAIN_ARRAY Array)
 	LogWriterUtils::WriteMultiLineInfoIndented(strm.str(), _T("\n"));
 }
 
-void dynarithmic::DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap)
+void dynarithmic::DumpArrayContents(DTWAIN_ARRAY Array, LONG lCap, bool anyLogFlags)
 {
-    if ( !(CTL_StaticData::GetLogFilterFlags() & DTWAIN_LOG_MISCELLANEOUS ))
+    auto logFlags = CTL_StaticData::GetLogFilterFlags();
+    bool doArrayDump = false;
+    if (logFlags && anyLogFlags)
+        doArrayDump = true;
+    else
+    if ( logFlags & DTWAIN_LOG_MISCELLANEOUS )
+        doArrayDump = true;
+    if ( !doArrayDump )
         return;
 
     std::string szBuf;
