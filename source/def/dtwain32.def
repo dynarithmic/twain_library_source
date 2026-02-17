@@ -1137,3 +1137,4 @@ DTWAIN_RotateDIBStringW                           @31166
 DTWAIN_ArrayGetAtLongEx                           @31167
 DTWAIN_ArrayGetAtLong64Ex                         @31168
 DTWAIN_ArrayGetAtFloatEx                          @31169
+DTWAIN_EnumOCRInterfacesEx                        @31170
