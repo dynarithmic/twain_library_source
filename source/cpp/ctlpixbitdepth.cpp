@@ -221,7 +221,6 @@ DTWAIN_ARRAY DLLENTRY_DEF DTWAIN_EnumBitDepthsEx2(DTWAIN_SOURCE Source, LONG Pix
 {
     LOG_FUNC_ENTRY_PARAMS((Source, PixelType))
     auto [pHandle, pSource] = VerifyHandles(Source);
-    DTWAIN_ARRAY theArray = {};
     if (pSource->IsPixelTypeSupported(PixelType) )
     {
 		auto retVal = CreateArrayFromFactory(pHandle, DTWAIN_ARRAYLONG, 0);
