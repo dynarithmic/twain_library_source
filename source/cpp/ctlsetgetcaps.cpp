@@ -120,12 +120,12 @@ static DTWAIN_ARRAY PerformGetCap(CTL_ITwainSource* pSource,
     if (lContainerType == DTWAIN_CONTONEVALUE)
     {
         bOk = GetOneCapValue<DataType>(pHandle,
-                                        pSource,
-                                        static_cast<UINT>(lCap),
-                                        static_cast<TW_UINT16>(lGetType),
-                                        oneCapFlag,
-                                        &dValue,
-                                        static_cast<TW_UINT16>(overrideDataType));
+                                       pSource,
+                                       static_cast<UINT>(lCap),
+                                       static_cast<TW_UINT16>(lGetType),
+                                       oneCapFlag,
+                                       &dValue,
+                                       static_cast<TW_UINT16>(overrideDataType));
         if (!bOk)
             return nullptr;
 
@@ -404,11 +404,17 @@ bool GetCapValuesEx_Internal( CTL_ITwainSource* pSource, TW_UINT16 lCap, LONG lG
                 SetCapabilityInfo<CAPINFO_IDX_GETDEFAULTCONTAINER>(pHandle, pSource, lContainerType, lCap);
             break;
         }
+
+        // Set the data type used
         SetCapabilityInfo<CAPINFO_IDX_DATATYPE>(pHandle, pSource, nDataType, lCap);
     }
 
+	// Set the MSG_SETCONSTRAINT to the same container type if using MSG_GET, and the return was successful
+    if ( lGetType == MSG_GET )
+	    SetCapabilityInfo<CAPINFO_IDX_SETCONSTRAINTCONTAINER>(pHandle, pSource, lContainerType, lCap);
+
     MoveArray(pHandle, pArray, &ThisArray); 
-    DumpArrayContents(*pArray, lCap);
+    dynarithmic::DumpArrayContents(*pArray, lCap);
     LOG_FUNC_EXIT_NONAME_PARAMS(true)
     CATCH_BLOCK(false)
 }

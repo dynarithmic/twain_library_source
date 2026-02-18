@@ -78,11 +78,7 @@ static LONG PerformCapContainerTest(CTL_TwainDLLHandle* pHandle, CTL_ITwainSourc
         return lResults;  // This is a single container type
 
     // Multiple container options exist for this cap or we have no idea (a custom cap).  Use TWAIN to get the best container type now
-    lResults = CTL_TwainAppMgr::DoCapContainerTest(pHandle, pSource, static_cast<TW_UINT16 >(nCap), lCapType);
-
-    // Replace container information with the updated information
-    std::get<CapInfoIdx>(*CapInfo) = lResults;
-    return lResults;
+    return CTL_TwainAppMgr::DoCapContainerTest(pHandle, pSource, static_cast<TW_UINT16 >(nCap), lCapType);
 }
 
 
@@ -131,38 +127,39 @@ LONG dynarithmic::GetCapContainer(CTL_ITwainSource* pSource, LONG nCap, LONG lCa
     const auto iter = pArray->find(static_cast<TW_UINT16>(nCap));
     if (iter != pArray->end())
     {
-        LONG lResults = 0;
         CTL_CapInfo* CapInfo = &iter->second;
-
         switch (lCapType)
         {
             case DTWAIN_CAPGET:
+            // We need to match up the MSG_GET container with the MSG_SETCONSTRAINT container
+			case DTWAIN_CAPSETAVAILABLE:
+			case DTWAIN_CAPSETCONSTRAINT:
             {
-                lResults = PerformCapContainerTest<CAPINFO_IDX_GETCONTAINER>(pHandle, pSource, nCap, lCapType, CapInfo);
-                return lResults;
+                return PerformCapContainerTest<CAPINFO_IDX_GETCONTAINER>(pHandle, pSource, nCap, MSG_GET, CapInfo);
             }
+            break;
 
             case DTWAIN_CAPGETCURRENT:
             {
-                lResults = PerformCapContainerTest<CAPINFO_IDX_GETCURRENTCONTAINER>(pHandle, pSource, nCap, lCapType, CapInfo);
-                return lResults;
+                return PerformCapContainerTest<CAPINFO_IDX_GETCURRENTCONTAINER>(pHandle, pSource, nCap, MSG_GETCURRENT, CapInfo);
             }
+            break;
+
             case DTWAIN_CAPGETDEFAULT:
             {
-                lResults = PerformCapContainerTest<CAPINFO_IDX_GETDEFAULTCONTAINER>(pHandle, pSource, nCap, lCapType, CapInfo);
-                return lResults;
+                return PerformCapContainerTest<CAPINFO_IDX_GETDEFAULTCONTAINER>(pHandle, pSource, nCap, MSG_GETDEFAULT, CapInfo);
             }
+            break;
 
             case DTWAIN_CAPSET:
             case DTWAIN_CAPSETCURRENT:
             {
+                if (nCap >= CAP_CUSTOMBASE)
+                {
+                    // We need to use the MSG_GET container type
+					return PerformCapContainerTest<CAPINFO_IDX_GETCONTAINER>(pHandle, pSource, nCap, MSG_GET, CapInfo);
+                }
                 return static_cast<LONG>(std::get<CAPINFO_IDX_SETCONTAINER>(*CapInfo));
-            }
-            break;
-            case DTWAIN_CAPSETAVAILABLE:
-            case DTWAIN_CAPSETCONSTRAINT:
-            {
-                return static_cast<LONG>(std::get<CAPINFO_IDX_SETCONSTRAINTCONTAINER>(*CapInfo));
             }
             break;
             case DTWAIN_CAPRESET:

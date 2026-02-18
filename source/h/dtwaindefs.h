@@ -251,11 +251,11 @@
 #define DTWAIN_CAPSET                6 /* Set one or more values                   */
 #define DTWAIN_CAPRESET              7 /* Set current value to default value       */
 #define DTWAIN_CAPRESETALL           8 /* Reset all capabilities */
-#define DTWAIN_CAPSETCONSTRAINT      9 /* constrain values */
 
 #define DTWAIN_CAPGETHELP            9
 #define DTWAIN_CAPGETLABEL           10
 #define DTWAIN_CAPGETLABELENUM       11
+#define DTWAIN_CAPSETCONSTRAINT      12 /* constrain values */
 
 /* The following values are ORed with the DTWAIN_CAPSET value */
 #define DTWAIN_CAPSETAVAILABLE       8  /* Sets available values  */
