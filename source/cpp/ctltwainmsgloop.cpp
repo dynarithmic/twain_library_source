@@ -36,7 +36,7 @@ static bool DTWAIN_ShouldUseGetMessage()
 {
 	MSG msg;
 
-	// 1) If no window belongs to this thread, likely script host
+    // 1) If no window belongs to this thread, likely script host
 	DWORD thisThread = GetCurrentThreadId();
 	bool hasWindow = false;
 
@@ -51,20 +51,22 @@ static bool DTWAIN_ShouldUseGetMessage()
 	if (!hasWindow)
 		return true; // safer to block
 
-	// 2) Probe PeekMessage responsiveness
-	DWORD start = GetTickCount();
 
-	while (GetTickCount() - start < 50) // 50 ms probe
+    // 2) Probe message responsiveness WITHOUT timing
+	constexpr int kProbeCount = 3;  // small, deterministic
+
+	for (int i = 0; i < kProbeCount; ++i)
 	{
 		if (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
-			return false; // messages flow normally so Peek is safe
+			return false; // messages are flowing, so PeekMessage loop OK
 
-		WaitMessage(); // yield cooperatively
+		WaitMessage(); // cooperative yield (debugger-safe)
 	}
 
-	// No messages appeared, likely host needs GetMessage
+	// No messages after several real waits, so prefer GetMessage
 	return true;
 }
+
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnablePeekMessageLoop(DTWAIN_SOURCE Source, BOOL bSet)
 {
