@@ -246,16 +246,34 @@ LRESULT CALLBACK DisplayTestCapProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
                 {
                     if (nNotification == CBN_SELCHANGE)
                     {
+						HWND hWndTestSet = GetDlgItem(hDlg, IDC_btnTestSet);
+						EnableWindow(hWndTestSet, TRUE);
 						TCHAR szGetType[100];
-                        /* This is the MSG_RESET */
-                        LRESULT nCurSel = SendMessage(GetDlgItem(hDlg, IDC_cmbSetTypes), CB_GETCURSEL, 0, 0);
+						/* This is the MSG_RESET */
+						LRESULT nCurSel = SendMessage(GetDlgItem(hDlg, IDC_cmbSetTypes), CB_GETCURSEL, 0, 0);
 						SendMessage(GetDlgItem(hDlg, IDC_cmbSetTypes), CB_GETLBTEXT, nCurSel, (LPARAM)szGetType);
 						SetTestSelection2(hDlg, szGetType, curCapValue);
-                        if (nCurSel == 1)
-                            EnableSetCapWindows(hDlg, FALSE);
-                        else
-                            EnableSetCapWindows(hDlg, TRUE);
-                    }
+						if (nCurSel == 1)
+						{
+							EnableSetCapWindows(hDlg, FALSE);
+							break;
+						}
+						else
+							EnableSetCapWindows(hDlg, TRUE);
+
+						/* Now test for MSG_SETCONSTRAINT */
+						if (nCurSel == 2)
+						{
+							LONG opts;
+							DTWAIN_GetCapOperations(g_CurrentSource, curCapValue, &opts);
+							if (!(opts & DTWAIN_CO_SETCONSTRAINT))
+							{
+								// Disable controls for constraint, including t
+								EnableSetCapWindows(hDlg, FALSE);
+                                EnableWindow(hWndTestSet, FALSE);
+							}
+						}
+					}
                 }
                 break;
 
