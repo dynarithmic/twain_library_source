@@ -246,8 +246,11 @@ LRESULT CALLBACK DisplayTestCapProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
                 {
                     if (nNotification == CBN_SELCHANGE)
                     {
+						TCHAR szGetType[100];
                         /* This is the MSG_RESET */
                         LRESULT nCurSel = SendMessage(GetDlgItem(hDlg, IDC_cmbSetTypes), CB_GETCURSEL, 0, 0);
+						SendMessage(GetDlgItem(hDlg, IDC_cmbSetTypes), CB_GETLBTEXT, nCurSel, (LPARAM)szGetType);
+						SetTestSelection2(hDlg, szGetType, curCapValue);
                         if (nCurSel == 1)
                             EnableSetCapWindows(hDlg, FALSE);
                         else
