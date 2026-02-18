@@ -325,12 +325,12 @@ Class DTWAINAPI
     Public Const DTWAIN_CAPSET As Integer = 6
     Public Const DTWAIN_CAPRESET As Integer = 7
     Public Const DTWAIN_CAPRESETALL As Integer = 8
-    Public Const DTWAIN_CAPSETCONSTRAINT As Integer = 9
     Public Const DTWAIN_CAPSETAVAILABLE As Integer = 8
     Public Const DTWAIN_CAPSETCURRENT As Integer = 16
     Public Const DTWAIN_CAPGETHELP As Integer = 9
     Public Const DTWAIN_CAPGETLABEL As Integer = 10
     Public Const DTWAIN_CAPGETLABELENUM As Integer = 11
+    Public Const DTWAIN_CAPSETCONSTRAINT As Integer = 12
     Public Const DTWAIN_AREASET As Integer = DTWAIN_CAPSET
     Public Const DTWAIN_AREARESET As Integer = DTWAIN_CAPRESET
     Public Const DTWAIN_AREACURRENT As Integer = DTWAIN_CAPGETCURRENT
@@ -1790,6 +1790,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_ArrayCreateFromReals Lib "dtwain64ud.dll" (ByRef pCArray As System.Double, nSize As Integer) As System.IntPtr
     Public Declare Function DTWAIN_ArrayDestroy Lib "dtwain64ud.dll" (pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_ArrayDestroyFrames Lib "dtwain64ud.dll" (FrameArray As System.IntPtr) As Integer
+    Public Declare Function DTWAIN_ArrayDumpToLog Lib "dtwain64ud.dll" (pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_ArrayFind Lib "dtwain64ud.dll" (pArray As System.IntPtr, pVariant As System.IntPtr) As Integer
     Public Declare Ansi Function DTWAIN_ArrayFindANSIString Lib "dtwain64ud.dll" (pArray As System.IntPtr, pString As String) As Integer
     Public Declare Function DTWAIN_ArrayFindFloat Lib "dtwain64ud.dll" (pArray As System.IntPtr, Val As System.Double, Tolerance As System.Double) As Integer
@@ -1961,6 +1962,7 @@ Class DTWAINAPI
     Public Declare Function DTWAIN_EnumNoiseFilters Lib "dtwain64ud.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_EnumNoiseFiltersEx Lib "dtwain64ud.dll" (Source As System.IntPtr) As System.IntPtr
     Public Declare Function DTWAIN_EnumOCRInterfaces Lib "dtwain64ud.dll" (ByRef OCRInterfaces As System.IntPtr) As Integer
+    Public Declare Function DTWAIN_EnumOCRInterfacesEx Lib "dtwain64ud.dll" () As System.IntPtr
     Public Declare Function DTWAIN_EnumOCRSupportedCaps Lib "dtwain64ud.dll" (Engine As System.IntPtr, ByRef SupportedCaps As System.IntPtr) As Integer
     Public Declare Function DTWAIN_EnumOrientations Lib "dtwain64ud.dll" (Source As System.IntPtr, ByRef pArray As System.IntPtr) As Integer
     Public Declare Function DTWAIN_EnumOrientationsEx Lib "dtwain64ud.dll" (Source As System.IntPtr) As System.IntPtr

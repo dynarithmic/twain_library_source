@@ -378,12 +378,12 @@ namespace Dynarithmic
         public const int DTWAIN_CAPSET = 6;
         public const int DTWAIN_CAPRESET = 7;
         public const int DTWAIN_CAPRESETALL = 8;
-        public const int DTWAIN_CAPSETCONSTRAINT = 9;
         public const int DTWAIN_CAPSETAVAILABLE = 8;
         public const int DTWAIN_CAPSETCURRENT = 16;
         public const int DTWAIN_CAPGETHELP = 9;
         public const int DTWAIN_CAPGETLABEL = 10;
         public const int DTWAIN_CAPGETLABELENUM = 11;
+        public const int DTWAIN_CAPSETCONSTRAINT = 12;
         public const int DTWAIN_AREASET = DTWAIN_CAPSET;
         public const int DTWAIN_AREARESET = DTWAIN_CAPRESET;
         public const int DTWAIN_AREACURRENT = DTWAIN_CAPGETCURRENT;
@@ -1936,6 +1936,9 @@ namespace Dynarithmic
         public static extern int DTWAIN_ArrayDestroyFrames(DTWAIN_ARRAY FrameArray);
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int DTWAIN_ArrayDumpToLog(DTWAIN_ARRAY pArray);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_ArrayFind(DTWAIN_ARRAY pArray, System.IntPtr pVariant);
 
         [DllImport(DTWAIN_LIBRARY, CharSet = CharSet.Ansi, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
@@ -2459,6 +2462,9 @@ namespace Dynarithmic
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_EnumOCRInterfaces(ref DTWAIN_ARRAY OCRInterfaces);
+
+        [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern DTWAIN_ARRAY DTWAIN_EnumOCRInterfacesEx();
 
         [DllImport(DTWAIN_LIBRARY,  ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern int DTWAIN_EnumOCRSupportedCaps(DTWAIN_OCRENGINE Engine, ref DTWAIN_ARRAY SupportedCaps);

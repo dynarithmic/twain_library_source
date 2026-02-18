@@ -421,12 +421,12 @@ const
   DTWAIN_CAPSET = 6;
   DTWAIN_CAPRESET = 7;
   DTWAIN_CAPRESETALL = 8;
-  DTWAIN_CAPSETCONSTRAINT = 9;
   DTWAIN_CAPSETAVAILABLE = 8;
   DTWAIN_CAPSETCURRENT = 16;
   DTWAIN_CAPGETHELP = 9;
   DTWAIN_CAPGETLABEL = 10;
   DTWAIN_CAPGETLABELENUM = 11;
+  DTWAIN_CAPSETCONSTRAINT = 12;
   DTWAIN_AREASET = DTWAIN_CAPSET;
   DTWAIN_AREARESET = DTWAIN_CAPRESET;
   DTWAIN_AREACURRENT = DTWAIN_CAPGETCURRENT;
@@ -1901,6 +1901,7 @@ function DTWAIN_ArrayCreateFromStringsA(nSize:LONG) : DTWAIN_ARRAY; external 'dt
 function DTWAIN_ArrayCreateFromStringsW(nSize:LONG) : DTWAIN_ARRAY; external 'dtwain64.dll'  name 'DTWAIN_ArrayCreateFromStringsW';
 function DTWAIN_ArrayDestroy(pArray:DTWAIN_ARRAY) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_ArrayDestroy';
 function DTWAIN_ArrayDestroyFrames(FrameArray:DTWAIN_ARRAY) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_ArrayDestroyFrames';
+function DTWAIN_ArrayDumpToLog(pArray:DTWAIN_ARRAY) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_ArrayDumpToLog';
 function DTWAIN_ArrayFind(pArray:DTWAIN_ARRAY; pVariant:LPVOID) : LONG; external 'dtwain64.dll'  name 'DTWAIN_ArrayFind';
 function DTWAIN_ArrayFindANSIString(pArray:DTWAIN_ARRAY; pString:LPCSTR) : LONG; external 'dtwain64.dll'  name 'DTWAIN_ArrayFindANSIString';
 function DTWAIN_ArrayFindFloat(pArray:DTWAIN_ARRAY; Val:DTWAIN_FLOAT; Tolerance:DTWAIN_FLOAT) : LONG; external 'dtwain64.dll'  name 'DTWAIN_ArrayFindFloat';
@@ -2103,6 +2104,7 @@ function DTWAIN_EnumMaxBuffersEx(Source:DTWAIN_SOURCE; bExpandRange:BOOL) : DTWA
 function DTWAIN_EnumNoiseFilters(Source:DTWAIN_SOURCE; pArray:LPDTWAIN_ARRAY) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_EnumNoiseFilters';
 function DTWAIN_EnumNoiseFiltersEx(Source:DTWAIN_SOURCE) : DTWAIN_ARRAY; external 'dtwain64.dll'  name 'DTWAIN_EnumNoiseFiltersEx';
 function DTWAIN_EnumOCRInterfaces(OCRInterfaces:LPDTWAIN_ARRAY) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_EnumOCRInterfaces';
+function DTWAIN_EnumOCRInterfacesEx : DTWAIN_ARRAY; external 'dtwain64.dll'  name 'DTWAIN_EnumOCRInterfacesEx';
 function DTWAIN_EnumOCRSupportedCaps(Engine:DTWAIN_OCRENGINE; SupportedCaps:LPDTWAIN_ARRAY) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_EnumOCRSupportedCaps';
 function DTWAIN_EnumOrientations(Source:DTWAIN_SOURCE; pArray:LPDTWAIN_ARRAY) : BOOL; external 'dtwain64.dll'  name 'DTWAIN_EnumOrientations';
 function DTWAIN_EnumOrientationsEx(Source:DTWAIN_SOURCE) : DTWAIN_ARRAY; external 'dtwain64.dll'  name 'DTWAIN_EnumOrientationsEx';

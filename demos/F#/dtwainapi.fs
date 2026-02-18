@@ -381,12 +381,12 @@ module TwainAPI =
     let public DTWAIN_CAPSET = 6
     let public DTWAIN_CAPRESET = 7
     let public DTWAIN_CAPRESETALL = 8
-    let public DTWAIN_CAPSETCONSTRAINT = 9
     let public DTWAIN_CAPSETAVAILABLE = 8
     let public DTWAIN_CAPSETCURRENT = 16
     let public DTWAIN_CAPGETHELP = 9
     let public DTWAIN_CAPGETLABEL = 10
     let public DTWAIN_CAPGETLABELENUM = 11
+    let public DTWAIN_CAPSETCONSTRAINT = 12
     let public DTWAIN_AREASET = DTWAIN_CAPSET
     let public DTWAIN_AREARESET = DTWAIN_CAPRESET
     let public DTWAIN_AREACURRENT = DTWAIN_CAPGETCURRENT
@@ -1999,6 +1999,9 @@ module TwainAPI =
     type DTWAIN_ArrayDestroyFramesDelegate = delegate of DTWAIN_ARRAY -> DTWAIN_BOOL
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_ArrayDumpToLogDelegate = delegate of DTWAIN_ARRAY -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_ArrayFindDelegate = delegate of DTWAIN_ARRAY * LPVOID -> LONG
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Ansi)>]
@@ -2510,6 +2513,9 @@ module TwainAPI =
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_EnumOCRInterfacesDelegate = delegate of DTWAIN_ARRAY byref -> DTWAIN_BOOL
+
+    [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
+    type DTWAIN_EnumOCRInterfacesExDelegate = delegate of unit -> DTWAIN_ARRAY
 
     [<UnmanagedFunctionPointer(CallingConvention.StdCall )>]
     type DTWAIN_EnumOCRSupportedCapsDelegate = delegate of DTWAIN_OCRENGINE * DTWAIN_ARRAY byref -> DTWAIN_BOOL
@@ -4285,6 +4291,7 @@ module TwainAPI =
     let private ArrayCreateFromReals = lazy (DynamicDll.Bind "DTWAIN_ArrayCreateFromReals" : DTWAIN_ArrayCreateFromRealsDelegate)
     let private ArrayDestroy = lazy (DynamicDll.Bind "DTWAIN_ArrayDestroy" : DTWAIN_ArrayDestroyDelegate)
     let private ArrayDestroyFrames = lazy (DynamicDll.Bind "DTWAIN_ArrayDestroyFrames" : DTWAIN_ArrayDestroyFramesDelegate)
+    let private ArrayDumpToLog = lazy (DynamicDll.Bind "DTWAIN_ArrayDumpToLog" : DTWAIN_ArrayDumpToLogDelegate)
     let private ArrayFind = lazy (DynamicDll.Bind "DTWAIN_ArrayFind" : DTWAIN_ArrayFindDelegate)
     let private ArrayFindANSIString = lazy (DynamicDll.Bind "DTWAIN_ArrayFindANSIString" : DTWAIN_ArrayFindANSIStringDelegate)
     let private ArrayFindFloat = lazy (DynamicDll.Bind "DTWAIN_ArrayFindFloat" : DTWAIN_ArrayFindFloatDelegate)
@@ -4456,6 +4463,7 @@ module TwainAPI =
     let private EnumNoiseFilters = lazy (DynamicDll.Bind "DTWAIN_EnumNoiseFilters" : DTWAIN_EnumNoiseFiltersDelegate)
     let private EnumNoiseFiltersEx = lazy (DynamicDll.Bind "DTWAIN_EnumNoiseFiltersEx" : DTWAIN_EnumNoiseFiltersExDelegate)
     let private EnumOCRInterfaces = lazy (DynamicDll.Bind "DTWAIN_EnumOCRInterfaces" : DTWAIN_EnumOCRInterfacesDelegate)
+    let private EnumOCRInterfacesEx = lazy (DynamicDll.Bind "DTWAIN_EnumOCRInterfacesEx" : DTWAIN_EnumOCRInterfacesExDelegate)
     let private EnumOCRSupportedCaps = lazy (DynamicDll.Bind "DTWAIN_EnumOCRSupportedCaps" : DTWAIN_EnumOCRSupportedCapsDelegate)
     let private EnumOrientations = lazy (DynamicDll.Bind "DTWAIN_EnumOrientations" : DTWAIN_EnumOrientationsDelegate)
     let private EnumOrientationsEx = lazy (DynamicDll.Bind "DTWAIN_EnumOrientationsEx" : DTWAIN_EnumOrientationsExDelegate)
@@ -5251,6 +5259,10 @@ module TwainAPI =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         ArrayDestroyFrames.Value.Invoke(framearray)
 
+    let DTWAIN_ArrayDumpToLog (parray: DTWAIN_ARRAY) : DTWAIN_BOOL =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        ArrayDumpToLog.Value.Invoke(parray)
+
     let DTWAIN_ArrayFind (parray: DTWAIN_ARRAY) (pvariant: LPVOID) : LONG =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         ArrayFind.Value.Invoke(parray, pvariant)
@@ -5934,6 +5946,10 @@ module TwainAPI =
     let DTWAIN_EnumOCRInterfaces (ocrinterfaces: DTWAIN_ARRAY byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"
         EnumOCRInterfaces.Value.Invoke(&ocrinterfaces)
+
+    let DTWAIN_EnumOCRInterfacesEx() : DTWAIN_ARRAY =
+        if not IsLoaded then failwith "Call TwainAPI.Load first"
+        EnumOCRInterfacesEx.Value.Invoke()
 
     let DTWAIN_EnumOCRSupportedCaps (engine: DTWAIN_OCRENGINE) (supportedcaps: DTWAIN_ARRAY byref) : DTWAIN_BOOL =
         if not IsLoaded then failwith "Call TwainAPI.Load first"

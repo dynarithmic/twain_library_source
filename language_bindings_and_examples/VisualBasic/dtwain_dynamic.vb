@@ -496,12 +496,12 @@ Namespace Dynarithmic
         Public Const DTWAIN_CAPSET As Integer = 6
         Public Const DTWAIN_CAPRESET As Integer = 7
         Public Const DTWAIN_CAPRESETALL As Integer = 8
-        Public Const DTWAIN_CAPSETCONSTRAINT As Integer = 9
         Public Const DTWAIN_CAPSETAVAILABLE As Integer = 8
         Public Const DTWAIN_CAPSETCURRENT As Integer = 16
         Public Const DTWAIN_CAPGETHELP As Integer = 9
         Public Const DTWAIN_CAPGETLABEL As Integer = 10
         Public Const DTWAIN_CAPGETLABELENUM As Integer = 11
+        Public Const DTWAIN_CAPSETCONSTRAINT As Integer = 12
         Public Const DTWAIN_AREASET As Integer = DTWAIN_CAPSET
         Public Const DTWAIN_AREARESET As Integer = DTWAIN_CAPRESET
         Public Const DTWAIN_AREACURRENT As Integer = DTWAIN_CAPGETCURRENT
@@ -2062,6 +2062,9 @@ Namespace Dynarithmic
         Private Delegate Function DTWAIN_ArrayDestroyFramesDelegate(FrameArray As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_ArrayDumpToLogDelegate(pArray As System.IntPtr) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_ArrayFindDelegate(pArray As System.IntPtr, pVariant As System.IntPtr) As Integer
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet:=CharSet.Ansi)>
@@ -2573,6 +2576,9 @@ Namespace Dynarithmic
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_EnumOCRInterfacesDelegate(ByRef OCRInterfaces As System.IntPtr) As Integer
+        
+        <UnmanagedFunctionPointer(CallingConvention.StdCall)>
+        Private Delegate Function DTWAIN_EnumOCRInterfacesExDelegate() As System.IntPtr
         
         <UnmanagedFunctionPointer(CallingConvention.StdCall)>
         Private Delegate Function DTWAIN_EnumOCRSupportedCapsDelegate(Engine As System.IntPtr, ByRef SupportedCaps As System.IntPtr) As Integer
@@ -4510,6 +4516,10 @@ Namespace Dynarithmic
         Return api.DTWAIN_ArrayDestroyFrames(FrameArray)
         End Function
         
+        Public Function DTWAIN_ArrayDumpToLog(pArray As System.IntPtr) As Integer
+        Return api.DTWAIN_ArrayDumpToLog(pArray)
+        End Function
+        
         Public Function DTWAIN_ArrayFind(pArray As System.IntPtr, pVariant As System.IntPtr) As Integer
         Return api.DTWAIN_ArrayFind(pArray, pVariant)
         End Function
@@ -5192,6 +5202,10 @@ Namespace Dynarithmic
         
         Public Function DTWAIN_EnumOCRInterfaces(ByRef OCRInterfaces As System.IntPtr) As Integer
         Return api.DTWAIN_EnumOCRInterfaces(OCRInterfaces)
+        End Function
+        
+        Public Function DTWAIN_EnumOCRInterfacesEx() As System.IntPtr
+        Return api.DTWAIN_EnumOCRInterfacesEx()
         End Function
         
         Public Function DTWAIN_EnumOCRSupportedCaps(Engine As System.IntPtr, ByRef SupportedCaps As System.IntPtr) As Integer
@@ -7560,6 +7574,7 @@ Namespace Dynarithmic
             Public DTWAIN_ArrayCreateFromReals As DTWAIN_ArrayCreateFromRealsDelegate
             Public DTWAIN_ArrayDestroy As DTWAIN_ArrayDestroyDelegate
             Public DTWAIN_ArrayDestroyFrames As DTWAIN_ArrayDestroyFramesDelegate
+            Public DTWAIN_ArrayDumpToLog As DTWAIN_ArrayDumpToLogDelegate
             Public DTWAIN_ArrayFind As DTWAIN_ArrayFindDelegate
             Public DTWAIN_ArrayFindANSIString As DTWAIN_ArrayFindANSIStringDelegate
             Public DTWAIN_ArrayFindFloat As DTWAIN_ArrayFindFloatDelegate
@@ -7731,6 +7746,7 @@ Namespace Dynarithmic
             Public DTWAIN_EnumNoiseFilters As DTWAIN_EnumNoiseFiltersDelegate
             Public DTWAIN_EnumNoiseFiltersEx As DTWAIN_EnumNoiseFiltersExDelegate
             Public DTWAIN_EnumOCRInterfaces As DTWAIN_EnumOCRInterfacesDelegate
+            Public DTWAIN_EnumOCRInterfacesEx As DTWAIN_EnumOCRInterfacesExDelegate
             Public DTWAIN_EnumOCRSupportedCaps As DTWAIN_EnumOCRSupportedCapsDelegate
             Public DTWAIN_EnumOrientations As DTWAIN_EnumOrientationsDelegate
             Public DTWAIN_EnumOrientationsEx As DTWAIN_EnumOrientationsExDelegate
