@@ -220,20 +220,11 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCustomCaps(DTWAIN_SOURCE Source, LPDTWAIN_AR
 
 static LONG GetCapOperationsInternal(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource* pSource, LONG lCapability)
 {
-    LONG nOps = 0;
     CTL_CapInfo* CapInfo = GetCapInfo(pHandle, pSource, static_cast<TW_UINT16>(lCapability));
     if (!CapInfo)
         return 0;
-    nOps = std::get<CAPINFO_IDX_SUPPORTEDOPS>(*CapInfo);
-    if (nOps == 0)
-    {
-        // Try and get the operations now from TWAIN
-        nOps = CTL_TwainAppMgr::GetCapOps(pSource, lCapability, true);
-        if (nOps != 0)
-            // Replace 0 with what TWAIN found out about the supported operations
-            std::get<CAPINFO_IDX_SUPPORTEDOPS>(*CapInfo) = nOps;
-    }
-    return nOps;
+    // Try and get the operations now from TWAIN
+    return CTL_TwainAppMgr::GetCapOps(pSource, lCapability, true);
 }
 
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCapability, LPLONG  lpOps)
