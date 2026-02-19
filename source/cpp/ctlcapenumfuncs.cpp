@@ -227,6 +227,15 @@ static LONG GetCapOperationsInternal(CTL_TwainDLLHandle* pHandle, const CTL_ITwa
     return CTL_TwainAppMgr::GetCapOps(pSource, lCapability, true);
 }
 
+LONG DLLENTRY_DEF DTWAIN_GetCapOperationsEx(DTWAIN_SOURCE Source, LONG lCapability)
+{
+    LOG_FUNC_ENTRY_PARAMS((Source, lCapability))
+    LONG val = 0;
+    DTWAIN_GetCapOperations(Source, lCapability, &val);
+	LOG_FUNC_EXIT_NONAME_PARAMS(val)
+	CATCH_BLOCK(0)
+}
+
 DTWAIN_BOOL DLLENTRY_DEF DTWAIN_GetCapOperations(DTWAIN_SOURCE Source, LONG lCapability, LPLONG  lpOps)
 {
     LOG_FUNC_ENTRY_PARAMS((Source, lCapability, lpOps))
