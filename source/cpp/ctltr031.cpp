@@ -368,24 +368,10 @@ TW_UINT16 CTL_ImageMemXferTriplet::Execute()
                             }
 
                             CurDib->FlipBitMap(m_nPixelType == TWPT_RGB?1:0);
-                            auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
-
                             m_hDataHandle = CurDib->GetHandle();
+
                             // Callback function for access to change DIB
-                            if ( sessionHandle->m_pDibUpdateProc != nullptr)
-                            {
-                                const HANDLE hRetDib =
-                                    (sessionHandle->m_pDibUpdateProc)
-                                            (pSource, static_cast<int>(nCurImage), m_hDataHandle);
-                                if ( hRetDib && hRetDib != m_hDataHandle)
-                                {
-                                    // Application changed DIB.  So make this the current dib
-                                    ImageMemoryHandler::GlobalFree( m_hDataHandle );
-                                    m_hDataHandle = hRetDib;
-                                    pSource->SetDibHandle( m_hDataHandle, nLastDib );
-                                    CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr,DTWAIN_TN_APPUPDATEDDIB, reinterpret_cast<LPARAM>(pSource));
-                                }
-                            }
+                            ProcessUserUpdatingDIB(nCurImage);
 
                             // Change bpp if necessary
                             if (bProcessDibEx)

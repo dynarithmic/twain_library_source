@@ -295,25 +295,8 @@ TW_UINT16 CTL_ImageXferTriplet::Execute()
                     break;  // The page is discarded
                 }
 
-                auto sessionHandle = GetSessionPtr()->GetTwainDLLHandle();
-
                 // Callback function for access to change DIB
-                if (sessionHandle->m_pDibUpdateProc != nullptr && GetDAT() != DAT_AUDIONATIVEXFER)
-                {
-                    HANDLE hRetDib =
-                        (sessionHandle->m_pDibUpdateProc)
-                        (pSource, static_cast<LONG>(nLastDib), m_hDataHandle);
-                    if (hRetDib && hRetDib != m_hDataHandle)
-                    {
-                        // Application changed DIB.  So make this the current dib
-                        #ifdef _WIN32
-                        GlobalFree(m_hDataHandle);
-                        #endif
-                        m_hDataHandle = hRetDib;
-                        pSource->SetDibHandle(m_hDataHandle, nLastDib);
-                        CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_APPUPDATEDDIB, reinterpret_cast<LPARAM>(pSource));
-                    }
-                }
+                ProcessUserUpdatingDIB(nLastDib);
 
                 // Change bpp if necessary
                 if (bProcessDibEx && GetDAT() != DAT_AUDIONATIVEXFER)
@@ -1575,6 +1558,28 @@ void CTL_ImageXferTriplet::SetBufferedTransfer(bool bSet)
 bool CTL_ImageXferTriplet::IsBufferedTransfer() const
 {
     return m_IsBuffered;
+}
+
+void CTL_ImageXferTriplet::ProcessUserUpdatingDIB(size_t nLastDib)
+{
+    CTL_ITwainSession* pSession = GetSessionPtr();
+    CTL_ITwainSource* pSource = GetSourcePtr();
+    auto sessionHandle = pSource->GetDTWAINHandle();
+
+	if (sessionHandle->m_pDibUpdateProc != nullptr && GetDAT() != DAT_AUDIONATIVEXFER)
+    {
+        HANDLE hRetDib = (sessionHandle->m_pDibUpdateProc)(pSource, static_cast<LONG>(nLastDib), m_hDataHandle);
+        if (hRetDib && hRetDib != m_hDataHandle)
+        {
+            // Application changed DIB.  So make this the current dib
+            #ifdef _WIN32
+	        ImageMemoryHandler::GlobalFree(m_hDataHandle);
+            #endif
+	        m_hDataHandle = hRetDib;
+	        pSource->SetDibHandle(m_hDataHandle, nLastDib);
+	        CTL_TwainAppMgr::SendTwainMsgToWindow(pSession, nullptr, DTWAIN_TN_APPUPDATEDDIB, reinterpret_cast<LPARAM>(pSource));
+        }
+    }
 }
 
 bool IsState7InfoNeeded(CTL_ITwainSource *pSource)
