@@ -47,6 +47,7 @@
 #include "ctltripletbase.h"
 #include "ctlconstexprutils.h"
 #include "ctlstringutils.h"
+#include "ctlsetgetcaps.h"
 
 using namespace dynarithmic;
 
@@ -1838,18 +1839,31 @@ void CTL_TwainAppMgr::GetExtendedCapabilities(const CTL_ITwainSource *pSource, C
     GetMultiValuesImpl<CTL_IntArray, TW_UINT16>::GetMultipleTwainCapValues(pSource, rArray, CAP_EXTENDEDCAPS, TWTY_UINT16, TwainContainer_ARRAY);
 }
 
-UINT CTL_TwainAppMgr::GetCapOps(const CTL_ITwainSource *pSource, int nCap, bool bCanQuery)
+UINT CTL_TwainAppMgr::GetCapOps(CTL_ITwainSource *pSource, int nCap, bool bCanQuery)
 {
     UINT nOps = 0;
     if ( bCanQuery )
         nOps = GetCapabilityOperations(pSource, nCap).GetSupport();
 
+    // Cannot query the support if nOps is 0
     if ( nOps == 0 )
     {
-        const UINT nContainer = GetContainerTypesFromCap( static_cast<TW_UINT16>(nCap), 1 );
-        nOps = 0xFFFF;
-        if ( !nContainer )
-            nOps = 0xFFFF & ~(TWQC_SET | TWQC_RESET);
+        // Fall back to the table of hard-coded container types
+        const CTL_CapStruct cStruct = GetGeneralCapInfo(nCap);
+        // Build the bit string from the cap info
+        if (cStruct.m_nGetContainer)
+            nOps |= TWQC_GET;
+        if (cStruct.m_nGetCurrentContainer)
+            nOps |= TWQC_GETCURRENT;
+        if (cStruct.m_nGetDefaultContainer)
+            nOps |= TWQC_GETDEFAULT;
+        if (cStruct.m_nSetContainer)
+            nOps |= TWQC_SET;
+        if (cStruct.m_nResetContainer)
+            nOps |= TWQC_RESET;
+        // We can't assume TWQC_SETCONSTRAINT, so client app is solely
+        // responsible if they attempt MSG_SETCONSTRAINT as a set type
+        // when setting a capability.
     }
     return nOps;
 }
@@ -1869,9 +1883,7 @@ CTL_CapabilityQueryTriplet CTL_TwainAppMgr::GetCapabilityOperations(const CTL_IT
         return { nullptr, nullptr, 0 };
 
     CTL_CapabilityQueryTriplet QT(pSession, pTempSource, static_cast<TW_UINT16>(nCap));
-    const TW_UINT16 rc = QT.Execute();
-    if (rc != TWRC_SUCCESS)
-        return { nullptr, nullptr, 0 };
+    QT.Execute();
     return QT;
 }
 

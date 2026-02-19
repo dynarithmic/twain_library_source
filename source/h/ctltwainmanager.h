@@ -152,7 +152,7 @@ namespace dynarithmic
 
             static void GetExtendedCapabilities(const CTL_ITwainSource *pSource, CTL_IntArray& rArray);
 
-            static UINT GetCapOps(const CTL_ITwainSource *pSource, int nCap, bool bCanQuery); // Does extra checking here
+            static UINT GetCapOps(CTL_ITwainSource *pSource, int nCap, bool bCanQuery); // Does extra checking here
 
             static CTL_CapabilityQueryTriplet GetCapabilityOperations(const CTL_ITwainSource *pSource, // Uses the MSG_QUERYSUPPORT triplet
                                                                       int nCap);

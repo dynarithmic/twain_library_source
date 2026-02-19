@@ -429,6 +429,7 @@ bool dynarithmic::SetCapValuesEx2_Internal( CTL_ITwainSource* pSource, LONG lCap
     LOG_FUNC_ENTRY_PARAMS((pSource, lCap, lSetType, lContainerType, nDataType, pArray))
     auto pHandle = pSource->GetDTWAINHandle();
 
+	pHandle->m_lLastError = 0; // Reset the error code here
     bool bOk = false;
     CHECK_IF_CAP_SUPPORTED(pSource, pHandle, static_cast<TW_UINT16>(lCap), false)
 
@@ -530,7 +531,9 @@ bool dynarithmic::SetCapValuesEx2_Internal( CTL_ITwainSource* pSource, LONG lCap
             break; // get out now
         }
     }
-	DTWAIN_Check_Error_Condition_2_Ex(pHandle, [&] {return !bOk; }, DTWAIN_ERR_SETCAP_FAILED, false, FUNC_MACRO);
+	// Something happened to return FALSE.  Let's make the last TWAIN condition code the last error
+	DTWAIN_Check_Error_Condition_2_Ex(pHandle, [&] {return !bOk; },
+        (pHandle->m_lLastError != 0)?pHandle->m_lLastError:DTWAIN_ERR_SETCAP_FAILED, false, FUNC_MACRO);
     LOG_FUNC_EXIT_NONAME_PARAMS(bOk)
     CATCH_BLOCK(false)
 }

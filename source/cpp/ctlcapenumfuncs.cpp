@@ -218,7 +218,7 @@ DTWAIN_BOOL DLLENTRY_DEF DTWAIN_EnumCustomCaps(DTWAIN_SOURCE Source, LPDTWAIN_AR
     CATCH_BLOCK_LOG_PARAMS(false)
 }
 
-static LONG GetCapOperationsInternal(CTL_TwainDLLHandle* pHandle, const CTL_ITwainSource* pSource, LONG lCapability)
+static LONG GetCapOperationsInternal(CTL_TwainDLLHandle* pHandle, CTL_ITwainSource* pSource, LONG lCapability)
 {
     CTL_CapInfo* CapInfo = GetCapInfo(pHandle, pSource, static_cast<TW_UINT16>(lCapability));
     if (!CapInfo)
