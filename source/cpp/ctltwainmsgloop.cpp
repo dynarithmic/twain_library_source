@@ -193,7 +193,6 @@ struct ContinueLoopTraits
         TwainWatchdog wd{ GetTickCount(), 3000, false };
 
         DWORD lastTwainProgressTick = GetTickCount();
-		const DWORD timeoutMs = 3000;
 
         // Start the message loop.
         while (LoopTraits::ContinueLoop(&msg))
@@ -241,6 +240,7 @@ struct ContinueLoopTraits
 			// PeekMessage watchdog
 			if (LoopTraits::isPeekMsg)
 			{
+				const DWORD timeoutMs = 3000;
 				if (GetTickCount() - lastTwainProgressTick > timeoutMs)
 				{
 					// no progress for timeout, exit loop
